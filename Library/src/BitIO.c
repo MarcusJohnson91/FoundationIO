@@ -9,16 +9,6 @@ uint64_t FileSequence(int argc, char *argv, int WhichArg) {
     return 0;
 };
 
-/*!
- *  Check if argv[x] is a file or folder, if a folder work on shit.
- */
-uint64_t IdFileOrFolder() {
-    
-    return 0;
-};
-
-
-/*
 void OptionParser(int argc, char *argv, const char *OptString) {
     int GetOptCount = 0, InputArg = 0, OutputArg = 0;
     while ((GetOptCount = getopt(argc, &argv, OptString) != -1)) {
@@ -35,7 +25,7 @@ void OptionParser(int argc, char *argv, const char *OptString) {
                 // Folder input
                 InputArg  = GetOptCount;
                 FileSequence(argc, argv, InputArg);
-                DIR *InputFolder;
+                BitIO.InputDir;
                 break;
             case 'F':
                 // Folder input
@@ -60,27 +50,30 @@ void OptionParser(int argc, char *argv, const char *OptString) {
  *  Initalize BitIO for use. this must be done first
  */
 int64_t Init_BitIO(char *InputFile, const char *InputMode, char *OutputFile, const char *OutputMode) {
-    BitIO.InputFP                              = fopen(InputFile, InputMode);
-    BitIO.OutputFP                             = fopen(OutputFile, OutputMode);
+    uint64_t BytesRead = 0;
+    
+    BitIO.InputFP  = fopen(InputFile, InputMode);
+    BitIO.OutputFP = fopen(OutputFile, OutputMode);
     
     if (BitIO.InputFP == NULL) {
-        printf("InputFile is NULL\n");
+        fprintf(stderr, "InputFile is NULL\n");
         return -2;
     }
     if (BitIO.OutputFP == NULL) {
-        printf("OutputFile couldn't be opened\n");
+        fprintf(stderr, "OutputFile couldn't be opened\n");
         return -3;
     }
+    
     fseek(BitIO.InputFP, 0, SEEK_END);
     BitIO.InputFPSize = ftell(BitIO.InputFP);
-    rewind(BitIO.InputFP);
+    fseek(BitIO.InputFP, 0, SEEK_SET);
     
-    uint64_t BytesRead = 0;
-    InputBufferManager(64); // TODO set this to the filesize if less than 64
+    memset(BitIO.InputBuffer, 0, 4096); ///* zero buffer before use.
     
-    if (BitIO.InputFPSize > BufferSize) {
+    if ((BitIO.InputFPSize - ftell(BitIO.InputFP)) >= BufferSize) { ///* buffer will be full.
         BytesRead = fread(BitIO.InputBuffer, 1, BufferSize, BitIO.InputFP);
-        BitIO.InputBitOffset = 0;
+        BitIO.InputBitOffset     = 0;
+        BitIO.InputBitsRemaining = 512; // Previously BufferLength, FixME: Verify this is still correct
         if (BytesRead < BufferSize) {
             // Retry reading in the rest of the missed data
             fprintf(stderr, "Init_BitIO read %llu of %d bytes\n", BytesRead, BufferSize);
@@ -88,15 +81,15 @@ int64_t Init_BitIO(char *InputFile, const char *InputMode, char *OutputFile, con
     } else {
         BytesRead = fread(BitIO.InputBuffer, 1, BitIO.InputFPSize, BitIO.InputFP);
         BitIO.InputBitOffset = 0;
-        if (BytesRead < BitIO.InputFPSize) {
+        if (BytesRead < BitIO.InputFPSize) { 
             // Retry reading in the rest of the missed data
             fprintf(stderr, "Init_BitIO read %llu of %llu bytes\n", BytesRead, BitIO.InputFPSize);
         }
     }
     
     // Endian Detection
-    uint8_t NumberArray[2] = {0xFF,0x00};
-    if (NumberArray[1] == 0) {
+    int Number = 1;
+    if (*(char *)&Number == 1) {
         BitIO.NativeEndian = Little;
     } else {
         BitIO.NativeEndian = Big;
@@ -105,30 +98,109 @@ int64_t Init_BitIO(char *InputFile, const char *InputMode, char *OutputFile, con
     return 0;
 };
 
-/*!
- *  The purpose of this function is to fread in data, and output the requested data to the requesting functions.
- *  This function is INTERNAL to BitIO.c, no externel function should call it.
- */
-uint64_t InputBufferManager(uint64_t RequestedBits) {
-    uint64_t OutputBits = 0, RightShift = 0, BytesRead = 0, ErrorCode = 0;
+uint64_t BitMask(uint64_t Offset, enum ShiftDirection Direction) {
+    uint64_t Mask = 0;
     
-    if (BitIO.InputFPSize - ftell(BitIO.InputFP) > BufferSize) { // buffer will be full.
-        BitIO.BufferIsFull = true;
+    if (Direction == Left) {
+        Mask = (0xFF << Offset) & 0xFF;
+    } else if (Direction == Right) {
+        Mask = 0xFF >> Offset;
     }
     
-    if (RequestedBits > 0 || RequestedBits <= 64) { // Basic sanity check, maybe this should be removed and just handle the buffer for Get* functions?
-        if ((BufferSizeInBits - BitIO.InputBitOffset) < RequestedBits) { // There are NOT enough bits to fulfill the request.
+    return Mask;
+};
+
+/*!
+ *  Reads bits into buffer, and breaks them into just the requested bits
+ *  Reading backwards isn't possible so don't even try.
+ *  If you need to skip backwards use fseek then flush BitIO
+ */
+uint64_t ReadBits(uint64_t Bits2Read) {
+    uint64_t BytesRead = 0, SelectedBits = 0, ErrorCode = 0, OutputData = 0;
+    
+    uint64_t LeftShift  = BitIO.InputBitOffset % 8;
+    uint64_t RightShift = LeftShift - Bits2Read;
+    uint8_t  BitMask[10] = {0x0};
+    
+    for (int i = 0; i < 10; i++) {
+        BitMask[i] = BitIO.InputBitsRemaining % 8;
+    }
+    
+    if (Bits2Read > 0 || Bits2Read <= 64) {
+        if (BitIO.InputBitsRemaining - BitIO.InputBitOffset < Bits2Read) { // read from the buffer, // Previously BufferLength, FixME: Verify this is still correct
+            // the buffer needs to be updated.
+            uint64_t Bytes2Update = BufferSizeInBits - BitIO.InputBitOffset;
+            // should i read the last byte over?
+        } else {
+            for (uint64_t i = 0; i < BitIO.InputBitsRemaining - Bits2Bytes(BitIO.InputBitOffset); i++) { // Previously BufferLength, FixME: Verify this is correct
+                OutputData = BitIO.InputBuffer[i] & BitMask;
+            }
+            OutputData << LeftShift;
+            OutputData >> RightShift;
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        return OutputData;
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        // Does the buffer have enough bits to fullfill the request?
+            // NO
+                // Update the buffer, using all kinds of complicated math.
+            // YES
+                // Read from the buffer, and output the requested bits.
+        
+        
+        
+        // If there aren't enough bits to fulfill the request, and the amount of bits left in the file is less than the buffer's max,
+        
+        // you have to take into account the number of unread bits sitting in the buffer, in addition to ftell, in order to judge the num bits left.
+        
+        
+        
+        
+        
+        
+        if (BitIO.InputFPSize  - ftell(BitIO.InputFP) < BufferSize) { // smaller than buffer case.
+            BitIO.InputBitsRemaining = ftell(BitIO.InputFP) - BitIO.InputFPSize * 8; // Previously BufferLength, FixME: Verify this is still correct
+            
+        } else { // Larger than buffer case.
+            BitIO.InputBitsRemaining = BufferSizeInBits; // Previously BufferLength, FixME: Verify this is still correct
+        }
+        
+        
+        
+        if ((BufferSizeInBits - BitIO.InputBitOffset) < Bits2Read) { // There are NOT enough unread bits to fulfill the request.
             if (BitIO.InputFPSize - ftell(BitIO.InputFP) >= Bits2Bytes(BufferSizeInBits - BitIO.InputBitOffset)) { // Make sure there are enough bits in the file
                 memset(BitIO.InputBuffer, 0, Bits2Bytes(BitIO.InputBitOffset)); // FIXME: the last array element is still polluted tho
                 for (uint64_t i = Bits2Bytes(BitIO.InputBitOffset); BufferSize; i++) {
-                    BytesRead = fread(BitIO.InputBuffer, 1, 1, BitIO.InputFP);
+                    BytesRead = fread(BitIO.InputBuffer, 8, BufferSize, BitIO.InputFP);
                 }
-                if ((BytesRead * 8) < RequestedBits) { // fread failed somewhere.
+                if ((BytesRead * 8) < Bits2Read) { // fread failed somewhere.
                     ErrorCode = ferror(BitIO.InputFP);
                     if (ErrorCode != 0) {
                         fprintf(stderr, "Error %llu reading from InputFile\n", ErrorCode);
                     }
-                    fprintf(stderr, "Couldn't read all the bits requested, read %llu of %llu\n", BytesRead, Bits2Bytes(RequestedBits));
+                    fprintf(stderr, "Couldn't read all the bits requested, read %llu of %llu\n", BytesRead, Bits2Bytes(Bits2Read));
                 }
             } else { // Not enough bits left in InputFP, read until EOF
                 // memset unused bits at the top to zero, set the unused value to the top of the usable thing.
@@ -138,51 +210,52 @@ uint64_t InputBufferManager(uint64_t RequestedBits) {
             
         }
     } else {
-        fprintf(stderr, "Requested less than 0 or more than 64 bits.\n");
+        fprintf(stderr, "ReadBits: %llu bits requested, min is 0, max is 64\n", Bits2Read);
     }
-    
-    return OutputBits;
 };
 
+
 /*!
- *  Reads bits into buffer, and breaks them into just the requested bits
- *  Reading backwards isn't possible so don't even try.
- *  If you need to skip backwards use fseek then flush BitIO
+ *  The purpose of this function is to fread in data, and output the requested data to the requesting functions.
+ *  This function is INTERNAL to BitIO.c, no externel function should call it.
  */
-uint64_t ReadBits(uint64_t Bits2Read) {
-    uint64_t BitsRead = 0, SelectedBits = 0;
-    bool BufferIsFull = 0;
+uint64_t InputBufferManager(uint64_t RequestedBits) {
+    uint64_t OutputBits = 0, RightShift = 0, BytesRead = 0, ErrorCode = 0;
     
-    if (Bits2Read <= 0 || Bits2Read > 64) {
-        sprintf(stderr, "ReadBits failed. %llu bits were requested", Bits2Read);
+    if (BitIO.InputFPSize - ftell(BitIO.InputFP) > BufferSize) { // buffer will be full.
+        BitIO.InputBitsRemaining = BufferSize; // Previously BufferLength, FixME: Verify this is still correct
     } else {
-        if ((BufferSizeInBits - BitIO.InputBitOffset) < Bits2Read) {
-            
-        }
+        BitIO.InputBitsRemaining = BitIO.InputFPSize - ftell(BitIO.InputFP); // Previously BufferLength, FixME: Verify this is still correct
     }
     
-    
-    
-    
-    /*
-    if (Bits2Read == 0 || Bits2Read > 64) {
-        fprintf(stderr, "%llu bits requested, You have to read at least 1, and the max is 64 bits.\n", Bits2Read);
-        return -1;
-    } else if (Bits2Read < BitIO.InputBitOffset) { // BitIO.InputBitIndex
-        int64_t BitsUpdated = UpdateInputBuffer(Bits2Read);
-        if (BitsUpdated != (Bits2Read - BitIO.InputBitOffset)) { // BitIO.InputBitIndex
-            printf("UpdateInputBuffer couldn't read all the bits requested: %lld\n", BitsUpdated);
+    if ((BufferSizeInBits - BitIO.InputBitOffset) < RequestedBits) { // There are NOT enough bits to fulfill the request.
+        if (BitIO.InputFPSize - ftell(BitIO.InputFP) >= Bits2Bytes(BufferSizeInBits - BitIO.InputBitOffset)) { // Make sure there are enough bits in the file
+            memset(BitIO.InputBuffer, 0, Bits2Bytes(BitIO.InputBitOffset)); // FIXME: the last array element is still polluted tho
+            for (uint64_t i = Bits2Bytes(BitIO.InputBitOffset); BufferSize; i++) {
+                BytesRead = fread(BitIO.InputBuffer, 1, 1, BitIO.InputFP);
+            }
+            if ((BytesRead * 8) < RequestedBits) { // fread failed somewhere.
+                ErrorCode = ferror(BitIO.InputFP);
+                if (ErrorCode != 0) {
+                    fprintf(stderr, "Error %llu reading from InputFile\n", ErrorCode);
+                }
+                fprintf(stderr, "Couldn't read all the bits requested, read %llu of %llu\n", BytesRead, Bits2Bytes(RequestedBits));
+            }
+        } else { // Not enough bits left in InputFP, read until EOF
+            // memset unused bits at the top to zero, set the unused value to the top of the usable thing.
+            memset(BitIO.InputBuffer, 0, Bits2Bytes(BitIO.InputBitOffset)); // FixME: only set unused portion of buffer.
         }
-    } else {
-        BitsRead = BufferManagment(Bits2Read); // if negative, an error has occured
+    } else { // There ARE enough bits to fulfill the request
+        
     }
-    */
-    return BitsRead;
+    
+    return BytesRead;
 };
 
 /*!
  *  Read in 512 bits and scan for the specified stop bit, and return how many bits were counted before the stop bit was reached
  */
+/*
 uint64_t ReadRICE(int Bits2RICE, bool StopBit) {
     uint64_t ArrayOffset = 0, BitOffset = 0, Output = 0;
     
@@ -199,26 +272,17 @@ uint64_t ReadRICE(int Bits2RICE, bool StopBit) {
     }
     
     BufferSizeInBits + (BitIO.InputFPSize * 8);
-    
-    /*
-    uint64_t Bits = ReadBits(Bits2RICE);
-    for (int i = 0; i < Bits2RICE; i++) {
-        if (((Bits & 0x8000000000000000)) == StopBit) {
-            Bits << 1;
-            return x = i;
-        }
-    }
-    return x;
-     */
     return Output;
 };
+*/
 
 /*!
  *  Function to Skip X number of bits
+ *  FIXME: This is a terrible hack.
  */
 void SkipBits(uint64_t Bits2Skip) {
     uint64_t Trash = ReadBits(Bits2Skip); /// TODO: This is horrible, fix this... like, today.
-    UpdateBitsRead(Bits2Skip);
+    //UpdateBitsRead(Bits2Skip);
 };
 
 /*!
@@ -340,13 +404,6 @@ int64_t PruneBits(int64_t Data2Prune) {
     return PrunedData;
 };
 
-/*
-void UpdateBitsRead(uint64_t BitsRead) {
-    BitIO.InputBitsLeft += BitsRead;
-    BitIO.InputBitIndex -= BitsRead;
-};
- */
-
 /*!
  *  Deallocate BitIO
  */
@@ -386,21 +443,21 @@ int64_t Unsigned2Signed(uint64_t Unsigned) {
 };
 
 /*!
- *  Swap endian of 2 byte integers
+ *  Swap endian of 16 byte integers
  */
 uint16_t EndianSwap16(uint16_t X) { // Officially works.
     return ((X & 0xff00) >> 8) | ((X & 0x00ff) << 8);
 }
 
 /*!
- *  Swap endian of 4 byte integers
+ *  Swap endian of 32 bit integers
  */
 uint32_t EndianSwap32(uint32_t X) { // Officially works
     return ((X & 0xff000000) >> 24) | ((X & 0x00ff0000) >> 8) | ((X & 0x0000ff00) << 8) | ((X & 0x000000ff) << 24);
 }
 
 /*!
- *  Swap endian of 8 byte integers
+ *  Swap endian of 64 bit integers
  */
 uint64_t EndianSwap64(uint64_t X) { // Offically works
     return
