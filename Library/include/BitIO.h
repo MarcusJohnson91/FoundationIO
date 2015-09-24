@@ -11,6 +11,8 @@
 
 #pragma once
 
+#define BitIO_Version "0.1"
+
 #define BufferSize 4096
 #define BufferSizeInBits 32768
 
@@ -73,14 +75,14 @@ extern "C" {
     /*!
      *  Internal: Byte offset in buffer
      */
-    inline uint64_t ByteOffset(uint64_t Bits) {
+    uint64_t ByteOffset(uint64_t Bits) {
         return Bits / 8;
     };
     
     /*!
      *  Internal: Number of bits to skip in the current byte, to be used with ByteOffset in bit reading and writing
      */
-    inline uint64_t BitOffset(uint64_t Bits) {
+    uint64_t BitOffset(uint64_t Bits) {
         uint64_t x = 0;
         if (Bits < 8) {
             x = Bits;
@@ -93,14 +95,14 @@ extern "C" {
     /*!
      *  Internal: Convert bits to bytes, round down if not divisible by 8
      */
-    inline uint64_t Bits2Bytes(uint64_t Bits) {
+    uint64_t Bits2Bytes(uint64_t Bits) {
         return Bits / 8;
     };
     
     /*!
      *  Skip X number of bits
      */
-    inline void SkipBits(uint64_t Bits2Skip) {
+    void SkipBits(uint64_t Bits2Skip) {
         BitIO.InputBitOffset     += Bits2Skip;
         BitIO.InputBitsRemaining -= Bits2Skip;
     };
@@ -108,7 +110,7 @@ extern "C" {
     /*!
      *  Writes BitIO.OutputBitOffset + padding bits to BitIO.OutputFP
      */
-    void FlushBitsToOutputFile(void) {
+    void FlushBits2OutputFile(void) {
         if ((BitIO.OutputBitOffset % 8) == 0) {
             fwrite(BitIO.OutputBuffer, 1, ByteOffset(BitIO.OutputBitOffset), BitIO.OutputFP);
         } else {
@@ -180,14 +182,14 @@ extern "C" {
     /*!
      *  Internal: Multiply bytes by 8 to get number of bits
      */
-    inline uint64_t Bytes2Bits(uint64_t Bytes) {
+    uint64_t Bytes2Bits(uint64_t Bytes) {
         return Bytes * 8;
     };
     
     /*!
      *  Internal: to count the number of bits in X
      */
-    inline uint64_t CountBits(uint64_t Bits2Count) {
+    uint64_t CountBits(uint64_t Bits2Count) {
         uint64_t NumberOfBits = 0;
         while (Bits2Count) {
             Bits2Count &= (Bits2Count - 1);
@@ -199,7 +201,7 @@ extern "C" {
     /*!
      *  Internal: Remove leading bits
      */
-    inline int64_t PruneBits(int64_t Data2Prune) {
+    int64_t PruneBits(int64_t Data2Prune) {
         uint64_t NumberOfBits = CountBits(Data2Prune);
         uint64_t PrunedData = 0;
         PrunedData = Data2Prune << (64 - NumberOfBits);
@@ -210,7 +212,7 @@ extern "C" {
      *  Internal: Converts an Signed int to a Unsigned int.
      *  Keep in mind that the internal representation in BitIO is unsigned.
      */
-    inline uint64_t Signed2Unsigned(int64_t Signed) {
+    uint64_t Signed2Unsigned(int64_t Signed) {
         return (uint64_t) Signed;
     };
     
@@ -218,28 +220,28 @@ extern "C" {
      *  Internal: Converts an Unsigned int to a Signed int.
      *  Keep in mind that the internal representation in BitIO is unsigned.
      */
-    inline int64_t Unsigned2Signed(uint64_t Unsigned) {
+    int64_t Unsigned2Signed(uint64_t Unsigned) {
         return (uint64_t) Unsigned;
     };
     
     /*!
      *  Internal: Swap endian of 16 byte integers
      */
-    inline uint16_t SwapEndian16(uint16_t X) {
+    uint16_t SwapEndian16(uint16_t X) {
         return ((X & 0xFF00) >> 8) | ((X & 0x00FF) << 8);
     };
     
     /*!
      *  Internal: Swap endian of 32 bit integers
      */
-    inline uint32_t SwapEndian32(uint32_t X) {
+    uint32_t SwapEndian32(uint32_t X) {
         return ((X & 0xFF000000) >> 24) | ((X & 0x00FF0000) >> 8) | ((X & 0x0000FF00) << 8) | ((X & 0x000000FF) << 24);
     };
     
     /*!
      *  Internal: Swap endian of 64 bit integers
      */
-    inline uint64_t SwapEndian64(uint64_t X) {
+    uint64_t SwapEndian64(uint64_t X) {
         return (((X & 0xFF00000000000000) >> 56) | ((X & 0x00FF000000000000) >> 40) |
                 ((X & 0x0000FF0000000000) >> 24) | ((X & 0x000000FF00000000) >> 8)  |
                 ((X & 0x00000000FF000000) << 8)  | ((X & 0x0000000000FF0000) << 24) |
@@ -251,7 +253,7 @@ extern "C" {
      *  For use when changing files, or when skipping backwards
      */
     void FlushBitIO(void) {
-        FlushBitsToOutputFile();
+        FlushBits2OutputFile();
         fclose(BitIO.InputFP);
         fclose(BitIO.OutputFP);
         BitIO.InputBitOffset      = 0;
@@ -292,6 +294,7 @@ extern "C" {
      *  Internal: parses command line flags
      *  Replace all of this with calls to Sscanf
      */
+    /*
     void OptionParser(int argc, char *argv, const char *OptString) {
         int GetOptCount = 0, InputArg = 0, OutputArg = 0;
         while ((GetOptCount = getopt(argc, &argv, OptString) != -1)) {
@@ -329,6 +332,7 @@ extern "C" {
             Init_BitIO(&argv[InputArg], "rb", &argv[OutputArg], "wb");
         }
     };
+     */
     
     /*!
      *  Reads bits into buffer, and breaks them into the requested bits
@@ -354,8 +358,7 @@ extern "C" {
         } else if (Bits2Read > BitIO.InputBitsRemaining) {
             // Update buffer
         } else {
-            for (uint64_t i = ByteOffset(BitIO.InputBitsRemaining); i < ByteOffset(BitIO.InputBitsRemaining + Bits2Read) + 1; i++) { // BYTE boundary
-                uint8_t BitMask = 0;
+            for (uint64_t i = BitIO.InputBitOffset / 8; i < (BitIO.InputBitOffset + Bits2Read) / 8; i++) { // BYTE boundary
                 /* Mask = 0, A = 0;
                  A       = BitIO.InputBitsRemaining;
                  Mask    = A % 8;
@@ -370,8 +373,8 @@ extern "C" {
                  }
                  }
                  */
-                BitMask = BitMaskOffset[i % 8];
-                OutputData = BitIO.InputBuffer[i] & BitMask;
+                uint8_t BitMask = BitMaskOffset[i % 8];
+                OutputData += BitIO.InputBuffer[i] & BitMask;
             }
             BitIO.InputBitsRemaining -= Bits2Read;
             BitIO.InputBitOffset     += Bits2Read;
@@ -429,7 +432,7 @@ extern "C" {
         BitIO.InputBitOffset     += Bytes2Bits(BytesActuallyRead);
         BitIO.InputBitsRemaining -= Bytes2Bits(BytesActuallyRead);
         
-        return (uintptr_t)&UUID;
+        return (uintptr_t) &UUID;
     };
     
 #ifdef __cplusplus
