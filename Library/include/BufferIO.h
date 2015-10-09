@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <dirent.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -36,31 +37,31 @@ extern "C" {
      */
     struct BitIO {
         // Common
-        enum Endian         NativeEndian; // SystemEndian
+        enum Endian NativeEndian;         // SystemEndian
         // Input
         FILE                    *InputFP; // File to read from
         DIR                    *InputDir; // Folder to read from
-        uint64_t             InputFPSize; // How large is the input file in bytes?
-        uint8_t  InputBuffer[BufferSize]; // the actual InputBuffer
-        uint64_t          InputBitOffset; // Number of bits read
-        uint64_t      InputBitsRemaining; // BufferSizeInBits - Number of bits read
+        uint64_t InputFPSize;             // How large is the input file in bytes?
+        uint8_t InputBuffer[BufferSize];  // the actual InputBuffer
+        uint64_t InputBitOffset;          // Number of bits read
+        uint64_t InputBitsRemaining;      // BufferSizeInBits - Number of bits read
         
         // Output
         FILE                   *OutputFP; // File to write to
         DIR                   *OutputDir; // Folder to write to
         uint8_t OutputBuffer[BufferSize]; // Buffer
-        uint64_t         OutputBitOffset; // Number of bits written
-        uint64_t     OutputBitsRemaining; // Number of open bits remaining in the buffer
+        uint64_t OutputBitOffset;         // Number of bits written
+        uint64_t OutputBitsRemaining;     // Number of open bits remaining in the buffer
     } BitIO;
     
-    struct UUID { /// TODO: Should I include room for hyphens?
+    struct UUID {         /// TODO: Should I include room for hyphens?
         uint64_t TimeLow;
         uint64_t TimeMid;
         uint64_t TimeHigh_Version;
         uint64_t ClockHigh_Version;
         uint64_t ClockLow;
-        uint8_t  Node[6];
-        uint8_t  Dash[4]; // room for hyphens
+        uint8_t Node[6];
+        uint8_t Dash[4];  // room for hyphens
     };
     
     //void Init_BitIO(const char *InputFile, const char *InputMode, const char *OutputFile, const char *OutputMode);
@@ -295,43 +296,43 @@ extern "C" {
      *  Replace all of this with calls to Sscanf
      */
     /*
-    void OptionParser(int argc, char *argv, const char *OptString) {
-        int GetOptCount = 0, InputArg = 0, OutputArg = 0;
-        while ((GetOptCount = getopt(argc, &argv, OptString) != -1)) {
-            switch (GetOptCount) {
-                case 'i':
-                    // Input
-                    InputArg  = GetOptCount;
-                    break;
-                case 'I':
-                    // Input
-                    InputArg  = GetOptCount;
-                    break;
-                case 'f':
-                    // Folder input
-                    InputArg  = GetOptCount;
-                    FileSequence(argc, argv, InputArg);
-                    BitIO.InputDir;
-                    
-                    break;
-                case 'F':
-                    // Folder input
-                    InputArg  = GetOptCount;
-                    break;
-                case 'o':
-                    // Output
-                    OutputArg = GetOptCount;
-                    break;
-                case 'O':
-                    // Output
-                    OutputArg = GetOptCount;
-                    break;
-                default:
-                    break;
-            }
-            Init_BitIO(&argv[InputArg], "rb", &argv[OutputArg], "wb");
-        }
-    };
+     void OptionParser(int argc, char *argv, const char *OptString) {
+     int GetOptCount = 0, InputArg = 0, OutputArg = 0;
+     while ((GetOptCount = getopt(argc, &argv, OptString) != -1)) {
+     switch (GetOptCount) {
+     case 'i':
+     // Input
+     InputArg  = GetOptCount;
+     break;
+     case 'I':
+     // Input
+     InputArg  = GetOptCount;
+     break;
+     case 'f':
+     // Folder input
+     InputArg  = GetOptCount;
+     FileSequence(argc, argv, InputArg);
+     BitIO.InputDir;
+     
+     break;
+     case 'F':
+     // Folder input
+     InputArg  = GetOptCount;
+     break;
+     case 'o':
+     // Output
+     OutputArg = GetOptCount;
+     break;
+     case 'O':
+     // Output
+     OutputArg = GetOptCount;
+     break;
+     default:
+     break;
+     }
+     Init_BitIO(&argv[InputArg], "rb", &argv[OutputArg], "wb");
+     }
+     };
      */
     
     /*!
@@ -412,6 +413,40 @@ extern "C" {
         }
         
         return BitsWritten;
+    };
+    
+    uint64_t ArithmeticEncoder(uintptr_t UnencodedData) {
+        uintptr_t EncodedData;
+        
+        return EncodedData;
+    };
+    
+    uint64_t ArithmeticDecoder(uintptr_t EncodedData) {
+        uintptr_t DecodedData;
+        
+        return DecodedData;
+    };
+    
+    uint64_t FiniteStateEncoder(uintptr_t UnencodedData) {
+        uintptr_t EncodedData;
+        
+        return EncodedData;
+    };
+    
+    uint64_t FiniteStateDecoder(uintptr_t EncodedData) {
+        uintptr_t DecodedData = 0;
+        
+        return DecodedData;
+    };
+    
+    uint64_t BijectiveBWTEncoder() {
+        
+        return 0;
+    };
+    
+    uint64_t BijectiveBWTDecoder() {
+        
+        return 0;
     };
     
     /*!
