@@ -1,466 +1,405 @@
-#include "BitIO.h"
+#include "../include/BitIO.h"
 
-uint64_t FileSequence(int argc, char *argv, int WhichArg) {
-    // small function to return the filename sequence specifier, aka take %03d and return leading 0, 3 digit, decimal, etc.
-    if (argv) {
-    }
-    strcmp(&argv[WhichArg -1], "%03d");
+#ifdef __cplusplus
+extern "C" {
+#endif
     
-    return 0;
-};
-
-void OptionParser(int argc, char *argv, const char *OptString) {
-    int GetOptCount = 0, InputArg = 0, OutputArg = 0;
-    while ((GetOptCount = getopt(argc, &argv, OptString) != -1)) {
-        switch (GetOptCount) {
-            case 'i':
-                // Input
-                InputArg  = GetOptCount;
-                break;
-            case 'I':
-                // Input
-                InputArg  = GetOptCount;
-                break;
-            case 'f':
-                // Folder input
-                InputArg  = GetOptCount;
-                FileSequence(argc, argv, InputArg);
-                BitIO.InputDir;
-                break;
-            case 'F':
-                // Folder input
-                InputArg  = GetOptCount;
-                break;
-            case 'o':
-                // Output
-                OutputArg = GetOptCount;
-                break;
-            case 'O':
-                // Output
-                OutputArg = GetOptCount;
-                break;
-            default:
-                break;
+    uint64_t Bits2Bytes(uint64_t Bits) {
+        return Bits / 8;
+    }
+    
+    uint64_t Bytes2Bits(uint64_t Bytes) {
+        return Bytes * 8; // Bytes << 3
+    }
+    
+    uint8_t BitsRemaining(uint8_t Bits) {
+        return 8 - (Bits % 8);
+    }
+    
+    uint64_t Signed2Unsigned(int64_t Signed) {
+        if (Signed == (-0|0)) {
+            return 0;
         }
-        Init_BitIO(&argv[InputArg], "rb", &argv[OutputArg], "wb");
-    }
-};
-
-/*!
- *  Initalize BitIO for use. this must be done first
- */
-int64_t Init_BitIO(char *InputFile, const char *InputMode, char *OutputFile, const char *OutputMode) {
-    uint64_t BytesRead = 0;
-    
-    BitIO.InputFP  = fopen(InputFile, InputMode);
-    BitIO.OutputFP = fopen(OutputFile, OutputMode);
-    
-    if (BitIO.InputFP == NULL) {
-        fprintf(stderr, "InputFile is NULL\n");
-        return -2;
-    }
-    if (BitIO.OutputFP == NULL) {
-        fprintf(stderr, "OutputFile couldn't be opened\n");
-        return -3;
+        return ~Signed + 1;
     }
     
-    fseek(BitIO.InputFP, 0, SEEK_END);
-    BitIO.InputFPSize = ftell(BitIO.InputFP);
-    fseek(BitIO.InputFP, 0, SEEK_SET);
-    
-    memset(BitIO.InputBuffer, 0, 4096); ///* zero buffer before use.
-    
-    if ((BitIO.InputFPSize - ftell(BitIO.InputFP)) >= BufferSize) { ///* buffer will be full.
-        BytesRead = fread(BitIO.InputBuffer, 1, BufferSize, BitIO.InputFP);
-        BitIO.InputBitOffset     = 0;
-        BitIO.InputBitsRemaining = 512; // Previously BufferLength, FixME: Verify this is still correct
-        if (BytesRead < BufferSize) {
-            // Retry reading in the rest of the missed data
-            fprintf(stderr, "Init_BitIO read %llu of %d bytes\n", BytesRead, BufferSize);
-        }
-    } else {
-        BytesRead = fread(BitIO.InputBuffer, 1, BitIO.InputFPSize, BitIO.InputFP);
-        BitIO.InputBitOffset = 0;
-        if (BytesRead < BitIO.InputFPSize) { 
-            // Retry reading in the rest of the missed data
-            fprintf(stderr, "Init_BitIO read %llu of %llu bytes\n", BytesRead, BitIO.InputFPSize);
-        }
+    int64_t Unsigned2Signed(uint64_t Unsigned) {
+        return (int64_t)Unsigned;
     }
     
-    // Endian Detection
-    int Number = 1;
-    if (*(char *)&Number == 1) {
-        BitIO.NativeEndian = Little;
-    } else {
-        BitIO.NativeEndian = Big;
+    void PadInputBits(BitInput *BitI, uint8_t BytesOfPadding) {
+        BitI->BitsUnavailable += Bytes2Bits(BytesOfPadding);
     }
     
-    return 0;
-};
-
-uint64_t BitMask(uint64_t Offset, enum ShiftDirection Direction) {
-    uint64_t Mask = 0;
-    
-    if (Direction == Left) {
-        Mask = (0xFF << Offset) & 0xFF;
-    } else if (Direction == Right) {
-        Mask = 0xFF >> Offset;
+    void PadOutputBits(BitOutput *BitO, uint8_t BytesOfPadding) {
+        BitO->BitsUnavailable += (Bytes2Bits(BytesOfPadding) - BitsRemaining(BitO->BitsUnavailable));
     }
     
-    return Mask;
-};
-
-/*!
- *  Reads bits into buffer, and breaks them into just the requested bits
- *  Reading backwards isn't possible so don't even try.
- *  If you need to skip backwards use fseek then flush BitIO
- */
-uint64_t ReadBits(uint64_t Bits2Read) {
-    uint64_t BytesRead = 0, SelectedBits = 0, ErrorCode = 0, OutputData = 0;
-    
-    uint64_t LeftShift  = BitIO.InputBitOffset % 8;
-    uint64_t RightShift = LeftShift - Bits2Read;
-    uint8_t  BitMask[10] = {0x0};
-    
-    for (int i = 0; i < 10; i++) {
-        BitMask[i] = BitIO.InputBitsRemaining % 8;
-    }
-    
-    if (Bits2Read > 0 || Bits2Read <= 64) {
-        if (BitIO.InputBitsRemaining - BitIO.InputBitOffset < Bits2Read) { // read from the buffer, // Previously BufferLength, FixME: Verify this is still correct
-            // the buffer needs to be updated.
-            uint64_t Bytes2Update = BufferSizeInBits - BitIO.InputBitOffset;
-            // should i read the last byte over?
+    uint64_t FindHighestBitSet(uint64_t InputData) {
+        // Count down from 64, once we find the first 1 bit that's the highest, so record it's position, stop looping, and return the value
+        uint8_t HighestBit = 0;
+        if (InputData == 0) {
+            HighestBit = 0;
         } else {
-            for (uint64_t i = 0; i < BitIO.InputBitsRemaining - Bits2Bytes(BitIO.InputBitOffset); i++) { // Previously BufferLength, FixME: Verify this is correct
-                OutputData = BitIO.InputBuffer[i] & BitMask;
-            }
-            OutputData << LeftShift;
-            OutputData >> RightShift;
-        }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        return OutputData;
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        // Does the buffer have enough bits to fullfill the request?
-            // NO
-                // Update the buffer, using all kinds of complicated math.
-            // YES
-                // Read from the buffer, and output the requested bits.
-        
-        
-        
-        // If there aren't enough bits to fulfill the request, and the amount of bits left in the file is less than the buffer's max,
-        
-        // you have to take into account the number of unread bits sitting in the buffer, in addition to ftell, in order to judge the num bits left.
-        
-        
-        
-        
-        
-        
-        if (BitIO.InputFPSize  - ftell(BitIO.InputFP) < BufferSize) { // smaller than buffer case.
-            BitIO.InputBitsRemaining = ftell(BitIO.InputFP) - BitIO.InputFPSize * 8; // Previously BufferLength, FixME: Verify this is still correct
-            
-        } else { // Larger than buffer case.
-            BitIO.InputBitsRemaining = BufferSizeInBits; // Previously BufferLength, FixME: Verify this is still correct
-        }
-        
-        
-        
-        if ((BufferSizeInBits - BitIO.InputBitOffset) < Bits2Read) { // There are NOT enough unread bits to fulfill the request.
-            if (BitIO.InputFPSize - ftell(BitIO.InputFP) >= Bits2Bytes(BufferSizeInBits - BitIO.InputBitOffset)) { // Make sure there are enough bits in the file
-                memset(BitIO.InputBuffer, 0, Bits2Bytes(BitIO.InputBitOffset)); // FIXME: the last array element is still polluted tho
-                for (uint64_t i = Bits2Bytes(BitIO.InputBitOffset); BufferSize; i++) {
-                    BytesRead = fread(BitIO.InputBuffer, 8, BufferSize, BitIO.InputFP);
+            for (uint8_t Bit = 64; Bit > 0; Bit--) { // stop at the first 1 bit, and return that.
+                if ((InputData & Bit) == 1) {
+                    HighestBit = Bit;
+                    break;
                 }
-                if ((BytesRead * 8) < Bits2Read) { // fread failed somewhere.
-                    ErrorCode = ferror(BitIO.InputFP);
-                    if (ErrorCode != 0) {
-                        fprintf(stderr, "Error %llu reading from InputFile\n", ErrorCode);
+            }
+            /*
+             for (size_t Bit = 63; Bit > 0; Bit--) { // should the loop start at 63? does it loop when it hits 0? if so replace "InputData & (1 <<= (Bit - 1))" with "InputData & Bit"
+             uint64_t CurrentBit = InputData & (1 <<= Bit);
+             if ((InputData & (1 <<= (Bit - 1))) == (1 <<= (Bit - 1))) {
+             HighestBit = Bit;
+             break;
+             }
+             }
+             */
+            
+        }
+        return HighestBit;
+    }
+    
+    bool IsOdd(int64_t Input) {
+        return Input % 2;
+    }
+    
+    uint64_t CountBits(uint64_t Input) {
+        uint8_t Count = 0;
+        if (Input == 0) {
+            return 0;
+        }
+        for (size_t Bit = 0; Bit < 64; Bit++) {
+            if ((Input & 1) == 1) {
+                Count++;
+            }
+            Input >>= 1;
+        }
+        return Count;
+    }
+    
+    uint16_t SwapEndian16(uint16_t X) {
+        return ((X & 0xFF00) >> 8) || ((X & 0x00FF) << 8);
+    }
+    
+    uint32_t SwapEndian32(uint32_t X) {
+        return ((X & 0xFF000000) >> 24) | ((X & 0x00FF0000) >> 8) | ((X & 0x0000FF00) << 8) | ((X & 0x000000FF) << 24);
+    }
+    
+    uint64_t SwapEndian64(uint64_t X) {
+        return (((X & 0xFF00000000000000) >> 56) | ((X & 0x00FF000000000000) >> 40) | ((X & 0x0000FF0000000000) >> 24) | ((X & 0x000000FF00000000) >> 8)  | ((X & 0x00000000FF000000) << 8)  | ((X & 0x0000000000FF0000) << 24) | ((X & 0x000000000000FF00) << 40) | ((X & 0x00000000000000FF) << 56));
+    }
+    
+    void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
+        glob_t *GlobBuffer = 0;
+        errno = 0;
+        
+        uint8_t Argument = BitI->CurrentArgument;
+        
+        while ((Argument < argc) && (BitI->File == 0)) {
+            if (strcasecmp(argv[Argument], "-i") == 0) {
+                Argument += 1;
+                if ((strcasecmp(argv[Argument], "-") || strcasecmp(argv[Argument], "–") || strcasecmp(argv[Argument], "—")) == 0) { // hyphen: -, en dash: –, em dash: —;
+                    BitI->File = freopen(argv[Argument], "rb", stdin);
+                } else if (strcasecmp(argv[Argument], "*")   == 0) {
+                    glob(argv[Argument], (GLOB_ERR|GLOB_TILDE), 0, GlobBuffer);
+                } else if (strcasecmp(argv[Argument], "?")   == 0) {
+                    glob(argv[Argument], (GLOB_ERR|GLOB_TILDE), 0, GlobBuffer);
+                } else {
+                    BitI->File = fopen(argv[Argument], "rb");
+                    if (errno != 0) {
+                        printf("Error opening file %s: %d\n", argv[Argument + 1], errno);
+                    } else {
+                        printf("Errno is %s: %d\n", argv[Argument], errno);
                     }
-                    fprintf(stderr, "Couldn't read all the bits requested, read %llu of %llu\n", BytesRead, Bits2Bytes(Bits2Read));
                 }
-            } else { // Not enough bits left in InputFP, read until EOF
-                // memset unused bits at the top to zero, set the unused value to the top of the usable thing.
-                memset(BitIO.InputBuffer, 0, Bits2Bytes(BitIO.InputBitOffset)); // FixME: only set unused portion of buffer.
             }
-        } else { // There ARE enough bits to fulfill the request
-            
+            BitI->CurrentArgument = Argument;
         }
-    } else {
-        fprintf(stderr, "ReadBits: %llu bits requested, min is 0, max is 64\n", Bits2Read);
-    }
-};
-
-
-/*!
- *  The purpose of this function is to fread in data, and output the requested data to the requesting functions.
- *  This function is INTERNAL to BitIO.c, no externel function should call it.
- */
-uint64_t InputBufferManager(uint64_t RequestedBits) {
-    uint64_t OutputBits = 0, RightShift = 0, BytesRead = 0, ErrorCode = 0;
-    
-    if (BitIO.InputFPSize - ftell(BitIO.InputFP) > BufferSize) { // buffer will be full.
-        BitIO.InputBitsRemaining = BufferSize; // Previously BufferLength, FixME: Verify this is still correct
-    } else {
-        BitIO.InputBitsRemaining = BitIO.InputFPSize - ftell(BitIO.InputFP); // Previously BufferLength, FixME: Verify this is still correct
     }
     
-    if ((BufferSizeInBits - BitIO.InputBitOffset) < RequestedBits) { // There are NOT enough bits to fulfill the request.
-        if (BitIO.InputFPSize - ftell(BitIO.InputFP) >= Bits2Bytes(BufferSizeInBits - BitIO.InputBitOffset)) { // Make sure there are enough bits in the file
-            memset(BitIO.InputBuffer, 0, Bits2Bytes(BitIO.InputBitOffset)); // FIXME: the last array element is still polluted tho
-            for (uint64_t i = Bits2Bytes(BitIO.InputBitOffset); BufferSize; i++) {
-                BytesRead = fread(BitIO.InputBuffer, 1, 1, BitIO.InputFP);
-            }
-            if ((BytesRead * 8) < RequestedBits) { // fread failed somewhere.
-                ErrorCode = ferror(BitIO.InputFP);
-                if (ErrorCode != 0) {
-                    fprintf(stderr, "Error %llu reading from InputFile\n", ErrorCode);
+    void ParseOutputOptions(BitOutput *BitO, int argc, const char *argv[]) {
+        glob_t *GlobBuffer = 0;
+        while (BitO->File == 0) {
+            for (uint8_t Argument = BitO->CurrentArgument; Argument < argc; Argument++) {
+                if (strcasecmp(argv[Argument], "-o") == 0) {
+                    if (strcasecmp(argv[Argument++], "-") == 0) {
+                        BitO->File = stdout;
+                    } else if (strcasecmp(argv[Argument], "*")   == 0) {
+                        glob(argv[Argument], (GLOB_ERR|GLOB_TILDE), 0, GlobBuffer);
+                    } else if (strcasecmp(argv[Argument], "?")   == 0) {
+                        glob(argv[Argument], (GLOB_ERR|GLOB_TILDE), 0, GlobBuffer);
+                    } else {
+                        BitO->File = fopen(argv[Argument], "wb");
+                    }
                 }
-                fprintf(stderr, "Couldn't read all the bits requested, read %llu of %llu\n", BytesRead, Bits2Bytes(RequestedBits));
             }
-        } else { // Not enough bits left in InputFP, read until EOF
-            // memset unused bits at the top to zero, set the unused value to the top of the usable thing.
-            memset(BitIO.InputBuffer, 0, Bits2Bytes(BitIO.InputBitOffset)); // FixME: only set unused portion of buffer.
         }
-    } else { // There ARE enough bits to fulfill the request
+    }
+    
+    void InitBitInput(BitInput *BitI, int argc, const char *argv[]) {
+        if (argc < 3) {
+            printf("Usage: -i <input> -o <output>\n");
+        } else {
+            ParseInputOptions(BitI, argc, argv);
+            if (BitI->File == 0) {
+                fprintf(stderr, "InitBitInput: InputFile couldn't be opened, check permissions\n");
+            } else {
+                BitI->CurrentArgument = 1;
+                fseek(BitI->File, 0, SEEK_END);
+                BitI->FileSize         = ftell(BitI->File);
+                fseek(BitI->File, 0, SEEK_SET);
+                
+                uint64_t Bytes2Read    = BitI->FileSize > BitIOBufferSize ? BitIOBufferSize : BitI->FileSize;
+                
+                memset(BitI->Buffer, 0, Bytes2Read);
+                uint64_t BytesRead     = fread(BitI->Buffer, 1, BitIOBufferSize, BitI->File);
+                if (BytesRead < Bytes2Read) {
+                    fprintf(stderr, "InitBitInput: Read: %llu of: %llu bytes, at position: %ld\n", BytesRead, Bytes2Read, ftell(BitI->File));
+                }
+                BitI->BitsAvailable = Bytes2Bits(BytesRead);
+                BitI->BitsUnavailable         = 0;
+                BitI->FilePosition  = ftell(BitI->File);
+            }
+        }
+    }
+    
+    void InitBitOutput(BitOutput *BitO, int argc, const char *argv[]) {
+        if (argc < 3) {
+            printf("Usage: -i <input> -o <output>\n");
+        } else {
+            ParseOutputOptions(BitO, argc, argv);
+            if (BitO->File == 0) {
+                fprintf(stderr, "InitBitOutput: OutputFile couldn't be opened, check permissions\n");
+            } else {
+                BitO->CurrentArgument = 1;
+                memset(BitO->Buffer,  0, BitIOBufferSize);
+                BitO->BitsAvailable   = BitIOBufferSizeInBits;
+                BitO->BitsUnavailable = 0;
+            }
+        }
+    }
+    
+    void CloseBitInput(BitInput *BitI) {
+        fclose(BitI->File);
+        BitI->FileSize         = 0;
+        BitI->FilePosition     = 0;
+        BitI->BitsUnavailable  = 0;
+        BitI->BitsAvailable    = 0;
+        memset(BitI->Buffer,     0, BitIOBufferSize);
+        free(BitI);
+    }
+    
+    void CloseBitOutput(BitOutput *BitO) {
+        fclose(BitO->File);
+        BitO->BitsUnavailable = 0;
+        BitO->BitsAvailable   = 0;
+        memset(BitO->Buffer,    0, BitIOBufferSize);
+        free(BitO);
+    }
+    
+    void UpdateInputBuffer(BitInput *BitI, uint64_t AbsoluteOffset) {
+        if (AbsoluteOffset == 0) {
+            AbsoluteOffset = BitI->FilePosition;
+        }
+        
+        ErrorStatus *ES = malloc(sizeof(ErrorStatus));
+        uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > BitIOBufferSize ? BitIOBufferSize : BitI->FileSize - BitI->FilePosition;
+        
+        fseek(BitI->File, AbsoluteOffset, SEEK_SET);
+        memset(BitI, 0, Bytes2Read);
+        uint64_t BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
+        if (BytesRead != Bytes2Read) {
+            printf("BitIO: UpdateInputBuffer failed! read %llu of %llu bytes\n", BytesRead, Bytes2Read);
+            ES->UpdateInputBuffer = 1;
+        }
+    }
+    
+    uint64_t ReadBits(BitInput *BitI, int8_t Bits2Read) { // FIXME: May read backwards?
+        uint64_t OutputData = 0;
+        if (Bits2Read <= 0) {
+            fprintf(stderr, "BitIO - ReadBits: You requested too few bits: %hhd\n", Bits2Read);
+        } else if (Bits2Read > 64) {
+            fprintf(stderr, "BitIO - ReadBits: You requested too many bits: %hhd\n", Bits2Read);
+        } else {
+            OutputData             = PeekBits(BitI, Bits2Read);
+            BitI->BitsUnavailable += Bits2Read;
+            BitI->BitsAvailable   -= Bits2Read;
+        }
+        return OutputData;
+    }
+    
+    uint64_t ReadExpGolomb(BitInput *BitI, bool IsSigned, bool IsTruncated) {
+        uint64_t Zeros = 0;
+        int64_t  Data  = 0;
+        
+        Data = ReadBits(BitI, 1);
+        if ((Zeros == 0) && (Data == 1)) {
+            while (ReadBits(BitI, 1) == 0) {
+                Zeros += 1;
+            }
+            Data = (1 << Zeros);
+            Data += ReadBits(BitI, Zeros);
+        }
+        
+        if (IsSigned == true) {
+            Data = Unsigned2Signed(Data);
+        }
+        
+        if (IsTruncated == true) {
+            Data = 2 * Zeros - 1; // Left bit first
+            Data += ReadBits(BitI, Zeros);
+        }
+        return Data;
+    }
+    
+    uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek) { // Bit by bit.
+        //FIXME: You CAN'T read byte by byte, it simply won't work so stop trying. Also, this is faster, instruction wise.
+        uint64_t OutputData = 0;
+        uint8_t  Data       = 0;
+        uint8_t  BitsLeft   = Bits2Peek;
+        uint8_t  BitMask    = 0;
+        ErrorStatus *ES = malloc(sizeof(ErrorStatus));
+        if ((BitsLeft <= 0) || (BitsLeft > 64)) {
+            ES->PeekBits = 1;
+        }
+        if (BitI->BitsUnavailable > (BitI->BitsAvailable - BitsLeft)) { // InputBuffer is damn near full, update it
+            UpdateInputBuffer(BitI, 0);
+        }
+        while (BitsLeft > 0) {
+            OutputData <<= 1;
+            BitMask      = 1 << ((8 - (BitI->BitsUnavailable % 8)) -1);
+            Data         = BitI->Buffer[Bits2Bytes(BitI->BitsUnavailable)] & BitMask;
+            Data       >>= ((8 - (BitI->BitsUnavailable % 8)) -1);
+            OutputData            += Data;
+            BitI->BitsAvailable   -= 1;
+            BitI->BitsUnavailable += 1;
+            BitsLeft              -= 1;
+        }
+        BitI->BitsAvailable   += Bits2Peek;
+        BitI->BitsUnavailable -= Bits2Peek;
+        return OutputData;
+    }
+    
+    void WriteBits(BitOutput *BitO, uint64_t Bits2Write, uint64_t Bits) { // FIXME: Rewrite WriteBits entirely.
+        if (Bits <= 0) {
+            fprintf(stderr, "BitIO - WriteBits: You requested to write too few bits: %llu\n", Bits);
+        } else if (Bits > 64) {
+            fprintf(stderr, "BitIO - WriteBits: You requested to write too many bits: %llu\n", Bits);
+        } else {
+            while (BitO->BitsUnavailable >= ((BitIOBufferSize - 16) * 8)) {
+                fwrite(BitO->Buffer, 1, Bits2Bytes(BitO->BitsUnavailable), BitO->File);
+                fflush(BitO->File);
+                memcpy(&BitO->Buffer, &BitO->Buffer + Bits2Bytes(BitO->BitsUnavailable), (BitIOBufferSize - Bits2Bytes(BitO->BitsUnavailable)));
+                memset(BitO->Buffer, 0, BitIOBufferSize);
+                BitO->BitsUnavailable = (BitO->BitsUnavailable - ((BitO->BitsUnavailable / 8) * 8));
+            }
+            while (Bits > 0) {
+                uint64_t X = Bits2Write & BitsRemaining(BitO->BitsUnavailable);
+                BitO->Buffer[Bits2Bytes(BitO->BitsUnavailable)] += X;
+                BitO->BitsUnavailable++;
+                Bits--;
+            }
+        }
+    }
+    
+    void WriteBuffer(BitOutput *BitO, uint64_t *Buffer2Write, size_t BufferSize) { // FIXME: This needs expand the buffer if nessicary.
+        for (size_t Byte = 0; Byte < BufferSize; Byte++) {
+            WriteBits(BitO, Buffer2Write[Byte], 8);
+        }
+    }
+    
+    void SeekBits(BitInput *BitI, int64_t Bits) {
+        if ((BitI->BitsUnavailable + Bits) >= BitI->BitsAvailable) {
+            UpdateInputBuffer(BitI, 0);
+        } else {
+            uint64_t Bytes2Read = BitI->BitsAvailable<BitIOBufferSizeInBits?BitI->BitsAvailable:BitIOBufferSizeInBits;
+            BitI->FilePosition = ftell(BitI->File);
+            fseek(BitI->File, BitIOBufferSizeInBits - (BitI->BitsUnavailable + Bits), SEEK_CUR);
+            memset(BitI->Buffer, 0, BitIOBufferSize);
+            fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
+        }
+    }
+    
+    uint64_t BinarySearch(BitInput *BitI, int64_t HexPattern, bool SearchWholeFile) { // FIXME: replace BitIOBufferSize with BitI->BitsAvailable
+        if (SearchWholeFile == false) {
+            for (uint16_t Byte = 0; Byte < BitI->BitsAvailable; Byte++) {
+                for (size_t HexPatternByte = 0; HexPatternByte < CountBits(HexPattern); HexPatternByte++) {
+                    if (BitI->Buffer[Byte] == HexPattern) {
+                        HexPatternByte++;
+                        if (HexPatternByte >= CountBits(HexPattern)) {
+                            return 1; // Basically, return the current position in the buffer, minus HexPatternSize,
+                        }
+                    }
+                }
+            }
+        } else {
+            for (uint16_t Byte = 0; Byte < BitI->BitsAvailable; Byte++) {
+                for (size_t HexPatternByte = 0; HexPatternByte < CountBits(HexPattern); HexPatternByte++) {
+                    if (BitI->Buffer[Byte] == HexPattern) {
+                        HexPatternByte++;
+                        if (HexPatternByte >= CountBits(HexPattern)) {
+                            return 1; // Basically, return the current position in the buffer, minus HexPatternSize,
+                        }
+                    }
+                }
+            }
+            if (BitI->BitsUnavailable >= BitI->BitsAvailable) {
+                UpdateInputBuffer(BitI, 0);
+            }
+        }
+        return 0;
+    }
+    
+    uint64_t GenerateCRC(uint64_t *DataBuffer, uint64_t BufferSize, bool IsBigEndian, uint64_t Polynomial, uint64_t CRCSize, uint64_t InitialValue) {
+        if (IsBigEndian == true) {
+        }
+        
+        uint64_t DataInput  = 0;
+        uint64_t DataOutput = 0;
+        
+        for (size_t BufferIndex = 0; BufferIndex < (BufferSize / CRCSize); BufferIndex++) { // needs to iterate over bytes the size of DataSize
+            DataInput = DataBuffer[BufferIndex];
+            for (uint8_t Bit = 0; Bit < CRCSize * 8; Bit++) {
+                if ((InitialValue & 0x1) ^ (DataInput & 0x1)) {
+                    InitialValue ^= Polynomial;
+                } else {
+                    InitialValue >>= 1;
+                }
+            }
+        }
+        return DataOutput;
+    }
+    
+    bool VerifyCRC(uint64_t *DataBuffer, uint64_t BufferSize, bool IsBigEndian, uint64_t Polynomial, uint64_t CRCSize, uint64_t InitialValue, uint64_t EmbeddedCRC) {
+        uint64_t GeneratedCRC = GenerateCRC(DataBuffer, BufferSize, IsBigEndian, Polynomial, CRCSize, InitialValue);
+        
+        if (GeneratedCRC == EmbeddedCRC) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    // tl;dr the most common symbols are assigned the smallest codes. How?
+    void HuffmanDecoder(BitInput *BitI, uint64_t NumberOfCodes) {
         
     }
     
-    return BytesRead;
-};
-
-/*!
- *  Read in 512 bits and scan for the specified stop bit, and return how many bits were counted before the stop bit was reached
- */
-/*
-uint64_t ReadRICE(int Bits2RICE, bool StopBit) {
-    uint64_t ArrayOffset = 0, BitOffset = 0, Output = 0;
-    
-    ArrayOffset = BitIO.InputBitOffset / 8; // MUST round down.
-    BitOffset   = BitIO.InputBitOffset - (ArrayOffset * 8); // difference between ArrayOffset and InputBitOffset
-    
-    
-    // for loop that reads all the bits available, and when done updates the buffer.
-    for (uint64_t i = 0; i < (BufferSizeInBits - BitIO.InputBitOffset); i++) {
-        if (((BitIO.InputBuffer[ArrayOffset] << BitOffset) & 0x7F) == StopBit)  { // Found the stop bit. report num bits.
-            Output = i;
-        }
-        BitIO.InputBitOffset += i;
+    void HuffmanEncoder(BitInput *BitI, uintptr_t HuffmanBlock, uint64_t BlockSize) {
+        uint8_t SymbolOccurance[256]; // Block based because sliding windows are retarded.
+        
     }
     
-    BufferSizeInBits + (BitIO.InputFPSize * 8);
-    return Output;
-};
-*/
-
-/*!
- *  Function to Skip X number of bits
- *  FIXME: This is a terrible hack.
- */
-void SkipBits(uint64_t Bits2Skip) {
-    uint64_t Trash = ReadBits(Bits2Skip); /// TODO: This is horrible, fix this... like, today.
-    //UpdateBitsRead(Bits2Skip);
-};
-
-/*!
- *  Write bits to buffer, and when full write OutputBuffer to disk
- */
-/*
-uint64_t WriteBits(uint64_t Bits2Write) {
-    // convert Bits2Write to array
-    for (int i = 0; i < 8; i++) {
-        BitIO.OutputBuffer[i] = (Bits2Write & 0x00000000000000FF);
+    void ArithmeticEncoder(void) {
+        
     }
     
-    uint64_t Times2Loop = Bits2Bytes(CountBits(Bits2Write));
-    uint64_t ArrayOffset = Bits2Bytes(CountBits(BitIO.BitsUnwritten)); // BitIO.BitsUnwritten
-    
-    for (uint64_t i = ArrayOffset; i < Times2Loop; i++) {
-        BitIO.OutputBuffer[i] = (Bits2Write & 0x00FF);
-        Bits2Write >>= 8;
-    }
-    fwrite(BitIO.OutputBuffer, 1, 4096, BitIO.OutputFP);
-    
-    
-    /*
-     for (int i = 0; i < Bits2Bytes(CountBits(Bits2Write)); i++) {
-     uint64_t SelectedBits = Bits2Write << 8;
-     BitIO.OutputBuffer[i] = SelectedBits;
-     }
-     
-     if (BitIO.BitsUnwritten == BufferSizeInBits) { // if Outputbuffer is full, write data to file, and reset UnwrittenBits
-     fwrite(BitIO.OutputBuffer, 1, 4096, BitIO.OutputFP);
-     BitIO.BitsUnwritten -= BufferSizeInBits;
-     }
-     */
-/*
-    return 0;
-};
-*/
-
-/*!
- *  Returns pointer to UUID struct containing UUID
- */
-uintptr_t ReadUUID() {
-    uint64_t BitsActuallyRead = 0;
-    
-    UUID.TimeLow                = ReadBits(32);
-    UUID.TimeMid                = ReadBits(16);
-    UUID.TimeHigh_Version       = ReadBits(16);
-    UUID.ClockHigh_Version      = ReadBits(8);
-    UUID.ClockLow               = ReadBits(8);
-    BitsActuallyRead = fread(UUID.Node, 1, 8, BitIO.InputFP);
-    UpdateBitsRead(BitsActuallyRead);
-    
-    return &UUID;
-};
-
-/*!
- *  Internel function to verify if X is a multiple of 8.
- */
-bool MultipleOf8(uint64_t IsMultiple) {
-    bool Multiple = 0;
-    
-    if (IsMultiple == 0) {
-        Multiple = false;
-    } else if ((IsMultiple % 8) == 0) {
-        Multiple = true;
-    } else {
-        Multiple = false;
+    void ArithmeticDecoder(void) {
+        
     }
     
-    return Multiple;
-};
-
-/*!
- *  convert bits to bytes, round up if not divisible by 8
- */
-uint64_t Bits2Bytes(uint64_t Bits) {
-    uint64_t x = Bits / 8;
-    if (MultipleOf8(Bits) == false) {
-        x++;
-    }
-    return x;
+#ifdef __cplusplus
 }
-
-/*!
- *  Internal: Divide Bytes by 8 to get number of bits
- */
-uint64_t Bytes2Bits(uint64_t Bytes) {
-    uint64_t x = Bytes * 8;
-    return x;
-}
-
-/*!
- *  Internal: for inverting the sign of X, for use in Byte Rounding calculations
- */
-int64_t InvertSign(int64_t Number2Invert) {
-    int64_t InvertedNumber = Number2Invert * -1;
-    return InvertedNumber;
-}
-
-/*!
- *  Internal to count the number of bits in X
- */
-uint64_t CountBits(uint64_t Bits2Count) {
-    uint64_t NumberOfBits = 0;
-    while (Bits2Count) {
-        Bits2Count &= (Bits2Count -1);
-        NumberOfBits++;
-    }
-    return NumberOfBits;
-};
-
-/*!
- *  Internal: Remove leading bits
- */
-int64_t PruneBits(int64_t Data2Prune) {
-    uint64_t NumberOfBits = CountBits(Data2Prune);
-    uint64_t PrunedData = 0;
-    PrunedData = Data2Prune << (64 - NumberOfBits);
-    return PrunedData;
-};
-
-/*!
- *  Deallocate BitIO
- */
-void Deallocate_BitIO(void) {
-    free(&BitIO);
-    fclose(BitIO.InputFP);
-    fclose(BitIO.OutputFP);
-    closedir(BitIO.InputDir);
-    closedir(BitIO.OutputDir);
-};
-
-/*!
- *  Internal: Converts a ones compliment value to twos compliment
- *  Keep in mind that the internal representation in BitIO is twos compliment.
- */
-uint64_t OnesCompliment2TwosCompliment() {
-    
-    return 0;
-}
-
-/*!
- *  Internal: Converts an Signed int to a Unsigned int.
- *  Keep in mind that the internal representation in BitIO is unsigned.
- */
-uint64_t Signed2Unsigned(int64_t Signed) {
-    
-    return 0;
-};
-
-/*!
- *  Internal: Converts an Unsigned int to a Signed int.
- *  Keep in mind that the internal representation in BitIO is unsigned.
- */
-int64_t Unsigned2Signed(uint64_t Unsigned) {
-  
-    return 0;
-};
-
-/*!
- *  Swap endian of 16 byte integers
- */
-uint16_t EndianSwap16(uint16_t X) { // Officially works.
-    return ((X & 0xff00) >> 8) | ((X & 0x00ff) << 8);
-}
-
-/*!
- *  Swap endian of 32 bit integers
- */
-uint32_t EndianSwap32(uint32_t X) { // Officially works
-    return ((X & 0xff000000) >> 24) | ((X & 0x00ff0000) >> 8) | ((X & 0x0000ff00) << 8) | ((X & 0x000000ff) << 24);
-}
-
-/*!
- *  Swap endian of 64 bit integers
- */
-uint64_t EndianSwap64(uint64_t X) { // Offically works
-    return
-    (((X & 0xff00000000000000) >> 56)|((X & 0x00ff000000000000) >> 40)|((X & 0x0000ff0000000000) >> 24)|((X & 0x000000ff00000000) >> 8)
-    |((X & 0x00000000ff000000) << 8)|((X & 0x0000000000ff0000) << 24)|((X & 0x000000000000ff00) << 40)|((X & 0x00000000000000ff) << 56));
-}
+#endif
