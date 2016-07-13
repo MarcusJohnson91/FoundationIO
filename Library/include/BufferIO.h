@@ -7,12 +7,18 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <string.h>
-#include <sys/mman.h> // mmap
-#include <unistd.h> // STDIN, Getopt, 
-#include <iso646.h> // Defines operators as words.
-#include <tgmath.h> // Type Generic Math, includes Math.h and Complex.h
+#include <sys/mman.h>   // mmap
+#include <unistd.h>     // STDIN, Getopt,
+#include <iso646.h>     // Defines operators as words.
+#include <tgmath.h>     // Type Generic Math, includes Math.h and Complex.h
+
+#include "ErrorCodes.h" // My header containing my error codes.
 
 #pragma once
+
+#if defined(_WIN32) || defined(_WIN64) || defined(CYGWIN_NT) || defined(MINGW32_NT) || defined(MSYS_NT)
+#define strcasecmp _stricmp
+#endif
 
 /*!
  @header    BitIO.h
@@ -21,10 +27,6 @@
  @version   1.0
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
  */
-
-#if defined(_WIN32) || defined(_WIN64)
-#define strcasecmp _stricmp
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,42 +37,40 @@ extern "C" {
 	
 	/*! @typedef    BitInput
 	 *  @abstract   Contains variables and buffers for reading bits.
-	 *  @discussion Tracks bits in relation to buffer and file to facilitate reading bits.
 	 *  @remark     The default internal representation in BitIO is unsigned.
 	 *
 	 *  @constant   File             Input file to read bits from.
 	 *  @constant   FileSize         Size of File in bytes.
      *  @constant   FilePosition     Current byte in the file.
      *  @constant   BitsUnavailable  Number of previously read bits in Buffer.
-	 *  @constant   BitsLeftInBuffer Number of readable bits remaining in Buffer.
+     *  @constant   BitsAvailable    Number of bits available for reading.
      *  @constant   CurrentArgument  Where to start in Argv processing.
-     *  @constant   Buffer           Buffer of BitIOBufferSizeInBits from File.
+     *  @constant   Buffer           Buffer of data from File
 	 */
     typedef struct BitInput {
         FILE                       *File;
         uint64_t                FileSize;
         uint64_t            FilePosition;
-        uint64_t         BitsUnavailable; // BitIndex
-        uint64_t           BitsAvailable; // BitsLeftInBuffer
-        uint64_t         CurrentArgument; // Which argument are we currently on?
+        uint64_t         BitsUnavailable;
+        uint64_t           BitsAvailable;
+        uint64_t         CurrentArgument;
         uint8_t  Buffer[BitIOBufferSize];
     } BitInput;
 	
 	/*! @typedef    BitOutput
 	 *  @abstract   Contains variables and buffers for writing bits.
-	 *  @discussion Tracks bits in relation to buffer and file to facilitate writing bits.
 	 *  @remark     The default internal representation in BitOutput is unsigned.
 	 *
 	 *  @constant   File             Input file to read bits from.
-     *  @constant   BitIndex         Number of previously read bits in Buffer.
-	 *  @constant   BitsLeftInBuffer Number of readable bits remaining in Buffer.
+     *  @constant   BitsUnavailable  Number of previously read bits in Buffer.
+	 *  @constant   BitsAvailable    Number of bits available for writing.
      *  @constant   CurrentArgument  Where to start in Argv processing.
      *  @constant   Buffer           Buffer of BitIOBufferSize bits from File.
 	 */
     typedef struct BitOutput {
         FILE                       *File;
-        uint64_t         BitsUnavailable; // BitIndex
-        uint64_t           BitsAvailable; // BitsLeftInBuffer
+        uint64_t         BitsUnavailable;
+        uint64_t           BitsAvailable;
         uint64_t         CurrentArgument;
         uint8_t  Buffer[BitIOBufferSize];
     } BitOutput;
@@ -82,6 +82,7 @@ extern "C" {
 	 *  @constant @SeekBits           Error code returned from SeekBits()
 	 *  @constant @PeekBits           Error code returned from PeekBits()
 	 *  @constant @WriteBits          Error code returned from WriteBits()
+     *  @constant @Power2Mask         Error code returned from Power2Mask()
 	 *  @constant @AlignBits2Byte     Error code returned from AlignBits2Bytes()
      *  @constant @UpdateInputBuffer  Error code returned from UpdateInputBuffer()
      */
@@ -90,17 +91,17 @@ extern "C" {
         int64_t           SeekBits;
 		int64_t           PeekBits;
 		int64_t          WriteBits;
+        int64_t         Power2Mask;
         int64_t     AlignBits2Byte;
         int64_t  UpdateInputBuffer;
     } ErrorStatus;
     
-    /*! @typedef  UUID
-     *  @abstract Contains     UUID in text and raw format
+    /*! @typedef   UUID
+     *  @abstract  Contains     UUID in text and raw format
      *
-     *  @constant RawUUIDData  Array of raw UUID bytes without separators
-     *  @constant UUIDString   Text string of UUID with separators.
+     *  @constant  RawUUIDData  Array of raw UUID bytes without separators
+     *  @constant  UUIDString   Text string of UUID with separators.
      */
-	
     typedef struct UUID {
         uint8_t RawUUIDData[16];
         uint8_t  UUIDString[21];
@@ -146,7 +147,7 @@ extern "C" {
     /*! @abstract   Finds the highest bit set; starts at MSB
      *  @param      InputData is the input int to find the highest bit set
      */
-    uint64_t FindHighestBitSet(uint64_t InputData);
+    uint8_t FindHighestBitSet(uint64_t InputData);
 	
 	/*! @abstract  Tells weather the input number is even or odd
      *  @returns   true for odd, false for even.
@@ -156,19 +157,31 @@ extern "C" {
     /*! @abstract   Counts the number of bits set to 1
      *  @param      Input integer to count the number of set bits
      */
-    uint64_t CountBits(uint64_t Input);
+    uint8_t CountBits(uint64_t Input);
     
     /*! @abstract   Swap endian of 16 bit integers
+     *
+     *  @param      Data2Swap Data to swap endian.
      */
-    uint16_t SwapEndian16(uint16_t X);
+    uint16_t SwapEndian16(uint16_t Data2Swap);
     
     /*! @abstract   Swap endian of 32 bit integers
+     *
+     *  @param      Data2Swap Data to swap endian.
      */
-    uint32_t SwapEndian32(uint32_t X);
+    uint32_t SwapEndian32(uint32_t Data2Swap);
     
     /*! @abstract   Swap endian of 64 bit integers
+     *
+     *  @param      Data2Swap Data to swap endian.
      */
-    uint64_t SwapEndian64(uint64_t X);
+    uint64_t SwapEndian64(uint64_t Data2Swap);
+    
+    /*! @abstract           Create bitmask from binary exponent.
+     *
+     *  @param    Exponent  Power to be raised.
+     */
+    uint64_t Power2Mask(ErrorStatus *ES, uint64_t Exponent);
 	
 	/*! @abstract   Parses command line flags
 	 */
@@ -201,37 +214,37 @@ extern "C" {
      *  @param     AbsoluteOffset number of bytes from the beginning of the current file
      *  @remark    if AbsoluteOffset is 0, it's assumed to be from the current position.
      */
-    void UpdateInputBuffer(BitInput *BitI, uint64_t AbsoluteOffset);
+    uint64_t UpdateInputBuffer(BitInput *BitI, uint64_t AbsoluteOffset);
     
     /*! @abstract   Manages InputBuffer and hands out the requested bits.
      *  @remark     DO NOT try reading backwards, it will not work. for that use SeekBits()
      */
-    uint64_t ReadBits(BitInput *BitI, int8_t Bits2Read);
+    uint64_t ReadBits(BitInput *BitI, ErrorStatus *ES, int8_t Bits2Read);
 	
     /*! @abstract Reads Exponential Golomb, and Truncated Exponential Golomb codes.
 	 *
      *  @return   Returns the decoded value of the Elias/Golomb code.
 	 */
-    uint64_t ReadExpGolomb(BitInput *BitI, bool IsSigned, bool IsTruncated);
+    uint64_t ReadExpGolomb(BitInput *BitI, ErrorStatus *ES, bool IsSigned, bool IsTruncated);
     
     /*! @abstract Shows the next X bits, without recording it as a read.
      *  @param    Bits2Peek Number of bits to peek.
      */
-    uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek);
+    uint64_t PeekBits(BitInput *BitI, ErrorStatus *ES, uint8_t Bits2Peek);
 	
 	/*! @abstract Writes bits to BitOutput
 	 *
 	 *  @param Bits2Write is the actual data to write out
 	 *  @param Bits       is the number of bits to write
 	 */
-	void WriteBits(BitOutput *BitO, uint64_t Bits2Write, uint64_t Bits);
+	void WriteBits(BitOutput *BitO, ErrorStatus *ES, uint64_t Bits2Write, uint64_t Bits);
 	
 	/*! @abstract Writes entire buffer to the output buffer, first come first serve.
 	 *
 	 *  @param Buffer2Write Pointer to the buffer to be written to the output buffer.
 	 *  @param BufferSize   Size of Buffer2Write in bytes
 	 */
-	void WriteBuffer(BitOutput *BitO, uint64_t *Buffer2Write, size_t BufferSize);
+	void WriteBuffer(BitOutput *BitO, ErrorStatus *ES, uint64_t *Buffer2Write, size_t BufferSize);
 	
     /*! @abstract Seeks Forwards and backwards in BitInput
 	 *  @remark   To seek backwards just use a negative number, to seek forwards positive.

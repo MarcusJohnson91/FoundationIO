@@ -3,13 +3,28 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+    uint16_t SwapEndian16(uint16_t Data2Swap) {
+        return ((Data2Swap & 0xFF00) >> 8) || ((Data2Swap & 0x00FF) << 8);
+    }
+    
+    uint32_t SwapEndian32(uint32_t Data2Swap) {
+        return ((Data2Swap & 0xFF000000) >> 24) | ((Data2Swap & 0x00FF0000) >> 8) | ((Data2Swap & 0x0000FF00) << 8) | ((Data2Swap & 0x000000FF) << 24);
+    }
+    
+    uint64_t SwapEndian64(uint64_t Data2Swap) {
+        return (((Data2Swap & 0xFF00000000000000) >> 56) | ((Data2Swap & 0x00FF000000000000) >> 40) | ((Data2Swap & 0x0000FF0000000000) >> 24) | ((Data2Swap & 0x000000FF00000000) >> 8)  | ((Data2Swap & 0x00000000FF000000) << 8)  | ((Data2Swap & 0x0000000000FF0000) << 24) | ((Data2Swap & 0x000000000000FF00) << 40) | ((Data2Swap & 0x00000000000000FF) << 56));
+    }
+    
+    bool IsOdd(int64_t Input) {
+        return Input % 2;
+    }
     
     uint64_t Bits2Bytes(uint64_t Bits) {
         return Bits / 8;
     }
     
     uint64_t Bytes2Bits(uint64_t Bytes) {
-        return Bytes * 8; // Bytes << 3
+        return Bytes * 8;
     }
     
     uint8_t BitsRemaining(uint8_t Bits) {
@@ -35,8 +50,7 @@ extern "C" {
         BitO->BitsUnavailable += (Bytes2Bits(BytesOfPadding) - BitsRemaining(BitO->BitsUnavailable));
     }
     
-    uint64_t FindHighestBitSet(uint64_t InputData) {
-        // Count down from 64, once we find the first 1 bit that's the highest, so record it's position, stop looping, and return the value
+    uint8_t FindHighestBitSet(uint64_t InputData) {
         uint8_t HighestBit = 0;
         if (InputData == 0) {
             HighestBit = 0;
@@ -47,48 +61,30 @@ extern "C" {
                     break;
                 }
             }
-            /*
-             for (size_t Bit = 63; Bit > 0; Bit--) { // should the loop start at 63? does it loop when it hits 0? if so replace "InputData & (1 <<= (Bit - 1))" with "InputData & Bit"
-             uint64_t CurrentBit = InputData & (1 <<= Bit);
-             if ((InputData & (1 <<= (Bit - 1))) == (1 <<= (Bit - 1))) {
-             HighestBit = Bit;
-             break;
-             }
-             }
-             */
-            
         }
         return HighestBit;
     }
     
-    bool IsOdd(int64_t Input) {
-        return Input % 2;
-    }
-    
-    uint64_t CountBits(uint64_t Input) {
-        uint8_t Count = 0;
+    uint8_t CountBits(uint64_t Input) {
         if (Input == 0) {
             return 0;
         }
+        uint8_t Count = 0;
         for (size_t Bit = 0; Bit < 64; Bit++) {
-            if ((Input & 1) == 1) {
+            uint64_t Mask = pow(2, Bit - 1);
+            if ((Input & Mask) == 1) { // if ((Input & 1) == 1) {
                 Count++;
             }
-            Input >>= 1;
         }
         return Count;
     }
     
-    uint16_t SwapEndian16(uint16_t X) {
-        return ((X & 0xFF00) >> 8) || ((X & 0x00FF) << 8);
-    }
-    
-    uint32_t SwapEndian32(uint32_t X) {
-        return ((X & 0xFF000000) >> 24) | ((X & 0x00FF0000) >> 8) | ((X & 0x0000FF00) << 8) | ((X & 0x000000FF) << 24);
-    }
-    
-    uint64_t SwapEndian64(uint64_t X) {
-        return (((X & 0xFF00000000000000) >> 56) | ((X & 0x00FF000000000000) >> 40) | ((X & 0x0000FF0000000000) >> 24) | ((X & 0x000000FF00000000) >> 8)  | ((X & 0x00000000FF000000) << 8)  | ((X & 0x0000000000FF0000) << 24) | ((X & 0x000000000000FF00) << 40) | ((X & 0x00000000000000FF) << 56));
+    uint64_t Power2Mask(ErrorStatus *ES, uint64_t Exponent) {
+        if (Exponent > 64) {
+            ES->Power2Mask = NUMBER_NOT_IN_RANGE;
+        }
+        uint64_t Mask = pow(2, Exponent);
+        return Mask;
     }
     
     void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
@@ -199,48 +195,47 @@ extern "C" {
         free(BitO);
     }
     
-    void UpdateInputBuffer(BitInput *BitI, uint64_t AbsoluteOffset) {
+    uint64_t UpdateInputBuffer(BitInput *BitI, uint64_t AbsoluteOffset) {
         if (AbsoluteOffset == 0) {
             AbsoluteOffset = BitI->FilePosition;
         }
         
-        ErrorStatus *ES = malloc(sizeof(ErrorStatus));
         uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > BitIOBufferSize ? BitIOBufferSize : BitI->FileSize - BitI->FilePosition;
         
         fseek(BitI->File, AbsoluteOffset, SEEK_SET);
         memset(BitI, 0, Bytes2Read);
         uint64_t BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
         if (BytesRead != Bytes2Read) {
-            printf("BitIO: UpdateInputBuffer failed! read %llu of %llu bytes\n", BytesRead, Bytes2Read);
-            ES->UpdateInputBuffer = 1;
+            return FREAD_UNKNOWN_FAILURE;
         }
+        return SUCCESS;
     }
     
-    uint64_t ReadBits(BitInput *BitI, int8_t Bits2Read) { // FIXME: May read backwards?
+    uint64_t ReadBits(BitInput *BitI, ErrorStatus *ES, int8_t Bits2Read) { // FIXME: May read backwards?
         uint64_t OutputData = 0;
         if (Bits2Read <= 0) {
             fprintf(stderr, "BitIO - ReadBits: You requested too few bits: %hhd\n", Bits2Read);
         } else if (Bits2Read > 64) {
             fprintf(stderr, "BitIO - ReadBits: You requested too many bits: %hhd\n", Bits2Read);
         } else {
-            OutputData             = PeekBits(BitI, Bits2Read);
+            OutputData             = PeekBits(BitI, ES, Bits2Read);
             BitI->BitsUnavailable += Bits2Read;
             BitI->BitsAvailable   -= Bits2Read;
         }
         return OutputData;
     }
     
-    uint64_t ReadExpGolomb(BitInput *BitI, bool IsSigned, bool IsTruncated) {
+    uint64_t ReadExpGolomb(BitInput *BitI, ErrorStatus *ES, bool IsSigned, bool IsTruncated) {
         uint64_t Zeros = 0;
         int64_t  Data  = 0;
         
-        Data = ReadBits(BitI, 1);
+        Data = ReadBits(BitI, ES, 1);
         if ((Zeros == 0) && (Data == 1)) {
-            while (ReadBits(BitI, 1) == 0) {
+            while (ReadBits(BitI, ES, 1) == 0) {
                 Zeros += 1;
             }
             Data = (1 << Zeros);
-            Data += ReadBits(BitI, Zeros);
+            Data += ReadBits(BitI, ES, Zeros);
         }
         
         if (IsSigned == true) {
@@ -249,20 +244,19 @@ extern "C" {
         
         if (IsTruncated == true) {
             Data = 2 * Zeros - 1; // Left bit first
-            Data += ReadBits(BitI, Zeros);
+            Data += ReadBits(BitI, ES, Zeros);
         }
         return Data;
     }
     
-    uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek) { // Bit by bit.
-        //FIXME: You CAN'T read byte by byte, it simply won't work so stop trying. Also, this is faster, instruction wise.
+    uint64_t PeekBits(BitInput *BitI, ErrorStatus *ES, uint8_t Bits2Peek) { // Bit by bit.
+        //WARNING: You CAN'T read byte by byte, it simply won't work so stop trying. Also, this is faster, instruction wise.
         uint64_t OutputData = 0;
         uint8_t  Data       = 0;
         uint8_t  BitsLeft   = Bits2Peek;
         uint8_t  BitMask    = 0;
-        ErrorStatus *ES = malloc(sizeof(ErrorStatus));
         if ((BitsLeft <= 0) || (BitsLeft > 64)) {
-            ES->PeekBits = 1;
+            ES->PeekBits = NUMBER_NOT_IN_RANGE;
         }
         if (BitI->BitsUnavailable > (BitI->BitsAvailable - BitsLeft)) { // InputBuffer is damn near full, update it
             UpdateInputBuffer(BitI, 0);
@@ -282,13 +276,12 @@ extern "C" {
         return OutputData;
     }
     
-    void WriteBits(BitOutput *BitO, uint64_t Bits2Write, uint64_t Bits) { // FIXME: Rewrite WriteBits entirely.
+    void WriteBits(BitOutput *BitO, ErrorStatus *ES, uint64_t Bits2Write, uint64_t Bits) { // FIXME: Rewrite WriteBits entirely.
         if (Bits <= 0) {
-            fprintf(stderr, "BitIO - WriteBits: You requested to write too few bits: %llu\n", Bits);
-        } else if (Bits > 64) {
-            fprintf(stderr, "BitIO - WriteBits: You requested to write too many bits: %llu\n", Bits);
+            ES->WriteBits = NUMBER_NOT_IN_RANGE;
         } else {
-            while (BitO->BitsUnavailable >= ((BitIOBufferSize - 16) * 8)) {
+            while (BitO->BitsUnavailable >= ((BitIOBufferSize - 16) * 8)) { // Write to disk because the buffer's full.
+                // FIXME: We need to just enlarge the buffer, the call a function to flush it all out to disk.
                 fwrite(BitO->Buffer, 1, Bits2Bytes(BitO->BitsUnavailable), BitO->File);
                 fflush(BitO->File);
                 memcpy(&BitO->Buffer, &BitO->Buffer + Bits2Bytes(BitO->BitsUnavailable), (BitIOBufferSize - Bits2Bytes(BitO->BitsUnavailable)));
@@ -304,9 +297,10 @@ extern "C" {
         }
     }
     
-    void WriteBuffer(BitOutput *BitO, uint64_t *Buffer2Write, size_t BufferSize) { // FIXME: This needs expand the buffer if nessicary.
+    void WriteBuffer(BitOutput *BitO, ErrorStatus *ES, uint64_t *Buffer2Write, size_t BufferSize) {
+        // FIXME: This needs expand the buffer if nessicary.
         for (size_t Byte = 0; Byte < BufferSize; Byte++) {
-            WriteBits(BitO, Buffer2Write[Byte], 8);
+            WriteBits(BitO, ES, Buffer2Write[Byte], 8);
         }
     }
     
@@ -384,22 +378,21 @@ extern "C" {
     
     // tl;dr the most common symbols are assigned the smallest codes. How?
     void HuffmanDecoder(BitInput *BitI, uint64_t NumberOfCodes) {
-        
     }
     
-    void HuffmanEncoder(BitInput *BitI, uintptr_t HuffmanBlock, uint64_t BlockSize) {
-        uint8_t SymbolOccurance[256]; // Block based because sliding windows are retarded.
-        
+    uintptr_t ReconstructHuffmanTree(BitInput *BitI, uintptr_t TableID, size_t TableSize) {
+        uintptr_t ReconstructedHuffmanTree = NULL;
+        return ReconstructedHuffmanTree;
+    }
+    
+    void HuffmanEncoder(BitInput *BitI, uintptr_t HuffmanBlock, uint64_t WindowSize) {
     }
     
     void ArithmeticEncoder(void) {
-        
     }
     
     void ArithmeticDecoder(void) {
-        
     }
-    
 #ifdef __cplusplus
 }
 #endif
