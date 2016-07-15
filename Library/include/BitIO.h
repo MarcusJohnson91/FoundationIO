@@ -31,9 +31,31 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
     #define BitIOBufferSize 4096
     #define BitIOBufferSizeInBits (BitIOBufferSize * 8)
+    
+    /*! @typedef  ErrorStatus
+     *  @abstract Allows check of the error status of various functions
+     *
+     *  @constant @ReadBits           Error code returned from ReadBits()
+     *  @constant @SeekBits           Error code returned from SeekBits()
+     *  @constant @PeekBits           Error code returned from PeekBits()
+     *  @constant @WriteBits          Error code returned from WriteBits()
+     *  @constant @Power2Mask         Error code returned from Power2Mask()
+     *  @constant @AlignBits2Byte     Error code returned from AlignBits2Bytes()
+     *  @constant @UpdateInputBuffer  Error code returned from UpdateInputBuffer()
+     */
+    typedef struct ErrorStatus {
+        int64_t           ReadBits;
+        int64_t           SeekBits;
+        int64_t           PeekBits;
+        int64_t          WriteBits;
+        int64_t         Power2Mask;
+        int64_t     AlignBits2Byte;
+        int64_t  UpdateInputBuffer;
+        int64_t       InitBitInput;
+        int64_t      InitBitOutput;
+    } ErrorStatus;
 	
 	/*! @typedef    BitInput
 	 *  @abstract   Contains variables and buffers for reading bits.
@@ -54,6 +76,7 @@ extern "C" {
         uint64_t         BitsUnavailable;
         uint64_t           BitsAvailable;
         uint64_t         CurrentArgument;
+        ErrorStatus                  *ES;
         uint8_t  Buffer[BitIOBufferSize];
     } BitInput;
 	
@@ -72,29 +95,9 @@ extern "C" {
         uint64_t         BitsUnavailable;
         uint64_t           BitsAvailable;
         uint64_t         CurrentArgument;
+        ErrorStatus                  *ES;
         uint8_t  Buffer[BitIOBufferSize];
     } BitOutput;
-	
-    /*! @typedef  ErrorStatus
-     *  @abstract Allows check of the error status of various functions
-	 *
-	 *  @constant @ReadBits           Error code returned from ReadBits()
-	 *  @constant @SeekBits           Error code returned from SeekBits()
-	 *  @constant @PeekBits           Error code returned from PeekBits()
-	 *  @constant @WriteBits          Error code returned from WriteBits()
-     *  @constant @Power2Mask         Error code returned from Power2Mask()
-	 *  @constant @AlignBits2Byte     Error code returned from AlignBits2Bytes()
-     *  @constant @UpdateInputBuffer  Error code returned from UpdateInputBuffer()
-     */
-    typedef struct ErrorStatus {
-        int64_t           ReadBits;
-        int64_t           SeekBits;
-		int64_t           PeekBits;
-		int64_t          WriteBits;
-        int64_t         Power2Mask;
-        int64_t     AlignBits2Byte;
-        int64_t  UpdateInputBuffer;
-    } ErrorStatus;
     
     /*! @typedef   UUID
      *  @abstract  Contains     UUID in text and raw format
@@ -157,7 +160,7 @@ extern "C" {
     /*! @abstract   Counts the number of bits set to 1
      *  @param      Input integer to count the number of set bits
      */
-    uint8_t CountBits(uint64_t Input);
+    uint8_t CountBits(BitInput *BitI, uint64_t Input);
     
     /*! @abstract   Swap endian of 16 bit integers
      *
@@ -181,7 +184,7 @@ extern "C" {
      *
      *  @param    Exponent  Power to be raised.
      */
-    uint64_t Power2Mask(ErrorStatus *ES, uint64_t Exponent);
+    uint64_t Power2Mask(BitInput *BitI, uint64_t Exponent);
 	
 	/*! @abstract   Parses command line flags
 	 */
@@ -219,32 +222,32 @@ extern "C" {
     /*! @abstract   Manages InputBuffer and hands out the requested bits.
      *  @remark     DO NOT try reading backwards, it will not work. for that use SeekBits()
      */
-    uint64_t ReadBits(BitInput *BitI, ErrorStatus *ES, int8_t Bits2Read);
+    uint64_t ReadBits(BitInput *BitI, int8_t Bits2Read);
 	
     /*! @abstract Reads Exponential Golomb, and Truncated Exponential Golomb codes.
 	 *
      *  @return   Returns the decoded value of the Elias/Golomb code.
 	 */
-    uint64_t ReadExpGolomb(BitInput *BitI, ErrorStatus *ES, bool IsSigned, bool IsTruncated);
+    uint64_t ReadExpGolomb(BitInput *BitI, bool IsSigned, bool IsTruncated);
     
     /*! @abstract Shows the next X bits, without recording it as a read.
      *  @param    Bits2Peek Number of bits to peek.
      */
-    uint64_t PeekBits(BitInput *BitI, ErrorStatus *ES, uint8_t Bits2Peek);
+    uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek);
 	
 	/*! @abstract Writes bits to BitOutput
 	 *
 	 *  @param Bits2Write is the actual data to write out
 	 *  @param Bits       is the number of bits to write
 	 */
-	void WriteBits(BitOutput *BitO, ErrorStatus *ES, uint64_t Bits2Write, uint64_t Bits);
+	void WriteBits(BitOutput *BitO, uint64_t Bits2Write, uint64_t Bits);
 	
 	/*! @abstract Writes entire buffer to the output buffer, first come first serve.
 	 *
 	 *  @param Buffer2Write Pointer to the buffer to be written to the output buffer.
 	 *  @param BufferSize   Size of Buffer2Write in bytes
 	 */
-	void WriteBuffer(BitOutput *BitO, ErrorStatus *ES, uint64_t *Buffer2Write, size_t BufferSize);
+	void WriteBuffer(BitOutput *BitO, uint64_t *Buffer2Write, size_t BufferSize);
 	
     /*! @abstract Seeks Forwards and backwards in BitInput
 	 *  @remark   To seek backwards just use a negative number, to seek forwards positive.
@@ -288,7 +291,6 @@ extern "C" {
      *  @param  EmbeddedCRC   Value to compare the data to, to be sure it was recieved and decoded correctly.
      */
     bool VerifyCRC(uint64_t *DataBuffer, uint64_t BufferSize, bool IsBigEndian, uint64_t Polynomial, uint64_t CRCSize, uint64_t InitialValue, uint64_t EmbeddedCRC);
-    
 #ifdef __cplusplus
 }
 #endif
