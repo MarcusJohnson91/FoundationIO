@@ -43,6 +43,9 @@ extern "C" {
         BitOutputBufferSizeInBits = BitOutputBufferSize * 8,
     } BitIOConstants;
     
+    uint64_t BitIOCurrentArgument = 1; // TODO: Make this not suck.
+    // WARNING: This *HAS* to be here to handle multiple inputs or outputs.
+    
     /*! @abstract                    "List of error codes the various functions in BitIO set in ErrorStatus".
      *  @remark                      "FIXME: Should the error codes be negative or positive?".
      */
