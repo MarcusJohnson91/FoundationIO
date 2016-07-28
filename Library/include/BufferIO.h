@@ -1,6 +1,6 @@
 /*!
  @header    BitIO.h
- @author    Marcus Johnson
+ @author    Marcus Johnson aka BumbleBritches57
  @copyright 2016, Marcus Johnson
  @version   1.0
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
@@ -32,34 +32,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    /*! @typedef                                "BitIOGlobalConstants".
-     *  @abstract                               "Contains global constants for BitIO".
-     *
-     *  @constant     BitIOBufferSize             "Is the size of the unified buffers, unused".
-     *  @constant     BitIOBufferSizeInBits       "Is the size of the unified buffers in bits, unused".
-     *  @constant     BitInputBufferSize          "Is the size of the buffer in BitInput".
-     *  @constant     BitInputBufferSizeInBits    "Is the size of the buffer in BitInput in bits".
-     *  @constant     BitOutputBufferSize         "Is the size of the buffer in BitOutput".
-     *  @constant     BitOutputBufferSizeInBits    "Is the size of the buffer in BitOutput in bits".
+    /*! @abstract                    "BitIO compile time constants".
+     *  @remark                      "Change the buffer sizes and whatnot in here.".
      */
-    enum BitIOGlobalConstants {
-        BitIOBufferSize           = 4096,
-        BitIOBufferSizeInBits     = BitIOBufferSize * 8,
-        BitInputBufferSize        = BitIOBufferSize,
+    enum BitIOConstants {
+        BitInputBufferSize        = 4096,
         BitInputBufferSizeInBits  = BitInputBufferSize * 8,
-        BitOutputBufferSize       = BitIOBufferSize,
+        BitOutputBufferSize       = 4096,
         BitOutputBufferSizeInBits = BitOutputBufferSize * 8,
-    };
+    } BitIOConstants;
     
-    //uint64_t BitIOCurrentArgument = 1; // TODO: Make this not suck.
-    
-    typedef struct BitIO {
-        uint64_t CurrentArgument; // MUST start at 1
-    } BitIO;
-    
-    /*! @typedef    ErrorCodes
-     *  @abstract                    "List of error codes the various functions in BitIO set in ErrorStatus".
-     *  @remark   "FIXME: Should the error codes be negative or positive? BitIO is currently unsigned, so positive".
+    /*! @abstract                    "List of error codes the various functions in BitIO set in ErrorStatus".
+     *  @remark                      "FIXME: Should the error codes be negative or positive?".
      */
     enum ErrorCodes {
         Success             =  0,
@@ -82,6 +66,7 @@ extern "C" {
     typedef struct ErrorStatus {
         int64_t           ReadBits;
         int64_t           ReadRICE;
+        int64_t          WriteRICE;
         int64_t           SeekBits;
         int64_t           PeekBits;
         int64_t          WriteBits;
@@ -113,10 +98,8 @@ extern "C" {
         uint64_t            FilePosition;
         uint64_t         BitsUnavailable;
         uint64_t           BitsAvailable;
-        uint64_t         CurrentArgument;
         ErrorStatus         *ErrorStatus;
-        BitIO                     *BitIO;
-        uint8_t  Buffer[BitIOBufferSize];
+        uint8_t  Buffer[BitInputBufferSize];
     } BitInput;
 	
 	/*! @typedef    BitOutput
@@ -126,17 +109,14 @@ extern "C" {
 	 *  @constant   File             "Input file to read bits from".
      *  @constant   BitsUnavailable  "Number of previously read bits in Buffer".
 	 *  @constant   BitsAvailable    "Number of bits available for writing".
-     *  @constant   CurrentArgument  "Where to start in Argv processing".
      *  @constant   Buffer           "Buffer of BitIOBufferSize bits from File".
 	 */
     typedef struct BitOutput {
         FILE                       *File;
         uint64_t         BitsUnavailable;
         uint64_t           BitsAvailable;
-        uint64_t         CurrentArgument;
         ErrorStatus         *ErrorStatus;
-        BitIO                     *BitIO;
-        uint8_t  Buffer[BitIOBufferSize];
+        uint8_t  Buffer[BitOutputBufferSize];
     } BitOutput;
     
     /*! @typedef    HuffmanTree
@@ -150,6 +130,21 @@ extern "C" {
         uint8_t  Tree[256];
         uint8_t  Probability[256];
     } HuffmanTree;
+    
+    typedef struct StaticHuffman {
+        uint64_t WAT;
+    } StaticHuffman;
+    
+    typedef struct DynamicHuffman {
+        uint16_t Length;
+        uint16_t Distance;
+        uint16_t CodeLength;
+    } DynamicHuffman;
+    
+    typedef struct Huffman {
+        StaticHuffman  *Static;
+        DynamicHuffman *Dynamic;
+    } Huffman;
     
     /*! @abstract                "Swap endian of 16 bit integers".
      *  @param    Data2Swap      "Data to swap endian".
@@ -221,26 +216,22 @@ extern "C" {
      */
     uint8_t CountBits(BitInput *BitI, uint64_t Input);
     
-    /*! @abstract                "Aligns bits for byte alignment".
-     *  @remark                  "For single-byte alignment".
+    /*! @abstract                "Aligns bits for single-byte alignment".
      *  @remark                  "TODO: Should this be Input/Output neutral?".
      */
     void AlignInputBits2Byte(BitInput *BitI);
     
-    /*! @abstract                "Aligns bits for X byte alignment".
-     *  @remark                  "For multi-byte alignment".
+    /*! @abstract                "Aligns bits for multi-byte alignment".
      *  @remark                  "TODO: Should this be Input/Output neutral?".
      */
     void AlignInputBits2Bytes(BitInput *BitI, uint8_t Bytes2Align);
     
-    /*! @abstract                "Aligns bits for X byte alignment".
-     *  @remark                  "For single byte alignment".
+    /*! @abstract                "Aligns bits for single-byte alignment".
      *  @remark                  "TODO: Should this be Input/Output neutral?".
      */
     void AlignOutputBits2Byte(BitOutput *BitO);
     
-    /*! @abstract                "Aligns bits for X byte alignment".
-     *  @remark                  "For multi-byte alignment".
+    /*! @abstract                "Aligns bits for multi-byte alignment".
      *  @remark                  "TODO: Should this be Input/Output neutral?".
      */
     void AlignOutputBits2Bytes(BitOutput *BitO, uint8_t Bytes2Align);
@@ -302,6 +293,12 @@ extern "C" {
      */
     uint64_t ReadRICE(BitInput *BitI, bool StopBit);
     
+    /*! @abstract                "Writes a number in RICE format".
+     *  @param    StopBit        "Has to be a 0 or a 1".
+     *  @param    Data2Write     "Number to encode into RICE format".
+     */
+    void WriteRICE(BitOutput *BitO, bool StopBit, uint64_t Data2Write);
+    
     /*! @abstract                "Shows the next X bits, without recording it as a read".
      *  @param    Bits2Peek      "Number of bits to peek".
      */
@@ -310,9 +307,9 @@ extern "C" {
 	/*! @abstract                "Writes bits to BitOutput".
 	 *
 	 *  @param    Data2Write     "Is the actual data to write out".
-	 *  @param    Bits2Write     "Is the number of bits to write".
+	 *  @param    NumBits        "Is the number of bits to write".
 	 */
-	void WriteBits(BitOutput *BitO, size_t Data2Write, uint64_t Bits2Write);
+	void WriteBits(BitOutput *BitO, uint64_t Data2Write, size_t NumBits);
 	
 	/*! @abstract                "Writes entire buffer to the output buffer, first come first serve".
 	 *
@@ -352,7 +349,7 @@ extern "C" {
     /*! @abstract                "Decodes Huffman encoded data".
      *  @remark                  "It's not even CLOSE to API/ABI compatible with zlib, because zlib is shit".
      */
-    void DecodeHuffman(BitInput *BitI);
+    void DecodeHuffman(BitInput *BitI, Huffman *Huff);
     
     /*! @abstract                "Parses DEFLATE encoded block, and sends it off to the Huffman/LZ77 decoder".
      */

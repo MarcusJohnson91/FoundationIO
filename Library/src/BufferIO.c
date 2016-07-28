@@ -123,7 +123,7 @@ extern "C" {
 	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
 		glob_t *GlobBuffer = 0;
 		while (BitI->File == NULL) {
-			for (uint64_t Argument = BitI->BitIO->CurrentArgument; Argument < argc; Argument++) {
+			for (uint64_t Argument = 1; Argument < argc; Argument++) {
 				if (strcasecmp(argv[Argument], "-i")             == 0) {
 					Argument += 1;
 					if (strcasecmp(argv[Argument], "-")          == 0) { // hyphen: -, en dash: –, em dash: —;
@@ -142,7 +142,6 @@ extern "C" {
 						
 						//setvbuf(BitI->File, BitI->Buffer, _IONBF, BitIOBufferSize); // I'm buffering BitInput, so the OS doesn't need to.
 					}
-					BitI->BitIO->CurrentArgument += Argument - 1;
 				}
 			}
 		}
@@ -151,7 +150,7 @@ extern "C" {
 	void ParseOutputOptions(BitOutput *BitO, int argc, const char *argv[]) {
 		glob_t *GlobBuffer = 0;
 		while (BitO->File == NULL) {
-			for (uint64_t Argument = BitO->BitIO->CurrentArgument; Argument < argc; Argument++) {
+			for (uint64_t Argument = 1; Argument < argc; Argument++) {
 				if (strcasecmp(argv[Argument], "-o")             == 0) {
 					Argument += 1; // FIXME: The For loop already handles this?
 					if (strcasecmp(argv[Argument], "-")          == 0) {
@@ -163,14 +162,13 @@ extern "C" {
 					} else {
 						BitO->File = fopen(argv[Argument], "wb");
 						//setbuf(BitO->File, _IONBF); // I'm buffering BitOutput, so the OS doesn't need to.
-						setvbuf(BitO->File, BitO->Buffer, _IONBF, BitIOBufferSize);
+						setvbuf(BitO->File, BitO->Buffer, _IONBF, BitOutputBufferSize);
 						if (BitO->File == NULL) {
 							BitO->ErrorStatus->ParseOutputOptions = strerror(errno);
 							fprintf(stderr, "BitIO: ParseOutputOptions failed with error %d, %s\n", errno, strerror(errno));
 							clearerr(BitO->File);
 						}
 					}
-					BitO->BitIO->CurrentArgument += Argument - 1;
 				}
 			}
 		}
@@ -182,16 +180,15 @@ extern "C" {
 		} else {
 			ParseInputOptions(BitI, argc, argv);
 			BitI->ErrorStatus = malloc(sizeof(ErrorStatus)); // FIXME: Can't malloc before init?
-			BitI->BitIO       = malloc(sizeof(BitIO));
 			if (BitI->File == NULL) {
 				BitI->ErrorStatus->InitBitInput = FreadUnknownFailure; // FIXME: Use errno to find the actual problem instead of guessing.
 			} else {
 				fseek(BitI->File, 0, SEEK_END);
 				BitI->FileSize         = ftell(BitI->File);
 				fseek(BitI->File, 0, SEEK_SET);
-				uint64_t Bytes2Read    = BitI->FileSize > BitIOBufferSize ? BitIOBufferSize : BitI->FileSize;
+				uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
 				memset(BitI->Buffer, 0, Bytes2Read);
-				uint64_t BytesRead     = fread(BitI->Buffer, 1, BitIOBufferSize, BitI->File);
+				uint64_t BytesRead     = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File);
 				if (BytesRead < Bytes2Read) {
 					fprintf(stderr, "InitBitInput: Read: %llu of: %llu bytes, at position: %ld\n", BytesRead, Bytes2Read, ftell(BitI->File));
 					BitI->ErrorStatus->InitBitInput = FreadUnknownFailure;
@@ -199,9 +196,6 @@ extern "C" {
 				BitI->BitsAvailable = Bytes2Bits(BytesRead);
 				BitI->BitsUnavailable         = 0;
 				BitI->FilePosition  = ftell(BitI->File);
-				if (BitI->BitIO->CurrentArgument == 0) {
-					BitI->BitIO->CurrentArgument = 1;
-				}
 			}
 		}
 	}
@@ -212,18 +206,14 @@ extern "C" {
 		} else {
 			ParseOutputOptions(BitO, argc, argv);
 			BitO->ErrorStatus = malloc(sizeof(ErrorStatus));
-			BitO->BitIO       = malloc(sizeof(BitIO));
 		// TODO: Does ErrorStatus need to be initalized at all? YES, It DOES.
 			if (BitO->File == NULL) {
 				fprintf(stderr, "InitBitOutput: OutputFile couldn't be opened, check permissions\n");
 				BitO->ErrorStatus->InitBitOutput = FreadUnknownFailure;
 			} else {
-				memset(BitO->Buffer,   0, BitIOBufferSize);
-				BitO->BitsAvailable    = BitInputBufferSizeInBits;
+				memset(BitO->Buffer,   0, BitOutputBufferSize);
+				BitO->BitsAvailable    = BitOutputBufferSizeInBits;
 				BitO->BitsUnavailable  = 0;
-				if (BitO->BitIO->CurrentArgument == 0) {
-					BitO->BitIO->CurrentArgument = 1;
-				}
 			}
 		}
 	}
@@ -234,8 +224,7 @@ extern "C" {
 		BitI->FilePosition     = 0;
 		BitI->BitsUnavailable  = 0;
 		BitI->BitsAvailable    = 0;
-		memset(BitI->Buffer,     0, BitIOBufferSize);
-		free(BitI->BitIO);
+		memset(BitI->Buffer,     0, BitInputBufferSize);
 		free(BitI->ErrorStatus);
 		free(BitI);
 	}
@@ -244,8 +233,7 @@ extern "C" {
 		fclose(BitO->File);
 		BitO->BitsUnavailable = 0;
 		BitO->BitsAvailable   = 0;
-		memset(BitO->Buffer,    0, BitIOBufferSize);
-		free(BitO->BitIO);
+		memset(BitO->Buffer,    0, BitInputBufferSize);
 		free(BitO->ErrorStatus);
 		free(BitO);
 	}
@@ -254,7 +242,7 @@ extern "C" {
 		if (AbsoluteOffset == 0) {
 			AbsoluteOffset  = BitI->FilePosition;
 		}
-		uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > BitIOBufferSize ? BitIOBufferSize : BitI->FileSize - BitI->FilePosition;
+		uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
 		fseek(BitI->File, AbsoluteOffset, SEEK_SET);
 		memset(BitI, 0, Bytes2Read);
 		uint64_t BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
@@ -311,6 +299,15 @@ extern "C" {
 		return BitCount;
 	}
 	
+	void WriteRICE(BitOutput *BitO, bool StopBit, uint64_t Data2Write) {
+		if (StopBit != (0|1)) {
+			BitO->ErrorStatus->WriteRICE = NumberNotInRange;
+		}
+		for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
+			WriteBits(BitO, ~StopBit, 1);
+		}
+	}
+	
 	uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek) { // Bit by bit.
 	//WARNING: You CAN'T read byte by byte, it simply won't work so stop trying. Also, this is faster, instruction wise.
 		uint64_t OutputData = 0;
@@ -338,25 +335,26 @@ extern "C" {
 		return OutputData;
 	}
 	
-	void WriteBits(BitOutput *BitO, size_t Data2Write, uint64_t Bits2Write) { // FIXME Count the number of bits in the damn buffer so the user doesn't have to supply it.
+	void WriteBits(BitOutput *BitO, uint64_t Data2Write, size_t NumBits) { // FIXME Count the number of bits in the damn buffer so the user doesn't have to supply it.
 		// FIXME: Rewrite WriteBits entirely.
-		if (Bits2Write <= 0) {
+		if (NumBits <= 0) {
 			BitO->ErrorStatus->WriteBits = NumberNotInRange;
 		} else {
-			while (BitO->BitsUnavailable >= ((BitIOBufferSize - 16) * 8)) {
+			while (BitO->BitsUnavailable >= ((BitOutputBufferSize - 16) * 8)) {
+		// FIXME: BitOutputBufferSize needs to be rewritten, because the output buffer may change after being compiled.
 		// Write to disk because the buffer's full.
 		// FIXME: We need to just enlarge the buffer, the call a function to flush it all out to disk.
 				fwrite(BitO->Buffer, 1, Bits2Bytes(BitO->BitsUnavailable), BitO->File);
 				fflush(BitO->File);
-				memcpy(&BitO->Buffer, &BitO->Buffer + Bits2Bytes(BitO->BitsUnavailable), (BitIOBufferSize - Bits2Bytes(BitO->BitsUnavailable)));
-				memset(BitO->Buffer, 0, BitIOBufferSize);
+				memcpy(&BitO->Buffer, &BitO->Buffer + Bits2Bytes(BitO->BitsUnavailable), (BitOutputBufferSize - Bits2Bytes(BitO->BitsUnavailable)));
+				memset(BitO->Buffer, 0, BitOutputBufferSize);
 				BitO->BitsUnavailable = (BitO->BitsUnavailable - ((BitO->BitsUnavailable / 8) * 8));
 			}
-			while (Bits2Write > 0) {
+			while (NumBits > 0) {
 				uint64_t X = Data2Write & BitsRemaining(BitO->BitsUnavailable);
 				BitO->Buffer[Bits2Bytes(BitO->BitsUnavailable)] += X;
 				BitO->BitsUnavailable++;
-				Bits2Write -= 1;
+				NumBits -= 1;
 			}
 		}
 	}
@@ -373,10 +371,10 @@ extern "C" {
 		if ((BitI->BitsUnavailable + Bits) >= BitI->BitsAvailable) {
 			UpdateInputBuffer(BitI, 0); // FIXME: This is ugly as hell
 		} else {
-			uint64_t Bytes2Read = BitI->BitsAvailable<BitIOBufferSizeInBits?BitI->BitsAvailable:BitIOBufferSizeInBits;
+			uint64_t Bytes2Read = BitI->BitsAvailable < BitOutputBufferSizeInBits ? BitI->BitsAvailable :BitOutputBufferSizeInBits;
 			BitI->FilePosition = ftell(BitI->File);
-			fseek(BitI->File, BitIOBufferSizeInBits - (BitI->BitsUnavailable + Bits), SEEK_CUR);
-			memset(BitI->Buffer, 0, BitIOBufferSize);
+			fseek(BitI->File, BitOutputBufferSizeInBits - (BitI->BitsUnavailable + Bits), SEEK_CUR);
+			memset(BitI->Buffer, 0, BitOutputBufferSize);
 			fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
 		}
 	}
@@ -416,10 +414,10 @@ extern "C" {
 		}
 	}
 	
-	void DecodeHuffman(BitInput *BitI) { // 3 alphabets, literal, "alphabet of bytes", or <length 8, distance, 15>
-		// the first 2 are combined, 0-255 = literal, 256 = EoB, 257-285 = length
+	void DecodeHuffman(BitInput *BitI, Huffman *Huff) { // 3 alphabets, literal, "alphabet of bytes", or <length 8, distance 15>
+		// the first 2 are combined, 0-255 = literal, 256 = End of Block, 257-285 = length
 		
-		// TODO: FIXME: WARNING: The Tilde ~ symbol is the negation symbol in C!!!!!
+		// FIXME: WARNING: The Tilde ~ symbol is the negation symbol in C!!!!!
 		
 		uint8_t  DecodedData[32768] = {0};
 		/* Parse Huffman block header */
@@ -427,9 +425,7 @@ extern "C" {
 		uint8_t  HuffmanCompressionType = ReadBits(BitI, 2); // 0 = none, 1 = fixed, 2 = dynamic, 3 = invalid.
 		int32_t  DataLength             = 0;
 		int32_t  OnesComplimentOfLength = 0; // Ones Compliment of DataLength
-		if (HuffmanCompressionType == 3) { // Invalid.
-		// Reject the stream.
-		}
+		
 		if (IsLastHuffmanBlock == true) {
 			
 		}
@@ -448,9 +444,11 @@ extern "C" {
 			uint16_t Distance = ReadBits(BitI, 5);
 			
 		} else if (HuffmanCompressionType == 2) { // Dynamic Huffman.
-			
-		} else {
-			// Error
+			Huff->Dynamic->Length     = ReadBits(BitI, 5) + 257;
+			Huff->Dynamic->Distance   = ReadBits(BitI, 5) + 1;
+			Huff->Dynamic->CodeLength = ReadBits(BitI, 4) + 4;
+		} else { // Invalid.
+				 // Reject the stream.
 		}
 		/*
 	   if compressed with dynamic Huffman codes
