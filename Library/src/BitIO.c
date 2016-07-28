@@ -123,7 +123,7 @@ extern "C" {
 	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
 		glob_t *GlobBuffer = 0;
 		while (BitI->File == NULL) {
-			for (uint64_t Argument = 1; Argument < argc; Argument++) {
+			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
 				if (strcasecmp(argv[Argument], "-i")             == 0) {
 					Argument += 1;
 					if (strcasecmp(argv[Argument], "-")          == 0) { // hyphen: -, en dash: –, em dash: —;
@@ -143,6 +143,7 @@ extern "C" {
 						//setvbuf(BitI->File, BitI->Buffer, _IONBF, BitIOBufferSize); // I'm buffering BitInput, so the OS doesn't need to.
 					}
 				}
+				BitIOCurrentArgument += Argument - 1;
 			}
 		}
 	}
@@ -150,7 +151,7 @@ extern "C" {
 	void ParseOutputOptions(BitOutput *BitO, int argc, const char *argv[]) {
 		glob_t *GlobBuffer = 0;
 		while (BitO->File == NULL) {
-			for (uint64_t Argument = 1; Argument < argc; Argument++) {
+			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
 				if (strcasecmp(argv[Argument], "-o")             == 0) {
 					Argument += 1; // FIXME: The For loop already handles this?
 					if (strcasecmp(argv[Argument], "-")          == 0) {
@@ -170,6 +171,7 @@ extern "C" {
 						}
 					}
 				}
+				BitIOCurrentArgument += Argument - 1;
 			}
 		}
 	}
