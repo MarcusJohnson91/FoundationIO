@@ -22,6 +22,7 @@
 #include <limits.h>
 #include <signal.h>
 #include <complex.h>
+#include <fcntl.h>
 
 #if defined(_WIN32) || defined(_WIN64) || defined(CYGWIN_NT) || defined(MINGW32_NT) || defined(MSYS_NT)
 #define strcasecmp _stricmp
