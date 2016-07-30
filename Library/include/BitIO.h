@@ -33,21 +33,23 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    /*! @abstract                    "BitIO compile time constants".
-     *  @remark                      "Change the buffer sizes and whatnot in here.".
+    /*! @abstract                   "BitIO compile time constants".
+     *  @remark                     "Change the buffer sizes and whatnot in here.".
      */
     enum BitIOConstants {
         BitInputBufferSize        = 4096,
         BitInputBufferSizeInBits  = BitInputBufferSize * 8,
         BitOutputBufferSize       = 4096,
         BitOutputBufferSizeInBits = BitOutputBufferSize * 8,
-    } BitIOConstants;
+    };
     
-    uint64_t BitIOCurrentArgument = 1; // TODO: Make this not suck.
+    extern uint64_t BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Inout/Output parses.
+    
+    //uint64_t BitIOCurrentArgument = 1; // TODO: Make this not suck.
     // WARNING: This *HAS* to be here to handle multiple inputs or outputs.
     
-    /*! @abstract                    "List of error codes the various functions in BitIO set in ErrorStatus".
-     *  @remark                      "FIXME: Should the error codes be negative or positive?".
+    /*! @abstract                   "List of error codes the various functions in BitIO set in ErrorStatus".
+     *  @remark                     "FIXME: Should the error codes be negative or positive?".
      */
     enum ErrorCodes {
         Success             =  0,
@@ -57,21 +59,14 @@ extern "C" {
     };
     
     /*! @typedef  ErrorStatus
-     *  @abstract                    "Allows check of the error status of various functions".
-     *
-     *  @constant @ReadBits          "Error code returned from ReadBits()".
-     *  @constant @SeekBits          "Error code returned from SeekBits()".
-     *  @constant @PeekBits          "Error code returned from PeekBits()".
-     *  @constant @WriteBits         "Error code returned from WriteBits()".
-     *  @constant @Power2Mask        "Error code returned from Power2Mask()".
-     *  @constant @AlignBits2Byte    "Error code returned from AlignBits2Bytes()".
-     *  @constant @UpdateInputBuffer "Error code returned from UpdateInputBuffer()".
+     *  @abstract                   "Allows checking of the error status of various functions".
      */
     typedef struct ErrorStatus {
         int64_t           ReadBits;
         int64_t           ReadRICE;
         int64_t          WriteRICE;
         int64_t           SeekBits;
+        int64_t           SkipBits;
         int64_t           PeekBits;
         int64_t          WriteBits;
         int64_t         Power2Mask;
@@ -328,6 +323,8 @@ extern "C" {
 	 *  @param    Bits           "The number of bits to seek".
      */
     void SeekBits(BitInput *BitI, int64_t Bits);
+    
+    void SkipBits(BitInput *BitI, uint8_t Bits2Skip);
     
     /*! @abstract                "Generates CRC from data".
      *  @remark                  "Uses Reciprocal representation".

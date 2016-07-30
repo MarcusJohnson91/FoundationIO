@@ -3,6 +3,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+	uint64_t BitIOCurrentArgument = 1;
+	
 	uint16_t SwapEndian16(uint16_t Data2Swap) {
 		return ((Data2Swap & 0xFF00) >> 8) || ((Data2Swap & 0x00FF) << 8);
 	}
@@ -306,7 +308,7 @@ extern "C" {
 			BitO->ErrorStatus->WriteRICE = NumberNotInRange;
 		}
 		for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
-			WriteBits(BitO, ~StopBit, 1);
+			WriteBits(BitO, (1 ^ StopBit), 1);
 		}
 	}
 	
@@ -379,6 +381,14 @@ extern "C" {
 			memset(BitI->Buffer, 0, BitOutputBufferSize);
 			fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
 		}
+	}
+	
+	void SkipBits(BitInput *BitI, uint8_t Bits2Skip) {
+		if (Bits2Skip <= 0 | Bits2Skip > 64) {
+			BitI->ErrorStatus->SkipBits = NumberNotInRange;
+			exit(EXIT_FAILURE);
+		}
+		SeekBits(BitI, Bits2Skip);
 	}
 	
 	uint64_t GenerateCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool Init) {
