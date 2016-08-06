@@ -53,9 +53,9 @@ extern "C" {
 		return Input ^ 0xFFFFFFFFFFFFFFFF + 1;
 	}
 	
-	uint8_t FindHighestBitSet(BitInput *BitI, uint64_t InputData) {
+	uint8_t FindHighestBitSet(ErrorStatus *ES, uint64_t InputData) {
 		if (InputData <= 0) {
-			BitI->ErrorStatus->FindHighestBitSet = NumberNotInRange;
+			ES->FindHighestBitSet = NumberNotInRange;
 		}
 		uint8_t HighestBitSet = 0;
 		for (uint8_t Bit = 64; Bit > 0; Bit--) { // stop at the first 1 bit, and return that.
@@ -108,15 +108,15 @@ extern "C" {
 		BitO->BitsAvailable   += BitsRemaining(BitO->BitsAvailable);
 		BitO->BitsUnavailable -= BitsRemaining(BitO->BitsUnavailable);
 		if (Bytes2Align > 1) {
-			uint64_t Wat = Bytes2Bits(Bytes2Align -1);
+			uint64_t Wat           = Bytes2Bits(Bytes2Align -1);
 			BitO->BitsAvailable   -= Wat;
 			BitO->BitsUnavailable += Wat;
 		}
 	}
 	
-	uint64_t Power2Mask(BitInput *BitI, uint64_t Exponent) {
+	uint64_t Power2Mask(ErrorStatus *ES, uint64_t Exponent) {
 		if (Exponent > 64) {
-			BitI->ErrorStatus->Power2Mask = NumberNotInRange;
+			ES->Power2Mask = NumberNotInRange;
 		}
 		uint64_t Mask = pow(2, Exponent) - 1;
 		return Mask;
@@ -178,12 +178,15 @@ extern "C" {
 		}
 	}
 	
-	void InitBitInput(BitInput *BitI, int argc, const char *argv[]) {
+	void InitBitInput(BitInput *BitI, ErrorStatus *ES, int argc, const char *argv[]) {
 		if (argc < 3) {
 			printf("Usage: -i <input> -o <output>\n");
 		} else {
+			if (BitI->ErrorStatus == NULL) {
+				BitI->ErrorStatus  = ES;
+			}
 			ParseInputOptions(BitI, argc, argv);
-			BitI->ErrorStatus = malloc(sizeof(ErrorStatus)); // FIXME: Can't malloc before init?
+			// FIXME: Can't calloc before init?
 			if (BitI->File == NULL) {
 				BitI->ErrorStatus->InitBitInput = FreadUnknownFailure; // FIXME: Use errno to find the actual problem instead of guessing.
 			} else {
@@ -204,20 +207,22 @@ extern "C" {
 		}
 	}
 	
-	void InitBitOutput(BitOutput *BitO, int argc, const char *argv[]) {
+	void InitBitOutput(BitOutput *BitO, ErrorStatus *ES, int argc, const char *argv[]) {
 		if (argc < 3) {
 			printf("Usage: -i <input> -o <output>\n");
 		} else {
+			if (BitO->ErrorStatus == NULL) {
+				BitO->ErrorStatus = ES;
+			}
 			ParseOutputOptions(BitO, argc, argv);
-			BitO->ErrorStatus = malloc(sizeof(ErrorStatus));
-		// TODO: Does ErrorStatus need to be initalized at all? YES, It DOES.
 			if (BitO->File == NULL) {
 				fprintf(stderr, "InitBitOutput: OutputFile couldn't be opened, check permissions\n");
-				BitO->ErrorStatus->InitBitOutput = FreadUnknownFailure;
+				BitO->ErrorStatus->InitBitOutput      = FreadUnknownFailure;
 			} else {
 				memset(BitO->Buffer,   0, BitOutputBufferSize);
 				BitO->BitsAvailable    = BitOutputBufferSizeInBits;
 				BitO->BitsUnavailable  = 0;
+				BitO->ErrorStatus      = ES;
 			}
 		}
 	}
@@ -229,7 +234,6 @@ extern "C" {
 		BitI->BitsUnavailable  = 0;
 		BitI->BitsAvailable    = 0;
 		memset(BitI->Buffer,     0, BitInputBufferSize);
-		free(BitI->ErrorStatus);
 		free(BitI);
 	}
 	
@@ -238,7 +242,6 @@ extern "C" {
 		BitO->BitsUnavailable = 0;
 		BitO->BitsAvailable   = 0;
 		memset(BitO->Buffer,    0, BitInputBufferSize);
-		free(BitO->ErrorStatus);
 		free(BitO);
 	}
 	
@@ -310,44 +313,51 @@ extern "C" {
 		for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
 			WriteBits(BitO, (1 ^ StopBit), 1);
 		}
+		WriteBits(BitO, StopBit, 1);
 	}
 	
-	uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek) { // Bit by bit.
+	uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek) {
 	//WARNING: You CAN'T read byte by byte, it simply won't work so stop trying. Also, this is faster, instruction wise.
 		uint64_t OutputData = 0;
 		uint8_t  Data       = 0;
 		uint8_t  BitsLeft   = Bits2Peek;
 		uint8_t  BitMask    = 0;
-		if ((BitsLeft <= 0) || (BitsLeft > 64)) {
-			BitI->ErrorStatus->PeekBits = NumberNotInRange;
-		}
-		if (BitI->BitsUnavailable > (BitI->BitsAvailable - BitsLeft)) { // InputBuffer is damn near full, update it
+		
+		if (Bits2Peek > 64) {
+			BitI->ErrorStatus->PeekBits = TriedReadingTooManyBits;
+		} else if (Bits2Peek <= 0) {
+			BitI->ErrorStatus->PeekBits = TriedReadingTooFewBits;
+		} else if (BitI->BitsUnavailable > (BitI->BitsAvailable - BitsLeft)) {
+			// InputBuffer can't completely satisfy the request, update it.
 			UpdateInputBuffer(BitI, 0);
+		} else {
+			while (BitsLeft > 0) {
+				OutputData           <<= 1;
+				BitMask                = 1 << ((8 - (BitI->BitsUnavailable % 8)) -1);
+				Data                   = BitI->Buffer[Bits2Bytes(BitI->BitsUnavailable)] & BitMask;
+				Data                 >>= ((8 - (BitI->BitsUnavailable % 8)) -1);
+				OutputData            += Data;
+				BitI->BitsAvailable   -= 1;
+				BitI->BitsUnavailable += 1;
+				BitsLeft              -= 1;
+			}
+			BitI->BitsAvailable       += Bits2Peek;
+			BitI->BitsUnavailable     -= Bits2Peek;
 		}
-		while (BitsLeft > 0) {
-			OutputData <<= 1;
-			BitMask      = 1 << ((8 - (BitI->BitsUnavailable % 8)) -1);
-			Data         = BitI->Buffer[Bits2Bytes(BitI->BitsUnavailable)] & BitMask;
-			Data       >>= ((8 - (BitI->BitsUnavailable % 8)) -1);
-			OutputData            += Data;
-			BitI->BitsAvailable   -= 1;
-			BitI->BitsUnavailable += 1;
-			BitsLeft              -= 1;
-		}
-		BitI->BitsAvailable   += Bits2Peek;
-		BitI->BitsUnavailable -= Bits2Peek;
 		return OutputData;
 	}
 	
-	void WriteBits(BitOutput *BitO, uint64_t Data2Write, size_t NumBits) { // FIXME Count the number of bits in the damn buffer so the user doesn't have to supply it.
+	void WriteBits(BitOutput *BitO, uint64_t Data2Write, size_t NumBits) {
+		// FIXME Count the number of bits in the damn buffer so the user doesn't have to supply it That's error prone...
 		// FIXME: Rewrite WriteBits entirely.
 		if (NumBits <= 0) {
-			BitO->ErrorStatus->WriteBits = NumberNotInRange;
+			BitO->ErrorStatus->WriteBits = TriedWritingTooFewBits;
 		} else {
-			while (BitO->BitsUnavailable >= ((BitOutputBufferSize - 16) * 8)) {
-		// FIXME: BitOutputBufferSize needs to be rewritten, because the output buffer may change after being compiled.
-		// Write to disk because the buffer's full.
-		// FIXME: We need to just enlarge the buffer, the call a function to flush it all out to disk.
+			
+			if (BitO->BitsAvailable < NumBits) {
+				// Write the completed bytes out, save the uncompleted ones in the array.
+			}
+			while (BitO->BitsUnavailable >= ((BitOutputBufferSize - 16) * 8)) { // FIXME: This needs work, don't rely on Bit*BufferSize, it isn't nessicarily accurate after initilization.
 				fwrite(BitO->Buffer, 1, Bits2Bytes(BitO->BitsUnavailable), BitO->File);
 				fflush(BitO->File);
 				memcpy(&BitO->Buffer, &BitO->Buffer + Bits2Bytes(BitO->BitsUnavailable), (BitOutputBufferSize - Bits2Bytes(BitO->BitsUnavailable)));
@@ -360,14 +370,46 @@ extern "C" {
 				BitO->BitsUnavailable++;
 				NumBits -= 1;
 			}
+			// FIXME: BitOutputBufferSize needs to be rewritten, because the output buffer may change after being compiled.
+			// Write to disk because the buffer's full.
+			// FIXME: We need to just enlarge the buffer, the call a function to flush it all out to disk.
 		}
 	}
 	
 	void WriteBuffer(BitOutput *BitO, uintptr_t *Buffer2Write, size_t BufferSize) {
-		// FIXME: This needs to expand the buffer if nessicary.
-		for (size_t Byte = 0; Byte < BufferSize; Byte++) {
-			WriteBits(BitO, Buffer2Write[Byte], 8);
+		uint8_t  Bits2Keep          = 0;
+		uint8_t  Byte2Keep          = 0;
+		uint64_t ExpandedBufferSize = 0;
+		if (BitO->BitsAvailable + BitO->BitsUnavailable < Bytes2Bits(BufferSize)) {
+			// It won't fit, so we have to enlarge the array.
+			
+			/* This part is just WriteBits */
+			Bits2Keep = BitsRemaining(BitO->BitsUnavailable); // BitO->BitsUnavailable % 8;
+			fwrite(BitO->Buffer, 1, Bits2Bytes(BitO->BitsUnavailable - Bits2Keep), BitO->File); // Write all but the uncompleted byte
 			fflush(BitO->File);
+			for (uint64_t Byte = Bits2Bytes(BitO->BitsUnavailable); Byte <Bits2Bytes(BitO->BitsUnavailable)+1; Byte++) {
+				Byte2Keep              = BitO->Buffer[Byte];
+			}
+			realloc(BitO->Buffer, BufferSize);
+			if (BitO->Buffer == NULL) {
+				BitO->ErrorStatus->WriteBuffer = ReallocFailed;
+				// Undo the reinit, restore the buffer
+			} else {
+				ExpandedBufferSize     = BitOutputBufferSize - BufferSize; // FIXME: is this correct?
+				for (uint64_t Byte = 0; Byte < BitOutputBufferSize; Byte++) {
+					BitO->Buffer[Byte] = 0;
+				}
+				BitO->Buffer[0]        = Byte2Keep; // Replace the unfinished byte in the first element.
+				BitO->BitsAvailable    = BitOutputBufferSizeInBits - Bits2Keep;
+				BitO->BitsUnavailable  = Bits2Keep;
+				
+				for (uint64_t Byte = 0; Byte < BufferSize; Byte++) {
+					for (uint8_t Bit = 0; Bit < 8; Bit++) {
+						uint8_t BitData = Buffer2Write[Byte] & (1 << Bit);
+						WriteBits(BitO, BitData, 1);
+					}
+				}
+			}
 		}
 	}
 	
@@ -383,9 +425,9 @@ extern "C" {
 		}
 	}
 	
-	void SkipBits(BitInput *BitI, uint8_t Bits2Skip) {
+	void SkipBits(BitInput *BitI, ErrorStatus *ES, uint8_t Bits2Skip) {
 		if (Bits2Skip <= 0 | Bits2Skip > 64) {
-			BitI->ErrorStatus->SkipBits = NumberNotInRange;
+			ES->SkipBits = NumberNotInRange;
 			exit(EXIT_FAILURE);
 		}
 		SeekBits(BitI, Bits2Skip);
@@ -441,6 +483,7 @@ extern "C" {
 		if (IsLastHuffmanBlock == true) {
 			
 		}
+		
 		if (HuffmanCompressionType == 0) { // No compression.
 			AlignInputBits2Byte(BitI); // Skip the rest of the current byte
 			DataLength             = ReadBits(BitI, 32);
@@ -503,52 +546,9 @@ extern "C" {
 	}
 	
 	HuffmanTree ReconstructHuffmanTree(BitInput *BitI, uintptr_t Table, size_t TableSize) {
-		HuffmanTree *Tree = malloc(sizeof(HuffmanTree));
+		HuffmanTree *Tree = calloc(sizeof(HuffmanTree), 1);
 		return *Tree;
 		// FIXME: !!! Memory leak !!!
-	}
-	
-	void ArithmeticEncoder(void) {
-	}
-	
-	void ArithmeticDecoder(void) {
-		
-	}
-	
-	/*  Example Adler32 Generator */
-	/*
-	 &      Bitwise AND operator.
-	 >>     Bitwise right shift operator. When applied to an unsigned quantity, as here, right shift inserts zero bit(s) at the left.
-	 <<     Bitwise left shift operator. Left shift inserts zero bit(s) at the right.
-	 ++     "n++" increments the variable n.
-	 %      modulo operator: a % b is the remainder of a divided by b.
-	 Update a running Adler-32 checksum with the bytes buf[0..len-1]
-	 and return the updated checksum. The Adler-32 checksum should be
-	 initialized to 1.
-	 
-	 Usage example:
-	 
-	 unsigned long adler = 1L;
-	 
-	 while (read_buffer(buffer, length) != EOF) {
-	 adler = update_adler32(adler, buffer, length);
-	 }
-	 if (adler != original_adler) error();
-	 */
-	
-	uint32_t update_adler32(uint32_t Adler, uint8_t *buf, size_t len) {
-		uint32_t Sum1  = Adler & 0xFFFF;
-		uint32_t Sum2  = (Adler >> 16) & 0xFFFF;
-		
-		for (size_t n = 0; n < len; n++) {
-			Sum1       = (Sum1 + buf[n]) % 65521;
-			Sum2       = (Sum2 + Sum1)   % 65521;
-		}
-		return (Sum2 << 16) + Sum1;
-	}
-	
-	uint32_t adler32(uint8_t *buf, size_t len) {
-		return update_adler32(1L, buf, len);
 	}
 	
 	uint32_t GenerateAdler32(BitInput *BitI, uintptr_t *Data, size_t DataSize) {
@@ -592,27 +592,22 @@ extern "C" {
 		return *UUID;
 	}
 	
-	bool CompareUUIDStrings(uintptr_t UUID1, uintptr_t UUID2) {
-		bool    Wat = 0;
-		uint8_t AreTheSame = strncmp(&UUID1, &UUID2, 20);
-		if (AreTheSame == 0) {
-			Wat = true;
-		} else {
-			Wat = false;
-		}
-		return Wat;
-	}
-	
-	void GenerateUUID(void) {
-		
-	}
-	
 	void WriteUUID(BitOutput *BitO, uintptr_t UUIDString[]) {
 		for (uint8_t Character = 0; Character < 21; Character++) {
-			if (Character != (4|7|10|13|21)) { // Don't write the terminating char.
+			if (Character != (4|7|10|13|21)) { // Don't write the NULL terminating char.
 				WriteBits(BitO, UUIDString[Character], 8);
 			}
 		}
+	}
+	
+	void RGB2YCgCo(uint16_t Red, uint16_t Green, uint16_t Blue) {
+		uint16_t Luminance, ChrominanceGreen, ChrominanceOrange, Purple; // Y, Cg, Co
+		
+		ChrominanceOrange =  Red - Blue;
+		Purple            = (Red + Blue) / 2;
+		Purple            = ((Blue * 2) + ChrominanceOrange) / 2;
+		Purple            = Blue + ChrominanceOrange / 2;
+		
 	}
 	
 #ifdef __cplusplus
