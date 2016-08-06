@@ -14,15 +14,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 //#include <strings.h>
-#include <string.h>
-#include <sys/mman.h>   /* mmap */
-#include <unistd.h>     /* STDIN, Getopt */
-#include <iso646.h>     /* Defines operators as words. */
-#include <tgmath.h>     /* Type Generic Math, includes Math.h and Complex.h */
+#include <string.h>     // strcasecmp, etc.
+#include <sys/mman.h>   // mmap
+#include <unistd.h>     // STDIN, Getopt
+#include <tgmath.h>     // Type Generic Math, includes Math.h and Complex.h
 #include <limits.h>
 #include <signal.h>
 #include <complex.h>
 #include <fcntl.h>
+#include <time.h>
 
 #if defined(_WIN32) || defined(_WIN64) || defined(CYGWIN_NT) || defined(MINGW32_NT) || defined(MSYS_NT)
 #define strcasecmp _stricmp
@@ -33,6 +33,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+    // ErrorStatus: ONLY InitBitInput and InitBitOutput need to directly handle ErrorStatus, because those functions will make sure that the passed in pointer to ErrorStatus is set to both arrays, then you can rely on that.
+    
+    
     /*! @abstract                   "BitIO compile time constants".
      *  @remark                     "Change the buffer sizes and whatnot in here.".
      */
@@ -43,33 +46,37 @@ extern "C" {
         BitOutputBufferSizeInBits = BitOutputBufferSize * 8,
     };
     
-    extern uint64_t BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Inout/Output parses.
-    
-    //uint64_t BitIOCurrentArgument = 1; // TODO: Make this not suck.
-    // WARNING: This *HAS* to be here to handle multiple inputs or outputs.
+    extern uint64_t BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Input/Output parsers.
     
     /*! @abstract                   "List of error codes the various functions in BitIO set in ErrorStatus".
      *  @remark                     "FIXME: Should the error codes be negative or positive?".
      */
     enum ErrorCodes {
-        Success             =  0,
-        NotEnoughMemory     =  1,
-        NumberNotInRange    =  2,
-        FreadUnknownFailure =  3,
+        Success                 =  0,
+        NotEnoughMemory         =  1,
+        NumberNotInRange        =  2,
+        FreadUnknownFailure     =  3,
+        TriedReadingTooManyBits =  4,
+        TriedReadingTooFewBits  =  5,
+        TriedWritingTooManyBits =  6,
+        TriedWritingTooFewBits  =  7,
+        ReallocFailed           =  8,
     };
     
     /*! @typedef  ErrorStatus
      *  @abstract                   "Allows checking of the error status of various functions".
      */
     typedef struct ErrorStatus {
-        int64_t           ReadBits;
-        int64_t           ReadRICE;
-        int64_t          WriteRICE;
         int64_t           SeekBits;
         int64_t           SkipBits;
         int64_t           PeekBits;
+        int64_t           ReadBits;
         int64_t          WriteBits;
+        int64_t        WriteBuffer;
+        int64_t           ReadRICE;
+        int64_t          WriteRICE;
         int64_t         Power2Mask;
+        int64_t       GenerateUUID;
         int64_t     AlignBits2Byte;
         int64_t  UpdateInputBuffer;
         int64_t       InitBitInput;
@@ -88,17 +95,16 @@ extern "C" {
      *  @constant   FilePosition     "Current byte in the file".
      *  @constant   BitsUnavailable  "Number of previously read bits in Buffer".
      *  @constant   BitsAvailable    "Number of bits available for reading".
-     *  @constant   CurrentArgument  "Where to start in Argv processing".
      *  @constant   Buffer           "Buffer of data from File".
 	 */
     typedef struct BitInput {
-        FILE                       *File;
-        uint64_t                FileSize;
-        uint64_t            FilePosition;
-        uint64_t         BitsUnavailable;
-        uint64_t           BitsAvailable;
-        ErrorStatus         *ErrorStatus;
-        uint8_t  Buffer[BitInputBufferSize];
+        FILE                            *File;
+        uint64_t                     FileSize;
+        uint64_t                 FilePosition;
+        uint64_t              BitsUnavailable;
+        uint64_t                BitsAvailable;
+        ErrorStatus              *ErrorStatus;
+        uint8_t    Buffer[BitInputBufferSize];
     } BitInput;
 	
 	/*! @typedef    BitOutput
@@ -111,11 +117,11 @@ extern "C" {
      *  @constant   Buffer           "Buffer of BitIOBufferSize bits from File".
 	 */
     typedef struct BitOutput {
-        FILE                       *File;
-        uint64_t         BitsUnavailable;
-        uint64_t           BitsAvailable;
-        ErrorStatus         *ErrorStatus;
-        uint8_t  Buffer[BitOutputBufferSize];
+        FILE                              *File;
+        uint64_t                BitsUnavailable;
+        uint64_t                  BitsAvailable;
+        ErrorStatus                *ErrorStatus;
+        uint8_t     Buffer[BitOutputBufferSize];
     } BitOutput;
     
     /*! @typedef    HuffmanTree
@@ -208,7 +214,7 @@ extern "C" {
      *  @remark                  "Starts at MSB (BitIO is Big Endian internally; It's not my fault Intel is stupid)".
      *  @param    InputData      "is the input int to find the highest bit set".
      */
-    uint8_t FindHighestBitSet(BitInput *BitI, uint64_t InputData);
+    uint8_t FindHighestBitSet(ErrorStatus *ES, uint64_t InputData);
     
     /*! @abstract                "Counts the number of bits set to 1"
      *  @param    Input          "integer to count the number of set bits".
@@ -239,7 +245,7 @@ extern "C" {
      *
      *  @param    Exponent       "Power to be raised by 2".
      */
-    uint64_t Power2Mask(BitInput *BitI, uint64_t Exponent);
+    uint64_t Power2Mask(ErrorStatus *ES, uint64_t Exponent);
 	
 	/*! @abstract                "Parses command line flags for BitInput".
 	 */
@@ -251,11 +257,11 @@ extern "C" {
 	
 	/*! @abstract                "Initalizes BitInput".
 	 */
-    void InitBitInput(BitInput *BitI, int argc, const char *argv[]);
+    void InitBitInput(BitInput *BitI, ErrorStatus *ES, int argc, const char *argv[]);
 	
 	/*! @abstract                "Initalizes BitOutput".
 	 */
-    void InitBitOutput(BitOutput *BitO, int argc, const char *argv[]);
+    void InitBitOutput(BitOutput *BitO, ErrorStatus *ES, int argc, const char *argv[]);
     
     /*! @abstract                "Deallocates BitInput".
      *  @remark                  "For use when changing files, or exiting the program".
@@ -324,7 +330,7 @@ extern "C" {
      */
     void SeekBits(BitInput *BitI, int64_t Bits);
     
-    void SkipBits(BitInput *BitI, uint8_t Bits2Skip);
+    void SkipBits(BitInput *BitI, ErrorStatus *ES, uint8_t Bits2Skip);
     
     /*! @abstract                "Generates CRC from data".
      *  @remark                  "Uses Reciprocal representation".
@@ -387,12 +393,14 @@ extern "C" {
      */
     bool CompareUUIDStrings(uintptr_t UUID1, uintptr_t UUID2);
     
-    void GenerateUUID(void);
+    void GenerateUUID(uint8_t Version);
     
     /*! @abstract                "Write UUID/GUID string as hyphen-less blob".
-     *  @example                 "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE aka AAAA-BB-CC-DD-EEEEEE in bytes".
+     *                           "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE aka AAAA-BB-CC-DD-EEEEEE in bytes".
      */
     void WriteUUID(BitOutput *BitO, uintptr_t UUIDString[]);
+    
+    void ConvertGUID2UUID(const char GUID[24]);
 #ifdef __cplusplus
 }
 #endif
