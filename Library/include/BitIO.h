@@ -275,11 +275,9 @@ extern "C" {
     
     /*! @abstract                "Updates BitInput->Buffer, for further reading".
      *
-     *  @param    AbsoluteOffset "Number of bytes from the beginning of the current file".
-     *  @remark                  "If AbsoluteOffset is 0, it's assumed to be from the current position".
-     *  FIXME:                   "Change AbsoluteOffset to RelativeOffset".
+     *  @param    RelativeOffset "Number of bytes from the beginning of the current file".
      */
-    void UpdateInputBuffer(BitInput *BitI, uint64_t AbsoluteOffset);
+    static void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffset);
     
     /*! @abstract                "Manages InputBuffer and hands out the requested bits".
      *  @remark                  "DO NOT try reading backwards, it will not work. for that use SeekBits()".
@@ -380,20 +378,13 @@ extern "C" {
     /*! @abstract                "Generates Adler32 from the input data, and compares it to the stored checksum".
      *  @return                  "Returns whether the input data matched the provided checksum or not".
      */
-    bool VerifyAdler32(BitInput *BitI, uintptr_t Data, size_t DataSize, uint32_t EmbeddedAdler32);
+    bool VerifyAdler32(BitInput *BitI, uintptr_t *Data, size_t DataSize, uint32_t EmbeddedAdler32);
     
     /*! @abstract                "Reads raw UUID/GUID from the bitstream".
-     *  @remark                  "UUID and GUID Strings are ALWAYS 20 chars (inlucing terminating char)".
-     *  @return                  "Returns a pointer to the UUID/GUID string (which is ALWAYS 20 bytes)"
+     *  @remark                  "UUID and GUID Strings are ALWAYS 21 chars (inlucing terminating char)".
+     *  @return                  "Returns a UUID/GUID string"
      */
-    uintptr_t ReadUUID(BitInput *BitI);
-    
-    /*! @abstract                "Compares UUID/GUID 1 to UUID/GUID 2".
-     *  @return                  "Returns a bool specifiing if the UUIDs/GUIDs are equal or not".
-     */
-    bool CompareUUIDStrings(uintptr_t UUID1, uintptr_t UUID2);
-    
-    void GenerateUUID(uint8_t Version);
+    const char ReadUUID(BitInput *BitI);
     
     /*! @abstract                "Write UUID/GUID string as hyphen-less blob".
      *                           "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE aka AAAA-BB-CC-DD-EEEEEE in bytes".
