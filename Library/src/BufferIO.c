@@ -186,7 +186,6 @@ extern "C" {
 				BitI->ErrorStatus  = ES;
 			}
 			ParseInputOptions(BitI, argc, argv);
-			// FIXME: Can't calloc before init?
 			if (BitI->File == NULL) {
 				BitI->ErrorStatus->InitBitInput = FreadUnknownFailure; // FIXME: Use errno to find the actual problem instead of guessing.
 			} else {
@@ -197,7 +196,6 @@ extern "C" {
 				memset(BitI->Buffer, 0, Bytes2Read);
 				uint64_t BytesRead     = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File);
 				if (BytesRead < Bytes2Read) {
-					fprintf(stderr, "InitBitInput: Read: %llu of: %llu bytes, at position: %ld\n", BytesRead, Bytes2Read, ftell(BitI->File));
 					BitI->ErrorStatus->InitBitInput = FreadUnknownFailure;
 				}
 				BitI->BitsAvailable = Bytes2Bits(BytesRead);
@@ -216,41 +214,33 @@ extern "C" {
 			}
 			ParseOutputOptions(BitO, argc, argv);
 			if (BitO->File == NULL) {
-				fprintf(stderr, "InitBitOutput: OutputFile couldn't be opened, check permissions\n");
-				BitO->ErrorStatus->InitBitOutput      = FreadUnknownFailure;
+				BitO->ErrorStatus->InitBitOutput = FreadUnknownFailure; // FIXME: Use errno to find the actual problem instead of guessing.
 			} else {
 				memset(BitO->Buffer,   0, BitOutputBufferSize);
 				BitO->BitsAvailable    = BitOutputBufferSizeInBits;
 				BitO->BitsUnavailable  = 0;
-				BitO->ErrorStatus      = ES;
 			}
 		}
 	}
 	
 	void CloseBitInput(BitInput *BitI) {
 		fclose(BitI->File);
-		BitI->FileSize         = 0;
-		BitI->FilePosition     = 0;
-		BitI->BitsUnavailable  = 0;
-		BitI->BitsAvailable    = 0;
 		memset(BitI->Buffer,     0, BitInputBufferSize);
 		free(BitI);
 	}
 	
 	void CloseBitOutput(BitOutput *BitO) {
 		fclose(BitO->File);
-		BitO->BitsUnavailable = 0;
-		BitO->BitsAvailable   = 0;
 		memset(BitO->Buffer,    0, BitInputBufferSize);
 		free(BitO);
 	}
 	
-	void UpdateInputBuffer(BitInput *BitI, uint64_t AbsoluteOffset) {
-		if (AbsoluteOffset == 0) {
-			AbsoluteOffset  = BitI->FilePosition;
+	static void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffset) {
+		if (RelativeOffset == 0) {
+			RelativeOffset  = BitI->FilePosition;
 		}
 		uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
-		fseek(BitI->File, AbsoluteOffset, SEEK_SET);
+		fseek(BitI->File, RelativeOffset, SEEK_CUR);
 		memset(BitI, 0, Bytes2Read);
 		uint64_t BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
 		if (BytesRead != Bytes2Read) {
@@ -265,8 +255,12 @@ extern "C" {
 			BitI->ErrorStatus->ReadBits = NumberNotInRange;
 		} else {
 			OutputData             = PeekBits(BitI, Bits2Read);
-			BitI->BitsUnavailable += Bits2Read;
-			BitI->BitsAvailable   -= Bits2Read;
+			if (BitI->ErrorStatus->PeekBits != Success) {
+				BitI->ErrorStatus->ReadBits  = FreadUnknownFailure;
+			} else {
+				BitI->BitsUnavailable += Bits2Read;
+				BitI->BitsAvailable   -= Bits2Read;
+			}
 		}
 		return OutputData;
 	}
@@ -275,45 +269,44 @@ extern "C" {
 		uint64_t Zeros = 0;
 		int64_t  Data  = 0;
 		Data = ReadBits(BitI, 1);
-		if ((Zeros == 0) && (Data == 1)) {
+		if ((Zeros == 0) && (Data == 1)) { // If this is the first loop?
 			while (ReadBits(BitI, 1) == 0) {
 				Zeros += 1;
 			}
-			Data = (1 << Zeros);
+			Data  = (1 << Zeros);
 			Data += ReadBits(BitI, Zeros);
 		}
 		if (IsSigned == true) {
-			Data = Unsigned2Signed(Data);
+			Data  = Unsigned2Signed(Data);
 		}
 		if (IsTruncated == true) {
-			Data = 2 * Zeros - 1; // Left bit first
+			Data  = 2 * Zeros - 1; // Left bit first
 			Data += ReadBits(BitI, Zeros);
 		}
 		return Data;
 	}
 	
 	uint64_t ReadRICE(BitInput *BitI, bool StopBit) {
+		uint64_t BitCount = 0;
 		if (StopBit != (0|1)) {
 			BitI->ErrorStatus->ReadRICE = NumberNotInRange;
+		} else {
+			while (PeekBits(BitI, 1) != StopBit) {
+				BitCount += 1;
+			}
 		}
-		
-		uint64_t BitCount = 0;
-		
-		while (PeekBits(BitI, 1) != StopBit) {
-			BitCount += ReadBits(BitI, 1);
-		}
-		
 		return BitCount;
 	}
 	
 	void WriteRICE(BitOutput *BitO, bool StopBit, uint64_t Data2Write) {
 		if (StopBit != (0|1)) {
 			BitO->ErrorStatus->WriteRICE = NumberNotInRange;
+		} else {
+			for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
+				WriteBits(BitO, (1 ^ StopBit), 1);
+			}
+			WriteBits(BitO, StopBit, 1);
 		}
-		for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
-			WriteBits(BitO, (1 ^ StopBit), 1);
-		}
-		WriteBits(BitO, StopBit, 1);
 	}
 	
 	uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek) {
@@ -568,7 +561,7 @@ extern "C" {
 		return (Sum2 << 16) + Sum1;
 	}
 	
-	bool VerifyAdler32(BitInput *BitI, uintptr_t Data, size_t DataSize, uint32_t EmbeddedAdler32) {
+	bool VerifyAdler32(BitInput *BitI, uintptr_t *Data, size_t DataSize, uint32_t EmbeddedAdler32) {
 		uint32_t GeneratedAdler32 = GenerateAdler32(BitI, &Data, DataSize);
 		if (GeneratedAdler32 != EmbeddedAdler32) {
 			return false;
@@ -577,19 +570,17 @@ extern "C" {
 		}
 	}
 	
-	uintptr_t ReadUUID(BitInput *BitI) {
-		uint8_t UUID[20] = {0};
-		for (uint8_t Character = 0; Character < 19; Character++) {
+	const char ReadUUID(BitInput *BitI) {
+		uint8_t UUID[21] = {0};
+		for (uint8_t Character = 0; Character < 20; Character++) {
 			if (Character == (4|7|10|13|21)) {
 				if (Character == (4|7|10|13)) {
 					UUID[Character] = "-";
-				} else if (Character == 21) {
-					UUID[Character] = NULL;
 				}
 			}
 			UUID[Character] = ReadBits(BitI, 8);
 		}
-		return *UUID;
+		return UUID;
 	}
 	
 	void WriteUUID(BitOutput *BitO, uintptr_t UUIDString[]) {
