@@ -531,19 +531,6 @@ extern "C" {
 		}
 	}
 	
-	void LZ77Decoder(BitInput *BitI, size_t WindowSize, uint8_t WordSize) { // LZ77 decoder
-		uint8_t SearchWindow[WindowSize];
-		for (size_t Byte = 0; Byte < WindowSize; Byte++) { // load search window
-			SearchWindow[Byte] = ReadBits(BitI, 8);
-		}
-	}
-	
-	HuffmanTree ReconstructHuffmanTree(BitInput *BitI, uintptr_t Table, size_t TableSize) {
-		HuffmanTree *Tree = calloc(sizeof(HuffmanTree), 1);
-		return *Tree;
-		// FIXME: !!! Memory leak !!!
-	}
-	
 	uint32_t GenerateAdler32(BitInput *BitI, uintptr_t *Data, size_t DataSize) {
 		// Add all values up, then modulo it by 65521 for Sum1. byte bound.
 		// Sum2 is Sum1 ran through the algorithm again.
@@ -583,23 +570,19 @@ extern "C" {
 		return UUID;
 	}
 	
-	void WriteUUID(BitOutput *BitO, uintptr_t UUIDString[]) {
+	void WriteUUID(BitOutput *BitO, const char UUIDString) {
+		if (sizeof(UUIDString) != 21) {
+			BitO->ErrorStatus->WriteUUID = WrongStringSize;
+		}
 		for (uint8_t Character = 0; Character < 21; Character++) {
 			if (Character != (4|7|10|13|21)) { // Don't write the NULL terminating char.
-				WriteBits(BitO, UUIDString[Character], 8);
+				WriteBits(BitO, UUIDString, 8);
 			}
 		}
 	}
 	
-	void RGB2YCgCo(uint16_t Red, uint16_t Green, uint16_t Blue) {
-		uint16_t Luminance, ChrominanceGreen, ChrominanceOrange, Purple; // Y, Cg, Co
-		
-		ChrominanceOrange =  Red - Blue;
-		Purple            = (Red + Blue) / 2;
-		Purple            = ((Blue * 2) + ChrominanceOrange) / 2;
-		Purple            = Blue + ChrominanceOrange / 2;
-		
-	}
+	/* Default Huffman table for reading the embedded table */
+	
 	
 #ifdef __cplusplus
 }

@@ -61,6 +61,7 @@ extern "C" {
         TriedWritingTooManyBits =  6,
         TriedWritingTooFewBits  =  7,
         ReallocFailed           =  8,
+        WrongStringSize         =  9,
     };
     
     /*! @typedef  ErrorStatus
@@ -71,6 +72,7 @@ extern "C" {
         int64_t           SkipBits;
         int64_t           PeekBits;
         int64_t           ReadBits;
+        int64_t          WriteUUID;
         int64_t          WriteBits;
         int64_t        WriteBuffer;
         int64_t           ReadRICE;
@@ -360,16 +362,6 @@ extern "C" {
      */
     void ParseDeflate(BitInput *BitI);
     
-    /*! @abstract                "Decodes LZ77 encoded data".
-     *
-     */
-    void LZ77Decoder(BitInput *BitI, size_t WindowSize, uint8_t WordSize);
-    
-    /*! @abstract                "Recreates a Huffman tree from an array".
-     *  @return                  "Returns a pointer to a Huffman tree contained in a struct".
-     */
-    HuffmanTree ReconstructHuffmanTree(BitInput *BitI, uintptr_t Table, size_t TableSize);
-    
     /*! @abstract                "Creates Adler32 checksum from input data".
      *  @return                  "Returns the Adler32 data from the data input".
      */
@@ -389,9 +381,7 @@ extern "C" {
     /*! @abstract                "Write UUID/GUID string as hyphen-less blob".
      *                           "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE aka AAAA-BB-CC-DD-EEEEEE in bytes".
      */
-    void WriteUUID(BitOutput *BitO, uintptr_t UUIDString[]);
-    
-    void ConvertGUID2UUID(const char GUID[24]);
+    void WriteUUID(BitOutput *BitO, const char UUIDString);
 #ifdef __cplusplus
 }
 #endif
