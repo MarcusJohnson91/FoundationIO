@@ -237,7 +237,7 @@ extern "C" {
 	
 	static void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffset) {
 		if (RelativeOffset == 0) {
-			RelativeOffset  = BitI->FilePosition;
+			BitI->ErrorStatus->UpdateInputBuffer = NumberNotInRange;
 		}
 		uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
 		fseek(BitI->File, RelativeOffset, SEEK_CUR);
