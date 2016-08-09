@@ -122,6 +122,97 @@ extern "C" {
 		return Mask;
 	}
 	
+	void GeneratePathMatchingPattern(const char Path, uint8_t Base, bool LeadingZeros, uint8_t NumDigits) {
+		if (LeadingZeros == true) {
+			if (Base == 8) { // Octal
+				
+			} else if (Base == 10) { // Decimal
+				
+			} else if (Base == 16) { // Hex
+				
+			} else { // Unsupported Number Base.
+				
+			}
+		} else if (LeadingZeros == false) {
+			if (Base == 8) { // Octal
+				
+			} else if (Base == 10) { // Decimal
+				
+			} else if (Base == 16) { // Hex
+				
+			} else { // Unsupported Number Base.
+				
+			}
+		}
+	}
+	
+	void ParsePath(const char Path[]) { // DOES NOT support char ranges or classes or any of that.
+		for (uint16_t Character = 0; Character < 4096; Character++) {
+			if (strcasecmp(&Path[Character], NULL) == 0) { // Null terminating character
+				break; // end of string
+			} else if (strcasecmp(&Path[Character], "%") == 0) { // Possibly the start of a scanf format specifier
+				if (strcasecmp(&Path[Character + 1], "0") == 0) { // Leading zeros
+					char NumberOfDigits = &Path[Character+ 2];
+					if (strcasecmp(&Path[Character + 3], "D") == 0) { // Decimal
+						
+					} else if (strcasecmp(&Path[Character + 3], "X") == 0) { // Hex
+						
+					} else if (strcasecmp(&Path[Character + 3], "O") == 0) { // Octal
+						
+					}
+				} else { // No leading zeros. %3d
+					char Digit = &Path[Character + 1];
+					if (Digit >= 48 && Digit <= 57) { // ASCII code is a digit
+						uint8_t Number = Digit - 47;
+						if (strcasecmp(&Path[Character + 2], "D") == 0) { // Decimal
+						// Now I need to generate a list of numbers that fit this format, then make a string to load them all.
+						} else if (strcasecmp(&Path[Character + 2], "X") == 0) { // Hex
+							
+						} else if (strcasecmp(&Path[Character + 2], "O") == 0) { // Octal
+							
+						}
+					}
+				}
+				sscanf(Path, 4096, NULL);
+			} else if (strcasecmp(&Path[Character], "?") == 0) { // single char wildcard
+				
+			} else if (strcasecmp(&Path[Character], "*") == 0) { // multi char wildcard.
+				
+			}
+		}
+	}
+	
+	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
+		glob_t *GlobBuffer = 0;
+		while (BitI->File == NULL) {
+			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
+				if (strcasecmp(argv[Argument], "-i")             == 0) {
+					Argument += 1;
+					if (strcasecmp(argv[Argument], "-")          == 0) { // hyphen: -, en dash: –, em dash: —;
+						BitI->File = freopen(argv[Argument], "rb", stdin);
+					} else if (strcasecmp(argv[Argument], "*")   == 0) {
+						uint8_t Path[4096];
+						DIR *Folder = readdir(dirname((char*)argv[Argument]));
+						Folder = opendir(dirname(argv[Argument]));
+					} else if (strcasecmp(argv[Argument], "?")   == 0) { // Single character expansion
+						glob(argv[Argument], (GLOB_ERR|GLOB_TILDE), 0, GlobBuffer);
+					} else {
+						BitI->File = fopen(argv[Argument], "rb"); // Why is this not fucking working?
+						if (BitI->File == NULL) {
+							BitI->ErrorStatus->ParseOutputOptions = strerror(errno);
+							fprintf(stderr, "BitIO: ParseOutputOptions failed with error %d, %s\n", errno, strerror(errno));
+							clearerr(BitI->File);
+						}
+						
+						//setvbuf(BitI->File, BitI->Buffer, _IONBF, BitIOBufferSize); // I'm buffering BitInput, so the OS doesn't need to.
+					}
+				}
+				BitIOCurrentArgument += Argument - 1;
+			}
+		}
+	}
+	
+	/*
 	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
 		glob_t *GlobBuffer = 0;
 		while (BitI->File == NULL) {
@@ -149,6 +240,7 @@ extern "C" {
 			}
 		}
 	}
+	 */
 	
 	void ParseOutputOptions(BitOutput *BitO, int argc, const char *argv[]) {
 		glob_t *GlobBuffer = 0;
