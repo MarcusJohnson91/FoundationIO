@@ -2,10 +2,11 @@
  @header    BitIO.h
  @author    Marcus Johnson aka BumbleBritches57
  @copyright 2016, Marcus Johnson
- @version   1.0
+ @version   0.9
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
  */
 
+#if defined(__unix__) || defined(__linux__) || (defined(__APPLE__) && defined(__MACH__))
 //#include <complex.h>
 #include <errno.h>
 #include <glob.h>
@@ -15,16 +16,17 @@
 #include <stdlib.h>
 //#include <strings.h>
 #include <string.h>     // strcasecmp, etc.
-#include <sys/mman.h>   // mmap
-#include <unistd.h>     // STDIN, Getopt
-#include <tgmath.h>     // Type Generic Math, includes Math.h and Complex.h
-#include <limits.h>
-#include <signal.h>
-#include <complex.h>
-#include <fcntl.h>
-#include <time.h>
+/*#include <unistd.h>     // STDIN, Getopt*/
+//#include <tgmath.h>     // Type Generic Math, includes Math.h and Complex.h
+//#include <limits.h>
+//#include <signal.h>
+//#include <complex.h>
+//#include <fcntl.h>
+//#include <time.h>
+#include <dirent.h>
+#include <libgen.h>
+#elif defined(_WIN32) || defined(_WIN64)
 
-#if defined(_WIN32) || defined(_WIN64) || defined(CYGWIN_NT) || defined(MINGW32_NT) || defined(MSYS_NT)
 #define strcasecmp _stricmp
 #endif
 
@@ -340,7 +342,7 @@ extern "C" {
      *  @param    Poly           "Recriprocal of the CRC polynomial".
      *  @param    Init           "The bit pattern to initalize the generator with".
      */
-    uint64_t GenerateCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool Init);
+	//uint64_t GenerateCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool Init);
     
     /*! @abstract                "Computes the CRC of DataBuffer, and compares it to the submitted CRC".
      *  @remark                  "Uses Reciprocal representation".
@@ -351,16 +353,16 @@ extern "C" {
      *  @param    Init           "The bit pattern to initalize the generator with".
      *  @param    EmbeddedCRC    "Value to compare the data to, to be sure it was recieved correctly".
      */
-    bool VerifyCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool Init, uint64_t EmbeddedCRC);
+	//bool VerifyCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool Init, uint64_t EmbeddedCRC);
     
     /*! @abstract                "Decodes Huffman encoded data".
      *  @remark                  "It's not even CLOSE to API/ABI compatible with zlib, because zlib is shit".
      */
-    void DecodeHuffman(BitInput *BitI, Huffman *Huff);
+	//void DecodeHuffman(BitInput *BitI, Huffman *Huff);
     
     /*! @abstract                "Parses DEFLATE encoded block, and sends it off to the Huffman/LZ77 decoder".
      */
-    void ParseDeflate(BitInput *BitI);
+	//void ParseDeflate(BitInput *BitI);
     
     /*! @abstract                "Creates Adler32 checksum from input data".
      *  @return                  "Returns the Adler32 data from the data input".
@@ -382,6 +384,11 @@ extern "C" {
      *                           "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE aka AAAA-BB-CC-DD-EEEEEE in bytes".
      */
     void WriteUUID(BitOutput *BitO, const char UUIDString);
+	
+	/*! @abstract                "Parses path for wildcards and sscanf format specifiers".
+	 *  @remark                  "Only supports ANSI currently".
+	 */
+	void ParsePath(const char Path[]);
 #ifdef __cplusplus
 }
 #endif
