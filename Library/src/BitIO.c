@@ -3,7 +3,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	uint64_t BitIOCurrentArgument = 1;
+	/* Start Anciliary Functions */
+	int BitIOCurrentArgument = 1;
 	
 	uint16_t SwapEndian16(uint16_t Data2Swap) {
 		return ((Data2Swap & 0xFF00) >> 8) || ((Data2Swap & 0x00FF) << 8);
@@ -53,31 +54,33 @@ extern "C" {
 		return Input ^ 0xFFFFFFFFFFFFFFFF + 1;
 	}
 	
-	uint8_t FindHighestBitSet(ErrorStatus *ES, uint64_t InputData) {
-		if (InputData <= 0) {
-			ES->FindHighestBitSet = NumberNotInRange;
-		}
+	uint8_t FindHighestBitSet(uint64_t InputData) {
+		// Just return 0... that should never appear, so you're good...
 		uint8_t HighestBitSet = 0;
 		for (uint8_t Bit = 64; Bit > 0; Bit--) { // stop at the first 1 bit, and return that.
-			uint64_t CurrentBit = (uint64_t)pow(2, Bit);
-			while ((InputData & (CurrentBit >>= Bit)) == 0) { //
+			if ((InputData & (1 << (Bit - 1))) == 1) {
+				HighestBitSet = Bit;
+			}
+			/*
+			while ((InputData & (CurrentBit >>= Bit)) == 0) { // FIXME: Wtf is this here for?
 				
 			}
 			if ((InputData & Bit) == 1) {
 				HighestBitSet = Bit;
 				break;
 			}
+			 */
 		}
 		return HighestBitSet;
 	}
 	
-	uint8_t CountBits(BitInput *BitI, uint64_t Input) {
+	uint8_t CountBits(uint64_t Input) {
 		if (Input == 0) {
 			return 0;
 		}
 		uint8_t Count = 0;
-		for (size_t Bit = 0; Bit < 64; Bit++) {
-			if ((Input & Power2Mask(BitI, Bit - 1)) == 1) { // if ((Input & 1) == 1) {
+		for (size_t Bit = 64; Bit > 0; Bit--) {
+			if ((Input & (1 << (Bit - 1))) == 1) {
 				Count++;
 			}
 		}
@@ -114,154 +117,73 @@ extern "C" {
 		}
 	}
 	
-	uint64_t Power2Mask(ErrorStatus *ES, uint64_t Exponent) {
+	uint64_t Power2Mask(uint8_t Exponent) { // Bitshifting, so it's limited to base 2.
 		if (Exponent > 64) {
-			ES->Power2Mask = NumberNotInRange;
+			return 0;
 		}
+		/*
 		uint64_t Mask = pow(2, Exponent) - 1;
-		return Mask;
+		 */
+		uint64_t Mask1 = 0, Mask2 = 0;
+		Mask1 = 1 << (Exponent - 1);
+		Mask2 = Mask1 - 1;
+		return Mask1 + Mask2;
+		
+		// Shift 1 (Exponent - 1) times, then take the result, subtract one, and add that to the result.
+	}
+	/* End Anciliary Functions */
+	
+	/* Start NEW Path processing functions */
+	void SanitizePath(const char Path2Sanitize[]) {
+		
 	}
 	
-	void GeneratePathMatchingPattern(const char Path, uint8_t Base, bool LeadingZeros, uint8_t NumDigits) {
-		if (LeadingZeros == true) {
-			if (Base == 8) { // Octal
-				
-			} else if (Base == 10) { // Decimal
-				
-			} else if (Base == 16) { // Hex
-				
-			} else { // Unsupported Number Base.
-				
-			}
-		} else if (LeadingZeros == false) {
-			if (Base == 8) { // Octal
-				
-			} else if (Base == 10) { // Decimal
-				
-			} else if (Base == 16) { // Hex
-				
-			} else { // Unsupported Number Base.
-				
-			}
-		}
+	/* Start Obselete Path processing functions */
+	void PrintHelp(void) {
+		fprintf(stderr, "Usage: -i <input> -o <output>\n");
 	}
 	
-	void ParsePath(const char Path[]) { // DOES NOT support char ranges or classes or any of that.
-		for (uint16_t Character = 0; Character < 4096; Character++) {
-			if (strcasecmp(&Path[Character], NULL) == 0) { // Null terminating character
-				break; // end of string
-			} else if (strcasecmp(&Path[Character], "%") == 0) { // Possibly the start of a scanf format specifier
-				if (strcasecmp(&Path[Character + 1], "0") == 0) { // Leading zeros
-					char NumberOfDigits = &Path[Character+ 2];
-					if (strcasecmp(&Path[Character + 3], "D") == 0) { // Decimal
-						
-					} else if (strcasecmp(&Path[Character + 3], "X") == 0) { // Hex
-						
-					} else if (strcasecmp(&Path[Character + 3], "O") == 0) { // Octal
-						
-					}
-				} else { // No leading zeros. %3d
-					char Digit = &Path[Character + 1];
-					if (Digit >= 48 && Digit <= 57) { // ASCII code is a digit
-						uint8_t Number = Digit - 47;
-						if (strcasecmp(&Path[Character + 2], "D") == 0) { // Decimal
-						// Now I need to generate a list of numbers that fit this format, then make a string to load them all.
-						} else if (strcasecmp(&Path[Character + 2], "X") == 0) { // Hex
-							
-						} else if (strcasecmp(&Path[Character + 2], "O") == 0) { // Octal
-							
-						}
-					}
-				}
-				sscanf(Path, 4096, NULL);
-			} else if (strcasecmp(&Path[Character], "?") == 0) { // single char wildcard
-				
-			} else if (strcasecmp(&Path[Character], "*") == 0) { // multi char wildcard.
-				
-			}
-		}
-	}
 	
 	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
-		glob_t *GlobBuffer = 0;
 		while (BitI->File == NULL) {
 			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
 				if (strcasecmp(argv[Argument], "-i")             == 0) {
-					Argument += 1;
+					Argument += 2; // Account for the space...
 					if (strcasecmp(argv[Argument], "-")          == 0) { // hyphen: -, en dash: –, em dash: —;
 						BitI->File = freopen(argv[Argument], "rb", stdin);
-					} else if (strcasecmp(argv[Argument], "*")   == 0) {
-						uint8_t Path[4096];
-						DIR *Folder = readdir(dirname((char*)argv[Argument]));
-						Folder = opendir(dirname(argv[Argument]));
-					} else if (strcasecmp(argv[Argument], "?")   == 0) { // Single character expansion
-						glob(argv[Argument], (GLOB_ERR|GLOB_TILDE), 0, GlobBuffer);
 					} else {
 						BitI->File = fopen(argv[Argument], "rb"); // Why is this not fucking working?
 						if (BitI->File == NULL) {
-							BitI->ErrorStatus->ParseOutputOptions = strerror(errno);
-							fprintf(stderr, "BitIO: ParseOutputOptions failed with error %d, %s\n", errno, strerror(errno));
-							clearerr(BitI->File);
+							Log(Critical, BitI->ErrorStatus->ParseInputOptions, FopenFailed, "BitIO", "ParseInputOptions", strerror(errno));
 						}
-						
-						//setvbuf(BitI->File, BitI->Buffer, _IONBF, BitIOBufferSize); // I'm buffering BitInput, so the OS doesn't need to.
 					}
 				}
 				BitIOCurrentArgument += Argument - 1;
 			}
 		}
 	}
-	
-	/*
-	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
-		glob_t *GlobBuffer = 0;
-		while (BitI->File == NULL) {
-			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
-				if (strcasecmp(argv[Argument], "-i")             == 0) {
-					Argument += 1;
-					if (strcasecmp(argv[Argument], "-")          == 0) { // hyphen: -, en dash: –, em dash: —;
-						BitI->File = freopen(argv[Argument], "rb", stdin);
-					} else if (strcasecmp(argv[Argument], "*")   == 0) {
-						glob(argv[Argument], (GLOB_ERR|GLOB_TILDE), 0, GlobBuffer);
-					} else if (strcasecmp(argv[Argument], "?")   == 0) {
-						glob(argv[Argument], (GLOB_ERR|GLOB_TILDE), 0, GlobBuffer);
-					} else {
-						BitI->File = fopen(argv[Argument], "rb"); // Why is this not fucking working?
-						if (BitI->File == NULL) {
-							BitI->ErrorStatus->ParseOutputOptions = strerror(errno);
-							fprintf(stderr, "BitIO: ParseOutputOptions failed with error %d, %s\n", errno, strerror(errno));
-							clearerr(BitI->File);
-						}
-						
-						//setvbuf(BitI->File, BitI->Buffer, _IONBF, BitIOBufferSize); // I'm buffering BitInput, so the OS doesn't need to.
-					}
-				}
-				BitIOCurrentArgument += Argument - 1;
-			}
-		}
-	}
-	 */
 	
 	void ParseOutputOptions(BitOutput *BitO, int argc, const char *argv[]) {
-		glob_t *GlobBuffer = 0;
+		//glob_t *GlobBuffer = 0;
 		while (BitO->File == NULL) {
 			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
 				if (strcasecmp(argv[Argument], "-o")             == 0) {
-					Argument += 1; // FIXME: The For loop already handles this?
+					//Argument += 1; // FIXME: The For loop already handles this?
+					Argument += 2; // Account for the space...
 					if (strcasecmp(argv[Argument], "-")          == 0) {
 						BitO->File = freopen(argv[Argument], "wb", stdout);
-					} else if (strcasecmp(argv[Argument], "*")   == 0) {
+					}
+					/*
+					else if (strcasecmp(argv[Argument], "*")   == 0) {
 						glob(argv[Argument], (GLOB_ERR|GLOB_TILDE), 0, GlobBuffer);
 					} else if (strcasecmp(argv[Argument], "?")   == 0) {
 						glob(argv[Argument], (GLOB_ERR|GLOB_TILDE), 0, GlobBuffer);
-					} else {
+					} 
+					 */
+					 else {
 						BitO->File = fopen(argv[Argument], "wb");
-						//setbuf(BitO->File, _IONBF); // I'm buffering BitOutput, so the OS doesn't need to.
-						setvbuf(BitO->File, BitO->Buffer, _IONBF, BitOutputBufferSize);
 						if (BitO->File == NULL) {
-							BitO->ErrorStatus->ParseOutputOptions = strerror(errno);
-							fprintf(stderr, "BitIO: ParseOutputOptions failed with error %d, %s\n", errno, strerror(errno));
-							clearerr(BitO->File);
+							Log(Critical, BitO->ErrorStatus->ParseOutputOptions, FopenFailed, "BitIO", "ParseOutputOptions", strerror(errno));
 						}
 					}
 				}
@@ -271,48 +193,47 @@ extern "C" {
 	}
 	
 	void InitBitInput(BitInput *BitI, ErrorStatus *ES, int argc, const char *argv[]) {
+		// FIXME: Remove any quotes on the path, or the issue could be that the -i and location are specified together...
 		if (argc < 3) {
-			printf("Usage: -i <input> -o <output>\n");
+			PrintHelp();
 		} else {
 			if (BitI->ErrorStatus == NULL) {
 				BitI->ErrorStatus  = ES;
 			}
+			setvbuf(BitI->File, NULL, _IONBF, BitInputBufferSize); // FIXME: should the last option be 0?
+			// This needs to be called before the buffer is filled?
 			ParseInputOptions(BitI, argc, argv);
-			if (BitI->File == NULL) {
-				BitI->ErrorStatus->InitBitInput = FreadUnknownFailure; // FIXME: Use errno to find the actual problem instead of guessing.
-			} else {
-				fseek(BitI->File, 0, SEEK_END);
-				BitI->FileSize         = ftell(BitI->File);
-				fseek(BitI->File, 0, SEEK_SET);
-				uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
-				memset(BitI->Buffer, 0, Bytes2Read);
-				uint64_t BytesRead     = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File);
-				if (BytesRead < Bytes2Read) {
-					BitI->ErrorStatus->InitBitInput = FreadUnknownFailure;
-				}
-				BitI->BitsAvailable = Bytes2Bits(BytesRead);
-				BitI->BitsUnavailable         = 0;
-				BitI->FilePosition  = ftell(BitI->File);
+			
+			fseek(BitI->File, 0, SEEK_END);
+			BitI->FileSize         = (uint64_t)ftell(BitI->File);
+			fseek(BitI->File, 0, SEEK_SET);
+			uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
+			uint64_t BytesRead     = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File);
+			if (BytesRead < Bytes2Read) {
+				Log(Critical, BitI->ErrorStatus->InitBitInput, FreadReturnedTooLittleData, "BitIO", "InitBitInput", strerror(errno));
 			}
+			BitI->BitsAvailable = Bytes2Bits(BytesRead);
+			BitI->BitsUnavailable         = 0;
 		}
 	}
 	
 	void InitBitOutput(BitOutput *BitO, ErrorStatus *ES, int argc, const char *argv[]) {
 		if (argc < 3) {
-			printf("Usage: -i <input> -o <output>\n");
+			PrintHelp();
 		} else {
 			if (BitO->ErrorStatus == NULL) {
 				BitO->ErrorStatus = ES;
 			}
 			ParseOutputOptions(BitO, argc, argv);
-			if (BitO->File == NULL) {
-				BitO->ErrorStatus->InitBitOutput = FreadUnknownFailure; // FIXME: Use errno to find the actual problem instead of guessing.
-			} else {
-				memset(BitO->Buffer,   0, BitOutputBufferSize);
-				BitO->BitsAvailable    = BitOutputBufferSizeInBits;
-				BitO->BitsUnavailable  = 0;
-			}
+			BitO->BitsAvailable    = BitOutputBufferSizeInBits;
+			BitO->BitsUnavailable  = 0;
 		}
+	}
+	
+	void ExitBitIO(BitInput *Input, BitOutput *Output) {
+		CloseBitInput(Input);
+		CloseBitOutput(Output);
+		closelog();
 	}
 	
 	void CloseBitInput(BitInput *BitI) {
@@ -326,29 +247,32 @@ extern "C" {
 		memset(BitO->Buffer,    0, BitInputBufferSize);
 		free(BitO);
 	}
+	/* End Input parsing functions */
 	
 	static void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffset) {
 		if (RelativeOffset == 0) {
-			BitI->ErrorStatus->UpdateInputBuffer = NumberNotInRange;
+			Log(Critical, BitI->ErrorStatus->UpdateInputBuffer, NumberNotInRange, "BitIO", "UpdateInputBuffer", NULL);
 		}
 		uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
 		fseek(BitI->File, RelativeOffset, SEEK_CUR);
 		memset(BitI, 0, Bytes2Read);
 		uint64_t BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
 		if (BytesRead != Bytes2Read) {
-			BitI->ErrorStatus->UpdateInputBuffer = FreadUnknownFailure;
+			Log(Warning, BitI->ErrorStatus->UpdateInputBuffer, FreadReturnedTooLittleData, "BitIO", "UpdateInputBuffer", NULL);
 		}
-		BitI->ErrorStatus->UpdateInputBuffer = Success;
 	}
 	
 	uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read) {
 		uint64_t OutputData = 0;
-		if ((Bits2Read <= 0) || (Bits2Read > 64)) {
-			BitI->ErrorStatus->ReadBits = NumberNotInRange;
+		
+		if (Bits2Read <= 0) {
+			Log(Critical, BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", "Read too few bits");
+		} else if (Bits2Read > 64) {
+			Log(Critical, BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", "Read too many bits");
 		} else {
 			OutputData             = PeekBits(BitI, Bits2Read);
 			if (BitI->ErrorStatus->PeekBits != Success) {
-				BitI->ErrorStatus->ReadBits  = FreadUnknownFailure;
+				BitI->ErrorStatus->ReadBits  = BitI->ErrorStatus->PeekBits;
 			} else {
 				BitI->BitsUnavailable += Bits2Read;
 				BitI->BitsAvailable   -= Bits2Read;
@@ -359,7 +283,7 @@ extern "C" {
 	
 	uint64_t ReadExpGolomb(BitInput *BitI, bool IsSigned, bool IsTruncated) {
 		uint64_t Zeros = 0;
-		int64_t  Data  = 0;
+		uint64_t  Data = 0;
 		Data = ReadBits(BitI, 1);
 		if ((Zeros == 0) && (Data == 1)) { // If this is the first loop?
 			while (ReadBits(BitI, 1) == 0) {
@@ -476,23 +400,18 @@ extern "C" {
 				Byte2Keep              = BitO->Buffer[Byte];
 			}
 			realloc(BitO->Buffer, BufferSize);
-			if (BitO->Buffer == NULL) {
-				BitO->ErrorStatus->WriteBuffer = ReallocFailed;
-				// Undo the reinit, restore the buffer
-			} else {
-				ExpandedBufferSize     = BitOutputBufferSize - BufferSize; // FIXME: is this correct?
-				for (uint64_t Byte = 0; Byte < BitOutputBufferSize; Byte++) {
-					BitO->Buffer[Byte] = 0;
-				}
-				BitO->Buffer[0]        = Byte2Keep; // Replace the unfinished byte in the first element.
-				BitO->BitsAvailable    = BitOutputBufferSizeInBits - Bits2Keep;
-				BitO->BitsUnavailable  = Bits2Keep;
-				
-				for (uint64_t Byte = 0; Byte < BufferSize; Byte++) {
-					for (uint8_t Bit = 0; Bit < 8; Bit++) {
-						uint8_t BitData = Buffer2Write[Byte] & (1 << Bit);
-						WriteBits(BitO, BitData, 1);
-					}
+			ExpandedBufferSize     = BitOutputBufferSize - BufferSize; // FIXME: is this correct?
+			for (uint64_t Byte = 0; Byte < BitOutputBufferSize; Byte++) {
+				BitO->Buffer[Byte] = 0;
+			}
+			BitO->Buffer[0]        = Byte2Keep; // Replace the unfinished byte in the first element.
+			BitO->BitsAvailable    = BitOutputBufferSizeInBits - Bits2Keep;
+			BitO->BitsUnavailable  = Bits2Keep;
+			
+			for (uint64_t Byte = 0; Byte < BufferSize; Byte++) {
+				for (uint8_t Bit = 0; Bit < 8; Bit++) {
+					uint8_t BitData = Buffer2Write[Byte] & (1 << Bit);
+					WriteBits(BitO, BitData, 1);
 				}
 			}
 		}
@@ -503,16 +422,16 @@ extern "C" {
 			UpdateInputBuffer(BitI, 0); // FIXME: This is ugly as hell
 		} else {
 			uint64_t Bytes2Read = BitI->BitsAvailable < BitOutputBufferSizeInBits ? BitI->BitsAvailable :BitOutputBufferSizeInBits;
-			BitI->FilePosition = ftell(BitI->File);
+			BitI->FilePosition = (uint64_t)ftell(BitI->File);
 			fseek(BitI->File, BitOutputBufferSizeInBits - (BitI->BitsUnavailable + Bits), SEEK_CUR);
 			memset(BitI->Buffer, 0, BitOutputBufferSize);
 			fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
 		}
 	}
 	
-	void SkipBits(BitInput *BitI, ErrorStatus *ES, uint8_t Bits2Skip) {
+	void SkipBits(BitInput *BitI, uint8_t Bits2Skip) {
 		if (Bits2Skip <= 0 | Bits2Skip > 64) {
-			ES->SkipBits = NumberNotInRange;
+			BitI->ErrorStatus->SkipBits = NumberNotInRange;
 			exit(EXIT_FAILURE);
 		}
 		SeekBits(BitI, Bits2Skip);
@@ -553,8 +472,52 @@ extern "C" {
 		}
 	}
 	
-	void DecodeHuffman(BitInput *BitI, Huffman *Huff) { // 3 alphabets, literal, "alphabet of bytes", or <length 8, distance 15>
-		// the first 2 are combined, 0-255 = literal, 256 = End of Block, 257-285 = length
+	char ReadUUID(BitInput *BitI) {
+		uint8_t UUID[21] = {0};
+		for (uint8_t Character = 0; Character < 20; Character++) {
+			if (Character == (4|7|10|13|21)) {
+				if (Character == (4|7|10|13)) {
+					UUID[Character] = "-";
+				}
+			}
+			UUID[Character] = ReadBits(BitI, 8);
+		}
+		return UUID;
+	}
+	
+	void WriteUUID(BitOutput *BitO, const char UUIDString) {
+		if (sizeof(UUIDString) != 21) {
+			BitO->ErrorStatus->WriteUUID = WrongStringSize;
+		}
+		for (uint8_t Character = 0; Character < 21; Character++) {
+			if (Character != (4|7|10|13|21)) { // Don't write the NULL terminating char.
+				WriteBits(BitO, UUIDString, 8);
+			}
+		}
+	}
+	
+	void Log(int64_t ErrorType, ErrorStatus *ErrorVariable, int64_t ESError, char Library[99], char Function[99], char Description[99]) {
+		if (LOG_SYSLOG == NULL) {
+			openlog(&Library, ErrorType, (LOG_PERROR|LOG_MAIL|LOG_USER));
+		}
+		
+		time_t CurrentTime;
+		char DateTime[26];
+		time(&CurrentTime);
+		strftime(DateTime, 26, "%A, %B %e, %g+1000: %I:%M:%S %p %Z", CurrentTime);
+		
+		ErrorVariable = ESError;
+		syslog(ErrorType, "%s: %s - %s: %s\n", DateTime, Library, Function, Description);
+		free(CurrentTime);
+	}
+	
+	/* Default Huffman table for reading the embedded table */
+	
+	
+	/* Huffman Decoding functions */
+	
+	void DecodeHuffman(BitInput *BitI, Huffman *Huff, size_t HuffmanSize) { // 3 alphabets, literal, "alphabet of bytes", or <length 8, distance 15>
+																			// the first 2 are combined, 0-255 = literal, 256 = End of Block, 257-285 = length
 		
 		// FIXME: WARNING: The Tilde ~ symbol is the negation symbol in C!!!!!
 		
@@ -564,6 +527,10 @@ extern "C" {
 		uint8_t  HuffmanCompressionType = ReadBits(BitI, 2); // 0 = none, 1 = fixed, 2 = dynamic, 3 = invalid.
 		int32_t  DataLength             = 0;
 		int32_t  OnesComplimentOfLength = 0; // Ones Compliment of DataLength
+		
+		if (OnesCompliment2TwosCompliment(OnesComplimentOfLength) != HuffmanSize) { // Make sure the numbers match up
+			Log(Warning, BitI->ErrorStatus->DecodeHuffman, InvalidData, "BitIO", "DecodeHuffman", "1s Compliment of Length != Length");
+		}
 		
 		if (IsLastHuffmanBlock == true) {
 			
@@ -591,24 +558,24 @@ extern "C" {
 				 // Reject the stream.
 		}
 		/*
-	   if compressed with dynamic Huffman codes
-		   read representation of code trees (see
-											  subsection below)
-		   loop (until end of block code recognized)
-		   decode literal/length value from input stream
-		   if value < 256
-			   copy value (literal byte) to output stream
-			   otherwise
-			   if value = end of block (256)
-				   break from loop
-				   otherwise (value = 257..285)
-				   decode distance from input stream
-				   
-				   move backwards distance bytes in the output
-				   stream, and copy length bytes from this
-				   position to the output stream.
-				   end loop
-				   while not last block
+		 if compressed with dynamic Huffman codes
+		 read representation of code trees (see
+		 subsection below)
+		 loop (until end of block code recognized)
+		 decode literal/length value from input stream
+		 if value < 256
+		 copy value (literal byte) to output stream
+		 otherwise
+		 if value = end of block (256)
+		 break from loop
+		 otherwise (value = 257..285)
+		 decode distance from input stream
+		 
+		 move backwards distance bytes in the output
+		 stream, and copy length bytes from this
+		 position to the output stream.
+		 end loop
+		 while not last block
 		 */
 	}
 	
@@ -623,7 +590,7 @@ extern "C" {
 		}
 	}
 	
-	uint32_t GenerateAdler32(BitInput *BitI, uintptr_t *Data, size_t DataSize) {
+	uint32_t GenerateAdler32(uint8_t *Data, size_t DataSize) {
 		// Add all values up, then modulo it by 65521 for Sum1. byte bound.
 		// Sum2 is Sum1 ran through the algorithm again.
 		// Sum2 is stored before Sum1. Big Endian.
@@ -640,41 +607,14 @@ extern "C" {
 		return (Sum2 << 16) + Sum1;
 	}
 	
-	bool VerifyAdler32(BitInput *BitI, uintptr_t *Data, size_t DataSize, uint32_t EmbeddedAdler32) {
-		uint32_t GeneratedAdler32 = GenerateAdler32(BitI, &Data, DataSize);
+	bool VerifyAdler32(uint8_t *Data, size_t DataSize, uint32_t EmbeddedAdler32) {
+		uint32_t GeneratedAdler32 = GenerateAdler32(Data, DataSize);
 		if (GeneratedAdler32 != EmbeddedAdler32) {
 			return false;
 		} else {
 			return true;
 		}
 	}
-	
-	const char ReadUUID(BitInput *BitI) {
-		uint8_t UUID[21] = {0};
-		for (uint8_t Character = 0; Character < 20; Character++) {
-			if (Character == (4|7|10|13|21)) {
-				if (Character == (4|7|10|13)) {
-					UUID[Character] = "-";
-				}
-			}
-			UUID[Character] = ReadBits(BitI, 8);
-		}
-		return UUID;
-	}
-	
-	void WriteUUID(BitOutput *BitO, const char UUIDString) {
-		if (sizeof(UUIDString) != 21) {
-			BitO->ErrorStatus->WriteUUID = WrongStringSize;
-		}
-		for (uint8_t Character = 0; Character < 21; Character++) {
-			if (Character != (4|7|10|13|21)) { // Don't write the NULL terminating char.
-				WriteBits(BitO, UUIDString, 8);
-			}
-		}
-	}
-	
-	/* Default Huffman table for reading the embedded table */
-	
 	
 #ifdef __cplusplus
 }

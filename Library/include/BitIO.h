@@ -3,32 +3,28 @@
  @author    Marcus Johnson aka BumbleBritches57
  @copyright 2016, Marcus Johnson
  @version   0.9
+ The Version number needs to be FeatureLevel.ABI.BugFix
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
  */
 
-#if defined(__unix__) || defined(__linux__) || (defined(__APPLE__) && defined(__MACH__))
-//#include <complex.h>
-#include <errno.h>
-#include <glob.h>
-//#include <stdarg.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-//#include <strings.h>
-#include <string.h>     // strcasecmp, etc.
-/*#include <unistd.h>     // STDIN, Getopt*/
-//#include <tgmath.h>     // Type Generic Math, includes Math.h and Complex.h
-//#include <limits.h>
-//#include <signal.h>
-//#include <complex.h>
-//#include <fcntl.h>
-//#include <time.h>
 #include <dirent.h>
+#include <errno.h>
 #include <libgen.h>
-#elif defined(_WIN32) || defined(_WIN64)
-
-#define strcasecmp _stricmp
+#include <math.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h> // stdin, fread, etc
+#include <stdlib.h>
+#include <string.h> // strcasecmp, etc.
+#include <syslog.h>
+#ifdef THREADS_H
+#include <threads.h>
+#else
+//#include <c11threads.h>
+#include </usr/local/Packages/C11Threads/c11threads.h>
 #endif
+#include <stdatomic.h>
 
 #pragma once
 
@@ -48,46 +44,59 @@ extern "C" {
         BitOutputBufferSizeInBits = BitOutputBufferSize * 8,
     };
     
-    extern uint64_t BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Input/Output parsers.
+    extern int BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Input/Output parsers.
     
     /*! @abstract                   "List of error codes the various functions in BitIO set in ErrorStatus".
      *  @remark                     "FIXME: Should the error codes be negative or positive?".
      */
     enum ErrorCodes {
-        Success                 =  0,
-        NotEnoughMemory         =  1,
-        NumberNotInRange        =  2,
-        FreadUnknownFailure     =  3,
-        TriedReadingTooManyBits =  4,
-        TriedReadingTooFewBits  =  5,
-        TriedWritingTooManyBits =  6,
-        TriedWritingTooFewBits  =  7,
-        ReallocFailed           =  8,
-        WrongStringSize         =  9,
+		SYSEmergency               =  0,
+		SYSAlert                   =  1,
+		SYSCritical                =  2,
+		SYSError                   =  3,
+		SYSWarning                 =  4,
+		SYSNotice                  =  5,
+		SYSInformation             =  6,
+		SYSDebug                   =  7,
+		/* End Syslog-type eror codes, begin BitIO specific error codes */
+        Success                    =  8,
+        NotEnoughMemory            =  9,
+        NumberNotInRange           = 10,
+        TriedReadingTooManyBits    = 11,
+        TriedReadingTooFewBits     = 12,
+        TriedWritingTooManyBits    = 13,
+        TriedWritingTooFewBits     = 14,
+        ReallocFailed              = 15,
+        WrongStringSize            = 16,
+		FopenFailed                = 17,
+		FreadReturnedTooLittleData = 18,
+		InvalidData                = 19,
     };
     
     /*! @typedef  ErrorStatus
      *  @abstract                   "Allows checking of the error status of various functions".
      */
     typedef struct ErrorStatus {
-        int64_t           SeekBits;
-        int64_t           SkipBits;
-        int64_t           PeekBits;
-        int64_t           ReadBits;
-        int64_t          WriteUUID;
-        int64_t          WriteBits;
-        int64_t        WriteBuffer;
-        int64_t           ReadRICE;
-        int64_t          WriteRICE;
-        int64_t         Power2Mask;
-        int64_t       GenerateUUID;
-        int64_t     AlignBits2Byte;
-        int64_t  UpdateInputBuffer;
-        int64_t       InitBitInput;
-        int64_t      InitBitOutput;
-        int64_t  ParseInputOptions;
-        int64_t ParseOutputOptions;
-        int64_t  FindHighestBitSet;
+        uint64_t           SeekBits;
+        uint64_t           SkipBits;
+        uint64_t           PeekBits;
+        uint64_t           ReadBits;
+        uint64_t          WriteUUID;
+        uint64_t          WriteBits;
+        uint64_t        WriteBuffer;
+        uint64_t           ReadRICE;
+        uint64_t          WriteRICE;
+        uint64_t         Power2Mask;
+        uint64_t       GenerateUUID;
+        uint64_t     AlignBits2Byte;
+        uint64_t  UpdateInputBuffer;
+        uint64_t       InitBitInput;
+        uint64_t      InitBitOutput;
+        uint64_t  ParseInputOptions;
+        uint64_t ParseOutputOptions;
+        uint64_t  FindHighestBitSet;
+		uint64_t       GeneratePath;
+		uint64_t      DecodeHuffman;
     } ErrorStatus;
 	
 	/*! @typedef    BitInput
@@ -127,6 +136,12 @@ extern "C" {
         ErrorStatus                *ErrorStatus;
         uint8_t     Buffer[BitOutputBufferSize];
     } BitOutput;
+	
+	typedef enum Base {
+		Octal       =  8,
+		Decimal     = 10,
+		Hexadecimal = 16,
+	} Base;
     
     /*! @typedef    HuffmanTree
      *  @abstract                    "Contains a complete Huffman tree".
@@ -218,12 +233,12 @@ extern "C" {
      *  @remark                  "Starts at MSB (BitIO is Big Endian internally; It's not my fault Intel is stupid)".
      *  @param    InputData      "is the input int to find the highest bit set".
      */
-    uint8_t FindHighestBitSet(ErrorStatus *ES, uint64_t InputData);
+    uint8_t FindHighestBitSet(uint64_t InputData);
     
     /*! @abstract                "Counts the number of bits set to 1"
      *  @param    Input          "integer to count the number of set bits".
      */
-    uint8_t CountBits(BitInput *BitI, uint64_t Input);
+    uint8_t CountBits(uint64_t Input);
     
     /*! @abstract                "Aligns bits for single-byte alignment".
      *  @remark                  "TODO: Should this be Input/Output neutral?".
@@ -247,9 +262,18 @@ extern "C" {
     
     /*! @abstract                "Create bitmask from binary exponent".
      *
+	 *  @param    Base           "Base to multiply base by, Exponent times."
      *  @param    Exponent       "Power to be raised by 2".
+	 *  @return                  "If 0 is returned, then either Base or Exponent were too large".
      */
-    uint64_t Power2Mask(ErrorStatus *ES, uint64_t Exponent);
+	uint64_t Power(uint8_t Base, uint8_t Exponent);
+	
+	/*! @abstract                "Create bitmask from binary exponent".
+	 *
+	 *  @param    Exponent       "Power to be raised by 2".
+	 *  @return                  "If 0 is returned, then Exponent was too large".
+	 */
+    uint64_t Power2Mask(uint8_t Exponent);
 	
 	/*! @abstract                "Parses command line flags for BitInput".
 	 */
@@ -285,6 +309,8 @@ extern "C" {
     
     /*! @abstract                "Manages InputBuffer and hands out the requested bits".
      *  @remark                  "DO NOT try reading backwards, it will not work. for that use SeekBits()".
+	 *  TODO: Consider - Maybe it's not a good idea to buffer, because it limits you to streaming formats only...
+	 *  TODO: Grow the buffer to accomidate a buffered formats.
      */
     uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read);
 	
@@ -331,8 +357,9 @@ extern "C" {
 	 *  @param    Bits           "The number of bits to seek".
      */
     void SeekBits(BitInput *BitI, int64_t Bits);
-    
-    void SkipBits(BitInput *BitI, ErrorStatus *ES, uint8_t Bits2Skip);
+	
+	
+    void SkipBits(BitInput *BitI, uint8_t Bits2Skip);
     
     /*! @abstract                "Generates CRC from data".
      *  @remark                  "Uses Reciprocal representation".
@@ -367,18 +394,18 @@ extern "C" {
     /*! @abstract                "Creates Adler32 checksum from input data".
      *  @return                  "Returns the Adler32 data from the data input".
      */
-    uint32_t GenerateAdler32(BitInput *BitI, uintptr_t *Data, size_t DataSize);
+    uint32_t GenerateAdler32(uint8_t *Data, size_t DataSize);
     
     /*! @abstract                "Generates Adler32 from the input data, and compares it to the stored checksum".
      *  @return                  "Returns whether the input data matched the provided checksum or not".
      */
-    bool VerifyAdler32(BitInput *BitI, uintptr_t *Data, size_t DataSize, uint32_t EmbeddedAdler32);
+    bool VerifyAdler32(uint8_t *Data, size_t DataSize, uint32_t EmbeddedAdler32);
     
     /*! @abstract                "Reads raw UUID/GUID from the bitstream".
      *  @remark                  "UUID and GUID Strings are ALWAYS 21 chars (inlucing terminating char)".
      *  @return                  "Returns a UUID/GUID string"
      */
-    const char ReadUUID(BitInput *BitI);
+    char ReadUUID(BitInput *BitI);
     
     /*! @abstract                "Write UUID/GUID string as hyphen-less blob".
      *                           "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE aka AAAA-BB-CC-DD-EEEEEE in bytes".
@@ -388,7 +415,22 @@ extern "C" {
 	/*! @abstract                "Parses path for wildcards and sscanf format specifiers".
 	 *  @remark                  "Only supports ANSI currently".
 	 */
-	void ParsePath(const char Path[]);
+	void ParsePath(ErrorStatus *ES, const char Path[]);
+	
+	/*!
+	 @param ErrorType        "Is this error message part of info, debug, fatal, etc?".
+	 @param ErrorVariable    "Pointer to the variable in ErrorStatus that should be set to ESError.".
+	 @param ESError          "Error code to add to ErrorStatus".
+	 @param Library          "Name of the program or library that called this function, to name the logfile".
+	 @param Function         "Which function is calling Log?".
+	 @param Description      "Perror type string describing what went wrong".
+							 "FIXME: Should I enable specifying if it should go to stderr, or to the logfile?".
+	 */
+	void Log(int64_t ErrorType, ErrorStatus *ErrorVariable, int64_t ESError, char Library[99], char Function[99], char Description[99]);
+	
+	/*! @abstract            "Prints the Help text when the user hasn't entered enough options".
+	 */
+	void PrintHelp(void);
 #ifdef __cplusplus
 }
 #endif
