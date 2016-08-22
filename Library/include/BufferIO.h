@@ -31,9 +31,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    // ErrorStatus: ONLY InitBitInput and InitBitOutput need to directly handle ErrorStatus, because those functions will make sure that the passed in pointer to ErrorStatus is set to both arrays, then you can rely on that.
-    
-    
     /*! @abstract                   "BitIO compile time constants".
      *  @remark                     "Change the buffer sizes and whatnot in here.".
      */

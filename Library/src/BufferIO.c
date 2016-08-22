@@ -200,7 +200,7 @@ extern "C" {
 			if (BitI->ErrorStatus == NULL) {
 				BitI->ErrorStatus  = ES;
 			}
-			setvbuf(BitI->File, NULL, _IONBF, BitInputBufferSize); // FIXME: should the last option be 0?
+			setvbuf(BitI->File, NULL, _IONBF, BitInputBufferSize);
 			// This needs to be called before the buffer is filled?
 			ParseInputOptions(BitI, argc, argv);
 			
@@ -210,7 +210,7 @@ extern "C" {
 			uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
 			uint64_t BytesRead     = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File);
 			if (BytesRead < Bytes2Read) {
-				Log(Critical, BitI->ErrorStatus->InitBitInput, FreadReturnedTooLittleData, "BitIO", "InitBitInput", strerror(errno));
+				Log(SYSCritical, BitI->ErrorStatus->InitBitInput, FreadReturnedTooLittleData, "BitIO", "InitBitInput", strerror(errno));
 			}
 			BitI->BitsAvailable = Bytes2Bits(BytesRead);
 			BitI->BitsUnavailable         = 0;
@@ -238,27 +238,27 @@ extern "C" {
 	
 	void CloseBitInput(BitInput *BitI) {
 		fclose(BitI->File);
-		memset(BitI->Buffer,     0, BitInputBufferSize);
+		memset(BitI->Buffer,     0, Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable));
 		free(BitI);
 	}
 	
 	void CloseBitOutput(BitOutput *BitO) {
 		fclose(BitO->File);
-		memset(BitO->Buffer,    0, BitInputBufferSize);
+		memset(BitO->Buffer,    0, Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable));
 		free(BitO);
 	}
 	/* End Input parsing functions */
 	
 	static void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffset) {
 		if (RelativeOffset == 0) {
-			Log(Critical, BitI->ErrorStatus->UpdateInputBuffer, NumberNotInRange, "BitIO", "UpdateInputBuffer", NULL);
+			Log(SYSCritical, BitI->ErrorStatus->UpdateInputBuffer, NumberNotInRange, "BitIO", "UpdateInputBuffer", NULL);
 		}
-		uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
+		uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) ? Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) : BitI->FileSize - BitI->FilePosition;
 		fseek(BitI->File, RelativeOffset, SEEK_CUR);
 		memset(BitI, 0, Bytes2Read);
 		uint64_t BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
 		if (BytesRead != Bytes2Read) {
-			Log(Warning, BitI->ErrorStatus->UpdateInputBuffer, FreadReturnedTooLittleData, "BitIO", "UpdateInputBuffer", NULL);
+			Log(SYSWarning, BitI->ErrorStatus->UpdateInputBuffer, FreadReturnedTooLittleData, "BitIO", "UpdateInputBuffer", NULL);
 		}
 	}
 	
@@ -357,8 +357,6 @@ extern "C" {
 	}
 	
 	void WriteBits(BitOutput *BitO, uint64_t Data2Write, size_t NumBits) {
-		// FIXME Count the number of bits in the damn buffer so the user doesn't have to supply it That's error prone...
-		// FIXME: Rewrite WriteBits entirely.
 		if (NumBits <= 0) {
 			BitO->ErrorStatus->WriteBits = TriedWritingTooFewBits;
 		} else {
@@ -366,11 +364,11 @@ extern "C" {
 			if (BitO->BitsAvailable < NumBits) {
 				// Write the completed bytes out, save the uncompleted ones in the array.
 			}
-			while (BitO->BitsUnavailable >= ((BitOutputBufferSize - 16) * 8)) { // FIXME: This needs work, don't rely on Bit*BufferSize, it isn't nessicarily accurate after initilization.
+			while (BitO->BitsUnavailable >= Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable)) {
 				fwrite(BitO->Buffer, 1, Bits2Bytes(BitO->BitsUnavailable), BitO->File);
 				fflush(BitO->File);
-				memcpy(&BitO->Buffer, &BitO->Buffer + Bits2Bytes(BitO->BitsUnavailable), (BitOutputBufferSize - Bits2Bytes(BitO->BitsUnavailable)));
-				memset(BitO->Buffer, 0, BitOutputBufferSize);
+				memcpy(&BitO->Buffer, &BitO->Buffer + Bits2Bytes(BitO->BitsUnavailable), (Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable) - Bits2Bytes(BitO->BitsUnavailable)));
+				memset(BitO->Buffer, 0, Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable));
 				BitO->BitsUnavailable = (BitO->BitsUnavailable - ((BitO->BitsUnavailable / 8) * 8));
 			}
 			while (NumBits > 0) {
@@ -379,8 +377,6 @@ extern "C" {
 				BitO->BitsUnavailable++;
 				NumBits -= 1;
 			}
-			// FIXME: BitOutputBufferSize needs to be rewritten, because the output buffer may change after being compiled.
-			// Write to disk because the buffer's full.
 			// FIXME: We need to just enlarge the buffer, the call a function to flush it all out to disk.
 		}
 	}
@@ -400,8 +396,8 @@ extern "C" {
 				Byte2Keep              = BitO->Buffer[Byte];
 			}
 			realloc(BitO->Buffer, BufferSize);
-			ExpandedBufferSize     = BitOutputBufferSize - BufferSize; // FIXME: is this correct?
-			for (uint64_t Byte = 0; Byte < BitOutputBufferSize; Byte++) {
+			ExpandedBufferSize     = Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable) - BufferSize; // FIXME: is this correct?
+			for (uint64_t Byte = 0; Byte < Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable); Byte++) {
 				BitO->Buffer[Byte] = 0;
 			}
 			BitO->Buffer[0]        = Byte2Keep; // Replace the unfinished byte in the first element.
@@ -421,10 +417,10 @@ extern "C" {
 		if ((BitI->BitsUnavailable + Bits) >= BitI->BitsAvailable) {
 			UpdateInputBuffer(BitI, 0); // FIXME: This is ugly as hell
 		} else {
-			uint64_t Bytes2Read = BitI->BitsAvailable < BitOutputBufferSizeInBits ? BitI->BitsAvailable :BitOutputBufferSizeInBits;
+			uint64_t Bytes2Read = BitI->BitsAvailable < BitOutputBufferSizeInBits ? BitI->BitsAvailable : BitOutputBufferSizeInBits;
 			BitI->FilePosition = (uint64_t)ftell(BitI->File);
 			fseek(BitI->File, BitOutputBufferSizeInBits - (BitI->BitsUnavailable + Bits), SEEK_CUR);
-			memset(BitI->Buffer, 0, BitOutputBufferSize);
+			memset(BitI->Buffer, 0, Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable));
 			fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
 		}
 	}
