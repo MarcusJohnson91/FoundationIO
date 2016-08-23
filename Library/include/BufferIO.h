@@ -14,15 +14,14 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h> // stdin, fread, etc
+#include <stdio.h>
 #include <stdlib.h>
-#include <string.h> // strcasecmp, etc.
+#include <string.h>
 #include <syslog.h>
 #ifdef THREADS_H
 #include <threads.h>
 #else
-//#include <c11threads.h>
-#include </usr/local/Packages/C11Threads/c11threads.h>
+#include </usr/local/include/c11threads.h>
 #endif
 #include <stdatomic.h>
 
@@ -48,6 +47,7 @@ extern "C" {
      */
     enum ErrorCodes {
 		SYSEmergency               =  0,
+		SYSPanic                   =  0,
 		SYSAlert                   =  1,
 		SYSCritical                =  2,
 		SYSError                   =  3,
@@ -74,26 +74,26 @@ extern "C" {
      *  @abstract                   "Allows checking of the error status of various functions".
      */
     typedef struct ErrorStatus {
-        uint64_t           SeekBits;
-        uint64_t           SkipBits;
-        uint64_t           PeekBits;
-        uint64_t           ReadBits;
-        uint64_t          WriteUUID;
-        uint64_t          WriteBits;
-        uint64_t        WriteBuffer;
-        uint64_t           ReadRICE;
-        uint64_t          WriteRICE;
-        uint64_t         Power2Mask;
-        uint64_t       GenerateUUID;
-        uint64_t     AlignBits2Byte;
-        uint64_t  UpdateInputBuffer;
-        uint64_t       InitBitInput;
-        uint64_t      InitBitOutput;
-        uint64_t  ParseInputOptions;
-        uint64_t ParseOutputOptions;
-        uint64_t  FindHighestBitSet;
-		uint64_t       GeneratePath;
-		uint64_t      DecodeHuffman;
+        int64_t           SeekBits;
+        int64_t           SkipBits;
+        int64_t           PeekBits;
+        int64_t           ReadBits;
+        int64_t          WriteUUID;
+        int64_t          WriteBits;
+        int64_t        WriteBuffer;
+        int64_t           ReadRICE;
+        int64_t          WriteRICE;
+        int64_t         Power2Mask;
+        int64_t       GenerateUUID;
+        int64_t     AlignBits2Byte;
+        int64_t  UpdateInputBuffer;
+        int64_t       InitBitInput;
+        int64_t      InitBitOutput;
+        int64_t  ParseInputOptions;
+        int64_t ParseOutputOptions;
+        int64_t  FindHighestBitSet;
+		int64_t       GeneratePath;
+		int64_t      DecodeHuffman;
     } ErrorStatus;
 	
 	/*! @typedef    BitInput
@@ -423,7 +423,7 @@ extern "C" {
 	 @param Description      "Perror type string describing what went wrong".
 							 "FIXME: Should I enable specifying if it should go to stderr, or to the logfile?".
 	 */
-	void Log(int64_t ErrorType, ErrorStatus *ErrorVariable, int64_t ESError, char Library[99], char Function[99], char Description[99]);
+	void Log(int64_t ErrorType, ErrorStatus *ErrorVariable, int64_t ESError, char Library[], char Function[], char Description[], char FormatSpecifier);
 	
 	/*! @abstract            "Prints the Help text when the user hasn't entered enough options".
 	 */

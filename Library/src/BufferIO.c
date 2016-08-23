@@ -154,7 +154,7 @@ extern "C" {
 					} else {
 						BitI->File = fopen(argv[Argument], "rb"); // Why is this not fucking working?
 						if (BitI->File == NULL) {
-							Log(Critical, BitI->ErrorStatus->ParseInputOptions, FopenFailed, "BitIO", "ParseInputOptions", strerror(errno));
+							Log(SYSCritical, BitI->ErrorStatus->ParseInputOptions, FopenFailed, "BitIO", "ParseInputOptions", strerror(errno), NULL);
 						}
 					}
 				}
@@ -183,7 +183,7 @@ extern "C" {
 					 else {
 						BitO->File = fopen(argv[Argument], "wb");
 						if (BitO->File == NULL) {
-							Log(Critical, BitO->ErrorStatus->ParseOutputOptions, FopenFailed, "BitIO", "ParseOutputOptions", strerror(errno));
+							Log(SYSCritical, BitO->ErrorStatus->ParseOutputOptions, FopenFailed, "BitIO", "ParseOutputOptions", strerror(errno), NULL);
 						}
 					}
 				}
@@ -210,7 +210,7 @@ extern "C" {
 			uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
 			uint64_t BytesRead     = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File);
 			if (BytesRead < Bytes2Read) {
-				Log(SYSCritical, BitI->ErrorStatus->InitBitInput, FreadReturnedTooLittleData, "BitIO", "InitBitInput", strerror(errno));
+				Log(SYSCritical, BitI->ErrorStatus->InitBitInput, FreadReturnedTooLittleData, "BitIO", "InitBitInput", strerror(errno), NULL);
 			}
 			BitI->BitsAvailable = Bytes2Bits(BytesRead);
 			BitI->BitsUnavailable         = 0;
@@ -251,14 +251,14 @@ extern "C" {
 	
 	static void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffset) {
 		if (RelativeOffset == 0) {
-			Log(SYSCritical, BitI->ErrorStatus->UpdateInputBuffer, NumberNotInRange, "BitIO", "UpdateInputBuffer", NULL);
+			Log(SYSCritical, BitI->ErrorStatus->UpdateInputBuffer, NumberNotInRange, "BitIO", "UpdateInputBuffer", NULL, NULL);
 		}
 		uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) ? Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) : BitI->FileSize - BitI->FilePosition;
 		fseek(BitI->File, RelativeOffset, SEEK_CUR);
 		memset(BitI, 0, Bytes2Read);
 		uint64_t BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
 		if (BytesRead != Bytes2Read) {
-			Log(SYSWarning, BitI->ErrorStatus->UpdateInputBuffer, FreadReturnedTooLittleData, "BitIO", "UpdateInputBuffer", NULL);
+			Log(SYSWarning, BitI->ErrorStatus->UpdateInputBuffer, FreadReturnedTooLittleData, "BitIO", "UpdateInputBuffer", NULL, NULL);
 		}
 	}
 	
@@ -266,9 +266,9 @@ extern "C" {
 		uint64_t OutputData = 0;
 		
 		if (Bits2Read <= 0) {
-			Log(Critical, BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", "Read too few bits");
+			Log(SYSCritical, BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", "Read too few bits", NULL);
 		} else if (Bits2Read > 64) {
-			Log(Critical, BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", "Read too many bits");
+			Log(SYSCritical, BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", "Read too many bits", NULL);
 		} else {
 			OutputData             = PeekBits(BitI, Bits2Read);
 			if (BitI->ErrorStatus->PeekBits != Success) {
@@ -492,10 +492,8 @@ extern "C" {
 		}
 	}
 	
-	void Log(int64_t ErrorType, ErrorStatus *ErrorVariable, int64_t ESError, char Library[99], char Function[99], char Description[99]) {
-		if (LOG_SYSLOG == NULL) {
-			openlog(&Library, ErrorType, (LOG_PERROR|LOG_MAIL|LOG_USER));
-		}
+	void Log(int64_t ErrorType, ErrorStatus *ErrorVariable, int64_t ESError, char Library[], char Function[], char Description[], char FormatSpecifier) {
+		openlog(Library, ErrorType, (LOG_PERROR|LOG_MAIL|LOG_USER));
 		
 		time_t CurrentTime;
 		char DateTime[26];
@@ -503,8 +501,8 @@ extern "C" {
 		strftime(DateTime, 26, "%A, %B %e, %g+1000: %I:%M:%S %p %Z", CurrentTime);
 		
 		ErrorVariable = ESError;
-		syslog(ErrorType, "%s: %s - %s: %s\n", DateTime, Library, Function, Description);
-		free(CurrentTime);
+		syslog(ErrorType, "%s: %s - %s: %s\n", DateTime, Library, Function, Description, FormatSpecifier);
+		free(&CurrentTime);
 	}
 	
 	/* Default Huffman table for reading the embedded table */
@@ -525,7 +523,7 @@ extern "C" {
 		int32_t  OnesComplimentOfLength = 0; // Ones Compliment of DataLength
 		
 		if (OnesCompliment2TwosCompliment(OnesComplimentOfLength) != HuffmanSize) { // Make sure the numbers match up
-			Log(Warning, BitI->ErrorStatus->DecodeHuffman, InvalidData, "BitIO", "DecodeHuffman", "1s Compliment of Length != Length");
+			Log(SYSWarning, BitI->ErrorStatus->DecodeHuffman, InvalidData, "BitIO", "DecodeHuffman", "1s Compliment of Length != Length", NULL);
 		}
 		
 		if (IsLastHuffmanBlock == true) {
