@@ -216,7 +216,7 @@ extern "C" {
     uint64_t Bytes2Bits(uint64_t Bytes);
     
     /*! 
-	 @abstract                "Computes the number of bits left over in a byte".
+	 @abstract                "Computes the number of bits until the next byte".
      @return                  "Returns the number of bits left".
      */
     uint8_t BitsRemaining(uint64_t BitsAvailable);
