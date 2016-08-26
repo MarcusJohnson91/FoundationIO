@@ -30,7 +30,7 @@ extern "C" {
 		return Bytes * 8;
 	}
 	
-	uint8_t BitsRemaining(uint64_t BitsAvailable) { // Should I renamed this from BitsRemaining to BitsRemainingInByte, or bits2NextByte?
+	uint8_t BitsRemaining(uint64_t BitsAvailable) {
 		return 8 - (BitsAvailable % 8);
 	}
 	
@@ -50,12 +50,11 @@ extern "C" {
 		Mask1 = 1 << (Exponent - 1);
 		Mask2 = Mask1 - 1;
 		return Mask1 + Mask2;
-		
 		// Shift 1 (Exponent - 1) times, then take the result, subtract one, and add that to the result.
 	}
 	
 	uint64_t OnesCompliment2TwosCompliment(uint64_t Input) { // All unset bits ABOVE the set bit are set, including those originally set
-															 // If 1 was already set, it's set as well.
+		// If 1 was already set, it's set as well.
 		return ~Input + 1;
 	}
 	
@@ -97,13 +96,15 @@ extern "C" {
 	}
 	
 	void AlignInputBits2Byte(BitInput *BitI) {
-		BitI->BitsAvailable   -= BitsRemaining(BitI->BitsAvailable);
-		BitI->BitsUnavailable += BitsRemaining(BitI->BitsAvailable);
+		uint8_t Bits2Add       = BitsRemaining(BitI->BitsAvailable);
+		BitI->BitsAvailable   -= Bits2Add;
+		BitI->BitsUnavailable += Bits2Add;
 	}
 	
-	void AlignInputBits2Bytes(BitInput *BitI, uint8_t Bytes2Align) { // TODO: TEST
-		BitI->BitsAvailable   -= BitsRemaining(BitI->BitsAvailable);
-		BitI->BitsUnavailable += BitsRemaining(BitI->BitsAvailable);
+	void AlignInputBits2Bytes(BitInput *BitI, uint8_t Bytes2Align) { // FIXME: This needs a LOT of work
+		uint8_t Bits2Add       = BitsRemaining(BitI->BitsAvailable);
+		BitI->BitsAvailable   -= Bits2Add;
+		BitI->BitsUnavailable += Bits2Add;
 		if (Bytes2Align > 1) {
 			uint64_t Wat = Bytes2Bits(Bytes2Align -1);
 			BitI->BitsAvailable   -= Wat;
@@ -112,13 +113,15 @@ extern "C" {
 	}
 	
 	void AlignOutputBits2Byte(BitOutput *BitO) {
-		BitO->BitsAvailable   -= BitsRemaining(BitO->BitsAvailable);
-		BitO->BitsUnavailable += BitsRemaining(BitO->BitsAvailable);
+		uint8_t Bits2Add       = BitsRemaining(BitO->BitsAvailable);
+		BitO->BitsAvailable   -= Bits2Add;
+		BitO->BitsUnavailable += Bits2Add;
 	}
 	
-	void AlignOutputBits2Bytes(BitOutput *BitO, uint8_t Bytes2Align) { // TODO: TEST
-		BitO->BitsAvailable   += BitsRemaining(BitO->BitsAvailable);
-		BitO->BitsUnavailable -= BitsRemaining(BitO->BitsUnavailable);
+	void AlignOutputBits2Bytes(BitOutput *BitO, uint8_t Bytes2Align) { // FIXME: This needs a LOT of work
+		uint8_t Bits2Add       = BitsRemaining(BitO->BitsAvailable);
+		BitO->BitsAvailable   += Bits2Add;
+		BitO->BitsUnavailable -= Bits2Add;
 		if (Bytes2Align > 1) {
 			uint64_t Wat           = Bytes2Bits(Bytes2Align -1);
 			BitO->BitsAvailable   -= Wat;
@@ -126,28 +129,30 @@ extern "C" {
 		}
 	}
 	
-	/* End Anciliary Functions */
-	
-	/* Start NEW Path processing functions */
-	void SanitizePath(const char Path2Sanitize[]) {
-		
-	}
-	
 	/* Start Obselete Path processing functions */
 	void PrintHelp(void) {
 		fprintf(stderr, "Usage: -i <input> -o <output>\n");
 	}
 	
-	
 	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
 		while (BitI->File == NULL) {
 			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
-				if (strcasecmp(argv[Argument], "-i")             == 0) {
-					Argument += 2; // Account for the space...
-					if (strcasecmp(argv[Argument], "-")          == 0) { // hyphen: -, en dash: –, em dash: —;
-						BitI->File = freopen(argv[Argument], "rb", stdin);
+				int64_t SpecifierOffset = 0;
+				char Path[1024];
+				snprintf(Path, strlen(argv[Argument]), "%s", argv[Argument]);
+				
+				if (strcasecmp(Path, "-s") == 0) { // Specifier Offset
+					Argument += 1; 
+					sprintf(SpecifierOffset, "%s", argv[Argument]);
+				}
+				
+				if (strcasecmp(Path, "-i") == 0) {
+					Argument += 1; // Does this actually do anything?
+					snprintf(Path, strlen(argv[Argument]), "%s", argv[Argument], SpecifierOffset); // Now it should
+					if (strcasecmp(Path, "-") == 0) {
+						BitI->File = freopen(Path, "rb", stdin);
 					} else {
-						BitI->File = fopen(argv[Argument], "rb"); // Why is this not fucking working?
+						BitI->File = fopen(Path, "rb");
 						if (BitI->File == NULL) {
 							Log(SYSCritical, &BitI->ErrorStatus->ParseInputOptions, FopenFailed, "BitIO", "ParseInputOptions", strerror(errno));
 						}
@@ -163,8 +168,7 @@ extern "C" {
 		while (BitO->File == NULL) {
 			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
 				if (strcasecmp(argv[Argument], "-o")             == 0) {
-					//Argument += 1; // FIXME: The For loop already handles this?
-					Argument += 2; // Account for the space...
+					Argument += 1;
 					if (strcasecmp(argv[Argument], "-")          == 0) {
 						BitO->File = freopen(argv[Argument], "wb", stdout);
 					}
@@ -341,9 +345,9 @@ extern "C" {
 		} else {
 			while (BitsLeft > 0) {
 				OutputData           <<= 1;
-				BitMask                = 1 << ((8 - (BitI->BitsUnavailable % 8)) -1);
+				BitMask                = 1 << (BitsRemaining(BitI->BitsUnavailable) - 1); // 1 << ((8 - (BitI->BitsUnavailable % 8)) -1);
 				Data                   = BitI->Buffer[Bits2Bytes(BitI->BitsUnavailable)] & BitMask;
-				Data                 >>= ((8 - (BitI->BitsUnavailable % 8)) -1);
+				Data                 >>= BitsRemaining(BitI->BitsUnavailable) - 1; // ((8 - (BitI->BitsUnavailable % 8)) -1);
 				OutputData            += Data;
 				BitI->BitsAvailable   -= 1;
 				BitI->BitsUnavailable += 1;
