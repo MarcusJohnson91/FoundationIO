@@ -149,7 +149,7 @@ extern "C" {
 					} else {
 						BitI->File = fopen(argv[Argument], "rb"); // Why is this not fucking working?
 						if (BitI->File == NULL) {
-							Log(SYSCritical, BitI->ErrorStatus->ParseInputOptions, FopenFailed, "BitIO", "ParseInputOptions", strerror(errno), NULL);
+							Log(SYSCritical, &BitI->ErrorStatus->ParseInputOptions, FopenFailed, "BitIO", "ParseInputOptions", strerror(errno));
 						}
 					}
 				}
@@ -178,7 +178,7 @@ extern "C" {
 					 else {
 						BitO->File = fopen(argv[Argument], "wb");
 						if (BitO->File == NULL) {
-							Log(SYSCritical, BitO->ErrorStatus->ParseOutputOptions, FopenFailed, "BitIO", "ParseOutputOptions", strerror(errno), NULL);
+							Log(SYSCritical, BitO->ErrorStatus->ParseOutputOptions, FopenFailed, "BitIO", "ParseOutputOptions", strerror(errno));
 						}
 					}
 				}
@@ -205,7 +205,7 @@ extern "C" {
 			uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
 			uint64_t BytesRead     = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File);
 			if (BytesRead < Bytes2Read) {
-				Log(SYSCritical, BitI->ErrorStatus->InitBitInput, FreadReturnedTooLittleData, "BitIO", "InitBitInput", strerror(errno), NULL);
+				Log(SYSCritical, &BitI->ErrorStatus->InitBitInput, FreadReturnedTooLittleData, "BitIO", "InitBitInput", strerror(errno));
 			}
 			BitI->BitsAvailable = Bytes2Bits(BytesRead);
 			BitI->BitsUnavailable         = 0;
@@ -246,14 +246,14 @@ extern "C" {
 	
 	static void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffset) {
 		if (RelativeOffset == 0) {
-			Log(SYSCritical, BitI->ErrorStatus->UpdateInputBuffer, NumberNotInRange, "BitIO", "UpdateInputBuffer", NULL, NULL);
+			Log(SYSCritical, &BitI->ErrorStatus->UpdateInputBuffer, NumberNotInRange, "BitIO", "UpdateInputBuffer", NULL);
 		}
 		uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) ? Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) : BitI->FileSize - BitI->FilePosition;
 		fseek(BitI->File, RelativeOffset, SEEK_CUR);
 		memset(BitI, 0, Bytes2Read);
 		uint64_t BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
 		if (BytesRead != Bytes2Read) {
-			Log(SYSWarning, BitI->ErrorStatus->UpdateInputBuffer, FreadReturnedTooLittleData, "BitIO", "UpdateInputBuffer", NULL, NULL);
+			Log(SYSWarning, &BitI->ErrorStatus->UpdateInputBuffer, FreadReturnedTooLittleData, "BitIO", "UpdateInputBuffer", NULL);
 		}
 	}
 	
@@ -261,9 +261,13 @@ extern "C" {
 		uint64_t OutputData = 0;
 		
 		if (Bits2Read <= 0) {
-			Log(SYSCritical, BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", "Read too few bits", NULL);
+			char Description[1024];
+			sprintf(Description, "Read too few bits: %d", Bits2Read);
+			Log(SYSCritical, &BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", Description);
 		} else if (Bits2Read > 64) {
-			Log(SYSCritical, BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", "Read too many bits", NULL);
+			char Description[1024];
+			sprintf(Description, "Read too many bits: %d", Bits2Read);
+			Log(SYSCritical, &BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", Description);
 		} else {
 			OutputData             = PeekBits(BitI, Bits2Read);
 			if (BitI->ErrorStatus->PeekBits != Success) {
