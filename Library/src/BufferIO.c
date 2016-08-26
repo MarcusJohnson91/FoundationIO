@@ -30,15 +30,11 @@ extern "C" {
 		return Bytes * 8;
 	}
 	
-	uint8_t BitsRemaining(uint64_t BitsAvailable) {
-		return 8 - (BitsAvailable % 8); // 8 - (32639 % 8) aka return 1.
+	uint8_t BitsRemaining(uint64_t BitsAvailable) { // Should I renamed this from BitsRemaining to BitsRemainingInByte, or bits2NextByte?
+		return 8 - (BitsAvailable % 8);
 	}
 	
 	uint64_t Signed2Unsigned(int64_t Signed) {
-		if (Signed == (-0|0)) {
-			return 0;
-		}
-		//return ~Signed + 1;
 		return (uint64_t)Signed;
 	}
 	
@@ -46,12 +42,25 @@ extern "C" {
 		return (int64_t)Unsigned;
 	}
 	
-	uint64_t OnesCompliment2TwosCompliment(uint64_t Input) { // FIXME: Test this.
-		return Input ^ 0xFFFFFFFFFFFFFFFF;
+	uint64_t Power2Mask(uint8_t Exponent) {
+		if (Exponent > 64) {
+			return 0;
+		}
+		uint64_t Mask1 = 0, Mask2 = 0;
+		Mask1 = 1 << (Exponent - 1);
+		Mask2 = Mask1 - 1;
+		return Mask1 + Mask2;
+		
+		// Shift 1 (Exponent - 1) times, then take the result, subtract one, and add that to the result.
 	}
 	
-	uint64_t TwosCompliment2OnesCompliment(uint64_t Input) {
-		return Input ^ 0xFFFFFFFFFFFFFFFF + 1;
+	uint64_t OnesCompliment2TwosCompliment(uint64_t Input) { // All unset bits ABOVE the set bit are set, including those originally set
+															 // If 1 was already set, it's set as well.
+		return ~Input + 1;
+	}
+	
+	uint64_t TwosCompliment2OnesCompliment(uint64_t Input) { // All unset bits become set, except those originally set
+		return Input ^ 0xFFFFFFFFFFFFFFFF;
 	}
 	
 	uint8_t FindHighestBitSet(uint64_t InputData) {
@@ -117,20 +126,6 @@ extern "C" {
 		}
 	}
 	
-	uint64_t Power2Mask(uint8_t Exponent) { // Bitshifting, so it's limited to base 2.
-		if (Exponent > 64) {
-			return 0;
-		}
-		/*
-		uint64_t Mask = pow(2, Exponent) - 1;
-		 */
-		uint64_t Mask1 = 0, Mask2 = 0;
-		Mask1 = 1 << (Exponent - 1);
-		Mask2 = Mask1 - 1;
-		return Mask1 + Mask2;
-		
-		// Shift 1 (Exponent - 1) times, then take the result, subtract one, and add that to the result.
-	}
 	/* End Anciliary Functions */
 	
 	/* Start NEW Path processing functions */
@@ -413,24 +408,27 @@ extern "C" {
 		}
 	}
 	
-	void SeekBits(BitInput *BitI, int64_t Bits) {
-		if ((BitI->BitsUnavailable + Bits) >= BitI->BitsAvailable) {
-			UpdateInputBuffer(BitI, 0); // FIXME: This is ugly as hell
+	void SkipBits(BitInput *BitI, int64_t Bits) { 
+		// The point of this is to seek around in the file, in case you need to jumpover parts of memory
+		// 
+		BitI->BitsAvailable   -= Bits;
+		BitI->BitsUnavailable += Bits;
+		
+		/*
+		if ((BitI->BitsUnavailable + Bits) > BitI->BitsAvailable) {
+			UpdateInputBuffer(BitI, 0);
 		} else {
 			uint64_t Bytes2Read = BitI->BitsAvailable < BitOutputBufferSizeInBits ? BitI->BitsAvailable : BitOutputBufferSizeInBits;
+			
+			uint64_t Bytes2Read2 = BitI->BitsAvailable < Bytes2Bits(BitI->BufferSize) ? BitI->BitsAvailable : BitOutputBufferSizeInBits;
+			
+			
 			BitI->FilePosition = (uint64_t)ftell(BitI->File);
 			fseek(BitI->File, BitOutputBufferSizeInBits - (BitI->BitsUnavailable + Bits), SEEK_CUR);
 			memset(BitI->Buffer, 0, Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable));
 			fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
 		}
-	}
-	
-	void SkipBits(BitInput *BitI, uint8_t Bits2Skip) {
-		if (Bits2Skip <= 0 | Bits2Skip > 64) {
-			BitI->ErrorStatus->SkipBits = NumberNotInRange;
-			exit(EXIT_FAILURE);
-		}
-		SeekBits(BitI, Bits2Skip);
+		 */
 	}
 	
 	uint64_t GenerateCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool Init) {
@@ -468,40 +466,43 @@ extern "C" {
 		}
 	}
 	
-	char ReadUUID(BitInput *BitI) {
-		uint8_t UUID[21] = {0};
-		for (uint8_t Character = 0; Character < 20; Character++) {
-			if (Character == (4|7|10|13|21)) {
-				if (Character == (4|7|10|13)) {
-					UUID[Character] = "-";
-				}
+	void ReadUUID(BitInput *BitI, char *UUIDString[21]) {
+		//static char UUIDString[21] = {0};
+		for (uint8_t Character = 0; Character < 21; Character++) {
+			if (Character == (4|7|10|13)) {
+				*UUIDString[Character] = 0x2D;
+			} else {
+				*UUIDString[Character] = ReadBits(BitI, 8);
 			}
-			UUID[Character] = ReadBits(BitI, 8);
 		}
-		return UUID;
 	}
 	
-	void WriteUUID(BitOutput *BitO, const char UUIDString) {
-		if (sizeof(UUIDString) != 21) {
+	void WriteUUID(BitOutput *BitO, char UUIDString[21]) {
+		if (strlen(UUIDString) != 21) {
 			BitO->ErrorStatus->WriteUUID = WrongStringSize;
 		}
 		for (uint8_t Character = 0; Character < 21; Character++) {
 			if (Character != (4|7|10|13|21)) { // Don't write the NULL terminating char.
-				WriteBits(BitO, UUIDString, 8);
+				WriteBits(BitO, UUIDString[Character], 8);
 			}
 		}
 	}
 	
-	void Log(int64_t ErrorType, ErrorStatus *ErrorVariable, int64_t ESError, char Library[], char Function[], char Description[], char FormatSpecifier) {
-		openlog(Library, ErrorType, (LOG_PERROR|LOG_MAIL|LOG_USER));
+	void Log(int64_t ErrorType, int64_t *ErrorVariable, int64_t ESError, char Library[32], char Function[64], char Description[1024]) {
+		if (ErrorType == (SYSCritical|SYSPanic)) {
+			openlog(Library, ErrorType, (LOG_PERROR|LOG_MAIL|LOG_USER));
+		} else {
+			openlog(Library, ErrorType, (LOG_PERROR|LOG_USER));
+		}
 		
-		time_t CurrentTime;
-		char DateTime[26];
-		time(&CurrentTime);
-		strftime(DateTime, 26, "%A, %B %e, %g+1000: %I:%M:%S %p %Z", CurrentTime);
+		time_t Time;
+		char CurrentTime[26];
+		time(&Time);
+		strftime(CurrentTime, 26, "%A, %B %e, %g+1000: %I:%M:%S %p %Z", Time);
 		
-		ErrorVariable = ESError;
-		syslog(ErrorType, "%s: %s - %s: %s\n", DateTime, Library, Function, Description, FormatSpecifier);
+		*ErrorVariable = ESError;
+		syslog(ErrorType, "%s: %s - %s: %s\n", CurrentTime, Library, Function, Description);
+		
 		free(&CurrentTime);
 	}
 	
@@ -523,7 +524,9 @@ extern "C" {
 		int32_t  OnesComplimentOfLength = 0; // Ones Compliment of DataLength
 		
 		if (OnesCompliment2TwosCompliment(OnesComplimentOfLength) != HuffmanSize) { // Make sure the numbers match up
-			Log(SYSWarning, BitI->ErrorStatus->DecodeHuffman, InvalidData, "BitIO", "DecodeHuffman", "1s Compliment of Length != Length", NULL);
+			char String2Print[1024];
+			sprintf(String2Print, "One's Compliment of Length: %d != Length %d", OnesComplimentOfLength, DataLength);
+			Log(SYSWarning, &BitI->ErrorStatus->DecodeHuffman, InvalidData, "BitIO", "DecodeHuffman", String2Print);
 		}
 		
 		if (IsLastHuffmanBlock == true) {
@@ -608,6 +611,10 @@ extern "C" {
 		} else {
 			return true;
 		}
+	}
+	
+	void ArithmeticDecoder(BitInput *BitI) {
+		
 	}
 	
 #ifdef __cplusplus
