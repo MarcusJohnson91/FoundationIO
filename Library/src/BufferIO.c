@@ -131,7 +131,7 @@ extern "C" {
 	
 	/* Start Obselete Path processing functions */
 	void PrintHelp(void) {
-		fprintf(stderr, "Usage: -i <input> -o <output>\n");
+		fprintf(stderr, "Usage: (optional: -s <FormatSpecifierOffset>) -i <input> -o <output>\n");
 	}
 	
 	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
@@ -159,14 +159,27 @@ extern "C" {
 					}
 				}
 				BitIOCurrentArgument += Argument - 1;
+				if ((Argument >= argc) && (BitI->File == NULL)) { // end of the argument list with no file, so start back at the top.
+					BitIOCurrentArgument = 1;
+				}
 			}
 		}
 	}
 	
 	void ParseOutputOptions(BitOutput *BitO, int argc, const char *argv[]) {
-		//glob_t *GlobBuffer = 0;
 		while (BitO->File == NULL) {
 			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
+				int64_t SpecifierOffset = 0;
+				char Path[1024];
+				snprintf(Path, strlen(argv[Argument]), "%s", argv[Argument]);
+				
+				
+				
+				if (strcasecmp(Path, "-s") == 0) { // Specifier Offset
+					Argument += 1; 
+					sprintf(SpecifierOffset, "%s", argv[Argument]);
+				}
+				
 				if (strcasecmp(argv[Argument], "-o")             == 0) {
 					Argument += 1;
 					if (strcasecmp(argv[Argument], "-")          == 0) {
@@ -182,11 +195,14 @@ extern "C" {
 					 else {
 						BitO->File = fopen(argv[Argument], "wb");
 						if (BitO->File == NULL) {
-							Log(SYSCritical, BitO->ErrorStatus->ParseOutputOptions, FopenFailed, "BitIO", "ParseOutputOptions", strerror(errno));
+							Log(SYSCritical, &BitO->ErrorStatus->ParseOutputOptions, FopenFailed, "BitIO", "ParseOutputOptions", strerror(errno));
 						}
 					}
 				}
 				BitIOCurrentArgument += Argument - 1;
+				if ((Argument >= argc) && (BitO->File == NULL)) { // end of the argument list with no file, so start back at the top.
+					BitIOCurrentArgument = 1;
+				}
 			}
 		}
 	}
@@ -519,7 +535,7 @@ extern "C" {
 	
 	/* Huffman Decoding functions */
 	
-	void DecodeHuffman(BitInput *BitI, Huffman *Huff, size_t HuffmanSize) { // 3 alphabets, literal, "alphabet of bytes", or <length 8, distance 15>
+	void DecodeHuffman(BitInput *BitI, size_t HuffmanSize) { // 3 alphabets, literal, "alphabet of bytes", or <length 8, distance 15>
 																			// the first 2 are combined, 0-255 = literal, 256 = End of Block, 257-285 = length
 		
 		// FIXME: WARNING: The Tilde ~ symbol is the negation symbol in C!!!!!
