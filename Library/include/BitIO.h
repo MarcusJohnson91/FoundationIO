@@ -3,7 +3,7 @@
  @author    Marcus Johnson aka BumbleBritches57
  @copyright 2016, Marcus Johnson
  @version   0.9.1
- FixME: The Version number needs to be FeatureLevel.ABI.BugFix
+				FIXME: The Version number needs to be FeatureLevel.ABI.BugFix
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
  */
 
@@ -18,12 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
-#ifdef THREADS_H
-#include <threads.h>
-#else
-#include </usr/local/include/c11threads.h>
-#endif
-#include <stdatomic.h>
+#include <time.h>
 
 #pragma once
 
@@ -33,7 +28,7 @@ extern "C" {
 	
     /*! 
 	 @abstract                   "BitIO compile time constants".
-     @remark                     "Change the buffer sizes and whatnot in here.".
+     @remark                     "Change the buffer sizes here.".
      */
     enum BitIOConstants {
         BitInputBufferSize        = 4096,
@@ -121,6 +116,7 @@ extern "C" {
         uint64_t              BitsUnavailable;
         uint64_t                BitsAvailable;
 		uint64_t                   BufferSize;
+		int64_t        CurrentFormatSpecifier;
         ErrorStatus              *ErrorStatus;
         uint8_t    Buffer[BitInputBufferSize];
     } BitInput;
@@ -139,6 +135,7 @@ extern "C" {
         FILE                              *File;
         uint64_t                BitsUnavailable;
         uint64_t                  BitsAvailable;
+		int64_t          CurrentFormatSpecifier;
         ErrorStatus                *ErrorStatus;
         uint8_t     Buffer[BitOutputBufferSize];
     } BitOutput;
@@ -148,34 +145,6 @@ extern "C" {
 		Decimal     = 10,
 		Hexadecimal = 16,
 	} Base;
-    
-    /*! 
-	 @typedef    HuffmanTree
-     @abstract                    "Contains a complete Huffman tree".
-     @constant   TreeSize         "Size of the Huffman tree, including the root node".
-     @constant   Tree             "Array containing the Huffman tree".
-     @constant   Probability      "Array containing the probability of each symbol's occurance".
-     */
-    typedef struct HuffmanTree {
-        uint64_t TreeSize;
-        uint8_t  Tree[256];
-        uint8_t  Probability[256];
-    } HuffmanTree;
-    
-    typedef struct StaticHuffman {
-        uint64_t WAT;
-    } StaticHuffman;
-    
-    typedef struct DynamicHuffman {
-        uint16_t Length;
-        uint16_t Distance;
-        uint16_t CodeLength;
-    } DynamicHuffman;
-    
-    typedef struct Huffman {
-        StaticHuffman  *Static;
-        DynamicHuffman *Dynamic;
-    } Huffman;
     
     /*! 
 	 @abstract                "Swap endian of 16 bit integers".
@@ -481,7 +450,7 @@ extern "C" {
 	/*! 
 	 @abstract            "Prints the Help text when the user hasn't entered enough options".
 	 */
-	void PrintHelp(void);
+	//void PrintHelp(void);
 	
 #ifdef __cplusplus
 }
