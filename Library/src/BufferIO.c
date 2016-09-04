@@ -7,15 +7,26 @@ extern "C" {
 	int BitIOCurrentArgument = 1;
 	
 	uint16_t SwapEndian16(uint16_t Data2Swap) {
-		return ((Data2Swap & 0xFF00) >> 8) || ((Data2Swap & 0x00FF) << 8);
+		return ((Data2Swap & 0xFF00) >> 8) || \
+		       ((Data2Swap & 0x00FF) << 8);
 	}
 	
 	uint32_t SwapEndian32(uint32_t Data2Swap) {
-		return ((Data2Swap & 0xFF000000) >> 24) | ((Data2Swap & 0x00FF0000) >> 8) | ((Data2Swap & 0x0000FF00) << 8) | ((Data2Swap & 0x000000FF) << 24);
+		return ((Data2Swap & 0xFF000000) >> 24) || \
+		       ((Data2Swap & 0x00FF0000) >>  8) || \
+			   ((Data2Swap & 0x0000FF00) <<  8) || \
+		       ((Data2Swap & 0x000000FF) << 24);
 	}
 	
 	uint64_t SwapEndian64(uint64_t Data2Swap) {
-		return (((Data2Swap & 0xFF00000000000000) >> 56) | ((Data2Swap & 0x00FF000000000000) >> 40) | ((Data2Swap & 0x0000FF0000000000) >> 24) | ((Data2Swap & 0x000000FF00000000) >> 8)  | ((Data2Swap & 0x00000000FF000000) << 8)  | ((Data2Swap & 0x0000000000FF0000) << 24) | ((Data2Swap & 0x000000000000FF00) << 40) | ((Data2Swap & 0x00000000000000FF) << 56));
+		return (((Data2Swap & 0xFF00000000000000) >> 56) || \
+				((Data2Swap & 0x00FF000000000000) >> 40) || \
+				((Data2Swap & 0x0000FF0000000000) >> 24) || \
+				((Data2Swap & 0x000000FF00000000) >>  8) || \
+				((Data2Swap & 0x00000000FF000000) <<  8) || \
+				((Data2Swap & 0x0000000000FF0000) << 24) || \
+				((Data2Swap & 0x000000000000FF00) << 40) || \
+				((Data2Swap & 0x00000000000000FF) << 56));
 	}
 	
 	bool IsOdd(int64_t Input) {
@@ -62,6 +73,7 @@ extern "C" {
 		return Input ^ 0xFFFFFFFFFFFFFFFF;
 	}
 	
+	/*
 	uint8_t FindHighestBitSet(uint64_t InputData) {
 		// Just return 0... that should never appear, so you're good...
 		uint8_t HighestBitSet = 0;
@@ -69,19 +81,11 @@ extern "C" {
 			if ((InputData & (1 << (Bit - 1))) == 1) {
 				HighestBitSet = Bit;
 			}
-			/*
-			while ((InputData & (CurrentBit >>= Bit)) == 0) { // FIXME: Wtf is this here for?
-				
-			}
-			if ((InputData & Bit) == 1) {
-				HighestBitSet = Bit;
-				break;
-			}
-			 */
 		}
 		return HighestBitSet;
 	}
-	
+	 */
+	/*
 	uint8_t CountBits(uint64_t Input) {
 		if (Input == 0) {
 			return 0;
@@ -93,6 +97,13 @@ extern "C" {
 			}
 		}
 		return Count;
+	}
+	*/
+	bool IsStreamByteAligned(uint64_t BitsUnavailable) {
+		if ((BitsUnavailable % 8) == 0) {
+			return YES;
+		}
+		return NO;
 	}
 	
 	void AlignInputBits2Byte(BitInput *BitI) {
@@ -131,24 +142,21 @@ extern "C" {
 	
 	/* Start Obselete Path processing functions */
 	void PrintHelp(void) {
-		fprintf(stderr, "Usage: (optional: -s <FormatSpecifierOffset>) -i <input> -o <output>\n");
+		fprintf(stderr, "Usage: -i <input> -o <output>\n");
 	}
 	
 	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
+		// I need to add some variables to BitInput to split the path into 3, one for the base path, the second for the format specifier number, and the third for the extension.
+		
+		
 		while (BitI->File == NULL) {
 			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
-				int64_t SpecifierOffset = 0;
 				char Path[1024];
 				snprintf(Path, strlen(argv[Argument]), "%s", argv[Argument]);
 				
-				if (strcasecmp(Path, "-s") == 0) { // Specifier Offset
-					Argument += 1; 
-					sprintf(SpecifierOffset, "%s", argv[Argument]);
-				}
-				
 				if (strcasecmp(Path, "-i") == 0) {
-					Argument += 1; // Does this actually do anything?
-					snprintf(Path, strlen(argv[Argument]), "%s", argv[Argument], SpecifierOffset); // Now it should
+					Argument += 1;
+					snprintf(Path, strlen(argv[Argument]), "%s", argv[Argument]);
 					if (strcasecmp(Path, "-") == 0) {
 						BitI->File = freopen(Path, "rb", stdin);
 					} else {
@@ -157,6 +165,8 @@ extern "C" {
 							Log(SYSCritical, &BitI->ErrorStatus->ParseInputOptions, FopenFailed, "BitIO", "ParseInputOptions", strerror(errno));
 						}
 					}
+				} else {
+					Argument += 1;
 				}
 				BitIOCurrentArgument += Argument - 1;
 				if ((Argument >= argc) && (BitI->File == NULL)) { // end of the argument list with no file, so start back at the top.
@@ -311,6 +321,9 @@ extern "C" {
 			Data  = (1 << Zeros);
 			Data += ReadBits(BitI, Zeros);
 		}
+		if (Zeros == 0) { // Zero case
+			Data = 0;
+		}
 		if (IsSigned == true) {
 			Data  = Unsigned2Signed(Data);
 		}
@@ -400,7 +413,34 @@ extern "C" {
 		}
 	}
 	
-	void WriteBuffer(BitOutput *BitO, uintptr_t *Buffer2Write, size_t BufferSize) {
+	void InitBitBuffer(BitBuffer *Bits, uintptr_t *Buffer, size_t BufferSize) {
+		Bits->BitsAvailable   = Bytes2Bits(BufferSize);
+		Bits->BitsUnavailable = 0;
+		Bits->Buffer = Buffer;
+	}
+	
+	uint64_t ReadBitBuffer(BitBuffer *Bits, uint8_t Bits2Read) {
+		uint64_t OutputData = 0, Data = 0, BitMask = 0;
+		if ((Bits2Read <= 0) || (Bits2Read > 64)) {
+			char ErrorDescription[1024] = {0};
+			sprintf(ErrorDescription, "You requested %d bits, ReadBuffer can only read 1-64 bits at a time\n", Bits2Read);
+			Log(SYSError, &Bits->ES->ReadBitBuffer, NumberNotInRange, "BitIO", "ReadBitBuffer", ErrorDescription);
+		} else {
+			while ((Bits2Read > 0) && (Bits->BitsAvailable >= Bits2Read)) {
+				OutputData           <<= 1;
+				BitMask                = 1 << (BitsRemaining(Bits->BitsUnavailable) - 1); // 1 << ((8 - (BitI->BitsUnavailable % 8)) -1);
+				Data                   = Bits->Buffer[Bits2Bytes(Bits->BitsUnavailable)] & BitMask;
+				Data                 >>= BitsRemaining(Bits->BitsUnavailable) - 1; // ((8 - (BitI->BitsUnavailable % 8)) -1);
+				OutputData            += Data;
+				Bits->BitsAvailable   -= 1;
+				Bits->BitsUnavailable += 1;
+				Bits2Read             -= 1;
+			}
+		}
+		return OutputData;
+	}
+	
+	void WriteBuffer(BitOutput *BitO, uintptr_t *Buffer2Write, size_t BufferSize) { // Is this even nessacary? what's the use case?
 		uint8_t  Bits2Keep          = 0;
 		uint8_t  Byte2Keep          = 0;
 		uint64_t ExpandedBufferSize = 0;
@@ -455,34 +495,27 @@ extern "C" {
 		 */
 	}
 	
-	uint64_t GenerateCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool Init) {
+	uint64_t GenerateCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize) {
 		uint64_t Output = ~Init;
+		uint64_t Polynomial = 1 << CRCSize; // Implicit bit
+		Polynomial += (Poly & Power2Mask(CRCSize));
+		
+		// Create a BitInput version of the data buffer, to readbits from the buffer.
+		BitBuffer *CRCBits = calloc(CRCSize, 1);
+		InitBitBuffer(CRCBits, DataBuffer, BufferSize);
+		
+		Init > 1 ? Power2Mask(CRCSize) : 1;
 		
 		for (size_t Byte = 0; Byte < BufferSize; Byte++) {
+			uint64_t Bits2XOR = ReadBuffer(CRCBits, CRCSize);
+			// if there aren't enough bits, simply shift to MSB to append 0s.
 			
 		}
-		
 		return Output;
-		
-		/*
-		uint64_t DataInput  = 0;
-		uint64_t DataOutput = 0;
-		for (size_t BufferIndex = 0; BufferIndex < BufferSize; BufferIndex++) { // needs to iterate over bytes the size of DataSize
-			DataInput = DataBuffer[BufferIndex];
-			for (uint8_t Bit = 0; Bit < CRCSize * 8; Bit++) {
-				if ((Init & 0x1) ^ (DataInput & 0x1)) {
-					Init ^= Poly;
-				} else {
-					Init >>= 1;
-				}
-			}
-		}
-		return DataOutput;
-		 */
 	}
 	
-	bool VerifyCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool Init, uint64_t EmbeddedCRC) {
-		uint64_t GeneratedCRC = GenerateCRC(DataBuffer, BufferSize, Poly, Init);
+	bool VerifyCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize, uint64_t EmbeddedCRC) {
+		uint64_t GeneratedCRC = GenerateCRC(DataBuffer, BufferSize, Poly, Init, CRCSize);
 		if (GeneratedCRC == EmbeddedCRC) {
 			return true;
 		} else {
@@ -494,7 +527,7 @@ extern "C" {
 		//static char UUIDString[21] = {0};
 		for (uint8_t Character = 0; Character < 21; Character++) {
 			if (Character == (4|7|10|13)) {
-				*UUIDString[Character] = 0x2D;
+				*UUIDString[Character] = 0x2D; // hyphen
 			} else {
 				*UUIDString[Character] = ReadBits(BitI, 8);
 			}
@@ -535,10 +568,9 @@ extern "C" {
 	
 	/* Huffman Decoding functions */
 	
-	void DecodeHuffman(BitInput *BitI, size_t HuffmanSize) { // 3 alphabets, literal, "alphabet of bytes", or <length 8, distance 15>
-																			// the first 2 are combined, 0-255 = literal, 256 = End of Block, 257-285 = length
-		
-		// FIXME: WARNING: The Tilde ~ symbol is the negation symbol in C!!!!!
+	void DecodeHuffman(BitInput *BitI, size_t HuffmanSize) { 
+		// 3 alphabets, literal, "alphabet of bytes", or <length 8, distance 15> the first 2 are combined, 0-255 = literal, 256 = End of Block, 257-285 = length
+		// FIXME: The Tilde ~ symbol is the negation symbol in C!!!!! XOR = ^
 		
 		uint8_t  DecodedData[32768] = {0};
 		/* Parse Huffman block header */
@@ -572,9 +604,11 @@ extern "C" {
 			uint16_t Distance = ReadBits(BitI, 5);
 			
 		} else if (HuffmanCompressionType == 2) { // Dynamic Huffman.
+			/*
 			Huff->Dynamic->Length     = ReadBits(BitI, 5) + 257;
 			Huff->Dynamic->Distance   = ReadBits(BitI, 5) + 1;
 			Huff->Dynamic->CodeLength = ReadBits(BitI, 4) + 4;
+			 */
 		} else { // Invalid.
 				 // Reject the stream.
 		}
@@ -616,7 +650,6 @@ extern "C" {
 		// Sum2 is Sum1 ran through the algorithm again.
 		// Sum2 is stored before Sum1. Big Endian.
 		
-		/* My Implementation */
 		uint32_t Adler  = 1;
 		uint32_t Sum1   = Adler & 0xFFFF;
 		uint32_t Sum2   = (Adler >> 16) & 0xFFFF;
