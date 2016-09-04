@@ -26,16 +26,21 @@
 extern "C" {
 #endif
 	
+	typedef enum Truth {
+		YES =  true,
+		NO  = false,
+	} Truth;
+	
     /*! 
 	 @abstract                   "BitIO compile time constants".
      @remark                     "Change the buffer sizes here.".
      */
-    enum BitIOConstants {
+    typedef enum BitIOConstants {
         BitInputBufferSize        = 4096,
         BitInputBufferSizeInBits  = BitInputBufferSize * 8,
         BitOutputBufferSize       = 4096,
         BitOutputBufferSizeInBits = BitOutputBufferSize * 8,
-    };
+    } BitIOConstants;
     
     extern int BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Input/Output parsers.
     
@@ -43,7 +48,7 @@ extern "C" {
 	 @abstract                   "List of error codes the various functions in BitIO set in ErrorStatus".
      @remark                     "FIXME: Should the error codes be negative or positive?".
      */
-    enum ErrorCodes {
+    typedef enum ErrorCodes {
 		SYSEmergency               =  0,
 		SYSPanic                   =  0,
 		SYSAlert                   =  1,
@@ -66,7 +71,7 @@ extern "C" {
 		FopenFailed                = 17,
 		FreadReturnedTooLittleData = 18,
 		InvalidData                = 19,
-    };
+    } ErrorCodes;
     
     /*! 
 	 @typedef  ErrorStatus
@@ -93,52 +98,73 @@ extern "C" {
         int64_t  FindHighestBitSet;
 		int64_t       GeneratePath;
 		int64_t      DecodeHuffman;
+		int64_t      ReadBitBuffer;
     } ErrorStatus;
 	
 	/*! 
 	 @typedef    BitInput
-	 @abstract                    "Contains variables and buffers for reading bits".
-	 @remark                      "The default internal representation in BitIO is unsigned, Big Endian".
+	 @abstract                     "Contains variables and buffers for reading bits".
+	 @remark                       "The default internal representation in BitIO is unsigned, Big Endian".
 	 
-	 @constant   File             "Input file to read bits from".
-	 @constant   FileSize         "Size of File in bytes".
-     @constant   FilePosition     "Current byte in the file".
-     @constant   BitsUnavailable  "Number of previously read bits in Buffer".
-     @constant   BitsAvailable    "Number of bits available for reading".
-	 @constant   BufferSize       "Size of the buffer, because it can grow or shrink".
-	 @constant   ErrorStatus      "Pointer to supplied ErrorStatus".
-     @constant   Buffer           "Buffer of data from File".
+	 @constant   File              "Input file to read bits from".
+	 @constant   FileSize          "Size of File in bytes".
+     @constant   FilePosition      "Current byte in the file".
+     @constant   BitsUnavailable   "Number of previously read bits in Buffer".
+     @constant   BitsAvailable     "Number of bits available for reading".
+	 @constant   BasePath          "Location and start of the name of the file, for use with format specified streams aka %03d".
+	 @constant   DigitsInSpecifier "Maybe this should be called number of digits?".
+	 @constant   FileNumber        "The number in the current specifier".
+	 @constant   Extension         "Everything after the format specifier to regenerate the complete path".
+	 @constant   ErrorStatus       "Pointer to supplied ErrorStatus".
+     @constant   Buffer            "Buffer of data from File".
 	 */
     typedef struct BitInput {
         FILE                            *File;
         uint64_t                     FileSize;
         uint64_t                 FilePosition;
         uint64_t              BitsUnavailable;
-        uint64_t                BitsAvailable;
-		uint64_t                   BufferSize;
-		int64_t        CurrentFormatSpecifier;
+		uint64_t                BitsAvailable;
+		char                   BasePath[1024];
+		uint8_t             DigitsInSpecifier;
+		int64_t                    FileNumber;
+		char                  Extension[1024];
         ErrorStatus              *ErrorStatus;
         uint8_t    Buffer[BitInputBufferSize];
     } BitInput;
 	
 	/*! 
 	 @typedef    BitOutput
-	 @abstract                    "Contains variables and buffers for writing bits".
-	 @remark                      "The default internal representation in BitOutput is unsigned".
+	 @abstract                     "Contains variables and buffers for writing bits".
+	 @remark                       "The default internal representation in BitOutput is unsigned".
 	 
-	 @constant   File             "Input file to read bits from".
-     @constant   BitsUnavailable  "Number of previously read bits in Buffer".
-	 @constant   BitsAvailable    "Number of bits available for writing".
-     @constant   Buffer           "Buffer of BitIOBufferSize bits from File".
+	 @constant   File              "Input file to read bits from".
+     @constant   BitsUnavailable   "Number of previously read bits in Buffer".
+	 @constant   BitsAvailable     "Number of bits available for writing".
+	 @constant   BasePath          "Location and start of the name of the file, for use with format specified streams aka %03d".
+	 @constant   DigitsInSpecifier "Maybe this should be called number of digits?".
+	 @constant   FileNumber        "The number in the current specifier".
+	 @constant   Extension         "Everything after the format specifier to regenerate the complete path".
+     @constant   Buffer            "Buffer of BitIOBufferSize bits from File".
 	 */
     typedef struct BitOutput {
         FILE                              *File;
         uint64_t                BitsUnavailable;
         uint64_t                  BitsAvailable;
+		char                     BasePath[1024];
+		uint8_t               DigitsInSpecifier;
+		int64_t                      FileNumber;
+		char                    Extension[1024];
 		int64_t          CurrentFormatSpecifier;
         ErrorStatus                *ErrorStatus;
         uint8_t     Buffer[BitOutputBufferSize];
     } BitOutput;
+	
+	typedef struct BitBuffer {
+		uint64_t  BitsUnavailable;
+		uint64_t    BitsAvailable;
+		ErrorStatus           *ES;
+		uintptr_t         *Buffer;
+	} BitBuffer;
 	
 	typedef enum Base {
 		Octal       =  8,
@@ -216,14 +242,14 @@ extern "C" {
      */
     uint64_t TwosCompliment2OnesCompliment(uint64_t Input);
     
-    /*! 
+    /*! @deprecated
 	 @abstract                "Finds the highest bit set".
      @remark                  "Starts at MSB (BitIO is Big Endian internally; It's not my fault Intel is stupid)".
      @param    InputData      "is the input int to find the highest bit set".
      */
     uint8_t FindHighestBitSet(uint64_t InputData);
     
-    /*! 
+    /*! @deprecated
 	 @abstract                "Counts the number of bits set to 1"
      @param    Input          "integer to count the number of set bits".
      */
@@ -353,12 +379,13 @@ extern "C" {
 	void WriteBits(BitOutput *BitO, uint64_t Data2Write, size_t NumBits);
 	
 	/*! 
+	 @deprecated
 	 @abstract                "Writes entire buffer to the output buffer, first come first serve".
 	 
 	 @param    Buffer2Write   "Pointer to the buffer to be written to the output buffer".
 	 @param    BufferSize     "Size of Buffer2Write in bytes".
 	 */
-	void WriteBuffer(BitOutput *BitO, uintptr_t *Buffer2Write, size_t BufferSize);
+	void WriteBuffer(BitOutput *BitO, uintptr_t *Buffer2Write, size_t BufferSize) __attribute__((deprecated));
 	
     /*! 
 	 @abstract                "Seeks Forwards and backwards in BitInput"
@@ -377,7 +404,7 @@ extern "C" {
      @param    Poly           "Recriprocal of the CRC polynomial".
      @param    Init           "The bit pattern to initalize the generator with".
      */
-	//uint64_t GenerateCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool Init);
+	//uint64_t GenerateCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize);
     
     /*! 
 	 @abstract                "Computes the CRC of DataBuffer, and compares it to the submitted CRC".
@@ -389,7 +416,7 @@ extern "C" {
      @param    Init           "The bit pattern to initalize the generator with".
      @param    EmbeddedCRC    "Value to compare the data to, to be sure it was recieved correctly".
      */
-	//bool VerifyCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool Init, uint64_t EmbeddedCRC);
+	//bool VerifyCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize, uint64_t EmbeddedCRC);
     
     /*! 
 	 @abstract                "Decodes Huffman encoded data".
@@ -451,6 +478,15 @@ extern "C" {
 	 @abstract            "Prints the Help text when the user hasn't entered enough options".
 	 */
 	//void PrintHelp(void);
+	
+	/*!
+	 @abstract                  "Tells if the stream is byte algined of not".
+	 */
+	bool IsStreamByteAligned(uint64_t BitsUnavailable);
+	
+	void InitBitBuffer(BitBuffer *Bits, uintptr_t *Buffer, size_t BufferSize);
+	
+	uint64_t ReadBitBuffer(BitBuffer *Bits, uint8_t Bits2Read);
 	
 #ifdef __cplusplus
 }
