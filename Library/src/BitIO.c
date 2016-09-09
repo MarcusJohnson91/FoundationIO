@@ -99,6 +99,7 @@ extern "C" {
 		return Count;
 	}
 	*/
+	
 	bool IsStreamByteAligned(uint64_t BitsUnavailable) {
 		if ((BitsUnavailable % 8) == 0) {
 			return YES;
@@ -147,8 +148,6 @@ extern "C" {
 	
 	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
 		// I need to add some variables to BitInput to split the path into 3, one for the base path, the second for the format specifier number, and the third for the extension.
-		
-		
 		while (BitI->File == NULL) {
 			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
 				char Path[1024];
@@ -187,7 +186,7 @@ extern "C" {
 				
 				if (strcasecmp(Path, "-s") == 0) { // Specifier Offset
 					Argument += 1; 
-					sprintf(SpecifierOffset, "%s", argv[Argument]);
+					snprintf(SpecifierOffset, 1, "%s", argv[Argument]);
 				}
 				
 				if (strcasecmp(argv[Argument], "-o")             == 0) {
@@ -272,6 +271,14 @@ extern "C" {
 		memset(BitO->Buffer,    0, Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable));
 		free(BitO);
 	}
+	
+	void CloseBitBuffer(BitBuffer *Bits) {
+		Bits->BitsAvailable = 0;
+		Bits->BitsUnavailable = 0;
+		Bits->Buffer          = NULL;
+		Bits->ES              = NULL;
+	}
+	
 	/* End Input parsing functions */
 	
 	static void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffset) {
@@ -292,11 +299,11 @@ extern "C" {
 		
 		if (Bits2Read <= 0) {
 			char Description[1024];
-			sprintf(Description, "Read too few bits: %d", Bits2Read);
+			snprintf(Description, 1024, "Read too few bits: %d", Bits2Read);
 			Log(SYSCritical, &BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", Description);
 		} else if (Bits2Read > 64) {
 			char Description[1024];
-			sprintf(Description, "Read too many bits: %d", Bits2Read);
+			snprintf(Description, 1024, "Read too many bits: %d", Bits2Read);
 			Log(SYSCritical, &BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", Description);
 		} else {
 			OutputData             = PeekBits(BitI, Bits2Read);
@@ -423,7 +430,7 @@ extern "C" {
 		uint64_t OutputData = 0, Data = 0, BitMask = 0;
 		if ((Bits2Read <= 0) || (Bits2Read > 64)) {
 			char ErrorDescription[1024] = {0};
-			sprintf(ErrorDescription, "You requested %d bits, ReadBuffer can only read 1-64 bits at a time\n", Bits2Read);
+			snprintf(ErrorDescription, 1024, "You requested %d bits, ReadBuffer can only read 1-64 bits at a time\n", Bits2Read);
 			Log(SYSError, &Bits->ES->ReadBitBuffer, NumberNotInRange, "BitIO", "ReadBitBuffer", ErrorDescription);
 		} else {
 			while ((Bits2Read > 0) && (Bits->BitsAvailable >= Bits2Read)) {
@@ -440,7 +447,7 @@ extern "C" {
 		return OutputData;
 	}
 	
-	void WriteBuffer(BitOutput *BitO, uintptr_t *Buffer2Write, size_t BufferSize) { // Is this even nessacary? what's the use case?
+	void WriteBitBuffer(BitOutput *BitO, uintptr_t *Buffer2Write, size_t BufferSize) { // Use BitBuffer as the backend
 		uint8_t  Bits2Keep          = 0;
 		uint8_t  Byte2Keep          = 0;
 		uint64_t ExpandedBufferSize = 0;
@@ -567,7 +574,6 @@ extern "C" {
 	
 	
 	/* Huffman Decoding functions */
-	
 	void DecodeHuffman(BitInput *BitI, size_t HuffmanSize) { 
 		// 3 alphabets, literal, "alphabet of bytes", or <length 8, distance 15> the first 2 are combined, 0-255 = literal, 256 = End of Block, 257-285 = length
 		// FIXME: The Tilde ~ symbol is the negation symbol in C!!!!! XOR = ^
@@ -581,7 +587,7 @@ extern "C" {
 		
 		if (OnesCompliment2TwosCompliment(OnesComplimentOfLength) != HuffmanSize) { // Make sure the numbers match up
 			char String2Print[1024];
-			sprintf(String2Print, "One's Compliment of Length: %d != Length %d", OnesComplimentOfLength, DataLength);
+			snprintf(String2Print, 1024, "One's Compliment of Length: %d != Length %d", OnesComplimentOfLength, DataLength);
 			Log(SYSWarning, &BitI->ErrorStatus->DecodeHuffman, InvalidData, "BitIO", "DecodeHuffman", String2Print);
 		}
 		
@@ -634,7 +640,7 @@ extern "C" {
 		 */
 	}
 	
-	void ParseDeflate(BitInput *BitI) {
+	static void ParseDeflate(BitInput *BitI) {
 		uint8_t CompressionInfo    = ReadBits(BitI, 4); // 7 = LZ77 window size 32k
 		uint8_t CompressionMethod  = ReadBits(BitI, 4); // 8 = DEFLATE
 		uint8_t CheckCode          = ReadBits(BitI, 5); // for the previous 2 fields, MUST be multiple of 31
@@ -671,6 +677,14 @@ extern "C" {
 	}
 	
 	void ArithmeticDecoder(BitInput *BitI) {
+		
+	}
+	
+	void ReadArithmetic(BitInput *BitI) {
+		
+	}
+	
+	void WriteArithmetic(BitOutput *BitO) { // Use the least precision you can get away with to be as efficent as possible.
 		
 	}
 	
