@@ -26,6 +26,12 @@
 extern "C" {
 #endif
 	
+#pragma GCC poison gets puts strcpy strcat tempfile mktemp sprintf // Insecure
+ 
+#pragma GCC poison gethostbyaddr gethostbyname // Not thread safe
+	
+#pragma GCC poison bzero // Not portable
+	
 	typedef enum Truth {
 		YES =  true,
 		NO  = false,
@@ -49,28 +55,28 @@ extern "C" {
      @remark                     "FIXME: Should the error codes be negative or positive?".
      */
     typedef enum ErrorCodes {
-		SYSEmergency               =  0,
-		SYSPanic                   =  0,
-		SYSAlert                   =  1,
-		SYSCritical                =  2,
-		SYSError                   =  3,
-		SYSWarning                 =  4,
-		SYSNotice                  =  5,
-		SYSInformation             =  6,
-		SYSDebug                   =  7,
+		SYSEmergency               =      1,
+		SYSPanic                   =      1,
+		SYSAlert                   =      2,
+		SYSCritical                =      4,
+		SYSError                   =      8,
+		SYSWarning                 =     16,
+		SYSNotice                  =     32,
+		SYSInformation             =     64,
+		SYSDebug                   =    128,
 		/* End Syslog-type eror codes, begin BitIO specific error codes */
-        Success                    =  8,
-        NotEnoughMemory            =  9,
-        NumberNotInRange           = 10,
-        TriedReadingTooManyBits    = 11,
-        TriedReadingTooFewBits     = 12,
-        TriedWritingTooManyBits    = 13,
-        TriedWritingTooFewBits     = 14,
-        ReallocFailed              = 15,
-        WrongStringSize            = 16,
-		FopenFailed                = 17,
-		FreadReturnedTooLittleData = 18,
-		InvalidData                = 19,
+        Success                    =    256,
+        NotEnoughMemory            =    512,
+        NumberNotInRange           =   1024,
+        TriedReadingTooManyBits    =   2048,
+        TriedReadingTooFewBits     =   4096,
+        TriedWritingTooManyBits    =   8192,
+        TriedWritingTooFewBits     =  16384,
+        ReallocFailed              =  32768,
+        WrongStringSize            =  65536,
+		FopenFailed                = 131072,
+		FreadReturnedTooLittleData = 262144,
+		InvalidData                = 524288,
     } ErrorCodes;
     
     /*! 
@@ -385,7 +391,7 @@ extern "C" {
 	 @param    Buffer2Write   "Pointer to the buffer to be written to the output buffer".
 	 @param    BufferSize     "Size of Buffer2Write in bytes".
 	 */
-	void WriteBuffer(BitOutput *BitO, uintptr_t *Buffer2Write, size_t BufferSize) __attribute__((deprecated));
+	void WriteBitBuffer(BitOutput *BitO, uintptr_t *Buffer2Write, size_t BufferSize) __attribute__((deprecated));
 	
     /*! 
 	 @abstract                "Seeks Forwards and backwards in BitInput"
@@ -404,7 +410,7 @@ extern "C" {
      @param    Poly           "Recriprocal of the CRC polynomial".
      @param    Init           "The bit pattern to initalize the generator with".
      */
-	//uint64_t GenerateCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize);
+	uint64_t GenerateCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize);
     
     /*! 
 	 @abstract                "Computes the CRC of DataBuffer, and compares it to the submitted CRC".
@@ -416,7 +422,7 @@ extern "C" {
      @param    Init           "The bit pattern to initalize the generator with".
      @param    EmbeddedCRC    "Value to compare the data to, to be sure it was recieved correctly".
      */
-	//bool VerifyCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize, uint64_t EmbeddedCRC);
+	bool VerifyCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize, uint64_t EmbeddedCRC);
     
     /*! 
 	 @abstract                "Decodes Huffman encoded data".
@@ -470,7 +476,7 @@ extern "C" {
 	 @param    ESError          "Error code to add to ErrorStatus".
 	 @param    Library          "Name of the program or library that called this function, to name the logfile".
 	 @param    Function         "Which function is calling Log?".
-	 @param    Description      "String describing what went wrong, if you need to use format specifiers, call sprintf/snprintf".
+	 @param    Description      "String describing what went wrong, if you need to use format specifiers, call snprintf".
 	 */
 	void Log(int64_t ErrorType, int64_t *ErrorVariable, int64_t ESError, char Library[32], char Function[64], char Description[1024]);
 	
@@ -487,6 +493,14 @@ extern "C" {
 	void InitBitBuffer(BitBuffer *Bits, uintptr_t *Buffer, size_t BufferSize);
 	
 	uint64_t ReadBitBuffer(BitBuffer *Bits, uint8_t Bits2Read);
+	
+	void WriteArithmetic(BitOutput *BitO);
+	
+	void ReadArithmetic(BitInput *BitI);
+	
+	void ArithmeticDecoder(BitInput *BitI);
+	
+	void CloseBitBuffer(BitBuffer *Bits);
 	
 #ifdef __cplusplus
 }
