@@ -102,9 +102,9 @@ extern "C" {
 	
 	bool IsStreamByteAligned(uint64_t BitsUnavailable) {
 		if ((BitsUnavailable % 8) == 0) {
-			return YES;
+			return true;
 		}
-		return NO;
+		return false;
 	}
 	
 	void AlignInputBits2Byte(BitInput *BitI) {
@@ -142,7 +142,7 @@ extern "C" {
 	}
 	
 	/* Start Obselete Path processing functions */
-	void PrintHelp(void) {
+	static void PrintHelp(void) {
 		fprintf(stderr, "Usage: -i <input> -o <output>\n");
 	}
 	
@@ -150,7 +150,7 @@ extern "C" {
 		// I need to add some variables to BitInput to split the path into 3, one for the base path, the second for the format specifier number, and the third for the extension.
 		while (BitI->File == NULL) {
 			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
-				char Path[1024];
+				char Path[BitIOPathSize];
 				snprintf(Path, strlen(argv[Argument]), "%s", argv[Argument]);
 				
 				if (strcasecmp(Path, "-i") == 0) {
@@ -179,7 +179,7 @@ extern "C" {
 		while (BitO->File == NULL) {
 			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
 				int64_t SpecifierOffset = 0;
-				char Path[1024];
+				char Path[BitIOPathSize];
 				snprintf(Path, strlen(argv[Argument]), "%s", argv[Argument]);
 				
 				
@@ -237,7 +237,7 @@ extern "C" {
 				Log(SYSCritical, &BitI->ErrorStatus->InitBitInput, FreadReturnedTooLittleData, "BitIO", "InitBitInput", strerror(errno));
 			}
 			BitI->BitsAvailable = Bytes2Bits(BytesRead);
-			BitI->BitsUnavailable         = 0;
+			BitI->BitsUnavailable  = 0;
 		}
 	}
 	
@@ -262,18 +262,18 @@ extern "C" {
 	
 	void CloseBitInput(BitInput *BitI) {
 		fclose(BitI->File);
-		memset(BitI->Buffer,     0, Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable));
+		memset(BitI->Buffer, 0, Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable));
 		free(BitI);
 	}
 	
 	void CloseBitOutput(BitOutput *BitO) {
 		fclose(BitO->File);
-		memset(BitO->Buffer,    0, Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable));
+		memset(BitO->Buffer, 0, Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable));
 		free(BitO);
 	}
 	
 	void CloseBitBuffer(BitBuffer *Bits) {
-		Bits->BitsAvailable = 0;
+		Bits->BitsAvailable   = 0;
 		Bits->BitsUnavailable = 0;
 		Bits->Buffer          = NULL;
 		Bits->ES              = NULL;
@@ -298,12 +298,12 @@ extern "C" {
 		uint64_t OutputData = 0;
 		
 		if (Bits2Read <= 0) {
-			char Description[1024];
-			snprintf(Description, 1024, "Read too few bits: %d", Bits2Read);
+			char Description[BitIOPathSize];
+			snprintf(Description, BitIOPathSize, "Read too few bits: %d", Bits2Read);
 			Log(SYSCritical, &BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", Description);
 		} else if (Bits2Read > 64) {
-			char Description[1024];
-			snprintf(Description, 1024, "Read too many bits: %d", Bits2Read);
+			char Description[BitIOPathSize];
+			snprintf(Description, BitIOPathSize, "Read too many bits: %d", Bits2Read);
 			Log(SYSCritical, &BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", Description);
 		} else {
 			OutputData             = PeekBits(BitI, Bits2Read);
@@ -429,8 +429,8 @@ extern "C" {
 	uint64_t ReadBitBuffer(BitBuffer *Bits, uint8_t Bits2Read) {
 		uint64_t OutputData = 0, Data = 0, BitMask = 0;
 		if ((Bits2Read <= 0) || (Bits2Read > 64)) {
-			char ErrorDescription[1024] = {0};
-			snprintf(ErrorDescription, 1024, "You requested %d bits, ReadBuffer can only read 1-64 bits at a time\n", Bits2Read);
+			char ErrorDescription[BitIOPathSize] = {0};
+			snprintf(ErrorDescription, BitIOPathSize, "You requested %d bits, ReadBuffer can only read 1-64 bits at a time\n", Bits2Read);
 			Log(SYSError, &Bits->ES->ReadBitBuffer, NumberNotInRange, "BitIO", "ReadBitBuffer", ErrorDescription);
 		} else {
 			while ((Bits2Read > 0) && (Bits->BitsAvailable >= Bits2Read)) {
@@ -514,7 +514,7 @@ extern "C" {
 		Init > 1 ? Power2Mask(CRCSize) : 1;
 		
 		for (size_t Byte = 0; Byte < BufferSize; Byte++) {
-			uint64_t Bits2XOR = ReadBuffer(CRCBits, CRCSize);
+			uint64_t Bits2XOR = ReadBitBuffer(CRCBits, CRCSize);
 			// if there aren't enough bits, simply shift to MSB to append 0s.
 			
 		}
@@ -530,10 +530,12 @@ extern "C" {
 		}
 	}
 	
-	void ReadUUID(BitInput *BitI, char *UUIDString[21]) {
+	void ReadUUID(BitInput *BitI, char *UUIDString[BitIOUUIDSize]) {
 		//static char UUIDString[21] = {0};
-		for (uint8_t Character = 0; Character < 21; Character++) {
-			if (Character == (4|7|10|13)) {
+		for (uint8_t Character = 0; Character < BitIOUUIDSize; Character++) {
+			if (Character == 21) {
+				*UUIDString[Character] = 0;
+			} else if ((Character == 4) || (Character == 7) || (Character == 10) || (Character == 13)) {
 				*UUIDString[Character] = 0x2D; // hyphen
 			} else {
 				*UUIDString[Character] = ReadBits(BitI, 8);
@@ -541,22 +543,103 @@ extern "C" {
 		}
 	}
 	
-	void WriteUUID(BitOutput *BitO, char UUIDString[21]) {
-		if (strlen(UUIDString) != 21) {
+	void WriteUUID(BitOutput *BitO, char UUIDString[BitIOUUIDSize]) {
+		if (strlen(UUIDString) != BitIOUUIDSize) {
 			BitO->ErrorStatus->WriteUUID = WrongStringSize;
 		}
-		for (uint8_t Character = 0; Character < 21; Character++) {
-			if (Character != (4|7|10|13|21)) { // Don't write the NULL terminating char.
+		for (uint8_t Character = 0; Character < BitIOUUIDSize; Character++) {
+			if ((Character == 4) || (Character == 7) || (Character == 10) || (Character == 13) || (Character == 21)) {
+				// Character 21 is the NULL terminator, the rest are the hyphens.
 				WriteBits(BitO, UUIDString[Character], 8);
+			}
+			
+		}
+	}
+
+	void ConvertUUID2GUID(char UUIDString[BitIOUUIDSize]) {
+		// Maybe I should just use ReadBitBuffer, pop it all into various sized ints, and then use SwapEndianX.
+		BitBuffer *UUID = calloc(sizeof(UUIDString), 1);
+		InitBitBuffer(UUID, UUIDString, BitIOUUIDSize); // I do need to rebase BitInput and BitOutput on top of BitBuffer, so SkipBits and whatnot will work with it.
+		uint32_t UUIDGroup1  = ReadBitBuffer(UUID, 32);
+		SkipBits(UUID, 8); // FIXME: Remove this once SkipBits can with with BitBuffers
+		uint16_t UUIDGroup2  = ReadBitBuffer(UUID, 16);
+		SkipBits(UUID, 8);
+		uint16_t UUIDGroup3  = ReadBitBuffer(UUID, 16);
+		SkipBits(UUID, 8);
+		uint16_t UUIDGroup4  = ReadBitBuffer(UUID, 16);
+		SkipBits(UUID, 8);
+		uint64_t UUIDGroup5  = ReadBitBuffer(UUID, 48);
+
+
+
+
+
+		uint32_t GUIDGroup1  = SwapEndian32(UUIDGroup1);
+		uint16_t GUIDGroup2  = SwapEndian16(UUIDGroup2);
+		uint16_t GUIDGroup3  = SwapEndian16(UUIDGroup3);
+		uint16_t
+
+
+
+
+
+
+
+
+
+		// Break the string into it's constituant parts, then swap the endian of the first 3 fields.
+		char Data1[4] = {0}; // NULL terminating
+		char Data2[2] = {0};
+		char Data3[2] = {0};
+		char Data4[8] = (0);
+
+		char Flipped1[4] = {0};
+		char Flipped2[2] = {0};
+		char Flipped3[2] = {0};
+
+		for (uint8_t Byte = 0; Byte < 20; Byte++) {
+			if ((Byte == 0) || (Byte == 1) || (Byte == 2) || (Byte == 3)) {
+				Data1[Byte] = UUIDString[Byte];
+			} else if ((Byte == 5) || (Byte == 6)) {
+				Data2[Byte] = UUIDString[Byte];
+			} else if ((Byte == 8) || (Byte == 9)) {
+				Data3[Byte] = UUIDString[Byte];
+			} else if ((Byte == 11) || (Byte == 12) || (Byte == 13) || (Byte == 14) || (Byte == 15) || (Byte == 16) || (Byte == 17) || (Byte == 18)) {
+				Data4[Byte] = UUIDString[Byte];
+			}
+		}
+		// Now we Swap endian. Manually.
+		for (uint8_t Byte = 0; Byte < 20; Byte++) {
+			if ((Byte == 0) || (Byte == 1) || (Byte == 2) || (Byte == 3)) {
+				uint8_t Byte1 = 0, Byte2 = 0, Byte3 = 0, Byte4 = 0;
+				Byte1 = Data1[1];
+				Byte2 = Data1[2];
+				Byte3 = Data1[3];
+				Byte4 = Data1[4];
+
+
+
+				Data1[1] = Data1[4];
+				Data1[4] = Data1[1];
+			} else if ((Byte == 5) || (Byte == 6)) {
+				Data2[Byte] = UUIDString[Byte];
+			} else if ((Byte == 8) || (Byte == 9)) {
+				Data3[Byte] = UUIDString[Byte];
+			} else if ((Byte == 11) || (Byte == 12) || (Byte == 13) || (Byte == 14) || (Byte == 15) || (Byte == 16) || (Byte == 17) || (Byte == 18)) {
+				Data4[Byte] = UUIDString[Byte];
 			}
 		}
 	}
+
+	void ConvertGUID2UUID(char GUIDString[BitIOGUIDSize]) {
+		// merely a wrapper around ConvertUUID2GUID
+	}
 	
-	void Log(int64_t ErrorType, int64_t *ErrorVariable, int64_t ESError, char Library[32], char Function[64], char Description[1024]) {
-		if (ErrorType == (SYSCritical|SYSPanic)) {
-			openlog(Library, ErrorType, (LOG_PERROR|LOG_MAIL|LOG_USER));
+	void Log(int64_t SYSError, int64_t *ES, int64_t ESError, char Library[BitIOStringSize], char Function[BitIOStringSize], char Description[BitIOStringSize]) {
+		if ((SYSError == SYSPanic) || (SYSError == SYSCritical)) {
+			openlog(Library, SYSError, (LOG_PERROR|LOG_MAIL|LOG_USER));
 		} else {
-			openlog(Library, ErrorType, (LOG_PERROR|LOG_USER));
+			openlog(Library, SYSError, (LOG_PERROR|LOG_USER));
 		}
 		
 		time_t Time;
@@ -564,8 +647,8 @@ extern "C" {
 		time(&Time);
 		strftime(CurrentTime, 26, "%A, %B %e, %g+1000: %I:%M:%S %p %Z", Time);
 		
-		*ErrorVariable = ESError;
-		syslog(ErrorType, "%s: %s - %s: %s\n", CurrentTime, Library, Function, Description);
+		*ES = ESError;
+		syslog(SYSError, "%s: %s - %s: %s\n", CurrentTime, Library, Function, Description);
 		
 		free(&CurrentTime);
 	}
@@ -586,8 +669,8 @@ extern "C" {
 		int32_t  OnesComplimentOfLength = 0; // Ones Compliment of DataLength
 		
 		if (OnesCompliment2TwosCompliment(OnesComplimentOfLength) != HuffmanSize) { // Make sure the numbers match up
-			char String2Print[1024];
-			snprintf(String2Print, 1024, "One's Compliment of Length: %d != Length %d", OnesComplimentOfLength, DataLength);
+			char String2Print[BitIOStringSize];
+			snprintf(String2Print, BitIOStringSize, "One's Compliment of Length: %d != Length %d", OnesComplimentOfLength, DataLength);
 			Log(SYSWarning, &BitI->ErrorStatus->DecodeHuffman, InvalidData, "BitIO", "DecodeHuffman", String2Print);
 		}
 		
@@ -640,14 +723,14 @@ extern "C" {
 		 */
 	}
 	
-	static void ParseDeflate(BitInput *BitI) {
+	void ParseDeflate(BitInput *BitI) {
 		uint8_t CompressionInfo    = ReadBits(BitI, 4); // 7 = LZ77 window size 32k
 		uint8_t CompressionMethod  = ReadBits(BitI, 4); // 8 = DEFLATE
 		uint8_t CheckCode          = ReadBits(BitI, 5); // for the previous 2 fields, MUST be multiple of 31
 		bool    DictionaryPresent  = ReadBits(BitI, 1); // false
 		uint8_t CompressionLevel   = ReadBits(BitI, 2); // Fixed Huffman
 		if (DictionaryPresent == true) {
-			uint16_t Dictionary   = ReadBits(BitI, 16);
+			uint16_t Dictionary    = ReadBits(BitI, 16);
 		}
 	}
 	
@@ -675,16 +758,64 @@ extern "C" {
 			return true;
 		}
 	}
-	
-	void ArithmeticDecoder(BitInput *BitI) {
-		
+
+	Probabilities FindProbabilityFromSymbol(Probabilities *Probability, double *MaximumTable, double *MinimumTable, size_t TableSize, uint64_t Symbol2Lookup) {
+		if (Symbol2Lookup > TableSize) {
+			// Not good.
+		} else {
+			Probability->Maximum = MaximumTable[Symbol2Lookup];
+			Probability->Minimum = MinimumTable[Symbol2Lookup];
+		}
+		return *Probability;
 	}
-	
-	void ReadArithmetic(BitInput *BitI) {
-		
+
+	// Create a function to lookup the symbol from the probabilities
+	uint16_t FindSymbolFromProbability(Probabilities *Probability, double *MaximumTable, double *MinimumTable, size_t TableSize) {
+		uint16_t MaxSymbol = 0, MinSymbol = 0;
+		MaxSymbol = MaximumTable[Probability->Maximum];
+		MinSymbol = MinimumTable[Probability->Minimum];
+		if (MaxSymbol != MinSymbol) {
+			char Error[BitIOStringSize] = {0};
+			snprintf(Error, BitIOStringSize, "MaxSymbol: %x, and MinSymbol: %x don't match\n", MaxSymbol, MinSymbol);
+			Log(InvalidData, NULL, NULL, "BitIO", "FindSymbolFromProbability", Error);
+		}
+		return (MaxSymbol + MinSymbol) - MaxSymbol;
 	}
-	
-	void WriteArithmetic(BitOutput *BitO) { // Use the least precision you can get away with to be as efficent as possible.
+
+
+	static char getSymbol(double d) {
+		if ((d >= 0.0) && (d < 0.26)) {
+			return 'A' + d * 100;
+		} else {
+			Log(SYSError, NULL, NumberNotInRange, "BitIO", "GetSymbol", "Message out of range\n");
+		}
+	}
+
+	void ReadArithmetic(BitInput *BitI, Probabilities *Probability, double *MaximumTable, double *MinimumTable, size_t TableSize, uint64_t Bits2Decode) {
+		double Maximum = 1.0;
+		double Minimum = 0.0;
+		double Range   = 0.0;
+
+		while (Bits2Decode > 0) { // No, this needs to be rethought
+			Range = Maximum - Minimum;
+			uint16_t Symbol = FindSymbolFromProbability(Probability, MaximumTable, MinimumTable, TableSize);
+			Maximum = Minimum + Range; // * p.second
+			Minimum = Minimum + Range; // * p.first
+		}
+	}
+
+	void WriteArithmetic(BitOutput *BitO, Probabilities *Probability, uint64_t Bits2Encode) { // Use the least precision you can get away with to be as efficent as possible.
+		double Maximum = 1.0;
+		double Minimum = 0.0;
+		double Range   = 0.0;
+
+		FindProbabilityFromSymbol(Probability, NULL, NULL, 65535, 0xAB37);
+
+		while (Bits2Encode > 0) {
+			Range   = Probability->Maximum - Probability->Minimum;
+			Maximum = Probability->Minimum + Range;
+			Minimum = Probability->Minimum + Range;
+		}
 		
 	}
 	
