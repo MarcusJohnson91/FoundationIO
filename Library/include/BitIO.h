@@ -64,34 +64,38 @@ extern "C" {
     } BitIOConstants;
     
     extern int BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Input/Output parsers.
+
+	typedef enum SystemErrors {
+		SYSEmergency               = 1,
+		SYSPanic                   = 1,
+		SYSAlert                   = 2,
+		SYSCritical                = 3,
+		SYSError                   = 4,
+		SYSWarning                 = 5,
+		SYSNotice                  = 6,
+		SYSInformation             = 7,
+		SYSDebug                   = 8,
+	} SystemErrors;
     
     /*! 
 	 @abstract                     "List of error codes the various functions in BitIO set in ErrorStatus".
      @remark                       "FIXME: Should the error codes be negative or positive?".
      */
     typedef enum ErrorCodes {
-		SYSEmergency               =      1,
-		SYSPanic                   =      1,
-		SYSAlert                   =      2,
-		SYSCritical                =      4,
-		SYSError                   =      8,
-		SYSWarning                 =     16,
-		SYSNotice                  =     32,
-		SYSInformation             =     64,
-		SYSDebug                   =    128,
 		/* End Syslog-type eror codes, begin BitIO specific error codes */
-        Success                    =    256,
-        NotEnoughMemory            =    512,
-        NumberNotInRange           =   1024,
-        TriedReadingTooManyBits    =   2048,
-        TriedReadingTooFewBits     =   4096,
-        TriedWritingTooManyBits    =   8192,
-        TriedWritingTooFewBits     =  16384,
-        ReallocFailed              =  32768,
-        WrongStringSize            =  65536,
-		FopenFailed                = 131072,
-		FreadReturnedTooLittleData = 262144,
-		InvalidData                = 524288,
+        Success                    = 9,
+        NotEnoughMemory            = 10,
+        NumberNotInRange           = 11,
+        TriedReadingTooManyBits    = 12,
+        TriedReadingTooFewBits     = 13,
+        TriedWritingTooManyBits    = 14,
+        TriedWritingTooFewBits     = 15,
+        ReallocFailed              = 16,
+        WrongStringSize            = 17,
+		FopenFailed                = 18,
+		FreadReturnedTooLittleData = 19,
+		InvalidData                = 20,
+		InvalidCRC                 = 21,
     } ErrorCodes;
     
     /*! 
@@ -99,22 +103,22 @@ extern "C" {
      @abstract                     "Allows checking of the error status of various functions".
      */
     typedef struct ErrorStatus {
-        int64_t           SkipBits;
-        int64_t           PeekBits;
-        int64_t           ReadBits;
-		int64_t           ReadRICE;
-		int64_t           ReadUUID;
+        int64_t      SkipBits;
+        int64_t      PeekBits;
+        int64_t      ReadBits;
+		int64_t      ReadRICE;
+		int64_t      ReadUUID;
 		int64_t      ReadBitBuffer;
-        int64_t  UpdateInputBuffer;
-        int64_t       InitBitInput;
+        int64_t      UpdateInputBuffer;
+        int64_t      InitBitInput;
         int64_t      InitBitOutput;
-        int64_t  ParseInputOptions;
-        int64_t ParseOutputOptions;
+        int64_t      ParseInputOptions;
+        int64_t      ParseOutputOptions;
 		int64_t      DecodeHuffman;
-		int64_t          WriteUUID;
-		int64_t          WriteBits;
-		int64_t        WriteBuffer;
-		int64_t          WriteRICE;
+		int64_t      WriteUUID;
+		int64_t      WriteBits;
+		int64_t      WriteBuffer;
+		int64_t      WriteRICE;
     } ErrorStatus;
 	
 	/*! 
@@ -137,18 +141,57 @@ extern "C" {
 	 FIXME: What if we just used snprintf to increment the format number instead of splitting the string and whatnot?
 	 */
     typedef struct BitInput {
-        FILE                            *File;
-        uint64_t                     FileSize;
-        uint64_t                 FilePosition;
-        uint64_t              BitsUnavailable;
-		uint64_t                BitsAvailable;
-		uint8_t             DigitsInSpecifier;
-		int64_t                    FileNumber;
-		char                   BasePath[1024];
-		char                  Extension[1024];
-        ErrorStatus              *ErrorStatus;
-        uint8_t    Buffer[BitInputBufferSize];
+        FILE        *File;
+        uint64_t     FileSize;
+        uint64_t     FilePosition;
+        uint64_t     BitsUnavailable;
+		uint64_t     BitsAvailable;
+		uint8_t      DigitsInSpecifier;
+		int64_t      FileNumber;
+		char         BasePath[BitIOPathSize];
+		char         Extension[BitIOPathSize];
+        ErrorStatus *ErrorStatus;
+        uint8_t      Buffer[BitInputBufferSize];
     } BitInput;
+
+	typedef struct BitBuffer {
+		uint64_t     BitsUnavailable;
+		uint64_t     BitsAvailable;
+		ErrorStatus *ES;
+		uint8_t     *Buffer;
+	} BitBuffer;
+
+	typedef struct BitFile {
+		FILE        *File;
+		uint64_t     FileSize;
+		uint64_t     FilePosition;
+	} BitFile;
+
+	typedef struct BitIOPath {
+		char         BasePath[BitIOPathSize];
+		uint8_t      DigitsInSpecifier;
+		int64_t      FileNumber;
+		char         Extension[BitIOPathSize];
+	} BitIOPath;
+
+	typedef struct BitInput2 {
+		BitIOPath   *Path;
+		BitFile     *Source; // aka File
+		BitBuffer   *Data;   // Buffer stuff
+		ErrorStatus *Error;
+	} BitInput2;
+
+	typedef struct BitOutput2 {
+		BitIOPath   *Path;
+		BitFile     *Source;
+		BitBuffer   *Data;
+		ErrorStatus *Error;
+	} BitOutput2;
+
+	void InitBitInput2(BitInput2 *Input, ErrorStatus *Error, int argc, const char *argv[]) {
+		Input->Error = Error;
+		Input->Path  = calloc(sizeof(BitIOPath), 1);
+	}
 	
 	/*! 
 	 @typedef    BitOutput
@@ -165,16 +208,16 @@ extern "C" {
      @constant   Buffer            "Buffer of BitIOBufferSize bits from File".
 	 */
     typedef struct BitOutput {
-        FILE                              *File;
-        uint64_t                BitsUnavailable;
-        uint64_t                  BitsAvailable;
-		char                     BasePath[1024];
-		uint8_t               DigitsInSpecifier;
-		int64_t                      FileNumber;
-		char                    Extension[1024];
-		int64_t          CurrentFormatSpecifier;
-        ErrorStatus                *ErrorStatus;
-        uint8_t     Buffer[BitOutputBufferSize];
+        FILE        *File;
+        uint64_t     BitsUnavailable;
+        uint64_t     BitsAvailable;
+		char         BasePath[BitIOPathSize];
+		uint8_t      DigitsInSpecifier;
+		int64_t      FileNumber;
+		char         Extension[BitIOPathSize];
+		int64_t      CurrentFormatSpecifier;
+        ErrorStatus *ErrorStatus;
+        uint8_t      Buffer[BitOutputBufferSize];
     } BitOutput;
 
 	typedef struct BitIOString {
@@ -188,13 +231,6 @@ extern "C" {
 		uint8_t  CodePoint[262140]; // String of Unicode bytes
 		size_t   StringSize; // number of letters in the string, NOT bytes
 	} BitIOString;
-	
-	typedef struct BitBuffer {
-		uint64_t  BitsUnavailable;
-		uint64_t    BitsAvailable;
-		ErrorStatus           *ES;
-		uintptr_t         *Buffer;
-	} BitBuffer;
 	
 	typedef enum Base {
 		Octal       =  8,
@@ -463,7 +499,7 @@ extern "C" {
 	 @param    Buffer2Write        "Pointer to the buffer to be written to the output buffer".
 	 @param    BufferSize          "Size of Buffer2Write in bytes".
 	 */
-	void WriteBitBuffer(BitOutput *BitO, uintptr_t *Buffer2Write, size_t BufferSize) __attribute__((deprecated));
+	void WriteBitBuffer(BitOutput *BitO, uint8_t *Buffer2Write, size_t BufferSize);
 	
     /*! 
 	 @abstract                     "Seeks Forwards and backwards in BitInput"
@@ -484,7 +520,7 @@ extern "C" {
      @param    Init                "The bit pattern to initalize the generator with".
 	 @param    CRCSize             "Number of bits that should be output as the CRC".
      */
-	uint64_t GenerateCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize);
+	uint64_t GenerateCRC(uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize);
     
     /*! 
 	 @abstract                     "Computes the CRC of DataBuffer, and compares it to the submitted CRC".
@@ -497,7 +533,7 @@ extern "C" {
 	 @param    CRCSize             "Number of bits that should be output as the CRC".
      @param    EmbeddedCRC         "Value to compare the data to, to be sure it was recieved correctly".
      */
-	bool VerifyCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize, uint64_t EmbeddedCRC);
+	bool VerifyCRC(uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize, uint64_t EmbeddedCRC);
     
     /*! 
 	 @abstract                     "Decodes Huffman encoded data".
@@ -575,7 +611,7 @@ extern "C" {
 	 @param    Buffer              "Pointer to the buffer to read from".
 	 @param    BufferSize          "Size of Buffer".
 	 */
-	void InitBitBuffer(BitBuffer *Bits, uintptr_t *Buffer, size_t BufferSize);
+	void InitBitBuffer(BitBuffer *Bits, uint8_t *Buffer, size_t BufferSize);
 	
 	/*!
 	 @abstract                     "Reads bits from a buffer".
@@ -590,7 +626,7 @@ extern "C" {
 		double Minimum;
 	} Probabilities;
 
-	void ReadArithmetic(BitInput *BitI, Probabilities *Probability, double *MaximumTable, double *MinimumTable, size_t TableSize, uint64_t Bits2Decode);
+	uint64_t ReadArithmetic(BitInput *Input, uint64_t *MaximumTable, uint64_t *MinimumTable, size_t TableSize, uint64_t Bits2Decode);
 	
 	void WriteArithmetic(BitOutput *BitO, Probabilities *Probability, uint64_t Bits2Encode);
 	
