@@ -347,6 +347,7 @@ extern "C" {
 			BitI->ErrorStatus->ReadRICE = NumberNotInRange;
 		} else {
 			while (PeekBits(BitI, 1) != StopBit) {
+				SkipBits(BitI, 1);
 				BitCount += 1;
 			}
 		}
@@ -354,7 +355,7 @@ extern "C" {
 	}
 	
 	void WriteRICE(BitOutput *BitO, bool StopBit, uint64_t Data2Write) {
-		if (StopBit != (0|1)) {
+		if ((StopBit != 0) || (StopBit != 1)) {
 			BitO->ErrorStatus->WriteRICE = NumberNotInRange;
 		} else {
 			for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
@@ -371,11 +372,11 @@ extern "C" {
 		uint8_t  BitsLeft   = Bits2Peek;
 		uint8_t  BitMask    = 0;
 		
-		if (Bits2Peek > 64) {
-			BitI->ErrorStatus->PeekBits = TriedReadingTooManyBits;
-		} else if (Bits2Peek <= 0) {
-			BitI->ErrorStatus->PeekBits = TriedReadingTooFewBits;
-		} else if (BitI->BitsUnavailable > (BitI->BitsAvailable - BitsLeft)) {
+		if ((Bits2Peek > 64) || (Bits2Peek <= 0)) {
+			char Description[BitIOStringSize] = {0};
+			snprintf(Description, BitIOStringSize, "Tried to peek %d bits, only 1-64 is valid\n", Bits2Peek);
+			Log(SYSError, &BitI->ErrorStatus->PeekBits, NumberNotInRange, "BitIO", "PeekBits", Description);
+		} else if (BitI->BitsAvailable < Bits2Peek) {
 			// InputBuffer can't completely satisfy the request, update it.
 			UpdateInputBuffer(BitI, 0);
 		} else {
@@ -391,6 +392,37 @@ extern "C" {
 			}
 			BitI->BitsAvailable       += Bits2Peek;
 			BitI->BitsUnavailable     -= Bits2Peek;
+		}
+		return OutputData;
+	}
+
+	uint64_t PeekBits2(BitInput2 *Input, uint8_t Bits2Peek) { // REBASED ON BitBuffer
+		//WARNING: You CAN'T read byte by byte, it simply won't work so stop trying. Also, this is faster, instruction wise.
+		uint64_t OutputData = 0;
+		uint8_t  Data       = 0;
+		uint8_t  BitsLeft   = Bits2Peek;
+		uint8_t  BitMask    = 0;
+
+		if ((Bits2Peek > 64) || (Bits2Peek <= 0)) {
+			char Description[BitIOStringSize] = {0};
+			snprintf(Description, BitIOStringSize, "Tried to peek %d bits, only 1-64 is valid\n", Bits2Peek);
+			Log(SYSError, &Input->Error->PeekBits, NumberNotInRange, "BitIO", "PeekBits", Description);
+		} else if (Input->Data->BitsAvailable < Bits2Peek) {
+			// InputBuffer can't completely satisfy the request, update it.
+			UpdateInputBuffer(Input->Source, 0);
+		} else {
+			while (BitsLeft > 0) {
+				OutputData                  <<= 1;
+				BitMask                       = 1 << (BitsRemaining(Input->Data->BitsUnavailable) - 1); // 1 << ((8 - (BitI->BitsUnavailable % 8)) -1);
+				Data                          = Input->Data->Buffer[Bits2Bytes(Input->Data->BitsUnavailable)] & BitMask;
+				Data                        >>= BitsRemaining(Input->Data->BitsUnavailable) - 1; // ((8 - (BitI->BitsUnavailable % 8)) -1);
+				OutputData                   += Data;
+				Input->Data->BitsAvailable   -= 1;
+				Input->Data->BitsUnavailable += 1;
+				BitsLeft                     -= 1;
+			}
+			Input->Data->BitsAvailable       += Bits2Peek;
+			Input->Data->BitsUnavailable     -= Bits2Peek;
 		}
 		return OutputData;
 	}
@@ -420,7 +452,7 @@ extern "C" {
 		}
 	}
 	
-	void InitBitBuffer(BitBuffer *Bits, uintptr_t *Buffer, size_t BufferSize) {
+	void InitBitBuffer(BitBuffer *Bits, uint8_t *Buffer, size_t BufferSize) {
 		Bits->BitsAvailable   = Bytes2Bits(BufferSize);
 		Bits->BitsUnavailable = 0;
 		Bits->Buffer = Buffer;
@@ -447,7 +479,7 @@ extern "C" {
 		return OutputData;
 	}
 	
-	void WriteBitBuffer(BitOutput *BitO, uintptr_t *Buffer2Write, size_t BufferSize) { // Use BitBuffer as the backend
+	void WriteBitBuffer(BitOutput *BitO, uint8_t *Buffer2Write, size_t BufferSize) { // Use BitBuffer as the backend
 		uint8_t  Bits2Keep          = 0;
 		uint8_t  Byte2Keep          = 0;
 		uint64_t ExpandedBufferSize = 0;
@@ -502,7 +534,7 @@ extern "C" {
 		 */
 	}
 	
-	uint64_t GenerateCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize) {
+	uint64_t GenerateCRC(uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize) {
 		uint64_t Output = ~Init;
 		uint64_t Polynomial = 1 << CRCSize; // Implicit bit
 		Polynomial += (Poly & Power2Mask(CRCSize));
@@ -521,7 +553,7 @@ extern "C" {
 		return Output;
 	}
 	
-	bool VerifyCRC(uintptr_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize, uint64_t EmbeddedCRC) {
+	bool VerifyCRC(uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize, uint64_t EmbeddedCRC) {
 		uint64_t GeneratedCRC = GenerateCRC(DataBuffer, BufferSize, Poly, Init, CRCSize);
 		if (GeneratedCRC == EmbeddedCRC) {
 			return true;
@@ -542,6 +574,21 @@ extern "C" {
 			}
 		}
 	}
+
+	void ReadUUIDAsGUID(BitInput *Input, char *UUIDString[BitIOUUIDSize]) { // We will flip endian to a standard UUID
+		for (uint8_t Character = 0; Character < BitIOGUIDSize; Character++) {
+			if (Character == 21) {
+				*UUIDString[Character] = 0;
+			} else if ((Character == 4) || (Character == 7) || (Character == 10) || (Character == 13)) {
+				*UUIDString[Character] = 0x2D;
+			} else {
+				uint32_t Section1 = SwapEndian32(ReadBits(Input, 32));
+				// Extract bytes from int into characters
+				uint16_t Section2 = SwapEndian16(ReadBits(Input, 16));
+				uint16_t Section3 = SwapEndian16(ReadBits(Input, 16));
+			}
+		}
+	}
 	
 	void WriteUUID(BitOutput *BitO, char UUIDString[BitIOUUIDSize]) {
 		if (strlen(UUIDString) != BitIOUUIDSize) {
@@ -556,6 +603,7 @@ extern "C" {
 		}
 	}
 
+	/*
 	void ConvertUUID2GUID(char UUIDString[BitIOUUIDSize]) {
 		// Maybe I should just use ReadBitBuffer, pop it all into various sized ints, and then use SwapEndianX.
 		BitBuffer *UUID = calloc(sizeof(UUIDString), 1);
@@ -577,7 +625,6 @@ extern "C" {
 		uint32_t GUIDGroup1  = SwapEndian32(UUIDGroup1);
 		uint16_t GUIDGroup2  = SwapEndian16(UUIDGroup2);
 		uint16_t GUIDGroup3  = SwapEndian16(UUIDGroup3);
-		uint16_t
 
 
 
@@ -588,10 +635,10 @@ extern "C" {
 
 
 		// Break the string into it's constituant parts, then swap the endian of the first 3 fields.
-		char Data1[4] = {0}; // NULL terminating
-		char Data2[2] = {0};
-		char Data3[2] = {0};
-		char Data4[8] = (0);
+		uint8_t Data1[4] = {0}; // NULL terminating
+		uint8_t Data2[2] = {0};
+		uint8_t Data3[2] = {0};
+		uint8_t Data4[8] = 0;
 
 		char Flipped1[4] = {0};
 		char Flipped2[2] = {0};
@@ -630,6 +677,7 @@ extern "C" {
 			}
 		}
 	}
+	 */
 
 	void ConvertGUID2UUID(char GUIDString[BitIOGUIDSize]) {
 		// merely a wrapper around ConvertUUID2GUID
@@ -770,38 +818,49 @@ extern "C" {
 	}
 
 	// Create a function to lookup the symbol from the probabilities
-	uint16_t FindSymbolFromProbability(Probabilities *Probability, double *MaximumTable, double *MinimumTable, size_t TableSize) {
-		uint16_t MaxSymbol = 0, MinSymbol = 0;
-		MaxSymbol = MaximumTable[Probability->Maximum];
-		MinSymbol = MinimumTable[Probability->Minimum];
-		if (MaxSymbol != MinSymbol) {
-			char Error[BitIOStringSize] = {0};
-			snprintf(Error, BitIOStringSize, "MaxSymbol: %x, and MinSymbol: %x don't match\n", MaxSymbol, MinSymbol);
-			Log(InvalidData, NULL, NULL, "BitIO", "FindSymbolFromProbability", Error);
-		}
-		return (MaxSymbol + MinSymbol) - MaxSymbol;
-	}
+	uint16_t FindSymbolFromProbability(double Probability, uint64_t	*MaximumTable, uint64_t *MinimumTable, size_t TableSize) {
+		uint16_t Symbol = 0; // there is a SINGLE probability, not two...
+		// If the probability is closer to 1 than 0, start the loop at 1, instead of 0. otherwise, start it at 0. to ensure it takes half the time to traverse it.
 
+		bool WhichEnd = round(Probability);
 
-	static char getSymbol(double d) {
-		if ((d >= 0.0) && (d < 0.26)) {
-			return 'A' + d * 100;
+		if (WhichEnd == 0) {
+			for (uint64_t Index = 0; Index < TableSize; Index++) {
+				uint64_t MaxProb   = MaximumTable[Index];
+				uint64_t MinProb   = MinimumTable[Index];
+				if ((Probability  >= MinProb) && (Probability <= MaxProb)) { // You found the symbol!
+					Symbol = Index;
+				}
+			}
 		} else {
-			Log(SYSError, NULL, NumberNotInRange, "BitIO", "GetSymbol", "Message out of range\n");
+			for (uint64_t Index = TableSize; Index > 0; Index--) {
+				uint64_t MaxProb   = MaximumTable[Index];
+				uint64_t MinProb   = MinimumTable[Index];
+				if ((Probability  >= MinProb) && (Probability <= MaxProb)) { // You found the symbol!
+					Symbol = Index;
+				}
+			}
 		}
+		return Symbol;
 	}
 
-	void ReadArithmetic(BitInput *BitI, Probabilities *Probability, double *MaximumTable, double *MinimumTable, size_t TableSize, uint64_t Bits2Decode) {
+	uint64_t ReadArithmetic(BitInput *Input, uint64_t *MaximumTable, uint64_t *MinimumTable, size_t TableSize, uint64_t Bits2Decode) {
 		double Maximum = 1.0;
 		double Minimum = 0.0;
 		double Range   = 0.0;
 
+		uint64_t Symbol = 0;
+
+		double Probability = ReadBits(Input, 1); // this is just a mockup.
+
+
 		while (Bits2Decode > 0) { // No, this needs to be rethought
 			Range = Maximum - Minimum;
-			uint16_t Symbol = FindSymbolFromProbability(Probability, MaximumTable, MinimumTable, TableSize);
+			uint64_t Symbol = FindSymbolFromProbability(Probability, MaximumTable, MinimumTable, TableSize);
 			Maximum = Minimum + Range; // * p.second
 			Minimum = Minimum + Range; // * p.first
 		}
+		return Symbol;
 	}
 
 	void WriteArithmetic(BitOutput *BitO, Probabilities *Probability, uint64_t Bits2Encode) { // Use the least precision you can get away with to be as efficent as possible.
@@ -817,6 +876,20 @@ extern "C" {
 			Minimum = Probability->Minimum + Range;
 		}
 		
+	}
+
+	void NaiveFizzBuzzTest(void) {
+		for (uint8_t Number = 1; Number < 100; Number++) {
+			if ((Number % 3 == 0) && (Number % 5 == 0)) {
+				printf("FizzBuzz\n");
+			} else if (Number % 5 == 0) {
+				printf("Buzz\n");
+			} else if (Number % 3 == 0) {
+				printf("Fizz\n");
+			} else {
+				printf("Number: %d\n", Number);
+			}
+		}
 	}
 	
 #ifdef __cplusplus
