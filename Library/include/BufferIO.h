@@ -31,6 +31,8 @@ extern "C" {
 #pragma GCC poison gethostbyaddr gethostbyname                     // Not thread safe
 	
 #pragma GCC poison bzero                                           // Not portable
+
+#pragma GCC poison strcmp                                          // misses cases that it shouldn't
 	
 	/*
 	typedef enum Truth {
