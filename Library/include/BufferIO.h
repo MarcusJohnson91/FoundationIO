@@ -33,7 +33,7 @@ extern "C" {
 #pragma GCC poison bzero                                           // Not portable
 
 #pragma GCC poison strcmp                                          // misses cases that it shouldn't
-	
+
 	/*
 	typedef enum Truth {
 		YES =  true,
@@ -65,7 +65,7 @@ extern "C" {
 		BitIOGUIDSize             = BitIOUUIDSize,
     } BitIOConstants;
     
-    extern int BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Input/Output parsers.
+    extern uint64_t BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Input/Output parsers.
 
 	typedef enum SystemErrors {
 		SYSEmergency               = 1,
