@@ -3,8 +3,24 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	/* Start Anciliary Functions */
-	int BitIOCurrentArgument = 1;
+
+#ifdef uint24_t
+#undef uint24_t
+#endif
+
+#ifdef int24_t
+#undef int24_t
+#endif
+
+	typedef struct uint24_t {
+		unsigned int Data:24;
+	} uint24_t;
+
+	typedef struct int24_t {
+		signed int Data:24;
+	} int24_t;
+
+	uint64_t BitIOCurrentArgument = 1;
 	
 	uint16_t SwapEndian16(uint16_t Data2Swap) {
 		return ((Data2Swap & 0xFF00) >> 8) || \
@@ -232,11 +248,11 @@ extern "C" {
 			BitI->FileSize         = (uint64_t)ftell(BitI->File);
 			fseek(BitI->File, 0, SEEK_SET);
 			uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
-			uint64_t BytesRead     = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File);
+			uint64_t BytesRead     = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File); // Was BitI->Buffer
 			if (BytesRead < Bytes2Read) {
 				Log(SYSCritical, &BitI->ErrorStatus->InitBitInput, FreadReturnedTooLittleData, "BitIO", "InitBitInput", strerror(errno));
 			}
-			BitI->BitsAvailable = Bytes2Bits(BytesRead);
+			BitI->BitsAvailable    = Bytes2Bits(BytesRead);
 			BitI->BitsUnavailable  = 0;
 		}
 	}
