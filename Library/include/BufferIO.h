@@ -19,6 +19,7 @@
 #include <string.h>
 #include <syslog.h>
 #include <time.h>
+#include <unistd.h>
 
 #pragma once
 
@@ -35,7 +36,7 @@ extern "C" {
 #pragma GCC poison strcmp                                          // misses cases that it shouldn't
 
 	/*
-	typedef enum Truth {
+	enum Truth {
 		YES =  true,
 		NO  = false,
 	} Truth;
@@ -54,7 +55,7 @@ extern "C" {
 	 @constant  BitIOPathSize             "Maximum size of a path in the filesystem in BitIO".
 	 @constant  BitIOUUIDSize             "size of a UUIDString including null terminator".
      */
-    typedef enum BitIOConstants {
+    enum BitIOConstants {
         BitInputBufferSize        = 4096,
         BitInputBufferSizeInBits  = BitInputBufferSize * 8,
         BitOutputBufferSize       = 4096,
@@ -67,7 +68,7 @@ extern "C" {
     
     extern uint64_t BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Input/Output parsers.
 
-	typedef enum SystemErrors {
+	enum SystemErrors {
 		SYSEmergency               = 1,
 		SYSPanic                   = 1,
 		SYSAlert                   = 2,
@@ -83,7 +84,7 @@ extern "C" {
 	 @abstract                     "List of error codes the various functions in BitIO set in ErrorStatus".
      @remark                       "FIXME: Should the error codes be negative or positive?".
      */
-    typedef enum ErrorCodes {
+    enum ErrorCodes {
 		/* End Syslog-type eror codes, begin BitIO specific error codes */
         Success                    = 9,
         NotEnoughMemory            = 10,
@@ -221,24 +222,17 @@ extern "C" {
         ErrorStatus *ErrorStatus;
         uint8_t      Buffer[BitOutputBufferSize];
     } BitOutput;
-
-	typedef struct BitIOString {
-/*
- Features I want:
- UTF-8.
- Variable length array to save space.
- 2 arrays, one to hold the number of bytes for each character, the second to actually hold the UTF-8 bytes.
- */
-		uint8_t  CharSize[65535]; // first definition to hold the number of bytes for the first character, max 65535 chars in string
-		uint8_t  CodePoint[262140]; // String of Unicode bytes
-		size_t   StringSize; // number of letters in the string, NOT bytes
-	} BitIOString;
 	
-	typedef enum Base {
+	enum Base {
 		Octal       =  8,
 		Decimal     = 10,
 		Hexadecimal = 16,
 	} Base;
+
+	typedef struct HuffmanTree {
+		uint16_t Symbol[255];      // input symbol to be coded
+		uint16_t HuffmanCode[255]; // Encoded value for that symbol
+	} HuffmanTree;
     
     /*! 
 	 @abstract                     "Swap endian of 16 bit integers".
@@ -266,8 +260,8 @@ extern "C" {
     
     /*! 
 	 @abstract                     "Computes the number of bytes from the number of bits".
-     @remark                       "Rounds up to the next byte if not multiple of 8 bits, 1 indexed instead of 0".
-     @return                       "Converts the number of bits to the number of bytes".
+     @remark                       "ONLY USE FOR ARRAY INDEXING. DOES NOT ROUND, ANYTHING LESS THAN 8 = 0".
+     @return                       "The number of bytes".
      */
     uint64_t Bits2Bytes(uint64_t Bits);
     
@@ -302,13 +296,13 @@ extern "C" {
 	 @abstract                     "Converts numbers from One's compliment to Two's compliment".
      @return                       "Returns the Input in Two's compliment format".
      */
-    uint64_t OnesCompliment2TwosCompliment(uint64_t Input);
+    uint64_t OnesCompliment2TwosCompliment(int64_t Input);
     
     /*! 
 	 @abstract                     "Converts numbers from Two's compliment to One's compliment".
      @return                       "Returns the Input in One's compliment format".
      */
-    uint64_t TwosCompliment2OnesCompliment(uint64_t Input);
+    uint64_t TwosCompliment2OnesCompliment(int64_t Input);
     
     /*! @deprecated
 	 @abstract                     "Finds the highest bit set".
@@ -325,48 +319,24 @@ extern "C" {
     uint8_t CountBits(uint64_t Input) __attribute__((deprecated));
     
     /*! 
-	 @abstract                     "Aligns bits for single-byte alignment".
-     @remark                       "TODO: Should this be Input/Output neutral?".
-	 
-	 @param    BitI                "Pointer to BitInput".
-     */
-    void AlignInputBits2Byte(BitInput *BitI);
-    
-    /*! 
 	 @abstract                     "Aligns bits for multi-byte alignment".
+	 @remark                       "Aligns to specified byte without care about the current position".
+	 @example                      "if you're trying to align to 32 bit boundary, and your last bit isn't on a byte boundary, it'll add 31 bits of alignment instead of 2. For absolute byte alignment check if it's aligned with IsByteStreamAligned, and call AlignInput with 1 as well"
      @remark                       "TODO: Should this be Input/Output neutral?".
 	 
 	 @param    BitI                "Pointer to BitInput".
-	 @param    Bytes2Align         "Number of bytes of padding to align it to. BytesOfPadding - 1, + AlignBits2Bytes"
+	 @param    BytesOfAlignment         "Number of bytes of padding to align it to. BytesOfPadding - 1, + AlignBits2Bytes"
      */
-    void AlignInputBits2Bytes(BitInput *BitI, uint8_t Bytes2Align);
-    
-    /*! 
-	 @abstract                     "Aligns bits for single-byte alignment".
-     @remark                       "TODO: Should this be Input/Output neutral?".
-	 
-	 @param    BitO                "Pointer to BitOutput".
-     */
-    void AlignOutputBits2Byte(BitOutput *BitO);
+    void AlignInput(BitInput *BitI, uint8_t BytesOfAlignment);
     
     /*! 
 	 @abstract                     "Aligns bits for multi-byte alignment".
      @remark                       "TODO: Should this be Input/Output neutral?".
 	 
 	 @param    BitO                "Pointer to BitOutput".
-	 @param    Bytes2Align         "Number of bytes of padding to align it to. BytesOfPadding - 1, + AlignBits2Bytes"
+	 @param    BytesOfAlignment         "Number of bytes of padding to align it to. BytesOfPadding - 1, + AlignBits2Bytes"
      */
-    void AlignOutputBits2Bytes(BitOutput *BitO, uint8_t Bytes2Align);
-    
-    /*! 
-	 @abstract                     "Create bitmask from binary exponent".
-     
-	 @param    Base                "Base to multiply base by, Exponent times."
-     @param    Exponent            "Power to be raised by 2".
-	 
-	 @return                       "If 0 is returned, then either Base or Exponent were too large".
-     */
-	uint64_t Power(uint8_t Base, uint8_t Exponent);
+    void AlignOutput(BitOutput *BitO, uint8_t BytesOfAlignment);
 	
 	/*! 
 	 @abstract                     "Create bitmask from binary exponent".
