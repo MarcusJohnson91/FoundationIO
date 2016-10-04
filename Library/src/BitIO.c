@@ -669,6 +669,10 @@ extern "C" {
 		free(&CurrentTime);
 	}
 
+	void CreateHuffmanTree(uint16_t *SymbolOccurance) {
+		
+	}
+
 	void SortArrayByValue(uint16_t *Symbols[], uint16_t *Probability[], uint16_t *SortedArray, size_t NumSymbols) {
 		uint16_t PreviousProbability = 0;
 		uint16_t CurrentProbabiity   = 0;

@@ -100,6 +100,13 @@ extern "C" {
 		InvalidData                = 20,
 		InvalidCRC                 = 21,
     } ErrorCodes;
+
+	enum HuffmanConstants {
+		Huffman_MaxLengthCodes      = 286,
+		Huffman_MaxDistanceSymbols  = 30,
+		Huffman_MaxSymbols          = Huffman_MaxLengthCodes + Huffman_MaxDistanceSymbols,
+		Huffman_FixedLengthCodes    = 288,
+	} HuffmanConstants;
     
     /*! 
 	 @typedef  ErrorStatus
