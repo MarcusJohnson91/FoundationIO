@@ -4,7 +4,12 @@
 extern "C" {
 #endif
 
+	// To handle a format specifier, there are 2 parts. The first is in argv which is %0XY, the second is in -s which is just a raw int
+
 	uint64_t BitIOCurrentArgument = 1;
+	char     BitInputFormatSpecifier[];
+	uint64_t BitInputCurrentSpecifier  = 0;
+	uint64_t BitOutputCurrentSpecifier = 0;
 
 	uint16_t SwapEndian16(uint16_t Data2Swap) { // In UnitTest
 		return ((Data2Swap & 0xFF00) >> 8) || ((Data2Swap & 0x00FF) << 8);
@@ -48,7 +53,7 @@ extern "C" {
 
 	uint64_t Power2Mask(uint8_t Exponent) { // UnitTest Unnecessary
 		if (Exponent > 64) {
-			return 0;
+			return EXIT_FAILURE;
 		}
 		uint64_t Mask1 = 0, Mask2 = 0;
 		Mask1          = 1 << (Exponent - 1);
@@ -93,8 +98,8 @@ extern "C" {
 	 }
 	 */
 
-	bool IsStreamByteAligned(uint64_t BitsUnavailable) {
-		if ((BitsUnavailable % 8) == 0) {
+	bool IsStreamByteAligned(uint64_t BitsUsed) {
+		if ((BitsUsed % 8) == 0) {
 			return true;
 		}
 		return false;
@@ -135,31 +140,30 @@ extern "C" {
 	}
 
 	static void PrintHelp(void) {
-		fprintf(stderr, "Usage: -i <input> -o <output> (-s should be before the argument it's intended for)\n");
+		fprintf(stderr, "Usage: -i <input> -o <output> (-s is to specify the start of a file sequence, and should be before the argument it's intended for)\n");
 	}
 
 	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
 		// I need to add some variables to BitInput to split the path into 3, one for the base path, the second for the format specifier number, and the third for the extension.
 		while (BitI->File == NULL) {
 			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
-				int64_t SpecifierOffset = 0;
 				char Path[BitIOPathSize];
-				snprintf(Path, strlen(argv[Argument]), "%s", argv[Argument]);
+				snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
 
-				if ((strcasecmp(Path, "-s") == 0) && (SpecifierOffset == 0)) {
+				if ((strcasecmp(Path, "-s") == 0) && (BitInputCurrentSpecifier == 0)) {
 					Argument += 1;
-					sscanf(Path, "%lld", &SpecifierOffset);
+					sscanf(Path, "%lld", &BitInputCurrentSpecifier);
 				}
 
 				if (strcasecmp(Path, "-i") == 0) {
 					Argument += 1;
-					if (SpecifierOffset != 0) {
+					if (BitInputCurrentSpecifier != 0) {
 						// We need to replace the character sequence with the specifier
 						// So use sprintf to substitute the format string with the SpecifierOffset, then increment it by one for the next time
-						snprintf(Path, strlen(argv[Argument]), "%s", argv[Argument]);
+						snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
 						// Extract the format specifier from the argument and replace it with SpecifierOffset and put that into Path
 					} else {
-						snprintf(Path, strlen(argv[Argument]), "%s", argv[Argument]);
+						snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
 					}
 
 					if (strcasecmp(Path, "-") == 0) {
@@ -186,7 +190,7 @@ extern "C" {
 			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
 				int64_t SpecifierOffset = 0;
 				char Path[BitIOPathSize];
-				snprintf(Path, strlen(argv[Argument]), "%s", argv[Argument]);
+				snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
 
 				if (strcasecmp(Path, "-s")   == 0) { // Specifier Offset
 					Argument += 1;
@@ -195,7 +199,7 @@ extern "C" {
 
 				if (strcasecmp(Path, "-o")    == 0) {
 					Argument += 1;
-					snprintf(Path, strlen(argv[Argument]), "%s", argv[Argument]);
+					snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
 					if (strcasecmp(Path, "-") == 0) {
 						BitO->File = freopen(Path, "wb", stdout);
 					} else {
@@ -280,7 +284,7 @@ extern "C" {
 
 	/* End Input parsing functions */
 
-	static void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffset) {
+	void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffset) {
 		if (RelativeOffset == 0) {
 			Log(SYSCritical, &BitI->ErrorStatus->UpdateInputBuffer, NumberNotInRange, "BitIO", "UpdateInputBuffer", NULL);
 		}
@@ -316,6 +320,14 @@ extern "C" {
 		return OutputData;
 	}
 
+	void ReadRLEData(BitInput *BitI, size_t BufferSize, uint64_t *DecodedBuffer) {
+
+	}
+
+	void WriteRLEData(BitOutput *BitO, size_t BufferSize, uint64_t *Buffer2Encode) {
+
+	}
+
 	uint64_t ReadExpGolomb(BitInput *BitI, bool IsSigned, bool IsTruncated) {
 		uint64_t Zeros = 0;
 		uint64_t  Data = 0;
@@ -345,12 +357,12 @@ extern "C" {
 		if (StopBit != (0|1)) {
 			BitI->ErrorStatus->ReadRICE = NumberNotInRange;
 		} else {
-			while (PeekBits(BitI, 1) != StopBit) {
+			while (PeekBits(BitI, 1) != StopBit) { // The StopBit needs to be included in the count.
 				SkipBits(BitI, 1);
 				BitCount += 1;
 			}
 		}
-		return BitCount;
+		return BitCount + 1;
 	}
 
 	void WriteRICE(BitOutput *BitO, bool StopBit, uint64_t Data2Write) {
@@ -561,25 +573,25 @@ extern "C" {
 		}
 	}
 
-	void ReadUUID(BitInput *BitI, char *UUIDString[BitIOUUIDSize]) {
+	void ReadUUID(BitInput *BitI, UUIDString *UUID) { // char *UUIDString[BitIOUUIDSize]
 		//static char UUIDString[21] = {0};
 		for (uint8_t Character = 0; Character < BitIOUUIDSize; Character++) {
 			if (Character == 21) {
-				*UUIDString[Character] = 0;
+				UUID->String[Character] = 0x00;
 			} else if ((Character == 4) || (Character == 7) || (Character == 10) || (Character == 13)) {
-				*UUIDString[Character] = 0x2D; // hyphen
+				UUID->String[Character] = 0x2D;
 			} else {
-				*UUIDString[Character] = ReadBits(BitI, 8);
+				UUID->String[Character] = ReadBits(BitI, 8);
 			}
 		}
 	}
 
-	void ReadUUIDAsGUID(BitInput *Input, char *UUIDString[BitIOUUIDSize]) { // We will flip endian to a standard UUID
+	void ReadUUIDAsGUID(BitInput *Input, UUIDString *UUID) { // char *UUIDString[BitIOUUIDSize]
 		for (uint8_t Character = 0; Character < BitIOGUIDSize; Character++) {
 			if (Character == 21) {
-				*UUIDString[Character] = 0;
+				UUID->String[Character] = 0x00;
 			} else if ((Character == 4) || (Character == 7) || (Character == 10) || (Character == 13)) {
-				*UUIDString[Character] = 0x2D;
+				UUID->String[Character] = 0x2D;
 			} else {
 				uint32_t Section1 = SwapEndian32(ReadBits(Input, 32));
 				// Extract bytes from int into characters
@@ -589,28 +601,28 @@ extern "C" {
 		}
 	}
 
-	void WriteGUIDAsUUID(BitOutput *BitO, char *GUIDString[BitIOGUIDSize]) {
+	void WriteGUIDAsUUID(BitOutput *BitO, UUIDString *UUID) { // char *GUIDString[BitIOGUIDSize]
 		for (uint8_t Byte = 0; Byte < BitIOGUIDSize - 1; Byte++) { // Don't write the NULL terminator
-			if (Byte != 4) || (Byte != 7) || (Byte != 10) || (Byte != 13)) { // Hyphens
+			if ((Byte != 4) || (Byte != 7) || (Byte != 10) || (Byte != 13)) { // Hyphens
 
 			}
 		}
 	}
 
-	void WriteUUID(BitOutput *BitO, char UUIDString[BitIOUUIDSize]) {
-		if (strlen(UUIDString) != BitIOUUIDSize) {
+	void WriteUUID(BitOutput *BitO, UUIDString *UUID) { // char *UUIDString[BitIOUUIDSize]
+		if (strlen(UUID->String) != BitIOUUIDSize) {
 			BitO->ErrorStatus->WriteUUID = WrongStringSize;
 		}
 		for (uint8_t Character = 0; Character < BitIOUUIDSize; Character++) {
 			if ((Character == 4) || (Character == 7) || (Character == 10) || (Character == 13) || (Character == 21)) {
 				// Character 21 is the NULL terminator, the rest are the hyphens.
-				WriteBits(BitO, UUIDString[Character], 8);
+				WriteBits(BitO, UUID->String[Character], 8);
 			}
 
 		}
 	}
 
-	void ReadGUIDAsUUID(BitInput *BitI, char UUIDString[BitIOGUIDSize]) {
+	void ReadGUIDAsUUID(BitInput *BitI, UUIDString *UUID) { // char *UUIDString[BitIOGUIDSize]
 		// Basically just swap the first 3 sections
 		uint32_t Section1 = ReadBits(BitI, 32);
 		uint16_t Section2 = ReadBits(BitI, 16);
@@ -624,18 +636,24 @@ extern "C" {
 
 		for (uint8_t Byte = 0; Byte < 21; Byte++) {
 			if ((Byte == 4) || (Byte == 7) || (Byte == 10) || (Byte == 13)) { // hyphen
-				UUIDString[Byte] = 0x2D;
+				UUID->String[Byte] = 0x2D;
 			} else if (Byte == 21) {
-				UUIDString[Byte] = 0x00; // trailing NULL
+				UUID->String[Byte] = 0x00; // trailing NULL
 			} else if ((Byte == 0) || (Byte == 1) || (Byte == 2) || (Byte == 3)) {
-				UUIDString[Byte] = UUID1 & (0xFF << Bytes2Bits(Byte));
+				UUID->String[Byte] = UUID1 & (0xFF << Bytes2Bits(Byte));
 			} else if ((Byte == 5) || (Byte == 6)) {
-				UUIDString[Byte] = UUID2 & (0xFF << Bytes2Bits(Byte - 5));
+				UUID->String[Byte] = UUID2 & (0xFF << Bytes2Bits(Byte - 5));
 			} else if ((Byte == 8) || (Byte == 9)) {
-				UUIDString[Byte] = UUID3 & (0xFF << Bytes2Bits(Byte - 8));
+				UUID->String[Byte] = UUID3 & (0xFF << Bytes2Bits(Byte - 8));
 			} else if ((Byte == 11) || (Byte == 12) || (Byte == 14) || (Byte == 15) || (Byte == 15) || (Byte == 16) || (Byte == 17) || (Byte == 18)) {
-				UUIDString[Byte] = Section4 & (0xFF << Bytes2Bits(Byte - 11));
+				UUID->String[Byte] = Section4 & (0xFF << Bytes2Bits(Byte - 11));
 			}
+		}
+	}
+
+	void CompareUUIDStrings(UUIDString *UUID1, UUIDString *UUID2) { // char UUIDString2[21]
+		for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDSize; UUIDByte++) {
+
 		}
 	}
 
