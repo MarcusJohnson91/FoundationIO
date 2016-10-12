@@ -98,11 +98,22 @@ extern "C" {
 	 }
 	 */
 
-	bool IsStreamByteAligned(uint64_t BitsUsed) {
-		if ((BitsUsed % 8) == 0) {
-			return true;
+	bool IsStreamByteAligned(uint64_t BitsUsed, uint8_t BytesOfAlignment) {
+		bool Truth = 0;
+
+		if (BytesOfAlignment == 1) {
+			if ((BitsUsed % 8) == 0) {
+				Truth = true;
+			}
+			Truth = false;
+		} else {
+			if ((BitsUsed % Bytes2Bits(BytesOfAlignment)) == true) {
+				Truth = true;
+			} else {
+				Truth = false;
+			}
 		}
-		return false;
+		return Truth;
 	}
 
 	void AlignInput(BitInput *BitI, uint8_t BytesOfAlignment) {
@@ -143,80 +154,80 @@ extern "C" {
 		fprintf(stderr, "Usage: -i <input> -o <output> (-s is to specify the start of a file sequence, and should be before the argument it's intended for)\n");
 	}
 
-	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
-		// I need to add some variables to BitInput to split the path into 3, one for the base path, the second for the format specifier number, and the third for the extension.
-		while (BitI->File == NULL) {
-			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
-				char Path[BitIOPathSize];
-				snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
+    void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
+        // I need to add some variables to BitInput to split the path into 3, one for the base path, the second for the format specifier number, and the third for the extension.
+        while (BitI->File == NULL) {
+            for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
+                char Path[BitIOPathSize];
+                snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
 
-				if ((strcasecmp(Path, "-s") == 0) && (BitInputCurrentSpecifier == 0)) {
-					Argument += 1;
-					sscanf(Path, "%lld", &BitInputCurrentSpecifier);
-				}
+                if ((strcasecmp(Path, "-s") == 0) && (BitInputCurrentSpecifier == 0)) {
+                    Argument += 1;
+                    sscanf(Path, "%lld", &BitInputCurrentSpecifier);
+                }
 
-				if (strcasecmp(Path, "-i") == 0) {
-					Argument += 1;
-					if (BitInputCurrentSpecifier != 0) {
-						// We need to replace the character sequence with the specifier
-						// So use sprintf to substitute the format string with the SpecifierOffset, then increment it by one for the next time
-						snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
-						// Extract the format specifier from the argument and replace it with SpecifierOffset and put that into Path
-					} else {
-						snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
-					}
+                if (strcasecmp(Path, "-i") == 0) {
+                    Argument += 1;
+                    if (BitInputCurrentSpecifier != 0) {
+                        // We need to replace the character sequence with the specifier
+                        // So use sprintf to substitute the format string with the SpecifierOffset, then increment it by one for the next time
+                        snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
+                        // Extract the format specifier from the argument and replace it with SpecifierOffset and put that into Path
+                    } else {
+                        snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
+                    }
 
-					if (strcasecmp(Path, "-") == 0) {
-						BitI->File = freopen(Path, "rb", stdin);
-					} else {
-						BitI->File = fopen(Path, "rb");
-						if (BitI->File == NULL) {
-							Log(SYSCritical, &BitI->ErrorStatus->ParseInputOptions, FopenFailed, "BitIO", "ParseInputOptions", strerror(errno));
-						}
-					}
-				} else {
-					Argument += 1;
-				}
-				BitIOCurrentArgument += Argument - 1;
-				if ((Argument >= argc) && (BitI->File == NULL)) { // end of the argument list with no file, so start back at the top.
-					BitIOCurrentArgument = 1;
-				}
-			}
-		}
-	}
+                    if (strcasecmp(Path, "-") == 0) {
+                        BitI->File = freopen(Path, "rb", stdin);
+                        setvbuf(BitI->File, NULL, _IONBF, BitInputBufferSize);
+                    } else {
+                        BitI->File = fopen(Path, "rb");
+                        setvbuf(BitI->File, NULL, _IONBF, BitInputBufferSize);
+                        if (BitI->File == NULL) {
+                            Log(SYSCritical, &BitI->ErrorStatus->ParseInputOptions, FopenFailed, "BitIO", "ParseInputOptions", strerror(errno));
+                        }
+                    }
+                    BitIOCurrentArgument = Argument + 1;
+                }
+                /*
+                BitIOCurrentArgument += Argument - 1;
+                if ((Argument >= argc) && (BitI->File == NULL)) { // end of the argument list with no file, so start back at the top.
+                    BitIOCurrentArgument = 1;
+                }
+                 */
+            }
+        }
+    }
 
-	void ParseOutputOptions(BitOutput *BitO, int argc, const char *argv[]) {
-		while (BitO->File == NULL) {
-			for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
-				int64_t SpecifierOffset = 0;
-				char Path[BitIOPathSize];
-				snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
+    void ParseOutputOptions(BitOutput *BitO, int argc, const char *argv[]) {
+        while (BitO->File == NULL) {
+            for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) { // The problem is that InputBuffer read past where it should.
+                int64_t SpecifierOffset = 0;
+                char Path[BitIOPathSize];
+                snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
 
-				if (strcasecmp(Path, "-s")   == 0) { // Specifier Offset
-					Argument += 1;
-					snprintf(SpecifierOffset, 1, "%s", argv[Argument]);
-				}
+                if (strcasecmp(Path, "-s")    == 0) { // Specifier Offset
+                    Argument += 1;
+                    snprintf(SpecifierOffset, 1, "%s", argv[Argument]);
+                }
 
-				if (strcasecmp(Path, "-o")    == 0) {
-					Argument += 1;
-					snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
-					if (strcasecmp(Path, "-") == 0) {
-						BitO->File = freopen(Path, "wb", stdout);
-					} else {
-						BitO->File = fopen(Path, "wb");
-						if (BitO->File == NULL) {
-							Log(SYSCritical, &BitO->ErrorStatus->ParseOutputOptions, FopenFailed, "BitIO", "ParseOutputOptions", strerror(errno));
-						}
-					}
-				} else {
-					Argument += 1;
-				}
-				BitIOCurrentArgument += Argument - 1;
-				if ((Argument >= argc) && (BitO->File == NULL)) { // end of the argument list with no file, so start back at the top.
-					BitIOCurrentArgument = 1;
-				}
-			}
-		}
+                if (strcasecmp(Path, "-o")    == 0) {
+                    Argument += 1;
+                    snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
+                    if (strcasecmp(Path, "-") == 0) {
+                        BitO->File = freopen(Path, "wb", stdout);
+                        setvbuf(BitO->File, NULL, _IONBF, BitOutputBufferSize);
+                    } else {
+                        BitO->File = fopen(Path, "wb");
+                        setvbuf(BitO->File, NULL, _IONBF, BitOutputBufferSize);
+                        if (BitO->File == NULL) {
+                            Log(SYSCritical, &BitO->ErrorStatus->ParseOutputOptions, FopenFailed, "BitIO", "ParseOutputOptions", strerror(errno));
+                        }
+                    }
+                    BitIOCurrentArgument = Argument + 1;
+                }
+            }
+        }
 	}
 
 	void InitBitInput(BitInput *BitI, ErrorStatus *ES, int argc, const char *argv[]) {
@@ -227,8 +238,6 @@ extern "C" {
 			if (BitI->ErrorStatus == NULL) {
 				BitI->ErrorStatus  = ES;
 			}
-			setvbuf(BitI->File, NULL, _IONBF, BitInputBufferSize);
-			// This needs to be called before the buffer is filled?
 			ParseInputOptions(BitI, argc, argv);
 
 			fseek(BitI->File, 0, SEEK_END);
