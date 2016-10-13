@@ -12,19 +12,20 @@ extern "C" {
 	uint64_t BitOutputCurrentSpecifier = 0;
 
 	uint16_t SwapEndian16(uint16_t Data2Swap) { // In UnitTest
-		return ((Data2Swap & 0xFF00) >> 8) || ((Data2Swap & 0x00FF) << 8);
+		return ((Data2Swap & 0xFF00) >> 8) | ((Data2Swap & 0x00FF) << 8);
 	}
 
 	uint32_t SwapEndian32(uint32_t Data2Swap) { // In UnitTest
-		return ((Data2Swap & 0xFF000000) >> 24) || ((Data2Swap & 0x00FF0000) >>  8) || \
-		((Data2Swap & 0x0000FF00) <<  8) || ((Data2Swap & 0x000000FF) << 24);
+        uint32_t Swapped = 0;
+		Swapped = ((Data2Swap & 0xFF000000) >> 24) | ((Data2Swap & 0x00FF0000) >> 8) | ((Data2Swap & 0x0000FF00) << 8) | ((Data2Swap & 0x000000FF) << 24);
+        return Swapped;
 	}
 
 	uint64_t SwapEndian64(uint64_t Data2Swap) { // In UnitTest
-		return (((Data2Swap & 0xFF00000000000000) >> 56) || ((Data2Swap & 0x00FF000000000000) >> 40) || \
-				((Data2Swap & 0x0000FF0000000000) >> 24) || ((Data2Swap & 0x000000FF00000000) >>  8) || \
-				((Data2Swap & 0x00000000FF000000) <<  8) || ((Data2Swap & 0x0000000000FF0000) << 24) || \
-				((Data2Swap & 0x000000000000FF00) << 40) || ((Data2Swap & 0x00000000000000FF) << 56));
+		return (((Data2Swap & 0xFF00000000000000) >> 56) | ((Data2Swap & 0x00FF000000000000) >> 40) | \
+				((Data2Swap & 0x0000FF0000000000) >> 24) | ((Data2Swap & 0x000000FF00000000) >>  8) | \
+				((Data2Swap & 0x00000000FF000000) <<  8) | ((Data2Swap & 0x0000000000FF0000) << 24) | \
+				((Data2Swap & 0x000000000000FF00) << 40) | ((Data2Swap & 0x00000000000000FF) << 56));
 	}
 
 	bool IsOdd(int64_t Input) { // UnitTest Unnecessary
@@ -179,10 +180,10 @@ extern "C" {
 
                     if (strcasecmp(Path, "-") == 0) {
                         BitI->File = freopen(Path, "rb", stdin);
-                        setvbuf(BitI->File, NULL, _IONBF, BitInputBufferSize);
+                        setvbuf(BitI->File, BitI->Buffer, _IONBF, BitInputBufferSize);
                     } else {
                         BitI->File = fopen(Path, "rb");
-                        setvbuf(BitI->File, NULL, _IONBF, BitInputBufferSize);
+                        setvbuf(BitI->File, BitI->Buffer, _IONBF, BitInputBufferSize);
                         if (BitI->File == NULL) {
                             Log(SYSCritical, &BitI->ErrorStatus->ParseInputOptions, FopenFailed, "BitIO", "ParseInputOptions", strerror(errno));
                         }
@@ -216,10 +217,10 @@ extern "C" {
                     snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
                     if (strcasecmp(Path, "-") == 0) {
                         BitO->File = freopen(Path, "wb", stdout);
-                        setvbuf(BitO->File, NULL, _IONBF, BitOutputBufferSize);
+                        setvbuf(BitO->File, BitO->Buffer, _IONBF, BitOutputBufferSize);
                     } else {
                         BitO->File = fopen(Path, "wb");
-                        setvbuf(BitO->File, NULL, _IONBF, BitOutputBufferSize);
+                        setvbuf(BitO->File, BitO->Buffer, _IONBF, BitOutputBufferSize);
                         if (BitO->File == NULL) {
                             Log(SYSCritical, &BitO->ErrorStatus->ParseOutputOptions, FopenFailed, "BitIO", "ParseOutputOptions", strerror(errno));
                         }
@@ -230,6 +231,19 @@ extern "C" {
         }
 	}
 
+	uint8_t DetectSystemEndian(void) { // this function always returns lil no matter what?
+		uint8_t SystemEndian = 0;
+		uint16_t Endian = 0xFFFE;
+		if (Endian == 0xFFFE) {
+			SystemEndian = LittleEndian;
+		} else if (Endian == 0xFEFF) {
+			SystemEndian = BigEndian;
+		} else {
+			SystemEndian = UnknownEndian;
+		}
+		return SystemEndian;
+	}
+
 	void InitBitInput(BitInput *BitI, ErrorStatus *ES, int argc, const char *argv[]) {
 		// FIXME: Remove any quotes on the path, or the issue could be that the -i and location are specified together...
 		if (argc < 3) {
@@ -238,15 +252,16 @@ extern "C" {
 			if (BitI->ErrorStatus == NULL) {
 				BitI->ErrorStatus  = ES;
 			}
+			BitI->SystemEndian = DetectSystemEndian();
 			ParseInputOptions(BitI, argc, argv);
 
 			fseek(BitI->File, 0, SEEK_END);
 			BitI->FileSize         = (uint64_t)ftell(BitI->File);
 			fseek(BitI->File, 0, SEEK_SET);
-			uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
-			uint64_t BytesRead     = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File); // Was BitI->Buffer
-			if (BytesRead < Bytes2Read) {
-				Log(SYSCritical, &BitI->ErrorStatus->InitBitInput, FreadReturnedTooLittleData, "BitIO", "InitBitInput", strerror(errno));
+			//uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
+			uint64_t BytesRead     = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File);
+			if (BytesRead < BitInputBufferSize) { // Bytes2Read
+				Log(SYSCritical, BitI->ErrorStatus->InitBitInput, FreadReturnedTooLittleData, "BitIO", "InitBitInput", strerror(errno));
 			}
 			BitI->BitsAvailable    = Bytes2Bits(BytesRead);
 			BitI->BitsUnavailable  = 0;
@@ -260,6 +275,7 @@ extern "C" {
 			if (BitO->ErrorStatus == NULL) {
 				BitO->ErrorStatus = ES;
 			}
+			BitO->SystemEndian     = DetectSystemEndian();
 			ParseOutputOptions(BitO, argc, argv);
 			BitO->BitsAvailable    = BitOutputBufferSizeInBits;
 			BitO->BitsUnavailable  = 0;
@@ -288,43 +304,43 @@ extern "C" {
 		Bits->BitsAvailable   = 0;
 		Bits->BitsUnavailable = 0;
 		Bits->Buffer          = NULL;
-		Bits->ES              = NULL;
+		Bits->ErrorStatus     = NULL;
 	}
 
 	/* End Input parsing functions */
 
 	void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffset) {
+        uint64_t BytesRead = 0;
+        /*
 		if (RelativeOffset == 0) {
-			Log(SYSCritical, &BitI->ErrorStatus->UpdateInputBuffer, NumberNotInRange, "BitIO", "UpdateInputBuffer", NULL);
+			Log(SYSCritical, BitI->ErrorStatus->UpdateInputBuffer, NumberNotInRange, "BitIO", "UpdateInputBuffer", NULL);
 		}
-		uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) ? Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) : BitI->FileSize - BitI->FilePosition;
-		fseek(BitI->File, RelativeOffset, SEEK_CUR);
-		memset(BitI, 0, Bytes2Read);
-		uint64_t BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
-		if (BytesRead != Bytes2Read) {
-			Log(SYSWarning, &BitI->ErrorStatus->UpdateInputBuffer, FreadReturnedTooLittleData, "BitIO", "UpdateInputBuffer", NULL);
+         */
+        fseek(BitI->File, RelativeOffset, SEEK_CUR);
+        BitI->FilePosition = ftell(BitI->File);
+        //uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) ? Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) : BitI->FileSize - BitI->FilePosition;
+        memset(BitI->Buffer, 0, BitInputBufferSize); // Bytes2Read
+        funlockfile(BitI->File);
+        BytesRead = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File); // Bytes2Read
+        if (BytesRead != BitInputBufferSize) { // Bytes2Read
+			Log(SYSWarning, BitI->ErrorStatus->UpdateInputBuffer, FreadReturnedTooLittleData, "BitIO", "UpdateInputBuffer", NULL);
 		}
 	}
 
 	uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read) {
 		uint64_t OutputData = 0;
 
-		if (Bits2Read <= 0) {
+		if ((Bits2Read <= 0) || (Bits2Read > 64)) {
 			char Description[BitIOPathSize];
-			snprintf(Description, BitIOPathSize, "Read too few bits: %d\n", Bits2Read);
-			Log(SYSCritical, &BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", Description);
-		} else if (Bits2Read > 64) {
-			char Description[BitIOPathSize];
-			snprintf(Description, BitIOPathSize, "Read too many bits: %d\n", Bits2Read);
+			snprintf(Description, BitIOPathSize, "ReadBits only supports reading 1-64 bits at a time, you tried reading: %d bits\n", Bits2Read);
 			Log(SYSCritical, &BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", Description);
 		} else {
-			OutputData             = PeekBits(BitI, Bits2Read);
+			OutputData             = PeekBits(BitI, Bits2Read); // , InputEndian
 			if (BitI->ErrorStatus->PeekBits != Success) {
 				BitI->ErrorStatus->ReadBits  = BitI->ErrorStatus->PeekBits;
-			} else {
-				BitI->BitsUnavailable += Bits2Read;
-				BitI->BitsAvailable   -= Bits2Read;
 			}
+			BitI->BitsUnavailable += Bits2Read;
+			BitI->BitsAvailable   -= Bits2Read;
 		}
 		return OutputData;
 	}
@@ -410,39 +426,15 @@ extern "C" {
 				BitI->BitsUnavailable += 1;
 				BitsLeft              -= 1;
 			}
+			/*
+			if ((InputEndian >= 0) && (InputEndian <= 2)) { // otherwise the endian is invalid
+				if (InputEndian != BitI->SystemEndian) {
+					SwapEndian64(OutputData);
+				}
+			}
+			 */
 			BitI->BitsAvailable       += Bits2Peek;
 			BitI->BitsUnavailable     -= Bits2Peek;
-		}
-		return OutputData;
-	}
-
-	uint64_t PeekBits2(BitInput2 *Input, uint8_t Bits2Peek) { // REBASED ON BitBuffer
-															  //WARNING: You CAN'T read byte by byte, it simply won't work so stop trying. Also, this is faster, instruction wise.
-		uint64_t OutputData = 0;
-		uint8_t  Data       = 0;
-		uint8_t  BitsLeft   = Bits2Peek;
-		uint8_t  BitMask    = 0;
-
-		if ((Bits2Peek > 64) || (Bits2Peek <= 0)) {
-			char Description[BitIOStringSize] = {0};
-			snprintf(Description, BitIOStringSize, "Tried to peek %d bits, only 1-64 is valid\n", Bits2Peek);
-			Log(SYSError, &Input->Error->PeekBits, NumberNotInRange, "BitIO", "PeekBits", Description);
-		} else if (Input->Data->BitsAvailable < Bits2Peek) {
-			// InputBuffer can't completely satisfy the request, update it.
-			UpdateInputBuffer(Input->Source, 0);
-		} else {
-			while (BitsLeft > 0) {
-				OutputData                  <<= 1;
-				BitMask                       = 1 << (BitsRemaining(Input->Data->BitsUnavailable) - 1); // 1 << ((8 - (BitI->BitsUnavailable % 8)) -1);
-				Data                          = Input->Data->Buffer[Bits2Bytes(Input->Data->BitsUnavailable)] & BitMask;
-				Data                        >>= BitsRemaining(Input->Data->BitsUnavailable) - 1; // ((8 - (BitI->BitsUnavailable % 8)) -1);
-				OutputData                   += Data;
-				Input->Data->BitsAvailable   -= 1;
-				Input->Data->BitsUnavailable += 1;
-				BitsLeft                     -= 1;
-			}
-			Input->Data->BitsAvailable       += Bits2Peek;
-			Input->Data->BitsUnavailable     -= Bits2Peek;
 		}
 		return OutputData;
 	}
@@ -483,7 +475,7 @@ extern "C" {
 		if ((Bits2Read <= 0) || (Bits2Read > 64)) {
 			char ErrorDescription[BitIOPathSize] = {0};
 			snprintf(ErrorDescription, BitIOPathSize, "You requested %d bits, ReadBuffer can only read 1-64 bits at a time\n", Bits2Read);
-			Log(SYSError, &Bits->ES->ReadBitBuffer, NumberNotInRange, "BitIO", "ReadBitBuffer", ErrorDescription);
+			Log(SYSError, &Bits->ErrorStatus->ReadBitBuffer, NumberNotInRange, "BitIO", "ReadBitBuffer", ErrorDescription);
 		} else {
 			while ((Bits2Read > 0) && (Bits->BitsAvailable >= Bits2Read)) {
 				OutputData           <<= 1;
@@ -667,7 +659,7 @@ extern "C" {
 	}
 
 
-	void Log(int64_t SYSError, int64_t *ES, int64_t ESError, char Library[BitIOStringSize], char Function[BitIOStringSize], char Description[BitIOStringSize]) {
+	void Log(int64_t SYSError, ErrorStatus *ES, int64_t ESError, char Library[BitIOStringSize], char Function[BitIOStringSize], char Description[BitIOStringSize]) {
 		char ComputerName[BitIOStringSize] = {0};
 		size_t StringSize = 0;
 
@@ -677,15 +669,16 @@ extern "C" {
 			openlog(Library, SYSError, (LOG_PERROR|LOG_USER));
 		}
 
-		time_t Time;
-		char CurrentTime[26];
-		time(&Time);
-		StringSize = strftime(CurrentTime, 26, "%A, %B %e, %g+1000: %I:%M:%S %p %Z", Time);
+		//time_t *Time;
+		struct tm *Time2;
+        char CurrentTime[26];
+		//time(Time);
+		StringSize = strftime(CurrentTime, 26, "%A, %B %e, %g+1000: %I:%M:%S %p %Z", Time2);
 		if ((StringSize <= 0) || (StringSize > BitIOStringSize)) {
 			fprintf(stderr, "BitIO - Log: String too big %zu\n", StringSize);
 		}
 
-		*ES = ESError;
+		ES = ESError;
 		// ADD SYSTEM NAME TO THE BEGINNING OF EACH LOG FILE AND LOGFILE NAME.
 		errno = gethostname(ComputerName, BitIOStringSize);
 		if (errno != 0) {
@@ -693,7 +686,7 @@ extern "C" {
 		}
 		syslog(SYSError, "%s - %s: %s - %s: %s\n", ComputerName, CurrentTime, Library, Function, Description);
 
-		free(&CurrentTime);
+        //free(&CurrentTime);
 	}
 
 	void CreateHuffmanTree(uint16_t *SymbolOccurance) {

@@ -19,6 +19,7 @@
 #include <string.h>
 #include <syslog.h>
 #include <time.h>
+#include <xlocale.h>
 #include <unistd.h>
 
 #ifdef __cplusplus
@@ -100,6 +101,7 @@ extern "C" {
 		FreadReturnedTooLittleData = 19,
 		InvalidData                = 20,
 		InvalidCRC                 = 21,
+        InvalidMarker              = 22,
 	} ErrorCodes;
 
 	enum HuffmanConstants {
@@ -142,10 +144,6 @@ extern "C" {
 	 @constant       FilePosition      "Current byte in the file".
 	 @constant       BitsUnavailable   "Number of previously read bits in Buffer".
 	 @constant       BitsAvailable     "Number of bits available for reading".
-	 @constant       BasePath          "Location and start of the name of the file, for use with format specified streams aka %03d".
-	 @constant       DigitsInSpecifier "Maybe this should be called number of digits?".
-	 @constant       FileNumber        "The number in the current specifier".
-	 @constant       Extension         "Everything after the format specifier to regenerate the complete path".
 	 @constant       ErrorStatus       "Pointer to supplied ErrorStatus".
 	 @constant       Buffer            "Buffer of data from File".
 
@@ -157,47 +155,10 @@ extern "C" {
 		uint64_t     FilePosition;
 		uint64_t     BitsUnavailable;
 		uint64_t     BitsAvailable;
-		uint8_t      DigitsInSpecifier;
-		int64_t      FileNumber;
-		char         BasePath[BitIOPathSize];
-		char         Extension[BitIOPathSize];
+		uint8_t      SystemEndian:2;
 		ErrorStatus *ErrorStatus;
 		uint8_t      Buffer[BitInputBufferSize];
 	} BitInput;
-
-	typedef struct BitBuffer {
-		uint64_t     BitsUnavailable;
-		uint64_t     BitsAvailable;
-		ErrorStatus *ES;
-		uint8_t     *Buffer;
-	} BitBuffer;
-
-	typedef struct BitFile {
-		FILE        *File;
-		uint64_t     FileSize;
-		uint64_t     FilePosition;
-	} BitFile;
-
-	typedef struct BitIOPath {
-		char         BasePath[BitIOPathSize];
-		uint8_t      DigitsInSpecifier;
-		int64_t      FileNumber;
-		char         Extension[BitIOPathSize];
-	} BitIOPath;
-
-	typedef struct BitInput2 {
-		BitIOPath   *Path;
-		BitFile     *Source; // aka File
-		BitBuffer   *Data;   // Buffer stuff
-		ErrorStatus *Error;
-	} BitInput2;
-
-	typedef struct BitOutput2 {
-		BitIOPath   *Path;
-		BitFile     *Source;
-		BitBuffer   *Data;
-		ErrorStatus *Error;
-	} BitOutput2;
 
 	/*!
 	 @typedef        BitOutput
@@ -207,30 +168,36 @@ extern "C" {
 	 @constant       File              "Input file to read bits from".
 	 @constant       BitsUnavailable   "Number of previously read bits in Buffer".
 	 @constant       BitsAvailable     "Number of bits available for writing".
-	 @constant       BasePath          "Location and start of the name of the file, for use with format specified streams aka %03d".
-	 @constant       DigitsInSpecifier "Maybe this should be called number of digits?".
-	 @constant       FileNumber        "The number in the current specifier".
-	 @constant       Extension         "Everything after the format specifier to regenerate the complete path".
+	 @param          ErrorStatus       "pointer to Error struct".
 	 @constant       Buffer            "Buffer of BitIOBufferSize bits from File".
 	 */
 	typedef struct BitOutput {
 		FILE        *File;
 		uint64_t     BitsUnavailable;
 		uint64_t     BitsAvailable;
-		char         BasePath[BitIOPathSize];
-		uint8_t      DigitsInSpecifier;
-		int64_t      FileNumber;
-		char         Extension[BitIOPathSize];
-		int64_t      CurrentFormatSpecifier;
+		uint8_t      SystemEndian:2;
 		ErrorStatus *ErrorStatus;
 		uint8_t      Buffer[BitOutputBufferSize];
 	} BitOutput;
+
+	typedef struct BitBuffer {
+		uint64_t     BitsUnavailable;
+		uint64_t     BitsAvailable;
+		ErrorStatus *ErrorStatus;
+		uint8_t     *Buffer;
+	} BitBuffer;
 
 	enum Base {
 		Octal       =  8,
 		Decimal     = 10,
 		Hexadecimal = 16,
 	} Base;
+
+	enum Endian {
+		UnknownEndian = 0,
+		BigEndian     = 1,
+		LittleEndian  = 2,
+	} Endian;
 
 	typedef struct HuffmanTree {
 		uint16_t   Symbol[255];        // input symbol to be coded
@@ -455,6 +422,7 @@ extern "C" {
 	 @abstract                     "Shows the next X bits, without recording it as a read".
 	 @param    BitI                "Pointer to BitInput".
 	 @param    Bits2Peek           "Number of bits to peek".
+	 @param    InputEndian         "Byte order of the input file, if they don't match the system, it'll be swapped".
 	 */
 	uint64_t       PeekBits(BitInput *BitI, uint8_t Bits2Peek);
 
@@ -552,7 +520,7 @@ extern "C" {
 	 @param    Function            "Which function is calling Log?".
 	 @param    Description         "String describing what went wrong, if you need to use format specifiers, call snprintf".
 	 */
-	void           Log(int64_t SYSError, int64_t *ES, int64_t ESError, char Library[BitIOStringSize], char Function[BitIOStringSize], char Description[BitIOStringSize]);
+	void           Log(int64_t SYSError, ErrorStatus *ES, int64_t ESError, char Library[BitIOStringSize], char Function[BitIOStringSize], char Description[BitIOStringSize]);
 
 	/*!
 	 @abstract                     "Tells if the stream/buffer is byte aligned of not".
@@ -627,6 +595,8 @@ extern "C" {
 	void           WriteArithmetic(BitOutput *BitO, Probabilities *Probability, uint64_t Bits2Encode);
 
 	void           CloseBitBuffer(BitBuffer *Bits);
+
+	uint8_t        DetectSystemEndian(void);
 
 #ifdef __cplusplus
 }
