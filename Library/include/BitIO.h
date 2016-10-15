@@ -168,7 +168,7 @@ extern "C" {
 	 @constant       File              "Input file to read bits from".
 	 @constant       BitsUnavailable   "Number of previously read bits in Buffer".
 	 @constant       BitsAvailable     "Number of bits available for writing".
-	 @param          ErrorStatus       "pointer to Error struct".
+	 @constant       ErrorStatus       "pointer to Error struct".
 	 @constant       Buffer            "Buffer of BitIOBufferSize bits from File".
 	 */
 	typedef struct BitOutput {
@@ -247,6 +247,19 @@ extern "C" {
 	 @return                           "Returns the number of bits left".
 	 */
 	uint8_t        BitsRemaining(uint64_t BitsAvailable);
+
+	/*!
+	 @abstract                         "Computes the number of bits until the next byte".
+	 @return                           "Returns the number of bits left".
+	 */
+	uint8_t        BitsRemaining2(uint64_t BitsAvailable);
+
+	/*!
+	 @abstract                         "Rounds Number2Round up to it's next multiple".
+	 @param        Number2Round        "The number that should be rounded up".
+	 @param        Multiple            "The multiple you want your number rounded to".
+	 */
+	uint64_t       RoundUp2NearestMultiple(uint64_t Number2Round, uint8_t Multiple);
 
 	/*!
 	 @abstract                         "Converts an Signed int to a Unsigned int".
@@ -373,10 +386,10 @@ extern "C" {
 	/*!
 	 @abstract                     "Updates BitInput->Buffer, for further reading".
 
-	 @param    BitI                "Pointer to BitInput".
-	 @param    RelativeOffset      "Number of bytes from the beginning of the current file".
+	 @param    BitI                  "Pointer to BitInput".
+	 @param    RelativeOffsetInBytes "Number of bytes from the beginning of the current file".
 	 */
-	void           UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffset);
+	void           UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffsetInBytes);
 
 	/*!
 	 @abstract                     "Manages InputBuffer and hands out the requested bits".
@@ -422,7 +435,6 @@ extern "C" {
 	 @abstract                     "Shows the next X bits, without recording it as a read".
 	 @param    BitI                "Pointer to BitInput".
 	 @param    Bits2Peek           "Number of bits to peek".
-	 @param    InputEndian         "Byte order of the input file, if they don't match the system, it'll be swapped".
 	 */
 	uint64_t       PeekBits(BitInput *BitI, uint8_t Bits2Peek);
 

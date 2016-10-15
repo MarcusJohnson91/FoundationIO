@@ -44,6 +44,10 @@ extern "C" {
 		return (8 - (BitsAvailable % 8));
 	}
 
+    uint8_t BitsRemaining2(uint64_t BitsAvailable) { // UnitTest Unnecessary
+        return BitsAvailable % 8;
+    }
+
 	uint64_t Signed2Unsigned(int64_t Signed) { // In UnitTest
 		return (uint64_t)Signed;
 	}
@@ -53,13 +57,16 @@ extern "C" {
 	}
 
 	uint64_t Power2Mask(uint8_t Exponent) { // UnitTest Unnecessary
+		uint64_t Mask1 = 0, Mask2 = 0;
+
 		if (Exponent > 64) {
 			return EXIT_FAILURE;
 		}
-		uint64_t Mask1 = 0, Mask2 = 0;
-		Mask1          = 1 << (Exponent - 1);
-		Mask2          = Mask1 - 1;
-		return Mask1 + Mask2;
+
+		Mask1          = 1 << Exponent; // -1
+        Mask2          = Mask1 - 1;
+        //return Mask1 + Mask2;
+        return Mask2;
 		// Shift 1 (Exponent - 1) times, then take the result, subtract one, and add that to the result.
 	}
 
@@ -209,7 +216,7 @@ extern "C" {
 
                 if (strcasecmp(Path, "-s")    == 0) { // Specifier Offset
                     Argument += 1;
-                    snprintf(SpecifierOffset, 1, "%s", argv[Argument]);
+                    snprintf((char*)SpecifierOffset, 1, "%s", argv[Argument]);
                 }
 
                 if (strcasecmp(Path, "-o")    == 0) {
@@ -309,22 +316,20 @@ extern "C" {
 
 	/* End Input parsing functions */
 
-	void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffset) {
+	void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffsetInBytes) {
         uint64_t BytesRead = 0;
-        /*
-		if (RelativeOffset == 0) {
-			Log(SYSCritical, BitI->ErrorStatus->UpdateInputBuffer, NumberNotInRange, "BitIO", "UpdateInputBuffer", NULL);
-		}
-         */
-        fseek(BitI->File, RelativeOffset, SEEK_CUR);
+        fseek(BitI->File, RelativeOffsetInBytes, SEEK_CUR);
         BitI->FilePosition = ftell(BitI->File);
         //uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) ? Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) : BitI->FileSize - BitI->FilePosition;
         memset(BitI->Buffer, 0, BitInputBufferSize); // Bytes2Read
-        funlockfile(BitI->File);
         BytesRead = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File); // Bytes2Read
         if (BytesRead != BitInputBufferSize) { // Bytes2Read
 			Log(SYSWarning, BitI->ErrorStatus->UpdateInputBuffer, FreadReturnedTooLittleData, "BitIO", "UpdateInputBuffer", NULL);
 		}
+		uint64_t NEWBitsUnavailable = BitI->BitsUnavailable % 8;
+
+        BitI->BitsUnavailable = NEWBitsUnavailable;
+        BitI->BitsAvailable   = Bytes2Bits(BytesRead);
 	}
 
 	uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read) {
@@ -401,43 +406,39 @@ extern "C" {
 		}
 	}
 
-	uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek) {
-		//WARNING: You CAN'T read byte by byte, it simply won't work so stop trying. Also, this is faster, instruction wise.
-		uint64_t OutputData = 0;
-		uint8_t  Data       = 0;
-		uint8_t  BitsLeft   = Bits2Peek;
-		uint8_t  BitMask    = 0;
+    uint64_t RoundUp2NearestMultiple(uint64_t Number2Round, uint8_t Multiple) { // 15, 8
+        if ((Number2Round % 8) == 0) {
+            return Number2Round;
+        }
+        return Number2Round + (Multiple - (Number2Round % Multiple));
+    }
 
-		if ((Bits2Peek > 64) || (Bits2Peek <= 0)) {
-			char Description[BitIOStringSize] = {0};
-			snprintf(Description, BitIOStringSize, "Tried to peek %d bits, only 1-64 is valid\n", Bits2Peek);
-			Log(SYSError, &BitI->ErrorStatus->PeekBits, NumberNotInRange, "BitIO", "PeekBits", Description);
-		} else if (BitI->BitsAvailable < Bits2Peek) {
-			// InputBuffer can't completely satisfy the request, update it.
-			UpdateInputBuffer(BitI, 0);
-		} else {
-			while (BitsLeft > 0) {
-				OutputData           <<= 1;
-				BitMask                = 1 << (BitsRemaining(BitI->BitsUnavailable) - 1); // 1 << ((8 - (BitI->BitsUnavailable % 8)) -1);
-				Data                   = BitI->Buffer[Bits2Bytes(BitI->BitsUnavailable)] & BitMask;
-				Data                 >>= BitsRemaining(BitI->BitsUnavailable) - 1; // ((8 - (BitI->BitsUnavailable % 8)) -1);
-				OutputData            += Data;
-				BitI->BitsAvailable   -= 1;
-				BitI->BitsUnavailable += 1;
-				BitsLeft              -= 1;
-			}
-			/*
-			if ((InputEndian >= 0) && (InputEndian <= 2)) { // otherwise the endian is invalid
-				if (InputEndian != BitI->SystemEndian) {
-					SwapEndian64(OutputData);
-				}
-			}
-			 */
-			BitI->BitsAvailable       += Bits2Peek;
-			BitI->BitsUnavailable     -= Bits2Peek;
-		}
-		return OutputData;
-	}
+    uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek) {
+        uint8_t BitsAvailableInCurrentByte = 0, BitsUserWants = 0, RequestShift = 0, RawData = 0;
+		uint8_t Bits = 0;
+
+        for (uint64_t Byte = BitI->BitsUnavailable / 8; Byte < RoundUp2NearestMultiple(BitI->BitsUnavailable + Bits2Peek, 8); Byte++) {
+            //while (Bits < Bits2Peek) {
+            //for (uint64_t Byte = (BitI->BitsUnavailable % 8); Byte < ((BitI->BitsUnavailable + Bits2Peek) % 8); Byte++) {
+            // if Bits2Peek are less than BitsAvailableInCurrentByte, then you'll have to shift the user mask by BAICB - bits2peek
+            RequestShift = Bits2Peek < BitsAvailableInCurrentByte ? BitsAvailableInCurrentByte : Bits2Peek - BitsAvailableInCurrentByte;
+            BitsAvailableInCurrentByte = BitI->BitsAvailable % 8;
+
+            RawData = BitI->Buffer[(BitI->BitsUnavailable + Bits2Peek) / 8] & Power2Mask(BitsAvailableInCurrentByte); // << RequestShift
+            // RawData = 5 bits from byte 1, but how did we arrive to that conclusion? Because 8 bits per byte - 3 bits used = 5, AND 5 is less than or equal to Bits2Peek
+
+            BitsUserWants = Bits2Peek >= 8 ? 8 : Bits2Peek;
+            if (BitsAvailableInCurrentByte > BitsUserWants) {
+
+            }
+
+            BitI->BitsUnavailable += BitsRemaining(BitI->BitsUnavailable);
+            BitI->BitsAvailable   -= BitsRemaining(BitI->BitsUnavailable);
+            Bits += abs(((BitI->BitsAvailable % 8) - (Bits2Peek > 8 ? 8 : Bits2Peek)));
+        }
+
+        return 0;
+    }
 
 	void WriteBits(BitOutput *BitO, uint64_t Data2Write, size_t NumBits) {
 		if (NumBits <= 0) {
@@ -447,19 +448,20 @@ extern "C" {
 			if (BitO->BitsAvailable < NumBits) {
 				// Write the completed bytes out, save the uncompleted ones in the array.
 			}
-			while (BitO->BitsUnavailable >= Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable)) {
-				fwrite(BitO->Buffer, 1, Bits2Bytes(BitO->BitsUnavailable), BitO->File);
-				fflush(BitO->File);
-				memcpy(&BitO->Buffer, &BitO->Buffer + Bits2Bytes(BitO->BitsUnavailable), (Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable) - Bits2Bytes(BitO->BitsUnavailable)));
-				memset(BitO->Buffer, 0, Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable));
-				BitO->BitsUnavailable = (BitO->BitsUnavailable - ((BitO->BitsUnavailable / 8) * 8));
-			}
-			while (NumBits > 0) {
-				uint64_t X = Data2Write & BitsRemaining(BitO->BitsUnavailable);
-				BitO->Buffer[Bits2Bytes(BitO->BitsUnavailable)] += X;
-				BitO->BitsUnavailable++;
-				NumBits -= 1;
-			}
+
+            if (BitO->BitsAvailable < BitOutputBufferSize) { // while (BitO->BitsUnavailable >= BitOutputBufferSize) {
+                fwrite(BitO->Buffer, 1, Bits2Bytes(BitO->BitsUnavailable), BitO->File);
+                fflush(BitO->File);
+                memcpy(&BitO->Buffer, &BitO->Buffer + Bits2Bytes(BitO->BitsUnavailable), (Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable) - Bits2Bytes(BitO->BitsUnavailable)));
+                memset(BitO->Buffer, 0, Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable));
+                BitO->BitsUnavailable = (BitO->BitsUnavailable - ((BitO->BitsUnavailable / 8) * 8));
+            }
+
+            for (uint64_t Bit = 0; Bit < NumBits; Bit++) {
+                uint64_t X = Data2Write & BitsRemaining(BitO->BitsUnavailable);
+                BitO->Buffer[Bits2Bytes(BitO->BitsUnavailable)] += X;
+                BitO->BitsUnavailable++;
+            }
 			// FIXME: We need to just enlarge the buffer, the call a function to flush it all out to disk.
 		}
 	}
@@ -526,8 +528,18 @@ extern "C" {
 	void SkipBits(BitInput *BitI, int64_t Bits) {
 		// The point of this is to seek around in the file, in case you need to jumpover parts of memory
 		//
-		BitI->BitsAvailable   -= Bits;
-		BitI->BitsUnavailable += Bits;
+		if (Bits <= BitI->BitsAvailable) {
+			BitI->BitsAvailable   -= Bits;
+			BitI->BitsUnavailable += Bits;
+		} else {
+			// fseek shit here, in multiples of BitInputBufferSize
+			// So we need to skip 1,078,200 bits, which is 32 times the blocksize + 29624 bits, or 3078 bytes +
+
+			// 134,775 bytes to skip.
+
+			// so just call
+			UpdateInputBuffer(BitI, Bits2Bytes(Bits));
+		}
 
 		/*
 		 if ((BitI->BitsUnavailable + Bits) > BitI->BitsAvailable) {
