@@ -249,12 +249,6 @@ extern "C" {
 	uint8_t        BitsRemaining(uint64_t BitsAvailable);
 
 	/*!
-	 @abstract                         "Computes the number of bits until the next byte".
-	 @return                           "Returns the number of bits left".
-	 */
-	uint8_t        BitsRemaining2(uint64_t BitsAvailable);
-
-	/*!
 	 @abstract                         "Rounds Number2Round up to it's next multiple".
 	 @param        Number2Round        "The number that should be rounded up".
 	 @param        Multiple            "The multiple you want your number rounded to".
@@ -438,6 +432,8 @@ extern "C" {
 	 */
 	uint64_t       PeekBits(BitInput *BitI, uint8_t Bits2Peek);
 
+	uint64_t    NewPeekBits(BitInput *BitI, uint8_t Bits2Peek);
+
 	/*!
 	 @abstract                     "Writes bits to BitOutput->File".
 
@@ -608,7 +604,9 @@ extern "C" {
 
 	void           CloseBitBuffer(BitBuffer *Bits);
 
-	uint8_t        DetectSystemEndian(void);
+	int64_t        PerfectSubtract(int64_t Sub1, int64_t Sub2);
+
+	uint64_t       NewPeekBits3(BitInput *BitI, uint8_t Bits2Peek);
 
 #ifdef __cplusplus
 }

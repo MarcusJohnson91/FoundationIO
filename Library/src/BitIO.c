@@ -40,13 +40,14 @@ extern "C" {
 		return (Bytes * 8);
 	}
 
-	uint8_t BitsRemaining(uint64_t BitsAvailable) { // UnitTest Unnecessary
-		return (8 - (BitsAvailable % 8));
-	}
+    uint8_t BitsRemaining(uint64_t BitsAvailable) { // UnitTest Unnecessary // 2
+		//uint8_t Bits = 0;
+		// The problem with this function, is that it doesn't use as many bits as possible, so if there are 12 bits left, it'd say to read 4 from byte 1, when you can read all 8.
+		// Let's solve that.
 
-    uint8_t BitsRemaining2(uint64_t BitsAvailable) { // UnitTest Unnecessary
-        return BitsAvailable % 8;
-    }
+		//Bits = BitsAvailable > 8 ? 8 : BitsAvailable; // New result: 2 ; Old Result: 2
+		return BitsAvailable > 8 ? 8 : BitsAvailable;
+	}
 
 	uint64_t Signed2Unsigned(int64_t Signed) { // In UnitTest
 		return (uint64_t)Signed;
@@ -57,17 +58,20 @@ extern "C" {
 	}
 
 	uint64_t Power2Mask(uint8_t Exponent) { // UnitTest Unnecessary
-		uint64_t Mask1 = 0, Mask2 = 0;
+		//uint64_t Mask1 = 0, Mask2 = 0;
 
-		if (Exponent > 64) {
+		if ((Exponent > 64) || (Exponent <= 0)) {
 			return EXIT_FAILURE;
 		}
 
-		Mask1          = 1 << Exponent; // -1
+		/*
+		Mask1          = 0x80 >> Exponent; // Mask1          = 1 << Exponent;
         Mask2          = Mask1 - 1;
         //return Mask1 + Mask2;
         return Mask2;
 		// Shift 1 (Exponent - 1) times, then take the result, subtract one, and add that to the result.
+		 */
+        return ((1 << Exponent) - 1); // 7
 	}
 
 	uint64_t OnesCompliment2TwosCompliment(int64_t Input) { // All unset bits ABOVE the set bit are set, including those originally set
@@ -105,6 +109,29 @@ extern "C" {
 		return Count;
 	 }
 	 */
+
+    uint64_t RoundUp2NearestMultiple(uint64_t Number2Round, uint8_t Multiple) { // 15, 8
+        uint64_t Rounded = 0;
+        if ((Number2Round % 8) == 0) {
+            Rounded = Number2Round;
+        } else {
+            Rounded = Number2Round + (Multiple - (Number2Round % Multiple)); // 15 + (8 - (15 % 8))
+        }
+        return Rounded;
+    }
+
+    uint8_t DetectSystemEndian(void) { // this function always returns lil no matter what?
+        uint8_t SystemEndian = 0;
+        uint16_t Endian = 0xFFFE;
+        if (Endian == 0xFFFE) {
+            SystemEndian = LittleEndian;
+        } else if (Endian == 0xFEFF) {
+            SystemEndian = BigEndian;
+        } else {
+            SystemEndian = UnknownEndian;
+        }
+        return SystemEndian;
+    }
 
 	bool IsStreamByteAligned(uint64_t BitsUsed, uint8_t BytesOfAlignment) {
 		bool Truth = 0;
@@ -238,19 +265,6 @@ extern "C" {
         }
 	}
 
-	uint8_t DetectSystemEndian(void) { // this function always returns lil no matter what?
-		uint8_t SystemEndian = 0;
-		uint16_t Endian = 0xFFFE;
-		if (Endian == 0xFFFE) {
-			SystemEndian = LittleEndian;
-		} else if (Endian == 0xFEFF) {
-			SystemEndian = BigEndian;
-		} else {
-			SystemEndian = UnknownEndian;
-		}
-		return SystemEndian;
-	}
-
 	void InitBitInput(BitInput *BitI, ErrorStatus *ES, int argc, const char *argv[]) {
 		// FIXME: Remove any quotes on the path, or the issue could be that the -i and location are specified together...
 		if (argc < 3) {
@@ -289,12 +303,6 @@ extern "C" {
 		}
 	}
 
-	void ExitBitIO(BitInput *Input, BitOutput *Output) {
-		CloseBitInput(Input);
-		CloseBitOutput(Output);
-		closelog();
-	}
-
 	void CloseBitInput(BitInput *BitI) {
 		fclose(BitI->File);
 		memset(BitI->Buffer, 0, Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable));
@@ -313,8 +321,6 @@ extern "C" {
 		Bits->Buffer          = NULL;
 		Bits->ErrorStatus     = NULL;
 	}
-
-	/* End Input parsing functions */
 
 	void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffsetInBytes) {
         uint64_t BytesRead = 0;
@@ -340,7 +346,7 @@ extern "C" {
 			snprintf(Description, BitIOPathSize, "ReadBits only supports reading 1-64 bits at a time, you tried reading: %d bits\n", Bits2Read);
 			Log(SYSCritical, &BitI->ErrorStatus->ReadBits, NumberNotInRange, "BitIO", "ReadBits", Description);
 		} else {
-			OutputData             = PeekBits(BitI, Bits2Read); // , InputEndian
+			OutputData             = NewPeekBits3(BitI, Bits2Read); // , InputEndian
 			if (BitI->ErrorStatus->PeekBits != Success) {
 				BitI->ErrorStatus->ReadBits  = BitI->ErrorStatus->PeekBits;
 			}
@@ -387,7 +393,7 @@ extern "C" {
 		if (StopBit != (0|1)) {
 			BitI->ErrorStatus->ReadRICE = NumberNotInRange;
 		} else {
-			while (PeekBits(BitI, 1) != StopBit) { // The StopBit needs to be included in the count.
+			while (NewPeekBits3(BitI, 1) != StopBit) { // The StopBit needs to be included in the count.
 				SkipBits(BitI, 1);
 				BitCount += 1;
 			}
@@ -406,25 +412,306 @@ extern "C" {
 		}
 	}
 
-    uint64_t RoundUp2NearestMultiple(uint64_t Number2Round, uint8_t Multiple) { // 15, 8
-        if ((Number2Round % 8) == 0) {
-            return Number2Round;
+	uint64_t NewPeekBits3(BitInput *BitI, uint8_t Bits2Peek) {
+		int8_t Bits = Bits2Peek, UserBits = 0, SystemBits = 0, LeftShift = 0, RightShift = 0, Mask = 0, Data = 0, OutputData = 0;
+
+		if (BitI->BitsAvailable < Bits) {
+			UpdateInputBuffer(BitI, 0);
+		}
+
+		while (Bits > 0) {
+			UserBits               = BitsRemaining(Bits);
+			SystemBits             = BitsRemaining(BitI->BitsAvailable);
+			if (UserBits < SystemBits) {
+				Bits               = UserBits;
+				LeftShift          = SystemBits - UserBits;
+				Mask               = Power2Mask(Bits) << LeftShift;
+			} else { // System bits are more constrained
+				Bits               = SystemBits;
+				RightShift         = UserBits - SystemBits;
+				Mask               = Power2Mask(Bits);
+			}
+
+			OutputData           <<= LeftShift;
+			Data                  += BitI->Buffer[BitI->BitsUnavailable / 8] & Mask;
+			if (SystemBits > UserBits) {
+				Data             >>= RightShift;
+			}
+			OutputData            += Data;
+			BitI->BitsAvailable   -= Bits;
+			BitI->BitsUnavailable += Bits;
+			Bits                   = Bits2Peek - Bits;
+		}
+
+		BitI->BitsAvailable       += Bits2Peek;
+		BitI->BitsUnavailable     -= Bits2Peek;
+
+		return OutputData;
+	}
+
+	uint64_t NewPeekBits2(BitInput *BitI, uint8_t Bits2Peek) {
+		uint64_t OutputData = 0, UserBits2Read = 0, SystemBitsAvailable = 0, UserBitsRequested = 0, SystemBits2Read = 0, CurrentByte = 0, Bits = Bits2Peek, Bits2Read = 0, Shift = 0, Mask = 0, ShiftedMask = 0, RawData = 0, LeftShift = 0, RightShift = 0;
+
+		// The ONLY time the user request matters, is when it's less than the system has available.
+		// So, if the System has fewer bits than the user wants, you go with the system, if the user wants fewer bits than the system has available, go with user + shift the mask.
+
+		if (BitI->BitsAvailable < Bits2Peek) {
+			UpdateInputBuffer(BitI, 0);
+		}
+
+		UserBits2Read       = BitsRemaining(Bits);
+		SystemBitsAvailable = BitsRemaining(BitI->BitsAvailable);
+		if (UserBits2Read < SystemBitsAvailable) {
+			Bits2Read       = UserBits2Read;
+			LeftShift       = SystemBitsAvailable - UserBits2Read;
+		} else { // System bits are more constrained
+			Bits2Read       = SystemBitsAvailable;
+			RightShift      = UserBits2Read - SystemBitsAvailable;
+		}
+
+		while (Bits > 0) {
+			SystemBitsAvailable = BitsRemaining(BitI->BitsAvailable);
+			UserBitsRequested   = BitsRemaining(Bits);
+
+			if (UserBitsRequested < SystemBitsAvailable) {
+				// User mask, and invert shift the user mask.
+			} else {
+				// SystemMask
+			}
+
+			CurrentByte         = BitI->BitsUnavailable / 8;
+			UserBits2Read       = Bits >= 8 ? 8 : Bits; // This is the user request, not the system available.
+			SystemBits2Read     = UserBits2Read > BitI->BitsAvailable % 8 ? BitI->BitsAvailable % 8 : UserBits2Read;
+			Mask                = UserBits2Read <  BitI->BitsAvailable % 8 ? Power2Mask(UserBits2Read) << ((BitI->BitsAvailable % 8) - UserBits2Read) : Power2Mask(UserBits2Read);
+			RawData             = BitI->Buffer[CurrentByte] & Mask;
+			OutputData        <<= UserBits2Read;
+			OutputData         += UserBits2Read < BitI->BitsAvailable % 8 ? (RawData >>= ((BitI->BitsAvailable % 8) - UserBits2Read)) : RawData; // If Bits2Read is less than the bits availe shift.
+			// But what about if the user request is more than the system can provide? That case should be handled by Bits2Read
+
+			// Bits2Read should be as many bits the buffer can provide.
+			// Bits2Read = Bits >= 8 ? 8 : Bits;
+			// if Bits2Read is more than the system can provide, Bits2Read should become what the system can provide
+
+			/*
+			if (UserBits2Read > BitI->BitsAvailable % 8) { // A : B
+				SystemBits2Read = BitI->BitsAvailable % 8; // X
+			} else {
+				SystemBits2Read = UserBits2Read;
+			}
+			 */
+
+			/*
+			if (Bits2Read < BitI->BitsAvailable % 8) { // A < B // Then we need to shift RawData
+				OutputData += (RawData >>= ((BitI->BitsAvailable % 8) - Bits2Read));
+			} else {
+				OutputData += RawData;
+			}
+			 */
+		}
+
+		return OutputData;
+	}
+
+    uint64_t NewPeekBits(BitInput *BitI, uint8_t Bits2Peek) { // 7
+        uint64_t OutputData = 0, Bits2ReadFromByte = 0, CurrentByte = 0, Bits = Bits2Peek, Shift = 0, Mask = 0, ShiftedMask = 0, RawData = 0;
+
+        if (BitI->BitsAvailable < Bits2Peek) {
+            UpdateInputBuffer(BitI, 0);
         }
-        return Number2Round + (Multiple - (Number2Round % Multiple));
+
+        while (Bits > 0) { // 5
+            CurrentByte            = BitI->BitsUnavailable / 8; // RoundUp2NearestMultiple(BitI->BitsUnavailable, 8)
+            Bits2ReadFromByte      = Bits >= 8 ? 8 : Bits;
+
+            Mask                   = Power2Mask(Bits2ReadFromByte);
+            Shift                  = (BitI->BitsAvailable % 8) - Bits2ReadFromByte; // (8 - Bits2ReadFromByte); // PerfectSubtract(BitsRemaining(BitI->BitsAvailable), Bits2ReadFromByte); // is 6, should be 1
+
+			Mask                   = Bits2ReadFromByte <  BitI->BitsAvailable % 8 ? Power2Mask(Bits2ReadFromByte) << ((BitI->BitsAvailable % 8) - Bits2ReadFromByte) : Power2Mask(Bits2ReadFromByte);
+
+
+            // You'll need to shift the mask when less than 8 bits are requested on the user side, AND the user requested less bits than the mask.
+            // When you do that^ you'll also need to shift the RawData
+
+            ShiftedMask            = (Mask << Shift); // BitI->BitsUnavailable % 8 <= 4 ? Mask << (8 - Bits2ReadFromByte) : Power2Mask(Bits2ReadFromByte);
+            /*
+            if (BitI->BitsUnavailable <= 4) { // A : B
+                ShiftedMask = Mask << Shift; // X
+            } else {
+                ShiftedMask = Mask; // Y
+            }
+             */
+            //Shift                  = BitI->BitsUnavailable % 8 > 4 ? BitI->BitsUnavailable % 8 : (8 - Bits2ReadFromByte);
+            // If the byte is shifted 5 spaces, there shouldn't be a second mask. if it's shifted 8 spaces, it needs to be shifted 3 spaces.
+
+            RawData                = BitI->Buffer[CurrentByte] & ShiftedMask; // (Mask << Shift) // PerfectSubtract(BitI->BitsUnavailable % 8, Bits2ReadFromByte) // << (8 - Bits2ReadFromByte)
+            //RawData              >>= Shift; // RawData >>= Shift;
+            /*
+            if (BitI->BitsUnavailable % 8 > 4) { // A:B
+                Shift = BitI->BitsUnavailable % 8; // X
+            } else {
+                Shift = (8 - Bits2ReadFromByte);
+            }
+            */
+            OutputData           <<= Bits2ReadFromByte;
+            OutputData            += RawData;
+
+            // This does not account for BitsUnavailable. Also, it shifts when it shouldn't.
+
+
+            // When should the shift kick in? Only when the user request is less than what the system can provide.
+            // In this MetadataBlockTpe case, it is exactly equal to the number of bits available.
+            // So, in order to get it to work properly the shift should be base on the different between the System Provided, and the UserRequested.
+            // For that, they should be added together?
+            // If the system has 6 bits available, and the user requests 4, 6 - 4 = 2.
+            // the problem comes when the user requests 5 and the system has 4.
+            Bits                  -= Bits2ReadFromByte;
+            BitI->BitsAvailable   -= Bits2ReadFromByte;
+            BitI->BitsUnavailable += Bits2ReadFromByte;
+
+
+            /*
+            if (Bits2Peek < BitI->BitsAvailable % 8) {
+                // You need to shift the mask
+                OutputData               += BitI->Buffer[BitI->BitsUnavailable / 8] & (Power2Mask(Bits2Peek) << ((BitI->BitsAvailable % 8) - Bits2Peek));
+            } else {
+                // Use regular mask that only accounts for the bits available in the buffer.
+                OutputData               += BitI->Buffer[BitI->BitsUnavailable / 8] & Power2Mask(BitI->BitsUnavailable);
+            }
+             */
+
+        }
+        BitI->ErrorStatus->PeekBits = Success;
+        BitI->BitsAvailable        += Bits2Peek;
+        BitI->BitsUnavailable      -= Bits2Peek;
+        return OutputData;
     }
 
+	/*
     uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek) {
-        uint8_t BitsAvailableInCurrentByte = 0, BitsUserWants = 0, RequestShift = 0, RawData = 0;
-		uint8_t Bits = 0;
+        uint8_t  BitsAvailableInCurrentByte = 0, BitsUserWants = 0, RequestShift = 0, Bits = 0;
+        int8_t   BitsUsed = 0, Bits2Read = Bits2Peek;
+        uint64_t RawData = 0, OutputData = 0, BitsUnavailable = 0;
 
-        for (uint64_t Byte = BitI->BitsUnavailable / 8; Byte < RoundUp2NearestMultiple(BitI->BitsUnavailable + Bits2Peek, 8); Byte++) {
+
+        // UserMask is just stupid, like what defines the number of bits to get per loop is the number of bits available in the buffered byte, and when that's all good, THEN the user request matters.
+
+        // The user request will always be at least 1 bit, otherwise the loop would end and the function would return.
+        // So, we don't need to worry about the user mask, ALSO if there's 1 bit available in the buffer, and the user wants 1 bit, the masks will cancel each other out.
+
+        // So, in order to get the mask to work properly, we should take the lowest of available bits, from the request and BitsAvailable, and then shift that over by the BitsAvailable?
+
+        // ALSO, we need to read from the MSB to the LSB in a byte, aka from the left to the right.
+
+        // if the user wants to read 8 bits, and 7 bits have already been read, then all that's left in this byte is the LSB aka 0x1.
+        // so the mufucka should mask the buffer with 0x1, and extract it. and then you may need to shift the mask?
+
+
+		while (Bits2Read > 0) { // (Bits2Peek > 0) && ((Bits2Peek % 8) >= 8)
+            //
+            BitsUsed               = BitsRemaining(BitI->BitsUnavailable); // this is somehow hardcoded to get 8 bits.
+			RawData              <<= BitsUsed;
+
+            RawData               += BitI->Buffer[BitI->BitsUnavailable / 8] & (Power2Mask(Bits2Read % 8) << (8 - Bits2Read)); // (Power2Mask(BitsRemaining(BitI->BitsUnavailable)) << (8 - BitsRemaining(BitI->BitsUnavailable)));
+            Bits2Read             -= BitsUsed;
+            BitI->BitsAvailable   -= BitsUsed;
+            BitI->BitsUnavailable += BitsUsed; // when negative this goes out of alignment
+
+        }
+		OutputData = RawData;
+        BitI->BitsAvailable       += Bits2Peek;
+        BitI->BitsUnavailable     -= Bits2Peek;
+
+
+
+
+        if (Bits2Peek < BitI->BitsAvailable % 8) {
+            // You need to shift the mask
+            RawData               += BitI->Buffer[BitI->BitsUnavailable / 8] & (Power2Mask(Bits2Peek) << ((BitI->BitsAvailable % 8) - Bits2Peek));
+        } else {
+            // Use regular mask that only accounts for the bits available in the buffer.
+            RawData               += BitI->Buffer[BitI->BitsUnavailable / 8] & (Power2Mask(BitI->BitsUnavailable);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Let's try reading 1 bit.
+
+        // Bits2Read = 1.
+        // BitsUsed  = 7.
+        // RawData   = BitI->Buffer[0] &
+
+        // For 1 bit, the BitsRemaining part messes it up, for 8 bits NOT having the BitsRemaining part messes it up. so what do I need to do?
+        // well, the whole point of bits remaining is to calculate the number of bits that are available in the buffered byte. 1 bit is a user request thing, so it needs to be handled differently.
+
+        // So how do I handle those competing demands? What do those 2 demands have in common? Well they both deal with how many bits should be extracted from a byte. they differe in only how many bits should be extracted, and I'll have to take the number of bits the byte can give into account when calculating ho many bits the user requests from the byte.
+
+        // In order to take both (system available AND user request) into account, I'll need to add both together and divide by 2?
+
+        // UserRequest = 17.
+
+        if (Bits2Read >= 8) { // A >= B
+            UserRequest = 8; // X
+        } else {
+            UserRequest = Bits2Read; // Y
+        }
+
+        UserRequest = Bits2Read >= 8 ? 8 : Bits2Read; // Max bits the user can accept.
+
+        SystemAvailable = BitI->BitsUnavailable % 8;
+
+        if (SystemAvailable < UserRequest) {
+            // Then go with the SystemAvailable
+        } else {
+            // Go with UserRequest. btw the UserRequest has nothing to do with where the bits are selected from.
+        }
+
+        Bits2ReadFromThisByte = UserRequest < BitI->BitsUnavailable % 8 ? UserRequest : BitI->BitsUnavailable % 8; // number of bits to read this loop. This is where the mask and shifting comes into play.
+        Mask = Power2Mask(Bits2ReadFromThisByte);
+
+        // Mask = Power2Mask(Bits2ReadFromThisByte);
+        // Shift = BitI->BitsUnavailable - Bits2ReadFromThisByte
+
+        // So lets say we should read 3 bits from the buffer, and the first 5 are unavailable; that means it shouldn't be shifted at all.
+
+        // If 1 bit has been used, and 1 bit has been requested, that bit will be gotten from 0x40, aka 0x80 shifted to the right once.
+
+        // So the mask is shifted by (8 - (the request - system available))?
+
+        // BY FAR THE BIGGEST PROBLEM is in selecting how the buffer is masked.
+
+        // ; if it's 8 - Bits2ReadFromThisByte
+
+
+
+
+
+
+        // ANCIENT CODE BELOW
+        /*
+        BitsUnavailable = BitI->BitsUnavailable;
+
+
+(BitsUnavailable + Bits2Peek)
+        for (uint64_t Byte = BitI->BitsUnavailable / 8; Byte < (RoundUp2NearestMultiple(Bits2Peek, 8) + BitsUnavailable); Byte++) {
             //while (Bits < Bits2Peek) {
             //for (uint64_t Byte = (BitI->BitsUnavailable % 8); Byte < ((BitI->BitsUnavailable + Bits2Peek) % 8); Byte++) {
             // if Bits2Peek are less than BitsAvailableInCurrentByte, then you'll have to shift the user mask by BAICB - bits2peek
-            RequestShift = Bits2Peek < BitsAvailableInCurrentByte ? BitsAvailableInCurrentByte : Bits2Peek - BitsAvailableInCurrentByte;
-            BitsAvailableInCurrentByte = BitI->BitsAvailable % 8;
+            BitsAvailableInCurrentByte = BitsRemaining(BitI->BitsAvailable);
+            OutputData <<= BitsAvailableInCurrentByte;
+            RequestShift = Bits2Peek < BitsAvailableInCurrentByte ? BitsAvailableInCurrentByte : (Bits2Peek - BitsAvailableInCurrentByte) % 8;
 
-            RawData = BitI->Buffer[(BitI->BitsUnavailable + Bits2Peek) / 8] & Power2Mask(BitsAvailableInCurrentByte); // << RequestShift
+            RawData = BitI->Buffer[Byte] & Power2Mask(BitsAvailableInCurrentByte); // << RequestShift
             // RawData = 5 bits from byte 1, but how did we arrive to that conclusion? Because 8 bits per byte - 3 bits used = 5, AND 5 is less than or equal to Bits2Peek
 
             BitsUserWants = Bits2Peek >= 8 ? 8 : Bits2Peek;
@@ -432,13 +719,18 @@ extern "C" {
 
             }
 
+            OutputData += RawData;
+
             BitI->BitsUnavailable += BitsRemaining(BitI->BitsUnavailable);
             BitI->BitsAvailable   -= BitsRemaining(BitI->BitsUnavailable);
             Bits += abs(((BitI->BitsAvailable % 8) - (Bits2Peek > 8 ? 8 : Bits2Peek)));
         }
+         */
 
-        return 0;
+	/*
+        return OutputData;
     }
+	 */
 
 	void WriteBits(BitOutput *BitO, uint64_t Data2Write, size_t NumBits) {
 		if (NumBits <= 0) {
@@ -525,20 +817,33 @@ extern "C" {
 		}
 	}
 
+    int64_t PerfectSubtract(int64_t Sub1, int64_t Sub2) { // 8, 4
+        int64_t Value = 0;
+        if (Sub1 >= Sub2) {
+            Value = Sub1 - Sub2;
+        } else {
+            Value = Sub2 - Sub1;
+        }
+        return Value;
+    }
+
 	void SkipBits(BitInput *BitI, int64_t Bits) {
 		// The point of this is to seek around in the file, in case you need to jumpover parts of memory
-		//
+		// if you're skipping more than one buffer of memory, you'll need to use fseek.
 		if (Bits <= BitI->BitsAvailable) {
 			BitI->BitsAvailable   -= Bits;
 			BitI->BitsUnavailable += Bits;
 		} else {
 			// fseek shit here, in multiples of BitInputBufferSize
-			// So we need to skip 1,078,200 bits, which is 32 times the blocksize + 29624 bits, or 3078 bytes +
+			// So we need to skip 1,078,200 bits, which is 32 times the blocksize + 29624 bits, or 3078 bytes + (BitInputBufferSize * 32)
 
 			// 134,775 bytes to skip.
 
 			// so just call
-			UpdateInputBuffer(BitI, Bits2Bytes(Bits));
+			fseek(BitI->File, Bits2Bytes(Bits - BitI->BitsAvailable), SEEK_CUR); // Bits2Bytes(PerfectSubtract(BitI->BitsAvailable, Bits))
+            BitI->BitsAvailable   = 0;
+            BitI->BitsUnavailable = 0;
+            UpdateInputBuffer(BitI, 0); // Bits2Bytes(Bits)
 		}
 
 		/*
@@ -682,11 +987,11 @@ extern "C" {
 		}
 
 		//time_t *Time;
-		struct tm *Time2;
-        char CurrentTime[26];
+		struct tm *Time2 = calloc(sizeof(struct tm), 1);
+        char CurrentTime[26] = {0};
 		//time(Time);
 		StringSize = strftime(CurrentTime, 26, "%A, %B %e, %g+1000: %I:%M:%S %p %Z", Time2);
-		if ((StringSize <= 0) || (StringSize > BitIOStringSize)) {
+		if ((StringSize < 0) || (StringSize > BitIOStringSize)) {
 			fprintf(stderr, "BitIO - Log: String too big %zu\n", StringSize);
 		}
 
