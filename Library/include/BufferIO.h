@@ -432,8 +432,6 @@ extern "C" {
 	 */
 	uint64_t       PeekBits(BitInput *BitI, uint8_t Bits2Peek);
 
-	uint64_t    NewPeekBits(BitInput *BitI, uint8_t Bits2Peek);
-
 	/*!
 	 @abstract                     "Writes bits to BitOutput->File".
 
@@ -606,7 +604,13 @@ extern "C" {
 
 	int64_t        PerfectSubtract(int64_t Sub1, int64_t Sub2);
 
-	uint64_t       NewPeekBits3(BitInput *BitI, uint8_t Bits2Peek);
+    /*
+     @abstract                     "Integer version of pow, for when casting isn't enough".
+     @warning                      "The code is ugly af, but it works so whateve".
+     */
+    uint64_t       Power(uint8_t Base, uint32_t Exponent);
+
+    uint64_t       MyRand(uint64_t Minimum, uint64_t Maximum);
 
 #ifdef __cplusplus
 }
