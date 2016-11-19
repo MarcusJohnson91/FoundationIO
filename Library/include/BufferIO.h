@@ -56,7 +56,7 @@ extern "C" {
 	 @constant       BitIOPathSize             "Maximum size of a path in the filesystem in BitIO".
 	 @constant       BitIOUUIDSize             "size of a UUIDString including null terminator".
 	 */
-	enum BitIOConstants {
+	extern enum BitIOConstants {
 		BitInputBufferSize        = 4096,
 		BitInputBufferSizeInBits  = BitInputBufferSize * 8,
 		BitOutputBufferSize       = 4096,
@@ -69,7 +69,7 @@ extern "C" {
 
 	extern uint64_t BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Input/Output parsers.
 
-	enum SystemErrors {
+	extern enum SystemErrors {
 		SYSEmergency               = 1,
 		SYSPanic                   = 1,
 		SYSAlert                   = 2,
@@ -86,7 +86,7 @@ extern "C" {
 	 @abstract                     "List of error codes the various functions in BitIO set in ErrorStatus".
 	 @remark                       "FIXME: Should the error codes be negative or positive?".
 	 */
-	enum ErrorCodes {
+	extern enum ErrorCodes {
 		/* begin BitIO specific error codes */
 		Success                    = 9,
 		NotEnoughMemory            = 10,
@@ -101,10 +101,10 @@ extern "C" {
 		FreadReturnedTooLittleData = 19,
 		InvalidData                = 20,
 		InvalidCRC                 = 21,
-        InvalidMarker              = 22,
+		InvalidMarker              = 22,
 	} ErrorCodes;
 
-	enum HuffmanConstants {
+	extern enum HuffmanConstants {
 		Huffman_MaxLengthCodes      = 286,
 		Huffman_MaxDistanceSymbols  = 30,
 		Huffman_MaxSymbols          = Huffman_MaxLengthCodes + Huffman_MaxDistanceSymbols,
@@ -132,6 +132,7 @@ extern "C" {
 		int64_t      WriteBits;
 		int64_t      WriteBuffer;
 		int64_t      WriteRICE;
+		int64_t      VerifyCRC;
 	} ErrorStatus;
 
 	/*!
@@ -175,7 +176,7 @@ extern "C" {
 		FILE        *File;
 		uint64_t     BitsUnavailable;
 		uint64_t     BitsAvailable;
-		uint8_t      SystemEndian:2;
+		uint8_t      SystemEndian;
 		ErrorStatus *ErrorStatus;
 		uint8_t      Buffer[BitOutputBufferSize];
 	} BitOutput;
@@ -187,13 +188,13 @@ extern "C" {
 		uint8_t     *Buffer;
 	} BitBuffer;
 
-	enum Base {
+	extern enum Base {
 		Octal       =  8,
 		Decimal     = 10,
 		Hexadecimal = 16,
 	} Base;
 
-	enum Endian {
+	extern enum Endian {
 		UnknownEndian = 0,
 		BigEndian     = 1,
 		LittleEndian  = 2,
@@ -203,6 +204,15 @@ extern "C" {
 		uint16_t   Symbol[255];        // input symbol to be coded
 		uint16_t   HuffmanCode[255];   // Encoded value for that symbol
 	} HuffmanTree;
+
+	/*
+	 @abstract                     "Type to contain hyphenated, null terminated UUID strings".
+
+	 @param   String               "char array to contain the UUIDString".
+	 */
+	typedef struct UUIDString {
+		uint8_t String[BitIOUUIDSize];
+	} UUIDString;
 
 	/*!
 	 @abstract                         "Swap endian of 16 bit integers".
@@ -520,13 +530,11 @@ extern "C" {
 	 @abstract                     "Logs errors to log files, and stderr; and mail if Critical/Panic."
 
 	 @param    SYSError            "Error message prefixed by SYS in ErrorCodes".
-	 @param    ES                  "Pointer to the variable in ErrorStatus that should be set to ESError.".
-	 @param    ESError             "Error code to add to ErrorStatus".
 	 @param    Library             "Name of the program or library that called this function, to name the logfile".
 	 @param    Function            "Which function is calling Log?".
 	 @param    Description         "String describing what went wrong, if you need to use format specifiers, call snprintf".
 	 */
-	void           Log(int64_t SYSError, ErrorStatus *ES, int64_t ESError, char Library[BitIOStringSize], char Function[BitIOStringSize], char Description[BitIOStringSize]);
+	void           Log(int64_t SYSError, char Library[BitIOStringSize], char Function[BitIOStringSize], char Description[BitIOStringSize]);
 
 	/*!
 	 @abstract                     "Tells if the stream/buffer is byte aligned of not".
@@ -557,15 +565,6 @@ extern "C" {
 		double Maximum;
 		double Minimum;
 	} Probabilities;
-
-	/*
-	 @abstract                     "Type to contain hyphenated, null terminated UUID strings".
-
-	 @param   String               "char array to contain the UUIDString".
-	 */
-	typedef struct UUIDString {
-		char String[BitIOUUIDSize];
-	} UUIDString;
 
 	/*!
 	 @abstract                     "Reads raw UUID/GUID from the bitstream".
@@ -598,20 +597,199 @@ extern "C" {
 	 */
 	uint64_t       ReadArithmetic(BitInput *Input, uint64_t *MaximumTable, uint64_t *MinimumTable, size_t TableSize, uint64_t Bits2Decode);
 
-	void           WriteArithmetic(BitOutput *BitO, Probabilities *Probability, uint64_t Bits2Encode);
 
-	void           CloseBitBuffer(BitBuffer *Bits);
+	void           ReadUUID(BitInput *BitI, UUIDString *UUID);
 
-	int64_t        PerfectSubtract(int64_t Sub1, int64_t Sub2);
+	void           ConvertGUID2UUID(UUIDString *String2Convert, UUIDString *Converted);
 
-    /*
-     @abstract                     "Integer version of pow, for when casting isn't enough".
-     @warning                      "The code is ugly af, but it works so whateve".
-     */
-    uint64_t       Power(uint8_t Base, uint32_t Exponent);
+	void           WriteUUID(BitOutput *BitO, UUIDString *UUID);
 
-    uint64_t       MyRand(uint64_t Minimum, uint64_t Maximum);
+	bool           CompareUUIDStrings(UUIDString *UUID1, UUIDString *UUID2);
 
+
+
+
+
+
+
+
+
+
+
+
+	// If the first 2 bits in a code point = 10, it's a "data" code point.
+	// if the first 2 bits = 11, it's the first codepoint in a character, and as a result of that it will tell how many more codepoints in the character there are
+
+	extern enum UTF8Constants { // UTF-8 strings are Big Endian by default, therefore 0xFEFF is correct. 0xFFFE needs to be swapped
+		UTF8String_MaxStringSize            = 65535,
+		UTF8String_MinStringSize            = 255,
+		UTF8String_MaxCodeUnitsInCodePoint  = 4,
+		UTF8String_MaxCodeUnits             = UTF8String_MaxStringSize * UTF8String_MaxCodeUnitsInCodePoint,
+		UTF8String_MinCodeUnits             = UTF8String_MinStringSize * UTF8String_MaxCodeUnitsInCodePoint,
+		UTF8String_MaxValue                 = 0x10FFFF, // highest valid Unicode codepoint.
+		UTF8String_BOM1_BE                  = 0xFEFF,
+		UTF8String_BOM1_LE                  = 0xFFFE,
+		UTF8String_BOM2_BE                  = 0xEFBBBF,
+		UTF8String_BOM2_LE                  = 0xBFBBEF,
+		UTF8String_LineFeed                 = 0x0A,
+		UTF8String_VerticalTab              = 0x0B,
+		UTF8String_FormFeed                 = 0x0C,
+		UTF8String_CarriageReturn           = 0x0D,
+		UTF8String_NextLine                 = 0x85,
+		UTF8String_LineSeperator            = 0x2028,
+		UTF8String_ParagraphSeperator       = 0x2029,
+	} UTF8Constants;
+
+	extern enum BOMType {
+		NoBOM   = 0,
+		BOM1_BE = 1,
+		BOM1_LE = 2,
+		BOM2_BE = 3,
+		BOM2_LE = 4,
+	} BOMType;
+
+	extern enum CodePointType {
+		FourCodeUnitsInCodePoint,
+		ThreeCodeUnitsInCodePoint,
+		TwoCodeUnitsInCodePoint,
+		OneCodeUnitInCodePoint,
+	} CodePointType;
+
+	extern enum UTF8StringErrorCodes {
+		NotEnoughRoomToConcatenate      = 1,
+		CharacterIsContinuationCodeUnit = 2,
+	} UTF8StringErrorCodes;
+
+	extern enum DiacriticalMarks { // Starts at 0x300, ends at 0x36F
+		GraveAccent                   = 0x300,
+		AcuteAccent                   = 0x301,
+		CircumflexAccent              = 0x302,
+		TildeAccent                   = 0x303,
+		MacronAccent                  = 0x304,
+		OverlineAccent                = 0x305,
+		BreveAccent                   = 0x306,
+		DotAccent                     = 0x307,
+		DieresisAccent                = 0x308,
+		TopHookAccent                 = 0x309,
+		RingAccent                    = 0x30A,
+		DoubleAcuteAccent             = 0x30B,
+		CaronAccent                   = 0x30C,
+		VerticalLineAboveAccent       = 0x30D,
+		DoubleVerticalLineAboveAccent = 0x30E,
+		DoubleGraveAccent             = 0x30F,
+		CandrabinduAccent             = 0x310,
+		InvertedBreveAccent           = 0x311,
+		TurnedCommaAboveAccent        = 0x312,
+		CommaAboveAccent              = 0x313,
+		ReversedCommaAboveAccent      = 0x314,
+		CommaAboveRightAccent         = 0x315,
+		GraveBelowAccent              = 0x316,
+		AcuteBelowAccent              = 0x317,
+		LeftTackBelowAccent           = 0x318,
+		RightTackBelowAccent          = 0x319,
+		LeftAngleAboveAccent          = 0x31A,
+		HornAccent                    = 0x31B,
+		LeftHalfRingBelow             = 0x31C,
+		UpTackBelow                   = 0x31D,
+		DownTackBelow                 = 0x31E,
+		PlusSignBelow                 = 0x31F,
+		MinusSignBelow                = 0x320,
+		PalatalizedHookBelow          = 0x321,
+		RetroflexHookBelow            = 0x322,
+		DotBelow                      = 0x323,
+		DieresisBelow                 = 0x324,
+		RingBelow                     = 0x325,
+		CommaBelow                    = 0x326,
+		Cedilla                       = 0x327,
+		Ogonek                        = 0x328,
+		VerticalLineBelow             = 0x329,
+		BridgeBelow                   = 0x32A,
+		InvertedDoubleArchBelow       = 0x32B,
+		CaronBelow                    = 0x32C,
+		CircumflexAccentBelow         = 0x32D,
+		BreveBelow                    = 0x32E,
+		InvertedBreveBelow            = 0x32F,
+		TildeBelow                    = 0x330,
+		MacronBelow                   = 0x331,
+	} DiacriticalMarks;
+
+	extern enum PrecomposedCodePoints {
+		CapitalAcuteA = 0xC1,
+		LowerAcuteA   = 0xE1,
+	} PrecomposedCodePoints;
+
+	typedef struct UTF8StringErrors {
+		int64_t ConcatenateStrings;
+		int64_t CompareStrings;
+		int64_t RemoveCharacter;
+	} UTF8StringErrors;
+
+	/*!
+	 @abstract                        "Structure to hold various variables to contain a string".
+	 @constant StringSizeInCodeUnits  "Total number of bytes in the string".
+	 @constant StringSizeInCodePoints "Size of string in the Unicode equilivent of characters"
+	 @constant CharacterSize          "Array to hold the number of Code Points in each UTF8 character, 2 bits each, 0 = 1, 1 = 2, etc.".
+	 @constant
+	 */
+	/*
+	typedef struct UTF8String {
+		UTF8StringErrors *Error;
+		bool              StringEndian:1;
+		size_t            StringSizeInCodeUnits; // aka bytes
+		size_t            StringSizeInCodePoints; // aka characters
+		size_t            StringSizeInGraphemes;
+		uint8_t           CodePoints[UTF8String_MaxCodeUnits];
+		// Because of combining characters and accents and whatnot, we' can't have a 4 bitfield, we'll have to scan each byte
+	} UTF8String;
+	 */
+
+	/*!
+	 @abstract                        "The SubString can be a character, or it's own string, all that matters is that each code point is adjacent".
+	 */
+
+	extern enum UTF8RopeConstants {
+		MaxGraphemes = 4096,
+		MaxCodeUnits = 16,
+	} UTF8RopeConstants;
+
+	extern enum UTF8InvalidCodePoints {
+		LowestValidCodePoint = 0x1FFFF,
+	} UTF8InvalidCodePoints;
+
+	//uint8_t Grapheme[]; // MaxCodeUnits
+
+	typedef struct Grapheme {
+        uint8_t    GraphemeSize[MaxGraphemes]; // MaxGraphemes
+		uint8_t    CodeUnit[];
+	} Grapheme;
+
+	typedef struct UTF8String {
+        uint8_t    Endian:2;
+        uint64_t   GraphemeCount;
+        Grapheme  *Graphemes[MaxGraphemes];
+	} UTF8String;
+
+	void       RemoveSubString(UTF8String *OldString, UTF8String *NewString, UTF8String String2Remove, bool RemoveAll);
+
+	bool       CodeUnitIsStartCodePoint(UTF8String *String, uint64_t StartCodeUnit);
+
+	void       DuplicateString(UTF8String *String, UTF8String *NewString);
+
+	bool       CompareStrings(UTF8String *String1, UTF8String *String2, bool CaseSensitive);
+
+	UTF8String ConcatenateStrings(UTF8String *String1, UTF8String *String2, UTF8String *NewString);
+
+	uint64_t   LocateOccurrence(UTF8String *String, UTF8String *Character2Locate, bool StartAtEnd);
+
+	void       CheckBOM(UTF8String *String);
+
+    //void       MeasureString(UTF8String *String);
+
+	void       CreateString(UTF8String *String2Create, char CodeUnits[]);
+	
+	UTF8String ReadUTF8String(BitInput *BitI, UTF8String *String, uint64_t Graphemes2Read);
+	
+	
 #ifdef __cplusplus
 }
 #endif
