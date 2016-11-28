@@ -205,15 +205,6 @@ extern "C" {
 		uint16_t   HuffmanCode[255];   // Encoded value for that symbol
 	} HuffmanTree;
 
-	/*
-	 @abstract                     "Type to contain hyphenated, null terminated UUID strings".
-
-	 @param   String               "char array to contain the UUIDString".
-	 */
-	typedef struct UUIDString {
-		uint8_t String[BitIOUUIDSize];
-	} UUIDString;
-
 	/*!
 	 @abstract                         "Swap endian of 16 bit integers".
 	 @param    Data2Swap               "Data to swap endian".
@@ -551,7 +542,7 @@ extern "C" {
 	 @param    Buffer              "Pointer to the buffer to read from".
 	 @param    BufferSize          "Size of Buffer".
 	 */
-	void           InitBitBuffer(BitBuffer *Bits, uint8_t *Buffer, size_t BufferSize);
+	//void           InitBitBuffer(BitBuffer *Bits, uint8_t *Buffer, size_t BufferSize);
 
 	/*!
 	 @abstract                     "Reads bits from a buffer".
@@ -559,7 +550,7 @@ extern "C" {
 	 @param    Bits                "Pointer to BitBuffer struct".
 	 @param    Bits2Read           "Number of bits to read from the buffer pointed to by Bits".
 	 */
-	uint64_t       ReadBitBuffer(BitBuffer *Bits, uint8_t Bits2Read);
+	//uint64_t       ReadBitBuffer(BitBuffer *Bits, uint8_t Bits2Read);
 
 	typedef struct Probabilities {
 		double Maximum;
@@ -571,45 +562,27 @@ extern "C" {
 	 @remark                       "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
 
 	 @param   BitI                 "Pointer to BitInput".
-	 @param   UUID                 "Character array to read UUID string into".
+	 @param   UUIDString           "Character array to read UUID string into".
 	 */
-	void           ReadUUID(BitInput *BitI, UUIDString *UUID);
+	void           ReadUUID(BitInput *BitI, char UUIDString[BitIOUUIDSize]);
+	
+	void           SwapUUID(char String2Convert[BitIOUUIDSize], char Converted[BitIOUUIDSize]);
 
 	/*!
 	 @abstract                     "Write UUID/GUID string as hyphen-less blob".
 	 @remark                       "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
 
 	 @param    BitO                "Pointer to BitOutput".
-	 @param    UUID                "UUID string to write to the file as a binary blob, aka remove hyphens and null terminating char".
+	 @param    UUIDString          "UUID string to write to the file as a binary blob, aka remove hyphens and null terminating char".
 	 */
-	void           WriteUUID(BitOutput *BitO, UUIDString *UUID);
+	void           WriteUUID(BitOutput *BitO, char UUIDString[BitIOUUIDSize]);
 
-	/*
-	 @abstract                     "Reads a GUID and byte swaps it to conform to the UUID spec (big endian)".
-
-	 @param    BitI                "Pointer to an initalized BitInput type, to read the data from a stream".
-	 @param    UUIDString          "Pointer to an empty but initalized UUID type to read the data into".
-	 */
-	void           ReadGUIDAsUUID(BitInput *BitI, UUIDString *UUID);
+	bool           CompareUUIDs(char UUIDString1[BitIOUUIDSize], char UUIDString2[BitIOUUIDSize]);
 
 	/*
 	 @abstract                     "Reads arthimetic endcoded data from the stream pointed to by Input".
 	 */
 	uint64_t       ReadArithmetic(BitInput *Input, uint64_t *MaximumTable, uint64_t *MinimumTable, size_t TableSize, uint64_t Bits2Decode);
-
-
-	void           ReadUUID(BitInput *BitI, UUIDString *UUID);
-
-	void           ConvertGUID2UUID(UUIDString *String2Convert, UUIDString *Converted);
-
-	void           WriteUUID(BitOutput *BitO, UUIDString *UUID);
-
-	bool           CompareUUIDStrings(UUIDString *UUID1, UUIDString *UUID2);
-
-
-
-
-
 
 
 
@@ -758,15 +731,15 @@ extern "C" {
 
 	//uint8_t Grapheme[]; // MaxCodeUnits
 
-	typedef struct Grapheme {
-        uint8_t    GraphemeSize[MaxGraphemes]; // MaxGraphemes
-		uint8_t    CodeUnit[];
+	typedef struct Grapheme { // Singular Grapheme
+        uint8_t    GraphemeSize;
+		uint8_t    Data[];
 	} Grapheme;
 
 	typedef struct UTF8String {
         uint8_t    Endian:2;
         uint64_t   GraphemeCount;
-        Grapheme  *Graphemes[MaxGraphemes];
+        Grapheme  *Graphemes[];
 	} UTF8String;
 
 	void       RemoveSubString(UTF8String *OldString, UTF8String *NewString, UTF8String String2Remove, bool RemoveAll);
