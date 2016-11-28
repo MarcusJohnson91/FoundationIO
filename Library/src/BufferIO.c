@@ -723,7 +723,16 @@ extern "C" {
 		return Symbol;
 	}
 
+	typedef struct Probability {
+		double Low;
+		double High;
+	} Probability;
+
 	uint64_t ReadArithmetic(BitInput *Input, uint64_t *MaximumTable, uint64_t *MinimumTable, size_t TableSize, uint64_t Bits2Decode) {
+		// Read a bit at a time.
+		uint64_t High = 0xFFFFFFFFFFFFFFFFULL, Low = 0ULL; // Decimal point is implied before the highest bit.
+
+		/*
 		double Maximum = 1.0;
 		double Minimum = 0.0;
 		double Range   = 0.0;
@@ -740,9 +749,20 @@ extern "C" {
 			Minimum = Minimum + Range; // * p.first
 		}
 		return Symbol;
+		 */
+		return 0;
 	}
 
-	void WriteArithmetic(BitOutput *BitO, Probabilities *Probability, uint64_t Bits2Encode) { // Use the least precision you can get away with to be as efficent as possible.
+	void WriteArithmetic(BitOutput *BitO, double *ProbabilityTable[], size_t TableSize, uint64_t Bits2Encode) { // Use the least precision you can get away with to be as efficent as possible.
+		uint64_t High = 0xFFFFFFFFFFFFFFFFULL, Low = 0ULL, Range = 0ULL, Probability = 0ULL;
+		while ((Bits2Encode >= High) && (Bits2Encode <= Low)) {
+			Range = (High - Low) + 1;
+			Probability = ProbabilityTable[Range]; // Probability should be an int table ordered on how often a symbol shows up, not it's quantized probability.
+			
+		}
+
+
+		/*
 		double Maximum = 1.0;
 		double Minimum = 0.0;
 		double Range   = 0.0;
@@ -754,7 +774,7 @@ extern "C" {
 			Maximum       = Probability->Minimum + Range;
 			Minimum       = Probability->Minimum + Range;
 		}
-
+		 */
 	}
 
 #ifdef __cplusplus
