@@ -262,8 +262,43 @@ extern "C" {
         BitI->BitsUnavailable = NEWBitsUnavailable;
         BitI->BitsAvailable   = Bytes2Bits(BytesRead);
 	}
+	
+	uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read) { // Actually reads bits.
+		uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, LeftShift = 0, RightShift = 0, Mask = 0, Data = 0, Mask2Shift = 0;
+		uint64_t OutputData = 0;
+		
+		if ((Bits2Read <= 0) || (Bits2Read > 64)) {
+			BitI->ErrorStatus->PeekBits = NumberNotInRange;
+			char Description[BitIOPathSize];
+			snprintf(Description, BitIOPathSize, "ReadBits only supports reading 1-64 bits at a time, you tried reading: %d bits\n", Bits2Read);
+			Log(SYSCritical, "BitIO", "ReadBits", Description);
+			exit(EXIT_FAILURE);
+		} else {
+			if (BitI->BitsAvailable < Bits) {
+				UpdateInputBuffer(BitI, 0);
+			}
+			while (Bits > 0) {
+				SystemBits             = 8 - (BitI->BitsUnavailable % 8);
+				UserBits               = BitsRemaining(Bits);
+				Bits2Read              = SystemBits >= UserBits  ? UserBits : SystemBits;
+				Mask2Shift             = SystemBits <= UserBits  ? 0 : SystemBits - UserBits;
+				Mask                   = (Power2Mask(Bits2Read) << Mask2Shift);
+				Data                   = BitI->Buffer[BitI->BitsUnavailable / 8] & Mask;
+				Data                 >>= Mask2Shift;
+				
+				OutputData           <<= SystemBits >= UserBits ? UserBits : SystemBits;
+				OutputData            += Data;
+				
+				BitI->BitsAvailable   -= SystemBits >= UserBits ? UserBits : SystemBits;
+				BitI->BitsUnavailable += SystemBits >= UserBits ? UserBits : SystemBits;
+				Bits                  -= SystemBits >= UserBits ? UserBits : SystemBits;
+			}
+		}
+		return OutputData;
+	}
 
-	uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read) {
+	/*
+	uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read) { // We need to make this PeekBits basically.
 		uint64_t OutputData = 0;
 
 		if ((Bits2Read <= 0) && (Bits2Read > 64)) {
@@ -281,6 +316,7 @@ extern "C" {
 		}
 		return OutputData;
 	}
+	 */
 
 	void ReadRLEData(BitInput *BitI, size_t BufferSize, uint8_t *DecodedBuffer, size_t RLESize) {
         
@@ -347,7 +383,18 @@ extern "C" {
 			WriteBits(BitO, StopBit, 1);
 		}
 	}
+	
+	uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek) {
+		uint64_t OutputData = 0ULL;
+		OutputData = ReadBits(BitI, Bits2Peek);
+		
+		BitI->BitsAvailable       += Bits2Peek;
+		BitI->BitsUnavailable     -= Bits2Peek;
+		
+		return OutputData;
+	}
 
+	/*
     uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek) { // 26, 22,215
 		uint8_t Bits = Bits2Peek, UserBits = 0, SystemBits = 0, LeftShift = 0, RightShift = 0, Mask = 0, Data = 0, Bits2Read = 0, Mask2Shift = 0;
         uint64_t OutputData = 0;
@@ -387,6 +434,7 @@ extern "C" {
 
 		return OutputData;
 	}
+	 */
 
 	void WriteBits(BitOutput *BitO, uint64_t Data2Write, size_t NumBits) {
         if (NumBits > BitO->BitsAvailable) {
@@ -405,7 +453,7 @@ extern "C" {
 		if (NumBits <= 0) {
 			BitO->ErrorStatus->WriteBits = TriedWritingTooFewBits;
             char Error[BitIOStringSize];
-            snprintf(Error, BitIOStringSize, "Tried writing %d bits\n", NumBits);
+            snprintf(Error, BitIOStringSize, "Tried writing %zu bits\n", NumBits);
             Log(SYSWarning, "BitIO", "WriteBits", "");
 		} else {
 			if (BitO->BitsAvailable < NumBits) {
