@@ -3,10 +3,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-	// To handle a format specifier, there are 2 parts. The first is in argv which is %0XY, the second is in -s which is just a raw int
-	uint64_t BitIOCurrentArgument = 1;
-    //char     BitInputFormatSpecifier[];
+	
+	uint64_t BitIOCurrentArgument      = 1;
 	uint64_t BitInputCurrentSpecifier  = 0;
 	uint64_t BitOutputCurrentSpecifier = 0;
 
@@ -60,7 +58,6 @@ extern "C" {
     }
 
 	uint64_t OnesCompliment2TwosCompliment(int64_t Input) { // All unset bits ABOVE the set bit are set, including those originally set
-															// If 1 was already set, it's set as well.
 		return ~Input + 1;
 	}
 
@@ -90,8 +87,6 @@ extern "C" {
 	}
 
 	void AlignInput(BitInput *BitI, uint8_t BytesOfAlignment) {
-        // Should this be BytesOfAlignment * 8, then subtract that from the modulo of the bitsavailable?
-        // We should test if it's a multiple of BytesOfAlignment, if so, you're good.
         uint8_t Bits2Align = BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
 
         if (Bits2Align != 0) { // NOT aligned
@@ -113,7 +108,6 @@ extern "C" {
 	}
 
     void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
-        // I need to add some variables to BitInput to split the path into 3, one for the base path, the second for the format specifier number, and the third for the extension.
         while (BitI->File == NULL) {
             for (int Argument = BitIOCurrentArgument; Argument < argc; Argument++) {
                 char Path[BitIOPathSize];
@@ -127,10 +121,7 @@ extern "C" {
                 if (strcasecmp(Path, "-i") == 0) {
                     Argument += 1;
                     if (BitInputCurrentSpecifier != 0) {
-                        // We need to replace the character sequence with the specifier
-                        // So use sprintf to substitute the format string with the SpecifierOffset, then increment it by one for the next time
                         snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
-                        // Extract the format specifier from the argument and replace it with SpecifierOffset and put that into Path
                     } else {
                         snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
                     }
@@ -148,12 +139,6 @@ extern "C" {
                     }
                     BitIOCurrentArgument = Argument + 1;
                 }
-                /*
-                BitIOCurrentArgument += Argument - 1;
-                if ((Argument >= argc) && (BitI->File == NULL)) { // end of the argument list with no file, so start back at the top.
-                    BitIOCurrentArgument = 1;
-                }
-                 */
             }
         }
     }
@@ -263,7 +248,7 @@ extern "C" {
         BitI->BitsAvailable   = Bytes2Bits(BytesRead);
 	}
 	
-	uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read) { // Actually reads bits.
+	uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read) { // Set this up so it can read from memory addresses, to support running on machines without an OS.
 		uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, LeftShift = 0, RightShift = 0, Mask = 0, Data = 0, Mask2Shift = 0;
 		uint64_t OutputData = 0;
 		
@@ -626,33 +611,6 @@ extern "C" {
 		}
 	}
 
-	/*!
-	 @abstract                     "Take the symbol table and the probabiility table to generate a Huffman Tree".
-	 @param    RootValue           "Should the root of the tree start at 0 or 1?".
-	 */
-	/*
-	void GenerateHuffmanTree(uint8_t *SymbolTable[255], uint8_t *ProbabilityTable, bool RootValue) {
-		uint16_t NumSymbols = sizeof(SymbolTable);
-		uint8_t *SortedArray[255];
-		SortArrayByValue(SymbolTable, ProbabilityTable, SortedArray, NumSymbols);
-
-
-		HuffmanTree *Tree = calloc(NumSymbols, 1);
-
-		for (uint16_t Code = NumSymbols; Code > 0; Code--) {
-			// The lowest rightmost node is SymbolTable[Code] + SymbolTable[Code - 1];
-		}
-
-
-		for (uint16_t Symbol = 0; Symbol< NumSymbols; Symbol++) {
-			Tree->Symbol[Symbol] = SortedArray[Symbol]; // The lowest symbol in this loop, is the most common symbol, therefore it should have the lowest code, and it should grow as the loop grows.
-			Tree->HuffmanCode[Symbol] = what?;
-
-		}
-
-	}
-*/
-
 	/* Huffman Decoding functions */
 	void DecodeHuffman(BitInput *BitI, size_t HuffmanSize) {
 		// 3 alphabets, literal, "alphabet of bytes", or <length 8, distance 15> the first 2 are combined, 0-255 = literal, 256 = End of Block, 257-285 = length
@@ -802,25 +760,6 @@ extern "C" {
 	uint64_t ReadArithmetic(BitInput *Input, uint64_t *MaximumTable, uint64_t *MinimumTable, size_t TableSize, uint64_t Bits2Decode) {
 		// Read a bit at a time.
 		uint64_t High = 0xFFFFFFFFFFFFFFFFULL, Low = 0ULL; // Decimal point is implied before the highest bit.
-
-		/*
-		double Maximum = 1.0;
-		double Minimum = 0.0;
-		double Range   = 0.0;
-
-		uint64_t Symbol = 0;
-
-		double Probability = ReadBits(Input, 1); // this is just a mockup.
-
-
-		while (Bits2Decode > 0) { // No, this needs to be rethought
-			Range = Maximum - Minimum;
-			uint64_t Symbol = FindSymbolFromProbability(Probability, MaximumTable, MinimumTable, TableSize);
-			Maximum = Minimum + Range; // * p.second
-			Minimum = Minimum + Range; // * p.first
-		}
-		return Symbol;
-		 */
 		return 0;
 	}
 
@@ -831,21 +770,6 @@ extern "C" {
 			Probability = ProbabilityTable[Range]; // Probability should be an int table ordered on how often a symbol shows up, not it's quantized probability.
 			
 		}
-
-
-		/*
-		double Maximum = 1.0;
-		double Minimum = 0.0;
-		double Range   = 0.0;
-
-		FindProbabilityFromSymbol(Probability, NULL, NULL, 65535, 0xAB37);
-
-		while (Bits2Encode > 0) {
-			Range         = Probability->Maximum - Probability->Minimum;
-			Maximum       = Probability->Minimum + Range;
-			Minimum       = Probability->Minimum + Range;
-		}
-		 */
 	}
 
 #ifdef __cplusplus
