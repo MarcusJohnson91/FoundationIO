@@ -65,22 +65,40 @@ extern "C" {
 		BitIOPathSize             = BitIOStringSize,
 		BitIOUUIDSize             = 21,
 		BitIOGUIDSize             = BitIOUUIDSize,
+		BitIOFlagSize             = 3,
 	} BitIOConstants;
 
 	extern uint64_t BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Input/Output parsers.
 
 	extern enum SystemErrors {
-		SYSEmergency               = 1,
-		SYSPanic                   = 1,
-		SYSAlert                   = 2,
-		SYSCritical                = 3,
-		SYSError                   = 4,
-		SYSWarning                 = 5,
-		SYSNotice                  = 6,
-		SYSInformation             = 7,
-		SYSDebug                   = 8,
+		        SYSEmergency     = 1,
+		        SYSPanic         = 1,
+		        SYSAlert         = 2,
+		        SYSCritical      = 3,
+		        SYSError         = 4,
+		        SYSWarning       = 5,
+		        SYSNotice        = 6,
+				SYSInformation   = 7,
+		        SYSDebug         = 8,
 		/* End Syslog-type eror codes */
 	} SystemErrors;
+	/*
+	typedef struct BitIOOption {
+		char      Flag[BitIOFlagSize];
+		char      FlagDescription[BitIOStringSize];
+	} BitIOOption;
+	 */
+	
+	typedef struct BitIOOption {
+		char       Flag[BitIOFlagSize];
+		char       FlagDescription[BitIOStringSize];
+	} BitIOOption;
+	
+	typedef struct BitIOOptions {
+		char       GeneralHelpMessage[BitIOStringSize];
+		uint8_t    NumberOfOptions;
+		uintptr_t *Options[];
+	} BitIOOptions;
 
 	/*!
 	 @abstract                     "List of error codes the various functions in BitIO set in ErrorStatus".
