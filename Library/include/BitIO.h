@@ -70,18 +70,7 @@ extern "C" {
 
 	extern uint64_t BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Input/Output parsers.
 
-	extern enum SystemErrors {
-		        SYSEmergency     = 1,
-		        SYSPanic         = 1,
-		        SYSAlert         = 2,
-		        SYSCritical      = 3,
-		        SYSError         = 4,
-		        SYSWarning       = 5,
-		        SYSNotice        = 6,
-				SYSInformation   = 7,
-		        SYSDebug         = 8,
-		/* End Syslog-type eror codes */
-	} SystemErrors;
+	
 	/*
 	typedef struct BitIOOption {
 		char      Flag[BitIOFlagSize];
@@ -89,16 +78,7 @@ extern "C" {
 	} BitIOOption;
 	 */
 	
-	typedef struct BitIOOption {
-		char       Flag[BitIOFlagSize];
-		char       FlagDescription[BitIOStringSize];
-	} BitIOOption;
 	
-	typedef struct BitIOOptions {
-		char       GeneralHelpMessage[BitIOStringSize];
-		uint8_t    NumberOfOptions;
-		uintptr_t *Options[];
-	} BitIOOptions;
 
 	/*!
 	 @abstract                     "List of error codes the various functions in BitIO set in ErrorStatus".
@@ -570,10 +550,7 @@ extern "C" {
 	 */
 	//uint64_t       ReadBitBuffer(BitBuffer *Bits, uint8_t Bits2Read);
 
-	typedef struct Probabilities {
-		double Maximum;
-		double Minimum;
-	} Probabilities;
+	
 
 	/*!
 	 @abstract                     "Reads raw UUID/GUID from the bitstream".
@@ -708,6 +685,24 @@ extern "C" {
 		CapitalAcuteA = 0xC1,
 		LowerAcuteA   = 0xE1,
 	} PrecomposedCodePoints;
+	
+	extern enum SystemErrors {
+		SYSEmergency     = 1,
+		SYSPanic         = 1,
+		SYSAlert         = 2,
+		SYSCritical      = 3,
+		SYSError         = 4,
+		SYSWarning       = 5,
+		SYSNotice        = 6,
+		SYSInformation   = 7,
+		SYSDebug         = 8,
+		/* End Syslog-type eror codes */
+	} SystemErrors;
+	
+	typedef struct Probabilities {
+		double Maximum;
+		double Minimum;
+	} Probabilities;
 
 	typedef struct UTF8StringErrors {
 		int64_t ConcatenateStrings;
@@ -747,8 +742,6 @@ extern "C" {
 		LowestValidCodePoint = 0x1FFFF,
 	} UTF8InvalidCodePoints;
 
-	//uint8_t Grapheme[]; // MaxCodeUnits
-
 	typedef struct Grapheme { // Singular Grapheme
         uint8_t    GraphemeSize;
 		uint8_t    Data[];
@@ -759,6 +752,11 @@ extern "C" {
         uint64_t   GraphemeCount;
         Grapheme  *Graphemes[];
 	} UTF8String;
+	
+	typedef struct LinkedList {
+		uint16_t           Value;
+		struct LinkedList *Next;
+	} LinkedList;
 
 	void       RemoveSubString(UTF8String *OldString, UTF8String *NewString, UTF8String String2Remove, bool RemoveAll);
 
