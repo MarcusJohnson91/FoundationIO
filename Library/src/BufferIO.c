@@ -362,7 +362,7 @@ extern "C" {
 
 	uint64_t ReadRICE(BitInput *BitI, bool StopBit) {
 		uint64_t BitCount = 0;
-		if (StopBit != (0|1)) {
+		if ((StopBit != 0) || (StopBit != 1)) {
 			BitI->ErrorStatus->ReadRICE = NumberNotInRange;
 		} else {
 			while (PeekBits(BitI, 1) != StopBit) { // The StopBit needs to be included in the count.
@@ -435,7 +435,27 @@ extern "C" {
 		return OutputData;
 	}
 	 */
-
+	
+	
+	
+	void WriteBits(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits) { // 12 bits 2 write, 0xFFF
+		uint8_t BitsLeft = NumBits, InputMask = 0, OutputMask = 0, Bits2Write = 0;
+		if (BitO->BitsAvailable < NumBits) {
+			fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable), 1, BitO->File);
+			// Save unused bits, memset, and recopy them to the start of the buffer
+		}
+		// in order to write bits to the buffer, I need to mask Data2Write, and apply it to the output buffer, also, with a mask.
+		while (BitsLeft > 0) {
+			// if BitsLeft is greater than 8, the input mask needs to be 8, otherwise, set it to BitsLeft
+			Bits2Write   = BitsLeft > 8 ? 8 : BitsLeft;
+			InputMask    = Power2Mask(Bits2Write);
+			BitO->Buffer[BitO->BitsUnavailable / 8] = Data2Write & InputMask;
+			Data2Write >>= Bits2Write;
+			BitsLeft    -= Bits2Write;
+		}
+	}
+	
+	/*
 	void WriteBits(BitOutput *BitO, uint64_t Data2Write, size_t NumBits) {
         if (NumBits > BitO->BitsAvailable) {
             fwrite(BitO->Buffer, sizeof(BitO->Buffer), 1, BitO->File);
@@ -476,10 +496,13 @@ extern "C" {
 			// FIXME: We need to just enlarge the buffer, the call a function to flush it all out to disk.
 		}
 	}
+	 */
 
+	/*
     void WriteBuffer(BitOutput *BitI, uint8_t *Buffer2Write, size_t BufferSize) {
 
     }
+	 */
 
 	void SkipBits(BitInput *BitI, int64_t Bits) {
 		if (Bits <= BitI->BitsAvailable) {

@@ -148,7 +148,7 @@ extern "C" {
 		int64_t      DecodeHuffman;
 		int64_t      WriteUUID;
 		int64_t      WriteBits;
-		int64_t      WriteBuffer;
+		//int64_t      WriteBuffer;
 		int64_t      WriteRICE;
 		int64_t      VerifyCRC;
 	} ErrorStatus;
@@ -458,7 +458,7 @@ extern "C" {
 	 @param    Data2Write          "Is the actual data to write out".
 	 @param    NumBits             "Is the number of bits to write".
 	 */
-	void           WriteBits(BitOutput *BitO, uint64_t Data2Write, size_t NumBits);
+	void           WriteBits(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits);
 
 	/*!
 	 @abstract                     "Writes entire buffer to the output buffer, first come first serve".
