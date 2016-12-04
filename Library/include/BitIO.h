@@ -36,14 +36,6 @@ extern "C" {
 
 #pragma once
 
-	/*
-	 enum Truth {
-		YES =  true,
-		NO  = false,
-	 } Truth;
-
-	 */
-
 	/*!
 	 @abstract                                 "BitIO compile time constants".
 	 @remark                                   "Change the buffer sizes here".
@@ -67,19 +59,10 @@ extern "C" {
 		BitIOGUIDSize             = BitIOUUIDSize,
 		BitIOFlagSize             = 3,
 	} BitIOConstants;
-
-	extern uint64_t BitIOCurrentArgument; // This HAS to start at one; Used by the Option and Input/Output parsers.
-
 	
-	/*
-	typedef struct BitIOOption {
-		char      Flag[BitIOFlagSize];
-		char      FlagDescription[BitIOStringSize];
-	} BitIOOption;
-	 */
+	extern uint64_t BitInputCurrentArgument;
+	extern uint64_t BitOutputCurrentArgument;
 	
-	
-
 	/*!
 	 @abstract                     "List of error codes the various functions in BitIO set in ErrorStatus".
 	 @remark                       "FIXME: Should the error codes be negative or positive?".
@@ -102,13 +85,6 @@ extern "C" {
 		InvalidMarker              = 22,
 	} ErrorCodes;
 
-	extern enum HuffmanConstants {
-		Huffman_MaxLengthCodes      = 286,
-		Huffman_MaxDistanceSymbols  = 30,
-		Huffman_MaxSymbols          = Huffman_MaxLengthCodes + Huffman_MaxDistanceSymbols,
-		Huffman_FixedLengthCodes    = 288,
-	} HuffmanConstants;
-
 	/*!
 	 @typedef        ErrorStatus
 	 @abstract                         "Allows checking of the error status of various functions".
@@ -119,7 +95,6 @@ extern "C" {
 		int64_t      ReadBits;
 		int64_t      ReadRICE;
 		int64_t      ReadUUID;
-		int64_t      ReadBitBuffer;
 		int64_t      UpdateInputBuffer;
 		int64_t      InitBitInput;
 		int64_t      InitBitOutput;
@@ -179,13 +154,6 @@ extern "C" {
 		uint8_t      Buffer[BitOutputBufferSize];
 	} BitOutput;
 
-	typedef struct BitBuffer {
-		uint64_t     BitsUnavailable;
-		uint64_t     BitsAvailable;
-		ErrorStatus *ErrorStatus;
-		uint8_t     *Buffer;
-	} BitBuffer;
-
 	extern enum Base {
 		Octal       =  8,
 		Decimal     = 10,
@@ -197,11 +165,6 @@ extern "C" {
 		BigEndian     = 1,
 		LittleEndian  = 2,
 	} Endian;
-
-	typedef struct HuffmanTree {
-		uint16_t   Symbol[255];        // input symbol to be coded
-		uint16_t   HuffmanCode[255];   // Encoded value for that symbol
-	} HuffmanTree;
 
 	/*!
 	 @abstract                         "Swap endian of 16 bit integers".
@@ -279,20 +242,6 @@ extern "C" {
 	 @return                           "Returns the Input in One's compliment format".
 	 */
 	uint64_t       TwosCompliment2OnesCompliment(int64_t Input);
-
-	/*!
-	 @abstract                         "Finds the highest bit set".
-	 @remark                           "Starts at MSB (BitIO is Big Endian internally; It's not my fault Intel is stupid)".
-	 @param          InputData         "Is the input int to find the highest bit set".
-	 */
-	uint8_t        FindHighestBitSet(uint64_t InputData) __attribute__((deprecated));
-
-	/*! @deprecated
-	 @abstract                         "Counts the number of bits set to 1"
-
-	 @param    Input                   "integer to count the number of set bits".
-	 */
-	uint8_t        CountBits(uint64_t Input) __attribute__((deprecated));
 
 	/*!
 	 @abstract                         "Aligns bits for multi-byte alignment".
@@ -441,15 +390,6 @@ extern "C" {
 	void           WriteBits(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits);
 
 	/*!
-	 @abstract                     "Writes entire buffer to the output buffer, first come first serve".
-
-	 @param    BitO                "Pointer to BitOutput".
-	 @param    Buffer2Write        "Pointer to the buffer to be written to the output buffer".
-	 @param    BufferSize          "Size of Buffer2Write in bytes".
-	 */
-	void           WriteBitBuffer(BitOutput *BitO, uint8_t *Buffer2Write, size_t BufferSize);
-
-	/*!
 	 @abstract                     "Seeks Forwards and backwards in BitInput"
 	 @remark                       "To seek backwards just use a negative number, to seek forwards positive".
 
@@ -457,6 +397,21 @@ extern "C" {
 	 @param    Bits                "The number of bits to skip".
 	 */
 	void           SkipBits(BitInput *BitI, int64_t Bits);
+	
+	extern enum PolynomialType {
+		Normal   = 0,
+		Reversed = 1,
+	} PolynomialType;
+	
+	typedef struct CRC {
+		uint8_t *Buffer;
+		size_t   BufferSize;
+		uint64_t Polynomial;
+		bool     PolynomialType;
+		uint8_t  PolynomialSize;
+		uint64_t Initalization;
+		uint64_t PreCalculatedCRC;
+	} CRC;
 
 	/*!
 	 @abstract                     "Generates CRC from data".
@@ -468,7 +423,7 @@ extern "C" {
 	 @param    Init                "The bit pattern to initalize the generator with".
 	 @param    CRCSize             "Number of bits that should be output as the CRC".
 	 */
-	uint64_t       GenerateCRC(uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize);
+	uint64_t       GenerateCRC(BitInput *BitI, size_t DataSize, CRC *CRCData); // uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool PolyType, uint64_t Init, uint8_t CRCSize
 
 	/*!
 	 @abstract                     "Computes the CRC of DataBuffer, and compares it to the submitted CRC".
@@ -481,20 +436,7 @@ extern "C" {
 	 @param    CRCSize             "Number of bits that should be output as the CRC".
 	 @param    EmbeddedCRC         "Value to compare the data to, to be sure it was recieved correctly".
 	 */
-	bool           VerifyCRC(uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, uint64_t Init, uint8_t CRCSize, uint64_t EmbeddedCRC);
-
-	/*!
-	 @abstract                     "Decodes Huffman encoded data".
-	 @remark                       "It's not even CLOSE to API/ABI compatible with zlib, because zlib is shit".
-	 */
-	//void DecodeHuffman(BitInput *BitI, Huffman *Huff);
-
-	/*!
-	 @abstract                     "Parses DEFLATE encoded block, and sends it off to the Huffman/LZ77 decoder".
-
-	 @param    BitI                "Pointer to BitInput".
-	 */
-	void           ParseDeflate(BitInput *BitI);
+	bool           VerifyCRC(BitInput *BitI, size_t DataSize, CRC *CRCData); // uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool PolyType, uint64_t Init, uint8_t CRCSize, uint64_t EmbeddedCRC
 
 	/*!
 	 @abstract                     "Creates Adler32 checksum from input data".
@@ -533,158 +475,10 @@ extern "C" {
 	 */
 	bool           IsStreamByteAligned(uint64_t BitsUsed, uint8_t BytesOfAlignment);
 
-	/*!
-	 @abstract                     "Read/Write bits from a buffer".
-
-	 @param    Bits                "Pointer to BitBuffer struct".
-	 @param    Buffer              "Pointer to the buffer to read from".
-	 @param    BufferSize          "Size of Buffer".
-	 */
-	//void           InitBitBuffer(BitBuffer *Bits, uint8_t *Buffer, size_t BufferSize);
-
-	/*!
-	 @abstract                     "Reads bits from a buffer".
-
-	 @param    Bits                "Pointer to BitBuffer struct".
-	 @param    Bits2Read           "Number of bits to read from the buffer pointed to by Bits".
-	 */
-	//uint64_t       ReadBitBuffer(BitBuffer *Bits, uint8_t Bits2Read);
-
-	
-
-	/*!
-	 @abstract                     "Reads raw UUID/GUID from the bitstream".
-	 @remark                       "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
-
-	 @param   BitI                 "Pointer to BitInput".
-	 @param   UUIDString           "Character array to read UUID string into".
-	 */
-	void           ReadUUID(BitInput *BitI, char UUIDString[BitIOUUIDSize]);
-	
-	void           SwapUUID(char String2Convert[BitIOUUIDSize], char Converted[BitIOUUIDSize]);
-
-	/*!
-	 @abstract                     "Write UUID/GUID string as hyphen-less blob".
-	 @remark                       "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
-
-	 @param    BitO                "Pointer to BitOutput".
-	 @param    UUIDString          "UUID string to write to the file as a binary blob, aka remove hyphens and null terminating char".
-	 */
-	void           WriteUUID(BitOutput *BitO, char UUIDString[BitIOUUIDSize]);
-
-	bool           CompareUUIDs(char UUIDString1[BitIOUUIDSize], char UUIDString2[BitIOUUIDSize]);
-
 	/*
 	 @abstract                     "Reads arthimetic endcoded data from the stream pointed to by Input".
 	 */
 	uint64_t       ReadArithmetic(BitInput *Input, uint64_t *MaximumTable, uint64_t *MinimumTable, size_t TableSize, uint64_t Bits2Decode);
-
-
-
-
-
-
-
-	// If the first 2 bits in a code point = 10, it's a "data" code point.
-	// if the first 2 bits = 11, it's the first codepoint in a character, and as a result of that it will tell how many more codepoints in the character there are
-
-	extern enum UTF8Constants { // UTF-8 strings are Big Endian by default, therefore 0xFEFF is correct. 0xFFFE needs to be swapped
-		UTF8String_MaxStringSize            = 65535,
-		UTF8String_MinStringSize            = 255,
-		UTF8String_MaxCodeUnitsInCodePoint  = 4,
-		UTF8String_MaxCodeUnits             = UTF8String_MaxStringSize * UTF8String_MaxCodeUnitsInCodePoint,
-		UTF8String_MinCodeUnits             = UTF8String_MinStringSize * UTF8String_MaxCodeUnitsInCodePoint,
-		UTF8String_MaxValue                 = 0x10FFFF, // highest valid Unicode codepoint.
-		UTF8String_BOM1_BE                  = 0xFEFF,
-		UTF8String_BOM1_LE                  = 0xFFFE,
-		UTF8String_BOM2_BE                  = 0xEFBBBF,
-		UTF8String_BOM2_LE                  = 0xBFBBEF,
-		UTF8String_LineFeed                 = 0x0A,
-		UTF8String_VerticalTab              = 0x0B,
-		UTF8String_FormFeed                 = 0x0C,
-		UTF8String_CarriageReturn           = 0x0D,
-		UTF8String_NextLine                 = 0x85,
-		UTF8String_LineSeperator            = 0x2028,
-		UTF8String_ParagraphSeperator       = 0x2029,
-	} UTF8Constants;
-
-	extern enum BOMType {
-		NoBOM   = 0,
-		BOM1_BE = 1,
-		BOM1_LE = 2,
-		BOM2_BE = 3,
-		BOM2_LE = 4,
-	} BOMType;
-
-	extern enum CodePointType {
-		FourCodeUnitsInCodePoint,
-		ThreeCodeUnitsInCodePoint,
-		TwoCodeUnitsInCodePoint,
-		OneCodeUnitInCodePoint,
-	} CodePointType;
-
-	extern enum UTF8StringErrorCodes {
-		NotEnoughRoomToConcatenate      = 1,
-		CharacterIsContinuationCodeUnit = 2,
-	} UTF8StringErrorCodes;
-
-	extern enum DiacriticalMarks { // Starts at 0x300, ends at 0x36F
-		GraveAccent                   = 0x300,
-		AcuteAccent                   = 0x301,
-		CircumflexAccent              = 0x302,
-		TildeAccent                   = 0x303,
-		MacronAccent                  = 0x304,
-		OverlineAccent                = 0x305,
-		BreveAccent                   = 0x306,
-		DotAccent                     = 0x307,
-		DieresisAccent                = 0x308,
-		TopHookAccent                 = 0x309,
-		RingAccent                    = 0x30A,
-		DoubleAcuteAccent             = 0x30B,
-		CaronAccent                   = 0x30C,
-		VerticalLineAboveAccent       = 0x30D,
-		DoubleVerticalLineAboveAccent = 0x30E,
-		DoubleGraveAccent             = 0x30F,
-		CandrabinduAccent             = 0x310,
-		InvertedBreveAccent           = 0x311,
-		TurnedCommaAboveAccent        = 0x312,
-		CommaAboveAccent              = 0x313,
-		ReversedCommaAboveAccent      = 0x314,
-		CommaAboveRightAccent         = 0x315,
-		GraveBelowAccent              = 0x316,
-		AcuteBelowAccent              = 0x317,
-		LeftTackBelowAccent           = 0x318,
-		RightTackBelowAccent          = 0x319,
-		LeftAngleAboveAccent          = 0x31A,
-		HornAccent                    = 0x31B,
-		LeftHalfRingBelow             = 0x31C,
-		UpTackBelow                   = 0x31D,
-		DownTackBelow                 = 0x31E,
-		PlusSignBelow                 = 0x31F,
-		MinusSignBelow                = 0x320,
-		PalatalizedHookBelow          = 0x321,
-		RetroflexHookBelow            = 0x322,
-		DotBelow                      = 0x323,
-		DieresisBelow                 = 0x324,
-		RingBelow                     = 0x325,
-		CommaBelow                    = 0x326,
-		Cedilla                       = 0x327,
-		Ogonek                        = 0x328,
-		VerticalLineBelow             = 0x329,
-		BridgeBelow                   = 0x32A,
-		InvertedDoubleArchBelow       = 0x32B,
-		CaronBelow                    = 0x32C,
-		CircumflexAccentBelow         = 0x32D,
-		BreveBelow                    = 0x32E,
-		InvertedBreveBelow            = 0x32F,
-		TildeBelow                    = 0x330,
-		MacronBelow                   = 0x331,
-	} DiacriticalMarks;
-
-	extern enum PrecomposedCodePoints {
-		CapitalAcuteA = 0xC1,
-		LowerAcuteA   = 0xE1,
-	} PrecomposedCodePoints;
 	
 	extern enum SystemErrors {
 		SYSEmergency     = 1,
@@ -703,81 +497,12 @@ extern "C" {
 		double Maximum;
 		double Minimum;
 	} Probabilities;
-
-	typedef struct UTF8StringErrors {
-		int64_t ConcatenateStrings;
-		int64_t CompareStrings;
-		int64_t RemoveCharacter;
-	} UTF8StringErrors;
-
-	/*!
-	 @abstract                        "Structure to hold various variables to contain a string".
-	 @constant StringSizeInCodeUnits  "Total number of bytes in the string".
-	 @constant StringSizeInCodePoints "Size of string in the Unicode equilivent of characters"
-	 @constant CharacterSize          "Array to hold the number of Code Points in each UTF8 character, 2 bits each, 0 = 1, 1 = 2, etc.".
-	 @constant
-	 */
-	/*
-	typedef struct UTF8String {
-		UTF8StringErrors *Error;
-		bool              StringEndian:1;
-		size_t            StringSizeInCodeUnits; // aka bytes
-		size_t            StringSizeInCodePoints; // aka characters
-		size_t            StringSizeInGraphemes;
-		uint8_t           CodePoints[UTF8String_MaxCodeUnits];
-		// Because of combining characters and accents and whatnot, we' can't have a 4 bitfield, we'll have to scan each byte
-	} UTF8String;
-	 */
-
-	/*!
-	 @abstract                        "The SubString can be a character, or it's own string, all that matters is that each code point is adjacent".
-	 */
-
-	extern enum UTF8RopeConstants {
-		MaxGraphemes = 4096,
-		MaxCodeUnits = 16,
-	} UTF8RopeConstants;
-
-	extern enum UTF8InvalidCodePoints {
-		LowestValidCodePoint = 0x1FFFF,
-	} UTF8InvalidCodePoints;
-
-	typedef struct Grapheme { // Singular Grapheme
-        uint8_t    GraphemeSize;
-		uint8_t    Data[];
-	} Grapheme;
-
-	typedef struct UTF8String {
-        uint8_t    Endian:2;
-        uint64_t   GraphemeCount;
-        Grapheme  *Graphemes[];
-	} UTF8String;
 	
 	typedef struct LinkedList {
 		uint16_t           Value;
 		struct LinkedList *Next;
 	} LinkedList;
 
-	void       RemoveSubString(UTF8String *OldString, UTF8String *NewString, UTF8String String2Remove, bool RemoveAll);
-
-	bool       CodeUnitIsStartCodePoint(UTF8String *String, uint64_t StartCodeUnit);
-
-	void       DuplicateString(UTF8String *String, UTF8String *NewString);
-
-	bool       CompareStrings(UTF8String *String1, UTF8String *String2, bool CaseSensitive);
-
-	UTF8String ConcatenateStrings(UTF8String *String1, UTF8String *String2, UTF8String *NewString);
-
-	uint64_t   LocateOccurrence(UTF8String *String, UTF8String *Character2Locate, bool StartAtEnd);
-
-	void       CheckBOM(UTF8String *String);
-
-    //void       MeasureString(UTF8String *String);
-
-	void       CreateString(UTF8String *String2Create, char CodeUnits[]);
-	
-	UTF8String ReadUTF8String(BitInput *BitI, UTF8String *String, uint64_t Graphemes2Read);
-	
 	
 #ifdef __cplusplus
 }
