@@ -4,8 +4,10 @@
 extern "C" {
 #endif
 	
-	uint64_t BitInputCurrentSpecifier  = 1;
-	uint64_t BitOutputCurrentSpecifier = 1;
+	uint64_t BitInputCurrentArgument   = 1;
+	uint64_t BitOutputCurrentArgument  = 1;
+	uint64_t BitInputCurrentSpecifier  = 0;
+	uint64_t BitOutputCurrentSpecifier = 0;
 
 	uint16_t SwapEndian16(uint16_t Data2Swap) { // In UnitTest
 		return ((Data2Swap & 0xFF00) >> 8) | ((Data2Swap & 0x00FF) << 8);
@@ -301,7 +303,7 @@ extern "C" {
 		return Data;
 	}
 
-	uint64_t ReadRICE(BitInput *BitI, bool StopBit) {
+	uint64_t ReadRICE(BitInput *BitI, uint8_t StopBit) {
 		uint64_t BitCount = 0;
 		if ((StopBit != 0) || (StopBit != 1)) {
 			BitI->ErrorStatus->ReadRICE = NumberNotInRange;
@@ -314,7 +316,7 @@ extern "C" {
 		return BitCount + 1;
 	}
 
-	void WriteRICE(BitOutput *BitO, bool StopBit, uint64_t Data2Write) {
+	void WriteRICE(BitOutput *BitO, uint8_t StopBit, uint64_t Data2Write) {
 		if ((StopBit < 0) || (StopBit > 1)) {
 			BitO->ErrorStatus->WriteRICE = NumberNotInRange;
 		} else {
@@ -427,7 +429,7 @@ extern "C" {
         char CurrentTime[26] = {0};
 		//time(Time);
 		StringSize = strftime(CurrentTime, 26, "%A, %B %e, %g+1000: %I:%M:%S %p %Z", Time);
-		if ((StringSize < 0) || (StringSize > BitIOStringSize)) {
+		if ((StringSize <= 0) || (StringSize > BitIOStringSize)) {
 			fprintf(stderr, "BitIO - Log: String too big %zu\n", StringSize);
 		}
 
@@ -441,6 +443,7 @@ extern "C" {
         free(Time);
 	}
 
+	/*
 	void SortArrayByValue(uint16_t *Symbols[], uint16_t *Probability[], uint16_t *SortedArray, size_t NumSymbols) {
 		uint16_t PreviousProbability = 0;
 		uint16_t CurrentProbabiity   = 0;
@@ -455,7 +458,7 @@ extern "C" {
 		/*
 		 Lets say that symbol 0x7C57 = highest probability, at 192 occurances.
 		 So once the for loop hit that number, we'd need to put that 
-		 */
+		 /
 
 		for (uint16_t PotentialSymbol = 0; PotentialSymbol < NumSymbols; PotentialSymbol++) {
 			if (PotentialSymbol == *Symbols[PotentialSymbol]) { // Symbol is actually in the table
@@ -483,6 +486,7 @@ extern "C" {
 			}
 		}
 	}
+	 */
 
 	uint32_t GenerateAdler32(uint8_t *Data, size_t DataSize) { // In UnitTest
 		// Add all values up, then modulo it by 65521 for Sum1. byte bound.
@@ -520,6 +524,7 @@ extern "C" {
 	}
 
 	// Create a function to lookup the symbol from the probabilities
+	/*
 	uint16_t FindSymbolFromProbability(double Probability, uint64_t	*MaximumTable, uint64_t *MinimumTable, size_t TableSize) {
 		uint16_t Symbol = 0; // there is a SINGLE probability, not two...
 							 // If the probability is closer to 1 than 0, start the loop at 1, instead of 0. otherwise, start it at 0. to ensure it takes half the time to traverse it.
@@ -545,12 +550,14 @@ extern "C" {
 		}
 		return Symbol;
 	}
+	*/
 
 	typedef struct Probability {
 		double Low;
 		double High;
 	} Probability;
 
+	/*
 	uint64_t ReadArithmetic(BitInput *Input, uint64_t *MaximumTable, uint64_t *MinimumTable, size_t TableSize, uint64_t Bits2Decode) {
 		// Read a bit at a time.
 		uint64_t High = 0xFFFFFFFFFFFFFFFFULL, Low = 0ULL; // Decimal point is implied before the highest bit.
@@ -565,6 +572,7 @@ extern "C" {
 			
 		}
 	}
+	 */
 
 #ifdef __cplusplus
 }
