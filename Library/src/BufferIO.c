@@ -105,75 +105,98 @@ extern "C" {
 	}
 
 	static void PrintHelp(void) {
-		fprintf(stderr, "Usage: -i <input> -o <output> (-s is to specify the start of a file sequence, and should be before the argument it's intended for)\n");
+		fprintf(stdout, "Usage: -i <input> -o <output> (-s is to specify the start of a file sequence, and should be before the argument it's intended for)\n");
+		fprintf(stdout, "Usage: -ia <input address>, -ias <input buffer size>, -oa <output address>, -oas <output buffer size>\n");
 	}
 
-    void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
-        while (BitI->File == NULL) {
-            for (int Argument = BitInputCurrentArgument; Argument < argc; Argument++) {
-                char Path[BitIOPathSize];
-                snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
+	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
+		while (BitI->File == NULL) {
+			for (int Index = BitInputCurrentArgument; Index < argc; Index++) {
+				char Argument[BitIOPathSize];
+				snprintf(Argument, BitIOPathSize, "%s", argv[Index]);
+				
+				if ((strcasecmp(Argument, "-s") == 0) && (BitInputCurrentSpecifier == 0)) {
+					Index += 1;
+					sscanf(Argument, "%lld", &BitInputCurrentSpecifier);
+				}
+				
+				if (strcasecmp(Argument, "-i") == 0) {
+					Index += 1;
+					if (BitInputCurrentSpecifier != 0) { // I have absolutely no idea why this is here
+						snprintf(Argument, BitIOPathSize, "%s", argv[Index]);
+					} else {
+						snprintf(Argument, BitIOPathSize, "%s", argv[Index]);
+					}
+					
+					if (strcasecmp(Argument, "-") == 0) {
+						//BitI->File = freopen(Argument, "rb", stdin);
+						BitI->File = fopen(stdin, "rb");
+						setvbuf(BitI->File, BitI->Buffer, _IONBF, BitInputBufferSize);
+					} else {
+						BitI->File = fopen(Argument, "rb");
+						setvbuf(BitI->File, BitI->Buffer, _IONBF, BitInputBufferSize);
+						if (BitI->File == NULL) {
+							BitI->ErrorStatus->ParseInputOptions = FopenFailed;
+							Log(SYSCritical, "BitIO", "ParseInputOptions", strerror(errno));
+						}
+					}
+					BitInputCurrentArgument = Index + 1;
+				}
+				
+				if (strcasecmp(Argument, "-ia")) { // input address
+					Index += 1;
+					BitI->StartReadAddress = (uint64_t)Argument;
+					BitI->IsFileBased      = true;
+				}
+				if (strcasecmp(Argument, "-ias")) { // input address size
+					Index += 1;
+					BitI->ExternalBufferSize = (uint64_t)Argument;
+				}
+			}
+		}
+	}
 
-                if ((strcasecmp(Path, "-s") == 0) && (BitInputCurrentSpecifier == 0)) {
-                    Argument += 1;
-                    sscanf(Path, "%lld", &BitInputCurrentSpecifier);
-                }
-
-                if (strcasecmp(Path, "-i") == 0) {
-                    Argument += 1;
-                    if (BitInputCurrentSpecifier != 0) {
-                        snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
-                    } else {
-                        snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
-                    }
-
-                    if (strcasecmp(Path, "-") == 0) {
-                        BitI->File = freopen(Path, "rb", stdin);
-                        setvbuf(BitI->File, BitI->Buffer, _IONBF, BitInputBufferSize);
-                    } else {
-                        BitI->File = fopen(Path, "rb");
-                        setvbuf(BitI->File, BitI->Buffer, _IONBF, BitInputBufferSize);
-                        if (BitI->File == NULL) {
-                            BitI->ErrorStatus->ParseInputOptions = FopenFailed;
-                            Log(SYSCritical, "BitIO", "ParseInputOptions", strerror(errno));
-                        }
-                    }
-                    BitInputCurrentArgument = Argument + 1;
-                }
-            }
-        }
-    }
-
-    void ParseOutputOptions(BitOutput *BitO, int argc, const char *argv[]) {
-        while (BitO->File == NULL) {
-            for (int Argument = BitOutputCurrentArgument; Argument < argc; Argument++) { // The problem is that InputBuffer read past where it should.
-                int64_t SpecifierOffset = 0;
-                char Path[BitIOPathSize];
-                snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
-
-                if (strcasecmp(Path, "-s")    == 0) { // Specifier Offset
-                    Argument += 1;
-                    snprintf((char*)SpecifierOffset, 1, "%s", argv[Argument]);
-                }
-
-                if (strcasecmp(Path, "-o")    == 0) {
-                    Argument += 1;
-                    snprintf(Path, BitIOPathSize, "%s", argv[Argument]);
-                    if (strcasecmp(Path, "-") == 0) {
-                        BitO->File = freopen(Path, "wb", stdout);
-                        setvbuf(BitO->File, BitO->Buffer, _IONBF, BitOutputBufferSize);
-                    } else {
-                        BitO->File = fopen(Path, "wb");
-                        setvbuf(BitO->File, BitO->Buffer, _IONBF, BitOutputBufferSize);
-                        if (BitO->File == NULL) {
-                            BitO->ErrorStatus->ParseOutputOptions = FopenFailed;
-                            Log(SYSCritical, "BitIO", "ParseOutputOptions", strerror(errno));
-                        }
-                    }
-                    BitOutputCurrentArgument = Argument + 1;
-                }
-            }
-        }
+	void ParseOutputOptions(BitOutput *BitO, int argc, const char *argv[]) {
+		while (BitO->File == NULL) {
+			for (int Index = BitOutputCurrentArgument; Index < argc; Index++) { // The problem is that InputBuffer read past where it should.
+				int64_t SpecifierOffset = 0;
+				char Argument[BitIOPathSize];
+				snprintf(Argument, BitIOPathSize, "%s", argv[Index]);
+				
+				if (strcasecmp(Argument, "-s")    == 0) { // Specifier Offset
+					Index += 1;
+					snprintf((char*)SpecifierOffset, 1, "%s", argv[Index]);
+				}
+				
+				if (strcasecmp(Argument, "-o")    == 0) {
+					Index += 1;
+					snprintf(Argument, BitIOPathSize, "%s", argv[Index]);
+					if (strcasecmp(Argument, "-") == 0) {
+						BitO->File = freopen(Argument, "wb", stdout);
+						setvbuf(BitO->File, BitO->Buffer, _IONBF, BitOutputBufferSize);
+					} else {
+						BitO->File = fopen(Argument, "wb");
+						setvbuf(BitO->File, BitO->Buffer, _IONBF, BitOutputBufferSize);
+						if (BitO->File == NULL) {
+							BitO->ErrorStatus->ParseOutputOptions = FopenFailed;
+							Log(SYSCritical, "BitIO", "ParseOutputOptions", strerror(errno));
+						}
+					}
+					BitOutputCurrentArgument = Index + 1;
+				}
+				
+				if (strcasecmp(Argument, "-oa")) { // Output address
+					Index += 1;
+					BitO->StartWriteAddress = (uint64_t)Argument;
+					BitO->IsFileBased       = true;
+				}
+				
+				if (strcasecmp(Argument, "-oas")) { // Output address size
+					Index += 1;
+					BitO->ExternalBufferSize = (uint64_t)Argument;
+				}
+			}
+		}
 	}
 
 	void InitBitInput(BitInput *BitI, ErrorStatus *ES, int argc, const char *argv[]) {
@@ -185,20 +208,27 @@ extern "C" {
 				BitI->ErrorStatus  = ES;
 			}
 			BitI->SystemEndian = DetectSystemEndian();
-			ParseInputOptions(BitI, argc, argv);
-
-			fseek(BitI->File, 0, SEEK_END);
-			BitI->FileSize         = (uint64_t)ftell(BitI->File);
-			fseek(BitI->File, 0, SEEK_SET);
-            BitI->FilePosition     = ftell(BitI->File);
-			//uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
-			uint64_t BytesRead     = fread(BitI->Buffer, 1, BitInputBufferSize, BitI->File);
-			if ((BitI->FilePosition + BytesRead < BitI->FileSize) && (BytesRead < BitInputBufferSize)) { // Bytes2Read
-                BitI->ErrorStatus->InitBitInput = FreadReturnedTooLittleData;
-				Log(SYSCritical, "BitIO", "InitBitInput", strerror(errno));
+			if (BitI->IsFileBased == true) {
+				// Do file related shit here.
+				ParseInputOptions(BitI, argc, argv);
+				fseek(BitI->File, 0, SEEK_END);
+				BitI->FileSize         = (uint64_t)ftell(BitI->File);
+				fseek(BitI->File, 0, SEEK_SET);
+				BitI->FilePosition     = ftell(BitI->File);
+				uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
+				uint64_t BytesRead     = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
+				if ((BitI->FilePosition + BytesRead < BitI->FileSize) && (BytesRead < BitInputBufferSize)) { // Bytes2Read
+					BitI->ErrorStatus->InitBitInput = FreadReturnedTooLittleData;
+					Log(SYSCritical, "BitIO", "InitBitInput", strerror(errno));
+				}
+				BitI->BitsAvailable    = Bytes2Bits(BytesRead);
+				BitI->BitsUnavailable  = 0;
+			} else {
+				// Do memory related shit here.
+				// Hmm, how do we accept memory address stuff?
+				// Well, we should skip creating a buffer when one already exists.
+				// BUUUT the buffer has already been initiated, so we have to use it.
 			}
-			BitI->BitsAvailable    = Bytes2Bits(BytesRead);
-			BitI->BitsUnavailable  = 0;
 		}
 	}
 
@@ -250,7 +280,7 @@ extern "C" {
 	}
 	
 	uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read) { // Set this up so it can read from memory addresses, to support running on machines without an OS.
-		uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, LeftShift = 0, RightShift = 0, Mask = 0, Data = 0, Mask2Shift = 0;
+		uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, Mask = 0, Data = 0, Mask2Shift = 0;
 		uint64_t OutputData = 0;
 		
 		if ((Bits2Read <= 0) || (Bits2Read > 64)) {

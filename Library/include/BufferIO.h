@@ -129,7 +129,10 @@ extern "C" {
 	 FIXME: What if we just used snprintf to increment the format number instead of splitting the string and whatnot?
 	 */
 	typedef struct BitInput {
+		bool         IsFileBased;
 		FILE        *File;
+		uintptr_t   *StartReadAddress;
+		size_t       ExternalBufferSize;
 		uint64_t     FileSize;
 		uint64_t     FilePosition;
 		uint64_t     BitsUnavailable;
@@ -151,7 +154,10 @@ extern "C" {
 	 @constant       Buffer            "Buffer of BitIOBufferSize bits from File".
 	 */
 	typedef struct BitOutput {
+		bool         IsFileBased;
 		FILE        *File;
+		uintptr_t   *StartWriteAddress;
+		size_t       ExternalBufferSize;
 		uint64_t     BitsUnavailable;
 		uint64_t     BitsAvailable;
 		uint8_t      SystemEndian;
