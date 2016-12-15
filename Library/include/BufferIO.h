@@ -56,9 +56,9 @@ extern "C" {
 		BitOutputBufferSize       = 4096,
 		BitOutputBufferSizeInBits = BitOutputBufferSize * 8,
 		BitIOStringSize           = 1024,
-		BitIOPathSize             = BitIOStringSize,
+		BitIOPathSize             = 1024,
 		BitIOUUIDSize             = 21,
-		BitIOGUIDSize             = BitIOUUIDSize,
+		BitIOGUIDSize             = 21,
 		BitIOFlagSize             = 3,
 		BitIOMD5Size              = 16,
 	} BitIOConstants;
