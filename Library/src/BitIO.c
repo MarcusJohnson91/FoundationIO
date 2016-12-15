@@ -262,13 +262,11 @@ extern "C" {
 
 	void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffsetInBytes) {
         uint64_t Bytes2Read = 0, BytesRead = 0;
-
         fseek(BitI->File, RelativeOffsetInBytes, SEEK_CUR);
         BitI->FilePosition = ftell(BitI->File);
-        //uint64_t Bytes2Read = BitI->FileSize - BitI->FilePosition > Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) ? Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable) : BitI->FileSize - BitI->FilePosition;
-        memset(BitI->Buffer, 0, BitInputBufferSize); // Bytes2Read
+        memset(BitI->Buffer, 0, sizeof(BitI->Buffer));
         Bytes2Read = BitI->FileSize - BitI->FilePosition >= BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
-        BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File); // Bytes2Read
+        BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
         if (BytesRead != Bytes2Read) { // Bytes2Read
             BitI->ErrorStatus->UpdateInputBuffer = FreadReturnedTooLittleData;
 			Log(SYSWarning, "BitIO", "UpdateInputBuffer", NULL);
