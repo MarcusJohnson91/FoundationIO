@@ -541,29 +541,6 @@ extern "C" {
 		}
 	}
 
-	Probabilities FindProbabilityFromSymbol(Probabilities *Probability, double *MaximumTable, double *MinimumTable, size_t TableSize, uint64_t Symbol2Lookup) {
-		if (Symbol2Lookup > TableSize) {
-			// Not good.
-		} else {
-			Probability->Maximum = MaximumTable[Symbol2Lookup];
-			Probability->Minimum = MinimumTable[Symbol2Lookup];
-		}
-		return *Probability;
-	}
-	
-	typedef struct Arthimetic {
-		uint16_t *ProbabilityTable;
-		size_t    TableSize;
-	} Arthimetic;
-
-	typedef struct Probability {
-		double Low;
-		double High;
-	} Probability;
-
-	
-	
-
 #ifdef __cplusplus
 }
 #endif
