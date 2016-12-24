@@ -111,7 +111,7 @@ extern "C" {
 		//int64_t      WriteBuffer;
 		int64_t      WriteRICE;
 		int64_t      VerifyCRC;
-	} ErrorStatus;
+	} ErrorStatus __attribute__((packed));
 
 	/*!
 	 @typedef        BitInput
@@ -140,7 +140,7 @@ extern "C" {
 		uint8_t      SystemEndian:2;
 		ErrorStatus *ErrorStatus;
 		uint8_t      Buffer[BitInputBufferSize];
-	} BitInput;
+	} BitInput __attribute__((packed));
 
 	/*!
 	 @typedef        BitOutput
@@ -163,7 +163,7 @@ extern "C" {
 		uint8_t      SystemEndian;
 		ErrorStatus *ErrorStatus;
 		uint8_t      Buffer[BitOutputBufferSize];
-	} BitOutput;
+	} BitOutput __attribute__((packed));
 
 	extern enum Base {
 		Octal       =  8,
@@ -367,22 +367,24 @@ extern "C" {
 	uint64_t       ReadExpGolomb(BitInput *BitI, bool IsSigned, bool IsTruncated);
 
 	/*!
-	 @abstract                     "Decodes RICE encoded data".
+	 @abstract                     "Reads and Decodes unary/RICE encoded data from BitInput stream".
 	 @return                       "Returns the count of bits aka the value encoded by the encoder".
 
-	 @param    BitI                "Pointer to BitInput".
+	 @param    BitI                "Pointer to BitInput, the Input stream".
+	 @param    IsTruncated         "Has the stop bit been pruned?"
 	 @param    StopBit             "MUST be a 0 or a 1. none of this funny business about how true > 0".
 	 */
-	uint64_t       ReadRICE(BitInput *BitI, uint8_t StopBit);
+	uint64_t       ReadRICE(BitInput *BitI, bool IsTruncated, bool StopBit);
 
 	/*!
-	 @abstract                     "Writes a number in RICE format".
+	 @abstract                     "Encodes and writes data in unary/RICE format to a BitOutput stream".
 
-	 @param    BitO                "Pointer to BitOutput".
+	 @param    BitO                "Pointer to BitOutput, the output stream".
+	 @param    IsTruncated         "Should the stop bit be pruned?"
 	 @param    StopBit             "Has to be a 0 or a 1".
 	 @param    Data2Write          "Number to encode into RICE format".
 	 */
-	void           WriteRICE(BitOutput *BitO, uint8_t StopBit, uint64_t Data2Write);
+	void           WriteRICE(BitOutput *BitO, bool IsTruncated, bool StopBit, uint64_t Data2Write);
 
 	/*!
 	 @abstract                     "Shows the next X bits, without recording it as a read".
@@ -490,6 +492,8 @@ extern "C" {
 	 @abstract                     "Reads arthimetic endcoded data from the stream pointed to by Input".
 	 */
 	uint64_t       ReadArithmetic(BitInput *Input, uint64_t *MaximumTable, uint64_t *MinimumTable, size_t TableSize, uint64_t Bits2Decode);
+	
+	void WriteExpGolomb(BitOutput *BitO, bool IsTruncated, uint64_t Data2Write);
 	
 	extern enum SystemErrors {
 		SYSEmergency     = 1,
