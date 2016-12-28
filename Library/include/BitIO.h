@@ -58,7 +58,9 @@ extern "C" {
 		BitIOStringSize           = 1024,
 		BitIOPathSize             = 1024,
 		BitIOUUIDSize             = 21,
+		BitIOEncodedUUIDSize      = 16,
 		BitIOGUIDSize             = 21,
+		BitIOEncodedGUIDSize      = 16,
 		BitIOFlagSize             = 3,
 		BitIOMD5Size              = 16,
 	} BitIOConstants;

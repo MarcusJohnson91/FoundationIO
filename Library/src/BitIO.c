@@ -129,9 +129,7 @@ extern "C" {
 					}
 					
 					if (strcasecmp(Argument, "-") == 0) {
-						//BitI->File = freopen(Argument, "rb", stdin);
-						BitI->File = fopen(stdin, "rb");
-						setvbuf(BitI->File, BitI->Buffer, _IONBF, BitInputBufferSize);
+						BitI->File = stdin;
 					} else {
 						BitI->File = fopen(Argument, "rb");
 						setvbuf(BitI->File, BitI->Buffer, _IONBF, BitInputBufferSize);
@@ -172,8 +170,7 @@ extern "C" {
 					Index += 1;
 					snprintf(Argument, BitIOPathSize, "%s", argv[Index]);
 					if (strcasecmp(Argument, "-") == 0) {
-						BitO->File = freopen(Argument, "wb", stdout);
-						setvbuf(BitO->File, BitO->Buffer, _IONBF, BitOutputBufferSize);
+						BitO->File = stdout;
 					} else {
 						BitO->File = fopen(Argument, "wb");
 						setvbuf(BitO->File, BitO->Buffer, _IONBF, BitOutputBufferSize);
