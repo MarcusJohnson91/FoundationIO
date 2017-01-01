@@ -135,10 +135,10 @@ extern "C" {
 		FILE        *File;
 		uintptr_t   *StartReadAddress;
 		size_t       ExternalBufferSize;
-		uint64_t     FileSize;
-		uint64_t     FilePosition;
-		uint64_t     BitsUnavailable;
-		uint64_t     BitsAvailable;
+		size_t       FileSize;
+		size_t       FilePosition;
+		size_t       BitsUnavailable;
+		size_t       BitsAvailable;
 		uint8_t      SystemEndian:2;
 		ErrorStatus *ErrorStatus;
 		uint8_t      Buffer[BitInputBufferSize];
@@ -160,8 +160,8 @@ extern "C" {
 		FILE        *File;
 		uintptr_t   *StartWriteAddress;
 		size_t       ExternalBufferSize;
-		uint64_t     BitsUnavailable;
-		uint64_t     BitsAvailable;
+		size_t       BitsUnavailable;
+		size_t       BitsAvailable;
 		uint8_t      SystemEndian;
 		ErrorStatus *ErrorStatus;
 		uint8_t      Buffer[BitOutputBufferSize];
