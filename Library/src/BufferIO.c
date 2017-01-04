@@ -6,6 +6,7 @@ extern "C" {
 	
 	uint64_t BitInputCurrentArgument   = 1;
 	uint64_t BitOutputCurrentArgument  = 1;
+	uint64_t BitIOCurrentArgument      = 1;
 	uint64_t BitInputCurrentSpecifier  = 0;
 	uint64_t BitOutputCurrentSpecifier = 0;
 
@@ -103,6 +104,31 @@ extern "C" {
             BitO->BitsUnavailable  += Bits2Align;
         }
 	}
+	
+	void DisplayHelp(CommandLineOptions *CMD) {
+		printf("%s Options:\n", CMD->ProgramName);
+		for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
+			printf("%s\t", CMD->Switch[Option]->Switch);
+			printf("%s\n", CMD->Switch[Option]->SwitchDescription);
+		}
+	}
+	
+	void ParseCommandLineArguments(int argc, char *argv[], CommandLineOptions *CMD) {
+		char Argument[BitIOPathSize];
+		if (argc < CMD->NumSwitches + 1) {
+			DisplayHelp(CMD);
+		} else {
+			for (int Index = BitIOCurrentArgument; Index < argc; Index++) {
+				snprintf(Argument, BitIOPathSize, "%s", argv[Index]);
+				
+				if ((strcasecmp(Argument, "-h") || strcasecmp(Argument, "--help")) == 0) {
+					DisplayHelp(CMD);
+				} else if (strcasecmp(Argument, CMD->Switch[Index]->Switch) == 0) {
+					snprintf(CMD->Switch[Index]->SwitchResult, BitIOStringSize, "%s", Argument);
+				}
+			}
+		}
+	}
 
 	static void PrintHelp(void) {
 		fprintf(stdout, "Usage: -i <input> -o <output> (-s is to specify the start of a file sequence, and should be before the argument it's intended for)\n");
@@ -132,7 +158,7 @@ extern "C" {
 						BitI->File = stdin;
 					} else {
 						BitI->File = fopen(Argument, "rb");
-						setvbuf(BitI->File, BitI->Buffer, _IONBF, BitInputBufferSize);
+						//errno = setvbuf(BitI->File, &BitI->Buffer, _IONBF, BitInputBufferSize);
 						if (BitI->File == NULL) {
 							BitI->ErrorStatus->ParseInputOptions = FopenFailed;
 							Log(SYSCritical, "BitIO", "ParseInputOptions", strerror(errno));
@@ -173,7 +199,7 @@ extern "C" {
 						BitO->File = stdout;
 					} else {
 						BitO->File = fopen(Argument, "wb");
-						setvbuf(BitO->File, BitO->Buffer, _IONBF, BitOutputBufferSize);
+						//errno = setvbuf(BitO->File, BitO->Buffer, _IONBF, BitOutputBufferSize);
 						if (BitO->File == NULL) {
 							BitO->ErrorStatus->ParseOutputOptions = FopenFailed;
 							Log(SYSCritical, "BitIO", "ParseOutputOptions", strerror(errno));
@@ -184,7 +210,7 @@ extern "C" {
 				
 				if (strcasecmp(Argument, "-oa")) { // Output address
 					Index += 1;
-					BitO->StartWriteAddress = (uint64_t)Argument;
+					BitO->StartWriteAddress = Argument;
 					BitO->IsFileBased       = true;
 				}
 				
@@ -205,27 +231,25 @@ extern "C" {
 				BitI->ErrorStatus  = ES;
 			}
 			BitI->SystemEndian = DetectSystemEndian();
-			if (BitI->IsFileBased == true) {
-				// Do file related shit here.
-				ParseInputOptions(BitI, argc, argv);
-				fseek(BitI->File, 0, SEEK_END);
-				BitI->FileSize         = (uint64_t)ftell(BitI->File);
-				fseek(BitI->File, 0, SEEK_SET);
-				BitI->FilePosition     = ftell(BitI->File);
-				uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
-				uint64_t BytesRead     = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
-				if ((BitI->FilePosition + BytesRead < BitI->FileSize) && (BytesRead < BitInputBufferSize)) { // Bytes2Read
-					BitI->ErrorStatus->InitBitInput = FreadReturnedTooLittleData;
-					Log(SYSCritical, "BitIO", "InitBitInput", strerror(errno));
-				}
-				BitI->BitsAvailable    = Bytes2Bits(BytesRead);
-				BitI->BitsUnavailable  = 0;
-			} else {
-				// Do memory related shit here.
-				// Hmm, how do we accept memory address stuff?
-				// Well, we should skip creating a buffer when one already exists.
-				// BUUUT the buffer has already been initiated, so we have to use it.
+			// Do file related shit here.
+			ParseInputOptions(BitI, argc, argv);
+			fseek(BitI->File, 0, SEEK_END);
+			BitI->FileSize         = (uint64_t)ftell(BitI->File);
+			fseek(BitI->File, 0, SEEK_SET);
+			BitI->FilePosition     = ftell(BitI->File);
+			uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
+			uint64_t BytesRead     = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
+			if ((BitI->FilePosition + BytesRead < BitI->FileSize) && (BytesRead < BitInputBufferSize)) { // Bytes2Read
+				BitI->ErrorStatus->InitBitInput = FreadReturnedTooLittleData;
+				Log(SYSCritical, "BitIO", "InitBitInput", strerror(errno));
 			}
+			BitI->BitsAvailable    = Bytes2Bits(BytesRead);
+			BitI->BitsUnavailable  = 0;
+			
+			// Do memory related shit here.
+			// Hmm, how do we accept memory address stuff?
+			// Well, we should skip creating a buffer when one already exists.
+			// BUUUT the buffer has already been initiated, so we have to use it.
 		}
 	}
 
@@ -416,6 +440,13 @@ extern "C" {
 		// Then, long divide the data by the poly, all subtractions in long division are done modulo 2. Modulo 2 subtraction = XOR
 		
 		// Loop over the whole data block, to calculate the CRC. use BitInput directly, instead of relying on data being submitted
+		// PNG Polynomial in reversed representation:
+		// x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+		// x^178 + x + 1 % 4294967296;
+		// Add any padding if nessicary?
+		// CRC Data Input: 49484452 00000058 00000058 08060000 00
+		// CRC in base 10: 1229472850 88 88 2054
+		// CRC result: 0x71953034
 		uint16_t CRCResult = 0;
 		for (uint64_t Byte = 0; Byte < DataSize; Byte++) {
 			CRCResult = CRCData->Polynomial ^ BitI->Buffer[BitI->BitsUnavailable / 8] << 8;

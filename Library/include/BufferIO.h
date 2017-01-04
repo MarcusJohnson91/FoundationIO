@@ -166,6 +166,26 @@ extern "C" {
 		ErrorStatus *ErrorStatus;
 		uint8_t      Buffer[BitOutputBufferSize];
 	} BitOutput __attribute__((packed));
+	
+	/*!
+	 @param Switch      "Must be null padded".
+	 
+	 */
+	typedef struct CLSwitch {
+		char       Switch[BitIOStringSize];
+		char       SwitchDescription[BitIOStringSize];
+		char       SwitchResult[BitIOStringSize];
+	} CLSwitch;
+	
+	typedef struct CommandLineOptions {
+		size_t      NumSwitches;
+		char        ProgramName[BitIOStringSize];
+		// Program name
+		// General line describing the program
+		// Switches:
+		// list of switches with their descriptions printed next to them
+		CLSwitch   *Switch[];
+	} CommandLineOptions;
 
 	extern enum Base {
 		Octal       =  8,
@@ -519,7 +539,6 @@ extern "C" {
 		uint16_t           Value;
 		struct LinkedList *Next;
 	} LinkedList;
-
 	
 #ifdef __cplusplus
 }
