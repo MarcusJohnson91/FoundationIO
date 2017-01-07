@@ -44,6 +44,17 @@ extern "C" {
 	int64_t Unsigned2Signed(uint64_t Unsigned) {  // In UnitTest
 		return (int64_t)Unsigned;
 	}
+	
+	uint8_t CountBitsSet(uint64_t Data) {
+		uint8_t DataBit = 0, BitCount = 0;
+		for (uint8_t Bit = 0; Bit < Bits2Bytes(sizeof(Data)); Bit++) {
+			DataBit = (Data & (1 << Bit)) >> Bit;
+			if (DataBit == 1) {
+				BitCount += 1;
+			}
+		}
+		return BitCount;
+	}
 
     uint64_t Power2Mask(uint8_t Exponent) { // In UnitTest
         if ((Exponent <= 0) || (Exponent > 64)) { // Exponent = 1

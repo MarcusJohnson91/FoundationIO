@@ -517,6 +517,8 @@ extern "C" {
 	
 	void WriteExpGolomb(BitOutput *BitO, bool IsTruncated, uint64_t Data2Write);
 	
+	uint8_t CountBitsSet(uint64_t Data);
+	
 	extern enum SystemErrors {
 		SYSEmergency     = 1,
 		SYSPanic         = 1,
