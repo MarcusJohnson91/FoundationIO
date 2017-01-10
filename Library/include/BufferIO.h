@@ -244,13 +244,6 @@ extern "C" {
 	uint8_t        BitsRemaining(uint64_t BitsAvailable);
 
 	/*!
-	 @abstract                         "Rounds Number2Round up to it's next multiple".
-	 @param        Number2Round        "The number that should be rounded up".
-	 @param        Multiple            "The multiple you want your number rounded to".
-	 */
-	uint64_t       RoundUp2NearestMultiple(uint64_t Number2Round, uint8_t Multiple);
-
-	/*!
 	 @abstract                         "Converts an Signed int to a Unsigned int".
 	 @remark                           "The internal representation in BitIO is unsigned".
 	 @return                           "Returns the input data in Unsigned format".
@@ -279,20 +272,18 @@ extern "C" {
 	/*!
 	 @abstract                         "Aligns bits for multi-byte alignment".
 	 @remark                           "Aligns to specified byte without care about the current position".
-	 @example                          "if you're trying to align to 32 bit boundary, and your last bit isn't on a byte boundary, it'll add 31 bits of alignment instead of 2. For absolute byte alignment check if it's aligned with IsByteStreamAligned, and call AlignInput with 1 as well"
-	 @remark                           "TODO: Should this be Input/Output neutral?".
 
 	 @param    BitI                    "Pointer to BitInput".
-	 @param    BytesOfAlignment        s"Number of bytes of padding to align it to. BytesOfPadding - 1, + AlignBits2Bytes"
+	 @param    BytesOfAlignment        "Number of bytes of padding to align it to"
 	 */
 	void           AlignInput(BitInput *BitI, uint8_t BytesOfAlignment);
 
 	/*!
-	 @abstract                     "Aligns bits for multi-byte alignment".
-	 @remark                       "TODO: Should this be Input/Output neutral?".
+	 @abstract                         "Aligns bits for multi-byte alignment".
+	 @remark                           "TODO: Should this be Input/Output neutral?".
 
-	 @param    BitO                "Pointer to BitOutput".
-	 @param    BytesOfAlignment         "Number of bytes of padding to align it to. BytesOfPadding - 1, + AlignBits2Bytes"
+	 @param    BitO                    "Pointer to BitOutput".
+	 @param    BytesOfAlignment        "Number of bytes of padding to align it to"
 	 */
 	void           AlignOutput(BitOutput *BitO, uint8_t BytesOfAlignment);
 
@@ -509,11 +500,7 @@ extern "C" {
 	 @param    BytesOfAlignment    "Number of bytes to check alignment with, aka is BitsUsed a multiple of BytesOfAlignment * 8?".
 	 */
 	bool           IsStreamByteAligned(uint64_t BitsUsed, uint8_t BytesOfAlignment);
-
-	/*
-	 @abstract                     "Reads arthimetic endcoded data from the stream pointed to by Input".
-	 */
-	uint64_t       ReadArithmetic(BitInput *Input, uint64_t *MaximumTable, uint64_t *MinimumTable, size_t TableSize, uint64_t Bits2Decode);
+	
 	/*!
 	 @abstract                     "Writes data encoded as Exponential-Golomb aka Elias Gamma".
 	 */
@@ -533,11 +520,6 @@ extern "C" {
 		SYSDebug         = 8,
 		/* End Syslog-type eror codes */
 	} SystemErrors;
-	
-	typedef struct Probabilities {
-		double Maximum;
-		double Minimum;
-	} Probabilities;
 	
 	typedef struct LinkedList {
 		uint16_t           Value;
