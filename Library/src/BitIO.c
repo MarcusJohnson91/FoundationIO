@@ -134,7 +134,6 @@ extern "C" {
 	}
 	
 	void DisplayHelp(CommandLineOptions *CMD) {
-		printf("%s Options:\n", CMD->ProgramName);
 		for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
 			printf("%s\t", CMD->Switch[Option]->Switch);
 			printf("%s\n", CMD->Switch[Option]->SwitchDescription);
@@ -144,6 +143,7 @@ extern "C" {
 	void ParseCommandLineArguments(int argc, char *argv[], CommandLineOptions *CMD) {
 		char Argument[BitIOPathSize];
 		if (argc < CMD->NumSwitches + 1) {
+			printf("%s Options:\n", CMD->ProgramName);
 			DisplayHelp(CMD);
 		} else {
 			for (int Index = BitIOCurrentArgument; Index < argc; Index++) {
