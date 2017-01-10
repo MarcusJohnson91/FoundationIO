@@ -116,6 +116,23 @@ extern "C" {
         }
 	}
 	
+	bool IsOdd(int64_t X) {
+		return X % 2 == 0 ? false : true;
+	}
+	
+	uint8_t  FindHighestBitSet(uint64_t X) {
+		uint8_t HighestBitSet = 0;
+		// use sizeof to get the size of the included bit (check to see if its always cast to 64 tho, if so just start at 64)
+		// then count down from 64 to 0, stopping when you first find a 1 bit, mark the number of loops. that's the highest bit set.
+		for (uint8_t Bit = sizeof(X); Bit > 0; Bit--) {
+			if (((X & Bit) >> (sizeof(X) - Bit)) == 1) {
+				HighestBitSet = Bit;
+				break;
+			}
+		}
+		return HighestBitSet;
+	}
+	
 	void DisplayHelp(CommandLineOptions *CMD) {
 		printf("%s Options:\n", CMD->ProgramName);
 		for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
@@ -342,43 +359,7 @@ extern "C" {
 		}
 		return OutputData;
 	}
-
-	uint64_t ReadExpGolomb(BitInput *BitI, bool IsSigned, bool IsTruncated) {
-		uint64_t Zeros = 0;
-		uint64_t  Data = 0;
-
-        while (ReadBits(BitI, 1) != 1) {
-            Zeros += 1;
-        }
-        Data  = (1LLU << Zeros);
-        Data += ReadBits(BitI, Zeros);
-
-		if (IsSigned == true) {
-			Data  = Unsigned2Signed(Data);
-		}
-		if (IsTruncated == true) {
-			Data  = 2 * Zeros - 1; // Left bit first
-			Data += ReadBits(BitI, Zeros);
-		}
-		return Data;
-	}
 	
-	void WriteExpGolomb(BitOutput *BitO, bool IsTruncated, uint64_t Data2Write) {
-		uint64_t Data = 0;
-		
-		if (IsTruncated == true) {
-			// Do truncated stuff here.
-			// if x = M, the terminating 0 is omitted.
-		} else {
-			// Do signed stuff here.
-			// tldr write Data2Write 1s, followed by a 0.
-			for (uint8_t Bit = 0; Bit < Data2Write - 1; Bit++) {
-				WriteBits(BitO, 0, 1);
-			}
-			WriteBits(BitO, 1, 1); // Trailing 1 bit
-		}
-	}
-
 	uint64_t ReadRICE(BitInput *BitI, bool IsTruncated, bool StopBit) {
 		uint64_t BitCount = 0;
 		
@@ -394,6 +375,49 @@ extern "C" {
 			BitCount += 1; // The StopBit needs to be included in the count.
 		}
 		return BitCount;
+	}
+
+	int64_t ReadExpGolomb(BitInput *BitI, bool IsSigned, bool IsTruncated) {
+		uint64_t Zeros   = 0;
+		uint64_t CodeNum = 0;
+		int64_t  Temp    = 0;
+		int64_t  Final   = 0;
+
+		while (ReadBits(BitI, 1) != 1) {
+			Zeros += 1;
+		}
+		
+		if (IsSigned == false && IsTruncated == false) { // Unsigned
+			CodeNum  = (1ULL << Zeros);
+			CodeNum += ReadBits(BitI, Zeros);
+		} else if (IsSigned == true && IsTruncated == false) { // Signed
+			// Find out if it's negative, if so, read it normally, then use Unsigned2Signed.
+			// If CodeNum is odd it's positive, even numbers are negative
+			if (IsOdd(CodeNum) == true) { // Positive
+				Final = CodeNum;
+			} else {
+				Final = -CodeNum;
+			}
+		} else if (IsTruncated == true && IsSigned == false) { // Truncated
+			
+		}
+		return Final; // FIXME: CodeNum is an intemediary number, not final
+	}
+	
+	void WriteExpGolomb(BitOutput *BitO, bool IsTruncated, bool IsMapped, uint64_t Data2Write) {
+		uint64_t Data = 0;
+		
+		if (IsTruncated == true) {
+			// Do truncated stuff here.
+			// if x = M, the terminating 0 is omitted.
+		} else {
+			// Do signed stuff here.
+			// tldr write Data2Write 1s, followed by a 0.
+			for (uint8_t Bit = 0; Bit < Data2Write - 1; Bit++) {
+				WriteBits(BitO, 0, 1);
+			}
+			WriteBits(BitO, 1, 1); // Trailing 1 bit
+		}
 	}
 
 	void WriteRICE(BitOutput *BitO, bool IsTruncated, bool StopBit, uint64_t Data2Write) {
