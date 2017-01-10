@@ -379,14 +379,14 @@ extern "C" {
 	uint64_t       ReadBits(BitInput *BitI, uint8_t Bits2Read);
 
 	/*!
-	 @abstract                     "Reads Exponential Golomb, and Truncated Exponential Golomb codes".
+	 @abstract                     "Reads data encoded as Exponential-Golomb aka Elias Gamma".
 	 @return                       "Returns the decoded value of the Elias/Golomb code".
 
 	 @param    BitI                "Pointer to BitInput".
 	 @param    IsSigned            "Should it be read as signed or unsigneed?".
 	 @param    IsTruncated         "Should it be read as the truncated variant of ExpGolomb coding?"
 	 */
-	uint64_t       ReadExpGolomb(BitInput *BitI, bool IsSigned, bool IsTruncated);
+	int64_t        ReadExpGolomb(BitInput *BitI, bool IsSigned, bool IsTruncated);
 
 	/*!
 	 @abstract                     "Reads and Decodes unary/RICE encoded data from BitInput stream".
@@ -514,8 +514,10 @@ extern "C" {
 	 @abstract                     "Reads arthimetic endcoded data from the stream pointed to by Input".
 	 */
 	uint64_t       ReadArithmetic(BitInput *Input, uint64_t *MaximumTable, uint64_t *MinimumTable, size_t TableSize, uint64_t Bits2Decode);
-	
-	void WriteExpGolomb(BitOutput *BitO, bool IsTruncated, uint64_t Data2Write);
+	/*!
+	 @abstract                     "Writes data encoded as Exponential-Golomb aka Elias Gamma".
+	 */
+	void WriteExpGolomb(BitOutput *BitO, bool IsTruncated, bool IsMapped, uint64_t Data2Write);
 	
 	uint8_t CountBitsSet(uint64_t Data);
 	
