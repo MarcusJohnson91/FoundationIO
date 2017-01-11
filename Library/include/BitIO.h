@@ -183,6 +183,7 @@ extern "C" {
 	typedef struct CommandLineOptions {
 		size_t      NumSwitches;
 		char        ProgramName[BitIOStringSize];
+		char        ProgramDescription[BitIOStringSize];
 		// Program name
 		// General line describing the program
 		// Switches:
