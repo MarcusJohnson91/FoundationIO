@@ -168,10 +168,13 @@ extern "C" {
 	} BitOutput __attribute__((packed));
 	
 	/*!
-	 @param Switch      "Must be null padded".
-	 
+	 @param SwitchOrderNum    "Order in which this switch should be printed".
+	 @param Switch            "Actual switch, including dash(es)".
+	 @param SwitchDescription "Message to print explaining what the switch does".
+	 @param SwitchResult      "String to contain the result of this switch, NULL if not found".
 	 */
 	typedef struct CLSwitch {
+		uint8_t    SwitchOrderNum;
 		char       Switch[BitIOStringSize];
 		char       SwitchDescription[BitIOStringSize];
 		char       SwitchResult[BitIOStringSize];

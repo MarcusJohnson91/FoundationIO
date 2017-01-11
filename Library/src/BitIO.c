@@ -267,7 +267,7 @@ extern "C" {
 			BitI->FilePosition     = ftell(BitI->File);
 			uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
 			uint64_t BytesRead     = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
-			if ((BitI->FilePosition + BytesRead < BitI->FileSize) && (BytesRead < BitInputBufferSize)) { // Bytes2Read
+			if (BitI->FilePosition + BytesRead < BitI->FileSize && BytesRead < BitInputBufferSize) { // Bytes2Read
 				BitI->ErrorStatus->InitBitInput = FreadReturnedTooLittleData;
 				Log(SYSCritical, "BitIO", "InitBitInput", strerror(errno));
 			}
