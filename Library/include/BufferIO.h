@@ -169,12 +169,13 @@ extern "C" {
 	} BitOutput __attribute__((packed));
 	
 	/*!
-	 @param SwitchOrderNum    "Order in which this switch should be printed".
+	 @param SwitchFound       "If the switch was found in argv, this will be set to 1".
 	 @param Switch            "Actual switch, including dash(es)".
 	 @param SwitchDescription "Message to print explaining what the switch does".
 	 @param SwitchResult      "String to contain the result of this switch, NULL if not found".
 	 */
 	typedef struct CLSwitch { //
+		bool        SwitchFound;
 		char       *Switch;
 		char       *SwitchDescription;
 		char       *SwitchResult;
@@ -184,7 +185,7 @@ extern "C" {
 		size_t      NumSwitches;
 		char        *ProgramName;
 		char        *ProgramDescription;
-		char        *AuthorLicenseCopyright;
+		char        *AuthorCopyrightLicense;
 		// Program name
 		// General line describing the program
 		// Switches:
