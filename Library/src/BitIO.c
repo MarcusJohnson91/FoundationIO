@@ -134,6 +134,11 @@ extern "C" {
 	}
 	
 	void DisplayHelp(CommandLineOptions *CMD) {
+		printf("%s:\t", CMD->ProgramName);
+		printf("%s\n",  CMD->ProgramDescription);
+		printf("%s\n",  CMD->AuthorCopyrightLicense);
+		printf("\n\n");
+		printf("Options:\n");
 		for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
 			printf("%s\t", CMD->Switch[Option]->Switch);
 			printf("%s\n", CMD->Switch[Option]->SwitchDescription);
@@ -143,16 +148,16 @@ extern "C" {
 	void ParseCommandLineArguments(int argc, char *argv[], CommandLineOptions *CMD) {
 		char Argument[BitIOPathSize];
 		if (argc < CMD->NumSwitches + 1) {
-			printf("%s Options:\n", CMD->ProgramName);
 			DisplayHelp(CMD);
 		} else {
 			for (int Index = BitIOCurrentArgument; Index < argc; Index++) {
-				snprintf(Argument, BitIOPathSize, "%s", argv[Index]);
-				
-				if ((strcasecmp(Argument, "-h") || strcasecmp(Argument, "--help")) == 0) {
+				if (strcasecmp(Argument, "-h") == 0 || strcasecmp(Argument, "--help") == 0 || strcasecmp(Argument, "/?")) {
 					DisplayHelp(CMD);
-				} else if (strcasecmp(Argument, CMD->Switch[Index]->Switch) == 0) {
-					snprintf(CMD->Switch[Index]->SwitchResult, BitIOStringSize, "%s", Argument);
+				} else {
+					if (strcasecmp(CMD->Switch[Index]->Switch, argv[Index]) == 0) { // If the current switch matches one of the switches, set the IsFound bool to true.
+						CMD->Switch[Index]->SwitchFound = true;
+						snprintf(CMD->Switch[Index]->SwitchResult, BitIOStringSize, "%s", argv[Index]);
+					}
 				}
 			}
 		}
