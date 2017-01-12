@@ -63,6 +63,7 @@ extern "C" {
 		BitIOEncodedGUIDSize      = 16,
 		BitIOFlagSize             = 3,
 		BitIOMD5Size              = 16,
+		BitIOMaxSwitches          = 64,
 	} BitIOConstants;
 	
 	extern uint64_t BitInputCurrentArgument;
@@ -173,22 +174,22 @@ extern "C" {
 	 @param SwitchDescription "Message to print explaining what the switch does".
 	 @param SwitchResult      "String to contain the result of this switch, NULL if not found".
 	 */
-	typedef struct CLSwitch {
-		uint8_t    SwitchOrderNum;
-		char       Switch[BitIOStringSize];
-		char       SwitchDescription[BitIOStringSize];
-		char       SwitchResult[BitIOStringSize];
+	typedef struct CLSwitch { //
+		char       *Switch;
+		char       *SwitchDescription;
+		char       *SwitchResult;
 	} CLSwitch;
 	
-	typedef struct CommandLineOptions {
+	typedef struct CommandLineOptions { // [BitIOStringSize]
 		size_t      NumSwitches;
-		char        ProgramName[BitIOStringSize];
-		char        ProgramDescription[BitIOStringSize];
+		char        *ProgramName;
+		char        *ProgramDescription;
+		char        *AuthorLicenseCopyright;
 		// Program name
 		// General line describing the program
 		// Switches:
 		// list of switches with their descriptions printed next to them
-		CLSwitch   *Switch[];
+		CLSwitch   *Switch[BitIOMaxSwitches];
 	} CommandLineOptions;
 
 	extern enum Base {
