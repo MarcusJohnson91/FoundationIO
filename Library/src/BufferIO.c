@@ -449,29 +449,36 @@ extern "C" {
 		}
 	}
 
-	int64_t ReadExpGolomb(BitInput *BitI, bool IsSigned) {
+	int64_t ReadExpGolomb(BitInput *BitI, bool IsSigned, uint8_t StopBit) {
 		uint64_t Zeros   = 0;
 		uint64_t CodeNum = 0;
 		int64_t  Temp    = 0;
 		int64_t  Final   = 0;
 
-		while (ReadBits(BitI, 1) != 1) {
-			Zeros += 1;
-		}
-		
-		if (IsSigned == false) { // Unsigned
-			CodeNum  = (1ULL << Zeros);
-			CodeNum += ReadBits(BitI, Zeros);
-		} else { // Signed
-			// Find out if it's negative, if so, read it normally, then use Unsigned2Signed.
-			// If CodeNum is odd it's positive, even numbers are negative
-			if (IsOdd(CodeNum) == true) { // Positive
-				Final = CodeNum;
-			} else {
-				Final = -CodeNum;
+		if (StopBit > 1) {
+			char Description[BitIOStringSize];
+			snprintf(Description, BitIOStringSize, "Invalid StopBit: %d\n", StopBit);
+			Log(SYSEmergency, "BitIO", "ReadExpGolomb", Description);
+			exit(EXIT_FAILURE);
+		} else {
+			while (ReadBits(BitI, 1) != StopBit) {
+				Zeros += 1; // Num bits to read after the top bit
+			}
+			
+			if (IsSigned == false) { // Unsigned
+				CodeNum  = (1ULL << Zeros);
+				CodeNum += ReadBits(BitI, Zeros);
+			} else { // Signed
+					 // Find out if it's negative, if so, read it normally, then use Unsigned2Signed.
+					 // If CodeNum is odd it's positive, even numbers are negative
+				if (IsOdd(CodeNum) == true) { // Positive
+					Final = CodeNum - 1;
+				} else {
+					Final = -(CodeNum - 1);
+				}
 			}
 		}
-		return Final; // FIXME: CodeNum is an intemediary number, not final
+		return Final;
 	}
 	
 	void WriteExpGolomb(BitOutput *BitO, bool IsTruncated, bool IsMapped, uint64_t Data2Write) {
