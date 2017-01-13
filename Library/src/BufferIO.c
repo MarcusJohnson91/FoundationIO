@@ -133,6 +133,10 @@ extern "C" {
 		return HighestBitSet;
 	}
 	
+	void OpenInputFile(BitInput *BitI, CommandLineOptions *CMD) {
+		
+	}
+	
 	void DisplayHelp(CommandLineOptions *CMD) {
 		printf("%s:\t", CMD->ProgramName);
 		printf("%s\n",  CMD->ProgramDescription);
@@ -146,14 +150,27 @@ extern "C" {
 	}
 	
 	void ParseCommandLineArguments(int argc, char *argv[], CommandLineOptions *CMD) {
-		char Argument[BitIOPathSize];
+		char Argument[BitIOStringSize];
+		size_t EqualsLocation = 0;
+		
 		if (argc < CMD->NumSwitches + 1) {
 			DisplayHelp(CMD);
 		} else {
+			// Scan for equals signs as well, if found, after after the equal sign is the result, everything before is the switch.
 			for (int Index = BitIOCurrentArgument; Index < argc; Index++) {
 				if (strcasecmp(Argument, "-h") == 0 || strcasecmp(Argument, "--help") == 0 || strcasecmp(Argument, "/?")) {
 					DisplayHelp(CMD);
 				} else {
+					EqualsLocation = strchr(Argument, 0x3D); // 0x3D = "="
+					if (EqualsLocation != NULL) { // found
+												 // Start reading the result of the switch from EqualLocation +1.
+						for (size_t Byte = EqualsLocation + 1; Byte < sizeof(argv[Index]); Byte++) {
+							for (size_t SwitchByte = 0; SwitchByte < sizeof(argv[Index]); SwitchByte++) {
+								CMD->Switch[Index]->SwitchResult[SwitchByte] = *argv[Index];
+							}
+						}
+					}
+					
 					if (strcasecmp(CMD->Switch[Index]->Switch, argv[Index]) == 0) { // If the current switch matches one of the switches, set the IsFound bool to true.
 						CMD->Switch[Index]->SwitchFound = true;
 						snprintf(CMD->Switch[Index]->SwitchResult, BitIOStringSize, "%s", argv[Index]);
@@ -365,8 +382,22 @@ extern "C" {
 		return OutputData;
 	}
 	
+	int64_t  ReadRICECoding(BitInput *BitI, bool Truncated, bool Signed, uint8_t StopBit) {
+		if (Truncated == true) {
+			// count the zero bit
+		} else {
+			// dont count the 0 bit
+		}
+		
+		if (Signed == true) {
+			// subtract the first bit, if it's set to 1 its negative
+		}
+		
+		return 0;
+	}
+	
 	uint64_t ReadRICE(BitInput *BitI, bool IsTruncated, bool StopBit) {
-		uint64_t BitCount = 0;
+		uint64_t BitCount = 0; // 2
 		
 		if (IsTruncated == true) {
 			// Truncated RICE code
@@ -377,6 +408,7 @@ extern "C" {
 			while (ReadBits(BitI, 1) != StopBit) {
 				BitCount += 1;
 			}
+			
 			BitCount += 1; // The StopBit needs to be included in the count.
 		}
 		return BitCount;
