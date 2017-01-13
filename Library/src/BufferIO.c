@@ -353,7 +353,6 @@ extern "C" {
 		uint64_t OutputData = 0;
 		
 		if ((Bits2Read <= 0) || (Bits2Read > 64)) {
-			BitI->ErrorStatus->PeekBits = NumberNotInRange;
 			char Description[BitIOPathSize];
 			snprintf(Description, BitIOPathSize, "ReadBits only supports reading 1-64 bits at a time, you tried reading: %d bits\n", Bits2Read);
 			Log(SYSCritical, "BitIO", "ReadBits", Description);
@@ -425,7 +424,9 @@ extern "C" {
 		uint64_t BitCount = 0;
 		
 		if (StopBit > 1) {
-			BitI->ErrorStatus->WriteRICE = NumberNotInRange;
+			char Description[BitIOStringSize];
+			snprintf(Description, BitIOStringSize, "Invalid StopBit: %d\n", StopBit);
+			Log(SYSEmergency, "BitIO", "ReadRICE", Description);
 			exit(EXIT_FAILURE);
 		} else {
 			while (ReadBits(BitI, 1) != StopBit) {
@@ -481,7 +482,7 @@ extern "C" {
 		return Final;
 	}
 	
-	void WriteExpGolomb(BitOutput *BitO, bool IsTruncated, bool IsMapped, uint64_t Data2Write) {
+	void WriteExpGolomb(BitOutput *BitO, uint64_t Data2Write) {
 		uint64_t Data = 0;
 		
 		if (IsTruncated == true) {
