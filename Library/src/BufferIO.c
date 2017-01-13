@@ -382,92 +382,6 @@ extern "C" {
 		return OutputData;
 	}
 	
-	int64_t  ReadRICECoding(BitInput *BitI, bool Truncated, bool Signed, uint8_t StopBit) {
-		if (Truncated == true) {
-			// count the zero bit
-		} else {
-			// dont count the 0 bit
-		}
-		
-		if (Signed == true) {
-			// subtract the first bit, if it's set to 1 its negative
-		}
-		
-		return 0;
-	}
-	
-	uint64_t ReadRICE(BitInput *BitI, bool IsTruncated, bool StopBit) {
-		uint64_t BitCount = 0; // 2
-		
-		if (IsTruncated == true) {
-			// Truncated RICE code
-			while (ReadBits(BitI, 1) != StopBit) {
-				BitCount += 1;
-			}
-		} else {
-			while (ReadBits(BitI, 1) != StopBit) {
-				BitCount += 1;
-			}
-			
-			BitCount += 1; // The StopBit needs to be included in the count.
-		}
-		return BitCount;
-	}
-
-	int64_t ReadExpGolomb(BitInput *BitI, bool IsSigned, bool IsTruncated) {
-		uint64_t Zeros   = 0;
-		uint64_t CodeNum = 0;
-		int64_t  Temp    = 0;
-		int64_t  Final   = 0;
-
-		while (ReadBits(BitI, 1) != 1) {
-			Zeros += 1;
-		}
-		
-		if (IsSigned == false && IsTruncated == false) { // Unsigned
-			CodeNum  = (1ULL << Zeros);
-			CodeNum += ReadBits(BitI, Zeros);
-		} else if (IsSigned == true && IsTruncated == false) { // Signed
-			// Find out if it's negative, if so, read it normally, then use Unsigned2Signed.
-			// If CodeNum is odd it's positive, even numbers are negative
-			if (IsOdd(CodeNum) == true) { // Positive
-				Final = CodeNum;
-			} else {
-				Final = -CodeNum;
-			}
-		} else if (IsTruncated == true && IsSigned == false) { // Truncated
-			
-		}
-		return Final; // FIXME: CodeNum is an intemediary number, not final
-	}
-	
-	void WriteExpGolomb(BitOutput *BitO, bool IsTruncated, bool IsMapped, uint64_t Data2Write) {
-		uint64_t Data = 0;
-		
-		if (IsTruncated == true) {
-			// Do truncated stuff here.
-			// if x = M, the terminating 0 is omitted.
-		} else {
-			// Do signed stuff here.
-			// tldr write Data2Write 1s, followed by a 0.
-			for (uint8_t Bit = 0; Bit < Data2Write - 1; Bit++) {
-				WriteBits(BitO, 0, 1);
-			}
-			WriteBits(BitO, 1, 1); // Trailing 1 bit
-		}
-	}
-
-	void WriteRICE(BitOutput *BitO, bool IsTruncated, bool StopBit, uint64_t Data2Write) {
-		if ((StopBit < 0) || (StopBit > 1)) {
-			BitO->ErrorStatus->WriteRICE = NumberNotInRange;
-		} else {
-			for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
-                WriteBits(BitO, (1 ^ StopBit), 1); // FIXME: XOR?
-			}
-			WriteBits(BitO, StopBit, 1);
-		}
-	}
-	
 	uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek) {
 		uint64_t OutputData = 0ULL;
 		OutputData = ReadBits(BitI, Bits2Peek);
@@ -494,16 +408,85 @@ extern "C" {
 			BitsLeft    -= Bits2Write;
 		}
 	}
-
+	
 	void SkipBits(BitInput *BitI, int64_t Bits) {
 		if (Bits <= BitI->BitsAvailable) {
 			BitI->BitsAvailable   -= Bits;
 			BitI->BitsUnavailable += Bits;
 		} else {
 			fseek(BitI->File, Bits2Bytes(Bits - BitI->BitsAvailable), SEEK_CUR);
-            BitI->BitsAvailable   = 0;
-            BitI->BitsUnavailable = 0;
-            UpdateInputBuffer(BitI, 0); // Bits2Bytes(Bits)
+			BitI->BitsAvailable   = BitI->FileSize + BitInputBufferSize <= BitI->FileSize ? BitInputBufferSize : BitI->FileSize;
+			BitI->BitsUnavailable = Bits % 8;
+			UpdateInputBuffer(BitI, 0); // Bits2Bytes(Bits)
+		}
+	}
+	
+	uint64_t  ReadRICE(BitInput *BitI, bool Truncated, uint8_t StopBit) {
+		uint64_t BitCount = 0;
+		
+		if (StopBit > 1) {
+			BitI->ErrorStatus->WriteRICE = NumberNotInRange;
+			exit(EXIT_FAILURE);
+		} else {
+			while (ReadBits(BitI, 1) != StopBit) {
+				BitCount += 1;
+			}
+			if (Truncated == true) {
+				BitCount++;
+			}
+		}
+		return BitCount;
+	}
+	
+	void WriteRICE(BitOutput *BitO, bool Truncated, bool StopBit, uint64_t Data2Write) {
+		if (StopBit > 1) {
+			BitO->ErrorStatus->WriteRICE = NumberNotInRange;
+		} else {
+			for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
+				WriteBits(BitO, (~StopBit), 1);
+			}
+			WriteBits(BitO, StopBit, 1);
+		}
+	}
+
+	int64_t ReadExpGolomb(BitInput *BitI, bool IsSigned) {
+		uint64_t Zeros   = 0;
+		uint64_t CodeNum = 0;
+		int64_t  Temp    = 0;
+		int64_t  Final   = 0;
+
+		while (ReadBits(BitI, 1) != 1) {
+			Zeros += 1;
+		}
+		
+		if (IsSigned == false) { // Unsigned
+			CodeNum  = (1ULL << Zeros);
+			CodeNum += ReadBits(BitI, Zeros);
+		} else { // Signed
+			// Find out if it's negative, if so, read it normally, then use Unsigned2Signed.
+			// If CodeNum is odd it's positive, even numbers are negative
+			if (IsOdd(CodeNum) == true) { // Positive
+				Final = CodeNum;
+			} else {
+				Final = -CodeNum;
+			}
+		}
+		return Final; // FIXME: CodeNum is an intemediary number, not final
+	}
+	
+	void WriteExpGolomb(BitOutput *BitO, bool IsTruncated, bool IsMapped, uint64_t Data2Write) {
+		uint64_t Data = 0;
+		
+		if (IsTruncated == true) {
+			// Do truncated stuff here.
+			// if x = M, the terminating 0 is omitted.
+		} else {
+			// Do signed stuff here.
+			// tldr write Data2Write 1s, followed by a 0.
+			for (uint8_t Bit = 0; Bit < Data2Write - 1; Bit++) {
+				WriteBits(BitO, 0, 1);
+			}
+			WriteBits(BitO, 1, 1); // Trailing 1 bit
 		}
 	}
 
