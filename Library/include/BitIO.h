@@ -381,29 +381,28 @@ extern "C" {
 
 	 @param    BitI                "Pointer to BitInput".
 	 @param    IsSigned            "Should it be read as signed or unsigneed?".
-	 @param    IsTruncated         "Should it be read as the truncated variant of ExpGolomb coding?"
 	 */
-	int64_t        ReadExpGolomb(BitInput *BitI, bool IsSigned, bool IsTruncated);
+	int64_t        ReadExpGolomb(BitInput *BitI, bool IsSigned);
 
 	/*!
 	 @abstract                     "Reads and Decodes unary/RICE encoded data from BitInput stream".
 	 @return                       "Returns the count of bits aka the value encoded by the encoder".
 
 	 @param    BitI                "Pointer to BitInput, the Input stream".
-	 @param    IsTruncated         "Has the stop bit been pruned?"
+	 @param    Truncated           "Shoould the StopBit be included in the count?"
 	 @param    StopBit             "MUST be a 0 or a 1. none of this funny business about how true > 0".
 	 */
-	uint64_t       ReadRICE(BitInput *BitI, bool IsTruncated, bool StopBit);
+	uint64_t       ReadRICE(BitInput *BitI, bool Truncated, uint8_t StopBit);
 
 	/*!
 	 @abstract                     "Encodes and writes data in unary/RICE format to a BitOutput stream".
 
 	 @param    BitO                "Pointer to BitOutput, the output stream".
-	 @param    IsTruncated         "Should the stop bit be pruned?"
+	 @param    Truncated           "Should the stop bit be pruned?"
 	 @param    StopBit             "Has to be a 0 or a 1".
 	 @param    Data2Write          "Number to encode into RICE format".
 	 */
-	void           WriteRICE(BitOutput *BitO, bool IsTruncated, bool StopBit, uint64_t Data2Write);
+	void           WriteRICE(BitOutput *BitO, bool Truncated, bool StopBit, uint64_t Data2Write);
 
 	/*!
 	 @abstract                     "Shows the next X bits, without recording it as a read".
