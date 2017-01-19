@@ -137,7 +137,7 @@ extern "C" {
 		
 	}
 	
-	void DisplayHelp(CommandLineOptions *CMD) {
+	void DisplayCMDHelp(CommandLineOptions *CMD) {
 		printf("%s:\t", CMD->ProgramName);
 		printf("%s\n",  CMD->ProgramDescription);
 		printf("%s\n",  CMD->AuthorCopyrightLicense);
@@ -154,12 +154,12 @@ extern "C" {
 		size_t EqualsLocation = 0;
 		
 		if (argc < CMD->NumSwitches + 1) {
-			DisplayHelp(CMD);
+			DisplayCMDHelp(CMD);
 		} else {
 			// Scan for equals signs as well, if found, after after the equal sign is the result, everything before is the switch.
 			for (int Index = BitIOCurrentArgument; Index < argc; Index++) {
 				if (strcasecmp(Argument, "-h") == 0 || strcasecmp(Argument, "--help") == 0 || strcasecmp(Argument, "/?")) {
-					DisplayHelp(CMD);
+					DisplayCMDHelp(CMD);
 				} else {
 					EqualsLocation = strchr(Argument, 0x3D); // 0x3D = "="
 					if (EqualsLocation != NULL) { // found
@@ -482,20 +482,16 @@ extern "C" {
 		return Final;
 	}
 	
-	void WriteExpGolomb(BitOutput *BitO, uint64_t Data2Write) {
+	void WriteExpGolomb(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits) {
 		uint64_t Data = 0;
 		
-		if (IsTruncated == true) {
-			// Do truncated stuff here.
-			// if x = M, the terminating 0 is omitted.
-		} else {
-			// Do signed stuff here.
-			// tldr write Data2Write 1s, followed by a 0.
-			for (uint8_t Bit = 0; Bit < Data2Write - 1; Bit++) {
-				WriteBits(BitO, 0, 1);
-			}
-			WriteBits(BitO, 1, 1); // Trailing 1 bit
+		
+		// Do signed stuff here.
+		// tldr write Data2Write 1s, followed by a 0.
+		for (uint8_t Bit = 0; Bit < Data2Write - 1; Bit++) {
+			WriteBits(BitO, 0, 1);
 		}
+		WriteBits(BitO, 1, 1); // Trailing 1 bit
 	}
 
 	uint64_t GenerateCRC(BitInput *BitI, size_t DataSize, CRC *CRCData) { // uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool PolyType, uint64_t Init, uint8_t CRCSize
