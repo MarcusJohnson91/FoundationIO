@@ -382,7 +382,7 @@ extern "C" {
 	 @param    BitI                "Pointer to BitInput".
 	 @param    IsSigned            "Should it be read as signed or unsigneed?".
 	 */
-	int64_t        ReadExpGolomb(BitInput *BitI, bool IsSigned);
+	int64_t        ReadExpGolomb(BitInput *BitI, bool IsSigned, uint8_t StopBit);
 
 	/*!
 	 @abstract                     "Reads and Decodes unary/RICE encoded data from BitInput stream".
@@ -509,9 +509,11 @@ extern "C" {
 	/*!
 	 @abstract                     "Writes data encoded as Exponential-Golomb aka Elias Gamma".
 	 */
-	void WriteExpGolomb(BitOutput *BitO, bool IsTruncated, bool IsMapped, uint64_t Data2Write);
+	void WriteExpGolomb(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits);
 	
 	uint8_t CountBitsSet(uint64_t Data);
+	
+	void DisplayCMDHelp(CommandLineOptions *CMD);
 	
 	extern enum SystemErrors {
 		SYSEmergency     = 1,
