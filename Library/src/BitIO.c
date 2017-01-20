@@ -517,23 +517,6 @@ extern "C" {
 				}
 			}
 		}
-		/*
-		uint64_t Output = ~CRCData->Initalization;
-		uint64_t Polynomial = 1 << CRCSize; // Implicit bit
-		Polynomial += (Poly & Power2Mask(CRCSize));
-
-		// Create a BitInput version of the data buffer, to readbits from the buffer.
-        //BitBuffer *CRCBits = calloc(CRCSize, 1);
-        //InitBitBuffer(CRCBits, DataBuffer, BufferSize);
-
-		Init > 1 ? Power2Mask(CRCSize) : 1;
-
-		for (size_t Byte = 0; Byte < BufferSize; Byte++) {
-			uint64_t Bits2XOR = 0;//ReadBitBuffer(CRCBits, CRCSize);
-			// if there aren't enough bits, simply shift to MSB to append 0s.
-
-		}
-		 */
 		return 0;
 	}
 
@@ -574,6 +557,7 @@ extern "C" {
 			fprintf(stderr, "Log error: %d\n", errno);
 		}
 		syslog(SYSError, "%s - %s: %s - %s: %s\n", ComputerName, CurrentTime, Library, Function, Description);
+		printf("Error in %s: %s\n", Function, Description);
 
         free(Time);
 	}
