@@ -138,10 +138,7 @@ extern "C" {
 	}
 	
 	void DisplayCMDHelp(CommandLineOptions *CMD) {
-		printf("%s:\t", CMD->ProgramName);
-		printf("%s\n",  CMD->ProgramDescription);
-		printf("%s\n",  CMD->AuthorCopyrightLicense);
-		printf("\n\n");
+		printf("%s: %s, %s\n\n", CMD->ProgramName, CMD->ProgramDescription, CMD->AuthorCopyrightLicense);
 		printf("Options:\n");
 		for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
 			printf("%s\t", CMD->Switch[Option]->Switch);
@@ -180,10 +177,12 @@ extern "C" {
 		}
 	}
 
+	/*
 	static void PrintHelp(void) {
 		fprintf(stdout, "Usage: -i <input> -o <output> (-s is to specify the start of a file sequence, and should be before the argument it's intended for)\n");
 		fprintf(stdout, "Usage: -ia <input address>, -ias <input buffer size>, -oa <output address>, -oas <output buffer size>\n");
 	}
+	 */
 
 	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
 		while (BitI->File == NULL) {
@@ -274,47 +273,39 @@ extern "C" {
 
 	void InitBitInput(BitInput *BitI, ErrorStatus *ES, int argc, const char *argv[]) {
 		// FIXME: Remove any quotes on the path, or the issue could be that the -i and location are specified together...
-		if (argc < 3) {
-			PrintHelp();
-		} else {
-			if (BitI->ErrorStatus == NULL) {
-				BitI->ErrorStatus  = ES;
-			}
-			BitI->SystemEndian = DetectSystemEndian();
-			// Do file related shit here.
-			ParseInputOptions(BitI, argc, argv);
-			fseek(BitI->File, 0, SEEK_END);
-			BitI->FileSize         = (uint64_t)ftell(BitI->File);
-			fseek(BitI->File, 0, SEEK_SET);
-			BitI->FilePosition     = ftell(BitI->File);
-			uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
-			uint64_t BytesRead     = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
-			if (BitI->FilePosition + BytesRead < BitI->FileSize && BytesRead < BitInputBufferSize) { // Bytes2Read
-				BitI->ErrorStatus->InitBitInput = FreadReturnedTooLittleData;
-				Log(SYSCritical, "BitIO", "InitBitInput", strerror(errno));
-			}
-			BitI->BitsAvailable    = Bytes2Bits(BytesRead);
-			BitI->BitsUnavailable  = 0;
-			
-			// Do memory related shit here.
-			// Hmm, how do we accept memory address stuff?
-			// Well, we should skip creating a buffer when one already exists.
-			// BUUUT the buffer has already been initiated, so we have to use it.
+		if (BitI->ErrorStatus == NULL) {
+			BitI->ErrorStatus  = ES;
 		}
+		BitI->SystemEndian = DetectSystemEndian();
+		// Do file related shit here.
+		ParseInputOptions(BitI, argc, argv);
+		fseek(BitI->File, 0, SEEK_END);
+		BitI->FileSize         = (uint64_t)ftell(BitI->File);
+		fseek(BitI->File, 0, SEEK_SET);
+		BitI->FilePosition     = ftell(BitI->File);
+		uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
+		uint64_t BytesRead     = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
+		if (BitI->FilePosition + BytesRead < BitI->FileSize && BytesRead < BitInputBufferSize) { // Bytes2Read
+			BitI->ErrorStatus->InitBitInput = FreadReturnedTooLittleData;
+			Log(SYSCritical, "BitIO", "InitBitInput", strerror(errno));
+		}
+		BitI->BitsAvailable    = Bytes2Bits(BytesRead);
+		BitI->BitsUnavailable  = 0;
+		
+		// Do memory related shit here.
+		// Hmm, how do we accept memory address stuff?
+		// Well, we should skip creating a buffer when one already exists.
+		// BUUUT the buffer has already been initiated, so we have to use it.
 	}
 
 	void InitBitOutput(BitOutput *BitO, ErrorStatus *ES, int argc, const char *argv[]) {
-		if (argc < 3) {
-			PrintHelp();
-		} else {
-			if (BitO->ErrorStatus == NULL) {
-				BitO->ErrorStatus = ES;
-			}
-			BitO->SystemEndian     = DetectSystemEndian();
-			ParseOutputOptions(BitO, argc, argv);
-			BitO->BitsAvailable    = BitOutputBufferSizeInBits;
-			BitO->BitsUnavailable  = 0;
+		if (BitO->ErrorStatus == NULL) {
+			BitO->ErrorStatus = ES;
 		}
+		BitO->SystemEndian     = DetectSystemEndian();
+		ParseOutputOptions(BitO, argc, argv);
+		BitO->BitsAvailable    = BitOutputBufferSizeInBits;
+		BitO->BitsUnavailable  = 0;
 	}
 
 	void CloseBitInput(BitInput *BitI) {
