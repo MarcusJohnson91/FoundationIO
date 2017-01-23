@@ -318,6 +318,10 @@ extern "C" {
 	 @param    argv                "Argv from Main()".
 	 */
 	void           ParseOutputOptions(BitOutput *BitO, int argc, const char *argv[]);
+	
+	void           ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]);
+	
+	void           OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, ErrorStatus *ES, uint8_t InputSwitch);
 
 	/*!
 	 @abstract                     "Initalizes BitInput".
