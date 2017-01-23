@@ -146,36 +146,33 @@ extern "C" {
 		}
 	}
 	
-	void ParseCommandLineArguments(int argc, char *argv[], CommandLineOptions *CMD) {
-		char Argument[BitIOStringSize];
-		size_t EqualsLocation = 0;
-		
-		if (argc < CMD->NumSwitches + 1) {
-			DisplayCMDHelp(CMD);
-		} else {
-			// Scan for equals signs as well, if found, after after the equal sign is the result, everything before is the switch.
-			for (int Index = BitIOCurrentArgument; Index < argc; Index++) {
-				if (strcasecmp(Argument, "-h") == 0 || strcasecmp(Argument, "--help") == 0 || strcasecmp(Argument, "/?")) {
-					DisplayCMDHelp(CMD);
-				} else {
-					EqualsLocation = strchr(Argument, 0x3D); // 0x3D = "="
-					if (EqualsLocation != NULL) { // found
-												 // Start reading the result of the switch from EqualLocation +1.
-						for (size_t Byte = EqualsLocation + 1; Byte < sizeof(argv[Index]); Byte++) {
-							for (size_t SwitchByte = 0; SwitchByte < sizeof(argv[Index]); SwitchByte++) {
-								CMD->Switch[Index]->SwitchResult[SwitchByte] = *argv[Index];
-							}
-						}
-					}
-					
-					if (strcasecmp(CMD->Switch[Index]->Switch, argv[Index]) == 0) { // If the current switch matches one of the switches, set the IsFound bool to true.
-						CMD->Switch[Index]->SwitchFound = true;
-						snprintf(CMD->Switch[Index]->SwitchResult, BitIOStringSize, "%s", argv[Index]);
-					}
-				}
-			}
-		}
-	}
+    void ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]) {
+        size_t EqualsLocation = 0;
+        
+        // Scan for equals signs as well, if found, after after the equal sign is the result, everything before is the switch.
+        for (uint8_t Argument = 0; Argument < argc; Argument++) {
+            for (uint8_t ArgSwitch = 0; ArgSwitch < CMD->NumSwitches; ArgSwitch++) {
+                if (strcasecmp(CMD->Switch[ArgSwitch]->Switch, argv[Argument]) == 0) { // If the current switch matches one of the switches, set the IsFound bool to true.
+                    CMD->Switch[ArgSwitch]->SwitchFound = true;
+                    char *SwitchResult = calloc(sizeof(argv[Argument + 1]), 1);
+                    snprintf(SwitchResult, sizeof(SwitchResult), "%s", argv[Argument += 1]);
+                    CMD->Switch[ArgSwitch]->SwitchResult = SwitchResult;
+                    Log(SYSInformation, "BitIO", "ParseCommandLineArguments", SwitchResult);
+                }
+                /*
+                 EqualsLocation = strchr(Argument, 0x3D); // 0x3D = "="
+                 if (EqualsLocation != NULL) { // found
+                 // Start reading the result of the switch from EqualLocation +1.
+                 for (size_t Byte = EqualsLocation + 1; Byte < sizeof(argv[Index]); Byte++) {
+                 for (size_t SwitchByte = 0; SwitchByte < sizeof(argv[Index]); SwitchByte++) {
+                 CMD->Switch[Index]->SwitchResult[SwitchByte] = *argv[Index];
+                 }
+                 }
+                 }
+                 */
+            }
+        }
+    }
 
 	/*
 	static void PrintHelp(void) {
@@ -183,6 +180,25 @@ extern "C" {
 		fprintf(stdout, "Usage: -ia <input address>, -ias <input buffer size>, -oa <output address>, -oas <output buffer size>\n");
 	}
 	 */
+	
+	void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, ErrorStatus *ES, uint8_t InputSwitch) {
+        if (BitI->ErrorStatus == NULL) {
+            BitI->ErrorStatus = ES;
+        }
+		BitI->File = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
+		fseek(BitI->File, 0, SEEK_END);
+		BitI->FileSize = (uint64_t)ftell(BitI->File);
+		fseek(BitI->File, 0, SEEK_SET);
+		BitI->FilePosition     = ftell(BitI->File);
+		uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
+		uint64_t BytesRead     = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
+		if (BitI->FilePosition + BytesRead < BitI->FileSize && BytesRead < BitInputBufferSize) { // Bytes2Read
+			BitI->ErrorStatus->InitBitInput = FreadReturnedTooLittleData;
+			Log(SYSCritical, "BitIO", "InitBitInput", strerror(errno));
+		}
+		BitI->BitsAvailable    = Bytes2Bits(BytesRead);
+		BitI->BitsUnavailable  = 0;
+	}
 
 	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
 		while (BitI->File == NULL) {
@@ -271,7 +287,7 @@ extern "C" {
 		}
 	}
 
-	void InitBitInput(BitInput *BitI, ErrorStatus *ES, int argc, const char *argv[]) {
+    void InitBitInput(BitInput *BitI, ErrorStatus *ES, int argc, const char *argv[]) { // int argc, const char *argv[]
 		// FIXME: Remove any quotes on the path, or the issue could be that the -i and location are specified together...
 		if (BitI->ErrorStatus == NULL) {
 			BitI->ErrorStatus  = ES;
@@ -502,7 +518,7 @@ extern "C" {
 			CRCResult = CRCData->Polynomial ^ BitI->Buffer[BitI->BitsUnavailable / 8] << 8;
 			for (uint8_t Bit = 0; Bit < 8; Bit++) {
 				if ((CRCResult & 0x8000) == true) {
-					CRCResult = ((CRCResult <<= 1) ^ CRCData->Polynomial);
+                    //CRCResult = ((CRCResult <<= 1) ^ CRCData->Polynomial);
 				} else {
 					CRCResult <<= 1;
 				}
