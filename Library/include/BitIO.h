@@ -55,8 +55,8 @@ extern "C" {
 		BitInputBufferSizeInBits  = BitInputBufferSize * 8,
 		BitOutputBufferSize       = 4096,
 		BitOutputBufferSizeInBits = BitOutputBufferSize * 8,
-		BitIOStringSize           = 1024,
-		BitIOPathSize             = 1024,
+		BitIOStringSize           = 4096,
+		BitIOPathSize             = 4096,
 		BitIOUUIDSize             = 21,
 		BitIOEncodedUUIDSize      = 16,
 		BitIOGUIDSize             = 21,
@@ -114,7 +114,7 @@ extern "C" {
 		//int64_t      WriteBuffer;
 		int64_t      WriteRICE;
 		int64_t      VerifyCRC;
-	} ErrorStatus __attribute__((packed));
+	} ErrorStatus;
 
 	/*!
 	 @typedef        BitInput
@@ -143,7 +143,7 @@ extern "C" {
 		uint8_t      SystemEndian:2;
 		ErrorStatus *ErrorStatus;
 		uint8_t      Buffer[BitInputBufferSize];
-	} BitInput __attribute__((packed));
+	} BitInput;
 
 	/*!
 	 @typedef        BitOutput
@@ -166,16 +166,17 @@ extern "C" {
 		uint8_t      SystemEndian;
 		ErrorStatus *ErrorStatus;
 		uint8_t      Buffer[BitOutputBufferSize];
-	} BitOutput __attribute__((packed));
+	} BitOutput;
 	
 	/*!
-	 @param SwitchFound       "If the switch was found in argv, this will be set to 1".
-	 @param Switch            "Actual switch, including dash(es)".
-	 @param SwitchDescription "Message to print explaining what the switch does".
-	 @param SwitchResult      "String to contain the result of this switch, NULL if not found".
+	 @constant SwitchFound       "If the switch was found in argv, this will be set to 1".
+	 @constant Switch            "Actual switch, including dash(es)".
+	 @constant SwitchDescription "Message to print explaining what the switch does".
+	 @constant SwitchResult      "String to contain the result of this switch, NULL if not found".
 	 */
 	typedef struct CLSwitch { //
 		bool        SwitchFound;
+		bool        Resultless;
 		char       *Switch;
 		char       *SwitchDescription;
 		char       *SwitchResult;
@@ -386,7 +387,7 @@ extern "C" {
 	 @param    BitI                "Pointer to BitInput".
 	 @param    IsSigned            "Should it be read as signed or unsigneed?".
 	 */
-	int64_t        ReadExpGolomb(BitInput *BitI, bool IsSigned, uint8_t StopBit);
+	int64_t        ReadExpGolomb(BitInput *BitI, bool IsSigned);
 
 	/*!
 	 @abstract                     "Reads and Decodes unary/RICE encoded data from BitInput stream".

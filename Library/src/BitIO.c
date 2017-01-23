@@ -133,10 +133,6 @@ extern "C" {
 		return HighestBitSet;
 	}
 	
-	void OpenInputFile(BitInput *BitI, CommandLineOptions *CMD) {
-		
-	}
-	
 	void DisplayCMDHelp(CommandLineOptions *CMD) {
 		printf("%s: %s, %s\n\n", CMD->ProgramName, CMD->ProgramDescription, CMD->AuthorCopyrightLicense);
 		printf("Options:\n");
@@ -147,17 +143,16 @@ extern "C" {
 	}
 	
     void ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]) {
-        size_t EqualsLocation = 0;
-        
         // Scan for equals signs as well, if found, after after the equal sign is the result, everything before is the switch.
         for (uint8_t Argument = 0; Argument < argc; Argument++) {
-            for (uint8_t ArgSwitch = 0; ArgSwitch < CMD->NumSwitches; ArgSwitch++) {
-                if (strcasecmp(CMD->Switch[ArgSwitch]->Switch, argv[Argument]) == 0) { // If the current switch matches one of the switches, set the IsFound bool to true.
-                    CMD->Switch[ArgSwitch]->SwitchFound = true;
-                    char *SwitchResult = calloc(sizeof(argv[Argument + 1]), 1);
-                    snprintf(SwitchResult, sizeof(SwitchResult), "%s", argv[Argument += 1]);
-                    CMD->Switch[ArgSwitch]->SwitchResult = SwitchResult;
-                    Log(SYSInformation, "BitIO", "ParseCommandLineArguments", SwitchResult);
+            for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
+                if (strcasecmp(CMD->Switch[Switch]->Switch, argv[Argument]) == 0) { // If the current switch matches one of the switches, set the IsFound bool to true.
+                    CMD->Switch[Switch]->SwitchFound = true;
+					if (CMD->Switch[Switch]->Resultless == false) {
+						char *SwitchResult = calloc(BitIOStringSize, 1);
+						snprintf(SwitchResult, BitIOStringSize, "%s", argv[Argument + 1]);
+						CMD->Switch[Switch]->SwitchResult = SwitchResult;
+					}
                 }
                 /*
                  EqualsLocation = strchr(Argument, 0x3D); // 0x3D = "="
@@ -457,38 +452,31 @@ extern "C" {
 		}
 	}
 
-	int64_t ReadExpGolomb(BitInput *BitI, bool IsSigned, uint8_t StopBit) {
+	int64_t ReadExpGolomb(BitInput *BitI, bool IsSigned) {
 		uint64_t Zeros   = 0;
 		uint64_t CodeNum = 0;
 		int64_t  Temp    = 0;
 		int64_t  Final   = 0;
-
-		if (StopBit > 1) {
-			char Description[BitIOStringSize];
-			snprintf(Description, BitIOStringSize, "Invalid StopBit: %d\n", StopBit);
-			Log(SYSEmergency, "BitIO", "ReadExpGolomb", Description);
-			exit(EXIT_FAILURE);
-		} else {
-			while (ReadBits(BitI, 1) != StopBit) {
-				Zeros += 1; // Num bits to read after the top bit
-			}
-			
-			if (IsSigned == false) { // Unsigned
-				CodeNum  = (1ULL << Zeros);
-				CodeNum += ReadBits(BitI, Zeros);
-			} else { // Signed
-					 // Find out if it's negative, if so, read it normally, then use Unsigned2Signed.
-					 // If CodeNum is odd it's positive, even numbers are negative
-				if (IsOdd(CodeNum) == true) { // Positive
-					Final = CodeNum - 1;
-				} else {
-					Final = -(CodeNum - 1);
-				}
+		
+		while (ReadBits(BitI, 1) != 1) {
+			Zeros += 1; // Num bits to read after the top bit
+		}
+		
+		if (IsSigned == false) { // Unsigned
+			CodeNum  = (1ULL << Zeros);
+			CodeNum += ReadBits(BitI, Zeros);
+		} else { // Signed
+				 // Find out if it's negative, if so, read it normally, then use Unsigned2Signed.
+				 // If CodeNum is odd it's positive, even numbers are negative
+			if (IsOdd(CodeNum) == true) { // Positive
+				Final = CodeNum - 1;
+			} else {
+				Final = -(CodeNum - 1);
 			}
 		}
 		return Final;
 	}
-	
+
 	void WriteExpGolomb(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits) {
 		uint64_t Data = 0;
 		
@@ -553,18 +541,22 @@ extern "C" {
 		struct tm *Time = calloc(sizeof(struct tm), 1);
         char CurrentTime[26] = {0};
 		//time(Time);
+		/*
 		StringSize = strftime(CurrentTime, 26, "%A, %B %e, %g+1000: %I:%M:%S %p %Z", Time);
 		if ((StringSize <= 0) || (StringSize > BitIOStringSize)) {
 			fprintf(stderr, "BitIO - Log: String too big %zu\n", StringSize);
 		}
+		 */
 
 		// ADD SYSTEM NAME TO THE BEGINNING OF EACH LOG FILE AND LOGFILE NAME.
+		/*
 		errno = gethostname(ComputerName, BitIOStringSize);
 		if (errno != 0) {
 			fprintf(stderr, "Log error: %d\n", errno);
 		}
-		syslog(SYSError, "%s - %s: %s - %s: %s\n", ComputerName, CurrentTime, Library, Function, Description);
-		printf("Error in %s: %s\n", Function, Description);
+		 */
+		syslog(SYSError, "%s: %s\n", Function, Description); // ComputerName, CurrentTime,
+		//printf("Error in %s: %s\n", Function, Description);
 
         free(Time);
 	}
