@@ -4,6 +4,12 @@
 extern "C" {
 #endif
 	
+#pragma GCC poison gets puts strcpy strcat tempfile mktemp sprintf // Not secure
+#pragma GCC poison gethostbyaddr gethostbyname                     // Not thread safe
+#pragma GCC poison bzero                                           // Not portable
+#pragma GCC poison strcmp                                          // misses cases that it shouldn't
+#pragma GCC poison malloc
+	
 	uint64_t BitInputCurrentArgument   = 1;
 	uint64_t BitOutputCurrentArgument  = 1;
 	uint64_t BitIOCurrentArgument      = 1;
@@ -321,7 +327,6 @@ extern "C" {
 
 	void CloseBitInput(BitInput *BitI) {
 		fclose(BitI->File);
-		memset(BitI->Buffer, 0, Bits2Bytes(BitI->BitsUnavailable + BitI->BitsAvailable));
 		free(BitI);
 	}
 
@@ -329,7 +334,6 @@ extern "C" {
         fwrite(BitO->Buffer, BitO->BitsUnavailable % 8, 1, BitO->File); // Make sure it's all written to disk
         fflush(BitO->File);
 		fclose(BitO->File);
-		memset(BitO->Buffer, 0, Bits2Bytes(BitO->BitsUnavailable + BitO->BitsAvailable));
 		free(BitO);
 	}
 
@@ -425,31 +429,20 @@ extern "C" {
 	uint64_t  ReadRICE(BitInput *BitI, bool Truncated, uint8_t StopBit) {
 		uint64_t BitCount = 0;
 		
-		if (StopBit > 1) {
-			char Description[BitIOStringSize];
-			snprintf(Description, BitIOStringSize, "Invalid StopBit: %d\n", StopBit);
-			Log(SYSEmergency, "BitIO", "ReadRICE", Description);
-			exit(EXIT_FAILURE);
-		} else {
-			while (ReadBits(BitI, 1) != StopBit) {
-				BitCount += 1;
-			}
-			if (Truncated == true) {
-				BitCount++;
-			}
+		while (ReadBits(BitI, 1) != StopBit) {
+			BitCount += 1;
+		}
+		if (Truncated == true) {
+			BitCount++;
 		}
 		return BitCount;
 	}
 	
 	void WriteRICE(BitOutput *BitO, bool Truncated, bool StopBit, uint64_t Data2Write) {
-		if (StopBit > 1) {
-			BitO->ErrorStatus->WriteRICE = NumberNotInRange;
-		} else {
-			for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
-				WriteBits(BitO, (~StopBit), 1);
-			}
-			WriteBits(BitO, StopBit, 1);
+		for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
+			WriteBits(BitO, (~StopBit), 1);
 		}
+		WriteBits(BitO, StopBit, 1);
 	}
 
 	int64_t ReadExpGolomb(BitInput *BitI, bool IsSigned) {

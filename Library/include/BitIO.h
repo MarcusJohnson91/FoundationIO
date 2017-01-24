@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <libgen.h>
 #include <math.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -19,22 +20,13 @@
 #include <string.h>
 #include <syslog.h>
 #include <time.h>
-#include <xlocale.h>
 #include <unistd.h>
+#include <xlocale.h>
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#pragma GCC poison gets puts strcpy strcat tempfile mktemp sprintf // Not secure
-
-#pragma GCC poison gethostbyaddr gethostbyname                     // Not thread safe
-
-#pragma GCC poison bzero                                           // Not portable
-
-#pragma GCC poison strcmp                                          // misses cases that it shouldn't
-	
-#pragma GCC poison malloc
 
 #pragma once
 
