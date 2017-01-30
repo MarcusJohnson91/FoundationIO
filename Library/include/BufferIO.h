@@ -315,6 +315,8 @@ extern "C" {
 	void           ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]);
 	
 	void           OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, ErrorStatus *ES, uint8_t InputSwitch);
+	
+	void           OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, ErrorStatus *ES, uint8_t InputSwitch);
 
 	/*!
 	 @abstract                     "Initalizes BitInput".
@@ -506,7 +508,7 @@ extern "C" {
 	/*!
 	 @abstract                     "Writes data encoded as Exponential-Golomb aka Elias Gamma".
 	 */
-	void WriteExpGolomb(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits);
+	void WriteExpGolomb(BitOutput *BitO, bool IsSigned, uint64_t Data2Write);
 	
 	uint8_t CountBitsSet(uint64_t Data);
 	
