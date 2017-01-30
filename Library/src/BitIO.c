@@ -200,6 +200,16 @@ extern "C" {
 		BitI->BitsAvailable    = Bytes2Bits(BytesRead);
 		BitI->BitsUnavailable  = 0;
 	}
+	
+	void OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, ErrorStatus *ES, uint8_t InputSwitch) {
+		if (BitO->ErrorStatus == NULL) {
+			BitO->ErrorStatus = ES;
+		}
+		BitO->File = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
+		
+		BitO->BitsAvailable    = BitOutputBufferSizeInBits;
+		BitO->BitsUnavailable  = 0;
+	}
 
 	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
 		while (BitI->File == NULL) {
@@ -452,16 +462,14 @@ extern "C" {
 		int64_t  Final   = 0;
 		
 		while (ReadBits(BitI, 1) != 1) {
-			Zeros += 1; // Num bits to read after the top bit
+			Zeros += 1;
 		}
 		
-		if (IsSigned == false) { // Unsigned
+		if (IsSigned == false) {
 			CodeNum  = (1ULL << Zeros);
 			CodeNum += ReadBits(BitI, Zeros);
 		} else { // Signed
-				 // Find out if it's negative, if so, read it normally, then use Unsigned2Signed.
-				 // If CodeNum is odd it's positive, even numbers are negative
-			if (IsOdd(CodeNum) == true) { // Positive
+			if (IsOdd(CodeNum) == true) {
 				Final = CodeNum - 1;
 			} else {
 				Final = -(CodeNum - 1);
@@ -470,14 +478,23 @@ extern "C" {
 		return Final;
 	}
 
-	void WriteExpGolomb(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits) {
-		uint64_t Data = 0;
+	void WriteExpGolomb(BitOutput *BitO, bool IsSigned, uint64_t Data2Write) {
+		uint64_t NumBits = 0;
 		
+		NumBits = FindHighestBitSet(Data2Write);
 		
-		// Do signed stuff here.
-		// tldr write Data2Write 1s, followed by a 0.
-		for (uint8_t Bit = 0; Bit < Data2Write - 1; Bit++) {
-			WriteBits(BitO, 0, 1);
+		if (IsSigned == false) { // Unsigned
+			WriteBits(BitO, 0, NumBits);
+			WriteBits(BitO, Data2Write + 1, NumBits + 1);
+		} else { // Signed
+				 // Neg numbers are even, odd numbers are pos
+			NumBits -= 1; // Remove the sign bit
+			WriteBits(BitO, 0, NumBits);
+			if (IsOdd(Data2Write +1) == false) { // Negative
+				WriteBits(BitO, Data2Write + 1, NumBits + 1);
+			} else {
+				WriteBits(BitO, Data2Write + 1, NumBits + 1); // TODO: Signed ExpGolomb
+			}
 		}
 		WriteBits(BitO, 1, 1); // Trailing 1 bit
 	}
