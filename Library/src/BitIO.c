@@ -496,7 +496,31 @@ extern "C" {
 				WriteBits(BitO, Data2Write + 1, NumBits + 1); // TODO: Signed ExpGolomb
 			}
 		}
-		WriteBits(BitO, 1, 1); // Trailing 1 bit
+	}
+	
+	void RotateArray(size_t DataSize, int64_t *Data, uint64_t NumRotations, bool RotateRight) {
+		// Theoretical speed up: just edit the pointer to each array element, and increment or decrement it by  NumRotation.
+		if (RotateRight == true) {
+			for (uint64_t Rotation = 0; Rotation < NumRotations; Rotation++) {
+				for (uint64_t Element = 0; Element < DataSize; Element++) {
+					Data[Element + 1] = Data[Element]; // TODO: Make sure the last element wraps around to the end.
+				}
+			}
+		} else { // Rotate left
+			for (uint64_t Rotation = 0; Rotation < NumRotations; Rotation++) {
+				for (uint64_t Element = DataSize; Element > 0; Element--) {
+					Data[Element] = Data[Element - 1];
+				}
+			}
+		}
+	}
+	
+	void Transform2BijectiveBWT(BitOutput *BitO, size_t DataSize, int16_t *Data) { // BANANA
+		// So basically move shit around a bunch of times until?
+	}
+	
+	void UndoBijectiveBWT(BitInput *BitI, size_t DataSize, int64_t *Data) {
+		
 	}
 
 	uint64_t GenerateCRC(BitInput *BitI, size_t DataSize, CRC *CRCData) { // uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool PolyType, uint64_t Init, uint8_t CRCSize
@@ -536,6 +560,11 @@ extern "C" {
 		 */
 		return false;
 	}
+	/*
+	void BitIOLog(uint8_t LogLevel, char *Function, char *ErrorDescription, ...) {
+		va_arg(<#ap#>, <#type#>)
+	}
+	 */
 
 	void Log(int64_t SYSError, char Library[BitIOStringSize], char Function[BitIOStringSize], char Description[BitIOStringSize]) {
 		char ComputerName[BitIOStringSize] = {0};
