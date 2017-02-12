@@ -4,17 +4,7 @@
 extern "C" {
 #endif
 	
-#pragma GCC poison gets puts strcpy strcat tempfile mktemp sprintf // Not secure
-#pragma GCC poison gethostbyaddr gethostbyname                     // Not thread safe
-#pragma GCC poison bzero                                           // Not portable
-#pragma GCC poison strcmp                                          // misses cases that it shouldn't
-#pragma GCC poison malloc
-	
-	uint64_t BitInputCurrentArgument   = 1;
-	uint64_t BitOutputCurrentArgument  = 1;
-	uint64_t BitIOCurrentArgument      = 1;
-	uint64_t BitInputCurrentSpecifier  = 0;
-	uint64_t BitOutputCurrentSpecifier = 0;
+	#pragma GCC poison gets puts strcpy strcat tempfile mktemp sprintf gethostbyaddr gethostbyname bzero strcmp malloc
 
 	uint16_t SwapEndian16(uint16_t Data2Swap) { // In UnitTest
 		return ((Data2Swap & 0xFF00) >> 8) | ((Data2Swap & 0x00FF) << 8);
@@ -51,7 +41,24 @@ extern "C" {
 		return (int64_t)Unsigned;
 	}
 	
-	uint8_t CountBitsSet(uint64_t Data) {
+	uint64_t Powi(uint64_t Base, uint64_t Exponent) {
+		uint64_t Result = 1;
+		
+		for (uint64_t Times = 0; Times < Exponent; Times++) {
+			Result *= Base;
+		}
+		return Result;
+	}
+	
+	int64_t Floori(double X) {
+		return (int64_t)floor(X);
+	}
+	
+	int64_t Ceili(int64_t X) {
+		return (int64_t)ceil(X);
+	}
+	
+	uint8_t  CountBitsSet(uint64_t Data) {
 		uint8_t DataBit = 0, BitCount = 0;
 		for (uint8_t Bit = 0; Bit < Bits2Bytes(sizeof(Data)); Bit++) {
 			DataBit = (Data & (1 << Bit)) >> Bit;
@@ -174,18 +181,8 @@ extern "C" {
             }
         }
     }
-
-	/*
-	static void PrintHelp(void) {
-		fprintf(stdout, "Usage: -i <input> -o <output> (-s is to specify the start of a file sequence, and should be before the argument it's intended for)\n");
-		fprintf(stdout, "Usage: -ia <input address>, -ias <input buffer size>, -oa <output address>, -oas <output buffer size>\n");
-	}
-	 */
 	
-	void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, ErrorStatus *ES, uint8_t InputSwitch) {
-        if (BitI->ErrorStatus == NULL) {
-            BitI->ErrorStatus = ES;
-        }
+	void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, uint8_t InputSwitch) {
 		BitI->File = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
 		fseek(BitI->File, 0, SEEK_END);
 		BitI->FileSize = (uint64_t)ftell(BitI->File);
@@ -193,146 +190,21 @@ extern "C" {
 		BitI->FilePosition     = ftell(BitI->File);
 		uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
 		uint64_t BytesRead     = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
-		if (BitI->FilePosition + BytesRead < BitI->FileSize && BytesRead < BitInputBufferSize) { // Bytes2Read
-			BitI->ErrorStatus->InitBitInput = FreadReturnedTooLittleData;
-			Log(SYSCritical, "BitIO", "InitBitInput", strerror(errno));
-		}
 		BitI->BitsAvailable    = Bytes2Bits(BytesRead);
 		BitI->BitsUnavailable  = 0;
 	}
 	
-	void OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, ErrorStatus *ES, uint8_t InputSwitch) {
-		if (BitO->ErrorStatus == NULL) {
-			BitO->ErrorStatus = ES;
-		}
+	void OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, uint8_t InputSwitch) {
 		BitO->File = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
-		
 		BitO->BitsAvailable    = BitOutputBufferSizeInBits;
 		BitO->BitsUnavailable  = 0;
 	}
-
-	void ParseInputOptions(BitInput *BitI, int argc, const char *argv[]) {
-		while (BitI->File == NULL) {
-			for (int Index = BitInputCurrentArgument; Index < argc; Index++) {
-				char Argument[BitIOPathSize];
-				snprintf(Argument, BitIOPathSize, "%s", argv[Index]);
-				
-				if ((strcasecmp(Argument, "-s") == 0) && (BitInputCurrentSpecifier == 0)) {
-					Index += 1;
-					sscanf(Argument, "%lld", &BitInputCurrentSpecifier);
-				}
-				
-				if (strcasecmp(Argument, "-i") == 0) {
-					Index += 1;
-					if (BitInputCurrentSpecifier != 0) { // I have absolutely no idea why this is here
-						snprintf(Argument, BitIOPathSize, "%s", argv[Index]);
-					} else {
-						snprintf(Argument, BitIOPathSize, "%s", argv[Index]);
-					}
-					
-					if (strcasecmp(Argument, "-") == 0) {
-						BitI->File = stdin;
-					} else {
-						BitI->File = fopen(Argument, "rb");
-						//errno = setvbuf(BitI->File, &BitI->Buffer, _IONBF, BitInputBufferSize);
-						if (BitI->File == NULL) {
-							BitI->ErrorStatus->ParseInputOptions = FopenFailed;
-							Log(SYSCritical, "BitIO", "ParseInputOptions", strerror(errno));
-						}
-					}
-					BitInputCurrentArgument = Index + 1;
-				}
-				
-				if (strcasecmp(Argument, "-ia")) { // input address
-					Index += 1;
-					BitI->StartReadAddress = (uint64_t)Argument;
-					BitI->IsFileBased      = true;
-				}
-				if (strcasecmp(Argument, "-ias")) { // input address size
-					Index += 1;
-					BitI->ExternalBufferSize = (uint64_t)Argument;
-				}
-			}
+	
+	void FlushBitOutput(BitOutput *BitO) {
+		if (IsStreamByteAligned(BitO->BitsUnavailable, 1) == false) {
+			AlignOutput(BitO, 1);
 		}
-	}
-
-	void ParseOutputOptions(BitOutput *BitO, int argc, const char *argv[]) {
-		while (BitO->File == NULL) {
-			for (int Index = BitOutputCurrentArgument; Index < argc; Index++) { // The problem is that InputBuffer read past where it should.
-				int64_t SpecifierOffset = 0;
-				char Argument[BitIOPathSize];
-				snprintf(Argument, BitIOPathSize, "%s", argv[Index]);
-				
-				if (strcasecmp(Argument, "-s")    == 0) { // Specifier Offset
-					Index += 1;
-					snprintf((char*)SpecifierOffset, 1, "%s", argv[Index]);
-				}
-				
-				if (strcasecmp(Argument, "-o")    == 0) {
-					Index += 1;
-					snprintf(Argument, BitIOPathSize, "%s", argv[Index]);
-					if (strcasecmp(Argument, "-") == 0) {
-						BitO->File = stdout;
-					} else {
-						BitO->File = fopen(Argument, "wb");
-						//errno = setvbuf(BitO->File, BitO->Buffer, _IONBF, BitOutputBufferSize);
-						if (BitO->File == NULL) {
-							BitO->ErrorStatus->ParseOutputOptions = FopenFailed;
-							Log(SYSCritical, "BitIO", "ParseOutputOptions", strerror(errno));
-						}
-					}
-					BitOutputCurrentArgument = Index + 1;
-				}
-				
-				if (strcasecmp(Argument, "-oa")) { // Output address
-					Index += 1;
-					BitO->StartWriteAddress = Argument;
-					BitO->IsFileBased       = true;
-				}
-				
-				if (strcasecmp(Argument, "-oas")) { // Output address size
-					Index += 1;
-					BitO->ExternalBufferSize = (uint64_t)Argument;
-				}
-			}
-		}
-	}
-
-    void InitBitInput(BitInput *BitI, ErrorStatus *ES, int argc, const char *argv[]) { // int argc, const char *argv[]
-		// FIXME: Remove any quotes on the path, or the issue could be that the -i and location are specified together...
-		if (BitI->ErrorStatus == NULL) {
-			BitI->ErrorStatus  = ES;
-		}
-		BitI->SystemEndian = DetectSystemEndian();
-		// Do file related shit here.
-		ParseInputOptions(BitI, argc, argv);
-		fseek(BitI->File, 0, SEEK_END);
-		BitI->FileSize         = (uint64_t)ftell(BitI->File);
-		fseek(BitI->File, 0, SEEK_SET);
-		BitI->FilePosition     = ftell(BitI->File);
-		uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
-		uint64_t BytesRead     = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
-		if (BitI->FilePosition + BytesRead < BitI->FileSize && BytesRead < BitInputBufferSize) { // Bytes2Read
-			BitI->ErrorStatus->InitBitInput = FreadReturnedTooLittleData;
-			Log(SYSCritical, "BitIO", "InitBitInput", strerror(errno));
-		}
-		BitI->BitsAvailable    = Bytes2Bits(BytesRead);
-		BitI->BitsUnavailable  = 0;
-		
-		// Do memory related shit here.
-		// Hmm, how do we accept memory address stuff?
-		// Well, we should skip creating a buffer when one already exists.
-		// BUUUT the buffer has already been initiated, so we have to use it.
-	}
-
-	void InitBitOutput(BitOutput *BitO, ErrorStatus *ES, int argc, const char *argv[]) {
-		if (BitO->ErrorStatus == NULL) {
-			BitO->ErrorStatus = ES;
-		}
-		BitO->SystemEndian     = DetectSystemEndian();
-		ParseOutputOptions(BitO, argc, argv);
-		BitO->BitsAvailable    = BitOutputBufferSizeInBits;
-		BitO->BitsUnavailable  = 0;
+		fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable), 1, BitO->File);
 	}
 
 	void CloseBitInput(BitInput *BitI) {
@@ -355,13 +227,60 @@ extern "C" {
         Bytes2Read = BitI->FileSize - BitI->FilePosition >= BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
         BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
         if (BytesRead != Bytes2Read) { // Bytes2Read
-            BitI->ErrorStatus->UpdateInputBuffer = FreadReturnedTooLittleData;
-			Log(SYSWarning, "BitIO", "UpdateInputBuffer", NULL);
+			Log(LOG_WARNING, "BitIO", "UpdateInputBuffer", NULL);
 		}
         uint64_t NEWBitsUnavailable = BitI->BitsUnavailable % 8; // FIXME: This assumes UpdateBuffer was called with at most 7 unread bits...
 
         BitI->BitsUnavailable = NEWBitsUnavailable;
         BitI->BitsAvailable   = Bytes2Bits(BytesRead);
+	}
+	
+	uint64_t ReadBits2(BitInput *BitI, uint8_t Bits2Read, bool ReadFromMSB) { // Set this up so it can read from memory addresses, to support running on machines without an OS.
+		uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, Mask = 0, Data = 0, Mask2Shift = 0;
+		uint64_t OutputData = 0;
+		
+		if ((Bits2Read <= 0) || (Bits2Read > 64)) {
+			char Description[BitIOPathSize];
+			snprintf(Description, BitIOPathSize, "ReadBits only supports reading 1-64 bits at a time, you tried reading: %d bits\n", Bits2Read);
+			Log(LOG_CRIT, "BitIO", "ReadBits", Description);
+			exit(EXIT_FAILURE);
+		} else {
+			if (BitI->BitsAvailable < Bits) {
+				UpdateInputBuffer(BitI, 0);
+			}
+			SystemBits             = 8 - (BitI->BitsUnavailable % 8);
+			UserBits               = BitsRemaining(Bits);
+			Bits2Read              = SystemBits >= UserBits  ? UserBits : SystemBits;
+			if (ReadFromMSB == true) {
+				Mask2Shift         = SystemBits <= UserBits  ? 0 : SystemBits - UserBits;
+				Mask               = (Power2Mask(Bits2Read) << Mask2Shift);
+			} else { // read from LSB
+					 // read 2 bits, 2 offset, so mask = 0b00001100
+					 // BitsAvailable = 72, BitsUnavailable = 95
+					 // SystemBits = 1
+					 // UserBits   = 2
+					 // Bits2Read  = 1
+					 // Mask2Shift = -1?????
+					 // Mask       = 1 << 0
+					 // Data       = 0x1
+				
+					 // Important variables:
+					 // The number of bits requested in general.
+					 // The number of bits available in general.
+					 // The number of bits to read from this byte, combinartion of those 2 variables.
+					 // Where to read the bits from in this byte (MSB/LSB here)
+					 // Shifting the read bits to accomadate the output (MSB/LSB here as well.)
+				Mask               = (Power2Mask(Bits2Read) << SystemBits);
+			}
+			Data                   = BitI->Buffer[BitI->BitsUnavailable / 8] & Mask;
+			Data                 >>= Mask2Shift;
+			OutputData           <<= SystemBits >= UserBits ? UserBits : SystemBits;
+			OutputData            += Data;
+			BitI->BitsAvailable   -= SystemBits >= UserBits ? UserBits : SystemBits;
+			BitI->BitsUnavailable += SystemBits >= UserBits ? UserBits : SystemBits;
+			Bits                  -= SystemBits >= UserBits ? UserBits : SystemBits;
+		}
+		return OutputData;
 	}
 	
 	uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read) { // Set this up so it can read from memory addresses, to support running on machines without an OS.
@@ -371,7 +290,7 @@ extern "C" {
 		if ((Bits2Read <= 0) || (Bits2Read > 64)) {
 			char Description[BitIOPathSize];
 			snprintf(Description, BitIOPathSize, "ReadBits only supports reading 1-64 bits at a time, you tried reading: %d bits\n", Bits2Read);
-			Log(SYSCritical, "BitIO", "ReadBits", Description);
+			Log(LOG_CRIT, "BitIO", "ReadBits", Description);
 			exit(EXIT_FAILURE);
 		} else {
 			if (BitI->BitsAvailable < Bits) {
@@ -562,7 +481,7 @@ extern "C" {
 	}
 	/*
 	void BitIOLog(uint8_t LogLevel, char *Function, char *ErrorDescription, ...) {
-		va_arg(<#ap#>, <#type#>)
+		va_arg(ap, type)
 	}
 	 */
 
@@ -570,7 +489,7 @@ extern "C" {
 		char ComputerName[BitIOStringSize] = {0};
 		size_t StringSize = 0;
 
-		if ((SYSError == SYSPanic) || (SYSError == SYSCritical)) {
+		if ((SYSError == LOG_EMERG) || (SYSError == LOG_CRIT)) {
 			openlog(Library, SYSError, (LOG_PERROR|LOG_MAIL|LOG_USER));
 		} else {
 			openlog(Library, SYSError, (LOG_PERROR|LOG_USER));
@@ -594,7 +513,7 @@ extern "C" {
 			fprintf(stderr, "Log error: %d\n", errno);
 		}
 		 */
-		syslog(SYSError, "%s: %s\n", Function, Description); // ComputerName, CurrentTime,
+		syslog(LOG_ERR, "%s: %s\n", Function, Description); // ComputerName, CurrentTime,
 		//printf("Error in %s: %s\n", Function, Description);
 
         free(Time);
@@ -623,6 +542,10 @@ extern "C" {
 		} else {
 			return true;
 		}
+	}
+	
+	void DecodeFiniteStateEntropy(BitInput *BitI, uint16_t *EncodedBuffer, uint16_t *DecodedBuffer, size_t EncodedBufferSize) {
+		
 	}
 
 #ifdef __cplusplus
