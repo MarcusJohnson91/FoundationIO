@@ -7,12 +7,12 @@
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
  */
 
-#include <dirent.h>
-#include <errno.h>
-#include <libgen.h>
+//#include <dirent.h>
+//#include <errno.h>
+//#include <libgen.h>
 #include <math.h>
-#include <signal.h>
-#include <stdarg.h>
+//#include <signal.h>
+//#include <stdarg.h> // Variadic arguments
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -57,56 +57,6 @@ extern "C" {
 		BitIOMD5Size              = 16,
 		BitIOMaxSwitches          = 64,
 	} BitIOConstants;
-	
-	extern uint64_t BitInputCurrentArgument;
-	extern uint64_t BitOutputCurrentArgument;
-	extern uint64_t BitInputCurrentSpecifier;
-	extern uint64_t BitOutputCurrentSpecifier;
-	
-	/*!
-	 @abstract                     "List of error codes the various functions in BitIO set in ErrorStatus".
-	 @remark                       "FIXME: Should the error codes be negative or positive?".
-	 */
-	extern enum ErrorCodes {
-		/* begin BitIO specific error codes */
-		Success                    = 9,
-		NotEnoughMemory            = 10,
-		NumberNotInRange           = 11,
-		TriedReadingTooManyBits    = 12,
-		TriedReadingTooFewBits     = 13,
-		TriedWritingTooManyBits    = 14,
-		TriedWritingTooFewBits     = 15,
-		ReallocFailed              = 16,
-		WrongStringSize            = 17,
-		FopenFailed                = 18,
-		FreadReturnedTooLittleData = 19,
-		InvalidData                = 20,
-		InvalidCRC                 = 21,
-		InvalidMarker              = 22,
-	} ErrorCodes;
-
-	/*!
-	 @typedef        ErrorStatus
-	 @abstract                         "Allows checking of the error status of various functions".
-	 */
-	typedef struct ErrorStatus {
-		int64_t      SkipBits;
-		int64_t      PeekBits;
-		int64_t      ReadBits;
-		int64_t      ReadRICE;
-		int64_t      ReadUUID;
-		int64_t      UpdateInputBuffer;
-		int64_t      InitBitInput;
-		int64_t      InitBitOutput;
-		int64_t      ParseInputOptions;
-		int64_t      ParseOutputOptions;
-		int64_t      DecodeHuffman;
-		int64_t      WriteUUID;
-		int64_t      WriteBits;
-		//int64_t      WriteBuffer;
-		int64_t      WriteRICE;
-		int64_t      VerifyCRC;
-	} ErrorStatus;
 
 	/*!
 	 @typedef        BitInput
@@ -118,22 +68,18 @@ extern "C" {
 	 @constant       FilePosition      "Current byte in the file".
 	 @constant       BitsUnavailable   "Number of previously read bits in Buffer".
 	 @constant       BitsAvailable     "Number of bits available for reading".
-	 @constant       ErrorStatus       "Pointer to supplied ErrorStatus".
+	 @constant       SystemEndian      "Endian of the running system".
 	 @constant       Buffer            "Buffer of data from File".
 
 	 FIXME: What if we just used snprintf to increment the format number instead of splitting the string and whatnot?
 	 */
 	typedef struct BitInput {
-		bool         IsFileBased;
 		FILE        *File;
-		uintptr_t   *StartReadAddress;
-		size_t       ExternalBufferSize;
 		size_t       FileSize;
 		size_t       FilePosition;
 		size_t       BitsUnavailable;
 		size_t       BitsAvailable;
 		uint8_t      SystemEndian:2;
-		ErrorStatus *ErrorStatus;
 		uint8_t      Buffer[BitInputBufferSize];
 	} BitInput;
 
@@ -145,18 +91,14 @@ extern "C" {
 	 @constant       File              "Input file to read bits from".
 	 @constant       BitsUnavailable   "Number of previously read bits in Buffer".
 	 @constant       BitsAvailable     "Number of bits available for writing".
-	 @constant       ErrorStatus       "pointer to Error struct".
+	 @constant       SystemEndian      "Endian of the running system".
 	 @constant       Buffer            "Buffer of BitIOBufferSize bits from File".
 	 */
 	typedef struct BitOutput {
-		bool         IsFileBased;
 		FILE        *File;
-		uintptr_t   *StartWriteAddress;
-		size_t       ExternalBufferSize;
 		size_t       BitsUnavailable;
 		size_t       BitsAvailable;
 		uint8_t      SystemEndian;
-		ErrorStatus *ErrorStatus;
 		uint8_t      Buffer[BitOutputBufferSize];
 	} BitOutput;
 	
@@ -166,7 +108,7 @@ extern "C" {
 	 @constant SwitchDescription "Message to print explaining what the switch does".
 	 @constant SwitchResult      "String to contain the result of this switch, NULL if not found".
 	 */
-	typedef struct CLSwitch { //
+	typedef struct CLSwitch {
 		bool        SwitchFound;
 		bool        Resultless;
 		char       *Switch;
@@ -174,23 +116,13 @@ extern "C" {
 		char       *SwitchResult;
 	} CLSwitch;
 	
-	typedef struct CommandLineOptions { // [BitIOStringSize]
+	typedef struct CommandLineOptions {
 		size_t      NumSwitches;
-		char        *ProgramName;
-		char        *ProgramDescription;
-		char        *AuthorCopyrightLicense;
-		// Program name
-		// General line describing the program
-		// Switches:
-		// list of switches with their descriptions printed next to them
+		char       *ProgramName;
+		char       *ProgramDescription;
+		char       *AuthorCopyrightLicense;
 		CLSwitch   *Switch[BitIOMaxSwitches];
 	} CommandLineOptions;
-
-	extern enum Base {
-		Octal       =  8,
-		Decimal     = 10,
-		Hexadecimal = 16,
-	} Base;
 
 	extern enum Endian {
 		UnknownEndian = 0,
@@ -294,49 +226,11 @@ extern "C" {
 	 */
 	uint64_t       Power2Mask(uint8_t Exponent);
 
-	/*!
-	 @abstract                     "Parses command line flags for BitInput".
-
-	 @param    BitI                "Pointer to BitInput".
-	 @param    argc                "Argc from Main()".
-	 @param    argv                "Argv from Main()".
-	 */
-	void           ParseInputOptions(BitInput *BitI, int argc, const char *argv[]);
-
-	/*!
-	 @abstract                     "Parses command line flags for BitOutput".
-
-	 @param    BitO                "Pointer to BitOutput".
-	 @param    argc                "Argc from Main()".
-	 @param    argv                "Argv from Main()".
-	 */
-	void           ParseOutputOptions(BitOutput *BitO, int argc, const char *argv[]);
-	
 	void           ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]);
 	
-	void           OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, ErrorStatus *ES, uint8_t InputSwitch);
+	void           OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, uint8_t InputSwitch);
 	
-	void           OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, ErrorStatus *ES, uint8_t InputSwitch);
-
-	/*!
-	 @abstract                     "Initalizes BitInput".
-
-	 @param    BitI                "Pointer to BitInput".
-	 @param    ES                  "Pointer to ErrorStatus".
-	 @param    argc                "Argc from Main()".
-	 @param    argv                "Argv from Main()".
-	 */
-	void           InitBitInput(BitInput *BitI, ErrorStatus *ES, int argc, const char *argv[]);
-
-	/*!
-	 @abstract                     "Initalizes BitOutput".
-
-	 @param    BitO                "Pointer to BitOutput".
-	 @param    ES                  "Pointer to ErrorStatus".
-	 @param    argc                "Argc from Main()".
-	 @param    argv                "Argv from Main()".
-	 */
-	void           InitBitOutput(BitOutput *BitO, ErrorStatus *ES, int argc, const char *argv[]);
+	void           OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, uint8_t InputSwitch);
 
 	/*!
 	 @abstract                     "Deallocates BitInput".
@@ -428,19 +322,34 @@ extern "C" {
 	 */
 	void           SkipBits(BitInput *BitI, int64_t Bits);
 	
-	extern enum PolynomialType {
-		Normal   = 0,
-		Reversed = 1,
+	/*!
+	 @abstract                     "Raise a base to the exponent".
+	 */
+	uint64_t       Powi(uint64_t Base, uint64_t Exponent);
+	
+	/*!
+	 @abstract                     "Integer floor function"
+	 */
+	int64_t        Floori(double X);
+	
+	/*!
+	 @abstract                     "Integer ceil function"
+	 */
+	int64_t        Ceili(int64_t X);
+	
+	extern enum    PolynomialType {
+		Normal     = 0,
+		Reversed   = 1,
 	} PolynomialType;
 	
 	typedef struct CRC {
-		uint8_t *Buffer;
-		size_t   BufferSize;
-		uint64_t Polynomial;
-		bool     PolynomialType;
-		uint8_t  PolynomialSize;
-		uint64_t Initalization;
-		uint64_t PreCalculatedCRC;
+		uint8_t   *Buffer;
+		size_t     BufferSize;
+		uint64_t   Polynomial;
+		bool       PolynomialType;
+		uint8_t    PolynomialSize;
+		uint64_t   Initalization;
+		uint64_t   PreCalculatedCRC;
 	} CRC;
 
 	/*!
@@ -485,7 +394,7 @@ extern "C" {
 	 
 	 @param   BufferSize           "Number of bits in Buffer".
 	 */
-	void           GenerateMD5(uint8_t *Buffer, size_t BufferSize, char MD5String[BitIOMD5Size]);
+	//void           GenerateMD5(uint8_t *Buffer, size_t BufferSize, char MD5String[BitIOMD5Size]);
 
 	/*!
 	 @abstract                     "Logs errors to log files, and stderr; and mail if Critical/Panic."
@@ -510,22 +419,14 @@ extern "C" {
 	 */
 	void WriteExpGolomb(BitOutput *BitO, bool IsSigned, uint64_t Data2Write);
 	
+	/*!
+	 @abstract                     "Writes BitO->Buffer to BitO->File".
+	 */
+	void FlushBitOutput(BitOutput *BitO);
+	
 	uint8_t CountBitsSet(uint64_t Data);
 	
 	void DisplayCMDHelp(CommandLineOptions *CMD);
-	
-	extern enum SystemErrors {
-		SYSEmergency     = 1,
-		SYSPanic         = 1,
-		SYSAlert         = 2,
-		SYSCritical      = 3,
-		SYSError         = 4,
-		SYSWarning       = 5,
-		SYSNotice        = 6,
-		SYSInformation   = 7,
-		SYSDebug         = 8,
-		/* End Syslog-type eror codes */
-	} SystemErrors;
 	
 	typedef struct LinkedList {
 		uint16_t           Value;
