@@ -7,7 +7,27 @@
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
  */
 
-//#include <dirent.h>
+#include <errno.h>
+#include <math.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#ifdef _POSIX_
+#include <dirent.h>
+#include <libgen.h>
+#include <syslog.h>
+#include <unistd.h>
+#include <xlocale.h>
+#endif
+
+/*
+ //#include <dirent.h>
 //#include <errno.h>
 //#include <libgen.h>
 #include <math.h>
@@ -22,6 +42,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <xlocale.h>
+ */
 
 
 #ifdef __cplusplus
@@ -100,6 +121,7 @@ extern "C" {
 		size_t       BitsAvailable;
 		uint8_t      SystemEndian;
 		uint8_t      Buffer[BitOutputBufferSize];
+		FILE        *LogFile;
 	} BitOutput;
 	
 	/*!

@@ -484,6 +484,10 @@ extern "C" {
 		va_arg(ap, type)
 	}
 	 */
+	
+	void Log2(FILE *Log, uint8_t ErrorLevel, char *Program, char *Library, char *Function, char *ErrorDescription) {
+		// Open a file, and keep the handle open somehow...
+	}
 
 	void Log(int64_t SYSError, char Library[BitIOStringSize], char Function[BitIOStringSize], char Description[BitIOStringSize]) {
 		char ComputerName[BitIOStringSize] = {0};
