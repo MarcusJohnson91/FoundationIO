@@ -58,7 +58,7 @@ extern "C" {
         return (int64_t)ceil(X);
     }
     
-    uint8_t  CountBitsSet(uint64_t Data) {
+    uint8_t CountBitsSet(uint64_t Data) {
         uint8_t DataBit = 0, BitCount = 0;
         for (uint8_t Bit = 0; Bit < Bits2Bytes(sizeof(Data)); Bit++) {
             DataBit = (Data & (1 << Bit)) >> Bit;
@@ -436,26 +436,7 @@ extern "C" {
         }
     }
     
-    void Transform2BijectiveBWT(BitOutput *BitO, size_t DataSize, int16_t *Data) { // BANANA
-                                                                                   // So basically move shit around a bunch of times until?
-    }
-    
-    void UndoBijectiveBWT(BitInput *BitI, size_t DataSize, int64_t *Data) {
-        
-    }
-    
-    uint64_t GenerateCRC(BitInput *BitI, size_t DataSize, CRC *CRCData) { // uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool PolyType, uint64_t Init, uint8_t CRCSize
-                                                                          // So, first append Z zero bits to the original message, for who knows why.
-                                                                          // Then, long divide the data by the poly, all subtractions in long division are done modulo 2. Modulo 2 subtraction = XOR
-        
-        // Loop over the whole data block, to calculate the CRC. use BitInput directly, instead of relying on data being submitted
-        // PNG Polynomial in reversed representation:
-        // x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
-        // x^178 + x + 1 % 4294967296;
-        // Add any padding if nessicary?
-        // CRC Data Input: 49484452 00000058 00000058 08060000 00
-        // CRC in base 10: 1229472850 88 88 2054
-        // CRC result: 0x71953034
+    uint64_t GenerateCRC(BitInput *BitI, size_t DataSize, CRC *CRCData) {
         uint16_t CRCResult = 0;
         for (uint64_t Byte = 0; Byte < DataSize; Byte++) {
             CRCResult = CRCData->Polynomial ^ BitI->Buffer[BitI->BitsUnavailable / 8] << 8;
@@ -496,10 +477,6 @@ extern "C" {
     }
     
     uint32_t GenerateAdler32(uint8_t *Data, size_t DataSize) { // In UnitTest
-                                                               // Add all values up, then modulo it by 65521 for Sum1. byte bound.
-                                                               // Sum2 is Sum1 ran through the algorithm again.
-                                                               // Sum2 is stored before Sum1. Big Endian.
-        
         uint32_t Adler  = 1;
         uint32_t Sum1   = Adler & 0xFFFF;
         uint32_t Sum2   = (Adler >> 16) & 0xFFFF;
@@ -518,10 +495,6 @@ extern "C" {
         } else {
             return true;
         }
-    }
-    
-    void DecodeFiniteStateEntropy(BitInput *BitI, uint16_t *EncodedBuffer, uint16_t *DecodedBuffer, size_t EncodedBufferSize) {
-        
     }
     
 #ifdef __cplusplus
