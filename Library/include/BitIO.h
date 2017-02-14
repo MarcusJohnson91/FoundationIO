@@ -18,7 +18,7 @@
 #include <string.h>
 #include <time.h>
 
-#ifdef _POSIX_
+#ifndef _POSIX_VERSION
 #include <dirent.h>
 #include <libgen.h>
 #include <syslog.h>
@@ -26,23 +26,18 @@
 #include <xlocale.h>
 #endif
 
-/*
- //#include <dirent.h>
-//#include <errno.h>
-//#include <libgen.h>
-#include <math.h>
-//#include <signal.h>
-//#include <stdarg.h> // Variadic arguments
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <syslog.h>
-#include <time.h>
-#include <unistd.h>
-#include <xlocale.h>
- */
+#ifndef _POSIX_VERSION
+enum LogTypes {
+    LOG_EMERG   = 0,
+    LOG_ALERT   = 1,
+    LOG_CRIT    = 2,
+    LOG_ERR     = 3,
+    LOG_WARNING = 4,
+    LOG_NOTICE  = 5,
+    LOG_INFO    = 6,
+    LOG_DEBUG   = 7,
+} LogTypes;
+#endif
 
 
 #ifdef __cplusplus
@@ -357,7 +352,7 @@ extern "C" {
 	/*!
 	 @abstract                     "Integer ceil function"
 	 */
-	int64_t        Ceili(int64_t X);
+	int64_t        Ceili(long double X);
 	
 	extern enum    PolynomialType {
 		Normal     = 0,
@@ -421,12 +416,12 @@ extern "C" {
 	/*!
 	 @abstract                     "Logs errors to log files, and stderr; and mail if Critical/Panic."
 
-	 @param    SYSError            "Error message prefixed by SYS in ErrorCodes".
-	 @param    Library             "Name of the program or library that called this function, to name the logfile".
+	 @param    ErrorLevel          "Error message prefixed by SYS in ErrorCodes".
+	 @param    LibraryOrProgram    "Name of the program or library that called this function, to name the logfile".
 	 @param    Function            "Which function is calling Log?".
-	 @param    Description         "String describing what went wrong, if you need to use format specifiers, call snprintf".
+	 @param    ErrorDescription    "String describing what went wrong, if you need to use format specifiers, call snprintf".
 	 */
-	void           Log(int64_t SYSError, char Library[BitIOStringSize], char Function[BitIOStringSize], char Description[BitIOStringSize]);
+    void           Log(uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription);
 
 	/*!
 	 @abstract                     "Tells if the stream/buffer is byte aligned of not".
