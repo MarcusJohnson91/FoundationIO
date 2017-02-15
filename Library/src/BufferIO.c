@@ -219,7 +219,27 @@ extern "C" {
         free(BitO);
     }
     
-    void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffsetInBytes) {
+    void NEWUpdateInputBuffer(BitInput *BitI, int64_t RelativeOffsetInBytes) { // You assume that there are 0 bits left.
+        uint64_t Bytes2Read = 0, BytesRead = 0;
+        // tl;dr you need to subtract the bytes unused from the relative offset, then modulo the result and put it in unavailable.
+        // Lets say we have 19 bits left in the buffer, and the user requested 24.
+        fseek(BitI->File, RelativeOffsetInBytes - Bits2Bytes(BitI->BitsAvailable), SEEK_CUR);
+        BitI->FilePosition = ftell(BitI->File);
+        memset(BitI->Buffer, 0, sizeof(BitI->Buffer));
+        
+        Bytes2Read = BitI->FileSize - BitI->FilePosition >= BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
+        BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
+        if (BytesRead != Bytes2Read) { // Bytes2Read
+            char ErrorDescription[BitIOStringSize];
+            snprintf(ErrorDescription, BitIOStringSize, "Supposed to read %llu bytes, but read %llu\n", Bytes2Read, BytesRead);
+            Log(LOG_WARNING, "libBitIO", "UpdateInputBuffer", ErrorDescription);
+        }
+        
+        BitI->BitsUnavailable = BitI->BitsUnavailable % 8;// FIXME: This assumes UpdateBuffer was called with at most 7 unread bits...
+        BitI->BitsAvailable   = Bytes2Bits(BytesRead);
+    }
+    
+    void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffsetInBytes) { // You assume that there are 0 bits left.
         uint64_t Bytes2Read = 0, BytesRead = 0;
         fseek(BitI->File, RelativeOffsetInBytes, SEEK_CUR);
         BitI->FilePosition = ftell(BitI->File);
@@ -237,7 +257,7 @@ extern "C" {
         BitI->BitsAvailable   = Bytes2Bits(BytesRead);
     }
     
-    uint64_t ReadBits2(BitInput *BitI, uint8_t Bits2Read, bool ReadFromMSB) { // Set this up so it can read from memory addresses, to support running on machines without an OS.
+    uint64_t ReadBits2(BitInput *BitI, uint8_t Bits2Read, bool ReadFromMSB) {
         uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, Mask = 0, Data = 0, Mask2Shift = 0;
         uint64_t OutputData = 0;
         
