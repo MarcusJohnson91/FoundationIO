@@ -42,12 +42,7 @@ extern "C" {
     }
     
     uint64_t Powi(uint64_t Base, uint64_t Exponent) {
-        uint64_t Result = 1;
-        
-        for (uint64_t Times = 0; Times < Exponent; Times++) {
-            Result *= Base;
-        }
-        return Result;
+        return (int64_t)pow(Base, Exponent);
     }
     
     int64_t Floori(double X) {
@@ -257,55 +252,7 @@ extern "C" {
         BitI->BitsAvailable   = Bytes2Bits(BytesRead);
     }
     
-    uint64_t ReadBits2(BitInput *BitI, uint8_t Bits2Read, bool ReadFromMSB) {
-        uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, Mask = 0, Data = 0, Mask2Shift = 0;
-        uint64_t OutputData = 0;
-        
-        if ((Bits2Read <= 0) || (Bits2Read > 64)) {
-            char Description[BitIOPathSize];
-            snprintf(Description, BitIOPathSize, "ReadBits only supports reading 1-64 bits at a time, you tried reading: %d bits\n", Bits2Read);
-            Log(LOG_CRIT, "libBitIO", "ReadBits2", Description);
-            exit(EXIT_FAILURE);
-        } else {
-            if (BitI->BitsAvailable < Bits) {
-                UpdateInputBuffer(BitI, 0);
-            }
-            SystemBits             = 8 - (BitI->BitsUnavailable % 8);
-            UserBits               = BitsRemaining(Bits);
-            Bits2Read              = SystemBits >= UserBits  ? UserBits : SystemBits;
-            if (ReadFromMSB == true) {
-                Mask2Shift         = SystemBits <= UserBits  ? 0 : SystemBits - UserBits;
-                Mask               = (Power2Mask(Bits2Read) << Mask2Shift);
-            } else { // read from LSB
-                     // read 2 bits, 2 offset, so mask = 0b00001100
-                     // BitsAvailable = 72, BitsUnavailable = 95
-                     // SystemBits = 1
-                     // UserBits   = 2
-                     // Bits2Read  = 1
-                     // Mask2Shift = -1?????
-                     // Mask       = 1 << 0
-                     // Data       = 0x1
-                
-                // Important variables:
-                // The number of bits requested in general.
-                // The number of bits available in general.
-                // The number of bits to read from this byte, combinartion of those 2 variables.
-                // Where to read the bits from in this byte (MSB/LSB here)
-                // Shifting the read bits to accomadate the output (MSB/LSB here as well.)
-                Mask               = (Power2Mask(Bits2Read) << SystemBits);
-            }
-            Data                   = BitI->Buffer[BitI->BitsUnavailable / 8] & Mask;
-            Data                 >>= Mask2Shift;
-            OutputData           <<= SystemBits >= UserBits ? UserBits : SystemBits;
-            OutputData            += Data;
-            BitI->BitsAvailable   -= SystemBits >= UserBits ? UserBits : SystemBits;
-            BitI->BitsUnavailable += SystemBits >= UserBits ? UserBits : SystemBits;
-            Bits                  -= SystemBits >= UserBits ? UserBits : SystemBits;
-        }
-        return OutputData;
-    }
-    
-    uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read) { // Set this up so it can read from memory addresses, to support running on machines without an OS.
+    uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read, bool ReadFromMSB) {
         uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, Mask = 0, Data = 0, Mask2Shift = 0;
         uint64_t OutputData = 0;
         
@@ -318,29 +265,29 @@ extern "C" {
             if (BitI->BitsAvailable < Bits) {
                 UpdateInputBuffer(BitI, 0);
             }
-            while (Bits > 0) {
-                SystemBits             = 8 - (BitI->BitsUnavailable % 8);
-                UserBits               = BitsRemaining(Bits);
-                Bits2Read              = SystemBits >= UserBits  ? UserBits : SystemBits;
-                Mask2Shift             = SystemBits <= UserBits  ? 0 : SystemBits - UserBits;
-                Mask                   = (Power2Mask(Bits2Read) << Mask2Shift);
-                Data                   = BitI->Buffer[BitI->BitsUnavailable / 8] & Mask;
-                Data                 >>= Mask2Shift;
-                
-                OutputData           <<= SystemBits >= UserBits ? UserBits : SystemBits;
-                OutputData            += Data;
-                
-                BitI->BitsAvailable   -= SystemBits >= UserBits ? UserBits : SystemBits;
-                BitI->BitsUnavailable += SystemBits >= UserBits ? UserBits : SystemBits;
-                Bits                  -= SystemBits >= UserBits ? UserBits : SystemBits;
+            SystemBits             = 8 - (BitI->BitsUnavailable % 8);
+            UserBits               = BitsRemaining(Bits);
+            Bits2Read              = SystemBits >= UserBits  ? UserBits : SystemBits;
+            if (ReadFromMSB == true) {
+                Mask2Shift         = SystemBits <= UserBits  ? 0 : SystemBits - UserBits;
+                Mask               = (Power2Mask(Bits2Read) << Mask2Shift);
+            } else {
+                Mask               = (Powi(2, Bits2Read) - 1) << BitI->BitsUnavailable % 8;
             }
+            Data                   = BitI->Buffer[BitI->BitsUnavailable / 8] & Mask;
+            Data                 >>= Mask2Shift;
+            OutputData           <<= SystemBits >= UserBits ? UserBits : SystemBits;
+            OutputData            += Data;
+            BitI->BitsAvailable   -= SystemBits >= UserBits ? UserBits : SystemBits;
+            BitI->BitsUnavailable += SystemBits >= UserBits ? UserBits : SystemBits;
+            Bits                  -= SystemBits >= UserBits ? UserBits : SystemBits;
         }
         return OutputData;
     }
     
-    uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek) {
+    uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek, bool ReadFromMSB) {
         uint64_t OutputData = 0ULL;
-        OutputData = ReadBits(BitI, Bits2Peek);
+        OutputData = ReadBits(BitI, Bits2Peek, ReadFromMSB);
         
         BitI->BitsAvailable       += Bits2Peek;
         BitI->BitsUnavailable     -= Bits2Peek;
@@ -380,7 +327,7 @@ extern "C" {
     uint64_t  ReadRICE(BitInput *BitI, bool Truncated, uint8_t StopBit) {
         uint64_t BitCount = 0;
         
-        while (ReadBits(BitI, 1) != StopBit) {
+        while (ReadBits(BitI, 1, false) != StopBit) {
             BitCount += 1;
         }
         if (Truncated == true) {
@@ -402,13 +349,13 @@ extern "C" {
         int64_t  Temp    = 0;
         int64_t  Final   = 0;
         
-        while (ReadBits(BitI, 1) != 1) {
+        while (ReadBits(BitI, 1, false) != 1) {
             Zeros += 1;
         }
         
         if (IsSigned == false) {
             CodeNum  = (1ULL << Zeros);
-            CodeNum += ReadBits(BitI, Zeros);
+            CodeNum += ReadBits(BitI, Zeros, false);
         } else { // Signed
             if (IsOdd(CodeNum) == true) {
                 Final = CodeNum - 1;

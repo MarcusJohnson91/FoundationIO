@@ -327,11 +327,9 @@ extern "C" {
      
      @param    BitI                "Pointer to BitInput struct".
      @param    Bits2Read           "Number of bits to read".
-     
-     TODO: Consider - Maybe it's not a good idea to buffer, because it limits you to streaming formats only...
-     TODO: Grow the buffer to accomidate a buffered formats.
+     @param    ReadFromMSB         "Should ReadBits start at the most significant bit in this byte?"
      */
-    uint64_t       ReadBits(BitInput *BitI, uint8_t Bits2Read);
+    uint64_t       ReadBits(BitInput *BitI, uint8_t Bits2Read, bool ReadFromMSB);
     
     /*!
      @abstract                     "Reads data encoded as Exponential-Golomb aka Elias Gamma".
@@ -366,8 +364,9 @@ extern "C" {
      @abstract                     "Shows the next X bits, without recording it as a read".
      @param    BitI                "Pointer to BitInput".
      @param    Bits2Peek           "Number of bits to peek".
+     @param    ReadFromMSB         "Should PeekBits start at the most significant bit in this byte?"
      */
-    uint64_t       PeekBits(BitInput *BitI, uint8_t Bits2Peek);
+    uint64_t       PeekBits(BitInput *BitI, uint8_t Bits2Peek, bool ReadFromMSB);
     
     /*!
      @abstract                     "Writes bits to BitOutput->File".
