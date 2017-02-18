@@ -150,61 +150,70 @@ extern "C" {
      @abstract                         "Swap endian of 16 bit integers".
      @param    Data2Swap               "Data to swap endian".
      */
-    uint16_t       SwapEndian16(uint16_t Data2Swap);
+    uint16_t       SwapEndian16(const uint16_t Data2Swap);
     
     /*!
      @abstract                         "Swap endian of 32 bit integers".
      @param    Data2Swap               "Data to swap endian".
      */
-    uint32_t       SwapEndian32(uint32_t Data2Swap);
+    uint32_t       SwapEndian32(const uint32_t Data2Swap);
     
     /*!
      @abstract                         "Swap endian of 64 bit integers".
      @param    Data2Swap               "Data to swap endian".
      */
-    uint64_t       SwapEndian64(uint64_t Data2Swap);
+    uint64_t       SwapEndian64(const uint64_t Data2Swap);
     
     /*!
      @abstract                         "Computes the number of bytes from the number of bits".
      @remark                           "ONLY USE FOR ARRAY INDEXING. DOES NOT ROUND, ANYTHING LESS THAN 8 = 0".
      @return                           "The number of bytes".
      */
-    uint64_t       Bits2Bytes(uint64_t Bits);
+    uint64_t       Bits2Bytes(const uint64_t Bits);
     
     /*!
      @abstract                         "Computes the number of bits from the number of bytes".
      @remark                           "Does not have sub-byte precision".
      @return                           "Converts the number of bytes to the number of bits".
      */
-    uint64_t       Bytes2Bits(uint64_t Bytes);
+    uint64_t       Bytes2Bits(const uint64_t Bytes);
     
     /*!
      @abstract                         "Computes the number of bits until the next byte".
      @return                           "Returns the number of bits left".
      */
-    uint8_t        BitsRemaining(uint64_t BitsAvailable);
+    uint8_t        BitsRemaining(const uint64_t BitsAvailable);
     
     /*!
      @abstract                         "Converts an Signed int to a Unsigned int".
      @remark                           "The internal representation in BitIO is unsigned".
      @return                           "Returns the input data in Unsigned format".
      */
-    uint64_t       Signed2Unsigned(int64_t Signed);
+    uint64_t       Signed2Unsigned(const int64_t Signed);
     
     /*!
      @abstract                         "Converts an Unsigned int to a Signed int".
      @remark                           "The internal representation in BitIO is unsigned".
      @return                           "Returns the input data in Signed format".
      */
-    int64_t        Unsigned2Signed(uint64_t Unsigned);
+    int64_t        Unsigned2Signed(const uint64_t Unsigned);
     
-    uint64_t       Powi(uint64_t Base, uint64_t Exponent);
+    /*!
+     @abstract                     "Raise a base to the exponent".
+     */
+    uint64_t       Powi(const uint64_t Base, const uint64_t Exponent);
     
-    int64_t        Floori(double X);
+    /*!
+     @abstract                     "Integer floor function"
+     */
+    int64_t        Floori(const long double X);
     
-    int64_t        Ceili(long double X);
+    /*!
+     @abstract                     "Integer ceil function"
+     */
+    int64_t        Ceili(const long double X);
     
-    uint8_t        CountBitsSet(uint64_t Data);
+    uint8_t        CountBitsSet(const uint64_t Data);
     
     /*!
      @abstract                     "Create bitmask from binary exponent".
@@ -212,19 +221,19 @@ extern "C" {
      @param    Exponent            "Power to be raised by 2".
      @return                       "If 0 is returned, then Exponent was too large".
      */
-    uint64_t       Power2Mask(uint8_t Exponent);
+    uint64_t       Power2Mask(const uint8_t Exponent);
     
     /*!
      @abstract                         "Converts numbers from One's compliment to Two's compliment".
      @return                           "Returns the Input in Two's compliment format".
      */
-    uint64_t       OnesCompliment2TwosCompliment(int64_t Input);
+    uint64_t       OnesCompliment2TwosCompliment(const int64_t OnesCompliment);
     
     /*!
      @abstract                         "Converts numbers from Two's compliment to One's compliment".
      @return                           "Returns the Input in One's compliment format".
      */
-    uint64_t       TwosCompliment2OnesCompliment(int64_t Input);
+    uint64_t       TwosCompliment2OnesCompliment(const int64_t TwosCompliment);
     
     uint8_t        DetectSystemEndian(void);
     
@@ -234,7 +243,7 @@ extern "C" {
      @param    BitsUsed            "Bits read from the stream, to calculate if it's on a byte aligned address".
      @param    BytesOfAlignment    "Number of bytes to check alignment with, aka is BitsUsed a multiple of BytesOfAlignment * 8?".
      */
-    bool           IsStreamByteAligned(uint64_t BitsUsed, uint8_t BytesOfAlignment);
+    bool           IsStreamByteAligned(const uint64_t BitsUsed, const uint8_t BytesOfAlignment);
     
     /*!
      @abstract                         "Aligns bits for multi-byte alignment".
@@ -243,7 +252,7 @@ extern "C" {
      @param    BitI                    "Pointer to BitInput".
      @param    BytesOfAlignment        "Number of bytes of padding to align it to"
      */
-    void           AlignInput(BitInput *BitI, uint8_t BytesOfAlignment);
+    void           AlignInput(BitInput *BitI, const uint8_t BytesOfAlignment);
     
     /*!
      @abstract                         "Aligns bits for multi-byte alignment".
@@ -252,23 +261,23 @@ extern "C" {
      @param    BitO                    "Pointer to BitOutput".
      @param    BytesOfAlignment        "Number of bytes of padding to align it to"
      */
-    void           AlignOutput(BitOutput *BitO, uint8_t BytesOfAlignment);
+    void           AlignOutput(BitOutput *BitO, const uint8_t BytesOfAlignment);
     
     /*!
      @abstract                         "Tells whether the input number is even or odd".
      @returns                          "True for odd, false for even".
      */
-    bool           IsOdd(int64_t Input);
+    bool           IsOdd(const int64_t Input);
     
-    uint8_t        FindHighestBitSet(uint64_t X);
+    uint8_t        FindHighestBitSet(const uint64_t X);
     
-    void           DisplayCMDHelp(CommandLineOptions *CMD);
+    void           DisplayCMDHelp(const CommandLineOptions *CMD);
     
-    void           ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]);
+    void           ParseCommandLineArguments(const CommandLineOptions *CMD, int argc, const char *argv[]);
     
-    void           OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, uint8_t InputSwitch);
+    void           OpenCMDInputFile(BitInput *BitI, const CommandLineOptions *CMD, const uint8_t InputSwitch);
     
-    void           OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, uint8_t InputSwitch);
+    void           OpenCMDOutputFile(BitOutput *BitO, const CommandLineOptions *CMD, const uint8_t InputSwitch);
     
     /*!
      @abstract                         "Writes BitO->Buffer to BitO->File".
@@ -329,7 +338,7 @@ extern "C" {
      @param    Bits2Read           "Number of bits to read".
      @param    ReadFromMSB         "Should ReadBits start at the most significant bit in this byte?"
      */
-    uint64_t       ReadBits(BitInput *BitI, uint8_t Bits2Read, bool ReadFromMSB);
+    uint64_t       ReadBits(BitInput *BitI, const uint8_t Bits2Read, bool ReadFromMSB);
     
     /*!
      @abstract                     "Reads data encoded as Exponential-Golomb aka Elias Gamma".
@@ -366,7 +375,7 @@ extern "C" {
      @param    Bits2Peek           "Number of bits to peek".
      @param    ReadFromMSB         "Should PeekBits start at the most significant bit in this byte?"
      */
-    uint64_t       PeekBits(BitInput *BitI, uint8_t Bits2Peek, bool ReadFromMSB);
+    uint64_t       PeekBits(BitInput *BitI, const uint8_t Bits2Peek, bool ReadFromMSB);
     
     /*!
      @abstract                     "Writes bits to BitOutput->File".
@@ -384,22 +393,7 @@ extern "C" {
      @param    BitI                "Pointer to BitInput".
      @param    Bits                "The number of bits to skip".
      */
-    void           SkipBits(BitInput *BitI, int64_t Bits);
-    
-    /*!
-     @abstract                     "Raise a base to the exponent".
-     */
-    uint64_t       Powi(uint64_t Base, uint64_t Exponent);
-    
-    /*!
-     @abstract                     "Integer floor function"
-     */
-    int64_t        Floori(double X);
-    
-    /*!
-     @abstract                     "Integer ceil function"
-     */
-    int64_t        Ceili(long double X);
+    void           SkipBits(BitInput *BitI, const int64_t Bits);
     
     extern enum    PolynomialType {
         Normal     = 0,
@@ -468,14 +462,12 @@ extern "C" {
      @param    Function            "Which function is calling Log?".
      @param    ErrorDescription    "String describing what went wrong, if you need to use format specifiers, call snprintf".
      */
-    void           Log(uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription);
+    void           Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription);
     
     /*!
      @abstract                     "Writes data encoded as Exponential-Golomb aka Elias Gamma".
      */
     void WriteExpGolomb(BitOutput *BitO, bool IsSigned, uint64_t Data2Write);
-    
-    uint8_t CountBitsSet(uint64_t Data);
     
     typedef struct LinkedList {
         uint16_t           Value;

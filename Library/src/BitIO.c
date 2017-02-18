@@ -6,54 +6,54 @@ extern "C" {
     
 #pragma GCC poison gets puts strcpy strcat tempfile mktemp sprintf gethostbyaddr gethostbyname bzero strcmp malloc
     
-    uint16_t SwapEndian16(uint16_t Data2Swap) { // In UnitTest
+    uint16_t SwapEndian16(const uint16_t Data2Swap) { // In UnitTest
         return ((Data2Swap & 0xFF00) >> 8) | ((Data2Swap & 0x00FF) << 8);
     }
     
-    uint32_t SwapEndian32(uint32_t Data2Swap) { // In UnitTest
+    uint32_t SwapEndian32(const uint32_t Data2Swap) { // In UnitTest
         return ((Data2Swap & 0xFF000000) >> 24) | ((Data2Swap & 0x00FF0000) >> 8) | ((Data2Swap & 0x0000FF00) << 8) | ((Data2Swap & 0x000000FF) << 24);
     }
     
-    uint64_t SwapEndian64(uint64_t Data2Swap) { // In UnitTest
+    uint64_t SwapEndian64(const uint64_t Data2Swap) { // In UnitTest
         return (((Data2Swap & 0xFF00000000000000) >> 56) | ((Data2Swap & 0x00FF000000000000) >> 40) | \
                 ((Data2Swap & 0x0000FF0000000000) >> 24) | ((Data2Swap & 0x000000FF00000000) >>  8) | \
                 ((Data2Swap & 0x00000000FF000000) <<  8) | ((Data2Swap & 0x0000000000FF0000) << 24) | \
                 ((Data2Swap & 0x000000000000FF00) << 40) | ((Data2Swap & 0x00000000000000FF) << 56));
     }
     
-    uint64_t Bits2Bytes(uint64_t Bits) { // In UnitTest
+    uint64_t Bits2Bytes(const uint64_t Bits) { // In UnitTest
         return (Bits / 8);
     }
     
-    uint64_t Bytes2Bits(uint64_t Bytes) { // In UnitTest
+    uint64_t Bytes2Bits(const uint64_t Bytes) { // In UnitTest
         return (Bytes * 8);
     }
     
-    uint8_t BitsRemaining(uint64_t BitsAvailable) { // In UnitTest
+    uint8_t BitsRemaining(const uint64_t BitsAvailable) { // In UnitTest
         return BitsAvailable > 8 ? 8 : BitsAvailable;
     }
     
-    uint64_t Signed2Unsigned(int64_t Signed) { // In UnitTest
+    uint64_t Signed2Unsigned(const int64_t Signed) { // In UnitTest
         return (uint64_t)Signed;
     }
     
-    int64_t Unsigned2Signed(uint64_t Unsigned) {  // In UnitTest
+    int64_t Unsigned2Signed(const uint64_t Unsigned) {  // In UnitTest
         return (int64_t)Unsigned;
     }
     
-    uint64_t Powi(uint64_t Base, uint64_t Exponent) {
+    uint64_t Powi(const uint64_t Base, const uint64_t Exponent) {
         return (int64_t)pow(Base, Exponent);
     }
     
-    int64_t Floori(double X) {
+    int64_t Floori(const long double X) {
         return (int64_t)floor(X);
     }
     
-    int64_t Ceili(long double X) {
+    int64_t Ceili(const long double X) {
         return (int64_t)ceil(X);
     }
     
-    uint8_t CountBitsSet(uint64_t Data) {
+    uint8_t CountBitsSet(const uint64_t Data) {
         uint8_t DataBit = 0, BitCount = 0;
         for (uint8_t Bit = 0; Bit < Bits2Bytes(sizeof(Data)); Bit++) {
             DataBit = (Data & (1 << Bit)) >> Bit;
@@ -64,7 +64,7 @@ extern "C" {
         return BitCount;
     }
     
-    uint64_t Power2Mask(uint8_t Exponent) { // In UnitTest
+    uint64_t Power2Mask(const uint8_t Exponent) { // In UnitTest
         if ((Exponent <= 0) || (Exponent > 64)) { // Exponent = 1
             return EXIT_FAILURE;
         } else {
@@ -78,12 +78,12 @@ extern "C" {
         }
     }
     
-    uint64_t OnesCompliment2TwosCompliment(int64_t Input) { // All unset bits ABOVE the set bit are set, including those originally set
-        return ~Input + 1;
+    uint64_t OnesCompliment2TwosCompliment(const int64_t OnesCompliment) { // All unset bits ABOVE the set bit are set, including those originally set
+        return ~OnesCompliment + 1;
     }
     
-    uint64_t TwosCompliment2OnesCompliment(int64_t Input) { // All unset bits become set, except those originally set
-        return Input ^ 0xFFFFFFFFFFFFFFFF;
+    uint64_t TwosCompliment2OnesCompliment(const int64_t TwosCompliment) { // All unset bits become set, except those originally set
+        return TwosCompliment ^ 0xFFFFFFFFFFFFFFFF;
     }
     
     uint8_t DetectSystemEndian(void) {
@@ -99,7 +99,7 @@ extern "C" {
         return SystemEndian;
     }
     
-    bool IsStreamByteAligned(uint64_t BitsUsed, uint8_t BytesOfAlignment) {
+    bool IsStreamByteAligned(const uint64_t BitsUsed, const uint8_t BytesOfAlignment) {
         if ((BitsUsed % Bytes2Bits(BytesOfAlignment)) == 0) {
             return true;
         } else {
@@ -107,7 +107,7 @@ extern "C" {
         }
     }
     
-    void AlignInput(BitInput *BitI, uint8_t BytesOfAlignment) {
+    void AlignInput(BitInput *BitI, const uint8_t BytesOfAlignment) {
         uint8_t Bits2Align = BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
         
         if (Bits2Align != 0) { // NOT aligned
@@ -116,7 +116,7 @@ extern "C" {
         }
     }
     
-    void AlignOutput(BitOutput *BitO, uint8_t BytesOfAlignment) {
+    void AlignOutput(BitOutput *BitO, const uint8_t BytesOfAlignment) {
         uint8_t Bits2Align = BitO->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
         if (Bits2Align != 0) {
             BitO->BitsAvailable    -= Bits2Align;
@@ -124,11 +124,11 @@ extern "C" {
         }
     }
     
-    bool IsOdd(int64_t X) {
+    bool IsOdd(const int64_t X) {
         return X % 2 == 0 ? false : true;
     }
     
-    uint8_t  FindHighestBitSet(uint64_t X) {
+    uint8_t  FindHighestBitSet(const uint64_t X) {
         uint8_t HighestBitSet = 0;
         // use sizeof to get the size of the included bit (check to see if its always cast to 64 tho, if so just start at 64)
         // then count down from 64 to 0, stopping when you first find a 1 bit, mark the number of loops. that's the highest bit set.
@@ -141,7 +141,7 @@ extern "C" {
         return HighestBitSet;
     }
     
-    void DisplayCMDHelp(CommandLineOptions *CMD) {
+    void DisplayCMDHelp(const CommandLineOptions *CMD) {
         printf("%s: %s, %s\n\n", CMD->ProgramName, CMD->ProgramDescription, CMD->AuthorCopyrightLicense);
         printf("Options:\n");
         for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
@@ -150,7 +150,7 @@ extern "C" {
         }
     }
     
-    void ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]) {
+    void ParseCommandLineArguments(const CommandLineOptions *CMD, int argc, const char *argv[]) {
         // Scan for equals signs as well, if found, after after the equal sign is the result, everything before is the switch.
         for (uint8_t Argument = 0; Argument < argc; Argument++) {
             for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
@@ -177,7 +177,7 @@ extern "C" {
         }
     }
     
-    void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, uint8_t InputSwitch) {
+    void OpenCMDInputFile(BitInput *BitI, const CommandLineOptions *CMD, const uint8_t InputSwitch) {
         BitI->File = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
         fseek(BitI->File, 0, SEEK_END);
         BitI->FileSize = (uint64_t)ftell(BitI->File);
@@ -189,7 +189,7 @@ extern "C" {
         BitI->BitsUnavailable  = 0;
     }
     
-    void OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, uint8_t InputSwitch) {
+    void OpenCMDOutputFile(BitOutput *BitO, const CommandLineOptions *CMD, const uint8_t InputSwitch) {
         BitO->File = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
         BitO->BitsAvailable    = BitOutputBufferSizeInBits;
         BitO->BitsUnavailable  = 0;
@@ -214,7 +214,7 @@ extern "C" {
         free(BitO);
     }
     
-    void NEWUpdateInputBuffer(BitInput *BitI, int64_t RelativeOffsetInBytes) { // You assume that there are 0 bits left.
+    void NEWUpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) { // You assume that there are 0 bits left.
         uint64_t Bytes2Read = 0, BytesRead = 0;
         // tl;dr you need to subtract the bytes unused from the relative offset, then modulo the result and put it in unavailable.
         // Lets say we have 19 bits left in the buffer, and the user requested 24.
@@ -252,7 +252,7 @@ extern "C" {
         BitI->BitsAvailable   = Bytes2Bits(BytesRead);
     }
     
-    uint64_t ReadBits(BitInput *BitI, uint8_t Bits2Read, bool ReadFromMSB) {
+    uint64_t ReadBits(BitInput *BitI, const uint8_t Bits2Read, bool ReadFromMSB) {
         uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, Mask = 0, Data = 0, Mask2Shift = 0;
         uint64_t OutputData = 0;
         
@@ -267,12 +267,12 @@ extern "C" {
             }
             SystemBits             = 8 - (BitI->BitsUnavailable % 8);
             UserBits               = BitsRemaining(Bits);
-            Bits2Read              = SystemBits >= UserBits  ? UserBits : SystemBits;
+            Bits                   = SystemBits >= UserBits  ? UserBits : SystemBits;
             if (ReadFromMSB == true) {
                 Mask2Shift         = SystemBits <= UserBits  ? 0 : SystemBits - UserBits;
-                Mask               = (Power2Mask(Bits2Read) << Mask2Shift);
+                Mask               = (Power2Mask(Bits) << Mask2Shift);
             } else {
-                Mask               = (Powi(2, Bits2Read) - 1) << BitI->BitsUnavailable % 8;
+                Mask               = (Powi(2, Bits) - 1) << BitI->BitsUnavailable % 8;
             }
             Data                   = BitI->Buffer[BitI->BitsUnavailable / 8] & Mask;
             Data                 >>= Mask2Shift;
@@ -285,7 +285,7 @@ extern "C" {
         return OutputData;
     }
     
-    uint64_t PeekBits(BitInput *BitI, uint8_t Bits2Peek, bool ReadFromMSB) {
+    uint64_t PeekBits(BitInput *BitI, const uint8_t Bits2Peek, bool ReadFromMSB) {
         uint64_t OutputData = 0ULL;
         OutputData = ReadBits(BitI, Bits2Peek, ReadFromMSB);
         
@@ -312,7 +312,7 @@ extern "C" {
         }
     }
     
-    void SkipBits(BitInput *BitI, int64_t Bits) {
+    void SkipBits(BitInput *BitI, const int64_t Bits) {
         if (Bits <= BitI->BitsAvailable) {
             BitI->BitsAvailable   -= Bits;
             BitI->BitsUnavailable += Bits;
@@ -430,7 +430,7 @@ extern "C" {
         return false;
     }
     
-    void Log(uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription) {
+    void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription) {
 #ifdef _WIN32 // windows mode
         fprintf(stderr, "%s - %s: %s\n", Library, Function, ErrorDescription);
 #else // UNIX Mode!!!
