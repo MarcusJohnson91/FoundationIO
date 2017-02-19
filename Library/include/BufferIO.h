@@ -18,7 +18,7 @@
 #include <string.h>
 #include <time.h>
 
-#ifndef _POSIX_VERSION
+#if defined(_POSIX_VERSION)||(__APPLE__)
 #include <dirent.h>
 #include <libgen.h>
 #include <syslog.h>
