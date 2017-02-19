@@ -41,8 +41,8 @@ extern "C" {
         return (int64_t)Unsigned;
     }
     
-    uint64_t Powi(const uint64_t Base, const uint64_t Exponent) {
-        return (int64_t)pow(Base, Exponent);
+    int64_t Powi(int64_t Base, const int64_t Exponent) {
+        return Base *= Exponent;
     }
     
     int64_t Floori(const long double X) {

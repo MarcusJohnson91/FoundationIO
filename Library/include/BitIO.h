@@ -201,7 +201,7 @@ extern "C" {
     /*!
      @abstract                     "Raise a base to the exponent".
      */
-    uint64_t       Powi(const uint64_t Base, const uint64_t Exponent);
+    int64_t       Powi(int64_t Base, const int64_t Exponent);
     
     /*!
      @abstract                     "Integer floor function"
