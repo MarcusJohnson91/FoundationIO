@@ -79,7 +79,7 @@ extern "C" {
         size_t       FilePosition;
         size_t       BitsUnavailable;
         size_t       BitsAvailable;
-        uint8_t      SystemEndian:2;
+        unsigned     SystemEndian:2;
         uint8_t      Buffer[BitInputBufferSize];
     } BitInput;
     
@@ -256,7 +256,6 @@ extern "C" {
     
     /*!
      @abstract                         "Aligns bits for multi-byte alignment".
-     @remark                           "TODO: Should this be Input/Output neutral?".
      
      @param    BitO                    "Pointer to BitOutput".
      @param    BytesOfAlignment        "Number of bytes of padding to align it to"
