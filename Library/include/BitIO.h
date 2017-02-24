@@ -104,27 +104,39 @@ extern "C" {
     } BitOutput;
     
     /*!
-     @constant SwitchFound       "If the switch was found in argv, this will be set to 1".
-     @constant Switch            "Actual switch, including dash(es)".
-     @constant SwitchDescription "Message to print explaining what the switch does".
-     @constant SwitchResult      "String to contain the result of this switch, NULL if not found".
+     @typedef  CLSwitch
+     @abstract                         "Contains the data to support a single switch".
+     @remark                           "You MUST include the null padding at the end of @Switch".
+     @constant SwitchFound             "If the switch was found in argv, this will be set to true".
+     @constant Resultless              "Is the mere presence of the switch what you're looking for? if so, set to true"
+     @constant Switch                  "Actual switch, including dash(s), slash, etc.".
+     @constant SwitchDescription       "Message to print explaining what the switch does".
+     @constant SwitchResult            "String to contain the result of this switch, NULL if not found".
      */
     typedef struct CLSwitch {
-        bool        SwitchFound;
-        bool        Resultless;
+        bool        SwitchFound:1;
+        bool        Resultless:1;
         char       *Switch;
         char       *SwitchDescription;
         char       *SwitchResult;
     } CLSwitch;
     
     /*!
+     @typedef  CommandLineOptions
+     @abstract                         "Type to contain a variable amount of CLSwitches".
+     @remark                           "The switches are zero indexed, and @NumSwitches is NOT zero indexed, so count from 1".
+     @constant NumSwitches             "The number of switches".
+     @constant ProgramName             "The name you want output when the help is printed".
+     @constant ProgramDescription      "The description of the program when the help is printed".
+     @constant AuthorCopyrightLicense  "The author, copyright years, and license of the program, or anything else you want printed".
+     @constant Switch                  "A pointer to an array of CLSwitch instances containing the properties of the switches".
      */
     typedef struct CommandLineOptions {
         size_t      NumSwitches;
         char       *ProgramName;
         char       *ProgramDescription;
         char       *AuthorCopyrightLicense;
-        CLSwitch   *Switch[BitIOMaxSwitches];
+        CLSwitch  **Switch;
     } CommandLineOptions;
     
     extern enum Endian {
@@ -299,36 +311,6 @@ extern "C" {
      */
     void           CloseBitOutput(BitOutput *BitO);
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     /*!
      @abstract                     "Manages InputBuffer and hands out the requested bits".
      @remark                       "DO NOT try reading backwards, it will not work. for that use SkipBits()".
@@ -384,6 +366,17 @@ extern "C" {
      @param    NumBits             "Is the number of bits to write".
      */
     void           WriteBits(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits);
+    
+    /*!
+     @abstract                  "Writes a buffer to a BitO pointer"
+     @param    BitO             "Pointer to BitOutput"
+     @param    Buffer          "The buffer you want written to the disk"
+     @param    IndexSize        "how many bits to read from a single buffer element, if the buffer is declared as uint16_t or int16_t, put 16, etc"
+     @param    BitOffset        "Where in the buffer do you want to start writing from?"
+     @param    Bits2Write       "The number of bits you want written from the buffer"
+     @param    MSB              "Should it read from the most significant bit of the byte?"
+     */
+    void           WriteBuffer(BitOutput *BitO, const uint64_t *Buffer, const uint8_t IndexSize, const size_t BitOffset, const size_t Bits2Write, const bool MSB);
     
     /*!
      @abstract                     "Seeks Forwards and backwards in BitInput"
