@@ -257,8 +257,8 @@ extern "C" {
         uint64_t OutputData = 0;
         
         if ((Bits2Read <= 0) || (Bits2Read > 64)) {
-            char Description[BitIOPathSize];
-            snprintf(Description, BitIOPathSize, "ReadBits only supports reading 1-64 bits at a time, you tried reading: %d bits\n", Bits2Read);
+            char Description[BitIOStringSize];
+            snprintf(Description, BitIOStringSize, "ReadBits only supports reading 1-64 bits at a time, you tried reading: %d bits\n", Bits2Read);
             Log(LOG_CRIT, "libBitIO", "ReadBits", Description);
             exit(EXIT_FAILURE);
         } else {

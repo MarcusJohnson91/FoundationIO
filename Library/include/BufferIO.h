@@ -41,8 +41,11 @@ extern "C" {
      @constant       BitOutputBufferSize       "Inital size of BitOutput buffer".
      @constant       BitOutputBufferSizeInBits "Inital size of BitOutput buffer in bits".
      @constant       BitIOStringSize           "Maximum size of a string in BitIO".
-     @constant       BitIOPathSize             "Maximum size of a path in the filesystem in BitIO".
-     @constant       BitIOUUIDSize             "size of a UUIDString including null terminator".
+     @constant       BitIOUUIDSize             "Size of a UUIDString including dashes and null terminator".
+     @constant       BitIOEncodedUUIDSize      "Size of a binary UUID string".
+     @constant       BitIOGUIDSize             "size of a GUIDString including dashes and null terminator".
+     @constant       BitIOEncodedGUIDSize      "Size of a binary GUID string".
+     @constant       BitIOMD5Size              "Size of a MD5 string".
      */
     extern enum BitIOConstants {
         BitInputBufferSize        = 4096,
@@ -50,21 +53,17 @@ extern "C" {
         BitOutputBufferSize       = 4096,
         BitOutputBufferSizeInBits = BitOutputBufferSize * 8,
         BitIOStringSize           = 4096,
-        BitIOPathSize             = 4096,
         BitIOUUIDSize             = 21,
         BitIOEncodedUUIDSize      = 16,
-        BitIOGUIDSize             = 21,
-        BitIOEncodedGUIDSize      = 16,
-        BitIOFlagSize             = 3,
+        BitIOGUIDSize             = BitIOUUIDSize,
+        BitIOEncodedGUIDSize      = BitIOEncodedUUIDSize,
         BitIOMD5Size              = 16,
-        BitIOMaxSwitches          = 64,
     } BitIOConstants;
     
     /*!
      @typedef        BitInput
      @abstract                         "Contains variables and buffers for reading bits".
      @remark                           "The default internal representation in BitIO is unsigned, Big Endian".
-     
      @constant       File              "Input file to read bits from".
      @constant       FileSize          "Size of File in bytes".
      @constant       FilePosition      "Current byte in the file".
@@ -87,7 +86,6 @@ extern "C" {
      @typedef        BitOutput
      @abstract                         "Contains variables and buffers for writing bits".
      @remark                           "The default internal representation in BitOutput is unsigned".
-     
      @constant       File              "Input file to read bits from".
      @constant       BitsUnavailable   "Number of previously read bits in Buffer".
      @constant       BitsAvailable     "Number of bits available for writing".
@@ -438,13 +436,6 @@ extern "C" {
      @param   EmbeddedAdler32      "Embedded Adler32 to compare the generated one to.".
      */
     bool           VerifyAdler32(const uint8_t *Data, const size_t DataSize, const uint32_t EmbeddedAdler32);
-    
-    /*!
-     @abstract                     "Generates an MD5 hash from the buffer of data you pass in".
-     
-     @param   BufferSize           "Number of bits in Buffer".
-     */
-    //void           GenerateMD5(uint8_t *Buffer, size_t BufferSize, char MD5String[BitIOMD5Size]);
     
     /*!
      @abstract                     "Logs errors to log files, and stderr; and mail if Critical/Panic."
