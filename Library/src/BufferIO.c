@@ -324,7 +324,7 @@ extern "C" {
         }
     }
     
-    uint64_t  ReadRICE(BitInput *BitI, bool Truncated, uint8_t StopBit) {
+    uint64_t  ReadRICE(BitInput *BitI, const bool Truncated, const bool StopBit) {
         uint64_t BitCount = 0;
         
         while (ReadBits(BitI, 1, false) != StopBit) {
@@ -336,14 +336,14 @@ extern "C" {
         return BitCount;
     }
     
-    void WriteRICE(BitOutput *BitO, bool Truncated, bool StopBit, uint64_t Data2Write) {
+    void WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write) {
         for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
             WriteBits(BitO, (~StopBit), 1);
         }
         WriteBits(BitO, StopBit, 1);
     }
     
-    int64_t ReadExpGolomb(BitInput *BitI, bool IsSigned) {
+    int64_t ReadExpGolomb(BitInput *BitI, const bool IsSigned) {
         uint64_t Zeros   = 0;
         uint64_t CodeNum = 0;
         int64_t  Temp    = 0;
@@ -366,7 +366,7 @@ extern "C" {
         return Final;
     }
     
-    void WriteExpGolomb(BitOutput *BitO, bool IsSigned, uint64_t Data2Write) {
+    void WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write) {
         uint64_t NumBits = 0;
         
         NumBits = FindHighestBitSet(Data2Write);
@@ -386,7 +386,7 @@ extern "C" {
         }
     }
     
-    void RotateArray(size_t DataSize, int64_t *Data, uint64_t NumRotations, bool RotateRight) {
+    void RotateArray(const size_t DataSize, int64_t *Data, const uint64_t NumRotations, const bool RotateRight) {
         // Theoretical speed up: just edit the pointer to each array element, and increment or decrement it by  NumRotation.
         if (RotateRight == true) {
             for (uint64_t Rotation = 0; Rotation < NumRotations; Rotation++) {
@@ -403,10 +403,10 @@ extern "C" {
         }
     }
     
-    uint64_t GenerateCRC(BitInput *BitI, size_t DataSize, CRC *CRCData) {
+    uint64_t GenerateCRC(const uint8_t *Data, const size_t DataSize, CRC *CRCData) {
         uint16_t CRCResult = 0;
         for (uint64_t Byte = 0; Byte < DataSize; Byte++) {
-            CRCResult = CRCData->Polynomial ^ BitI->Buffer[BitI->BitsUnavailable / 8] << 8;
+            CRCResult = CRCData->Polynomial ^ Data[Byte] << 8;
             for (uint8_t Bit = 0; Bit < 8; Bit++) {
                 if ((CRCResult & 0x8000) == true) {
                     //CRCResult = ((CRCResult <<= 1) ^ CRCData->Polynomial);
@@ -418,7 +418,7 @@ extern "C" {
         return 0;
     }
     
-    bool VerifyCRC(BitInput *BitI, size_t DataSize, CRC *CRCData) { // uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool PolyType, uint64_t Init, uint8_t CRCSize, uint64_t EmbeddedCRC
+    bool VerifyCRC(const uint8_t *Data, const size_t DataSize, CRC *CRCData) { // uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool PolyType, uint64_t Init, uint8_t CRCSize, uint64_t EmbeddedCRC
         /*
          uint64_t GeneratedCRC = GenerateCRC(CRCData); // DataBuffer, BufferSize, Poly, PolyType, Init, CRCSize
          if (GeneratedCRC == EmbeddedCRC) {
@@ -443,7 +443,7 @@ extern "C" {
 #endif
     }
     
-    uint32_t GenerateAdler32(uint8_t *Data, size_t DataSize) { // In UnitTest
+    uint32_t GenerateAdler32(const uint8_t *Data, const size_t DataSize) { // In UnitTest
         uint32_t Adler  = 1;
         uint32_t Sum1   = Adler & 0xFFFF;
         uint32_t Sum2   = (Adler >> 16) & 0xFFFF;
@@ -455,7 +455,7 @@ extern "C" {
         return (Sum2 << 16) + Sum1;
     }
     
-    bool VerifyAdler32(uint8_t *Data, size_t DataSize, uint32_t EmbeddedAdler32) { // In UnitTest
+    bool VerifyAdler32(const uint8_t *Data, const size_t DataSize, const uint32_t EmbeddedAdler32) { // In UnitTest
         uint32_t GeneratedAdler32 = GenerateAdler32(Data, DataSize);
         if (GeneratedAdler32 != EmbeddedAdler32) {
             return false;
