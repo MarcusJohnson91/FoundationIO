@@ -166,7 +166,7 @@ extern "C" {
     
     /*!
      @abstract                         "Computes the number of bytes from the number of bits".
-     @remark                           "ONLY USE FOR ARRAY INDEXING. DOES NOT ROUND, ANYTHING LESS THAN 8 = 0".
+     @remark                           "Rounds down".
      @return                           "The number of bytes".
      */
     uint64_t       Bits2Bytes(const uint64_t Bits);
@@ -346,7 +346,7 @@ extern "C" {
      @param    BitI                "Pointer to BitInput".
      @param    IsSigned            "Should it be read as signed or unsigneed?".
      */
-    int64_t        ReadExpGolomb(BitInput *BitI, bool IsSigned);
+    int64_t        ReadExpGolomb(BitInput *BitI, const bool IsSigned);
     
     /*!
      @abstract                     "Reads and Decodes unary/RICE encoded data from BitInput stream".
@@ -356,7 +356,7 @@ extern "C" {
      @param    Truncated           "Shoould the StopBit be included in the count?"
      @param    StopBit             "MUST be a 0 or a 1. none of this funny business about how true > 0".
      */
-    uint64_t       ReadRICE(BitInput *BitI, bool Truncated, uint8_t StopBit);
+    uint64_t       ReadRICE(BitInput *BitI, const bool Truncated, const bool StopBit);
     
     /*!
      @abstract                     "Encodes and writes data in unary/RICE format to a BitOutput stream".
@@ -366,7 +366,7 @@ extern "C" {
      @param    StopBit             "Has to be a 0 or a 1".
      @param    Data2Write          "Number to encode into RICE format".
      */
-    void           WriteRICE(BitOutput *BitO, bool Truncated, bool StopBit, uint64_t Data2Write);
+    void           WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write);
     
     /*!
      @abstract                     "Shows the next X bits, without recording it as a read".
@@ -412,20 +412,20 @@ extern "C" {
     /*!
      @abstract                     "Generates CRC from data".
      
-     @param    BitI                "Pointer to Initalized BitInput type to read from data".
+     @param    Data                "Pointer to a data buffer containing data to run the CRC algorithm over".
      @param    DataSize            "Size of the data chunk to generate the CRC for".
      @param    CRCData             "Pointer to struct containing the CRC parameters, like Polynomial, etc"
      */
-    uint64_t       GenerateCRC(BitInput *BitI, size_t DataSize, CRC *CRCData);
+    uint64_t       GenerateCRC(const uint8_t *Data, const size_t DataSize, CRC *CRCData);
     
     /*!
      @abstract                     "Computes the CRC of DataBuffer, and compares it to the submitted CRC".
      
-     @param    BitI                "Pointer to Initalized BitInput type to read from data".
+     @param    Data                "Pointer to a data buffer containing data to run the CRC algorithm over".
      @param    DataSize            "Size of the data chunk to generate the CRC for".
      @param    CRCData             "Pointer to struct containing the CRC parameters, like Polynomial, etc"
      */
-    bool           VerifyCRC(BitInput *BitI, size_t DataSize, CRC *CRCData);
+    bool           VerifyCRC(const uint8_t *Data, const size_t DataSize, CRC *CRCData);
     
     /*!
      @abstract                     "Creates Adler32 checksum from input data".
@@ -434,7 +434,7 @@ extern "C" {
      @param   Data                 "Pointer to the data to generate the Adler hash from".
      @param   DataSize             "Size of data".
      */
-    uint32_t       GenerateAdler32(uint8_t *Data, size_t DataSize);
+    uint32_t       GenerateAdler32(const uint8_t *Data, const size_t DataSize);
     
     /*!
      @abstract                     "Generates Adler32 from the input data, and compares it to the submitted checksum".
@@ -444,7 +444,7 @@ extern "C" {
      @param   DataSize             "Size of data".
      @param   EmbeddedAdler32      "Embedded Adler32 to compare the generated one to.".
      */
-    bool           VerifyAdler32(uint8_t *Data, size_t DataSize, uint32_t EmbeddedAdler32);
+    bool           VerifyAdler32(const uint8_t *Data, const size_t DataSize, const uint32_t EmbeddedAdler32);
     
     /*!
      @abstract                     "Generates an MD5 hash from the buffer of data you pass in".
@@ -466,7 +466,7 @@ extern "C" {
     /*!
      @abstract                     "Writes data encoded as Exponential-Golomb aka Elias Gamma".
      */
-    void WriteExpGolomb(BitOutput *BitO, bool IsSigned, uint64_t Data2Write);
+    void WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write);
     
     typedef struct LinkedList {
         uint16_t           Value;
