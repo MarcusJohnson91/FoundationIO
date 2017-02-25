@@ -432,7 +432,7 @@ extern "C" {
     
     void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription) {
 #ifdef _WIN32 // windows mode
-        fprintf(stderr, "%s - %s: %s\n", Library, Function, ErrorDescription);
+        fprintf(stderr, "%s - %s: %s\n", LibraryOrProgram, Function, ErrorDescription);
 #else // UNIX Mode!!!
         if ((ErrorLevel == LOG_EMERG) || (ErrorLevel == LOG_CRIT)) {
             openlog(LibraryOrProgram, ErrorLevel, (LOG_PERROR|LOG_MAIL|LOG_USER));
