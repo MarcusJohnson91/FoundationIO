@@ -21,8 +21,12 @@ extern "C" {
                 ((Data2Swap & 0x000000000000FF00) << 40) | ((Data2Swap & 0x00000000000000FF) << 56));
     }
     
-    uint64_t Bits2Bytes(const uint64_t Bits) { // In UnitTest
+    uint64_t Bits2BytesRoundsDown(const uint64_t Bits) { // In UnitTest
         return (Bits / 8);
+    }
+    
+    int64_t Bits2BytesRoundsUp(const int64_t Bits) {
+        return (Bits / 8) + (8 - (Bits % 8));
     }
     
     uint64_t Bytes2Bits(const uint64_t Bytes) { // In UnitTest
@@ -55,7 +59,7 @@ extern "C" {
     
     uint8_t CountBitsSet(const uint64_t Data) {
         uint8_t DataBit = 0, BitCount = 0;
-        for (uint8_t Bit = 0; Bit < Bits2Bytes(sizeof(Data)); Bit++) {
+        for (uint8_t Bit = 0; Bit < 64; Bit++) {
             DataBit = (Data & (1 << Bit)) >> Bit;
             if (DataBit == 1) {
                 BitCount += 1;
@@ -199,7 +203,7 @@ extern "C" {
         if (IsStreamByteAligned(BitO->BitsUnavailable, 1) == false) {
             AlignOutput(BitO, 1);
         }
-        fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable), 1, BitO->File);
+        fwrite(BitO->Buffer, Bits2BytesRoundsUp(BitO->BitsUnavailable), 1, BitO->File);
     }
     
     void CloseBitInput(BitInput *BitI) {
@@ -218,7 +222,7 @@ extern "C" {
         uint64_t Bytes2Read = 0, BytesRead = 0;
         // tl;dr you need to subtract the bytes unused from the relative offset, then modulo the result and put it in unavailable.
         // Lets say we have 19 bits left in the buffer, and the user requested 24.
-        fseek(BitI->File, RelativeOffsetInBytes - Bits2Bytes(BitI->BitsAvailable), SEEK_CUR);
+        fseek(BitI->File, RelativeOffsetInBytes - Bits2BytesRoundsUp(BitI->BitsAvailable), SEEK_CUR);
         BitI->FilePosition = ftell(BitI->File);
         memset(BitI->Buffer, 0, sizeof(BitI->Buffer));
         
@@ -296,9 +300,10 @@ extern "C" {
     }
     
     void WriteBits(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits) { // 12 bits 2 write, 0xFFF
+        // FIXME: WriteBits currently copies NumBits bits to the file, even if the input is shorter than that. we need to prepend 0 bits if that's the case
         uint8_t BitsLeft = NumBits, InputMask = 0, OutputMask = 0, Bits2Write = 0;
         if (BitO->BitsAvailable < NumBits) {
-            fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable), 1, BitO->File);
+            fwrite(BitO->Buffer, Bits2BytesRoundsUp(BitO->BitsUnavailable), 1, BitO->File);
             // Save unused bits, memset, and recopy them to the start of the buffer
         }
         // in order to write bits to the buffer, I need to mask Data2Write, and apply it to the output buffer, also, with a mask.
@@ -317,7 +322,7 @@ extern "C" {
             BitI->BitsAvailable   -= Bits;
             BitI->BitsUnavailable += Bits;
         } else {
-            fseek(BitI->File, Bits2Bytes(Bits - BitI->BitsAvailable), SEEK_CUR);
+            fseek(BitI->File, Bits2BytesRoundsUp(Bits - BitI->BitsAvailable), SEEK_CUR);
             BitI->BitsAvailable   = BitI->FileSize + BitInputBufferSize <= BitI->FileSize ? BitInputBufferSize : BitI->FileSize;
             BitI->BitsUnavailable = Bits % 8;
             UpdateInputBuffer(BitI, 0); // Bits2Bytes(Bits)
