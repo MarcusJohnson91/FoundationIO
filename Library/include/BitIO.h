@@ -175,16 +175,12 @@ extern "C" {
     uint64_t       SwapEndian64(const uint64_t Data2Swap);
     
     /*!
-     @abstract                         "Computes the number of bytes from the number of bits, rounding down".
-     @return                           "The number of bytes".
-     */
-    uint64_t       Bits2BytesRoundsDown(const uint64_t Bits);
-    
-    /*!
      @abstract                         "Computes the number of bytes from the number of bits, rounding up".
      @return                           "The number of bytes".
+     @param    Bits                    "The bits to convert to bytes".
+     @param    RoundUp                 "Should the resulting bytes be rounded up or down?"
      */
-    int64_t        Bits2BytesRoundsUp(const int64_t Bits);
+    int64_t        Bits2Bytes(const int64_t Bits, const bool RoundUp);
     
     /*!
      @abstract                         "Computes the number of bits from the number of bytes".
