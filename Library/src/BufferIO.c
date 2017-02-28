@@ -436,15 +436,17 @@ extern "C" {
     }
     
     void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription) {
+        char ErrorString[BitIOStringSize];
+        snprintf(ErrorString, BitIOStringSize, "%s - %s: %s", LibraryOrProgram, Function, ErrorDescription);
 #ifdef _WIN32 // windows mode
-        fprintf(stderr, "%s - %s: %s\n", LibraryOrProgram, Function, ErrorDescription);
+        fprintf(stderr, "%s\n", ErrorString);
 #else // UNIX Mode!!!
         if ((ErrorLevel == LOG_EMERG) || (ErrorLevel == LOG_CRIT)) {
             openlog(LibraryOrProgram, ErrorLevel, (LOG_PERROR|LOG_MAIL|LOG_USER));
         } else {
             openlog(LibraryOrProgram, ErrorLevel, (LOG_PERROR|LOG_USER));
         }
-        syslog(LOG_ERR, "%s - %s: %s\n", LibraryOrProgram, Function, ErrorDescription);
+        syslog(LOG_ERR, "%s\n", ErrorString);
 #endif
     }
     
