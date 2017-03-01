@@ -7,23 +7,15 @@
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
  */
 
-#include <errno.h>
-#include <math.h>
-#include <signal.h>
-#include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 #if defined(_POSIX_VERSION)||(__APPLE__)
-#include <dirent.h>
-#include <libgen.h>
 #include <syslog.h>
 #include <unistd.h>
-#include <xlocale.h>
 #endif
 
 #ifdef __cplusplus
