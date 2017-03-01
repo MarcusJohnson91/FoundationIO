@@ -7,6 +7,7 @@
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
  */
 
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
