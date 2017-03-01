@@ -4,7 +4,7 @@
 extern "C" {
 #endif
     
-#pragma GCC poison gets puts strcpy strcat tempfile mktemp sprintf gethostbyaddr gethostbyname bzero strcmp malloc
+    //#pragma GCC poison gets puts strcpy strcat tempfile mktemp sprintf gethostbyaddr gethostbyname bzero strcmp malloc
     
     uint16_t SwapEndian16(const uint16_t Data2Swap) { // In UnitTest
         return ((Data2Swap & 0xFF00) >> 8) | ((Data2Swap & 0x00FF) << 8);
@@ -301,7 +301,7 @@ extern "C" {
     
     void WriteBits(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits) { // 12 bits 2 write, 0xFFF
         // FIXME: WriteBits currently copies NumBits bits to the file, even if the input is shorter than that. we need to prepend 0 bits if that's the case
-        uint8_t BitsLeft = NumBits, InputMask = 0, OutputMask = 0, Bits2Write = 0;
+        uint8_t BitsLeft = NumBits, InputMask = 0, Bits2Write = 0;
         if (BitO->BitsAvailable < NumBits) {
             fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
             // Save unused bits, memset, and recopy them to the start of the buffer
@@ -351,7 +351,6 @@ extern "C" {
     int64_t ReadExpGolomb(BitInput *BitI, const bool IsSigned) {
         uint64_t Zeros   = 0;
         uint64_t CodeNum = 0;
-        int64_t  Temp    = 0;
         int64_t  Final   = 0;
         
         while (ReadBits(BitI, 1, false) != 1) {
