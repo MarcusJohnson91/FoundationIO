@@ -21,7 +21,6 @@ extern "C" {
     /*!
      @abstract                                 "BitIO compile time constants".
      @remark                                   "Change the buffer sizes here".
-     
      @constant       BitInputBufferSize        "Inital size of BitInput buffer".
      @constant       BitInputBufferSizeInBits  "Inital size of BitInput buffer in bits".
      @constant       BitOutputBufferSize       "Inital size of BitOutput buffer".
