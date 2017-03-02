@@ -3,7 +3,7 @@
 #include <math.h>
 #include <string.h>
 
-#if defined(_POSIX_VERSION)||(__APPLE__)
+#ifndef _WIN32
 #include <syslog.h>
 #include <unistd.h>
 #endif
