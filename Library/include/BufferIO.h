@@ -412,6 +412,7 @@ extern "C" {
     
     /*!
      @abstract                         "Writes a buffer to a BitO pointer"
+     @remark                           "Currently just a STUB".
      @param        BitO                "Pointer to BitOutput"
      @param        Buffer              "The buffer you want written to the disk"
      @param        IndexSize           "how many bits to read from a single buffer element, if the buffer is declared as uint16_t or int16_t, put 16, etc"

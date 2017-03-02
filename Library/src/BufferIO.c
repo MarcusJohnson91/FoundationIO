@@ -314,6 +314,10 @@ extern "C" {
         }
     }
     
+    void WriteBuffer(BitOutput *BitO, const uint64_t *Buffer, const uint8_t IndexSize, const size_t BitOffset, const size_t Bits2Write, const bool MSB) {
+        
+    }
+    
     void WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write) {
         for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
             WriteBits(BitO, (~StopBit), 1);
