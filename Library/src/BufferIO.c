@@ -1,3 +1,5 @@
+#include "../include/BitIO.h"
+
 #include <math.h>
 #include <string.h>
 
@@ -6,14 +8,12 @@
 #include <unistd.h>
 #endif
 
-#include "../include/BitIO.h"
-
-#ifdef _WIN32
-#define strcasecmp stricmp
-#endif
-
 #ifdef __cplusplus
 extern "C" {
+#endif
+    
+#ifdef _WIN32
+#define strcasecmp stricmp
 #endif
     
     uint16_t SwapEndian16(const uint16_t Data2Swap) { 
