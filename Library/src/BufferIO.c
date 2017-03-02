@@ -1,3 +1,13 @@
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#if defined(_POSIX_VERSION)||(__APPLE__)
+#include <syslog.h>
+#include <unistd.h>
+#endif
+
 #include "../include/BitIO.h"
 
 #ifdef __cplusplus
