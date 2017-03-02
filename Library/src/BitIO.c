@@ -8,6 +8,10 @@
 
 #include "../include/BitIO.h"
 
+#ifdef _WIN32
+#define strcasecmp stricmp
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
