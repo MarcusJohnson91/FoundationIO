@@ -147,7 +147,7 @@ extern "C" {
                 if (strcasecmp(CMD->Switch[Switch]->Switch, argv[Argument]) == 0) {
                     CMD->Switch[Switch]->SwitchFound = true;
                     if (CMD->Switch[Switch]->Resultless == false) {
-                        char SwitchResult[BitIOStringSize];
+                        char *SwitchResult = calloc(sizeof(BitIOStringSize), 1);
                         snprintf(SwitchResult, BitIOStringSize, "%s", argv[Argument + 1]);
                         CMD->Switch[Switch]->SwitchResult = SwitchResult;
                     }
