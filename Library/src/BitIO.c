@@ -4,17 +4,15 @@
 extern "C" {
 #endif
     
-    //#pragma GCC poison gets puts strcpy strcat tempfile mktemp sprintf gethostbyaddr gethostbyname bzero strcmp malloc
-    
-    uint16_t SwapEndian16(const uint16_t Data2Swap) { // In UnitTest
+    uint16_t SwapEndian16(const uint16_t Data2Swap) { 
         return ((Data2Swap & 0xFF00) >> 8) | ((Data2Swap & 0x00FF) << 8);
     }
     
-    uint32_t SwapEndian32(const uint32_t Data2Swap) { // In UnitTest
+    uint32_t SwapEndian32(const uint32_t Data2Swap) { 
         return ((Data2Swap & 0xFF000000) >> 24) | ((Data2Swap & 0x00FF0000) >> 8) | ((Data2Swap & 0x0000FF00) << 8) | ((Data2Swap & 0x000000FF) << 24);
     }
     
-    uint64_t SwapEndian64(const uint64_t Data2Swap) { // In UnitTest
+    uint64_t SwapEndian64(const uint64_t Data2Swap) { 
         return (((Data2Swap & 0xFF00000000000000) >> 56) | ((Data2Swap & 0x00FF000000000000) >> 40) | \
                 ((Data2Swap & 0x0000FF0000000000) >> 24) | ((Data2Swap & 0x000000FF00000000) >>  8) | \
                 ((Data2Swap & 0x00000000FF000000) <<  8) | ((Data2Swap & 0x0000000000FF0000) << 24) | \
@@ -29,19 +27,19 @@ extern "C" {
         }
     }
     
-    uint64_t Bytes2Bits(const uint64_t Bytes) { // In UnitTest
+    uint64_t Bytes2Bits(const uint64_t Bytes) { 
         return (Bytes * 8);
     }
     
-    uint8_t BitsRemaining(const uint64_t BitsAvailable) { // In UnitTest
+    uint8_t BitsRemaining(const uint64_t BitsAvailable) { 
         return BitsAvailable > 8 ? 8 : BitsAvailable;
     }
     
-    uint64_t Signed2Unsigned(const int64_t Signed) { // In UnitTest
+    uint64_t Signed2Unsigned(const int64_t Signed) { 
         return (uint64_t)Signed;
     }
     
-    int64_t Unsigned2Signed(const uint64_t Unsigned) {  // In UnitTest
+    int64_t Unsigned2Signed(const uint64_t Unsigned) {  
         return (int64_t)Unsigned;
     }
     
@@ -49,18 +47,18 @@ extern "C" {
         return Base *= Exponent;
     }
     
-    int64_t Floori(const long double X) {
-        return (int64_t)floor(X);
+    int64_t Floori(const long double Number2Floor) {
+        return (int64_t)floor(Number2Floor);
     }
     
-    int64_t Ceili(const long double X) {
-        return (int64_t)ceil(X);
+    int64_t Ceili(const long double Number2Ceil) {
+        return (int64_t)ceil(Number2Ceil);
     }
     
-    uint8_t CountBitsSet(const uint64_t Data) {
+    uint8_t CountBitsSet(const uint64_t Bits2Count) {
         uint8_t DataBit = 0, BitCount = 0;
         for (uint8_t Bit = 0; Bit < 64; Bit++) {
-            DataBit = (Data & (1 << Bit)) >> Bit;
+            DataBit = (Bits2Count & (1 << Bit)) >> Bit;
             if (DataBit == 1) {
                 BitCount += 1;
             }
@@ -68,7 +66,7 @@ extern "C" {
         return BitCount;
     }
     
-    uint64_t Power2Mask(const uint8_t Exponent) { // In UnitTest
+    uint64_t Power2Mask(const uint8_t Exponent) { 
         if ((Exponent <= 0) || (Exponent > 64)) { // Exponent = 1
             return EXIT_FAILURE;
         } else {
@@ -77,17 +75,32 @@ extern "C" {
             } else if (Exponent == 64) {
                 return ((1ULL << Exponent) - 1) + (((1ULL << Exponent) - 1) - 1);
             } else {
-                return (1ULL << Exponent) - 1; // Exponent = 6 // ((1ULL << (Exponent - 1)) - 1)
-            } // (1ULL << (Exponent - 1)) + ((1ULL << Exponent -1) -1);
+                return (1ULL << Exponent) - 1;
+            }
         }
     }
     
-    uint64_t OnesCompliment2TwosCompliment(const int64_t OnesCompliment) { // All unset bits ABOVE the set bit are set, including those originally set
+    uint64_t OnesCompliment2TwosCompliment(const int64_t OnesCompliment) {
         return ~OnesCompliment + 1;
     }
     
-    uint64_t TwosCompliment2OnesCompliment(const int64_t TwosCompliment) { // All unset bits become set, except those originally set
+    uint64_t TwosCompliment2OnesCompliment(const int64_t TwosCompliment) {
         return TwosCompliment ^ 0xFFFFFFFFFFFFFFFF;
+    }
+    
+    bool IsOdd(const int64_t Number2Check) {
+        return Number2Check % 2 == 0 ? false : true;
+    }
+    
+    uint8_t  FindHighestBitSet(const uint64_t Integer2Search) {
+        uint8_t HighestBitSet = 0;
+        for (uint8_t Bit = sizeof(Integer2Search); Bit > 0; Bit--) {
+            if (((Integer2Search & Bit) >> (sizeof(Integer2Search) - Bit)) == 1) {
+                HighestBitSet = Bit;
+                break;
+            }
+        }
+        return HighestBitSet;
     }
     
     uint8_t DetectSystemEndian(void) {
@@ -103,48 +116,6 @@ extern "C" {
         return SystemEndian;
     }
     
-    bool IsStreamByteAligned(const uint64_t BitsUsed, const uint8_t BytesOfAlignment) {
-        if ((BitsUsed % Bytes2Bits(BytesOfAlignment)) == 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    void AlignInput(BitInput *BitI, const uint8_t BytesOfAlignment) {
-        uint8_t Bits2Align = BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
-        
-        if (Bits2Align != 0) { // NOT aligned
-            BitI->BitsAvailable   -= Bits2Align;
-            BitI->BitsUnavailable += Bits2Align;
-        }
-    }
-    
-    void AlignOutput(BitOutput *BitO, const uint8_t BytesOfAlignment) {
-        uint8_t Bits2Align = BitO->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
-        if (Bits2Align != 0) {
-            BitO->BitsAvailable    -= Bits2Align;
-            BitO->BitsUnavailable  += Bits2Align;
-        }
-    }
-    
-    bool IsOdd(const int64_t X) {
-        return X % 2 == 0 ? false : true;
-    }
-    
-    uint8_t  FindHighestBitSet(const uint64_t X) {
-        uint8_t HighestBitSet = 0;
-        // use sizeof to get the size of the included bit (check to see if its always cast to 64 tho, if so just start at 64)
-        // then count down from 64 to 0, stopping when you first find a 1 bit, mark the number of loops. that's the highest bit set.
-        for (uint8_t Bit = sizeof(X); Bit > 0; Bit--) {
-            if (((X & Bit) >> (sizeof(X) - Bit)) == 1) {
-                HighestBitSet = Bit;
-                break;
-            }
-        }
-        return HighestBitSet;
-    }
-    
     void DisplayCMDHelp(const CommandLineOptions *CMD) {
         printf("%s: %s, %s\n\n", CMD->ProgramName, CMD->ProgramDescription, CMD->AuthorCopyrightLicense);
         printf("Options:\n");
@@ -155,10 +126,13 @@ extern "C" {
     }
     
     void ParseCommandLineArguments(const CommandLineOptions *CMD, int argc, const char *argv[]) {
-        // Scan for equals signs as well, if found, after after the equal sign is the result, everything before is the switch.
+        // TODO: Scan for equals signs as well, if found, after after the equal sign is the result, everything before is the switch.
         for (uint8_t Argument = 0; Argument < argc; Argument++) {
             for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
-                if (strcasecmp(CMD->Switch[Switch]->Switch, argv[Argument]) == 0) { // If the current switch matches one of the switches, set the IsFound bool to true.
+                if (strcasecmp("-h", argv[Argument]) == 0 || strcasecmp("--h", argv[Argument]) == 0 || strcasecmp("/?", argv[Argument]) == 0) {
+                    DisplayCMDHelp(CMD);
+                }
+                if (strcasecmp(CMD->Switch[Switch]->Switch, argv[Argument]) == 0) {
                     CMD->Switch[Switch]->SwitchFound = true;
                     if (CMD->Switch[Switch]->Resultless == false) {
                         char *SwitchResult = calloc(BitIOStringSize, 1);
@@ -166,23 +140,12 @@ extern "C" {
                         CMD->Switch[Switch]->SwitchResult = SwitchResult;
                     }
                 }
-                /*
-                 EqualsLocation = strchr(Argument, 0x3D); // 0x3D = "="
-                 if (EqualsLocation != NULL) { // found
-                 // Start reading the result of the switch from EqualLocation +1.
-                 for (size_t Byte = EqualsLocation + 1; Byte < sizeof(argv[Index]); Byte++) {
-                 for (size_t SwitchByte = 0; SwitchByte < sizeof(argv[Index]); SwitchByte++) {
-                 CMD->Switch[Index]->SwitchResult[SwitchByte] = *argv[Index];
-                 }
-                 }
-                 }
-                 */
             }
         }
     }
     
     void OpenCMDInputFile(BitInput *BitI, const CommandLineOptions *CMD, const uint8_t InputSwitch) {
-        BitI->File = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
+        BitI->File             = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
         fseek(BitI->File, 0, SEEK_END);
         BitI->FileSize = (uint64_t)ftell(BitI->File);
         fseek(BitI->File, 0, SEEK_SET);
@@ -193,59 +156,20 @@ extern "C" {
         BitI->BitsUnavailable  = 0;
     }
     
-    void OpenCMDOutputFile(BitOutput *BitO, const CommandLineOptions *CMD, const uint8_t InputSwitch) {
-        BitO->File = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
+    void OpenCMDOutputFile(BitOutput *BitO, const CommandLineOptions *CMD, const uint8_t OutputSwitch) {
+        BitO->File             = fopen(CMD->Switch[OutputSwitch]->SwitchResult, "rb");
         BitO->BitsAvailable    = BitOutputBufferSizeInBits;
         BitO->BitsUnavailable  = 0;
     }
     
-    void FlushBitOutput(BitOutput *BitO) {
-        if (IsStreamByteAligned(BitO->BitsUnavailable, 1) == false) {
-            AlignOutput(BitO, 1);
-        }
-        fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
-    }
-    
-    void CloseBitInput(BitInput *BitI) {
-        fclose(BitI->File);
-        free(BitI);
-    }
-    
-    void CloseBitOutput(BitOutput *BitO) {
-        fwrite(BitO->Buffer, BitO->BitsUnavailable % 8, 1, BitO->File); // Make sure it's all written to disk
-        fflush(BitO->File);
-        fclose(BitO->File);
-        free(BitO);
-    }
-    
-    void NEWUpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) { // You assume that there are 0 bits left.
-        uint64_t Bytes2Read = 0, BytesRead = 0;
-        // tl;dr you need to subtract the bytes unused from the relative offset, then modulo the result and put it in unavailable.
-        // Lets say we have 19 bits left in the buffer, and the user requested 24.
-        fseek(BitI->File, RelativeOffsetInBytes - Bits2Bytes(BitI->BitsAvailable, true), SEEK_CUR);
-        BitI->FilePosition = ftell(BitI->File);
-        memset(BitI->Buffer, 0, sizeof(BitI->Buffer));
-        
-        Bytes2Read = BitI->FileSize - BitI->FilePosition >= BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
-        BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
-        if (BytesRead != Bytes2Read) { // Bytes2Read
-            char ErrorDescription[BitIOStringSize];
-            snprintf(ErrorDescription, BitIOStringSize, "Supposed to read %llu bytes, but read %llu\n", Bytes2Read, BytesRead);
-            Log(LOG_WARNING, "libBitIO", "UpdateInputBuffer", ErrorDescription);
-        }
-        
-        BitI->BitsUnavailable = BitI->BitsUnavailable % 8;// FIXME: This assumes UpdateBuffer was called with at most 7 unread bits...
-        BitI->BitsAvailable   = Bytes2Bits(BytesRead);
-    }
-    
-    void UpdateInputBuffer(BitInput *BitI, int64_t RelativeOffsetInBytes) { // You assume that there are 0 bits left.
+    void UpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) { // INTERNAL ONLY, // You assume that there are 0 bits left.
         uint64_t Bytes2Read = 0, BytesRead = 0;
         fseek(BitI->File, RelativeOffsetInBytes, SEEK_CUR);
         BitI->FilePosition = ftell(BitI->File);
         memset(BitI->Buffer, 0, sizeof(BitI->Buffer));
         Bytes2Read = BitI->FileSize - BitI->FilePosition >= BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
         BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
-        if (BytesRead != Bytes2Read) { // Bytes2Read
+        if (BytesRead != Bytes2Read) {
             char ErrorDescription[BitIOStringSize];
             snprintf(ErrorDescription, BitIOStringSize, "Supposed to read %llu bytes, but read %llu\n", Bytes2Read, BytesRead);
             Log(LOG_WARNING, "libBitIO", "UpdateInputBuffer", ErrorDescription);
@@ -299,36 +223,6 @@ extern "C" {
         return OutputData;
     }
     
-    void WriteBits(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits) { // 12 bits 2 write, 0xFFF
-        // FIXME: WriteBits currently copies NumBits bits to the file, even if the input is shorter than that. we need to prepend 0 bits if that's the case
-        uint8_t BitsLeft = NumBits, InputMask = 0, Bits2Write = 0;
-        if (BitO->BitsAvailable < NumBits) {
-            fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
-            // Save unused bits, memset, and recopy them to the start of the buffer
-        }
-        // in order to write bits to the buffer, I need to mask Data2Write, and apply it to the output buffer, also, with a mask.
-        while (BitsLeft > 0) {
-            // if BitsLeft is greater than 8, the input mask needs to be 8, otherwise, set it to BitsLeft
-            Bits2Write   = BitsLeft > 8 ? 8 : BitsLeft;
-            InputMask    = Power2Mask(Bits2Write);
-            BitO->Buffer[BitO->BitsUnavailable / 8] = Data2Write & InputMask;
-            Data2Write >>= Bits2Write;
-            BitsLeft    -= Bits2Write;
-        }
-    }
-    
-    void SkipBits(BitInput *BitI, const int64_t Bits) {
-        if (Bits <= BitI->BitsAvailable) {
-            BitI->BitsAvailable   -= Bits;
-            BitI->BitsUnavailable += Bits;
-        } else {
-            fseek(BitI->File, Bits2Bytes(Bits - BitI->BitsAvailable, true), SEEK_CUR);
-            BitI->BitsAvailable   = BitI->FileSize + BitInputBufferSize <= BitI->FileSize ? BitInputBufferSize : BitI->FileSize;
-            BitI->BitsUnavailable = Bits % 8;
-            UpdateInputBuffer(BitI, 0); // Bits2Bytes(Bits)
-        }
-    }
-    
     uint64_t  ReadRICE(BitInput *BitI, const bool Truncated, const bool StopBit) {
         uint64_t BitCount = 0;
         
@@ -339,13 +233,6 @@ extern "C" {
             BitCount++;
         }
         return BitCount;
-    }
-    
-    void WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write) {
-        for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
-            WriteBits(BitO, (~StopBit), 1);
-        }
-        WriteBits(BitO, StopBit, 1);
     }
     
     int64_t ReadExpGolomb(BitInput *BitI, const bool IsSigned) {
@@ -370,23 +257,138 @@ extern "C" {
         return Final;
     }
     
+    void SkipBits(BitInput *BitI, const int64_t Bits2Skip) {
+        if (Bits2Skip <= BitI->BitsAvailable) {
+            BitI->BitsAvailable   -= Bits2Skip;
+            BitI->BitsUnavailable += Bits2Skip;
+        } else {
+            fseek(BitI->File, Bits2Bytes(Bits2Skip - BitI->BitsAvailable, true), SEEK_CUR);
+            BitI->BitsAvailable   = BitI->FileSize + BitInputBufferSize <= BitI->FileSize ? BitInputBufferSize : BitI->FileSize;
+            BitI->BitsUnavailable = Bits2Skip % 8;
+            UpdateInputBuffer(BitI, 0);
+        }
+    }
+    
+    void AlignInput(BitInput *BitI, const uint8_t BytesOfAlignment) {
+        uint8_t Bits2Align = BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
+        
+        if (Bits2Align != 0) {
+            BitI->BitsAvailable   -= Bits2Align;
+            BitI->BitsUnavailable += Bits2Align;
+        }
+    }
+    
+    void CloseBitInput(BitInput *BitI) {
+        fclose(BitI->File);
+        free(BitI);
+    }
+    
+    bool IsStreamByteAligned(const uint64_t BitsUsed, const uint8_t BytesOfAlignment) {
+        if ((BitsUsed % Bytes2Bits(BytesOfAlignment)) == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    void AlignOutput(BitOutput *BitO, const uint8_t BytesOfAlignment) {
+        uint8_t Bits2Align = BitO->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
+        if (Bits2Align != 0) {
+            BitO->BitsAvailable    -= Bits2Align;
+            BitO->BitsUnavailable  += Bits2Align;
+        }
+    }
+    
+    void WriteBits(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits) {
+        // FIXME: WriteBits currently copies NumBits bits to the file, even if the input is shorter than that. we need to prepend 0 bits if that's the case
+        uint8_t BitsLeft = NumBits, InputMask = 0, Bits2Write = 0;
+        if (BitO->BitsAvailable < NumBits) {
+            fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
+        }
+        while (BitsLeft > 0) {
+            Bits2Write   = BitsLeft > 8 ? 8 : BitsLeft;
+            InputMask    = Power2Mask(Bits2Write);
+            BitO->Buffer[BitO->BitsUnavailable / 8] = Data2Write & InputMask;
+            Data2Write >>= Bits2Write;
+            BitsLeft    -= Bits2Write;
+        }
+    }
+    
+    void WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write) {
+        for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
+            WriteBits(BitO, (~StopBit), 1);
+        }
+        WriteBits(BitO, StopBit, 1);
+    }
+    
     void WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write) {
         uint64_t NumBits = 0;
         
         NumBits = FindHighestBitSet(Data2Write);
         
-        if (IsSigned == false) { // Unsigned
+        if (IsSigned == false) {
             WriteBits(BitO, 0, NumBits);
             WriteBits(BitO, Data2Write + 1, NumBits + 1);
-        } else { // Signed
-                 // Neg numbers are even, odd numbers are pos
-            NumBits -= 1; // Remove the sign bit
+        } else {
+            NumBits -= 1;
             WriteBits(BitO, 0, NumBits);
-            if (IsOdd(Data2Write +1) == false) { // Negative
+            if (IsOdd(Data2Write +1) == false) {
                 WriteBits(BitO, Data2Write + 1, NumBits + 1);
             } else {
-                WriteBits(BitO, Data2Write + 1, NumBits + 1); // TODO: Signed ExpGolomb
+                WriteBits(BitO, Data2Write + 1, NumBits + 1);
             }
+        }
+    }
+    
+    void FlushBitOutput(BitOutput *BitO) {
+        if (IsStreamByteAligned(BitO->BitsUnavailable, 1) == false) {
+            AlignOutput(BitO, 1);
+        }
+        fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
+    }
+    
+    void CloseBitOutput(BitOutput *BitO) {
+        FlushBitOutput(BitO);
+        fclose(BitO->File);
+        free(BitO);
+    }
+    
+    uint64_t GenerateCRC(const uint8_t *Data, const size_t DataSize, CRC *CRCData) {
+        uint16_t CRCResult = 0;
+        for (uint64_t Byte = 0; Byte < DataSize; Byte++) {
+            CRCResult = CRCData->Polynomial ^ Data[Byte] << 8;
+            for (uint8_t Bit = 0; Bit < 8; Bit++) {
+                if ((CRCResult & 0x8000) == true) {
+                } else {
+                    CRCResult <<= 1;
+                }
+            }
+        }
+        return 0;
+    }
+    
+    bool VerifyCRC(const uint8_t *Data, const size_t DataSize, CRC *CRCData) {
+        return false;
+    }
+    
+    uint32_t GenerateAdler32(const uint8_t *Data, const size_t DataSize) { 
+        uint32_t Adler  = 1;
+        uint32_t Sum1   = Adler & 0xFFFF;
+        uint32_t Sum2   = (Adler >> 16) & 0xFFFF;
+        
+        for (uint64_t Byte = 0; Byte < DataSize; Byte++) {
+            Sum1 += Data[Byte] % 65521;
+            Sum2 += Sum1 % 65521;
+        }
+        return (Sum2 << 16) + Sum1;
+    }
+    
+    bool VerifyAdler32(const uint8_t *Data, const size_t DataSize, const uint32_t EmbeddedAdler32) { 
+        uint32_t GeneratedAdler32 = GenerateAdler32(Data, DataSize);
+        if (GeneratedAdler32 != EmbeddedAdler32) {
+            return false;
+        } else {
+            return true;
         }
     }
     
@@ -407,39 +409,12 @@ extern "C" {
         }
     }
     
-    uint64_t GenerateCRC(const uint8_t *Data, const size_t DataSize, CRC *CRCData) {
-        uint16_t CRCResult = 0;
-        for (uint64_t Byte = 0; Byte < DataSize; Byte++) {
-            CRCResult = CRCData->Polynomial ^ Data[Byte] << 8;
-            for (uint8_t Bit = 0; Bit < 8; Bit++) {
-                if ((CRCResult & 0x8000) == true) {
-                    //CRCResult = ((CRCResult <<= 1) ^ CRCData->Polynomial);
-                } else {
-                    CRCResult <<= 1;
-                }
-            }
-        }
-        return 0;
-    }
-    
-    bool VerifyCRC(const uint8_t *Data, const size_t DataSize, CRC *CRCData) { // uint8_t *DataBuffer, size_t BufferSize, uint64_t Poly, bool PolyType, uint64_t Init, uint8_t CRCSize, uint64_t EmbeddedCRC
-        /*
-         uint64_t GeneratedCRC = GenerateCRC(CRCData); // DataBuffer, BufferSize, Poly, PolyType, Init, CRCSize
-         if (GeneratedCRC == EmbeddedCRC) {
-         return true;
-         } else {
-         return false;
-         }
-         */
-        return false;
-    }
-    
     void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription) {
         char ErrorString[BitIOStringSize];
         snprintf(ErrorString, BitIOStringSize, "%s - %s: %s", LibraryOrProgram, Function, ErrorDescription);
-#ifdef _WIN32 // windows mode
+#ifdef _WIN32
         fprintf(stderr, "%s\n", ErrorString);
-#else // UNIX Mode!!!
+#else
         if ((ErrorLevel == LOG_EMERG) || (ErrorLevel == LOG_CRIT)) {
             openlog(LibraryOrProgram, ErrorLevel, (LOG_PERROR|LOG_MAIL|LOG_USER));
         } else {
@@ -447,27 +422,6 @@ extern "C" {
         }
         syslog(LOG_ERR, "%s\n", ErrorString);
 #endif
-    }
-    
-    uint32_t GenerateAdler32(const uint8_t *Data, const size_t DataSize) { // In UnitTest
-        uint32_t Adler  = 1;
-        uint32_t Sum1   = Adler & 0xFFFF;
-        uint32_t Sum2   = (Adler >> 16) & 0xFFFF;
-        
-        for (uint64_t Byte = 0; Byte < DataSize; Byte++) {
-            Sum1 += Data[Byte] % 65521;
-            Sum2 += Sum1 % 65521;
-        }
-        return (Sum2 << 16) + Sum1;
-    }
-    
-    bool VerifyAdler32(const uint8_t *Data, const size_t DataSize, const uint32_t EmbeddedAdler32) { // In UnitTest
-        uint32_t GeneratedAdler32 = GenerateAdler32(Data, DataSize);
-        if (GeneratedAdler32 != EmbeddedAdler32) {
-            return false;
-        } else {
-            return true;
-        }
     }
     
 #ifdef __cplusplus
