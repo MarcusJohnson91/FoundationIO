@@ -430,12 +430,6 @@ extern "C" {
     void           WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write);
     
     /*!
-     @abstract                         "Writes BitO->Buffer to BitO->File".
-     @param        BitO                "Pointer to BitOutput".
-     */
-    void           FlushBitOutput(BitOutput *BitO);
-    
-    /*!
      @abstract                         "Deallocates BitOutput"
      @remark                           "For use when changing files, or exiting the program".
      @param        BitO                "Pointer to BitOutput".
@@ -482,7 +476,7 @@ extern "C" {
      @param        Function            "Which function is calling Log?".
      @param        ErrorDescription    "String describing what went wrong / error code".
      */
-    void           Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription);
+    void           Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription, ...);
     
     /*!
      @abstract                     "Reads raw UUID/GUID from the bitstream".
