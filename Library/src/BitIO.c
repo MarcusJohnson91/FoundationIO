@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <string.h>
+#include <stdarg.h>
 
 #ifndef _WIN32
 #include <syslog.h>
@@ -356,15 +357,19 @@ extern "C" {
         }
     }
     
-    void FlushBitOutput(BitOutput *BitO) {
+    void FlushOutputBuffer(BitOutput *BitO, const size_t Bytes2Flush) {
+        size_t BytesWritten = 0;
+        BytesWritten = fwrite(BitO->Buffer, 1, Bytes2Flush, BitO->File);
+        if (BytesWritten != Bytes2Flush) {
+            Log(LOG_EMERG, "libBitIO", "FlushOutputBuffer", "Wrote %d bytes out of %d", BytesWritten, Bytes2Flush);
+        }
+    }
+    
+    void CloseBitOutput(BitOutput *BitO) {
         if (IsStreamByteAligned(BitO->BitsUnavailable, 1) == false) {
             AlignOutput(BitO, 1);
         }
         fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
-    }
-    
-    void CloseBitOutput(BitOutput *BitO) {
-        FlushBitOutput(BitO);
         fclose(BitO->File);
         free(BitO);
     }
@@ -425,9 +430,14 @@ extern "C" {
         }
     }
     
-    void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription) {
+    void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription, ...) {
         char ErrorString[BitIOStringSize];
-        snprintf(ErrorString, BitIOStringSize, "%s - %s: %s", LibraryOrProgram, Function, ErrorDescription);
+        char VariadicArguments[BitIOStringSize];
+        va_list ExtraArguments;
+        va_start(ExtraArguments, ErrorDescription);
+        vsnprintf(VariadicArguments, BitIOStringSize, "%s", ExtraArguments);
+        va_end(ExtraArguments);
+        snprintf(ErrorString, BitIOStringSize, "%s - %s: %s - %s\n", LibraryOrProgram, Function, ErrorDescription, VariadicArguments);
 #ifdef _WIN32
         fprintf(stderr, "%s\n", ErrorString);
 #else
