@@ -400,19 +400,7 @@ extern "C" {
      @param        Data2Write          "Is the actual data to write out".
      @param        NumBits             "Is the number of bits to write".
      */
-    void           WriteBits(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits);
-    
-    /*!
-     @abstract                         "Writes a buffer to a BitO pointer"
-     @remark                           "Currently just a STUB".
-     @param        BitO                "Pointer to BitOutput"
-     @param        Buffer              "The buffer you want written to the disk"
-     @param        IndexSize           "how many bits to read from a single buffer element, if the buffer is declared as uint16_t or int16_t, put 16, etc"
-     @param        BitOffset           "Where in the buffer do you want to start writing from?"
-     @param        Bits2Write          "The number of bits you want written from the buffer"
-     @param        MSB                 "Should it read from the most significant bit of the byte?"
-     */
-    void           WriteBuffer(BitOutput *BitO, const uint64_t *Buffer, const uint8_t IndexSize, const size_t BitOffset, const size_t Bits2Write, const bool MSB);
+    void           WriteBits(BitOutput *BitO, const uint64_t Data2Write, const uint8_t NumBits, const bool ReadFromMSB);
     
     /*!
      @abstract                         "Encodes and writes data in unary/RICE format to a BitOutput stream".
@@ -421,13 +409,13 @@ extern "C" {
      @param        StopBit             "Has to be a 0 or a 1".
      @param        Data2Write          "Number to encode into RICE format".
      */
-    void           WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write);
+    void           WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write, const bool ReadFromMSB);
     
     /*!
      @abstract                         "Writes data encoded as Exponential-Golomb aka Elias Gamma codes to BitO".
      @param        BitO                "Pointer to BitOutput".
      */
-    void           WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write);
+    void           WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write, const bool ReadFromMSB);
     
     /*!
      @abstract                         "Deallocates BitOutput"

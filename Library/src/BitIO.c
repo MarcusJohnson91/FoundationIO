@@ -312,47 +312,48 @@ extern "C" {
         }
     }
     
-    void WriteBits(BitOutput *BitO, uint64_t Data2Write, uint8_t NumBits) {
+    void WriteBits(BitOutput *BitO, const uint64_t Data2Write, const uint8_t NumBits, const bool ReadFromMSB) {
         // FIXME: WriteBits currently copies NumBits bits to the file, even if the input is shorter than that. we need to prepend 0 bits if that's the case
         uint8_t BitsLeft = NumBits, InputMask = 0, Bits2Write = 0;
+        
+        uint8_t Bits2WriteInBuffer, Bits2ShiftMask, Mask;
+        
         if (BitO->BitsAvailable < NumBits) {
             fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
         }
-        while (BitsLeft > 0) {
-            Bits2Write   = BitsLeft > 8 ? 8 : BitsLeft;
-            InputMask    = Power2Mask(Bits2Write);
-            BitO->Buffer[BitO->BitsUnavailable / 8] = Data2Write & InputMask;
-            Data2Write >>= Bits2Write;
-            BitsLeft    -= Bits2Write;
-        }
-    }
-    
-    void WriteBuffer(BitOutput *BitO, const uint64_t *Buffer, const uint8_t IndexSize, const size_t BitOffset, const size_t Bits2Write, const bool MSB) {
         
-    }
-    
-    void WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write) {
-        for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
-            WriteBits(BitO, (~StopBit), 1);
+        if (ReadFromMSB == true) {
+            Bits2WriteInBuffer = 8 - (BitO->BitsAvailable % 8); // So if we've got 32763 bits available
+            Bits2ShiftMask     = BitO->BitsAvailable % 8; // We may be able to do this as a ternary operator and drop the if
+            Mask               = Power2Mask(Bits2WriteInBuffer); // 0x1F
+            
+        } else {
+            
         }
-        WriteBits(BitO, StopBit, 1);
     }
     
-    void WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write) {
+    void WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write, const bool ReadFromMSB) {
+        for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
+            WriteBits(BitO, (~StopBit), 1, ReadFromMSB);
+        }
+        WriteBits(BitO, StopBit, 1, ReadFromMSB);
+    }
+    
+    void WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write, const bool ReadFromMSB) {
         uint64_t NumBits = 0;
         
         NumBits = FindHighestBitSet(Data2Write);
         
         if (IsSigned == false) {
-            WriteBits(BitO, 0, NumBits);
-            WriteBits(BitO, Data2Write + 1, NumBits + 1);
+            WriteBits(BitO, 0, NumBits, ReadFromMSB);
+            WriteBits(BitO, Data2Write + 1, NumBits + 1, ReadFromMSB);
         } else {
             NumBits -= 1;
-            WriteBits(BitO, 0, NumBits);
+            WriteBits(BitO, 0, NumBits, ReadFromMSB);
             if (IsOdd(Data2Write +1) == false) {
-                WriteBits(BitO, Data2Write + 1, NumBits + 1);
+                WriteBits(BitO, Data2Write + 1, NumBits + 1, ReadFromMSB);
             } else {
-                WriteBits(BitO, Data2Write + 1, NumBits + 1);
+                WriteBits(BitO, Data2Write + 1, NumBits + 1, ReadFromMSB);
             }
         }
     }
@@ -518,7 +519,7 @@ extern "C" {
             for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDSize - 1; UUIDByte++) {
                 if ((UUIDByte != 4) && (UUIDByte != 7) && (UUIDByte != 10) && (UUIDByte != 13) && (UUIDByte != 20)) {
                     // Character 21 is the NULL terminator, the rest are the hyphens.
-                    WriteBits(BitO, UUIDString[UUIDByte], 8);
+                    WriteBits(BitO, UUIDString[UUIDByte], 8, true);
                 }
             }
         }
