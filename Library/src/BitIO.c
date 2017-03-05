@@ -209,6 +209,7 @@ extern "C" {
             SystemBits             = 8 - (BitI->BitsUnavailable % 8);
             UserBits               = BitsRemaining(Bits);
             Bits                   = SystemBits >= UserBits  ? UserBits : SystemBits;
+            Mask2Shift             = ReadFromMSB ? BitI->BitsAvailable % 8 : 0;
             if (ReadFromMSB == true) {
                 Mask2Shift         = SystemBits <= UserBits  ? 0 : SystemBits - UserBits;
                 Mask               = (Power2Mask(Bits) << Mask2Shift);
@@ -312,23 +313,29 @@ extern "C" {
         }
     }
     
-    void WriteBits(BitOutput *BitO, const uint64_t Data2Write, const uint8_t NumBits, const bool ReadFromMSB) {
+    void WriteBits(BitOutput *BitO, const uint64_t Data2Write, uint8_t NumBits, const bool ReadFromMSB) {
         // FIXME: WriteBits currently copies NumBits bits to the file, even if the input is shorter than that. we need to prepend 0 bits if that's the case
-        uint8_t BitsLeft = NumBits, InputMask = 0, Bits2Write = 0;
         
-        uint8_t Bits2WriteInBuffer, Bits2ShiftMask, Mask;
+        uint8_t Bits2Write2BufferByte, Bits2ShiftMask, Mask, Bits2Write;
         
         if (BitO->BitsAvailable < NumBits) {
             fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
         }
         
-        if (ReadFromMSB == true) {
-            Bits2WriteInBuffer = 8 - (BitO->BitsAvailable % 8); // So if we've got 32763 bits available
-            Bits2ShiftMask     = BitO->BitsAvailable % 8; // We may be able to do this as a ternary operator and drop the if
-            Mask               = Power2Mask(Bits2WriteInBuffer); // 0x1F
-            
-        } else {
-            
+        // so we're trying to write 9 bits, 0x1FF.
+        // There are only 5 bits available in the current byte.
+        // So, that means we have to pull out 5 bits from Data2Write, and pop it into BitO->Buffer.
+        // The Mask should be 0x1F if LSBfirst, or 0xF8 if MSB first.
+        // The buffer's representation is MSB first.
+        // if we're supposed to write this data LSB first we need to shift it after extraction to get it ready to be applied.
+        while (NumBits > 0) {
+            Bits2Write2BufferByte  = 8 - (BitO->BitsAvailable % 8); // extract 5 bits from the buffer
+            Bits2ShiftMask         = ReadFromMSB ? BitO->BitsAvailable % 8 : 0;
+            Mask                   = Power2Mask(Bits2Write2BufferByte) << Bits2ShiftMask; // 0x1F
+            BitO->Buffer[Bits2Bytes(BitO->BitsAvailable, false)] = Data2Write & Mask;
+            NumBits               -= Bits2Write2BufferByte;
+            BitO->BitsAvailable   -= Bits2Write2BufferByte;
+            BitO->BitsUnavailable += Bits2Write2BufferByte;
         }
     }
     
