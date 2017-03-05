@@ -400,7 +400,7 @@ extern "C" {
      @param        Data2Write          "Is the actual data to write out".
      @param        NumBits             "Is the number of bits to write".
      */
-    void           WriteBits(BitOutput *BitO, const uint64_t Data2Write, const uint8_t NumBits, const bool ReadFromMSB);
+    void           WriteBits(BitOutput *BitO, const uint64_t Data2Write, uint8_t NumBits, const bool ReadFromMSB);
     
     /*!
      @abstract                         "Encodes and writes data in unary/RICE format to a BitOutput stream".
