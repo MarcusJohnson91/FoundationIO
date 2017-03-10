@@ -3,7 +3,7 @@
  @author    Marcus Johnson aka BumbleBritches57
  @copyright 2016, Marcus Johnson
  @version   0.9.1
- FIXME: The Version number needs to be FeatureLevel.ABI.BugFix
+ FIXME:     The Version number needs to be FeatureLevel.ABI.BugFix
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
  */
 
@@ -400,7 +400,7 @@ extern "C" {
      @param        Data2Write          "Is the actual data to write out".
      @param        NumBits             "Is the number of bits to write".
      */
-    void           WriteBits(BitOutput *BitO, const uint64_t Data2Write, uint8_t NumBits, const bool ReadFromMSB);
+    void           WriteBits(BitOutput *BitO, const uint64_t Data2Write, uint8_t NumBits, const bool WriteFromMSB);
     
     /*!
      @abstract                         "Encodes and writes data in unary/RICE format to a BitOutput stream".
@@ -467,35 +467,33 @@ extern "C" {
     void           Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription, ...);
     
     /*!
-     @abstract                     "Reads raw UUID/GUID from the bitstream".
-     @remark                       "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
-     
-     @param   BitI                 "Pointer to BitInput".
-     @param   UUIDString           "Character array to read UUID string into".
+     @abstract                         "Reads raw UUID/GUID from the bitstream".
+     @remark                           "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
+     @param        BitI                "Pointer to BitInput".
+     @param        UUIDString          "Character array to read UUID string into".
      */
     void           ReadUUID(BitInput *BitI, char *UUIDString);
     
     /*!
-     @abstract                     "Endian swaps a UUID into a GUID and vice versa".
-     @param UUIDString2Convert     "Pointer to a UUIDString to be converted".
-     @param ConvertedUUIDString    "The resulting UUID or GUID".
+     @abstract                         "Endian swaps a UUID into a GUID and vice versa".
+     @param        UUIDString2Convert  "Pointer to a UUIDString to be converted".
+     @param        ConvertedUUIDString "The resulting UUID or GUID".
      */
     void           SwapUUID(const char *UUIDString2Convert, char *ConvertedUUIDString);
     
     /*!
-     @abstract                     "Write UUID/GUID string as hyphen-less blob".
-     @remark                       "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
-     
-     @param    BitO                "Pointer to BitOutput".
-     @param    UUIDString          "UUID string to write to the file as a binary blob, aka remove hyphens and null terminating char".
+     @abstract                         "Write UUID/GUID string as hyphen-less blob".
+     @remark                           "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
+     @param        BitO                "Pointer to BitOutput".
+     @param        UUIDString          "UUID string to write to the file as a binary blob, aka remove hyphens and null terminating char".
      */
     uint8_t        WriteUUID(BitOutput *BitO, const char *UUIDString);
     
     /*!
-     @abstract                     "Verify two UUIDs match each other".
-     @remark                       "Matches hyphens and NULL terminating character as well, it's pretty literal".
-     @param    UUIDString1         "Pointer to a UUIDString to be matched against".
-     @param    UUIDString2         "Pointer to a UUIDString to match against UUIDString1".
+     @abstract                         "Verify two UUIDs match each other".
+     @remark                           "Matches hyphens and NULL terminating character as well, it's pretty literal".
+     @param        UUIDString1         "Pointer to a UUIDString to be matched against".
+     @param        UUIDString2         "Pointer to a UUIDString to match against UUIDString1".
      */
     bool           CompareUUIDs(const char *UUIDString1, const char *UUIDString2);
     
