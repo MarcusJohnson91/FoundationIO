@@ -313,7 +313,7 @@ extern "C" {
         }
     }
     
-    void WriteBits(BitOutput *BitO, const uint64_t Data2Write, uint8_t NumBits, const bool ReadFromMSB) {
+    void WriteBits(BitOutput *BitO, const uint64_t Data2Write, uint8_t NumBits, const bool WriteFromMSB) {
         // FIXME: WriteBits currently copies NumBits bits to the file, even if the input is shorter than that. we need to prepend 0 bits if that's the case
         
         uint8_t Bits2Write2BufferByte, Bits2ShiftMask, Mask, Bits2Write;
@@ -330,7 +330,7 @@ extern "C" {
         // if we're supposed to write this data LSB first we need to shift it after extraction to get it ready to be applied.
         while (NumBits > 0) {
             Bits2Write2BufferByte  = 8 - (BitO->BitsAvailable % 8); // extract 5 bits from the buffer
-            Bits2ShiftMask         = ReadFromMSB ? BitO->BitsAvailable % 8 : 0;
+            Bits2ShiftMask         = WriteFromMSB ? BitO->BitsAvailable % 8 : 0;
             Mask                   = Power2Mask(Bits2Write2BufferByte) << Bits2ShiftMask; // 0x1F
             BitO->Buffer[Bits2Bytes(BitO->BitsAvailable, false)] = Data2Write & Mask;
             NumBits               -= Bits2Write2BufferByte;
