@@ -43,7 +43,7 @@ extern "C" {
         BitIOGUIDSize             = BitIOUUIDSize,
         BitIOEncodedGUIDSize      = BitIOEncodedUUIDSize,
         BitIOMD5Size              = 16,
-    } BitIOConstants;
+    };
     
     /*!
      @typedef        BitInput
@@ -137,12 +137,12 @@ extern "C" {
         UnknownEndian = 0,
         BigEndian     = 1,
         LittleEndian  = 2,
-    } Endian;
+    };
     
     extern enum    PolynomialType {
         Normal     = 0,
         Reversed   = 1,
-    } PolynomialType;
+    };
     
     typedef struct CRC {
         uint8_t   *Buffer;
@@ -175,7 +175,7 @@ extern "C" {
         LOG_NOTICE  = 5,
         LOG_INFO    = 6,
         LOG_DEBUG   = 7,
-    } LogTypes;
+    };
 #endif
     
     /*!
