@@ -139,21 +139,6 @@ extern "C" {
         LittleEndian  = 2,
     };
     
-    extern enum    PolynomialType {
-        Normal     = 0,
-        Reversed   = 1,
-    };
-    
-    typedef struct CRC {
-        uint8_t   *Buffer;
-        size_t     BufferSize;
-        uint64_t   Polynomial;
-        bool       PolynomialType;
-        uint8_t    PolynomialSize;
-        uint64_t   Initalization;
-        uint64_t   PreCalculatedCRC;
-    } CRC;
-    
 #ifndef _POSIX_VERSION
     /*!
      @enum     LogTypes
@@ -426,19 +411,24 @@ extern "C" {
     
     /*!
      @abstract                         "Generates CRC from data".
-     @param        Data                "Pointer to a data buffer containing data to run the CRC algorithm over".
-     @param        DataSize            "Size of the data chunk to generate the CRC for".
-     @param        CRCData             "Pointer to struct containing the CRC parameters, like Polynomial, etc"
+     @param        Data2CRC            "Pointer to a data buffer containing data to run the CRC algorithm over".
+     @param        Data2CRCSize        "Size of the data chunk to generate the CRC for".
+     @param        ReciprocalPoly      "The Polynomial in Reciprocal representation".
+     @param        PolySize            "The size of the polynomial in bits".
+     @param        PolyInit            "Initalization value".
      */
-    uint64_t       GenerateCRC(const uint8_t *Data, const size_t DataSize, CRC *CRCData);
+    uint64_t       GenerateCRC(const uint8_t *Data2CRC, const size_t Data2CRCSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit);
     
     /*!
      @abstract                         "Computes the CRC of DataBuffer, and compares it to the submitted CRC".
-     @param        Data                "Pointer to a data buffer containing data to run the CRC algorithm over".
-     @param        DataSize            "Size of the data chunk to generate the CRC for".
-     @param        CRCData             "Pointer to struct containing the CRC parameters, like Polynomial, etc"
+     @param        Data2CRC            "Pointer to a data buffer containing data to run the CRC algorithm over".
+     @param        Data2CRCSize        "Size of the data chunk to generate the CRC for".
+     @param        ReciprocalPoly      "The Polynomial in Reciprocal representation".
+     @param        PolySize            "The size of the polynomial in bits".
+     @param        PolyInit            "Initalization value".
+     @param        PrecomputedCRC      "The precomputed resulting CRC of Data2CRC, to compare the generated CRC with".
      */
-    bool           VerifyCRC(const uint8_t *Data, const size_t DataSize, CRC *CRCData);
+    bool           VerifyCRC(const uint8_t *Data2CRC, const size_t Data2CRCSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit, const uint64_t PrecomputedCRC);
     
     /*!
      @abstract                         "Creates Adler32 checksum from input data".
