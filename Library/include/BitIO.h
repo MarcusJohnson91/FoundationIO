@@ -12,11 +12,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef BITIO_H
+#define BITIO_H
+
+#pragma once
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
-#pragma once
     
     /*!
      @abstract                                 "BitIO compile time constants".
@@ -490,3 +493,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* BITIO_H */
