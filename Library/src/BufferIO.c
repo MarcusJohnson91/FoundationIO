@@ -4,9 +4,11 @@
 #include <string.h>
 #include <stdarg.h>
 
-#ifndef _WIN32
+#ifndef _POSIX_VERSION
 #include <syslog.h>
 #include <unistd.h>
+#elif defined _WIN32
+#include <winbase.h>
 #endif
 
 #ifdef __cplusplus
@@ -441,13 +443,24 @@ extern "C" {
     void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription, ...) {
         char ErrorString[BitIOStringSize];
         char VariadicArguments[BitIOStringSize];
+        
         va_list ExtraArguments;
         va_start(ExtraArguments, ErrorDescription);
         vsnprintf(VariadicArguments, BitIOStringSize, "%s", ExtraArguments);
         va_end(ExtraArguments);
+        
         snprintf(ErrorString, BitIOStringSize, "%s - %s: %s - %s\n", LibraryOrProgram, Function, ErrorDescription, VariadicArguments);
 #ifdef _WIN32
-        fprintf(stderr, "%s\n", ErrorString);
+        uintptr_t *EventLog = RegisterEventSource(NULL, LibraryOrProgram);
+        uint32_t ErrorCode = ReportEvent(EventLog, ErrorLevel, 1, 0xF000FFFF, NULL, 1, strlen(ErrorString), ErrorString, NULL);
+        if (ErrorCode != 0) {
+            fprintf(stderr, "BitIO - Log: Windows version of Logger failed\n");
+            fprintf(stderr, ErrorString);
+        }
+        bool DeregisterSucceeded = DeregisterEventSource(EventLog);
+        if (DeregisterSucceeded > 0) {
+            fprintf(stderr, "BitIO - Log: Deregistering EventLog failed\n");
+        }
 #else
         if ((ErrorLevel == LOG_EMERG) || (ErrorLevel == LOG_CRIT)) {
             openlog(LibraryOrProgram, ErrorLevel, (LOG_PERROR|LOG_MAIL|LOG_USER));
