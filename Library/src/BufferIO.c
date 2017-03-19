@@ -385,7 +385,7 @@ extern "C" {
     uint64_t GenerateCRC(const uint8_t *Data2CRC, const size_t Data2CRCSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit) {
         uint16_t CRCResult = 0;
         for (uint64_t Byte = 0; Byte < Data2CRCSize; Byte++) {
-            CRCResult = ReciprocalPoly ^ Data[Byte] << 8;
+            CRCResult = ReciprocalPoly ^ Data2CRC[Byte] << 8;
             for (uint8_t Bit = 0; Bit < 8; Bit++) {
                 if ((CRCResult & 0x8000) == true) {
                 } else {
