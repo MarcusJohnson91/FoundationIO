@@ -35,7 +35,7 @@ extern "C" {
      @constant       BitIOEncodedGUIDSize      "Size of a binary GUID string".
      @constant       BitIOMD5Size              "Size of a MD5 string".
      */
-    extern enum BitIOConstants {
+    enum BitIOConstants {
         BitInputBufferSize        = 4096,
         BitInputBufferSizeInBits  = BitInputBufferSize * 8,
         BitOutputBufferSize       = 4096,
@@ -136,7 +136,7 @@ extern "C" {
      @constant BigEndian               "The machine is Big endian".
      @constant LittleEndian            "The machine is little endian".
      */
-    extern enum Endian {
+    enum Endian {
         UnknownEndian = 0,
         BigEndian     = 1,
         LittleEndian  = 2,
@@ -154,7 +154,7 @@ extern "C" {
      @constant LOG_INFO                "Informational message logged".
      @constant LOG_DEBUG               "Testing information logged".
      */
-    extern enum LogTypes {
+    enum LogTypes {
         LOG_EMERG   = 0,
         LOG_ALERT   = 1,
         LOG_CRIT    = 2,
