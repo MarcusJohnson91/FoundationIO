@@ -19,15 +19,15 @@ extern "C" {
 #define strcasecmp stricmp
 #endif
     
-    uint16_t SwapEndian16(const uint16_t Data2Swap) { 
+    uint16_t SwapEndian16(const uint16_t Data2Swap) {
         return ((Data2Swap & 0xFF00) >> 8) | ((Data2Swap & 0x00FF) << 8);
     }
     
-    uint32_t SwapEndian32(const uint32_t Data2Swap) { 
+    uint32_t SwapEndian32(const uint32_t Data2Swap) { // 0x0000011C, 0xC1010000
         return ((Data2Swap & 0xFF000000) >> 24) | ((Data2Swap & 0x00FF0000) >> 8) | ((Data2Swap & 0x0000FF00) << 8) | ((Data2Swap & 0x000000FF) << 24);
     }
     
-    uint64_t SwapEndian64(const uint64_t Data2Swap) { 
+    uint64_t SwapEndian64(const uint64_t Data2Swap) {
         return (((Data2Swap & 0xFF00000000000000) >> 56) | ((Data2Swap & 0x00FF000000000000) >> 40) | \
                 ((Data2Swap & 0x0000FF0000000000) >> 24) | ((Data2Swap & 0x000000FF00000000) >>  8) | \
                 ((Data2Swap & 0x00000000FF000000) <<  8) | ((Data2Swap & 0x0000000000FF0000) << 24) | \
@@ -42,19 +42,19 @@ extern "C" {
         }
     }
     
-    uint64_t Bytes2Bits(const uint64_t Bytes) { 
+    uint64_t Bytes2Bits(const uint64_t Bytes) {
         return (Bytes * 8);
     }
     
-    uint8_t BitsRemaining(const uint64_t BitsAvailable) { 
+    uint8_t BitsRemaining(const uint64_t BitsAvailable) {
         return BitsAvailable > 8 ? 8 : BitsAvailable;
     }
     
-    uint64_t Signed2Unsigned(const int64_t Signed) { 
+    uint64_t Signed2Unsigned(const int64_t Signed) {
         return (uint64_t)Signed;
     }
     
-    int64_t Unsigned2Signed(const uint64_t Unsigned) {  
+    int64_t Unsigned2Signed(const uint64_t Unsigned) {
         return (int64_t)Unsigned;
     }
     
@@ -81,8 +81,8 @@ extern "C" {
         return BitCount;
     }
     
-    uint64_t Power2Mask(const uint8_t Exponent) { 
-        if ((Exponent <= 0) || (Exponent > 64)) { // Exponent = 1
+    uint64_t Power2Mask(const uint8_t Exponent) {
+        if ((Exponent <= 0) || (Exponent > 64)) {
             return EXIT_FAILURE;
         } else {
             if (Exponent == 1) {
