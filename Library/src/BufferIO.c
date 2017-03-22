@@ -471,7 +471,7 @@ extern "C" {
 #endif
     }
     
-    void ReadUUID(BitInput *BitI, char *UUIDString) {
+    void ReadUUID(BitInput *BitI, uint8_t *UUIDString) {
         for (uint8_t Character = 0; Character < BitIOUUIDSize - 1; Character++) {
             if (Character == 21) {
                 UUIDString[Character] = 0x00;
@@ -483,7 +483,7 @@ extern "C" {
         }
     }
     
-    void SwapUUID(const char *UUIDString2Convert, char *ConvertedUUIDString) {
+    void SwapUUID(const uint8_t *UUIDString2Convert, uint8_t *ConvertedUUIDString) {
         uint32_t Section1  = 0, SwappedSection1 = 0;
         uint16_t Section2  = 0, SwappedSection2 = 0;
         uint16_t Section3  = 0, SwappedSection3 = 0;
@@ -532,7 +532,7 @@ extern "C" {
         }
     }
     
-    uint8_t WriteUUID(BitOutput *BitO, const char *UUIDString) {
+    uint8_t WriteUUID(BitOutput *BitO, const uint8_t *UUIDString) {
         if (strlen(UUIDString) != BitIOUUIDSize - 1) {
             return EXIT_SUCCESS;
         } else {
@@ -546,7 +546,7 @@ extern "C" {
         return EXIT_SUCCESS;
     }
     
-    bool CompareUUIDs(const char *UUIDString1, const char *UUIDString2) {
+    bool CompareUUIDs(const uint8_t *UUIDString1, const uint8_t *UUIDString2) {
         bool UUIDsMatch = 0;
         for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDSize - 1; UUIDByte++) {
             if (UUIDString1[UUIDByte] != UUIDString2[UUIDByte]) {
