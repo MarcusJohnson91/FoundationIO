@@ -465,14 +465,14 @@ extern "C" {
      @param        BitI                "Pointer to BitInput".
      @param        UUIDString          "Character array to read UUID string into".
      */
-    void           ReadUUID(BitInput *BitI, char *UUIDString);
+    void           ReadUUID(BitInput *BitI, uint8_t *UUIDString);
     
     /*!
      @abstract                         "Endian swaps a UUID into a GUID and vice versa".
      @param        UUIDString2Convert  "Pointer to a UUIDString to be converted".
      @param        ConvertedUUIDString "The resulting UUID or GUID".
      */
-    void           SwapUUID(const char *UUIDString2Convert, char *ConvertedUUIDString);
+    void           SwapUUID(const uint8_t *UUIDString2Convert, uint8_t *ConvertedUUIDString);
     
     /*!
      @abstract                         "Write UUID/GUID string as hyphen-less blob".
@@ -480,7 +480,7 @@ extern "C" {
      @param        BitO                "Pointer to BitOutput".
      @param        UUIDString          "UUID string to write to the file as a binary blob, aka remove hyphens and null terminating char".
      */
-    uint8_t        WriteUUID(BitOutput *BitO, const char *UUIDString);
+    uint8_t        WriteUUID(BitOutput *BitO, const uint8_t *UUIDString);
     
     /*!
      @abstract                         "Verify two UUIDs match each other".
@@ -488,7 +488,7 @@ extern "C" {
      @param        UUIDString1         "Pointer to a UUIDString to be matched against".
      @param        UUIDString2         "Pointer to a UUIDString to match against UUIDString1".
      */
-    bool           CompareUUIDs(const char *UUIDString1, const char *UUIDString2);
+    bool           CompareUUIDs(const uint8_t *UUIDString1, const uint8_t *UUIDString2);
     
 #ifdef __cplusplus
 }
