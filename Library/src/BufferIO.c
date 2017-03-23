@@ -389,8 +389,16 @@ extern "C" {
         free(BitI);
     }
     
-    bool IsStreamByteAligned(const uint64_t BitsUsed, const uint8_t BytesOfAlignment) {
-        if ((BitsUsed % Bytes2Bits(BytesOfAlignment)) == 0) {
+    bool IsInputStreamByteAligned(BitInput *BitI, const uint8_t BytesOfAlignment) {
+        if ((BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    bool IsOutputStreamByteAligned(BitOutput *BitO, const uint8_t BytesOfAlignment) {
+        if ((BitO->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
             return true;
         } else {
             return false;
