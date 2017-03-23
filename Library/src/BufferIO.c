@@ -104,6 +104,10 @@ extern "C" {
         return BitI->FilePosition - BitI->FileSize;
     }
     
+    uint64_t GetInputFileSize(BitInput *BitI) {
+        return BitI->FileSize;
+    }
+    
     uint64_t Signed2Unsigned(const int64_t Signed) {
         return (uint64_t)Signed;
     }
