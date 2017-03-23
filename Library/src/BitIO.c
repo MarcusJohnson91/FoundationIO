@@ -64,24 +64,6 @@ extern "C" {
         FILE        *LogFile;
     } BitOutput;
     
-    /*!
-     @typedef  CLSwitch
-     @abstract                         "Contains the data to support a single switch".
-     @remark                           "You MUST include the null padding at the end of @Switch".
-     @constant SwitchFound             "If the switch was found in argv, this will be set to true".
-     @constant Resultless              "Is the mere presence of the switch what you're looking for? if so, set to true"
-     @constant Switch                  "Actual switch, including dash(s), slash, etc.".
-     @constant SwitchDescription       "Message to print explaining what the switch does".
-     @constant SwitchResult            "String to contain the result of this switch, NULL if not found".
-     */
-    typedef struct CLSwitch {
-        bool        SwitchFound:1;
-        bool        Resultless:1;
-        char       *Switch;
-        char       *SwitchDescription;
-        char       *SwitchResult;
-    } CLSwitch;
-    
     typedef struct LinkedList {
         uint16_t           Value;
         struct LinkedList *Next;
