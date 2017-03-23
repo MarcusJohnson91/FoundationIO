@@ -303,10 +303,15 @@ extern "C" {
     
     /*!
      @abstract                         "Tells if the stream/buffer is byte aligned or not".
-     @param        BitsUsed            "Number of bits previously read from the stream, to calculate if it's on a byte aligned address".
      @param        BytesOfAlignment    "Are you trying to see if it's aligned to a byte, short, word, etc alignment? Specify in number of bytes".
      */
-    bool           IsStreamByteAligned(const uint64_t BitsUsed, const uint8_t BytesOfAlignment);
+    bool           IsInputStreamByteAligned(BitInput *BitI, const uint8_t BytesOfAlignment);
+    
+    /*!
+     @abstract                         "Tells if the stream/buffer is byte aligned or not".
+     @param        BytesOfAlignment    "Are you trying to see if it's aligned to a byte, short, word, etc alignment? Specify in number of bytes".
+     */
+    bool           IsOutputStreamByteAligned(BitOutput *BitO, const uint8_t BytesOfAlignment);
     
     /*!
      @abstract                         "Aligns bits for multi-byte alignment".
