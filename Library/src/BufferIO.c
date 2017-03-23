@@ -341,28 +341,28 @@ extern "C" {
         }
     }
     
-    void WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write, const bool ReadFromMSB) {
+    void WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write, const bool WriteFromMSB) {
         for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
-            WriteBits(BitO, (~StopBit), 1, ReadFromMSB);
+            WriteBits(BitO, (~StopBit), 1, WriteFromMSB);
         }
-        WriteBits(BitO, StopBit, 1, ReadFromMSB);
+        WriteBits(BitO, StopBit, 1, WriteFromMSB);
     }
     
-    void WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write, const bool ReadFromMSB) {
+    void WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write, const bool WriteFromMSB) {
         uint64_t NumBits = 0;
         
         NumBits = FindHighestBitSet(Data2Write);
         
         if (IsSigned == false) {
-            WriteBits(BitO, 0, NumBits, ReadFromMSB);
-            WriteBits(BitO, Data2Write + 1, NumBits + 1, ReadFromMSB);
+            WriteBits(BitO, 0, NumBits, WriteFromMSB);
+            WriteBits(BitO, Data2Write + 1, NumBits + 1, WriteFromMSB);
         } else {
             NumBits -= 1;
-            WriteBits(BitO, 0, NumBits, ReadFromMSB);
+            WriteBits(BitO, 0, NumBits, WriteFromMSB);
             if (IsOdd(Data2Write +1) == false) {
-                WriteBits(BitO, Data2Write + 1, NumBits + 1, ReadFromMSB);
+                WriteBits(BitO, Data2Write + 1, NumBits + 1, WriteFromMSB);
             } else {
-                WriteBits(BitO, Data2Write + 1, NumBits + 1, ReadFromMSB);
+                WriteBits(BitO, Data2Write + 1, NumBits + 1, WriteFromMSB);
             }
         }
     }

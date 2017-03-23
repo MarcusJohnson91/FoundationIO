@@ -396,14 +396,18 @@ extern "C" {
      @param        Truncated           "Should the stop bit be pruned?"
      @param        StopBit             "Has to be a 0 or a 1".
      @param        Data2Write          "Number to encode into RICE format".
+     @param        WriteFromMSB        "Should Data2Write be written from the MSB or the LSB?".
      */
-    void           WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write, const bool ReadFromMSB);
+    void           WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write, const bool WriteFromMSB);
     
     /*!
      @abstract                         "Writes data encoded as Exponential-Golomb aka Elias Gamma codes to BitO".
      @param        BitO                "Pointer to BitOutput".
+     @param        IsSigned            "Is Data2Write signed?".
+     @param        Data2Write          "The actual data to write to the output file".
+     @param        WriteFromMSB        "Should Data2Write be written from the MSB or the LSB?".
      */
-    void           WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write, const bool ReadFromMSB);
+    void           WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write, const bool WriteFromMSB);
     
     /*!
      @abstract                         "Deallocates BitOutput"
