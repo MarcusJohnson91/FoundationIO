@@ -82,24 +82,6 @@ extern "C" {
         char       *SwitchResult;
     } CLSwitch;
     
-    /*!
-     @typedef  CommandLineOptions
-     @abstract                         "Type to contain a variable amount of CLSwitches".
-     @remark                           "The switches are zero indexed, and @NumSwitches is NOT zero indexed, so count from 1".
-     @constant NumSwitches             "The number of switches".
-     @constant ProgramName             "The name you want output when the help is printed".
-     @constant ProgramDescription      "The description of the program when the help is printed".
-     @constant AuthorCopyrightLicense  "The author, copyright years, and license of the program, or anything else you want printed".
-     @constant Switch                  "A pointer to an array of CLSwitch instances containing the properties of the switches".
-     */
-    typedef struct CommandLineOptions {
-        size_t      NumSwitches;
-        char       *ProgramName;
-        char       *ProgramDescription;
-        char       *AuthorCopyrightLicense;
-        CLSwitch  **Switch;
-    } CommandLineOptions;
-    
     typedef struct LinkedList {
         uint16_t           Value;
         struct LinkedList *Next;
