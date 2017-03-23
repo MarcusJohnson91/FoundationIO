@@ -352,9 +352,9 @@ extern "C" {
         }
     }
     
-    void CloseBitInput(BitInput *BitI) {
-        fclose(BitI->File);
-        free(BitI);
+    BitInput *InitBitInput(void) {
+        BitInput *BitI = calloc(sizeof(BitInput), 1);
+        return BitI;
     }
     
     bool IsInputStreamByteAligned(BitInput *BitI, const uint8_t BytesOfAlignment) {
@@ -363,6 +363,16 @@ extern "C" {
         } else {
             return false;
         }
+    }
+    
+    void CloseBitInput(BitInput *BitI) {
+        fclose(BitI->File);
+        free(BitI);
+    }
+    
+    BitOutput *InitBitOutput(void) {
+        BitOutput *BitO = calloc(sizeof(BitOutput), 1);
+        return BitO;
     }
     
     bool IsOutputStreamByteAligned(BitOutput *BitO, const uint8_t BytesOfAlignment) {

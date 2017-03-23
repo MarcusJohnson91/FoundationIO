@@ -333,6 +333,18 @@ extern "C" {
     void           AlignInput(BitInput *BitI, const uint8_t BytesOfAlignment);
     
     /*!
+     @avstact                          "Initializes a BitInput structure".
+     @return                           "Returns a pointer to said BitInput structure".
+     */
+    BitInput      *InitBitInput(void);
+    
+    /*!
+     @avstact                          "Initializes a BitOutput structure".
+     @return                           "Returns a pointer to said BitOutput structure".
+     */
+    BitOutput     *InitBitOutput(void);
+    
+    /*!
      @abstract                         "Deallocates BitInput".
      @remark                           "For use when changing files, or exiting the program".
      @param        BitI                "Pointer to BitInput".
