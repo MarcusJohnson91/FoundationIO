@@ -172,6 +172,11 @@ extern "C" {
     uint64_t       BytesRemainingInFile(BitInput *BitI);
     
     /*!
+     @return                           "Returns the value in BitI->FileSize".
+     */
+    uint64_t       GetInputFileSize(BitInput *BitI);
+    
+    /*!
      @abstract                         "Converts an Signed int to a Unsigned int".
      @param        Signed              "Signed data to convert to unsigned".
      @return                           "Returns the input data in Unsigned format".
