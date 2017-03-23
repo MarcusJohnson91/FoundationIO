@@ -1,8 +1,12 @@
 #include "../include/BitIO.h"
 
 #include <math.h>
-#include <string.h>
 #include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifndef _POSIX_VERSION
 #include <syslog.h>
@@ -18,6 +22,88 @@ extern "C" {
 #ifdef _WIN32
 #define strcasecmp stricmp
 #endif
+    
+    /*!
+     @typedef        BitInput
+     @abstract                         "Contains variables and buffers for reading bits".
+     @remark                           "The default internal representation in BitIO is unsigned, Big Endian".
+     @constant       File              "Input file to read bits from".
+     @constant       FileSize          "Size of File in bytes".
+     @constant       FilePosition      "Current byte in the file".
+     @constant       BitsUnavailable   "Number of previously read bits in Buffer".
+     @constant       BitsAvailable     "Number of bits available for reading".
+     @constant       SystemEndian      "Endian of the running system".
+     @constant       Buffer            "Buffer of data from File".
+     */
+    typedef struct BitInput {
+        FILE        *File;
+        size_t       FileSize;
+        size_t       FilePosition;
+        size_t       BitsUnavailable;
+        size_t       BitsAvailable;
+        unsigned     SystemEndian:2;
+        uint8_t      Buffer[BitInputBufferSize];
+    } BitInput;
+    
+    /*!
+     @typedef        BitOutput
+     @abstract                         "Contains variables and buffers for writing bits".
+     @remark                           "The default internal representation in BitOutput is unsigned".
+     @constant       File              "Input file to read bits from".
+     @constant       BitsUnavailable   "Number of previously read bits in Buffer".
+     @constant       BitsAvailable     "Number of bits available for writing".
+     @constant       SystemEndian      "Endian of the running system".
+     @constant       Buffer            "Buffer of BitIOBufferSize bits from File".
+     */
+    typedef struct BitOutput {
+        FILE        *File;
+        size_t       BitsUnavailable;
+        size_t       BitsAvailable;
+        uint8_t      SystemEndian;
+        uint8_t      Buffer[BitOutputBufferSize];
+        FILE        *LogFile;
+    } BitOutput;
+    
+    /*!
+     @typedef  CLSwitch
+     @abstract                         "Contains the data to support a single switch".
+     @remark                           "You MUST include the null padding at the end of @Switch".
+     @constant SwitchFound             "If the switch was found in argv, this will be set to true".
+     @constant Resultless              "Is the mere presence of the switch what you're looking for? if so, set to true"
+     @constant Switch                  "Actual switch, including dash(s), slash, etc.".
+     @constant SwitchDescription       "Message to print explaining what the switch does".
+     @constant SwitchResult            "String to contain the result of this switch, NULL if not found".
+     */
+    typedef struct CLSwitch {
+        bool        SwitchFound:1;
+        bool        Resultless:1;
+        char       *Switch;
+        char       *SwitchDescription;
+        char       *SwitchResult;
+    } CLSwitch;
+    
+    /*!
+     @typedef  CommandLineOptions
+     @abstract                         "Type to contain a variable amount of CLSwitches".
+     @remark                           "The switches are zero indexed, and @NumSwitches is NOT zero indexed, so count from 1".
+     @constant NumSwitches             "The number of switches".
+     @constant ProgramName             "The name you want output when the help is printed".
+     @constant ProgramDescription      "The description of the program when the help is printed".
+     @constant AuthorCopyrightLicense  "The author, copyright years, and license of the program, or anything else you want printed".
+     @constant Switch                  "A pointer to an array of CLSwitch instances containing the properties of the switches".
+     */
+    typedef struct CommandLineOptions {
+        size_t      NumSwitches;
+        char       *ProgramName;
+        char       *ProgramDescription;
+        char       *AuthorCopyrightLicense;
+        CLSwitch  **Switch;
+    } CommandLineOptions;
+    
+    typedef struct LinkedList {
+        uint16_t           Value;
+        struct LinkedList *Next;
+    } LinkedList;
     
     uint16_t SwapEndian16(const uint16_t Data2Swap) {
         return ((Data2Swap & 0xFF00) >> 8) | ((Data2Swap & 0x00FF) << 8);
@@ -46,8 +132,12 @@ extern "C" {
         return (Bytes * 8);
     }
     
-    uint8_t BitsRemaining(const uint64_t BitsAvailable) {
+    uint8_t BitsRemainingInByte(const uint64_t BitsAvailable) {
         return BitsAvailable > 8 ? 8 : BitsAvailable;
+    }
+    
+    uint64_t BytesRemainingInFile(BitInput *BitI) {
+        return BitI->FilePosition - BitI->FileSize;
     }
     
     uint64_t Signed2Unsigned(const int64_t Signed) {
@@ -209,7 +299,7 @@ extern "C" {
                 UpdateInputBuffer(BitI, 0);
             }
             SystemBits             = 8 - (BitI->BitsUnavailable % 8);
-            UserBits               = BitsRemaining(Bits);
+            UserBits               = BitsRemainingInByte(Bits);
             Bits                   = SystemBits >= UserBits  ? UserBits : SystemBits;
             Mask2Shift             = ReadFromMSB ? BitI->BitsAvailable % 8 : 0;
             if (ReadFromMSB == true) {
