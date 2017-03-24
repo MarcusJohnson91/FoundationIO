@@ -502,6 +502,11 @@ extern "C" {
     CommandLineSwitch  *InitCommandLineSwitch(void);
     
     /*!
+     @abstract                              "Initalizes NumSwitches CommandLineSwitch's, and attaches them to CommandLineOptions".
+     */
+    CommandLineOptions *BatchInitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches);
+    
+    /*!
      @abstract                              "Frees CommandLineSwitch instance".
      */
     void                CloseCommandLineSwitch(CommandLineSwitch *Switch);
@@ -514,16 +519,29 @@ extern "C" {
     bool                IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch);
     
     /*!
-     @abstract                              "Set the main details, like the program name, number of switches, program description, and license".
-     @param             CMD                 "Pointer to CommandLineOptions instance".
-     @param             NumSwitches         "How many CLSwitch insannces are there?".
-     @param             Name                "Name of the program you're building".
-     @param             Description         "Description of what this program does".
-     @param             Author              "Who wrote this program?".
-     @param             Copyright           "Years this program came out".
-     @param             License             "License this program is released under".
+     @abstract          "Sets the name of the program".
      */
-    void                SetCMDDetails(CommandLineOptions *CMD, const uint64_t NumSwitches, const char *Name, const char *Description, const char *Author, const char *Copyright, const char *License);
+    void                SetCMDName(CommandLineOptions *CMD, const char *Name);
+    
+    /*!
+     @abstract          "Sets the description of the program".
+     */
+    void                SetCMDDescription(CommandLineOptions *CMD, const char *Description);
+    
+    /*!
+     @abstract          "Sets the author of the program".
+     */
+    void                SetCMDAuthor(CommandLineOptions *CMD, const char *Author);
+    
+    /*!
+     @abstract          "Sets the copyright years of the program".
+     */
+    void                SetCMDCopyright(CommandLineOptions *CMD, const char *Copyright);
+    
+    /*!
+     @abstract          "Sets the license of the program".
+     */
+    void                SetCMDLicense(CommandLineOptions *CMD, const char *License);
     
 #ifdef __cplusplus
 }
