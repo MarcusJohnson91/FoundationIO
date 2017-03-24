@@ -63,13 +63,13 @@ extern "C" {
      @constant SwitchDescription       "Message to print explaining what the switch does".
      @constant SwitchResult            "String to contain the result of this switch, NULL if not found".
      */
-    typedef struct CLSwitch {
+    typedef struct CommandLineSwitch {
         bool        SwitchFound:1;
         bool        Resultless:1;
         char       *Switch;
         char       *SwitchDescription;
         char       *SwitchResult;
-    } CLSwitch;
+    } CommandLineSwitch;
     
     /*!
      @typedef  CommandLineOptions
@@ -486,7 +486,7 @@ extern "C" {
     
     
     /*!
-     @abstract                         "Initalizes CommandLineOptions instance".
+     @abstract                         "Initalizes a CommandLineOptions instance".
      @return                           "Returns a pointer to an initalized CommandLineOptions instance".
      */
     CommandLineOptions *InitCommandLineOptions(void);
@@ -494,7 +494,17 @@ extern "C" {
     /*!
      @abstract                         "Frees CommandLineOptions instance".
      */
-    void           CloseCommandLineOptions(CommandLineOptions *CMD);
+    void                CloseCommandLineOptions(CommandLineOptions *CMD);
+    
+    /*!
+     @abstract                         "Initalizes a CommandLineSwitch instance".
+     */
+    CommandLineSwitch  *InitCommandLineSwitch(void);
+    
+    /*!
+     @abstract                         "Frees CommandLineSwitch instance".
+     */
+    void                CloseCommandLineSwitch(CommandLineSwitch *Switch);
     
     /*!
      @abstract                         "Tells if a certain switch has been found".

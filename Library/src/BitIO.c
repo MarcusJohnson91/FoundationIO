@@ -643,6 +643,15 @@ extern "C" {
         free(CMD);
     }
     
+    CommandLineSwitch *InitCommandLineSwitch(void) {
+        CommandLineSwitch *Switch = calloc(sizeof(CommandLineSwitch), 1);
+        return Switch;
+    }
+    
+    void CloseCommandLineSwitch(CommandLineSwitch *Switch) {
+        free(Switch);
+    }
+    
     bool IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch) {
         return CMD->Switch[Switch]->SwitchFound;
     }
