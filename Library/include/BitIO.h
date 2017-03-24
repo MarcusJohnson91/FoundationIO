@@ -469,7 +469,7 @@ extern "C" {
     /*!
      @abstract                              "Initalizes NumSwitches CommandLineSwitch's, and attaches them to CommandLineOptions".
      */
-    CommandLineOptions *BatchInitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches);
+    CommandLineOptions *InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches);
     
     /*!
      @abstract                              "Frees CommandLineSwitch instance".
@@ -507,7 +507,7 @@ extern "C" {
     
     void                SetSwitchResultStatus(CommandLineOptions *CMD, uint64_t SwitchNum, bool IsSwitchResultless);
     
-    char               *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum);
+    const char         *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum);
     
     /*!
      @abstract                              "Tells if a certain switch has been found".
@@ -515,6 +515,10 @@ extern "C" {
      @param             Switch              "The switch to check".
      */
     bool                IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch);
+    
+    size_t              GetBitInputBufferSize(BitInput *BitI);
+    
+    size_t              GetBitOutputBufferSize(BitOutput *BitO);
     
 #ifdef __cplusplus
 }
