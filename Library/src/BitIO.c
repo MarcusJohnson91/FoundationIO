@@ -638,6 +638,15 @@ extern "C" {
         return CMD->Switch[Switch]->SwitchFound;
     }
     
+    void SetCMDDetails(CommandLineOptions *CMD, const uint64_t NumSwitches, const char *Name, const char *Description, const char *Author, const char *Copyright, const char *License) {
+        CMD->NumSwitches            = NumSwitches;
+        CMD->Name                   = Name;
+        CMD->Description            = Description;
+        CMD->Author                 = Author;
+        CMD->Copyright              = Copyright;
+        CMD->License                = License;
+    }
+    
 #ifdef __cplusplus
 }
 #endif
