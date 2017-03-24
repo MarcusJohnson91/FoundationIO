@@ -8,10 +8,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef _POSIX_VERSION
+#ifndef _WIN32
 #include <syslog.h>
 #include <unistd.h>
-#elif defined _WIN32
+#else
 #include <winbase.h>
 #endif
 
@@ -70,16 +70,16 @@ extern "C" {
      @remark                           "You MUST include the null padding at the end of @Switch".
      @constant SwitchFound             "If the switch was found in argv, this will be set to true".
      @constant Resultless              "Is the mere presence of the switch what you're looking for? if so, set to true"
-     @constant Switch                  "Actual switch, including dash(s), slash, etc.".
+     @constant Flag                    "Actual flag, WITHOUT dash(s) or backslash, Flags are case insensitive".
      @constant SwitchDescription       "Message to print explaining what the switch does".
      @constant SwitchResult            "String to contain the result of this switch, NULL if not found".
      */
     typedef struct CommandLineSwitch {
         bool        SwitchFound:1;
         bool        Resultless:1;
-        char       *Flag;
-        char       *SwitchDescription;
-        char       *SwitchResult;
+        const char *Flag;
+        const char *SwitchDescription;
+        const char *SwitchResult;
     } CommandLineSwitch;
     
     /*!
@@ -500,7 +500,7 @@ extern "C" {
     }
     
     void CloseBitOutput(BitOutput *BitO) {
-        if (IsStreamByteAligned(BitO->BitsUnavailable, 1) == false) {
+        if (IsOutputStreamByteAligned(BitO, 1) == false) {
             AlignOutput(BitO, 1);
         }
         fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
@@ -696,7 +696,7 @@ extern "C" {
         return Switch;
     }
     
-    CommandLineOptions *BatchInitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches) {
+    CommandLineOptions *InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches) {
         CMD->NumSwitches = NumSwitches;
         for (uint64_t Switch2Init = 0; Switch2Init < NumSwitches; Switch2Init++) {
             CMD->Switch[Switch2Init] = calloc(sizeof(CommandLineSwitch), 1);
@@ -740,12 +740,20 @@ extern "C" {
         CMD->Switch[SwitchNum]->Resultless = IsSwitchResultless;
     }
     
-    char *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum) {
+    const char *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum) {
         return CMD->Switch[SwitchNum]->SwitchResult;
     }
     
     bool IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch) {
         return CMD->Switch[Switch]->SwitchFound;
+    }
+    
+    size_t GetBitInputBufferSize(BitInput *BitI) {
+        return sizeof(BitI->Buffer);
+    }
+    
+    size_t GetBitOutputBufferSize(BitOutput *BitO) {
+        return sizeof(BitO->Buffer);
     }
     
 #ifdef __cplusplus
