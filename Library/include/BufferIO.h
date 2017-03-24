@@ -513,13 +513,6 @@ extern "C" {
     void                CloseCommandLineSwitch(CommandLineSwitch *Switch);
     
     /*!
-     @abstract                              "Tells if a certain switch has been found".
-     @param             CMD                 "Pointer to CommandLineOptions instance".
-     @param             Switch              "The switch to check".
-     */
-    bool                IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch);
-    
-    /*!
      @abstract          "Sets the name of the program".
      */
     void                SetCMDName(CommandLineOptions *CMD, const char *Name);
@@ -543,6 +536,21 @@ extern "C" {
      @abstract          "Sets the license of the program".
      */
     void                SetCMDLicense(CommandLineOptions *CMD, const char *License);
+    
+    void                SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag);
+    
+    void                SetSwitchDescription(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Description);
+    
+    void                SetSwitchResultStatus(CommandLineOptions *CMD, uint64_t SwitchNum, bool IsSwitchResultless);
+    
+    char               *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum);
+    
+    /*!
+     @abstract                              "Tells if a certain switch has been found".
+     @param             CMD                 "Pointer to CommandLineOptions instance".
+     @param             Switch              "The switch to check".
+     */
+    bool                IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch);
     
 #ifdef __cplusplus
 }

@@ -660,10 +660,6 @@ extern "C" {
         free(Switch);
     }
     
-    bool IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch) {
-        return CMD->Switch[Switch]->SwitchFound;
-    }
-    
     void SetCMDName(CommandLineOptions *CMD, const char *Name) {
         CMD->Name = Name;
     }
@@ -700,8 +696,8 @@ extern "C" {
         return CMD->Switch[SwitchNum]->SwitchResult;
     }
     
-    bool GetSwitchPresence(CommandLineOptions *CMD, uint64_t SwitchNum) {
-        return CMD->Switch[SwitchNum]->SwitchFound;
+    bool IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch) {
+        return CMD->Switch[Switch]->SwitchFound;
     }
     
 #ifdef __cplusplus
