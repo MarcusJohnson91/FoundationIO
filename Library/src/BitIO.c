@@ -648,6 +648,14 @@ extern "C" {
         return Switch;
     }
     
+    CommandLineOptions *BatchInitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches) {
+        CMD->NumSwitches = NumSwitches;
+        for (uint64_t Switch2Init = 0; Switch2Init < NumSwitches; Switch2Init++) {
+            CMD->Switch[Switch2Init] = calloc(sizeof(CommandLineSwitch), 1);
+        }
+        return CMD;
+    }
+    
     void CloseCommandLineSwitch(CommandLineSwitch *Switch) {
         free(Switch);
     }
@@ -656,13 +664,24 @@ extern "C" {
         return CMD->Switch[Switch]->SwitchFound;
     }
     
-    void SetCMDDetails(CommandLineOptions *CMD, const uint64_t NumSwitches, const char *Name, const char *Description, const char *Author, const char *Copyright, const char *License) {
-        CMD->NumSwitches            = NumSwitches;
-        CMD->Name                   = Name;
-        CMD->Description            = Description;
-        CMD->Author                 = Author;
-        CMD->Copyright              = Copyright;
-        CMD->License                = License;
+    void SetCMDName(CommandLineOptions *CMD, const char *Name) {
+        CMD->Name = Name;
+    }
+    
+    void SetCMDDescription(CommandLineOptions *CMD, const char *Description) {
+        CMD->Description = Description;
+    }
+    
+    void SetCMDAuthor(CommandLineOptions *CMD, const char *Author) {
+        CMD->Author = Author;
+    }
+    
+    void SetCMDCopyright(CommandLineOptions *CMD, const char *Copyright) {
+        CMD->Copyright = Copyright;
+    }
+    
+    void SetCMDLicense(CommandLineOptions *CMD, const char *License) {
+        CMD->License = License;
     }
     
 #ifdef __cplusplus
