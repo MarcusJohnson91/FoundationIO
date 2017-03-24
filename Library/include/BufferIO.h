@@ -84,9 +84,11 @@ extern "C" {
      */
     typedef struct CommandLineOptions {
         size_t      NumSwitches;
-        char       *ProgramName;
-        char       *ProgramDescription;
-        char       *AuthorCopyrightLicense;
+        const char *Name;
+        const char *Description;
+        const char *Author;
+        const char *Copyright;
+        const char *License;
         CLSwitch  **Switch;
     } CommandLineOptions;
     
@@ -484,10 +486,22 @@ extern "C" {
     
     /*!
      @abstract                         "Tells if a certain switch has been found".
-     @param        CMD                 "Pointer to CommandLineOptions".
+     @param        CMD                 "Pointer to CommandLineOptions instance".
      @param        Switch              "The switch to check".
      */
     bool           IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch);
+    
+    /*!
+     @abstract                         "Set the main details, like the program name, number of switches, program description, and license".
+     @param        CMD                 "Pointer to CommandLineOptions instance".
+     @param        NumSwitches         "How many CLSwitch insannces are there?".
+     @param        Name                "Name of the program you're building".
+     @param        Description         "Description of what this program does".
+     @param        Author              "Who wrote this program?".
+     @param        Copyright           "Years this program came out".
+     @param        License             "License this program is released under".
+     */
+    void           SetCMDDetails(CommandLineOptions *CMD, const uint64_t NumSwitches, const char *Name, const char *Description, const char *Author, const char *Copyright, const char *License);
     
 #ifdef __cplusplus
 }
