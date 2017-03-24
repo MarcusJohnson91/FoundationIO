@@ -53,44 +53,9 @@ extern "C" {
     
     typedef struct LinkedList LinkedList;
     
-    /*!
-     @typedef  CommandLineSwitch
-     @abstract                         "Contains the data to support a single switch".
-     @remark                           "You MUST include the null padding at the end of @Switch".
-     @constant SwitchFound             "If the switch was found in argv, this will be set to true".
-     @constant Resultless              "Is the mere presence of the switch what you're looking for? if so, set to true"
-     @constant Switch                  "Actual switch, including dash(s), slash, etc.".
-     @constant SwitchDescription       "Message to print explaining what the switch does".
-     @constant SwitchResult            "String to contain the result of this switch, NULL if not found".
-     */
-    typedef struct CommandLineSwitch {
-        bool        SwitchFound:1;
-        bool        Resultless:1;
-        char       *Flag;
-        char       *SwitchDescription;
-        char       *SwitchResult;
-    } CommandLineSwitch;
+    typedef struct CommandLineSwitch CommandLineSwitch;
     
-    /*!
-     @typedef  CommandLineOptions
-     @abstract                         "Type to contain a variable amount of CLSwitches".
-     @remark                           "The switches are zero indexed, and @NumSwitches is NOT zero indexed, so count from 1".
-     @constant NumSwitches             "The number of switches".
-     @constant ProgramName             "The name you want output when the help is printed".
-     @constant ProgramDescription      "The description of the program when the help is printed".
-     @constant AuthorCopyrightLicense  "The author, copyright years, and license of the program, or anything else you want printed".
-     @constant Switch                  "A pointer to an array of CLSwitch instances containing the properties of the switches".
-     TODO: Add functions to modify this so it can be private
-     */
-    typedef struct CommandLineOptions {
-        size_t               NumSwitches;
-        const char          *Name;
-        const char          *Description;
-        const char          *Author;
-        const char          *Copyright;
-        const char          *License;
-        CommandLineSwitch  **Switch;
-    } CommandLineOptions;
+    typedef struct CommandLineOptions CommandLineOptions;
     
     /*!
      @enum     Endiam
