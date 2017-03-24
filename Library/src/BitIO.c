@@ -684,6 +684,26 @@ extern "C" {
         CMD->License = License;
     }
     
+    void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag) {
+        CMD->Switch[SwitchNum]->Flag = Flag;
+    }
+    
+    void SetSwitchDescription(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Description) {
+        CMD->Switch[SwitchNum]->SwitchDescription = Description;
+    }
+    
+    void SetSwitchResultStatus(CommandLineOptions *CMD, uint64_t SwitchNum, bool IsSwitchResultless) {
+        CMD->Switch[SwitchNum]->Resultless = IsSwitchResultless;
+    }
+    
+    char *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum) {
+        return CMD->Switch[SwitchNum]->SwitchResult;
+    }
+    
+    bool GetSwitchPresence(CommandLineOptions *CMD, uint64_t SwitchNum) {
+        return CMD->Switch[SwitchNum]->SwitchFound;
+    }
+    
 #ifdef __cplusplus
 }
 #endif
