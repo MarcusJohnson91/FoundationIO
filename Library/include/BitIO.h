@@ -523,7 +523,7 @@ extern "C" {
      @param             Copyright           "Years this program came out".
      @param             License             "License this program is released under".
      */
-    void           SetCMDDetails(CommandLineOptions *CMD, const uint64_t NumSwitches, const char *Name, const char *Description, const char *Author, const char *Copyright, const char *License);
+    void                SetCMDDetails(CommandLineOptions *CMD, const uint64_t NumSwitches, const char *Name, const char *Description, const char *Author, const char *Copyright, const char *License);
     
 #ifdef __cplusplus
 }
