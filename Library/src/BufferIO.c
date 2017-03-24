@@ -193,7 +193,7 @@ extern "C" {
         printf("%s by %s ©%s: %s, Released under the %s license\n\n", CMD->Name, CMD->Author, CMD->Copyright, CMD->Description, CMD->License);
         printf("Options:\n");
         for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
-            printf("%s\t", CMD->Switch[Option]->Switch);
+            printf("%s\t", CMD->Switch[Option]->Flag);
             printf("%s\n", CMD->Switch[Option]->SwitchDescription);
         }
     }
@@ -205,7 +205,16 @@ extern "C" {
                 if (strcasecmp("-h", argv[Argument]) == 0 || strcasecmp("--h", argv[Argument]) == 0 || strcasecmp("/?", argv[Argument]) == 0) {
                     DisplayCMDHelp(CMD);
                 }
-                if (strcasecmp(CMD->Switch[Switch]->Switch, argv[Argument]) == 0) {
+                char *SingleDash = calloc(1, strlen(CMD->Switch[Switch]->Flag + 2));
+                snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch]->Flag);
+                
+                char *DoubleDash = calloc(1, strlen(CMD->Switch[Switch]->Flag + 3));
+                snprintf(DoubleDash, sizeof(DoubleDash), "--%s\n", CMD->Switch[Switch]->Flag);
+                
+                char *Slash      = calloc(1, strlen(CMD->Switch[Switch]->Flag + 2));
+                snprintf(Slash, sizeof(Slash), "/%s\n", CMD->Switch[Switch]->Flag);
+                
+                if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                     CMD->Switch[Switch]->SwitchFound = true;
                     if (CMD->Switch[Switch]->Resultless == false) {
                         char *SwitchResult = calloc(sizeof(BitIOStringSize), 1);

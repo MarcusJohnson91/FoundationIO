@@ -62,7 +62,6 @@ extern "C" {
      @constant Switch                  "Actual switch, including dash(s), slash, etc.".
      @constant SwitchDescription       "Message to print explaining what the switch does".
      @constant SwitchResult            "String to contain the result of this switch, NULL if not found".
-     TODO: Remove the dash/slash, and have the parser handle that automatically
      */
     typedef struct CommandLineSwitch {
         bool        SwitchFound:1;
