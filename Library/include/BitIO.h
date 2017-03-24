@@ -482,6 +482,13 @@ extern "C" {
      */
     bool           CompareUUIDs(const uint8_t *UUIDString1, const uint8_t *UUIDString2);
     
+    /*!
+     @abstract                         "Tells if a certain switch has been found".
+     @param        CMD                 "Pointer to CommandLineOptions".
+     @param        Switch              "The switch to check".
+     */
+    bool           IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch);
+    
 #ifdef __cplusplus
 }
 #endif

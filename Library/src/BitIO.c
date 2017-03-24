@@ -634,6 +634,10 @@ extern "C" {
         return UUIDsMatch;
     }
     
+    bool IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch) {
+        return CMD->Switch[Switch]->SwitchFound;
+    }
+    
 #ifdef __cplusplus
 }
 #endif
