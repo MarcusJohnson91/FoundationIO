@@ -484,6 +484,18 @@ extern "C" {
      */
     bool           CompareUUIDs(const uint8_t *UUIDString1, const uint8_t *UUIDString2);
     
+    
+    /*!
+     @abstract                         "Initalizes CommandLineOptions instance".
+     @return                           "Returns a pointer to an initalized CommandLineOptions instance".
+     */
+    CommandLineOptions *InitCommandLineOptions(void);
+    
+    /*!
+     @abstract                         "Frees CommandLineOptions instance".
+     */
+    void           CloseCommandLineOptions(CommandLineOptions *CMD);
+    
     /*!
      @abstract                         "Tells if a certain switch has been found".
      @param        CMD                 "Pointer to CommandLineOptions instance".

@@ -634,6 +634,15 @@ extern "C" {
         return UUIDsMatch;
     }
     
+    CommandLineOptions *InitCommandLineOptions(void) {
+        CommandLineOptions *CMD = calloc(sizeof(CommandLineOptions), 1);
+        return CMD;
+    }
+    
+    void CloseCommandLineOptions(CommandLineOptions *CMD) {
+        free(CMD);
+    }
+    
     bool IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch) {
         return CMD->Switch[Switch]->SwitchFound;
     }
