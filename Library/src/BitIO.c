@@ -190,7 +190,7 @@ extern "C" {
     }
     
     void DisplayCMDHelp(const CommandLineOptions *CMD) {
-        printf("%s: %s, %s\n\n", CMD->ProgramName, CMD->ProgramDescription, CMD->AuthorCopyrightLicense);
+        printf("%s: %s, %s, %s, %s\n\n", CMD->Name, CMD->Description, CMD->Author, CMD->Copyright, CMD->License);
         printf("Options:\n");
         for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
             printf("%s\t", CMD->Switch[Option]->Switch);
