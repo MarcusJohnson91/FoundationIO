@@ -244,13 +244,13 @@ extern "C" {
                 if (strcasecmp("-h", argv[Argument]) == 0 || strcasecmp("--h", argv[Argument]) == 0 || strcasecmp("/?", argv[Argument]) == 0) {
                     DisplayCMDHelp(CMD);
                 }
-                char *SingleDash = calloc(1, strlen(CMD->Switch[Switch]->Flag + 2));
+                char *SingleDash = calloc(strlen(CMD->Switch[Switch]->Flag + 2), 1);
                 snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch]->Flag);
                 
-                char *DoubleDash = calloc(1, strlen(CMD->Switch[Switch]->Flag + 3));
+                char *DoubleDash = calloc(strlen(CMD->Switch[Switch]->Flag + 3), 1);
                 snprintf(DoubleDash, sizeof(DoubleDash), "--%s\n", CMD->Switch[Switch]->Flag);
                 
-                char *Slash      = calloc(1, strlen(CMD->Switch[Switch]->Flag + 2));
+                char *Slash      = calloc(strlen(CMD->Switch[Switch]->Flag + 2), 1);
                 snprintf(Slash, sizeof(Slash), "/%s\n", CMD->Switch[Switch]->Flag);
                 
                 if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
