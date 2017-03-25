@@ -256,7 +256,7 @@ extern "C" {
                 if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                     CMD->Switch[Switch]->SwitchFound = true;
                     if (CMD->Switch[Switch]->Resultless == false) {
-                        char *SwitchResult = calloc(sizeof(BitIOStringSize), 1);
+                        char *SwitchResult = calloc(1, sizeof(BitIOStringSize));
                         snprintf(SwitchResult, BitIOStringSize, "%s", argv[Argument + 1]);
                         CMD->Switch[Switch]->SwitchResult = SwitchResult;
                     }
@@ -401,7 +401,7 @@ extern "C" {
     }
     
     BitInput *InitBitInput(void) {
-        BitInput *BitI = calloc(sizeof(BitInput), 1);
+        BitInput *BitI = calloc(1, sizeof(BitInput));
         return BitI;
     }
     
@@ -419,7 +419,7 @@ extern "C" {
     }
     
     BitOutput *InitBitOutput(void) {
-        BitOutput *BitO = calloc(sizeof(BitOutput), 1);
+        BitOutput *BitO = calloc(1, sizeof(BitOutput));
         return BitO;
     }
     
@@ -683,7 +683,7 @@ extern "C" {
     }
     
     CommandLineOptions *InitCommandLineOptions(void) {
-        CommandLineOptions *CMD = calloc(sizeof(CommandLineOptions), 1);
+        CommandLineOptions *CMD = calloc(1, sizeof(CommandLineOptions));
         return CMD;
     }
     
@@ -697,7 +697,7 @@ extern "C" {
     CommandLineOptions *InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches) {
         CMD->NumSwitches = NumSwitches;
         for (uint64_t Switch2Init = 0; Switch2Init < NumSwitches; Switch2Init++) {
-            CMD->Switch[Switch2Init] = calloc(sizeof(CommandLineSwitch), 1);
+            CMD->Switch[Switch2Init] = calloc(1, sizeof(CommandLineSwitch));
         }
         return CMD;
     }
