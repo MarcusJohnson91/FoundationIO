@@ -51,10 +51,6 @@ extern "C" {
     
     typedef struct BitOutput BitOutput;
     
-    typedef struct LinkedList LinkedList;
-    
-    typedef struct CommandLineSwitch CommandLineSwitch;
-    
     typedef struct CommandLineOptions CommandLineOptions;
     
     /*!
