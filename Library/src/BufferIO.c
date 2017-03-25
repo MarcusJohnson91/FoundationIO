@@ -688,12 +688,10 @@ extern "C" {
     }
     
     void CloseCommandLineOptions(CommandLineOptions *CMD) {
+        for (uint64_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
+            free(CMD->Switch[Switch]);
+        }
         free(CMD);
-    }
-    
-    CommandLineSwitch *InitCommandLineSwitch(void) {
-        CommandLineSwitch *Switch = calloc(sizeof(CommandLineSwitch), 1);
-        return Switch;
     }
     
     CommandLineOptions *InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches) {
@@ -702,10 +700,6 @@ extern "C" {
             CMD->Switch[Switch2Init] = calloc(sizeof(CommandLineSwitch), 1);
         }
         return CMD;
-    }
-    
-    void CloseCommandLineSwitch(CommandLineSwitch *Switch) {
-        free(Switch);
     }
     
     void SetCMDName(CommandLineOptions *CMD, const char *Name) {
@@ -741,11 +735,16 @@ extern "C" {
     }
     
     const char *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum) {
-        return CMD->Switch[SwitchNum]->SwitchResult;
+        size_t SwitchResultSize = strlen(CMD->Switch[SwitchNum]->SwitchResult);
+        if (SwitchResultSize == 0) {
+            return 0;
+        } else {
+            return CMD->Switch[SwitchNum]->SwitchResult;
+        }
     }
     
-    bool IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch) {
-        return CMD->Switch[Switch]->SwitchFound;
+    bool IsSwitchPresent(CommandLineOptions *CMD, uint64_t SwitchNum) {
+        return CMD->Switch[SwitchNum]->SwitchFound;
     }
     
     size_t GetBitInputBufferSize(BitInput *BitI) {

@@ -236,7 +236,7 @@ extern "C" {
     
     /*!
      @abstract                              "Opens an input file, pointed to by InputSwitch in CMD and stores the resulting pointer in BitI->File".
-     @param             BitI                "Pointer to BitInput".
+     @param             BitI                "Pointer to instance of BitInput".
      @param             CMD                 "Pointer to CommandLineOptions".
      @param             InputSwitch         "Number of the switch that contains the Input file"
      */
@@ -244,7 +244,7 @@ extern "C" {
     
     /*!
      @abstract                         "Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitO->File".
-     @param             BitO                "Pointer to BitOutput".
+     @param             BitO                "Pointer to instance of BitOutput".
      @param             CMD                 "Pointer to CommandLineOptions".
      @param             OutputSwitch        "Number of the switch that contains the Output file"
      */
@@ -253,7 +253,7 @@ extern "C" {
     /*!
      @abstract                              "Manages InputBuffer and hands out the requested bits".
      @remark                                "DO NOT try reading backwards, it will not work. for that use SkipBits()".
-     @param             BitI                "Pointer to BitInput".
+     @param             BitI                "Pointer to instance of BitInput".
      @param             Bits2Read           "Number of bits to read".
      @param             ReadFromMSB         "Should ReadBits start at the most significant bit in this byte?"
      */
@@ -261,7 +261,7 @@ extern "C" {
     
     /*!
      @abstract                              "Shows the next X bits, without recording it as a read".
-     @param             BitI                "Pointer to BitInput".
+     @param             BitI                "Pointer to instance of BitInput".
      @param             Bits2Peek           "Number of bits to peek".
      @param             ReadFromMSB         "Should PeekBits start at the most significant bit in this byte?"
      */
@@ -270,7 +270,7 @@ extern "C" {
     /*!
      @abstract                              "Reads and Decodes unary/RICE encoded data from BitInput stream".
      @return                                "Returns the count of bits aka the value encoded by the encoder".
-     @param             BitI                "Pointer to BitInput".
+     @param             BitI                "Pointer to instance of BitInput".
      @param             Truncated           "Shoould the StopBit be included in the count?"
      @param             StopBit             "MUST be a 0 or a 1. none of this funny business about how true > 0".
      */
@@ -279,7 +279,7 @@ extern "C" {
     /*!
      @abstract                              "Reads data encoded as Exponential-Golomb aka Elias Gamma".
      @return                                "Returns the decoded value of the Elias/Golomb code".
-     @param             BitI                "Pointer to BitInput".
+     @param             BitI                "Pointer to instance of BitInput".
      @param             IsSigned            "Should it be read as signed or unsigneed?".
      */
     int64_t             ReadExpGolomb(BitInput *BitI, const bool IsSigned);
@@ -287,14 +287,14 @@ extern "C" {
     /*!
      @abstract                              "Seeks Forwards and backwards in BitInput"
      @remark                                "To seek backwards just use a negative number, to seek forwards positive".
-     @param             BitI                "Pointer to BitInput".
+     @param             BitI                "Pointer to instance of BitInput".
      @param             Bits2Skip           "The number of bits to skip".
      */
     void                SkipBits(BitInput *BitI, const int64_t Bits2Skip);
     
     /*!
      @abstract                              "Pads output buffer so it is aligned to whatever number of bytes you want".
-     @param             BitI                "Pointer to BitInput".
+     @param             BitI                "Pointer to instance of BitInput".
      @param             BytesOfAlignment    "Align BitI to X byte boundary".
      */
     void                AlignInput(BitInput *BitI, const uint8_t BytesOfAlignment);
@@ -314,7 +314,7 @@ extern "C" {
     /*!
      @abstract                              "Deallocates BitInput".
      @remark                                "For use when changing files, or exiting the program".
-     @param             BitI                "Pointer to BitInput".
+     @param             BitI                "Pointer to instance of BitInput".
      */
     void                CloseBitInput(BitInput *BitI);
     
@@ -332,14 +332,14 @@ extern "C" {
     
     /*!
      @abstract                              "Aligns bits for multi-byte alignment".
-     @param             BitO                "Pointer to BitOutput".
+     @param             BitO                "Pointer to instance of BitOutput".
      @param             BytesOfAlignment    "Align BitI to X byte boundary".
      */
     void                AlignOutput(BitOutput *BitO, const uint8_t BytesOfAlignment);
     
     /*!
      @abstract                              "Writes bits to BitOutput->File".
-     @param             BitO                "Pointer to BitOutput".
+     @param             BitO                "Pointer to instance of BitOutput".
      @param             Data2Write          "Is the actual data to write out".
      @param             NumBits             "Is the number of bits to write".
      */
@@ -357,7 +357,7 @@ extern "C" {
     
     /*!
      @abstract                              "Writes data encoded as Exponential-Golomb aka Elias Gamma codes to BitO".
-     @param             BitO                "Pointer to BitOutput".
+     @param             BitO                "Pointer to instance of BitOutput".
      @param             IsSigned            "Is Data2Write signed?".
      @param             Data2Write          "The actual data to write to the output file".
      @param             WriteFromMSB        "Should Data2Write be written from the MSB or the LSB?".
@@ -367,7 +367,7 @@ extern "C" {
     /*!
      @abstract                              "Deallocates BitOutput"
      @remark                                "For use when changing files, or exiting the program".
-     @param             BitO                "Pointer to BitOutput".
+     @param             BitO                "Pointer to instance of BitOutput".
      */
     void                CloseBitOutput(BitOutput *BitO);
     
@@ -421,7 +421,7 @@ extern "C" {
     /*!
      @abstract                              "Reads raw UUID/GUID from the bitstream".
      @remark                                "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
-     @param             BitI                "Pointer to BitInput".
+     @param             BitI                "Pointer to instance of BitInput".
      @param             UUIDString          "Character array to read UUID string into".
      */
     void                ReadUUID(BitInput *BitI, uint8_t *UUIDString);
@@ -436,7 +436,7 @@ extern "C" {
     /*!
      @abstract                              "Write UUID/GUID string as hyphen-less blob".
      @remark                                "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
-     @param             BitO                "Pointer to BitOutput".
+     @param             BitO                "Pointer to instance of BitOutput".
      @param             UUIDString          "UUID string to write to the file as a binary blob, aka remove hyphens and null terminating char".
      */
     uint8_t             WriteUUID(BitOutput *BitO, const uint8_t *UUIDString);
@@ -458,66 +458,101 @@ extern "C" {
     
     /*!
      @abstract                              "Frees CommandLineOptions instance".
+     @param             CMD                 "Pointer to instance of CommandLineOptions".
      */
     void                CloseCommandLineOptions(CommandLineOptions *CMD);
     
     /*!
-     @abstract                              "Initalizes a CommandLineSwitch instance".
-     */
-    CommandLineSwitch  *InitCommandLineSwitch(void);
-    
-    /*!
      @abstract                              "Initalizes NumSwitches CommandLineSwitch's, and attaches them to CommandLineOptions".
+     @param             CMD                 "Pointer to instance of CommandLineOptions".
+     @param             NumSwitches         "The number of switches to initalize and attach to CommandLineOptions pointer CMD"
      */
     CommandLineOptions *InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches);
     
     /*!
-     @abstract                              "Frees CommandLineSwitch instance".
-     */
-    void                CloseCommandLineSwitch(CommandLineSwitch *Switch);
-    
-    /*!
-     @abstract          "Sets the name of the program".
+     @abstract                              "Sets the name of the program".
+     @param             CMD                 "Pointer to instance of CommandLineOptions".
+     @param             Name                "Pointer to a C string contining the name of the program you're building"
      */
     void                SetCMDName(CommandLineOptions *CMD, const char *Name);
     
     /*!
-     @abstract          "Sets the description of the program".
+     @abstract                              "Sets the description of the program".
+     @param             CMD                 "Pointer to instance of CommandLineOptions".
+     @param             Description         "Description of what the program does".
      */
     void                SetCMDDescription(CommandLineOptions *CMD, const char *Description);
     
     /*!
-     @abstract          "Sets the author of the program".
+     @abstract                              "Sets the author of the program".
+     @param             CMD                 "Pointer to instance of CommandLineOptions".
+     @param             Author              "Author of this program".
      */
     void                SetCMDAuthor(CommandLineOptions *CMD, const char *Author);
     
     /*!
-     @abstract          "Sets the copyright years of the program".
+     @abstract                              "Sets the copyright years of the program".
+     @param             CMD                 "Pointer to instance of CommandLineOptions".
+     @param             Copyright           "The starting year this program was written dash (CURRENTYEAR)".
      */
     void                SetCMDCopyright(CommandLineOptions *CMD, const char *Copyright);
     
     /*!
-     @abstract          "Sets the license of the program".
+     @abstract                              "Sets the license of the program".
+     @param             CMD                 "Pointer to instance of CommandLineOptions".
+     @param             License             "The license this program is licensed under".
      */
     void                SetCMDLicense(CommandLineOptions *CMD, const char *License);
     
+    /*!
+     @abstract                              "Sets SwitchNum's flag in the CommandLineOptions instance pointed by CMD"
+     @param             CMD                 "Pointer to instance of CommandLineOptions".
+     @param             SwitchNum           "The switch to set".
+     @param             Flag                "The flag to identify an option with".
+     */
     void                SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag);
     
+    /*!
+     @param             CMD                 "Pointer to instance of CommandLineOptions".
+     @param             SwitchNum           "The switch to set".
+     @param             Description         "Pointer to a C string containing the description of what this program does"
+     */
     void                SetSwitchDescription(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Description);
     
+    /*!
+     @param             CMD                 "Pointer to instance of CommandLineOptions".
+     @param             SwitchNum           "The switch to set".
+     @param             IsSwitchResultless  "Are you expecting this switch to contain data, or are you just testing for it's presence?".
+     */
     void                SetSwitchResultStatus(CommandLineOptions *CMD, uint64_t SwitchNum, bool IsSwitchResultless);
     
+    /*!
+     @abstract                              "Gets the data contained in Switch->Result"
+     @return                                "Returns the data after the switch, if the switch is resultless it will return 0"
+     @param             CMD                 "Pointer to instance of CommandLineOptions".
+     @param             SwitchNum           "The switch to check".
+     */
     const char         *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum);
     
     /*!
      @abstract                              "Tells if a certain switch has been found".
      @param             CMD                 "Pointer to CommandLineOptions instance".
-     @param             Switch              "The switch to check".
+     @param             SwitchNum           "The switch to check".
      */
-    bool                IsSwitchPresent(CommandLineOptions *CMD, uint64_t Switch);
+    bool                IsSwitchPresent(CommandLineOptions *CMD, uint64_t SwitchNum);
     
+    /*!
+     @abstract                              "Gets the size of the buffer in an instance of BitInput".
+     @return                                "Returns the size of BitInput->Buffer"
+     @param             BitI                "Pointer to instance of BitInput".
+     */
     size_t              GetBitInputBufferSize(BitInput *BitI);
     
+    /*!
+     @abstract                              "Gets the size of the buffer in an instance of BitOutput".
+     @return                                "Returns the size of BitOutput->Buffer"
+     @param             BitO                "Pointer to instance of BitOutput".
+     */
     size_t              GetBitOutputBufferSize(BitOutput *BitO);
     
 #ifdef __cplusplus
