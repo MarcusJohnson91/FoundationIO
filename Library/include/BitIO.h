@@ -375,7 +375,7 @@ extern "C" {
      @abstract                              "Generates CRC from data".
      @param             Data2CRC            "Pointer to a data buffer containing data to run the CRC algorithm over".
      @param             Data2CRCSize        "Size of the data chunk to generate the CRC for".
-     @param             ReciprocalPoly      "The Polynomial in Reciprocal representation".
+     @param             ReciprocalPoly      "The Polynomial in Normal representation".
      @param             PolySize            "The size of the polynomial in bits".
      @param             PolyInit            "Initalization value".
      */
