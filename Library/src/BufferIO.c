@@ -442,7 +442,7 @@ extern "C" {
     void WriteBits(BitOutput *BitO, const uint64_t Data2Write, uint8_t NumBits, const bool WriteFromMSB) {
         // FIXME: WriteBits currently copies NumBits bits to the file, even if the input is shorter than that. we need to prepend 0 bits if that's the case
         
-        uint8_t Bits2Write2BufferByte, Bits2ShiftMask, Mask, Bits2Write;
+        uint8_t Bits2Write2BufferByte, Bits2ShiftMask, Mask;
         
         if (BitO->BitsAvailable < NumBits) {
             fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
