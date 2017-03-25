@@ -11,10 +11,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#pragma once
+
 #ifndef LIBBITIO_BITIO_H
 #define LIBBITIO_BITIO_H
-
-#pragma once
 
 #ifdef __cplusplus
 extern "C" {
