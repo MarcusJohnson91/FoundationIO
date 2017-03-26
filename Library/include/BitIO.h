@@ -120,7 +120,7 @@ extern "C" {
      @remark                                "Does not have sub-byte precision".
      @return                                "Converts the number of bytes to the number of bits".
      */
-    uint64_t            Bytes2Bits(const uint64_t Bytes);
+    int64_t             Bytes2Bits(const int64_t Bytes);
     
     /*!
      @abstract                              "Computes the number of bits until the next byte".
@@ -206,9 +206,10 @@ extern "C" {
     
     /*!
      @abstract                              "Finds the highest set bit in an int".
+     @remark                                "Will NOT WORK WITH SIGNED INTS. it will ALWAYS return the sign bit".
      @return                                "Returns the position of the highest set bit".
      */
-    uint8_t             FindHighestBitSet(const uint64_t Integer2Search);
+    uint8_t             FindHighestBitSet(const uint64_t UnsignedInt2Search);
     
     /*!
      @abstract                              "Determins the endian-ness of the current system at runtime".
