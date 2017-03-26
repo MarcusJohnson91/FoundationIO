@@ -278,7 +278,7 @@ extern "C" {
             SetSwitchDescription(CMD, CMD->NumSwitches, "Prints all the command line options\n");
             SetSwitchResultStatus(CMD, CMD->NumSwitches, true);
             
-            for (uint8_t Argument = 0; Argument < argc; Argument++) {
+            for (uint8_t Argument = 1; Argument < argc; Argument++) { // the executable path is skipped over
                 for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
                     char *SingleDash = calloc(strlen(CMD->Switch[Switch]->Flag + 2), 1);
                     snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch]->Flag);
