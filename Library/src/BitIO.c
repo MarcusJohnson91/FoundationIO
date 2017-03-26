@@ -92,7 +92,6 @@ extern "C" {
      @constant ProgramDescription      "The description of the program when the help is printed".
      @constant AuthorCopyrightLicense  "The author, copyright years, and license of the program, or anything else you want printed".
      @constant Switch                  "A pointer to an array of CLSwitch instances containing the properties of the switches".
-     TODO: Add functions to modify this so it can be private
      */
     typedef struct CommandLineOptions {
         size_t               NumSwitches;
@@ -109,7 +108,7 @@ extern "C" {
         return ((Data2Swap & 0xFF00) >> 8) | ((Data2Swap & 0x00FF) << 8);
     }
     
-    uint32_t SwapEndian32(const uint32_t Data2Swap) { // 0x0000011C, 0xC1010000
+    uint32_t SwapEndian32(const uint32_t Data2Swap) {
         return ((Data2Swap & 0xFF000000) >> 24) | ((Data2Swap & 0x00FF0000) >> 8) | ((Data2Swap & 0x0000FF00) << 8) | ((Data2Swap & 0x000000FF) << 24);
     }
     
@@ -240,15 +239,6 @@ extern "C" {
         return BitO->SystemEndian;
     }
     
-    void DisplayCMDHelp(CommandLineOptions *CMD) {
-        printf("%s by %s ©%s: %s, Released under the %s license\n\n", CMD->Name, CMD->Author, CMD->Copyright, CMD->Description, CMD->License);
-        printf("Options:\n");
-        for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
-            printf("%s\t", CMD->Switch[Option]->Flag);
-            printf("%s\n", CMD->Switch[Option]->SwitchDescription);
-        }
-    }
-    
     CommandLineOptions *InitCommandLineOptions(void) {
         CommandLineOptions *CMD = calloc(1, sizeof(CommandLineOptions));
         return CMD;
@@ -265,6 +255,15 @@ extern "C" {
     void AddCommandLineSwitch(CommandLineOptions *CMD) {
         CMD->NumSwitches += 1;
         CMD->Switch[CMD->NumSwitches] = calloc(1, sizeof(CommandLineSwitch));
+    }
+    
+    void DisplayCMDHelp(CommandLineOptions *CMD) {
+        printf("%s by %s ©%s: %s, Released under the %s license\n\n", CMD->Name, CMD->Author, CMD->Copyright, CMD->Description, CMD->License);
+        printf("Options:\n");
+        for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
+            printf("%s\t", CMD->Switch[Option]->Flag);
+            printf("%s\n", CMD->Switch[Option]->SwitchDescription);
+        }
     }
     
     void ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]) {
@@ -296,7 +295,7 @@ extern "C" {
                         } else {
                             CMD->Switch[Switch]->SwitchFound = true;
                             if (CMD->Switch[Switch]->Resultless == false) {
-                                char *SwitchResult = calloc(1, sizeof(BitIOStringSize));
+                                char *SwitchResult = calloc(1, strlen(argv[Argument] - strlen(CMD->Switch[Switch])));
                                 snprintf(SwitchResult, BitIOStringSize, "%s", argv[Argument + 1]);
                                 CMD->Switch[Switch]->SwitchResult = SwitchResult;
                             }
@@ -305,6 +304,16 @@ extern "C" {
                 }
             }
         }
+    }
+    
+    BitInput *InitBitInput(void) {
+        BitInput *BitI = calloc(1, sizeof(BitInput));
+        return BitI;
+    }
+    
+    BitOutput *InitBitOutput(void) {
+        BitOutput *BitO = calloc(1, sizeof(BitOutput));
+        return BitO;
     }
     
     void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, const uint8_t InputSwitch) {
@@ -379,7 +388,7 @@ extern "C" {
         free(CMD);
     }
     
-    void UpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) { // INTERNAL ONLY, // You assume that there are 0 bits left.
+    void UpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) {
         uint64_t Bytes2Read = 0, BytesRead = 0;
         fseek(BitI->File, RelativeOffsetInBytes, SEEK_CUR);
         BitI->FilePosition = ftell(BitI->File);
@@ -391,7 +400,7 @@ extern "C" {
             snprintf(ErrorDescription, BitIOStringSize, "Supposed to read %llu bytes, but read %llu\n", Bytes2Read, BytesRead);
             Log(LOG_WARNING, "libBitIO", "UpdateInputBuffer", ErrorDescription);
         }
-        uint64_t NEWBitsUnavailable = BitI->BitsUnavailable % 8; // FIXME: This assumes UpdateBuffer was called with at most 7 unread bits...
+        uint64_t NEWBitsUnavailable = BitI->BitsUnavailable % 8; // FIXME: This assumes UpdateBuffer was called with at most 7 unused bits in the buffer...
         
         BitI->BitsUnavailable = NEWBitsUnavailable;
         BitI->BitsAvailable   = Bytes2Bits(BytesRead);
@@ -487,36 +496,12 @@ extern "C" {
         }
     }
     
-    void AlignInput(BitInput *BitI, const uint8_t BytesOfAlignment) {
-        uint8_t Bits2Align = BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
-        
-        if (Bits2Align != 0) {
-            BitI->BitsAvailable   -= Bits2Align;
-            BitI->BitsUnavailable += Bits2Align;
-        }
-    }
-    
-    BitInput *InitBitInput(void) {
-        BitInput *BitI = calloc(1, sizeof(BitInput));
-        return BitI;
-    }
-    
     bool IsInputStreamByteAligned(BitInput *BitI, const uint8_t BytesOfAlignment) {
         if ((BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
             return true;
         } else {
             return false;
         }
-    }
-    
-    void CloseBitInput(BitInput *BitI) {
-        fclose(BitI->File);
-        free(BitI);
-    }
-    
-    BitOutput *InitBitOutput(void) {
-        BitOutput *BitO = calloc(1, sizeof(BitOutput));
-        return BitO;
     }
     
     bool IsOutputStreamByteAligned(BitOutput *BitO, const uint8_t BytesOfAlignment) {
@@ -527,12 +512,29 @@ extern "C" {
         }
     }
     
+    void AlignInput(BitInput *BitI, const uint8_t BytesOfAlignment) {
+        uint8_t Bits2Align = BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
+        
+        if (Bits2Align != 0) {
+            BitI->BitsAvailable   -= Bits2Align;
+            BitI->BitsUnavailable += Bits2Align;
+        }
+    }
+    
     void AlignOutput(BitOutput *BitO, const uint8_t BytesOfAlignment) {
         uint8_t Bits2Align = BitO->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
         if (Bits2Align != 0) {
             BitO->BitsAvailable    -= Bits2Align;
             BitO->BitsUnavailable  += Bits2Align;
         }
+    }
+    
+    size_t GetBitInputBufferSize(BitInput *BitI) {
+        return sizeof(BitI->Buffer);
+    }
+    
+    size_t GetBitOutputBufferSize(BitOutput *BitO) {
+        return sizeof(BitO->Buffer);
     }
     
     void WriteBits(BitOutput *BitO, const uint64_t Data2Write, uint8_t NumBits, const bool WriteFromMSB) {
@@ -553,7 +555,7 @@ extern "C" {
         while (NumBits > 0) {
             Bits2Write2BufferByte  = 8 - (BitO->BitsAvailable % 8); // extract 5 bits from the buffer
             Bits2ShiftMask         = WriteFromMSB ? BitO->BitsAvailable % 8 : 0;
-            Mask                   = Power2Mask(Bits2Write2BufferByte) << Bits2ShiftMask; // 0x1F
+            Mask                   = Power2Mask(Bits2Write2BufferByte) << Bits2ShiftMask;
             BitO->Buffer[Bits2Bytes(BitO->BitsAvailable, false)] = Data2Write & Mask;
             NumBits               -= Bits2Write2BufferByte;
             BitO->BitsAvailable   -= Bits2Write2BufferByte;
@@ -585,6 +587,11 @@ extern "C" {
                 WriteBits(BitO, Data2Write + 1, NumBits + 1, WriteFromMSB);
             }
         }
+    }
+    
+    void CloseBitInput(BitInput *BitI) {
+        fclose(BitI->File);
+        free(BitI);
     }
     
     void FlushOutputBuffer(BitOutput *BitO, const size_t Bytes2Flush) {
@@ -757,8 +764,7 @@ extern "C" {
             return EXIT_SUCCESS;
         } else {
             for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDSize - 1; UUIDByte++) {
-                if ((UUIDByte != 4) && (UUIDByte != 7) && (UUIDByte != 10) && (UUIDByte != 13) && (UUIDByte != 20)) {
-                    // Character 21 is the NULL terminator, the rest are the hyphens.
+                if ((UUIDByte != 4) && (UUIDByte != 7) && (UUIDByte != 10) && (UUIDByte != 13) && (UUIDByte != 20)) { // Bullshit bytes
                     WriteBits(BitO, UUIDString[UUIDByte], 8, true);
                 }
             }
@@ -776,14 +782,6 @@ extern "C" {
             }
         }
         return UUIDsMatch;
-    }
-    
-    size_t GetBitInputBufferSize(BitInput *BitI) {
-        return sizeof(BitI->Buffer);
-    }
-    
-    size_t GetBitOutputBufferSize(BitOutput *BitO) {
-        return sizeof(BitO->Buffer);
     }
     
 #ifdef __cplusplus
