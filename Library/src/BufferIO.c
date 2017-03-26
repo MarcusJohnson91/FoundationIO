@@ -41,7 +41,7 @@ extern "C" {
         size_t       FilePosition;
         size_t       BitsUnavailable;
         size_t       BitsAvailable;
-        unsigned     SystemEndian:2;
+        uint8_t      SystemEndian:2;
         uint8_t      Buffer[BitInputBufferSize];
     } BitInput;
     
@@ -59,7 +59,7 @@ extern "C" {
         FILE        *File;
         size_t       BitsUnavailable;
         size_t       BitsAvailable;
-        uint8_t      SystemEndian;
+        uint8_t      SystemEndian:2;
         uint8_t      Buffer[BitOutputBufferSize];
         FILE        *LogFile;
     } BitOutput;
@@ -230,6 +230,14 @@ extern "C" {
         return SystemEndian;
     }
     
+    uint8_t GetBitInputEndian(BitInput *BitI) {
+        return BitI->SystemEndian;
+    }
+    
+    uint8_t GetBitOutputEndian(BitOutput *BitO) {
+        return BitO->SystemEndian;
+    }
+    
     void DisplayCMDHelp(const CommandLineOptions *CMD) {
         printf("%s by %s ©%s: %s, Released under the %s license\n\n", CMD->Name, CMD->Author, CMD->Copyright, CMD->Description, CMD->License);
         printf("Options:\n");
@@ -277,12 +285,14 @@ extern "C" {
         uint64_t BytesRead     = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
         BitI->BitsAvailable    = Bytes2Bits(BytesRead);
         BitI->BitsUnavailable  = 0;
+        DetectSystemEndian();
     }
     
     void OpenCMDOutputFile(BitOutput *BitO, const CommandLineOptions *CMD, const uint8_t OutputSwitch) {
         BitO->File             = fopen(CMD->Switch[OutputSwitch]->SwitchResult, "rb");
         BitO->BitsAvailable    = BitOutputBufferSizeInBits;
         BitO->BitsUnavailable  = 0;
+        DetectSystemEndian();
     }
     
     void UpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) { // INTERNAL ONLY, // You assume that there are 0 bits left.

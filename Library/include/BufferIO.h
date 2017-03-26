@@ -212,22 +212,25 @@ extern "C" {
     uint8_t             FindHighestBitSet(const uint64_t UnsignedInt2Search);
     
     /*!
-     @abstract                              "Determins the endian-ness of the current system at runtime".
-     @return                                'An int matching @enum Endian, defining the endian of the running system'.
+     @abstract                              "The BitOutput type was made private, this function was added so users can still get this information".
+     @return                                "Returns the endian of the running system".
+     @param             BitI                "Pointer to instance of BitInput".
      */
-    uint8_t             DetectSystemEndian(void);
+    uint8_t             GetBitInputEndian(BitInput *BitI);
     
     /*!
-     @abstract                              "Loops over the user's provided CLSwitches to print the help information.".
-     @remark                                "Command Line Switches are case insensitive".
-     @param             CMD                 "Pointer to CommandLineOptions".
+     @abstract                              "The BitOutput type was made private, this function was added so users can still get this information".
+     @return                                "Returns the endian of the running system".
+     @param             BitO                "Pointer to instance of BitOutput".
      */
-    void                DisplayCMDHelp(const CommandLineOptions *CMD);
+    uint8_t             GetBitOutputEndian(BitOutput *BitO);
     
     /*!
      @abstract                              "Parses argv for switches matching the ones contained in CMD".
      @remark                                "Automatically supports `-h`, `--h`, and `/?`".
      @param             CMD                 "Pointer to CommandLineOptions".
+     @param             argc                "Main's argc, for the number of arguments entered".
+     @param             argv                "Main's argv, for the actual arguments the user has entered".
      */
     void                ParseCommandLineArguments(const CommandLineOptions *CMD, int argc, const char *argv[]);
     
@@ -240,7 +243,7 @@ extern "C" {
     void                OpenCMDInputFile(BitInput *BitI, const CommandLineOptions *CMD, const uint8_t InputSwitch);
     
     /*!
-     @abstract                         "Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitO->File".
+     @abstract                              "Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitO->File".
      @param             BitO                "Pointer to instance of BitOutput".
      @param             CMD                 "Pointer to CommandLineOptions".
      @param             OutputSwitch        "Number of the switch that contains the Output file"
@@ -402,7 +405,7 @@ extern "C" {
      @return                                "Returns whether the input data matched the provided checksum or not".
      @param             Data                "Pointer to the data to generate the Adler hash from".
      @param             DataSize            "Size of data".
-     @param             EmbeddedAdler32     "Embedded Adler32 to compare the generated one to.".
+     @param             EmbeddedAdler32     "Embedded Adler32 to compare the generated one to".
      */
     bool                VerifyAdler32(const uint8_t *Data, const size_t DataSize, const uint32_t EmbeddedAdler32);
     
