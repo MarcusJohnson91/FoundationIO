@@ -126,7 +126,7 @@ extern "C" {
         }
     }
     
-    uint64_t Bytes2Bits(const uint64_t Bytes) {
+    int64_t Bytes2Bits(const int64_t Bytes) {
         return (Bytes * 8);
     }
     
@@ -164,6 +164,9 @@ extern "C" {
     
     uint8_t CountBitsSet(const uint64_t Bits2Count) {
         uint8_t DataBit = 0, BitCount = 0;
+        if (Bits2Count == 0) {
+            return 0;
+        }
         for (uint8_t Bit = 0; Bit < 64; Bit++) {
             DataBit = (Bits2Count & (1 << Bit)) >> Bit;
             if (DataBit == 1) {
@@ -174,8 +177,9 @@ extern "C" {
     }
     
     uint64_t Power2Mask(const uint8_t Exponent) {
-        if ((Exponent <= 0) || (Exponent > 64)) {
-            return EXIT_FAILURE;
+        if (Exponent <= 0 || Exponent > 64) {
+            Log(LOG_ERR, "libBitIO", "Power2Mask", "Exponent %d is out of bounds\n", Exponent);
+            return 0;
         } else {
             if (Exponent == 1) {
                 return 1;
@@ -196,13 +200,16 @@ extern "C" {
     }
     
     bool IsOdd(const int64_t Number2Check) {
-        return Number2Check % 2 == 0 ? false : true;
+        return Number2Check % 2 == 0 ? true : false;
     }
     
-    uint8_t  FindHighestBitSet(const uint64_t Integer2Search) {
-        uint8_t HighestBitSet = 0;
-        for (uint8_t Bit = sizeof(Integer2Search); Bit > 0; Bit--) {
-            if (((Integer2Search & Bit) >> (sizeof(Integer2Search) - Bit)) == 1) {
+    uint8_t  FindHighestBitSet(const uint64_t UnsignedInt2Search) {
+        uint8_t  HighestBitSet = 0;
+        uint64_t Shift = 0ULL;
+        
+        for (uint8_t Bit = 64; Bit > 0; Bit--) {
+            Shift = ((1ULL << Bit) - 1);
+            if (((UnsignedInt2Search & Shift) >> Shift) == 1) {
                 HighestBitSet = Bit;
                 break;
             }
