@@ -87,6 +87,7 @@ extern "C" {
      @abstract                         "Type to contain a variable amount of CLSwitches".
      @remark                           "The switches are zero indexed, and @NumSwitches is NOT zero indexed, so count from 1".
      @constant NumSwitches             "The number of switches".
+     @constant MinSwitches             "The minimum number of switches this program requires to run".
      @constant ProgramName             "The name you want output when the help is printed".
      @constant ProgramDescription      "The description of the program when the help is printed".
      @constant AuthorCopyrightLicense  "The author, copyright years, and license of the program, or anything else you want printed".
@@ -95,6 +96,7 @@ extern "C" {
      */
     typedef struct CommandLineOptions {
         size_t               NumSwitches;
+        uint64_t             MinSwitches;
         const char          *Name;
         const char          *Description;
         const char          *Author;
@@ -238,7 +240,7 @@ extern "C" {
         return BitO->SystemEndian;
     }
     
-    void DisplayCMDHelp(const CommandLineOptions *CMD) {
+    void DisplayCMDHelp(CommandLineOptions *CMD) {
         printf("%s by %s ©%s: %s, Released under the %s license\n\n", CMD->Name, CMD->Author, CMD->Copyright, CMD->Description, CMD->License);
         printf("Options:\n");
         for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
@@ -247,35 +249,52 @@ extern "C" {
         }
     }
     
-    void ParseCommandLineArguments(const CommandLineOptions *CMD, int argc, const char *argv[]) {
-        // TODO: Scan for equals signs as well, if found, after after the equal sign is the result, everything before is the switch.
-        for (uint8_t Argument = 0; Argument < argc; Argument++) {
-            for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
-                if (strcasecmp("-h", argv[Argument]) == 0 || strcasecmp("--h", argv[Argument]) == 0 || strcasecmp("/?", argv[Argument]) == 0) {
-                    DisplayCMDHelp(CMD);
-                }
-                char *SingleDash = calloc(strlen(CMD->Switch[Switch]->Flag + 2), 1);
-                snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch]->Flag);
-                
-                char *DoubleDash = calloc(strlen(CMD->Switch[Switch]->Flag + 3), 1);
-                snprintf(DoubleDash, sizeof(DoubleDash), "--%s\n", CMD->Switch[Switch]->Flag);
-                
-                char *Slash      = calloc(strlen(CMD->Switch[Switch]->Flag + 2), 1);
-                snprintf(Slash, sizeof(Slash), "/%s\n", CMD->Switch[Switch]->Flag);
-                
-                if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
-                    CMD->Switch[Switch]->SwitchFound = true;
-                    if (CMD->Switch[Switch]->Resultless == false) {
-                        char *SwitchResult = calloc(1, sizeof(BitIOStringSize));
-                        snprintf(SwitchResult, BitIOStringSize, "%s", argv[Argument + 1]);
-                        CMD->Switch[Switch]->SwitchResult = SwitchResult;
+    void AddCommandLineSwitch(CommandLineOptions *CMD) {
+        CMD->NumSwitches += 1;
+        CMD->Switch[CMD->NumSwitches] = calloc(1, sizeof(CommandLineSwitch));
+    }
+    
+    void ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]) {
+        // TODO: Scan for equals signs as well, if found, after the equal sign is the result, everything before is the switch.
+        // TODO: add support for generating the short versions of the arguments.
+        if (CMD->NumSwitches < CMD->MinSwitches) {
+            DisplayCMDHelp(CMD);
+        } else {
+            AddCommandLineSwitch(CMD);
+            
+            SetSwitchFlag(CMD, CMD->NumSwitches, "Help");
+            SetSwitchDescription(CMD, CMD->NumSwitches, "Prints all the command line options\n");
+            SetSwitchResultStatus(CMD, CMD->NumSwitches, true);
+            
+            for (uint8_t Argument = 0; Argument < argc; Argument++) {
+                for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
+                    char *SingleDash = calloc(strlen(CMD->Switch[Switch]->Flag + 2), 1);
+                    snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch]->Flag);
+                    
+                    char *DoubleDash = calloc(strlen(CMD->Switch[Switch]->Flag + 3), 1);
+                    snprintf(DoubleDash, sizeof(DoubleDash), "--%s\n", CMD->Switch[Switch]->Flag);
+                    
+                    char *Slash      = calloc(strlen(CMD->Switch[Switch]->Flag + 2), 1);
+                    snprintf(Slash, sizeof(Slash), "/%s\n", CMD->Switch[Switch]->Flag);
+                    
+                    if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
+                        if (Argument == CMD->NumSwitches - 1) {
+                            DisplayCMDHelp(CMD);
+                        } else {
+                            CMD->Switch[Switch]->SwitchFound = true;
+                            if (CMD->Switch[Switch]->Resultless == false) {
+                                char *SwitchResult = calloc(1, sizeof(BitIOStringSize));
+                                snprintf(SwitchResult, BitIOStringSize, "%s", argv[Argument + 1]);
+                                CMD->Switch[Switch]->SwitchResult = SwitchResult;
+                            }
+                        }
                     }
                 }
             }
         }
     }
     
-    void OpenCMDInputFile(BitInput *BitI, const CommandLineOptions *CMD, const uint8_t InputSwitch) {
+    void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, const uint8_t InputSwitch) {
         BitI->File             = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
         fseek(BitI->File, 0, SEEK_END);
         BitI->FileSize = (uint64_t)ftell(BitI->File);
@@ -288,7 +307,7 @@ extern "C" {
         DetectSystemEndian();
     }
     
-    void OpenCMDOutputFile(BitOutput *BitO, const CommandLineOptions *CMD, const uint8_t OutputSwitch) {
+    void OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, const uint8_t OutputSwitch) {
         BitO->File             = fopen(CMD->Switch[OutputSwitch]->SwitchResult, "rb");
         BitO->BitsAvailable    = BitOutputBufferSizeInBits;
         BitO->BitsUnavailable  = 0;
@@ -707,7 +726,7 @@ extern "C" {
     }
     
     CommandLineOptions *InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches) {
-        CMD->NumSwitches = NumSwitches;
+        CMD->NumSwitches += NumSwitches;
         for (uint64_t Switch2Init = 0; Switch2Init < NumSwitches; Switch2Init++) {
             CMD->Switch[Switch2Init] = calloc(1, sizeof(CommandLineSwitch));
         }

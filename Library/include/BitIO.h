@@ -227,12 +227,12 @@ extern "C" {
     
     /*!
      @abstract                              "Parses argv for switches matching the ones contained in CMD".
-     @remark                                "Automatically supports `-h`, `--h`, and `/?`".
+     @remark                                "Automatically supports `-h`, `--h`, and `/?`, and it's stored in the last element that we inited for you".
      @param             CMD                 "Pointer to CommandLineOptions".
      @param             argc                "Main's argc, for the number of arguments entered".
      @param             argv                "Main's argv, for the actual arguments the user has entered".
      */
-    void                ParseCommandLineArguments(const CommandLineOptions *CMD, int argc, const char *argv[]);
+    void                ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]);
     
     /*!
      @abstract                              "Opens an input file, pointed to by InputSwitch in CMD and stores the resulting pointer in BitI->File".
@@ -240,7 +240,7 @@ extern "C" {
      @param             CMD                 "Pointer to CommandLineOptions".
      @param             InputSwitch         "Number of the switch that contains the Input file"
      */
-    void                OpenCMDInputFile(BitInput *BitI, const CommandLineOptions *CMD, const uint8_t InputSwitch);
+    void                OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, const uint8_t InputSwitch);
     
     /*!
      @abstract                              "Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitO->File".
@@ -248,7 +248,7 @@ extern "C" {
      @param             CMD                 "Pointer to CommandLineOptions".
      @param             OutputSwitch        "Number of the switch that contains the Output file"
      */
-    void                OpenCMDOutputFile(BitOutput *BitO, const CommandLineOptions *CMD, const uint8_t OutputSwitch);
+    void                OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, const uint8_t OutputSwitch);
     
     /*!
      @abstract                              "Manages InputBuffer and hands out the requested bits".
