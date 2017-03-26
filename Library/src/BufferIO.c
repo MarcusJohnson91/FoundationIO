@@ -103,11 +103,6 @@ extern "C" {
         CommandLineSwitch  **Switch;
     } CommandLineOptions;
     
-    typedef struct LinkedList {
-        uint16_t           Value;
-        struct LinkedList *Next;
-    } LinkedList;
-    
     uint16_t SwapEndian16(const uint16_t Data2Swap) {
         return ((Data2Swap & 0xFF00) >> 8) | ((Data2Swap & 0x00FF) << 8);
     }
