@@ -249,6 +249,19 @@ extern "C" {
         }
     }
     
+    CommandLineOptions *InitCommandLineOptions(void) {
+        CommandLineOptions *CMD = calloc(1, sizeof(CommandLineOptions));
+        return CMD;
+    }
+    
+    CommandLineOptions *InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches) {
+        CMD->NumSwitches += NumSwitches;
+        for (uint64_t Switch2Init = 0; Switch2Init < NumSwitches; Switch2Init++) {
+            CMD->Switch[Switch2Init] = calloc(1, sizeof(CommandLineSwitch));
+        }
+        return CMD;
+    }
+    
     void AddCommandLineSwitch(CommandLineOptions *CMD) {
         CMD->NumSwitches += 1;
         CMD->Switch[CMD->NumSwitches] = calloc(1, sizeof(CommandLineSwitch));
@@ -312,6 +325,58 @@ extern "C" {
         BitO->BitsAvailable    = BitOutputBufferSizeInBits;
         BitO->BitsUnavailable  = 0;
         DetectSystemEndian();
+    }
+    
+    void SetCMDName(CommandLineOptions *CMD, const char *Name) {
+        CMD->Name = Name;
+    }
+    
+    void SetCMDDescription(CommandLineOptions *CMD, const char *Description) {
+        CMD->Description = Description;
+    }
+    
+    void SetCMDAuthor(CommandLineOptions *CMD, const char *Author) {
+        CMD->Author = Author;
+    }
+    
+    void SetCMDCopyright(CommandLineOptions *CMD, const char *Copyright) {
+        CMD->Copyright = Copyright;
+    }
+    
+    void SetCMDLicense(CommandLineOptions *CMD, const char *License) {
+        CMD->License = License;
+    }
+    
+    void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag) {
+        CMD->Switch[SwitchNum]->Flag = Flag;
+    }
+    
+    void SetSwitchDescription(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Description) {
+        CMD->Switch[SwitchNum]->SwitchDescription = Description;
+    }
+    
+    void SetSwitchResultStatus(CommandLineOptions *CMD, uint64_t SwitchNum, bool IsSwitchResultless) {
+        CMD->Switch[SwitchNum]->Resultless = IsSwitchResultless;
+    }
+    
+    const char *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum) {
+        size_t SwitchResultSize = strlen(CMD->Switch[SwitchNum]->SwitchResult);
+        if (SwitchResultSize == 0) {
+            return 0;
+        } else {
+            return CMD->Switch[SwitchNum]->SwitchResult;
+        }
+    }
+    
+    bool IsSwitchPresent(CommandLineOptions *CMD, uint64_t SwitchNum) {
+        return CMD->Switch[SwitchNum]->SwitchFound;
+    }
+    
+    void CloseCommandLineOptions(CommandLineOptions *CMD) {
+        for (uint64_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
+            free(CMD->Switch[Switch]);
+        }
+        free(CMD);
     }
     
     void UpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) { // INTERNAL ONLY, // You assume that there are 0 bits left.
@@ -711,71 +776,6 @@ extern "C" {
             }
         }
         return UUIDsMatch;
-    }
-    
-    CommandLineOptions *InitCommandLineOptions(void) {
-        CommandLineOptions *CMD = calloc(1, sizeof(CommandLineOptions));
-        return CMD;
-    }
-    
-    void CloseCommandLineOptions(CommandLineOptions *CMD) {
-        for (uint64_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
-            free(CMD->Switch[Switch]);
-        }
-        free(CMD);
-    }
-    
-    CommandLineOptions *InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches) {
-        CMD->NumSwitches += NumSwitches;
-        for (uint64_t Switch2Init = 0; Switch2Init < NumSwitches; Switch2Init++) {
-            CMD->Switch[Switch2Init] = calloc(1, sizeof(CommandLineSwitch));
-        }
-        return CMD;
-    }
-    
-    void SetCMDName(CommandLineOptions *CMD, const char *Name) {
-        CMD->Name = Name;
-    }
-    
-    void SetCMDDescription(CommandLineOptions *CMD, const char *Description) {
-        CMD->Description = Description;
-    }
-    
-    void SetCMDAuthor(CommandLineOptions *CMD, const char *Author) {
-        CMD->Author = Author;
-    }
-    
-    void SetCMDCopyright(CommandLineOptions *CMD, const char *Copyright) {
-        CMD->Copyright = Copyright;
-    }
-    
-    void SetCMDLicense(CommandLineOptions *CMD, const char *License) {
-        CMD->License = License;
-    }
-    
-    void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag) {
-        CMD->Switch[SwitchNum]->Flag = Flag;
-    }
-    
-    void SetSwitchDescription(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Description) {
-        CMD->Switch[SwitchNum]->SwitchDescription = Description;
-    }
-    
-    void SetSwitchResultStatus(CommandLineOptions *CMD, uint64_t SwitchNum, bool IsSwitchResultless) {
-        CMD->Switch[SwitchNum]->Resultless = IsSwitchResultless;
-    }
-    
-    const char *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum) {
-        size_t SwitchResultSize = strlen(CMD->Switch[SwitchNum]->SwitchResult);
-        if (SwitchResultSize == 0) {
-            return 0;
-        } else {
-            return CMD->Switch[SwitchNum]->SwitchResult;
-        }
-    }
-    
-    bool IsSwitchPresent(CommandLineOptions *CMD, uint64_t SwitchNum) {
-        return CMD->Switch[SwitchNum]->SwitchFound;
     }
     
     size_t GetBitInputBufferSize(BitInput *BitI) {
