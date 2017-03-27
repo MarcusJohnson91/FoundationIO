@@ -245,9 +245,10 @@ extern "C" {
     }
     
     CommandLineOptions *InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches) {
+        // CommandLineSwitch *Switch[NumSwitches] = calloc(NumSwitches, sizeof(CommandLineSwitch));
         CMD->NumSwitches += NumSwitches;
         for (uint64_t Switch2Init = 0; Switch2Init < NumSwitches; Switch2Init++) {
-            CMD->Switch[Switch2Init] = calloc(1, sizeof(CommandLineSwitch));
+            CMD->Switch[Switch2Init] = calloc(NumSwitches, sizeof(CommandLineSwitch));
         }
         return CMD;
     }
