@@ -468,7 +468,7 @@ extern "C" {
      @param             CMD                 "Pointer to instance of CommandLineOptions".
      @param             NumSwitches         "The number of switches to initalize and attach to CommandLineOptions pointer CMD"
      */
-    CommandLineOptions *InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches);
+    void                InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches);
     
     /*!
      @abstract                              "Sets the name of the program".
