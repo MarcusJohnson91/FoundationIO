@@ -506,6 +506,13 @@ extern "C" {
     void                SetCMDLicense(CommandLineOptions *CMD, const char *License);
     
     /*!
+     @abstract                              "What is the minimum number of switches your program needs to operate?".
+     @param             CMD                 "Pointer to instance of CommandLineOptions".
+     @param             MinSwitches         "The minimum number of switches".
+     */
+    void                SetCMDMinSwitches(CommandLineOptions *CMD, const uint64_t MinSwitches);
+    
+    /*!
      @abstract                              "Sets SwitchNum's flag in the CommandLineOptions instance pointed by CMD"
      @param             CMD                 "Pointer to instance of CommandLineOptions".
      @param             SwitchNum           "The switch to set".
