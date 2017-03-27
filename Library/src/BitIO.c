@@ -360,8 +360,8 @@ extern "C" {
         CMD->MinSwitches = MinSwitches;
     }
     
-    void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char **Flag) {
-        CMD->Switch[SwitchNum]->Flag = *Flag;
+    void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag) {
+        CMD->Switch[SwitchNum]->Flag = Flag;
     }
     
     void SetSwitchDescription(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Description) {
@@ -764,7 +764,7 @@ extern "C" {
     }
     
     uint8_t WriteUUID(BitOutput *BitO, const uint8_t *UUIDString) {
-        if (strlen(UUIDString) != BitIOUUIDSize - 1) {
+        if (strlen(UUIDString) != BitIOUUIDSize) {
             return EXIT_SUCCESS;
         } else {
             for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDSize - 1; UUIDByte++) {
