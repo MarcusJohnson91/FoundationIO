@@ -358,7 +358,7 @@ extern "C" {
         CMD->MinSwitches = MinSwitches;
     }
     
-    void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag) {
+    void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char **Flag) {
         CMD->Switch[SwitchNum]->Flag = *Flag;
     }
     
