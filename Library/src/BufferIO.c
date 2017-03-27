@@ -24,84 +24,86 @@ extern "C" {
 #endif
     
     /*!
-     @typedef        BitInput
-     @abstract                         "Contains variables and buffers for reading bits".
-     @remark                           "The default internal representation in BitIO is unsigned, Big Endian".
-     @constant       File              "Input file to read bits from".
-     @constant       FileSize          "Size of File in bytes".
-     @constant       FilePosition      "Current byte in the file".
-     @constant       BitsUnavailable   "Number of previously read bits in Buffer".
-     @constant       BitsAvailable     "Number of bits available for reading".
-     @constant       SystemEndian      "Endian of the running system".
-     @constant       Buffer            "Buffer of data from File".
+     @typedef           BitInput
+     @abstract                              "Contains variables and buffers for reading bits".
+     @remark                                "The default internal representation in BitIO is unsigned, Big Endian".
+     @constant          File                "Input file to read bits from".
+     @constant          FileSize            "Size of File in bytes".
+     @constant          FilePosition        "Current byte in the file".
+     @constant          BitsUnavailable     "Number of previously read bits in Buffer".
+     @constant          BitsAvailable       "Number of bits available for reading".
+     @constant          SystemEndian        "Endian of the running system".
+     @constant          Buffer              "Buffer of data from File".
      */
     typedef struct BitInput {
-        FILE        *File;
-        size_t       FileSize;
-        size_t       FilePosition;
-        size_t       BitsUnavailable;
-        size_t       BitsAvailable;
-        uint8_t      SystemEndian:2;
-        uint8_t      Buffer[BitInputBufferSize];
+        FILE              *File;
+        size_t             FileSize;
+        size_t             FilePosition;
+        size_t             BitsUnavailable;
+        size_t             BitsAvailable;
+        uint8_t            SystemEndian:2;
+        uint8_t            Buffer[BitInputBufferSize];
     } BitInput;
     
     /*!
-     @typedef        BitOutput
-     @abstract                         "Contains variables and buffers for writing bits".
-     @remark                           "The default internal representation in BitOutput is unsigned".
-     @constant       File              "Input file to read bits from".
-     @constant       BitsUnavailable   "Number of previously read bits in Buffer".
-     @constant       BitsAvailable     "Number of bits available for writing".
-     @constant       SystemEndian      "Endian of the running system".
-     @constant       Buffer            "Buffer of BitIOBufferSize bits from File".
+     @typedef           BitOutput
+     @abstract                              "Contains variables and buffers for writing bits".
+     @remark                                "The default internal representation in BitOutput is unsigned".
+     @constant          File                "Input file to read bits from".
+     @constant          BitsUnavailable     "Number of previously read bits in Buffer".
+     @constant          BitsAvailable       "Number of bits available for writing".
+     @constant          SystemEndian        "Endian of the running system".
+     @constant          Buffer              "Buffer of BitIOBufferSize bits from File".
      */
     typedef struct BitOutput {
-        FILE        *File;
-        size_t       BitsUnavailable;
-        size_t       BitsAvailable;
-        uint8_t      SystemEndian:2;
-        uint8_t      Buffer[BitOutputBufferSize];
-        FILE        *LogFile;
+        FILE              *File;
+        size_t             BitsUnavailable;
+        size_t             BitsAvailable;
+        uint8_t            SystemEndian:2;
+        uint8_t            Buffer[BitOutputBufferSize];
+        FILE              *LogFile;
     } BitOutput;
     
     /*!
-     @typedef  CommandLineSwitch
-     @abstract                         "Contains the data to support a single switch".
-     @remark                           "You MUST include the null padding at the end of @Switch".
-     @constant SwitchFound             "If the switch was found in argv, this will be set to true".
-     @constant Resultless              "Is the mere presence of the switch what you're looking for? if so, set to true"
-     @constant Flag                    "Actual flag, WITHOUT dash(s) or backslash, Flags are case insensitive".
-     @constant SwitchDescription       "Message to print explaining what the switch does".
-     @constant SwitchResult            "String to contain the result of this switch, NULL if not found".
+     @typedef           CommandLineSwitch
+     @abstract                              "Contains the data to support a single switch".
+     @remark                                "You MUST include the null padding at the end of @Switch".
+     @constant          SwitchFound         "If the switch was found in argv, this will be set to true".
+     @constant          Resultless          "Is the mere presence of the switch what you're looking for? if so, set to true"
+     @constant          Flag                "Actual flag, WITHOUT dash(s) or backslash, Flags are case insensitive".
+     @constant          SwitchDescription   "Message to print explaining what the switch does".
+     @constant          SwitchResult        "String to contain the result of this switch, NULL if not found".
      */
     typedef struct CommandLineSwitch {
-        bool        SwitchFound:1;
-        bool        Resultless:1;
-        const char *Flag;
-        const char *SwitchDescription;
-        const char *SwitchResult;
+        bool               SwitchFound:1;
+        bool               Resultless:1;
+        const char        *Flag;
+        const char        *SwitchDescription;
+        const char        *SwitchResult;
     } CommandLineSwitch;
     
     /*!
-     @typedef  CommandLineOptions
-     @abstract                         "Type to contain a variable amount of CLSwitches".
-     @remark                           "The switches are zero indexed, and @NumSwitches is NOT zero indexed, so count from 1".
-     @constant NumSwitches             "The number of switches".
-     @constant MinSwitches             "The minimum number of switches this program requires to run".
-     @constant ProgramName             "The name you want output when the help is printed".
-     @constant ProgramDescription      "The description of the program when the help is printed".
-     @constant AuthorCopyrightLicense  "The author, copyright years, and license of the program, or anything else you want printed".
-     @constant Switch                  "A pointer to an array of CLSwitch instances containing the properties of the switches".
+     @typedef           CommandLineOptions
+     @abstract                              "Type to contain a variable amount of CLSwitches".
+     @remark                                "The switches are zero indexed, and @NumSwitches is NOT zero indexed, so count from 1".
+     @constant          NumSwitches         "The number of switches".
+     @constant          MinSwitches         "The minimum number of switches this program requires to run".
+     @constant          ProgramName         "The name you want output when the help is printed".
+     @constant          ProgramDescription  "The description of the program when the help is printed".
+     @constant          Author              "The author of the program".
+     @constant          Copyright           "The starting and ending copyright years".
+     @constant          License             "The license this program is released under".
+     @constant          Switch              "A pointer to an array of CLSwitch instances containing the properties of the switches".
      */
     typedef struct CommandLineOptions {
-        size_t               NumSwitches;
-        uint64_t             MinSwitches;
-        const char          *Name;
-        const char          *Description;
-        const char          *Author;
-        const char          *Copyright;
-        const char          *License;
-        CommandLineSwitch  **Switch;
+        size_t              NumSwitches;
+        uint64_t            MinSwitches;
+        const char         *Name;
+        const char         *Description;
+        const char         *Author;
+        const char         *Copyright;
+        const char         *License;
+        CommandLineSwitch **Switch;
     } CommandLineOptions;
     
     uint16_t SwapEndian16(const uint16_t Data2Swap) {
