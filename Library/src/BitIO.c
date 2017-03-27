@@ -75,8 +75,8 @@ extern "C" {
      @constant          SwitchResult        "String to contain the result of this switch, NULL if not found".
      */
     typedef struct CommandLineSwitch {
-        bool               SwitchFound:1;
-        bool               Resultless:1;
+        bool               SwitchFound;
+        bool               Resultless;
         const char        *Flag;
         const char        *SwitchDescription;
         const char        *SwitchResult;
