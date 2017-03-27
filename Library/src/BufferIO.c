@@ -358,6 +358,10 @@ extern "C" {
         CMD->License = License;
     }
     
+    void SetCMDMinSwitches(CommandLineOptions *CMD, const uint64_t MinSwitches) {
+        CMD->MinSwitches = MinSwitches;
+    }
+    
     void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag) {
         CMD->Switch[SwitchNum]->Flag = Flag;
     }
