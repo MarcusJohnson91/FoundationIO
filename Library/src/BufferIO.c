@@ -361,11 +361,7 @@ extern "C" {
     }
     
     void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag) {
-        CommandLineSwitch *Switch = calloc(1, sizeof(CommandLineSwitch));
-        Switch->Flag = Flag;
-        CMD->Switch[SwitchNum] = *Switch;
-        
-        free(Switch);
+        CMD->Switch[SwitchNum].Flag = Flag;
     }
     
     void SetSwitchDescription(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Description) {
