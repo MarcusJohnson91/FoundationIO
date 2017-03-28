@@ -400,9 +400,7 @@ extern "C" {
         Bytes2Read = BitI->FileSize - BitI->FilePosition >= BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
         BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
         if (BytesRead != Bytes2Read) {
-            char ErrorDescription[BitIOStringSize];
-            snprintf(ErrorDescription, BitIOStringSize, "Supposed to read %llu bytes, but read %llu\n", Bytes2Read, BytesRead);
-            Log(LOG_WARNING, "libBitIO", "UpdateInputBuffer", ErrorDescription);
+            Log(LOG_WARNING, "libBitIO", "UpdateInputBuffer", "Supposed to read %llu bytes, but read %llu\n", Bytes2Read, BytesRead);
         }
         uint64_t NEWBitsUnavailable = BitI->BitsUnavailable % 8; // FIXME: This assumes UpdateBuffer was called with at most 7 unused bits in the buffer...
         
@@ -415,9 +413,7 @@ extern "C" {
         uint64_t OutputData = 0;
         
         if ((Bits2Read <= 0) || (Bits2Read > 64)) {
-            char Description[BitIOStringSize];
-            snprintf(Description, BitIOStringSize, "ReadBits only supports reading 1-64 bits at a time, you tried reading: %d bits\n", Bits2Read);
-            Log(LOG_CRIT, "libBitIO", "ReadBits", Description);
+            Log(LOG_CRIT, "libBitIO", "ReadBits", "ReadBits only supports reading 1-64 bits at a time, you tried reading: %d bits\n", Bits2Read);
             exit(EXIT_FAILURE);
         } else {
             if (BitI->BitsAvailable < Bits) {
