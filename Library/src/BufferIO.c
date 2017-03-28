@@ -103,7 +103,7 @@ extern "C" {
         const char         *Author;
         const char         *Copyright;
         const char         *License;
-        CommandLineSwitch **Switch;
+        CommandLineSwitch *Switch;
     } CommandLineOptions;
     
     uint16_t SwapEndian16(const uint16_t Data2Swap) {
@@ -249,20 +249,20 @@ extern "C" {
     void InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches) {
         CMD->NumSwitches += NumSwitches;
         CommandLineSwitch **Switch = calloc(NumSwitches, sizeof(CommandLineSwitch));
-        CMD->Switch = Switch;
+        CMD->Switch = *Switch;
     }
     
     void AddCommandLineSwitch(CommandLineOptions *CMD) {
         CMD->NumSwitches += 1;
-        CMD->Switch[CMD->NumSwitches] = calloc(1, sizeof(CommandLineSwitch));
+        CMD->Switch       = calloc(1, sizeof(CommandLineSwitch));
     }
     
     void DisplayCMDHelp(CommandLineOptions *CMD) {
         printf("%s by %s ©%s: %s, Released under the %s license\n\n", CMD->Name, CMD->Author, CMD->Copyright, CMD->Description, CMD->License);
         printf("Options:\n");
         for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
-            printf("%s\t", CMD->Switch[Option]->Flag);
-            printf("%s\n", CMD->Switch[Option]->SwitchDescription);
+            printf("%s\t", CMD->Switch[Option].Flag);
+            printf("%s\n", CMD->Switch[Option].SwitchDescription);
         }
     }
     
@@ -280,24 +280,24 @@ extern "C" {
             
             for (uint8_t Argument = 1; Argument < argc; Argument++) { // the executable path is skipped over
                 for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
-                    char *SingleDash = calloc(strlen(CMD->Switch[Switch]->Flag + 2), 1);
-                    snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch]->Flag);
+                    char *SingleDash = calloc(strlen(CMD->Switch[Switch].Flag + 2), 1);
+                    snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch].Flag);
                     
-                    char *DoubleDash = calloc(strlen(CMD->Switch[Switch]->Flag + 3), 1);
-                    snprintf(DoubleDash, sizeof(DoubleDash), "--%s\n", CMD->Switch[Switch]->Flag);
+                    char *DoubleDash = calloc(strlen(CMD->Switch[Switch].Flag + 3), 1);
+                    snprintf(DoubleDash, sizeof(DoubleDash), "--%s\n", CMD->Switch[Switch].Flag);
                     
-                    char *Slash      = calloc(strlen(CMD->Switch[Switch]->Flag + 2), 1);
-                    snprintf(Slash, sizeof(Slash), "/%s\n", CMD->Switch[Switch]->Flag);
+                    char *Slash      = calloc(strlen(CMD->Switch[Switch].Flag + 2), 1);
+                    snprintf(Slash, sizeof(Slash), "/%s\n", CMD->Switch[Switch].Flag);
                     
                     if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                         if (Argument == CMD->NumSwitches - 1) {
                             DisplayCMDHelp(CMD);
                         } else {
-                            CMD->Switch[Switch]->SwitchFound = true;
-                            if (CMD->Switch[Switch]->Resultless == false) {
-                                char *SwitchResult = calloc(1, strlen(argv[Argument] - strlen(CMD->Switch[Switch])));
+                            CMD->Switch[Switch].SwitchFound = true;
+                            if (CMD->Switch[Switch].Resultless == false) {
+                                char *SwitchResult = calloc(1, strlen(argv[Argument] - strlen(CMD->Switch[Switch].SwitchResult)));
                                 snprintf(SwitchResult, BitIOStringSize, "%s", argv[Argument + 1]);
-                                CMD->Switch[Switch]->SwitchResult = SwitchResult;
+                                CMD->Switch[Switch].SwitchResult = SwitchResult;
                             }
                         }
                     }
@@ -317,7 +317,7 @@ extern "C" {
     }
     
     void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, const uint8_t InputSwitch) {
-        BitI->File             = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
+        BitI->File             = fopen(CMD->Switch[InputSwitch].SwitchResult, "rb");
         fseek(BitI->File, 0, SEEK_END);
         BitI->FileSize = (uint64_t)ftell(BitI->File);
         fseek(BitI->File, 0, SEEK_SET);
@@ -330,7 +330,7 @@ extern "C" {
     }
     
     void OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, const uint8_t OutputSwitch) {
-        BitO->File             = fopen(CMD->Switch[OutputSwitch]->SwitchResult, "rb");
+        BitO->File             = fopen(CMD->Switch[OutputSwitch].SwitchResult, "rb");
         BitO->BitsAvailable    = BitOutputBufferSizeInBits;
         BitO->BitsUnavailable  = 0;
         DetectSystemEndian();
@@ -363,35 +363,35 @@ extern "C" {
     void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag) {
         CommandLineSwitch *Switch = calloc(1, sizeof(CommandLineSwitch));
         Switch->Flag = Flag;
-        CMD->Switch[SwitchNum] = Switch;
+        CMD->Switch[SwitchNum] = *Switch;
         
         free(Switch);
     }
     
     void SetSwitchDescription(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Description) {
-        CMD->Switch[SwitchNum]->SwitchDescription = Description;
+        CMD->Switch[SwitchNum].SwitchDescription = Description;
     }
     
     void SetSwitchResultStatus(CommandLineOptions *CMD, uint64_t SwitchNum, bool IsSwitchResultless) {
-        CMD->Switch[SwitchNum]->Resultless = IsSwitchResultless;
+        CMD->Switch[SwitchNum].Resultless = IsSwitchResultless;
     }
     
     const char *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum) {
-        size_t SwitchResultSize = strlen(CMD->Switch[SwitchNum]->SwitchResult);
+        size_t SwitchResultSize = strlen(CMD->Switch[SwitchNum].SwitchResult);
         if (SwitchResultSize == 0) {
             return 0;
         } else {
-            return CMD->Switch[SwitchNum]->SwitchResult;
+            return CMD->Switch[SwitchNum].SwitchResult;
         }
     }
     
     bool IsSwitchPresent(CommandLineOptions *CMD, uint64_t SwitchNum) {
-        return CMD->Switch[SwitchNum]->SwitchFound;
+        return CMD->Switch[SwitchNum].SwitchFound;
     }
     
     void CloseCommandLineOptions(CommandLineOptions *CMD) {
-        for (uint64_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
-            free(CMD->Switch[Switch]);
+        for (uint64_t Option = 0; Option < CMD->NumSwitches; Option++) {
+            free(&CMD->Switch[Option]);
         }
         free(CMD);
     }
