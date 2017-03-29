@@ -474,6 +474,7 @@ extern "C" {
         if (IsSigned == false) {
             CodeNum  = (1ULL << Zeros);
             CodeNum += ReadBits(BitI, Zeros, false);
+            Final    = CodeNum;
         } else { // Signed
             if (IsOdd(CodeNum) == true) {
                 Final = CodeNum - 1;
