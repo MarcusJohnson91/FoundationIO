@@ -67,7 +67,7 @@ extern "C" {
     /*!
      @typedef           CommandLineSwitch
      @abstract                              "Contains the data to support a single switch".
-     @remark                                "You MUST include the null padding at the end of @Switch".
+     @remark                                "You MUST include the NULL padding at the end of @Switch".
      @constant          SwitchFound         "If the switch was found in argv, this will be set to true".
      @constant          Resultless          "Is the mere presence of the switch what you're looking for? if so, set to true"
      @constant          Flag                "Actual flag, WITHOUT dash(s) or backslash, Flags are case insensitive".
@@ -138,19 +138,31 @@ extern "C" {
     }
     
     uint64_t BytesRemainingInFile(BitInput *BitI) {
-        return BitI->FilePosition - BitI->FileSize;
+        uint64_t BytesLeft = 0;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "BytesRemainingInFile", "Pointer to BitInput is NULL\n");
+        } else {
+            BytesLeft = BitI->FilePosition - BitI->FileSize;
+        }
+        return BytesLeft;
     }
     
     uint64_t GetInputFileSize(BitInput *BitI) {
-        return BitI->FileSize;
+        uint64_t InputSize = 0;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetInputFileSize", "Pointer to BitInput is NULL\n");
+        } else {
+            InputSize = BitI->FileSize;
+        }
+        return InputSize;
     }
     
     uint64_t Signed2Unsigned(const int64_t Signed) {
-        return (uint64_t)Signed;
+        return ~Signed + 1;
     }
     
     int64_t Unsigned2Signed(const uint64_t Unsigned) {
-        return (int64_t)Unsigned;
+        return ~Unsigned - 1;
     }
     
     int64_t Powi(int64_t Base, const int64_t Exponent) {
@@ -169,29 +181,31 @@ extern "C" {
         uint8_t DataBit = 0, BitCount = 0;
         if (Bits2Count == 0) {
             return 0;
-        }
-        for (uint8_t Bit = 0; Bit < 64; Bit++) {
-            DataBit = (Bits2Count & (1 << Bit)) >> Bit;
-            if (DataBit == 1) {
-                BitCount += 1;
+        } else {
+            for (uint8_t Bit = 0; Bit < 64; Bit++) {
+                DataBit = (Bits2Count & (1 << Bit)) >> Bit;
+                if (DataBit == 1) {
+                    BitCount += 1;
+                }
             }
         }
         return BitCount;
     }
     
     uint64_t Power2Mask(const uint8_t Exponent) {
-        if (Exponent <= 0 || Exponent > 64) {
-            Log(LOG_ERR, "libBitIO", "Power2Mask", "Exponent %d is out of bounds\n", Exponent);
-            return 0;
+        uint64_t Mask = 0;
+        if (Exponent > 64) {
+            Log(LOG_ERR, "libBitIO", "Power2Mask", "Exponent %d is too large\n", Exponent);
         } else {
             if (Exponent == 1) {
-                return 1;
+                Mask = 1;
             } else if (Exponent == 64) {
-                return ((1ULL << Exponent) - 1) + (((1ULL << Exponent) - 1) - 1);
+                Mask = ((1ULL << Exponent) - 1) + (((1ULL << Exponent) - 1) - 1);
             } else {
-                return (1ULL << Exponent) - 1;
+                Mask = (1ULL << Exponent) - 1;
             }
         }
+        return Mask;
     }
     
     uint64_t OnesCompliment2TwosCompliment(const int64_t OnesCompliment) {
@@ -234,11 +248,23 @@ extern "C" {
     }
     
     uint8_t GetBitInputEndian(BitInput *BitI) {
-        return BitI->SystemEndian;
+        uint8_t Endian = 0;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetBitInputEndian", "Pointer to BitInput is NULL\n");
+        } else {
+            Endian = BitI->SystemEndian;;
+        }
+        return Endian;
     }
     
     uint8_t GetBitOutputEndian(BitOutput *BitO) {
-        return BitO->SystemEndian;
+        uint8_t Endian = 0;
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetBitOutputEndian", "Pointer to BitOutput is NULL\n");
+        } else {
+            Endian = BitO->SystemEndian;;
+        }
+        return Endian;
     }
     
     CommandLineOptions *InitCommandLineOptions(void) {
@@ -247,57 +273,73 @@ extern "C" {
     }
     
     void InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches) {
-        CMD->NumSwitches += NumSwitches;
-        CommandLineSwitch **Switch = calloc(NumSwitches, sizeof(CommandLineSwitch));
-        CMD->Switch = *Switch;
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "InitCommandLineSwitches", "Pointer to CommandLineOptions is NULL\n");
+        } else {
+            CMD->NumSwitches          += NumSwitches;
+            CommandLineSwitch **Switch = calloc(NumSwitches, sizeof(CommandLineSwitch));
+            CMD->Switch                = *Switch;
+        }
     }
     
     void AddCommandLineSwitch(CommandLineOptions *CMD) {
-        CMD->NumSwitches += 1;
-        CMD->Switch       = calloc(1, sizeof(CommandLineSwitch));
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "AddCommandLineSwitch", "Pointer to CommandLineOptions is NULL\n");
+        } else {
+            CMD->NumSwitches += 1;
+            CMD->Switch       = calloc(1, sizeof(CommandLineSwitch));
+        }
     }
     
     void DisplayCMDHelp(CommandLineOptions *CMD) {
-        printf("%s by %s ©%s: %s, Released under the %s license\n\n", CMD->Name, CMD->Author, CMD->Copyright, CMD->Description, CMD->License);
-        printf("Options:\n");
-        for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
-            printf("%s\t", CMD->Switch[Option].Flag);
-            printf("%s\n", CMD->Switch[Option].SwitchDescription);
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "DisplayCMDHelp", "Pointer to CommandLineOptions is NULL\n");
+        } else {
+            printf("%s by %s ©%s: %s, Released under the %s license\n\n", CMD->Name, CMD->Author, CMD->Copyright, CMD->Description, CMD->License);
+            printf("Options:\n");
+            for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
+                printf("%s\t", CMD->Switch[Option].Flag);
+                printf("%s\n", CMD->Switch[Option].SwitchDescription);
+            }
         }
     }
     
     void ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]) {
         // TODO: Scan for equals signs as well, if found, after the equal sign is the result, everything before is the switch.
         // TODO: add support for generating the short versions of the arguments.
-        if (CMD->NumSwitches < CMD->MinSwitches) {
-            DisplayCMDHelp(CMD);
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineOptions is NULL\n");
         } else {
-            AddCommandLineSwitch(CMD);
-            
-            SetSwitchFlag(CMD, CMD->NumSwitches, "Help");
-            SetSwitchDescription(CMD, CMD->NumSwitches, "Prints all the command line options\n");
-            SetSwitchResultStatus(CMD, CMD->NumSwitches, true);
-            
-            for (uint8_t Argument = 1; Argument < argc; Argument++) { // the executable path is skipped over
-                for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
-                    char *SingleDash = calloc(strlen(CMD->Switch[Switch].Flag + 2), 1);
-                    snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch].Flag);
-                    
-                    char *DoubleDash = calloc(strlen(CMD->Switch[Switch].Flag + 3), 1);
-                    snprintf(DoubleDash, sizeof(DoubleDash), "--%s\n", CMD->Switch[Switch].Flag);
-                    
-                    char *Slash      = calloc(strlen(CMD->Switch[Switch].Flag + 2), 1);
-                    snprintf(Slash, sizeof(Slash), "/%s\n", CMD->Switch[Switch].Flag);
-                    
-                    if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
-                        if (Argument == CMD->NumSwitches - 1) {
-                            DisplayCMDHelp(CMD);
-                        } else {
-                            CMD->Switch[Switch].SwitchFound = true;
-                            if (CMD->Switch[Switch].Resultless == false) {
-                                char *SwitchResult = calloc(1, strlen(argv[Argument] - strlen(CMD->Switch[Switch].SwitchResult)));
-                                snprintf(SwitchResult, BitIOStringSize, "%s", argv[Argument + 1]);
-                                CMD->Switch[Switch].SwitchResult = SwitchResult;
+            if (CMD->NumSwitches < CMD->MinSwitches) {
+                DisplayCMDHelp(CMD);
+            } else {
+                AddCommandLineSwitch(CMD);
+                
+                SetSwitchFlag(CMD, CMD->NumSwitches, "Help");
+                SetSwitchDescription(CMD, CMD->NumSwitches, "Prints all the command line options\n");
+                SetSwitchResultStatus(CMD, CMD->NumSwitches, true);
+                
+                for (uint8_t Argument = 1; Argument < argc; Argument++) { // the executable path is skipped over
+                    for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
+                        char *SingleDash = calloc(strlen(CMD->Switch[Switch].Flag + 2), 1);
+                        snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch].Flag);
+                        
+                        char *DoubleDash = calloc(strlen(CMD->Switch[Switch].Flag + 3), 1);
+                        snprintf(DoubleDash, sizeof(DoubleDash), "--%s\n", CMD->Switch[Switch].Flag);
+                        
+                        char *Slash      = calloc(strlen(CMD->Switch[Switch].Flag + 2), 1);
+                        snprintf(Slash, sizeof(Slash), "/%s\n", CMD->Switch[Switch].Flag);
+                        
+                        if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
+                            if (Argument == CMD->NumSwitches - 1) {
+                                DisplayCMDHelp(CMD);
+                            } else {
+                                CMD->Switch[Switch].SwitchFound = true;
+                                if (CMD->Switch[Switch].Resultless == false) {
+                                    char *SwitchResult = calloc(1, strlen(argv[Argument] - strlen(CMD->Switch[Switch].SwitchResult)));
+                                    snprintf(SwitchResult, BitIOStringSize, "%s", argv[Argument + 1]);
+                                    CMD->Switch[Switch].SwitchResult = SwitchResult;
+                                }
                             }
                         }
                     }
@@ -317,43 +359,85 @@ extern "C" {
     }
     
     void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, const uint8_t InputSwitch) {
-        BitI->File             = fopen(CMD->Switch[InputSwitch].SwitchResult, "rb");
-        fseek(BitI->File, 0, SEEK_END);
-        BitI->FileSize = (uint64_t)ftell(BitI->File);
-        fseek(BitI->File, 0, SEEK_SET);
-        BitI->FilePosition     = ftell(BitI->File);
-        uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
-        uint64_t BytesRead     = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
-        BitI->BitsAvailable    = Bytes2Bits(BytesRead);
-        BitI->BitsUnavailable  = 0;
-        DetectSystemEndian();
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Pointer to CommandLineOptions is NULL\n");
+        } else if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Pointer to BitInput is NULL\n");
+        } else {
+            BitI->File             = fopen(CMD->Switch[InputSwitch].SwitchResult, "rb");
+            fseek(BitI->File, 0, SEEK_END);
+            BitI->FileSize = (uint64_t)ftell(BitI->File);
+            fseek(BitI->File, 0, SEEK_SET);
+            BitI->FilePosition     = ftell(BitI->File);
+            uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
+            uint64_t BytesRead     = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
+            BitI->BitsAvailable    = Bytes2Bits(BytesRead);
+            BitI->BitsUnavailable  = 0;
+            DetectSystemEndian();
+        }
     }
     
     void OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, const uint8_t OutputSwitch) {
-        BitO->File             = fopen(CMD->Switch[OutputSwitch].SwitchResult, "rb");
-        BitO->BitsAvailable    = BitOutputBufferSizeInBits;
-        BitO->BitsUnavailable  = 0;
-        DetectSystemEndian();
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Pointer to CommandLineOptions is NULL\n");
+        } else if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Pointer to BitOutput is NULL\n");
+        } else {
+            BitO->File             = fopen(CMD->Switch[OutputSwitch].SwitchResult, "rb");
+            BitO->BitsAvailable    = BitOutputBufferSizeInBits;
+            BitO->BitsUnavailable  = 0;
+            DetectSystemEndian();
+        }
     }
     
     void SetCMDName(CommandLineOptions *CMD, const char *Name) {
-        CMD->Name = Name;
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDName", "Pointer to CommandLineOptions is NULL\n");
+        } else if (Name == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDName", "Pointer to Name is NULL\n");
+        } else {
+            CMD->Name = Name;
+        }
     }
     
     void SetCMDDescription(CommandLineOptions *CMD, const char *Description) {
-        CMD->Description = Description;
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDDescription", "Pointer to CommandLineOptions is NULL\n");
+        } else if (Description == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDDescription", "Pointer to Description is NULL\n");
+        } else {
+            CMD->Description = Description;
+        }
     }
     
     void SetCMDAuthor(CommandLineOptions *CMD, const char *Author) {
-        CMD->Author = Author;
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDAuthor", "Pointer to CommandLineOptions is NULL\n");
+        } else if (Author == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDAuthor", "Pointer to Author is NULL\n");
+        } else {
+            CMD->Author = Author;
+        }
     }
     
     void SetCMDCopyright(CommandLineOptions *CMD, const char *Copyright) {
-        CMD->Copyright = Copyright;
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDCopyright", "Pointer to CommandLineOptions is NULL\n");
+        } else if (Copyright == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDCopyright", "Pointer to Copyright is NULL\n");
+        } else {
+            CMD->Copyright = Copyright;
+        }
     }
     
     void SetCMDLicense(CommandLineOptions *CMD, const char *License) {
-        CMD->License = License;
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDLicense", "Pointer to CommandLineOptions is NULL\n");
+        } else if (License == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDLicense", "Pointer to License is NULL\n");
+        } else {
+            CMD->License = License;
+        }
     }
     
     void SetCMDMinSwitches(CommandLineOptions *CMD, const uint64_t MinSwitches) {
@@ -361,51 +445,89 @@ extern "C" {
     }
     
     void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag) {
-        CMD->Switch[SwitchNum].Flag = Flag;
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetSwitchFlag", "Pointer to CommandLineOptions is NULL\n");
+        } else if (Flag == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetSwitchFlag", "Pointer to switch Flag is NULL\n");
+        } else {
+            CMD->Switch[SwitchNum].Flag = Flag;
+        }
     }
     
     void SetSwitchDescription(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Description) {
-        CMD->Switch[SwitchNum].SwitchDescription = Description;
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetSwitchDescription", "Pointer to CommandLineOptions is NULL\n");
+        } else if (Description == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetSwitchDescription", "Pointer to switch Description is NULL\n");
+        } else {
+            CMD->Switch[SwitchNum].SwitchDescription = Description;
+        }
     }
     
     void SetSwitchResultStatus(CommandLineOptions *CMD, uint64_t SwitchNum, bool IsSwitchResultless) {
-        CMD->Switch[SwitchNum].Resultless = IsSwitchResultless;
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetSwitchResultStatus", "Pointer to CommandLineOptions is NULL\n");
+        } else if (SwitchNum <= CMD->NumSwitches - 1) { // - 1 so the hidden help option isn't exposed
+            Log(LOG_ERR, "libBitIO", "SetSwitchResultStatus", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches - 1);
+        } else {
+            CMD->Switch[SwitchNum].Resultless = (IsSwitchResultless & 1);
+        }
     }
     
     const char *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum) {
-        size_t SwitchResultSize = strlen(CMD->Switch[SwitchNum].SwitchResult);
-        if (SwitchResultSize == 0) {
-            return 0;
+        const char *Result = 0;
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetSwitchResult", "Pointer to CommandLineOptions is NULL\n");
+        } else if (SwitchNum <= CMD->NumSwitches - 1) { // - 1 so the hidden help option isn't exposed
+            Log(LOG_ERR, "libBitIO", "GetSwitchResult", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches - 1);
         } else {
-            return CMD->Switch[SwitchNum].SwitchResult;
+            Result = calloc(1, strlen(CMD->Switch[SwitchNum].SwitchResult));
+            Result = CMD->Switch[SwitchNum].SwitchResult;
         }
+        return Result;
     }
     
     bool IsSwitchPresent(CommandLineOptions *CMD, uint64_t SwitchNum) {
-        return CMD->Switch[SwitchNum].SwitchFound;
+        bool Status = 0;
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "IsSwitchPresent", "Pointer to CommandLineOptions is NULL\n");
+        } else if (SwitchNum <= CMD->NumSwitches - 1) { // - 1 so the hidden help option isn't exposed
+            Log(LOG_ERR, "libBitIO", "IsSwitchPresent", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches - 1);
+        } else {
+            Status = CMD->Switch[SwitchNum].SwitchFound;
+        }
+        return Status;
     }
     
     void CloseCommandLineOptions(CommandLineOptions *CMD) {
-        for (uint64_t Option = 0; Option < CMD->NumSwitches; Option++) {
-            free(&CMD->Switch[Option]);
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "CloseCommandLineOptions", "Pointer to CommandLineOptions is NULL\n");
+        } else {
+            for (uint64_t Option = 0; Option < CMD->NumSwitches; Option++) {
+                free(&CMD->Switch[Option]);
+            }
+            free(CMD);
         }
-        free(CMD);
     }
     
     void UpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) {
         uint64_t Bytes2Read = 0, BytesRead = 0;
-        fseek(BitI->File, RelativeOffsetInBytes, SEEK_CUR);
-        BitI->FilePosition = ftell(BitI->File);
-        memset(BitI->Buffer, 0, sizeof(BitI->Buffer));
-        Bytes2Read = BitI->FileSize - BitI->FilePosition >= BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
-        BytesRead = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
-        if (BytesRead != Bytes2Read) {
-            Log(LOG_WARNING, "libBitIO", "UpdateInputBuffer", "Supposed to read %llu bytes, but read %llu\n", Bytes2Read, BytesRead);
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "UpdateInputBuffer", "Pointer to BitInput is NULL\n");
+        } else {
+            fseek(BitI->File, RelativeOffsetInBytes, SEEK_CUR);
+            BitI->FilePosition = ftell(BitI->File);
+            memset(BitI->Buffer, 0, sizeof(BitI->Buffer));
+            Bytes2Read = BitI->FileSize - BitI->FilePosition >= BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
+            BytesRead  = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
+            if (BytesRead != Bytes2Read) {
+                Log(LOG_WARNING, "libBitIO", "UpdateInputBuffer", "Supposed to read %llu bytes, but read %llu\n", Bytes2Read, BytesRead);
+            }
+            uint64_t NEWBitsUnavailable = BitI->BitsUnavailable % 8; // FIXME: This assumes UpdateBuffer was called with at most 7 unused bits in the buffer...
+            
+            BitI->BitsUnavailable = NEWBitsUnavailable;
+            BitI->BitsAvailable   = Bytes2Bits(BytesRead);
         }
-        uint64_t NEWBitsUnavailable = BitI->BitsUnavailable % 8; // FIXME: This assumes UpdateBuffer was called with at most 7 unused bits in the buffer...
-        
-        BitI->BitsUnavailable = NEWBitsUnavailable;
-        BitI->BitsAvailable   = Bytes2Bits(BytesRead);
     }
     
     uint64_t ReadBits(BitInput *BitI, const uint8_t Bits2Read, bool ReadFromMSB) {
@@ -413,8 +535,7 @@ extern "C" {
         uint64_t OutputData = 0;
         
         if ((Bits2Read <= 0) || (Bits2Read > 64)) {
-            Log(LOG_CRIT, "libBitIO", "ReadBits", "ReadBits only supports reading 1-64 bits at a time, you tried reading: %d bits\n", Bits2Read);
-            exit(EXIT_FAILURE);
+            Log(LOG_ERR, "libBitIO", "ReadBits", "ReadBits: %d, only supports reading 1-64 bits\n", Bits2Read);
         } else {
             if (BitI->BitsAvailable < Bits) {
                 UpdateInputBuffer(BitI, 0);
@@ -442,174 +563,253 @@ extern "C" {
     
     uint64_t PeekBits(BitInput *BitI, const uint8_t Bits2Peek, bool ReadFromMSB) {
         uint64_t OutputData = 0ULL;
-        OutputData = ReadBits(BitI, Bits2Peek, ReadFromMSB);
-        
-        BitI->BitsAvailable       += Bits2Peek;
-        BitI->BitsUnavailable     -= Bits2Peek;
-        
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "PeekBits", "Pointer to BitInput is NULL\n");
+        } else {
+            OutputData                 = ReadBits(BitI, Bits2Peek, ReadFromMSB);
+            BitI->BitsAvailable       += Bits2Peek;
+            BitI->BitsUnavailable     -= Bits2Peek;
+        }
         return OutputData;
     }
     
     uint64_t  ReadRICE(BitInput *BitI, const bool Truncated, const bool StopBit) {
         uint64_t BitCount = 0;
-        
-        while (ReadBits(BitI, 1, false) != StopBit) {
-            BitCount += 1;
-        }
-        if (Truncated == true) {
-            BitCount++;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadRICE", "Pointer to BitInput is NULL\n");
+        } else {
+            while (ReadBits(BitI, 1, false) != (StopBit & 1)) {
+                BitCount += 1;
+            }
+            if (Truncated == true) {
+                BitCount++;
+            }
         }
         return BitCount;
     }
     
     int64_t ReadExpGolomb(BitInput *BitI, const bool IsSigned) {
-        uint64_t Zeros   = 0;
-        uint64_t CodeNum = 0;
-        int64_t  Final   = 0;
-        
-        while (ReadBits(BitI, 1, false) != 1) {
-            Zeros += 1;
-        }
-        
-        if (IsSigned == false) {
-            CodeNum  = (1ULL << Zeros);
-            CodeNum += ReadBits(BitI, Zeros, false);
-            Final    = CodeNum;
-        } else { // Signed
-            if (IsOdd(CodeNum) == true) {
-                Final = CodeNum - 1;
-            } else {
-                Final = -(CodeNum - 1);
+        int64_t  Final = 0;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadExpGolomb", "Pointer to BitInput is NULL\n");
+        } else {
+            uint64_t Zeros   = 0;
+            uint64_t CodeNum = 0;
+            
+            while (ReadBits(BitI, 1, false) != 1) {
+                Zeros += 1;
+            }
+            
+            if (IsSigned == false) {
+                CodeNum  = (1ULL << Zeros);
+                CodeNum += ReadBits(BitI, Zeros, false);
+                Final    = CodeNum;
+            } else { // Signed
+                if (IsOdd(CodeNum) == true) {
+                    Final = CodeNum - 1;
+                } else {
+                    Final = -(CodeNum - 1);
+                }
             }
         }
         return Final;
     }
     
     void SkipBits(BitInput *BitI, const int64_t Bits2Skip) {
-        if (Bits2Skip <= BitI->BitsAvailable) {
-            BitI->BitsAvailable   -= Bits2Skip;
-            BitI->BitsUnavailable += Bits2Skip;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "SkipBits", "Pointer to BitInput is NULL\n");
         } else {
-            fseek(BitI->File, Bits2Bytes(Bits2Skip - BitI->BitsAvailable, true), SEEK_CUR);
-            BitI->BitsAvailable   = BitI->FileSize + BitInputBufferSize <= BitI->FileSize ? BitInputBufferSize : BitI->FileSize;
-            BitI->BitsUnavailable = Bits2Skip % 8;
-            UpdateInputBuffer(BitI, 0);
+            if (Bits2Skip <= BitI->BitsAvailable) {
+                BitI->BitsAvailable   -= Bits2Skip;
+                BitI->BitsUnavailable += Bits2Skip;
+            } else {
+                fseek(BitI->File, Bits2Bytes(Bits2Skip - BitI->BitsAvailable, true), SEEK_CUR);
+                BitI->BitsAvailable   = BitI->FileSize + BitInputBufferSize <= BitI->FileSize ? BitInputBufferSize : BitI->FileSize;
+                BitI->BitsUnavailable = Bits2Skip % 8;
+                UpdateInputBuffer(BitI, 0);
+            }
         }
     }
     
     bool IsInputStreamByteAligned(BitInput *BitI, const uint8_t BytesOfAlignment) {
-        if ((BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
-            return true;
+        bool AlignmentStatus = 0;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "IsInputStreamByteAligned", "Pointer to BitInput is NULL\n");
+        } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
+            Log(LOG_ERR, "libBitIO", "IsInputStreamByteAligned", "BytesOfAlignment: %d isn't a power of 2 (or 1)\n", BytesOfAlignment);
         } else {
-            return false;
+            if ((BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
+                AlignmentStatus = true;
+            } else {
+                AlignmentStatus = false;
+            }
         }
+        return AlignmentStatus;
     }
     
     bool IsOutputStreamByteAligned(BitOutput *BitO, const uint8_t BytesOfAlignment) {
-        if ((BitO->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
-            return true;
+        bool AlignmentStatus = 0;
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "IsOutputStreamByteAligned", "Pointer to BitOutput is NULL\n");
+        } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
+            Log(LOG_ERR, "libBitIO", "IsOutputStreamByteAligned", "BytesOfAlignment: %d isn't a power of 2 (or 1)\n", BytesOfAlignment);
         } else {
-            return false;
+            if ((BitO->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
+                AlignmentStatus = true;
+            } else {
+                AlignmentStatus = false;
+            }
         }
+        return AlignmentStatus;
     }
     
     void AlignInput(BitInput *BitI, const uint8_t BytesOfAlignment) {
-        uint8_t Bits2Align = BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
-        
-        if (Bits2Align != 0) {
-            BitI->BitsAvailable   -= Bits2Align;
-            BitI->BitsUnavailable += Bits2Align;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "AlignInput", "Pointer to BitInput is NULL\n");
+        } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
+            Log(LOG_ERR, "libBitIO", "AlignInput", "BytesOfAlignment: %d isn't a power of 2 (or 1)\n", BytesOfAlignment);
+        } else {
+            uint8_t Bits2Align = BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
+            if (Bits2Align != 0) {
+                BitI->BitsAvailable   -= Bits2Align;
+                BitI->BitsUnavailable += Bits2Align;
+            }
         }
     }
     
     void AlignOutput(BitOutput *BitO, const uint8_t BytesOfAlignment) {
-        uint8_t Bits2Align = BitO->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
-        if (Bits2Align != 0) {
-            BitO->BitsAvailable    -= Bits2Align;
-            BitO->BitsUnavailable  += Bits2Align;
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "AlignOutput", "Pointer to BitOutput is NULL\n");
+        } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
+            Log(LOG_ERR, "libBitIO", "AlignOutput", "BytesOfAlignment: %d isn't a power of 2 (or 1)\n", BytesOfAlignment);
+        } else {
+            uint8_t Bits2Align = BitO->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
+            if (Bits2Align != 0) {
+                BitO->BitsAvailable    -= Bits2Align;
+                BitO->BitsUnavailable  += Bits2Align;
+            }
         }
     }
     
     size_t GetBitInputBufferSize(BitInput *BitI) {
-        return sizeof(BitI->Buffer);
+        uint64_t BufferSize = 0;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetBitInputBufferSize", "Pointer to BitOutput is NULL\n");
+        } else {
+            BufferSize = sizeof(BitI->Buffer);
+        }
+        return BufferSize;
     }
     
     size_t GetBitOutputBufferSize(BitOutput *BitO) {
-        return sizeof(BitO->Buffer);
+        uint64_t BufferSize = 0;
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetBitOutputBufferSize", "Pointer to BitOutput is NULL\n");
+        } else {
+            BufferSize = sizeof(BitO->Buffer);
+        }
+        return BufferSize;
     }
     
     void WriteBits(BitOutput *BitO, const uint64_t Data2Write, uint8_t NumBits, const bool WriteFromMSB) {
-        // FIXME: WriteBits currently copies NumBits bits to the file, even if the input is shorter than that. we need to prepend 0 bits if that's the case
-        
-        uint8_t Bits2Write2BufferByte, Bits2ShiftMask, Mask;
-        
-        if (BitO->BitsAvailable < NumBits) {
-            fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
-        }
-        
-        // so we're trying to write 9 bits, 0x1FF.
-        // There are only 5 bits available in the current byte.
-        // So, that means we have to pull out 5 bits from Data2Write, and pop it into BitO->Buffer.
-        // The Mask should be 0x1F if LSBfirst, or 0xF8 if MSB first.
-        // The buffer's representation is MSB first.
-        // if we're supposed to write this data LSB first we need to shift it after extraction to get it ready to be applied.
-        while (NumBits > 0) {
-            Bits2Write2BufferByte  = 8 - (BitO->BitsAvailable % 8); // extract 5 bits from the buffer
-            Bits2ShiftMask         = WriteFromMSB ? BitO->BitsAvailable % 8 : 0;
-            Mask                   = Power2Mask(Bits2Write2BufferByte) << Bits2ShiftMask;
-            BitO->Buffer[Bits2Bytes(BitO->BitsAvailable, false)] = Data2Write & Mask;
-            NumBits               -= Bits2Write2BufferByte;
-            BitO->BitsAvailable   -= Bits2Write2BufferByte;
-            BitO->BitsUnavailable += Bits2Write2BufferByte;
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteBits", "Pointer to BitOutput is NULL\n");
+        } else {
+            // FIXME: WriteBits currently copies NumBits bits to the file, even if the input is shorter than that. we need to prepend 0 bits if that's the case
+            
+            uint8_t Bits2Write2BufferByte, Bits2ShiftMask, Mask;
+            
+            if (BitO->BitsAvailable < NumBits) {
+                fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
+            }
+            
+            // so we're trying to write 9 bits, 0x1FF.
+            // There are only 5 bits available in the current byte.
+            // So, that means we have to pull out 5 bits from Data2Write, and pop it into BitO->Buffer.
+            // The Mask should be 0x1F if LSBfirst, or 0xF8 if MSB first.
+            // The buffer's representation is MSB first.
+            // if we're supposed to write this data LSB first we need to shift it after extraction to get it ready to be applied.
+            while (NumBits > 0) {
+                Bits2Write2BufferByte  = 8 - (BitO->BitsAvailable % 8); // extract 5 bits from the buffer
+                Bits2ShiftMask         = WriteFromMSB ? BitO->BitsAvailable % 8 : 0;
+                Mask                   = Power2Mask(Bits2Write2BufferByte) << Bits2ShiftMask;
+                BitO->Buffer[Bits2Bytes(BitO->BitsAvailable, false)] = Data2Write & Mask;
+                NumBits               -= Bits2Write2BufferByte;
+                BitO->BitsAvailable   -= Bits2Write2BufferByte;
+                BitO->BitsUnavailable += Bits2Write2BufferByte;
+            }
         }
     }
     
     void WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write, const bool WriteFromMSB) {
-        for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
-            WriteBits(BitO, (~StopBit), 1, WriteFromMSB);
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteRICE", "Pointer to BitOutput is NULL\n");
+        } else {
+            for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
+                WriteBits(BitO, (~StopBit), 1, WriteFromMSB);
+            }
+            WriteBits(BitO, StopBit, 1, WriteFromMSB);
         }
-        WriteBits(BitO, StopBit, 1, WriteFromMSB);
     }
     
     void WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write, const bool WriteFromMSB) {
-        uint64_t NumBits = 0;
-        
-        NumBits = FindHighestBitSet(Data2Write);
-        
-        if (IsSigned == false) {
-            WriteBits(BitO, 0, NumBits, WriteFromMSB);
-            WriteBits(BitO, Data2Write + 1, NumBits + 1, WriteFromMSB);
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteExpGolomb", "Pointer to BitOutput is NULL\n");
         } else {
-            NumBits -= 1;
-            WriteBits(BitO, 0, NumBits, WriteFromMSB);
-            if (IsOdd(Data2Write +1) == false) {
+            uint64_t NumBits = 0;
+            
+            NumBits = FindHighestBitSet(Data2Write);
+            
+            if (IsSigned == false) {
+                WriteBits(BitO, 0, NumBits, WriteFromMSB);
                 WriteBits(BitO, Data2Write + 1, NumBits + 1, WriteFromMSB);
             } else {
-                WriteBits(BitO, Data2Write + 1, NumBits + 1, WriteFromMSB);
+                NumBits -= 1;
+                WriteBits(BitO, 0, NumBits, WriteFromMSB);
+                if (IsOdd(Data2Write +1) == false) {
+                    WriteBits(BitO, Data2Write + 1, NumBits + 1, WriteFromMSB);
+                } else {
+                    WriteBits(BitO, Data2Write + 1, NumBits + 1, WriteFromMSB);
+                }
             }
         }
     }
     
     void CloseBitInput(BitInput *BitI) {
-        fclose(BitI->File);
-        free(BitI);
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "CloseBitInput", "Pointer to BitInput is NULL\n");
+        } else {
+            fclose(BitI->File);
+            free(BitI);
+        }
     }
     
     void FlushOutputBuffer(BitOutput *BitO, const size_t Bytes2Flush) {
-        size_t BytesWritten = 0;
-        BytesWritten = fwrite(BitO->Buffer, 1, Bytes2Flush, BitO->File);
-        if (BytesWritten != Bytes2Flush) {
-            Log(LOG_EMERG, "libBitIO", "FlushOutputBuffer", "Wrote %d bytes out of %d", BytesWritten, Bytes2Flush);
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "FlushOutputBuffer", "Pointer to BitOutput is NULL\n");
+        } else if (Bytes2Flush <= 0) {
+            Log(LOG_ERR, "libBitIO", "FlushOutputBuffer", "Bytes2Flush is %d, should be >= 1\n", Bytes2Flush);
+        } else {
+            size_t BytesWritten = 0;
+            BytesWritten = fwrite(BitO->Buffer, 1, Bytes2Flush, BitO->File);
+            if (BytesWritten != Bytes2Flush) {
+                Log(LOG_EMERG, "libBitIO", "FlushOutputBuffer", "Wrote %d bytes out of %d", BytesWritten, Bytes2Flush);
+            }
         }
     }
     
     void CloseBitOutput(BitOutput *BitO) {
-        if (IsOutputStreamByteAligned(BitO, 1) == false) {
-            AlignOutput(BitO, 1);
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "CloseBitOutput", "Pointer to BitOutput is NULL");
+        } else {
+            if (IsOutputStreamByteAligned(BitO, 1) == false) {
+                AlignOutput(BitO, 1);
+            }
+            fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
+            fflush(BitO->File);
+            fclose(BitO->File);
+            free(BitO);
         }
-        fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
-        fclose(BitO->File);
-        free(BitO);
     }
     
     uint64_t GenerateCRC(const uint8_t *Data2CRC, const size_t Data2CRCSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit) {
@@ -652,7 +852,7 @@ extern "C" {
     }
     
     void RotateArray(const size_t DataSize, int64_t *Data, const uint64_t NumRotations, const bool RotateRight) {
-        // Theoretical speed up: just edit the pointer to each array element, and increment or decrement it by  NumRotation.
+        // Theoretical speed up: just edit the Pointer to each array element, and increment or decrement it by  NumRotation.
         if (RotateRight == true) {
             for (uint64_t Rotation = 0; Rotation < NumRotations; Rotation++) {
                 for (uint64_t Element = 0; Element < DataSize; Element++) {
