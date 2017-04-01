@@ -85,7 +85,7 @@ extern "C" {
     /*!
      @typedef           CommandLineOptions
      @abstract                              "Type to contain a variable amount of CLSwitches".
-     @remark                                "The switches are zero indexed, and @NumSwitches is NOT zero indexed, so count from 1".
+     @remark                                "The switches are zero indexed, and @NumSwitches is zero indexed, so count from 0".
      @constant          NumSwitches         "The number of switches".
      @constant          MinSwitches         "The minimum number of switches this program requires to run".
      @constant          ProgramName         "The name you want output when the help is printed".
@@ -299,7 +299,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "AddCommandLineSwitch", "Pointer to CommandLineOptions is NULL\n");
         } else {
             CMD->NumSwitches += 1;
-            CMD->Switch[CMD->NumSwitches + 1] = calloc(1, sizeof(CommandLineSwitch));
+            CMD->Switch[CMD->NumSwitches] = calloc(1, sizeof(CommandLineSwitch));
         }
     }
     
@@ -327,9 +327,9 @@ extern "C" {
             } else {
                 AddCommandLineSwitch(CMD);
                 
-                SetSwitchFlag(CMD, CMD->NumSwitches + 1, "Help");
-                SetSwitchDescription(CMD, CMD->NumSwitches + 1, "Prints all the command line options\n");
-                SetSwitchResultStatus(CMD, CMD->NumSwitches + 1, true);
+                SetSwitchFlag(CMD, CMD->NumSwitches, "Help");
+                SetSwitchDescription(CMD, CMD->NumSwitches, "Prints all the command line options\n");
+                SetSwitchResultStatus(CMD, CMD->NumSwitches, true);
                 
                 for (uint8_t Argument = 1; Argument < argc; Argument++) { // the executable path is skipped over
                     for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
@@ -484,7 +484,7 @@ extern "C" {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetSwitchResultStatus", "Pointer to CommandLineOptions is NULL\n");
         } else if (SwitchNum >= CMD->NumSwitches) { // - 1 so the hidden help option isn't exposed
-            Log(LOG_ERR, "libBitIO", "SetSwitchResultStatus", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches - 1);
+            Log(LOG_ERR, "libBitIO", "SetSwitchResultStatus", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
         } else if (SwitchNum > CMD->NumSwitches) {
             Log(LOG_ERR, "libBitIO", "SetSwitchResultStatus", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
         } else {
@@ -497,7 +497,7 @@ extern "C" {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "GetSwitchResult", "Pointer to CommandLineOptions is NULL\n");
         } else if (SwitchNum > CMD->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "GetSwitchResult", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches - 1);
+            Log(LOG_ERR, "libBitIO", "GetSwitchResult", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
         } else {
             Result = calloc(1, strlen(CMD->Switch[SwitchNum]->SwitchResult));
             Result = CMD->Switch[SwitchNum]->SwitchResult;
@@ -510,7 +510,7 @@ extern "C" {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "IsSwitchPresent", "Pointer to CommandLineOptions is NULL\n");
         } else if (SwitchNum > CMD->NumSwitches) { // - 1 so the hidden help option isn't exposed
-            Log(LOG_ERR, "libBitIO", "IsSwitchPresent", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches - 1);
+            Log(LOG_ERR, "libBitIO", "IsSwitchPresent", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
         } else {
             Status = CMD->Switch[SwitchNum]->SwitchFound;
         }
