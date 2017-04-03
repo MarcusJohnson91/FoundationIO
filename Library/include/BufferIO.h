@@ -547,7 +547,7 @@ extern "C" {
      @param             CMD                 "Pointer to CommandLineOptions instance".
      @param             SwitchNum           "The switch to check".
      */
-    bool                IsSwitchPresent(CommandLineOptions *CMD, uint64_t SwitchNum);
+    bool                GetSwitchPresence(CommandLineOptions *CMD, uint64_t SwitchNum);
     
     /*!
      @abstract                              "Gets the size of the buffer in an instance of BitInput".
