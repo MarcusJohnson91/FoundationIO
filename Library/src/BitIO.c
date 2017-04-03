@@ -505,12 +505,12 @@ extern "C" {
         return Result;
     }
     
-    bool IsSwitchPresent(CommandLineOptions *CMD, uint64_t SwitchNum) {
+    bool GetSwitchPresence(CommandLineOptions *CMD, uint64_t SwitchNum) {
         bool Status = 0;
         if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "IsSwitchPresent", "Pointer to CommandLineOptions is NULL\n");
+            Log(LOG_ERR, "libBitIO", "GetSwitchPresence", "Pointer to CommandLineOptions is NULL\n");
         } else if (SwitchNum > CMD->NumSwitches) { // - 1 so the hidden help option isn't exposed
-            Log(LOG_ERR, "libBitIO", "IsSwitchPresent", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "GetSwitchPresence", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
         } else {
             Status = CMD->Switch[SwitchNum]->SwitchFound;
         }
