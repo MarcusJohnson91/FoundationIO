@@ -830,9 +830,9 @@ extern "C" {
         }
     }
     
-    uint64_t GenerateCRC(const uint8_t *Data2CRC, const size_t Data2CRCSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit) {
+    uint64_t GenerateCRC(const uint8_t *Data2CRC, const size_t DataSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit) {
         uint16_t CRCResult = 0;
-        for (uint64_t Byte = 0; Byte < Data2CRCSize; Byte++) {
+        for (uint64_t Byte = 0; Byte < DataSize; Byte++) {
             CRCResult = ReciprocalPoly ^ Data2CRC[Byte] << 8;
             for (uint8_t Bit = 0; Bit < 8; Bit++) {
                 if ((CRCResult & 0x8000) == true) {
@@ -1017,6 +1017,17 @@ extern "C" {
             }
         }
         return UUIDsMatch;
+    }
+    
+    /*!
+     @abstract Reads and decodes MIME Base64
+     */
+    void ReadBase64(BitInput *BitI, uint8_t *Buffer, uint64_t BufferSize, uint64_t LineLength) {
+        
+    }
+    
+    void WriteBase64(BitOutput *BitO, uint8_t *Buffer, uint64_t BufferSize) {
+        
     }
     
 #ifdef __cplusplus

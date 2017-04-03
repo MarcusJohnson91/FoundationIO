@@ -375,12 +375,12 @@ extern "C" {
     /*!
      @abstract                              "Generates CRC from data".
      @param             Data2CRC            "Pointer to a data buffer containing data to run the CRC algorithm over".
-     @param             Data2CRCSize        "Size of the data chunk to generate the CRC for".
+     @param             DataSize            "Size of the data chunk to generate the CRC for, in bytes".
      @param             ReciprocalPoly      "The Polynomial in Normal representation".
      @param             PolySize            "The size of the polynomial in bits".
      @param             PolyInit            "Initalization value".
      */
-    uint64_t            GenerateCRC(const uint8_t *Data2CRC, const size_t Data2CRCSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit);
+    uint64_t            GenerateCRC(const uint8_t *Data2CRC, const size_t DataSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit);
     
     /*!
      @abstract                              "Computes the CRC of DataBuffer, and compares it to the submitted CRC".
