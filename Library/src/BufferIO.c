@@ -831,6 +831,23 @@ extern "C" {
     }
     
     uint64_t GenerateCRC(const uint8_t *Data2CRC, const size_t DataSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit) {
+        if (PolySize % 8 != 0) {
+            // You have to do it bitwise
+        } else if (DataSize % PolySize) {
+            // do it word wise aka grab PolySize bits from Data2CRC at once
+        } else {
+            // Do it bytewise
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         uint16_t CRCResult = 0;
         for (uint64_t Byte = 0; Byte < DataSize; Byte++) {
             CRCResult = ReciprocalPoly ^ Data2CRC[Byte] << 8;
