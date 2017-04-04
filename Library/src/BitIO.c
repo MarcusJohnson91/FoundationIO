@@ -1019,17 +1019,6 @@ extern "C" {
         return UUIDsMatch;
     }
     
-    /*!
-     @abstract Reads and decodes MIME Base64
-     */
-    void ReadBase64(BitInput *BitI, uint8_t *Buffer, uint64_t BufferSize, uint64_t LineLength) {
-        
-    }
-    
-    void WriteBase64(BitOutput *BitO, uint8_t *Buffer, uint64_t BufferSize) {
-        
-    }
-    
 #ifdef __cplusplus
 }
 #endif
