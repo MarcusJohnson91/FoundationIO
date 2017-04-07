@@ -51,6 +51,8 @@ extern "C" {
     
     typedef struct BitOutput BitOutput;
     
+    typedef struct BitBuffer BitBuffer;
+    
     typedef struct CommandLineOptions CommandLineOptions;
     
     /*!
@@ -258,7 +260,7 @@ extern "C" {
      @param             Bits2Read           "Number of bits to read".
      @param             ReadFromMSB         "Should ReadBits start at the most significant bit in this byte?"
      */
-    uint64_t            ReadBits(BitInput *BitI, const uint8_t Bits2Read, bool ReadFromMSB);
+    uint64_t            ReadBits(BitInput *BitI, const uint8_t Bits2Read, const bool ReadFromMSB);
     
     /*!
      @abstract                              "Shows the next X bits, without recording it as a read".
@@ -266,7 +268,7 @@ extern "C" {
      @param             Bits2Peek           "Number of bits to peek".
      @param             ReadFromMSB         "Should PeekBits start at the most significant bit in this byte?"
      */
-    uint64_t            PeekBits(BitInput *BitI, const uint8_t Bits2Peek, bool ReadFromMSB);
+    uint64_t            PeekBits(BitInput *BitI, const uint8_t Bits2Peek, const bool ReadFromMSB);
     
     /*!
      @abstract                              "Reads and Decodes unary/RICE encoded data from BitInput stream".
@@ -313,6 +315,14 @@ extern "C" {
     BitOutput          *InitBitOutput(void);
     
     /*!
+     @abstract                              "Initalizes a BitBuffer structure".
+     @param             BufferSize          "Size of the buffer in bytes".
+     @remark                                "The buffer MUST be unread".
+     @return                                "Returns a pointer to said BitBuffer structure".
+     */
+    BitBuffer          *InitBitBuffer(const size_t BufferSize);
+    
+    /*!
      @abstract                              "Deallocates BitInput".
      @remark                                "For use when changing files, or exiting the program".
      @param             BitI                "Pointer to instance of BitInput".
@@ -344,7 +354,7 @@ extern "C" {
      @param             Data2Write          "Is the actual data to write out".
      @param             NumBits             "Is the number of bits to write".
      */
-    void                WriteBits(BitOutput *BitO, const uint64_t Data2Write, uint8_t NumBits, const bool WriteFromMSB);
+    void                WriteBits(BitOutput *BitO, const uint64_t Data2Write, const uint8_t NumBits, const bool WriteFromMSB);
     
     /*!
      @abstract                              "Encodes and writes data in unary/RICE format to a BitOutput stream".
@@ -371,6 +381,8 @@ extern "C" {
      @param             BitO                "Pointer to instance of BitOutput".
      */
     void                CloseBitOutput(BitOutput *BitO);
+    
+    void                CloseBitBuffer(BitBuffer *BitB);
     
     /*!
      @abstract                              "Generates CRC from data".
