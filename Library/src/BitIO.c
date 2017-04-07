@@ -45,6 +45,12 @@ extern "C" {
         uint8_t            Buffer[BitInputBufferSize];
     } BitInput;
     
+    typedef struct BitBuffer {
+        size_t             BitsUnavailable;
+        size_t             BitsAvailable;
+        uint8_t           *Buffer;
+    } BitBuffer;
+    
     /*!
      @typedef           BitOutput
      @abstract                              "Contains variables and buffers for writing bits".
@@ -370,6 +376,13 @@ extern "C" {
         return BitO;
     }
     
+    BitBuffer *InitBitBuffer(const size_t BufferSize) {
+        BitBuffer *BitB       = calloc(1, sizeof(BitBuffer));
+        BitB->BitsAvailable   = Bytes2Bits(BufferSize);
+        BitB->BitsUnavailable = 0;
+        return BitB;
+    }
+    
     void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, const uint8_t InputSwitch) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Pointer to CommandLineOptions is NULL\n");
@@ -579,13 +592,59 @@ extern "C" {
         return OutputData;
     }
     
-    uint64_t PeekBits(BitInput *BitI, const uint8_t Bits2Peek, bool ReadFromMSB) {
+    uint64_t ReadBufferBits(BitBuffer *BitB, const uint8_t Bits2Read, const bool ReadFromMSB) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadBufferBits", "Invalid pointer to BitBuffer");
+        } else if (Bits2Read == 0 || Bits2Read > 64) {
+            Log(LOG_ERR, "libBitIO", "ReadBufferBits", "ReadBufferBits: %d, only supports reading 1-64 bits\n", Bits2Read);
+        } else if (BitB->BitsAvailable < Bits2Read) {
+            Log(LOG_ERR, "libBitIO", "ReadBufferBits", "Not enough bits in the buffer %d to satisfy the request %d", BitB->BitsAvailable, Bits2Read);
+        } else {
+            SystemBits             = 8 - (BitB->BitsUnavailable % 8);
+            UserBits               = BitsRemainingInByte(BitB);
+            Bits                   = SystemBits >= UserBits  ? UserBits : SystemBits;
+            Mask2Shift             = ReadFromMSB ? BitB->BitsAvailable % 8 : 0;
+            if (ReadFromMSB == true) {
+                Mask2Shift         = SystemBits <= UserBits  ? 0 : SystemBits - UserBits;
+                Mask               = (Power2Mask(Bits) << Mask2Shift);
+            } else {
+                Mask               = (Powi(2, Bits) - 1) << BitI->BitsUnavailable % 8;
+            }
+            Data                   = BitI->Buffer[BitI->BitsUnavailable / 8] & Mask;
+            Data                 >>= Mask2Shift;
+            OutputData           <<= SystemBits >= UserBits ? UserBits : SystemBits;
+            OutputData            += Data;
+            BitI->BitsAvailable   -= SystemBits >= UserBits ? UserBits : SystemBits;
+            BitI->BitsUnavailable += SystemBits >= UserBits ? UserBits : SystemBits;
+            Bits                  -= SystemBits >= UserBits ? UserBits : SystemBits;
+        }
+        
+        return 0;
+    }
+    
+    uint64_t PeekBufferBits(BitBuffer *BitB, const uint8_t Bits2Peek, const bool ReadFromMSB) {
+        uint64_t OutputData = 0ULL;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadBufferBits", "Invalid pointer to BitBuffer");
+        } else if (Bits2Read == 0 || Bits2Read > 64) {
+            Log(LOG_ERR, "libBitIO", "ReadBufferBits", "ReadBufferBits: %d, only supports reading 1-64 bits\n", Bits2Read);
+        } else if (BitB->BitsAvailable < Bits2Read) {
+            Log(LOG_ERR, "libBitIO", "ReadBufferBits", "Not enough bits in the buffer %d to satisfy the request %d", BitB->BitsAvailable, Bits2Read);
+        } else {
+            OutputData = ReadBufferBits(BitB, Bits2Peek, ReadFromMSB);
+            BitB->BitsAvailable   += Bits2Peek;
+            BitB->BitsUnavailable -= Bits2Peek;
+        }
+        return OutputData;
+    }
+    
+    uint64_t PeekBits(BitInput *BitI, const uint8_t Bits2Peek, const bool ReadFromMSB) {
         uint64_t OutputData = 0ULL;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "PeekBits", "Pointer to BitInput is NULL\n");
         } else {
             OutputData                 = ReadBits(BitI, Bits2Peek, ReadFromMSB);
-            BitI->BitsAvailable       += Bits2Peek;
+            BitI->BitsAvailable       += Bits2Peek; // Backwards to set the counter back to where it was.
             BitI->BitsUnavailable     -= Bits2Peek;
         }
         return OutputData;
@@ -827,6 +886,15 @@ extern "C" {
             fflush(BitO->File);
             fclose(BitO->File);
             free(BitO);
+        }
+    }
+    
+    void CloseBitBuffer(BitBuffer *BitB) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "CloseBitBuffer", "Pointer to BitBuffer is NULL");
+        } else {
+            free(BitB->Buffer);
+            free(BitB);
         }
     }
     
