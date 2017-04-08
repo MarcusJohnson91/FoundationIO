@@ -46,12 +46,17 @@ extern "C" {
         BitIOEncodedGUIDSize      = BitIOEncodedUUIDSize,
         BitIOMD5Size              = 16,
     };
+    /*
+    typedef struct BitInput BitInput;
+    
+    typedef struct BitOutput BitOutput;
+     */
+    
+    typedef struct BitBuffer BitBuffer;
     
     typedef struct BitInput BitInput;
     
     typedef struct BitOutput BitOutput;
-    
-    typedef struct BitBuffer BitBuffer;
     
     typedef struct CommandLineOptions CommandLineOptions;
     
@@ -256,44 +261,44 @@ extern "C" {
     /*!
      @abstract                              "Manages InputBuffer and hands out the requested bits".
      @remark                                "DO NOT try reading backwards, it will not work. for that use SkipBits()".
-     @param             BitI                "Pointer to instance of BitInput".
+     @param             BitB                "Pointer to instance of BitBuffer".
      @param             Bits2Read           "Number of bits to read".
      @param             ReadFromMSB         "Should ReadBits start at the most significant bit in this byte?"
      */
-    uint64_t            ReadBits(BitInput *BitI, const uint8_t Bits2Read, const bool ReadFromMSB);
+    uint64_t            ReadBits(BitBuffer *BitB, const uint8_t Bits2Read, const bool ReadFromMSB);
     
     /*!
      @abstract                              "Shows the next X bits, without recording it as a read".
-     @param             BitI                "Pointer to instance of BitInput".
+     @param             BitB                "Pointer to instance of BitBuffer".
      @param             Bits2Peek           "Number of bits to peek".
      @param             ReadFromMSB         "Should PeekBits start at the most significant bit in this byte?"
      */
-    uint64_t            PeekBits(BitInput *BitI, const uint8_t Bits2Peek, const bool ReadFromMSB);
+    uint64_t            PeekBits(BitBuffer *BitB, const uint8_t Bits2Peek, const bool ReadFromMSB);
     
     /*!
      @abstract                              "Reads and Decodes unary/RICE encoded data from BitInput stream".
      @return                                "Returns the count of bits aka the value encoded by the encoder".
-     @param             BitI                "Pointer to instance of BitInput".
+     @param             BitB                "Pointer to instance of BitBuffer".
      @param             Truncated           "Shoould the StopBit be included in the count?"
      @param             StopBit             "MUST be a 0 or a 1. none of this funny business about how true > 0".
      */
-    uint64_t            ReadRICE(BitInput *BitI, const bool Truncated, const bool StopBit);
+    uint64_t            ReadRICE(BitBuffer *BitB, const bool Truncated, const bool StopBit);
     
     /*!
      @abstract                              "Reads data encoded as Exponential-Golomb aka Elias Gamma".
      @return                                "Returns the decoded value of the Elias/Golomb code".
-     @param             BitI                "Pointer to instance of BitInput".
+     @param             BitB                "Pointer to instance of BitBuffer".
      @param             IsSigned            "Should it be read as signed or unsigneed?".
      */
-    int64_t             ReadExpGolomb(BitInput *BitI, const bool IsSigned);
+    int64_t             ReadExpGolomb(BitBuffer *BitB, const bool IsSigned);
     
     /*!
      @abstract                              "Seeks Forwards and backwards in BitInput"
      @remark                                "To seek backwards just use a negative number, to seek forwards positive".
-     @param             BitI                "Pointer to instance of BitInput".
+     @param             BitB                "Pointer to instance of BitBuffer".
      @param             Bits2Skip           "The number of bits to skip".
      */
-    void                SkipBits(BitInput *BitI, const int64_t Bits2Skip);
+    void                SkipBits(BitBuffer *BitB, const int64_t Bits2Skip);
     
     /*!
      @abstract                              "Pads output buffer so it is aligned to whatever number of bytes you want".
@@ -333,47 +338,41 @@ extern "C" {
      @abstract                              "Tells if the stream/buffer is byte aligned or not".
      @param             BytesOfAlignment    "Are you trying to see if it's aligned to a byte, short, word, etc alignment? Specify in number of bytes".
      */
-    bool                IsInputStreamByteAligned(BitInput *BitI, const uint8_t BytesOfAlignment);
-    
-    /*!
-     @abstract                              "Tells if the stream/buffer is byte aligned or not".
-     @param             BytesOfAlignment    "Are you trying to see if it's aligned to a byte, short, word, etc alignment? Specify in number of bytes".
-     */
-    bool                IsOutputStreamByteAligned(BitOutput *BitO, const uint8_t BytesOfAlignment);
+    bool                IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment);
     
     /*!
      @abstract                              "Aligns bits for multi-byte alignment".
-     @param             BitO                "Pointer to instance of BitOutput".
+     @param             BitB                "Pointer to instance of BitBuffer".
      @param             BytesOfAlignment    "Align BitI to X byte boundary".
      */
-    void                AlignOutput(BitOutput *BitO, const uint8_t BytesOfAlignment);
+    void                AlignBitBuffer(BitBuffer *BitB, const uint8_t BytesOfAlignment);
     
     /*!
      @abstract                              "Writes bits to BitOutput->File".
-     @param             BitO                "Pointer to instance of BitOutput".
+     @param             BitB                "Pointer to instance of BitBuffer".
      @param             Data2Write          "Is the actual data to write out".
      @param             NumBits             "Is the number of bits to write".
      */
-    void                WriteBits(BitOutput *BitO, const uint64_t Data2Write, const uint8_t NumBits, const bool WriteFromMSB);
+    void                WriteBits(BitBuffer *BitB, const uint64_t Data2Write, const uint8_t NumBits, const bool WriteFromMSB);
     
     /*!
      @abstract                              "Encodes and writes data in unary/RICE format to a BitOutput stream".
-     @param             BitO                "Pointer to BitOutput, the output stream".
+     @param             BitB                "Pointer to BitBuffer, the output buffer".
      @param             Truncated           "Should the stop bit be pruned?"
      @param             StopBit             "Has to be a 0 or a 1".
      @param             Data2Write          "Number to encode into RICE format".
      @param             WriteFromMSB        "Should Data2Write be written from the MSB or the LSB?".
      */
-    void                WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write, const bool WriteFromMSB);
+    void                WriteRICE(BitBuffer *BitB, const bool Truncated, const bool StopBit, const uint64_t Data2Write, const bool WriteFromMSB);
     
     /*!
      @abstract                              "Writes data encoded as Exponential-Golomb aka Elias Gamma codes to BitO".
-     @param             BitO                "Pointer to instance of BitOutput".
+     @param             BitB                "Pointer to instance of BitBuffer".
      @param             IsSigned            "Is Data2Write signed?".
      @param             Data2Write          "The actual data to write to the output file".
      @param             WriteFromMSB        "Should Data2Write be written from the MSB or the LSB?".
      */
-    void                WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write, const bool WriteFromMSB);
+    void                WriteExpGolomb(BitBuffer *BitB, const bool IsSigned, const uint64_t Data2Write, const bool WriteFromMSB);
     
     /*!
      @abstract                              "Deallocates BitOutput"
@@ -434,10 +433,10 @@ extern "C" {
     /*!
      @abstract                              "Reads raw UUID/GUID from the bitstream".
      @remark                                "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
-     @param             BitI                "Pointer to instance of BitInput".
+     @param             BitB                "Pointer to instance of BitBuffer".
      @param             UUIDString          "Character array to read UUID string into".
      */
-    void                ReadUUID(BitInput *BitI, uint8_t *UUIDString);
+    void                ReadUUID(BitBuffer *BitB, uint8_t *UUIDString);
     
     /*!
      @abstract                              "Endian swaps a UUID into a GUID and vice versa".
@@ -449,10 +448,10 @@ extern "C" {
     /*!
      @abstract                              "Write UUID/GUID string as hyphen-less blob".
      @remark                                "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
-     @param             BitO                "Pointer to instance of BitOutput".
+     @param             BitB                "Pointer to instance of BitBuffer".
      @param             UUIDString          "UUID string to write to the file as a binary blob, aka remove hyphens and null terminating char".
      */
-    uint8_t             WriteUUID(BitOutput *BitO, const uint8_t *UUIDString);
+    uint8_t             WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString);
     
     /*!
      @abstract                              "Verify two UUIDs match each other".

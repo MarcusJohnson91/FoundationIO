@@ -9,10 +9,12 @@
 #include <string.h>
 
 #ifndef _WIN32
+#include <sys/socket.h>
 #include <syslog.h>
 #include <unistd.h>
 #else
 #include <winbase.h>
+#include <winsock.h>
 #endif
 
 #ifdef __cplusplus
@@ -35,6 +37,7 @@ extern "C" {
      @constant          SystemEndian        "Endian of the running system".
      @constant          Buffer              "Buffer of data from File".
      */
+    /*
     typedef struct BitInput {
         FILE              *File;
         size_t             FileSize;
@@ -44,12 +47,7 @@ extern "C" {
         uint8_t            SystemEndian:2;
         uint8_t            Buffer[BitInputBufferSize];
     } BitInput;
-    
-    typedef struct BitBuffer {
-        size_t             BitsUnavailable;
-        size_t             BitsAvailable;
-        uint8_t           *Buffer;
-    } BitBuffer;
+     */
     
     /*!
      @typedef           BitOutput
@@ -61,6 +59,7 @@ extern "C" {
      @constant          SystemEndian        "Endian of the running system".
      @constant          Buffer              "Buffer of BitIOBufferSize bits from File".
      */
+    /*
     typedef struct BitOutput {
         FILE              *File;
         size_t             BitsUnavailable;
@@ -68,6 +67,39 @@ extern "C" {
         uint8_t            SystemEndian:2;
         uint8_t            Buffer[BitOutputBufferSize];
         FILE              *LogFile;
+    } BitOutput;
+     */
+    
+    
+    // The whole point of setting up BitBuffer, is to read and write bits anywhere, instead of just to files.
+    // So, ReadBits should read and write to a buffer, and the file handling needs to be exported to dedicated functions.
+    // Oh, and we need to also handle network streams as well.
+    // So, lets say i'm getting Mpeg2Stream packets from a file or the network.
+    // I need to break that file into Program/Transport/PES packets, then go to work on a buffer containing a single packet at once.
+    // So, we need to call a File2Buffer function that extracts 188 bytes at a time.
+    // We then identify the type of packet, and send it off along to the various parsing functions.
+    // Then we buffer the data contained in the packets, to build up an elementary packet (like a video frame)
+    // So, we need a file/socket muxer to break up packets.
+    typedef struct BitBuffer {
+        size_t             BitsUnavailable;
+        size_t             BitsAvailable;
+        uint8_t           *Buffer;
+    } BitBuffer;
+    
+    typedef struct BitInput {
+        FILE              *File;
+        size_t             FileSize;
+        size_t             FilePosition;
+        uint8_t            SystemEndian:2;
+        FILE              *LogFile;
+        BitBuffer         *BitB;
+    } BitInput;
+    
+    typedef struct BitOutput {
+        FILE              *File;
+        uint8_t            SystemEndian:2;
+        FILE              *LogFile;
+        BitBuffer         *BitB;
     } BitOutput;
     
     /*!
@@ -393,11 +425,11 @@ extern "C" {
             fseek(BitI->File, 0, SEEK_END);
             BitI->FileSize = (uint64_t)ftell(BitI->File);
             fseek(BitI->File, 0, SEEK_SET);
-            BitI->FilePosition     = ftell(BitI->File);
-            uint64_t Bytes2Read    = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
-            uint64_t BytesRead     = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
-            BitI->BitsAvailable    = Bytes2Bits(BytesRead);
-            BitI->BitsUnavailable  = 0;
+            BitI->FilePosition          = ftell(BitI->File);
+            uint64_t Bytes2Read         = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
+            uint64_t BytesRead          = fread(BitI->BitB->Buffer, 1, Bytes2Read, BitI->File);
+            BitI->BitB->BitsAvailable   = Bytes2Bits(BytesRead);
+            BitI->BitB->BitsUnavailable = 0;
             DetectSystemEndian();
         }
     }
@@ -409,8 +441,8 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Pointer to BitOutput is NULL\n");
         } else {
             BitO->File             = fopen(CMD->Switch[OutputSwitch]->SwitchResult, "rb");
-            BitO->BitsAvailable    = BitOutputBufferSizeInBits;
-            BitO->BitsUnavailable  = 0;
+            BitO->BitB->BitsAvailable = BitOutputBufferSizeInBits;
+            BitO->BitB->BitsUnavailable = 0;
             DetectSystemEndian();
         }
     }
@@ -548,114 +580,65 @@ extern "C" {
         } else {
             fseek(BitI->File, RelativeOffsetInBytes, SEEK_CUR);
             BitI->FilePosition = ftell(BitI->File);
-            memset(BitI->Buffer, 0, sizeof(BitI->Buffer));
+            memset(BitI->BitB->Buffer, 0, sizeof(BitI->BitB->Buffer));
             Bytes2Read = BitI->FileSize - BitI->FilePosition >= BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
-            BytesRead  = fread(BitI->Buffer, 1, Bytes2Read, BitI->File);
+            BytesRead  = fread(BitI->BitB->Buffer, 1, Bytes2Read, BitI->File);
             if (BytesRead != Bytes2Read) {
                 Log(LOG_WARNING, "libBitIO", "UpdateInputBuffer", "Supposed to read %llu bytes, but read %llu\n", Bytes2Read, BytesRead);
             }
-            uint64_t NEWBitsUnavailable = BitI->BitsUnavailable % 8; // FIXME: This assumes UpdateBuffer was called with at most 7 unused bits in the buffer...
+            uint64_t NEWBitsUnavailable = BitI->BitB->BitsUnavailable % 8; // FIXME: This assumes UpdateBuffer was called with at most 7 unused bits in the buffer...
             
-            BitI->BitsUnavailable = NEWBitsUnavailable;
-            BitI->BitsAvailable   = Bytes2Bits(BytesRead);
+            BitI->BitB->BitsUnavailable = NEWBitsUnavailable;
+            BitI->BitB->BitsAvailable   = Bytes2Bits(BytesRead);
         }
     }
     
-    uint64_t ReadBits(BitInput *BitI, const uint8_t Bits2Read, bool ReadFromMSB) {
+    uint64_t ReadBits(BitBuffer *BitB, const uint8_t Bits2Read, bool ReadFromMSB) {
         uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, Mask = 0, Data = 0, Mask2Shift = 0;
         uint64_t OutputData = 0;
         
         if ((Bits2Read <= 0) || (Bits2Read > 64)) {
             Log(LOG_ERR, "libBitIO", "ReadBits", "ReadBits: %d, only supports reading 1-64 bits\n", Bits2Read);
         } else {
-            if (BitI->BitsAvailable < Bits) {
-                UpdateInputBuffer(BitI, 0);
-            }
-            SystemBits             = 8 - (BitI->BitsUnavailable % 8);
-            UserBits               = BitsRemainingInByte(Bits);
-            Bits                   = SystemBits >= UserBits  ? UserBits : SystemBits;
-            Mask2Shift             = ReadFromMSB ? BitI->BitsAvailable % 8 : 0;
-            if (ReadFromMSB == true) {
-                Mask2Shift         = SystemBits <= UserBits  ? 0 : SystemBits - UserBits;
-                Mask               = (Power2Mask(Bits) << Mask2Shift);
-            } else {
-                Mask               = (Powi(2, Bits) - 1) << BitI->BitsUnavailable % 8;
-            }
-            Data                   = BitI->Buffer[BitI->BitsUnavailable / 8] & Mask;
-            Data                 >>= Mask2Shift;
-            OutputData           <<= SystemBits >= UserBits ? UserBits : SystemBits;
-            OutputData            += Data;
-            BitI->BitsAvailable   -= SystemBits >= UserBits ? UserBits : SystemBits;
-            BitI->BitsUnavailable += SystemBits >= UserBits ? UserBits : SystemBits;
-            Bits                  -= SystemBits >= UserBits ? UserBits : SystemBits;
-        }
-        return OutputData;
-    }
-    
-    uint64_t ReadBufferBits(BitBuffer *BitB, const uint8_t Bits2Read, const bool ReadFromMSB) {
-        if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadBufferBits", "Invalid pointer to BitBuffer");
-        } else if (Bits2Read == 0 || Bits2Read > 64) {
-            Log(LOG_ERR, "libBitIO", "ReadBufferBits", "ReadBufferBits: %d, only supports reading 1-64 bits\n", Bits2Read);
-        } else if (BitB->BitsAvailable < Bits2Read) {
-            Log(LOG_ERR, "libBitIO", "ReadBufferBits", "Not enough bits in the buffer %d to satisfy the request %d", BitB->BitsAvailable, Bits2Read);
-        } else {
             SystemBits             = 8 - (BitB->BitsUnavailable % 8);
-            UserBits               = BitsRemainingInByte(BitB);
+            UserBits               = BitsRemainingInByte(Bits);
             Bits                   = SystemBits >= UserBits  ? UserBits : SystemBits;
             Mask2Shift             = ReadFromMSB ? BitB->BitsAvailable % 8 : 0;
             if (ReadFromMSB == true) {
                 Mask2Shift         = SystemBits <= UserBits  ? 0 : SystemBits - UserBits;
                 Mask               = (Power2Mask(Bits) << Mask2Shift);
             } else {
-                Mask               = (Powi(2, Bits) - 1) << BitI->BitsUnavailable % 8;
+                Mask               = (Powi(2, Bits) - 1) << BitB->BitsUnavailable % 8;
             }
-            Data                   = BitI->Buffer[BitI->BitsUnavailable / 8] & Mask;
+            Data                   = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
             Data                 >>= Mask2Shift;
             OutputData           <<= SystemBits >= UserBits ? UserBits : SystemBits;
             OutputData            += Data;
-            BitI->BitsAvailable   -= SystemBits >= UserBits ? UserBits : SystemBits;
-            BitI->BitsUnavailable += SystemBits >= UserBits ? UserBits : SystemBits;
+            BitB->BitsAvailable   -= SystemBits >= UserBits ? UserBits : SystemBits;
+            BitB->BitsUnavailable += SystemBits >= UserBits ? UserBits : SystemBits;
             Bits                  -= SystemBits >= UserBits ? UserBits : SystemBits;
         }
-        
-        return 0;
+        return OutputData;
     }
     
-    uint64_t PeekBufferBits(BitBuffer *BitB, const uint8_t Bits2Peek, const bool ReadFromMSB) {
+    uint64_t PeekBits(BitBuffer *BitB, const uint8_t Bits2Peek, const bool ReadFromMSB) {
         uint64_t OutputData = 0ULL;
         if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadBufferBits", "Invalid pointer to BitBuffer");
-        } else if (Bits2Read == 0 || Bits2Read > 64) {
-            Log(LOG_ERR, "libBitIO", "ReadBufferBits", "ReadBufferBits: %d, only supports reading 1-64 bits\n", Bits2Read);
-        } else if (BitB->BitsAvailable < Bits2Read) {
-            Log(LOG_ERR, "libBitIO", "ReadBufferBits", "Not enough bits in the buffer %d to satisfy the request %d", BitB->BitsAvailable, Bits2Read);
+            Log(LOG_ERR, "libBitIO", "PeekBits", "Pointer to BitBuffer is NULL\n");
         } else {
-            OutputData = ReadBufferBits(BitB, Bits2Peek, ReadFromMSB);
-            BitB->BitsAvailable   += Bits2Peek;
-            BitB->BitsUnavailable -= Bits2Peek;
+            OutputData                 = ReadBits(BitB, Bits2Peek, ReadFromMSB);
+            BitB->BitsAvailable       += Bits2Peek; // Backwards to set the counter back to where it was.
+            BitB->BitsUnavailable     -= Bits2Peek;
         }
         return OutputData;
     }
     
-    uint64_t PeekBits(BitInput *BitI, const uint8_t Bits2Peek, const bool ReadFromMSB) {
-        uint64_t OutputData = 0ULL;
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "PeekBits", "Pointer to BitInput is NULL\n");
-        } else {
-            OutputData                 = ReadBits(BitI, Bits2Peek, ReadFromMSB);
-            BitI->BitsAvailable       += Bits2Peek; // Backwards to set the counter back to where it was.
-            BitI->BitsUnavailable     -= Bits2Peek;
-        }
-        return OutputData;
-    }
-    
-    uint64_t  ReadRICE(BitInput *BitI, const bool Truncated, const bool StopBit) {
+    uint64_t  ReadRICE(BitBuffer *BitB, const bool Truncated, const bool StopBit) {
         uint64_t BitCount = 0;
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadRICE", "Pointer to BitInput is NULL\n");
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadRICE", "Pointer to BitBuffer is NULL\n");
         } else {
-            while (ReadBits(BitI, 1, false) != (StopBit & 1)) {
+            while (ReadBits(BitB, 1, false) != (StopBit & 1)) {
                 BitCount += 1;
             }
             if (Truncated == true) {
@@ -665,21 +648,21 @@ extern "C" {
         return BitCount;
     }
     
-    int64_t ReadExpGolomb(BitInput *BitI, const bool IsSigned) {
+    int64_t ReadExpGolomb(BitBuffer *BitB, const bool IsSigned) {
         int64_t  Final = 0;
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadExpGolomb", "Pointer to BitInput is NULL\n");
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadExpGolomb", "Pointer to BitBuffer is NULL\n");
         } else {
             uint64_t Zeros   = 0;
             uint64_t CodeNum = 0;
             
-            while (ReadBits(BitI, 1, false) != 1) {
+            while (ReadBits(BitB, 1, false) != 1) {
                 Zeros += 1;
             }
             
             if (IsSigned == false) {
                 CodeNum  = (1ULL << Zeros);
-                CodeNum += ReadBits(BitI, Zeros, false);
+                CodeNum += ReadBits(BitB, Zeros, false);
                 Final    = CodeNum;
             } else { // Signed
                 if (IsOdd(CodeNum) == true) {
@@ -692,46 +675,24 @@ extern "C" {
         return Final;
     }
     
-    void SkipBits(BitInput *BitI, const int64_t Bits2Skip) {
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SkipBits", "Pointer to BitInput is NULL\n");
+    void SkipBits(BitBuffer *BitB, const int64_t Bits2Skip) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "SkipBits", "Pointer to BitBuffer is NULL\n");
         } else {
-            if (Bits2Skip <= BitI->BitsAvailable) {
-                BitI->BitsAvailable   -= Bits2Skip;
-                BitI->BitsUnavailable += Bits2Skip;
-            } else {
-                fseek(BitI->File, Bits2Bytes(Bits2Skip - BitI->BitsAvailable, true), SEEK_CUR);
-                BitI->BitsAvailable   = BitI->FileSize + BitInputBufferSize <= BitI->FileSize ? BitInputBufferSize : BitI->FileSize;
-                BitI->BitsUnavailable = Bits2Skip % 8;
-                UpdateInputBuffer(BitI, 0);
-            }
+            BitB->BitsAvailable   -= Bits2Skip;
+            BitB->BitsUnavailable += Bits2Skip;
+            // The file/stream updating functions need to keep this in mind.
         }
     }
     
-    bool IsInputStreamByteAligned(BitInput *BitI, const uint8_t BytesOfAlignment) {
+    bool IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
         bool AlignmentStatus = 0;
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "IsInputStreamByteAligned", "Pointer to BitInput is NULL\n");
-        } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
-            Log(LOG_ERR, "libBitIO", "IsInputStreamByteAligned", "BytesOfAlignment: %d isn't a power of 2 (or 1)\n", BytesOfAlignment);
-        } else {
-            if ((BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
-                AlignmentStatus = true;
-            } else {
-                AlignmentStatus = false;
-            }
-        }
-        return AlignmentStatus;
-    }
-    
-    bool IsOutputStreamByteAligned(BitOutput *BitO, const uint8_t BytesOfAlignment) {
-        bool AlignmentStatus = 0;
-        if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "IsOutputStreamByteAligned", "Pointer to BitOutput is NULL\n");
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "IsOutputStreamByteAligned", "Pointer to BitBuffer is NULL\n");
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
             Log(LOG_ERR, "libBitIO", "IsOutputStreamByteAligned", "BytesOfAlignment: %d isn't a power of 2 (or 1)\n", BytesOfAlignment);
         } else {
-            if ((BitO->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
+            if ((BitB->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
                 AlignmentStatus = true;
             } else {
                 AlignmentStatus = false;
@@ -740,16 +701,16 @@ extern "C" {
         return AlignmentStatus;
     }
     
-    void AlignInput(BitInput *BitI, const uint8_t BytesOfAlignment) {
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "AlignInput", "Pointer to BitInput is NULL\n");
+    void AlignBitBuffer(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "AlignInput", "Pointer to BitBuffer is NULL\n");
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
             Log(LOG_ERR, "libBitIO", "AlignInput", "BytesOfAlignment: %d isn't a power of 2 (or 1)\n", BytesOfAlignment);
         } else {
-            uint8_t Bits2Align = BitI->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
+            uint8_t Bits2Align = BitB->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
             if (Bits2Align != 0) {
-                BitI->BitsAvailable   -= Bits2Align;
-                BitI->BitsUnavailable += Bits2Align;
+                BitB->BitsAvailable   -= Bits2Align;
+                BitB->BitsUnavailable += Bits2Align;
             }
         }
     }
@@ -760,10 +721,10 @@ extern "C" {
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
             Log(LOG_ERR, "libBitIO", "AlignOutput", "BytesOfAlignment: %d isn't a power of 2 (or 1)\n", BytesOfAlignment);
         } else {
-            uint8_t Bits2Align = BitO->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
+            uint8_t Bits2Align = BitO->BitB->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
             if (Bits2Align != 0) {
-                BitO->BitsAvailable    -= Bits2Align;
-                BitO->BitsUnavailable  += Bits2Align;
+                BitO->BitB->BitsAvailable    -= Bits2Align;
+                BitO->BitB->BitsUnavailable  += Bits2Align;
             }
         }
     }
@@ -773,7 +734,7 @@ extern "C" {
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputBufferSize", "Pointer to BitOutput is NULL\n");
         } else {
-            BufferSize = sizeof(BitI->Buffer);
+            BufferSize = sizeof(BitI->BitB->Buffer);
         }
         return BufferSize;
     }
@@ -783,22 +744,18 @@ extern "C" {
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitOutputBufferSize", "Pointer to BitOutput is NULL\n");
         } else {
-            BufferSize = sizeof(BitO->Buffer);
+            BufferSize = sizeof(BitO->BitB->Buffer);
         }
         return BufferSize;
     }
     
-    void WriteBits(BitOutput *BitO, const uint64_t Data2Write, uint8_t NumBits, const bool WriteFromMSB) {
-        if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteBits", "Pointer to BitOutput is NULL\n");
+    void WriteBits(BitBuffer *BitB, const uint64_t Data2Write, uint8_t NumBits, const bool WriteFromMSB) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteBits", "Pointer to BitBuffer is NULL\n");
         } else {
             // FIXME: WriteBits currently copies NumBits bits to the file, even if the input is shorter than that. we need to prepend 0 bits if that's the case
             
             uint8_t Bits2Write2BufferByte, Bits2ShiftMask, Mask;
-            
-            if (BitO->BitsAvailable < NumBits) {
-                fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
-            }
             
             // so we're trying to write 9 bits, 0x1FF.
             // There are only 5 bits available in the current byte.
@@ -807,30 +764,30 @@ extern "C" {
             // The buffer's representation is MSB first.
             // if we're supposed to write this data LSB first we need to shift it after extraction to get it ready to be applied.
             while (NumBits > 0) {
-                Bits2Write2BufferByte  = 8 - (BitO->BitsAvailable % 8); // extract 5 bits from the buffer
-                Bits2ShiftMask         = WriteFromMSB ? BitO->BitsAvailable % 8 : 0;
+                Bits2Write2BufferByte  = 8 - (BitB->BitsAvailable % 8); // extract 5 bits from the buffer
+                Bits2ShiftMask         = WriteFromMSB ? BitB->BitsAvailable % 8 : 0;
                 Mask                   = Power2Mask(Bits2Write2BufferByte) << Bits2ShiftMask;
-                BitO->Buffer[Bits2Bytes(BitO->BitsAvailable, false)] = Data2Write & Mask;
+                BitB->Buffer[Bits2Bytes(BitB->BitsAvailable, false)] = Data2Write & Mask;
                 NumBits               -= Bits2Write2BufferByte;
-                BitO->BitsAvailable   -= Bits2Write2BufferByte;
-                BitO->BitsUnavailable += Bits2Write2BufferByte;
+                BitB->BitsAvailable   -= Bits2Write2BufferByte;
+                BitB->BitsUnavailable += Bits2Write2BufferByte;
             }
         }
     }
     
-    void WriteRICE(BitOutput *BitO, const bool Truncated, const bool StopBit, const uint64_t Data2Write, const bool WriteFromMSB) {
-        if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteRICE", "Pointer to BitOutput is NULL\n");
+    void WriteRICE(BitBuffer *BitB, const bool Truncated, const bool StopBit, const uint64_t Data2Write, const bool WriteFromMSB) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteRICE", "Pointer to BitBuffer is NULL\n");
         } else {
             for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
-                WriteBits(BitO, (~StopBit), 1, WriteFromMSB);
+                WriteBits(BitB, (~StopBit), 1, WriteFromMSB);
             }
-            WriteBits(BitO, StopBit, 1, WriteFromMSB);
+            WriteBits(BitB, StopBit, 1, WriteFromMSB);
         }
     }
     
-    void WriteExpGolomb(BitOutput *BitO, const bool IsSigned, const uint64_t Data2Write, const bool WriteFromMSB) {
-        if (BitO == NULL) {
+    void WriteExpGolomb(BitBuffer *BitB, const bool IsSigned, const uint64_t Data2Write, const bool WriteFromMSB) {
+        if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteExpGolomb", "Pointer to BitOutput is NULL\n");
         } else {
             uint64_t NumBits = 0;
@@ -838,15 +795,15 @@ extern "C" {
             NumBits = FindHighestBitSet(Data2Write);
             
             if (IsSigned == false) {
-                WriteBits(BitO, 0, NumBits, WriteFromMSB);
-                WriteBits(BitO, Data2Write + 1, NumBits + 1, WriteFromMSB);
+                WriteBits(BitB, 0, NumBits, WriteFromMSB);
+                WriteBits(BitB, Data2Write + 1, NumBits + 1, WriteFromMSB);
             } else {
                 NumBits -= 1;
-                WriteBits(BitO, 0, NumBits, WriteFromMSB);
+                WriteBits(BitB, 0, NumBits, WriteFromMSB);
                 if (IsOdd(Data2Write +1) == false) {
-                    WriteBits(BitO, Data2Write + 1, NumBits + 1, WriteFromMSB);
+                    WriteBits(BitB, Data2Write + 1, NumBits + 1, WriteFromMSB);
                 } else {
-                    WriteBits(BitO, Data2Write + 1, NumBits + 1, WriteFromMSB);
+                    WriteBits(BitB, Data2Write + 1, NumBits + 1, WriteFromMSB);
                 }
             }
         }
@@ -868,7 +825,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "FlushOutputBuffer", "Bytes2Flush is %d, should be >= 1\n", Bytes2Flush);
         } else {
             size_t BytesWritten = 0;
-            BytesWritten = fwrite(BitO->Buffer, 1, Bytes2Flush, BitO->File);
+            BytesWritten = fwrite(BitO->BitB->Buffer, 1, Bytes2Flush, BitO->File);
             if (BytesWritten != Bytes2Flush) {
                 Log(LOG_EMERG, "libBitIO", "FlushOutputBuffer", "Wrote %d bytes out of %d", BytesWritten, Bytes2Flush);
             }
@@ -882,7 +839,7 @@ extern "C" {
             if (IsOutputStreamByteAligned(BitO, 1) == false) {
                 AlignOutput(BitO, 1);
             }
-            fwrite(BitO->Buffer, Bits2Bytes(BitO->BitsUnavailable, true), 1, BitO->File);
+            fwrite(BitO->BitB->Buffer, Bits2Bytes(BitO->BitB->BitsUnavailable, true), 1, BitO->File);
             fflush(BitO->File);
             fclose(BitO->File);
             free(BitO);
@@ -906,16 +863,7 @@ extern "C" {
         } else {
             // Do it bytewise
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        /*
         uint16_t CRCResult = 0;
         for (uint64_t Byte = 0; Byte < DataSize; Byte++) {
             CRCResult = ReciprocalPoly ^ Data2CRC[Byte] << 8;
@@ -926,6 +874,7 @@ extern "C" {
                 }
             }
         }
+         */
         return 0;
     }
     
@@ -951,23 +900,6 @@ extern "C" {
             return false;
         } else {
             return true;
-        }
-    }
-    
-    void RotateArray(const size_t DataSize, int64_t *Data, const uint64_t NumRotations, const bool RotateRight) {
-        // Theoretical speed up: just edit the Pointer to each array element, and increment or decrement it by  NumRotation.
-        if (RotateRight == true) {
-            for (uint64_t Rotation = 0; Rotation < NumRotations; Rotation++) {
-                for (uint64_t Element = 0; Element < DataSize; Element++) {
-                    Data[Element + 1] = Data[Element]; // TODO: Make sure the last element wraps around to the end.
-                }
-            }
-        } else { // Rotate left
-            for (uint64_t Rotation = 0; Rotation < NumRotations; Rotation++) {
-                for (uint64_t Element = DataSize; Element > 0; Element--) {
-                    Data[Element] = Data[Element - 1];
-                }
-            }
         }
     }
     
@@ -1005,7 +937,7 @@ extern "C" {
 #endif
     }
     
-    void ReadUUID(BitInput *BitI, uint8_t *UUIDString) {
+    void ReadUUID(BitBuffer *BitB, uint8_t *UUIDString) {
         if (sizeof(UUIDString) != BitIOUUIDSize) {
             Log(LOG_ERR, "libBitIO", "ReadUUID", "UUIDString is %d bytes long, should be 21\n", sizeof(UUIDString));
         } else {
@@ -1015,7 +947,7 @@ extern "C" {
                 } else if ((Character == 4) || (Character == 7) || (Character == 10) || (Character == 13)) {
                     UUIDString[Character] = 0x2D;
                 } else {
-                    UUIDString[Character] = ReadBits(BitI, 8, true);
+                    UUIDString[Character] = ReadBits(BitB, 8, true);
                 }
             }
         }
@@ -1074,13 +1006,13 @@ extern "C" {
         }
     }
     
-    uint8_t WriteUUID(BitOutput *BitO, const uint8_t *UUIDString) {
+    uint8_t WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString) {
         if (sizeof(UUIDString) != BitIOUUIDSize) {
             Log(LOG_ERR, "libBitIO", "WriteUUID", "UUIDString is %d bytes long, should be 21\n", sizeof(UUIDString));
         } else {
             for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDSize - 1; UUIDByte++) {
                 if ((UUIDByte != 4) && (UUIDByte != 7) && (UUIDByte != 10) && (UUIDByte != 13) && (UUIDByte != 20)) { // Bullshit bytes
-                    WriteBits(BitO, UUIDString[UUIDByte], 8, true);
+                    WriteBits(BitB, UUIDString[UUIDByte], 8, true);
                 }
             }
         }
@@ -1102,6 +1034,52 @@ extern "C" {
             }
         }
         return UUIDsMatch;
+    }
+    
+    void OpenSocket() {
+        
+    }
+    
+    void CreateSocket(const int Domain, const int Type, const int Protocol) {
+        int Socket;
+#ifndef _WIN32
+        Socket = socket(Domain, Type, Protocol);
+#elif _WIN32
+        
+#endif
+    }
+    
+    // So, I need to accept packets of variable size, from the network, disk, whatever.
+    
+    // Should BitInput and BitOutput store a value saying what type of "file" it's being written to? or just write to the file handle regardless?
+    // So, the gist is we need a function to read from a file or network stream, and create a buffer from that data, and pop it into the struct.
+    // Ok, so I need a function to read a file/socket into a buffer, and one to write a buffer to a file/socket.
+    // I don't know if FILE pointers work with sockets, but i'm going to ignore that for now.
+    
+    void ReadFile2Buffer(BitInput *BitI, size_t Bytes2Read) {
+        // Should this just take in BitInput?
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadFile2Buffer", "Pointer to BitInput is NULL\n");
+        } else {
+            uint8_t *Buffer             = calloc(1, Bytes2Read);
+            fread(Buffer, 1, Bytes2Read, BitI->File);
+            BitI->BitB->Buffer          = Buffer;
+            BitI->FilePosition          = ftell(BitI->File);
+            BitI->BitB->BitsAvailable   = Bytes2Bits(Bytes2Read);
+            BitI->BitB->BitsUnavailable = 0;
+        }
+    }
+    
+    void ReadSocket2Buffer(BitInput *BitI, size_t Bytes2Read) {
+        
+    }
+    
+    void WriteBuffer2File(BitOutput *BitO) {
+        
+    }
+    
+    void WriteBuffer2Socket(BitOutput *BitO) {
+        
     }
     
 #ifdef __cplusplus
