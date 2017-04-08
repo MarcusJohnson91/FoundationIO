@@ -26,79 +26,47 @@ extern "C" {
 #endif
     
     /*!
-     @typedef           BitInput
-     @abstract                              "Contains variables and buffers for reading bits".
-     @remark                                "The default internal representation in BitIO is unsigned, Big Endian".
-     @constant          File                "Input file to read bits from".
-     @constant          FileSize            "Size of File in bytes".
-     @constant          FilePosition        "Current byte in the file".
-     @constant          BitsUnavailable     "Number of previously read bits in Buffer".
-     @constant          BitsAvailable       "Number of bits available for reading".
-     @constant          SystemEndian        "Endian of the running system".
-     @constant          Buffer              "Buffer of data from File".
+     @typedef           BitBuffer
+     @abstract                              "Contains variables and a pointer to a buffer for reading and writing bits".
+     @constant          BitsAvailable       "The number of bits available for reading".
+     @constant          BitsUnavailable     "The number of bits previously read, or available for writing".
+     @constant          Buffer              "A pointer to an unsigned byte buffer".
      */
-    /*
-    typedef struct BitInput {
-        FILE              *File;
-        size_t             FileSize;
-        size_t             FilePosition;
-        size_t             BitsUnavailable;
-        size_t             BitsAvailable;
-        uint8_t            SystemEndian:2;
-        uint8_t            Buffer[BitInputBufferSize];
-    } BitInput;
-     */
-    
-    /*!
-     @typedef           BitOutput
-     @abstract                              "Contains variables and buffers for writing bits".
-     @remark                                "The default internal representation in BitOutput is unsigned".
-     @constant          File                "Input file to read bits from".
-     @constant          BitsUnavailable     "Number of previously read bits in Buffer".
-     @constant          BitsAvailable       "Number of bits available for writing".
-     @constant          SystemEndian        "Endian of the running system".
-     @constant          Buffer              "Buffer of BitIOBufferSize bits from File".
-     */
-    /*
-    typedef struct BitOutput {
-        FILE              *File;
-        size_t             BitsUnavailable;
-        size_t             BitsAvailable;
-        uint8_t            SystemEndian:2;
-        uint8_t            Buffer[BitOutputBufferSize];
-        FILE              *LogFile;
-    } BitOutput;
-     */
-    
-    
-    // The whole point of setting up BitBuffer, is to read and write bits anywhere, instead of just to files.
-    // So, ReadBits should read and write to a buffer, and the file handling needs to be exported to dedicated functions.
-    // Oh, and we need to also handle network streams as well.
-    // So, lets say i'm getting Mpeg2Stream packets from a file or the network.
-    // I need to break that file into Program/Transport/PES packets, then go to work on a buffer containing a single packet at once.
-    // So, we need to call a File2Buffer function that extracts 188 bytes at a time.
-    // We then identify the type of packet, and send it off along to the various parsing functions.
-    // Then we buffer the data contained in the packets, to build up an elementary packet (like a video frame)
-    // So, we need a file/socket muxer to break up packets.
     typedef struct BitBuffer {
-        size_t             BitsUnavailable;
         size_t             BitsAvailable;
+        size_t             BitsUnavailable;
         uint8_t           *Buffer;
     } BitBuffer;
     
+    /*!
+     @typedef           BitInput
+     @abstract                              "Contains File/Socket pointers for reading to a BitBuffer.
+     @constant          File                "Input File/Socket to read into a BitBuffer".
+     @constant          FileSize            "Size of the File in bytes".
+     @constant          FilePosition        "Current byte in the file".
+     @constant          SystemEndian        "Endian of the running system".
+     @constant          BitB                "Pointer to an instance of BitBuffer".
+     */
     typedef struct BitInput {
         FILE              *File;
         size_t             FileSize;
         size_t             FilePosition;
         uint8_t            SystemEndian:2;
-        FILE              *LogFile;
         BitBuffer         *BitB;
     } BitInput;
     
+    /*!
+     @typedef           BitOutput
+     @abstract                              "Contains File/Socket pointers for writing from a BitBuffer".
+     @constant          File                "Input File/Socket to write a BitBuffer into".
+     @constant          FilePosition        "Current byte in the file".
+     @constant          SystemEndian        "Endian of the running system".
+     @constant          BitB                "Pointer to an instance of BitBuffer".
+     */
     typedef struct BitOutput {
         FILE              *File;
+        size_t             FilePosition;
         uint8_t            SystemEndian:2;
-        FILE              *LogFile;
         BitBuffer         *BitB;
     } BitOutput;
     
@@ -143,6 +111,49 @@ extern "C" {
         const char         *License;
         CommandLineSwitch **Switch;
     } CommandLineOptions;
+    
+    BitInput *InitBitInput(void) {
+        BitInput *BitI = calloc(1, sizeof(BitInput));
+        return BitI;
+    }
+    
+    BitOutput *InitBitOutput(void) {
+        BitOutput *BitO = calloc(1, sizeof(BitOutput));
+        return BitO;
+    }
+    
+    BitBuffer *InitBitBuffer(const size_t BufferSize) {
+        BitBuffer *BitB       = calloc(1, sizeof(BitBuffer));
+        BitB->BitsAvailable   = Bytes2Bits(BufferSize);
+        BitB->BitsUnavailable = 0;
+        return BitB;
+    }
+    
+    CommandLineOptions *InitCommandLineOptions(void) {
+        CommandLineOptions *CMD = calloc(1, sizeof(CommandLineOptions));
+        return CMD;
+    }
+    
+    void InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches) {
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "InitCommandLineSwitches", "Pointer to CommandLineOptions is NULL\n");
+        } else {
+            CMD->NumSwitches          += NumSwitches;
+            CMD->Switch                = calloc(NumSwitches, sizeof(CommandLineSwitch));
+            for (uint64_t Option = 0; Option < NumSwitches; Option++) {
+                CMD->Switch[Option]    = calloc(1, sizeof(CommandLineSwitch));
+            }
+        }
+    }
+    
+    void AddCommandLineSwitch(CommandLineOptions *CMD) {
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "AddCommandLineSwitch", "Pointer to CommandLineOptions is NULL\n");
+        } else {
+            CMD->NumSwitches += 1;
+            CMD->Switch[CMD->NumSwitches] = calloc(1, sizeof(CommandLineSwitch));
+        }
+    }
     
     uint16_t SwapEndian16(const uint16_t Data2Swap) {
         return ((Data2Swap & 0xFF00) >> 8) | ((Data2Swap & 0x00FF) << 8);
@@ -305,42 +316,6 @@ extern "C" {
         return Endian;
     }
     
-    CommandLineOptions *InitCommandLineOptions(void) {
-        CommandLineOptions *CMD = calloc(1, sizeof(CommandLineOptions));
-        return CMD;
-    }
-    
-    void InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "InitCommandLineSwitches", "Pointer to CommandLineOptions is NULL\n");
-        } else {
-            CMD->NumSwitches          += NumSwitches;
-            CMD->Switch                = calloc(NumSwitches, sizeof(CommandLineSwitch));
-            for (uint64_t Option = 0; Option < NumSwitches; Option++) {
-                CMD->Switch[Option]    = calloc(1, sizeof(CommandLineSwitch));
-            }
-            /*
-             for (uint64_t Option = 0; Option < NumSwitches; Option++) {
-             CommandLineSwitch *Switch = calloc(1, sizeof(CommandLineSwitch));
-             CMD->Switch[Option] = Switch;
-             }
-             */
-            /*
-             CommandLineSwitch  *Switch = calloc(NumSwitches, sizeof(CommandLineSwitch));
-             CMD->Switch                = Switch;
-             */
-        }
-    }
-    
-    void AddCommandLineSwitch(CommandLineOptions *CMD) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "AddCommandLineSwitch", "Pointer to CommandLineOptions is NULL\n");
-        } else {
-            CMD->NumSwitches += 1;
-            CMD->Switch[CMD->NumSwitches] = calloc(1, sizeof(CommandLineSwitch));
-        }
-    }
-    
     void DisplayCMDHelp(CommandLineOptions *CMD) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "DisplayCMDHelp", "Pointer to CommandLineOptions is NULL\n");
@@ -396,23 +371,6 @@ extern "C" {
                 }
             }
         }
-    }
-    
-    BitInput *InitBitInput(void) {
-        BitInput *BitI = calloc(1, sizeof(BitInput));
-        return BitI;
-    }
-    
-    BitOutput *InitBitOutput(void) {
-        BitOutput *BitO = calloc(1, sizeof(BitOutput));
-        return BitO;
-    }
-    
-    BitBuffer *InitBitBuffer(const size_t BufferSize) {
-        BitBuffer *BitB       = calloc(1, sizeof(BitBuffer));
-        BitB->BitsAvailable   = Bytes2Bits(BufferSize);
-        BitB->BitsUnavailable = 0;
-        return BitB;
     }
     
     void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, const uint8_t InputSwitch) {

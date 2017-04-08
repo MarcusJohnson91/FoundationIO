@@ -21,6 +21,7 @@ extern "C" {
 #endif
     
     /*!
+     @enumdef        BitIOConstants
      @abstract                                 "BitIO compile time constants".
      @remark                                   "Change the buffer sizes here".
      @constant       BitInputBufferSize        "Inital size of BitInput buffer".
@@ -47,9 +48,9 @@ extern "C" {
         BitIOMD5Size              = 16,
     };
     /*
-    typedef struct BitInput BitInput;
-    
-    typedef struct BitOutput BitOutput;
+     typedef struct BitInput BitInput;
+     
+     typedef struct BitOutput BitOutput;
      */
     
     typedef struct BitBuffer BitBuffer;
