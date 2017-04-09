@@ -972,21 +972,18 @@ extern "C" {
     // Ok, so I need a function to read a file/socket into a buffer, and one to write a buffer to a file/socket.
     // I don't know if FILE pointers work with sockets, but i'm going to ignore that for now.
     
-    /*!
-     @remark            "If the pointer to BitBuffer is not new, all the old contents will be lost".
-     */
-    void ReadFile2Buffer(FILE *InputFile, BitBuffer *BitB, size_t Bytes2Read) {
+    void ReadFile2Buffer(FILE *InputFile, BitBuffer *Buffer2Read, size_t Bytes2Read) {
         // Should this just take in BitInput?
         if (InputFile == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadFile2Buffer", "Pointer to FILE is NULL\n");
-        } else if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadFile2Buffer", "Pointer to BitBuffer is NULL\n");
+            Log(LOG_ERR, "libBitIO", "ReadFile2Buffer", "InputFile pointer is NULL\n");
+        } else if (Buffer2Read == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadFile2Buffer", "Buffer2Read pointer is NULL\n");
         } else {
             size_t BytesRead = 0;
-            memset(&BitB->Buffer, 0, sizeof(BitB->Buffer));
-            BytesRead             = fread(BitB->Buffer, 1, Bytes2Read, InputFile);
-            BitB->BitsAvailable   = Bytes2Bits(BytesRead);
-            BitB->BitsUnavailable = 0;
+            memset(&Buffer2Read->Buffer, 0, sizeof(Buffer2Read->Buffer));
+            BytesRead                    = fread(Buffer2Read->Buffer, 1, Bytes2Read, InputFile);
+            Buffer2Read->BitsAvailable   = Bytes2Bits(BytesRead);
+            Buffer2Read->BitsUnavailable = 0;
             
         }
     }
@@ -995,8 +992,21 @@ extern "C" {
         
     }
     
-    void WriteBuffer2File(BitOutput *BitO) {
-        
+    void WriteBuffer2File(FILE *OutputFile, BitBuffer *Buffer2Write, size_t Bytes2Write) {
+        size_t BytesWritten = 0;
+        if (OutputFile == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteBuffer2File", "OutputFile pointer is NULL\n");
+        } else if (Buffer2Write == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteBuffer2File", "Buffer2Write pointer is NULL\n");
+        } else {
+            BytesWritten                  = fwrite(Buffer2Write->Buffer, 1, Bytes2Write, OutputFile);
+            memset(&Buffer2Write->Buffer, 0, BytesWritten);
+            if (BytesWritten != Bytes2Write) {
+                Log(LOG_CRIT, "libBitIO", "WriteBuffer2File", "Wrote %d bytes instead of %d\n", BytesWritten, Bytes2Write);
+            }
+            Buffer2Write->BitsAvailable   = 0;
+            Buffer2Write->BitsUnavailable = 0;
+        }
     }
     
     void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB) {

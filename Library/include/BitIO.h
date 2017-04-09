@@ -538,10 +538,10 @@ extern "C" {
      @abstract                              "Reads Bytes2Read into a buffer pointed to by BitB from InputFile"
      @remark                                "If the pointer to BitBuffer is not new, all the old contents will be lost".
      @param             InputFile           "FILE pointer to read from".
-     @param             BitB                "Pointer to the buffer to put the bytes into".
+     @param             Buffer2Read         "Pointer to the buffer to put the bytes into".
      @para,             Bytes2Read          "The number of bytes to read from the InputFile into the Buffer"
      */
-    void                ReadFile2Buffer(FILE *InputFile, BitBuffer *BitB, size_t Bytes2Read);
+    void                ReadFile2Buffer(FILE *InputFile, BitBuffer *Buffer2Read, size_t Bytes2Read);
     
 #ifndef _POSIX_VERSION
     /*!
