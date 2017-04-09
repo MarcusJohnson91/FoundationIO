@@ -972,17 +972,22 @@ extern "C" {
     // Ok, so I need a function to read a file/socket into a buffer, and one to write a buffer to a file/socket.
     // I don't know if FILE pointers work with sockets, but i'm going to ignore that for now.
     
-    void ReadFile2Buffer(BitInput *BitI, size_t Bytes2Read) {
+    /*!
+     @remark            "If the pointer to BitBuffer is not new, all the old contents will be lost".
+     */
+    void ReadFile2Buffer(FILE *InputFile, BitBuffer *BitB, size_t Bytes2Read) {
         // Should this just take in BitInput?
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadFile2Buffer", "Pointer to BitInput is NULL\n");
+        if (InputFile == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadFile2Buffer", "Pointer to FILE is NULL\n");
+        } else if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadFile2Buffer", "Pointer to BitBuffer is NULL\n");
         } else {
-            uint8_t *Buffer             = calloc(1, Bytes2Read);
-            fread(Buffer, 1, Bytes2Read, BitI->File);
-            BitI->BitB->Buffer          = Buffer;
-            BitI->FilePosition          = ftell(BitI->File);
-            BitI->BitB->BitsAvailable   = Bytes2Bits(Bytes2Read);
-            BitI->BitB->BitsUnavailable = 0;
+            size_t BytesRead = 0;
+            memset(&BitB->Buffer, 0, sizeof(BitB->Buffer));
+            BytesRead             = fread(BitB->Buffer, 1, Bytes2Read, InputFile);
+            BitB->BitsAvailable   = Bytes2Bits(BytesRead);
+            BitB->BitsUnavailable = 0;
+            
         }
     }
     
