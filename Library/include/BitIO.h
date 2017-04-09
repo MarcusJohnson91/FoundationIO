@@ -9,6 +9,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #pragma once
@@ -532,6 +533,15 @@ extern "C" {
      @param             UUIDString          "UUID string to write to the file as a binary blob, aka remove hyphens and null terminating char".
      */
     uint8_t             WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString);
+    
+    /*!
+     @abstract                              "Reads Bytes2Read into a buffer pointed to by BitB from InputFile"
+     @remark                                "If the pointer to BitBuffer is not new, all the old contents will be lost".
+     @param             InputFile           "FILE pointer to read from".
+     @param             BitB                "Pointer to the buffer to put the bytes into".
+     @para,             Bytes2Read          "The number of bytes to read from the InputFile into the Buffer"
+     */
+    void                ReadFile2Buffer(FILE *InputFile, BitBuffer *BitB, size_t Bytes2Read);
     
 #ifndef _POSIX_VERSION
     /*!
