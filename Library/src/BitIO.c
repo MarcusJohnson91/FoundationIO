@@ -146,12 +146,55 @@ extern "C" {
         }
     }
     
-    void AddCommandLineSwitch(CommandLineOptions *CMD) {
+    void AddCommandLineSwitch(CommandLineOptions *CMD) { // FIXME: Is this supposed to be public?
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "AddCommandLineSwitch", "Pointer to CommandLineOptions is NULL\n");
         } else {
             CMD->NumSwitches += 1;
             CMD->Switch[CMD->NumSwitches] = calloc(1, sizeof(CommandLineSwitch));
+        }
+    }
+    
+    void CloseBitInput(BitInput *BitI) {
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "CloseBitInput", "Pointer to BitInput is NULL\n");
+        } else {
+            fclose(BitI->File);
+            free(BitI);
+        }
+    }
+    
+    void CloseBitOutput(BitOutput *BitO) {
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "CloseBitOutput", "Pointer to BitOutput is NULL");
+        } else {
+            if (IsOutputStreamByteAligned(BitO, 1) == false) {
+                AlignOutput(BitO, 1);
+            }
+            fwrite(BitO->BitB->Buffer, Bits2Bytes(BitO->BitB->BitsUnavailable, true), 1, BitO->File);
+            fflush(BitO->File);
+            fclose(BitO->File);
+            free(BitO);
+        }
+    }
+    
+    void CloseBitBuffer(BitBuffer *BitB) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "CloseBitBuffer", "Pointer to BitBuffer is NULL");
+        } else {
+            free(BitB->Buffer);
+            free(BitB);
+        }
+    }
+    
+    void CloseCommandLineOptions(CommandLineOptions *CMD) {
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "CloseCommandLineOptions", "Pointer to CommandLineOptions is NULL\n");
+        } else {
+            for (uint64_t Option = 0; Option < CMD->NumSwitches; Option++) {
+                free(&CMD->Switch[Option]);
+            }
+            free(CMD);
         }
     }
     
@@ -170,40 +213,16 @@ extern "C" {
                 ((Data2Swap & 0x000000000000FF00) << 40) | ((Data2Swap & 0x00000000000000FF) << 56));
     }
     
+    int64_t Bytes2Bits(const int64_t Bytes) {
+        return (Bytes * 8);
+    }
+    
     int64_t Bits2Bytes(const int64_t Bits, const bool RoundUp) {
         if (RoundUp == true) {
             return (Bits / 8) + (8 - (Bits % 8));
         } else {
             return (Bits / 8);
         }
-    }
-    
-    int64_t Bytes2Bits(const int64_t Bytes) {
-        return (Bytes * 8);
-    }
-    
-    uint8_t BitsRemainingInByte(const uint64_t BitsAvailable) {
-        return BitsAvailable > 8 ? 8 : BitsAvailable;
-    }
-    
-    uint64_t BytesRemainingInFile(BitInput *BitI) {
-        uint64_t BytesLeft = 0;
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "BytesRemainingInFile", "Pointer to BitInput is NULL\n");
-        } else {
-            BytesLeft = BitI->FilePosition - BitI->FileSize;
-        }
-        return BytesLeft;
-    }
-    
-    uint64_t GetInputFileSize(BitInput *BitI) {
-        uint64_t InputSize = 0;
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetInputFileSize", "Pointer to BitInput is NULL\n");
-        } else {
-            InputSize = BitI->FileSize;
-        }
-        return InputSize;
     }
     
     uint64_t Signed2Unsigned(const int64_t Signed) {
@@ -241,7 +260,7 @@ extern "C" {
         return BitCount;
     }
     
-    uint64_t Power2Mask(const uint8_t Exponent) {
+    uint64_t Power2Mask(const uint8_t Exponent) { // TODO: Make this more generic
         uint64_t Mask = 0;
         if (Exponent > 64) {
             Log(LOG_ERR, "libBitIO", "Power2Mask", "Exponent %d is too large\n", Exponent);
@@ -283,7 +302,7 @@ extern "C" {
         return HighestBitSet;
     }
     
-    uint8_t DetectSystemEndian(void) {
+    uint8_t DetectSystemEndian(void) { // MARK: This function needs to remain internal
         uint8_t SystemEndian = 0;
         uint16_t Endian = 0xFFFE;
         if (Endian == 0xFFFE) {
@@ -296,27 +315,57 @@ extern "C" {
         return SystemEndian;
     }
     
-    uint8_t GetBitInputEndian(BitInput *BitI) {
+    size_t BytesRemainingInInputFile(BitInput *BitI) {
+        uint64_t BytesLeft = 0;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "BytesRemainingInInputFile", "Pointer to BitInput is NULL\n");
+        } else {
+            BytesLeft = BitI->FileSize - BitI->FilePosition;
+        }
+        return BytesLeft;
+    }
+    
+    size_t GetBitInputFileSize(BitInput *BitI) {
+        uint64_t InputSize = 0;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL\n");
+        } else {
+            InputSize = BitI->FileSize;
+        }
+        return InputSize;
+    }
+    
+    size_t GetBitBufferSize(BitBuffer *BitB) {
+        size_t BitBufferSize = 0;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetBitBufferSize", "Pointer to BitBuffer is NULL\n");
+        } else {
+            BitBufferSize = sizeof(BitB->Buffer);
+        }
+        return BitBufferSize;
+    }
+    
+    uint8_t GetBitInputSystemEndian(BitInput *BitI) {
         uint8_t Endian = 0;
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitInputEndian", "Pointer to BitInput is NULL\n");
+            Log(LOG_ERR, "libBitIO", "GetBitInputSystemEndian", "Pointer to BitInput is NULL\n");
         } else {
             Endian = BitI->SystemEndian;;
         }
         return Endian;
     }
     
-    uint8_t GetBitOutputEndian(BitOutput *BitO) {
+    uint8_t GetBitOutputSystemEndian(BitOutput *BitO) {
         uint8_t Endian = 0;
         if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitOutputEndian", "Pointer to BitOutput is NULL\n");
+            Log(LOG_ERR, "libBitIO", "GetBitOutputSystemEndian", "Pointer to BitOutput is NULL\n");
         } else {
             Endian = BitO->SystemEndian;;
         }
         return Endian;
     }
     
-    void DisplayCMDHelp(CommandLineOptions *CMD) {
+    void DisplayCMDHelp(CommandLineOptions *CMD) { // MARK: This function needs to remain internal
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "DisplayCMDHelp", "Pointer to CommandLineOptions is NULL\n");
         } else {
@@ -520,18 +569,7 @@ extern "C" {
         return Status;
     }
     
-    void CloseCommandLineOptions(CommandLineOptions *CMD) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "CloseCommandLineOptions", "Pointer to CommandLineOptions is NULL\n");
-        } else {
-            for (uint64_t Option = 0; Option < CMD->NumSwitches; Option++) {
-                free(&CMD->Switch[Option]);
-            }
-            free(CMD);
-        }
-    }
-    
-    void UpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) {
+    void UpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) { // MARK: This function needs to remain internal
         uint64_t Bytes2Read = 0, BytesRead = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "UpdateInputBuffer", "Pointer to BitInput is NULL\n");
@@ -559,7 +597,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ReadBits", "ReadBits: %d, only supports reading 1-64 bits\n", Bits2Read);
         } else {
             SystemBits             = 8 - (BitB->BitsUnavailable % 8);
-            UserBits               = BitsRemainingInByte(Bits);
+            UserBits               = Bits > 8 ? 8 : Bits;
             Bits                   = SystemBits >= UserBits  ? UserBits : SystemBits;
             Mask2Shift             = ReadFromMSB ? BitB->BitsAvailable % 8 : 0;
             if (ReadFromMSB == true) {
@@ -643,70 +681,6 @@ extern "C" {
         }
     }
     
-    bool IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
-        bool AlignmentStatus = 0;
-        if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "IsOutputStreamByteAligned", "Pointer to BitBuffer is NULL\n");
-        } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
-            Log(LOG_ERR, "libBitIO", "IsOutputStreamByteAligned", "BytesOfAlignment: %d isn't a power of 2 (or 1)\n", BytesOfAlignment);
-        } else {
-            if ((BitB->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
-                AlignmentStatus = true;
-            } else {
-                AlignmentStatus = false;
-            }
-        }
-        return AlignmentStatus;
-    }
-    
-    void AlignBitBuffer(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
-        if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "AlignInput", "Pointer to BitBuffer is NULL\n");
-        } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
-            Log(LOG_ERR, "libBitIO", "AlignInput", "BytesOfAlignment: %d isn't a power of 2 (or 1)\n", BytesOfAlignment);
-        } else {
-            uint8_t Bits2Align = BitB->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
-            if (Bits2Align != 0) {
-                BitB->BitsAvailable   -= Bits2Align;
-                BitB->BitsUnavailable += Bits2Align;
-            }
-        }
-    }
-    
-    void AlignOutput(BitOutput *BitO, const uint8_t BytesOfAlignment) {
-        if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "AlignOutput", "Pointer to BitOutput is NULL\n");
-        } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
-            Log(LOG_ERR, "libBitIO", "AlignOutput", "BytesOfAlignment: %d isn't a power of 2 (or 1)\n", BytesOfAlignment);
-        } else {
-            uint8_t Bits2Align = BitO->BitB->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
-            if (Bits2Align != 0) {
-                BitO->BitB->BitsAvailable    -= Bits2Align;
-                BitO->BitB->BitsUnavailable  += Bits2Align;
-            }
-        }
-    }
-    
-    size_t GetBitInputBufferSize(BitInput *BitI) {
-        uint64_t BufferSize = 0;
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitInputBufferSize", "Pointer to BitOutput is NULL\n");
-        } else {
-            BufferSize = sizeof(BitI->BitB->Buffer);
-        }
-        return BufferSize;
-    }
-    
-    size_t GetBitOutputBufferSize(BitOutput *BitO) {
-        uint64_t BufferSize = 0;
-        if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitOutputBufferSize", "Pointer to BitOutput is NULL\n");
-        } else {
-            BufferSize = sizeof(BitO->BitB->Buffer);
-        }
-        return BufferSize;
-    }
-    
     void WriteBits(BitBuffer *BitB, const uint64_t Data2Write, uint8_t NumBits, const bool WriteFromMSB) {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteBits", "Pointer to BitBuffer is NULL\n");
@@ -767,13 +741,77 @@ extern "C" {
         }
     }
     
-    void CloseBitInput(BitInput *BitI) {
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "CloseBitInput", "Pointer to BitInput is NULL\n");
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    bool IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
+        bool AlignmentStatus = 0;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "IsOutputStreamByteAligned", "Pointer to BitBuffer is NULL\n");
+        } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
+            Log(LOG_ERR, "libBitIO", "IsOutputStreamByteAligned", "BytesOfAlignment: %d isn't a power of 2 (or 1)\n", BytesOfAlignment);
         } else {
-            fclose(BitI->File);
-            free(BitI);
+            if ((BitB->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
+                AlignmentStatus = true;
+            } else {
+                AlignmentStatus = false;
+            }
         }
+        return AlignmentStatus;
+    }
+    
+    void AlignBitBuffer(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "AlignBitBuffer", "Pointer to BitBuffer is NULL\n");
+        } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
+            Log(LOG_ERR, "libBitIO", "AlignBitBuffer", "BytesOfAlignment: %d isn't a power of 2 (or 1)\n", BytesOfAlignment);
+        } else {
+            uint8_t Bits2Align = BitB->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
+            if (Bits2Align != 0) {
+                BitB->BitsAvailable   -= Bits2Align;
+                BitB->BitsUnavailable += Bits2Align;
+            }
+        }
+    }
+    
+    size_t GetBitInputBufferSize(BitInput *BitI) { // FIXME: Is this even relevent anymore?
+        uint64_t BufferSize = 0;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetBitInputBufferSize", "Pointer to BitOutput is NULL\n");
+        } else {
+            BufferSize = sizeof(BitI->BitB->Buffer);
+        }
+        return BufferSize;
+    }
+    
+    size_t GetBitOutputBufferSize(BitOutput *BitO) { // FIXME: Is this even relevent anymore?
+        uint64_t BufferSize = 0;
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetBitOutputBufferSize", "Pointer to BitOutput is NULL\n");
+        } else {
+            BufferSize = sizeof(BitO->BitB->Buffer);
+        }
+        return BufferSize;
     }
     
     void FlushOutputBuffer(BitOutput *BitO, const size_t Bytes2Flush) {
@@ -790,48 +828,25 @@ extern "C" {
         }
     }
     
-    void CloseBitOutput(BitOutput *BitO) {
-        if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "CloseBitOutput", "Pointer to BitOutput is NULL");
-        } else {
-            if (IsOutputStreamByteAligned(BitO, 1) == false) {
-                AlignOutput(BitO, 1);
-            }
-            fwrite(BitO->BitB->Buffer, Bits2Bytes(BitO->BitB->BitsUnavailable, true), 1, BitO->File);
-            fflush(BitO->File);
-            fclose(BitO->File);
-            free(BitO);
-        }
-    }
-    
-    void CloseBitBuffer(BitBuffer *BitB) {
-        if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "CloseBitBuffer", "Pointer to BitBuffer is NULL");
-        } else {
-            free(BitB->Buffer);
-            free(BitB);
-        }
-    }
-    
     uint64_t GenerateCRC(const uint8_t *Data2CRC, const size_t DataSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit) {
         if (PolySize % 8 != 0) {
             // You have to do it bitwise
-        } else if (DataSize % PolySize) {
+        } else if (DataSize % PolySize || DataSize > PolySize) {
             // do it word wise aka grab PolySize bits from Data2CRC at once
         } else {
             // Do it bytewise
         }
         /*
-        uint16_t CRCResult = 0;
-        for (uint64_t Byte = 0; Byte < DataSize; Byte++) {
-            CRCResult = ReciprocalPoly ^ Data2CRC[Byte] << 8;
-            for (uint8_t Bit = 0; Bit < 8; Bit++) {
-                if ((CRCResult & 0x8000) == true) {
-                } else {
-                    CRCResult <<= 1;
-                }
-            }
-        }
+         uint16_t CRCResult = 0;
+         for (uint64_t Byte = 0; Byte < DataSize; Byte++) {
+         CRCResult = ReciprocalPoly ^ Data2CRC[Byte] << 8;
+         for (uint8_t Bit = 0; Bit < 8; Bit++) {
+         if ((CRCResult & 0x8000) == true) {
+         } else {
+         CRCResult <<= 1;
+         }
+         }
+         }
          */
         return 0;
     }
@@ -859,40 +874,6 @@ extern "C" {
         } else {
             return true;
         }
-    }
-    
-    void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription, ...) {
-        char ErrorString[BitIOStringSize];
-        char VariadicArguments[BitIOStringSize];
-        
-        va_list ExtraArguments;
-        va_start(ExtraArguments, ErrorDescription);
-        //va_arg(ExtraArguments, const char);
-        //vsnprintf(VariadicArguments, BitIOStringSize, "%s", ExtraArguments);
-        char *VarArgString = va_arg(ExtraArguments, char);
-        vsnprintf(VariadicArguments, BitIOStringSize, "%s", VarArgString);
-        va_end(ExtraArguments);
-        
-        snprintf(ErrorString, BitIOStringSize, "%s - %s: %s - %s\n", LibraryOrProgram, Function, ErrorDescription, VariadicArguments);
-#ifdef _WIN32
-        uintptr_t *EventLog = RegisterEventSource(NULL, LibraryOrProgram);
-        uint32_t ErrorCode = ReportEvent(EventLog, ErrorLevel, 1, 0xF000FFFF, NULL, 1, strlen(ErrorString), ErrorString, NULL);
-        if (ErrorCode != 0) {
-            fprintf(stderr, "BitIO - Log: Windows version of Logger failed\n");
-            fprintf(stderr, ErrorString);
-        }
-        bool DeregisterSucceeded = DeregisterEventSource(EventLog);
-        if (DeregisterSucceeded > 0) {
-            fprintf(stderr, "BitIO - Log: Deregistering EventLog failed\n");
-        }
-#else
-        if ((ErrorLevel == LOG_EMERG) || (ErrorLevel == LOG_CRIT)) {
-            openlog(LibraryOrProgram, ErrorLevel, (LOG_PERROR|LOG_MAIL|LOG_USER));
-        } else {
-            openlog(LibraryOrProgram, ErrorLevel, (LOG_PERROR|LOG_USER));
-        }
-        syslog(LOG_ERR, "%s\n", ErrorString);
-#endif
     }
     
     void ReadUUID(BitBuffer *BitB, uint8_t *UUIDString) {
@@ -964,19 +945,6 @@ extern "C" {
         }
     }
     
-    uint8_t WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString) {
-        if (sizeof(UUIDString) != BitIOUUIDSize) {
-            Log(LOG_ERR, "libBitIO", "WriteUUID", "UUIDString is %d bytes long, should be 21\n", sizeof(UUIDString));
-        } else {
-            for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDSize - 1; UUIDByte++) {
-                if ((UUIDByte != 4) && (UUIDByte != 7) && (UUIDByte != 10) && (UUIDByte != 13) && (UUIDByte != 20)) { // Bullshit bytes
-                    WriteBits(BitB, UUIDString[UUIDByte], 8, true);
-                }
-            }
-        }
-        return EXIT_SUCCESS;
-    }
-    
     bool CompareUUIDs(const uint8_t *UUIDString1, const uint8_t *UUIDString2) {
         bool UUIDsMatch = 0;
         
@@ -992,6 +960,19 @@ extern "C" {
             }
         }
         return UUIDsMatch;
+    }
+    
+    uint8_t WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString) {
+        if (sizeof(UUIDString) != BitIOUUIDSize) {
+            Log(LOG_ERR, "libBitIO", "WriteUUID", "UUIDString is %d bytes long, should be 21\n", sizeof(UUIDString));
+        } else {
+            for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDSize - 1; UUIDByte++) {
+                if ((UUIDByte != 4) && (UUIDByte != 7) && (UUIDByte != 10) && (UUIDByte != 13) && (UUIDByte != 20)) { // Bullshit bytes
+                    WriteBits(BitB, UUIDString[UUIDByte], 8, true);
+                }
+            }
+        }
+        return EXIT_SUCCESS;
     }
     
     void OpenSocket() {
@@ -1036,8 +1017,42 @@ extern "C" {
         
     }
     
-    void WriteBuffer2Socket(BitOutput *BitO) {
+    void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB) {
         
+    }
+    
+    void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription, ...) {
+        char ErrorString[BitIOStringSize];
+        char VariadicArguments[BitIOStringSize];
+        
+        va_list ExtraArguments;
+        va_start(ExtraArguments, ErrorDescription);
+        //va_arg(ExtraArguments, const char);
+        //vsnprintf(VariadicArguments, BitIOStringSize, "%s", ExtraArguments);
+        char *VarArgString = va_arg(ExtraArguments, char);
+        vsnprintf(VariadicArguments, BitIOStringSize, "%s", VarArgString);
+        va_end(ExtraArguments);
+        
+        snprintf(ErrorString, BitIOStringSize, "%s - %s: %s - %s\n", LibraryOrProgram, Function, ErrorDescription, VariadicArguments);
+#ifdef _WIN32
+        uintptr_t *EventLog = RegisterEventSource(NULL, LibraryOrProgram);
+        uint32_t ErrorCode = ReportEvent(EventLog, ErrorLevel, 1, 0xF000FFFF, NULL, 1, strlen(ErrorString), ErrorString, NULL);
+        if (ErrorCode != 0) {
+            fprintf(stderr, "BitIO - Log: Windows version of Logger failed\n");
+            fprintf(stderr, ErrorString);
+        }
+        bool DeregisterSucceeded = DeregisterEventSource(EventLog);
+        if (DeregisterSucceeded > 0) {
+            fprintf(stderr, "BitIO - Log: Deregistering EventLog failed\n");
+        }
+#else
+        if ((ErrorLevel == LOG_EMERG) || (ErrorLevel == LOG_CRIT)) {
+            openlog(LibraryOrProgram, ErrorLevel, (LOG_PERROR|LOG_MAIL|LOG_USER));
+        } else {
+            openlog(LibraryOrProgram, ErrorLevel, (LOG_PERROR|LOG_USER));
+        }
+        syslog(LOG_ERR, "%s\n", ErrorString);
+#endif
     }
     
 #ifdef __cplusplus
