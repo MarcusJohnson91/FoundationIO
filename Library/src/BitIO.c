@@ -741,29 +741,6 @@ extern "C" {
         }
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     bool IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
         bool AlignmentStatus = 0;
         if (BitB == NULL) {
