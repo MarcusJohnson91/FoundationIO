@@ -869,12 +869,7 @@ extern "C" {
         }
     }
     
-    // What if I just wrote a few functions to handle converting a UUID into an int, and vice versa?
-    // Then swapping would be easier, and the Read/Write functions would be simply wrappers around these two, plus a call to Read/WriteBits.
-    
-    // OR, should we just say that ReadUUID and WriteUUID ask what type of ID is it, BUT that would require we have knowledge about the running system's endian, AND the file format.
-    
-    void ConvertBinaryUUID2UUIDString(uint8_t *BinaryUUID, uint8_t *UUIDString) {
+    void ConvertBinaryUUID2UUIDString(const uint8_t *BinaryUUID, uint8_t *UUIDString) {
         if (strlen(BinaryUUID) != BitIOBinaryUUIDSize) {
             Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, strlen(BinaryUUID));
         } else if (strlen(UUIDString) != BitIOUUIDStringSize) {
@@ -892,7 +887,7 @@ extern "C" {
         }
     }
     
-    void ConvertUUIDString2BinaryUUID(uint8_t *UUIDString, uint8_t *BinaryUUID) {
+    void ConvertUUIDString2BinaryUUID(const uint8_t *UUIDString, uint8_t *BinaryUUID) {
         if (strlen(UUIDString) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, strlen(UUIDString));
         } else if (strlen(BinaryUUID) != BitIOBinaryUUIDSize) {
@@ -910,56 +905,54 @@ extern "C" {
         }
     }
     
-    void SwapUUID(const uint8_t *UUIDString2Convert, uint8_t *ConvertedUUIDString) {
-        uint32_t Section1  = 0, SwappedSection1 = 0;
-        uint16_t Section2  = 0, SwappedSection2 = 0;
-        uint16_t Section3  = 0, SwappedSection3 = 0;
-        uint16_t Section4  = 0, SwappedSection4 = 0;
-        uint64_t Section5  = 0, SwappedSection5 = 0;
-        
-        if (sizeof(UUIDString2Convert) != BitIOUUIDStringSize || sizeof(ConvertedUUIDString) != BitIOUUIDStringSize) {
-            Log(LOG_ERR, "libBitIO", "SwapUUID", "UUIDString2Convert is %d bytes long, ConvertedUUIDString is %d bytes long, should be 21\n", sizeof(UUIDString2Convert), sizeof(ConvertedUUIDString));
+    void SwapBinaryUUID(const uint8_t *BinaryUUID, uint8_t *SwappedBinaryUUID) { // Should I make wrappers called ConvertUUID2GUID and SwapGUID2UUID?
+        if (strlen(BinaryUUID) != BitIOBinaryUUIDSize) {
+            Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, strlen(BinaryUUID));
+        } else if (strlen(SwappedBinaryUUID) != BitIOUUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "SwappedBinaryUUID size should be: %d, but is: %d\n", BitIOUUIDStringSize, strlen(SwappedBinaryUUID));
         } else {
-            for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDStringSize - 1; UUIDByte++) {
-                if ((UUIDByte == 0) || (UUIDByte == 1) || (UUIDByte == 2) || (UUIDByte == 3)) {
-                    Section1 <<= 8;
-                    Section1  += UUIDString2Convert[UUIDByte];
-                } else if ((UUIDByte == 5) || (UUIDByte == 6)) {
-                    Section2 <<= 8;
-                    Section2  += UUIDString2Convert[UUIDByte];
-                } else if ((UUIDByte == 8) || (UUIDByte == 9)) {
-                    Section3 <<= 8;
-                    Section3  += UUIDString2Convert[UUIDByte];
-                } else if ((UUIDByte == 11) || (UUIDByte == 12)) {
-                    Section4 <<= 8;
-                    Section4  += UUIDString2Convert[UUIDByte];
-                } else if ((UUIDByte == 14) || (UUIDByte == 15) || (UUIDByte == 16) || (UUIDByte == 17) || (UUIDByte == 18) || (UUIDByte == 19)) {
-                    Section5 <<= 8;
-                    Section5 += UUIDString2Convert[UUIDByte];
-                }
+            SwappedBinaryUUID[0]        = BinaryUUID[3];
+            SwappedBinaryUUID[1]        = BinaryUUID[2];
+            SwappedBinaryUUID[2]        = BinaryUUID[1];
+            SwappedBinaryUUID[3]        = BinaryUUID[0];
+            SwappedBinaryUUID[4]        = BinaryUUID[5];
+            SwappedBinaryUUID[5]        = BinaryUUID[4];
+            SwappedBinaryUUID[6]        = BinaryUUID[7];
+            SwappedBinaryUUID[7]        = BinaryUUID[6];
+            SwappedBinaryUUID[8]        = BinaryUUID[9];
+            SwappedBinaryUUID[9]        = BinaryUUID[8];
+            for (uint8_t Byte = 10; Byte < 16; Byte++) {
+                SwappedBinaryUUID[Byte] = BinaryUUID[Byte];
             }
-            SwappedSection1 = SwapEndian32(Section1);
-            SwappedSection2 = SwapEndian16(Section2);
-            SwappedSection3 = SwapEndian16(Section3);
-            SwappedSection4 = SwapEndian16(Section4);
-            SwappedSection5 = SwapEndian64(Section5);
-            for (uint8_t UUIDByte = BitIOUUIDStringSize - 1; UUIDByte > 0; UUIDByte--) {
-                if ((UUIDByte == 0) || (UUIDByte == 1) || (UUIDByte == 2) || (UUIDByte == 3)) {
-                    ConvertedUUIDString[UUIDByte] = SwappedSection1 & Power2Mask(8);
-                } else if ((UUIDByte == 5) || (UUIDByte == 6)) {
-                    ConvertedUUIDString[UUIDByte] = SwappedSection2 & Power2Mask(8);
-                } else if ((UUIDByte == 8) || (UUIDByte == 9)) {
-                    ConvertedUUIDString[UUIDByte] = SwappedSection3 & Power2Mask(8);
-                } else if ((UUIDByte == 11) || (UUIDByte == 12)) {
-                    ConvertedUUIDString[UUIDByte] = SwappedSection4 & Power2Mask(8);
-                } else if ((UUIDByte == 14) || (UUIDByte == 15) || (UUIDByte == 16) || (UUIDByte == 17) || (UUIDByte == 18) || (UUIDByte == 19)) {
-                    ConvertedUUIDString[UUIDByte] = SwappedSection5 & Power2Mask(8);
-                } else if (UUIDByte == 20) {
-                    ConvertedUUIDString[UUIDByte] = 0x00;
-                } else {
-                    ConvertedUUIDString[UUIDByte] = 0x2D;
-                }
-            }
+        }
+    }
+    
+    void ConvertUUID2GUID(const uint8_t *UUIDString, uint8_t *GUIDString) {
+        if (strlen(UUIDString) != BitIOUUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, strlen(UUIDString));
+        } else if (strlen(GUIDString) != BitIOGUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, strlen(GUIDString));
+        } else {
+            // So, first we call the function that'll convert a UUIDString to a BinaryUUID, then call SwapBinaryUUID, then convert the BinaryGUID back to a UUIDString.
+            uint8_t BinaryUUID[BitIOBinaryUUIDSize];
+            uint8_t BinaryGUID[BitIOBinaryUUIDSize];
+            ConvertUUIDString2BinaryUUID(UUIDString, BinaryUUID);
+            SwapBinaryUUID(BinaryUUID, BinaryGUID);
+            ConvertBinaryUUID2UUIDString(BinaryGUID, GUIDString);
+        }
+    }
+    
+    void ConvertGUID2UUID(const uint8_t *GUIDString, uint8_t *UUIDString) {
+        if (strlen(GUIDString) != BitIOGUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertGUID2UUID", "GUIDString size should be: %d, but is: %d\n", BitIOGUIDStringSize, strlen(GUIDString));
+        } else if (strlen(UUIDString) != BitIOUUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertGUID2UUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, strlen(UUIDString));
+        } else {
+            uint8_t BinaryGUID[BitIOBinaryUUIDSize];
+            ConvertUUIDString2BinaryUUID(GUIDString, BinaryGUID);
+            uint8_t BinaryUUID[BitIOBinaryUUIDSize];
+            SwapBinaryUUID(BinaryGUID, BinaryUUID);
+            ConvertBinaryUUID2UUIDString(BinaryUUID, UUIDString);
         }
     }
     

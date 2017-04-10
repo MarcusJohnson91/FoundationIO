@@ -512,11 +512,18 @@ extern "C" {
     void                ReadUUID(BitBuffer *BitB, uint8_t *UUIDString);
     
     /*!
-     @abstract                              "Endian swaps a UUID into a GUID and vice versa".
-     @param             UUIDString2Convert  "Pointer to a UUIDString to be converted".
-     @param             ConvertedUUIDString "The resulting UUID or GUID".
+     @abstract                              "Converts a UUIDString to a GUIDString by swapping the endian of each section".
+     @param             UUIDString          "An array containing the UUID in string form".
+     @param             GUIDString          "An empty array to put the swapped string into".
      */
-    void                SwapUUID(const uint8_t *UUIDString2Convert, uint8_t *ConvertedUUIDString);
+    void                ConvertUUID2GUID(const uint8_t *UUIDString, uint8_t *GUIDString);
+    
+    /*!
+     @abstract                              "Converts a GUIDString to a UUIDString by swapping the endian of each section".
+     @param             GUIDString          "An array containing the converted UUID in string form".
+     @param             UUIDString          "An empty array to put the swapped string into".
+     */
+    void                ConvertGUID2UUID(const uint8_t *GUIDString, uint8_t *UUIDString);
     
     /*!
      @abstract                              "Verify two UUIDs match each other".
