@@ -30,10 +30,10 @@ extern "C" {
      @constant       BitOutputBufferSize       "Inital size of BitOutput buffer".
      @constant       BitOutputBufferSizeInBits "Inital size of BitOutput buffer in bits".
      @constant       BitIOStringSize           "Maximum size of a string in BitIO".
-     @constant       BitIOUUIDSize             "Size of a UUIDString including dashes and null terminator".
-     @constant       BitIOEncodedUUIDSize      "Size of a binary UUID string".
-     @constant       BitIOGUIDSize             "size of a GUIDString including dashes and null terminator".
-     @constant       BitIOEncodedGUIDSize      "Size of a binary GUID string".
+     @constant       BitIOUUIDStringSize       "Size of a UUIDString including dashes and null terminator".
+     @constant       BitIOBinaryUUIDSize       "Size of a binary UUID string".
+     @constant       BitIOGUIDStringSize       "Size of a GUIDString including dashes and null terminator".
+     @constant       BitIOBinaryGUIDSize       "Size of a binary GUID string".
      @constant       BitIOMD5Size              "Size of a MD5 string".
      */
     enum BitIOConstants {
@@ -42,10 +42,10 @@ extern "C" {
         BitOutputBufferSize       = 4096,
         BitOutputBufferSizeInBits = BitOutputBufferSize * 8,
         BitIOStringSize           = 4096,
-        BitIOUUIDSize             = 21,
-        BitIOEncodedUUIDSize      = 16,
-        BitIOGUIDSize             = BitIOUUIDSize,
-        BitIOEncodedGUIDSize      = BitIOEncodedUUIDSize,
+        BitIOUUIDStringSize       = 21,
+        BitIOBinaryUUIDSize       = 16,
+        BitIOGUIDStringSize       = BitIOUUIDStringSize,
+        BitIOBinaryGUIDSize       = BitIOBinaryUUIDSize,
         BitIOMD5Size              = 16,
     };
     
@@ -267,7 +267,7 @@ extern "C" {
     /*!
      @abstract                              "Parses argv for switches matching the ones contained in CMD".
      @remark                                "Automatically supports `-h`, `--h`, and `/?`, and it's stored in the last element that we inited for you".
-     @remark                                "argv[0] (the path for the original executable) is NEVER searched or used".
+     @remark                                "Argv[0] (the path for the original executable) is NEVER searched or used".
      @param             CMD                 "Pointer to CommandLineOptions".
      @param             argc                "Main's argc, for the number of arguments entered".
      @param             argv                "Main's argv, for the actual arguments the user has entered".
