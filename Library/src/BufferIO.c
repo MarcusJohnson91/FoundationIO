@@ -874,12 +874,40 @@ extern "C" {
     
     // OR, should we just say that ReadUUID and WriteUUID ask what type of ID is it, BUT that would require we have knowledge about the running system's endian, AND the file format.
     
-    void CreateUUIDStringFromBinary(uint8_t BinaryUUID[BitIOBinaryUUIDSize]) {
-        
+    void ConvertBinaryUUID2UUIDString(uint8_t *BinaryUUID, uint8_t *UUIDString) {
+        if (strlen(BinaryUUID) != BitIOBinaryUUIDSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, strlen(BinaryUUID));
+        } else if (strlen(UUIDString) != BitIOUUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, strlen(UUIDString));
+        } else {
+            for (uint8_t Byte = 0; Byte < BitIOBinaryUUIDSize; Byte++) {
+                if (Byte == 4 || Byte == 7 || Byte == 10 || Byte == 13) {
+                    UUIDString[Byte] = 0x2D;
+                } else if (Byte == 20) {
+                    UUIDString[Byte] = 0x0;
+                } else {
+                    UUIDString[Byte] = BinaryUUID[Byte];
+                }
+            }
+        }
     }
     
-    void CreateBinaryUUIDFromString() {
-        
+    void ConvertUUIDString2BinaryUUID(uint8_t *UUIDString, uint8_t *BinaryUUID) {
+        if (strlen(UUIDString) != BitIOUUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, strlen(UUIDString));
+        } else if (strlen(BinaryUUID) != BitIOBinaryUUIDSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, strlen(BinaryUUID));
+        } else {
+            // Remove the lil dashes n shit.
+            // BB57-LI-VC-Pi-cParam
+            
+            // Remove bytes 4, 7, 10, 13, and 20
+            for (uint8_t Byte = 0; Byte < BitIOUUIDStringSize; Byte++) {
+                if (Byte != 4 || Byte != 7 || Byte != 10 || Byte != 13 || Byte != 20) {
+                    BinaryUUID[Byte] = UUIDString[Byte];
+                }
+            }
+        }
     }
     
     void SwapUUID(const uint8_t *UUIDString2Convert, uint8_t *ConvertedUUIDString) {
