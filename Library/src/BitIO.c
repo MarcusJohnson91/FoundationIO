@@ -260,18 +260,15 @@ extern "C" {
         return BitCount;
     }
     
-    uint64_t Power2Mask(const uint8_t Exponent) { // TODO: Make this more generic
-        uint64_t Mask = 0;
+    uint64_t Power2Mask(const uint8_t Exponent) {
+        uint64_t Mask = 0ULL;
         if (Exponent > 64) {
             Log(LOG_ERR, "libBitIO", "Power2Mask", "Exponent %d is too large\n", Exponent);
         } else {
-            if (Exponent == 1) {
-                Mask = 1;
-            } else if (Exponent == 64) {
-                Mask = ((1ULL << Exponent) - 1) + (((1ULL << Exponent) - 1) - 1);
-            } else {
-                Mask = (1ULL << Exponent) - 1;
-            }
+            uint64_t HighestBit = 0ULL, Fill = 0ULL;
+            HighestBit          = Powi(2, Exponent - 1);
+            Fill                = HighestBit - 1;
+            Mask                = HighestBit + Fill;
         }
         return Mask;
     }
