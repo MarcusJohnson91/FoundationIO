@@ -290,7 +290,7 @@ extern "C" {
     
     uint8_t  FindHighestBitSet(const uint64_t UnsignedInt2Search) {
         uint8_t  HighestBitSet = 0;
-        uint64_t Shift = 0ULL;
+        uint64_t Shift         = 0ULL;
         
         for (uint8_t Bit = 64; Bit > 0; Bit--) {
             Shift = ((1ULL << Bit) - 1);
@@ -304,7 +304,7 @@ extern "C" {
     
     uint8_t DetectSystemEndian(void) { // MARK: This function needs to remain internal
         uint8_t SystemEndian = 0;
-        uint16_t Endian = 0xFFFE;
+        uint16_t Endian      = 0xFFFE;
         if (Endian == 0xFFFE) {
             SystemEndian = LittleEndian;
         } else if (Endian == 0xFEFF) {
@@ -410,7 +410,7 @@ extern "C" {
                             } else {
                                 CMD->Switch[Switch]->SwitchFound = true;
                                 if (CMD->Switch[Switch]->Resultless == false) {
-                                    char *SwitchResult = calloc(1, strlen(argv[Argument] - strlen(CMD->Switch[Switch]->SwitchResult)));
+                                    char *SwitchResult                = calloc(1, strlen(argv[Argument] - strlen(CMD->Switch[Switch]->SwitchResult)));
                                     snprintf(SwitchResult, BitIOStringSize, "%s", argv[Argument + 1]);
                                     CMD->Switch[Switch]->SwitchResult = SwitchResult;
                                 }
@@ -428,9 +428,9 @@ extern "C" {
         } else if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Pointer to BitInput is NULL\n");
         } else {
-            BitI->File             = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
+            BitI->File                  = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
             fseek(BitI->File, 0, SEEK_END);
-            BitI->FileSize = (uint64_t)ftell(BitI->File);
+            BitI->FileSize              = (uint64_t)ftell(BitI->File);
             fseek(BitI->File, 0, SEEK_SET);
             BitI->FilePosition          = ftell(BitI->File);
             uint64_t Bytes2Read         = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
@@ -447,8 +447,8 @@ extern "C" {
         } else if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Pointer to BitOutput is NULL\n");
         } else {
-            BitO->File             = fopen(CMD->Switch[OutputSwitch]->SwitchResult, "rb");
-            BitO->BitB->BitsAvailable = BitOutputBufferSizeInBits;
+            BitO->File                  = fopen(CMD->Switch[OutputSwitch]->SwitchResult, "rb");
+            BitO->BitB->BitsAvailable   = BitOutputBufferSizeInBits;
             BitO->BitB->BitsUnavailable = 0;
             DetectSystemEndian();
         }
@@ -854,10 +854,10 @@ extern "C" {
     }
     
     void ReadUUID(BitBuffer *BitB, uint8_t *UUIDString) {
-        if (sizeof(UUIDString) != BitIOUUIDSize) {
+        if (sizeof(UUIDString) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "ReadUUID", "UUIDString is %d bytes long, should be 21\n", sizeof(UUIDString));
         } else {
-            for (uint8_t Character = 0; Character < BitIOUUIDSize - 1; Character++) {
+            for (uint8_t Character = 0; Character < BitIOUUIDStringSize - 1; Character++) {
                 if (Character == 21) {
                     UUIDString[Character] = 0x00;
                 } else if ((Character == 4) || (Character == 7) || (Character == 10) || (Character == 13)) {
@@ -869,6 +869,19 @@ extern "C" {
         }
     }
     
+    // What if I just wrote a few functions to handle converting a UUID into an int, and vice versa?
+    // Then swapping would be easier, and the Read/Write functions would be simply wrappers around these two, plus a call to Read/WriteBits.
+    
+    // OR, should we just say that ReadUUID and WriteUUID ask what type of ID is it, BUT that would require we have knowledge about the running system's endian, AND the file format.
+    
+    void CreateUUIDStringFromBinary(uint8_t BinaryUUID[BitIOBinaryUUIDSize]) {
+        
+    }
+    
+    void CreateBinaryUUIDFromString() {
+        
+    }
+    
     void SwapUUID(const uint8_t *UUIDString2Convert, uint8_t *ConvertedUUIDString) {
         uint32_t Section1  = 0, SwappedSection1 = 0;
         uint16_t Section2  = 0, SwappedSection2 = 0;
@@ -876,10 +889,10 @@ extern "C" {
         uint16_t Section4  = 0, SwappedSection4 = 0;
         uint64_t Section5  = 0, SwappedSection5 = 0;
         
-        if (sizeof(UUIDString2Convert) != BitIOUUIDSize || sizeof(ConvertedUUIDString) != BitIOUUIDSize) {
+        if (sizeof(UUIDString2Convert) != BitIOUUIDStringSize || sizeof(ConvertedUUIDString) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "SwapUUID", "UUIDString2Convert is %d bytes long, ConvertedUUIDString is %d bytes long, should be 21\n", sizeof(UUIDString2Convert), sizeof(ConvertedUUIDString));
         } else {
-            for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDSize - 1; UUIDByte++) {
+            for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDStringSize - 1; UUIDByte++) {
                 if ((UUIDByte == 0) || (UUIDByte == 1) || (UUIDByte == 2) || (UUIDByte == 3)) {
                     Section1 <<= 8;
                     Section1  += UUIDString2Convert[UUIDByte];
@@ -902,7 +915,7 @@ extern "C" {
             SwappedSection3 = SwapEndian16(Section3);
             SwappedSection4 = SwapEndian16(Section4);
             SwappedSection5 = SwapEndian64(Section5);
-            for (uint8_t UUIDByte = BitIOUUIDSize - 1; UUIDByte > 0; UUIDByte--) {
+            for (uint8_t UUIDByte = BitIOUUIDStringSize - 1; UUIDByte > 0; UUIDByte--) {
                 if ((UUIDByte == 0) || (UUIDByte == 1) || (UUIDByte == 2) || (UUIDByte == 3)) {
                     ConvertedUUIDString[UUIDByte] = SwappedSection1 & Power2Mask(8);
                 } else if ((UUIDByte == 5) || (UUIDByte == 6)) {
@@ -925,13 +938,13 @@ extern "C" {
     bool CompareUUIDs(const uint8_t *UUIDString1, const uint8_t *UUIDString2) {
         bool UUIDsMatch = 0;
         
-        if (sizeof(UUIDString1) != BitIOUUIDSize || sizeof(UUIDString2) != BitIOUUIDSize) {
+        if (sizeof(UUIDString1) != BitIOUUIDStringSize || sizeof(UUIDString2) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "CompareUUIDs", "UUIDString1 is %d bytes long, UUIDString2 is %d bytes long, should be 21\n", sizeof(UUIDString1), sizeof(UUIDString2));
         } else {
-            for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDSize - 1; UUIDByte++) {
+            for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDStringSize - 1; UUIDByte++) {
                 if (UUIDString1[UUIDByte] != UUIDString2[UUIDByte]) {
                     UUIDsMatch = false;
-                } else if ((UUIDString1[UUIDByte] == UUIDString2[UUIDByte]) && (UUIDByte = BitIOUUIDSize - 1)) {
+                } else if ((UUIDString1[UUIDByte] == UUIDString2[UUIDByte]) && (UUIDByte = BitIOUUIDStringSize - 1)) {
                     UUIDsMatch = true;
                 }
             }
@@ -940,10 +953,10 @@ extern "C" {
     }
     
     uint8_t WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString) {
-        if (sizeof(UUIDString) != BitIOUUIDSize) {
+        if (sizeof(UUIDString) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "WriteUUID", "UUIDString is %d bytes long, should be 21\n", sizeof(UUIDString));
         } else {
-            for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDSize - 1; UUIDByte++) {
+            for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDStringSize - 1; UUIDByte++) {
                 if ((UUIDByte != 4) && (UUIDByte != 7) && (UUIDByte != 10) && (UUIDByte != 13) && (UUIDByte != 20)) { // Bullshit bytes
                     WriteBits(BitB, UUIDString[UUIDByte], 8, true);
                 }
@@ -1009,7 +1022,7 @@ extern "C" {
         }
     }
     
-    void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB) {
+    void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB, int Socket) {
         
     }
     
@@ -1028,10 +1041,9 @@ extern "C" {
         snprintf(ErrorString, BitIOStringSize, "%s - %s: %s - %s\n", LibraryOrProgram, Function, ErrorDescription, VariadicArguments);
 #ifdef _WIN32
         uintptr_t *EventLog = RegisterEventSource(NULL, LibraryOrProgram);
-        uint32_t ErrorCode = ReportEvent(EventLog, ErrorLevel, 1, 0xF000FFFF, NULL, 1, strlen(ErrorString), ErrorString, NULL);
+        uint32_t ErrorCode  = ReportEvent(EventLog, ErrorLevel, 1, 0xF000FFFF, NULL, 1, strlen(ErrorString), ErrorString, NULL);
         if (ErrorCode != 0) {
-            fprintf(stderr, "BitIO - Log: Windows version of Logger failed\n");
-            fprintf(stderr, ErrorString);
+            fprintf(stderr, "BitIO - Log: Windows version of Logger failed with error: %s\n", ErrorString);
         }
         bool DeregisterSucceeded = DeregisterEventSource(EventLog);
         if (DeregisterSucceeded > 0) {
