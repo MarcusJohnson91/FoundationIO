@@ -850,22 +850,6 @@ extern "C" {
         }
     }
     
-    void ReadUUID(BitBuffer *BitB, uint8_t *UUIDString) {
-        if (sizeof(UUIDString) != BitIOUUIDStringSize) {
-            Log(LOG_ERR, "libBitIO", "ReadUUID", "UUIDString is %d bytes long, should be 21\n", sizeof(UUIDString));
-        } else {
-            for (uint8_t Character = 0; Character < BitIOUUIDStringSize - 1; Character++) {
-                if (Character == 21) {
-                    UUIDString[Character] = 0x00;
-                } else if ((Character == 4) || (Character == 7) || (Character == 10) || (Character == 13)) {
-                    UUIDString[Character] = 0x2D;
-                } else {
-                    UUIDString[Character] = ReadBits(BitB, 8, true);
-                }
-            }
-        }
-    }
-    
     void ConvertBinaryUUID2UUIDString(const uint8_t *BinaryUUID, uint8_t *UUIDString) {
         if (strlen(BinaryUUID) != BitIOBinaryUUIDSize) {
             Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, strlen(BinaryUUID));
@@ -881,6 +865,18 @@ extern "C" {
                     UUIDString[Byte] = BinaryUUID[Byte];
                 }
             }
+        }
+    }
+    
+    void ReadUUID(BitBuffer *BitB, uint8_t *UUIDString) {
+        if (sizeof(UUIDString) != BitIOUUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "ReadUUID", "UUIDString is: %d bytes long, it should be: %d\n", sizeof(UUIDString), BitIOUUIDStringSize);
+        } else {
+            uint8_t BinaryUUID[BitIOBinaryUUIDSize];
+            for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
+                BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
+            }
+            ConvertBinaryUUID2UUIDString(BinaryUUID, UUIDString);
         }
     }
     
@@ -970,17 +966,19 @@ extern "C" {
         return UUIDsMatch;
     }
     
-    uint8_t WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString) {
-        if (sizeof(UUIDString) != BitIOUUIDStringSize) {
+    void WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "BitIO", "WriteUUID", "Pointer to instance of BitBuffer is NULL\n");
+        } else if (sizeof(UUIDString) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "WriteUUID", "UUIDString is %d bytes long, should be 21\n", sizeof(UUIDString));
         } else {
-            for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDStringSize - 1; UUIDByte++) {
-                if ((UUIDByte != 4) && (UUIDByte != 7) && (UUIDByte != 10) && (UUIDByte != 13) && (UUIDByte != 20)) { // Bullshit bytes
-                    WriteBits(BitB, UUIDString[UUIDByte], 8, true);
-                }
+            // Convert UUIDString to BinaryUUID, then write that.
+            uint8_t BinaryUUID[BitIOBinaryUUIDSize];
+            ConvertUUIDString2BinaryUUID(UUIDString, BinaryUUID);
+            for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
+                WriteBits(BitB, BinaryUUID[UUIDByte], 8, true);
             }
         }
-        return EXIT_SUCCESS;
     }
     
     void OpenSocket() {
