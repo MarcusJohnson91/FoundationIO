@@ -47,6 +47,7 @@ extern "C" {
         BitIOGUIDStringSize       = BitIOUUIDStringSize,
         BitIOBinaryGUIDSize       = BitIOBinaryUUIDSize,
         BitIOMD5Size              = 16,
+        BitIONumHuffmanSymbols    = 256,
     };
     
     typedef struct BitBuffer BitBuffer;
