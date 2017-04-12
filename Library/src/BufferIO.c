@@ -192,7 +192,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "CloseCommandLineOptions", "Pointer to CommandLineOptions is NULL\n");
         } else {
             for (uint64_t Option = 0; Option < CMD->NumSwitches; Option++) {
-                free(&CMD->Switch[Option]);
+                free(CMD->Switch[Option]);
             }
             free(CMD);
         }
@@ -542,13 +542,12 @@ extern "C" {
     }
     
     const char *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum) {
-        const char *Result = 0;
+        const char *Result = NULL;
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "GetSwitchResult", "Pointer to CommandLineOptions is NULL\n");
         } else if (SwitchNum > CMD->NumSwitches) {
             Log(LOG_ERR, "libBitIO", "GetSwitchResult", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
         } else {
-            Result = calloc(1, strlen(CMD->Switch[SwitchNum]->SwitchResult));
             Result = CMD->Switch[SwitchNum]->SwitchResult;
         }
         return Result;
