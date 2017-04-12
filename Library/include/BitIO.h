@@ -539,7 +539,7 @@ extern "C" {
      @param             BitB                "Pointer to the instance of BitBuffer".
      @param             UUIDString          "UUID string to write to the file as a binary blob, aka remove hyphens and null terminating char".
      */
-    uint8_t             WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString);
+    void                WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString);
     
     /*!
      @abstract                              "Reads Bytes2Read into a buffer pointed to by BitB from InputFile"
