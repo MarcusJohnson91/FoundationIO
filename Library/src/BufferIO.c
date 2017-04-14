@@ -140,7 +140,7 @@ extern "C" {
         } else {
             CMD->NumSwitches          += NumSwitches;
             CMD->Switch                = calloc(NumSwitches, sizeof(CommandLineSwitch));
-            for (uint64_t Option = 0; Option < NumSwitches; Option++) {
+            for (uint64_t Option = 0; Option <= NumSwitches; Option++) {
                 CMD->Switch[Option]    = calloc(1, sizeof(CommandLineSwitch));
             }
         }
@@ -386,9 +386,9 @@ extern "C" {
             } else {
                 AddCommandLineSwitch(CMD);
                 
-                SetSwitchFlag(CMD, CMD->NumSwitches, "Help");
-                SetSwitchDescription(CMD, CMD->NumSwitches, "Prints all the command line options\n");
-                SetSwitchResultStatus(CMD, CMD->NumSwitches, true);
+                SetSwitchFlag(CMD, CMD->NumSwitches - 1, "Help");
+                SetSwitchDescription(CMD, CMD->NumSwitches - 1, "Prints all the command line options\n");
+                SetSwitchResultStatus(CMD, CMD->NumSwitches - 1, true);
                 
                 for (uint8_t Argument = 1; Argument < argc; Argument++) { // the executable path is skipped over
                     for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
