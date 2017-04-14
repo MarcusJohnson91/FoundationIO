@@ -341,7 +341,7 @@ extern "C" {
      @param             SwitchNum           "The switch to set".
      @param             Flag                "The flag to identify an option with".
      */
-    void                SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag);
+    void                SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag, const size_t FlagSize);
     
     /*!
      @param             CMD                 "Pointer to the instance of CommandLineOptions".
