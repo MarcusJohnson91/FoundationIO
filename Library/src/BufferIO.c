@@ -109,7 +109,7 @@ extern "C" {
         const char         *Author;
         const char         *Copyright;
         const char         *License;
-        CommandLineSwitch **Switch;
+        CommandLineSwitch *Switch[];
     } CommandLineOptions;
     
     BitInput *InitBitInput(void) {
@@ -139,7 +139,6 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "InitCommandLineSwitches", "Pointer to CommandLineOptions is NULL\n");
         } else {
             CMD->NumSwitches          += NumSwitches;
-            CMD->Switch                = (CommandLineSwitch**)calloc(NumSwitches, sizeof(CommandLineSwitch));
             for (uint64_t Option = 0; Option <= NumSwitches; Option++) {
                 CMD->Switch[Option]    = calloc(1, sizeof(CommandLineSwitch));
             }
@@ -402,7 +401,7 @@ extern "C" {
                         snprintf(Slash, sizeof(Slash), "/%s\n", CMD->Switch[Switch]->Flag);
                         
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
-                            if (Argument == CMD->NumSwitches - 1) {
+                            if (Argument == CMD->NumSwitches) {
                                 DisplayCMDHelp(CMD);
                             } else {
                                 CMD->Switch[Switch]->SwitchFound = true;
