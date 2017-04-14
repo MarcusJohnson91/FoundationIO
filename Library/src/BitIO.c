@@ -371,46 +371,43 @@ extern "C" {
     }
     
     void ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]) {
-        // TODO: Scan for equals signs as well, if found, after the equal sign is the result, everything before is the switch.
-        // TODO: add support for generating the short versions of the arguments.
+        // TODO : Scan for equals signs as well, if found, after the equal sign is the result, everything before is the switch.
+        // TODO : add support for generating the short versions of the arguments.
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineOptions is NULL\n");
         } else {
             if (CMD->NumSwitches < CMD->MinSwitches && CMD->MinSwitches > 0) {
                 DisplayCMDHelp(CMD);
             } else {
-                SetSwitchFlag(CMD, CMD->NumSwitches, "Help", strlen("Help"));
+                SetSwitchFlag(CMD, CMD->NumSwitches, "Help", 5);
                 SetSwitchDescription(CMD, CMD->NumSwitches, "Prints all the command line options\n");
                 SetSwitchResultStatus(CMD, CMD->NumSwitches, true);
                 
                 for (uint8_t Argument = 1; Argument < argc; Argument++) { // the executable path is skipped over
                     for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
+                        // Once the switch is found, we should skip over this argument.
                         
-                        // All of this Dash/Slash stuff, dereferences a NULL pointer. that's why it's crashing.
+                        char *SingleDash                             = calloc(1, CMD->Switch[Switch].FlagSize + 1);
+                        snprintf(SingleDash, CMD->Switch[Switch].FlagSize + 1, "-%s\n", CMD->Switch[Switch].Flag);
                         
-                        size_t FlagSize  = sizeof(CMD->Switch[Switch].Flag + 1);
-                        size_t FlagSize2 = strlen(CMD->Switch[Switch].Flag + 1);
+                        char *DoubleDash                             = calloc(1, CMD->Switch[Switch].FlagSize + 2);
+                        snprintf(DoubleDash, CMD->Switch[Switch].FlagSize + 2, "--%s\n", CMD->Switch[Switch].Flag);
                         
-                        char *SingleDash = calloc(1, CMD->Switch[Switch].FlagSize + 1);
-                        snprintf(SingleDash, sizeof(SingleDash), "-%s", CMD->Switch[Switch].Flag);
-                        
-                        char *DoubleDash = calloc(1, CMD->Switch[Switch].FlagSize + 2);
-                        snprintf(DoubleDash, sizeof(DoubleDash), "--%s", CMD->Switch[Switch].Flag);
-                        
-                        char *Slash      = calloc(1, CMD->Switch[Switch].FlagSize + 1);
-                        snprintf(Slash, sizeof(Slash), "/%s", CMD->Switch[Switch].Flag);
+                        char *Slash                                  = calloc(1, CMD->Switch[Switch].FlagSize + 1);
+                        snprintf(Slash, CMD->Switch[Switch].FlagSize + 1, "/%s\n", CMD->Switch[Switch].Flag);
                         
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                             if (Argument == CMD->NumSwitches) {
                                 DisplayCMDHelp(CMD);
                             } else {
-                                CMD->Switch[Switch].SwitchFound = true;
+                                CMD->Switch[Switch].SwitchFound      = true;
                                 if (CMD->Switch[Switch].Resultless == false) {
-                                    char *SwitchResult                = calloc(1, strlen(argv[Argument] - strlen(CMD->Switch[Switch].SwitchResult)));
-                                    snprintf(SwitchResult, BitIOStringSize, "%s", argv[Argument + 1]);
+                                    char *SwitchResult               = calloc(1, strlen(argv[Argument]));
+                                    snprintf(SwitchResult, strlen(argv[Argument] + 1), "%s", argv[Argument + 1]);
                                     CMD->Switch[Switch].SwitchResult = SwitchResult;
                                 }
                             }
+                            Argument += 1;
                         }
                     }
                 }
