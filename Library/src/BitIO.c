@@ -109,7 +109,7 @@ extern "C" {
         const char         *Author;
         const char         *Copyright;
         const char         *License;
-        CommandLineSwitch  *Switch[];
+        CommandLineSwitch  *Switch;
     } CommandLineOptions;
     
     BitInput *InitBitInput(void) {
@@ -138,19 +138,14 @@ extern "C" {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "InitCommandLineSwitches", "Pointer to CommandLineOptions is NULL\n");
         } else {
-            CMD->NumSwitches          += NumSwitches;
+            CMD->NumSwitches           = NumSwitches + 1; // Help option
+            CMD->Switch                = calloc(NumSwitches, sizeof(CommandLineSwitch));
+            /*
             for (uint64_t Option = 0; Option <= NumSwitches; Option++) {
+                CMD->Switch[Option]    = calloc(1, sizeof(CommandLineSwitch*));
                 CMD->Switch[Option]    = calloc(1, sizeof(CommandLineSwitch));
             }
-        }
-    }
-    
-    void AddCommandLineSwitch(CommandLineOptions *CMD) { // FIXME: Is this supposed to be public?
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "AddCommandLineSwitch", "Pointer to CommandLineOptions is NULL\n");
-        } else {
-            CMD->NumSwitches += 1;
-            CMD->Switch[CMD->NumSwitches - 1] = calloc(1, sizeof(CommandLineSwitch));
+             */
         }
     }
     
@@ -191,7 +186,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "CloseCommandLineOptions", "Pointer to CommandLineOptions is NULL\n");
         } else {
             for (uint64_t Option = 0; Option < CMD->NumSwitches; Option++) {
-                free(CMD->Switch[Option]);
+                free(CMD->Switch);
             }
             free(CMD);
         }
@@ -368,8 +363,8 @@ extern "C" {
             printf("%s by %s ©%s: %s, Released under the %s license\n\n", CMD->Name, CMD->Author, CMD->Copyright, CMD->Description, CMD->License);
             printf("Options:\n");
             for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
-                printf("%s\t", CMD->Switch[Option]->Flag);
-                printf("%s\n", CMD->Switch[Option]->SwitchDescription);
+                printf("%s\t", CMD->Switch[Option].Flag);
+                printf("%s\n", CMD->Switch[Option].SwitchDescription);
             }
         }
     }
@@ -383,32 +378,30 @@ extern "C" {
             if (CMD->NumSwitches < CMD->MinSwitches && CMD->MinSwitches > 0) {
                 DisplayCMDHelp(CMD);
             } else {
-                AddCommandLineSwitch(CMD);
-                
                 SetSwitchFlag(CMD, CMD->NumSwitches, "Help");
                 SetSwitchDescription(CMD, CMD->NumSwitches, "Prints all the command line options\n");
                 SetSwitchResultStatus(CMD, CMD->NumSwitches, true);
                 
                 for (uint8_t Argument = 1; Argument < argc; Argument++) { // the executable path is skipped over
                     for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
-                        char *SingleDash = calloc(1, strlen(CMD->Switch[Switch]->Flag + 1));
-                        snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch]->Flag);
+                        char *SingleDash = calloc(1, strlen(CMD->Switch[Switch].Flag + 1));
+                        snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch].Flag);
                         
-                        char *DoubleDash = calloc(1, strlen(CMD->Switch[Switch]->Flag + 2));
-                        snprintf(DoubleDash, sizeof(DoubleDash), "--%s\n", CMD->Switch[Switch]->Flag);
+                        char *DoubleDash = calloc(1, strlen(CMD->Switch[Switch].Flag + 2));
+                        snprintf(DoubleDash, sizeof(DoubleDash), "--%s\n", CMD->Switch[Switch].Flag);
                         
-                        char *Slash      = calloc(1, strlen(CMD->Switch[Switch]->Flag + 1));
-                        snprintf(Slash, sizeof(Slash), "/%s\n", CMD->Switch[Switch]->Flag);
+                        char *Slash      = calloc(1, strlen(CMD->Switch[Switch].Flag + 1));
+                        snprintf(Slash, sizeof(Slash), "/%s\n", CMD->Switch[Switch].Flag);
                         
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                             if (Argument == CMD->NumSwitches) {
                                 DisplayCMDHelp(CMD);
                             } else {
-                                CMD->Switch[Switch]->SwitchFound = true;
-                                if (CMD->Switch[Switch]->Resultless == false) {
-                                    char *SwitchResult                = calloc(1, strlen(argv[Argument] - strlen(CMD->Switch[Switch]->SwitchResult)));
+                                CMD->Switch[Switch].SwitchFound = true;
+                                if (CMD->Switch[Switch].Resultless == false) {
+                                    char *SwitchResult                = calloc(1, strlen(argv[Argument] - strlen(CMD->Switch[Switch].SwitchResult)));
                                     snprintf(SwitchResult, BitIOStringSize, "%s", argv[Argument + 1]);
-                                    CMD->Switch[Switch]->SwitchResult = SwitchResult;
+                                    CMD->Switch[Switch].SwitchResult = SwitchResult;
                                 }
                             }
                         }
@@ -424,7 +417,7 @@ extern "C" {
         } else if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Pointer to BitInput is NULL\n");
         } else {
-            BitI->File                  = fopen(CMD->Switch[InputSwitch]->SwitchResult, "rb");
+            BitI->File                  = fopen(CMD->Switch[InputSwitch].SwitchResult, "rb");
             fseek(BitI->File, 0, SEEK_END);
             BitI->FileSize              = (uint64_t)ftell(BitI->File);
             fseek(BitI->File, 0, SEEK_SET);
@@ -447,7 +440,7 @@ extern "C" {
         } else if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Pointer to BitOutput is NULL\n");
         } else {
-            BitO->File                  = fopen(CMD->Switch[OutputSwitch]->SwitchResult, "rb");
+            BitO->File                  = fopen(CMD->Switch[OutputSwitch].SwitchResult, "rb");
             BitO->BitB->BitsAvailable   = BitOutputBufferSizeInBits;
             BitO->BitB->BitsUnavailable = 0;
             DetectSystemEndian();
@@ -520,7 +513,7 @@ extern "C" {
         } else if (SwitchNum > CMD->NumSwitches) {
             Log(LOG_ERR, "libBitIO", "SetSwitchFlag", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
         } else {
-            CMD->Switch[SwitchNum]->Flag = Flag;
+            CMD->Switch[SwitchNum].Flag = Flag;
         }
     }
     
@@ -532,7 +525,7 @@ extern "C" {
         } else if (SwitchNum > CMD->NumSwitches) {
             Log(LOG_ERR, "libBitIO", "SetSwitchDescription", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
         } else {
-            CMD->Switch[SwitchNum]->SwitchDescription = Description;
+            CMD->Switch[SwitchNum].SwitchDescription = Description;
         }
     }
     
@@ -544,7 +537,7 @@ extern "C" {
         } else if (SwitchNum > CMD->NumSwitches) {
             Log(LOG_ERR, "libBitIO", "SetSwitchResultStatus", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
         } else {
-            CMD->Switch[SwitchNum]->Resultless = (IsSwitchResultless & 1);
+            CMD->Switch[SwitchNum].Resultless = (IsSwitchResultless & 1);
         }
     }
     
@@ -555,7 +548,7 @@ extern "C" {
         } else if (SwitchNum > CMD->NumSwitches) {
             Log(LOG_ERR, "libBitIO", "GetSwitchResult", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
         } else {
-            Result = CMD->Switch[SwitchNum]->SwitchResult;
+            Result = CMD->Switch[SwitchNum].SwitchResult;
         }
         return Result;
     }
@@ -567,7 +560,7 @@ extern "C" {
         } else if (SwitchNum > CMD->NumSwitches) { // - 1 so the hidden help option isn't exposed
             Log(LOG_ERR, "libBitIO", "GetSwitchPresence", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
         } else {
-            Status = CMD->Switch[SwitchNum]->SwitchFound;
+            Status = CMD->Switch[SwitchNum].SwitchFound;
         }
         return Status;
     }
