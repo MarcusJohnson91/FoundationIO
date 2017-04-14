@@ -83,6 +83,7 @@ extern "C" {
     typedef struct CommandLineSwitch {
         bool               SwitchFound;
         bool               Resultless;
+        size_t             FlagSize;
         const char        *Flag;
         const char        *SwitchDescription;
         const char        *SwitchResult;
@@ -378,7 +379,7 @@ extern "C" {
             if (CMD->NumSwitches < CMD->MinSwitches && CMD->MinSwitches > 0) {
                 DisplayCMDHelp(CMD);
             } else {
-                SetSwitchFlag(CMD, CMD->NumSwitches, "Help");
+                SetSwitchFlag(CMD, CMD->NumSwitches, "Help", strlen("Help"));
                 SetSwitchDescription(CMD, CMD->NumSwitches, "Prints all the command line options\n");
                 SetSwitchResultStatus(CMD, CMD->NumSwitches, true);
                 
@@ -390,14 +391,14 @@ extern "C" {
                         size_t FlagSize  = sizeof(CMD->Switch[Switch].Flag + 1);
                         size_t FlagSize2 = strlen(CMD->Switch[Switch].Flag + 1);
                         
-                        char *SingleDash = calloc(1, strlen(CMD->Switch[Switch].Flag + 1));
-                        snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch].Flag);
+                        char *SingleDash = calloc(1, CMD->Switch[Switch].FlagSize + 1);
+                        snprintf(SingleDash, sizeof(SingleDash), "-%s", CMD->Switch[Switch].Flag);
                         
-                        char *DoubleDash = calloc(1, strlen(CMD->Switch[Switch].Flag + 2));
-                        snprintf(DoubleDash, sizeof(DoubleDash), "--%s\n", CMD->Switch[Switch].Flag);
+                        char *DoubleDash = calloc(1, CMD->Switch[Switch].FlagSize + 2);
+                        snprintf(DoubleDash, sizeof(DoubleDash), "--%s", CMD->Switch[Switch].Flag);
                         
-                        char *Slash      = calloc(1, strlen(CMD->Switch[Switch].Flag + 1));
-                        snprintf(Slash, sizeof(Slash), "/%s\n", CMD->Switch[Switch].Flag);
+                        char *Slash      = calloc(1, CMD->Switch[Switch].FlagSize + 1);
+                        snprintf(Slash, sizeof(Slash), "/%s", CMD->Switch[Switch].Flag);
                         
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                             if (Argument == CMD->NumSwitches) {
@@ -511,7 +512,7 @@ extern "C" {
         CMD->MinSwitches = MinSwitches;
     }
     
-    void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag) {
+    void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag, const size_t FlagSize) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetSwitchFlag", "Pointer to CommandLineOptions is NULL\n");
         } else if (Flag == NULL) {
@@ -520,6 +521,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "SetSwitchFlag", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
         } else {
             CMD->Switch[SwitchNum].Flag = Flag;
+            CMD->Switch[SwitchNum].FlagSize = FlagSize;
         }
     }
     
