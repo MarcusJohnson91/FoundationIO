@@ -384,6 +384,12 @@ extern "C" {
                 
                 for (uint8_t Argument = 1; Argument < argc; Argument++) { // the executable path is skipped over
                     for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
+                        
+                        // All of this Dash/Slash stuff, dereferences a NULL pointer. that's why it's crashing.
+                        
+                        size_t FlagSize  = sizeof(CMD->Switch[Switch].Flag + 1);
+                        size_t FlagSize2 = strlen(CMD->Switch[Switch].Flag + 1);
+                        
                         char *SingleDash = calloc(1, strlen(CMD->Switch[Switch].Flag + 1));
                         snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch].Flag);
                         
