@@ -391,13 +391,13 @@ extern "C" {
                 
                 for (uint8_t Argument = 1; Argument < argc; Argument++) { // the executable path is skipped over
                     for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
-                        char *SingleDash = calloc(strlen(CMD->Switch[Switch]->Flag + 2), 1);
+                        char *SingleDash = calloc(1, strlen(CMD->Switch[Switch]->Flag + 1));
                         snprintf(SingleDash, sizeof(SingleDash), "-%s\n", CMD->Switch[Switch]->Flag);
                         
-                        char *DoubleDash = calloc(strlen(CMD->Switch[Switch]->Flag + 3), 1);
+                        char *DoubleDash = calloc(1, strlen(CMD->Switch[Switch]->Flag + 2));
                         snprintf(DoubleDash, sizeof(DoubleDash), "--%s\n", CMD->Switch[Switch]->Flag);
                         
-                        char *Slash      = calloc(strlen(CMD->Switch[Switch]->Flag + 2), 1);
+                        char *Slash      = calloc(1, strlen(CMD->Switch[Switch]->Flag + 1));
                         snprintf(Slash, sizeof(Slash), "/%s\n", CMD->Switch[Switch]->Flag);
                         
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
