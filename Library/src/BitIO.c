@@ -139,7 +139,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "InitCommandLineSwitches", "Pointer to CommandLineOptions is NULL\n");
         } else {
             CMD->NumSwitches          += NumSwitches;
-            CMD->Switch                = calloc(NumSwitches, sizeof(CommandLineSwitch));
+            CMD->Switch                = (CommandLineSwitch**)calloc(NumSwitches, sizeof(CommandLineSwitch));
             for (uint64_t Option = 0; Option <= NumSwitches; Option++) {
                 CMD->Switch[Option]    = calloc(1, sizeof(CommandLineSwitch));
             }
