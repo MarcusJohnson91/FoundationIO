@@ -168,8 +168,8 @@ extern "C" {
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "CloseBitOutput", "Pointer to BitOutput is NULL");
         } else {
-            if (IsOutputStreamByteAligned(BitO, 1) == false) {
-                AlignOutput(BitO, 1);
+            if (IsBitBufferAligned(BitO->BitB, 1) == false) {
+                AlignBitBuffer(BitO->BitB, 1);
             }
             fwrite(BitO->BitB->Buffer, Bits2Bytes(BitO->BitB->BitsUnavailable, true), 1, BitO->File);
             fflush(BitO->File);
@@ -438,6 +438,10 @@ extern "C" {
         }
     }
     
+    void OpenCMDInputSocket() {
+        
+    }
+    
     void OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, const uint8_t OutputSwitch) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Pointer to CommandLineOptions is NULL\n");
@@ -449,6 +453,10 @@ extern "C" {
             BitO->BitB->BitsUnavailable = 0;
             DetectSystemEndian();
         }
+    }
+    
+    void OpenCMDOutputSocket() {
+        
     }
     
     void SetCMDName(CommandLineOptions *CMD, const char *Name) {
