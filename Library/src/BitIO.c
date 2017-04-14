@@ -540,7 +540,7 @@ extern "C" {
     void SetSwitchResultStatus(CommandLineOptions *CMD, uint64_t SwitchNum, bool IsSwitchResultless) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetSwitchResultStatus", "Pointer to CommandLineOptions is NULL\n");
-        } else if (SwitchNum >= CMD->NumSwitches) { // - 1 so the hidden help option isn't exposed
+        } else if (SwitchNum > CMD->NumSwitches) { // - 1 so the hidden help option isn't exposed
             Log(LOG_ERR, "libBitIO", "SetSwitchResultStatus", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
         } else if (SwitchNum > CMD->NumSwitches) {
             Log(LOG_ERR, "libBitIO", "SetSwitchResultStatus", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
