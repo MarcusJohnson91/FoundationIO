@@ -381,7 +381,7 @@ extern "C" {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineOptions is NULL\n");
         } else {
-            if (CMD->NumSwitches < CMD->MinSwitches) {
+            if (CMD->NumSwitches < CMD->MinSwitches && CMD->MinSwitches > 0) {
                 DisplayCMDHelp(CMD);
             } else {
                 AddCommandLineSwitch(CMD);
