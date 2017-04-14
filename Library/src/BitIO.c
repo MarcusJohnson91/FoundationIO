@@ -150,7 +150,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "AddCommandLineSwitch", "Pointer to CommandLineOptions is NULL\n");
         } else {
             CMD->NumSwitches += 1;
-            CMD->Switch[CMD->NumSwitches] = calloc(1, sizeof(CommandLineSwitch));
+            CMD->Switch[CMD->NumSwitches - 1] = calloc(1, sizeof(CommandLineSwitch));
         }
     }
     
