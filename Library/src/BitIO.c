@@ -109,7 +109,7 @@ extern "C" {
         const char         *Author;
         const char         *Copyright;
         const char         *License;
-        CommandLineSwitch *Switch[];
+        CommandLineSwitch  *Switch[];
     } CommandLineOptions;
     
     BitInput *InitBitInput(void) {
@@ -385,9 +385,9 @@ extern "C" {
             } else {
                 AddCommandLineSwitch(CMD);
                 
-                SetSwitchFlag(CMD, CMD->NumSwitches - 1, "Help");
-                SetSwitchDescription(CMD, CMD->NumSwitches - 1, "Prints all the command line options\n");
-                SetSwitchResultStatus(CMD, CMD->NumSwitches - 1, true);
+                SetSwitchFlag(CMD, CMD->NumSwitches, "Help");
+                SetSwitchDescription(CMD, CMD->NumSwitches, "Prints all the command line options\n");
+                SetSwitchResultStatus(CMD, CMD->NumSwitches, true);
                 
                 for (uint8_t Argument = 1; Argument < argc; Argument++) { // the executable path is skipped over
                     for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
