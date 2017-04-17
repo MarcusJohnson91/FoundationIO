@@ -73,6 +73,16 @@ extern "C" {
     };
     
     /*!
+     @enum     PathType
+     @constant Filw     The submitted path is a regular file
+     @constant URL      The submitted path is to a network resource or IP address 
+     */
+    enum PathType {
+        File = 0,
+        URL  = 1,
+    };
+    
+    /*!
      @avstact                               "Initializes a BitInput structure".
      @return                                "Returns a pointer to said BitInput structure".
      */
