@@ -415,6 +415,21 @@ extern "C" {
         }
     }
     
+    bool GetPathType(const char *Path) {
+        // If it starts with "file://", or a leading slash/tilde it's a file.
+        // URLs should start with their protocol, like http:// or https://, but may start with www., or ftp://
+        // and on Windows files are prepended by a single character, then a colon and a slash.
+        
+        // Shouuld this function be more general to simply tell if a path is a URL?
+        // Also, we need to support IPv4 and IPv6 addresses
+        if (strcasecmp(&Path[0], "/") == 0 || strcasecmp(&Path[0], "~") || strcasecmp(Path, "file://" || strcasecmp(Path, "%c:/")) == 0) {
+            return File;
+        } else if (strcasecmp(Path, "http://") == 0 || strcasecmp(Path, "https://") == 0 || strcasecmp(Path, "www.") == 0 || strcasecmp(Path, "ftp://") == 0) {
+            
+        }
+        return false;
+    }
+    
     void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, const uint8_t InputSwitch) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Pointer to CommandLineOptions is NULL\n");
@@ -808,6 +823,9 @@ extern "C" {
     
     uint64_t GenerateCRC(const uint8_t *Data2CRC, const size_t DataSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit) {
         if (PolySize % 8 != 0) {
+            // Ok, so we also need to add the ability to do incremental CRC generation for the iDAT/fDAT chunks in PNG
+            
+            
             // You have to do it bitwise
         } else if (DataSize % PolySize || DataSize > PolySize) {
             // do it word wise aka grab PolySize bits from Data2CRC at once
