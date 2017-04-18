@@ -299,7 +299,7 @@ extern "C" {
         return HighestBitSet;
     }
     
-    uint8_t DetectSystemEndian(void) { // MARK: This function needs to remain internal
+    static uint8_t DetectSystemEndian(void) { // MARK: This function needs to remain internal
         uint8_t SystemEndian = 0;
         uint16_t Endian      = 0xFFFE;
         if (Endian == 0xFFFE) {
@@ -362,13 +362,17 @@ extern "C" {
         return Endian;
     }
     
-    void DisplayCMDHelp(CommandLineOptions *CMD) { // MARK: This function needs to remain internal
+    static void DisplayCMDHelp(CommandLineOptions *CMD) { // MARK: This function needs to remain internal
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "DisplayCMDHelp", "Pointer to CommandLineOptions is NULL\n");
         } else {
             printf("Options:\n");
             for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
                 printf("%s\t", CMD->Switch[Option].Flag);
+                // Options:
+                // -Input, --Input, or /Input:
+                // (-|--|/) Input: Input file or stdin with '-'
+                // Ok, so we should show all the prefixes, then the long option, then in parentheses the short option is there is one, but how do we repesent short options?
                 printf("%s\n", CMD->Switch[Option].SwitchDescription);
             }
         }
@@ -651,7 +655,7 @@ extern "C" {
         return Status;
     }
     
-    void UpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) { // MARK: This function needs to remain internal
+    static void UpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) { // MARK: This function needs to remain internal
         uint64_t Bytes2Read = 0, BytesRead = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "UpdateInputBuffer", "Pointer to BitInput is NULL\n");
@@ -938,11 +942,11 @@ extern "C" {
         }
     }
     
-    void ConvertBinaryUUID2UUIDString(const uint8_t *BinaryUUID, uint8_t *UUIDString) {
-        if (strlen(BinaryUUID) != BitIOBinaryUUIDSize) {
-            Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, strlen(BinaryUUID));
-        } else if (strlen(UUIDString) != BitIOUUIDStringSize) {
-            Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, strlen(UUIDString));
+    static void ConvertBinaryUUID2UUIDString(const uint8_t *BinaryUUID, uint8_t *UUIDString) {
+        if (sizeof(BinaryUUID) != BitIOBinaryUUIDSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, sizeof(BinaryUUID));
+        } else if (sizeof(UUIDString) != BitIOUUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, sizeof(UUIDString));
         } else {
             for (uint8_t Byte = 0; Byte < BitIOBinaryUUIDSize; Byte++) {
                 if (Byte == 4 || Byte == 7 || Byte == 10 || Byte == 13) {
@@ -956,28 +960,12 @@ extern "C" {
         }
     }
     
-    void ReadUUID(BitBuffer *BitB, uint8_t *UUIDString) {
+    static void ConvertUUIDString2BinaryUUID(const uint8_t *UUIDString, uint8_t *BinaryUUID) {
         if (sizeof(UUIDString) != BitIOUUIDStringSize) {
-            Log(LOG_ERR, "libBitIO", "ReadUUID", "UUIDString is: %d bytes long, it should be: %d\n", sizeof(UUIDString), BitIOUUIDStringSize);
+            Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, sizeof(UUIDString));
+        } else if (sizeof(BinaryUUID) != BitIOBinaryUUIDSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, sizeof(BinaryUUID));
         } else {
-            uint8_t BinaryUUID[BitIOBinaryUUIDSize];
-            for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
-                BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
-            }
-            ConvertBinaryUUID2UUIDString(BinaryUUID, UUIDString);
-        }
-    }
-    
-    void ConvertUUIDString2BinaryUUID(const uint8_t *UUIDString, uint8_t *BinaryUUID) {
-        if (strlen(UUIDString) != BitIOUUIDStringSize) {
-            Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, strlen(UUIDString));
-        } else if (strlen(BinaryUUID) != BitIOBinaryUUIDSize) {
-            Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, strlen(BinaryUUID));
-        } else {
-            // Remove the lil dashes n shit.
-            // BB57-LI-VC-Pi-cParam
-            
-            // Remove bytes 4, 7, 10, 13, and 20
             for (uint8_t Byte = 0; Byte < BitIOUUIDStringSize; Byte++) {
                 if (Byte != 4 || Byte != 7 || Byte != 10 || Byte != 13 || Byte != 20) {
                     BinaryUUID[Byte] = UUIDString[Byte];
@@ -986,11 +974,11 @@ extern "C" {
         }
     }
     
-    void SwapBinaryUUID(const uint8_t *BinaryUUID, uint8_t *SwappedBinaryUUID) { // Should I make wrappers called ConvertUUID2GUID and SwapGUID2UUID?
-        if (strlen(BinaryUUID) != BitIOBinaryUUIDSize) {
-            Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, strlen(BinaryUUID));
-        } else if (strlen(SwappedBinaryUUID) != BitIOUUIDStringSize) {
-            Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "SwappedBinaryUUID size should be: %d, but is: %d\n", BitIOUUIDStringSize, strlen(SwappedBinaryUUID));
+    static void SwapBinaryUUID(const uint8_t *BinaryUUID, uint8_t *SwappedBinaryUUID) { // Should I make wrappers called ConvertUUID2GUID and SwapGUID2UUID?
+        if (sizeof(BinaryUUID) != BitIOBinaryUUIDSize) {
+            Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, sizeof(BinaryUUID));
+        } else if (sizeof(SwappedBinaryUUID) != BitIOUUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "SwappedBinaryUUID size should be: %d, but is: %d\n", BitIOUUIDStringSize, sizeof(SwappedBinaryUUID));
         } else {
             SwappedBinaryUUID[0]        = BinaryUUID[3];
             SwappedBinaryUUID[1]        = BinaryUUID[2];
@@ -1008,11 +996,23 @@ extern "C" {
         }
     }
     
+    void ReadUUID(BitBuffer *BitB, uint8_t *UUIDString) {
+        if (sizeof(UUIDString) != BitIOUUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "ReadUUID", "UUIDString is: %d bytes long, it should be: %d\n", sizeof(UUIDString), BitIOUUIDStringSize);
+        } else {
+            uint8_t BinaryUUID[BitIOBinaryUUIDSize];
+            for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
+                BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
+            }
+            ConvertBinaryUUID2UUIDString(BinaryUUID, UUIDString);
+        }
+    }
+    
     void ConvertUUID2GUID(const uint8_t *UUIDString, uint8_t *GUIDString) {
-        if (strlen(UUIDString) != BitIOUUIDStringSize) {
-            Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, strlen(UUIDString));
-        } else if (strlen(GUIDString) != BitIOGUIDStringSize) {
-            Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, strlen(GUIDString));
+        if (sizeof(UUIDString) != BitIOUUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, sizeof(UUIDString));
+        } else if (sizeof(GUIDString) != BitIOGUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, sizeof(GUIDString));
         } else {
             // So, first we call the function that'll convert a UUIDString to a BinaryUUID, then call SwapBinaryUUID, then convert the BinaryGUID back to a UUIDString.
             uint8_t BinaryUUID[BitIOBinaryUUIDSize];
@@ -1024,10 +1024,10 @@ extern "C" {
     }
     
     void ConvertGUID2UUID(const uint8_t *GUIDString, uint8_t *UUIDString) {
-        if (strlen(GUIDString) != BitIOGUIDStringSize) {
-            Log(LOG_ERR, "libBitIO", "ConvertGUID2UUID", "GUIDString size should be: %d, but is: %d\n", BitIOGUIDStringSize, strlen(GUIDString));
-        } else if (strlen(UUIDString) != BitIOUUIDStringSize) {
-            Log(LOG_ERR, "libBitIO", "ConvertGUID2UUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, strlen(UUIDString));
+        if (sizeof(GUIDString) != BitIOGUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertGUID2UUID", "GUIDString size should be: %d, but is: %d\n", BitIOGUIDStringSize, sizeof(GUIDString));
+        } else if (sizeof(UUIDString) != BitIOUUIDStringSize) {
+            Log(LOG_ERR, "libBitIO", "ConvertGUID2UUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, sizeof(UUIDString));
         } else {
             uint8_t BinaryGUID[BitIOBinaryUUIDSize];
             ConvertUUIDString2BinaryUUID(GUIDString, BinaryGUID);
@@ -1069,11 +1069,11 @@ extern "C" {
         }
     }
     
-    void OpenSocket() {
+    void OpenSocket() { // Define it in the header when it's done
         
     }
     
-    void CreateSocket(const int Domain, const int Type, const int Protocol) {
+    void CreateSocket(const int Domain, const int Type, const int Protocol) { // Define it in the header when it's done
         int Socket;
 #ifndef _WIN32
         Socket = socket(Domain, Type, Protocol);
@@ -1105,7 +1105,7 @@ extern "C" {
         }
     }
     
-    void ReadSocket2Buffer(BitInput *BitI, size_t Bytes2Read) {
+    void ReadSocket2Buffer(BitInput *BitI, size_t Bytes2Read) { // Define it in the header when it's done
         
     }
     
@@ -1126,7 +1126,7 @@ extern "C" {
         }
     }
     
-    void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB, int Socket) {
+    void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB, int Socket) { // Define it in the header when it's done
         
     }
     
