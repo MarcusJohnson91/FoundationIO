@@ -457,12 +457,20 @@ extern "C" {
     void                SkipBits(BitBuffer *BitB, const int64_t Bits2Skip);
     
     /*!
-     @abstract                              "Writes bits to BitOutput->File".
+     @abstract                              "Writes bits to BitBuffer".
      @param             BitB                "Pointer to the instance of BitBuffer".
      @param             Data2Write          "Is the actual data to write out".
      @param             NumBits             "Is the number of bits to write".
      */
     void                WriteBits(BitBuffer *BitB, const uint64_t Data2Write, const uint8_t NumBits, const bool WriteFromMSB);
+    
+    /*!
+     @abstract                              "Writes a BitBuffer to a file, kinda shity tho".
+     @param             OutputFile          "File to write the buffer to".
+     @param             Buffer2Write        "The buffer to be written to the output file".
+     @param             Bytes2Write         "The number of bytes from the buffer to write to the file"
+     */
+    void                WriteBuffer2File(FILE *OutputFile, BitBuffer *Buffer2Write, size_t Bytes2Write);
     
     /*!
      @abstract                              "Encodes and writes data in unary/RICE format to a BitOutput stream".
