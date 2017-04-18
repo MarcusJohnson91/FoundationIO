@@ -147,10 +147,10 @@ extern "C" {
             CMD->NumSwitches           = NumSwitches + 1; // Help option
             CMD->Switch                = calloc(NumSwitches, sizeof(CommandLineSwitch));
             /*
-            for (uint64_t Option = 0; Option <= NumSwitches; Option++) {
-                CMD->Switch[Option]    = calloc(1, sizeof(CommandLineSwitch*));
-                CMD->Switch[Option]    = calloc(1, sizeof(CommandLineSwitch));
-            }
+             for (uint64_t Option = 0; Option <= NumSwitches; Option++) {
+             CMD->Switch[Option]    = calloc(1, sizeof(CommandLineSwitch*));
+             CMD->Switch[Option]    = calloc(1, sizeof(CommandLineSwitch));
+             }
              */
         }
     }
