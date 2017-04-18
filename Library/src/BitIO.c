@@ -106,10 +106,15 @@ extern "C" {
         size_t              NumSwitches;
         uint64_t            MinSwitches;
         const char         *Name;
+        const char         *Version;
         const char         *Description;
         const char         *Author;
         const char         *Copyright;
+        bool                IsOpenSource; // if open source, then set the license and URL, if not set a warning, and EULA url
         const char         *License;
+        const char         *LicenseURL;
+        const char         *EULAWarning;
+        const char         *EULAURL;
         CommandLineSwitch  *Switch;
     } CommandLineOptions;
     
@@ -361,11 +366,23 @@ extern "C" {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "DisplayCMDHelp", "Pointer to CommandLineOptions is NULL\n");
         } else {
-            printf("%s by %s ©%s: %s, Released under the %s license\n\n", CMD->Name, CMD->Author, CMD->Copyright, CMD->Description, CMD->License);
             printf("Options:\n");
             for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
                 printf("%s\t", CMD->Switch[Option].Flag);
                 printf("%s\n", CMD->Switch[Option].SwitchDescription);
+            }
+        }
+    }
+    
+    static void DisplayProgramBanner(CommandLineOptions *CMD) {
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "DisplayProgramBanner", "Pointer to CommandLineOptions is NULL\n");
+        } else {
+            if (CMD->IsOpenSource == true) { // License stuff
+                printf("%s version %s by %s © %s: %s, Released under the \"%s\" license\n\n", CMD->Name, CMD->Version, CMD->Author, CMD->Copyright, CMD->Description, CMD->License);
+                // ModernPNG by BumbleBritches57 © 2017-2017: PNG encoder/decoder written from scratch in modern C, Released under the "Revised BSD (3 clause)" license
+            } else { // EULA stuff
+                printf("%s version %s by %s © %s: %s, By using this software, you agree to the End User License Agreement, available at: %s\n\n", CMD->Name, CMD->Version, CMD->Author, CMD->Copyright, CMD->Description, CMD->EULAURL);
             }
         }
     }
@@ -379,6 +396,7 @@ extern "C" {
             if (CMD->NumSwitches < CMD->MinSwitches && CMD->MinSwitches > 0) {
                 DisplayCMDHelp(CMD);
             } else {
+                DisplayProgramBanner(CMD);
                 SetSwitchFlag(CMD, CMD->NumSwitches, "Help", 5);
                 SetSwitchDescription(CMD, CMD->NumSwitches, "Prints all the command line options\n");
                 SetSwitchResultStatus(CMD, CMD->NumSwitches, true);
@@ -480,6 +498,16 @@ extern "C" {
         }
     }
     
+    void SetCMDVersion(CommandLineOptions *CMD, const char *VersionString) {
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDVersion", "Pointer to CommandLineOptions is NULL\n");
+        } else if (VersionString == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDVersion", "Pointer to VersionString is NULL\n");
+        } else {
+            CMD->Version = VersionString;
+        }
+    }
+    
     void SetCMDDescription(CommandLineOptions *CMD, const char *Description) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCMDDescription", "Pointer to CommandLineOptions is NULL\n");
@@ -516,12 +544,50 @@ extern "C" {
         } else if (License == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCMDLicense", "Pointer to License is NULL\n");
         } else {
-            CMD->License = License;
+            CMD->License      = License;
+            CMD->IsOpenSource = true;
+        }
+    }
+    
+    void SetCMDLicenseURL(CommandLineOptions *CMD, const char *LicenseURL) {
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDLicenseURL", "Pointer to CommandLineOptions is NULL\n");
+        } else if (LicenseURL == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDLicenseURL", "Pointer to LicenseURL is NULL\n");
+        } else {
+            CMD->LicenseURL   = LicenseURL;
+            CMD->IsOpenSource = true;
+        }
+    }
+    
+    void SetCMDEULAWarning(CommandLineOptions *CMD, const char *EULAWarning) {
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDEULAWarning", "Pointer to CommandLineOptions is NULL\n");
+        } else if (EULAWarning == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDEULAWarning", "Pointer to EULAWarning is NULL\n");
+        } else {
+            CMD->EULAWarning  = EULAWarning;
+            CMD->IsOpenSource = false;
+        }
+    }
+    
+    void SetCMDEULAURL(CommandLineOptions *CMD, const char *EULAURL) {
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDEULAURL", "Pointer to CommandLineOptions is NULL\n");
+        } else if (EULAURL == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDEULAURL", "Pointer to EULAURL is NULL\n");
+        } else {
+            CMD->EULAURL      = EULAURL;
+            CMD->IsOpenSource = false;
         }
     }
     
     void SetCMDMinSwitches(CommandLineOptions *CMD, const uint64_t MinSwitches) {
-        CMD->MinSwitches = MinSwitches;
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDMinSwitches", "Pointer to CommandLineOptions is NULL\n");
+        } else {
+            CMD->MinSwitches = MinSwitches;
+        }
     }
     
     void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag, const size_t FlagSize) {
