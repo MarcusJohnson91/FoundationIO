@@ -383,7 +383,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "DisplayProgramBanner", "Pointer to CommandLineOptions is NULL\n");
         } else {
             if (CMD->IsOpenSource == true) { // License stuff
-                printf("%s version %s by %s © %s: %s, Released under the \"%s\" license\n\n", CMD->Name, CMD->Version, CMD->Author, CMD->Copyright, CMD->Description, CMD->License);
+                printf("%s version %s by %s © %s: %s, Released under the \"%s\" license: %s\n\n", CMD->Name, CMD->Version, CMD->Author, CMD->Copyright, CMD->Description, CMD->License, CMD->LicenseURL);
                 // ModernPNG by BumbleBritches57 © 2017-2017: PNG encoder/decoder written from scratch in modern C, Released under the "Revised BSD (3 clause)" license
             } else { // EULA stuff
                 printf("%s version %s by %s © %s: %s, By using this software, you agree to the End User License Agreement, available at: %s\n\n", CMD->Name, CMD->Version, CMD->Author, CMD->Copyright, CMD->Description, CMD->EULAURL);
