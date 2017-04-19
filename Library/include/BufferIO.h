@@ -272,7 +272,6 @@ extern "C" {
     
     /*!
      @abstract                              "Parses argv for switches matching the ones contained in CMD".
-     @remark                                "Automatically supports `-h`, `--h`, and `/?`, and it's stored in the last element that we inited for you".
      @remark                                "Argv[0] (the path for the original executable) is NEVER searched or used".
      @param             CMD                 "Pointer to CommandLineOptions".
      @param             argc                "Main's argc, for the number of arguments entered".
