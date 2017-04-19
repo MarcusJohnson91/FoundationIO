@@ -47,7 +47,7 @@ extern "C" {
         BitIOGUIDStringSize       = BitIOUUIDStringSize,
         BitIOBinaryGUIDSize       = BitIOBinaryUUIDSize,
         BitIOMD5Size              = 16,
-        BitIONumHuffmanSymbols    = 288,   // 0-255 = literal, 256 = end of block, 
+        BitIONumHuffmanSymbols    = 288,   // 0-255 = literal, 256 = end of block,
         BitIOLZ77MaxDistanceCode  = 258,   // - 3
         BitIOLZ77MaxWindowSize    = 32768, // - 1
     };
@@ -75,7 +75,7 @@ extern "C" {
     /*!
      @enum     PathType
      @constant Filw     The submitted path is a regular file
-     @constant URL      The submitted path is to a network resource or IP address 
+     @constant URL      The submitted path is to a network resource or IP address
      */
     enum PathType {
         File = 0,
@@ -107,19 +107,6 @@ extern "C" {
      @return                                "Returns a pointer to an initalized CommandLineOptions instance".
      */
     CommandLineOptions *InitCommandLineOptions(size_t NumSwitches);
-    
-    /*!
-     @abstract                              "Initalizes a CommandLineOptions instance".
-     @return                                "Returns a pointer to an initalized CommandLineOptions instance".
-     */
-    //CommandLineOptions *InitCommandLineOptions2(size_t NumSwitches);
-    
-    /*!
-     @abstract                              "Initalizes NumSwitches CommandLineSwitch's, and attaches them to CommandLineOptions".
-     @param             CMD                 "Pointer to the instance of CommandLineOptions".
-     @param             NumSwitches         "The number of switches to initalize and attach to CommandLineOptions pointer CMD"
-     */
-    void                InitCommandLineSwitches(CommandLineOptions *CMD, uint64_t NumSwitches);
     
     /*!
      @abstract                              "Deallocates BitInput".
