@@ -409,14 +409,18 @@ extern "C" {
                     for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
                         // Once the switch is found, we should skip over this argument.
                         
-                        char *SingleDash                             = calloc(1, CMD->Switch[Switch].FlagSize + 1);
-                        snprintf(SingleDash, CMD->Switch[Switch].FlagSize + 1, "-%s\n", CMD->Switch[Switch].Flag);
+                        size_t SingleDashSize = CMD->Switch[Switch].FlagSize + 1;
+                        size_t DoubleDashSize = CMD->Switch[Switch].FlagSize + 2;
+                        size_t SlashSize      = CMD->Switch[Switch].FlagSize + 1;
                         
-                        char *DoubleDash                             = calloc(1, CMD->Switch[Switch].FlagSize + 2);
-                        snprintf(DoubleDash, CMD->Switch[Switch].FlagSize + 2, "--%s\n", CMD->Switch[Switch].Flag);
+                        char *SingleDash                             = calloc(1, SingleDashSize);
+                        snprintf(SingleDash, SingleDashSize, "-%s\n", SingleDashSize);
                         
-                        char *Slash                                  = calloc(1, CMD->Switch[Switch].FlagSize + 1);
-                        snprintf(Slash, CMD->Switch[Switch].FlagSize + 1, "/%s\n", CMD->Switch[Switch].Flag);
+                        char *DoubleDash                             = calloc(1, DoubleDashSize);
+                        snprintf(DoubleDash, DoubleDashSize, "--%s\n", CMD->Switch[Switch].Flag);
+                        
+                        char *Slash                                  = calloc(1, SlashSize);
+                        snprintf(Slash,SlashSize, "/%s\n", CMD->Switch[Switch].Flag);
                         
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                             if (Argument == CMD->NumSwitches) {
