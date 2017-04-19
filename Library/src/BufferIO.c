@@ -414,13 +414,13 @@ extern "C" {
                         size_t SlashSize      = CMD->Switch[Switch].FlagSize + 1;
                         
                         char *SingleDash                             = calloc(1, SingleDashSize);
-                        snprintf(SingleDash, SingleDashSize, "-%s\n", SingleDashSize);
+                        snprintf(SingleDash, SingleDashSize, "-%s", CMD->Switch[Switch].Flag);
                         
                         char *DoubleDash                             = calloc(1, DoubleDashSize);
-                        snprintf(DoubleDash, DoubleDashSize, "--%s\n", CMD->Switch[Switch].Flag);
+                        snprintf(DoubleDash, DoubleDashSize, "--%s", CMD->Switch[Switch].Flag);
                         
                         char *Slash                                  = calloc(1, SlashSize);
-                        snprintf(Slash,SlashSize, "/%s\n", CMD->Switch[Switch].Flag);
+                        snprintf(Slash,SlashSize, "/%s", CMD->Switch[Switch].Flag);
                         
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                             if (Argument == CMD->NumSwitches) {
