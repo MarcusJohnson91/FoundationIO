@@ -400,22 +400,14 @@ extern "C" {
                         size_t DoubleDashSize = CMD->Switch[Switch].FlagSize + 2;
                         size_t SlashSize      = CMD->Switch[Switch].FlagSize + 1;
                         
-                        fprintf(stderr, "Before printing: Argument: %d, Switch: %d, Flag: %s\n", Argument, Switch, CMD->Switch[Switch].Flag);
-                        
                         char *SingleDash                             = calloc(1, SingleDashSize);
                         snprintf(SingleDash, SingleDashSize, "-%s", CMD->Switch[Switch].Flag);
-                        
-                        fprintf(stderr, "SingleDash: Argument: %d, Switch: %d, Flag: %s\n", Argument, Switch, SingleDash);
                         
                         char *DoubleDash                             = calloc(1, DoubleDashSize);
                         snprintf(DoubleDash, DoubleDashSize, "--%s", CMD->Switch[Switch].Flag);
                         
-                        fprintf(stderr, "DoubleDash: Argument: %d, Switch: %d, Flag: %s\n", Argument, Switch, DoubleDash);
-                        
                         char *Slash                                  = calloc(1, SlashSize);
-                        snprintf(Slash,SlashSize, "/%s", CMD->Switch[Switch].Flag);
-                        
-                        fprintf(stderr, "Slash: Argument: %d, Switch: %d, Flag: %s\n", Argument, Switch, Slash);
+                        snprintf(Slash, SlashSize, "/%s", CMD->Switch[Switch].Flag);
                         
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                             CMD->Switch[Switch].SwitchFound      = true;
