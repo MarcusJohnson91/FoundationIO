@@ -106,7 +106,13 @@ extern "C" {
      @abstract                              "Initalizes a CommandLineOptions instance".
      @return                                "Returns a pointer to an initalized CommandLineOptions instance".
      */
-    CommandLineOptions *InitCommandLineOptions(void);
+    CommandLineOptions *InitCommandLineOptions(size_t NumSwitches);
+    
+    /*!
+     @abstract                              "Initalizes a CommandLineOptions instance".
+     @return                                "Returns a pointer to an initalized CommandLineOptions instance".
+     */
+    //CommandLineOptions *InitCommandLineOptions2(size_t NumSwitches);
     
     /*!
      @abstract                              "Initalizes NumSwitches CommandLineSwitch's, and attaches them to CommandLineOptions".
