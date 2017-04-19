@@ -392,7 +392,7 @@ extern "C" {
             } else {
                 DisplayProgramBanner(CMD);
                 
-                for (uint8_t Argument = 1; Argument < argc; Argument++) { // the executable path is skipped over
+                for (uint8_t Argument = 1; Argument < argc - 1; Argument++) { // the executable path is skipped over
                     for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
                         // Once the switch is found, we should skip over this argument.
                         
@@ -400,22 +400,22 @@ extern "C" {
                         size_t DoubleDashSize = CMD->Switch[Switch].FlagSize + 2;
                         size_t SlashSize      = CMD->Switch[Switch].FlagSize + 1;
                         
-                        fprintf(stderr, "Before printing: Switch: %d, Flag: %s\n", Switch, CMD->Switch[Switch].Flag);
+                        fprintf(stderr, "Before printing: Argument: %d, Switch: %d, Flag: %s\n", Argument, Switch, CMD->Switch[Switch].Flag);
                         
                         char *SingleDash                             = calloc(1, SingleDashSize);
                         snprintf(SingleDash, SingleDashSize, "-%s", CMD->Switch[Switch].Flag);
                         
-                        fprintf(stderr, "SingleDash: Switch: %d, Flag: %s\n", Switch, SingleDash);
+                        fprintf(stderr, "SingleDash: Argument: %d, Switch: %d, Flag: %s\n", Argument, Switch, SingleDash);
                         
                         char *DoubleDash                             = calloc(1, DoubleDashSize);
                         snprintf(DoubleDash, DoubleDashSize, "--%s", CMD->Switch[Switch].Flag);
                         
-                        fprintf(stderr, "DoubleDash: Switch: %d, Flag: %s\n", Switch, DoubleDash);
+                        fprintf(stderr, "DoubleDash: Argument: %d, Switch: %d, Flag: %s\n", Argument, Switch, DoubleDash);
                         
                         char *Slash                                  = calloc(1, SlashSize);
                         snprintf(Slash,SlashSize, "/%s", CMD->Switch[Switch].Flag);
                         
-                        fprintf(stderr, "Slash: Switch: %d, Flag: %s\n", Switch, Slash);
+                        fprintf(stderr, "Slash: Argument: %d, Switch: %d, Flag: %s\n", Argument, Switch, Slash);
                         
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                             CMD->Switch[Switch].SwitchFound      = true;
