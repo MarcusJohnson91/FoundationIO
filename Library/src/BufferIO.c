@@ -137,6 +137,9 @@ extern "C" {
     
     CommandLineOptions *InitCommandLineOptions(size_t NumSwitches) {
         CommandLineOptions *CMD = calloc(1, sizeof(CommandLineOptions));
+        
+        CMD->NumSwitches = NumSwitches;
+        
         for (size_t Switch = 0; Switch < NumSwitches; Switch++) {
             CMD->Switch[Switch] = calloc(1, sizeof(CommandLineSwitch));
         }
