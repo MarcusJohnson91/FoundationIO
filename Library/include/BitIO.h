@@ -199,6 +199,13 @@ extern "C" {
     int64_t             Ceili(const long double Number2Ceil);
     
     /*!
+     @abstract                              "Computes the number of bits required to hold a certain amount of symbols".
+     @remark                                "Rounds up to the next integer bits to ensure all symbols can be contained in simple binary"
+     @param             NumSymbols          "The number of symbols you're looking to contain in a binary number".
+     */
+    uint64_t            NumBits2ReadSymbols(const uint64_t NumSymbols);
+    
+    /*!
      @abstract                              "Counts the number of bits that are set in a int".
      @param             Bits2Count          "The int who's bits should be counted".
      @return                                "The number of bits set in Bits2Count".

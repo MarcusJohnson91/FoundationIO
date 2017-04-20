@@ -235,6 +235,10 @@ extern "C" {
         return (int64_t)ceil(Number2Ceil);
     }
     
+    uint64_t NumBits2ReadSymbols(uint64_t NumSymbols) { // Use a binary logarithm, that you round up, in order to get the number of bits required to read a certain number of symbols.
+        return ceil(log2(NumSymbols));
+    }
+    
     uint8_t CountBitsSet(const uint64_t Bits2Count) {
         uint8_t DataBit = 0, BitCount = 0;
         if (Bits2Count == 0) {
@@ -412,7 +416,7 @@ extern "C" {
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                             CMD->Switch[Switch].SwitchFound      = true;
                             if (CMD->Switch[Switch].Resultless == false) {
-                                char *SwitchResult               = calloc(1, strlen(argv[Argument]));
+                                char *SwitchResult               = calloc(1, strlen(argv[Argument]) + 1);
                                 snprintf(SwitchResult, strlen(argv[Argument] + 1), "%s", argv[Argument + 1]);
                                 CMD->Switch[Switch].SwitchResult = SwitchResult;
                             }
@@ -1115,6 +1119,38 @@ extern "C" {
     void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB, int Socket) { // Define it in the header when it's done
         
     }
+    
+    /* Deflate (encode deflate) */
+    void EncodeLZ77(BitBuffer *RawBuffer, BitBuffer *LZ77Buffer, const size_t WindowSize, const size_t DistanceLength) {
+        // The dictionary is simply the current buffer, at the current buffer position -(WindowSize / 2) +(WindowSize / 2)
+        // So, the first thing you write is the distance from the cursor to the previous string.
+        // Then you write the length of the largest match you can find.
+        // Then write the next byte in the stream.
+        // Then move the cusor the length of the longest match + 1
+        // When we're at the start of the match, simply record the byte and the length of the match (1).
+        
+        
+        // We need to have a BitBuffer to read from, and a BitBuffer to write to.
+        if (RawBuffer == NULL) {
+            Log(LOG_ERR, "BitIO", "EncodeLZ77", "The pointer to the raw buffer is NULL\n");
+        } else if (LZ77Buffer == NULL) {
+            Log(LOG_ERR, "BitIO", "EncodeLZ77", "The pointer to the LZ77 buffer is NULL\n");
+        } else {
+            uint64_t WindowBits   = NumBits2ReadSymbols(WindowSize);
+            uint64_t DistanceBits = NumBits2ReadSymbols(DistanceLength);
+            
+            // Now, we just need to read the RawBuffer (which must contain ALL the data to be encoded) byte wise, and start looking for matches.
+            // then start writing LZ77Buffer with our discoveries.
+            // So, loop over RawBuffer, if RawByte == 0, just code the longest string you can, or the first 3 bytes (if they're all different)
+            for (uint64_t RawByte = 0; RawByte < RawBuffer->BitsUnavailable; RawByte++) {
+                if (RawByte == 0) {
+                    
+                }
+            }
+        }
+    }
+    
+    
     
     void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription, ...) {
         char *ErrorString = NULL;
