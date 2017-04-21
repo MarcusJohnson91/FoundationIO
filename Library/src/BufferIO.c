@@ -327,7 +327,23 @@ extern "C" {
     }
     
     size_t GetBitInputFilePosition(BitInput *BitI) {
-        return BitI->FilePosition;
+        size_t Position = 0;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL\n");
+        } else {
+            Position = BitI->FilePosition;
+        }
+        return Position;
+    }
+    
+    size_t GetBitBufferPosition(BitBuffer *BitB) {
+        size_t Position = 0;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL\n");
+        } else {
+            Position = BitB->BitsUnavailable;
+        }
+        return Position;
     }
     
     size_t GetBitBufferSize(BitBuffer *BitB) {
