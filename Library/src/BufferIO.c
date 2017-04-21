@@ -386,7 +386,7 @@ extern "C" {
                 // Options:
                 // -Input, --Input, or /Input:
                 // (-|--|/) Input: Input file or stdin with '-'
-                // Ok, so we should show all the prefixes, then the long option, then in parentheses the short option is there is one, but how do we repesent short options?
+                // Ok, so we should show all the prefixes, then the long option, then in parentheses the short option is there is one, but how do we represent short options?
                 printf("%s\n", CMD->Switch[Option].SwitchDescription);
             }
         }
@@ -453,7 +453,7 @@ extern "C" {
         // URLs should start with their protocol, like http:// or https://, but may start with www., or ftp://
         // and on Windows files are prepended by a single character, then a colon and a slash.
         
-        // Shouuld this function be more general to simply tell if a path is a URL?
+        // Should this function be more general to simply tell if a path is a URL?
         // Also, we need to support IPv4 and IPv6 addresses
         if (strcasecmp(&Path[0], "/") == 0 || strcasecmp(&Path[0], "~") || strcasecmp(Path, "file://" || strcasecmp(Path, "%c:/")) == 0) {
             return File;
@@ -867,7 +867,7 @@ extern "C" {
         }
     }
     
-    size_t GetBitInputBufferSize(BitInput *BitI) { // FIXME: Is this even relevent anymore?
+    size_t GetBitInputBufferSize(BitInput *BitI) { // FIXME: Is this even relevant anymore?
         uint64_t BufferSize = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputBufferSize", "Pointer to BitOutput is NULL\n");
@@ -877,7 +877,7 @@ extern "C" {
         return BufferSize;
     }
     
-    size_t GetBitOutputBufferSize(BitOutput *BitO) { // FIXME: Is this even relevent anymore?
+    size_t GetBitOutputBufferSize(BitOutput *BitO) { // FIXME: Is this even relevant anymore?
         uint64_t BufferSize = 0;
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitOutputBufferSize", "Pointer to BitOutput is NULL\n");
@@ -910,7 +910,7 @@ extern "C" {
         } else if (DataSize % PolySize || DataSize > PolySize) {
             // do it word wise aka grab PolySize bits from Data2CRC at once
         } else {
-            // Do it bytewise
+            // Do it byte-wise
         }
         /*
          uint16_t CRCResult = 0;
@@ -1146,7 +1146,7 @@ extern "C" {
         // So, the first thing you write is the distance from the cursor to the previous string.
         // Then you write the length of the largest match you can find.
         // Then write the next byte in the stream.
-        // Then move the cusor the length of the longest match + 1
+        // Then move the cursor the length of the longest match + 1
         // When we're at the start of the match, simply record the byte and the length of the match (1).
         
         

@@ -25,7 +25,7 @@ extern "C" {
      @enumdef        BitIOConstants
      @abstract                                 "BitIO compile time constants".
      @remark                                   "Change the buffer sizes here".
-     @constant       BitInputBufferSize        "Inital size of BitInput buffer".
+     @constant       BitInputBufferSize        "Initial size of BitInput buffer".
      @constant       BitInputBufferSizeInBits  "Inital size of BitInput buffer in bits".
      @constant       BitOutputBufferSize       "Inital size of BitOutput buffer".
      @constant       BitOutputBufferSizeInBits "Inital size of BitOutput buffer in bits".
@@ -61,7 +61,7 @@ extern "C" {
     typedef struct CommandLineOptions CommandLineOptions;
     
     /*!
-     @enum     Endiam
+     @enum     Endian
      @constant UnknownEndian           "The endian of the machine is currently unknown".
      @constant BigEndian               "The machine is Big endian".
      @constant LittleEndian            "The machine is little endian".
@@ -74,7 +74,7 @@ extern "C" {
     
     /*!
      @enum     PathType
-     @constant Filw     The submitted path is a regular file
+     @constant File     The submitted path is a regular file
      @constant URL      The submitted path is to a network resource or IP address
      */
     enum PathType {
@@ -83,19 +83,19 @@ extern "C" {
     };
     
     /*!
-     @avstact                               "Initializes a BitInput structure".
+     @abstract                              "Initializes a BitInput structure".
      @return                                "Returns a pointer to said BitInput structure".
      */
     BitInput           *InitBitInput(void);
     
     /*!
-     @avstact                               "Initializes a BitOutput structure".
+     @abstract                              "Initializes a BitOutput structure".
      @return                                "Returns a pointer to said BitOutput structure".
      */
     BitOutput          *InitBitOutput(void);
     
     /*!
-     @abstract                              "Initalizes a BitBuffer structure".
+     @abstract                              "Initializes a BitBuffer structure".
      @param             BufferSize          "Size of the buffer in bytes".
      @remark                                "The buffer MUST be unread".
      @return                                "Returns a pointer to said BitBuffer structure".
@@ -103,8 +103,8 @@ extern "C" {
     BitBuffer          *InitBitBuffer(const size_t BufferSize);
     
     /*!
-     @abstract                              "Initalizes a CommandLineOptions instance".
-     @return                                "Returns a pointer to an initalized CommandLineOptions instance".
+     @abstract                              "Initializes a CommandLineOptions instance".
+     @return                                "Returns a pointer to an initialized CommandLineOptions instance".
      */
     CommandLineOptions *InitCommandLineOptions(size_t NumSwitches);
     
@@ -213,7 +213,7 @@ extern "C" {
     uint8_t             CountBitsSet(const uint64_t Bits2Count);
     
     /*!
-     @abstract                              "Create bitmask from binary exponent".
+     @abstract                              "Create bit-mask from binary exponent".
      @param             Exponent            "Power to be raised by 2".
      @return                                "A bit mask generated from a power".
      */
@@ -315,7 +315,7 @@ extern "C" {
     /*!
      @abstract                              "Sets the name of the program".
      @param             CMD                 "Pointer to the instance of CommandLineOptions".
-     @param             Name                "Pointer to a C string contining the name of the program you're building"
+     @param             Name                "Pointer to a C string containing the name of the program you're building"
      */
     void                SetCMDName(CommandLineOptions *CMD, const char *Name);
     
@@ -444,7 +444,7 @@ extern "C" {
      @abstract                              "Reads and Decodes unary/RICE encoded data from BitInput stream".
      @return                                "Returns the count of bits aka the value encoded by the encoder".
      @param             BitB                "Pointer to the instance of BitBuffer".
-     @param             Truncated           "Shoould the StopBit be included in the count?"
+     @param             Truncated           "Should the StopBit be included in the count?"
      @param             StopBit             "MUST be a 0 or a 1. none of this funny business about how true > 0".
      */
     uint64_t            ReadRICE(BitBuffer *BitB, const bool Truncated, const bool StopBit);
@@ -453,7 +453,7 @@ extern "C" {
      @abstract                              "Reads data encoded as Exponential-Golomb aka Elias Gamma".
      @return                                "Returns the decoded value of the Elias/Golomb code".
      @param             BitB                "Pointer to the instance of BitBuffer".
-     @param             IsSigned            "Should it be read as signed or unsigneed?".
+     @param             IsSigned            "Should it be read as signed or unsigned?".
      */
     int64_t             ReadExpGolomb(BitBuffer *BitB, const bool IsSigned);
     
@@ -474,7 +474,7 @@ extern "C" {
     void                WriteBits(BitBuffer *BitB, const uint64_t Data2Write, const uint8_t NumBits, const bool WriteFromMSB);
     
     /*!
-     @abstract                              "Writes a BitBuffer to a file, kinda shity tho".
+     @abstract                              "Writes a BitBuffer to a file, kinda shitty tho".
      @param             OutputFile          "File to write the buffer to".
      @param             Buffer2Write        "The buffer to be written to the output file".
      @param             Bytes2Write         "The number of bytes from the buffer to write to the file"
@@ -533,7 +533,7 @@ extern "C" {
      @param             DataSize            "Size of the data chunk to generate the CRC for, in bytes".
      @param             ReciprocalPoly      "The Polynomial in Normal representation".
      @param             PolySize            "The size of the polynomial in bits".
-     @param             PolyInit            "Initalization value".
+     @param             PolyInit            "Initialization value".
      */
     uint64_t            GenerateCRC(const uint8_t *Data2CRC, const size_t DataSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit);
     
@@ -543,7 +543,7 @@ extern "C" {
      @param             Data2CRCSize        "Size of the data chunk to generate the CRC for".
      @param             ReciprocalPoly      "The Polynomial in Reciprocal representation".
      @param             PolySize            "The size of the polynomial in bits".
-     @param             PolyInit            "Initalization value".
+     @param             PolyInit            "Initialization value".
      @param             PrecomputedCRC      "The precomputed resulting CRC of Data2CRC, to compare the generated CRC with".
      */
     bool                VerifyCRC(const uint8_t *Data2CRC, const size_t Data2CRCSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit, const uint64_t PrecomputedCRC);
@@ -615,7 +615,7 @@ extern "C" {
 #ifndef _POSIX_VERSION
     /*!
      @enum     LogTypes
-     @constant LOG_EMERG               "The system is unusable, the program is quitting (equlivent to panic)".
+     @constant LOG_EMERG               "The system is unusable, the program is quitting (equivalent to panic)".
      @constant LOG_ALERT               "Immediate action is required".
      @constant LOG_CRIT                "Critical condition encountered".
      @constant LOG_ERR                 "Error condition encountered".
@@ -639,7 +639,7 @@ extern "C" {
     /*!
      @abstract                              "Logs errors to log files, and stderr; and mail if Critical/Panic."
      @param             ErrorLevel          "Error message prefixed by SYS in ErrorCodes".
-     @param             LibraryOrProgram    "Name of the program or library that called this function, to name the logfile".
+     @param             LibraryOrProgram    "Name of the program or library that called this function".
      @param             Function            "Which function is calling Log?".
      @param             ErrorDescription    "String describing what went wrong / error code".
      */
