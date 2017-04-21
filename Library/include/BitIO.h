@@ -264,6 +264,11 @@ extern "C" {
     size_t              GetBitInputFilePosition(BitInput *BitI);
     
     /*!
+     @abstract                              "Returns the number of bits used in BitB".
+     */
+    size_t              GetBitBufferPosition(BitBuffer *BitB);
+    
+    /*!
      @abstract                              "Gets the size of the BitBuffer".
      */
     size_t              GetBitBufferSize(BitBuffer *BitB);
