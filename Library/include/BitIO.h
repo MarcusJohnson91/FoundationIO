@@ -259,6 +259,11 @@ extern "C" {
     size_t              GetBitInputFileSize(BitInput *BitI);
     
     /*!
+     @abstract                              "Returns the position of the current file".
+     */
+    size_t              GetBitInputFilePosition(BitInput *BitI);
+    
+    /*!
      @abstract                              "Gets the size of the BitBuffer".
      */
     size_t              GetBitBufferSize(BitBuffer *BitB);

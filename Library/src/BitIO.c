@@ -326,6 +326,10 @@ extern "C" {
         return InputSize;
     }
     
+    size_t GetBitInputFilePosition(BitInput *BitI) {
+        return BitI->FilePosition;
+    }
+    
     size_t GetBitBufferSize(BitBuffer *BitB) {
         size_t BitBufferSize = 0;
         if (BitB == NULL) {
