@@ -179,7 +179,7 @@ extern "C" {
         }
     }
     
-    void CloseCommandLineOptions(const CommandLineOptions *CMD) {
+    void CloseCommandLineOptions(CommandLineOptions *CMD) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "CloseCommandLineOptions", "Pointer to CommandLineOptions is NULL\n");
         } else {
