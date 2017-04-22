@@ -45,14 +45,12 @@ extern "C" {
      @constant          FileSize            "Size of the File in bytes".
      @constant          FilePosition        "Current byte in the file".
      @constant          SystemEndian        "Endian of the running system".
-     @constant          BitB                "Pointer to an instance of BitBuffer".
      */
     typedef struct BitInput {
         FILE              *File;
         size_t             FileSize;
         size_t             FilePosition;
         uint8_t            SystemEndian:2;
-        BitBuffer         *BitB;
     } BitInput;
     
     /*!
@@ -61,13 +59,11 @@ extern "C" {
      @constant          File                "Input File/Socket to write a BitBuffer into".
      @constant          FilePosition        "Current byte in the file".
      @constant          SystemEndian        "Endian of the running system".
-     @constant          BitB                "Pointer to an instance of BitBuffer".
      */
     typedef struct BitOutput {
         FILE              *File;
         size_t             FilePosition;
         uint8_t            SystemEndian:2;
-        BitBuffer         *BitB;
     } BitOutput;
     
     /*!
@@ -977,7 +973,7 @@ extern "C" {
         } else {
             for (uint8_t Byte = 0; Byte < BitIOUUIDStringSize; Byte++) {
                 if (Byte != 4 || Byte != 7 || Byte != 10 || Byte != 13 || Byte != 20) {
-                     BinaryUUID[Byte] = UUIDString[Byte];
+                    BinaryUUID[Byte] = UUIDString[Byte];
                 }
             }
         }
@@ -1008,7 +1004,7 @@ extern "C" {
     }
     
     uint8_t *ReadUUID(BitBuffer *BitB) {
-        uint8_t *UUIDString;
+        uint8_t *UUIDString = NULL;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadUUID", "Pointer to BitBuffer is NULL\n");
         } else {
