@@ -224,14 +224,14 @@ extern "C" {
      @param             OnesCompliment      "Int in 1's compliment form to convert into 2's compliment".
      @return                                "Returns OnesCompliment in 2's compliment format".
      */
-    uint64_t            OnesCompliment2TwosCompliment(const int64_t OnesCompliment);
+    int64_t             OnesCompliment2TwosCompliment(const int64_t OnesCompliment);
     
     /*!
      @abstract                              "Converts numbers from Two's compliment to One's compliment".
      @param             TwosCompliment      "Int in 2's compliment form to convert into 1's compliment".
      @return                                "Returns the TwosCompliment in 1's compliment format".
      */
-    uint64_t            TwosCompliment2OnesCompliment(const int64_t TwosCompliment);
+    int64_t             TwosCompliment2OnesCompliment(const int64_t TwosCompliment);
     
     /*!
      @abstract                              "Tells whether Input is even or odd".
@@ -392,21 +392,21 @@ extern "C" {
      @param             SwitchNum           "The switch to set".
      @param             Flag                "The flag to identify an option with".
      */
-    void                SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag, const size_t FlagSize);
+    void                SetSwitchFlag(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Flag, const size_t FlagSize);
     
     /*!
      @param             CMD                 "Pointer to the instance of CommandLineOptions".
      @param             SwitchNum           "The switch to set".
      @param             Description         "Pointer to a C string containing the description of what this program does"
      */
-    void                SetSwitchDescription(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Description);
+    void                SetSwitchDescription(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Description);
     
     /*!
      @param             CMD                 "Pointer to the instance of CommandLineOptions".
      @param             SwitchNum           "The switch to set".
      @param             IsSwitchResultless  "Are you expecting this switch to contain data, or are you just testing for it's presence?".
      */
-    void                SetSwitchResultStatus(CommandLineOptions *CMD, uint64_t SwitchNum, bool IsSwitchResultless);
+    void                SetSwitchResultStatus(CommandLineOptions *CMD, const uint64_t SwitchNum, const bool IsSwitchResultless);
     
     /*!
      @abstract                              "Gets the data contained in Switch->Result"
@@ -414,14 +414,14 @@ extern "C" {
      @param             CMD                 "Pointer to the instance of CommandLineOptions".
      @param             SwitchNum           "The switch to check".
      */
-    const char         *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum);
+    const char         *GetSwitchResult(CommandLineOptions *CMD, const uint64_t SwitchNum);
     
     /*!
      @abstract                              "Tells if a certain switch has been found".
      @param             CMD                 "Pointer to CommandLineOptions instance".
      @param             SwitchNum           "The switch to check".
      */
-    bool                GetSwitchPresence(CommandLineOptions *CMD, uint64_t SwitchNum);
+    bool                GetSwitchPresence(CommandLineOptions *CMD, const uint64_t SwitchNum);
     
     /*!
      @abstract                              "Manages InputBuffer and hands out the requested bits".
@@ -479,7 +479,7 @@ extern "C" {
      @param             Buffer2Write        "The buffer to be written to the output file".
      @param             Bytes2Write         "The number of bytes from the buffer to write to the file"
      */
-    void                WriteBuffer2File(FILE *OutputFile, BitBuffer *Buffer2Write, size_t Bytes2Write);
+    void                WriteBuffer2File(FILE *OutputFile, BitBuffer *Buffer2Write, const size_t Bytes2Write);
     
     /*!
      @abstract                              "Encodes and writes data in unary/RICE format to a BitOutput stream".

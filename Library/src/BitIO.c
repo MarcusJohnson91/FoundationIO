@@ -235,7 +235,7 @@ extern "C" {
         return (int64_t)ceil(Number2Ceil);
     }
     
-    uint64_t NumBits2ReadSymbols(uint64_t NumSymbols) { // Use a binary logarithm, that you round up, in order to get the number of bits required to read a certain number of symbols.
+    uint64_t NumBits2ReadSymbols(const uint64_t NumSymbols) { // Use a binary logarithm, that you round up, in order to get the number of bits required to read a certain number of symbols.
         return ceil(log2(NumSymbols));
     }
     
@@ -260,18 +260,18 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "Power2Mask", "Exponent %d is too large\n", Exponent);
         } else {
             uint64_t HighestBit = 0ULL, Fill = 0ULL;
-            HighestBit          = Powi(2, Exponent - 1);
+            HighestBit          = (uint64_t)Powi(2, Exponent - 1);
             Fill                = HighestBit - 1;
             Mask                = HighestBit + Fill;
         }
         return Mask;
     }
     
-    uint64_t OnesCompliment2TwosCompliment(const int64_t OnesCompliment) {
+    int64_t OnesCompliment2TwosCompliment(const int64_t OnesCompliment) {
         return ~OnesCompliment + 1;
     }
     
-    uint64_t TwosCompliment2OnesCompliment(const int64_t TwosCompliment) {
+    int64_t TwosCompliment2OnesCompliment(const int64_t TwosCompliment) {
         return TwosCompliment ^ 0xFFFFFFFFFFFFFFFF;
     }
     
@@ -279,7 +279,7 @@ extern "C" {
         return Number2Check % 2 == 0 ? true : false;
     }
     
-    uint8_t  FindHighestBitSet(const uint64_t UnsignedInt2Search) {
+    uint8_t FindHighestBitSet(const uint64_t UnsignedInt2Search) {
         uint8_t  HighestBitSet = 0;
         uint64_t Shift         = 0ULL;
         
@@ -606,7 +606,7 @@ extern "C" {
         }
     }
     
-    void SetSwitchFlag(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Flag, const size_t FlagSize) {
+    void SetSwitchFlag(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Flag, const size_t FlagSize) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetSwitchFlag", "Pointer to CommandLineOptions is NULL\n");
         } else if (Flag == NULL) {
@@ -619,7 +619,7 @@ extern "C" {
         }
     }
     
-    void SetSwitchDescription(CommandLineOptions *CMD, uint64_t SwitchNum, const char *Description) {
+    void SetSwitchDescription(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Description) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetSwitchDescription", "Pointer to CommandLineOptions is NULL\n");
         } else if (Description == NULL) {
@@ -631,7 +631,7 @@ extern "C" {
         }
     }
     
-    void SetSwitchResultStatus(CommandLineOptions *CMD, uint64_t SwitchNum, bool IsSwitchResultless) {
+    void SetSwitchResultStatus(CommandLineOptions *CMD, const uint64_t SwitchNum, const bool IsSwitchResultless) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetSwitchResultStatus", "Pointer to CommandLineOptions is NULL\n");
         } else if (SwitchNum > CMD->NumSwitches) { // - 1 so the hidden help option isn't exposed
@@ -641,7 +641,7 @@ extern "C" {
         }
     }
     
-    const char *GetSwitchResult(CommandLineOptions *CMD, uint64_t SwitchNum) {
+    const char *GetSwitchResult(CommandLineOptions *CMD, const uint64_t SwitchNum) {
         const char *Result = NULL;
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "GetSwitchResult", "Pointer to CommandLineOptions is NULL\n");
@@ -653,7 +653,7 @@ extern "C" {
         return Result;
     }
     
-    bool GetSwitchPresence(CommandLineOptions *CMD, uint64_t SwitchNum) {
+    bool GetSwitchPresence(CommandLineOptions *CMD, const uint64_t SwitchNum) {
         bool Status = 0;
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "GetSwitchPresence", "Pointer to CommandLineOptions is NULL\n");
@@ -685,7 +685,7 @@ extern "C" {
         }
     }
     
-    uint64_t ReadBits(BitBuffer *BitB, const uint8_t Bits2Read, bool ReadFromMSB) {
+    uint64_t ReadBits(BitBuffer *BitB, const uint8_t Bits2Read, const bool ReadFromMSB) {
         uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, Mask = 0, Data = 0, Mask2Shift = 0;
         uint64_t OutputData = 0;
         
@@ -777,13 +777,13 @@ extern "C" {
         }
     }
     
-    void WriteBits(BitBuffer *BitB, const uint64_t Data2Write, uint8_t NumBits, const bool WriteFromMSB) {
+    void WriteBits(BitBuffer *BitB, const uint64_t Data2Write, const uint8_t NumBits, const bool WriteFromMSB) {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteBits", "Pointer to BitBuffer is NULL\n");
         } else {
             // FIXME: WriteBits currently copies NumBits bits to the file, even if the input is shorter than that. we need to prepend 0 bits if that's the case
             
-            uint8_t Bits2Write2BufferByte, Bits2ShiftMask, Mask;
+            uint8_t Bits2Write2BufferByte, Bits2ShiftMask, Mask, Bits2Write = NumBits;
             
             // so we're trying to write 9 bits, 0x1FF.
             // There are only 5 bits available in the current byte.
@@ -791,12 +791,12 @@ extern "C" {
             // The Mask should be 0x1F if LSBfirst, or 0xF8 if MSB first.
             // The buffer's representation is MSB first.
             // if we're supposed to write this data LSB first we need to shift it after extraction to get it ready to be applied.
-            while (NumBits > 0) {
+            while (Bits2Write > 0) {
                 Bits2Write2BufferByte  = 8 - (BitB->BitsAvailable % 8); // extract 5 bits from the buffer
                 Bits2ShiftMask         = WriteFromMSB ? BitB->BitsAvailable % 8 : 0;
                 Mask                   = Power2Mask(Bits2Write2BufferByte) << Bits2ShiftMask;
                 BitB->Buffer[Bits2Bytes(BitB->BitsAvailable, false)] = Data2Write & Mask;
-                NumBits               -= Bits2Write2BufferByte;
+                Bits2Write            -= Bits2Write2BufferByte;
                 BitB->BitsAvailable   -= Bits2Write2BufferByte;
                 BitB->BitsUnavailable += Bits2Write2BufferByte;
             }
@@ -1115,11 +1115,11 @@ extern "C" {
         }
     }
     
-    void ReadSocket2Buffer(BitInput *BitI, size_t Bytes2Read) { // Define it in the header when it's done
+    void ReadSocket2Buffer(BitInput *BitI, const size_t Bytes2Read) { // Define it in the header when it's done
         
     }
     
-    void WriteBuffer2File(FILE *OutputFile, BitBuffer *Buffer2Write, size_t Bytes2Write) {
+    void WriteBuffer2File(FILE *OutputFile, BitBuffer *Buffer2Write, const size_t Bytes2Write) {
         size_t BytesWritten = 0;
         if (OutputFile == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteBuffer2File", "OutputFile pointer is NULL\n");
@@ -1136,7 +1136,7 @@ extern "C" {
         }
     }
     
-    void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB, int Socket) { // Define it in the header when it's done
+    void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB, const int Socket) { // Define it in the header when it's done
         
     }
     
@@ -1169,8 +1169,6 @@ extern "C" {
             }
         }
     }
-    
-    
     
     void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription, ...) {
         char *ErrorString = NULL;
