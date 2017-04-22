@@ -156,12 +156,9 @@ extern "C" {
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "CloseBitOutput", "Pointer to BitOutput is NULL");
         } else {
-            if (IsBitBufferAligned(BitO->BitB, 1) == false) {
-                AlignBitBuffer(BitO->BitB, 1);
-            }
-            fwrite(BitO->BitB->Buffer, Bits2Bytes(BitO->BitB->BitsUnavailable, true), 1, BitO->File);
             fflush(BitO->File);
             fclose(BitO->File);
+            free(BitO->File);
             free(BitO);
         }
     }
@@ -470,11 +467,6 @@ extern "C" {
             BitI->FileSize              = (uint64_t)ftell(BitI->File);
             fseek(BitI->File, 0, SEEK_SET);
             BitI->FilePosition          = ftell(BitI->File);
-            uint64_t Bytes2Read         = BitI->FileSize > BitInputBufferSize ? BitInputBufferSize : BitI->FileSize;
-            uint64_t BytesRead          = fread(BitI->BitB->Buffer, 1, Bytes2Read, BitI->File);
-            BitI->BitB->BitsAvailable   = Bytes2Bits(BytesRead);
-            BitI->BitB->BitsUnavailable = 0;
-            BitI->BitB->Buffer[0];
             BitI->SystemEndian          = DetectSystemEndian();
         }
     }
@@ -490,8 +482,6 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Pointer to BitOutput is NULL\n");
         } else {
             BitO->File                  = fopen(CMD->Switch[OutputSwitch].SwitchResult, "rb");
-            BitO->BitB->BitsAvailable   = BitOutputBufferSizeInBits;
-            BitO->BitB->BitsUnavailable = 0;
             BitO->SystemEndian          = DetectSystemEndian();
         }
     }
@@ -661,7 +651,9 @@ extern "C" {
         return Status;
     }
     
-    static void UpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) { // MARK: This function needs to remain internal
+    // Deprecate this, and replace it with a UpdateBufferFromBitInput or whateve function
+    /*
+    static void UpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) {
         uint64_t Bytes2Read = 0, BytesRead = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "UpdateInputBuffer", "Pointer to BitInput is NULL\n");
@@ -680,7 +672,7 @@ extern "C" {
             BitI->BitB->BitsAvailable   = Bytes2Bits(BytesRead);
         }
     }
-    
+     */
     uint64_t ReadBits(BitBuffer *BitB, const uint8_t Bits2Read, const bool ReadFromMSB) {
         uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, Mask = 0, Data = 0, Mask2Shift = 0;
         uint64_t OutputData = 0;
@@ -863,40 +855,6 @@ extern "C" {
         }
     }
     
-    size_t GetBitInputBufferSize(BitInput *BitI) { // FIXME: Is this even relevant anymore?
-        uint64_t BufferSize = 0;
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitInputBufferSize", "Pointer to BitOutput is NULL\n");
-        } else {
-            BufferSize = sizeof(BitI->BitB->Buffer);
-        }
-        return BufferSize;
-    }
-    
-    size_t GetBitOutputBufferSize(BitOutput *BitO) { // FIXME: Is this even relevant anymore?
-        uint64_t BufferSize = 0;
-        if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitOutputBufferSize", "Pointer to BitOutput is NULL\n");
-        } else {
-            BufferSize = sizeof(BitO->BitB->Buffer);
-        }
-        return BufferSize;
-    }
-    
-    void FlushOutputBuffer(BitOutput *BitO, const size_t Bytes2Flush) {
-        if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "FlushOutputBuffer", "Pointer to BitOutput is NULL\n");
-        } else if (Bytes2Flush <= 0) {
-            Log(LOG_ERR, "libBitIO", "FlushOutputBuffer", "Bytes2Flush is %d, should be >= 1\n", Bytes2Flush);
-        } else {
-            size_t BytesWritten = 0;
-            BytesWritten = fwrite(BitO->BitB->Buffer, 1, Bytes2Flush, BitO->File);
-            if (BytesWritten != Bytes2Flush) {
-                Log(LOG_EMERG, "libBitIO", "FlushOutputBuffer", "Wrote %d bytes out of %d", BytesWritten, Bytes2Flush);
-            }
-        }
-    }
-    
     uint64_t GenerateCRC(const uint8_t *Data2CRC, const size_t DataSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit) {
         if (PolySize % 8 != 0) {
             // Ok, so we also need to add the ability to do incremental CRC generation for the iDAT/fDAT chunks in PNG
@@ -1000,7 +958,7 @@ extern "C" {
                 SwappedBinaryUUID[Byte] = BinaryUUID[Byte];
             }
         }
-        return *SwappedBinaryUUID;
+        return SwappedBinaryUUID;
     }
     
     uint8_t *ReadUUID(BitBuffer *BitB) {
@@ -1101,6 +1059,47 @@ extern "C" {
     // So, the gist is we need a function to read from a file or network stream, and create a buffer from that data, and pop it into the struct.
     // Ok, so I need a function to read a file/socket into a buffer, and one to write a buffer to a file/socket.
     // I don't know if FILE pointers work with sockets, but i'm going to ignore that for now.
+    
+    void ReadInputFile2Buffer(BitInput *BitI, BitBuffer *BitB, const size_t Bytes2Read) { // It's the user's job to ensure buffers and files are kept in sync, not mine.
+        size_t BytesRead              = 0;
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "BitI pointer is NULL\n");
+        } else if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "BitB pointer is NULL\n");
+        } else if (Bytes2Read > BitI->FileSize - BitI->FilePosition) {
+            Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "You tried reading more data: % than is available: %d in the file\n", Bytes2Read, BitI->FileSize - BitI->FilePosition);
+        } else {
+            if (BitB->Buffer != NULL) {
+                free(BitB->Buffer);
+            }
+            BitB->Buffer              = calloc(1, Bytes2Read);
+            BytesRead                 = fread(BitB->Buffer, 1, Bytes2Read, BitI->File);
+            if (BytesRead            != Bytes2Read) {
+                Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "Fread read: %d bytes, but you requested: %d\n", BytesRead, Bytes2Read);
+            } else {
+                BitB->BitsAvailable   = Bytes2Bits(BytesRead);
+                BitB->BitsUnavailable = 0;
+            }
+        }
+    }
+    
+    void WriteBuffer2OutputFile(BitOutput *BitO, BitBuffer *BitB, const size_t Bytes2Write) {
+        size_t BytesWritten           = 0;
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteBuffer2OutputFile", "BitI pointer is NULL\n");
+        } else if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteBuffer2OutputFile", "BitB pointer is NULL\n");
+        } else {
+            // Write the bytes in BitB->Buffer to BitO->File
+            BytesWritten              = fwrite(BitB->Buffer, 1, Bytes2Write, BitO->File);
+            if (BytesWritten         != Bytes2Write) {
+                Log(LOG_ERR, "libBitIO", "WriteBuffer2OutputFile", "Fwrite wrote: %d bytes, but you requested: %d\n", BytesWritten, Bytes2Write);
+            } else {
+                BitB->BitsAvailable   = Bytes2Bits(BytesWritten);
+                BitB->BitsUnavailable = 0;
+            }
+        }
+    }
     
     void ReadFile2Buffer(FILE *InputFile, BitBuffer *Buffer2Read, size_t Bytes2Read) {
         // Should this just take in BitInput?
