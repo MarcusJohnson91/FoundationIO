@@ -132,7 +132,7 @@ extern "C" {
      @abstract                              "Deallocates the instance of CommandLineOptions pointed to by CMD".
      @param             CMD                 "Pointer to the instance of CommandLineOptions you want to delete".
      */
-    void                CloseCommandLineOptions(CommandLineOptions *CMD);
+    void                CloseCommandLineOptions(const CommandLineOptions *CMD);
     
     /*!
      @abstract                              "Swap endian of 16 bit integers".
