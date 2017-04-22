@@ -294,8 +294,8 @@ extern "C" {
     }
     
     static uint8_t DetectSystemEndian(void) { // MARK: This function needs to remain internal
-        uint8_t SystemEndian = 0;
-        uint16_t Endian      = 0xFFFE;
+        uint8_t  SystemEndian = 0;
+        uint16_t Endian       = 0xFFFE;
         if (Endian == 0xFFFE) {
             SystemEndian = LittleEndian;
         } else if (Endian == 0xFEFF) {
@@ -479,7 +479,7 @@ extern "C" {
             BitI->BitB->BitsAvailable   = Bytes2Bits(BytesRead);
             BitI->BitB->BitsUnavailable = 0;
             BitI->BitB->Buffer[0];
-            DetectSystemEndian();
+            BitI->SystemEndian          = DetectSystemEndian();
         }
     }
     
@@ -496,7 +496,7 @@ extern "C" {
             BitO->File                  = fopen(CMD->Switch[OutputSwitch].SwitchResult, "rb");
             BitO->BitB->BitsAvailable   = BitOutputBufferSizeInBits;
             BitO->BitB->BitsUnavailable = 0;
-            DetectSystemEndian();
+            BitO->SystemEndian          = DetectSystemEndian();
         }
     }
     
