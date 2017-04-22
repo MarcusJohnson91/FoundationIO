@@ -569,23 +569,20 @@ extern "C" {
      @abstract                              "Reads raw UUID/GUID from the bitstream".
      @remark                                "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
      @param             BitB                "Pointer to the instance of BitBuffer".
-     @param             UUIDString          "Character array to read UUID string into".
      */
-    void                ReadUUID(BitBuffer *BitB, uint8_t *UUIDString);
+    uint8_t            *ReadUUID(BitBuffer *BitB);
     
     /*!
      @abstract                              "Converts a UUIDString to a GUIDString by swapping the endian of each section".
      @param             UUIDString          "An array containing the UUID in string form".
-     @param             GUIDString          "An empty array to put the swapped string into".
      */
-    void                ConvertUUID2GUID(const uint8_t *UUIDString, uint8_t *GUIDString);
+    uint8_t            *ConvertUUID2GUID(const uint8_t *UUIDString);
     
     /*!
      @abstract                              "Converts a GUIDString to a UUIDString by swapping the endian of each section".
      @param             GUIDString          "An array containing the converted UUID in string form".
-     @param             UUIDString          "An empty array to put the swapped string into".
      */
-    void                ConvertGUID2UUID(const uint8_t *GUIDString, uint8_t *UUIDString);
+    uint8_t            *ConvertGUID2UUID(const uint8_t *GUIDString);
     
     /*!
      @abstract                              "Verify two UUIDs match each other".
