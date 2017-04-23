@@ -858,6 +858,21 @@ extern "C" {
         }
     }
     
+    void EncodeRABS(BitBuffer *Data2Encode, BitBuffer *EncodedData, const uint64_t NumSymbols, const uint64_t Probabilities) {
+        // Encoded symbols need to be written from the last to the beginning of the buffer, so we should do it backwards, so WriteBits can work unmodified
+        // Aka, read from the last element in the unencoded buffer, and write to the first element in the buffer
+        
+        // So, for each buffer we re-measuere the probabilities of the symbols.
+        
+        if (Data2Encode == NULL) {
+            Log(LOG_ERR, "libBitIO", "EncodeRANS", "Data2Encode pointer is NULL\n");
+        } else if (EncodedData == NULL) {
+            Log(LOG_ERR, "libBitIO", "EncodeRANS", "EncodedData pointer is NULL\n");
+        } else {
+            
+        }
+    }
+    
     uint64_t GenerateCRC(const uint8_t *Data2CRC, const size_t DataSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit) {
         if (PolySize % 8 != 0) {
             // Ok, so we also need to add the ability to do incremental CRC generation for the iDAT/fDAT chunks in PNG
