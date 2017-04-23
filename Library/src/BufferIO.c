@@ -208,15 +208,7 @@ extern "C" {
         }
     }
     
-    uint64_t Signed2Unsigned(const int64_t Signed) {
-        return ~Signed + 1;
-    }
-    
-    int64_t Unsigned2Signed(const uint64_t Unsigned) {
-        return ~Unsigned - 1;
-    }
-    
-    int64_t Powi(int64_t Base, const int64_t Exponent) {
+    int64_t Powi(const int64_t Base, const int64_t Exponent) {
         int64_t Result = 0;
         for (uint64_t Loop = 0; Loop < Exponent; Loop++) {
             Result += Base * Base;
