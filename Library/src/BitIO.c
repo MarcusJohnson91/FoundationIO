@@ -217,7 +217,11 @@ extern "C" {
     }
     
     int64_t Powi(int64_t Base, const int64_t Exponent) {
-        return Base *= Exponent;
+        int64_t Result = 0;
+        for (uint64_t Loop = 0; Loop < Exponent; Loop++) {
+            Result += Base * Base;
+        }
+        return Result;
     }
     
     int64_t Floori(const long double Number2Floor) {
