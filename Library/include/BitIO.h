@@ -168,25 +168,11 @@ extern "C" {
     int64_t             Bits2Bytes(const int64_t Bits, const bool RoundUp);
     
     /*!
-     @abstract                              "Converts an Signed int to a Unsigned int".
-     @param             Signed              "Signed data to convert to unsigned".
-     @return                                "Returns the input data in Unsigned format".
-     */
-    uint64_t            Signed2Unsigned(const int64_t Signed);
-    
-    /*!
-     @abstract                              "Converts an Unsigned int to a Signed int".
-     @param             Unsigned            "Unsigned data to convert to signed".
-     @return                                "Returns the input data in Signed format".
-     */
-    int64_t             Unsigned2Signed(const uint64_t Unsigned);
-    
-    /*!
      @abstract                              "Raise a base to the exponent".
      @param             Base                "The base to be multiplied by it's self Exponent times".
      @param             Exponent            "The number of times to multiply Base by it's self".
      */
-    int64_t             Powi(int64_t Base, const int64_t Exponent);
+    int64_t             Powi(const int64_t Base, const int64_t Exponent);
     
     /*!
      @abstract                              "Integer floor function"
