@@ -197,21 +197,28 @@ extern "C" {
     }
     
     int64_t Bytes2Bits(const int64_t Bytes) {
-        return (Bytes * 8);
+        return Bytes * 8;
     }
     
     int64_t Bits2Bytes(const int64_t Bits, const bool RoundUp) {
         if (RoundUp == true) {
             return (Bits / 8) + (8 - (Bits % 8));
         } else {
-            return (Bits / 8);
+            return Bits / 8;
         }
     }
     
     int64_t Powi(const int64_t Base, const int64_t Exponent) {
         int64_t Result = 0;
-        for (uint64_t Loop = 0; Loop < Exponent; Loop++) {
-            Result += Base * Base;
+        
+        if (Base == 0) {
+            Result = 0;
+        } else if (Exponent == 0) {
+            Result = 1;
+        } else {
+            for (uint64_t Loop = 0; Loop < Exponent; Loop++) {
+                Result += Base * Base;
+            }
         }
         return Result;
     }
