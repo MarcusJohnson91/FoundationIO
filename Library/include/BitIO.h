@@ -461,11 +461,11 @@ extern "C" {
     
     /*!
      @abstract                              "Writes a BitBuffer to a file, kinda shitty tho".
-     @param             OutputFile          "File to write the buffer to".
-     @param             Buffer2Write        "The buffer to be written to the output file".
+     @param             BitO                "Pointer to BitOutput to write the buffer to".
+     @param             BitB                "The buffer to be written to the output file".
      @param             Bytes2Write         "The number of bytes from the buffer to write to the file"
      */
-    void                WriteBuffer2File(FILE *OutputFile, BitBuffer *Buffer2Write, const size_t Bytes2Write);
+    void                WriteBuffer2OutputFile(BitOutput *BitO, BitBuffer *BitB, const size_t Bytes2Write);
     
     /*!
      @abstract                              "Encodes and writes data in unary/RICE format to a BitOutput stream".
@@ -589,11 +589,11 @@ extern "C" {
     /*!
      @abstract                              "Reads Bytes2Read into a buffer pointed to by BitB from InputFile"
      @remark                                "If the pointer to BitBuffer is not new, all the old contents will be lost".
-     @param             InputFile           "FILE pointer to read from".
-     @param             Buffer2Read         "Pointer to the buffer to put the bytes into".
+     @param             BitI                "Pointer to BitInput".
+     @param             BitB                "Pointer to BitBuffer to put the bytes into".
      @para,             Bytes2Read          "The number of bytes to read from the InputFile into the Buffer"
      */
-    void                ReadFile2Buffer(FILE *InputFile, BitBuffer *Buffer2Read, size_t Bytes2Read);
+    void                ReadInputFile2Buffer(BitInput *BitI, BitBuffer *BitB, const size_t Bytes2Read);
     
 #ifndef _POSIX_VERSION
     /*!

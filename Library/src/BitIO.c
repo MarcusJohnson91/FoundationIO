@@ -1101,41 +1101,8 @@ extern "C" {
         }
     }
     
-    void ReadFile2Buffer(FILE *InputFile, BitBuffer *Buffer2Read, size_t Bytes2Read) {
-        // Should this just take in BitInput?
-        if (InputFile == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadFile2Buffer", "InputFile pointer is NULL\n");
-        } else if (Buffer2Read == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadFile2Buffer", "Buffer2Read pointer is NULL\n");
-        } else {
-            size_t BytesRead = 0;
-            memset(&Buffer2Read->Buffer, 0, sizeof(Buffer2Read->Buffer));
-            BytesRead                    = fread(Buffer2Read->Buffer, 1, Bytes2Read, InputFile);
-            Buffer2Read->BitsAvailable   = Bytes2Bits(BytesRead);
-            Buffer2Read->BitsUnavailable = 0;
-            
-        }
-    }
-    
     void ReadSocket2Buffer(BitInput *BitI, const size_t Bytes2Read) { // Define it in the header when it's done
         
-    }
-    
-    void WriteBuffer2File(FILE *OutputFile, BitBuffer *Buffer2Write, const size_t Bytes2Write) {
-        size_t BytesWritten = 0;
-        if (OutputFile == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteBuffer2File", "OutputFile pointer is NULL\n");
-        } else if (Buffer2Write == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteBuffer2File", "Buffer2Write pointer is NULL\n");
-        } else {
-            BytesWritten                  = fwrite(Buffer2Write->Buffer, 1, Bytes2Write, OutputFile);
-            memset(&Buffer2Write->Buffer, 0, BytesWritten);
-            if (BytesWritten != Bytes2Write) {
-                Log(LOG_CRIT, "libBitIO", "WriteBuffer2File", "Wrote %d bytes instead of %d\n", BytesWritten, Bytes2Write);
-            }
-            Buffer2Write->BitsAvailable   = 0;
-            Buffer2Write->BitsUnavailable = 0;
-        }
     }
     
     void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB, const int Socket) { // Define it in the header when it's done
