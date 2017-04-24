@@ -275,7 +275,7 @@ extern "C" {
         return Number2Check % 2 == 0 ? true : false;
     }
     
-    uint8_t FindHighestBitSet(const uint64_t UnsignedInt2Search) {
+    uint8_t FindHighestBitSet(const uint64_t UnsignedInt2Search) { // UnsignedInt2Search = 0x8000
         uint8_t  HighestBitSet = 0;
         uint64_t Shift         = 0ULL;
         
@@ -658,28 +658,6 @@ extern "C" {
         return Status;
     }
     
-    // Deprecate this, and replace it with a UpdateBufferFromBitInput or whateve function
-    /*
-    static void UpdateInputBuffer(BitInput *BitI, const int64_t RelativeOffsetInBytes) {
-        uint64_t Bytes2Read = 0, BytesRead = 0;
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "UpdateInputBuffer", "Pointer to BitInput is NULL\n");
-        } else {
-            fseek(BitI->File, RelativeOffsetInBytes, SEEK_CUR);
-            BitI->FilePosition = ftell(BitI->File);
-            memset(BitI->BitB->Buffer, 0, sizeof(BitI->BitB->Buffer));
-            Bytes2Read = BitI->FileSize - BitI->FilePosition >= BitInputBufferSize ? BitInputBufferSize : BitI->FileSize - BitI->FilePosition;
-            BytesRead  = fread(BitI->BitB->Buffer, 1, Bytes2Read, BitI->File);
-            if (BytesRead != Bytes2Read) {
-                Log(LOG_WARNING, "libBitIO", "UpdateInputBuffer", "Supposed to read %llu bytes, but read %llu\n", Bytes2Read, BytesRead);
-            }
-            uint64_t NEWBitsUnavailable = BitI->BitB->BitsUnavailable % 8; // FIXME: This assumes UpdateBuffer was called with at most 7 unused bits in the buffer...
-            
-            BitI->BitB->BitsUnavailable = NEWBitsUnavailable;
-            BitI->BitB->BitsAvailable   = Bytes2Bits(BytesRead);
-        }
-    }
-     */
     uint64_t ReadBits(BitBuffer *BitB, const uint8_t Bits2Read, const bool ReadFromMSB) {
         uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, Mask = 0, Data = 0, Mask2Shift = 0;
         uint64_t OutputData = 0;
