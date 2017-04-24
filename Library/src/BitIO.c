@@ -158,7 +158,6 @@ extern "C" {
         } else {
             fflush(BitO->File);
             fclose(BitO->File);
-            free(BitO->File);
             free(BitO);
         }
     }
