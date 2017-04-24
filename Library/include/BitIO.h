@@ -22,19 +22,19 @@ extern "C" {
 #endif
     
     /*!
-     @enumdef        BitIOConstants
-     @abstract                                 "BitIO compile time constants".
-     @remark                                   "Change the buffer sizes here".
-     @constant       BitInputBufferSize        "Initial size of BitInput buffer".
-     @constant       BitInputBufferSizeInBits  "Inital size of BitInput buffer in bits".
-     @constant       BitOutputBufferSize       "Inital size of BitOutput buffer".
-     @constant       BitOutputBufferSizeInBits "Inital size of BitOutput buffer in bits".
-     @constant       BitIOStringSize           "Maximum size of a string in BitIO".
-     @constant       BitIOUUIDStringSize       "Size of a UUIDString including dashes and null terminator".
-     @constant       BitIOBinaryUUIDSize       "Size of a binary UUID string".
-     @constant       BitIOGUIDStringSize       "Size of a GUIDString including dashes and null terminator".
-     @constant       BitIOBinaryGUIDSize       "Size of a binary GUID string".
-     @constant       BitIOMD5Size              "Size of a MD5 string".
+     @enumdef           BitIOConstants
+     @abstract                                    "BitIO compile time constants".
+     @remark                                      "Change the buffer sizes here".
+     @constant          BitInputBufferSize        "Initial size of BitInput buffer".
+     @constant          BitInputBufferSizeInBits  "Inital size of BitInput buffer in bits".
+     @constant          BitOutputBufferSize       "Inital size of BitOutput buffer".
+     @constant          BitOutputBufferSizeInBits "Inital size of BitOutput buffer in bits".
+     @constant          BitIOStringSize           "Maximum size of a string in BitIO".
+     @constant          BitIOUUIDStringSize       "Size of a UUIDString including dashes and null terminator".
+     @constant          BitIOBinaryUUIDSize       "Size of a binary UUID string".
+     @constant          BitIOGUIDStringSize       "Size of a GUIDString including dashes and null terminator".
+     @constant          BitIOBinaryGUIDSize       "Size of a binary GUID string".
+     @constant          BitIOMD5Size              "Size of a MD5 string".
      */
     enum BitIOConstants {
         BitInputBufferSize        = 4096,
@@ -52,19 +52,19 @@ extern "C" {
         BitIOLZ77MaxWindowSize    = 32768, // - 1
     };
     
-    typedef struct BitBuffer BitBuffer;
+    typedef struct BitBuffer          BitBuffer;
     
-    typedef struct BitInput BitInput;
+    typedef struct BitInput           BitInput;
     
-    typedef struct BitOutput BitOutput;
+    typedef struct BitOutput          BitOutput;
     
     typedef struct CommandLineOptions CommandLineOptions;
     
     /*!
-     @enum     Endian
-     @constant UnknownEndian           "The endian of the machine is currently unknown".
-     @constant BigEndian               "The machine is Big endian".
-     @constant LittleEndian            "The machine is little endian".
+     @enum              Endian
+     @constant          UnknownEndian       "The endian of the machine is currently unknown".
+     @constant          BigEndian           "The machine is Big endian".
+     @constant          LittleEndian        "The machine is little endian".
      */
     enum Endian {
         UnknownEndian = 0,
@@ -73,9 +73,9 @@ extern "C" {
     };
     
     /*!
-     @enum     PathType
-     @constant File     The submitted path is a regular file
-     @constant URL      The submitted path is to a network resource or IP address
+     @enum              PathType
+     @constant          File                "The submitted path is a regular file"
+     @constant          URL                 "The submitted path is to a network resource or IP address"
      */
     enum PathType {
         File = 0,
@@ -583,15 +583,15 @@ extern "C" {
     
 #ifndef _POSIX_VERSION
     /*!
-     @enum     LogTypes
-     @constant LOG_EMERG               "The system is unusable, the program is quitting (equivalent to panic)".
-     @constant LOG_ALERT               "Immediate action is required".
-     @constant LOG_CRIT                "Critical condition encountered".
-     @constant LOG_ERR                 "Error condition encountered".
-     @constant LOG_WARNING             "Warning condition encountered".
-     @constant LOG_NOTICE              "Normal, but important condition encountered".
-     @constant LOG_INFO                "Informational message logged".
-     @constant LOG_DEBUG               "Testing information logged".
+     @enum              LogTypes
+     @constant          LOG_EMERG           "The system is unusable, the program is quitting (equivalent to panic)".
+     @constant          LOG_ALERT           "Immediate action is required".
+     @constant          LOG_CRIT            "Critical condition encountered".
+     @constant          LOG_ERR             "Error condition encountered".
+     @constant          LOG_WARNING         "Warning condition encountered".
+     @constant          LOG_NOTICE          "Normal, but important condition encountered".
+     @constant          LOG_INFO            "Informational message logged".
+     @constant          LOG_DEBUG           "Testing information logged".
      */
     enum LogTypes {
         LOG_EMERG   = 0,
