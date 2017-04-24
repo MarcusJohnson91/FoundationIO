@@ -22,7 +22,7 @@ extern "C" {
 #endif
     
     /*!
-     @enumdef           BitIOConstants
+     @enum              BitIOConstants
      @abstract                                    "BitIO compile time constants".
      @remark                                      "Change the buffer sizes here".
      @constant          BitInputBufferSize        "Initial size of BitInput buffer".
@@ -52,14 +52,6 @@ extern "C" {
         BitIOLZ77MaxWindowSize    = 32768, // - 1
     };
     
-    typedef struct BitBuffer          BitBuffer;
-    
-    typedef struct BitInput           BitInput;
-    
-    typedef struct BitOutput          BitOutput;
-    
-    typedef struct CommandLineOptions CommandLineOptions;
-    
     /*!
      @enum              Endian
      @constant          UnknownEndian       "The endian of the machine is currently unknown".
@@ -82,6 +74,14 @@ extern "C" {
         URL  = 1,
     };
     
+    typedef struct BitBuffer          BitBuffer;
+    
+    typedef struct BitInput           BitInput;
+    
+    typedef struct BitOutput          BitOutput;
+    
+    typedef struct CommandLineOptions CommandLineOptions;
+    
     /*!
      @abstract                              "Initializes a BitInput structure".
      @return                                "Returns a pointer to said BitInput structure".
@@ -96,15 +96,16 @@ extern "C" {
     
     /*!
      @abstract                              "Initializes a BitBuffer structure".
-     @param             BufferSize          "Size of the buffer in bytes".
      @remark                                "The buffer MUST be unread".
      @return                                "Returns a pointer to said BitBuffer structure".
+     @param             BufferSize          "Size of the buffer in bytes".
      */
     BitBuffer          *InitBitBuffer(const size_t BufferSize);
     
     /*!
      @abstract                              "Initializes a CommandLineOptions instance".
      @return                                "Returns a pointer to an initialized CommandLineOptions instance".
+     @param             NumSwitches         "The number of CommandLineSwitch structures to initalize".
      */
     CommandLineOptions *InitCommandLineOptions(size_t NumSwitches);
     
@@ -156,6 +157,7 @@ extern "C" {
      @abstract                              "Computes the number of bits from the number of bytes".
      @remark                                "Does not have sub-byte precision".
      @return                                "Returns the number of bits".
+     @param             Bytes               "The number of bytes you want to intrepret as bits".
      */
     int64_t             Bytes2Bits(const int64_t Bytes);
     
@@ -175,12 +177,15 @@ extern "C" {
     int64_t             Powi(const int64_t Base, const int64_t Exponent);
     
     /*!
-     @abstract                              "Integer floor function"
+     @abstract                              "Integer floor function".
+     @param             Number2Floor        "The input number as a floating point value".
      */
     int64_t             Floori(const long double Number2Floor);
     
     /*!
-     @abstract                              "Integer ceil function"
+     @abstract                              "Integer ceil function".
+     @todo                                  "We should extract the decimal part and drop the mantissa, it would make it an int-only op, and faster".
+     @param             Number2Ceil         "The input number to Ceil as a floating point number".
      */
     int64_t             Ceili(const long double Number2Ceil);
     
@@ -193,69 +198,77 @@ extern "C" {
     
     /*!
      @abstract                              "Counts the number of bits that are set in a int".
-     @param             Bits2Count          "The int who's bits should be counted".
      @return                                "The number of bits set in Bits2Count".
+     @param             Bits2Count          "The int who's bits should be counted".
      */
     uint8_t             CountBitsSet(const uint64_t Bits2Count);
     
     /*!
      @abstract                              "Create bit-mask from binary exponent".
-     @param             Exponent            "Power to be raised by 2".
      @return                                "A bit mask generated from a power".
+     @param             Exponent            "Power to be raised by 2".
      */
     uint64_t            Power2Mask(const uint8_t Exponent);
     
     /*!
      @abstract                              "Converts numbers from One's compliment to Two's compliment"
-     @param             OnesCompliment      "Int in 1's compliment form to convert into 2's compliment".
      @return                                "Returns OnesCompliment in 2's compliment format".
+     @param             OnesCompliment      "Int in 1's compliment form to convert into 2's compliment".
      */
     int64_t             OnesCompliment2TwosCompliment(const int64_t OnesCompliment);
     
     /*!
      @abstract                              "Converts numbers from Two's compliment to One's compliment".
-     @param             TwosCompliment      "Int in 2's compliment form to convert into 1's compliment".
      @return                                "Returns the TwosCompliment in 1's compliment format".
+     @param             TwosCompliment      "Int in 2's compliment form to convert into 1's compliment".
      */
     int64_t             TwosCompliment2OnesCompliment(const int64_t TwosCompliment);
     
     /*!
      @abstract                              "Tells whether Input is even or odd".
-     @returns                               "True for odd, false for even".
+     @return                                "True for odd, false for even".
+     @param             Number2Check        "The number to see if it's odd or even".
      */
     bool                IsOdd(const int64_t Number2Check);
     
     /*!
      @abstract                              "Finds the highest set bit in an int".
+     @todo                                  "We should have a flag for if it's positive or negative, and if neg, search instead for the highest 0, called FindHighestSetBit"
      @remark                                "Will NOT WORK WITH SIGNED INTS. it will ALWAYS return the sign bit".
      @return                                "Returns the position of the highest set bit".
+     @param             UnsignedInt2Search  "Unsigned integer to search for the highest set bit".
      */
     uint8_t             FindHighestBitSet(const uint64_t UnsignedInt2Search);
     
     /*!
      @abstract                              "Computes the number of bytes left in the file".
      @returm                                "Returns the number of bytes left in the file".
+     @param             BitI                "Pointer to the instance of BitInput".
      */
     size_t              BytesRemainingInInputFile(BitInput *BitI);
     
     /*!
      @abstract                              "Gets the size of the file pointed to by BitI"
      @return                                "Returns the value in BitI->FileSize".
+     @param             BitI                "Pointer to the instance of BitInput".
      */
     size_t              GetBitInputFileSize(BitInput *BitI);
     
     /*!
      @abstract                              "Returns the position of the current file".
+     @param             BitI                "Pointer to the instance of BitInput".
      */
     size_t              GetBitInputFilePosition(BitInput *BitI);
     
     /*!
      @abstract                              "Returns the number of bits used in BitB".
+     @param             BitB                "Pointer to the instance of BitBuffer".
      */
     size_t              GetBitBufferPosition(BitBuffer *BitB);
     
     /*!
      @abstract                              "Gets the size of the BitBuffer".
+     @param             BitB                "Pointer to the instance of BitBuffer".
      */
     size_t              GetBitBufferSize(BitBuffer *BitB);
     
@@ -359,14 +372,16 @@ extern "C" {
     void                SetCMDMinSwitches(CommandLineOptions *CMD, const uint64_t MinSwitches);
     
     /*!
-     @abstract                              "Sets SwitchNum's flag in the CommandLineOptions instance pointed by CMD"
+     @abstract                              "Sets SwitchNum's flag in the CommandLineOptions instance pointed by CMD".
      @param             CMD                 "Pointer to the instance of CommandLineOptions".
      @param             SwitchNum           "The switch to set".
      @param             Flag                "The flag to identify an option with".
+     @param             FlagSize            "Size of the flag string".
      */
     void                SetSwitchFlag(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Flag, const size_t FlagSize);
     
     /*!
+     @abstract                              "Sets SwitchDescription's flag in the CommandLineOptions instance pointed by CMD".
      @param             CMD                 "Pointer to the instance of CommandLineOptions".
      @param             SwitchNum           "The switch to set".
      @param             Description         "Pointer to a C string containing the description of what this program does"
@@ -374,6 +389,7 @@ extern "C" {
     void                SetSwitchDescription(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Description);
     
     /*!
+     @abstract                              "Sets SwitchResult's flag in the CommandLineOptions instance pointed by CMD".
      @param             CMD                 "Pointer to the instance of CommandLineOptions".
      @param             SwitchNum           "The switch to set".
      @param             IsSwitchResultless  "Are you expecting this switch to contain data, or are you just testing for it's presence?".
@@ -439,9 +455,11 @@ extern "C" {
     
     /*!
      @abstract                              "Writes bits to BitBuffer".
+     @todo                                  "We should replace WriteFromMSB with a WriteLittleEndian or WriteBigEndian".
      @param             BitB                "Pointer to the instance of BitBuffer".
      @param             Data2Write          "Is the actual data to write out".
      @param             NumBits             "Is the number of bits to write".
+     @param             WriteFromMSB        "Should we write the bits from the most significant bit?".
      */
     void                WriteBits(BitBuffer *BitB, const uint64_t Data2Write, const uint8_t NumBits, const bool WriteFromMSB);
     
@@ -455,6 +473,7 @@ extern "C" {
     
     /*!
      @abstract                              "Encodes and writes data in unary/RICE format to a BitOutput stream".
+     @todo                                  "We should replace WriteFromMSB with a WriteLittleEndian or WriteBigEndian".
      @param             BitB                "Pointer to BitBuffer, the output buffer".
      @param             Truncated           "Should the stop bit be pruned?"
      @param             StopBit             "Has to be a 0 or a 1".
@@ -465,6 +484,7 @@ extern "C" {
     
     /*!
      @abstract                              "Writes data encoded as Exponential-Golomb aka Elias Gamma codes to BitO".
+     @todo                                  "We should replace WriteFromMSB with a WriteLittleEndian or WriteBigEndian".
      @param             BitB                "Pointer to the instance of BitBuffer".
      @param             IsSigned            "Is Data2Write signed?".
      @param             Data2Write          "The actual data to write to the output file".
@@ -577,7 +597,7 @@ extern "C" {
      @remark                                "If the pointer to BitBuffer is not new, all the old contents will be lost".
      @param             BitI                "Pointer to BitInput".
      @param             BitB                "Pointer to BitBuffer to put the bytes into".
-     @para,             Bytes2Read          "The number of bytes to read from the InputFile into the Buffer"
+     @param             Bytes2Read          "The number of bytes to read from the InputFile into the Buffer"
      */
     void                ReadInputFile2Buffer(BitInput *BitI, BitBuffer *BitB, const size_t Bytes2Read);
     
