@@ -109,8 +109,6 @@ extern "C" {
         bool                IsOpenSource; // if open source, then set the license and URL, if not set a warning, and EULA url
         const char         *License;
         const char         *LicenseURL;
-        const char         *EULAWarning;
-        const char         *EULAURL;
         CommandLineSwitch  *Switch; // 1D array of CommandLineSwitch's
     } CommandLineOptions;
     
@@ -395,12 +393,13 @@ extern "C" {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "DisplayProgramBanner", "Pointer to CommandLineOptions is NULL\n");
         } else {
-            if (CMD->IsOpenSource == true) { // License stuff
-                printf("%s version %s by %s © %s: %s, Released under the \"%s\" license: %s\n\n", CMD->Name, CMD->Version, CMD->Author, CMD->Copyright, CMD->Description, CMD->License, CMD->LicenseURL);
-                // ModernPNG by BumbleBritches57 © 2017-2017: PNG encoder/decoder written from scratch in modern C, Released under the "Revised BSD (3 clause)" license
-            } else { // EULA stuff
-                printf("%s version %s by %s © %s: %s, By using this software, you agree to the End User License Agreement, available at: %s\n\n", CMD->Name, CMD->Version, CMD->Author, CMD->Copyright, CMD->Description, CMD->EULAURL);
+            printf("%s version %s by %s © %s: %s, ", CMD->Name, CMD->Version, CMD->Author, CMD->Copyright, CMD->Description); // Generic part of the string.
+            if (CMD->IsOpenSource == true) {
+                printf("Released under the \"%s\" license: %s\n\n", CMD->License, CMD->LicenseURL);
+            } else {
+                printf("By using this software, you agree to the End User License Agreement, available at: %s\n\n", CMD->License, CMD->LicenseURL);
             }
+            
         }
     }
     
@@ -546,47 +545,33 @@ extern "C" {
         }
     }
     
-    void SetCMDLicense(CommandLineOptions *CMD, const char *License) {
+    void SetCMDLicense(CommandLineOptions *CMD, const char *License, const bool IsEULA) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCMDLicense", "Pointer to CommandLineOptions is NULL\n");
         } else if (License == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCMDLicense", "Pointer to License is NULL\n");
         } else {
             CMD->License      = License;
-            CMD->IsOpenSource = true;
+            if (IsEULA == true) {
+                CMD->IsOpenSource = false;
+            } else {
+                CMD->IsOpenSource = true;
+            }
         }
     }
     
-    void SetCMDLicenseURL(CommandLineOptions *CMD, const char *LicenseURL) {
+    void SetCMDLicenseURL(CommandLineOptions *CMD, const char *LicenseURL, const bool IsEULA) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCMDLicenseURL", "Pointer to CommandLineOptions is NULL\n");
         } else if (LicenseURL == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCMDLicenseURL", "Pointer to LicenseURL is NULL\n");
         } else {
             CMD->LicenseURL   = LicenseURL;
-            CMD->IsOpenSource = true;
-        }
-    }
-    
-    void SetCMDEULAWarning(CommandLineOptions *CMD, const char *EULAWarning) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDEULAWarning", "Pointer to CommandLineOptions is NULL\n");
-        } else if (EULAWarning == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDEULAWarning", "Pointer to EULAWarning is NULL\n");
-        } else {
-            CMD->EULAWarning  = EULAWarning;
-            CMD->IsOpenSource = false;
-        }
-    }
-    
-    void SetCMDEULAURL(CommandLineOptions *CMD, const char *EULAURL) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDEULAURL", "Pointer to CommandLineOptions is NULL\n");
-        } else if (EULAURL == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDEULAURL", "Pointer to EULAURL is NULL\n");
-        } else {
-            CMD->EULAURL      = EULAURL;
-            CMD->IsOpenSource = false;
+            if (IsEULA == true) {
+                CMD->IsOpenSource = false;
+            } else {
+                CMD->IsOpenSource = true;
+            }
         }
     }
     
