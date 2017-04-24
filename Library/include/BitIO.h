@@ -338,32 +338,18 @@ extern "C" {
      @remark                                "If your program is closed source, do NOT use the License options, use the EULA functions".
      @param             CMD                 "Pointer to the instance of CommandLineOptions".
      @param             License             "The license this program is licensed under".
+     @param             IsEULA              "Is this program released under an open source license, or a EULA?"
      */
-    void                SetCMDLicense(CommandLineOptions *CMD, const char *License);
+    void                SetCMDLicense(CommandLineOptions *CMD, const char *License, const bool IsEULA);
     
     /*!
      @abstract                              "Sets the URL for the license, in the main program banner".
      @remark                                "If your program is closed source, do NOT use the License options, use the EULA functions".
      @param             CMD                 "Pointer to the instance of CommandLineOptions".
      @param             LicenseURL          "the actual URL for the license".
+     @param             IsEULA              "Is this program released under an open source license, or a EULA?"
      */
-    void                SetCMDLicenseURL(CommandLineOptions *CMD, const char *LicenseURL);
-    
-    /*!
-     @abstract                              "Sets the URL for the license, in the main program banner".
-     @remark                                "If your program is open source, do NOT use the EULA options, use the license ones".
-     @param             CMD                 "Pointer to the instance of CommandLineOptions".
-     @param             EULAWarning         "A summary of the End User License Agreement".
-     */
-    void                SetCMDEULAWarning(CommandLineOptions *CMD, const char *EULAWarning);
-    
-    /*!
-     @abstract                              "Sets the URL for the End User License Agreement, in the main program banner".
-     @remark                                "If your program is open source, do NOT use the EULA options, use the license ones".
-     @param             CMD                 "Pointer to the instance of CommandLineOptions".
-     @param             EULAURL             "the actual URL for the End User License Agreement".
-     */
-    void                SetCMDEULAURL(CommandLineOptions *CMD, const char *EULAURL);
+    void                SetCMDLicenseURL(CommandLineOptions *CMD, const char *LicenseURL, const bool IsEULA);
     
     /*!
      @abstract                              "What is the minimum number of switches your program needs to operate?".
