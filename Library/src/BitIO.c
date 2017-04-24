@@ -279,11 +279,15 @@ extern "C" {
         uint8_t  HighestBitSet = 0;
         uint64_t Shift         = 0ULL;
         
-        for (uint8_t Bit = 64; Bit > 0; Bit--) {
-            Shift = ((1ULL << Bit) - 1);
-            if (((UnsignedInt2Search & Shift) >> Shift) == 1) {
-                HighestBitSet = Bit;
-                break;
+        if (UnsignedInt2Search == 0) {
+            HighestBitSet = 0;
+        } else {
+            for (uint8_t Bit = 1; Bit < 64; Bit++) {
+                // We should count up tho, that way the last update is the last highest bit, that also means it requires 64 loops no matter what :(
+                Shift = 1ULL << (Bit - 1);
+                if (((UnsignedInt2Search & Shift) >> (Bit - 1)) == 1) {
+                    HighestBitSet = Bit;
+                }
             }
         }
         return HighestBitSet;
@@ -357,7 +361,7 @@ extern "C" {
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputSystemEndian", "Pointer to BitInput is NULL\n");
         } else {
-            Endian = BitI->SystemEndian;;
+            Endian = BitI->SystemEndian;
         }
         return Endian;
     }
@@ -367,7 +371,7 @@ extern "C" {
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitOutputSystemEndian", "Pointer to BitOutput is NULL\n");
         } else {
-            Endian = BitO->SystemEndian;;
+            Endian = BitO->SystemEndian;
         }
         return Endian;
     }
