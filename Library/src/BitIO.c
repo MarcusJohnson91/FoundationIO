@@ -865,9 +865,9 @@ extern "C" {
         // So, for each buffer we re-measuere the probabilities of the symbols.
         
         if (Data2Encode == NULL) {
-            Log(LOG_ERR, "libBitIO", "EncodeRANS", "Data2Encode pointer is NULL\n");
+            Log(LOG_ERR, "libBitIO", "EncodeRABS", "Data2Encode pointer is NULL\n");
         } else if (EncodedData == NULL) {
-            Log(LOG_ERR, "libBitIO", "EncodeRANS", "EncodedData pointer is NULL\n");
+            Log(LOG_ERR, "libBitIO", "EncodeRABS", "EncodedData pointer is NULL\n");
         } else {
             
         }
