@@ -6,13 +6,13 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #ifndef _WIN32
 #include <sys/socket.h>
 #include <syslog.h>
 #include <unistd.h>
 #else
+#include <windows.h>
 #include <winbase.h>
 #include <winsock.h>
 #endif
