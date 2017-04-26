@@ -1093,6 +1093,40 @@ extern "C" {
         
     }
     
+    /*
+     Huffman, Arthimetic, and ANS/ABS coding systems ALL require having a sorted list of symbol and their frequency (to keep it in the int domain)
+     So writing a sorting algorithm is going to be the first thing i do, and I'm not going to fuck around with crazy sorters, just a real simple one that should optimize better.
+     */
+    
+    int64_t *MeasureSymbolFrequency(const int64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
+        // Ok, if this doesn't work look into using _Generic
+        
+        int64_t *SymbolFrequencies = calloc(1, ElementSizeInBytes * BufferSizeInElements);
+        
+        if (SymbolFrequencies == NULL) {
+            Log(LOG_ERR, "libBitIO", "MeasureSymbolFrequency", "Calloc failed allocating %d bytes for SortedSymbolFrequencies\n", ElementSizeInBytes * BufferSizeInElements);
+        } else {
+            // Loop over the buffer, taking the symbol as the index, and incrementing the value of that index.
+            for (uint64_t Element = 0; Element < BufferSizeInElements; Element++) {
+                SymbolFrequencies[Buffer2Measure[Element]] += 1;
+            }
+        }
+        return SymbolFrequencies;
+    }
+    
+    void SortSymbolFrequencies(int64_t *SymbolFrequency, size_t NumSymbols, uint8_t SymbolSizeInBytes) {
+        /* the hardest part is that we have to change that array from Symbol[Frequency] to Frequency[Symbol],
+         so we need 2 loops, one to find the lowest element in the first array and pop it to the bottom of the second?
+         */
+        
+        for (size_t SymbolElement = 0; SymbolElement < NumSymbols; SymbolElement++) {
+            for (size_t FrequencyElement = 0; FrequencyElement < NumSymbols; FrequencyElement++) { // Should we remove 0 frequency elements?
+                
+            }
+        }
+        
+    }
+    
     /* Deflate (encode deflate) */
     void EncodeLZ77(BitBuffer *RawBuffer, BitBuffer *LZ77Buffer, const size_t WindowSize, const size_t DistanceLength) {
         // The dictionary is simply the current buffer, at the current buffer position -(WindowSize / 2) +(WindowSize / 2)
