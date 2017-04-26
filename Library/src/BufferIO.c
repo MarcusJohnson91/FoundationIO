@@ -592,7 +592,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "SetSwitchFlag", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
         } else {
             CMD->Switch[SwitchNum].Flag = Flag;
-            CMD->Switch[SwitchNum].FlagSize = FlagSize;
+            CMD->Switch[SwitchNum].FlagSize = FlagSize + 1; // add one for the trailing NULL
         }
     }
     

@@ -373,6 +373,7 @@ extern "C" {
     
     /*!
      @abstract                              "Sets SwitchNum's flag in the CommandLineOptions instance pointed by CMD".
+     @remark                                "Just enter the number of characters you typed into the string not counting the quotes".
      @param             CMD                 "Pointer to the instance of CommandLineOptions".
      @param             SwitchNum           "The switch to set".
      @param             Flag                "The flag to identify an option with".
