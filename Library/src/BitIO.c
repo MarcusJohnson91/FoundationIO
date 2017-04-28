@@ -421,9 +421,9 @@ extern "C" {
                     for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches; SwitchNum++) {
                         // Once the switch is found, we should skip over this argument.
                         
-                        size_t SingleDashSize = CMD->Switch[Switch].FlagSize + 1;
-                        size_t DoubleDashSize = CMD->Switch[Switch].FlagSize + 2;
-                        size_t SlashSize      = CMD->Switch[Switch].FlagSize + 1;
+                        size_t SingleDashSize                       = CMD->Switch[SwitchNum].FlagSize + 1;
+                        size_t DoubleDashSize                       = CMD->Switch[SwitchNum].FlagSize + 2;
+                        size_t SlashSize                            = CMD->Switch[SwitchNum].FlagSize + 1;
                         
                         char *SingleDash                            = (char*)calloc(1, SingleDashSize);
                         snprintf(SingleDash, SingleDashSize, "-%s", CMD->Switch[SwitchNum].Flag);
@@ -594,7 +594,7 @@ extern "C" {
         } else if (SwitchNum > CMD->NumSwitches) {
             Log(LOG_ERR, "libBitIO", "SetSwitchFlag", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
         } else {
-            CMD->Switch[SwitchNum].Flag = Flag;
+            CMD->Switch[SwitchNum].Flag     = Flag;
             CMD->Switch[SwitchNum].FlagSize = FlagSize + 1; // add one for the trailing NULL
         }
     }
