@@ -135,6 +135,11 @@ extern "C" {
         CMD->NumSwitches        = NumSwitches;
         
         size_t CLSSize          = sizeof(CommandLineSwitch); // 40 bytes
+        /*
+         for (uint64_t SwitchNum = 0; SwitchNum < NumSwitches; SwitchNum++) {
+         CMD->Switch         = (CommandLineSwitch*)calloc(1, CLSSize);
+         }
+         */
         CMD->Switch             = calloc(NumSwitches, CLSSize);
         
         return CMD;
