@@ -432,15 +432,15 @@ extern "C" {
                         snprintf(Slash, SlashSize, "/%s", CMD->Switch[Switch].Flag);
                         
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
-                            CMD->Switch[Switch].SwitchFound      = true;
-                            if (CMD->Switch[Switch].Resultless == false) {
-                                char *SwitchResult               = calloc(1, strlen(argv[Argument]) + 1);
+                            CMD->Switch[SwitchNum].SwitchFound      = true;
+                            if (CMD->Switch[SwitchNum].Resultless == false) {
+                                char *SwitchResult                  = (char*)calloc(1, strlen(argv[Argument]) + 1);
                                 snprintf(SwitchResult, strlen(argv[Argument] + 1), "%s", argv[Argument + 1]);
-                                CMD->Switch[Switch].SwitchResult = SwitchResult;
+                                CMD->Switch[SwitchNum].SwitchResult = SwitchResult;
                             }
-                            Argument += 1;
                         }
                     }
+                    break;
                 }
             }
         }
