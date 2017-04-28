@@ -377,13 +377,13 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "DisplayCMDHelp", "Pointer to CommandLineOptions is NULL\n");
         } else {
             printf("Options:\n");
-            for (uint8_t Option = 0; Option < CMD->NumSwitches; Option++) {
-                printf("%s\t", CMD->Switch[Option].Flag);
+            for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches; SwitchNum++) {
+                printf("%s\t", CMD->Switch[SwitchNum].Flag);
                 // Options:
                 // -Input, --Input, or /Input:
                 // (-|--|/) Input: Input file or stdin with '-'
                 // Ok, so we should show all the prefixes, then the long option, then in parentheses the short option is there is one, but how do we represent short options?
-                printf("%s\n", CMD->Switch[Option].SwitchDescription);
+                printf("%s\n", CMD->Switch[SwitchNum].SwitchDescription);
             }
         }
     }
@@ -414,7 +414,7 @@ extern "C" {
                 DisplayProgramBanner(CMD);
                 
                 for (uint8_t Argument = 1; Argument < argc - 1; Argument++) { // the executable path is skipped over
-                    for (uint8_t Switch = 0; Switch < CMD->NumSwitches; Switch++) {
+                    for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches; SwitchNum++) {
                         // Once the switch is found, we should skip over this argument.
                         
                         size_t SingleDashSize = CMD->Switch[Switch].FlagSize + 1;
@@ -460,13 +460,13 @@ extern "C" {
         return false;
     }
     
-    void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, const uint8_t InputSwitch) {
+    void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, const uint8_t SwitchNum) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Pointer to CommandLineOptions is NULL\n");
         } else if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Pointer to BitInput is NULL\n");
         } else {
-            BitI->File                  = fopen(CMD->Switch[InputSwitch].SwitchResult, "rb");
+            BitI->File                  = fopen(CMD->Switch[SwitchNum].SwitchResult, "rb");
             fseek(BitI->File, 0, SEEK_END);
             BitI->FileSize              = (uint64_t)ftell(BitI->File);
             fseek(BitI->File, 0, SEEK_SET);
@@ -479,13 +479,13 @@ extern "C" {
         
     }
     
-    void OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, const uint8_t OutputSwitch) {
+    void OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, const uint8_t SwitchNum) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Pointer to CommandLineOptions is NULL\n");
         } else if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Pointer to BitOutput is NULL\n");
         } else {
-            BitO->File                  = fopen(CMD->Switch[OutputSwitch].SwitchResult, "rb");
+            BitO->File                  = fopen(CMD->Switch[SwitchNum].SwitchResult, "rb");
             BitO->SystemEndian          = DetectSystemEndian();
         }
     }
