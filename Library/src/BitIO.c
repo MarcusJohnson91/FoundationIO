@@ -890,7 +890,7 @@ extern "C" {
     }
     
     static uint8_t *ConvertBinaryUUID2UUIDString(const uint8_t *BinaryUUID) {
-        uint8_t UUIDString[BitIOUUIDStringSize];
+        uint8_t *UUIDString = (uint8_t*)calloc(1, BitIOUUIDStringSize);
         if (sizeof(BinaryUUID) != BitIOBinaryUUIDSize) {
             Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, sizeof(BinaryUUID));
         } else {
@@ -904,11 +904,11 @@ extern "C" {
                 }
             }
         }
-        return *UUIDString;
+        return UUIDString;
     }
     
     static uint8_t *ConvertUUIDString2BinaryUUID(const uint8_t *UUIDString) {
-        uint8_t BinaryUUID[BitIOBinaryUUIDSize];
+        uint8_t *BinaryUUID = (uint8_t*)calloc(1, BitIOBinaryUUIDSize);
         if (sizeof(UUIDString) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, sizeof(UUIDString));
         } else {
@@ -918,11 +918,11 @@ extern "C" {
                 }
             }
         }
-        return *BinaryUUID;
+        return BinaryUUID;
     }
     
     static uint8_t *SwapBinaryUUID(const uint8_t *BinaryUUID) { // Should I make wrappers called ConvertUUID2GUID and SwapGUID2UUID?
-        uint8_t SwappedBinaryUUID[BitIOBinaryUUIDSize];
+        uint8_t *SwappedBinaryUUID = (uint8_t*)calloc(1, BitIOBinaryUUIDSize);
         
         if (sizeof(BinaryUUID) != BitIOBinaryUUIDSize) {
             Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, sizeof(BinaryUUID));
@@ -961,7 +961,7 @@ extern "C" {
     uint8_t *ConvertUUID2GUID(const uint8_t *UUIDString) {
         uint8_t *BinaryUUID;
         uint8_t *BinaryGUID;
-        uint8_t *GUIDString;
+        uint8_t *GUIDString = (uint8_t*)calloc(1, BitIOGUIDStringSize);
         
         if (sizeof(UUIDString) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, sizeof(UUIDString));
@@ -978,7 +978,7 @@ extern "C" {
     uint8_t *ConvertGUID2UUID(const uint8_t *GUIDString) {
         uint8_t *BinaryGUID;
         uint8_t *BinaryUUID;
-        uint8_t *UUIDString;
+        uint8_t *UUIDString = NULL;
         
         
         if (sizeof(GUIDString) != BitIOGUIDStringSize) {
