@@ -177,7 +177,6 @@ extern "C" {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "CloseCommandLineOptions", "Pointer to CommandLineOptions is NULL\n");
         } else {
-            free(CMD->Switch);
             free(CMD);
         }
     }
