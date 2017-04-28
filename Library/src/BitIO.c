@@ -113,25 +113,24 @@ extern "C" {
     } CommandLineOptions;
     
     BitInput *InitBitInput(void) {
-        BitInput *BitI        = calloc(1, sizeof(BitInput));
+        BitInput *BitI        = (BitInput*)calloc(1, sizeof(BitInput));
         return BitI;
     }
     
     BitOutput *InitBitOutput(void) {
-        BitOutput *BitO       = calloc(1, sizeof(BitOutput));
+        BitOutput *BitO       = (BitOutput*)calloc(1, sizeof(BitOutput));
         return BitO;
     }
     
     BitBuffer *InitBitBuffer(const size_t BufferSize) {
-        BitBuffer *BitB       = calloc(1, sizeof(BitBuffer));
-        BitB->Buffer          = calloc(1, BufferSize);
+        BitBuffer *BitB       = (BitBuffer*)calloc(1, sizeof(BitBuffer) + BufferSize);
         BitB->BitsAvailable   = Bytes2Bits(BufferSize);
         BitB->BitsUnavailable = 0;
         return BitB;
     }
     
     CommandLineOptions *InitCommandLineOptions(const size_t NumSwitches) {
-        CommandLineOptions *CMD = calloc(1, sizeof(CommandLineOptions));
+        CommandLineOptions *CMD = (CommandLineOptions*)calloc(1, sizeof(CommandLineOptions));
         
         CMD->NumSwitches        = NumSwitches;
         
@@ -422,14 +421,14 @@ extern "C" {
                         size_t DoubleDashSize = CMD->Switch[Switch].FlagSize + 2;
                         size_t SlashSize      = CMD->Switch[Switch].FlagSize + 1;
                         
-                        char *SingleDash                             = calloc(1, SingleDashSize);
-                        snprintf(SingleDash, SingleDashSize, "-%s", CMD->Switch[Switch].Flag);
+                        char *SingleDash                            = (char*)calloc(1, SingleDashSize);
+                        snprintf(SingleDash, SingleDashSize, "-%s", CMD->Switch[SwitchNum].Flag);
                         
-                        char *DoubleDash                             = calloc(1, DoubleDashSize);
-                        snprintf(DoubleDash, DoubleDashSize, "--%s", CMD->Switch[Switch].Flag);
+                        char *DoubleDash                            = (char*)calloc(1, DoubleDashSize);
+                        snprintf(DoubleDash, DoubleDashSize, "--%s", CMD->Switch[SwitchNum].Flag);
                         
-                        char *Slash                                  = calloc(1, SlashSize);
-                        snprintf(Slash, SlashSize, "/%s", CMD->Switch[Switch].Flag);
+                        char *Slash                                 = (char*)calloc(1, SlashSize);
+                        snprintf(Slash, SlashSize, "/%s", CMD->Switch[SwitchNum].Flag);
                         
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                             CMD->Switch[SwitchNum].SwitchFound      = true;
@@ -1056,7 +1055,7 @@ extern "C" {
             if (BitB->Buffer != NULL) {
                 free(BitB->Buffer);
             }
-            BitB->Buffer              = calloc(1, Bytes2Read);
+            BitB->Buffer              = (uint8_t*)calloc(1, Bytes2Read);
             BytesRead                 = fread(BitB->Buffer, 1, Bytes2Read, BitI->File);
             if (BytesRead            != Bytes2Read) {
                 Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "Fread read: %d bytes, but you requested: %d\n", BytesRead, Bytes2Read);
@@ -1101,7 +1100,7 @@ extern "C" {
     uint64_t *MeasureSymbolFrequency(const uint64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
         // Ok, if this doesn't work look into using _Generic
         
-        int64_t *SymbolFrequencies = calloc(1, ElementSizeInBytes * BufferSizeInElements);
+        int64_t *SymbolFrequencies = (int64_t*)calloc(1, ElementSizeInBytes * BufferSizeInElements);
         
         if (SymbolFrequencies == NULL) {
             Log(LOG_ERR, "libBitIO", "MeasureSymbolFrequency", "Calloc failed allocating %d bytes for SortedSymbolFrequencies\n", ElementSizeInBytes * BufferSizeInElements);
@@ -1139,7 +1138,7 @@ extern "C" {
     uint64_t *MeasureSortSymbolFrequency(const uint64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
         // This is MeasureSymbolFrequency + sorting as we go.
         
-        int64_t *SymbolFrequencies = calloc(1, ElementSizeInBytes * BufferSizeInElements);
+        int64_t *SymbolFrequencies = (int64_t*)calloc(1, ElementSizeInBytes * BufferSizeInElements);
         
         if (SymbolFrequencies == NULL) {
             Log(LOG_ERR, "libBitIO", "MeasureSymbolFrequency", "Calloc failed allocating %d bytes for SortedSymbolFrequencies\n", ElementSizeInBytes * BufferSizeInElements);
