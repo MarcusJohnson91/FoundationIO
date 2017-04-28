@@ -396,7 +396,7 @@ extern "C" {
             if (CMD->IsOpenSource == true) {
                 printf("Released under the \"%s\" license: %s\n\n", CMD->License, CMD->LicenseURL);
             } else {
-                printf("By using this software, you agree to the End User License Agreement, available at: %s\n\n", CMD->License, CMD->LicenseURL);
+                printf("By using this software, you agree to the End User License Agreement %s, available at: %s\n\n", CMD->License, CMD->LicenseURL);
             }
             
         }
