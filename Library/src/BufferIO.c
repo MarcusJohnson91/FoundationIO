@@ -405,7 +405,7 @@ extern "C" {
     
     void ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]) {
         // TODO : Scan for equals signs as well, if found, after the equal sign is the result, everything before is the switch.
-        // TODO : add support for generating the short versions of the arguments.
+        // TODO : add support for generating the short versions of the flags.
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineOptions is NULL\n");
         } else {
