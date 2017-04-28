@@ -1098,7 +1098,7 @@ extern "C" {
      So writing a sorting algorithm is going to be the first thing i do, and I'm not going to fuck around with crazy sorters, just a real simple one that should optimize better.
      */
     
-    int64_t *MeasureSymbolFrequency(const int64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
+    uint64_t *MeasureSymbolFrequency(const uint64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
         // Ok, if this doesn't work look into using _Generic
         
         int64_t *SymbolFrequencies = calloc(1, ElementSizeInBytes * BufferSizeInElements);
@@ -1114,9 +1114,18 @@ extern "C" {
         return SymbolFrequencies;
     }
     
-    void SortSymbolFrequencies(int64_t *SymbolFrequency, size_t NumSymbols, uint8_t SymbolSizeInBytes) {
+    void SortSymbolFrequencies(uint64_t *SymbolFrequency, size_t NumSymbols, uint8_t SymbolSizeInBytes) {
         /* the hardest part is that we have to change that array from Symbol[Frequency] to Frequency[Symbol],
          so we need 2 loops, one to find the lowest element in the first array and pop it to the bottom of the second?
+         
+         So lets just find the highest frequency possible and use that? NO!!!
+         
+         Maybe the best idea would be to average the frequencies, and put each one
+         
+         // Actually, it might be a better idea to sort the array during the measuring phase...
+         
+         // That way only a few elements have to be compared each time, significantly reducing the amount of work to be done.
+         
          */
         
         for (size_t SymbolElement = 0; SymbolElement < NumSymbols; SymbolElement++) {
@@ -1125,6 +1134,22 @@ extern "C" {
             }
         }
         
+    }
+    
+    uint64_t *MeasureSortSymbolFrequency(const uint64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
+        // This is MeasureSymbolFrequency + sorting as we go.
+        
+        int64_t *SymbolFrequencies = calloc(1, ElementSizeInBytes * BufferSizeInElements);
+        
+        if (SymbolFrequencies == NULL) {
+            Log(LOG_ERR, "libBitIO", "MeasureSymbolFrequency", "Calloc failed allocating %d bytes for SortedSymbolFrequencies\n", ElementSizeInBytes * BufferSizeInElements);
+        } else {
+            // Loop over the buffer, taking the symbol as the index, and incrementing the value of that index.
+            for (uint64_t Element = 0; Element < BufferSizeInElements; Element++) {
+                SymbolFrequencies[Buffer2Measure[Element]] += 1;
+            }
+        }
+        return SymbolFrequencies;
     }
     
     /* Deflate (encode deflate) */
