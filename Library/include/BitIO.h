@@ -97,9 +97,14 @@ extern "C" {
      @abstract                              "Initializes a BitBuffer structure".
      @remark                                "The buffer MUST be unread".
      @return                                "Returns a pointer to said BitBuffer structure".
-     @param             BufferSize          "Size of the buffer in bytes".
      */
-    BitBuffer          *InitBitBuffer(const size_t BufferSize);
+    BitBuffer          *InitBitBuffer(void);
+    
+    /*!
+     @abstract                              "Creates an empty buffer for putting data into"
+     @param             EmptyBufferSize     "Size of the buffer to create in bytes".
+     */
+    void                CreateEmptyBuffer(BitBuffer *BitB, const size_t EmptyBufferSize);
     
     /*!
      @abstract                              "Initializes a CommandLineOptions instance".
