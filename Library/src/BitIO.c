@@ -1139,7 +1139,7 @@ extern "C" {
         
     }
     
-    uint64_t *MeasureSortSymbolFrequency(const uint64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
+    uint64_t *MeasureSymbolFrequencySort(const uint64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
         // This is MeasureSymbolFrequency + sorting as we go.
         
         int64_t *SymbolFrequencies = (int64_t*)calloc(1, ElementSizeInBytes * BufferSizeInElements);
@@ -1148,6 +1148,9 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "MeasureSymbolFrequency", "Calloc failed allocating %d bytes for SortedSymbolFrequencies\n", ElementSizeInBytes * BufferSizeInElements);
         } else {
             // Loop over the buffer, taking the symbol as the index, and incrementing the value of that index.
+            // Also keep an array of where the first entry for frequency resides index wise.
+            // So FrequencyIndex[Frequency] = TopEntry in the main list
+            // How do we look it up tho? Just increment the byte read from the buffer's index, then take the index's total frequency as the index of where in the thing it is?
             for (uint64_t Element = 0; Element < BufferSizeInElements; Element++) {
                 SymbolFrequencies[Buffer2Measure[Element]] += 1;
             }
@@ -1188,8 +1191,8 @@ extern "C" {
     }
     
     void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription, ...) {
-        char *ErrorString = NULL;
-        const char *VariadicArguments = NULL;
+        char *ErrorString = (char*)NULL;
+        const char *VariadicArguments = (char*)NULL;
         
         va_list Argument;
         va_start(Argument, ErrorDescription);
