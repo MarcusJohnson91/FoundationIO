@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
 #ifndef _WIN32
 #include <sys/socket.h>
@@ -114,32 +116,50 @@ extern "C" {
     
     BitInput *InitBitInput(void) {
         BitInput *BitI        = (BitInput*)calloc(1, sizeof(BitInput));
+        if (errno == ENOMEM) {
+            Log(LOG_ERR, "libBitIO", "InitBitInput", "Not enough memory to initalize BitInput\n");
+        }
         return BitI;
     }
     
     BitOutput *InitBitOutput(void) {
         BitOutput *BitO       = (BitOutput*)calloc(1, sizeof(BitOutput));
+        if (errno == ENOMEM) {
+            Log(LOG_ERR, "libBitIO", "InitBitOutput", "Not enough memory to initalize BitOutput\n");
+        }
         return BitO;
     }
     
-    BitBuffer *InitBitBuffer(const size_t BufferSize) {
-        BitBuffer *BitB       = (BitBuffer*)calloc(1, sizeof(BitBuffer) + BufferSize);
-        BitB->BitsAvailable   = Bytes2Bits(BufferSize);
-        BitB->BitsUnavailable = 0;
+    BitBuffer *InitBitBuffer(void) {
+        BitBuffer *BitB       = (BitBuffer*)calloc(1, sizeof(BitBuffer));
+        if (errno == ENOMEM) {
+            Log(LOG_ERR, "libBitIO", "InitBitBuffer", "Not enough memory to initalize BitBuffer\n");
+        }
         return BitB;
+    }
+    
+    void CreateEmptyBuffer(BitBuffer *BitB, const size_t EmptyBufferSize) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "CreateEmptyBuffer", "Pointer to BitBuffer is NULL\n");
+        } else if (EmptyBufferSize <= 0) {
+            Log(LOG_ERR, "libBitIO", "CreateEmptyBuffer", "You tried creating a empty buffer of size: %d, which is invalid\n", EmptyBufferSize);
+        } else {
+            BitB->Buffer = (uint8_t*)calloc(1, EmptyBufferSize);
+            if (errno == ENOMEM) {
+                Log(LOG_ERR, "libBitIO", "CreateEmptyBuffer", "Not enough memory to create empty buffer: %d\n", EmptyBufferSize);
+            }
+        }
     }
     
     CommandLineOptions *InitCommandLineOptions(const size_t NumSwitches) {
         CommandLineOptions *CMD = (CommandLineOptions*)calloc(1, sizeof(CommandLineOptions));
+        if (errno == ENOMEM) {
+            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Not enough memory to initalize CommandLineOptions\n");
+        }
         
         CMD->NumSwitches        = NumSwitches;
         
         size_t CLSSize          = sizeof(CommandLineSwitch); // 40 bytes
-        /*
-         for (uint64_t SwitchNum = 0; SwitchNum < NumSwitches; SwitchNum++) {
-         CMD->Switch         = (CommandLineSwitch*)calloc(1, CLSSize);
-         }
-         */
         CMD->Switch             = calloc(NumSwitches, CLSSize);
         
         return CMD;
@@ -412,14 +432,14 @@ extern "C" {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineOptions is NULL\n");
         } else {
-            if ((CMD->NumSwitches < CMD->MinSwitches && CMD->MinSwitches > 0) || argc <= 1) {
+            if ((CMD->NumSwitches < CMD->MinSwitches && CMD->MinSwitches > 0) || argc == 1) {
                 DisplayCMDHelp(CMD);
             } else {
                 DisplayProgramBanner(CMD);
                 
-                for (uint8_t Argument = 1; Argument < argc - 1; Argument++) { // the executable path is skipped over
-                    for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches; SwitchNum++) {
-                        // Once the switch is found, we should skip over this argument.
+                for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches; SwitchNum++) {
+                    for (uint8_t Argument = 1; Argument < argc - 1; Argument++) { // the executable path is skipped over
+                                                                                  // Once the switch is found, we should skip over this argument.
                         
                         size_t SingleDashSize                       = CMD->Switch[SwitchNum].FlagSize + 1;
                         size_t DoubleDashSize                       = CMD->Switch[SwitchNum].FlagSize + 2;
@@ -435,15 +455,19 @@ extern "C" {
                         snprintf(Slash, SlashSize, "/%s", CMD->Switch[SwitchNum].Flag);
                         
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
+                            
+                            size_t ArgumentSize = strlen(argv[Argument + 1]) + 1;
+                            
                             CMD->Switch[SwitchNum].SwitchFound      = true;
                             if (CMD->Switch[SwitchNum].Resultless == false) {
-                                char *SwitchResult                  = (char*)calloc(1, strlen(argv[Argument]) + 1);
-                                snprintf(SwitchResult, strlen(argv[Argument] + 1), "%s", argv[Argument + 1]);
+                                char *SwitchResult                  = (char*)calloc(1, ArgumentSize);
+                                snprintf(SwitchResult, ArgumentSize, "%s", argv[Argument + 1]);
                                 CMD->Switch[SwitchNum].SwitchResult = SwitchResult;
                             }
+                            SwitchNum += 1; // To break out of looking for this switch
+                            Argument  += 1;
                         }
                     }
-                    break;
                 }
             }
         }
@@ -470,7 +494,12 @@ extern "C" {
         } else if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Pointer to BitInput is NULL\n");
         } else {
-            BitI->File                  = fopen(CMD->Switch[SwitchNum].SwitchResult, "rb");
+            size_t PathSize = strlen(CMD->Switch[SwitchNum].SwitchResult) + 1;
+            
+            char *InputFile = calloc(1, PathSize);
+            snprintf(InputFile, PathSize, "%s", CMD->Switch[SwitchNum].SwitchResult);
+            
+            BitI->File                  = fopen(InputFile, "rb");
             fseek(BitI->File, 0, SEEK_END);
             BitI->FileSize              = (uint64_t)ftell(BitI->File);
             fseek(BitI->File, 0, SEEK_SET);
@@ -489,7 +518,12 @@ extern "C" {
         } else if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Pointer to BitOutput is NULL\n");
         } else {
-            BitO->File                  = fopen(CMD->Switch[SwitchNum].SwitchResult, "rb");
+            size_t PathSize = strlen(CMD->Switch[SwitchNum].SwitchResult) + 1;
+            
+            char *OutputFile = calloc(1, PathSize);
+            snprintf(OutputFile, PathSize, "%s", CMD->Switch[SwitchNum].SwitchResult);
+            
+            BitO->File                  = fopen(OutputFile, "wb");
             BitO->SystemEndian          = DetectSystemEndian();
         }
     }
@@ -646,29 +680,35 @@ extern "C" {
     }
     
     uint64_t ReadBits(BitBuffer *BitB, const uint8_t Bits2Read, const bool ReadFromMSB) {
-        uint8_t Bits = Bits2Read, UserBits = 0, SystemBits = 0, Mask = 0, Data = 0, Mask2Shift = 0;
+        uint8_t Bits = Bits2Read, UserRequestBits = 0, BufferBitsAvailable = 0, Mask = 0, Data = 0, Mask2Shift = 0;
         uint64_t OutputData = 0;
         
-        if ((Bits2Read <= 0) || (Bits2Read > 64)) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadBits", "Pointer to BitBuffer is NULL\n");
+        } else if (BitB->Buffer == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadBits", "Pointer to Buffer in BitBuffer is NULL\n");
+        } else if (Bits2Read > 64) {
             Log(LOG_ERR, "libBitIO", "ReadBits", "ReadBits: %d, only supports reading 1-64 bits\n", Bits2Read);
+        } else if (Bits2Read == 0) {
+            return 0;
         } else {
-            SystemBits             = 8 - (BitB->BitsUnavailable % 8);
-            UserBits               = Bits > 8 ? 8 : Bits;
-            Bits                   = SystemBits >= UserBits  ? UserBits : SystemBits;
-            Mask2Shift             = ReadFromMSB ? BitB->BitsAvailable % 8 : 0;
+            BufferBitsAvailable = 8 - (BitB->BitsUnavailable % 8);
+            UserRequestBits     = Bits > 8 ? 8 : Bits;
+            Bits                = BufferBitsAvailable >= UserRequestBits  ? UserRequestBits : BufferBitsAvailable;
+            Mask2Shift          = ReadFromMSB ? BitB->BitsAvailable % 8 : 0;
             if (ReadFromMSB == true) {
-                Mask2Shift         = SystemBits <= UserBits  ? 0 : SystemBits - UserBits;
-                Mask               = (Power2Mask(Bits) << Mask2Shift);
+                Mask2Shift      = BufferBitsAvailable <= UserRequestBits  ? 0 : BufferBitsAvailable - UserRequestBits;
+                Mask            = (Power2Mask(Bits) << Mask2Shift);
             } else {
-                Mask               = (Powi(2, Bits) - 1) << BitB->BitsUnavailable % 8;
+                Mask            = (Power2Mask(Bits) - 1) << BitB->BitsUnavailable % 8;
             }
-            Data                   = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
+            Data                = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
             Data                 >>= Mask2Shift;
-            OutputData           <<= SystemBits >= UserBits ? UserBits : SystemBits;
+            OutputData           <<= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
             OutputData            += Data;
-            BitB->BitsAvailable   -= SystemBits >= UserBits ? UserBits : SystemBits;
-            BitB->BitsUnavailable += SystemBits >= UserBits ? UserBits : SystemBits;
-            Bits                  -= SystemBits >= UserBits ? UserBits : SystemBits;
+            BitB->BitsAvailable   -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+            BitB->BitsUnavailable += BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+            Bits                  -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
         }
         return OutputData;
     }
@@ -1139,7 +1179,7 @@ extern "C" {
         
     }
     
-    uint64_t *MeasureSymbolFrequencySort(const uint64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
+    uint64_t *MeasureSortSymbolFrequency(const uint64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
         // This is MeasureSymbolFrequency + sorting as we go.
         
         int64_t *SymbolFrequencies = (int64_t*)calloc(1, ElementSizeInBytes * BufferSizeInElements);
