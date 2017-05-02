@@ -1231,7 +1231,6 @@ extern "C" {
     }
     
     void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription, ...) {
-        char *ErrorString = (char*)NULL;
         const char *VariadicArguments = (char*)NULL;
         
         va_list Argument;
@@ -1241,7 +1240,8 @@ extern "C" {
             vprintf(VariadicArguments, Argument);
         }
         va_end(Argument);
-        snprintf(ErrorString, BitIOStringSize, "%s - %s: %s - %s\n", LibraryOrProgram, Function, ErrorDescription, VariadicArguments);
+		char *ErrorString = (char*)NULL;
+		snprintf(ErrorString, BitIOStringSize, "%s - %s: %s - %s\n", LibraryOrProgram, Function, ErrorDescription, VariadicArguments);
         
 #ifndef _WIN32
         if ((ErrorLevel == LOG_EMERG) || (ErrorLevel == LOG_CRIT)) {
@@ -1251,10 +1251,10 @@ extern "C" {
         }
         syslog(LOG_ERR, "%s\n", ErrorString);
 #else
-		LPCWSTR *WinLibraryOrProgram;
+		char *WinLibraryOrProgram;
 		snprintf(WinLibraryOrProgram, strlen(LibraryOrProgram), "L%s", LibraryOrProgram);
-        uintptr_t *EventLog = RegisterEventSource(NULL, WinLibraryOrProgram);
-        uint32_t ErrorCode  = ReportEvent(EventLog, ErrorLevel, 1, 0xF000FFFF, NULL, 1, strlen(ErrorString), ErrorString, NULL);
+        HANDLE EventLog = RegisterEventSourceA(NULL, (LPCSTR)WinLibraryOrProgram);
+        uint32_t ErrorCode  = ReportEvent(EventLog, ErrorLevel, 1, 0xF000FFFF, NULL, 1, (DWORD)strlen(ErrorString), (LPCWSTR*)ErrorString, NULL);
         if (ErrorCode != 0) {
             fprintf(stderr, "BitIO - Log: Windows version of Logger failed with error: %s\n", ErrorString);
         }
