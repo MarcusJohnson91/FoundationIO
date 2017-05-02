@@ -160,7 +160,7 @@ extern "C" {
         CMD->NumSwitches        = NumSwitches;
         
         size_t CLSSize          = sizeof(CommandLineSwitch); // 40 bytes
-        CMD->Switch             = calloc(NumSwitches, CLSSize);
+        CMD->Switch             = (CommandLineSwitch*)calloc(NumSwitches, CLSSize);
         
         return CMD;
     }
@@ -480,7 +480,7 @@ extern "C" {
         
         // Should this function be more general to simply tell if a path is a URL?
         // Also, we need to support IPv4 and IPv6 addresses
-        if (strcasecmp(&Path[0], "/") == 0 || strcasecmp(&Path[0], "~") || strcasecmp(Path, "file://" || strcasecmp(Path, "%c:/")) == 0) {
+        if (strcasecmp(&Path[0], "/") == 0 || strcasecmp(&Path[0], "~") == 0 || strcasecmp(Path, "file://") == 0 || strcasecmp(Path, "%c:/") == 0) {
             return File;
         } else if (strcasecmp(Path, "http://") == 0 || strcasecmp(Path, "https://") == 0 || strcasecmp(Path, "www.") == 0 || strcasecmp(Path, "ftp://") == 0) {
             
@@ -496,7 +496,7 @@ extern "C" {
         } else {
             size_t PathSize = strlen(CMD->Switch[SwitchNum].SwitchResult) + 1;
             
-            char *InputFile = calloc(1, PathSize);
+            char *InputFile = (char*)calloc(1, PathSize);
             snprintf(InputFile, PathSize, "%s", CMD->Switch[SwitchNum].SwitchResult);
             
             BitI->File                  = fopen(InputFile, "rb");
@@ -520,7 +520,7 @@ extern "C" {
         } else {
             size_t PathSize = strlen(CMD->Switch[SwitchNum].SwitchResult) + 1;
             
-            char *OutputFile = calloc(1, PathSize);
+            char *OutputFile = (char*)calloc(1, PathSize);
             snprintf(OutputFile, PathSize, "%s", CMD->Switch[SwitchNum].SwitchResult);
             
             BitO->File                  = fopen(OutputFile, "wb");
@@ -1028,7 +1028,7 @@ extern "C" {
         if (sizeof(GUIDString) != BitIOGUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "ConvertGUID2UUID", "GUIDString size should be: %d, but is: %d\n", BitIOGUIDStringSize, sizeof(GUIDString));
         } else {
-            BinaryGUID = ConvertGUIDString2BinaryUUID(GUIDString);
+            BinaryGUID = ConvertUUIDString2BinaryUUID(GUIDString);
             BinaryUUID = SwapBinaryUUID(BinaryGUID);
             UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
         }
@@ -1144,7 +1144,7 @@ extern "C" {
     uint64_t *MeasureSymbolFrequency(const uint64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
         // Ok, if this doesn't work look into using _Generic
         
-        int64_t *SymbolFrequencies = (int64_t*)calloc(1, ElementSizeInBytes * BufferSizeInElements);
+        uint64_t *SymbolFrequencies = (uint64_t*)calloc(1, ElementSizeInBytes * BufferSizeInElements);
         
         if (SymbolFrequencies == NULL) {
             Log(LOG_ERR, "libBitIO", "MeasureSymbolFrequency", "Calloc failed allocating %d bytes for SortedSymbolFrequencies\n", ElementSizeInBytes * BufferSizeInElements);
@@ -1182,7 +1182,7 @@ extern "C" {
     uint64_t *MeasureSortSymbolFrequency(const uint64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
         // This is MeasureSymbolFrequency + sorting as we go.
         
-        int64_t *SymbolFrequencies = (int64_t*)calloc(1, ElementSizeInBytes * BufferSizeInElements);
+        uint64_t *SymbolFrequencies = (uint64_t*)calloc(1, ElementSizeInBytes * BufferSizeInElements);
         
         if (SymbolFrequencies == NULL) {
             Log(LOG_ERR, "libBitIO", "MeasureSymbolFrequency", "Calloc failed allocating %d bytes for SortedSymbolFrequencies\n", ElementSizeInBytes * BufferSizeInElements);
@@ -1251,7 +1251,9 @@ extern "C" {
         }
         syslog(LOG_ERR, "%s\n", ErrorString);
 #else
-        uintptr_t *EventLog = RegisterEventSource(NULL, LibraryOrProgram);
+		LPCWSTR *WinLibraryOrProgram;
+		snprintf(WinLibraryOrProgram, strlen(LibraryOrProgram), "L%s", LibraryOrProgram);
+        uintptr_t *EventLog = RegisterEventSource(NULL, WinLibraryOrProgram);
         uint32_t ErrorCode  = ReportEvent(EventLog, ErrorLevel, 1, 0xF000FFFF, NULL, 1, strlen(ErrorString), ErrorString, NULL);
         if (ErrorCode != 0) {
             fprintf(stderr, "BitIO - Log: Windows version of Logger failed with error: %s\n", ErrorString);
