@@ -1142,38 +1142,23 @@ extern "C" {
      Huffman, Arthimetic, and ANS/ABS coding systems ALL require having a sorted list of symbol and their frequency (to keep it in the int domain)
      So writing a sorting algorithm is going to be the first thing i do, and I'm not going to fuck around with crazy sorters, just a real simple one that should optimize better.
      */
-    
-    uint64_t *MeasureSymbolFrequency(const uint64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
-        // Ok, if this doesn't work look into using _Generic
-        
-        uint64_t *SymbolFrequencies = (uint64_t*)calloc(1, ElementSizeInBytes * BufferSizeInElements);
-        
-        if (SymbolFrequencies == NULL) {
-            Log(LOG_ERR, "libBitIO", "MeasureSymbolFrequency", "Calloc failed allocating %d bytes for SortedSymbolFrequencies\n", ElementSizeInBytes * BufferSizeInElements);
-        } else {
-            // Loop over the buffer, taking the symbol as the index, and incrementing the value of that index.
-            for (uint64_t Element = 0; Element < BufferSizeInElements; Element++) {
-                SymbolFrequencies[Buffer2Measure[Element]] += 1;
-            }
-        }
-        return SymbolFrequencies;
-    }
-    
     uint64_t *MeasureSortSymbolFrequency(const uint16_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
         // This is MeasureSymbolFrequency + sorting as we go.
         
         uint64_t *SymbolFrequencies = (uint64_t*)calloc(1, BufferSizeInElements);
-        uint64_t *HighestFrequency  = (uint64_t*)calloc(1, BufferSizeInElements);
+        uint64_t *FrequencyPosition = (uint64_t*)calloc(1, BufferSizeInElements);
         
         if (SymbolFrequencies == NULL) {
             Log(LOG_ERR, "libBitIO", "MeasureSymbolFrequency", "Calloc failed allocating %d bytes for SortedSymbolFrequencies\n", ElementSizeInBytes * BufferSizeInElements);
         } else {
-            // Loop over the buffer, taking the symbol as the index, and incrementing the value of that index.
-            // Also keep an array of where the first entry for frequency resides index wise.
-            // So FrequencyIndex[Frequency] = TopEntry in the main list
-            // How do we look it up tho? Just increment the byte read from the buffer's index, then take the index's total frequency as the index of where in the thing it is?
             for (uint64_t Element = 0; Element < BufferSizeInElements; Element++) {
-                SymbolFrequencies[Buffer2Measure[Element]] += 1;
+                SymbolFrequencies[Buffer2Measure[Element]] += 1; // The index is the symbol
+                
+                uint64_t Frequency = SymbolFrequencies[Buffer2Measure[Element]];
+                
+                while (SymbolFrequencies[Buffer2Measure[Element]] != Frequency) {
+                    FrequencyPosition[SymbolFrequencies[Buffer2Measure[Element]]] += 1;
+                }
             }
             /*
              Buffer2Measure contains the symbols to be measured.
@@ -1181,6 +1166,24 @@ extern "C" {
              From SymbolFrequency, we need to create a sorted list who's index is the most common to least common symbols, each element contains the actual symbol.
              We need anoth array to store the locations of the highest of each frequency (so if 0 and 1 both contain 4, store 0)
              then we need to use the frequency of list 1 in list 2 storing the position
+             
+             We do not know the total order, so we need to build it as we go.
+             
+             therefore the index in the position array needs to be the frequency, which stores the last element of that frequency (last being defined as the farthest from the top of the buffer)
+             
+             So each time we find an element in a buffer, we need to update the frequency position, use that position to set the result of the frequency buffer.
+             
+             So, to sort as we go, what we have to do is Read a symbol from the buffer, and find that symbol in the array by using it as an index into the array.
+             then increment the frequency of that symbol.
+             
+             So Array1's index is the symbol, with the value being the frequency.
+             
+             Array2's index is the frequency.
+             
+             So we have to extract the value from array1 and use that as the index in array 2.
+             then we need to loop over array 1 long enough to find a frequency smaller than this which shouldn't take too many loops.
+             once we find a symbol with lower frequency, we simply use the last value as an array value.
+             Well, it'll have tobe a while loop inside the for loop
              */
         }
         return SymbolFrequencies;
