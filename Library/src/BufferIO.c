@@ -692,23 +692,25 @@ extern "C" {
         } else if (Bits2Read == 0) {
             return 0;
         } else {
-            BufferBitsAvailable = 8 - (BitB->BitsUnavailable % 8);
-            UserRequestBits     = Bits > 8 ? 8 : Bits;
-            Bits                = BufferBitsAvailable >= UserRequestBits  ? UserRequestBits : BufferBitsAvailable;
-            Mask2Shift          = ReadFromMSB ? BitB->BitsAvailable % 8 : 0;
-            if (ReadFromMSB == true) {
-                Mask2Shift      = BufferBitsAvailable <= UserRequestBits  ? 0 : BufferBitsAvailable - UserRequestBits;
-                Mask            = (Power2Mask(Bits) << Mask2Shift);
-            } else {
-                Mask            = (Power2Mask(Bits) - 1) << BitB->BitsUnavailable % 8;
+            while (Bits > 0) {
+                BufferBitsAvailable = 8 - (BitB->BitsUnavailable % 8);
+                UserRequestBits     = Bits > 8 ? 8 : Bits;
+                Bits                = BufferBitsAvailable >= UserRequestBits  ? UserRequestBits : BufferBitsAvailable;
+                Mask2Shift          = ReadFromMSB ? BitB->BitsAvailable % 8 : 0;
+                if (ReadFromMSB == true) {
+                    Mask2Shift      = BufferBitsAvailable <= UserRequestBits  ? 0 : BufferBitsAvailable - UserRequestBits;
+                    Mask            = (Power2Mask(Bits) << Mask2Shift);
+                } else {
+                    Mask            = (Power2Mask(Bits) - 1) << BitB->BitsUnavailable % 8;
+                }
+                Data                = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
+                Data                 >>= Mask2Shift;
+                OutputData           <<= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                OutputData            += Data;
+                BitB->BitsAvailable   -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                BitB->BitsUnavailable += BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                Bits                  -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
             }
-            Data                = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
-            Data                 >>= Mask2Shift;
-            OutputData           <<= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            OutputData            += Data;
-            BitB->BitsAvailable   -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            BitB->BitsUnavailable += BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            Bits                  -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
         }
         return OutputData;
     }
@@ -957,7 +959,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, sizeof(UUIDString));
         } else {
             for (uint8_t Byte = 0; Byte < BitIOUUIDStringSize; Byte++) {
-                if (Byte != 4 || Byte != 7 || Byte != 10 || Byte != 13 || Byte != 20) {
+                if (Byte != 4 && Byte != 7 && Byte != 10 && Byte != 13 && Byte != 20) {
                     BinaryUUID[Byte] = UUIDString[Byte];
                 }
             }
@@ -1157,32 +1159,11 @@ extern "C" {
         return SymbolFrequencies;
     }
     
-    void SortSymbolFrequencies(uint64_t *SymbolFrequency, size_t NumSymbols, uint8_t SymbolSizeInBytes) {
-        /* the hardest part is that we have to change that array from Symbol[Frequency] to Frequency[Symbol],
-         so we need 2 loops, one to find the lowest element in the first array and pop it to the bottom of the second?
-         
-         So lets just find the highest frequency possible and use that? NO!!!
-         
-         Maybe the best idea would be to average the frequencies, and put each one
-         
-         // Actually, it might be a better idea to sort the array during the measuring phase...
-         
-         // That way only a few elements have to be compared each time, significantly reducing the amount of work to be done.
-         
-         */
-        
-        for (size_t SymbolElement = 0; SymbolElement < NumSymbols; SymbolElement++) {
-            for (size_t FrequencyElement = 0; FrequencyElement < NumSymbols; FrequencyElement++) { // Should we remove 0 frequency elements?
-                
-            }
-        }
-        
-    }
-    
-    uint64_t *MeasureSortSymbolFrequency(const uint64_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
+    uint64_t *MeasureSortSymbolFrequency(const uint16_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
         // This is MeasureSymbolFrequency + sorting as we go.
         
-        uint64_t *SymbolFrequencies = (uint64_t*)calloc(1, ElementSizeInBytes * BufferSizeInElements);
+        uint64_t *SymbolFrequencies = (uint64_t*)calloc(1, BufferSizeInElements);
+        uint64_t *HighestFrequency  = (uint64_t*)calloc(1, BufferSizeInElements);
         
         if (SymbolFrequencies == NULL) {
             Log(LOG_ERR, "libBitIO", "MeasureSymbolFrequency", "Calloc failed allocating %d bytes for SortedSymbolFrequencies\n", ElementSizeInBytes * BufferSizeInElements);
@@ -1194,6 +1175,13 @@ extern "C" {
             for (uint64_t Element = 0; Element < BufferSizeInElements; Element++) {
                 SymbolFrequencies[Buffer2Measure[Element]] += 1;
             }
+            /*
+             Buffer2Measure contains the symbols to be measured.
+             SymbolFrequency contains the frequency of each symbol
+             From SymbolFrequency, we need to create a sorted list who's index is the most common to least common symbols, each element contains the actual symbol.
+             We need anoth array to store the locations of the highest of each frequency (so if 0 and 1 both contain 4, store 0)
+             then we need to use the frequency of list 1 in list 2 storing the position
+             */
         }
         return SymbolFrequencies;
     }
