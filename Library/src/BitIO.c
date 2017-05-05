@@ -1131,7 +1131,7 @@ extern "C" {
     }
     
     void ReadSocket2Buffer(BitInput *BitI, const size_t Bytes2Read) { // Define it in the header when it's done
-        
+                                                                      //sockaddr_in
     }
     
     void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB, const int Socket) { // Define it in the header when it's done
@@ -1190,7 +1190,7 @@ extern "C" {
     }
     
     /* Deflate (encode deflate) */
-    void EncodeLZ77(BitBuffer *RawBuffer, BitBuffer *LZ77Buffer, const size_t WindowSize, const size_t DistanceLength) {
+    void EncodeLZ77(BitBuffer *RawBuffer, BitBuffer *LZ77Buffer, const size_t WindowSize, const size_t DistanceLength, const size_t SymbolSize) {
         // The dictionary is simply the current buffer, at the current buffer position -(WindowSize / 2) +(WindowSize / 2)
         // So, the first thing you write is the distance from the cursor to the previous string.
         // Then you write the length of the largest match you can find.
@@ -1208,7 +1208,21 @@ extern "C" {
             uint64_t WindowBits   = NumBits2ReadSymbols(WindowSize);
             uint64_t DistanceBits = NumBits2ReadSymbols(DistanceLength);
             
-            // Now, we just need to read the RawBuffer (which must contain ALL the data to be encoded) byte wise, and start looking for matches.
+            uint64_t CurrentSymbol = 0;
+            uint64_t PreviousSymbol = 0;
+            
+            while (GetBitBufferPosition(RawBuffer) != GetBitBufferSize(RawBuffer)) {
+                CurrentSymbol = ReadBits(RawBuffer, SymbolSize, true);
+                if (CurrentSymbol == PreviousSymbol) {
+                    // find the largest string of symbols that matches the current one
+                }
+            }
+            
+            
+            
+            /* ------------OLD SHIT----------------
+            
+            // Now, we just need to read the RawBuffer (which must contain ALL the data to be encoded) with ReadBits(SymbolSize)
             // then start writing LZ77Buffer with our discoveries.
             // So, loop over RawBuffer, if RawByte == 0, just code the longest string you can, or the first 3 bytes (if they're all different)
             for (uint64_t RawByte = 0; RawByte < RawBuffer->BitsUnavailable; RawByte++) {
@@ -1218,6 +1232,7 @@ extern "C" {
                     }
                 }
             }
+             */
         }
     }
     
