@@ -14,8 +14,6 @@
 #include <syslog.h>
 #include <unistd.h>
 #else
-//#include <windows.h>
-//#include <winbase.h>
 #include <winsock.h>
 #endif
 
