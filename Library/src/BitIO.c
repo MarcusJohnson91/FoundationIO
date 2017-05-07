@@ -14,8 +14,8 @@
 #include <syslog.h>
 #include <unistd.h>
 #else
-#include <windows.h>
-#include <winbase.h>
+//#include <windows.h>
+//#include <winbase.h>
 #include <winsock.h>
 #endif
 
@@ -24,7 +24,7 @@ extern "C" {
 #endif
     
 #ifdef _WIN32
-#define strcasecmp stricmp
+#define strcasecmp _stricmp
 #endif
     
     /*!
