@@ -112,6 +112,21 @@ extern "C" {
         CommandLineSwitch  *Switch; // 1D array of CommandLineSwitch's
     } CommandLineOptions;
     
+    typedef struct HuffmanNode {
+        int64_t        LeftHuffmanCode;
+        int64_t        RightHuffmanCode;
+        int64_t       *LeftNode;
+        int64_t       *RightNode;
+    } HuffmanNode;
+    
+    typedef struct HuffmanTree {
+        uint64_t       NumNodes;
+        HuffmanNode   *Node;
+        uint64_t      *SymbolFrequency;
+        bool           TableIsUsable;
+        const uint8_t *Table;
+    } HuffmanTree;
+    
     BitInput *InitBitInput(void) {
         BitInput *BitI        = (BitInput*)calloc(1, sizeof(BitInput));
         if (errno == ENOMEM) {
@@ -1188,6 +1203,156 @@ extern "C" {
     }
     
     /* Deflate (encode deflate) */
+    void ParseZLIBHeader(BitInput *BitI, DeflateBlock *Inflate) {
+        // stored in big endian byte order, bits are stored LSB first
+        uint8_t CompressionMethod  = ReadBits(BitI, 4, true); // 8 = DEFLATE
+        uint8_t CompressionInfo    = ReadBits(BitI, 4, true); // 7 = LZ77 window size 32k
+        uint8_t CheckCode          = ReadBits(BitI, 5, true); // 1, for the previous 2 fields, MUST be multiple of 31
+        bool    DictionaryPresent  = ReadBits(BitI, 1, true); //
+        uint8_t CompressionLevel   = ReadBits(BitI, 2, true); // 0
+        if (DictionaryPresent == true) {
+            uint32_t DictionaryID  = ReadBits(BitI, 32, true); // 0xEDC1
+        }
+        if (CompressionMethod == 8) {
+            ParseDeflateBlock(BitI, Inflate, BlockSize[CompressionInfo]);
+        } else {
+            Log(LOG_ERR, "BitIO", "ParseDeflate", "Invalid DEFLATE compression method %d\n", CompressionMethod);
+        }
+    }
+    
+    void DecodeHuffman(BitInput *BitI, size_t HuffmanSize) {
+        // 3 alphabets, literal, "alphabet of bytes", or <length 8, distance 15> the first 2 are combined, 0-255 = literal, 256 = End of Block, 257-285 = length
+        // FIXME: The Tilde ~ symbol is the negation symbol in C!!!!! XOR = ^
+        
+        uint8_t  DecodedData[32768] = {0};
+        bool     IsLastHuffmanBlock     = ReadBits(BitI, 1, true);
+        uint8_t  HuffmanCompressionType = ReadBits(BitI, 2, true); // 0 = none, 1 = fixed, 2 = dynamic, 3 = invalid.
+        uint32_t DataLength             = 0;
+        uint32_t OnesComplimentOfLength = 0; // Ones Compliment of DataLength
+        
+        if (OnesCompliment2TwosCompliment(OnesComplimentOfLength) != HuffmanSize) { // Make sure the numbers match up
+            Log(LOG_WARNING, "BitIO", "DecodeHuffman", "One's Compliment of Length: %d != Length %d", OnesComplimentOfLength, DataLength);
+        }
+        
+        if (IsLastHuffmanBlock == true) {
+            
+        }
+        
+        if (HuffmanCompressionType == 0) { // No compression.
+            AlignInput(BitI, 1); // Skip the rest of the current byte
+            DataLength             = ReadBits(BitI, 32, true);
+            OnesComplimentOfLength = ReadBits(BitI, 32, true);
+            if (OnesCompliment2TwosCompliment(OnesComplimentOfLength) != DataLength) {
+                // Exit because there's an issue.
+            }
+            for (uint32_t Byte = 0; Byte < DataLength; Byte++) {
+                DecodedData[Byte] = ReadBits(BitI, 8, true);
+            }
+        } else if (HuffmanCompressionType == 1) { // Static Huffman.
+            uint8_t  Length   = (ReadBits(BitI, 8, true) - 254);
+            uint16_t Distance = ReadBits(BitI, 5, true);
+            
+        } else if (HuffmanCompressionType == 2) { // Dynamic Huffman.
+            /*
+            Huff->Dynamic->Length     = ReadBits(BitI, 5) + 257;
+            Huff->Dynamic->Distance   = ReadBits(BitI, 5) + 1;
+            Huff->Dynamic->CodeLength = ReadBits(BitI, 4) + 4;
+            */
+        } else { // Invalid.
+                 // Reject the stream.
+        }
+        /*
+         if compressed with dynamic Huffman codes
+         read representation of code trees (see
+         subsection below)
+         loop (until end of block code recognized)
+         decode literal/length value from input stream
+         if value < 256
+         copy value (literal byte) to output stream
+         otherwise
+         if value = end of block (256)
+         break from loop
+         otherwise (value = 257..285)
+         decode distance from input stream
+         
+         move backwards distance bytes in the output
+         stream, and copy length bytes from this
+         position to the output stream.
+         end loop
+         while not last block
+         /
+         }
+         */
+    }
+    
+    uint64_t GetHuffmanCode(HuffmanTree *Tree, int64_t **SymbolsAndProbabilities, int64_t Symbol, size_t NumSymbols) {
+        uint64_t SymbolPlace = 0;
+        for (uint64_t Index = 0; Index < NumSymbols; Index++) {
+            // Find the probability of Symbol, then build the actual huffman code from where in the tree that symbol was assigned
+            
+            // No, then you'd have to do 2 lookups per symbol instead of just one.
+            // So, we should just take in a Symbol to find, and the tree to find it in
+            // But, to do that, we need to store the symbol with the probability, also we should think about building a table from this tree and hitting that first?
+            
+            // No, we should simply do a search through all the nodes, and when we find the symbol, create the Huffman code.
+            // Also, tree traversal for each fucking code will be slow should we just store the code alongside the symbol to speed up Decoding/Encoding?
+            
+            // Honestly, you have to build a table to embed in the PNG anyway, so I might as well store the table in the tree pointer.
+            // Now, I just need to write a function to build a tree from the data, and include a bool so it knows when to use the tree.
+            
+            
+            
+            
+            
+            // Search through the nodes by finding the probability of the submitted symbol, then go down the tree tracing that step.
+            // Lets say E is the symbol we're supposed to find, which is the fifth highest probability overall.
+            // We go to the root node, which has a 0. then the right since we're in position 1, not 5.
+            // the right branch of the root node has value 1, we go to the right node again since we're only as position 2.
+            // the code so far is 01, we're at the second right node, and we need to go right again. the code is now 011
+            // we're at position 4, so we need to go down 1 more node. the code is currently 0111
+            // since we're at position 5, we need to go left? the code is now 01110
+            // the Huffman code for the symbol E, is 0b01110, or 0xE (LOL HOLY SHIT WHA	T A COINCIDENCE!)
+        }
+        return 0;
+    }
+    
+    HuffmanTree *BuildHuffmanTree(HuffmanTree *Tree2Build, int64_t **SymbolsAndProbabilities, size_t NumSymbols) {
+        // Well start by taking the lowest probability pair (the bottom 2 regardless of value) symbols, and assigning them to nodes.
+        Tree2Build->NumNodes = NumSymbols / 2;
+        
+        for (uint64_t Symbol = NumSymbols; Symbol > 0; Symbol -= 2) { // What do we do if the number of symbols is uneven?
+            Tree2Build->Node[0].LeftNode  = SymbolsAndProbabilities[Symbol]; // FIXME: Not sure if "SymbolPair - 1" is gonna work?
+            Tree2Build->Node[0].RightNode = SymbolsAndProbabilities[Symbol + 1];
+        }
+        
+        return Tree2Build; // Is this seriously it?
+                           // Make sure to remove any codes that do not occur (frequency = 0)
+                           // When multiple values have the same frequency sort by intensity.
+    }
+    
+    void ParseDeflateBlock(BitInput *BitI, DeflateBlock *Inflate, uint16_t BlockSize) {
+        Inflate->IsLastBlock    = ReadBits(BitI, 1, true); // no
+        Inflate->EncodingMethod = ReadBits(BitI, 2, true); // 3
+        
+        switch (Inflate->EncodingMethod) {
+            case 0:
+                // Stored.
+                DecodeStoredHuffman(BitI, Inflate);
+                break;
+            case 1:
+                // Static Huffman + preagreed table
+                DecodeStaticHuffman(BitI, Inflate);
+                break;
+            case 2:
+                // Dynamic Huffman
+                DecodeDynamicHuffman(BitI, Inflate);
+                break;
+            default:
+                Log(LOG_EMERG, "BitIO", "ParseDeflateBlock", "Invalid Deflate encoding method: %d\n", Inflate->EncodingMethod);
+                break;
+        }
+    }
+    
     void EncodeLZ77(BitBuffer *RawBuffer, BitBuffer *LZ77Buffer, const size_t WindowSize, const size_t DistanceLength, const size_t SymbolSize) {
         // The dictionary is simply the current buffer, at the current buffer position -(WindowSize / 2) +(WindowSize / 2)
         // So, the first thing you write is the distance from the cursor to the previous string.
@@ -1232,6 +1397,14 @@ extern "C" {
             }
              */
         }
+    }
+    
+    void EncodeDeflate(BitBuffer *Data2Encode, BitBuffer *EncodedData) {
+        
+    }
+    
+    void DecodeDeflate(BitBuffer *Data2Decode, BitBuffer *DecodedData) {
+        
     }
     
     void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription, ...) {
