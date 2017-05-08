@@ -1203,30 +1203,30 @@ extern "C" {
     }
     
     /* Deflate (encode deflate) */
-    void ParseZLIBHeader(BitInput *BitI, DeflateBlock *Inflate) {
+    void ParseZLIBHeader(BitBuffer *DeflatedData) {
         // stored in big endian byte order, bits are stored LSB first
-        uint8_t CompressionMethod  = ReadBits(BitI, 4, true); // 8 = DEFLATE
-        uint8_t CompressionInfo    = ReadBits(BitI, 4, true); // 7 = LZ77 window size 32k
-        uint8_t CheckCode          = ReadBits(BitI, 5, true); // 1, for the previous 2 fields, MUST be multiple of 31
-        bool    DictionaryPresent  = ReadBits(BitI, 1, true); //
-        uint8_t CompressionLevel   = ReadBits(BitI, 2, true); // 0
+        uint8_t CompressionMethod  = ReadBits(DeflatedData, 4, true); // 8 = DEFLATE
+        uint8_t CompressionInfo    = ReadBits(DeflatedData, 4, true); // 7 = LZ77 window size 32k
+        uint8_t CheckCode          = ReadBits(DeflatedData, 5, true); // 1, for the previous 2 fields, MUST be multiple of 31
+        bool    DictionaryPresent  = ReadBits(DeflatedData, 1, true); //
+        uint8_t CompressionLevel   = ReadBits(DeflatedData, 2, true); // 0
         if (DictionaryPresent == true) {
-            uint32_t DictionaryID  = ReadBits(BitI, 32, true); // 0xEDC1
+            uint32_t DictionaryID  = ReadBits(DeflatedData, 32, true); // 0xEDC1
         }
         if (CompressionMethod == 8) {
-            ParseDeflateBlock(BitI, Inflate, BlockSize[CompressionInfo]);
+            //ParseDeflateBlock(DeflatedData, BlockSize[CompressionInfo]);
         } else {
-            Log(LOG_ERR, "BitIO", "ParseDeflate", "Invalid DEFLATE compression method %d\n", CompressionMethod);
+            Log(LOG_ERR, "BitIO", "ParseZLIBHeader", "Invalid DEFLATE compression method %d\n", CompressionMethod);
         }
     }
     
-    void DecodeHuffman(BitInput *BitI, size_t HuffmanSize) {
+    void DecodeHuffman(BitBuffer *BitB, size_t HuffmanSize) {
         // 3 alphabets, literal, "alphabet of bytes", or <length 8, distance 15> the first 2 are combined, 0-255 = literal, 256 = End of Block, 257-285 = length
         // FIXME: The Tilde ~ symbol is the negation symbol in C!!!!! XOR = ^
         
         uint8_t  DecodedData[32768] = {0};
-        bool     IsLastHuffmanBlock     = ReadBits(BitI, 1, true);
-        uint8_t  HuffmanCompressionType = ReadBits(BitI, 2, true); // 0 = none, 1 = fixed, 2 = dynamic, 3 = invalid.
+        bool     IsLastHuffmanBlock     = ReadBits(BitB, 1, true);
+        uint8_t  HuffmanCompressionType = ReadBits(BitB, 2, true); // 0 = none, 1 = fixed, 2 = dynamic, 3 = invalid.
         uint32_t DataLength             = 0;
         uint32_t OnesComplimentOfLength = 0; // Ones Compliment of DataLength
         
@@ -1239,18 +1239,18 @@ extern "C" {
         }
         
         if (HuffmanCompressionType == 0) { // No compression.
-            AlignInput(BitI, 1); // Skip the rest of the current byte
-            DataLength             = ReadBits(BitI, 32, true);
-            OnesComplimentOfLength = ReadBits(BitI, 32, true);
+            AlignInput(BitB, 1); // Skip the rest of the current byte
+            DataLength             = ReadBits(BitB, 32, true);
+            OnesComplimentOfLength = ReadBits(BitB, 32, true);
             if (OnesCompliment2TwosCompliment(OnesComplimentOfLength) != DataLength) {
                 // Exit because there's an issue.
             }
             for (uint32_t Byte = 0; Byte < DataLength; Byte++) {
-                DecodedData[Byte] = ReadBits(BitI, 8, true);
+                DecodedData[Byte] = ReadBits(BitB, 8, true);
             }
         } else if (HuffmanCompressionType == 1) { // Static Huffman.
-            uint8_t  Length   = (ReadBits(BitI, 8, true) - 254);
-            uint16_t Distance = ReadBits(BitI, 5, true);
+            uint8_t  Length   = ReadBits(BitB, 8, true) - 254;
+            uint16_t Distance = ReadBits(BitB, 5, true);
             
         } else if (HuffmanCompressionType == 2) { // Dynamic Huffman.
             /*
@@ -1329,10 +1329,10 @@ extern "C" {
                            // Make sure to remove any codes that do not occur (frequency = 0)
                            // When multiple values have the same frequency sort by intensity.
     }
-    
-    void ParseDeflateBlock(BitInput *BitI, DeflateBlock *Inflate, uint16_t BlockSize) {
-        Inflate->IsLastBlock    = ReadBits(BitI, 1, true); // no
-        Inflate->EncodingMethod = ReadBits(BitI, 2, true); // 3
+    /*
+    void ParseDeflateBlock(BitBuffer *BitB, DeflateBlock *Inflate, uint16_t BlockSize) {
+        Inflate->IsLastBlock    = ReadBits(BitB, 1, true); // no
+        Inflate->EncodingMethod = ReadBits(BitB, 2, true); // 3
         
         switch (Inflate->EncodingMethod) {
             case 0:
@@ -1352,6 +1352,7 @@ extern "C" {
                 break;
         }
     }
+     */
     
     void EncodeLZ77(BitBuffer *RawBuffer, BitBuffer *LZ77Buffer, const size_t WindowSize, const size_t DistanceLength, const size_t SymbolSize) {
         // The dictionary is simply the current buffer, at the current buffer position -(WindowSize / 2) +(WindowSize / 2)
