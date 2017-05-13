@@ -1237,7 +1237,7 @@ extern "C" {
         }
         
         if (HuffmanCompressionType == 0) { // No compression.
-            AlignInput(BitB, 1); // Skip the rest of the current byte
+			AlignBitBuffer(BitB, 1); // Skip the rest of the current byte
             DataLength             = ReadBits(BitB, 32, true);
             OnesComplimentOfLength = ReadBits(BitB, 32, true);
             if (OnesCompliment2TwosCompliment(OnesComplimentOfLength) != DataLength) {
