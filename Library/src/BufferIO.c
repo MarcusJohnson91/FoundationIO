@@ -444,6 +444,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineOptions is NULL\n");
         } else {
             if ((CMD->NumSwitches < CMD->MinSwitches && CMD->MinSwitches > 0) || argc == 1) {
+                DisplayProgramBanner(CMD);
                 DisplayCMDHelp(CMD);
             } else {
                 DisplayProgramBanner(CMD);
