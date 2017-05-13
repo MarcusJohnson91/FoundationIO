@@ -413,12 +413,15 @@ extern "C" {
         } else {
             printf("Options:\n");
             for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches; SwitchNum++) {
-                printf("%s\t", CMD->Switch[SwitchNum].Flag);
+                printf("(-|--|/) %s: ", CMD->Switch[SwitchNum].Flag);
+                printf("%s\n", CMD->Switch[SwitchNum].SwitchDescription);
+                /*
+                (-|--|/) Input: Input file or stdin with: -
+                 */
                 // Options:
                 // -Input, --Input, or /Input:
                 // (-|--|/) Input: Input file or stdin with '-'
-                // Ok, so we should show all the prefixes, then the long option, then in parentheses the short option is there is one, but how do we represent short options?
-                printf("%s\n", CMD->Switch[SwitchNum].SwitchDescription);
+                // Ok, so we should show all the prefixes, then the long option, then in parentheses the short option if there is one, but how do we represent short options?
             }
         }
     }
