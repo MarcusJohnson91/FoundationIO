@@ -413,8 +413,7 @@ extern "C" {
         } else {
             printf("Options:\n");
             for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches; SwitchNum++) {
-                printf("(-|--|/) %s: ", CMD->Switch[SwitchNum].Flag);
-                printf("%s\n", CMD->Switch[SwitchNum].SwitchDescription);
+                printf("(-|--|/) %s: %s\n", CMD->Switch[SwitchNum].Flag, CMD->Switch[SwitchNum].SwitchDescription);
                 /*
                 (-|--|/) Input: Input file or stdin with: -
                  */
