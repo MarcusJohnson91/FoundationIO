@@ -1,5 +1,3 @@
-#include "../include/BitIO.h"
-
 #include <errno.h>
 #include <math.h>
 #include <stdarg.h>
@@ -14,6 +12,8 @@
 #else
 #include <winsock.h>
 #endif
+
+#include "../include/BitIO.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -1252,10 +1252,10 @@ extern "C" {
             
         } else if (HuffmanCompressionType == 2) { // Dynamic Huffman.
             /*
-            Huff->Dynamic->Length     = ReadBits(BitI, 5) + 257;
-            Huff->Dynamic->Distance   = ReadBits(BitI, 5) + 1;
-            Huff->Dynamic->CodeLength = ReadBits(BitI, 4) + 4;
-            */
+             Huff->Dynamic->Length     = ReadBits(BitI, 5) + 257;
+             Huff->Dynamic->Distance   = ReadBits(BitI, 5) + 1;
+             Huff->Dynamic->CodeLength = ReadBits(BitI, 4) + 4;
+             */
         } else { // Invalid.
                  // Reject the stream.
         }
@@ -1328,28 +1328,28 @@ extern "C" {
                            // When multiple values have the same frequency sort by intensity.
     }
     /*
-    void ParseDeflateBlock(BitBuffer *BitB, DeflateBlock *Inflate, uint16_t BlockSize) {
-        Inflate->IsLastBlock    = ReadBits(BitB, 1, true); // no
-        Inflate->EncodingMethod = ReadBits(BitB, 2, true); // 3
-        
-        switch (Inflate->EncodingMethod) {
-            case 0:
-                // Stored.
-                DecodeStoredHuffman(BitI, Inflate);
-                break;
-            case 1:
-                // Static Huffman + preagreed table
-                DecodeStaticHuffman(BitI, Inflate);
-                break;
-            case 2:
-                // Dynamic Huffman
-                DecodeDynamicHuffman(BitI, Inflate);
-                break;
-            default:
-                Log(LOG_EMERG, "BitIO", "ParseDeflateBlock", "Invalid Deflate encoding method: %d\n", Inflate->EncodingMethod);
-                break;
-        }
-    }
+     void ParseDeflateBlock(BitBuffer *BitB, DeflateBlock *Inflate, uint16_t BlockSize) {
+     Inflate->IsLastBlock    = ReadBits(BitB, 1, true); // no
+     Inflate->EncodingMethod = ReadBits(BitB, 2, true); // 3
+     
+     switch (Inflate->EncodingMethod) {
+     case 0:
+     // Stored.
+     DecodeStoredHuffman(BitI, Inflate);
+     break;
+     case 1:
+     // Static Huffman + preagreed table
+     DecodeStaticHuffman(BitI, Inflate);
+     break;
+     case 2:
+     // Dynamic Huffman
+     DecodeDynamicHuffman(BitI, Inflate);
+     break;
+     default:
+     Log(LOG_EMERG, "BitIO", "ParseDeflateBlock", "Invalid Deflate encoding method: %d\n", Inflate->EncodingMethod);
+     break;
+     }
+     }
      */
     
     void EncodeLZ77(BitBuffer *RawBuffer, BitBuffer *LZ77Buffer, const size_t WindowSize, const size_t DistanceLength, const size_t SymbolSize) {
@@ -1383,17 +1383,17 @@ extern "C" {
             
             
             /* ------------OLD SHIT----------------
-            
-            // Now, we just need to read the RawBuffer (which must contain ALL the data to be encoded) with ReadBits(SymbolSize)
-            // then start writing LZ77Buffer with our discoveries.
-            // So, loop over RawBuffer, if RawByte == 0, just code the longest string you can, or the first 3 bytes (if they're all different)
-            for (uint64_t RawByte = 0; RawByte < RawBuffer->BitsUnavailable; RawByte++) {
-                if (RawByte == 0) {
-                    if (RawBuffer->Buffer[RawByte] == RawBuffer->Buffer[RawByte + 1] || RawBuffer->Buffer[RawByte + 1] == RawBuffer->Buffer[RawByte + 2]) {
-                        
-                    }
-                }
-            }
+             
+             // Now, we just need to read the RawBuffer (which must contain ALL the data to be encoded) with ReadBits(SymbolSize)
+             // then start writing LZ77Buffer with our discoveries.
+             // So, loop over RawBuffer, if RawByte == 0, just code the longest string you can, or the first 3 bytes (if they're all different)
+             for (uint64_t RawByte = 0; RawByte < RawBuffer->BitsUnavailable; RawByte++) {
+             if (RawByte == 0) {
+             if (RawBuffer->Buffer[RawByte] == RawBuffer->Buffer[RawByte + 1] || RawBuffer->Buffer[RawByte + 1] == RawBuffer->Buffer[RawByte + 2]) {
+             
+             }
+             }
+             }
              */
         }
     }
@@ -1416,8 +1416,8 @@ extern "C" {
             vprintf(VariadicArguments, Argument);
         }
         va_end(Argument);
-		char *ErrorString = (char*)NULL;
-		snprintf(ErrorString, BitIOStringSize, "%s - %s: %s - %s\n", LibraryOrProgram, Function, ErrorDescription, VariadicArguments);
+        char *ErrorString = (char*)NULL;
+        snprintf(ErrorString, BitIOStringSize, "%s - %s: %s - %s\n", LibraryOrProgram, Function, ErrorDescription, VariadicArguments);
         
 #ifndef _WIN32
         if ((ErrorLevel == LOG_EMERG) || (ErrorLevel == LOG_CRIT)) {
@@ -1427,8 +1427,8 @@ extern "C" {
         }
         syslog(LOG_ERR, "%s\n", ErrorString);
 #else
-		char *WinLibraryOrProgram;
-		snprintf(WinLibraryOrProgram, strlen(LibraryOrProgram), "L%s", LibraryOrProgram);
+        char *WinLibraryOrProgram;
+        snprintf(WinLibraryOrProgram, strlen(LibraryOrProgram), "L%s", LibraryOrProgram);
         HANDLE EventLog = RegisterEventSourceA(NULL, (LPCSTR)WinLibraryOrProgram);
         uint32_t ErrorCode  = ReportEvent(EventLog, ErrorLevel, 1, 0xF000FFFF, NULL, 1, (DWORD)strlen(ErrorString), (LPCWSTR*)ErrorString, NULL);
         if (ErrorCode != 0) {
