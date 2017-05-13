@@ -411,9 +411,9 @@ extern "C" {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "DisplayCMDHelp", "Pointer to CommandLineOptions is NULL\n");
         } else {
-            printf("Options:\n");
+            printf("Options: (-|--|/)\n");
             for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches; SwitchNum++) {
-                printf("(-|--|/) %s: %s\n", CMD->Switch[SwitchNum].Flag, CMD->Switch[SwitchNum].SwitchDescription);
+                printf("%s: %s\n", CMD->Switch[SwitchNum].Flag, CMD->Switch[SwitchNum].SwitchDescription);
                 /*
                 (-|--|/) Input: Input file or stdin with: -
                  */
