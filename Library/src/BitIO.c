@@ -1,13 +1,11 @@
 #include "../include/BitIO.h"
 
+#include <errno.h>
 #include <math.h>
 #include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 
 #ifndef _WIN32
 #include <sys/socket.h>
