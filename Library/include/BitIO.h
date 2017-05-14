@@ -511,20 +511,6 @@ extern "C" {
     void                AlignBitBuffer(BitBuffer *BitB, const uint8_t BytesOfAlignment);
     
     /*!
-     @abstract                              "Gets the size of the buffer in an instance of BitInput".
-     @return                                "Returns the size of BitInput->Buffer"
-     @param             BitI                "Pointer to the instance of BitInput".
-     */
-    size_t              GetBitInputBufferSize(BitInput *BitI);
-    
-    /*!
-     @abstract                              "Gets the size of the buffer in an instance of BitOutput".
-     @return                                "Returns the size of BitOutput->Buffer"
-     @param             BitO                "Pointer to the instance of BitOutput".
-     */
-    size_t              GetBitOutputBufferSize(BitOutput *BitO);
-    
-    /*!
      @abstract                              "Generates CRC from data".
      @param             Data2CRC            "Pointer to a data buffer containing data to run the CRC algorithm over".
      @param             DataSize            "Size of the data chunk to generate the CRC for, in bytes".
