@@ -126,52 +126,60 @@ extern "C" {
     } HuffmanTree;
     
     BitInput *InitBitInput(void) {
+        errno = 0;
         BitInput *BitI        = (BitInput*)calloc(1, sizeof(BitInput));
-        if (errno == ENOMEM) {
-            Log(LOG_ERR, "libBitIO", "InitBitInput", "Not enough memory to initalize BitInput\n");
+        if (errno != 0) {
+            Log(LOG_ERR, "libBitIO", "InitBitInput", "Errno error: %s\n", strerror(errno));
         }
         return BitI;
     }
     
     BitOutput *InitBitOutput(void) {
+        errno = 0;
         BitOutput *BitO       = (BitOutput*)calloc(1, sizeof(BitOutput));
-        if (errno == ENOMEM) {
-            Log(LOG_ERR, "libBitIO", "InitBitOutput", "Not enough memory to initalize BitOutput\n");
+        if (errno != 0) {
+            Log(LOG_ERR, "libBitIO", "InitBitOutput", "Errno error: %s\n", strerror(errno));
         }
         return BitO;
     }
     
     BitBuffer *InitBitBuffer(void) {
+        errno = 0;
         BitBuffer *BitB       = (BitBuffer*)calloc(1, sizeof(BitBuffer));
-        if (errno == ENOMEM) {
-            Log(LOG_ERR, "libBitIO", "InitBitBuffer", "Not enough memory to initalize BitBuffer\n");
+        if (errno != 0) {
+            Log(LOG_ERR, "libBitIO", "InitBitBuffer", "Errno error: %s\n", strerror(errno));
         }
         return BitB;
     }
     
     void CreateEmptyBuffer(BitBuffer *BitB, const size_t EmptyBufferSize) {
+        errno = 0;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "CreateEmptyBuffer", "Pointer to BitBuffer is NULL\n");
         } else if (EmptyBufferSize <= 0) {
             Log(LOG_ERR, "libBitIO", "CreateEmptyBuffer", "You tried creating a empty buffer of size: %d, which is invalid\n", EmptyBufferSize);
         } else {
             BitB->Buffer = (uint8_t*)calloc(1, EmptyBufferSize);
-            if (errno == ENOMEM) {
-                Log(LOG_ERR, "libBitIO", "CreateEmptyBuffer", "Not enough memory to create empty buffer: %d\n", EmptyBufferSize);
+            if (errno != 0) {
+                Log(LOG_ERR, "libBitIO", "CreateEmptyBuffer", "Errno error: %s\n", strerror(errno));
             }
         }
     }
     
     CommandLineOptions *InitCommandLineOptions(const size_t NumSwitches) {
+        errno = 0;
         CommandLineOptions *CMD = (CommandLineOptions*)calloc(1, sizeof(CommandLineOptions));
-        if (errno == ENOMEM) {
-            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Not enough memory to initalize CommandLineOptions\n");
+        if (errno != 0) {
+            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing CommandLineOptions error: %s\n", strerror(errno));
         }
-        
+        errno = 0;
         CMD->NumSwitches        = NumSwitches;
         
         size_t CLSSize          = sizeof(CommandLineSwitch); // 40 bytes
         CMD->Switch             = (CommandLineSwitch*)calloc(NumSwitches, CLSSize);
+        if (errno != 0) {
+            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing CommandLineSwitch error: %s\n", strerror(errno));
+        }
         
         return CMD;
     }
@@ -451,6 +459,8 @@ extern "C" {
             } else {
                 DisplayProgramBanner(CMD);
                 
+                errno = 0;
+                
                 for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches; SwitchNum++) {
                     for (uint8_t Argument = 1; Argument < argc - 1; Argument++) { // the executable path is skipped over
                                                                                   // Once the switch is found, we should skip over this argument.
@@ -460,14 +470,29 @@ extern "C" {
                         size_t SlashSize                            = CMD->Switch[SwitchNum].FlagSize + 1;
                         
                         char *SingleDash                            = (char*)calloc(1, SingleDashSize);
-                        snprintf(SingleDash, SingleDashSize, "-%s", CMD->Switch[SwitchNum].Flag);
+                        if (errno != 0) {
+                            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno SingleDash = %s, Arg = %d, Switch = %d, errno = %s", strerror(errno), Argument, SwitchNum);
+                            errno = 0;
+                        } else {
+                            snprintf(SingleDash, SingleDashSize, "-%s", CMD->Switch[SwitchNum].Flag);
+                        }
                         
                         char *DoubleDash                            = (char*)calloc(1, DoubleDashSize);
-                        snprintf(DoubleDash, DoubleDashSize, "--%s", CMD->Switch[SwitchNum].Flag);
+                        if (errno != 0) {
+                            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno DoubleDash = %s, Arg = %d, Switch = %d", strerror(errno), Argument, SwitchNum);
+                            errno = 0;
+                        } else {
+                            snprintf(DoubleDash, DoubleDashSize, "--%s", CMD->Switch[SwitchNum].Flag);
+                        }
                         
                         char *Slash                                 = (char*)calloc(1, SlashSize);
-                        snprintf(Slash, SlashSize, "/%s", CMD->Switch[SwitchNum].Flag);
-                        
+                        if (errno != 0) {
+                            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno Slash = %s, Arg = %d, Switch = %d", strerror(errno), Argument, SwitchNum);
+                            errno = 0; // Here to reset to catch errors with the strcmp stuff below
+                        } else {
+                            snprintf(Slash, SlashSize, "/%s", CMD->Switch[SwitchNum].Flag);
+                        }
+                    
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                             
                             size_t ArgumentSize = strlen(argv[Argument + 1]) + 1;
@@ -475,8 +500,12 @@ extern "C" {
                             CMD->Switch[SwitchNum].SwitchFound      = true;
                             if (CMD->Switch[SwitchNum].Resultless == false) {
                                 char *SwitchResult                  = (char*)calloc(1, ArgumentSize);
-                                snprintf(SwitchResult, ArgumentSize, "%s", argv[Argument + 1]);
-                                CMD->Switch[SwitchNum].SwitchResult = SwitchResult;
+                                if (errno != 0) {
+                                    Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno SwitchResult = %s, Arg = %d, Switch = %d", strerror(errno), Argument, SwitchNum);
+                                } else {
+                                    snprintf(SwitchResult, ArgumentSize, "%s", argv[Argument + 1]);
+                                    CMD->Switch[SwitchNum].SwitchResult = SwitchResult;
+                                }
                             }
                             SwitchNum += 1; // To break out of looking for this switch
                             Argument  += 1;
@@ -508,17 +537,22 @@ extern "C" {
         } else if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Pointer to BitInput is NULL\n");
         } else {
+            errno = 0;
             size_t PathSize = strlen(CMD->Switch[SwitchNum].SwitchResult) + 1;
             
             char *InputFile = (char*)calloc(1, PathSize);
-            snprintf(InputFile, PathSize, "%s", CMD->Switch[SwitchNum].SwitchResult);
-            
-            BitI->File                  = fopen(InputFile, "rb");
-            fseek(BitI->File, 0, SEEK_END);
-            BitI->FileSize              = (uint64_t)ftell(BitI->File);
-            fseek(BitI->File, 0, SEEK_SET);
-            BitI->FilePosition          = ftell(BitI->File);
-            BitI->SystemEndian          = DetectSystemEndian();
+            if (errno != 0) {
+                Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Error: %s", strerror(errno));
+            } else {
+                snprintf(InputFile, PathSize, "%s", CMD->Switch[SwitchNum].SwitchResult);
+                
+                BitI->File                  = fopen(InputFile, "rb");
+                fseek(BitI->File, 0, SEEK_END);
+                BitI->FileSize              = (uint64_t)ftell(BitI->File);
+                fseek(BitI->File, 0, SEEK_SET);
+                BitI->FilePosition          = ftell(BitI->File);
+                BitI->SystemEndian          = DetectSystemEndian();
+            }
         }
     }
     
@@ -532,13 +566,18 @@ extern "C" {
         } else if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Pointer to BitOutput is NULL\n");
         } else {
+            errno = 0;
             size_t PathSize = strlen(CMD->Switch[SwitchNum].SwitchResult) + 1;
-            
             char *OutputFile = (char*)calloc(1, PathSize);
-            snprintf(OutputFile, PathSize, "%s", CMD->Switch[SwitchNum].SwitchResult);
             
-            BitO->File                  = fopen(OutputFile, "wb");
-            BitO->SystemEndian          = DetectSystemEndian();
+            if (errno != 0) {
+                Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Error: %s", strerror(errno));
+            } else {
+                snprintf(OutputFile, PathSize, "%s", CMD->Switch[SwitchNum].SwitchResult);
+                
+                BitO->File                  = fopen(OutputFile, "wb");
+                BitO->SystemEndian          = DetectSystemEndian();
+            }
         }
     }
     
@@ -924,6 +963,26 @@ extern "C" {
         return 0;
     }
     
+    /*
+     
+     So, the CRC generator need to stream input, which means it needs to be aligned to the CRC size, so 16 bit alignment for CRC16, 32 for CRC32, etc.
+     
+     The real probelem is in the CRC function being called multiple times, or it handling it's own input and output itself...
+     
+     Out of those 2 choices, it being called multiple times is a simplier option.
+     
+     So, if that's the case, we should have a Previous CRC argument, and a bool saying if this has been repeated before?
+     
+     */
+    
+    void GenerateCRCFromStream(BitBuffer *Buffer2CRC, uint64_t Poly, uint8_t PolySize, uint64_t PolyInit, uint64_t PreviousCRC) {
+        if (PreviousCRC == 0) { // assume that this is the first chunk of the stream
+            
+        } else {
+            
+        }
+    }
+    
     bool VerifyCRC(const uint8_t *Data2CRC, const size_t Data2CRCSize, const uint64_t RecipricalPoly, const uint8_t PolySize, const uint64_t PolyInit, const uint64_t PrecomputedCRC) {
         return false;
     }
@@ -950,17 +1009,26 @@ extern "C" {
     }
     
     static uint8_t *ConvertBinaryUUID2UUIDString(const uint8_t *BinaryUUID) {
-        uint8_t *UUIDString = (uint8_t*)calloc(1, BitIOUUIDStringSize);
-        if (sizeof(BinaryUUID) != BitIOBinaryUUIDSize) {
+        uint8_t *UUIDString = NULL;
+        
+        if (BinaryUUID == NULL) {
+            Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "Pointer to BinaryUUID is NULL\n");
+        } else if (sizeof(BinaryUUID) != BitIOBinaryUUIDSize) {
             Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, sizeof(BinaryUUID));
         } else {
-            for (uint8_t Byte = 0; Byte < BitIOBinaryUUIDSize; Byte++) {
-                if (Byte == 4 || Byte == 7 || Byte == 10 || Byte == 13) {
-                    UUIDString[Byte] = 0x2D;
-                } else if (Byte == 20) {
-                    UUIDString[Byte] = 0x0;
-                } else {
-                    UUIDString[Byte] = BinaryUUID[Byte];
+            errno = 0;
+            UUIDString = (uint8_t*)calloc(1, BitIOUUIDStringSize);
+            if (errno != 0) {
+                Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "Errno: %s", strerror(errno));
+            } else {
+                for (uint8_t Byte = 0; Byte < BitIOBinaryUUIDSize; Byte++) {
+                    if (Byte == 4 || Byte == 7 || Byte == 10 || Byte == 13) {
+                        UUIDString[Byte] = 0x2D;
+                    } else if (Byte == 20) {
+                        UUIDString[Byte] = 0x0;
+                    } else {
+                        UUIDString[Byte] = BinaryUUID[Byte];
+                    }
                 }
             }
         }
@@ -968,13 +1036,22 @@ extern "C" {
     }
     
     static uint8_t *ConvertUUIDString2BinaryUUID(const uint8_t *UUIDString) {
-        uint8_t *BinaryUUID = (uint8_t*)calloc(1, BitIOBinaryUUIDSize);
-        if (sizeof(UUIDString) != BitIOUUIDStringSize) {
+        uint8_t *BinaryUUID = NULL;
+        
+        if (UUIDString == NULL) {
+            Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "Pointer to UUIDString is NULL\n");
+        } else if (sizeof(UUIDString) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, sizeof(UUIDString));
         } else {
-            for (uint8_t Byte = 0; Byte < BitIOUUIDStringSize; Byte++) {
-                if (Byte != 4 && Byte != 7 && Byte != 10 && Byte != 13 && Byte != 20) {
-                    BinaryUUID[Byte] = UUIDString[Byte];
+            errno = 0;
+            BinaryUUID = (uint8_t*)calloc(1, BitIOBinaryUUIDSize);
+            if (errno != 0) {
+                Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "Errno: %s", strerror(errno));
+            } else {
+                for (uint8_t Byte = 0; Byte < BitIOUUIDStringSize; Byte++) {
+                    if (Byte != 4 && Byte != 7 && Byte != 10 && Byte != 13 && Byte != 20) {
+                        BinaryUUID[Byte] = UUIDString[Byte];
+                    }
                 }
             }
         }
@@ -982,23 +1059,31 @@ extern "C" {
     }
     
     static uint8_t *SwapBinaryUUID(const uint8_t *BinaryUUID) { // Should I make wrappers called ConvertUUID2GUID and SwapGUID2UUID?
-        uint8_t *SwappedBinaryUUID = (uint8_t*)calloc(1, BitIOBinaryUUIDSize);
+        uint8_t *SwappedBinaryUUID = NULL;
         
-        if (sizeof(BinaryUUID) != BitIOBinaryUUIDSize) {
+        if (BinaryUUID == NULL) {
+            Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "Pointer to BinaryUUID is NULL\n");
+        } else if (sizeof(BinaryUUID) != BitIOBinaryUUIDSize) {
             Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, sizeof(BinaryUUID));
         } else {
-            SwappedBinaryUUID[0]        = BinaryUUID[3];
-            SwappedBinaryUUID[1]        = BinaryUUID[2];
-            SwappedBinaryUUID[2]        = BinaryUUID[1];
-            SwappedBinaryUUID[3]        = BinaryUUID[0];
-            SwappedBinaryUUID[4]        = BinaryUUID[5];
-            SwappedBinaryUUID[5]        = BinaryUUID[4];
-            SwappedBinaryUUID[6]        = BinaryUUID[7];
-            SwappedBinaryUUID[7]        = BinaryUUID[6];
-            SwappedBinaryUUID[8]        = BinaryUUID[9];
-            SwappedBinaryUUID[9]        = BinaryUUID[8];
-            for (uint8_t Byte = 10; Byte < 16; Byte++) {
-                SwappedBinaryUUID[Byte] = BinaryUUID[Byte];
+            errno = 0;
+            SwappedBinaryUUID = (uint8_t*)calloc(1, BitIOBinaryUUIDSize);
+            if (errno != 0) {
+                Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "Errno: %s", strerror(errno));
+            } else {
+                SwappedBinaryUUID[0]        = BinaryUUID[3];
+                SwappedBinaryUUID[1]        = BinaryUUID[2];
+                SwappedBinaryUUID[2]        = BinaryUUID[1];
+                SwappedBinaryUUID[3]        = BinaryUUID[0];
+                SwappedBinaryUUID[4]        = BinaryUUID[5];
+                SwappedBinaryUUID[5]        = BinaryUUID[4];
+                SwappedBinaryUUID[6]        = BinaryUUID[7];
+                SwappedBinaryUUID[7]        = BinaryUUID[6];
+                SwappedBinaryUUID[8]        = BinaryUUID[9];
+                SwappedBinaryUUID[9]        = BinaryUUID[8];
+                for (uint8_t Byte = 10; Byte < 16; Byte++) {
+                    SwappedBinaryUUID[Byte] = BinaryUUID[Byte];
+                }
             }
         }
         return SwappedBinaryUUID;
@@ -1009,44 +1094,62 @@ extern "C" {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadUUID", "Pointer to BitBuffer is NULL\n");
         } else {
-            uint8_t BinaryUUID[BitIOBinaryUUIDSize];
-            for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
-                BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
+            errno = 0;
+            uint8_t *BinaryUUID = (uint8_t*)calloc(1, BitIOBinaryUUIDSize);
+            if (errno != 0) {
+                Log(LOG_ERR, "libBitIO", "ReadUUID", "Errno: %s", strerror(errno));
+            } else {
+                for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
+                    BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
+                }
+                UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
             }
-            UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
         }
         return UUIDString;
     }
     
     uint8_t *ConvertUUID2GUID(const uint8_t *UUIDString) {
-        uint8_t *BinaryUUID;
-        uint8_t *BinaryGUID;
-        uint8_t *GUIDString = (uint8_t*)calloc(1, BitIOGUIDStringSize);
+        uint8_t *BinaryUUID = NULL;
+        uint8_t *BinaryGUID = NULL;
+        uint8_t *GUIDString = NULL;
         
-        if (sizeof(UUIDString) != BitIOUUIDStringSize) {
+        if (UUIDString == NULL) {
+            Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "Pointer to UUIDString is NULL");
+        } else if (sizeof(UUIDString) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, sizeof(UUIDString));
         } else {
-            // Why not allocate our own GUIDString, reduce the number of parameters, and not have to worry about non-const objects?
-            
-            BinaryUUID = ConvertUUIDString2BinaryUUID(UUIDString);
-            BinaryGUID = SwapBinaryUUID(BinaryUUID);
-            GUIDString = ConvertBinaryUUID2UUIDString(BinaryGUID);
+            errno = 0;
+            GUIDString = (uint8_t*)calloc(1, BitIOGUIDStringSize);
+            if (errno != 0) {
+                Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "Errno: %s", strerror(errno));
+            } else {
+                BinaryUUID = ConvertUUIDString2BinaryUUID(UUIDString);
+                BinaryGUID = SwapBinaryUUID(BinaryUUID);
+                GUIDString = ConvertBinaryUUID2UUIDString(BinaryGUID);
+            }
         }
         return GUIDString;
     }
     
     uint8_t *ConvertGUID2UUID(const uint8_t *GUIDString) {
-        uint8_t *BinaryGUID;
-        uint8_t *BinaryUUID;
+        uint8_t *BinaryGUID = NULL;
+        uint8_t *BinaryUUID = NULL;
         uint8_t *UUIDString = NULL;
         
-        
-        if (sizeof(GUIDString) != BitIOGUIDStringSize) {
+        if (GUIDString == NULL) {
+            Log(LOG_ERR, "libBitIO", "ConvertGUID2UUID", "Pointer to GUIDString is NULL");
+        } else if (sizeof(GUIDString) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "ConvertGUID2UUID", "GUIDString size should be: %d, but is: %d\n", BitIOGUIDStringSize, sizeof(GUIDString));
         } else {
-            BinaryGUID = ConvertUUIDString2BinaryUUID(GUIDString);
-            BinaryUUID = SwapBinaryUUID(BinaryGUID);
-            UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
+            errno = 0;
+            UUIDString = (uint8_t*)calloc(1, BitIOUUIDStringSize);
+            if (errno != 0) {
+                Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "Errno: %s", strerror(errno));
+            } else {
+                BinaryGUID = ConvertUUIDString2BinaryUUID(GUIDString);
+                BinaryUUID = SwapBinaryUUID(BinaryGUID);
+                UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
+            }
         }
         return UUIDString;
     }
@@ -1054,7 +1157,11 @@ extern "C" {
     bool CompareUUIDs(const uint8_t *UUIDString1, const uint8_t *UUIDString2) {
         bool UUIDsMatch = 0;
         
-        if (sizeof(UUIDString1) != BitIOUUIDStringSize || sizeof(UUIDString2) != BitIOUUIDStringSize) {
+        if (UUIDString1 == NULL) {
+            Log(LOG_ERR, "libBitIO", "CompareUUIDs", "Pointer to UUIDString1 is NULL");
+        } else if (UUIDString2 == NULL) {
+            Log(LOG_ERR, "libBitIO", "CompareUUIDs", "Pointer to UUIDString2 is NULL");
+        } else if (sizeof(UUIDString1) != BitIOUUIDStringSize || sizeof(UUIDString2) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "CompareUUIDs", "UUIDString1 is %d bytes long, UUIDString2 is %d bytes long, should be 21\n", sizeof(UUIDString1), sizeof(UUIDString2));
         } else {
             for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDStringSize - 1; UUIDByte++) {
@@ -1070,12 +1177,14 @@ extern "C" {
     
     void WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString) {
         if (BitB == NULL) {
-            Log(LOG_ERR, "BitIO", "WriteUUID", "Pointer to instance of BitBuffer is NULL\n");
+            Log(LOG_ERR, "libBitIO", "WriteUUID", "Pointer to instance of BitBuffer is NULL\n");
+        } else if (UUIDString == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteUUID", "Pointer to UUIDString is NULL");
         } else if (sizeof(UUIDString) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "WriteUUID", "UUIDString is %d bytes long, should be 21\n", sizeof(UUIDString));
         } else {
             // Convert UUIDString to BinaryUUID, then write that.
-            uint8_t *BinaryUUID;
+            uint8_t *BinaryUUID = NULL;
             BinaryUUID = ConvertUUIDString2BinaryUUID(UUIDString);
             for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
                 WriteBits(BitB, BinaryUUID[UUIDByte], 8, true);
@@ -1115,13 +1224,18 @@ extern "C" {
             if (BitB->Buffer != NULL) {
                 free(BitB->Buffer);
             }
-            BitB->Buffer              = (uint8_t*)calloc(1, Bytes2Read);
-            BytesRead                 = fread(BitB->Buffer, 1, Bytes2Read, BitI->File);
-            if (BytesRead            != Bytes2Read) {
-                Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "Fread read: %d bytes, but you requested: %d\n", BytesRead, Bytes2Read);
+            errno = 0;
+            BitB->Buffer                  = (uint8_t*)calloc(1, Bytes2Read);
+            if (errno != 0) {
+                Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "Errno: %s", strerror(errno));
             } else {
-                BitB->BitsAvailable   = Bytes2Bits(BytesRead);
-                BitB->BitsUnavailable = 0;
+                BytesRead                 = fread(BitB->Buffer, 1, Bytes2Read, BitI->File);
+                if (BytesRead            != Bytes2Read) {
+                    Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "Fread read: %d bytes, but you requested: %d\n", BytesRead, Bytes2Read);
+                } else {
+                    BitB->BitsAvailable   = Bytes2Bits(BytesRead);
+                    BitB->BitsUnavailable = 0;
+                }
             }
         }
     }
@@ -1217,7 +1331,7 @@ extern "C" {
         if (CompressionMethod == 8) {
             //ParseDeflateBlock(DeflatedData, BlockSize[CompressionInfo]);
         } else {
-            Log(LOG_ERR, "BitIO", "ParseDeflateHeader", "Invalid DEFLATE compression method %d\n", CompressionMethod);
+            Log(LOG_ERR, "libBitIO", "ParseDeflateHeader", "Invalid DEFLATE compression method %d\n", CompressionMethod);
         }
     }
     
@@ -1232,7 +1346,7 @@ extern "C" {
         uint32_t OnesComplimentOfLength = 0; // Ones Compliment of DataLength
         
         if (OnesCompliment2TwosCompliment(OnesComplimentOfLength) != HuffmanSize) { // Make sure the numbers match up
-            Log(LOG_WARNING, "BitIO", "DecodeHuffman", "One's Compliment of Length: %d != Length %d", OnesComplimentOfLength, DataLength);
+            Log(LOG_WARNING, "libBitIO", "DecodeHuffman", "One's Compliment of Length: %d != Length %d", OnesComplimentOfLength, DataLength);
         }
         
         if (IsLastHuffmanBlock == true) {
@@ -1349,7 +1463,7 @@ extern "C" {
      DecodeDynamicHuffman(BitI, Inflate);
      break;
      default:
-     Log(LOG_EMERG, "BitIO", "ParseDeflateBlock", "Invalid Deflate encoding method: %d\n", Inflate->EncodingMethod);
+     Log(LOG_EMERG, "libBitIO", "ParseDeflateBlock", "Invalid Deflate encoding method: %d\n", Inflate->EncodingMethod);
      break;
      }
      }
@@ -1366,9 +1480,9 @@ extern "C" {
         
         // We need to have a BitBuffer to read from, and a BitBuffer to write to.
         if (RawBuffer == NULL) {
-            Log(LOG_ERR, "BitIO", "EncodeLZ77", "The pointer to the raw buffer is NULL\n");
+            Log(LOG_ERR, "libBitIO", "EncodeLZ77", "The pointer to the raw buffer is NULL\n");
         } else if (LZ77Buffer == NULL) {
-            Log(LOG_ERR, "BitIO", "EncodeLZ77", "The pointer to the LZ77 buffer is NULL\n");
+            Log(LOG_ERR, "libBitIO", "EncodeLZ77", "The pointer to the LZ77 buffer is NULL\n");
         } else {
             uint64_t WindowBits   = NumBits2ReadSymbols(WindowSize);
             uint64_t DistanceBits = NumBits2ReadSymbols(DistanceLength);
