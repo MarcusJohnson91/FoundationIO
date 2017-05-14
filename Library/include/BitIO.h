@@ -24,28 +24,26 @@ extern "C" {
      @enum              BitIOConstants
      @abstract                                    "BitIO compile time constants".
      @remark                                      "Change the buffer sizes here".
-     @constant          BitInputBufferSize        "Initial size of BitInput buffer".
-     @constant          BitInputBufferSizeInBits  "Inital size of BitInput buffer in bits".
-     @constant          BitOutputBufferSize       "Inital size of BitOutput buffer".
-     @constant          BitOutputBufferSizeInBits "Inital size of BitOutput buffer in bits".
+     
      @constant          BitIOStringSize           "Maximum size of a string in BitIO".
      @constant          BitIOUUIDStringSize       "Size of a UUIDString including dashes and null terminator".
-     @constant          BitIOBinaryUUIDSize       "Size of a binary UUID string".
      @constant          BitIOGUIDStringSize       "Size of a GUIDString including dashes and null terminator".
+     @constant          BitIOBinaryUUIDSize       "Size of a binary UUID string".
      @constant          BitIOBinaryGUIDSize       "Size of a binary GUID string".
      @constant          BitIOMD5Size              "Size of a MD5 string".
+     @constant          BitIOCRCMaxBufferSize     "Max size for the CRC buffer at a time, in bytes".
+     @constant          BitIONumHuffmanSymbols    "Number of Huffman symbols to hold in the Huffman tree".
+     @constant          BitIOLZ77MaxDistanceCode  "The maximum distance back in the buffer for the pointer to be in Deflate's LZ77".
+     @constant          BitIOLZ77MaxWindowSize    "The maximum size the sliding window can be in Deflate's LZ77."
      */
     enum BitIOConstants {
-        BitInputBufferSize        = 4096,
-        BitInputBufferSizeInBits  = BitInputBufferSize * 8,
-        BitOutputBufferSize       = 4096,
-        BitOutputBufferSizeInBits = BitOutputBufferSize * 8,
         BitIOStringSize           = 4096,
         BitIOUUIDStringSize       = 21,
-        BitIOBinaryUUIDSize       = 16,
         BitIOGUIDStringSize       = BitIOUUIDStringSize,
+        BitIOBinaryUUIDSize       = 16,
         BitIOBinaryGUIDSize       = BitIOBinaryUUIDSize,
         BitIOMD5Size              = 16,
+        BitIOCRCMaxBufferSize     = 4096,
         BitIONumHuffmanSymbols    = 288,   // 0-255 = literal, 256 = end of block,
         BitIOLZ77MaxDistanceCode  = 258,   // - 3
         BitIOLZ77MaxWindowSize    = 32768, // - 1

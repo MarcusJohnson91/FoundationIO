@@ -1204,7 +1204,7 @@ extern "C" {
     }
     
     /* Deflate (encode deflate) */
-    void ParseZLIBHeader(BitBuffer *DeflatedData) {
+    void ParseDeflateHeader(BitBuffer *DeflatedData) {
         // stored in big endian byte order, bits are stored LSB first
         uint8_t CompressionMethod  = ReadBits(DeflatedData, 4, true); // 8 = DEFLATE
         uint8_t CompressionInfo    = ReadBits(DeflatedData, 4, true); // 7 = LZ77 window size 32k
@@ -1217,7 +1217,7 @@ extern "C" {
         if (CompressionMethod == 8) {
             //ParseDeflateBlock(DeflatedData, BlockSize[CompressionInfo]);
         } else {
-            Log(LOG_ERR, "BitIO", "ParseZLIBHeader", "Invalid DEFLATE compression method %d\n", CompressionMethod);
+            Log(LOG_ERR, "BitIO", "ParseDeflateHeader", "Invalid DEFLATE compression method %d\n", CompressionMethod);
         }
     }
     
