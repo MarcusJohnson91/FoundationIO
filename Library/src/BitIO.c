@@ -129,7 +129,9 @@ extern "C" {
         errno = 0;
         BitInput *BitI        = (BitInput*)calloc(1, sizeof(BitInput));
         if (errno != 0) {
-            Log(LOG_ERR, "libBitIO", "InitBitInput", "Errno error: %s\n", strerror(errno));
+            const char ErrnoError[128];
+            strerror_r(errno, ErrnoError, 128);
+            Log(LOG_ERR, "libBitIO", "InitBitInput", "Errno error: %s\n", ErrnoError);
         }
         return BitI;
     }
@@ -138,7 +140,9 @@ extern "C" {
         errno = 0;
         BitOutput *BitO       = (BitOutput*)calloc(1, sizeof(BitOutput));
         if (errno != 0) {
-            Log(LOG_ERR, "libBitIO", "InitBitOutput", "Errno error: %s\n", strerror(errno));
+            const char ErrnoError[128];
+            strerror_r(errno, ErrnoError, 128);
+            Log(LOG_ERR, "libBitIO", "InitBitOutput", "Errno error: %s\n", ErrnoError);
         }
         return BitO;
     }
@@ -147,7 +151,9 @@ extern "C" {
         errno = 0;
         BitBuffer *BitB       = (BitBuffer*)calloc(1, sizeof(BitBuffer));
         if (errno != 0) {
-            Log(LOG_ERR, "libBitIO", "InitBitBuffer", "Errno error: %s\n", strerror(errno));
+            const char ErrnoError[128];
+            strerror_r(errno, ErrnoError, 128);
+            Log(LOG_ERR, "libBitIO", "InitBitBuffer", "Errno error: %s\n", ErrnoError);
         }
         return BitB;
     }
@@ -161,7 +167,9 @@ extern "C" {
         } else {
             BitB->Buffer = (uint8_t*)calloc(1, EmptyBufferSize);
             if (errno != 0) {
-                Log(LOG_ERR, "libBitIO", "CreateEmptyBuffer", "Errno error: %s\n", strerror(errno));
+                const char ErrnoError[128];
+                strerror_r(errno, ErrnoError, 128);
+                Log(LOG_ERR, "libBitIO", "CreateEmptyBuffer", "Errno error: %s\n", ErrnoError);
             }
         }
     }
@@ -170,7 +178,9 @@ extern "C" {
         errno = 0;
         CommandLineOptions *CMD = (CommandLineOptions*)calloc(1, sizeof(CommandLineOptions));
         if (errno != 0) {
-            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing CommandLineOptions error: %s\n", strerror(errno));
+            const char ErrnoError[128];
+            strerror_r(errno, ErrnoError, 128);
+            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing CommandLineOptions error: %s\n", ErrnoError);
         }
         errno = 0;
         CMD->NumSwitches        = NumSwitches;
@@ -178,7 +188,9 @@ extern "C" {
         size_t CLSSize          = sizeof(CommandLineSwitch); // 40 bytes
         CMD->Switch             = (CommandLineSwitch*)calloc(NumSwitches, CLSSize);
         if (errno != 0) {
-            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing CommandLineSwitch error: %s\n", strerror(errno));
+            const char ErrnoError[128];
+            strerror_r(errno, ErrnoError, 128);
+            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing CommandLineSwitch error: %s\n", ErrnoError);
         }
         
         return CMD;
@@ -471,7 +483,9 @@ extern "C" {
                         
                         char *SingleDash                            = (char*)calloc(1, SingleDashSize);
                         if (errno != 0) {
-                            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno SingleDash = %s, Arg = %d, Switch = %d, errno = %s", strerror(errno), Argument, SwitchNum);
+                            const char ErrnoError[128];
+                            strerror_r(errno, ErrnoError, 128);
+                            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno SingleDash = %s, Arg = %d, Switch = %d, errno = %s", ErrnoError, Argument, SwitchNum);
                             errno = 0;
                         } else {
                             snprintf(SingleDash, SingleDashSize, "-%s", CMD->Switch[SwitchNum].Flag);
@@ -479,7 +493,9 @@ extern "C" {
                         
                         char *DoubleDash                            = (char*)calloc(1, DoubleDashSize);
                         if (errno != 0) {
-                            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno DoubleDash = %s, Arg = %d, Switch = %d", strerror(errno), Argument, SwitchNum);
+                            const char ErrnoError[128];
+                            strerror_r(errno, ErrnoError, 128);
+                            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno DoubleDash = %s, Arg = %d, Switch = %d", ErrnoError, Argument, SwitchNum);
                             errno = 0;
                         } else {
                             snprintf(DoubleDash, DoubleDashSize, "--%s", CMD->Switch[SwitchNum].Flag);
@@ -487,7 +503,9 @@ extern "C" {
                         
                         char *Slash                                 = (char*)calloc(1, SlashSize);
                         if (errno != 0) {
-                            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno Slash = %s, Arg = %d, Switch = %d", strerror(errno), Argument, SwitchNum);
+                            const char ErrnoError[128];
+                            strerror_r(errno, ErrnoError, 128);
+                            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno Slash = %s, Arg = %d, Switch = %d", ErrnoError, Argument, SwitchNum);
                             errno = 0; // Here to reset to catch errors with the strcmp stuff below
                         } else {
                             snprintf(Slash, SlashSize, "/%s", CMD->Switch[SwitchNum].Flag);
@@ -501,7 +519,9 @@ extern "C" {
                             if (CMD->Switch[SwitchNum].Resultless == false) {
                                 char *SwitchResult                  = (char*)calloc(1, ArgumentSize);
                                 if (errno != 0) {
-                                    Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno SwitchResult = %s, Arg = %d, Switch = %d", strerror(errno), Argument, SwitchNum);
+                                    const char ErrnoError[128];
+                                    strerror_r(errno, ErrnoError, 128);
+                                    Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno SwitchResult = %s, Arg = %d, Switch = %d", ErrnoError, Argument, SwitchNum);
                                 } else {
                                     snprintf(SwitchResult, ArgumentSize, "%s", argv[Argument + 1]);
                                     CMD->Switch[SwitchNum].SwitchResult = SwitchResult;
@@ -542,7 +562,9 @@ extern "C" {
             
             char *InputFile = (char*)calloc(1, PathSize);
             if (errno != 0) {
-                Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Error: %s", strerror(errno));
+                const char ErrnoError[128];
+                strerror_r(errno, ErrnoError, 128);
+                Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Error: %s", ErrnoError);
             } else {
                 snprintf(InputFile, PathSize, "%s", CMD->Switch[SwitchNum].SwitchResult);
                 
@@ -570,7 +592,9 @@ extern "C" {
             size_t PathSize = strlen(CMD->Switch[SwitchNum].SwitchResult) + 1;
             char *OutputFile = (char*)calloc(1, PathSize);
             if (errno != 0) {
-                Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Error: %s", strerror(errno));
+                const char ErrnoError[128];
+                strerror_r(errno, ErrnoError, 128);
+                Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Error: %s", ErrnoError);
             } else {
                 snprintf(OutputFile, PathSize, "%s", CMD->Switch[SwitchNum].SwitchResult);
                 
@@ -1018,7 +1042,9 @@ extern "C" {
             errno = 0;
             UUIDString = (uint8_t*)calloc(1, BitIOUUIDStringSize);
             if (errno != 0) {
-                Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "Errno: %s", strerror(errno));
+                const char ErrnoError[128];
+                strerror_r(errno, ErrnoError, 128);
+                Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "Errno: %s", ErrnoError);
             } else {
                 for (uint8_t Byte = 0; Byte < BitIOBinaryUUIDSize; Byte++) {
                     if (Byte == 4 || Byte == 7 || Byte == 10 || Byte == 13) {
@@ -1045,7 +1071,9 @@ extern "C" {
             errno = 0;
             BinaryUUID = (uint8_t*)calloc(1, BitIOBinaryUUIDSize);
             if (errno != 0) {
-                Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "Errno: %s", strerror(errno));
+                const char ErrnoError[128];
+                strerror_r(errno, ErrnoError, 128);
+                Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "Errno: %s", ErrnoError);
             } else {
                 for (uint8_t Byte = 0; Byte < BitIOUUIDStringSize; Byte++) {
                     if (Byte != 4 && Byte != 7 && Byte != 10 && Byte != 13 && Byte != 20) {
@@ -1068,7 +1096,9 @@ extern "C" {
             errno = 0;
             SwappedBinaryUUID = (uint8_t*)calloc(1, BitIOBinaryUUIDSize);
             if (errno != 0) {
-                Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "Errno: %s", strerror(errno));
+                const char ErrnoError[128];
+                strerror_r(errno, ErrnoError, 128);
+                Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "Errno: %s", ErrnoError);
             } else {
                 SwappedBinaryUUID[0]        = BinaryUUID[3];
                 SwappedBinaryUUID[1]        = BinaryUUID[2];
@@ -1096,7 +1126,9 @@ extern "C" {
             errno = 0;
             uint8_t *BinaryUUID = (uint8_t*)calloc(1, BitIOBinaryUUIDSize);
             if (errno != 0) {
-                Log(LOG_ERR, "libBitIO", "ReadUUID", "Errno: %s", strerror(errno));
+                const char ErrnoError[128];
+                strerror_r(errno, ErrnoError, 128);
+                Log(LOG_ERR, "libBitIO", "ReadUUID", "Errno: %s", ErrnoError);
             } else {
                 for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
                     BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
@@ -1120,7 +1152,9 @@ extern "C" {
             errno = 0;
             GUIDString = (uint8_t*)calloc(1, BitIOGUIDStringSize);
             if (errno != 0) {
-                Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "Errno: %s", strerror(errno));
+                const char ErrnoError[128];
+                strerror_r(errno, ErrnoError, 128);
+                Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "Errno: %s", ErrnoError);
             } else {
                 BinaryUUID = ConvertUUIDString2BinaryUUID(UUIDString);
                 BinaryGUID = SwapBinaryUUID(BinaryUUID);
@@ -1143,7 +1177,9 @@ extern "C" {
             errno = 0;
             UUIDString = (uint8_t*)calloc(1, BitIOUUIDStringSize);
             if (errno != 0) {
-                Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "Errno: %s", strerror(errno));
+                const char ErrnoError[128];
+                strerror_r(errno, ErrnoError, 128);
+                Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "Errno: %s", ErrnoError);
             } else {
                 BinaryGUID = ConvertUUIDString2BinaryUUID(GUIDString);
                 BinaryUUID = SwapBinaryUUID(BinaryGUID);
@@ -1226,7 +1262,9 @@ extern "C" {
             errno = 0;
             BitB->Buffer                  = (uint8_t*)calloc(1, Bytes2Read);
             if (errno != 0) {
-                Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "Errno: %s", strerror(errno));
+                const char ErrnoError[128];
+                strerror_r(errno, ErrnoError, 128);
+                Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "Errno: %s", ErrnoError);
             } else {
                 BytesRead                 = fread(BitB->Buffer, 1, Bytes2Read, BitI->File);
                 if (BytesRead            != Bytes2Read) {
@@ -1274,12 +1312,16 @@ extern "C" {
         errno = 0;
         uint64_t *SymbolFrequencies = (uint64_t*)calloc(1, BufferSizeInElements);
         if (errno != 0) {
-            Log(LOG_ERR, "libBitIO", "MeasureSortSymbolFrequency", " Errno: SymbolFrequencies = %s, size = %d", strerror(errno), BufferSizeInElements);
+            const char ErrnoError[128];
+            strerror_r(errno, ErrnoError, 128);
+            Log(LOG_ERR, "libBitIO", "MeasureSortSymbolFrequency", " Errno: SymbolFrequencies = %s, size = %d", ErrnoError, BufferSizeInElements);
             errno = 0;
         }
         uint64_t *FrequencyPosition = (uint64_t*)calloc(1, BufferSizeInElements);
         if (errno != 0) {
-            Log(LOG_ERR, "libBitIO", "MeasureSortSymbolFrequency", " Errno: FrequencyPosition = %s, size = %d", strerror(errno), BufferSizeInElements);
+            const char ErrnoError[128];
+            strerror_r(errno, ErrnoError, 128);
+            Log(LOG_ERR, "libBitIO", "MeasureSortSymbolFrequency", " Errno: FrequencyPosition = %s, size = %d", ErrnoError, BufferSizeInElements);
             errno = 0;
         }
         
