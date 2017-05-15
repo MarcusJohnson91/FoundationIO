@@ -23,27 +23,12 @@ extern "C" {
 #define strcasecmp _stricmp
 #endif
     
-    /*!
-     @typedef           BitBuffer
-     @abstract                              "Contains variables and a pointer to a buffer for reading and writing bits".
-     @constant          BitsAvailable       "The number of bits available for reading".
-     @constant          BitsUnavailable     "The number of bits previously read, or available for writing".
-     @constant          Buffer              "A pointer to an unsigned byte buffer".
-     */
     typedef struct BitBuffer {
         size_t             BitsAvailable;
         size_t             BitsUnavailable;
         uint8_t           *Buffer;
     } BitBuffer;
     
-    /*!
-     @typedef           BitInput
-     @abstract                              "Contains File/Socket pointers for reading to a BitBuffer.
-     @constant          File                "Input File/Socket to read into a BitBuffer".
-     @constant          FileSize            "Size of the File in bytes".
-     @constant          FilePosition        "Current byte in the file".
-     @constant          SystemEndian        "Endian of the running system".
-     */
     typedef struct BitInput {
         FILE              *File;
         size_t             FileSize;
@@ -51,13 +36,6 @@ extern "C" {
         uint8_t            SystemEndian:2;
     } BitInput;
     
-    /*!
-     @typedef           BitOutput
-     @abstract                              "Contains File/Socket pointers for writing from a BitBuffer".
-     @constant          File                "Input File/Socket to write a BitBuffer into".
-     @constant          FilePosition        "Current byte in the file".
-     @constant          SystemEndian        "Endian of the running system".
-     */
     typedef struct BitOutput {
         FILE              *File;
         size_t             FilePosition;
@@ -435,7 +413,7 @@ extern "C" {
             for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches; SwitchNum++) {
                 printf("%s: %s\n", CMD->Switch[SwitchNum].Flag, CMD->Switch[SwitchNum].SwitchDescription);
                 /*
-                (-|--|/) Input: Input file or stdin with: -
+                 (-|--|/) Input: Input file or stdin with: -
                  */
                 // Options:
                 // -Input, --Input, or /Input:
@@ -510,7 +488,7 @@ extern "C" {
                         } else {
                             snprintf(Slash, SlashSize, "/%s", CMD->Switch[SwitchNum].Flag);
                         }
-                    
+                        
                         if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
                             
                             size_t ArgumentSize = strlen(argv[Argument + 1]) + 1;
