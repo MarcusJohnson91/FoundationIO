@@ -47,14 +47,14 @@ extern "C" {
      @abstract                              "Contains the data to support a single switch".
      @remark                                "You MUST include the NULL padding at the end of @Switch".
      @constant          SwitchFound         "If the switch was found in argv, this will be set to true".
-     @constant          Resultless          "Is the mere presence of the switch what you're looking for? if so, set to true"
+     @constant          IsThereAResult      "Is there a trailing option after the flag? if so, set to true"
      @constant          Flag                "Actual flag, WITHOUT dash(s) or backslash, Flags are case insensitive".
      @constant          SwitchDescription   "Message to print explaining what the switch does".
-     @constant          SwitchResult        "String to contain the result of this switch, NULL if not found".
+     @constant          SwitchResult        "String to contain the result of this switch, NULL if not found or not included".
      */
     typedef struct CommandLineSwitch {
         bool               SwitchFound;
-        bool               Resultless;
+        bool               IsThereAResult;
         size_t             FlagSize;
         const char        *Flag;
         const char        *SwitchDescription;
@@ -481,7 +481,7 @@ extern "C" {
                             size_t ArgumentSize = strlen(argv[Argument + 1]) + 1;
                             
                             CMD->Switch[SwitchNum].SwitchFound      = true;
-                            if (CMD->Switch[SwitchNum].Resultless == false) {
+                            if (CMD->Switch[SwitchNum].IsThereAResult == true) {
                                 char *SwitchResult                  = (char*)calloc(1, ArgumentSize);
                                 if (errno != 0) {
                                     const char ErrnoError[128];
@@ -686,13 +686,13 @@ extern "C" {
         }
     }
     
-    void SetCMDSwitchResultStatus(CommandLineOptions *CMD, const uint64_t SwitchNum, const bool IsSwitchResultless) {
+    void SetCMDSwitchResultStatus(CommandLineOptions *CMD, const uint64_t SwitchNum, const bool IsThereAResult) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCMDSwitchResultStatus", "Pointer to CommandLineOptions is NULL\n");
         } else if (SwitchNum > CMD->NumSwitches) { // - 1 so the hidden help option isn't exposed
             Log(LOG_ERR, "libBitIO", "SetCMDSwitchResultStatus", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
         } else {
-            CMD->Switch[SwitchNum].Resultless = (IsSwitchResultless & 1);
+            CMD->Switch[SwitchNum].IsThereAResult = IsThereAResult & 1;
         }
     }
     
