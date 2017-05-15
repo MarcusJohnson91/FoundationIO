@@ -103,6 +103,7 @@ extern "C" {
      @typedef           CommandLineOptions
      @abstract                                    "Type to contain a variable amount of CLSwitches".
      @remark                                      "The switches are zero indexed, and @NumSwitches is zero indexed, so count from 0".
+     @remark                                      "The last switch MUST be the help option".
      @constant          NumSwitches               "The number of switches".
      @constant          MinSwitches               "The minimum number of switches this program requires to run".
      @constant          ProgramName               "The name you want output when the help is printed".
@@ -111,6 +112,7 @@ extern "C" {
      @constant          Copyright                 "The starting and ending copyright years".
      @constant          License                   "The license this program is released under".
      @constant          Switch                    "A pointer to an array of CLSwitch instances containing the properties of the switches".
+     
      */
     typedef struct      CommandLineOptions  CommandLineOptions;
     
