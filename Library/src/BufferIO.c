@@ -61,19 +61,6 @@ extern "C" {
         const char        *SwitchResult;
     } CommandLineSwitch;
     
-    /*!
-     @typedef           CommandLineOptions
-     @abstract                              "Type to contain a variable amount of CLSwitches".
-     @remark                                "The switches are zero indexed, and @NumSwitches is zero indexed, so count from 0".
-     @constant          NumSwitches         "The number of switches".
-     @constant          MinSwitches         "The minimum number of switches this program requires to run".
-     @constant          ProgramName         "The name you want output when the help is printed".
-     @constant          ProgramDescription  "The description of the program when the help is printed".
-     @constant          Author              "The author of the program".
-     @constant          Copyright           "The starting and ending copyright years".
-     @constant          License             "The license this program is released under".
-     @constant          Switch              "A pointer to an array of CLSwitch instances containing the properties of the switches".
-     */
     typedef struct CommandLineOptions {
         size_t              NumSwitches;
         uint64_t            MinSwitches;
@@ -674,59 +661,59 @@ extern "C" {
         }
     }
     
-    void SetSwitchFlag(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Flag, const size_t FlagSize) {
+    void SetCMDSwitchFlag(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Flag, const size_t FlagSize) {
         if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetSwitchFlag", "Pointer to CommandLineOptions is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchFlag", "Pointer to CommandLineOptions is NULL\n");
         } else if (Flag == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetSwitchFlag", "Pointer to switch Flag is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchFlag", "Pointer to switch Flag is NULL\n");
         } else if (SwitchNum > CMD->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetSwitchFlag", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchFlag", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
         } else {
             CMD->Switch[SwitchNum].Flag     = Flag;
             CMD->Switch[SwitchNum].FlagSize = FlagSize + 1; // add one for the trailing NULL
         }
     }
     
-    void SetSwitchDescription(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Description) {
+    void SetCMDSwitchDescription(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Description) {
         if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetSwitchDescription", "Pointer to CommandLineOptions is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDescription", "Pointer to CommandLineOptions is NULL\n");
         } else if (Description == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetSwitchDescription", "Pointer to switch Description is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDescription", "Pointer to switch Description is NULL\n");
         } else if (SwitchNum > CMD->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetSwitchDescription", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDescription", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
         } else {
             CMD->Switch[SwitchNum].SwitchDescription = Description;
         }
     }
     
-    void SetSwitchResultStatus(CommandLineOptions *CMD, const uint64_t SwitchNum, const bool IsSwitchResultless) {
+    void SetCMDSwitchResultStatus(CommandLineOptions *CMD, const uint64_t SwitchNum, const bool IsSwitchResultless) {
         if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetSwitchResultStatus", "Pointer to CommandLineOptions is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchResultStatus", "Pointer to CommandLineOptions is NULL\n");
         } else if (SwitchNum > CMD->NumSwitches) { // - 1 so the hidden help option isn't exposed
-            Log(LOG_ERR, "libBitIO", "SetSwitchResultStatus", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchResultStatus", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
         } else {
             CMD->Switch[SwitchNum].Resultless = (IsSwitchResultless & 1);
         }
     }
     
-    const char *GetSwitchResult(CommandLineOptions *CMD, const uint64_t SwitchNum) {
+    const char *GetCMDSwitchResult(CommandLineOptions *CMD, const uint64_t SwitchNum) {
         const char *Result = NULL;
         if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetSwitchResult", "Pointer to CommandLineOptions is NULL\n");
+            Log(LOG_ERR, "libBitIO", "GetCMDSwitchResult", "Pointer to CommandLineOptions is NULL\n");
         } else if (SwitchNum > CMD->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "GetSwitchResult", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "GetCMDSwitchResult", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
         } else {
             Result = CMD->Switch[SwitchNum].SwitchResult;
         }
         return Result;
     }
     
-    bool GetSwitchPresence(CommandLineOptions *CMD, const uint64_t SwitchNum) {
+    bool GetCMDSwitchPresence(CommandLineOptions *CMD, const uint64_t SwitchNum) {
         bool Status = 0;
         if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetSwitchPresence", "Pointer to CommandLineOptions is NULL\n");
+            Log(LOG_ERR, "libBitIO", "GetCMDSwitchPresence", "Pointer to CommandLineOptions is NULL\n");
         } else if (SwitchNum > CMD->NumSwitches) { // - 1 so the hidden help option isn't exposed
-            Log(LOG_ERR, "libBitIO", "GetSwitchPresence", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "GetCMDSwitchPresence", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
         } else {
             Status = CMD->Switch[SwitchNum].SwitchFound;
         }

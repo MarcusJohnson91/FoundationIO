@@ -99,6 +99,19 @@ extern "C" {
      */
     typedef struct      BitOutput           BitOutput;
     
+    /*!
+     @typedef           CommandLineOptions
+     @abstract                                    "Type to contain a variable amount of CLSwitches".
+     @remark                                      "The switches are zero indexed, and @NumSwitches is zero indexed, so count from 0".
+     @constant          NumSwitches               "The number of switches".
+     @constant          MinSwitches               "The minimum number of switches this program requires to run".
+     @constant          ProgramName               "The name you want output when the help is printed".
+     @constant          ProgramDescription        "The description of the program when the help is printed".
+     @constant          Author                    "The author of the program".
+     @constant          Copyright                 "The starting and ending copyright years".
+     @constant          License                   "The license this program is released under".
+     @constant          Switch                    "A pointer to an array of CLSwitch instances containing the properties of the switches".
+     */
     typedef struct      CommandLineOptions  CommandLineOptions;
     
     typedef struct      HuffmanTree         HuffmanTree;
@@ -405,7 +418,7 @@ extern "C" {
      @param             Flag                      "The flag to identify an option with".
      @param             FlagSize                  "Size of the flag string".
      */
-    void                SetSwitchFlag(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Flag, const size_t FlagSize);
+    void                SetCMDSwitchFlag(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Flag, const size_t FlagSize);
     
     /*!
      @abstract                                    "Sets SwitchDescription's flag in the CommandLineOptions instance pointed by CMD".
@@ -413,7 +426,7 @@ extern "C" {
      @param             SwitchNum                 "The switch to set".
      @param             Description               "Pointer to a C string containing the description of what this program does"
      */
-    void                SetSwitchDescription(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Description);
+    void                SetCMDSwitchDescription(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Description);
     
     /*!
      @abstract                                    "Sets SwitchResult's flag in the CommandLineOptions instance pointed by CMD".
@@ -421,7 +434,7 @@ extern "C" {
      @param             SwitchNum                 "The switch to set".
      @param             IsSwitchResultless        "Are you expecting this switch to contain data, or are you just testing for it's presence?".
      */
-    void                SetSwitchResultStatus(CommandLineOptions *CMD, const uint64_t SwitchNum, const bool IsSwitchResultless);
+    void                SetCMDSwitchResultStatus(CommandLineOptions *CMD, const uint64_t SwitchNum, const bool IsSwitchResultless);
     
     /*!
      @abstract                                    "Gets the data contained in Switch->Result"
@@ -429,14 +442,14 @@ extern "C" {
      @param             CMD                       "Pointer to the instance of CommandLineOptions".
      @param             SwitchNum                 "The switch to check".
      */
-    const char         *GetSwitchResult(CommandLineOptions *CMD, const uint64_t SwitchNum);
+    const char         *GetCMDSwitchResult(CommandLineOptions *CMD, const uint64_t SwitchNum);
     
     /*!
      @abstract                                    "Tells if a certain switch has been found".
      @param             CMD                       "Pointer to CommandLineOptions instance".
      @param             SwitchNum                 "The switch to check".
      */
-    bool                GetSwitchPresence(CommandLineOptions *CMD, const uint64_t SwitchNum);
+    bool                GetCMDSwitchPresence(CommandLineOptions *CMD, const uint64_t SwitchNum);
     
     /*!
      @abstract                                    "Manages InputBuffer and hands out the requested bits".
