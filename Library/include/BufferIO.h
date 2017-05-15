@@ -432,9 +432,9 @@ extern "C" {
      @abstract                                    "Sets SwitchResult's flag in the CommandLineOptions instance pointed by CMD".
      @param             CMD                       "Pointer to the instance of CommandLineOptions".
      @param             SwitchNum                 "The switch to set".
-     @param             IsSwitchResultless        "Are you expecting this switch to contain data, or are you just testing for it's presence?".
+     @param             IsThereAResult            "Are you expecting this switch to contain data, or are you just testing for it's presence?".
      */
-    void                SetCMDSwitchResultStatus(CommandLineOptions *CMD, const uint64_t SwitchNum, const bool IsSwitchResultless);
+    void                SetCMDSwitchResultStatus(CommandLineOptions *CMD, const uint64_t SwitchNum, const bool IsThereAResult);
     
     /*!
      @abstract                                    "Gets the data contained in Switch->Result"
