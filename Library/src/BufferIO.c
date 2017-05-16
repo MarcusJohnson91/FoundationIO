@@ -62,17 +62,17 @@ extern "C" {
     } CommandLineSwitch;
     
     typedef struct CommandLineOptions {
-        size_t              NumSwitches;
-        uint64_t            MinSwitches;
-        const char         *Name;
-        const char         *Version;
-        const char         *Description;
-        const char         *Author;
-        const char         *Copyright;
-        bool                IsOpenSource; // if open source, then set the license and URL, if not set a warning, and EULA url
-        const char         *License;
-        const char         *LicenseURL;
-        CommandLineSwitch  *Switch; // 1D array of CommandLineSwitch's
+        size_t             NumSwitches;
+        uint64_t           MinSwitches;
+        const char        *Name;
+        const char        *Version;
+        const char        *Description;
+        const char        *Author;
+        const char        *Copyright;
+        bool               IsOpenSource; // if open source, then set the license and URL, if not set a warning, and EULA url
+        const char        *License;
+        const char        *LicenseURL;
+        CommandLineSwitch *Switch; // 1D array of CommandLineSwitch's
     } CommandLineOptions;
     
     typedef struct HuffmanNode {
@@ -239,11 +239,11 @@ extern "C" {
         return Result;
     }
     
-    int64_t Floori(const long double Number2Floor) {
+    int64_t Floori(const double Number2Floor) {
         return (int64_t)floor(Number2Floor);
     }
     
-    int64_t Ceili(const long double Number2Ceil) {
+    int64_t Ceili(const double Number2Ceil) {
         return (int64_t)ceil(Number2Ceil);
     }
     
@@ -964,6 +964,7 @@ extern "C" {
      */
     
     void GenerateCRCFromStream(BitBuffer *Buffer2CRC, uint64_t Poly, uint8_t PolySize, uint64_t PolyInit, uint64_t PreviousCRC) {
+        // I'm just going to do it bitwise
         if (PreviousCRC == 0) { // assume that this is the first chunk of the stream
             
         } else {
