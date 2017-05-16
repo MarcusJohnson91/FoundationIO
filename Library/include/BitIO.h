@@ -221,14 +221,14 @@ extern "C" {
      @abstract                                    "Integer floor function".
      @param             Number2Floor              "The input number as a floating point value".
      */
-    int64_t             Floori(const long double Number2Floor);
+    int64_t             Floori(const double Number2Floor);
     
     /*!
      @abstract                                    "Integer ceil function".
      @todo                                        "We should extract the decimal part and drop the mantissa, it would make it an int-only op, and faster".
      @param             Number2Ceil               "The input number to Ceil as a floating point number".
      */
-    int64_t             Ceili(const long double Number2Ceil);
+    int64_t             Ceili(const double Number2Ceil);
     
     /*!
      @abstract                                    "Computes the number of bits required to hold a certain amount of symbols".
