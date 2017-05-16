@@ -34,12 +34,18 @@ extern "C" {
         size_t             FileSize;
         size_t             FilePosition;
         uint8_t            SystemEndian:2;
+        const char        *FormatSpecifier;
+        uint8_t            FormatSpecifierBase:2;
+        uint64_t           CurrentFileSpecifierNumber;
     } BitInput;
     
     typedef struct BitOutput {
         FILE              *File;
         size_t             FilePosition;
         uint8_t            SystemEndian:2;
+        const char        *FormatSpecifier;
+        uint8_t            FormatSpecifierBase:2;
+        uint64_t           CurrentFileSpecifierNumber;
     } BitOutput;
     
     /*!

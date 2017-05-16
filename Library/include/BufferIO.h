@@ -62,6 +62,18 @@ extern "C" {
     };
     
     /*!
+     @enum             FormatSpecifierBase
+     @constant         Octal                      "Base  2 format specifier".
+     @constant         Decimal                    "Base 10 format specifier".
+     @constant         Hexadecimal                "Base 16 format specifier".
+     */
+    enum FormatSpecifierBase {
+        Octal       = 1,
+        Decimal     = 2,
+        Hexadecimal = 3,
+    };
+    
+    /*!
      @enum              PathType
      @constant          File                      "The submitted path is a regular file"
      @constant          URL                       "The submitted path is to a network resource or IP address"
