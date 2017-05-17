@@ -436,6 +436,14 @@ extern "C" {
     void                SetCMDSwitchFlag(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Flag, const size_t FlagSize);
     
     /*!
+     @abstract                                    "What switch is SwitchNum dependent on?".
+     @param             CMD                       "Pointer to the instance of CommandLineOptions".
+     @param             SwitchNum                 "The switch to set".
+     @param             DependentOn               "The flag to identify an option with".
+     */
+    void                SetCMDSwitchDependency(CommandLineOptions *CMD, const uint64_t SwitchNum, const uint64_t DependentOn);
+    
+    /*!
      @abstract                                    "Sets SwitchDescription's flag in the CommandLineOptions instance pointed by CMD".
      @param             CMD                       "Pointer to the instance of CommandLineOptions".
      @param             SwitchNum                 "The switch to set".

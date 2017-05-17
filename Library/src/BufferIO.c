@@ -53,18 +53,21 @@ extern "C" {
      @abstract                              "Contains the data to support a single switch".
      @remark                                "You MUST include the NULL padding at the end of @Switch".
      @constant          SwitchFound         "If the switch was found in argv, this will be set to true".
-     @constant          IsThereAResult      "Is there a trailing option after the flag? if so, set to true"
+     @constant          IsThereAResult      "Is there a trailing option after the flag? if so, set to true".
      @constant          Flag                "Actual flag, WITHOUT dash(s) or backslash, Flags are case insensitive".
+     @constant          FlagSize            "size of the flag in bytes".
      @constant          SwitchDescription   "Message to print explaining what the switch does".
      @constant          SwitchResult        "String to contain the result of this switch, NULL if not found or not included".
+     @constant          DependentOn         "What switch is this one dependent on?".
      */
     typedef struct CommandLineSwitch {
         bool               SwitchFound;
         bool               IsThereAResult;
-        size_t             FlagSize;
         const char        *Flag;
+        size_t             FlagSize;
         const char        *SwitchDescription;
         const char        *SwitchResult;
+        uint64_t           DependentOn;
     } CommandLineSwitch;
     
     typedef struct CommandLineOptions {
@@ -456,6 +459,9 @@ extern "C" {
                     for (uint8_t Argument = 1; Argument < argc - 1; Argument++) { // the executable path is skipped over
                                                                                   // Once the switch is found, we should skip over this argument.
                         
+                        // Make sure the switch dependency was found before the depedent one.
+                        // So, idk how to add this...
+                        
                         size_t SingleDashSize                       = CMD->Switch[SwitchNum].FlagSize + 1;
                         size_t DoubleDashSize                       = CMD->Switch[SwitchNum].FlagSize + 2;
                         size_t SlashSize                            = CMD->Switch[SwitchNum].FlagSize + 1;
@@ -688,6 +694,18 @@ extern "C" {
         }
     }
     
+    void SetCMDSwitchDependency(CommandLineOptions *CMD, const uint64_t SwitchNum, const uint64_t DependentOn) {
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDependency", "Pointer to CommandLineOptions is NULL\n");
+        } else if (SwitchNum > CMD->NumSwitches) {
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDependency", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
+        } else if (DependentOn > CMD->NumSwitches) {
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDependency", "DependentOn: %d, should be between 0 and %d\n", DependentOn, CMD->NumSwitches);
+        } else {
+            CMD->Switch[SwitchNum].DependentOn = DependentOn;
+        }
+    }
+    
     void SetCMDSwitchDescription(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Description) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCMDSwitchDescription", "Pointer to CommandLineOptions is NULL\n");
@@ -703,7 +721,7 @@ extern "C" {
     void SetCMDSwitchResultStatus(CommandLineOptions *CMD, const uint64_t SwitchNum, const bool IsThereAResult) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCMDSwitchResultStatus", "Pointer to CommandLineOptions is NULL\n");
-        } else if (SwitchNum > CMD->NumSwitches) { // - 1 so the hidden help option isn't exposed
+        } else if (SwitchNum > CMD->NumSwitches) {
             Log(LOG_ERR, "libBitIO", "SetCMDSwitchResultStatus", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
         } else {
             CMD->Switch[SwitchNum].IsThereAResult = IsThereAResult & 1;
