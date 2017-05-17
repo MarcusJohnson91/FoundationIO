@@ -74,6 +74,7 @@ extern "C" {
     typedef struct CommandLineOptions {
         size_t             NumSwitches;
         uint64_t           MinSwitches;
+        bool               DependentSwitchesPresent;
         const char        *Name;
         const char        *Version;
         const char        *Description;
@@ -703,6 +704,9 @@ extern "C" {
         } else if (DependsOn > CMD->NumSwitches) {
             Log(LOG_ERR, "libBitIO", "SetCMDSwitchDependency", "DependsOn: %d, should be between 0 and %d\n", DependsOn, CMD->NumSwitches);
         } else {
+            if (CMD->DependentSwitchesPresent == false) {
+                CMD->DependentSwitchesPresent = true;
+            }
             CMD->Switch[SwitchNum].IsDependent = true;
             CMD->Switch[SwitchNum].DependsOn   = DependsOn;
         }
