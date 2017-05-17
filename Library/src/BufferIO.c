@@ -58,7 +58,7 @@ extern "C" {
      @constant          FlagSize            "size of the flag in bytes".
      @constant          SwitchDescription   "Message to print explaining what the switch does".
      @constant          SwitchResult        "String to contain the result of this switch, NULL if not found or not included".
-     @constant          DependentOn         "What switch is this one dependent on?".
+     @constant          DependsOn         "What switch is this one dependent on?".
      */
     typedef struct CommandLineSwitch {
         bool               SwitchFound;
@@ -67,7 +67,8 @@ extern "C" {
         size_t             FlagSize;
         const char        *SwitchDescription;
         const char        *SwitchResult;
-        uint64_t           DependentOn;
+        bool               IsDependent;
+        uint64_t           DependsOn;
     } CommandLineSwitch;
     
     typedef struct CommandLineOptions {
@@ -694,15 +695,16 @@ extern "C" {
         }
     }
     
-    void SetCMDSwitchDependency(CommandLineOptions *CMD, const uint64_t SwitchNum, const uint64_t DependentOn) {
+    void SetCMDSwitchDependency(CommandLineOptions *CMD, const uint64_t SwitchNum, const uint64_t DependsOn) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCMDSwitchDependency", "Pointer to CommandLineOptions is NULL\n");
         } else if (SwitchNum > CMD->NumSwitches) {
             Log(LOG_ERR, "libBitIO", "SetCMDSwitchDependency", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
-        } else if (DependentOn > CMD->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDependency", "DependentOn: %d, should be between 0 and %d\n", DependentOn, CMD->NumSwitches);
+        } else if (DependsOn > CMD->NumSwitches) {
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDependency", "DependsOn: %d, should be between 0 and %d\n", DependsOn, CMD->NumSwitches);
         } else {
-            CMD->Switch[SwitchNum].DependentOn = DependentOn;
+            CMD->Switch[SwitchNum].IsDependent = true;
+            CMD->Switch[SwitchNum].DependsOn   = DependsOn;
         }
     }
     
