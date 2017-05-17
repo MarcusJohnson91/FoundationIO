@@ -439,9 +439,9 @@ extern "C" {
      @abstract                                    "What switch is SwitchNum dependent on?".
      @param             CMD                       "Pointer to the instance of CommandLineOptions".
      @param             SwitchNum                 "The switch to set".
-     @param             DependentOn               "The flag to identify an option with".
+     @param             DependsOn                 "The flag SwitchNum needs in order to be valid".
      */
-    void                SetCMDSwitchDependency(CommandLineOptions *CMD, const uint64_t SwitchNum, const uint64_t DependentOn);
+    void                SetCMDSwitchDependency(CommandLineOptions *CMD, const uint64_t SwitchNum, const uint64_t DependsOn);
     
     /*!
      @abstract                                    "Sets SwitchDescription's flag in the CommandLineOptions instance pointed by CMD".
