@@ -1251,14 +1251,14 @@ extern "C" {
     // Ok, so I need a function to read a file/socket into a buffer, and one to write a buffer to a file/socket.
     // I don't know if FILE pointers work with sockets, but i'm going to ignore that for now.
     
-    void ReadInputFile2Buffer(BitInput *BitI, BitBuffer *BitB, const size_t Bytes2Read) { // It's the user's job to ensure buffers and files are kept in sync, not mine.
+    void ReadBitInput2BitBuffer(BitInput *BitI, BitBuffer *BitB, const size_t Bytes2Read) { // It's the user's job to ensure buffers and files are kept in sync, not mine.
         size_t BytesRead              = 0;
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "BitI pointer is NULL\n");
+            Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "BitI pointer is NULL\n");
         } else if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "BitB pointer is NULL\n");
+            Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "BitB pointer is NULL\n");
         } else if (Bytes2Read > BitI->FileSize - BitI->FilePosition) {
-            Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "You tried reading more data: % than is available: %d in the file\n", Bytes2Read, BitI->FileSize - BitI->FilePosition);
+            Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "You tried reading more data: % than is available: %d in the file\n", Bytes2Read, BitI->FileSize - BitI->FilePosition);
         } else {
             if (BitB->Buffer != NULL) {
                 free(BitB->Buffer);
@@ -1268,11 +1268,11 @@ extern "C" {
             if (errno != 0) {
                 const char ErrnoError[128];
                 strerror_r(errno, ErrnoError, 128);
-                Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "Errno: %s", ErrnoError);
+                Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "Errno: %s", ErrnoError);
             } else {
                 BytesRead                 = fread(BitB->Buffer, 1, Bytes2Read, BitI->File);
                 if (BytesRead            != Bytes2Read) {
-                    Log(LOG_ERR, "libBitIO", "ReadInputFile2Buffer", "Fread read: %d bytes, but you requested: %d\n", BytesRead, Bytes2Read);
+                    Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "Fread read: %d bytes, but you requested: %d\n", BytesRead, Bytes2Read);
                 } else {
                     BitB->BitsAvailable   = Bytes2Bits(BytesRead);
                     BitB->BitsUnavailable = 0;
@@ -1281,17 +1281,17 @@ extern "C" {
         }
     }
     
-    void WriteBuffer2OutputFile(BitOutput *BitO, BitBuffer *BitB, const size_t Bytes2Write) {
+    void WriteBitBuffer2BitOutput(BitOutput *BitO, BitBuffer *BitB, const size_t Bytes2Write) {
         size_t BytesWritten           = 0;
         if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteBuffer2OutputFile", "BitI pointer is NULL\n");
+            Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "BitI pointer is NULL\n");
         } else if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteBuffer2OutputFile", "BitB pointer is NULL\n");
+            Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "BitB pointer is NULL\n");
         } else {
             // Write the bytes in BitB->Buffer to BitO->File
             BytesWritten              = fwrite(BitB->Buffer, 1, Bytes2Write, BitO->File);
             if (BytesWritten         != Bytes2Write) {
-                Log(LOG_ERR, "libBitIO", "WriteBuffer2OutputFile", "Fwrite wrote: %d bytes, but you requested: %d\n", BytesWritten, Bytes2Write);
+                Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "Fwrite wrote: %d bytes, but you requested: %d\n", BytesWritten, Bytes2Write);
             } else {
                 BitB->BitsAvailable   = Bytes2Bits(BytesWritten);
                 BitB->BitsUnavailable = 0;
