@@ -527,14 +527,6 @@ extern "C" {
     void                WriteBits(BitBuffer *BitB, const uint64_t Data2Write, const uint8_t NumBits, const bool WriteFromMSB);
     
     /*!
-     @abstract                                    "Writes a BitBuffer to a file, kinda shitty tho".
-     @param             BitO                      "Pointer to BitOutput to write the buffer to".
-     @param             BitB                      "The buffer to be written to the output file".
-     @param             Bytes2Write               "The number of bytes from the buffer to write to the file"
-     */
-    void                WriteBuffer2OutputFile(BitOutput *BitO, BitBuffer *BitB, const size_t Bytes2Write);
-    
-    /*!
      @abstract                                    "Encodes and writes data in unary/RICE format to a BitOutput stream".
      @todo                                        "We should replace WriteFromMSB with a WriteLittleEndian or WriteBigEndian".
      @param             BitB                      "Pointer to BitBuffer, the output buffer".
@@ -648,7 +640,15 @@ extern "C" {
      @param             BitB                      "Pointer to BitBuffer to put the bytes into".
      @param             Bytes2Read                "The number of bytes to read from the InputFile into the Buffer"
      */
-    void                ReadInputFile2Buffer(BitInput *BitI, BitBuffer *BitB, const size_t Bytes2Read);
+    void                ReadBitInput2BitBuffer(BitInput *BitI, BitBuffer *BitB, const size_t Bytes2Read);
+    
+    /*!
+     @abstract                                    "Writes a BitBuffer to a file, kinda shitty tho".
+     @param             BitO                      "Pointer to BitOutput to write the buffer to".
+     @param             BitB                      "The buffer to be written to the output file".
+     @param             Bytes2Write               "The number of bytes from the buffer to write to the file"
+     */
+    void                WriteBitBuffer2BitOutput(BitOutput *BitO, BitBuffer *BitB, const size_t Bytes2Write);
     
 #ifndef _POSIX_VERSION
     /*!
