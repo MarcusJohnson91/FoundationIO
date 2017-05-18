@@ -696,6 +696,18 @@ extern "C" {
         }
     }
     
+    void SetCMDSwitchDescription(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Description) {
+        if (CMD == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDescription", "Pointer to CommandLineOptions is NULL\n");
+        } else if (Description == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDescription", "Pointer to switch Description is NULL\n");
+        } else if (SwitchNum > CMD->NumSwitches) {
+            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDescription", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
+        } else {
+            CMD->Switch[SwitchNum].SwitchDescription = Description;
+        }
+    }
+    
     void SetCMDSwitchDependency(CommandLineOptions *CMD, const uint64_t SwitchNum, const uint64_t DependsOn) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCMDSwitchDependency", "Pointer to CommandLineOptions is NULL\n");
@@ -709,18 +721,6 @@ extern "C" {
             }
             CMD->Switch[SwitchNum].IsDependent = true;
             CMD->Switch[SwitchNum].DependsOn   = DependsOn;
-        }
-    }
-    
-    void SetCMDSwitchDescription(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Description) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDescription", "Pointer to CommandLineOptions is NULL\n");
-        } else if (Description == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDescription", "Pointer to switch Description is NULL\n");
-        } else if (SwitchNum > CMD->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDescription", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
-        } else {
-            CMD->Switch[SwitchNum].SwitchDescription = Description;
         }
     }
     
