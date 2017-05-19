@@ -91,7 +91,7 @@ extern "C" {
      @constant          BitsUnavailable           "The number of bits previously read, or available for writing".
      @constant          Buffer                    "A pointer to an unsigned byte buffer".
      */
-    typedef struct      BitBuffer           BitBuffer;
+    typedef struct      BitBuffer                 BitBuffer;
     
     /*!
      @typedef           BitInput
@@ -103,7 +103,7 @@ extern "C" {
      @constant          FormatSpecifier           "A string containing the format specifier for printf".
      @constant          CurrentFileSpecifierNum   "Which file are we currently on?".
      */
-    typedef struct      BitInput            BitInput;
+    typedef struct      BitInput                  BitInput;
     
     /*!
      @typedef           BitOutput
@@ -114,21 +114,21 @@ extern "C" {
      @constant          FormatSpecifier           "A string containing the format specifier for printf".
      @constant          CurrentFileSpecifierNum   "Which file are we currently on?".
      */
-    typedef struct      BitOutput           BitOutput;
+    typedef struct      BitOutput                 BitOutput;
     
     /*!
      @typedef           CommandLineSwitch
-     @abstract                              "Contains the data to support a single switch".
-     @remark                                "You MUST include the NULL padding at the end of @Switch".
-     @constant          SwitchFound         "If the switch was found in argv, this will be set to true".
-     @constant          IsThereAResult      "Is there a trailing option after the flag? if so, set to true".
-     @constant          Flag                "Actual flag, WITHOUT dash(s) or backslash, Flags are case insensitive".
-     @constant          FlagSize            "size of the flag in bytes".
-     @constant          SwitchDescription   "Message to print explaining what the switch does".
-     @constant          SwitchResult        "String to contain the result of this switch, NULL if not found or not included".
-     @constant          DependsOn           "What switch is this one dependent on?".
+     @abstract                                    "Contains the data to support a single switch".
+     @remark                                      "You MUST include the NULL padding at the end of @Switch".
+     @constant          SwitchFound               "If the switch was found in argv, this will be set to true".
+     @constant          IsThereAResult            "Is there a trailing option after the flag? if so, set to true".
+     @constant          Flag                      "Actual flag, WITHOUT dash(s) or backslash, Flags are case insensitive".
+     @constant          FlagSize                  "Size of the flag in bytes".
+     @constant          SwitchDescription         "Message to print explaining what the switch does".
+     @constant          SwitchResult              "String to contain the result of this switch, NULL if not found or not included".
+     @constant          DependsOn                 "What switch is this one dependent on?".
      */
-    typedef struct      CommandLineSwitch   CommandLineSwitch;
+    typedef struct      CommandLineSwitch         CommandLineSwitch;
     
     /*!
      @typedef           CommandLineOptions
@@ -144,9 +144,9 @@ extern "C" {
      @constant          License                   "The license this program is released under".
      @constant          Switch                    "A pointer to an array of CLSwitch instances containing the properties of the switches".
      */
-    typedef struct      CommandLineOptions  CommandLineOptions;
+    typedef struct      CommandLineOptions        CommandLineOptions;
     
-    typedef struct      HuffmanTree         HuffmanTree;
+    typedef struct      HuffmanTree               HuffmanTree;
     
     /*!
      @abstract                                    "Initializes a BitInput structure".
