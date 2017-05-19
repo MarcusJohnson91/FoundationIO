@@ -35,8 +35,7 @@ extern "C" {
         size_t             FilePosition;
         uint8_t            SystemEndian:2;
         const char        *FormatSpecifier;
-        uint8_t            FormatSpecifierBase:2;
-        uint64_t           CurrentFileSpecifierNumber;
+        uint64_t           CurrentFileSpecifierNum;
     } BitInput;
     
     typedef struct BitOutput {
@@ -44,8 +43,7 @@ extern "C" {
         size_t             FilePosition;
         uint8_t            SystemEndian:2;
         const char        *FormatSpecifier;
-        uint8_t            FormatSpecifierBase:2;
-        uint64_t           CurrentFileSpecifierNumber;
+        uint64_t           CurrentFileSpecifierNum;
     } BitOutput;
     
     typedef struct CommandLineSwitch {
