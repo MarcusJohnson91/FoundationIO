@@ -100,6 +100,8 @@ extern "C" {
      @constant          FileSize                  "Size of the File in bytes".
      @constant          FilePosition              "Current byte in the file".
      @constant          SystemEndian              "Endian of the running system".
+     @constant          FormatSpecifier           "A string containing the format specifier for printf".
+     @constant          CurrentFileSpecifierNum   "Which file are we currently on?".
      */
     typedef struct      BitInput            BitInput;
     
@@ -109,6 +111,8 @@ extern "C" {
      @constant          File                      "Input File/Socket to write a BitBuffer into".
      @constant          FilePosition              "Current byte in the file".
      @constant          SystemEndian              "Endian of the running system".
+     @constant          FormatSpecifier           "A string containing the format specifier for printf".
+     @constant          CurrentFileSpecifierNum   "Which file are we currently on?".
      */
     typedef struct      BitOutput           BitOutput;
     
