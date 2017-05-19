@@ -113,6 +113,20 @@ extern "C" {
     typedef struct      BitOutput           BitOutput;
     
     /*!
+     @typedef           CommandLineSwitch
+     @abstract                              "Contains the data to support a single switch".
+     @remark                                "You MUST include the NULL padding at the end of @Switch".
+     @constant          SwitchFound         "If the switch was found in argv, this will be set to true".
+     @constant          IsThereAResult      "Is there a trailing option after the flag? if so, set to true".
+     @constant          Flag                "Actual flag, WITHOUT dash(s) or backslash, Flags are case insensitive".
+     @constant          FlagSize            "size of the flag in bytes".
+     @constant          SwitchDescription   "Message to print explaining what the switch does".
+     @constant          SwitchResult        "String to contain the result of this switch, NULL if not found or not included".
+     @constant          DependsOn           "What switch is this one dependent on?".
+     */
+    typedef struct      CommandLineSwitch   CommandLineSwitch;
+    
+    /*!
      @typedef           CommandLineOptions
      @abstract                                    "Type to contain a variable amount of CLSwitches".
      @remark                                      "The switches are zero indexed, and @NumSwitches is zero indexed, so count from 0".
@@ -125,7 +139,6 @@ extern "C" {
      @constant          Copyright                 "The starting and ending copyright years".
      @constant          License                   "The license this program is released under".
      @constant          Switch                    "A pointer to an array of CLSwitch instances containing the properties of the switches".
-     
      */
     typedef struct      CommandLineOptions  CommandLineOptions;
     
