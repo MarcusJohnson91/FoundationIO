@@ -59,6 +59,7 @@ extern "C" {
     
     typedef struct CommandLineOptions {
         size_t             NumSwitches;
+        uint8_t           *SwitchCount;
         uint64_t           MinSwitches;
         bool               DependentSwitchesPresent;
         const char        *Name;
@@ -142,7 +143,7 @@ extern "C" {
         if (errno != 0) {
             const char ErrnoError[128];
             strerror_r(errno, ErrnoError, 128);
-            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing CommandLineOptions error: %s\n", ErrnoError);
+            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing CommandLineOptions: %s\n", ErrnoError);
         }
         errno = 0;
         CMD->NumSwitches        = NumSwitches;
@@ -152,7 +153,14 @@ extern "C" {
         if (errno != 0) {
             const char ErrnoError[128];
             strerror_r(errno, ErrnoError, 128);
-            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing CommandLineSwitch error: %s\n", ErrnoError);
+            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing CommandLineSwitch: %s\n", ErrnoError);
+        }
+        errno                   = 0;
+        CMD->SwitchCount        = (uint8_t*)calloc(NumSwitches, sizeof(uint8_t));
+        if (errno != 0) {
+            const char ErrnoError[128];
+            strerror_r(errno, ErrnoError, 128);
+            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing SwitchCount in CommandLineOptions: %s\n", ErrnoError);
         }
         
         return CMD;
