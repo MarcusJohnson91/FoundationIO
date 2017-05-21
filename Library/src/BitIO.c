@@ -73,6 +73,12 @@ extern "C" {
         CommandLineSwitch *Switch; // 1D array of CommandLineSwitch's
     } CommandLineOptions;
     
+    typedef struct SymbolFrequencies { // We assume that all the symbols are unsigned integers of varying size
+        uint64_t           NumSymbols; // Probability is just the frequency of occurance divided by the number of symbols.
+        uint8_t            SymbolSize; // number of bytes per symbol
+        void              *Frequency;
+    } SymbolFrequencies;
+    
     typedef struct HuffmanNode {
         int64_t            LeftHuffmanCode;
         int64_t            RightHuffmanCode;
