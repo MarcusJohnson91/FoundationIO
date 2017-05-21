@@ -74,18 +74,18 @@ extern "C" {
     } CommandLineOptions;
     
     typedef struct HuffmanNode {
-        int64_t        LeftHuffmanCode;
-        int64_t        RightHuffmanCode;
-        int64_t       *LeftNode;
-        int64_t       *RightNode;
+        int64_t            LeftHuffmanCode;
+        int64_t            RightHuffmanCode;
+        int64_t           *LeftNode;
+        int64_t           *RightNode;
     } HuffmanNode;
     
     typedef struct HuffmanTree {
-        uint64_t       NumNodes;
-        HuffmanNode   *Node;
-        uint64_t      *SymbolFrequency;
-        bool           TableIsUsable;
-        const uint8_t *Table;
+        uint64_t           NumNodes;
+        HuffmanNode       *Node;
+        uint64_t          *SymbolFrequency;
+        bool               TableIsUsable;
+        const uint8_t     *Table;
     } HuffmanTree;
     
     BitInput *InitBitInput(void) {
