@@ -415,16 +415,10 @@ extern "C" {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "DisplayCMDHelp", "Pointer to CommandLineOptions is NULL\n");
         } else {
-            printf("Options: (-|--|/)\n");
+            printf("Accepted prefixes: -, --, /\n");
+            printf("Options: \n");
             for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches - 1; SwitchNum++) {
-                printf("%s: %s\n", CMD->Switch[SwitchNum].Flag, CMD->Switch[SwitchNum].SwitchDescription);
-                /*
-                 (-|--|/) Input: Input file or stdin with: -
-                 */
-                // Options:
-                // -Input, --Input, or /Input:
-                // (-|--|/) Input: Input file or stdin with '-'
-                // Ok, so we should show all the prefixes, then the long option, then in parentheses the short option if there is one, but how do we represent short options?
+                printf("\t%s: %s\n", CMD->Switch[SwitchNum].Flag, CMD->Switch[SwitchNum].SwitchDescription);
             }
         }
     }
