@@ -417,8 +417,47 @@ extern "C" {
         } else {
             printf("Accepted prefixes: -, --, /\n");
             printf("Options: \n");
-            for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches - 1; SwitchNum++) {
-                printf("\t%s: %s\n", CMD->Switch[SwitchNum].Flag, CMD->Switch[SwitchNum].SwitchDescription);
+            // It would be cool if we could visually distinguish which options depend on which ones as well.
+            
+            // In order to do that, we need to have an if statement that checks if CMD->DependentSwitchesPresent is true
+            
+            /*
+             
+             I'm thinking something like:
+             
+             Accepted prefixes: -, --, /
+             Options:
+             Input: Input file or stdin with -
+             Output: Output file or stdout with -
+             Encode: Encode input to PNG
+             	Resolution: Resolution in WidthxHeight format (if 3D specify the per eye resolution)
+             	Interlace: Resolution in WidthxHeight format (if 3D specify the per eye resolution)
+             	Optimize: Optimize the encoded PNG to be as small as possible (try all filter options)
+             	Stereo3D: Encode an image as a single stereoscopic, 3D image (the first input should be the left eye)
+             Decode: Decode PNG to output
+             	Split3D: Decode stereo PNG to 2 output files
+             
+             */
+            
+            if (CMD->DependentSwitchesPresent == true) {
+                // Well, logically we should iterate over each switch in numerical order, and if it has a dependent switch, we should print that first, then tab the dependency.
+                // But for that to work seamlessly, we need to have a flag on each dependenency that says if it's been printed or not.
+                // But why put that in the structs when it's only needed here?
+                bool *DependentSwitchPrinted = (bool)calloc(CMD->NumSwitches, sizeof(bool));
+                // So, as we loop we need to check if a switch is dependent on anything, if it is, check if the dependent switch has been printed
+                
+                for (size_t DepSwitch = 0; DepSwitch < CMD->NumSwitches; DepSwitch++) {
+                    if (CMD->Switch[DepSwitch].IsDependent == true && DependentSwitchPrinted[DepSwitch] == false) {
+                        // Print the dependent switch stored in Switch->DependsOn
+                        size_t DepSwitchDependsOn = CMD->Switch[DepSwitch].DependsOn;
+                        printf("\t%s: %s\n", CMD->Switch[DepSwitchDependsOn].Flag, CMD->Switch[DepSwitchDependsOn].SwitchDescription);
+                    }
+                }
+                free(DependentSwitchPrinted);
+            } else {
+                for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches - 1; SwitchNum++) {
+                    printf("\t%s: %s\n", CMD->Switch[SwitchNum].Flag, CMD->Switch[SwitchNum].SwitchDescription);
+                }
             }
         }
     }
@@ -449,6 +488,10 @@ extern "C" {
             } else {
                 DisplayProgramBanner(CMD);
                 
+                char *SingleDash = NULL;
+                char *DoubleDash = NULL;
+                char *Slash      = NULL;
+                
                 errno = 0;
                 
                 for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches; SwitchNum++) {
@@ -462,7 +505,7 @@ extern "C" {
                         size_t DoubleDashSize                       = CMD->Switch[SwitchNum].FlagSize + 2;
                         size_t SlashSize                            = CMD->Switch[SwitchNum].FlagSize + 1;
                         
-                        char *SingleDash                            = (char*)calloc(1, SingleDashSize);
+                        SingleDash                                  = (char*)calloc(1, SingleDashSize);
                         if (errno != 0) {
                             const char ErrnoError[128];
                             strerror_r(errno, ErrnoError, 128);
@@ -472,7 +515,7 @@ extern "C" {
                             snprintf(SingleDash, SingleDashSize, "-%s", CMD->Switch[SwitchNum].Flag);
                         }
                         
-                        char *DoubleDash                            = (char*)calloc(1, DoubleDashSize);
+                        DoubleDash                                  = (char*)calloc(1, DoubleDashSize);
                         if (errno != 0) {
                             const char ErrnoError[128];
                             strerror_r(errno, ErrnoError, 128);
@@ -482,7 +525,7 @@ extern "C" {
                             snprintf(DoubleDash, DoubleDashSize, "--%s", CMD->Switch[SwitchNum].Flag);
                         }
                         
-                        char *Slash                                 = (char*)calloc(1, SlashSize);
+                        Slash                                       = (char*)calloc(1, SlashSize);
                         if (errno != 0) {
                             const char ErrnoError[128];
                             strerror_r(errno, ErrnoError, 128);
@@ -513,6 +556,9 @@ extern "C" {
                         }
                     }
                 }
+                free(SingleDash);
+                free(DoubleDash);
+                free(Slash);
             }
         }
     }
