@@ -584,6 +584,17 @@ extern "C" {
         } else if (Path2Open == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenInputFile", "Pointer to Path2Open is NULL\n");
         } else {
+            /*
+             Now I need to write a function to tell if there is a format specifier in the path, and where it is.
+             Well, we need to look through the string for %09d or whateve.
+             Or, maybe we should just print Path2Open to another string that is 5 bytes bigger than the current one?
+             and ofc we use the
+             */
+            
+            size_t Path2OpenSize = strlen(Path2Open);
+            char *NewPath = (char*)calloc(1, Path2OpenSize);
+            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitI->CurrentFileSpecifierNum);
+            
             errno = 0;
             BitI->File = fopen(Path2Open, "rb");
             if (errno != 0) {
@@ -609,6 +620,10 @@ extern "C" {
         } else if (Path2Open == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenOutputFile", "Fopen error: Pointer is NULL\n");
         } else {
+            size_t Path2OpenSize = strlen(Path2Open);
+            char *NewPath = (char*)calloc(1, Path2OpenSize);
+            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitO->CurrentFileSpecifierNum);
+            
             errno = 0;
             BitO->File = fopen(Path2Open, "wb");
             if (errno != 0) {
