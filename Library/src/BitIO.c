@@ -578,60 +578,55 @@ extern "C" {
         return false;
     }
     
-    void OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, const uint8_t SwitchNum) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Pointer to CommandLineOptions is NULL\n");
-        } else if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Pointer to BitInput is NULL\n");
+    void OpenInputFile(BitInput *BitI, const char *Path2Open) {
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "OpenInputFile", "Pointer to BitInput is NULL\n");
+        } else if (Path2Open == NULL) {
+            Log(LOG_ERR, "libBitIO", "OpenInputFile", "Pointer to Path2Open is NULL\n");
         } else {
             errno = 0;
-            size_t PathSize = strlen(CMD->Switch[SwitchNum].SwitchResult) + 1;
-            
-            char *InputFile = (char*)calloc(1, PathSize);
+            BitI->File = fopen(Path2Open, "rb");
             if (errno != 0) {
-                const char ErrnoError[128];
-                strerror_r(errno, ErrnoError, 128);
-                Log(LOG_ERR, "libBitIO", "OpenCMDInputFile", "Error: %s", ErrnoError);
+                const char ErrnoError[96];
+                strerror_r(errno, ErrnoError, 96);
+                Log(LOG_ERR, "libBitIO", "OpenInputFile", "Fopen error: %s\n", ErrnoError);
+                errno  = 0;
+            } else if (BitI->File == NULL) {
+                Log(LOG_ERR, "libBitIO", "OpenInputFile", "BitI->File error: Pointer is NULL\n");
             } else {
-                snprintf(InputFile, PathSize, "%s", CMD->Switch[SwitchNum].SwitchResult);
-                
-                BitI->File                  = fopen(InputFile, "rb");
                 fseek(BitI->File, 0, SEEK_END);
-                BitI->FileSize              = (uint64_t)ftell(BitI->File);
+                BitI->FileSize     = ftell(BitI->File);
                 fseek(BitI->File, 0, SEEK_SET);
-                BitI->FilePosition          = ftell(BitI->File);
-                BitI->SystemEndian          = DetectSystemEndian();
+                BitI->FilePosition = ftell(BitI->File);
+                BitI->SystemEndian = DetectSystemEndian();
             }
         }
     }
     
-    void OpenCMDInputSocket() {
-        
-    }
-    
-    void OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, const uint8_t SwitchNum) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Pointer to CommandLineOptions is NULL\n");
-        } else if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Pointer to BitOutput is NULL\n");
+    void OpenOutputFile(BitOutput *BitO, const char *Path2Open) {
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "OpenOutputFile", "Pointer to BitOutput is NULL\n");
+        } else if (Path2Open == NULL) {
+            Log(LOG_ERR, "libBitIO", "OpenOutputFile", "Fopen error: Pointer is NULL\n");
         } else {
             errno = 0;
-            size_t PathSize = strlen(CMD->Switch[SwitchNum].SwitchResult) + 1;
-            char *OutputFile = (char*)calloc(1, PathSize);
+            BitO->File = fopen(Path2Open, "wb");
             if (errno != 0) {
-                const char ErrnoError[128];
-                strerror_r(errno, ErrnoError, 128);
-                Log(LOG_ERR, "libBitIO", "OpenCMDOutputFile", "Error: %s", ErrnoError);
+                const char ErrnoError[96];
+                strerror_r(errno, ErrnoError, 96);
+                Log(LOG_ERR, "libBitIO", "OpenOutputFile", "Fopen error: %s", ErrnoError);
+            } else if (BitO->File == NULL) {
+                Log(LOG_ERR, "libBitIO", "OpenOutputFile", "BitO->File error: Pointer is NULL\n");
             } else {
-                snprintf(OutputFile, PathSize, "%s", CMD->Switch[SwitchNum].SwitchResult);
-                
-                BitO->File                  = fopen(OutputFile, "wb");
                 BitO->SystemEndian          = DetectSystemEndian();
             }
         }
     }
     
     void OpenCMDOutputSocket() {
+        
+    }
+    
         
     }
     

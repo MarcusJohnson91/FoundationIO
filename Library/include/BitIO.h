@@ -369,18 +369,16 @@ extern "C" {
     /*!
      @abstract                                    "Opens an input file, pointed to by InputSwitch in CMD and stores the resulting pointer in BitI->File".
      @param             BitI                      "Pointer to the instance of BitInput".
-     @param             CMD                       "Pointer to CommandLineOptions".
-     @param             InputSwitch               "Number of the switch that contains the Input file"
+     @param             Path2Open                 "Path to the input file to open".
      */
-    void                OpenCMDInputFile(BitInput *BitI, CommandLineOptions *CMD, const uint8_t InputSwitch);
+    void                OpenInputFile(BitInput *BitI, const char *Path2Open);
     
     /*!
      @abstract                                    "Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitO->File".
      @param             BitO                      "Pointer to the instance of BitOutput".
-     @param             CMD                       "Pointer to CommandLineOptions".
-     @param             OutputSwitch              "Number of the switch that contains the Output file"
+     @param             Path2Open                 "Path to the output file to open".
      */
-    void                OpenCMDOutputFile(BitOutput *BitO, CommandLineOptions *CMD, const uint8_t OutputSwitch);
+    void                OpenOutputFile(BitOutput *BitO, const char *Path2Open);
     
     /*!
      @abstract                                    "Sets the name of the program".
