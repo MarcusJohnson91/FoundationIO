@@ -623,10 +623,11 @@ extern "C" {
         }
     }
     
-    void OpenCMDOutputSocket() {
+    void OpenInputSocket() {
         
     }
     
+    void OpenOutputSocket() {
         
     }
     
