@@ -1674,6 +1674,12 @@ extern "C" {
         
     }
     
+    
+    
+    static void EncodeAABS(SymbolFrequencies *Symbols, BitBuffer *EncodedData, uint64_t Symbol2Encode) { // Adaptive Asymmetric Binary System
+        
+    }
+    
     void Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription, ...) {
         const char *VariadicArguments = (char*)NULL;
         
