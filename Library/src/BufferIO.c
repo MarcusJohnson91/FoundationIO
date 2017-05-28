@@ -443,7 +443,7 @@ extern "C" {
                 // Well, logically we should iterate over each switch in numerical order, and if it has a dependent switch, we should print that first, then tab the dependency.
                 // But for that to work seamlessly, we need to have a flag on each dependenency that says if it's been printed or not.
                 // But why put that in the structs when it's only needed here?
-                bool *DependentSwitchPrinted = (bool)calloc(CMD->NumSwitches, sizeof(bool));
+                bool *DependentSwitchPrinted = (bool*)calloc(CMD->NumSwitches, sizeof(bool));
                 // So, as we loop we need to check if a switch is dependent on anything, if it is, check if the dependent switch has been printed
                 
                 for (size_t DepSwitch = 0; DepSwitch < CMD->NumSwitches; DepSwitch++) {
@@ -1418,6 +1418,7 @@ extern "C" {
              Well, it'll have tobe a while loop inside the for loop
              */
         }
+        free(FrequencyPosition);
         return SymbolFrequencies;
     }
     
