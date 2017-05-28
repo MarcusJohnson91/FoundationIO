@@ -54,7 +54,8 @@ extern "C" {
         const char        *SwitchDescription;
         const char        *SwitchResult;
         bool               IsDependent;
-        uint64_t           DependsOn;
+        uint8_t            NumDependencies;
+        uint64_t          *DependsOn;
     } CommandLineSwitch;
     
     typedef struct CommandLineOptions {
@@ -437,12 +438,12 @@ extern "C" {
              Input: Input file or stdin with -
              Output: Output file or stdout with -
              Encode: Encode input to PNG
-             	Resolution: Resolution in WidthxHeight format (if 3D specify the per eye resolution)
-             	Interlace: Resolution in WidthxHeight format (if 3D specify the per eye resolution)
-             	Optimize: Optimize the encoded PNG to be as small as possible (try all filter options)
-             	Stereo3D: Encode an image as a single stereoscopic, 3D image (the first input should be the left eye)
+             Resolution: Resolution in WidthxHeight format (if 3D specify the per eye resolution)
+             Interlace: Resolution in WidthxHeight format (if 3D specify the per eye resolution)
+             Optimize: Optimize the encoded PNG to be as small as possible (try all filter options)
+             Stereo3D: Encode an image as a single stereoscopic, 3D image (the first input should be the left eye)
              Decode: Decode PNG to output
-             	Split3D: Decode stereo PNG to 2 output files
+             Split3D: Decode stereo PNG to 2 output files
              
              */
             
