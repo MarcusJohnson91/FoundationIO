@@ -660,10 +660,10 @@ extern "C" {
     /*!
      @abstract                                    "Writes a BitBuffer to a file, kinda shitty tho".
      @param             BitO                      "Pointer to BitOutput to write the buffer to".
-     @param             BitB                      "The buffer to be written to the output file".
+     @param             Buffer2Write              "The buffer to be written to the output file".
      @param             Bytes2Write               "The number of bytes from the buffer to write to the file"
      */
-    void                WriteBitBuffer2BitOutput(BitOutput *BitO, BitBuffer *BitB, const size_t Bytes2Write);
+    void                WriteBitBuffer2BitOutput(const BitOutput *BitO, BitBuffer *Buffer2Write, const size_t Bytes2Write);
     
 #ifndef _POSIX_VERSION
     /*!
