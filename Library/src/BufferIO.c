@@ -282,7 +282,7 @@ extern "C" {
         return (int64_t)Number2Extract;
     }
     
-    int64_t ExtractDecimalFromDouble(const double Number2Extract, const uint8_t Digits2Extract) {
+    int64_t ExtractDecimalFromDouble(const double Number2Extract, const uint8_t Digits2Extract) { // FIXME: This is just a stub
         return 0;
     }
     
@@ -361,7 +361,7 @@ extern "C" {
         return SystemEndian;
     }
     
-    size_t BytesRemainingInInputFile(BitInput *BitI) {
+    size_t BytesRemainingInInputFile(const BitInput *BitI) {
         uint64_t BytesLeft = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "BytesRemainingInInputFile", "Pointer to BitInput is NULL\n");
@@ -371,7 +371,7 @@ extern "C" {
         return BytesLeft;
     }
     
-    size_t GetBitInputFileSize(BitInput *BitI) {
+    size_t GetBitInputFileSize(const BitInput *BitI) {
         uint64_t InputSize = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL\n");
@@ -381,7 +381,7 @@ extern "C" {
         return InputSize;
     }
     
-    size_t GetBitInputFilePosition(BitInput *BitI) {
+    size_t GetBitInputFilePosition(const BitInput *BitI) {
         size_t Position = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL\n");
@@ -391,7 +391,7 @@ extern "C" {
         return Position;
     }
     
-    size_t GetBitBufferPosition(BitBuffer *BitB) {
+    size_t GetBitBufferPosition(const BitBuffer *BitB) {
         size_t Position = 0;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL\n");
@@ -401,7 +401,7 @@ extern "C" {
         return Position;
     }
     
-    size_t GetBitBufferSize(BitBuffer *BitB) {
+    size_t GetBitBufferSize(const BitBuffer *BitB) {
         size_t BitBufferSize = 0;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitBufferSize", "Pointer to BitBuffer is NULL\n");
@@ -411,7 +411,7 @@ extern "C" {
         return BitBufferSize;
     }
     
-    uint8_t GetBitInputSystemEndian(BitInput *BitI) {
+    uint8_t GetBitInputSystemEndian(const BitInput *BitI) {
         uint8_t Endian = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputSystemEndian", "Pointer to BitInput is NULL\n");
@@ -421,7 +421,7 @@ extern "C" {
         return Endian;
     }
     
-    uint8_t GetBitOutputSystemEndian(BitOutput *BitO) {
+    uint8_t GetBitOutputSystemEndian(const BitOutput *BitO) {
         uint8_t Endian = 0;
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitOutputSystemEndian", "Pointer to BitOutput is NULL\n");
@@ -431,7 +431,7 @@ extern "C" {
         return Endian;
     }
     
-    static void DisplayCMDHelp(CommandLineOptions *CMD) {
+    static void DisplayCMDHelp(const CommandLineOptions *CMD) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "DisplayCMDHelp", "Pointer to CommandLineOptions is NULL\n");
         } else {
@@ -482,7 +482,7 @@ extern "C" {
         }
     }
     
-    static void DisplayProgramBanner(CommandLineOptions *CMD) {
+    static void DisplayProgramBanner(const CommandLineOptions *CMD) {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "DisplayProgramBanner", "Pointer to CommandLineOptions is NULL\n");
         } else {
@@ -496,7 +496,7 @@ extern "C" {
         }
     }
     
-    void ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]) {
+    void ParseCommandLineArguments(const CommandLineOptions *CMD, const int argc, const char *argv[]) {
         // TODO : Scan for equals signs as well, if found, after the equal sign is the result, everything before is the switch.
         // TODO : add support for generating the short versions of the flags.
         if (CMD == NULL) {
@@ -812,7 +812,7 @@ extern "C" {
         }
     }
     
-    const char *GetCMDSwitchResult(CommandLineOptions *CMD, const uint64_t SwitchNum) {
+    const char *GetCMDSwitchResult(const CommandLineOptions *CMD, const uint64_t SwitchNum) {
         const char *Result = NULL;
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "GetCMDSwitchResult", "Pointer to CommandLineOptions is NULL\n");
@@ -824,7 +824,7 @@ extern "C" {
         return Result;
     }
     
-    bool GetCMDSwitchPresence(CommandLineOptions *CMD, const uint64_t SwitchNum) {
+    bool GetCMDSwitchPresence(const CommandLineOptions *CMD, const uint64_t SwitchNum) {
         bool Status = 0;
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "GetCMDSwitchPresence", "Pointer to CommandLineOptions is NULL\n");
@@ -884,7 +884,7 @@ extern "C" {
         return OutputData;
     }
     
-    uint64_t  ReadRICE(BitBuffer *BitB, const bool Truncated, const bool StopBit) {
+    uint64_t  ReadRICE(const BitBuffer *BitB, const bool Truncated, const bool StopBit) {
         uint64_t BitCount = 0;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadRICE", "Pointer to BitBuffer is NULL\n");
@@ -899,7 +899,7 @@ extern "C" {
         return BitCount;
     }
     
-    int64_t ReadExpGolomb(BitBuffer *BitB, const bool IsSigned) {
+    int64_t ReadExpGolomb(const BitBuffer *BitB, const bool IsSigned) {
         int64_t  Final = 0;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadExpGolomb", "Pointer to BitBuffer is NULL\n");
@@ -996,7 +996,7 @@ extern "C" {
         }
     }
     
-    bool IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
+    bool IsBitBufferAligned(const BitBuffer *BitB, const uint8_t BytesOfAlignment) {
         bool AlignmentStatus = 0;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "IsOutputStreamByteAligned", "Pointer to BitBuffer is NULL\n");
@@ -1203,7 +1203,7 @@ extern "C" {
         return SwappedBinaryUUID;
     }
     
-    uint8_t *ReadUUID(BitBuffer *BitB) {
+    uint8_t *ReadUUID(const BitBuffer *BitB) {
         uint8_t *UUIDString = NULL;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadUUID", "Pointer to BitBuffer is NULL\n");
@@ -1298,7 +1298,7 @@ extern "C" {
         return UUIDsMatch;
     }
     
-    void WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString) {
+    void WriteUUID(const BitBuffer *BitB, const uint8_t *UUIDString) {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteUUID", "Pointer to instance of BitBuffer is NULL\n");
         } else if (UUIDString == NULL) {
@@ -1335,7 +1335,7 @@ extern "C" {
     // Ok, so I need a function to read a file/socket into a buffer, and one to write a buffer to a file/socket.
     // I don't know if FILE pointers work with sockets, but i'm going to ignore that for now.
     
-    void ReadBitInput2BitBuffer(BitInput *BitI, BitBuffer *BitB, const size_t Bytes2Read) { // It's the user's job to ensure buffers and files are kept in sync, not mine.
+    void ReadBitInput2BitBuffer(const BitInput *BitI, BitBuffer *BitB, const size_t Bytes2Read) { // It's the user's job to ensure buffers and files are kept in sync, not mine.
         size_t BytesRead              = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "BitI pointer is NULL\n");
@@ -1384,11 +1384,13 @@ extern "C" {
         }
     }
     
-    void ReadSocket2Buffer(BitInput *BitI, const size_t Bytes2Read) { // Define it in the header when it's done
+    void ReadSocket2Buffer(const BitInput *BitI, const size_t Bytes2Read) { // FIXME: Just a stub
+        // Define it in the header when it's done
                                                                       //sockaddr_in
     }
     
-    void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB, const int Socket) { // Define it in the header when it's done
+    void WriteBuffer2Socket(const BitOutput *BitO, const BitBuffer *BitB, const int Socket) { // FIXME: Just a stub
+        // Define it in the header when it's done
         
     }
     
@@ -1459,7 +1461,7 @@ extern "C" {
     }
     
     /* Deflate (encode deflate) */
-    void ParseDeflateHeader(BitBuffer *DeflatedData) {
+    void ParseDeflateHeader(const BitBuffer *DeflatedData) {
         if (DeflatedData == NULL) {
             Log(LOG_ERR, "libBitIO", "ParseDeflateHeader", "BitBuffer pointer is NULL");
         } else {
@@ -1480,7 +1482,7 @@ extern "C" {
         }
     }
     
-    void DecodeHuffman(BitBuffer *BitB, size_t HuffmanSize) {
+    void DecodeHuffman(const BitBuffer *BitB, size_t HuffmanSize) {
         // 3 alphabets, literal, "alphabet of bytes", or <length 8, distance 15> the first 2 are combined, 0-255 = literal, 256 = End of Block, 257-285 = length
         // FIXME: The Tilde ~ symbol is the negation symbol in C!!!!! XOR = ^
         
@@ -1605,7 +1607,7 @@ extern "C" {
                            // When multiple values have the same frequency sort by intensity.
     }
     
-    void ParseDeflateBlock(BitBuffer *BitB, uint16_t BlockSize) {
+    void ParseDeflateBlock(const BitBuffer *BitB, uint16_t BlockSize) {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ParseDeflateBlock", "Pointer to BitBuffer is NULL");
         } else {
@@ -1632,7 +1634,7 @@ extern "C" {
         }
     }
     
-    void EncodeLZ77(BitBuffer *RawBuffer, BitBuffer *LZ77Buffer, const size_t WindowSize, const size_t DistanceLength, const size_t SymbolSize) {
+    void EncodeLZ77(const BitBuffer *RawBuffer, const BitBuffer *LZ77Buffer, const size_t WindowSize, const size_t DistanceLength, const size_t SymbolSize) {
         // The dictionary is simply the current buffer, at the current buffer position -(WindowSize / 2) +(WindowSize / 2)
         // So, the first thing you write is the distance from the cursor to the previous string.
         // Then you write the length of the largest match you can find.
@@ -1678,11 +1680,11 @@ extern "C" {
         }
     }
     
-    void EncodeDeflate(BitBuffer *Data2Encode, BitBuffer *EncodedData) {
+    void EncodeDeflate(const BitBuffer *Data2Encode, const BitBuffer *EncodedData) { // FIXME: Just a stub
         
     }
     
-    void DecodeDeflate(BitBuffer *Data2Decode, BitBuffer *DecodedData) {
+    void DecodeDeflate(const BitBuffer *Data2Decode, const BitBuffer *DecodedData) { // FIXME: Just a stub
         
     }
     

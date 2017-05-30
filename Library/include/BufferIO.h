@@ -178,7 +178,7 @@ extern "C" {
      @return                                      "Returns a pointer to an initialized CommandLineOptions instance".
      @param             NumSwitches               "The number of CommandLineSwitch structures to initalize".
      */
-    CommandLineOptions *InitCommandLineOptions(size_t NumSwitches);
+    CommandLineOptions *InitCommandLineOptions(const size_t NumSwitches);
     
     /*!
      @abstract                                    "Deallocates BitInput".
@@ -316,46 +316,46 @@ extern "C" {
      @returm                                      "Returns the number of bytes left in the file".
      @param             BitI                      "Pointer to the instance of BitInput".
      */
-    size_t              BytesRemainingInInputFile(BitInput *BitI);
+    size_t              BytesRemainingInInputFile(const BitInput *BitI);
     
     /*!
      @abstract                                    "Gets the size of the file pointed to by BitI"
      @return                                      "Returns the value in BitI->FileSize".
      @param             BitI                      "Pointer to the instance of BitInput".
      */
-    size_t              GetBitInputFileSize(BitInput *BitI);
+    size_t              GetBitInputFileSize(const BitInput *BitI);
     
     /*!
      @abstract                                    "Returns the position of the current file".
      @param             BitI                      "Pointer to the instance of BitInput".
      */
-    size_t              GetBitInputFilePosition(BitInput *BitI);
+    size_t              GetBitInputFilePosition(const BitInput *BitI);
     
     /*!
      @abstract                                    "Returns the number of bits used in BitB".
      @param             BitB                      "Pointer to the instance of BitBuffer".
      */
-    size_t              GetBitBufferPosition(BitBuffer *BitB);
+    size_t              GetBitBufferPosition(const BitBuffer *BitB);
     
     /*!
      @abstract                                    "Gets the size of the BitBuffer".
      @param             BitB                      "Pointer to the instance of BitBuffer".
      */
-    size_t              GetBitBufferSize(BitBuffer *BitB);
+    size_t              GetBitBufferSize(const BitBuffer *BitB);
     
     /*!
      @abstract                                    "The BitOutput type was made private, this function was added so users can still get this information".
      @return                                      "Returns the endian of the running system".
      @param             BitI                      "Pointer to the instance of BitInput".
      */
-    uint8_t             GetBitInputSystemEndian(BitInput *BitI);
+    uint8_t             GetBitInputSystemEndian(const BitInput *BitI);
     
     /*!
      @abstract                                    "The BitOutput type was made private, this function was added so users can still get this information".
      @return                                      "Returns the endian of the running system".
      @param             BitO                      "Pointer to the instance of BitOutput".
      */
-    uint8_t             GetBitOutputSystemEndian(BitOutput *BitO);
+    uint8_t             GetBitOutputSystemEndian(const BitOutput *BitO);
     
     /*!
      @abstract                                    "Parses argv for switches matching the ones contained in CMD".
@@ -364,7 +364,7 @@ extern "C" {
      @param             argc                      "Main's argc, for the number of arguments entered".
      @param             argv                      "Main's argv, for the actual arguments the user has entered".
      */
-    void                ParseCommandLineArguments(CommandLineOptions *CMD, int argc, const char *argv[]);
+    void                ParseCommandLineArguments(const CommandLineOptions *CMD, int argc, const char *argv[]);
     
     /*!
      @abstract                                    "Opens an input file, pointed to by InputSwitch in CMD and stores the resulting pointer in BitI->File".
@@ -480,14 +480,14 @@ extern "C" {
      @param             CMD                       "Pointer to the instance of CommandLineOptions".
      @param             SwitchNum                 "The switch to check".
      */
-    const char         *GetCMDSwitchResult(CommandLineOptions *CMD, const uint64_t SwitchNum);
+    const char         *GetCMDSwitchResult(const CommandLineOptions *CMD, const uint64_t SwitchNum);
     
     /*!
      @abstract                                    "Tells if a certain switch has been found".
      @param             CMD                       "Pointer to CommandLineOptions instance".
      @param             SwitchNum                 "The switch to check".
      */
-    bool                GetCMDSwitchPresence(CommandLineOptions *CMD, const uint64_t SwitchNum);
+    bool                GetCMDSwitchPresence(const CommandLineOptions *CMD, const uint64_t SwitchNum);
     
     /*!
      @abstract                                    "Manages InputBuffer and hands out the requested bits".
@@ -513,7 +513,7 @@ extern "C" {
      @param             Truncated                 "Should the StopBit be included in the count?"
      @param             StopBit                   "MUST be a 0 or a 1. none of this funny business about how true > 0".
      */
-    uint64_t            ReadRICE(BitBuffer *BitB, const bool Truncated, const bool StopBit);
+    uint64_t            ReadRICE(const BitBuffer *BitB, const bool Truncated, const bool StopBit);
     
     /*!
      @abstract                                    "Reads data encoded as Exponential-Golomb aka Elias Gamma".
@@ -521,7 +521,7 @@ extern "C" {
      @param             BitB                      "Pointer to the instance of BitBuffer".
      @param             IsSigned                  "Should it be read as signed or unsigned?".
      */
-    int64_t             ReadExpGolomb(BitBuffer *BitB, const bool IsSigned);
+    int64_t             ReadExpGolomb(const BitBuffer *BitB, const bool IsSigned);
     
     /*!
      @abstract                                    "Seeks Forwards and backwards in BitInput"
@@ -566,7 +566,7 @@ extern "C" {
      @abstract                                    "Tells if the stream/buffer is byte aligned or not".
      @param             BytesOfAlignment          "Are you trying to see if it's aligned to a byte, short, word, etc alignment? Specify in number of bytes".
      */
-    bool                IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment);
+    bool                IsBitBufferAligned(const BitBuffer *BitB, const uint8_t BytesOfAlignment);
     
     /*!
      @abstract                                    "Aligns bits for multi-byte alignment".
@@ -618,7 +618,7 @@ extern "C" {
      @remark                                      "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
      @param             BitB                      "Pointer to the instance of BitBuffer".
      */
-    uint8_t            *ReadUUID(BitBuffer *BitB);
+    uint8_t            *ReadUUID(const BitBuffer *BitB);
     
     /*!
      @abstract                                    "Converts a UUIDString to a GUIDString by swapping the endian of each section".
@@ -646,7 +646,7 @@ extern "C" {
      @param             BitB                      "Pointer to the instance of BitBuffer".
      @param             UUIDString                "UUID string to write to the file as a binary blob, aka remove hyphens and null terminating char".
      */
-    void                WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString);
+    void                WriteUUID(const BitBuffer *BitB, const uint8_t *UUIDString);
     
     /*!
      @abstract                                    "Reads Bytes2Read into a buffer pointed to by BitB from InputFile"
@@ -655,7 +655,7 @@ extern "C" {
      @param             BitB                      "Pointer to BitBuffer to put the bytes into".
      @param             Bytes2Read                "The number of bytes to read from the InputFile into the Buffer"
      */
-    void                ReadBitInput2BitBuffer(BitInput *BitI, BitBuffer *BitB, const size_t Bytes2Read);
+    void                ReadBitInput2BitBuffer(const BitInput *BitI, BitBuffer *BitB, const size_t Bytes2Read);
     
     /*!
      @abstract                                    "Writes a BitBuffer to a file, kinda shitty tho".
