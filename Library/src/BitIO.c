@@ -1366,20 +1366,20 @@ extern "C" {
         }
     }
     
-    void WriteBitBuffer2BitOutput(BitOutput *BitO, BitBuffer *BitB, const size_t Bytes2Write) {
+    void WriteBitBuffer2BitOutput(const BitOutput *BitO, BitBuffer *Buffer2Write, const size_t Bytes2Write) { // FIXME Assuming we wrote the whole buffer
         size_t BytesWritten           = 0;
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "BitI pointer is NULL\n");
-        } else if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "BitB pointer is NULL\n");
+        } else if (Buffer2Write == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "Buffer2Write pointer is NULL\n");
         } else {
             // Write the bytes in BitB->Buffer to BitO->File
-            BytesWritten              = fwrite(BitB->Buffer, 1, Bytes2Write, BitO->File);
+            BytesWritten              = fwrite(Buffer2Write->Buffer, 1, Bytes2Write, BitO->File);
             if (BytesWritten         != Bytes2Write) {
                 Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "Fwrite wrote: %d bytes, but you requested: %d\n", BytesWritten, Bytes2Write);
             } else {
-                BitB->BitsAvailable   = Bytes2Bits(BytesWritten);
-                BitB->BitsUnavailable = 0;
+                Buffer2Write->BitsAvailable   = Bytes2Bits(BytesWritten);
+                Buffer2Write->BitsUnavailable = 0;
             }
         }
     }
