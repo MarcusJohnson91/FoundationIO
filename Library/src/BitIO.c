@@ -131,21 +131,24 @@ extern "C" {
         return BitB;
     }
     
-    void CreateEmptyBuffer(BitBuffer *BitB, const size_t EmptyBufferSize) {
+    BitBuffer *CreateEmptyBitBuffer(const size_t EmptyBufferSize) {
         errno = 0;
+        BitBuffer *BitB = (BitBuffer*)calloc(1, sizeof(BitBuffer));
         if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "CreateEmptyBuffer", "Pointer to BitBuffer is NULL\n");
+            Log(LOG_ERR, "libBitIO", "CreateEmptyBitBuffer", "Pointer to BitBuffer is NULL\n");
         } else if (EmptyBufferSize <= 0) {
-            Log(LOG_ERR, "libBitIO", "CreateEmptyBuffer", "You tried creating a empty buffer of size: %d, which is invalid\n", EmptyBufferSize);
+            Log(LOG_ERR, "libBitIO", "CreateEmptyBitBuffer", "You tried creating a empty buffer of size: %d, which is invalid\n", EmptyBufferSize);
+            free(BitB);
         } else {
             BitB->Buffer = (uint8_t*)calloc(1, EmptyBufferSize);
             if (errno != 0) {
                 char *ErrnoError = (char*)calloc(1, 96);
                 strerror_r(errno, ErrnoError, 96);
-                Log(LOG_ERR, "libBitIO", "CreateEmptyBuffer", "Errno error: %s\n", ErrnoError);
+                Log(LOG_ERR, "libBitIO", "CreateEmptyBitBuffer", "Errno error: %s\n", ErrnoError);
                 free(ErrnoError);
             }
         }
+        return BitB;
     }
     
     CommandLineOptions *InitCommandLineOptions(const size_t NumSwitches) {
