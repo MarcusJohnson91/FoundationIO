@@ -171,7 +171,7 @@ extern "C" {
      @abstract                                    "Creates an empty buffer for putting data into"
      @param             EmptyBufferSize           "Size of the buffer to create in bytes".
      */
-    void                CreateEmptyBuffer(BitBuffer *BitB, const size_t EmptyBufferSize);
+    BitBuffer          *CreateEmptyBitBuffer(const size_t EmptyBufferSize);
     
     /*!
      @abstract                                    "Initializes a CommandLineOptions instance".
