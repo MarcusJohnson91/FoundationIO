@@ -34,16 +34,14 @@ extern "C" {
         size_t             FileSize;
         size_t             FilePosition;
         uint8_t            SystemEndian:2;
-        const char        *FormatSpecifier;
-        uint64_t           CurrentFileSpecifierNum;
+        uint64_t           FileSpecifierNum;
     } BitInput;
     
     typedef struct BitOutput {
         FILE              *File;
         size_t             FilePosition;
         uint8_t            SystemEndian:2;
-        const char        *FormatSpecifier;
-        uint64_t           CurrentFileSpecifierNum;
+        uint64_t           FileSpecifierNum;
     } BitOutput;
     
     typedef struct CommandLineSwitch {
@@ -215,6 +213,13 @@ extern "C" {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "CloseCommandLineOptions", "Pointer to CommandLineOptions is NULL\n");
         } else {
+            /* Free switches */
+            free(CMD->Switch->DependsOn);
+            free(CMD->Switch->Flag);
+            free(CMD->Switch->SwitchDescription);
+            free(CMD->Switch->SwitchResult);
+            free(CMD->Switch);
+            /* Free CommandLineOptions */
             free(CMD->Author);
             free(CMD->Copyright);
             free(CMD->Description);
@@ -222,7 +227,6 @@ extern "C" {
             free(CMD->LicenseURL);
             free(CMD->Name);
             free(CMD->Version);
-            free(CMD->Switch);
             free(CMD->SwitchCount);
             free(CMD);
         }
@@ -618,7 +622,7 @@ extern "C" {
             
             size_t Path2OpenSize = strlen(Path2Open);
             char *NewPath = (char*)calloc(1, Path2OpenSize);
-            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitI->CurrentFileSpecifierNum);
+            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitI->FileSpecifierNum);
             
             errno = 0;
             BitI->File = fopen(Path2Open, "rb");
@@ -648,7 +652,7 @@ extern "C" {
         } else {
             size_t Path2OpenSize = strlen(Path2Open);
             char *NewPath = (char*)calloc(1, Path2OpenSize);
-            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitO->CurrentFileSpecifierNum);
+            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitO->FileSpecifierNum);
             
             errno = 0;
             BitO->File = fopen(Path2Open, "wb");
@@ -1687,8 +1691,6 @@ extern "C" {
     void DecodeDeflate(const BitBuffer *Data2Decode, const BitBuffer *DecodedData) { // FIXME: Just a stub
         
     }
-    
-    
     
     static void EncodeAABS(SymbolFrequencies *Symbols, BitBuffer *EncodedData, uint64_t Symbol2Encode) { // Adaptive Asymmetric Binary System
         
