@@ -2,7 +2,7 @@
  @header    BitIO.h
  @author    Marcus Johnson aka BumbleBritches57
  @copyright 2016, Marcus Johnson
- @version   0.9.2
+ @version   0.6.0
  FIXME:     The Version number needs to be FeatureLevel.ABI.BugFix
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
  */
