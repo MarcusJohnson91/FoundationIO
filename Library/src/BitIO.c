@@ -95,7 +95,7 @@ extern "C" {
     
     BitInput *InitBitInput(void) {
         errno = 0;
-        BitInput *BitI        = (BitInput*)calloc(1, sizeof(BitInput));
+        BitInput *BitI       = (BitInput*)calloc(1, sizeof(BitInput));
         if (errno != 0) {
             char *ErrnoError = (char*)calloc(1, 96);
             strerror_r(errno, ErrnoError, 96);
@@ -107,7 +107,7 @@ extern "C" {
     
     BitOutput *InitBitOutput(void) {
         errno = 0;
-        BitOutput *BitO       = (BitOutput*)calloc(1, sizeof(BitOutput));
+        BitOutput *BitO      = (BitOutput*)calloc(1, sizeof(BitOutput));
         if (errno != 0) {
             char *ErrnoError = (char*)calloc(1, 96);
             strerror_r(errno, ErrnoError, 96);
@@ -119,7 +119,7 @@ extern "C" {
     
     BitBuffer *InitBitBuffer(void) {
         errno = 0;
-        BitBuffer *BitB       = (BitBuffer*)calloc(1, sizeof(BitBuffer));
+        BitBuffer *BitB      = (BitBuffer*)calloc(1, sizeof(BitBuffer));
         if (errno != 0) {
             char *ErrnoError = (char*)calloc(1, 96);
             strerror_r(errno, ErrnoError, 96);
@@ -131,14 +131,14 @@ extern "C" {
     
     BitBuffer *CreateEmptyBitBuffer(const size_t EmptyBufferSize) {
         errno = 0;
-        BitBuffer *BitB = (BitBuffer*)calloc(1, sizeof(BitBuffer));
+        BitBuffer *BitB          = (BitBuffer*)calloc(1, sizeof(BitBuffer));
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "CreateEmptyBitBuffer", "Pointer to BitBuffer is NULL\n");
         } else if (EmptyBufferSize <= 0) {
             Log(LOG_ERR, "libBitIO", "CreateEmptyBitBuffer", "You tried creating a empty buffer of size: %d, which is invalid\n", EmptyBufferSize);
             free(BitB);
         } else {
-            BitB->Buffer = (uint8_t*)calloc(1, EmptyBufferSize);
+            BitB->Buffer         = (uint8_t*)calloc(1, EmptyBufferSize);
             if (errno != 0) {
                 char *ErrnoError = (char*)calloc(1, 96);
                 strerror_r(errno, ErrnoError, 96);
@@ -164,7 +164,7 @@ extern "C" {
         size_t CLSSize          = sizeof(CommandLineSwitch); // 40 bytes
         CMD->Switch             = (CommandLineSwitch*)calloc(NumSwitches, CLSSize);
         if (errno != 0) {
-            char *ErrnoError = (char*)calloc(1, 96);
+            char *ErrnoError    = (char*)calloc(1, 96);
             strerror_r(errno, ErrnoError, 96);
             Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing CommandLineSwitch: %s\n", ErrnoError);
             free(ErrnoError);
@@ -172,12 +172,11 @@ extern "C" {
         errno                   = 0;
         CMD->SwitchCount        = (uint8_t*)calloc(NumSwitches, sizeof(uint8_t));
         if (errno != 0) {
-            char *ErrnoError = (char*)calloc(1, 96);
+            char *ErrnoError    = (char*)calloc(1, 96);
             strerror_r(errno, ErrnoError, 96);
             Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing SwitchCount in CommandLineOptions: %s\n", ErrnoError);
             free(ErrnoError);
         }
-        
         return CMD;
     }
     
@@ -213,7 +212,7 @@ extern "C" {
         if (CMD == NULL) {
             Log(LOG_ERR, "libBitIO", "CloseCommandLineOptions", "Pointer to CommandLineOptions is NULL\n");
         } else {
-            /* Free switches */
+            /* Free CommandLineSwitch */
             free(CMD->Switch->DependsOn);
             free(CMD->Switch->Flag);
             free(CMD->Switch->SwitchDescription);
@@ -282,7 +281,7 @@ extern "C" {
         return (int64_t)ceil(Number2Ceil);
     }
     
-    int64_t ExtractIntegerPartFromDouble(const double Number2Extract) {
+    int64_t ExtractIntegerPartFromDouble(const double Number2Extract) { // FIXME: This is just a wrapper
         return (int64_t)Number2Extract;
     }
     
@@ -290,7 +289,8 @@ extern "C" {
         return 0;
     }
     
-    uint64_t NumBits2ReadSymbols(const uint64_t NumSymbols) { // Use a binary logarithm, that you round up, in order to get the number of bits required to read a certain number of symbols.
+    uint64_t NumBits2ReadSymbols(const uint64_t NumSymbols) {
+        // Use a binary logarithm, that you round up, in order to get the number of bits required to read a certain number of symbols.
         return ceil(log2(NumSymbols));
     }
     
@@ -352,7 +352,7 @@ extern "C" {
         return HighestBitSet;
     }
     
-    static uint8_t DetectSystemEndian(void) { // MARK: This function needs to remain internal
+    static uint8_t DetectSystemEndian(void) {
         uint8_t  SystemEndian = 0;
         uint16_t Endian       = 0xFFFE;
         if (Endian == 0xFFFE) {
