@@ -45,28 +45,28 @@ extern "C" {
     } BitOutput;
     
     typedef struct CommandLineSwitch {
-        bool               SwitchFound;
-        bool               IsThereAResult;
+        bool               SwitchFound:1;
+        bool               IsThereAResult:1;
+        bool               IsDependent:1;
+        bool               IsDependedOn:1;
         const char        *Flag;
         size_t             FlagSize;
         const char        *SwitchDescription;
         const char        *SwitchResult;
-        bool               IsDependent;
-        uint8_t            NumDependencies;
-        uint64_t          *DependsOn;
+        uint64_t           DependsOn;
     } CommandLineSwitch;
     
     typedef struct CommandLineOptions {
         size_t             NumSwitches;
-        uint8_t           *SwitchCount;
+        uint8_t           *SwitchCount; // This is for telling how many copies of a switch were found
         uint64_t           MinSwitches;
         bool               DependentSwitchesPresent;
+        bool               IsOpenSource:1; // if open source, then set the license and URL, if not set a warning, and EULA url
         const char        *Name;
         const char        *Version;
         const char        *Description;
         const char        *Author;
         const char        *Copyright;
-        bool               IsOpenSource; // if open source, then set the license and URL, if not set a warning, and EULA url
         const char        *License;
         const char        *LicenseURL;
         CommandLineSwitch *Switch; // 1D array of CommandLineSwitch's
@@ -95,19 +95,18 @@ extern "C" {
     
     BitInput *InitBitInput(void) {
         errno = 0;
-        BitInput *BitI       = (BitInput*)calloc(1, sizeof(BitInput));
+        BitInput *BitI        = (BitInput*)calloc(1, sizeof(BitInput));
         if (errno != 0) {
-            char *ErrnoError = (char*)calloc(1, 96);
-            strerror_r(errno, ErrnoError, 96);
+            const char ErrnoError[128];
+            strerror_r(errno, ErrnoError, 128);
             Log(LOG_ERR, "libBitIO", "InitBitInput", "Errno error: %s\n", ErrnoError);
-            free(ErrnoError);
         }
         return BitI;
     }
     
     BitOutput *InitBitOutput(void) {
         errno = 0;
-        BitOutput *BitO      = (BitOutput*)calloc(1, sizeof(BitOutput));
+        BitOutput *BitO       = (BitOutput*)calloc(1, sizeof(BitOutput));
         if (errno != 0) {
             char *ErrnoError = (char*)calloc(1, 96);
             strerror_r(errno, ErrnoError, 96);
@@ -119,7 +118,7 @@ extern "C" {
     
     BitBuffer *InitBitBuffer(void) {
         errno = 0;
-        BitBuffer *BitB      = (BitBuffer*)calloc(1, sizeof(BitBuffer));
+        BitBuffer *BitB       = (BitBuffer*)calloc(1, sizeof(BitBuffer));
         if (errno != 0) {
             char *ErrnoError = (char*)calloc(1, 96);
             strerror_r(errno, ErrnoError, 96);
@@ -177,6 +176,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing SwitchCount in CommandLineOptions: %s\n", ErrnoError);
             free(ErrnoError);
         }
+        
         return CMD;
     }
     
@@ -352,7 +352,7 @@ extern "C" {
         return HighestBitSet;
     }
     
-    static uint8_t DetectSystemEndian(void) {
+    static uint8_t DetectSystemEndian(void) { // MARK: This function needs to remain internal
         uint8_t  SystemEndian = 0;
         uint16_t Endian       = 0xFFFE;
         if (Endian == 0xFFFE) {
@@ -803,6 +803,8 @@ extern "C" {
             }
             CMD->Switch[SwitchNum].IsDependent = true;
             CMD->Switch[SwitchNum].DependsOn   = DependsOn;
+            
+            CMD->Switch[DependsOn].IsDependedOn = true;
         }
     }
     
