@@ -47,8 +47,10 @@ extern "C" {
     typedef struct CommandLineSwitch {
         bool               SwitchFound:1;
         bool               IsThereAResult:1;
-        bool               IsDependent:1;
-        bool               IsDependedOn:1;
+        bool               AreThereDependentSwitches:1;
+        uint64_t           NumDependentSwitches;
+        uint64_t           NumSwitchInstances;
+        uint64_t          *DependentSwitches;
         const char        *Flag;
         size_t             FlagSize;
         const char        *SwitchDescription;
@@ -160,8 +162,10 @@ extern "C" {
         errno = 0;
         CMD->NumSwitches        = NumSwitches;
         
-        size_t CLSSize          = sizeof(CommandLineSwitch); // 40 bytes
-        CMD->Switch             = (CommandLineSwitch*)calloc(NumSwitches, CLSSize);
+        size_t CMDSize          = sizeof(CommandLineOptions);
+        size_t SwitchSize       = sizeof(CommandLineSwitch);
+        
+        CMD->Switch             = (CommandLineSwitch*)calloc(NumSwitches, SwitchSize);
         if (errno != 0) {
             char *ErrnoError    = (char*)calloc(1, 96);
             strerror_r(errno, ErrnoError, 96);
@@ -471,11 +475,13 @@ extern "C" {
                 // So, as we loop we need to check if a switch is dependent on anything, if it is, check if the dependent switch has been printed
                 
                 for (size_t DepSwitch = 0; DepSwitch < CMD->NumSwitches; DepSwitch++) {
+                    /*
                     if (CMD->Switch[DepSwitch].IsDependent == true && DependentSwitchPrinted[DepSwitch] == false) {
                         // Print the dependent switch stored in Switch->DependsOn
                         size_t DepSwitchDependsOn = CMD->Switch[DepSwitch].DependsOn;
                         printf("\t%s: %s\n", CMD->Switch[DepSwitchDependsOn].Flag, CMD->Switch[DepSwitchDependsOn].SwitchDescription);
                     }
+                     */
                 }
                 free(DependentSwitchPrinted);
             } else {
@@ -801,10 +807,12 @@ extern "C" {
             if (CMD->DependentSwitchesPresent == false) {
                 CMD->DependentSwitchesPresent = true;
             }
+            /*
             CMD->Switch[SwitchNum].IsDependent = true;
             CMD->Switch[SwitchNum].DependsOn   = DependsOn;
             
             CMD->Switch[DependsOn].IsDependedOn = true;
+             */
         }
     }
     
