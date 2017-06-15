@@ -116,36 +116,6 @@ extern "C" {
      */
     typedef struct      BitOutput                 BitOutput;
     
-    /*!
-     @typedef           CommandLineSwitch
-     @abstract                                    "Contains the data to support a single switch".
-     @remark                                      "You MUST include the NULL padding at the end of @Switch".
-     @constant          SwitchFound               "If the switch was found in argv, this will be set to true".
-     @constant          IsThereAResult            "Is there a trailing option after the flag? if so, set to true".
-     @constant          Flag                      "Actual flag, WITHOUT dash(s) or backslash, Flags are case insensitive".
-     @constant          FlagSize                  "Size of the flag in bytes".
-     @constant          SwitchDescription         "Message to print explaining what the switch does".
-     @constant          SwitchResult              "String to contain the result of this switch, NULL if not found or not included".
-     @constant          DependsOn                 "What switch is this one dependent on?".
-     */
-    typedef struct      CommandLineSwitch         CommandLineSwitch;
-    
-    /*!
-     @typedef           CommandLineOptions
-     @abstract                                    "Type to contain a variable amount of CLSwitches".
-     @remark                                      "The switches are zero indexed, and @NumSwitches is zero indexed, so count from 0".
-     @remark                                      "The last switch MUST be the help option".
-     @constant          NumSwitches               "The number of switches".
-     @constant          MinSwitches               "The minimum number of switches this program requires to run".
-     @constant          ProgramName               "The name you want output when the help is printed".
-     @constant          ProgramDescription        "The description of the program when the help is printed".
-     @constant          Author                    "The author of the program".
-     @constant          Copyright                 "The starting and ending copyright years".
-     @constant          License                   "The license this program is released under".
-     @constant          Switch                    "A pointer to an array of CLSwitch instances containing the properties of the switches".
-     */
-    typedef struct      CommandLineOptions        CommandLineOptions;
-    
     typedef struct      HuffmanTree               HuffmanTree;
     
     /*!
@@ -174,13 +144,6 @@ extern "C" {
     BitBuffer          *CreateEmptyBitBuffer(const size_t EmptyBufferSize);
     
     /*!
-     @abstract                                    "Initializes a CommandLineOptions instance".
-     @return                                      "Returns a pointer to an initialized CommandLineOptions instance".
-     @param             NumSwitches               "The number of CommandLineSwitch structures to initalize".
-     */
-    CommandLineOptions *InitCommandLineOptions(const size_t NumSwitches);
-    
-    /*!
      @abstract                                    "Deallocates BitInput".
      @remark                                      "For use when changing files, or exiting the program".
      @param             BitI                      "Pointer to the instance of BitInput you want to delete".
@@ -199,12 +162,6 @@ extern "C" {
      @param             BitB                      "Pointer to the instance of BitBuffer you want to delete"
      */
     void                CloseBitBuffer(BitBuffer *BitB);
-    
-    /*!
-     @abstract                                    "Deallocates the instance of CommandLineOptions pointed to by CMD".
-     @param             CMD                       "Pointer to the instance of CommandLineOptions you want to delete".
-     */
-    void                CloseCommandLineOptions(CommandLineOptions *CMD);
     
     /*!
      @abstract                                    "Swap endian of 16 bit integers".
@@ -358,15 +315,6 @@ extern "C" {
     uint8_t             GetBitOutputSystemEndian(const BitOutput *BitO);
     
     /*!
-     @abstract                                    "Parses argv for switches matching the ones contained in CMD".
-     @remark                                      "Argv[0] (the path for the original executable) is NEVER searched or used".
-     @param             CMD                       "Pointer to CommandLineOptions".
-     @param             argc                      "Main's argc, for the number of arguments entered".
-     @param             argv                      "Main's argv, for the actual arguments the user has entered".
-     */
-    void                ParseCommandLineArguments(const CommandLineOptions *CMD, int argc, const char *argv[]);
-    
-    /*!
      @abstract                                    "Opens an input file, pointed to by InputSwitch in CMD and stores the resulting pointer in BitI->File".
      @param             BitI                      "Pointer to the instance of BitInput".
      @param             Path2Open                 "Path to the input file to open".
@@ -379,115 +327,6 @@ extern "C" {
      @param             Path2Open                 "Path to the output file to open".
      */
     void                OpenOutputFile(BitOutput *BitO, const char *Path2Open);
-    
-    /*!
-     @abstract                                    "Sets the name of the program".
-     @param             CMD                       "Pointer to the instance of CommandLineOptions".
-     @param             Name                      "Pointer to a C string containing the name of the program you're building"
-     */
-    void                SetCMDName(CommandLineOptions *CMD, const char *Name);
-    
-    /*!
-     @abstract                                    "Sets the name of the program".
-     @param             CMD                       "Pointer to the instance of CommandLineOptions".
-     @param             VersionString             "Pointer to a C string contining the version of the program you're building"
-     */
-    void                SetCMDVersion(CommandLineOptions *CMD, const char *VersionString);
-    
-    /*!
-     @abstract                                    "Sets the description of the program".
-     @param             CMD                       "Pointer to the instance of CommandLineOptions".
-     @param             Description               "Description of what the program does".
-     */
-    void                SetCMDDescription(CommandLineOptions *CMD, const char *Description);
-    
-    /*!
-     @abstract                                    "Sets the author of the program".
-     @param             CMD                       "Pointer to the instance of CommandLineOptions".
-     @param             Author                    "Author of this program".
-     */
-    void                SetCMDAuthor(CommandLineOptions *CMD, const char *Author);
-    
-    /*!
-     @abstract                                    "Sets the copyright years of the program".
-     @param             CMD                       "Pointer to the instance of CommandLineOptions".
-     @param             Copyright                 "The starting year this program was written dash (CURRENTYEAR)".
-     */
-    void                SetCMDCopyright(CommandLineOptions *CMD, const char *Copyright);
-    
-    /*!
-     @abstract                                    "Sets the license of the program".
-     @remark                                      "If your program is closed source, do NOT use the License options, use the EULA functions".
-     @param             CMD                       "Pointer to the instance of CommandLineOptions".
-     @param             License                   "The license this program is licensed under".
-     @param             IsEULA                    "Is this program released under an open source license, or a EULA?"
-     */
-    void                SetCMDLicense(CommandLineOptions *CMD, const char *License, const bool IsEULA);
-    
-    /*!
-     @abstract                                    "Sets the URL for the license, in the main program banner".
-     @remark                                      "If your program is closed source, do NOT use the License options, use the EULA functions".
-     @param             CMD                       "Pointer to the instance of CommandLineOptions".
-     @param             LicenseURL                "the actual URL for the license".
-     @param             IsEULA                    "Is this program released under an open source license, or a EULA?"
-     */
-    void                SetCMDLicenseURL(CommandLineOptions *CMD, const char *LicenseURL, const bool IsEULA);
-    
-    /*!
-     @abstract                                    "What is the minimum number of switches your program needs to operate?".
-     @param             CMD                       "Pointer to the instance of CommandLineOptions".
-     @param             MinSwitches               "The minimum number of switches".
-     */
-    void                SetCMDMinSwitches(CommandLineOptions *CMD, const uint64_t MinSwitches);
-    
-    /*!
-     @abstract                                    "Sets SwitchNum's flag in the CommandLineOptions instance pointed by CMD".
-     @remark                                      "Just enter the number of characters you typed into the string not counting the quotes".
-     @param             CMD                       "Pointer to the instance of CommandLineOptions".
-     @param             SwitchNum                 "The switch to set".
-     @param             Flag                      "The flag to identify an option with".
-     @param             FlagSize                  "Size of the flag string".
-     */
-    void                SetCMDSwitchFlag(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Flag, const size_t FlagSize);
-    
-    /*!
-     @abstract                                    "What switch is SwitchNum dependent on?".
-     @param             CMD                       "Pointer to the instance of CommandLineOptions".
-     @param             SwitchNum                 "The switch to set".
-     @param             DependsOn                 "The flag SwitchNum needs in order to be valid".
-     */
-    void                SetCMDSwitchDependency(CommandLineOptions *CMD, const uint64_t SwitchNum, const uint64_t DependsOn);
-    
-    /*!
-     @abstract                                    "Sets SwitchDescription's flag in the CommandLineOptions instance pointed by CMD".
-     @param             CMD                       "Pointer to the instance of CommandLineOptions".
-     @param             SwitchNum                 "The switch to set".
-     @param             Description               "Pointer to a C string containing the description of what this program does"
-     */
-    void                SetCMDSwitchDescription(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Description);
-    
-    /*!
-     @abstract                                    "Sets SwitchResult's flag in the CommandLineOptions instance pointed by CMD".
-     @param             CMD                       "Pointer to the instance of CommandLineOptions".
-     @param             SwitchNum                 "The switch to set".
-     @param             IsThereAResult            "Are you expecting this switch to contain data, or are you just testing for it's presence?".
-     */
-    void                SetCMDSwitchResultStatus(CommandLineOptions *CMD, const uint64_t SwitchNum, const bool IsThereAResult);
-    
-    /*!
-     @abstract                                    "Gets the data contained in Switch->Result"
-     @return                                      "Returns the data after the switch, if the switch is resultless it will return 0"
-     @param             CMD                       "Pointer to the instance of CommandLineOptions".
-     @param             SwitchNum                 "The switch to check".
-     */
-    const char         *GetCMDSwitchResult(const CommandLineOptions *CMD, const uint64_t SwitchNum);
-    
-    /*!
-     @abstract                                    "Tells if a certain switch has been found".
-     @param             CMD                       "Pointer to CommandLineOptions instance".
-     @param             SwitchNum                 "The switch to check".
-     */
-    bool                GetCMDSwitchPresence(const CommandLineOptions *CMD, const uint64_t SwitchNum);
     
     /*!
      @abstract                                    "Manages InputBuffer and hands out the requested bits".

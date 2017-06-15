@@ -44,11 +44,22 @@ extern "C" {
         uint64_t           FileSpecifierNum;
     } BitOutput;
     
-    typedef struct CommandLineSwitch {
+     /*!
+     @typedef           CommandLineSwitch
+     @abstract                                    "Contains the data to support a single switch".
+     @remark                                      "You MUST include the NULL padding at the end of @Switch".
+     @constant          SwitchFound               "If the switch was found in argv, this will be set to true".
+     @constant          IsThereAResult            "Is there a trailing option after the flag? if so, set to true".
+     @constant          Flag                      "Actual flag, WITHOUT dash(s) or backslash, Flags are case insensitive".
+     @constant          FlagSize                  "Size of the flag in bytes".
+     @constant          SwitchDescription         "Message to print explaining what the switch does".
+     @constant          SwitchResult              "String to contain the result of this switch, NULL if not found or not included".
+     @constant          DependsOn                 "What switch is this one dependent on?".
+    typedef struct CommandLineSwitch_OLD {
         bool               SwitchFound:1;
+        bool               IsAMetaSwitch:1; // Meta switches are switches that depend on other switches.
         bool               IsThereAResult:1;
-        bool               AreThereDependentSwitches:1;
-        uint64_t           NumDependentSwitches;
+        uint64_t           NumMetaSwitches;
         uint64_t           NumSwitchInstances;
         uint64_t          *DependentSwitches;
         const char        *Flag;
@@ -56,14 +67,27 @@ extern "C" {
         const char        *SwitchDescription;
         const char        *SwitchResult;
         uint64_t           DependsOn;
-    } CommandLineSwitch;
+    } CommandLineSwitch_OLD;
     
-    typedef struct CommandLineOptions {
+      /*!
+      @typedef           CommandLineInterface
+      @abstract                                    "Type to contain a variable amount of CLSwitches".
+      @remark                                      "The switches are zero indexed, and @NumSwitches is zero indexed, so count from 0".
+      @remark                                      "The last switch MUST be the help option".
+      @constant          NumSwitches               "The number of switches".
+      @constant          MinSwitches               "The minimum number of switches this program requires to run".
+      @constant          ProgramName               "The name you want output when the help is printed".
+      @constant          ProgramDescription        "The description of the program when the help is printed".
+      @constant          Author                    "The author of the program".
+      @constant          Copyright                 "The starting and ending copyright years".
+      @constant          License                   "The license this program is released under".
+      @constant          Switch                    "A pointer to an array of CLSwitch instances containing the properties of the switches".
+    typedef struct CommandLineOptions_OLD {
         size_t             NumSwitches;
-        uint8_t           *SwitchCount; // This is for telling how many copies of a switch were found
+        uint8_t           *SwitchCount;                // This is for telling how many copies of a switch were found, nope, this belongs in CLSwitch
         uint64_t           MinSwitches;
         bool               DependentSwitchesPresent;
-        bool               IsOpenSource:1; // if open source, then set the license and URL, if not set a warning, and EULA url
+        bool               IsOpenSource:1;             // if open source, then set the license and URL, if not set a warning, and EULA url
         const char        *Name;
         const char        *Version;
         const char        *Description;
@@ -71,8 +95,9 @@ extern "C" {
         const char        *Copyright;
         const char        *License;
         const char        *LicenseURL;
-        CommandLineSwitch *Switch; // 1D array of CommandLineSwitch's
-    } CommandLineOptions;
+        CommandLineSwitch *Switch;                    // 1D array of CommandLineSwitch's
+    } CommandLineOptions_OLD;
+     */
     
     typedef struct SymbolFrequencies { // We assume that all the symbols are unsigned integers of varying size
         uint64_t           NumSymbols; // Probability is just the frequency of occurance divided by the number of symbols.
@@ -150,40 +175,6 @@ extern "C" {
         return BitB;
     }
     
-    CommandLineOptions *InitCommandLineOptions(const size_t NumSwitches) {
-        errno = 0;
-        CommandLineOptions *CMD = (CommandLineOptions*)calloc(1, sizeof(CommandLineOptions));
-        if (errno != 0) {
-            char *ErrnoError = (char*)calloc(1, 96);
-            strerror_r(errno, ErrnoError, 96);
-            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing CommandLineOptions: %s\n", ErrnoError);
-            free(ErrnoError);
-        }
-        errno = 0;
-        CMD->NumSwitches        = NumSwitches;
-        
-        size_t CMDSize          = sizeof(CommandLineOptions);
-        size_t SwitchSize       = sizeof(CommandLineSwitch);
-        
-        CMD->Switch             = (CommandLineSwitch*)calloc(NumSwitches, SwitchSize);
-        if (errno != 0) {
-            char *ErrnoError    = (char*)calloc(1, 96);
-            strerror_r(errno, ErrnoError, 96);
-            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing CommandLineSwitch: %s\n", ErrnoError);
-            free(ErrnoError);
-        }
-        errno                   = 0;
-        CMD->SwitchCount        = (uint8_t*)calloc(NumSwitches, sizeof(uint8_t));
-        if (errno != 0) {
-            char *ErrnoError    = (char*)calloc(1, 96);
-            strerror_r(errno, ErrnoError, 96);
-            Log(LOG_ERR, "libBitIO", "InitCommandLineOptions", "Errno Initing SwitchCount in CommandLineOptions: %s\n", ErrnoError);
-            free(ErrnoError);
-        }
-        
-        return CMD;
-    }
-    
     void CloseBitInput(BitInput *BitI) {
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "CloseBitInput", "Pointer to BitInput is NULL\n");
@@ -209,29 +200,6 @@ extern "C" {
         } else {
             free(BitB->Buffer);
             free(BitB);
-        }
-    }
-    
-    void CloseCommandLineOptions(CommandLineOptions *CMD) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "CloseCommandLineOptions", "Pointer to CommandLineOptions is NULL\n");
-        } else {
-            /* Free CommandLineSwitch */
-            free(CMD->Switch->DependsOn);
-            free(CMD->Switch->Flag);
-            free(CMD->Switch->SwitchDescription);
-            free(CMD->Switch->SwitchResult);
-            free(CMD->Switch);
-            /* Free CommandLineOptions */
-            free(CMD->Author);
-            free(CMD->Copyright);
-            free(CMD->Description);
-            free(CMD->License);
-            free(CMD->LicenseURL);
-            free(CMD->Name);
-            free(CMD->Version);
-            free(CMD->SwitchCount);
-            free(CMD);
         }
     }
     
@@ -439,165 +407,6 @@ extern "C" {
         return Endian;
     }
     
-    static void DisplayCMDHelp(const CommandLineOptions *CMD) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "DisplayCMDHelp", "Pointer to CommandLineOptions is NULL\n");
-        } else {
-            printf("Accepted prefixes: -, --, /\n");
-            printf("Options: \n");
-            // It would be cool if we could visually distinguish which options depend on which ones as well.
-            
-            // In order to do that, we need to have an if statement that checks if CMD->DependentSwitchesPresent is true
-            
-            /*
-             
-             I'm thinking something like:
-             
-             Accepted prefixes: -, --, /
-             Options:
-             Input: Input file or stdin with -
-             Output: Output file or stdout with -
-             Encode: Encode input to PNG
-             Resolution: Resolution in WidthxHeight format (if 3D specify the per eye resolution)
-             Interlace: Resolution in WidthxHeight format (if 3D specify the per eye resolution)
-             Optimize: Optimize the encoded PNG to be as small as possible (try all filter options)
-             Stereo3D: Encode an image as a single stereoscopic, 3D image (the first input should be the left eye)
-             Decode: Decode PNG to output
-             Split3D: Decode stereo PNG to 2 output files
-             
-             */
-            
-            if (CMD->DependentSwitchesPresent == true) {
-                // Well, logically we should iterate over each switch in numerical order, and if it has a dependent switch, we should print that first, then tab the dependency.
-                // But for that to work seamlessly, we need to have a flag on each dependenency that says if it's been printed or not.
-                // But why put that in the structs when it's only needed here?
-                bool *DependentSwitchPrinted = (bool*)calloc(CMD->NumSwitches, sizeof(bool));
-                // So, as we loop we need to check if a switch is dependent on anything, if it is, check if the dependent switch has been printed
-                
-                for (size_t DepSwitch = 0; DepSwitch < CMD->NumSwitches; DepSwitch++) {
-                    /*
-                    if (CMD->Switch[DepSwitch].IsDependent == true && DependentSwitchPrinted[DepSwitch] == false) {
-                        // Print the dependent switch stored in Switch->DependsOn
-                        size_t DepSwitchDependsOn = CMD->Switch[DepSwitch].DependsOn;
-                        printf("\t%s: %s\n", CMD->Switch[DepSwitchDependsOn].Flag, CMD->Switch[DepSwitchDependsOn].SwitchDescription);
-                    }
-                     */
-                }
-                free(DependentSwitchPrinted);
-            } else {
-                for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches - 1; SwitchNum++) {
-                    printf("\t%s: %s\n", CMD->Switch[SwitchNum].Flag, CMD->Switch[SwitchNum].SwitchDescription);
-                }
-            }
-        }
-    }
-    
-    static void DisplayProgramBanner(const CommandLineOptions *CMD) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "DisplayProgramBanner", "Pointer to CommandLineOptions is NULL\n");
-        } else {
-            printf("%s version %s by %s © %s: %s, ", CMD->Name, CMD->Version, CMD->Author, CMD->Copyright, CMD->Description); // Generic part of the string.
-            if (CMD->IsOpenSource == true) {
-                printf("Released under the \"%s\" license: %s\n\n", CMD->License, CMD->LicenseURL);
-            } else {
-                printf("By using this software, you agree to the End User License Agreement %s, available at: %s\n\n", CMD->License, CMD->LicenseURL);
-            }
-            
-        }
-    }
-    
-    void ParseCommandLineArguments(const CommandLineOptions *CMD, const int argc, const char *argv[]) {
-        // TODO : Scan for equals signs as well, if found, after the equal sign is the result, everything before is the switch.
-        // TODO : add support for generating the short versions of the flags.
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineOptions is NULL\n");
-        } else {
-            if ((CMD->NumSwitches < CMD->MinSwitches && CMD->MinSwitches > 0) || argc == 1) {
-                DisplayProgramBanner(CMD);
-                DisplayCMDHelp(CMD);
-            } else {
-                DisplayProgramBanner(CMD);
-                
-                char *SingleDash = NULL;
-                char *DoubleDash = NULL;
-                char *Slash      = NULL;
-                
-                errno = 0;
-                
-                for (uint8_t SwitchNum = 0; SwitchNum < CMD->NumSwitches; SwitchNum++) {
-                    for (uint8_t Argument = 1; Argument < argc - 1; Argument++) { // the executable path is skipped over
-                                                                                  // Once the switch is found, we should skip over this argument.
-                        
-                        // Make sure the switch dependency was found before the depedent one.
-                        // So, idk how to add this...
-                        
-                        size_t SingleDashSize                       = CMD->Switch[SwitchNum].FlagSize + 1;
-                        size_t DoubleDashSize                       = CMD->Switch[SwitchNum].FlagSize + 2;
-                        size_t SlashSize                            = CMD->Switch[SwitchNum].FlagSize + 1;
-                        
-                        SingleDash                                  = (char*)calloc(1, SingleDashSize);
-                        if (errno != 0) {
-                            char *ErrnoError = (char*)calloc(1, 96);
-                            strerror_r(errno, ErrnoError, 96);
-                            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno SingleDash = %s, Arg = %d, Switch = %d, errno = %s", ErrnoError, Argument, SwitchNum);
-                            free(ErrnoError);
-                            errno = 0;
-                        } else {
-                            snprintf(SingleDash, SingleDashSize, "-%s", CMD->Switch[SwitchNum].Flag);
-                        }
-                        
-                        DoubleDash                                  = (char*)calloc(1, DoubleDashSize);
-                        if (errno != 0) {
-                            char *ErrnoError = (char*)calloc(1, 96);
-                            strerror_r(errno, ErrnoError, 96);
-                            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno DoubleDash = %s, Arg = %d, Switch = %d", ErrnoError, Argument, SwitchNum);
-                            free(ErrnoError);
-                            errno = 0;
-                        } else {
-                            snprintf(DoubleDash, DoubleDashSize, "--%s", CMD->Switch[SwitchNum].Flag);
-                        }
-                        
-                        Slash                                       = (char*)calloc(1, SlashSize);
-                        if (errno != 0) {
-                            char *ErrnoError = (char*)calloc(1, 96);
-                            strerror_r(errno, ErrnoError, 96);
-                            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno Slash = %s, Arg = %d, Switch = %d", ErrnoError, Argument, SwitchNum);
-                            free(ErrnoError);
-                            errno = 0; // Here to reset to catch errors with the strcmp stuff below
-                        } else {
-                            snprintf(Slash, SlashSize, "/%s", CMD->Switch[SwitchNum].Flag);
-                        }
-                        
-                        if (strcasecmp(SingleDash, argv[Argument]) == 0 || strcasecmp(DoubleDash, argv[Argument]) == 0 || strcasecmp(Slash, argv[Argument]) == 0) {
-                            
-                            size_t ArgumentSize = strlen(argv[Argument + 1]) + 1;
-                            
-                            CMD->Switch[SwitchNum].SwitchFound      = true;
-                            if (CMD->Switch[SwitchNum].IsThereAResult == true) {
-                                char *SwitchResult                  = (char*)calloc(1, ArgumentSize);
-                                if (errno != 0) {
-                                    char *ErrnoError = (char*)calloc(1, 96);
-                                    strerror_r(errno, ErrnoError, 96);
-                                    Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Errno SwitchResult = %s, Arg = %d, Switch = %d", ErrnoError, Argument, SwitchNum);
-                                    free(ErrnoError);
-                                } else {
-                                    snprintf(SwitchResult, ArgumentSize, "%s", argv[Argument + 1]);
-                                    CMD->Switch[SwitchNum].SwitchResult = SwitchResult;
-                                }
-                                free(SwitchResult);
-                            }
-                            SwitchNum += 1; // To break out of looking for this switch
-                            Argument  += 1;
-                        }
-                    }
-                }
-                free(SingleDash);
-                free(DoubleDash);
-                free(Slash);
-            }
-        }
-    }
-    
     bool GetPathType(const char *Path) {
         // If it starts with "file://", or a leading slash/tilde it's a file.
         // URLs should start with their protocol, like http:// or https://, but may start with www., or ftp://
@@ -681,173 +490,6 @@ extern "C" {
     
     void OpenOutputSocket() {
         
-    }
-    
-    void SetCMDName(CommandLineOptions *CMD, const char *Name) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDName", "Pointer to CommandLineOptions is NULL\n");
-        } else if (Name == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDName", "Pointer to Name is NULL\n");
-        } else {
-            CMD->Name = Name;
-        }
-    }
-    
-    void SetCMDVersion(CommandLineOptions *CMD, const char *VersionString) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDVersion", "Pointer to CommandLineOptions is NULL\n");
-        } else if (VersionString == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDVersion", "Pointer to VersionString is NULL\n");
-        } else {
-            CMD->Version = VersionString;
-        }
-    }
-    
-    void SetCMDDescription(CommandLineOptions *CMD, const char *Description) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDDescription", "Pointer to CommandLineOptions is NULL\n");
-        } else if (Description == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDDescription", "Pointer to Description is NULL\n");
-        } else {
-            CMD->Description = Description;
-        }
-    }
-    
-    void SetCMDAuthor(CommandLineOptions *CMD, const char *Author) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDAuthor", "Pointer to CommandLineOptions is NULL\n");
-        } else if (Author == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDAuthor", "Pointer to Author is NULL\n");
-        } else {
-            CMD->Author = Author;
-        }
-    }
-    
-    void SetCMDCopyright(CommandLineOptions *CMD, const char *Copyright) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDCopyright", "Pointer to CommandLineOptions is NULL\n");
-        } else if (Copyright == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDCopyright", "Pointer to Copyright is NULL\n");
-        } else {
-            CMD->Copyright = Copyright;
-        }
-    }
-    
-    void SetCMDLicense(CommandLineOptions *CMD, const char *License, const bool IsEULA) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDLicense", "Pointer to CommandLineOptions is NULL\n");
-        } else if (License == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDLicense", "Pointer to License is NULL\n");
-        } else {
-            CMD->License      = License;
-            if (IsEULA == true) {
-                CMD->IsOpenSource = false;
-            } else {
-                CMD->IsOpenSource = true;
-            }
-        }
-    }
-    
-    void SetCMDLicenseURL(CommandLineOptions *CMD, const char *LicenseURL, const bool IsEULA) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDLicenseURL", "Pointer to CommandLineOptions is NULL\n");
-        } else if (LicenseURL == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDLicenseURL", "Pointer to LicenseURL is NULL\n");
-        } else {
-            CMD->LicenseURL   = LicenseURL;
-            if (IsEULA == true) {
-                CMD->IsOpenSource = false;
-            } else {
-                CMD->IsOpenSource = true;
-            }
-        }
-    }
-    
-    void SetCMDMinSwitches(CommandLineOptions *CMD, const uint64_t MinSwitches) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDMinSwitches", "Pointer to CommandLineOptions is NULL\n");
-        } else {
-            CMD->MinSwitches = MinSwitches;
-        }
-    }
-    
-    void SetCMDSwitchFlag(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Flag, const size_t FlagSize) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchFlag", "Pointer to CommandLineOptions is NULL\n");
-        } else if (Flag == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchFlag", "Pointer to switch Flag is NULL\n");
-        } else if (SwitchNum > CMD->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchFlag", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
-        } else {
-            CMD->Switch[SwitchNum].Flag     = Flag;
-            CMD->Switch[SwitchNum].FlagSize = FlagSize + 1; // add one for the trailing NULL
-        }
-    }
-    
-    void SetCMDSwitchDescription(CommandLineOptions *CMD, const uint64_t SwitchNum, const char *Description) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDescription", "Pointer to CommandLineOptions is NULL\n");
-        } else if (Description == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDescription", "Pointer to switch Description is NULL\n");
-        } else if (SwitchNum > CMD->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDescription", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CMD->NumSwitches);
-        } else {
-            CMD->Switch[SwitchNum].SwitchDescription = Description;
-        }
-    }
-    
-    void SetCMDSwitchDependency(CommandLineOptions *CMD, const uint64_t SwitchNum, const uint64_t DependsOn) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDependency", "Pointer to CommandLineOptions is NULL\n");
-        } else if (SwitchNum > CMD->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDependency", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
-        } else if (DependsOn > CMD->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchDependency", "DependsOn: %d, should be between 0 and %d\n", DependsOn, CMD->NumSwitches);
-        } else {
-            if (CMD->DependentSwitchesPresent == false) {
-                CMD->DependentSwitchesPresent = true;
-            }
-            /*
-            CMD->Switch[SwitchNum].IsDependent = true;
-            CMD->Switch[SwitchNum].DependsOn   = DependsOn;
-            
-            CMD->Switch[DependsOn].IsDependedOn = true;
-             */
-        }
-    }
-    
-    void SetCMDSwitchResultStatus(CommandLineOptions *CMD, const uint64_t SwitchNum, const bool IsThereAResult) {
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchResultStatus", "Pointer to CommandLineOptions is NULL\n");
-        } else if (SwitchNum > CMD->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetCMDSwitchResultStatus", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
-        } else {
-            CMD->Switch[SwitchNum].IsThereAResult = IsThereAResult & 1;
-        }
-    }
-    
-    const char *GetCMDSwitchResult(const CommandLineOptions *CMD, const uint64_t SwitchNum) {
-        const char *Result = NULL;
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetCMDSwitchResult", "Pointer to CommandLineOptions is NULL\n");
-        } else if (SwitchNum > CMD->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "GetCMDSwitchResult", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
-        } else {
-            Result = CMD->Switch[SwitchNum].SwitchResult;
-        }
-        return Result;
-    }
-    
-    bool GetCMDSwitchPresence(const CommandLineOptions *CMD, const uint64_t SwitchNum) {
-        bool Status = 0;
-        if (CMD == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetCMDSwitchPresence", "Pointer to CommandLineOptions is NULL\n");
-        } else if (SwitchNum > CMD->NumSwitches) { // - 1 so the hidden help option isn't exposed
-            Log(LOG_ERR, "libBitIO", "GetCMDSwitchPresence", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CMD->NumSwitches);
-        } else {
-            Status = CMD->Switch[SwitchNum].SwitchFound;
-        }
-        return Status;
     }
     
     uint64_t ReadBits(BitBuffer *BitB, const uint8_t Bits2Read, const bool ReadFromMSB) {
