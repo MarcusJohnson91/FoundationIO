@@ -122,7 +122,7 @@ extern "C" {
     
     BitInput *InitBitInput(void) {
         errno = 0;
-        BitInput *BitI        = (BitInput*)calloc(1, sizeof(BitInput));
+        BitInput *BitI        = (BitInput*) calloc(1, sizeof(BitInput));
         if (errno != 0) {
             const char ErrnoError[128];
             strerror_r(errno, ErrnoError, 128);
@@ -133,9 +133,9 @@ extern "C" {
     
     BitOutput *InitBitOutput(void) {
         errno = 0;
-        BitOutput *BitO       = (BitOutput*)calloc(1, sizeof(BitOutput));
+        BitOutput *BitO       = (BitOutput*) calloc(1, sizeof(BitOutput));
         if (errno != 0) {
-            char *ErrnoError = (char*)calloc(1, 96);
+            char *ErrnoError = (char*) calloc(1, 96);
             strerror_r(errno, ErrnoError, 96);
             Log(LOG_ERR, "libBitIO", "InitBitOutput", "Errno error: %s\n", ErrnoError);
             free(ErrnoError);
@@ -145,9 +145,9 @@ extern "C" {
     
     BitBuffer *InitBitBuffer(void) {
         errno = 0;
-        BitBuffer *BitB       = (BitBuffer*)calloc(1, sizeof(BitBuffer));
+        BitBuffer *BitB       = (BitBuffer*) calloc(1, sizeof(BitBuffer));
         if (errno != 0) {
-            char *ErrnoError = (char*)calloc(1, 96);
+            char *ErrnoError = (char*) calloc(1, 96);
             strerror_r(errno, ErrnoError, 96);
             Log(LOG_ERR, "libBitIO", "InitBitBuffer", "Errno error: %s\n", ErrnoError);
             free(ErrnoError);
@@ -157,16 +157,14 @@ extern "C" {
     
     BitBuffer *CreateEmptyBitBuffer(const size_t EmptyBufferSize) {
         errno = 0;
-        BitBuffer *BitB          = (BitBuffer*)calloc(1, sizeof(BitBuffer));
-        if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "CreateEmptyBitBuffer", "Pointer to BitBuffer is NULL\n");
-        } else if (EmptyBufferSize <= 0) {
+        BitBuffer *BitB = NULL;
+        if (EmptyBufferSize <= 0) {
             Log(LOG_ERR, "libBitIO", "CreateEmptyBitBuffer", "You tried creating a empty buffer of size: %d, which is invalid\n", EmptyBufferSize);
-            free(BitB);
         } else {
-            BitB->Buffer         = (uint8_t*)calloc(1, EmptyBufferSize);
+            BitB                 = (BitBuffer*) calloc(1, sizeof(BitBuffer));
+            BitB->Buffer         = (uint8_t*) calloc(1, EmptyBufferSize);
             if (errno != 0) {
-                char *ErrnoError = (char*)calloc(1, 96);
+                char *ErrnoError = (char*) calloc(1, 96);
                 strerror_r(errno, ErrnoError, 96);
                 Log(LOG_ERR, "libBitIO", "CreateEmptyBitBuffer", "Errno error: %s\n", ErrnoError);
                 free(ErrnoError);
@@ -436,13 +434,13 @@ extern "C" {
              */
             
             size_t Path2OpenSize = strlen(Path2Open);
-            char *NewPath = (char*)calloc(1, Path2OpenSize);
+            char *NewPath = (char*) calloc(1, Path2OpenSize);
             snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitI->FileSpecifierNum);
             
             errno = 0;
             BitI->File = fopen(Path2Open, "rb");
             if (errno != 0) {
-                char *ErrnoError = (char*)calloc(1, 96);
+                char *ErrnoError = (char*) calloc(1, 96);
                 strerror_r(errno, ErrnoError, 96);
                 Log(LOG_ERR, "libBitIO", "OpenInputFile", "Fopen error: %s\n", ErrnoError);
                 free(ErrnoError);
@@ -466,13 +464,13 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "OpenOutputFile", "Fopen error: Pointer is NULL\n");
         } else {
             size_t Path2OpenSize = strlen(Path2Open);
-            char *NewPath = (char*)calloc(1, Path2OpenSize);
+            char *NewPath = (char*) calloc(1, Path2OpenSize);
             snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitO->FileSpecifierNum);
             
             errno = 0;
             BitO->File = fopen(Path2Open, "wb");
             if (errno != 0) {
-                char *ErrnoError = (char*)calloc(1, 96);
+                char *ErrnoError = (char*) calloc(1, 96);
                 strerror_r(errno, ErrnoError, 96);
                 Log(LOG_ERR, "libBitIO", "OpenOutputFile", "Fopen error: %s", ErrnoError);
                 free(ErrnoError);
@@ -778,9 +776,9 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, sizeof(BinaryUUID));
         } else {
             errno = 0;
-            UUIDString = (uint8_t*)calloc(1, BitIOUUIDStringSize);
+            UUIDString = (uint8_t*) calloc(1, BitIOUUIDStringSize);
             if (errno != 0) {
-                char *ErrnoError = (char*)calloc(1, 96);
+                char *ErrnoError = (char*) calloc(1, 96);
                 strerror_r(errno, ErrnoError, 96);
                 Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "Errno: %s", ErrnoError);
                 free(ErrnoError);
@@ -808,9 +806,9 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, sizeof(UUIDString));
         } else {
             errno = 0;
-            BinaryUUID = (uint8_t*)calloc(1, BitIOBinaryUUIDSize);
+            BinaryUUID = (uint8_t*) calloc(1, BitIOBinaryUUIDSize);
             if (errno != 0) {
-                char *ErrnoError = (char*)calloc(1, 96);
+                char *ErrnoError = (char*) calloc(1, 96);
                 strerror_r(errno, ErrnoError, 96);
                 Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "Errno: %s", ErrnoError);
                 free(ErrnoError);
@@ -834,9 +832,9 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "BinaryUUID size should be: %d, but is: %d\n", BitIOBinaryUUIDSize, sizeof(BinaryUUID));
         } else {
             errno = 0;
-            SwappedBinaryUUID = (uint8_t*)calloc(1, BitIOBinaryUUIDSize);
+            SwappedBinaryUUID = (uint8_t*) calloc(1, BitIOBinaryUUIDSize);
             if (errno != 0) {
-                char *ErrnoError = (char*)calloc(1, 96);
+                char *ErrnoError = (char*) calloc(1, 96);
                 strerror_r(errno, ErrnoError, 96);
                 Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "Errno: %s", ErrnoError);
                 free(ErrnoError);
@@ -865,9 +863,9 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ReadUUID", "Pointer to BitBuffer is NULL\n");
         } else {
             errno = 0;
-            uint8_t *BinaryUUID = (uint8_t*)calloc(1, BitIOBinaryUUIDSize);
+            uint8_t *BinaryUUID = (uint8_t*) calloc(1, BitIOBinaryUUIDSize);
             if (errno != 0) {
-                char *ErrnoError = (char*)calloc(1, 96);
+                char *ErrnoError = (char*) calloc(1, 96);
                 strerror_r(errno, ErrnoError, 96);
                 Log(LOG_ERR, "libBitIO", "ReadUUID", "Errno: %s", ErrnoError);
                 free(ErrnoError);
@@ -892,9 +890,9 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "UUIDString size should be: %d, but is: %d\n", BitIOUUIDStringSize, sizeof(UUIDString));
         } else {
             errno = 0;
-            GUIDString = (uint8_t*)calloc(1, BitIOGUIDStringSize);
+            GUIDString = (uint8_t*) calloc(1, BitIOGUIDStringSize);
             if (errno != 0) {
-                char *ErrnoError = (char*)calloc(1, 96);
+                char *ErrnoError = (char*) calloc(1, 96);
                 strerror_r(errno, ErrnoError, 96);
                 Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "Errno: %s", ErrnoError);
                 free(ErrnoError);
@@ -918,9 +916,9 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ConvertGUID2UUID", "GUIDString size should be: %d, but is: %d\n", BitIOGUIDStringSize, sizeof(GUIDString));
         } else {
             errno = 0;
-            UUIDString = (uint8_t*)calloc(1, BitIOUUIDStringSize);
+            UUIDString = (uint8_t*) calloc(1, BitIOUUIDStringSize);
             if (errno != 0) {
-                char *ErrnoError = (char*)calloc(1, 96);
+                char *ErrnoError = (char*) calloc(1, 96);
                 strerror_r(errno, ErrnoError, 96);
                 Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "Errno: %s", ErrnoError);
                 free(ErrnoError);
@@ -1004,9 +1002,9 @@ extern "C" {
                 free(BitB->Buffer);
             }
             errno = 0;
-            BitB->Buffer                  = (uint8_t*)calloc(1, Bytes2Read);
+            BitB->Buffer                  = (uint8_t*) calloc(1, Bytes2Read);
             if (errno != 0) {
-                char *ErrnoError = (char*)calloc(1, 96);
+                char *ErrnoError = (char*) calloc(1, 96);
                 strerror_r(errno, ErrnoError, 96);
                 Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "Errno: %s", ErrnoError);
                 free(ErrnoError);
@@ -1057,17 +1055,17 @@ extern "C" {
     uint64_t *MeasureSortSymbolFrequency(const uint16_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
         // This is MeasureSymbolFrequency + sorting as we go.
         errno = 0;
-        uint64_t *SymbolFrequencies = (uint64_t*)calloc(1, BufferSizeInElements);
+        uint64_t *SymbolFrequencies = (uint64_t*) calloc(1, BufferSizeInElements);
         if (errno != 0) {
-            char *ErrnoError = (char*)calloc(1, 96);
+            char *ErrnoError = (char*) calloc(1, 96);
             strerror_r(errno, ErrnoError, 96);
             Log(LOG_ERR, "libBitIO", "MeasureSortSymbolFrequency", " Errno: SymbolFrequencies = %s, size = %d", ErrnoError, BufferSizeInElements);
             free(ErrnoError);
             errno = 0;
         }
-        uint64_t *FrequencyPosition = (uint64_t*)calloc(1, BufferSizeInElements);
+        uint64_t *FrequencyPosition = (uint64_t*) calloc(1, BufferSizeInElements);
         if (errno != 0) {
-            char *ErrnoError = (char*)calloc(1, 96);
+            char *ErrnoError = (char*) calloc(1, 96);
             strerror_r(errno, ErrnoError, 96);
             Log(LOG_ERR, "libBitIO", "MeasureSortSymbolFrequency", " Errno: FrequencyPosition = %s, size = %d", ErrnoError, BufferSizeInElements);
             free(ErrnoError);
