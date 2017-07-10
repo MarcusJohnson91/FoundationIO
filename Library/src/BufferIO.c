@@ -430,12 +430,15 @@ extern "C" {
              Now I need to write a function to tell if there is a format specifier in the path, and where it is.
              Well, we need to look through the string for %09d or whateve.
              Or, maybe we should just print Path2Open to another string that is 5 bytes bigger than the current one?
-             and ofc we use the
+             No, that's a bad idea, but IDK how to do it better.
+             
+             Also, we need to be able to store when/if FileSpecifierNum has been updated.
              */
             
             size_t Path2OpenSize = strlen(Path2Open);
             char *NewPath = (char*) calloc(1, Path2OpenSize);
-            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitI->FileSpecifierNum);
+            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitI->FileSpecifierNum + 1);
+            BitI->FileSpecifierNum += 1;
             
             errno = 0;
             BitI->File = fopen(Path2Open, "rb");
