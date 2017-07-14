@@ -228,29 +228,6 @@ extern "C" {
         }
     }
     
-    int64_t Powi(const int64_t Base, const int64_t Exponent) {
-        int64_t Result = 0;
-        
-        if (Base == 0) {
-            Result = 0;
-        } else if (Exponent == 0) {
-            Result = 1;
-        } else {
-            for (uint64_t Loop = 0; Loop < Exponent; Loop++) {
-                Result += Base * Base;
-            }
-        }
-        return Result;
-    }
-    
-    int64_t Floori(const double Number2Floor) {
-        return (int64_t)floor(Number2Floor);
-    }
-    
-    int64_t Ceili(const double Number2Ceil) {
-        return (int64_t)ceil(Number2Ceil);
-    }
-    
     int64_t ExtractIntegerPartFromDouble(const double Number2Extract) { // FIXME: This is just a wrapper
         return (int64_t)Number2Extract;
     }
@@ -285,7 +262,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "Power2Mask", "Exponent %d is too large\n", Exponent);
         } else {
             uint64_t HighestBit = 0ULL, Fill = 0ULL;
-            HighestBit          = (uint64_t)Powi(2, Exponent - 1);
+            HighestBit          = (uint64_t)pow(2, Exponent - 1);
             Fill                = HighestBit - 1;
             Mask                = HighestBit + Fill;
         }

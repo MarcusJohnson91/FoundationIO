@@ -198,26 +198,6 @@ extern "C" {
     int64_t             Bits2Bytes(const int64_t Bits, const bool RoundUp);
     
     /*!
-     @abstract                                    "Raise a base to the exponent".
-     @param             Base                      "The base to be multiplied by it's self Exponent times".
-     @param             Exponent                  "The number of times to multiply Base by it's self".
-     */
-    int64_t             Powi(const int64_t Base, const int64_t Exponent);
-    
-    /*!
-     @abstract                                    "Integer floor function".
-     @param             Number2Floor              "The input number as a floating point value".
-     */
-    int64_t             Floori(const double Number2Floor);
-    
-    /*!
-     @abstract                                    "Integer ceil function".
-     @todo                                        "We should extract the decimal part and drop the mantissa, it would make it an int-only op, and faster".
-     @param             Number2Ceil               "The input number to Ceil as a floating point number".
-     */
-    int64_t             Ceili(const double Number2Ceil);
-    
-    /*!
      @abstract                                    "Computes the number of bits required to hold a certain amount of symbols".
      @remark                                      "Rounds up to the next integer bits to ensure all symbols can be contained in simple binary"
      @param             NumSymbols                "The number of symbols you're looking to contain in a binary number".
