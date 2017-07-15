@@ -397,7 +397,7 @@ extern "C" {
         return false;
     }
     
-    void OpenInputFile(BitInput *BitI, const char *Path2Open) {
+    void OpenInputFile(BitInput *BitI, const char *Path2Open, bool OpenForReadWrite) {
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenInputFile", "Pointer to BitInput is NULL\n");
         } else if (Path2Open == NULL) {
@@ -418,7 +418,11 @@ extern "C" {
             BitI->FileSpecifierNum += 1;
             
             errno = 0;
-            BitI->File = fopen(Path2Open, "rb");
+            if (OpenForReadWrite == true) {
+                BitI->File = fopen(Path2Open, "rb+");
+            } else {
+                BitI->File = fopen(Path2Open, "rb");
+            }
             if (errno != 0) {
                 char *ErrnoError = (char*) calloc(1, 96);
                 strerror_r(errno, ErrnoError, 96);
@@ -426,12 +430,12 @@ extern "C" {
                 free(ErrnoError);
                 errno  = 0;
             } else if (BitI->File == NULL) {
-                Log(LOG_ERR, "libBitIO", "OpenInputFile", "BitI->File error: Pointer is NULL\n");
+                Log(LOG_ERR, "libBitIO", "OpenInputFile", "BitI->File error: Pointer to File is NULL\n");
             } else {
                 fseek(BitI->File, 0, SEEK_END);
-                BitI->FileSize     = ftell(BitI->File);
+                BitI->FileSize     = (size_t) ftell(BitI->File);
                 fseek(BitI->File, 0, SEEK_SET);
-                BitI->FilePosition = ftell(BitI->File);
+                BitI->FilePosition = (size_t) ftell(BitI->File);
                 BitI->SystemEndian = DetectSystemEndian();
             }
         }
