@@ -298,8 +298,9 @@ extern "C" {
      @abstract                                    "Opens an input file, pointed to by InputSwitch in CMD and stores the resulting pointer in BitI->File".
      @param             BitI                      "Pointer to the instance of BitInput".
      @param             Path2Open                 "Path to the input file to open".
+     @param             OpenForReadWrite          "Should the File be opened for both reading and writing?".
      */
-    void                OpenInputFile(BitInput *BitI, const char *Path2Open);
+    void                OpenInputFile(BitInput *BitI, const char *Path2Open, bool OpenForReadWrite);
     
     /*!
      @abstract                                    "Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitO->File".
