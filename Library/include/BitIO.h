@@ -485,6 +485,15 @@ extern "C" {
      */
     void                WriteBitBuffer2BitOutput(const BitOutput *BitO, BitBuffer *Buffer2Write, const size_t Bytes2Write);
     
+    /*!
+     @abstract                                    "Decodes Run-Length Encoded data".
+     @param             Data2Decode               "Pointer to BitBuffer containing RLE encoded data".
+     @param             Decoded                   "Pointer to BitBuffer containing decoded data".
+     @param             LengthCodeSize            "The number of bits used to represent the length code".
+     @param             SymbolSize                "The number of bits used to represent the symbol".
+     */
+    void                DecodeRLE(const BitBuffer *Data2Decode, BitBuffer *Decoded, const uint8_t LengthCodeSize, const uint8_t SymbolSize);
+    
 #ifndef _POSIX_VERSION
     /*!
      @enum              LogTypes
