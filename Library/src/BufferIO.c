@@ -1032,6 +1032,33 @@ extern "C" {
         
     }
     
+    
+    void DecodeRLE(const BitBuffer *Data2Decode, BitBuffer *Decoded, const uint8_t LengthCodeSize, const uint8_t SymbolSize) {
+        if (Data2Decode == NULL) {
+            Log(LOG_ERR, "libBitIO", "DecodeRLE", "Pointer to Data2Decode is NULL\n");
+        } else if (Decoded == NULL) {
+            Log(LOG_ERR, "libBitIO", "DecodeRLE", "Pointer to Decoded is NULL\n");
+        } else if (LengthCodeSize < 1) {
+            Log(LOG_ERR, "libBitIO", "DecodeRLE", "LengthCodeSize %d is invalid\n", LengthCodeSize);
+        } else if (SymbolSize < 1) {
+            Log(LOG_ERR, "libBitIO", "DecodeRLE", "SymbolSize %d is invalid\n", SymbolSize);
+        } else {
+            uint64_t  CurrentSymbol = 0ULL;
+            uint64_t  CurrentLength = 0ULL;
+            uint64_t *OutputString  = NULL;
+            for (uint64_t D2DSymbol = 0; D2DSymbol < Data2Decode->BitsUnavailable / SymbolSize; D2DSymbol++) { // FIXME: BitsUnavailable / SymbolSize needs some work
+                CurrentSymbol = ReadBits(Data2Decode, SymbolSize, true);
+                CurrentLength = ReadBits(Data2Decode, LengthCodeSize, true);
+                // Now we simply need to create CurrentLength copies of CurrentSymbol, and append them to Decoded
+                OutputString = calloc(CurrentLength, Bits2Bytes(SymbolSize, true));
+                for (uint64_t OutputStringSymbol = 0; OutputStringSymbol < CurrentLength; OutputStringSymbol++) {
+                    OutputString[OutputStringSymbol] = CurrentSymbol;
+                }
+                WriteBits(Decoded, *OutputString, SymbolSize, true);
+            }
+        }
+    }
+    
     /*
      Huffman, Arthimetic, and ANS/ABS coding systems ALL require having a sorted list of symbol and their frequency (to keep it in the int domain)
      So writing a sorting algorithm is going to be the first thing i do, and I'm not going to fuck around with crazy sorters, just a real simple one that should optimize better.
