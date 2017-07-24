@@ -44,61 +44,6 @@ extern "C" {
         uint64_t           FileSpecifierNum;
     } BitOutput;
     
-     /*!
-     @typedef           CommandLineSwitch
-     @abstract                                    "Contains the data to support a single switch".
-     @remark                                      "You MUST include the NULL padding at the end of @Switch".
-     @constant          SwitchFound               "If the switch was found in argv, this will be set to true".
-     @constant          IsThereAResult            "Is there a trailing option after the flag? if so, set to true".
-     @constant          Flag                      "Actual flag, WITHOUT dash(s) or backslash, Flags are case insensitive".
-     @constant          FlagSize                  "Size of the flag in bytes".
-     @constant          SwitchDescription         "Message to print explaining what the switch does".
-     @constant          SwitchResult              "String to contain the result of this switch, NULL if not found or not included".
-     @constant          DependsOn                 "What switch is this one dependent on?".
-    typedef struct CommandLineSwitch_OLD {
-        bool               SwitchFound:1;
-        bool               IsAMetaSwitch:1; // Meta switches are switches that depend on other switches.
-        bool               IsThereAResult:1;
-        uint64_t           NumMetaSwitches;
-        uint64_t           NumSwitchInstances;
-        uint64_t          *DependentSwitches;
-        const char        *Flag;
-        size_t             FlagSize;
-        const char        *SwitchDescription;
-        const char        *SwitchResult;
-        uint64_t           DependsOn;
-    } CommandLineSwitch_OLD;
-    
-      /*!
-      @typedef           CommandLineInterface
-      @abstract                                    "Type to contain a variable amount of CLSwitches".
-      @remark                                      "The switches are zero indexed, and @NumSwitches is zero indexed, so count from 0".
-      @remark                                      "The last switch MUST be the help option".
-      @constant          NumSwitches               "The number of switches".
-      @constant          MinSwitches               "The minimum number of switches this program requires to run".
-      @constant          ProgramName               "The name you want output when the help is printed".
-      @constant          ProgramDescription        "The description of the program when the help is printed".
-      @constant          Author                    "The author of the program".
-      @constant          Copyright                 "The starting and ending copyright years".
-      @constant          License                   "The license this program is released under".
-      @constant          Switch                    "A pointer to an array of CLSwitch instances containing the properties of the switches".
-    typedef struct CommandLineOptions_OLD {
-        size_t             NumSwitches;
-        uint8_t           *SwitchCount;                // This is for telling how many copies of a switch were found, nope, this belongs in CLSwitch
-        uint64_t           MinSwitches;
-        bool               DependentSwitchesPresent;
-        bool               IsOpenSource:1;             // if open source, then set the license and URL, if not set a warning, and EULA url
-        const char        *Name;
-        const char        *Version;
-        const char        *Description;
-        const char        *Author;
-        const char        *Copyright;
-        const char        *License;
-        const char        *LicenseURL;
-        CommandLineSwitch *Switch;                    // 1D array of CommandLineSwitch's
-    } CommandLineOptions_OLD;
-     */
-    
     typedef struct SymbolFrequencies { // We assume that all the symbols are unsigned integers of varying size
         uint64_t           NumSymbols; // Probability is just the frequency of occurance divided by the number of symbols.
         uint8_t            SymbolSize; // number of bytes per symbol
