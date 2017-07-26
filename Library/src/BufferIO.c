@@ -427,10 +427,8 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ReadBits", "Pointer to BitBuffer is NULL\n");
         } else if (BitB->Buffer == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadBits", "Pointer to Buffer in BitBuffer is NULL\n");
-        } else if (Bits2Read > 64) {
+        } else if (Bits2Read > 64 || Bits2Read == 0) {
             Log(LOG_ERR, "libBitIO", "ReadBits", "ReadBits: %d, only supports reading 1-64 bits\n", Bits2Read);
-        } else if (Bits2Read == 0) {
-            return 0;
         } else {
             while (Bits > 0) {
                 BufferBitsAvailable = 8 - (BitB->BitsUnavailable % 8);
