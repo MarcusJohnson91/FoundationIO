@@ -134,34 +134,29 @@ extern "C" {
      @abstract                                    "Initializes a BitBuffer structure".
      @remark                                      "The buffer MUST be unread".
      @return                                      "Returns a pointer to said BitBuffer structure".
+     @param             BitBufferSize             "Number of bytes to create Bitbuffer with".
      */
-    BitBuffer          *InitBitBuffer(void);
-    
-    /*!
-     @abstract                                    "Creates an empty buffer for putting data into"
-     @param             EmptyBufferSize           "Size of the buffer to create in bytes".
-     */
-    BitBuffer          *CreateEmptyBitBuffer(const size_t EmptyBufferSize);
+    BitBuffer          *InitBitBuffer(const size_t BitBufferSize);
     
     /*!
      @abstract                                    "Deallocates BitInput".
      @remark                                      "For use when changing files, or exiting the program".
      @param             BitI                      "Pointer to the instance of BitInput you want to delete".
      */
-    void                CloseBitInput(BitInput *BitI);
+    void                DeinitBitInput(BitInput *BitI);
     
     /*!
      @abstract                                    "Deallocates the instance of BitOutput pointed to by BitI"
      @remark                                      "For use when changing files, or exiting the program".
      @param             BitO                      "Pointer to the instance of BitOutput you want to delete".
      */
-    void                CloseBitOutput(BitOutput *BitO);
+    void                DeinitBitOutput(BitOutput *BitO);
     
     /*!
      @abstract                                    "Deallocates the instance of BitBuffer pointed to by BitB"
      @param             BitB                      "Pointer to the instance of BitBuffer you want to delete"
      */
-    void                CloseBitBuffer(BitBuffer *BitB);
+    void                DeinitBitBuffer(BitBuffer *BitB);
     
     /*!
      @abstract                                    "Swap endian of 16 bit integers".
