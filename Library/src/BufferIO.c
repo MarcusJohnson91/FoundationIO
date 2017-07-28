@@ -88,11 +88,12 @@ extern "C" {
         return BitO;
     }
     
-    BitBuffer *InitBitBuffer(void) {
+    BitBuffer *InitBitBuffer(const size_t BitBufferSize) {
         errno = 0;
         BitBuffer *BitB       = (BitBuffer*) calloc(1, sizeof(BitBuffer));
+        BitB->Buffer          = calloc(1, BitBufferSize);
         if (errno != 0) {
-            char *ErrnoError = (char*) calloc(1, 96);
+            char *ErrnoError  = (char*) calloc(1, 96);
             strerror_r(errno, ErrnoError, 96);
             Log(LOG_ERR, "libBitIO", "InitBitBuffer", "Errno error: %s\n", ErrnoError);
             free(ErrnoError);
@@ -100,36 +101,18 @@ extern "C" {
         return BitB;
     }
     
-    BitBuffer *CreateEmptyBitBuffer(const size_t EmptyBufferSize) {
-        errno = 0;
-        BitBuffer *BitB = NULL;
-        if (EmptyBufferSize <= 0) {
-            Log(LOG_ERR, "libBitIO", "CreateEmptyBitBuffer", "You tried creating a empty buffer of size: %d, which is invalid\n", EmptyBufferSize);
-        } else {
-            BitB                 = (BitBuffer*) calloc(1, sizeof(BitBuffer));
-            BitB->Buffer         = (uint8_t*) calloc(1, EmptyBufferSize);
-            if (errno != 0) {
-                char *ErrnoError = (char*) calloc(1, 96);
-                strerror_r(errno, ErrnoError, 96);
-                Log(LOG_ERR, "libBitIO", "CreateEmptyBitBuffer", "Errno error: %s\n", ErrnoError);
-                free(ErrnoError);
-            }
-        }
-        return BitB;
-    }
-    
-    void CloseBitInput(BitInput *BitI) {
+    void DeinitBitInput(BitInput *BitI) {
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "CloseBitInput", "Pointer to BitInput is NULL\n");
+            Log(LOG_ERR, "libBitIO", "DeinitBitInput", "Pointer to BitInput is NULL\n");
         } else {
             fclose(BitI->File);
             free(BitI);
         }
     }
     
-    void CloseBitOutput(BitOutput *BitO) {
+    void DeinitBitOutput(BitOutput *BitO) {
         if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "CloseBitOutput", "Pointer to BitOutput is NULL");
+            Log(LOG_ERR, "libBitIO", "DeinitBitOutput", "Pointer to BitOutput is NULL");
         } else {
             fflush(BitO->File);
             fclose(BitO->File);
@@ -137,9 +120,9 @@ extern "C" {
         }
     }
     
-    void CloseBitBuffer(BitBuffer *BitB) {
+    void DeinitBitBuffer(BitBuffer *BitB) {
         if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "CloseBitBuffer", "Pointer to BitBuffer is NULL");
+            Log(LOG_ERR, "libBitIO", "DeinitBitBuffer", "Pointer to BitBuffer is NULL");
         } else {
             free(BitB->Buffer);
             free(BitB);
@@ -428,7 +411,7 @@ extern "C" {
         } else if (BitB->Buffer == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadBits", "Pointer to Buffer in BitBuffer is NULL\n");
         } else if (Bits2Read > 64 || Bits2Read == 0) {
-            Log(LOG_ERR, "libBitIO", "ReadBits", "ReadBits: %d, only supports reading 1-64 bits\n", Bits2Read);
+            Log(LOG_ERR, "libBitIO", "ReadBits", "Bits2Read: %d, only supports reading 1-64 bits\n", Bits2Read);
         } else {
             while (Bits > 0) {
                 BufferBitsAvailable = 8 - (BitB->BitsUnavailable % 8);
@@ -527,7 +510,7 @@ extern "C" {
             
             // so we're trying to write 9 bits, 0x1FF.
             // There are only 5 bits available in the current byte.
-            // So, that means we have to pull out 5 bits from Data2Write, and pop it into BitO->Buffer.
+            // So, that means we have to pull out 5 bits from Data2Write, and pop it into BitB->Buffer.
             // The Mask should be 0x1F if LSBfirst, or 0xF8 if MSB first.
             // The buffer's representation is MSB first.
             // if we're supposed to write this data LSB first we need to shift it after extraction to get it ready to be applied.
