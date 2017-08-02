@@ -24,22 +24,26 @@ extern "C" {
 #endif
     
     typedef struct BitBuffer {
-        size_t             BitsAvailable;
-        size_t             BitsUnavailable;
+        uint64_t           BitsAvailable;
+        uint64_t           BitsUnavailable;
         uint8_t           *Buffer;
     } BitBuffer;
     
     typedef struct BitInput {
+        bool               IsFileOrSocket;
         FILE              *File;
-        size_t             FileSize;
-        size_t             FilePosition;
+        int                Socket;
+        uint64_t           FileSize;
+        uint64_t           FilePosition;
         uint8_t            SystemEndian:2;
         uint64_t           FileSpecifierNum;
     } BitInput;
     
     typedef struct BitOutput {
+        bool               IsFileOrSocket;
         FILE              *File;
-        size_t             FilePosition;
+        int                Socket;
+        uint64_t           FilePosition;
         uint8_t            SystemEndian:2;
         uint64_t           FileSpecifierNum;
     } BitOutput;
@@ -88,7 +92,7 @@ extern "C" {
         return BitO;
     }
     
-    BitBuffer *InitBitBuffer(const size_t BitBufferSize) {
+    BitBuffer *InitBitBuffer(const uint64_t BitBufferSize) {
         errno = 0;
         BitBuffer *BitB       = (BitBuffer*) calloc(1, sizeof(BitBuffer));
         BitB->Buffer          = calloc(1, BitBufferSize);
@@ -240,7 +244,7 @@ extern "C" {
         return SystemEndian;
     }
     
-    size_t BytesRemainingInInputFile(const BitInput *BitI) {
+    uint64_t BytesRemainingInInputFile(const BitInput *BitI) {
         uint64_t BytesLeft = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "BytesRemainingInInputFile", "Pointer to BitInput is NULL\n");
@@ -250,7 +254,7 @@ extern "C" {
         return BytesLeft;
     }
     
-    size_t GetBitInputFileSize(const BitInput *BitI) {
+    uint64_t GetBitInputFileSize(const BitInput *BitI) {
         uint64_t InputSize = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL\n");
@@ -260,8 +264,8 @@ extern "C" {
         return InputSize;
     }
     
-    size_t GetBitInputFilePosition(const BitInput *BitI) {
-        size_t Position = 0;
+    uint64_t GetBitInputFilePosition(const BitInput *BitI) {
+        uint64_t Position = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL\n");
         } else {
@@ -270,8 +274,8 @@ extern "C" {
         return Position;
     }
     
-    size_t GetBitBufferPosition(const BitBuffer *BitB) {
-        size_t Position = 0;
+    uint64_t GetBitBufferPosition(const BitBuffer *BitB) {
+        uint64_t Position = 0;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL\n");
         } else {
@@ -280,8 +284,8 @@ extern "C" {
         return Position;
     }
     
-    size_t GetBitBufferSize(const BitBuffer *BitB) {
-        size_t BitBufferSize = 0;
+    uint64_t GetBitBufferSize(const BitBuffer *BitB) {
+        uint64_t BitBufferSize = 0;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitBufferSize", "Pointer to BitBuffer is NULL\n");
         } else {
@@ -340,7 +344,7 @@ extern "C" {
              Also, we need to be able to store when/if FileSpecifierNum has been updated.
              */
             
-            size_t Path2OpenSize = strlen(Path2Open);
+            uint64_t Path2OpenSize = strlen(Path2Open);
             char *NewPath = (char*) calloc(1, Path2OpenSize);
             snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitI->FileSpecifierNum + 1);
             BitI->FileSpecifierNum += 1;
@@ -361,9 +365,9 @@ extern "C" {
                 Log(LOG_ERR, "libBitIO", "OpenInputFile", "BitI->File error: Pointer to File is NULL\n");
             } else {
                 fseek(BitI->File, 0, SEEK_END);
-                BitI->FileSize     = (size_t) ftell(BitI->File);
+                BitI->FileSize     = (uint64_t) ftell(BitI->File);
                 fseek(BitI->File, 0, SEEK_SET);
-                BitI->FilePosition = (size_t) ftell(BitI->File);
+                BitI->FilePosition = (uint64_t) ftell(BitI->File);
                 BitI->SystemEndian = DetectSystemEndian();
             }
         }
@@ -375,7 +379,7 @@ extern "C" {
         } else if (Path2Open == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenOutputFile", "Fopen error: Pointer is NULL\n");
         } else {
-            size_t Path2OpenSize = strlen(Path2Open);
+            uint64_t Path2OpenSize = strlen(Path2Open);
             char *NewPath = (char*) calloc(1, Path2OpenSize);
             snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitO->FileSpecifierNum);
             
@@ -394,11 +398,37 @@ extern "C" {
         }
     }
     
-    void OpenInputSocket() {
+    void OpenInputSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol) {
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "OpenInputSocket", "Pointer to BitInput is NULL\n");
+        } else {
+#ifndef _WIN32
+            BitI->Socket         = socket(Domain, Type, Protocol);
+            BitI->IsFileOrSocket = Socket;
+#elif _WIN32
+            
+#endif
+        }
+    }
+    
+    void OpenOutputSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol) {
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "OpenInputSocket", "Pointer to BitInput is NULL\n");
+        } else {
+#ifndef _WIN32
+            BitO->Socket         = socket(Domain, Type, Protocol);
+            BitO->IsFileOrSocket = Socket;
+#elif _WIN32
+            
+#endif
+        }
+    }
+    
+    void ConnectInputSocket(BitInput *BitI) {
         
     }
     
-    void OpenOutputSocket() {
+    void ConnectOutputSocket(BitOutput *BitO) {
         
     }
     
@@ -605,7 +635,7 @@ extern "C" {
         }
     }
     
-    uint64_t GenerateCRC(const uint8_t *Data2CRC, const size_t DataSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit) {
+    uint64_t GenerateCRC(const uint8_t *Data2CRC, const uint64_t DataSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit) {
         if (PolySize % 8 != 0) {
             // Ok, so we also need to add the ability to do incremental CRC generation for the iDAT/fDAT chunks in PNG
             
@@ -652,11 +682,11 @@ extern "C" {
         }
     }
     
-    bool VerifyCRC(const uint8_t *Data2CRC, const size_t Data2CRCSize, const uint64_t RecipricalPoly, const uint8_t PolySize, const uint64_t PolyInit, const uint64_t PrecomputedCRC) {
+    bool VerifyCRC(const uint8_t *Data2CRC, const uint64_t Data2CRCSize, const uint64_t RecipricalPoly, const uint8_t PolySize, const uint64_t PolyInit, const uint64_t PrecomputedCRC) {
         return false;
     }
     
-    uint32_t GenerateAdler32(const uint8_t *Data, const size_t DataSize) {
+    uint32_t GenerateAdler32(const uint8_t *Data, const uint64_t DataSize) {
         uint32_t Adler  = 1;
         uint32_t Sum1   = Adler & 0xFFFF;
         uint32_t Sum2   = (Adler >> 16) & 0xFFFF;
@@ -668,7 +698,7 @@ extern "C" {
         return (Sum2 << 16) + Sum1;
     }
     
-    bool VerifyAdler32(const uint8_t *Data, const size_t DataSize, const uint32_t EmbeddedAdler32) {
+    bool VerifyAdler32(const uint8_t *Data, const uint64_t DataSize, const uint32_t EmbeddedAdler32) {
         uint32_t GeneratedAdler32 = GenerateAdler32(Data, DataSize);
         if (GeneratedAdler32 != EmbeddedAdler32) {
             return false;
@@ -879,10 +909,6 @@ extern "C" {
         }
     }
     
-    void OpenSocket() { // Define it in the header when it's done
-        
-    }
-    
     void CreateSocket(const int Domain, const int Type, const int Protocol) { // Define it in the header when it's done
         int Socket;
 #ifndef _WIN32
@@ -899,8 +925,8 @@ extern "C" {
     // Ok, so I need a function to read a file/socket into a buffer, and one to write a buffer to a file/socket.
     // I don't know if FILE pointers work with sockets, but i'm going to ignore that for now.
     
-    void ReadBitInput2BitBuffer(const BitInput *BitI, BitBuffer *BitB, const size_t Bytes2Read) { // It's the user's job to ensure buffers and files are kept in sync, not mine.
-        size_t BytesRead              = 0;
+    void ReadBitInput2BitBuffer(const BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read) { // It's the user's job to ensure buffers and files are kept in sync, not mine.
+        uint64_t BytesRead              = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "BitI pointer is NULL\n");
         } else if (BitB == NULL) {
@@ -930,8 +956,8 @@ extern "C" {
         }
     }
     
-    void WriteBitBuffer2BitOutput(const BitOutput *BitO, BitBuffer *Buffer2Write, const size_t Bytes2Write) { // FIXME Assuming we wrote the whole buffer
-        size_t BytesWritten           = 0;
+    void WriteBitBuffer2BitOutput(const BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write) { // FIXME Assuming we wrote the whole buffer
+        uint64_t BytesWritten           = 0;
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "BitI pointer is NULL\n");
         } else if (Buffer2Write == NULL) {
@@ -948,9 +974,9 @@ extern "C" {
         }
     }
     
-    void ReadSocket2Buffer(const BitInput *BitI, const size_t Bytes2Read) { // FIXME: Just a stub
+    void ReadSocket2Buffer(const BitInput *BitI, const uint64_t Bytes2Read) { // FIXME: Just a stub
         // Define it in the header when it's done
-                                                                      //sockaddr_in
+        //sockaddr_in
     }
     
     void WriteBuffer2Socket(const BitOutput *BitO, const BitBuffer *BitB, const int Socket) { // FIXME: Just a stub
@@ -958,6 +984,14 @@ extern "C" {
         
     }
     
+    void EncodeRLE(BitBuffer *Data2Encode, BitBuffer *Encoded, uint8_t LengthCodeSize, uint8_t SymbolSize, bool IsReversed) {
+        uint64_t CurrentSymbol = 0;
+        uint64_t LengthSymbol  = 0;
+        
+        if (IsReversed == true) { // then the symbol is first and the length is second
+            CurrentSymbol = ReadBits(Data2Encode, SymbolSize, true);
+        }
+    }
     
     void DecodeRLE(const BitBuffer *Data2Decode, BitBuffer *Decoded, const uint8_t LengthCodeSize, const uint8_t SymbolSize) {
         if (Data2Decode == NULL) {
@@ -989,7 +1023,7 @@ extern "C" {
      Huffman, Arthimetic, and ANS/ABS coding systems ALL require having a sorted list of symbol and their frequency (to keep it in the int domain)
      So writing a sorting algorithm is going to be the first thing i do, and I'm not going to fuck around with crazy sorters, just a real simple one that should optimize better.
      */
-    uint64_t *MeasureSortSymbolFrequency(const uint16_t *Buffer2Measure, const size_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
+    uint64_t *MeasureSortSymbolFrequency(const uint16_t *Buffer2Measure, const uint64_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
         // This is MeasureSymbolFrequency + sorting as we go.
         errno = 0;
         uint64_t *SymbolFrequencies = (uint64_t*) calloc(1, BufferSizeInElements);
@@ -1073,7 +1107,7 @@ extern "C" {
         }
     }
     
-    void DecodeHuffman(const BitBuffer *BitB, size_t HuffmanSize) {
+    void DecodeHuffman(const BitBuffer *BitB, uint64_t HuffmanSize) {
         // 3 alphabets, literal, "alphabet of bytes", or <length 8, distance 15> the first 2 are combined, 0-255 = literal, 256 = End of Block, 257-285 = length
         // FIXME: The Tilde ~ symbol is the negation symbol in C!!!!! XOR = ^
         
@@ -1142,7 +1176,7 @@ extern "C" {
         }
     }
     
-    uint64_t GetHuffmanCode(HuffmanTree *Tree, int64_t **SymbolsAndProbabilities, int64_t Symbol, size_t NumSymbols) {
+    uint64_t GetHuffmanCode(HuffmanTree *Tree, int64_t **SymbolsAndProbabilities, int64_t Symbol, uint64_t NumSymbols) {
         if (Tree == NULL) {
             Log(LOG_ERR, "libBitIO", "GetHuffmanCode", "Pointer to HuffmanTree is NULL");
         } else if (SymbolsAndProbabilities == NULL) {
@@ -1179,7 +1213,7 @@ extern "C" {
         return 0;
     }
     
-    HuffmanTree *BuildHuffmanTree(HuffmanTree *Tree2Build, int64_t **SymbolsAndProbabilities, size_t NumSymbols) {
+    HuffmanTree *BuildHuffmanTree(HuffmanTree *Tree2Build, int64_t **SymbolsAndProbabilities, uint64_t NumSymbols) {
         if (Tree2Build == NULL) {
             Log(LOG_ERR, "libBitIO", "BuildHuffmanTree", "Pointer to HuffmanTree is NULL");
         } else if (SymbolsAndProbabilities == NULL) {
@@ -1225,7 +1259,7 @@ extern "C" {
         }
     }
     
-    void EncodeLZ77(const BitBuffer *RawBuffer, const BitBuffer *LZ77Buffer, const size_t WindowSize, const size_t DistanceLength, const size_t SymbolSize) {
+    void EncodeLZ77(const BitBuffer *RawBuffer, const BitBuffer *LZ77Buffer, const uint64_t WindowSize, const uint64_t DistanceLength, const uint64_t SymbolSize) {
         // The dictionary is simply the current buffer, at the current buffer position -(WindowSize / 2) +(WindowSize / 2)
         // So, the first thing you write is the distance from the cursor to the previous string.
         // Then you write the length of the largest match you can find.
