@@ -11,6 +11,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef _WIN32
+#include <sys/socket.h>
+#else
+#include <winsock.h>
+#endif
 
 #pragma once
 
@@ -75,13 +80,13 @@ extern "C" {
     };
     
     /*!
-     @enum              PathType
-     @constant          File                      "The submitted path is a regular file"
-     @constant          URL                       "The submitted path is to a network resource or IP address"
+     @enum             BitIOFileOrSocket
+     @constant         File                       "This BitInput/BitOutput type is to a file".
+     @constant         Socket                     "This BitInput/BitOutput type is to a socket".
      */
-    enum PathType {
-                        File = 0,
-                        URL  = 1,
+    enum BitIOFileOrSocket {
+        File   = 0,
+        Socket = 1,
     };
     
     /*!
@@ -136,7 +141,7 @@ extern "C" {
      @return                                      "Returns a pointer to said BitBuffer structure".
      @param             BitBufferSize             "Number of bytes to create Bitbuffer with".
      */
-    BitBuffer          *InitBitBuffer(const size_t BitBufferSize);
+    BitBuffer          *InitBitBuffer(const uint64_t BitBufferSize);
     
     /*!
      @abstract                                    "Deallocates BitInput".
@@ -245,35 +250,35 @@ extern "C" {
     
     /*!
      @abstract                                    "Computes the number of bytes left in the file".
-     @returm                                      "Returns the number of bytes left in the file".
+     @return                                      "Returns the number of bytes left in the file".
      @param             BitI                      "Pointer to the instance of BitInput".
      */
-    size_t              BytesRemainingInInputFile(const BitInput *BitI);
+    uint64_t            BytesRemainingInInputFile(const BitInput *BitI);
     
     /*!
      @abstract                                    "Gets the size of the file pointed to by BitI"
      @return                                      "Returns the value in BitI->FileSize".
      @param             BitI                      "Pointer to the instance of BitInput".
      */
-    size_t              GetBitInputFileSize(const BitInput *BitI);
+    uint64_t            GetBitInputFileSize(const BitInput *BitI);
     
     /*!
      @abstract                                    "Returns the position of the current file".
      @param             BitI                      "Pointer to the instance of BitInput".
      */
-    size_t              GetBitInputFilePosition(const BitInput *BitI);
+    uint64_t            GetBitInputFilePosition(const BitInput *BitI);
     
     /*!
      @abstract                                    "Returns the number of bits used in BitB".
      @param             BitB                      "Pointer to the instance of BitBuffer".
      */
-    size_t              GetBitBufferPosition(const BitBuffer *BitB);
+    uint64_t            GetBitBufferPosition(const BitBuffer *BitB);
     
     /*!
      @abstract                                    "Gets the size of the BitBuffer".
      @param             BitB                      "Pointer to the instance of BitBuffer".
      */
-    size_t              GetBitBufferSize(const BitBuffer *BitB);
+    uint64_t            GetBitBufferSize(const BitBuffer *BitB);
     
     /*!
      @abstract                                    "The BitOutput type was made private, this function was added so users can still get this information".
@@ -398,7 +403,7 @@ extern "C" {
      @param             PolySize                  "The size of the polynomial in bits".
      @param             PolyInit                  "Initialization value".
      */
-    uint64_t            GenerateCRC(const uint8_t *Data2CRC, const size_t DataSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit);
+    uint64_t            GenerateCRC(const uint8_t *Data2CRC, const uint64_t DataSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit);
     
     /*!
      @abstract                                    "Computes the CRC of DataBuffer, and compares it to the submitted CRC".
@@ -409,7 +414,7 @@ extern "C" {
      @param             PolyInit                  "Initialization value".
      @param             PrecomputedCRC            "The precomputed resulting CRC of Data2CRC, to compare the generated CRC with".
      */
-    bool                VerifyCRC(const uint8_t *Data2CRC, const size_t Data2CRCSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit, const uint64_t PrecomputedCRC);
+    bool                VerifyCRC(const uint8_t *Data2CRC, const uint64_t Data2CRCSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit, const uint64_t PrecomputedCRC);
     
     /*!
      @abstract                                    "Creates Adler32 checksum from input data".
@@ -417,7 +422,7 @@ extern "C" {
      @param             Data                      "Pointer to the data to generate the Adler hash from".
      @param             DataSize                  "Size of data".
      */
-    uint32_t            GenerateAdler32(const uint8_t *Data, const size_t DataSize);
+    uint32_t            GenerateAdler32(const uint8_t *Data, const uint64_t DataSize);
     
     /*!
      @abstract                                    "Generates Adler32 from the input data, and compares it to the submitted checksum".
@@ -426,7 +431,7 @@ extern "C" {
      @param             DataSize                  "Size of data".
      @param             EmbeddedAdler32           "Embedded Adler32 to compare the generated one to".
      */
-    bool                VerifyAdler32(const uint8_t *Data, const size_t DataSize, const uint32_t EmbeddedAdler32);
+    bool                VerifyAdler32(const uint8_t *Data, const uint64_t DataSize, const uint32_t EmbeddedAdler32);
     
     /*!
      @abstract                                    "Reads raw UUID/GUID from the bitstream".
@@ -470,7 +475,7 @@ extern "C" {
      @param             BitB                      "Pointer to BitBuffer to put the bytes into".
      @param             Bytes2Read                "The number of bytes to read from the InputFile into the Buffer"
      */
-    void                ReadBitInput2BitBuffer(const BitInput *BitI, BitBuffer *BitB, const size_t Bytes2Read);
+    void                ReadBitInput2BitBuffer(const BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read);
     
     /*!
      @abstract                                    "Writes a BitBuffer to a file, kinda shitty tho".
@@ -478,7 +483,7 @@ extern "C" {
      @param             Buffer2Write              "The buffer to be written to the output file".
      @param             Bytes2Write               "The number of bytes from the buffer to write to the file"
      */
-    void                WriteBitBuffer2BitOutput(const BitOutput *BitO, BitBuffer *Buffer2Write, const size_t Bytes2Write);
+    void                WriteBitBuffer2BitOutput(const BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write);
     
     /*!
      @abstract                                    "Decodes Run-Length Encoded data".
