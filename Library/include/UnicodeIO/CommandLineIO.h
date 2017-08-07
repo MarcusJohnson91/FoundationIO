@@ -117,6 +117,14 @@ extern "C" {
     
     /*!
      @abstract                                      "Sets SwitchNum's flag in the CommandLineIO instance pointed by CLI".
+     @param               CLI                       "Pointer to the instance of CommandLineInterface".
+     @param               Switch                    "Which switch are we talking about?"
+     @param               IsMain                    "Is SwitchX a main switch or not?"
+     */
+    void                  SetCLISwitchAsMain(CommandLineIO *CLI, const uint64_t Switch, const bool IsMain);
+    
+    /*!
+     @abstract                                      "Sets SwitchNum's flag in the CommandLineIO instance pointed by CLI".
      @remark                                        "Just enter the number of characters you typed into the string not counting the quotes".
      @param               CLI                       "Pointer to the instance of CommandLineIO".
      @param               SwitchNum                 "The switch to set".

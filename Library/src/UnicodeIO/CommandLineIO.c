@@ -216,6 +216,14 @@ extern "C" {
         }
     }
     
+    void SetCLISwitchAsMain(CommandLineIO *CLI, const uint64_t Switch, const bool IsMain) {
+        if (CLI == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "Pointer to CommandLineInterface is NULL\n");
+        } else {
+            CLI->Switches[Switch].IsMainSwitch = IsMain;
+        }
+    }
+    
     void SetCLISwitchFlag(CommandLineIO *CLI, const uint64_t SwitchNum, char *Flag, const uint64_t FlagSize) {
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "Pointer to CommandLineIO is NULL\n");
