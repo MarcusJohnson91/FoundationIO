@@ -117,7 +117,7 @@ extern "C" {
     
     /*!
      @abstract                                      "Sets SwitchNum's flag in the CommandLineIO instance pointed by CLI".
-     @param               CLI                       "Pointer to the instance of CommandLineInterface".
+     @param               CLI                       "Pointer to the instance of CommandLineIO".
      @param               Switch                    "Which switch are we talking about?"
      @param               IsMain                    "Is SwitchX a main switch or not?"
      */
