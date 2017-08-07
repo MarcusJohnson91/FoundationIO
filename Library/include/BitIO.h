@@ -9,18 +9,19 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef _WIN32
-#include <sys/socket.h>
-#else
+#ifdef _WIN32
 #include <winsock.h>
+#else
+#include <sys/socket.h>
 #endif
 
 #pragma once
 
-#ifndef LIBBITIO_BITIO_H
-#define LIBBITIO_BITIO_H
+#ifndef LIBBITIO_BitIO_H
+#define LIBBITIO_BitIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,57 +37,55 @@ extern "C" {
      @constant          BitIOGUIDStringSize       "Size of a GUIDString including dashes and null terminator".
      @constant          BitIOBinaryUUIDSize       "Size of a binary UUID string".
      @constant          BitIOBinaryGUIDSize       "Size of a binary GUID string".
-     @constant          BitIOMD5Size              "Size of a MD5 string".
-     @constant          BitIOCRCMaxBufferSize     "Max size for the CRC buffer at a time, in bytes".
-     @constant          BitIONumHuffmanSymbols    "Number of Huffman symbols to hold in the Huffman tree".
-     @constant          BitIOLZ77MaxDistanceCode  "The maximum distance back in the buffer for the pointer to be in Deflate's LZ77".
-     @constant          BitIOLZ77MaxWindowSize    "The maximum size the sliding window can be in Deflate's LZ77."
      */
     enum BitIOConstants {
-                        BitIOStringSize          = 4096,
-                        BitIOUUIDStringSize      = 21,
-                        BitIOGUIDStringSize      = BitIOUUIDStringSize,
-                        BitIOBinaryUUIDSize      = 16,
-                        BitIOBinaryGUIDSize      = BitIOBinaryUUIDSize,
-                        BitIOMD5Size             = 16,
-                        BitIOCRCMaxBufferSize    = 4096,
-                        BitIONumHuffmanSymbols   = 288,   // 0-255 = literal, 256 = end of block,
-                        BitIOLZ77MaxDistanceCode = 258,   // - 3
-                        BitIOLZ77MaxWindowSize   = 32768, // - 1
+                        BitIOStringSize           = 4096,
+                        BitIOUUIDStringSize       = 21,
+                        BitIOGUIDStringSize       = BitIOUUIDStringSize,
+                        BitIOBinaryUUIDSize       = 16,
+                        BitIOBinaryGUIDSize       = BitIOBinaryUUIDSize,
     };
     
     /*!
-     @enum              Endian
-     @constant          UnknownEndian             "The endian of the machine is currently unknown".
-     @constant          BigEndian                 "The machine is Big endian".
-     @constant          LittleEndian              "The machine is little endian".
+     @enum             BitIOByteBitOrders
+     @constant         UnknownEndian              "THe endian of this system is unknown".
+     @constant         BigEndianLSBit             "Read the data MSByte LSBit first".
+     @constant         BigEndianMSBit             "Read the data MSByte MSBit first".
+     @constant         LilEndianLSBit             "Read the data LSByte LSBit first".
+     @constant         LilEndianMSBit             "Read the data LSByte MSBit first".
+     @constant         LSBit                      "The bit order is least significant bit first".
+     @constant         MSBit                      "The bit order is most  significant bit first".
      */
-    enum Endian {
-                        UnknownEndian = 0,
-                        BigEndian     = 1,
-                        LittleEndian  = 2,
+    enum BitIOByteBitOrders {
+        UnknownEndian              = 0,
+        BigEndianLSBit             = 1,
+        BigEndianMSBit             = 2,
+        LilEndianLSBit             = 3,
+        LilEndianMSBit             = 4,
+        LSBit                      = 5,
+        MSBit                      = 6,
     };
     
     /*!
-     @enum             FormatSpecifierBase
-     @constant         Octal                      "Base  2 format specifier".
-     @constant         Decimal                    "Base 10 format specifier".
-     @constant         Hexadecimal                "Base 16 format specifier".
+     @enum              BitIOLogTypes
+     @constant          LOG_EMERG                 "The system is unusable, the program is quitting (equivalent to panic)".
+     @constant          LOG_ALERT                 "Immediate action is required".
+     @constant          LOG_CRIT                  "Critical condition encountered".
+     @constant          LOG_ERR                   "Error condition encountered".
+     @constant          LOG_WARNING               "Warning condition encountered".
+     @constant          LOG_NOTICE                "Normal, but important condition encountered".
+     @constant          LOG_INFO                  "Informational message logged".
+     @constant          LOG_DEBUG                 "Testing information logged".
      */
-    enum FormatSpecifierBase {
-        Octal       = 1,
-        Decimal     = 2,
-        Hexadecimal = 3,
-    };
-    
-    /*!
-     @enum             BitIOFileOrSocket
-     @constant         File                       "This BitInput/BitOutput type is to a file".
-     @constant         Socket                     "This BitInput/BitOutput type is to a socket".
-     */
-    enum BitIOFileOrSocket {
-        File   = 0,
-        Socket = 1,
+    enum BitIOLogTypes {
+                        LOG_EMERG                 = 0,
+                        LOG_ALERT                 = 1,
+                        LOG_CRIT                  = 2,
+                        LOG_ERR                   = 3,
+                        LOG_WARNING               = 4,
+                        LOG_NOTICE                = 5,
+                        LOG_INFO                  = 6,
+                        LOG_DEBUG                 = 7,
     };
     
     /*!
@@ -310,6 +309,12 @@ extern "C" {
     void                OpenOutputFile(BitOutput *BitO, const char *Path2Open);
     
     /*!
+     @abstract                                    "Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitIOGlobalLogFile".
+     @param             LogFilePath               "Path to the log file to open/create".
+     */
+    void                OpenLogFile(const char *LogFilePath);
+    
+    /*!
      @abstract                                    "Manages InputBuffer and hands out the requested bits".
      @remark                                      "DO NOT try reading backwards, it will not work. for that use SkipBits()".
      @param             BitB                      "Pointer to the instance of BitBuffer".
@@ -438,7 +443,7 @@ extern "C" {
      @remark                                      "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
      @param             BitB                      "Pointer to the instance of BitBuffer".
      */
-    uint8_t            *ReadUUID(const BitBuffer *BitB);
+    uint8_t            *ReadUUID(BitBuffer *BitB);
     
     /*!
      @abstract                                    "Converts a UUIDString to a GUIDString by swapping the endian of each section".
@@ -494,41 +499,17 @@ extern "C" {
      */
     void                DecodeRLE(const BitBuffer *Data2Decode, BitBuffer *Decoded, const uint8_t LengthCodeSize, const uint8_t SymbolSize);
     
-#ifndef _POSIX_VERSION
     /*!
-     @enum              LogTypes
-     @constant          LOG_EMERG                 "The system is unusable, the program is quitting (equivalent to panic)".
-     @constant          LOG_ALERT                 "Immediate action is required".
-     @constant          LOG_CRIT                  "Critical condition encountered".
-     @constant          LOG_ERR                   "Error condition encountered".
-     @constant          LOG_WARNING               "Warning condition encountered".
-     @constant          LOG_NOTICE                "Normal, but important condition encountered".
-     @constant          LOG_INFO                  "Informational message logged".
-     @constant          LOG_DEBUG                 "Testing information logged".
-     */
-    enum LogTypes {
-        LOG_EMERG   = 0,
-        LOG_ALERT   = 1,
-        LOG_CRIT    = 2,
-        LOG_ERR     = 3,
-        LOG_WARNING = 4,
-        LOG_NOTICE  = 5,
-        LOG_INFO    = 6,
-        LOG_DEBUG   = 7,
-    };
-#endif
-    
-    /*!
-     @abstract                                    "Logs errors to log files, and stderr; and mail if Critical/Panic."
-     @param             ErrorLevel                "Error message prefixed by SYS in ErrorCodes".
+     @abstract                                    "Logs errors to the user provided log file, or stderr".
+     @param             ErrorSeverity             "Error message prefixed by SYS in ErrorCodes".
      @param             LibraryOrProgram          "Name of the program or library that called this function".
-     @param             Function                  "Which function is calling Log?".
-     @param             ErrorDescription          "String describing what went wrong / error code".
+     @param             FunctionName              "Which function is calling Log?".
+     @param             Description               "String describing what went wrong / error code".
      */
-    void                Log(const uint8_t ErrorLevel, const char *LibraryOrProgram, const char *Function, const char *ErrorDescription, ...);
+    void                Log(const uint8_t ErrorSeverity, const char *LibraryOrProgram, const char *FunctionName, const char *Description, ...);
     
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBBITIO_BITIO_H */
+#endif /* LIBBITIO_BitIO_H */

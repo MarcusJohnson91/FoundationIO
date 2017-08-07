@@ -1,6 +1,3 @@
-#include <errno.h>
-#include <stdio.h>
-
 #include "../include/BitIO.h"
 #include "../include/CommandLineIO.h"
 
@@ -389,7 +386,6 @@ extern "C" {
             DisplayCLIHelp(CLI);
         } else {
             DisplayProgramBanner(CLI);
-            errno                         = 0;
             char    *SingleDashFlag       = NULL;
             char    *DoubleDashFlag       = NULL;
             char    *SingleSlashFlag      = NULL;
