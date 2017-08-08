@@ -77,23 +77,15 @@ extern "C" {
     };
     
     CommandLineIO *InitCommandLineIO(const uint64_t NumSwitches) {
-        errno = 0;
         CommandLineIO *CLI = (CommandLineIO*) calloc(1, sizeof(CommandLineIO));
-        if (errno != 0) {
-            char *ErrnoError      = (char*) calloc(1, 96);
-            strerror_r(errno, ErrnoError, 96);
-            Log(LOG_ERR, "libBitIO", "InitCommandLineIO", "Errno Initing CommandLineIO: %s\n", ErrnoError);
-            free(ErrnoError);
-            errno = 0;
+        
+        if (CLI == NULL) {
+            Log(LOG_ERR, "libBitIO", "InitCommandLineIO", "Not enough memory to allocate CommandLineIO");
         }
         CLI->NumSwitches          = NumSwitches;
         CLI->Switches             = (CommandLineSwitch*) calloc(NumSwitches, sizeof(CommandLineSwitch));
-        if (errno != 0) {
-            char *ErrnoError      = (char*) calloc(1, 96);
-            strerror_r(errno, ErrnoError, 96);
-            Log(LOG_ERR, "libBitIO", "InitCommandLineIO", "Errno Initing CommandLineSwitch: %s\n", ErrnoError);
-            free(ErrnoError);
-            errno                 = 0;
+        if (CLI->Switches == NULL) {
+            Log(LOG_ERR, "libBitIO", "InitCommandLineIO", "Not enough memory to allocate CommandLineIO, NumSwitches = %d", NumSwitches);
         }
         return CLI;
     }
