@@ -213,9 +213,10 @@ extern "C" {
     /*!
      @abstract                                    "Create bit-mask from binary exponent".
      @return                                      "A bit mask generated from a power".
+     @param             BitOrder                  "Should the mask be shifted to the left or not?".
      @param             Exponent                  "Power to be raised by 2".
      */
-    uint64_t            Power2Mask(const uint8_t Exponent);
+    uint8_t             Power2Mask(const uint8_t BitOrder, const uint8_t Exponent);
     
     /*!
      @abstract                                    "Converts numbers from One's compliment to Two's compliment"

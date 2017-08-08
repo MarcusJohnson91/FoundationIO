@@ -166,15 +166,16 @@ extern "C" {
         return BitCount;
     }
     
-    uint64_t Power2Mask(const uint8_t Exponent) {
-        uint64_t Mask = 0ULL;
-        if (Exponent > 64) {
-            Log(LOG_ERR, "libBitIO", "Power2Mask", "Exponent %d is too large\n", Exponent);
+    uint8_t Power2Mask(const uint8_t BitOrder, const uint8_t Exponent) {
+        uint8_t Mask = 0;
+        if (Exponent > 8) {
+            Log(LOG_ERR, "libBitIO", "Power2Mask2", "Exponent %d is too large", Exponent);
         } else {
-            uint64_t HighestBit = 0ULL, Fill = 0ULL;
-            HighestBit          = (uint64_t)pow(2, Exponent - 1);
-            Fill                = HighestBit - 1;
-            Mask                = HighestBit + Fill;
+            if (BitOrder == LSBit) {
+                Mask = (uint8_t) (pow(2, Exponent) - 1);
+            } else if (BitOrder == MSBit) {
+                Mask = (uint8_t) (pow(2, Exponent) - 1) << (8 - Exponent);
+            }
         }
         return Mask;
     }
@@ -354,6 +355,7 @@ extern "C" {
     
     void OpenLogFile(const char *LogFilePath) {
         if (LogFilePath == NULL) {
+            BitIOGlobalLogFile = NULL;
             Log(LOG_ERR, "libBitIO", "OpenLogFile", "LogFilePath is NULL");
         } else {
             BitIOGlobalLogFile = fopen(LogFilePath, "a+");
@@ -392,6 +394,137 @@ extern "C" {
         
     }
     
+    uint64_t ReadBits2(uint8_t ByteBitOrder, BitBuffer *BitB, const uint8_t Bits2Read) {
+        uint8_t Bits = Bits2Read, UserRequestBits = 0, BufferBitsAvailable = 0, Mask = 0, Data = 0, Mask2Shift = 0;
+        uint64_t OutputData = 0;
+        
+        if (ByteBitOrder != BigEndianLSBit || ByteBitOrder != BigEndianMSBit || ByteBitOrder != LilEndianLSBit || ByteBitOrder != LilEndianMSBit) {
+            Log(LOG_ERR, "libBitIO", "ReadBits", "Invalid ByteBitOrder: %d", ByteBitOrder);
+        } else if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadBits", "Pointer to BitBuffer is NULL");
+        } else if (BitB->Buffer == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadBits", "Pointer to Buffer in BitBuffer is NULL");
+        } else if (Bits2Read <= 0 || Bits2Read > 64) {
+            Log(LOG_ERR, "libBitIO", "ReadBits", "Bits2Read: %d, only supports reading 1-64 bits", Bits2Read);
+        } else {
+            uint8_t BitsAvailabeInCurrentByte = 8 - (BitB->BitsUnavailable % 8);
+            uint8_t Bits2ReadFromCurrentByte  = Bits2Read > 8 ? BitsAvailabeInCurrentByte : Bits2Read;
+            if (ByteBitOrder == BigEndianLSBit) { // Big endian LSBit first.
+                while (Bits > 0) {
+                    Bits                   = BitsAvailabeInCurrentByte >= UserRequestBits  ? UserRequestBits : BufferBitsAvailable;
+                    Data                   = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
+                    OutputData           <<= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                    OutputData            += Data;
+                    BitB->BitsAvailable   -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                    BitB->BitsUnavailable += BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                    Bits                  -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                }
+            } else if (ByteBitOrder == LilEndianLSBit) { // Lil endian LSBit first
+                while (Bits > 0) {
+                    Bits                   = BufferBitsAvailable >= UserRequestBits  ? UserRequestBits : BufferBitsAvailable;
+                    Data                   = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
+                    OutputData           <<= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                    OutputData            += Data;
+                    BitB->BitsAvailable   -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                    BitB->BitsUnavailable += BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                    Bits                  -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                }
+            } else if (ByteBitOrder == BigEndianMSBit) { // Big endian MSBit first
+                while (Bits > 0) {
+                    Bits                   = BufferBitsAvailable >= UserRequestBits  ? UserRequestBits : BufferBitsAvailable;
+                    Data                   = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
+                    Data                 >>= Mask2Shift;
+                    OutputData           <<= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                    OutputData            += Data;
+                    BitB->BitsAvailable   -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                    BitB->BitsUnavailable += BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                    Bits                  -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                }
+            } else if (ByteBitOrder == LilEndianMSBit) { // Lil endian MSBit first
+                while (Bits > 0) {
+                    Bits                   = BufferBitsAvailable >= UserRequestBits  ? UserRequestBits : BufferBitsAvailable;
+                    Data                   = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
+                    Data                 >>= Mask2Shift;
+                    OutputData           <<= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                    OutputData            += Data;
+                    BitB->BitsAvailable   -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                    BitB->BitsUnavailable += BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                    Bits                  -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
+                }
+            }
+        }
+        return OutputData;
+    }
+    
+    uint64_t PeekBits2(uint8_t ByteBitOrder, BitBuffer *BitB, const uint8_t Bits2Peek) {
+        uint64_t PeekedBits = 0;
+        if (ByteBitOrder != BigEndianLSBit || ByteBitOrder != BigEndianMSBit || ByteBitOrder != LilEndianLSBit || ByteBitOrder != LilEndianMSBit) {
+            Log(LOG_ERR, "libBitIO", "PeekBits2", "Invalid ByteBitOrder: %d", ByteBitOrder);
+        } else if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "PeekBits2", "Pointer to BitBuffer is NULL");
+        } else if (BitB->Buffer == NULL) {
+            Log(LOG_ERR, "libBitIO", "PeekBits2", "Pointer to Buffer in BitBuffer is NULL");
+        } else if (Bits2Peek <= 0 || Bits2Peek > 64) {
+            Log(LOG_ERR, "libBitIO", "PeekBits2", "Bits2Peek: %d, only supports reading 1-64 bits", Bits2Peek);
+        } else {
+            if (ByteBitOrder == BigEndianLSBit) {
+                
+            } else if (ByteBitOrder == LilEndianLSBit) {
+                
+            } else if (ByteBitOrder == BigEndianMSBit) {
+                
+            } else if (ByteBitOrder == LilEndianMSBit) {
+                
+            }
+        }
+        return PeekedBits;
+    }
+    
+    uint64_t ReadRICE2(uint8_t ByteBitOrder, BitBuffer *BitB, const bool Truncated, const bool StopBit) {
+        uint64_t DeRICEdBits = 0;
+        if (ByteBitOrder != BigEndianLSBit || ByteBitOrder != BigEndianMSBit || ByteBitOrder != LilEndianLSBit || ByteBitOrder != LilEndianMSBit) {
+            Log(LOG_ERR, "libBitIO", "PeekBits2", "Invalid ByteBitOrder: %d", ByteBitOrder);
+        } else if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "PeekBits2", "Pointer to BitBuffer is NULL");
+        } else if (BitB->Buffer == NULL) {
+            Log(LOG_ERR, "libBitIO", "PeekBits2", "Pointer to Buffer in BitBuffer is NULL");
+        } else {
+            if (ByteBitOrder == BigEndianLSBit) {
+                
+            } else if (ByteBitOrder == LilEndianLSBit) {
+                
+            } else if (ByteBitOrder == BigEndianMSBit) {
+                
+            } else if (ByteBitOrder == LilEndianMSBit) {
+                
+            }
+        }
+        return DeRICEdBits;
+    }
+    
+    void *ReadExpGolomb2(uint8_t ByteBitOrder, BitBuffer *BitB, const bool IsSigned) {
+        uint64_t DeExpGolombedBits = 0;
+        if (ByteBitOrder != BigEndianLSBit || ByteBitOrder != BigEndianMSBit || ByteBitOrder != LilEndianLSBit || ByteBitOrder != LilEndianMSBit) {
+            Log(LOG_ERR, "libBitIO", "PeekBits2", "Invalid ByteBitOrder: %d", ByteBitOrder);
+        } else if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "PeekBits2", "Pointer to BitBuffer is NULL");
+        } else if (BitB->Buffer == NULL) {
+            Log(LOG_ERR, "libBitIO", "PeekBits2", "Pointer to Buffer in BitBuffer is NULL");
+        } else {
+            if (ByteBitOrder == BigEndianLSBit) {
+                
+            } else if (ByteBitOrder == LilEndianLSBit) {
+                
+            } else if (ByteBitOrder == BigEndianMSBit) {
+                
+            } else if (ByteBitOrder == LilEndianMSBit) {
+                
+            }
+        }
+        return DeExpGolombedBits;
+    }
+    
+    /*
     uint64_t ReadBits(BitBuffer *BitB, const uint8_t Bits2Read, const bool ReadFromMSB) {
         uint8_t Bits = Bits2Read, UserRequestBits = 0, BufferBitsAvailable = 0, Mask = 0, Data = 0, Mask2Shift = 0;
         uint64_t OutputData = 0;
@@ -479,6 +612,7 @@ extern "C" {
         }
         return Final;
     }
+     */
     
     void SkipBits(BitBuffer *BitB, const int64_t Bits2Skip) {
         if (BitB == NULL) {
@@ -915,12 +1049,18 @@ extern "C" {
         
     }
     
-    void EncodeRLE(BitBuffer *Data2Encode, BitBuffer *Encoded, uint8_t LengthCodeSize, uint8_t SymbolSize, bool IsReversed) {
-        uint64_t CurrentSymbol = 0;
-        uint64_t LengthSymbol  = 0;
-        
-        if (IsReversed == true) { // then the symbol is first and the length is second
-            CurrentSymbol = ReadBits(Data2Encode, SymbolSize, true);
+    void EncodeRLE(const BitBuffer *Data2Encode, BitBuffer *Encoded, const uint8_t LengthCodeSize, const uint8_t SymbolSize) {
+        if (Data2Encode == NULL) {
+            Log(LOG_ERR, "libBitIO", "DecodeRLE", "Pointer to Data2Decode is NULL");
+        } else if (Encoded == NULL) {
+            Log(LOG_ERR, "libBitIO", "DecodeRLE", "Pointer to Decoded is NULL");
+        } else if (LengthCodeSize < 1) {
+            Log(LOG_ERR, "libBitIO", "DecodeRLE", "LengthCodeSize %d is invalid", LengthCodeSize);
+        } else if (SymbolSize < 1) {
+            Log(LOG_ERR, "libBitIO", "DecodeRLE", "SymbolSize %d is invalid", SymbolSize);
+        } else {
+            uint64_t CurrentSymbol = 0;
+            uint64_t LengthSymbol  = 0;
         }
     }
     
