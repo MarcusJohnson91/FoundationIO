@@ -955,15 +955,16 @@ extern "C" {
      So writing a sorting algorithm is going to be the first thing i do, and I'm not going to fuck around with crazy sorters, just a real simple one that should optimize better.
      */
     uint64_t *MeasureSortSymbolFrequency(const uint16_t *Buffer2Measure, const uint64_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
+        uint64_t *SymbolFrequencies = NULL, *FrequencyPosition = NULL;
         // This is MeasureSymbolFrequency + sorting as we go.
         if (Buffer2Measure == NULL) {
             Log(LOG_ERR, "libBitIO", "MeasureSortSymbolFrequency", "Buffer2Measure is NULL");
         } else {
-            uint64_t *SymbolFrequencies = (uint64_t*) calloc(1, BufferSizeInElements);
+            SymbolFrequencies = (uint64_t*) calloc(1, BufferSizeInElements);
             if (SymbolFrequencies == NULL) {
                 Log(LOG_ERR, "libBitIO", "MeasureSortSymbolFrequency", "Not enough memory to allocate SymbolFrequencies %d", BufferSizeInElements);
             }
-            uint64_t *FrequencyPosition = (uint64_t*) calloc(1, BufferSizeInElements);
+            FrequencyPosition = (uint64_t*) calloc(1, BufferSizeInElements);
             if (FrequencyPosition == NULL) {
                 Log(LOG_ERR, "libBitIO", "MeasureSortSymbolFrequency", "Not enough memory to allocate FrequencyPosition %d", BufferSizeInElements);
             }
