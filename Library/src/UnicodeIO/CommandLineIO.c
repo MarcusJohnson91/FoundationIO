@@ -169,16 +169,16 @@ extern "C" {
         }
     }
     
-    void SetCLILicense(CommandLineIO *CLI, char *Name, char *License, const bool IsProprietary) {
+    void SetCLILicense(CommandLineIO *CLI, char *Name, char *LicenseDescription, const bool IsProprietary) {
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCLILicense", "Pointer to CommandLineIO is NULL\n");
         } else if (Name == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCLILicense", "Pointer to Name is NULL\n");
-        } else if (License == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLILicense", "Pointer to License is NULL\n");
+        } else if (LicenseDescription == NULL) {
+            Log(LOG_ERR, "libBitIO", "SetCLILicense", "Pointer to LicenseDescription is NULL\n");
         } else {
             CLI->ProgramLicenseName        = Name;
-            CLI->ProgramLicenseDescription = License;
+            CLI->ProgramLicenseDescription = LicenseDescription;
             if (IsProprietary == true) {
                 CLI->IsProprietary         = false;
             } else {
