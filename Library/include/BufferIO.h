@@ -163,6 +163,18 @@ extern "C" {
     void                DeinitBitBuffer(BitBuffer *BitB);
     
     /*!
+     @abstract                                    "Swap bits in a byte".
+     @param             Byte                      "Byte to swap bits".
+     */
+    uint8_t             SwapBitsInByte(const uint8_t Byte);
+    
+    /*!
+     @abstract                                    "Swap nibbles in a byte".
+     @param             Byte2Swap                 "Byte to swap nibbles".
+     */
+    uint8_t             SwapNibble(const uint8_t Byte2Swap);
+    
+    /*!
      @abstract                                    "Swap endian of 16 bit integers".
      @param             Data2Swap                 "Data to swap endian".
      */

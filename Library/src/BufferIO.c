@@ -123,6 +123,14 @@ extern "C" {
         }
     }
     
+    uint8_t SwapBitsInByte(const uint8_t Byte) {
+        return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
+    }
+    
+    uint8_t SwapNibble(const uint8_t Byte2Swap) {
+        return ((Byte2Swap & 0xF0 >> 4) | (Byte2Swap & 0x0F << 4));
+    }
+    
     uint16_t SwapEndian16(const uint16_t Data2Swap) {
         return ((Data2Swap & 0xFF00) >> 8) | ((Data2Swap & 0x00FF) << 8);
     }
@@ -137,6 +145,8 @@ extern "C" {
                 ((Data2Swap & 0x00000000FF000000) <<  8) | ((Data2Swap & 0x0000000000FF0000) << 24) | \
                 ((Data2Swap & 0x000000000000FF00) << 40) | ((Data2Swap & 0x00000000000000FF) << 56));
     }
+    
+    
     
     int64_t Bytes2Bits(const int64_t Bytes) {
         return Bytes * 8;
