@@ -394,11 +394,11 @@ extern "C" {
         
     }
     
-    uint64_t ReadBits2(uint8_t ByteBitOrder, BitBuffer *BitB, const uint8_t Bits2Read) {
+    uint64_t ReadBits2(const uint8_t ByteBitOrder, BitBuffer *BitB, const uint8_t Bits2Read) {
         uint8_t Bits = Bits2Read, UserRequestBits = 0, BufferBitsAvailable = 0, Mask = 0, Data = 0, Mask2Shift = 0;
         uint64_t OutputData = 0;
         
-        if (ByteBitOrder != BigEndianLSBit || ByteBitOrder != BigEndianMSBit || ByteBitOrder != LilEndianLSBit || ByteBitOrder != LilEndianMSBit) {
+        if (ByteBitOrder == LSBit || ByteBitOrder == MSBit || ByteBitOrder > 6) {
             Log(LOG_ERR, "libBitIO", "ReadBits", "Invalid ByteBitOrder: %d", ByteBitOrder);
         } else if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadBits", "Pointer to BitBuffer is NULL");
@@ -456,9 +456,9 @@ extern "C" {
         return OutputData;
     }
     
-    uint64_t PeekBits2(uint8_t ByteBitOrder, BitBuffer *BitB, const uint8_t Bits2Peek) {
+    uint64_t PeekBits2(const uint8_t ByteBitOrder, BitBuffer *BitB, const uint8_t Bits2Peek) {
         uint64_t PeekedBits = 0;
-        if (ByteBitOrder != BigEndianLSBit || ByteBitOrder != BigEndianMSBit || ByteBitOrder != LilEndianLSBit || ByteBitOrder != LilEndianMSBit) {
+        if (ByteBitOrder == LSBit || ByteBitOrder == MSBit || ByteBitOrder > 6) {
             Log(LOG_ERR, "libBitIO", "PeekBits2", "Invalid ByteBitOrder: %d", ByteBitOrder);
         } else if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "PeekBits2", "Pointer to BitBuffer is NULL");
@@ -480,9 +480,9 @@ extern "C" {
         return PeekedBits;
     }
     
-    uint64_t ReadRICE2(uint8_t ByteBitOrder, BitBuffer *BitB, const bool Truncated, const bool StopBit) {
+    uint64_t ReadRICE2(const uint8_t ByteBitOrder, BitBuffer *BitB, const bool Truncated, const bool StopBit) {
         uint64_t DeRICEdBits = 0;
-        if (ByteBitOrder != BigEndianLSBit || ByteBitOrder != BigEndianMSBit || ByteBitOrder != LilEndianLSBit || ByteBitOrder != LilEndianMSBit) {
+        if (ByteBitOrder == LSBit || ByteBitOrder == MSBit || ByteBitOrder > 6) {
             Log(LOG_ERR, "libBitIO", "PeekBits2", "Invalid ByteBitOrder: %d", ByteBitOrder);
         } else if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "PeekBits2", "Pointer to BitBuffer is NULL");
@@ -502,9 +502,9 @@ extern "C" {
         return DeRICEdBits;
     }
     
-    void *ReadExpGolomb2(uint8_t ByteBitOrder, BitBuffer *BitB, const bool IsSigned) {
+    void *ReadExpGolomb2(const uint8_t ByteBitOrder, BitBuffer *BitB, const bool IsSigned) {
         uint64_t DeExpGolombedBits = 0;
-        if (ByteBitOrder != BigEndianLSBit || ByteBitOrder != BigEndianMSBit || ByteBitOrder != LilEndianLSBit || ByteBitOrder != LilEndianMSBit) {
+        if (ByteBitOrder == LSBit || ByteBitOrder == MSBit || ByteBitOrder > 6) {
             Log(LOG_ERR, "libBitIO", "PeekBits2", "Invalid ByteBitOrder: %d", ByteBitOrder);
         } else if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "PeekBits2", "Pointer to BitBuffer is NULL");
@@ -621,6 +621,26 @@ extern "C" {
             BitB->BitsAvailable   -= Bits2Skip;
             BitB->BitsUnavailable += Bits2Skip;
             // The file/stream updating functions need to keep this in mind.
+        }
+    }
+    
+    void WriteBits2(const uint8_t ByteBitOrder, BitBuffer *Buffer2Write, const uint8_t Bits2Write, const uint64_t Value2Write) {
+        if (ByteBitOrder == LSBit || ByteBitOrder == MSBit || ByteBitOrder > 6) {
+            Log(LOG_ERR, "libBitIO", "WriteBits2", "Invalid ByteBitOrder: %d", ByteBitOrder);
+        } else if (Buffer2Write == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteBits2", "Pointer to BitBuffer is NULL");
+        } else if (Buffer2Write->Buffer == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteBits2", "Pointer to Buffer in BitBuffer is NULL");
+        } else {
+            if (ByteBitOrder == BigEndianLSBit) {
+                
+            } else if (ByteBitOrder == LilEndianLSBit) {
+                
+            } else if (ByteBitOrder == BigEndianMSBit) {
+                
+            } else if (ByteBitOrder == LilEndianMSBit) {
+                
+            }
         }
     }
     
