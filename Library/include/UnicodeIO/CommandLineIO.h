@@ -42,21 +42,6 @@ extern "C" {
     CommandLineIO        *InitCommandLineIO(const uint64_t NumSwitches);
     
     /*!
-     @abstract                                      "Deallocates the instance of CommandLineIO pointed to by CLI".
-     @param               CLI                       "Pointer to the instance of CommandLineIO you want to delete".
-     */
-    void                  DeinitCommandLineIO(CommandLineIO *CLI);
-    
-    /*!
-     @abstract                                      "Parses argv for switches matching the ones contained in CLI".
-     @remark                                        "Argv[0] (the path for the original executable) is NEVER searched or used".
-     @param               CLI                       "Pointer to CommandLineIO".
-     @param               argc                      "Main's argc, for the number of arguments entered".
-     @param               argv                      "Main's argv, for the actual arguments the user has entered".
-     */
-    void                  ParseCommandLineArguments(CommandLineIO *CLI, int argc, const char *argv[]);
-    
-    /*!
      @abstract                                      "Sets the name of the program".
      @param               CLI                       "Pointer to the instance of CommandLineIO".
      @param               Name                      "Pointer to a C string containing the name of the program you're building"
@@ -120,9 +105,9 @@ extern "C" {
      @abstract                                      "Sets SwitchNum's flag in the CommandLineIO instance pointed by CLI".
      @param               CLI                       "Pointer to the instance of CommandLineIO".
      @param               Switch                    "Which switch are we talking about?"
-     @param               IsMain                    "Is SwitchX a main switch or not?"
+     @param               IsMaster                  "Is Switch a master switch?"
      */
-    void                  SetCLISwitchAsMain(CommandLineIO *CLI, const uint64_t Switch, const bool IsMain);
+    void                  SetCLISwitchAsMaster(CommandLineIO *CLI, const uint64_t Switch, const bool IsMaster);
     
     /*!
      @abstract                                      "Sets SwitchNum's flag in the CommandLineIO instance pointed by CLI".
@@ -132,7 +117,7 @@ extern "C" {
      @param               Flag                      "The flag to identify an option with".
      @param               FlagSize                  "Size of the flag string".
      */
-    void                  SetCLISwitchFlag(CommandLineIO *CLI, const uint64_t SwitchNum, char *Flag, const uint64_t FlagSize);
+    void                  SetCLISwitchFlag(CommandLineIO *CLI, const uint64_t SwitchNum, char *Flag);
     
     /*!
      @abstract                                      "Sets MetaFlag switch as a meta flag for switch SwitchNum".
@@ -159,19 +144,20 @@ extern "C" {
     void                  SetCLISwitchResultStatus(CommandLineIO *CLI, const uint64_t SwitchNum, const bool IsThereAResult);
     
     /*!
-     @abstract                                      "Gets the data contained in Switch->Result"
-     @return                                        "Returns the data after the switch, if the switch is resultless it will return 0"
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
-     @param               ArgumentNum               "The argument's result to return".
+     @abstract                                      "Parses argv for switches matching the ones contained in CLI".
+     @remark                                        "Argv[0] (the path for the original executable) is NEVER searched or used".
+     @param               CLI                       "Pointer to CommandLineIO".
+     @param               argc                      "Main's argc, for the number of arguments entered".
+     @param               argv                      "Main's argv, for the actual arguments the user has entered".
      */
-    char                 *GetCLIArgumentResult(CommandLineIO *CLI, const uint64_t ArgumentNum);
+    void                  ParseCommandLineArguments(CommandLineIO *CLI, int argc, const char *argv[]);
     
     /*!
-     @abstract                                      "Tells if SwitchNum was found in the CommandLineArguments".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
-     @param               SwitchNum                 "The switch to check".
+     @abstract                                      "Parses CommandLine arguments and counts the copies of a given switch found".
+     @param               CLI                       "Pointer to CommandLineIO".
+     @param               Switch                    "Which switch should we look for?".
      */
-    bool                  GetCLISwitchPresence(CommandLineIO *CLI, const uint64_t SwitchNum);
+    uint64_t              GetCLINumArgumentsMatchingSwitch(CommandLineIO *CLI, const uint64_t Switch);
     
     /*!
      @abstract                                      "Finds the argument that has both ParentSwitch and ChildSwitch present"
@@ -185,7 +171,21 @@ extern "C" {
     /*!
      @return              Returns the switch number if it was found, if it was not, it returns 0xFFFFFFFFFFFFFFFF
      */
-    uint64_t              GetCLISwitchNumFromFlag(CommandLineIO *CLI, const char *Flag);
+    uint64_t              GetCLIArgumentNumFromFlag(CommandLineIO *CLI, const char *Flag);
+    
+    /*!
+     @abstract                                      "Gets the data contained in Switch->Result"
+     @return                                        "Returns the data after the switch, if the switch is resultless it will return 0"
+     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               ArgumentNum               "The argument's result to return".
+     */
+    char                 *GetCLIArgumentResult(CommandLineIO *CLI, const uint64_t ArgumentNum);
+    
+    /*!
+     @abstract                                      "Deallocates the instance of CommandLineIO pointed to by CLI".
+     @param               CLI                       "Pointer to the instance of CommandLineIO you want to delete".
+     */
+    void                  DeinitCommandLineIO(CommandLineIO *CLI);
     
 #ifdef __cplusplus
 }
