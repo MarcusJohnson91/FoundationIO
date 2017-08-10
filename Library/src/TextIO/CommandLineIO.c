@@ -9,8 +9,8 @@ extern "C" {
      @struct                 CommandLineSwitch
      @abstract                                         "Contains the data to support a single switch".
      
-     @constant               IsMainSwitch              "Does this switch have descendents, or is it a descendent?"
-     @constant               SwitchHasResult           "Does this switch have a result?".
+     @constant               IsMasterSwitch            "Does this switch depend on any others?"
+     @constant               SwitchHasResult           "Does this switch take any arguments, or is it's mere presence all that matters?".
      @constant               FlagSize                  "What is the number of bytes (if ASCII)/ code points (if UTF) of this switch?".
      @constant               NumChildSwitches          "How many child switches are there in ChildSwitches?".
      @constant               ChildSwitches             "Pointer to an array that contains the numbers of the child switches".
@@ -18,7 +18,7 @@ extern "C" {
      @constant               SwitchDescription         "Describe to the user what this switch does".
      */
     struct CommandLineSwitch {
-        bool                 IsMainSwitch;
+        bool                 IsMasterSwitch;
         bool                 SwitchHasResult;
         uint64_t             FlagSize;
         uint64_t             NumChildSwitches;
@@ -92,7 +92,7 @@ extern "C" {
     
     void DeinitCommandLineIO(CommandLineIO *CLI) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "DeinitCommandLineIO", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "DeinitCommandLineIO", "Pointer to CommandLineIO is NULL");
         } else {
             /* Free CommandLineSwitches */
             for (uint64_t Switch = 0; Switch < CLI->NumSwitches; Switch++) {
@@ -121,9 +121,9 @@ extern "C" {
     
     void SetCLIName(CommandLineIO *CLI, char *Name) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLIName", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLIName", "Pointer to CommandLineIO is NULL");
         } else if (Name == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLIName", "Pointer to Name is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLIName", "Pointer to Name is NULL");
         } else {
             CLI->ProgramName = Name;
         }
@@ -131,9 +131,9 @@ extern "C" {
     
     void SetCLIVersion(CommandLineIO *CLI, char *VersionString) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLIVersion", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLIVersion", "Pointer to CommandLineIO is NULL");
         } else if (VersionString == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLIVersion", "Pointer to VersionString is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLIVersion", "Pointer to VersionString is NULL");
         } else {
             CLI->ProgramVersion = VersionString;
         }
@@ -141,9 +141,9 @@ extern "C" {
     
     void SetCLIDescription(CommandLineIO *CLI, char *Description) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLIDescription", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLIDescription", "Pointer to CommandLineIO is NULL");
         } else if (Description == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLIDescription", "Pointer to Description is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLIDescription", "Pointer to Description is NULL");
         } else {
             CLI->ProgramDescription = Description;
         }
@@ -151,9 +151,9 @@ extern "C" {
     
     void SetCLIAuthor(CommandLineIO *CLI, char *Author) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLIAuthor", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLIAuthor", "Pointer to CommandLineIO is NULL");
         } else if (Author == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLIAuthor", "Pointer to Author is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLIAuthor", "Pointer to Author is NULL");
         } else {
             CLI->ProgramAuthor = Author;
         }
@@ -161,9 +161,9 @@ extern "C" {
     
     void SetCLICopyright(CommandLineIO *CLI, char *Copyright) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLICopyright", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLICopyright", "Pointer to CommandLineIO is NULL");
         } else if (Copyright == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLICopyright", "Pointer to Copyright is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLICopyright", "Pointer to Copyright is NULL");
         } else {
             CLI->ProgramCopyright = Copyright;
         }
@@ -171,11 +171,11 @@ extern "C" {
     
     void SetCLILicense(CommandLineIO *CLI, char *Name, char *LicenseDescription, const bool IsProprietary) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLILicense", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLILicense", "Pointer to CommandLineIO is NULL");
         } else if (Name == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLILicense", "Pointer to Name is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLILicense", "Pointer to Name is NULL");
         } else if (LicenseDescription == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLILicense", "Pointer to LicenseDescription is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLILicense", "Pointer to LicenseDescription is NULL");
         } else {
             CLI->ProgramLicenseName        = Name;
             CLI->ProgramLicenseDescription = LicenseDescription;
@@ -189,9 +189,9 @@ extern "C" {
     
     void SetCLILicenseURL(CommandLineIO *CLI, char *LicenseURL) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLILicenseURL", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLILicenseURL", "Pointer to CommandLineIO is NULL");
         } else if (LicenseURL == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLILicenseURL", "Pointer to LicenseURL is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLILicenseURL", "Pointer to LicenseURL is NULL");
         } else {
             CLI->ProgramLicenseURL = LicenseURL;
         }
@@ -199,42 +199,40 @@ extern "C" {
     
     void SetCLIMinSwitches(CommandLineIO *CLI, const uint64_t MinSwitches) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLIMinSwitches", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLIMinSwitches", "Pointer to CommandLineIO is NULL");
         } else {
             CLI->MinSwitches = MinSwitches;
         }
     }
     
-    void SetCLISwitchAsMain(CommandLineIO *CLI, const uint64_t Switch, const bool IsMain) {
+    void SetCLISwitchAsMaster(CommandLineIO *CLI, const uint64_t Switch, const bool IsMaster) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "Pointer to CommandLineIO is NULL");
         } else {
-            CLI->Switches[Switch].IsMainSwitch = IsMain;
+            CLI->Switches[Switch].IsMasterSwitch = IsMaster;
         }
     }
     
-    void SetCLISwitchFlag(CommandLineIO *CLI, const uint64_t SwitchNum, char *Flag, const uint64_t FlagSize) {
+    void SetCLISwitchFlag(CommandLineIO *CLI, const uint64_t SwitchNum, char *Flag) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "Pointer to CommandLineIO is NULL");
         } else if (Flag == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "Pointer to switch Flag is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "Pointer to switch Flag is NULL");
         } else if (SwitchNum > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CLI->NumSwitches);
-        } else if (FlagSize == 0) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "Invalid FlagSize %d\n", FlagSize);
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "SwitchNum %d is too high, there are only %d switches", SwitchNum, CLI->NumSwitches);
         } else {
             CLI->Switches[SwitchNum].Flag     = Flag;
-            CLI->Switches[SwitchNum].FlagSize = FlagSize + 1;
+            CLI->Switches[SwitchNum].FlagSize = strlen(Flag); // TODO: Make sure this does not include any null
         }
     }
     
     void SetCLISwitchDescription(CommandLineIO *CLI, const uint64_t SwitchNum, char *Description) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchDescription", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchDescription", "Pointer to CommandLineIO is NULL");
         } else if (SwitchNum > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchDescription", "SwitchNum %d is too high, there are only %d switches\n", SwitchNum, CLI->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchDescription", "SwitchNum %d is too high, there are only %d switches", SwitchNum, CLI->NumSwitches);
         } else if (Description == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchDescription", "Pointer to switch Description is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchDescription", "Pointer to switch Description is NULL");
         } else {
             CLI->Switches[SwitchNum].SwitchDescription = Description;
         }
@@ -242,63 +240,17 @@ extern "C" {
     
     void SetCLISwitchResultStatus(CommandLineIO *CLI, const uint64_t SwitchNum, const bool IsThereAResult) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchResultStatus", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchResultStatus", "Pointer to CommandLineIO is NULL");
         } else if (SwitchNum > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchResultStatus", "SwitchNum: %d, should be between 0 and %d\n", SwitchNum, CLI->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchResultStatus", "SwitchNum: %d, should be between 0 and %d", SwitchNum, CLI->NumSwitches);
         } else {
             CLI->Switches[SwitchNum].SwitchHasResult = IsThereAResult;
         }
     }
     
-    bool GetCLISwitchPresence(CommandLineIO *CLI, const uint64_t SwitchNum) {
-        bool SwitchFound = false;
-        if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetCLISwitchPresence", "Pointer to CommandLineIO is NULL\n");
-        } else {
-            for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
-                if (CLI->Arguments[Argument].SwitchNum == SwitchNum) {
-                    SwitchFound = true;
-                }
-            }
-        }
-        return SwitchFound;
-    }
-    
-    uint64_t GetCLIChildSwitchArgument(CommandLineIO *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch) {
-        uint64_t SwitchContainingMetaArg = 0xFFFFFFFFFFFFFFFF;
-        if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "Pointer to CommandLineIO is NULL\n");
-        } else if (ParentSwitch > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "ParentSwitch: %d, should be between 0 and %d\n", ParentSwitch, CLI->NumSwitches);
-        } else if (ChildSwitch > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "ChildSwitch: %d, should be between 0 and %d\n", ChildSwitch, CLI->NumSwitches);
-        } else {
-            for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
-                for (uint64_t ChildArg = 0; ChildArg < CLI->Arguments[Argument].NumChildArguments; ChildArg++) {
-                    if (CLI->Arguments[Argument].ChildArguments[ChildArg] == ChildSwitch && CLI->Arguments[Argument].SwitchNum == ParentSwitch) {
-                        SwitchContainingMetaArg = Argument;
-                    }
-                }
-            }
-        }
-        return SwitchContainingMetaArg;
-    }
-    
-    char *GetCLIArgumentResult(CommandLineIO *CLI, const uint64_t ArgumentNum) {
-        char *Result = NULL;
-        if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetCLIArgumentResult", "Pointer to CommandLineIO is NULL\n");
-        } else if (ArgumentNum > CLI->NumArguments) {
-            Log(LOG_ERR, "libBitIO", "GetCLIArgumentResult", "ArgumentNum is greater than there are arguments");
-        } else {
-            Result = CLI->Arguments[ArgumentNum].ArgumentResult;
-        }
-        return Result;
-    }
-    
     static void DisplayCLIHelp(CommandLineIO *CLI) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "DisplayCLIHelp", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "DisplayCLIHelp", "Pointer to CommandLineIO is NULL");
         } else {
             bool *IsChildSwitch = calloc(CLI->NumSwitches, sizeof(bool));
             for (uint64_t Switch = 0; Switch < CLI->NumSwitches; Switch++) {
@@ -306,13 +258,13 @@ extern "C" {
                     IsChildSwitch[CLI->Switches[Switch].ChildSwitches[ChildSwitch]] = true;
                 }
             }
-            printf("Options: (-|--|/)\n");
+            printf("Options: (-|--|/)");
             for (uint64_t Switch = 0; Switch < CLI->NumSwitches; Switch++) {
                 if (IsChildSwitch[Switch] == false) {
-                    printf("%s: %s\n", CLI->Switches[Switch].Flag, CLI->Switches[Switch].SwitchDescription);
+                    printf("%s: %s", CLI->Switches[Switch].Flag, CLI->Switches[Switch].SwitchDescription);
                     for (uint64_t ChildSwitch = 0; ChildSwitch < CLI->Switches[Switch].NumChildSwitches; ChildSwitch++) {
                         uint64_t CurrentChildSwitch = CLI->Switches[Switch].ChildSwitches[ChildSwitch];
-                        printf("\t%s: %s\n", CLI->Switches[CurrentChildSwitch].Flag, CLI->Switches[CurrentChildSwitch].SwitchDescription);
+                        printf("\t%s: %s", CLI->Switches[CurrentChildSwitch].Flag, CLI->Switches[CurrentChildSwitch].SwitchDescription);
                     }
                 }
             }
@@ -322,7 +274,7 @@ extern "C" {
     
     static void DisplayProgramBanner(CommandLineIO *CLI) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "DisplayProgramBanner", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "DisplayProgramBanner", "Pointer to CommandLineIO is NULL");
         } else {
             if (CLI->ProgramName != NULL) {
                 printf("%s ", CLI->ProgramName);
@@ -335,28 +287,20 @@ extern "C" {
             } else if (CLI->ProgramDescription != NULL) {
                 printf(": %s", CLI->ProgramDescription);
             } else if (CLI->IsProprietary == true && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL) {
-                printf(", Released under the \"%s\" license: %s, available at: %s\n\n", CLI->ProgramLicenseName, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL);
+                printf(", Released under the \"%s\" license: %s, available at: %s", CLI->ProgramLicenseName, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL);
             } else if (CLI->IsProprietary == false && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL) {
-                printf(", By using this software, you agree to the End User License Agreement %s, available at: %s\n\n", CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL);
+                printf(", By using this software, you agree to the End User License Agreement %s, available at: %s", CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL);
             }
-            /*
-             printf("%s version %s by %s © %s: %s, ", CLI->ProgramName, CLI->ProgramVersion, CLI->ProgramAuthor, CLI->ProgramCopyright, CLI->ProgramDescription); // Generic part of the string.
-             if (CLI->IsProprietary == true) {
-             printf("Released under the \"%s\" license: %s\n\n", CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL);
-             } else {
-             printf("By using this software, you agree to the End User License Agreement %s, available at: %s\n\n", CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL);
-             }
-             */
         }
     }
     
     void SetCLISwitchAsChild(CommandLineIO *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchAsChild", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchAsChild", "Pointer to CommandLineIO is NULL");
         } else if (ParentSwitch > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchAsChild", "ParentSwitch: %d, should be between 0 and %d\n", ParentSwitch, CLI->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchAsChild", "ParentSwitch: %d, should be between 0 and %d", ParentSwitch, CLI->NumSwitches);
         } else if (ChildSwitch > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchAsChild", "ChildSwitch: %d, should be between 0 and %d\n", ChildSwitch, CLI->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchAsChild", "ChildSwitch: %d, should be between 0 and %d", ChildSwitch, CLI->NumSwitches);
         } else {
             CLI->Switches[ParentSwitch].NumChildSwitches  += 1;
             if (CLI->Switches[ParentSwitch].ChildSwitches == NULL) {
@@ -372,7 +316,7 @@ extern "C" {
     
     void ParseCommandLineArguments(CommandLineIO *CLI, const int argc, const char *argv[]) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineIO is NULL");
         } else if (argc <= 1 || (argc < CLI->MinSwitches && CLI->MinSwitches > 1) || argv == NULL) {
             DisplayProgramBanner(CLI);
             DisplayCLIHelp(CLI);
@@ -387,7 +331,7 @@ extern "C" {
             
             for (int Argument = 1; Argument < argc; Argument++) { // No point in scanning the program's path
                 for (uint64_t CurrentSwitch = 0; CurrentSwitch < CLI->NumSwitches; CurrentSwitch++) {
-                    if (CLI->Switches[CurrentSwitch].IsMainSwitch == true) {
+                    if (CLI->Switches[CurrentSwitch].IsMasterSwitch == true) {
                         uint64_t FlagSize  = CLI->Switches[CurrentSwitch].FlagSize;
                         SingleDashFlag   = (char*) calloc(1, FlagSize + 1);
                         DoubleDashFlag   = (char*) calloc(1, FlagSize + 2);
@@ -441,10 +385,21 @@ extern "C" {
         }
     }
     
-    uint64_t GetCLISwitchNumFromFlag(CommandLineIO *CLI, const char *Flag) {
+    uint64_t GetCLINumArgumentsMatchingSwitch(CommandLineIO *CLI, const uint64_t Switch) { // The gist, is that we want to find how many arguments there are for Switch X.
+        uint64_t NumSwitchesFound = 0;
+        for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
+            if (CLI->Arguments[Argument].SwitchNum == Switch) {
+                NumSwitchesFound += 1;
+            }
+        }
+        
+        return NumSwitchesFound;
+    }
+    
+    uint64_t GetCLIArgumentNumFromFlag(CommandLineIO *CLI, const char *Flag) {
         uint64_t FoundSwitch = 0xFFFFFFFFFFFFFFFF;
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetCLISwitchNumFromFlag", "Pointer to CommandLineIO is NULL\n");
+            Log(LOG_ERR, "libBitIO", "GetCLIArgumentNumFromFlag", "Pointer to CommandLineIO is NULL");
         } else {
             for (uint64_t Switch = 0; Switch < CLI->NumSwitches; Switch++) {
                 if (strcasecmp(CLI->Switches[Switch].Flag, Flag) == 0) {
@@ -455,30 +410,37 @@ extern "C" {
         return FoundSwitch;
     }
     
-    /*
-    uint64_t FindCLIArgument(CommandLineIO *CLI, const uint64_t Switch, uint64_t NumChildSwitches, const uint64_t *ChildSwitches) {
-        // So the gist is we search CLI->Arguments looking for Switch with ChildSwitches, and return that argument.
-        // What should the error code be tho? just return NULL?
-        
-        uint64_t FoundArgument = 0;
+    char *GetCLIArgumentResult(CommandLineIO *CLI, const uint64_t ArgumentNum) {
+        char *Result = NULL;
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "FindCLIArgument", "Pointer to CommandLineIO is NULL\n");
-        } else if (Switch > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "FindCLIArgument", "Switch: %d, should be between 0 and %d\n", Switch, CLI->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "GetCLIArgumentResult", "Pointer to CommandLineIO is NULL");
+        } else if (ArgumentNum > CLI->NumArguments) {
+            Log(LOG_ERR, "libBitIO", "GetCLIArgumentResult", "ArgumentNum is greater than there are arguments");
         } else {
-            for (uint64_t Argument = 1; Argument < CLI->NumArguments; Argument++) {
-                for (uint64_t MetaSwitch = 0; MetaSwitch < NumChildSwitches; MetaSwitch++) {
-                    for (uint64_t ArgChildSwitch = 0; ArgChildSwitch < CLI->Arguments[Argument].NumChildArguments; ArgChildSwitch++) {
-                        if (CLI->Arguments[Argument].SwitchNum == Switch && ChildSwitches[MetaSwitch] == CLI->Arguments[Argument].ChildArguments[ArgChildSwitch]) {
-                            FoundArgument = Argument;
-                        }
+            Result = CLI->Arguments[ArgumentNum].ArgumentResult;
+        }
+        return Result;
+    }
+    
+    uint64_t GetCLIChildSwitchArgument(CommandLineIO *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch) {
+        uint64_t SwitchContainingMetaArg = 0xFFFFFFFFFFFFFFFF;
+        if (CLI == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "Pointer to CommandLineIO is NULL");
+        } else if (ParentSwitch > CLI->NumSwitches) {
+            Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "ParentSwitch: %d, should be between 0 and %d", ParentSwitch, CLI->NumSwitches);
+        } else if (ChildSwitch > CLI->NumSwitches) {
+            Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "ChildSwitch: %d, should be between 0 and %d", ChildSwitch, CLI->NumSwitches);
+        } else {
+            for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
+                for (uint64_t ChildArg = 0; ChildArg < CLI->Arguments[Argument].NumChildArguments; ChildArg++) {
+                    if (CLI->Arguments[Argument].ChildArguments[ChildArg] == ChildSwitch && CLI->Arguments[Argument].SwitchNum == ParentSwitch) {
+                        SwitchContainingMetaArg = Argument;
                     }
                 }
             }
         }
-        return FoundArgument;
+        return SwitchContainingMetaArg;
     }
-    */
     
 #ifdef __cplusplus
 }

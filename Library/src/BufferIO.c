@@ -1400,10 +1400,18 @@ extern "C" {
         snprintf(ErrorString, ErrorStringSize, "%s%s", EasyString, HardString);
         if (BitIOGlobalLogFile == NULL) {
             // Set STDERR As the output file
+#ifdef _POSIX_VERSION
             fprintf(stderr, "%s\n", ErrorString);
+#elif _WIN32
+            fprintf(stderr, "%s\r\n", ErrorString);
+#endif
         } else {
             // Use BitO->LogFile as the output file
+#ifdef _POSIX_VERSION
             fprintf(BitIOGlobalLogFile, "%s\n", ErrorString);
+#elif _WIN32
+            fprintf(BitIOGlobalLogFile, "%s\r\n", ErrorString);
+#endif
         }
     }
     
