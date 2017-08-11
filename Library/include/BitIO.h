@@ -3,7 +3,6 @@
  @author    Marcus Johnson
  @copyright 2016 - 2017
  @version   0.6.0
- FIXME:     The Version number needs to be FeatureLevel.ABI.BugFix
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
  */
 
@@ -57,13 +56,13 @@ extern "C" {
      @constant         MSBit                      "The bit order is most  significant bit first".
      */
     enum BitIOByteBitOrders {
-        UnknownEndian              = 0,
-        BigEndianLSBit             = 1,
-        BigEndianMSBit             = 2,
-        LilEndianLSBit             = 3,
-        LilEndianMSBit             = 4,
-        LSBit                      = 5,
-        MSBit                      = 6,
+                       UnknownEndian              = 0,
+                       BigEndianLSBit             = 1,
+                       BigEndianMSBit             = 2,
+                       LilEndianLSBit             = 3,
+                       LilEndianMSBit             = 4,
+                       LSBit                      = 5,
+                       MSBit                      = 6,
     };
     
     /*!
