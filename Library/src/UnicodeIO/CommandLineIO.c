@@ -78,45 +78,16 @@ extern "C" {
     
     CommandLineIO *InitCommandLineIO(const uint64_t NumSwitches) {
         CommandLineIO *CLI = (CommandLineIO*) calloc(1, sizeof(CommandLineIO));
-        
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "InitCommandLineIO", "Not enough memory to allocate CommandLineIO");
-        }
-        CLI->NumSwitches          = NumSwitches;
-        CLI->Switches             = (CommandLineSwitch*) calloc(NumSwitches, sizeof(CommandLineSwitch));
-        if (CLI->Switches == NULL) {
-            Log(LOG_ERR, "libBitIO", "InitCommandLineIO", "Not enough memory to allocate CommandLineIO, NumSwitches = %d", NumSwitches);
+        } else {
+            CLI->NumSwitches          = NumSwitches;
+            CLI->Switches             = (CommandLineSwitch*) calloc(NumSwitches, sizeof(CommandLineSwitch));
+            if (CLI->Switches == NULL) {
+                Log(LOG_ERR, "libBitIO", "InitCommandLineIO", "Not enough memory to allocate CommandLineSwitch, NumSwitches = %d", NumSwitches);
+            }
         }
         return CLI;
-    }
-    
-    void DeinitCommandLineIO(CommandLineIO *CLI) {
-        if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "DeinitCommandLineIO", "Pointer to CommandLineIO is NULL");
-        } else {
-            /* Free CommandLineSwitches */
-            for (uint64_t Switch = 0; Switch < CLI->NumSwitches; Switch++) {
-                free((char*)CLI->Switches[Switch].Flag);
-                free((char*)CLI->Switches[Switch].SwitchDescription);
-            }
-            /* Free CommandLineArguments */
-            for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
-                for (uint64_t MetaSwitch = 0; MetaSwitch < CLI->Switches[Argument].NumChildSwitches; MetaSwitch++) {
-                    free((char*)CLI->Arguments[Argument].ArgumentResult);
-                }
-            }
-            free(CLI->Switches);
-            free(CLI->Arguments);
-            /* Free CommandLineIO */
-            free((char*)CLI->ProgramName);
-            free((char*)CLI->ProgramAuthor);
-            free((char*)CLI->ProgramDescription);
-            free((char*)CLI->ProgramVersion);
-            free((char*)CLI->ProgramCopyright);
-            free((char*)CLI->ProgramLicenseDescription);
-            free((char*)CLI->ProgramLicenseURL);
-            free(CLI);
-        }
     }
     
     void SetCLIName(CommandLineIO *CLI, char *Name) {
@@ -222,7 +193,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "SwitchNum %d is too high, there are only %d switches", SwitchNum, CLI->NumSwitches);
         } else {
             CLI->Switches[SwitchNum].Flag     = Flag;
-            CLI->Switches[SwitchNum].FlagSize = strlen(Flag); // TODO: Make sure this does not include any null
+            CLI->Switches[SwitchNum].FlagSize = strlen(Flag);
         }
     }
     
@@ -317,7 +288,7 @@ extern "C" {
     void ParseCommandLineArguments(CommandLineIO *CLI, const int argc, const char *argv[]) {
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineIO is NULL");
-        } else if (argc <= 1 || (argc < CLI->MinSwitches && CLI->MinSwitches > 1) || argv == NULL) {
+        } else if (argc <= 1 || (argc < (int) CLI->MinSwitches && CLI->MinSwitches > 1) || argv == NULL) {
             DisplayProgramBanner(CLI);
             DisplayCLIHelp(CLI);
         } else {
@@ -343,7 +314,7 @@ extern "C" {
                             if (CLI->NumArguments == 0) {
                                 CLI->Arguments = calloc(1, sizeof(CommandLineArgument));
                             } else {
-                                uint64_t NumArguments  = CLI->Arguments + 1;
+                                uint64_t NumArguments  = (uint64_t) CLI->Arguments + 1;
                                 uint64_t ArgumentsSize = sizeof(CommandLineArgument) * NumArguments;
                                 CLI->Arguments = realloc(CLI->Arguments, ArgumentsSize);
                             }
@@ -357,7 +328,7 @@ extern "C" {
                                 snprintf(ChildSingleDashFlag,  ChildFlagSize + 1,  "-%s", CLI->Switches[CurrentSwitch + 1].Flag);
                                 snprintf(ChildDoubleDashFlag,  ChildFlagSize + 2, "--%s", CLI->Switches[CurrentSwitch + 1].Flag);
                                 snprintf(ChildSingleSlashFlag, ChildFlagSize + 1,  "/%s", CLI->Switches[CurrentSwitch + 1].Flag);
-                                if (strcasecmp(argv[Argument + ChildSwitch], ChildSingleDashFlag) == 0 || strcasecmp(argv[Argument + ChildSwitch], ChildDoubleDashFlag) == 0 || strcasecmp(argv[Argument + ChildSwitch], ChildSingleSlashFlag) == 0) {
+                                if (strcasecmp(argv[Argument + (int) ChildSwitch], ChildSingleDashFlag) == 0 || strcasecmp(argv[Argument + (int) ChildSwitch], ChildDoubleDashFlag) == 0 || strcasecmp(argv[Argument + (int) ChildSwitch], ChildSingleSlashFlag) == 0) {
                                     CLI->Arguments[ChildSwitch].NumChildArguments += 1;
                                     CLI->Arguments[ChildSwitch].ChildArguments     = GetCLISwitchNumFromFlag(CLI, argv[Argument + 1]);
                                     /*
@@ -387,12 +358,17 @@ extern "C" {
     
     uint64_t GetCLINumArgumentsMatchingSwitch(CommandLineIO *CLI, const uint64_t Switch) { // The gist, is that we want to find how many arguments there are for Switch X.
         uint64_t NumSwitchesFound = 0;
-        for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
-            if (CLI->Arguments[Argument].SwitchNum == Switch) {
-                NumSwitchesFound += 1;
+        if (CLI == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetCLINumArgumentsMatchingSwitch", "Pointer to CommandLineIO is NULL");
+        } else if (Switch > CLI->NumSwitches) {
+            Log(LOG_ERR, "libBitIO", "GetCLINumArgumentsMatchingSwitch", "Switch: %d, should be between 0 and %d", Switch, CLI->NumSwitches);
+        } else {
+            for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
+                if (CLI->Arguments[Argument].SwitchNum == Switch) {
+                    NumSwitchesFound += 1;
+                }
             }
         }
-        
         return NumSwitchesFound;
     }
     
@@ -400,6 +376,8 @@ extern "C" {
         uint64_t FoundSwitch = 0xFFFFFFFFFFFFFFFF;
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetCLIArgumentNumFromFlag", "Pointer to CommandLineIO is NULL");
+        } else if (Flag == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetCLIArgumentNumFromFlag", "Pointer to Flag is NULL");
         } else {
             for (uint64_t Switch = 0; Switch < CLI->NumSwitches; Switch++) {
                 if (strcasecmp(CLI->Switches[Switch].Flag, Flag) == 0) {
@@ -440,6 +418,36 @@ extern "C" {
             }
         }
         return SwitchContainingMetaArg;
+    }
+    
+    void DeinitCommandLineIO(CommandLineIO *CLI) {
+        if (CLI == NULL) {
+            Log(LOG_ERR, "libBitIO", "DeinitCommandLineIO", "Pointer to CommandLineIO is NULL");
+        } else {
+            /* Free CommandLineSwitches */
+            for (uint64_t Switch = 0; Switch < CLI->NumSwitches; Switch++) {
+                free((char*) CLI->Switches[Switch].Flag);
+                free((char*) CLI->Switches[Switch].SwitchDescription);
+                free((char*) CLI->Switches[Switch].ChildSwitches);
+            }
+            /* Free CommandLineArguments */
+            for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
+                free(CLI->Arguments[Argument].ChildArguments);
+                free(CLI->Arguments[Argument].ArgumentResult);
+            }
+            free(CLI->Switches);
+            free(CLI->Arguments);
+            /* Free CommandLineIO */
+            free((char*) CLI->ProgramName);
+            free((char*) CLI->ProgramAuthor);
+            free((char*) CLI->ProgramDescription);
+            free((char*) CLI->ProgramVersion);
+            free((char*) CLI->ProgramCopyright);
+            free((char*) CLI->ProgramLicenseName);
+            free((char*) CLI->ProgramLicenseDescription);
+            free((char*) CLI->ProgramLicenseURL);
+            free(CLI);
+        }
     }
     
 #ifdef __cplusplus
