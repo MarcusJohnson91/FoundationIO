@@ -115,7 +115,6 @@ extern "C" {
      @param               CLI                       "Pointer to the instance of CommandLineIO".
      @param               SwitchNum                 "The switch to set".
      @param               Flag                      "The flag to identify an option with".
-     @param               FlagSize                  "Size of the flag string".
      */
     void                  SetCLISwitchFlag(CommandLineIO *CLI, const uint64_t SwitchNum, char *Flag);
     
