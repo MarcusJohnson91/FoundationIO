@@ -20,6 +20,7 @@ extern "C" {
 #ifdef _WIN32
 #define strcasecmp _stricmp
 #endif
+    
     extern FILE           *BitIOGlobalLogFile; // ONLY global variable in all of BitIO
     
     typedef struct BitBuffer {
@@ -179,7 +180,7 @@ extern "C" {
     uint8_t Power2Mask(const uint8_t BitOrder, const uint8_t Exponent) {
         uint8_t Mask = 0;
         if (Exponent > 8) {
-            Log(LOG_ERR, "libBitIO", "Power2Mask2", "Exponent %d is too large", Exponent);
+            Log(LOG_ERR, "libBitIO", "Power2Mask", "Exponent %d is too large", Exponent);
         } else {
             if (BitOrder == LSBit) {
                 Mask = (uint8_t) (pow(2, Exponent) - 1);
@@ -376,10 +377,10 @@ extern "C" {
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenInputSocket", "Pointer to BitInput is NULL");
         } else {
-#ifdef _WIN32
-#else
+#ifdef _POSIX_VERSION
             BitI->Socket         = socket(Domain, Type, Protocol);
             BitI->IsFileOrSocket = &socket;
+#elif  _WIN32
 #endif
         }
     }
@@ -388,10 +389,10 @@ extern "C" {
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenInputSocket", "Pointer to BitInput is NULL");
         } else {
-#ifdef _WIN32
-#else
+#ifdef _POSIX_VERSION
             BitO->Socket         = socket(Domain, Type, Protocol);
             BitO->IsFileOrSocket = &socket;
+#elif  _WIN32
 #endif
         }
     }
@@ -636,11 +637,11 @@ extern "C" {
     
     void WriteBits2(const uint8_t ByteBitOrder, BitBuffer *Buffer2Write, const uint8_t Bits2Write, const uint64_t Value2Write) {
         if (ByteBitOrder == LSBit || ByteBitOrder == MSBit || ByteBitOrder > 6) {
-            Log(LOG_ERR, "libBitIO", "WriteBits2", "Invalid ByteBitOrder: %d", ByteBitOrder);
+            Log(LOG_ERR, "libBitIO", "WriteBits", "Invalid ByteBitOrder: %d", ByteBitOrder);
         } else if (Buffer2Write == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteBits2", "Pointer to BitBuffer is NULL");
+            Log(LOG_ERR, "libBitIO", "WriteBits", "Pointer to BitBuffer is NULL");
         } else if (Buffer2Write->Buffer == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteBits2", "Pointer to Buffer in BitBuffer is NULL");
+            Log(LOG_ERR, "libBitIO", "WriteBits", "Pointer to Buffer in BitBuffer is NULL");
         } else {
             if (ByteBitOrder == BigEndianLSBit) {
                 
@@ -1010,10 +1011,9 @@ extern "C" {
     
     void CreateSocket(const int Domain, const int Type, const int Protocol) { // Define it in the header when it's done
         int Socket;
-#ifndef _WIN32
+#ifdef _POSIX_VERSION
         Socket = socket(Domain, Type, Protocol);
 #elif _WIN32
-        
 #endif
     }
     
