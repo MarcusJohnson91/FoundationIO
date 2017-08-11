@@ -3,7 +3,6 @@
  @author    Marcus Johnson aka BumbleBritches57
  @copyright 2017, Marcus Johnson
  @version   2.0.0
- FIXME:     The Version number needs to be FeatureLevel.ABI.BugFix
  @brief     This header contains code related to parsing the command line arguments.
  */
 
