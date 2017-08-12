@@ -86,18 +86,16 @@ License:
 BitIO is released under the 3 clause simplified BSD license. (I may relicense or dual license under the MIT license tho, not sure)
 
 Here's a tl;dr of my license:
+* **Do** include in your acknowledgments a link to [BitIO on GitHub](https://www.github.com/MarcusJohnson91/FoundationIO).
 * **Don't** plagiarize BitIO.
 * **Don't** relicense BitIO.
-* **Don't** sue me if something goes wrong, or for using patented algorithms; I'm a programmer, not a patent clerk.
-* **Do** Include in your acknowledgments a link to [BitIO on GitHub](https://www.github.com/MarcusJohnson91/FoundationIO).
+* **Don't** sue me if something goes wrong. I never have and never will gurantee BitIO works for anything, you figure out if it's right for you.
+
 
 Todo:
 -----
 * Add format specifier support to `OpenInputFile` and `OpenOutputFile`, and add a function to increment the file.
 * Finish the CRC generator and verifier.
-* Finish MD5 generator and verifier.
 * Finish Deflate/Inflate (which includes Huffman and LZ77)
 * Write a Reed-Soloman Error correction verifier.
-* Write a LDPC encoder/decoder
 * Write a Asymmetric Binary System encoder and decoder
-* Change ReadFromMSB/WriteFromMSB functions to ReadFromLittleEndian/ReadFromBigEndian and WriteFromBigEndian/WriteFromLittleEndian
