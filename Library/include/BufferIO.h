@@ -119,8 +119,6 @@ extern "C" {
      */
     typedef struct      BitOutput                 BitOutput;
     
-    typedef struct      HuffmanTree               HuffmanTree;
-    
     /*!
      @abstract                                    "Initializes a BitInput structure".
      @return                                      "Returns a pointer to said BitInput structure".
