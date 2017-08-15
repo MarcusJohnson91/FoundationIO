@@ -1121,6 +1121,16 @@ extern "C" {
     void Log(const uint8_t ErrorSeverity, const char *LibraryOrProgram, const char *FunctionName, const char *Description, ...) {
         uint64_t FunctionNameSize = 0, DescriptionSize = 0;
         
+#ifndef BitIONewLine
+#ifdef _POSIX_VERSION
+#define BitIONewLine ("\n")
+#elif  _WIN32
+#define BitIONewLine ("\r\n")
+#elif Macintosh
+#define BitIONewLine ("\r")
+#endif
+#endif /* BitIONewLine */
+        
         char *EasyString = calloc(1, 1 + strlen(FunctionName) + strlen(Description)); // the 1 is for the error severity
         snprintf(EasyString, FunctionNameSize + DescriptionSize, "%hhu: %s - %s", ErrorSeverity, FunctionName, Description);
         
@@ -1130,24 +1140,15 @@ extern "C" {
         vsprintf(HardString, "%s", Arguments);
         va_end(Arguments);
         
-        
         uint64_t ErrorStringSize = strlen(EasyString) + strlen(HardString);
         char *ErrorString = calloc(1, ErrorStringSize);
         snprintf(ErrorString, ErrorStringSize, "%s%s", EasyString, HardString);
         if (BitIOGlobalLogFile == NULL) {
             // Set STDERR As the output file
-#ifdef _POSIX_VERSION
-            fprintf(stderr, "%s\n", ErrorString);
-#elif  _WIN32
-            fprintf(stderr, "%s\r\n", ErrorString);
-#endif
+            fprintf(stderr, "%s%s", ErrorString, BitIONewLine);
         } else {
             // Use BitO->LogFile as the output file
-#ifdef _POSIX_VERSION
-            fprintf(BitIOGlobalLogFile, "%s\n", ErrorString);
-#elif  _WIN32
-            fprintf(BitIOGlobalLogFile, "%s\r\n", ErrorString);
-#endif
+            fprintf(BitIOGlobalLogFile, "%s%s", ErrorString, BitIONewLine);
         }
     }
     
