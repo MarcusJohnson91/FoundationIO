@@ -26,6 +26,16 @@
 extern "C" {
 #endif
     
+#ifndef BitIONewLine
+#ifdef _POSIX_VERSION
+#define BitIONewLine ("\n")
+#elif  _WIN32
+#define BitIONewLine ("\r\n")
+#elif Macintosh
+#define BitIONewLine ("\r")
+#endif
+#endif /* BitIONewLine */
+    
     /*!
      @enum              BitIOConstants
      @abstract                                    "BitIO compile time constants".
@@ -265,17 +275,23 @@ extern "C" {
     uint64_t            BytesRemainingInInputFile(const BitInput *BitI);
     
     /*!
+     @abstract                                    "Seeks to the end of BitI->File to determine the size"
+     @param             BitI                      "Pointer to the instance of BitInput".
+     */
+    void                GetFileSize(BitInput *BitI);
+    
+    /*!
      @abstract                                    "Gets the size of the file pointed to by BitI"
      @return                                      "Returns the value in BitI->FileSize".
      @param             BitI                      "Pointer to the instance of BitInput".
      */
-    uint64_t            GetBitInputFileSize(const BitInput *BitI);
+    fpos_t              GetBitInputFileSize(const BitInput *BitI);
     
     /*!
      @abstract                                    "Returns the position of the current file".
      @param             BitI                      "Pointer to the instance of BitInput".
      */
-    uint64_t            GetBitInputFilePosition(const BitInput *BitI);
+    fpos_t              GetBitInputFilePosition(const BitInput *BitI);
     
     /*!
      @abstract                                    "Returns the number of bits used in BitB".
