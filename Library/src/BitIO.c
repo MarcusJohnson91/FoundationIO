@@ -1,3 +1,11 @@
+#ifndef _LARGEFILE_SOURCE
+#define _LARGEFILE_SOURCE
+#endif
+#ifndef _LARGEFILE64_SOURCE
+#define _LARGEFILE64_SOURCE
+#endif
+
+
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -33,7 +41,7 @@ extern "C" {
         FILE              *File;
         bool               IsFileOrSocket;
         int                Socket;
-        uint64_t           FileSize;
+        fpos_t             FileSize;
         uint64_t           FilePosition;
         uint64_t           FileSpecifierNum;
         uint8_t            SystemEndian;
@@ -109,36 +117,34 @@ extern "C" {
         }
     }
     
-    uint8_t SwapBitsInByte(const uint8_t Byte) {
+    inline uint8_t SwapBitsInByte(const uint8_t Byte) {
         return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
     }
     
-    uint8_t SwapNibble(const uint8_t Byte2Swap) {
+    inline uint8_t SwapNibble(const uint8_t Byte2Swap) {
         return ((Byte2Swap & 0xF0 >> 4) | (Byte2Swap & 0x0F << 4));
     }
     
-    uint16_t SwapEndian16(const uint16_t Data2Swap) {
+    inline uint16_t SwapEndian16(const uint16_t Data2Swap) {
         return ((Data2Swap & 0xFF00) >> 8) | ((Data2Swap & 0x00FF) << 8);
     }
     
-    uint32_t SwapEndian32(const uint32_t Data2Swap) {
+    inline uint32_t SwapEndian32(const uint32_t Data2Swap) {
         return ((Data2Swap & 0xFF000000) >> 24) | ((Data2Swap & 0x00FF0000) >> 8) | ((Data2Swap & 0x0000FF00) << 8) | ((Data2Swap & 0x000000FF) << 24);
     }
     
-    uint64_t SwapEndian64(const uint64_t Data2Swap) {
+    inline uint64_t SwapEndian64(const uint64_t Data2Swap) {
         return (((Data2Swap & 0xFF00000000000000) >> 56) | ((Data2Swap & 0x00FF000000000000) >> 40) | \
                 ((Data2Swap & 0x0000FF0000000000) >> 24) | ((Data2Swap & 0x000000FF00000000) >>  8) | \
                 ((Data2Swap & 0x00000000FF000000) <<  8) | ((Data2Swap & 0x0000000000FF0000) << 24) | \
                 ((Data2Swap & 0x000000000000FF00) << 40) | ((Data2Swap & 0x00000000000000FF) << 56));
     }
     
-    
-    
-    int64_t Bytes2Bits(const int64_t Bytes) {
+    inline int64_t Bytes2Bits(const int64_t Bytes) {
         return Bytes * 8;
     }
     
-    int64_t Bits2Bytes(const int64_t Bits, const bool RoundUp) {
+    inline int64_t Bits2Bytes(const int64_t Bits, const bool RoundUp) {
         if (RoundUp == true) {
             return (Bits / 8) + (8 - (Bits % 8));
         } else {
@@ -162,7 +168,7 @@ extern "C" {
         return BitCount;
     }
     
-    uint8_t Power2Mask(const uint8_t BitOrder, const uint8_t Exponent) {
+    inline uint8_t Power2Mask(const uint8_t BitOrder, const uint8_t Exponent) {
         uint8_t Mask = 0;
         if (Exponent > 8) {
             Log(LOG_ERR, "libBitIO", "Power2Mask", "Exponent %d is too large", Exponent);
@@ -233,21 +239,27 @@ extern "C" {
         return BytesLeft;
     }
     
-    uint64_t GetBitInputFileSize(const BitInput *BitI) {
+    fpos_t GetBitInputFileSize(const BitInput *BitI) {
         uint64_t InputSize = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL");
         } else {
+            if (BitI->FileSize == NULL) {
+                GetFileSize(BitI);
+            }
             InputSize = BitI->FileSize;
         }
         return InputSize;
     }
     
-    uint64_t GetBitInputFilePosition(const BitInput *BitI) {
+    fpos_t GetBitInputFilePosition(const BitInput *BitI) {
         uint64_t Position = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL");
         } else {
+            if (BitI->FilePosition == NULL) {
+                GetFileSize(BitI);
+            }
             Position = BitI->FilePosition;
         }
         return Position;
@@ -320,15 +332,18 @@ extern "C" {
             }
             
             if (BitI->File == NULL) {
-                Log(LOG_ERR, "libBitIO", "OpenInputFile", "BitI->File error: Pointer to File is NULL");
+                Log(LOG_ERR, "libBitIO", "OpenInputFile", "Couldn't open file: Check that the file exists and the permissions are correct");
             } else {
-                fseek(BitI->File, 0, SEEK_END);
-                BitI->FileSize     = (uint64_t) ftell(BitI->File);
-                fseek(BitI->File, 0, SEEK_SET);
-                BitI->FilePosition = (uint64_t) ftell(BitI->File);
                 BitI->SystemEndian = DetectSystemEndian();
             }
         }
+    }
+    
+    void GetFileSize(BitInput *BitI) {
+        fseek(BitI->File, 0, SEEK_END);
+        fgetpos(BitI->File, (uint64_t)BitI->FileSize);
+        fseek(BitI->File, 0, SEEK_SET);
+        fgetpos(BitI->File, BitI->FilePosition);
     }
     
     void OpenOutputFile(BitOutput *BitO, const char *Path2Open) {
@@ -343,7 +358,7 @@ extern "C" {
             
             BitO->File = fopen(Path2Open, "wb");
             if (BitO->File == NULL) {
-                Log(LOG_ALERT, "libBitIO", "OpenOutputFile", "Failed opening Path2Open");
+                Log(LOG_ALERT, "libBitIO", "OpenOutputFile", "Couldn't open file: Check that the file exists and the permissions are correct");
             }
             BitO->SystemEndian          = DetectSystemEndian();
         }
@@ -1120,16 +1135,6 @@ extern "C" {
     
     void Log(const uint8_t ErrorSeverity, const char *LibraryOrProgram, const char *FunctionName, const char *Description, ...) {
         uint64_t FunctionNameSize = 0, DescriptionSize = 0;
-        
-#ifndef BitIONewLine
-#ifdef _POSIX_VERSION
-#define BitIONewLine ("\n")
-#elif  _WIN32
-#define BitIONewLine ("\r\n")
-#elif Macintosh
-#define BitIONewLine ("\r")
-#endif
-#endif /* BitIONewLine */
         
         char *EasyString = calloc(1, 1 + strlen(FunctionName) + strlen(Description)); // the 1 is for the error severity
         snprintf(EasyString, FunctionNameSize + DescriptionSize, "%hhu: %s - %s", ErrorSeverity, FunctionName, Description);
