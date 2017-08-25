@@ -173,31 +173,30 @@ extern "C" {
      @abstract                                    "Swap bits in a byte".
      @param             Byte                      "Byte to swap bits".
      */
-    uint8_t             SwapBitsInByte(const uint8_t Byte);
+    inline uint8_t      SwapBitsInByte(const uint8_t Byte);
     
     /*!
      @abstract                                    "Swap nibbles in a byte".
      @param             Byte2Swap                 "Byte to swap nibbles".
      */
-    uint8_t             SwapNibble(const uint8_t Byte2Swap);
+    inline uint8_t      SwapNibble(const uint8_t Byte2Swap);
     
     /*!
      @abstract                                    "Swap endian of 16 bit integers".
      @param             Data2Swap                 "Data to swap endian".
      */
-    uint16_t            SwapEndian16(const uint16_t Data2Swap);
+    inline uint16_t     SwapEndian16(const uint16_t Data2Swap);
     
     /*!
      @abstract                                    "Swap endian of 32 bit integers".
      @param             Data2Swap                 "Data to swap endian".
      */
-    uint32_t            SwapEndian32(const uint32_t Data2Swap);
+    inline uint32_t     SwapEndian32(const uint32_t Data2Swap);
     
     /*!
      @abstract                                    "Swap endian of 64 bit integers".
      @param             Data2Swap                 "Data to swap endian".
      */
-    uint64_t            SwapEndian64(const uint64_t Data2Swap);
     
     /*!
      @abstract                                    "Computes the number of bits from the number of bytes".
@@ -205,7 +204,7 @@ extern "C" {
      @return                                      "Returns the number of bits".
      @param             Bytes                     "The number of bytes you want to intrepret as bits".
      */
-    int64_t             Bytes2Bits(const int64_t Bytes);
+    inline int64_t      Bytes2Bits(const int64_t Bytes);
     
     /*!
      @abstract                                    "Computes the number of bytes from the number of bits".
@@ -213,50 +212,21 @@ extern "C" {
      @param             Bits                      "The bits to convert to bytes".
      @param             RoundUp                   "Should the resulting bytes be rounded up or down?"
      */
-    int64_t             Bits2Bytes(const int64_t Bits, const bool RoundUp);
+    inline int64_t      Bits2Bytes(const int64_t Bits, const bool RoundUp);
     
     /*!
      @abstract                                    "Computes the number of bits required to hold a certain amount of symbols".
      @remark                                      "Rounds up to the next integer bits to ensure all symbols can be contained in simple binary"
      @param             NumSymbols                "The number of symbols you're looking to contain in a binary number".
      */
-    uint64_t            NumBits2ReadSymbols(const uint64_t NumSymbols);
+    inline uint64_t     NumBits2ReadSymbols(const uint64_t NumSymbols);
     
     /*!
      @abstract                                    "Counts the number of bits that are set in a int".
      @return                                      "The number of bits set in Bits2Count".
      @param             Bits2Count                "The int who's bits should be counted".
      */
-    uint8_t             CountBitsSet(const uint64_t Bits2Count);
-    
-    /*!
-     @abstract                                    "Create bit-mask from binary exponent".
-     @return                                      "A bit mask generated from a power".
-     @param             BitOrder                  "Should the mask be shifted to the left or not?".
-     @param             Exponent                  "Power to be raised by 2".
-     */
-    uint8_t             Power2Mask(const uint8_t BitOrder, const uint8_t Exponent);
-    
-    /*!
-     @abstract                                    "Converts numbers from One's compliment to Two's compliment"
-     @return                                      "Returns OnesCompliment in 2's compliment format".
-     @param             OnesCompliment            "Int in 1's compliment form to convert into 2's compliment".
-     */
-    int64_t             OnesCompliment2TwosCompliment(const int64_t OnesCompliment);
-    
-    /*!
-     @abstract                                    "Converts numbers from Two's compliment to One's compliment".
-     @return                                      "Returns the TwosCompliment in 1's compliment format".
-     @param             TwosCompliment            "Int in 2's compliment form to convert into 1's compliment".
-     */
-    int64_t             TwosCompliment2OnesCompliment(const int64_t TwosCompliment);
-    
-    /*!
-     @abstract                                    "Tells whether Input is even or odd".
-     @return                                      "True for odd, false for even".
-     @param             Number2Check              "The number to see if it's odd or even".
-     */
-    bool                IsOdd(const int64_t Number2Check);
+    inline uint8_t      CountBitsSet(const uint64_t Bits2Count);
     
     /*!
      @abstract                                    "Finds the highest set bit in an int".
@@ -265,7 +235,36 @@ extern "C" {
      @return                                      "Returns the position of the highest set bit".
      @param             UnsignedInt2Search        "Unsigned integer to search for the highest set bit".
      */
-    uint8_t             FindHighestBitSet(const uint64_t UnsignedInt2Search);
+    inline uint8_t      FindHighestBitSet(const uint64_t UnsignedInt2Search);
+    
+    /*!
+     @abstract                                    "Create bit-mask from binary exponent".
+     @return                                      "A bit mask generated from a power".
+     @param             BitOrder                  "Should the mask be shifted to the left or not?".
+     @param             Exponent                  "Power to be raised by 2".
+     */
+    inline uint8_t      Power2Mask(const uint8_t BitOrder, const uint8_t Exponent);
+    
+    /*!
+     @abstract                                    "Converts numbers from One's compliment to Two's compliment"
+     @return                                      "Returns OnesCompliment in 2's compliment format".
+     @param             OnesCompliment            "Int in 1's compliment form to convert into 2's compliment".
+     */
+    inline int64_t      OnesCompliment2TwosCompliment(const int64_t OnesCompliment);
+    
+    /*!
+     @abstract                                    "Converts numbers from Two's compliment to One's compliment".
+     @return                                      "Returns the TwosCompliment in 1's compliment format".
+     @param             TwosCompliment            "Int in 2's compliment form to convert into 1's compliment".
+     */
+    inline int64_t      TwosCompliment2OnesCompliment(const int64_t TwosCompliment);
+    
+    /*!
+     @abstract                                    "Tells whether Input is even or odd".
+     @return                                      "True for odd, false for even".
+     @param             Number2Check              "The number to see if it's odd or even".
+     */
+    inline bool         IsOdd(const int64_t Number2Check);
     
     /*!
      @abstract                                    "Computes the number of bytes left in the file".
@@ -427,27 +426,6 @@ extern "C" {
     void                AlignBitBuffer(BitBuffer *BitB, const uint8_t BytesOfAlignment);
     
     /*!
-     @abstract                                    "Generates CRC from data".
-     @param             Data2CRC                  "Pointer to a data buffer containing data to run the CRC algorithm over".
-     @param             DataSize                  "Size of the data chunk to generate the CRC for, in bytes".
-     @param             ReciprocalPoly            "The Polynomial in Normal representation".
-     @param             PolySize                  "The size of the polynomial in bits".
-     @param             PolyInit                  "Initialization value".
-     */
-    uint64_t            GenerateCRC(const uint8_t *Data2CRC, const uint64_t DataSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit);
-    
-    /*!
-     @abstract                                    "Computes the CRC of DataBuffer, and compares it to the submitted CRC".
-     @param             Data2CRC                  "Pointer to a data buffer containing data to run the CRC algorithm over".
-     @param             Data2CRCSize              "Size of the data chunk to generate the CRC for".
-     @param             ReciprocalPoly            "The Polynomial in Reciprocal representation".
-     @param             PolySize                  "The size of the polynomial in bits".
-     @param             PolyInit                  "Initialization value".
-     @param             PrecomputedCRC            "The precomputed resulting CRC of Data2CRC, to compare the generated CRC with".
-     */
-    bool                VerifyCRC(const uint8_t *Data2CRC, const uint64_t Data2CRCSize, const uint64_t ReciprocalPoly, const uint8_t PolySize, const uint64_t PolyInit, const uint64_t PrecomputedCRC);
-    
-    /*!
      @abstract                                    "Reads raw UUID/GUID from the bitstream".
      @remark                                      "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
      @param             BitB                      "Pointer to the instance of BitBuffer".
@@ -498,15 +476,6 @@ extern "C" {
      @param             Bytes2Write               "The number of bytes from the buffer to write to the file"
      */
     void                WriteBitBuffer2BitOutput(const BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write);
-    
-    /*!
-     @abstract                                    "Decodes Run-Length Encoded data".
-     @param             Data2Decode               "Pointer to BitBuffer containing RLE encoded data".
-     @param             Decoded                   "Pointer to BitBuffer containing decoded data".
-     @param             LengthCodeSize            "The number of bits used to represent the length code".
-     @param             SymbolSize                "The number of bits used to represent the symbol".
-     */
-    void                DecodeRLE(const BitBuffer *Data2Decode, BitBuffer *Decoded, const uint8_t LengthCodeSize, const uint8_t SymbolSize);
     
     /*!
      @abstract                                    "Logs errors to the user provided log file, or stderr".

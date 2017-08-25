@@ -1,9 +1,5 @@
-#ifndef _LARGEFILE_SOURCE
 #define _LARGEFILE_SOURCE
-#endif
-#ifndef _LARGEFILE64_SOURCE
 #define _LARGEFILE64_SOURCE
-#endif
 
 
 #include <math.h>
@@ -152,12 +148,12 @@ extern "C" {
         }
     }
     
-    uint64_t NumBits2ReadSymbols(const uint64_t NumSymbols) {
+    inline uint64_t NumBits2ReadSymbols(const uint64_t NumSymbols) {
         // Use a binary logarithm, that you round up, in order to get the number of bits required to read a certain number of symbols.
         return ceil(log2(NumSymbols));
     }
     
-    uint8_t CountBitsSet(const uint64_t Bits2Count) {
+    inline uint8_t CountBitsSet(const uint64_t Bits2Count) {
         uint8_t DataBit = 0, BitCount = 0;
         for (uint8_t Bit = 0; Bit < 64; Bit++) {
             DataBit = (Bits2Count & (1 << Bit)) >> Bit;
@@ -166,6 +162,24 @@ extern "C" {
             }
         }
         return BitCount;
+    }
+    
+    inline uint8_t FindHighestBitSet(const uint64_t UnsignedInt2Search) { // UnsignedInt2Search = 0x8000
+        uint8_t  HighestBitSet = 0;
+        uint64_t Shift         = 0ULL;
+        
+        if (UnsignedInt2Search == 0) {
+            HighestBitSet = 0;
+        } else {
+            for (uint8_t Bit = 1; Bit < 64; Bit++) {
+                // We should count up tho, that way the last update is the last highest bit, that also means it requires 64 loops no matter what :(
+                Shift = 1ULL << (Bit - 1);
+                if (((UnsignedInt2Search & Shift) >> (Bit - 1)) == 1) {
+                    HighestBitSet = Bit;
+                }
+            }
+        }
+        return HighestBitSet;
     }
     
     inline uint8_t Power2Mask(const uint8_t BitOrder, const uint8_t Exponent) {
@@ -182,34 +196,16 @@ extern "C" {
         return Mask;
     }
     
-    int64_t OnesCompliment2TwosCompliment(const int64_t OnesCompliment) {
+    inline int64_t OnesCompliment2TwosCompliment(const int64_t OnesCompliment) {
         return ~OnesCompliment + 1;
     }
     
-    int64_t TwosCompliment2OnesCompliment(const int64_t TwosCompliment) {
+    inline int64_t TwosCompliment2OnesCompliment(const int64_t TwosCompliment) {
         return TwosCompliment ^ 0xFFFFFFFFFFFFFFFF;
     }
     
-    bool IsOdd(const int64_t Number2Check) {
+    inline bool IsOdd(const int64_t Number2Check) {
         return Number2Check % 2 == 0 ? true : false;
-    }
-    
-    uint8_t FindHighestBitSet(const uint64_t UnsignedInt2Search) { // UnsignedInt2Search = 0x8000
-        uint8_t  HighestBitSet = 0;
-        uint64_t Shift         = 0ULL;
-        
-        if (UnsignedInt2Search == 0) {
-            HighestBitSet = 0;
-        } else {
-            for (uint8_t Bit = 1; Bit < 64; Bit++) {
-                // We should count up tho, that way the last update is the last highest bit, that also means it requires 64 loops no matter what :(
-                Shift = 1ULL << (Bit - 1);
-                if (((UnsignedInt2Search & Shift) >> (Bit - 1)) == 1) {
-                    HighestBitSet = Bit;
-                }
-            }
-        }
-        return HighestBitSet;
     }
     
     static uint8_t DetectSystemEndian(void) {
@@ -1071,66 +1067,6 @@ extern "C" {
             uint64_t CurrentSymbol = 0;
             uint64_t LengthSymbol  = 0;
         }
-    }
-    
-    void DecodeRLE(const BitBuffer *Data2Decode, BitBuffer *Decoded, const uint8_t LengthCodeSize, const uint8_t SymbolSize) {
-        if (Data2Decode == NULL) {
-            Log(LOG_ERR, "libBitIO", "DecodeRLE", "Pointer to Data2Decode is NULL");
-        } else if (Decoded == NULL) {
-            Log(LOG_ERR, "libBitIO", "DecodeRLE", "Pointer to Decoded is NULL");
-        } else if (LengthCodeSize < 1) {
-            Log(LOG_ERR, "libBitIO", "DecodeRLE", "LengthCodeSize %d is invalid", LengthCodeSize);
-        } else if (SymbolSize < 1) {
-            Log(LOG_ERR, "libBitIO", "DecodeRLE", "SymbolSize %d is invalid", SymbolSize);
-        } else {
-            uint64_t  CurrentSymbol = 0ULL;
-            uint64_t  CurrentLength = 0ULL;
-            uint64_t *OutputString  = NULL;
-            for (uint64_t D2DSymbol = 0; D2DSymbol < Data2Decode->BitsUnavailable / SymbolSize; D2DSymbol++) { // FIXME: BitsUnavailable / SymbolSize needs some work
-                CurrentSymbol = ReadBits(Data2Decode, SymbolSize, true);
-                CurrentLength = ReadBits(Data2Decode, LengthCodeSize, true);
-                // Now we simply need to create CurrentLength copies of CurrentSymbol, and append them to Decoded
-                OutputString = calloc(CurrentLength, Bits2Bytes(SymbolSize, true));
-                for (uint64_t OutputStringSymbol = 0; OutputStringSymbol < CurrentLength; OutputStringSymbol++) {
-                    OutputString[OutputStringSymbol] = CurrentSymbol;
-                }
-                WriteBits(Decoded, *OutputString, SymbolSize, true);
-            }
-        }
-    }
-    
-    /*
-     Huffman, Arthimetic, and ANS/ABS coding systems ALL require having a sorted list of symbol and their frequency (to keep it in the int domain)
-     So writing a sorting algorithm is going to be the first thing i do, and I'm not going to fuck around with crazy sorters, just a real simple one that should optimize better.
-     */
-    uint64_t *MeasureSortSymbolFrequency(const uint16_t *Buffer2Measure, const uint64_t BufferSizeInElements, const uint8_t ElementSizeInBytes) {
-        uint64_t *SymbolFrequencies = NULL, *FrequencyPosition = NULL;
-        // This is MeasureSymbolFrequency + sorting as we go.
-        if (Buffer2Measure == NULL) {
-            Log(LOG_ERR, "libBitIO", "MeasureSortSymbolFrequency", "Buffer2Measure is NULL");
-        } else {
-            SymbolFrequencies = (uint64_t*) calloc(1, BufferSizeInElements);
-            if (SymbolFrequencies == NULL) {
-                Log(LOG_ERR, "libBitIO", "MeasureSortSymbolFrequency", "Not enough memory to allocate SymbolFrequencies %d", BufferSizeInElements);
-            }
-            FrequencyPosition = (uint64_t*) calloc(1, BufferSizeInElements);
-            if (FrequencyPosition == NULL) {
-                Log(LOG_ERR, "libBitIO", "MeasureSortSymbolFrequency", "Not enough memory to allocate FrequencyPosition %d", BufferSizeInElements);
-            }
-            for (uint64_t Element = 0; Element < BufferSizeInElements; Element++) {
-                SymbolFrequencies[Buffer2Measure[Element]] += 1; // The index is the symbol
-                uint64_t Frequency = SymbolFrequencies[Buffer2Measure[Element]];
-                while (SymbolFrequencies[Buffer2Measure[Element]] != Frequency) {
-                    FrequencyPosition[SymbolFrequencies[Buffer2Measure[Element]]] += 1;
-                }
-            }
-        }
-        free(FrequencyPosition);
-        return SymbolFrequencies;
-    }
-    
-    static void EncodeAABS(SymbolFrequencies *Symbols, BitBuffer *EncodedData, uint64_t Symbol2Encode) { // Adaptive Asymmetric Binary System
-        
     }
     
     void Log(const uint8_t ErrorSeverity, const char *LibraryOrProgram, const char *FunctionName, const char *Description, ...) {
