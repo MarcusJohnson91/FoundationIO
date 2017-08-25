@@ -310,20 +310,22 @@ extern "C" {
             for (int Argument = 1; Argument < argc; Argument++) {
                 for (uint64_t CurrentSwitch = 0; CurrentSwitch < CLI->NumSwitches; CurrentSwitch++) {
                     if (CLI->Switches[CurrentSwitch].IsMasterSwitch == true) {
-                        uint64_t FlagSize  = CLI->Switches[CurrentSwitch].FlagSize;
-                        SingleDashFlag   = (char*) calloc(1, FlagSize + 1);
-                        DoubleDashFlag   = (char*) calloc(1, FlagSize + 2);
-                        SingleSlashFlag  = (char*) calloc(1, FlagSize + 1);
+                        uint64_t FlagSize = CLI->Switches[CurrentSwitch].FlagSize;
+                        SingleDashFlag    = (char*) calloc(1, FlagSize + 1);
+                        DoubleDashFlag    = (char*) calloc(1, FlagSize + 2);
+                        SingleSlashFlag   = (char*) calloc(1, FlagSize + 1);
+                        
                         snprintf(SingleDashFlag,  FlagSize + 1,  "-%s", CLI->Switches[CurrentSwitch].Flag);
                         snprintf(DoubleDashFlag,  FlagSize + 2, "--%s", CLI->Switches[CurrentSwitch].Flag);
                         snprintf(SingleSlashFlag, FlagSize + 1,  "/%s", CLI->Switches[CurrentSwitch].Flag);
+                        
                         if (strcasecmp(argv[Argument], SingleDashFlag) == 0 || strcasecmp(argv[Argument], DoubleDashFlag) == 0 || strcasecmp(argv[Argument], SingleSlashFlag) == 0) {
                             if (CLI->NumArguments == 0) {
-                                CLI->Arguments = calloc(1, sizeof(CommandLineArgument));
+                                CLI->Arguments         = calloc(1, sizeof(CommandLineArgument));
                             } else {
                                 uint64_t NumArguments  = (uint64_t) CLI->Arguments + 1;
                                 uint64_t ArgumentsSize = sizeof(CommandLineArgument) * NumArguments;
-                                CLI->Arguments = realloc(CLI->Arguments, ArgumentsSize);
+                                CLI->Arguments         = realloc(CLI->Arguments, ArgumentsSize);
                             }
                             
                             for (uint64_t ChildSwitch = 0; ChildSwitch < CLI->Switches[CurrentSwitch].NumChildSwitches; ChildSwitch++) {
@@ -335,8 +337,9 @@ extern "C" {
                                 snprintf(ChildSingleDashFlag,  ChildFlagSize + 1,  "-%s", CLI->Switches[CurrentSwitch + 1].Flag);
                                 snprintf(ChildDoubleDashFlag,  ChildFlagSize + 2, "--%s", CLI->Switches[CurrentSwitch + 1].Flag);
                                 snprintf(ChildSingleSlashFlag, ChildFlagSize + 1,  "/%s", CLI->Switches[CurrentSwitch + 1].Flag);
+                                
                                 if (strcasecmp(argv[Argument + (int) ChildSwitch], ChildSingleDashFlag) == 0 || strcasecmp(argv[Argument + (int) ChildSwitch], ChildDoubleDashFlag) == 0 || strcasecmp(argv[Argument + (int) ChildSwitch], ChildSingleSlashFlag) == 0) {
-                                    uint64_t ArgvPlus1SwitchNum = GetCLISwitchNumFromFlag(CLI, argv[Argument + 1]);
+                                    uint64_t ArgvPlus1SwitchNum       = GetCLISwitchNumFromFlag(CLI, argv[Argument + 1]);
                                     uint64_t NumArgsMatchingArgvPlus1 = GetCLINumArgumentsMatchingSwitch(CLI, ArgvPlus1SwitchNum);
                                     CLI->Arguments[ChildSwitch].NumChildArguments += NumArgsMatchingArgvPlus1;
                                     for (uint64_t MatchingChildArgs = 0; MatchingChildArgs < NumArgsMatchingArgvPlus1; MatchingChildArgs++) {
@@ -367,22 +370,6 @@ extern "C" {
         }
     }
     
-    uint64_t GetCLINumArgumentsMatchingSwitch(CommandLineIO *CLI, const uint64_t Switch) {
-        uint64_t NumSwitchesFound = 0;
-        if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetCLINumArgumentsMatchingSwitch", "Pointer to CommandLineIO is NULL");
-        } else if (Switch > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "GetCLINumArgumentsMatchingSwitch", "Switch: %d, should be between 0 and %d", Switch, CLI->NumSwitches);
-        } else {
-            for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
-                if (CLI->Arguments[Argument].SwitchNum == Switch) {
-                    NumSwitchesFound += 1;
-                }
-            }
-        }
-        return NumSwitchesFound;
-    }
-    
     uint64_t GetCLISwitchNumFromFlag(CommandLineIO *CLI, const char *Flag) {
         uint64_t FoundFlagSwitchNum = 0xFFFFFFFFFFFFFFFFULL;
         if (CLI == NULL) {
@@ -397,6 +384,22 @@ extern "C" {
             }
         }
         return FoundFlagSwitchNum;
+    }
+    
+    uint64_t GetCLINumArgumentsMatchingSwitch(CommandLineIO *CLI, const uint64_t Switch) {
+        uint64_t NumSwitchesFound = 0;
+        if (CLI == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetCLINumArgumentsMatchingSwitch", "Pointer to CommandLineIO is NULL");
+        } else if (Switch > CLI->NumSwitches) {
+            Log(LOG_ERR, "libBitIO", "GetCLINumArgumentsMatchingSwitch", "Switch: %d, should be between 0 and %d", Switch, CLI->NumSwitches);
+        } else {
+            for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
+                if (CLI->Arguments[Argument].SwitchNum == Switch) {
+                    NumSwitchesFound += 1;
+                }
+            }
+        }
+        return NumSwitchesFound;
     }
     
     uint64_t GetCLIArgumentNumFromFlag(CommandLineIO *CLI, const char *Flag) {
