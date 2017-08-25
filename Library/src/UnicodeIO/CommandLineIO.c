@@ -42,9 +42,12 @@ extern "C" {
         char                *ArgumentResult;
     };
     
+    typedef struct           CommandLineSwitch         CommandLineSwitch;
+    typedef struct           CommandLineArgument       CommandLineArgument;
+    
     /*!
      @struct                 CommandLineIO
-     @abstract                                         "Contains all the information on the command line in an easy to understand format".
+     @abstract                                         "Contains all the information, and relationships between switches on the command line".
      @constant               NumSwitches               "How many switches are there?".
      @constant               MinSwitches               "The minimum number of switches to accept without dumping the help".
      @constant               NumArguments              "The number of arguments present in argv, after extracting any child switches".
@@ -329,8 +332,11 @@ extern "C" {
                                 snprintf(ChildDoubleDashFlag,  ChildFlagSize + 2, "--%s", CLI->Switches[CurrentSwitch + 1].Flag);
                                 snprintf(ChildSingleSlashFlag, ChildFlagSize + 1,  "/%s", CLI->Switches[CurrentSwitch + 1].Flag);
                                 if (strcasecmp(argv[Argument + (int) ChildSwitch], ChildSingleDashFlag) == 0 || strcasecmp(argv[Argument + (int) ChildSwitch], ChildDoubleDashFlag) == 0 || strcasecmp(argv[Argument + (int) ChildSwitch], ChildSingleSlashFlag) == 0) {
-                                    CLI->Arguments[ChildSwitch].NumChildArguments += 1;
-                                    CLI->Arguments[ChildSwitch].ChildArguments     = GetCLISwitchNumFromFlag(CLI, argv[Argument + 1]);
+                                    uint64_t NumArgsMatchingArgvPlus1 = GetCLINumArgumentsMatchingSwitch(CLI, argv[Argument + 1]);
+                                    CLI->Arguments[ChildSwitch].NumChildArguments += NumArgsMatchingArgvPlus1;
+                                    for (uint64_t MatchingChildArgs = 0; MatchingChildArgs < NumArgsMatchingArgvPlus1; MatchingChildArgs++) {
+                                        CLI->Arguments[ChildSwitch].ChildArguments[MatchingChildArgs] = GetCLISwitchNumFromFlag(CLI, argv[Argument + 1]);
+                                    }
                                     /*
                                      TODO: What I really need to do tho, is loop over the remaining arguments to be sure I catch any and ALL child arguments, and just do it right, but this'll work for now.
                                      
@@ -356,7 +362,7 @@ extern "C" {
         }
     }
     
-    uint64_t GetCLINumArgumentsMatchingSwitch(CommandLineIO *CLI, const uint64_t Switch) { // The gist, is that we want to find how many arguments there are for Switch X.
+    uint64_t GetCLINumArgumentsMatchingSwitch(CommandLineIO *CLI, const uint64_t Switch) {
         uint64_t NumSwitchesFound = 0;
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetCLINumArgumentsMatchingSwitch", "Pointer to CommandLineIO is NULL");
@@ -373,7 +379,7 @@ extern "C" {
     }
     
     uint64_t GetCLIArgumentNumFromFlag(CommandLineIO *CLI, const char *Flag) {
-        uint64_t FoundSwitch = 0xFFFFFFFFFFFFFFFF;
+        uint64_t FoundSwitch = 0xFFFFFFFFFFFFFFFFULL;
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetCLIArgumentNumFromFlag", "Pointer to CommandLineIO is NULL");
         } else if (Flag == NULL) {
@@ -401,7 +407,7 @@ extern "C" {
     }
     
     uint64_t GetCLIChildSwitchArgument(CommandLineIO *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch) {
-        uint64_t SwitchContainingMetaArg = 0xFFFFFFFFFFFFFFFF;
+        uint64_t SwitchContainingMetaArg = 0xFFFFFFFFFFFFFFFFULL;
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "Pointer to CommandLineIO is NULL");
         } else if (ParentSwitch > CLI->NumSwitches) {
@@ -424,20 +430,17 @@ extern "C" {
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "DeinitCommandLineIO", "Pointer to CommandLineIO is NULL");
         } else {
-            /* Free CommandLineSwitches */
             for (uint64_t Switch = 0; Switch < CLI->NumSwitches; Switch++) {
                 free((char*) CLI->Switches[Switch].Flag);
                 free((char*) CLI->Switches[Switch].SwitchDescription);
                 free((char*) CLI->Switches[Switch].ChildSwitches);
             }
-            /* Free CommandLineArguments */
             for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
                 free(CLI->Arguments[Argument].ChildArguments);
                 free(CLI->Arguments[Argument].ArgumentResult);
             }
             free(CLI->Switches);
             free(CLI->Arguments);
-            /* Free CommandLineIO */
             free((char*) CLI->ProgramName);
             free((char*) CLI->ProgramAuthor);
             free((char*) CLI->ProgramDescription);
