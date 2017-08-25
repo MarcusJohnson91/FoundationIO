@@ -17,6 +17,43 @@
 #include <sys/socket.h>
 #endif
 
+#ifndef BITIOBYTEBITORDERS
+#define BITIOBYTEBITORDERS
+
+#ifndef BITIOUNKNOWNENDIAN
+#define BITIOUNKNOWNENDIAN   0
+#endif  /* BITIOUNKNOWNENDIAN */
+
+#ifndef BITIOUNKNOWNBITORDER
+#define BITIOUNKNOWNBITORDER 1
+#endif  /* BITIOUNKNOWNBITORDER */
+
+#ifndef BITIOLITTLEENDIAN
+#define BITIOLITTLEENDIAN    2
+#endif  /* LITTLEENDIAN */
+
+#ifndef BITIOBIGENDIAN
+#define BITIOBIGENDIAN       3
+#endif  /* BITIOBIGENDIAN */
+
+#ifndef BITIOLSBitFIRST
+#define BITIOLSBitFIRST      4
+#endif  /* BITIOLSBitFIRST */
+
+#ifndef BITIOMSBitFIRST
+#define BITIOMSBitFIRST      5
+#endif  /* BITIOMSBitFIRST */
+
+#ifndef TARGETBYTEORDER
+#define TARGETBYTEORDER
+#endif  /* TARGETBYTEORDER */
+
+#ifndef TARGETBITORDER
+#define TARGETBITORDER
+#endif  /* TARGETBITORDER */
+
+#endif /* BITIOBYTEBITORDERS */
+
 #pragma once
 
 #ifndef LIBBITIO_BitIO_H
@@ -197,6 +234,7 @@ extern "C" {
      @abstract                                    "Swap endian of 64 bit integers".
      @param             Data2Swap                 "Data to swap endian".
      */
+    inline uint64_t     SwapEndian64(const uint64_t Data2Swap);
     
     /*!
      @abstract                                    "Computes the number of bits from the number of bytes".
@@ -382,35 +420,32 @@ extern "C" {
     void                SkipBits(BitBuffer *BitB, const int64_t Bits2Skip);
     
     /*!
-     @abstract                                    "Writes bits to BitBuffer".
-     @todo                                        "We should replace WriteFromMSB with a WriteLittleEndian or WriteBigEndian".
-     @param             BitB                      "Pointer to the instance of BitBuffer".
-     @param             Data2Write                "Is the actual data to write out".
-     @param             NumBits                   "Is the number of bits to write".
-     @param             WriteFromMSB              "Should we write the bits from the most significant bit?".
+     @abstract                                    "Writes bits to Buffer2Write".
+     @param             ByteBitOrder              "What byte and bit order should Value2Write be written in?"
+     @param             Buffer2Write              "Pointer to the instance of BitBuffer where the data should be written".
+     @param             NumBits2Write             "Number of bits to write".
+     @param             Value2Write               "The actual data to write".
      */
-    void                WriteBits(BitBuffer *BitB, const uint64_t Data2Write, const uint8_t NumBits, const bool WriteFromMSB);
+    void                WriteBits(const uint8_t ByteBitOrder, BitBuffer *Buffer2Write, const uint8_t NumBits2Write, const uint64_t Value2Write);
     
     /*!
-     @abstract                                    "Encodes and writes data in unary/RICE format to a BitOutput stream".
-     @todo                                        "We should replace WriteFromMSB with a WriteLittleEndian or WriteBigEndian".
-     @param             BitB                      "Pointer to BitBuffer, the output buffer".
-     @param             Truncated                 "Should the stop bit be pruned?"
-     @param             StopBit                   "Has to be a 0 or a 1".
-     @param             Data2Write                "Number to encode into RICE format".
-     @param             WriteFromMSB              "Should Data2Write be written from the MSB or the LSB?".
+     @abstract                                    "Encodes and writes data in unary/RICE format to Buffer2Write".
+     @param             ByteBitOrder              "What byte and bit order should Value2Write be written in?"
+     @param             Buffer2Write              "Pointer to the instance of BitBuffer where the data should be written".
+     @param             NumBits2Write             "Number of bits to write".
+     @param             Value2Write               "The actual data to write".
+     @param             Truncate                  "Should the stop bit be pruned?".
      */
-    void                WriteRICE(BitBuffer *BitB, const bool Truncated, const bool StopBit, const uint64_t Data2Write, const bool WriteFromMSB);
+    void                WriteRICE(const uint8_t ByteBitOrder, BitBuffer *Buffer2Write, const uint8_t NumBits2Write, const uint64_t Value2Write, const bool Truncate);
     
     /*!
-     @abstract                                    "Writes data encoded as Exponential-Golomb aka Elias Gamma codes to BitO".
-     @todo                                        "We should replace WriteFromMSB with a WriteLittleEndian or WriteBigEndian".
-     @param             BitB                      "Pointer to the instance of BitBuffer".
-     @param             IsSigned                  "Is Data2Write signed?".
-     @param             Data2Write                "The actual data to write to the output file".
-     @param             WriteFromMSB              "Should Data2Write be written from the MSB or the LSB?".
+     @abstract                                    "Writes data encoded as Exponential-Golomb aka Elias Gamma codes to Buffer2Write".
+     @param             ByteBitOrder              "What byte and bit order should Value2Write be written in?"
+     @param             Buffer2Write              "Pointer to the instance of BitBuffer where the data should be written".
+     @param             NumBits2Write             "Number of bits to write".
+     @param             Value2Write               "The actual data to write".
      */
-    void                WriteExpGolomb(BitBuffer *BitB, const bool IsSigned, const uint64_t Data2Write, const bool WriteFromMSB);
+    void                WriteExpGolomb(const uint8_t ByteBitOrder, BitBuffer *Buffer2Write, const uint8_t NumBits2Write, const uint64_t Value2Write);
     
     /*!
      @abstract                                    "Tells if the stream/buffer is byte aligned or not".
