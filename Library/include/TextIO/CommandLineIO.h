@@ -19,18 +19,10 @@
 extern "C" {
 #endif
     
-    typedef struct        CommandLineSwitch         CommandLineSwitch;
-    
     /*!
-     @typedef             CommandLineArgument
-     @abstract                                      "Contains the data to support a single switch".
-     @constant            SwitchNum                 "Which switch is this argument?".
-     @constant            NumChildSwitches           "How many meta switches are part of this argument?".
-     @constant            ChildSwitches              "Pointer to an array that contains the numbers of the meta switches".
-     @constant            ArgumentResult            "If there is a path or other result expected for this switch's argument, it'll be here".
+     @typedef             CommandLineIO
+     @abstract                                      "Contains all the information, and relationships between switches on the command line".
      */
-    typedef struct        CommandLineArgument       CommandLineArgument;
-    
     typedef struct        CommandLineIO             CommandLineIO;
     
     /*!
@@ -42,35 +34,35 @@ extern "C" {
     
     /*!
      @abstract                                      "Sets the name of the program".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               Name                      "Pointer to a C string containing the name of the program you're building"
      */
     void                  SetCLIName(CommandLineIO *CLI, char *Name);
     
     /*!
      @abstract                                      "Sets the name of the program".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               VersionString             "Pointer to a C string contining the version of the program you're building"
      */
     void                  SetCLIVersion(CommandLineIO *CLI, char *VersionString);
     
     /*!
      @abstract                                      "Sets the description of the program".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               Description               "Description of what the program does".
      */
     void                  SetCLIDescription(CommandLineIO *CLI, char *Description);
     
     /*!
      @abstract                                      "Sets the author of the program".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               Author                    "Author of this program".
      */
     void                  SetCLIAuthor(CommandLineIO *CLI, char *Author);
     
     /*!
      @abstract                                      "Sets the copyright years of the program".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               Copyright                 "The starting year this program was written dash (CURRENTYEAR)".
      */
     void                  SetCLICopyright(CommandLineIO *CLI, char *Copyright);
@@ -78,7 +70,7 @@ extern "C" {
     /*!
      @abstract                                      "Sets the license of the program".
      @remark                                        "If your program is closed source, do NOT use the License options, use the EULA functions".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               Name                      "What is the name of the license?".
      @param               LicenseDescription        "Describe the license this program is licensed under".
      @param               IsProprietary             "Is this program released under an open source license, or a EULA?"
@@ -88,21 +80,21 @@ extern "C" {
     /*!
      @abstract                                      "Sets the URL for the license, in the main program banner".
      @remark                                        "If your program is closed source, do NOT use the License options, use the EULA functions".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               LicenseURL                "the actual URL for the license".
      */
     void                  SetCLILicenseURL(CommandLineIO *CLI, char *LicenseURL);
     
     /*!
      @abstract                                      "What is the minimum number of switches your program needs to operate?".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               MinSwitches               "The minimum number of switches".
      */
     void                  SetCLIMinSwitches(CommandLineIO *CLI, const uint64_t MinSwitches);
     
     /*!
      @abstract                                      "Sets SwitchNum's flag in the CommandLineIO instance pointed by CLI".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               Switch                    "Which switch are we talking about?"
      @param               IsMaster                  "Is Switch a master switch?"
      */
@@ -111,7 +103,7 @@ extern "C" {
     /*!
      @abstract                                      "Sets SwitchNum's flag in the CommandLineIO instance pointed by CLI".
      @remark                                        "Just enter the number of characters you typed into the string not counting the quotes".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               SwitchNum                 "The switch to set".
      @param               Flag                      "The flag to identify an option with".
      */
@@ -127,7 +119,7 @@ extern "C" {
     
     /*!
      @abstract                                      "Sets SwitchDescription's flag in the CommandLineIO instance pointed by CLI".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               SwitchNum                 "The switch to set".
      @param               Description               "Pointer to a C string containing the description of what this program does"
      */
@@ -135,7 +127,7 @@ extern "C" {
     
     /*!
      @abstract                                      "Sets SwitchResult's flag in the CommandLineIO instance pointed by CLI".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               SwitchNum                 "The switch to set".
      @param               IsThereAResult            "Are you expecting this switch to contain data, or are you just testing for it's presence?".
      */
@@ -159,22 +151,25 @@ extern "C" {
     
     /*!
      @abstract                                      "Finds the argument that has both ParentSwitch and ChildSwitch present"
-     @return                                        "If no argument is found with that switch set, 0xFFFFFFFFFFFFFFFF is returned as the invalid result".
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @return                                        "If no argument is found with that switch set, -1 is returned as the invalid result".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               ParentSwitch              "The switch MetaSwitch should be in"
      @param               ChildSwitch               "MetaSwitch to find in the arguments"
      */
     uint64_t              GetCLIChildSwitchArgument(CommandLineIO *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch);
     
     /*!
-     @return              Returns the switch number if it was found, if it was not, it returns 0xFFFFFFFFFFFFFFFF
+     @abstract                                      "Finds which argument contains Flag".
+     @return                                        "Returns the switch number if it was found, if it was not, it returns -1"
+     @param               CLI                       "Pointer to CommandLineIO".
+     @param               Flag                      "String containing the switch to look for".
      */
     uint64_t              GetCLIArgumentNumFromFlag(CommandLineIO *CLI, const char *Flag);
     
     /*!
      @abstract                                      "Gets the data contained in Switch->Result"
      @return                                        "Returns the data after the switch, if the switch is resultless it will return 0"
-     @param               CLI                       "Pointer to the instance of CommandLineIO".
+     @param               CLI                       "Pointer to CommandLineIO".
      @param               ArgumentNum               "The argument's result to return".
      */
     char                 *GetCLIArgumentResult(CommandLineIO *CLI, const uint64_t ArgumentNum);
