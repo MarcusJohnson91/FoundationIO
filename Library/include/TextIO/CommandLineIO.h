@@ -101,6 +101,14 @@ extern "C" {
     void                  SetCLISwitchAsMaster(CommandLineIO *CLI, const uint64_t Switch, const bool IsMaster);
     
     /*!
+     @abstract                                      "Sets MetaFlag switch as a meta flag for switch SwitchNum".
+     @param               CLI                       "Pointer to CommandLineIO".
+     @param               ParentSwitch              "Which switch does the child/meta switch depend on?".
+     @param               ChildSwitch               "Which switch is the child switch?".
+     */
+    void                  SetCLISwitchAsChild(CommandLineIO *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch);
+    
+    /*!
      @abstract                                      "Sets SwitchNum's flag in the CommandLineIO instance pointed by CLI".
      @remark                                        "Just enter the number of characters you typed into the string not counting the quotes".
      @param               CLI                       "Pointer to CommandLineIO".
@@ -108,14 +116,6 @@ extern "C" {
      @param               Flag                      "The flag to identify an option with".
      */
     void                  SetCLISwitchFlag(CommandLineIO *CLI, const uint64_t SwitchNum, const char *Flag);
-    
-    /*!
-     @abstract                                      "Sets MetaFlag switch as a meta flag for switch SwitchNum".
-     @param               CLI                       "Pointer to CommandLineIO".
-     @param               ParentSwitch              "Which switch does the child/meta switch depend on?".
-     @param               ChildSwitch               "Which switch is the child switch?".
-     */
-    void                  SetCLISwitchAsChild(CommandLineIO *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch);
     
     /*!
      @abstract                                      "Sets SwitchDescription's flag in the CommandLineIO instance pointed by CLI".
