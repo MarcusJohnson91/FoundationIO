@@ -327,38 +327,36 @@ extern "C" {
                                 uint64_t ArgumentsSize = sizeof(CommandLineArgument) * NumArguments;
                                 CLI->Arguments         = realloc(CLI->Arguments, ArgumentsSize);
                             }
-                            
-                            for (uint64_t ChildSwitch = 0; ChildSwitch < CLI->Switches[CurrentSwitch].NumChildSwitches; ChildSwitch++) {
-                                uint64_t ChildFlagSize  = CLI->Switches[CurrentSwitch].FlagSize;
-                                ChildSingleDashFlag     = (char*) calloc(1, ChildFlagSize + 1);
-                                ChildDoubleDashFlag     = (char*) calloc(1, ChildFlagSize + 2);
-                                ChildSingleSlashFlag    = (char*) calloc(1, ChildFlagSize + 1);
-                                
-                                snprintf(ChildSingleDashFlag,  ChildFlagSize + 1,  "-%s", CLI->Switches[CurrentSwitch + 1].Flag);
-                                snprintf(ChildDoubleDashFlag,  ChildFlagSize + 2, "--%s", CLI->Switches[CurrentSwitch + 1].Flag);
-                                snprintf(ChildSingleSlashFlag, ChildFlagSize + 1,  "/%s", CLI->Switches[CurrentSwitch + 1].Flag);
-                                
-                                if (strcasecmp(argv[Argument + (int) ChildSwitch], ChildSingleDashFlag) == 0 || strcasecmp(argv[Argument + (int) ChildSwitch], ChildDoubleDashFlag) == 0 || strcasecmp(argv[Argument + (int) ChildSwitch], ChildSingleSlashFlag) == 0) {
-                                    uint64_t ArgvPlus1SwitchNum       = GetCLISwitchNumFromFlag(CLI, argv[Argument + 1]);
-                                    uint64_t NumArgsMatchingArgvPlus1 = GetCLINumArgumentsMatchingSwitch(CLI, ArgvPlus1SwitchNum);
-                                    CLI->Arguments[ChildSwitch].NumChildArguments += NumArgsMatchingArgvPlus1;
-                                    for (uint64_t MatchingChildArgs = 0; MatchingChildArgs < NumArgsMatchingArgvPlus1; MatchingChildArgs++) {
-                                        CLI->Arguments[ChildSwitch].ChildArguments[MatchingChildArgs] = GetCLISwitchNumFromFlag(CLI, argv[Argument + 1]);
+                            if (CLI->Switches[CurrentSwitch].SwitchHasResult == true && CLI->Switches[CurrentSwitch].NumChildSwitches > 0) {
+                                // Ok, so how abou if it's a master switch AND has a result, let's check to see if there's a child switch first, if not, then there's just a straight result.
+                                // So, if the switch has a result, and has child switches, check the child switches first.
+                                for (uint64_t ChildSwitch = 0; ChildSwitch < CLI->Switches[CurrentSwitch].NumChildSwitches; ChildSwitch++) {
+                                    uint64_t ChildFlagSize  = CLI->Switches[CurrentSwitch].FlagSize + 1; // to account for the NULL pointer at the end
+                                    ChildSingleDashFlag     = (char*) calloc(1, ChildFlagSize + 1);
+                                    ChildDoubleDashFlag     = (char*) calloc(1, ChildFlagSize + 2);
+                                    ChildSingleSlashFlag    = (char*) calloc(1, ChildFlagSize + 1);
+                                    
+                                    snprintf(ChildSingleDashFlag,  ChildFlagSize + 1,  "-%s", CLI->Switches[CurrentSwitch + 1].Flag);
+                                    snprintf(ChildDoubleDashFlag,  ChildFlagSize + 2, "--%s", CLI->Switches[CurrentSwitch + 1].Flag);
+                                    snprintf(ChildSingleSlashFlag, ChildFlagSize + 1,  "/%s", CLI->Switches[CurrentSwitch + 1].Flag);
+                                    
+                                    if (strcasecmp(argv[Argument + (int) ChildSwitch], ChildSingleDashFlag) == 0 || strcasecmp(argv[Argument + (int) ChildSwitch], ChildDoubleDashFlag) == 0 || strcasecmp(argv[Argument + (int) ChildSwitch], ChildSingleSlashFlag) == 0) {
+                                        uint64_t ArgvPlus1SwitchNum       = GetCLISwitchNumFromFlag(CLI, argv[Argument + 1]);
+                                        uint64_t NumArgsMatchingArgvPlus1 = GetCLINumArgumentsMatchingSwitch(CLI, ArgvPlus1SwitchNum);
+                                        CLI->Arguments[ChildSwitch].NumChildArguments += NumArgsMatchingArgvPlus1;
+                                        for (uint64_t MatchingChildArgs = 0; MatchingChildArgs < NumArgsMatchingArgvPlus1; MatchingChildArgs++) {
+                                            CLI->Arguments[ChildSwitch].ChildArguments[MatchingChildArgs] = GetCLISwitchNumFromFlag(CLI, argv[Argument + 1]);
+                                        }
+                                        
+                                        
+                                        
                                     }
-                                    /*
-                                     TODO: What I really need to do tho, is loop over the remaining arguments to be sure I catch any and ALL child arguments, and just do it right, but this'll work for now.
-                                     
-                                     How do I structure that tho?
-                                     
-                                     Well, have 4 loops, the first loops over argc from 1, the second loops over the first to the end of argc, the 3rd loops over all the switches, and the 4th loops over all of it's child switches
-                                     
-                                     for each switch, load up
-                                     
-                                     */
+                                    free(ChildSingleDashFlag);
+                                    free(ChildDoubleDashFlag);
+                                    free(ChildSingleSlashFlag);
                                 }
-                                free(ChildSingleDashFlag);
-                                free(ChildDoubleDashFlag);
-                                free(ChildSingleSlashFlag);
+                            } else if (CLI->Switches[CurrentSwitch].SwitchHasResult == true) {
+                                CLI->Arguments[CLI->NumArguments + 1].ArgumentResult = argv[Argument + 1];
                             }
                         }
                         free(SingleDashFlag);
