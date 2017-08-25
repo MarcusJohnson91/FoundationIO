@@ -62,6 +62,7 @@ extern "C" {
      @constant               ProgramDescription        "What does this program do?".
      @constant               ProgramVersion            "What is the version of this program?".
      @constant               ProgramCopyright          "String containing the copyright years like "2015 - 2017"".
+     @constant               ProgramLicenseName        "Short name of the license, like "3-clause BSD", etc".
      @constant               ProgramLicenseDescription "Describe the license or EULA".
      @constant               ProgramLicenseURL         "URL for the EULA, ToS, or Open source license".
      */
