@@ -37,35 +37,35 @@ extern "C" {
      @param               CLI                       "Pointer to CommandLineIO".
      @param               Name                      "Pointer to a C string containing the name of the program you're building"
      */
-    void                  SetCLIName(CommandLineIO *CLI, const char *Name);
+    void                  SetCLIName(CommandLineIO *CLI, char *Name);
     
     /*!
      @abstract                                      "Sets the name of the program".
      @param               CLI                       "Pointer to CommandLineIO".
      @param               VersionString             "Pointer to a C string contining the version of the program you're building"
      */
-    void                  SetCLIVersion(CommandLineIO *CLI, const char *VersionString);
+    void                  SetCLIVersion(CommandLineIO *CLI, char *VersionString);
     
     /*!
      @abstract                                      "Sets the description of the program".
      @param               CLI                       "Pointer to CommandLineIO".
      @param               Description               "Description of what the program does".
      */
-    void                  SetCLIDescription(CommandLineIO *CLI, const char *Description);
+    void                  SetCLIDescription(CommandLineIO *CLI, char *Description);
     
     /*!
      @abstract                                      "Sets the author of the program".
      @param               CLI                       "Pointer to CommandLineIO".
      @param               Author                    "Author of this program".
      */
-    void                  SetCLIAuthor(CommandLineIO *CLI, const char *Author);
+    void                  SetCLIAuthor(CommandLineIO *CLI, char *Author);
     
     /*!
      @abstract                                      "Sets the copyright years of the program".
      @param               CLI                       "Pointer to CommandLineIO".
      @param               Copyright                 "The starting year this program was written dash (CURRENTYEAR)".
      */
-    void                  SetCLICopyright(CommandLineIO *CLI, const char *Copyright);
+    void                  SetCLICopyright(CommandLineIO *CLI, char *Copyright);
     
     /*!
      @abstract                                      "Sets the license of the program".
@@ -75,7 +75,7 @@ extern "C" {
      @param               LicenseDescription        "Describe the license this program is licensed under".
      @param               IsProprietary             "Is this program released under an open source license, or a EULA?"
      */
-    void                  SetCLILicense(CommandLineIO *CLI, const char *Name, const char *LicenseDescription, const bool IsProprietary);
+    void                  SetCLILicense(CommandLineIO *CLI, char *Name, char *LicenseDescription, const bool IsProprietary);
     
     /*!
      @abstract                                      "Sets the URL for the license, in the main program banner".
@@ -83,7 +83,7 @@ extern "C" {
      @param               CLI                       "Pointer to CommandLineIO".
      @param               LicenseURL                "the actual URL for the license".
      */
-    void                  SetCLILicenseURL(CommandLineIO *CLI, const char *LicenseURL);
+    void                  SetCLILicenseURL(CommandLineIO *CLI, char *LicenseURL);
     
     /*!
      @abstract                                      "What is the minimum number of switches your program needs to operate?".
@@ -115,7 +115,7 @@ extern "C" {
      @param               SwitchNum                 "The switch to set".
      @param               Flag                      "The flag to identify an option with".
      */
-    void                  SetCLISwitchFlag(CommandLineIO *CLI, const uint64_t SwitchNum, const char *Flag);
+    void                  SetCLISwitchFlag(CommandLineIO *CLI, const uint64_t SwitchNum, char *Flag);
     
     /*!
      @abstract                                      "Sets SwitchDescription's flag in the CommandLineIO instance pointed by CLI".
@@ -123,7 +123,7 @@ extern "C" {
      @param               SwitchNum                 "The switch to set".
      @param               Description               "Pointer to a C string containing the description of what this program does"
      */
-    void                  SetCLISwitchDescription(CommandLineIO *CLI, const uint64_t SwitchNum, const char *Description);
+    void                  SetCLISwitchDescription(CommandLineIO *CLI, const uint64_t SwitchNum, char *Description);
     
     /*!
      @abstract                                      "Sets SwitchResult's flag in the CommandLineIO instance pointed by CLI".
@@ -140,7 +140,7 @@ extern "C" {
      @param               argc                      "Main's argc, for the number of arguments entered".
      @param               argv                      "Main's argv, for the actual arguments the user has entered".
      */
-    void                  ParseCommandLineArguments(CommandLineIO *CLI, const int argc, const char *argv[]);
+    void                  ParseCommandLineArguments(CommandLineIO *CLI, const int argc, char *argv[]);
     
     /*!
      @abstract                                      "Parses CommandLine arguments and counts the copies of a given switch found".
@@ -164,7 +164,7 @@ extern "C" {
      @param               CLI                       "Pointer to CommandLineIO".
      @param               Flag                      "String containing the switch to look for".
      */
-    uint64_t              GetCLISwitchNumFromFlag(CommandLineIO *CLI, const char *Flag);
+    uint64_t              GetCLISwitchNumFromFlag(CommandLineIO *CLI, char *Flag);
     
     /*!
      @abstract                                      "Finds which argument contains Flag".
@@ -172,7 +172,7 @@ extern "C" {
      @param               CLI                       "Pointer to CommandLineIO".
      @param               Flag                      "String containing the switch to look for".
      */
-    uint64_t              GetCLIArgumentNumFromFlag(CommandLineIO *CLI, const char *Flag);
+    uint64_t              GetCLIArgumentNumFromFlag(CommandLineIO *CLI, char *Flag);
     
     /*!
      @abstract                                      "Gets the data contained in Switch->Result"
