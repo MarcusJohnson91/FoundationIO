@@ -308,7 +308,7 @@ extern "C" {
              Also, we need to be able to store when/if FileSpecifierNum has been updated.
              */
             
-            uint64_t Path2OpenSize = strlen(Path2Open);
+            uint64_t Path2OpenSize = strlen(Path2Open) + 1;
             char *NewPath = (char*) calloc(1, Path2OpenSize);
             snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitI->FileSpecifierNum + 1);
             BitI->FileSpecifierNum += 1;
@@ -340,7 +340,7 @@ extern "C" {
         } else if (Path2Open == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenOutputFile", "Fopen error: Pointer is NULL");
         } else {
-            uint64_t Path2OpenSize = strlen(Path2Open);
+            uint64_t Path2OpenSize = strlen(Path2Open) + 1;
             char *NewPath = (char*) calloc(1, Path2OpenSize);
             snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitO->FileSpecifierNum);
             
@@ -1056,7 +1056,7 @@ extern "C" {
     void Log(const uint8_t ErrorSeverity, const char *LibraryOrProgram, const char *FunctionName, const char *Description, ...) {
         uint64_t FunctionNameSize = 0, DescriptionSize = 0;
         
-        char *EasyString = calloc(1, 1 + strlen(FunctionName) + strlen(Description)); // the 1 is for the error severity
+        char *EasyString = calloc(1, 1 + strlen(FunctionName) + strlen(Description) + 2); // the 1 is for the error severity + 2 for the NULs
         snprintf(EasyString, FunctionNameSize + DescriptionSize, "%hhu: %s - %s", ErrorSeverity, FunctionName, Description);
         
         char *HardString = calloc(1, BitIOStringSize); // FIXME: REMOVE BITIOSTRINGSIZE
@@ -1065,7 +1065,7 @@ extern "C" {
         vsprintf(HardString, "%s", Arguments);
         va_end(Arguments);
         
-        uint64_t ErrorStringSize = strlen(EasyString) + strlen(HardString);
+        uint64_t ErrorStringSize = strlen(EasyString) + strlen(HardString) + 2;
         char *ErrorString = calloc(1, ErrorStringSize);
         snprintf(ErrorString, ErrorStringSize, "%s%s", EasyString, HardString);
         if (BitIOGlobalLogFile == NULL) {
