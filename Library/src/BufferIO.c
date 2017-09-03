@@ -196,14 +196,6 @@ extern "C" {
         return Mask;
     }
     
-    inline int64_t OnesCompliment2TwosCompliment(const int64_t OnesCompliment) {
-        return ~OnesCompliment + 1;
-    }
-    
-    inline int64_t TwosCompliment2OnesCompliment(const int64_t TwosCompliment) {
-        return TwosCompliment ^ 0xFFFFFFFFFFFFFFFF;
-    }
-    
     inline bool IsOdd(const int64_t Number2Check) {
         return Number2Check % 2 == 0 ? true : false;
     }
@@ -401,94 +393,6 @@ extern "C" {
         
     }
     /*
-    static inline uint64_t ReadBitsTargetLELSB(BitBuffer *BitB, const uint8_t Bits2Read) {
-        uint8_t Bits = Bits2Read, UserRequestBits = 0, BufferBitsAvailable = 0, Mask = 0, Data = 0, Mask2Shift = 0;
-        while (Bits > 0) {
-            Bits                   = BufferBitsAvailable >= UserRequestBits  ? UserRequestBits : BufferBitsAvailable;
-            Data                   = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
-            OutputData           <<= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            OutputData            += Data;
-            BitB->BitsAvailable   -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            BitB->BitsUnavailable += BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            Bits                  -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-        }
-        return 0ULL;
-    }
-    
-    static inline uint64_t ReadBitsTargetBELSB(BitBuffer *BitB, const uint8_t Bits2Read) {
-        uint8_t Bits = Bits2Read, UserRequestBits = 0, BufferBitsAvailable = 0, Mask = 0, Data = 0, Mask2Shift = 0;
-        while (Bits > 0) {
-            Bits                   = BitsAvailabeInCurrentByte >= UserRequestBits  ? UserRequestBits : BufferBitsAvailable;
-            Data                   = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
-            OutputData           <<= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            OutputData            += Data;
-            BitB->BitsAvailable   -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            BitB->BitsUnavailable += BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            Bits                  -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-        }
-        return 0ULL;
-    }
-    
-    static inline uint64_t ReadBitsTargetBEMSB(BitBuffer *BitB, const uint8_t Bits2Read) {
-        uint8_t Bits = Bits2Read, UserRequestBits = 0, BufferBitsAvailable = 0, Mask = 0, Data = 0, Mask2Shift = 0;
-        while (Bits > 0) {
-            Bits                   = BufferBitsAvailable >= UserRequestBits  ? UserRequestBits : BufferBitsAvailable;
-            Data                   = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
-            Data                 >>= Mask2Shift;
-            OutputData           <<= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            OutputData            += Data;
-            BitB->BitsAvailable   -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            BitB->BitsUnavailable += BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            Bits                  -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-        }
-        return 0ULL;
-    }
-    
-    static inline uint64_t ReadBitsTargetLEMSB(BitBuffer *BitB, const uint8_t Bits2Read) {
-        uint8_t Bits = Bits2Read, UserRequestBits = 0, BufferBitsAvailable = 0, Mask = 0, Data = 0, Mask2Shift = 0;
-        while (Bits > 0) {
-            Bits                   = BufferBitsAvailable >= UserRequestBits  ? UserRequestBits : BufferBitsAvailable;
-            Data                   = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
-            Data                 >>= Mask2Shift;
-            OutputData           <<= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            OutputData            += Data;
-            BitB->BitsAvailable   -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            BitB->BitsUnavailable += BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            Bits                  -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-        }
-        return 0ULL;
-    }
-    
-    static inline uint64_t ReadBitsSourceLETargetLEMSB(BitBuffer *BitB, const uint8_t Bits2Read) {
-        uint8_t Bits = Bits2Read, UserRequestBits = 0, BufferBitsAvailable = 0, Mask = 0, Data = 0, Mask2Shift = 0;
-        while (Bits > 0) {
-            Bits                   = BufferBitsAvailable >= UserRequestBits  ? UserRequestBits : BufferBitsAvailable;
-            Data                   = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
-            Data                 >>= Mask2Shift;
-            OutputData           <<= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            OutputData            += Data;
-            BitB->BitsAvailable   -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            BitB->BitsUnavailable += BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            Bits                  -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-        }
-        return 0ULL;
-    }
-    
-    static inline uint64_t ReadBitsSourceBETargetLEMSB(BitBuffer *BitB, const uint8_t Bits2Read) {
-        uint8_t Bits = Bits2Read, UserRequestBits = 0, BufferBitsAvailable = 0, Mask = 0, Data = 0, Mask2Shift = 0;
-        while (Bits > 0) {
-            Bits                   = BufferBitsAvailable >= UserRequestBits  ? UserRequestBits : BufferBitsAvailable;
-            Data                   = BitB->Buffer[BitB->BitsUnavailable / 8] & Mask;
-            Data                 >>= Mask2Shift;
-            OutputData           <<= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            OutputData            += Data;
-            BitB->BitsAvailable   -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            BitB->BitsUnavailable += BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-            Bits                  -= BufferBitsAvailable >= UserRequestBits ? UserRequestBits : BufferBitsAvailable;
-        }
-        return 0ULL;
-    }
-    
     uint64_t ReadBits(const uint8_t ByteBitOrder, BitBuffer *BitB, const uint8_t Bits2Read) {
         uint8_t Bits = Bits2Read, UserRequestBits = 0, BufferBitsAvailable = 0, Mask = 0, Data = 0, Mask2Shift = 0;
         uint64_t OutputData = 0;
@@ -1147,21 +1051,6 @@ extern "C" {
     void WriteBuffer2Socket(const BitOutput *BitO, const BitBuffer *BitB, const int Socket) { // FIXME: Just a stub
         // Define it in the header when it's done
         
-    }
-    
-    void EncodeRLE(const BitBuffer *Data2Encode, BitBuffer *Encoded, const uint8_t LengthCodeSize, const uint8_t SymbolSize) {
-        if (Data2Encode == NULL) {
-            Log(LOG_ERR, "libBitIO", "DecodeRLE", "Pointer to Data2Decode is NULL");
-        } else if (Encoded == NULL) {
-            Log(LOG_ERR, "libBitIO", "DecodeRLE", "Pointer to Decoded is NULL");
-        } else if (LengthCodeSize < 1) {
-            Log(LOG_ERR, "libBitIO", "DecodeRLE", "LengthCodeSize %d is invalid", LengthCodeSize);
-        } else if (SymbolSize < 1) {
-            Log(LOG_ERR, "libBitIO", "DecodeRLE", "SymbolSize %d is invalid", SymbolSize);
-        } else {
-            uint64_t CurrentSymbol = 0;
-            uint64_t LengthSymbol  = 0;
-        }
     }
     
     void Log(const uint8_t ErrorSeverity, const char *LibraryOrProgram, const char *FunctionName, const char *Description, ...) {
