@@ -220,7 +220,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "SwitchNum %d is too high, there are only %d switches", SwitchNum, CLI->NumSwitches);
         } else {
             CLI->Switches[SwitchNum].Flag     = Flag;
-            CLI->Switches[SwitchNum].FlagSize = strlen(Flag);
+            CLI->Switches[SwitchNum].FlagSize = strlen(Flag) + 1;
         }
     }
     
