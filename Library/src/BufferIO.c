@@ -145,35 +145,6 @@ extern "C" {
         return ceil(log2(NumSymbols));
     }
     
-    inline uint8_t CountBitsSet(const uint64_t Bits2Count) {
-        uint8_t DataBit = 0, BitCount = 0;
-        for (uint8_t Bit = 0; Bit < 64; Bit++) {
-            DataBit = (Bits2Count & (1 << Bit)) >> Bit;
-            if (DataBit == 1) {
-                BitCount += 1;
-            }
-        }
-        return BitCount;
-    }
-    
-    inline uint8_t FindHighestBitSet(const uint64_t UnsignedInt2Search) { // UnsignedInt2Search = 0x8000
-        uint8_t  HighestBitSet = 0;
-        uint64_t Shift         = 0ULL;
-        
-        if (UnsignedInt2Search == 0) {
-            HighestBitSet = 0;
-        } else {
-            for (uint8_t Bit = 1; Bit < 64; Bit++) {
-                // We should count up tho, that way the last update is the last highest bit, that also means it requires 64 loops no matter what :(
-                Shift = 1ULL << (Bit - 1);
-                if (((UnsignedInt2Search & Shift) >> (Bit - 1)) == 1) {
-                    HighestBitSet = Bit;
-                }
-            }
-        }
-        return HighestBitSet;
-    }
-    
     static inline uint8_t Power2MaskLSByte(const uint8_t Exponent) {
         return (pow(2, Exponent) - 1);
     }
