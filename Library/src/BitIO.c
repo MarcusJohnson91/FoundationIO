@@ -233,7 +233,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL");
         } else {
             if (BitI->FileSize == 0) {
-                GetFileSize(BitI);
+                FindFileSize(BitI);
             } else {
                 InputSize = BitI->FileSize;
             }
@@ -247,7 +247,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "GetBitInputFilePosition", "Pointer to BitInput is NULL");
         } else {
             if (BitI->FilePosition == 0) {
-                GetFileSize(BitI);
+                FindFileSize(BitI);
             } else {
                 Position = BitI->FilePosition;
             }
@@ -329,9 +329,9 @@ extern "C" {
         }
     }
     
-    void GetFileSize(BitInput *BitI) {
+    void FindFileSize(BitInput *BitI) {
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetFileSize", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "FindFileSize", "Pointer to BitInput is NULL");
         } else {
             fseek(BitI->File, 0, SEEK_END);
             fgetpos(BitI->File, (uint64_t)BitI->FileSize);

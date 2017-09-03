@@ -315,7 +315,7 @@ extern "C" {
      @abstract                                    "Seeks to the end of BitI->File to determine the size"
      @param             BitI                      "Pointer to the instance of BitInput".
      */
-    void                GetFileSize(BitInput *BitI);
+    void                FindFileSize(BitInput *BitI);
     
     /*!
      @abstract                                    "Gets the size of the file pointed to by BitI"
