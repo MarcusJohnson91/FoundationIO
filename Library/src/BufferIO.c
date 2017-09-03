@@ -25,7 +25,7 @@ extern "C" {
 #define strcasecmp _stricmp
 #endif
     
-    extern FILE           *BitIOGlobalLogFile; // ONLY global variable in all of BitIO
+    extern FILE           *BitIOGlobalLogFile = NULL; // ONLY global variable in all of BitIO
     
     typedef struct BitBuffer {
         uint64_t           BitsAvailable;
@@ -38,7 +38,7 @@ extern "C" {
         bool               IsFileOrSocket;
         int                Socket;
         fpos_t             FileSize;
-        uint64_t           FilePosition;
+        fpos_t             FilePosition;
         uint64_t           FileSpecifierNum;
         uint8_t            SystemEndian;
     } BitInput;
@@ -47,7 +47,7 @@ extern "C" {
         FILE              *File;
         bool               IsFileOrSocket;
         int                Socket;
-        uint64_t           FilePosition;
+        fpos_t             FilePosition;
         uint64_t           FileSpecifierNum;
         uint8_t            SystemEndian;
     } BitOutput;
@@ -217,8 +217,8 @@ extern "C" {
         return SystemEndian;
     }
     
-    uint64_t BytesRemainingInInputFile(const BitInput *BitI) {
-        uint64_t BytesLeft = 0;
+    fpos_t BytesRemainingInInputFile(BitInput *BitI) {
+        fpos_t BytesLeft = 0ULL;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "BytesRemainingInInputFile", "Pointer to BitInput is NULL");
         } else {
@@ -227,44 +227,46 @@ extern "C" {
         return BytesLeft;
     }
     
-    fpos_t GetBitInputFileSize(const BitInput *BitI) {
-        uint64_t InputSize = 0;
+    fpos_t GetBitInputFileSize(BitInput *BitI) {
+        fpos_t InputSize = 0LL;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL");
         } else {
-            if (BitI->FileSize == NULL) {
+            if (BitI->FileSize == 0) {
                 GetFileSize(BitI);
+            } else {
+                InputSize = BitI->FileSize;
             }
-            InputSize = BitI->FileSize;
         }
         return InputSize;
     }
     
-    fpos_t GetBitInputFilePosition(const BitInput *BitI) {
-        uint64_t Position = 0;
+    fpos_t GetBitInputFilePosition(BitInput *BitI) {
+        fpos_t Position = 0LL;
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "GetBitInputFilePosition", "Pointer to BitInput is NULL");
         } else {
-            if (BitI->FilePosition == NULL) {
+            if (BitI->FilePosition == 0) {
                 GetFileSize(BitI);
+            } else {
+                Position = BitI->FilePosition;
             }
-            Position = BitI->FilePosition;
         }
         return Position;
     }
     
-    uint64_t GetBitBufferPosition(const BitBuffer *BitB) {
-        uint64_t Position = 0;
+    uint64_t GetBitBufferPosition(BitBuffer *BitB) {
+        uint64_t Position = 0ULL;
         if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "GetBitBufferPosition", "Pointer to BitInput is NULL");
         } else {
             Position = BitB->BitsUnavailable;
         }
         return Position;
     }
     
-    uint64_t GetBitBufferSize(const BitBuffer *BitB) {
-        uint64_t BitBufferSize = 0;
+    uint64_t GetBitBufferSize(BitBuffer *BitB) {
+        uint64_t BitBufferSize = 0ULL;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitBufferSize", "Pointer to BitBuffer is NULL");
         } else {
@@ -273,7 +275,7 @@ extern "C" {
         return BitBufferSize;
     }
     
-    uint8_t GetBitInputSystemEndian(const BitInput *BitI) {
+    uint8_t GetBitInputSystemEndian(BitInput *BitI) {
         uint8_t Endian = 0;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitInputSystemEndian", "Pointer to BitInput is NULL");
@@ -283,7 +285,7 @@ extern "C" {
         return Endian;
     }
     
-    uint8_t GetBitOutputSystemEndian(const BitOutput *BitO) {
+    uint8_t GetBitOutputSystemEndian(BitOutput *BitO) {
         uint8_t Endian = 0;
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitOutputSystemEndian", "Pointer to BitOutput is NULL");
@@ -328,10 +330,14 @@ extern "C" {
     }
     
     void GetFileSize(BitInput *BitI) {
-        fseek(BitI->File, 0, SEEK_END);
-        fgetpos(BitI->File, (uint64_t)BitI->FileSize);
-        fseek(BitI->File, 0, SEEK_SET);
-        fgetpos(BitI->File, BitI->FilePosition);
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetFileSize", "Pointer to BitInput is NULL");
+        } else {
+            fseek(BitI->File, 0, SEEK_END);
+            fgetpos(BitI->File, (uint64_t)BitI->FileSize);
+            fseek(BitI->File, 0, SEEK_SET);
+            fgetpos(BitI->File, &BitI->FilePosition);
+        }
     }
     
     void OpenOutputFile(BitOutput *BitO, const char *Path2Open) {
@@ -375,7 +381,7 @@ extern "C" {
     
     void OpenOutputSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol) {
         if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenInputSocket", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "OpenOutputSocket", "Pointer to BitInput is NULL");
         } else {
 #ifdef _POSIX_VERSION
             BitO->Socket         = socket(Domain, Type, Protocol);
@@ -395,7 +401,7 @@ extern "C" {
     /*
     uint64_t ReadBits(const uint8_t ByteBitOrder, BitBuffer *BitB, const uint8_t Bits2Read) {
         uint8_t Bits = Bits2Read, UserRequestBits = 0, BufferBitsAvailable = 0, Mask = 0, Data = 0, Mask2Shift = 0;
-        uint64_t OutputData = 0;
+        uint64_t OutputData = 0ULL;
         
         if (ByteBitOrder == LSBit || ByteBitOrder == MSBit || ByteBitOrder > 6) {
             Log(LOG_ERR, "libBitIO", "ReadBits", "Invalid ByteBitOrder: %d", ByteBitOrder);
@@ -486,7 +492,7 @@ extern "C" {
     }
     
     uint64_t PeekBits2(const uint8_t ByteBitOrder, BitBuffer *BitB, const uint8_t Bits2Peek) {
-        uint64_t PeekedBits = 0;
+        uint64_t PeekedBits = 0ULL;
         if (ByteBitOrder == LSBit || ByteBitOrder == MSBit || ByteBitOrder > 6) {
             Log(LOG_ERR, "libBitIO", "PeekBits2", "Invalid ByteBitOrder: %d", ByteBitOrder);
         } else if (BitB == NULL) {
@@ -510,7 +516,7 @@ extern "C" {
     }
     
     uint64_t ReadRICE2(const uint8_t ByteBitOrder, BitBuffer *BitB, const bool Truncated, const bool StopBit) {
-        uint64_t DeRICEdBits = 0;
+        uint64_t DeRICEdBits = 0ULL;
         if (ByteBitOrder == LSBit || ByteBitOrder == MSBit || ByteBitOrder > 6) {
             Log(LOG_ERR, "libBitIO", "PeekBits2", "Invalid ByteBitOrder: %d", ByteBitOrder);
         } else if (BitB == NULL) {
@@ -532,7 +538,7 @@ extern "C" {
     }
     
     void *ReadExpGolomb2(const uint8_t ByteBitOrder, BitBuffer *BitB, const bool IsSigned) {
-        uint64_t DeExpGolombedBits = 0;
+        uint64_t DeExpGolombedBits = 0ULL;
         if (ByteBitOrder == LSBit || ByteBitOrder == MSBit || ByteBitOrder > 6) {
             Log(LOG_ERR, "libBitIO", "PeekBits2", "Invalid ByteBitOrder: %d", ByteBitOrder);
         } else if (BitB == NULL) {
@@ -556,7 +562,7 @@ extern "C" {
     /*
     uint64_t ReadBits(BitBuffer *BitB, const uint8_t Bits2Read, const bool ReadFromMSB) {
         uint8_t Bits = Bits2Read, UserRequestBits = 0, BufferBitsAvailable = 0, Mask = 0, Data = 0, Mask2Shift = 0;
-        uint64_t OutputData = 0;
+        uint64_t OutputData = 0ULL;
         
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadBits", "Pointer to BitBuffer is NULL");
@@ -600,8 +606,8 @@ extern "C" {
         return OutputData;
     }
     
-    uint64_t  ReadRICE(const BitBuffer *BitB, const bool Truncated, const bool StopBit) {
-        uint64_t BitCount = 0;
+    uint64_t  ReadRICE(BitBuffer *BitB, const bool Truncated, const bool StopBit) {
+        uint64_t BitCount = 0ULL;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadRICE", "Pointer to BitBuffer is NULL");
         } else {
@@ -615,13 +621,13 @@ extern "C" {
         return BitCount;
     }
     
-    int64_t ReadExpGolomb(const BitBuffer *BitB, const bool IsSigned) {
-        int64_t  Final = 0;
+    int64_t ReadExpGolomb(BitBuffer *BitB, const bool IsSigned) {
+        int64_t  Final = 0LL;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadExpGolomb", "Pointer to BitBuffer is NULL");
         } else {
-            uint64_t Zeros   = 0;
-            uint64_t CodeNum = 0;
+            uint64_t Zeros   = 0ULL;
+            uint64_t CodeNum = 0ULL;
             
             while (ReadBits(BitB, 1, false) != 1) {
                 Zeros += 1;
@@ -744,7 +750,7 @@ extern "C" {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteRICE", "Pointer to BitBuffer is NULL");
         } else {
-            for (uint64_t Bit = 0; Bit < Data2Write; Bit++) {
+            for (uint64_t Bit = 0ULL; Bit < Data2Write; Bit++) {
                 WriteBits(BitB, (~StopBit), 1, WriteFromMSB);
             }
             WriteBits(BitB, StopBit, 1, WriteFromMSB);
@@ -755,7 +761,7 @@ extern "C" {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteExpGolomb", "Pointer to BitOutput is NULL");
         } else {
-            uint64_t NumBits = 0;
+            uint64_t NumBits = 0ULL;
             
             NumBits = FindHighestBitSet(Data2Write);
             
@@ -775,12 +781,12 @@ extern "C" {
     }
      */
     
-    bool IsBitBufferAligned(const BitBuffer *BitB, const uint8_t BytesOfAlignment) {
+    bool IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
         bool AlignmentStatus = 0;
         if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "IsOutputStreamByteAligned", "Pointer to BitBuffer is NULL");
+            Log(LOG_ERR, "libBitIO", "IsBitBufferAligned", "Pointer to BitBuffer is NULL");
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
-            Log(LOG_ERR, "libBitIO", "IsOutputStreamByteAligned", "BytesOfAlignment: %d isn't a power of 2 (or 1)", BytesOfAlignment);
+            Log(LOG_ERR, "libBitIO", "IsBitBufferAligned", "BytesOfAlignment: %d isn't a power of 2 (or 1)", BytesOfAlignment);
         } else {
             if ((BitB->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
                 AlignmentStatus = true;
@@ -969,7 +975,7 @@ extern "C" {
         return UUIDsMatch;
     }
     
-    void WriteUUID(const BitBuffer *BitB, const uint8_t *UUIDString) {
+    void WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString) {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteUUID", "Pointer to instance of BitBuffer is NULL");
         } else if (UUIDString == NULL) {
@@ -998,8 +1004,8 @@ extern "C" {
     // Ok, so I need a function to read a file/socket into a buffer, and one to write a buffer to a file/socket.
     // I don't know if FILE pointers work with sockets, but i'm going to ignore that for now.
     
-    void ReadBitInput2BitBuffer(const BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read) { // It's the user's job to ensure buffers and files are kept in sync, not mine.
-        uint64_t BytesRead              = 0;
+    void ReadBitInput2BitBuffer(BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read) { // It's the user's job to ensure buffers and files are kept in sync, not mine.
+        uint64_t BytesRead              = 0ULL;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "BitI pointer is NULL");
         } else if (BitB == NULL) {
@@ -1019,14 +1025,14 @@ extern "C" {
                     Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "Fread read: %d bytes, but you requested: %d", BytesRead, Bytes2Read);
                 } else {
                     BitB->BitsAvailable   = Bytes2Bits(BytesRead);
-                    BitB->BitsUnavailable = 0;
+                    BitB->BitsUnavailable = 0ULL;
                 }
             }
         }
     }
     
-    void WriteBitBuffer2BitOutput(const BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write) { // FIXME Assuming we wrote the whole buffer
-        uint64_t BytesWritten           = 0;
+    void WriteBitBuffer2BitOutput(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write) { // FIXME Assuming we wrote the whole buffer
+        uint64_t BytesWritten           = 0ULL;
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "BitI pointer is NULL");
         } else if (Buffer2Write == NULL) {
@@ -1038,23 +1044,23 @@ extern "C" {
                 Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "Fwrite wrote: %d bytes, but you requested: %d", BytesWritten, Bytes2Write);
             } else {
                 Buffer2Write->BitsAvailable   = Bytes2Bits(BytesWritten);
-                Buffer2Write->BitsUnavailable = 0;
+                Buffer2Write->BitsUnavailable = 0ULL;
             }
         }
     }
     
-    void ReadSocket2Buffer(const BitInput *BitI, const uint64_t Bytes2Read) { // FIXME: Just a stub
+    void ReadSocket2Buffer(BitInput *BitI, const uint64_t Bytes2Read) { // FIXME: Just a stub
         // Define it in the header when it's done
         //sockaddr_in
     }
     
-    void WriteBuffer2Socket(const BitOutput *BitO, const BitBuffer *BitB, const int Socket) { // FIXME: Just a stub
+    void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB, const int Socket) { // FIXME: Just a stub
         // Define it in the header when it's done
         
     }
     
     void Log(const uint8_t ErrorSeverity, const char *LibraryOrProgram, const char *FunctionName, const char *Description, ...) {
-        uint64_t FunctionNameSize = 0, DescriptionSize = 0;
+        uint64_t FunctionNameSize = 0ULL, DescriptionSize = 0ULL;
         
         char *EasyString = calloc(1, 1 + strlen(FunctionName) + strlen(Description) + 2); // the 1 is for the error severity + 2 for the NULs
         snprintf(EasyString, FunctionNameSize + DescriptionSize, "%hhu: %s - %s", ErrorSeverity, FunctionName, Description);
