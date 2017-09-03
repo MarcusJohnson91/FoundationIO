@@ -12,6 +12,7 @@ License:
 libBitIO is released under the terms of the 3 clause [`Revised BSD`](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29) license.
 
 Here's a tl;dr of my license:
+
 * **Do** include in your acknowledgments a link to [BitIO on GitHub](https://www.github.com/MarcusJohnson91/FoundationIO).
 * **Don't** plagiarize BitIO.
 * **Don't** relicense BitIO.
@@ -29,6 +30,7 @@ How To Use libBitIO:
 -----------------
 In order to use libBitIO, you need to include CommandLineIO.h, or BitIO.h.
 Tips:
+
 * You can have as many instances of `BitInput`, `BitOutput`, and `BitBuffer` as you want, for instances, reading/writing multiple files.
 
 CommandLineIO:
@@ -67,6 +69,7 @@ UUID/GUIDs:
 -----------------
 
 `ReadUUID`:
+
 * UUIDs and GUIDs have the same size, but use a different format,  so `ReadUUID` can also read GUIDs.
 * The only difference is that GUIDs are little endian.
 * To convert a UUID to a GUID or vice versa call `ConvertUUID2GUID` or `ConvertGUID2UUID`.
