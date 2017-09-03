@@ -264,22 +264,6 @@ extern "C" {
     inline uint64_t     NumBits2ReadSymbols(const uint64_t NumSymbols);
     
     /*!
-     @abstract                                    "Counts the number of bits that are set in a int".
-     @return                                      "The number of bits set in Bits2Count".
-     @param             Bits2Count                "The int who's bits should be counted".
-     */
-    inline uint8_t      CountBitsSet(const uint64_t Bits2Count);
-    
-    /*!
-     @abstract                                    "Finds the highest set bit in an int".
-     @todo                                        "We should have a flag for if it's positive or negative, and if neg, search instead for the highest 0, called FindHighestSetBit"
-     @remark                                      "Will NOT WORK WITH SIGNED INTS. it will ALWAYS return the sign bit".
-     @return                                      "Returns the position of the highest set bit".
-     @param             UnsignedInt2Search        "Unsigned integer to search for the highest set bit".
-     */
-    inline uint8_t      FindHighestBitSet(const uint64_t UnsignedInt2Search);
-    
-    /*!
      @abstract                                    "Tells whether Input is even or odd".
      @return                                      "True for odd, false for even".
      @param             Number2Check              "The number to see if it's odd or even".
