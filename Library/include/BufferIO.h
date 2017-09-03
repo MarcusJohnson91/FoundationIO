@@ -15,6 +15,8 @@
 #include <winsock.h>
 #else
 #include <sys/socket.h>
+#include <syslog.h>
+#include <unistd.h>
 #endif
 
 #ifndef BITIOBYTEBITORDERS
@@ -112,6 +114,7 @@ extern "C" {
                        MSBit                      = 6,
     };
     
+#ifndef _POSIX_VERSION
     /*!
      @enum              BitIOLogTypes
      @constant          LOG_EMERG                 "The system is unusable, the program is quitting (equivalent to panic)".
@@ -133,6 +136,7 @@ extern "C" {
                         LOG_INFO                  = 6,
                         LOG_DEBUG                 = 7,
     };
+#endif
     
     /*!
      @typedef           BitBuffer
@@ -276,28 +280,6 @@ extern "C" {
     inline uint8_t      FindHighestBitSet(const uint64_t UnsignedInt2Search);
     
     /*!
-     @abstract                                    "Create bit-mask from binary exponent".
-     @return                                      "A bit mask generated from a power".
-     @param             BitOrder                  "Should the mask be shifted to the left or not?".
-     @param             Exponent                  "Power to be raised by 2".
-     */
-    inline uint8_t      Power2Mask(const uint8_t BitOrder, const uint8_t Exponent);
-    
-    /*!
-     @abstract                                    "Converts numbers from One's compliment to Two's compliment"
-     @return                                      "Returns OnesCompliment in 2's compliment format".
-     @param             OnesCompliment            "Int in 1's compliment form to convert into 2's compliment".
-     */
-    inline int64_t      OnesCompliment2TwosCompliment(const int64_t OnesCompliment);
-    
-    /*!
-     @abstract                                    "Converts numbers from Two's compliment to One's compliment".
-     @return                                      "Returns the TwosCompliment in 1's compliment format".
-     @param             TwosCompliment            "Int in 2's compliment form to convert into 1's compliment".
-     */
-    inline int64_t      TwosCompliment2OnesCompliment(const int64_t TwosCompliment);
-    
-    /*!
      @abstract                                    "Tells whether Input is even or odd".
      @return                                      "True for odd, false for even".
      @param             Number2Check              "The number to see if it's odd or even".
@@ -309,13 +291,7 @@ extern "C" {
      @return                                      "Returns the number of bytes left in the file".
      @param             BitI                      "Pointer to the instance of BitInput".
      */
-    fpos_t              BytesRemainingInInputFile(BitInput *BitI);
-    
-    /*!
-     @abstract                                    "Seeks to the end of BitI->File to determine the size"
-     @param             BitI                      "Pointer to the instance of BitInput".
-     */
-    void                FindFileSize(BitInput *BitI);
+    fpos_t              BytesRemainingInBitInput(BitInput *BitI);
     
     /*!
      @abstract                                    "Gets the size of the file pointed to by BitI"
@@ -343,18 +319,10 @@ extern "C" {
     uint64_t            GetBitBufferSize(BitBuffer *BitB);
     
     /*!
-     @abstract                                    "The BitOutput type was made private, this function was added so users can still get this information".
-     @return                                      "Returns the endian of the running system".
+     @abstract                                    "Seeks to the end of BitI->File to determine the size"
      @param             BitI                      "Pointer to the instance of BitInput".
      */
-    uint8_t             GetBitInputSystemEndian(BitInput *BitI);
-    
-    /*!
-     @abstract                                    "The BitOutput type was made private, this function was added so users can still get this information".
-     @return                                      "Returns the endian of the running system".
-     @param             BitO                      "Pointer to the instance of BitOutput".
-     */
-    uint8_t             GetBitOutputSystemEndian(BitOutput *BitO);
+    void                FindFileSize(BitInput *BitI);
     
     /*!
      @abstract                                    "Opens an input file, pointed to by InputSwitch in CMD and stores the resulting pointer in BitI->File".
@@ -377,39 +345,9 @@ extern "C" {
      */
     void                OpenLogFile(const char *LogFilePath);
     
-    /*!
-     @abstract                                    "Manages InputBuffer and hands out the requested bits".
-     @remark                                      "DO NOT try reading backwards, it will not work. for that use SkipBits()".
-     @param             BitB                      "Pointer to the instance of BitBuffer".
-     @param             Bits2Read                 "Number of bits to read".
-     @param             ReadFromMSB               "Should ReadBits start at the most significant bit in this byte?"
-     */
-    uint64_t            ReadBits(BitBuffer *BitB, const uint8_t Bits2Read, const bool ReadFromMSB);
+    void                OpenInputSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol);
     
-    /*!
-     @abstract                                    "Shows the next X bits, without recording it as a read".
-     @param             BitB                      "Pointer to the instance of BitBuffer".
-     @param             Bits2Peek                 "Number of bits to peek".
-     @param             ReadFromMSB               "Should PeekBits start at the most significant bit in this byte?"
-     */
-    uint64_t            PeekBits(BitBuffer *BitB, const uint8_t Bits2Peek, const bool ReadFromMSB);
-    
-    /*!
-     @abstract                                    "Reads and Decodes unary/RICE encoded data from BitInput stream".
-     @return                                      "Returns the count of bits aka the value encoded by the encoder".
-     @param             BitB                      "Pointer to the instance of BitBuffer".
-     @param             Truncated                 "Should the StopBit be included in the count?"
-     @param             StopBit                   "MUST be a 0 or a 1. none of this funny business about how true > 0".
-     */
-    uint64_t            ReadRICE(BitBuffer *BitB, const bool Truncated, const bool StopBit);
-    
-    /*!
-     @abstract                                    "Reads data encoded as Exponential-Golomb aka Elias Gamma".
-     @return                                      "Returns the decoded value of the Elias/Golomb code".
-     @param             BitB                      "Pointer to the instance of BitBuffer".
-     @param             IsSigned                  "Should it be read as signed or unsigned?".
-     */
-    int64_t             ReadExpGolomb(BitBuffer *BitB, const bool IsSigned);
+    void                OpenOutputSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol);
     
     /*!
      @abstract                                    "Seeks Forwards and backwards in BitInput"
@@ -418,34 +356,6 @@ extern "C" {
      @param             Bits2Skip                 "The number of bits to skip".
      */
     void                SkipBits(BitBuffer *BitB, const int64_t Bits2Skip);
-    
-    /*!
-     @abstract                                    "Writes bits to Buffer2Write".
-     @param             ByteBitOrder              "What byte and bit order should Value2Write be written in?"
-     @param             Buffer2Write              "Pointer to the instance of BitBuffer where the data should be written".
-     @param             NumBits2Write             "Number of bits to write".
-     @param             Value2Write               "The actual data to write".
-     */
-    void                WriteBits(const uint8_t ByteBitOrder, BitBuffer *Buffer2Write, const uint8_t NumBits2Write, const uint64_t Value2Write);
-    
-    /*!
-     @abstract                                    "Encodes and writes data in unary/RICE format to Buffer2Write".
-     @param             ByteBitOrder              "What byte and bit order should Value2Write be written in?"
-     @param             Buffer2Write              "Pointer to the instance of BitBuffer where the data should be written".
-     @param             NumBits2Write             "Number of bits to write".
-     @param             Value2Write               "The actual data to write".
-     @param             Truncate                  "Should the stop bit be pruned?".
-     */
-    void                WriteRICE(const uint8_t ByteBitOrder, BitBuffer *Buffer2Write, const uint8_t NumBits2Write, const uint64_t Value2Write, const bool Truncate);
-    
-    /*!
-     @abstract                                    "Writes data encoded as Exponential-Golomb aka Elias Gamma codes to Buffer2Write".
-     @param             ByteBitOrder              "What byte and bit order should Value2Write be written in?"
-     @param             Buffer2Write              "Pointer to the instance of BitBuffer where the data should be written".
-     @param             NumBits2Write             "Number of bits to write".
-     @param             Value2Write               "The actual data to write".
-     */
-    void                WriteExpGolomb(const uint8_t ByteBitOrder, BitBuffer *Buffer2Write, const uint8_t NumBits2Write, const uint64_t Value2Write);
     
     /*!
      @abstract                                    "Tells if the stream/buffer is byte aligned or not".

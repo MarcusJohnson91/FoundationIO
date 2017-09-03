@@ -7,11 +7,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #ifdef _WIN32
 #include <winsock.h>
 #else
 #include <sys/socket.h>
+#include <syslog.h>
 #include <unistd.h>
 #endif
 
@@ -40,7 +40,6 @@ extern "C" {
         fpos_t             FileSize;
         fpos_t             FilePosition;
         uint64_t           FileSpecifierNum;
-        uint8_t            SystemEndian;
     } BitInput;
     
     typedef struct BitOutput {
@@ -49,14 +48,7 @@ extern "C" {
         int                Socket;
         fpos_t             FilePosition;
         uint64_t           FileSpecifierNum;
-        uint8_t            SystemEndian;
     } BitOutput;
-    
-    typedef struct SymbolFrequencies { // We assume that all the symbols are unsigned integers of varying size
-        uint64_t           NumSymbols; // Probability is just the frequency of occurance divided by the number of symbols.
-        uint8_t            SymbolSize; // number of bytes per symbol
-        void              *Frequency;
-    } SymbolFrequencies;
     
     BitInput *InitBitInput(void) {
         BitInput *BitI        = (BitInput*) calloc(1, sizeof(BitInput));
@@ -182,42 +174,19 @@ extern "C" {
         return HighestBitSet;
     }
     
-    inline uint8_t Power2Mask(const uint8_t BitOrder, const uint8_t Exponent) {
-        uint8_t Mask = 0;
-        if (Exponent > 8) {
-            Log(LOG_ERR, "libBitIO", "Power2Mask", "Exponent %d is too large", Exponent);
-        } else {
-            if (BitOrder == LSBit) {
-                Mask = (uint8_t) (pow(2, Exponent) - 1);
-            } else if (BitOrder == MSBit) {
-                Mask = (uint8_t) (pow(2, Exponent) - 1) << (8 - Exponent);
-            }
-        }
-        return Mask;
+    static inline uint8_t Power2MaskLSByte(const uint8_t Exponent) {
+        return (pow(2, Exponent) - 1);
+    }
+    
+    static inline uint8_t Power2MaskMSByte(const uint8_t Exponent) {
+        return (((uint8_t) pow(2, Exponent) - 1) << (8 - Exponent));
     }
     
     inline bool IsOdd(const int64_t Number2Check) {
         return Number2Check % 2 == 0 ? true : false;
     }
     
-    static uint8_t DetectSystemEndian(void) {
-        uint8_t  SystemEndian = 0;
-        uint16_t Endian       = 0xFFFE;
-        if (Endian == 0xFFFE) {
-            SystemEndian = LilEndianLSBit;
-        } else if (Endian == 0xFF7F) {
-            SystemEndian = LilEndianMSBit;
-        } else if (Endian == 0xFEFF) {
-            SystemEndian = BigEndianLSBit;
-        } else if (Endian == 0xBFFF) {
-            SystemEndian = BigEndianMSBit;
-        } else {
-            SystemEndian = UnknownEndian;
-        }
-        return SystemEndian;
-    }
-    
-    fpos_t BytesRemainingInInputFile(BitInput *BitI) {
+    fpos_t BytesRemainingInBitInput(BitInput *BitI) {
         fpos_t BytesLeft = 0ULL;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "BytesRemainingInInputFile", "Pointer to BitInput is NULL");
@@ -275,24 +244,15 @@ extern "C" {
         return BitBufferSize;
     }
     
-    uint8_t GetBitInputSystemEndian(BitInput *BitI) {
-        uint8_t Endian = 0;
+    void FindFileSize(BitInput *BitI) {
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitInputSystemEndian", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "FindFileSize", "Pointer to BitInput is NULL");
         } else {
-            Endian = BitI->SystemEndian;
+            fseek(BitI->File, 0, SEEK_END);
+            fgetpos(BitI->File, (uint64_t)BitI->FileSize);
+            fseek(BitI->File, 0, SEEK_SET);
+            fgetpos(BitI->File, &BitI->FilePosition);
         }
-        return Endian;
-    }
-    
-    uint8_t GetBitOutputSystemEndian(BitOutput *BitO) {
-        uint8_t Endian = 0;
-        if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitOutputSystemEndian", "Pointer to BitOutput is NULL");
-        } else {
-            Endian = BitO->SystemEndian;
-        }
-        return Endian;
     }
     
     void OpenInputFile(BitInput *BitI, const char *Path2Open, bool OpenForReadWrite) {
@@ -323,20 +283,7 @@ extern "C" {
             
             if (BitI->File == NULL) {
                 Log(LOG_ERR, "libBitIO", "OpenInputFile", "Couldn't open file: Check that the file exists and the permissions are correct");
-            } else {
-                BitI->SystemEndian = DetectSystemEndian();
             }
-        }
-    }
-    
-    void FindFileSize(BitInput *BitI) {
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "FindFileSize", "Pointer to BitInput is NULL");
-        } else {
-            fseek(BitI->File, 0, SEEK_END);
-            fgetpos(BitI->File, (uint64_t)BitI->FileSize);
-            fseek(BitI->File, 0, SEEK_SET);
-            fgetpos(BitI->File, &BitI->FilePosition);
         }
     }
     
@@ -354,7 +301,6 @@ extern "C" {
             if (BitO->File == NULL) {
                 Log(LOG_ALERT, "libBitIO", "OpenOutputFile", "Couldn't open file: Check that the file exists and the permissions are correct");
             }
-            BitO->SystemEndian          = DetectSystemEndian();
         }
     }
     
@@ -406,66 +352,6 @@ extern "C" {
             BitB->BitsAvailable   -= Bits2Skip;
             BitB->BitsUnavailable += Bits2Skip;
             // The file/stream updating functions need to keep this in mind.
-        }
-    }
-    
-    void WriteBits(const uint8_t ByteBitOrder, BitBuffer *Buffer2Write, const uint8_t Bits2Write, const uint64_t Value2Write) {
-        if (ByteBitOrder == LSBit || ByteBitOrder == MSBit || ByteBitOrder > 6) {
-            Log(LOG_ERR, "libBitIO", "WriteBits", "Invalid ByteBitOrder: %d", ByteBitOrder);
-        } else if (Buffer2Write == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteBits", "Pointer to BitBuffer is NULL");
-        } else if (Buffer2Write->Buffer == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteBits", "Pointer to Buffer in BitBuffer is NULL");
-        } else {
-            if (ByteBitOrder == BigEndianLSBit) {
-                
-            } else if (ByteBitOrder == LilEndianLSBit) {
-                
-            } else if (ByteBitOrder == BigEndianMSBit) {
-                
-            } else if (ByteBitOrder == LilEndianMSBit) {
-                
-            }
-        }
-    }
-    
-    void WriteRICE(const uint8_t ByteBitOrder, BitBuffer *Buffer2Write, const uint8_t NumBits2Write, const uint64_t Value2Write, const bool Truncate) {
-        if (ByteBitOrder == LSBit || ByteBitOrder == MSBit || ByteBitOrder > 6) {
-            Log(LOG_ERR, "libBitIO", "WriteRICE", "Invalid ByteBitOrder: %d", ByteBitOrder);
-        } else if (Buffer2Write == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteRICE", "Pointer to BitBuffer is NULL");
-        } else if (Buffer2Write->Buffer == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteRICE", "Pointer to Buffer in BitBuffer is NULL");
-        } else {
-            if (ByteBitOrder == BigEndianLSBit) {
-                
-            } else if (ByteBitOrder == LilEndianLSBit) {
-                
-            } else if (ByteBitOrder == BigEndianMSBit) {
-                
-            } else if (ByteBitOrder == LilEndianMSBit) {
-                
-            }
-        }
-    }
-    
-    void WriteExpGolomb(const uint8_t ByteBitOrder, BitBuffer *Buffer2Write, const uint8_t NumBits2Write, const uint64_t Value2Write) {
-        if (ByteBitOrder == LSBit || ByteBitOrder == MSBit || ByteBitOrder > 6) {
-            Log(LOG_ERR, "libBitIO", "WriteExpGolomb", "Invalid ByteBitOrder: %d", ByteBitOrder);
-        } else if (Buffer2Write == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteExpGolomb", "Pointer to BitBuffer is NULL");
-        } else if (Buffer2Write->Buffer == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteExpGolomb", "Pointer to Buffer in BitBuffer is NULL");
-        } else {
-            if (ByteBitOrder == BigEndianLSBit) {
-                
-            } else if (ByteBitOrder == LilEndianLSBit) {
-                
-            } else if (ByteBitOrder == BigEndianMSBit) {
-                
-            } else if (ByteBitOrder == LilEndianMSBit) {
-                
-            }
         }
     }
     
@@ -527,6 +413,25 @@ extern "C" {
         return UUIDString;
     }
     
+    uint8_t *ReadUUID(BitBuffer *BitB) {
+        uint8_t *UUIDString = NULL;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadUUID", "Pointer to BitBuffer is NULL");
+        } else {
+            uint8_t *BinaryUUID = (uint8_t*) calloc(1, BitIOBinaryUUIDSize);
+            
+            if (BinaryUUID == NULL) {
+                Log(LOG_ERR, "libBitIO", "ReadUUID", "Not enough memory to allocate BinaryUUID");
+            } else {
+                for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
+                    BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
+                }
+                UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
+            }
+        }
+        return UUIDString;
+    }
+    
     static uint8_t *ConvertUUIDString2BinaryUUID(const uint8_t *UUIDString) {
         uint8_t *BinaryUUID = NULL;
         
@@ -580,25 +485,6 @@ extern "C" {
             }
         }
         return SwappedBinaryUUID;
-    }
-    
-    uint8_t *ReadUUID(BitBuffer *BitB) {
-        uint8_t *UUIDString = NULL;
-        if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadUUID", "Pointer to BitBuffer is NULL");
-        } else {
-            uint8_t *BinaryUUID = (uint8_t*) calloc(1, BitIOBinaryUUIDSize);
-            
-            if (BinaryUUID == NULL) {
-                Log(LOG_ERR, "libBitIO", "ReadUUID", "Not enough memory to allocate BinaryUUID");
-            } else {
-                for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
-                    BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
-                }
-                UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
-            }
-        }
-        return UUIDString;
     }
     
     uint8_t *ConvertUUID2GUID(const uint8_t *UUIDString) {
@@ -676,21 +562,14 @@ extern "C" {
         }
     }
     
-    void CreateSocket(const int Domain, const int Type, const int Protocol) { // Define it in the header when it's done
-        int Socket;
-#ifdef _POSIX_VERSION
-        Socket = socket(Domain, Type, Protocol);
-#elif _WIN32
-#endif
-    }
-    
-    // So, I need to accept packets of variable size, from the network, disk, whatever.
-    
-    // Should BitInput and BitOutput store a value saying what type of "file" it's being written to? or just write to the file handle regardless?
-    // So, the gist is we need a function to read from a file or network stream, and create a buffer from that data, and pop it into the struct.
-    // Ok, so I need a function to read a file/socket into a buffer, and one to write a buffer to a file/socket.
-    // I don't know if FILE pointers work with sockets, but i'm going to ignore that for now.
-    
+    /*
+     So, I need to accept packets of variable size, from the network, disk, whatever.
+     
+     Should BitInput and BitOutput store a value saying what type of "file" it's being written to? or just write to the file handle regardless?
+     So, the gist is we need a function to read from a file or network stream, and create a buffer from that data, and pop it into the struct.
+     Ok, so I need a function to read a file/socket into a buffer, and one to write a buffer to a file/socket.
+     I don't know if FILE pointers work with sockets, but i'm going to ignore that for now.
+     */
     void ReadBitInput2BitBuffer(BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read) { // It's the user's job to ensure buffers and files are kept in sync, not mine.
         uint64_t BytesRead              = 0ULL;
         if (BitI == NULL) {
@@ -734,16 +613,6 @@ extern "C" {
                 Buffer2Write->BitsUnavailable = 0ULL;
             }
         }
-    }
-    
-    void ReadSocket2Buffer(BitInput *BitI, const uint64_t Bytes2Read) { // FIXME: Just a stub
-        // Define it in the header when it's done
-        //sockaddr_in
-    }
-    
-    void WriteBuffer2Socket(BitOutput *BitO, BitBuffer *BitB, const int Socket) { // FIXME: Just a stub
-        // Define it in the header when it's done
-        
     }
     
     void Log(const uint8_t ErrorSeverity, const char *LibraryOrProgram, const char *FunctionName, const char *Description, ...) {
