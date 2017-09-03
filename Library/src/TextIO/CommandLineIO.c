@@ -42,7 +42,7 @@ extern "C" {
         uint64_t             SwitchNum;
         uint64_t             NumChildArguments;
         uint64_t            *ChildArguments;
-        char          *ArgumentResult;
+        char                *ArgumentResult;
     };
     
     typedef struct           CommandLineSwitch         CommandLineSwitch;
@@ -73,14 +73,14 @@ extern "C" {
         CommandLineSwitch   *Switches;
         CommandLineArgument *Arguments;
         bool                 IsProprietary;
-        char          *ProgramName;
-        char          *ProgramAuthor;
-        char          *ProgramDescription;
-        char          *ProgramVersion;
-        char          *ProgramCopyright;
-        char          *ProgramLicenseName;
-        char          *ProgramLicenseDescription;
-        char          *ProgramLicenseURL;
+        char                *ProgramName;
+        char                *ProgramAuthor;
+        char                *ProgramDescription;
+        char                *ProgramVersion;
+        char                *ProgramCopyright;
+        char                *ProgramLicenseName;
+        char                *ProgramLicenseDescription;
+        char                *ProgramLicenseURL;
     };
     
     CommandLineIO *InitCommandLineIO(const uint64_t NumSwitches) {
