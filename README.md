@@ -27,14 +27,14 @@ Compiling:
 * On my Mac for AMD64, the libBitIO static library is about 200kb, if that's too big for your use, enable link time optimization on your program to trim unused functions.
 
 How To Use libBitIO:
------------------
+--------------------
 In order to use libBitIO, you need to include CommandLineIO.h, or BitIO.h.
 Tips:
 
 * You can have as many instances of `BitInput`, `BitOutput`, and `BitBuffer` as you want, for instances, reading/writing multiple files.
 
 CommandLineIO:
--------------
+--------------
 
 * To use CommandLineIO, in `main()` call `InitCommandLineIO` to create a pointer to the CommandLineIO struct.
 * Create an enum to hold your command line switches. Number them starting at 0. your **help** option MUST be the last one.
@@ -59,14 +59,14 @@ BitIO:
 
 
 Logging:
-------------
+--------
 `Log()` 
 
 * Writes to a file you set as `BitIOGlobalLogFile`, if it's unset or otherwise inaccessible, all logs are printed to stderr.
 * Works on any platform that provides `stderr`, and `vsprintf`.
 
 UUID/GUIDs:
------------------
+-----------
 
 `ReadUUID`:
 
