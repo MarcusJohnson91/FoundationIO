@@ -154,7 +154,13 @@ extern "C" {
     }
     
     inline bool IsOdd(const int64_t Number2Check) {
-        return Number2Check % 2 == 0 ? true : false;
+        bool X = 0;
+        if (Number2Check % 2 == 0) {
+            X = true;
+        } else {
+            X = false;
+        }
+        return X;
     }
     
     fpos_t BytesRemainingInBitInput(BitInput *BitI) {
