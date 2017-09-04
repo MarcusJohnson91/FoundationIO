@@ -49,12 +49,12 @@ CommandLineIO:
 BitIO:
 ------
 * To use BitIO in `main()` call `InitBitInput` and `InitBitOutput` to read from and write to files and sockets.
-* Reading and writing from/to files/sockets, requires a `BitBuffer` Init that with `InitBitBuffer`
-* To open a file into BitInput call `OpenInputFile` and `OpenOutputFile` (except for the logging file, which uses `OpenLogFile`)
+* Reading and writing from/to files/sockets, requires a `BitBuffer` Init that with `InitBitBuffer`.
+* To open a file into BitInput call `OpenInputFile` and `OpenOutputFile` (except for the logging file, which uses `OpenLogFile`).
 * to measure the size of the file in`BitInput`, call `GetFileSize`.
 * To get the size of a file from `BitInput` call `GetBitInputFileSize`.
 * To Read bits from a BitBuffer, use the `ReadBits` generic macro. to write bits to a BitBuffer use the `WriteBits` generic macro.
-* To pull in fresh data from a file, call `ReadBitInput2BitBuffer`, and to write out fresh data call `WriteBitBuffer2BitOutput`
+* To pull in fresh data from a file, call `ReadBitInput2BitBuffer`, and to write out fresh data call `WriteBitBuffer2BitOutput`.
 * When you're all done, call `DeinitBitInput`, `DeinitBitOutput`, and `DeinitBitBuffer`.
 
 
@@ -78,4 +78,4 @@ UUID/GUIDs:
 Todo:
 -----
 * Add format specifier support to `OpenInputFile` and `OpenOutputFile`, and add a function to increment the file.
-* Write a WriteArray2BitBuffer and ReadBitBuffer2Array functions
+* Write a WriteArray2BitBuffer and ReadBitBuffer2Array functions.
