@@ -75,7 +75,8 @@ UUID/GUIDs:
 * To convert a UUID to a GUID or vice versa call `ConvertUUID2GUID` or `ConvertGUID2UUID`.
 
 
-Todo:
+TODO:
 -----
 * Add format specifier support to `OpenInputFile` and `OpenOutputFile`, and add a function to increment the file.
 * Write a WriteArray2BitBuffer and ReadBitBuffer2Array functions.
+* Make the makefile able to extract the TargetByteOrder and TargetBitOrder from the target architecture.
