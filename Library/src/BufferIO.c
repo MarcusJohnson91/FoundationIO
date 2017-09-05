@@ -25,20 +25,14 @@ extern "C" {
 #define strcasecmp _stricmp
 #endif
     
-    extern FILE           *BitIOGlobalLogFile = NULL; // ONLY global variable in all of BitIO
+    extern FILE           *BitIOGlobalLogFile = NULL;
     
-    struct              BitBuffer {
-        uint64_t        NumBits;
-        uint64_t        BitOffset;
-        uint8_t        *Buffer;
-    };
-    /*
-    typedef struct BitBuffer {
-        uint64_t           BitsAvailable;
-        uint64_t           BitsUnavailable;
+    struct                 BitBuffer {
+        uint64_t           NumBits;
+        uint64_t           BitOffset;
         uint8_t           *Buffer;
-    } BitBuffer;
-    */
+    };
+    
     struct BitInput {
         FILE              *File;
         bool               IsFileOrSocket;
@@ -255,7 +249,7 @@ extern "C" {
             
             uint64_t Path2OpenSize = strlen(Path2Open) + 1;
             char *NewPath = (char*) calloc(1, Path2OpenSize);
-            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitI->FileSpecifierNum + 1);
+            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitI->FileSpecifierNum + 1); // FIXME: HANDLE FORMAT STRINGS BETTER
             BitI->FileSpecifierNum += 1;
             
             if (OpenForReadWrite == true) {
@@ -278,7 +272,7 @@ extern "C" {
         } else {
             uint64_t Path2OpenSize = strlen(Path2Open) + 1;
             char *NewPath = (char*) calloc(1, Path2OpenSize);
-            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitO->FileSpecifierNum);
+            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitO->FileSpecifierNum + 1); // FIXME: HANDLE FORMAT STRINGS BETTER
             
             BitO->File = fopen(Path2Open, "wb");
             if (BitO->File == NULL) {
@@ -294,38 +288,6 @@ extern "C" {
         } else {
             BitIOGlobalLogFile = fopen(LogFilePath, "a+");
         }
-    }
-    
-    void OpenInputSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol) {
-        if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenInputSocket", "Pointer to BitInput is NULL");
-        } else {
-#ifdef _POSIX_VERSION
-            BitI->Socket         = socket(Domain, Type, Protocol);
-            BitI->IsFileOrSocket = &socket;
-#elif  _WIN32
-#endif
-        }
-    }
-    
-    void OpenOutputSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol) {
-        if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenOutputSocket", "Pointer to BitInput is NULL");
-        } else {
-#ifdef _POSIX_VERSION
-            BitO->Socket         = socket(Domain, Type, Protocol);
-            BitO->IsFileOrSocket = &socket;
-#elif  _WIN32
-#endif
-        }
-    }
-    
-    void ConnectInputSocket(BitInput *BitI) {
-        
-    }
-    
-    void ConnectOutputSocket(BitOutput *BitO) {
-        
     }
     
     void SkipBits(BitBuffer *BitB, const int64_t Bits2Skip) {
@@ -492,7 +454,7 @@ extern "C" {
         return GUIDString;
     }
     
-    uint8_t *ConvertGUID2UUID(const uint8_t *GUIDString) { // TODO: We should probably deprecate this
+    uint8_t *ConvertGUID2UUID(const uint8_t *GUIDString) {
         uint8_t *BinaryGUID = NULL;
         uint8_t *BinaryUUID = NULL;
         uint8_t *UUIDString = NULL;
@@ -560,7 +522,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "BitI pointer is NULL");
         } else if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "BitB pointer is NULL");
-        } else if (Bytes2Read > BitI->FileSize - BitI->FilePosition) {
+        } else if (Bytes2Read > (BitI->FileSize - BitI->FilePosition)) {
             Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "You tried reading more data: % than is available: %d in the file", Bytes2Read, BitI->FileSize - BitI->FilePosition);
         } else {
             if (BitB->Buffer != NULL) {
@@ -595,6 +557,38 @@ extern "C" {
                 Buffer2Write->NumBits -= Bytes2Bits(BytesWritten);
             }
         }
+    }
+    
+    void OpenInputSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol) {
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "OpenInputSocket", "Pointer to BitInput is NULL");
+        } else {
+#ifdef _POSIX_VERSION
+            BitI->Socket         = socket(Domain, Type, Protocol);
+            BitI->IsFileOrSocket = &socket;
+#elif  _WIN32
+#endif
+        }
+    }
+    
+    void OpenOutputSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol) {
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "OpenOutputSocket", "Pointer to BitInput is NULL");
+        } else {
+#ifdef _POSIX_VERSION
+            BitO->Socket         = socket(Domain, Type, Protocol);
+            BitO->IsFileOrSocket = &socket;
+#elif  _WIN32
+#endif
+        }
+    }
+    
+    void ConnectInputSocket(BitInput *BitI) {
+        
+    }
+    
+    void ConnectOutputSocket(BitOutput *BitO) {
+        
     }
     
     void Log(const uint8_t ErrorSeverity, const char *LibraryOrProgram, const char *FunctionName, const char *Description, ...) {
