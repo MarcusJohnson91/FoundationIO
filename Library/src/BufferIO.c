@@ -595,24 +595,27 @@ extern "C" {
     void Log(const uint8_t ErrorSeverity, const char *LibraryOrProgram, const char *FunctionName, const char *Description, ...) {
         uint64_t FunctionNameSize = 0ULL, DescriptionSize = 0ULL;
         
-        char *EasyString = calloc(1, 1 + strlen(FunctionName) + strlen(Description) + 2); // the 1 is for the error severity + 2 for the NULs
+        
+        int   EasyStringSize = strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + 1; // Plus 1 for the terminating NULL
+        char *EasyString     = calloc(1, EasyStringSize); // the 1 is for the error severity + 2 for the NULs
         snprintf(EasyString, FunctionNameSize + DescriptionSize, "%hhu: %s - %s", ErrorSeverity, FunctionName, Description);
         
-        char *HardString = calloc(1, BitIOStringSize); // FIXME: REMOVE BITIOSTRINGSIZE
         va_list Arguments;
         va_start(Arguments, Description);
-        vsprintf(HardString, "%s", Arguments);
+        int HardStringSize = 0;
+        char *HardString = NULL;
+        HardStringSize = vsnprintf(NULL, 0, "%s", Arguments);
         va_end(Arguments);
         
-        uint64_t ErrorStringSize = strlen(EasyString) + strlen(HardString) + 2;
+        uint64_t ErrorStringSize = EasyStringSize + HardStringSize + BitIONewLineSize;
         char *ErrorString = calloc(1, ErrorStringSize);
-        snprintf(ErrorString, ErrorStringSize, "%s%s", EasyString, HardString);
+        snprintf(ErrorString, ErrorStringSize, "%s%s%s", EasyString, HardString, BitIONewLine);
         if (BitIOGlobalLogFile == NULL) {
             // Set STDERR As the output file
-            fprintf(stderr, "%s%s", ErrorString, BitIONewLine);
+            fprintf(stderr, "%s%s", ErrorString);
         } else {
             // Use BitO->LogFile as the output file
-            fprintf(BitIOGlobalLogFile, "%s%s", ErrorString, BitIONewLine);
+            fprintf(BitIOGlobalLogFile, "%s%s", ErrorString);
         }
     }
     
