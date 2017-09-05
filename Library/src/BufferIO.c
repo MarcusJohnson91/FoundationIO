@@ -27,6 +27,12 @@ extern "C" {
     
     extern FILE           *BitIOGlobalLogFile = NULL; // ONLY global variable in all of BitIO
     
+    struct              BitBuffer {
+        uint64_t        NumBits;
+        uint64_t        BitOffset;
+        uint8_t        *Buffer;
+    };
+    /*
     typedef struct BitBuffer {
         uint64_t           BitsAvailable;
         uint64_t           BitsUnavailable;
@@ -206,7 +212,7 @@ extern "C" {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "GetBitBufferPosition", "Pointer to BitInput is NULL");
         } else {
-            Position = BitB->BitsUnavailable;
+            Position = BitB->BitOffset;
         }
         return Position;
     }
@@ -326,9 +332,11 @@ extern "C" {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "SkipBits", "Pointer to BitBuffer is NULL");
         } else {
-            BitB->BitsAvailable   -= Bits2Skip;
-            BitB->BitsUnavailable += Bits2Skip;
-            // The file/stream updating functions need to keep this in mind.
+            if (Bits2Skip < 0) {
+                BitB->BitOffset -= Bits2Skip;
+            } else {
+                BitB->BitOffset += Bits2Skip;
+            }
         }
     }
     
@@ -339,7 +347,7 @@ extern "C" {
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
             Log(LOG_ERR, "libBitIO", "IsBitBufferAligned", "BytesOfAlignment: %d isn't a power of 2 (or 1)", BytesOfAlignment);
         } else {
-            if ((BitB->BitsUnavailable % Bytes2Bits(BytesOfAlignment)) == 0) {
+            if ((BitB->BitOffset % Bytes2Bits(BytesOfAlignment)) == 0) {
                 AlignmentStatus = true;
             } else {
                 AlignmentStatus = false;
@@ -354,10 +362,9 @@ extern "C" {
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
             Log(LOG_ERR, "libBitIO", "AlignBitBuffer", "BytesOfAlignment: %d isn't a power of 2 (or 1)", BytesOfAlignment);
         } else {
-            uint8_t Bits2Align = BitB->BitsUnavailable % Bytes2Bits(BytesOfAlignment);
+            uint8_t Bits2Align = BitB->BitOffset % Bytes2Bits(BytesOfAlignment);
             if (Bits2Align != 0) {
-                BitB->BitsAvailable   -= Bits2Align;
-                BitB->BitsUnavailable += Bits2Align;
+                BitB->BitOffset       += Bytes2Bits(BytesOfAlignment);
             }
         }
     }
@@ -567,8 +574,7 @@ extern "C" {
                 if (BytesRead            != Bytes2Read) {
                     Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "Fread read: %d bytes, but you requested: %d", BytesRead, Bytes2Read);
                 } else {
-                    BitB->BitsAvailable   = Bytes2Bits(BytesRead);
-                    BitB->BitsUnavailable = 0ULL;
+                    BitB->NumBits         = Bytes2Bits(BytesRead);
                 }
             }
         }
@@ -582,12 +588,11 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "Buffer2Write pointer is NULL");
         } else {
             // Write the bytes in BitB->Buffer to BitO->File
-            BytesWritten              = fwrite(Buffer2Write->Buffer, 1, Bytes2Write, BitO->File);
-            if (BytesWritten         != Bytes2Write) {
+            BytesWritten               = fwrite(Buffer2Write->Buffer, 1, Bytes2Write, BitO->File);
+            if (BytesWritten != Bytes2Write) {
                 Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "Fwrite wrote: %d bytes, but you requested: %d", BytesWritten, Bytes2Write);
             } else {
-                Buffer2Write->BitsAvailable   = Bytes2Bits(BytesWritten);
-                Buffer2Write->BitsUnavailable = 0ULL;
+                Buffer2Write->NumBits -= Bytes2Bits(BytesWritten);
             }
         }
     }

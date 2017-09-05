@@ -140,8 +140,8 @@ extern "C" {
     /*!
      @typedef           BitBuffer
      @abstract                                    "Contains variables and a pointer to a buffer for reading and writing bits".
-     @constant          BitsAvailable             "The number of bits available for reading".
-     @constant          BitsUnavailable           "The number of bits previously read, or available for writing".
+     @constant          NumBits                   "The number of bits in the buffer".
+     @constant          BitOffset                 "The number of bits previously read/written".
      @constant          Buffer                    "A pointer to an unsigned byte buffer".
      */
     typedef struct      BitBuffer                 BitBuffer;
