@@ -32,23 +32,23 @@ extern "C" {
         uint64_t           BitsUnavailable;
         uint8_t           *Buffer;
     } BitBuffer;
-    
-    typedef struct BitInput {
+    */
+    struct BitInput {
         FILE              *File;
         bool               IsFileOrSocket;
         int                Socket;
         fpos_t             FileSize;
         fpos_t             FilePosition;
         uint64_t           FileSpecifierNum;
-    } BitInput;
+    };
     
-    typedef struct BitOutput {
+    struct BitOutput {
         FILE              *File;
         bool               IsFileOrSocket;
         int                Socket;
         fpos_t             FilePosition;
         uint64_t           FileSpecifierNum;
-    } BitOutput;
+    };
     
     BitInput *InitBitInput(void) {
         BitInput *BitI        = (BitInput*) calloc(1, sizeof(BitInput));
