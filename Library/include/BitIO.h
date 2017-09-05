@@ -67,10 +67,13 @@ extern "C" {
     
 #ifndef BitIONewLine
 #ifdef _POSIX_VERSION
+#define BitIONewLineSize 1
 #define BitIONewLine ("\n")
 #elif  _WIN32
+#define BitIONewLineSize 2
 #define BitIONewLine ("\r\n")
 #elif Macintosh
+#define BitIONewLineSize 1
 #define BitIONewLine ("\r")
 #endif
 #endif /* BitIONewLine */
@@ -78,16 +81,12 @@ extern "C" {
     /*!
      @enum              BitIOConstants
      @abstract                                    "BitIO compile time constants".
-     @remark                                      "Change the buffer sizes here".
-     
-     @constant          BitIOStringSize           "Maximum size of a string in BitIO".
      @constant          BitIOUUIDStringSize       "Size of a UUIDString including dashes and null terminator".
      @constant          BitIOGUIDStringSize       "Size of a GUIDString including dashes and null terminator".
      @constant          BitIOBinaryUUIDSize       "Size of a binary UUID string".
      @constant          BitIOBinaryGUIDSize       "Size of a binary GUID string".
      */
     enum BitIOConstants {
-                        BitIOStringSize           = 4096,
                         BitIOUUIDStringSize       = 21,
                         BitIOGUIDStringSize       = BitIOUUIDStringSize,
                         BitIOBinaryUUIDSize       = 16,
