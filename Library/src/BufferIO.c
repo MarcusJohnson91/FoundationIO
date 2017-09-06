@@ -25,7 +25,7 @@ extern "C" {
 #define strcasecmp _stricmp
 #endif
     
-    extern FILE           *BitIOGlobalLogFile = NULL;
+    static FILE           *BitIOGlobalLogFile = NULL;
     
     struct                 BitBuffer {
         uint64_t           NumBits;
