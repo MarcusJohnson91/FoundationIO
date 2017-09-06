@@ -358,27 +358,50 @@ extern "C" {
      @remark                                      "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
      @param             BitB                      "Pointer to the instance of BitBuffer".
      */
-    uint8_t            *ReadUUID(BitBuffer *BitB);
+    uint8_t            *ReadBinaryUUID(BitBuffer *BitB);
+    
+    /*!
+     @abstract                                    "Reads raw UUID/GUID from the bitstream".
+     @remark                                      "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
+     @param             BitB                      "Pointer to the instance of BitBuffer".
+     */
+    uint8_t            *ReadUUIDString(BitBuffer *BitB);
+    
+    /*!
+     @abstract                                    "Reads raw UUID/GUID from the bitstream".
+     @remark                                      "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
+     @param             BitB                      "Pointer to the instance of BitBuffer".
+     */
+    uint8_t            *ReadBinaryGUID(BitBuffer *BitB);
+    
+    /*!
+     @abstract                                    "Reads raw UUID/GUID from the bitstream".
+     @remark                                      "UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
+     @param             BitB                      "Pointer to the instance of BitBuffer".
+     */
+    uint8_t            *ReadGUIDString(BitBuffer *BitB);
     
     /*!
      @abstract                                    "Converts a UUIDString to a GUIDString by swapping the endian of each section".
      @param             UUIDString                "An array containing the UUID in string form".
+     @return                                      "Returns a pointer to a GUIDString".
      */
-    uint8_t            *ConvertUUID2GUID(const uint8_t *UUIDString);
+    uint8_t            *ConvertUUIDString2GUIDString(const uint8_t *UUIDString);
     
     /*!
      @abstract                                    "Converts a GUIDString to a UUIDString by swapping the endian of each section".
      @param             GUIDString                "An array containing the converted UUID in string form".
+     @return                                      "Returns a pointer to a UUIDString".
      */
-    uint8_t            *ConvertGUID2UUID(const uint8_t *GUIDString);
+    uint8_t            *ConvertGUIDString2UUIDString(const uint8_t *GUIDString);
     
     /*!
-     @abstract                                    "Verify two UUIDs match each other".
+     @abstract                                    "Verify two UUIDStrings match each other".
      @remark                                      "Matches hyphens and NULL terminating character as well, it's pretty literal".
      @param             UUIDString1               "Pointer to a UUIDString to be matched against".
      @param             UUIDString2               "Pointer to a UUIDString to match against UUIDString1".
      */
-    bool                CompareUUIDs(const uint8_t *UUIDString1, const uint8_t *UUIDString2);
+    bool                CompareUUIDStrings(const uint8_t *UUIDString1, const uint8_t *UUIDString2);
     
     /*!
      @abstract                                    "Write UUID/GUID string as hyphen-less blob".

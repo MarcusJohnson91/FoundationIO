@@ -51,7 +51,7 @@ extern "C" {
     };
     
     BitInput *InitBitInput(void) {
-        BitInput *BitI        = (BitInput*) calloc(1, sizeof(BitInput));
+        BitInput *BitI        = calloc(1, sizeof(BitInput));
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "InitBitInput", "Not enough memory to allocate this instance of BitInput");
         }
@@ -59,7 +59,7 @@ extern "C" {
     }
     
     BitOutput *InitBitOutput(void) {
-        BitOutput *BitO       = (BitOutput*) calloc(1, sizeof(BitOutput));
+        BitOutput *BitO       = calloc(1, sizeof(BitOutput));
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "InitBitOutput", "Not enough memory to allocate this instance of BitOutput");
         }
@@ -67,8 +67,8 @@ extern "C" {
     }
     
     BitBuffer *InitBitBuffer(const uint64_t BitBufferSize) {
-        BitBuffer *BitB       = (BitBuffer*) calloc(1, sizeof(BitBuffer));
-        BitB->Buffer          =              calloc(1, BitBufferSize);
+        BitBuffer *BitB       = calloc(1, sizeof(BitBuffer));
+        BitB->Buffer          = calloc(1, BitBufferSize);
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "InitBitBuffer", "Not enough memory to allocate this instance of BitBuffer");
         } else if (BitB->Buffer == NULL) {
@@ -166,7 +166,7 @@ extern "C" {
     fpos_t BytesRemainingInBitInput(BitInput *BitI) {
         fpos_t BytesLeft = 0ULL;
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "BytesRemainingInInputFile", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "BytesRemainingInBitInput", "Pointer to BitInput is NULL");
         } else {
             BytesLeft = BitI->FileSize - BitI->FilePosition;
         }
@@ -204,7 +204,7 @@ extern "C" {
     uint64_t GetBitBufferPosition(BitBuffer *BitB) {
         uint64_t Position = 0ULL;
         if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitBufferPosition", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "GetBitBufferPosition", "Pointer to BitBuffer is NULL");
         } else {
             Position = BitB->BitOffset;
         }
@@ -246,18 +246,15 @@ extern "C" {
              
              Also, we need to be able to store when/if FileSpecifierNum has been updated.
              */
-            
             uint64_t Path2OpenSize = strlen(Path2Open) + 1;
-            char *NewPath = (char*) calloc(1, Path2OpenSize);
+            char *NewPath = calloc(1, Path2OpenSize);
             snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitI->FileSpecifierNum + 1); // FIXME: HANDLE FORMAT STRINGS BETTER
             BitI->FileSpecifierNum += 1;
-            
             if (OpenForReadWrite == true) {
                 BitI->File = fopen(Path2Open, "rb+");
             } else {
                 BitI->File = fopen(Path2Open, "rb");
             }
-            
             if (BitI->File == NULL) {
                 Log(LOG_ERR, "libBitIO", "OpenInputFile", "Couldn't open file: Check that the file exists and the permissions are correct");
             }
@@ -268,15 +265,15 @@ extern "C" {
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenOutputFile", "Pointer to BitOutput is NULL");
         } else if (Path2Open == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenOutputFile", "Fopen error: Pointer is NULL");
+            Log(LOG_ERR, "libBitIO", "OpenOutputFile", "Pointer to Path2Open is NULL");
         } else {
             uint64_t Path2OpenSize = strlen(Path2Open) + 1;
-            char *NewPath = (char*) calloc(1, Path2OpenSize);
+            char *NewPath          = calloc(1, Path2OpenSize);
             snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitO->FileSpecifierNum + 1); // FIXME: HANDLE FORMAT STRINGS BETTER
             
             BitO->File = fopen(Path2Open, "wb");
             if (BitO->File == NULL) {
-                Log(LOG_ALERT, "libBitIO", "OpenOutputFile", "Couldn't open file: Check that the file exists and the permissions are correct");
+                Log(LOG_ALERT, "libBitIO", "OpenOutputFile", "Couldn't open output file; Check that the path exists and the permissions are correct");
             }
         }
     }
@@ -284,7 +281,7 @@ extern "C" {
     void OpenLogFile(const char *LogFilePath) {
         if (LogFilePath == NULL) {
             BitIOGlobalLogFile = NULL;
-            Log(LOG_ERR, "libBitIO", "OpenLogFile", "LogFilePath is NULL");
+            Log(LOG_ERR, "libBitIO", "OpenLogFile", "Pointer to LogFilePath is NULL");
         } else {
             BitIOGlobalLogFile = fopen(LogFilePath, "a+");
         }
@@ -307,7 +304,7 @@ extern "C" {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "IsBitBufferAligned", "Pointer to BitBuffer is NULL");
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
-            Log(LOG_ERR, "libBitIO", "IsBitBufferAligned", "BytesOfAlignment: %d isn't a power of 2 (or 1)", BytesOfAlignment);
+            Log(LOG_ERR, "libBitIO", "IsBitBufferAligned", "BytesOfAlignment: %d isn't an integer power of 2", BytesOfAlignment);
         } else {
             if ((BitB->BitOffset % Bytes2Bits(BytesOfAlignment)) == 0) {
                 AlignmentStatus = true;
@@ -341,7 +338,7 @@ extern "C" {
         } else if (sizeof(BinaryUUID) != BitIOBinaryUUIDSize) {
             Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "BinaryUUID size should be: %d, but is: %d", BitIOBinaryUUIDSize, sizeof(BinaryUUID));
         } else {
-            UUIDString = (uint8_t*) calloc(1, BitIOUUIDStringSize);
+            UUIDString = calloc(1, BitIOUUIDStringSize);
             if (UUIDString == NULL) {
                 Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "Not enough memory to allocate UUIDString");
             } else {
@@ -359,15 +356,71 @@ extern "C" {
         return UUIDString;
     }
     
-    uint8_t *ReadUUID(BitBuffer *BitB) {
+    uint8_t *ReadBinaryUUID(BitBuffer *BitB) {
         uint8_t *UUIDString = NULL;
         if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadUUID", "Pointer to BitBuffer is NULL");
+            Log(LOG_ERR, "libBitIO", "ReadBinaryUUID", "Pointer to BitBuffer is NULL");
         } else {
-            uint8_t *BinaryUUID = (uint8_t*) calloc(1, BitIOBinaryUUIDSize);
+            uint8_t *BinaryUUID = calloc(1, BitIOBinaryUUIDSize);
+            if (BinaryUUID == NULL) {
+                Log(LOG_ERR, "libBitIO", "ReadBinaryUUID", "Not enough memory to allocate BinaryUUID");
+            } else {
+                for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
+                    BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
+                }
+                UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
+            }
+        }
+        return UUIDString;
+    }
+    
+    uint8_t *ReadUUIDString(BitBuffer *BitB) {
+        uint8_t *UUIDString = NULL;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadUUIDString", "Pointer to BitBuffer is NULL");
+        } else {
+            uint8_t *BinaryUUID = calloc(1, BitIOBinaryUUIDSize);
             
             if (BinaryUUID == NULL) {
-                Log(LOG_ERR, "libBitIO", "ReadUUID", "Not enough memory to allocate BinaryUUID");
+                Log(LOG_ERR, "libBitIO", "ReadUUIDString", "Not enough memory to allocate BinaryUUID");
+            } else {
+                for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
+                    BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
+                }
+                UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
+            }
+        }
+        return UUIDString;
+    }
+    
+    uint8_t *ReadBinaryGUID(BitBuffer *BitB) {
+        uint8_t *UUIDString = NULL;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadBinaryGUID", "Pointer to BitBuffer is NULL");
+        } else {
+            uint8_t *BinaryUUID = calloc(1, BitIOBinaryUUIDSize);
+            
+            if (BinaryUUID == NULL) {
+                Log(LOG_ERR, "libBitIO", "ReadBinaryGUID", "Not enough memory to allocate BinaryUUID");
+            } else {
+                for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
+                    BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
+                }
+                UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
+            }
+        }
+        return UUIDString;
+    }
+    
+    uint8_t *ReadGUIDString(BitBuffer *BitB) {
+        uint8_t *UUIDString = NULL;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadGUIDString", "Pointer to BitBuffer is NULL");
+        } else {
+            uint8_t *BinaryUUID = calloc(1, BitIOBinaryUUIDSize);
+            
+            if (BinaryUUID == NULL) {
+                Log(LOG_ERR, "libBitIO", "ReadGUIDString", "Not enough memory to allocate BinaryUUID");
             } else {
                 for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
                     BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
@@ -388,7 +441,7 @@ extern "C" {
         } else if (sizeof(UUIDString) != BitIOUUIDStringSize) {
             Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "UUIDString size should be: %d, but is: %d", BitIOUUIDStringSize, sizeof(UUIDString));
         } else {
-            BinaryUUID = (uint8_t*) calloc(1, BitIOBinaryUUIDSize);
+            BinaryUUID = calloc(1, BitIOBinaryUUIDSize);
             
             if (BinaryUUID == NULL) {
                 Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "Not enough memory to allocate BinaryUUID");
@@ -411,7 +464,7 @@ extern "C" {
         } else if (sizeof(BinaryUUID) != BitIOBinaryUUIDSize) {
             Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "BinaryUUID size should be: %d, but is: %d", BitIOBinaryUUIDSize, sizeof(BinaryUUID));
         } else {
-            SwappedBinaryUUID = (uint8_t*) calloc(1, BitIOBinaryUUIDSize);
+            SwappedBinaryUUID = calloc(1, BitIOBinaryUUIDSize);
             if (SwappedBinaryUUID == NULL) {
                 Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "Not enough memory to allocate SwappedBinaryUUID");
             } else {
@@ -433,18 +486,18 @@ extern "C" {
         return SwappedBinaryUUID;
     }
     
-    uint8_t *ConvertUUID2GUID(const uint8_t *UUIDString) {
+    uint8_t *ConvertUUIDString2GUIDString(const uint8_t *UUIDString) {
         uint8_t *BinaryUUID = NULL;
         uint8_t *BinaryGUID = NULL;
         uint8_t *GUIDString = NULL;
         
         if (UUIDString == NULL) {
-            Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "Pointer to UUIDString is NULL");
+            Log(LOG_ERR, "libBitIO", "ConvertUUIDString2GUIDString", "Pointer to UUIDString is NULL");
         } else {
-            GUIDString = (uint8_t*) calloc(1, BitIOGUIDStringSize);
+            GUIDString = calloc(1, BitIOGUIDStringSize);
             
             if (GUIDString == NULL) {
-                Log(LOG_ERR, "libBitIO", "ConvertUUID2GUID", "Not enough memory to allocate GUIDString");
+                Log(LOG_ERR, "libBitIO", "ConvertUUIDString2GUIDString", "Not enough memory to allocate GUIDString");
             } else {
                 BinaryUUID = ConvertUUIDString2BinaryUUID(UUIDString);
                 BinaryGUID = SwapBinaryUUID(BinaryUUID);
@@ -454,18 +507,18 @@ extern "C" {
         return GUIDString;
     }
     
-    uint8_t *ConvertGUID2UUID(const uint8_t *GUIDString) {
+    uint8_t *ConvertGUIDString2UUIDString(const uint8_t *GUIDString) {
         uint8_t *BinaryGUID = NULL;
         uint8_t *BinaryUUID = NULL;
         uint8_t *UUIDString = NULL;
         
         if (GUIDString == NULL) {
-            Log(LOG_ERR, "libBitIO", "ConvertGUID2UUID", "Pointer to GUIDString is NULL");
+            Log(LOG_ERR, "libBitIO", "ConvertGUIDString2UUIDString", "Pointer to GUIDString is NULL");
         } else {
-            UUIDString = (uint8_t*) calloc(1, BitIOUUIDStringSize);
+            UUIDString = calloc(1, BitIOUUIDStringSize);
             
             if (UUIDString == NULL) {
-                Log(LOG_ERR, "libBitIO", "ConvertGUID2UUID", "Not enough memory to allocate UUIDString");
+                Log(LOG_ERR, "libBitIO", "ConvertGUIDString2UUIDString", "Not enough memory to allocate UUIDString");
             } else {
                 BinaryGUID = ConvertUUIDString2BinaryUUID(GUIDString);
                 BinaryUUID = SwapBinaryUUID(BinaryGUID);
@@ -475,13 +528,13 @@ extern "C" {
         return UUIDString;
     }
     
-    bool CompareUUIDs(const uint8_t *UUIDString1, const uint8_t *UUIDString2) {
+    bool CompareUUIDStrings(const uint8_t *UUIDString1, const uint8_t *UUIDString2) {
         bool UUIDsMatch = 0;
         
         if (UUIDString1 == NULL) {
-            Log(LOG_ERR, "libBitIO", "CompareUUIDs", "Pointer to UUIDString1 is NULL");
+            Log(LOG_ERR, "libBitIO", "CompareUUIDStrings", "Pointer to UUIDString1 is NULL");
         } else if (UUIDString2 == NULL) {
-            Log(LOG_ERR, "libBitIO", "CompareUUIDs", "Pointer to UUIDString2 is NULL");
+            Log(LOG_ERR, "libBitIO", "CompareUUIDStrings", "Pointer to UUIDString2 is NULL");
         } else {
             for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDStringSize - 1; UUIDByte++) {
                 if (UUIDString1[UUIDByte] != UUIDString2[UUIDByte]) {
@@ -496,7 +549,7 @@ extern "C" {
     
     void WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString) {
         if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteUUID", "Pointer to instance of BitBuffer is NULL");
+            Log(LOG_ERR, "libBitIO", "WriteUUID", "Pointer to BitBuffer is NULL");
         } else if (UUIDString == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteUUID", "Pointer to UUIDString is NULL");
         } else {
@@ -519,18 +572,18 @@ extern "C" {
     void ReadBitInput2BitBuffer(BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read) { // It's the user's job to ensure buffers and files are kept in sync, not mine.
         uint64_t BytesRead              = 0ULL;
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "BitI pointer is NULL");
+            Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "Pointer to BitInput is NULL");
         } else if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "BitB pointer is NULL");
+            Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "Pointer to BitBuffer is NULL");
         } else if (Bytes2Read > (BitI->FileSize - BitI->FilePosition)) {
             Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "You tried reading more data: % than is available: %d in the file", Bytes2Read, BitI->FileSize - BitI->FilePosition);
         } else {
             if (BitB->Buffer != NULL) {
                 free(BitB->Buffer);
             }
-            BitB->Buffer                  = (uint8_t*) calloc(1, Bytes2Read);
+            BitB->Buffer                  = calloc(1, Bytes2Read);
             if (BitB->Buffer == NULL) {
-                Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "Not enough memory to allocate BitB->Buffer");
+                Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "Not enough memory to allocate Buffer in BitBuffer");
             } else {
                 BytesRead                 = fread(BitB->Buffer, 1, Bytes2Read, BitI->File);
                 if (BytesRead            != Bytes2Read) {
@@ -545,9 +598,9 @@ extern "C" {
     void WriteBitBuffer2BitOutput(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write) { // FIXME Assuming we wrote the whole buffer
         uint64_t BytesWritten           = 0ULL;
         if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "BitI pointer is NULL");
+            Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "Pointer to BitInput is NULL");
         } else if (Buffer2Write == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "Buffer2Write pointer is NULL");
+            Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "Pointer to BitBuffer is NULL");
         } else {
             // Write the bytes in BitB->Buffer to BitO->File
             BytesWritten               = fwrite(Buffer2Write->Buffer, 1, Bytes2Write, BitO->File);
@@ -584,10 +637,19 @@ extern "C" {
     }
     
     void ConnectInputSocket(BitInput *BitI) {
-        
+        if (BitI == NULL) {
+            Log(LOG_ERR, "libBitIO", "ConnectInputSocket", "Pointer to BitOutput is NULL");
+        } else {
+            
+        }
     }
     
     void ConnectOutputSocket(BitOutput *BitO) {
+        if (BitO == NULL) {
+            Log(LOG_ERR, "libBitIO", "ConnectOutputSocket", "Pointer to BitOutput is NULL");
+        } else {
+            
+        }
         
     }
     
