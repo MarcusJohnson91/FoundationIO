@@ -185,7 +185,7 @@ extern "C" {
     
     void SetCLISwitchAsMaster(CommandLineIO *CLI, const uint64_t Switch, const bool IsMaster) {
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "Pointer to CommandLineIO is NULL");
+            Log(LOG_ERR, "libBitIO", "SetCLISwitchAsMaster", "Pointer to CommandLineIO is NULL");
         } else {
             CLI->Switches[Switch].IsMasterSwitch = IsMaster;
         }
@@ -246,7 +246,7 @@ extern "C" {
         }
     }
     
-    static void DisplayCLIHelp(CommandLineIO *CLI) {
+    static inline void DisplayCLIHelp(CommandLineIO *CLI) {
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "DisplayCLIHelp", "Pointer to CommandLineIO is NULL");
         } else {
@@ -270,7 +270,7 @@ extern "C" {
         }
     }
     
-    static void DisplayProgramBanner(CommandLineIO *CLI) {
+    static inline void DisplayProgramBanner(CommandLineIO *CLI) {
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "DisplayProgramBanner", "Pointer to CommandLineIO is NULL");
         } else {
