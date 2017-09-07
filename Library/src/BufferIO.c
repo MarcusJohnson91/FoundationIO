@@ -248,7 +248,7 @@ extern "C" {
              */
             uint64_t Path2OpenSize = strlen(Path2Open) + 1;
             char *NewPath = calloc(1, Path2OpenSize);
-            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitI->FileSpecifierNum + 1); // FIXME: HANDLE FORMAT STRINGS BETTER
+            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitI->FileSpecifierNum += 1); // FIXME: HANDLE FORMAT STRINGS BETTER
             BitI->FileSpecifierNum += 1;
             if (OpenForReadWrite == true) {
                 BitI->File = fopen(Path2Open, "rb+");
@@ -269,7 +269,7 @@ extern "C" {
         } else {
             uint64_t Path2OpenSize = strlen(Path2Open) + 1;
             char *NewPath          = calloc(1, Path2OpenSize);
-            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitO->FileSpecifierNum + 1); // FIXME: HANDLE FORMAT STRINGS BETTER
+            snprintf(NewPath, Path2OpenSize, "%s", Path2Open, BitO->FileSpecifierNum += 1); // FIXME: HANDLE FORMAT STRINGS BETTER
             
             BitO->File = fopen(Path2Open, "wb");
             if (BitO->File == NULL) {
