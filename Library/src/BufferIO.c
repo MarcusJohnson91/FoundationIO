@@ -291,6 +291,9 @@ extern "C" {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "SkipBits", "Pointer to BitBuffer is NULL");
         } else {
+            if (Bits2Skip + BitB->BitOffset > BitB->NumBits) {
+                BitB->Buffer = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Skip, true));
+            }
             BitB->BitOffset += Bits2Skip;
         }
     }
@@ -302,7 +305,7 @@ extern "C" {
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
             Log(LOG_ERR, "libBitIO", "IsBitBufferAligned", "BytesOfAlignment: %d isn't an integer power of 2", BytesOfAlignment);
         } else {
-            if (Bytes2Bits(BytesOfAlignment) - (8 - (BitB->BitOffset % 8)) == 0) { // if BitOffset = 2, thie byte needs to be padded with 6 bits.
+            if (Bytes2Bits(BytesOfAlignment) - (8 - (BitB->BitOffset % 8)) == 0) {
                 AlignmentStatus = true;
             } else {
                 AlignmentStatus = false;
@@ -318,6 +321,9 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "AlignBitBuffer", "BytesOfAlignment: %d isn't a power of 2 (or 1)", BytesOfAlignment);
         } else {
             uint8_t Bits2Align = Bytes2Bits(BytesOfAlignment) - (8 - (BitB->BitOffset % 8));
+            if (Bits2Align + BitB->BitOffset > BitB->NumBits) {
+                BitB->Buffer = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, true));
+            }
             BitB->BitOffset   += Bits2Align;
         }
     }
@@ -596,7 +602,6 @@ extern "C" {
         } else if (Buffer2Write == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "Pointer to BitBuffer is NULL");
         } else {
-            // Write the bytes in BitB->Buffer to BitO->File
             BytesWritten               = fwrite(Buffer2Write->Buffer, 1, Bytes2Write, BitO->File);
             if (BytesWritten != Bytes2Write) {
                 Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "Fwrite wrote: %d bytes, but you requested: %d", BytesWritten, Bytes2Write);
