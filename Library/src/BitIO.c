@@ -321,10 +321,8 @@ extern "C" {
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
             Log(LOG_ERR, "libBitIO", "AlignBitBuffer", "BytesOfAlignment: %d isn't a power of 2 (or 1)", BytesOfAlignment);
         } else {
-            uint8_t Bits2Align = BitB->BitOffset % Bytes2Bits(BytesOfAlignment);
-            if (Bits2Align != 0) {
-                BitB->BitOffset       += Bytes2Bits(BytesOfAlignment);
-            }
+            uint8_t Bits2Align = Bytes2Bits(BytesOfAlignment) - (BitB->BitOffset % 8);
+            BitB->BitOffset   += Bytes2Bits(BytesOfAlignment);
         }
     }
     
