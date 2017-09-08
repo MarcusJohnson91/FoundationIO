@@ -306,7 +306,7 @@ extern "C" {
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
             Log(LOG_ERR, "libBitIO", "IsBitBufferAligned", "BytesOfAlignment: %d isn't an integer power of 2", BytesOfAlignment);
         } else {
-            if ((BitB->BitOffset % Bytes2Bits(BytesOfAlignment)) == 0) {
+            if (Bytes2Bits(BytesOfAlignment) - (BitB->BitOffset % 8) == 0) {
                 AlignmentStatus = true;
             } else {
                 AlignmentStatus = false;

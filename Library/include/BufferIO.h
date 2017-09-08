@@ -342,12 +342,14 @@ extern "C" {
     
     /*!
      @abstract                                    "Tells if the stream/buffer is byte aligned or not".
+     @remark                                      "Checks the stream is aligned on an BytesOfAlignment boundary, not that there are X bits of padding".
      @param             BytesOfAlignment          "Are you trying to see if it's aligned to a byte, short, word, etc alignment? Specify in number of bytes".
      */
     bool                IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment);
     
     /*!
      @abstract                                    "Aligns bits for multi-byte alignment".
+     @remark                                      "Aligns the stream on a BytesOfAlignment boundary, it does NOT add (BytesOfAlignment * 8) bits of padding".
      @param             BitB                      "Pointer to the instance of BitBuffer".
      @param             BytesOfAlignment          "Align BitB to X byte boundary".
      */
