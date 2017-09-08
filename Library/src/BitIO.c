@@ -291,11 +291,7 @@ extern "C" {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "SkipBits", "Pointer to BitBuffer is NULL");
         } else {
-            if (Bits2Skip < 0) {
-                BitB->BitOffset -= Bits2Skip;
-            } else {
-                BitB->BitOffset += Bits2Skip;
-            }
+            BitB->BitOffset += Bits2Skip;
         }
     }
     
