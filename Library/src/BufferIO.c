@@ -105,6 +105,10 @@ extern "C" {
         }
     }
     
+    void DeinitBitIOGlobalLogFile(void) {
+        fclose(BitIOGlobalLogFile);
+    }
+    
     inline uint8_t SwapBitsInByte(const uint8_t Byte) {
         return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
     }
@@ -287,17 +291,6 @@ extern "C" {
         }
     }
     
-    void SkipBits(BitBuffer *BitB, const int64_t Bits2Skip) {
-        if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "SkipBits", "Pointer to BitBuffer is NULL");
-        } else {
-            if (Bits2Skip + BitB->BitOffset > BitB->NumBits) {
-                BitB->Buffer = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Skip, true));
-            }
-            BitB->BitOffset += Bits2Skip;
-        }
-    }
-    
     bool IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
         bool AlignmentStatus = 0;
         if (BitB == NULL) {
@@ -325,6 +318,17 @@ extern "C" {
                 BitB->Buffer = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, true));
             }
             BitB->BitOffset   += Bits2Align;
+        }
+    }
+    
+    void SkipBits(BitBuffer *BitB, const int64_t Bits2Skip) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "SkipBits", "Pointer to BitBuffer is NULL");
+        } else {
+            if (Bits2Skip + BitB->BitOffset > BitB->NumBits) {
+                BitB->Buffer = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Skip, true));
+            }
+            BitB->BitOffset += Bits2Skip;
         }
     }
     
