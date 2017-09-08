@@ -306,7 +306,7 @@ extern "C" {
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
             Log(LOG_ERR, "libBitIO", "IsBitBufferAligned", "BytesOfAlignment: %d isn't an integer power of 2", BytesOfAlignment);
         } else {
-            if (Bytes2Bits(BytesOfAlignment) - (BitB->BitOffset % 8) == 0) {
+            if (Bytes2Bits(BytesOfAlignment) - (8 - (BitB->BitOffset % 8)) == 0) { // if BitOffset = 2, thie byte needs to be padded with 6 bits.
                 AlignmentStatus = true;
             } else {
                 AlignmentStatus = false;
@@ -321,8 +321,8 @@ extern "C" {
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
             Log(LOG_ERR, "libBitIO", "AlignBitBuffer", "BytesOfAlignment: %d isn't a power of 2 (or 1)", BytesOfAlignment);
         } else {
-            uint8_t Bits2Align = Bytes2Bits(BytesOfAlignment) - (BitB->BitOffset % 8);
-            BitB->BitOffset   += Bytes2Bits(BytesOfAlignment);
+            uint8_t Bits2Align = Bytes2Bits(BytesOfAlignment) - (8 - (BitB->BitOffset % 8));
+            BitB->BitOffset   += Bits2Align;
         }
     }
     
