@@ -95,10 +95,9 @@ extern "C" {
     /*!
      @abstract                                      "Sets SwitchNum's flag in the CommandLineIO instance pointed by CLI".
      @param               CLI                       "Pointer to CommandLineIO".
-     @param               Switch                    "Which switch are we talking about?"
-     @param               IsMaster                  "Is Switch a master switch?"
+     @param               Switch                    "Which switch are we talking about?".
      */
-    void                  SetCLISwitchAsMaster(CommandLineIO *CLI, const uint64_t Switch, const bool IsMaster);
+    void                  SetCLISwitchAsMaster(CommandLineIO *CLI, const uint64_t Switch);
     
     /*!
      @abstract                                      "Sets MetaFlag switch as a meta flag for switch SwitchNum".
