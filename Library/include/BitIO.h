@@ -448,7 +448,7 @@ extern "C" {
      @param             FunctionName              "Which function is calling Log?".
      @param             Description               "String describing what went wrong / error code".
      */
-    void                Log(const uint8_t ErrorSeverity, const char *restrict LibraryOrProgram, const char *restrict FunctionName, const char *restrict Description, ...);
+    void                Log(const uint8_t ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...);
     
 #ifdef __cplusplus
 }
