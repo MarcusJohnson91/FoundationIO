@@ -210,6 +210,11 @@ extern "C" {
     void                DeinitBitBuffer(BitBuffer *BitB);
     
     /*!
+     @abstract                                    "Closes the GlobalLogFile".
+     */
+    void                DeinitBitIOGlobalLogFile(void);
+    
+    /*!
      @abstract                                    "Swap bits in a byte".
      @param             Byte                      "Byte to swap bits".
      */
@@ -443,7 +448,7 @@ extern "C" {
      @param             FunctionName              "Which function is calling Log?".
      @param             Description               "String describing what went wrong / error code".
      */
-    void                Log(const uint8_t ErrorSeverity, const char *LibraryOrProgram, const char *FunctionName, const char *Description, ...);
+    void                Log(const uint8_t ErrorSeverity, const char *restrict LibraryOrProgram, const char *restrict FunctionName, const char *restrict Description, ...);
     
 #ifdef __cplusplus
 }

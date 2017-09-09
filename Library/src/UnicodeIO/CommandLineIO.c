@@ -183,11 +183,11 @@ extern "C" {
         }
     }
     
-    void SetCLISwitchAsMaster(CommandLineIO *CLI, const uint64_t Switch, const bool IsMaster) {
+    void SetCLISwitchAsMaster(CommandLineIO *CLI, const uint64_t Switch) {
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCLISwitchAsMaster", "Pointer to CommandLineIO is NULL");
         } else {
-            CLI->Switches[Switch].IsMasterSwitch = IsMaster;
+            CLI->Switches[Switch].IsMasterSwitch = true;
         }
     }
     
@@ -347,9 +347,6 @@ extern "C" {
                                         for (uint64_t MatchingChildArgs = 0ULL; MatchingChildArgs < NumArgsMatchingArgvPlus1; MatchingChildArgs++) {
                                             CLI->Arguments[ChildSwitch].ChildArguments[MatchingChildArgs] = GetCLISwitchNumFromFlag(CLI, argv[Argument + 1]);
                                         }
-                                        
-                                        
-                                        
                                     }
                                     free(ChildSingleDashFlag);
                                     free(ChildDoubleDashFlag);

@@ -656,7 +656,7 @@ extern "C" {
         
     }
     
-    void Log(const uint8_t ErrorSeverity, const char *LibraryOrProgram, const char *FunctionName, const char *Description, ...) {
+    void Log(const uint8_t ErrorSeverity, const char *restrict LibraryOrProgram, const char *restrict FunctionName, const char *restrict Description, ...) {
         int   EasyStringSize = strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + 1; // Plus 1 for the terminating NULL
         char *EasyString     = calloc(1, EasyStringSize); // the 1 is for the error severity + 2 for the NULs
         snprintf(EasyString, EasyStringSize, "%hhu: %s - %s", ErrorSeverity, FunctionName, Description);
