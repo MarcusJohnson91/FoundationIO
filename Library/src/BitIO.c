@@ -520,7 +520,6 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ConvertGUIDString2UUIDString", "Pointer to GUIDString is NULL");
         } else {
             UUIDString = calloc(1, BitIOUUIDStringSize);
-            
             if (UUIDString == NULL) {
                 Log(LOG_ERR, "libBitIO", "ConvertGUIDString2UUIDString", "Not enough memory to allocate UUIDString");
             } else {
@@ -663,14 +662,16 @@ extern "C" {
         
         va_list Arguments;
         va_start(Arguments, Description);
-        int HardStringSize = 0;
-        char *HardString = NULL;
-        HardStringSize = vsnprintf(NULL, 0, "%s", Arguments);
+        int HardStringSize = vsnprintf(NULL, 0, "%s", Arguments);
+        char *HardString   = calloc(1, HardStringSize);
+        vsprintf(HardString, "%s", Arguments);
         va_end(Arguments);
         
         uint64_t ErrorStringSize = EasyStringSize + HardStringSize + BitIONewLineSize;
         char *ErrorString = calloc(1, ErrorStringSize);
         snprintf(ErrorString, ErrorStringSize, "%s%s%s", EasyString, HardString, BitIONewLine);
+        free(EasyString);
+        free(HardString);
         if (BitIOGlobalLogFile == NULL) {
             // Set STDERR As the output file
             fprintf(stderr, "%s", ErrorString);
@@ -678,6 +679,7 @@ extern "C" {
             // Use BitO->LogFile as the output file
             fprintf(BitIOGlobalLogFile, "%s", ErrorString);
         }
+        free(ErrorString);
     }
     
 #ifdef __cplusplus
