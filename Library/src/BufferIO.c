@@ -670,8 +670,6 @@ extern "C" {
         uint64_t ErrorStringSize = EasyStringSize + HardStringSize + BitIONewLineSize;
         char *ErrorString = calloc(1, ErrorStringSize);
         snprintf(ErrorString, ErrorStringSize, "%s%s%s", EasyString, HardString, BitIONewLine);
-        free(EasyString);
-        free(HardString);
         if (BitIOGlobalLogFile == NULL) {
             // Set STDERR As the output file
             fprintf(stderr, "%s", ErrorString);
@@ -679,6 +677,8 @@ extern "C" {
             // Use BitO->LogFile as the output file
             fprintf(BitIOGlobalLogFile, "%s", ErrorString);
         }
+        free(EasyString);
+        free(HardString);
         free(ErrorString);
     }
     
