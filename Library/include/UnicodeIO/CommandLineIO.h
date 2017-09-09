@@ -139,7 +139,7 @@ extern "C" {
      @param               argc                      "Main's argc, for the number of arguments entered".
      @param               argv                      "Main's argv, for the actual arguments the user has entered".
      */
-    void                  ParseCommandLineArguments(CommandLineIO *CLI, const int argc, char *argv[]);
+    void                  ParseCommandLineArguments(CommandLineIO *CLI, const int argc, const char *argv[]);
     
     /*!
      @abstract                                      "Parses CommandLine arguments and counts the copies of a given switch found".
