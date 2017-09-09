@@ -148,7 +148,7 @@ extern "C" {
     
     /*!
      @typedef           BitInput
-     @abstract                                    "Contains File/Socket pointers for reading to a BitBuffer.
+     @abstract                                    "Contains File/Socket pointers for reading to a BitBuffer".
      @constant          File                      "Input File/Socket to read into a BitBuffer".
      @constant          FileSize                  "Size of the File in bytes".
      @constant          FilePosition              "Current byte in the file".
@@ -197,15 +197,15 @@ extern "C" {
     void                DeinitBitInput(BitInput *BitI);
     
     /*!
-     @abstract                                    "Deallocates the instance of BitOutput pointed to by BitI"
+     @abstract                                    "Deallocates the instance of BitOutput pointed to by BitI".
      @remark                                      "For use when changing files, or exiting the program".
      @param             BitO                      "Pointer to the instance of BitOutput you want to delete".
      */
     void                DeinitBitOutput(BitOutput *BitO);
     
     /*!
-     @abstract                                    "Deallocates the instance of BitBuffer pointed to by BitB"
-     @param             BitB                      "Pointer to the instance of BitBuffer you want to delete"
+     @abstract                                    "Deallocates the instance of BitBuffer pointed to by BitB".
+     @param             BitB                      "Pointer to the instance of BitBuffer you want to delete".
      */
     void                DeinitBitBuffer(BitBuffer *BitB);
     
@@ -251,13 +251,13 @@ extern "C" {
      @abstract                                    "Computes the number of bytes from the number of bits".
      @return                                      "Returns The number of bytes".
      @param             Bits                      "The bits to convert to bytes".
-     @param             RoundUp                   "Should the resulting bytes be rounded up or down?"
+     @param             RoundUp                   "Should the resulting bytes be rounded up or down?".
      */
     inline int64_t      Bits2Bytes(const int64_t Bits, const bool RoundUp);
     
     /*!
      @abstract                                    "Computes the number of bits required to hold a certain amount of symbols".
-     @remark                                      "Rounds up to the next integer bits to ensure all symbols can be contained in simple binary"
+     @remark                                      "Rounds up to the next integer bits to ensure all symbols can be contained in simple binary".
      @param             NumSymbols                "The number of symbols you're looking to contain in a binary number".
      */
     inline uint64_t     NumBits2ReadSymbols(const uint64_t NumSymbols);
@@ -302,7 +302,7 @@ extern "C" {
     uint64_t            GetBitBufferSize(BitBuffer *BitB);
     
     /*!
-     @abstract                                    "Seeks to the end of BitI->File to determine the size"
+     @abstract                                    "Seeks to the end of BitI->File to determine the size".
      @param             BitI                      "Pointer to the instance of BitInput".
      */
     void                FindFileSize(BitInput *BitI);
@@ -328,12 +328,18 @@ extern "C" {
      */
     void                OpenLogFile(const char *LogFilePath);
     
+    /*!
+     @abstract                                    "Opens a socket for reading".
+     */
     void                OpenInputSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol);
     
+    /*!
+     @abstract                                    "Opens a socket for writing".
+     */
     void                OpenOutputSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol);
     
     /*!
-     @abstract                                    "Seeks Forwards and backwards in BitInput"
+     @abstract                                    "Seeks Forwards and backwards in BitInput".
      @remark                                      "To seek backwards just use a negative number, to seek forwards positive".
      @param             BitB                      "Pointer to the instance of BitBuffer".
      @param             Bits2Skip                 "The number of bits to skip".
@@ -414,11 +420,11 @@ extern "C" {
     void                WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString);
     
     /*!
-     @abstract                                    "Reads Bytes2Read into a buffer pointed to by BitB from InputFile"
+     @abstract                                    "Reads Bytes2Read into a buffer pointed to by BitB from InputFile".
      @remark                                      "If the pointer to BitBuffer is not new, all the old contents will be lost".
      @param             BitI                      "Pointer to BitInput".
      @param             BitB                      "Pointer to BitBuffer to put the bytes into".
-     @param             Bytes2Read                "The number of bytes to read from the InputFile into the Buffer"
+     @param             Bytes2Read                "The number of bytes to read from the InputFile into the Buffer".
      */
     void                ReadBitInput2BitBuffer(BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read);
     
@@ -426,7 +432,7 @@ extern "C" {
      @abstract                                    "Writes a BitBuffer to a file, kinda shitty tho".
      @param             BitO                      "Pointer to BitOutput to write the buffer to".
      @param             Buffer2Write              "The buffer to be written to the output file".
-     @param             Bytes2Write               "The number of bytes from the buffer to write to the file"
+     @param             Bytes2Write               "The number of bytes from the buffer to write to the file".
      */
     void                WriteBitBuffer2BitOutput(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write);
     
