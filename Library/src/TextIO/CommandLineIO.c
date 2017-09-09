@@ -292,7 +292,7 @@ extern "C" {
         }
     }
     
-    void ParseCommandLineArguments(CommandLineIO *CLI, const int argc, char *argv[]) {
+    void ParseCommandLineArguments(CommandLineIO *CLI, const int argc, const char *argv[]) {
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineIO is NULL");
         } else if (argc <= 1 || (argc < (int) CLI->MinSwitches && CLI->MinSwitches > 1) || argv == NULL) {
