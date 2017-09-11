@@ -21,8 +21,8 @@ Here's a tl;dr of my license:
 Compiling:
 ----------
 * libBitIO alone won't do a whole lot for you, it's real use is in being a library other libraries rely on.
-* When compiling you need to set the variables `ByteOrder` and `BitOrder` to `LSByte/MSByte` and `LSBit/MSBit` for the byte and bit order your CPU targets.
-* The makefile by defaults builds the library as a static library, in release form, to change this set `BUILDTYPE` to DEBUG.
+* When compiling you need to set the macros `LSByte/MSByte` and `LSBit/MSBit` for the byte and bit order of your CPU targets, if you're using libbitIO as a dependency, make sure to edit your makefile to pass those parameters.
+* The makefile by defaults builds the library as a static library, for RELEASE, to change this set `BUILDTYPE` to DEBUG.
 * BitIO is included as a submodule in git, so you don't need to install it if you're using one of my libraries, ModernPNG, ModernFLAC, ModernAVC, etc.
 * On my Mac for AMD64, the libBitIO static library is about 200kb, if that's too big for your use, enable link time optimization on your program to trim unused functions.
 
