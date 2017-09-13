@@ -65,19 +65,6 @@
 extern "C" {
 #endif
     
-#ifndef BitIONewLine
-#ifdef _POSIX_VERSION
-#define BitIONewLineSize 1
-#define BitIONewLine ("\n")
-#elif  _WIN32
-#define BitIONewLineSize 2
-#define BitIONewLine ("\r\n")
-#elif Macintosh
-#define BitIONewLineSize 1
-#define BitIONewLine ("\r")
-#endif
-#endif /* BitIONewLine */
-    
     /*!
      @enum              BitIOConstants
      @abstract                                    "BitIO compile time constants".
