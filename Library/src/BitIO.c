@@ -654,6 +654,17 @@ extern "C" {
     }
     
     void Log(const uint8_t ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...) {
+#ifdef _POSIX_VERSION
+        uint8_t    NewLineSize = 1;
+        const char NewLine[1]  = {"\n"};
+#elif Macintosh
+        uint8_t    NewLineSize = 1;
+        const char NewLine[1]  = {"\r"};
+#elif  _WIN32
+        uint8_t    NewLineSize = 2;
+        const char NewLine[2]  = {"\r\n"};
+#endif
+        
         int   EasyStringSize = strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + 1; // Plus 1 for the terminating NULL
         char *EasyString     = calloc(1, EasyStringSize); // the 1 is for the error severity + 2 for the NULs
         snprintf(EasyString, EasyStringSize, "%hhu: %s - %s", ErrorSeverity, FunctionName, Description);
@@ -665,9 +676,9 @@ extern "C" {
         vsprintf(HardString, "%s", Arguments);
         va_end(Arguments);
         
-        uint64_t ErrorStringSize = EasyStringSize + HardStringSize + BitIONewLineSize;
+        uint64_t ErrorStringSize = EasyStringSize + HardStringSize + NewLineSize;
         char *ErrorString = calloc(1, ErrorStringSize);
-        snprintf(ErrorString, ErrorStringSize, "%s%s%s", EasyString, HardString, BitIONewLine);
+        snprintf(ErrorString, ErrorStringSize, "%s%s%s", EasyString, HardString, NewLine);
         if (BitIOGlobalLogFile == NULL) {
             // Set STDERR As the output file
             fprintf(stderr, "%s", ErrorString);
