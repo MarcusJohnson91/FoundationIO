@@ -576,7 +576,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "Pointer to BitInput is NULL");
         } else if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "Pointer to BitBuffer is NULL");
-        } else if (Bytes2Read > (BitI->FileSize - BitI->FilePosition)) {
+        } else if (Bytes2Read > (uint64_t)(BitI->FileSize - BitI->FilePosition)) {
             Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "You tried reading more data: % than is available: %d in the file", Bytes2Read, BitI->FileSize - BitI->FilePosition);
         } else {
             if (BitB->Buffer != NULL) {
