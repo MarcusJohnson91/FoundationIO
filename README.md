@@ -13,6 +13,7 @@ libBitIO is released under the terms of the 3 clause [`Revised BSD`](https://tld
 
 Here's a tl;dr of my license:
 
+* **Do** If you fork BitIO, change the name.
 * **Do** include in your acknowledgments a link to [BitIO on GitHub](https://www.github.com/MarcusJohnson91/FoundationIO).
 * **Don't** plagiarize BitIO.
 * **Don't** relicense BitIO.
