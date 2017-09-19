@@ -6,6 +6,7 @@
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
  */
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -19,42 +20,45 @@
 #include <unistd.h>
 #endif
 
-#ifndef BITIOBYTEBITORDERS
-#define BITIOBYTEBITORDERS
+#ifndef    BITIOBYTEBITORDERS
+#define    BITIOBYTEBITORDERS
+#ifndef    BitIOLSByte
+#define    BitIOLSByte     ULLONG_MAX
+typedef unsigned long long BitBLSByte_t;
+#endif  /* BitIOLittleEndian */
+#ifndef    BitIOMSByte
+#define    BitIOMSByte     LLONG_MIN
+typedef signed long long   BitBMSByte_t;
+#endif  /* BitIOBigEndian */
+#ifndef    BitIOLSBit
+#define    BitIOLSBit      ULLONG_MAX
+typedef unsigned long long BitBLSBit_t;
+#endif  /* BitIOLSBit */
+#ifndef    BitIOMSBit
+#define    BitIOMSBit      LLONG_MIN
+typedef signed long long   BitBMSBit_t;
+#endif  /* BitIOMSBit */
+#endif  /* BITIOBYTEBITORDERS */
 
-#ifndef BITIOUNKNOWNENDIAN
-#define BITIOUNKNOWNENDIAN   0
-#endif  /* BITIOUNKNOWNENDIAN */
-
-#ifndef BITIOUNKNOWNBITORDER
-#define BITIOUNKNOWNBITORDER 1
-#endif  /* BITIOUNKNOWNBITORDER */
-
-#ifndef BITIOLITTLEENDIAN
-#define BITIOLITTLEENDIAN    2
-#endif  /* LITTLEENDIAN */
-
-#ifndef BITIOBIGENDIAN
-#define BITIOBIGENDIAN       3
-#endif  /* BITIOBIGENDIAN */
-
-#ifndef BITIOLSBitFIRST
-#define BITIOLSBitFIRST      4
-#endif  /* BITIOLSBitFIRST */
-
-#ifndef BITIOMSBitFIRST
-#define BITIOMSBitFIRST      5
-#endif  /* BITIOMSBitFIRST */
-
-#ifndef TARGETBYTEORDER
-#define TARGETBYTEORDER
-#endif  /* TARGETBYTEORDER */
-
-#ifndef TARGETBITORDER
-#define TARGETBITORDER
-#endif  /* TARGETBITORDER */
-
-#endif /* BITIOBYTEBITORDERS */
+#ifndef   BITIOGUUIDTYPES
+#define   BITIOGUUIDTYPES
+#ifndef   BitIOGUIDString
+#define   BitIOGUIDString  ULLONG_MAX
+typedef unsigned long long GUIDString_t;
+#endif /* BitIOGUIDString */
+#ifndef   BitIOUUIDString
+#define   BitIOUUIDString  LLONG_MIN
+typedef signed long long   UUIDString_t;
+#endif /* BitIOUUIDString */
+#ifndef   BitIOBinaryGUID
+#define   BitIOBinaryGUID  UCHAR_MAX
+typedef unsigned char      BinaryGUID_t;
+#endif /* BitIOBinaryGUID */
+#ifndef   BitIOBinaryUUID
+#define   BitIOBinaryUUID  CHAR_MIN
+typedef signed char        BinaryUUID_t;
+#endif /* BITIOGUUIDTYPES */
+#endif /* BITIOGUUIDTYPES */
 
 #pragma once
 
@@ -337,6 +341,62 @@ extern "C" {
      @param             Bits2Skip                 "The number of bits to skip".
      */
     void                SkipBits(BitBuffer *BitB, const int64_t Bits2Skip);
+    
+    uint64_t            ReadBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read);
+    uint64_t            ReadBitsFromLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read);
+    uint64_t            ReadBitsFromMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read);
+    uint64_t            ReadBitsFromMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read);
+    
+#define ReadBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Read)\
+_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsFromLSByteLSBit,BitBMSBit_t:ReadBitsFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsFromMSByteLSBit,BitBMSBit_t:ReadBitsFromMSByteMSBit))(BitB,Bits2Read)
+    
+    uint64_t            PeekBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
+    uint64_t            PeekBitsFromLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
+    uint64_t            PeekBitsFromMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
+    uint64_t            PeekBitsFromMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
+    
+#define PeekBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Peek)\
+_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsFromLSByteLSBit,BitBMSBit_t:PeekBitsFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsFromMSByteLSBit,BitBMSBit_t:PeekBitsFromMSByteMSBit))(BitB,Bits2Peek)
+    
+    uint64_t            ReadUnaryFromLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+    uint64_t            ReadUnaryFromLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+    uint64_t            ReadUnaryFromMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+    uint64_t            ReadUnaryFromMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+    
+#define ReadUnary(BitBByteOrder,BitBBitOrder,BitB,IsStrictlyPositive,StopBit)\
+_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryFromLSByteLSBit,BitBMSBit_t:ReadUnaryFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryFromMSByteLSBit,BitBMSBit_t:ReadUnaryFromMSByteMSBit))(BitB,IsStrictlyPositive,StopBit)
+    
+    uint64_t            ReadExpGolombFromLSByteLSBit(BitBuffer *BitB, const bool IsSigned);
+    uint64_t            ReadExpGolombFromLSByteMSBit(BitBuffer *BitB, const bool IsSigned);
+    uint64_t            ReadExpGolombFromMSByteLSBit(BitBuffer *BitB, const bool IsSigned);
+    uint64_t            ReadExpGolombFromMSByteMSBit(BitBuffer *BitB, const bool IsSigned);
+    
+#define ReadExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned)\
+_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromLSByteLSBit,BitBMSBit_t:ReadExpGolombFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromMSByteLSBit,BitBMSBit_t:ReadExpGolombFromMSByteMSBit))(BitB,IsSigned)
+    
+    void                WriteBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    void                WriteBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    void                WriteBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    void                WriteBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    
+#define WriteBits(BitBByteOrder,BitBBitOrder,BitB,NumBits2Write,Bits2Insert)\
+_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsLSByteLSBit,BitBMSBit_t:WriteBitsAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsMSByteLSBit,BitBMSBit_t:WriteBitsAsMSByteMSBit))(BitB,NumBits2Write,Bits2Insert)
+    
+    uint8_t            *ReadGUUIDAsUUIDString(BitBuffer *BitB);
+    uint8_t            *ReadGUUIDAsGUIDString(BitBuffer *BitB);
+    uint8_t            *ReadGUUIDAsBinaryUUID(BitBuffer *BitB);
+    uint8_t            *ReadGUUIDAsBinaryGUID(BitBuffer *BitB);
+    
+#define ReadGUUID(GUUIDType,BitB)\
+_Generic((GUUIDType),BitIOUUIDString_t:ReadGUUIDAsUUIDString,BitIOGUIDString_t:ReadGUUIDAsGUIDString,BitIOBinaryUUID_t:ReadGUUIDAsBinaryUUID,BitIOBinaryGUID_t:ReadGUUIDAsBinaryGUID)(BitB)
+    
+    uint8_t            *WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString);
+    uint8_t            *WriteGUUIDAsGUIDString(BitBuffer *BitB, const uint8_t *GUIDString);
+    uint8_t            *WriteGUUIDAsBinaryUUID(BitBuffer *BitB, const uint8_t *BinaryUUID);
+    uint8_t            *WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID);
+    
+#define WriteGUUID(GUUIDType,BitB,GUUID)\
+_Generic((GUUIDType),BitIOUUIDString_t:WriteGUUIDAsUUIDString,BitIOGUIDString_t:WriteGUUIDAsGUIDString,BitIOBinaryUUID_t:WriteGUUIDAsBinaryUUID,BitIOBinaryGUID_t:WriteGUUIDAsBinaryGUID)(BitB,GUUID)
     
     /*!
      @abstract                                    "Tells if the stream/buffer is byte aligned or not".
