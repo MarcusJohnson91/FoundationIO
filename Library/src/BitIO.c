@@ -334,6 +334,354 @@ extern "C" {
         }
     }
     
+    static inline uint64_t ExtractBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Extract) { // So this function reads data FROM Little endian, Least Significant Bit first
+        uint64_t OutputData        = 0ULL;
+        uint8_t  UserRequestedBits = Bits2Extract;
+        
+        while (UserRequestedBits > 0) { // What happens when the user requests more bits than are available in this byte? bit offset % 8 = 6, user requests 3 bits,only 2 bits can be fulfilled from this byte. wait, this means we shouldn't assume 8 bits are availble, but calculate it as part of the loop.
+            uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
+            uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Get);
+#ifdef RuntimeLSByte
+#ifdef RuntimeLSBit
+            OutputData           <<= Bits2Get;
+            // Extract as is
+#elif  RuntimeMSBit
+            uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+            OutputData           >>= Bits2Get;
+            // Extract and flip bit order
+#endif
+#elif  RuntimeMSByte
+#ifdef RuntimeLSBit
+            // Extract and flip byte order
+            OutputData             & (0xFF << (Bits2Extract - Bits2Get)); // Byte shift
+            OutputData           <<= Bits2Get; // Bit shift
+#elif  RuntimeMSBit
+            uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+            OutputData             & (0xFF << (Bits2Extract - Bits2Get)); // Byte Shift
+            OutputData           >>= Bits2Get; // Bit shift
+                                               // Extract and flip the byte order AND bit order
+#endif
+#endif
+            OutputData            += Data;
+            UserRequestedBits     -= Bits2Get;
+        }
+        return OutputData;
+    }
+    
+    static inline uint64_t ExtractBitsFromMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Extract) { // So the bits are in MSByte, MSBit format.
+        uint64_t OutputData        = 0ULL;
+        uint8_t  UserRequestedBits = Bits2Extract;
+        
+        while (UserRequestedBits > 0) {
+            uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
+            uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskMSBit(Bits2Get);
+#ifdef RuntimeLSByte
+#ifdef RuntimeLSBit
+            OutputData             & (0xFF << (Bits2Extract - Bits2Get)); // Byte Shift
+            uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+            // Convert MSByte MSBit to LSByte LSBit
+#elif  RuntimeMSBit
+            OutputData             & (0xFF << (Bits2Extract - Bits2Get)); // Byte Shift
+                                                                          // Convert MSByte MSBit to LSByte MSBit
+#endif
+#elif  RuntimeMSByte
+#ifdef RuntimeLSBit
+            uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+            // Convert MSByte MSBit to MSByte LSBit
+#elif  RuntimeMSBit
+            // Convert MSByte MSBit to MSByte MSBit aka extract.
+#endif
+#endif
+            OutputData           >>= BitB->BitOffset - Bits2Get;
+            OutputData            += Data;
+            UserRequestedBits     -= Bits2Get;
+        }
+        return 0ULL;
+    }
+    
+    static inline uint64_t ExtractBitsFromLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Extract) {
+        uint64_t OutputData        = 0ULL;
+        uint8_t  UserRequestedBits = Bits2Extract;
+        
+        while (UserRequestedBits > 0) {
+            uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
+            uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskMSBit(Bits2Get);
+#ifdef RuntimeLSByte
+#ifdef RuntimeLSBit
+            uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+#elif  RuntimeMSBit
+            //
+#endif
+#elif  RuntimeMSByte
+#ifdef RuntimeLSBit
+            uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+#elif  RuntimeMSBit
+            //
+#endif
+#endif
+            OutputData           >>= BitB->BitOffset - Bits2Get;
+            OutputData            += Data;
+            UserRequestedBits     -= Bits2Get;
+        }
+        return 0ULL;
+    }
+    
+    static inline uint64_t ExtractBitsFromMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Extract) { // So the data needs to be 0x6E7C
+        uint64_t OutputData        = 0ULL;
+        uint8_t  UserRequestedBits = Bits2Extract;
+        while (UserRequestedBits > 0) {
+            uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
+            uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Get);
+#ifdef RuntimeLSByte
+#ifdef RuntimeLSBit
+            /*
+             Extract data from Big Endian MSBit first, to little endian least significant bit first
+             So, if we need to extract 3 bits because the buffer is full, we need to extract them from the left aka mask with 0xE0
+             and we need to apply them as 0x7, aka rightshift 8 - Bits2Read=3 aka 5.
+             */
+            // SO the bits need to be extracted from BitBuffer as LSBit? and applied as LSBit
+            // It is 0x7C6E
+#elif  RuntimeMSBit
+            // Extract the bits as LSBit, and apply them as MSBit.
+            uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+            // Is is 0x3E76
+#endif
+#elif  RuntimeMSByte
+#ifdef RuntimeLSBit
+            // Extract the bits as LSBit and apply them as LSBit
+            // Swap Bytes
+            // It is 0x6E7C
+#elif  RuntimeMSBit
+            // Extract the bits as LSBit and apply them as MSBit
+            uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+            // It is 0x763E
+#endif
+#endif
+            OutputData           >>= BitB->BitOffset - Bits2Get;
+            OutputData            += Data;
+            UserRequestedBits     -= Bits2Get;
+        }
+        return OutputData;
+    }
+    
+    uint64_t PeekBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek) {
+        uint64_t OutputData = 0ULL;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "PeekBitsFromLSByteLSBit", "Pointer to BitBuffer is NULL");
+        } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
+            Log(LOG_ERR, "libBitIO", "PeekBitsFromLSByteLSBit", "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
+        } else {
+            OutputData = ExtractBitsFromLSByteLSBit(BitB, Bits2Peek);
+        }
+        return OutputData;
+    }
+    
+    uint64_t PeekBitsFromLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek) {
+        uint64_t OutputData = 0ULL;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "PeekBitsFromLSByteMSBit", "Pointer to BitBuffer is NULL");
+        } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
+            Log(LOG_ERR, "libBitIO", "PeekBitsFromLSByteMSBit", "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
+        } else {
+            OutputData = ExtractBitsFromLSByteMSBit(BitB, Bits2Peek);
+        }
+        return OutputData;
+    }
+    
+    uint64_t PeekBitsFromMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek) {
+        uint64_t OutputData = 0ULL;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "PeekBitsFromMSByteLSBit", "Pointer to BitBuffer is NULL");
+        } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
+            Log(LOG_ERR, "libBitIO", "PeekBitsFromMSByteLSBit", "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
+        } else {
+            OutputData = ExtractBitsFromMSByteLSBit(BitB, Bits2Peek);
+        }
+        return OutputData;
+    }
+    
+    uint64_t PeekBitsFromMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek) {
+        uint64_t OutputData = 0ULL;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "PeekBitsFromMSByteMSBit", "Pointer to BitBuffer is NULL");
+        } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
+            Log(LOG_ERR, "libBitIO", "PeekBitsFromMSByteMSBit", "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
+        } else {
+            OutputData = ExtractBitsFromMSByteMSBit(BitB, Bits2Peek);
+        }
+        return OutputData;
+    }
+    
+    uint64_t ReadBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read) {
+        uint64_t OutputData = 0ULL;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadBitsFromLSByteLSBit", "Pointer to BitBuffer is NULL");
+        } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
+            Log(LOG_ERR, "libBitIO", "ReadBitsFromLSByteLSBit", "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
+        } else {
+            // Ok, we need to do absolutely nothing.
+            OutputData         = ExtractBitsFromLSByteLSBit(BitB, Bits2Read);
+            BitB->BitOffset   += Bits2Read;
+        }
+        return OutputData;
+    }
+    
+    uint64_t ReadBitsFromLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read) {
+        uint64_t OutputData = 0ULL;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadBitsFromLSByteMSBit", "Pointer to BitBuffer is NULL");
+        } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
+            Log(LOG_ERR, "libBitIO", "ReadBitsFromLSByteMSBit", "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
+        } else {
+            // Ok, we need to just swap the bit order
+            OutputData         = ExtractBitsFromLSByteMSBit(Bits2Read, Bits2Read);
+            BitB->BitOffset   += Bits2Read;
+        }
+        return OutputData;
+    }
+    
+    uint64_t ReadBitsFromMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read) {
+        uint64_t OutputData = 0ULL;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadBitsFromMSByteLSBit", "Pointer to BitBuffer is NULL");
+        } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
+            Log(LOG_ERR, "libBitIO", "ReadBitsFromMSByteLSBit", "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
+        } else {
+            // Ok, we need to read it, and swap endian.
+            OutputData         = ExtractBitsFromMSByteLSBit(BitB, Bits2Read);
+            BitB->BitOffset   += Bits2Read;
+        }
+        return OutputData;
+    }
+    
+    uint64_t ReadBitsFromMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read) {
+        uint64_t OutputData = 0ULL;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "ReadBitsFromMSByteMSBit", "Pointer to BitBuffer is NULL");
+        } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
+            Log(LOG_ERR, "libBitIO", "ReadBitsFromMSByteMSBit", "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
+        } else {
+            // Ok, we need to read it normally except swap the bit order in a byte, and swap endian.
+            OutputData         = ExtractBitsFromMSByteMSBit(BitB, Bits2Read);
+            BitB->BitOffset   += Bits2Read;
+        }
+        return OutputData;
+    }
+    
+    static inline void InsertBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
+        // Write data from LSByte (LSBit is default) to LSByte,LSBit
+        // What variables do we need to take into account? Just the BitsAvailable, and looping...
+        uint8_t Bits = NumBits2Insert;
+        
+        while (Bits > 0) {
+            uint64_t Bits2Put      = NumBits2ExtractFromByte(BitB->BitOffset, Bits);
+            uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Put);
+#ifdef RuntimeLSByte
+#ifdef RuntimeLSBit
+            // Extract as is
+#elif  RuntimeMSBit
+            uint8_t FinalByte      = SwapBits(Data, Bits2Put);
+            // Extract and flip bit order
+#endif
+#elif  RuntimeMSByte
+#ifdef RuntimeLSBit
+            // Extract and flip byte order
+#elif  RuntimeMSBit
+            uint8_t FinalByte      = SwapBits(Data, Bits2Put);
+            // Extract and flip the byte order AND bit order
+#endif
+#endif
+            Bits                  -= Bits2Put;
+        }
+    }
+    
+    static inline void InsertBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
+        // Write data from LSByte (LSBit is default) to LSByte,LSBit
+        // What variables do we need to take into account? Just swapping bit order, BitsAvailable, and looping...
+    }
+    
+    static inline void InsertBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
+        // Write data from LSByte (LSBit is default) to MSByte, LSBit.
+        // What variables do we need to take into account? Just swapping byte order, BitsAvailable, and looping...
+    }
+    
+    static inline void InsertBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
+        // Write data from LSByte (LSBit is default) to MSByte, LSBit.
+        // What variables do we need to take into account? Just swapping byte and bit order, BitsAvailable, and looping...
+    }
+    
+    void WriteBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteBitsAsLSByteLSBit", "Pointer to BitBuffer is NULL");
+        } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
+            Log(LOG_ERR, "libBitIO", "WriteBitsAsLSByteLSBit", "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
+        } else {
+            InsertBitsAsLSByteLSBit(BitB, NumBits2Write, Bits2Write);
+        }
+    }
+    
+    void WriteBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteBitsAsLSByteMSBit", "Pointer to BitBuffer is NULL");
+        } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
+            Log(LOG_ERR, "libBitIO", "WriteBitsAsLSByteMSBit", "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
+        } else {
+            InsertBitsAsLSByteMSBit(BitB, NumBits2Write, Bits2Write);
+        }
+    }
+    
+    void WriteBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteBitsAsMSByteLSBit", "Pointer to BitBuffer is NULL");
+        } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
+            Log(LOG_ERR, "libBitIO", "WriteBitsAsMSByteLSBit", "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
+        } else {
+            InsertBitsAsMSByteLSBit(BitB, NumBits2Write, Bits2Write);
+        }
+    }
+    
+    void WriteBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteBitsAsMSByteMSBit", "Pointer to BitBuffer is NULL");
+        } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
+            Log(LOG_ERR, "libBitIO", "WriteBitsAsMSByteMSBit", "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
+        } else {
+            InsertBitsAsMSByteMSBit(BitB, NumBits2Write, Bits2Write);
+        }
+    }
+    
+    uint8_t *ReadGUUIDAsUUIDString(BitBuffer *BitB) {
+        return NULL;
+    }
+    
+    uint8_t *ReadGUUIDAsGUIDString(BitBuffer *BitB) {
+        return NULL;
+    }
+    
+    uint8_t *ReadGUUIDAsBinaryUUID(BitBuffer *BitB) {
+        return NULL;
+    }
+    
+    uint8_t *ReadGUUIDAsBinaryGUID(BitBuffer *BitB) {
+        return NULL;
+    }
+    
+    uint8_t *WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString) {
+        return NULL;
+    }
+    
+    uint8_t *WriteGUUIDAsGUIDString(BitBuffer *BitB, const uint8_t *GUIDString) {
+        return NULL;
+    }
+    
+    uint8_t *WriteGUUIDAsBinaryUUID(BitBuffer *BitB, const uint8_t *BinaryUUID) {
+        return NULL;
+    }
+    
+    uint8_t *WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID) {
+        return NULL;
+    }
+    /*
     static uint8_t *ConvertBinaryUUID2UUIDString(const uint8_t *BinaryUUID) {
         uint8_t *UUIDString = NULL;
         
@@ -561,6 +909,7 @@ extern "C" {
             }
         }
     }
+     */
     
     /*
      So, I need to accept packets of variable size, from the network, disk, whatever.
