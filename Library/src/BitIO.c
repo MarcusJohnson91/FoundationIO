@@ -149,14 +149,6 @@ extern "C" {
         return ceil(log2(NumSymbols));
     }
     
-    static inline uint8_t Power2MaskLSByte(const uint8_t Exponent) {
-        return (pow(2, Exponent) - 1);
-    }
-    
-    static inline uint8_t Power2MaskMSByte(const uint8_t Exponent) {
-        return (((uint8_t) pow(2, Exponent) - 1) << (8 - Exponent));
-    }
-    
     inline bool IsOdd(const int64_t Number2Check) {
         bool X = 0;
         if (Number2Check % 2 == 0) {
@@ -332,6 +324,29 @@ extern "C" {
             }
             BitB->BitOffset += Bits2Skip;
         }
+    }
+    
+    static inline uint8_t CreateBitMaskLSBit(const uint8_t Bits2Extract) {
+        return (uint8_t) pow(2, Bits2Extract) << (8 - Bits2Extract);
+    }
+    
+    static inline uint8_t CreateBitMaskMSBit(const uint8_t Bits2Extract) {
+        return (uint8_t) pow(2, Bits2Extract) >> (8 - Bits2Extract);
+    }
+    
+    static inline uint8_t NumBits2ExtractFromByte(const uint64_t BitOffset, const uint8_t Bits2Extract) { // BitOffset = 6, Bits2Extract = 3
+        uint8_t Bits2ExtractFromThisByte = 0;
+        uint8_t BitsInThisByte           = BitOffset % 8; // 2
+        if (Bits2Extract >= BitsInThisByte) { // 3 > 6 = false
+            Bits2ExtractFromThisByte = BitsInThisByte;
+        } else {
+            Bits2ExtractFromThisByte = Bits2Extract; // 3
+        }
+        return Bits2ExtractFromThisByte; // 3 accurate
+    }
+    
+    static inline uint8_t SwapBits(const uint8_t Byte) {
+        return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
     }
     
     static inline uint64_t ExtractBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Extract) { // So this function reads data FROM Little endian, Least Significant Bit first
