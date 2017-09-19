@@ -130,7 +130,7 @@ extern "C" {
      @param               SwitchNum                 "The switch to set".
      @param               IsThereAResult            "Are you expecting this switch to contain data, or are you just testing for it's presence?".
      */
-    void                  SetCLISwitchResultStatus(CommandLineIO *CLI, const uint64_t SwitchNum, const bool IsThereAResult);
+    void                  SetCLISwitchResultStatus(CommandLineIO const *CLI, const uint64_t SwitchNum, const bool IsThereAResult);
     
     /*!
      @abstract                                      "Parses argv for switches matching the ones contained in CLI".
@@ -146,7 +146,7 @@ extern "C" {
      @param               CLI                       "Pointer to CommandLineIO".
      @param               Switch                    "Which switch should we look for?".
      */
-    uint64_t              GetCLINumArgumentsMatchingSwitch(CommandLineIO *CLI, const uint64_t Switch);
+    uint64_t              GetCLINumArgumentsMatchingSwitch(CommandLineIO const *CLI, const uint64_t Switch);
     
     /*!
      @abstract                                      "Finds the argument that has both ParentSwitch and ChildSwitch present".
@@ -155,7 +155,7 @@ extern "C" {
      @param               ParentSwitch              "The switch MetaSwitch should be in".
      @param               ChildSwitch               "MetaSwitch to find in the arguments".
      */
-    uint64_t              GetCLIChildSwitchArgument(CommandLineIO *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch);
+    uint64_t              GetCLIChildSwitchArgument(CommandLineIO const *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch);
     
     /*!
      @abstract                                      "Finds the switch who's flag matches Flag".
@@ -163,7 +163,7 @@ extern "C" {
      @param               CLI                       "Pointer to CommandLineIO".
      @param               Flag                      "String containing the switch to look for".
      */
-    uint64_t              GetCLISwitchNumFromFlag(CommandLineIO *CLI, char *Flag);
+    uint64_t              GetCLISwitchNumFromFlag(CommandLineIO const *CLI, char *Flag);
     
     /*!
      @abstract                                      "Finds which argument contains Flag".
@@ -171,7 +171,7 @@ extern "C" {
      @param               CLI                       "Pointer to CommandLineIO".
      @param               Flag                      "String containing the switch to look for".
      */
-    uint64_t              GetCLIArgumentNumFromFlag(CommandLineIO *CLI, char *Flag);
+    uint64_t              GetCLIArgumentNumFromFlag(CommandLineIO const *CLI, char *Flag);
     
     /*!
      @abstract                                      "Gets the data contained in Switch->Result".
@@ -179,7 +179,7 @@ extern "C" {
      @param               CLI                       "Pointer to CommandLineIO".
      @param               ArgumentNum               "The argument's result to return".
      */
-    char                 *GetCLIArgumentResult(CommandLineIO *CLI, const uint64_t ArgumentNum);
+    char                 *GetCLIArgumentResult(CommandLineIO const *CLI, const uint64_t ArgumentNum);
     
     /*!
      @abstract                                      "Deallocates the instance of CommandLineIO pointed to by CLI".

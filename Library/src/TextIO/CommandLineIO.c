@@ -236,7 +236,7 @@ extern "C" {
         }
     }
     
-    void SetCLISwitchResultStatus(CommandLineIO *CLI, const uint64_t SwitchNum, const bool IsThereAResult) {
+    void SetCLISwitchResultStatus(CommandLineIO const *CLI, const uint64_t SwitchNum, const bool IsThereAResult) {
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCLISwitchResultStatus", "Pointer to CommandLineIO is NULL");
         } else if (SwitchNum > CLI->NumSwitches) {
@@ -365,7 +365,7 @@ extern "C" {
         }
     }
     
-    uint64_t GetCLINumArgumentsMatchingSwitch(CommandLineIO *CLI, const uint64_t Switch) {
+    uint64_t GetCLINumArgumentsMatchingSwitch(CommandLineIO const *CLI, const uint64_t Switch) {
         uint64_t NumSwitchesFound = 0ULL;
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetCLINumArgumentsMatchingSwitch", "Pointer to CommandLineIO is NULL");
@@ -381,7 +381,7 @@ extern "C" {
         return NumSwitchesFound;
     }
     
-    uint64_t GetCLIChildSwitchArgument(CommandLineIO *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch) {
+    uint64_t GetCLIChildSwitchArgument(CommandLineIO const *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch) {
         uint64_t SwitchContainingMetaArg = 0xFFFFFFFFFFFFFFFFULL;
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "Pointer to CommandLineIO is NULL");
@@ -401,7 +401,7 @@ extern "C" {
         return SwitchContainingMetaArg;
     }
     
-    uint64_t GetCLISwitchNumFromFlag(CommandLineIO *CLI, char *Flag) {
+    uint64_t GetCLISwitchNumFromFlag(CommandLineIO const *CLI, char *Flag) {
         uint64_t FoundFlagSwitchNum = 0xFFFFFFFFFFFFFFFFULL;
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetCLISwitchNumFromFlag", "Pointer to CommandLineIO is NULL");
@@ -417,7 +417,7 @@ extern "C" {
         return FoundFlagSwitchNum;
     }
     
-    uint64_t GetCLIArgumentNumFromFlag(CommandLineIO *CLI, char *Flag) {
+    uint64_t GetCLIArgumentNumFromFlag(CommandLineIO const *CLI, char *Flag) {
         uint64_t FoundSwitch = 0xFFFFFFFFFFFFFFFFULL;
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetCLIArgumentNumFromFlag", "Pointer to CommandLineIO is NULL");
@@ -433,7 +433,7 @@ extern "C" {
         return FoundSwitch;
     }
     
-    char *GetCLIArgumentResult(CommandLineIO *CLI, const uint64_t ArgumentNum) {
+    char *GetCLIArgumentResult(CommandLineIO const *CLI, const uint64_t ArgumentNum) {
         char *Result = NULL;
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetCLIArgumentResult", "Pointer to CommandLineIO is NULL");
