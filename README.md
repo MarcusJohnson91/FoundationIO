@@ -1,5 +1,5 @@
-**BitIO:** [![Build Status](https://travis-ci.org/MarcusJohnson91/FoundationIO.svg?branch=master)](https://travis-ci.org/MarcusJohnson91/FoundationIO)
-========================
+**BitIO:** [![Build Status](https://travis-ci.org/MarcusJohnson91/BitIO.svg?branch=master)](https://travis-ci.org/MarcusJohnson91/BitIO)
+==========
 * BitIO (Pronounced Bit Eye Oh) is a library for Reading, and Writing bits (and all the tasks associated with doing so, like swapping byte and bit order, etc).
 * BitIO is designed for and tested on 64 bit CPUs (ARM64 and AMD64 to be specific), 32 bit OSes and CPUs are not tested, and never will be.
 * I've gone to great lengths to make sure BitIO is as fast as it can be, my bit readers and writers are generic functions to move branching to compile time instead of runtime for exmaple.
@@ -8,7 +8,7 @@
 * Currently, there's no stable API, let alone ABI. I break shit constantly to keep it easy to use.
 
 License:
---------
+=======
 libBitIO is released under the terms of the 3 clause [`Revised BSD`](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29) license.
 
 Here's a tl;dr of my license:
@@ -20,22 +20,27 @@ Here's a tl;dr of my license:
 * **Don't** sue me if something goes wrong. I never have and never will gurantee BitIO works for anything, you figure out if it's right for you.
 
 Compiling:
-----------
+=========
 * libBitIO alone won't do a whole lot for you, it's real use is in being a library other libraries rely on.
 * When compiling you need to set the macros `LSByte/MSByte` and `LSBit/MSBit` for the byte and bit order of your CPU targets, if you're using libbitIO as a dependency, make sure to edit your makefile to pass those parameters.
 * The makefile by defaults builds the library as a static library, for RELEASE, to change this set `BUILDTYPE` to DEBUG.
 * BitIO is included as a submodule in git, so you don't need to install it if you're using one of my libraries, ModernPNG, ModernFLAC, ModernAVC, etc.
 * On my Mac for AMD64, the libBitIO static library is about 200kb, if that's too big for your use, enable link time optimization on your program to trim unused functions.
 
+MSVC:
+----
+* Microsoft has decided to not support C11's `_Generic` preprocessor keyword, so you can't directly use the `ReadBits`/`PeekBits`/`ReadUnary`/`ReadExpGolomb`/`ReadGUUID`/`WriteBits`/`WriteGUUID` macros, I've chosen to rely on this preprocessor keyword to ensure that there is minimal branching during runtime, to gain performance on accelorators like GPUs.
+To solve this problem, you can hardcode it with the `Read`/`Write``From``ByteOrder``BitOrder` functions, or pester Microsoft to fix their support for the C11 standard.
+
 How To Use libBitIO:
---------------------
+===================
 In order to use libBitIO, you need to include CommandLineIO.h, or BitIO.h.
 Tips:
 
 * You can have as many instances of `BitInput`, `BitOutput`, and `BitBuffer` as you want, for instances, reading/writing multiple files.
 
 CommandLineIO:
---------------
+-------------
 
 * To use CommandLineIO, in `main()` call `InitCommandLineIO` to create a pointer to the CommandLineIO struct.
 * Create an enum to hold your command line switches. Number them starting at 0. your **help** option MUST be the last one.
@@ -48,7 +53,7 @@ CommandLineIO:
 * At the end of `main()` call `DeinitCommandLineIO` to clean everything up.
 
 BitIO:
-------
+-----
 * To use BitIO in `main()` call `InitBitInput` and `InitBitOutput` to read from and write to files and sockets.
 * Reading and writing from/to files/sockets, requires a `BitBuffer` Init that with `InitBitBuffer`.
 * To open a file into BitInput call `OpenInputFile` and `OpenOutputFile` (except for the logging file, which uses `OpenLogFile`).
@@ -60,14 +65,14 @@ BitIO:
 
 
 Logging:
---------
-`Log()` 
+-------
+`Log()`
 
 * Writes to a file you set as `BitIOGlobalLogFile`, if it's unset or otherwise inaccessible, all logs are printed to stderr.
 * Works on any platform that provides `stderr`, and `vsprintf`.
 
 UUID/GUIDs:
------------
+----------
 
 `ReadUUID`:
 
