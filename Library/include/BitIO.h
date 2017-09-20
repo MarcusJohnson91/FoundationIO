@@ -374,14 +374,6 @@ _Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUn
 #define ReadExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned)\
 _Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromLSByteLSBit,BitBMSBit_t:ReadExpGolombFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromMSByteLSBit,BitBMSBit_t:ReadExpGolombFromMSByteMSBit))(BitB,IsSigned)
     
-    void                WriteBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
-    void                WriteBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
-    void                WriteBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
-    void                WriteBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
-    
-#define WriteBits(BitBByteOrder,BitBBitOrder,BitB,NumBits2Write,Bits2Insert)\
-_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsLSByteLSBit,BitBMSBit_t:WriteBitsAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsMSByteLSBit,BitBMSBit_t:WriteBitsAsMSByteMSBit))(BitB,NumBits2Write,Bits2Insert)
-    
     uint8_t            *ReadGUUIDAsUUIDString(BitBuffer *BitB);
     uint8_t            *ReadGUUIDAsGUIDString(BitBuffer *BitB);
     uint8_t            *ReadGUUIDAsBinaryUUID(BitBuffer *BitB);
@@ -389,6 +381,14 @@ _Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteB
     
 #define ReadGUUID(GUUIDType,BitB)\
 _Generic((GUUIDType),BitIOUUIDString_t:ReadGUUIDAsUUIDString,BitIOGUIDString_t:ReadGUUIDAsGUIDString,BitIOBinaryUUID_t:ReadGUUIDAsBinaryUUID,BitIOBinaryGUID_t:ReadGUUIDAsBinaryGUID)(BitB)
+    
+    void                WriteBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    void                WriteBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    void                WriteBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    void                WriteBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    
+#define WriteBits(BitBByteOrder,BitBBitOrder,BitB,NumBits2Write,Bits2Insert)\
+_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsLSByteLSBit,BitBMSBit_t:WriteBitsAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsMSByteLSBit,BitBMSBit_t:WriteBitsAsMSByteMSBit))(BitB,NumBits2Write,Bits2Insert)
     
     uint8_t            *WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString);
     uint8_t            *WriteGUUIDAsGUIDString(BitBuffer *BitB, const uint8_t *GUIDString);
