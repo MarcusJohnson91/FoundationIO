@@ -69,6 +69,17 @@ typedef signed char        BinaryUUID_t;
 extern "C" {
 #endif
     
+#ifdef _POSIX_VERSION
+#define BitIONewLineSize 1
+    static const char BitIOLineEnding[1]  = {"\n"};
+#elif Macintosh
+#define BitIONewLineSize 1
+    static const char BitIOLineEnding[1]  = {"\r"};
+#elif  _WIN32
+#define BitIONewLineSize 2
+    static const char BitIOLineEnding[2]  = {"\r\n"};
+#endif
+    
     /*!
      @enum              BitIOConstants
      @abstract                                    "BitIO compile time constants".
@@ -78,9 +89,9 @@ extern "C" {
      @constant          BitIOBinaryGUIDSize       "Size of a binary GUID string".
      */
     enum BitIOConstants {
-                        BitIOUUIDStringSize       = 21,
+                        BitIOUUIDStringSize       = 21 + BitIONewLineSize,
                         BitIOGUIDStringSize       = BitIOUUIDStringSize,
-                        BitIOBinaryUUIDSize       = 16,
+                        BitIOBinaryUUIDSize       = 17, // + 1 for the NULL
                         BitIOBinaryGUIDSize       = BitIOBinaryUUIDSize,
     };
     
@@ -397,6 +408,11 @@ _Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteB
     
 #define WriteGUUID(GUUIDType,BitB,GUUID)\
 _Generic((GUUIDType),BitIOUUIDString_t:WriteGUUIDAsUUIDString,BitIOGUIDString_t:WriteGUUIDAsGUIDString,BitIOBinaryUUID_t:WriteGUUIDAsBinaryUUID,BitIOBinaryGUID_t:WriteGUUIDAsBinaryGUID)(BitB,GUUID)
+    
+    /*!
+     @abstract                                    "Frees a BinaryGUUID aka BinaryGUID/BinaryUUID or GUUIDString, aka GUIDString/UUIDString".
+     */
+    void                DeinitGUUID(uint8_t *GUUID);
     
     /*!
      @abstract                                    "Tells if the stream/buffer is byte aligned or not".

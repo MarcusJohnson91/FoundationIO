@@ -665,20 +665,51 @@ extern "C" {
         }
     }
     
-    uint8_t *ReadGUUIDAsUUIDString(BitBuffer *BitB) {
-        return NULL;
+    uint8_t *ReadGUUIDAsUUIDString(BitBuffer *BitB) { // ee b1 b4 50 - 95 06 - 4e dc - a8 c2 - 9e dc dd d8 04 f6 \n 00
+        // Read UUID String aka big endian.
+        uint8_t *UUIDString  = calloc(1, BitIOUUIDStringSize);
+        uint32_t Section1    = ExtractBitsFromMSByteLSBit(BitB, 32);
+        SkipBits(BitB, 8);
+        uint16_t Section2    = ExtractBitsFromMSByteLSBit(BitB, 16);
+        SkipBits(BitB, 8);
+        uint16_t Section3    = ExtractBitsFromMSByteLSBit(BitB, 16);
+        SkipBits(BitB, 8);
+        uint16_t Section4    = ExtractBitsFromMSByteLSBit(BitB, 16);
+        SkipBits(BitB, 8);
+        uint64_t Section5    = ExtractBitsFromMSByteLSBit(BitB, 48);
+        sprintf(UUIDString, "%d-%d-%d-%d-%llu", Section1, Section2, Section3, Section4, Section5, BitIOLineEnding);
+        return UUIDString;
     }
     
     uint8_t *ReadGUUIDAsGUIDString(BitBuffer *BitB) {
-        return NULL;
+        uint8_t *GUIDString  = calloc(1, BitIOGUIDStringSize);
+        uint32_t Section1    = ExtractBitsFromLSByteLSBit(BitB, 32);
+        SkipBits(BitB, 8);
+        uint16_t Section2    = ExtractBitsFromLSByteLSBit(BitB, 16);
+        SkipBits(BitB, 8);
+        uint16_t Section3    = ExtractBitsFromLSByteLSBit(BitB, 16);
+        SkipBits(BitB, 8);
+        uint16_t Section4    = ExtractBitsFromLSByteLSBit(BitB, 16);
+        SkipBits(BitB, 8);
+        uint64_t Section5    = ExtractBitsFromMSByteLSBit(BitB, 48);
+        sprintf(GUIDString, "%d-%d-%d-%d-%llu", Section1, Section2, Section3, Section4, Section5, BitIOLineEnding);
+        return GUIDString;
     }
     
     uint8_t *ReadGUUIDAsBinaryUUID(BitBuffer *BitB) {
-        return NULL;
+        uint8_t *BinaryUUID  = calloc(1, BitIOBinaryUUIDSize);
+        for (uint8_t Byte = 0; Byte < BitIOBinaryUUIDSize; Byte++) {
+            BinaryUUID[Byte] = ExtractBitsFromLSByteLSBit(BitB, 8);
+        }
+        return BinaryUUID;
     }
     
     uint8_t *ReadGUUIDAsBinaryGUID(BitBuffer *BitB) {
-        return NULL;
+        uint8_t *BinaryGUID = calloc(1, BitIOBinaryGUIDSize);
+        for (uint8_t Byte = 0; Byte < BitIOBinaryGUIDSize; Byte++) {
+            BinaryGUID[Byte] = ExtractBitsFromMSByteLSBit(BitB, 8);
+        }
+        return BinaryGUID;
     }
     
     uint8_t *WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString) {
@@ -696,6 +727,11 @@ extern "C" {
     uint8_t *WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID) {
         return NULL;
     }
+    
+    void DeinitGUUID(uint8_t *GUUID) {
+        free(GUUID);
+    }
+    
     /*
     static uint8_t *ConvertBinaryUUID2UUIDString(const uint8_t *BinaryUUID) {
         uint8_t *UUIDString = NULL;
@@ -1018,17 +1054,6 @@ extern "C" {
     }
     
     void Log(const uint8_t ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...) {
-#ifdef _POSIX_VERSION
-        uint8_t    NewLineSize = 1;
-        const char NewLine[1]  = {"\n"};
-#elif Macintosh
-        uint8_t    NewLineSize = 1;
-        const char NewLine[1]  = {"\r"};
-#elif  _WIN32
-        uint8_t    NewLineSize = 2;
-        const char NewLine[2]  = {"\r\n"};
-#endif
-        
         int   EasyStringSize = strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + 1; // Plus 1 for the terminating NULL
         char *EasyString     = calloc(1, EasyStringSize); // the 1 is for the error severity + 2 for the NULs
         snprintf(EasyString, EasyStringSize, "%hhu: %s - %s", ErrorSeverity, FunctionName, Description);
@@ -1040,9 +1065,9 @@ extern "C" {
         vsprintf(HardString, "%s", Arguments);
         va_end(Arguments);
         
-        uint64_t ErrorStringSize = EasyStringSize + HardStringSize + NewLineSize;
+        uint64_t ErrorStringSize = EasyStringSize + HardStringSize + BitIONewLineSize;
         char *ErrorString = calloc(1, ErrorStringSize);
-        snprintf(ErrorString, ErrorStringSize, "%s%s%s", EasyString, HardString, NewLine);
+        snprintf(ErrorString, ErrorStringSize, "%s%s%s", EasyString, HardString, BitIOLineEnding);
         if (BitIOGlobalLogFile == NULL) {
             // Set STDERR As the output file
             fprintf(stderr, "%s", ErrorString);
