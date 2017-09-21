@@ -74,10 +74,10 @@ Logging:
 UUID/GUIDs:
 ----------
 
-`ReadUUID`:
+`ReadGUUID`/`WriteGUUID`:
 
-* UUIDs and GUIDs have the same size, but use a different format,  so `ReadUUID` can also read GUIDs.
-* The only difference is that GUIDs are little endian.
+* To free a UUID/GUID String, or Binary UUID/GUID call `DeinitGUUID`.
+
 * To convert a UUID to a GUID or vice versa call `ConvertUUID2GUID` or `ConvertGUID2UUID`.
 
 
