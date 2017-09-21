@@ -668,7 +668,6 @@ extern "C" {
     uint8_t *ReadGUUIDAsUUIDString(BitBuffer *BitB) {
         uint8_t *UUIDString      = calloc(1, BitIOUUIDStringSize);
         if (BitB == NULL) {
-            free(UUIDString);
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsUUIDString", "Pointer to BitBuffer is NULL");
         } else {
             uint32_t Section1    = ExtractBitsFromMSByteLSBit(BitB, 32);
@@ -688,7 +687,6 @@ extern "C" {
     uint8_t *ReadGUUIDAsGUIDString(BitBuffer *BitB) {
         uint8_t *GUIDString      = calloc(1, BitIOGUIDStringSize);
         if (BitB == NULL) {
-            free(GUIDString);
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsGUIDString", "Pointer to BitBuffer is NULL");
         } else {
             uint32_t Section1    = ExtractBitsFromLSByteLSBit(BitB, 32);
@@ -708,7 +706,6 @@ extern "C" {
     uint8_t *ReadGUUIDAsBinaryUUID(BitBuffer *BitB) {
         uint8_t *BinaryUUID  = calloc(1, BitIOBinaryUUIDSize);
         if (BitB == NULL) {
-            free(BinaryUUID);
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsBinaryUUID", "Pointer to BitBuffer is NULL");
         } else {
             for (uint8_t Byte = 0; Byte < BitIOBinaryUUIDSize; Byte++) {
@@ -721,7 +718,6 @@ extern "C" {
     uint8_t *ReadGUUIDAsBinaryGUID(BitBuffer *BitB) {
         uint8_t *BinaryGUID = calloc(1, BitIOBinaryGUIDSize);
         if (BitB == NULL) {
-            free(BinaryGUID);
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsBinaryGUID", "Pointer to BitBuffer is NULL");
         } else {
             for (uint8_t Byte = 0; Byte < BitIOBinaryGUIDSize; Byte++) {
