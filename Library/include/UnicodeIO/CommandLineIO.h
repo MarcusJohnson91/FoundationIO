@@ -73,17 +73,10 @@ extern "C" {
      @param               CLI                       "Pointer to CommandLineIO".
      @param               Name                      "What is the name of the license?".
      @param               LicenseDescription        "Describe the license this program is licensed under".
+     @param               LicenseURL                "the actual URL for the license".
      @param               IsProprietary             "Is this program released under an open source license, or a EULA?".
      */
-    void                  SetCLILicense(CommandLineIO *CLI, char *Name, char *LicenseDescription, const bool IsProprietary);
-    
-    /*!
-     @abstract                                      "Sets the URL for the license, in the main program banner".
-     @remark                                        "If your program is closed source, do NOT use the License options, use the EULA functions".
-     @param               CLI                       "Pointer to CommandLineIO".
-     @param               LicenseURL                "the actual URL for the license".
-     */
-    void                  SetCLILicenseURL(CommandLineIO *CLI, char *LicenseURL);
+    void                  SetCLILicense(CommandLineIO *CLI, char *Name, char *LicenseDescription, const char *LicenseURL, const bool IsProprietary);
     
     /*!
      @abstract                                      "What is the minimum number of switches your program needs to operate?".
