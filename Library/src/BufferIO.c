@@ -666,7 +666,7 @@ extern "C" {
     }
     
     uint8_t *ReadGUUIDAsUUIDString(BitBuffer *BitB) {
-        uint8_t *UUIDString      = calloc(1, BitIOUUIDStringSize);
+        uint8_t *UUIDString      = calloc(1, BitIOGUUIDStringSize);
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsUUIDString", "Pointer to BitBuffer is NULL");
         } else {
@@ -685,7 +685,7 @@ extern "C" {
     }
     
     uint8_t *ReadGUUIDAsGUIDString(BitBuffer *BitB) {
-        uint8_t *GUIDString      = calloc(1, BitIOGUIDStringSize);
+        uint8_t *GUIDString      = calloc(1, BitIOGUUIDStringSize);
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsGUIDString", "Pointer to BitBuffer is NULL");
         } else {
@@ -704,11 +704,11 @@ extern "C" {
     }
     
     uint8_t *ReadGUUIDAsBinaryUUID(BitBuffer *BitB) {
-        uint8_t *BinaryUUID  = calloc(1, BitIOBinaryUUIDSize);
+        uint8_t *BinaryUUID  = calloc(1, BitIOBinaryGUUIDSize);
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsBinaryUUID", "Pointer to BitBuffer is NULL");
         } else {
-            for (uint8_t Byte = 0; Byte < BitIOBinaryUUIDSize; Byte++) {
+            for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
                 BinaryUUID[Byte] = ExtractBitsFromLSByteLSBit(BitB, 8);
             }
         }
@@ -716,15 +716,25 @@ extern "C" {
     }
     
     uint8_t *ReadGUUIDAsBinaryGUID(BitBuffer *BitB) {
-        uint8_t *BinaryGUID = calloc(1, BitIOBinaryGUIDSize);
+        uint8_t *BinaryGUID = calloc(1, BitIOBinaryGUUIDSize);
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsBinaryGUID", "Pointer to BitBuffer is NULL");
         } else {
-            for (uint8_t Byte = 0; Byte < BitIOBinaryGUIDSize; Byte++) {
+            for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
                 BinaryGUID[Byte] = ExtractBitsFromMSByteLSBit(BitB, 8);
             }
         }
         return BinaryGUID;
+    }
+    
+    bool     CompareGUUIDs(const uint8_t *GUUID1, const uint8_t *GUUID2, const uint8_t GUUIDSize) { // The only restriction is that you can only compare GUUIDStrings to GUUIDStrings or BinaryGUUIDs to BinaryGUUIDs.
+        bool GUUIDsMatch = true;
+        for (uint8_t GUUIDByte = 0; GUUIDByte < GUUIDSize; GUUIDByte++) {
+            if (GUUID1[GUUIDByte] != GUUID2[GUUIDByte]) {
+                GUUIDsMatch = false;
+            }
+        }
+        return GUUIDsMatch;
     }
     
     uint8_t *WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString) {
@@ -1065,7 +1075,6 @@ extern "C" {
         } else {
             
         }
-        
     }
     
     void Log(const uint8_t ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...) {

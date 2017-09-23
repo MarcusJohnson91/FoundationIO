@@ -82,17 +82,13 @@ extern "C" {
     
     /*!
      @enum              BitIOConstants
-     @abstract                                    "BitIO compile time constants".
-     @constant          BitIOUUIDStringSize       "Size of a UUIDString including dashes and null terminator".
-     @constant          BitIOGUIDStringSize       "Size of a GUIDString including dashes and null terminator".
-     @constant          BitIOBinaryUUIDSize       "Size of a binary UUID string".
-     @constant          BitIOBinaryGUIDSize       "Size of a binary GUID string".
+     @abstract                                     "BitIO compile time constants".
+     @constant          BitIOGUUIDStringSize       "Size of a UUIDString or GUIDString including dashes, line ending, and null terminator".
+     @constant          BitIOBinaryGUUIDSize       "Size of a BinaryUUID or BinaryGUID".
      */
     enum BitIOConstants {
-                        BitIOUUIDStringSize       = 21 + BitIONewLineSize,
-                        BitIOGUIDStringSize       = BitIOUUIDStringSize,
-                        BitIOBinaryUUIDSize       = 17, // + 1 for the NULL
-                        BitIOBinaryGUIDSize       = BitIOBinaryUUIDSize,
+        				BitIOGUUIDStringSize       = (21 + BitIONewLineSize),
+                        BitIOBinaryGUUIDSize       = (16),
     };
     
     /*!
@@ -408,6 +404,15 @@ _Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteB
     
 #define WriteGUUID(GUUIDType,BitB,GUUID)\
 _Generic((GUUIDType),BitIOUUIDString_t:WriteGUUIDAsUUIDString,BitIOGUIDString_t:WriteGUUIDAsGUIDString,BitIOBinaryUUID_t:WriteGUUIDAsBinaryUUID,BitIOBinaryGUID_t:WriteGUUIDAsBinaryGUID)(BitB,GUUID)
+    
+    /*!
+     @abstract                                    "Compares GUUIDStrings or BinaryGUUIDs (but not a GUUIDString to a BinaryGUUID) for equilivence".
+     @param             GUUID1                    "Pointer to GUUIDString or BinaryGUUID to be compared".
+     @param             GUUID2                    "Pointer to GUUIDString or BinaryGUUID to be compared".
+     @param             GUUIDSize                 "The size of the GUUIDs, either BitIOGU"
+     @return                                      "Returns wether GUUID1 and GUUID2 match".
+     */
+    bool                CompareGUUIDs(const uint8_t *GUUID1, const uint8_t *GUUID2, const uint8_t GUUIDSize);
     
     /*!
      @abstract                                    "Frees a BinaryGUUID aka BinaryGUID/BinaryUUID or GUUIDString, aka GUIDString/UUIDString".
