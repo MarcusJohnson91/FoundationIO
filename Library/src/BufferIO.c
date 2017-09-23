@@ -35,8 +35,8 @@ extern "C" {
     
     struct BitInput {
         FILE              *File;
-        bool               IsFileOrSocket;
         int                Socket;
+        bool               IsFileOrSocket;
         fpos_t             FileSize;
         fpos_t             FilePosition;
         uint64_t           FileSpecifierNum;
@@ -44,8 +44,8 @@ extern "C" {
     
     struct BitOutput {
         FILE              *File;
-        bool               IsFileOrSocket;
         int                Socket;
+        bool               IsFileOrSocket;
         fpos_t             FilePosition;
         uint64_t           FileSpecifierNum;
     };
