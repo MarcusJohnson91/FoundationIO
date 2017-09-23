@@ -69,12 +69,12 @@ typedef signed char        BinaryUUID_t;
 extern "C" {
 #endif
     
-#ifdef _POSIX_VERSION
-#define BitIONewLineSize 1
-    static const char BitIOLineEnding[1]  = {"\n"};
-#elif Macintosh
+#ifdef Macintosh
 #define BitIONewLineSize 1
     static const char BitIOLineEnding[1]  = {"\r"};
+#elif _POSIX_VERSION
+#define BitIONewLineSize 1
+    static const char BitIOLineEnding[1]  = {"\n"};
 #elif  _WIN32
 #define BitIONewLineSize 2
     static const char BitIOLineEnding[2]  = {"\r\n"};
@@ -161,8 +161,8 @@ extern "C" {
     
     /*!
      @abstract									"Initializes a BitBuffer structure".
+     @param				BitBufferSize			"Number of bytes to create BitBuffer with".
      @return									"Returns a pointer to said BitBuffer structure".
-     @param				BitBufferSize			"Number of bytes to create Bitbuffer with".
      */
     BitBuffer		   *InitBitBuffer(const uint64_t BitBufferSize);
     
@@ -194,45 +194,50 @@ extern "C" {
     /*!
      @abstract									"Swap bits in a byte".
      @param				Byte					"Byte to swap bits".
+     @return									"Returns swapped byte".
      */
     inline uint8_t      SwapBitsInByte(const uint8_t Byte);
     
     /*!
      @abstract									"Swap nibbles in a byte".
      @param				Byte2Swap				"Byte to swap nibbles".
+     @return									"Returns byte with swapped nibbles".
      */
     inline uint8_t      SwapNibble(const uint8_t Byte2Swap);
     
     /*!
      @abstract									"Swap endian of 16 bit integers".
      @param				Data2Swap				"Data to swap endian".
+     @return									"Returns swapped uint16_t".
      */
     inline uint16_t     SwapEndian16(const uint16_t Data2Swap);
     
     /*!
      @abstract									"Swap endian of 32 bit integers".
      @param				Data2Swap				"Data to swap endian".
+     @return									"Returns swapped uint32_t".
      */
     inline uint32_t     SwapEndian32(const uint32_t Data2Swap);
     
     /*!
      @abstract									"Swap endian of 64 bit integers".
      @param				Data2Swap				"Data to swap endian".
+     @return									"Returns swapped uint64_t".
      */
     inline uint64_t     SwapEndian64(const uint64_t Data2Swap);
     
     /*!
      @abstract									"Computes the number of bits from the number of bytes".
+     @param				Bytes					"The number of bytes you want to interpret as bits".
      @return									"Returns the number of bits".
-     @param				Bytes					"The number of bytes you want to intrepret as bits".
      */
     inline int64_t      Bytes2Bits(const int64_t Bytes);
     
     /*!
      @abstract									"Computes the number of bytes from the number of bits".
-     @return									"Returns the number of bytes".
      @param				Bits					"The bits to convert to bytes".
      @param				RoundUp					"Should the resulting bytes be rounded up or down?".
+     @return									"Returns the number of bytes".
      */
     inline int64_t      Bits2Bytes(const int64_t Bits, const bool RoundUp);
     
@@ -240,39 +245,42 @@ extern "C" {
      @abstract									"Computes the number of bits required to hold a certain amount of symbols".
      @remark									"Rounds up to the next integer number of bits to ensure all symbols can be contained in single integer".
      @param				NumSymbols				"The number of symbols you're looking to contain in a binary number".
+     @return									"Returns the number of bits required to read a symbol".
      */
     inline uint64_t     NumBits2ReadSymbols(const uint64_t NumSymbols);
     
     /*!
      @abstract									"Tells whether Input is even or odd".
-     @return									"True for odd, false for even".
      @param				Number2Check			"The number to see if it's odd or even".
+     @return									"True for odd, false for even".
      */
     inline bool         IsOdd(const int64_t Number2Check);
     
     /*!
      @abstract									"Computes the number of bytes left in the file".
-     @return									"Returns the number of bytes left in the file".
      @param				BitI					"Pointer to the instance of BitInput".
+     @return									"Returns the number of bytes left in the file".
      */
     fpos_t              BytesRemainingInBitInput(BitInput *BitI);
     
     /*!
      @abstract									"Gets the size of the file pointed to by BitI"
-     @return									"Returns the value in BitI->FileSize".
      @param				BitI					"Pointer to the instance of BitInput".
+     @return									"Returns the value in BitI->FileSize if it exists".
      */
     fpos_t              GetBitInputFileSize(BitInput *BitI);
     
     /*!
-     @abstract									"Returns the position of the current file".
+     @abstract									"Gets the position of the Input file from the start".
      @param				BitI					"Pointer to the instance of BitInput".
+     @return									"Returns the position of the file in bytes from the beginning"
      */
     fpos_t              GetBitInputFilePosition(BitInput *BitI);
     
     /*!
-     @abstract									"Returns the number of bits used in BitB".
+     @abstract									"Gets the offset of the BitBuffer".
      @param				BitB					"Pointer to the instance of BitBuffer".
+     @return									"Returns the position offset from the start of BitBuffer".
      */
     uint64_t            GetBitBufferPosition(BitBuffer *BitB);
     
@@ -333,65 +341,86 @@ extern "C" {
     uint64_t		    ReadBitsFromMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read);
     uint64_t		    ReadBitsFromMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read);
     
-#define ReadBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Read)\
-_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsFromLSByteLSBit,BitBMSBit_t:ReadBitsFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsFromMSByteLSBit,BitBMSBit_t:ReadBitsFromMSByteMSBit))(BitB,Bits2Read)
+#define ReadBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Read)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsFromLSByteLSBit,BitBMSBit_t:ReadBitsFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsFromMSByteLSBit,BitBMSBit_t:ReadBitsFromMSByteMSBit))(BitB,Bits2Read)
     
     uint64_t		    PeekBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
     uint64_t		    PeekBitsFromLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
     uint64_t		    PeekBitsFromMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
     uint64_t		    PeekBitsFromMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
     
-#define PeekBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Peek)\
-_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsFromLSByteLSBit,BitBMSBit_t:PeekBitsFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsFromMSByteLSBit,BitBMSBit_t:PeekBitsFromMSByteMSBit))(BitB,Bits2Peek)
+#define PeekBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Peek)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsFromLSByteLSBit,BitBMSBit_t:PeekBitsFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsFromMSByteLSBit,BitBMSBit_t:PeekBitsFromMSByteMSBit))(BitB,Bits2Peek)
     
     uint64_t		    ReadUnaryFromLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
     uint64_t		    ReadUnaryFromLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
     uint64_t		    ReadUnaryFromMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
     uint64_t		    ReadUnaryFromMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
     
-#define ReadUnary(BitBByteOrder,BitBBitOrder,BitB,IsStrictlyPositive,StopBit)\
-_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryFromLSByteLSBit,BitBMSBit_t:ReadUnaryFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryFromMSByteLSBit,BitBMSBit_t:ReadUnaryFromMSByteMSBit))(BitB,IsStrictlyPositive,StopBit)
+#define ReadUnary(BitBByteOrder,BitBBitOrder,BitB,IsStrictlyPositive,StopBit)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryFromLSByteLSBit,BitBMSBit_t:ReadUnaryFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryFromMSByteLSBit,BitBMSBit_t:ReadUnaryFromMSByteMSBit))(BitB,IsStrictlyPositive,StopBit)
     
     uint64_t		    ReadExpGolombFromLSByteLSBit(BitBuffer *BitB, const bool IsSigned);
     uint64_t		    ReadExpGolombFromLSByteMSBit(BitBuffer *BitB, const bool IsSigned);
     uint64_t		    ReadExpGolombFromMSByteLSBit(BitBuffer *BitB, const bool IsSigned);
     uint64_t		    ReadExpGolombFromMSByteMSBit(BitBuffer *BitB, const bool IsSigned);
     
-#define ReadExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned)\
-_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromLSByteLSBit,BitBMSBit_t:ReadExpGolombFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromMSByteLSBit,BitBMSBit_t:ReadExpGolombFromMSByteMSBit))(BitB,IsSigned)
+#define ReadExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromLSByteLSBit,BitBMSBit_t:ReadExpGolombFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromMSByteLSBit,BitBMSBit_t:ReadExpGolombFromMSByteMSBit))(BitB,IsSigned)
     
     uint8_t		       *ReadGUUIDAsUUIDString(BitBuffer *BitB);
     uint8_t		       *ReadGUUIDAsGUIDString(BitBuffer *BitB);
     uint8_t		       *ReadGUUIDAsBinaryUUID(BitBuffer *BitB);
     uint8_t		       *ReadGUUIDAsBinaryGUID(BitBuffer *BitB);
     
-#define ReadGUUID(GUUIDType,BitB)\
-_Generic((GUUIDType),BitIOUUIDString_t:ReadGUUIDAsUUIDString,BitIOGUIDString_t:ReadGUUIDAsGUIDString,BitIOBinaryUUID_t:ReadGUUIDAsBinaryUUID,BitIOBinaryGUID_t:ReadGUUIDAsBinaryGUID)(BitB)
+#define ReadGUUID(GUUIDType,BitB)_Generic((GUUIDType),BitIOUUIDString_t:ReadGUUIDAsUUIDString,BitIOGUIDString_t:ReadGUUIDAsGUIDString,BitIOBinaryUUID_t:ReadGUUIDAsBinaryUUID,BitIOBinaryGUID_t:ReadGUUIDAsBinaryGUID)(BitB)
     
     void				WriteBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
     void				WriteBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
     void				WriteBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
     void				WriteBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
     
-#define WriteBits(BitBByteOrder,BitBBitOrder,BitB,NumBits2Write,Bits2Insert)\
-_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsLSByteLSBit,BitBMSBit_t:WriteBitsAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsMSByteLSBit,BitBMSBit_t:WriteBitsAsMSByteMSBit))(BitB,NumBits2Write,Bits2Insert)
+#define WriteBits(BitBByteOrder,BitBBitOrder,BitB,NumBits2Write,Bits2Insert)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsLSByteLSBit,BitBMSBit_t:WriteBitsAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsMSByteLSBit,BitBMSBit_t:WriteBitsAsMSByteMSBit))(BitB,NumBits2Write,Bits2Insert)
     
     uint8_t		       *WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString);
     uint8_t		       *WriteGUUIDAsGUIDString(BitBuffer *BitB, const uint8_t *GUIDString);
     uint8_t		       *WriteGUUIDAsBinaryUUID(BitBuffer *BitB, const uint8_t *BinaryUUID);
     uint8_t		       *WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID);
     
-#define WriteGUUID(GUUIDType,BitB,GUUID)\
-_Generic((GUUIDType),BitIOUUIDString_t:WriteGUUIDAsUUIDString,BitIOGUIDString_t:WriteGUUIDAsGUIDString,BitIOBinaryUUID_t:WriteGUUIDAsBinaryUUID,BitIOBinaryGUID_t:WriteGUUIDAsBinaryGUID)(BitB,GUUID)
+#define WriteGUUID(GUUIDType,BitB,GUUID)_Generic((GUUIDType),BitIOUUIDString_t:WriteGUUIDAsUUIDString,BitIOGUIDString_t:WriteGUUIDAsGUIDString,BitIOBinaryUUID_t:WriteGUUIDAsBinaryUUID,BitIOBinaryGUID_t:WriteGUUIDAsBinaryGUID)(BitB,GUUID)
     
     /*!
      @abstract									"Compares GUUIDStrings or BinaryGUUIDs (but not a GUUIDString to a BinaryGUUID) for equilivence".
      @param				GUUID1				    "Pointer to GUUIDString or BinaryGUUID to be compared".
      @param				GUUID2				    "Pointer to GUUIDString or BinaryGUUID to be compared".
      @param				GUUIDSize				"The size of the GUUIDs, either BitIOGUUIDStringSize or BitIOBinaryGUUIDSize"
-     @return									"Returns wether GUUID1 and GUUID2 match".
+     @return									"Returns whether GUUID1 and GUUID2 match".
      */
     bool				CompareGUUIDs(const uint8_t *GUUID1, const uint8_t *GUUID2, const uint8_t GUUIDSize);
+    
+    /*!
+     @abstract									"Converts a GUID/UUIDString to a BinaryGUID/UUID".
+     @param             GUUIDString             "Pointer to a GUID/UUIDString".
+     @return                                    "Returns a pointer to a BinaryGUID/UUID".
+     */
+    uint8_t            *ConvertGUUIDString2BinaryGUUID(const uint8_t *GUUIDString);
+    
+    /*!
+     @abstract									"Converts a BinaryGUID/UUID to a GUID/UUIDString".
+     @param             BinaryGUUID             "Pointer to a BinaryGUID/UUID".
+     @return                                    "Returns a pointer to a GUID/UUIDString".
+     */
+    uint8_t            *ConvertBinaryGUUID2GUUIDString(const uint8_t *BinaryGUUID);
+    
+    /*!
+     @abstract									"Converts a GUID/UUIDString to a UUID/GUIDString".
+     @param             GUUIDString             "Pointer to a GUID/UUIDString".
+     @return                                    "Returns a pointer to a UUID/GUIDString".
+     */
+    uint8_t            *SwapGUUIDString(const uint8_t *GUUIDString);
+    
+    /*!
+     @abstract									"Converts a BinaryGUID/UUID to a BinaryUUID/GUID".
+     @param             BinaryGUUID             "Pointer to a BinaryGUID/UUID".
+     @return                                    "Returns a pointer to a BinaryUUID/GUID".
+     */
+    uint8_t            *SwapBinaryGUUID(const uint8_t *BinaryGUUID);
     
     /*!
      @abstract									"Frees a BinaryGUUID aka BinaryGUID/BinaryUUID or GUUIDString, aka GUIDString/UUIDString".
@@ -402,6 +431,7 @@ _Generic((GUUIDType),BitIOUUIDString_t:WriteGUUIDAsUUIDString,BitIOGUIDString_t:
      @abstract									"Tells if the stream/buffer is byte aligned or not".
      @remark									"Checks the stream is aligned on an BytesOfAlignment boundary, not that there are X bits of padding".
      @param				BytesOfAlignment		"Are you trying to see if it's aligned to a byte, short, word, etc alignment? Specify in number of bytes".
+     @return									"Returns whether the BitBuffer is aligned on a multiple of BytesOfAlignment".
      */
     bool				IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment);
     
@@ -413,63 +443,7 @@ _Generic((GUUIDType),BitIOUUIDString_t:WriteGUUIDAsUUIDString,BitIOGUIDString_t:
      */
     void				AlignBitBuffer(BitBuffer *BitB, const uint8_t BytesOfAlignment);
     
-    /*!
-     @abstract									"Reads raw UUID/GUID from the bitstream".
-     @remark									"UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     */
-    uint8_t            *ReadBinaryUUID(BitBuffer *BitB);
     
-    /*!
-     @abstract									"Reads raw UUID/GUID from the bitstream".
-     @remark									"UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     */
-    uint8_t            *ReadUUIDString(BitBuffer *BitB);
-    
-    /*!
-     @abstract									"Reads raw UUID/GUID from the bitstream".
-     @remark									"UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     */
-    uint8_t            *ReadBinaryGUID(BitBuffer *BitB);
-    
-    /*!
-     @abstract									"Reads raw UUID/GUID from the bitstream".
-     @remark									"UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     */
-    uint8_t            *ReadGUIDString(BitBuffer *BitB);
-    
-    /*!
-     @abstract									"Converts a UUIDString to a GUIDString by swapping the endian of each section".
-     @param				UUIDString				"An array containing the UUID in string form".
-     @return									"Returns a pointer to a GUIDString".
-     */
-    uint8_t           *ConvertUUIDString2GUIDString(const uint8_t *UUIDString);
-    
-    /*!
-     @abstract									"Converts a GUIDString to a UUIDString by swapping the endian of each section".
-     @param				GUIDString				"An array containing the converted UUID in string form".
-     @return									"Returns a pointer to a UUIDString".
-     */
-    uint8_t           *ConvertGUIDString2UUIDString(const uint8_t *GUIDString);
-    
-    /*!
-     @abstract									"Verify two UUIDStrings match each other".
-     @remark									"Matches hyphens and NULL terminating character as well, it's pretty literal".
-     @param				UUIDString1				"Pointer to a UUIDString to be matched against".
-     @param				UUIDString2				"Pointer to a UUIDString to match against UUIDString1".
-     */
-    bool				CompareUUIDStrings(const uint8_t *UUIDString1, const uint8_t *UUIDString2);
-    
-    /*!
-     @abstract									"Write UUID/GUID string as hyphen-less blob".
-     @remark									"UUID and GUID Strings are ALWAYS 21 chars (including terminating char)".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				UUIDString				"UUID string to write to the file as a binary blob, aka remove hyphens and null terminating char".
-     */
-    void				WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString);
     
     /*!
      @abstract									"Reads Bytes2Read into a buffer pointed to by BitB from InputFile".

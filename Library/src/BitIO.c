@@ -679,7 +679,7 @@ extern "C" {
             uint16_t Section4    = ExtractBitsFromMSByteLSBit(BitB, 16);
             SkipBits(BitB, 8);
             uint64_t Section5    = ExtractBitsFromMSByteLSBit(BitB, 48);
-            sprintf(UUIDString, "%d-%d-%d-%d-%llu", Section1, Section2, Section3, Section4, Section5, BitIOLineEnding);
+            sprintf((char*)UUIDString, "%d-%d-%d-%d-%llu%s", Section1, Section2, Section3, Section4, Section5, BitIOLineEnding);
         }
         return UUIDString;
     }
@@ -698,7 +698,7 @@ extern "C" {
             uint16_t Section4    = ExtractBitsFromLSByteLSBit(BitB, 16);
             SkipBits(BitB, 8);
             uint64_t Section5    = ExtractBitsFromMSByteLSBit(BitB, 48);
-            sprintf(GUIDString, "%d-%d-%d-%d-%llu", Section1, Section2, Section3, Section4, Section5, BitIOLineEnding);
+            sprintf((char*)GUIDString, "%d-%d-%d-%d-%llu%s", Section1, Section2, Section3, Section4, Section5, BitIOLineEnding);
         }
         return GUIDString;
     }
@@ -737,6 +737,172 @@ extern "C" {
         return GUUIDsMatch;
     }
     
+    uint8_t *ConvertGUUIDString2BinaryGUUID(const uint8_t *GUUIDString) {
+        uint8_t *BinaryGUUID = NULL;
+        if (GUUIDString == NULL) {
+            Log(LOG_ERR, "libBitIO", "ConvertGUUIDString2BinaryGUUID", "Pointer to GUUIDString is NULL");
+        } else {
+            BinaryGUUID = calloc(1, BitIOBinaryGUUIDSize);
+            if (BinaryGUUID == NULL) {
+                Log(LOG_ERR, "libBitIO", "ConvertGUUIDString2BinaryGUUID", "Not enough memory to calloc %d bytes", BitIOBinaryGUUIDSize);
+            } else {
+                BinaryGUUID[0] = GUUIDString[0];
+                BinaryGUUID[1] = GUUIDString[1];
+                BinaryGUUID[2] = GUUIDString[2];
+                BinaryGUUID[3] = GUUIDString[3];
+                
+                BinaryGUUID[4] = GUUIDString[5];
+                BinaryGUUID[5] = GUUIDString[6];
+                
+                BinaryGUUID[6] = GUUIDString[8];
+                BinaryGUUID[7] = GUUIDString[9];
+                
+                BinaryGUUID[8] = GUUIDString[11];
+                BinaryGUUID[9] = GUUIDString[12];
+                
+                BinaryGUUID[10] = GUUIDString[14];
+                BinaryGUUID[11] = GUUIDString[15];
+                BinaryGUUID[12] = GUUIDString[16];
+                BinaryGUUID[13] = GUUIDString[17];
+                BinaryGUUID[14] = GUUIDString[18];
+                BinaryGUUID[15] = GUUIDString[19];
+            }
+        }
+        return NULL;
+    }
+    
+    uint8_t *ConvertBinaryGUUID2GUUIDString(const uint8_t *BinaryGUUID) {
+        uint8_t *GUUIDString   = NULL;
+        if (BinaryGUUID == NULL) {
+            Log(LOG_ERR, "libBitIO", "ConvertBinaryGUUID2GUUIDString", "Pointer to BinaryGUUID is NULL");
+        } else {
+            GUUIDString        = calloc(1, BitIOGUUIDStringSize);
+            if (GUUIDString == NULL) {
+                Log(LOG_ERR, "libBitIO", "ConvertBinaryGUUID2GUUIDString", "Not enough memory to calloc %d bytes", BitIOGUUIDStringSize);
+            } else {
+                GUUIDString[0] = BinaryGUUID[0];
+                GUUIDString[1] = BinaryGUUID[1];
+                GUUIDString[2] = BinaryGUUID[2];
+                GUUIDString[3] = BinaryGUUID[3];
+                
+                GUUIDString[4] = 0x2D;
+                
+                GUUIDString[5] = BinaryGUUID[4];
+                GUUIDString[6] = BinaryGUUID[5];
+                
+                GUUIDString[7] = 0x2D;
+                
+                GUUIDString[8] = BinaryGUUID[6];
+                GUUIDString[9] = BinaryGUUID[7];
+                
+                GUUIDString[10] = 0x2D;
+                
+                GUUIDString[11] = BinaryGUUID[8];
+                GUUIDString[12] = BinaryGUUID[9];
+                
+                GUUIDString[13] = 0x2D;
+                
+                GUUIDString[14] = BinaryGUUID[10];
+                GUUIDString[15] = BinaryGUUID[11];
+                GUUIDString[16] = BinaryGUUID[12];
+                GUUIDString[17] = BinaryGUUID[13];
+                GUUIDString[18] = BinaryGUUID[14];
+                GUUIDString[19] = BinaryGUUID[15];
+#ifdef Macintosh
+                GUUIDString[20] = '\r';
+                GUUIDString[21] = 0x00;
+#elif _POSIX_VERSION
+                GUUIDString[20] = '\n';
+                GUUIDString[21] = 0x00;
+#elif  _WIN32
+                GUUIDString[20] = '\r';
+                GUUIDString[21] = '\n';
+                GUUIDString[22] = 0x00;
+#endif
+            }
+        }
+        return GUUIDString;
+    }
+    
+    uint8_t *SwapGUUIDString(const uint8_t *GUUIDString) {
+        uint8_t *SwappedGUUIDString    = NULL;
+        if (GUUIDString == NULL) {
+            Log(LOG_ERR, "libBitIO", "SwapGUUIDString", "Pointer to GUUIDString is NULL");
+        } else {
+            SwappedGUUIDString         = calloc(1, BitIOGUUIDStringSize);
+            if (SwappedGUUIDString == NULL) {
+                Log(LOG_ERR, "libBitIO", "SwapGUUIDString", "Not enough memory to calloc %d bytes", BitIOGUUIDStringSize);
+            } else {
+                SwappedGUUIDString[0]  = GUUIDString[3];
+                SwappedGUUIDString[1]  = GUUIDString[2];
+                SwappedGUUIDString[2]  = GUUIDString[1];
+                SwappedGUUIDString[3]  = GUUIDString[0];
+                
+                SwappedGUUIDString[4]  = GUUIDString[4];
+                
+                SwappedGUUIDString[5]  = GUUIDString[6];
+                SwappedGUUIDString[6]  = GUUIDString[5];
+                
+                SwappedGUUIDString[7]  = GUUIDString[7];
+                
+                SwappedGUUIDString[8]  = GUUIDString[9];
+                SwappedGUUIDString[9]  = GUUIDString[8];
+                
+                SwappedGUUIDString[10] = GUUIDString[10];
+                
+                SwappedGUUIDString[11] = GUUIDString[12];
+                SwappedGUUIDString[12] = GUUIDString[11];
+                
+                for (uint8_t EndBytes = 13; EndBytes < BitIOGUUIDStringSize - 1; EndBytes++) {
+                    SwappedGUUIDString[EndBytes] = GUUIDString[EndBytes];
+                }
+#ifdef Macintosh
+                SwappedGUUIDString[20] = '\r';
+                SwappedGUUIDString[21] = 0x00;
+#elif _POSIX_VERSION
+                SwappedGUUIDString[20] = '\n';
+                SwappedGUUIDString[21] = 0x00;
+#elif  _WIN32
+                SwappedGUUIDString[20] = '\r';
+                SwappedGUUIDString[21] = '\n';
+                SwappedGUUIDString[22] = 0x00;
+#endif
+            }
+        }
+        return SwappedGUUIDString;
+    }
+    
+    uint8_t *SwapBinaryGUUID(const uint8_t *BinaryGUUID) {
+        uint8_t *SwappedBinaryGUUID   = NULL;
+        if (BinaryGUUID == NULL) {
+            Log(LOG_ERR, "libBitIO", "SwapBinaryGUUID", "Pointer to BinaryGUUID is NULL");
+        } else {
+            SwappedBinaryGUUID        = calloc(1, BitIOBinaryGUUIDSize);
+            if (SwappedBinaryGUUID == NULL) {
+                Log(LOG_ERR, "libBitIO", "SwapBinaryGUUID", "Not enough memory to calloc %d bytes", BitIOBinaryGUUIDSize);
+            } else {
+                SwappedBinaryGUUID[0] = BinaryGUUID[3];
+                SwappedBinaryGUUID[1] = BinaryGUUID[2];
+                SwappedBinaryGUUID[2] = BinaryGUUID[1];
+                SwappedBinaryGUUID[3] = BinaryGUUID[0];
+                
+                SwappedBinaryGUUID[4] = BinaryGUUID[5];
+                SwappedBinaryGUUID[5] = BinaryGUUID[4];
+                
+                SwappedBinaryGUUID[6] = BinaryGUUID[7];
+                SwappedBinaryGUUID[7] = BinaryGUUID[6];
+                
+                SwappedBinaryGUUID[8] = BinaryGUUID[9];
+                SwappedBinaryGUUID[9] = BinaryGUUID[8];
+                
+                for (uint8_t EndBytes = 10; EndBytes < BitIOBinaryGUUIDSize - 1; EndBytes++) {
+                    SwappedBinaryGUUID[EndBytes] = BinaryGUUID[EndBytes];
+                }
+            }
+        }
+        return SwappedBinaryGUUID;
+    }
+    
     uint8_t *WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString) {
         return NULL;
     }
@@ -756,236 +922,6 @@ extern "C" {
     void DeinitGUUID(uint8_t *GUUID) {
         free(GUUID);
     }
-    
-    /*
-    static uint8_t *ConvertBinaryUUID2UUIDString(const uint8_t *BinaryUUID) {
-        uint8_t *UUIDString = NULL;
-        
-        // 0xe6 0x1b 0xd7 0x90 - 0xa9 0xc4 - 0x4a 0xf8 - 0xa5 0x28 - 0x5a 0xfb 0x6a 0xcd 0x27 0x1b
-        
-        if (BinaryUUID == NULL) {
-            Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "Pointer to BinaryUUID is NULL");
-        } else if (sizeof(BinaryUUID) != BitIOBinaryUUIDSize) {
-            Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "BinaryUUID size should be: %d, but is: %d", BitIOBinaryUUIDSize, sizeof(BinaryUUID));
-        } else {
-            UUIDString = calloc(1, BitIOUUIDStringSize);
-            if (UUIDString == NULL) {
-                Log(LOG_ERR, "libBitIO", "ConvertBinaryUUID2UUIDString", "Not enough memory to allocate UUIDString");
-            } else {
-                for (uint8_t Byte = 0; Byte < BitIOBinaryUUIDSize; Byte++) {
-                    if (Byte == 4 || Byte == 7 || Byte == 10 || Byte == 13) {
-                        UUIDString[Byte] = 0x2D;
-                    } else if (Byte == 20) {
-                        UUIDString[Byte] = 0x0;
-                    } else {
-                        UUIDString[Byte] = BinaryUUID[Byte];
-                    }
-                }
-            }
-        }
-        return UUIDString;
-    }
-    
-    uint8_t *ReadBinaryUUID(BitBuffer *BitB) {
-        uint8_t *UUIDString = NULL;
-        if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadBinaryUUID", "Pointer to BitBuffer is NULL");
-        } else {
-            uint8_t *BinaryUUID = calloc(1, BitIOBinaryUUIDSize);
-            if (BinaryUUID == NULL) {
-                Log(LOG_ERR, "libBitIO", "ReadBinaryUUID", "Not enough memory to allocate BinaryUUID");
-            } else {
-                for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
-                    BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
-                }
-                UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
-                free(BinaryUUID);
-            }
-        }
-        return UUIDString;
-    }
-    
-    uint8_t *ReadUUIDString(BitBuffer *BitB) {
-        uint8_t *UUIDString = NULL;
-        if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadUUIDString", "Pointer to BitBuffer is NULL");
-        } else {
-            uint8_t *BinaryUUID = calloc(1, BitIOBinaryUUIDSize);
-            if (BinaryUUID == NULL) {
-                Log(LOG_ERR, "libBitIO", "ReadUUIDString", "Not enough memory to allocate BinaryUUID");
-            } else {
-                for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
-                    BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
-                }
-                UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
-                free(BinaryUUID);
-            }
-        }
-        return UUIDString;
-    }
-    
-    uint8_t *ReadBinaryGUID(BitBuffer *BitB) {
-        uint8_t *UUIDString = NULL;
-        if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadBinaryGUID", "Pointer to BitBuffer is NULL");
-        } else {
-            uint8_t *BinaryUUID = calloc(1, BitIOBinaryUUIDSize);
-            if (BinaryUUID == NULL) {
-                Log(LOG_ERR, "libBitIO", "ReadBinaryGUID", "Not enough memory to allocate BinaryUUID");
-            } else {
-                for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
-                    BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
-                }
-                UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
-                free(BinaryUUID);
-            }
-        }
-        return UUIDString;
-    }
-    
-    uint8_t *ReadGUIDString(BitBuffer *BitB) {
-        uint8_t *UUIDString = NULL;
-        if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "ReadGUIDString", "Pointer to BitBuffer is NULL");
-        } else {
-            uint8_t *BinaryUUID = calloc(1, BitIOBinaryUUIDSize);
-            if (BinaryUUID == NULL) {
-                Log(LOG_ERR, "libBitIO", "ReadGUIDString", "Not enough memory to allocate BinaryUUID");
-            } else {
-                for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
-                    BinaryUUID[UUIDByte] = ReadBits(BitB, 8, true);
-                }
-                UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
-                free(BinaryUUID);
-            }
-        }
-        return UUIDString;
-    }
-    
-    static uint8_t *ConvertUUIDString2BinaryUUID(const uint8_t *UUIDString) {
-        uint8_t *BinaryUUID = NULL;
-        // 0xe6 0x1b 0xd7 0x90 - 0xa9 0xc4 - 0x4a 0xf8 - 0xa5 0x28 - 0x5a 0xfb 0x6a 0xcd 0x27 0x1b
-        if (UUIDString == NULL) {
-            Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "Pointer to UUIDString is NULL");
-        } else if (sizeof(UUIDString) != BitIOUUIDStringSize) {
-            Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "UUIDString size should be: %d, but is: %d", BitIOUUIDStringSize, sizeof(UUIDString));
-        } else {
-            BinaryUUID = calloc(1, BitIOBinaryUUIDSize);
-            if (BinaryUUID == NULL) {
-                Log(LOG_ERR, "libBitIO", "ConvertUUIDString2BinaryUUID", "Not enough memory to allocate BinaryUUID");
-            } else {
-                for (uint8_t Byte = 0; Byte < BitIOUUIDStringSize; Byte++) {
-                    if (Byte != 4 && Byte != 7 && Byte != 10 && Byte != 13 && Byte != 20) {
-                        BinaryUUID[Byte] = UUIDString[Byte];
-                    }
-                }
-            }
-        }
-        return BinaryUUID;
-    }
-    
-    static uint8_t *SwapBinaryUUID(const uint8_t *BinaryUUID) { // Should I make wrappers called ConvertUUID2GUID and SwapGUID2UUID?
-        uint8_t *SwappedBinaryUUID = NULL;
-        
-        if (BinaryUUID == NULL) {
-            Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "Pointer to BinaryUUID is NULL");
-        } else if (sizeof(BinaryUUID) != BitIOBinaryUUIDSize) {
-            Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "BinaryUUID size should be: %d, but is: %d", BitIOBinaryUUIDSize, sizeof(BinaryUUID));
-        } else {
-            SwappedBinaryUUID = calloc(1, BitIOBinaryUUIDSize);
-            if (SwappedBinaryUUID == NULL) {
-                Log(LOG_ERR, "libBitIO", "SwapBinaryUUID", "Not enough memory to allocate SwappedBinaryUUID");
-            } else {
-                SwappedBinaryUUID[0]        = BinaryUUID[3];
-                SwappedBinaryUUID[1]        = BinaryUUID[2];
-                SwappedBinaryUUID[2]        = BinaryUUID[1];
-                SwappedBinaryUUID[3]        = BinaryUUID[0];
-                SwappedBinaryUUID[4]        = BinaryUUID[5];
-                SwappedBinaryUUID[5]        = BinaryUUID[4];
-                SwappedBinaryUUID[6]        = BinaryUUID[7];
-                SwappedBinaryUUID[7]        = BinaryUUID[6];
-                SwappedBinaryUUID[8]        = BinaryUUID[9];
-                SwappedBinaryUUID[9]        = BinaryUUID[8];
-                for (uint8_t Byte = 10; Byte < 16; Byte++) {
-                    SwappedBinaryUUID[Byte] = BinaryUUID[Byte];
-                }
-            }
-        }
-        return SwappedBinaryUUID;
-    }
-    
-    uint8_t *ConvertUUIDString2GUIDString(const uint8_t *UUIDString) {
-        uint8_t *BinaryUUID = NULL;
-        uint8_t *BinaryGUID = NULL;
-        uint8_t *GUIDString = NULL;
-        
-        if (UUIDString == NULL) {
-            Log(LOG_ERR, "libBitIO", "ConvertUUIDString2GUIDString", "Pointer to UUIDString is NULL");
-        } else {
-            GUIDString = calloc(1, BitIOGUIDStringSize);
-            if (GUIDString == NULL) {
-                Log(LOG_ERR, "libBitIO", "ConvertUUIDString2GUIDString", "Not enough memory to allocate GUIDString");
-            } else {
-                BinaryUUID = ConvertUUIDString2BinaryUUID(UUIDString);
-                BinaryGUID = SwapBinaryUUID(BinaryUUID);
-                GUIDString = ConvertBinaryUUID2UUIDString(BinaryGUID);
-            }
-        }
-        return GUIDString;
-    }
-    
-    uint8_t *ConvertGUIDString2UUIDString(const uint8_t *GUIDString) {
-        uint8_t *BinaryGUID = NULL;
-        uint8_t *BinaryUUID = NULL;
-        uint8_t *UUIDString = NULL;
-        
-        if (GUIDString == NULL) {
-            Log(LOG_ERR, "libBitIO", "ConvertGUIDString2UUIDString", "Pointer to GUIDString is NULL");
-        } else {
-            UUIDString = calloc(1, BitIOUUIDStringSize);
-            if (UUIDString == NULL) {
-                Log(LOG_ERR, "libBitIO", "ConvertGUIDString2UUIDString", "Not enough memory to allocate UUIDString");
-            } else {
-                BinaryGUID = ConvertUUIDString2BinaryUUID(GUIDString);
-                BinaryUUID = SwapBinaryUUID(BinaryGUID);
-                UUIDString = ConvertBinaryUUID2UUIDString(BinaryUUID);
-            }
-        }
-        return UUIDString;
-    }
-    
-    bool CompareUUIDStrings(const uint8_t *UUIDString1, const uint8_t *UUIDString2) {
-        bool UUIDsMatch = 0;
-        
-        if (UUIDString1 == NULL) {
-            Log(LOG_ERR, "libBitIO", "CompareUUIDStrings", "Pointer to UUIDString1 is NULL");
-        } else if (UUIDString2 == NULL) {
-            Log(LOG_ERR, "libBitIO", "CompareUUIDStrings", "Pointer to UUIDString2 is NULL");
-        } else {
-            for (uint8_t UUIDByte = 0; UUIDByte < BitIOUUIDStringSize - 1; UUIDByte++) {
-                if (UUIDString1[UUIDByte] != UUIDString2[UUIDByte]) {
-                    UUIDsMatch = false;
-                } else if ((UUIDString1[UUIDByte] == UUIDString2[UUIDByte]) && (UUIDByte = BitIOUUIDStringSize - 1)) {
-                    UUIDsMatch = true;
-                }
-            }
-        }
-        return UUIDsMatch;
-    }
-    
-    void WriteUUID(BitBuffer *BitB, const uint8_t *UUIDString) {
-        if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteUUID", "Pointer to BitBuffer is NULL");
-        } else if (UUIDString == NULL) {
-            Log(LOG_ERR, "libBitIO", "WriteUUID", "Pointer to UUIDString is NULL");
-        } else {
-            uint8_t *BinaryUUID = ConvertUUIDString2BinaryUUID(UUIDString);
-            for (uint8_t UUIDByte = 0; UUIDByte < BitIOBinaryUUIDSize; UUIDByte++) {
-                WriteBits(BitB, BinaryUUID[UUIDByte], 8, true);
-            }
-        }
-    }
-     */
     
     /*
      So, I need to accept packets of variable size, from the network, disk, whatever.
