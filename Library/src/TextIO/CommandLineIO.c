@@ -147,7 +147,7 @@ extern "C" {
         }
     }
     
-    void SetCLILicense(CommandLineIO *CLI, char *Name, char *LicenseDescription, const char *LicenseURL, const bool IsProprietary) {
+    void SetCLILicense(CommandLineIO *CLI, char *Name, char *LicenseDescription, char *LicenseURL, const bool IsProprietary) {
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "SetCLILicense", "Pointer to CommandLineIO is NULL");
         } else if (Name == NULL) {
@@ -163,16 +163,6 @@ extern "C" {
             } else {
                 CLI->IsProprietary         = false;
             }
-        }
-    }
-    
-    void SetCLILicenseURL(CommandLineIO *CLI, char *LicenseURL) {
-        if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLILicenseURL", "Pointer to CommandLineIO is NULL");
-        } else if (LicenseURL == NULL) {
-            Log(LOG_ERR, "libBitIO", "SetCLILicenseURL", "Pointer to LicenseURL is NULL");
-        } else {
-            CLI->ProgramLicenseURL = LicenseURL;
         }
     }
     
