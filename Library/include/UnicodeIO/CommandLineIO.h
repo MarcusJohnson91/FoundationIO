@@ -76,7 +76,7 @@ extern "C" {
      @param               LicenseURL                "the actual URL for the license".
      @param               IsProprietary             "Is this program released under an open source license, or a EULA?".
      */
-    void                  SetCLILicense(CommandLineIO *CLI, char *Name, char *LicenseDescription, const char *LicenseURL, const bool IsProprietary);
+    void                  SetCLILicense(CommandLineIO *CLI, char *Name, char *LicenseDescription, char *LicenseURL, const bool IsProprietary);
     
     /*!
      @abstract                                      "What is the minimum number of switches your program needs to operate?".
