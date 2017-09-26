@@ -83,11 +83,11 @@ extern "C" {
     /*!
      @enum				BitIOConstants
      @abstract									"BitIO compile time constants".
-     @constant			BitIOGUUIDStringSize	"Size of a UUIDString or GUIDString including dashes, line ending, and null terminator".
+     @constant			BitIOGUUIDStringSize	"Size of a UUIDString or GUIDString including dashes, and null terminator".
      @constant			BitIOBinaryGUUIDSize	"Size of a BinaryUUID or BinaryGUID".
      */
     enum BitIOConstants {
-        				BitIOGUUIDStringSize	= (21 + BitIONewLineSize),
+        				BitIOGUUIDStringSize	= (21),
         				BitIOBinaryGUUIDSize	= (16),
     };
     
