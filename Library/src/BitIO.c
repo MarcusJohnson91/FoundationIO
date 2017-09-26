@@ -679,7 +679,7 @@ extern "C" {
             uint16_t Section4    = ExtractBitsFromMSByteLSBit(BitB, 16);
             SkipBits(BitB, 8);
             uint64_t Section5    = ExtractBitsFromMSByteLSBit(BitB, 48);
-            sprintf((char*)UUIDString, "%d-%d-%d-%d-%llu%s", Section1, Section2, Section3, Section4, Section5, BitIOLineEnding);
+            sprintf((char*)UUIDString, "%d-%d-%d-%d-%llu%d", Section1, Section2, Section3, Section4, Section5, 0x0);
         }
         return UUIDString;
     }
@@ -698,7 +698,7 @@ extern "C" {
             uint16_t Section4    = ExtractBitsFromLSByteLSBit(BitB, 16);
             SkipBits(BitB, 8);
             uint64_t Section5    = ExtractBitsFromMSByteLSBit(BitB, 48);
-            sprintf((char*)GUIDString, "%d-%d-%d-%d-%llu%s", Section1, Section2, Section3, Section4, Section5, BitIOLineEnding);
+            sprintf((char*)GUIDString, "%d-%d-%d-%d-%llu%d", Section1, Section2, Section3, Section4, Section5, 0x0);
         }
         return GUIDString;
     }
@@ -808,17 +808,7 @@ extern "C" {
                 GUUIDString[17] = BinaryGUUID[13];
                 GUUIDString[18] = BinaryGUUID[14];
                 GUUIDString[19] = BinaryGUUID[15];
-#ifdef Macintosh
-                GUUIDString[20] = '\r';
-                GUUIDString[21] = 0x00;
-#elif _POSIX_VERSION
-                GUUIDString[20] = '\n';
-                GUUIDString[21] = 0x00;
-#elif  _WIN32
-                GUUIDString[20] = '\r';
-                GUUIDString[21] = '\n';
-                GUUIDString[22] = 0x00;
-#endif
+                GUUIDString[20] = 0x00;
             }
         }
         return GUUIDString;
@@ -856,17 +846,7 @@ extern "C" {
                 for (uint8_t EndBytes = 13; EndBytes < BitIOGUUIDStringSize - 1; EndBytes++) {
                     SwappedGUUIDString[EndBytes] = GUUIDString[EndBytes];
                 }
-#ifdef Macintosh
-                SwappedGUUIDString[20] = '\r';
-                SwappedGUUIDString[21] = 0x00;
-#elif _POSIX_VERSION
-                SwappedGUUIDString[20] = '\n';
-                SwappedGUUIDString[21] = 0x00;
-#elif  _WIN32
-                SwappedGUUIDString[20] = '\r';
-                SwappedGUUIDString[21] = '\n';
-                SwappedGUUIDString[22] = 0x00;
-#endif
+                SwappedGUUIDString[20] = 0x00;
             }
         }
         return SwappedGUUIDString;

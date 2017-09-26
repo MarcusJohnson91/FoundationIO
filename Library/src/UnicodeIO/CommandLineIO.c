@@ -453,6 +453,23 @@ extern "C" {
         return Result;
     }
     
+    bool GetCLIArgumentPresenceFromSwitch(CommandLineIO const *CLI, uint64_t SwitchNum) {
+        uint64_t FoundArgument = 0xFFFFFFFFFFFFFFFFULL;
+        if (CLI == NULL) {
+            Log(LOG_ERR, "libBitIO", "GetCLIArgumentNumFromSwitchNum", "Pointer to CommandLineIO is NULL");
+        } else if (SwitchNum > CLI->NumSwitches) {
+            Log(LOG_ERR, "libBitIO", "GetCLIArgumentNumFromSwitchNum", "SwitchNum %d is not a valid Switch", SwitchNum);
+        } else {
+            for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
+                // Loop over the arguments until you find CLI->Arguments[Argument].SwitchNum that matches SwitchNum
+                if (CLI->Arguments[Argument].SwitchNum == SwitchNum) {
+                    FoundArgument = Argument;
+                }
+            }
+        }
+        return FoundArgument;
+    }
+    
     void DeinitCommandLineIO(CommandLineIO *CLI) {
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "DeinitCommandLineIO", "Pointer to CommandLineIO is NULL");
