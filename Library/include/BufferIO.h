@@ -369,7 +369,7 @@ extern "C" {
     uint8_t		       *ReadGUUIDAsBinaryUUID(BitBuffer *BitB);
     uint8_t		       *ReadGUUIDAsBinaryGUID(BitBuffer *BitB);
     
-#define ReadGUUID(GUUIDType,BitB)_Generic((GUUIDType),BitIOUUIDString_t:ReadGUUIDAsUUIDString,BitIOGUIDString_t:ReadGUUIDAsGUIDString,BitIOBinaryUUID_t:ReadGUUIDAsBinaryUUID,BitIOBinaryGUID_t:ReadGUUIDAsBinaryGUID)(BitB)
+#define ReadGUUID(GUUIDType,BitB)_Generic((GUUIDType),UUIDString_t:ReadGUUIDAsUUIDString,GUIDString_t:ReadGUUIDAsGUIDString,BinaryUUID_t:ReadGUUIDAsBinaryUUID,BinaryGUID_t:ReadGUUIDAsBinaryGUID)(BitB)
     
     void				WriteBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
     void				WriteBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
