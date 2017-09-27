@@ -6,6 +6,7 @@
  @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
  */
 
+#include <float.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
