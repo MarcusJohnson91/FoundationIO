@@ -23,40 +23,40 @@
 #ifndef    BITIOBYTEBITORDERS
 #define    BITIOBYTEBITORDERS
 #ifndef    BitIOLSByte
-#define    BitIOLSByte     ULLONG_MAX
-typedef unsigned long long BitBLSByte_t;
+#define    BitIOLSByte        ULLONG_MAX
+typedef    unsigned long long BitBLSByte_t;
 #endif  /* BitIOLittleEndian */
 #ifndef    BitIOMSByte
-#define    BitIOMSByte     LLONG_MIN
-typedef signed long long   BitBMSByte_t;
+#define    BitIOMSByte        LLONG_MIN
+typedef    signed long long   BitBMSByte_t;
 #endif  /* BitIOBigEndian */
 #ifndef    BitIOLSBit
-#define    BitIOLSBit      ULLONG_MAX
-typedef unsigned long long BitBLSBit_t;
+#define    BitIOLSBit         ULLONG_MAX
+typedef    unsigned long long BitBLSBit_t;
 #endif  /* BitIOLSBit */
 #ifndef    BitIOMSBit
-#define    BitIOMSBit      LLONG_MIN
-typedef signed long long   BitBMSBit_t;
+#define    BitIOMSBit         LLONG_MIN
+typedef    signed long long   BitBMSBit_t;
 #endif  /* BitIOMSBit */
 #endif  /* BITIOBYTEBITORDERS */
 
 #ifndef   BITIOGUUIDTYPES
 #define   BITIOGUUIDTYPES
 #ifndef   BitIOGUIDString
-#define   BitIOGUIDString  ULLONG_MAX
-typedef unsigned long long GUIDString_t;
+#define   BitIOGUIDString    ULLONG_MAX
+typedef   unsigned long long GUIDString_t;
 #endif /* BitIOGUIDString */
 #ifndef   BitIOUUIDString
-#define   BitIOUUIDString  LLONG_MIN
-typedef signed long long   UUIDString_t;
+#define   BitIOUUIDString    LLONG_MAX
+typedef   signed long long   UUIDString_t;
 #endif /* BitIOUUIDString */
 #ifndef   BitIOBinaryGUID
-#define   BitIOBinaryGUID  UCHAR_MAX
-typedef unsigned char      BinaryGUID_t;
+#define   BitIOBinaryGUID    FLT_MIN
+typedef   float              BinaryGUID_t;
 #endif /* BitIOBinaryGUID */
 #ifndef   BitIOBinaryUUID
-#define   BitIOBinaryUUID  CHAR_MIN
-typedef signed char        BinaryUUID_t;
+#define   BitIOBinaryUUID    DBL_MAX
+typedef   double             BinaryUUID_t;
 #endif /* BITIOGUUIDTYPES */
 #endif /* BITIOGUUIDTYPES */
 
@@ -383,7 +383,7 @@ extern "C" {
     uint8_t		       *WriteGUUIDAsBinaryUUID(BitBuffer *BitB, const uint8_t *BinaryUUID);
     uint8_t		       *WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID);
     
-#define WriteGUUID(GUUIDType,BitB,GUUID)_Generic((GUUIDType),BitIOUUIDString_t:WriteGUUIDAsUUIDString,BitIOGUIDString_t:WriteGUUIDAsGUIDString,BitIOBinaryUUID_t:WriteGUUIDAsBinaryUUID,BitIOBinaryGUID_t:WriteGUUIDAsBinaryGUID)(BitB,GUUID)
+#define WriteGUUID(GUUIDType,BitB,GUUID)_Generic((GUUIDType),UUIDString_t:WriteGUUIDAsUUIDString,GUIDString_t:WriteGUUIDAsGUIDString,BinaryUUID_t:WriteGUUIDAsBinaryUUID,BinaryGUID_t:WriteGUUIDAsBinaryGUID)(BitB,GUUID)
     
     /*!
      @abstract									"Compares GUUIDStrings or BinaryGUUIDs (but not a GUUIDString to a BinaryGUUID) for equilivence".
