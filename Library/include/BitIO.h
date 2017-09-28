@@ -197,42 +197,42 @@ extern "C" {
      @param				Byte					"Byte to swap bits".
      @return									"Returns swapped byte".
      */
-    inline uint8_t      SwapBitsInByte(const uint8_t Byte);
+ 	uint8_t      		SwapBitsInByte(const uint8_t Byte);
     
     /*!
      @abstract									"Swap nibbles in a byte".
      @param				Byte2Swap				"Byte to swap nibbles".
      @return									"Returns byte with swapped nibbles".
      */
-    inline uint8_t      SwapNibble(const uint8_t Byte2Swap);
+ 	uint8_t      		SwapNibble(const uint8_t Byte2Swap);
     
     /*!
      @abstract									"Swap endian of 16 bit integers".
      @param				Data2Swap				"Data to swap endian".
      @return									"Returns swapped uint16_t".
      */
-    inline uint16_t     SwapEndian16(const uint16_t Data2Swap);
+ 	uint16_t     		SwapEndian16(const uint16_t Data2Swap);
     
     /*!
      @abstract									"Swap endian of 32 bit integers".
      @param				Data2Swap				"Data to swap endian".
      @return									"Returns swapped uint32_t".
      */
-    inline uint32_t     SwapEndian32(const uint32_t Data2Swap);
+ 	uint32_t     		SwapEndian32(const uint32_t Data2Swap);
     
     /*!
      @abstract									"Swap endian of 64 bit integers".
      @param				Data2Swap				"Data to swap endian".
      @return									"Returns swapped uint64_t".
      */
-    inline uint64_t     SwapEndian64(const uint64_t Data2Swap);
+ 	uint64_t     		SwapEndian64(const uint64_t Data2Swap);
     
     /*!
      @abstract									"Computes the number of bits from the number of bytes".
      @param				Bytes					"The number of bytes you want to interpret as bits".
      @return									"Returns the number of bits".
      */
-    inline int64_t      Bytes2Bits(const int64_t Bytes);
+ 	int64_t      		Bytes2Bits(const int64_t Bytes);
     
     /*!
      @abstract									"Computes the number of bytes from the number of bits".
@@ -240,7 +240,7 @@ extern "C" {
      @param				RoundUp					"Should the resulting bytes be rounded up or down?".
      @return									"Returns the number of bytes".
      */
-    inline int64_t      Bits2Bytes(const int64_t Bits, const bool RoundUp);
+ 	int64_t      		Bits2Bytes(const int64_t Bits, const bool RoundUp);
     
     /*!
      @abstract									"Computes the number of bits required to hold a certain amount of symbols".
@@ -248,14 +248,14 @@ extern "C" {
      @param				NumSymbols				"The number of symbols you're looking to contain in a binary number".
      @return									"Returns the number of bits required to read a symbol".
      */
-    inline uint64_t     NumBits2ReadSymbols(const uint64_t NumSymbols);
+ 	uint64_t     		NumBits2ReadSymbols(const uint64_t NumSymbols);
     
     /*!
      @abstract									"Tells whether Input is even or odd".
      @param				Number2Check			"The number to see if it's odd or even".
      @return									"True for odd, false for even".
      */
-    inline bool         IsOdd(const int64_t Number2Check);
+ 	bool         		IsOdd(const int64_t Number2Check);
     
     /*!
      @abstract									"Computes the number of bytes left in the file".
