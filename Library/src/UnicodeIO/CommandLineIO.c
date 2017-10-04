@@ -314,8 +314,8 @@ extern "C" {
                             if (CLI->NumArguments == 0) {
                                 CLI->Arguments         = calloc(1, sizeof(CommandLineArgument));
                             } else {
-                                uint64_t NumArguments  = (uint64_t) CLI->Arguments + 1;
-                                uint64_t ArgumentsSize = sizeof(CommandLineArgument) * NumArguments;
+                                CLI->NumArguments     += 1;
+                                uint64_t ArgumentsSize = sizeof(CommandLineArgument) * CLI->NumArguments;
                                 CLI->Arguments         = realloc(CLI->Arguments, ArgumentsSize);
                             }
                             if (CLI->Switches[CurrentSwitch].SwitchHasResult == true && CLI->Switches[CurrentSwitch].NumChildSwitches > 0) {

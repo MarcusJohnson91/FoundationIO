@@ -1,7 +1,3 @@
-#define _LARGEFILE_SOURCE
-#define _LARGEFILE64_SOURCE
-
-
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -665,6 +661,22 @@ extern "C" {
         }
     }
     
+    void WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned) {
+        
+    }
+    
+    void WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned) {
+        
+    }
+    
+    void WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned) {
+        
+    }
+    
+    void WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned) {
+        
+    }
+    
     uint8_t *ReadGUUIDAsUUIDString(BitBuffer *BitB) {
         uint8_t *UUIDString      = calloc(1, BitIOGUUIDStringSize);
         if (BitB == NULL) {
@@ -883,20 +895,16 @@ extern "C" {
         return SwappedBinaryGUUID;
     }
     
-    uint8_t *WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString) {
-        return NULL;
+    void WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString) {
     }
     
-    uint8_t *WriteGUUIDAsGUIDString(BitBuffer *BitB, const uint8_t *GUIDString) {
-        return NULL;
+    void WriteGUUIDAsGUIDString(BitBuffer *BitB, const uint8_t *GUIDString) {
     }
     
-    uint8_t *WriteGUUIDAsBinaryUUID(BitBuffer *BitB, const uint8_t *BinaryUUID) {
-        return NULL;
+    void WriteGUUIDAsBinaryUUID(BitBuffer *BitB, const uint8_t *BinaryUUID) {
     }
     
-    uint8_t *WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID) {
-        return NULL;
+    void WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID) {
     }
     
     void DeinitGUUID(uint8_t *GUUID) {
