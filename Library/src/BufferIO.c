@@ -661,19 +661,19 @@ extern "C" {
         }
     }
     
-    void WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned) {
+    void WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Bits2Write) {
         
     }
     
-    void WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned) {
+    void WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Bits2Write) {
         
     }
     
-    void WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned) {
+    void WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Bits2Write) {
         
     }
     
-    void WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned) {
+    void WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Bits2Write) {
         
     }
     
