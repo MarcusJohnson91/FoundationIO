@@ -379,12 +379,12 @@ extern "C" {
     
 #define ReadExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromLSByteLSBit,BitBMSBit_t:ReadExpGolombFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromMSByteLSBit,BitBMSBit_t:ReadExpGolombFromMSByteMSBit))(BitB,IsSigned)
     
-    void                WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned);
-    void                WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned);
-    void                WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned);
-    void                WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned);
+    void                WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Bits2Write);
+    void                WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Bits2Write);
+    void                WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Bits2Write);
+    void                WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Bits2Write);
     
-#define WriteExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsLSByteLSBit,BitBMSBit_t:WriteExpGolombAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsMSByteLSBit,BitBMSBit_t:WriteExpGolombAsMSByteMSBit))(BitB,IsSigned)
+#define WriteExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned,Bits2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsLSByteLSBit,BitBMSBit_t:WriteExpGolombAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsMSByteLSBit,BitBMSBit_t:WriteExpGolombAsMSByteMSBit))(BitB,IsSigned,Bits2Write)
     
     uint8_t		       *ReadGUUIDAsUUIDString(BitBuffer *BitB);
     uint8_t		       *ReadGUUIDAsGUIDString(BitBuffer *BitB);
