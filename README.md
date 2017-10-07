@@ -1,5 +1,5 @@
-**BitIO:** [![Build Status](https://travis-ci.org/MarcusJohnson91/BitIO.svg?branch=master)](https://travis-ci.org/MarcusJohnson91/BitIO)
-==========
+**BitIO:**
+========
 * BitIO (Pronounced Bit Eye Oh) is a library for Reading, and Writing bits (and all the tasks associated with doing so, like swapping byte and bit order, etc).
 * BitIO is designed for and tested on 64 bit CPUs (ARM64 and AMD64 to be specific), 32 bit OSes and CPUs are not tested, and never will be.
 * I've gone to great lengths to make sure BitIO is as fast as it can be, my bit readers and writers are generic functions to move branching to compile time instead of runtime for exmaple.
