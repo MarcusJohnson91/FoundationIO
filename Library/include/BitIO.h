@@ -51,25 +51,25 @@ typedef    signed long long   BitBMSBit_t;
 #endif  /* BitIOMSBit */
 #endif  /* BITIOBYTEBITORDERS */
 
-#ifndef   BITIOGUUIDTYPES
-#define   BITIOGUUIDTYPES
-#ifndef   BitIOGUIDString
-#define   BitIOGUIDString    ULLONG_MAX
-typedef   unsigned long long GUIDString_t;
-#endif /* BitIOGUIDString */
-#ifndef   BitIOUUIDString
-#define   BitIOUUIDString    LLONG_MAX
-typedef   signed long long   UUIDString_t;
-#endif /* BitIOUUIDString */
-#ifndef   BitIOBinaryGUID
-#define   BitIOBinaryGUID    FLT_MIN
-typedef   float              BinaryGUID_t;
-#endif /* BitIOBinaryGUID */
-#ifndef   BitIOBinaryUUID
-#define   BitIOBinaryUUID    DBL_MAX
-typedef   double             BinaryUUID_t;
-#endif /* BITIOGUUIDTYPES */
-#endif /* BITIOGUUIDTYPES */
+#ifndef    BITIOGUUIDTYPES
+#define    BITIOGUUIDTYPES
+#ifndef    BitIOGUIDString
+#define    BitIOGUIDString    ULLONG_MAX
+typedef    unsigned long long GUIDString_t;
+#endif  /* BitIOGUIDString */
+#ifndef    BitIOUUIDString
+#define    BitIOUUIDString    LLONG_MAX
+typedef    signed long long   UUIDString_t;
+#endif  /* BitIOUUIDString */
+#ifndef    BitIOBinaryGUID
+#define    BitIOBinaryGUID    FLT_MIN
+typedef    float              BinaryGUID_t;
+#endif  /* BitIOBinaryGUID */
+#ifndef    BitIOBinaryUUID
+#define    BitIOBinaryUUID    DBL_MAX
+typedef    double             BinaryUUID_t;
+#endif  /* BITIOGUUIDTYPES */
+#endif  /* BITIOGUUIDTYPES */
 
 #pragma once
 
