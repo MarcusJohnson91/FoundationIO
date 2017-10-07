@@ -21,6 +21,16 @@
 #include <unistd.h>
 #endif
 
+#ifndef    BitIOYesNo
+#define    BitIOYesNo
+#ifndef    Yes
+#define    Yes true
+#endif  /* Yes */
+#ifndef    No
+#define    No false
+#endif  /* No */
+#endif /* BitIOYesNo */
+
 #ifndef    BITIOBYTEBITORDERS
 #define    BITIOBYTEBITORDERS
 #ifndef    BitIOLSByte

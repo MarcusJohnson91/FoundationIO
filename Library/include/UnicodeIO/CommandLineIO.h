@@ -1,6 +1,6 @@
 /*!
  @header    CommandLineIO.h
- @author    Marcus Johnson aka BumbleBritches57
+ @author    Marcus Johnson
  @copyright 2017, Marcus Johnson
  @version   2.0.0
  @brief     This header contains code related to parsing the command line arguments.
