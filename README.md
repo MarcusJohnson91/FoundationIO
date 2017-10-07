@@ -1,8 +1,8 @@
 **BitIO:**
 ========
 * BitIO (Pronounced Bit Eye Oh) is a library for Reading, and Writing bits (and all the tasks associated with doing so, like swapping byte and bit order, etc).
-* BitIO is designed for and tested on 64 bit CPUs (ARM64 and AMD64 to be specific), 32 bit OSes and CPUs are not tested, and never will be.
-* I've gone to great lengths to make sure BitIO is as fast as it can be, my bit readers and writers are generic functions to move branching to compile time instead of runtime for exmaple.
+* BitIO is designed for and tested on 64 bit CPUs (ARM64 and AMD64 to be specific), 32 bit operating systems and CPUs are not tested, and never will be.
+* I've gone to great lengths to make sure BitIO is as fast as it can be, my bit readers and writers are generic functions to move branching to compile time instead of runtime for example.
 * Also, I've tried keeping BitIO modern, minimalist, and easy to use. we require C99, along with a preprocessor that supports _Generic programming.
 * BitIO is compatible with C++ through the C API, there are no wrappers because there's really no point in adding the additional baggage.
 * Currently, there's no stable API, let alone ABI. I break shit constantly to keep it easy to use.
@@ -17,19 +17,19 @@ Here's a tl;dr of my license:
 * **Do** include in your acknowledgments a link to [BitIO on GitHub](https://www.github.com/MarcusJohnson91/FoundationIO).
 * **Don't** plagiarize BitIO.
 * **Don't** relicense BitIO.
-* **Don't** sue me if something goes wrong. I never have and never will gurantee BitIO works for anything, you figure out if it's right for you.
+* **Don't** sue me if something goes wrong. I never have and never will guarantee BitIO works for anything, you figure out if it's right for you.
 
 Compiling:
 =========
 * libBitIO alone won't do a whole lot for you, it's real use is in being a library other libraries rely on.
-* When compiling you need to set the macros `LSByte/MSByte` and `LSBit/MSBit` for the byte and bit order of your CPU targets, if you're using libbitIO as a dependency, make sure to edit your makefile to pass those parameters.
+* When compiling you need to set the macros `LSByte/MSByte` and `LSBit/MSBit` for the byte and bit order of your CPU targets, if you're using libBitIO as a dependency, make sure to edit your makefile to pass those parameters.
 * The makefile by defaults builds the library as a static library, for RELEASE, to change this set `BUILDTYPE` to DEBUG.
 * BitIO is included as a submodule in git, so you don't need to install it if you're using one of my libraries, ModernPNG, ModernFLAC, ModernAVC, etc.
 * On my Mac for AMD64, the libBitIO static library is about 200kb, if that's too big for your use, enable link time optimization on your program to trim unused functions.
 
 MSVC:
 ----
-* Microsoft has decided to not support C11's `_Generic` preprocessor keyword, so you can't directly use the `ReadBits`/`PeekBits`/`ReadUnary`/`ReadExpGolomb`/`ReadGUUID`/`WriteBits`/`WriteGUUID` macros, I've chosen to rely on this preprocessor keyword to ensure that there is minimal branching during runtime, to gain performance on accelorators like GPUs.
+* Microsoft has decided to not support C11's `_Generic` preprocessor keyword, so you can't directly use the `ReadBits`/`PeekBits`/`ReadUnary`/`ReadExpGolomb`/`ReadGUUID`/`WriteBits`/`WriteUnary`/`WriteExpGolomb`/`WriteGUUID`/`WriteBits` macros, I've chosen to rely on this preprocessor keyword to ensure that there is minimal branching during runtime, to gain performance on accelerators like GPUs.
 To solve this problem, you can hardcode it with the `Read`/`Write``From``ByteOrder``BitOrder` functions, or pester Microsoft to fix their support for the C11 standard.
 
 How To Use libBitIO:
@@ -71,15 +71,31 @@ Logging:
 * Writes to a file you set as `BitIOGlobalLogFile`, if it's unset or otherwise inaccessible, all logs are printed to stderr.
 * Works on any platform that provides `stderr`, and `vsprintf`.
 
-UUID/GUIDs:
+GUUIDs:
 ----------
+* A `GUUID` is just a handy way to refer to UUID/GUIDStrings, and BinaryUUID/GUIDs as one object.
+* A GUUIDString is 21 bytes long, and includes a NULL terminator,  and the dashes.
+* A BinaryGUUID is 16 bytes long, and does not contain a NULL terminator or the dashes.
+* A UUID is most significant byte first for each section.
+* A GUID is least significant byte first for each section, except the last 6 bytes which are most significant.
 
-`ReadGUUID`/`WriteGUUID`:
+* GUUIDType: BitIOBinaryUUID, BitIOBinaryGUID, BitIOUUIDString, BitIOGUIDString
 
-* To free a UUID/GUID String, or Binary UUID/GUID call `DeinitGUUID`.
+`ReadGUUID`:  Reads a GUUID of GUUIDType from the BitBuffer, and returns a pointer to the new GUUID.
 
-* To convert a UUID to a GUID or vice versa call `ConvertUUID2GUID` or `ConvertGUID2UUID`.
+`WriteGUUID`: Writes a GUUID of GUUIDType from a pointer into the BitBuffer.
 
+`CompareGUUIDs`: Compares GUUIDs of the same GUUIDType to each other.
+
+`ConvertGUUIDString2BinaryGUUID`: Converts a GUUIDString to a BinaryGUUID (without swapping).
+
+`ConvertBinaryGUUID2GUUIDString`: Converts a BinaryGUUID to a GUUIDString (without swapping).
+
+`SwapGUUIDString`: Converts a GUUIDString to a GUUIDString of the opposite byte order.
+
+`SwapBinaryGUUID`: Converts a BinaryGUUID to a BinaryGUUID of the opposite byte order.
+
+`DeinitGUUID`: When you've had enough of GUUID nonsense, call this function to make your problems disappear.
 
 TODO:
 -----
