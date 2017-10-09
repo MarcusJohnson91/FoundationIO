@@ -138,31 +138,32 @@ extern "C" {
      @abstract                                      "Parses CommandLine arguments and counts the copies of a given switch found".
      @param               CLI                       "Pointer to CommandLineIO".
      @param               Switch                    "Which switch should we look for?".
+     @return                                        "Returns the number of arguments matching the SwitchNum"
      */
     uint64_t              GetCLINumArgumentsMatchingSwitch(CommandLineIO const *CLI, const uint64_t Switch);
     
     /*!
      @abstract                                      "Finds the argument that has both ParentSwitch and ChildSwitch present".
-     @return                                        "If no argument is found with that switch set, -1 is returned as the invalid result".
      @param               CLI                       "Pointer to CommandLineIO".
      @param               ParentSwitch              "The switch MetaSwitch should be in".
      @param               ChildSwitch               "MetaSwitch to find in the arguments".
+     @return                                        "If no argument is found with that switch set, -1 is returned as the invalid result".
      */
     uint64_t              GetCLIChildSwitchArgument(CommandLineIO const *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch);
     
     /*!
      @abstract                                      "Finds the switch who's flag matches Flag".
-     @return                                        "Returns 0xFFFFFFFFFFFFFFFF if a switch matching this flag was NOT found, otherwise, returns the switch num".
      @param               CLI                       "Pointer to CommandLineIO".
      @param               Flag                      "String containing the switch to look for".
+     @return                                        "Returns 0xFFFFFFFFFFFFFFFF if a switch matching this flag was NOT found, otherwise, returns the switch num".
      */
     uint64_t              GetCLISwitchNumFromFlag(CommandLineIO const *CLI, char *Flag);
     
     /*!
      @abstract                                      "Finds which argument contains Flag".
-     @return                                        "Returns the switch number if it was found, if it was not, it returns -1".
      @param               CLI                       "Pointer to CommandLineIO".
      @param               Flag                      "String containing the switch to look for".
+     @return                                        "Returns the switch number if it was found, if it was not, it returns -1".
      */
     uint64_t              GetCLIArgumentNumFromFlag(CommandLineIO const *CLI, char *Flag);
     
@@ -176,9 +177,9 @@ extern "C" {
     
     /*!
      @abstract                                      "Gets the data contained in Switch->Result".
-     @return                                        "Returns the data after the switch, if the switch is resultless it will return 0".
      @param               CLI                       "Pointer to CommandLineIO".
      @param               ArgumentNum               "The argument's result to return".
+     @return                                        "Returns the data after the switch, if the switch is resultless it will return 0".
      */
     char                 *GetCLIArgumentResult(CommandLineIO const *CLI, const uint64_t ArgumentNum);
     
