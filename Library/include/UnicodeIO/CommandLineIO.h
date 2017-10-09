@@ -184,6 +184,14 @@ extern "C" {
     char                 *GetCLIArgumentResult(CommandLineIO const *CLI, const uint64_t ArgumentNum);
     
     /*!
+     @abstract                                      "Is SwitchNum present in the Argument list?".
+     @param               CLI                       "Pointer to CommandLineIO".
+     @param               SwitchNum                 "The Switch to look for".
+     @return                                        "Returns the data after the switch, if the switch is resultless it will return 0".
+     */
+    bool                  GetCLIArgumentPresenceFromSwitch(CommandLineIO const *CLI, uint64_t SwitchNum);
+    
+    /*!
      @abstract                                      "Deallocates the instance of CommandLineIO pointed to by CLI".
      @param               CLI                       "Pointer to the instance of CommandLineIO you want to delete".
      */
