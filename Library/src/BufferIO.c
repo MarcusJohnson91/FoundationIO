@@ -674,35 +674,83 @@ extern "C" {
     }
     
     uint64_t ReadUnaryFromLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit) {
-        return 0ULL;
+        uint64_t Value = 0ULL;
+        while (ExtractBitsFromLSByteLSBit(BitB, 1) != StopBit) {
+            Value += 1;
+        }
+        return IsStrictlyPositive ? Value + 1 : Value; // Add 1 to count the stop bit for StrinctlyPostive, do not for non-negative.
     }
     
     uint64_t ReadUnaryFromLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit) {
-        return 0ULL;
+        uint64_t Value = 0ULL;
+        while (ExtractBitsFromLSByteMSBit(BitB, 1) != StopBit) {
+            Value += 1;
+        }
+        return IsStrictlyPositive ? Value + 1 : Value; // Add 1 to count the stop bit for StrinctlyPostive, do not for non-negative.
     }
     
     uint64_t ReadUnaryFromMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit) {
-        return 0ULL;
+        uint64_t Value = 0ULL;
+        while (ExtractBitsFromMSByteLSBit(BitB, 1) != StopBit) {
+            Value += 1;
+        }
+        return IsStrictlyPositive ? Value + 1 : Value; // Add 1 to count the stop bit for StrinctlyPostive, do not for non-negative.
     }
     
     uint64_t ReadUnaryFromMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit) {
-        return 0ULL;
+        uint64_t Value = 0ULL;
+        while (ExtractBitsFromMSByteMSBit(BitB, 1) != StopBit) {
+            Value += 1;
+        }
+        return IsStrictlyPositive ? Value + 1 : Value; // Add 1 to count the stop bit for StrinctlyPostive, do not for non-negative.
     }
     
-    void     WriteUnaryFromLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, const uint64_t Field2Write) {
-        
+    void     WriteUnaryFromLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write) {
+        bool ValueBit = ~StopBit & 1;
+        while (Field2Write > 0) {
+            if (IsStrictlyPositive == true) {
+                Field2Write -= 1;
+            }
+            InsertBitsAsLSByteLSBit(BitB, 1, ValueBit);
+            Field2Write--;
+        }
+        InsertBitsAsLSByteLSBit(BitB, 1, StopBit & 1);
     }
     
-    void     WriteUnaryFromLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, const uint64_t Field2Write) {
-        
+    void     WriteUnaryFromLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write) {
+        bool ValueBit = ~StopBit & 1;
+        while (Field2Write > 0) {
+            if (IsStrictlyPositive == true) {
+                Field2Write -= 1;
+            }
+            InsertBitsAsLSByteMSBit(BitB, 1, ValueBit);
+            Field2Write--;
+        }
+        InsertBitsAsLSByteMSBit(BitB, 1, StopBit & 1);
     }
     
-    void     WriteUnaryFromMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, const uint64_t Field2Write) {
-        
+    void     WriteUnaryFromMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write) {
+        bool ValueBit = ~StopBit & 1;
+        while (Field2Write > 0) {
+            if (IsStrictlyPositive == true) {
+                Field2Write -= 1;
+            }
+            InsertBitsAsMSByteLSBit(BitB, 1, ValueBit);
+            Field2Write--;
+        }
+        InsertBitsAsMSByteLSBit(BitB, 1, StopBit & 1);
     }
     
-    void     WriteUnaryFromMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, const uint64_t Field2Write) {
-        
+    void     WriteUnaryFromMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write) {
+        bool ValueBit = ~StopBit & 1;
+        while (Field2Write > 0) {
+            if (IsStrictlyPositive == true) {
+                Field2Write -= 1;
+            }
+            InsertBitsAsMSByteMSBit(BitB, 1, ValueBit);
+            Field2Write--;
+        }
+        InsertBitsAsMSByteMSBit(BitB, 1, StopBit & 1);
     }
     
     uint64_t ReadExpGolombFromLSByteLSBit(BitBuffer *BitB, const bool IsSigned) {

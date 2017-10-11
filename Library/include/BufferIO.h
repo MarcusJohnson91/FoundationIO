@@ -209,318 +209,309 @@ extern "C" {
 	 @return									"Returns the result of 1 *= Base, Exponent times".
 	 */
 	uint64_t            Power(const uint64_t Base, const uint64_t Exponent);
-    
-    /*!
-     @abstract									"Swap bits in a byte".
-     @param				Byte					"Byte to swap bits".
-     @return									"Returns swapped byte".
-     */
-    uint8_t      		SwapBitsInByte(const uint8_t Byte);
-    
-    /*!
-     @abstract									"Swap nibbles in a byte".
-     @param				Byte2Swap				"Byte to swap nibbles".
-     @return									"Returns byte with swapped nibbles".
-     */
-    uint8_t      		SwapNibble(const uint8_t Byte2Swap);
-    
-    /*!
-     @abstract									"Swap endian of 16 bit integers".
-     @param				Data2Swap				"Data to swap endian".
-     @return									"Returns swapped uint16_t".
-     */
-    uint16_t     		SwapEndian16(const uint16_t Data2Swap);
-    
-    /*!
-     @abstract									"Swap endian of 32 bit integers".
-     @param				Data2Swap				"Data to swap endian".
-     @return									"Returns swapped uint32_t".
-     */
-    uint32_t     		SwapEndian32(const uint32_t Data2Swap);
-    
-    /*!
-     @abstract									"Swap endian of 64 bit integers".
-     @param				Data2Swap				"Data to swap endian".
-     @return									"Returns swapped uint64_t".
-     */
-    uint64_t     		SwapEndian64(const uint64_t Data2Swap);
-    
-    /*!
-     @abstract									"Computes the number of bits from the number of bytes".
-     @param				Bytes					"The number of bytes you want to interpret as bits".
-     @return									"Returns the number of bits".
-     */
-    int64_t      		Bytes2Bits(const int64_t Bytes);
-    
-    /*!
-     @abstract									"Computes the number of bytes from the number of bits".
-     @param				Bits					"The bits to convert to bytes".
-     @param				RoundUp					"Should the resulting bytes be rounded up or down?".
-     @return									"Returns the number of bytes".
-     */
-    int64_t      		Bits2Bytes(const int64_t Bits, const bool RoundUp);
-    
-    /*!
-     @abstract									"Computes the number of bits required to hold a certain amount of symbols".
-     @remark									"Rounds up to the next integer number of bits to ensure all symbols can be contained in single integer".
-     @param				NumSymbols				"The number of symbols you're looking to contain in a binary number".
-     @return									"Returns the number of bits required to read a symbol".
-     */
-    uint64_t     		NumBits2ReadSymbols(const uint64_t NumSymbols);
-    
-    /*!
-     @abstract									"Tells whether Input is even or odd".
-     @param				Number2Check			"The number to see if it's odd or even".
-     @return									"True for odd, false for even".
-     */
-    bool         		IsOdd(const int64_t Number2Check);
-    
-    /*!
-     @abstract									"Computes the number of bytes left in the file".
-     @param				BitI					"Pointer to the instance of BitInput".
-     @return									"Returns the number of bytes left in the file".
-     */
-    fpos_t              BytesRemainingInBitInput(BitInput *BitI);
-    
-    /*!
-     @abstract									"Gets the size of the file pointed to by BitI"
-     @param				BitI					"Pointer to the instance of BitInput".
-     @return									"Returns the value in BitI->FileSize if it exists".
-     */
-    fpos_t              GetBitInputFileSize(BitInput *BitI);
-    
-    /*!
-     @abstract									"Gets the position of the Input file from the start".
-     @param				BitI					"Pointer to the instance of BitInput".
-     @return									"Returns the position of the file in bytes from the beginning"
-     */
-    fpos_t              GetBitInputFilePosition(BitInput *BitI);
-    
-    /*!
-     @abstract									"Gets the offset of the BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @return									"Returns the position offset from the start of BitBuffer".
-     */
-    uint64_t            GetBitBufferPosition(BitBuffer *BitB);
-    
-    /*!
-     @abstract									"Gets the size of the BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @return									"Returns the number of bits the buffer can hold max".
-     */
-    uint64_t            GetBitBufferSize(BitBuffer *BitB);
-    
-    /*!
-     @abstract									"Seeks to the end of BitI->File to determine the size".
-     @param				BitI					"Pointer to the instance of BitInput".
-     */
-    void				FindFileSize(BitInput *BitI);
-    
-    /*!
-     @abstract									"Opens an input file, pointed to by InputSwitch in CMD and stores the resulting pointer in BitI->File".
-     @param				BitI					"Pointer to the instance of BitInput".
-     @param				Path2Open				"Path to the input file to open".
-     */
-    void				OpenInputFile(BitInput *BitI, const char *Path2Open);
-    
-    /*!
-     @abstract									"Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitO->File".
-     @param				BitO					"Pointer to the instance of BitOutput".
-     @param				Path2Open				"Path to the output file to open".
-     */
-    void				OpenOutputFile(BitOutput *BitO, const char *Path2Open);
-    
-    /*!
-     @abstract									"Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitIOGlobalLogFile".
-     @param				LogFilePath				"Path to the log file to open/create".
-     */
-    void				OpenLogFile(const char *LogFilePath);
-    
-    /*!
-     @abstract									"Opens a socket for reading".
-     */
-    void				OpenInputSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol);
-    
-    /*!
-     @abstract									"Opens a socket for writing".
-     */
-    void				OpenOutputSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol);
-    
-    /*!
-     @abstract									"Seeks Forwards and backwards in BitInput".
-     @remark									"To seek backwards just use a negative number, to seek forwards positive".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				Bits2Skip				"The number of bits to skip".
-     */
-    void				SkipBits(BitBuffer *BitB, const int64_t Bits2Skip);
-    
-    /*!
-     @abstract									"Reads bits from BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				Bits2Read				"The number of bits to read from the BitBuffer, as LSByte, LSBit format, to the runtime byte/bit order".
-     */
-    uint64_t		    ReadBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read);
-    
-    /*!
-     @abstract									"Reads bits from BitBuffer".
-     @param				BitB                 	"Pointer to the instance of BitBuffer".
-     @param				Bits2Read           	"The number of bits to read from the BitBuffer, as LSByte, MSBit format, to the runtime byte/bit order".
-     */
-    uint64_t		    ReadBitsFromLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read);
-    
-    /*!
-     @abstract									"Reads bits from BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				Bits2Read				"The number of bits to read from the BitBuffer, as MSByte, LSBit format, to the runtime byte/bit order".
-     */
-    uint64_t		    ReadBitsFromMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read);
-    
-    /*!
-     @abstract									"Reads bits from BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				Bits2Read				"The number of bits to read from the BitBuffer, as MSByte, MSBit format, to the runtime byte/bit order".
-     */
-    uint64_t		    ReadBitsFromMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read);
-    
-    /*!
-     @abstract                                  "Reads bits from BitBuffer".
-     @param				BitBByteOrder			"What byte order are the bits in the BitBuffer for this field stored as"?
-     @param				BitBBitOrder			"What bit order are the bits in the BitBuffer for this field stored as"?
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				Bits2Read				"The number of bits to read from the BitBuffer".
-     */
+	
+	/*!
+	 @abstract									"Swap bits in a byte".
+	 @param				Byte					"Byte to swap bits".
+	 @return									"Returns swapped byte".
+	 */
+	uint8_t      		SwapBitsInByte(const uint8_t Byte);
+	
+	/*!
+	 @abstract									"Swap nibbles in a byte".
+	 @param				Byte2Swap				"Byte to swap nibbles".
+	 @return									"Returns byte with swapped nibbles".
+	 */
+	uint8_t      		SwapNibble(const uint8_t Byte2Swap);
+	
+	/*!
+	 @abstract									"Swap endian of 16 bit integers".
+	 @param				Data2Swap				"Data to swap endian".
+	 @return									"Returns swapped uint16_t".
+	 */
+	uint16_t     		SwapEndian16(const uint16_t Data2Swap);
+	
+	/*!
+	 @abstract									"Swap endian of 32 bit integers".
+	 @param				Data2Swap				"Data to swap endian".
+	 @return									"Returns swapped uint32_t".
+	 */
+	uint32_t     		SwapEndian32(const uint32_t Data2Swap);
+	
+	/*!
+	 @abstract									"Swap endian of 64 bit integers".
+	 @param				Data2Swap				"Data to swap endian".
+	 @return									"Returns swapped uint64_t".
+	 */
+	uint64_t     		SwapEndian64(const uint64_t Data2Swap);
+	
+	/*!
+	 @abstract									"Computes the number of bits from the number of bytes".
+	 @param				Bytes					"The number of bytes you want to interpret as bits".
+	 @return									"Returns the number of bits".
+	 */
+	int64_t      		Bytes2Bits(const int64_t Bytes);
+	
+	/*!
+	 @abstract									"Computes the number of bytes from the number of bits".
+	 @param				Bits					"The bits to convert to bytes".
+	 @param				RoundUp					"Should the resulting bytes be rounded up or down?".
+	 @return									"Returns the number of bytes".
+	 */
+	int64_t      		Bits2Bytes(const int64_t Bits, const bool RoundUp);
+	
+	/*!
+	 @abstract									"Computes the number of bits required to hold a certain amount of symbols".
+	 @remark									"Rounds up to the next integer number of bits to ensure all symbols can be contained in single integer".
+	 @param				NumSymbols				"The number of symbols you're looking to contain in a binary number".
+	 @return									"Returns the number of bits required to read a symbol".
+	 */
+	uint64_t     		NumBits2ReadSymbols(const uint64_t NumSymbols);
+	
+	/*!
+	 @abstract									"Tells whether Input is even or odd".
+	 @param				Number2Check			"The number to see if it's odd or even".
+	 @return									"True for odd, false for even".
+	 */
+	bool         		IsOdd(const int64_t Number2Check);
+	
+	/*!
+	 @abstract									"Computes the number of bytes left in the file".
+	 @param				BitI					"Pointer to the instance of BitInput".
+	 @return									"Returns the number of bytes left in the file".
+	 */
+	fpos_t              BytesRemainingInBitInput(BitInput *BitI);
+	
+	/*!
+	 @abstract									"Gets the size of the file pointed to by BitI"
+	 @param				BitI					"Pointer to the instance of BitInput".
+	 @return									"Returns the value in BitI->FileSize if it exists".
+	 */
+	fpos_t              GetBitInputFileSize(BitInput *BitI);
+	
+	/*!
+	 @abstract									"Gets the position of the Input file from the start".
+	 @param				BitI					"Pointer to the instance of BitInput".
+	 @return									"Returns the position of the file in bytes from the beginning"
+	 */
+	fpos_t              GetBitInputFilePosition(BitInput *BitI);
+	
+	/*!
+	 @abstract									"Gets the offset of the BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @return									"Returns the position offset from the start of BitBuffer".
+	 */
+	uint64_t            GetBitBufferPosition(BitBuffer *BitB);
+	
+	/*!
+	 @abstract									"Gets the size of the BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @return									"Returns the number of bits the buffer can hold max".
+	 */
+	uint64_t            GetBitBufferSize(BitBuffer *BitB);
+	
+	/*!
+	 @abstract									"Seeks to the end of BitI->File to determine the size".
+	 @param				BitI					"Pointer to the instance of BitInput".
+	 */
+	void				FindFileSize(BitInput *BitI);
+	
+	/*!
+	 @abstract									"Opens an input file, pointed to by InputSwitch in CMD and stores the resulting pointer in BitI->File".
+	 @param				BitI					"Pointer to the instance of BitInput".
+	 @param				Path2Open				"Path to the input file to open".
+	 */
+	void				OpenInputFile(BitInput *BitI, const char *Path2Open);
+	
+	/*!
+	 @abstract									"Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitO->File".
+	 @param				BitO					"Pointer to the instance of BitOutput".
+	 @param				Path2Open				"Path to the output file to open".
+	 */
+	void				OpenOutputFile(BitOutput *BitO, const char *Path2Open);
+	
+	/*!
+	 @abstract									"Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitIOGlobalLogFile".
+	 @param				LogFilePath				"Path to the log file to open/create".
+	 */
+	void				OpenLogFile(const char *LogFilePath);
+	
+	/*!
+	 @abstract									"Opens a socket for reading".
+	 */
+	void				OpenInputSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol);
+	
+	/*!
+	 @abstract									"Opens a socket for writing".
+	 */
+	void				OpenOutputSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol);
+	
+	/*!
+	 @abstract									"Seeks Forwards and backwards in BitInput".
+	 @remark									"To seek backwards just use a negative number, to seek forwards positive".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				Bits2Skip				"The number of bits to skip".
+	 */
+	void				SkipBits(BitBuffer *BitB, const int64_t Bits2Skip);
+	
+	/*!
+	 @abstract									"Reads bits from BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				Bits2Read				"The number of bits to read from the BitBuffer, as LSByte, LSBit format, to the runtime byte/bit order".
+	 */
+	uint64_t		    ReadBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read);
+	
+	/*!
+	 @abstract									"Reads bits from BitBuffer".
+	 @param				BitB                 	"Pointer to the instance of BitBuffer".
+	 @param				Bits2Read           	"The number of bits to read from the BitBuffer, as LSByte, MSBit format, to the runtime byte/bit order".
+	 */
+	uint64_t		    ReadBitsFromLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read);
+	
+	/*!
+	 @abstract									"Reads bits from BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				Bits2Read				"The number of bits to read from the BitBuffer, as MSByte, LSBit format, to the runtime byte/bit order".
+	 */
+	uint64_t		    ReadBitsFromMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read);
+	
+	/*!
+	 @abstract									"Reads bits from BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				Bits2Read				"The number of bits to read from the BitBuffer, as MSByte, MSBit format, to the runtime byte/bit order".
+	 */
+	uint64_t		    ReadBitsFromMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read);
+	
+	/*!
+	 @abstract                                  "Reads bits from BitBuffer".
+	 @param				BitBByteOrder			"What byte order are the bits in the BitBuffer for this field stored as"?
+	 @param				BitBBitOrder			"What bit order are the bits in the BitBuffer for this field stored as"?
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				Bits2Read				"The number of bits to read from the BitBuffer".
+	 */
 #define ReadBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Read)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsFromLSByteLSBit,BitBMSBit_t:ReadBitsFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsFromMSByteLSBit,BitBMSBit_t:ReadBitsFromMSByteMSBit))(BitB,Bits2Read)
-    
-    /*!
-     @abstract                                  "Peeks (read but without recording that it's been read) bits from BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				Bits2Peek				"The number of bits to Peek from the BitBuffer, as LSByte, LSBit format, to the runtime byte/bit order".
-     */
-    uint64_t		    PeekBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
-    
-    /*!
-     @abstract									"Peeks (read but without recording that it's been read) bits from BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				Bits2Peek				"The number of bits to Peek from the BitBuffer, as LSByte, MSBit format, to the runtime byte/bit order".
-     */
-    uint64_t		    PeekBitsFromLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
-    
-    /*!
-     @abstract									"Peeks (read but without recording that it's been read) bits from BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				Bits2Peek				"The number of bits to Peek from the BitBuffer, as MSByte, LSBit format, to the runtime byte/bit order".
-     */
-    uint64_t		    PeekBitsFromMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
-    
-    /*!
-     @abstract									"Peeks (read but without recording that it's been read) bits from BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				Bits2Peek				"The number of bits to Peek from the BitBuffer, as MSByte, MSBit format, to the runtime byte/bit order".
-     */
-    uint64_t		    PeekBitsFromMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
-    
-    /*!
-     @abstract									"Peeks (read but without recording that it's been read) bits from BitBuffer".
-     @param				BitBByteOrder			"What byte order are the bits in the BitBuffer for this field stored as"?
-     @param				BitBBitOrder			"What bit order are the bits in the BitBuffer for this field stored as"?
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				Bits2Peek				"The number of bits to peek from the BitBuffer".
-     */
+	
+	/*!
+	 @abstract                                  "Peeks (read but without recording that it's been read) bits from BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				Bits2Peek				"The number of bits to Peek from the BitBuffer, as LSByte, LSBit format, to the runtime byte/bit order".
+	 */
+	uint64_t		    PeekBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
+	
+	/*!
+	 @abstract									"Peeks (read but without recording that it's been read) bits from BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				Bits2Peek				"The number of bits to Peek from the BitBuffer, as LSByte, MSBit format, to the runtime byte/bit order".
+	 */
+	uint64_t		    PeekBitsFromLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
+	
+	/*!
+	 @abstract									"Peeks (read but without recording that it's been read) bits from BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				Bits2Peek				"The number of bits to Peek from the BitBuffer, as MSByte, LSBit format, to the runtime byte/bit order".
+	 */
+	uint64_t		    PeekBitsFromMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
+	
+	/*!
+	 @abstract									"Peeks (read but without recording that it's been read) bits from BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				Bits2Peek				"The number of bits to Peek from the BitBuffer, as MSByte, MSBit format, to the runtime byte/bit order".
+	 */
+	uint64_t		    PeekBitsFromMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
+	
+	/*!
+	 @abstract									"Peeks (read but without recording that it's been read) bits from BitBuffer".
+	 @param				BitBByteOrder			"What byte order are the bits in the BitBuffer for this field stored as"?
+	 @param				BitBBitOrder			"What bit order are the bits in the BitBuffer for this field stored as"?
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				Bits2Peek				"The number of bits to peek from the BitBuffer".
+	 */
 #define PeekBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Peek)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsFromLSByteLSBit,BitBMSBit_t:PeekBitsFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsFromMSByteLSBit,BitBMSBit_t:PeekBitsFromMSByteMSBit))(BitB,Bits2Peek)
-    
-    /*!
-     @abstract									"Writes bits to the BitBuffer, from the runtime byte/bit order to the specified byte/bit order".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				NumBits2Write			"How many bits from Bits2Write should we write?".
-     @param				Bits2Write				"The variable to read the bits into the BitBuffer".
-     */
-    void                WriteBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
-    
-    /*!
-     @abstract									"Writes bits to the BitBuffer, from the runtime byte/bit order to the specified byte/bit order".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				NumBits2Write			"How many bits from Bits2Write should we write?".
-     @param				Bits2Write				"The variable to read the bits into the BitBuffer".
-     */
-    void                WriteBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
-    
-    /*!
-     @abstract									"Writes bits to the BitBuffer, from the runtime byte/bit order to the specified byte/bit order".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				NumBits2Write			"How many bits from Bits2Write should we write?".
-     @param				Bits2Write				"The variable to read the bits into the BitBuffer".
-     */
-    void                WriteBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
-    
+	
 	/*!
 	 @abstract									"Writes bits to the BitBuffer, from the runtime byte/bit order to the specified byte/bit order".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				NumBits2Write			"How many bits from Bits2Write should we write?".
 	 @param				Bits2Write				"The variable to read the bits into the BitBuffer".
 	 */
-    void                WriteBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
-    
-    /*!
-     @abstract									"Writes bits to the BitBuffer".
-     @param				BitBByteOrder			"What byte order are the bits in the BitBuffer for this field stored as"?
-     @param				BitBBitOrder			"What bit order are the bits in the BitBuffer for this field stored as"?
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				NumBits2Write			"How many bits from Bits2Write should we write?".
-     @param				Bits2Write				"The variable to read the bits into the BitBuffer".
-     */
+	void                WriteBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+	
+	/*!
+	 @abstract									"Writes bits to the BitBuffer, from the runtime byte/bit order to the specified byte/bit order".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				NumBits2Write			"How many bits from Bits2Write should we write?".
+	 @param				Bits2Write				"The variable to read the bits into the BitBuffer".
+	 */
+	void                WriteBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+	
+	/*!
+	 @abstract									"Writes bits to the BitBuffer, from the runtime byte/bit order to the specified byte/bit order".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				NumBits2Write			"How many bits from Bits2Write should we write?".
+	 @param				Bits2Write				"The variable to read the bits into the BitBuffer".
+	 */
+	void                WriteBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+	
+	/*!
+	 @abstract									"Writes bits to the BitBuffer, from the runtime byte/bit order to the specified byte/bit order".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				NumBits2Write			"How many bits from Bits2Write should we write?".
+	 @param				Bits2Write				"The variable to read the bits into the BitBuffer".
+	 */
+	void                WriteBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+	
+	/*!
+	 @abstract									"Writes bits to the BitBuffer".
+	 @param				BitBByteOrder			"What byte order are the bits in the BitBuffer for this field stored as"?
+	 @param				BitBBitOrder			"What bit order are the bits in the BitBuffer for this field stored as"?
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				NumBits2Write			"How many bits from Bits2Write should we write?".
+	 @param				Bits2Write				"The variable to read the bits into the BitBuffer".
+	 */
 #define WriteBits(BitBByteOrder,BitBBitOrder,BitB,NumBits2Write,Bits2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsLSByteLSBit,BitBMSBit_t:WriteBitsAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsMSByteLSBit,BitBMSBit_t:WriteBitsAsMSByteMSBit))(BitB,NumBits2Write,Bits2Write)
-    
-    /*!
-     @abstract									"Reads unary encoded fields from the BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
-     @param				StopBit					"Is the stop bit a one or a zero"?
-     */
-    uint64_t		    ReadUnaryFromLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
-    
-    /*!
-     @abstract									"Reads unary encoded fields from the BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
-     @param				StopBit					"Is the stop bit a one or a zero"?
-     */
-    uint64_t		    ReadUnaryFromLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
-    
-    /*!
-     @abstract									"Reads unary encoded fields from the BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
-     @param				StopBit					"Is the stop bit a one or a zero"?
-     */
-    uint64_t		    ReadUnaryFromMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
-    
-    /*!
-     @abstract									"Reads unary encoded fields from the BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
-     @param				StopBit					"Is the stop bit a one or a zero"?
-     */
-    uint64_t		    ReadUnaryFromMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
-    
-    /*!
-     @abstract									"Reads unary encoded fields from the BitBuffer".
-     @param				BitBByteOrder			"What byte order are the bits in the BitBuffer for this field stored as"?
-     @param				BitBBitOrder			"What bit order are the bits in the BitBuffer for this field stored as"?
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
-     @param				StopBit					"Is the stop bit a one or a zero"?
-     */
+	
+	/*!
+	 @abstract									"Reads unary encoded fields from the BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				StopBit					"Is the stop bit a one or a zero"?
+	 */
+	uint64_t		    ReadUnaryFromLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+	
+	/*!
+	 @abstract									"Reads unary encoded fields from the BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				StopBit					"Is the stop bit a one or a zero"?
+	 */
+	uint64_t		    ReadUnaryFromLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+	
+	/*!
+	 @abstract									"Reads unary encoded fields from the BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				StopBit					"Is the stop bit a one or a zero"?
+	 */
+	uint64_t		    ReadUnaryFromMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+	
+	/*!
+	 @abstract									"Reads unary encoded fields from the BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				StopBit					"Is the stop bit a one or a zero"?
+	 */
+	uint64_t		    ReadUnaryFromMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+	
+	/*!
+	 @abstract									"Reads unary encoded fields from the BitBuffer".
+	 @param				BitBByteOrder			"What byte order are the bits in the BitBuffer for this field stored as"?
+	 @param				BitBBitOrder			"What bit order are the bits in the BitBuffer for this field stored as"?
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				StopBit					"Is the stop bit a one or a zero"?
+	 */
 #define ReadUnary(BitBByteOrder,BitBBitOrder,BitB,IsStrictlyPositive,StopBit)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryFromLSByteLSBit,BitBMSBit_t:ReadUnaryFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryFromMSByteLSBit,BitBMSBit_t:ReadUnaryFromMSByteMSBit))(BitB,IsStrictlyPositive,StopBit)
-    
-    /*!
-     @abstract									"Writes unary encoded fields to the BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
-     @param				StopBit					"Is the stop bit a one or a zero"?
-     @param				Field2Write				"Value to be written as Unary encoded".
-     */
-    void                WriteUnaryFromLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, const uint64_t Field2Write);
-    
+	
 	/*!
 	 @abstract									"Writes unary encoded fields to the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
@@ -528,8 +519,8 @@ extern "C" {
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 @param				Field2Write				"Value to be written as Unary encoded".
 	 */
-    void                WriteUnaryFromLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, const uint64_t Field2Write);
-    
+	void                WriteUnaryFromLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
+	
 	/*!
 	 @abstract									"Writes unary encoded fields to the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
@@ -537,8 +528,8 @@ extern "C" {
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 @param				Field2Write				"Value to be written as Unary encoded".
 	 */
-    void                WriteUnaryFromMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, const uint64_t Field2Write);
-    
+	void                WriteUnaryFromLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
+	
 	/*!
 	 @abstract									"Writes unary encoded fields to the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
@@ -546,248 +537,257 @@ extern "C" {
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 @param				Field2Write				"Value to be written as Unary encoded".
 	 */
-    void                WriteUnaryFromMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, const uint64_t Field2Write);
-    
-    /*!
-     @abstract									"Writes unary encoded bits to the BitBuffer".
-     @param				BitBByteOrder			"What byte order should the bits be in the BitBuffer"?
-     @param				BitBBitOrder			"What bit order should the bits be in the BitBuffer"?
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
-     @param				StopBit					"Is the stop bit a one or a zero"?
-     @param				Field2Write				"Value to be written as Unary encoded".
-     */
+	void                WriteUnaryFromMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
+	
+	/*!
+	 @abstract									"Writes unary encoded fields to the BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				StopBit					"Is the stop bit a one or a zero"?
+	 @param				Field2Write				"Value to be written as Unary encoded".
+	 */
+	void                WriteUnaryFromMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
+	
+	/*!
+	 @abstract									"Writes unary encoded bits to the BitBuffer".
+	 @param				BitBByteOrder			"What byte order should the bits be in the BitBuffer"?
+	 @param				BitBBitOrder			"What bit order should the bits be in the BitBuffer"?
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				StopBit					"Is the stop bit a one or a zero"?
+	 @param				Field2Write				"Value to be written as Unary encoded".
+	 */
 #define WriteUnary(BitBByteOrder,BitBBitOrder,BitB,IsStrictlyPositive,StopBit,Field2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteUnaryFromLSByteLSBit,BitBMSBit_t:WriteUnaryFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteUnaryFromMSByteLSBit,BitBMSBit_t:WriteUnaryFromMSByteMSBit))(BitB,IsStrictlyPositive,StopBit,Field2Write)
-    
-    /*!
-     @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsSigned				"Can there be negative values in this field"?
-     */
-    uint64_t		    ReadExpGolombFromLSByteLSBit(BitBuffer *BitB, const bool IsSigned);
-    
-    /*!
-     @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsSigned				"Can there be negative values in this field"?
-     */
-    uint64_t		    ReadExpGolombFromLSByteMSBit(BitBuffer *BitB, const bool IsSigned);
-    
-    /*!
-     @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsSigned				"Can there be negative values in this field"?
-     */
-    uint64_t		    ReadExpGolombFromMSByteLSBit(BitBuffer *BitB, const bool IsSigned);
-    
-    /*!
-     @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsSigned				"Can there be negative values in this field"?
-     */
-    uint64_t		    ReadExpGolombFromMSByteMSBit(BitBuffer *BitB, const bool IsSigned);
-    
-    /*!
-     @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
+	
+	/*!
+	 @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsSigned				"Can there be negative values in this field"?
+	 */
+	uint64_t		    ReadExpGolombFromLSByteLSBit(BitBuffer *BitB, const bool IsSigned);
+	
+	/*!
+	 @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsSigned				"Can there be negative values in this field"?
+	 */
+	uint64_t		    ReadExpGolombFromLSByteMSBit(BitBuffer *BitB, const bool IsSigned);
+	
+	/*!
+	 @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsSigned				"Can there be negative values in this field"?
+	 */
+	uint64_t		    ReadExpGolombFromMSByteLSBit(BitBuffer *BitB, const bool IsSigned);
+	
+	/*!
+	 @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsSigned				"Can there be negative values in this field"?
+	 */
+	uint64_t		    ReadExpGolombFromMSByteMSBit(BitBuffer *BitB, const bool IsSigned);
+	
+	/*!
+	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
 	 @param				BitBByteOrder			"What byte order should the bits be in the BitBuffer"?
 	 @param				BitBBitOrder			"What bit order should the bits be in the BitBuffer"?
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsSigned				"Can there be negative values in this field"?
-     */
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsSigned				"Can there be negative values in this field"?
+	 */
 #define ReadExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromLSByteLSBit,BitBMSBit_t:ReadExpGolombFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromMSByteLSBit,BitBMSBit_t:ReadExpGolombFromMSByteMSBit))(BitB,IsSigned)
-    
-    /*!
-     @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsSigned				"Can there be negative values in this field"?
-     @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
-     */
-    void                WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write);
-    
+	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
 	 */
-    void                WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write);
-    
+	void                WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write);
+	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
 	 */
-    void                WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write);
-    
+	void                WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write);
+	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
 	 */
-    void                WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write);
-    
-    /*!
-     @abstract									"Writes Exp-Golomb encoded fields to the BitBuffer".
+	void                WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write);
+	
+	/*!
+	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsSigned				"Can there be negative values in this field"?
+	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
+	 */
+	void                WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write);
+	
+	/*!
+	 @abstract									"Writes Exp-Golomb encoded fields to the BitBuffer".
 	 @param				BitBByteOrder			"What byte order should the bits be in the BitBuffer"?
 	 @param				BitBBitOrder			"What bit order should the bits be in the BitBuffer"?
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				IsSigned				"Can there be negative values in this field?".
-     @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
-     */
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				IsSigned				"Can there be negative values in this field?".
+	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
+	 */
 #define WriteExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned,Field2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsLSByteLSBit,BitBMSBit_t:WriteExpGolombAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsMSByteLSBit,BitBMSBit_t:WriteExpGolombAsMSByteMSBit))(BitB,IsSigned,Field2Write)
-    
-    /*!
-     @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
-     @param				BitB					"Pointer to an instance of BitBuffer".
-     @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
-     */
-    uint8_t		       *ReadGUUIDAsUUIDString(BitBuffer *BitB);
-    
+	
 	/*!
 	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
 	 @param				BitB					"Pointer to an instance of BitBuffer".
 	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
 	 */
-    uint8_t		       *ReadGUUIDAsGUIDString(BitBuffer *BitB);
-    
+	uint8_t		       *ReadGUUIDAsUUIDString(BitBuffer *BitB);
+	
 	/*!
 	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
 	 @param				BitB					"Pointer to an instance of BitBuffer".
 	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
 	 */
-    uint8_t		       *ReadGUUIDAsBinaryUUID(BitBuffer *BitB);
-    
+	uint8_t		       *ReadGUUIDAsGUIDString(BitBuffer *BitB);
+	
 	/*!
 	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
 	 @param				BitB					"Pointer to an instance of BitBuffer".
 	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
 	 */
-    uint8_t		       *ReadGUUIDAsBinaryGUID(BitBuffer *BitB);
-    
-    /*!
-     @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
-     @param				GUUIDType				"GUUIDType is BitIOUUIDString, BitIOGUIDString, BitIOBinaryUUID, or BitIOBinaryGUID"
-     @param				BitB					"Pointer to an instance of BitBuffer".
-     @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
-     */
+	uint8_t		       *ReadGUUIDAsBinaryUUID(BitBuffer *BitB);
+	
+	/*!
+	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
+	 @param				BitB					"Pointer to an instance of BitBuffer".
+	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
+	 */
+	uint8_t		       *ReadGUUIDAsBinaryGUID(BitBuffer *BitB);
+	
+	/*!
+	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
+	 @param				GUUIDType				"GUUIDType is BitIOUUIDString, BitIOGUIDString, BitIOBinaryUUID, or BitIOBinaryGUID"
+	 @param				BitB					"Pointer to an instance of BitBuffer".
+	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
+	 */
 #define ReadGUUID(GUUIDType,BitB)_Generic((GUUIDType),UUIDString_t:ReadGUUIDAsUUIDString,GUIDString_t:ReadGUUIDAsGUIDString,BinaryUUID_t:ReadGUUIDAsBinaryUUID,BinaryGUID_t:ReadGUUIDAsBinaryGUID)(BitB)
-    
-    /*!
-     @abstract									"Writes a BinaryGUUID/GUUIDString to the BitBuffer".
-     @param				BitB					"Pointer to an instance of BitBuffer".
-     @param				UUIDString				"Pointer to the UUIDString you want to write".
-     */
-    void		        WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString);
-    
+	
+	/*!
+	 @abstract									"Writes a BinaryGUUID/GUUIDString to the BitBuffer".
+	 @param				BitB					"Pointer to an instance of BitBuffer".
+	 @param				UUIDString				"Pointer to the UUIDString you want to write".
+	 */
+	void		        WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString);
+	
 	/*!
 	 @abstract									"Writes a BinaryGUUID/GUUIDString to the BitBuffer".
 	 @param				BitB					"Pointer to an instance of BitBuffer".
 	 @param				GUIDString				"Pointer to the UUIDString you want to write".
 	 */
-    void		        WriteGUUIDAsGUIDString(BitBuffer *BitB, const uint8_t *GUIDString);
-    
+	void		        WriteGUUIDAsGUIDString(BitBuffer *BitB, const uint8_t *GUIDString);
+	
 	/*!
 	 @abstract									"Writes a BinaryGUUID/GUUIDString to the BitBuffer".
 	 @param				BitB					"Pointer to an instance of BitBuffer".
 	 @param				BinaryUUID				"Pointer to the UUIDString you want to write".
 	 */
-    void		        WriteGUUIDAsBinaryUUID(BitBuffer *BitB, const uint8_t *BinaryUUID);
-    
+	void		        WriteGUUIDAsBinaryUUID(BitBuffer *BitB, const uint8_t *BinaryUUID);
+	
 	/*!
 	 @abstract									"Writes a BinaryGUUID/GUUIDString to the BitBuffer".
 	 @param				BitB					"Pointer to an instance of BitBuffer".
 	 @param				BinaryGUID				"Pointer to the UUIDString you want to write".
 	 */
-    void		        WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID);
-    
+	void		        WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID);
+	
 #define WriteGUUID(GUUIDType,BitB,GUUID)_Generic((GUUIDType),BinaryUUID_t:WriteGUUIDAsBinaryUUID,BinaryGUID_t:WriteGUUIDAsBinaryGUID,UUIDString_t:WriteGUUIDAsUUIDString,GUIDString_t:WriteGUUIDAsGUIDString)(BitB,GUUID)
-    
-    /*!
-     @abstract									"Compares GUUIDStrings or BinaryGUUIDs (but not a GUUIDString to a BinaryGUUID) for equilivence".
-     @param				GUUID1				    "Pointer to GUUIDString or BinaryGUUID to be compared".
-     @param				GUUID2				    "Pointer to GUUIDString or BinaryGUUID to be compared".
-     @param				GUUIDSize				"The size of the GUUIDs, either BitIOGUUIDStringSize or BitIOBinaryGUUIDSize"
-     @return									"Returns whether GUUID1 and GUUID2 match".
-     */
-    bool				CompareGUUIDs(const uint8_t *GUUID1, const uint8_t *GUUID2, const uint8_t GUUIDSize);
-    
-    /*!
-     @abstract									"Converts a GUID/UUIDString to a BinaryGUID/UUID".
-     @param             GUUIDString             "Pointer to a GUID/UUIDString".
-     @return                                    "Returns a pointer to a BinaryGUID/UUID".
-     */
-    uint8_t            *ConvertGUUIDString2BinaryGUUID(const uint8_t *GUUIDString);
-    
-    /*!
-     @abstract									"Converts a BinaryGUID/UUID to a GUID/UUIDString".
-     @param             BinaryGUUID             "Pointer to a BinaryGUID/UUID".
-     @return                                    "Returns a pointer to a GUID/UUIDString".
-     */
-    uint8_t            *ConvertBinaryGUUID2GUUIDString(const uint8_t *BinaryGUUID);
-    
-    /*!
-     @abstract									"Converts a GUID/UUIDString to a UUID/GUIDString".
-     @param             GUUIDString             "Pointer to a GUID/UUIDString".
-     @return                                    "Returns a pointer to a UUID/GUIDString".
-     */
-    uint8_t            *SwapGUUIDString(const uint8_t *GUUIDString);
-    
-    /*!
-     @abstract									"Converts a BinaryGUID/UUID to a BinaryUUID/GUID".
-     @param             BinaryGUUID             "Pointer to a BinaryGUID/UUID".
-     @return                                    "Returns a pointer to a BinaryUUID/GUID".
-     */
-    uint8_t            *SwapBinaryGUUID(const uint8_t *BinaryGUUID);
-    
-    /*!
-     @abstract									"Frees a BinaryGUUID aka BinaryGUID/BinaryUUID or GUUIDString, aka GUIDString/UUIDString".
-     */
-    void				DeinitGUUID(uint8_t *GUUID);
-    
-    /*!
-     @abstract									"Tells if the stream/buffer is byte aligned or not".
-     @remark									"Checks the stream is aligned on an BytesOfAlignment boundary, not that there are X bits of padding".
-     @param				BytesOfAlignment		"Are you trying to see if it's aligned to a byte, short, word, etc alignment? Specify in number of bytes".
-     @return									"Returns whether the BitBuffer is aligned on a multiple of BytesOfAlignment".
-     */
-    bool				IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment);
-    
-    /*!
-     @abstract									"Aligns bits for multi-byte alignment".
-     @remark									"Aligns the stream on a BytesOfAlignment boundary, it does NOT add (BytesOfAlignment * 8) bits of padding".
-     @param				BitB					"Pointer to the instance of BitBuffer".
-     @param				BytesOfAlignment		"Align BitB to X byte boundary".
-     */
-    void				AlignBitBuffer(BitBuffer *BitB, const uint8_t BytesOfAlignment);
-    
-    /*!
-     @abstract									"Reads Bytes2Read into a buffer pointed to by BitB from InputFile".
-     @remark									"If the pointer to BitBuffer is not new, all the old contents will be lost".
-     @param				BitI					"Pointer to BitInput".
-     @param				BitB					"Pointer to BitBuffer to put the bytes into".
-     @param				Bytes2Read				"The number of bytes to read from the InputFile into the Buffer".
-     */
-    void				ReadBitInput2BitBuffer(BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read);
-    
-    /*!
-     @abstract									"Writes a BitBuffer to a file, kinda shitty tho".
-     @param				BitO					"Pointer to BitOutput to write the buffer to".
-     @param				Buffer2Write		    "The buffer to be written to the output file".
-     @param				Bytes2Write				"The number of bytes from the buffer to write to the file".
-     */
-    void				WriteBitBuffer2BitOutput(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write);
-    
-    /*!
-     @abstract									"Logs errors to the user provided log file, or stderr".
-     @param				ErrorSeverity			"Error message prefixed by SYS in ErrorCodes".
-     @param				LibraryOrProgram		"Name of the program or library that called this function".
-     @param				FunctionName		    "Which function is calling Log?".
-     @param				Description				"String describing what went wrong / error code".
-     */
-    void				Log(const uint8_t ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...);
-    
+	
+	/*!
+	 @abstract									"Compares GUUIDStrings or BinaryGUUIDs (but not a GUUIDString to a BinaryGUUID) for equilivence".
+	 @param				GUUID1				    "Pointer to GUUIDString or BinaryGUUID to be compared".
+	 @param				GUUID2				    "Pointer to GUUIDString or BinaryGUUID to be compared".
+	 @param				GUUIDSize				"The size of the GUUIDs, either BitIOGUUIDStringSize or BitIOBinaryGUUIDSize"
+	 @return									"Returns whether GUUID1 and GUUID2 match".
+	 */
+	bool				CompareGUUIDs(const uint8_t *GUUID1, const uint8_t *GUUID2, const uint8_t GUUIDSize);
+	
+	/*!
+	 @abstract									"Converts a GUID/UUIDString to a BinaryGUID/UUID".
+	 @param             GUUIDString             "Pointer to a GUID/UUIDString".
+	 @return                                    "Returns a pointer to a BinaryGUID/UUID".
+	 */
+	uint8_t            *ConvertGUUIDString2BinaryGUUID(const uint8_t *GUUIDString);
+	
+	/*!
+	 @abstract									"Converts a BinaryGUID/UUID to a GUID/UUIDString".
+	 @param             BinaryGUUID             "Pointer to a BinaryGUID/UUID".
+	 @return                                    "Returns a pointer to a GUID/UUIDString".
+	 */
+	uint8_t            *ConvertBinaryGUUID2GUUIDString(const uint8_t *BinaryGUUID);
+	
+	/*!
+	 @abstract									"Converts a GUID/UUIDString to a UUID/GUIDString".
+	 @param             GUUIDString             "Pointer to a GUID/UUIDString".
+	 @return                                    "Returns a pointer to a UUID/GUIDString".
+	 */
+	uint8_t            *SwapGUUIDString(const uint8_t *GUUIDString);
+	
+	/*!
+	 @abstract									"Converts a BinaryGUID/UUID to a BinaryUUID/GUID".
+	 @param             BinaryGUUID             "Pointer to a BinaryGUID/UUID".
+	 @return                                    "Returns a pointer to a BinaryUUID/GUID".
+	 */
+	uint8_t            *SwapBinaryGUUID(const uint8_t *BinaryGUUID);
+	
+	/*!
+	 @abstract									"Frees a BinaryGUUID aka BinaryGUID/BinaryUUID or GUUIDString, aka GUIDString/UUIDString".
+	 */
+	void				DeinitGUUID(uint8_t *GUUID);
+	
+	/*!
+	 @abstract									"Tells if the stream/buffer is byte aligned or not".
+	 @remark									"Checks the stream is aligned on an BytesOfAlignment boundary, not that there are X bits of padding".
+	 @param				BytesOfAlignment		"Are you trying to see if it's aligned to a byte, short, word, etc alignment? Specify in number of bytes".
+	 @return									"Returns whether the BitBuffer is aligned on a multiple of BytesOfAlignment".
+	 */
+	bool				IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment);
+	
+	/*!
+	 @abstract									"Aligns bits for multi-byte alignment".
+	 @remark									"Aligns the stream on a BytesOfAlignment boundary, it does NOT add (BytesOfAlignment * 8) bits of padding".
+	 @param				BitB					"Pointer to the instance of BitBuffer".
+	 @param				BytesOfAlignment		"Align BitB to X byte boundary".
+	 */
+	void				AlignBitBuffer(BitBuffer *BitB, const uint8_t BytesOfAlignment);
+	
+	/*!
+	 @abstract									"Reads Bytes2Read into a buffer pointed to by BitB from InputFile".
+	 @remark									"If the pointer to BitBuffer is not new, all the old contents will be lost".
+	 @param				BitI					"Pointer to BitInput".
+	 @param				BitB					"Pointer to BitBuffer to put the bytes into".
+	 @param				Bytes2Read				"The number of bytes to read from the InputFile into the Buffer".
+	 */
+	void				ReadBitInput2BitBuffer(BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read);
+	
+	/*!
+	 @abstract									"Writes a BitBuffer to a file, kinda shitty tho".
+	 @param				BitO					"Pointer to BitOutput to write the buffer to".
+	 @param				Buffer2Write		    "The buffer to be written to the output file".
+	 @param				Bytes2Write				"The number of bytes from the buffer to write to the file".
+	 */
+	void				WriteBitBuffer2BitOutput(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write);
+	
+	/*!
+	 @abstract									"Logs errors to the user provided log file, or stderr".
+	 @param				ErrorSeverity			"Error message prefixed by SYS in ErrorCodes".
+	 @param				LibraryOrProgram		"Name of the program or library that called this function".
+	 @param				FunctionName		    "Which function is calling Log?".
+	 @param				Description				"String describing what went wrong / error code".
+	 */
+	void				Log(const uint8_t ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...);
+	
 #ifdef __cplusplus
 }
 #endif
