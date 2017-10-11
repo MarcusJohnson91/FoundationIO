@@ -73,134 +73,134 @@ typedef    double             BinaryUUID_t;
 
 #pragma once
 
-#ifndef LIBBITIO_BitIO_H
-#define LIBBITIO_BitIO_H
+#ifndef    LIBBITIO_BitIO_H
+#define    LIBBITIO_BitIO_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
-#ifdef Macintosh
-#define BitIONewLineSize 1
-    static const char BitIOLineEnding[1]  = {"\r"};
-#elif _POSIX_VERSION
-#define BitIONewLineSize 1
-    static const char BitIOLineEnding[1]  = {"\n"};
-#elif  _WIN32
-#define BitIONewLineSize 2
-    static const char BitIOLineEnding[2]  = {"\r\n"};
+	
+#ifdef     Macintosh
+#define    BitIONewLineSize 1
+	static const char BitIOLineEnding[1]  = {"\r"};
+#elif     _POSIX_VERSION
+#define    BitIONewLineSize 1
+	static const char BitIOLineEnding[1]  = {"\n"};
+#elif     _WIN32
+#define    BitIONewLineSize 2
+	static const char BitIOLineEnding[2]  = {"\r\n"};
 #endif
-    
-    /*!
-     @enum				BitIOConstants
-     @abstract									"BitIO compile time constants".
-     @constant			BitIOGUUIDStringSize	"Size of a UUIDString or GUIDString including dashes, and null terminator".
-     @constant			BitIOBinaryGUUIDSize	"Size of a BinaryUUID or BinaryGUID".
-     */
-    enum BitIOConstants {
-        BitIOGUUIDStringSize	= (21),
-        BitIOBinaryGUUIDSize	= (16),
-    };
-    
+	
+	/*!
+	 @enum				BitIOConstants
+	 @abstract									"BitIO compile time constants".
+	 @constant			BitIOGUUIDStringSize	"Size of a UUIDString or GUIDString including dashes, and null terminator".
+	 @constant			BitIOBinaryGUUIDSize	"Size of a BinaryUUID or BinaryGUID".
+	 */
+	enum BitIOConstants {
+						BitIOGUUIDStringSize	= (21),
+						BitIOBinaryGUUIDSize	= (16),
+	};
+	
 #ifndef _POSIX_VERSION
-    /*!
-     @enum				BitIOLogTypes
-     @constant			LOG_EMERG				"The system is unusable, the program is quitting (equivalent to panic)".
-     @constant			LOG_ALERT				"Immediate action is required".
-     @constant			LOG_CRIT				"Critical condition encountered".
-     @constant			LOG_ERR					"Error condition encountered".
-     @constant			LOG_WARNING				"Warning condition encountered".
-     @constant			LOG_NOTICE				"Normal, but important condition encountered".
-     @constant			LOG_INFO				"Informational message logged".
-     @constant			LOG_DEBUG				"Testing information logged".
-     */
-    enum BitIOLogTypes {
-        				LOG_EMERG				= 0,
-        				LOG_ALERT				= 1,
-        				LOG_CRIT				= 2,
-        				LOG_ERR					= 3,
-        				LOG_WARNING				= 4,
-        				LOG_NOTICE				= 5,
-        				LOG_INFO				= 6,
-        				LOG_DEBUG				= 7,
-    };
+	/*!
+	 @enum				BitIOLogTypes
+	 @constant			LOG_EMERG				"The system is unusable, the program is quitting (equivalent to panic)".
+	 @constant			LOG_ALERT				"Immediate action is required".
+	 @constant			LOG_CRIT				"Critical condition encountered".
+	 @constant			LOG_ERR					"Error condition encountered".
+	 @constant			LOG_WARNING				"Warning condition encountered".
+	 @constant			LOG_NOTICE				"Normal, but important condition encountered".
+	 @constant			LOG_INFO				"Informational message logged".
+	 @constant			LOG_DEBUG				"Testing information logged".
+	 */
+	enum BitIOLogTypes {
+						LOG_EMERG				= 0,
+						LOG_ALERT				= 1,
+						LOG_CRIT				= 2,
+						LOG_ERR					= 3,
+						LOG_WARNING				= 4,
+						LOG_NOTICE				= 5,
+						LOG_INFO				= 6,
+						LOG_DEBUG				= 7,
+	};
 #endif
-    
-    /*!
-     @typedef			BitBuffer
-     @abstract									"Contains variables and a pointer to a buffer for reading and writing bits".
-     @constant			NumBits					"The number of bits in the buffer".
-     @constant			BitOffset				"The number of bits previously read/written".
-     @constant			Buffer					"A pointer to an unsigned byte buffer".
-     */
-    typedef struct		BitBuffer				BitBuffer;
-    
-    /*!
-     @typedef			BitInput
-     @abstract									"Contains File/Socket pointers for reading to a BitBuffer".
-     @constant			File					"Input File/Socket to read into a BitBuffer".
-     @constant			Socket					"Socket number".
-     @constant			IsFileOrSocket			"Is this BitInput for a file or socket"?
-     @constant			FileSize				"Size of the File in bytes".
-     @constant			FilePosition			"Current byte in the file".
-     @constant			FileSpecifierNum		"Which file are we currently on?".
-     */
-    typedef struct		BitInput				BitInput;
-    
-    /*!
-     @typedef			BitOutput
-     @abstract									"Contains File/Socket pointers for writing from a BitBuffer".
-     @constant			File					"Input File/Socket to write a BitBuffer into".
-     @constant			Socket					"Socket number".
-     @constant			IsFileOrSocket			"Is this BitInput for a file or socket"?
-     @constant			FilePosition			"Current byte in the file".
-     @constant			FileSpecifierNum		"Which file are we currently on?".
-     */
-    typedef struct		BitOutput				BitOutput;
-    
-    /*!
-     @abstract									"Initializes a BitInput structure".
-     @return									"Returns a pointer to said BitInput structure".
-     */
-    BitInput		   *InitBitInput(void);
-    
-    /*!
-     @abstract									"Initializes a BitOutput structure".
-     @return									"Returns a pointer to said BitOutput structure".
-     */
-    BitOutput		   *InitBitOutput(void);
-    
-    /*!
-     @abstract									"Initializes a BitBuffer structure".
-     @param				BitBufferSize			"Number of bytes to create BitBuffer with".
-     @return									"Returns a pointer to said BitBuffer structure".
-     */
-    BitBuffer		   *InitBitBuffer(const uint64_t BitBufferSize);
-    
-    /*!
-     @abstract									"Deallocates BitInput".
-     @remark									"For use when changing files, or exiting the program".
-     @param				BitI					"Pointer to the instance of BitInput you want to delete".
-     */
-    void				DeinitBitInput(BitInput *BitI);
-    
-    /*!
-     @abstract									"Deallocates the instance of BitOutput pointed to by BitI".
-     @remark									"For use when changing files, or exiting the program".
-     @param				BitO					"Pointer to the instance of BitOutput you want to delete".
-     */
-    void				DeinitBitOutput(BitOutput *BitO);
-    
-    /*!
-     @abstract									"Deallocates the instance of BitBuffer pointed to by BitB".
-     @param				BitB					"Pointer to the instance of BitBuffer you want to delete".
-     */
-    void				DeinitBitBuffer(BitBuffer *BitB);
-    
-    /*!
-     @abstract									"Closes the GlobalLogFile".
-     */
-    void				DeinitBitIOGlobalLogFile(void);
+	
+	/*!
+	 @typedef			BitBuffer
+	 @abstract									"Contains variables and a pointer to a buffer for reading and writing bits".
+	 @constant			NumBits					"The number of bits in the buffer".
+	 @constant			BitOffset				"The number of bits previously read/written".
+	 @constant			Buffer					"A pointer to an unsigned byte buffer".
+	 */
+	typedef struct		BitBuffer				BitBuffer;
+	
+	/*!
+	 @typedef			BitInput
+	 @abstract									"Contains File/Socket pointers for reading to a BitBuffer".
+	 @constant			File					"Input File/Socket to read into a BitBuffer".
+	 @constant			Socket					"Socket number".
+	 @constant			IsFileOrSocket			"Is this BitInput for a file or socket"?
+	 @constant			FileSize				"Size of the File in bytes".
+	 @constant			FilePosition			"Current byte in the file".
+	 @constant			FileSpecifierNum		"Which file are we currently on?".
+	 */
+	typedef struct		BitInput				BitInput;
+	
+	/*!
+	 @typedef			BitOutput
+	 @abstract									"Contains File/Socket pointers for writing from a BitBuffer".
+	 @constant			File					"Input File/Socket to write a BitBuffer into".
+	 @constant			Socket					"Socket number".
+	 @constant			IsFileOrSocket			"Is this BitInput for a file or socket"?
+	 @constant			FilePosition			"Current byte in the file".
+	 @constant			FileSpecifierNum		"Which file are we currently on?".
+	 */
+	typedef struct		BitOutput				BitOutput;
+	
+	/*!
+	 @abstract									"Initializes a BitInput structure".
+	 @return									"Returns a pointer to said BitInput structure".
+	 */
+	BitInput		   *InitBitInput(void);
+	
+	/*!
+	 @abstract									"Initializes a BitOutput structure".
+	 @return									"Returns a pointer to said BitOutput structure".
+	 */
+	BitOutput		   *InitBitOutput(void);
+	
+	/*!
+	 @abstract									"Initializes a BitBuffer structure".
+	 @param				BitBufferSize			"Number of bytes to create BitBuffer with".
+	 @return									"Returns a pointer to said BitBuffer structure".
+	 */
+	BitBuffer		   *InitBitBuffer(const uint64_t BitBufferSize);
+	
+	/*!
+	 @abstract									"Deallocates BitInput".
+	 @remark									"For use when changing files, or exiting the program".
+	 @param				BitI					"Pointer to the instance of BitInput you want to delete".
+	 */
+	void				DeinitBitInput(BitInput *BitI);
+	
+	/*!
+	 @abstract									"Deallocates the instance of BitOutput pointed to by BitI".
+	 @remark									"For use when changing files, or exiting the program".
+	 @param				BitO					"Pointer to the instance of BitOutput you want to delete".
+	 */
+	void				DeinitBitOutput(BitOutput *BitO);
+	
+	/*!
+	 @abstract									"Deallocates the instance of BitBuffer pointed to by BitB".
+	 @param				BitB					"Pointer to the instance of BitBuffer you want to delete".
+	 */
+	void				DeinitBitBuffer(BitBuffer *BitB);
+	
+	/*!
+	 @abstract									"Closes the GlobalLogFile".
+	 */
+	void				DeinitBitIOGlobalLogFile(void);
 	
 	/*!
 	 @abstract									"Integer Power function".
