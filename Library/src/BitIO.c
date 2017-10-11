@@ -141,7 +141,7 @@ extern "C" {
     }
     
     inline uint64_t NumBits2ReadSymbols(const uint64_t NumSymbols) {
-        // Use a binary logarithm, that you round up, in order to get the number of bits required to read a certain number of symbols.
+        // Use a binary logarithm, that you round up, in order to get the number of bits required to ∂ a certain number of symbols.
         return ceil(log2(NumSymbols));
     }
     
@@ -343,6 +343,48 @@ extern "C" {
     
     static inline uint8_t SwapBits(const uint8_t Byte) {
         return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
+    }
+    
+    static inline void InsertBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
+        // Write data from LSByte (LSBit is default) to LSByte,LSBit
+        // What variables do we need to take into account? Just the BitsAvailable, and looping...
+        uint8_t Bits = NumBits2Insert;
+        
+        while (Bits > 0) {
+            uint64_t Bits2Put      = NumBits2ExtractFromByte(BitB->BitOffset, Bits);
+            uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Put);
+#ifdef RuntimeLSByte
+#ifdef RuntimeLSBit
+            // Extract as is
+#elif  RuntimeMSBit
+            uint8_t FinalByte      = SwapBits(Data, Bits2Put);
+            // Extract and flip bit order
+#endif
+#elif  RuntimeMSByte
+#ifdef RuntimeLSBit
+            // Extract and flip byte order
+#elif  RuntimeMSBit
+            uint8_t FinalByte      = SwapBits(Data, Bits2Put);
+            // Extract and flip the byte order AND bit order
+#endif
+#endif
+            Bits                  -= Bits2Put;
+        }
+    }
+    
+    static inline void InsertBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
+        // Write data from LSByte (LSBit is default) to LSByte,LSBit
+        // What variables do we need to take into account? Just swapping bit order, BitsAvailable, and looping...
+    }
+    
+    static inline void InsertBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
+        // Write data from LSByte (LSBit is default) to MSByte, LSBit.
+        // What variables do we need to take into account? Just swapping byte order, BitsAvailable, and looping...
+    }
+    
+    static inline void InsertBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
+        // Write data from LSByte (LSBit is default) to MSByte, LSBit.
+        // What variables do we need to take into account? Just swapping byte and bit order, BitsAvailable, and looping...
     }
     
     static inline uint64_t ExtractBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Extract) { // So this function reads data FROM Little endian, Least Significant Bit first
@@ -579,49 +621,7 @@ extern "C" {
         return OutputData;
     }
     
-    static inline void InsertBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
-        // Write data from LSByte (LSBit is default) to LSByte,LSBit
-        // What variables do we need to take into account? Just the BitsAvailable, and looping...
-        uint8_t Bits = NumBits2Insert;
-        
-        while (Bits > 0) {
-            uint64_t Bits2Put      = NumBits2ExtractFromByte(BitB->BitOffset, Bits);
-            uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Put);
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            // Extract as is
-#elif  RuntimeMSBit
-            uint8_t FinalByte      = SwapBits(Data, Bits2Put);
-            // Extract and flip bit order
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            // Extract and flip byte order
-#elif  RuntimeMSBit
-            uint8_t FinalByte      = SwapBits(Data, Bits2Put);
-            // Extract and flip the byte order AND bit order
-#endif
-#endif
-            Bits                  -= Bits2Put;
-        }
-    }
-    
-    static inline void InsertBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
-        // Write data from LSByte (LSBit is default) to LSByte,LSBit
-        // What variables do we need to take into account? Just swapping bit order, BitsAvailable, and looping...
-    }
-    
-    static inline void InsertBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
-        // Write data from LSByte (LSBit is default) to MSByte, LSBit.
-        // What variables do we need to take into account? Just swapping byte order, BitsAvailable, and looping...
-    }
-    
-    static inline void InsertBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
-        // Write data from LSByte (LSBit is default) to MSByte, LSBit.
-        // What variables do we need to take into account? Just swapping byte and bit order, BitsAvailable, and looping...
-    }
-    
-    void WriteBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
+    void     WriteBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteBitsAsLSByteLSBit", "Pointer to BitBuffer is NULL");
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
@@ -631,7 +631,7 @@ extern "C" {
         }
     }
     
-    void WriteBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
+    void     WriteBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteBitsAsLSByteMSBit", "Pointer to BitBuffer is NULL");
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
@@ -641,7 +641,7 @@ extern "C" {
         }
     }
     
-    void WriteBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
+    void     WriteBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteBitsAsMSByteLSBit", "Pointer to BitBuffer is NULL");
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
@@ -651,7 +651,7 @@ extern "C" {
         }
     }
     
-    void WriteBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
+    void     WriteBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteBitsAsMSByteMSBit", "Pointer to BitBuffer is NULL");
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
@@ -661,19 +661,67 @@ extern "C" {
         }
     }
     
-    void WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write) {
+    uint64_t ReadUnaryFromLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit) {
+        return 0ULL;
+    }
+    
+    uint64_t ReadUnaryFromLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit) {
+        return 0ULL;
+    }
+    
+    uint64_t ReadUnaryFromMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit) {
+        return 0ULL;
+    }
+    
+    uint64_t ReadUnaryFromMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit) {
+        return 0ULL;
+    }
+    
+    void     WriteUnaryFromLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, const uint64_t Field2Write) {
         
     }
     
-    void WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write) {
+    void     WriteUnaryFromLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, const uint64_t Field2Write) {
         
     }
     
-    void WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write) {
+    void     WriteUnaryFromMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, const uint64_t Field2Write) {
         
     }
     
-    void WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write ) {
+    void     WriteUnaryFromMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, const uint64_t Field2Write) {
+        
+    }
+    
+    uint64_t ReadExpGolombFromLSByteLSBit(BitBuffer *BitB, const bool IsSigned) {
+        return 0ULL;
+    }
+    
+    uint64_t ReadExpGolombFromLSByteMSBit(BitBuffer *BitB, const bool IsSigned) {
+        return 0ULL;
+    }
+    
+    uint64_t ReadExpGolombFromMSByteLSBit(BitBuffer *BitB, const bool IsSigned) {
+        return 0ULL;
+    }
+    
+    uint64_t ReadExpGolombFromMSByteMSBit(BitBuffer *BitB, const bool IsSigned) {
+        return 0ULL;
+    }
+    
+    void     WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write) {
+        
+    }
+    
+    void     WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write) {
+        
+    }
+    
+    void     WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write) {
+        
+    }
+    
+    void     WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write ) {
         
     }
     
