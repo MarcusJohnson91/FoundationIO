@@ -201,6 +201,14 @@ extern "C" {
      @abstract									"Closes the GlobalLogFile".
      */
     void				DeinitBitIOGlobalLogFile(void);
+	
+	/*!
+	 @abstract									"Integer Power function".
+	 @param				Base					"What base should the power be calculated in"?
+	 @param				Exponent				"How many times should the Base be raised"?
+	 @return									"Returns the result of 1 *= Base, Exponent times".
+	 */
+	uint64_t            Power(const uint64_t Base, const uint64_t Exponent);
     
     /*!
      @abstract									"Swap bits in a byte".
