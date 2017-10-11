@@ -105,6 +105,18 @@ extern "C" {
         fclose(BitIOGlobalLogFile);
     }
     
+    inline uint64_t Power(const uint64_t Base, const uint64_t Exponent) {
+        uint64_t Result = 1ULL;
+        for (uint64_t i = 0; i < Exponent; i++) {
+            Result *= Base;
+        }
+        return Result;
+    }
+    
+    inline uint64_t Logarithm(const uint64_t Base, const uint64_t Exponent) {
+        return 0ULL;
+    }
+    
     inline uint8_t SwapBitsInByte(const uint8_t Byte) {
         return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
     }
@@ -323,11 +335,11 @@ extern "C" {
     }
     
     static inline uint8_t CreateBitMaskLSBit(const uint8_t Bits2Extract) {
-        return (uint8_t) pow(2, Bits2Extract) << (8 - Bits2Extract);
+        return (uint8_t) Power(2, Bits2Extract) << (8 - Bits2Extract);
     }
     
     static inline uint8_t CreateBitMaskMSBit(const uint8_t Bits2Extract) {
-        return (uint8_t) pow(2, Bits2Extract) >> (8 - Bits2Extract);
+        return (uint8_t) Power(2, Bits2Extract) >> (8 - Bits2Extract);
     }
     
     static inline uint8_t NumBits2ExtractFromByte(const uint64_t BitOffset, const uint8_t Bits2Extract) { // BitOffset = 6, Bits2Extract = 3
