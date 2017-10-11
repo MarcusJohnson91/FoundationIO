@@ -754,19 +754,39 @@ extern "C" {
     }
     
     uint64_t ReadExpGolombFromLSByteLSBit(BitBuffer *BitB, const bool IsSigned) {
-        return 0ULL;
+        uint64_t Value = 0ULL;
+        if (IsSigned == true) {
+            uint64_t Bits2Read = ReadUnaryFromLSByteLSBit(BitB, false, 0);
+            Value              = ExtractBitsFromLSByteLSBit(BitB, Bits2Read);
+        }
+        return Value;
     }
     
     uint64_t ReadExpGolombFromLSByteMSBit(BitBuffer *BitB, const bool IsSigned) {
-        return 0ULL;
+        uint64_t Value = 0ULL;
+        if (IsSigned == true) {
+            uint64_t Bits2Read = ReadUnaryFromLSByteMSBit(BitB, false, 0);
+            Value              = ExtractBitsFromLSByteMSBit(BitB, Bits2Read);
+        }
+        return Value;
     }
     
     uint64_t ReadExpGolombFromMSByteLSBit(BitBuffer *BitB, const bool IsSigned) {
-        return 0ULL;
+        uint64_t Value = 0ULL;
+        if (IsSigned == true) {
+            uint64_t Bits2Read = ReadUnaryFromMSByteLSBit(BitB, false, 0);
+         	Value              = ExtractBitsFromMSByteLSBit(BitB, Bits2Read);
+        }
+        return Value;
     }
     
     uint64_t ReadExpGolombFromMSByteMSBit(BitBuffer *BitB, const bool IsSigned) {
-        return 0ULL;
+        uint64_t Value = 0ULL;
+        if (IsSigned == true) {
+            uint64_t Bits2Read = ReadUnaryFromMSByteMSBit(BitB, false, 0);
+            Value              = ExtractBitsFromMSByteMSBit(BitB, Bits2Read);
+        }
+        return Value;
     }
     
     void     WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write) {
