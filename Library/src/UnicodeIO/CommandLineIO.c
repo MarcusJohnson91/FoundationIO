@@ -361,7 +361,7 @@ extern "C" {
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetCLINumArgumentsMatchingSwitch", "Pointer to CommandLineIO is NULL");
         } else if (Switch > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "GetCLINumArgumentsMatchingSwitch", "Switch: %d, should be between 0 and %d", Switch, CLI->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "GetCLINumArgumentsMatchingSwitch", "Switch %d is greater than there are switches %d", Switch, CLI->NumSwitches);
         } else {
             for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
                 if (CLI->Arguments[Argument].SwitchNum == Switch) {
@@ -377,9 +377,9 @@ extern "C" {
         if (CLI == NULL) {
             Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "Pointer to CommandLineIO is NULL");
         } else if (ParentSwitch > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "ParentSwitch: %d, should be between 0 and %d", ParentSwitch, CLI->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "ParentSwitch %d is greater than there are switches %d", ParentSwitch, CLI->NumSwitches);
         } else if (ChildSwitch > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "ChildSwitch: %d, should be between 0 and %d", ChildSwitch, CLI->NumSwitches);
+            Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "ChildSwitch %d is greater than there are switches %d", ChildSwitch, CLI->NumSwitches);
         } else {
             for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
                 for (uint64_t ChildArg = 0ULL; ChildArg < CLI->Arguments[Argument].NumChildArguments; ChildArg++) {
@@ -424,16 +424,16 @@ extern "C" {
         return FoundSwitch;
     }
     
-    uint64_t GetCLIArgumentNumFromSwitchNum(CommandLineIO const *CLI, uint64_t SwitchNum) {
+    uint64_t GetCLIArgumentNumFromSwitch(CommandLineIO const *CLI, const uint64_t Switch) {
         uint64_t FoundArgument = 0xFFFFFFFFFFFFFFFFULL;
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetCLIArgumentNumFromSwitchNum", "Pointer to CommandLineIO is NULL");
-        } else if (SwitchNum > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "GetCLIArgumentNumFromSwitchNum", "SwitchNum %d is not a valid Switch", SwitchNum);
+            Log(LOG_ERR, "libBitIO", "GetCLIArgumentNumFromSwitch", "Pointer to CommandLineIO is NULL");
+        } else if (Switch > CLI->NumSwitches) {
+            Log(LOG_ERR, "libBitIO", "GetCLIArgumentNumFromSwitch", "Switch %d is greater than there are switches %d", Switch, CLI->NumSwitches);
         } else {
             for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
                 // Loop over the arguments until you find CLI->Arguments[Argument].SwitchNum that matches SwitchNum
-                if (CLI->Arguments[Argument].SwitchNum == SwitchNum) {
+                if (CLI->Arguments[Argument].SwitchNum == Switch) {
                     FoundArgument = Argument;
                 }
             }
@@ -453,16 +453,16 @@ extern "C" {
         return Result;
     }
     
-    bool GetCLIArgumentPresenceFromSwitch(CommandLineIO const *CLI, uint64_t SwitchNum) {
+    bool GetCLIArgumentPresenceFromSwitch(CommandLineIO const *CLI, const uint64_t Switch) {
         uint64_t FoundArgument = 0xFFFFFFFFFFFFFFFFULL;
         if (CLI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetCLIArgumentNumFromSwitchNum", "Pointer to CommandLineIO is NULL");
-        } else if (SwitchNum > CLI->NumSwitches) {
-            Log(LOG_ERR, "libBitIO", "GetCLIArgumentNumFromSwitchNum", "SwitchNum %d is not a valid Switch", SwitchNum);
+            Log(LOG_ERR, "libBitIO", "GetCLIArgumentPresenceFromSwitch", "Pointer to CommandLineIO is NULL");
+        } else if (Switch > CLI->NumSwitches) {
+            Log(LOG_ERR, "libBitIO", "GetCLIArgumentPresenceFromSwitch", "SwitchNum %d is not a valid Switch", Switch);
         } else {
             for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
                 // Loop over the arguments until you find CLI->Arguments[Argument].SwitchNum that matches SwitchNum
-                if (CLI->Arguments[Argument].SwitchNum == SwitchNum) {
+                if (CLI->Arguments[Argument].SwitchNum == Switch) {
                     FoundArgument = Argument;
                 }
             }
