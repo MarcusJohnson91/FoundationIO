@@ -609,7 +609,7 @@ extern "C" {
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
 	 */
-	void                WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write);
+	void                WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
@@ -617,7 +617,7 @@ extern "C" {
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
 	 */
-	void                WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write);
+	void                WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
@@ -625,7 +625,7 @@ extern "C" {
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
 	 */
-	void                WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write);
+	void                WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
@@ -633,7 +633,7 @@ extern "C" {
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
 	 */
-	void                WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write);
+	void                WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields to the BitBuffer".

@@ -802,47 +802,68 @@ extern "C" {
         return Value;
     }
     
-    void     WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write) {
-        uint64_t Bits2Write = NumBits2ContainSymbol(Field2Write);
-        WriteUnaryFromLSByteLSBit(BitB, false, StopBit, Bits2Write); // Write the Unary part.
-        WriteBitsAsLSByteLSBit(BitB, 1, ~StopBit); // Write the StopBit
+    void     WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
+        uint64_t NumBits2Write = NumBits2ContainSymbol(Field2Write);
+        WriteUnaryFromLSByteLSBit(BitB, false, ~StopBit, NumBits2Write); // Write the Unary part.
+        WriteBitsAsLSByteLSBit(BitB, 1, StopBit); // Write the StopBit
         if (IsSigned == false) {
-            WriteBitsAsLSByteLSBit(BitB, Bits2Write + 1, Field2Write + 1);
+            WriteBitsAsLSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
         } else {
-            
+            if (Field2Write < 0) { // Negative
+                                   // Lets say we wanna write the number -3, -3 * 2 = -6,
+            } else { // Positive
+                     // Simply add 1, and subtract the Bits2Write + 1 from it? so, Bits2Write = 2, so just write the 2 lowest bits...
+                WriteBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
+            }
         }
     }
     
-    void     WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write) {
-        uint64_t Bits2Write = NumBits2ContainSymbol(Field2Write);
-        WriteUnaryFromLSByteMSBit(BitB, false, StopBit, Bits2Write); // Write the Unary part.
-        WriteBitsAsLSByteMSBit(BitB, 1, ~StopBit); // Write the StopBit
+    void     WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
+        uint64_t NumBits2Write = NumBits2ContainSymbol(Field2Write);
+        WriteUnaryFromLSByteMSBit(BitB, false, ~StopBit, NumBits2Write); // Write the Unary part.
+        WriteBitsAsLSByteMSBit(BitB, 1, StopBit); // Write the StopBit
         if (IsSigned == false) {
-            WriteBitsAsLSByteMSBit(BitB, Bits2Write + 1, Field2Write + 1);
+            WriteBitsAsLSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
         } else {
-            
+            if (Field2Write < 0) { // Negative
+                                   // Lets say we wanna write the number -3, -3 * 2 = -6,
+            } else { // Positive
+                     // Simply add 1, and subtract the Bits2Write + 1 from it? so, Bits2Write = 2, so just write the 2 lowest bits...
+                WriteBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
+            }
         }
     }
     
-    void     WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write) {
-        uint64_t Bits2Write = NumBits2ContainSymbol(Field2Write);
-        WriteUnaryFromMSByteLSBit(BitB, false, StopBit, Bits2Write); // Write the Unary part.
-        WriteBitsAsMSByteLSBit(BitB, 1, ~StopBit); // Write the StopBit
+    void     WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
+        uint64_t NumBits2Write = NumBits2ContainSymbol(Field2Write);
+        WriteUnaryFromMSByteLSBit(BitB, false, ~StopBit, NumBits2Write); // Write the Unary part.
+        WriteBitsAsMSByteLSBit(BitB, 1, StopBit); // Write the StopBit
         if (IsSigned == false) {
-            WriteBitsAsMSByteLSBit(BitB, Bits2Write + 1, Field2Write + 1);
+            WriteBitsAsMSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
         } else {
-            
+            if (Field2Write < 0) { // Negative
+                                   // Lets say we wanna write the number -3, -3 * 2 = -6,
+            } else { // Positive
+                     // Simply add 1, and subtract the Bits2Write + 1 from it? so, Bits2Write = 2, so just write the 2 lowest bits...
+                WriteBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
+            }
         }
     }
     
-    void     WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write) {
-        uint64_t Bits2Write = NumBits2ContainSymbol(Field2Write);
-        WriteUnaryFromMSByteMSBit(BitB, false, StopBit, Bits2Write); // Write the Unary part.
-        WriteBitsAsMSByteMSBit(BitB, 1, ~StopBit); // Write the StopBit
+    void     WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
+        uint64_t NumBits2Write = NumBits2ContainSymbol(Field2Write);
+        WriteUnaryFromMSByteMSBit(BitB, false, ~StopBit, NumBits2Write); // Write the Unary part.
+        WriteBitsAsMSByteMSBit(BitB, 1, StopBit); // Write the StopBit
         if (IsSigned == false) {
-            WriteBitsAsMSByteMSBit(BitB, Bits2Write + 1, Field2Write + 1);
+            WriteBitsAsMSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
         } else {
-            
+            // Negative ints are multiplied by 2, and positive are multiplied by 2 and have 1 extracted from them.
+            if (Field2Write < 0) { // Negative
+                // Lets say we wanna write the number -3, -3 * 2 = -6,
+            } else { // Positive
+                // Simply add 1, and subtract the Bits2Write + 1 from it? so, Bits2Write = 2, so just write the 2 lowest bits...
+                WriteBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
+            }
         }
     }
     
