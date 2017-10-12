@@ -113,8 +113,13 @@ extern "C" {
         return Result;
     }
     
-    inline uint64_t Logarithm(const uint64_t Base, const uint64_t Exponent) {
-        return 0ULL;
+    inline uint64_t NumBits2ContainSymbol(uint64_t Value) {
+        uint64_t TimesShifted = 1ULL;
+        while (Value >= 2) {
+            Value >>= 1;
+            TimesShifted += 1;
+        }
+        return TimesShifted;
     }
     
     inline uint8_t SwapBitsInByte(const uint8_t Byte) {
@@ -797,20 +802,48 @@ extern "C" {
         return Value;
     }
     
-    void     WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write) {
-        
+    void     WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write) {
+        uint64_t Bits2Write = NumBits2ContainSymbol(Field2Write);
+        WriteUnaryFromLSByteLSBit(BitB, false, StopBit, Bits2Write); // Write the Unary part.
+        WriteBitsAsLSByteLSBit(BitB, 1, ~StopBit); // Write the StopBit
+        if (IsSigned == false) {
+            WriteBitsAsLSByteLSBit(BitB, Bits2Write + 1, Field2Write + 1);
+        } else {
+            
+        }
     }
     
-    void     WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write) {
-        
+    void     WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write) {
+        uint64_t Bits2Write = NumBits2ContainSymbol(Field2Write);
+        WriteUnaryFromLSByteMSBit(BitB, false, StopBit, Bits2Write); // Write the Unary part.
+        WriteBitsAsLSByteMSBit(BitB, 1, ~StopBit); // Write the StopBit
+        if (IsSigned == false) {
+            WriteBitsAsLSByteMSBit(BitB, Bits2Write + 1, Field2Write + 1);
+        } else {
+            
+        }
     }
     
-    void     WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write) {
-        
+    void     WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write) {
+        uint64_t Bits2Write = NumBits2ContainSymbol(Field2Write);
+        WriteUnaryFromMSByteLSBit(BitB, false, StopBit, Bits2Write); // Write the Unary part.
+        WriteBitsAsMSByteLSBit(BitB, 1, ~StopBit); // Write the StopBit
+        if (IsSigned == false) {
+            WriteBitsAsMSByteLSBit(BitB, Bits2Write + 1, Field2Write + 1);
+        } else {
+            
+        }
     }
     
-    void     WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write ) {
-        
+    void     WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write) {
+        uint64_t Bits2Write = NumBits2ContainSymbol(Field2Write);
+        WriteUnaryFromMSByteMSBit(BitB, false, StopBit, Bits2Write); // Write the Unary part.
+        WriteBitsAsMSByteMSBit(BitB, 1, ~StopBit); // Write the StopBit
+        if (IsSigned == false) {
+            WriteBitsAsMSByteMSBit(BitB, Bits2Write + 1, Field2Write + 1);
+        } else {
+            
+        }
     }
     
     uint8_t *ReadGUUIDAsUUIDString(BitBuffer *BitB) {
