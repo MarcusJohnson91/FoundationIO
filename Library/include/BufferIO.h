@@ -211,6 +211,13 @@ extern "C" {
 	uint64_t            Power(const uint64_t Base, const uint64_t Exponent);
 	
 	/*!
+	 @abstract									"Integer Binary Logarithm function, used to find the number of bits needed to hold a value".
+	 @param				Symbol					"The symbol to calculare the number of bits necessary required".
+	 @return									"Returns the minimum number of bits necessary to hold the value.".
+	 */
+	uint64_t            NumBits2ContainSymbol(uint64_t Symbol);
+	
+	/*!
 	 @abstract									"Swap bits in a byte".
 	 @param				Byte					"Byte to swap bits".
 	 @return									"Returns swapped byte".
@@ -602,7 +609,7 @@ extern "C" {
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
 	 */
-	void                WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write);
+	void                WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
@@ -610,7 +617,7 @@ extern "C" {
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
 	 */
-	void                WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write);
+	void                WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
@@ -618,7 +625,7 @@ extern "C" {
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
 	 */
-	void                WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write);
+	void                WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
@@ -626,7 +633,7 @@ extern "C" {
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
 	 */
-	void                WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const uint64_t Field2Write);
+	void                WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const uint64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields to the BitBuffer".
@@ -636,7 +643,7 @@ extern "C" {
 	 @param				IsSigned				"Can there be negative values in this field?".
 	 @param				Field2Write				"Value to be encoded as Exp-Golomb and written".
 	 */
-#define WriteExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned,Field2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsLSByteLSBit,BitBMSBit_t:WriteExpGolombAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsMSByteLSBit,BitBMSBit_t:WriteExpGolombAsMSByteMSBit))(BitB,IsSigned,Field2Write)
+#define WriteExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned,StopBit,Field2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsLSByteLSBit,BitBMSBit_t:WriteExpGolombAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsMSByteLSBit,BitBMSBit_t:WriteExpGolombAsMSByteMSBit))(BitB,IsSigned,StopBit,Field2Write)
 	
 	/*!
 	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
