@@ -366,28 +366,28 @@ extern "C" {
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				Bits2Read				"The number of bits to read from the BitBuffer, as LSByte, LSBit format, to the runtime byte/bit order".
 	 */
-	uint64_t		    ReadBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read);
+	uint64_t		    ReadBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read);
 	
 	/*!
 	 @abstract									"Reads bits from BitBuffer".
 	 @param				BitB                 	"Pointer to the instance of BitBuffer".
 	 @param				Bits2Read           	"The number of bits to read from the BitBuffer, as LSByte, MSBit format, to the runtime byte/bit order".
 	 */
-	uint64_t		    ReadBitsFromLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read);
+	uint64_t		    ReadBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read);
 	
 	/*!
 	 @abstract									"Reads bits from BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				Bits2Read				"The number of bits to read from the BitBuffer, as MSByte, LSBit format, to the runtime byte/bit order".
 	 */
-	uint64_t		    ReadBitsFromMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read);
+	uint64_t		    ReadBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read);
 	
 	/*!
 	 @abstract									"Reads bits from BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				Bits2Read				"The number of bits to read from the BitBuffer, as MSByte, MSBit format, to the runtime byte/bit order".
 	 */
-	uint64_t		    ReadBitsFromMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read);
+	uint64_t		    ReadBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read);
 	
 	/*!
 	 @abstract                                  "Reads bits from BitBuffer".
@@ -396,35 +396,35 @@ extern "C" {
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				Bits2Read				"The number of bits to read from the BitBuffer".
 	 */
-#define ReadBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Read)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsFromLSByteLSBit,BitBMSBit_t:ReadBitsFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsFromMSByteLSBit,BitBMSBit_t:ReadBitsFromMSByteMSBit))(BitB,Bits2Read)
+#define ReadBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Read)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsAsLSByteLSBit,BitBMSBit_t:ReadBitsAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsAsMSByteLSBit,BitBMSBit_t:ReadBitsAsMSByteMSBit))(BitB,Bits2Read)
 	
 	/*!
 	 @abstract                                  "Peeks (read but without recording that it's been read) bits from BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				Bits2Peek				"The number of bits to Peek from the BitBuffer, as LSByte, LSBit format, to the runtime byte/bit order".
 	 */
-	uint64_t		    PeekBitsFromLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
+	uint64_t		    PeekBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
 	
 	/*!
 	 @abstract									"Peeks (read but without recording that it's been read) bits from BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				Bits2Peek				"The number of bits to Peek from the BitBuffer, as LSByte, MSBit format, to the runtime byte/bit order".
 	 */
-	uint64_t		    PeekBitsFromLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
+	uint64_t		    PeekBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
 	
 	/*!
 	 @abstract									"Peeks (read but without recording that it's been read) bits from BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				Bits2Peek				"The number of bits to Peek from the BitBuffer, as MSByte, LSBit format, to the runtime byte/bit order".
 	 */
-	uint64_t		    PeekBitsFromMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
+	uint64_t		    PeekBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
 	
 	/*!
 	 @abstract									"Peeks (read but without recording that it's been read) bits from BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				Bits2Peek				"The number of bits to Peek from the BitBuffer, as MSByte, MSBit format, to the runtime byte/bit order".
 	 */
-	uint64_t		    PeekBitsFromMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
+	uint64_t		    PeekBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
 	
 	/*!
 	 @abstract									"Peeks (read but without recording that it's been read) bits from BitBuffer".
@@ -433,7 +433,7 @@ extern "C" {
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				Bits2Peek				"The number of bits to peek from the BitBuffer".
 	 */
-#define PeekBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Peek)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsFromLSByteLSBit,BitBMSBit_t:PeekBitsFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsFromMSByteLSBit,BitBMSBit_t:PeekBitsFromMSByteMSBit))(BitB,Bits2Peek)
+#define PeekBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Peek)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsAsLSByteLSBit,BitBMSBit_t:PeekBitsAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsAsMSByteLSBit,BitBMSBit_t:PeekBitsAsMSByteMSBit))(BitB,Bits2Peek)
 	
 	/*!
 	 @abstract									"Writes bits to the BitBuffer, from the runtime byte/bit order to the specified byte/bit order".
@@ -483,7 +483,7 @@ extern "C" {
 	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 */
-	uint64_t		    ReadUnaryFromLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+	uint64_t		    ReadUnaryAsLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
 	
 	/*!
 	 @abstract									"Reads unary encoded fields from the BitBuffer".
@@ -491,7 +491,7 @@ extern "C" {
 	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 */
-	uint64_t		    ReadUnaryFromLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+	uint64_t		    ReadUnaryAsLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
 	
 	/*!
 	 @abstract									"Reads unary encoded fields from the BitBuffer".
@@ -499,7 +499,7 @@ extern "C" {
 	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 */
-	uint64_t		    ReadUnaryFromMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+	uint64_t		    ReadUnaryAsMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
 	
 	/*!
 	 @abstract									"Reads unary encoded fields from the BitBuffer".
@@ -507,7 +507,7 @@ extern "C" {
 	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 */
-	uint64_t		    ReadUnaryFromMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+	uint64_t		    ReadUnaryAsMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
 	
 	/*!
 	 @abstract									"Reads unary encoded fields from the BitBuffer".
@@ -517,7 +517,7 @@ extern "C" {
 	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 */
-#define ReadUnary(BitBByteOrder,BitBBitOrder,BitB,IsStrictlyPositive,StopBit)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryFromLSByteLSBit,BitBMSBit_t:ReadUnaryFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryFromMSByteLSBit,BitBMSBit_t:ReadUnaryFromMSByteMSBit))(BitB,IsStrictlyPositive,StopBit)
+#define ReadUnary(BitBByteOrder,BitBBitOrder,BitB,IsStrictlyPositive,StopBit)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryAsLSByteLSBit,BitBMSBit_t:ReadUnaryAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryAsMSByteLSBit,BitBMSBit_t:ReadUnaryAsMSByteMSBit))(BitB,IsStrictlyPositive,StopBit)
 	
 	/*!
 	 @abstract									"Writes unary encoded fields to the BitBuffer".
@@ -526,7 +526,7 @@ extern "C" {
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 @param				Field2Write				"Value to be written as Unary encoded".
 	 */
-	void                WriteUnaryFromLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
+	void                WriteUnaryAsLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes unary encoded fields to the BitBuffer".
@@ -535,7 +535,7 @@ extern "C" {
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 @param				Field2Write				"Value to be written as Unary encoded".
 	 */
-	void                WriteUnaryFromLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
+	void                WriteUnaryAsLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes unary encoded fields to the BitBuffer".
@@ -544,7 +544,7 @@ extern "C" {
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 @param				Field2Write				"Value to be written as Unary encoded".
 	 */
-	void                WriteUnaryFromMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
+	void                WriteUnaryAsMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes unary encoded fields to the BitBuffer".
@@ -553,7 +553,7 @@ extern "C" {
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 @param				Field2Write				"Value to be written as Unary encoded".
 	 */
-	void                WriteUnaryFromMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
+	void                WriteUnaryAsMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes unary encoded bits to the BitBuffer".
@@ -564,35 +564,35 @@ extern "C" {
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 @param				Field2Write				"Value to be written as Unary encoded".
 	 */
-#define WriteUnary(BitBByteOrder,BitBBitOrder,BitB,IsStrictlyPositive,StopBit,Field2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteUnaryFromLSByteLSBit,BitBMSBit_t:WriteUnaryFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteUnaryFromMSByteLSBit,BitBMSBit_t:WriteUnaryFromMSByteMSBit))(BitB,IsStrictlyPositive,StopBit,Field2Write)
+#define WriteUnary(BitBByteOrder,BitBBitOrder,BitB,IsStrictlyPositive,StopBit,Field2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteUnaryAsLSByteLSBit,BitBMSBit_t:WriteUnaryAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteUnaryAsMSByteLSBit,BitBMSBit_t:WriteUnaryAsMSByteMSBit))(BitB,IsStrictlyPositive,StopBit,Field2Write)
 	
 	/*!
 	 @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 */
-	uint64_t		    ReadExpGolombFromLSByteLSBit(BitBuffer *BitB, const bool IsSigned);
+	uint64_t		    ReadExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned);
 	
 	/*!
 	 @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 */
-	uint64_t		    ReadExpGolombFromLSByteMSBit(BitBuffer *BitB, const bool IsSigned);
+	uint64_t		    ReadExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned);
 	
 	/*!
 	 @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 */
-	uint64_t		    ReadExpGolombFromMSByteLSBit(BitBuffer *BitB, const bool IsSigned);
+	uint64_t		    ReadExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned);
 	
 	/*!
 	 @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 */
-	uint64_t		    ReadExpGolombFromMSByteMSBit(BitBuffer *BitB, const bool IsSigned);
+	uint64_t		    ReadExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned);
 	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
@@ -601,7 +601,7 @@ extern "C" {
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				IsSigned				"Can there be negative values in this field"?
 	 */
-#define ReadExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromLSByteLSBit,BitBMSBit_t:ReadExpGolombFromLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombFromMSByteLSBit,BitBMSBit_t:ReadExpGolombFromMSByteMSBit))(BitB,IsSigned)
+#define ReadExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombAsLSByteLSBit,BitBMSBit_t:ReadExpGolombAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombAsMSByteLSBit,BitBMSBit_t:ReadExpGolombAsMSByteMSBit))(BitB,IsSigned)
 	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
