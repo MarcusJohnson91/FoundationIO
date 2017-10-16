@@ -157,9 +157,17 @@ extern "C" {
         }
     }
     
-    inline uint64_t NumBits2ReadSymbols(const uint64_t NumSymbols) {
-        // Use a binary logarithm, that you round up, in order to get the number of bits required to ∂ a certain number of symbols.
-        return ceil(log2(NumSymbols));
+    inline uint64_t NumBits2StoreSymbol(uint64_t Symbol) {
+        uint64_t Bits = 0ULL;
+        if (Symbol == 0) {
+            Bits = 1;
+        } else {
+            while (Symbol > 0) {
+                Bits += 1;
+                Symbol >>= 1;
+            }
+        }
+        return Bits;
     }
     
     inline bool IsOdd(const int64_t Number2Check) {
