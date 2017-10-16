@@ -977,11 +977,6 @@ extern "C" {
         if (IsSigned == false) {
             WriteBitsAsMSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             // Negative ints are multiplied by 2, and positive are multiplied by 2 and have 1 extracted from them.
             if (Field2Write < 0) { // Negative
                 // Lets say we wanna write the number -3, -3 * 2 = -6,
@@ -993,88 +988,88 @@ extern "C" {
     }
     
     uint8_t *ReadGUUIDAsUUIDString(BitBuffer *BitB) {
-        uint8_t *UUIDString      = calloc(1, BitIOGUUIDStringSize);
+        uint8_t *UUIDString      = NULL;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsUUIDString", "Pointer to BitBuffer is NULL");
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
-            uint32_t Section1    = ExtractBitsAsMSByteLSBit(BitB, 32);
-            SkipBits(BitB, 8);
-            uint16_t Section2    = ExtractBitsAsMSByteLSBit(BitB, 16);
-            SkipBits(BitB, 8);
-            uint16_t Section3    = ExtractBitsAsMSByteLSBit(BitB, 16);
-            SkipBits(BitB, 8);
-            uint16_t Section4    = ExtractBitsAsMSByteLSBit(BitB, 16);
-            SkipBits(BitB, 8);
-            uint64_t Section5    = ExtractBitsAsMSByteLSBit(BitB, 48);
-            sprintf((char*)UUIDString, "%d-%d-%d-%d-%llu%d", Section1, Section2, Section3, Section4, Section5, 0x0);
+            UUIDString           = calloc(1, BitIOGUUIDStringSize);
+            if (UUIDString == NULL) {
+                Log(LOG_ERR, "libBitIO", "ReadGUUIDAsUUIDString", "Not enough memory to allocate UUIDString");
+            } else {
+                uint32_t Section1    = ExtractBitsAsMSByteLSBit(BitB, 32);
+                SkipBits(BitB, 8);
+                uint16_t Section2    = ExtractBitsAsMSByteLSBit(BitB, 16);
+                SkipBits(BitB, 8);
+                uint16_t Section3    = ExtractBitsAsMSByteLSBit(BitB, 16);
+                SkipBits(BitB, 8);
+                uint16_t Section4    = ExtractBitsAsMSByteLSBit(BitB, 16);
+                SkipBits(BitB, 8);
+                uint64_t Section5    = ExtractBitsAsMSByteLSBit(BitB, 48);
+                sprintf((char*)UUIDString, "%d-%d-%d-%d-%llu", Section1, Section2, Section3, Section4, Section5);
+            }
         }
         return UUIDString;
     }
     
     uint8_t *ReadGUUIDAsGUIDString(BitBuffer *BitB) {
-        uint8_t *GUIDString      = calloc(1, BitIOGUUIDStringSize);
+        uint8_t *GUIDString      = NULL;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsGUIDString", "Pointer to BitBuffer is NULL");
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
-            uint32_t Section1    = ExtractBitsAsLSByteLSBit(BitB, 32);
-            SkipBits(BitB, 8);
-            uint16_t Section2    = ExtractBitsAsLSByteLSBit(BitB, 16);
-            SkipBits(BitB, 8);
-            uint16_t Section3    = ExtractBitsAsLSByteLSBit(BitB, 16);
-            SkipBits(BitB, 8);
-            uint16_t Section4    = ExtractBitsAsLSByteLSBit(BitB, 16);
-            SkipBits(BitB, 8);
-            uint64_t Section5    = ExtractBitsAsMSByteLSBit(BitB, 48);
-            sprintf((char*)GUIDString, "%d-%d-%d-%d-%llu%d", Section1, Section2, Section3, Section4, Section5, 0x0);
+            GUIDString           = calloc(1, BitIOGUUIDStringSize);
+            if (GUIDString == NULL) {
+                Log(LOG_ERR, "libBitIO", "ReadGUUIDAsGUIDString", "Not enough memory to allocate GUIDString");
+            } else {
+                uint32_t Section1    = ExtractBitsAsLSByteLSBit(BitB, 32);
+                SkipBits(BitB, 8);
+                uint16_t Section2    = ExtractBitsAsLSByteLSBit(BitB, 16);
+                SkipBits(BitB, 8);
+                uint16_t Section3    = ExtractBitsAsLSByteLSBit(BitB, 16);
+                SkipBits(BitB, 8);
+                uint16_t Section4    = ExtractBitsAsLSByteLSBit(BitB, 16);
+                SkipBits(BitB, 8);
+                uint64_t Section5    = ExtractBitsAsMSByteLSBit(BitB, 48);
+                sprintf((char*)GUIDString, "%d-%d-%d-%d-%llu", Section1, Section2, Section3, Section4, Section5);
+            }
         }
         return GUIDString;
     }
     
     uint8_t *ReadGUUIDAsBinaryUUID(BitBuffer *BitB) {
-        uint8_t *BinaryUUID  = calloc(1, BitIOBinaryGUUIDSize);
+        uint8_t *BinaryUUID  = NULL;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsBinaryUUID", "Pointer to BitBuffer is NULL");
         } else {
-            for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
-                BinaryUUID[Byte] = ExtractBitsAsLSByteLSBit(BitB, 8);
+            BinaryUUID       = calloc(1, BitIOBinaryGUUIDSize);
+            if (BinaryUUID == NULL) {
+                Log(LOG_ERR, "libBitIO", "ReadGUUIDAsBinaryUUID", "Not enough memory to allocate BinaryUUID");
+            } else {
+                for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
+                    BinaryUUID[Byte] = ExtractBitsAsMSByteLSBit(BitB, 8);
+                }
             }
         }
         return BinaryUUID;
     }
     
     uint8_t *ReadGUUIDAsBinaryGUID(BitBuffer *BitB) {
-        uint8_t *BinaryGUID = calloc(1, BitIOBinaryGUUIDSize);
+        uint8_t *BinaryGUID = NULL;
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsBinaryGUID", "Pointer to BitBuffer is NULL");
         } else {
-            for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
-                BinaryGUID[Byte] = ExtractBitsAsMSByteLSBit(BitB, 8);
+            BinaryGUID      = calloc(1, BitIOBinaryGUUIDSize);
+            if (BinaryGUID == NULL) {
+                Log(LOG_ERR, "libBitIO", "ReadGUUIDAsBinaryGUID", "Not enough memory to allocate BinaryGUID");
+            } else {
+                for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
+                    BinaryGUID[Byte] = ExtractBitsAsLSByteLSBit(BitB, 8);
+                }
             }
         }
         return BinaryGUID;
     }
     
-    bool     CompareGUUIDs(const uint8_t *GUUID1, const uint8_t *GUUID2, const uint8_t GUUIDSize) { // The only restriction is that you can only compare GUUIDStrings to GUUIDStrings or BinaryGUUIDs to BinaryGUUIDs.
+    bool     CompareGUUIDs(const uint8_t *GUUID1, const uint8_t *GUUID2, const uint8_t GUUIDSize) {
         bool GUUIDsMatch = true;
         for (uint8_t GUUIDByte = 0; GUUIDByte < GUUIDSize; GUUIDByte++) {
             if (GUUID1[GUUIDByte] != GUUID2[GUUIDByte]) {

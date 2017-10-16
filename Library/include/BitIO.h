@@ -98,7 +98,7 @@ extern "C" {
 	 @constant			BitIOBinaryGUUIDSize	"Size of a BinaryUUID or BinaryGUID".
 	 */
 	enum BitIOConstants {
-						BitIOGUUIDStringSize	= (21),
+						BitIOGUUIDStringSize	= (20),
 						BitIOBinaryGUUIDSize	= (16),
 	};
 	
@@ -648,14 +648,14 @@ extern "C" {
 	/*!
 	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
 	 @param				BitB					"Pointer to an instance of BitBuffer".
-	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
+	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes, there is no NULL terminator".
 	 */
 	uint8_t		       *ReadGUUIDAsUUIDString(BitBuffer *BitB);
 	
 	/*!
 	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
 	 @param				BitB					"Pointer to an instance of BitBuffer".
-	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
+	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes, there is no NULL terminator".
 	 */
 	uint8_t		       *ReadGUUIDAsGUIDString(BitBuffer *BitB);
 	
