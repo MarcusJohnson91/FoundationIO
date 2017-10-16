@@ -268,12 +268,12 @@ extern "C" {
 	int64_t      		Bits2Bytes(const int64_t Bits, const bool RoundUp);
 	
 	/*!
-	 @abstract									"Computes the number of bits required to hold a certain amount of symbols".
-	 @remark									"Rounds up to the next integer number of bits to ensure all symbols can be contained in single integer".
-	 @param				NumSymbols				"The number of symbols you're looking to contain in a binary number".
-	 @return									"Returns the number of bits required to read a symbol".
+	 @abstract									"Computes the number of bits required to hold a certain symbol".
+	 @remark									"Rounds up to the next integer number of bits to ensure all symbols can be contained in a single integer".
+	 @param				Symbol					"The symbol you're looking to store".
+	 @return									"Returns the number of bits required to store a symbol".
 	 */
-	uint64_t     		NumBits2ReadSymbols(const uint64_t NumSymbols);
+	uint64_t     		NumBits2StoreSymbol(const uint64_t Symbol);
 	
 	/*!
 	 @abstract									"Tells whether Input is even or odd".
