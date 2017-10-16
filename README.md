@@ -26,10 +26,7 @@ Compiling:
 * The makefile by defaults builds the library as a static library, for RELEASE, to change this set `BUILDTYPE` to DEBUG.
 * BitIO is included as a submodule in git, so you don't need to install it if you're using one of my libraries, ModernPNG, ModernFLAC, ModernAVC, etc.
 * On my Mac for AMD64, the libBitIO static library is about 200kb, if that's too big for your use, enable link time optimization on your program to trim unused functions.
-
-MSVC:
-----
-* Microsoft has decided to not support C11's `_Generic` preprocessor keyword, so you can't directly use the `ReadBits`/`PeekBits`/`ReadUnary`/`ReadExpGolomb`/`ReadGUUID`/`WriteBits`/`WriteUnary`/`WriteExpGolomb`/`WriteGUUID`/`WriteBits` macros, I've chosen to rely on this preprocessor keyword to ensure that there is minimal branching during runtime, to gain performance on accelerators like GPUs.
+*  **Microsoft** has decided to not support C11's `_Generic` preprocessor keyword, so you can't directly use the `ReadBits`/`PeekBits`/`ReadUnary`/`ReadExpGolomb`/`ReadGUUID`/`WriteBits`/`WriteUnary`/`WriteExpGolomb`/`WriteGUUID`/`WriteBits` macros, I've chosen to rely on this preprocessor keyword to ensure that there is minimal branching during runtime, to gain performance on accelerators like GPUs.
 To solve this problem, you can hardcode it with the `Read`/`Write``From``ByteOrder``BitOrder` functions, or pester Microsoft to fix their support for the C11 standard.
 
 How To Use libBitIO:
@@ -102,3 +99,4 @@ TODO:
 * Add format specifier support to `OpenInputFile` and `OpenOutputFile`, and add a function to increment the file.
 * Write a WriteArray2BitBuffer and ReadBitBuffer2Array functions.
 * Make the makefile able to extract the TargetByteOrder and TargetBitOrder from the target architecture.
+
