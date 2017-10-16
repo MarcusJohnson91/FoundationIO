@@ -115,8 +115,8 @@ extern "C" {
     }
     
     inline uint64_t NumBits2ContainSymbol(uint64_t Value) {
-        uint64_t TimesShifted = 1ULL;
-        while (Value >= 2) {
+        uint64_t TimesShifted = 0ULL;
+        while (Value > 0) {
             Value >>= 1;
             TimesShifted += 1;
         }
@@ -1231,35 +1231,28 @@ extern "C" {
     }
     
     void WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString) {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
+        for (uint8_t Byte = 0; Byte < BitIOGUUIDStringSize; Byte++) {
+            WriteBitsAsMSByteLSBit(BitB, 8, UUIDString[Byte]);
+        }
     }
     
     void WriteGUUIDAsGUIDString(BitBuffer *BitB, const uint8_t *GUIDString) {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
+        for (uint8_t Byte = 0; Byte < BitIOGUUIDStringSize; Byte++) {
+            WriteBitsAsLSByteLSBit(BitB, 8, GUIDString[Byte]);
+        }
     }
     
     void WriteGUUIDAsBinaryUUID(BitBuffer *BitB, const uint8_t *BinaryUUID) {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
+        for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
+            WriteBitsAsMSByteLSBit(BitB, 8, BinaryUUID[Byte]);
+        }
     }
     
     void WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID) {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
+        /* A Binary GUUID is least significant byte first, so we just need to convert the runtime representation to this */
+        for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
+            WriteBitsAsLSByteLSBit(BitB, 8, BinaryGUID[Byte]);
+        }
     }
     
     void DeinitGUUID(uint8_t *GUUID) {
