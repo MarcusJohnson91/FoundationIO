@@ -22,12 +22,11 @@ Here's a tl;dr of my license:
 Compiling:
 =========
 * libBitIO alone won't do a whole lot for you, it's real use is in being a library other libraries rely on.
-* When compiling you need to set the macros `LSByte/MSByte` and `LSBit/MSBit` for the byte and bit order of your CPU targets, if you're using libBitIO as a dependency, make sure to edit your makefile to pass those parameters.
-* The makefile by defaults builds the library as a static library, for RELEASE, to change this set `BUILDTYPE` to DEBUG.
+* The makefile by defaults builds the library as a static library, for RELEASE, to change this set `BUILDTYPE` to `DEBUG`.
 * BitIO is included as a submodule in git, so you don't need to install it if you're using one of my libraries, ModernPNG, ModernFLAC, ModernAVC, etc.
 * On my Mac for AMD64, the libBitIO static library is about 200kb, if that's too big for your use, enable link time optimization on your program to trim unused functions.
-*  **Microsoft** has decided to not support C11's `_Generic` preprocessor keyword, so you can't directly use the `ReadBits`/`PeekBits`/`ReadUnary`/`ReadExpGolomb`/`ReadGUUID`/`WriteBits`/`WriteUnary`/`WriteExpGolomb`/`WriteGUUID`/`WriteBits` macros, I've chosen to rely on this preprocessor keyword to ensure that there is minimal branching during runtime, to gain performance on accelerators like GPUs.
-To solve this problem, you can hardcode it with the `Read`/`Write``From``ByteOrder``BitOrder` functions, or pester Microsoft to fix their support for the C11 standard.
+*  **Microsoft** has decided to not support C11's `_Generic` preprocessor keyword, so you can't directly use the `ReadBits`/`PeekBits`/`ReadUnary`/`ReadExpGolomb`/`ReadGUUID`/`WriteBits`/`WriteUnary`/`WriteExpGolomb`/`WriteGUUID` macros, I've chosen to rely on this preprocessor keyword to ensure that there is minimal branching during runtime, to gain performance on accelerators like GPUs.
+To solve this problem, you can hardcode it with the `Read`/`Write``As``ByteOrder``BitOrder` functions, or pester Microsoft to fix their support for the C11 standard.
 
 How To Use libBitIO:
 ===================
