@@ -12,6 +12,7 @@
 #endif
 
 #include "../include/BitIO.h"
+#include "../include/Private/Endian.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -378,20 +379,14 @@ extern "C" {
         while (Bits > 0) {
             uint64_t Bits2Put      = NumBits2ExtractFromByte(BitB->BitOffset, Bits);
             uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Put);
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
             // Extract as is
-#elif  RuntimeMSBit
-            uint8_t FinalByte      = SwapBits(Data, Bits2Put);
-            // Extract and flip bit order
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+            uint8_t FinalByte      = SwapBits(Data, Bits2Put); // Extract and flip bit order
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
             // Extract and flip byte order
-#elif  RuntimeMSBit
-            uint8_t FinalByte      = SwapBits(Data, Bits2Put);
-            // Extract and flip the byte order AND bit order
-#endif
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
+            uint8_t FinalByte      = SwapBits(Data, Bits2Put); // Extract and flip the byte order AND bit order
 #endif
             Bits                  -= Bits2Put;
         }
@@ -400,16 +395,31 @@ extern "C" {
     static inline void InsertBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
         // Write data from LSByte (LSBit is default) to LSByte,LSBit
         // What variables do we need to take into account? Just swapping bit order, BitsAvailable, and looping...
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
+#endif
     }
     
     static inline void InsertBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
         // Write data from LSByte (LSBit is default) to MSByte, LSBit.
         // What variables do we need to take into account? Just swapping byte order, BitsAvailable, and looping...
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
+#endif
     }
     
     static inline void InsertBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
         // Write data from LSByte (LSBit is default) to MSByte, LSBit.
         // What variables do we need to take into account? Just swapping byte and bit order, BitsAvailable, and looping...
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
+#endif
     }
     
     static inline uint64_t ExtractBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Extract) { // So this function reads data FROM Little endian, Least Significant Bit first
@@ -419,26 +429,18 @@ extern "C" {
         while (UserRequestedBits > 0) { // What happens when the user requests more bits than are available in this byte? bit offset % 8 = 6, user requests 3 bits,only 2 bits can be fulfilled from this byte. wait, this means we shouldn't assume 8 bits are availble, but calculate it as part of the loop.
             uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
             uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Get);
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
             OutputData           <<= Bits2Get;
-            // Extract as is
-#elif  RuntimeMSBit
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
             uint8_t FinalByte      = SwapBits(Data, Bits2Get);
             OutputData           >>= Bits2Get;
-            // Extract and flip bit order
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            // Extract and flip byte order
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
             OutputData             & (0xFF << (Bits2Extract - Bits2Get)); // Byte shift
             OutputData           <<= Bits2Get; // Bit shift
-#elif  RuntimeMSBit
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
             uint8_t FinalByte      = SwapBits(Data, Bits2Get);
             OutputData             & (0xFF << (Bits2Extract - Bits2Get)); // Byte Shift
             OutputData           >>= Bits2Get; // Bit shift
-                                               // Extract and flip the byte order AND bit order
-#endif
 #endif
             OutputData            += Data;
             UserRequestedBits     -= Bits2Get;
@@ -453,22 +455,14 @@ extern "C" {
         while (UserRequestedBits > 0) {
             uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
             uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskMSBit(Bits2Get);
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
             OutputData             & (0xFF << (Bits2Extract - Bits2Get)); // Byte Shift
             uint8_t FinalByte      = SwapBits(Data, Bits2Get);
-            // Convert MSByte MSBit to LSByte LSBit
-#elif  RuntimeMSBit
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
             OutputData             & (0xFF << (Bits2Extract - Bits2Get)); // Byte Shift
-                                                                          // Convert MSByte MSBit to LSByte MSBit
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
             uint8_t FinalByte      = SwapBits(Data, Bits2Get);
-            // Convert MSByte MSBit to MSByte LSBit
-#elif  RuntimeMSBit
-            // Convert MSByte MSBit to MSByte MSBit aka extract.
-#endif
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             OutputData           >>= BitB->BitOffset - Bits2Get;
             OutputData            += Data;
@@ -484,18 +478,13 @@ extern "C" {
         while (UserRequestedBits > 0) {
             uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
             uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskMSBit(Bits2Get);
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
+            
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
             uint8_t FinalByte      = SwapBits(Data, Bits2Get);
-#elif  RuntimeMSBit
-            //
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
             uint8_t FinalByte      = SwapBits(Data, Bits2Get);
-#elif  RuntimeMSBit
-            //
-#endif
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             OutputData           >>= BitB->BitOffset - Bits2Get;
             OutputData            += Data;
@@ -510,8 +499,7 @@ extern "C" {
         while (UserRequestedBits > 0) {
             uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
             uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Get);
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
             /*
              Extract data from Big Endian MSBit first, to little endian least significant bit first
              So, if we need to extract 3 bits because the buffer is full, we need to extract them from the left aka mask with 0xE0
@@ -519,21 +507,18 @@ extern "C" {
              */
             // SO the bits need to be extracted from BitBuffer as LSBit? and applied as LSBit
             // It is 0x7C6E
-#elif  RuntimeMSBit
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
             // Extract the bits as LSBit, and apply them as MSBit.
             uint8_t FinalByte      = SwapBits(Data, Bits2Get);
             // Is is 0x3E76
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
             // Extract the bits as LSBit and apply them as LSBit
             // Swap Bytes
             // It is 0x6E7C
-#elif  RuntimeMSBit
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
             // Extract the bits as LSBit and apply them as MSBit
             uint8_t FinalByte      = SwapBits(Data, Bits2Get);
             // It is 0x763E
-#endif
 #endif
             OutputData           >>= BitB->BitOffset - Bits2Get;
             OutputData            += Data;
@@ -549,18 +534,10 @@ extern "C" {
         } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "PeekBitsAsLSByteLSBit", "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             OutputData = ExtractBitsAsLSByteLSBit(BitB, Bits2Peek);
         }
@@ -574,18 +551,10 @@ extern "C" {
         } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "PeekBitsAsLSByteMSBit", "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             OutputData = ExtractBitsAsLSByteMSBit(BitB, Bits2Peek);
         }
@@ -599,18 +568,10 @@ extern "C" {
         } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "PeekBitsAsMSByteLSBit", "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             OutputData = ExtractBitsAsMSByteLSBit(BitB, Bits2Peek);
         }
@@ -624,18 +585,10 @@ extern "C" {
         } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "PeekBitsAsMSByteMSBit", "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             OutputData = ExtractBitsAsMSByteMSBit(BitB, Bits2Peek);
         }
@@ -649,18 +602,10 @@ extern "C" {
         } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "ReadBitsAsLSByteLSBit", "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             OutputData         = ExtractBitsAsLSByteLSBit(BitB, Bits2Read);
             BitB->BitOffset   += Bits2Read;
@@ -675,18 +620,10 @@ extern "C" {
         } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "ReadBitsAsLSByteMSBit", "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             OutputData         = ExtractBitsAsLSByteMSBit(Bits2Read, Bits2Read);
             BitB->BitOffset   += Bits2Read;
@@ -701,18 +638,10 @@ extern "C" {
         } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "ReadBitsAsMSByteLSBit", "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             OutputData         = ExtractBitsAsMSByteLSBit(BitB, Bits2Read);
             BitB->BitOffset   += Bits2Read;
@@ -727,18 +656,10 @@ extern "C" {
         } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "ReadBitsAsMSByteMSBit", "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             OutputData         = ExtractBitsAsMSByteMSBit(BitB, Bits2Read);
             BitB->BitOffset   += Bits2Read;
@@ -752,18 +673,10 @@ extern "C" {
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
             Log(LOG_ERR, "libBitIO", "WriteBitsAsLSByteLSBit", "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             InsertBitsAsLSByteLSBit(BitB, NumBits2Write, Bits2Write);
         }
@@ -775,18 +688,10 @@ extern "C" {
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
             Log(LOG_ERR, "libBitIO", "WriteBitsAsLSByteMSBit", "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             InsertBitsAsLSByteMSBit(BitB, NumBits2Write, Bits2Write);
         }
@@ -798,18 +703,10 @@ extern "C" {
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
             Log(LOG_ERR, "libBitIO", "WriteBitsAsMSByteLSBit", "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             InsertBitsAsMSByteLSBit(BitB, NumBits2Write, Bits2Write);
         }
@@ -821,18 +718,10 @@ extern "C" {
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
             Log(LOG_ERR, "libBitIO", "WriteBitsAsMSByteMSBit", "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             InsertBitsAsMSByteMSBit(BitB, NumBits2Write, Bits2Write);
         }
@@ -840,6 +729,11 @@ extern "C" {
     
     uint64_t ReadUnaryAsLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit) {
         uint64_t Value = 0ULL;
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
+#endif
         while (ExtractBitsAsLSByteLSBit(BitB, 1) != StopBit) {
             Value += 1;
         }
@@ -848,6 +742,11 @@ extern "C" {
     
     uint64_t ReadUnaryAsLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit) {
         uint64_t Value = 0ULL;
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
+#endif
         while (ExtractBitsAsLSByteMSBit(BitB, 1) != StopBit) {
             Value += 1;
         }
@@ -856,6 +755,11 @@ extern "C" {
     
     uint64_t ReadUnaryAsMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit) {
         uint64_t Value = 0ULL;
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
+#endif
         while (ExtractBitsAsMSByteLSBit(BitB, 1) != StopBit) {
             Value += 1;
         }
@@ -864,6 +768,11 @@ extern "C" {
     
     uint64_t ReadUnaryAsMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit) {
         uint64_t Value = 0ULL;
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
+#endif
         while (ExtractBitsAsMSByteMSBit(BitB, 1) != StopBit) {
             Value += 1;
         }
@@ -872,6 +781,11 @@ extern "C" {
     
     void     WriteUnaryAsLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write) {
         bool UnaryBit = ~StopBit & 1;
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
+#endif
         while (Field2Write > 0) {
             if (IsStrictlyPositive == true) {
                 Field2Write -= 1;
@@ -884,6 +798,11 @@ extern "C" {
     
     void     WriteUnaryAsLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write) {
         bool UnaryBit = ~StopBit & 1;
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
+#endif
         while (Field2Write > 0) {
             if (IsStrictlyPositive == true) {
                 Field2Write -= 1;
@@ -896,6 +815,11 @@ extern "C" {
     
     void     WriteUnaryAsMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write) {
         bool UnaryBit = ~StopBit & 1;
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
+#endif
         while (Field2Write > 0) {
             if (IsStrictlyPositive == true) {
                 Field2Write -= 1;
@@ -908,6 +832,11 @@ extern "C" {
     
     void     WriteUnaryAsMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write) {
         bool UnaryBit = ~StopBit & 1;
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
+#endif
         while (Field2Write > 0) {
             if (IsStrictlyPositive == true) {
                 Field2Write -= 1;
@@ -924,18 +853,10 @@ extern "C" {
             uint64_t Bits2Read = ReadUnaryAsLSByteLSBit(BitB, false, 0);
             Value              = ExtractBitsAsLSByteLSBit(BitB, Bits2Read);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
         }
         return Value;
@@ -947,18 +868,10 @@ extern "C" {
             uint64_t Bits2Read = ReadUnaryAsLSByteMSBit(BitB, false, 0);
             Value              = ExtractBitsAsLSByteMSBit(BitB, Bits2Read);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
         }
         return Value;
@@ -970,18 +883,10 @@ extern "C" {
             uint64_t Bits2Read = ReadUnaryAsMSByteLSBit(BitB, false, 0);
          	Value              = ExtractBitsAsMSByteLSBit(BitB, Bits2Read);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
         }
         return Value;
@@ -993,18 +898,10 @@ extern "C" {
             uint64_t Bits2Read = ReadUnaryAsMSByteMSBit(BitB, false, 0);
             Value              = ExtractBitsAsMSByteMSBit(BitB, Bits2Read);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
         }
         return Value;
@@ -1017,18 +914,10 @@ extern "C" {
         if (IsSigned == false) {
             WriteBitsAsLSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             if (Field2Write < 0) { // Negative
                                    // Lets say we wanna write the number -3, -3 * 2 = -6,
@@ -1046,18 +935,10 @@ extern "C" {
         if (IsSigned == false) {
             WriteBitsAsLSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             if (Field2Write < 0) { // Negative
                                    // Lets say we wanna write the number -3, -3 * 2 = -6,
@@ -1075,18 +956,10 @@ extern "C" {
         if (IsSigned == false) {
             WriteBitsAsMSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             if (Field2Write < 0) { // Negative
                                    // Lets say we wanna write the number -3, -3 * 2 = -6,
@@ -1104,18 +977,10 @@ extern "C" {
         if (IsSigned == false) {
             WriteBitsAsMSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             // Negative ints are multiplied by 2, and positive are multiplied by 2 and have 1 extracted from them.
             if (Field2Write < 0) { // Negative
@@ -1132,18 +997,10 @@ extern "C" {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsUUIDString", "Pointer to BitBuffer is NULL");
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             uint32_t Section1    = ExtractBitsAsMSByteLSBit(BitB, 32);
             SkipBits(BitB, 8);
@@ -1164,18 +1021,10 @@ extern "C" {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsGUIDString", "Pointer to BitBuffer is NULL");
         } else {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-            
-#elif  RuntimeMSBit
-            
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             uint32_t Section1    = ExtractBitsAsLSByteLSBit(BitB, 32);
             SkipBits(BitB, 8);
@@ -1197,18 +1046,10 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsBinaryUUID", "Pointer to BitBuffer is NULL");
         } else {
             for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-                
-#elif  RuntimeMSBit
-                
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-                
-#elif  RuntimeMSBit
-                
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
                 BinaryUUID[Byte] = ExtractBitsAsLSByteLSBit(BitB, 8);
             }
@@ -1222,18 +1063,10 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "ReadGUUIDAsBinaryGUID", "Pointer to BitBuffer is NULL");
         } else {
             for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-                
-#elif  RuntimeMSBit
-                
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-                
-#elif  RuntimeMSBit
-                
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
                 BinaryGUID[Byte] = ExtractBitsAsMSByteLSBit(BitB, 8);
             }
@@ -1398,66 +1231,34 @@ extern "C" {
     }
     
     void WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString) {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-        
-#elif  RuntimeMSBit
-        
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-        
-#elif  RuntimeMSBit
-        
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
     }
     
     void WriteGUUIDAsGUIDString(BitBuffer *BitB, const uint8_t *GUIDString) {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-        
-#elif  RuntimeMSBit
-        
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-        
-#elif  RuntimeMSBit
-        
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
     }
     
     void WriteGUUIDAsBinaryUUID(BitBuffer *BitB, const uint8_t *BinaryUUID) {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-        
-#elif  RuntimeMSBit
-        
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-        
-#elif  RuntimeMSBit
-        
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
     }
     
     void WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID) {
-#ifdef RuntimeLSByte
-#ifdef RuntimeLSBit
-        
-#elif  RuntimeMSBit
-        
-#endif
-#elif  RuntimeMSByte
-#ifdef RuntimeLSBit
-        
-#elif  RuntimeMSBit
-        
-#endif
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
+#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
     }
     
