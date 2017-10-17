@@ -876,7 +876,7 @@ extern "C" {
     
     void     WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
         uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
-        WriteUnaryAsLSByteLSBit(BitB, Yes, Yes, !StopBit, Field2Write);
+        WriteUnaryAsLSByteLSBit(BitB, Yes, Yes, StopBit, Field2Write);
         WriteBitsAsLSByteLSBit(BitB, 1, StopBit); // Write the StopBit
         if (IsSigned == false) {
             WriteBitsAsLSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
@@ -897,7 +897,7 @@ extern "C" {
     
     void     WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
         uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
-        WriteUnaryAsLSByteMSBit(BitB, Yes, Yes, !StopBit, Field2Write); // Write the Unary part.
+        WriteUnaryAsLSByteMSBit(BitB, Yes, Yes, StopBit, Field2Write); // Write the Unary part.
         WriteBitsAsLSByteMSBit(BitB, 1, StopBit); // Write the StopBit
         if (IsSigned == false) {
             WriteBitsAsLSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
@@ -918,7 +918,7 @@ extern "C" {
     
     void     WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
         uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
-        WriteUnaryAsMSByteLSBit(BitB, Yes, Yes, !StopBit, Field2Write); // Write the Unary part.
+        WriteUnaryAsMSByteLSBit(BitB, Yes, Yes, StopBit, Field2Write); // Write the Unary part.
         WriteBitsAsMSByteLSBit(BitB, 1, StopBit); // Write the StopBit
         if (IsSigned == false) {
             WriteBitsAsMSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
@@ -939,7 +939,7 @@ extern "C" {
     
     void     WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
         uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
-        WriteUnaryAsMSByteMSBit(BitB, Yes, Yes, !StopBit, Field2Write); // Write the Unary part.
+        WriteUnaryAsMSByteMSBit(BitB, Yes, Yes, StopBit, Field2Write); // Write the Unary part.
         WriteBitsAsMSByteMSBit(BitB, 1, StopBit); // Write the StopBit
         if (IsSigned == false) {
             WriteBitsAsMSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
