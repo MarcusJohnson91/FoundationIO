@@ -814,13 +814,13 @@ extern "C" {
 	void     WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
 		uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
 		WriteUnaryAsLSByteLSBit(BitB, Yes, Yes, StopBit, Field2Write);
-		WriteBitsAsLSByteLSBit(BitB, 1, StopBit);
+		InsertBitsAsLSByteLSBit(BitB, 1, StopBit);
 		if (IsSigned == false) {
-			WriteBitsAsLSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
+			InsertBitsAsLSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
 		} else {
 			if (Field2Write < 0) { // Negative
 			} else { // Positive
-				WriteBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
+				InsertBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
 			}
 		}
 	}
@@ -828,13 +828,13 @@ extern "C" {
 	void     WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
 		uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
 		WriteUnaryAsLSByteMSBit(BitB, Yes, Yes, StopBit, Field2Write);
-		WriteBitsAsLSByteMSBit(BitB, 1, StopBit);
+		InsertBitsAsLSByteMSBit(BitB, 1, StopBit);
 		if (IsSigned == false) {
-			WriteBitsAsLSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
+			InsertBitsAsLSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
 		} else {
 			if (Field2Write < 0) { // Negative
 			} else { // Positive
-				WriteBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
+				InsertBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
 			}
 		}
 	}
@@ -842,13 +842,13 @@ extern "C" {
 	void     WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
 		uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
 		WriteUnaryAsMSByteLSBit(BitB, Yes, Yes, StopBit, Field2Write);
-		WriteBitsAsMSByteLSBit(BitB, 1, StopBit);
+		InsertBitsAsMSByteLSBit(BitB, 1, StopBit);
 		if (IsSigned == false) {
-			WriteBitsAsMSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
+			InsertBitsAsMSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
 		} else {
 			if (Field2Write < 0) { // Negative
 			} else { // Positive
-				WriteBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
+				InsertBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
 			}
 		}
 	}
@@ -856,13 +856,13 @@ extern "C" {
 	void     WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
 		uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
 		WriteUnaryAsMSByteMSBit(BitB, Yes, Yes, StopBit, Field2Write);
-		WriteBitsAsMSByteMSBit(BitB, 1, StopBit);
+		InsertBitsAsMSByteMSBit(BitB, 1, StopBit);
 		if (IsSigned == false) {
-			WriteBitsAsMSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
+			InsertBitsAsMSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
 		} else {
 			if (Field2Write < 0) { // Negative
 			} else { // Positive
-				WriteBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
+				InsertBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
 			}
 		}
 	}
@@ -1105,25 +1105,25 @@ extern "C" {
 	
 	void WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString) {
 		for (uint8_t Byte = 0; Byte < BitIOGUUIDStringSize; Byte++) {
-			WriteBitsAsMSByteLSBit(BitB, 8, UUIDString[Byte]);
+			InsertBitsAsMSByteLSBit(BitB, 8, UUIDString[Byte]);
 		}
 	}
 	
 	void WriteGUUIDAsGUIDString(BitBuffer *BitB, const uint8_t *GUIDString) {
 		for (uint8_t Byte = 0; Byte < BitIOGUUIDStringSize; Byte++) {
-			WriteBitsAsLSByteLSBit(BitB, 8, GUIDString[Byte]);
+			InsertBitsAsLSByteLSBit(BitB, 8, GUIDString[Byte]);
 		}
 	}
 	
 	void WriteGUUIDAsBinaryUUID(BitBuffer *BitB, const uint8_t *BinaryUUID) {
 		for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
-			WriteBitsAsMSByteLSBit(BitB, 8, BinaryUUID[Byte]);
+			InsertBitsAsMSByteLSBit(BitB, 8, BinaryUUID[Byte]);
 		}
 	}
 	
 	void WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID) {
 		for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
-			WriteBitsAsLSByteLSBit(BitB, 8, BinaryGUID[Byte]);
+			InsertBitsAsLSByteLSBit(BitB, 8, BinaryGUID[Byte]);
 		}
 	}
 	
