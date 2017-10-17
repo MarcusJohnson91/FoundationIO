@@ -697,13 +697,13 @@ extern "C" {
 		if (BitB == NULL) {
 			Log(LOG_ERR, "libBitIO", "WriteUnaryAsLSByteLSBit", "Pointer to BitBuffer is NULL");
 		} else {
+			if (IsTruncated == true) {
+				UnaryBits2Write -= 1;
+			}
+			if (IsZeroAvailable == true) {
+				Field2Write += 1;
+			}
 			while (Field2Write > 0) {
-				if (IsTruncated == true) {
-					UnaryBits2Write -= 1;
-				}
-				if (IsZeroAvailable == true) {
-					Field2Write += 1;
-				}
 				InsertBitsAsLSByteLSBit(BitB, 1, UnaryBit);
 				Field2Write--;
 			}
@@ -717,13 +717,13 @@ extern "C" {
 		if (BitB == NULL) {
 			Log(LOG_ERR, "libBitIO", "WriteUnaryAsLSByteLSBit", "Pointer to BitBuffer is NULL");
 		} else {
+			if (IsTruncated == true) {
+				UnaryBits2Write -= 1;
+			}
+			if (IsZeroAvailable == true) {
+				Field2Write += 1;
+			}
 			while (Field2Write > 0) {
-				if (IsTruncated == true) {
-					UnaryBits2Write -= 1;
-				}
-				if (IsZeroAvailable == true) {
-					Field2Write += 1;
-				}
 				InsertBitsAsLSByteMSBit(BitB, 1, UnaryBit);
 				Field2Write--;
 			}
@@ -737,13 +737,14 @@ extern "C" {
 		if (BitB == NULL) {
 			Log(LOG_ERR, "libBitIO", "WriteUnaryAsLSByteLSBit", "Pointer to BitBuffer is NULL");
 		} else {
+			if (IsTruncated == true) {
+				UnaryBits2Write -= 1;
+			}
+			if (IsZeroAvailable == true) {
+				Field2Write += 1;
+			}
 			while (Field2Write > 0) {
-				if (IsTruncated == true) {
-					UnaryBits2Write -= 1;
-				}
-				if (IsZeroAvailable == true) {
-					Field2Write += 1;
-				}
+				
 				InsertBitsAsMSByteLSBit(BitB, 1, UnaryBit);
 				Field2Write--;
 			}
@@ -757,13 +758,13 @@ extern "C" {
 		if (BitB == NULL) {
 			Log(LOG_ERR, "libBitIO", "WriteUnaryAsLSByteLSBit", "Pointer to BitBuffer is NULL");
 		} else {
+			if (IsTruncated == true) {
+				UnaryBits2Write -= 1;
+			}
+			if (IsZeroAvailable == true) {
+				Field2Write += 1;
+			}
 			while (Field2Write > 0) {
-				if (IsTruncated == true) {
-					UnaryBits2Write -= 1;
-				}
-				if (IsZeroAvailable == true) {
-					Field2Write += 1;
-				}
 				InsertBitsAsMSByteMSBit(BitB, 1, UnaryBit);
 				Field2Write--;
 			}
