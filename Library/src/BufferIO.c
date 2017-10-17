@@ -162,6 +162,29 @@ extern "C" {
         return Bits;
     }
     
+    static inline uint8_t CreateBitMaskLSBit(const uint8_t Bits2Extract) {
+        return (uint8_t) Power(2, Bits2Extract) << (8 - Bits2Extract);
+    }
+    
+    static inline uint8_t CreateBitMaskMSBit(const uint8_t Bits2Extract) {
+        return (uint8_t) Power(2, Bits2Extract) >> (8 - Bits2Extract);
+    }
+    
+    static inline uint8_t NumBits2ExtractFromByte(const uint64_t BitOffset, const uint8_t Bits2Extract) {
+        uint8_t Bits2ExtractFromThisByte = 0;
+        uint8_t BitsInThisByte           = BitOffset % 8;
+        if (Bits2Extract >= BitsInThisByte) {
+            Bits2ExtractFromThisByte = BitsInThisByte;
+        } else {
+            Bits2ExtractFromThisByte = Bits2Extract;
+        }
+        return Bits2ExtractFromThisByte;
+    }
+    
+    static inline uint8_t SwapBits(const uint8_t Byte) {
+        return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
+    }
+    
     inline bool IsOdd(const int64_t Number2Check) {
         bool X = false;
         if (Number2Check % 2 == 0) {
@@ -329,29 +352,6 @@ extern "C" {
             }
             BitB->BitOffset += Bits2Skip;
         }
-    }
-    
-    static inline uint8_t CreateBitMaskLSBit(const uint8_t Bits2Extract) {
-        return (uint8_t) Power(2, Bits2Extract) << (8 - Bits2Extract);
-    }
-    
-    static inline uint8_t CreateBitMaskMSBit(const uint8_t Bits2Extract) {
-        return (uint8_t) Power(2, Bits2Extract) >> (8 - Bits2Extract);
-    }
-    
-    static inline uint8_t NumBits2ExtractFromByte(const uint64_t BitOffset, const uint8_t Bits2Extract) {
-        uint8_t Bits2ExtractFromThisByte = 0;
-        uint8_t BitsInThisByte           = BitOffset % 8;
-        if (Bits2Extract >= BitsInThisByte) {
-            Bits2ExtractFromThisByte = BitsInThisByte;
-        } else {
-            Bits2ExtractFromThisByte = Bits2Extract;
-        }
-        return Bits2ExtractFromThisByte;
-    }
-    
-    static inline uint8_t SwapBits(const uint8_t Byte) {
-        return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
     }
     
     static inline void InsertBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
