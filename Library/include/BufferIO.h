@@ -563,29 +563,33 @@ extern "C" {
 	 @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				IsSigned				"Can there be negative values in this field"?
+	 @param				StopBit					"What bit is the stop bit"?
 	 */
-	uint64_t		    ReadExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned);
+	uint64_t		    ReadExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit);
 	
 	/*!
 	 @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				IsSigned				"Can there be negative values in this field"?
+	 @param				StopBit					"What bit is the stop bit"?
 	 */
-	uint64_t		    ReadExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned);
+	uint64_t		    ReadExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit);
 	
 	/*!
 	 @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				IsSigned				"Can there be negative values in this field"?
+	 @param				StopBit					"What bit is the stop bit"?
 	 */
-	uint64_t		    ReadExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned);
+	uint64_t		    ReadExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit);
 	
 	/*!
 	 @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				IsSigned				"Can there be negative values in this field"?
+	 @param				StopBit					"What bit is the stop bit"?
 	 */
-	uint64_t		    ReadExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned);
+	uint64_t		    ReadExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit);
 	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
@@ -593,8 +597,9 @@ extern "C" {
 	 @param				BitBBitOrder			"What bit order should the bits be in the BitBuffer"?
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				IsSigned				"Can there be negative values in this field"?
+	 @param				StopBit					"What bit is the stop bit"?
 	 */
-#define ReadExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombAsLSByteLSBit,BitBMSBit_t:ReadExpGolombAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombAsMSByteLSBit,BitBMSBit_t:ReadExpGolombAsMSByteMSBit))(BitB,IsSigned)
+#define ReadExpGolomb(BitBByteOrder,BitBBitOrder,BitB,IsSigned,StopBit)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombAsLSByteLSBit,BitBMSBit_t:ReadExpGolombAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombAsMSByteLSBit,BitBMSBit_t:ReadExpGolombAsMSByteMSBit))(BitB,IsSigned,StopBit)
 	
 	/*!
 	 @abstract									"Writes Exp-Golomb encoded fields from the BitBuffer".
