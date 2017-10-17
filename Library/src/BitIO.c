@@ -247,16 +247,8 @@ extern "C" {
         } else if (Path2Open == NULL) {
             Log(LOG_ERR, "libBitIO", "OpenInputFile", "Pointer to Path2Open is NULL");
         } else {
-            /*
-             Now I need to write a function to tell if there is a format specifier in the path, and where it is.
-             Well, we need to look through the string for %09d or whateve.
-             Or, maybe we should just print Path2Open to another string that is 5 bytes bigger than the current one?
-             No, that's a bad idea, but IDK how to do it better.
-             
-             Also, we need to be able to store when/if FileSpecifierNum has been updated.
-             */
-            uint64_t Path2OpenSize = strlen(Path2Open) + 1;
-            char *NewPath = calloc(1, Path2OpenSize);
+            uint64_t Path2OpenSize  = strlen(Path2Open) + 1;
+            char *NewPath           = calloc(1, Path2OpenSize);
             snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum += 1); // FIXME: HANDLE FORMAT STRINGS BETTER
             BitI->FileSpecifierNum += 1;
             BitI->File = fopen(Path2Open, "rb");
@@ -278,7 +270,6 @@ extern "C" {
             uint64_t Path2OpenSize = strlen(Path2Open) + 1;
             char *NewPath          = calloc(1, Path2OpenSize);
             snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum += 1); // FIXME: HANDLE FORMAT STRINGS BETTER
-            
             BitO->File = fopen(Path2Open, "wb");
             if (BitO->File == NULL) {
                 Log(LOG_ALERT, "libBitIO", "OpenOutputFile", "Couldn't open output file; Check that the path exists and the permissions are correct");
@@ -347,15 +338,15 @@ extern "C" {
         return (uint8_t) Power(2, Bits2Extract) >> (8 - Bits2Extract);
     }
     
-    static inline uint8_t NumBits2ExtractFromByte(const uint64_t BitOffset, const uint8_t Bits2Extract) { // BitOffset = 6, Bits2Extract = 3
+    static inline uint8_t NumBits2ExtractFromByte(const uint64_t BitOffset, const uint8_t Bits2Extract) {
         uint8_t Bits2ExtractFromThisByte = 0;
-        uint8_t BitsInThisByte           = BitOffset % 8; // 2
-        if (Bits2Extract >= BitsInThisByte) { // 3 > 6 = false
+        uint8_t BitsInThisByte           = BitOffset % 8;
+        if (Bits2Extract >= BitsInThisByte) {
             Bits2ExtractFromThisByte = BitsInThisByte;
         } else {
-            Bits2ExtractFromThisByte = Bits2Extract; // 3
+            Bits2ExtractFromThisByte = Bits2Extract;
         }
-        return Bits2ExtractFromThisByte; // 3 accurate
+        return Bits2ExtractFromThisByte;
     }
     
     static inline uint8_t SwapBits(const uint8_t Byte) {
@@ -363,10 +354,7 @@ extern "C" {
     }
     
     static inline void InsertBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
-        // Write data from LSByte (LSBit is default) to LSByte,LSBit
-        // What variables do we need to take into account? Just the BitsAvailable, and looping...
         uint8_t Bits = NumBits2Insert;
-        
         while (Bits > 0) {
             uint64_t Bits2Put      = NumBits2ExtractFromByte(BitB->BitOffset, Bits);
             uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Put);
@@ -447,12 +435,12 @@ extern "C" {
             uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
             uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskMSBit(Bits2Get);
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-            OutputData             & (0xFF << (Bits2Extract - Bits2Get)); // Byte Shift
-            uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+            OutputData            &= (0xFF << (Bits2Extract - Bits2Get)); // Byte Shift
+            uint8_t FinalByte      = SwapBits(Data);
 #elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
             OutputData             & (0xFF << (Bits2Extract - Bits2Get)); // Byte Shift
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-            uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+            uint8_t FinalByte      = SwapBits(Data);
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             OutputData           >>= BitB->BitOffset - Bits2Get;
@@ -471,10 +459,10 @@ extern "C" {
             uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskMSBit(Bits2Get);
             
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-            uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+            uint8_t FinalByte      = SwapBits(Data);
 #elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-            uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+            uint8_t FinalByte      = SwapBits(Data);
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 #endif
             OutputData           >>= BitB->BitOffset - Bits2Get;
@@ -525,11 +513,6 @@ extern "C" {
         } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "PeekBitsAsLSByteLSBit", "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             OutputData = ExtractBitsAsLSByteLSBit(BitB, Bits2Peek);
         }
         return OutputData;
@@ -542,11 +525,6 @@ extern "C" {
         } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "PeekBitsAsLSByteMSBit", "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             OutputData = ExtractBitsAsLSByteMSBit(BitB, Bits2Peek);
         }
         return OutputData;
@@ -559,11 +537,6 @@ extern "C" {
         } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "PeekBitsAsMSByteLSBit", "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             OutputData = ExtractBitsAsMSByteLSBit(BitB, Bits2Peek);
         }
         return OutputData;
@@ -576,11 +549,6 @@ extern "C" {
         } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "PeekBitsAsMSByteMSBit", "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             OutputData = ExtractBitsAsMSByteMSBit(BitB, Bits2Peek);
         }
         return OutputData;
@@ -593,11 +561,6 @@ extern "C" {
         } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "ReadBitsAsLSByteLSBit", "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             OutputData         = ExtractBitsAsLSByteLSBit(BitB, Bits2Read);
             BitB->BitOffset   += Bits2Read;
         }
@@ -611,12 +574,7 @@ extern "C" {
         } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "ReadBitsAsLSByteMSBit", "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
-            OutputData         = ExtractBitsAsLSByteMSBit(Bits2Read, Bits2Read);
+            OutputData         = ExtractBitsAsLSByteMSBit(BitB, Bits2Read);
             BitB->BitOffset   += Bits2Read;
         }
         return OutputData;
@@ -629,11 +587,6 @@ extern "C" {
         } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "ReadBitsAsMSByteLSBit", "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             OutputData         = ExtractBitsAsMSByteLSBit(BitB, Bits2Read);
             BitB->BitOffset   += Bits2Read;
         }
@@ -647,11 +600,6 @@ extern "C" {
         } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
             Log(LOG_ERR, "libBitIO", "ReadBitsAsMSByteMSBit", "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             OutputData         = ExtractBitsAsMSByteMSBit(BitB, Bits2Read);
             BitB->BitOffset   += Bits2Read;
         }
@@ -664,11 +612,6 @@ extern "C" {
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
             Log(LOG_ERR, "libBitIO", "WriteBitsAsLSByteLSBit", "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             InsertBitsAsLSByteLSBit(BitB, NumBits2Write, Bits2Write);
         }
     }
@@ -679,11 +622,6 @@ extern "C" {
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
             Log(LOG_ERR, "libBitIO", "WriteBitsAsLSByteMSBit", "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             InsertBitsAsLSByteMSBit(BitB, NumBits2Write, Bits2Write);
         }
     }
@@ -694,11 +632,6 @@ extern "C" {
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
             Log(LOG_ERR, "libBitIO", "WriteBitsAsMSByteLSBit", "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             InsertBitsAsMSByteLSBit(BitB, NumBits2Write, Bits2Write);
         }
     }
@@ -709,11 +642,6 @@ extern "C" {
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
             Log(LOG_ERR, "libBitIO", "WriteBitsAsMSByteMSBit", "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             InsertBitsAsMSByteMSBit(BitB, NumBits2Write, Bits2Write);
         }
     }
@@ -726,7 +654,7 @@ extern "C" {
         while (ExtractBitsAsLSByteLSBit(BitB, 1) != StopBit) {
             Value += 1;
         }
-        return IsZeroAvailable ? Value + 1 : Value; // Add 1 to count the stop bit for StrinctlyPostive, do not for non-negative.
+        return IsZeroAvailable ? Value + 1 : Value;
     }
     
     uint64_t ReadUnaryAsLSByteMSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit) {
@@ -737,7 +665,7 @@ extern "C" {
         while (ExtractBitsAsLSByteMSBit(BitB, 1) != StopBit) {
             Value += 1;
         }
-        return IsZeroAvailable ? Value + 1 : Value; // Add 1 to count the stop bit for StrinctlyPostive, do not for non-negative.
+        return IsZeroAvailable ? Value + 1 : Value;
     }
     
     uint64_t ReadUnaryAsMSByteLSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit) {
@@ -748,7 +676,7 @@ extern "C" {
         while (ExtractBitsAsMSByteLSBit(BitB, 1) != StopBit) {
             Value += 1;
         }
-        return IsZeroAvailable ? Value + 1 : Value; // Add 1 to count the stop bit for StrinctlyPostive, do not for non-negative.
+        return IsZeroAvailable ? Value + 1 : Value;
     }
     
     uint64_t ReadUnaryAsMSByteMSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit) {
@@ -759,7 +687,7 @@ extern "C" {
         while (ExtractBitsAsMSByteMSBit(BitB, 1) != StopBit) {
             Value += 1;
         }
-        return IsZeroAvailable ? Value + 1 : Value; // Add 1 to count the stop bit for StrinctlyPostive, do not for non-negative.
+        return IsZeroAvailable ? Value + 1 : Value;
     }
     
     void     WriteUnaryAsLSByteLSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit, uint64_t Field2Write) {
@@ -770,7 +698,6 @@ extern "C" {
         } else {
             while (Field2Write > 0) {
                 if (IsTruncated == true) {
-                    // Subtract 1 from the Bits2Write, because you count the stop bit.
                     UnaryBits2Write -= 1;
                 }
                 if (IsZeroAvailable == true) {
@@ -791,7 +718,6 @@ extern "C" {
         } else {
             while (Field2Write > 0) {
                 if (IsTruncated == true) {
-                    // Subtract 1 from the Bits2Write, because you count the stop bit.
                     UnaryBits2Write -= 1;
                 }
                 if (IsZeroAvailable == true) {
@@ -812,7 +738,6 @@ extern "C" {
         } else {
             while (Field2Write > 0) {
                 if (IsTruncated == true) {
-                    // Subtract 1 from the Bits2Write, because you count the stop bit.
                     UnaryBits2Write -= 1;
                 }
                 if (IsZeroAvailable == true) {
@@ -833,7 +758,6 @@ extern "C" {
         } else {
             while (Field2Write > 0) {
                 if (IsTruncated == true) {
-                    // Subtract 1 from the Bits2Write, because you count the stop bit.
                     UnaryBits2Write -= 1;
                 }
                 if (IsZeroAvailable == true) {
@@ -846,62 +770,42 @@ extern "C" {
         }
     }
     
-    uint64_t ReadExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned) {
+    uint64_t ReadExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit) {
         uint64_t Value = 0ULL;
         if (IsSigned == false) {
-            uint64_t Bits2Read = ReadUnaryAsLSByteLSBit(BitB, Yes, Yes, 0);
+            uint64_t Bits2Read = ReadUnaryAsLSByteLSBit(BitB, Yes, Yes, StopBit);
             Value              = ExtractBitsAsLSByteLSBit(BitB, Bits2Read);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
         }
         return Value;
     }
     
-    uint64_t ReadExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned) {
+    uint64_t ReadExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit) {
         uint64_t Value = 0ULL;
         if (IsSigned == false) {
-            uint64_t Bits2Read = ReadUnaryAsLSByteMSBit(BitB, Yes, Yes, 0);
+            uint64_t Bits2Read = ReadUnaryAsLSByteMSBit(BitB, Yes, Yes, StopBit);
             Value              = ExtractBitsAsLSByteMSBit(BitB, Bits2Read);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
         }
         return Value;
     }
     
-    uint64_t ReadExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned) {
+    uint64_t ReadExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit) {
         uint64_t Value = 0ULL;
         if (IsSigned == false) {
-            uint64_t Bits2Read = ReadUnaryAsMSByteLSBit(BitB, Yes, Yes, 0);
+            uint64_t Bits2Read = ReadUnaryAsMSByteLSBit(BitB, Yes, Yes, StopBit);
          	Value              = ExtractBitsAsMSByteLSBit(BitB, Bits2Read);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
         }
         return Value;
     }
     
-    uint64_t ReadExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned) {
+    uint64_t ReadExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit) {
         uint64_t Value = 0ULL;
         if (IsSigned == false) {
-            uint64_t Bits2Read = ReadUnaryAsMSByteMSBit(BitB, Yes, Yes, 0);
+            uint64_t Bits2Read = ReadUnaryAsMSByteMSBit(BitB, Yes, Yes, StopBit);
             Value              = ExtractBitsAsMSByteMSBit(BitB, Bits2Read);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
         }
         return Value;
     }
@@ -909,19 +813,12 @@ extern "C" {
     void     WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
         uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
         WriteUnaryAsLSByteLSBit(BitB, Yes, Yes, StopBit, Field2Write);
-        WriteBitsAsLSByteLSBit(BitB, 1, StopBit); // Write the StopBit
+        WriteBitsAsLSByteLSBit(BitB, 1, StopBit);
         if (IsSigned == false) {
             WriteBitsAsLSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             if (Field2Write < 0) { // Negative
-                                   // Lets say we wanna write the number -3, -3 * 2 = -6,
             } else { // Positive
-                     // Simply add 1, and subtract the Bits2Write + 1 from it? so, Bits2Write = 2, so just write the 2 lowest bits...
                 WriteBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
             }
         }
@@ -929,20 +826,13 @@ extern "C" {
     
     void     WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
         uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
-        WriteUnaryAsLSByteMSBit(BitB, Yes, Yes, StopBit, Field2Write); // Write the Unary part.
-        WriteBitsAsLSByteMSBit(BitB, 1, StopBit); // Write the StopBit
+        WriteUnaryAsLSByteMSBit(BitB, Yes, Yes, StopBit, Field2Write);
+        WriteBitsAsLSByteMSBit(BitB, 1, StopBit);
         if (IsSigned == false) {
             WriteBitsAsLSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             if (Field2Write < 0) { // Negative
-                                   // Lets say we wanna write the number -3, -3 * 2 = -6,
             } else { // Positive
-                     // Simply add 1, and subtract the Bits2Write + 1 from it? so, Bits2Write = 2, so just write the 2 lowest bits...
                 WriteBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
             }
         }
@@ -950,20 +840,13 @@ extern "C" {
     
     void     WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
         uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
-        WriteUnaryAsMSByteLSBit(BitB, Yes, Yes, StopBit, Field2Write); // Write the Unary part.
-        WriteBitsAsMSByteLSBit(BitB, 1, StopBit); // Write the StopBit
+        WriteUnaryAsMSByteLSBit(BitB, Yes, Yes, StopBit, Field2Write);
+        WriteBitsAsMSByteLSBit(BitB, 1, StopBit);
         if (IsSigned == false) {
             WriteBitsAsMSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
         } else {
-#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-#elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-#endif
             if (Field2Write < 0) { // Negative
-                                   // Lets say we wanna write the number -3, -3 * 2 = -6,
             } else { // Positive
-                     // Simply add 1, and subtract the Bits2Write + 1 from it? so, Bits2Write = 2, so just write the 2 lowest bits...
                 WriteBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
             }
         }
@@ -971,16 +854,13 @@ extern "C" {
     
     void     WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit, const int64_t Field2Write) {
         uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
-        WriteUnaryAsMSByteMSBit(BitB, Yes, Yes, StopBit, Field2Write); // Write the Unary part.
-        WriteBitsAsMSByteMSBit(BitB, 1, StopBit); // Write the StopBit
+        WriteUnaryAsMSByteMSBit(BitB, Yes, Yes, StopBit, Field2Write);
+        WriteBitsAsMSByteMSBit(BitB, 1, StopBit);
         if (IsSigned == false) {
             WriteBitsAsMSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
         } else {
-            // Negative ints are multiplied by 2, and positive are multiplied by 2 and have 1 extracted from them.
             if (Field2Write < 0) { // Negative
-                // Lets say we wanna write the number -3, -3 * 2 = -6,
             } else { // Positive
-                // Simply add 1, and subtract the Bits2Write + 1 from it? so, Bits2Write = 2, so just write the 2 lowest bits...
                 WriteBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write + 1);
             }
         }
@@ -1085,7 +965,7 @@ extern "C" {
         } else {
             BinaryGUUID = calloc(1, BitIOBinaryGUUIDSize);
             if (BinaryGUUID == NULL) {
-                Log(LOG_ERR, "libBitIO", "ConvertGUUIDString2BinaryGUUID", "Not enough memory to calloc %d bytes", BitIOBinaryGUUIDSize);
+                Log(LOG_ERR, "libBitIO", "ConvertGUUIDString2BinaryGUUID", "Not enough memory to allocate BinaryGUUID");
             } else {
                 BinaryGUUID[0] = GUUIDString[0];
                 BinaryGUUID[1] = GUUIDString[1];
@@ -1149,7 +1029,6 @@ extern "C" {
                 GUUIDString[17] = BinaryGUUID[13];
                 GUUIDString[18] = BinaryGUUID[14];
                 GUUIDString[19] = BinaryGUUID[15];
-                GUUIDString[20] = 0x00;
             }
         }
         return GUUIDString;
@@ -1184,10 +1063,9 @@ extern "C" {
                 SwappedGUUIDString[11] = GUUIDString[12];
                 SwappedGUUIDString[12] = GUUIDString[11];
                 
-                for (uint8_t EndBytes = 13; EndBytes < BitIOGUUIDStringSize - 1; EndBytes++) {
+                for (uint8_t EndBytes = 13; EndBytes < BitIOGUUIDStringSize; EndBytes++) {
                     SwappedGUUIDString[EndBytes] = GUUIDString[EndBytes];
                 }
-                SwappedGUUIDString[20] = 0x00;
             }
         }
         return SwappedGUUIDString;
@@ -1216,7 +1094,7 @@ extern "C" {
                 SwappedBinaryGUUID[8] = BinaryGUUID[9];
                 SwappedBinaryGUUID[9] = BinaryGUUID[8];
                 
-                for (uint8_t EndBytes = 10; EndBytes < BitIOBinaryGUUIDSize - 1; EndBytes++) {
+                for (uint8_t EndBytes = 10; EndBytes < BitIOBinaryGUUIDSize; EndBytes++) {
                     SwappedBinaryGUUID[EndBytes] = BinaryGUUID[EndBytes];
                 }
             }
@@ -1243,7 +1121,6 @@ extern "C" {
     }
     
     void WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID) {
-        /* A Binary GUUID is least significant byte first, so we just need to convert the runtime representation to this */
         for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
             WriteBitsAsLSByteLSBit(BitB, 8, BinaryGUID[Byte]);
         }
@@ -1253,15 +1130,7 @@ extern "C" {
         free(GUUID);
     }
     
-    /*
-     So, I need to accept packets of variable size, from the network, disk, whatever.
-     
-     Should BitInput and BitOutput store a value saying what type of "file" it's being written to? or just write to the file handle regardless?
-     So, the gist is we need a function to read from a file or network stream, and create a buffer from that data, and pop it into the struct.
-     Ok, so I need a function to read a file/socket into a buffer, and one to write a buffer to a file/socket.
-     I don't know if FILE pointers work with sockets, but i'm going to ignore that for now.
-     */
-    void ReadBitInput2BitBuffer(BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read) { // It's the user's job to ensure buffers and files are kept in sync, not mine.
+    void ReadBitInput2BitBuffer(BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read) {
         uint64_t BytesRead              = 0ULL;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "ReadBitInput2BitBuffer", "Pointer to BitInput is NULL");
@@ -1287,7 +1156,7 @@ extern "C" {
         }
     }
     
-    void WriteBitBuffer2BitOutput(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write) { // FIXME Assuming we wrote the whole buffer
+    void WriteBitBuffer2BitOutput(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write) {
         uint64_t BytesWritten           = 0ULL;
         if (BitO == NULL) {
             Log(LOG_ERR, "libBitIO", "WriteBitBuffer2BitOutput", "Pointer to BitInput is NULL");
@@ -1375,8 +1244,10 @@ extern "C" {
             ErrorCodePrefix  = "UNKNOWN!";
         }
         
-        int   EasyStringSize = ErrorCodeSize + strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + 1; // Plus 1 for the terminating NULL
-        char *EasyString     = calloc(1, EasyStringSize); // the 1 is for the error severity + 2 for the NULLs
+        uint8_t TerminatingNULLSize = 1;
+        
+        int   EasyStringSize = ErrorCodeSize + strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + TerminatingNULLSize;
+        char *EasyString     = calloc(1, EasyStringSize);
         
         snprintf(EasyString, EasyStringSize, "%s: %s - %s", ErrorCodePrefix, FunctionName, Description);
         
@@ -1391,10 +1262,8 @@ extern "C" {
         char *ErrorString = calloc(1, ErrorStringSize);
         snprintf(ErrorString, ErrorStringSize, "%s%s%s", EasyString, HardString, BitIOLineEnding);
         if (BitIOGlobalLogFile == NULL) {
-            // Set STDERR As the output file
             fprintf(stderr, "%s", ErrorString);
         } else {
-            // Use BitO->LogFile as the output file
             fprintf(BitIOGlobalLogFile, "%s", ErrorString);
         }
         free(EasyString);
