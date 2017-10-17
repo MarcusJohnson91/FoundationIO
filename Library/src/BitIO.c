@@ -228,9 +228,9 @@ extern "C" {
         return BitBufferSize;
     }
     
-    void FindBitInputFileSize(BitInput *BitI) {
+    void BitInputFindFileSize(BitInput *BitI) {
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "FindBitInputFileSize", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "BitInputFindFileSize", "Pointer to BitInput is NULL");
         } else {
             fseek(BitI->File, 0, SEEK_END);
             fgetpos(BitI->File, &BitI->FileSize);
@@ -239,19 +239,19 @@ extern "C" {
         }
     }
     
-    void OpenInputFile(BitInput *BitI, const char *Path2Open) {
+    void BitInputOpenFile(BitInput *BitI, const char *Path2Open) {
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenInputFile", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "BitInputOpenFile", "Pointer to BitInput is NULL");
         } else if (Path2Open == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenInputFile", "Pointer to Path2Open is NULL");
+            Log(LOG_ERR, "libBitIO", "BitInputOpenFile", "Pointer to Path2Open is NULL");
         } else {
             uint64_t Path2OpenSize  = strlen(Path2Open) + 1;
             char *NewPath           = calloc(1, Path2OpenSize);
-            snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum += 1); // FIXME: HANDLE FORMAT STRINGS BETTER
             BitI->FileSpecifierNum += 1;
+            snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
             BitI->File = fopen(Path2Open, "rb");
             if (BitI->File == NULL) {
-                Log(LOG_ERR, "libBitIO", "OpenInputFile", "Couldn't open file: Check that the file exists and the permissions are correct");
+                Log(LOG_ERR, "libBitIO", "BitInputOpenFile", "Couldn't open file: Check that the file exists and the permissions are correct");
             } else {
                 setvbuf(BitI->File, NULL, _IONBF, 0);
             }
@@ -259,18 +259,18 @@ extern "C" {
         }
     }
     
-    void OpenOutputFile(BitOutput *BitO, const char *Path2Open) {
+    void BitOutputOpenFile(BitOutput *BitO, const char *Path2Open) {
         if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenOutputFile", "Pointer to BitOutput is NULL");
+            Log(LOG_ERR, "libBitIO", "BitOutputOpenFile", "Pointer to BitOutput is NULL");
         } else if (Path2Open == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenOutputFile", "Pointer to Path2Open is NULL");
+            Log(LOG_ERR, "libBitIO", "BitOutputOpenFile", "Pointer to Path2Open is NULL");
         } else {
             uint64_t Path2OpenSize = strlen(Path2Open) + 1;
             char *NewPath          = calloc(1, Path2OpenSize);
             snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum += 1); // FIXME: HANDLE FORMAT STRINGS BETTER
             BitO->File = fopen(Path2Open, "wb");
             if (BitO->File == NULL) {
-                Log(LOG_ALERT, "libBitIO", "OpenOutputFile", "Couldn't open output file; Check that the path exists and the permissions are correct");
+                Log(LOG_ALERT, "libBitIO", "BitOutputOpenFile", "Couldn't open output file; Check that the path exists and the permissions are correct");
             } else {
                 setvbuf(BitO->File, NULL, _IONBF, 0);
             }

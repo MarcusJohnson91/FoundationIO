@@ -314,21 +314,21 @@ extern "C" {
 	 @abstract									"Seeks to the end of BitI->File to determine the size".
 	 @param				BitI					"Pointer to the instance of BitInput".
 	 */
-	void				FindBitInputFileSize(BitInput *BitI);
+	void				BitInputFindFileSize(BitInput *BitI);
 	
 	/*!
 	 @abstract									"Opens an input file, pointed to by InputSwitch in CMD and stores the resulting pointer in BitI->File".
 	 @param				BitI					"Pointer to the instance of BitInput".
 	 @param				Path2Open				"Path to the input file to open".
 	 */
-	void				OpenInputFile(BitInput *BitI, const char *Path2Open);
+	void				BitInputOpenFile(BitInput *BitI, const char *Path2Open);
 	
 	/*!
 	 @abstract									"Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitO->File".
 	 @param				BitO					"Pointer to the instance of BitOutput".
 	 @param				Path2Open				"Path to the output file to open".
 	 */
-	void				OpenOutputFile(BitOutput *BitO, const char *Path2Open);
+	void				BitOutputOpenFile(BitOutput *BitO, const char *Path2Open);
 	
 	/*!
 	 @abstract									"Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitIOGlobalLogFile".
