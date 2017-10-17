@@ -211,13 +211,6 @@ extern "C" {
 	uint64_t            Power(const uint64_t Base, const uint64_t Exponent);
 	
 	/*!
-	 @abstract									"Integer Binary Logarithm function, used to find the number of bits needed to hold a value".
-	 @param				Symbol					"The symbol to calculare the number of bits necessary required".
-	 @return									"Returns the minimum number of bits necessary to hold the value.".
-	 */
-	uint64_t            NumBits2ContainSymbol(uint64_t Symbol);
-	
-	/*!
 	 @abstract									"Swap bits in a byte".
 	 @param				Byte					"Byte to swap bits".
 	 @return									"Returns swapped byte".
@@ -480,91 +473,91 @@ extern "C" {
 	/*!
 	 @abstract									"Reads unary encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
-	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				IsZeroAvailable			"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 */
-	uint64_t		    ReadUnaryAsLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+	uint64_t		    ReadUnaryAsLSByteLSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit);
 	
 	/*!
 	 @abstract									"Reads unary encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
-	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				IsZeroAvailable			"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 */
-	uint64_t		    ReadUnaryAsLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+	uint64_t		    ReadUnaryAsLSByteMSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit);
 	
 	/*!
 	 @abstract									"Reads unary encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
-	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				IsZeroAvailable			"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 */
-	uint64_t		    ReadUnaryAsMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+	uint64_t		    ReadUnaryAsMSByteLSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit);
 	
 	/*!
 	 @abstract									"Reads unary encoded fields from the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
-	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				IsZeroAvailable			"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 */
-	uint64_t		    ReadUnaryAsMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit);
+	uint64_t		    ReadUnaryAsMSByteMSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit);
 	
 	/*!
 	 @abstract									"Reads unary encoded fields from the BitBuffer".
 	 @param				BitBByteOrder			"What byte order are the bits in the BitBuffer for this field stored as"?
 	 @param				BitBBitOrder			"What bit order are the bits in the BitBuffer for this field stored as"?
 	 @param				BitB					"Pointer to the instance of BitBuffer".
-	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				IsZeroAvailable			"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 */
-#define ReadUnary(BitBByteOrder,BitBBitOrder,BitB,IsStrictlyPositive,StopBit)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryAsLSByteLSBit,BitBMSBit_t:ReadUnaryAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryAsMSByteLSBit,BitBMSBit_t:ReadUnaryAsMSByteMSBit))(BitB,IsStrictlyPositive,StopBit)
+#define ReadUnary(BitBByteOrder,BitBBitOrder,BitB,IsZeroAvailable,IsTruncated,StopBit)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryAsLSByteLSBit,BitBMSBit_t:ReadUnaryAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryAsMSByteLSBit,BitBMSBit_t:ReadUnaryAsMSByteMSBit))(BitB,IsZeroAvailable,IsTruncated,StopBit)
 	
 	/*!
 	 @abstract									"Writes unary encoded fields to the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
-	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				IsZeroAvailable			"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 @param				Field2Write				"Value to be written as Unary encoded".
 	 */
-	void                WriteUnaryAsLSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
+	void                WriteUnaryAsLSByteLSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit, uint64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes unary encoded fields to the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
-	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				IsZeroAvailable			"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 @param				Field2Write				"Value to be written as Unary encoded".
 	 */
-	void                WriteUnaryAsLSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
+	void                WriteUnaryAsLSByteMSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit, uint64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes unary encoded fields to the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
-	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				IsZeroAvailable			"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 @param				Field2Write				"Value to be written as Unary encoded".
 	 */
-	void                WriteUnaryAsMSByteLSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
+	void                WriteUnaryAsMSByteLSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit, uint64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes unary encoded fields to the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
-	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				IsZeroAvailable			"Will we need to read a zero? If so, set this to false".
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 @param				Field2Write				"Value to be written as Unary encoded".
 	 */
-	void                WriteUnaryAsMSByteMSBit(BitBuffer *BitB, const bool IsStrictlyPositive, const bool StopBit, uint64_t Field2Write);
+	void                WriteUnaryAsMSByteMSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit, uint64_t Field2Write);
 	
 	/*!
 	 @abstract									"Writes unary encoded bits to the BitBuffer".
 	 @param				BitBByteOrder			"What byte order should the bits be in the BitBuffer"?
 	 @param				BitBBitOrder			"What bit order should the bits be in the BitBuffer"?
 	 @param				BitB					"Pointer to the instance of BitBuffer".
-	 @param				IsStrictlyPositive		"Will we need to read a zero? If so, set this to false".
+	 @param				IsZeroAvailable			"Is writing a zero possible"?
 	 @param				StopBit					"Is the stop bit a one or a zero"?
 	 @param				Field2Write				"Value to be written as Unary encoded".
 	 */
-#define WriteUnary(BitBByteOrder,BitBBitOrder,BitB,IsStrictlyPositive,StopBit,Field2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteUnaryAsLSByteLSBit,BitBMSBit_t:WriteUnaryAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteUnaryAsMSByteLSBit,BitBMSBit_t:WriteUnaryAsMSByteMSBit))(BitB,IsStrictlyPositive,StopBit,Field2Write)
+#define WriteUnary(BitBByteOrder,BitBBitOrder,BitB,IsZeroAvailable,IsTruncated,StopBit,Field2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteUnaryAsLSByteLSBit,BitBMSBit_t:WriteUnaryAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteUnaryAsMSByteLSBit,BitBMSBit_t:WriteUnaryAsMSByteMSBit))(BitB,IsZeroAvailable,IsTruncated,StopBit,Field2Write)
 	
 	/*!
 	 @abstract									"Reads Exp-Golomb encoded fields from the BitBuffer".
