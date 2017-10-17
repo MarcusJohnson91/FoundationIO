@@ -31,18 +31,18 @@ extern "C" {
     };
     
     struct BitInput {
+        uint8_t            SourceType;
         FILE              *File;
         int                Socket;
-        bool               IsFileOrSocket;
         fpos_t             FileSize;
         fpos_t             FilePosition;
         uint64_t           FileSpecifierNum;
     };
     
     struct BitOutput {
+        uint8_t            DrainType;
         FILE              *File;
         int                Socket;
-        bool               IsFileOrSocket;
         fpos_t             FilePosition;
         uint64_t           FileSpecifierNum;
     };
@@ -245,6 +245,7 @@ extern "C" {
         } else if (Path2Open == NULL) {
             Log(LOG_ERR, "libBitIO", "BitInputOpenFile", "Pointer to Path2Open is NULL");
         } else {
+            BitI->SourceType        = BitIOFile;
             uint64_t Path2OpenSize  = strlen(Path2Open) + 1;
             char *NewPath           = calloc(1, Path2OpenSize);
             BitI->FileSpecifierNum += 1;
@@ -265,6 +266,7 @@ extern "C" {
         } else if (Path2Open == NULL) {
             Log(LOG_ERR, "libBitIO", "BitOutputOpenFile", "Pointer to Path2Open is NULL");
         } else {
+            BitO->DrainType        = BitIOFile;
             uint64_t Path2OpenSize = strlen(Path2Open) + 1;
             char *NewPath          = calloc(1, Path2OpenSize);
             snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum += 1); // FIXME: HANDLE FORMAT STRINGS BETTER
@@ -1170,43 +1172,49 @@ extern "C" {
         }
     }
     
-    void OpenInputSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol) {
+    void BitInputOpenSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol) {
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenInputSocket", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "BitInputOpenSocket", "Pointer to BitInput is NULL");
         } else {
+            BitI->SourceType     = BitIOSocket;
 #ifdef _POSIX_VERSION
             BitI->Socket         = socket(Domain, Type, Protocol);
-            BitI->IsFileOrSocket = &socket;
 #elif  _WIN32
 #endif
         }
     }
     
-    void OpenOutputSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol) {
+    void BitOutputOpenSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol) {
         if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "OpenOutputSocket", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "BitOutputOpenSocket", "Pointer to BitInput is NULL");
         } else {
+            BitO->DrainType      = BitIOSocket;
 #ifdef _POSIX_VERSION
             BitO->Socket         = socket(Domain, Type, Protocol);
-            BitO->IsFileOrSocket = &socket;
 #elif  _WIN32
 #endif
         }
     }
     
-    void ConnectInputSocket(BitInput *BitI) {
+    void BitInputConnectSocket(BitInput *BitI, struct sockaddr *SocketAddress, const uint64_t SocketSize) {
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "ConnectInputSocket", "Pointer to BitOutput is NULL");
+            Log(LOG_ERR, "libBitIO", "BitInputConnectSocket", "Pointer to BitInput is NULL");
+        } else if (SocketAddress == NULL) {
+            Log(LOG_ERR, "libBitIO", "BitInputConnectSocket", "Pointer to SocketAddress is NULL");
         } else {
-            
+            BitI->SourceType = BitIOSocket;
+            connect(BitI->Socket, SocketAddress, SocketSize);
         }
     }
     
-    void ConnectOutputSocket(BitOutput *BitO) {
+    void BitOutputConnectSocket(BitOutput *BitO, struct sockaddr *SocketAddress, const uint64_t SocketSize) {
         if (BitO == NULL) {
-            Log(LOG_ERR, "libBitIO", "ConnectOutputSocket", "Pointer to BitOutput is NULL");
+            Log(LOG_ERR, "libBitIO", "BitOutputConnectSocket", "Pointer to BitOutput is NULL");
+        } else if (SocketAddress == NULL) {
+            Log(LOG_ERR, "libBitIO", "BitOutputConnectSocket", "Pointer to SocketAddress is NULL");
         } else {
-            
+            BitO->DrainType = BitIOSocket;
+            connect(BitO->Socket, SocketAddress, SocketSize);
         }
     }
     
