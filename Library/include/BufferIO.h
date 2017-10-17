@@ -292,35 +292,35 @@ extern "C" {
 	 @param				BitI					"Pointer to the instance of BitInput".
 	 @return									"Returns the number of bytes left in the file".
 	 */
-	fpos_t              BytesRemainingInBitInput(BitInput *BitI);
+	fpos_t              BitInputBytesRemainingInFile(BitInput *BitI);
 	
 	/*!
 	 @abstract									"Gets the size of the file pointed to by BitI"
 	 @param				BitI					"Pointer to the instance of BitInput".
 	 @return									"Returns the value in BitI->FileSize if it exists".
 	 */
-	fpos_t              GetBitInputFileSize(BitInput *BitI);
+	fpos_t              BitInputGetFileSize(BitInput *BitI);
 	
 	/*!
 	 @abstract									"Gets the position of the Input file from the start".
 	 @param				BitI					"Pointer to the instance of BitInput".
 	 @return									"Returns the position of the file in bytes from the beginning"
 	 */
-	fpos_t              GetBitInputFilePosition(BitInput *BitI);
+	fpos_t              BitInputGetFilePosition(BitInput *BitI);
 	
 	/*!
 	 @abstract									"Gets the offset of the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @return									"Returns the position offset from the start of BitBuffer".
 	 */
-	uint64_t            GetBitBufferPosition(BitBuffer *BitB);
+	uint64_t            BitBufferGetPosition(BitBuffer *BitB);
 	
 	/*!
 	 @abstract									"Gets the size of the BitBuffer".
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @return									"Returns the number of bits the buffer can hold max".
 	 */
-	uint64_t            GetBitBufferSize(BitBuffer *BitB);
+	uint64_t            BitBufferGetSize(BitBuffer *BitB);
 	
 	/*!
 	 @abstract									"Seeks to the end of BitI->File to determine the size".
@@ -374,7 +374,7 @@ extern "C" {
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				Bits2Skip				"The number of bits to skip".
 	 */
-	void				SkipBits(BitBuffer *BitB, const int64_t Bits2Skip);
+	void				BitBufferSkip(BitBuffer *BitB, const int64_t Bits2Skip);
 	
 	/*!
 	 @abstract									"Reads bits from BitBuffer".
@@ -779,7 +779,7 @@ extern "C" {
 	 @param				BytesOfAlignment		"Are you trying to see if it's aligned to a byte, short, word, etc alignment? Specify in number of bytes".
 	 @return									"Returns whether the BitBuffer is aligned on a multiple of BytesOfAlignment".
 	 */
-	bool				IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment);
+	bool				BitBufferIsAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment);
 	
 	/*!
 	 @abstract									"Aligns bits for multi-byte alignment".
@@ -787,7 +787,7 @@ extern "C" {
 	 @param				BitB					"Pointer to the instance of BitBuffer".
 	 @param				BytesOfAlignment		"Align BitB to X byte boundary".
 	 */
-	void				AlignBitBuffer(BitBuffer *BitB, const uint8_t BytesOfAlignment);
+	void				BitBufferMakeAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment);
 	
 	/*!
 	 @abstract									"Reads Bytes2Read into a buffer pointed to by BitB from InputFile".
