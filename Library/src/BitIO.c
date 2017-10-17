@@ -246,7 +246,7 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "BitInputOpenFile", "Pointer to Path2Open is NULL");
         } else {
             BitI->SourceType        = BitIOFile;
-            uint64_t Path2OpenSize  = strlen(Path2Open) + 1;
+            uint64_t Path2OpenSize  = strlen(Path2Open) + BitIOStringNULLSize;
             char *NewPath           = calloc(1, Path2OpenSize);
             BitI->FileSpecifierNum += 1;
             snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
@@ -267,9 +267,10 @@ extern "C" {
             Log(LOG_ERR, "libBitIO", "BitOutputOpenFile", "Pointer to Path2Open is NULL");
         } else {
             BitO->DrainType        = BitIOFile;
-            uint64_t Path2OpenSize = strlen(Path2Open) + 1;
+            uint64_t Path2OpenSize = strlen(Path2Open) + BitIOStringNULLSize;
             char *NewPath          = calloc(1, Path2OpenSize);
-            snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum += 1); // FIXME: HANDLE FORMAT STRINGS BETTER
+            BitO->FileSpecifierNum += 1;
+            snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
             BitO->File = fopen(Path2Open, "wb");
             if (BitO->File == NULL) {
                 Log(LOG_ALERT, "libBitIO", "BitOutputOpenFile", "Couldn't open output file; Check that the path exists and the permissions are correct");
@@ -1250,9 +1251,7 @@ extern "C" {
             ErrorCodePrefix  = "UNKNOWN!";
         }
         
-        uint8_t TerminatingNULLSize = 1;
-        
-        int   EasyStringSize = ErrorCodeSize + strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + TerminatingNULLSize;
+        int   EasyStringSize = ErrorCodeSize + strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + BitIOStringNULLSize;
         char *EasyString     = calloc(1, EasyStringSize);
         
         snprintf(EasyString, EasyStringSize, "%s: %s - %s", ErrorCodePrefix, FunctionName, Description);
