@@ -314,7 +314,7 @@ extern "C" {
 	 @abstract									"Seeks to the end of BitI->File to determine the size".
 	 @param				BitI					"Pointer to the instance of BitInput".
 	 */
-	void				FindFileSize(BitInput *BitI);
+	void				FindBitInputFileSize(BitInput *BitI);
 	
 	/*!
 	 @abstract									"Opens an input file, pointed to by InputSwitch in CMD and stores the resulting pointer in BitI->File".

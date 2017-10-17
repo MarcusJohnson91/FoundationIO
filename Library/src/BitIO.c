@@ -69,7 +69,7 @@ extern "C" {
         if (BitB == NULL) {
             Log(LOG_ERR, "libBitIO", "InitBitBuffer", "Not enough memory to allocate this instance of BitBuffer");
         } else if (BitB->Buffer == NULL) {
-            Log(LOG_ERR, "libBitIO", "InitBitBuffer", "Not enough memory to allocate %d bytes for BitBuffer's buffer", BitBufferSize);
+            Log(LOG_ERR, "libBitIO", "InitBitBuffer", "Not enough memory to allocate %d bits for BitBuffer's buffer", BitBufferSize);
         }
         return BitB;
     }
@@ -163,17 +163,15 @@ extern "C" {
     }
     
     inline bool IsOdd(const int64_t Number2Check) {
-        bool X = 0;
+        bool X = false;
         if (Number2Check % 2 == 0) {
             X = true;
-        } else {
-            X = false;
         }
         return X;
     }
     
     fpos_t BytesRemainingInBitInput(BitInput *BitI) {
-        fpos_t BytesLeft = 0ULL;
+        fpos_t BytesLeft = 0LL;
         if (BitI == NULL) {
             Log(LOG_ERR, "libBitIO", "BytesRemainingInBitInput", "Pointer to BitInput is NULL");
         } else {
@@ -230,12 +228,12 @@ extern "C" {
         return BitBufferSize;
     }
     
-    void FindFileSize(BitInput *BitI) {
+    void FindBitInputFileSize(BitInput *BitI) {
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "FindFileSize", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "FindBitInputFileSize", "Pointer to BitInput is NULL");
         } else {
             fseek(BitI->File, 0, SEEK_END);
-            fgetpos(BitI->File, (uint64_t)BitI->FileSize);
+            fgetpos(BitI->File, &BitI->FileSize);
             fseek(BitI->File, 0, SEEK_SET);
             fgetpos(BitI->File, &BitI->FilePosition);
         }
