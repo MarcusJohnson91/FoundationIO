@@ -765,53 +765,85 @@ extern "C" {
     void     WriteUnaryAsLSByteLSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit, uint64_t Field2Write) {
         bool UnaryBit = !StopBit;
         uint64_t UnaryBits2Write = NumBits2StoreSymbol(Field2Write);
-        while (Field2Write > 0) {
-            if (IsZeroAvailable == true) {
-                Field2Write -= 1;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteUnaryAsLSByteLSBit", "Pointer to BitBuffer is NULL");
+        } else {
+            while (Field2Write > 0) {
+                if (IsTruncated == true) {
+                    // Subtract 1 from the Bits2Write, because you count the stop bit.
+                    UnaryBits2Write -= 1;
+                }
+                if (IsZeroAvailable == true) {
+                    Field2Write += 1;
+                }
+                InsertBitsAsLSByteLSBit(BitB, 1, UnaryBit);
+                Field2Write--;
             }
-            InsertBitsAsLSByteLSBit(BitB, 1, UnaryBit);
-            Field2Write--;
+            InsertBitsAsLSByteLSBit(BitB, 1, StopBit & 1);
         }
-        InsertBitsAsLSByteLSBit(BitB, 1, StopBit & 1);
     }
     
     void     WriteUnaryAsLSByteMSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit, uint64_t Field2Write) {
         bool UnaryBit = !StopBit;
         uint64_t UnaryBits2Write = NumBits2StoreSymbol(Field2Write);
-        while (Field2Write > 0) {
-            if (IsZeroAvailable == true) {
-                Field2Write -= 1;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteUnaryAsLSByteLSBit", "Pointer to BitBuffer is NULL");
+        } else {
+            while (Field2Write > 0) {
+                if (IsTruncated == true) {
+                    // Subtract 1 from the Bits2Write, because you count the stop bit.
+                    UnaryBits2Write -= 1;
+                }
+                if (IsZeroAvailable == true) {
+                    Field2Write += 1;
+                }
+                InsertBitsAsLSByteMSBit(BitB, 1, UnaryBit);
+                Field2Write--;
             }
-            InsertBitsAsLSByteMSBit(BitB, 1, UnaryBit);
-            Field2Write--;
+            InsertBitsAsLSByteMSBit(BitB, 1, StopBit & 1);
         }
-        InsertBitsAsLSByteMSBit(BitB, 1, StopBit & 1);
     }
     
     void     WriteUnaryAsMSByteLSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit, uint64_t Field2Write) {
         bool UnaryBit = !StopBit;
         uint64_t UnaryBits2Write = NumBits2StoreSymbol(Field2Write);
-        while (Field2Write > 0) {
-            if (IsZeroAvailable == true) {
-                Field2Write -= 1;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteUnaryAsLSByteLSBit", "Pointer to BitBuffer is NULL");
+        } else {
+            while (Field2Write > 0) {
+                if (IsTruncated == true) {
+                    // Subtract 1 from the Bits2Write, because you count the stop bit.
+                    UnaryBits2Write -= 1;
+                }
+                if (IsZeroAvailable == true) {
+                    Field2Write += 1;
+                }
+                InsertBitsAsMSByteLSBit(BitB, 1, UnaryBit);
+                Field2Write--;
             }
-            InsertBitsAsMSByteLSBit(BitB, 1, UnaryBit);
-            Field2Write--;
+            InsertBitsAsMSByteLSBit(BitB, 1, StopBit & 1);
         }
-        InsertBitsAsMSByteLSBit(BitB, 1, StopBit & 1);
     }
     
     void     WriteUnaryAsMSByteMSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit, uint64_t Field2Write) {
         bool UnaryBit = !StopBit;
         uint64_t UnaryBits2Write = NumBits2StoreSymbol(Field2Write);
-        while (Field2Write > 0) {
-            if (IsZeroAvailable == true) {
-                Field2Write -= 1;
+        if (BitB == NULL) {
+            Log(LOG_ERR, "libBitIO", "WriteUnaryAsLSByteLSBit", "Pointer to BitBuffer is NULL");
+        } else {
+            while (Field2Write > 0) {
+                if (IsTruncated == true) {
+                    // Subtract 1 from the Bits2Write, because you count the stop bit.
+                    UnaryBits2Write -= 1;
+                }
+                if (IsZeroAvailable == true) {
+                    Field2Write += 1;
+                }
+                InsertBitsAsMSByteMSBit(BitB, 1, UnaryBit);
+                Field2Write--;
             }
-            InsertBitsAsMSByteMSBit(BitB, 1, UnaryBit);
-            Field2Write--;
+            InsertBitsAsMSByteMSBit(BitB, 1, StopBit & 1);
         }
-        InsertBitsAsMSByteMSBit(BitB, 1, StopBit & 1);
     }
     
     uint64_t ReadExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned) {
