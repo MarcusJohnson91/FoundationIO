@@ -21,8 +21,8 @@
 #include <unistd.h>
 #endif
 
-#ifndef    BitIOYesNo
-#define    BitIOYesNo
+#ifndef   BitIOYesNo
+#define   BitIOYesNo
 #ifndef    Yes
 #define    Yes true
 #endif  /* Yes */
