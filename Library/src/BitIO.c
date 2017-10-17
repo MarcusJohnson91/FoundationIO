@@ -170,23 +170,23 @@ extern "C" {
         return X;
     }
     
-    fpos_t BytesRemainingInBitInput(BitInput *BitI) {
+    fpos_t BitInputBytesRemainingInFile(BitInput *BitI) { // BitInputBytesRemainingInFile
         fpos_t BytesLeft = 0LL;
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "BytesRemainingInBitInput", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "BitInputBytesRemainingInFile", "Pointer to BitInput is NULL");
         } else {
             BytesLeft = BitI->FileSize - BitI->FilePosition;
         }
         return BytesLeft;
     }
     
-    fpos_t GetBitInputFileSize(BitInput *BitI) {
+    fpos_t BitInputGetFileSize(BitInput *BitI) {
         fpos_t InputSize = 0LL;
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitInputFileSize", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "BitInputGetFileSize", "Pointer to BitInput is NULL");
         } else {
             if (BitI->FileSize == 0) {
-                FindFileSize(BitI);
+                BitInputFindFileSize(BitI);
             } else {
                 InputSize = BitI->FileSize;
             }
@@ -194,13 +194,13 @@ extern "C" {
         return InputSize;
     }
     
-    fpos_t GetBitInputFilePosition(BitInput *BitI) {
+    fpos_t BitInputGetFilePosition(BitInput *BitI) {
         fpos_t Position = 0LL;
         if (BitI == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitInputFilePosition", "Pointer to BitInput is NULL");
+            Log(LOG_ERR, "libBitIO", "BitInputGetFilePosition", "Pointer to BitInput is NULL");
         } else {
             if (BitI->FilePosition == 0) {
-                FindFileSize(BitI);
+                BitInputFindFileSize(BitI);
             } else {
                 Position = BitI->FilePosition;
             }
@@ -208,20 +208,20 @@ extern "C" {
         return Position;
     }
     
-    uint64_t GetBitBufferPosition(BitBuffer *BitB) {
+    uint64_t BitBufferGetPosition(BitBuffer *BitB) {
         uint64_t Position = 0ULL;
         if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitBufferPosition", "Pointer to BitBuffer is NULL");
+            Log(LOG_ERR, "libBitIO", "BitBufferGetPosition", "Pointer to BitBuffer is NULL");
         } else {
             Position = BitB->BitOffset;
         }
         return Position;
     }
     
-    uint64_t GetBitBufferSize(BitBuffer *BitB) {
+    uint64_t BitBufferGetSize(BitBuffer *BitB) {
         uint64_t BitBufferSize = 0ULL;
         if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "GetBitBufferSize", "Pointer to BitBuffer is NULL");
+            Log(LOG_ERR, "libBitIO", "BitBufferGetSize", "Pointer to BitBuffer is NULL");
         } else {
             BitBufferSize = sizeof(BitB->Buffer);
         }
@@ -289,12 +289,12 @@ extern "C" {
         }
     }
     
-    bool IsBitBufferAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
+    bool BitBufferIsAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) { // BitBufferIsAligned
         bool AlignmentStatus = 0;
         if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "IsBitBufferAligned", "Pointer to BitBuffer is NULL");
+            Log(LOG_ERR, "libBitIO", "BitBufferIsAligned", "Pointer to BitBuffer is NULL");
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
-            Log(LOG_ERR, "libBitIO", "IsBitBufferAligned", "BytesOfAlignment: %d isn't an integer power of 2", BytesOfAlignment);
+            Log(LOG_ERR, "libBitIO", "BitBufferIsAligned", "BytesOfAlignment: %d isn't an integer power of 2", BytesOfAlignment);
         } else {
             if (Bytes2Bits(BytesOfAlignment) - (8 - (BitB->BitOffset % 8)) == 0) {
                 AlignmentStatus = true;
@@ -305,11 +305,11 @@ extern "C" {
         return AlignmentStatus;
     }
     
-    void AlignBitBuffer(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
+    void BitBufferMakeAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
         if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "AlignBitBuffer", "Pointer to BitBuffer is NULL");
+            Log(LOG_ERR, "libBitIO", "BitBufferMakeAligned", "Pointer to BitBuffer is NULL");
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
-            Log(LOG_ERR, "libBitIO", "AlignBitBuffer", "BytesOfAlignment: %d isn't a power of 2 (or 1)", BytesOfAlignment);
+            Log(LOG_ERR, "libBitIO", "BitBufferMakeAligned", "BytesOfAlignment: %d isn't a power of 2 (or 1)", BytesOfAlignment);
         } else {
             uint8_t Bits2Align = Bytes2Bits(BytesOfAlignment) - (8 - (BitB->BitOffset % 8));
             if (Bits2Align + BitB->BitOffset > BitB->NumBits) {
@@ -319,9 +319,9 @@ extern "C" {
         }
     }
     
-    void SkipBits(BitBuffer *BitB, const int64_t Bits2Skip) {
+    void BitBufferSkip(BitBuffer *BitB, const int64_t Bits2Skip) {
         if (BitB == NULL) {
-            Log(LOG_ERR, "libBitIO", "SkipBits", "Pointer to BitBuffer is NULL");
+            Log(LOG_ERR, "libBitIO", "BitBufferSkip", "Pointer to BitBuffer is NULL");
         } else {
             if (Bits2Skip + BitB->BitOffset > BitB->NumBits) {
                 BitB->Buffer = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Skip, true));
@@ -876,13 +876,13 @@ extern "C" {
                 Log(LOG_ERR, "libBitIO", "ReadGUUIDAsUUIDString", "Not enough memory to allocate UUIDString");
             } else {
                 uint32_t Section1    = ExtractBitsAsMSByteLSBit(BitB, 32);
-                SkipBits(BitB, 8);
+                BitBufferSkip(BitB, 8);
                 uint16_t Section2    = ExtractBitsAsMSByteLSBit(BitB, 16);
-                SkipBits(BitB, 8);
+                BitBufferSkip(BitB, 8);
                 uint16_t Section3    = ExtractBitsAsMSByteLSBit(BitB, 16);
-                SkipBits(BitB, 8);
+                BitBufferSkip(BitB, 8);
                 uint16_t Section4    = ExtractBitsAsMSByteLSBit(BitB, 16);
-                SkipBits(BitB, 8);
+                BitBufferSkip(BitB, 8);
                 uint64_t Section5    = ExtractBitsAsMSByteLSBit(BitB, 48);
                 sprintf((char*)UUIDString, "%d-%d-%d-%d-%llu", Section1, Section2, Section3, Section4, Section5);
             }
@@ -900,13 +900,13 @@ extern "C" {
                 Log(LOG_ERR, "libBitIO", "ReadGUUIDAsGUIDString", "Not enough memory to allocate GUIDString");
             } else {
                 uint32_t Section1    = ExtractBitsAsLSByteLSBit(BitB, 32);
-                SkipBits(BitB, 8);
+                BitBufferSkip(BitB, 8);
                 uint16_t Section2    = ExtractBitsAsLSByteLSBit(BitB, 16);
-                SkipBits(BitB, 8);
+                BitBufferSkip(BitB, 8);
                 uint16_t Section3    = ExtractBitsAsLSByteLSBit(BitB, 16);
-                SkipBits(BitB, 8);
+                BitBufferSkip(BitB, 8);
                 uint16_t Section4    = ExtractBitsAsLSByteLSBit(BitB, 16);
-                SkipBits(BitB, 8);
+                BitBufferSkip(BitB, 8);
                 uint64_t Section5    = ExtractBitsAsMSByteLSBit(BitB, 48);
                 sprintf((char*)GUIDString, "%d-%d-%d-%d-%llu", Section1, Section2, Section3, Section4, Section5);
             }
