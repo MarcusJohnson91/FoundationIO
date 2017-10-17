@@ -102,6 +102,18 @@ extern "C" {
 						BitIOBinaryGUUIDSize	= (16),
 	};
 	
+	/*!
+	 @enum				BitIOSourceDrainTypes
+	 @abstract									"Is this BitInput or BitOutput connected to a File or Socket?".
+	 @constant			BitIOFile				"This instance of BitInput/BitOutput is connected to a File".
+	 @constant			BitIOSocket				"This instance of BitInput/BitOutput is connected to a Socket".
+	 */
+	enum BitIOSourceDrainTypes {
+						BitIOUnknownFileType	= 0,
+						BitIOFile				= 1,
+						BitIOSocket				= 2,
+	};
+	
 #ifndef _POSIX_VERSION
 	/*!
 	 @enum				BitIOLogTypes
@@ -138,9 +150,9 @@ extern "C" {
 	/*!
 	 @typedef			BitInput
 	 @abstract									"Contains File/Socket pointers for reading to a BitBuffer".
+	 @constant			SourceType				"Is this BitInput for a file or socket"?
 	 @constant			File					"Input File/Socket to read into a BitBuffer".
 	 @constant			Socket					"Socket number".
-	 @constant			IsFileOrSocket			"Is this BitInput for a file or socket"?
 	 @constant			FileSize				"Size of the File in bytes".
 	 @constant			FilePosition			"Current byte in the file".
 	 @constant			FileSpecifierNum		"Which file are we currently on?".
@@ -150,9 +162,9 @@ extern "C" {
 	/*!
 	 @typedef			BitOutput
 	 @abstract									"Contains File/Socket pointers for writing from a BitBuffer".
+	 @constant			DrainType				"Is this BitOutput for a file or socket"?
 	 @constant			File					"Input File/Socket to write a BitBuffer into".
 	 @constant			Socket					"Socket number".
-	 @constant			IsFileOrSocket			"Is this BitInput for a file or socket"?
 	 @constant			FilePosition			"Current byte in the file".
 	 @constant			FileSpecifierNum		"Which file are we currently on?".
 	 */
@@ -339,12 +351,22 @@ extern "C" {
 	/*!
 	 @abstract									"Opens a socket for reading".
 	 */
-	void				OpenInputSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol);
+	void				BitInputOpenSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol);
 	
 	/*!
 	 @abstract									"Opens a socket for writing".
 	 */
-	void				OpenOutputSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol);
+	void				BitOutputOpenSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol);
+	
+	/*!
+	 @abstract									"Connects BitInput to a socket".
+	 */
+	void				BitInputConnectSocket(BitInput *BitI, struct sockaddr *SocketAddress, const uint64_t SocketSize);
+	
+	/*!
+	 @abstract									"Connects BitOutput to a socket".
+	 */
+	void				BitOutputConnectSocket(BitOutput *BitO, struct sockaddr *SocketAddress, const uint64_t SocketSize);
 	
 	/*!
 	 @abstract									"Seeks Forwards and backwards in BitInput".
