@@ -114,10 +114,6 @@ extern "C" {
 		return Result;
 	}
 	
-	inline uint8_t SwapBitsInByte(const uint8_t Byte) {
-		return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
-	}
-	
 	inline uint8_t SwapNibble(const uint8_t Byte2Swap) {
 		return ((Byte2Swap & 0xF0 >> 4) | (Byte2Swap & 0x0F << 4));
 	}
@@ -181,7 +177,7 @@ extern "C" {
 		return Bits2ExtractFromThisByte;
 	}
 	
-	static inline uint8_t SwapBits(const uint8_t Byte) {
+	inline uint8_t SwapBits(const uint8_t Byte) {
 		return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
 	}
 	
@@ -362,11 +358,11 @@ extern "C" {
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
 			// Extract as is
 #elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-			uint8_t FinalByte      = SwapBits(Data, Bits2Put); // Extract and flip bit order
+			uint8_t FinalByte      = SwapBits(Data); // Extract and flip bit order
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
 			// Extract and flip byte order
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-			uint8_t FinalByte      = SwapBits(Data, Bits2Put); // Extract and flip the byte order AND bit order
+			uint8_t FinalByte      = SwapBits(Data); // Extract and flip the byte order AND bit order
 #endif
 			Bits                  -= Bits2Put;
 		}
@@ -412,13 +408,13 @@ extern "C" {
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
 			OutputData           <<= Bits2Get;
 #elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-			uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+			uint8_t FinalByte      = SwapBits(Data);
 			OutputData           >>= Bits2Get;
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
 			OutputData             & (0xFF << (Bits2Extract - Bits2Get)); // Byte shift
 			OutputData           <<= Bits2Get; // Bit shift
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-			uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+			uint8_t FinalByte      = SwapBits(Data);
 			OutputData             & (0xFF << (Bits2Extract - Bits2Get)); // Byte Shift
 			OutputData           >>= Bits2Get; // Bit shift
 #endif
@@ -489,7 +485,7 @@ extern "C" {
 			// It is 0x7C6E
 #elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
 			// Extract the bits as LSBit, and apply them as MSBit.
-			uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+			uint8_t FinalByte      = SwapBits(Data);
 			// Is is 0x3E76
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
 			// Extract the bits as LSBit and apply them as LSBit
@@ -497,7 +493,7 @@ extern "C" {
 			// It is 0x6E7C
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
 			// Extract the bits as LSBit and apply them as MSBit
-			uint8_t FinalByte      = SwapBits(Data, Bits2Get);
+			uint8_t FinalByte      = SwapBits(Data);
 			// It is 0x763E
 #endif
 			OutputData           >>= BitB->BitOffset - Bits2Get;
