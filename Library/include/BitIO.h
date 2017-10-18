@@ -794,11 +794,11 @@ extern "C" {
 	/*!
 	 @abstract									"Reads Bytes2Read into a buffer pointed to by BitB from InputFile".
 	 @remark									"If the pointer to BitBuffer is not new, all the old contents will be lost".
-	 @param				BitI					"Pointer to BitInput".
 	 @param				BitB					"Pointer to BitBuffer to put the bytes into".
+	 @param				BitI					"Pointer to BitInput".
 	 @param				Bytes2Read				"The number of bytes to read from the InputFile into the Buffer".
 	 */
-	void				ReadBitInput2BitBuffer(BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read);
+	void				BitBufferReadFromBitInput(BitBuffer *BitB, BitInput *BitI, const uint64_t Bytes2Read);
 	
 	/*!
 	 @abstract									"Writes a BitBuffer to a file, kinda shitty tho".
@@ -806,7 +806,7 @@ extern "C" {
 	 @param				Buffer2Write		    "The buffer to be written to the output file".
 	 @param				Bytes2Write				"The number of bytes from the buffer to write to the file".
 	 */
-	void				WriteBitBuffer2BitOutput(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write);
+	void				BitBufferWrite2BitOutput(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write); // BitBufferWrite2BitOutput
 	
 	/*!
 	 @abstract									"Logs errors to the user provided log file, or stderr".

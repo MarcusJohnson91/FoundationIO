@@ -90,7 +90,7 @@ extern "C" {
 	 @param               CLI                       "Pointer to CommandLineIO".
 	 @param               Switch                    "Which switch are we talking about?".
 	 */
-	void                  SetCLISwitchAsMaster(CommandLineIO *CLI, const uint64_t Switch);
+	void                  SetCLISwitchAsIndependent(CommandLineIO *CLI, const uint64_t Switch);
 	
 	/*!
 	 @abstract                                      "How many dependent switches can be active in a master argument at once"?
