@@ -229,7 +229,7 @@ extern "C" {
 	 @param				Byte					"Byte to swap bits".
 	 @return									"Returns swapped byte".
 	 */
-	uint8_t      		SwapBitsInByte(const uint8_t Byte);
+	uint8_t      		SwapBits(const uint8_t Byte);
 	
 	/*!
 	 @abstract									"Swap nibbles in a byte".
