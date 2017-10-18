@@ -798,7 +798,7 @@ extern "C" {
 	 @param				BitI					"Pointer to BitInput".
 	 @param				Bytes2Read				"The number of bytes to read from the InputFile into the Buffer".
 	 */
-	void				BitBufferReadFromBitInput(BitBuffer *BitB, BitInput *BitI, const uint64_t Bytes2Read);
+	void				BitBufferReadFromBitInput(BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read);
 	
 	/*!
 	 @abstract									"Writes a BitBuffer to a file, kinda shitty tho".
