@@ -37,6 +37,10 @@ Tips:
 
 CommandLineIO:
 -------------
+* **Independent/Dependent Switches**
+===============================
+* A dependent switch is one that provides further context to another, indepedent switch.
+* Only independent switches can have dependent switches.
 
 * To use CommandLineIO, in `main()` call `InitCommandLineIO` to create a pointer to the CommandLineIO struct.
 * Create an enum to hold your command line switches. Number them starting at 0. your **help** option MUST be the last one.
@@ -51,12 +55,12 @@ CommandLineIO:
 BitIO:
 -----
 * To use BitIO in `main()` call `InitBitInput` and `InitBitOutput` to read from and write to files and sockets.
-* Reading and writing from/to files/sockets, requires a `BitBuffer` Init that with `InitBitBuffer`.
-* To open a file into BitInput call `OpenInputFile` and `OpenOutputFile` (except for the logging file, which uses `OpenLogFile`).
-* to measure the size of the file in`BitInput`, call `GetFileSize`.
+* Reading and writing from/to files/sockets, requires a `BitBuffer` Init it with `InitBitBuffer`.
+* To open a file call `BitInputOpenFile` or `BitOutputOpenFile` (except for the logging file, which uses `OpenLogFile`).
+* To measure the size of the file in`BitInput`, call `BitInputGetFileSize`.
 * To get the size of a file from `BitInput` call `GetBitInputFileSize`.
-* To Read bits from a BitBuffer, use the `ReadBits` generic macro. to write bits to a BitBuffer use the `WriteBits` generic macro.
-* To pull in fresh data from a file, call `ReadBitInput2BitBuffer`, and to write out fresh data call `WriteBitBuffer2BitOutput`.
+* To read bits from a BitBuffer, use the `ReadBits`/`PeekBits` generic macro. to write bits to a BitBuffer use the `WriteBits` generic macro.
+* To pull in fresh data from a file, call `BitBufferReadFromBitInput`, and to write out fresh data call `BitBufferWrite2BitOutput`.
 * When you're all done, call `DeinitBitInput`, `DeinitBitOutput`, and `DeinitBitBuffer`.
 
 
@@ -95,7 +99,5 @@ GUUIDs:
 
 TODO:
 -----
-* Add format specifier support to `OpenInputFile` and `OpenOutputFile`, and add a function to increment the file.
 * Write a WriteArray2BitBuffer and ReadBitBuffer2Array functions.
-* Make the makefile able to extract the TargetByteOrder and TargetBitOrder from the target architecture.
 
