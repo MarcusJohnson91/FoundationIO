@@ -1138,7 +1138,7 @@ extern "C" {
 	}
 	
 	void BitBufferReadFromBitInput(BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read) { // BitBufferUpdateFromBitInput
-		uint64_t BytesRead              = 0ULL;
+		uint64_t BytesRead            = 0ULL;
 		if (BitI == NULL) {
 			Log(LOG_ERR, "libBitIO", "BitBufferReadFromBitInput", "Pointer to BitInput is NULL");
 		} else if (BitB == NULL) {
@@ -1149,16 +1149,16 @@ extern "C" {
 			if (BitB->Buffer != NULL) {
 				free(BitB->Buffer);
 			}
-			BitB->Buffer                  = calloc(1, Bytes2Read);
+			BitB->Buffer              = calloc(1, Bytes2Read);
 			if (BitB->Buffer == NULL) {
 				Log(LOG_ERR, "libBitIO", "BitBufferReadFromBitInput", "Not enough memory to allocate Buffer in BitBuffer");
 			} else {
 				if (BitI->SourceType == BitIOFile) {
 					// Read from File
-					BytesRead = fread(BitB->Buffer, 1, Bytes2Read, BitI->File);
+					BytesRead         = fread(BitB->Buffer, 1, Bytes2Read, BitI->File);
 				} else if (BitI->SourceType == BitIOSocket) {
 					// Read from Socket
-					BytesRead = read(BitI->Socket, BitB->Buffer, Bytes2Read);
+					BytesRead         = read(BitI->Socket, BitB->Buffer, Bytes2Read);
 				}
 				if (BytesRead != Bytes2Read && BitI->SourceType == BitIOFile) {
 					Log(LOG_ERR, "libBitIO", "BitBufferReadFromBitInput", "Fread read: %d bytes, but you requested: %d", BytesRead, Bytes2Read);
@@ -1170,16 +1170,16 @@ extern "C" {
 	}
 	
 	void BitBufferWrite2BitOutput(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write) {
-		uint64_t BytesWritten           = 0ULL;
+		uint64_t BytesWritten          = 0ULL;
 		if (BitO == NULL) {
 			Log(LOG_ERR, "libBitIO", "BitBufferWrite2BitOutput", "Pointer to BitInput is NULL");
 		} else if (Buffer2Write == NULL) {
 			Log(LOG_ERR, "libBitIO", "BitBufferWrite2BitOutput", "Pointer to BitBuffer is NULL");
 		} else {
 			if (BitO->DrainType == BitIOFile) {
-				BytesWritten               = fwrite(Buffer2Write->Buffer, 1, Bytes2Write, BitO->File);
+				BytesWritten           = fwrite(Buffer2Write->Buffer, 1, Bytes2Write, BitO->File);
 			} else if (BitO->DrainType == BitIOSocket) {
-				BytesWritten               = write(BitO->Socket, Buffer2Write->Buffer, Bits2Bytes(Buffer2Write->NumBits, true));
+				BytesWritten           = write(BitO->Socket, Buffer2Write->Buffer, Bits2Bytes(Buffer2Write->NumBits, true));
 			}
 			if (BytesWritten != Bytes2Write) {
 				Log(LOG_ERR, "libBitIO", "BitBufferWrite2BitOutput", "Fwrite wrote: %d bytes, but you requested: %d", BytesWritten, Bytes2Write);
@@ -1193,9 +1193,9 @@ extern "C" {
 		if (BitI == NULL) {
 			Log(LOG_ERR, "libBitIO", "BitInputOpenSocket", "Pointer to BitInput is NULL");
 		} else {
-			BitI->SourceType     = BitIOSocket;
+			BitI->SourceType = BitIOSocket;
 #ifdef _POSIX_VERSION
-			BitI->Socket         = socket(Domain, Type, Protocol);
+			BitI->Socket     = socket(Domain, Type, Protocol);
 #elif  _WIN32
 #endif
 		}
@@ -1205,9 +1205,9 @@ extern "C" {
 		if (BitO == NULL) {
 			Log(LOG_ERR, "libBitIO", "BitOutputOpenSocket", "Pointer to BitInput is NULL");
 		} else {
-			BitO->DrainType      = BitIOSocket;
+			BitO->DrainType = BitIOSocket;
 #ifdef _POSIX_VERSION
-			BitO->Socket         = socket(Domain, Type, Protocol);
+			BitO->Socket    = socket(Domain, Type, Protocol);
 #elif  _WIN32
 #endif
 		}
