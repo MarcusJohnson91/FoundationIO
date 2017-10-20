@@ -99,5 +99,5 @@ GUUIDs:
 
 TODO:
 -----
-* Write a WriteArray2BitBuffer and ReadBitBuffer2Array functions.
+* Write a WriteArray2BitBuffer and ReadBitBuffer2Array functions, that way I could theoretically at least use SIMD operations on the data.
 
