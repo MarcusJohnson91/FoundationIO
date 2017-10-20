@@ -1230,38 +1230,28 @@ extern "C" {
 	}
 	
 	void Log(const uint8_t ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...) {
-		uint8_t ErrorCodeSize = 0;
 		static const char *ErrorCodePrefix = NULL;
 		if (ErrorSeverity == LOG_EMERG) {
-			ErrorCodeSize    = 10;
 			ErrorCodePrefix  = "EMERGENCY!";
 		} else if (ErrorSeverity == LOG_ALERT) {
-			ErrorCodeSize    = 6;
 			ErrorCodePrefix  = "ALERT!";
 		} else if (ErrorSeverity == LOG_CRIT) {
-			ErrorCodeSize    = 9;
 			ErrorCodePrefix  = "CRITICAL!";
 		} else if (ErrorSeverity == LOG_ERR) {
-			ErrorCodeSize    = 6;
 			ErrorCodePrefix  = "ERROR!";
 		} else if (ErrorSeverity == LOG_WARNING) {
-			ErrorCodeSize    = 7;
 			ErrorCodePrefix  = "WARNING";
 		} else if (ErrorSeverity == LOG_NOTICE) {
-			ErrorCodeSize    = 6;
 			ErrorCodePrefix  = "NOTICE";
 		} else if (ErrorSeverity == LOG_INFO) {
-			ErrorCodeSize    = 11;
 			ErrorCodePrefix  = "INFORMATION";
 		} else if (ErrorSeverity == LOG_DEBUG) {
-			ErrorCodeSize    = 5;
 			ErrorCodePrefix  = "DEBUG";
 		} else {
-			ErrorCodeSize    = 8;
 			ErrorCodePrefix  = "UNKNOWN!";
 		}
 		
-		int   EasyStringSize = ErrorCodeSize + strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + BitIOStringNULLSize;
+		int   EasyStringSize = strlen(ErrorCodePrefix) + strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + BitIOStringNULLSize;
 		char *EasyString     = calloc(1, EasyStringSize);
 		
 		snprintf(EasyString, EasyStringSize, "%s: %s - %s", ErrorCodePrefix, FunctionName, Description);
