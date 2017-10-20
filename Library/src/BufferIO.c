@@ -1194,10 +1194,7 @@ extern "C" {
 			Log(LOG_ERR, "libBitIO", "BitInputOpenSocket", "Pointer to BitInput is NULL");
 		} else {
 			BitI->SourceType = BitIOSocket;
-#ifdef _POSIX_VERSION
 			BitI->Socket     = socket(Domain, Type, Protocol);
-#elif  _WIN32
-#endif
 		}
 	}
 	
@@ -1206,10 +1203,7 @@ extern "C" {
 			Log(LOG_ERR, "libBitIO", "BitOutputOpenSocket", "Pointer to BitInput is NULL");
 		} else {
 			BitO->DrainType = BitIOSocket;
-#ifdef _POSIX_VERSION
 			BitO->Socket    = socket(Domain, Type, Protocol);
-#elif  _WIN32
-#endif
 		}
 	}
 	
