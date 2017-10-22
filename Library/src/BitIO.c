@@ -161,14 +161,15 @@ extern "C" {
 		return Bytes;
 	}
 	
-	inline uint64_t NumBits2StoreSymbol(uint64_t Symbol) {
+	inline uint64_t NumBits2StoreSymbol(const uint64_t Symbol) {
 		uint64_t Bits = 0ULL;
+		uint64_t SymbolCopy = Symbol;
 		if (Symbol == 0) {
 			Bits = 1;
 		} else {
-			while (Symbol > 0) {
+			while (SymbolCopy > 0) {
 				Bits += 1;
-				Symbol >>= 1;
+				SymbolCopy >>= 1;
 			}
 		}
 		return Bits;
