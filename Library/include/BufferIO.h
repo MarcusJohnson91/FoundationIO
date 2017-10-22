@@ -225,6 +225,13 @@ extern "C" {
 	uint64_t            Power(const uint64_t Base, const uint64_t Exponent);
 	
 	/*!
+	 @abstract                                  "Unsigned integer absolute value function".
+	 @remark                                    "The C standard committee fucked up when they decided the abs family of functions should return a signed integer".
+	 @param				Value					"The value to find the absolute value of".
+	 */
+	uint64_t            Absolute(const int64_t Value);
+	
+	/*!
 	 @abstract									"Swap bits in a byte".
 	 @param				Byte					"Byte to swap bits".
 	 @return									"Returns swapped byte".
