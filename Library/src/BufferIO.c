@@ -241,10 +241,10 @@ extern "C" {
 	
 	uint64_t BitBufferGetSize(BitBuffer *BitB) {
 		uint64_t BitBufferSize = 0ULL;
-		if (BitB == NULL) {
-			Log(LOG_ERR, "libBitIO", "BitBufferGetSize", "Pointer to BitBuffer is NULL");
+		if (BitB != NULL) {
+			BitBufferSize = Bits2Bytes(BitB->NumBits, false);
 		} else {
-			BitBufferSize = sizeof(BitB->Buffer);
+			Log(LOG_ERR, "libBitIO", "BitBufferGetSize", "Pointer to BitBuffer is NULL");
 		}
 		return BitBufferSize;
 	}
