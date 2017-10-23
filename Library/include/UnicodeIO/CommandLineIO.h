@@ -137,23 +137,6 @@ extern "C" {
 	void                  ParseCommandLineArguments(CommandLineIO *CLI, const int argc, const char *argv[]);
 	
 	/*!
-	 @abstract                                      "Parses CommandLine arguments and counts the copies of a given switch found".
-	 @param               CLI                       "Pointer to CommandLineIO".
-	 @param               Switch                    "Which switch should we look for?".
-	 @return                                        "Returns the number of arguments matching the SwitchNum"
-	 */
-	uint64_t              GetCLINumArgumentsMatchingIndependentSwitch(CommandLineIO const *CLI, const uint64_t Switch);
-	
-	/*!
-	 @abstract                                      "Finds the argument that has both ParentSwitch and ChildSwitch present".
-	 @param               CLI                       "Pointer to CommandLineIO".
-	 @param               ParentSwitch              "The switch MetaSwitch should be in".
-	 @param               ChildSwitch               "MetaSwitch to find in the arguments".
-	 @return                                        "If no argument is found with that switch set, -1 is returned as the invalid result".
-	 */
-	uint64_t              GetCLIChildSwitchArgument(CommandLineIO const *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch);
-	
-	/*!
 	 @abstract                                      "Finds the argument that contains SwitchNum".
 	 @param               CLI                       "Pointer to CommandLineIO".
 	 @param               Switch                    "The switch number to look for".
@@ -176,6 +159,16 @@ extern "C" {
 	 @return                                        "Returns the data after the switch, if the switch is resultless it will return 0".
 	 */
 	bool                  GetCLIArgumentPresenceFromSwitch(CommandLineIO const *CLI, const uint64_t Switch);
+	
+	/*!
+	 @abstract										"Gets the number of Arguments in CLI that contain an Independent switch with all Dependents specified".
+	 */
+	uint64_t              GetCLINumArgumentsWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, const uint64_t *Dependents);
+	
+	/*!
+	 @abstract										"Returns the argument number that matches all the switches in the parameters".
+	 */
+	uint64_t              GetCLIArgumentNumWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, const uint64_t *Dependents);
 	
 	/*!
 	 @abstract                                      "Extracts the path of the argument that contains both the parent and child switch, lazily evaluated".
