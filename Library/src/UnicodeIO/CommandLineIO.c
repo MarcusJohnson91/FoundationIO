@@ -33,8 +33,8 @@ extern "C" {
 	 @struct				CommandLineArgument
 	 @abstract											"Contains the data to support a single argument".
 	 @constant				Switch						"Which switch does this argument correspond to"?
-	 @constant				NumDependentArguments		"How many child arguments were found in this argument?".
-	 @constant				DependentArguments			"Array of child argument numbers, to look up in CLI->Switches".
+	 @constant				NumDependentArguments		"How many Dependent arguments were found in this argument?".
+	 @constant				DependentArguments			"Array of Dependent argument numbers, to look up in CLI->Switches".
 	 @constant				ArgumentResult				"If there is a path or other result expected for this switch's argument, it'll be here".
 	 */
 	typedef struct CommandLineArgument {
@@ -49,7 +49,7 @@ extern "C" {
 	 @abstract											"Contains all the information, and relationships between switches on the command line".
 	 @constant				NumSwitches					"How many switches are there?".
 	 @constant				MinSwitches					"The minimum number of switches to accept without dumping the help".
-	 @constant				NumArguments				"The number of arguments present in argv, after extracting any child switches".
+	 @constant				NumArguments				"The number of arguments present in argv, after extracting any Dependent switches".
 	 @constant				HelpSwitch					"Which switch displays the help"?
 	 @constant				Switches					"Pointer to an array of switches".
 	 @constant				Arguments					"Pointer to an array of arguments".
@@ -282,46 +282,8 @@ extern "C" {
 			}
 		}
 	}
-	/*
-	static bool *BuildMasterSwitchTable(CommandLineIO *CLI, const int argc, const char *argv[]) {
-		char    *SingleDashFlag    = NULL;
-		char    *DoubleDashFlag    = NULL;
-		char    *SingleSlashFlag   = NULL;
-		
-		bool    *MasterSwitchTable = calloc(1, argc * sizeof(bool));
-		
-		for (int ArgvMap = 0; ArgvMap < argc; ArgvMap++) {
-			for (uint64_t ArgvMapSwitch = 0; ArgvMapSwitch < CLI->NumSwitches; ArgvMapSwitch++) {
-				uint64_t SingleDashFlagSize  = CLI->Switches[ArgvMapSwitch].SwitchFlagSize + 1;
-				uint64_t DoubleDashFlagSize  = CLI->Switches[ArgvMapSwitch].SwitchFlagSize + 2;
-				uint64_t SingleSlashFlagSize = CLI->Switches[ArgvMapSwitch].SwitchFlagSize + 1;
-				
-				SingleDashFlag     = calloc(1, SingleDashFlagSize);
-				DoubleDashFlag     = calloc(1, DoubleDashFlagSize);
-				SingleSlashFlag    = calloc(1, SingleSlashFlagSize);
-				
-				snprintf(SingleDashFlag, SingleDashFlagSize, "-%s", CLI->Switches[ArgvMapSwitch].SwitchFlag);
-				snprintf(DoubleDashFlag, DoubleDashFlagSize, "--%s", CLI->Switches[ArgvMapSwitch].SwitchFlag);
-				snprintf(SingleSlashFlag, SingleSlashFlagSize, "/%s", CLI->Switches[ArgvMapSwitch].SwitchFlag);
-				strcasecmp(argv[ArgvMap], SingleDashFlag);
-				strcasecmp(argv[ArgvMap], DoubleDashFlag);
-				strcasecmp(argv[ArgvMap], SingleSlashFlag);
-				if (strcasecmp(argv[ArgvMap], SingleDashFlag) == 0 || strcasecmp(argv[ArgvMap], DoubleDashFlag) == 0 || strcasecmp(argv[ArgvMap], SingleSlashFlag) == 0) {
-					// Then this argv argument matches the current flag, all we need to do is verify if this switch is a Master switch.
-					if (CLI->Switches[ArgvMapSwitch].IsMasterSwitch == true) {
-						MasterSwitchTable[ArgvMap] = true;
-					}
-				}
-				free(SingleDashFlag);
-				free(DoubleDashFlag);
-				free(SingleSlashFlag);
-			}
-		}
-		return MasterSwitchTable;
-	}
-	 */
 	
-	static char *ConvertArgumentString2SwitchFlag(const char *ArgumentString) {
+	static inline char *ConvertArgumentString2SwitchFlag(const char *ArgumentString) {
 		uint8_t  Bytes2RemoveFromArg = 0;
 		uint64_t ArgumentStringSize  = strlen(ArgumentString);
 		char    *ArgumentSwitch = NULL;
@@ -332,16 +294,12 @@ extern "C" {
 		} else if (strncasecmp(ArgumentString, "-", 1) == 0) {
 			Bytes2RemoveFromArg = 1;
 		}
-		
 		uint64_t ArgumentSwitchSize = (ArgumentStringSize - Bytes2RemoveFromArg) + BitIOStringNULLSize;
-		
 		ArgumentSwitch = calloc(1, ArgumentSwitchSize);
-		
 		if (ArgumentSwitch == NULL) {
 			Log(LOG_ERR, "libBitIO", "ConvertArgumentString2SwitchFlag", "Not enough memory to allocate ArgumentSwitch which needs %ulld bytes of memory", ArgumentSwitchSize);
 		} else {
 			for (uint64_t Byte = Bytes2RemoveFromArg - 1; Byte < ArgumentStringSize; Byte++) {
-				// Ok, so we just start copying the bytes
 				ArgumentSwitch[Byte] = ArgumentString[Byte];
 			}
 		}
@@ -356,21 +314,31 @@ extern "C" {
 			DisplayCLIHelp(CLI);
 		} else {
 			DisplayProgramBanner(CLI);
-			/*
-			 Ok, so we need to loop over argc, and compare each argv string to each switch, when a match is found, enter it into CLI->Arguments
-			 */
-			for (int argvArgument = 1; argvArgument < argc; argvArgument++) {
-				for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
-					// Convert argvArgument to a switch string, then compare it to all Switch flags.
-					char *ArgvArgumentSwitch = ConvertArgumentString2SwitchFlag(argv[argvArgument]);
-					if (CLI->Switches[Switch].IsIndependentSwitch == true) {
-						if (strcasecmp(ArgvArgumentSwitch, CLI->Switches[Switch].SwitchFlag) == 0) { // Found a match
-							// Now we go ahead and compare all the following arguments to this argument's Dependencies.
-							for (uint64_t DependentSwitch = 0ULL; DependentSwitch < CLI->Switches[Switch].NumDependentSwitches; DependentSwitch++) {
+			
+			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
+				for (int ArgvArg = 0L; ArgvArg < argc; ArgvArg++) {
+					char *ArgvString        = ConvertArgumentString2SwitchFlag(argv[ArgvArg]);
+					uint64_t ArgvStringSize = strlen(ArgvString);
+					for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
+						if (CLI->Switches[Switch].SwitchFlagSize == ArgvStringSize) {
+							if (strcasecmp(ArgvString, CLI->Switches[Switch].SwitchFlag) == 0) {
+								if (CLI->Switches[Switch].IsIndependentSwitch == true) {
+									for (uint64_t DependentSwitch = 0ULL; DependentSwitch < CLI->Switches[Switch].NumDependentSwitches; DependentSwitch++) {
+										char *PotentialDependentArgument   = ConvertArgumentString2SwitchFlag(argv[ArgvArg + DependentSwitch]);
+										uint64_t PotentialDependentArgSize = strlen(PotentialDependentArgument);
+										if (CLI->Switches[Switch + DependentSwitch].SwitchFlagSize == PotentialDependentArgSize) {
+											if (strcasecmp(PotentialDependentArgument, CLI->Switches[Switch + DependentSwitch].SwitchFlag) == 0) {
+												CLI->Arguments[Argument].NumDependentArguments += 1;
+												CLI->Arguments[Argument].DependentArguments[DependentSwitch] = Switch + DependentSwitch; // FIXME: Is this right?
+											}
+										}
+									}
+								}
 							}
 						}
 					}
 				}
+				CLI->NumArguments += 1; // you have to do this as we build the argument list, or the loop will break
 			}
 		}
 	}
@@ -397,18 +365,18 @@ extern "C" {
 		}
 	}
 	
-	uint64_t GetCLIChildSwitchArgument(CommandLineIO const *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch) {
+	uint64_t GetCLIDependentSwitchArgument(CommandLineIO const *CLI, const uint64_t IndependentSwitch, const uint64_t DependentSwitch) {
 		uint64_t SwitchContainingMetaArg = 0xFFFFFFFFFFFFFFFFULL;
 		if (CLI == NULL) {
-			Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "Pointer to CommandLineIO is NULL");
-		} else if (ParentSwitch > CLI->NumSwitches) {
-			Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "ParentSwitch %d is greater than there are switches %d", ParentSwitch, CLI->NumSwitches);
-		} else if (ChildSwitch > CLI->NumSwitches) {
-			Log(LOG_ERR, "libBitIO", "GetCLIChildSwitchArgument", "ChildSwitch %d is greater than there are switches %d", ChildSwitch, CLI->NumSwitches);
+			Log(LOG_ERR, "libBitIO", "GetCLIDependentSwitchArgument", "Pointer to CommandLineIO is NULL");
+		} else if (IndependentSwitch > CLI->NumSwitches) {
+			Log(LOG_ERR, "libBitIO", "GetCLIDependentSwitchArgument", "IndependentSwitch %d is greater than there are switches %d", IndependentSwitch, CLI->NumSwitches);
+		} else if (DependentSwitch > CLI->NumSwitches) {
+			Log(LOG_ERR, "libBitIO", "GetCLIDependentSwitchArgument", "DependentSwitch %d is greater than there are switches %d", DependentSwitch, CLI->NumSwitches);
 		} else {
 			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-				for (uint64_t ChildArg = 0ULL; ChildArg < CLI->Arguments[Argument].NumChildArguments; ChildArg++) {
-					if (CLI->Arguments[Argument].ChildArguments[ChildArg] == ChildSwitch && CLI->Arguments[Argument].SwitchNum == ParentSwitch) {
+				for (uint64_t DependentArg = 0ULL; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
+					if (CLI->Arguments[Argument].DependentArguments[DependentArg] == DependentSwitch && CLI->Arguments[Argument].SwitchNum == IndependentSwitch) {
 						SwitchContainingMetaArg = Argument;
 					}
 				}
@@ -434,7 +402,7 @@ extern "C" {
 		return FoundArgument;
 	}
 	
-	uint64_t GetCLIArgumentNumFromSwitches(CommandLineIO const *CLI, const uint64_t ParentSwitch, const uint64_t NumChildSwitches, const uint64_t *ChildSwitch) {
+	uint64_t GetCLIArgumentNumFromSwitches(CommandLineIO const *CLI, const uint64_t IndependentSwitch, const uint64_t NumDependentSwitches, const uint64_t *DependentSwitch) {
 		
 		return 0ULL;
 	}
@@ -468,8 +436,8 @@ extern "C" {
 		return FoundArgument;
 	}
 	
-	char *GetCLIArgumentResultFromParentChildSwitch(CommandLineIO const *CLI, const uint64_t Master, const uint64_t Dependent) {
-		// We need to find adjacent arguments that contain both the parent and child switches.
+	char *GetCLIArgumentResultFromIndependentDependentSwitch(CommandLineIO const *CLI, const uint64_t Independent, const uint64_t Dependent) {
+		// We need to find adjacent arguments that contain both the Independent and Dependent switches.
 		char *ArgumentResult = NULL;
 		for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
 			for (uint64_t DependentArg = 0; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
@@ -477,19 +445,11 @@ extern "C" {
 					<#statements#>
 				}
 				
-				
-				
-				
-				
-				
-				
-				
-				
-				if (CLI->Arguments[Argument].Switch == Master && CLI->Arguments[Argument].NumChildArguments >= 1) { // If there are child arguments, look further into it.
-					if (CLI->Arguments[Argument].ChildArguments[DependentArg] == Dependent) {
+				if (CLI->Arguments[Argument].Switch == Independent && CLI->Arguments[Argument].NumDependentArguments >= 1) { // If there are Dependent arguments, look further into it.
+					if (CLI->Arguments[Argument].DependentArguments[DependentArg] == Dependent) {
 						// Found A argument that contains both, but what if there are multiple?
-						uint64_t ChildArgResult = CLI->Arguments[Argument].ChildArguments[ChildArg];
-						ArgumentResult = CLI->Arguments[ChildArgResult].ArgumentResult;
+						uint64_t DependentArgResult = CLI->Arguments[Argument].DependentArguments[DependentArg];
+						ArgumentResult = CLI->Arguments[DependentArgResult].ArgumentResult;
 					}
 				}
 			}
@@ -508,7 +468,6 @@ extern "C" {
 				free(CLI->Switches[Switch].ValidDependents);
 			}
 			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-				free(CLI->Arguments[Argument].Switch);
 				free(CLI->Arguments[Argument].DependentArguments);
 				free(CLI->Arguments[Argument].ArgumentResult);
 			}
