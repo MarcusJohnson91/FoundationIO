@@ -435,7 +435,7 @@ extern "C" {
 		return FoundArgument;
 	}
 	
-	uint64_t GetCLINumArgumentsWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, const uint64_t *Dependents) {
+	uint64_t GetCLINumArgumentsWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, ...) {
 		/*
 		 So, We need to go through all of the arguments, and see which argument is composed of Independent switch with the right number of dependent switches.
 		 */
@@ -444,15 +444,19 @@ extern "C" {
 			if (CLI->Arguments[Argument].Switch == Independent) {
 				if (NumDependents > 0 && CLI->Arguments[Argument].NumDependentArguments > 0) { // Check the dependencies
 					for (uint64_t DependentArg = 0ULL; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
+						va_list DependentArguments;
+						va_start(DependentArguments, NumDependents);
+						uint64_t *VariadicDependentArguments = calloc(1, NumDependents);
+						for (uint64_t VariadicArgs = 0ULL; VariadicArgs < NumDependents; VariadicArgs++) {
+							VariadicDependentArguments[VariadicArgs] = va_arg(DependentArguments, uint64_t);
+						}
+						va_end(DependentArguments);
 						for (uint64_t DependentParam = 0ULL; DependentParam < NumDependents; DependentParam++) {
-							/*
-							 Well, we need to loop over the Dependent arguments submitted here, as well as the dependents in the struct.
-							 */
-							// So, just check if CLI->Arguments[Argument].DependentArgument[DependentArg].Switch == Dependents[DependentParam]
-							if (CLI->Arguments[Argument].Dependent->SwitchNum == Dependents[DependentParam]) {
+							if (CLI->Arguments[Argument].Dependent->SwitchNum == VariadicDependentArguments[DependentParam]) {
 								NumMatchingArguments += 1;
 							}
 						}
+						free(VariadicDependentArguments);
 					}
 				} else { // There are no dependencies
 					NumMatchingArguments += 1;
@@ -462,21 +466,25 @@ extern "C" {
 		return NumMatchingArguments;
 	}
 	
-	uint64_t GetCLIArgumentNumWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, const uint64_t *Dependents) {
+	uint64_t GetCLIArgumentNumWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, ...) {
 		uint64_t MatchingArgumentNum = 0ULL;
 		for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
 			if (CLI->Arguments[Argument].Switch == Independent) {
 				if (NumDependents > 0 && CLI->Arguments[Argument].NumDependentArguments > 0) { // Check the dependencies
 					for (uint64_t DependentArg = 0ULL; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
+						va_list DependentArguments;
+						va_start(DependentArguments, NumDependents);
+						uint64_t *VariadicDependentArguments = calloc(1, NumDependents);
+						for (uint64_t VariadicArgs = 0ULL; VariadicArgs < NumDependents; VariadicArgs++) {
+							VariadicDependentArguments[VariadicArgs] = va_arg(DependentArguments, uint64_t);
+						}
+						va_end(DependentArguments);
 						for (uint64_t DependentParam = 0ULL; DependentParam < NumDependents; DependentParam++) {
-							/*
-							 Well, we need to loop over the Dependent arguments submitted here, as well as the dependents in the struct.
-							 */
-							// So, just check if CLI->Arguments[Argument].DependentArgument[DependentArg].Switch == Dependents[DependentParam]
-							if (CLI->Arguments[Argument].Dependent->SwitchNum == Dependents[DependentParam]) {
+							if (CLI->Arguments[Argument].Dependent->SwitchNum == VariadicDependentArguments[DependentParam]) {
 								MatchingArgumentNum = Argument;
 							}
 						}
+						free(VariadicDependentArguments);
 					}
 				} else {
 					MatchingArgumentNum = Argument;
