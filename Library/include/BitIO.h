@@ -214,7 +214,7 @@ extern "C" {
 	/*!
 	 @abstract									"Closes the GlobalLogFile".
 	 */
-	void				DeinitBitIOGlobalLogFile(void);
+	void				BitIOGlobalLogFileDeinit(void);
 	
 	/*!
 	 @abstract									"Integer Power function".
@@ -780,7 +780,7 @@ extern "C" {
 	/*!
 	 @abstract									"Frees a BinaryGUUID aka BinaryGUID/BinaryUUID or GUUIDString, aka GUIDString/UUIDString".
 	 */
-	void				DeinitGUUID(uint8_t *GUUID);
+	void				GUUIDDeinit(uint8_t *GUUID);
 	
 	/*!
 	 @abstract									"Tells if the stream/buffer is byte aligned or not".

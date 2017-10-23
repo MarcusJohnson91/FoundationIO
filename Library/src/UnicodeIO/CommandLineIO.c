@@ -86,15 +86,15 @@ extern "C" {
 		CommandLineArgument *Arguments;
 	};
 	
-	CommandLineIO *InitCommandLineIO(const uint64_t NumSwitches) {
+	CommandLineIO *CommandLineIOInit(const uint64_t NumSwitches) {
 		CommandLineIO *CLI = calloc(1, sizeof(CommandLineIO));
 		if (CLI == NULL) {
-			Log(LOG_ERR, "libBitIO", "InitCommandLineIO", "Not enough memory to allocate CommandLineIO");
+			Log(LOG_ERR, "libBitIO", "CommandLineIOInit", "Not enough memory to allocate CommandLineIO");
 		} else {
 			CLI->NumSwitches          = NumSwitches;
 			CLI->Switches             = calloc(NumSwitches, sizeof(CommandLineSwitch));
 			if (CLI->Switches == NULL) {
-				Log(LOG_ERR, "libBitIO", "InitCommandLineIO", "Not enough memory to allocate CommandLineSwitch, NumSwitches = %d", NumSwitches);
+				Log(LOG_ERR, "libBitIO", "CommandLineIOInit", "Not enough memory to allocate CommandLineSwitch, NumSwitches = %d", NumSwitches);
 			}
 		}
 		return CLI;
@@ -515,9 +515,9 @@ extern "C" {
 		return ArgumentResult;
 	}
 	
-	void DeinitCommandLineIO(CommandLineIO *CLI) {
+	void CommandLineIODeinit(CommandLineIO *CLI) {
 		if (CLI == NULL) {
-			Log(LOG_ERR, "libBitIO", "DeinitCommandLineIO", "Pointer to CommandLineIO is NULL");
+			Log(LOG_ERR, "libBitIO", "CommandLineIODeinit", "Pointer to CommandLineIO is NULL");
 		} else {
 			for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
 				free(CLI->Switches[Switch].SwitchFlag);

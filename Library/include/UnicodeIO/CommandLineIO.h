@@ -31,7 +31,7 @@ extern "C" {
 	 @return                                        "Returns a pointer to an initialized CommandLineIO instance".
 	 @param               NumSwitches               "The number of CommandLineSwitch structures to initalize".
 	 */
-	CommandLineIO        *InitCommandLineIO(const uint64_t NumSwitches);
+	CommandLineIO        *CommandLineIOInit(const uint64_t NumSwitches);
 	
 	/*!
 	 @abstract                                      "Sets the name of the program".
@@ -188,7 +188,7 @@ extern "C" {
 	 @abstract                                      "Deallocates the instance of CommandLineIO pointed to by CLI".
 	 @param               CLI                       "Pointer to the instance of CommandLineIO you want to delete".
 	 */
-	void                  DeinitCommandLineIO(CommandLineIO *CLI);
+	void                  CommandLineIODeinit(CommandLineIO *CLI);
 	
 #ifdef __cplusplus
 }

@@ -112,7 +112,7 @@ extern "C" {
 		}
 	}
 	
-	void DeinitBitIOGlobalLogFile(void) {
+	void BitIOGlobalLogFileDeinit(void) {
 		fclose(BitIOGlobalLogFile);
 	}
 	
@@ -1156,7 +1156,7 @@ extern "C" {
 		}
 	}
 	
-	void DeinitGUUID(uint8_t *GUUID) {
+	void GUUIDDeinit(uint8_t *GUUID) {
 		free(GUUID);
 	}
 	
