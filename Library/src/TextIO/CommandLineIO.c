@@ -29,18 +29,23 @@ extern "C" {
 		uint64_t            *ValidDependents;
 	} CommandLineSwitch;
 	
+	typedef struct DependentArgument {
+		uint64_t SwitchNum;
+	} DependentArgument;
+	
 	/*!
 	 @struct				CommandLineArgument
 	 @abstract											"Contains the data to support a single argument".
 	 @constant				Switch						"Which switch does this argument correspond to"?
 	 @constant				NumDependentArguments		"How many Dependent arguments were found in this argument?".
-	 @constant				DependentArguments			"Array of Dependent argument numbers, to look up in CLI->Switches".
+	 @constant				Dependent					"Array of Dependent argument numbers, to look up in CLI->Switches".
 	 @constant				ArgumentResult				"If there is a path or other result expected for this switch's argument, it'll be here".
 	 */
 	typedef struct CommandLineArgument {
 		uint64_t             Switch;
 		uint64_t             NumDependentArguments;
-		uint64_t            *DependentArguments;
+		DependentArgument   *Dependent;
+		//uint64_t            *DependentArguments;
 		char                *ArgumentResult;
 	} CommandLineArgument;
 	
@@ -329,7 +334,7 @@ extern "C" {
 										if (CLI->Switches[Switch + DependentSwitch].SwitchFlagSize == PotentialDependentArgSize) {
 											if (strcasecmp(PotentialDependentArgument, CLI->Switches[Switch + DependentSwitch].SwitchFlag) == 0) {
 												CLI->Arguments[Argument].NumDependentArguments += 1;
-												CLI->Arguments[Argument].DependentArguments[DependentSwitch] = Switch + DependentSwitch; // FIXME: Is this right?
+												CLI->Arguments[Argument].Dependent[DependentSwitch].SwitchNum = Switch + DependentSwitch; // FIXME: Is this right?
 											}
 										}
 									}
@@ -343,7 +348,6 @@ extern "C" {
 		}
 	}
 	
-	/*
 	uint64_t GetCLINumArgsMatchingSwitch(CommandLineIO const *CLI, const uint64_t IndependentSwitch, const uint64_t NumDependents, const uint64_t *DependentSwitches) {
 		uint64_t SwitchContainingMetaArg = 0xFFFFFFFFFFFFFFFFULL;
 		if (CLI == NULL) {
@@ -356,13 +360,13 @@ extern "C" {
 			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
 				for (uint64_t DependentArgument = 0ULL; DependentArgument < CLI->Arguments[Argument].NumDependentArguments; DependentArgument++) {
 					const char *ArgumentSwitch = ConvertArgument2SwitchFlag(CLI->Arguments[Argument].Switch);
-					if (CLI->Arguments[Argument].Switch == CLI->Switches[Argument]) {
-						
+					if (CLI->Arguments[Argument].Switch == CLI->Switches[Argument].IsIndependentSwitch) {
 						
 					}
 				}
 			}
 		}
+		return NULL;
 	}
 	
 	uint64_t GetCLIDependentSwitchArgument(CommandLineIO const *CLI, const uint64_t IndependentSwitch, const uint64_t DependentSwitch) {
@@ -376,7 +380,7 @@ extern "C" {
 		} else {
 			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
 				for (uint64_t DependentArg = 0ULL; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
-					if (CLI->Arguments[Argument].DependentArguments[DependentArg] == DependentSwitch && CLI->Arguments[Argument].SwitchNum == IndependentSwitch) {
+					if (CLI->Arguments[Argument].Dependent[DependentArg].SwitchNum == DependentSwitch && CLI->Arguments[Argument].Switch == IndependentSwitch) {
 						SwitchContainingMetaArg = Argument;
 					}
 				}
@@ -400,11 +404,6 @@ extern "C" {
 			}
 		}
 		return FoundArgument;
-	}
-	
-	uint64_t GetCLIArgumentNumFromSwitches(CommandLineIO const *CLI, const uint64_t IndependentSwitch, const uint64_t NumDependentSwitches, const uint64_t *DependentSwitch) {
-		
-		return 0ULL;
 	}
 	
 	char *GetCLIArgumentResult(CommandLineIO const *CLI, const uint64_t Argument) {
@@ -436,19 +435,70 @@ extern "C" {
 		return FoundArgument;
 	}
 	
+	uint64_t GetCLINumArgumentsWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, const uint64_t *Dependents) {
+		/*
+		 So, We need to go through all of the arguments, and see which argument is composed of Independent switch with the right number of dependent switches.
+		 */
+		uint64_t NumMatchingArguments = 0ULL;
+		for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
+			if (CLI->Arguments[Argument].Switch == Independent) {
+				if (NumDependents > 0 && CLI->Arguments[Argument].NumDependentArguments > 0) { // Check the dependencies
+					for (uint64_t DependentArg = 0ULL; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
+						for (uint64_t DependentParam = 0ULL; DependentParam < NumDependents; DependentParam++) {
+							/*
+							 Well, we need to loop over the Dependent arguments submitted here, as well as the dependents in the struct.
+							 */
+							// So, just check if CLI->Arguments[Argument].DependentArgument[DependentArg].Switch == Dependents[DependentParam]
+							if (CLI->Arguments[Argument].Dependent->SwitchNum == Dependents[DependentParam]) {
+								NumMatchingArguments += 1;
+							}
+						}
+					}
+				} else { // There are no dependencies
+					NumMatchingArguments += 1;
+				}
+			}
+		}
+		return NumMatchingArguments;
+	}
+	
+	uint64_t GetCLIArgumentNumWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, const uint64_t *Dependents) {
+		uint64_t MatchingArgumentNum = 0ULL;
+		for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
+			if (CLI->Arguments[Argument].Switch == Independent) {
+				if (NumDependents > 0 && CLI->Arguments[Argument].NumDependentArguments > 0) { // Check the dependencies
+					for (uint64_t DependentArg = 0ULL; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
+						for (uint64_t DependentParam = 0ULL; DependentParam < NumDependents; DependentParam++) {
+							/*
+							 Well, we need to loop over the Dependent arguments submitted here, as well as the dependents in the struct.
+							 */
+							// So, just check if CLI->Arguments[Argument].DependentArgument[DependentArg].Switch == Dependents[DependentParam]
+							if (CLI->Arguments[Argument].Dependent->SwitchNum == Dependents[DependentParam]) {
+								MatchingArgumentNum = Argument;
+							}
+						}
+					}
+				} else {
+					MatchingArgumentNum = Argument;
+				}
+			}
+		}
+		return MatchingArgumentNum;
+	}
+	
 	char *GetCLIArgumentResultFromIndependentDependentSwitch(CommandLineIO const *CLI, const uint64_t Independent, const uint64_t Dependent) {
 		// We need to find adjacent arguments that contain both the Independent and Dependent switches.
 		char *ArgumentResult = NULL;
 		for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
 			for (uint64_t DependentArg = 0; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
-				if (CLI->Arguments[Argument].DependentSwitches[DependentArg]) {
-					<#statements#>
+				if (CLI->Arguments[Argument].Dependent[DependentArg].SwitchNum) {
+					
 				}
 				
 				if (CLI->Arguments[Argument].Switch == Independent && CLI->Arguments[Argument].NumDependentArguments >= 1) { // If there are Dependent arguments, look further into it.
-					if (CLI->Arguments[Argument].DependentArguments[DependentArg] == Dependent) {
+					if (CLI->Arguments[Argument].Dependent[DependentArg].SwitchNum == Dependent) {
 						// Found A argument that contains both, but what if there are multiple?
-						uint64_t DependentArgResult = CLI->Arguments[Argument].DependentArguments[DependentArg];
+						uint64_t DependentArgResult = CLI->Arguments[Argument].Dependent[DependentArg].SwitchNum;
 						ArgumentResult = CLI->Arguments[DependentArgResult].ArgumentResult;
 					}
 				}
@@ -456,7 +506,6 @@ extern "C" {
 		}
 		return ArgumentResult;
 	}
-	 */
 	
 	void DeinitCommandLineIO(CommandLineIO *CLI) {
 		if (CLI == NULL) {
@@ -468,7 +517,7 @@ extern "C" {
 				free(CLI->Switches[Switch].ValidDependents);
 			}
 			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-				free(CLI->Arguments[Argument].DependentArguments);
+				free(CLI->Arguments[Argument].Dependent);
 				free(CLI->Arguments[Argument].ArgumentResult);
 			}
 			free(CLI->Switches);
