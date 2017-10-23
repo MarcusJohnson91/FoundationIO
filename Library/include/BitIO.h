@@ -176,40 +176,40 @@ extern "C" {
 	 @abstract									"Initializes a BitInput structure".
 	 @return									"Returns a pointer to said BitInput structure".
 	 */
-	BitInput		   *InitBitInput(void);
+	BitInput		   *BitInputInit(void);
 	
 	/*!
 	 @abstract									"Initializes a BitOutput structure".
 	 @return									"Returns a pointer to said BitOutput structure".
 	 */
-	BitOutput		   *InitBitOutput(void);
+	BitOutput		   *BitOutputInit(void);
 	
 	/*!
 	 @abstract									"Initializes a BitBuffer structure".
 	 @param				BitBufferSize			"Number of bytes to create BitBuffer with".
 	 @return									"Returns a pointer to said BitBuffer structure".
 	 */
-	BitBuffer		   *InitBitBuffer(const uint64_t BitBufferSize);
+	BitBuffer		   *BitBufferInit(const uint64_t BitBufferSize);
 	
 	/*!
 	 @abstract									"Deallocates BitInput".
 	 @remark									"For use when changing files, or exiting the program".
 	 @param				BitI					"Pointer to the instance of BitInput you want to delete".
 	 */
-	void				DeinitBitInput(BitInput *BitI);
+	void				BitInputDeinit(BitInput *BitI);
 	
 	/*!
 	 @abstract									"Deallocates the instance of BitOutput pointed to by BitI".
 	 @remark									"For use when changing files, or exiting the program".
 	 @param				BitO					"Pointer to the instance of BitOutput you want to delete".
 	 */
-	void				DeinitBitOutput(BitOutput *BitO);
+	void				BitOutputDeinit(BitOutput *BitO);
 	
 	/*!
 	 @abstract									"Deallocates the instance of BitBuffer pointed to by BitB".
 	 @param				BitB					"Pointer to the instance of BitBuffer you want to delete".
 	 */
-	void				DeinitBitBuffer(BitBuffer *BitB);
+	void				BitBufferDeinit(BitBuffer *BitB);
 	
 	/*!
 	 @abstract									"Closes the GlobalLogFile".
