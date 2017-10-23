@@ -420,11 +420,13 @@ extern "C" {
 		uint8_t  UserRequestedBits = Bits2Extract;
 		uint8_t  FinalByte         = 0;
 		uint8_t  Times2Shift       = 0;
+		uint8_t  Data              = 0;
 		
 		while (UserRequestedBits > 0) {
 			uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
-			uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Get);
+			Data                   = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Get);
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+			// Ok, so the byte and bit order is the same, so we need to just loop over the bits normally.
 			OutputData           <<= Bits2Get;
 			OutputData            += Data;
 #elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
@@ -451,18 +453,24 @@ extern "C" {
 	static inline uint64_t ExtractBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Extract) { // So the bits are in MSByte, MSBit format.
 		uint64_t OutputData        = 0ULL;
 		uint8_t  UserRequestedBits = Bits2Extract;
+		uint8_t  FinalByte         = 0;
+		uint8_t  Times2Shift       = 0;
+		uint8_t  Data              = 0;
 		
 		while (UserRequestedBits > 0) {
 			uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
-			uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskMSBit(Bits2Get);
+			Data                   = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskMSBit(Bits2Get);
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
 			OutputData            &= (0xFF << (Bits2Extract - Bits2Get)); // Byte Shift
-			uint8_t FinalByte      = SwapBits(Data);
+			Data                   = SwapBits(Data);
 #elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
 			OutputData             & (0xFF << (Bits2Extract - Bits2Get)); // Byte Shift
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-			uint8_t FinalByte      = SwapBits(Data);
+			Data                   = SwapBits(Data);
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
+			//Just extract
+			OutputData           >>= Bits2Get;
+			OutputData            += Data;
 #endif
 			OutputData           >>= BitB->BitOffset - Bits2Get;
 			OutputData            += Data;
