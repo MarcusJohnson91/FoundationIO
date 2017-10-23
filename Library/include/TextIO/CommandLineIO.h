@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #pragma once
 
@@ -163,12 +164,16 @@ extern "C" {
 	/*!
 	 @abstract										"Gets the number of Arguments in CLI that contain an Independent switch with all Dependents specified".
 	 */
-	uint64_t              GetCLINumArgumentsWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, const uint64_t *Dependents);
+	uint64_t              GetCLINumArgumentsWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, ...);
 	
 	/*!
 	 @abstract										"Returns the argument number that matches all the switches in the parameters".
+	 @param               CLI                       "Pointer to CommandLineIO".
+	 @param               Independent               "The Independent switch to look for".
+	 @param               NumDependents				"MUST start at 1".
+	 @param               ...						"A variable list of dependent arguments to check, all must be present to count".
 	 */
-	uint64_t              GetCLIArgumentNumWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, const uint64_t *Dependents);
+	uint64_t              GetCLIArgumentNumWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, ...);
 	
 	/*!
 	 @abstract                                      "Extracts the path of the argument that contains both the parent and child switch, lazily evaluated".
