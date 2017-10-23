@@ -47,36 +47,36 @@ extern "C" {
 		uint64_t           FileSpecifierNum;
 	};
 	
-	BitInput *InitBitInput(void) {
+	BitInput *BitInputInit(void) {
 		BitInput *BitI = calloc(1, sizeof(BitInput));
 		if (BitI == NULL) {
-			Log(LOG_ERR, "libBitIO", "InitBitInput", "Not enough memory to allocate this instance of BitInput");
+			Log(LOG_ERR, "libBitIO", "BitInputInit", "Not enough memory to allocate this instance of BitInput");
 		}
 		return BitI;
 	}
 	
-	BitOutput *InitBitOutput(void) {
+	BitOutput *BitOutputInit(void) {
 		BitOutput *BitO = calloc(1, sizeof(BitOutput));
 		if (BitO == NULL) {
-			Log(LOG_ERR, "libBitIO", "InitBitOutput", "Not enough memory to allocate this instance of BitOutput");
+			Log(LOG_ERR, "libBitIO", "BitOutputInit", "Not enough memory to allocate this instance of BitOutput");
 		}
 		return BitO;
 	}
 	
-	BitBuffer *InitBitBuffer(const uint64_t BitBufferSize) {
+	BitBuffer *BitBufferInit(const uint64_t BitBufferSize) {
 		BitBuffer *BitB  = calloc(1, sizeof(BitBuffer));
 		if (BitB != NULL) {
 			BitB->Buffer = calloc(1, BitBufferSize);
 			if (BitB->Buffer == NULL) {
-				Log(LOG_ERR, "libBitIO", "InitBitBuffer", "Not enough memory to allocate %d bits for BitBuffer's buffer", BitBufferSize);
+				Log(LOG_ERR, "libBitIO", "BitBufferInit", "Not enough memory to allocate %d bits for BitBuffer's buffer", BitBufferSize);
 			}
 		} else {
-			Log(LOG_ERR, "libBitIO", "InitBitBuffer", "Not enough memory to allocate this instance of BitBuffer");
+			Log(LOG_ERR, "libBitIO", "BitBufferInit", "Not enough memory to allocate this instance of BitBuffer");
 		}
 		return BitB;
 	}
 	
-	void DeinitBitInput(BitInput *BitI) {
+	void BitInputDeinit(BitInput *BitI) {
 		if (BitI != NULL) {
 			if (BitI->SourceType == BitIOFile) {
 				fclose(BitI->File);
@@ -85,11 +85,11 @@ extern "C" {
 			}
 			free(BitI);
 		} else {
-			Log(LOG_ERR, "libBitIO", "DeinitBitInput", "Pointer to BitInput is NULL");
+			Log(LOG_ERR, "libBitIO", "BitInputDeinit", "Pointer to BitInput is NULL");
 		}
 	}
 	
-	void DeinitBitOutput(BitOutput *BitO) {
+	void BitOutputDeinit(BitOutput *BitO) {
 		if (BitO != NULL) {
 			fflush(BitO->File);
 			if (BitO->DrainType == BitIOFile) {
@@ -99,13 +99,13 @@ extern "C" {
 			}
 			free(BitO);
 		} else {
-			Log(LOG_ERR, "libBitIO", "DeinitBitOutput", "Pointer to BitOutput is NULL");
+			Log(LOG_ERR, "libBitIO", "BitOutputDeinit", "Pointer to BitOutput is NULL");
 		}
 	}
 	
-	void DeinitBitBuffer(BitBuffer *BitB) {
+	void BitBufferDeinit(BitBuffer *BitB) {
 		if (BitB == NULL) {
-			Log(LOG_ERR, "libBitIO", "DeinitBitBuffer", "Pointer to BitBuffer is NULL");
+			Log(LOG_ERR, "libBitIO", "BitBufferDeinit", "Pointer to BitBuffer is NULL");
 		} else {
 			free(BitB->Buffer);
 			free(BitB);
