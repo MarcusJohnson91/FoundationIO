@@ -84,7 +84,7 @@ extern "C" {
 	 @param               CLI                       "Pointer to CommandLineIO".
 	 @param               MinSwitches               "The minimum number of switches".
 	 */
-	void                  SetCLIMinSwitches(CommandLineIO *CLI, const uint64_t MinSwitches);
+	void                  SetCLIMinArguments(CommandLineIO *CLI, const uint64_t MinArguments);
 	
 	/*!
 	 @abstract                                      "Sets SwitchNum's flag in the CommandLineIO instance pointed by CLI".

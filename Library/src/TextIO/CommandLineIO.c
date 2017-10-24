@@ -70,7 +70,7 @@ extern "C" {
 	 */
 	struct CommandLineIO {
 		uint64_t             NumSwitches;
-		uint64_t             MinSwitches;
+		uint64_t             MinArguments;
 		uint64_t             NumArguments;
 		uint64_t             HelpSwitch;
 		bool                 IsProprietary;
@@ -169,11 +169,11 @@ extern "C" {
 		}
 	}
 	
-	void SetCLIMinSwitches(CommandLineIO *CLI, const uint64_t MinSwitches) {
+	void SetCLIMinArguments(CommandLineIO *CLI, const uint64_t MinArguments) {
 		if (CLI == NULL) {
-			Log(LOG_ERR, "libBitIO", "SetCLIMinSwitches", "Pointer to CommandLineIO is NULL");
+			Log(LOG_ERR, "libBitIO", "SetCLIMinArguments", "Pointer to CommandLineIO is NULL");
 		} else {
-			CLI->MinSwitches = MinSwitches;
+			CLI->MinArguments = MinArguments;
 		}
 	}
 	
@@ -316,9 +316,7 @@ extern "C" {
 	void ParseCommandLineArguments(CommandLineIO *CLI, const int argc, const char *argv[]) {
 		if (CLI == NULL) {
 			Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineIO is NULL");
-		} else if (argc < CLI->MinSwitches || strncasecmp(ConvertArgumentString2SwitchFlag(argv[1]), CLI->Switches[CLI->HelpSwitch].SwitchFlag, CLI->Switches[CLI->HelpSwitch].SwitchFlagSize) == 0) {
-			
-			DisplayProgramBanner(CLI);
+		} else if (argc < (int) CLI->MinSwitches || strncasecmp(ConvertArgumentString2SwitchFlag(argv[1]), CLI->Switches[CLI->HelpSwitch].SwitchFlag, CLI->Switches[CLI->HelpSwitch].SwitchFlagSize) == 0) {
 			DisplayCLIHelp(CLI);
 		} else {
 			DisplayProgramBanner(CLI);
