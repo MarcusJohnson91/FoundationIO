@@ -18,10 +18,6 @@
 extern "C" {
 #endif
 	
-#ifdef _WIN32
-#define strcasecmp _stricmp
-#endif
-	
 	static FILE           *BitIOGlobalLogFile = NULL;
 	
 	struct                 BitBuffer {
