@@ -177,6 +177,16 @@ extern "C" {
 		}
 	}
 	
+	void SetCLIHelpSwitch(CommandLineIO *CLI, const uint64_t HelpSwitch) {
+		if (CLI == NULL) {
+			Log(LOG_ERR, "libBitIO", "SetCLIHelpSwitch", "Pointer to CommandLineIO is NULL");
+		} else if (HelpSwitch > CLI->NumSwitches) {
+			Log(LOG_ERR, "libBitIO", "SetCLIHelpSwitch", "HelpSwitch %d is too high, there are only %d switches", HelpSwitch, CLI->NumSwitches);
+		} else {
+			CLI->HelpSwitch = HelpSwitch;
+		}
+	}
+	
 	void SetCLISwitchFlag(CommandLineIO *CLI, const uint64_t SwitchNum, char *Flag) {
 		if (CLI == NULL) {
 			Log(LOG_ERR, "libBitIO", "SetCLISwitchFlag", "Pointer to CommandLineIO is NULL");
@@ -199,16 +209,6 @@ extern "C" {
 			Log(LOG_ERR, "libBitIO", "SetCLISwitchDescription", "Pointer to switch Description is NULL");
 		} else {
 			CLI->Switches[SwitchNum].SwitchDescription = Description;
-		}
-	}
-	
-	void SetCLIHelpSwitch(CommandLineIO *CLI, const uint64_t HelpSwitch) {
-		if (CLI == NULL) {
-			Log(LOG_ERR, "libBitIO", "SetCLIHelpSwitch", "Pointer to CommandLineIO is NULL");
-		} else if (HelpSwitch > CLI->NumSwitches) {
-			Log(LOG_ERR, "libBitIO", "SetCLIHelpSwitch", "HelpSwitch %d is too high, there are only %d switches", HelpSwitch, CLI->NumSwitches);
-		} else {
-			CLI->HelpSwitch = HelpSwitch;
 		}
 	}
 	
@@ -254,7 +254,7 @@ extern "C" {
 		if (CLI == NULL) {
 			Log(LOG_ERR, "libBitIO", "DisplayCLIHelp", "Pointer to CommandLineIO is NULL");
 		} else {
-			printf("%s Options: (-|--|/)", CLI->ProgramName);
+			printf("%s Options: (-|--|/)\n", CLI->ProgramName);
 			for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
 				if (CLI->Switches[Switch].IsIndependentSwitch == true) {
 					printf("%s: %s", CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchDescription);
@@ -271,7 +271,7 @@ extern "C" {
 			Log(LOG_ERR, "libBitIO", "DisplayProgramBanner", "Pointer to CommandLineIO is NULL");
 		} else {
 			if (CLI->ProgramName != NULL) {
-				printf("%s ", CLI->ProgramName);
+				printf("%s \n", CLI->ProgramName);
 			} else if (CLI->ProgramVersion != NULL) {
 				printf("version %s", CLI->ProgramVersion);
 			} else if (CLI->ProgramAuthor != NULL) {
@@ -284,6 +284,8 @@ extern "C" {
 				printf(", Released under the \"%s\" license: %s, available at: %s", CLI->ProgramLicenseName, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL);
 			} else if (CLI->IsProprietary == false && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL) {
 				printf(", By using this software, you agree to the End User License Agreement %s, available at: %s", CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL);
+			} else {
+				printf("\n");
 			}
 		}
 	}
