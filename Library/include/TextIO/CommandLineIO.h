@@ -104,10 +104,10 @@ extern "C" {
 	/*!
 	 @abstract                                      "Sets MetaFlag switch as a meta flag for switch SwitchNum".
 	 @param               CLI                       "Pointer to CommandLineIO".
-	 @param               Master                    "Which switch does the child/meta switch depend on?".
+	 @param               Independent               "Which switch does the child/meta switch depend on?".
 	 @param               Dependent                 "Which switch is the child switch?".
 	 */
-	void                  SetCLISwitchAsDependent(CommandLineIO *CLI, const uint64_t Master, const uint64_t Dependent);
+	void                  SetCLISwitchAsDependent(CommandLineIO *CLI, const uint64_t Independent, const uint64_t Dependent);
 	
 	/*!
 	 @abstract                                      "Sets SwitchNum's flag in the CommandLineIO instance pointed by CLI".
