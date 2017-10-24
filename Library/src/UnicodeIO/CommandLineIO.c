@@ -53,7 +53,7 @@ extern "C" {
 	 @struct				CommandLineIO
 	 @abstract											"Contains all the information, and relationships between switches on the command line".
 	 @constant				NumSwitches					"How many switches are there?".
-	 @constant				MinSwitches					"The minimum number of switches to accept without dumping the help".
+	 @constant				MinArguments				"The minimum number of switches to accept without dumping the help".
 	 @constant				NumArguments				"The number of arguments present in argv, after extracting any Dependent switches".
 	 @constant				HelpSwitch					"Which switch displays the help"?
 	 @constant				Switches					"Pointer to an array of switches".
@@ -316,7 +316,7 @@ extern "C" {
 	void ParseCommandLineArguments(CommandLineIO *CLI, const int argc, const char *argv[]) {
 		if (CLI == NULL) {
 			Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineIO is NULL");
-		} else if (argc < (int) CLI->MinSwitches || strncasecmp(ConvertArgumentString2SwitchFlag(argv[1]), CLI->Switches[CLI->HelpSwitch].SwitchFlag, CLI->Switches[CLI->HelpSwitch].SwitchFlagSize) == 0) {
+		} else if (argc < (int) CLI->MinArguments || strncasecmp(ConvertArgumentString2SwitchFlag(argv[1]), CLI->Switches[CLI->HelpSwitch].SwitchFlag, CLI->Switches[CLI->HelpSwitch].SwitchFlagSize) == 0) {
 			DisplayCLIHelp(CLI);
 		} else {
 			DisplayProgramBanner(CLI);
