@@ -246,7 +246,7 @@ extern "C" {
 				CLI->Switches[Independent].ValidDependents = realloc(CLI->Switches[Independent].ValidDependents, DependentSwitchesSize);
 			}
 			uint64_t CurrentDependentSwitch = CLI->Switches[Independent].NumDependentSwitches;
-			CLI->Switches[Independent].ValidDependents[CurrentDependentSwitch] = Dependent;
+			CLI->Switches[Independent].ValidDependents[CLI->Switches[Independent].NumDependentSwitches - 1] = Dependent;
 		}
 	}
 	
