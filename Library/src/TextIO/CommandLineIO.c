@@ -2,7 +2,7 @@
 #include "../include/CommandLineIO.h"
 
 #ifdef _WIN32
-#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
 #endif
 
 #ifdef __cplusplus
@@ -314,7 +314,8 @@ extern "C" {
 	void ParseCommandLineArguments(CommandLineIO *CLI, const int argc, const char *argv[]) {
 		if (CLI == NULL) {
 			Log(LOG_ERR, "libBitIO", "ParseCommandLineArguments", "Pointer to CommandLineIO is NULL");
-		} else if (argc <= 1 || (argc < (int) CLI->MinSwitches && CLI->MinSwitches > 1) || argv == NULL || strcasecmp(argv[1], CLI->Switches[CLI->NumSwitches].SwitchFlag)) {
+		} else if (argc < CLI->MinSwitches || strncasecmp(ConvertArgumentString2SwitchFlag(argv[1]), CLI->Switches[CLI->HelpSwitch].SwitchFlag, CLI->Switches[CLI->HelpSwitch].SwitchFlagSize) == 0) {
+			
 			DisplayProgramBanner(CLI);
 			DisplayCLIHelp(CLI);
 		} else {
@@ -326,13 +327,13 @@ extern "C" {
 					uint64_t ArgvStringSize = strlen(ArgvString);
 					for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
 						if (CLI->Switches[Switch].SwitchFlagSize == ArgvStringSize) {
-							if (strcasecmp(ArgvString, CLI->Switches[Switch].SwitchFlag) == 0) {
+							if (strncasecmp(ArgvString, CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchFlagSize) == 0) {
 								if (CLI->Switches[Switch].IsIndependentSwitch == true) {
 									for (uint64_t DependentSwitch = 0ULL; DependentSwitch < CLI->Switches[Switch].NumDependentSwitches; DependentSwitch++) {
 										char *PotentialDependentArgument   = ConvertArgumentString2SwitchFlag(argv[ArgvArg + DependentSwitch]);
 										uint64_t PotentialDependentArgSize = strlen(PotentialDependentArgument);
 										if (CLI->Switches[Switch + DependentSwitch].SwitchFlagSize == PotentialDependentArgSize) {
-											if (strcasecmp(PotentialDependentArgument, CLI->Switches[Switch + DependentSwitch].SwitchFlag) == 0) {
+											if (strncasecmp(PotentialDependentArgument, CLI->Switches[Switch + DependentSwitch].SwitchFlag, CLI->Switches[Switch + DependentSwitch].SwitchFlagSize) == 0) {
 												CLI->Arguments[Argument].NumDependentArguments += 1;
 												CLI->Arguments[Argument].Dependent[DependentSwitch].SwitchNum = Switch + DependentSwitch; // FIXME: Is this right?
 											}
