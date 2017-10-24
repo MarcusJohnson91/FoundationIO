@@ -359,7 +359,7 @@ extern "C" {
 		} else {
 			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
 				for (uint64_t DependentArgument = 0ULL; DependentArgument < CLI->Arguments[Argument].NumDependentArguments; DependentArgument++) {
-					const char *ArgumentSwitch = ConvertArgument2SwitchFlag(CLI->Arguments[Argument].Switch);
+					const char *ArgumentSwitch = ConvertArgumentString2SwitchFlag(CLI->Arguments[Argument].Switch);
 					if (CLI->Arguments[Argument].Switch == CLI->Switches[Argument].IsIndependentSwitch) {
 						
 					}
