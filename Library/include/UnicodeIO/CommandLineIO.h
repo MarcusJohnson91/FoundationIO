@@ -82,7 +82,7 @@ extern "C" {
 	/*!
 	 @abstract                                      "What is the minimum number of switches your program needs to operate?".
 	 @param               CLI                       "Pointer to CommandLineIO".
-	 @param               MinSwitches               "The minimum number of switches".
+	 @param               MinArguments              "The minimum number of switches".
 	 */
 	void                  SetCLIMinArguments(CommandLineIO *CLI, const uint64_t MinArguments);
 	
