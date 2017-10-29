@@ -149,7 +149,7 @@ extern "C" {
 	
 	inline int64_t Bits2Bytes(const int64_t Bits, const bool RoundUp) {
 		int64_t Bytes = 0ULL;
-		if (RoundUp == false) {
+		if (RoundUp == No) {
 			Bytes = Bits / 8;
 		} else {
 			Bytes = (Bits / 8) + (8 - (Bits % 8));
@@ -673,7 +673,7 @@ extern "C" {
 	
 	uint64_t ReadUnaryAsLSByteLSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit) {
 		uint64_t Value = 0ULL;
-		if (IsTruncated == true) {
+		if (IsTruncated == Yes) {
 			Value += 1;
 		}
 		while (ExtractBitsAsLSByteLSBit(BitB, 1) != StopBit) {
@@ -684,7 +684,7 @@ extern "C" {
 	
 	uint64_t ReadUnaryAsLSByteMSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit) {
 		uint64_t Value = 0ULL;
-		if (IsTruncated == true) {
+		if (IsTruncated == Yes) {
 			Value += 1;
 		}
 		while (ExtractBitsAsLSByteMSBit(BitB, 1) != StopBit) {
@@ -695,7 +695,7 @@ extern "C" {
 	
 	uint64_t ReadUnaryAsMSByteLSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit) {
 		uint64_t Value = 0ULL;
-		if (IsTruncated == true) {
+		if (IsTruncated == Yes) {
 			Value += 1;
 		}
 		while (ExtractBitsAsMSByteLSBit(BitB, 1) != StopBit) {
@@ -706,7 +706,7 @@ extern "C" {
 	
 	uint64_t ReadUnaryAsMSByteMSBit(BitBuffer *BitB, const bool IsZeroAvailable, const bool IsTruncated, const bool StopBit) {
 		uint64_t Value = 0ULL;
-		if (IsTruncated == true) {
+		if (IsTruncated == Yes) {
 			Value += 1;
 		}
 		while (ExtractBitsAsMSByteMSBit(BitB, 1) != StopBit) {
@@ -721,10 +721,10 @@ extern "C" {
 		if (BitB == NULL) {
 			Log(LOG_ERR, "libBitIO", "WriteUnaryAsLSByteLSBit", "Pointer to BitBuffer is NULL");
 		} else {
-			if (IsTruncated == true) {
+			if (IsTruncated == Yes) {
 				UnaryBits2Write -= 1;
 			}
-			if (IsZeroAvailable == true) {
+			if (IsZeroAvailable == Yes) {
 				Field2Write += 1;
 			}
 			while (Field2Write > 0) {
@@ -741,10 +741,10 @@ extern "C" {
 		if (BitB == NULL) {
 			Log(LOG_ERR, "libBitIO", "WriteUnaryAsLSByteLSBit", "Pointer to BitBuffer is NULL");
 		} else {
-			if (IsTruncated == true) {
+			if (IsTruncated == Yes) {
 				UnaryBits2Write -= 1;
 			}
-			if (IsZeroAvailable == true) {
+			if (IsZeroAvailable == Yes) {
 				Field2Write += 1;
 			}
 			while (Field2Write > 0) {
@@ -761,10 +761,10 @@ extern "C" {
 		if (BitB == NULL) {
 			Log(LOG_ERR, "libBitIO", "WriteUnaryAsLSByteLSBit", "Pointer to BitBuffer is NULL");
 		} else {
-			if (IsTruncated == true) {
+			if (IsTruncated == Yes) {
 				UnaryBits2Write -= 1;
 			}
-			if (IsZeroAvailable == true) {
+			if (IsZeroAvailable == Yes) {
 				Field2Write += 1;
 			}
 			while (Field2Write > 0) {
@@ -782,10 +782,10 @@ extern "C" {
 		if (BitB == NULL) {
 			Log(LOG_ERR, "libBitIO", "WriteUnaryAsLSByteLSBit", "Pointer to BitBuffer is NULL");
 		} else {
-			if (IsTruncated == true) {
+			if (IsTruncated == Yes) {
 				UnaryBits2Write -= 1;
 			}
-			if (IsZeroAvailable == true) {
+			if (IsZeroAvailable == Yes) {
 				Field2Write += 1;
 			}
 			while (Field2Write > 0) {
@@ -798,7 +798,7 @@ extern "C" {
 	
 	uint64_t ReadExpGolombAsLSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit) {
 		uint64_t Value = 0ULL;
-		if (IsSigned == false) {
+		if (IsSigned == No) {
 			uint64_t Bits2Read = ReadUnaryAsLSByteLSBit(BitB, Yes, Yes, StopBit);
 			Value              = ExtractBitsAsLSByteLSBit(BitB, Bits2Read);
 		} else {
@@ -808,7 +808,7 @@ extern "C" {
 	
 	uint64_t ReadExpGolombAsLSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit) {
 		uint64_t Value = 0ULL;
-		if (IsSigned == false) {
+		if (IsSigned == No) {
 			uint64_t Bits2Read = ReadUnaryAsLSByteMSBit(BitB, Yes, Yes, StopBit);
 			Value              = ExtractBitsAsLSByteMSBit(BitB, Bits2Read);
 		} else {
@@ -818,7 +818,7 @@ extern "C" {
 	
 	uint64_t ReadExpGolombAsMSByteLSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit) {
 		uint64_t Value = 0ULL;
-		if (IsSigned == false) {
+		if (IsSigned == No) {
 			uint64_t Bits2Read = ReadUnaryAsMSByteLSBit(BitB, Yes, Yes, StopBit);
 			Value              = ExtractBitsAsMSByteLSBit(BitB, Bits2Read);
 		} else {
@@ -828,7 +828,7 @@ extern "C" {
 	
 	uint64_t ReadExpGolombAsMSByteMSBit(BitBuffer *BitB, const bool IsSigned, const bool StopBit) {
 		uint64_t Value = 0ULL;
-		if (IsSigned == false) {
+		if (IsSigned == No) {
 			uint64_t Bits2Read = ReadUnaryAsMSByteMSBit(BitB, Yes, Yes, StopBit);
 			Value              = ExtractBitsAsMSByteMSBit(BitB, Bits2Read);
 		} else {
@@ -840,7 +840,7 @@ extern "C" {
 		uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
 		WriteUnaryAsLSByteLSBit(BitB, Yes, Yes, StopBit, Field2Write);
 		InsertBitsAsLSByteLSBit(BitB, 1, StopBit);
-		if (IsSigned == false) {
+		if (IsSigned == No) {
 			InsertBitsAsLSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
 		} else {
 			if (Field2Write < 0) { // Negative
@@ -854,7 +854,7 @@ extern "C" {
 		uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
 		WriteUnaryAsLSByteMSBit(BitB, Yes, Yes, StopBit, Field2Write);
 		InsertBitsAsLSByteMSBit(BitB, 1, StopBit);
-		if (IsSigned == false) {
+		if (IsSigned == No) {
 			InsertBitsAsLSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
 		} else {
 			if (Field2Write < 0) { // Negative
@@ -868,7 +868,7 @@ extern "C" {
 		uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
 		WriteUnaryAsMSByteLSBit(BitB, Yes, Yes, StopBit, Field2Write);
 		InsertBitsAsMSByteLSBit(BitB, 1, StopBit);
-		if (IsSigned == false) {
+		if (IsSigned == No) {
 			InsertBitsAsMSByteLSBit(BitB, NumBits2Write + 1, Field2Write + 1);
 		} else {
 			if (Field2Write < 0) { // Negative
@@ -882,7 +882,7 @@ extern "C" {
 		uint64_t NumBits2Write = NumBits2StoreSymbol(Field2Write);
 		WriteUnaryAsMSByteMSBit(BitB, Yes, Yes, StopBit, Field2Write);
 		InsertBitsAsMSByteMSBit(BitB, 1, StopBit);
-		if (IsSigned == false) {
+		if (IsSigned == No) {
 			InsertBitsAsMSByteMSBit(BitB, NumBits2Write + 1, Field2Write + 1);
 		} else {
 			if (Field2Write < 0) { // Negative
