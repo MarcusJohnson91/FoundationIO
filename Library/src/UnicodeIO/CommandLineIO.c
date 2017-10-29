@@ -161,7 +161,7 @@ extern "C" {
 			CLI->ProgramLicenseName        = Name;
 			CLI->ProgramLicenseDescription = LicenseDescription;
 			CLI->ProgramLicenseURL         = LicenseURL;
-			if (IsProprietary == true) {
+			if (IsProprietary == Yes) {
 				CLI->IsProprietary         = true;
 			} else {
 				CLI->IsProprietary         = false;
@@ -256,7 +256,7 @@ extern "C" {
 		} else {
 			printf("%s Options: (-|--|/)\n", CLI->ProgramName);
 			for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
-				if (CLI->Switches[Switch].IsIndependentSwitch == true) {
+				if (CLI->Switches[Switch].IsIndependentSwitch == Yes) {
 					printf("%s: %s", CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchDescription);
 					for (uint64_t DependentSwitch = 0ULL; DependentSwitch < CLI->Switches[Switch].NumDependentSwitches; DependentSwitch++) {
 						printf("\t%s: %s", CLI->Switches[DependentSwitch].SwitchFlag, CLI->Switches[DependentSwitch].SwitchDescription);
@@ -280,9 +280,9 @@ extern "C" {
 				printf(" © %s", CLI->ProgramCopyright);
 			} else if (CLI->ProgramDescription != NULL) {
 				printf(": %s", CLI->ProgramDescription);
-			} else if (CLI->IsProprietary == true && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL) {
+			} else if (CLI->IsProprietary == Yes && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL) {
 				printf(", Released under the \"%s\" license: %s, available at: %s", CLI->ProgramLicenseName, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL);
-			} else if (CLI->IsProprietary == false && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL) {
+			} else if (CLI->IsProprietary == No && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL) {
 				printf(", By using this software, you agree to the End User License Agreement %s, available at: %s", CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL);
 			} else {
 				printf("\n");
@@ -328,7 +328,7 @@ extern "C" {
 					for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
 						if (CLI->Switches[Switch].SwitchFlagSize == ArgvStringSize) {
 							if (strncasecmp(ArgvString, CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchFlagSize) == 0) {
-								if (CLI->Switches[Switch].IsIndependentSwitch == true) {
+								if (CLI->Switches[Switch].IsIndependentSwitch == Yes) {
 									for (uint64_t DependentSwitch = 0ULL; DependentSwitch < CLI->Switches[Switch].NumDependentSwitches; DependentSwitch++) {
 										char *PotentialDependentArgument   = ConvertArgumentString2SwitchFlag(argv[ArgvArg + DependentSwitch]);
 										uint64_t PotentialDependentArgSize = strlen(PotentialDependentArgument);
