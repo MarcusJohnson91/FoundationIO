@@ -18,30 +18,30 @@
 extern "C" {
 #endif
 	
-	static FILE           *BitIOGlobalLogFile = NULL;
+	static FILE              *BitIOGlobalLogFile = NULL;
 	
-	struct                 BitBuffer {
-		uint64_t           NumBits;
-		uint64_t           BitOffset;
-		uint8_t           *Buffer;
-	};
+	typedef struct BitBuffer {
+		uint64_t              NumBits;
+		uint64_t              BitOffset;
+		uint8_t              *Buffer;
+	} BitBuffer;
 	
-	struct BitInput {
-		uint8_t            SourceType;
-		FILE              *File;
-		int                Socket;
-		fpos_t             FileSize;
-		fpos_t             FilePosition;
-		uint64_t           FileSpecifierNum;
-	};
+	typedef struct BitInput {
+		BitIOSourceDrainTypes SourceType;
+		FILE                 *File;
+		int                   Socket;
+		fpos_t                FileSize;
+		fpos_t                FilePosition;
+		uint64_t              FileSpecifierNum;
+	} BitInput;
 	
-	struct BitOutput {
-		uint8_t            DrainType;
-		FILE              *File;
-		int                Socket;
-		fpos_t             FilePosition;
-		uint64_t           FileSpecifierNum;
-	};
+	typedef struct BitOutput {
+		BitIOSourceDrainTypes DrainType;
+		FILE                 *File;
+		int                   Socket;
+		fpos_t                FilePosition;
+		uint64_t              FileSpecifierNum;
+	} BitOutput;
 	
 	BitInput *BitInputInit(void) {
 		BitInput *BitI = calloc(1, sizeof(BitInput));
@@ -1248,32 +1248,24 @@ extern "C" {
 		}
 	}
 	
-	void Log(const uint8_t ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...) {
-		static const char *ErrorCodePrefix = NULL;
-		if (ErrorSeverity == LOG_EMERG) {
-			ErrorCodePrefix  = "EMERGENCY!";
-		} else if (ErrorSeverity == LOG_ALERT) {
-			ErrorCodePrefix  = "ALERT!";
-		} else if (ErrorSeverity == LOG_CRIT) {
-			ErrorCodePrefix  = "CRITICAL!";
-		} else if (ErrorSeverity == LOG_ERR) {
-			ErrorCodePrefix  = "ERROR!";
-		} else if (ErrorSeverity == LOG_WARNING) {
-			ErrorCodePrefix  = "WARNING";
-		} else if (ErrorSeverity == LOG_NOTICE) {
-			ErrorCodePrefix  = "NOTICE";
-		} else if (ErrorSeverity == LOG_INFO) {
-			ErrorCodePrefix  = "INFORMATION";
-		} else if (ErrorSeverity == LOG_DEBUG) {
-			ErrorCodePrefix  = "DEBUG";
-		} else {
-			ErrorCodePrefix  = "UNKNOWN!";
+	void Log(BitIOLogTypes ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...) {
+		static const char *ErrorCodeString = NULL;
+	  	uint8_t ErrorCodeStringSize        = 0;
+		if (ErrorSeverity == LOG_INFORMATION) {
+			ErrorCodeString     = "INFORMATION";
+			ErrorCodeStringSize = 11;
+		} else if (ErrorSeverity == LOG_ERROR) {
+			ErrorCodeString     = "ERROR";
+			ErrorCodeStringSize = 5;
+		} else if (ErrorSeverity == LOG_EMERGENCY) {
+			ErrorCodeString     = "EMERGENCY";
+			ErrorCodeStringSize = 9;
 		}
 		
-		int   EasyStringSize = strlen(ErrorCodePrefix) + strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + BitIOStringNULLSize;
+		int   EasyStringSize = ErrorCodeStringSize + strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + BitIOStringNULLSize;
 		char *EasyString     = calloc(1, EasyStringSize);
 		
-		snprintf(EasyString, EasyStringSize, "%s: %s - %s", ErrorCodePrefix, FunctionName, Description);
+		snprintf(EasyString, EasyStringSize, "%s: %s - %s", ErrorCodeString, FunctionName, Description);
 		
 		va_list Arguments;
 		va_start(Arguments, Description);
