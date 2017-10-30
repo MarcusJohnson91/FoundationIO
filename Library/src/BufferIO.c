@@ -1248,7 +1248,7 @@ extern "C" {
 		}
 	}
 	
-	void Log(BitIOLogTypes ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...) {
+	void BitIOLog(BitIOLogTypes ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...) {
 		static const char *ErrorCodeString = NULL;
 	  	uint8_t ErrorCodeStringSize        = 0;
 		if (ErrorSeverity == LOG_INFORMATION) {

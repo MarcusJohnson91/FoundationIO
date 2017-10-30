@@ -17,7 +17,6 @@
 #include <winsock.h>
 #else
 #include <sys/socket.h>
-#include <syslog.h>
 #include <unistd.h>
 #endif
 
@@ -810,7 +809,7 @@ extern "C" {
 	 @param				FunctionName		    "Which function is calling Log?".
 	 @param				Description				"String describing what went wrong / error code".
 	 */
-	void				Log(BitIOLogTypes ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...);
+	void				BitIOLog(BitIOLogTypes ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...);
 	
 #ifdef __cplusplus
 }
