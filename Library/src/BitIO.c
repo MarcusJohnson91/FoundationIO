@@ -974,8 +974,15 @@ extern "C" {
 		return BinaryGUID;
 	}
 	
-	bool     CompareGUUIDs(const uint8_t *GUUID1, const uint8_t *GUUID2, const uint8_t GUUIDSize) {
+	bool     CompareGUUIDs(const uint8_t *GUUID1, const uint8_t *GUUID2, BitIOGUUIDType GUUIDType) {
 		bool GUUIDsMatch = true;
+		uint8_t GUUIDSize = 0;
+		if (GUUIDType == BitIOGUUIDString) {
+			GUUIDSize = BitIOGUUIDStringSize - BitIOStringNULLSize;
+		} else if (GUUIDType == BitIOBinaryGUUID) {
+			GUUIDSize = BitIOBinaryGUUIDSize;
+		}
+		
 		for (uint8_t GUUIDByte = 0; GUUIDByte < GUUIDSize; GUUIDByte++) {
 			if (GUUID1[GUUIDByte] != GUUID2[GUUIDByte]) {
 				GUUIDsMatch = false;
@@ -1015,7 +1022,7 @@ extern "C" {
 				BinaryGUUID[15] = GUUIDString[19];
 			}
 		}
-		return NULL;
+		return BinaryGUUID;
 	}
 	
 	uint8_t *ConvertBinaryGUUID2GUUIDString(const uint8_t *BinaryGUUID) {
@@ -1089,7 +1096,7 @@ extern "C" {
 				SwappedGUUIDString[11] = GUUIDString[12];
 				SwappedGUUIDString[12] = GUUIDString[11];
 				
-				for (uint8_t EndBytes = 13; EndBytes < BitIOGUUIDStringSize; EndBytes++) {
+				for (uint8_t EndBytes = 13; EndBytes < BitIOGUUIDStringSize - BitIOStringNULLSize; EndBytes++) {
 					SwappedGUUIDString[EndBytes] = GUUIDString[EndBytes];
 				}
 			}
@@ -1129,13 +1136,13 @@ extern "C" {
 	}
 	
 	void WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString) {
-		for (uint8_t Byte = 0; Byte < BitIOGUUIDStringSize; Byte++) {
+		for (uint8_t Byte = 0; Byte < BitIOGUUIDStringSize - BitIOStringNULLSize; Byte++) {
 			InsertBitsAsMSByteLSBit(BitB, 8, UUIDString[Byte]);
 		}
 	}
 	
 	void WriteGUUIDAsGUIDString(BitBuffer *BitB, const uint8_t *GUIDString) {
-		for (uint8_t Byte = 0; Byte < BitIOGUUIDStringSize; Byte++) {
+		for (uint8_t Byte = 0; Byte < BitIOGUUIDStringSize - BitIOStringNULLSize; Byte++) {
 			InsertBitsAsLSByteLSBit(BitB, 8, GUIDString[Byte]);
 		}
 	}

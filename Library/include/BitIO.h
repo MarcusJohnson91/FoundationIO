@@ -98,10 +98,16 @@ extern "C" {
 	 @constant			BitIOStringNULLSize		"How large is the NULL terminator for a string"?
 	 */
  	enum BitIOConstants {
-						BitIOGUUIDStringSize	= 20,
+						BitIOGUUIDStringSize	= 21,
 						BitIOBinaryGUUIDSize	= 16,
 						BitIOStringNULLSize		=  1,
 	};
+	
+	typedef enum BitIOGUUIDType {
+		BitIOUnknownGUUID = 0,
+		BitIOGUUIDString  = 1,
+		BitIOBinaryGUUID  = 2,
+	} BitIOGUUIDType;
 	
 	/*!
 	 @enum				BitIOSourceDrainTypes
@@ -731,10 +737,10 @@ extern "C" {
 	 @abstract									"Compares GUUIDStrings or BinaryGUUIDs (but not a GUUIDString to a BinaryGUUID) for equilivence".
 	 @param				GUUID1				    "Pointer to GUUIDString or BinaryGUUID to be compared".
 	 @param				GUUID2				    "Pointer to GUUIDString or BinaryGUUID to be compared".
-	 @param				GUUIDSize				"The size of the GUUIDs, either BitIOGUUIDStringSize or BitIOBinaryGUUIDSize"
+	 @param				GUUIDType				"The type of the GUUIDs, either BitIOGUUIDString or BitIOBinaryGUUID"
 	 @return									"Returns whether GUUID1 and GUUID2 match".
 	 */
-	bool				CompareGUUIDs(const uint8_t *GUUID1, const uint8_t *GUUID2, const uint8_t GUUIDSize);
+	bool				CompareGUUIDs(const uint8_t *GUUID1, const uint8_t *GUUID2, BitIOGUUIDType GUUIDType);
 	
 	/*!
 	 @abstract									"Converts a GUID/UUIDString to a BinaryGUID/UUID".
