@@ -119,7 +119,7 @@ extern "C" {
 	 @enum				BitIOLogTypes
 	 @constant			LOG_EMERGENCY			"The system is unusable, the program is quitting (equivalent to panic)".
 	 @constant			LOG_ERROR				"Error condition encountered".
-	 @constant			LOG_INFORMATION			"Informational message logged".
+	 @constant			LOG_INFORMATION			"Information for debugging purposes".
 	 */
 	typedef enum BitIOLogTypes {
 		LOG_INFORMATION			= 1,
@@ -179,6 +179,12 @@ extern "C" {
 	BitBuffer		   *BitBufferInit(const uint64_t BitBufferSize);
 	
 	/*!
+	 @abstract									"Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitIOLogFile".
+	 @param				LogFilePath				"Path to the log file to open/create".
+	 */
+	void				BitIOLogOpenFile(const char *LogFilePath);
+	
+	/*!
 	 @abstract									"Deallocates BitInput".
 	 @remark									"For use when changing files, or exiting the program".
 	 @param				BitI					"Pointer to the instance of BitInput you want to delete".
@@ -199,9 +205,9 @@ extern "C" {
 	void				BitBufferDeinit(BitBuffer *BitB);
 	
 	/*!
-	 @abstract									"Closes the GlobalLogFile".
+	 @abstract									"Closes the BitIOLogFile".
 	 */
-	void				BitIOGlobalLogFileDeinit(void);
+	void				BitIOLogCloseFile(void);
 	
 	/*!
 	 @abstract									"Integer Power function".
@@ -337,12 +343,6 @@ extern "C" {
 	 @param				Path2Open				"Path to the output file to open".
 	 */
 	void				BitOutputOpenFile(BitOutput *BitO, const char *Path2Open);
-	
-	/*!
-	 @abstract									"Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitIOGlobalLogFile".
-	 @param				LogFilePath				"Path to the log file to open/create".
-	 */
-	void				OpenLogFile(const char *LogFilePath);
 	
 	/*!
 	 @abstract									"Opens a socket for reading".
@@ -803,11 +803,11 @@ extern "C" {
 	void				BitBufferWrite2BitOutput(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write); // BitBufferWrite2BitOutput
 	
 	/*!
-	 @abstract									"Logs errors to the user provided log file, or stderr".
-	 @param				ErrorSeverity			"Error message prefixed by SYS in ErrorCodes".
-	 @param				LibraryOrProgram		"Name of the program or library that called this function".
-	 @param				FunctionName		    "Which function is calling Log?".
-	 @param				Description				"String describing what went wrong / error code".
+	 @abstract									"Logs to BitIOLogFile, which can be a user specified path, otherwise it's STDERR".
+	 @param				ErrorSeverity			"Any of the types provided by BitIOLogTypes".
+	 @param				LibraryOrProgram		"Name of the program or library at fault".
+	 @param				FunctionName		    "Which function is calling BitIOLog?".
+	 @param				Description				"String describing what went wrong".
 	 */
 	void				BitIOLog(BitIOLogTypes ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...);
 	
