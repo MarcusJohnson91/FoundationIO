@@ -98,10 +98,10 @@ extern "C" {
 	 @constant			BitIOBinaryGUUIDSize	"Size of a BinaryUUID or BinaryGUID".
 	 @constant			BitIOStringNULLSize		"How large is the NULL terminator for a string"?
 	 */
-	enum BitIOConstants {
-						BitIOGUUIDStringSize	= (20),
-						BitIOBinaryGUUIDSize	= (16),
-						BitIOStringNULLSize		= (1),
+ 	enum BitIOConstants {
+						BitIOGUUIDStringSize	= 20,
+						BitIOBinaryGUUIDSize	= 16,
+						BitIOStringNULLSize		=  1,
 	};
 	
 	/*!
@@ -110,35 +110,23 @@ extern "C" {
 	 @constant			BitIOFile				"This instance of BitInput/BitOutput is connected to a File".
 	 @constant			BitIOSocket				"This instance of BitInput/BitOutput is connected to a Socket".
 	 */
-	enum BitIOSourceDrainTypes {
+	typedef enum BitIOSourceDrainTypes {
 						BitIOUnknownFileType	= 0,
 						BitIOFile				= 1,
 						BitIOSocket				= 2,
-	};
+	} BitIOSourceDrainTypes;
 	
-#ifndef _POSIX_VERSION
 	/*!
 	 @enum				BitIOLogTypes
-	 @constant			LOG_EMERG				"The system is unusable, the program is quitting (equivalent to panic)".
-	 @constant			LOG_ALERT				"Immediate action is required".
-	 @constant			LOG_CRIT				"Critical condition encountered".
-	 @constant			LOG_ERR					"Error condition encountered".
-	 @constant			LOG_WARNING				"Warning condition encountered".
-	 @constant			LOG_NOTICE				"Normal, but important condition encountered".
-	 @constant			LOG_INFO				"Informational message logged".
-	 @constant			LOG_DEBUG				"Testing information logged".
+	 @constant			LOG_EMERGENCY			"The system is unusable, the program is quitting (equivalent to panic)".
+	 @constant			LOG_ERROR				"Error condition encountered".
+	 @constant			LOG_INFORMATION			"Informational message logged".
 	 */
-	enum BitIOLogTypes {
-						LOG_EMERG				= 0,
-						LOG_ALERT				= 1,
-						LOG_CRIT				= 2,
-						LOG_ERR					= 3,
-						LOG_WARNING				= 4,
-						LOG_NOTICE				= 5,
-						LOG_INFO				= 6,
-						LOG_DEBUG				= 7,
-	};
-#endif
+	typedef enum BitIOLogTypes {
+		LOG_INFORMATION			= 1,
+		LOG_ERROR				= 2,
+		LOG_EMERGENCY			= 3,
+	} BitIOLogTypes;
 	
 	/*!
 	 @typedef			BitBuffer
@@ -822,7 +810,7 @@ extern "C" {
 	 @param				FunctionName		    "Which function is calling Log?".
 	 @param				Description				"String describing what went wrong / error code".
 	 */
-	void				Log(const uint8_t ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...);
+	void				Log(BitIOLogTypes ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...);
 	
 #ifdef __cplusplus
 }
