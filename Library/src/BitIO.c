@@ -1180,10 +1180,8 @@ extern "C" {
 				BitIOLog(LOG_ERROR, "libBitIO", "BitBufferReadFromBitInput", "Not enough memory to allocate Buffer in BitBuffer");
 			} else {
 				if (BitI->SourceType == BitIOFile) {
-					// Read from File
 					BytesRead         = fread(BitB->Buffer, 1, Bytes2Read, BitI->File);
 				} else if (BitI->SourceType == BitIOSocket) {
-					// Read from Socket
 					BytesRead         = read(BitI->Socket, BitB->Buffer, Bytes2Read);
 				}
 				if (BytesRead != Bytes2Read && BitI->SourceType == BitIOFile) {
@@ -1202,13 +1200,15 @@ extern "C" {
 		} else if (Buffer2Write == NULL) {
 			BitIOLog(LOG_ERROR, "libBitIO", "BitBufferWrite2BitOutput", "Pointer to BitBuffer is NULL");
 		} else {
+			uint64_t BufferBytes    = Bits2Bytes(Buffer2Write->NumBits, true);
+			uint64_t NumBytes2Write = Bytes2Write > BufferBytes ? Bytes2Write : BufferBytes;
 			if (BitO->DrainType == BitIOFile) {
-				BytesWritten           = fwrite(Buffer2Write->Buffer, 1, Bytes2Write, BitO->File);
+				BytesWritten           = fwrite(Buffer2Write->Buffer, 1, NumBytes2Write, BitO->File);
 			} else if (BitO->DrainType == BitIOSocket) {
-				BytesWritten           = write(BitO->Socket, Buffer2Write->Buffer, Bits2Bytes(Buffer2Write->NumBits, true));
+				BytesWritten           = write(BitO->Socket, Buffer2Write->Buffer, NumBytes2Write);
 			}
-			if (BytesWritten != Bytes2Write) {
-				BitIOLog(LOG_ERROR, "libBitIO", "BitBufferWrite2BitOutput", "Fwrite wrote: %d bytes, but you requested: %d", BytesWritten, Bytes2Write);
+			if (BytesWritten != NumBytes2Write) {
+				BitIOLog(LOG_ERROR, "libBitIO", "BitBufferWrite2BitOutput", "Fwrite wrote: %d bytes, but you requested: %d", BytesWritten, NumBytes2Write);
 			} else {
 				Buffer2Write->NumBits -= Bytes2Bits(BytesWritten);
 			}
