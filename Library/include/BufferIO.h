@@ -738,7 +738,7 @@ extern "C" {
 	 @param				GUUID1				    "Pointer to GUUIDString or BinaryGUUID to be compared".
 	 @param				GUUID2				    "Pointer to GUUIDString or BinaryGUUID to be compared".
 	 @param				GUUIDType				"The type of the GUUIDs, either BitIOGUUIDString or BitIOBinaryGUUID"
-	 @return									"Returns whether GUUID1 and GUUID2 match".
+	 @return									"Returns Yes if GUUID1 and GUUID2 match, No otherwise".
 	 */
 	bool				CompareGUUIDs(const uint8_t *GUUID1, const uint8_t *GUUID2, BitIOGUUIDType GUUIDType);
 	

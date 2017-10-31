@@ -22,7 +22,7 @@ Here's a tl;dr of my license:
 Compiling:
 =========
 * libBitIO alone won't do a whole lot for you, it's real use is in being a library other libraries rely on.
-* The makefile by defaults builds the library as a static library, for RELEASE, to change this set `BUILDTYPE` to `DEBUG`.
+* The makefile by default builds the library as a static library, for RELEASE, to change this set `BUILDTYPE` to `DEBUG`.
 * BitIO is included as a submodule in git, so you don't need to install it if you're using one of my libraries, ModernPNG, ModernFLAC, ModernAVC, etc.
 * On my Mac for AMD64, the libBitIO static library is about 200kb, if that's too big for your use, enable link time optimization on your program to trim unused functions.
 *  **Microsoft** has decided to not support C11's `_Generic` preprocessor keyword, so you can't directly use the `ReadBits`/`PeekBits`/`ReadUnary`/`ReadExpGolomb`/`ReadGUUID`/`WriteBits`/`WriteUnary`/`WriteExpGolomb`/`WriteGUUID` macros, I've chosen to rely on this preprocessor keyword to ensure that there is minimal branching during runtime, to gain performance on accelerators like GPUs.
@@ -66,9 +66,9 @@ BitIO:
 
 Logging:
 -------
-`Log()`
+`BitIOLog()`
 
-* Writes to a file you set as `BitIOGlobalLogFile`, if it's unset or otherwise inaccessible, all logs are printed to stderr.
+* Writes to a file you open with `BitIOLogOpenFile`, if it's unset or otherwise inaccessible, all logs are printed to stderr.
 * Works on any platform that provides `stderr`, and `vsprintf`.
 
 GUUIDs:
@@ -85,7 +85,7 @@ GUUIDs:
 
 `WriteGUUID`: Writes a GUUID of GUUIDType from a pointer into the BitBuffer.
 
-`CompareGUUIDs`: Compares GUUIDs of the same GUUIDType to each other.
+`CompareGUUIDs`: Compares GUUIDs of the same GUUIDType to each other
 
 `ConvertGUUIDString2BinaryGUUID`: Converts a GUUIDString to a BinaryGUUID (without swapping).
 
@@ -100,4 +100,3 @@ GUUIDs:
 TODO:
 -----
 * Write a WriteArray2BitBuffer and ReadBitBuffer2Array functions, that way I could theoretically at least use SIMD operations on the data.
-
