@@ -185,6 +185,12 @@ extern "C" {
 	char                 *GetCLIArgumentResultFromParentChildSwitch(CommandLineIO const *CLI, const uint64_t ParentSwitch, const uint64_t ChildSwitch);
 	
 	/*!
+	 @abstract										"Returns the extension from Path as a string".
+	 @param               Path						"The string to work on".
+	 */
+	char                 *GetExtensionFromPath(const char *Path);
+	
+	/*!
 	 @abstract                                      "Deallocates the instance of CommandLineIO pointed to by CLI".
 	 @param               CLI                       "Pointer to the instance of CommandLineIO you want to delete".
 	 */
