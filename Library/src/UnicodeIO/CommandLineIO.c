@@ -516,7 +516,7 @@ extern "C" {
 		return ArgumentResult;
 	}
 	
-	char *GetExtensionFromPath(const char *Path) {
+	char *GetExtensionFromPath(const char *Path) { // Do not include the seperator aka period.
 		uint64_t PathSize        = strlen(Path);
 		uint64_t ExtensionOffset = 0ULL; // From the end
 		uint64_t ExtensionSize   = PathSize - ExtensionOffset;
