@@ -302,7 +302,7 @@ extern "C" {
 			Bytes2RemoveFromArg = 1;
 		}
 		uint64_t ArgumentSwitchSize = (ArgumentStringSize - Bytes2RemoveFromArg) + BitIOStringNULLSize;
-		ArgumentSwitch = calloc(1, ArgumentSwitchSize * sizeof(uint8_t));
+		ArgumentSwitch = calloc(1, ArgumentSwitchSize * sizeof(char));
 		if (ArgumentSwitch == NULL) {
 			BitIOLog(LOG_ERROR, "libBitIO", "ConvertArgumentString2SwitchFlag", "Not enough memory to allocate ArgumentSwitch which needs %ulld bytes of memory", ArgumentSwitchSize);
 		} else {
@@ -447,7 +447,7 @@ extern "C" {
 					for (uint64_t DependentArg = 0ULL; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
 						va_list DependentArguments;
 						va_start(DependentArguments, NumDependents);
-						uint64_t *VariadicDependentArguments = calloc(1, NumDependents * sizeof(uint8_t));
+						uint64_t *VariadicDependentArguments = calloc(1, NumDependents * sizeof(uint64_t));
 						for (uint64_t VariadicArgs = 0ULL; VariadicArgs < NumDependents; VariadicArgs++) {
 							VariadicDependentArguments[VariadicArgs] = va_arg(DependentArguments, uint64_t);
 						}
@@ -475,7 +475,7 @@ extern "C" {
 					for (uint64_t DependentArg = 0ULL; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
 						va_list DependentArguments;
 						va_start(DependentArguments, NumDependents);
-						uint64_t *VariadicDependentArguments = calloc(1, NumDependents * sizeof(uint8_t));
+						uint64_t *VariadicDependentArguments = calloc(1, NumDependents * sizeof(uint64_t));
 						for (uint64_t VariadicArgs = 0ULL; VariadicArgs < NumDependents; VariadicArgs++) {
 							VariadicDependentArguments[VariadicArgs] = va_arg(DependentArguments, uint64_t);
 						}
@@ -525,7 +525,7 @@ extern "C" {
 				ExtensionOffset += 1;
 			}
 		}
-		char *ExtensionString    = calloc(1, ExtensionSize + BitIOStringNULLSize);
+		char *ExtensionString    = calloc(1, (ExtensionSize + BitIOStringNULLSize) * sizeof(char));
 		if (ExtensionString == NULL) {
 			BitIOLog(LOG_ERROR, "CommandLineIO", "GetExtensionFromPath", "Couldn't allocate %lld bytes for the Extension String", ExtensionSize);
 		} else {
