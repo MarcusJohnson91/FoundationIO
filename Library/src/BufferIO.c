@@ -61,7 +61,7 @@ extern "C" {
 	BitBuffer *BitBufferInit(const uint64_t BitBufferSize) {
 		BitBuffer *BitB  = calloc(1, sizeof(BitBuffer));
 		if (BitB != NULL) {
-			BitB->Buffer = calloc(1, BitBufferSize);
+			BitB->Buffer = calloc(1, BitBufferSize * sizeof(uint8_t));
 			if (BitB->Buffer == NULL) {
 				BitIOLog(LOG_ERROR, "libBitIO", "BitBufferInit", "Not enough memory to allocate %d bits for BitBuffer's buffer", BitBufferSize);
 			}
@@ -288,7 +288,7 @@ extern "C" {
 		} else {
 			BitI->SourceType        = BitIOFile;
 			uint64_t Path2OpenSize  = strlen(Path2Open) + BitIOStringNULLSize;
-			char *NewPath           = calloc(1, Path2OpenSize);
+			char *NewPath           = calloc(1, Path2OpenSize * sizeof(uint8_t));
 			snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
 			BitI->FileSpecifierNum += 1;
 			BitI->File = fopen(Path2Open, "rb");
@@ -309,7 +309,7 @@ extern "C" {
 		} else {
 			BitO->DrainType         = BitIOFile;
 			uint64_t Path2OpenSize  = strlen(Path2Open) + BitIOStringNULLSize;
-			char *NewPath           = calloc(1, Path2OpenSize);
+			char *NewPath           = calloc(1, Path2OpenSize * sizeof(uint8_t));
 			snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
 			BitO->FileSpecifierNum += 1;
 			BitO->File = fopen(Path2Open, "wb");
@@ -897,7 +897,7 @@ extern "C" {
 		if (BitB == NULL) {
 			BitIOLog(LOG_ERROR, "libBitIO", "ReadGUUIDAsUUIDString", "Pointer to BitBuffer is NULL");
 		} else {
-			UUIDString           = calloc(1, BitIOGUUIDStringSize);
+			UUIDString           = calloc(1, BitIOGUUIDStringSize * sizeof(uint8_t));
 			if (UUIDString == NULL) {
 				BitIOLog(LOG_ERROR, "libBitIO", "ReadGUUIDAsUUIDString", "Not enough memory to allocate UUIDString");
 			} else {
@@ -921,7 +921,7 @@ extern "C" {
 		if (BitB == NULL) {
 			BitIOLog(LOG_ERROR, "libBitIO", "ReadGUUIDAsGUIDString", "Pointer to BitBuffer is NULL");
 		} else {
-			GUIDString           = calloc(1, BitIOGUUIDStringSize);
+			GUIDString           = calloc(1, BitIOGUUIDStringSize * sizeof(uint8_t));
 			if (GUIDString == NULL) {
 				BitIOLog(LOG_ERROR, "libBitIO", "ReadGUUIDAsGUIDString", "Not enough memory to allocate GUIDString");
 			} else {
@@ -945,7 +945,7 @@ extern "C" {
 		if (BitB == NULL) {
 			BitIOLog(LOG_ERROR, "libBitIO", "ReadGUUIDAsBinaryUUID", "Pointer to BitBuffer is NULL");
 		} else {
-			BinaryUUID       = calloc(1, BitIOBinaryGUUIDSize);
+			BinaryUUID       = calloc(1, BitIOBinaryGUUIDSize * sizeof(uint8_t));
 			if (BinaryUUID == NULL) {
 				BitIOLog(LOG_ERROR, "libBitIO", "ReadGUUIDAsBinaryUUID", "Not enough memory to allocate BinaryUUID");
 			} else {
@@ -962,7 +962,7 @@ extern "C" {
 		if (BitB == NULL) {
 			BitIOLog(LOG_ERROR, "libBitIO", "ReadGUUIDAsBinaryGUID", "Pointer to BitBuffer is NULL");
 		} else {
-			BinaryGUID      = calloc(1, BitIOBinaryGUUIDSize);
+			BinaryGUID      = calloc(1, BitIOBinaryGUUIDSize * sizeof(uint8_t));
 			if (BinaryGUID == NULL) {
 				BitIOLog(LOG_ERROR, "libBitIO", "ReadGUUIDAsBinaryGUID", "Not enough memory to allocate BinaryGUID");
 			} else {
@@ -996,7 +996,7 @@ extern "C" {
 		if (GUUIDString == NULL) {
 			BitIOLog(LOG_ERROR, "libBitIO", "ConvertGUUIDString2BinaryGUUID", "Pointer to GUUIDString is NULL");
 		} else {
-			BinaryGUUID = calloc(1, BitIOBinaryGUUIDSize);
+			BinaryGUUID = calloc(1, BitIOBinaryGUUIDSize * sizeof(uint8_t));
 			if (BinaryGUUID == NULL) {
 				BitIOLog(LOG_ERROR, "libBitIO", "ConvertGUUIDString2BinaryGUUID", "Not enough memory to allocate BinaryGUUID");
 			} else {
@@ -1030,9 +1030,9 @@ extern "C" {
 		if (BinaryGUUID == NULL) {
 			BitIOLog(LOG_ERROR, "libBitIO", "ConvertBinaryGUUID2GUUIDString", "Pointer to BinaryGUUID is NULL");
 		} else {
-			GUUIDString        = calloc(1, BitIOGUUIDStringSize);
+			GUUIDString        = calloc(1, BitIOGUUIDStringSize * sizeof(uint8_t));
 			if (GUUIDString == NULL) {
-				BitIOLog(LOG_ERROR, "libBitIO", "ConvertBinaryGUUID2GUUIDString", "Not enough memory to calloc %d bytes", BitIOGUUIDStringSize);
+				BitIOLog(LOG_ERROR, "libBitIO", "ConvertBinaryGUUID2GUUIDString", "Not enough memory to allocate %d bytes", BitIOGUUIDStringSize);
 			} else {
 				GUUIDString[0] = BinaryGUUID[0];
 				GUUIDString[1] = BinaryGUUID[1];
@@ -1072,9 +1072,9 @@ extern "C" {
 		if (GUUIDString == NULL) {
 			BitIOLog(LOG_ERROR, "libBitIO", "SwapGUUIDString", "Pointer to GUUIDString is NULL");
 		} else {
-			SwappedGUUIDString         = calloc(1, BitIOGUUIDStringSize);
+			SwappedGUUIDString         = calloc(1, BitIOGUUIDStringSize * sizeof(uint8_t));
 			if (SwappedGUUIDString == NULL) {
-				BitIOLog(LOG_ERROR, "libBitIO", "SwapGUUIDString", "Not enough memory to calloc %d bytes", BitIOGUUIDStringSize);
+				BitIOLog(LOG_ERROR, "libBitIO", "SwapGUUIDString", "Not enough memory to allocate %d bytes", BitIOGUUIDStringSize);
 			} else {
 				SwappedGUUIDString[0]  = GUUIDString[3];
 				SwappedGUUIDString[1]  = GUUIDString[2];
@@ -1109,9 +1109,9 @@ extern "C" {
 		if (BinaryGUUID == NULL) {
 			BitIOLog(LOG_ERROR, "libBitIO", "SwapBinaryGUUID", "Pointer to BinaryGUUID is NULL");
 		} else {
-			SwappedBinaryGUUID        = calloc(1, BitIOBinaryGUUIDSize);
+			SwappedBinaryGUUID        = calloc(1, BitIOBinaryGUUIDSize * sizeof(uint8_t));
 			if (SwappedBinaryGUUID == NULL) {
-				BitIOLog(LOG_ERROR, "libBitIO", "SwapBinaryGUUID", "Not enough memory to calloc %d bytes", BitIOBinaryGUUIDSize);
+				BitIOLog(LOG_ERROR, "libBitIO", "SwapBinaryGUUID", "Not enough memory to allocate %d bytes", BitIOBinaryGUUIDSize);
 			} else {
 				SwappedBinaryGUUID[0] = BinaryGUUID[3];
 				SwappedBinaryGUUID[1] = BinaryGUUID[2];
@@ -1175,7 +1175,7 @@ extern "C" {
 			if (BitB->Buffer != NULL) {
 				free(BitB->Buffer);
 			}
-			BitB->Buffer              = calloc(1, Bytes2Read);
+			BitB->Buffer              = calloc(1, Bytes2Read * sizeof(uint8_t));
 			if (BitB->Buffer == NULL) {
 				BitIOLog(LOG_ERROR, "libBitIO", "BitBufferReadFromBitInput", "Not enough memory to allocate Buffer in BitBuffer");
 			} else {
@@ -1270,19 +1270,19 @@ extern "C" {
 		}
 		
 		int   EasyStringSize = ErrorCodeStringSize + strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + BitIOStringNULLSize;
-		char *EasyString     = calloc(1, EasyStringSize);
+		char *EasyString     = calloc(1, EasyStringSize * sizeof(uint8_t));
 		
 		snprintf(EasyString, EasyStringSize, "%s: %s - %s", ErrorCodeString, FunctionName, Description);
 		
 		va_list Arguments;
 		va_start(Arguments, Description);
 		int HardStringSize = vsnprintf(NULL, 0, "%s", Arguments);
-		char *HardString   = calloc(1, HardStringSize);
+		char *HardString   = calloc(1, HardStringSize * sizeof(uint8_t));
 		vsprintf(HardString, "%s", Arguments);
 		va_end(Arguments);
 		
 		uint64_t ErrorStringSize = EasyStringSize + HardStringSize + BitIONewLineSize;
-		char *ErrorString = calloc(1, ErrorStringSize);
+		char *ErrorString = calloc(1, ErrorStringSize * sizeof(uint8_t));
 		snprintf(ErrorString, ErrorStringSize, "%s%s%s", EasyString, HardString, BitIOLineEnding);
 		if (BitIOLogFile == NULL) {
 			fprintf(stderr, "%s", ErrorString);
