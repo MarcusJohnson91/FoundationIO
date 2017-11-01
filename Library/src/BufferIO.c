@@ -288,7 +288,7 @@ extern "C" {
 		} else {
 			BitI->SourceType        = BitIOFile;
 			uint64_t Path2OpenSize  = strlen(Path2Open) + BitIOStringNULLSize;
-			char *NewPath           = calloc(1, Path2OpenSize * sizeof(uint8_t));
+			char *NewPath           = calloc(1, Path2OpenSize * sizeof(char));
 			snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
 			BitI->FileSpecifierNum += 1;
 			BitI->File = fopen(Path2Open, "rb");
@@ -309,7 +309,7 @@ extern "C" {
 		} else {
 			BitO->DrainType         = BitIOFile;
 			uint64_t Path2OpenSize  = strlen(Path2Open) + BitIOStringNULLSize;
-			char *NewPath           = calloc(1, Path2OpenSize * sizeof(uint8_t));
+			char *NewPath           = calloc(1, Path2OpenSize * sizeof(char));
 			snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
 			BitO->FileSpecifierNum += 1;
 			BitO->File = fopen(Path2Open, "wb");
@@ -1270,19 +1270,19 @@ extern "C" {
 		}
 		
 		int   EasyStringSize = ErrorCodeStringSize + strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + BitIOStringNULLSize;
-		char *EasyString     = calloc(1, EasyStringSize * sizeof(uint8_t));
+		char *EasyString     = calloc(1, EasyStringSize * sizeof(char));
 		
 		snprintf(EasyString, EasyStringSize, "%s: %s - %s", ErrorCodeString, FunctionName, Description);
 		
 		va_list Arguments;
 		va_start(Arguments, Description);
 		int HardStringSize = vsnprintf(NULL, 0, "%s", Arguments);
-		char *HardString   = calloc(1, HardStringSize * sizeof(uint8_t));
+		char *HardString   = calloc(1, HardStringSize * sizeof(char));
 		vsprintf(HardString, "%s", Arguments);
 		va_end(Arguments);
 		
 		uint64_t ErrorStringSize = EasyStringSize + HardStringSize + BitIONewLineSize;
-		char *ErrorString = calloc(1, ErrorStringSize * sizeof(uint8_t));
+		char *ErrorString = calloc(1, ErrorStringSize * sizeof(char));
 		snprintf(ErrorString, ErrorStringSize, "%s%s%s", EasyString, HardString, BitIOLineEnding);
 		if (BitIOLogFile == NULL) {
 			fprintf(stderr, "%s", ErrorString);
