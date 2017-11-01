@@ -516,6 +516,26 @@ extern "C" {
 		return ArgumentResult;
 	}
 	
+	char *GetExtensionFromPath(const char *Path) {
+		uint64_t PathSize        = strlen(Path);
+		uint64_t ExtensionOffset = 0ULL; // From the end
+		uint64_t ExtensionSize   = PathSize - ExtensionOffset;
+		for (uint64_t PathByte   = PathSize; PathByte > 0ULL; PathByte--) {
+			if (Path[PathByte]  != 0x2E) { // 0x2E is a period in ASCII
+				ExtensionOffset += 1;
+			}
+		}
+		char *ExtensionString    = calloc(1, sizeof(ExtensionSize) + BitIOStringNULLSize);
+		if (ExtensionString == NULL) {
+			BitIOLog(LOG_ERROR, "CommandLineIO", "GetExtensionFromPath", "Couldn't allocate %lld bytes for the Extension String", ExtensionSize);
+		} else {
+			for (uint64_t ExtensionByte = ExtensionOffset; ExtensionByte < PathSize; ExtensionByte++) {
+				ExtensionString[ExtensionByte] = Path[ExtensionByte];
+			}
+		}
+		return ExtensionString;
+	}
+	
 	void CommandLineIODeinit(CommandLineIO *CLI) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, "libBitIO", "CommandLineIODeinit", "Pointer to CommandLineIO is NULL");
