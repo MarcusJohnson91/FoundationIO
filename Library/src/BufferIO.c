@@ -121,7 +121,32 @@ extern "C" {
 		return Value >= 0 ? Value : ~Value + 1;
 	}
 	
-	inline uint8_t SwapNibble(const uint8_t Byte2Swap) {
+	inline uint8_t NumBits2StoreSymbol(uint64_t Symbol) {
+		uint64_t Bits    = 0ULL;
+		if (Symbol == 0) {
+			Bits = 1;
+		} else {
+			while (Symbol > 0) {
+				Bits    += 1;
+				Symbol >>= 1;
+			}
+		}
+		return Bits;
+	}
+	
+	static inline uint8_t CreateBitMaskLSBit(const uint8_t Bits2Extract) {
+		return (uint8_t) Power(2, Bits2Extract) << (8 - Bits2Extract);
+	}
+	
+	static inline uint8_t CreateBitMaskMSBit(const uint8_t Bits2Extract) {
+		return (uint8_t) Power(2, Bits2Extract) >> (8 - Bits2Extract);
+	}
+	
+	inline uint8_t  SwapBits(const uint8_t Byte) {
+		return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
+	}
+	
+	inline uint8_t  SwapNibble(const uint8_t Byte2Swap) {
 		return ((Byte2Swap & 0xF0 >> 4) | (Byte2Swap & 0x0F << 4));
 	}
 	
@@ -154,28 +179,6 @@ extern "C" {
 		return Bytes;
 	}
 	
-	inline uint64_t NumBits2StoreSymbol(const uint64_t Symbol) {
-		uint64_t Bits = 0ULL;
-		uint64_t SymbolCopy = Symbol;
-		if (Symbol == 0) {
-			Bits = 1;
-		} else {
-			while (SymbolCopy > 0) {
-				Bits += 1;
-				SymbolCopy >>= 1;
-			}
-		}
-		return Bits;
-	}
-	
-	static inline uint8_t CreateBitMaskLSBit(const uint8_t Bits2Extract) {
-		return (uint8_t) Power(2, Bits2Extract) << (8 - Bits2Extract);
-	}
-	
-	static inline uint8_t CreateBitMaskMSBit(const uint8_t Bits2Extract) {
-		return (uint8_t) Power(2, Bits2Extract) >> (8 - Bits2Extract);
-	}
-	
 	static inline uint8_t NumBits2ExtractFromByte(const uint64_t BitOffset, const uint8_t Bits2Extract) {
 		uint8_t Bits2ExtractFromThisByte = 0;
 		uint8_t BitsInThisByte           = BitOffset % 8;
@@ -185,10 +188,6 @@ extern "C" {
 			Bits2ExtractFromThisByte = Bits2Extract;
 		}
 		return Bits2ExtractFromThisByte;
-	}
-	
-	inline uint8_t SwapBits(const uint8_t Byte) {
-		return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
 	}
 	
 	inline bool IsOdd(const int64_t Number2Check) {
