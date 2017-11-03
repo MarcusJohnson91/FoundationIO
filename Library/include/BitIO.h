@@ -1,15 +1,29 @@
 /*!
  @header    BitIO.h
  @author    Marcus Johnson
- @copyright 2016 - 2017
- @version   0.6.0
- @brief     This header contains code related to reading and writing files, and utility functions to support that goal.
+ @copyright 2015 - 2017
+ @version   0.9.0
+ @brief     This header contains code related to reading and writing files and sockets, and utility functions to manage those details.
  */
 
-#include <float.h>
-#include <limits.h>
-#include <stdbool.h>
-#include <stdint.h>
+#include <float.h>      /* Included for the double  max/min macros for the _Generic macros */
+#include <limits.h>     /* Included for the integer max/min macros for the _Generic macros */
+#include <math.h>       /* Included for math functions like log2 */
+#include <stdarg.h>     /* Included for variadic argument support macros */
+#include <stdbool.h>    /* Included for bool type */
+#include <stdint.h>     /* Included for u/intX_t types,  */
+#include <stdio.h>      /* Included for FILE type, STD IN/OUT/ERR, SEEK SET/END/CUR macros */
+#include <stdlib.h>     /* Included for EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
+#include <string.h>     /* Included for atoll */
+#ifdef _WIN32
+#include <winsock.h>    /* Included for socket support on Windows */
+#else
+#include <sys/socket.h> /* Included for socket support */
+#include <unistd.h>     /* Included SOLELY for the _POSIX_VERSION macro */
+#endif
+
+#include <math.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,10 +37,10 @@
 #ifndef   BitIOYesNo
 #define   BitIOYesNo
 #ifndef    Yes
-#define    Yes true
+#define    Yes 1
 #endif  /* Yes */
 #ifndef    No
-#define    No false
+#define    No  0
 #endif  /* No */
 #endif /* BitIOYesNo */
 
