@@ -1,15 +1,3 @@
-#include <math.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#ifdef _WIN32
-#include <winsock.h>
-#else
-#include <sys/socket.h>
-#include <unistd.h>
-#endif
-
 #include "../include/BitIO.h"
 #include "../include/Private/Endian.h"
 
