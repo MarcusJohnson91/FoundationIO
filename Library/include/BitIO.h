@@ -239,7 +239,7 @@ extern "C" {
 	
 	/*!
 	 @abstract                                  "Unsigned integer absolute value function".
-	 @remark                                    "The C standard committee fucked up when they decided the abs family of functions should return a signed integer".
+	 @remark                                    "Returning a signed absolute value integer is dumb. REQUIRES two's complement signed representation".
 	 @param				Value					"The value to find the absolute value of".
 	 */
 	uint64_t            Absolute(const int64_t Value);
@@ -296,11 +296,11 @@ extern "C" {
 	
 	/*!
 	 @abstract									"Computes the number of bits required to hold a certain symbol".
-	 @remark									"Rounds up to the next integer number of bits to ensure all symbols can be contained in a single integer".
+	 @remark									"Rounds up to the next integer number of bits to ensure all symbols can be contained in a single integer, This of it as ceil(log2(Symbol))".
 	 @param				Symbol					"The symbol you're looking to store".
 	 @return									"Returns the number of bits required to store a symbol".
 	 */
-	uint64_t     		NumBits2StoreSymbol(const uint64_t Symbol);
+ 	uint8_t				NumBits2StoreSymbol(uint64_t Symbol);
 	
 	/*!
 	 @abstract									"Tells whether Input is even or odd".
