@@ -11,7 +11,7 @@
 #include <math.h>       /* Included for math functions like log2 */
 #include <stdarg.h>     /* Included for variadic argument support macros */
 #include <stdbool.h>    /* Included for bool type */
-#include <stdint.h>     /* Included for u/intX_t types,  */
+#include <stdint.h>     /* Included for u/intX_t types */
 #include <stdio.h>      /* Included for FILE type, STD IN/OUT/ERR, SEEK SET/END/CUR macros */
 #include <stdlib.h>     /* Included for EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
 #include <string.h>     /* Included for atoll */
