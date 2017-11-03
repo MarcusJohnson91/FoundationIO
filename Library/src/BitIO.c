@@ -192,9 +192,9 @@ extern "C" {
 	}
 	
 	inline bool IsOdd(const int64_t Number2Check) {
-		bool X = false;
+		bool X = No;
 		if (Number2Check % 2 == 0) {
-			X = true;
+			X = Yes;
 		}
 		return X;
 	}
@@ -318,9 +318,9 @@ extern "C" {
 			BitIOLog(LOG_ERROR, "libBitIO", "BitBufferIsAligned", "BytesOfAlignment: %d isn't an integer power of 2", BytesOfAlignment);
 		} else {
 			if (Bytes2Bits(BytesOfAlignment) - (8 - (BitB->BitOffset % 8)) == 0) {
-				AlignmentStatus = true;
+				AlignmentStatus = Yes;
 			} else {
-				AlignmentStatus = false;
+				AlignmentStatus = No;
 			}
 		}
 		return AlignmentStatus;
@@ -334,7 +334,7 @@ extern "C" {
 		} else {
 			uint8_t Bits2Align = Bytes2Bits(BytesOfAlignment) - (8 - (BitB->BitOffset % 8));
 			if (Bits2Align + BitB->BitOffset > BitB->NumBits) {
-				BitB->Buffer = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, true));
+				BitB->Buffer = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
 			}
 			BitB->BitOffset   += Bits2Align;
 		}
@@ -345,7 +345,7 @@ extern "C" {
 			BitIOLog(LOG_ERROR, "libBitIO", "BitBufferSkip", "Pointer to BitBuffer is NULL");
 		} else {
 			if (Bits2Skip + BitB->BitOffset > BitB->NumBits) {
-				BitB->Buffer = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Skip, true));
+				BitB->Buffer = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Skip, Yes));
 			}
 			BitB->BitOffset += Bits2Skip;
 		}
@@ -355,7 +355,7 @@ extern "C" {
 		uint8_t Bits = NumBits2Insert;
 		while (Bits > 0) {
 			uint64_t Bits2Put      = NumBits2ExtractFromByte(BitB->BitOffset, Bits);
-			uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Put);
+			uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, No)] & CreateBitMaskLSBit(Bits2Put);
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
 			// Extract as is
 #elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
@@ -408,7 +408,7 @@ extern "C" {
 		
 		while (UserRequestedBits > 0) {
 			uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
-			Data                   = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Get);
+			Data                   = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, No)] & CreateBitMaskLSBit(Bits2Get);
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
 			// Ok, so the byte and bit order is the same, so we need to just loop over the bits normally.
 			OutputData           <<= Bits2Get;
@@ -443,7 +443,7 @@ extern "C" {
 		
 		while (UserRequestedBits > 0) {
 			uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
-			Data                   = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskMSBit(Bits2Get);
+			Data                   = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, No)] & CreateBitMaskMSBit(Bits2Get);
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
 			OutputData            &= (0xFF << (Bits2Extract - Bits2Get)); // Byte Shift
 			Data                   = SwapBits(Data);
@@ -469,7 +469,7 @@ extern "C" {
 		
 		while (UserRequestedBits > 0) {
 			uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
-			uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskMSBit(Bits2Get);
+			uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, No)] & CreateBitMaskMSBit(Bits2Get);
 			
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
 			uint8_t FinalByte      = SwapBits(Data);
@@ -490,7 +490,7 @@ extern "C" {
 		uint8_t  UserRequestedBits = Bits2Extract;
 		while (UserRequestedBits > 0) {
 			uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
-			uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, false)] & CreateBitMaskLSBit(Bits2Get);
+			uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset / 8, No)] & CreateBitMaskLSBit(Bits2Get);
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
 			/*
 			 Extract data from Big Endian MSBit first, to little endian least significant bit first
@@ -963,7 +963,7 @@ extern "C" {
 	}
 	
 	bool     CompareGUUIDs(const uint8_t *GUUID1, const uint8_t *GUUID2, BitIOGUUIDType GUUIDType) {
-		bool GUUIDsMatch = true;
+		bool GUUIDsMatch = Yes;
 		uint8_t GUUIDSize = 0;
 		if (GUUIDType == BitIOGUUIDString) {
 			GUUIDSize = BitIOGUUIDStringSize - BitIOStringNULLSize;
@@ -973,7 +973,7 @@ extern "C" {
 		
 		for (uint8_t GUUIDByte = 0; GUUIDByte < GUUIDSize; GUUIDByte++) {
 			if (GUUID1[GUUIDByte] != GUUID2[GUUIDByte]) {
-				GUUIDsMatch = false;
+				GUUIDsMatch = No;
 			}
 		}
 		return GUUIDsMatch;
@@ -1188,7 +1188,7 @@ extern "C" {
 		} else if (Buffer2Write == NULL) {
 			BitIOLog(LOG_ERROR, "libBitIO", "BitBufferWrite2BitOutput", "Pointer to BitBuffer is NULL");
 		} else {
-			uint64_t BufferBytes    = Bits2Bytes(Buffer2Write->NumBits, true);
+			uint64_t BufferBytes    = Bits2Bytes(Buffer2Write->NumBits, Yes);
 			uint64_t NumBytes2Write = Bytes2Write > BufferBytes ? Bytes2Write : BufferBytes;
 			if (BitO->DrainType == BitIOFile) {
 				BytesWritten           = fwrite(Buffer2Write->Buffer, 1, NumBytes2Write, BitO->File);
