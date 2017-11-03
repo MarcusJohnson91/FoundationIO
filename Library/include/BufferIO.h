@@ -107,20 +107,20 @@ extern "C" {
 	/*!
 	 @enum				BitIOConstants
 	 @abstract									"BitIO compile time constants".
+	 @constant			BitIOStringNULLSize		"How large is the NULL terminator for a string"?
 	 @constant			BitIOGUUIDStringSize	"Size of a UUIDString or GUIDString including dashes, and null terminator".
 	 @constant			BitIOBinaryGUUIDSize	"Size of a BinaryUUID or BinaryGUID".
-	 @constant			BitIOStringNULLSize		"How large is the NULL terminator for a string"?
 	 */
  	enum BitIOConstants {
-						BitIOGUUIDStringSize	= 21,
-						BitIOBinaryGUUIDSize	= 16,
 						BitIOStringNULLSize		=  1,
+						BitIOGUUIDStringSize	= 20 + BitIOStringNULLSize,
+						BitIOBinaryGUUIDSize	= 16,
 	};
 	
 	typedef enum BitIOGUUIDType {
-		BitIOUnknownGUUID = 0,
-		BitIOGUUIDString  = 1,
-		BitIOBinaryGUUID  = 2,
+						BitIOUnknownGUUID		= 0,
+						BitIOGUUIDString		= 1,
+						BitIOBinaryGUUID		= 2,
 	} BitIOGUUIDType;
 	
 	/*!
@@ -142,9 +142,9 @@ extern "C" {
 	 @constant			LOG_INFORMATION			"Information for debugging purposes".
 	 */
 	typedef enum BitIOLogTypes {
-		LOG_INFORMATION			= 1,
-		LOG_ERROR				= 2,
-		LOG_EMERGENCY			= 3,
+						LOG_INFORMATION			= 1,
+						LOG_ERROR				= 2,
+						LOG_EMERGENCY			= 3,
 	} BitIOLogTypes;
 	
 	/*!
