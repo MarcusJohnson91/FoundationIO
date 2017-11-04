@@ -1248,22 +1248,13 @@ extern "C" {
 	
 	void BitIOLog(BitIOLogTypes ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...) {
 		static const char *ErrorCodeString = NULL;
-	  	uint8_t ErrorCodeStringSize        = 0;
 		if (ErrorSeverity == LOG_INFORMATION) {
 			ErrorCodeString     = "INFORMATION";
-			ErrorCodeStringSize = 11;
 		} else if (ErrorSeverity == LOG_ERROR) {
 			ErrorCodeString     = "ERROR";
-			ErrorCodeStringSize = 5;
 		} else if (ErrorSeverity == LOG_EMERGENCY) {
 			ErrorCodeString     = "EMERGENCY";
-			ErrorCodeStringSize = 9;
 		}
-		
-		int   EasyStringSize = ErrorCodeStringSize + strlen(LibraryOrProgram) + strlen(FunctionName) + strlen(Description) + BitIONULLStringSize;
-		char *EasyString     = calloc(1, EasyStringSize * sizeof(char));
-		
-		snprintf(EasyString, EasyStringSize, "%s: %s - %s", ErrorCodeString, FunctionName, Description);
 		
 		va_list Arguments;
 		va_start(Arguments, Description);
@@ -1272,17 +1263,12 @@ extern "C" {
 		vsprintf(HardString, "%s", Arguments);
 		va_end(Arguments);
 		
-		uint64_t ErrorStringSize = EasyStringSize + HardStringSize + BitIONewLineSize + BitIONULLStringSize;
-		char *ErrorString = calloc(1, ErrorStringSize * sizeof(char));
-		snprintf(ErrorString, ErrorStringSize, "%s%s%s", EasyString, HardString, BitIOLineEnding);
 		if (BitIOLogFile == NULL) {
-			fprintf(stderr, "%s", ErrorString);
+			fprintf(stderr, "%s: %s - %s%s%s%s", ErrorCodeString, LibraryOrProgram, FunctionName, Description, HardString, BitIOLineEnding);
 		} else {
-			fprintf(BitIOLogFile, "%s", ErrorString);
+			fprintf(BitIOLogFile, "%s: %s - %s%s%s%s", ErrorCodeString, LibraryOrProgram, FunctionName, Description, HardString, BitIOLineEnding);
 		}
-		free(EasyString);
 		free(HardString);
-		free(ErrorString);
 	}
 	
 #ifdef __cplusplus
