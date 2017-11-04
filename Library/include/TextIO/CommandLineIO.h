@@ -43,9 +43,9 @@ extern "C" {
 	/*!
 	 @abstract                                      "Sets the name of the program".
 	 @param               CLI                       "Pointer to CommandLineIO".
-	 @param               VersionString             "Pointer to a C string contining the version of the program you're building".
+	 @param               Version	                "Pointer to a C string contining the version of the program you're building".
 	 */
-	void                  SetCLIVersion(CommandLineIO *CLI, char *VersionString);
+	void                  SetCLIVersion(CommandLineIO *CLI, char *Version);
 	
 	/*!
 	 @abstract                                      "Sets the description of the program".
