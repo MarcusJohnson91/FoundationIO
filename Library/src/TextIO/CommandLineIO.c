@@ -254,7 +254,7 @@ extern "C" {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else {
-			printf("%s Options: (-|--|/)%s", CLI->ProgramName, BitIOLineEnding);
+			printf("%s Options (-|--|/):%s", CLI->ProgramName, BitIOLineEnding);
 			for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
 				if (CLI->Switches[Switch].IsIndependentSwitch == Yes) {
 					printf("%s: %s%s", CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchDescription, BitIOLineEnding);
