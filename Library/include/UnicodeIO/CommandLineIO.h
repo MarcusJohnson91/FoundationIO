@@ -23,17 +23,17 @@ extern "C" {
 #endif
 	
 	/*!
-	 @typedef             CommandLineIO
-	 @abstract                                     "Contains all the information, and relationships between switches and arguments on the command line".
+	 @typedef				CommandLineIO
+	 @abstract										"Contains all the information, and relationships between switches and arguments on the command line".
 	 */
-	typedef struct        CommandLineIO             CommandLineIO;
+	typedef struct			CommandLineIO			CommandLineIO;
 	
 	/*!
 	 @abstract                                     "Initializes a CommandLineIO instance".
-	 @return                                       "Returns a pointer to an initialized CommandLineIO instance".
 	 @param               NumSwitches              "The number of CommandLineSwitch structures to initalize".
+	 @return                                       "Returns a pointer to an initialized CommandLineIO instance".
 	 */
-	CommandLineIO        *CommandLineIOInit(const uint64_t NumSwitches);
+	CommandLineIO        *CommandLineIO_Init(const uint64_t NumSwitches);
 	
 	/*!
 	 @abstract                                     "Sets the name of the program".
@@ -204,7 +204,7 @@ extern "C" {
 	 @abstract                                      "Deallocates the instance of CommandLineIO pointed to by CLI".
 	 @param               CLI                       "Pointer to the instance of CommandLineIO you want to delete".
 	 */
-	void                  CommandLineIODeinit(CommandLineIO *CLI);
+	void                  CommandLineIO_Deinit(CommandLineIO *CLI);
 	
 #ifdef __cplusplus
 }
