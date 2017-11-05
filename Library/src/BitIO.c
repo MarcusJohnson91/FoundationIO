@@ -1,5 +1,4 @@
 #include "../include/BitIO.h"
-#include "../include/Private/Endian.h"
 
 #ifdef __cplusplus
 extern "C" {
