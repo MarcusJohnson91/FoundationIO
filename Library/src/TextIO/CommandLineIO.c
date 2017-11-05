@@ -86,7 +86,7 @@ extern "C" {
 		CommandLineArgument *Arguments;
 	};
 	
-	CommandLineIO *CommandLineIOInit(const uint64_t NumSwitches) {
+	CommandLineIO *CommandLineIO_Init(const uint64_t NumSwitches) {
 		CommandLineIO *CLI = calloc(1, sizeof(CommandLineIO));
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate CommandLineIO");
@@ -536,7 +536,7 @@ extern "C" {
 		return ExtensionString;
 	}
 	
-	void CommandLineIODeinit(CommandLineIO *CLI) {
+	void CommandLineIO_Deinit(CommandLineIO *CLI) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else {
