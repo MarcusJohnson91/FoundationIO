@@ -1168,31 +1168,31 @@ extern "C" {
 		free(GUUID);
 	}
 	
-	void BitBufferReadFromBitInput(BitInput *BitI, BitBuffer *BitB, const uint64_t Bytes2Read) { // BitBufferUpdateFromBitInput
+	void BitBufferReadFromBitInput(BitInput *BitI, BitBuffer *Buffer2Read, const uint64_t Bytes2Read) { // BitBufferUpdateFromBitInput
 		uint64_t BytesRead            = 0ULL;
 		if (BitI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "BitInput Pointer is NULL");
-		} else if (BitB == NULL) {
+		} else if (Buffer2Read == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
 		} else if (Bytes2Read > (uint64_t)(BitI->FileSize - BitI->FilePosition)) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "You tried reading more data: % than is available: %d in the file", Bytes2Read, BitI->FileSize - BitI->FilePosition);
 		} else {
-			if (BitB->Buffer != NULL) {
-				free(BitB->Buffer);
+			if (Buffer2Read->Buffer != NULL) {
+				free(Buffer2Read->Buffer);
 			}
-			BitB->Buffer              = calloc(1, Bytes2Read * sizeof(uint8_t));
-			if (BitB->Buffer == NULL) {
+			Buffer2Read->Buffer              = calloc(1, Bytes2Read * sizeof(uint8_t));
+			if (Buffer2Read->Buffer == NULL) {
 				BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate Buffer in BitBuffer");
 			} else {
 				if (BitI->SourceType == BitIOFile) {
-					BytesRead         = fread(BitB->Buffer, 1, Bytes2Read, BitI->File);
+					BytesRead         = fread(Buffer2Read->Buffer, 1, Bytes2Read, BitI->File);
 				} else if (BitI->SourceType == BitIOSocket) {
-					BytesRead         = read(BitI->Socket, BitB->Buffer, Bytes2Read);
+					BytesRead         = read(BitI->Socket, Buffer2Read->Buffer, Bytes2Read);
 				}
 				if (BytesRead != Bytes2Read && BitI->SourceType == BitIOFile) {
 					BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Fread read: %d bytes, but you requested: %d", BytesRead, Bytes2Read);
 				} else {
-					BitB->NumBits = Bytes2Bits(BytesRead);
+					Buffer2Read->NumBits = Bytes2Bits(BytesRead);
 				}
 			}
 		}
