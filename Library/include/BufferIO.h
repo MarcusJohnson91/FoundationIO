@@ -8,81 +8,22 @@
 
 #include <float.h>      /* Included for the double  max/min macros for the _Generic macros */
 #include <limits.h>     /* Included for the integer max/min macros for the _Generic macros */
-#include <math.h>       /* Included for math functions like log2 */
-#include <stdarg.h>     /* Included for variadic argument support macros */
-#include <stdbool.h>    /* Included for bool type */
-#include <stdint.h>     /* Included for u/intX_t types */
-#include <stdio.h>      /* Included for FILE type, STD IN/OUT/ERR, SEEK SET/END/CUR macros */
-#include <stdlib.h>     /* Included for EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
-#include <string.h>     /* Included for atoll */
+#include <math.h>       /* Included for the math functions like log2 */
+#include <stdarg.h>     /* Included for the variadic argument support macros */
+#include <stdbool.h>    /* Included for the bool type */
+#include <stdint.h>     /* Included for the u/intX_t types */
+#include <stdio.h>      /* Included for the FILE type, STD IN/OUT/ERR, SEEK SET/END/CUR macros */
+#include <stdlib.h>     /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
+#include <string.h>     /* Included for the atoll */
+
 #ifdef _WIN32
-#include <winsock.h>    /* Included for socket support on Windows */
+#include <winsock.h>    /* Included for the socket support on Windows */
 #else
-#include <sys/socket.h> /* Included for socket support */
+#include <sys/socket.h> /* Included for the socket support */
 #include <unistd.h>     /* Included SOLELY for the _POSIX_VERSION macro */
 #endif
 
-#include <math.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#ifdef _WIN32
-#include <winsock.h>
-#else
-#include <sys/socket.h>
-#include <unistd.h>
-#endif
-
-#ifndef   BitIOYesNo
-#define   BitIOYesNo
-#ifndef    Yes
-#define    Yes 1
-#endif  /* Yes */
-#ifndef    No
-#define    No  0
-#endif  /* No */
-#endif /* BitIOYesNo */
-
-#ifndef    BITIOBYTEBITORDERS
-#define    BITIOBYTEBITORDERS
-#ifndef    BitIOLSByte
-#define    BitIOLSByte        ULLONG_MAX
-typedef    unsigned long long BitBLSByte_t;
-#endif  /* BitIOLittleEndian */
-#ifndef    BitIOMSByte
-#define    BitIOMSByte        LLONG_MIN
-typedef    signed long long   BitBMSByte_t;
-#endif  /* BitIOBigEndian */
-#ifndef    BitIOLSBit
-#define    BitIOLSBit         ULLONG_MAX
-typedef    unsigned long long BitBLSBit_t;
-#endif  /* BitIOLSBit */
-#ifndef    BitIOMSBit
-#define    BitIOMSBit         LLONG_MIN
-typedef    signed long long   BitBMSBit_t;
-#endif  /* BitIOMSBit */
-#endif  /* BITIOBYTEBITORDERS */
-
-#ifndef    BITIOGUUIDTYPES
-#define    BITIOGUUIDTYPES
-#ifndef    BitIOGUIDString
-#define    BitIOGUIDString    ULLONG_MAX
-typedef    unsigned long long GUIDString_t;
-#endif  /* BitIOGUIDString */
-#ifndef    BitIOUUIDString
-#define    BitIOUUIDString    LLONG_MAX
-typedef    signed long long   UUIDString_t;
-#endif  /* BitIOUUIDString */
-#ifndef    BitIOBinaryGUID
-#define    BitIOBinaryGUID    FLT_MIN
-typedef    float              BinaryGUID_t;
-#endif  /* BitIOBinaryGUID */
-#ifndef    BitIOBinaryUUID
-#define    BitIOBinaryUUID    DBL_MAX
-typedef    double             BinaryUUID_t;
-#endif  /* BITIOGUUIDTYPES */
-#endif  /* BITIOGUUIDTYPES */
+#include "Macros.h"
 
 #pragma once
 
@@ -91,17 +32,6 @@ typedef    double             BinaryUUID_t;
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-	
-#ifdef     Macintosh
-#define    BitIONewLineSize 1
-	static const char BitIOLineEnding[1]  = {"\r"};
-#elif     _POSIX_VERSION
-#define    BitIONewLineSize 1
-	static const char BitIOLineEnding[1]  = {"\n"};
-#elif     _WIN32
-#define    BitIONewLineSize 2
-	static const char BitIOLineEnding[2]  = {"\r\n"};
 #endif
 	
 	/*!
@@ -156,8 +86,8 @@ extern "C" {
 	 @constant			WholeUnary				"Supports all the whole integers including zero and negatives (up to 2^63 -1 anyway)".
 	 */
 	typedef enum UnaryTypes {
-		CountUnary = 0,
-		WholeUnary = 1,
+						CountUnary				= 0,
+						WholeUnary 				= 1,
 	} UnaryTypes;
 	
 	/*!
