@@ -191,7 +191,8 @@ extern "C" {
 	 */
 	bool                CompareBinaryGUUIDs(const uint8_t *BinaryGUUID1, const uint8_t *BinaryGUUID2);
 	
-#define GUUID_Compare(GUUIDType,GUUID1,GUUID2)_Generic((GUUIDType),GUIDString_t:CompareGUUIDStrings,UUIDString_t:CompareGUUIDStrings),_Generic((GUUIDType),BinaryGUID_t:CompareGUUIDStrings,BinaryUUID_t:CompareGUUIDStrings)
+#define GUUID_Compare(GUUIDType,GUUID1,GUUID2)_Generic((GUUIDType),GUUIDString_t:CompareGUUIDStrings,BinaryGUUID_t:CompareGUUIDStrings)(GUUID1,GUUID2)
+
 	
 	/*!
 	 @abstract									"Converts a GUID/UUIDString to a BinaryGUID/UUID".
