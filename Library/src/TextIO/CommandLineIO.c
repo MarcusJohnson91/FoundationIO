@@ -12,40 +12,35 @@ extern "C" {
 	/*!
 	 @struct				CommandLineSwitch
 	 @abstract											"Contains the data to support a switch".
-	 @constant				IsIndependentSwitch			"Can this switch have dependent arguments"?
+	 @constant				Type						"What type of switch is this"?
 	 @constant				SwitchFlag					"What is this switch called, how do we identify it?".
 	 @constant				SwitchFlagSize				"What is the number of bytes (if ASCII)/ code points (if UTF) of this switch?".
 	 @constant				SwitchDescription			"Describe to the user what this switch does".
-	 @constant				MaxActiveDependents			"How many dependent switches can be active at once"?
-	 @constant				ValidDependents				"Pointer to an array that contains the list of aloowable dependent switches".
+	 @constant				MaxActiveSlaves				"How many Slave switches can be active at once"?
+	 @constant				ValidSlaves					"Pointer to an array that contains the list of aloowable Slave switches".
 	 */
 	typedef struct CommandLineSwitch {
-		bool                 IsIndependentSwitch;
+		CLISwitchTypes       Type;
 		uint8_t              SwitchFlagSize;
+		uint64_t             NumSlaves;
+		uint64_t             MaxActiveSlaves;
+		uint64_t            *ValidSlaves;
 		char                *SwitchFlag;
 		char                *SwitchDescription;
-		uint64_t             MaxActiveDependents;
-		uint64_t             NumDependentSwitches;
-		uint64_t            *ValidDependents;
 	} CommandLineSwitch;
-	
-	typedef struct DependentArgument {
-		uint64_t SwitchNum;
-	} DependentArgument;
 	
 	/*!
 	 @struct				CommandLineArgument
 	 @abstract											"Contains the data to support a single argument".
 	 @constant				Switch						"Which switch does this argument correspond to"?
-	 @constant				NumDependentArguments		"How many Dependent arguments were found in this argument?".
-	 @constant				Dependent					"Array of Dependent argument numbers, to look up in CLI->Switches".
+	 @constant				NumDependentArguments		"How many Slave arguments were found in this argument?".
+	 @constant				Slave						"Array of Slave argument numbers, to look up in CLI->Switches".
 	 @constant				ArgumentResult				"If there is a path or other result expected for this switch's argument, it'll be here".
 	 */
 	typedef struct CommandLineArgument {
 		uint64_t             Switch;
 		uint64_t             NumDependentArguments;
-		DependentArgument   *Dependent;
-		//uint64_t            *DependentArguments;
+		uint64_t            *DependentArguments;
 		char                *ArgumentResult;
 	} CommandLineArgument;
 	
@@ -54,7 +49,7 @@ extern "C" {
 	 @abstract											"Contains all the information, and relationships between switches on the command line".
 	 @constant				NumSwitches					"How many switches are there?".
 	 @constant				MinArguments				"The minimum number of switches to accept without dumping the help".
-	 @constant				NumArguments				"The number of arguments present in argv, after extracting any Dependent switches".
+	 @constant				NumArguments				"The number of arguments present in argv, after extracting any Slave switches".
 	 @constant				HelpSwitch					"Which switch displays the help"?
 	 @constant				Switches					"Pointer to an array of switches".
 	 @constant				Arguments					"Pointer to an array of arguments".
@@ -68,7 +63,7 @@ extern "C" {
 	 @constant				ProgramLicenseDescription	"Describe the license or EULA".
 	 @constant				ProgramLicenseURL			"URL for the EULA, ToS, or Open source license".
 	 */
-	struct CommandLineIO {
+	typedef struct CommandLineIO {
 		uint64_t             NumSwitches;
 		uint64_t             MinArguments;
 		uint64_t             NumArguments;
@@ -84,7 +79,7 @@ extern "C" {
 		char                *ProgramLicenseURL;
 		CommandLineSwitch   *Switches;
 		CommandLineArgument *Arguments;
-	};
+	} CommandLineIO;
 	
 	CommandLineIO *CommandLineIO_Init(const uint64_t NumSwitches) {
 		CommandLineIO *CLI = calloc(1, sizeof(CommandLineIO));
@@ -100,7 +95,7 @@ extern "C" {
 		return CLI;
 	}
 	
-	void SetCLIName(CommandLineIO *CLI, char *Name) {
+	void CLISetName(CommandLineIO *CLI, char *Name) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else if (Name == NULL) {
@@ -110,7 +105,7 @@ extern "C" {
 		}
 	}
 	
-	void SetCLIVersion(CommandLineIO *CLI, char *Version) {
+	void CLISetVersion(CommandLineIO *CLI, char *Version) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else if (Version == NULL) {
@@ -120,7 +115,7 @@ extern "C" {
 		}
 	}
 	
-	void SetCLIDescription(CommandLineIO *CLI, char *Description) {
+	void CLISetDescription(CommandLineIO *CLI, char *Description) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else if (Description == NULL) {
@@ -130,7 +125,7 @@ extern "C" {
 		}
 	}
 	
-	void SetCLIAuthor(CommandLineIO *CLI, char *Author) {
+	void CLISetAuthor(CommandLineIO *CLI, char *Author) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else if (Author == NULL) {
@@ -140,7 +135,7 @@ extern "C" {
 		}
 	}
 	
-	void SetCLICopyright(CommandLineIO *CLI, char *Copyright) {
+	void CLISetCopyright(CommandLineIO *CLI, char *Copyright) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else if (Copyright == NULL) {
@@ -150,7 +145,7 @@ extern "C" {
 		}
 	}
 	
-	void SetCLILicense(CommandLineIO *CLI, char *Name, char *LicenseDescription, char *LicenseURL, const bool IsProprietary) {
+	void CLISetLicense(CommandLineIO *CLI, char *Name, char *LicenseDescription, char *LicenseURL, const bool IsProprietary) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else if (Name == NULL) {
@@ -169,7 +164,7 @@ extern "C" {
 		}
 	}
 	
-	void SetCLIMinArguments(CommandLineIO *CLI, const uint64_t MinArguments) {
+	void CLISetMinArguments(CommandLineIO *CLI, const uint64_t MinArguments) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else {
@@ -177,7 +172,7 @@ extern "C" {
 		}
 	}
 	
-	void SetCLIHelpSwitch(CommandLineIO *CLI, const uint64_t HelpSwitch) {
+	void CLISetHelpSwitch(CommandLineIO *CLI, const uint64_t HelpSwitch) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else if (HelpSwitch > CLI->NumSwitches) {
@@ -187,7 +182,7 @@ extern "C" {
 		}
 	}
 	
-	void SetCLISwitchFlag(CommandLineIO *CLI, const uint64_t SwitchNum, char *Flag) {
+	void CLISetSwitchFlag(CommandLineIO *CLI, const uint64_t SwitchNum, char *Flag) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else if (Flag == NULL) {
@@ -200,7 +195,7 @@ extern "C" {
 		}
 	}
 	
-	void SetCLISwitchDescription(CommandLineIO *CLI, const uint64_t SwitchNum, char *Description) {
+	void CLISetSwitchDescription(CommandLineIO *CLI, const uint64_t SwitchNum, char *Description) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else if (SwitchNum > CLI->NumSwitches) {
@@ -212,41 +207,36 @@ extern "C" {
 		}
 	}
 	
-	void SetCLISwitchAsIndependent(CommandLineIO *CLI, const uint64_t Switch) {
+	void CLISetSwitchType(CommandLineIO *CLI, uint64_t Switch, CLISwitchTypes Type) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else {
-			CLI->Switches[Switch].IsIndependentSwitch = true;
+			CLI->Switches[Switch].Type = Type;
 		}
 	}
 	
-	void SetCLISwitchMaxActiveDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t MaxActiveDependents) {
+	void CLISetSwitchAsSlave(CommandLineIO *CLI, const uint64_t Master, const uint64_t Slave) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
-		} else if (Independent > CLI->NumSwitches) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Independent %d, should be between 0 and %d", Independent, CLI->NumSwitches);
+		} else if (Master > CLI->NumSwitches) {
+			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Master %d, should be between 0 and %d", Master, CLI->NumSwitches);
+		} else if (Slave > CLI->NumSwitches) {
+			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Slave %d, should be between 0 and %d", Slave, CLI->NumSwitches);
 		} else {
-			CLI->Switches[Independent].MaxActiveDependents = MaxActiveDependents;
+			CLI->Switches[Master].NumSlaves      += 1;
+			uint64_t NumSlaves                    = CLI->Switches[Master].NumSlaves;
+			CLI->Switches[Master].ValidSlaves     = realloc(CLI->Switches[Master].ValidSlaves, NumSlaves);
+			CLI->Switches[Master].ValidSlaves[NumSlaves - 1] = Slave;
 		}
 	}
 	
-	void SetCLISwitchAsDependent(CommandLineIO *CLI, const uint64_t Independent, const uint64_t Dependent) {
+	void CLISetSwitchMaxActiveSlaves(CommandLineIO *CLI, const uint64_t Master, const uint64_t MaxActiveSlaves) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
-		} else if (Independent > CLI->NumSwitches) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Independent %d, should be between 0 and %d", Independent, CLI->NumSwitches);
-		} else if (Dependent > CLI->NumSwitches) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Dependent %d, should be between 0 and %d", Dependent, CLI->NumSwitches);
+		} else if (Master > CLI->NumSwitches) {
+			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Master %d, should be between 0 and %d", Master, CLI->NumSwitches);
 		} else {
-			CLI->Switches[Independent].NumDependentSwitches += 1;
-			if (CLI->Switches[Independent].ValidDependents == NULL) {
-				CLI->Switches[Independent].ValidDependents = calloc(CLI->Switches[Independent].NumDependentSwitches, sizeof(uint64_t));
-			} else {
-				uint64_t DependentSwitchesSize = sizeof(uint64_t) * CLI->Switches[Independent].NumDependentSwitches;
-				CLI->Switches[Independent].ValidDependents = realloc(CLI->Switches[Independent].ValidDependents, DependentSwitchesSize);
-			}
-			uint64_t CurrentDependentSwitch = CLI->Switches[Independent].NumDependentSwitches;
-			CLI->Switches[Independent].ValidDependents[CLI->Switches[Independent].NumDependentSwitches - 1] = Dependent;
+			CLI->Switches[Master].MaxActiveSlaves = MaxActiveSlaves;
 		}
 	}
 	
@@ -256,11 +246,14 @@ extern "C" {
 		} else {
 			printf("%s Options (-|--|/):%s", CLI->ProgramName, BitIOLineEnding);
 			for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
-				if (CLI->Switches[Switch].IsIndependentSwitch == Yes) {
+				CLISwitchTypes CurrentSwitchType = CLI->Switches[Switch].Type;
+				if (CurrentSwitchType == MasterType) {
 					printf("%s: %s%s", CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchDescription, BitIOLineEnding);
-					for (uint64_t DependentSwitch = 0ULL; DependentSwitch < CLI->Switches[Switch].NumDependentSwitches; DependentSwitch++) {
-						printf("\t%s: %s%s", CLI->Switches[DependentSwitch].SwitchFlag, CLI->Switches[DependentSwitch].SwitchDescription, BitIOLineEnding);
+					for (uint64_t SlaveSwitch = 0ULL; SlaveSwitch < CLI->Switches[Switch].NumSlaves; SlaveSwitch++) {
+						printf("\t%s: %s%s", CLI->Switches[SlaveSwitch].SwitchFlag, CLI->Switches[SlaveSwitch].SwitchDescription, BitIOLineEnding);
 					}
+				} else if (CurrentSwitchType == StandaloneType) {
+					printf("%s: %s%s", CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchDescription, BitIOLineEnding);
 				}
 			}
 		}
@@ -271,7 +264,7 @@ extern "C" {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else {
 			if (CLI->ProgramName != NULL) {
-				printf("%s \n", CLI->ProgramName);
+				printf("%s%s", CLI->ProgramName, BitIOLineEnding);
 			} else if (CLI->ProgramVersion != NULL) {
 				printf("version %s", CLI->ProgramVersion);
 			} else if (CLI->ProgramAuthor != NULL) {
@@ -285,12 +278,12 @@ extern "C" {
 			} else if (CLI->IsProprietary == No && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL) {
 				printf(", By using this software, you agree to the End User License Agreement %s, available at: %s", CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL);
 			} else {
-				printf("\n");
+				printf("%s", BitIOLineEnding);
 			}
 		}
 	}
 	
-	static inline char *ConvertArgumentString2SwitchFlag(const char *ArgumentString) {
+	static char *ConvertArgumentString2SwitchFlag(const char *ArgumentString) {
 		uint8_t  Bytes2RemoveFromArg = 0;
 		uint64_t ArgumentStringSize  = strlen(ArgumentString);
 		char    *ArgumentSwitch = NULL;
@@ -306,7 +299,7 @@ extern "C" {
 		if (ArgumentSwitch == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate ArgumentSwitch which needs %ulld bytes of memory", ArgumentSwitchSize);
 		} else {
-			for (uint64_t Byte = Bytes2RemoveFromArg - 1; Byte < ArgumentStringSize; Byte++) {
+			for (uint64_t Byte = Bytes2RemoveFromArg - BitIONULLStringSize; Byte < ArgumentStringSize; Byte++) {
 				ArgumentSwitch[Byte] = ArgumentString[Byte];
 			}
 		}
@@ -316,98 +309,101 @@ extern "C" {
 	void ParseCommandLineArguments(CommandLineIO *CLI, const int argc, const char *argv[]) {
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
-		} else if (argc < (int) CLI->MinArguments || strncasecmp(ConvertArgumentString2SwitchFlag(argv[1]), CLI->Switches[CLI->HelpSwitch].SwitchFlag, CLI->Switches[CLI->HelpSwitch].SwitchFlagSize) == 0) {
-			DisplayCLIHelp(CLI);
 		} else {
-			DisplayProgramBanner(CLI);
-			
-			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-				for (int ArgvArg = 0L; ArgvArg < argc; ArgvArg++) {
-					char *ArgvString        = ConvertArgumentString2SwitchFlag(argv[ArgvArg]);
-					uint64_t ArgvStringSize = strlen(ArgvString);
-					for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
-						if (CLI->Switches[Switch].SwitchFlagSize == ArgvStringSize) {
-							if (strncasecmp(ArgvString, CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchFlagSize) == 0) {
-								if (CLI->Switches[Switch].IsIndependentSwitch == Yes) {
-									for (uint64_t DependentSwitch = 0ULL; DependentSwitch < CLI->Switches[Switch].NumDependentSwitches; DependentSwitch++) {
-										char *PotentialDependentArgument   = ConvertArgumentString2SwitchFlag(argv[ArgvArg + DependentSwitch]);
-										uint64_t PotentialDependentArgSize = strlen(PotentialDependentArgument);
-										if (CLI->Switches[Switch + DependentSwitch].SwitchFlagSize == PotentialDependentArgSize) {
-											if (strncasecmp(PotentialDependentArgument, CLI->Switches[Switch + DependentSwitch].SwitchFlag, CLI->Switches[Switch + DependentSwitch].SwitchFlagSize) == 0) {
-												CLI->Arguments[Argument].NumDependentArguments += 1;
-												CLI->Arguments[Argument].Dependent[DependentSwitch].SwitchNum = Switch + DependentSwitch; // FIXME: Is this right?
+			char *FirstArgumentAsFlag = ConvertArgumentString2SwitchFlag(argv[1]);
+			char *HelpFlag            = ConvertArgumentString2SwitchFlag(CLI->Switches[CLI->HelpSwitch].SwitchFlag);
+			if (argc < (int) CLI->MinArguments || strncasecmp(FirstArgumentAsFlag, HelpFlag, CLI->Switches[CLI->HelpSwitch].SwitchFlagSize) == 0) {
+				DisplayCLIHelp(CLI);
+			} else {
+				DisplayProgramBanner(CLI);
+				for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
+					for (int ArgvArg = 0L; ArgvArg < argc; ArgvArg++) {
+						char *ArgvString        = ConvertArgumentString2SwitchFlag(argv[ArgvArg]);
+						uint64_t ArgvStringSize = strlen(ArgvString);
+						for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
+							if (CLI->Switches[Switch].SwitchFlagSize == ArgvStringSize) {
+								if (strncasecmp(ArgvString, CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchFlagSize) == 0) {
+									if (CLI->Switches[Switch].Type == MasterType) {
+										for (uint64_t DependentSwitch = 0ULL; DependentSwitch < CLI->Switches[Switch].NumSlaves; DependentSwitch++) {
+											char *PotentialDependentArgument   = ConvertArgumentString2SwitchFlag(argv[ArgvArg + DependentSwitch]);
+											uint64_t PotentialDependentArgSize = strlen(PotentialDependentArgument);
+											if (CLI->Switches[Switch + DependentSwitch].SwitchFlagSize == PotentialDependentArgSize) {
+												if (strncasecmp(PotentialDependentArgument, CLI->Switches[Switch + DependentSwitch].SwitchFlag, CLI->Switches[Switch + DependentSwitch].SwitchFlagSize) == 0) {
+													CLI->Arguments[Argument].NumDependentArguments += 1;
+													CLI->Arguments[Argument].DependentArguments[DependentSwitch] = Switch + DependentSwitch; // FIXME: Is this right?
+												}
 											}
 										}
+									} else if (CLI->Switches[Switch].Type == StandaloneType) {
+										
 									}
 								}
 							}
 						}
 					}
+					CLI->NumArguments += 1; // you have to do this as we build the argument list, or the loop will break
 				}
-				CLI->NumArguments += 1; // you have to do this as we build the argument list, or the loop will break
 			}
 		}
 	}
 	
-	uint64_t GetCLINumArgsMatchingSwitch(CommandLineIO const *CLI, const uint64_t IndependentSwitch, const uint64_t NumDependents, const uint64_t *DependentSwitches) {
-		uint64_t SwitchContainingMetaArg = 0xFFFFFFFFFFFFFFFFULL;
-		if (CLI == NULL) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
-		} else if (IndependentSwitch > CLI->NumSwitches) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "IndependentSwitch %d is greater than there are switches %d", IndependentSwitch, CLI->NumSwitches);
-		} else if (NumDependents > CLI->Switches[IndependentSwitch].MaxActiveDependents) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "More dependent switches than allowed");
-		} else {
-			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-				for (uint64_t DependentArgument = 0ULL; DependentArgument < CLI->Arguments[Argument].NumDependentArguments; DependentArgument++) {
-					const char *ArgumentSwitch = ConvertArgumentString2SwitchFlag(CLI->Arguments[Argument].Switch);
-					if (CLI->Arguments[Argument].Switch == CLI->Switches[Argument].IsIndependentSwitch) {
-						
+	uint64_t CLIGetNumMatchingArguments(CommandLineIO *CLI, const uint64_t Master, const uint64_t NumSlaves, const uint64_t *Slaves) { // Gets the number of arguments that are composed of Master, and all the Slaves
+		uint64_t       NumMatchingArguments                          = 0ULL;
+		CLISwitchTypes CurrentSwitchType                             = UnknownType;
+		uint64_t       NumDependentArgsInArg                         = 0ULL;
+		for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
+			NumDependentArgsInArg                                    = CLI->Arguments[Argument].NumDependentArguments;
+			CurrentSwitchType                                        = CLI->Switches[CLI->Arguments[Argument].Switch].Type;
+			if (CurrentSwitchType == MasterType && NumSlaves > 0) {
+				for (uint64_t DependentArg = 0ULL; DependentArg < NumDependentArgsInArg; DependentArg++) {
+					for (uint64_t Slave = 0ULL; Slave < NumSlaves; Slave++) {
+						if (CLI->Arguments[Argument].DependentArguments[Slave] == Slaves[Slave]) {
+							NumMatchingArguments                    += 1;
+						}
 					}
 				}
+			} else if (CurrentSwitchType == StandaloneType && NumSlaves == 0) {
+				if (CLI->Arguments[Argument].Switch == Master) {
+					NumMatchingArguments                            += 1;
+				}
+			} else {
+				BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Incompatible Switch type %d and NumSlaves %d", CurrentSwitchType, NumSlaves);
 			}
 		}
-		return NULL;
+		return NumMatchingArguments;
 	}
 	
-	uint64_t GetCLIDependentSwitchArgument(CommandLineIO const *CLI, const uint64_t IndependentSwitch, const uint64_t DependentSwitch) {
-		uint64_t SwitchContainingMetaArg = 0xFFFFFFFFFFFFFFFFULL;
-		if (CLI == NULL) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
-		} else if (IndependentSwitch > CLI->NumSwitches) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "IndependentSwitch %d is greater than there are switches %d", IndependentSwitch, CLI->NumSwitches);
-		} else if (DependentSwitch > CLI->NumSwitches) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "DependentSwitch %d is greater than there are switches %d", DependentSwitch, CLI->NumSwitches);
-		} else {
-			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-				for (uint64_t DependentArg = 0ULL; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
-					if (CLI->Arguments[Argument].Dependent[DependentArg].SwitchNum == DependentSwitch && CLI->Arguments[Argument].Switch == IndependentSwitch) {
-						SwitchContainingMetaArg = Argument;
+	uint64_t CLIGetMatchingArgumentNum(CommandLineIO *CLI, const uint64_t Instance, const uint64_t Master, const uint64_t NumSlaves, const uint64_t *Slaves) { // Gets the argument number matching Master
+		uint64_t       MatchingArgumentNum                           = 0ULL;
+		uint64_t       MatchingInstance                              = 0ULL;
+		CLISwitchTypes CurrentSwitchType                             = UnknownType;
+		uint64_t       NumDependentArgsInArg                         = 0ULL;
+		// Make sure that we track the number of found matching arguments so we can compare it to Instance, if they match, return; otherwise, keep looping.
+		for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
+			NumDependentArgsInArg                                    = CLI->Arguments[Argument].NumDependentArguments;
+			CurrentSwitchType                                        = CLI->Switches[CLI->Arguments[Argument].Switch].Type;
+			if (CurrentSwitchType == MasterType && NumSlaves > 0) {
+				for (uint64_t DependentArg = 0ULL; DependentArg < NumDependentArgsInArg; DependentArg++) {
+					for (uint64_t Slave = 0ULL; Slave < NumSlaves; Slave++) {
+						if (CLI->Arguments[Argument].DependentArguments[Slave] == Slaves[Slave]) {
+							MatchingArgumentNum                      = Argument;
+							MatchingInstance                        += 1;
+						}
 					}
 				}
-			}
-		}
-		return SwitchContainingMetaArg;
-	}
-	
-	uint64_t GetCLIArgumentNumFromSwitch(CommandLineIO const *CLI, const uint64_t Switch) {
-		uint64_t FoundArgument = 0xFFFFFFFFFFFFFFFFULL;
-		if (CLI == NULL) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
-		} else if (Switch > CLI->NumSwitches) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Switch %d is greater than there are switches %d", Switch, CLI->NumSwitches);
-		} else {
-			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-				// Loop over the arguments until you find CLI->Arguments[Argument].SwitchNum that matches SwitchNum
-				if (CLI->Arguments[Argument].Switch == Switch) {
-					FoundArgument = Argument;
+			} else if (CurrentSwitchType == StandaloneType && NumSlaves == 0) {
+				if (CLI->Arguments[Argument].Switch == Master) {
+					MatchingArgumentNum                      = Argument;
+					MatchingInstance                        += 1;
 				}
+			} else {
+				BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Incompatible Switch type %d and NumSlaves %d", CurrentSwitchType, NumSlaves);
 			}
 		}
-		return FoundArgument;
+		return MatchingArgumentNum;
 	}
 	
-	char *GetCLIArgumentResult(CommandLineIO const *CLI, const uint64_t Argument) {
+	char *CLIGetArgumentResult(CommandLineIO const *CLI, const uint64_t Argument) {
 		char *Result = NULL;
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
@@ -417,103 +413,6 @@ extern "C" {
 			Result = CLI->Arguments[Argument].ArgumentResult;
 		}
 		return Result;
-	}
-	
-	bool GetCLIArgumentPresenceFromSwitch(CommandLineIO const *CLI, const uint64_t Switch) {
-		uint64_t FoundArgument = 0xFFFFFFFFFFFFFFFFULL;
-		if (CLI == NULL) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
-		} else if (Switch > CLI->NumSwitches) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "SwitchNum %d is not a valid Switch", Switch);
-		} else {
-			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-				// Loop over the arguments until you find CLI->Arguments[Argument].SwitchNum that matches SwitchNum
-				if (CLI->Arguments[Argument].Switch == Switch) {
-					FoundArgument = Argument;
-				}
-			}
-		}
-		return FoundArgument;
-	}
-	
-	uint64_t GetCLINumArgumentsWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, ...) {
-		/*
-		 So, We need to go through all of the arguments, and see which argument is composed of Independent switch with the right number of dependent switches.
-		 */
-		uint64_t NumMatchingArguments = 0ULL;
-		for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-			if (CLI->Arguments[Argument].Switch == Independent) {
-				if (NumDependents > 0 && CLI->Arguments[Argument].NumDependentArguments > 0) { // Check the dependencies
-					for (uint64_t DependentArg = 0ULL; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
-						va_list DependentArguments;
-						va_start(DependentArguments, NumDependents);
-						uint64_t *VariadicDependentArguments = calloc(1, NumDependents * sizeof(uint64_t));
-						for (uint64_t VariadicArgs = 0ULL; VariadicArgs < NumDependents; VariadicArgs++) {
-							VariadicDependentArguments[VariadicArgs] = va_arg(DependentArguments, uint64_t);
-						}
-						va_end(DependentArguments);
-						for (uint64_t DependentParam = 0ULL; DependentParam < NumDependents; DependentParam++) {
-							if (CLI->Arguments[Argument].Dependent->SwitchNum == VariadicDependentArguments[DependentParam]) {
-								NumMatchingArguments += 1;
-							}
-						}
-						free(VariadicDependentArguments);
-					}
-				} else { // There are no dependencies
-					NumMatchingArguments += 1;
-				}
-			}
-		}
-		return NumMatchingArguments;
-	}
-	
-	uint64_t GetCLIArgumentNumWithIndependentAndDependents(CommandLineIO *CLI, const uint64_t Independent, const uint64_t NumDependents, ...) {
-		uint64_t MatchingArgumentNum = 0ULL;
-		for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-			if (CLI->Arguments[Argument].Switch == Independent) {
-				if (NumDependents > 0 && CLI->Arguments[Argument].NumDependentArguments > 0) { // Check the dependencies
-					for (uint64_t DependentArg = 0ULL; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
-						va_list DependentArguments;
-						va_start(DependentArguments, NumDependents);
-						uint64_t *VariadicDependentArguments = calloc(1, NumDependents * sizeof(uint64_t));
-						for (uint64_t VariadicArgs = 0ULL; VariadicArgs < NumDependents; VariadicArgs++) {
-							VariadicDependentArguments[VariadicArgs] = va_arg(DependentArguments, uint64_t);
-						}
-						va_end(DependentArguments);
-						for (uint64_t DependentParam = 0ULL; DependentParam < NumDependents; DependentParam++) {
-							if (CLI->Arguments[Argument].Dependent->SwitchNum == VariadicDependentArguments[DependentParam]) {
-								MatchingArgumentNum = Argument;
-							}
-						}
-						free(VariadicDependentArguments);
-					}
-				} else {
-					MatchingArgumentNum = Argument;
-				}
-			}
-		}
-		return MatchingArgumentNum;
-	}
-	
-	char *GetCLIArgumentResultFromIndependentDependentSwitch(CommandLineIO const *CLI, const uint64_t Independent, const uint64_t Dependent) {
-		// We need to find adjacent arguments that contain both the Independent and Dependent switches.
-		char *ArgumentResult = NULL;
-		for (uint64_t Argument = 0; Argument < CLI->NumArguments; Argument++) {
-			for (uint64_t DependentArg = 0; DependentArg < CLI->Arguments[Argument].NumDependentArguments; DependentArg++) {
-				if (CLI->Arguments[Argument].Dependent[DependentArg].SwitchNum) {
-					
-				}
-				
-				if (CLI->Arguments[Argument].Switch == Independent && CLI->Arguments[Argument].NumDependentArguments >= 1) { // If there are Dependent arguments, look further into it.
-					if (CLI->Arguments[Argument].Dependent[DependentArg].SwitchNum == Dependent) {
-						// Found A argument that contains both, but what if there are multiple?
-						uint64_t DependentArgResult = CLI->Arguments[Argument].Dependent[DependentArg].SwitchNum;
-						ArgumentResult = CLI->Arguments[DependentArgResult].ArgumentResult;
-					}
-				}
-			}
-		}
-		return ArgumentResult;
 	}
 	
 	char *GetExtensionFromPath(const char *Path) { // Do not include the seperator aka period.
@@ -543,10 +442,10 @@ extern "C" {
 			for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
 				free(CLI->Switches[Switch].SwitchFlag);
 				free(CLI->Switches[Switch].SwitchDescription);
-				free(CLI->Switches[Switch].ValidDependents);
+				free(CLI->Switches[Switch].ValidSlaves);
 			}
 			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-				free(CLI->Arguments[Argument].Dependent);
+				free(CLI->Arguments[Argument].DependentArguments);
 				free(CLI->Arguments[Argument].ArgumentResult);
 			}
 			free(CLI->Switches);
