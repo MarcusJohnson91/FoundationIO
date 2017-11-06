@@ -48,12 +48,6 @@ extern "C" {
 						BitIOBinaryGUUIDSize	= 16,
 	};
 	
-	typedef enum BitIOGUUIDType {
-						BitIOUnknownGUUID		= 0,
-						BitIOGUUIDString		= 1,
-						BitIOBinaryGUUID		= 2,
-	} BitIOGUUIDType;
-	
 	/*!
 	 @enum				BitIOSourceDrainTypes
 	 @abstract									"Is this BitInput or BitOutput connected to a File or Socket?".
