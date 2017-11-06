@@ -212,6 +212,11 @@ extern "C" {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else {
 			CLI->Switches[Switch].Type = Type;
+			if (Type == StandaloneWithResult || Type == StandaloneNoResult || Type == SlaveType) {
+				CLI->Switches[Switch].MaxActiveSlaves = 0;
+				CLI->Switches[Switch].NumSlaves       = 0;
+				CLI->Switches[Switch].ValidSlaves     = NULL;
+			}
 		}
 	}
 	
