@@ -257,7 +257,7 @@ extern "C" {
 					for (uint64_t SlaveSwitch = 0ULL; SlaveSwitch < CLI->Switches[Switch].NumSlaves; SlaveSwitch++) {
 						printf("\t%s: %s%s", CLI->Switches[SlaveSwitch].SwitchFlag, CLI->Switches[SlaveSwitch].SwitchDescription, BitIOLineEnding);
 					}
-				} else if (CurrentSwitchType == StandaloneType) {
+				} else if (CurrentSwitchType == StandaloneWithResult || CurrentSwitchType == StandaloneNoResult) {
 					printf("%s: %s%s", CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchDescription, BitIOLineEnding);
 				}
 			}
@@ -339,7 +339,7 @@ extern "C" {
 												}
 											}
 										}
-									} else if (CLI->Switches[Switch].Type == StandaloneType) {
+									} else if (CLI->Switches[Switch].Type == StandaloneWithResult || CLI->Switches[Switch].Type == StandaloneNoResult) {
 										
 									}
 								}
@@ -367,7 +367,7 @@ extern "C" {
 						}
 					}
 				}
-			} else if (CurrentSwitchType == StandaloneType && NumSlaves == 0) {
+			} else if (CurrentSwitchType == StandaloneWithResult && NumSlaves == 0) {
 				if (CLI->Arguments[Argument].Switch == Master) {
 					NumMatchingArguments                            += 1;
 				}
@@ -396,7 +396,7 @@ extern "C" {
 						}
 					}
 				}
-			} else if (CurrentSwitchType == StandaloneType && NumSlaves == 0) {
+			} else if (CurrentSwitchType == StandaloneWithResult && NumSlaves == 0) {
 				if (CLI->Arguments[Argument].Switch == Master) {
 					MatchingArgumentNum                      = Argument;
 					MatchingInstance                        += 1;

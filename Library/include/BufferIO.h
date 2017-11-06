@@ -191,7 +191,6 @@ extern "C" {
 	 */
 	bool                CompareBinaryGUUIDs(const uint8_t *BinaryGUUID1, const uint8_t *BinaryGUUID2);
 	
-#define GUUID_Compare(GUUIDType,GUUID1,GUUID2)_Generic((GUUIDType),GUIDString_t:CompareGUUIDStrings,UUIDString_t:CompareGUUIDStrings),_Generic((GUUIDType),BinaryGUID_t:CompareGUUIDStrings,BinaryUUID_t:CompareGUUIDStrings)
 	
 	/*!
 	 @abstract									"Converts a GUID/UUIDString to a BinaryGUID/UUID".
@@ -207,8 +206,14 @@ extern "C" {
 	 */
 	uint8_t            *ConvertBinaryGUUID2GUUIDString(const uint8_t *BinaryGUUID);
 	
+	/*!
+	 @abstract									"Converts a GUIDString to a UUIDString or vice versa".
+	 */
 	uint8_t            *SwapGUUIDString(const uint8_t *GUUIDString);
 	
+	/*!
+	 @abstract									"Converts a BinaryGUID to a BinaryUUID or vice versa".
+	 */
 	uint8_t            *SwapBinaryGUUID(const uint8_t *BinaryGUUID);
 	
 	/*!
@@ -377,6 +382,43 @@ extern "C" {
 	 @param				Bits2Read				"The number of bits to read from the BitBuffer".
 	 */
 #define ReadBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Read)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsAsLSByteLSBit,BitBMSBit_t:ReadBitsAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsAsMSByteLSBit,BitBMSBit_t:ReadBitsAsMSByteMSBit))(BitB,Bits2Read)
+	
+	/*!
+	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
+	 @param				BitB					"Pointer to an instance of BitBuffer".
+	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes, there is no NULL terminator".
+	 */
+	uint8_t		       *ReadGUUIDAsUUIDString(BitBuffer *BitB);
+	
+	/*!
+	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
+	 @param				BitB					"Pointer to an instance of BitBuffer".
+	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes, there is no NULL terminator".
+	 */
+	uint8_t		       *ReadGUUIDAsGUIDString(BitBuffer *BitB);
+	
+	/*!
+	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
+	 @param				BitB					"Pointer to an instance of BitBuffer".
+	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
+	 */
+	uint8_t		       *ReadGUUIDAsBinaryUUID(BitBuffer *BitB);
+	
+	/*!
+	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
+	 @param				BitB					"Pointer to an instance of BitBuffer".
+	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
+	 */
+	uint8_t		       *ReadGUUIDAsBinaryGUID(BitBuffer *BitB);
+	
+	/*!
+	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
+	 @param				GUUIDType				"GUUIDType is BitIOGUUIDString or BitIOBinaryGUUID".
+	 @param				ByteOrder				"ByteOrder is BitIOLSByte or BitIOMSByte".
+	 @param				BitB					"Pointer to an instance of BitBuffer".
+	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
+	 */
+#define ReadGUUID(GUUIDType,ByteOrder,BitB)_Generic((GUUIDType),GUUIDString_t:_Generic((ByteOrder),BitBLSByte_t:ReadGUUIDAsGUIDString,BitBMSByte_t:ReadGUUIDAsUUIDString),BinaryGUUID_t:_Generic((ByteOrder),BitBLSByte_t:ReadGUUIDAsBinaryGUID,BitBMSByte_t:ReadGUUIDAsBinaryUUID))(BitB)
 	
 	/*!
 	 @abstract									"Reads unary encoded fields from the BitBuffer".
@@ -598,41 +640,6 @@ extern "C" {
 #define WriteExpGolomb(BitBByteOrder,BitBBitOrder,BitB,UnaryType,StopBit,Field2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsLSByteLSBit,BitBMSBit_t:WriteExpGolombAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsMSByteLSBit,BitBMSBit_t:WriteExpGolombAsMSByteMSBit))(BitB,UnaryType,StopBit,Field2Write)
 	
 	/* BitBuffer GUUID */
-	/*!
-	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
-	 @param				BitB					"Pointer to an instance of BitBuffer".
-	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes, there is no NULL terminator".
-	 */
-	uint8_t		       *ReadGUUIDAsUUIDString(BitBuffer *BitB);
-	
-	/*!
-	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
-	 @param				BitB					"Pointer to an instance of BitBuffer".
-	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes, there is no NULL terminator".
-	 */
-	uint8_t		       *ReadGUUIDAsGUIDString(BitBuffer *BitB);
-	
-	/*!
-	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
-	 @param				BitB					"Pointer to an instance of BitBuffer".
-	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
-	 */
-	uint8_t		       *ReadGUUIDAsBinaryUUID(BitBuffer *BitB);
-	
-	/*!
-	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
-	 @param				BitB					"Pointer to an instance of BitBuffer".
-	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
-	 */
-	uint8_t		       *ReadGUUIDAsBinaryGUID(BitBuffer *BitB);
-	
-	/*!
-	 @abstract									"Reads a BinaryGUUID/GUUIDString from the BitBuffer".
-	 @param				GUUIDType				"GUUIDType is BitIOUUIDString, BitIOGUIDString, BitIOBinaryUUID, or BitIOBinaryGUID"
-	 @param				BitB					"Pointer to an instance of BitBuffer".
-	 @return									"Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
-	 */
-#define ReadGUUID(GUUIDType,BitB)_Generic((GUUIDType),UUIDString_t:ReadGUUIDAsUUIDString,GUIDString_t:ReadGUUIDAsGUIDString,BinaryUUID_t:ReadGUUIDAsBinaryUUID,BinaryGUID_t:ReadGUUIDAsBinaryGUID)(BitB)
 	
 	/*!
 	 @abstract									"Writes a BinaryGUUID/GUUIDString to the BitBuffer".
@@ -662,8 +669,7 @@ extern "C" {
 	 */
 	void		        WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID);
 	
-#define WriteGUUID(GUUIDType,BitB,GUUID2Write)_Generic((GUUIDType),BinaryUUID_t:WriteGUUIDAsBinaryUUID,BinaryGUID_t:WriteGUUIDAsBinaryGUID,UUIDString_t:WriteGUUIDAsUUIDString,GUIDString_t:WriteGUUIDAsGUIDString)(BitB,GUUID2Write)
-	/* BitBuffer GUUID */
+#define WriteGUUID(GUUIDType,ByteOrder,BitB,GUUID2Write)_Generic((GUUIDType),GUUIDString_t:_Generic((ByteOrder),BitBLSByte_t:WriteGUUIDAsGUIDString,BitBMSByte_t:WriteGUUIDAsUUIDString),BinaryGUUID_t:_Generic((ByteOrder),BitBLSByte_t:WriteGUUIDAsBinaryGUID,BitBMSByte_t:WriteGUUIDAsBinaryUUID))(BitB,GUUID2Write)
 	
 	/*!
 	 @abstract									"Deallocates the instance of BitBuffer pointed to by BitB".
@@ -692,13 +698,13 @@ extern "C" {
 	BitInput		   *BitInput_Init(void);
 	
 	/*!
-	@abstract									"Reads Bytes2Read into a buffer pointed to by BitB from InputFile".
-	@remark										"If the BitBuffer Pointer is not new, all the old contents will be lost".
-	@param				BitI					"BitInput Pointer".
-	@param				Buffer2Read				"BitBuffer Pointer".
-	@param				Bytes2Read				"The number of bytes to read from the InputFile into the Buffer".
-	*/
-	void				BitInput_Read2BitBuffer(BitInput *BitI, BitBuffer *Buffer2Read, const uint64_t Bytes2Read); // BitInput_Read2BitBuffer
+	 @abstract									"Reads Bytes2Read into a BitBuffer from BitInput".
+	 @remark									"If the BitBuffer Pointer is not new, all the old contents will be lost".
+	 @param				BitI					"BitInput Pointer".
+	 @param				Buffer2Read				"BitBuffer Pointer".
+	 @param				Bytes2Read				"The number of bytes to read from the BitInput into the BitBuffer".
+	 */
+	void				BitInput_Read2BitBuffer(BitInput *BitI, BitBuffer *Buffer2Read, const uint64_t Bytes2Read);
 	
 	/*!
 	 @abstract									"Opens an input file, pointed to by InputSwitch in CMD and stores the resulting pointer in BitI->File".
@@ -811,3 +817,4 @@ extern "C" {
 #endif
 
 #endif /* LIBBITIO_BitIO_H */
+
