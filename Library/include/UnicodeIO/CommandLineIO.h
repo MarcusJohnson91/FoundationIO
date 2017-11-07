@@ -25,18 +25,18 @@ extern "C" {
 	/*!
 	 @enum					CLISwitchTypes
 	 @abstract										"Defines the type of switch".
-	 @constant				UnknownType				"Unknown Switch type".
-	 @constant				StandaloneWithResult	"Has no dependencies of it's own and isn't a dependnt of any other switch".
-	 @constant				StandaloneNoResult		"Has no result, you can just check for it's existence".
-	 @constant				MasterType				"Has Slave switches, is not Slave on any other switch".
-	 @constant				SlaveType				"Is Slave on another switch, is not Master at all".
+	 @constant				UnknownSwitchType		"Unknown Switch type".
+	 @constant				SingleSwitchWithResult	"Has no dependencies of it's own and isn't a dependnt of any other switch".
+	 @constant				SingleSwitchNoResult	"Has no result, you can just check for it's existence".
+	 @constant				MasterSwitch			"Has Slave switches, is not Slave on any other switch".
+	 @constant				SlaveSwitch				"Is Slave on another switch, is not Master at all".
 	 */
 	typedef enum CLISwitchTypes {
-		UnknownType          = 0,
-		StandaloneWithResult = 1,
-		StandaloneNoResult   = 2,
-		MasterType           = 3,
-		SlaveType            = 4,
+		UnknownSwitchType      = 0,
+		SingleSwitchWithResult = 1,
+		SingleSwitchNoResult   = 2,
+		MasterSwitch           = 3,
+		SlaveSwitch            = 4,
 	} CLISwitchTypes;
 	
 	/*!

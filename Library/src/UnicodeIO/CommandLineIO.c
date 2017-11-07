@@ -212,7 +212,7 @@ extern "C" {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else {
 			CLI->Switches[Switch].Type = Type;
-			if (Type == StandaloneWithResult || Type == StandaloneNoResult || Type == SlaveType) {
+			if (Type == SingleSwitchWithResult || Type == SingleSwitchNoResult || Type == SlaveSwitch) {
 				CLI->Switches[Switch].MaxActiveSlaves = 0;
 				CLI->Switches[Switch].NumSlaves       = 0;
 				CLI->Switches[Switch].ValidSlaves     = NULL;
@@ -252,12 +252,12 @@ extern "C" {
 			printf("%s Options (-|--|/):%s", CLI->ProgramName, BitIOLineEnding);
 			for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
 				CLISwitchTypes CurrentSwitchType = CLI->Switches[Switch].Type;
-				if (CurrentSwitchType == MasterType) {
+				if (CurrentSwitchType == MasterSwitch) {
 					printf("%s: %s%s", CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchDescription, BitIOLineEnding);
 					for (uint64_t SlaveSwitch = 0ULL; SlaveSwitch < CLI->Switches[Switch].NumSlaves; SlaveSwitch++) {
 						printf("\t%s: %s%s", CLI->Switches[SlaveSwitch].SwitchFlag, CLI->Switches[SlaveSwitch].SwitchDescription, BitIOLineEnding);
 					}
-				} else if (CurrentSwitchType == StandaloneWithResult || CurrentSwitchType == StandaloneNoResult) {
+				} else if (CurrentSwitchType == SingleSwitchWithResult || CurrentSwitchType == SingleSwitchNoResult) {
 					printf("%s: %s%s", CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchDescription, BitIOLineEnding);
 				}
 			}
@@ -328,7 +328,7 @@ extern "C" {
 						for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
 							if (CLI->Switches[Switch].SwitchFlagSize == ArgvStringSize) {
 								if (strncasecmp(ArgvString, CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchFlagSize) == 0) {
-									if (CLI->Switches[Switch].Type == MasterType) {
+									if (CLI->Switches[Switch].Type == MasterSwitch) {
 										for (uint64_t DependentSwitch = 0ULL; DependentSwitch < CLI->Switches[Switch].NumSlaves; DependentSwitch++) {
 											char *PotentialDependentArgument   = ConvertArgumentString2SwitchFlag(argv[ArgvArg + DependentSwitch]);
 											uint64_t PotentialDependentArgSize = strlen(PotentialDependentArgument);
@@ -339,7 +339,7 @@ extern "C" {
 												}
 											}
 										}
-									} else if (CLI->Switches[Switch].Type == StandaloneWithResult || CLI->Switches[Switch].Type == StandaloneNoResult) {
+									} else if (CLI->Switches[Switch].Type == SingleSwitchWithResult || CLI->Switches[Switch].Type == SingleSwitchNoResult) {
 										
 									}
 								}
@@ -354,12 +354,12 @@ extern "C" {
 	
 	uint64_t CLIGetNumMatchingArguments(CommandLineIO *CLI, const uint64_t Master, const uint64_t NumSlaves, const uint64_t *Slaves) { // Gets the number of arguments that are composed of Master, and all the Slaves
 		uint64_t       NumMatchingArguments                          = 0ULL;
-		CLISwitchTypes CurrentSwitchType                             = UnknownType;
+		CLISwitchTypes CurrentSwitchType                             = UnknownSwitchType;
 		uint64_t       NumDependentArgsInArg                         = 0ULL;
 		for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
 			NumDependentArgsInArg                                    = CLI->Arguments[Argument].NumDependentArguments;
 			CurrentSwitchType                                        = CLI->Switches[CLI->Arguments[Argument].Switch].Type;
-			if (CurrentSwitchType == MasterType && NumSlaves > 0) {
+			if (CurrentSwitchType == MasterSwitch && NumSlaves > 0) {
 				for (uint64_t DependentArg = 0ULL; DependentArg < NumDependentArgsInArg; DependentArg++) {
 					for (uint64_t Slave = 0ULL; Slave < NumSlaves; Slave++) {
 						if (CLI->Arguments[Argument].DependentArguments[Slave] == Slaves[Slave]) {
@@ -367,7 +367,7 @@ extern "C" {
 						}
 					}
 				}
-			} else if (CurrentSwitchType == StandaloneWithResult && NumSlaves == 0) {
+			} else if (CurrentSwitchType == SingleSwitchWithResult && NumSlaves == 0) {
 				if (CLI->Arguments[Argument].Switch == Master) {
 					NumMatchingArguments                            += 1;
 				}
@@ -381,13 +381,13 @@ extern "C" {
 	uint64_t CLIGetMatchingArgumentNum(CommandLineIO *CLI, const uint64_t Instance, const uint64_t Master, const uint64_t NumSlaves, const uint64_t *Slaves) { // Gets the argument number matching Master
 		uint64_t       MatchingArgumentNum                           = 0ULL;
 		uint64_t       MatchingInstance                              = 0ULL;
-		CLISwitchTypes CurrentSwitchType                             = UnknownType;
+		CLISwitchTypes CurrentSwitchType                             = UnknownSwitchType;
 		uint64_t       NumDependentArgsInArg                         = 0ULL;
 		// Make sure that we track the number of found matching arguments so we can compare it to Instance, if they match, return; otherwise, keep looping.
 		for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
 			NumDependentArgsInArg                                    = CLI->Arguments[Argument].NumDependentArguments;
 			CurrentSwitchType                                        = CLI->Switches[CLI->Arguments[Argument].Switch].Type;
-			if (CurrentSwitchType == MasterType && NumSlaves > 0) {
+			if (CurrentSwitchType == MasterSwitch && NumSlaves > 0) {
 				for (uint64_t DependentArg = 0ULL; DependentArg < NumDependentArgsInArg; DependentArg++) {
 					for (uint64_t Slave = 0ULL; Slave < NumSlaves; Slave++) {
 						if (CLI->Arguments[Argument].DependentArguments[Slave] == Slaves[Slave]) {
@@ -396,7 +396,7 @@ extern "C" {
 						}
 					}
 				}
-			} else if (CurrentSwitchType == StandaloneWithResult && NumSlaves == 0) {
+			} else if (CurrentSwitchType == SingleSwitchWithResult && NumSlaves == 0) {
 				if (CLI->Arguments[Argument].Switch == Master) {
 					MatchingArgumentNum                      = Argument;
 					MatchingInstance                        += 1;
