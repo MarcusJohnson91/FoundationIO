@@ -33,14 +33,14 @@ extern "C" {
 	 @struct				CommandLineArgument
 	 @abstract											"Contains the data to support a single argument".
 	 @constant				Switch						"Which switch does this argument correspond to"?
-	 @constant				NumDependentArguments		"How many Slave arguments were found in this argument?".
-	 @constant				Slave						"Array of Slave argument numbers, to look up in CLI->Switches".
+	 @constant				NumSlaves					"How many Slave arguments were found in this argument?".
+	 @constant				Slaves						"Array of Slave argument numbers, to look up in CLI->Switches".
 	 @constant				ArgumentResult				"If there is a path or other result expected for this switch's argument, it'll be here".
 	 */
 	typedef struct CommandLineArgument {
 		uint64_t             Switch;
-		uint64_t             NumDependentArguments;
-		uint64_t            *DependentArguments;
+		uint64_t             NumSlaves;
+		uint64_t            *Slaves;
 		char                *ArgumentResult;
 	} CommandLineArgument;
 	
@@ -312,6 +312,7 @@ extern "C" {
 	}
 	
 	void ParseCommandLineArguments(CommandLineIO *CLI, const int argc, const char *argv[]) {
+		uint64_t CurrentArg = 0ULL;
 		if (CLI == NULL) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else {
@@ -321,32 +322,47 @@ extern "C" {
 				DisplayCLIHelp(CLI);
 			} else {
 				DisplayProgramBanner(CLI);
-				for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-					for (int ArgvArg = 0L; ArgvArg < argc; ArgvArg++) {
-						char *ArgvString        = ConvertArgumentString2SwitchFlag(argv[ArgvArg]);
-						uint64_t ArgvStringSize = strlen(ArgvString);
-						for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
-							if (CLI->Switches[Switch].SwitchFlagSize == ArgvStringSize) {
-								if (strncasecmp(ArgvString, CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchFlagSize) == 0) {
-									if (CLI->Switches[Switch].Type == MasterSwitch) {
-										for (uint64_t DependentSwitch = 0ULL; DependentSwitch < CLI->Switches[Switch].NumSlaves; DependentSwitch++) {
-											char *PotentialDependentArgument   = ConvertArgumentString2SwitchFlag(argv[ArgvArg + DependentSwitch]);
-											uint64_t PotentialDependentArgSize = strlen(PotentialDependentArgument);
-											if (CLI->Switches[Switch + DependentSwitch].SwitchFlagSize == PotentialDependentArgSize) {
-												if (strncasecmp(PotentialDependentArgument, CLI->Switches[Switch + DependentSwitch].SwitchFlag, CLI->Switches[Switch + DependentSwitch].SwitchFlagSize) == 0) {
-													CLI->Arguments[Argument].NumDependentArguments += 1;
-													CLI->Arguments[Argument].DependentArguments[DependentSwitch] = Switch + DependentSwitch; // FIXME: Is this right?
-												}
-											}
-										}
-									} else if (CLI->Switches[Switch].Type == SingleSwitchWithResult || CLI->Switches[Switch].Type == SingleSwitchNoResult) {
+				CLI->Arguments         = calloc(CLI->NumArguments + 1, sizeof(CommandLineArgument));
+				
+				for (int ArgvArg = 0L; ArgvArg < argc; ArgvArg++) {
+					char *CurrentArgvStringAsFlag = ConvertArgumentString2SwitchFlag(argv[ArgvArg]);
+					for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
+						if (strcasecmp(CurrentArgvStringAsFlag, CLI->Switches[Switch].SwitchFlag) == 0) {
+							// So we found the switch, now we need to find out the type of switch it is so we can continue processing
+							CLI->NumArguments               += 1;
+							CurrentArg                       = CLI->NumArguments;
+							CLI->Arguments                   = realloc(CLI->Arguments, CLI->NumArguments * sizeof(CommandLineArgument));
+							CLISwitchTypes CurrentSwitchType = CLI->Switches[Switch].Type;
+							if (CurrentSwitchType == SingleSwitchNoResult) {
+								// Make an argument, set the SwitchNum in the argument as Switch, and be done.
+								CLI->Arguments[CurrentArg].Switch = Switch;
+							} else if (CurrentSwitchType == SingleSwitchWithResult) {
+								CLI->Arguments[CurrentArg].Switch         = Switch;
+								CLI->Arguments[CurrentArg].ArgumentResult = argv[ArgvArg + 1];
+							} else if (CurrentSwitchType == MasterSwitch) {
+								CLI->Arguments[CurrentArg].Switch = Switch;
+								for (uint64_t SlaveSwitch = 0ULL; SlaveSwitch < CLI->Switches[Switch].NumSlaves; SlaveSwitch++) {
+									uint64_t NumArgsLeft = argc - (ArgvArg + SlaveSwitch);
+									if (NumArgsLeft < CLI->Arguments[CurrentArg].NumSlaves + 1) { // + 1 for the Argument result
+																								  // idk
+									}
+									char *SlaveArg  = ConvertArgumentString2SwitchFlag(argv[ArgvArg + (SlaveSwitch + 1)]);
+									// Ok, so we're looping over the slave args, we just need to compare the Slave to CLI->Switches[CLI->Switches[Switch].ValidSlaves[Slave]].SwitchFlag
+									if (strcasecmp(SlaveArg, CLI->Switches[CLI->Switches[Switch].ValidSlaves[SlaveSwitch]].SwitchFlag) == 0) {
+										// If the SlaveArg string matches A valid slave, add it to the argument
+										CLI->Arguments[CurrentArg].NumSlaves += 1;
+										uint64_t NumSlaves = CLI->Arguments[CurrentArg].NumSlaves;
+										CLI->Arguments[CurrentArg].Slaves = realloc(CLI->Arguments[CLI->NumArguments].Slaves, NumSlaves * sizeof(uint64_t)); // Add 1 more slave to make room
+										CLI->Arguments[CurrentArg].Slaves[SlaveSwitch] = CLI->Switches[CLI->Switches[Switch].ValidSlaves[SlaveSwitch]].SwitchFlag; // Set the slave as the switch that it matches
 										
+										/*
+										 As we loop over the Slaves, we need to keep in mind the MaxActiveSlaves, as we as the number of arguments left.
+										 */
 									}
 								}
 							}
 						}
 					}
-					CLI->NumArguments += 1; // you have to do this as we build the argument list, or the loop will break
 				}
 			}
 		}
@@ -357,12 +373,12 @@ extern "C" {
 		CLISwitchTypes CurrentSwitchType                             = UnknownSwitchType;
 		uint64_t       NumDependentArgsInArg                         = 0ULL;
 		for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-			NumDependentArgsInArg                                    = CLI->Arguments[Argument].NumDependentArguments;
+			NumDependentArgsInArg                                    = CLI->Arguments[Argument].NumSlaves;
 			CurrentSwitchType                                        = CLI->Switches[CLI->Arguments[Argument].Switch].Type;
 			if (CurrentSwitchType == MasterSwitch && NumSlaves > 0) {
 				for (uint64_t DependentArg = 0ULL; DependentArg < NumDependentArgsInArg; DependentArg++) {
 					for (uint64_t Slave = 0ULL; Slave < NumSlaves; Slave++) {
-						if (CLI->Arguments[Argument].DependentArguments[Slave] == Slaves[Slave]) {
+						if (CLI->Arguments[Argument].Slaves[Slave] == Slaves[Slave]) {
 							NumMatchingArguments                    += 1;
 						}
 					}
@@ -379,18 +395,18 @@ extern "C" {
 	}
 	
 	uint64_t CLIGetMatchingArgumentNum(CommandLineIO *CLI, const uint64_t Instance, const uint64_t Master, const uint64_t NumSlaves, const uint64_t *Slaves) { // Gets the argument number matching Master
-		uint64_t       MatchingArgumentNum                           = 0ULL;
+		uint64_t       MatchingArgumentNum                           = -1;
 		uint64_t       MatchingInstance                              = 0ULL;
 		CLISwitchTypes CurrentSwitchType                             = UnknownSwitchType;
 		uint64_t       NumDependentArgsInArg                         = 0ULL;
 		// Make sure that we track the number of found matching arguments so we can compare it to Instance, if they match, return; otherwise, keep looping.
 		for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-			NumDependentArgsInArg                                    = CLI->Arguments[Argument].NumDependentArguments;
+			NumDependentArgsInArg                                    = CLI->Arguments[Argument].Slaves;
 			CurrentSwitchType                                        = CLI->Switches[CLI->Arguments[Argument].Switch].Type;
 			if (CurrentSwitchType == MasterSwitch && NumSlaves > 0) {
 				for (uint64_t DependentArg = 0ULL; DependentArg < NumDependentArgsInArg; DependentArg++) {
 					for (uint64_t Slave = 0ULL; Slave < NumSlaves; Slave++) {
-						if (CLI->Arguments[Argument].DependentArguments[Slave] == Slaves[Slave]) {
+						if (CLI->Arguments[Argument].Slaves[Slave] == Slaves[Slave]) {
 							MatchingArgumentNum                      = Argument;
 							MatchingInstance                        += 1;
 						}
@@ -422,14 +438,15 @@ extern "C" {
 	
 	char *GetExtensionFromPath(const char *Path) { // Do not include the seperator aka period.
 		uint64_t PathSize        = strlen(Path);
-		uint64_t ExtensionOffset = 0ULL; // From the end
-		uint64_t ExtensionSize   = PathSize - ExtensionOffset;
-		for (uint64_t PathByte   = PathSize; PathByte > 0ULL; PathByte--) {
+		uint64_t ExtensionOffset = PathSize; // From the end
+		uint64_t ExtensionSize   = 0ULL;
+		for (uint64_t PathByte = PathSize; PathByte > 0ULL; PathByte--) {
 			if (Path[PathByte]  != 0x2E) { // 0x2E is a period in ASCII
-				ExtensionOffset += 1;
+				ExtensionOffset -= 1;
+				ExtensionSize   += 1;
 			}
 		}
-		char *ExtensionString    = calloc(1, (ExtensionSize + BitIONULLStringSize) * sizeof(char));
+		char *ExtensionString    = calloc(ExtensionSize + BitIONULLStringSize, sizeof(char));
 		if (ExtensionString == NULL) {
 			BitIOLog(LOG_ERROR, "CommandLineIO", __func__, "Couldn't allocate %lld bytes for the Extension String", ExtensionSize);
 		} else {
@@ -450,7 +467,7 @@ extern "C" {
 				free(CLI->Switches[Switch].ValidSlaves);
 			}
 			for (uint64_t Argument = 0ULL; Argument < CLI->NumArguments; Argument++) {
-				free(CLI->Arguments[Argument].DependentArguments);
+				free(CLI->Arguments[Argument].Slaves);
 				free(CLI->Arguments[Argument].ArgumentResult);
 			}
 			free(CLI->Switches);
@@ -470,3 +487,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
