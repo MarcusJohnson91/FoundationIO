@@ -281,17 +281,16 @@ extern "C" {
 			ErrorCodeString      = "EMERGENCY";
 		}
 		
-		va_list Arguments;
-		va_start(Arguments, Description);
-		int HardStringSize = vsnprintf(NULL, 0, "%s", Arguments);
-		char *HardString   = calloc(1, HardStringSize * sizeof(char));
-		vsprintf(HardString, "%s", Arguments);
-		va_end(Arguments);
+		va_list VariadicArguments;
+		va_start(VariadicArguments, Description);
+		char *HardString         = NULL;
+		vasprintf(&HardString, Description, VariadicArguments);
+		va_end(VariadicArguments);
 		
 		if (BitIOLogFile == NULL) {
-			fprintf(stderr, "%s: %s - %s%s%s%s", ErrorCodeString, LibraryOrProgram, FunctionName, Description, HardString, BitIOLineEnding);
+			fprintf(stderr, "%s %s - %s: %s%s", ErrorCodeString, LibraryOrProgram, FunctionName, HardString, BitIOLineEnding);
 		} else {
-			fprintf(BitIOLogFile, "%s: %s - %s%s%s%s", ErrorCodeString, LibraryOrProgram, FunctionName, Description, HardString, BitIOLineEnding);
+			fprintf(BitIOLogFile, "%s: %s - %s:, %s%s", ErrorCodeString, LibraryOrProgram, FunctionName, HardString, BitIOLineEnding);
 		}
 		free(HardString);
 	}
