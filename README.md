@@ -69,7 +69,7 @@ Logging:
 `BitIOLog()`
 
 * Writes to a file you open with `BitIOLogOpenFile`, if it's unset or otherwise inaccessible, all logs are printed to stderr.
-* Works on any platform that provides `stderr`, and `vsprintf`.
+* Works on any platform that provides `stderr`, and `vasprintf`.
 
 GUUIDs:
 ----------
