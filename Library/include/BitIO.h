@@ -240,7 +240,7 @@ extern "C" {
 	 @param				FunctionName		    "Which function is calling BitIOLog?".
 	 @param				Description				"String describing what went wrong".
 	 */
-	void				BitIOLog(BitIOLogTypes ErrorSeverity, const char *__restrict LibraryOrProgram, const char *__restrict FunctionName, const char *__restrict Description, ...);
+	void				BitIOLog(BitIOLogTypes ErrorSeverity, const char *restrict LibraryOrProgram, const char *restrict FunctionName, const char *restrict Description, ...);
 	
 	/*!
 	 @abstract									"Closes the BitIOLogFile".
