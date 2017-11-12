@@ -286,27 +286,27 @@ extern "C" {
 		}
 	}
 	
-	static char *ConvertOptionString2SwitchFlag(const char *Optionstring) {
+	static char *ConvertOptionString2SwitchFlag(const char *OptionString) {
 		uint8_t  Bytes2RemoveFromArg = 0;
-		uint64_t OptionstringSize  = strlen(Optionstring);
-		char    *Optionswitch = NULL;
-		if (strncasecmp(Optionstring, "/", 1) == 0) {
+		uint64_t OptionStringSize  = strlen(OptionString);
+		char    *OptionSwitch = NULL;
+		if (strncasecmp(OptionString, "/", 1) == 0) {
 			Bytes2RemoveFromArg = 1;
-		} else if (strncasecmp(Optionstring, "--", 2) == 0) {
+		} else if (strncasecmp(OptionString, "--", 2) == 0) {
 			Bytes2RemoveFromArg = 2;
-		} else if (strncasecmp(Optionstring, "-", 1) == 0) {
+		} else if (strncasecmp(OptionString, "-", 1) == 0) {
 			Bytes2RemoveFromArg = 1;
 		}
-		uint64_t OptionswitchSize = (OptionstringSize - Bytes2RemoveFromArg) + BitIONULLStringSize;
-		Optionswitch = calloc(1, OptionswitchSize * sizeof(char));
-		if (Optionswitch == NULL) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate Optionswitch which needs %ulld bytes of memory", OptionswitchSize);
+		uint64_t OptionSwitchSize = (OptionStringSize - Bytes2RemoveFromArg) + BitIONULLStringSize;
+		OptionSwitch = calloc(1, OptionSwitchSize * sizeof(char));
+		if (OptionSwitch == NULL) {
+			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate Optionswitch which needs %ulld bytes of memory", OptionSwitchSize);
 		} else {
-			for (uint64_t Byte = Bytes2RemoveFromArg - BitIONULLStringSize; Byte < OptionstringSize; Byte++) {
-				Optionswitch[Byte] = Optionstring[Byte];
+			for (uint64_t Byte = Bytes2RemoveFromArg - BitIONULLStringSize; Byte < OptionStringSize; Byte++) {
+				OptionSwitch[Byte] = OptionString[Byte];
 			}
 		}
-		return Optionswitch;
+		return OptionSwitch;
 	}
 	
 	void ParseCommandLineOptions(CommandLineIO *CLI, const int argc, const char *argv[]) {
@@ -322,7 +322,7 @@ extern "C" {
 				DisplayProgramBanner(CLI);
 				uint64_t NumCommandLineOptionsNeeded = 0ULL;
 				// Count how many Options we're gonna need total, then go through and make the
-				for (int ArgvCount = 1; ArgvCount < argc; ArgvCount++) {
+				for (uint32_t ArgvCount = 1; ArgvCount < (uint32_t) argc; ArgvCount++) {
 					// ok so check the type of argument by looking up the switch
 					char *CurrentArgvStringAsFlag    = ConvertOptionString2SwitchFlag(argv[ArgvCount]);
 					CLISwitchTypes CurrentSwitchType = UnknownSwitchType;
@@ -382,7 +382,7 @@ extern "C" {
 									break;
 								case SingleSwitchWithResult:
 									CLI->Options[CurrentArg].Switch         = Switch;
-									CLI->Options[CurrentArg].ArgumentResult = argv[ArgvArg + 1];
+									CLI->Options[CurrentArg].ArgumentResult = (char*) argv[ArgvArg + 1];
 									break;
 								case MasterSwitch:
 									CLI->Options[CurrentArg].Switch         = Switch;
