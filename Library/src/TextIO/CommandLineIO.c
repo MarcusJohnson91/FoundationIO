@@ -21,8 +21,8 @@ extern "C" {
 	 */
 	typedef struct CommandLineSwitch {
 		CLISwitchTypes       Type;
-		uint64_t             SwitchFlagSize;
-		uint64_t             NumSlaves;
+		uint8_t              SwitchFlagSize;
+		uint64_t             NumSlaveIDs;
 		uint64_t             MaxActiveSlaves;
 		uint64_t            *ValidSlaves;
 		char                *SwitchFlag;
@@ -32,16 +32,16 @@ extern "C" {
 	/*!
 	 @struct				CommandLineOption
 	 @abstract											"Contains the data to support a single argument".
-	 @constant				Switch						"Which switch does this argument correspond to"?
-	 @constant				NumSlaves					"How many Slave Options were found in this argument?".
-	 @constant				Slaves						"Array of Slave argument numbers, to look up in CLI->Switches".
-	 @constant				ArgumentResult				"If there is a path or other result expected for this switch's argument, it'll be here".
+	 @constant				SwitchID					"Which switch does this argument correspond to"?
+	 @constant				NumSlaveArgs				"How many Slave Options were found in this argument?".
+	 @constant				SlaveIDs					"Array of Slave argument numbers, to look up in CLI->Switches".
+	 @constant				OptionResult				"If there is a path or other result expected for this switch's argument, it'll be here".
 	 */
 	typedef struct CommandLineOption {
-		uint64_t             Switch;
-		uint64_t             NumSlaves;
-		uint64_t            *Slaves;
-		char                *ArgumentResult;
+		uint64_t             SwitchID;
+		uint64_t             NumSlaveIDs;
+		uint64_t            *SlaveIDs;
+		char                *OptionResult;
 	} CommandLineOption;
 	
 	/*!
@@ -214,7 +214,7 @@ extern "C" {
 			CLI->Switches[Switch].Type                = SwitchType;
 			if (SwitchType == SingleSwitchWithResult || SwitchType == SingleSwitchNoResult || SwitchType == SlaveSwitch) {
 				CLI->Switches[Switch].MaxActiveSlaves = 0;
-				CLI->Switches[Switch].NumSlaves       = 0;
+				CLI->Switches[Switch].NumSlaveIDs     = 0;
 				CLI->Switches[Switch].ValidSlaves     = NULL;
 			}
 		}
@@ -228,8 +228,10 @@ extern "C" {
 		} else if (Slave > CLI->NumSwitches) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Slave %d, should be between 0 and %d", Slave, CLI->NumSwitches);
 		} else {
-			CLI->Switches[Master].NumSlaves                 += 1;
-			uint64_t NumSlaves                               = CLI->Switches[Master].NumSlaves;
+			CLI->Switches[Master].NumSlaveIDs               += 1;
+			
+			uint64_t NumSlaves                               = CLI->Switches[Master].NumSlaveIDs;
+			
 			CLI->Switches[Master].ValidSlaves                = realloc(CLI->Switches[Master].ValidSlaves, NumSlaves);
 			CLI->Switches[Master].ValidSlaves[NumSlaves - 1] = Slave;
 		}
@@ -254,7 +256,7 @@ extern "C" {
 				CLISwitchTypes CurrentSwitchType = CLI->Switches[Switch].Type;
 				printf("%s: %s%s", CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchDescription, BitIOLineEnding);
 				if (CurrentSwitchType == MasterSwitch) {
-					for (uint64_t SlaveSwitch = 0ULL; SlaveSwitch < CLI->Switches[Switch].NumSlaves; SlaveSwitch++) {
+					for (uint64_t SlaveSwitch = 0ULL; SlaveSwitch < CLI->Switches[Switch].NumSlaveIDs; SlaveSwitch++) {
 						printf("\t%s: %s%s", CLI->Switches[SlaveSwitch].SwitchFlag, CLI->Switches[SlaveSwitch].SwitchDescription, BitIOLineEnding);
 					}
 				}
@@ -343,7 +345,7 @@ extern "C" {
 									break;
 								case MasterSwitch:
 									NumCommandLineOptionsNeeded += 1;
-									for (uint64_t Slave = 0ULL; Slave < CLI->Switches[Switch].NumSlaves; Slave++) {
+									for (uint64_t Slave = 0ULL; Slave < CLI->Switches[Switch].NumSlaveIDs; Slave++) {
 										// compare the next argument to the list of slaves
 										char *SlaveArgvAsFlag    = ConvertOptionString2SwitchFlag(argv[ArgvCount + (Slave + 1)]);
 										// Now try to match the slave to a switch
@@ -356,7 +358,7 @@ extern "C" {
 									}
 									break;
 								case SlaveSwitch:
-									CLI->Options[Switch].Slaves += 1;
+									CLI->Options[Switch].SlaveIDs += 1; // FIXME: WHAT
 									break;
 							}
 						}
@@ -368,37 +370,34 @@ extern "C" {
 					for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
 						if (strcasecmp(CurrentArgvStringAsFlag, CLI->Switches[Switch].SwitchFlag) == 0) {
 							// So we found the switch, now we need to find out the type of switch it is so we can continue processing
-							CLI->NumOptions                 += 1;
-							CurrentArg                       = CLI->NumOptions;
-							CLI->Options                     = realloc(CLI->Options, CLI->NumOptions * sizeof(CommandLineOption));
-							CLISwitchTypes CurrentSwitchType = CLI->Switches[Switch].Type;
+							CLI->NumOptions                  += 1;
+							CurrentArg                        = CLI->NumOptions;
+							CLI->Options                      = realloc(CLI->Options, CLI->NumOptions * sizeof(CommandLineOption));
+							CLISwitchTypes CurrentSwitchType  = CLI->Switches[Switch].Type;
+							
+							CLI->Options[CurrentArg].SwitchID = Switch;
 							
 							switch (CurrentSwitchType) {
 								case UnknownSwitchType:
 									BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Unknown Switch type %d", CurrentSwitchType);
 									break;
-								case SingleSwitchNoResult:
-									CLI->Options[CurrentArg].Switch = Switch;
-									break;
 								case SingleSwitchWithResult:
-									CLI->Options[CurrentArg].Switch         = Switch;
-									CLI->Options[CurrentArg].ArgumentResult = (char*) argv[ArgvArg + 1];
+									CLI->Options[CurrentArg].OptionResult = (char*) argv[ArgvArg + 1];
 									break;
 								case MasterSwitch:
-									CLI->Options[CurrentArg].Switch         = Switch;
-									CLI->Options[CurrentArg].Slaves         = calloc(CLI->Options[CurrentArg].NumSlaves, sizeof(uint64_t));
-									for (uint64_t SlaveSwitch = 0ULL; SlaveSwitch < CLI->Switches[Switch].NumSlaves; SlaveSwitch++) {
+									CLI->Options[CurrentArg].SlaveIDs = calloc(CLI->Options[CurrentArg].NumSlaveIDs, sizeof(uint64_t));
+									for (uint64_t SlaveSwitch = 0ULL; SlaveSwitch < CLI->Switches[Switch].NumSlaveIDs; SlaveSwitch++) {
 										uint64_t NumArgsLeft = argc - (ArgvArg + SlaveSwitch);
-										if (NumArgsLeft < CLI->Options[CurrentArg].NumSlaves + 1) { // + 1 for the Argument result
+										if (NumArgsLeft < CLI->Options[CurrentArg].NumSlaveIDs + 1) { // + 1 for the Argument result
 																									// idk
 										}
 										char *SlaveArg  = ConvertOptionString2SwitchFlag(argv[ArgvArg + (SlaveSwitch + 1)]);
 										// Ok, so we're looping over the slave args, we just need to compare the Slave to CLI->Switches[CLI->Switches[Switch].ValidSlaves[Slave]].SwitchFlag
 										if (strcasecmp(SlaveArg, CLI->Switches[CLI->Switches[Switch].ValidSlaves[SlaveSwitch]].SwitchFlag) == 0) {
 											// If the SlaveArg string matches A valid slave, add it to the argument
-											CLI->Options[CurrentArg].NumSlaves          += 1;
-											uint64_t NumSlaves                           = CLI->Options[CurrentArg].NumSlaves;
-											CLI->Options[CurrentArg].Slaves[SlaveSwitch] = CLI->Switches[CLI->Switches[Switch].ValidSlaves[SlaveSwitch]].SwitchFlag; // Set the slave as the switch that it matches
+											CLI->Options[CurrentArg].NumSlaveIDs          += 1;
+											uint64_t NumSlaves                             = CLI->Options[CurrentArg].NumSlaveIDs;
+											CLI->Options[CurrentArg].SlaveIDs[SlaveSwitch] = CLI->Switches[CLI->Switches[Switch].ValidSlaves[SlaveSwitch]].SwitchFlag; // Set the slave as the switch that it matches
 											/*
 											 As we loop over the Slaves, we need to keep in mind the MaxActiveSlaves, as we as the number of Options left.
 											 */
@@ -421,21 +420,21 @@ extern "C" {
 		/* Keep track of the instance of the matcing argument, loop over the Options and slaves of each argument,
 		 and compare them, when you find a matching one increment the instance count, compare the instance count to Instance, if they match, you found the argument you're looking for
 		 so return that result */
-		uint64_t MatchingArgNum = 0ULL;
+		int64_t MatchingArgNum = 0ULL;
 		for (uint64_t Option = 0ULL; Option < CLI->NumOptions; Option++) {
-			CLISwitchTypes CurrentArgumentType = CLI->Switches[CLI->Options[Option].Switch].Type;
-			if (CLI->Options[Option].Switch == Master) {
+			CLISwitchTypes CurrentArgumentType = CLI->Switches[CLI->Options[Option].SwitchID].Type;
+			if (CLI->Options[Option].SwitchID == Master) {
 				if (CurrentArgumentType == MasterSwitch && NumSlaves > 0) {
-					for (uint64_t ArgSlave = 0ULL; ArgSlave < CLI->Options[Option].NumSlaves; ArgSlave++) {
+					for (uint64_t ArgSlave = 0ULL; ArgSlave < CLI->Options[Option].NumSlaveIDs; ArgSlave++) {
 						for (uint64_t ParamSlave = 0ULL; ParamSlave < NumSlaves; ParamSlave++) {
-							if (CLI->Options[Option].Slaves[ArgSlave] == Slaves[ParamSlave]) {
-								MatchingArgNum = Option;
+							if (CLI->Options[Option].SlaveIDs[ArgSlave] == Slaves[ParamSlave]) {
+								MatchingArgNum = (int64_t) Option;
 							}
 						}
 					}
 				} else if (CurrentArgumentType == SingleSwitchWithResult || CurrentArgumentType == SingleSwitchNoResult || (CurrentArgumentType == MasterSwitch && NumSlaves == 0)) {
 					// Make sure that the argument matches, keep a count of the instances found, and return.
-					MatchingArgNum = Option;
+					MatchingArgNum = (int64_t) Option;
 				}
 			} else {
 				MatchingArgNum = -1;
@@ -451,7 +450,7 @@ extern "C" {
 		} else if (Option > CLI->NumOptions) {
 			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Option %d is greater than there are Options %d", Option, CLI->NumOptions);
 		} else {
-			Result = CLI->Options[Option].ArgumentResult;
+			Result = CLI->Options[Option].OptionResult;
 		}
 		return Result;
 	}
@@ -491,8 +490,8 @@ extern "C" {
 			}
 			if (CLI->Options != NULL) {
 				for (uint64_t Option = 0ULL; Option < CLI->NumOptions; Option++) {
-					free(CLI->Options[Option].Slaves);
-					free(CLI->Options[Option].ArgumentResult);
+					free(CLI->Options[Option].SlaveIDs);
+					free(CLI->Options[Option].OptionResult);
 				}
 				free(CLI->Options);
 			}
