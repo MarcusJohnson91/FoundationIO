@@ -17,8 +17,8 @@ extern "C" {
 		return Result;
 	}
 	
-	inline uint8_t IntegerLog2(uint64_t Symbol) { // IntegerLog2, IntegerLog2
-		uint64_t Bits    = 0ULL;
+	inline uint8_t IntegerLog2(uint64_t Symbol) {
+		uint8_t Bits     = 0;
 		if (Symbol == 0) {
 			Bits = 1;
 		} else {
@@ -879,7 +879,7 @@ extern "C" {
 	}
 	
 	void     WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const int64_t Field2Write) {
-		uint64_t NumBits2Write = IntegerLog2(Field2Write);
+		uint8_t NumBits2Write = IntegerLog2(Field2Write);
 		WriteUnaryAsLSByteLSBit(BitB, UnaryType, StopBit, NumBits2Write);
 		if (UnaryType == CountUnary) {
 			InsertBitsAsLSByteLSBit(BitB, NumBits2Write, Field2Write);
@@ -893,7 +893,7 @@ extern "C" {
 	}
 	
 	void     WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const int64_t Field2Write) {
-		uint64_t NumBits2Write = IntegerLog2(Field2Write);
+		uint8_t NumBits2Write = IntegerLog2(Field2Write);
 		WriteUnaryAsLSByteMSBit(BitB, UnaryType, StopBit, NumBits2Write);
 		if (UnaryType == CountUnary) {
 			InsertBitsAsLSByteMSBit(BitB, NumBits2Write, Field2Write);
@@ -907,7 +907,7 @@ extern "C" {
 	}
 	
 	void     WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const int64_t Field2Write) {
-		uint64_t NumBits2Write = IntegerLog2(Field2Write);
+		uint8_t NumBits2Write = IntegerLog2(Field2Write);
 		WriteUnaryAsMSByteLSBit(BitB, UnaryType, StopBit, NumBits2Write);
 		if (UnaryType == CountUnary) {
 			InsertBitsAsMSByteLSBit(BitB, NumBits2Write, Field2Write);
@@ -921,7 +921,7 @@ extern "C" {
 	}
 	
 	void     WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const int64_t Field2Write) {
-		uint64_t NumBits2Write = IntegerLog2(Field2Write);
+		uint8_t NumBits2Write = IntegerLog2(Field2Write);
 		WriteUnaryAsMSByteMSBit(BitB, UnaryType, StopBit, NumBits2Write);
 		if (UnaryType == CountUnary) {
 			InsertBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write);
