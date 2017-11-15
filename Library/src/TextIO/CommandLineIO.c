@@ -290,22 +290,21 @@ extern "C" {
 	
 	static char *ConvertOptionString2SwitchFlag(const char *OptionString) {
 		uint8_t  Bytes2RemoveFromArg = 0;
-		uint64_t OptionStringSize  = strlen(OptionString);
-		char    *OptionSwitch = NULL;
+		uint64_t OptionStringSize    = strlen(OptionString);
 		if (strncasecmp(OptionString, "/", 1) == 0) {
-			Bytes2RemoveFromArg = 1;
+			Bytes2RemoveFromArg      = 1;
 		} else if (strncasecmp(OptionString, "--", 2) == 0) {
-			Bytes2RemoveFromArg = 2;
+			Bytes2RemoveFromArg      = 2;
 		} else if (strncasecmp(OptionString, "-", 1) == 0) {
-			Bytes2RemoveFromArg = 1;
+			Bytes2RemoveFromArg      = 1;
 		}
-		uint64_t OptionSwitchSize = (OptionStringSize - Bytes2RemoveFromArg) + BitIONULLStringSize;
-		OptionSwitch = calloc(1, OptionSwitchSize * sizeof(char));
+		uint64_t OptionSwitchSize    = (OptionStringSize - Bytes2RemoveFromArg) + BitIONULLStringSize;
+		char    *OptionSwitch        = calloc(OptionSwitchSize, sizeof(char));
 		if (OptionSwitch == NULL) {
-			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate Optionswitch which needs %ulld bytes of memory", OptionSwitchSize);
+			BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate OptionSwitch which needs %ulld bytes of memory", OptionSwitchSize);
 		} else {
-			for (uint64_t Byte = Bytes2RemoveFromArg - BitIONULLStringSize; Byte < OptionStringSize; Byte++) {
-				OptionSwitch[Byte] = OptionString[Byte];
+			for (uint64_t Byte = Bytes2RemoveFromArg; Byte < (OptionStringSize + BitIONULLStringSize) - Bytes2RemoveFromArg; Byte++) {
+				OptionSwitch[Byte]   = OptionString[Byte];
 			}
 		}
 		return OptionSwitch;
