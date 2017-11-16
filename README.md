@@ -25,8 +25,14 @@ Compiling:
 * The makefile by default builds the library as a static library, for RELEASE, to change this set `BUILDTYPE` to `DEBUG`.
 * BitIO is included as a submodule in git, so you don't need to install it if you're using one of my libraries, ModernPNG, ModernFLAC, ModernAVC, etc.
 * On my Mac for AMD64, the libBitIO static library is about 200kb, if that's too big for your use, enable link time optimization on your program to trim unused functions.
-*  **Microsoft** has decided to not support C11's `_Generic` preprocessor keyword, so you can't directly use the `ReadBits`/`PeekBits`/`ReadUnary`/`ReadExpGolomb`/`ReadGUUID`/`WriteBits`/`WriteUnary`/`WriteExpGolomb`/`WriteGUUID` macros, I've chosen to rely on this preprocessor keyword to ensure that there is minimal branching during runtime, to gain performance on accelerators like GPUs.
-To solve this problem, you can hardcode it with the `Read`/`Write``As``ByteOrder``BitOrder` functions, or pester Microsoft to fix their support for the C11 standard.
+Microsoft
+-----------
+BitIO requires the following features that Microsoft's MSVC does not provide as of Visual Studio 2017
+
+* `_Generic` Added in C11, preprocessor support, used by the Read/Peek/Write function families.
+* `_Static_assert` Added in C11, preprocessor support to validate the function calls provided by BitIO at compile time instead of runtime, used by every function.
+* WORKAROUND: Install Clang's cl.exe from the Visual Studio Installer, the option is called "Clang/C2" in the "Desktop Development with C++" menu.
+* Thank Microsoft for the trouble they've caused.
 
 How To Use libBitIO:
 ===================
@@ -100,3 +106,4 @@ GUUIDs:
 TODO:
 -----
 * Write a WriteArray2BitBuffer and ReadBitBuffer2Array functions, that way I could theoretically at least use SIMD operations on the data.
+
