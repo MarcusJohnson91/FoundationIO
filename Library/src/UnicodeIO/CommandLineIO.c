@@ -308,6 +308,50 @@ extern "C" {
 		return OptionSwitch;
 	}
 	
+	static void CLIAllocateOptions(CommandLineIO *CLI, const int argc, const char *argv[]) {
+		uint64_t NumCommandLineOptionsNeeded               = 0ULL;
+		for (uint32_t ArgvCount = 1; ArgvCount < (uint32_t) argc; ArgvCount++) {
+			// ok so check the type of argument by looking up the switch
+			char *CurrentArgvStringAsFlag                  = ConvertOptionString2SwitchFlag(argv[ArgvCount]);
+			// Now compare the SwitchFlag with CurrentArgvStringAsFlag
+			for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
+				if (strcasecmp(CurrentArgvStringAsFlag, CLI->Switches[Switch].SwitchFlag) == 0) {
+					CLISwitchTypes CurrentSwitchType       = CLI->Switches[Switch].Type;
+					switch (CurrentSwitchType) {
+						case UnknownSwitchType:
+							BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Unknown Switch type %d", CurrentSwitchType);
+							break;
+						case SingleSwitchWithResult:
+							NumCommandLineOptionsNeeded   += 1;
+							ArgvCount += 1;
+							break;
+						case SingleSwitchNoResult:
+							NumCommandLineOptionsNeeded   += 1;
+							break;
+						case MasterSwitch:
+							NumCommandLineOptionsNeeded   += 1;
+							for (uint64_t Slave = 0ULL; Slave < CLI->Switches[Switch].NumSlaveIDs; Slave++) {
+								// compare the next argument to the list of slaves
+								char *SlaveArgvAsFlag      = ConvertOptionString2SwitchFlag(argv[ArgvCount + (Slave + 1)]);
+								// Now try to match the slave to a switch
+								for (uint64_t SlaveSwitch = 0ULL; SlaveSwitch < CLI->NumSwitches; SlaveSwitch++) {
+									if (strcasecmp(SlaveArgvAsFlag, CLI->Switches[SlaveSwitch].SwitchFlag) == 0) {
+										// Ok, we found a matching SlaveSwitch
+										ArgvCount += 1;
+									}
+								}
+							}
+							break;
+						case SlaveSwitch:
+							CLI->Options[Switch].SlaveIDs += 1; // FIXME: WHAT
+							break;
+					}
+				}
+			}
+		}
+		CLI->Options                                       = calloc(CLI->NumOptions, sizeof(CommandLineOption));
+	}
+	
 	void ParseCommandLineOptions(CommandLineIO *CLI, const int argc, const char *argv[]) {
 		uint64_t CurrentArg = 0ULL;
 		if (CLI == NULL) {
@@ -319,49 +363,7 @@ extern "C" {
 				DisplayCLIHelp(CLI);
 			} else {
 				DisplayProgramBanner(CLI);
-				uint64_t NumCommandLineOptionsNeeded = 0ULL;
-				// Count how many Options we're gonna need total, then go through and make the
-				for (uint32_t ArgvCount = 1; ArgvCount < (uint32_t) argc; ArgvCount++) {
-					// ok so check the type of argument by looking up the switch
-					char *CurrentArgvStringAsFlag    = ConvertOptionString2SwitchFlag(argv[ArgvCount]);
-					CLISwitchTypes CurrentSwitchType = UnknownSwitchType;
-					// Now compare the SwitchFlag with CurrentArgvStringAsFlag
-					for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
-						if (strcasecmp(CurrentArgvStringAsFlag, CLI->Switches[Switch].SwitchFlag) == 0) {
-							CurrentSwitchType = CLI->Switches[Switch].Type;
-							switch (CurrentSwitchType) {
-								case UnknownSwitchType:
-									BitIOLog(LOG_ERROR, BitIOLibraryName, __func__, "Unknown Switch type %d", CurrentSwitchType);
-									break;
-								case SingleSwitchWithResult:
-									NumCommandLineOptionsNeeded += 1;
-									ArgvCount += 1;
-									break;
-								case SingleSwitchNoResult:
-									NumCommandLineOptionsNeeded += 1;
-									break;
-								case MasterSwitch:
-									NumCommandLineOptionsNeeded += 1;
-									for (uint64_t Slave = 0ULL; Slave < CLI->Switches[Switch].NumSlaveIDs; Slave++) {
-										// compare the next argument to the list of slaves
-										char *SlaveArgvAsFlag    = ConvertOptionString2SwitchFlag(argv[ArgvCount + (Slave + 1)]);
-										// Now try to match the slave to a switch
-										for (uint64_t SlaveSwitch = 0ULL; SlaveSwitch < CLI->NumSwitches; SlaveSwitch++) {
-											if (strcasecmp(SlaveArgvAsFlag, CLI->Switches[SlaveSwitch].SwitchFlag) == 0) {
-												// Ok, we found a matching SlaveSwitch
-												ArgvCount += 1;
-											}
-										}
-									}
-									break;
-								case SlaveSwitch:
-									CLI->Options[Switch].SlaveIDs += 1; // FIXME: WHAT
-									break;
-							}
-						}
-					}
-				}
-				CLI->Options = calloc(CLI->NumOptions, sizeof(CommandLineOption));
+				CLIAllocateOptions(CLI, argc, argv);
 				for (int ArgvArg = 1L; ArgvArg < argc; ArgvArg++) {
 					char *CurrentArgvStringAsFlag = ConvertOptionString2SwitchFlag(argv[ArgvArg]);
 					for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
