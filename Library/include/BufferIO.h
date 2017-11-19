@@ -63,14 +63,12 @@ extern "C" {
 	
 	/*!
 	 @enum				BitIOLogTypes
-	 @constant			LOG_EMERGENCY			"The system is unusable, the program is quitting (equivalent to panic)".
-	 @constant			LOG_ERROR				"Error condition encountered".
-	 @constant			LOG_INFORMATION			"Information for debugging purposes".
+	 @constant			BitIOLog_ERROR			"An error occurred".
+	 @constant			BitIOLog_DEBUG			"Used for debugging".
 	 */
 	typedef enum BitIOLogTypes {
-						LOG_INFORMATION			= 1,
-						LOG_ERROR				= 2,
-						LOG_EMERGENCY			= 3,
+						BitIOLog_ERROR			= 1,
+						BitIOLog_DEBUG			= 2,
 	} BitIOLogTypes;
 	
 	/*!
@@ -84,22 +82,6 @@ extern "C" {
 	} UnaryTypes;
 	
 	static const char  *BitIOLibraryName        = "libBitIO";
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	/* Pure Math */
 	/*!

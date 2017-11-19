@@ -27,19 +27,17 @@ extern "C" {
 	 @enum					CLISwitchTypes
 	 @abstract										"Defines the type of switch".
 	 @constant				UnknownSwitchType		"Unknown Switch type".
-	 @constant				SingleSwitchWithResult	"Has no dependencies of it's own and isn't a dependnt of any other switch".
-	 @constant				SingleSwitchNoResult	"Has no result, you can just check for it's existence".
-	 @constant				MasterWithSlaves		"MUST Have at least 1 Slave option, is not Slave on any other switch, Masters MUST have a result".
-	 @constant				MasterWithoutSlaves		"MUST NOT have any slave options, is not Slave on any other switch, Masters MUST have a result".
-	 @constant				SlaveSwitch				"Is Slave on another switch, is not Master at all".
+	 @constant				SwitchMayHaveSlaves		"The switch may have slaves, but it may not too".
+	 @constant				SwitchCantHaveSlaves	"The switch can not have any slaves".
+	 @constant				SwitchIsASlave			"The switch is a slave".
+	 @constant				ExistentialSwitch		"The switch can not have any slaves, or any arguments, it just exists or doesn't exist".
 	 */
 	typedef enum CLISwitchTypes {
 							UnknownSwitchType       = 0,
-							SingleSwitchWithResult  = 1,
-							SingleSwitchNoResult    = 2,
-							MasterWithSlaves        = 3,
-							MasterWithoutSlaves     = 4,
-							SlaveSwitch             = 5,
+							SwitchMayHaveSlaves     = 1,
+							SwitchCantHaveSlaves    = 2,
+							SwitchIsASlave          = 3,
+							ExistentialSwitch       = 4,
 	} CLISwitchTypes;
 	
 	/*!
@@ -115,33 +113,33 @@ extern "C" {
 	void					CLISetHelpSwitch(CommandLineIO *CLI, const uint64_t HelpSwitch);
 	
 	/*!
-	 @abstract										"Sets SwitchNum's flag in the CommandLineIO instance pointed by CLI".
+	 @abstract										"Sets SwitchID's flag in the CommandLineIO instance pointed by CLI".
 	 @remark                                        "Just enter the number of characters you typed into the string not counting the quotes".
 	 @param					CLI						"CommandLineIO Pointer".
-	 @param					SwitchNum				"The switch to set".
+	 @param					SwitchID				"The switch to set".
 	 @param					Flag					"The flag to identify an option with".
 	 */
-	void					CLISetSwitchFlag(CommandLineIO *CLI, const uint64_t SwitchNum, char *Flag);
+	void					CLISetSwitchFlag(CommandLineIO *CLI, const uint64_t SwitchID, char *Flag);
 	
 	/*!
 	 @abstract										"Sets SwitchDescription's flag in the CommandLineIO instance pointed by CLI".
 	 @param					CLI						"CommandLineIO Pointer".
-	 @param					SwitchNum				"The switch to set".
+	 @param					SwitchID				"The switch to set".
 	 @param					Description				"Pointer to a C string containing the description of what this program does".
 	 */
-	void					CLISetSwitchDescription(CommandLineIO *CLI, const uint64_t SwitchNum, char *Description);
+	void					CLISetSwitchDescription(CommandLineIO *CLI, const uint64_t SwitchID, char *Description);
 	
 	/*!
-	 @abstract										"Sets SwitchNum's flag in the CommandLineIO instance pointed by CLI".
+	 @abstract										"Sets SwitchID's flag in the CommandLineIO instance pointed by CLI".
 	 @param					CLI						"CommandLineIO Pointer".
-	 @param					Switch					"Which switch are we talking about?".
+	 @param					SwitchID				"Which switch are we talking about?".
 	 */
-	void					CLISetSwitchType(CommandLineIO *CLI, uint64_t Switch, CLISwitchTypes SwitchType);
+	void					CLISetSwitchType(CommandLineIO *CLI, uint64_t SwitchID, CLISwitchTypes SwitchType);
 	
 	/*!
-	 @abstract										"Sets MetaFlag switch as a meta flag for switch SwitchNum".
+	 @abstract										"Sets MetaFlag switch as a meta flag for switch SwitchID".
 	 @param					CLI						"CommandLineIO Pointer".
-	 @param					Master					"Which switch does the child/meta switch depend on?".
+	 @param					MasterID				"Which switch does the child/meta switch depend on?".
 	 @param					Slave					"Which switch is the child switch?".
 	 */
 	void					CLISetSwitchAsSlave(CommandLineIO *CLI, const int64_t MasterID, const int64_t Slave);
@@ -149,10 +147,10 @@ extern "C" {
 	/*!
 	 @abstract										"How many Slave switches can be active in a master argument at once"?
 	 @param					CLI						"CommandLineIO Pointer".
-	 @param					Master					"Which switch are we talking about?".
-	 @param					MaxActiveDependents		"How many Slave switches can be active in an argument at once"?
+	 @param					MasterID				"Which switch are we talking about?".
+	 @param					MaxActiveSlaves			"How many Slave switches can be active in an argument at once"?
 	 */
-	void					CLISetSwitchMaxActiveSlaves(CommandLineIO *CLI, const uint64_t Master, const uint64_t MaxActiveDependents);
+	void					CLISetSwitchMaxActiveSlaves(CommandLineIO *CLI, const uint64_t MasterID, const uint64_t MaxActiveSlaves);
 	
 	/*!
 	 @abstract										"Parses argv for switches matching the ones contained in CLI".
@@ -162,8 +160,6 @@ extern "C" {
 	 @param					argv					"Main's argv, for the actual Options the user has entered".
 	 */
 	void					ParseCommandLineOptions(CommandLineIO *CLI, const int argc, const char *argv[]); // CLIParseOptions
-	
-	void PrintCommandLineOptions(CommandLineIO *CLI);
 	
 	/*!
 	 @abstract										"How many Master switches are present in the Options (will also check for slave switches if present)".
@@ -176,12 +172,12 @@ extern "C" {
 	int64_t					CLIGetOptionNum(CommandLineIO *CLI, const int64_t SwitchID, const uint64_t NumSlaves, const int64_t *SlaveIDs);
 	
 	/*!
-	 @abstract										"Gets the data contained in Switch->Result".
+	 @abstract										"Gets the data contained in Argument2Option".
 	 @param					CLI						"CommandLineIO Pointer".
-	 @param					Argument				"The option's result to return".
+	 @param					Option					"The option's result to return".
 	 @return										"Returns the data after the switch, if the switch is resultless it will return 0".
 	 */
-	char					*CLIGetOptionResult(CommandLineIO const *CLI, const uint64_t Argument);
+	char					*CLIGetOptionResult(CommandLineIO const *CLI, const uint64_t Option);
 	
 	/*!
 	 @abstract										"Returns the extension from Path as a string".
@@ -194,6 +190,10 @@ extern "C" {
 	 @param					CLI						"Pointer to the instance of CommandLineIO you want to delete".
 	 */
 	void					CommandLineIO_Deinit(CommandLineIO *CLI);
+	
+	/*!
+	 */
+	void 					PrintCommandLineOptions(CommandLineIO *CLI);
 	
 #ifdef __cplusplus
 }
