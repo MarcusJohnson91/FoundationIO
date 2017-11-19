@@ -6,6 +6,7 @@
  @brief     This header contains code for parsing command line Options.
  */
 
+#include <assert.h>     /* Included for static_assert */
 #include <stdarg.h>     /* Included for the variadic argument support macros */
 #include <stdbool.h>    /* Included for the bool type */
 #include <stdint.h>     /* Included for the u/intX_t types */
@@ -28,15 +29,17 @@ extern "C" {
 	 @constant				UnknownSwitchType		"Unknown Switch type".
 	 @constant				SingleSwitchWithResult	"Has no dependencies of it's own and isn't a dependnt of any other switch".
 	 @constant				SingleSwitchNoResult	"Has no result, you can just check for it's existence".
-	 @constant				MasterSwitch			"Has Slave switches, is not Slave on any other switch".
+	 @constant				MasterWithSlaves		"MUST Have at least 1 Slave option, is not Slave on any other switch, Masters MUST have a result".
+	 @constant				MasterWithoutSlaves		"MUST NOT have any slave options, is not Slave on any other switch, Masters MUST have a result".
 	 @constant				SlaveSwitch				"Is Slave on another switch, is not Master at all".
 	 */
 	typedef enum CLISwitchTypes {
 							UnknownSwitchType       = 0,
 							SingleSwitchWithResult  = 1,
 							SingleSwitchNoResult    = 2,
-							MasterSwitch            = 3,
-							SlaveSwitch             = 4,
+							MasterWithSlaves        = 3,
+							MasterWithoutSlaves     = 4,
+							SlaveSwitch             = 5,
 	} CLISwitchTypes;
 	
 	/*!
@@ -141,7 +144,7 @@ extern "C" {
 	 @param					Master					"Which switch does the child/meta switch depend on?".
 	 @param					Slave					"Which switch is the child switch?".
 	 */
-	void					CLISetSwitchAsSlave(CommandLineIO *CLI, const uint64_t Master, const uint64_t Slave);
+	void					CLISetSwitchAsSlave(CommandLineIO *CLI, const int64_t MasterID, const int64_t Slave);
 	
 	/*!
 	 @abstract										"How many Slave switches can be active in a master argument at once"?
@@ -160,15 +163,17 @@ extern "C" {
 	 */
 	void					ParseCommandLineOptions(CommandLineIO *CLI, const int argc, const char *argv[]); // CLIParseOptions
 	
+	void PrintCommandLineOptions(CommandLineIO *CLI);
+	
 	/*!
 	 @abstract										"How many Master switches are present in the Options (will also check for slave switches if present)".
 	 @param					CLI						"CommandLineIO Pointer".
-	 @param					Master					"The Switch to look for".
+	 @param					SwitchID				"The Switch to look for".
 	 @param					NumSlaves				"How many slave Options should we look for"?
-	 @param					Slaves					"Pointer to an array with all the slaves you want to mke sure are present".
+	 @param					SlaveIDs				"Pointer to an array with all the slaves you want to mke sure are present".
 	 @return										"Returns the argument number if there is no matching argument it will return -1".
 	 */
-	int64_t					CLIGetOptionNum(CommandLineIO *CLI, const uint64_t Master, const uint64_t NumSlaves, const uint64_t *Slaves);
+	int64_t					CLIGetOptionNum(CommandLineIO *CLI, const int64_t SwitchID, const uint64_t NumSlaves, const int64_t *SlaveIDs);
 	
 	/*!
 	 @abstract										"Gets the data contained in Switch->Result".
