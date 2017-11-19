@@ -6,6 +6,7 @@
  @brief     This header contains code related to reading and writing files and sockets, and utility functions to manage those details.
  */
 
+#include <assert.h>     /* Included for static_assert */
 #include <float.h>      /* Included for the double  max/min macros for the _Generic macros */
 #include <limits.h>     /* Included for the integer max/min macros for the _Generic macros */
 #include <math.h>       /* Included for the math functions like log2 */
@@ -175,7 +176,7 @@ extern "C" {
 	 @param				GUUIDString2			"Pointer to GUUIDString or BinaryGUUID to be compared".
 	 @return									"Returns Yes if GUUID1 and GUUID2 match, No otherwise".
 	 */
-	bool                CompareGUUIDStrings(const uint8_t *GUUIDString1, const uint8_t *GUUIDString2);
+	bool                CompareGUUIDStrings(const uint8_t GUUIDString1[BitIOGUUIDStringSize], const uint8_t GUUIDString2[BitIOGUUIDStringSize]);
 	
 	/*!
 	 @abstract									"Compares BinaryGUUIDs for equilivence".
@@ -183,7 +184,7 @@ extern "C" {
 	 @param				BinaryGUUID2		    "Pointer to GUUIDString or BinaryGUUID to be compared".
 	 @return									"Returns Yes if GUUID1 and GUUID2 match, No otherwise".
 	 */
-	bool                CompareBinaryGUUIDs(const uint8_t *BinaryGUUID1, const uint8_t *BinaryGUUID2);
+	bool                CompareBinaryGUUIDs(const uint8_t BinaryGUUID1[BitIOBinaryGUUIDSize], const uint8_t BinaryGUUID2[BitIOBinaryGUUIDSize]);
 	
 #define GUUID_Compare(GUUIDType,GUUID1,GUUID2)_Generic((GUUIDType),GUUIDString_t:CompareGUUIDStrings,BinaryGUUID_t:CompareGUUIDStrings)(GUUID1,GUUID2)
 
@@ -200,17 +201,17 @@ extern "C" {
 	 @param             BinaryGUUID             "Pointer to a BinaryGUID/UUID".
 	 @return                                    "Returns a pointer to a GUID/UUIDString".
 	 */
-	uint8_t            *ConvertBinaryGUUID2GUUIDString(const uint8_t *BinaryGUUID);
+	uint8_t            *ConvertBinaryGUUID2GUUIDString(const uint8_t BinaryGUUID[BitIOBinaryGUUIDSize]);
 	
 	/*!
 	 @abstract									"Converts a GUIDString to a UUIDString or vice versa".
 	 */
-	uint8_t            *SwapGUUIDString(const uint8_t *GUUIDString);
+	uint8_t            *SwapGUUIDString(const uint8_t GUUIDString[BitIOGUUIDStringSize]);
 	
 	/*!
 	 @abstract									"Converts a BinaryGUID to a BinaryUUID or vice versa".
 	 */
-	uint8_t            *SwapBinaryGUUID(const uint8_t *BinaryGUUID);
+	uint8_t            *SwapBinaryGUUID(const uint8_t BinaryGUUID[BitIOBinaryGUUIDSize]);
 	
 	/*!
 	 @abstract									"Converts a BinaryGUID/UUID to a BinaryUUID/GUID".
