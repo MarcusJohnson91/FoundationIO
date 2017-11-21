@@ -169,15 +169,15 @@ extern "C" {
 	 @param					SlaveIDs				"Pointer to an array with all the slaves you want to mke sure are present".
 	 @return										"Returns the argument number if there is no matching argument it will return -1".
 	 */
-	int64_t					CLIGetOptionNum(CommandLineIO *CLI, const int64_t SwitchID, const uint64_t NumSlaves, const int64_t *SlaveIDs);
+	int64_t					CLIGetOptionNum(CommandLineIO *CLI, const int64_t SwitchID, const int64_t NumSlaves, const int64_t *SlaveIDs);
 	
 	/*!
 	 @abstract										"Gets the data contained in Argument2Option".
 	 @param					CLI						"CommandLineIO Pointer".
-	 @param					Option					"The option's result to return".
+	 @param					OptionID				"The option's result to return".
 	 @return										"Returns the data after the switch, if the switch is resultless it will return 0".
 	 */
-	char					*CLIGetOptionResult(CommandLineIO const *CLI, const uint64_t Option);
+	char					*CLIGetOptionResult(CommandLineIO const *CLI, const int64_t OptionID);
 	
 	/*!
 	 @abstract										"Returns the extension from Path as a string".
