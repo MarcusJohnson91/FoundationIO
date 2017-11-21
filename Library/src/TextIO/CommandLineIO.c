@@ -423,6 +423,35 @@ extern "C" {
 		}
 	}
 	
+	int64_t CLIGetNumMatchingOptions(CommandLineIO *CLI, const int64_t OptionID, const int64_t NumSlaves, const int64_t *SlaveIDs) {
+		int64_t NumMatchingOptions = 0LL;
+		if (CLI == NULL) {
+			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
+		} else if (OptionID > CLI->NumSwitches - 1 || OptionID < 0) {
+			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "SwitchID %d is invalid, it should be between 0 and %d", OptionID, CLI->NumSwitches - 1);
+		} else if (NumSlaves > CLI->NumSwitches - 1 || NumSlaves < 0) {
+			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "NumSlaves %d is invalid, it should be between 0 and %d", NumSlaves, CLI->Options[OptionID].NumSlaveIDs - 1);
+		} else {
+			for (int64_t Option = 0LL; Option < CLI->NumOptions - 1; Option++) { // Loop over all the options
+				if (CLI->Options[Option].SwitchID == OptionID) { // When a potential match is found, go ahead and check the slaves
+					if (NumSlaves == 0 && CLI->Options[Option].NumSlaveIDs == 0) {
+						NumMatchingOptions               += 1;
+					} else if (NumSlaves > 0 && CLI->Options[Option].NumSlaveIDs > 0) {
+						for (int64_t ParamSlave = 0LL; ParamSlave < NumSlaves - 1; ParamSlave++) {
+							for (int64_t OptionSlave = 0LL; OptionSlave < CLI->Options[Option].NumSlaveIDs - 1; OptionSlave++) {
+								if (SlaveIDs[ParamSlave] == CLI->Options[Option].SlaveIDs[OptionSlave]) {
+									NumMatchingOptions   += 1;
+								}
+							}
+						}
+					}
+				}
+				//TODO: Now we just need to make sure that for switches like "-Input -RightEye" it doesn't return -Input -LeftEye
+			}
+		}
+		return NumMatchingOptions;
+	}
+	
 	int64_t CLIGetOptionNum(CommandLineIO *CLI, const int64_t OptionID, const int64_t NumSlaves, const int64_t *SlaveIDs) {
 		int64_t MatchingOption = -1LL;
 		if (CLI == NULL) {

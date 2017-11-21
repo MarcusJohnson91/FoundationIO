@@ -159,7 +159,17 @@ extern "C" {
 	 @param					argc					"Main's argc, for the number of Options entered".
 	 @param					argv					"Main's argv, for the actual Options the user has entered".
 	 */
-	void					ParseCommandLineOptions(CommandLineIO *CLI, const int argc, const char *argv[]); // CLIParseOptions
+	void					ParseCommandLineOptions(CommandLineIO *CLI, const int argc, const char *argv[]);
+	
+	/*!
+	 @abstract										"How many matching options are present in CommandLineIO (will also check for slave switches if present)".
+	 @param					CLI						"CommandLineIO Pointer".
+	 @param					SwitchID				"The switch to look for".
+	 @param					NumSlaves				"How many slave Options should we look for"?
+	 @param					SlaveIDs				"Pointer to an array with all the slaves you want to mke sure are present".
+	 @return										"Returns the argument number if there is no matching argument it will return -1".
+	 */
+	int64_t 				CLIGetNumMatchingOptions(CommandLineIO *CLI, const int64_t SwitchID, const int64_t NumSlaves, const int64_t *SlaveIDs);
 	
 	/*!
 	 @abstract										"How many Master switches are present in the Options (will also check for slave switches if present)".
