@@ -104,13 +104,13 @@ extern "C" {
 	 @param					CLI						"CommandLineIO Pointer".
 	 @param					MinOptions				"The minimum number of switches".
 	 */
-	void					CLISetMinOptions(CommandLineIO *CLI, const uint64_t MinOptions);
+	void					CLISetMinOptions(CommandLineIO *CLI, const int64_t MinOptions);
 	
 	/*!
 	 @abstract				CLI						"CommandLineIO Pointer".
 	 @param					HelpSwitch				"Which switch is the one to print all the Options"?
 	 */
-	void					CLISetHelpSwitch(CommandLineIO *CLI, const uint64_t HelpSwitch);
+	void					CLISetHelpSwitch(CommandLineIO *CLI, const int64_t HelpSwitch);
 	
 	/*!
 	 @abstract										"Sets SwitchID's flag in the CommandLineIO instance pointed by CLI".
@@ -119,7 +119,7 @@ extern "C" {
 	 @param					SwitchID				"The switch to set".
 	 @param					Flag					"The flag to identify an option with".
 	 */
-	void					CLISetSwitchFlag(CommandLineIO *CLI, const uint64_t SwitchID, char *Flag);
+	void					CLISetSwitchFlag(CommandLineIO *CLI, const int64_t SwitchID, char *Flag);
 	
 	/*!
 	 @abstract										"Sets SwitchDescription's flag in the CommandLineIO instance pointed by CLI".
@@ -127,14 +127,14 @@ extern "C" {
 	 @param					SwitchID				"The switch to set".
 	 @param					Description				"Pointer to a C string containing the description of what this program does".
 	 */
-	void					CLISetSwitchDescription(CommandLineIO *CLI, const uint64_t SwitchID, char *Description);
+	void					CLISetSwitchDescription(CommandLineIO *CLI, const int64_t SwitchID, char *Description);
 	
 	/*!
 	 @abstract										"Sets SwitchID's flag in the CommandLineIO instance pointed by CLI".
 	 @param					CLI						"CommandLineIO Pointer".
 	 @param					SwitchID				"Which switch are we talking about?".
 	 */
-	void					CLISetSwitchType(CommandLineIO *CLI, uint64_t SwitchID, CLISwitchTypes SwitchType);
+	void					CLISetSwitchType(CommandLineIO *CLI, int64_t SwitchID, CLISwitchTypes SwitchType);
 	
 	/*!
 	 @abstract										"Sets MetaFlag switch as a meta flag for switch SwitchID".
@@ -150,7 +150,7 @@ extern "C" {
 	 @param					MasterID				"Which switch are we talking about?".
 	 @param					MaxActiveSlaves			"How many Slave switches can be active in an argument at once"?
 	 */
-	void					CLISetSwitchMaxActiveSlaves(CommandLineIO *CLI, const uint64_t MasterID, const uint64_t MaxActiveSlaves);
+	void					CLISetSwitchMaxActiveSlaves(CommandLineIO *CLI, const int64_t MasterID, const int64_t MaxActiveSlaves);
 	
 	/*!
 	 @abstract										"Parses argv for switches matching the ones contained in CLI".
@@ -200,4 +200,3 @@ extern "C" {
 #endif
 
 #endif /* LIBBITIO_CommandLineIO_H */
-

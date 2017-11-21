@@ -796,4 +796,3 @@ extern "C" {
 #endif
 
 #endif /* LIBBITIO_BitIO_H */
-
