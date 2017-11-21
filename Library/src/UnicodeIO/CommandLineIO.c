@@ -324,20 +324,11 @@ extern "C" {
 				char *CurrentArgvStringAsFlag                              = ConvertOptionString2SwitchFlag(argv[ArgvCount]);
 				for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
 					if (strcasecmp(CurrentArgvStringAsFlag, CLI->Switches[Switch].SwitchFlag) == 0) { // TODO: Break out of this loop onec a match has been found.
-						CLISwitchTypes CurrentSwitchType                       = CLI->Switches[Switch].SwitchType;
-						switch (CurrentSwitchType) {
-							case SwitchMayHaveSlaves:
-								CLI->NumOptions                               += 1;
-								break;
-							case SwitchCantHaveSlaves:
-								CLI->NumOptions                               += 1;
-								break;
-							case SwitchIsASlave:
-								CLI->Options[CLI->NumOptions - 1].NumSlaveIDs += 1;
-								break;
-							case ExistentialSwitch:
-								CLI->NumOptions                               += 1;
-								break;
+						CLISwitchTypes CurrentSwitchType                   = CLI->Switches[Switch].SwitchType;
+						if (CurrentSwitchType == SwitchIsASlave) {
+							CLI->Options[CLI->NumOptions - 1].NumSlaveIDs += 1;
+						} else if (CurrentSwitchType != UnknownSwitchType) {
+							CLI->NumOptions                               += 1;
 						}
 					}
 				}
