@@ -2,6 +2,7 @@
 #include "../include/CommandLineIO.h"
 
 #ifdef _WIN32
+#define strcasecmp   stricmp
 #define strncasecmp _strnicmp
 #endif
 
@@ -22,8 +23,8 @@ extern "C" {
 	typedef struct CommandLineSwitch {
 		CLISwitchTypes       SwitchType;
 		uint8_t              SwitchFlagSize;
-		uint64_t             MaxActiveSlaves;
-		uint64_t             NumValidSlaveIDs;
+		int64_t              MaxActiveSlaves;
+		int64_t              NumValidSlaveIDs;
 		int64_t             *ValidSlaves;
 		char                *SwitchFlag;
 		char                *SwitchDescription;
@@ -39,7 +40,7 @@ extern "C" {
 	 */
 	typedef struct CommandLineOption {
 		int64_t              SwitchID;
-		uint64_t             NumSlaveIDs;
+		int64_t              NumSlaveIDs;
 		int64_t             *SlaveIDs;
 		char                *Argument2Option;
 	} CommandLineOption;
@@ -64,10 +65,10 @@ extern "C" {
 	 @constant				ProgramLicenseURL			"URL for the EULA, ToS, or Open source license".
 	 */
 	typedef struct CommandLineIO {
-		uint64_t             NumSwitches;
-		uint64_t             NumOptions;
-		uint64_t             MinOptions;
-		uint64_t             HelpSwitch;
+		int64_t              NumSwitches;
+		int64_t              NumOptions;
+		int64_t              MinOptions;
+		int64_t              HelpSwitch;
 		bool                 IsProprietary;
 		char                *ProgramName;
 		char                *ProgramAuthor;
@@ -81,7 +82,7 @@ extern "C" {
 		CommandLineOption   *Options;
 	} CommandLineIO;
 	
-	CommandLineIO *CommandLineIO_Init(const uint64_t NumSwitches) {
+	CommandLineIO *CommandLineIO_Init(const int64_t NumSwitches) {
 		CommandLineIO *CLI            = calloc(1, sizeof(CommandLineIO));
 		if (CLI == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Couldn't allocate CommandLineIO");
@@ -256,11 +257,11 @@ extern "C" {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else {
 			fprintf(stdout, "%s Options (-|--|/):%s", CLI->ProgramName, BitIONewLine);
-			for (uint64_t Switch = 0LLU; Switch < CLI->NumSwitches - 1; Switch++) {
+			for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
 				CLISwitchTypes CurrentSwitchType = CLI->Switches[Switch].SwitchType;
 				fprintf(stdout, "%s: %s%s", CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchDescription, BitIONewLine);
 				if (CurrentSwitchType == SwitchMayHaveSlaves && CLI->Switches[Switch].NumValidSlaveIDs > 0) {
-					for (uint64_t SlaveSwitch = 0LLU; SlaveSwitch < CLI->Switches[Switch].NumValidSlaveIDs; SlaveSwitch++) {
+					for (int64_t SlaveSwitch = 0LL; SlaveSwitch < CLI->Switches[Switch].NumValidSlaveIDs; SlaveSwitch++) {
 						fprintf(stdout, "\t%s: %s%s", CLI->Switches[SlaveSwitch].SwitchFlag, CLI->Switches[SlaveSwitch].SwitchDescription, BitIONewLine);
 					}
 				}
@@ -272,64 +273,48 @@ extern "C" {
 		if (CLI == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else {
-			if (CLI->ProgramName != NULL) {
-				fprintf(stdout, "%s%s", CLI->ProgramName, BitIONewLine);
-			} else if (CLI->ProgramVersion != NULL) {
-				fprintf(stdout, "version %s", CLI->ProgramVersion);
-			} else if (CLI->ProgramAuthor != NULL) {
-				fprintf(stdout, " by %s", CLI->ProgramAuthor);
-			} else if (CLI->ProgramCopyright != NULL) {
-				fprintf(stdout, " © %s", CLI->ProgramCopyright);
-			} else if (CLI->ProgramDescription != NULL) {
-				fprintf(stdout, ": %s", CLI->ProgramDescription);
-			} else if (CLI->IsProprietary == Yes && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL) {
-				fprintf(stdout, ", Released under the \"%s\" license: %s, available at: %s", CLI->ProgramLicenseName, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL);
-			} else if (CLI->IsProprietary == No && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL) {
-				fprintf(stdout, ", By using this software, you agree to the End User License Agreement %s, available at: %s", CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL);
-			} else {
-				fprintf(stdout, "%s", BitIONewLine);
+			if ((CLI->ProgramName && CLI->ProgramVersion && CLI->ProgramAuthor && CLI->ProgramCopyright) != NULL) {
+				fprintf(stdout, "%s, v. %s by %s © %s%s", CLI->ProgramName, CLI->ProgramVersion, CLI->ProgramAuthor, CLI->ProgramCopyright, BitIONewLine);
 			}
-		}
-	}
-	
-	void PrintCommandLineOptions(CommandLineIO *CLI) {
-		BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "NumOptions %d%s", CLI->NumOptions, BitIONewLine);
-		for (uint64_t Option = 0LLU; Option < CLI->NumOptions; Option++) {
-			if (CLI->Options[Option].SwitchID >= 0) {
-				BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "OptionNum %d, OptionSwitchID %d, OptionFlag %s%s", Option, CLI->Options[Option].SwitchID, CLI->Switches[CLI->Options[Option].SwitchID].SwitchFlag, BitIONewLine);
-				if (CLI->Options[Option].NumSlaveIDs >= 1) {
-					for (uint64_t OptionSlave = 0LLU; OptionSlave < CLI->Options[Option].NumSlaveIDs; OptionSlave++) {
-						BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "SlaveID %d%s", OptionSlave, BitIONewLine);
-					}
-				}
+			
+			if ((CLI->ProgramDescription && CLI->ProgramLicenseName && CLI->ProgramLicenseDescription && CLI->ProgramLicenseURL) != NULL && CLI->IsProprietary == No) {
+				fprintf(stdout, "%s, Released under the \"%s\" %s, available at: %s%s", CLI->ProgramDescription, CLI->ProgramLicenseName, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, BitIONewLine);
+			} else if ((CLI->ProgramDescription && CLI->ProgramLicenseDescription && CLI->ProgramLicenseURL) != NULL && CLI->IsProprietary == Yes) {
+				fprintf(stdout, "%s, By using this software, you agree to the End User License Agreement %s, available at: %s%s", CLI->ProgramDescription, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, BitIONewLine);
 			}
 		}
 	}
 	
 	static char *ConvertOptionString2SwitchFlag(const char *OptionString) {
-		uint8_t  Bytes2RemoveFromArg = 0;
-		uint64_t OptionStringSize    = strlen(OptionString);
-		char    *OptionStringPrefix  = calloc(3, sizeof(char));
-		strncpy(OptionStringPrefix, OptionString, 2);
-		if (strncasecmp((const char*)OptionStringPrefix, "/", 1) == 0) {
-			Bytes2RemoveFromArg      = 1;
-		} else if (strncasecmp((const char*)OptionStringPrefix, "--", 2) == 0) {
-			Bytes2RemoveFromArg      = 2;
-		} else if (strncasecmp((const char*)OptionStringPrefix, "-", 1) == 0) {
-			Bytes2RemoveFromArg      = 1;
+		char *OptionSwitch = NULL;
+		if (OptionString == NULL) {
+			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Bruh, OptionString can't be NULL");
+		} else {
+			uint8_t  OptionStringPrefixSize = 0;
+			enum {
+				ASCIIHyphen = 0x2D,
+				ASCIIFSlash = 0x5C,
+				ASCIIBSlash = 0x2F,
+			};
+			
+			if (OptionString[0] == ASCIIHyphen && OptionString[1] == ASCIIHyphen) {
+				OptionStringPrefixSize  = 2;
+			} else if (OptionString[0] == ASCIIBSlash || OptionString[0] == ASCIIFSlash || OptionString[0] == ASCIIHyphen) {
+				OptionStringPrefixSize  = 1;
+			}
+			uint32_t OptionStringSize    = strlen(OptionString);
+			uint64_t OptionSwitchSize    = (OptionStringSize - OptionStringPrefixSize) + BitIONULLStringSize;
+			OptionSwitch                 = calloc(OptionSwitchSize, sizeof(char));
+			strncpy(OptionSwitch, OptionString + OptionStringPrefixSize, OptionStringSize - OptionStringPrefixSize);
 		}
-		free(OptionStringPrefix);
-		uint64_t OptionSwitchSize    = (OptionStringSize - Bytes2RemoveFromArg) + BitIONULLStringSize;
-		char    *OptionSwitch        = calloc(OptionSwitchSize, sizeof(char));
-		strncpy(OptionSwitch, OptionString + Bytes2RemoveFromArg, OptionStringSize - Bytes2RemoveFromArg);
 		return OptionSwitch;
 	}
 	
 	static void CLIAllocateOptions(CommandLineIO *CLI, const int argc, const char *argv[]) {
-		for (uint32_t ArgvCount = 1; ArgvCount < (uint32_t) argc - 1; ArgvCount++) {
-			char *CurrentArgvStringAsFlag                                  = ConvertOptionString2SwitchFlag(argv[ArgvCount]);
-			for (uint64_t Switch = 0LLU; Switch < CLI->NumSwitches - 1; Switch++) {
-				if (strcasecmp(CurrentArgvStringAsFlag, CLI->Switches[Switch].SwitchFlag) == 0) {
+		for (int ArgvCount = 1; ArgvCount < argc; ArgvCount++) {
+			char *CurrentArgvStringAsFlag                              = ConvertOptionString2SwitchFlag(argv[ArgvCount]);
+			for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
+				if (strcasecmp(CurrentArgvStringAsFlag, CLI->Switches[Switch].SwitchFlag) == 0) { // TODO: Break out of this loop onec a match has been found.
 					CLISwitchTypes CurrentSwitchType                       = CLI->Switches[Switch].SwitchType;
 					switch (CurrentSwitchType) {
 						case SwitchMayHaveSlaves:
@@ -344,76 +329,84 @@ extern "C" {
 						case ExistentialSwitch:
 							CLI->NumOptions                               += 1;
 							break;
-						case UnknownSwitchType:
-							BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "You need to call CLISetSwitchType for SwitchID %d", Switch);
-							break;
 					}
 				}
 			}
 		}
-		CLI->Options                                                       = calloc(CLI->NumOptions, sizeof(CommandLineOption));
-		if (CLI->Options != NULL) {
-			for (uint64_t Option = 0LLU; Option < CLI->NumOptions - 1; Option++) {
-				CLI->Options[Option].SwitchID                              = -1;
-				CLI->Options[Option].SlaveIDs                              = calloc(CLI->Options[Option].NumSlaveIDs, sizeof(int64_t));
-				if (CLI->Options[Option].NumSlaveIDs >= 1) {
-					for (uint64_t OptionSlave = 0LLU; OptionSlave < CLI->Options[Option].NumSlaveIDs - 1; OptionSlave++) {
-						CLI->Options[Option].SlaveIDs[OptionSlave]         = -1;
+		if (CLI->NumOptions >= CLI->MinOptions) {
+			CLI->Options                                                   = calloc(CLI->NumOptions, sizeof(CommandLineOption));
+			if (CLI->Options != NULL) {
+				for (int64_t Option = 0LL; Option < CLI->NumOptions - 1; Option++) {
+					CLI->Options[Option].SwitchID                          = -1;
+					if (CLI->Options[Option].NumSlaveIDs >= 1) {
+						CLI->Options[Option].SlaveIDs                      = calloc(CLI->Options[Option].NumSlaveIDs, sizeof(int64_t));
+						for (int64_t OptionSlave = 0LL; OptionSlave < CLI->Options[Option].NumSlaveIDs - 1; OptionSlave++) {
+							CLI->Options[Option].SlaveIDs[OptionSlave]     = -1;
+						}
 					}
 				}
+			} else {
+				BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Couldn't allocate %d options", CLI->NumOptions);
 			}
 		} else {
-			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Couldn't allocate %d options", CLI->NumOptions);
+			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "You only specified %d options, %d is the minimum", CLI->NumOptions, CLI->MinOptions);
 		}
+		
 	}
 	
 	void ParseCommandLineOptions(CommandLineIO *CLI, const int argc, const char *argv[]) {
-		uint64_t CurrentArg                                                                = 0LLU;
 		if (CLI == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
+		} else if (argc < CLI->MinOptions) {
+			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "You entered %d options, the minimum is %d", argc - 1, CLI->MinOptions);
 		} else {
 			char *FirstArgumentAsFlag                                                      = ConvertOptionString2SwitchFlag(argv[1]);
-			char *HelpFlag                                                                 = ConvertOptionString2SwitchFlag(CLI->Switches[CLI->HelpSwitch].SwitchFlag);
-			if (argc < (int) CLI->MinOptions || strncasecmp(FirstArgumentAsFlag, HelpFlag, CLI->Switches[CLI->HelpSwitch].SwitchFlagSize) == 0) {
+			char *HelpFlag                                                                 = CLI->Switches[CLI->HelpSwitch].SwitchFlag;
+			if (strncasecmp(FirstArgumentAsFlag, HelpFlag, CLI->Switches[CLI->HelpSwitch].SwitchFlagSize) == 0) {
 				DisplayCLIHelp(CLI);
 			} else {
+				free(FirstArgumentAsFlag);
 				DisplayProgramBanner(CLI);
 				CLIAllocateOptions(CLI, argc, argv);
-				for (int ArgvArg = 1L; ArgvArg < argc; ArgvArg++) {
-					char *CurrentArgvStringAsFlag = ConvertOptionString2SwitchFlag(argv[ArgvArg]);
-					for (uint64_t Switch = 0LLU; Switch < CLI->NumSwitches - 1; Switch++) {
-						if (strcasecmp(CurrentArgvStringAsFlag, CLI->Switches[Switch].SwitchFlag) == 0) {
-							CLI->NumOptions                                               += 1;
-							CurrentArg                                                     = CLI->NumOptions - 1;
-							CLISwitchTypes CurrentSwitchType                               = CLI->Switches[Switch].SwitchType;
-							switch (CurrentSwitchType) {
-								case ExistentialSwitch:
-									CLI->Options[CurrentArg].SwitchID                      = (int64_t) Switch;
-									break;
-								case SwitchMayHaveSlaves:
-									CLI->Options[CurrentArg].SwitchID                      = (int64_t) Switch;
-									break;
-								case SwitchCantHaveSlaves:
-									CLI->Options[CurrentArg].SwitchID                      = (int64_t) Switch;
-									CLI->Options[CurrentArg].Argument2Option               = (char*) argv[ArgvArg + 1];
-									break;
-								case SwitchIsASlave:
-									for (uint64_t OptionSlave = 0LLU; OptionSlave < CLI->Options[Switch].NumSlaveIDs - 1; OptionSlave++) {
-										uint64_t NumArgsLeft                               = argc - (ArgvArg + OptionSlave);
-										if (NumArgsLeft < CLI->Options[CurrentArg].NumSlaveIDs + 1) { // + 1 for the Argument result
-											// idk
+				
+				int64_t CurrentOption = 0LL;
+				
+				while (CurrentOption < CLI->NumOptions) {
+					for (int ArgvArg = 1L; ArgvArg < argc - 1; ArgvArg++) {
+						for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
+							char *CurrentArgvStringAsFlag  = ConvertOptionString2SwitchFlag(argv[ArgvArg]);
+							uint64_t ComparisonResult      = strncasecmp(CurrentArgvStringAsFlag, CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchFlagSize);
+							if (ComparisonResult == 0) {
+								CLISwitchTypes CurrentSwitchType                          = CLI->Switches[Switch].SwitchType;
+								switch (CurrentSwitchType) {
+									case ExistentialSwitch:
+										CLI->Options[CurrentOption].SwitchID                     = Switch;
+										break;
+									case SwitchMayHaveSlaves:
+										CLI->Options[CurrentOption].SwitchID                     = Switch;
+										break;
+									case SwitchCantHaveSlaves:
+										CLI->Options[CurrentOption].SwitchID                     = Switch;
+										break;
+									case SwitchIsASlave:
+										for (uint64_t OptionSlave = 0LL; OptionSlave < CLI->Options[CurrentOption].NumSlaveIDs - 1; OptionSlave++) {
+											uint64_t NumArgsLeft                          = argc - (ArgvArg + OptionSlave);
+											if (NumArgsLeft < CLI->Options[ArgvArg].NumSlaveIDs + 1) { // + 1 for the Argument result
+												// idk
+											}
+											char *SlaveArg                                = ConvertOptionString2SwitchFlag(argv[CurrentOption + (OptionSlave + 1)]);
+											if (strcasecmp(SlaveArg, CLI->Switches[CLI->Switches[CurrentOption].ValidSlaves[OptionSlave]].SwitchFlag) == 0) {
+												CLI->Options[CurrentOption].NumSlaveIDs          += 1;
+												uint64_t NumSlaves                         = CLI->Options[CurrentOption].NumSlaveIDs;
+												CLI->Options[CurrentOption].SlaveIDs[OptionSlave] = CLI->Switches[CLI->Switches[Switch].ValidSlaves[OptionSlave]].SwitchFlag;
+											}
 										}
-										char *SlaveArg                                     = ConvertOptionString2SwitchFlag(argv[ArgvArg + (OptionSlave + 1)]);
-										if (strcasecmp(SlaveArg, CLI->Switches[CLI->Switches[Switch].ValidSlaves[OptionSlave]].SwitchFlag) == 0) {
-											CLI->Options[CurrentArg].NumSlaveIDs          += 1;
-											uint64_t NumSlaves                             = CLI->Options[CurrentArg].NumSlaveIDs;
-											CLI->Options[CurrentArg].SlaveIDs[OptionSlave] = CLI->Switches[CLI->Switches[Switch].ValidSlaves[OptionSlave]].SwitchFlag;
-										}
-									}
-									break;
+										break;
+								}
+								CurrentOption += 1;
+							} else {
+								CLI->Options[CurrentOption].Argument2Option = (char*)argv[ArgvArg + (CLI->Options[CurrentOption].NumSlaveIDs + 1)];
 							}
-						} else if (CLI->Switches[CLI->Options[CLI->NumOptions - 1].SwitchID].SwitchType != ExistentialSwitch) {
-							CLI->Options[CLI->NumOptions - 1].Argument2Option  = (char*) argv[ArgvArg];
 						}
 					}
 				}
@@ -423,11 +416,11 @@ extern "C" {
 	
 	int64_t CLIGetOptionNum(CommandLineIO *CLI, const int64_t SwitchID, const uint64_t NumSlaves, const int64_t *SlaveIDs) {
 		bool AllOptionsMatch   = Yes;
-		int64_t MatchingArgNum = 0LLU;
-		for (uint64_t Option = 0LLU; Option < CLI->NumOptions; Option++) {
+		int64_t MatchingArgNum = 0LL;
+		for (int64_t Option = 0LL; Option < CLI->NumOptions - 1; Option++) {
 			if (CLI->Options[Option].SwitchID == SwitchID) {
-				for (uint64_t OptionSlave = 0LLU; OptionSlave < CLI->Options[Option].NumSlaveIDs; OptionSlave++) {
-					for (uint64_t ParamSlave = 0LLU; ParamSlave < NumSlaves; ParamSlave++) {
+				for (int64_t OptionSlave = 0LL; OptionSlave < CLI->Options[Option].NumSlaveIDs; OptionSlave++) {
+					for (int64_t ParamSlave = 0LL; ParamSlave < NumSlaves; ParamSlave++) {
 						if (SlaveIDs[ParamSlave] == CLI->Options[Option].SlaveIDs[OptionSlave]) {
 							
 						}
@@ -480,8 +473,8 @@ extern "C" {
 		char *Result = NULL;
 		if (CLI == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
-		} else if (Option > CLI->NumOptions) {
-			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Option %d is greater than there are Options %d", Option, CLI->NumOptions);
+		} else if (Option > CLI->NumOptions - 1) {
+			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Option %d is greater than there are Options %d", Option, CLI->NumOptions - 1);
 		} else {
 			Result = CLI->Options[Option].Argument2Option;
 		}
@@ -517,7 +510,7 @@ extern "C" {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else {
 			if (CLI->Switches != NULL) {
-				for (uint64_t Switch = 0LLU; Switch < CLI->NumSwitches - 1; Switch++) {
+				for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
 					free(CLI->Switches[Switch].SwitchFlag);
 					free(CLI->Switches[Switch].SwitchDescription);
 					free(CLI->Switches[Switch].ValidSlaves);
@@ -525,7 +518,7 @@ extern "C" {
 				free(CLI->Switches);
 			}
 			if (CLI->Options != NULL) {
-				for (uint64_t Option = 0LLU; Option < CLI->NumOptions - 1; Option++) {
+				for (int64_t Option = 0LL; Option < CLI->NumOptions - 1; Option++) {
 					free(CLI->Options[Option].SlaveIDs);
 					free(CLI->Options[Option].Argument2Option);
 				}
@@ -562,3 +555,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
