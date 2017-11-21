@@ -51,7 +51,7 @@ extern "C" {
 	 @param					NumSwitches				"The number of CommandLineSwitch structures to initalize".
 	 @return										"Returns a pointer to an initialized CommandLineIO instance".
 	 */
-	CommandLineIO			*CommandLineIO_Init(const uint64_t NumSwitches);
+	CommandLineIO			*CommandLineIO_Init(const int64_t NumSwitches);
 	
 	/*!
 	 @abstract										"Sets the name of the program".
