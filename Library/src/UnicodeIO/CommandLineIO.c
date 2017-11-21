@@ -414,69 +414,40 @@ extern "C" {
 		}
 	}
 	
-	int64_t CLIGetOptionNum(CommandLineIO *CLI, const int64_t SwitchID, const uint64_t NumSlaves, const int64_t *SlaveIDs) {
-		bool AllOptionsMatch   = Yes;
-		int64_t MatchingArgNum = 0LL;
-		for (int64_t Option = 0LL; Option < CLI->NumOptions - 1; Option++) {
-			if (CLI->Options[Option].SwitchID == SwitchID) {
-				for (int64_t OptionSlave = 0LL; OptionSlave < CLI->Options[Option].NumSlaveIDs; OptionSlave++) {
-					for (int64_t ParamSlave = 0LL; ParamSlave < NumSlaves; ParamSlave++) {
-						if (SlaveIDs[ParamSlave] == CLI->Options[Option].SlaveIDs[OptionSlave]) {
-							
-						}
-					}
-				}
-			}
-			
-			CLISwitchTypes CurrentArgumentType = CLI->Switches[CLI->Options[Option].SwitchID].SwitchType;
-			
-			/*
-			 Loop over the Options looking for SwitchID, when you find an option that matches SwitchID, check if the SlaveIDs match
-			 if the SlaveIDs don't match all, then you need to go ahead and keep looping.
-			 */
-			
-			switch (CurrentArgumentType) {
-				case UnknownSwitchType:
-					break;
-				case SwitchMayHaveSlaves:
-					break;
-				case SwitchCantHaveSlaves:
-					break;
-				case SwitchIsASlave:
-					break;
-				case ExistentialSwitch:
-					break;
-			}
-			/*
-			if (CLI->Switches[CLI->Options[Option].SwitchID].Type == Master) {
-				if (CurrentArgumentType == MasterSwitch && NumSlaves > 0) {
-					for (uint64_t ArgSlave = 0LLU; ArgSlave < CLI->Options[Option].NumSlaveIDs; ArgSlave++) {
-						for (uint64_t ParamSlave = 0LLU; ParamSlave < NumSlaves; ParamSlave++) {
-							if (CLI->Options[Option].SlaveIDs[ArgSlave] == SlaveIDs[ParamSlave]) {
-								MatchingArgNum = (int64_t) Option;
+	int64_t CLIGetOptionNum(CommandLineIO *CLI, const int64_t SwitchID, const int64_t NumSlaves, const int64_t *SlaveIDs) {
+		bool AllOptionsMatch   = No;
+		int64_t MatchingOption = -1LL;
+		for (int64_t Option = 0LL; Option < CLI->NumOptions - 1; Option++) { // Loop over all the options
+			if (CLI->Options[Option].SwitchID == SwitchID) { // When a potential match is found, go ahead and check the slaves
+				if (NumSlaves == 0 && CLI->Options[Option].NumSlaveIDs == 0) {
+					AllOptionsMatch       = Yes;
+					MatchingOption        = Option;
+				} else {
+					for (int64_t ParamSlave = 0LL; ParamSlave < NumSlaves - 1; ParamSlave++) {
+						for (int64_t OptionSlave = 0LL; OptionSlave < CLI->Options[Option].NumSlaveIDs - 1; OptionSlave++) {
+							if (SlaveIDs[ParamSlave] == CLI->Options[Option].SlaveIDs[OptionSlave]) {
+								AllOptionsMatch       = Yes;
+								MatchingOption        = Option;
 							}
 						}
 					}
-				} else if (CurrentArgumentType == SingleSwitchWithResult || CurrentArgumentType == SingleSwitchNoResult || (CurrentArgumentType == MasterSwitch && NumSlaves == 0)) {
-					// Make sure that the argument matches, keep a count of the instances found, and return.
-					MatchingArgNum = (int64_t) Option;
 				}
-			} else {
-				MatchingArgNum = -1;
 			}
-			 */
+			//TODO: Now we just need to make sure that for switches like "-Input -RightEye" it doesn't return -Input -LeftEye
 		}
-		return MatchingArgNum;
+		return MatchingOption;
 	}
 	
-	char *CLIGetOptionResult(CommandLineIO const *CLI, const uint64_t Option) {
+	char *CLIGetOptionResult(CommandLineIO const *CLI, const int64_t OptionID) {
 		char *Result = NULL;
 		if (CLI == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
-		} else if (Option > CLI->NumOptions - 1) {
-			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Option %d is greater than there are Options %d", Option, CLI->NumOptions - 1);
+		} else if (OptionID > CLI->NumOptions - 1) {
+			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Option %d is greater than there are Options %d", OptionID, CLI->NumOptions - 1);
+		} else if (OptionID < 0) {
+			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Invalid OptionID %d, valid IDs range from 0 - %d", OptionID, CLI->NumOptions - 1);
 		} else {
-			Result = CLI->Options[Option].Argument2Option;
+			Result = CLI->Options[OptionID].Argument2Option;
 		}
 		return Result;
 	}
