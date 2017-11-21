@@ -453,24 +453,25 @@ extern "C" {
 	}
 	
 	char *GetExtensionFromPath(const char *Path) {
-		uint64_t PathSize        = strlen(Path);
-		uint64_t ExtensionOffset = PathSize;
-		uint64_t ExtensionSize   = 0LLU;
-		enum {
-			ASCIIPeriod          = 0x2E,
-		};
-		for (uint64_t PathByte = PathSize; PathByte > 0LLU; PathByte--) {
-			if (Path[PathByte]  != ASCIIPeriod) {
-				ExtensionOffset -= 1;
-				ExtensionSize   += 1;
-			}
-		}
-		char *ExtensionString    = calloc(ExtensionSize + BitIONULLStringSize, sizeof(char));
-		if (ExtensionString == NULL) {
-			BitIOLog(BitIOLog_ERROR, "CommandLineIO", __func__, "Couldn't allocate %lld bytes for the Extension String", ExtensionSize);
+		char *ExtensionString                  = NULL;
+		if (Path == NULL) {
+			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Path Pointer is NULL");
 		} else {
-			for (uint64_t ExtensionByte = ExtensionOffset; ExtensionByte < PathSize; ExtensionByte++) {
-				ExtensionString[ExtensionByte] = Path[ExtensionByte];
+			uint64_t PathSize                  = strlen(Path) + 1;
+			uint64_t ExtensionSize             = PathSize;
+			uint64_t ExtensionDistanceFromEnd  = 0ULL;
+			while (Path[ExtensionDistanceFromEnd] != 0x2E) {
+				ExtensionSize                 -= 1;
+				ExtensionDistanceFromEnd      += 1;
+			}
+			ExtensionSize                      = PathSize - ExtensionDistanceFromEnd;
+			ExtensionString                    = calloc(ExtensionSize + BitIONULLStringSize, sizeof(char));
+			if (ExtensionString == NULL) {
+				BitIOLog(BitIOLog_ERROR, "CommandLineIO", __func__, "Couldn't allocate %lld bytes for the Extension String", ExtensionSize);
+			} else {
+				for (uint64_t ExtensionByte = 0LLU; ExtensionByte < ExtensionSize; ExtensionByte++) {
+					ExtensionString[ExtensionByte] = Path[ExtensionByte + ExtensionDistanceFromEnd];
+				}
 			}
 		}
 		return ExtensionString;
