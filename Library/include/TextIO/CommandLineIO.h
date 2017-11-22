@@ -12,7 +12,7 @@
 #include <stdint.h>     /* Included for the u/intX_t types */
 #include <stdlib.h>     /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
 
-#include "Macros.h"
+#include "BitIOMacros.h"
 
 #pragma once
 

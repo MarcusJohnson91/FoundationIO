@@ -17,14 +17,14 @@
 #include <stdlib.h>     /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
 #include <string.h>     /* Included for the atoll */
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_WIN64)
 #include <winsock.h>    /* Included for the socket support on Windows */
 #else
 #include <sys/socket.h> /* Included for the socket support */
 #include <unistd.h>     /* Included SOLELY for the _POSIX_VERSION macro */
 #endif
 
-#include "Macros.h"
+#include "BitIOMacros.h"
 
 #pragma once
 

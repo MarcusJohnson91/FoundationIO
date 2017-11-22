@@ -1,11 +1,6 @@
 #include "../include/BitIO.h"
 #include "../include/CommandLineIO.h"
 
-#ifdef _WIN32
-#define strcasecmp   stricmp
-#define strncasecmp _strnicmp
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
