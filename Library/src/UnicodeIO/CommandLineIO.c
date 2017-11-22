@@ -18,14 +18,14 @@ extern "C" {
 	 @constant				SwitchFlagSize				"What is the number of bytes (if ASCII)/ code points (if UTF) of this switch?".
 	 @constant				SwitchDescription			"Describe to the user what this switch does".
 	 @constant				MaxActiveSlaves				"How many Slave switches can be active at once"?
-	 @constant				ValidSlaves					"Pointer to an array that contains the list of aloowable Slave switches".
+	 @constant				SlaveIDs					"Pointer to an array that contains the list of aloowable Slave switches".
 	 */
 	typedef struct CommandLineSwitch {
-		int64_t              MaxActiveSlaves;
-		int64_t              NumValidSlaveIDs;
-		int64_t             *ValidSlaves;
+		int64_t             *SlaveIDs;
 		char                *SwitchFlag;
 		char                *SwitchDescription;
+		int64_t              MaxActiveSlaves;
+		int64_t              NumSlaveIDs;
 		CLISwitchTypes       SwitchType;
 		uint8_t              SwitchFlagSize;
 	} CommandLineSwitch;
@@ -39,10 +39,10 @@ extern "C" {
 	 @constant				Argument2Option				"If there is a path or other result expected for this switch's argument, it'll be here".
 	 */
 	typedef struct CommandLineOption {
+		char                *Argument2Option;
+		int64_t             *SlaveIDs;
 		int64_t              SwitchID;
 		int64_t              NumSlaveIDs;
-		int64_t             *SlaveIDs;
-		char                *Argument2Option;
 	} CommandLineOption;
 	
 	/*!
@@ -223,8 +223,8 @@ extern "C" {
 			CLI->Switches[SwitchID].SwitchType           = SwitchType;
 			if (SwitchType == SwitchCantHaveSlaves || SwitchType == SwitchIsASlave || SwitchType == ExistentialSwitch) {
 				CLI->Switches[SwitchID].MaxActiveSlaves  = 0;
-				CLI->Switches[SwitchID].NumValidSlaveIDs = 0;
-				CLI->Switches[SwitchID].ValidSlaves      = NULL;
+				CLI->Switches[SwitchID].NumSlaveIDs      = 0;
+				CLI->Switches[SwitchID].SlaveIDs         = NULL;
 			}
 		}
 	}
@@ -237,12 +237,12 @@ extern "C" {
 		} else if (SlaveID > CLI->NumSwitches - 1 || SlaveID < 0) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "SlaveID %d is invalid, it should be between 0 and %d", SlaveID, CLI->NumSwitches - 1);
 		} else {
-			CLI->Switches[MasterID].NumValidSlaveIDs          += 1;
+			CLI->Switches[MasterID].NumSlaveIDs            += 1;
 			
-			int64_t NumSlaves                                  = CLI->Switches[MasterID].NumValidSlaveIDs + 1;
+			int64_t NumSlaves                               = CLI->Switches[MasterID].NumSlaveIDs + 1;
 			
-			CLI->Switches[MasterID].ValidSlaves                = realloc(CLI->Switches[MasterID].ValidSlaves, NumSlaves * sizeof(int64_t));
-			CLI->Switches[MasterID].ValidSlaves[NumSlaves - 1] = SlaveID;
+			CLI->Switches[MasterID].SlaveIDs                = realloc(CLI->Switches[MasterID].SlaveIDs, NumSlaves * sizeof(int64_t));
+			CLI->Switches[MasterID].SlaveIDs[NumSlaves - 1] = SlaveID;
 		}
 	}
 	
@@ -266,8 +266,8 @@ extern "C" {
 			for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
 				CLISwitchTypes CurrentSwitchType = CLI->Switches[Switch].SwitchType;
 				fprintf(stdout, "%s: %s%s", CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchDescription, BitIONewLine);
-				if (CurrentSwitchType == SwitchMayHaveSlaves && CLI->Switches[Switch].NumValidSlaveIDs > 0) {
-					for (int64_t SlaveSwitch = 0LL; SlaveSwitch < CLI->Switches[Switch].NumValidSlaveIDs; SlaveSwitch++) {
+				if (CurrentSwitchType == SwitchMayHaveSlaves && CLI->Switches[Switch].NumSlaveIDs > 0) {
+					for (int64_t SlaveSwitch = 0LL; SlaveSwitch < CLI->Switches[Switch].NumSlaveIDs; SlaveSwitch++) {
 						fprintf(stdout, "\t%s: %s%s", CLI->Switches[SlaveSwitch].SwitchFlag, CLI->Switches[SlaveSwitch].SwitchDescription, BitIONewLine);
 					}
 				}
@@ -395,10 +395,10 @@ extern "C" {
 												// idk
 											}
 											char *SlaveArg                                        = ConvertOptionString2SwitchFlag(argv[CurrentOption + (OptionSlave + 1)]);
-											if (strcasecmp(SlaveArg, CLI->Switches[CLI->Switches[CurrentOption].ValidSlaves[OptionSlave]].SwitchFlag) == 0) {
+											if (strcasecmp(SlaveArg, CLI->Switches[CLI->Switches[CurrentOption].SlaveIDs[OptionSlave]].SwitchFlag) == 0) {
 												CLI->Options[CurrentOption].NumSlaveIDs          += 1;
 												uint64_t NumSlaves                                = CLI->Options[CurrentOption].NumSlaveIDs;
-												CLI->Options[CurrentOption].SlaveIDs[OptionSlave] = CLI->Switches[CLI->Switches[Switch].ValidSlaves[OptionSlave]].SwitchFlag;
+												CLI->Options[CurrentOption].SlaveIDs[OptionSlave] = CLI->Switches[CLI->Switches[Switch].SlaveIDs[OptionSlave]].SwitchFlag;
 											}
 										}
 										break;
@@ -520,7 +520,7 @@ extern "C" {
 				for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
 					free(CLI->Switches[Switch].SwitchFlag);
 					free(CLI->Switches[Switch].SwitchDescription);
-					free(CLI->Switches[Switch].ValidSlaves);
+					free(CLI->Switches[Switch].SlaveIDs);
 				}
 				free(CLI->Switches);
 			}
