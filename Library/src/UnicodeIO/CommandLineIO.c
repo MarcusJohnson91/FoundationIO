@@ -289,7 +289,7 @@ extern "C" {
 	static char *ConvertOptionString2SwitchFlag(const char *OptionString) {
 		char *OptionSwitch = NULL;
 		if (OptionString == NULL) {
-			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "OptionString can't be NULL");
+			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "OptionString Pointer is NULL");
 		} else {
 			uint8_t  OptionStringPrefixSize = 0;
 			enum {
@@ -298,15 +298,21 @@ extern "C" {
 				ASCIIBSlash = 0x2F,
 			};
 			
-			if (OptionString[0] == ASCIIHyphen && OptionString[1] == ASCIIHyphen) {
-				OptionStringPrefixSize  = 2;
-			} else if (OptionString[0] == ASCIIBSlash || OptionString[0] == ASCIIFSlash || OptionString[0] == ASCIIHyphen) {
-				OptionStringPrefixSize  = 1;
-			}
 			uint32_t OptionStringSize    = strlen(OptionString);
-			uint64_t OptionSwitchSize    = (OptionStringSize - OptionStringPrefixSize) + BitIONULLStringSize;
-			OptionSwitch                 = calloc(OptionSwitchSize, sizeof(char));
-			strncpy(OptionSwitch, OptionString + OptionStringPrefixSize, OptionStringSize - OptionStringPrefixSize);
+			
+			if (OptionStringSize >= 2) {
+				BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "OptionString[0] = 0x%X, OptionString[1] = 0x%X", OptionString[0], OptionString[1]);
+				if (OptionString[0] == ASCIIHyphen && OptionString[1] == ASCIIHyphen) {
+					OptionStringPrefixSize  = 2;
+				} else if (OptionString[0] == ASCIIBSlash || OptionString[0] == ASCIIFSlash || OptionString[0] == ASCIIHyphen) {
+					OptionStringPrefixSize  = 1;
+				}
+			} else {
+				BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "OptionString is not an option string");
+			}
+			uint64_t OptionSwitchSize    = OptionStringSize - OptionStringPrefixSize;
+			OptionSwitch                 = calloc(1, OptionSwitchSize + BitIONULLStringSize);
+			strncpy(OptionSwitch, &OptionString[OptionStringPrefixSize], OptionSwitchSize);
 		}
 		return OptionSwitch;
 	}
