@@ -208,7 +208,7 @@ extern   "C" {
     
     
     
-    void                        PrintCommandLineOptions(CommandLineIO *CLI)
+    void                        PrintCommandLineOptions(CommandLineIO *CLI);
     
 #ifdef   __cplusplus
 }
