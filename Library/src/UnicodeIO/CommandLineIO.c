@@ -277,13 +277,13 @@ extern "C" {
 		if (CLI == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
 		} else {
-			if ((CLI->ProgramName && CLI->ProgramVersion && CLI->ProgramAuthor && CLI->ProgramCopyright) != NULL) {
+			if (CLI->ProgramName != NULL && CLI->ProgramVersion != NULL && CLI->ProgramAuthor != NULL && CLI->ProgramCopyright != NULL) {
 				fprintf(stdout, "%s, v. %s by %s © %s%s", CLI->ProgramName, CLI->ProgramVersion, CLI->ProgramAuthor, CLI->ProgramCopyright, BitIONewLine);
 			}
 			
-			if ((CLI->ProgramDescription && CLI->ProgramLicenseName && CLI->ProgramLicenseDescription && CLI->ProgramLicenseURL) != NULL && CLI->IsProprietary == No) {
+			if (CLI->ProgramDescription != NULL && CLI->ProgramLicenseName != NULL && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL && CLI->IsProprietary == No) {
 				fprintf(stdout, "%s, Released under the \"%s\" %s, available at: %s%s", CLI->ProgramDescription, CLI->ProgramLicenseName, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, BitIONewLine);
-			} else if ((CLI->ProgramDescription && CLI->ProgramLicenseDescription && CLI->ProgramLicenseURL) != NULL && CLI->IsProprietary == Yes) {
+			} else if (CLI->ProgramDescription != NULL && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL && CLI->IsProprietary == Yes) {
 				fprintf(stdout, "%s, By using this software, you agree to the End User License Agreement %s, available at: %s%s", CLI->ProgramDescription, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, BitIONewLine);
 			}
 		}

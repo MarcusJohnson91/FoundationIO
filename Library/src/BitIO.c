@@ -1243,7 +1243,7 @@ extern "C" {
 		} else if (SocketAddress == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "SocketAddress Pointer is NULL");
 		} else {
-			BitO->File = BitIOSocket;
+			BitO->FileType = BitIOSocket;
 			connect(BitO->Socket, SocketAddress, SocketSize);
 		}
 	}
