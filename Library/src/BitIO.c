@@ -1039,12 +1039,12 @@ extern "C" {
 	
 	/* BitInput */
 	typedef struct BitInput {
-		BitIOSourceDrainTypes SourceType;
-		int                   Socket;
-		FILE                 *File;
-		fpos_t                FileSize;
-		fpos_t                FilePosition;
-		uint64_t              FileSpecifierNum;
+		BitInputOutputFileTypes FileType;
+		int                     Socket;
+		FILE                   *File;
+		fpos_t                  FileSize;
+		fpos_t                  FilePosition;
+		uint64_t                FileSpecifierNum;
 	} BitInput;
 	
 	BitInput *BitInput_Init(void) {
@@ -1061,7 +1061,7 @@ extern "C" {
 		} else if (Path2Open == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Path2Open Pointer is NULL");
 		} else {
-			BitI->SourceType        = BitIOFile;
+			BitI->FileType          = BitIOFile;
 			uint64_t Path2OpenSize  = strlen(Path2Open) + BitIONULLStringSize;
 			char *NewPath           = calloc(1, Path2OpenSize * sizeof(char));
 			snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
@@ -1080,7 +1080,7 @@ extern "C" {
 		if (BitI == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitInput Pointer is NULL");
 		} else {
-			BitI->SourceType = BitIOSocket;
+			BitI->FileType   = BitIOSocket;
 			BitI->Socket     = socket(Domain, Type, Protocol);
 		}
 	}
@@ -1091,7 +1091,7 @@ extern "C" {
 		} else if (SocketAddress == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "SocketAddress Pointer is NULL");
 		} else {
-			BitI->SourceType = BitIOSocket;
+			BitI->FileType = BitIOSocket;
 			connect(BitI->Socket, SocketAddress, SocketSize);
 		}
 	}
@@ -1112,12 +1112,12 @@ extern "C" {
 			if (Buffer2Read->Buffer == NULL) {
 				BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate Buffer in BitBuffer");
 			} else {
-				if (BitI->SourceType == BitIOFile) {
+				if (BitI->FileType   == BitIOFile) {
 					BytesRead         = fread(Buffer2Read->Buffer, 1, Bytes2Read, BitI->File);
-				} else if (BitI->SourceType == BitIOSocket) {
+				} else if (BitI->FileType == BitIOSocket) {
 					BytesRead         = read(BitI->Socket, Buffer2Read->Buffer, Bytes2Read);
 				}
-				if (BytesRead != Bytes2Read && BitI->SourceType == BitIOFile) {
+				if (BytesRead != Bytes2Read && BitI->FileType == BitIOFile) {
 					BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Fread read: %d bytes, but you requested: %d", BytesRead, Bytes2Read);
 				} else {
 					Buffer2Read->NumBits = Bytes2Bits(BytesRead);
@@ -1179,9 +1179,9 @@ extern "C" {
 		if (BitI == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitInput Pointer is NULL");
 		} else {
-			if (BitI->SourceType == BitIOFile) {
+			if (BitI->FileType == BitIOFile) {
 				fclose(BitI->File);
-			} else if (BitI->SourceType == BitIOSocket) {
+			} else if (BitI->FileType == BitIOSocket) {
 				close(BitI->Socket);
 			}
 			free(BitI);
@@ -1192,11 +1192,11 @@ extern "C" {
 	
 	/* BitOutput */
 	typedef struct BitOutput {
-		BitIOSourceDrainTypes DrainType;
-		int                   Socket;
-		FILE                 *File;
-		fpos_t                FilePosition;
-		uint64_t              FileSpecifierNum;
+		BitInputOutputFileTypes FileType;
+		int                     Socket;
+		FILE                   *File;
+		fpos_t                  FilePosition;
+		uint64_t                FileSpecifierNum;
 	} BitOutput;
 	
 	BitOutput *BitOutput_Init(void) {
@@ -1213,7 +1213,7 @@ extern "C" {
 		} else if (Path2Open == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Path2Open Pointer is NULL");
 		} else {
-			BitO->DrainType         = BitIOFile;
+			BitO->FileType          = BitIOFile;
 			uint64_t Path2OpenSize  = strlen(Path2Open) + BitIONULLStringSize;
 			char *NewPath           = calloc(1, Path2OpenSize * sizeof(char));
 			snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
@@ -1232,7 +1232,7 @@ extern "C" {
 		if (BitO == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitInput Pointer is NULL");
 		} else {
-			BitO->DrainType = BitIOSocket;
+			BitO->FileType  = BitIOSocket;
 			BitO->Socket    = socket(Domain, Type, Protocol);
 		}
 	}
@@ -1243,7 +1243,7 @@ extern "C" {
 		} else if (SocketAddress == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "SocketAddress Pointer is NULL");
 		} else {
-			BitO->DrainType = BitIOSocket;
+			BitO->File = BitIOSocket;
 			connect(BitO->Socket, SocketAddress, SocketSize);
 		}
 	}
@@ -1257,9 +1257,9 @@ extern "C" {
 		} else {
 			uint64_t BufferBytes       = Bits2Bytes(Buffer2Write->NumBits, Yes);
 			uint64_t NumBytes2Write    = Bytes2Write > BufferBytes ? Bytes2Write : BufferBytes;
-			if (BitO->DrainType == BitIOFile) {
+			if (BitO->FileType == BitIOFile) {
 				BytesWritten           = fwrite(Buffer2Write->Buffer, 1, NumBytes2Write, BitO->File);
-			} else if (BitO->DrainType == BitIOSocket) {
+			} else if (BitO->FileType == BitIOSocket) {
 				BytesWritten           = write(BitO->Socket, Buffer2Write->Buffer, NumBytes2Write);
 			}
 			if (BytesWritten != NumBytes2Write) {
@@ -1275,9 +1275,9 @@ extern "C" {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitOutput Pointer is NULL");
 		} else {
 			fflush(BitO->File);
-			if (BitO->DrainType == BitIOFile) {
+			if (BitO->FileType == BitIOFile) {
 				fclose(BitO->File);
-			} else if (BitO->DrainType == BitIOSocket) {
+			} else if (BitO->FileType == BitIOSocket) {
 				close(BitO->Socket);
 			}
 			free(BitO);
