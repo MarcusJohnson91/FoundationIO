@@ -43,9 +43,9 @@ static  const char BitIONewLine[3]  = {"\x0D\x0A\x00"}; // \r\n
 #endif
   
 #if !defined(_FILE_OFFSET_BITS)
-#define _FILE_OFFSET_BITS = 64
-#elif
-#define _FILE_OFFSET_BITS = 64
+#define _FILE_OFFSET_BITS  = 64
+#elif   _FILE_OFFSET_BITS != 64
+#define _FILE_OFFSET_BITS  = 64
 #endif
     
 #ifndef   BitIOEndianByteOrders
