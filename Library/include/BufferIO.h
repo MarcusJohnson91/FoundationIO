@@ -6,38 +6,32 @@
  @brief     This header contains code related to reading and writing files and sockets, and utility functions to manage those details.
  */
 
-#include <assert.h>     /* Included for static_assert */
-#include <float.h>      /* Included for the double  max/min macros for the _Generic macros */
-#include <limits.h>     /* Included for the integer max/min macros for the _Generic macros */
-#include <math.h>       /* Included for the math functions like log2 */
-#include <stdarg.h>     /* Included for the variadic argument support macros */
-#include <stdbool.h>    /* Included for the bool type */
-#include <stdint.h>     /* Included for the u/intX_t types */
-#include <stdio.h>      /* Included for the FILE type, STD IN/OUT/ERR, SEEK SET/END/CUR macros */
-#include <stdlib.h>     /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
-#include <string.h>     /* Included for the atoll */
-
-#if defined(_WIN32) || defined(_WIN64)
-#include <winsock.h>    /* Included for the socket support on Windows */
-#else
-#include <sys/socket.h> /* Included for the socket support */
-#include <unistd.h>     /* Included SOLELY for the _POSIX_VERSION macro */
-#endif
+#include <assert.h>  /* Included for static_assert */
+#include <float.h>   /* Included for the double  max/min macros for the _Generic macros */
+#include <limits.h>  /* Included for the integer max/min macros for the _Generic macros */
+#include <math.h>    /* Included for the math functions like log2 */
+#include <stdarg.h>  /* Included for the variadic argument support macros */
+#include <stdbool.h> /* Included for the bool type */
+#include <stdint.h>  /* Included for the u/intX_t types */
+#include <stdio.h>   /* Included for the FILE type, STD IN/OUT/ERR, SEEK SET/END/CUR macros */
+#include <stdlib.h>  /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
+#include <string.h>  /* Included for the atoll */
 
 #include "BitIOMacros.h"
 
-#pragma once
+#pragma  once
 
-#ifndef    LIBBITIO_BitIO_H
-#define    LIBBITIO_BitIO_H
+#ifndef  LIBBITIO_BitIO_H
+#define  LIBBITIO_BitIO_H
 
-#ifdef __cplusplus
-extern "C" {
+#ifdef   __cplusplus
+extern   "C" {
 #endif
 	
 	/*!
 	 @enum				BitIOConstants
 	 @abstract									"BitIO compile time constants".
+	 @constant          BitIONullString			"String terminating NULL character".
 	 @constant			BitIONULLStringSize		"How large is the NULL terminator for a string"?
 	 @constant			BitIOGUUIDStringSize	"Size of a UUIDString or GUIDString including dashes, and null terminator".
 	 @constant			BitIOBinaryGUUIDSize	"Size of a BinaryUUID or BinaryGUID".
@@ -50,16 +44,17 @@ extern "C" {
 	};
 	
 	/*!
-	 @enum				BitIOSourceDrainTypes
+	 @enum				BitInputOutputFileTypes
 	 @abstract									"Is this BitInput or BitOutput connected to a File or Socket?".
+	 @constant			BitIOUnknownFileType	"Unknown file type".
 	 @constant			BitIOFile				"This instance of BitInput/BitOutput is connected to a File".
 	 @constant			BitIOSocket				"This instance of BitInput/BitOutput is connected to a Socket".
 	 */
-	typedef enum BitIOSourceDrainTypes {
+	typedef enum BitInputOutputFileTypes {
 						BitIOUnknownFileType	= 0,
 						BitIOFile				= 1,
 						BitIOSocket				= 2,
-	} BitIOSourceDrainTypes;
+	} BitInputOutputFileTypes;
 	
 	/*!
 	 @enum				BitIOLogTypes
@@ -661,7 +656,7 @@ extern "C" {
 	/*!
 	 @typedef			BitInput
 	 @abstract									"Contains File/Socket pointers for reading to a BitBuffer".
-	 @constant			SourceType				"Is this BitInput for a file or socket"?
+	 @constant			FileType				"Is this BitInput for a file or socket"?
 	 @constant			File					"Input File/Socket to read into a BitBuffer".
 	 @constant			Socket					"Socket number".
 	 @constant			FileSize				"Size of the File in bytes".
@@ -703,6 +698,9 @@ extern "C" {
 	
 	/*!
 	 @abstract									"Connects BitInput to a socket".
+	 @param				BitI					"BitInput Pointer".
+	 @param				SocketAddress			"The address of the socket".
+	 @param				SocketSize				"I honest have no idea what this means".
 	 */
 	void				BitInput_ConnectSocket(BitInput *BitI, struct sockaddr *SocketAddress, const uint64_t SocketSize);
 	
@@ -740,7 +738,7 @@ extern "C" {
 	/*!
 	 @typedef			BitOutput
 	 @abstract									"Contains File/Socket pointers for writing from a BitBuffer".
-	 @constant			DrainType				"Is this BitOutput for a file or socket"?
+	 @constant			FileType				"Is this BitOutput for a file or socket"?
 	 @constant			File					"Input File/Socket to write a BitBuffer into".
 	 @constant			Socket					"Socket number".
 	 @constant			FilePosition			"Current byte in the file".
@@ -772,6 +770,9 @@ extern "C" {
 	
 	/*!
 	 @abstract									"Connects BitOutput to a socket".
+	 @param				BitO					"BitOutput Pointer".
+	 @param				SocketAddress			"The address of the socket".
+	 @param				SocketSize				"I honest have no idea what this means".
 	 */
 	void				BitOutput_ConnectSocket(BitOutput *BitO, struct sockaddr *SocketAddress, const uint64_t SocketSize);
 	
@@ -791,8 +792,8 @@ extern "C" {
 	void				BitOutput_Deinit(BitOutput *BitO);
 	/* BitOutput */
 	
-#ifdef __cplusplus
+#ifdef   __cplusplus
 }
 #endif
 
-#endif /* LIBBITIO_BitIO_H */
+#endif   /* LIBBITIO_BitIO_H */

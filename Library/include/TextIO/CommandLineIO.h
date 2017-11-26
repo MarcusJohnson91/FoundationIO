@@ -14,13 +14,13 @@
 
 #include "BitIOMacros.h"
 
-#pragma once
+#pragma  once
 
-#ifndef LIBBITIO_CommandLineIO_H
-#define LIBBITIO_CommandLineIO_H
+#ifndef  LIBBITIO_CommandLineIO_H
+#define  LIBBITIO_CommandLineIO_H
 
-#ifdef __cplusplus
-extern "C" {
+#ifdef   __cplusplus
+extern   "C" {
 #endif
 	
 	/*!
@@ -201,8 +201,8 @@ extern "C" {
 	 */
 	void					CommandLineIO_Deinit(CommandLineIO *CLI);
 	
-#ifdef __cplusplus
+#ifdef   __cplusplus
 }
 #endif
 
-#endif /* LIBBITIO_CommandLineIO_H */
+#endif   /* LIBBITIO_CommandLineIO_H */
