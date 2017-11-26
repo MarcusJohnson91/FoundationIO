@@ -6,7 +6,7 @@
 #ifdef  __cplusplus
 extern  "C" {
 #endif
-
+    
 #if      defined(macintosh) || defined(Macintosh)
 #define             BitIONewLineSize    1
 static   const char BitIONewLine[2]  = {"\x0D\x00"}; /* \r */
@@ -23,82 +23,81 @@ static   const char BitIONewLine[3]  = {"\x0D\x0A\x00"}; /* \r\n */
 #define             strcasecmp          stricmp
 #include           <winsock.h>    /* Included for the socket support on Windows */
 #endif
-
-#ifndef _LARGEFILE_SOURCE
-#define _LARGEFILE_SOURCE
+    
+#ifndef   _LARGEFILE_SOURCE
+#define   _LARGEFILE_SOURCE
 #endif
     
-#ifndef _LARGEFILE64_SOURCE
-#define _LARGEFILE64_SOURCE
+#ifndef   _LARGEFILE64_SOURCE
+#define   _LARGEFILE64_SOURCE
 #endif
-  
-#if     _FILE_OFFSET_BITS != 64
-#define _FILE_OFFSET_BITS  = 64
-#endif
+    
+#undef    _FILE_OFFSET_BITS
+#define   _FILE_OFFSET_BITS = 64
     
 #ifndef   BitIOByteOrders
 #define   BitIOByteOrders
-#define    UnknownByteOrder   0
-#define    LSByte             1
-#define    MSByte             2
+#define    UnknownByteOrder    0
+#define    LSByte              1
+#define    MSByte              2
 #endif  /* BitIOEndianByteOrders */
     
 #ifndef   BitIOBitOrders
 #define   BitIOBitOrders
-#define    UnknownBitOrder    0
-#define    LSBit              1
-#define    MSBit              2
+#define    UnknownBitOrder     0
+#define    LSBit               1
+#define    MSBit               2
 #endif  /* BitIOBitOrders */
     
 #ifndef   BitIOYesNo
 #define   BitIOYesNo
 #ifndef    Yes
-#define    Yes                1
+#define    Yes                 1
 #endif  /* Yes */
 #ifndef    No
-#define    No                 0
+#define    No                  0
 #endif  /* No */
 #endif  /* BitIOYesNo */
     
 #ifndef    BitIOByteBitOrders
 #define    BitIOByteBitOrders
 #ifndef    BitIOLSByte
-#define    BitIOLSByte        ULLONG_MAX
-typedef    unsigned long long BitBLSByte_t;
+#define    BitIOLSByte         ULLONG_MAX
+typedef    unsigned long long  BitBLSByte_t;
 #endif  /* BitIOLittleEndian */
 #ifndef    BitIOMSByte
-#define    BitIOMSByte        LLONG_MIN
-typedef    signed long long   BitBMSByte_t;
+#define    BitIOMSByte         LLONG_MIN
+typedef    signed long long    BitBMSByte_t;
 #endif  /* BitIOBigEndian */
 #ifndef    BitIOLSBit
-#define    BitIOLSBit         ULLONG_MAX
-typedef    unsigned long long BitBLSBit_t;
+#define    BitIOLSBit          ULLONG_MAX
+typedef    unsigned long long  BitBLSBit_t;
 #endif  /* BitIOLSBit */
 #ifndef    BitIOMSBit
-#define    BitIOMSBit         LLONG_MIN
-typedef    signed long long   BitBMSBit_t;
+#define    BitIOMSBit          LLONG_MIN
+typedef    signed long long    BitBMSBit_t;
 #endif  /* BitIOMSBit */
 #endif  /* BitIOByteBitOrders */
     
 #ifndef    BitIOGUUIDTypes
 #define    BitIOGUUIDTypes
 #ifndef    BitIOGUUIDString
-#define    BitIOGUUIDString   ULLONG_MAX
-typedef    unsigned long long GUUIDString_t;
+#define    BitIOGUUIDString    ULLONG_MAX
+typedef    unsigned long long  GUUIDString_t;
 #endif  /* BitIOGUIDString */
 #ifndef    BitIOBinaryGUUID
-#define    BitIOBinaryGUUID   FLT_MIN
-typedef    float              BinaryGUUID_t;
+#define    BitIOBinaryGUUID    FLT_MIN
+typedef    float               BinaryGUUID_t;
 #endif  /* BitIOBinaryGUID */
 #endif  /* BitIOGUUIDTypes */
     
     
 #if     defined(__LITTLE_ENDIAN__) || (__ARMEL__) || (__THUMBEL__) || (__AARCH64EL__) || (_MIPSEL) || (__MIPSEL) || (__MIPSEL__) || (__BYTE_ORDER==(__LITTLE_ENDIAN || __ORDER_LITTLE_ENDIAN))
-#define    RuntimeByteOrder LSByte
-#define    RuntimeBitOrder  LSBit
+#define    RuntimeByteOrder    LSByte
+#define    RuntimeBitOrder     LSBit
 #elif   defined(__BIG_ENDIAN__) || (__ARMEB__) || (__THUMBEB__) || (__AARCH64EB__) || (_MIPSEB) || (__MIPSEB) || (__MIPSEB__) || (__BYTE_ORDER==(__BIG_ENDIAN || __ORDER_BIG_ENDIAN))
-#define    RuntimeByteOrder MSByte
-#define    RuntimeBitOrder  MSBit
+#define    RuntimeByteOrder    MSByte
+#define    RuntimeBitOrder     MSBit
 #endif
     
 #define BitIOArraySizeInElements(Array) (sizeof(Array)/sizeof(Array[0])) /* DOES NOT WORK FOR DYNAMIC ARRAYS */

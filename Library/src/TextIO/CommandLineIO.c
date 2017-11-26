@@ -1,8 +1,8 @@
 #include "../include/CommandLineIO.h"
 #include "../include/BitIO.h"
 
-#ifdef __cplusplus
-extern "C" {
+#ifdef   __cplusplus
+extern   "C" {
 #endif
 	
 	/*!
@@ -320,42 +320,103 @@ extern "C" {
 		return ArgumentSwitch;
 	}
 	
-	static void CLIAllocateOptions(CommandLineIO *CLI, const int argc, const char *argv[]) {
-		if (CLI == NULL) {
-			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
-		} else {
-			for (int ArgvCount = 1; ArgvCount < argc; ArgvCount++) {
-				char *CurrentArgvStringAsFlag                              = ConvertOptionString2SwitchFlag(argv[ArgvCount]);
-				for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
-					if (strcasecmp(CurrentArgvStringAsFlag, CLI->Switches[Switch].SwitchFlag) == 0) { // TODO: Break out of this loop onec a match has been found.
-						CLISwitchTypes CurrentSwitchType                   = CLI->Switches[Switch].SwitchType;
-						if (CurrentSwitchType == SwitchIsASlave) {
-							CLI->Options[CLI->NumOptions - 1].NumSlaveIDs += 1;
-						} else if (CurrentSwitchType != UnknownSwitchType) {
-							CLI->NumOptions                               += 1;
-						}
-					}
+	static int64_t GetSubStringsAbsolutePosition(int64_t StartOffset, int64_t StringSize, char *OptionString, char *SubString) {
+		int64_t SubStringPosition = -1LL;
+		int64_t SubStringSize = strlen(OptionString);
+		int64_t MatchingChars = 0ULL;
+		for (int64_t Char = StartOffset; Char < StringSize; Char++) {
+			for (int64_t SubChar = 0; SubChar < SubStringSize; SubChar++) {
+				if (OptionString[Char] == SubString[SubChar]) { // IDK how to specify that the whole substring matches
+					MatchingChars += 1;
+					/*
+					 Loop over the string and substring, count the matching characters if you've got X matches and the SubString is X long, you've found the match. simply record the current position - X as the start
+					 */
+				} else {
+					MatchingChars = 0;
+				}
+				if (MatchingChars == SubStringSize) {
+					SubStringPosition = (Char + StartOffset) - SubChar;
 				}
 			}
-			if (CLI->NumOptions >= CLI->MinOptions) {
-				CLI->Options                                                   = calloc(CLI->NumOptions, sizeof(CommandLineOption));
-				if (CLI->Options != NULL) {
-					for (int64_t Option = 0LL; Option < CLI->NumOptions - 1; Option++) {
-						CLI->Options[Option].SwitchID                          = -1;
-						if (CLI->Options[Option].NumSlaveIDs >= 1) {
-							CLI->Options[Option].SlaveIDs                      = calloc(CLI->Options[Option].NumSlaveIDs, sizeof(int64_t));
-							for (int64_t OptionSlave = 0LL; OptionSlave < CLI->Options[Option].NumSlaveIDs - 1; OptionSlave++) {
-								CLI->Options[Option].SlaveIDs[OptionSlave]     = -1;
-							}
-						}
+			
+		}
+		return SubStringPosition;
+	}
+	
+	static char *SplitInlineOption(int64_t OptionID, char *OptionString, uint64_t OptionStringSize, uint64_t NumSplitOptions) {
+		/*
+		 Ok so we loop over the argument string and look for the various delimiters (=|:|..)
+		 */
+		char *OutputStrings = NULL;
+		enum Delimiters { // 3d, 3a, 2e 2e
+			Colon     = 0x3A,
+			Equal     = 0x3D,
+			Period    = 0x2E,
+		};
+		
+		typedef enum DelimiterTypes {
+			UnknownDelimiter = 0,
+			RangeDelimiter   = 1,
+			EqualDelimiter   = 2,
+			ColonDelimiter   = 3,
+		} DelimiterTypes;
+		
+		for (uint64_t Byte = 0ULL; Byte < OptionStringSize; Byte++) {
+			uint64_t DelimiterOffset = 0ULL;
+			DelimiterTypes DelimiterType = UnknownDelimiter;
+			if (OptionString[Byte] == Colon) {
+				DelimiterType        = ColonDelimiter;
+				DelimiterOffset      = Byte - 1;
+			} else if (OptionString[Byte] == Equal) {
+				DelimiterType        = EqualDelimiter;
+				DelimiterOffset      = Byte - 1;
+			} else if (Byte <= (OptionStringSize - 1) && (OptionString[Byte] == Period && OptionString[Byte + 1] == Period)) {
+				DelimiterType        = RangeDelimiter;
+				DelimiterOffset      = Byte - 1;
+			}
+			/* Ok so we need to go ahead and split the option, I guess it depends on the kind of delimiter */
+			if (DelimiterType == RangeDelimiter || DelimiterType == ColonDelimiter) {
+				/* Well I guess we need to start at the beginning of the range/colon operator, and work our way back until we find a non-ASCII numeral character, or we reach the beginning of the string ofc */
+				uint64_t FirstRangeOffset = 0ULL;
+				for (uint64_t RangeByte = DelimiterOffset; RangeByte > 0; RangeByte++) {
+					if (OptionString[RangeByte] < 30 || OptionString[RangeByte] > 39) {
+						FirstRangeOffset  = DelimiterOffset - RangeByte;
 					}
-				} else {
-					BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Couldn't allocate %d options", CLI->NumOptions);
 				}
-			} else {
-				BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "You only specified %d options, %d is the minimum", CLI->NumOptions, CLI->MinOptions);
+				// Now copy from FirstRangeOffset to DelimiterOffset
+				uint64_t FirstRangeSize   = FirstRangeOffset - 0;
+				char    *FirstRangeString = calloc(1, FirstRangeSize);
+				for (uint64_t Byte = 0; Byte < FirstRangeSize; Byte++) {
+					for (uint64_t RangeByte = FirstRangeOffset; Byte < FirstRangeSize; Byte++) {
+						FirstRangeString[Byte] = OptionString[RangeByte];
+					}
+				}
+				
+				uint64_t SecondRangeOffset = 0ULL;
+				for (uint64_t RangeByte = DelimiterOffset; RangeByte > 0; RangeByte++) {
+					if (OptionString[RangeByte] < 30 || OptionString[RangeByte] > 39) {
+						SecondRangeOffset  = DelimiterOffset - RangeByte;
+					}
+				}
+				// Now copy from SecondRangeOffset to DelimiterOffset
+				uint64_t SecondRangeSize   = FirstRangeOffset - 0;
+				char    *SecondRangeString = calloc(1, SecondRangeSize);
+				for (uint64_t Byte = 0; Byte < SecondRangeSize; Byte++) {
+					for (uint64_t RangeByte = SecondRangeSize; Byte < SecondRangeSize; Byte++) {
+						SecondRangeString[Byte] = OptionString[RangeByte];
+					}
+				}
+				//uint64_t LongestSplitString = FirstRangeSize >= SecondRangeSize ? FirstRangeSize : SecondRangeSize;
+				//OutputStrings = calloc(2, LongestSplitString);
+				OutputStrings[0] = *FirstRangeString;
+				OutputStrings[1] = *SecondRangeString;
+			} else if (DelimiterType == ColonDelimiter) {
+				
+			} else if (DelimiterType == EqualDelimiter) {
+				
 			}
 		}
+		return OutputStrings;
 	}
 	
 	void ParseCommandLineOptions(CommandLineIO *CLI, const int argc, const char *argv[]) {
@@ -364,56 +425,99 @@ extern "C" {
 		} else if (argc < CLI->MinOptions || argc <= 1) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "You entered %d options, the minimum is %d", argc - 1, CLI->MinOptions);
 		} else {
-			char *FirstArgumentAsFlag                                                      = ConvertOptionString2SwitchFlag(argv[1]);
-			char *HelpFlag                                                                 = CLI->Switches[CLI->HelpSwitch].SwitchFlag;
-			if (strncasecmp(FirstArgumentAsFlag, HelpFlag, CLI->Switches[CLI->HelpSwitch].SwitchFlagSize) == 0) {
+			char    *FirstArgumentAsFlag                                         = ArgumentString2SwitchFlag(argv[1]);
+			uint64_t FirstArgumentSize                                           = strlen(argv[1]);
+			char    *HelpFlag                                                    = CLI->Switches[CLI->HelpSwitch].SwitchFlag;
+			if (strncasecmp(FirstArgumentAsFlag, HelpFlag, FirstArgumentSize) == 0) {
 				DisplayCLIHelp(CLI);
 			} else {
 				free(FirstArgumentAsFlag);
 				DisplayProgramBanner(CLI);
-				CLIAllocateOptions(CLI, argc, argv);
 				
-				int64_t CurrentOption = 0LL;
+				typedef enum ArgumentTypes {
+					UnknownArg           = 0,
+					OptionArg            = 1,
+					SlaveArg             = 2,
+					ResultArg            = 3,
+				} ArgumentTypes;
 				
-				while (CurrentOption < CLI->NumOptions) {
-					for (int32_t ArgvArg = 1LL; ArgvArg < argc - 1; ArgvArg++) {
-						for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
-							char *CurrentArgvStringAsFlag  = ConvertOptionString2SwitchFlag(argv[ArgvArg]);
-							uint64_t ComparisonResult      = strncasecmp(CurrentArgvStringAsFlag, CLI->Switches[Switch].SwitchFlag, CLI->Switches[Switch].SwitchFlagSize);
-							if (ComparisonResult == 0) {
-								CLISwitchTypes CurrentSwitchType                                  = CLI->Switches[Switch].SwitchType;
-								switch (CurrentSwitchType) {
-									case ExistentialSwitch:
-										CLI->Options[CurrentOption].SwitchID                      = Switch;
-										break;
-									case SwitchMayHaveSlaves:
-										CLI->Options[CurrentOption].SwitchID                      = Switch;
-										break;
-									case SwitchCantHaveSlaves:
-										CLI->Options[CurrentOption].SwitchID                      = Switch;
-										break;
-									case SwitchIsASlave:
-										for (uint64_t OptionSlave = 0LL; OptionSlave < CLI->Options[CurrentOption].NumSlaveIDs - 1; OptionSlave++) {
-											uint64_t NumArgsLeft                                  = argc - (ArgvArg + OptionSlave);
-											if (NumArgsLeft < CLI->Options[ArgvArg].NumSlaveIDs + 1) { // + 1 for the Argument result
-												// idk
-											}
-											char *SlaveArg                                        = ConvertOptionString2SwitchFlag(argv[CurrentOption + (OptionSlave + 1)]);
-											if (strcasecmp(SlaveArg, CLI->Switches[CLI->Switches[CurrentOption].SlaveIDs[OptionSlave]].SwitchFlag) == 0) {
-												CLI->Options[CurrentOption].NumSlaveIDs          += 1;
-												uint64_t NumSlaves                                = CLI->Options[CurrentOption].NumSlaveIDs;
-												CLI->Options[CurrentOption].SlaveIDs[OptionSlave] = CLI->Switches[CLI->Switches[Switch].SlaveIDs[OptionSlave]].SwitchFlag;
-											}
-										}
-										break;
-								}
-								CurrentOption                                                    += 1;
-							} else {
-								CLI->Options[CurrentOption].Argument2Option                       = (char*)argv[ArgvArg + (CLI->Options[CurrentOption].NumSlaveIDs + 1)];
+				ArgumentTypes *ArgumentType                     = calloc((size_t)argc, sizeof(ArgumentTypes));
+				for (int32_t ArgvArg1 = 1LL; ArgvArg1 < argc - 1; ArgvArg1++) {
+					
+					/*  Extract the argv string and remove the prefix */
+					char     *CurrentArgumentString             = ArgumentString2SwitchFlag(argv[ArgvArg1]);
+					int64_t   CurrentArgumentStringSize         = (int64_t) strlen(CurrentArgumentString);
+					
+					/* Look for inline delimiters */
+					int64_t EqualPosition = GetSubStringsAbsolutePosition(0, CurrentArgumentStringSize, CurrentArgumentString, "=");
+					if (EqualPosition != -1) { // We found an equal's sign!!! now we just need to make sure it's actually valid.
+						
+					}
+					
+					int64_t DoubleDotPosition = GetSubStringsAbsolutePosition(0, CurrentArgumentStringSize, CurrentArgumentString, "..");
+					if (DoubleDotPosition != -1) { // We found range notation!!! now we just need to mke sure it's valid
+						
+					}
+					
+					for (int64_t Switch = 0LL; Switch < CLI->NumSwitches; Switch++) {
+						CLISwitchTypes CurrentArgvSwitchType    = CLI->Switches[Switch].SwitchType;
+						uint64_t CurrentArgvStringSize          = strlen(CurrentArgumentString);
+						uint64_t ShortestStringSize             = CLI->Switches[Switch].SwitchFlagSize >= CurrentArgvStringSize ? CurrentArgvStringSize : CLI->Switches[Switch].SwitchFlagSize;
+						int64_t SwitchFlagMatchesArgumentString = strncasecmp(CLI->Switches[Switch].SwitchFlag, CurrentArgumentString, ShortestStringSize);
+						
+						if  (SwitchFlagMatchesArgumentString == 0 && CurrentArgvSwitchType != UnknownSwitchType) {
+							if (CurrentArgvSwitchType == SwitchMayHaveSlaves || CurrentArgvSwitchType == SwitchCantHaveSlaves || CurrentArgvSwitchType == ExistentialSwitch) {
+								ArgumentType[ArgvArg1]          = OptionArg;
+							} else if (CurrentArgvSwitchType == SwitchIsASlave) {
+								ArgumentType[ArgvArg1]          = SlaveArg;
 							}
+						} else if (Switch == CLI->NumSwitches && SwitchFlagMatchesArgumentString != 0) { // SwitchFlagMatchesArgumentString != 0 &&
+							ArgumentType[ArgvArg1]              = ResultArg;
 						}
 					}
 				}
+				
+				int64_t NumOptionsFound = 0ULL;
+				for (int32_t ArgType = 1LL; ArgType < argc - 1; ArgType++) {
+					if (ArgumentType[ArgType] == OptionArg) {
+						NumOptionsFound += 1;
+					}
+					BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "Argument = %d, ArgumentType = %d", ArgType, ArgumentType[ArgType]);
+				}
+				CLI->NumOptions = NumOptionsFound;
+				BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "NumOptionsFound %d", NumOptionsFound);
+				
+				// So allocate a list of the number of slaves per option based on the number of options found
+				CLI->Options                     = calloc(NumOptionsFound, sizeof(CommandLineOption));
+				for (int32_t Arg = 1L; Arg < argc - 1; Arg++) {
+					for (int64_t Option = 0LL; Option < NumOptionsFound; Option++) {
+						if (ArgumentType[Arg] == SlaveArg) {
+							// Ok so we loop over all the Options in ArgumentType
+							// we record the latest Option, then record how many slaves there are until the next option.
+							//NumSlavesForEachOption[Option] += 1;
+							CLI->Options[Option].NumOptionSlaves += 1;
+						}
+						BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "Option %d, NumSlaves %d", Option, CLI->Options[Option].NumOptionSlaves);
+					}
+				}
+				
+				for (int64_t Option = 0LL; Option < CLI->NumOptions; Option++) {
+					// Allocate the slaves
+					if (CLI->Options[Option].NumOptionSlaves >= 1) {
+						CLI->Options[Option].SlaveIDs = calloc(CLI->Options[Option].NumOptionSlaves, sizeof(int64_t));
+					}
+				}
+				
+				for (int64_t Option = 0LL; Option < CLI->NumOptions; Option++) {
+					for (int32_t ArgvArg2 = 1; ArgvArg2 < argc - 1; ArgvArg2++) {
+						if ((ArgumentType[ArgvArg2] == ResultArg || ArgumentType[ArgvArg2] == UnknownArg) && CLI->Options[Option].Argument2Option == NULL) {
+							// Now we just set the options and do verification
+							CLI->Options[Option].Argument2Option = (char*) argv[ArgvArg2];
+							BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "Option %d ArgumentString = %s", Option, CLI->Options[Option].Argument2Option);
+						}
+					}
+				}
+				free(ArgumentType);
 			}
 		}
 	}
@@ -586,24 +690,23 @@ extern "C" {
 	
 	
 	
-	
-	
+
 	
 	
 	void PrintCommandLineOptions(CommandLineIO *CLI) {
-		BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "NumOptions %d%s", CLI->NumOptions, BitIONewLine);
+		BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "NumOptions %d", CLI->NumOptions);
 		for (int64_t Option = 0LL; Option < CLI->NumOptions; Option++) {
 			if (CLI->Options[Option].SwitchID >= 0) {
-				BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "OptionID %d, OptionSwitchID %d, OptionFlag %s, OptionType %d, OptionArgument %s%s", Option, CLI->Options[Option].SwitchID, CLI->Switches[CLI->Options[Option].SwitchID].SwitchFlag, CLI->Switches[CLI->Options[Option].SwitchID].SwitchType, CLI->Options[Option].Argument2Option, BitIONewLine);
+				BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "OptionID %d, OptionSwitchID %d, OptionFlag %s, OptionType %d, OptionArgument %s", Option, CLI->Options[Option].SwitchID, CLI->Switches[CLI->Options[Option].SwitchID].SwitchFlag, CLI->Switches[CLI->Options[Option].SwitchID].SwitchType, CLI->Options[Option].Argument2Option);
 				if (CLI->Options[Option].NumOptionSlaves >= 1) {
 					for (int64_t OptionSlave = 0LL; OptionSlave < CLI->Options[Option].NumOptionSlaves; OptionSlave++) {
-						BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "SlaveID %d%s", OptionSlave, BitIONewLine);
+						BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "SlaveID %d", OptionSlave);
 					}
 				}
 			}
 		}
 	}
 	
-#ifdef __cplusplus
+#ifdef   __cplusplus
 }
 #endif
