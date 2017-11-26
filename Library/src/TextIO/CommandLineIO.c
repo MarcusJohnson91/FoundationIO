@@ -516,6 +516,18 @@ extern "C" {
 		return ExtensionString;
 	}
 	
+	void CommandLineIO_ShowProgress(uint8_t PercentDone) {
+		// we have a reolution of half a percent, the values 0-200 are acceptable.
+		/*
+		 How do we get the window size? I want to be able to resize the window
+		 I want the bar to have an even number of dashes on each side with the number in the middle.
+		 like this:
+		 [-----                    Frame W/X 10.5%                           ] 10.5% gets rounded down to 10 which is 5 dashes
+		 [-------------------------Cluster Y/Z 50.5%                         ] 50.5% gets rounded down to 50 which is 25 dashes
+		 Also we'll need to know the size of the center string so we can keep both bars equal lengths
+		 */
+	}
+	
 	void CommandLineIO_Deinit(CommandLineIO *CLI) {
 		if (CLI == NULL) {
 			BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
