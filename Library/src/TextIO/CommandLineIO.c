@@ -575,6 +575,35 @@ extern "C" {
 		}
 	}
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	void PrintCommandLineOptions(CommandLineIO *CLI) {
+		BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "NumOptions %d%s", CLI->NumOptions, BitIONewLine);
+		for (int64_t Option = 0LL; Option < CLI->NumOptions; Option++) {
+			if (CLI->Options[Option].SwitchID >= 0) {
+				BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "OptionID %d, OptionSwitchID %d, OptionFlag %s, OptionType %d, OptionArgument %s%s", Option, CLI->Options[Option].SwitchID, CLI->Switches[CLI->Options[Option].SwitchID].SwitchFlag, CLI->Switches[CLI->Options[Option].SwitchID].SwitchType, CLI->Options[Option].Argument2Option, BitIONewLine);
+				if (CLI->Options[Option].NumOptionSlaves >= 1) {
+					for (int64_t OptionSlave = 0LL; OptionSlave < CLI->Options[Option].NumOptionSlaves; OptionSlave++) {
+						BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "SlaveID %d%s", OptionSlave, BitIONewLine);
+					}
+				}
+			}
+		}
+	}
+	
 #ifdef __cplusplus
 }
 #endif

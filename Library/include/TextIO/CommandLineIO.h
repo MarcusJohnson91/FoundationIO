@@ -201,6 +201,15 @@ extern   "C" {
 	 */
 	void					CommandLineIO_Deinit(CommandLineIO *CLI);
 	
+	
+	
+	
+	
+	
+	
+	
+	void PrintCommandLineOptions(CommandLineIO *CLI)
+	
 #ifdef   __cplusplus
 }
 #endif
