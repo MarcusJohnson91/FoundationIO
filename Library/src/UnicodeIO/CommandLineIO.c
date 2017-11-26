@@ -1,5 +1,5 @@
-#include "../include/BitIO.h"
 #include "../include/CommandLineIO.h"
+#include "../include/BitIO.h"
 
 #ifdef __cplusplus
 extern "C" {
