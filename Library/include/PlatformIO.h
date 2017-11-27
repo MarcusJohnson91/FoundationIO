@@ -33,7 +33,7 @@ static   const char BitIONewLine[3]  = {"\x0D\x0A\x00"}; /* \r\n */
 #endif
     
 #undef    _FILE_OFFSET_BITS
-#define   _FILE_OFFSET_BITS = 64
+#define   _FILE_OFFSET_BITS   64
     
 #ifndef   BitIOByteOrders
 #define   BitIOByteOrders
