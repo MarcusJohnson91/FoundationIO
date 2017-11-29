@@ -36,9 +36,18 @@ extern   "C" {
                                 UnknownSwitchType               = 0,
                                 SwitchMayHaveSlaves             = 1,
                                 SwitchCantHaveSlaves            = 2,
-                                SwitchIsASlave                  = 3,
-                                ExistentialSwitch               = 4,
+                                SwitchIsASlave                  = 4,
+                                ExistentialSwitch               = 8,
     } CLISwitchTypes;
+    
+    typedef enum CLIArgumentTypes {
+                                UnknownArgumentType             = 0,
+                                ArgumentIsAPath                 = 1,
+                                ArgumentIsAString               = 2,
+                                ArgumentIsARange                = 4,
+                                ArgumentIsARatio                = 8,
+        
+    } CLIArgumentTypes;
     
     /*!
      @typedef                   CommandLineIO

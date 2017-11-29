@@ -620,7 +620,7 @@ extern   "C" {
 		return ExtensionString;
 	}
 	
-	void CommandLineIO_ShowProgress(uint8_t PercentDone) {
+	static void CommandLineIO_ShowProgress(uint8_t PercentDone) {
 		// we have a reolution of half a percent, the values 0-200 are acceptable.
 		/*
 		 How do we get the window size? I want to be able to resize the window

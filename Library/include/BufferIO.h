@@ -72,8 +72,8 @@ extern   "C" {
      @constant                  WholeUnary                      "Supports all the whole integers including zero and negatives (up to 2^63 -1 anyway)".
      */
     typedef enum UnaryTypes {
-                                CountUnary                      = 0,
-                                WholeUnary                      = 1,
+                                CountUnary                      = 1,
+                                WholeUnary                      = 2,
     } UnaryTypes;
     
     static const char          *BitIOLibraryName                = "libBitIO";
