@@ -143,43 +143,40 @@ extern "C" {
     }
     
     uint8_t *ConvertBinaryGUUID2GUUIDString(const uint8_t BinaryGUUID[BitIOBinaryGUUIDSize]) {
-        uint8_t *GUUIDString   = NULL;
-        GUUIDString        = calloc(1, BitIOGUUIDStringSize);
+        uint8_t *GUUIDString    = calloc(1, BitIOGUUIDStringSize);
         if (GUUIDString == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate %d bytes", BitIOGUUIDStringSize);
         } else {
-            enum {
-                ASCIIHyphen = 0x2D,
-            };
+            uint8_t ASCIIHyphen = 0x2D,
             
-            GUUIDString[0]  = BinaryGUUID[0];
-            GUUIDString[1]  = BinaryGUUID[1];
-            GUUIDString[2]  = BinaryGUUID[2];
-            GUUIDString[3]  = BinaryGUUID[3];
+            GUUIDString[0]      = BinaryGUUID[0];
+            GUUIDString[1]      = BinaryGUUID[1];
+            GUUIDString[2]      = BinaryGUUID[2];
+            GUUIDString[3]      = BinaryGUUID[3];
             
-            GUUIDString[4]  = ASCIIHyphen;
+            GUUIDString[4]      = ASCIIHyphen;
             
-            GUUIDString[5]  = BinaryGUUID[4];
-            GUUIDString[6]  = BinaryGUUID[5];
+            GUUIDString[5]      = BinaryGUUID[4];
+            GUUIDString[6]      = BinaryGUUID[5];
             
-            GUUIDString[7]  = ASCIIHyphen;
+            GUUIDString[7]      = ASCIIHyphen;
             
-            GUUIDString[8]  = BinaryGUUID[6];
-            GUUIDString[9]  = BinaryGUUID[7];
+            GUUIDString[8]      = BinaryGUUID[6];
+            GUUIDString[9]      = BinaryGUUID[7];
             
-            GUUIDString[10] = ASCIIHyphen;
+            GUUIDString[10]     = ASCIIHyphen;
             
-            GUUIDString[11] = BinaryGUUID[8];
-            GUUIDString[12] = BinaryGUUID[9];
+            GUUIDString[11]     = BinaryGUUID[8];
+            GUUIDString[12]     = BinaryGUUID[9];
             
-            GUUIDString[13] = ASCIIHyphen;
+            GUUIDString[13]     = ASCIIHyphen;
             
-            GUUIDString[14] = BinaryGUUID[10];
-            GUUIDString[15] = BinaryGUUID[11];
-            GUUIDString[16] = BinaryGUUID[12];
-            GUUIDString[17] = BinaryGUUID[13];
-            GUUIDString[18] = BinaryGUUID[14];
-            GUUIDString[19] = BinaryGUUID[15];
+            GUUIDString[14]     = BinaryGUUID[10];
+            GUUIDString[15]     = BinaryGUUID[11];
+            GUUIDString[16]     = BinaryGUUID[12];
+            GUUIDString[17]     = BinaryGUUID[13];
+            GUUIDString[18]     = BinaryGUUID[14];
+            GUUIDString[19]     = BinaryGUUID[15];
         }
         return GUUIDString;
     }
