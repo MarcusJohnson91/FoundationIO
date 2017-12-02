@@ -118,26 +118,13 @@ extern "C" {
         if (BinaryGUUID == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate BinaryGUUID");
         } else {
-            BinaryGUUID[0] = GUUIDString[0];
-            BinaryGUUID[1] = GUUIDString[1];
-            BinaryGUUID[2] = GUUIDString[2];
-            BinaryGUUID[3] = GUUIDString[3];
-            
-            BinaryGUUID[4] = GUUIDString[5];
-            BinaryGUUID[5] = GUUIDString[6];
-            
-            BinaryGUUID[6] = GUUIDString[8];
-            BinaryGUUID[7] = GUUIDString[9];
-            
-            BinaryGUUID[8] = GUUIDString[11];
-            BinaryGUUID[9] = GUUIDString[12];
-            
-            BinaryGUUID[10] = GUUIDString[14];
-            BinaryGUUID[11] = GUUIDString[15];
-            BinaryGUUID[12] = GUUIDString[16];
-            BinaryGUUID[13] = GUUIDString[17];
-            BinaryGUUID[14] = GUUIDString[18];
-            BinaryGUUID[15] = GUUIDString[19];
+            for (uint8_t StringByte = 0; StringByte < BitIOGUUIDStringSize; StringByte++) { // 00 00 00 00 - 00 00 - 00 00 - 00 00 - 00 00 00 00 00 00
+                for (uint8_t BinaryByte = 0; BinaryByte < BitIOBinaryGUUIDSize; BinaryByte++) {
+                    if (GUUIDString[StringByte] != 0x2D) {
+                        BinaryGUUID[BinaryByte]  = GUUIDString[StringByte];
+                    }
+                }
+            }
         }
         return BinaryGUUID;
     }
@@ -147,65 +134,46 @@ extern "C" {
         if (GUUIDString == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate %d bytes", BitIOGUUIDStringSize);
         } else {
-            uint8_t ASCIIHyphen = 0x2D,
+            uint8_t ASCIIHyphen = 0x2D;
             
-            GUUIDString[0]      = BinaryGUUID[0];
-            GUUIDString[1]      = BinaryGUUID[1];
-            GUUIDString[2]      = BinaryGUUID[2];
-            GUUIDString[3]      = BinaryGUUID[3];
-            
-            GUUIDString[4]      = ASCIIHyphen;
-            
-            GUUIDString[5]      = BinaryGUUID[4];
-            GUUIDString[6]      = BinaryGUUID[5];
-            
-            GUUIDString[7]      = ASCIIHyphen;
-            
-            GUUIDString[8]      = BinaryGUUID[6];
-            GUUIDString[9]      = BinaryGUUID[7];
-            
-            GUUIDString[10]     = ASCIIHyphen;
-            
-            GUUIDString[11]     = BinaryGUUID[8];
-            GUUIDString[12]     = BinaryGUUID[9];
-            
-            GUUIDString[13]     = ASCIIHyphen;
-            
-            GUUIDString[14]     = BinaryGUUID[10];
-            GUUIDString[15]     = BinaryGUUID[11];
-            GUUIDString[16]     = BinaryGUUID[12];
-            GUUIDString[17]     = BinaryGUUID[13];
-            GUUIDString[18]     = BinaryGUUID[14];
-            GUUIDString[19]     = BinaryGUUID[15];
+            for (uint8_t BinaryByte = 0; BinaryByte < BitIOBinaryGUUIDSize; BinaryByte++) {
+                for (uint8_t StringByte = 0; StringByte < BitIOGUUIDStringSize; StringByte++) { // 00 00 00 00 - 00 00 - 00 00 - 00 00 - 00 00 00 00 00 00
+                    if (BinaryByte == 4 || BinaryByte == 7 || BinaryByte == 10 || BinaryByte == 13) {
+                        GUUIDString[StringByte]  = ASCIIHyphen;
+                    } else {
+                        GUUIDString[StringByte]  = BinaryGUUID[BinaryByte];
+                    }
+                }
+            }
         }
         return GUUIDString;
     }
     
     uint8_t *SwapGUUIDString(const uint8_t GUUIDString[BitIOGUUIDStringSize]) {
-        uint8_t *SwappedGUUIDString    = NULL;
-        SwappedGUUIDString         = calloc(1, BitIOGUUIDStringSize * sizeof(uint8_t));
+        uint8_t *SwappedGUUIDString = NULL;
+        SwappedGUUIDString          = calloc(1, BitIOGUUIDStringSize * sizeof(uint8_t));
         if (SwappedGUUIDString == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate %d bytes", BitIOGUUIDStringSize);
         } else {
-            SwappedGUUIDString[0]  = GUUIDString[3];
-            SwappedGUUIDString[1]  = GUUIDString[2];
-            SwappedGUUIDString[2]  = GUUIDString[1];
-            SwappedGUUIDString[3]  = GUUIDString[0];
+            SwappedGUUIDString[0]   = GUUIDString[3];
+            SwappedGUUIDString[1]   = GUUIDString[2];
+            SwappedGUUIDString[2]   = GUUIDString[1];
+            SwappedGUUIDString[3]   = GUUIDString[0];
             
-            SwappedGUUIDString[4]  = GUUIDString[4];
+            SwappedGUUIDString[4]   = GUUIDString[4];
             
-            SwappedGUUIDString[5]  = GUUIDString[6];
-            SwappedGUUIDString[6]  = GUUIDString[5];
+            SwappedGUUIDString[5]   = GUUIDString[6];
+            SwappedGUUIDString[6]   = GUUIDString[5];
             
-            SwappedGUUIDString[7]  = GUUIDString[7];
+            SwappedGUUIDString[7]   = GUUIDString[7];
             
-            SwappedGUUIDString[8]  = GUUIDString[9];
-            SwappedGUUIDString[9]  = GUUIDString[8];
+            SwappedGUUIDString[8]   = GUUIDString[9];
+            SwappedGUUIDString[9]   = GUUIDString[8];
             
-            SwappedGUUIDString[10] = GUUIDString[10];
+            SwappedGUUIDString[10]  = GUUIDString[10];
             
-            SwappedGUUIDString[11] = GUUIDString[12];
-            SwappedGUUIDString[12] = GUUIDString[11];
+            SwappedGUUIDString[11]  = GUUIDString[12];
+            SwappedGUUIDString[12]  = GUUIDString[11];
             
             for (uint8_t EndBytes = 13; EndBytes < BitIOGUUIDStringSize - BitIONULLStringSize; EndBytes++) {
                 SwappedGUUIDString[EndBytes] = GUUIDString[EndBytes];
