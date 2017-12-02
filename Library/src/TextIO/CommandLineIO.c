@@ -73,8 +73,8 @@ extern   "C" {
         int64_t              NumOptions;
         int64_t              MinOptions;
         int64_t              HelpSwitch;
-        int64_t              ConsoleWidth;
-        int64_t              ConsoleHeight;
+        uint16_t             ConsoleWidth;
+        uint16_t             ConsoleHeight;
         char                *ProgramName;
         char                *ProgramAuthor;
         char                *ProgramDescription;
@@ -102,6 +102,19 @@ extern   "C" {
                 BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Couldn't allocate %d CommandLineSwitches", NumSwitches);
                 exit(EXIT_FAILURE);
             }
+#if   (BitIOTargetOS == BitIOWindowsOS)
+            // Get the size of the console with Windows' bullshit
+            CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
+            GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
+            CLI->ConsoleHeight = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
+            CLI->ConsoleWidth = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
+#elif (BitIOTargetOS == BitIOPOSIXOS)
+            // Get the size of the console with IOCTL
+            struct winsize WindowSize;
+            ioctl(0, TIOCGWINSZ, &WindowSize);
+            CLI->ConsoleWidth  = WindowSize.ws_row;
+            CLI->ConsoleHeight = WindowSize.ws_col;
+#endif
         }
         return CLI;
     }
@@ -673,16 +686,20 @@ extern   "C" {
         return ExtensionString;
     }
     
-    static void CommandLineIO_ShowProgress(uint8_t PercentDone) {
-        // we have a reolution of half a percent, the values 0-200 are acceptable.
+    static void CommandLineIO_ShowProgress(uint8_t NumItems2Display, char *Strings, uint64_t *Numerator, uint64_t *Denominator) {
+        // we have a resolution of half a percent, the values 0-200 are acceptable.
         /*
          How do we get the window size? I want to be able to resize the window
          I want the bar to have an even number of dashes on each side with the number in the middle.
          like this:
+         [--                        Shot U/V 2.0%                            ]
          [-----                    Frame W/X 10.5%                           ] 10.5% gets rounded down to 10 which is 5 dashes
          [-------------------------Cluster Y/Z 50.5%                         ] 50.5% gets rounded down to 50 which is 25 dashes
          Also we'll need to know the size of the center string so we can keep both bars equal lengths
          */
+        for (uint64_t Item = 0ULL; Item < NumItems2Display; Item++) {
+            
+        }
     }
     
     void CommandLineIO_Deinit(CommandLineIO *CLI) {
