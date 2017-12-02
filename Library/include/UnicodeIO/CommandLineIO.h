@@ -171,6 +171,16 @@ extern   "C" {
     void                        ParseCommandLineOptions(CommandLineIO *CLI, const int argc, const char *argv[]);
     
     /*!
+     @abstract                                                  "Displays on the screen the progress of X actions that are taking place"
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     NumItems2Display                "The number of things you want to show the progress of".
+     @param                     Strings                         "A pointer to an array of the strings describing what progress is being tracked".
+     @param                     Numerator                       "A pointer to an array of the number of X tasks that have been completed".
+     @param                     Denominator                     "A pointer to an array of the number of X thats that there are to do".
+     */
+    void                        CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, char *Strings, uint64_t *Numerator, uint64_t *Denominator);
+    
+    /*!
      @abstract                                                  "How many matching options are present in CommandLineIO (will also check for slave switches if present)".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     SwitchID                        "The switch to look for".
