@@ -44,7 +44,7 @@ static   const char BitIONewLine[2]  = {"\x0D\x00"}; /* \r */
 static   const char BitIONewLine[2]  = {"\x0A\x00"}; /* \n */
 #endif
     
-#include           <sys/ioctl.h>  /* Included for the terminal width */
+#include           <sys/ioctl.h>  /* Included for the terminal size */
 #include           <sys/socket.h> /* Included for the socket support */
 #include           <unistd.h>     /* Included for STD IN/OUT/ERR */
     
