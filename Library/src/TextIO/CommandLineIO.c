@@ -686,8 +686,7 @@ extern   "C" {
         return ExtensionString;
     }
     
-    static void CommandLineIO_ShowProgress(uint8_t NumItems2Display, char *Strings, uint64_t *Numerator, uint64_t *Denominator) {
-        // we have a resolution of half a percent, the values 0-200 are acceptable.
+    void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, char *Strings, uint64_t *Numerator, uint64_t *Denominator) {
         /*
          How do we get the window size? I want to be able to resize the window
          I want the bar to have an even number of dashes on each side with the number in the middle.
@@ -697,9 +696,40 @@ extern   "C" {
          [-------------------------Cluster Y/Z 50.5%                         ] 50.5% gets rounded down to 50 which is 25 dashes
          Also we'll need to know the size of the center string so we can keep both bars equal lengths
          */
-        for (uint64_t Item = 0ULL; Item < NumItems2Display; Item++) {
+        /*
+         Ok, so we know the width of the console, now we need to figure out the sizes of each of the strings
+         */
+        
+        size_t *StringSize = calloc(NumItems2Display, sizeof(size_t));
+        for (uint8_t Item = 0; Item < NumItems2Display; Item++) { // Get the size of the strings
+            StringSize[Item] = strlen(&Strings[Item]);
+            // huh, well we need 2 characters for the brackets.
             
         }
+        // Number of seperators for each string
+        size_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(size_t));
+        char   *ActualStrings2Print            = calloc(NumItems2Display, sizeof(char) * CLI->ConsoleWidth);
+        for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
+            // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
+            NumProgressIndicatorsPerString[String] = CLI->ConsoleWidth - (2 + StringSize[String]); // what if it's not even?
+            
+            
+            
+            uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
+            
+            uint8_t HalfOfTheIndicators = (PercentComplete / 2);
+            
+            // Now we go ahead and memset a string with the proper number of indicators
+            char *Indicator = calloc(1, sizeof(char) * CLI->ConsoleWidth);
+            memset(Indicator, '-', HalfOfTheIndicators);
+            
+            sprintf(&ActualStrings2Print[String], "[%s%s %d/%d %hhu/% %s]", Indicator, Strings[String], Numerator, Denominator, PercentComplete, Indicator);
+            fprintf(stdout, "%s%s", &ActualStrings2Print[String], BitIONewLine);
+            free(Indicator);
+        }
+        free(StringSize);
+        free(NumProgressIndicatorsPerString);
+        free(ActualStrings2Print);
     }
     
     void CommandLineIO_Deinit(CommandLineIO *CLI) {
