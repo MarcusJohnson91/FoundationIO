@@ -46,7 +46,7 @@ extern   "C" {
                                 ArgumentIsAString               = 2,
                                 ArgumentIsARange                = 4,
                                 ArgumentIsARatio                = 8,
-        
+                                ArgumentNotAllowed              = 16,
     } CLIArgumentTypes;
     
     /*!
@@ -60,7 +60,7 @@ extern   "C" {
      @param                     NumSwitches                     "The number of CommandLineSwitch structures to initalize".
      @return                                                    "Returns a pointer to an initialized CommandLineIO instance".
      */
-    CommandLineIO              *CommandLineIO_Init(const int64_t NumSwitches);
+    CommandLineIO              *CommandLineIO_Init(const size_t NumSwitches);
     
     /*!
      @abstract                                                  "Sets the name of the program".
@@ -126,9 +126,9 @@ extern   "C" {
      @remark                                                    "Just enter the number of characters you typed into the string not counting the quotes".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     SwitchID                        "The switch to set".
-     @param                     Flag                            "The flag to identify an option with".
+     @param                     Name                            "The flag to identify an option with".
      */
-    void                        CLISetSwitchFlag(CommandLineIO *CLI, const int64_t SwitchID, char *Flag);
+    void                        CLISetSwitchName(CommandLineIO *CLI, const int64_t SwitchID, char *Name);
     
     /*!
      @abstract                                                  "Sets SwitchDescription's flag in the CommandLineIO instance pointed by CLI".

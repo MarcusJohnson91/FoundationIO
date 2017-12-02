@@ -7,22 +7,73 @@
 extern  "C" {
 #endif
     
+#ifndef BitIOUnknownOS
+#define BitIOUnknownOS    0
+#endif
+    
+#ifndef BitIOPOSIXOS
+#define BitIOPOSIXOS      1
+#endif
+    
+#ifndef BitIOWindowsOS
+#define BitIOWindowsOS    2
+#endif
+    
+#ifndef BitIOMacClassicOS
+#define BitIOMacClassicOS 3
+#endif
+    
 #if      defined(macintosh) || defined(Macintosh)
+#ifndef             BitIOTargetOS
+#define             BitIOTargetOS (BitIOMacClassicOS)
+#endif
+    
+#ifndef             BitIONewLineSize
 #define             BitIONewLineSize    1
 static   const char BitIONewLine[2]  = {"\x0D\x00"}; /* \r */
+#endif
+    
 #elif    defined(_POSIX_C_SOURCE) || defined(__APPLE__) || defined(__MACH__) || defined(BSD) || defined(linux) || defined(__linux)
+    
+#ifndef             BitIOTargetOS
+#define             BitIOTargetOS (BitIOPOSIXOS)
+#endif
+    
+#ifndef             BitIONewLineSize
 #define             BitIONewLineSize    1
 static   const char BitIONewLine[2]  = {"\x0A\x00"}; /* \n */
+#endif
+    
+#include           <sys/ioctl.h>  /* Included for the terminal width */
 #include           <sys/socket.h> /* Included for the socket support */
-#include           <unistd.h>
+#include           <unistd.h>     /* Included for STD IN/OUT/ERR */
+    
 #elif    defined(_WIN32) || defined(__WIN32__) || defined(_WIN64) || defined(__WINDOWS__)
+
+#ifndef             BitIOTargetOS
+#define             BitIOTargetOS (BitIOWindowsOS)
+#endif
+
+#ifndef             BitIONewLineSize
 #define             BitIONewLineSize    2
 static   const char BitIONewLine[3]  = {"\x0D\x0A\x00"}; /* \r\n */
-#define             restrict          __restrict
-#define             strncasecmp        _strnicmp
-#define             strcasecmp          stricmp
-#include           <winsock.h>    /* Included for the socket support on Windows */
 #endif
+    
+#include           <winsock.h>    /* Included for the socket support on Windows */
+#include           <wincon.h>
+
+#ifndef             restrict
+#define             restrict          __restrict
+#endif
+
+#ifndef             strncasecmp
+#define             strncasecmp        _strnicmp
+#endif
+    
+#ifndef             strcasecmp
+#define             strcasecmp          stricmp
+#endif
+#endif   /* End OS detection */
     
 #ifndef   _LARGEFILE_SOURCE
 #define   _LARGEFILE_SOURCE
