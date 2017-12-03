@@ -338,7 +338,7 @@ extern   "C" {
                 if (ArgumentString[0] == ASCIIHyphen && ArgumentString[1] == ASCIIHyphen) {
                     ArgumentStringPrefixSize  = 2;
                 } //else if (ArgumentString[0] == ASCIIBSlash || ArgumentString[0] == ASCIIFSlash || ArgumentString[0] == ASCIIHyphen) {
-                    //ArgumentStringPrefixSize  = 1;
+                //ArgumentStringPrefixSize  = 1;
                 //}
             } else {
                 BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "OptionString is not an option string");
@@ -693,7 +693,7 @@ extern   "C" {
          like this:
          [--                        Shot U/V 2.0%                            ]
          [-----                    Frame W/X 10.5%                           ] 10.5% gets rounded down to 10 which is 5 dashes
-         [-------------------------Cluster Y/Z 50.5%                         ] 50.5% gets rounded down to 50 which is 25 dashes
+         [-------------------------Block Y/Z 50.5%                           ] 50.5% gets rounded down to 50 which is 25 dashes
          Also we'll need to know the size of the center string so we can keep both bars equal lengths
          */
         /*
