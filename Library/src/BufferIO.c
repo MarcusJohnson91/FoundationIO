@@ -332,10 +332,12 @@ extern "C" {
         if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         } else {
+            uint8_t NumBits2Add = BitB->NumBits - (Bits2Skip + BitB->BitOffset);
             if (Bits2Skip + BitB->BitOffset > BitB->NumBits) {
-                BitB->Buffer = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Skip, Yes));
+                BitB->Buffer   = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Skip, Yes));
+                BitB->NumBits += NumBits2Add;
             }
-            BitB->BitOffset += Bits2Skip;
+            BitB->BitOffset   += Bits2Skip;
         }
     }
     
