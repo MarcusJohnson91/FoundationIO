@@ -28,6 +28,8 @@
 extern   "C" {
 #endif
     
+    static const char          *BitIOLibraryName                = "libBitIO";
+    
     /*!
      @enum                      BitIOConstants
      @abstract                                                  "BitIO compile time constants".
@@ -76,8 +78,6 @@ extern   "C" {
                                 WholeUnary                      = 2,
     } UnaryTypes;
     
-    static const char          *BitIOLibraryName                = "libBitIO";
-    
     /* Pure Math */
     /*!
      @abstract                                                  "Unsigned integer absolute value function".
@@ -100,7 +100,7 @@ extern   "C" {
      @param                     Symbol                          "The symbol you're looking to store".
      @return                                                    "Returns the number of bits required to store a symbol".
      */
-    uint8_t                     IntegerLog2(uint64_t Symbol);
+    int8_t                      IntegerLog2(int64_t Symbol);
     
     /*!
      @abstract                                                  "Swap endian of 16 bit integers".
@@ -171,7 +171,7 @@ extern   "C" {
      @param                     GUUIDString                     "Pointer to a GUID/UUIDString".
      @return                                                    "Returns a pointer to a BinaryGUID/UUID".
      */
-    uint8_t                    *ConvertGUUIDString2BinaryGUUID(const uint8_t *GUUIDString);
+    uint8_t                    *ConvertGUUIDString2BinaryGUUID(const uint8_t GUUIDString[BitIOGUUIDStringSize]);
     
     /*!
      @abstract                                                  "Converts a BinaryGUID/UUID to a GUID/UUIDString".
@@ -254,7 +254,7 @@ extern   "C" {
     /*!
      @abstract                                                  "Gets the offset of the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer".
-     @return                                                    "Returns the position offset from the start of BitBuffer".
+     @return                                                    "Returns the position offset from the start of BitBuffer in bits".
      */
     uint64_t                    BitBuffer_GetPosition(BitBuffer *BitB);
     
