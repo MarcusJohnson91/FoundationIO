@@ -17,8 +17,8 @@ extern "C" {
         return Result;
     }
     
-    inline uint8_t IntegerLog2(uint64_t Symbol) {
-        uint8_t Bits     = 0;
+    inline int8_t IntegerLog2(int64_t Symbol) {
+        int8_t Bits      = 0;
         if (Symbol == 0) {
             Bits         = 1;
         } else {
@@ -118,7 +118,7 @@ extern "C" {
         if (BinaryGUUID == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate BinaryGUUID");
         } else {
-            for (uint8_t StringByte = 0; StringByte < BitIOGUUIDStringSize; StringByte++) { // 00 00 00 00 - 00 00 - 00 00 - 00 00 - 00 00 00 00 00 00
+            for (uint8_t StringByte = 0; StringByte < BitIOGUUIDStringSize; StringByte++) {
                 for (uint8_t BinaryByte = 0; BinaryByte < BitIOBinaryGUUIDSize; BinaryByte++) {
                     if (GUUIDString[StringByte] != 0x2D) {
                         BinaryGUUID[BinaryByte]  = GUUIDString[StringByte];
@@ -137,7 +137,7 @@ extern "C" {
             uint8_t ASCIIHyphen = 0x2D;
             
             for (uint8_t BinaryByte = 0; BinaryByte < BitIOBinaryGUUIDSize; BinaryByte++) {
-                for (uint8_t StringByte = 0; StringByte < BitIOGUUIDStringSize; StringByte++) { // 00 00 00 00 - 00 00 - 00 00 - 00 00 - 00 00 00 00 00 00
+                for (uint8_t StringByte = 0; StringByte < BitIOGUUIDStringSize; StringByte++) {
                     if (BinaryByte == 4 || BinaryByte == 7 || BinaryByte == 10 || BinaryByte == 13) {
                         GUUIDString[StringByte]  = ASCIIHyphen;
                     } else {
@@ -282,7 +282,7 @@ extern "C" {
         if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         } else {
-            BitBufferSize      = Bits2Bytes(BitB->NumBits, No);
+            BitBufferSize      = BitB->NumBits;
         }
         return BitBufferSize;
     }
@@ -297,14 +297,14 @@ extern "C" {
         return Position;
     }
     
-    bool BitBuffer_IsAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) { // BitBuffer_IsAligned
+    bool BitBuffer_IsAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
         bool AlignmentStatus = 0;
         if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BytesOfAlignment: %d isn't an integer power of 2", BytesOfAlignment);
         } else {
-            if (Bytes2Bits(BytesOfAlignment) - Bits2Bytes(BitB->BitOffset, Yes) == 0) {
+            if (BitB->BitOffset % (BytesOfAlignment * 8) == 0) {
                 AlignmentStatus = Yes;
             } else {
                 AlignmentStatus = No;
@@ -319,9 +319,10 @@ extern "C" {
         } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BytesOfAlignment: %d isn't a power of 2 (or 1)", BytesOfAlignment);
         } else {
-            uint8_t Bits2Align = Bytes2Bits(BytesOfAlignment) - Bits2Bytes(BitB->BitOffset, Yes);
+            uint8_t Bits2Align = (BytesOfAlignment * 8) - (BitB->BitOffset % (BytesOfAlignment * 8)); // 127 bits, 64 bits 2 align
             if (Bits2Align + BitB->BitOffset > BitB->NumBits) {
-                BitB->Buffer = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
+                BitB->Buffer   = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
+                BitB->NumBits  += Bits2Align;
             }
             BitB->BitOffset   += Bits2Align;
         }
@@ -356,11 +357,13 @@ extern "C" {
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
             // Extract as is
 #elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
-            uint8_t FinalByte      = SwapBits(Data); // Extract and flip bit order
+            uint8_t FinalByte      = SwapBits(Data);
+            // Extract and flip bit order
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
             // Extract and flip byte order
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-            uint8_t FinalByte      = SwapBits(Data); // Extract and flip the byte order AND bit order
+            uint8_t FinalByte      = SwapBits(Data);
+            // Extract and flip the byte order AND bit order
 #endif
             Bits                  -= Bits2Put;
         }
@@ -396,7 +399,7 @@ extern "C" {
 #endif
     }
     
-    static inline uint64_t ExtractBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Extract) { // So this function reads data FROM Little endian, Least Significant Bit first
+    static inline uint64_t ExtractBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Extract) {
         uint64_t OutputData        = 0ULL;
         uint8_t  UserRequestedBits = Bits2Extract;
         uint8_t  FinalByte         = 0;
@@ -431,7 +434,7 @@ extern "C" {
         return OutputData;
     }
     
-    static inline uint64_t ExtractBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Extract) { // So the bits are in MSByte, MSBit format.
+    static inline uint64_t ExtractBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Extract) {
         uint64_t OutputData        = 0ULL;
         uint8_t  UserRequestedBits = Bits2Extract;
         uint8_t  FinalByte         = 0;
@@ -482,7 +485,7 @@ extern "C" {
         return 0ULL;
     }
     
-    static inline uint64_t ExtractBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Extract) { // So the data needs to be 0x6E7C
+    static inline uint64_t ExtractBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Extract) {
         uint64_t OutputData        = 0ULL;
         uint8_t  UserRequestedBits = Bits2Extract;
         while (UserRequestedBits > 0) {
@@ -1061,7 +1064,7 @@ extern "C" {
         }
     }
     
-    void BitInput_Read2BitBuffer(BitInput *BitI, BitBuffer *Buffer2Read, const uint64_t Bytes2Read) { // BitBufferUpdateFromBitInput
+    void BitInput_Read2BitBuffer(BitInput *BitI, BitBuffer *Buffer2Read, const uint64_t Bytes2Read) {
         uint64_t BytesRead            = 0ULL;
         if (BitI == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitInput Pointer is NULL");
