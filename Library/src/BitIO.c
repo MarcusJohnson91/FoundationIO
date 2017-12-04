@@ -322,7 +322,7 @@ extern "C" {
             uint8_t Bits2Align = (BytesOfAlignment * 8) - (BitB->BitOffset % (BytesOfAlignment * 8)); // 127 bits, 64 bits 2 align
             if (Bits2Align + BitB->BitOffset > BitB->NumBits) {
                 BitB->Buffer   = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
-                BitB->NumBits  += Bits2Align;
+                BitB->NumBits += Bits2Align;
             }
             BitB->BitOffset   += Bits2Align;
         }
