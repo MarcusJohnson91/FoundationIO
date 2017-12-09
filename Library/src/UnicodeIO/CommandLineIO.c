@@ -379,101 +379,57 @@ extern   "C" {
         } else if (argc < CLI->MinOptions || argc <= 1) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "You entered %d options, the minimum is %d", argc - 1, CLI->MinOptions);
         } else {
-            char    *FirstArgumentAsFlag                                         = ArgumentString2SwitchFlag(argv[1]);
-            uint64_t FirstArgumentSize                                           = strlen(argv[1]);
-            char    *HelpFlag                                                    = CLI->SwitchIDs[CLI->HelpSwitch].Name;
-            if (strncasecmp(FirstArgumentAsFlag, HelpFlag, FirstArgumentSize) == 0) {
-                DisplayCLIHelp(CLI);
-            } else {
-                free(FirstArgumentAsFlag);
-                DisplayProgramBanner(CLI);
-                
-                for (int Argument = 1; Argument < argc; Argument++) {
-                    BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "Argument %d %s", Argument, argv[Argument]);
-                }
-                
-                ArgumentTypes *ArgumentType                     = calloc((size_t)argc, sizeof(ArgumentTypes));
-                for (int32_t ArgvArg1 = 1LL; ArgvArg1 < argc - 1; ArgvArg1++) {
-                    
-                    /*  Extract the argv string and remove the prefix */
-                    char     *CurrentArgumentString             = ArgumentString2SwitchFlag(argv[ArgvArg1]);
-                    int64_t   CurrentArgumentStringSize         = (int64_t) strlen(CurrentArgumentString);
-                    
-                    /* Look for inline delimiters */
-                    int64_t EqualPosition = GetSubStringsAbsolutePosition(0, CurrentArgumentStringSize, CurrentArgumentString, "=");
-                    if (EqualPosition != -1) { // We found an equal's sign!!! now we just need to make sure it's actually valid.
+            /* Ok, so the first thing we need to do is loop over the arguments, and loop over the actual bytes of each argument */
+            int32_t  CurrentArgument        = 1LL;
+            
+            do {
+                // Extract the first argument as a switch.
+                char    *Argument         = (char*) argv[CurrentArgument];
+                char    *ArgumentFlag     = ArgumentString2SwitchFlag(Argument);
+                uint64_t ArgumentFlagSize = strlen(ArgumentFlag);
+                // now loop over the switches
+                for (int64_t Switch = 0LL; Switch < CLI->NumSwitches; Switch++) {
+                    // now compare ArgumentFlag to Switch
+                    // Which string is smaller?
+                    uint64_t SmallestStringSize = ArgumentFlagSize <= CLI->SwitchIDs[Switch].NameSize ? ArgumentFlagSize : CLI->SwitchIDs[Switch].NameSize;
+                    if (strncasecmp(ArgumentFlag, CLI->SwitchIDs[Switch].Name, SmallestStringSize) == 0) { // ArgumentFlag matches this switch
+                                                                                                           // Set up the Option here
+                        CLI->NumOptions += 1;
+                        if (CLI->NumOptions == 1) {
+                            CLI->OptionIDs = calloc(1, sizeof(CommandLineOption));
+                        } else {
+                            CLI->OptionIDs = realloc(CLI->OptionIDs, CLI->NumOptions * sizeof(CommandLineOption));
+                        }
+                        CLI->OptionIDs[CLI->NumOptions - 1].SwitchID = Switch;
                         
-                    }
-                    
-                    int64_t DoubleDotPosition = GetSubStringsAbsolutePosition(0, CurrentArgumentStringSize, CurrentArgumentString, "..");
-                    if (DoubleDotPosition != -1) { // We found range notation!!! now we just need to mke sure it's valid
                         
-                    }
-                    
-                    for (int64_t Switch = 0LL; Switch < CLI->NumSwitches; Switch++) {
-                        CLISwitchTypes CurrentArgvSwitchType    = CLI->SwitchIDs[Switch].SwitchType;
-                        uint64_t CurrentArgvStringSize          = strlen(CurrentArgumentString);
-                        uint64_t ShortestStringSize             = CLI->SwitchIDs[Switch].NameSize >= CurrentArgvStringSize ? CurrentArgvStringSize : CLI->SwitchIDs[Switch].NameSize;
-                        int64_t SwitchFlagMatchesArgumentString = strncasecmp(CLI->SwitchIDs[Switch].Name, CurrentArgumentString, ShortestStringSize);
-                        
-                        if  (SwitchFlagMatchesArgumentString == 0 && CurrentArgvSwitchType != UnknownSwitchType) {
-                            if (CurrentArgvSwitchType == SwitchMayHaveSlaves || CurrentArgvSwitchType == SwitchCantHaveSlaves || CurrentArgvSwitchType == ExistentialSwitch) {
-                                ArgumentType[ArgvArg1]          = OptionArg;
-                            } else if (CurrentArgvSwitchType == SwitchIsASlave) {
-                                ArgumentType[ArgvArg1]          = SlaveArg;
+                        // so now we need to look over the current switch's MaxConcurrentSlaves and NumPotentialSlaves wait num potential slaves will be indexxed by the loop
+                        for (int64_t ArgSlave = 1LL; ArgSlave < CLI->SwitchIDs[Switch].MaxConcurrentSlaves; ArgSlave++) {
+                            char *PotentialSlaveArg        = (char*) argv[CurrentArgument + ArgSlave];
+                            uint64_t PotentialSlaveArgSize = strlen(PotentialSlaveArg);
+                            for (int64_t Slave = 0LL; Slave < CLI->SwitchIDs[Switch].NumPotentialSlaves; Slave++) {
+                                // Ok so now we loop over the values stores in PoentialSlaves, looking up their switch flags.
+                                char *PotentialSlaveFlag   = CLI->SwitchIDs[CLI->SwitchIDs[Switch].PotentialSlaves[Slave]].Name;
+                                // Now compare PotentialSlaveFlag to PotentialSlaveArg
+                                uint64_t SmallestSlaveFlag = PotentialSlaveArgSize <= CLI->SwitchIDs[CLI->SwitchIDs[Switch].PotentialSlaves[Slave]].NameSize ? PotentialSlaveArgSize : CLI->SwitchIDs[CLI->SwitchIDs[Switch].PotentialSlaves[Slave]].NameSize;
+                                if (strncasecmp(PotentialSlaveArg, PotentialSlaveFlag, SmallestSlaveFlag) == 0) {
+                                    // We found a slave in the next argument so set the option up.
+                                    CLI->OptionIDs[CLI->NumOptions - 1].NumOptionSlaves += 1;
+                                    CLI->OptionIDs[CLI->NumOptions - 1].OptionSlaves[CLI->OptionIDs[CLI->NumOptions - 1].NumOptionSlaves - 1] = CLI->SwitchIDs[Switch].PotentialSlaves[Slave];
+                                }
+                                free(PotentialSlaveFlag);
                             }
-                        } else if (Switch == CLI->NumSwitches && SwitchFlagMatchesArgumentString != 0) { // SwitchFlagMatchesArgumentString != 0 &&
-                            ArgumentType[ArgvArg1]              = ResultArg;
+                            free(PotentialSlaveArg);
                         }
                     }
                 }
-                
-                int64_t NumOptionsFound = 0ULL;
-                for (int32_t ArgType = 1LL; ArgType < argc - 1; ArgType++) {
-                    if (ArgumentType[ArgType] == OptionArg) {
-                        NumOptionsFound += 1;
-                    }
-                    BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "Argument = %d, ArgumentType = %d", ArgType, ArgumentType[ArgType]);
-                }
-                CLI->NumOptions = NumOptionsFound;
-                BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "NumOptionsFound %d", NumOptionsFound);
-                
-                // So allocate a list of the number of slaves per option based on the number of options found
-                CLI->OptionIDs                     = calloc(NumOptionsFound, sizeof(CommandLineOption));
-                for (int32_t Arg = 1L; Arg < argc - 1; Arg++) {
-                    for (int64_t Option = 0LL; Option < NumOptionsFound; Option++) {
-                        if (ArgumentType[Arg] == SlaveArg) {
-                            // Ok so we loop over all the Options in ArgumentType
-                            // we record the latest Option, then record how many slaves there are until the next option.
-                            //NumSlavesForEachOption[Option] += 1;
-                            CLI->OptionIDs[Option].NumOptionSlaves += 1;
-                        }
-                        BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "Option %d, NumSlaves %d", Option, CLI->OptionIDs[Option].NumOptionSlaves);
-                    }
-                }
-                
-                for (int64_t Option = 0LL; Option < CLI->NumOptions; Option++) {
-                    // Allocate the slaves
-                    if (CLI->OptionIDs[Option].NumOptionSlaves >= 1) {
-                        CLI->OptionIDs[Option].OptionSlaves = calloc(CLI->OptionIDs[Option].NumOptionSlaves, sizeof(int64_t));
-                    }
-                }
-                
-                for (int64_t Option = 0LL; Option < CLI->NumOptions; Option++) {
-                    for (int32_t ArgvArg2 = 1; ArgvArg2 < argc - 1; ArgvArg2++) {
-                        if ((ArgumentType[ArgvArg2] == ResultArg || ArgumentType[ArgvArg2] == UnknownArg) && CLI->OptionIDs[Option].Argument == NULL) {
-                            // Now we just set the options and do verification
-                            CLI->OptionIDs[Option].Argument = (char*) argv[ArgvArg2];
-                            BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "Option %d ArgumentString = %s", Option, CLI->OptionIDs[Option].Argument);
-                        }
-                    }
-                }
-                free(ArgumentType);
-            }
+                free(Argument);
+                free(ArgumentFlag);
+            } while (CurrentArgument < argc);
         }
     }
-    /*
-    char **SplitInlineArgument(const char *ArgumentString, const uint64_t ArgumentStringSize, uint64_t NumSplitArguments) {
+    
+    static char **SplitInlineArgument(const char *ArgumentString, const uint64_t ArgumentStringSize, uint64_t NumSplitArguments) {
         /*
          Ok, so we take in an argument string and it's size.
          We output whatever the argument contains in multiple strings.
@@ -485,7 +441,7 @@ extern   "C" {
          
          You simply loop over the string comparing each byte to those symbols until you get to the end of the string and you keep a count of the number of delimiters found, each's size, and offset from 0.
          We need to do this in 2 passes, the first to find the number of delimiters there are.
-         /
+         */
         
         uint64_t  NumDelimitersFound = 0ULL;
         uint64_t  FoundStrings       = 0ULL;
@@ -542,50 +498,6 @@ extern   "C" {
         
         NumSplitArguments = FoundStrings;
         return &StringPointers;
-    }
-     */
-    
-    static void ParseCommandLineOptions2(CommandLineIO *CLI, const int argc, const char *argv[]) {
-        if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "CommandLineIO Pointer is NULL");
-        } else if (argc < CLI->MinOptions || argc <= 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "You entered %d options, the minimum is %d", argc - 1, CLI->MinOptions);
-        } else {
-            /* Ok, so the first thing we need to do is loop over the arguments, and loop over the actual bytes of each argument */
-            uint64_t NumSplitArguments      = 0ULL;
-            uint64_t NewNumSplitArguments   = 0ULL;
-            char **SplitArguments           = NULL;
-            for (int32_t Argument = 1; Argument < argc; Argument++) {
-                //SplitArguments            = SplitInlineArgument(argv[Argument], strlen(argv[Argument]), NewNumSplitArguments);
-                char *CurrentArgument       = (char*) argv[Argument];
-                SplitArguments[Argument]    = strsep(&CurrentArgument, "=");
-                NumSplitArguments          += NewNumSplitArguments;
-            }
-            
-            /*
-             Ok, so each argument has been split into strings.
-             Now we need to go ahead and find which Switch the string corresponds to.
-             */
-            
-            for (uint64_t ArgString = 0ULL; ArgString < NumSplitArguments; ArgString++) {
-                for (int64_t SwitchID = 0LL; SwitchID < CLI->NumSwitches; SwitchID++) {
-                    char *CurrentFlag = CLI->SwitchIDs[SwitchID].Name;
-                    uint64_t SplitArgumentMatchesFlag = strcasecmp(SplitArguments[ArgString], CurrentFlag);
-                    if (SplitArgumentMatchesFlag == 0) { // it matches
-                        CLI->NumOptions += 1;
-                        CLI->OptionIDs[CLI->NumOptions - 1].SwitchID = SwitchID;
-                        // Now we need to get the number of PotentialSlaves, and loop over the next num strings with that looking for them on the switch side and MaxConcurrentSlaves on the ArgString side
-                        for (int64_t PotentialSlave = 0LL; PotentialSlave < CLI->SwitchIDs[SwitchID].NumPotentialSlaves; PotentialSlave++) {
-                            uint64_t PotentialSlaveArgStringMatches = strcasecmp(SplitArguments[ArgString + (PotentialSlave + 1)], CLI->SwitchIDs[CLI->SwitchIDs[SwitchID].PotentialSlaves[PotentialSlave]].Name);
-                            if (PotentialSlaveArgStringMatches == 0) {
-                                CLI->SwitchIDs[SwitchID].PotentialSlaves;
-                            }
-                        }
-                    }
-                }
-            }
-            
-        }
     }
     
     int64_t CLIGetNumMatchingOptions(CommandLineIO *CLI, const int64_t OptionID, const int64_t NumSlaves, const int64_t *SlaveIDs) {
@@ -691,9 +603,9 @@ extern   "C" {
          How do we get the window size? I want to be able to resize the window
          I want the bar to have an even number of dashes on each side with the number in the middle.
          like this:
-         [--                        Shot U/V 2.0%                            ]
-         [-----                    Frame W/X 10.5%                           ] 10.5% gets rounded down to 10 which is 5 dashes
-         [-------------------------Block Y/Z 50.5%                           ] 50.5% gets rounded down to 50 which is 25 dashes
+         [--                        Shot U/V 2%                              ]
+         [-----                    Frame W/X 10%                             ] 10.5% gets rounded down to 10 which is 5 dashes
+         [-------------------------Block Y/Z 51%-                            ] 50.5% gets rounded up to 51 which is 26 dashes
          Also we'll need to know the size of the center string so we can keep both bars equal lengths
          */
         /*

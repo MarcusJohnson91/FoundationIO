@@ -40,6 +40,32 @@ extern   "C" {
                                 ExistentialSwitch               = 8,
     } CLISwitchTypes;
     
+    /*!
+     @enum                      CLIOptionTypes
+     @abstract                                                  "Defines the type of Option".
+     @constant                  UnknownSwitchType               "Unknown Option type".
+     @constant                  SwitchHasArgMayHaveSlaves       "The Option may have slaves, but it may not too".
+     @constant                  SwitchHasArgNoSlaves            "The Option can not have any slaves".
+     @constant                  SwitchNoArgMayHaveSlaves        "The Option is a slave".
+     @constant                  SwitchNoArgNoSlaves             "The Option can not have any slaves, or any arguments, it just exists or doesn't exist".
+     */
+    typedef enum CLIOptionTypes {
+                                UnknownOptionType               = 0,
+                                OptionHasArgMayHaveSlaves       = 1,
+                                OptionHasArgNoSlaves            = 2,
+                                OptionNoArgMayHaveSlaves        = 4,
+                                OptionNoArgNoSlaves             = 8,
+    } CLIOptionTypes;
+    
+    /*!
+     @enum                      CLIArgumentTypes
+     @abstract                                                  "Defines the type of argument accepted by the Option".
+     @constant                  UnknownArgumentType             "Unknown Argument type".
+     @constant                  ArgumentIsAPath                 "The Argument may have slaves, but it may not too".
+     @constant                  ArgumentIsAString               "The Argument can not have any slaves".
+     @constant                  ArgumentIsARange                "The Argument is a slave".
+     @constant                  ArgumentIsARatio                "The Argument can not have any slaves, or any arguments, it just exists or doesn't exist".
+     */
     typedef enum CLIArgumentTypes {
                                 UnknownArgumentType             = 0,
                                 ArgumentIsAPath                 = 1,
@@ -48,6 +74,32 @@ extern   "C" {
                                 ArgumentIsARatio                = 8,
                                 ArgumentNotAllowed              = 16,
     } CLIArgumentTypes;
+    
+    enum SwitchPrefixes {
+        ASCIIHyphen          = 0x2D,
+        //ASCIIFSlash          = 0x5C,
+        //ASCIIBSlash          = 0x2F,
+    };
+    
+    enum Delimiters {
+        Colon                = 0x3A,
+        Equal                = 0x3D,
+        Period               = 0x2E,
+    };
+    
+    typedef enum DelimiterTypes {
+        UnknownDelimiter     = 0,
+        RangeDelimiter       = 1,
+        EqualDelimiter       = 2,
+        ColonDelimiter       = 3,
+    } DelimiterTypes;
+    
+    typedef enum ArgumentTypes {
+        UnknownArg           = 0,
+        OptionArg            = 1,
+        SlaveArg             = 2,
+        ResultArg            = 3,
+    } ArgumentTypes;
     
     /*!
      @typedef                   CommandLineIO
@@ -159,7 +211,7 @@ extern   "C" {
      @param                     MasterID                        "Which switch are we talking about?".
      @param                     MaxActiveSlaves                 "How many Slave switches can be active in an argument at once"?
      */
-    void                        CLISetSwitchMaxActiveSlaves(CommandLineIO *CLI, const int64_t MasterID, const int64_t MaxActiveSlaves);
+    void                        CLISetSwitchMaxConcurrentSlaves(CommandLineIO *CLI, const int64_t MasterID, const int64_t MaxActiveSlaves);
     
     /*!
      @abstract                                                  "Parses argv for switches matching the ones contained in CLI".
