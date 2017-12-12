@@ -5,6 +5,14 @@ extern "C" {
 #endif
     
     /* Pure Math */
+    inline bool     IsNegative(const int64_t Integer) {
+        if (Integer >= 0 && ~Integer >= 0) {
+            return No;
+        } else {
+            return Yes;
+        }
+    }
+    
     inline uint64_t Absolute(const int64_t Value) {
         return Value >= 0 ? (uint64_t) Value : (uint64_t) ~Value + 1;
     }
