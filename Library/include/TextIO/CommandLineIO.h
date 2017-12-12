@@ -197,6 +197,8 @@ extern   "C" {
      */
     void                        CLISetSwitchType(CommandLineIO *CLI, int64_t SwitchID, CLISwitchTypes SwitchType);
     
+    void                        CLISetSwitchArgumentType(CommandLineIO *CLI, const int64_t SwitchID, CLIArgumentTypes ArgumentType);
+    
     /*!
      @abstract                                                  "Sets MetaFlag switch as a meta flag for switch SwitchID".
      @param                     CLI                             "CommandLineIO Pointer".
