@@ -80,6 +80,12 @@ extern   "C" {
     
     /* Pure Math */
     /*!
+     @abstract                                                  "Tells if the number is negative".
+     @param                     Integer                         "The value to find the signedness of".
+     */
+    bool                        IsNegative(const int64_t Integer);
+    
+    /*!
      @abstract                                                  "Unsigned integer absolute value function".
      @remark                                                    "Returning a signed absolute value integer is dumb. REQUIRES two's complement signed representation".
      @param                     Value                           "The value to find the absolute value of".
