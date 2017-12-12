@@ -344,7 +344,7 @@ extern   "C" {
                 BitIOLog(BitIOLog_DEBUG, BitIOLibraryName, __func__, "OptionString is not an option string");
             }
             uint64_t ArgumentSwitchSize    = ArgumentStringSize - ArgumentStringPrefixSize;
-            ArgumentSwitch                 = calloc(1, ArgumentSwitchSize + BitIONULLStringSize);
+            ArgumentSwitch                 = calloc(ArgumentSwitchSize + BitIONULLStringSize, sizeof(uint8_t));
             strncpy(ArgumentSwitch, &ArgumentString[ArgumentStringPrefixSize], ArgumentSwitchSize);
         }
         return ArgumentSwitch;
@@ -492,7 +492,7 @@ extern   "C" {
         for (uint64_t String = 0ULL; String < FoundStrings; String++) {
             // In here allocate a string for each found string
             // Allocate the string here
-            char *StringPointer    = calloc(1, SubStringSize[String]);
+            char *StringPointer    = calloc(SubStringSize[String], sizeof(uint8_t));
             StringPointers[String] = *StringPointer;
         }
         
@@ -620,7 +620,7 @@ extern   "C" {
         }
         // Number of seperators for each string
         size_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(size_t));
-        char   *ActualStrings2Print            = calloc(NumItems2Display, sizeof(char) * CLI->ConsoleWidth);
+        char   *ActualStrings2Print            = calloc(NumItems2Display * CLI->ConsoleWidth, sizeof(char));
         for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
             // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
             NumProgressIndicatorsPerString[String] = CLI->ConsoleWidth - (2 + StringSize[String]); // what if it's not even?
@@ -632,7 +632,7 @@ extern   "C" {
             uint8_t HalfOfTheIndicators = (PercentComplete / 2);
             
             // Now we go ahead and memset a string with the proper number of indicators
-            char *Indicator = calloc(1, sizeof(char) * CLI->ConsoleWidth);
+            char *Indicator = calloc(CLI->ConsoleWidth, sizeof(char));
             memset(Indicator, '-', HalfOfTheIndicators);
             
             sprintf(&ActualStrings2Print[String], "[%s%s %d/%d %hhu/% %s]", Indicator, Strings[String], Numerator, Denominator, PercentComplete, Indicator);
