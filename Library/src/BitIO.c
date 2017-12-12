@@ -102,30 +102,41 @@ extern "C" {
     /* Pure GUUID Management */
     bool CompareGUUIDStrings(const uint8_t GUUIDString1[BitIOGUUIDStringSize], const uint8_t GUUIDString2[BitIOGUUIDStringSize]) {
         bool GUUIDStringsMatch = Yes;
-        for (uint8_t GUUIDStringByte = 0; GUUIDStringByte < BitIOGUUIDStringSize - BitIONULLStringSize; GUUIDStringByte++) {
-            if (GUUIDString1[GUUIDStringByte] != GUUIDString2[GUUIDStringByte]) {
-                GUUIDStringsMatch = No;
+        if (GUUIDString1 != NULL && GUUIDString2 != NULL) {
+            for (uint8_t GUUIDStringByte = 0; GUUIDStringByte < BitIOGUUIDStringSize - BitIONULLStringSize; GUUIDStringByte++) {
+                if (GUUIDString1[GUUIDStringByte] != GUUIDString2[GUUIDStringByte]) {
+                    GUUIDStringsMatch = No;
+                }
             }
+        } else if (GUUIDString1 == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "GUUIDString1 Pointer is NULL");
+        } else if (GUUIDString2 == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "GUUIDString2 Pointer is NULL");
         }
+        
         return GUUIDStringsMatch;
     }
     
     bool CompareBinaryGUUIDs(const uint8_t BinaryGUUID1[BitIOBinaryGUUIDSize], const uint8_t BinaryGUUID2[BitIOBinaryGUUIDSize]) {
         bool BinaryGUUIDsMatch = Yes;
-        for (uint8_t BinaryGUUIDByte = 0; BinaryGUUIDByte < BitIOBinaryGUUIDSize; BinaryGUUIDByte++) {
-            if (BinaryGUUID1[BinaryGUUIDByte] != BinaryGUUID2[BinaryGUUIDByte]) {
-                BinaryGUUIDsMatch = No;
+        if (BinaryGUUID1 != NULL && BinaryGUUID2 != NULL) {
+            for (uint8_t BinaryGUUIDByte = 0; BinaryGUUIDByte < BitIOBinaryGUUIDSize; BinaryGUUIDByte++) {
+                if (BinaryGUUID1[BinaryGUUIDByte] != BinaryGUUID2[BinaryGUUIDByte]) {
+                    BinaryGUUIDsMatch = No;
+                }
             }
+        } else if (BinaryGUUID1 == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BinaryGUUID1 Pointer is NULL");
+        } else if (BinaryGUUID2 == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BinaryGUUID2 Pointer is NULL");
         }
+        
         return BinaryGUUIDsMatch;
     }
     
     uint8_t *ConvertGUUIDString2BinaryGUUID(const uint8_t GUUIDString[BitIOGUUIDStringSize]) {
-        uint8_t *BinaryGUUID = NULL;
-        BinaryGUUID = calloc(1, BitIOBinaryGUUIDSize);
-        if (BinaryGUUID == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate BinaryGUUID");
-        } else {
+        uint8_t *BinaryGUUID = calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
+        if (GUUIDString != NULL && BinaryGUUID != NULL) {
             for (uint8_t StringByte = 0; StringByte < BitIOGUUIDStringSize; StringByte++) {
                 for (uint8_t BinaryByte = 0; BinaryByte < BitIOBinaryGUUIDSize; BinaryByte++) {
                     if (GUUIDString[StringByte] != 0x2D) {
@@ -133,36 +144,39 @@ extern "C" {
                     }
                 }
             }
+        } else if (GUUIDString == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "GUUIDString Pointer is NULL");
+        } else if (BinaryGUUID == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate %d bytes", BitIOGUUIDStringSize);
         }
         return BinaryGUUID;
     }
     
     uint8_t *ConvertBinaryGUUID2GUUIDString(const uint8_t BinaryGUUID[BitIOBinaryGUUIDSize]) {
-        uint8_t *GUUIDString    = calloc(1, BitIOGUUIDStringSize);
-        if (GUUIDString == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate %d bytes", BitIOGUUIDStringSize);
-        } else {
+        uint8_t *GUUIDString                     = calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
+        if (BinaryGUUID != NULL && GUUIDString != NULL) {
             uint8_t ASCIIHyphen = 0x2D;
-            
             for (uint8_t BinaryByte = 0; BinaryByte < BitIOBinaryGUUIDSize; BinaryByte++) {
                 for (uint8_t StringByte = 0; StringByte < BitIOGUUIDStringSize; StringByte++) {
-                    if (BinaryByte == 4 || BinaryByte == 7 || BinaryByte == 10 || BinaryByte == 13) {
-                        GUUIDString[StringByte]  = ASCIIHyphen;
-                    } else {
+                    if (BinaryByte != 4 && BinaryByte != 7 && BinaryByte != 10 && BinaryByte != 13) {
                         GUUIDString[StringByte]  = BinaryGUUID[BinaryByte];
+                    } else {
+                        GUUIDString[StringByte]  = ASCIIHyphen;
                     }
                 }
             }
+        } else if (BinaryGUUID == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BinaryGUUID Pointer is NULL");
+        } else if (GUUIDString == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate %d bytes", BitIOGUUIDStringSize);
         }
         return GUUIDString;
     }
     
     uint8_t *SwapGUUIDString(const uint8_t GUUIDString[BitIOGUUIDStringSize]) {
-        uint8_t *SwappedGUUIDString = NULL;
-        SwappedGUUIDString          = calloc(1, BitIOGUUIDStringSize * sizeof(uint8_t));
-        if (SwappedGUUIDString == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate %d bytes", BitIOGUUIDStringSize);
-        } else {
+        uint8_t *SwappedGUUIDString = calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
+        
+        if (GUUIDString != NULL && SwappedGUUIDString != NULL) {
             SwappedGUUIDString[0]   = GUUIDString[3];
             SwappedGUUIDString[1]   = GUUIDString[2];
             SwappedGUUIDString[2]   = GUUIDString[1];
@@ -186,43 +200,46 @@ extern "C" {
             for (uint8_t EndBytes = 13; EndBytes < BitIOGUUIDStringSize - BitIONULLStringSize; EndBytes++) {
                 SwappedGUUIDString[EndBytes] = GUUIDString[EndBytes];
             }
+        } else if (GUUIDString == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "GUUIDString Pointer is NULL");
+        } else if (SwappedGUUIDString == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate %d bytes", BitIOGUUIDStringSize);
         }
         return SwappedGUUIDString;
     }
     
     uint8_t *SwapBinaryGUUID(const uint8_t BinaryGUUID[BitIOBinaryGUUIDSize]) {
-        uint8_t *SwappedBinaryGUUID    = NULL;
-        if (BinaryGUUID == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BinaryGUUID Pointer is NULL");
-        } else {
-            SwappedBinaryGUUID         = calloc(1, BitIOBinaryGUUIDSize * sizeof(uint8_t));
-            if (SwappedBinaryGUUID == NULL) {
-                BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate %d bytes", BitIOBinaryGUUIDSize);
-            } else {
-                SwappedBinaryGUUID[0]  = BinaryGUUID[3];
-                SwappedBinaryGUUID[1]  = BinaryGUUID[2];
-                SwappedBinaryGUUID[2]  = BinaryGUUID[1];
-                SwappedBinaryGUUID[3]  = BinaryGUUID[0];
-                
-                SwappedBinaryGUUID[4]  = BinaryGUUID[5];
-                SwappedBinaryGUUID[5]  = BinaryGUUID[4];
-                
-                SwappedBinaryGUUID[6]  = BinaryGUUID[7];
-                SwappedBinaryGUUID[7]  = BinaryGUUID[6];
-                
-                SwappedBinaryGUUID[8]  = BinaryGUUID[9];
-                SwappedBinaryGUUID[9]  = BinaryGUUID[8];
-                
-                for (uint8_t EndBytes = 10; EndBytes < BitIOBinaryGUUIDSize; EndBytes++) {
-                    SwappedBinaryGUUID[EndBytes] = BinaryGUUID[EndBytes];
-                }
+        uint8_t *SwappedBinaryGUUID = calloc(BitIOBinaryGUUIDSize, sizeof(uint8_t));
+        if (BinaryGUUID != NULL && SwappedBinaryGUUID != NULL) {
+            SwappedBinaryGUUID[0]   = BinaryGUUID[3];
+            SwappedBinaryGUUID[1]   = BinaryGUUID[2];
+            SwappedBinaryGUUID[2]   = BinaryGUUID[1];
+            SwappedBinaryGUUID[3]   = BinaryGUUID[0];
+            
+            SwappedBinaryGUUID[4]   = BinaryGUUID[5];
+            SwappedBinaryGUUID[5]   = BinaryGUUID[4];
+            
+            SwappedBinaryGUUID[6]   = BinaryGUUID[7];
+            SwappedBinaryGUUID[7]   = BinaryGUUID[6];
+            
+            SwappedBinaryGUUID[8]   = BinaryGUUID[9];
+            SwappedBinaryGUUID[9]   = BinaryGUUID[8];
+            
+            for (uint8_t EndBytes = 10; EndBytes < BitIOBinaryGUUIDSize; EndBytes++) {
+                SwappedBinaryGUUID[EndBytes] = BinaryGUUID[EndBytes];
             }
+        } else if (BinaryGUUID == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BinaryGUUID Pointer is NULL");
+        } else if (SwappedBinaryGUUID == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate %d bytes", BitIOBinaryGUUIDSize);
         }
         return SwappedBinaryGUUID;
     }
     
     void GUUID_Deinit(uint8_t *GUUID) {
-        free(GUUID);
+        if (GUUID != NULL) {
+            free(GUUID);
+        }
     }
     /* Pure GUUID Management */
     
@@ -232,15 +249,17 @@ extern "C" {
     void BitIOLog_OpenFile(const char *LogFilePath) {
         if (LogFilePath != NULL) {
             BitIOLogFile = fopen(LogFilePath, "a+");
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "LogFilePath Pointer is NULL");
         }
     }
     
     void BitIOLog(BitIOLogTypes ErrorSeverity, const char *restrict LibraryOrProgram, const char *restrict FunctionName, const char *restrict Description, ...) {
         static const char *ErrorCodeString = NULL;
-        if (ErrorSeverity == BitIOLog_DEBUG) {
-            ErrorCodeString      = "DEBUG";
-        } else if (ErrorSeverity == BitIOLog_ERROR) {
+        if (ErrorSeverity == BitIOLog_ERROR) {
             ErrorCodeString      = "ERROR";
+        } else if (ErrorSeverity == BitIOLog_DEBUG) {
+            ErrorCodeString      = "DEBUG";
         }
         
         va_list VariadicArguments;
@@ -274,86 +293,84 @@ extern "C" {
     
     BitBuffer *BitBuffer_Init(const uint64_t BitBufferSize) {
         BitBuffer *BitB                  = calloc(1, sizeof(BitBuffer));
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate this instance of BitBuffer");
-        } else {
-            BitB->Buffer                 = calloc(1, BitBufferSize * sizeof(uint8_t));
+        if (BitB != NULL) {
+            BitB->Buffer                 = calloc(BitBufferSize, sizeof(uint8_t));
             if (BitB->Buffer == NULL) {
                 BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate %d bits for BitBuffer's buffer", BitBufferSize);
             }
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Not enough memory to allocate this instance of BitBuffer");
         }
         return BitB;
     }
     
     uint64_t BitBuffer_GetSize(BitBuffer *BitB) {
         uint64_t BitBufferSize = 0ULL;
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else {
+        if (BitB != NULL) {
             BitBufferSize      = BitB->NumBits;
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
         return BitBufferSize;
     }
     
     uint64_t BitBuffer_GetPosition(BitBuffer *BitB) {
         uint64_t Position = 0ULL;
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else {
+        if (BitB != NULL) {
             Position = BitB->BitOffset;
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
         return Position;
     }
     
     bool BitBuffer_IsAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
-        bool AlignmentStatus = 0;
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BytesOfAlignment: %d isn't an integer power of 2", BytesOfAlignment);
-        } else {
+        bool AlignmentStatus = No;
+        if (BitB != NULL && (BytesOfAlignment % 2 == 0 || BytesOfAlignment == 1)) {
             if (BitB->BitOffset % (BytesOfAlignment * 8) == 0) {
                 AlignmentStatus = Yes;
-            } else {
-                AlignmentStatus = No;
             }
+        } else if (BitB == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
+        } else if (BytesOfAlignment % 2 == 0 || BytesOfAlignment == 1) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BytesOfAlignment: %d isn't an integer power of 2", BytesOfAlignment);
         }
         return AlignmentStatus;
     }
     
     void BitBuffer_Align(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else if (BytesOfAlignment % 2 != 0 && BytesOfAlignment != 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BytesOfAlignment: %d isn't a power of 2 (or 1)", BytesOfAlignment);
-        } else {
+        if (BitB != NULL && (BytesOfAlignment % 2 == 0 || BytesOfAlignment == 1)) {
             uint8_t Bits2Align = (BytesOfAlignment * 8) - (BitB->BitOffset % (BytesOfAlignment * 8)); // 127 bits, 64 bits 2 align
-            if (Bits2Align + BitB->BitOffset > BitB->NumBits) {
+            if ((BitB->BitOffset + Bits2Align > BitB->NumBits) || (BitB->BitOffset + Bits2Align < BitB->NumBits)) {
                 BitB->Buffer   = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
                 BitB->NumBits += Bits2Align;
             }
             BitB->BitOffset   += Bits2Align;
+        } else if (BitB == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
+        } else if (BytesOfAlignment % 2 == 0 || BytesOfAlignment == 1) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BytesOfAlignment: %d isn't a power of 2 (or 1)", BytesOfAlignment);
         }
     }
     
     void BitBuffer_Skip(BitBuffer *BitB, const int64_t Bits2Skip) {
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else {
-            if (BitB->BitOffset + Bits2Skip > BitB->NumBits) {
+        if (BitB != NULL) {
+            if ((BitB->BitOffset + Bits2Skip > BitB->NumBits) || (BitB->BitOffset + Bits2Skip < BitB->NumBits)) {
                 BitB->Buffer    = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Skip, Yes));
                 BitB->NumBits  += Bits2Skip;
             }
             BitB->BitOffset    += Bits2Skip;
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
     }
     
     void BitBuffer_Deinit(BitBuffer *BitB) {
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else {
+        if (BitB != NULL) {
             free(BitB->Buffer);
             free(BitB);
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
     }
     
@@ -530,153 +547,167 @@ extern "C" {
     
     uint64_t PeekBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek) {
         uint64_t OutputData = 0ULL;
-        if (BitB == NULL) {
+        if (BitB != NULL && (Bits2Peek >= 1 && Bits2Peek <= 64) && (Bits2Peek <= (BitB->BitOffset - BitB->NumBits))) {
+            OutputData         = ExtractBitsAsLSByteLSBit(BitB, Bits2Peek);
+        } else if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
+        } else if ((Bits2Peek == 0 || Bits2Peek > 64) || (Bits2Peek > (BitB->BitOffset - BitB->NumBits))) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
-        } else {
-            OutputData = ExtractBitsAsLSByteLSBit(BitB, Bits2Peek);
         }
         return OutputData;
     }
     
     uint64_t PeekBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek) {
         uint64_t OutputData = 0ULL;
-        if (BitB == NULL) {
+        if (BitB != NULL && (Bits2Peek >= 1 && Bits2Peek <= 64) && (Bits2Peek <= (BitB->BitOffset - BitB->NumBits))) {
+            OutputData         = ExtractBitsAsLSByteMSBit(BitB, Bits2Peek);
+        } else if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
+        } else if ((Bits2Peek == 0 || Bits2Peek > 64) || (Bits2Peek > (BitB->BitOffset - BitB->NumBits))) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
-        } else {
-            OutputData = ExtractBitsAsLSByteMSBit(BitB, Bits2Peek);
         }
         return OutputData;
     }
     
     uint64_t PeekBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek) {
         uint64_t OutputData = 0ULL;
-        if (BitB == NULL) {
+        if (BitB != NULL && (Bits2Peek >= 1 && Bits2Peek <= 64) && (Bits2Peek <= (BitB->BitOffset - BitB->NumBits))) {
+            OutputData         = ExtractBitsAsMSByteLSBit(BitB, Bits2Peek);
+        } else if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
+        } else if ((Bits2Peek == 0 || Bits2Peek > 64) || (Bits2Peek > (BitB->BitOffset - BitB->NumBits))) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
-        } else {
-            OutputData = ExtractBitsAsMSByteLSBit(BitB, Bits2Peek);
         }
         return OutputData;
     }
     
     uint64_t PeekBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek) {
         uint64_t OutputData = 0ULL;
-        if (BitB == NULL) {
+        if (BitB != NULL && (Bits2Peek >= 1 && Bits2Peek <= 64) && (Bits2Peek <= (BitB->BitOffset - BitB->NumBits))) {
+            OutputData         = ExtractBitsAsMSByteMSBit(BitB, Bits2Peek);
+        } else if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else if (Bits2Peek <= 0 || Bits2Peek > 64 || Bits2Peek > BitB->BitOffset) {
+        } else if ((Bits2Peek == 0 || Bits2Peek > 64) || (Bits2Peek > (BitB->BitOffset - BitB->NumBits))) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64", Bits2Peek, BitB->BitOffset);
-        } else {
-            OutputData = ExtractBitsAsMSByteMSBit(BitB, Bits2Peek);
         }
         return OutputData;
     }
     
     uint64_t ReadBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read) {
         uint64_t OutputData = 0ULL;
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
-        } else {
+        if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
             OutputData         = ExtractBitsAsLSByteLSBit(BitB, Bits2Read);
             BitB->BitOffset   += Bits2Read;
+        } else if (BitB == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
+        } else if ((Bits2Read == 0 || Bits2Read > 64) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
         }
         return OutputData;
     }
     
     uint64_t ReadBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read) {
         uint64_t OutputData = 0ULL;
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
-        } else {
+        if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
             OutputData         = ExtractBitsAsLSByteMSBit(BitB, Bits2Read);
             BitB->BitOffset   += Bits2Read;
+        } else if (BitB == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
+        } else if ((Bits2Read == 0 || Bits2Read > 64) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
         }
         return OutputData;
     }
     
     uint64_t ReadBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read) {
         uint64_t OutputData = 0ULL;
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
-        } else {
+        if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
             OutputData         = ExtractBitsAsMSByteLSBit(BitB, Bits2Read);
             BitB->BitOffset   += Bits2Read;
+        } else if (BitB == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
+        } else if ((Bits2Read == 0 || Bits2Read > 64) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
         }
         return OutputData;
     }
     
     uint64_t ReadBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read) {
         uint64_t OutputData = 0ULL;
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else if (Bits2Read <= 0 || Bits2Read > 64 || Bits2Read > BitB->BitOffset) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
-        } else {
+        if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
             OutputData         = ExtractBitsAsMSByteMSBit(BitB, Bits2Read);
             BitB->BitOffset   += Bits2Read;
+        } else if (BitB == NULL) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
+        } else if ((Bits2Read == 0 || Bits2Read > 64) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64", Bits2Read, BitB->BitOffset);
         }
         return OutputData;
     }
     
     uint64_t ReadUnaryAsLSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit) {
         uint64_t Value = 0ULL;
-        if (UnaryType == CountUnary) {
-            Value += 1;
-        }
-        while (ExtractBitsAsLSByteLSBit(BitB, 1) != StopBit) {
-            Value += 1;
+        if (BitB != NULL) {
+            if (UnaryType == CountUnary) {
+                Value += 1;
+            }
+            while (ExtractBitsAsLSByteLSBit(BitB, 1) != StopBit) {
+                Value += 1;
+            }
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
         return Value;
     }
     
     uint64_t ReadUnaryAsLSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit) {
         uint64_t Value = 0ULL;
-        if (UnaryType == CountUnary) {
-            Value += 1;
-        }
-        while (ExtractBitsAsLSByteMSBit(BitB, 1) != StopBit) {
-            Value += 1;
+        if (BitB != NULL) {
+            if (UnaryType == CountUnary) {
+                Value += 1;
+            }
+            while (ExtractBitsAsLSByteMSBit(BitB, 1) != StopBit) {
+                Value += 1;
+            }
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
         return Value;
     }
     
     uint64_t ReadUnaryAsMSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit) {
         uint64_t Value = 0ULL;
-        if (UnaryType == CountUnary) {
-            Value += 1;
-        }
-        while (ExtractBitsAsMSByteLSBit(BitB, 1) != StopBit) {
-            Value += 1;
+        if (BitB != NULL) {
+            if (UnaryType == CountUnary) {
+                Value += 1;
+            }
+            while (ExtractBitsAsMSByteLSBit(BitB, 1) != StopBit) {
+                Value += 1;
+            }
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
         return Value;
     }
     
     uint64_t ReadUnaryAsMSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit) {
         uint64_t Value = 0ULL;
-        if (UnaryType == CountUnary) {
-            Value += 1;
-        }
-        while (ExtractBitsAsMSByteMSBit(BitB, 1) != StopBit) {
-            Value += 1;
+        if (BitB != NULL) {
+            if (UnaryType == CountUnary) {
+                Value += 1;
+            }
+            while (ExtractBitsAsMSByteMSBit(BitB, 1) != StopBit) {
+                Value += 1;
+            }
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
         return Value;
     }
     
     uint64_t ReadExpGolombAsLSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit) {
-        int64_t ExtractedBits  = 0LL;
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else {
+        int64_t ExtractedBits      = 0LL;
+        if (BitB != NULL) {
             uint64_t Bits2Read     = ReadUnaryAsLSByteLSBit(BitB, UnaryType, StopBit);
             ExtractedBits          = ExtractBitsAsLSByteLSBit(BitB, Bits2Read);
             if (ExtractedBits < 0) {
@@ -684,102 +715,102 @@ extern "C" {
             } else {
                 ExtractedBits      = ExtractedBits / 2;
             }
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
         return ExtractedBits;
     }
     
     uint64_t ReadExpGolombAsLSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit) {
-        int64_t ExtractedBits  = 0LL;
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else {
+        int64_t ExtractedBits      = 0LL;
+        if (BitB != NULL) {
             uint64_t Bits2Read     = ReadUnaryAsLSByteLSBit(BitB, UnaryType, StopBit);
             ExtractedBits          = ExtractBitsAsLSByteLSBit(BitB, Bits2Read);
             if (ExtractedBits <= 0) {
-                ExtractedBits  = (Absolute(ExtractedBits) / 2) + 1;
+                ExtractedBits      = (Absolute(ExtractedBits) / 2) + 1;
             } else {
-                ExtractedBits  = ExtractedBits / 2;
+                ExtractedBits      = ExtractedBits / 2;
             }
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
         return ExtractedBits;
     }
     
     uint64_t ReadExpGolombAsMSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit) {
         int64_t ExtractedBits  = 0LL;
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else {
-            uint64_t Bits2Read     = ReadUnaryAsLSByteLSBit(BitB, UnaryType, StopBit);
-            ExtractedBits          = ExtractBitsAsLSByteLSBit(BitB, Bits2Read);
-            if (ExtractedBits <= 0) {
-                ExtractedBits      = (Absolute(ExtractedBits) / 2) + 1;
-            } else {
+        if (BitB != NULL) {
+            uint64_t Bits2Read     = ReadUnaryAsMSByteLSBit(BitB, UnaryType, StopBit);
+            ExtractedBits          = ExtractBitsAsMSByteLSBit(BitB, Bits2Read);
+            if (ExtractedBits > 0) {
                 ExtractedBits      = ExtractedBits / 2;
+            } else {
+                ExtractedBits      = (Absolute(ExtractedBits) / 2) + 1;
             }
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
         return ExtractedBits;
     }
     
     uint64_t ReadExpGolombAsMSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit) {
         int64_t ExtractedBits  = 0LL;
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else {
-            uint64_t Bits2Read     = ReadUnaryAsLSByteLSBit(BitB, UnaryType, StopBit);
-            ExtractedBits          = ExtractBitsAsLSByteLSBit(BitB, Bits2Read);
-            if (ExtractedBits <= 0) {
-                ExtractedBits      = (Absolute(ExtractedBits) / 2) + 1;
-            } else {
+        if (BitB != NULL) {
+            uint64_t Bits2Read     = ReadUnaryAsMSByteMSBit(BitB, UnaryType, StopBit);
+            ExtractedBits          = ExtractBitsAsMSByteMSBit(BitB, Bits2Read);
+            if (ExtractedBits > 0) {
                 ExtractedBits      = ExtractedBits / 2;
+            } else {
+                ExtractedBits      = (Absolute(ExtractedBits) / 2) + 1;
             }
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
         return ExtractedBits;
     }
     
     void     WriteBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
-        if (BitB == NULL) {
+        if (BitB != NULL && NumBits2Write >= 1 && NumBits2Write <= 64) {
+            InsertBitsAsLSByteLSBit(BitB, NumBits2Write, Bits2Write);
+        } else if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
-        } else {
-            InsertBitsAsLSByteLSBit(BitB, NumBits2Write, Bits2Write);
         }
     }
     
     void     WriteBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
-        if (BitB == NULL) {
+        if (BitB != NULL && NumBits2Write >= 1 && NumBits2Write <= 64) {
+            InsertBitsAsLSByteMSBit(BitB, NumBits2Write, Bits2Write);
+        } else if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
-        } else {
-            InsertBitsAsLSByteMSBit(BitB, NumBits2Write, Bits2Write);
         }
     }
     
     void     WriteBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
-        if (BitB == NULL) {
+        if (BitB != NULL && NumBits2Write >= 1 && NumBits2Write <= 64) {
+            InsertBitsAsMSByteLSBit(BitB, NumBits2Write, Bits2Write);
+        } else if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
-        } else {
-            InsertBitsAsMSByteLSBit(BitB, NumBits2Write, Bits2Write);
         }
     }
     
     void     WriteBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
-        if (BitB == NULL) {
+        if (BitB != NULL && NumBits2Write >= 1 && NumBits2Write <= 64) {
+            InsertBitsAsMSByteMSBit(BitB, NumBits2Write, Bits2Write);
+        } else if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
             BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64", NumBits2Write);
-        } else {
-            InsertBitsAsMSByteMSBit(BitB, NumBits2Write, Bits2Write);
         }
     }
     
     void     WriteUnaryAsLSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, uint8_t Field2Write) {
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else {
+        if (BitB != NULL) {
             StopBit         &= 1;
             if (UnaryType == CountUnary) {
                 Field2Write -= 1;
@@ -790,13 +821,13 @@ extern "C" {
                 InsertBitsAsLSByteLSBit(BitB, Field2Write, 0);
             }
             InsertBitsAsLSByteLSBit(BitB, 1, StopBit);
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
     }
     
     void     WriteUnaryAsLSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, uint8_t Field2Write) {
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else {
+        if (BitB != NULL) {
             StopBit         &= 1;
             if (UnaryType == CountUnary) {
                 Field2Write -= 1;
@@ -807,13 +838,13 @@ extern "C" {
                 InsertBitsAsLSByteMSBit(BitB, Field2Write, 0);
             }
             InsertBitsAsLSByteMSBit(BitB, 1, StopBit);
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
     }
     
     void     WriteUnaryAsMSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, uint8_t Field2Write) {
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else {
+        if (BitB != NULL) {
             StopBit         &= 1;
             if (UnaryType == CountUnary) {
                 Field2Write -= 1;
@@ -824,13 +855,13 @@ extern "C" {
                 InsertBitsAsMSByteLSBit(BitB, Field2Write, 0);
             }
             InsertBitsAsMSByteLSBit(BitB, 1, StopBit);
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
     }
     
     void     WriteUnaryAsMSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, uint8_t Field2Write) {
-        if (BitB == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
-        } else {
+        if (BitB != NULL) {
             StopBit         &= 1;
             if (UnaryType == CountUnary) {
                 Field2Write -= 1;
@@ -841,34 +872,44 @@ extern "C" {
                 InsertBitsAsMSByteMSBit(BitB, Field2Write, 0);
             }
             InsertBitsAsMSByteMSBit(BitB, 1, StopBit);
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
     }
     
     void     WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const int64_t Field2Write) {
-        uint8_t NumBits2Write = IntegerLog2(Field2Write);
-        WriteUnaryAsLSByteLSBit(BitB, UnaryType, StopBit, NumBits2Write);
-        if (UnaryType == CountUnary) {
-            InsertBitsAsLSByteLSBit(BitB, NumBits2Write, Field2Write);
-        } else if (UnaryType == WholeUnary) {
-            if (Field2Write < 0) {
-                InsertBitsAsLSByteLSBit(BitB, NumBits2Write, (Absolute(Field2Write) * 2) - 1);
-            } else {
-                InsertBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write * 2);
+        if (BitB != NULL) {
+            uint8_t NumBits2Write = IntegerLog2(Field2Write);
+            WriteUnaryAsLSByteLSBit(BitB, UnaryType, StopBit, NumBits2Write);
+            if (UnaryType == CountUnary) {
+                InsertBitsAsLSByteLSBit(BitB, NumBits2Write, Field2Write);
+            } else if (UnaryType == WholeUnary) {
+                if (Field2Write > 0) {
+                    InsertBitsAsLSByteLSBit(BitB, NumBits2Write, Field2Write * 2);
+                } else {
+                    InsertBitsAsLSByteLSBit(BitB, NumBits2Write, (Absolute(Field2Write) * 2) - 1);
+                }
             }
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
     }
     
     void     WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const int64_t Field2Write) {
-        uint8_t NumBits2Write = IntegerLog2(Field2Write);
-        WriteUnaryAsLSByteMSBit(BitB, UnaryType, StopBit, NumBits2Write);
-        if (UnaryType == CountUnary) {
-            InsertBitsAsLSByteMSBit(BitB, NumBits2Write, Field2Write);
-        } else  if (UnaryType == WholeUnary) {
-            if (Field2Write < 0) {
-                InsertBitsAsLSByteLSBit(BitB, NumBits2Write, (Absolute(Field2Write) * 2) - 1);
-            } else {
-                InsertBitsAsMSByteMSBit(BitB, NumBits2Write, Field2Write * 2);
+        if (BitB != NULL) {
+            uint8_t NumBits2Write = IntegerLog2(Field2Write);
+            WriteUnaryAsLSByteMSBit(BitB, UnaryType, StopBit, NumBits2Write);
+            if (UnaryType == CountUnary) {
+                InsertBitsAsLSByteMSBit(BitB, NumBits2Write, Field2Write);
+            } else if (UnaryType == WholeUnary) {
+                if (Field2Write > 0) {
+                    InsertBitsAsLSByteMSBit(BitB, NumBits2Write, Field2Write * 2);
+                } else {
+                    InsertBitsAsLSByteMSBit(BitB, NumBits2Write, (Absolute(Field2Write) * 2) - 1);
+                }
             }
+        } else {
+            BitIOLog(BitIOLog_ERROR, BitIOLibraryName, __func__, "BitBuffer Pointer is NULL");
         }
     }
     
@@ -879,10 +920,10 @@ extern "C" {
             if (UnaryType == CountUnary) {
                 InsertBitsAsMSByteLSBit(BitB, NumBits2Write, Field2Write);
             } else if (UnaryType == WholeUnary) {
-                if (Field2Write < 0) {
-                    InsertBitsAsLSByteLSBit(BitB, NumBits2Write, (Absolute(Field2Write) * 2) - 1);
-                } else {
+                if (Field2Write > 0) {
                     InsertBitsAsMSByteLSBit(BitB, NumBits2Write, Field2Write * 2);
+                } else {
+                    InsertBitsAsMSByteLSBit(BitB, NumBits2Write, (Absolute(Field2Write) * 2) - 1);
                 }
             }
         } else {
@@ -961,7 +1002,7 @@ extern "C" {
     uint8_t *ReadGUUIDAsBinaryUUID(BitBuffer *BitB) {
         uint8_t *BinaryUUID  = NULL;
         if (BitB != NULL) {
-            BinaryUUID       = calloc(1, BitIOBinaryGUUIDSize * sizeof(uint8_t));
+            BinaryUUID       = calloc(BitIOBinaryGUUIDSize, sizeof(uint8_t));
             if (BinaryUUID != NULL) {
                 for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
                     BinaryUUID[Byte] = ExtractBitsAsMSByteLSBit(BitB, 8);
@@ -978,7 +1019,7 @@ extern "C" {
     uint8_t *ReadGUUIDAsBinaryGUID(BitBuffer *BitB) {
         uint8_t *BinaryGUID = NULL;
         if (BitB != NULL) {
-            BinaryGUID      = calloc(1, BitIOBinaryGUUIDSize * sizeof(uint8_t));
+            BinaryGUID      = calloc(BitIOBinaryGUUIDSize, sizeof(uint8_t));
             if (BinaryGUID != NULL) {
                 for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
                     BinaryGUID[Byte] = ExtractBitsAsLSByteLSBit(BitB, 8);
@@ -1064,7 +1105,7 @@ extern "C" {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType          = BitIOFile;
             uint64_t Path2OpenSize  = strlen(Path2Open) + BitIONULLStringSize;
-            char *NewPath           = calloc(1, Path2OpenSize * sizeof(char));
+            char *NewPath           = calloc(Path2OpenSize, sizeof(unsigned char));
             snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
             BitI->FileSpecifierNum += 1;
             BitI->File = fopen(Path2Open, "rb");
@@ -1216,7 +1257,7 @@ extern "C" {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType          = BitIOFile;
             uint64_t Path2OpenSize  = strlen(Path2Open) + BitIONULLStringSize;
-            char *NewPath           = calloc(1, Path2OpenSize * sizeof(char));
+            char *NewPath           = calloc(Path2OpenSize, sizeof(char));
             snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
             BitO->FileSpecifierNum += 1;
             BitO->File              = fopen(Path2Open, "wb");
