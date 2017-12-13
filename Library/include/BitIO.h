@@ -10,12 +10,11 @@
 #include <float.h>   /* Included for the double  max/min macros for the _Generic macros */
 #include <limits.h>  /* Included for the integer max/min macros for the _Generic macros */
 #include <math.h>    /* Included for the math functions like log2 */
-#include <stdarg.h>  /* Included for the variadic argument support macros */
 #include <stdbool.h> /* Included for the bool type */
 #include <stdint.h>  /* Included for the u/intX_t types */
 #include <stdio.h>   /* Included for the FILE type, STD IN/OUT/ERR, SEEK SET/END/CUR macros */
 #include <stdlib.h>  /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
-#include <string.h>  /* Included for the atoll */
+#include <string.h>  /* Included for the atoll, memset */
 
 #include "BitIOMacros.h"
 
@@ -27,8 +26,6 @@
 #ifdef   __cplusplus
 extern   "C" {
 #endif
-    
-    static const char          *BitIOLibraryName                = "libBitIO";
     
     /*!
      @enum                      BitIOConstants
@@ -59,16 +56,6 @@ extern   "C" {
     } BitInputOutputFileTypes;
     
     /*!
-     @enum                      BitIOLogTypes
-     @constant                  BitIOLog_ERROR                  "An error occurred".
-     @constant                  BitIOLog_DEBUG                  "Used for debugging".
-     */
-    typedef enum BitIOLogTypes {
-                                BitIOLog_ERROR                  = 1,
-                                BitIOLog_DEBUG                  = 2,
-    } BitIOLogTypes;
-    
-    /*!
      @enum                      UnaryTypes
      @constant                  CountUnary                      "Supports only positive integers (excluding zero), Truncates the last bit before the stop bit".
      @constant                  WholeUnary                      "Supports all the whole integers including zero and negatives (up to 2^63 -1 anyway)".
@@ -77,80 +64,6 @@ extern   "C" {
                                 CountUnary                      = 1,
                                 WholeUnary                      = 2,
     } UnaryTypes;
-    
-    /* Pure Math */
-    /*!
-     @abstract                                                  "Tells if the number is negative".
-     @param                     Integer                         "The value to find the signedness of".
-     */
-    bool                        IsNegative(const int64_t Integer);
-    
-    /*!
-     @abstract                                                  "Unsigned integer absolute value function".
-     @remark                                                    "Returning a signed absolute value integer is dumb. REQUIRES two's complement signed representation".
-     @param                     Value                           "The value to find the absolute value of".
-     */
-    uint64_t                    Absolute(const int64_t Value);
-    
-    /*!
-     @abstract                                                  "Integer Power function".
-     @param                     Base                            "What base should the power be calculated in"?
-     @param                     Exponent                        "How many times should the Base be raised"?
-     @return                                                    "Returns the result of 1 *= Base, Exponent times".
-     */
-    uint64_t                    Power(const uint64_t Base, const uint64_t Exponent);
-    
-    /*!
-     @abstract                                                  "Computes the number of bits required to hold a certain symbol".
-     @remark                                                    "Rounds up to the next integer number of bits to ensure all symbols can be contained in a single integer".
-     @param                     Symbol                          "The symbol you're looking to store".
-     @return                                                    "Returns the number of bits required to store a symbol".
-     */
-    int8_t                      IntegerLog2(int64_t Symbol);
-    
-    /*!
-     @abstract                                                  "Swap endian of 16 bit integers".
-     @param                     Data2Swap                       "Data to swap endian".
-     @return                                                    "Returns swapped uint16_t".
-     */
-    uint16_t                    SwapEndian16(const uint16_t Data2Swap);
-    
-    /*!
-     @abstract                                                  "Swap endian of 32 bit integers".
-     @param                     Data2Swap                       "Data to swap endian".
-     @return                                                    "Returns swapped uint32_t".
-     */
-    uint32_t                    SwapEndian32(const uint32_t Data2Swap);
-    
-    /*!
-     @abstract                                                  "Swap endian of 64 bit integers".
-     @param                     Data2Swap                       "Data to swap endian".
-     @return                                                    "Returns swapped uint64_t".
-     */
-    uint64_t                    SwapEndian64(const uint64_t Data2Swap);
-    
-    /*!
-     @abstract                                                  "Computes the number of bits from the number of bytes".
-     @param                     Bytes                           "The number of bytes you want to interpret as bits".
-     @return                                                    "Returns the number of bits".
-     */
-    int64_t                     Bytes2Bits(const int64_t Bytes);
-    
-    /*!
-     @abstract                                                  "Computes the number of bytes from the number of bits".
-     @param                     Bits                            "The bits to convert to bytes".
-     @param                     RoundUp                         "Should the resulting bytes be rounded up or down?".
-     @return                                                    "Returns the number of bytes".
-     */
-    int64_t                     Bits2Bytes(const int64_t Bits, const bool RoundUp);
-    
-    /*!
-     @abstract                                                  "Tells whether Input is even or odd".
-     @param                     Number2Check                    "The number to see if it's odd or even".
-     @return                                                    "True for odd, false for even".
-     */
-    bool                        IsOdd(const int64_t Number2Check);
-    /* Pure Math */
     
     /* Pure GUUID */
     /*!
@@ -209,28 +122,6 @@ extern   "C" {
      */
     void                        GUUID_Deinit(uint8_t *GUUID);
     /* GUUID */
-    
-    /* BitIOLog */
-    /*!
-     @abstract                                                  "Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitIOLogFile".
-     @param                     LogFilePath                     "Path to the log file to open/create".
-     */
-    void                        BitIOLog_OpenFile(const char *LogFilePath);
-    
-    /*!
-     @abstract                                                  "Logs to BitIOLogFile, which can be a user specified path, otherwise it's STDERR".
-     @param                     ErrorSeverity                   "Any of the types provided by BitIOLogTypes".
-     @param                     LibraryOrProgram                "Name of the program or library at fault".
-     @param                     FunctionName                    "Which function is calling BitIOLog?".
-     @param                     Description                     "String describing what went wrong".
-     */
-    void                        BitIOLog(BitIOLogTypes ErrorSeverity, const char *restrict LibraryOrProgram, const char *restrict FunctionName, const char *restrict Description, ...);
-    
-    /*!
-     @abstract                                                  "Closes the BitIOLogFile".
-     */
-    void                        BitIOLog_CloseFile(void);
-    /* BitIOLog */
     
     
     /* BitBuffer */
