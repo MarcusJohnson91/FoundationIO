@@ -1,3 +1,11 @@
+/*!
+@header    BitIOMath.h
+@author    Marcus Johnson aka BumbleBritches57
+@copyright 2017 - 2017, Marcus Johnson
+@version   1.0.0
+@brief     This header contains code for specific mathematical functions used in BitIO and it's consumers.
+*/
+
 #pragma warning(push, 0)        
 #include <math.h>    /* Included for the math functions like log2 */
 #include <stdbool.h> /* Included for the bool type */
