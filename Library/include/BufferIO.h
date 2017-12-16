@@ -114,7 +114,7 @@ extern   "C" {
 #define GUUID_Swap(GUUIDType,GUUID2Swap)_Generic((GUUIDType),BinaryUUID_t:SwapBinaryGUUID,BinaryGUID_t:SwapBinaryGUUID,UUIDString_t:SwapGUUIDString,GUIDString_t:SwapGUUIDString)(GUUID2Swap)
     
     /*!
-      @abstract                                                 "Frees a BinaryGUUID aka BinaryGUID/BinaryUUID or GUUIDString, aka GUIDString/UUIDString".
+     @abstract                                                 "Frees a BinaryGUUID aka BinaryGUID/BinaryUUID or GUUIDString, aka GUIDString/UUIDString".
      */
     void                        GUUID_Deinit(uint8_t *GUUID);
     /* GUUID */

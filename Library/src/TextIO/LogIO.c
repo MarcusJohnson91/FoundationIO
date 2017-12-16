@@ -12,7 +12,7 @@
 extern "C" {
 #endif
     
-    #define BitIOLogNULLStringSize 1
+#define BitIOLogNULLStringSize 1
     
     /* BitIOLog */
     static FILE *BitIOLogFile     = NULL;
