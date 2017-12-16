@@ -1102,9 +1102,10 @@ extern "C" {
     static void BitInput_FindFileSize(BitInput *BitI) {
         if (BitI != NULL) {
             fseek(BitI->File, 0, SEEK_END);
-            fgetpos(BitI->File, &BitI->FileSize);
+            BitI->FileSize = ftell(BitI->File);
             fseek(BitI->File, 0, SEEK_SET);
-            fgetpos(BitI->File, &BitI->FilePosition);
+            BitI->FilePosition = ftell(BitI->File);
+            //fgetpos(BitI->File, &BitI->FilePosition);
         } else {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "BitInput Pointer is NULL");
         }

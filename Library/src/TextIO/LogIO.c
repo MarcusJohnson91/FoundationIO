@@ -10,6 +10,8 @@
 extern "C" {
 #endif
     
+    #define BitIOLogNULLStringSize 1
+    
     /* BitIOLog */
     static FILE *BitIOLogFile     = NULL;
     static char *BitIOProgramName = NULL;
@@ -34,10 +36,19 @@ extern "C" {
             ErrorCodeString      = "DEBUG";
         }
         
+        // Get the size of the Variadic arguments, on windows use `_vscprintf`; on POSIX use
+        
         va_list VariadicArguments;
         va_start(VariadicArguments, Description);
+#if (BitIOTargetOS == BitIOWindowsOS)
+        // Get the size of the variadic arguments with _vscprintf
+        int32_t  VarArgSize = _vscprintf(Description, VariadicArguments) + BitIOLogNULLStringSize;
+        char    *HardString = calloc(VarArgSize, sizeof(uint8_t));
+        vsprintf(HardString, Description, VariadicArguments);
+#elif (BitIOTargetOS == BitIOPOSIXOS)
         char *HardString         = NULL;
         vasprintf(&HardString, Description, VariadicArguments);
+#endif
         va_end(VariadicArguments);
         
         if (BitIOLogFile == NULL) {
