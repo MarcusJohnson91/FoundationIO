@@ -1,5 +1,7 @@
+#pragma warning(push, 0)        
 #include <limits.h>
 #include <float.h>
+#pragma warning(pop)
 
 #pragma once
 

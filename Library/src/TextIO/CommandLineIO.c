@@ -1,20 +1,26 @@
+#pragma warning(push, 0)        
 #include <assert.h>     /* Included for static_assert */
 #include <stdarg.h>     /* Included for the variadic argument support macros */
 #include <stdbool.h>    /* Included for bool */
 #include <stdio.h>      /* Included for fprintf, stdout, sprintf */
 #include <stdlib.h>     /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 #include <string.h>     /* Included for memset */
-#include <strings.h>    /* Included for strncasecmp */
+#pragma warning(pop)
 
 #include "../include/BitIOMacros.h"
 #include "../include/CommandLineIO.h"
 #include "../include/BitIOLog.h"
 
 #if   (BitIOTargetOS == BitIOPOSIXOS)
+#pragma warning(push, 0)
+#include <strings.h>    /* Included for strncasecmp */
 #include <sys/ioctl.h>  /* Included for the terminal size */
 #include <sys/ttycom.h> /* Included for winsize, TIOCGWINSZ */
+#pragma warning(pop)
 #elif (BitIOTargetOS == BitIOWindowsOS)
+#pragma warning(push, 0)  
 #include <wincon.h>
+#pragma warning(pop)
 #endif
 
 #ifdef   __cplusplus

@@ -1,17 +1,22 @@
+#pragma warning(push, 0)        
 #include <assert.h>     /* Included for static_assert */
 #include <stdlib.h>     /* Included for calloc, realloc, and free */
 #include <string.h>     /* Included for strlen */
-#include <sys/socket.h> /* Included for connect, socket, sockaddr (ptr only) */
+#pragma warning(pop)
 
 #include "../include/BitIO.h"
 #include "../include/BitIOMath.h"
 #include "../include/BitIOLog.h"
 
-#if   (BitIOTargetOS == BitIOPOSIXOS)
-#include           <sys/socket.h> /* Included for the socket support */
-#include           <unistd.h>     /* Included for read and shit */
-#elif (BitIOTargetOS == BitIOWindowsOS)
+#if (BitIOTargetOS == BitIOWindowsOS)
+#pragma warning(push, 0)  
 #include           <winsock.h>    /* Included for the socket support on Windows */
+#pragma warning(pop)
+#elif (BitIOTargetOS == BitIOPOSIXOS)
+#pragma warning(push, 0)  
+#include           <sys/socket.h> /* Included for connect, socket, sockaddr */
+#include           <unistd.h>     /* Included for read and shit */
+#pragma warning(pop)
 #endif
 
 #ifdef __cplusplus

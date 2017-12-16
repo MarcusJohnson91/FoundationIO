@@ -1,5 +1,7 @@
+#pragma warning(push, 0)        
 #include <stdbool.h>
 #include <stdint.h>
+#pragma warning(pop)
 
 #pragma  once
 

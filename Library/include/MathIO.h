@@ -1,6 +1,8 @@
+#pragma warning(push, 0)        
 #include <math.h>    /* Included for the math functions like log2 */
 #include <stdbool.h> /* Included for the bool type */
 #include <stdint.h>  /* Included for the u/intX_t types */
+#pragma warning(pop)
 
 #pragma  once
 
