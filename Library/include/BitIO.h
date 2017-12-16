@@ -6,9 +6,11 @@
  @brief     This header contains code related to reading and writing files and sockets, and utility functions to manage those details.
  */
 
+#pragma warning(push, 0)        
 #include <stdbool.h> /* Included for the bool type */
 #include <stdint.h>  /* Included for the u/intX_t types */
 #include <stdio.h>   /* Included for the FILE type, STD IN/OUT/ERR, SEEK SET/END/CUR macros */
+#pragma warning(pop)
 
 #include "BitIOMacros.h"
 

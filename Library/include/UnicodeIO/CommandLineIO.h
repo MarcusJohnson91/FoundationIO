@@ -3,12 +3,13 @@
  @author    Marcus Johnson
  @copyright 2017, Marcus Johnson
  @version   4.0.0
- @brief     This header contains code for parsing command line Options.
+ @brief     This header contains code for parsing command line options.
  */
 
-
+#pragma warning(push, 0)        
 #include <stdbool.h> /* Included for the bool type */
 #include <stdint.h>  /* Included for the u/intX_t types */
+#pragma warning(pop)
 
 #include "BitIOMacros.h"
 
