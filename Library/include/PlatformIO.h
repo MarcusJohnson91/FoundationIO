@@ -1,3 +1,6 @@
+#include <limits.h>
+#include <float.h>
+
 #pragma once
 
 #ifndef LIBBITIO_BitIOMacros_H
