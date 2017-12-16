@@ -6,15 +6,9 @@
  @brief     This header contains code related to reading and writing files and sockets, and utility functions to manage those details.
  */
 
-#include <assert.h>  /* Included for static_assert */
-#include <float.h>   /* Included for the double  max/min macros for the _Generic macros */
-#include <limits.h>  /* Included for the integer max/min macros for the _Generic macros */
-#include <math.h>    /* Included for the math functions like log2 */
 #include <stdbool.h> /* Included for the bool type */
 #include <stdint.h>  /* Included for the u/intX_t types */
 #include <stdio.h>   /* Included for the FILE type, STD IN/OUT/ERR, SEEK SET/END/CUR macros */
-#include <stdlib.h>  /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
-#include <string.h>  /* Included for the atoll, memset */
 
 #include "BitIOMacros.h"
 

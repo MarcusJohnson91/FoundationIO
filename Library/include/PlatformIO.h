@@ -44,10 +44,6 @@ static   const char BitIONewLine[2]  = {"\x0D\x00"}; /* \r */
 static   const char BitIONewLine[2]  = {"\x0A\x00"}; /* \n */
 #endif
     
-#include           <sys/ioctl.h>  /* Included for the terminal size */
-#include           <sys/socket.h> /* Included for the socket support */
-#include           <unistd.h>     /* Included for STD IN/OUT/ERR */
-    
 #elif    defined(_WIN32) || defined(__WIN32__) || defined(_WIN64) || defined(__WINDOWS__)
 
 #ifndef             BitIOTargetOS
@@ -58,9 +54,6 @@ static   const char BitIONewLine[2]  = {"\x0A\x00"}; /* \n */
 #define             BitIONewLineSize    2
 static   const char BitIONewLine[3]  = {"\x0D\x0A\x00"}; /* \r\n */
 #endif
-    
-#include           <winsock.h>    /* Included for the socket support on Windows */
-#include           <wincon.h>
 
 #ifndef             restrict
 #define             restrict          __restrict
