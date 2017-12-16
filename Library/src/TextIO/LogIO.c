@@ -11,11 +11,18 @@ extern "C" {
 #endif
     
     /* BitIOLog */
-    static FILE *BitIOLogFile = NULL;
+    static FILE *BitIOLogFile     = NULL;
+    static char *BitIOProgramName = NULL;
     
     void BitIOLog_OpenFile(const char *LogFilePath) {
         if (LogFilePath != NULL) {
             BitIOLogFile = fopen(LogFilePath, "a+");
+        }
+    }
+    
+    void BitIOLog_SetProgramName(char *ProgramName) {
+        if (ProgramName != NULL) {
+            BitIOProgramName = ProgramName;
         }
     }
     
@@ -34,9 +41,9 @@ extern "C" {
         va_end(VariadicArguments);
         
         if (BitIOLogFile == NULL) {
-            fprintf(stderr, "%s %s - %s: %s%s", ErrorCodeString, LibraryOrProgram, FunctionName, HardString, BitIONewLine);
+            fprintf(stderr, "%s %s %s - %s: %s%s", BitIOProgramName, ErrorCodeString, LibraryOrProgram, FunctionName, HardString, BitIONewLine);
         } else {
-            fprintf(BitIOLogFile, "%s: %s - %s:, %s%s", ErrorCodeString, LibraryOrProgram, FunctionName, HardString, BitIONewLine);
+            fprintf(BitIOLogFile, "%s %s: %s - %s:, %s%s", BitIOProgramName, ErrorCodeString, LibraryOrProgram, FunctionName, HardString, BitIONewLine);
         }
         free(HardString);
     }
