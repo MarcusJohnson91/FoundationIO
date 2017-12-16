@@ -29,6 +29,12 @@ extern   "C" {
     void                        BitIOLog_OpenFile(const char *LogFilePath);
     
     /*!
+     @abstract                                                  "Sets the name or path of the program to give the logs more context".
+     @param                     ProgramName                     "String containing either the name or the path of the program that this library was linked into".
+     */
+    void                        BitIOLog_SetProgramName(char *ProgramName);
+    
+    /*!
      @abstract                                                  "Logs to BitIOLogFile, which can be a user specified path, otherwise it's STDERR".
      @param                     ErrorSeverity                   "Any of the types provided by BitIOLogTypes".
      @param                     LibraryOrProgram                "Name of the program or library at fault".
