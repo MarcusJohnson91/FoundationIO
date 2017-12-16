@@ -1,8 +1,21 @@
-//#include <stdio.h>   /* Included for the printf family */
-#include <string.h>  /* Included for memset */
+#include <assert.h>     /* Included for static_assert */
+#include <stdarg.h>     /* Included for the variadic argument support macros */
+#include <stdbool.h>    /* Included for bool */
+#include <stdio.h>      /* Included for fprintf, stdout, sprintf */
+#include <stdlib.h>     /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
+#include <string.h>     /* Included for memset */
+#include <strings.h>    /* Included for strncasecmp */
 
+#include "../include/BitIOMacros.h"
 #include "../include/CommandLineIO.h"
 #include "../include/BitIOLog.h"
+
+#if   (BitIOTargetOS == BitIOPOSIXOS)
+#include <sys/ioctl.h>  /* Included for the terminal size */
+#include <sys/ttycom.h> /* Included for winsize, TIOCGWINSZ */
+#elif (BitIOTargetOS == BitIOWindowsOS)
+#include <wincon.h>
+#endif
 
 #ifdef   __cplusplus
 extern   "C" {

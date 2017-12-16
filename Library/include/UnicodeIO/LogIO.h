@@ -1,5 +1,5 @@
-#include <stdio.h>   /* Included for the printf family */
-#include <string.h>  /* Included for atoll, memset */
+#include <stdbool.h>
+#include <stdint.h>
 
 #pragma  once
 

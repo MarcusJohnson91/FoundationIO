@@ -6,11 +6,9 @@
  @brief     This header contains code for parsing command line Options.
  */
 
-#include <assert.h>  /* Included for static_assert */
-#include <stdarg.h>  /* Included for the variadic argument support macros */
+
 #include <stdbool.h> /* Included for the bool type */
 #include <stdint.h>  /* Included for the u/intX_t types */
-#include <stdlib.h>  /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
 
 #include "BitIOMacros.h"
 
