@@ -41,6 +41,12 @@ static   const char BitIONewLine[2]  = {"\x0D\x00"}; /* \r */
 #ifndef             BitIOTargetOS
 #define             BitIOTargetOS (BitIOPOSIXOS)
 #endif
+  
+#undef              fseek
+#define             fseek               fseeko
+    
+#undef              ftell
+#define             ftell               ftello
     
 #ifndef             BitIONewLineSize
 #define             BitIONewLineSize    1
@@ -66,21 +72,17 @@ static   const char BitIONewLine[3]  = {"\x0D\x0A\x00"}; /* \r\n */
 #define             strncasecmp        _strnicmp
 #endif
     
+#undef              fseek
+#define             fseek              _fseeki64
+    
+#undef              ftell
+#define             ftell              _ftelli64
+    
 #ifndef             strcasecmp
 #define             strcasecmp          stricmp
 #endif
+    
 #endif   /* End OS detection */
-    
-#ifndef   _LARGEFILE_SOURCE
-#define   _LARGEFILE_SOURCE
-#endif
-    
-#ifndef   _LARGEFILE64_SOURCE
-#define   _LARGEFILE64_SOURCE
-#endif
-    
-#undef    _FILE_OFFSET_BITS
-#define   _FILE_OFFSET_BITS   64
     
 #ifndef   BitIOByteOrders
 #define   BitIOByteOrders
