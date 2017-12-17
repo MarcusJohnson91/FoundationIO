@@ -98,7 +98,7 @@ extern "C" {
     }
     
     uint8_t *ConvertGUUIDString2BinaryGUUID(const uint8_t GUUIDString[BitIOGUUIDStringSize]) {
-        uint8_t *BinaryGUUID = calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
+        uint8_t *BinaryGUUID = (uint8_t*) calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
         if (GUUIDString != NULL && BinaryGUUID != NULL) {
             for (uint8_t StringByte = 0; StringByte < BitIOGUUIDStringSize; StringByte++) {
                 for (uint8_t BinaryByte = 0; BinaryByte < BitIOBinaryGUUIDSize; BinaryByte++) {
@@ -116,7 +116,7 @@ extern "C" {
     }
     
     uint8_t *ConvertBinaryGUUID2GUUIDString(const uint8_t BinaryGUUID[BitIOBinaryGUUIDSize]) {
-        uint8_t *GUUIDString                     = calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
+        uint8_t *GUUIDString                     = (uint8_t*) calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
         if (BinaryGUUID != NULL && GUUIDString != NULL) {
             uint8_t ASCIIHyphen = 0x2D;
             for (uint8_t BinaryByte = 0; BinaryByte < BitIOBinaryGUUIDSize; BinaryByte++) {
@@ -137,7 +137,7 @@ extern "C" {
     }
     
     uint8_t *SwapGUUIDString(const uint8_t GUUIDString[BitIOGUUIDStringSize]) {
-        uint8_t *SwappedGUUIDString = calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
+        uint8_t *SwappedGUUIDString = (uint8_t*) calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
         
         if (GUUIDString != NULL && SwappedGUUIDString != NULL) {
             SwappedGUUIDString[0]   = GUUIDString[3];
@@ -172,7 +172,7 @@ extern "C" {
     }
     
     uint8_t *SwapBinaryGUUID(const uint8_t BinaryGUUID[BitIOBinaryGUUIDSize]) {
-        uint8_t *SwappedBinaryGUUID = calloc(BitIOBinaryGUUIDSize, sizeof(uint8_t));
+        uint8_t *SwappedBinaryGUUID = (uint8_t*) calloc(BitIOBinaryGUUIDSize, sizeof(uint8_t));
         if (BinaryGUUID != NULL && SwappedBinaryGUUID != NULL) {
             SwappedBinaryGUUID[0]   = BinaryGUUID[3];
             SwappedBinaryGUUID[1]   = BinaryGUUID[2];
@@ -215,9 +215,9 @@ extern "C" {
     } BitBuffer;
     
     BitBuffer *BitBuffer_Init(const uint64_t BitBufferSize) {
-        BitBuffer *BitB                  = calloc(1, sizeof(BitBuffer));
+        BitBuffer *BitB                  = (BitBuffer*) calloc(1, sizeof(BitBuffer));
         if (BitB != NULL) {
-            BitB->Buffer                 = calloc(BitBufferSize, sizeof(uint8_t));
+            BitB->Buffer                 = (uint8_t*) calloc(BitBufferSize, sizeof(uint8_t));
             if (BitB->Buffer == NULL) {
                 BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "Not enough memory to allocate %d bits for BitBuffer's buffer", BitBufferSize);
             }
@@ -265,7 +265,7 @@ extern "C" {
         if (BitB != NULL && (BytesOfAlignment % 2 == 0 || BytesOfAlignment == 1)) {
             uint8_t Bits2Align = (BytesOfAlignment * 8) - (BitB->BitOffset % (BytesOfAlignment * 8)); // 127 bits, 64 bits 2 align
             if ((BitB->BitOffset + Bits2Align > BitB->NumBits) || (BitB->BitOffset + Bits2Align < BitB->NumBits)) {
-                BitB->Buffer   = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
+                BitB->Buffer   = (uint8_t*) realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
                 BitB->NumBits += Bits2Align;
             }
             BitB->BitOffset   += Bits2Align;
@@ -279,7 +279,7 @@ extern "C" {
     void BitBuffer_Skip(BitBuffer *BitB, const int64_t Bits2Skip) {
         if (BitB != NULL) {
             if ((BitB->BitOffset + Bits2Skip > BitB->NumBits) || (BitB->BitOffset + Bits2Skip < BitB->NumBits)) {
-                BitB->Buffer    = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Skip, Yes));
+                BitB->Buffer    = (uint8_t*) realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Skip, Yes));
                 BitB->NumBits  += Bits2Skip;
             }
             BitB->BitOffset    += Bits2Skip;
@@ -877,7 +877,7 @@ extern "C" {
     uint8_t *ReadGUUIDAsUUIDString(BitBuffer *BitB) {
         uint8_t *UUIDString          = NULL;
         if (BitB != NULL) {
-            UUIDString               = calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
+            UUIDString               = (uint8_t*) calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
             if (UUIDString != NULL) {
                 uint32_t Section1    = ExtractBitsAsMSByteLSBit(BitB, 32);
                 BitBuffer_Skip(BitB, 8);
@@ -901,7 +901,7 @@ extern "C" {
     uint8_t *ReadGUUIDAsGUIDString(BitBuffer *BitB) {
         uint8_t *GUIDString          = NULL;
         if (BitB != NULL) {
-            GUIDString               = calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
+            GUIDString               = (uint8_t*) calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
             if (GUIDString != NULL) {
                 uint32_t Section1    = ExtractBitsAsLSByteLSBit(BitB, 32);
                 BitBuffer_Skip(BitB, 8);
@@ -925,7 +925,7 @@ extern "C" {
     uint8_t *ReadGUUIDAsBinaryUUID(BitBuffer *BitB) {
         uint8_t *BinaryUUID  = NULL;
         if (BitB != NULL) {
-            BinaryUUID       = calloc(BitIOBinaryGUUIDSize, sizeof(uint8_t));
+            BinaryUUID       = (uint8_t*) calloc(BitIOBinaryGUUIDSize, sizeof(uint8_t));
             if (BinaryUUID != NULL) {
                 for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
                     BinaryUUID[Byte] = ExtractBitsAsMSByteLSBit(BitB, 8);
@@ -942,7 +942,7 @@ extern "C" {
     uint8_t *ReadGUUIDAsBinaryGUID(BitBuffer *BitB) {
         uint8_t *BinaryGUID = NULL;
         if (BitB != NULL) {
-            BinaryGUID      = calloc(BitIOBinaryGUUIDSize, sizeof(uint8_t));
+            BinaryGUID      = (uint8_t*) calloc(BitIOBinaryGUUIDSize, sizeof(uint8_t));
             if (BinaryGUID != NULL) {
                 for (uint8_t Byte = 0; Byte < BitIOBinaryGUUIDSize; Byte++) {
                     BinaryGUID[Byte] = ExtractBitsAsLSByteLSBit(BitB, 8);
@@ -1017,7 +1017,7 @@ extern "C" {
     } BitInput;
     
     BitInput *BitInput_Init(void) {
-        BitInput *BitI = calloc(1, sizeof(BitInput));
+        BitInput *BitI = (BitInput*) calloc(1, sizeof(BitInput));
         if (BitI == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "Not enough memory to allocate this instance of BitInput");
         }
@@ -1028,7 +1028,7 @@ extern "C" {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType          = BitIOFile;
             uint64_t Path2OpenSize  = strlen(Path2Open) + BitIONULLStringSize;
-            char *NewPath           = calloc(Path2OpenSize, sizeof(unsigned char));
+            char *NewPath           = (char*) calloc(Path2OpenSize, sizeof(unsigned char));
             snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
             BitI->FileSpecifierNum += 1;
             BitI->File = fopen(Path2Open, "rb");
@@ -1071,7 +1071,7 @@ extern "C" {
             if (Buffer2Read->Buffer  != NULL) {
                 free(Buffer2Read->Buffer);
             }
-            Buffer2Read->Buffer       = calloc(Bytes2Read, sizeof(uint8_t));
+            Buffer2Read->Buffer       = (uint8_t*) calloc(Bytes2Read, sizeof(uint8_t));
             if (Buffer2Read->Buffer != NULL) {
                 if (BitI->FileType   == BitIOFile) {
                     BytesRead         = fread(Buffer2Read->Buffer, 1, Bytes2Read, BitI->File);
@@ -1178,7 +1178,7 @@ extern "C" {
     } BitOutput;
     
     BitOutput *BitOutput_Init(void) {
-        BitOutput *BitO = calloc(1, sizeof(BitOutput));
+        BitOutput *BitO = (BitOutput*) calloc(1, sizeof(BitOutput));
         if (BitO == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "Not enough memory to allocate this instance of BitOutput");
         }
@@ -1189,7 +1189,7 @@ extern "C" {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType          = BitIOFile;
             uint64_t Path2OpenSize  = strlen(Path2Open) + BitIONULLStringSize;
-            char *NewPath           = calloc(Path2OpenSize, sizeof(char));
+            char *NewPath           = (char*) calloc(Path2OpenSize, sizeof(char));
             snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
             BitO->FileSpecifierNum += 1;
             BitO->File              = fopen(Path2Open, "wb");
