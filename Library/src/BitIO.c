@@ -9,7 +9,8 @@
 #include "../include/BitIOLog.h"
 
 #if (BitIOTargetOS == BitIOWindowsOS)
-#pragma warning(push, 0)  
+#pragma warning(push, 0)
+#include           <io.h>         /* Actual Socket functions like _read, _write */
 #include           <winsock.h>    /* Included for the socket support on Windows */
 #pragma warning(pop)
 #elif (BitIOTargetOS == BitIOPOSIXOS)
@@ -1075,7 +1076,11 @@ extern "C" {
                 if (BitI->FileType   == BitIOFile) {
                     BytesRead         = fread(Buffer2Read->Buffer, 1, Bytes2Read, BitI->File);
                 } else if (BitI->FileType == BitIOSocket) {
+#if   (BitIOTargetOS == BitIOPOSIXOS)
                     BytesRead         = read(BitI->Socket, Buffer2Read->Buffer, Bytes2Read);
+#elif (BitIOTargetOS == BitIOWindowsOS)
+					BytesRead         = _read(BitI->Socket, Buffer2Read->Buffer, Bytes2Read);
+#endif
                 }
                 if (BytesRead == Bytes2Read) {
                     Buffer2Read->NumBits = Bytes2Bits(BytesRead);
@@ -1149,7 +1154,11 @@ extern "C" {
             if (BitI->FileType == BitIOFile) {
                 fclose(BitI->File);
             } else if (BitI->FileType == BitIOSocket) {
-                close(BitI->Socket);
+#if    (BitIOTargetOS == BitIOPOSIXOS)
+				close(BitI->Socket);
+#elif  (BitIOTargetOS == BitIOWindowsOS)
+				_close(BitI->Socket);
+#endif          
             }
             free(BitI);
         } else {
@@ -1225,7 +1234,11 @@ extern "C" {
             if (BitO->FileType == BitIOFile) {
                 BytesWritten           = fwrite(Buffer2Write->Buffer, 1, NumBytes2Write, BitO->File);
             } else if (BitO->FileType == BitIOSocket) {
+#if   (BitIOTargetOS == BitIOPOSIXOS)
                 BytesWritten           = write(BitO->Socket, Buffer2Write->Buffer, NumBytes2Write);
+#elif (BitIOTargetOS == BitIOWindowsOS)
+				BytesWritten           = _write(BitO->Socket, Buffer2Write->Buffer, NumBytes2Write);
+#endif
             }
             if (BytesWritten != NumBytes2Write) {
                 BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "Fwrite wrote: %d bytes, but you requested: %d", BytesWritten, NumBytes2Write);
@@ -1245,7 +1258,11 @@ extern "C" {
             if (BitO->FileType == BitIOFile) {
                 fclose(BitO->File);
             } else if (BitO->FileType == BitIOSocket) {
-                close(BitO->Socket);
+#if (BitIOTargetOS == BitIOPOSIXOS)
+				close(BitO->Socket);
+#elif   (BitIOTargetOS == BitIOWindowsOS)
+				_close(BitO->Socket);
+#endif  
             }
             free(BitO);
         } else {
