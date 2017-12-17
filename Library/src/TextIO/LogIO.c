@@ -45,7 +45,7 @@ extern "C" {
 #if (BitIOTargetOS == BitIOWindowsOS)
         // Get the size of the variadic arguments with _vscprintf
         int32_t  VarArgSize = _vscprintf(Description, VariadicArguments) + BitIOLogNULLStringSize;
-        char    *HardString = calloc(VarArgSize, sizeof(uint8_t));
+        char    *HardString = (char*) calloc(VarArgSize, sizeof(uint8_t));
         vsprintf(HardString, Description, VariadicArguments);
 #elif (BitIOTargetOS == BitIOPOSIXOS)
         char *HardString         = NULL;

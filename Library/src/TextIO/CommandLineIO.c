@@ -11,17 +11,15 @@
 #include "../include/CommandLineIO.h"
 #include "../include/BitIOLog.h"
 
-#if   (BitIOTargetOS == BitIOPOSIXOS)
 #pragma warning(push, 0)
+#if   (BitIOTargetOS == BitIOPOSIXOS)
 #include <strings.h>    /* Included for strncasecmp */
 #include <sys/ioctl.h>  /* Included for the terminal size */
 #include <sys/ttycom.h> /* Included for winsize, TIOCGWINSZ */
-#pragma warning(pop)
 #elif (BitIOTargetOS == BitIOWindowsOS)
-#pragma warning(push, 0)  
 #include <wincon.h>
-#pragma warning(pop)
 #endif
+#pragma warning(pop)
 
 #ifdef   __cplusplus
 extern   "C" {
@@ -118,23 +116,21 @@ extern   "C" {
     } CommandLineIO;
     
     CommandLineIO *CommandLineIO_Init(const size_t NumSwitches) {
-        CommandLineIO *CLI   = calloc(1, sizeof(CommandLineIO));
+        CommandLineIO *CLI   = (CommandLineIO*) calloc(1, sizeof(CommandLineIO));
         if (CLI != NULL && NumSwitches > 0) {
             CLI->NumSwitches = (int64_t) NumSwitches;
-            CLI->SwitchIDs   = calloc(NumSwitches, sizeof(CommandLineSwitch));
+            CLI->SwitchIDs   = (CommandLineSwitch*) calloc(NumSwitches, sizeof(CommandLineSwitch));
             if (CLI->SwitchIDs == NULL) {
                 free(CLI);
                 BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "Couldn't allocate %d CommandLineSwitches", NumSwitches);
                 exit(EXIT_FAILURE);
             }
 #if   (BitIOTargetOS == BitIOWindowsOS)
-            // Get the size of the console with Windows' bullshit
             CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
             GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
             CLI->ConsoleHeight = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
             CLI->ConsoleWidth = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
 #elif (BitIOTargetOS == BitIOPOSIXOS)
-            // Get the size of the console with IOCTL
             struct winsize WindowSize;
             ioctl(0, TIOCGWINSZ, &WindowSize);
             CLI->ConsoleWidth  = WindowSize.ws_row;
@@ -145,7 +141,6 @@ extern   "C" {
         } else if (NumSwitches == 0) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "NumSwitches %d must be greater than or equal to 1", NumSwitches);
         }
-        
         return CLI;
     }
     
@@ -297,9 +292,9 @@ extern   "C" {
         if (CLI != NULL && (MasterID > 0 && MasterID < CLI->NumSwitches) && (SlaveID > 0 && SlaveID < CLI->NumSwitches)) {
             CLI->SwitchIDs[MasterID].NumPotentialSlaves += 1;
             if (CLI->SwitchIDs[MasterID].PotentialSlaves != NULL) {
-                CLI->SwitchIDs[MasterID].PotentialSlaves = realloc(CLI->SwitchIDs[MasterID].PotentialSlaves, CLI->SwitchIDs[MasterID].NumPotentialSlaves * sizeof(int64_t));
+                CLI->SwitchIDs[MasterID].PotentialSlaves = (int64_t*) realloc(CLI->SwitchIDs[MasterID].PotentialSlaves, CLI->SwitchIDs[MasterID].NumPotentialSlaves * sizeof(int64_t));
             } else {
-                CLI->SwitchIDs[MasterID].PotentialSlaves = calloc(1, sizeof(int64_t));
+                CLI->SwitchIDs[MasterID].PotentialSlaves = (int64_t*) calloc(1, sizeof(int64_t));
             }
             CLI->SwitchIDs[MasterID].PotentialSlaves[CLI->SwitchIDs[MasterID].NumPotentialSlaves - 1] = SlaveID;
         } else if (CLI == NULL) {
@@ -374,7 +369,7 @@ extern   "C" {
                 BitIOLog(BitIOLog_DEBUG, BitIOLogLibraryName, __func__, "OptionString is not an option string");
             }
             uint64_t ArgumentSwitchSize    = ArgumentStringSize - ArgumentStringPrefixSize;
-            ArgumentSwitch                 = calloc(ArgumentSwitchSize + NULLTerminatorSize, sizeof(uint8_t));
+            ArgumentSwitch                 = (char*) calloc(ArgumentSwitchSize + NULLTerminatorSize, sizeof(uint8_t));
             strncpy(ArgumentSwitch, &ArgumentString[ArgumentStringPrefixSize], ArgumentSwitchSize);
         } else {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "OptionString Pointer is NULL");
@@ -428,9 +423,9 @@ extern   "C" {
                                                                                                            // Set up the Option here
                         CLI->NumOptions += 1;
                         if (CLI->NumOptions == 1) {
-                            CLI->OptionIDs = calloc(1, sizeof(CommandLineOption));
+                            CLI->OptionIDs = (CommandLineOption*) calloc(1, sizeof(CommandLineOption));
                         } else {
-                            CLI->OptionIDs = realloc(CLI->OptionIDs, CLI->NumOptions * sizeof(CommandLineOption));
+                            CLI->OptionIDs = (CommandLineOption*) realloc(CLI->OptionIDs, CLI->NumOptions * sizeof(CommandLineOption));
                         }
                         CLI->OptionIDs[CLI->NumOptions - 1].SwitchID = Switch;
                         
@@ -499,8 +494,8 @@ extern   "C" {
             }
         }
         
-        SubStringSize   = calloc(NumDelimitersFound, sizeof(uint64_t));
-        SubStringOffset = calloc(NumDelimitersFound, sizeof(uint64_t));
+        SubStringSize   = (uint64_t*) calloc(NumDelimitersFound, sizeof(uint64_t));
+        SubStringOffset = (uint64_t*) calloc(NumDelimitersFound, sizeof(uint64_t));
         
         for (uint64_t ArgumentByte = 0ULL; ArgumentByte < ArgumentStringSize; ArgumentByte++) {
             uint8_t CurrentByte = ArgumentString[ArgumentByte];
@@ -520,11 +515,11 @@ extern   "C" {
         // Ok, now we just go ahead and copy the substrings out
         // and now we go ahead and create the number of srings found * their size, then put pointers to those strings into an array of pointers
         FoundStrings         = NumDelimitersFound - 1;
-        char *StringPointers = calloc(FoundStrings, sizeof(char*));
+        char *StringPointers = (char*) calloc(FoundStrings, sizeof(char*));
         for (uint64_t String = 0ULL; String < FoundStrings; String++) {
             // In here allocate a string for each found string
             // Allocate the string here
-            char *StringPointer    = calloc(SubStringSize[String], sizeof(uint8_t));
+            char *StringPointer    = (char*) calloc(SubStringSize[String], sizeof(char));
             StringPointers[String] = *StringPointer;
         }
         
@@ -618,7 +613,7 @@ extern   "C" {
                 ExtensionDistanceFromEnd      += 1;
             }
             ExtensionSize                      = PathSize - ExtensionDistanceFromEnd;
-            ExtensionString                    = calloc(ExtensionSize + NULLTerminatorSize, sizeof(char));
+            ExtensionString                    = (char*) calloc(ExtensionSize + NULLTerminatorSize, sizeof(char));
             if (ExtensionString == NULL) {
                 BitIOLog(BitIOLog_ERROR, "CommandLineIO", __func__, "Couldn't allocate %lld bytes for the Extension String", ExtensionSize);
             } else {
@@ -644,29 +639,23 @@ extern   "C" {
          Ok, so we know the width of the console, now we need to figure out the sizes of each of the strings
          */
         
-        size_t *StringSize = calloc(NumItems2Display, sizeof(size_t));
+        size_t *StringSize = (size_t*) calloc(NumItems2Display, sizeof(size_t));
         for (uint8_t Item = 0; Item < NumItems2Display; Item++) { // Get the size of the strings
             StringSize[Item] = strlen(&Strings[Item]);
             // huh, well we need 2 characters for the brackets.
             
         }
         // Number of seperators for each string
-        size_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(size_t));
-        char   *ActualStrings2Print            = calloc(NumItems2Display * CLI->ConsoleWidth, sizeof(char));
+        size_t *NumProgressIndicatorsPerString = (size_t*) calloc(NumItems2Display, sizeof(size_t));
+        char   *ActualStrings2Print            = (char*) calloc(NumItems2Display * CLI->ConsoleWidth, sizeof(char));
         for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
             // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
             NumProgressIndicatorsPerString[String] = CLI->ConsoleWidth - (2 + StringSize[String]); // what if it's not even?
-            
-            
-            
             uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
-            
             uint8_t HalfOfTheIndicators = (PercentComplete / 2);
-            
             // Now we go ahead and memset a string with the proper number of indicators
-            char *Indicator = calloc(CLI->ConsoleWidth, sizeof(char));
+            char *Indicator = (char*) calloc(CLI->ConsoleWidth, sizeof(char));
             memset(Indicator, '-', HalfOfTheIndicators);
-            
             sprintf(&ActualStrings2Print[String], "[%s%s %d/%d %hhu/% %s]", Indicator, Strings[String], Numerator, Denominator, PercentComplete, Indicator);
             fprintf(stdout, "%s%s", &ActualStrings2Print[String], BitIONewLine);
             free(Indicator);
