@@ -43,7 +43,7 @@ extern  "C" {
     
 #ifndef             BitIONewLineSize
 #define             BitIONewLineSize    1
-static   const char BitIONewLine[2]  = {"\x0D\x00"}; /* \r */
+static   const char BitIONewLine[2]  = {0x0D, 0x00}; /* \r */
 #endif
     
 #elif    defined(_POSIX_C_SOURCE) || defined(__APPLE__) || defined(__MACH__) || defined(BSD) || defined(linux) || defined(__linux)
@@ -60,7 +60,7 @@ static   const char BitIONewLine[2]  = {"\x0D\x00"}; /* \r */
     
 #ifndef             BitIONewLineSize
 #define             BitIONewLineSize    1
-static   const char BitIONewLine[2]  = {"\x0A\x00"}; /* \n */
+static   const char BitIONewLine[2]  = {0x0A, 0x00}; /* \n */
 #endif
     
 #elif    defined(_WIN32) || defined(__WIN32__) || defined(_WIN64) || defined(__WINDOWS__)
@@ -71,7 +71,7 @@ static   const char BitIONewLine[2]  = {"\x0A\x00"}; /* \n */
 
 #ifndef             BitIONewLineSize
 #define             BitIONewLineSize    2
-static   const char BitIONewLine[3]  = {"\x0D\x0A\x00"}; /* \r\n */
+static   const char BitIONewLine[3]  = {0x0D, 0x0A, 0x00}; /* \r\n */
 #endif
 
 #ifndef             restrict
