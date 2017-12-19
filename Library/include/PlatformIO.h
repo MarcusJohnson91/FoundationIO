@@ -1,12 +1,12 @@
 /*!
-@header    BitIOMacros.h
-@author    Marcus Johnson aka BumbleBritches57
-@copyright 2017 - 2017, Marcus Johnson
-@version   1.0.0
-@brief     This header contains preprocessor macros for generic functions in BitIO, and cross-platform compatibility.
-*/
+ @header    BitIOMacros.h
+ @author    Marcus Johnson aka BumbleBritches57
+ @copyright 2017 - 2017, Marcus Johnson
+ @version   1.0.0
+ @brief     This header contains preprocessor macros for generic functions in BitIO, and cross-platform compatibility.
+ */
 
-#pragma warning(push, 0)        
+#pragma warning(push, 0)
 #include <limits.h>
 #include <float.h>
 #pragma warning(pop)
