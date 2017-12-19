@@ -1,17 +1,15 @@
-#pragma warning(push, 0)        
+#include "../include/CommandLineIO.h"
+
+#include "../include/BitIOLog.h"
+#include "../include/BitIOMacros.h"
+
+#pragma warning(push, 0)
 #include <assert.h>     /* Included for static_assert */
 #include <stdarg.h>     /* Included for the variadic argument support macros */
 #include <stdbool.h>    /* Included for bool */
 #include <stdio.h>      /* Included for fprintf, stdout, sprintf */
 #include <stdlib.h>     /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 #include <string.h>     /* Included for memset */
-#pragma warning(pop)
-
-#include "../include/BitIOMacros.h"
-#include "../include/CommandLineIO.h"
-#include "../include/BitIOLog.h"
-
-#pragma warning(push, 0)
 #if   (BitIOTargetOS == BitIOPOSIXOS)
 #include <strings.h>    /* Included for strncasecmp */
 #include <sys/ioctl.h>  /* Included for the terminal size */
