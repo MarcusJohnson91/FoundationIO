@@ -118,13 +118,12 @@ extern "C" {
     uint8_t *ConvertBinaryGUUID2GUUIDString(const uint8_t BinaryGUUID[BitIOBinaryGUUIDSize]) {
         uint8_t *GUUIDString                     = (uint8_t*) calloc(BitIOGUUIDStringSize, sizeof(uint8_t));
         if (BinaryGUUID != NULL && GUUIDString != NULL) {
-            uint8_t ASCIIHyphen = 0x2D;
             for (uint8_t BinaryByte = 0; BinaryByte < BitIOBinaryGUUIDSize; BinaryByte++) {
                 for (uint8_t StringByte = 0; StringByte < BitIOGUUIDStringSize; StringByte++) {
                     if (BinaryByte != 4 && BinaryByte != 7 && BinaryByte != 10 && BinaryByte != 13) {
                         GUUIDString[StringByte]  = BinaryGUUID[BinaryByte];
                     } else {
-                        GUUIDString[StringByte]  = ASCIIHyphen;
+                        GUUIDString[StringByte]  = '-';
                     }
                 }
             }

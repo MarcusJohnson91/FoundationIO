@@ -7,6 +7,7 @@
 
 #include "../include/BitIOMacros.h"
 #include "../include/BitIOLog.h"
+#include "../include/StringIO.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +31,7 @@ extern "C" {
         }
     }
     
-    void BitIOLog(BitIOLogTypes ErrorSeverity, const char *restrict LibraryOrProgram, const char *restrict FunctionName, const char *restrict Description, ...) {
+    void BitIOLog(BitIOLogTypes ErrorSeverity, const unsigned char *restrict LibraryOrProgram, const unsigned char *restrict FunctionName, const UTF8String restrict Description, ...) {
         static const char *ErrorCodeString = NULL;
         if (ErrorSeverity == BitIOLog_ERROR) {
             ErrorCodeString      = "ERROR";

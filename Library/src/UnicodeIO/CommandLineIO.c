@@ -2,6 +2,7 @@
 
 #include "../include/BitIOLog.h"
 #include "../include/BitIOMacros.h"
+#include "../include/StringIO.h"
 
 #pragma warning(push, 0)
 #include <assert.h>     /* Included for static_assert */
@@ -40,23 +41,23 @@ extern   "C" {
      @constant               SwitchType                  "What type of switch is this"?
      @constant               ArgumentType                "What type of argument does this switch accept"?
      @constant               Name                        "What is this switch called, how do we identify it"?
-     @constant               NameSize                    "What is the number of bytes (if ASCII)/ code points (if UTF) of this switch"?
      @constant               Description                 "Describe to the user what this switch does".
-     @constant               DescriptionSize             "What is the number of bytes/code points of this switch"?
+     @constant               NameSize                    "What is the number of code units of this string"?
+     @constant               DescriptionSize             "What is the number of code units of this string"?
      @constant               NumPotentialSlaves          "How many potential slaves are there"?
      @constant               MaxConcurrentSlaves         "How many Slave switches can be active at once"?
      @constant               PotentialSlaves             "Pointer to an array that contains the list of aloowable Slave switches".
      */
     typedef struct CommandLineSwitch {
-        CLISwitchTypes       SwitchType;
-        CLIArgumentTypes     ArgumentType;
-        char                *Name;
-        uint8_t              NameSize;
-        char                *Description;
-        uint8_t              DescriptionSize;
+        UTF8String           Name;
+        UTF8String           Description;
+        uint64_t             NameSize;
+        uint64_t             DescriptionSize;
         int64_t              NumPotentialSlaves;
         int64_t              MaxConcurrentSlaves;
         int64_t             *PotentialSlaves;
+        CLISwitchTypes       SwitchType;
+        CLIArgumentTypes     ArgumentType;
     } CommandLineSwitch;
     
     /*!
@@ -71,45 +72,61 @@ extern   "C" {
         int64_t              SwitchID;
         int64_t              NumOptionSlaves;
         int64_t             *OptionSlaves;
-        char                *Argument;
+        UTF8String           Argument;
     } CommandLineOption;
     
     /*!
      @struct                 CommandLineIO
-     @abstract                                           "Contains all the information, and relationships between switches on the command line".
-     @constant               NumSwitches                 "How many switches are there?".
-     @constant               NumOptions                  "The number of Options present in argv, after extracting any Slave switches".
-     @constant               MinOptions                  "The minimum number of switches to accept without dumping the help".
-     @constant               HelpSwitch                  "Which switch displays the help"?
-     @constant               Switches                    "Pointer to an array of switches".
-     @constant               Options                     "Pointer to an array of Options".
-     @constant               IsProprietary               "Is this program proprietary?".
-     @constant               ProgramName                 "What is the name of this program?".
-     @constant               ProgramAuthor               "Who wrote this program?".
-     @constant               ProgramDescription          "What does this program do?".
-     @constant               ProgramVersion              "What is the version of this program?".
-     @constant               ProgramCopyright            "String containing the copyright years like "2015 - 2017"".
-     @constant               ProgramLicenseName          "Short name of the license, like "3-clause BSD", etc".
-     @constant               ProgramLicenseDescription   "Describe the license or EULA".
-     @constant               ProgramLicenseURL           "URL for the EULA, ToS, or Open source license".
+     @abstract                                             "Contains all the information, and relationships between switches on the command line".
+     @constant               NumSwitches                   "How many switches are there?".
+     @constant               NumOptions                    "The number of Options present in argv, after extracting any Slave switches".
+     @constant               MinOptions                    "The minimum number of switches to accept without dumping the help".
+     @constant               HelpSwitch                    "Which switch displays the help"?
+     @constant               Switches                      "Pointer to an array of switches".
+     @constant               Options                       "Pointer to an array of Options".
+     @constant               IsProprietary                 "Is this program proprietary"?
+     @constant               ProgramName                   "What is the name of this program"?
+     @constant               ProgramAuthor                 "Who wrote this program"?
+     @constant               ProgramDescription            "What does this program do"?
+     @constant               ProgramVersion                "What is the version of this program"?
+     @constant               ProgramCopyright              "String containing the copyright years like "2015 - 2017"".
+     @constant               ProgramLicenseName            "Short name of the license, like "3-clause BSD", etc".
+     @constant               ProgramLicenseDescription     "Describe the license or EULA".
+     @constant               ProgramLicenseURL             "URL for the EULA, ToS, or Open source license".
+     @constant               ProgramNameSize               "The number of codepoints in this field".
+     @constant               ProgramAuthorSize             "The number of codepoints in this field".
+     @constant               ProgramDescriptionSize        "The number of codepoints in this field".
+     @constant               ProgramVersionSize            "The number of codepoints in this field".
+     @constant               ProgramCopyrightSize          "The number of codepoints in this field".
+     @constant               ProgramLicenseNameSize        "The number of codepoints in this field".
+     @constant               ProgramLicenseDescriptionSize "The number of codepoints in this field".
+     @constant               ProgramLicenseURLSize         "The number of codepoints in this field".
      */
     typedef struct CommandLineIO {
         int64_t              NumSwitches;
         int64_t              NumOptions;
         int64_t              MinOptions;
         int64_t              HelpSwitch;
-        uint16_t             ConsoleWidth;
-        uint16_t             ConsoleHeight;
-        char                *ProgramName;
-        char                *ProgramAuthor;
-        char                *ProgramDescription;
-        char                *ProgramVersion;
-        char                *ProgramCopyright;
-        char                *ProgramLicenseName;
-        char                *ProgramLicenseDescription;
-        char                *ProgramLicenseURL;
+        UTF8String           ProgramName;
+        UTF8String           ProgramAuthor;
+        UTF8String           ProgramDescription;
+        UTF8String           ProgramVersion;
+        UTF8String           ProgramCopyright;
+        UTF8String           ProgramLicenseName;
+        UTF8String           ProgramLicenseDescription;
+        UTF8String           ProgramLicenseURL;
+        uint64_t             ProgramNameSize;
+        uint64_t             ProgramAuthorSize;
+        uint64_t             ProgramDescriptionSize;
+        uint64_t             ProgramVersionSize;
+        uint64_t             ProgramCopyrightSize;
+        uint64_t             ProgramLicenseNameSize;
+        uint64_t             ProgramLicenseDescriptionSize;
+        uint64_t             ProgramLicenseURLSize;
         CommandLineSwitch   *SwitchIDs;
         CommandLineOption   *OptionIDs;
+        uint16_t             ConsoleWidth;
+        uint16_t             ConsoleHeight;
         bool                 IsProprietary;
     } CommandLineIO;
     
@@ -142,9 +159,10 @@ extern   "C" {
         return CLI;
     }
     
-    void CLISetName(CommandLineIO *CLI, char *Name) {
+    void CLISetName(CommandLineIO *CLI, UTF8String Name) {
         if (CLI != NULL && Name != NULL) {
-            CLI->ProgramName = Name;
+            CLI->ProgramName     = Name;
+            CLI->ProgramNameSize = UTF8String_GetNumCodePoints(Name);
         } else if (CLI == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "CommandLineIO Pointer is NULL");
         } else if (Name == NULL) {
@@ -152,9 +170,10 @@ extern   "C" {
         }
     }
     
-    void CLISetVersion(CommandLineIO *CLI, char *Version) {
+    void CLISetVersion(CommandLineIO *CLI, UTF8String Version) {
         if (CLI != NULL && Version != NULL) {
-            CLI->ProgramVersion = Version;
+            CLI->ProgramVersion     = Version;
+            CLI->ProgramVersionSize = UTF8String_GetNumCodePoints(Version);
         } else if (CLI == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "CommandLineIO Pointer is NULL");
         } else if (Version == NULL) {
@@ -162,9 +181,10 @@ extern   "C" {
         }
     }
     
-    void CLISetDescription(CommandLineIO *CLI, char *Description) {
+    void CLISetDescription(CommandLineIO *CLI, UTF8String Description) {
         if (CLI != NULL && Description != NULL) {
-            CLI->ProgramDescription = Description;
+            CLI->ProgramDescription     = Description;
+            CLI->ProgramDescriptionSize = UTF8String_GetNumCodePoints(Description);
         } else if (CLI == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "CommandLineIO Pointer is NULL");
         } else if (Description == NULL) {
@@ -172,9 +192,10 @@ extern   "C" {
         }
     }
     
-    void CLISetAuthor(CommandLineIO *CLI, char *Author) {
+    void CLISetAuthor(CommandLineIO *CLI, UTF8String Author) {
         if (CLI != NULL && Author != NULL) {
-            CLI->ProgramAuthor = Author;
+            CLI->ProgramAuthor     = Author;
+            CLI->ProgramAuthorSize = UTF8String_GetNumCodePoints(Author);
         } else if (CLI == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "CommandLineIO Pointer is NULL");
         } else if (Author == NULL) {
@@ -182,9 +203,10 @@ extern   "C" {
         }
     }
     
-    void CLISetCopyright(CommandLineIO *CLI, char *Copyright) {
+    void CLISetCopyright(CommandLineIO *CLI, UTF8String Copyright) {
         if (CLI != NULL && Copyright != NULL) {
-            CLI->ProgramCopyright = Copyright;
+            CLI->ProgramCopyright     = Copyright;
+            CLI->ProgramCopyrightSize = UTF8String_GetNumCodePoints(Copyright);
         } else if (CLI == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "CommandLineIO Pointer is NULL");
         } else if (Copyright == NULL) {
@@ -192,11 +214,14 @@ extern   "C" {
         }
     }
     
-    void CLISetLicense(CommandLineIO *CLI, char *Name, char *LicenseDescription, char *LicenseURL, const bool IsProprietary) {
+    void CLISetLicense(CommandLineIO *CLI, UTF8String Name, UTF8String LicenseDescription, UTF8String LicenseURL, const bool IsProprietary) {
         if (CLI != NULL && (Name != NULL || LicenseDescription != NULL) && LicenseURL != NULL) {
-            CLI->ProgramLicenseName        = Name;
-            CLI->ProgramLicenseDescription = LicenseDescription;
-            CLI->ProgramLicenseURL         = LicenseURL;
+            CLI->ProgramLicenseName            = Name;
+            CLI->ProgramLicenseDescription     = LicenseDescription;
+            CLI->ProgramLicenseURL             = LicenseURL;
+            CLI->ProgramLicenseNameSize        = UTF8String_GetNumCodePoints(Name);
+            CLI->ProgramLicenseDescriptionSize = UTF8String_GetNumCodePoints(LicenseDescription);
+            CLI->ProgramLicenseURLSize         = UTF8String_GetNumCodePoints(LicenseURL);
             if (IsProprietary == No) {
                 CLI->IsProprietary         = No;
             } else {
@@ -231,10 +256,9 @@ extern   "C" {
         }
     }
     
-    void CLISetSwitchName(CommandLineIO *CLI, const int64_t SwitchID, char *Name) {
+    void CLISetSwitchName(CommandLineIO *CLI, const int64_t SwitchID, UTF8String Name) {
         if (CLI != NULL && (SwitchID >= 0 && SwitchID <= CLI->NumSwitches) && Name != NULL) {
-            CLI->SwitchIDs[SwitchID].Name     = Name;
-            CLI->SwitchIDs[SwitchID].NameSize = (uint8_t) strlen(Name);
+            CLI->SwitchIDs[SwitchID].Name = Name;
         } else if (CLI == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "CommandLineIO Pointer is NULL");
         } else if (Name == NULL) {
@@ -244,10 +268,10 @@ extern   "C" {
         }
     }
     
-    void CLISetSwitchDescription(CommandLineIO *CLI, const int64_t SwitchID, char *Description) {
+    void CLISetSwitchDescription(CommandLineIO *CLI, const int64_t SwitchID, UTF8String Description) {
         if (CLI != NULL && Description != NULL && (SwitchID > 0 && SwitchID < CLI->NumSwitches)) {
             CLI->SwitchIDs[SwitchID].Description     = Description;
-            CLI->SwitchIDs[SwitchID].DescriptionSize = (uint8_t) strlen(Description);
+            CLI->SwitchIDs[SwitchID].DescriptionSize = UTF8String_GetNumCodePoints(Description);
         } else if (CLI == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "CommandLineIO Pointer is NULL");
         } else if (Description == NULL) {
@@ -338,7 +362,6 @@ extern   "C" {
             if (CLI->ProgramName != NULL && CLI->ProgramVersion != NULL && CLI->ProgramAuthor != NULL && CLI->ProgramCopyright != NULL) {
                 fprintf(stdout, "%s, v. %s by %s © %s%s", CLI->ProgramName, CLI->ProgramVersion, CLI->ProgramAuthor, CLI->ProgramCopyright, BitIONewLine);
             }
-            
             if (CLI->ProgramDescription != NULL && CLI->ProgramLicenseName != NULL && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL && CLI->IsProprietary == No) {
                 fprintf(stdout, "%s, Released under the \"%s\" %s, available at: %s%s", CLI->ProgramDescription, CLI->ProgramLicenseName, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, BitIONewLine);
             } else if (CLI->ProgramDescription != NULL && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL && CLI->IsProprietary == Yes) {
@@ -349,25 +372,24 @@ extern   "C" {
         }
     }
     
-    static char *ArgumentString2SwitchFlag(const char *ArgumentString) {
-        char *ArgumentSwitch = NULL;
+    static UTF8String ArgumentString2SwitchFlag(const UTF8String ArgumentString) {
+        UTF8String ArgumentSwitch = NULL;
         if (ArgumentString != NULL) {
             uint8_t  ArgumentStringPrefixSize = 0;
-            
-            uint32_t ArgumentStringSize    = strlen(ArgumentString);
+            uint32_t ArgumentStringSize       = UTF8String_GetNumCodePoints(ArgumentString);
             
             if (ArgumentStringSize >= 2) {
                 //BitIOLog(BitIOLog_DEBUG, BitIOLogLibraryName, __func__, "ArgumentString[0] = 0x%X, ArgumentString[1] = 0x%X", ArgumentString[0], ArgumentString[1]);
-                if (ArgumentString[0] == ASCIIHyphen && ArgumentString[1] == ASCIIHyphen) {
+                if (ArgumentString[0] == '-' && ArgumentString[1] == '-') {
                     ArgumentStringPrefixSize  = 2;
-                } //else if (ArgumentString[0] == ASCIIBSlash || ArgumentString[0] == ASCIIFSlash || ArgumentString[0] == ASCIIHyphen) {
-                  //ArgumentStringPrefixSize  = 1;
-                  //}
+                } else if (ArgumentString[0] == "/" || ArgumentString[0] == "\\" || ArgumentString[0] == "-") {
+                  ArgumentStringPrefixSize    = 1;
+                }
             } else {
                 BitIOLog(BitIOLog_DEBUG, BitIOLogLibraryName, __func__, "OptionString is not an option string");
             }
             uint64_t ArgumentSwitchSize    = ArgumentStringSize - ArgumentStringPrefixSize;
-            ArgumentSwitch                 = (char*) calloc(ArgumentSwitchSize + NULLTerminatorSize, sizeof(uint8_t));
+            ArgumentSwitch                 = (UTF8String) calloc(ArgumentSwitchSize + NULLTerminatorSize, sizeof(UTF8String));
             strncpy(ArgumentSwitch, &ArgumentString[ArgumentStringPrefixSize], ArgumentSwitchSize);
         } else {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "OptionString Pointer is NULL");
@@ -375,7 +397,7 @@ extern   "C" {
         return ArgumentSwitch;
     }
     
-    static int64_t GetSubStringsAbsolutePosition(int64_t StartOffset, int64_t StringSize, char *OptionString, char *SubString) {
+    static int64_t GetSubStringsAbsolutePosition(int64_t StartOffset, int64_t StringSize, UTF8String OptionString, UTF8String SubString) {
         int64_t SubStringPosition = -1LL;
         int64_t SubStringSize = strlen(OptionString);
         int64_t MatchingChars = 0ULL;
@@ -409,8 +431,8 @@ extern   "C" {
             
             do {
                 // Extract the first argument as a switch.
-                char    *Argument         = (char*) argv[CurrentArgument];
-                char    *ArgumentFlag     = ArgumentString2SwitchFlag(Argument);
+                UTF8String Argument         = (UTF8String) argv[CurrentArgument];
+                UTF8String ArgumentFlag     = ArgumentString2SwitchFlag(Argument);
                 uint64_t ArgumentFlagSize = strlen(ArgumentFlag);
                 // now loop over the switches
                 for (int64_t Switch = 0LL; Switch < CLI->NumSwitches; Switch++) {
@@ -430,11 +452,11 @@ extern   "C" {
                         
                         // so now we need to look over the current switch's MaxConcurrentSlaves and NumPotentialSlaves wait num potential slaves will be indexxed by the loop
                         for (int64_t ArgSlave = 1LL; ArgSlave < CLI->SwitchIDs[Switch].MaxConcurrentSlaves; ArgSlave++) {
-                            char *PotentialSlaveArg        = (char*) argv[CurrentArgument + ArgSlave];
+                            UTF8String PotentialSlaveArg        = (UTF8String) argv[CurrentArgument + ArgSlave];
                             uint64_t PotentialSlaveArgSize = strlen(PotentialSlaveArg);
                             for (int64_t Slave = 0LL; Slave < CLI->SwitchIDs[Switch].NumPotentialSlaves; Slave++) {
                                 // Ok so now we loop over the values stores in PoentialSlaves, looking up their switch flags.
-                                char *PotentialSlaveFlag   = CLI->SwitchIDs[CLI->SwitchIDs[Switch].PotentialSlaves[Slave]].Name;
+                                UTF8String PotentialSlaveFlag   = CLI->SwitchIDs[CLI->SwitchIDs[Switch].PotentialSlaves[Slave]].Name;
                                 // Now compare PotentialSlaveFlag to PotentialSlaveArg
                                 uint64_t SmallestSlaveFlag = PotentialSlaveArgSize <= CLI->SwitchIDs[CLI->SwitchIDs[Switch].PotentialSlaves[Slave]].NameSize ? PotentialSlaveArgSize : CLI->SwitchIDs[CLI->SwitchIDs[Switch].PotentialSlaves[Slave]].NameSize;
                                 if (strncasecmp(PotentialSlaveArg, PotentialSlaveFlag, SmallestSlaveFlag) == 0) {
@@ -454,7 +476,7 @@ extern   "C" {
         }
     }
     
-    static char **SplitInlineArgument(const char *ArgumentString, const uint64_t ArgumentStringSize, uint64_t NumSplitArguments) {
+    static UTF8String SplitInlineArgument(const UTF8String ArgumentString, const uint64_t ArgumentStringSize, uint64_t NumSplitArguments) {
         /*
          Ok, so we take in an argument string and it's size.
          We output whatever the argument contains in multiple strings.
@@ -485,9 +507,9 @@ extern   "C" {
         for (uint64_t ArgumentByte = 0ULL; ArgumentByte < ArgumentStringSize; ArgumentByte++) {
             uint8_t CurrentByte = ArgumentString[ArgumentByte];
             uint8_t NextByte    = ArgumentString[ArgumentByte + 1];
-            if (CurrentByte == Colon || CurrentByte == Equal || (CurrentByte == Hyphen && NextByte == Hyphen) || (CurrentByte == Period && NextByte == Period) || CurrentByte == Hyphen || CurrentByte == Period) {
+            if (CurrentByte == ":" || CurrentByte == "=" || (CurrentByte == "-" && NextByte == "-") || (CurrentByte == "." && NextByte == ".") || CurrentByte == "-" || CurrentByte == ".") {
                 NumDelimitersFound += 1;
-                if ((CurrentByte == Hyphen && NextByte == Hyphen) || (CurrentByte == Period && NextByte == Period)) {
+                if ((CurrentByte == "-" && NextByte == "-") || (CurrentByte == "." && NextByte == ".")) {
                 }
             }
         }
@@ -496,11 +518,11 @@ extern   "C" {
         SubStringOffset = (uint64_t*) calloc(NumDelimitersFound, sizeof(uint64_t));
         
         for (uint64_t ArgumentByte = 0ULL; ArgumentByte < ArgumentStringSize; ArgumentByte++) {
-            uint8_t CurrentByte = ArgumentString[ArgumentByte];
-            uint8_t NextByte    = ArgumentString[ArgumentByte + 1];
-            if (CurrentByte == Colon || CurrentByte == Equal || (CurrentByte == Hyphen && NextByte == Hyphen) || (CurrentByte == Period && NextByte == Period) || CurrentByte == Hyphen || CurrentByte == Period) {
-                CurrentDelimiter += 1;
-                if ((CurrentByte == Hyphen && NextByte == Hyphen) || (CurrentByte == Period && NextByte == Period)) {
+            uint8_t CurrentByte                       = ArgumentString[ArgumentByte];
+            uint8_t NextByte                          = ArgumentString[ArgumentByte + 1];
+            if (CurrentByte == ":" || CurrentByte == "=" || (CurrentByte == "-" && NextByte == "-") || (CurrentByte == "." && NextByte == ".") || CurrentByte == "-" || CurrentByte == ".") {
+                CurrentDelimiter                     += 1;
+                if ((CurrentByte == "-" && NextByte == "-") || (CurrentByte == "." && NextByte == ".")) {
                     SubStringOffset[CurrentDelimiter] = NextByte;
                     SubStringSize[CurrentDelimiter]   = SubStringOffset[CurrentDelimiter] - ArgumentStringSize;
                 } else {
@@ -512,17 +534,17 @@ extern   "C" {
         
         // Ok, now we just go ahead and copy the substrings out
         // and now we go ahead and create the number of srings found * their size, then put pointers to those strings into an array of pointers
-        FoundStrings         = NumDelimitersFound - 1;
-        char *StringPointers = (char*) calloc(FoundStrings, sizeof(char*));
+        FoundStrings              = NumDelimitersFound - 1;
+        UTF8String StringPointers = (UTF8String) calloc(FoundStrings, sizeof(UTF8String));
         for (uint64_t String = 0ULL; String < FoundStrings; String++) {
             // In here allocate a string for each found string
             // Allocate the string here
-            char *StringPointer    = (char*) calloc(SubStringSize[String], sizeof(char));
+            UTF8String StringPointer    = (UTF8String) calloc(SubStringSize[String], sizeof(UTF8String));
             StringPointers[String] = *StringPointer;
         }
         
         NumSplitArguments = FoundStrings;
-        return &StringPointers;
+        return StringPointers;
     }
     
     int64_t CLIGetNumMatchingOptions(CommandLineIO *CLI, const int64_t OptionID, const int64_t NumSlaves, const int64_t *SlaveIDs) {
@@ -584,8 +606,8 @@ extern   "C" {
         return MatchingOption;
     }
     
-    char *CLIGetOptionResult(CommandLineIO const *CLI, const int64_t OptionID) {
-        char *Result = NULL;
+    UTF8String CLIGetOptionResult(CommandLineIO const *CLI, const int64_t OptionID) {
+        UTF8String Result = NULL;
         if (CLI == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "CommandLineIO Pointer is NULL");
         } else if (OptionID > CLI->NumOptions - 1) {
@@ -598,8 +620,8 @@ extern   "C" {
         return Result;
     }
     
-    char *GetExtensionFromPath(const char *Path) {
-        char *ExtensionString                  = NULL;
+    UTF8String GetExtensionFromPath(const UTF8String Path) {
+        UTF8String ExtensionString                  = NULL;
         if (Path == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "Path Pointer is NULL");
         } else {
@@ -611,7 +633,7 @@ extern   "C" {
                 ExtensionDistanceFromEnd      += 1;
             }
             ExtensionSize                      = PathSize - ExtensionDistanceFromEnd;
-            ExtensionString                    = (char*) calloc(ExtensionSize + NULLTerminatorSize, sizeof(char));
+            ExtensionString                    = (UTF8String) calloc(ExtensionSize + NULLTerminatorSize, sizeof(UTF8String));
             if (ExtensionString == NULL) {
                 BitIOLog(BitIOLog_ERROR, "CommandLineIO", __func__, "Couldn't allocate %lld bytes for the Extension String", ExtensionSize);
             } else {
@@ -623,7 +645,7 @@ extern   "C" {
         return ExtensionString;
     }
     
-    void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, char *Strings, uint64_t *Numerator, uint64_t *Denominator) {
+    void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF8String Strings, uint64_t *Numerator, uint64_t *Denominator) {
         /*
          How do we get the window size? I want to be able to resize the window
          I want the bar to have an even number of dashes on each side with the number in the middle.
@@ -645,14 +667,14 @@ extern   "C" {
         }
         // Number of seperators for each string
         size_t *NumProgressIndicatorsPerString = (size_t*) calloc(NumItems2Display, sizeof(size_t));
-        char   *ActualStrings2Print            = (char*) calloc(NumItems2Display * CLI->ConsoleWidth, sizeof(char));
+        UTF8String   ActualStrings2Print            = (UTF8String) calloc(NumItems2Display * CLI->ConsoleWidth, sizeof(UTF8String));
         for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
-            // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
+                                                                        // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
             NumProgressIndicatorsPerString[String] = CLI->ConsoleWidth - (2 + StringSize[String]); // what if it's not even?
             uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
             uint8_t HalfOfTheIndicators = (PercentComplete / 2);
             // Now we go ahead and memset a string with the proper number of indicators
-            char *Indicator = (char*) calloc(CLI->ConsoleWidth, sizeof(char));
+            UTF8String Indicator = (UTF8String) calloc(CLI->ConsoleWidth, sizeof(char));
             memset(Indicator, '-', HalfOfTheIndicators);
             sprintf(&ActualStrings2Print[String], "[%s%s %d/%d %hhu/% %s]", Indicator, Strings[String], Numerator, Denominator, PercentComplete, Indicator);
             fprintf(stdout, "%s%s", &ActualStrings2Print[String], BitIONewLine);
