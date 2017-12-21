@@ -11,6 +11,8 @@
 #include <stdint.h>
 #pragma warning(pop)
 
+#include "../include/StringIO.h"
+
 #pragma  once
 
 #ifndef  LIBBITIO_BitIOLog_H
@@ -20,7 +22,7 @@
 extern   "C" {
 #endif
     
-    static const char          *BitIOLogLibraryName             = "libBitIO";
+    UTF8String                  BitIOLogLibraryName             = u8"libBitIO";
     
     /*!
      @enum                      BitIOLogTypes
@@ -28,8 +30,8 @@ extern   "C" {
      @constant                  BitIOLog_DEBUG                  "Used for debugging".
      */
     typedef enum BitIOLogTypes {
-                                BitIOLog_ERROR                  = 1,
-                                BitIOLog_DEBUG                  = 2,
+        BitIOLog_ERROR                  = 1,
+        BitIOLog_DEBUG                  = 2,
     } BitIOLogTypes;
     
     /*!
@@ -51,7 +53,7 @@ extern   "C" {
      @param                     FunctionName                    "Which function is calling BitIOLog?".
      @param                     Description                     "String describing what went wrong".
      */
-    void                        BitIOLog(BitIOLogTypes ErrorSeverity, const char *restrict LibraryOrProgram, const char *restrict FunctionName, const char *restrict Description, ...);
+    void                        BitIOLog(BitIOLogTypes ErrorSeverity, const unsigned char *restrict LibraryOrProgram, const unsigned char *restrict FunctionName, const UTF8String restrict Description, ...);
     
     /*!
      @abstract                                                  "Closes the BitIOLogFile".

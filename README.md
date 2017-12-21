@@ -41,6 +41,11 @@ Tips:
 
 * You can have as many instances of `BitInput`, `BitOutput`, and `BitBuffer` as you want, for instances, reading/writing multiple files.
 
+StringIO:
+----------
+* StringIO provides BitIO with Unicode string handling, it supports decoding and encodeding both UTF-8 and UTF-16 (actual UTF-16 with surrogate pairs, not just UCS-2).
+* The functions in StringIO use UTF-32 internally, that way we can use ANY codepoint in Unicode, StringIO is not just limited to the BMP.
+
 CommandLineIO:
 -------------
 * **Independent/Dependent Switches**
@@ -70,9 +75,8 @@ BitIO:
 * When you're all done, call `DeinitBitInput`, `DeinitBitOutput`, and `DeinitBitBuffer`.
 
 
-Logging:
+BitIOLog:
 -------
-`BitIOLog()`
 
 * Writes to a file you open with `BitIOLogOpenFile`, if it's unset or otherwise inaccessible, all logs are printed to stderr.
 * Works on any platform that provides `stderr`, and `vasprintf`.
