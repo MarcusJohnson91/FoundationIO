@@ -36,7 +36,7 @@ extern  "C" {
         return CodePointSize;
     }
     
-    uint64_t       UTF8String_GetNumCodePoints(UTF8String String) {
+    uint64_t    UTF8String_GetNumCodePoints(UTF8String String) {
         uint64_t CurrentByteNum          = 0ULL;
         uint64_t NumCodePoints           = 0ULL;
         
@@ -53,7 +53,7 @@ extern  "C" {
         return NumCodePoints;
     }
     
-    uint64_t       UTF8String_GetNumCodeUnits(UTF8String String2Count) { // Read a codeunit, get it's size, skip that many bytes, check that it's not 0x0, then repeat
+    uint64_t    UTF8String_GetNumCodeUnits(UTF8String String2Count) { // Read a codeunit, get it's size, skip that many bytes, check that it's not 0x0, then repeat
         uint64_t NumCodeUnits                = 0ULL;
         uint64_t CurrentCodeUnit             = 0ULL;
         if (String2Count != NULL) {
@@ -68,7 +68,7 @@ extern  "C" {
     }
     
     /* Decode UTF-X to UTF-32 */
-    UTF32String    UTF8String_Decode(UTF8String String, uint64_t NumCodePoints) {
+    UTF32String UTF8String_Decode(UTF8String String, uint64_t NumCodePoints) {
         uint8_t  CodePointSize = 0;
         uint64_t CodeUnitNum   = 0ULL;
         uint8_t  Byte1 = 0, Byte2 = 0, Byte3 = 0, Byte4 = 0;
@@ -118,7 +118,7 @@ extern  "C" {
         return DecodedString;
     }
     
-    UTF8String     UTF8String_Encode(UTF32String String, uint64_t StringSize) {
+    UTF8String  UTF8String_Encode(UTF32String String, uint64_t StringSize) {
         uint8_t  CodePointSize   = 0;
         uint64_t CodeUnitNum     = 0ULL;
         UTF8String EncodedString = NULL;
@@ -155,7 +155,7 @@ extern  "C" {
         return EncodedString;
     }
     
-    UTF32String    UTF16String_Decode(UTF16String String, uint64_t NumCodePoints) {
+    UTF32String UTF16String_Decode(UTF16String String, uint64_t NumCodePoints) {
         uint8_t  CodePointSize = 0;
         uint64_t CodeUnitNum   = 0ULL;
         UTF32String DecodedString = NULL;
@@ -179,7 +179,7 @@ extern  "C" {
         return DecodedString;
     }
     
-    UTF16String    UTF16String_Encode(UTF32String String, uint64_t NumCodePoints) {
+    UTF16String UTF16String_Encode(UTF32String String, uint64_t NumCodePoints) {
         uint8_t  CodePointSize    = 0;
         uint64_t CodeUnitNum      = 0ULL;
         UTF16String EncodedString = NULL;
@@ -213,7 +213,7 @@ extern  "C" {
         return EncodedString;
     }
     
-    UTF32String    UTF32String_Normalize(UTF32String String2Normalize, uint64_t StringSize) {
+    UTF32String UTF32String_Normalize(UTF32String String2Normalize, uint64_t StringSize) {
         /*
          So we should try to convert codepoints to a precomposed codepoint, but if we can't we need to order them by their lexiographic value.
          */
@@ -233,7 +233,7 @@ extern  "C" {
         return NULL;
     }
 
-    UTF32String    UTF32String_CaseFold(UTF32String String, uint64_t StringSize) {
+    UTF32String UTF32String_CaseFold(UTF32String String, uint64_t StringSize) {
         UTF32String FoldedString = NULL;
         if (String != NULL) {
             FoldedString = calloc(StringSize, sizeof(UTF32String));
@@ -255,7 +255,7 @@ extern  "C" {
         return FoldedString;
     }
     
-    bool           UTF32Strings_Compare(UTF32String String1, uint64_t String1Size, UTF32String String2, uint64_t String2Size) {
+    bool        UTF32Strings_Compare(UTF32String String1, uint64_t String1Size, UTF32String String2, uint64_t String2Size) {
         bool StringsMatch = No;
         if (String1 != NULL && String2 != NULL && String1Size == String2Size) {
             if (String1Size == String2Size) {
@@ -279,7 +279,7 @@ extern  "C" {
         return StringsMatch;
     }
     
-    uint64_t       UTF32String_FindSubstring(UTF32String String, uint64_t StringSize, UTF32String SubString, uint64_t SubStringSize) {
+    uint64_t    UTF32String_FindSubstring(UTF32String String, uint64_t StringSize, UTF32String SubString, uint64_t SubStringSize) {
         uint64_t   Offset             = 0ULL;
         uint64_t   CodePoint          = 0ULL;
         uint64_t   SubStringCodePoint = 0ULL;
@@ -304,7 +304,7 @@ extern  "C" {
         return Offset;
     }
     
-    UTF32String    UTF32String_Extract(UTF32String String, uint64_t StringSize, uint64_t Start, uint64_t End) {// Example: ~/Desktop/ElephantsDream_%05d.png, we're extracting %05d, Start = 26, End = 29, Size = 4
+    UTF32String UTF32String_Extract(UTF32String String, uint64_t StringSize, uint64_t Start, uint64_t End) {// Example: ~/Desktop/ElephantsDream_%05d.png, we're extracting %05d, Start = 26, End = 29, Size = 4
         uint64_t    ExtractedStringSize = (Start - End) + 1 + UnicodeNULLStringSize;
         UTF32String ExtractedString     = NULL;
         if (String != NULL && Start <= StringSize && End <= StringSize && End > Start) {
@@ -330,5 +330,46 @@ extern  "C" {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "End is before Start");
         }
         return ExtractedString;
+    }
+    
+    int64_t      UTF32String_ToNumber(UTF32String String, uint64_t StringSize) {
+        uint64_t CodePoint  = 0ULL;
+        int8_t   Sign       =  1;
+        uint8_t  Base       = 10;
+        int64_t  Value      =  0;
+        
+        for (uint8_t WhiteSpace = 0; WhiteSpace < WhitespaceTableSize; WhiteSpace++) {
+            if (String[CodePoint] == WhitespaceTable[WhiteSpace]) {
+                CodePoint += 1;
+            }
+        }
+        
+        if (String[CodePoint] == '0') {
+            if (String[CodePoint + 1] == 'b' || String[CodePoint + 1] == 'B') {
+                Base = 2;
+            } else if (String[CodePoint + 1] == 'o' || String[CodePoint] == 'O') {
+                Base = 8;
+            } else if (String[CodePoint + 1] == 'x' || String[CodePoint] == 'X') {
+                Base = 16;
+            }
+        } else if (String[CodePoint] == '-') {
+            Sign     = -1;
+        }
+        
+        while (CodePoint < StringSize) {
+            Value     *= Base;
+            if (Base == 16 && (String[CodePoint] >= 0x41 && String[CodePoint] <= 0x46)) {
+                Value += (String[CodePoint] - 50);
+            } else if (Base == 16 && (String[CodePoint] >= 0x61 && String[CodePoint] <= 0x66)) {
+                Value += (String[CodePoint] - 82);
+            } else if ((Base == 10 || Base == 16) && (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39)) {
+                Value += (String[CodePoint] - 48);
+            } else if (Base == 8 && (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x37)) {
+                Value += (String[CodePoint] - 48);
+            } else if (Base == 2 && (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x31)) {
+                Value += (String[CodePoint] - 48);
+            }
+        }
+        return Sign < 0 ? Value * Sign : Value;
     }
     
