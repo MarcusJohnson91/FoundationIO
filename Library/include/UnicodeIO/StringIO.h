@@ -93,6 +93,13 @@ extern  "C" {
      */
     uint64_t              UTF32String_FindSubstring(UTF32String String, uint64_t StringSize, UTF32String SubString, uint64_t SubStringSize);
     
+    /*!
+     @abstract                             "Extracts a number from a string".
+     @param               String           "The sring to extract a number from".
+     @param               StringSize       "The size of String in CodePoints".
+     */
+    int64_t               UTF32String_ToNumber(UTF32String String, uint64_t StringSize);
+    
 #ifdef  __cplusplus
 }
 #endif
