@@ -7,6 +7,7 @@
 #include "../include/BitIO.h"
 #include "../include/BitIOMath.h"
 #include "../include/BitIOLog.h"
+#include "../include/StringIO.h"
 
 #if (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(push, 0)
@@ -1012,6 +1013,7 @@ extern "C" {
         FILE                   *File;
         fpos_t                  FileSize;
         fpos_t                  FilePosition;
+        bool                    FileSpecifierExists;
         uint64_t                FileSpecifierNum;
     } BitInput;
     
@@ -1023,20 +1025,28 @@ extern "C" {
         return BitI;
     }
     
-    void BitInput_OpenFile(BitInput *BitI, const char *Path2Open) {
+    void BitInput_OpenFile(BitInput *BitI, const UTF8String Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType          = BitIOFile;
-            uint64_t Path2OpenSize  = strlen(Path2Open) + BitIONULLStringSize;
-            char *NewPath           = (char*) calloc(Path2OpenSize, sizeof(unsigned char));
-            snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
-            BitI->FileSpecifierNum += 1;
+            uint64_t Path2OpenSize  = UTF8String_GetNumCodePoints(Path2Open) + BitIONULLStringSize;
+            if (BitI->FileSpecifierExists == Yes) {
+                UTF8String NewPath  = (UTF8String) calloc(Path2OpenSize, sizeof(UTF8String));
+                snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
+                free(NewPath);
+            }
+#if    (BitIOTargetOS == BitIOWindowsOS)
+            UTF32String WidePath    = UTF8String_Decode(Path2Open, Path2OpenSize);
+            BitI->File              = _wfopen(WidePath, "rb");
+            free(WidePath);
+#elif  (BitIOTargetOS == BitIOPOSIXOS)
             BitI->File = fopen(Path2Open, "rb");
+#endif
             if (BitI->File == NULL) {
                 BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "Couldn't open file: Check that the file exists and the permissions are correct");
             } else {
                 setvbuf(BitI->File, NULL, _IONBF, 0);
             }
-            free(NewPath);
+            
         } else if (BitI == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "BitInput Pointer is NULL");
         } else if (Path2Open == NULL) {
@@ -1173,6 +1183,7 @@ extern "C" {
         int                     Socket;
         FILE                   *File;
         fpos_t                  FilePosition;
+        bool                    FileSpecifierExists;
         uint64_t                FileSpecifierNum;
     } BitOutput;
     
@@ -1184,20 +1195,27 @@ extern "C" {
         return BitO;
     }
     
-    void BitOutput_OpenFile(BitOutput *BitO, const char *Path2Open) {
+    void BitOutput_OpenFile(BitOutput *BitO, const UTF8String Path2Open) {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType          = BitIOFile;
-            uint64_t Path2OpenSize  = strlen(Path2Open) + BitIONULLStringSize;
-            char *NewPath           = (char*) calloc(Path2OpenSize, sizeof(char));
-            snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
-            BitO->FileSpecifierNum += 1;
-            BitO->File              = fopen(Path2Open, "wb");
+            uint64_t Path2OpenSize  = UTF8String_GetNumCodePoints(Path2Open) + BitIONULLStringSize;
+            if (BitO->FileSpecifierExists == Yes) {
+                UTF8String NewPath  = (UTF8String) calloc(Path2OpenSize, sizeof(UTF8String));
+                snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
+                free(NewPath);
+            }
+#if    (BitIOTargetOS == BitIOWindowsOS)
+            UTF32String WidePath    = UTF8String_Decode(Path2Open, Path2OpenSize);
+            BitO->File              = _wfopen(WidePath, "rb");
+            free(WidePath);
+#elif  (BitIOTargetOS == BitIOPOSIXOS)
+            BitO->File = fopen(Path2Open, "wb");
+#endif
             if (BitO->File != NULL) {
                 setvbuf(BitO->File, NULL, _IONBF, 0);
             } else {
                 BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "Couldn't open output file; Check that the path exists and the permissions are correct");
             }
-            free(NewPath);
         } else if (BitO == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "BitOutput Pointer is NULL");
         } else if (Path2Open == NULL) {

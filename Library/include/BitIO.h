@@ -13,6 +13,7 @@
 #pragma warning(pop)
 
 #include "BitIOMacros.h"
+#include "StringIO.h"
 
 #pragma  once
 
@@ -22,6 +23,7 @@
 #ifdef   __cplusplus
 extern   "C" {
 #endif
+    
     
     /*!
      @enum                      BitIOConstants
@@ -578,7 +580,7 @@ extern   "C" {
      @param                     BitI                            "BitInput Pointer".
      @param                     Path2Open                       "Path to the input file to open".
      */
-    void                        BitInput_OpenFile(BitInput *BitI, const char *Path2Open);
+    void                        BitInput_OpenFile(BitInput *BitI, const UTF8String Path2Open);
     
     /*!
      @abstract                                                  "Opens a socket for reading".
@@ -650,7 +652,7 @@ extern   "C" {
      @param                     BitO                            "BitOutput Pointer".
      @param                     Path2Open                       "Path to the output file to open".
      */
-    void                        BitOutput_OpenFile(BitOutput *BitO, const char *Path2Open);
+    void                        BitOutput_OpenFile(BitOutput *BitO, const UTF8String Path2Open);
     
     /*!
      @abstract                                                  "Opens a socket for writing".
