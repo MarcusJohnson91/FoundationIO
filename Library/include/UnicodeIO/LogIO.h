@@ -22,7 +22,7 @@
 extern   "C" {
 #endif
     
-    UTF8String                  BitIOLogLibraryName             = u8"libBitIO";
+    extern UTF8Constant         BitIOLogLibraryName             = u8"libBitIO";
     
     /*!
      @enum                      BitIOLogTypes
@@ -38,13 +38,13 @@ extern   "C" {
      @abstract                                                  "Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in BitIOLogFile".
      @param                     LogFilePath                     "Path to the log file to open/create".
      */
-    void                        BitIOLog_OpenFile(const char *LogFilePath);
+    void                        BitIOLog_OpenFile(UTF8String LogFilePath);
     
     /*!
      @abstract                                                  "Sets the name or path of the program to give the logs more context".
      @param                     ProgramName                     "String containing either the name or the path of the program that this library was linked into".
      */
-    void                        BitIOLog_SetProgramName(char *ProgramName);
+    void                        BitIOLog_SetProgramName(UTF8String ProgramName);
     
     /*!
      @abstract                                                  "Logs to BitIOLogFile, which can be a user specified path, otherwise it's STDERR".
@@ -53,7 +53,7 @@ extern   "C" {
      @param                     FunctionName                    "Which function is calling BitIOLog?".
      @param                     Description                     "String describing what went wrong".
      */
-    void                        BitIOLog(BitIOLogTypes ErrorSeverity, const unsigned char *restrict LibraryOrProgram, const unsigned char *restrict FunctionName, const UTF8String restrict Description, ...);
+    void                        BitIOLog(BitIOLogTypes ErrorSeverity, UTF8Constant LibraryOrProgram, UTF8Constant FunctionName, UTF8Constant Description, ...);
     
     /*!
      @abstract                                                  "Closes the BitIOLogFile".

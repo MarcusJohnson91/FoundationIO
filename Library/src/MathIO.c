@@ -13,6 +13,14 @@ extern   "C" {
         }
     }
     
+    inline bool     IsOdd(const int64_t Number2Check) {
+        bool X = No;
+        if (Number2Check % 2 == 0) {
+            X = Yes;
+        }
+        return X;
+    }
+    
     inline uint64_t Absolute(const int64_t Value) {
         return Value >= 0 ? (uint64_t) Value : (uint64_t) ~Value + 1;
     }
@@ -25,7 +33,7 @@ extern   "C" {
         return Result;
     }
     
-    inline int8_t IntegerLog2(int64_t Symbol) {
+    inline int8_t   IntegerLog2(int64_t Symbol) {
         int8_t Bits      = 0;
         if (Symbol == 0) {
             Bits         = 1;
@@ -38,11 +46,11 @@ extern   "C" {
         return Bits;
     }
     
-    inline int64_t Bytes2Bits(const int64_t Bytes) {
+    inline int64_t  Bytes2Bits(const int64_t Bytes) {
         return Bytes * 8;
     }
     
-    inline int64_t Bits2Bytes(const int64_t Bits, const bool RoundUp) {
+    inline int64_t  Bits2Bytes(const int64_t Bits, const bool RoundUp) {
         int64_t Bytes = 0ULL;
         if (RoundUp == No) {
             Bytes = Bits / 8;
@@ -52,13 +60,7 @@ extern   "C" {
         return Bytes;
     }
     
-    inline bool IsOdd(const int64_t Number2Check) {
-        bool X = No;
-        if (Number2Check % 2 == 0) {
-            X = Yes;
-        }
-        return X;
-    }
+    
     
 #ifdef   __cplusplus
 }

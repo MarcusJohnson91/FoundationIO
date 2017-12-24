@@ -46,7 +46,7 @@ extern  "C" {
                 NumCodePoints               += 1;
             } while (String[CurrentByteNum] != 0x0);
         } else {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String Pointer is NULL");
         }
         
         
@@ -61,7 +61,7 @@ extern  "C" {
                 NumCodeUnits                    += UTF8String_GetCodePointSize(String2Count[CurrentCodeUnit]);
             } while (String2Count[CurrentCodeUnit] != 0x0);
         } else {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String Pointer is NULL");
         }
         
         return NumCodeUnits;
@@ -103,16 +103,16 @@ extern  "C" {
                         if (DecodedString[CodePoint] <= 0x7F && CodePointSize > 1) {
                             // Invalid, overlong sequence detected, replace it with 0xFFFD
                             DecodedString[CodePoint] = 0xFFFD;
-                            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "CodePoint %d is overlong", CodeUnitNum);
+                            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CodePoint %d is overlong", CodeUnitNum);
                         }
                     }
                     CodeUnitNum += CodePointSize;
                 } while (String[CodeUnitNum] != 0x00);
             } else {
-                BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String Pointer is NULL, not enough memory");
+                BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"Not enough memory to allocate string");
             }
         } else {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String Pointer is NULL");
         }
         
         return DecodedString;
@@ -146,10 +146,10 @@ extern  "C" {
                     }
                 }
             } else {
-                BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String Pointer is NULL, not enough memory");
+                BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String Pointer is NULL, not enough memory");
             }
         } else {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String Pointer is NULL");
         }
         
         return EncodedString;
@@ -170,10 +170,10 @@ extern  "C" {
                     }
                 }
             } else {
-                BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String Pointer is NULL, not enough memory");
+                BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String Pointer is NULL, not enough memory");
             }
         } else {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String Pointer is NULL");
         }
         
         return DecodedString;
@@ -204,10 +204,10 @@ extern  "C" {
                     EncodedString[CodePoint + 1] = Low;
                 }
             } else {
-                BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "EncodedString Pointer is NULL, not enough memory");
+                BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"EncodedString Pointer is NULL, not enough memory");
             }
         } else {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String Pointer is NULL");
         }
         
         return EncodedString;
@@ -227,7 +227,7 @@ extern  "C" {
                 }
             }
         } else if (String2Normalize == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String2Normalize Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String2Normalize Pointer is NULL");
         }
         
         return NULL;
@@ -247,10 +247,10 @@ extern  "C" {
                     }
                 }
             } else {
-                BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "FoldedString Pointer is NULL");
+                BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"FoldedString Pointer is NULL");
             }
         } else {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String Pointer is NULL");
         }
         return FoldedString;
     }
@@ -269,11 +269,11 @@ extern  "C" {
                 StringsMatch = No;
             }
         } else if (String1 == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String1 Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String1 Pointer is NULL");
         } else if (String2 == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String2 Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String2 Pointer is NULL");
         } else if (String1Size != String2Size) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String1Size and String2Size don't match");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String1Size and String2Size don't match");
         }
         
         return StringsMatch;
@@ -294,11 +294,11 @@ extern  "C" {
                 Offset = CodePoint;
             }
         } else if (String == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String Pointer is NULL");
         } else if (SubString == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "SubString Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"SubString Pointer is NULL");
         } else if (SubStringSize >= StringSize) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "SubString is bigger than or equal to String");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"SubString is bigger than or equal to String");
         }
         
         return Offset;
@@ -316,18 +316,18 @@ extern  "C" {
                     ExtractedString[CodePoint - Start] = String[CodePoint];
                 }
             } else {
-                BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "Not enough memory to allocate ExtractedString");
+                BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"Not enough memory to allocate ExtractedString");
             }
         } else if (String == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "String Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"String Pointer is NULL");
         } else if (Start > StringSize) {
             // You can't copy past the end of the string
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "Start is after the end of the string");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"Start is after the end of the string");
         } else if (End > StringSize) {
             // You can't copy past the end of the string
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "End is after the end of the string");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"End is after the end of the string");
         } else if (End < Start) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, "End is before Start");
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"End is before Start");
         }
         return ExtractedString;
     }
