@@ -373,3 +373,27 @@ extern  "C" {
         return Sign < 0 ? Value * Sign : Value;
     }
     
+    bool UTF8String_Compare(UTF8String String1, uint64_t String1Size, UTF8String String2, uint64_t String2Size, bool Normalize, bool CaseFold) {
+        UTF32String String1UTF32 = UTF8String_Decode(String1, String1Size);
+        UTF32String String2UTF32 = UTF8String_Decode(String2, String2Size);
+        if (Normalize == Yes) {
+            // Normalize these sumbitches after decoding it
+            UTF32String_Normalize(String1UTF32, String1Size);
+            UTF32String_Normalize(String2UTF32, String2Size);
+        }
+        if (CaseFold == Yes) {
+            // CaseFold these sumbitches after decoding it
+            UTF32String_CaseFold(String1UTF32, String1Size);
+            UTF32String_CaseFold(String2UTF32, String2Size);
+        }
+        
+        // Now we compare them
+        bool StringsMatch = UTF32Strings_Compare(String1UTF32, String1Size, String2UTF32, String2Size);
+        free(String1UTF32);
+        free(String2UTF32);
+        return StringsMatch;
+    }
+    
+#ifdef  __cplusplus
+}
+#endif

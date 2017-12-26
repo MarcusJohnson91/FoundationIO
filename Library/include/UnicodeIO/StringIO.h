@@ -101,6 +101,9 @@ extern  "C" {
      */
     int64_t               UTF32String_ToNumber(UTF32String String, uint64_t StringSize);
     
+    /* High level fucntions */
+    bool                  UTF8String_Compare(UTF8String String1, uint64_t String1Size, UTF8String String2, uint64_t String2Size, bool Normalize, bool CaseFold);
+    
 #ifdef  __cplusplus
 }
 #endif
