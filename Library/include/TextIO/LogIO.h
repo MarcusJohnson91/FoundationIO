@@ -22,8 +22,6 @@
 extern   "C" {
 #endif
     
-    extern UTF8Constant         BitIOLogLibraryName             = u8"libBitIO";
-    
     /*!
      @enum                      BitIOLogTypes
      @constant                  BitIOLog_ERROR                  "An error occurred".

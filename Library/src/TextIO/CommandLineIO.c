@@ -24,6 +24,8 @@
 extern   "C" {
 #endif
     
+    UTF8Constant             CommandLineIOLibraryName    = u8"libBitIO_CommandLineIO";
+    
     /*
      Maybe what I should do, is remove the NULL pointer checking from the functions that set/get the value, to the functions that actually initalize the types in the first place.
      */
@@ -137,7 +139,7 @@ extern   "C" {
             CLI->SwitchIDs   = (CommandLineSwitch*) calloc(NumSwitches, sizeof(CommandLineSwitch));
             if (CLI->SwitchIDs == NULL) {
                 free(CLI);
-                BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"Couldn't allocate %d CommandLineSwitches", NumSwitches);
+                BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"Couldn't allocate %d CommandLineSwitches", NumSwitches);
                 exit(EXIT_FAILURE);
             }
 #if   (BitIOTargetOS == BitIOWindowsOS)
@@ -152,9 +154,9 @@ extern   "C" {
             CLI->ConsoleHeight = WindowSize.ws_col;
 #endif
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"Couldn't allocate CommandLineIO");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"Couldn't allocate CommandLineIO");
         } else if (NumSwitches == 0) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"NumSwitches %d must be greater than or equal to 1", NumSwitches);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"NumSwitches %d must be greater than or equal to 1", NumSwitches);
         }
         return CLI;
     }
@@ -164,9 +166,9 @@ extern   "C" {
             CLI->ProgramName     = Name;
             CLI->ProgramNameSize = UTF8String_GetNumCodePoints(Name);
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (Name == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"The Name string is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"The Name string is NULL");
         }
     }
     
@@ -175,9 +177,9 @@ extern   "C" {
             CLI->ProgramVersion     = Version;
             CLI->ProgramVersionSize = UTF8String_GetNumCodePoints(Version);
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (Version == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"The Version String is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"The Version String is NULL");
         }
     }
     
@@ -186,9 +188,9 @@ extern   "C" {
             CLI->ProgramDescription     = Description;
             CLI->ProgramDescriptionSize = UTF8String_GetNumCodePoints(Description);
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (Description == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"The Description String is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"The Description String is NULL");
         }
     }
     
@@ -197,9 +199,9 @@ extern   "C" {
             CLI->ProgramAuthor     = Author;
             CLI->ProgramAuthorSize = UTF8String_GetNumCodePoints(Author);
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (Author == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"The Author String is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"The Author String is NULL");
         }
     }
     
@@ -208,9 +210,9 @@ extern   "C" {
             CLI->ProgramCopyright     = Copyright;
             CLI->ProgramCopyrightSize = UTF8String_GetNumCodePoints(Copyright);
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (Copyright == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"The Copyright String is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"The Copyright String is NULL");
         }
     }
     
@@ -228,11 +230,11 @@ extern   "C" {
                 CLI->IsProprietary         = Yes;
             }
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (Name == NULL || LicenseDescription == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"At least the License Name or License Description must be set");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"At least the License Name or License Description must be set");
         } else if (LicenseURL == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"The License URL must be set");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"The License URL must be set");
         }
     }
     
@@ -240,9 +242,9 @@ extern   "C" {
         if (CLI != NULL && (MinOptions <= CLI->NumSwitches - 1 || MinOptions > 0)) {
             CLI->MinOptions = MinOptions;
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (MinOptions > CLI->NumSwitches - 1 || MinOptions <= 0) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"MinOptions %s is invalid, it should be between 0 and %d", MinOptions, CLI->NumSwitches - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"MinOptions %s is invalid, it should be between 0 and %d", MinOptions, CLI->NumSwitches - 1);
         }
     }
     
@@ -250,9 +252,9 @@ extern   "C" {
         if (CLI != NULL && (HelpSwitch >= 0 && HelpSwitch <= CLI->NumSwitches - 1)) {
             CLI->HelpSwitch = HelpSwitch;
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (HelpSwitch >= 0 && HelpSwitch <= CLI->NumSwitches - 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"HelpSwitch %d is invalid, it should be between 0 and %d", HelpSwitch, CLI->NumSwitches - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"HelpSwitch %d is invalid, it should be between 0 and %d", HelpSwitch, CLI->NumSwitches - 1);
         }
     }
     
@@ -260,11 +262,11 @@ extern   "C" {
         if (CLI != NULL && (SwitchID >= 0 && SwitchID <= CLI->NumSwitches - 1) && Name != NULL) {
             CLI->SwitchIDs[SwitchID].Name = Name;
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (Name == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"Name String is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"Name String is NULL");
         } else if (SwitchID >= 0 && SwitchID <= CLI->NumSwitches - 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", SwitchID, CLI->NumSwitches - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -273,11 +275,11 @@ extern   "C" {
             CLI->SwitchIDs[SwitchID].Description     = Description;
             CLI->SwitchIDs[SwitchID].DescriptionSize = UTF8String_GetNumCodePoints(Description);
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (Description == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"Description String is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"Description String is NULL");
         } else if (SwitchID < 0 || SwitchID >= CLI->NumSwitches - 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", SwitchID, CLI->NumSwitches - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -290,11 +292,11 @@ extern   "C" {
                 CLI->SwitchIDs[SwitchID].PotentialSlaves     = NULL;
             }
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (SwitchType == UnknownSwitchType) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"You can not set SwitchID %d to UnknownSwitchType", SwitchID);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"You can not set SwitchID %d to UnknownSwitchType", SwitchID);
         } else if (SwitchID < 0 || SwitchID >= CLI->NumSwitches - 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", SwitchID, CLI->NumSwitches - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -302,11 +304,11 @@ extern   "C" {
         if (CLI != NULL && ArgumentType != UnknownArgumentType && (SwitchID > 0 && SwitchID < CLI->NumSwitches - 1)) {
             CLI->SwitchIDs[SwitchID].ArgumentType = ArgumentType;
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (ArgumentType == UnknownArgumentType) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"You can not set SwitchID %d to UnknownArgumentType", SwitchID);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"You can not set SwitchID %d to UnknownArgumentType", SwitchID);
         } else if (SwitchID < 0 || SwitchID >= CLI->NumSwitches - 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", SwitchID, CLI->NumSwitches - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -320,11 +322,11 @@ extern   "C" {
             }
             CLI->SwitchIDs[MasterID].PotentialSlaves[CLI->SwitchIDs[MasterID].NumPotentialSlaves - 1] = SlaveID;
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (MasterID < 0 && MasterID >= CLI->NumSwitches - 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"MasterID %d is invalid, it should be between 0 and %d", MasterID, CLI->NumSwitches - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"MasterID %d is invalid, it should be between 0 and %d", MasterID, CLI->NumSwitches - 1);
         } else if (SlaveID < 0 && SlaveID >= CLI->NumSwitches - 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"SlaveID %d is invalid, it should be between 0 and %d", SlaveID, CLI->NumSwitches - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"SlaveID %d is invalid, it should be between 0 and %d", SlaveID, CLI->NumSwitches - 1);
         }
     }
     
@@ -332,11 +334,11 @@ extern   "C" {
         if (CLI != NULL && (MasterID > 0 && MasterID < CLI->NumSwitches - 1) && (MaxConcurrentSlaves > 0 && MaxConcurrentSlaves < CLI->NumSwitches - 1)) {
             CLI->SwitchIDs[MasterID].MaxConcurrentSlaves = MaxConcurrentSlaves;
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (MasterID < 0 && MasterID >= CLI->NumSwitches - 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"MasterID %d is invalid, it should be between 0 and %d", MasterID, CLI->NumSwitches - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"MasterID %d is invalid, it should be between 0 and %d", MasterID, CLI->NumSwitches - 1);
         } else if (MaxConcurrentSlaves < 0 && MaxConcurrentSlaves >= CLI->NumSwitches - 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"MaxConcurrentSlaves %d is invalid, it should be between 0 and %d", MasterID, CLI->NumSwitches - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"MaxConcurrentSlaves %d is invalid, it should be between 0 and %d", MasterID, CLI->NumSwitches - 1);
         }
     }
     
@@ -353,7 +355,7 @@ extern   "C" {
                 }
             }
         } else {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         }
     }
     
@@ -368,7 +370,7 @@ extern   "C" {
                 fprintf(stdout, "%s, By using this software, you agree to the End User License Agreement %s, available at: %s%s", CLI->ProgramDescription, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, BitIONewLine);
             }
         } else {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         }
     }
     
@@ -379,20 +381,20 @@ extern   "C" {
             uint32_t ArgumentStringSize       = UTF8String_GetNumCodePoints(ArgumentString);
             
             if (ArgumentStringSize >= 2) {
-                //BitIOLog(BitIOLog_DEBUG, BitIOLogLibraryName, __func__, "ArgumentString[0] = 0x%X, ArgumentString[1] = 0x%X", ArgumentString[0], ArgumentString[1]);
+                //BitIOLog(BitIOLog_DEBUG, CommandLineIOLibraryName, __func__, "ArgumentString[0] = 0x%X, ArgumentString[1] = 0x%X", ArgumentString[0], ArgumentString[1]);
                 if (ArgumentString[0] == '-' && ArgumentString[1] == '-') {
                     ArgumentStringPrefixSize  = 2;
                 } else if (ArgumentString[0] == "/" || ArgumentString[0] == "\\" || ArgumentString[0] == "-") {
                   ArgumentStringPrefixSize    = 1;
                 }
             } else {
-                BitIOLog(BitIOLog_DEBUG, BitIOLogLibraryName, __func__, "OptionString is not an option string");
+                BitIOLog(BitIOLog_DEBUG, CommandLineIOLibraryName, __func__, "OptionString is not an option string");
             }
             uint64_t ArgumentSwitchSize    = ArgumentStringSize - ArgumentStringPrefixSize;
             ArgumentSwitch                 = (UTF8String) calloc(ArgumentSwitchSize + NULLTerminatorSize, sizeof(UTF8String));
             strncpy(ArgumentSwitch, &ArgumentString[ArgumentStringPrefixSize], ArgumentSwitchSize);
         } else {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"OptionString Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"OptionString Pointer is NULL");
         }
         return ArgumentSwitch;
     }
@@ -422,9 +424,9 @@ extern   "C" {
     
     void ParseCommandLineOptions(CommandLineIO *CLI, const int argc, const char *argv[]) {
         if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (argc < CLI->MinOptions || argc <= 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"You entered %d options, the minimum is %d", argc - 1, CLI->MinOptions);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"You entered %d options, the minimum is %d", argc - 1, CLI->MinOptions);
         } else {
             /* Ok, so the first thing we need to do is loop over the arguments, and loop over the actual bytes of each argument */
             int32_t  CurrentArgument        = 1LL;
@@ -552,18 +554,18 @@ extern   "C" {
         if (CLI != NULL && (OptionID < 0 && OptionID > CLI->NumOptions - 1) && (NumSlaves < 0 && NumSlaves > CLI->NumSwitches - 1)) {
             
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (OptionID < 0 || OptionID > CLI->NumOptions - 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", OptionID, CLI->NumSwitches - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", OptionID, CLI->NumSwitches - 1);
         }
         
         
         if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (OptionID > CLI->NumSwitches - 1 || OptionID < 0) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", OptionID, CLI->NumSwitches - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", OptionID, CLI->NumSwitches - 1);
         } else if (NumSlaves > CLI->NumSwitches - 1 || NumSlaves < 0) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"NumSlaves %d is invalid, it should be between 0 and %d", NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"NumSlaves %d is invalid, it should be between 0 and %d", NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
         } else {
             for (int64_t Option = 0LL; Option < CLI->NumOptions - 1; Option++) {
                 if (CLI->OptionIDs[Option].SwitchID == OptionID) {
@@ -606,11 +608,11 @@ extern   "C" {
                 //TODO: Now we just need to make sure that for switches like "-Input -RightEye" it doesn't return -Input -LeftEye
             }
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (OptionID < 0 || OptionID > CLI->NumOptions - 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", OptionID, CLI->NumSwitches - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", OptionID, CLI->NumSwitches - 1);
         } else if (NumSlaves < 0 || NumSlaves > CLI->NumOptions - 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"NumSlaves %d is invalid, it should be between 0 and %d", NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"NumSlaves %d is invalid, it should be between 0 and %d", NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
         }
         return MatchingOption;
     }
@@ -620,9 +622,9 @@ extern   "C" {
         if (CLI != NULL && (OptionID >= 0 && OptionID <= CLI->NumOptions - 1)) {
             Result = CLI->OptionIDs[OptionID].Argument;
         } else if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (OptionID < 0 || OptionID > CLI->NumOptions - 1) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"Option %d is outside the range 0 - %d", OptionID, CLI->NumOptions - 1);
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"Option %d is outside the range 0 - %d", OptionID, CLI->NumOptions - 1);
         }
         return Result;
     }
@@ -647,7 +649,7 @@ extern   "C" {
                  BitIOLog(BitIOLog_ERROR, "CommandLineIO", __func__, u8"Couldn't allocate %lld bytes for the Extension String", ExtensionSize);
             }
         } else {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"Path Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"Path Pointer is NULL");
         }
         return ExtensionString;
     }
@@ -694,7 +696,7 @@ extern   "C" {
     
     void CommandLineIO_Deinit(CommandLineIO *CLI) {
         if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
+            BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"CommandLineIO Pointer is NULL");
         } else {
             if (CLI->SwitchIDs != NULL) {
                 for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
@@ -754,13 +756,13 @@ extern   "C" {
     
     
     void PrintCommandLineOptions(CommandLineIO *CLI) {
-        BitIOLog(BitIOLog_DEBUG, BitIOLogLibraryName, __func__, "NumOptions %d", CLI->NumOptions);
+        BitIOLog(BitIOLog_DEBUG, CommandLineIOLibraryName, __func__, "NumOptions %d", CLI->NumOptions);
         for (int64_t Option = 0LL; Option < CLI->NumOptions; Option++) {
             if (CLI->OptionIDs[Option].SwitchID >= 0) {
-                BitIOLog(BitIOLog_DEBUG, BitIOLogLibraryName, __func__, "OptionID %d, OptionSwitchID %d, OptionFlag %s, OptionType %d, OptionArgument %s", Option, CLI->OptionIDs[Option].SwitchID, CLI->SwitchIDs[CLI->OptionIDs[Option].SwitchID].Name, CLI->SwitchIDs[CLI->OptionIDs[Option].SwitchID].SwitchType, CLI->OptionIDs[Option].Argument);
+                BitIOLog(BitIOLog_DEBUG, CommandLineIOLibraryName, __func__, "OptionID %d, OptionSwitchID %d, OptionFlag %s, OptionType %d, OptionArgument %s", Option, CLI->OptionIDs[Option].SwitchID, CLI->SwitchIDs[CLI->OptionIDs[Option].SwitchID].Name, CLI->SwitchIDs[CLI->OptionIDs[Option].SwitchID].SwitchType, CLI->OptionIDs[Option].Argument);
                 if (CLI->OptionIDs[Option].NumOptionSlaves >= 1) {
                     for (int64_t OptionSlave = 0LL; OptionSlave < CLI->OptionIDs[Option].NumOptionSlaves; OptionSlave++) {
-                        BitIOLog(BitIOLog_DEBUG, BitIOLogLibraryName, __func__, "SlaveID %d", OptionSlave);
+                        BitIOLog(BitIOLog_DEBUG, CommandLineIOLibraryName, __func__, "SlaveID %d", OptionSlave);
                     }
                 }
             }
