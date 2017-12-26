@@ -30,8 +30,8 @@ extern   "C" {
      @constant                  BitIOLog_DEBUG                  "Used for debugging".
      */
     typedef enum BitIOLogTypes {
-        BitIOLog_ERROR                  = 1,
-        BitIOLog_DEBUG                  = 2,
+                                BitIOLog_ERROR                  = 1,
+                                BitIOLog_DEBUG                  = 2,
     } BitIOLogTypes;
     
     /*!
