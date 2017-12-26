@@ -25,6 +25,8 @@
 extern "C" {
 #endif
     
+    UTF8Constant         BitIOLogLibraryName             = u8"libBitIO";
+    
     static inline uint8_t NumBits2ExtractFromByte(const uint64_t BitOffset, const uint8_t Bits2Extract) {
         uint8_t Bits2ExtractFromThisByte = 0;
         uint8_t BitsInThisByte           = BitOffset % 8;
