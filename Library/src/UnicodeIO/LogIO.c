@@ -42,10 +42,6 @@ extern "C" {
     }
     
     void BitIOLog(BitIOLogTypes ErrorSeverity, UTF8Constant LibraryOrProgram, UTF8Constant FunctionName, UTF8Constant Description, ...) {
-        // Get the size of the Variadic arguments, on windows use `_vscprintf`; on POSIX use
-//#define ErrorString (ErrorSeverity == BitIOLog_ERROR ? BitIOLogErrorString : BitIOLogDebugString)
-        //UTF8Constant ErrorString = ErrorSeverity == BitIOLog_ERROR ? u8"ERROR" : u8"DEBUG";
-        
         UTF8Constant ErrorString = u8"ERROR";
         UTF8Constant DebugString = u8"DEBUG";
         
