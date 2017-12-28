@@ -1,16 +1,3 @@
-/*!
- @header    BitIOMacros.h
- @author    Marcus Johnson aka BumbleBritches57
- @copyright 2017 - 2017, Marcus Johnson
- @version   1.0.0
- @brief     This header contains preprocessor macros for generic functions in BitIO, and cross-platform compatibility.
- */
-
-#pragma warning(push, 0)
-#include <limits.h>
-#include <float.h>
-#pragma warning(pop)
-
 #pragma once
 
 #ifndef LIBBITIO_BitIOMacros_H
@@ -19,6 +6,14 @@
 #ifdef  __cplusplus
 extern  "C" {
 #endif
+    
+    /*!
+     @header    BitIOMacros.h
+     @author    Marcus Johnson aka BumbleBritches57
+     @copyright 2017 - 2017, Marcus Johnson
+     @version   1.0.0
+     @brief     This header contains preprocessor macros for generic functions in BitIO, and cross-platform compatibility.
+     */
     
 #ifndef BitIOUnknownOS
 #define BitIOUnknownOS    0
@@ -43,7 +38,7 @@ extern  "C" {
     
 #ifndef             BitIONewLineSize
 #define             BitIONewLineSize    1
-static   const char BitIONewLine[2]  = {0x0D, 0x00}; /* \r */
+    static   const char BitIONewLine[2]  = {0x0D, 0x00}; /* \r */
 #endif
     
 #elif    defined(_POSIX_C_SOURCE) || defined(__APPLE__) || defined(__MACH__) || defined(BSD) || defined(linux) || defined(__linux)
@@ -51,7 +46,7 @@ static   const char BitIONewLine[2]  = {0x0D, 0x00}; /* \r */
 #ifndef             BitIOTargetOS
 #define             BitIOTargetOS (BitIOPOSIXOS)
 #endif
-  
+    
 #undef              fseek
 #define             fseek               fseeko
     
@@ -60,24 +55,24 @@ static   const char BitIONewLine[2]  = {0x0D, 0x00}; /* \r */
     
 #ifndef             BitIONewLineSize
 #define             BitIONewLineSize    1
-static   const char BitIONewLine[2]  = {0x0A, 0x00}; /* \n */
+    static   const char BitIONewLine[2]  = {0x0A, 0x00}; /* \n */
 #endif
     
 #elif    defined(_WIN32) || defined(__WIN32__) || defined(_WIN64) || defined(__WINDOWS__)
-
+    
 #ifndef             BitIOTargetOS
 #define             BitIOTargetOS (BitIOWindowsOS)
 #endif
-
+    
 #ifndef             BitIONewLineSize
 #define             BitIONewLineSize    2
-static   const char BitIONewLine[3]  = {0x0D, 0x0A, 0x00}; /* \r\n */
+    static   const char BitIONewLine[3]  = {0x0D, 0x0A, 0x00}; /* \r\n */
 #endif
-
+    
 #ifndef             restrict
 #define             restrict          __restrict
 #endif
-
+    
 #ifndef             strncasecmp
 #define             strncasecmp        _strnicmp
 #endif
@@ -93,6 +88,15 @@ static   const char BitIONewLine[3]  = {0x0D, 0x0A, 0x00}; /* \r\n */
 #endif
     
 #endif   /* End OS detection */
+    
+#if    (BitIOTargetOS == BitIOWindowsOS)
+#pragma warning(push, 0)
+#endif
+#include <limits.h>
+#include <float.h>
+#if    (BitIOTargetOS == BitIOWindowsOS)
+#pragma warning(pop)
+#endif
     
 #ifndef   BitIOByteOrders
 #define   BitIOByteOrders
@@ -122,19 +126,19 @@ static   const char BitIONewLine[3]  = {0x0D, 0x0A, 0x00}; /* \r\n */
 #define    BitIOByteBitOrders
 #ifndef    BitIOLSByte
 #define    BitIOLSByte         ULLONG_MAX
-typedef    unsigned long long  BitBLSByte_t;
+    typedef    unsigned long long  BitBLSByte_t;
 #endif  /* BitIOLittleEndian */
 #ifndef    BitIOMSByte
 #define    BitIOMSByte         LLONG_MIN
-typedef    signed long long    BitBMSByte_t;
+    typedef    signed long long    BitBMSByte_t;
 #endif  /* BitIOBigEndian */
 #ifndef    BitIOLSBit
 #define    BitIOLSBit          ULLONG_MAX
-typedef    unsigned long long  BitBLSBit_t;
+    typedef    unsigned long long  BitBLSBit_t;
 #endif  /* BitIOLSBit */
 #ifndef    BitIOMSBit
 #define    BitIOMSBit          LLONG_MIN
-typedef    signed long long    BitBMSBit_t;
+    typedef    signed long long    BitBMSBit_t;
 #endif  /* BitIOMSBit */
 #endif  /* BitIOByteBitOrders */
     
@@ -142,11 +146,11 @@ typedef    signed long long    BitBMSBit_t;
 #define    BitIOGUUIDTypes
 #ifndef    BitIOGUUIDString
 #define    BitIOGUUIDString    ULLONG_MAX
-typedef    unsigned long long  GUUIDString_t;
+    typedef    unsigned long long  GUUIDString_t;
 #endif  /* BitIOGUIDString */
 #ifndef    BitIOBinaryGUUID
 #define    BitIOBinaryGUUID    FLT_MIN
-typedef    float               BinaryGUUID_t;
+    typedef    float               BinaryGUUID_t;
 #endif  /* BitIOBinaryGUID */
 #endif  /* BitIOGUUIDTypes */
     

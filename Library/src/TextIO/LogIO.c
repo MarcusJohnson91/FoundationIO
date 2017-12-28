@@ -1,21 +1,20 @@
-#pragma warning(push, 0)        
+#include "../include/BitIOLog.h"
+
+#if    (BitIOTargetOS == BitIOWindowsOS)
+#pragma warning(push, 0)
+#endif
 #include <stdarg.h>  /* Included for the variadic argument support macros */
 #include <stdio.h>   /* Included for the printf family */
 #include <stdlib.h>  /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
-#include <string.h>  /* Included for atoll, memset */
+#if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(pop)
-
-#include "../include/BitIOMacros.h"
-#include "../include/BitIOLog.h"
-#include "../include/StringIO.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
     
 #define BitIOLogNULLStringSize 1
-    UTF8Constant BitIOLogErrorString = u8"ERROR";
-    UTF8Constant BitIOLogDebugString = u8"DEBUG";
     
     static FILE       *BitIOLogFile     = NULL;
     static UTF8String  BitIOProgramName = NULL;

@@ -1,23 +1,21 @@
-#pragma warning(push, 0)        
-#include <assert.h>     /* Included for static_assert */
-#include <stdlib.h>     /* Included for calloc, realloc, and free */
-#include <string.h>     /* Included for strlen */
-#pragma warning(pop)
-
-#include "../include/BitIO.h"
 #include "../include/BitIOMath.h"
 #include "../include/BitIOLog.h"
-#include "../include/StringIO.h"
+#include "../include/BitIO.h"
 
-#if (BitIOTargetOS == BitIOWindowsOS)
+#if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(push, 0)
-#include           <io.h>         /* Actual Socket functions like _read, _write */
-#include           <winsock.h>    /* Included for the socket support on Windows */
-#pragma warning(pop)
+#endif
+#include <stdlib.h>     /* Included for calloc, realloc, and free */
+#include <string.h>     /* Included for strlen */
+#include <stdio.h>      /* Included for the FILE type, SEEK SET/END/CUR macros */
+#if   (BitIOTargetOS == BitIOWindowsOS)
+#include <io.h>         /* Actual Socket functions like _read, _write */
+#include <winsock.h>    /* Included for the socket support on Windows */
 #elif (BitIOTargetOS == BitIOPOSIXOS)
-#pragma warning(push, 0)  
-#include           <sys/socket.h> /* Included for connect, socket, sockaddr */
-#include           <unistd.h>     /* Included for read and shit */
+#include <sys/socket.h> /* Included for connect, socket, sockaddr */
+#include <unistd.h>     /* Included for read and shit */
+#endif
+#if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(pop)
 #endif
 
@@ -25,7 +23,7 @@
 extern "C" {
 #endif
     
-    UTF8Constant         BitIOLogLibraryName             = u8"libBitIO";
+    static UTF8Constant   BitIOLogLibraryName = u8"libBitIO";
     
     static inline uint8_t NumBits2ExtractFromByte(const uint64_t BitOffset, const uint8_t Bits2Extract) {
         uint8_t Bits2ExtractFromThisByte = 0;
@@ -265,7 +263,7 @@ extern "C" {
     
     void BitBuffer_Align(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
         if (BitB != NULL && (BytesOfAlignment % 2 == 0 || BytesOfAlignment == 1)) {
-            uint8_t Bits2Align = (BytesOfAlignment * 8) - (BitB->BitOffset % (BytesOfAlignment * 8)); // 127 bits, 64 bits 2 align
+            uint8_t Bits2Align = (BytesOfAlignment * 8) - (BitB->BitOffset % (BytesOfAlignment * 8));
             if ((BitB->BitOffset + Bits2Align > BitB->NumBits) || (BitB->BitOffset + Bits2Align < BitB->NumBits)) {
                 BitB->Buffer   = (uint8_t*) realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
                 BitB->NumBits += Bits2Align;
@@ -1123,10 +1121,9 @@ extern "C" {
     static void BitInput_FindFileSize(BitInput *BitI) {
         if (BitI != NULL) {
             fseek(BitI->File, 0, SEEK_END);
-            BitI->FileSize = ftell(BitI->File);
+            BitI->FileSize     = ftell(BitI->File);
             fseek(BitI->File, 0, SEEK_SET);
             BitI->FilePosition = ftell(BitI->File);
-            //fgetpos(BitI->File, &BitI->FilePosition);
         } else {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"BitInput Pointer is NULL");
         }
@@ -1165,9 +1162,9 @@ extern "C" {
             if (BitI->FileType == BitIOFile) {
                 fclose(BitI->File);
             } else if (BitI->FileType == BitIOSocket) {
-#if    (BitIOTargetOS == BitIOPOSIXOS)
+#if   (BitIOTargetOS == BitIOPOSIXOS)
 				close(BitI->Socket);
-#elif  (BitIOTargetOS == BitIOWindowsOS)
+#elif (BitIOTargetOS == BitIOWindowsOS)
 				_close(BitI->Socket);
 #endif          
             }
@@ -1206,11 +1203,11 @@ extern "C" {
                 snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
                 free(NewPath);
             }
-#if    (BitIOTargetOS == BitIOWindowsOS)
+#if   (BitIOTargetOS == BitIOWindowsOS)
             UTF32String WidePath    = UTF8String_Decode(Path2Open, Path2OpenSize);
             BitO->File              = _wfopen(WidePath, "rb");
             free(WidePath);
-#elif  (BitIOTargetOS == BitIOPOSIXOS)
+#elif (BitIOTargetOS == BitIOPOSIXOS)
             BitO->File = fopen(Path2Open, "wb");
 #endif
             if (BitO->File != NULL) {
@@ -1277,9 +1274,9 @@ extern "C" {
             if (BitO->FileType == BitIOFile) {
                 fclose(BitO->File);
             } else if (BitO->FileType == BitIOSocket) {
-#if (BitIOTargetOS == BitIOPOSIXOS)
+#if   (BitIOTargetOS == BitIOPOSIXOS)
 				close(BitO->Socket);
-#elif   (BitIOTargetOS == BitIOWindowsOS)
+#elif (BitIOTargetOS == BitIOWindowsOS)
 				_close(BitO->Socket);
 #endif  
             }

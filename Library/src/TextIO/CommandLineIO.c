@@ -1,30 +1,29 @@
+#include "../include/BitIOLog.h"
 #include "../include/CommandLineIO.h"
 
-#include "../include/BitIOLog.h"
-#include "../include/BitIOMacros.h"
-#include "../include/StringIO.h"
-
+#if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(push, 0)
-#include <assert.h>     /* Included for static_assert */
+#endif
 #include <stdarg.h>     /* Included for the variadic argument support macros */
 #include <stdbool.h>    /* Included for bool */
-#include <stdio.h>      /* Included for fprintf, stdout, sprintf */
+#include <stdio.h>      /* Included for fprintf, STD IN/OUT/ERR, sprintf */
 #include <stdlib.h>     /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 #include <string.h>     /* Included for memset */
-#if   (BitIOTargetOS == BitIOPOSIXOS)
-#include <strings.h>    /* Included for strncasecmp */
+#if    (BitIOTargetOS == BitIOPOSIXOS)
 #include <sys/ioctl.h>  /* Included for the terminal size */
 #include <sys/ttycom.h> /* Included for winsize, TIOCGWINSZ */
-#elif (BitIOTargetOS == BitIOWindowsOS)
-#include <wincon.h>
+#elif  (BitIOTargetOS == BitIOWindowsOS)
+#include <wincon.h>     /* Included for getting the terminal size */
 #endif
+#if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(pop)
+#endif
 
 #ifdef   __cplusplus
 extern   "C" {
 #endif
     
-    UTF8Constant             CommandLineIOLibraryName    = u8"libBitIO_CommandLineIO";
+    static UTF8Constant      CommandLineIOLibraryName    = u8"libBitIO_CommandLineIO";
     
     /*
      Maybe what I should do, is remove the NULL pointer checking from the functions that set/get the value, to the functions that actually initalize the types in the first place.
@@ -146,7 +145,7 @@ extern   "C" {
             CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
             GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
             CLI->ConsoleHeight = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
-            CLI->ConsoleWidth = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
+            CLI->ConsoleWidth  = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
 #elif (BitIOTargetOS == BitIOPOSIXOS)
             struct winsize WindowSize;
             ioctl(0, TIOCGWINSZ, &WindowSize);
