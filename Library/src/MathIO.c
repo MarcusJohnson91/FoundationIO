@@ -1,4 +1,3 @@
-#include "../include/BitIOMacros.h"
 #include "../include/BitIOMath.h"
 
 #ifdef   __cplusplus
@@ -59,8 +58,6 @@ extern   "C" {
         }
         return Bytes;
     }
-    
-    
     
 #ifdef   __cplusplus
 }

@@ -1,22 +1,20 @@
-#include "../include/BitIOMacros.h"
-#include "../include/StringIO.h"
-#include "../include/BitIOMath.h"
 #include "../include/BitIOLog.h"
+#include "../include/StringIO.h"
 
 #if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(push, 0)
 #endif
-#include <assert.h>  /* Included for static_assert */
-#include <stdlib.h>  /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
-#include <string.h>  /* Included for the atoll */
+#include <stdlib.h>  /* Included for calloc, and free */
 #if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(pop)
 #endif
 
-#include "StringIOTables.h"
-
-#define UnicodeNULLStringSize  1
-#define UTF16BOMSize           1
+#define UnicodeNULLStringSize         1
+#define UTF16BOMSize                  1
+#define WhitespaceTableSize          30
+#define NormalizationTableSize       45
+#define NormalizationTableMaxWidth    5
+#define SimpleCaseFoldTableSize    1298
 
 /* 0x00 is valid in UTF-16, NULL is 0x0000, be sure to catch this mistake. */
 /* U+D800 - U+DFFF are invalid UTF32 code points. when converting to/from UTF32 make sure that that is not a code point becuse they're reserved as UTF-16 surrogate pairs */
@@ -218,11 +216,6 @@ extern  "C" {
         
         return EncodedString;
     }
-    
-#define WhitespaceTableSize        30
-#define NormalizationTableSize     45
-#define NormalizationTableMaxWidth  5
-#define SimpleCaseFoldTableSize  1298
     
     static const UTF32CodePoint WhitespaceTable[WhitespaceTableSize] = {
         0x00009, 0x0000A, 0x0000B, 0x0000C, 0x0000D, 0x00020,
@@ -651,7 +644,7 @@ extern  "C" {
         {0x1E950,0}, {0x1E951,1}, {0x1E952,2}, {0x1E953,3}, {0x1E954,4}, {0x1E955,5}, {0x1E956,6}, {0x1E957,7}, {0x1E958,8}, {0x1E959,9},
     };
     
-    UTF32String UTF32String_Normalize(UTF32String String2Normalize, uint64_t StringSize) {
+    static UTF32String UTF32String_Normalize(UTF32String String2Normalize, uint64_t StringSize) {
         /*
          So we should try to convert codepoints to a precomposed codepoint, but if we can't we need to order them by their lexiographic value.
          */
@@ -742,14 +735,12 @@ extern  "C" {
         return Offset;
     }
     
-    UTF32String UTF32String_Extract(UTF32String String, uint64_t StringSize, uint64_t Start, uint64_t End) {// Example: ~/Desktop/ElephantsDream_%05d.png, we're extracting %05d, Start = 26, End = 29, Size = 4
+    UTF32String UTF32String_Extract(UTF32String String, uint64_t StringSize, uint64_t Start, uint64_t End) {
         uint64_t    ExtractedStringSize = (Start - End) + 1 + UnicodeNULLStringSize;
         UTF32String ExtractedString     = NULL;
         if (String != NULL && Start <= StringSize && End <= StringSize && End > Start) {
-            // the extracted strings size is End - Start
             ExtractedString             = calloc(ExtractedStringSize, sizeof(uint32_t));
             if (ExtractedString != NULL) {
-                // Start copying the codepoints
                 for (uint64_t CodePoint = Start; CodePoint < End; CodePoint++) {
                     ExtractedString[CodePoint - Start] = String[CodePoint];
                 }
@@ -759,10 +750,8 @@ extern  "C" {
         } else if (String == NULL) {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String Pointer is NULL");
         } else if (Start > StringSize) {
-            // You can't copy past the end of the string
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"Start is after the end of the string");
         } else if (End > StringSize) {
-            // You can't copy past the end of the string
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"End is after the end of the string");
         } else if (End < Start) {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"End is before Start");

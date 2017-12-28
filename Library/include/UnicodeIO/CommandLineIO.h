@@ -1,19 +1,14 @@
-/*!
- @header    CommandLineIO.h
- @author    Marcus Johnson
- @copyright 2017, Marcus Johnson
- @version   4.0.0
- @brief     This header contains code for parsing command line options.
- */
+#include "../include/BitIOMacros.h"
+#include "../include/StringIO.h"
 
-#pragma warning(push, 0)        
+#if    (BitIOTargetOS == BitIOWindowsOS)
+#pragma warning(push, 0)
+#endif
 #include <stdbool.h> /* Included for the bool type */
 #include <stdint.h>  /* Included for the u/intX_t types */
+#if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(pop)
-
-#include "BitIOMacros.h"
-
-#include "../include/StringIO.h"
+#endif
 
 #pragma  once
 
@@ -23,6 +18,14 @@
 #ifdef   __cplusplus
 extern   "C" {
 #endif
+    
+    /*!
+     @header    CommandLineIO.h
+     @author    Marcus Johnson aka BumbleBritches57
+     @copyright 2017, Marcus Johnson
+     @version   4.0.0
+     @brief     This header contains code for parsing command line options.
+     */
     
     /*!
      @enum                      CLISwitchTypes

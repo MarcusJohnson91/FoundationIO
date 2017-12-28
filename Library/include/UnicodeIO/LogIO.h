@@ -1,17 +1,14 @@
-/*!
- @header    BitIOLog.h
- @author    Marcus Johnson aka BumbleBritches57
- @copyright 2017 - 2017, Marcus Johnson
- @version   1.0.0
- @brief     This header contains code for logging errors and debugging information.
- */
+#include "../include/BitIOMacros.h"
+#include "../include/StringIO.h"
 
-#pragma warning(push, 0)        
+#if    (BitIOTargetOS == BitIOWindowsOS)
+#pragma warning(push, 0)
+#endif
 #include <stdbool.h>
 #include <stdint.h>
+#if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(pop)
-
-#include "../include/StringIO.h"
+#endif
 
 #pragma  once
 
@@ -21,6 +18,14 @@
 #ifdef   __cplusplus
 extern   "C" {
 #endif
+    
+    /*!
+     @header    BitIOLog.h
+     @author    Marcus Johnson aka BumbleBritches57
+     @copyright 2017 - 2017, Marcus Johnson
+     @version   1.0.0
+     @brief     This header contains code for logging errors and debugging information.
+     */
     
     /*!
      @enum                      BitIOLogTypes

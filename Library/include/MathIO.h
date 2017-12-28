@@ -1,16 +1,13 @@
-/*!
- @header    BitIOMath.h
- @author    Marcus Johnson aka BumbleBritches57
- @copyright 2017 - 2017, Marcus Johnson
- @version   1.0.0
- @brief     This header contains code for specific mathematical functions used in BitIO and it's consumers.
- */
+#include "../include/BitIOMacros.h"
 
-#pragma warning(push, 0)        
-#include <math.h>    /* Included for the math functions like log2 */
+#if    (BitIOTargetOS == BitIOWindowsOS)
+#pragma warning(push, 0)
+#endif
 #include <stdbool.h> /* Included for the bool type */
 #include <stdint.h>  /* Included for the u/intX_t types */
+#if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(pop)
+#endif
 
 #pragma  once
 
@@ -20,6 +17,14 @@
 #ifdef   __cplusplus
 extern   "C" {
 #endif
+    
+    /*!
+     @header    BitIOMath.h
+     @author    Marcus Johnson aka BumbleBritches57
+     @copyright 2017 - 2017, Marcus Johnson
+     @version   1.0.0
+     @brief     This header contains code for specific mathematical functions used in BitIO and it's consumers.
+     */
     
     /*!
      @abstract                                                  "Tells if the number is negative".

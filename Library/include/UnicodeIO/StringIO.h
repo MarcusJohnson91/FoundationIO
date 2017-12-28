@@ -1,15 +1,13 @@
-/*!
- @header    StringIO.h
- @author    Marcus Johnson aka BumbleBritches57
- @copyright 2017 - 2017, Marcus Johnson
- @version   0.2.0
- @brief     This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
- */
+#include "../include/BitIOMacros.h"
 
+#if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(push, 0)
+#endif
 #include <stdbool.h> /* Included for the bool type */
 #include <stdint.h>  /* Included for the u/intX_t types */
+#if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(pop)
+#endif
 
 #pragma once
 
@@ -20,10 +18,19 @@
 extern  "C" {
 #endif
     
+    /*!
+     @header    StringIO.h
+     @author    Marcus Johnson aka BumbleBritches57
+     @copyright 2017
+     @version   0.2.0
+     @brief     This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
+     */
+    
     typedef       unsigned char*  UTF8String;     // MUST be NULL terminated, and just tweak the code until you get it to while loop while not 0
     typedef const unsigned char   UTF8Constant[]; // MUST be NULL terminated
     typedef       unsigned short* UTF16String;    // MUST be NULL terminated
     typedef       unsigned long*  UTF32String;    // MUST be NULL terminated
+    typedef       unsigned long   UTF32CodePoint;
     
     /*!
      @abstract                             "Gets the number of Unicode codepoints in the UTF8String".

@@ -1,19 +1,15 @@
-/*!
- @header    BitIO.h
- @author    Marcus Johnson
- @copyright 2015 - 2017
- @version   0.9.0
- @brief     This header contains code related to reading and writing files and sockets, and utility functions to manage those details.
- */
+#include "../include/BitIOMacros.h"
+#include "../include/StringIO.h"
 
-#pragma warning(push, 0)        
+#if    (BitIOTargetOS == BitIOWindowsOS)
+#pragma warning(push, 0)
+#endif
 #include <stdbool.h> /* Included for the bool type */
 #include <stdint.h>  /* Included for the u/intX_t types */
-#include <stdio.h>   /* Included for the FILE type, STD IN/OUT/ERR, SEEK SET/END/CUR macros */
+#include <stdio.h>   /* Included for fpos_t */
+#if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(pop)
-
-#include "BitIOMacros.h"
-#include "StringIO.h"
+#endif
 
 #pragma  once
 
@@ -24,6 +20,13 @@
 extern   "C" {
 #endif
     
+    /*!
+     @header    BitIO.h
+     @author    Marcus Johnson
+     @copyright 2015 - 2017, Marcus Johnson
+     @version   0.9.0
+     @brief     This header contains code related to reading and writing files and sockets, and utility functions to manage those details.
+     */
     
     /*!
      @enum                      BitIOConstants
