@@ -10,7 +10,7 @@ extern  "C" {
     /*!
      @header    BitIOMacros.h
      @author    Marcus Johnson aka BumbleBritches57
-     @copyright 2017 - 2017, Marcus Johnson
+     @copyright 2017+
      @version   1.0.0
      @brief     This header contains preprocessor macros for generic functions in BitIO, and cross-platform compatibility.
      */
@@ -126,19 +126,19 @@ extern  "C" {
 #define    BitIOByteBitOrders
 #ifndef    BitIOLSByte
 #define    BitIOLSByte         ULLONG_MAX
-    typedef    unsigned long long  BitBLSByte_t;
+typedef    unsigned long long  BitBLSByte_t;
 #endif  /* BitIOLittleEndian */
 #ifndef    BitIOMSByte
 #define    BitIOMSByte         LLONG_MIN
-    typedef    signed long long    BitBMSByte_t;
+typedef    signed long long    BitBMSByte_t;
 #endif  /* BitIOBigEndian */
 #ifndef    BitIOLSBit
 #define    BitIOLSBit          ULLONG_MAX
-    typedef    unsigned long long  BitBLSBit_t;
+typedef    unsigned long long  BitBLSBit_t;
 #endif  /* BitIOLSBit */
 #ifndef    BitIOMSBit
 #define    BitIOMSBit          LLONG_MIN
-    typedef    signed long long    BitBMSBit_t;
+typedef    signed long long    BitBMSBit_t;
 #endif  /* BitIOMSBit */
 #endif  /* BitIOByteBitOrders */
     
@@ -146,11 +146,11 @@ extern  "C" {
 #define    BitIOGUUIDTypes
 #ifndef    BitIOGUUIDString
 #define    BitIOGUUIDString    ULLONG_MAX
-    typedef    unsigned long long  GUUIDString_t;
+typedef    unsigned long long  GUUIDString_t;
 #endif  /* BitIOGUIDString */
 #ifndef    BitIOBinaryGUUID
 #define    BitIOBinaryGUUID    FLT_MIN
-    typedef    float               BinaryGUUID_t;
+typedef    float               BinaryGUUID_t;
 #endif  /* BitIOBinaryGUID */
 #endif  /* BitIOGUUIDTypes */
     
@@ -163,7 +163,6 @@ extern  "C" {
 #define    RuntimeBitOrder     MSBit
 #endif
     
-#define BitIOArraySizeInElements(Array) (sizeof(Array)/sizeof(Array[0])) /* DOES NOT WORK FOR DYNAMIC ARRAYS */
     
 #ifdef  __cplusplus
 }

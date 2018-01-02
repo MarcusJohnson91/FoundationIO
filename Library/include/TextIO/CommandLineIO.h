@@ -22,7 +22,7 @@ extern   "C" {
     /*!
      @header    CommandLineIO.h
      @author    Marcus Johnson aka BumbleBritches57
-     @copyright 2017, Marcus Johnson
+     @copyright 2017+
      @version   4.0.0
      @brief     This header contains code for parsing command line options.
      */

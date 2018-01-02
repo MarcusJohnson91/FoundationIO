@@ -23,7 +23,7 @@ extern   "C" {
     /*!
      @header    BitIO.h
      @author    Marcus Johnson
-     @copyright 2015 - 2017, Marcus Johnson
+     @copyright 2015+
      @version   0.9.0
      @brief     This header contains code related to reading and writing files and sockets, and utility functions to manage those details.
      */

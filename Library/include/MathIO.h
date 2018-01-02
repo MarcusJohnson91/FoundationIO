@@ -21,7 +21,7 @@ extern   "C" {
     /*!
      @header    BitIOMath.h
      @author    Marcus Johnson aka BumbleBritches57
-     @copyright 2017 - 2017, Marcus Johnson
+     @copyright 2017+
      @version   1.0.0
      @brief     This header contains code for specific mathematical functions used in BitIO and it's consumers.
      */

@@ -27,15 +27,15 @@ extern "C" {
     
     void BitIOLog_OpenFile(UTF8String LogFilePath) {
         if (LogFilePath != NULL) {
-#if   (BitIOTargetOS == BitIOWindowsOS)
+#if   (BitIOTargetOS == BitIOPOSIXOS)
+            BitIOLogFile                = fopen(LogFilePath, "a+");
+#elif (BitIOTargetOS == BitIOWindowsOS)
             uint64_t    LogFilePathSize = UTF8String_GetNumCodePoints(LogFilePath);
             UTF32String LogFilePath32   = UTF8String_Decode(LogFilePath, LogFilePathSize);
             UTF16String LogFilePath16   = UTF16String_Encode(LogFilePath32, LogFilePathSize);
             free(LogFilePath32);
             BitIOLogFile                = _wfopen(LogFilePath16, "a+");
             free(LogFilePath16);
-#elif (BitIOTargetOS == BitIOPOSIXOS)
-            BitIOLogFile                = fopen(LogFilePath, "a+");
 #endif
         }
     }

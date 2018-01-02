@@ -1,5 +1,5 @@
-#include "../include/BitIOLog.h"
 #include "../include/StringIO.h"
+#include "../include/BitIOLog.h"
 
 #if    (BitIOTargetOS == BitIOWindowsOS)
 #pragma warning(push, 0)
@@ -9,8 +9,8 @@
 #pragma warning(pop)
 #endif
 
-#define UnicodeNULLStringSize         1
-#define UTF16BOMSize                  1
+#define UnicodeNULLTerminatorSize     1
+#define UnicodeBOMSize                1
 #define WhitespaceTableSize          30
 #define NormalizationTableSize       45
 #define NormalizationTableMaxWidth    5
@@ -24,9 +24,9 @@
 extern  "C" {
 #endif
     
-    static UTF8Constant   StringIOLibraryName = u8"libBitIO_StringIO";
+    static UTF8Constant StringIOLibraryName = u8"libBitIO_StringIO";
     
-    static uint8_t UTF8String_GetCodePointSize(uint8_t CodeUnit) {
+    static uint8_t      UTF8String_GetCodePointSize(uint8_t CodeUnit) {
         uint8_t CodePointSize      = 0;
         if (((CodeUnit & 0x80) >> 7) == 0) {
             CodePointSize         += 1;
@@ -40,172 +40,264 @@ extern  "C" {
         return CodePointSize;
     }
     
-    uint64_t    UTF8String_GetNumCodePoints(UTF8String String) {
-        uint64_t CurrentByteNum          = 0ULL;
-        uint64_t NumCodePoints           = 0ULL;
-        
-        if (String != NULL) {
-            do {
-                CurrentByteNum              += UTF8String_GetCodePointSize(String[CurrentByteNum]);
-                NumCodePoints               += 1;
-            } while (String[CurrentByteNum] != 0x0);
-        } else {
-            BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String Pointer is NULL");
-        }
-        
-        
-        return NumCodePoints;
-    }
-    
-    uint64_t    UTF8String_GetNumCodeUnits(UTF8String String2Count) { // Read a codeunit, get it's size, skip that many bytes, check that it's not 0x0, then repeat
-        uint64_t NumCodeUnits                = 0ULL;
-        uint64_t CurrentCodeUnit             = 0ULL;
+    uint64_t            UTF8String_GetNumCodeUnits(UTF8String String2Count) { // Read a codeunit, get it's size, skip that many bytes, check that it's not 0x0, then repeat
+        uint64_t NumCodeUnits                       = 0ULL;
+        uint64_t CurrentCodeUnit                    = 0ULL;
         if (String2Count != NULL) {
             do {
-                NumCodeUnits                    += UTF8String_GetCodePointSize(String2Count[CurrentCodeUnit]);
-            } while (String2Count[CurrentCodeUnit] != 0x0);
+                NumCodeUnits                       += UTF8String_GetCodePointSize(String2Count[CurrentCodeUnit]);
+            } while (String2Count[CurrentCodeUnit] != 0);
         } else {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String Pointer is NULL");
         }
-        
         return NumCodeUnits;
     }
     
-    /* Decode UTF-X to UTF-32 */
-    UTF32String UTF8String_Decode(UTF8String String, uint64_t NumCodePoints) {
-        uint8_t  CodePointSize = 0;
-        uint64_t CodeUnitNum   = 0ULL;
-        uint8_t  Byte1 = 0, Byte2 = 0, Byte3 = 0, Byte4 = 0;
-        UTF32String DecodedString = NULL;
+    uint64_t            UTF8String_GetNumCodePoints(UTF8String String) {
+        uint64_t CurrentCodeUnit              = 0ULL;
+        uint64_t NumCodePoints                = 0ULL;
         if (String != NULL) {
-            DecodedString = calloc(NumCodePoints, sizeof(UTF32String));
+            do {
+                CurrentCodeUnit              += UTF8String_GetCodePointSize(String[CurrentCodeUnit]);
+                NumCodePoints                += 1;
+            } while (String[CurrentCodeUnit] != 0);
+        } else {
+            BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String Pointer is NULL");
+        }
+        return NumCodePoints;
+    }
+    
+    uint8_t             UTF16String_GetCodePointSize(uint16_t CodeUnit) {
+        uint8_t CodePointSize = 0;
+        if (CodeUnit >= 0xD800 && CodeUnit <= 0xDFFF) { // Surrogate
+            CodePointSize     = 2;
+        } else {
+            CodePointSize     = 1;
+        }
+        return CodePointSize;
+    }
+    
+    uint64_t            UTF16String_GetNumCodeUnits(UTF16String String) {
+        uint64_t NumCodeUnits       = 0ULL;
+        uint64_t CodePoint          = 0ULL;
+        do {
+            NumCodeUnits += UTF16String_GetCodePointSize(String[CodePoint]);
+            CodePoint    += 1;
+        } while (String[CodePoint] != 0);
+        return NumCodeUnits;
+    }
+    
+    uint64_t            UTF16String_GetNumCodePoints(UTF16String String) {
+        uint64_t NumCodeUnits           = 0ULL;
+        uint64_t NumCodePoints          = 0ULL;
+        do {
+            NumCodeUnits               += UTF16String_GetCodePointSize(String[NumCodeUnits]);
+            NumCodePoints              += 1;
+        } while (String[NumCodePoints] != 0);
+        return NumCodePoints;
+    }
+    
+    static uint64_t     UTF32String_GetNumCodeUnits4UTF8(UTF32String String) {
+        uint64_t CodePoint          = 0ULL;
+        uint64_t UTF8CodeUnits      = 0ULL;
+        do {
+            if (String[CodePoint] <= 0x7F) {
+                UTF8CodeUnits      += 1;
+            } else if (String[CodePoint] >= 0x80 && String[CodePoint] <= 0x7FF) {
+                UTF8CodeUnits      += 2;
+            } else if (String[CodePoint] >= 0x800 && String[CodePoint] <= 0xFFFF) {
+                UTF8CodeUnits      += 3;
+            } else if (String[CodePoint] >= 0x10000 && String[CodePoint] <= 0x1FFFFF) {
+                UTF8CodeUnits      += 4;
+            }
+            CodePoint              += 1;
+        } while (String[CodePoint] != 0);
+        return UTF8CodeUnits;
+    }
+    
+    static uint64_t     UTF32String_GetNumCodeUnits4UTF16(UTF32String String) {
+        uint64_t CodePoint          = 0ULL;
+        uint64_t UTF16CodeUnits     = 0ULL;
+        do {
+            if (String[CodePoint] >= 0x10000) {
+                UTF16CodeUnits     += 2;
+            } else {
+                UTF16CodeUnits     += 1;
+            }
+            CodePoint              += 1;
+        } while (String[CodePoint] != 0);
+        return UTF16CodeUnits;
+    }
+    
+    /* Decode UTF-X to UTF-32 */
+    UTF32String         UTF8String_Decode(UTF8String String) {
+        // We should make sure we don't decode anything in the surrogate block, between 0xDBFF to 0xD800 or DFFF to DC00
+        uint8_t  CodePointSize      = 0;
+        uint64_t CodeUnitNum        = 0ULL;
+        uint64_t CodePoint          = 0ULL;
+        UTF32String DecodedString   = NULL;
+        if (String != NULL) {
+            uint64_t UTF8CodePoints = UTF8String_GetNumCodePoints(String) + UnicodeNULLTerminatorSize + UnicodeBOMSize;
+            DecodedString           = calloc(UTF8CodePoints, sizeof(UTF32String));
             if (DecodedString != NULL) {
                 do {
-                    // Loop over the bytes in the bytes
-                    for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePoints; CodePoint++) {
-                        CodePointSize = UTF8String_GetCodePointSize(String[CodeUnitNum]);
-                        switch (CodePointSize) {
-                            case 1: // 7 bits
-                                DecodedString[CodePoint] = String[CodeUnitNum] & 0x7F;
-                                break;
-                            case 2: // 11 bits, U+E4, 0xC3A4
-                                DecodedString[CodePoint] = ((String[CodeUnitNum] & 0x1F) << 6);
-                                DecodedString[CodePoint] = (String[CodeUnitNum + 1] & 0x3F);
-                                break;
-                            case 3: // 16 bits, U+16A0, 0xE19AA0
-                                DecodedString[CodePoint] = ((String[CodeUnitNum] & 0x0F) << 12);
-                                DecodedString[CodePoint] = ((String[CodeUnitNum + 1] & 0x3F) << 6);
-                                DecodedString[CodePoint] = (String[CodeUnitNum + 2] & 0x3F);
-                                break;
-                            case 4: // 21 bits, U+1F984, 0xF09FA684
-                                DecodedString[CodePoint] = ((String[CodeUnitNum] & 0x07) << 18);
-                                DecodedString[CodePoint] = ((String[CodeUnitNum + 1] & 0x3F) << 12);
-                                DecodedString[CodePoint] = ((String[CodeUnitNum + 2] & 0x3F) << 6);
-                                DecodedString[CodePoint] = (String[CodeUnitNum + 3] & 0x3F);
-                                break;
-                        }
-                        if (DecodedString[CodePoint] <= 0x7F && CodePointSize > 1) {
-                            // Invalid, overlong sequence detected, replace it with 0xFFFD
-                            DecodedString[CodePoint] = 0xFFFD;
-                            BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"CodePoint %d is overlong", CodeUnitNum);
-                        }
+                    // Get the number of codepoints contained in the UTF8String, then allocate that much memory, then decode.
+                    if (CodePoint == 0) {
+                        // set the Unicode BOM
+#if   (RuntimeByteOrder == LSByte)
+                        DecodedString[0] = 0xFFFE;
+#elif (RuntimeByteOrder == MSByte)
+                        DecodedString[0] = 0xFEFF;
+#endif
                     }
-                    CodeUnitNum += CodePointSize;
-                } while (String[CodeUnitNum] != 0x00);
+                    switch (CodePointSize) {
+                        case 1: // 7 bits
+                            DecodedString[CodePoint] =  String[CodeUnitNum - 1];
+                            CodeUnitNum             += 1;
+                            break;
+                        case 2: // 11 bits, U+80 - U+7FF
+                            DecodedString[CodePoint] = (String[CodeUnitNum - 1] & 0x1F) << 6;
+                            DecodedString[CodePoint] =  String[CodeUnitNum]     & 0x3F;
+                            CodeUnitNum             += 2;
+                            break;
+                        case 3: // 16 bits, U+800 - U+FFFF (except U+D800 - U+DFFF)
+                            DecodedString[CodePoint] = (String[CodeUnitNum - 1] & 0x0F) << 12;
+                            DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x1F) << 6;
+                            DecodedString[CodePoint] = (String[CodeUnitNum + 1] & 0x1F);
+                            CodeUnitNum             += 3;
+                            break;
+                        case 4: // 21 bits, U+10000 - U+10FFFF
+                            DecodedString[CodePoint] = (String[CodeUnitNum - 1] & 0x07) << 18;
+                            DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x3F) << 12;
+                            DecodedString[CodePoint] = (String[CodeUnitNum + 1] & 0x3F) <<  6;
+                            DecodedString[CodePoint] = (String[CodeUnitNum + 2] & 0x3F);
+                            CodeUnitNum             += 4;
+                            break;
+                    }
+                    if (DecodedString[CodePoint]    <= 0x7F && CodePointSize > 1) { // Invalid, overlong sequence detected, replace it with 0xFFFD
+                        DecodedString[CodePoint]     = 0xFFFD;
+                        BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"CodePoint %d is overlong, replaced with U+FFFD", CodePoint);
+                    } else if ((DecodedString[CodePoint] >= 0xD800 && DecodedString[CodePoint] <= 0xDBFF) || (DecodedString[CodePoint] >= 0xDC00 && DecodedString[CodePoint] <= 0xDFFF)) {
+                        DecodedString[CodePoint]     = 0xFFFD;
+                        BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, "Codepoint %d is invalid, overlaps Surrogate Pair Block, replacing with U+FFFD", CodePoint);
+                    }
+                } while (String[CodeUnitNum] != 0);
             } else {
                 BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"Not enough memory to allocate string");
             }
         } else {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String Pointer is NULL");
         }
-        
         return DecodedString;
     }
     
-    UTF8String  UTF8String_Encode(UTF32String String, uint64_t StringSize) {
-        uint8_t  CodePointSize   = 0;
-        uint64_t CodeUnitNum     = 0ULL;
-        UTF8String EncodedString = NULL;
+    UTF8String          UTF8String_Encode(UTF32String String) {
+        uint64_t CodePoint                             = 0ULL;
+        uint64_t CodeUnitNum                           = 0ULL;
+        UTF8String EncodedString                       = NULL;
         if (String != NULL) {
-            EncodedString        = calloc(StringSize + UnicodeNULLStringSize, sizeof(UTF8String));
+            uint64_t UTF8CodeUnits                     = UTF32String_GetNumCodeUnits4UTF8(String) + UnicodeNULLTerminatorSize;
+            EncodedString                              = calloc(UTF8CodeUnits, sizeof(UTF8String));
             if (EncodedString != NULL) {
-                for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
-                    if (String <= 0x7F) {
-                        // 1 byte ASCII codepoint
-                        EncodedString[CodePoint]     = String[CodePoint] & 0x7F;
-                    } else if (String >= 0x80 && String <= 0x7FF) {
-                        // 2 byte UTF8
-                        EncodedString[CodePoint]     = (0xC0 & (String[CodePoint] & 0x7C0) >> 6);
-                        EncodedString[CodePoint + 1] = (0x80 & (String[CodePoint] & 0x3F));
-                    } else if (String >= 0x800 && String <= 0xFFFF) {
-                        // 3 byte UTF8
-                        EncodedString[CodePoint]     = (0xE0 & (String[CodePoint] & 0xF800) >> 11);
-                        EncodedString[CodePoint + 1] = (0xC0 & (String[CodePoint] & 0xFC0) >> 6);
-                        EncodedString[CodePoint + 2] = (0x80 & (String[CodePoint] & 0x3F));
-                    } else if (String >= 0x10000 && String <= 0x10FFFF) {
-                        // 4 byte UTF8
-                        EncodedString[CodePoint]     = (0xE0 & (String[CodePoint] & 0xF800) >> 11);
-                        EncodedString[CodePoint + 1] = (0xC0 & (String[CodePoint] & 0xFC0) >> 6);
-                        EncodedString[CodePoint + 2] = (0x80 & (String[CodePoint] & 0x3F));
+                do {
+                    if (String[CodePoint] >= 0xD800 && String[CodePoint] <= 0xDFFF) {
+                        String[CodePoint]              = 0xFFFD;
+                        BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, "Codepoint %d is invalid, overlaps Surrogate Pair Block, replacing with U+FFFD");
                     }
-                }
+                    if (String[CodePoint] <= 0x7F) {
+                        EncodedString[CodeUnitNum]     = String[CodePoint] & 0x7F;
+                        CodeUnitNum                   += 1;
+                    } else if (String[CodePoint] >= 0x80 && String[CodePoint] <= 0x7FF) {
+                        EncodedString[CodeUnitNum]     = (0xC0 & ((String[CodePoint] & 0x7C0) >> 6));
+                        EncodedString[CodeUnitNum + 1] = (0x80 &  (String[CodePoint] & 0x03F));
+                        CodeUnitNum                   += 2;
+                    }  else if (String[CodePoint] >= 0x800 && String[CodePoint] <= 0xFFFF) {
+                        EncodedString[CodeUnitNum]     = (0xE0 & ((String[CodePoint] & 0x03F000) >> 12));
+                        EncodedString[CodeUnitNum + 1] = (0x80 & ((String[CodePoint] & 0x000FC0) >>  6));
+                        EncodedString[CodeUnitNum + 2] = (0x80 &  (String[CodePoint] & 0x00003F));
+                        CodeUnitNum                   += 3;
+                    } else if (String[CodePoint] >= 0x10000 && String[CodePoint] <= 0x10FFFF) {
+                        EncodedString[CodeUnitNum]     = (0xF0 & ((String[CodePoint] & 0x1C0000) >> 18));
+                        EncodedString[CodeUnitNum + 1] = (0x80 & ((String[CodePoint] & 0x03F000) >> 12));
+                        EncodedString[CodeUnitNum + 2] = (0x80 & ((String[CodePoint] & 0x000FC0) >>  6));
+                        EncodedString[CodeUnitNum + 3] = (0x80 &  (String[CodePoint] & 0x00003F));
+                        CodeUnitNum                   += 4;
+                    }
+                } while (String[CodePoint] != 0);
             } else {
                 BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String Pointer is NULL, not enough memory");
             }
         } else {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String Pointer is NULL");
         }
-        
         return EncodedString;
     }
     
-    UTF32String UTF16String_Decode(UTF16String String, uint64_t NumCodePoints) {
-        uint8_t  CodePointSize = 0;
-        uint64_t CodeUnitNum   = 0ULL;
-        UTF32String DecodedString = NULL;
+    UTF32String         UTF16String_Decode(UTF16String String) {
+        uint64_t CodePoint          = 0ULL;
+        uint64_t CodeUnitNum        = 0ULL;
+        UTF32String DecodedString   = NULL;
         if (String != NULL) {
-            DecodedString = calloc(NumCodePoints, sizeof(UTF32String));
+            uint64_t UTF16CodeUnits = UTF16String_GetNumCodePoints(String) + UnicodeNULLTerminatorSize;
+            DecodedString           = calloc(UTF16CodeUnits, sizeof(UTF32String));
             if (DecodedString != NULL) {
-                for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePoints; CodePoint++) {
-                    if ((String[CodeUnitNum] <= 0xD7FF) && (String[CodeUnitNum] >= 0xE000 && String[CodeUnitNum] <= 0xFFFF)) { // single code unit per code point
-                        DecodedString[CodePoint] = String[CodeUnitNum];
-                    } else {
-                        DecodedString[CodePoint] = ((String[CodePoint] - 0xD800) * 0x400) + (String[CodePoint + 1] - 0xDC00) + 0x10000;
+                do {
+                    if (CodePoint == 0) {
+                        // set the Unicode BOM
+#if   (RuntimeByteOrder == LSByte)
+                        DecodedString[0] = 0xFFFE;
+#elif (RuntimeByteOrder == MSByte)
+                        DecodedString[0] = 0xFEFF;
+#endif
                     }
-                }
+                    
+                    if (String[CodeUnitNum] <= 0xD7FF || (String[CodeUnitNum] >= 0xE000 && String[CodeUnitNum] <= 0xFFFF)) {
+                        DecodedString[CodePoint] = String[CodeUnitNum - 1];
+                    } else {
+                        DecodedString[CodePoint] = (((String[CodeUnitNum - 1] - 0xD800) * 0x400) + (String[CodeUnitNum] - 0xDC00) + 0x10000);
+                    }
+                } while (String[CodePoint] != 0);
             } else {
                 BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String Pointer is NULL, not enough memory");
             }
         } else {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String Pointer is NULL");
         }
-        
         return DecodedString;
     }
     
-    UTF16String UTF16String_Encode(UTF32String String, uint64_t NumCodePoints) {
-        uint8_t  CodePointSize    = 0;
-        uint64_t CodeUnitNum      = 0ULL;
-        UTF16String EncodedString = NULL;
+    UTF16String         UTF16String_Encode(UTF32String String) {
+        uint8_t  CodePointSize         = 0;
+        uint64_t CodeUnitNum           = 0ULL;
+        UTF16String EncodedString      = NULL;
         if (String != NULL) {
-            uint64_t UTF16NumCodePoints = NumCodePoints + UTF16BOMSize + UnicodeNULLStringSize;
-            EncodedString = calloc(UTF16NumCodePoints, sizeof(UTF16String));
+            uint64_t UTF16NumCodeUnits = UTF32String_GetNumCodeUnits4UTF16(String) + UnicodeBOMSize + UnicodeNULLTerminatorSize;
+            EncodedString              = calloc(UTF16NumCodeUnits, sizeof(UTF16String));
             if (EncodedString != NULL) {
-                for (uint64_t CodePoint = 0ULL; CodePoint < UTF16NumCodePoints; CodePoint++) {
+                for (uint64_t CodeUnit = 0ULL; CodeUnit < UTF16NumCodeUnits; CodeUnit++) {
                     // High = ((String[CodePoint] - 0x10000) / 0x400) + 0xD800
                     // Low  = (String[CodePoint]  - 0x10000) % 0x400) + 0xDC00
                     // High = 0x1F984 - 0x10000 = 0xF984 / 0x400 = 0x3E  + 0xD800 = 0xD83E
                     // Low  = 0x1F984 - 0x10000 = 0xF984 % 0x400 = 0x184 + 0xDC00 = 0xDD84
-                    if (CodePoint == 0) {
-                        // Insert the BOM
-                        uint16_t ByteOrderMark = 0xFEFF;
-                        EncodedString[CodePoint] = ByteOrderMark;
+                    if (CodeUnit == 0) {
+                        // set the Unicode BOM
+#if   (RuntimeByteOrder == LSByte)
+                        EncodedString[0] = 0xFFFE;
+#elif (RuntimeByteOrder == MSByte)
+                        EncodedString[0] = 0xFEFF;
+#endif
                     }
-                    uint32_t ModCodePoint = String[CodePoint] - 0x10000;
-                    uint16_t High         = (ModCodePoint / 0x400) + 0xD800;
-                    uint16_t Low          = (ModCodePoint % 0x400) + 0xDC00;
-                    EncodedString[CodePoint]     = High;
-                    EncodedString[CodePoint + 1] = Low;
+                    if (String[CodeUnitNum] <= 0xD7FF || (String[CodeUnitNum] >= 0xE000 && String[CodeUnitNum] <= 0xFFFF)) { // Single code point
+                        EncodedString[CodeUnitNum]         = String[CodeUnit];
+                    } else {
+#if  (RuntimeByteOrder == LSByte) // little endian
+                            EncodedString[CodeUnitNum]     = ((String[CodeUnitNum - 1] - 0x10000) % 0x400) + 0xDC00;
+                            EncodedString[CodeUnitNum + 1] = ((String[CodeUnitNum] - 0x10000) / 0x400) + 0xD800;
+#elif (RuntimeByteOrder == MSByte) // big endian
+                            EncodedString[CodeUnitNum]     = ((String[CodeUnitNum - 1] - 0x10000) / 0x400) + 0xD800;
+                            EncodedString[CodeUnitNum + 1] = ((String[CodeUnitNum] - 0x10000) % 0x400) + 0xDC00;
+#endif
+                    }
                 }
             } else {
                 BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"EncodedString Pointer is NULL, not enough memory");
@@ -213,8 +305,53 @@ extern  "C" {
         } else {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String Pointer is NULL");
         }
-        
         return EncodedString;
+    }
+    
+    UTF16String UTF16String_ConvertByteOrder(UTF16String String2Convert, UnicodeByteOrder TargetByteOrder) {
+        uint16_t         UTF16ByteOrder                = String2Convert[0];
+        UnicodeByteOrder CurrentByteOrder              = UnicodeUnknownOrder;
+        if (UTF16ByteOrder == 0xFEFF) {
+            CurrentByteOrder = UnicodeLittleEndian;
+        } else if (UTF16ByteOrder == 0xFFFE) {
+            CurrentByteOrder = UnicodeBigEndian;
+        }
+        uint64_t         CurrentCodePoint              = 1ULL;
+        uint8_t          HighByte                      = 0;
+        uint8_t          LowByte                       = 0;
+        if (CurrentByteOrder != TargetByteOrder) {
+            do {
+                HighByte                               = (String2Convert[CurrentCodePoint] & 0xFF00) >> 8;
+                LowByte                                = (String2Convert[CurrentCodePoint] & 0x00FF);
+                String2Convert[CurrentCodePoint]       = (LowByte & HighByte);
+            } while (String2Convert[CurrentCodePoint] != 0);
+        }
+        return String2Convert;
+    }
+    
+    UTF32String UTF32String_ConvertByteOrder(UTF32String String2Convert, UnicodeByteOrder TargetByteOrder) {
+        uint32_t         UTF32ByteOrder                = String2Convert[0];
+        UnicodeByteOrder CurrentByteOrder              = UnicodeUnknownOrder;
+        if (UTF32ByteOrder == 0xFEFF) {
+            CurrentByteOrder = UnicodeLittleEndian;
+        } else if (UTF32ByteOrder == 0xFFFE) {
+            CurrentByteOrder = UnicodeBigEndian;
+        }
+        uint64_t         CurrentCodePoint              = 1ULL;
+        uint8_t          Byte0                         = 0;
+        uint8_t          Byte1                         = 0;
+        uint8_t          Byte2                         = 0;
+        uint8_t          Byte3                         = 0;
+        if (CurrentByteOrder != TargetByteOrder) {
+            do {
+                Byte0                                  = (String2Convert[CurrentCodePoint] & 0xFF000000) >> 24;
+                Byte1                                  = (String2Convert[CurrentCodePoint] & 0x00FF0000) >> 16;
+                Byte2                                  = (String2Convert[CurrentCodePoint] & 0x0000FF00) >>  8;
+                Byte3                                  = (String2Convert[CurrentCodePoint] & 0x000000FF);
+                String2Convert[CurrentCodePoint]       = (Byte0 & (Byte1 << 8) & (Byte2 << 16) & (Byte3 << 24));
+            } while (String2Convert[CurrentCodePoint] != 0);
+        }
+        return String2Convert;
     }
     
     static const UTF32CodePoint WhitespaceTable[WhitespaceTableSize] = {
@@ -644,7 +781,7 @@ extern  "C" {
         {0x1E950,0}, {0x1E951,1}, {0x1E952,2}, {0x1E953,3}, {0x1E954,4}, {0x1E955,5}, {0x1E956,6}, {0x1E957,7}, {0x1E958,8}, {0x1E959,9},
     };
     
-    static UTF32String UTF32String_Normalize(UTF32String String2Normalize, uint64_t StringSize) {
+    static UTF32String  UTF32String_Normalize(UTF32String String2Normalize, uint64_t StringSize) {
         /*
          So we should try to convert codepoints to a precomposed codepoint, but if we can't we need to order them by their lexiographic value.
          */
@@ -664,7 +801,7 @@ extern  "C" {
         return NULL;
     }
 
-    UTF32String UTF32String_CaseFold(UTF32String String, uint64_t StringSize) {
+    UTF32String         UTF32String_CaseFold(UTF32String String, uint64_t StringSize) {
         UTF32String FoldedString = NULL;
         if (String != NULL) {
             FoldedString = calloc(StringSize, sizeof(UTF32String));
@@ -686,41 +823,47 @@ extern  "C" {
         return FoldedString;
     }
     
-    bool        UTF32Strings_Compare(UTF32String String1, uint64_t String1Size, UTF32String String2, uint64_t String2Size) {
-        bool StringsMatch = No;
-        if (String1 != NULL && String2 != NULL && String1Size == String2Size) {
-            if (String1Size == String2Size) {
-                for (uint64_t CodePoint = 0ULL; CodePoint < String1Size; CodePoint++) {
+    static uint64_t UTF32String_GetNumCodePoints(UTF32String String) {
+        uint64_t NumCodePoints          = 0;
+        do {
+            NumCodePoints              += 1;
+        } while (String[NumCodePoints] != 0);
+        return NumCodePoints;
+    }
+    
+    bool                UTF32Strings_Compare(UTF32String String1, UTF32String String2) {
+        uint64_t CodePoint = 0ULL;
+        bool StringsMatch  = Yes;
+        if (String1 != NULL && String2 != NULL) {
+            uint64_t String1Size = UTF32String_GetNumCodePoints(String1);
+            uint64_t String2Size = UTF32String_GetNumCodePoints(String2);
+            if (String1Size != String2Size) {
+                StringsMatch = No;
+            } else {
+                do {
                     if (String1[CodePoint] != String2[CodePoint]) {
                         StringsMatch = No;
                         break;
                     }
-                }
-            } else {
-                StringsMatch = No;
+                } while (String1[CodePoint] != 0 && String2[CodePoint] != 0);
             }
         } else if (String1 == NULL) {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String1 Pointer is NULL");
         } else if (String2 == NULL) {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String2 Pointer is NULL");
-        } else if (String1Size != String2Size) {
-            BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String1Size and String2Size don't match");
         }
-        
         return StringsMatch;
     }
     
-    uint64_t    UTF32String_FindSubstring(UTF32String String, uint64_t StringSize, UTF32String SubString, uint64_t SubStringSize) {
+    uint64_t            UTF32String_FindSubstring(UTF32String String, uint64_t StringSize, UTF32String SubString, uint64_t SubStringSize) {
         uint64_t   Offset             = 0ULL;
         uint64_t   CodePoint          = 0ULL;
         uint64_t   SubStringCodePoint = 0ULL;
-        
         if (String != NULL && SubString != NULL && SubStringSize < StringSize) {
             while (String[CodePoint] == SubString[SubStringCodePoint] && CodePoint <= StringSize && SubStringCodePoint <= SubStringSize) {
                 CodePoint                += 1;
                 SubStringCodePoint       += 1;
             }
-            
             if (CodePoint == StringSize) {
                 Offset = CodePoint;
             }
@@ -735,8 +878,8 @@ extern  "C" {
         return Offset;
     }
     
-    UTF32String UTF32String_Extract(UTF32String String, uint64_t StringSize, uint64_t Start, uint64_t End) {
-        uint64_t    ExtractedStringSize = (Start - End) + 1 + UnicodeNULLStringSize;
+    UTF32String         UTF32String_Extract(UTF32String String, uint64_t StringSize, uint64_t Start, uint64_t End) {
+        uint64_t    ExtractedStringSize = (Start - End) + 1 + UnicodeNULLTerminatorSize;
         UTF32String ExtractedString     = NULL;
         if (String != NULL && Start <= StringSize && End <= StringSize && End > Start) {
             ExtractedString             = calloc(ExtractedStringSize, sizeof(uint32_t));
@@ -759,18 +902,16 @@ extern  "C" {
         return ExtractedString;
     }
     
-    int64_t      UTF32String_ToNumber(UTF32String String, uint64_t StringSize) {
+    int64_t             UTF32String_ToNumber(UTF32String String, uint64_t StringSize) {
         uint64_t CodePoint  = 0ULL;
         int8_t   Sign       =  1;
         uint8_t  Base       = 10;
         int64_t  Value      =  0;
-        
         for (uint8_t WhiteSpace = 0; WhiteSpace < WhitespaceTableSize; WhiteSpace++) {
             if (String[CodePoint] == WhitespaceTable[WhiteSpace]) {
                 CodePoint += 1;
             }
         }
-        
         if (String[CodePoint] == '0') {
             if (String[CodePoint + 1] == 'b' || String[CodePoint + 1] == 'B') {
                 Base = 2;
@@ -782,7 +923,6 @@ extern  "C" {
         } else if (String[CodePoint] == '-') {
             Sign     = -1;
         }
-        
         while (CodePoint < StringSize) {
             Value     *= Base;
             if (Base == 16 && (String[CodePoint] >= 0x41 && String[CodePoint] <= 0x46)) {
@@ -800,24 +940,49 @@ extern  "C" {
         return Sign < 0 ? Value * Sign : Value;
     }
     
-    bool UTF8String_Compare(UTF8String String1, uint64_t String1Size, UTF8String String2, uint64_t String2Size, bool Normalize, bool CaseFold) {
-        UTF32String String1UTF32 = UTF8String_Decode(String1, String1Size);
-        UTF32String String2UTF32 = UTF8String_Decode(String2, String2Size);
-        if (Normalize == Yes) {
-            // Normalize these sumbitches after decoding it
-            UTF32String_Normalize(String1UTF32, String1Size);
-            UTF32String_Normalize(String2UTF32, String2Size);
+    bool                UTF8String_Compare(UTF8String String1, uint64_t String1Size, UTF8String String2, uint64_t String2Size, bool Normalize, bool CaseFold) {
+        bool StringsMatch = No;
+        if (String1 != NULL && String2 != NULL) {
+            UTF32String String1UTF32 = UTF8String_Decode(String1);
+            UTF32String String2UTF32 = UTF8String_Decode(String2);
+            if (Normalize == Yes) {
+                UTF32String_Normalize(String1UTF32, String1Size);
+                UTF32String_Normalize(String2UTF32, String2Size);
+            }
+            if (CaseFold == Yes) {
+                UTF32String_CaseFold(String1UTF32, String1Size);
+                UTF32String_CaseFold(String2UTF32, String2Size);
+            }
+            StringsMatch = UTF32Strings_Compare(String1UTF32, String2UTF32);
+            free(String1UTF32);
+            free(String2UTF32);
+        } else if (String1 == NULL) {
+            BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, "String1 Pointer is NULL");
+        } else if (String2 == NULL) {
+            BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, "String2 Pointer is NULL");
         }
-        if (CaseFold == Yes) {
-            // CaseFold these sumbitches after decoding it
-            UTF32String_CaseFold(String1UTF32, String1Size);
-            UTF32String_CaseFold(String2UTF32, String2Size);
+        return StringsMatch;
+    }
+    
+    bool               UTF16String_Compare(UTF16String String1, uint64_t String1Size, UTF16String String2, uint64_t String2Size, bool Normalize, bool CaseFold) {
+        bool StringsMatch = No;
+        if (String1 != NULL && String2 != NULL) {
+            UTF32String String1UTF32 = UTF16String_Decode(String1);
+            UTF32String String2UTF32 = UTF16String_Decode(String2);
+            if (Normalize == Yes) {
+                UTF32String_Normalize(String1UTF32, String1Size);
+                UTF32String_Normalize(String2UTF32, String2Size);
+            }
+            if (CaseFold == Yes) {
+                UTF32String_CaseFold(String1UTF32, String1Size);
+                UTF32String_CaseFold(String2UTF32, String2Size);
+            }
+            StringsMatch = UTF32Strings_Compare(String1UTF32, String2UTF32);
+        } else if (String1 == NULL) {
+            BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, "String1 Pointer is NULL");
+        } else if (String2 == NULL) {
+            BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, "String2 Pointer is NULL");
         }
-        
-        // Now we compare them
-        bool StringsMatch = UTF32Strings_Compare(String1UTF32, String1Size, String2UTF32, String2Size);
-        free(String1UTF32);
-        free(String2UTF32);
         return StringsMatch;
     }
     
