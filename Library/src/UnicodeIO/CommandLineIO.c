@@ -141,16 +141,16 @@ extern   "C" {
                 BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"Couldn't allocate %d CommandLineSwitches", NumSwitches);
                 exit(EXIT_FAILURE);
             }
-#if   (BitIOTargetOS == BitIOWindowsOS)
-            CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
-            GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
-            CLI->ConsoleHeight = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
-            CLI->ConsoleWidth  = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
-#elif (BitIOTargetOS == BitIOPOSIXOS)
+#if   (BitIOTargetOS == BitIOPOSIXOS)
             struct winsize WindowSize;
             ioctl(0, TIOCGWINSZ, &WindowSize);
             CLI->ConsoleWidth  = WindowSize.ws_row;
             CLI->ConsoleHeight = WindowSize.ws_col;
+#elif (BitIOTargetOS == BitIOWindowsOS)
+            CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
+            GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
+            CLI->ConsoleHeight = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
+            CLI->ConsoleWidth  = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
 #endif
         } else if (CLI == NULL) {
             BitIOLog(BitIOLog_ERROR, CommandLineIOLibraryName, __func__, u8"Couldn't allocate CommandLineIO");

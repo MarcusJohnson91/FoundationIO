@@ -1034,12 +1034,12 @@ extern "C" {
                 snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
                 free(NewPath);
             }
-#if    (BitIOTargetOS == BitIOWindowsOS)
+#if   (BitIOTargetOS == BitIOPOSIXOS)
+            BitI->File = fopen(Path2Open, "rb");
+#elif (BitIOTargetOS == BitIOWindowsOS)
             UTF32String WidePath    = UTF8String_Decode(Path2Open, Path2OpenSize);
             BitI->File              = _wfopen(WidePath, "rb");
             free(WidePath);
-#elif  (BitIOTargetOS == BitIOPOSIXOS)
-            BitI->File = fopen(Path2Open, "rb");
 #endif
             if (BitI->File == NULL) {
                 BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"Couldn't open file: Check that the file exists and the permissions are correct");
@@ -1203,12 +1203,12 @@ extern "C" {
                 snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
                 free(NewPath);
             }
-#if   (BitIOTargetOS == BitIOWindowsOS)
+#if   (BitIOTargetOS == BitIOPOSIXOS)
+            BitO->File = fopen(Path2Open, "wb");
+#elif (BitIOTargetOS == BitIOWindowsOS)
             UTF32String WidePath    = UTF8String_Decode(Path2Open, Path2OpenSize);
             BitO->File              = _wfopen(WidePath, "rb");
             free(WidePath);
-#elif (BitIOTargetOS == BitIOPOSIXOS)
-            BitO->File = fopen(Path2Open, "wb");
 #endif
             if (BitO->File != NULL) {
                 setvbuf(BitO->File, NULL, _IONBF, 0);
