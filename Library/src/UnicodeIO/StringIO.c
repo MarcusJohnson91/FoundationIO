@@ -9,12 +9,18 @@
 #pragma warning(pop)
 #endif
 
-#define UnicodeNULLTerminatorSize     1
-#define UnicodeBOMSize                1
-#define WhitespaceTableSize          30
-#define NormalizationTableSize       45
-#define NormalizationTableMaxWidth    5
-#define SimpleCaseFoldTableSize    1298
+#define UnicodeNULLTerminatorSize       1
+#define UnicodeBOMSize                  1
+#define WhitespaceTableSize            30
+#define NormalizationTableIndex        45
+#define NormalizationTableNumDiacritics 1
+#define NormalizationTableBaseCodePoint 1
+#define NormalizationTableDiacritics    1
+//#define NormalizationTablePrecomposed   1
+
+//#define NormalizationTableNumDiacritics 2
+//#define NormalizationTableMaxWidth      5
+#define SimpleCaseFoldTableSize      1298
 
 /* 0x00 is valid in UTF-16, NULL is 0x0000, be sure to catch this mistake. */
 /* U+D800 - U+DFFF are invalid UTF32 code points. when converting to/from UTF32 make sure that that is not a code point becuse they're reserved as UTF-16 surrogate pairs */
@@ -205,7 +211,7 @@ extern  "C" {
                         BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, "Codepoint %d is invalid, overlaps Surrogate Pair Block, replacing with U+FFFD");
                     }
                     if (String[CodePoint] <= 0x7F) {
-                        EncodedString[CodeUnitNum]     = String[CodePoint] & 0x7F;
+                        EncodedString[CodeUnitNum]     = String[CodePoint];
                         CodeUnitNum                   += 1;
                     } else if (String[CodePoint] >= 0x80 && String[CodePoint] <= 0x7FF) {
                         EncodedString[CodeUnitNum]     = (0xC0 & ((String[CodePoint] & 0x7C0) >> 6));
@@ -361,8 +367,8 @@ extern  "C" {
         0x0200A, 0x02028, 0x02029, 0x0202F, 0x0205F, 0x03000,
         0x0200B, 0x0200C, 0x0200D, 0x02060, 0x0FEFF, 0x0FFFE
     };
-    
-    static const UTF32CodePoint NormalizationTable[NormalizationTableSize][NormalizationTableMaxWidth] = {  // NumDiacritics, Base, Diacritics, Precomposed
+    /*
+    static const UTF32CodePoint NormalizationTable[NormalizationTableIndex][NormalizationTableNumDiacritics][NormalizationTableBaseCodePoint][NormalizationTableDiacritics][NormalizationTablePrecomposed] = {  // NumDiacritics, Base, Diacritics, Precomposed
         {1, 0x0041, 0x030F, 0x0200}, {1, 0x0061, 0x030F, 0x0201},
         {1, 0x0041, 0x0311, 0x0202}, {1, 0x0061, 0x0311, 0x0203},
         {1, 0x0045, 0x030F, 0x0204}, {1, 0x0065, 0x030F, 0x0205},
@@ -389,6 +395,11 @@ extern  "C" {
         {2, 0x004F, 0x0307, 0x0304, 0x0230},
         {2, 0x006F, 0x0307, 0x0304, 0x0231},
         {2, 0x006F, 0x0307, 0x0304, 0x0231},
+    };
+     */
+    
+    static const UTF32CodePoint NormalizationTablePrecomposed[26] = {
+        0x200, 0x201
     };
     
     static const UTF32CodePoint SimpleCaseFoldTable[SimpleCaseFoldTableSize][2] = {
@@ -781,46 +792,40 @@ extern  "C" {
         {0x1E950,0}, {0x1E951,1}, {0x1E952,2}, {0x1E953,3}, {0x1E954,4}, {0x1E955,5}, {0x1E956,6}, {0x1E957,7}, {0x1E958,8}, {0x1E959,9},
     };
     
-    static UTF32String  UTF32String_Normalize(UTF32String String2Normalize, uint64_t StringSize) {
+    void UTF32String_Normalize(UTF32String String2Normalize) {
         /*
          So we should try to convert codepoints to a precomposed codepoint, but if we can't we need to order them by their lexiographic value.
          */
-        if (String2Normalize != NULL && StringSize > 0) {
-            for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
+        uint64_t CodePoint    = 1ULL; // Skip the BOM
+        if (String2Normalize != NULL) {
+            do {
                 // For each codepoint, compare it to the base number, if it matches one, then compare the following codepoint(s) to the diacritic(s), if they all match, replace.
-                for (uint8_t TableColumn = 0; TableColumn < NormalizationTableSize; TableColumn++) {
-                    for (uint8_t Diacritic = 2; Diacritic < NormalizationTable[TableColumn][0]; Diacritic++) {
+                /*
+                for (uint8_t TableColumn = 0; TableColumn < NormalizationTableIndex; TableColumn++) {
+                    for (uint8_t Diacritic = NormalizationTable[]; Diacritic < NormalizationTable[TableColumn][0]; Diacritic++) {
                         
                     }
                 }
-            }
-        } else if (String2Normalize == NULL) {
+                 */
+            } while (String2Normalize[CodePoint] != 0);
+        } else {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String2Normalize Pointer is NULL");
         }
-        
-        return NULL;
     }
 
-    UTF32String         UTF32String_CaseFold(UTF32String String, uint64_t StringSize) {
-        UTF32String FoldedString = NULL;
+    void            UTF32String_CaseFold(UTF32String String) {
+        uint64_t CodePoint = 1ULL;
         if (String != NULL) {
-            FoldedString = calloc(StringSize, sizeof(UTF32String));
-            if (FoldedString != NULL) {
-                for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
-                    // Loop over the table collumn 0 comparing it to the codepoints in the table, and replacing it with the same in #1.
-                    for (uint16_t Table = 0; Table < SimpleCaseFoldTableSize; Table++) {
-                        if (String[CodePoint] == SimpleCaseFoldTable[Table][0]) {
-                            FoldedString[CodePoint] = SimpleCaseFoldTable[Table][1];
-                        }
+            do {
+                for (uint16_t Table = 0; Table < SimpleCaseFoldTableSize; Table++) {
+                    if (String[CodePoint] == SimpleCaseFoldTable[Table][0]) {
+                        String[CodePoint]  = SimpleCaseFoldTable[Table][1];
                     }
                 }
-            } else {
-                BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"FoldedString Pointer is NULL");
-            }
+            } while (String[CodePoint] != 0);
         } else {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String Pointer is NULL");
         }
-        return FoldedString;
     }
     
     static uint64_t UTF32String_GetNumCodePoints(UTF32String String) {
@@ -831,7 +836,7 @@ extern  "C" {
         return NumCodePoints;
     }
     
-    bool                UTF32Strings_Compare(UTF32String String1, UTF32String String2) {
+    bool            UTF32Strings_Compare(UTF32String String1, UTF32String String2) {
         uint64_t CodePoint = 0ULL;
         bool StringsMatch  = Yes;
         if (String1 != NULL && String2 != NULL) {
@@ -855,33 +860,28 @@ extern  "C" {
         return StringsMatch;
     }
     
-    uint64_t            UTF32String_FindSubstring(UTF32String String, uint64_t StringSize, UTF32String SubString, uint64_t SubStringSize) {
+    uint64_t        UTF32String_FindSubstring(UTF32String String, UTF32String SubString) {
         uint64_t   Offset             = 0ULL;
-        uint64_t   CodePoint          = 0ULL;
-        uint64_t   SubStringCodePoint = 0ULL;
-        if (String != NULL && SubString != NULL && SubStringSize < StringSize) {
-            while (String[CodePoint] == SubString[SubStringCodePoint] && CodePoint <= StringSize && SubStringCodePoint <= SubStringSize) {
-                CodePoint                += 1;
-                SubStringCodePoint       += 1;
-            }
-            if (CodePoint == StringSize) {
-                Offset = CodePoint;
-            }
+        uint64_t   CodePoint          = 1ULL;
+        uint64_t   SubStringCodePoint = 1ULL;
+        if (String != NULL && SubString != NULL) {
+            do {
+                if (String[CodePoint] == SubString[SubStringCodePoint] && String[CodePoint] == SubString[SubStringCodePoint]) {
+                    // Ok well lets go ahead and implement finding substring
+                }
+            } while (String[CodePoint] != 0);
         } else if (String == NULL) {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String Pointer is NULL");
         } else if (SubString == NULL) {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"SubString Pointer is NULL");
-        } else if (SubStringSize >= StringSize) {
-            BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"SubString is bigger than or equal to String");
         }
-        
         return Offset;
     }
     
-    UTF32String         UTF32String_Extract(UTF32String String, uint64_t StringSize, uint64_t Start, uint64_t End) {
+    UTF32String         UTF32String_Extract(UTF32String String, uint64_t Start, uint64_t End) {
         uint64_t    ExtractedStringSize = (Start - End) + 1 + UnicodeNULLTerminatorSize;
         UTF32String ExtractedString     = NULL;
-        if (String != NULL && Start <= StringSize && End <= StringSize && End > Start) {
+        if (String != NULL && End > Start) {
             ExtractedString             = calloc(ExtractedStringSize, sizeof(uint32_t));
             if (ExtractedString != NULL) {
                 for (uint64_t CodePoint = Start; CodePoint < End; CodePoint++) {
@@ -892,17 +892,13 @@ extern  "C" {
             }
         } else if (String == NULL) {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"String Pointer is NULL");
-        } else if (Start > StringSize) {
-            BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"Start is after the end of the string");
-        } else if (End > StringSize) {
-            BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"End is after the end of the string");
         } else if (End < Start) {
             BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"End is before Start");
         }
         return ExtractedString;
     }
     
-    int64_t             UTF32String_ToNumber(UTF32String String, uint64_t StringSize) {
+    int64_t             UTF32String_ToNumber(UTF32String String) {
         uint64_t CodePoint  = 0ULL;
         int8_t   Sign       =  1;
         uint8_t  Base       = 10;
@@ -923,7 +919,7 @@ extern  "C" {
         } else if (String[CodePoint] == '-') {
             Sign     = -1;
         }
-        while (CodePoint < StringSize) {
+        do {
             Value     *= Base;
             if (Base == 16 && (String[CodePoint] >= 0x41 && String[CodePoint] <= 0x46)) {
                 Value += (String[CodePoint] - 50);
@@ -936,22 +932,22 @@ extern  "C" {
             } else if (Base == 2 && (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x31)) {
                 Value += (String[CodePoint] - 48);
             }
-        }
+        } while (String[CodePoint] != 0);
         return Sign < 0 ? Value * Sign : Value;
     }
     
-    bool                UTF8String_Compare(UTF8String String1, uint64_t String1Size, UTF8String String2, uint64_t String2Size, bool Normalize, bool CaseFold) {
+    bool                UTF8String_Compare(UTF8String String1, UTF8String String2, bool Normalize, bool CaseFold) {
         bool StringsMatch = No;
         if (String1 != NULL && String2 != NULL) {
             UTF32String String1UTF32 = UTF8String_Decode(String1);
             UTF32String String2UTF32 = UTF8String_Decode(String2);
             if (Normalize == Yes) {
-                UTF32String_Normalize(String1UTF32, String1Size);
-                UTF32String_Normalize(String2UTF32, String2Size);
+                UTF32String_Normalize(String1UTF32);
+                UTF32String_Normalize(String2UTF32);
             }
             if (CaseFold == Yes) {
-                UTF32String_CaseFold(String1UTF32, String1Size);
-                UTF32String_CaseFold(String2UTF32, String2Size);
+                UTF32String_CaseFold(String1UTF32);
+                UTF32String_CaseFold(String2UTF32);
             }
             StringsMatch = UTF32Strings_Compare(String1UTF32, String2UTF32);
             free(String1UTF32);
@@ -964,18 +960,18 @@ extern  "C" {
         return StringsMatch;
     }
     
-    bool               UTF16String_Compare(UTF16String String1, uint64_t String1Size, UTF16String String2, uint64_t String2Size, bool Normalize, bool CaseFold) {
+    bool               UTF16String_Compare(UTF16String String1, UTF16String String2, bool Normalize, bool CaseFold) {
         bool StringsMatch = No;
         if (String1 != NULL && String2 != NULL) {
             UTF32String String1UTF32 = UTF16String_Decode(String1);
             UTF32String String2UTF32 = UTF16String_Decode(String2);
             if (Normalize == Yes) {
-                UTF32String_Normalize(String1UTF32, String1Size);
-                UTF32String_Normalize(String2UTF32, String2Size);
+                UTF32String_Normalize(String1UTF32);
+                UTF32String_Normalize(String2UTF32);
             }
             if (CaseFold == Yes) {
-                UTF32String_CaseFold(String1UTF32, String1Size);
-                UTF32String_CaseFold(String2UTF32, String2Size);
+                UTF32String_CaseFold(String1UTF32);
+                UTF32String_CaseFold(String2UTF32);
             }
             StringsMatch = UTF32Strings_Compare(String1UTF32, String2UTF32);
         } else if (String1 == NULL) {

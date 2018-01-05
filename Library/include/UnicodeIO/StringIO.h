@@ -96,17 +96,16 @@ extern  "C" {
     
     /*!
      @abstract                             "Converts string to use precomposed forms when possible, otherwise it orders the combining codepoints in lexiographic order".
+     @remark                               "The string is reallocated at the end to remove unused space".
      @param               String2Normalize "The sring to be normalized".
-     @param               StringSize       "The size of String2Normalize in CodePoints".
      */
-    UTF32String           UTF32StringNormalize(UTF32String String2Normalize, uint64_t StringSize);
+    void                  UTF32String_Normalize(UTF32String String2Normalize);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
      @param               String2CaseFold  "The sring to be casefolded".
-     @param               StringSize       "The size of String2CaseFold in CodePoints".
      */
-    UTF32String           UTF32String_CaseFold(UTF32String String2CaseFold, uint64_t StringSize);
+    void                  UTF32String_CaseFold(UTF32String String2CaseFold);
     
     /*!
      @abstract                             "Compares String1 and String2 for equilivence".
@@ -116,24 +115,23 @@ extern  "C" {
     /*!
      @abstract                             "Extracts a substring from String starting at position Start and ending at position End".
      */
-    UTF32String           UTF32String_Extract(UTF32String String, uint64_t StringSize, uint64_t Start, uint64_t End);
+    UTF32String           UTF32String_Extract(UTF32String String, uint64_t Start, uint64_t End);
     
     /*!
-     @abstract                             "Returns the position of the first non-substring codepoint".
+     @abstract                             "Returns the position of the first codepoint in the substring".
      */
-    uint64_t              UTF32String_FindSubstring(UTF32String String, uint64_t StringSize, UTF32String SubString, uint64_t SubStringSize);
+    uint64_t              UTF32String_FindSubstring(UTF32String String, UTF32String SubString);
     
     /*!
      @abstract                             "Extracts a number from a string".
      @param               String           "The sring to extract a number from".
-     @param               StringSize       "The size of String in CodePoints".
      */
-    int64_t               UTF32String_ToNumber(UTF32String String, uint64_t StringSize);
+    int64_t               UTF32String_ToNumber(UTF32String String);
     
     /* High level fucntions */
-    bool                  UTF8String_Compare(UTF8String String1, uint64_t String1Size, UTF8String String2, uint64_t String2Size, bool Normalize, bool CaseFold);
+    bool                  UTF8String_Compare(UTF8String String1, UTF8String String2, bool Normalize, bool CaseFold);
     
-    bool                  UTF16String_Compare(UTF16String String1, uint64_t String1Size, UTF16String String2, uint64_t String2Size, bool Normalize, bool CaseFold);
+    bool                  UTF16String_Compare(UTF16String String1, UTF16String String2, bool Normalize, bool CaseFold);
     
 #ifdef  __cplusplus
 }

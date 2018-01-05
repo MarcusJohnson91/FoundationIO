@@ -194,7 +194,7 @@ extern "C" {
         } else if (BinaryGUUID == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"BinaryGUUID Pointer is NULL");
         } else if (SwappedBinaryGUUID == NULL) {
-            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, (const UTF8String)__func__, u8"Not enough memory to allocate %d bytes", BitIOBinaryGUUIDSize);
+            BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"Not enough memory to allocate %d bytes", BitIOBinaryGUUIDSize);
         }
         return SwappedBinaryGUUID;
     }
@@ -299,22 +299,29 @@ extern "C" {
     
     /* BitBuffer Resource Management */
     static inline void InsertBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
+        // The number of bits to pop into each loop of the byte is 8 - (BitB->BitOffset % 8)
         uint8_t Bits = NumBits2Insert;
         while (Bits > 0) {
-            uint64_t Bits2Put      = NumBits2ExtractFromByte(BitB->BitOffset, Bits);
-            uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)] & CreateBitMaskLSBit(Bits2Put);
+            /*
+             uint64_t Bits2Put      = NumBits2ExtractFromByte(BitB->BitOffset, Bits);
+             uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)] & CreateBitMaskLSBit(Bits2Put);
+             */
+            uint8_t Bits2InsertForThisByte = Bits > 8 - (BitB->BitOffset % 8) ? 8 - (BitB->BitOffset % 8) : Bits;
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
-            // Extract as is
+            uint8_t  ParamOffset    = NumBits2Insert - Bits;
+            uint64_t ByteMask       = CreateBitMaskLSBit(Bits2InsertForThisByte) << ParamOffset;
+            uint8_t  Byte2Insert    = (Data2Insert & ByteMask) >> ParamOffset;
+            BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)] = Byte2Insert & CreateBitMaskLSBit(Bits2InsertForThisByte);
 #elif (RuntimeByteOrder == LSByte && RuntimeBitOrder == MSBit)
             uint8_t FinalByte      = SwapBits(Data);
-            // Extract and flip bit order
+            // Extract the data from byte0 bit7
+            
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == LSBit)
-            // Extract and flip byte order
+            // Extract the data from byte8 bit0
 #elif (RuntimeByteOrder == MSByte && RuntimeBitOrder == MSBit)
-            uint8_t FinalByte      = SwapBits(Data);
-            // Extract and flip the byte order AND bit order
+            // Extract the data from byte8 bit7
 #endif
-            Bits                  -= Bits2Put;
+            Bits                  -= Bits2InsertForThisByte;
         }
     }
     
