@@ -51,12 +51,12 @@ extern   "C" {
     
     /*!
      @abstract                                                  "Logs to BitIOLogFile, which can be a user specified path, otherwise it's STDERR".
-     @param                     ErrorSeverity                   "Any of the types provided by BitIOLogTypes".
-     @param                     LibraryOrProgram                "Name of the program or library at fault".
+     @param                     Severity                        "Any of the types provided by BitIOLogTypes".
+     @param                     LibraryName                     "Name of the program or library at fault".
      @param                     FunctionName                    "Which function is calling BitIOLog?".
      @param                     Description                     "String describing what went wrong".
      */
-    void                        BitIOLog(BitIOLogTypes ErrorSeverity, UTF8Constant LibraryOrProgram, UTF8Constant FunctionName, UTF8Constant Description, ...);
+    void                        BitIOLog(BitIOLogTypes Severity, UTF8Constant LibraryName, UTF8Constant FunctionName, UTF8Constant Description, ...);
     
     /*!
      @abstract                                                  "Closes the BitIOLogFile".

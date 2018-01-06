@@ -40,21 +40,27 @@ extern "C" {
         }
     }
     
-    void BitIOLog(BitIOLogTypes ErrorSeverity, UTF8Constant LibraryOrProgram, UTF8Constant FunctionName, UTF8Constant Description, ...) {
-        UTF8Constant ErrorString = u8"ERROR";
-        UTF8Constant DebugString = u8"DEBUG";
+    void BitIOLog(BitIOLogTypes Severity, UTF8Constant LibraryName, UTF8Constant FunctionName, UTF8Constant Description, ...) {
+        UTF8Constant Error = u8"ERROR";
+        UTF8Constant Debug = u8"DEBUG";
         
         va_list VariadicArguments;
         va_start(VariadicArguments, Description);
-        UTF8String StringSizeString = calloc(2, sizeof(UTF8String));
-        uint64_t StringSize = vsnprintf(StringSizeString, 2, Description, VariadicArguments);
-        free(StringSizeString);
-        UTF8String HardString = calloc(StringSize + BitIOLogNULLStringSize, sizeof(UTF8String));
-        vsnprintf(HardString, StringSize, Description, VariadicArguments);
-        va_end(VariadicArguments);
         
-        fprintf(BitIOLogFile == NULL ? stderr : BitIOLogFile, "%s: %s in %s\'s %s: \"%s\"%s", BitIOProgramName, ErrorSeverity == BitIOLog_ERROR ? ErrorString : DebugString, LibraryOrProgram, FunctionName, HardString, BitIONewLine);
-        free(HardString);
+        UTF8String StringSizeString = calloc(2, sizeof(UTF8String));
+        uint64_t   StringSize       = vsnprintf(StringSizeString, 2, Description, VariadicArguments) + BitIOLogNULLStringSize + BitIONewLineSize;
+        free(StringSizeString);
+        
+        UTF8String Variadic         = calloc(StringSize, sizeof(UTF8String));
+        vsnprintf(Variadic, StringSize, Description, VariadicArguments);
+        
+        va_end(VariadicArguments);
+        if (BitIOProgramName != NULL) {
+            fprintf(BitIOLogFile == NULL ? stderr : BitIOLogFile, "%s: %s in %s\'s %s: \"%s\"%s", BitIOProgramName, Severity == BitIOLog_ERROR ? Error : Debug, LibraryName, FunctionName, Variadic, BitIONewLine);
+        } else {
+            fprintf(BitIOLogFile == NULL ? stderr : BitIOLogFile, "%s in %s\'s %s: \"%s\"%s", Severity == BitIOLog_ERROR ? Error : Debug, LibraryName, FunctionName, Variadic, BitIONewLine);
+        }
+        free(Variadic);
     }
     
     void BitIOLog_CloseFile(void) {
@@ -66,3 +72,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+

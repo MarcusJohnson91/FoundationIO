@@ -216,12 +216,14 @@ extern "C" {
     
     BitBuffer *BitBuffer_Init(const uint64_t BitBufferSize) {
         BitBuffer *BitB                  = (BitBuffer*) calloc(1, sizeof(BitBuffer));
-        if (BitB != NULL) {
+        if (BitB != NULL && BitBufferSize > 0) {
             BitB->Buffer                 = (uint8_t*) calloc(BitBufferSize, sizeof(uint8_t));
-            if (BitB->Buffer == NULL) {
+            if (BitB->Buffer != NULL) {
+                BitB->NumBits            = Bytes2Bits(BitBufferSize);
+            } else {
                 BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"Not enough memory to allocate %d bits for BitBuffer's buffer", BitBufferSize);
             }
-        } else {
+        } else if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"Not enough memory to allocate this instance of BitBuffer");
         }
         return BitB;
@@ -355,16 +357,25 @@ extern "C" {
 #endif
     }
     
-    static inline uint64_t ExtractBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Extract) {
-        uint64_t OutputData        = 0ULL;
-        uint8_t  UserRequestedBits = Bits2Extract;
-        uint8_t  FinalByte         = 0;
-        uint8_t  Times2Shift       = 0;
-        uint8_t  Data              = 0;
+    static inline uint64_t ExtractBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Extract) {
+        /*
+        uint8_t Bits = NumBits2Insert;
+        while (Bits > 0) {
+            // uint64_t Bits2Put      = NumBits2ExtractFromByte(BitB->BitOffset, Bits);
+            // uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)] & CreateBitMaskLSBit(Bits2Put);
+            uint8_t Bits2InsertForThisByte = Bits > 8 - (BitB->BitOffset % 8) ? 8 - (BitB->BitOffset % 8) : Bits;
+#if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
+            uint8_t  ParamOffset    = NumBits2Insert - Bits;
+            uint64_t ByteMask       = CreateBitMaskLSBit(Bits2InsertForThisByte) << ParamOffset;
+            uint8_t  Byte2Insert    = (Data2Insert & ByteMask) >> ParamOffset;
+            BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)] = Byte2Insert & CreateBitMaskLSBit(Bits2InsertForThisByte);
+            */
+        uint8_t OutputData = 0ULL;
+        uint8_t Bits       = NumBits2Extract;
         
-        while (UserRequestedBits > 0) {
-            uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, UserRequestedBits);
-            Data                   = BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)] & CreateBitMaskLSBit(Bits2Get);
+        while (Bits > 0) {
+            uint64_t Bits2Get      = NumBits2ExtractFromByte(BitB->BitOffset, Bits);
+            uint8_t  Data          = BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)] & CreateBitMaskLSBit(Bits2Get);
 #if   (RuntimeByteOrder == LSByte && RuntimeBitOrder == LSBit)
             // Ok, so the byte and bit order is the same, so we need to just loop over the bits normally.
             OutputData           <<= Bits2Get;
@@ -385,7 +396,7 @@ extern "C" {
             OutputData            += Data;
             OutputData             = SwapEndian64(OutputData);
 #endif
-            UserRequestedBits     -= Bits2Get;
+            Bits                  -= Bits2Get;
         }
         return OutputData;
     }
@@ -1139,11 +1150,10 @@ extern "C" {
     fpos_t BitInput_GetFileSize(BitInput *BitI) {
         fpos_t InputSize = 0LL;
         if (BitI != NULL) {
-            if (BitI->FileSize != 0) {
-                InputSize = BitI->FileSize;
-            } else {
+            if (BitI->FileSize == 0) {
                 BitInput_FindFileSize(BitI);
             }
+            InputSize = BitI->FileSize;
         } else {
             BitIOLog(BitIOLog_ERROR, BitIOLogLibraryName, __func__, u8"BitInput Pointer is NULL");
         }
