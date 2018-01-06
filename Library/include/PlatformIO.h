@@ -163,6 +163,131 @@ typedef    float               BinaryGUUID_t;
 #define    RuntimeBitOrder     MSBit
 #endif
     
+    /*
+     Ok so we need to know the position of a bit, byte, and word in the runtime system.
+     the Most Significant Bit  means which bit  has the highest value, the one on the left or the right?
+     the Most Significant Byte means which byte has the highest value, the one on the left or the right?
+     
+     In order to test the bit  order, we need to set a byte  to 0x80   and read it back, if the value is   128 then the left-most bit  is the most significant, if it's   1 it's the rightmost bit.
+     In order to test the byte order, we need to set a short to 0xFF00 and read it back, if the value is 65280 then the left-most byte is the most significant, it it's 255 it's the rightmost byte.
+     */
+    
+    /*
+     For now, let's just worry about setting up runtime functions to detect the bit and byte orders, we'll worry about optimizing it with compile time generics later on.
+     */
+    
+    /*
+     First we need to come up with a new way to describe bit/byte order.
+     What we're trying to describe is the position or side in which the most value bit/bye is located.
+     if the most significant bit  is on the left, then blah blah blah.
+     if the most significant byte is on the left, then blah blah blah.
+     
+     Now, the least signifiicant bit/byte is NESSICARILY on the opposite side as the most significant.
+     
+     WhichSideIsTheMostSignificantBitOn  Left/Right
+     WhichSideIsTheMostSignificantByteOn Left/Right
+     
+     How do we shorten that?
+     
+     BitIOMSByte = Left/Right
+     BitIOLSByte = Left/Right
+     BitIOMSBit  = Left/Right
+     BitIOLSBit  = Left/Right
+     
+     or what about
+     
+     BitIORuntimeByteOrder = BitIOMSByteLeft/BitIOMSByteRight
+     BitIORuntimeBitOrder  = BitIOMSBitLeft/BitIOMSBitRight
+     
+     so
+     
+     BitIORuntimeByteOrder
+     BitIORuntimeBitOrder
+     
+     BitIOMSByteLeft
+     BitIOMSByteRight
+     
+     BitIOMSBitLeft
+     BitIOMSBitRight
+     
+     BitIOLSByteLeft
+     BitIOLSByteRight
+     
+     BitIOLSBitLeft
+     BitIOLSBitRight
+     
+     Byte order values should be W/X
+     Bit  order values should be Y/Z
+     
+     I want it so that the most signfiicant and least significant bits and bytes can be ANDed together to create a simple bitmask that describes the order of bits/bytes
+     
+     so that RuntimeByteOrder == (MostSignificantByteDirection|LeastSignificantByteDirection)
+     
+     so if the MSBit is on the left and the LSBit is on the right, we're looking at a LSBitFirst byte
+     
+     so
+     
+     MSBitSide  = (Left||Right)
+     LSBitSide  = (Left||Right)
+     
+     MSByteSide = (Left||Right)
+     LSByteSide = (Left||Right)
+     
+     what if instead we used the position? so that where teh left or right is in relation to each other tells us where the MSB is?
+     
+     ByteOrder  = (Left|Right) // Left side is the MSB Right is the LSB, and therefore the byte order is left to right
+     BitOrder   = (Right|Left) // The rightmost bit is the MSB and the leftmost bit is the LSB.
+     
+     Well if we set Left's and Right's value to it's position, we may have something...
+     
+     so Left = 8 because it's bit 8, and right to 1 because it's bit 1 when hey're ORed together we get 9
+     the only problem is that we'll also get 9 if we OR 1 and 8.
+     
+     
+     
+     Ok, so we need to record where the LSBit/LSByte is directionally.
+     
+     is it to the far left or far right?
+     
+     Ok so we have A Unicode French symbol, U+269C, in BigEndian it's 0x269C, in LittleEndian it's 0x9C26.
+     
+     on a little endian machine, you just read the bytes for the LE version.
+     on a big    endian machine, you just read the bytes for the BE version.
+     
+     on a little endian machine, you byteswap the BE version.
+     on a big    endian machine, you byteswap the LE version.
+     
+     To properly read the data, we need to know the format the data is written in, and the format the target machine requires.
+     
+     
+     */
+    
+    typedef enum BitIODirection {
+        BitIODirectionUnknown      = 0,
+        BitIODirectionRight2Left   = 1,
+        BitIODirectionLeft2Right   = 2,
+    } BitIODirection;
+    
+#define BitIOByteOrder BitIODirectionRight2Left // aka read from the LSB to the MSB
+#define BitIOBitOrder  BitIODirectionLeft2Right // aka read from the MSB to the LSB
+    
+    static void DetectRuntimeBitOrder() {
+        uint8_t Value = 0x80;
+        if (Value == 128) {
+            //BIT_ORDER = MSBit;
+        } else if (Value == 1) {
+            //BIT_ORDER = LSBit;
+        }
+    }
+    
+    static void DetectRuntimeByteOrder() {
+        uint16_t Value = 0xFF00;
+        if (Value == 65280) {
+            //BYTE_ORDER = MSByte;
+        } else if (Value == 255) {
+            //BYTE_ORDER = LSByte;
+        }
+    }
     
 #ifdef  __cplusplus
 }
