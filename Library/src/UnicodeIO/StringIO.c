@@ -180,10 +180,10 @@ extern  "C" {
                             CodeUnitNum             += 4;
                             break;
                     }
-                    if (DecodedString[CodePoint]    <= 0x7F && CodePointSize > 1) { // Invalid, overlong sequence detected, replace it with 0xFFFD
+                    if (CodePointSize > 1 && DecodedString[CodePoint] <= 0x7F) { // Invalid, overlong sequence detected, replace it with 0xFFFD
                         DecodedString[CodePoint]     = 0xFFFD;
                         BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, u8"CodePoint %d is overlong, replaced with U+FFFD", CodePoint);
-                    } else if ((DecodedString[CodePoint] >= 0xD800 && DecodedString[CodePoint] <= 0xDBFF) || (DecodedString[CodePoint] >= 0xDC00 && DecodedString[CodePoint] <= 0xDFFF)) {
+                    } else if (DecodedString[CodePoint] >= 0xD800 && DecodedString[CodePoint] <= 0xDFFF) {
                         DecodedString[CodePoint]     = 0xFFFD;
                         BitIOLog(BitIOLog_ERROR, StringIOLibraryName, __func__, "Codepoint %d is invalid, overlaps Surrogate Pair Block, replacing with U+FFFD", CodePoint);
                     }
@@ -240,6 +240,10 @@ extern  "C" {
     }
     
     UTF32String         UTF16String_Decode(UTF16String String) {
+        /*
+         High Surrogate range: 0xD800 - 0xDBFF
+         Low  Surrogate range: 0xDC00 - 0xDFFF
+         */
         uint64_t CodePoint          = 0ULL;
         uint64_t CodeUnitNum        = 0ULL;
         UTF32String DecodedString   = NULL;
