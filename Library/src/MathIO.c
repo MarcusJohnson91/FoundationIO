@@ -1,4 +1,7 @@
 #include "../include/BitIOMath.h"
+#include "../include/BitIOMacros.h"
+
+#include <tgmath.h>
 
 #ifdef   __cplusplus
 extern   "C" {

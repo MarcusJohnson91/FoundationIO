@@ -1,38 +1,34 @@
-#include "../include/BitIOLog.h"
+#include <stdarg.h>                  /* Included for va_end, va_list, va_start */
+#include <stdint.h>                  /* Included for uint64_t */
+#include <stdio.h>                   /* Included for FILE */
+#include <stdlib.h>                  /* Included for calloc, free */
 
-#if    (BitIOTargetOS == BitIOWindowsOS)
-#pragma warning(push, 0)
-#endif
-#include <stdarg.h>  /* Included for the variadic argument support macros */
-#include <stdio.h>   /* Included for the printf family */
-#include <stdlib.h>  /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, and free */
-#if    (BitIOTargetOS == BitIOWindowsOS)
-#pragma warning(pop)
-#endif
+#include "../include/StringIO.h"     /* Included for UTF8 */
+#include "../include/BitIOLog.h"     /* Included for BitIOLogTypes */
+#include "../include/BitIOMacros.h"  /* Included for BitIONewLineWithNULLSize, BitIOTargetOS */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
     
-#define BitIOLogNULLStringSize 1
+    static FILE  *BitIOLog_LogFile     = NULL;
+    static UTF8 *BitIOLog_ProgramName  = NULL;
     
-    static FILE       *BitIOLogFile     = NULL;
-    static UTF8String  BitIOProgramName = NULL;
-    
-    void BitIOLog_SetProgramName(UTF8String ProgramName) {
+    void BitIOLog_SetProgramName(UTF8 *ProgramName) {
         if (ProgramName != NULL) {
-            BitIOProgramName = ProgramName;
+            BitIOLog_ProgramName = ProgramName;
+            printf("BitIOLog_ProgramName: %s%s", BitIOLog_ProgramName, BitIONewLine);
         }
     }
     
-    void BitIOLog_OpenFile(UTF8String LogFilePath) {
+    void BitIOLog_OpenFile(UTF8 *restrict LogFilePath) {
         if (LogFilePath != NULL) {
 #if   (BitIOTargetOS == BitIOPOSIXOS)
-            BitIOLogFile                = fopen(LogFilePath, "a+");
+            BitIOLog_LogFile            = fopen(LogFilePath, "a+");
 #elif (BitIOTargetOS == BitIOWindowsOS)
-            uint64_t    LogFilePathSize = UTF8String_GetNumCodePoints(LogFilePath);
-            UTF32String LogFilePath32   = UTF8String_Decode(LogFilePath, LogFilePathSize);
-            UTF16String LogFilePath16   = UTF16String_Encode(LogFilePath32, LogFilePathSize);
+            uint64_t    LogFilePathSize = UTF8_GetNumCodePoints(LogFilePath);
+            UTF32 LogFilePath32         = UTF8_Decode(LogFilePath, LogFilePathSize);
+            UTF16 LogFilePath16         = UTF16_Encode(LogFilePath32, LogFilePathSize);
             free(LogFilePath32);
             BitIOLogFile                = _wfopen(LogFilePath16, "a+");
             free(LogFilePath16);
@@ -40,32 +36,31 @@ extern "C" {
         }
     }
     
-    void BitIOLog(BitIOLogTypes Severity, UTF8Constant LibraryName, UTF8Constant FunctionName, UTF8Constant Description, ...) {
-        UTF8Constant Error = u8"ERROR";
-        UTF8Constant Debug = u8"DEBUG";
+    void BitIOLog(BitIOLogTypes Severity, const UTF8 FunctionName[], const UTF8 Description[], ...) {
+        UTF8 Error[] = u8"ERROR";
+        UTF8 Debug[] = u8"DEBUG";
         
         va_list VariadicArguments;
         va_start(VariadicArguments, Description);
-        
-        UTF8String StringSizeString = calloc(2, sizeof(UTF8String));
-        uint64_t   StringSize       = vsnprintf(StringSizeString, 2, Description, VariadicArguments) + BitIOLogNULLStringSize + BitIONewLineSize;
-        free(StringSizeString);
-        
-        UTF8String Variadic         = calloc(StringSize, sizeof(UTF8String));
-        vsnprintf(Variadic, StringSize, Description, VariadicArguments);
-        
+        uint64_t   StringSize       = vsnprintf(NULL, 0, Description, VariadicArguments) + BitIONewLineWithNULLSize;
+        UTF8 *VariadicString        = calloc(StringSize, sizeof(UTF8));
+        vsnprintf(VariadicString, StringSize, Description, VariadicArguments);
         va_end(VariadicArguments);
-        if (BitIOProgramName != NULL) {
-            fprintf(BitIOLogFile == NULL ? stderr : BitIOLogFile, "%s: %s in %s\'s %s: \"%s\"%s", BitIOProgramName, Severity == BitIOLog_ERROR ? Error : Debug, LibraryName, FunctionName, Variadic, BitIONewLine);
+        
+        if (BitIOLog_ProgramName != NULL) {
+            fprintf(BitIOLog_LogFile == NULL ? stderr : BitIOLog_LogFile, "%s: %s in %s: \"%s\"%s", BitIOLog_ProgramName, Severity == BitIOLog_ERROR ? Error : Debug, FunctionName, VariadicString, BitIONewLine);
         } else {
-            fprintf(BitIOLogFile == NULL ? stderr : BitIOLogFile, "%s in %s\'s %s: \"%s\"%s", Severity == BitIOLog_ERROR ? Error : Debug, LibraryName, FunctionName, Variadic, BitIONewLine);
+            fprintf(BitIOLog_LogFile == NULL ? stderr : BitIOLog_LogFile, "%s in %s: \"%s\"%s", Severity == BitIOLog_ERROR ? Error : Debug, FunctionName, VariadicString, BitIONewLine);
         }
-        free(Variadic);
+        free(VariadicString);
     }
     
-    void BitIOLog_CloseFile(void) {
-        if (BitIOLogFile != NULL) {
-            fclose(BitIOLogFile);
+    void BitIOLog_Deinit(void) {
+        if (BitIOLog_LogFile != NULL) {
+            fclose(BitIOLog_LogFile);
+        }
+        if (BitIOLog_ProgramName != NULL) {
+            free(BitIOLog_ProgramName);
         }
     }
     

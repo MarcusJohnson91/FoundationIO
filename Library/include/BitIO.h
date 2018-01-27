@@ -1,15 +1,9 @@
-#include "../include/BitIOMacros.h"
-#include "../include/StringIO.h"
-
-#if    (BitIOTargetOS == BitIOWindowsOS)
-#pragma warning(push, 0)
-#endif
 #include <stdbool.h> /* Included for the bool type */
 #include <stdint.h>  /* Included for the u/intX_t types */
 #include <stdio.h>   /* Included for fpos_t */
-#if    (BitIOTargetOS == BitIOWindowsOS)
-#pragma warning(pop)
-#endif
+
+#include "../include/StringIO.h"
+#include "../include/BitIOMacros.h"
 
 #pragma  once
 
@@ -37,7 +31,7 @@ extern   "C" {
      @constant                  BitIOBinaryGUUIDSize            "Size of a BinaryUUID or BinaryGUID".
      */
     enum BitIOConstants {
-                                BitIONULLString                 = 0x0,
+                                BitIONULLString                 =  0,
                                 BitIONULLStringSize             =  1,
                                 BitIOGUUIDStringSize            = 20 + BitIONULLStringSize,
                                 BitIOBinaryGUUIDSize            = 16,
@@ -57,66 +51,57 @@ extern   "C" {
     } BitInputOutputFileTypes;
     
     /*!
+     @enum                      GUUIDTypes
+     @constant                  UnknownGUUID                    "The GUUID type is unknown, invalid".
+     @constant                  GUIDString                      "The GUUID is a GUID string, aka little endian/Least Significant Byte first UUID with hyphens".
+     @constant                  UUIDString                      "The GUUID is a UUID string, aka big endian   /Most  Significant Byte first UUID with hyphens".
+     @constant                  BinaryGUID                      "The GUUID is a Binary GUID, aka little endian/Least Significant Byte first UUID without hyphens".
+     @constant                  BinaryUUID                      "The GUUID is a Binary UUID, aka big endian   /Most  Significant Byte First UUID without hypthns".
+     */
+    typedef enum GUUIDTypes {
+                                UnknownGUUID                    = 0,
+                                GUIDString                      = 1,
+                                UUIDString                      = 2,
+                                BinaryGUID                      = 3,
+                                BinaryUUID                      = 4,
+    } GUUIDTypes;
+    
+    /*!
      @enum                      UnaryTypes
-     @constant                  CountUnary                      "Supports only positive integers (excluding zero), Truncates the last bit before the stop bit".
+     @constant                  CountUnary                      "Supports only positive integers (including zero), The stop bit is excluded from the count".
+     @constant                  TruncatedCountUnary             "Supports only positive integers (excluding zero), The stop bit is included in the count".
      @constant                  WholeUnary                      "Supports all the whole integers including zero and negatives (up to 2^63 -1 anyway)".
      */
     typedef enum UnaryTypes {
+                                UnknownUnary                    = 0,
                                 CountUnary                      = 1,
-                                WholeUnary                      = 2,
+                                TruncatedCountUnary             = 2,
+                                WholeUnary                      = 3,
     } UnaryTypes;
     
-    /* Pure GUUID */
     /*!
-     @abstract                                                  "Compares GUUIDStrings for equilivence".
-     @param                     GUUIDString1                    "Pointer to GUUIDString or BinaryGUUID to be compared".
-     @param                     GUUIDString2                    "Pointer to GUUIDString or BinaryGUUID to be compared".
+     @abstract                                                  "Compares GUUIDs for equilivence, GUUID1 and 2 HAVE to be the same type".
+     @param                     GUUID1                          "Pointer to a GUUID to be compared".
+     @param                     GUUID2                          "Pointer to a GUUID to be compared".
      @return                                                    "Returns Yes if GUUID1 and GUUID2 match, No otherwise".
      */
-    bool                        CompareGUUIDStrings(const uint8_t GUUIDString1[BitIOGUUIDStringSize], const uint8_t GUUIDString2[BitIOGUUIDStringSize]);
+    bool                        CompareGUUIDs(GUUIDTypes GUUIDType, const uint8_t *GUUID1, const uint8_t *GUUID2);
     
     /*!
-     @abstract                                                  "Compares BinaryGUUIDs for equilivence".
-     @param                     BinaryGUUID1                    "Pointer to GUUIDString or BinaryGUUID to be compared".
-     @param                     BinaryGUUID2                    "Pointer to GUUIDString or BinaryGUUID to be compared".
-     @return                                                    "Returns Yes if GUUID1 and GUUID2 match, No otherwise".
+     @abstract                                                  "Converts a GUUID from one representation to another (String->Binary<-String/UUIG->GUID<-UUID)".
+     @param                     InputGUUIDType                  "What type of GUUID are we converting from"?
+     @param                     OutputGUUIDType                 "What type of GUUID are we converting to"?
+     @return                                                    "Returns the converted GUUID".
      */
-    bool                        CompareBinaryGUUIDs(const uint8_t BinaryGUUID1[BitIOBinaryGUUIDSize], const uint8_t BinaryGUUID2[BitIOBinaryGUUIDSize]);
-    
-#define GUUID_Compare(GUUIDType,GUUID1,GUUID2)_Generic((GUUIDType),GUUIDString_t:CompareGUUIDStrings,BinaryGUUID_t:CompareGUUIDStrings)(GUUID1,GUUID2)
-    
+    uint8_t                    *ConvertGUUID(GUUIDTypes InputGUUIDType, GUUIDTypes OutputGUUIDType, const uint8_t *GUUID2Convert);
     
     /*!
-     @abstract                                                  "Converts a GUID/UUIDString to a BinaryGUID/UUID".
-     @param                     GUUIDString                     "Pointer to a GUID/UUIDString".
-     @return                                                    "Returns a pointer to a BinaryGUID/UUID".
-     */
-    uint8_t                    *ConvertGUUIDString2BinaryGUUID(const uint8_t GUUIDString[BitIOGUUIDStringSize]);
-    
-    /*!
-     @abstract                                                  "Converts a BinaryGUID/UUID to a GUID/UUIDString".
-     @param                     BinaryGUUID                     "Pointer to a BinaryGUUID".
-     @return                                                    "Returns a pointer to a GUUIDString".
-     */
-    uint8_t                    *ConvertBinaryGUUID2GUUIDString(const uint8_t BinaryGUUID[BitIOBinaryGUUIDSize]);
-    
-    /*!
-     @abstract                                                  "Converts a GUIDString to a UUIDString or vice versa"
-     */
-    uint8_t                    *SwapGUUIDString(const uint8_t GUUIDString[BitIOGUUIDStringSize]);
-    
-    /*!
-     @abstract                                                  "Converts a BinaryGUID to a BinaryUUID or vice versa".
-     */
-    uint8_t                    *SwapBinaryGUUID(const uint8_t BinaryGUUID[BitIOBinaryGUUIDSize]);
-    
-    /*!
-     @abstract                                                  "Converts a BinaryGUID/UUID to a BinaryUUID/GUID".
+     @abstract                                                  "Swaps the byte order of a BinaryGUUID or GUUIDString".
      @param                     GUUIDType                       "Is this a GUUIDString or BinaryGUUID"?
      @param                     GUUID2Swap                      "GUUID Pointer to swap".
      @return                                                    "Returns a pointer to a swapped GUUID".
      */
-#define GUUID_Swap(GUUIDType,GUUID2Swap)_Generic((GUUIDType),BinaryUUID_t:SwapBinaryGUUID,BinaryGUID_t:SwapBinaryGUUID,UUIDString_t:SwapGUUIDString,GUIDString_t:SwapGUUIDString)(GUUID2Swap)
+    uint8_t                    *SwapGUUID(GUUIDTypes GUUIDType, uint8_t *GUUID2Swap);
     
     /*!
      @abstract                                                 "Frees a BinaryGUUID aka BinaryGUID/BinaryUUID or GUUIDString, aka GUIDString/UUIDString".
@@ -182,366 +167,89 @@ extern   "C" {
     void                        BitBuffer_Skip(BitBuffer *BitB, const int64_t Bits2Skip);
     
     /*!
-     @abstract                                                  "Peeks (read but without recording that it's been read) bits from BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     Bits2Peek                       "The number of bits to Peek from the BitBuffer, as LSByte, LSBit format, to the runtime byte/bit order".
-     */
-    uint64_t                    PeekBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
-    
-    /*!
-     @abstract                                                  "Peeks (read but without recording that it's been read) bits from BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     Bits2Peek                       "The number of bits to Peek from the BitBuffer, as LSByte, MSBit format, to the runtime byte/bit order".
-     */
-    uint64_t                    PeekBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
-    
-    /*!
-     @abstract                                                  "Peeks (read but without recording that it's been read) bits from BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     Bits2Peek                       "The number of bits to Peek from the BitBuffer, as MSByte, LSBit format, to the runtime byte/bit order".
-     */
-    uint64_t                    PeekBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
-    
-    /*!
-     @abstract                                                  "Peeks (read but without recording that it's been read) bits from BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     Bits2Peek                       "The number of bits to Peek from the BitBuffer, as MSByte, MSBit format, to the runtime byte/bit order".
-     */
-    uint64_t                    PeekBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Peek);
-    
-    /*!
-     @abstract                                                  "Peeks (read but without recording that it's been read) bits from BitBuffer".
-     @param                     BitBByteOrder                   "What byte order are the bits in the BitBuffer for this field stored as"?
-     @param                     BitBBitOrder                    "What bit order are the bits in the BitBuffer for this field stored as"?
+     @abstract                                                  "Peeks (reads but without recording that it's been read) bits from BitBuffer".
+     @param                     ByteOrder                       "What byte order are the bits in the BitBuffer for this field stored as"?
+     @param                     BitOrder                        "What bit order are the bits in the BitBuffer for this field stored as"?
      @param                     BitB                            "BitBuffer Pointer".
      @param                     Bits2Peek                       "The number of bits to peek from the BitBuffer".
      */
-#define PeekBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Peek)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsAsLSByteLSBit,BitBMSBit_t:PeekBitsAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:PeekBitsAsMSByteLSBit,BitBMSBit_t:PeekBitsAsMSByteMSBit))(BitB,Bits2Peek)
+    uint64_t                    PeekBits(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Peek);
     
     /*!
      @abstract                                                  "Reads bits from BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     Bits2Read                       "The number of bits to read from the BitBuffer, as LSByte, LSBit format, to the runtime byte/bit order".
-     */
-    uint64_t                    ReadBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read);
-    
-    /*!
-     @abstract                                                  "Reads bits from BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     Bits2Read                       "The number of bits to read from the BitBuffer, as LSByte, MSBit format, to the runtime byte/bit order".
-     */
-    uint64_t                    ReadBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read);
-    
-    /*!
-     @abstract                                                  "Reads bits from BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     Bits2Read                       "The number of bits to read from the BitBuffer, as MSByte, LSBit format, to the runtime byte/bit order".
-     */
-    uint64_t                    ReadBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t Bits2Read);
-    
-    /*!
-     @abstract                                                  "Reads bits from BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     Bits2Read                       "The number of bits to read from the BitBuffer, as MSByte, MSBit format, to the runtime byte/bit order".
-     */
-    uint64_t                    ReadBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t Bits2Read);
-    
-    /*!
-     @abstract                                                  "Reads bits from BitBuffer".
-     @param                     BitBByteOrder                   "What byte order are the bits in the BitBuffer for this field stored as"?
-     @param                     BitBBitOrder                    "What bit order are the bits in the BitBuffer for this field stored as"?
+     @param                     ByteOrder                       "What byte order are the bits in the BitBuffer for this field stored as"?
+     @param                     BitOrder                        "What bit order are the bits in the BitBuffer for this field stored as"?
      @param                     BitB                            "BitBuffer Pointer".
      @param                     Bits2Read                       "The number of bits to read from the BitBuffer".
      */
-#define ReadBits(BitBByteOrder,BitBBitOrder,BitB,Bits2Read)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsAsLSByteLSBit,BitBMSBit_t:ReadBitsAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadBitsAsMSByteLSBit,BitBMSBit_t:ReadBitsAsMSByteMSBit))(BitB,Bits2Read)
+    uint64_t                    ReadBits(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Read);
     
     /*!
      @abstract                                                  "Reads a BinaryGUUID/GUUIDString from the BitBuffer".
-     @param                     BitB                            "Pointer to an instance of BitBuffer".
-     @return                                                    "Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes, there is no NULL terminator".
-     */
-    uint8_t                    *ReadGUUIDAsUUIDString(BitBuffer *BitB);
-    
-    /*!
-     @abstract                                                  "Reads a BinaryGUUID/GUUIDString from the BitBuffer".
-     @param                     BitB                            "Pointer to an instance of BitBuffer".
-     @return                                                    "Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes, there is no NULL terminator".
-     */
-    uint8_t                    *ReadGUUIDAsGUIDString(BitBuffer *BitB);
-    
-    /*!
-     @abstract                                                  "Reads a BinaryGUUID/GUUIDString from the BitBuffer".
+     @param                     GUUIDType                       "The type of GUUID to read".
      @param                     BitB                            "Pointer to an instance of BitBuffer".
      @return                                                    "Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
      */
-    uint8_t                    *ReadGUUIDAsBinaryUUID(BitBuffer *BitB);
-    
-    /*!
-     @abstract                                                  "Reads a BinaryGUUID/GUUIDString from the BitBuffer".
-     @param                     BitB                            "Pointer to an instance of BitBuffer".
-     @return                                                    "Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
-     */
-    uint8_t                    *ReadGUUIDAsBinaryGUID(BitBuffer *BitB);
-    
-    /*!
-     @abstract                                                  "Reads a BinaryGUUID/GUUIDString from the BitBuffer".
-     @param                     GUUIDType                       "GUUIDType is BitIOGUUIDString or BitIOBinaryGUUID".
-     @param                     ByteOrder                       "ByteOrder is BitIOLSByte or BitIOMSByte".
-     @param                     BitB                            "Pointer to an instance of BitBuffer".
-     @return                                                    "Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
-     */
-#define ReadGUUID(GUUIDType,ByteOrder,BitB)_Generic((GUUIDType),GUUIDString_t:_Generic((ByteOrder),BitBLSByte_t:ReadGUUIDAsGUIDString,BitBMSByte_t:ReadGUUIDAsUUIDString),BinaryGUUID_t:_Generic((ByteOrder),BitBLSByte_t:ReadGUUIDAsBinaryGUID,BitBMSByte_t:ReadGUUIDAsBinaryUUID))(BitB)
+    uint8_t                    *ReadGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB);
     
     /*!
      @abstract                                                  "Reads unary encoded fields from the BitBuffer".
+     @param                     ByteOrder                       "What byte order are the bits in the BitBuffer for this field stored as"?
+     @param                     BitOrder                        "What bit order are the bits in the BitBuffer for this field stored as"?
      @param                     BitB                            "BitBuffer Pointer".
      @param                     UnaryType                       "What type of Unary coding are we reading"?
      @param                     StopBit                         "Is the stop bit a one or a zero"?
      */
-    uint64_t                    ReadUnaryAsLSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
-    
-    /*!
-     @abstract                                                  "Reads unary encoded fields from the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "Is the stop bit a one or a zero"?
-     */
-    uint64_t                    ReadUnaryAsLSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
-    
-    /*!
-     @abstract                                                  "Reads unary encoded fields from the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "Is the stop bit a one or a zero"?
-     */
-    uint64_t                    ReadUnaryAsMSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
-    
-    /*!
-     @abstract                                                  "Reads unary encoded fields from the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "Is the stop bit a one or a zero"?
-     */
-    uint64_t                    ReadUnaryAsMSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
-    
-    /*!
-     @abstract                                                  "Reads unary encoded fields from the BitBuffer".
-     @param                     BitBByteOrder                   "What byte order are the bits in the BitBuffer for this field stored as"?
-     @param                     BitBBitOrder                    "What bit order are the bits in the BitBuffer for this field stored as"?
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "Is the stop bit a one or a zero"?
-     */
-#define ReadUnary(BitBByteOrder,BitBBitOrder,BitB,UnaryType,StopBit)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryAsLSByteLSBit,BitBMSBit_t:ReadUnaryAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadUnaryAsMSByteLSBit,BitBMSBit_t:ReadUnaryAsMSByteMSBit))(BitB,UnaryType,StopBit)
-    
-    /*!
-     @abstract                                                  "Reads Exp-Golomb encoded fields from the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "What bit is the stop bit"?
-     */
-    uint64_t                    ReadExpGolombAsLSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
-    
-    /*!
-     @abstract                                                  "Reads Exp-Golomb encoded fields from the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "What bit is the stop bit"?
-     */
-    uint64_t                    ReadExpGolombAsLSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
-    
-    /*!
-     @abstract                                                  "Reads Exp-Golomb encoded fields from the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "What bit is the stop bit"?
-     */
-    uint64_t                    ReadExpGolombAsMSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
-    
-    /*!
-     @abstract                                                  "Reads Exp-Golomb encoded fields from the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "What bit is the stop bit"?
-     */
-    uint64_t                    ReadExpGolombAsMSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
+    uint64_t                    ReadUnary(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
     
     /*!
      @abstract                                                  "Writes Exp-Golomb encoded fields from the BitBuffer".
-     @param                     BitBByteOrder                   "What byte order should the bits be in the BitBuffer"?
-     @param                     BitBBitOrder                    "What bit order should the bits be in the BitBuffer"?
+     @param                     ByteOrder                       "What byte order should the bits be in the BitBuffer"?
+     @param                     BitOrder                        "What bit order should the bits be in the BitBuffer"?
      @param                     BitB                            "BitBuffer Pointer".
      @param                     UnaryType                       "What type of Unary coding are we reading"?
      @param                     StopBit                         "What bit is the stop bit"?
      */
-#define ReadExpGolomb(BitBByteOrder,BitBBitOrder,BitB,UnaryType,StopBit)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombAsLSByteLSBit,BitBMSBit_t:ReadExpGolombAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:ReadExpGolombAsMSByteLSBit,BitBMSBit_t:ReadExpGolombAsMSByteMSBit))(BitB,UnaryType,StopBit)
-    
-    /*!
-     @abstract                                                  "Writes bits to the BitBuffer, from the runtime byte/bit order to the specified byte/bit order".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     NumBits2Write                   "How many bits from Bits2Write should we write?".
-     @param                     Bits2Write                      "Contains the data to write into the BitBuffer".
-     */
-    void                        WriteBitsAsLSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
-    
-    /*!
-     @abstract                                                  "Writes bits to the BitBuffer, from the runtime byte/bit order to the specified byte/bit order".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     NumBits2Write                   "How many bits from Bits2Write should we write?".
-     @param                     Bits2Write                      "Contains the data to write into the BitBuffer".
-     */
-    void                        WriteBitsAsLSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
-    
-    /*!
-     @abstract                                                  "Writes bits to the BitBuffer, from the runtime byte/bit order to the specified byte/bit order".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     NumBits2Write                   "How many bits from Bits2Write should we write?".
-     @param                     Bits2Write                      "Contains the data to write into the BitBuffer".
-     */
-    void                        WriteBitsAsMSByteLSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
-    
-    /*!
-     @abstract                                                  "Writes bits to the BitBuffer, from the runtime byte/bit order to the specified byte/bit order".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     NumBits2Write                   "How many bits from Bits2Write should we write?".
-     @param                     Bits2Write                      "Contains the data to write into the BitBuffer".
-     */
-    void                        WriteBitsAsMSByteMSBit(BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    uint64_t                    ReadExpGolomb(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit);
     
     /*!
      @abstract                                                  "Writes bits to the BitBuffer".
-     @param                     BitBByteOrder                   "What byte order are the bits in the BitBuffer for this field stored as"?
-     @param                     BitBBitOrder                    "What bit order are the bits in the BitBuffer for this field stored as"?
+     @param                     ByteOrder                       "What byte order are the bits in the BitBuffer for this field stored as"?
+     @param                     BitOrder                        "What bit order are the bits in the BitBuffer for this field stored as"?
      @param                     BitB                            "BitBuffer Pointer".
      @param                     NumBits2Write                   "How many bits from Bits2Write should we write?".
      @param                     Bits2Write                      "Contains the data to write into the BitBuffer".
      */
-#define WriteBits(BitBByteOrder,BitBBitOrder,BitB,NumBits2Write,Bits2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsLSByteLSBit,BitBMSBit_t:WriteBitsAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteBitsAsMSByteLSBit,BitBMSBit_t:WriteBitsAsMSByteMSBit))(BitB,NumBits2Write,Bits2Write)
-    
-    /*!
-     @abstract                                                  "Writes unary encoded fields to the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "Is the stop bit a one or a zero"?
-     @param                     Field2Write                     "Value to be written as Unary encoded".
-     */
-    void                        WriteUnaryAsLSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit, uint8_t Field2Write);
-    
-    /*!
-     @abstract                                                  "Writes unary encoded fields to the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "Is the stop bit a one or a zero"?
-     @param                     Field2Write                     "Value to be written as Unary encoded".
-     */
-    void                        WriteUnaryAsLSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit, uint8_t Field2Write);
-    
-    /*!
-     @abstract                                                  "Writes unary encoded fields to the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "Is the stop bit a one or a zero"?
-     @param                     Field2Write                     "Value to be written as Unary encoded".
-     */
-    void                        WriteUnaryAsMSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit, uint8_t Field2Write);
-    
-    /*!
-     @abstract                                                  "Writes unary encoded fields to the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "Is the stop bit a one or a zero"?
-     @param                     Field2Write                     "Value to be written as Unary encoded".
-     */
-    void                        WriteUnaryAsMSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit, uint8_t Field2Write);
+    void                        WriteBits(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
     
     /*!
      @abstract                                                  "Writes unary encoded bits to the BitBuffer".
-     @param                     BitBByteOrder                   "What byte order should the bits be in the BitBuffer"?
-     @param                     BitBBitOrder                    "What bit order should the bits be in the BitBuffer"?
+     @param                     ByteOrder                       "What byte order should the bits be in the BitBuffer"?
+     @param                     BitOrder                        "What bit order should the bits be in the BitBuffer"?
      @param                     BitB                            "BitBuffer Pointer".
      @param                     UnaryType                       "What type of Unary coding are we reading"?
      @param                     StopBit                         "Is the stop bit a one or a zero"?
-     @param                     Field2Write                     "Value to be written as Unary encoded".
+     @param                     UnaryBits2Write                 "Value to be written as Unary encoded".
      */
-#define WriteUnary(BitBByteOrder,BitBBitOrder,BitB,UnaryType,StopBit,Field2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteUnaryAsLSByteLSBit,BitBMSBit_t:WriteUnaryAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteUnaryAsMSByteLSBit,BitBMSBit_t:WriteUnaryAsMSByteMSBit))(BitB,UnaryType,StopBit,Field2Write)
-    
-    /*!
-     @abstract                                                  "Writes Exp-Golomb encoded fields from the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     Field2Write                     "Value to be encoded as Exp-Golomb and written".
-     */
-    void                        WriteExpGolombAsLSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit, const int64_t Field2Write);
-    
-    /*!
-     @abstract                                                  "Writes Exp-Golomb encoded fields from the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "What bit is the stop bit"?
-     @param                     Field2Write                     "Value to be encoded as Exp-Golomb and written".
-     */
-    void                        WriteExpGolombAsLSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit, const int64_t Field2Write);
-    
-    /*!
-     @abstract                                                  "Writes Exp-Golomb encoded fields from the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "What bit is the stop bit"?
-     @param                     Field2Write                     "Value to be encoded as Exp-Golomb and written".
-     */
-    void                        WriteExpGolombAsMSByteLSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit, const int64_t Field2Write);
-    
-    /*!
-     @abstract                                                  "Writes Exp-Golomb encoded fields from the BitBuffer".
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "What bit is the stop bit"?
-     @param                     Field2Write                     "Value to be encoded as Exp-Golomb and written".
-     */
-    void                        WriteExpGolombAsMSByteMSBit(BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit, const int64_t Field2Write);
+    void                        WriteUnary(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const uint8_t UnaryBits2Write);
     
     /*!
      @abstract                                                  "Writes Exp-Golomb encoded fields to the BitBuffer".
-     @param                     BitBByteOrder                   "What byte order should the bits be in the BitBuffer"?
-     @param                     BitBBitOrder                    "What bit order should the bits be in the BitBuffer"?
+     @param                     ByteOrder                       "What byte order should the bits be in the BitBuffer"?
+     @param                     BitOrder                        "What bit order should the bits be in the BitBuffer"?
      @param                     BitB                            "BitBuffer Pointer".
      @param                     UnaryType                       "What type of Unary coding are we reading"?
      @param                     StopBit                         "What bit is the stop bit"?
      @param                     Field2Write                     "Value to be encoded as Exp-Golomb and written".
      */
-#define WriteExpGolomb(BitBByteOrder,BitBBitOrder,BitB,UnaryType,StopBit,Field2Write)_Generic((BitBByteOrder),BitBLSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsLSByteLSBit,BitBMSBit_t:WriteExpGolombAsLSByteMSBit),BitBMSByte_t:_Generic((BitBBitOrder),BitBLSBit_t:WriteExpGolombAsMSByteLSBit,BitBMSBit_t:WriteExpGolombAsMSByteMSBit))(BitB,UnaryType,StopBit,Field2Write)
-    
-    /* BitBuffer GUUID */
+    void                        WriteExpGolomb(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const int64_t Field2Write);
     
     /*!
-     @abstract                                                  "Writes a BinaryGUUID/GUUIDString to the BitBuffer".
+     @abstract                                                  "Writes a GUUID to the BitBuffer".
      @param                     BitB                            "Pointer to an instance of BitBuffer".
-     @param                     UUIDString                      "Pointer to the UUIDString you want to write".
+     @param                     GUUID2Write                     "Pointer to the GUUID you want to write".
      */
-    void                        WriteGUUIDAsUUIDString(BitBuffer *BitB, const uint8_t *UUIDString);
-    
-    /*!
-     @abstract                                                  "Writes a BinaryGUUID/GUUIDString to the BitBuffer".
-     @param                     BitB                            "Pointer to an instance of BitBuffer".
-     @param                     GUIDString                      "Pointer to the UUIDString you want to write".
-     */
-    void                        WriteGUUIDAsGUIDString(BitBuffer *BitB, const uint8_t *GUIDString);
-    
-    /*!
-     @abstract                                                  "Writes a BinaryGUUID/GUUIDString to the BitBuffer".
-     @param                     BitB                            "Pointer to an instance of BitBuffer".
-     @param                     BinaryUUID                      "Pointer to the UUIDString you want to write".
-     */
-    void                        WriteGUUIDAsBinaryUUID(BitBuffer *BitB, const uint8_t *BinaryUUID);
-    
-    /*!
-     @abstract                                                  "Writes a BinaryGUUID/GUUIDString to the BitBuffer".
-     @param                     BitB                            "Pointer to an instance of BitBuffer".
-     @param                     BinaryGUID                      "Pointer to the UUIDString you want to write".
-     */
-    void                        WriteGUUIDAsBinaryGUID(BitBuffer *BitB, const uint8_t *BinaryGUID);
-    
-#define WriteGUUID(GUUIDType,ByteOrder,BitB,GUUID2Write)_Generic((GUUIDType),GUUIDString_t:_Generic((ByteOrder),BitBLSByte_t:WriteGUUIDAsGUIDString,BitBMSByte_t:WriteGUUIDAsUUIDString),BinaryGUUID_t:_Generic((ByteOrder),BitBLSByte_t:WriteGUUIDAsBinaryGUID,BitBMSByte_t:WriteGUUIDAsBinaryUUID))(BitB,GUUID2Write)
+    void                        WriteGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB, const uint8_t *GUUID2Write);
     
     /*!
      @abstract                                                  "Deallocates the instance of BitBuffer pointed to by BitB".
@@ -576,14 +284,14 @@ extern   "C" {
      @param                     Buffer2Read                     "BitBuffer Pointer".
      @param                     Bytes2Read                      "The number of bytes to read from the BitInput into the BitBuffer".
      */
-    void                        BitInput_Read2BitBuffer(BitInput *BitI, BitBuffer *Buffer2Read, const uint64_t Bytes2Read);
+    void                        BitInput_Read2BitBuffer(BitInput *BitI, BitBuffer *Buffer2Read, const int64_t Bytes2Read);
     
     /*!
      @abstract                                                  "Opens an input file, pointed to by InputSwitch in CMD and stores the resulting pointer in BitI->File".
      @param                     BitI                            "BitInput Pointer".
      @param                     Path2Open                       "Path to the input file to open".
      */
-    void                        BitInput_OpenFile(BitInput *BitI, const UTF8String Path2Open);
+    void                        BitInput_OpenFile(BitInput *BitI, const UTF8 *Path2Open);
     
     /*!
      @abstract                                                  "Opens a socket for reading".
@@ -631,7 +339,6 @@ extern   "C" {
     void                        BitInput_Deinit(BitInput *BitI);
     /* BitInput */
     
-    
     /* BitOutput */
     /*!
      @typedef                   BitOutput
@@ -655,7 +362,7 @@ extern   "C" {
      @param                     BitO                            "BitOutput Pointer".
      @param                     Path2Open                       "Path to the output file to open".
      */
-    void                        BitOutput_OpenFile(BitOutput *BitO, const UTF8String Path2Open);
+    void                        BitOutput_OpenFile(BitOutput *BitO, UTF8 *Path2Open);
     
     /*!
      @abstract                                                  "Opens a socket for writing".
