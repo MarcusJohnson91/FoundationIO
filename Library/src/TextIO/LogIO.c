@@ -17,7 +17,6 @@ extern "C" {
     void BitIOLog_SetProgramName(UTF8 *ProgramName) {
         if (ProgramName != NULL) {
             BitIOLog_ProgramName = ProgramName;
-            printf("BitIOLog_ProgramName: %s%s", BitIOLog_ProgramName, BitIONewLine);
         }
     }
     
