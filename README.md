@@ -1,11 +1,10 @@
 **BitIO:**
 ========
 * BitIO (Pronounced Bit Eye Oh) is a library for Reading, and Writing bits (and all the tasks associated with doing so, like swapping byte and bit order, etc).
-* BitIO is designed for and tested on 64 bit CPUs (ARM64 and AMD64 to be specific), 32 bit operating systems and CPUs are not tested, and never will be.
-* I've gone to great lengths to make sure BitIO is as fast as it can be, my bit readers and writers are generic functions to move branching to compile time instead of runtime for example.
-* Also, I've tried keeping BitIO modern, minimalist, and easy to use. we require C99, along with a preprocessor that supports _Generic programming.
-* BitIO is compatible with C++ through the C API, there are no wrappers because there's really no point in adding the additional baggage.
-* Currently, there's no stable API, let alone ABI. I break shit constantly to keep it easy to use.
+* BitIO is designed for and tested on 64 bit CPUs (AMD64 and ARM64 to be specific), 32 bit operating systems and CPUs are not tested, and never will be.
+* I've tried keeping BitIO modern, minimalist, and easy to use. we require a C99 compiler.
+* BitIO is compatible with C++ through the C API.
+* Currently, there's no stable API, let alone ABI. I break shit constantly because i'm very indecisive.
 
 License:
 =======
@@ -21,30 +20,23 @@ Here's a tl;dr of my license:
 
 Compiling:
 =========
-* libBitIO alone won't do a whole lot for you, it's real use is in being a library other libraries rely on.
-* The makefile by default builds the library as a static library, for RELEASE, to change this set `BUILDTYPE` to `DEBUG`.
-* BitIO is included as a submodule in git, so you don't need to install it if you're using one of my libraries, ModernPNG, ModernFLAC, ModernAVC, etc.
-* On my Mac for AMD64, the libBitIO static library is about 200kb, if that's too big for your use, enable link time optimization on your program to trim unused functions.
-Microsoft
------------
-BitIO requires the following features that Microsoft's MSVC does not provide as of Visual Studio 2017
-
-* `_Generic` Added in C11, preprocessor support, used by the Read/Peek/Write function families.
-* `_Static_assert` Added in C11, preprocessor support to validate the function calls provided by BitIO at compile time instead of runtime, used by every function.
-* WORKAROUND: Install Clang's cl.exe from the Visual Studio Installer, the option is called "Clang/C2" in the "Desktop Development with C++" menu.
-* Thank Microsoft for the trouble they've caused.
+* to use BitIO in your project, add it as a submodule with `git submodule add Dependencies/BitIO BITIO_URL`, then include whatever sub library headers you want to use.
+* call `cmake` with `-G "Unix Makefiles"`, the cmake file is in the Projects folder.
+* Then compile the makefiles with make like usual.
 
 How To Use libBitIO:
 ===================
 In order to use libBitIO, you need to include CommandLineIO.h, or BitIO.h.
 Tips:
 
-* You can have as many instances of `BitInput`, `BitOutput`, and `BitBuffer` as you want, for instances, reading/writing multiple files.
+* You can have as many instances of `BitInput`, `BitOutput`, and `BitBuffer` as you want, for instance, reading/writing multiple files.
 
 StringIO:
 ----------
-* StringIO provides BitIO with Unicode string handling, it supports decoding and encodeding both UTF-8 and UTF-16 (actual UTF-16 with surrogate pairs, not just UCS-2).
+* StringIO provides BitIO with Unicode string handling, it supports decoding and encoding both UTF-8 (NOT CESU-8, WTF-8, or Java's Modified UTF-8) and UTF-16 (actual UTF-16 with surrogate pairs, not just UCS-2).
+* If you need any of those formats (CESU-8, WTF-8, or Java's mUTF-8, or UCS-2), feel free to send a pull request.
 * The functions in StringIO use UTF-32 internally, that way we can use ANY codepoint in Unicode, StringIO is not just limited to the BMP.
+* StringIO is meant to provide basic support for Unicode strings, and some of the more advanced operations on them, like case mapping, and de/normalization, but some things will never be on the map, like REGEX. StringIO's primary purpose is suppoing input and output, not everything Unicode.
 
 CommandLineIO:
 -------------
@@ -77,9 +69,9 @@ BitIO:
 
 BitIOLog:
 -------
-
 * Writes to a file you open with `BitIOLogOpenFile`, if it's unset or otherwise inaccessible, all logs are printed to stderr.
-* Works on any platform that provides `stderr`, and `vasprintf`.
+* The interface requires UTF8 which you can coerce your strings to be with the `u8` string literal prefix.
+* Works on any platform that provides `stderr`, and `fprintf`.
 
 GUUIDs:
 ----------
@@ -105,9 +97,10 @@ GUUIDs:
 
 `SwapBinaryGUUID`: Converts a BinaryGUUID to a BinaryGUUID of the opposite byte order.
 
-`DeinitGUUID`: When you've had enough of GUUID nonsense, call this function to make your problems disappear.
+`DeinitGUUID`: When you've had enough of GUUID's nonsense, call this function to make your problems disappear.
 
 TODO:
 -----
 * Write a WriteArray2BitBuffer and ReadBitBuffer2Array functions, that way I could theoretically at least use SIMD operations on the data.
-
+* Finish writing the UCD parsing script so I can add full support for case-mapping and de/normalization to StringIO.
+* Finalize the cmake build script.

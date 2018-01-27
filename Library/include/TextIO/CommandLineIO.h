@@ -1,14 +1,7 @@
-#include "../include/BitIOMacros.h"
-#include "../include/StringIO.h"
+#include <stdbool.h>
+#include <stdint.h>
 
-#if    (BitIOTargetOS == BitIOWindowsOS)
-#pragma warning(push, 0)
-#endif
-#include <stdbool.h> /* Included for the bool type */
-#include <stdint.h>  /* Included for the u/intX_t types */
-#if    (BitIOTargetOS == BitIOWindowsOS)
-#pragma warning(pop)
-#endif
+#include "../include/StringIO.h"
 
 #pragma  once
 
@@ -80,17 +73,17 @@ extern   "C" {
     } CLIArgumentTypes;
     
     typedef enum DelimiterTypes {
-        UnknownDelimiter     = 0,
-        RangeDelimiter       = 1,
-        EqualDelimiter       = 2,
-        ColonDelimiter       = 3,
+                                UnknownDelimiter                = 0,
+                                RangeDelimiter                  = 1,
+                                EqualDelimiter                  = 2,
+                                ColonDelimiter                  = 3,
     } DelimiterTypes;
     
     typedef enum ArgumentTypes {
-        UnknownArg           = 0,
-        OptionArg            = 1,
-        SlaveArg             = 2,
-        ResultArg            = 3,
+                                UnknownArg                      = 0,
+                                OptionArg                       = 1,
+                                SlaveArg                        = 2,
+                                ResultArg                       = 3,
     } ArgumentTypes;
     
     /*!
@@ -104,42 +97,42 @@ extern   "C" {
      @param                     NumSwitches                     "The number of CommandLineSwitch structures to initalize".
      @return                                                    "Returns a pointer to an initialized CommandLineIO instance".
      */
-    CommandLineIO              *CommandLineIO_Init(const size_t NumSwitches);
+    CommandLineIO              *CommandLineIO_Init(const int64_t NumSwitches);
     
     /*!
      @abstract                                                  "Sets the name of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Name                            "Pointer to a C string containing the name of the program you're building".
      */
-    void                        CLISetName(CommandLineIO *CLI, UTF8String Name);
+    void                        CLISetName(CommandLineIO *CLI, UTF8 *Name);
     
     /*!
      @abstract                                                  "Sets the name of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Version                         "Pointer to a C string contining the version of the program you're building".
      */
-    void                        CLISetVersion(CommandLineIO *CLI, UTF8String Version);
+    void                        CLISetVersion(CommandLineIO *CLI, UTF8 *Version);
     
     /*!
      @abstract                                                  "Sets the description of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Description                     "Description of what the program does".
      */
-    void                        CLISetDescription(CommandLineIO *CLI, UTF8String Description);
+    void                        CLISetDescription(CommandLineIO *CLI, UTF8 *Description);
     
     /*!
      @abstract                                                  "Sets the author of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Author                          "Author of this program".
      */
-    void                        CLISetAuthor(CommandLineIO *CLI, UTF8String Author);
+    void                        CLISetAuthor(CommandLineIO *CLI, UTF8 *Author);
     
     /*!
      @abstract                                                  "Sets the copyright years of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Copyright                       "The starting year this program was written dash (CURRENTYEAR)".
      */
-    void                        CLISetCopyright(CommandLineIO *CLI, UTF8String Copyright);
+    void                        CLISetCopyright(CommandLineIO *CLI, UTF8 *Copyright);
     
     /*!
      @abstract                                                  "Sets the license of the program".
@@ -150,7 +143,7 @@ extern   "C" {
      @param                     LicenseURL                      "The actual URL for the license".
      @param                     IsProprietary                   "Is this program released under an open source license, or a EULA?".
      */
-    void                        CLISetLicense(CommandLineIO *CLI, UTF8String Name, UTF8String LicenseDescription, UTF8String LicenseURL, const bool IsProprietary);
+    void                        CLISetLicense(CommandLineIO *CLI, UTF8 *Name, UTF8 *LicenseDescription, UTF8 *LicenseURL, const bool IsProprietary);
     
     /*!
      @abstract                                                  "What is the minimum number of switches your program needs to operate?".
@@ -172,7 +165,7 @@ extern   "C" {
      @param                     SwitchID                        "The switch to set".
      @param                     Name                            "The flag to identify an option with".
      */
-    void                        CLISetSwitchName(CommandLineIO *CLI, const int64_t SwitchID, UTF8String Name);
+    void                        CLISetSwitchName(CommandLineIO *CLI, const int64_t SwitchID, UTF8 *Name);
     
     /*!
      @abstract                                                  "Sets SwitchDescription's flag in the CommandLineIO instance pointed by CLI".
@@ -180,7 +173,7 @@ extern   "C" {
      @param                     SwitchID                        "The switch to set".
      @param                     Description                     "Pointer to a C string containing the description of what this program does".
      */
-    void                        CLISetSwitchDescription(CommandLineIO *CLI, const int64_t SwitchID, UTF8String Description);
+    void                        CLISetSwitchDescription(CommandLineIO *CLI, const int64_t SwitchID, UTF8 *Description);
     
     /*!
      @abstract                                                  "Sets SwitchID's flag in the CommandLineIO instance pointed by CLI".
@@ -224,7 +217,7 @@ extern   "C" {
      @param                     Numerator                       "A pointer to an array of the number of X tasks that have been completed".
      @param                     Denominator                     "A pointer to an array of the number of X thats that there are to do".
      */
-    void                        CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF8String Strings, uint64_t *Numerator, uint64_t *Denominator);
+    void                        CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF8 *Strings[], uint64_t *Numerator, uint64_t *Denominator);
     
     /*!
      @abstract                                                  "How many matching options are present in CommandLineIO (will also check for slave switches if present)".
@@ -252,13 +245,13 @@ extern   "C" {
      @param                     OptionID                        "The option's result to return".
      @return                                                    "Returns the data after the switch, if the switch is resultless it will return 0".
      */
-    UTF8String                  CLIGetOptionResult(CommandLineIO const *CLI, const int64_t OptionID);
+    UTF8                        CLIGetOptionResult(CommandLineIO const *CLI, const int64_t OptionID);
     
     /*!
      @abstract                                                  "Returns the extension from Path as a string".
      @param                     Path                            "The string to work on".
      */
-    UTF8String                  GetExtensionFromPath(const UTF8String Path);
+    UTF8                       *GetExtensionFromPath(UTF8 *Path);
     
     /*!
      @abstract                                                  "Deallocates the instance of CommandLineIO pointed to by CLI".
@@ -266,17 +259,11 @@ extern   "C" {
      */
     void                        CommandLineIO_Deinit(CommandLineIO *CLI);
     
-    
-    
-    
-    
-    
-    
-    
-    void                        PrintCommandLineOptions(CommandLineIO *CLI);
+    void                        DEBUGCommandLineOptions(CommandLineIO *CLI);
     
 #ifdef   __cplusplus
 }
 #endif
 
 #endif   /* LIBBITIO_CommandLineIO_H */
+

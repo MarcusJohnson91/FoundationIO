@@ -1,13 +1,5 @@
-#include "../include/BitIOMacros.h"
-
-#if    (BitIOTargetOS == BitIOWindowsOS)
-#pragma warning(push, 0)
-#endif
 #include <stdbool.h> /* Included for the bool type */
 #include <stdint.h>  /* Included for the u/intX_t types */
-#if    (BitIOTargetOS == BitIOWindowsOS)
-#pragma warning(pop)
-#endif
 
 #pragma  once
 
