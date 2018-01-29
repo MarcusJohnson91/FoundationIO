@@ -59,9 +59,9 @@ extern "C" {
     
     /* Start BitBuffer section */
     typedef struct BitBuffer {
+        uint8_t              *Buffer;
         uint64_t              NumBits;
         uint64_t              BitOffset;
-        uint8_t              *Buffer;
     } BitBuffer;
     
     BitBuffer *BitBuffer_Init(const uint64_t BitBufferSize) {
@@ -496,13 +496,13 @@ extern "C" {
     
     /* BitInput */
     typedef struct BitInput {
-        BitInputOutputFileTypes FileType;
-        int                     Socket;
         FILE                   *File;
+        uint64_t                FileSpecifierNum;
         fpos_t                  FileSize;
         fpos_t                  FilePosition;
+        int                     Socket;
+        BitInputOutputFileTypes FileType;
         bool                    FileSpecifierExists;
-        uint64_t                FileSpecifierNum;
     } BitInput;
     
     BitInput *BitInput_Init(void) {
@@ -516,7 +516,7 @@ extern "C" {
     void BitInput_OpenFile(BitInput *BitI, const UTF8 *Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType          = BitIOFile;
-            uint64_t Path2OpenSize  = UTF8_GetNumCodePoints(*Path2Open) + BitIONULLStringSize;
+            uint64_t Path2OpenSize  = UTF8_GetSizeInCodePoints(*Path2Open) + BitIONULLStringSize;
             if (BitI->FileSpecifierExists == Yes) {
                 UTF8 *NewPath       = calloc(Path2OpenSize, sizeof(UTF8));
                 snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
@@ -665,12 +665,12 @@ extern "C" {
     
     /* BitOutput */
     typedef struct BitOutput {
-        BitInputOutputFileTypes FileType;
-        int                     Socket;
         FILE                   *File;
-        fpos_t                  FilePosition;
-        bool                    FileSpecifierExists;
         uint64_t                FileSpecifierNum;
+        fpos_t                  FilePosition;
+        int                     Socket;
+        BitInputOutputFileTypes FileType;
+        bool                    FileSpecifierExists;
     } BitOutput;
     
     BitOutput *BitOutput_Init(void) {
@@ -684,7 +684,7 @@ extern "C" {
     void BitOutput_OpenFile(BitOutput *BitO, UTF8 *Path2Open) {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType          = BitIOFile;
-            uint64_t Path2OpenSize  = UTF8_GetNumCodePoints(Path2Open) + BitIONULLStringSize;
+            uint64_t Path2OpenSize  = UTF8_GetSizeInCodePoints(Path2Open) + BitIONULLStringSize;
             if (BitO->FileSpecifierExists == Yes) {
                 UTF8 *NewPath       = calloc(Path2OpenSize, sizeof(UTF8));
                 snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER

@@ -25,7 +25,7 @@ extern "C" {
 #if   (BitIOTargetOS == BitIOPOSIXOS)
             BitIOLog_LogFile            = fopen(LogFilePath, "a+");
 #elif (BitIOTargetOS == BitIOWindowsOS)
-            uint64_t    LogFilePathSize = UTF8_GetNumCodePoints(LogFilePath);
+            uint64_t    LogFilePathSize = UTF8_GetSizeInCodePoints(LogFilePath);
             UTF32 LogFilePath32         = UTF8_Decode(LogFilePath, LogFilePathSize);
             UTF16 LogFilePath16         = UTF16_Encode(LogFilePath32, LogFilePathSize);
             free(LogFilePath32);
