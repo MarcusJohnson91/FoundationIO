@@ -411,7 +411,7 @@ extern  "C" {
         }
     }
     
-    static uint64_t UTF32_GetNumCodePoints(UTF32 *String) {
+    static uint64_t UTF32_GetSizeInCodePoints(UTF32 *String) {
         uint64_t NumCodePoints          = 0;
         do {
             NumCodePoints              += 1;
@@ -423,8 +423,8 @@ extern  "C" {
         uint64_t CodePoint = 0ULL;
         bool StringsMatch  = Yes;
         if (String1 != NULL && String2 != NULL) {
-            uint64_t String1Size = UTF32_GetNumCodePoints(String1);
-            uint64_t String2Size = UTF32_GetNumCodePoints(String2);
+            uint64_t String1Size = UTF32_GetSizeInCodePoints(String1);
+            uint64_t String2Size = UTF32_GetSizeInCodePoints(String2);
             if (String1Size != String2Size) {
                 StringsMatch = No;
             } else {
@@ -567,29 +567,39 @@ extern  "C" {
         return StringsMatch;
     }
     
-    bool UTF32_CodePointIsUpperCase(UTF32 CodePoint) {
-        return false;
-    }
-    
-    bool UTF32_CodePointIsLowerCase(UTF32 CodePoint) {
-        return false;
-    }
-    
-    bool UTF32_CodePointIsNumeral(UTF32 CodePoint) {
-        // Basically just look the codepoint up in a table, if it's in the UnicodeNumerals table, return yes, otherwise no.
-        return false;
-    }
-    
-    bool UTF32_CodePointIsCombining(UTF32 CodePoint) {
-        return false;
-    }
-    
-    bool UTF32_CodePointIsPunctuation(UTF32 CodePoint) {
-        return false;
-    }
-    
-    bool UTF32_CodePointIsControl(UTF32 CodePoint) {
-        return false;
+    UTF32 *UTF32_ReplaceSubsection(UTF32 *String, uint64_t Offset, uint64_t Length, UTF32 *Replacement) {
+        UTF32   *NewString = NULL;
+        uint64_t CodePoint = 0ULL;
+        if (String != NULL && Replacement != NULL && Length >= 1) {
+            uint64_t StringSize            = UTF32_GetSizeInCodePoints(String);
+            uint64_t ReplacementStringSize = UTF32_GetSizeInCodePoints(Replacement);
+            if (ReplacementStringSize > Length) {
+                NewString = calloc(Length - ReplacementStringSize, sizeof(UTF32));
+            } else if (ReplacementStringSize < Length) {
+                NewString = calloc(ReplacementStringSize - Length, sizeof(UTF32));
+            } else if (ReplacementStringSize == Length) {
+                NewString = calloc(ReplacementStringSize, sizeof(UTF32));
+            }
+            do {
+                NewString[CodePoint] = String[CodePoint];
+                CodePoint           += 1;
+            } while (CodePoint != Offset);
+            do {
+                NewString[CodePoint] = Replacement[CodePoint];
+                CodePoint           += 1;
+            } while (CodePoint < Offset + Length);
+            do {
+                NewString[CodePoint] = String[CodePoint];
+                CodePoint           += 1;
+            } while (String[CodePoint] != 0); // We have to subtract something from something else here what is it?
+        } else if (String == NULL) {
+            BitIOLog(BitIOLog_ERROR, __func__, "String Pointer is NULL");
+        } else if (Replacement == NULL) {
+            BitIOLog(BitIOLog_ERROR, __func__, "Replacement Pointer is NULL");
+        } else if (Length == 0) {
+            BitIOLog(BitIOLog_ERROR, __func__, "Length %d is too short", Length);
+        }
+        return NewString;
     }
     
 #ifdef  __cplusplus
