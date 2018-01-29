@@ -47,9 +47,9 @@ extern   "C" {
     typedef struct CommandLineSwitch {
         UTF8                *Name;
         UTF8                *Description;
+        int64_t             *PotentialSlaves;
         int64_t              NumPotentialSlaves;
         int64_t              MaxConcurrentSlaves;
-        int64_t             *PotentialSlaves;
         CLISwitchTypes       SwitchType;
         CLIArgumentTypes     ArgumentType;
     } CommandLineSwitch;
@@ -63,10 +63,10 @@ extern   "C" {
      @constant               Argument                    "If there is a path or other result expected for this switch's argument, it'll be here".
      */
     typedef struct CommandLineOption {
-        int64_t              SwitchID;
-        int64_t              NumOptionSlaves;
         int64_t             *OptionSlaves;
         UTF8                *Argument;
+        int64_t              SwitchID;
+        int64_t              NumOptionSlaves;
     } CommandLineOption;
     
     /*!
@@ -97,10 +97,6 @@ extern   "C" {
      @constant               ProgramLicenseURLSize         "The number of codepoints in this field".
      */
     typedef struct CommandLineIO {
-        int64_t              NumSwitches;
-        int64_t              NumOptions;
-        int64_t              MinOptions;
-        int64_t              HelpSwitch;
         UTF8                *ProgramName;
         UTF8                *ProgramAuthor;
         UTF8                *ProgramDescription;
@@ -111,6 +107,10 @@ extern   "C" {
         UTF8                *ProgramLicenseURL;
         CommandLineSwitch   *SwitchIDs;
         CommandLineOption   *OptionIDs;
+        int64_t              NumSwitches;
+        int64_t              NumOptions;
+        int64_t              MinOptions;
+        int64_t              HelpSwitch;
         uint16_t             ConsoleWidth;
         uint16_t             ConsoleHeight;
         bool                 IsProprietary;
@@ -354,7 +354,7 @@ extern   "C" {
         UTF8 ArgumentSwitch = NULL;
         if (ArgumentString != NULL) {
             uint8_t  ArgumentStringPrefixSize = 0;
-            uint32_t ArgumentStringSize       = UTF8_GetNumCodePoints(ArgumentString);
+            uint32_t ArgumentStringSize       = UTF8_GetSizeInCodePoints(ArgumentString);
             
             if (ArgumentStringSize >= 2) {
                 //BitIOLog(BitIOLog_DEBUG, __func__, "ArgumentString[0] = 0x%X, ArgumentString[1] = 0x%X", ArgumentString[0], ArgumentString[1]);
@@ -377,7 +377,7 @@ extern   "C" {
     
     static int64_t GetSubStringsAbsolutePosition(int64_t StartOffset, int64_t StringSize, UTF8 *OptionString, UTF8 *SubString) {
         int64_t SubStringPosition = -1LL;
-        int64_t SubStringSize = UTF8_GetNumCodePoints(OptionString);
+        int64_t SubStringSize = UTF8_GetSizeInCodePoints(OptionString);
         int64_t MatchingChars = 0ULL;
         for (int64_t Char = StartOffset; Char < StringSize; Char++) {
             for (int64_t SubChar = 0; SubChar < SubStringSize; SubChar++) {
@@ -411,7 +411,7 @@ extern   "C" {
                 // Extract the first argument as a switch.
                 UTF8 Argument         = argv[CurrentArgument];
                 UTF8 ArgumentFlag     = ArgumentString2SwitchFlag(Argument);
-                uint64_t ArgumentFlagSize = UTF8_GetNumCodePoints(ArgumentFlag);
+                uint64_t ArgumentFlagSize = UTF8_GetSizeInCodePoints(ArgumentFlag);
                 // now loop over the switches
                 for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                     // now compare ArgumentFlag to Switch
@@ -606,7 +606,7 @@ extern   "C" {
     UTF8 *GetExtensionFromPath(UTF8 *Path) {
         UTF8 *ExtensionString                  = NULL;
         if (Path != NULL) {
-            uint64_t PathSize                  = UTF8_GetNumCodePoints(Path) + 1;
+            uint64_t PathSize                  = UTF8_GetSizeInCodePoints(Path) + 1;
             uint64_t ExtensionSize             = PathSize;
             uint64_t ExtensionDistanceFromEnd  = 0ULL;
             while (Path[ExtensionDistanceFromEnd] != 0x2E) {
@@ -644,7 +644,7 @@ extern   "C" {
         
         uint64_t *StringSize = calloc(NumItems2Display, sizeof(size_t));
         for (uint8_t Item = 0; Item < NumItems2Display; Item++) { // Get the size of the strings
-            StringSize[Item] = UTF8_GetNumCodePoints(Strings[Item]);
+            StringSize[Item] = UTF8_GetSizeInCodePoints(Strings[Item]);
             // huh, well we need 2 characters for the brackets.
         }
         // Number of seperators for each string

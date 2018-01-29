@@ -7,6 +7,7 @@
 
 #define UnicodeNULLTerminatorSize       1
 #define UTF1632BOMSize                  1
+#define UTF8BOMSize                     3
 
 /* 0x00 is valid in UTF-16, NULL is 0x0000, be sure to catch this mistake. */
 /* U+D800 - U+DFFF are invalid UTF32 code points. when converting to/from UTF32 make sure that that is not a code point becuse they're reserved as UTF-16 surrogate pairs */
@@ -15,8 +16,6 @@
 #ifdef  __cplusplus
 extern  "C" {
 #endif
-    
-    static const UTF8 StringIOLibraryName[] = u8"libBitIO_StringIO";
     
     static uint8_t      UTF8_GetCodePointSize(UTF8 CodeUnit) {
         uint8_t CodePointSize      = 0;
@@ -32,7 +31,7 @@ extern  "C" {
         return CodePointSize;
     }
     
-    uint64_t            UTF8_GetNumCodeUnits(UTF8 *String2Count) { // Read a codeunit, get it's size, skip that many bytes, check that it's not 0x0, then repeat
+    uint64_t            UTF8_GetSizeInCodeUnits(UTF8 *String2Count) { // Read a codeunit, get it's size, skip that many bytes, check that it's not 0x0, then repeat
         uint64_t NumCodeUnits                       = 0ULL;
         uint64_t CurrentCodeUnit                    = 0ULL;
         if (String2Count != NULL) {
@@ -45,7 +44,7 @@ extern  "C" {
         return NumCodeUnits;
     }
     
-    uint64_t            UTF8_GetNumCodePoints(UTF8 String[]) {
+    uint64_t            UTF8_GetSizeInCodePoints(UTF8 *String) {
         uint64_t CurrentCodeUnit              = 0ULL;
         uint64_t NumCodePoints                = 0ULL;
         if (String != NULL) {
@@ -69,7 +68,7 @@ extern  "C" {
         return CodePointSize;
     }
     
-    uint64_t            UTF16_GetNumCodeUnits(UTF16 *String) {
+    uint64_t            UTF16_GetSizeInCodeUnits(UTF16 *String) {
         uint64_t NumCodeUnits       = 0ULL;
         uint64_t CodePoint          = 0ULL;
         do {
@@ -79,7 +78,7 @@ extern  "C" {
         return NumCodeUnits;
     }
     
-    uint64_t            UTF16_GetNumCodePoints(UTF16 *String) {
+    uint64_t            UTF16_GetSizeInCodePoints(UTF16 *String) {
         uint64_t NumCodeUnits           = 0ULL;
         uint64_t NumCodePoints          = 0ULL;
         do {
@@ -89,7 +88,7 @@ extern  "C" {
         return NumCodePoints;
     }
     
-    static uint64_t     UTF32_GetNumCodeUnits4UTF8(UTF32 *String) {
+    static uint64_t     UTF32_GetSizeInCodeUnits4UTF8(UTF32 *String) {
         uint64_t CodePoint          = 0ULL;
         uint64_t UTF8CodeUnits      = 0ULL;
         do {
@@ -107,7 +106,7 @@ extern  "C" {
         return UTF8CodeUnits;
     }
     
-    static uint64_t     UTF32_GetNumCodeUnits4UTF16(UTF32 *String) {
+    static uint64_t     UTF32_GetSizeInCodeUnits4UTF16(UTF32 *String) {
         uint64_t CodePoint          = 0ULL;
         uint64_t UTF16CodeUnits     = 0ULL;
         do {
@@ -129,7 +128,7 @@ extern  "C" {
         uint64_t CodePoint          = 0ULL;
         UTF32   *DecodedString      = NULL;
         if (String != NULL) {
-            uint64_t NumCodePoints  = UTF1632BOMSize + UTF8_GetNumCodePoints(String) + UnicodeNULLTerminatorSize;
+            uint64_t NumCodePoints  = UTF1632BOMSize + UTF8_GetSizeInCodePoints(String) + UnicodeNULLTerminatorSize;
             DecodedString           = calloc(NumCodePoints, sizeof(UTF32));
             if (DecodedString != NULL) {
                 do {
@@ -169,7 +168,7 @@ extern  "C" {
                     if (CodePointSize > 1 && DecodedString[CodePoint] <= 0x7F) { // Invalid, overlong sequence detected, replace it with 0xFFFD
                         DecodedString[CodePoint]     = 0xFFFD;
                         BitIOLog(BitIOLog_ERROR, __func__, u8"CodePoint %d is overlong, replaced with U+FFFD", CodePoint);
-                    } else if (DecodedString[CodePoint] >= 0xD800 && DecodedString[CodePoint] <= 0xDFFF) {
+                    } else if (DecodedString[CodePoint] >= 0xD800 && DecodedString[CodePoint] <= 0xDFFF && DecodedString[CodePoint] != 0xFFFE && DecodedString[CodePoint] != 0xFEFF) {
                         DecodedString[CodePoint]     = 0xFFFD;
                         BitIOLog(BitIOLog_ERROR, __func__, u8"Codepoint %d is invalid, overlaps Surrogate Pair Block, replacing with U+FFFD", CodePoint);
                     }
@@ -183,21 +182,23 @@ extern  "C" {
         return DecodedString;
     }
     
-    UTF8          *UTF8_Encode(UTF32 *String) {
-        if (BitIOGlobalByteOrder == NULL || BitIOGlobalBitOrder == NULL) {
+    UTF8          *UTF8_Encode(UTF32 *String, const bool IncludeBOM) {
+        if (BitIOGlobalByteOrder == BitIOUnknownByteFirst || BitIOGlobalBitOrder == BitIOUnknownBitFirst) {
             BitIOGetRuntimeByteBitOrder();
         }
         uint64_t CodePoint                             = 0ULL;
         uint64_t CodeUnitNum                           = 0ULL;
         UTF8    *EncodedString                         = NULL;
         if (String != NULL) {
-            uint64_t UTF8CodeUnits                     = UTF32_GetNumCodeUnits4UTF8(String) + UnicodeNULLTerminatorSize;
+            uint64_t UTF8CodeUnits                     = UTF32_GetSizeInCodeUnits4UTF8(String) + IncludeBOM == true ? UnicodeNULLTerminatorSize + UTF8BOMSize: UnicodeNULLTerminatorSize;
+            
             EncodedString                              = calloc(UTF8CodeUnits, sizeof(UTF8));
             if (EncodedString != NULL) {
                 do {
-                    if (String[CodePoint] >= 0xD800 && String[CodePoint] <= 0xDFFF) {
-                        String[CodePoint]              = 0xFFFD;
-                        BitIOLog(BitIOLog_ERROR, __func__, u8"Codepoint %d is invalid, overlaps Surrogate Pair Block, replacing with U+FFFD");
+                    if (CodeUnitNum == 0 && IncludeBOM == Yes) {
+                        EncodedString[CodeUnitNum]      = 0xEF;
+                        EncodedString[CodeUnitNum += 1] = 0xBB;
+                        EncodedString[CodeUnitNum += 1] = 0xBF;
                     }
                     if (String[CodePoint] <= 0x7F) {
                         EncodedString[CodeUnitNum]     = String[CodePoint];
@@ -206,7 +207,7 @@ extern  "C" {
                         EncodedString[CodeUnitNum]     = (0xC0 & ((String[CodePoint] & 0x7C0) >> 6));
                         EncodedString[CodeUnitNum + 1] = (0x80 &  (String[CodePoint] & 0x03F));
                         CodeUnitNum                   += 2;
-                    }  else if (String[CodePoint] >= 0x800 && String[CodePoint] <= 0xFFFF) {
+                    }  else if (String[CodePoint] >= 0x800 && String[CodePoint] <= 0xFFFF && String[CodePoint] <= 0xD7FF && String[CodePoint] >= 0xE000 && String[CodePoint] != 0xFFFE && String[CodePoint] != 0xFEFF) {
                         EncodedString[CodeUnitNum]     = (0xE0 & ((String[CodePoint] & 0x03F000) >> 12));
                         EncodedString[CodeUnitNum + 1] = (0x80 & ((String[CodePoint] & 0x000FC0) >>  6));
                         EncodedString[CodeUnitNum + 2] = (0x80 &  (String[CodePoint] & 0x00003F));
@@ -217,6 +218,9 @@ extern  "C" {
                         EncodedString[CodeUnitNum + 2] = (0x80 & ((String[CodePoint] & 0x000FC0) >>  6));
                         EncodedString[CodeUnitNum + 3] = (0x80 &  (String[CodePoint] & 0x00003F));
                         CodeUnitNum                   += 4;
+                    } else if (String[CodePoint] >= 0xD800 && String[CodePoint] <= 0xDFFF && String[CodePoint] != 0xFFFE && String[CodePoint] != 0xFEFF) {
+                        String[CodePoint]              = 0xFFFD;
+                        BitIOLog(BitIOLog_ERROR, __func__, u8"Codepoint %d is invalid, overlaps Surrogate Pair Block, replacing with U+FFFD");
                     }
                 } while (String[CodePoint] != 0);
             } else {
@@ -229,7 +233,7 @@ extern  "C" {
     }
     
     UTF32         *UTF16_Decode(UTF16 *String) {
-        if (BitIOGlobalByteOrder == NULL || BitIOGlobalBitOrder == NULL) {
+        if (BitIOGlobalByteOrder == BitIOUnknownByteFirst || BitIOGlobalBitOrder == BitIOUnknownBitFirst) {
             BitIOGetRuntimeByteBitOrder();
         }
         /*
@@ -240,7 +244,7 @@ extern  "C" {
         uint64_t CodeUnitNum        = 0ULL;
         UTF32   *DecodedString      = NULL;
         if (String != NULL) {
-            uint64_t UTF16CodeUnits = UTF1632BOMSize + UTF16_GetNumCodePoints(String) + UnicodeNULLTerminatorSize;
+            uint64_t UTF16CodeUnits = UTF1632BOMSize + UTF16_GetSizeInCodePoints(String) + UnicodeNULLTerminatorSize;
             DecodedString           = calloc(UTF16CodeUnits, sizeof(UTF32));
             if (DecodedString != NULL) {
                 do {
@@ -252,7 +256,6 @@ extern  "C" {
                             DecodedString[0] = 0xFEFF;
                         }
                     }
-                    
                     if (String[CodeUnitNum] <= 0xD7FF || (String[CodeUnitNum] >= 0xE000 && String[CodeUnitNum] <= 0xFFFF)) {
                         DecodedString[CodePoint] = String[CodeUnitNum - 1];
                     } else {
@@ -269,14 +272,14 @@ extern  "C" {
     }
     
     UTF16         *UTF16_Encode(UTF32 *String) {
-        if (BitIOGlobalByteOrder == NULL || BitIOGlobalBitOrder == NULL) {
+        if (BitIOGlobalByteOrder == BitIOUnknownByteFirst || BitIOGlobalBitOrder == BitIOUnknownBitFirst) {
             BitIOGetRuntimeByteBitOrder();
         }
         uint8_t  CodePointSize         = 0;
         uint64_t CodeUnitNum           = 0ULL;
         UTF16   *EncodedString         = NULL;
         if (String != NULL) {
-            uint64_t UTF16NumCodeUnits = UTF32_GetNumCodeUnits4UTF16(String) + UTF1632BOMSize + UnicodeNULLTerminatorSize;
+            uint64_t UTF16NumCodeUnits = UTF32_GetSizeInCodeUnits4UTF16(String) + UTF1632BOMSize + UnicodeNULLTerminatorSize;
             EncodedString              = calloc(UTF16NumCodeUnits, sizeof(UTF16));
             if (EncodedString != NULL) {
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < UTF16NumCodeUnits; CodeUnit++) {
@@ -314,14 +317,14 @@ extern  "C" {
     }
     
     UTF16 *UTF16_ConvertByteOrder(UnicodeTypes Type, UTF16 *String2Convert) {
-        if (BitIOGlobalByteOrder == NULL || BitIOGlobalBitOrder == NULL) {
+        if (BitIOGlobalByteOrder == BitIOUnknownByteFirst || BitIOGlobalBitOrder == BitIOUnknownBitFirst) {
             BitIOGetRuntimeByteBitOrder();
         }
         uint16_t         UTF16ByteOrder                = String2Convert[0];
         UnicodeTypes     CurrentByteOrder              = UnicodeUnknownSizeByteOrder;
-        if (UTF16ByteOrder == 0xFEFF) {
+        if (UTF16ByteOrder == 0xFFFE) {
             CurrentByteOrder = UTF16LE;
-        } else if (UTF16ByteOrder == 0xFFFE) {
+        } else if (UTF16ByteOrder == 0xFEFF) {
             CurrentByteOrder = UTF16BE;
         }
         uint64_t         CurrentCodePoint              = 1ULL;
@@ -338,14 +341,14 @@ extern  "C" {
     }
     
     UTF32 *UTF32_ConvertByteOrder(UnicodeTypes Type, UTF32 *String2Convert) {
-        if (BitIOGlobalByteOrder == NULL || BitIOGlobalBitOrder == NULL) {
+        if (BitIOGlobalByteOrder == BitIOUnknownByteFirst || BitIOGlobalBitOrder == BitIOUnknownBitFirst) {
             BitIOGetRuntimeByteBitOrder();
         }
         uint32_t         UTF32ByteOrder                = String2Convert[0];
         UnicodeTypes     CurrentByteOrder              = UnicodeUnknownSizeByteOrder;
-        if (UTF32ByteOrder == 0xFEFF) {
+        if (UTF32ByteOrder == 0xFFFE) {
             CurrentByteOrder = UTF32LE;
-        } else if (UTF32ByteOrder == 0xFFFE) {
+        } else if (UTF32ByteOrder == 0xFEFF) {
             CurrentByteOrder = UTF32BE;
         }
         uint64_t         CurrentCodePoint              = 1ULL;
