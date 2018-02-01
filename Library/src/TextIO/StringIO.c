@@ -1,4 +1,5 @@
 #include <stdlib.h>  /* Included for calloc, and free */
+#include <varargs.h> /* Included for va_start, va_end */
 
 #include "../include/BitIOLog.h"
 
@@ -58,7 +59,7 @@ extern  "C" {
         return NumCodePoints;
     }
     
-    uint8_t             UTF16_GetCodePointSize(UTF16 CodeUnit[1]) {
+    static uint8_t      UTF16_GetCodePointSize(UTF16 CodeUnit) {
         uint8_t CodePointSize = 0;
         if (CodeUnit >= 0xD800 && CodeUnit <= 0xDFFF) { // Surrogate
             CodePointSize     = 2;
@@ -69,12 +70,10 @@ extern  "C" {
     }
     
     uint64_t            UTF16_GetSizeInCodeUnits(UTF16 *String) {
-        uint64_t NumCodeUnits       = 0ULL;
-        uint64_t CodePoint          = 0ULL;
+        uint64_t NumCodeUnits          = 0ULL;
         do {
-            NumCodeUnits += UTF16_GetCodePointSize(String[CodePoint]);
-            CodePoint    += 1;
-        } while (String[CodePoint] != 0);
+            NumCodeUnits              += UTF16_GetCodePointSize(String[NumCodeUnits]);
+        } while (String[NumCodeUnits] != 0);
         return NumCodeUnits;
     }
     
@@ -118,6 +117,14 @@ extern  "C" {
             CodePoint              += 1;
         } while (String[CodePoint] != 0);
         return UTF16CodeUnits;
+    }
+    
+    uint64_t            UTF32_GetSizeInCodePoints(UTF32 *String) {
+        uint64_t NumCodePoints          = 0ULL;
+        do {
+            NumCodePoints              += 1;
+        } while (String[NumCodePoints] != 0);
+        return NumCodePoints;
     }
     
     /* Decode UTF-X to UTF-32 */
@@ -409,14 +416,6 @@ extern  "C" {
         } else {
             BitIOLog(BitIOLog_ERROR, __func__, u8"String Pointer is NULL");
         }
-    }
-    
-    static uint64_t UTF32_GetSizeInCodePoints(UTF32 *String) {
-        uint64_t NumCodePoints          = 0;
-        do {
-            NumCodePoints              += 1;
-        } while (String[NumCodePoints] != 0);
-        return NumCodePoints;
     }
     
     bool            UTF32Strings_Compare(UTF32 *String1, UTF32 *String2) {
