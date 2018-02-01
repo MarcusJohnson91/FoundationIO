@@ -1,5 +1,5 @@
 #include <stdlib.h>  /* Included for calloc, and free */
-#include <varargs.h> /* Included for va_start, va_end */
+#include <stdarg.h>  /* Included for va_start, va_end */
 
 #include "../include/BitIOLog.h"
 
