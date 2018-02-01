@@ -71,6 +71,10 @@ static const char   BitIONewLine[2]  = {0x0D, 0x00}; /* \r */
 #define             BitIONewLineWithNULLSize    1
 static const char   BitIONewLine[2]  = {0x0A, 0x00}; /* \n */
 #endif
+
+#ifndef typeof
+#define             typeof   __typeof__
+#endif
     
 #elif    defined(_WIN32) || defined(__WIN32__) || defined(_WIN64) || defined(__WINDOWS__)
     
@@ -82,24 +86,28 @@ static const char   BitIONewLine[2]  = {0x0A, 0x00}; /* \n */
 #define             BitIONewLineWithNULLSize    2
 static const char   BitIONewLine[3]  = {0x0D, 0x0A, 0x00}; /* \r\n */
 #endif
+
+#ifndef typeof
+#define             typeof             __typeof
+#endif
     
 #ifndef             restrict
-#define             restrict          __restrict
-#endif
-    
-#ifndef             strcasecmp
-#define             strcasecmp          stricmp
-#endif
-    
-#ifndef             strncasecmp
-#define             strncasecmp        _strnicmp
+#define             restrict           __restrict
 #endif
     
 #undef              fseek
-#define             fseek              _fseeki64
+#define             fseek               _fseeti64
     
 #undef              ftell
-#define             ftell              _ftelli64
+#define             ftell               _ftelli64
+    
+#ifndef             strncasecmp
+#define             strncasecmp         _strnicmp
+#endif
+    
+#ifndef             strcasecmp
+#define             strcasecmp           stricmp
+#endif
     
 #endif   /* End OS detection */
     
