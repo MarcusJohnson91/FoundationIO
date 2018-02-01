@@ -19,17 +19,6 @@
 extern "C" {
 #endif
     
-    static inline uint8_t NumBits2ExtractFromByte(const uint64_t BitOffset, const uint8_t Bits2Extract) {
-        uint8_t Bits2ExtractFromThisByte = 0;
-        uint8_t BitsInThisByte           = BitOffset % 8;
-        if (Bits2Extract >= BitsInThisByte) {
-            Bits2ExtractFromThisByte     = BitsInThisByte;
-        } else {
-            Bits2ExtractFromThisByte     = Bits2Extract;
-        }
-        return Bits2ExtractFromThisByte;
-    }
-    
     static inline uint8_t SwapBits(const uint8_t Byte) {
         return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
     }
@@ -158,22 +147,30 @@ extern "C" {
         if (BitB != NULL && BitB->NumBits >= BitB->BitOffset + NumBits2Insert) {
             uint8_t  Bits                         = NumBits2Insert;
             while (Bits > 0) {
-                uint64_t ByteOffset               = ByteOrder == BitIOGlobalByteOrder ? Bits2Bytes(BitB->BitOffset + 1, No):Bits2Bytes(BitB->BitOffset + 1 + NumBits2Insert, No);
-                uint8_t  Bits2InsertForThisByte   = 8 - (BitB->BitOffset % 8);
-                uint8_t  BitMask                  = 0;
-                uint8_t  Byte                     = 0;
-                if (BitOrder == BitIOLSBitFirst) {
-                    BitMask                       = CreateBitMaskLSBit(Bits2InsertForThisByte);
-                } else if (BitOrder == BitIOMSBitFirst) {
-                    BitMask                       = CreateBitMaskMSBit(Bits2InsertForThisByte);
-                }
-                Byte                              = BitB->Buffer[ByteOffset] & BitMask;
-                if (BitOrder == BitIOLSBitFirst) {
-                    // Right shift the Byte
-                    Byte                          = Byte >> (8 - Bits2InsertForThisByte);
-                } else if (BitOrder == BitIOMSBitFirst) {
-                    // Left shift the byte by 8 - he number of bits we extracted from this byte
-                    Byte                          = Byte << (8 - Bits2InsertForThisByte);
+                if (NumBits2Insert % 8 == 0 && BitB->BitOffset % 8 == 0) {
+                    // Just copy the bytes
+                    for (uint8_t Byte = 0; Byte < Bits2Bytes(Bits, No); Byte++) {
+                        BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)] = Data2Insert & 0xFF << Byte * 8;
+                    }
+                } else {
+                    // Mask, Shift, etc.
+                    uint64_t ByteOffset               = ByteOrder == BitIOGlobalByteOrder ? Bits2Bytes(BitB->BitOffset + 1, No):Bits2Bytes(BitB->BitOffset + 1 + NumBits2Insert, No);
+                    uint8_t  Bits2InsertForThisByte   = 8 - (BitB->BitOffset % 8);
+                    uint8_t  BitMask                  = 0;
+                    uint8_t  Byte                     = 0;
+                    if (BitOrder == BitIOLSBitFirst) {
+                        BitMask                       = CreateBitMaskLSBit(Bits2InsertForThisByte);
+                    } else if (BitOrder == BitIOMSBitFirst) {
+                        BitMask                       = CreateBitMaskMSBit(Bits2InsertForThisByte);
+                    }
+                    Byte                              = BitB->Buffer[ByteOffset] & BitMask;
+                    if (BitOrder == BitIOLSBitFirst) {
+                        // Right shift the Byte
+                        Byte                          = Byte >> (8 - Bits2InsertForThisByte);
+                    } else if (BitOrder == BitIOMSBitFirst) {
+                        // Left shift the byte by 8 - he number of bits we extracted from this byte
+                        Byte                          = Byte << (8 - Bits2InsertForThisByte);
+                    }
                 }
             }
         } else if (BitB == NULL) {
@@ -188,24 +185,31 @@ extern "C" {
         if (BitB != NULL && BitB->NumBits >= BitB->BitOffset + 1 + NumBits2Extract) {
             uint8_t  Bits                         = NumBits2Extract;
             while (Bits > 0) {
-                uint64_t ByteOffset               = ByteOrder == BitIOGlobalByteOrder ? Bits2Bytes(BitB->BitOffset + 1, No):Bits2Bytes(BitB->BitOffset + 1 + NumBits2Extract, No);
-                uint8_t  Bits2ExtractFromThisByte = 8 - (BitB->BitOffset % 8); //uint64_t Bits2Get = NumBits2ExtractFromByte(BitB->BitOffset, Bits);
-                uint8_t  BitMask                  = 0;
-                uint8_t  Byte                     = 0;
-                if (BitOrder == BitIOLSBitFirst) {
-                    BitMask                       = CreateBitMaskLSBit(Bits2ExtractFromThisByte);
-                } else if (BitOrder == BitIOMSBitFirst) {
-                    BitMask                       = CreateBitMaskMSBit(Bits2ExtractFromThisByte);
+                if (NumBits2Extract % 8 == 0 && BitB->BitOffset % 8 == 0) {
+                    // Just copy the bytes
+                    for (uint8_t Byte = 0; Byte < Bits2Bytes(Bits, No); Byte++) {
+                        ExtractedBits = BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)];
+                    }
+                } else {
+                    uint64_t ByteOffset               = ByteOrder == BitIOGlobalByteOrder ? Bits2Bytes(BitB->BitOffset + 1, No):Bits2Bytes(BitB->BitOffset + 1 + NumBits2Extract, No);
+                    uint8_t  Bits2ExtractFromThisByte = 8 - (BitB->BitOffset % 8); //uint64_t Bits2Get = NumBits2ExtractFromByte(BitB->BitOffset, Bits);
+                    uint8_t  BitMask                  = 0;
+                    uint8_t  Byte                     = 0;
+                    if (BitOrder == BitIOLSBitFirst) {
+                        BitMask                       = CreateBitMaskLSBit(Bits2ExtractFromThisByte);
+                    } else if (BitOrder == BitIOMSBitFirst) {
+                        BitMask                       = CreateBitMaskMSBit(Bits2ExtractFromThisByte);
+                    }
+                    Byte                              = BitB->Buffer[ByteOffset] & BitMask;
+                    if (BitOrder == BitIOLSBitFirst) {
+                        // Right shift the Byte
+                        Byte                          = Byte >> (8 - Bits2ExtractFromThisByte);
+                    } else if (BitOrder == BitIOMSBitFirst) {
+                        // Left shift the byte by 8 - he number of bits we extracted from this byte
+                        Byte                          = Byte << (8 - Bits2ExtractFromThisByte);
+                    }
+                    ExtractedBits                     = Byte; // if the byte order matches the systems append it at the low side?
                 }
-                Byte                              = BitB->Buffer[ByteOffset] & BitMask;
-                if (BitOrder == BitIOLSBitFirst) {
-                    // Right shift the Byte
-                    Byte                          = Byte >> (8 - Bits2ExtractFromThisByte);
-                } else if (BitOrder == BitIOMSBitFirst) {
-                    // Left shift the byte by 8 - he number of bits we extracted from this byte
-                    Byte                          = Byte << (8 - Bits2ExtractFromThisByte);
-                }
-                ExtractedBits                     = Byte; // if the byte order matches the systems append it at the low side?
             }
         } else if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, __func__, "BitB's Pointer is NULL");
