@@ -53,10 +53,18 @@ extern  "C" {
     uint64_t              UTF8_GetSizeInCodePoints(UTF8 *String);
     
     /*!
+     @abstract                             "Gets the number of Unicode codeunits in the UTF8".
+     @param               String2Count     "The string to get the number of codepoints in".
+     */
+    uint64_t              UTF16_GetSizeInCodeUnits(UTF16 *String2Count);
+    
+    /*!
      @abstract                             "Gets the number of Unicode codepoints in the string".
      @param               String           "The string to get the number of codepoints in".
      */
     uint64_t              UTF16_GetSizeInCodePoints(UTF16 *String);
+    
+    uint64_t              UTF32_GetSizeInCodePoints(UTF32 *String);
     
     /*!
      @abstract                             "Decodes a UTF8 string to a UTF32 string".
