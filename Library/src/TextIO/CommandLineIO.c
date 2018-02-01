@@ -196,20 +196,21 @@ extern   "C" {
         }
     }
     
-    void CLISetLicense(CommandLineIO *CLI, UTF8 *Name, UTF8 *LicenseDescription, UTF8 *LicenseURL, const bool IsProprietary) {
-        if (CLI != NULL && (Name != NULL || LicenseDescription != NULL) && LicenseURL != NULL) {
-            CLI->ProgramLicenseName            = Name;
-            CLI->ProgramLicenseDescription     = LicenseDescription;
-            CLI->ProgramLicenseURL             = LicenseURL;
-            if (IsProprietary == No) {
-                CLI->IsProprietary         = No;
-            } else {
-                CLI->IsProprietary         = Yes;
+    void CLISetLicense(CommandLineIO *CLI, CLILicenseTypes LicenseType, UTF8 *Name, UTF8 *LicenseURL) {
+        if (CLI != NULL && LicenseType != UnknownLicenseType && Name != NULL && LicenseURL != NULL) {
+            if (LicenseType == PermissiveLicense || LicenseType == CopyleftLicense) {
+                CLI->IsProprietary             = No;
+            } else if (LicenseType == ProprietaryLicense) {
+                CLI->IsProprietary             = Yes;
             }
+            CLI->ProgramLicenseName            = Name;
+            CLI->ProgramLicenseURL             = LicenseURL;
         } else if (CLI == NULL) {
             BitIOLog(BitIOLog_ERROR, __func__, u8"CommandLineIO Pointer is NULL");
-        } else if (Name == NULL || LicenseDescription == NULL) {
-            BitIOLog(BitIOLog_ERROR, __func__, u8"At least the License Name or License Description must be set");
+        } else if (LicenseType == UnknownLicenseType) {
+            BitIOLog(BitIOLog_ERROR, __func__, u8"The LicenseType Is Invalid");
+        } else if (Name == NULL) {
+            BitIOLog(BitIOLog_ERROR, __func__, u8"License Name Pointer is Invalid");
         } else if (LicenseURL == NULL) {
             BitIOLog(BitIOLog_ERROR, __func__, u8"The License URL must be set");
         }

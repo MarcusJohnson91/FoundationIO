@@ -72,19 +72,19 @@ extern   "C" {
                                 ArgumentNotAllowed              = 16,
     } CLIArgumentTypes;
     
+    typedef enum CLILicenseTypes {
+                                UnknownLicenseType              = 0,
+                                PermissiveLicense               = 1,
+                                ProprietaryLicense              = 2,
+                                CopyleftLicense                 = 3,
+    } CLILicenseTypes;
+    
     typedef enum DelimiterTypes {
                                 UnknownDelimiter                = 0,
                                 RangeDelimiter                  = 1,
                                 EqualDelimiter                  = 2,
                                 ColonDelimiter                  = 3,
     } DelimiterTypes;
-    
-    typedef enum ArgumentTypes {
-                                UnknownArg                      = 0,
-                                OptionArg                       = 1,
-                                SlaveArg                        = 2,
-                                ResultArg                       = 3,
-    } ArgumentTypes;
     
     /*!
      @typedef                   CommandLineIO
@@ -138,15 +138,14 @@ extern   "C" {
      @abstract                                                  "Sets the license of the program".
      @remark                                                    "If your program is closed source, do NOT use the License options, use the EULA functions".
      @param                     CLI                             "CommandLineIO Pointer".
-     @param                     Name                            "What is the name of the license?".
-     @param                     LicenseDescription              "Describe the license this program is licensed under".
+     @param                     LicenseType                     "What type of license is this software released under"?
+     @param                     Name                            "What is the name of the license"?
      @param                     LicenseURL                      "The actual URL for the license".
-     @param                     IsProprietary                   "Is this program released under an open source license, or a EULA?".
      */
-    void                        CLISetLicense(CommandLineIO *CLI, UTF8 *Name, UTF8 *LicenseDescription, UTF8 *LicenseURL, const bool IsProprietary);
+    void                        CLISetLicense(CommandLineIO *CLI, CLILicenseTypes LicenseType, UTF8 *Name, UTF8 *LicenseURL);
     
     /*!
-     @abstract                                                  "What is the minimum number of switches your program needs to operate?".
+     @abstract                                                  "What is the minimum number of switches your program needs to operate"?
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     MinOptions                      "The minimum number of switches".
      */
@@ -178,7 +177,7 @@ extern   "C" {
     /*!
      @abstract                                                  "Sets SwitchID's flag in the CommandLineIO instance pointed by CLI".
      @param                     CLI                             "CommandLineIO Pointer".
-     @param                     SwitchID                        "Which switch are we talking about?".
+     @param                     SwitchID                        "Which switch are we talking about"?
      */
     void                        CLISetSwitchType(CommandLineIO *CLI, int64_t SwitchID, CLISwitchTypes SwitchType);
     
@@ -187,15 +186,15 @@ extern   "C" {
     /*!
      @abstract                                                  "Sets MetaFlag switch as a meta flag for switch SwitchID".
      @param                     CLI                             "CommandLineIO Pointer".
-     @param                     MasterID                        "Which switch does the child/meta switch depend on?".
-     @param                     Slave                           "Which switch is the child switch?".
+     @param                     MasterID                        "Which switch does the child/meta switch depend on"?
+     @param                     Slave                           "Which switch is the child switch"?
      */
     void                        CLISetSwitchAsSlave(CommandLineIO *CLI, const int64_t MasterID, const int64_t Slave);
     
     /*!
      @abstract                                                  "How many Slave switches can be active in a master argument at once"?
      @param                     CLI                             "CommandLineIO Pointer".
-     @param                     MasterID                        "Which switch are we talking about?".
+     @param                     MasterID                        "Which switch are we talking about"?
      @param                     MaxActiveSlaves                 "How many Slave switches can be active in an argument at once"?
      */
     void                        CLISetSwitchMaxConcurrentSlaves(CommandLineIO *CLI, const int64_t MasterID, const int64_t MaxActiveSlaves);
