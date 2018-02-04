@@ -50,7 +50,9 @@ extern "C" {
         
         if (BitIOLog_LogFile == NULL) {
 #if (BitIOTargetOS == BitIOWindowsOS)
-            SetConsoleOutputCP(WindowsUTF8CodePage);
+            if (GetConsoleOutputCP() != WindowsUTF8CodePage) {
+                SetConsoleOutputCP(WindowsUTF8CodePage);
+            }
 #endif
         }
         if (BitIOLog_ProgramName != NULL) {
