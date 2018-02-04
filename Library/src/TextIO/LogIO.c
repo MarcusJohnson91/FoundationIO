@@ -7,6 +7,8 @@
 #include "../include/BitIOLog.h"     /* Included for BitIOLogTypes */
 #include "../include/BitIOMacros.h"  /* Included for BitIONewLineWithNULLSize, BitIOTargetOS */
 
+#define WindowsUTF8CodePage 65001
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,6 +48,11 @@ extern "C" {
         vsnprintf(VariadicString, StringSize, Description, VariadicArguments);
         va_end(VariadicArguments);
         
+        if (BitIOLog_LogFile == NULL) {
+#if (BitIOTargetOS == BitIOWindowsOS)
+            SetConsoleOutputCP(WindowsUTF8CodePage);
+#endif
+        }
         if (BitIOLog_ProgramName != NULL) {
             fprintf(BitIOLog_LogFile == NULL ? stderr : BitIOLog_LogFile, "%s: %s in %s: \"%s\"%s", BitIOLog_ProgramName, Severity == BitIOLog_ERROR ? Error : Debug, FunctionName, VariadicString, BitIONewLine);
         } else {
