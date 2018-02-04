@@ -20,6 +20,8 @@
 extern   "C" {
 #endif
     
+#define WindowsUTF8CodePage 65001
+    
     /*
      Maybe what I should do, is remove the NULL pointer checking from the functions that set/get the value, to the functions that actually initalize the types in the first place.
      */
@@ -133,6 +135,7 @@ extern   "C" {
             CLI->ConsoleWidth    = WindowSize.ws_row;
             CLI->ConsoleHeight   = WindowSize.ws_col;
 #elif (BitIOTargetOS == BitIOWindowsOS)
+            SetConsoleCP(WindowsUTF8CodePage); // Sets the input codepage in Windows to UTF-8
             CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
             GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
             CLI->ConsoleHeight   = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
