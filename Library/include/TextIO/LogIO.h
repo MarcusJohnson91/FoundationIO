@@ -23,7 +23,7 @@ extern "C" {
     /*!
      @enum                      BitIOLogTypes
      @constant                  BitIOLog_ERROR                  "An error occurred".
-     @constant                  BitIOLog_DEBUG                  "Informatyion for debugging".
+     @constant                  BitIOLog_DEBUG                  "Information for debugging".
      */
     typedef enum BitIOLogTypes {
                                 BitIOLog_ERROR                  = 1,

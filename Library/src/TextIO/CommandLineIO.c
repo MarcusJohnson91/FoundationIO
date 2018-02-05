@@ -74,13 +74,6 @@ extern   "C" {
     /*!
      @struct                 CommandLineIO
      @abstract                                             "Contains all the information, and relationships between switches on the command line".
-     @constant               NumSwitches                   "How many switches are there?".
-     @constant               NumOptions                    "The number of Options present in argv, after extracting any Slave switches".
-     @constant               MinOptions                    "The minimum number of switches to accept without dumping the help".
-     @constant               HelpSwitch                    "Which switch displays the help"?
-     @constant               Switches                      "Pointer to an array of switches".
-     @constant               Options                       "Pointer to an array of Options".
-     @constant               IsProprietary                 "Is this program proprietary"?
      @constant               ProgramName                   "What is the name of this program"?
      @constant               ProgramAuthor                 "Who wrote this program"?
      @constant               ProgramDescription            "What does this program do"?
@@ -89,14 +82,13 @@ extern   "C" {
      @constant               ProgramLicenseName            "Short name of the license, like "3-clause BSD", etc".
      @constant               ProgramLicenseDescription     "Describe the license or EULA".
      @constant               ProgramLicenseURL             "URL for the EULA, ToS, or Open source license".
-     @constant               ProgramNameSize               "The number of codepoints in this field".
-     @constant               ProgramAuthorSize             "The number of codepoints in this field".
-     @constant               ProgramDescriptionSize        "The number of codepoints in this field".
-     @constant               ProgramVersionSize            "The number of codepoints in this field".
-     @constant               ProgramCopyrightSize          "The number of codepoints in this field".
-     @constant               ProgramLicenseNameSize        "The number of codepoints in this field".
-     @constant               ProgramLicenseDescriptionSize "The number of codepoints in this field".
-     @constant               ProgramLicenseURLSize         "The number of codepoints in this field".
+     @constant               NumSwitches                   "How many switches are there?".
+     @constant               NumOptions                    "The number of Options present in argv, after extracting any Slave switches".
+     @constant               MinOptions                    "The minimum number of switches to accept without dumping the help".
+     @constant               HelpSwitch                    "Which switch displays the help"?
+     @constant               Switches                      "Pointer to an array of switches".
+     @constant               Options                       "Pointer to an array of Options".
+     @constant               IsProprietary                 "Is this program proprietary"?
      */
     typedef struct CommandLineIO {
         UTF8                *ProgramName;
@@ -381,33 +373,34 @@ extern   "C" {
     
     static int64_t GetSubStringsAbsolutePosition(int64_t StartOffset, int64_t StringSize, UTF8 *OptionString, UTF8 *SubString) {
         int64_t SubStringPosition = -1LL;
-        int64_t SubStringSize = UTF8_GetSizeInCodePoints(OptionString);
-        int64_t MatchingChars = 0ULL;
-        for (int64_t Char = StartOffset; Char < StringSize; Char++) {
-            for (int64_t SubChar = 0; SubChar < SubStringSize; SubChar++) {
-                if (OptionString[Char] == SubString[SubChar]) { // IDK how to specify that the whole substring matches
-                    MatchingChars += 1;
-                    /*
-                     Loop over the string and substring, count the matching characters if you've got X matches and the SubString is X long, you've found the match. simply record the current position - X as the start
-                     */
-                } else {
-                    MatchingChars = 0;
-                }
-                if (MatchingChars == SubStringSize) {
-                    SubStringPosition = (Char + StartOffset) - SubChar;
+        if (OptionString != NULL && SubString != NULL) {
+            int64_t SubStringSize = UTF8_GetSizeInCodePoints(OptionString);
+            int64_t MatchingChars = 0ULL;
+            for (int64_t Char = StartOffset; Char < StringSize; Char++) {
+                for (int64_t SubChar = 0; SubChar < SubStringSize; SubChar++) {
+                    if (OptionString[Char] == SubString[SubChar]) { // IDK how to specify that the whole substring matches
+                        MatchingChars += 1;
+                        /*
+                         Loop over the string and substring, count the matching characters if you've got X matches and the SubString is X long, you've found the match. simply record the current position - X as the start
+                         */
+                    } else {
+                        MatchingChars = 0;
+                    }
+                    if (MatchingChars == SubStringSize) {
+                        SubStringPosition = (Char + StartOffset) - SubChar;
+                    }
                 }
             }
-            
+        } else if (OptionString == NULL) {
+            BitIOLog(BitIOLog_ERROR, __func__, "OptionString is NULL");
+        } else if (SubString == NULL) {
+            BitIOLog(BitIOLog_ERROR, __func__, "SubString is NULL");
         }
         return SubStringPosition;
     }
     
     void ParseCommandLineOptions(CommandLineIO *CLI, const int argc, const char *argv[]) {
-        if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, __func__, u8"CommandLineIO Pointer is NULL");
-        } else if (argc < CLI->MinOptions || argc <= 1) {
-            BitIOLog(BitIOLog_ERROR, __func__, u8"You entered %d options, the minimum is %d", argc - 1, CLI->MinOptions);
-        } else {
+        if (CLI != NULL && CLI->MinOptions >= 1 && argc >= CLI->MinOptions) {
             /* Ok, so the first thing we need to do is loop over the arguments, and loop over the actual bytes of each argument */
             int32_t  CurrentArgument        = 1LL;
             
@@ -421,7 +414,7 @@ extern   "C" {
                     // now compare ArgumentFlag to Switch
                     // Which string is smaller?
                     if (UTF8_Compare(&ArgumentFlag, CLI->SwitchIDs[Switch].Name, Yes, Yes) == Yes) { // ArgumentFlag matches this switch
-                                                                                                           // Set up the Option here
+                        // Set up the Option here
                         CLI->NumOptions += 1;
                         if (CLI->NumOptions == 1) {
                             CLI->OptionIDs = calloc(1, sizeof(CommandLineOption));
@@ -452,77 +445,78 @@ extern   "C" {
                 free(Argument);
                 free(ArgumentFlag);
             } while (CurrentArgument < argc);
+        } else if (CLI == NULL) {
+            BitIOLog(BitIOLog_ERROR, __func__, u8"CommandLineIO Pointer is NULL");
+        } else if (CLI->MinOptions <= 1 || argc <= 1) {
+            BitIOLog(BitIOLog_ERROR, __func__, u8"You entered %d options, the minimum is %d", argc - 1, CLI->MinOptions);
         }
     }
     
     static UTF8 SplitInlineArgument(const UTF8 *ArgumentString, const uint64_t ArgumentStringSize, uint64_t NumSplitArguments) {
-        /*
-         Ok, so we take in an argument string and it's size.
-         We output whatever the argument contains in multiple strings.
-         
-         if our InlineArgument is: --Input:LeftEye=/Users/Marcus/Desktop/ElephantsDream_Left_%05d.png
-         then we output          : Input LeftEye /Users/Marcus/Desktop/ElephantsDream_Left_%05d.png
-         Symbols to break strings apart with: (:|=|-|..|--|)
-         Theoretically this is simple.
-         
-         You simply loop over the string comparing each byte to those symbols until you get to the end of the string and you keep a count of the number of delimiters found, each's size, and offset from 0.
-         We need to do this in 2 passes, the first to find the number of delimiters there are.
-         */
-        
-        uint64_t  NumDelimitersFound = 0ULL;
-        uint64_t  FoundStrings       = 0ULL;
-        uint64_t *SubStringSize      = NULL;
-        uint64_t *SubStringOffset    = NULL;
-        
-        uint64_t  CurrentDelimiter   = 0ULL;
-        
-        enum Delimiters { // 3d, 3a, 2e 2e
-            Colon     = 0x3A,
-            Equal     = 0x3D,
-            Hyphen    = 0x2D,
-            Period    = 0x2E,
-        };
-        
-        for (uint64_t ArgumentByte = 0ULL; ArgumentByte < ArgumentStringSize; ArgumentByte++) {
-            uint8_t CurrentByte = ArgumentString[ArgumentByte];
-            uint8_t NextByte    = ArgumentString[ArgumentByte + 1];
-            if (CurrentByte == ":" || CurrentByte == "=" || (CurrentByte == "-" && NextByte == "-") || (CurrentByte == "." && NextByte == ".") || CurrentByte == "-" || CurrentByte == ".") {
-                NumDelimitersFound += 1;
-                if ((CurrentByte == "-" && NextByte == "-") || (CurrentByte == "." && NextByte == ".")) {
+        UTF8 *StringPointers = NULL;
+        if (ArgumentString != NULL) {
+            /*
+             Ok, so we take in an argument string and it's size.
+             We output whatever the argument contains in multiple strings.
+             
+             if our InlineArgument is: --Input:LeftEye=/Users/Marcus/Desktop/ElephantsDream_Left_%05d.png
+             then we output          : Input LeftEye /Users/Marcus/Desktop/ElephantsDream_Left_%05d.png
+             Symbols to break strings apart with: (:|=|-|..|--|)
+             Theoretically this is simple.
+             
+             You simply loop over the string comparing each byte to those symbols until you get to the end of the string and you keep a count of the number of delimiters found, each's size, and offset from 0.
+             We need to do this in 2 passes, the first to find the number of delimiters there are.
+             */
+            uint64_t  NumDelimitersFound = 0ULL;
+            uint64_t  FoundStrings       = 0ULL;
+            uint64_t *SubStringSize      = NULL;
+            uint64_t *SubStringOffset    = NULL;
+            uint64_t  CurrentDelimiter   = 0ULL;
+            enum Delimiters { // 3d, 3a, 2e 2e
+                Colon     = 0x3A,
+                Equal     = 0x3D,
+                Hyphen    = 0x2D,
+                Period    = 0x2E,
+            };
+            for (uint64_t ArgumentByte = 0ULL; ArgumentByte < ArgumentStringSize; ArgumentByte++) {
+                uint8_t CurrentByte = ArgumentString[ArgumentByte];
+                uint8_t NextByte    = ArgumentString[ArgumentByte + 1];
+                if (CurrentByte == ":" || CurrentByte == "=" || (CurrentByte == "-" && NextByte == "-") || (CurrentByte == "." && NextByte == ".") || CurrentByte == "-" || CurrentByte == ".") {
+                    NumDelimitersFound += 1;
+                    if ((CurrentByte == "-" && NextByte == "-") || (CurrentByte == "." && NextByte == ".")) {
+                    }
                 }
             }
-        }
-        
-        SubStringSize   = calloc(NumDelimitersFound, sizeof(uint64_t));
-        SubStringOffset = calloc(NumDelimitersFound, sizeof(uint64_t));
-        
-        for (uint64_t ArgumentByte = 0ULL; ArgumentByte < ArgumentStringSize; ArgumentByte++) {
-            uint8_t CurrentByte                       = ArgumentString[ArgumentByte];
-            uint8_t NextByte                          = ArgumentString[ArgumentByte + 1];
-            if (CurrentByte == ":" || CurrentByte == "=" || (CurrentByte == "-" && NextByte == "-") || (CurrentByte == "." && NextByte == ".") || CurrentByte == "-" || CurrentByte == ".") {
-                CurrentDelimiter                     += 1;
-                if ((CurrentByte == "-" && NextByte == "-") || (CurrentByte == "." && NextByte == ".")) {
-                    SubStringOffset[CurrentDelimiter] = NextByte;
-                    SubStringSize[CurrentDelimiter]   = SubStringOffset[CurrentDelimiter] - ArgumentStringSize;
-                } else {
-                    SubStringOffset[CurrentDelimiter] = CurrentByte;
-                    SubStringSize[CurrentDelimiter]   = SubStringOffset[CurrentDelimiter] - ArgumentStringSize;
+            SubStringSize   = calloc(NumDelimitersFound, sizeof(uint64_t));
+            SubStringOffset = calloc(NumDelimitersFound, sizeof(uint64_t));
+            for (uint64_t ArgumentByte = 0ULL; ArgumentByte < ArgumentStringSize; ArgumentByte++) {
+                uint8_t CurrentByte                       = ArgumentString[ArgumentByte];
+                uint8_t NextByte                          = ArgumentString[ArgumentByte + 1];
+                if (CurrentByte == ":" || CurrentByte == "=" || (CurrentByte == "-" && NextByte == "-") || (CurrentByte == "." && NextByte == ".") || CurrentByte == "-" || CurrentByte == ".") {
+                    CurrentDelimiter                     += 1;
+                    if ((CurrentByte == "-" && NextByte == "-") || (CurrentByte == "." && NextByte == ".")) {
+                        SubStringOffset[CurrentDelimiter] = NextByte;
+                        SubStringSize[CurrentDelimiter]   = SubStringOffset[CurrentDelimiter] - ArgumentStringSize;
+                    } else {
+                        SubStringOffset[CurrentDelimiter] = CurrentByte;
+                        SubStringSize[CurrentDelimiter]   = SubStringOffset[CurrentDelimiter] - ArgumentStringSize;
+                    }
                 }
             }
+            // Ok, now we just go ahead and copy the substrings out
+            // and now we go ahead and create the number of srings found * their size, then put pointers to those strings into an array of pointers
+            FoundStrings              =  NumDelimitersFound - 1;
+            StringPointers            =  calloc(FoundStrings, sizeof(UTF8));
+            for (uint64_t String = 0ULL; String < FoundStrings; String++) {
+                // In here allocate a string for each found string
+                // Allocate the string here
+                UTF8 *StringPointer    =  calloc(SubStringSize[String], sizeof(UTF8));
+                StringPointers[String] = *StringPointer;
+            }
+            NumSplitArguments = FoundStrings;
+        } else {
+            BitIOLog(BitIOLog_ERROR, __func__, "ArgumentString Pointer is NULL");
         }
-        
-        // Ok, now we just go ahead and copy the substrings out
-        // and now we go ahead and create the number of srings found * their size, then put pointers to those strings into an array of pointers
-        FoundStrings              =  NumDelimitersFound - 1;
-        UTF8 *StringPointers      =  calloc(FoundStrings, sizeof(UTF8));
-        for (uint64_t String = 0ULL; String < FoundStrings; String++) {
-            // In here allocate a string for each found string
-            // Allocate the string here
-            UTF8 *StringPointer    =  calloc(SubStringSize[String], sizeof(UTF8));
-            StringPointers[String] = *StringPointer;
-        }
-        
-        NumSplitArguments = FoundStrings;
         return StringPointers;
     }
     
@@ -548,17 +542,8 @@ extern   "C" {
             BitIOLog(BitIOLog_ERROR, __func__, u8"CommandLineIO Pointer is NULL");
         } else if (OptionID < 0 || OptionID > CLI->NumOptions - 1) {
             BitIOLog(BitIOLog_ERROR, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", OptionID, CLI->NumSwitches - 1);
-        }
-        
-        
-        if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, __func__, u8"CommandLineIO Pointer is NULL");
-        } else if (OptionID > CLI->NumSwitches - 1 || OptionID < 0) {
-            BitIOLog(BitIOLog_ERROR, __func__, u8"SwitchID %d is invalid, it should be between 0 and %d", OptionID, CLI->NumSwitches - 1);
-        } else if (NumSlaves > CLI->NumSwitches - 1 || NumSlaves < 0) {
+        } else if (NumSlaves < 0 || NumSlaves > CLI->NumSwitches - 1) {
             BitIOLog(BitIOLog_ERROR, __func__, u8"NumSlaves %d is invalid, it should be between 0 and %d", NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
-        } else {
-            
         }
         return NumMatchingOptions;
     }
@@ -633,48 +618,50 @@ extern   "C" {
     }
     
     void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF8 *Strings[], uint64_t *Numerator, uint64_t *Denominator) {
-        /*
-         How do we get the window size? I want to be able to resize the window
-         I want the bar to have an even number of dashes on each side with the number in the middle.
-         like this:
-         [--                        Shot U/V 2%                              ]
-         [-----                    Frame W/X 10%                             ] 10.5% gets rounded down to 10 which is 5 dashes
-         [-------------------------Block Y/Z 51%-                            ] 50.5% gets rounded up to 51 which is 26 dashes
-         Also we'll need to know the size of the center string so we can keep both bars equal lengths
-         */
-        /*
-         Ok, so we know the width of the console, now we need to figure out the sizes of each of the strings
-         */
-        
-        uint64_t *StringSize = calloc(NumItems2Display, sizeof(size_t));
-        for (uint8_t Item = 0; Item < NumItems2Display; Item++) { // Get the size of the strings
-            StringSize[Item] = UTF8_GetSizeInCodePoints(Strings[Item]);
-            // huh, well we need 2 characters for the brackets.
+        if (CLI != NULL) {
+            /*
+             How do we get the window size? I want to be able to resize the window
+             I want the bar to have an even number of dashes on each side with the number in the middle.
+             like this:
+             [--                        Shot U/V 2%                              ]
+             [-----                    Frame W/X 10%                             ] 10.5% gets rounded down to 10 which is 5 dashes
+             [-------------------------Block Y/Z 51%-                            ] 50.5% gets rounded up to 51 which is 26 dashes
+             Also we'll need to know the size of the center string so we can keep both bars equal lengths
+             */
+            /*
+             Ok, so we know the width of the console, now we need to figure out the sizes of each of the strings
+             */
+            
+            uint64_t *StringSize = calloc(NumItems2Display, sizeof(size_t));
+            for (uint8_t Item = 0; Item < NumItems2Display; Item++) { // Get the size of the strings
+                StringSize[Item] = UTF8_GetSizeInCodePoints(Strings[Item]);
+                // huh, well we need 2 characters for the brackets.
+            }
+            // Number of seperators for each string
+            uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(size_t));
+            UTF8     *ActualStrings2Print            = calloc(NumItems2Display * CLI->ConsoleWidth, sizeof(UTF8));
+            for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
+                // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
+                NumProgressIndicatorsPerString[String] = CLI->ConsoleWidth - (2 + StringSize[String]); // what if it's not even?
+                uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
+                uint8_t HalfOfTheIndicators = (PercentComplete / 2);
+                // Now we go ahead and memset a string with the proper number of indicators
+                UTF8 *Indicator             = calloc(CLI->ConsoleWidth, sizeof(UTF8));
+                memset(Indicator, '-', HalfOfTheIndicators);
+                sprintf(ActualStrings2Print[String], "[%s%s %d/%d %hhu/% %s]", Indicator, Strings[String], Numerator, Denominator, PercentComplete, Indicator);
+                fprintf(stdout, "%s%s", &ActualStrings2Print[String], BitIONewLine);
+                free(Indicator);
+            }
+            free(StringSize);
+            free(NumProgressIndicatorsPerString);
+            free(ActualStrings2Print);
+        } else {
+            BitIOLog(BitIOLog_ERROR, __func__, u8"CommandLineIO Pointer is NULL");
         }
-        // Number of seperators for each string
-        uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(size_t));
-        UTF8     *ActualStrings2Print            = calloc(NumItems2Display * CLI->ConsoleWidth, sizeof(UTF8));
-        for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
-                                                                        // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
-            NumProgressIndicatorsPerString[String] = CLI->ConsoleWidth - (2 + StringSize[String]); // what if it's not even?
-            uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
-            uint8_t HalfOfTheIndicators = (PercentComplete / 2);
-            // Now we go ahead and memset a string with the proper number of indicators
-            UTF8 *Indicator             = calloc(CLI->ConsoleWidth, sizeof(UTF8));
-            memset(Indicator, '-', HalfOfTheIndicators);
-            sprintf(ActualStrings2Print[String], "[%s%s %d/%d %hhu/% %s]", Indicator, Strings[String], Numerator, Denominator, PercentComplete, Indicator);
-            fprintf(stdout, "%s%s", &ActualStrings2Print[String], BitIONewLine);
-            free(Indicator);
-        }
-        free(StringSize);
-        free(NumProgressIndicatorsPerString);
-        free(ActualStrings2Print);
     }
     
     void CommandLineIO_Deinit(CommandLineIO *CLI) {
-        if (CLI == NULL) {
-            BitIOLog(BitIOLog_ERROR, __func__, u8"CommandLineIO Pointer is NULL");
-        } else {
+        if (CLI != NULL) {
             if (CLI->SwitchIDs != NULL) {
                 for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                     free(CLI->SwitchIDs[Switch].Name);
@@ -715,6 +702,8 @@ extern   "C" {
                 free(CLI->ProgramLicenseURL);
             }
             free(CLI);
+        } else {
+            BitIOLog(BitIOLog_ERROR, __func__, u8"CommandLineIO Pointer is NULL");
         }
     }
     
