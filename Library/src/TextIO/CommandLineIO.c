@@ -127,7 +127,7 @@ extern   "C" {
             CLI->ConsoleWidth    = WindowSize.ws_row;
             CLI->ConsoleHeight   = WindowSize.ws_col;
 #elif (BitIOTargetOS == BitIOWindowsOS)
-            SetConsoleCP(WindowsUTF8CodePage); // Sets the input codepage in Windows to UTF-8
+            SetConsoleCP(WindowsUTF8CodePage);
             CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
             GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
             CLI->ConsoleHeight   = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
@@ -626,19 +626,21 @@ extern   "C" {
              [--                        Shot U/V 2%                              ]
              [-----                    Frame W/X 10%                             ] 10.5% gets rounded down to 10 which is 5 dashes
              [-------------------------Block Y/Z 51%-                            ] 50.5% gets rounded up to 51 which is 26 dashes
-             Also we'll need to know the size of the center string so we can keep both bars equal lengths
+             FormatString: "[%s" "%s %d/%d %d%" "%s]", FirstDashes. String[Index], Numerator, Denominator, DerivedPercentage, LastDashes
+             
+             So we need to know the length of String[Index] in Graphemes, after being composed.
              */
             /*
              Ok, so we know the width of the console, now we need to figure out the sizes of each of the strings
              */
             
-            uint64_t *StringSize = calloc(NumItems2Display, sizeof(size_t));
+            uint64_t *StringSize = calloc(NumItems2Display, sizeof(uint64_t));
             for (uint8_t Item = 0; Item < NumItems2Display; Item++) { // Get the size of the strings
                 StringSize[Item] = UTF8_GetSizeInCodePoints(Strings[Item]);
                 // huh, well we need 2 characters for the brackets.
             }
             // Number of seperators for each string
-            uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(size_t));
+            uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
             UTF8     *ActualStrings2Print            = calloc(NumItems2Display * CLI->ConsoleWidth, sizeof(UTF8));
             for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
                 // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
