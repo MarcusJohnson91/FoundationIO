@@ -1,18 +1,20 @@
-#include <stdio.h>      /* Included for the FILE type, SEEK SET/END/CUR macros */
-#include <stdlib.h>     /* Included for calloc, realloc, and free */
+#include <stdbool.h>                  /* Included for bool true/false, Yes/No are in BitIOMacros */
+#include <stdint.h>                   /* Included for u/intX_t */
+#include <stdio.h>                    /* Included for the FILE type, SEEK SET/END/CUR macros */
+#include <stdlib.h>                   /* Included for calloc, realloc, and free */
 
+#include "../include/BitIOMacros.h"
 #include "../include/BitIOMath.h"
 #include "../include/StringIO.h"
 #include "../include/BitIOLog.h"
 #include "../include/BitIO.h"
-#include "../include/BitIOMacros.h"
 
 #if   (BitIOTargetOS == BitIOWindowsOS)
-#include <io.h>         /* Actual Socket functions like _read, _write */
-#include <winsock.h>    /* Included for the socket support on Windows */
+#include <io.h>                       /* Actual Socket functions like _read, _write */
+#include <winsock.h>                  /* Included for the socket support on Windows */
 #elif (BitIOTargetOS == BitIOPOSIXOS)
-#include <sys/socket.h> /* Included for connect, socket, sockaddr */
-#include <unistd.h>     /* Included for read and shit */
+#include <sys/socket.h>               /* Included for connect, socket, sockaddr */
+#include <unistd.h>                   /* Included for read and shit */
 #endif
 
 #ifdef __cplusplus
@@ -154,7 +156,7 @@ extern "C" {
                     }
                 } else {
                     // Mask, Shift, etc.
-                    uint64_t ByteOffset               = ByteOrder == BitIOGlobalByteOrder ? Bits2Bytes(BitB->BitOffset + 1, No):Bits2Bytes(BitB->BitOffset + 1 + NumBits2Insert, No);
+                    uint64_t ByteOffset               = (ByteOrder == BitIOGlobalByteOrder ? Bits2Bytes(BitB->BitOffset + 1, No):Bits2Bytes(BitB->BitOffset + 1 + NumBits2Insert, No));
                     uint8_t  Bits2InsertForThisByte   = 8 - (BitB->BitOffset % 8);
                     uint8_t  BitMask                  = 0;
                     uint8_t  Byte                     = 0;
@@ -191,7 +193,7 @@ extern "C" {
                         ExtractedBits = BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)];
                     }
                 } else {
-                    uint64_t ByteOffset               = ByteOrder == BitIOGlobalByteOrder ? Bits2Bytes(BitB->BitOffset + 1, No):Bits2Bytes(BitB->BitOffset + 1 + NumBits2Extract, No);
+                    uint64_t ByteOffset               = (ByteOrder == BitIOGlobalByteOrder ? Bits2Bytes(BitB->BitOffset + 1, No):Bits2Bytes(BitB->BitOffset + 1 + NumBits2Extract, No));
                     uint8_t  Bits2ExtractFromThisByte = 8 - (BitB->BitOffset % 8); //uint64_t Bits2Get = NumBits2ExtractFromByte(BitB->BitOffset, Bits);
                     uint8_t  BitMask                  = 0;
                     uint8_t  Byte                     = 0;
@@ -255,7 +257,7 @@ extern "C" {
         } else if (BitB == NULL) {
             BitIOLog(BitIOLog_ERROR, __func__, u8"BitBuffer Pointer is NULL");
         }
-        return UnaryType == CountUnary ? OutputData + 1 : OutputData;
+        return (UnaryType == CountUnary ? OutputData + 1 : OutputData);
     }
     
     uint64_t ReadExpGolomb(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit) {
@@ -315,7 +317,7 @@ extern "C" {
     
     /* BitBuffer GUUID Management */
     bool CompareGUUIDs(GUUIDTypes GUUIDType, const uint8_t *GUUID1, const uint8_t *GUUID2) {
-        uint8_t GUUIDSize = (GUUIDType == GUIDString || GUUIDType == UUIDString) ? BitIOGUUIDStringSize - BitIONULLStringSize : BitIOBinaryGUUIDSize;
+        uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? BitIOGUUIDStringSize - BitIONULLStringSize : BitIOBinaryGUUIDSize);
         bool GUUIDsMatch = Yes;
         if (GUUID1 != NULL && GUUID2 != NULL && GUUIDType != UnknownGUUID) {
             for (uint8_t BinaryGUUIDByte = 0; BinaryGUUIDByte < GUUIDSize; BinaryGUUIDByte++) {
@@ -334,9 +336,12 @@ extern "C" {
     }
     
     uint8_t *ConvertGUUID(GUUIDTypes InputGUUIDType, GUUIDTypes OutputGUUIDType, const uint8_t *GUUID2Convert) {
-        uint8_t  OutputGUUIDSize  = OutputGUUIDType == GUIDString || OutputGUUIDType == UUIDString ? BitIOGUUIDStringSize : BitIOBinaryGUUIDSize;
-        bool     ByteOrderDiffers = ((InputGUUIDType == GUIDString && OutputGUUIDType == UUIDString) || (InputGUUIDType == UUIDString && OutputGUUIDType == GUIDString) || (InputGUUIDType == BinaryUUID && OutputGUUIDType == BinaryGUID) || (InputGUUIDType == BinaryGUID && OutputGUUIDType == BinaryUUID)) ? Yes : No;
-        bool     TypeDiffers      = ((InputGUUIDType == GUIDString && OutputGUUIDType == BinaryGUID) || (InputGUUIDType == BinaryGUID && OutputGUUIDType == GUIDString) || (InputGUUIDType == UUIDString && OutputGUUIDType == BinaryUUID) || (InputGUUIDType == BinaryUUID && OutputGUUIDType == UUIDString)) ? Yes : No;
+        uint8_t  OutputGUUIDSize  = ((OutputGUUIDType == GUIDString || OutputGUUIDType == UUIDString) ? BitIOGUUIDStringSize : BitIOBinaryGUUIDSize);
+        
+        bool     ByteOrderDiffers = (((InputGUUIDType == GUIDString && OutputGUUIDType == UUIDString) || (InputGUUIDType == UUIDString && OutputGUUIDType == GUIDString) || (InputGUUIDType == BinaryUUID && OutputGUUIDType == BinaryGUID) || (InputGUUIDType == BinaryGUID && OutputGUUIDType == BinaryUUID)) ? Yes : No);
+        
+        bool     TypeDiffers      = (((InputGUUIDType == GUIDString && OutputGUUIDType == BinaryGUID) || (InputGUUIDType == BinaryGUID && OutputGUUIDType == GUIDString) || (InputGUUIDType == UUIDString && OutputGUUIDType == BinaryUUID) || (InputGUUIDType == BinaryUUID && OutputGUUIDType == UUIDString)) ? Yes : No);
+        
         uint8_t *ConvertedGUUID   = calloc(OutputGUUIDSize, sizeof(uint8_t));
         if (ConvertedGUUID != NULL && GUUID2Convert != NULL && InputGUUIDType != UnknownGUUID && OutputGUUIDType != UnknownGUUID) {
             if (ByteOrderDiffers == Yes) {
@@ -442,7 +447,7 @@ extern "C" {
     }
     
     uint8_t *ReadGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB) {
-        uint8_t ByteOrder = GUUIDType == GUIDString || GUUIDType == BinaryGUID ? BitIOLSByteFirst : BitIOMSByteFirst;
+        uint8_t ByteOrder = ((GUUIDType == GUIDString || GUUIDType == BinaryGUID) ? BitIOLSByteFirst : BitIOMSByteFirst);
         uint8_t *GUUID = NULL;
         if (GUUIDType != UnknownGUUID && BitB != NULL && (BitB->NumBits - BitB->BitOffset) >= BitIOGUUIDStringSize) {
             if (GUUIDType == BinaryUUID || GUUIDType == BinaryGUID) {
@@ -478,8 +483,8 @@ extern "C" {
     
     void WriteGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB, const uint8_t *GUUID2Write) {
         if (BitB != NULL && BitBuffer_GetPosition(BitB)  && GUUID2Write != NULL) { // TODO: Make sure that the BitBuffer can hold the GUUID
-            uint8_t GUUIDSize = (GUUIDType == GUIDString || GUUIDType == UUIDString) ? BitIOGUUIDStringSize - BitIONULLStringSize : BitIOBinaryGUUIDSize;
-            uint8_t ByteOrder = (GUUIDType == GUIDString || GUUIDType == BinaryGUID) ? BitIOLSByteFirst : BitIOMSByteFirst;
+            uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? BitIOGUUIDStringSize - BitIONULLStringSize : BitIOBinaryGUUIDSize);
+            uint8_t ByteOrder = ((GUUIDType == GUIDString || GUUIDType == BinaryGUID) ? BitIOLSByteFirst : BitIOMSByteFirst);
             for (uint8_t Byte = 0; Byte < GUUIDSize; Byte++) {
                 InsertBits(ByteOrder, BitIOLSBitFirst, BitB, 8, GUUID2Write[Byte]);
             }
@@ -737,7 +742,7 @@ extern "C" {
         uint64_t BytesWritten          = 0ULL;
         if (BitO != NULL && Buffer2Write != NULL) {
             uint64_t BufferBytes       = Bits2Bytes(Buffer2Write->NumBits, Yes);
-            uint64_t NumBytes2Write    = Bytes2Write > BufferBytes ? Bytes2Write : BufferBytes;
+            uint64_t NumBytes2Write    = (Bytes2Write > BufferBytes ? Bytes2Write : BufferBytes);
             if (BitO->FileType == BitIOFile) {
                 BytesWritten           = fwrite(Buffer2Write->Buffer, 1, NumBytes2Write, BitO->File);
             } else if (BitO->FileType == BitIOSocket) {

@@ -1,5 +1,5 @@
-#include <stdbool.h>
-#include <stdint.h>
+#include <stdbool.h>                  /* Included for bool true/false, Yes/No are in BitIOMacros */
+#include <stdint.h>                   /* Included for u/intX_t */
 
 #include "../include/StringIO.h"
 
@@ -60,4 +60,3 @@ extern "C" {
 #endif
 
 #endif /* LIBBITIO_BitIOLog_H */
-

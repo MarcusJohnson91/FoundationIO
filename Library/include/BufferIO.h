@@ -1,6 +1,6 @@
-#include <stdbool.h> /* Included for the bool type */
-#include <stdint.h>  /* Included for the u/intX_t types */
-#include <stdio.h>   /* Included for fpos_t */
+#include <stdbool.h>                  /* Included for bool true/false, Yes/No are in BitIOMacros */
+#include <stdint.h>                   /* Included for u/intX_t */
+#include <stdio.h>                    /* Included for fpos_t */
 
 #include "../include/StringIO.h"
 #include "../include/BitIOMacros.h"

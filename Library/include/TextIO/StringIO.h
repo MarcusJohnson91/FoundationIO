@@ -1,5 +1,5 @@
-#include <stdbool.h> /* Included for the bool type */
-#include <stdint.h>  /* Included for the u/intX_t types */
+#include <stdbool.h>                  /* Included for bool true/false, Yes/No are in BitIOMacros */
+#include <stdint.h>                   /* Included for u/intX_t */
 
 #pragma once
 
@@ -24,10 +24,10 @@ extern  "C" {
     
     typedef enum UnicodeTypes {
         UnicodeUnknownSizeByteOrder        = 0,
-        UTF16LE                            = 1,
-        UTF16BE                            = 2,
-        UTF32LE                            = 3,
-        UTF32BE                            = 4,
+        UTF16LE                            = 65534,
+        UTF16BE                            = 65279,
+        UTF32LE                            = 65534,
+        UTF32BE                            = 65279,
     } UnicodeTypes;
     
     typedef enum UnicodeCodePointTypes {
@@ -113,7 +113,7 @@ extern  "C" {
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
-     @param               String2CaseFold  "The sring to be casefolded".
+     @param               String2CaseFold  "The string to be casefolded".
      */
     void                  UTF32_CaseFold(UTF32 *String2CaseFold);
     
@@ -139,13 +139,13 @@ extern  "C" {
     int64_t               UTF32_ToNumber(UTF32 *String);
     
     /* High level fucntions */
-    bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2, bool Normalize, bool CaseFold);
+    bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2, bool Normalize, bool CaseInsensitive);
     
-    bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2, bool Normalize, bool CaseFold);
+    bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2, bool Normalize, bool CaseInsensitive);
+    
     
 #ifdef  __cplusplus
 }
 #endif
 
 #endif  /* LIBBITIO_StringIO_H */
-

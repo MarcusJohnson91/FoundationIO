@@ -1,5 +1,12 @@
-#include <stdbool.h> /* Included for the bool type */
-#include <stdint.h>  /* Included for the u/intX_t types */
+#include <stdbool.h>                  /* Included for bool true/false, Yes/No are in BitIOMacros */
+#include <stdint.h>                   /* Included for u/intX_t */
+
+#if (defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L)
+#include <tgmath.h>
+#else
+#include <math>
+#include <complex.h>
+#endif
 
 #pragma  once
 
