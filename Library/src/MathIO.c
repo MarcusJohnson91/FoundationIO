@@ -1,7 +1,8 @@
+#include <stdbool.h>                  /* Included for bool true/false, Yes/No are in BitIOMacros */
+#include <stdint.h>                   /* Included for u/intX_t */
+
 #include "../include/BitIOMath.h"
 #include "../include/BitIOMacros.h"
-
-#include <tgmath.h>
 
 #ifdef   __cplusplus
 extern   "C" {
@@ -24,7 +25,7 @@ extern   "C" {
     }
     
     inline uint64_t Absolute(const int64_t Value) {
-        return Value >= 0 ? (uint64_t) Value : (uint64_t) ~Value + 1;
+        return (Value >= 0 ? (uint64_t) Value : (uint64_t) ~Value + 1);
     }
     
     inline uint64_t Power(const uint64_t Base, const uint64_t Exponent) {

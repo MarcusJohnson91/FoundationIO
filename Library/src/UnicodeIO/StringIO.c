@@ -1,10 +1,13 @@
-#include <stdlib.h>  /* Included for calloc, and free */
-#include <stdarg.h>  /* Included for va_start, va_end */
+#include <stdarg.h>                   /* Included for va_start, va_end */
+#include <stdbool.h>                  /* Included for bool true/false, Yes/No are in BitIOMacros */
+#include <stdint.h>                   /* Included for u/intX_t */
+#include <stdlib.h>                   /* Included for calloc, and free */
+#include <wchar.h>                    /* Included for widechar utilities */
 
-#include "../include/BitIOLog.h"
-
-#include "../include/StringIO.h"
 #include "../include/BitIOMacros.h"
+#include "../include/BitIOMath.h"
+#include "../include/StringIO.h"
+#include "../include/BitIOLog.h"
 
 #define UnicodeNULLTerminatorSize       1
 #define UTF1632BOMSize                  1
@@ -179,6 +182,10 @@ extern  "C" {
                         DecodedString[CodePoint]     = 0xFFFD;
                         BitIOLog(BitIOLog_ERROR, __func__, u8"Codepoint %d is invalid, overlaps Surrogate Pair Block, replacing with U+FFFD", CodePoint);
                     }
+                    if (BitIOGlobalByteOrder == BitIOLSByteFirst) { // The string byte order does not match the main machines, we need to swap
+                        // Swap the endian as we encode
+                        DecodedString[CodePoint] = SwapEndian32(String[CodePoint]);
+                    }
                 } while (String[CodeUnitNum] != 0);
             } else {
                 BitIOLog(BitIOLog_ERROR, __func__, u8"Not enough memory to allocate string");
@@ -197,11 +204,15 @@ extern  "C" {
         uint64_t CodeUnitNum                           = 0ULL;
         UTF8    *EncodedString                         = NULL;
         if (String != NULL) {
-            uint64_t UTF8CodeUnits                     = UTF32_GetSizeInCodeUnits4UTF8(String) + IncludeBOM == true ? UnicodeNULLTerminatorSize + UTF8BOMSize: UnicodeNULLTerminatorSize;
+            uint64_t UTF8CodeUnits                     = (UTF32_GetSizeInCodeUnits4UTF8(String) + IncludeBOM == true ? UnicodeNULLTerminatorSize + UTF8BOMSize: UnicodeNULLTerminatorSize);
             
             EncodedString                              = calloc(UTF8CodeUnits, sizeof(UTF8));
             if (EncodedString != NULL) {
                 do {
+                    if ((String[0] == 0xFFFE && BitIOGlobalByteOrder == BitIOMSByteFirst) || (String[0] == 0xFEFF && BitIOGlobalByteOrder == BitIOLSByteFirst)) { // The string byte order does not match the main machines, we need to swap
+                        // Swap the endian as we encode
+                        String[CodePoint] = SwapEndian32(String[CodePoint]);
+                    }
                     if (CodeUnitNum == 0 && IncludeBOM == Yes) {
                         EncodedString[CodeUnitNum]      = 0xEF;
                         EncodedString[CodeUnitNum += 1] = 0xBB;
@@ -255,6 +266,10 @@ extern  "C" {
             DecodedString           = calloc(UTF16CodeUnits, sizeof(UTF32));
             if (DecodedString != NULL) {
                 do {
+                    if ((String[0] == 0xFFFE && BitIOGlobalByteOrder == BitIOMSByteFirst) || (String[0] == 0xFEFF && BitIOGlobalByteOrder == BitIOLSByteFirst)) { // The string byte order does not match the main machines, we need to swap
+                        // Swap the endian as we encode
+                        String[CodePoint] = SwapEndian16(String[CodePoint]);
+                    }
                     if (CodePoint == 0) {
                         // set the Unicode BOM
                         if (BitIOGlobalByteOrder == BitIOLSByteFirst) {
@@ -279,21 +294,25 @@ extern  "C" {
     }
     
     UTF16         *UTF16_Encode(UTF32 *String) {
-        if (BitIOGlobalByteOrder == BitIOUnknownByteFirst || BitIOGlobalBitOrder == BitIOUnknownBitFirst) {
-            BitIOGetRuntimeByteBitOrder();
-        }
-        uint8_t  CodePointSize         = 0;
-        uint64_t CodeUnitNum           = 0ULL;
-        UTF16   *EncodedString         = NULL;
+         UTF16   *EncodedString         = NULL;
         if (String != NULL) {
-            uint64_t UTF16NumCodeUnits = UTF32_GetSizeInCodeUnits4UTF16(String) + UTF1632BOMSize + UnicodeNULLTerminatorSize;
-            EncodedString              = calloc(UTF16NumCodeUnits, sizeof(UTF16));
+            if (BitIOGlobalByteOrder == BitIOUnknownByteFirst || BitIOGlobalBitOrder == BitIOUnknownBitFirst) {
+                BitIOGetRuntimeByteBitOrder();
+            }
+            uint8_t  CodePointSize         = 0;
+            uint64_t CodeUnitNum           = 0ULL;
+            uint64_t UTF16NumCodeUnits     = UTF32_GetSizeInCodeUnits4UTF16(String) + UTF1632BOMSize + UnicodeNULLTerminatorSize;
+            EncodedString                  = calloc(UTF16NumCodeUnits, sizeof(UTF16));
             if (EncodedString != NULL) {
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < UTF16NumCodeUnits; CodeUnit++) {
                     // High = ((String[CodePoint] - 0x10000) / 0x400) + 0xD800
                     // Low  = (String[CodePoint]  - 0x10000) % 0x400) + 0xDC00
                     // High = 0x1F984 - 0x10000 = 0xF984 / 0x400 = 0x3E  + 0xD800 = 0xD83E
                     // Low  = 0x1F984 - 0x10000 = 0xF984 % 0x400 = 0x184 + 0xDC00 = 0xDD84
+                    if ((String[0] == 0xFFFE && BitIOGlobalByteOrder == BitIOMSByteFirst) || (String[0] == 0xFEFF && BitIOGlobalByteOrder == BitIOLSByteFirst)) { // The string byte order does not match the main machines, we need to swap
+                        // Swap the endian as we encode
+                        String[CodeUnit] = SwapEndian32(String[CodeUnit]);
+                    }
                     if (CodeUnit == 0) {
                         // set the Unicode BOM
                         if (BitIOGlobalByteOrder == BitIOLSByteFirst) {
@@ -517,10 +536,10 @@ extern  "C" {
                 Value += (String[CodePoint] - 48);
             }
         } while (String[CodePoint] != 0);
-        return Sign < 0 ? Value * Sign : Value;
+        return (Sign < 0 ? Value * Sign : Value);
     }
     
-    bool                UTF8_Compare(UTF8 *String1, UTF8 *String2, bool Normalize, bool CaseFold) {
+    bool                UTF8_Compare(UTF8 *String1, UTF8 *String2, bool Normalize, bool CaseInsensitive) {
         bool StringsMatch = No;
         if (String1 != NULL && String2 != NULL) {
             UTF32 *String1UTF32 = UTF8_Decode(String1);
@@ -529,7 +548,7 @@ extern  "C" {
                 UTF32_Normalize(String1UTF32);
                 UTF32_Normalize(String2UTF32);
             }
-            if (CaseFold == Yes) {
+            if (CaseInsensitive == Yes) {
                 UTF32_CaseFold(String1UTF32);
                 UTF32_CaseFold(String2UTF32);
             }
@@ -544,7 +563,7 @@ extern  "C" {
         return StringsMatch;
     }
     
-    bool               UTF16_Compare(UTF16 *String1, UTF16 *String2, bool Normalize, bool CaseFold) {
+    bool               UTF16_Compare(UTF16 *String1, UTF16 *String2, bool Normalize, bool CaseInsensitive) {
         bool StringsMatch = No;
         if (String1 != NULL && String2 != NULL) {
             UTF32 *String1UTF32 = UTF16_Decode(String1);
@@ -553,7 +572,7 @@ extern  "C" {
                 UTF32_Normalize(String1UTF32);
                 UTF32_Normalize(String2UTF32);
             }
-            if (CaseFold == Yes) {
+            if (CaseInsensitive == Yes) {
                 UTF32_CaseFold(String1UTF32);
                 UTF32_CaseFold(String2UTF32);
             }
@@ -567,30 +586,28 @@ extern  "C" {
     }
     
     UTF32 *UTF32_ReplaceSubsection(UTF32 *String, uint64_t Offset, uint64_t Length, UTF32 *Replacement) {
-        UTF32   *NewString = NULL;
-        uint64_t CodePoint = 0ULL;
+        UTF32   *NewString                 = NULL;
         if (String != NULL && Replacement != NULL && Length >= 1) {
             uint64_t StringSize            = UTF32_GetSizeInCodePoints(String);
             uint64_t ReplacementStringSize = UTF32_GetSizeInCodePoints(Replacement);
-            if (ReplacementStringSize > Length) {
-                NewString = calloc(Length - ReplacementStringSize, sizeof(UTF32));
-            } else if (ReplacementStringSize < Length) {
-                NewString = calloc(ReplacementStringSize - Length, sizeof(UTF32));
-            } else if (ReplacementStringSize == Length) {
-                NewString = calloc(ReplacementStringSize, sizeof(UTF32));
+            uint64_t NewStringSize         = 0ULL;
+            if (ReplacementStringSize < Length) {
+                NewStringSize              = StringSize - (ReplacementStringSize - Length);
+            } else if (ReplacementStringSize >= Length) {
+                NewStringSize              = StringSize + (ReplacementStringSize - Length);
             }
-            do {
-                NewString[CodePoint] = String[CodePoint];
-                CodePoint           += 1;
-            } while (CodePoint != Offset);
-            do {
-                NewString[CodePoint] = Replacement[CodePoint];
-                CodePoint           += 1;
-            } while (CodePoint < Offset + Length);
-            do {
-                NewString[CodePoint] = String[CodePoint];
-                CodePoint           += 1;
-            } while (String[CodePoint] != 0); // We have to subtract something from something else here what is it?
+            NewString                      = calloc(NewStringSize, sizeof(UTF32));
+            for (uint64_t CodePoint = 0ULL; CodePoint < NewStringSize; CodePoint++) {
+                if (CodePoint < Offset) {
+                    NewString[CodePoint]   = String[CodePoint];
+                }
+                for (uint64_t ReplacementCodePoint = 0ULL; ReplacementCodePoint < ReplacementStringSize; ReplacementCodePoint++) {
+                    NewString[CodePoint]   = Replacement[ReplacementCodePoint];
+                }
+                if (CodePoint > ReplacementStringSize) {
+                    NewString[CodePoint]   = String[CodePoint];
+                }
+            }
         } else if (String == NULL) {
             BitIOLog(BitIOLog_ERROR, __func__, "String Pointer is NULL");
         } else if (Replacement == NULL) {

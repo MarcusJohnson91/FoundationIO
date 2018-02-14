@@ -1,19 +1,21 @@
-#include <stdarg.h>     /* Included for the variadic argument support macros */
-#include <stdbool.h>    /* Included for bool */
-#include <stdio.h>      /* Included for fprintf, STD IN/OUT/ERR, sprintf */
-#include <stdlib.h>     /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
-#include <string.h>     /* Included for memset */
+#include <stdarg.h>                   /* Included for the variadic argument support macros */
+#include <stdbool.h>                  /* Included for bool true/false, Yes/No are in BitIOMacros */
+#include <stdint.h>                   /* Included for u/intX_t */
+#include <stdio.h>                    /* Included for fprintf, STD IN/OUT/ERR, sprintf */
+#include <stdlib.h>                   /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
+#include <string.h>                   /* Included for memset */
 
+#include "../include/BitIOMacros.h"
 #include "../include/StringIO.h"
 #include "../include/BitIOLog.h"
 #include "../include/CommandLineIO.h"
-#include "../include/BitIOMacros.h"
+
 
 #if    (BitIOTargetOS == BitIOPOSIXOS)
-#include <sys/ioctl.h>  /* Included for the terminal size */
-#include <sys/ttycom.h> /* Included for winsize, TIOCGWINSZ */
+#include <sys/ioctl.h>                /* Included for the terminal size */
+#include <sys/ttycom.h>               /* Included for winsize, TIOCGWINSZ */
 #elif  (BitIOTargetOS == BitIOWindowsOS)
-#include <wincon.h>     /* Included for getting the terminal size */
+#include <wincon.h>                   /* Included for getting the terminal size */
 #endif
 
 #ifdef   __cplusplus

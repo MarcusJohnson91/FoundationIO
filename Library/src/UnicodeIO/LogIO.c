@@ -1,11 +1,12 @@
-#include <stdarg.h>                  /* Included for va_end, va_list, va_start */
-#include <stdint.h>                  /* Included for uint64_t */
-#include <stdio.h>                   /* Included for FILE */
-#include <stdlib.h>                  /* Included for calloc, free */
+#include <stdarg.h>                   /* Included for va_end, va_list, va_start */
+#include <stdbool.h>                  /* Included for bool true/false, Yes/No are in BitIOMacros */
+#include <stdint.h>                   /* Included for u/intX_t */
+#include <stdio.h>                    /* Included for FILE */
+#include <stdlib.h>                   /* Included for calloc, free */
 
-#include "../include/StringIO.h"     /* Included for UTF8 */
-#include "../include/BitIOLog.h"     /* Included for BitIOLogTypes */
-#include "../include/BitIOMacros.h"  /* Included for BitIONewLineWithNULLSize, BitIOTargetOS */
+#include "../include/StringIO.h"      /* Included for UTF8 */
+#include "../include/BitIOLog.h"      /* Included for BitIOLogTypes */
+#include "../include/BitIOMacros.h"   /* Included for BitIONewLineWithNULLSize, BitIOTargetOS */
 
 #define WindowsUTF8CodePage 65001
 
@@ -56,9 +57,9 @@ extern "C" {
 #endif
         }
         if (BitIOLog_ProgramName != NULL) {
-            fprintf(BitIOLog_LogFile == NULL ? stderr : BitIOLog_LogFile, "%s: %s in %s: \"%s\"%s", BitIOLog_ProgramName, Severity == BitIOLog_ERROR ? Error : Debug, FunctionName, VariadicString, BitIONewLine);
+            fprintf((BitIOLog_LogFile == NULL ? stderr : BitIOLog_LogFile), "%s: %s in %s: \"%s\"%s", BitIOLog_ProgramName, (Severity == BitIOLog_ERROR ? Error : Debug), FunctionName, VariadicString, BitIONewLine);
         } else {
-            fprintf(BitIOLog_LogFile == NULL ? stderr : BitIOLog_LogFile, "%s in %s: \"%s\"%s", Severity == BitIOLog_ERROR ? Error : Debug, FunctionName, VariadicString, BitIONewLine);
+            fprintf((BitIOLog_LogFile == NULL ? stderr : BitIOLog_LogFile), "%s in %s: \"%s\"%s", (Severity == BitIOLog_ERROR ? Error : Debug), FunctionName, VariadicString, BitIONewLine);
         }
         free(VariadicString);
     }
