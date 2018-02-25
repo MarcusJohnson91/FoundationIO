@@ -4,6 +4,15 @@
 #include "../include/Macros.h"        /* Included for NewLineWithNULLSize, FoundationIOTargetOS */
 #include "../include/StringIO.h"      /* Included for UTF8 */
 
+#if   (FoundationIOTargetOS == POSIXOS)
+#include <sys/types.h>
+#include <sys/socket.h>               /* Included for connect, socket, sockaddr */
+#include <unistd.h>                   /* Included for read and shit */
+#elif (FoundationIOTargetOS == WindowsOS)
+#include <io.h>                       /* Actual Socket functions like _read, _write */
+#include <winsock.h>                  /* Included for the socket support on Windows */
+#endif
+
 #pragma  once
 
 #ifndef  FoundationIO_BitIO_H
@@ -28,8 +37,8 @@ extern   "C" {
      @constant                  BitIONULLStringSize             "How large is the NULL terminator for a string"?
      */
     enum BitIOConstants {
-        BitIONULLString                 =  0,
-        BitIONULLStringSize             =  1,
+                                BitIONULLString                 =  0,
+                                BitIONULLStringSize             =  1,
     };
     
     /*!
@@ -40,9 +49,9 @@ extern   "C" {
      @constant                  BitIOSocket                     "This instance of BitInput/BitOutput is connected to a Socket".
      */
     typedef enum BitInputOutputFileTypes {
-        BitIOUnknownFileType            = 0,
-        BitIOFile                       = 1,
-        BitIOSocket                     = 2,
+                                BitIOUnknownFileType            = 0,
+                                BitIOFile                       = 1,
+                                BitIOSocket                     = 2,
     } BitInputOutputFileTypes;
     
     /*!
@@ -52,10 +61,10 @@ extern   "C" {
      @constant                  WholeUnary                      "Supports all the whole integers including zero and negatives (up to 2^63 -1 anyway)".
      */
     typedef enum UnaryTypes {
-        UnknownUnary                    = 0,
-        CountUnary                      = 1,
-        TruncatedCountUnary             = 2,
-        WholeUnary                      = 3,
+                                UnknownUnary                    = 0,
+                                CountUnary                      = 1,
+                                TruncatedCountUnary             = 2,
+                                WholeUnary                      = 3,
     } UnaryTypes;
     
     /* BitBuffer */
@@ -224,7 +233,7 @@ extern   "C" {
      @param                     BitI                            "BitInput Pointer".
      @param                     Path2Open                       "Path to the input file to open".
      */
-    void                        BitInput_OpenFile(BitInput *BitI, const UTF8 *Path2Open);
+    void                        BitInput_OpenFile(BitInput *BitI, UTF8 *Path2Open);
     
     /*!
      @abstract                                                  "Opens a socket for reading".
