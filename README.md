@@ -1,6 +1,6 @@
-**BitIO:**
+**FoundationIO:**
 ========
-* BitIO (Pronounced Bit Eye Oh) is a library for Reading, and Writing bits (and all the tasks associated with doing so, like swapping byte and bit order, etc).
+* FoundationIO is a library for reading, and writing bits
 * BitIO is designed for and tested on 64 bit CPUs (AMD64 and ARM64 to be specific), 32 bit operating systems and CPUs are not tested, and never will be.
 * I've tried keeping BitIO modern, minimalist, and easy to use. we require a C99 compiler.
 * BitIO is compatible with C++ through the C API.

@@ -1,14 +1,13 @@
-#include <stdbool.h>                  /* Included for bool true/false, Yes/No are in BitIOMacros */
 #include <stdint.h>                   /* Included for u/intX_t */
 #include <stdio.h>                    /* Included for fpos_t */
 
-#include "../include/StringIO.h"
-#include "../include/BitIOMacros.h"
+#include "../include/Macros.h"        /* Included for NewLineWithNULLSize, FoundationIOTargetOS */
+#include "../include/StringIO.h"      /* Included for UTF8 */
 
 #pragma  once
 
-#ifndef  LIBBITIO_BitIO_H
-#define  LIBBITIO_BitIO_H
+#ifndef  FoundationIO_BitIO_H
+#define  FoundationIO_BitIO_H
 
 #ifdef   __cplusplus
 extern   "C" {
@@ -27,14 +26,10 @@ extern   "C" {
      @abstract                                                  "BitIO compile time constants".
      @constant                  BitIONullString                 "String terminating NULL character".
      @constant                  BitIONULLStringSize             "How large is the NULL terminator for a string"?
-     @constant                  BitIOGUUIDStringSize            "Size of a UUIDString or GUIDString including dashes, and null terminator".
-     @constant                  BitIOBinaryGUUIDSize            "Size of a BinaryUUID or BinaryGUID".
      */
     enum BitIOConstants {
-                                BitIONULLString                 =  0,
-                                BitIONULLStringSize             =  1,
-                                BitIOGUUIDStringSize            = 20 + BitIONULLStringSize,
-                                BitIOBinaryGUUIDSize            = 16,
+        BitIONULLString                 =  0,
+        BitIONULLStringSize             =  1,
     };
     
     /*!
@@ -45,26 +40,10 @@ extern   "C" {
      @constant                  BitIOSocket                     "This instance of BitInput/BitOutput is connected to a Socket".
      */
     typedef enum BitInputOutputFileTypes {
-                                BitIOUnknownFileType            = 0,
-                                BitIOFile                       = 1,
-                                BitIOSocket                     = 2,
+        BitIOUnknownFileType            = 0,
+        BitIOFile                       = 1,
+        BitIOSocket                     = 2,
     } BitInputOutputFileTypes;
-    
-    /*!
-     @enum                      GUUIDTypes
-     @constant                  UnknownGUUID                    "The GUUID type is unknown, invalid".
-     @constant                  GUIDString                      "The GUUID is a GUID string, aka little endian/Least Significant Byte first UUID with hyphens".
-     @constant                  UUIDString                      "The GUUID is a UUID string, aka big endian   /Most  Significant Byte first UUID with hyphens".
-     @constant                  BinaryGUID                      "The GUUID is a Binary GUID, aka little endian/Least Significant Byte first UUID without hyphens".
-     @constant                  BinaryUUID                      "The GUUID is a Binary UUID, aka big endian   /Most  Significant Byte First UUID without hypthns".
-     */
-    typedef enum GUUIDTypes {
-                                UnknownGUUID                    = 0,
-                                GUIDString                      = 1,
-                                UUIDString                      = 2,
-                                BinaryGUID                      = 3,
-                                BinaryUUID                      = 4,
-    } GUUIDTypes;
     
     /*!
      @enum                      UnaryTypes
@@ -73,42 +52,11 @@ extern   "C" {
      @constant                  WholeUnary                      "Supports all the whole integers including zero and negatives (up to 2^63 -1 anyway)".
      */
     typedef enum UnaryTypes {
-                                UnknownUnary                    = 0,
-                                CountUnary                      = 1,
-                                TruncatedCountUnary             = 2,
-                                WholeUnary                      = 3,
+        UnknownUnary                    = 0,
+        CountUnary                      = 1,
+        TruncatedCountUnary             = 2,
+        WholeUnary                      = 3,
     } UnaryTypes;
-    
-    /*!
-     @abstract                                                  "Compares GUUIDs for equilivence, GUUID1 and 2 HAVE to be the same type".
-     @param                     GUUID1                          "Pointer to a GUUID to be compared".
-     @param                     GUUID2                          "Pointer to a GUUID to be compared".
-     @return                                                    "Returns Yes if GUUID1 and GUUID2 match, No otherwise".
-     */
-    bool                        CompareGUUIDs(GUUIDTypes GUUIDType, const uint8_t *GUUID1, const uint8_t *GUUID2);
-    
-    /*!
-     @abstract                                                  "Converts a GUUID from one representation to another (String->Binary<-String/UUIG->GUID<-UUID)".
-     @param                     InputGUUIDType                  "What type of GUUID are we converting from"?
-     @param                     OutputGUUIDType                 "What type of GUUID are we converting to"?
-     @return                                                    "Returns the converted GUUID".
-     */
-    uint8_t                    *ConvertGUUID(GUUIDTypes InputGUUIDType, GUUIDTypes OutputGUUIDType, const uint8_t *GUUID2Convert);
-    
-    /*!
-     @abstract                                                  "Swaps the byte order of a BinaryGUUID or GUUIDString".
-     @param                     GUUIDType                       "Is this a GUUIDString or BinaryGUUID"?
-     @param                     GUUID2Swap                      "GUUID Pointer to swap".
-     @return                                                    "Returns a pointer to a swapped GUUID".
-     */
-    uint8_t                    *SwapGUUID(GUUIDTypes GUUIDType, uint8_t *GUUID2Swap);
-    
-    /*!
-     @abstract                                                 "Frees a BinaryGUUID aka BinaryGUID/BinaryUUID or GUUIDString, aka GUIDString/UUIDString".
-     */
-    void                        GUUID_Deinit(uint8_t *GUUID);
-    /* GUUID */
-    
     
     /* BitBuffer */
     /*!
@@ -173,7 +121,7 @@ extern   "C" {
      @param                     BitB                            "BitBuffer Pointer".
      @param                     Bits2Peek                       "The number of bits to peek from the BitBuffer".
      */
-    uint64_t                    PeekBits(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Peek);
+    uint64_t                    PeekBits(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Peek);
     
     /*!
      @abstract                                                  "Reads bits from BitBuffer".
@@ -182,15 +130,7 @@ extern   "C" {
      @param                     BitB                            "BitBuffer Pointer".
      @param                     Bits2Read                       "The number of bits to read from the BitBuffer".
      */
-    uint64_t                    ReadBits(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Read);
-    
-    /*!
-     @abstract                                                  "Reads a BinaryGUUID/GUUIDString from the BitBuffer".
-     @param                     GUUIDType                       "The type of GUUID to read".
-     @param                     BitB                            "Pointer to an instance of BitBuffer".
-     @return                                                    "Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BitIOBinaryGUUIDSize or BitIOGUUIDStringSize bytes".
-     */
-    uint8_t                    *ReadGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB);
+    uint64_t                    ReadBits(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Read);
     
     /*!
      @abstract                                                  "Reads unary encoded fields from the BitBuffer".
@@ -200,7 +140,7 @@ extern   "C" {
      @param                     UnaryType                       "What type of Unary coding are we reading"?
      @param                     StopBit                         "Is the stop bit a one or a zero"?
      */
-    uint64_t                    ReadUnary(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
+    uint64_t                    ReadUnary(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
     
     /*!
      @abstract                                                  "Writes Exp-Golomb encoded fields from the BitBuffer".
@@ -210,7 +150,7 @@ extern   "C" {
      @param                     UnaryType                       "What type of Unary coding are we reading"?
      @param                     StopBit                         "What bit is the stop bit"?
      */
-    uint64_t                    ReadExpGolomb(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit);
+    uint64_t                    ReadExpGolomb(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit);
     
     /*!
      @abstract                                                  "Writes bits to the BitBuffer".
@@ -220,7 +160,7 @@ extern   "C" {
      @param                     NumBits2Write                   "How many bits from Bits2Write should we write?".
      @param                     Bits2Write                      "Contains the data to write into the BitBuffer".
      */
-    void                        WriteBits(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    void                        WriteBits(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
     
     /*!
      @abstract                                                  "Writes unary encoded bits to the BitBuffer".
@@ -231,7 +171,7 @@ extern   "C" {
      @param                     StopBit                         "Is the stop bit a one or a zero"?
      @param                     UnaryBits2Write                 "Value to be written as Unary encoded".
      */
-    void                        WriteUnary(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const uint8_t UnaryBits2Write);
+    void                        WriteUnary(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const uint8_t UnaryBits2Write);
     
     /*!
      @abstract                                                  "Writes Exp-Golomb encoded fields to the BitBuffer".
@@ -242,14 +182,7 @@ extern   "C" {
      @param                     StopBit                         "What bit is the stop bit"?
      @param                     Field2Write                     "Value to be encoded as Exp-Golomb and written".
      */
-    void                        WriteExpGolomb(BitIOBitByteOrders ByteOrder, BitIOBitByteOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const int64_t Field2Write);
-    
-    /*!
-     @abstract                                                  "Writes a GUUID to the BitBuffer".
-     @param                     BitB                            "Pointer to an instance of BitBuffer".
-     @param                     GUUID2Write                     "Pointer to the GUUID you want to write".
-     */
-    void                        WriteGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB, const uint8_t *GUUID2Write);
+    void                        WriteExpGolomb(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const int64_t Field2Write);
     
     /*!
      @abstract                                                  "Deallocates the instance of BitBuffer pointed to by BitB".
@@ -401,4 +334,4 @@ extern   "C" {
 }
 #endif
 
-#endif   /* LIBBITIO_BitIO_H */
+#endif   /* FoundationIO_BitIO_H */

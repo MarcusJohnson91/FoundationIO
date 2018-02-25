@@ -1,14 +1,15 @@
-#include <stdbool.h>                  /* Included for bool true/false, Yes/No are in BitIOMacros */
 #include <stdint.h>                   /* Included for u/intX_t */
 
 #pragma once
 
-#ifndef LIBBITIO_StringIO_H
-#define LIBBITIO_StringIO_H
+#ifndef FoundationIO_StringIO_H
+#define FoundationIO_StringIO_H
 
 #ifdef  __cplusplus
 extern  "C" {
 #endif
+    
+#define WindowsUTF8CodePage 65001
     
     /*!
      @header    StringIO.h
@@ -39,6 +40,31 @@ extern  "C" {
         NumericDecimalCodePoint            = 5,
         CombiningCodePoint                 = 6,
     } UnicodeCodePointTypes;
+    
+    typedef enum Number2StringBases {
+        Binary                             = 2,
+        Octal                              = 8,
+        Decimal                            = 10,
+        Hex                                = 16,
+    } Number2StringBases;
+    
+    typedef enum FormatStringTypes {
+        SignedInteger8                     = 1,
+        SignedInteger16                    = 2,
+        SignedInteger32                    = 3,
+        SignedInteger64                    = 4,
+        UnsignedInteger8                   = 5,
+        UnsignedInteger16                  = 6,
+        UnsignedInteger32                  = 7,
+        UnsignedInteger64                  = 8,
+        Float16                            = 9,
+        Float32                            = 10,
+        Float64                            = 11,
+        Float128                           = 12,
+        String8                            = 13,
+        String16                           = 14,
+        String32                           = 15,
+    } FormatStringTypes;
     
     /*!
      @abstract                             "Gets the number of Unicode codeunits in the UTF8".
@@ -143,9 +169,12 @@ extern  "C" {
     
     bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2, bool Normalize, bool CaseInsensitive);
     
+    UTF32                *UTF32_FormatString(const uint64_t VarArgCount, const UTF32 *Format, va_list *VariadicArguments);
+    
+#define FormatString(Format, ...)_Generic((Format),UTF32:UTF32_FormatString)(CountVariadicArguments(__VA_ARGS__), Format, __VA_ARGS__)
     
 #ifdef  __cplusplus
 }
 #endif
 
-#endif  /* LIBBITIO_StringIO_H */
+#endif  /* FoundationIO_StringIO_H */

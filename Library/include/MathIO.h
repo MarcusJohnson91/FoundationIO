@@ -1,28 +1,29 @@
-#include <stdbool.h>                  /* Included for bool true/false, Yes/No are in BitIOMacros */
 #include <stdint.h>                   /* Included for u/intX_t */
 
 #if (defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L)
 #include <tgmath.h>
 #else
-#include <math>
+#include <math.h>
 #include <complex.h>
 #endif
 
+#include "../include/Macros.h"
+
 #pragma  once
 
-#ifndef  LIBBITIO_BitIOMath_H
-#define  LIBBITIO_BitIOMath_H
+#ifndef  FoundationIO_Math_H
+#define  FoundationIO_Math_H
 
 #ifdef   __cplusplus
 extern   "C" {
 #endif
     
     /*!
-     @header    BitIOMath.h
+     @header    Math.h
      @author    Marcus Johnson aka BumbleBritches57
      @copyright 2017+
      @version   1.0.0
-     @brief     This header contains code for specific mathematical functions used in BitIO and it's consumers.
+     @brief     This header contains code for specific mathematical functions used in FoundationIO and it's consumers.
      */
     
     /*!
@@ -44,15 +45,16 @@ extern   "C" {
      @param                     Exponent                        "How many times should the Base be raised"?
      @return                                                    "Returns the result of 1 *= Base, Exponent times".
      */
-    uint64_t                    Power(const uint64_t Base, const uint64_t Exponent);
+    uint64_t                    Exponentiate(const uint64_t Base, const uint64_t Exponent);
     
     /*!
      @abstract                                                  "Computes the number of bits required to hold a certain symbol".
      @remark                                                    "Rounds up to the next integer number of bits to ensure all symbols can be contained in a single integer".
-     @param                     Symbol                          "The symbol you're looking to store".
+     @param                     Base                            "The base, or radix to divide the exponent by".
+     @param                     Exponent                        "The exponent".
      @return                                                    "Returns the number of bits required to store a symbol".
      */
-    int8_t                      IntegerLog2(int64_t Symbol);
+    int64_t                     Logarithm(int64_t Base, int64_t Exponent);
     
     /*!
      @abstract                                                  "Swap endian of 16 bit integers".
@@ -101,4 +103,4 @@ extern   "C" {
 }
 #endif
 
-#endif   /* LIBBITIO_BitIOMath_H */
+#endif   /* FoundationIO_Math_H */
