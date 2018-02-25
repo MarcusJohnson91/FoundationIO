@@ -8,7 +8,7 @@
 
 License:
 =======
-libBitIO is released under the terms of the 3 clause [`Revised BSD`](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29) license.
+FoundationIO is released under the terms of the 3 clause [`Revised BSD`](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29) license.
 
 Here's a tl;dr of my license:
 
@@ -24,9 +24,9 @@ Compiling:
 * call `cmake` with `-G "Unix Makefiles"`, the cmake file is in the Projects folder.
 * Then compile the makefiles with make like usual.
 
-How To Use libBitIO:
+How To Use FoundationIO:
 ===================
-In order to use libBitIO, you need to include CommandLineIO.h, or BitIO.h.
+In order to use FoundationIO, you need to include CommandLineIO.h, or BitIO.h.
 Tips:
 
 * You can have as many instances of `BitInput`, `BitOutput`, and `BitBuffer` as you want, for instance, reading/writing multiple files.
@@ -67,10 +67,10 @@ BitIO:
 * When you're all done, call `DeinitBitInput`, `DeinitBitOutput`, and `DeinitBitBuffer`.
 
 
-BitIOLog:
+Log:
 -------
-* Writes to a file you open with `BitIOLogOpenFile`, if it's unset or otherwise inaccessible, all logs are printed to stderr.
-* The interface requires UTF8 which you can coerce your strings to be with the `u8` string literal prefix.
+* Writes to a file you open with `Log_OpenFile`, if it's unset or otherwise inaccessible, all logs are printed to stderr.
+* The interface requires UTF8 which you can coerce your strings to be with the `u8` string literal prefix, or just calling the `U8` macro
 * Works on any platform that provides `stderr`, and `fprintf`.
 
 GUUIDs:
