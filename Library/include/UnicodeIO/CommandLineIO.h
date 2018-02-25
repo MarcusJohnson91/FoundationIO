@@ -1,12 +1,11 @@
-#include <stdbool.h>                  /* Included for bool true/false, Yes/No are in BitIOMacros */
 #include <stdint.h>                   /* Included for u/intX_t */
 
-#include "../include/StringIO.h"
+#include "../include/StringIO.h"      /* Included for UTF8 */
 
 #pragma  once
 
-#ifndef  LIBBITIO_CommandLineIO_H
-#define  LIBBITIO_CommandLineIO_H
+#ifndef  FoundationIO_CommandLineIO_H
+#define  FoundationIO_CommandLineIO_H
 
 #ifdef   __cplusplus
 extern   "C" {
@@ -30,11 +29,11 @@ extern   "C" {
      @constant                  ExistentialSwitch               "The switch can not have any slaves, or any arguments, it just exists or doesn't exist".
      */
     typedef enum CLISwitchTypes {
-                                UnknownSwitchType               = 0,
-                                SwitchMayHaveSlaves             = 1,
-                                SwitchCantHaveSlaves            = 2,
-                                SwitchIsASlave                  = 4,
-                                ExistentialSwitch               = 8,
+        UnknownSwitchType               = 0,
+        SwitchMayHaveSlaves             = 1,
+        SwitchCantHaveSlaves            = 2,
+        SwitchIsASlave                  = 4,
+        ExistentialSwitch               = 8,
     } CLISwitchTypes;
     
     /*!
@@ -47,11 +46,11 @@ extern   "C" {
      @constant                  SwitchNoArgNoSlaves             "The Option can not have any slaves, or any arguments, it just exists or doesn't exist".
      */
     typedef enum CLIOptionTypes {
-                                UnknownOptionType               = 0,
-                                OptionHasArgMayHaveSlaves       = 1,
-                                OptionHasArgNoSlaves            = 2,
-                                OptionNoArgMayHaveSlaves        = 4,
-                                OptionNoArgNoSlaves             = 8,
+        UnknownOptionType               = 0,
+        OptionHasArgMayHaveSlaves       = 1,
+        OptionHasArgNoSlaves            = 2,
+        OptionNoArgMayHaveSlaves        = 4,
+        OptionNoArgNoSlaves             = 8,
     } CLIOptionTypes;
     
     /*!
@@ -64,26 +63,26 @@ extern   "C" {
      @constant                  ArgumentIsARatio                "The Argument can not have any slaves, or any arguments, it just exists or doesn't exist".
      */
     typedef enum CLIArgumentTypes {
-                                UnknownArgumentType             = 0,
-                                ArgumentIsAPath                 = 1,
-                                ArgumentIsAString               = 2,
-                                ArgumentIsARange                = 4,
-                                ArgumentIsARatio                = 8,
-                                ArgumentNotAllowed              = 16,
+        UnknownArgumentType             = 0,
+        ArgumentIsAPath                 = 1,
+        ArgumentIsAString               = 2,
+        ArgumentIsARange                = 4,
+        ArgumentIsARatio                = 8,
+        ArgumentNotAllowed              = 16,
     } CLIArgumentTypes;
     
     typedef enum CLILicenseTypes {
-                                UnknownLicenseType              = 0,
-                                PermissiveLicense               = 1,
-                                ProprietaryLicense              = 2,
-                                CopyleftLicense                 = 3,
+        UnknownLicenseType              = 0,
+        PermissiveLicense               = 1,
+        ProprietaryLicense              = 2,
+        CopyleftLicense                 = 3,
     } CLILicenseTypes;
     
     typedef enum DelimiterTypes {
-                                UnknownDelimiter                = 0,
-                                RangeDelimiter                  = 1,
-                                EqualDelimiter                  = 2,
-                                ColonDelimiter                  = 3,
+        UnknownDelimiter                = 0,
+        RangeDelimiter                  = 1,
+        EqualDelimiter                  = 2,
+        ColonDelimiter                  = 3,
     } DelimiterTypes;
     
     /*!
@@ -264,4 +263,4 @@ extern   "C" {
 }
 #endif
 
-#endif   /* LIBBITIO_CommandLineIO_H */
+#endif   /* FoundationIO_CommandLineIO_H */
