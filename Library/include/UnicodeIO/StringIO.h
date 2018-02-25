@@ -9,8 +9,6 @@
 extern  "C" {
 #endif
     
-#define WindowsUTF8CodePage 65001
-    
     /*!
      @header    StringIO.h
      @author    Marcus Johnson aka BumbleBritches57
@@ -24,50 +22,62 @@ extern  "C" {
     typedef unsigned int    UTF32;
     
     typedef enum UnicodeTypes {
-        UnicodeUnknownSizeByteOrder        = 0,
-        UTF16LE                            = 65534,
-        UTF16BE                            = 65279,
-        UTF32LE                            = 65534,
-        UTF32BE                            = 65279,
+                                UnicodeUnknownSizeByteOrder        = 0x0000,
+                                UTF16LE                            = 0xFFFE,
+                                UTF16BE                            = 0xFEFF,
+                                UTF32LE                            = 0xFFFE,
+                                UTF32BE                            = 0xFEFF,
+                                UTF16HighSurrogateStart            = 0xD800,
+                                UTF16HighSurrogateEnd              = 0xDBFF,
+                                UTF16LowSurrogateStart             = 0xDC00,
+                                UTF16LowSurrogateEnd               = 0xDFFF,
     } UnicodeTypes;
     
     typedef enum UnicodeCodePointTypes {
-        UnknownCodePointType               = 0,
-        CaselessCodePoint                  = 1,
-        UpperCaseCodePoint                 = 2,
-        LowerCaseCodePoint                 = 3,
-        NumericIntegerCodePoint            = 4,
-        NumericDecimalCodePoint            = 5,
-        CombiningCodePoint                 = 6,
+                                UnknownCodePointType               = 0,
+                                CaselessCodePoint                  = 1,
+                                UpperCaseCodePoint                 = 2,
+                                LowerCaseCodePoint                 = 3,
+                                NumericIntegerCodePoint            = 4,
+                                NumericDecimalCodePoint            = 5,
+                                CombiningCodePoint                 = 6,
     } UnicodeCodePointTypes;
     
     typedef enum Number2StringBases {
-        Binary                             = 2,
-        Octal                              = 8,
-        Decimal                            = 10,
-        Hex                                = 16,
+                                Binary                             = 2,
+                                Octal                              = 8,
+                                Decimal                            = 10,
+                                Hex                                = 16,
     } Number2StringBases;
     
     typedef enum FormatStringTypes {
-        SignedInteger8                     = 1,
-        SignedInteger16                    = 2,
-        SignedInteger32                    = 3,
-        SignedInteger64                    = 4,
-        UnsignedInteger8                   = 5,
-        UnsignedInteger16                  = 6,
-        UnsignedInteger32                  = 7,
-        UnsignedInteger64                  = 8,
-        Float16                            = 9,
-        Float32                            = 10,
-        Float64                            = 11,
-        Float128                           = 12,
-        String8                            = 13,
-        String16                           = 14,
-        String32                           = 15,
+                                UnknownFormatStringType            = 0,
+                                SignedInteger8                     = 1,
+                                SignedInteger16                    = 2,
+                                SignedInteger32                    = 3,
+                                SignedInteger64                    = 4,
+                                UnsignedInteger8                   = 5,
+                                UnsignedInteger16                  = 6,
+                                UnsignedInteger32                  = 7,
+                                UnsignedInteger64                  = 8,
+                                Float16                            = 9,
+                                Float32                            = 10,
+                                Float64                            = 11,
+                                Float128                           = 12,
+                                String8                            = 13,
+                                String16                           = 14,
+                                String32                           = 15,
     } FormatStringTypes;
     
+    typedef enum UnicodeBOMState {
+                                UnknownBOMState                    = 0,
+                                UnconditionallyAddBOM              = 1,
+                                UnconditionallyRemoveBOM           = 2,
+                                KeepTheBOMStateTheSame             = 3,
+    } UTF8BOMState;
+    
     /*!
-     @abstract                             "Gets the number of Unicode codeunits in the UTF8".
+     @abstract                             "Gets the number of Unicode codeunits in the UTF8 string".
      @param               String2Count     "The string to get the number of codepoints in".
      */
     uint64_t              UTF8_GetSizeInCodeUnits(UTF8 *String2Count);
@@ -135,43 +145,43 @@ extern  "C" {
      @remark                               "The string is reallocated at the end to remove unused space".
      @param               String2Normalize "The sring to be normalized".
      */
-    void                  UTF32_Normalize(UTF32 *String2Normalize);
+    void                  NormalizeString(UTF32 *String2Normalize);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
      @param               String2CaseFold  "The string to be casefolded".
      */
-    void                  UTF32_CaseFold(UTF32 *String2CaseFold);
-    
-    /*!
-     @abstract                             "Compares String1 and String2 for equilivence".
-     */
-    bool                  UTF32Strings_Compare(UTF32 *String1, UTF32 *String2);
+    void                  CaseFoldString(UTF32 *String2CaseFold);
     
     /*!
      @abstract                             "Extracts a substring from String starting at position Start and ending at position End".
      */
-    UTF32                *UTF32_Extract(UTF32 *String, uint64_t Start, uint64_t End);
+    UTF32                *ExtractSubstring(UTF32 *String, uint64_t Start, uint64_t End);
     
     /*!
      @abstract                             "Returns the position of the first codepoint in the substring".
      */
-    uint64_t              UTF32_FindSubstring(UTF32 *String, UTF32 *SubString);
+    uint64_t              FindSubstring(UTF32 *String, UTF32 *SubString);
     
     /*!
      @abstract                             "Extracts a number from a string".
      @param               String           "The sring to extract a number from".
      */
-    int64_t               UTF32_ToNumber(UTF32 *String);
+    int64_t               String2Integer(UTF32 *String);
     
     /* High level fucntions */
     bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2, bool Normalize, bool CaseInsensitive);
     
     bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2, bool Normalize, bool CaseInsensitive);
     
-    UTF32                *UTF32_FormatString(const uint64_t VarArgCount, const UTF32 *Format, va_list *VariadicArguments);
+    /*!
+     @abstract                             "Compares String1 and String2 for equilivence".
+     */
+    bool                  CompareStrings(UTF32 *String1, UTF32 *String2);
     
-#define FormatString(Format, ...)_Generic((Format),UTF32:UTF32_FormatString)(CountVariadicArguments(__VA_ARGS__), Format, __VA_ARGS__)
+    UTF32                *FormatString32(const uint64_t VarArgCount, UTF32 *Format, ...);
+    
+#define                   FormatString(Format, ...) FormatString32(CountVariadicArguments(__VA_ARGS__), Format, __VA_ARGS__)
     
 #ifdef  __cplusplus
 }

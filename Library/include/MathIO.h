@@ -1,13 +1,13 @@
-#include <stdint.h>                   /* Included for u/intX_t */
+#include <stdbool.h>
 
 #if (defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L)
 #include <tgmath.h>
-#else
+#elif (!defined __STDC_NO_COMPLEX__)
 #include <math.h>
 #include <complex.h>
+#else
+#include <math.h>
 #endif
-
-#include "../include/Macros.h"
 
 #pragma  once
 

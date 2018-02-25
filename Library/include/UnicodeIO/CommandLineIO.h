@@ -29,11 +29,11 @@ extern   "C" {
      @constant                  ExistentialSwitch               "The switch can not have any slaves, or any arguments, it just exists or doesn't exist".
      */
     typedef enum CLISwitchTypes {
-        UnknownSwitchType               = 0,
-        SwitchMayHaveSlaves             = 1,
-        SwitchCantHaveSlaves            = 2,
-        SwitchIsASlave                  = 4,
-        ExistentialSwitch               = 8,
+                                UnknownSwitchType               = 0,
+                                SwitchMayHaveSlaves             = 1,
+                                SwitchCantHaveSlaves            = 2,
+                                SwitchIsASlave                  = 4,
+                                ExistentialSwitch               = 8,
     } CLISwitchTypes;
     
     /*!
@@ -46,11 +46,11 @@ extern   "C" {
      @constant                  SwitchNoArgNoSlaves             "The Option can not have any slaves, or any arguments, it just exists or doesn't exist".
      */
     typedef enum CLIOptionTypes {
-        UnknownOptionType               = 0,
-        OptionHasArgMayHaveSlaves       = 1,
-        OptionHasArgNoSlaves            = 2,
-        OptionNoArgMayHaveSlaves        = 4,
-        OptionNoArgNoSlaves             = 8,
+                                UnknownOptionType               = 0,
+                                OptionHasArgMayHaveSlaves       = 1,
+                                OptionHasArgNoSlaves            = 2,
+                                OptionNoArgMayHaveSlaves        = 4,
+                                OptionNoArgNoSlaves             = 8,
     } CLIOptionTypes;
     
     /*!
@@ -63,26 +63,26 @@ extern   "C" {
      @constant                  ArgumentIsARatio                "The Argument can not have any slaves, or any arguments, it just exists or doesn't exist".
      */
     typedef enum CLIArgumentTypes {
-        UnknownArgumentType             = 0,
-        ArgumentIsAPath                 = 1,
-        ArgumentIsAString               = 2,
-        ArgumentIsARange                = 4,
-        ArgumentIsARatio                = 8,
-        ArgumentNotAllowed              = 16,
+                                UnknownArgumentType             = 0,
+                                ArgumentIsAPath                 = 1,
+                                ArgumentIsAString               = 2,
+                                ArgumentIsARange                = 4,
+                                ArgumentIsARatio                = 8,
+                                ArgumentNotAllowed              = 16,
     } CLIArgumentTypes;
     
     typedef enum CLILicenseTypes {
-        UnknownLicenseType              = 0,
-        PermissiveLicense               = 1,
-        ProprietaryLicense              = 2,
-        CopyleftLicense                 = 3,
+                                UnknownLicenseType              = 0,
+                                PermissiveLicense               = 1,
+                                ProprietaryLicense              = 2,
+                                CopyleftLicense                 = 3,
     } CLILicenseTypes;
     
     typedef enum DelimiterTypes {
-        UnknownDelimiter                = 0,
-        RangeDelimiter                  = 1,
-        EqualDelimiter                  = 2,
-        ColonDelimiter                  = 3,
+                                UnknownDelimiter                = 0,
+                                RangeDelimiter                  = 1,
+                                EqualDelimiter                  = 2,
+                                ColonDelimiter                  = 3,
     } DelimiterTypes;
     
     /*!
@@ -200,12 +200,12 @@ extern   "C" {
     
     /*!
      @abstract                                                  "Parses argv for switches matching the ones contained in CLI".
-     @remark                                                    "Argv[0] (the path for the original executable) is NEVER searched or used".
+     @remark                                                    "Args[0] (the path for the original executable) is NEVER searched or used, and is assumed to exist, if it's not set it to NULL".
      @param                     CLI                             "CommandLineIO Pointer".
-     @param                     argc                            "Main's argc, for the number of Options entered".
-     @param                     argv                            "Main's argv, for the actual Options the user has entered".
+     @param                     NumArgs                         "The number of Arguments entered".
+     @param                     Args                            "An array of UTF-8 encoded strings, for WMain call UTF16_Decode and UTF8_Encode on each string".
      */
-    void                        ParseCommandLineOptions(CommandLineIO *CLI, const int argc, const char *argv[]);
+    void                        ParseCommandLineOptions(CommandLineIO *CLI, const uint64_t NumArgs, const UTF8 **Args);
     
     /*!
      @abstract                                                  "Displays on the screen the progress of X actions that are taking place"

@@ -1,11 +1,11 @@
-#include <stdarg.h>                   /* Included for va_end, va_list, va_start */
-#include <stdint.h>                   /* Included for u/intX_t */
-#include <stdio.h>                    /* Included for FILE, NULL, fprintf, fclose, fopen, stderr */
-#include <stdlib.h>                   /* Included for calloc, free */
+#include <stdarg.h>                    /* Included for va_end, va_list, va_start */
+#include <stdint.h>                    /* Included for u/intX_t */
+#include <stdio.h>                     /* Included for FILE */
+#include <stdlib.h>                    /* Included for calloc, free */
 
-#include "../include/Macros.h"        /* Included for NewLineWithNULLSize, FoundationIOTargetOS */
-#include "../include/StringIO.h"      /* Included for UTF8 */
-#include "../include/Log.h"           /* Included for LogTypes */
+#include "../include/Macros.h"         /* Included for NewLineWithNULLSize, FoundationIOTargetOS */
+#include "../include/StringIO.h"       /* Included for UTF8 */
+#include "../include/Log.h"            /* Included for LogTypes */
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,21 +23,20 @@ extern "C" {
     void Log_OpenFile(UTF8 *restrict LogFilePath) {
         if (LogFilePath != NULL) {
 #if   (FoundationIOTargetOS == POSIXOS)
-            Log_LogFile                 = fopen(LogFilePath, "a+");
+            Log_LogFile   = fopen(LogFilePath, U8("a+"));
 #elif (FoundationIOTargetOS == WindowsOS)
-            uint64_t    LogFilePathSize = UTF8_GetSizeInCodePoints(LogFilePath);
-            UTF32 LogFilePath32         = UTF8_Decode(LogFilePath, LogFilePathSize);
-            UTF16 LogFilePath16         = UTF16_Encode(LogFilePath32, LogFilePathSize);
-            free(LogFilePath32);
-            LogFile                     = _wfopen(LogFilePath16, "a+");
-            free(LogFilePath16);
+            UTF32 *Path32 = UTF8_Decode(LogFilePath);
+            UTF16 *Path16 = UTF16_Encode(Path32);
+            free(Path32);
+            Log_LogFile   = _wfopen(Path16, U16("rb"));
+            free(Path16);
 #endif
         }
     }
     
     void Log(LogTypes Severity, const UTF8 FunctionName[], const UTF8 Description[], ...) {
-        UTF8 Error[] = u8"ERROR";
-        UTF8 Debug[] = u8"DEBUG";
+        UTF8 Error[] = U8("ERROR");
+        UTF8 Debug[] = U8("DEBUG");
         
         va_list VariadicArguments;
         va_start(VariadicArguments, Description);
@@ -46,13 +45,32 @@ extern "C" {
         vsnprintf(VariadicString, StringSize, Description, VariadicArguments);
         va_end(VariadicArguments);
         
-        if (Log_LogFile == NULL) {
-#if (FoundationIOTargetOS == WindowsOS)
-            if (GetConsoleOutputCP() != WindowsUTF8CodePage) {
-                SetConsoleOutputCP(WindowsUTF8CodePage);
-            }
+        /*
+         Ok, well take Description and the Variadic arguments and send it all to FormatString in StringIO
+         After the string has been formatted, go ahead and do the platform dependent stuff, on POSIX encode it as UTF-8 and output it.
+         on Windows encode it as UTF-16, and output it.
+         
+         First things first, how do we get the variadic arguments? then we need to get their type from Description.
+         
+         Well, what we should do is count the number of printf placeholders in the Description String.
+         
+         Where should that go? in the string formatter it's self?
+         
+         What is the process?
+         
+         Read the Description string for printf placeholders, and count them up, then return an array of the various placeholders type to send off to that one function?
+         */
+        
+#if (FoundationIOTargetOS == POSIXOS)
+        // Encode the formatted string as UTF-8 and send to Log_LogFile or STDERR.
+#elif (FoundationIOTargetOS == WindowsOS)
+        // Encode the formatted string as UTF-16 and send to Log_LogFile or STDERR.
 #endif
+        
+        if (Log_LogFile == NULL) {
+            // Log to STDERR
         }
+        
         if (Log_ProgramName != NULL) {
             fprintf((Log_LogFile == NULL ? stderr : Log_LogFile), "%s: %s in %s: \"%s\"%s", Log_ProgramName, (Severity == Log_ERROR ? Error : Debug), FunctionName, VariadicString, NewLine);
         } else {

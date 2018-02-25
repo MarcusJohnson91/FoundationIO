@@ -1,5 +1,6 @@
-#include <stdint.h>                   /* Included for u/intX_t */
+#include <stdint.h>                    /* Included for u/intX_t */
 
+#include "../include/Macros.h"
 #include "../include/Math.h"
 
 #ifdef   __cplusplus
