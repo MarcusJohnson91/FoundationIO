@@ -160,8 +160,17 @@ extern  "C" {
     
     void GetRuntimeBitByteOrder(void);
     
-#define UTF8ify2(StringLiteral) u8##StringLiteral
-#define UTF8ify(StringLiteral) UTF8ify2(StringLiteral)
+#ifndef             U8
+#define             U8(QuotedLiteral) u8##QuotedLiteral
+#endif
+    
+#ifndef             U16
+#define             U16(QuotedLiteral) u##QuotedLiteral
+#endif
+    
+#ifndef             U32
+#define             U32(QuotedLiteral) U##QuotedLiteral
+#endif
     
 #ifdef  __cplusplus
 }
