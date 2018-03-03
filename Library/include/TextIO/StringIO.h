@@ -17,9 +17,9 @@ extern  "C" {
      @brief     This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
      */
     
-    typedef unsigned char   UTF8;
-    typedef unsigned short  UTF16;
-    typedef unsigned int    UTF32;
+    typedef uint_least8_t   UTF8;
+    typedef uint_least16_t  UTF16;
+    typedef uint_least32_t  UTF32;
     
     typedef enum UnicodeTypes {
                                 UnicodeUnknownSizeByteOrder        = 0x0000,
