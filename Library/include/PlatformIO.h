@@ -158,6 +158,7 @@ extern  "C" {
 #ifndef             U32
 #define             U32(QuotedLiteral) U##QuotedLiteral
 #endif
+    void GetRuntimeByteBitOrder(void);
     
 #ifndef qNAN
 #define qNANBE 0x7FC00001

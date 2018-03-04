@@ -6,7 +6,7 @@
 extern  "C" {
 #endif
     
-    void GetRuntimeBitByteOrder(void) {
+    void GetRuntimeByteBitOrder(void) {
         uint8_t  BitOrderNumber  = 0x8;
         if (BitOrderNumber == 8) {
             GlobalBitOrder = LSBitFirst;
