@@ -1,6 +1,6 @@
 #include <stdint.h>                    /* Included for u/intX_t */
 
-#include "../include/Macros.h"
+#include "../include/Macros.h"         /* Included for the Yes/No macros */
 #include "../include/Math.h"
 
 #ifdef   __cplusplus

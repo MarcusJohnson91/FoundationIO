@@ -1,5 +1,7 @@
 #include <stdint.h>                   /* Included for u/intX_t */
 
+#include "Macros.h"                   /* Included for bool and Yes/No macros */
+
 #pragma once
 
 #ifndef FoundationIO_StringIO_H

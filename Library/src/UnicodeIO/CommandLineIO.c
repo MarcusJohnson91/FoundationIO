@@ -4,9 +4,9 @@
 #include <stdlib.h>                    /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 #include <string.h>                    /* Included for memset */
 
+#include "../include/CommandLineIO.h"  /* Included for the CommandLineIO declarations */
 #include "../include/Macros.h"         /* Included for NewLineWithNULLSize, FoundationIOTargetOS */
-#include "../include/Log.h"            /* Included for LogTypes */
-#include "../include/CommandLineIO.h"
+#include "../include/Log.h"            /* Included for Log */
 
 
 #if   (FoundationIOTargetOS == POSIXOS)

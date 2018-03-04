@@ -172,7 +172,7 @@ extern  "C" {
     
     UTF8          *UTF8_Encode(UTF32 *String, const bool IncludeBOM) {
         if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
-            GetRuntimeBitByteOrder();
+            GetRuntimeByteBitOrder();
         }
         uint64_t CodePoint                             = 0ULL;
         uint64_t CodeUnitNum                           = 0ULL;
@@ -256,7 +256,7 @@ extern  "C" {
     
     UTF32         *UTF16_Decode(UTF16 *String) {
         if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
-            GetRuntimeBitByteOrder();
+            GetRuntimeByteBitOrder();
         }
         /*
          High Surrogate range: UTF16HighSurrogateStart - UTF16HighSurrogateEnd
@@ -303,7 +303,7 @@ extern  "C" {
         UTF16   *EncodedString         = NULL;
         if (String != NULL) {
             if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
-                GetRuntimeBitByteOrder();
+                GetRuntimeByteBitOrder();
             }
             uint8_t  CodePointSize         = 0;
             uint64_t CodeUnitNum           = 0ULL;
@@ -350,7 +350,7 @@ extern  "C" {
     
     UTF16 *UTF16_ConvertByteOrder(UnicodeTypes Type, UTF16 *String2Convert) {
         if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
-            GetRuntimeBitByteOrder();
+            GetRuntimeByteBitOrder();
         }
         uint16_t         UTF16ByteOrder                = String2Convert[0];
         UnicodeTypes     CurrentByteOrder              = UnicodeUnknownSizeByteOrder;
@@ -384,7 +384,7 @@ extern  "C" {
     UTF32 *UTF32_ConvertByteOrder(UnicodeTypes Type, UTF32 *String2Convert) {
         if (Type != UnicodeUnknownSizeByteOrder && String2Convert != NULL) {
             if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
-                GetRuntimeBitByteOrder();
+                GetRuntimeByteBitOrder();
             }
             uint32_t         UTF32ByteOrder                = String2Convert[0];
             UnicodeTypes     CurrentByteOrder              = UnicodeUnknownSizeByteOrder;

@@ -1,8 +1,8 @@
 #include <stdint.h>                   /* Included for u/intX_t */
 #include <stdio.h>                    /* Included for fpos_t */
 
-#include "../include/Macros.h"        /* Included for NewLineWithNULLSize, FoundationIOTargetOS */
-#include "../include/StringIO.h"      /* Included for UTF8 */
+#include "Macros.h"                   /* Included for FoundationIOTargetOS */
+#include "StringIO.h"                 /* Included for UTF8 */
 
 #if   (FoundationIOTargetOS == POSIXOS)
 #include <sys/types.h>
