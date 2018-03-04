@@ -67,6 +67,29 @@ extern   "C" {
                                 WholeUnary                      = 3,
     } UnaryTypes;
     
+    /*!
+     @typedef                   BitInput
+     @abstract                                                  "Contains File/Socket pointers for reading to a BitBuffer".
+     @constant                  FileType                        "Is this BitInput for a file or socket"?
+     @constant                  File                            "Input File/Socket to read into a BitBuffer".
+     @constant                  Socket                          "Socket number".
+     @constant                  FileSize                        "Size of the File in bytes".
+     @constant                  FilePosition                    "Current byte in the file".
+     @constant                  FileSpecifierNum                "Which file are we currently on?".
+     */
+    typedef struct              BitInput                        BitInput;
+    
+    /*!
+     @typedef                   BitOutput
+     @abstract                                                  "Contains File/Socket pointers for writing from a BitBuffer".
+     @constant                  FileType                        "Is this BitOutput for a file or socket"?
+     @constant                  File                            "Input File/Socket to write a BitBuffer into".
+     @constant                  Socket                          "Socket number".
+     @constant                  FilePosition                    "Current byte in the file".
+     @constant                  FileSpecifierNum                "Which file are we currently on?".
+     */
+    typedef struct              BitOutput                       BitOutput;
+    
     /* BitBuffer */
     /*!
      @typedef                   BitBuffer
@@ -219,18 +242,6 @@ extern   "C" {
     
     /* BitInput */
     /*!
-     @typedef                   BitInput
-     @abstract                                                  "Contains File/Socket pointers for reading to a BitBuffer".
-     @constant                  FileType                        "Is this BitInput for a file or socket"?
-     @constant                  File                            "Input File/Socket to read into a BitBuffer".
-     @constant                  Socket                          "Socket number".
-     @constant                  FileSize                        "Size of the File in bytes".
-     @constant                  FilePosition                    "Current byte in the file".
-     @constant                  FileSpecifierNum                "Which file are we currently on?".
-     */
-    typedef struct              BitInput                        BitInput;
-    
-    /*!
      @abstract                                                  "Initializes a BitInput structure".
      @return                                                    "Returns a pointer to said BitInput structure".
      */
@@ -299,17 +310,6 @@ extern   "C" {
     /* BitInput */
     
     /* BitOutput */
-    /*!
-     @typedef                   BitOutput
-     @abstract                                                  "Contains File/Socket pointers for writing from a BitBuffer".
-     @constant                  FileType                        "Is this BitOutput for a file or socket"?
-     @constant                  File                            "Input File/Socket to write a BitBuffer into".
-     @constant                  Socket                          "Socket number".
-     @constant                  FilePosition                    "Current byte in the file".
-     @constant                  FileSpecifierNum                "Which file are we currently on?".
-     */
-    typedef struct              BitOutput                       BitOutput;
-    
     /*!
      @abstract                                                  "Initializes a BitOutput structure".
      @return                                                    "Returns a pointer to said BitOutput structure".
