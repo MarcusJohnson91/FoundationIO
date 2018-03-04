@@ -27,8 +27,8 @@ extern   "C" {
     /*!
      */
     enum CommandLineIOConstants {
-                                NULLTerminator              = 0,
-                                NULLTerminatorSize          = 1,
+                             NULLTerminator              = 0,
+                             NULLTerminatorSize          = 1,
     };
     
     /*!
@@ -410,7 +410,7 @@ extern   "C" {
                 for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                     // now compare ArgumentFlag to Switch
                     // Which string is smaller?
-                    if (UTF8_Compare(&ArgumentFlag, CLI->SwitchIDs[Switch].Name, Yes, Yes) == Yes) { // ArgumentFlag matches this switch
+                    if (UTF8_Compare(ArgumentFlag, CLI->SwitchIDs[Switch].Name, Yes, Yes) == Yes) { // ArgumentFlag matches this switch
                         // Set up the Option here
                         CLI->NumOptions   += 1;
                         if (CLI->NumOptions == 1) {

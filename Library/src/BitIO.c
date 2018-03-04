@@ -426,7 +426,7 @@ extern "C" {
     }
     
     void BitInput_Read2BitBuffer(BitInput *BitI, BitBuffer *Buffer2Read, const int64_t Bytes2Read) {
-        uint64_t BytesRead            = 0ULL;
+        int64_t BytesRead             = 0ULL;
         if (BitI != NULL && Buffer2Read != NULL && Bytes2Read > (BitI->FileSize - BitI->FilePosition)) {
             if (Buffer2Read->Buffer  != NULL) {
                 free(Buffer2Read->Buffer);
@@ -584,7 +584,6 @@ extern "C" {
     }
     
     void BitOutput_ConnectSocket(BitOutput *BitO, struct sockaddr *SocketAddress, const uint64_t SocketSize) {
-        uint8_t SocketAddressSize = sizeof(&SocketAddress);
         if (BitO != NULL && SocketAddress != NULL) {
             BitO->FileType = BitIOSocket;
             connect(BitO->Socket, SocketAddress, SocketSize);

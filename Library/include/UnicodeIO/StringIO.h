@@ -23,6 +23,18 @@ extern  "C" {
     typedef uint_least16_t  UTF16;
     typedef uint_least32_t  UTF32;
     
+#ifndef             U8
+#define             U8(QuotedLiteral) u8##QuotedLiteral
+#endif
+    
+#ifndef             U16
+#define             U16(QuotedLiteral) u##QuotedLiteral
+#endif
+    
+#ifndef             U32
+#define             U32(QuotedLiteral) U##QuotedLiteral
+#endif
+    
     typedef enum UnicodeTypes {
                                 UnicodeUnknownSizeByteOrder        = 0x0000,
                                 UTF16LE                            = 0xFFFE,
