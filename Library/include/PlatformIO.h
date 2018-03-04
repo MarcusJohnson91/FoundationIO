@@ -137,27 +137,14 @@ extern  "C" {
      @constant                  MSByteFirst                "Read from the Most  Significant Byte to the Least Significant, aka left to right".
      */
     typedef enum ByteBitOrders {
-        UnknownBitFirst            = 0,
-        UnknownByteFirst           = 1,
-        LSBitFirst                 = 2,
-        LSByteFirst                = 3,
-        MSBitFirst                 = 4,
-        MSByteFirst                = 5,
+                                UnknownBitFirst            = 0,
+                                UnknownByteFirst           = 1,
+                                LSBitFirst                 = 2,
+                                LSByteFirst                = 3,
+                                MSBitFirst                 = 4,
+                                MSByteFirst                = 5,
     } ByteBitOrders;
     
-    void GetRuntimeBitByteOrder(void);
-    
-#ifndef             U8
-#define             U8(QuotedLiteral) u8##QuotedLiteral
-#endif
-    
-#ifndef             U16
-#define             U16(QuotedLiteral) u##QuotedLiteral
-#endif
-    
-#ifndef             U32
-#define             U32(QuotedLiteral) U##QuotedLiteral
-#endif
     void GetRuntimeByteBitOrder(void);
     
 #ifndef qNAN

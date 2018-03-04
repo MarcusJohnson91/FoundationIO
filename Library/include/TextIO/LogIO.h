@@ -25,8 +25,8 @@ extern "C" {
      @constant                  Log_DEBUG                       "Information for debugging".
      */
     typedef enum LogTypes {
-        Log_ERROR                       = 1,
-        Log_DEBUG                       = 2,
+                                Log_ERROR                       = 1,
+                                Log_DEBUG                       = 2,
     } LogTypes;
     
     /*!
