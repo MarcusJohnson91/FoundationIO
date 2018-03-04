@@ -1,11 +1,11 @@
 #include <stdint.h>                    /* Included for u/intX_t */
 #include <stdio.h>                     /* Included for the FILE type, SEEK SET/END/CUR macros */
 #include <stdlib.h>                    /* Included for calloc, realloc, and free */
+#include <string.h>                    /* Included for memset, memmove */
 
 #include "../include/Macros.h"         /* Included for NewLineWithNULLSize */
 #include "../include/Math.h"           /* Included for Integer functions */
 #include "../include/Log.h"            /* Included for LogTypes */
-#include "../include/StringIO.h"
 #include "../include/BitIO.h"
 
 #ifdef __cplusplus
@@ -120,6 +120,43 @@ extern "C" {
                 BitB->NumBits  += Bits2Skip;
             }
             BitB->BitOffset    += Bits2Skip;
+        } else {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        }
+    }
+    
+    void BitBuffer_Update(BitInput *BitI, BitBuffer *BitB) {
+        if (BitI != NULL && BitB != NULL) {
+            // Ok so we need to Get the number of bits that haven't yet been read from the buffer by subtracting BitOffset from NumBits.
+            uint64_t NumBits2Keep      = BitB->NumBits - BitB->BitOffset;
+            uint64_t BufferSizeInBytes = Bits2Bytes(BitB->NumBits, No);
+            uint8_t *NewBuffer         = calloc(BufferSizeInBytes, sizeof(uint8_t));
+            if (NewBuffer != NULL) {
+                memmove(NewBuffer, BitB->Buffer + BufferSizeInBytes, Bits2Bytes(NumBits2Keep, No));
+                memset(BitB->Buffer, 0, BufferSizeInBytes);
+                free(BitB->Buffer);
+                BitB->Buffer           = NewBuffer;
+            } else {
+                Log(Log_ERROR, __func__, U8("Allocating %d bytes failed"), BufferSizeInBytes);
+            }
+        } else if (BitI == NULL) {
+            Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
+        } else if (BitB == NULL) {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        }
+    }
+    
+    void BitBuffer_Resize(BitBuffer *BitB, const uint64_t NewSizeInBytes) {
+        if (BitB != NULL) {
+            memset(BitB->Buffer, 0, Bits2Bytes(BitB->NumBits, No));
+            free(BitB->Buffer);
+            BitB->Buffer        = calloc(NewSizeInBytes, sizeof(uint8_t));
+            if (BitB->Buffer != NULL) {
+                BitB->BitOffset = 0;
+                BitB->NumBits   = Bits2Bytes(NewSizeInBytes, No);
+            } else {
+                Log(Log_ERROR, __func__, U8("Allocating %d bytes failed"), NewSizeInBytes);
+            }
         } else {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         }

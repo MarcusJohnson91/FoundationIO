@@ -124,6 +124,23 @@ extern   "C" {
     void                        BitBuffer_Skip(BitBuffer *BitB, const int64_t Bits2Skip);
     
     /*!
+     @abstract                                                  "Reads in fresh data to a BitBuffer from a BitInput source".
+     @remark                                                    "Is NOT destructive, it will keep any unread data in the buffer".
+     @param                     BitI                            "BitInput Pointer".
+     @param                     BitB                            "The BitBuffer to update".
+     */
+    void                        BitBuffer_Update(BitInput *BitI, BitBuffer *BitB);
+    
+    /*!
+     @abstract                                                  "Changes the size of an already initalized BitBuffer".
+     @remark                                                    "Resizing a BitBuffer WILL erase the current buffer".
+     @remark                                                    "Resize the BitBuffer BEFORE you call BitBuffer_Update".
+     @param                     BitB                            "BitBuffer Pointer to resize".
+     @param                     NewSizeInBytes                  "The size of the internal buffer in bytes".
+     */
+    void                        BitBuffer_Resize(BitBuffer *BitB, const uint64_t NewSizeInBytes);
+    
+    /*!
      @abstract                                                  "Peeks (reads but without recording that it's been read) bits from BitBuffer".
      @param                     ByteOrder                       "What byte order are the bits in the BitBuffer for this field stored as"?
      @param                     BitOrder                        "What bit order are the bits in the BitBuffer for this field stored as"?
