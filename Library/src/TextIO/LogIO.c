@@ -3,9 +3,9 @@
 #include <stdio.h>                     /* Included for FILE */
 #include <stdlib.h>                    /* Included for calloc, free */
 
+#include "../include/Log.h"            /* Included for the Log declarations */
 #include "../include/Macros.h"         /* Included for NewLineWithNULLSize, FoundationIOTargetOS */
 #include "../include/StringIO.h"       /* Included for UTF8 */
-#include "../include/Log.h"            /* Included for LogTypes */
 
 #ifdef __cplusplus
 extern "C" {

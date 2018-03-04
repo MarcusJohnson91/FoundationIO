@@ -1,6 +1,6 @@
 #include <stdint.h>                   /* Included for u/intX_t */
 
-#include "../include/StringIO.h"      /* Included for UTF8 */
+#include "StringIO.h"                 /* Included for UTF8 */
 
 #pragma  once
 
