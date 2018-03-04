@@ -33,7 +33,7 @@ extern "C" {
     
     BitBuffer *BitBuffer_Init(const uint64_t BitBufferSize) {
         if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
-            GetRuntimeBitByteOrder();
+            GetRuntimeByteBitOrder();
         }
         BitBuffer *BitB                  = calloc(1, sizeof(BitBuffer));
         if (BitB != NULL && BitBufferSize > 0) {
