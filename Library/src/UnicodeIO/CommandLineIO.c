@@ -615,7 +615,7 @@ extern   "C" {
         return ExtensionString;
     }
     
-    void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF8 *Strings[], uint64_t *Numerator, uint64_t *Denominator) {
+    void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF8 **Strings, uint64_t *Numerator, uint64_t *Denominator) {
         if (CLI != NULL) {
             /*
              How do we get the window size? I want to be able to resize the window

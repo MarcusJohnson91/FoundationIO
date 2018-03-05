@@ -34,7 +34,7 @@ extern "C" {
         }
     }
     
-    void Log(LogTypes Severity, const UTF8 FunctionName[], const UTF8 Description[], ...) {
+    void Log(LogTypes Severity, const UTF8 *FunctionName, const UTF8 *Description, ...) {
         UTF8 Error[] = U8("ERROR");
         UTF8 Debug[] = U8("DEBUG");
         
