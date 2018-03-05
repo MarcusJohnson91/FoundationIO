@@ -358,8 +358,8 @@ extern "C" {
     typedef struct BitInput {
         FILE                   *File;
         uint64_t                FileSpecifierNum;
-        fpos_t                  FileSize;
-        fpos_t                  FilePosition;
+        int64_t                 FileSize;
+        int64_t                 FilePosition;
         int                     Socket;
         BitInputOutputFileTypes FileType;
         bool                    FileSpecifierExists;
@@ -471,10 +471,10 @@ extern "C" {
     
     static void BitInput_FindFileSize(BitInput *BitI) {
         if (BitI != NULL) {
-            fseek(BitI->File, 0, SEEK_END);
-            BitI->FileSize     = ftell(BitI->File);
-            fseek(BitI->File, 0, SEEK_SET);
-            BitI->FilePosition = ftell(BitI->File);
+            FoundationIO_Seek(BitI->File, 0, SEEK_END);
+            BitI->FileSize     = FoundationIO_Tell(BitI->File);
+            FoundationIO_Seek(BitI->File, 0, SEEK_SET);
+            BitI->FilePosition = FoundationIO_Tell(BitI->File);
         } else {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         }
@@ -530,7 +530,7 @@ extern "C" {
     typedef struct BitOutput {
         FILE                   *File;
         uint64_t                FileSpecifierNum;
-        fpos_t                  FilePosition;
+        int64_t                 FilePosition;
         int                     Socket;
         BitInputOutputFileTypes FileType;
         bool                    FileSpecifierExists;
@@ -559,7 +559,7 @@ extern "C" {
             UTF32 *Path32           = UTF8_Decode(Path2Open);
             UTF16 *Path16           = UTF16_Encode(Path32);
             free(Path32);
-            BitI->File              = _wfopen(Path16, U16("rb"));
+            BitO->File              = _wfopen(Path16, U16("rb"));
             free(Path16);
 #endif
             if (BitO->File != NULL) {

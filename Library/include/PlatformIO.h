@@ -82,6 +82,14 @@ extern  "C" {
 #define             typeof   __typeof__
 #endif
     
+#ifndef             FoundationIO_Tell
+#define             FoundationIO_Tell(File) ftello(File)
+#endif
+    
+#ifndef              FoundationIO_Seek
+#define              FoundationIO_Seek(File, Offset, Origin) fseeko(File, Offset, Origin)
+#endif
+    
 #elif    defined(_WIN32) || defined(__WIN32__) || defined(_WIN64) || defined(__WINDOWS__)
     
 #ifndef             FoundationIOTargetOS
@@ -101,11 +109,13 @@ extern  "C" {
 #define             restrict           __restrict
 #endif
     
-#undef              fseek
-#define             fseek               _fseeti64
+#ifndef             FoundationIO_Tell
+#define             FoundationIO_Tell(File) _ftelli64(File)
+#endif
     
-#undef              ftell
-#define             ftell               _ftelli64
+#ifndef             FoundationIO_Seek
+#define             FoundationIO_Seek(File, Offset, Origin) _fseeki64(File, Offset, Origin)
+#endif
     
 #ifndef             strncasecmp
 #define             strncasecmp         _strnicmp
