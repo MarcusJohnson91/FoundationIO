@@ -159,29 +159,29 @@ extern  "C" {
      @remark                               "The string is reallocated at the end to remove unused space".
      @param               String2Normalize "The sring to be normalized".
      */
-    void                  NormalizeString(UTF32 *String2Normalize);
+    void                  UTF32_NormalizeString(UTF32 *String2Normalize);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
      @param               String2CaseFold  "The string to be casefolded".
      */
-    void                  CaseFoldString(UTF32 *String2CaseFold);
+    void                  UTF32_CaseFoldString(UTF32 *String2CaseFold);
     
     /*!
      @abstract                             "Extracts a substring from String starting at position Start and ending at position End".
      */
-    UTF32                *ExtractSubstring(UTF32 *String, uint64_t Start, uint64_t End);
+    UTF32                *UTF32_ExtractSubstring(UTF32 *String, uint64_t Start, uint64_t End);
     
     /*!
      @abstract                             "Returns the position of the first codepoint in the substring".
      */
-    uint64_t              FindSubstring(UTF32 *String, UTF32 *SubString);
+    uint64_t              UTF32_FindSubstring(UTF32 *String, UTF32 *SubString);
     
     /*!
      @abstract                             "Extracts a number from a string".
      @param               String           "The sring to extract a number from".
      */
-    int64_t               String2Integer(UTF32 *String);
+    int64_t               UTF32_String2Integer(UTF32 *String);
     
     /* High level fucntions */
     bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2, bool Normalize, bool CaseInsensitive);
@@ -191,7 +191,7 @@ extern  "C" {
     /*!
      @abstract                             "Compares String1 and String2 for equilivence".
      */
-    bool                  CompareStrings(UTF32 *String1, UTF32 *String2);
+    bool                  CompareStrings32(UTF32 *String1, UTF32 *String2);
     
     UTF32                *FormatString32(const uint64_t VarArgCount, UTF32 *Format, ...);
     
