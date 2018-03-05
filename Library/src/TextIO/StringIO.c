@@ -417,14 +417,14 @@ extern  "C" {
             UTF32 *String1UTF32 = UTF8_Decode(String1);
             UTF32 *String2UTF32 = UTF8_Decode(String2);
             if (Normalize == Yes) {
-                NormalizeString(String1UTF32);
-                NormalizeString(String2UTF32);
+                UTF32_NormalizeString(String1UTF32);
+                UTF32_NormalizeString(String2UTF32);
             }
             if (CaseInsensitive == Yes) {
-                CaseFoldString(String1UTF32);
-                CaseFoldString(String2UTF32);
+                UTF32_CaseFoldString(String1UTF32);
+                UTF32_CaseFoldString(String2UTF32);
             }
-            StringsMatch = CompareStrings(String1UTF32, String2UTF32);
+            StringsMatch = CompareStrings32(String1UTF32, String2UTF32);
             free(String1UTF32);
             free(String2UTF32);
         } else if (String1 == NULL) {
@@ -441,14 +441,14 @@ extern  "C" {
             UTF32 *String1UTF32 = UTF16_Decode(String1);
             UTF32 *String2UTF32 = UTF16_Decode(String2);
             if (Normalize == Yes) {
-                NormalizeString(String1UTF32);
-                NormalizeString(String2UTF32);
+                UTF32_NormalizeString(String1UTF32);
+                UTF32_NormalizeString(String2UTF32);
             }
             if (CaseInsensitive == Yes) {
-                CaseFoldString(String1UTF32);
-                CaseFoldString(String2UTF32);
+                UTF32_CaseFoldString(String1UTF32);
+                UTF32_CaseFoldString(String2UTF32);
             }
-            StringsMatch = CompareStrings(String1UTF32, String2UTF32);
+            StringsMatch = CompareStrings32(String1UTF32, String2UTF32);
         } else if (String1 == NULL) {
             Log(Log_ERROR, __func__, U8("String1 Pointer is NULL"));
         } else if (String2 == NULL) {
@@ -459,7 +459,7 @@ extern  "C" {
     
     
     /* StringIO High Level Functions */
-    void NormalizeString(UTF32 *String2Normalize) {
+    void UTF32_NormalizeString(UTF32 *String2Normalize) {
         /*
          So we should try to convert codepoints to a precomposed codepoint, but if we can't we need to order them by their lexiographic value.
          */
@@ -480,7 +480,7 @@ extern  "C" {
         }
     }
     
-    void CaseFoldString(UTF32 *String) {
+    void UTF32_CaseFoldString(UTF32 *String) {
         uint64_t CodePoint = 1ULL;
         if (String != NULL) {
             do {
@@ -498,7 +498,7 @@ extern  "C" {
         }
     }
     
-    bool CompareStrings(UTF32 *String1, UTF32 *String2) {
+    bool CompareStrings32(UTF32 *String1, UTF32 *String2) {
         uint64_t CodePoint = 0ULL;
         bool StringsMatch  = Yes;
         if (String1 != NULL && String2 != NULL) {
@@ -522,7 +522,7 @@ extern  "C" {
         return StringsMatch;
     }
     
-    uint64_t FindSubstring(UTF32 *String, UTF32 *SubString) {
+    uint64_t UTF32_FindSubstring(UTF32 *String, UTF32 *SubString) {
         uint64_t   Offset             = 0ULL;
         uint64_t   CodePoint          = 1ULL;
         uint64_t   SubStringCodePoint = 1ULL;
@@ -540,7 +540,7 @@ extern  "C" {
         return Offset;
     }
     
-    UTF32 *ExtractSubstring(UTF32 *String, uint64_t Start, uint64_t End) {
+    UTF32 *UTF32_ExtractSubstring(UTF32 *String, uint64_t Start, uint64_t End) {
         uint64_t    ExtractedStringSize = (Start - End) + 1 + UnicodeNULLTerminatorSize;
         UTF32 *ExtractedString          = NULL;
         if (String != NULL && End > Start) {
@@ -560,7 +560,7 @@ extern  "C" {
         return ExtractedString;
     }
     
-    int64_t String2Integer(UTF32 *String) {
+    int64_t UTF32_String2Integer(UTF32 *String) {
         uint64_t CodePoint  = 0ULL;
         int8_t   Sign       =  1;
         uint8_t  Base       = 10;
@@ -657,7 +657,7 @@ extern  "C" {
          Should we support Binary Coded Decimal BCD?
          Invalid doubles return a NULL string
          */
-        UTF32   *OutputString = NAN;
+        UTF32   *OutputString = NULL;
         int8_t   Sign         = Value < 0.0 ? -1 : 1;
         int32_t *Exponent     = 0;
         int32_t  Exponent2    = Exponent;
