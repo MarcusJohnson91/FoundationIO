@@ -13,6 +13,7 @@
 #include <sys/ioctl.h>                 /* Included for the terminal size */
 #include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
 #elif (FoundationIOTargetOS == WindowsOS)
+#include <Windows.h>                   /* Included because WinCon needs it */
 #include <wincon.h>                    /* Included for getting the terminal size */
 #endif
 
