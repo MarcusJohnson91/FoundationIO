@@ -215,7 +215,7 @@ extern   "C" {
      @param                     Numerator                       "A pointer to an array of the number of X tasks that have been completed".
      @param                     Denominator                     "A pointer to an array of the number of X thats that there are to do".
      */
-    void                        CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF8 *Strings[], uint64_t *Numerator, uint64_t *Denominator);
+    void                        CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF8 **Strings, uint64_t *Numerator, uint64_t *Denominator);
     
     /*!
      @abstract                                                  "How many matching options are present in CommandLineIO (will also check for slave switches if present)".

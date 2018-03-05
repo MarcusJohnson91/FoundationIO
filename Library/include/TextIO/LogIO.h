@@ -47,7 +47,7 @@ extern "C" {
      @param                     FunctionName                    "Which function is calling Log?".
      @param                     Description                     "String describing what went wrong".
      */
-    extern void                 Log(LogTypes Severity, const UTF8 FunctionName[], const UTF8 Description[], ...);
+    extern void                 Log(LogTypes Severity, const UTF8 *FunctionName, const UTF8 *Description, ...);
     
     /*!
      @abstract                                                  "Closes the LogFile".
