@@ -82,6 +82,15 @@ extern  "C" {
 #define             typeof   __typeof__
 #endif
     
+#ifndef qNAN
+#define qNANBE 0x7FC00001
+#define qNANLE 0x1000C07F
+#endif
+    
+#ifndef NAN
+#define NAN qNANBE
+#endif
+    
 #ifndef             FoundationIO_Tell
 #define             FoundationIO_Tell(File) ftello(File)
 #endif
@@ -156,19 +165,6 @@ extern  "C" {
     } ByteBitOrders;
     
     void GetRuntimeByteBitOrder(void);
-    
-#ifndef qNAN
-#define qNANBE 0x7FC00001
-#define qNANLE 0x1000C07F
-#endif
-    
-#ifndef NAN
-#define NAN qNANBE
-#endif
-    
-#ifndef INF
-#define INF
-#endif
     
 #ifdef  __cplusplus
 }
