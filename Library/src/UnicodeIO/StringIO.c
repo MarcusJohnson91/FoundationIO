@@ -311,12 +311,14 @@ extern  "C" {
             EncodedString                  = calloc(UTF16NumCodeUnits, sizeof(UTF16));
             if (EncodedString != NULL) {
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < UTF16NumCodeUnits; CodeUnit++) {
+                    // High Surrogate Range: 0xD800 - 0xDBFF
+                    // Low  Surrogate Range: 0xDC00 - 0xDFFF
+                    // Surrogates Range: 0xD800 - 0xDFFF
                     // High = ((String[CodePoint] - 0x10000) / 0x400) + UTF16HighSurrogateStart
                     // Low  = (String[CodePoint]  - 0x10000) % 0x400) + UTF16LowSurrogateStart
                     // High = 0x1F984 - 0x10000 = 0xF984 / 0x400 = 0x3E  + UTF16HighSurrogateStart = 0xD83E
                     // Low  = 0x1F984 - 0x10000 = 0xF984 % 0x400 = 0x184 + UTF16LowSurrogateStart = 0xDD84
-                    if ((String[0] == UTF16LE && GlobalByteOrder == MSByteFirst) || (String[0] == UTF16BE && GlobalByteOrder == LSByteFirst)) { // The string byte order does not match the main machines, we need to swap
-                        // Swap the endian as we encode
+                    if ((String[0] == UTF16LE && GlobalByteOrder == MSByteFirst) || (String[0] == UTF16BE && GlobalByteOrder == LSByteFirst)) {
                         String[CodeUnit] = SwapEndian32(String[CodeUnit]);
                     }
                     if (CodeUnit == 0) {
@@ -330,13 +332,14 @@ extern  "C" {
                     if (String[CodeUnitNum] <= 0xD7FF || (String[CodeUnitNum] >= 0xE000 && String[CodeUnitNum] <= 0xFFFF)) { // Single code point
                         EncodedString[CodeUnitNum]         = String[CodeUnit];
                     } else {
-                        if (GlobalByteOrder == LSByteFirst) {
-                            EncodedString[CodeUnitNum]     = ((String[CodeUnitNum - 1] - 0x10000) % 0x400) + UTF16LowSurrogateStart;
-                            EncodedString[CodeUnitNum + 1] = ((String[CodeUnitNum] - 0x10000) / 0x400) + UTF16HighSurrogateStart;
-                        } else if (GlobalByteOrder == MSByteFirst) {
-                            EncodedString[CodeUnitNum]     = ((String[CodeUnitNum - 1] - 0x10000) / 0x400) + UTF16HighSurrogateStart;
-                            EncodedString[CodeUnitNum + 1] = ((String[CodeUnitNum] - 0x10000) % 0x400) + UTF16LowSurrogateStart;
+                        uint16_t HighSurrogate = ((String[CodeUnitNum] - 0x10000) / 0x400) + UTF16HighSurrogateStart;
+                        uint16_t LowSurrogate  = ((String[CodeUnitNum] - 0x10000) % 0x400) + UTF16LowSurrogateStart;
+                        // U+1F984
+                        // High = 0xF984 / 0x400 = 0x3E  + 0xD800 = 0xD83E
+                        // Low  = 0xF984 % 0x400 = 0x184 + 0xDC00 = 0xDD84
                         }
+                        EncodedString[CodeUnitNum]     = HighSurrogate;
+                        EncodedString[CodeUnitNum + 1] = LowSurrogate;
                     }
                 }
             } else {
