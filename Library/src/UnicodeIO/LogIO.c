@@ -26,7 +26,7 @@ extern "C" {
             Log_LogFile   = fopen(LogFilePath, U8("a+"));
 #elif (FoundationIOTargetOS == WindowsOS)
             UTF32 *Path32 = UTF8_Decode(LogFilePath);
-            UTF16 *Path16 = UTF16_Encode(Path32);
+            UTF16 *Path16 = UTF16_Encode(Path32, UseNativeByteOrder);
             free(Path32);
             Log_LogFile   = _wfopen(Path16, U16("rb"));
             free(Path16);
