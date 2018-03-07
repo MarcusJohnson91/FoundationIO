@@ -387,7 +387,7 @@ extern "C" {
             BitI->File              = fopen(Path2Open, U8("rb"));
 #elif (FoundationIOTargetOS == WindowsOS)
             UTF32 *Path32           = UTF8_Decode(Path2Open);
-            UTF16 *Path16           = UTF16_Encode(Path32);
+            UTF16 *Path16           = UTF16_Encode(Path32, UseNativeByteOrder);
             free(Path32);
             BitI->File              = _wfopen(Path16, U16("rb"));
             free(Path16);
@@ -557,7 +557,7 @@ extern "C" {
             BitO->File              = fopen(Path2Open, U8("wb"));
 #elif (FoundationIOTargetOS == WindowsOS)
             UTF32 *Path32           = UTF8_Decode(Path2Open);
-            UTF16 *Path16           = UTF16_Encode(Path32);
+            UTF16 *Path16           = UTF16_Encode(Path32, UseNativeByteOrder);
             free(Path32);
             BitO->File              = _wfopen(Path16, U16("rb"));
             free(Path16);
