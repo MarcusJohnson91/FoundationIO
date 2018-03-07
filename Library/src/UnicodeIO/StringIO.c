@@ -32,7 +32,7 @@ extern  "C" {
 #endif
     
     /* UTF-8 I/O */
-    static uint8_t      UTF8_GetCodePointSize(UTF8 CodeUnit) {
+    static uint8_t UTF8_GetCodePointSize(UTF8 CodeUnit) {
         uint8_t CodePointSize      = 0;
         if (((CodeUnit & 0x80) >> 7) == 0) {
             CodePointSize         += 1;
@@ -46,7 +46,7 @@ extern  "C" {
         return CodePointSize;
     }
     
-    uint64_t            UTF8_GetSizeInCodeUnits(UTF8 *String2Count) { // Read a codeunit, get it's size, skip that many bytes, check that it's not 0x0, then repeat
+    uint64_t UTF8_GetSizeInCodeUnits(UTF8 *String2Count) { // Read a codeunit, get it's size, skip that many bytes, check that it's not 0x0, then repeat
         uint64_t NumCodeUnits                       = 0ULL;
         uint64_t CurrentCodeUnit                    = 0ULL;
         if (String2Count != NULL) {
@@ -59,7 +59,7 @@ extern  "C" {
         return NumCodeUnits;
     }
     
-    uint64_t            UTF8_GetSizeInCodePoints(UTF8 *String) {
+    uint64_t UTF8_GetSizeInCodePoints(UTF8 *String) {
         uint64_t CurrentCodeUnit              = 0ULL;
         uint64_t NumCodePoints                = 0ULL;
         if (String != NULL) {
@@ -91,7 +91,7 @@ extern  "C" {
         return UTF8CodeUnits;
     }
     
-    static uint64_t     UTF32_GetSizeInCodeUnits4UTF16(UTF32 *String) {
+    static uint64_t UTF32_GetSizeInCodeUnits4UTF16(UTF32 *String) {
         uint64_t CodePoint          = 0ULL;
         uint64_t UTF16CodeUnits     = 0ULL;
         do {
@@ -105,7 +105,7 @@ extern  "C" {
         return UTF16CodeUnits;
     }
     
-    UTF32         *UTF8_Decode(UTF8 *String) {
+    UTF32 *UTF8_Decode(UTF8 *String) {
         // We should make sure we don't decode anything in the surrogate block, between UTF16HighSurrogateEnd to UTF16HighSurrogateStart or DFFF to DC00
         uint8_t  CodePointSize      = 0;
         uint64_t CodeUnitNum        = 0ULL;
@@ -170,7 +170,7 @@ extern  "C" {
         return DecodedString;
     }
     
-    UTF8          *UTF8_Encode(UTF32 *String, const bool IncludeBOM) {
+    UTF8 *UTF8_Encode(UTF32 *String, const bool IncludeBOM) {
         if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
             GetRuntimeByteBitOrder();
         }
@@ -226,7 +226,7 @@ extern  "C" {
     
     
     /* UTF-16 I/O */
-    static uint8_t      UTF16_GetCodePointSize(UTF16 CodeUnit) {
+    static uint8_t UTF16_GetCodePointSize(UTF16 CodeUnit) {
         uint8_t CodePointSize = 0;
         if (CodeUnit >= UTF16HighSurrogateStart && CodeUnit <= UTF16LowSurrogateEnd) { // Surrogate
             CodePointSize     = 2;
@@ -236,7 +236,7 @@ extern  "C" {
         return CodePointSize;
     }
     
-    uint64_t            UTF16_GetSizeInCodeUnits(UTF16 *String) {
+    uint64_t UTF16_GetSizeInCodeUnits(UTF16 *String) {
         uint64_t NumCodeUnits          = 0ULL;
         do {
             NumCodeUnits              += UTF16_GetCodePointSize(String[NumCodeUnits]);
@@ -244,7 +244,7 @@ extern  "C" {
         return NumCodeUnits;
     }
     
-    uint64_t            UTF16_GetSizeInCodePoints(UTF16 *String) {
+    uint64_t UTF16_GetSizeInCodePoints(UTF16 *String) {
         uint64_t NumCodeUnits           = 0ULL;
         uint64_t NumCodePoints          = 0ULL;
         do {
@@ -254,7 +254,7 @@ extern  "C" {
         return NumCodePoints;
     }
     
-    UTF32         *UTF16_Decode(UTF16 *String) {
+    UTF32 *UTF16_Decode(UTF16 *String) {
         if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
             GetRuntimeByteBitOrder();
         }
@@ -373,7 +373,7 @@ extern  "C" {
     }
     
     /* UTF-32 I/O */
-    uint64_t            UTF32_GetSizeInCodePoints(UTF32 *String) {
+    uint64_t UTF32_GetSizeInCodePoints(UTF32 *String) {
         uint64_t NumCodePoints          = 0ULL;
         do {
             NumCodePoints              += 1;
