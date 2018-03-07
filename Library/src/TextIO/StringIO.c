@@ -134,6 +134,19 @@ extern  "C" {
         return UTF16CodeUnits;
     }
     
+    uint64_t UTF32_GetSizeInCodePoints(UTF32 *String) {
+        uint64_t NumCodePoints              = 0ULL;
+        if (String != NULL) {
+            do {
+                NumCodePoints              += 1;
+            } while (String[NumCodePoints] != 0);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        
+        return NumCodePoints;
+    }
+    
     UTF32 *UTF8_Decode(UTF8 *String) {
         // We should make sure we don't decode anything in the surrogate block, between UTF16HighSurrogateEnd to UTF16HighSurrogateStart or DFFF to DC00
         uint8_t  CodePointSize      = 0;
@@ -357,19 +370,6 @@ extern  "C" {
     }
     
     /* UTF-32 I/O */
-    uint64_t UTF32_GetSizeInCodePoints(UTF32 *String) {
-        uint64_t NumCodePoints              = 0ULL;
-        if (String != NULL) {
-            do {
-                NumCodePoints              += 1;
-            } while (String[NumCodePoints] != 0);
-        } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        }
-        
-        return NumCodePoints;
-    }
-    
     void UTF32_ConvertByteOrder(UTF32 *String2Convert, UnicodeByteOrder OutputByteOrder) {
         if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
             GetRuntimeByteBitOrder();
