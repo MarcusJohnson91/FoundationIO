@@ -7,7 +7,7 @@
 extern   "C" {
 #endif
     
-    bool     IsNegative(const int64_t Integer) {
+    bool IsNegative(const int64_t Integer) {
         if (Integer >= 0 && ~Integer >= 0) {
             return No;
         } else {
@@ -15,7 +15,7 @@ extern   "C" {
         }
     }
     
-    bool     IsOdd(const int64_t Number2Check) {
+    bool IsOdd(const int64_t Number2Check) {
         bool X = No;
         if (Number2Check % 2 == 0) {
             X = Yes;
@@ -48,11 +48,11 @@ extern   "C" {
         return Bits;
     }
     
-    int64_t  Bytes2Bits(const int64_t Bytes) {
+    int64_t Bytes2Bits(const int64_t Bytes) {
         return Bytes * 8;
     }
     
-    int64_t  Bits2Bytes(const int64_t Bits, const bool RoundUp) {
+    int64_t Bits2Bytes(const int64_t Bits, const bool RoundUp) {
         int64_t Bytes = 0ULL;
         if (RoundUp == No) {
             Bytes = Bits / 8;
