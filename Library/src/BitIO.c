@@ -41,10 +41,10 @@ extern "C" {
             if (BitB->Buffer != NULL) {
                 BitB->NumBits            = Bytes2Bits(BitBufferSize);
             } else {
-                Log(Log_ERROR, __func__, U8("Not enough memory to allocate %d bits for BitBuffer's buffer"), BitBufferSize);
+                Log(Log_ERROR, __func__, U8("Couldn't allocate %d bits for BitBuffer's buffer"), BitBufferSize);
             }
         } else if (BitB == NULL) {
-            Log(Log_ERROR, __func__, U8("Not enough memory to allocate this instance of BitBuffer"));
+            Log(Log_ERROR, __func__, U8("Couldn't allocate BitBuffer"));
         }
         return BitB;
     }
@@ -368,7 +368,7 @@ extern "C" {
     BitInput *BitInput_Init(void) {
         BitInput *BitI = calloc(1, sizeof(BitInput));
         if (BitI == NULL) {
-            Log(Log_ERROR, __func__, U8("Not enough memory to allocate this instance of BitInput"));
+            Log(Log_ERROR, __func__, U8("Couldn't allocate BitInput"));
         }
         return BitI;
     }
@@ -448,7 +448,7 @@ extern "C" {
                     Log(Log_ERROR, __func__, U8("Fread read: %d bytes, but you requested: %d"), BytesRead, Bytes2Read);
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Not enough memory to allocate Buffer in BitBuffer"));
+                Log(Log_ERROR, __func__, U8("Couldn't allocate BitBuffer's buffer"));
             }
         } else if (BitI == NULL) {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
@@ -539,7 +539,7 @@ extern "C" {
     BitOutput *BitOutput_Init(void) {
         BitOutput *BitO = calloc(1, sizeof(BitOutput));
         if (BitO == NULL) {
-            Log(Log_ERROR, __func__, U8("Not enough memory to allocate this instance of BitOutput"));
+            Log(Log_ERROR, __func__, U8("Couldn't allocate BitOutput"));
         }
         return BitO;
     }
