@@ -1,3 +1,11 @@
+/*!
+ @header    StringIO.h
+ @author    Marcus Johnson aka BumbleBritches57
+ @copyright 2017+
+ @version   0.8.0
+ @brief     This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
+ */
+
 #include <stdint.h>                   /* Included for u/intX_t */
 
 #include "Macros.h"                   /* Included for bool and Yes/No macros */
@@ -10,14 +18,6 @@
 #ifdef  __cplusplus
 extern  "C" {
 #endif
-    
-    /*!
-     @header    StringIO.h
-     @author    Marcus Johnson aka BumbleBritches57
-     @copyright 2017+
-     @version   0.8.0
-     @brief     This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
-     */
     
     typedef uint_least8_t   UTF8;
     typedef uint_least16_t  UTF16;
@@ -49,6 +49,10 @@ extern  "C" {
                                 UTF16LowSurrogateEnd                 = 0xDFFF,
                                 InvalidCodePointReplacementCharacter = 0xFFFD,
                                 UnicodeMaxCodePoint                  = 0x10FFFF,
+                                UTF16MaxCodePoint                    = 0xFFFF,
+                                UTF16SurrogatePairModDividend        = 0x400,
+                                UTF16SurrogatePairStart              = 0x10000,
+                                UnicodeNULLTerminator                = 0x0,
     } StringIOCommon;
     
     typedef enum UnicodeCodePointTypes {
@@ -185,9 +189,9 @@ extern  "C" {
     void                  UTF32_ConvertByteOrder(UTF32 *String2Convert, UnicodeByteOrder OutputByteOrder);
     
     /*!
-     @abstract                             "Converts string to use precomposed forms when possible, otherwise it orders the combining codepoints in lexiographic order".
+     @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
      @remark                               "The string is reallocated at the end to remove unused space".
-     @param               String2Normalize "The sring to be normalized".
+     @param               String2Normalize "The string to be normalized".
      */
     void                  UTF32_NormalizeString(UTF32 *String2Normalize);
     
@@ -198,20 +202,58 @@ extern  "C" {
     void                  UTF32_CaseFoldString(UTF32 *String2CaseFold);
     
     /*!
-     @abstract                             "Extracts a substring from String starting at position Start and ending at position End".
+     @abstract                             "Finds a substring within string, starting at codepoint Offset, and ending at Offset + Length".
+     @remark                               "We do NOT casefold, or normalize the String or SubString, that's your job".
+     @param               String           "The string to search for SubString in".
+     @param               SubString        "The SubString to find in String".
+     @param               Offset           "Where in the string should we start looking for the substring"?
+     @param               Length           "How many codepoints should we search for the substring? -1 means all codepoints".
+     @return                               "Returns the offset of the start of the substring in String, or -1 if a match wasn't found.".
      */
-    UTF32                *UTF32_ExtractSubstring(UTF32 *String, uint64_t Start, uint64_t End);
+    int64_t               UTF32_FindSubString(UTF32 *String, UTF32 *SubString, uint64_t Offset, int64_t Length);
     
     /*!
-     @abstract                             "Returns the position of the first codepoint in the substring".
+     @abstract                             "Extracts a SubString from String".
+     @param               String           "The string to extract from".
+     @param               Offset           "The CodePoint to start extracting from".
+     @param               Length           "The number of codepoints to extract".
      */
-    uint64_t              UTF32_FindSubstring(UTF32 *String, UTF32 *SubString);
+    UTF32                *UTF32_ExtractSubString(UTF32 *String, uint64_t Offset, uint64_t Length);
+    
+    /*!
+     @abstract                             "Replaces a section in String starting at Offset and ending at Offset + Length with Replacement".
+     @param               String           "The string to edit".
+     @param               Replacement      "The string to splice in".
+     @param               Offset           "Where to start replacing String with Replacement".
+     @param               Length           "The number of codepoints to replace, can be more or less than Replacement".
+     */
+    UTF32                *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Extracts a number from a string".
-     @param               String           "The sring to extract a number from".
+     @param               String           "The string to extract a number from".
      */
     int64_t               UTF32_String2Integer(UTF32 *String);
+    
+    /*!
+     @abstract                             "Converts an integer to a string".
+     @param               UpperCase        "If the Base is Hex, should the output string be upper case"?
+     @param               Base             "The base to output the integer in".
+     @param               Integer2Convert  "The number to convert into a string".
+     */
+    UTF32                *UTF32_Integer2String(const Number2StringBases Base, const bool UpperCase, int64_t Integer2Convert);
+    
+    /*!
+     @abstract                             "Converts a string to a double, replaces strtod and atof".
+     @param               String           "The string composed of a decimal number to convert to a decimal".
+     */
+    double                String2Decimal(UTF32 *String);
+    
+    /*!
+     @abstract                             "Converts a double to a string, replaces strtod and atof".
+     @param               Decimal          "The decimal number to convert to a string".
+     */
+    UTF32                *Decimal2String(double Decimal);
     
     /* High level functions */
     bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2, bool Normalize, bool CaseInsensitive);
@@ -221,11 +263,11 @@ extern  "C" {
     /*!
      @abstract                             "Compares String1 and String2 for equilivence".
      */
-    bool                  CompareStrings32(UTF32 *String1, UTF32 *String2);
+    bool                  UTF32_Compare(UTF32 *String1, UTF32 *String2);
     
-    UTF32                *FormatString32(const uint64_t VarArgCount, UTF32 *Format, ...);
+    UTF32                *UTF32_FormatString(const uint64_t VarArgCount, UTF32 *Format, ...);
     
-#define                   FormatString(Format, ...) FormatString32(CountVariadicArguments(__VA_ARGS__), Format, __VA_ARGS__)
+#define                   FormatString(Format, ...) UTF32_FormatString(CountVariadicArguments(__VA_ARGS__), Format, __VA_ARGS__)
     
 #ifdef  __cplusplus
 }
