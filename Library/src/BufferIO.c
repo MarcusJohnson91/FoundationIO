@@ -26,9 +26,9 @@ extern "C" {
     
     /* Start BitBuffer section */
     typedef struct BitBuffer {
-        uint8_t              *Buffer;
-        uint64_t              NumBits;
-        uint64_t              BitOffset;
+        uint64_t   NumBits;
+        uint64_t   BitOffset;
+        uint8_t   *Buffer;
     } BitBuffer;
     
     BitBuffer *BitBuffer_Init(const uint64_t BitBufferSize) {
