@@ -19,6 +19,7 @@
 		2CB7753D203681C000C0F8DB /* CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CB77536203681C000C0F8DB /* CommandLineIO.c */; };
 		2CB7753E203681C000C0F8DB /* Log.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CB77537203681C000C0F8DB /* Log.c */; };
 		2CB77540203681C000C0F8DB /* GUUID.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CB77539203681C000C0F8DB /* GUUID.c */; };
+		2CBCBF86205861AF006AC334 /* StringIOTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CBCBF85205861AF006AC334 /* StringIOTables.h */; };
 		2CC59FE6203749770045AE12 /* StringIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CB77538203681C000C0F8DB /* StringIO.c */; };
 		2CC59FE8203775250045AE12 /* BitIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CB7753A203681C000C0F8DB /* BitIO.c */; };
 /* End PBXBuildFile section */
@@ -39,6 +40,7 @@
 		2CB77538203681C000C0F8DB /* StringIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = StringIO.c; path = ../libFoundationIO/src/StringIO.c; sourceTree = "<group>"; };
 		2CB77539203681C000C0F8DB /* GUUID.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GUUID.c; path = ../libFoundationIO/src/GUUID.c; sourceTree = "<group>"; };
 		2CB7753A203681C000C0F8DB /* BitIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BitIO.c; path = ../libFoundationIO/src/BitIO.c; sourceTree = "<group>"; };
+		2CBCBF85205861AF006AC334 /* StringIOTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StringIOTables.h; path = ../libFoundationIO/include/StringIOTables.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +76,7 @@
 				2CB775272036819500C0F8DB /* Macros.h */,
 				2CB7752C2036819600C0F8DB /* Math.h */,
 				2CB775292036819500C0F8DB /* StringIO.h */,
+				2CBCBF85205861AF006AC334 /* StringIOTables.h */,
 				2CB775282036819500C0F8DB /* BitIO.h */,
 				2CB775262036819500C0F8DB /* CommandLineIO.h */,
 				2CB7752B2036819600C0F8DB /* Log.h */,
@@ -112,6 +115,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2CBCBF86205861AF006AC334 /* StringIOTables.h in Headers */,
 				2CB7752E2036819600C0F8DB /* Macros.h in Headers */,
 				2CB775332036819600C0F8DB /* Math.h in Headers */,
 				2CB775302036819600C0F8DB /* StringIO.h in Headers */,
@@ -264,7 +268,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = "-funsigned-char";
+				OTHER_CFLAGS = (
+					"-funsigned-char",
+					"-Wpadding",
+				);
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 				VALID_ARCHS = "arm64 x86_64";
@@ -341,7 +348,10 @@
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_CFLAGS = "-funsigned-char";
+				OTHER_CFLAGS = (
+					"-funsigned-char",
+					"-Wpadding",
+				);
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 				VALID_ARCHS = "arm64 x86_64";
