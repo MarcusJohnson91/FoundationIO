@@ -36,8 +36,9 @@ extern  "C" {
 #endif
     
     typedef enum StringIOCommon {
-                                UTF8BOMSize                          = 3,
-                                UTF1632BOMSize                       = 1,
+                                UTF8BOMSizeInCodeUnits               = 3,
+                                UTF8BOMSizeInCodePoints              = 1,
+                                UTF1632BOMSizeInCodePoints           = 1,
                                 UnicodeNULLTerminatorSize            = 1,
                                 UTF16LE                              = 0xFFFE,
                                 UTF16BE                              = 0xFEFF,

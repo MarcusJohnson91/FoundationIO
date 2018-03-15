@@ -147,17 +147,19 @@ extern  "C" {
     }
     
     UTF32 *UTF8_Decode(UTF8 *String) {
-        // We should make sure we don't decode anything in the surrogate block, between UTF16HighSurrogateEnd to UTF16HighSurrogateStart or DFFF to DC00
         uint8_t  CodePointSize      = 0;
         uint64_t CodeUnitNum        = 0ULL;
         uint64_t CodePoint          = 0ULL;
         UTF32   *DecodedString      = NULL;
         if (String != NULL) {
-            uint64_t NumCodePoints  = UTF1632BOMSize + UTF8_GetSizeInCodePoints(String) + UnicodeNULLTerminatorSize;
+            uint64_t NumCodePoints  = UTF1632BOMSizeInCodePoints + UTF8_GetSizeInCodePoints(String) + UnicodeNULLTerminatorSize;
+            if (String[0] == 0xEF && String[1] == 0xBB && String[2] == 0xBF) { // We need to remove the BOM, and subtract it's size from the Num codepoints
+                NumCodePoints      -= UTF8BOMSizeInCodePoints;
+                CodeUnitNum        += UTF8BOMSizeInCodeUnits;
+            }
             DecodedString           = calloc(NumCodePoints, sizeof(UTF32));
             if (DecodedString != NULL) {
                 do {
-                    // Get the number of codepoints contained in the UTF8, then allocate that much memory, then decode.
                     if (CodePoint == 0) {
                         // set the Unicode BOM
                         if (GlobalByteOrder == LSByteFirst) {
@@ -166,7 +168,7 @@ extern  "C" {
                             DecodedString[0] = UTF32BE;
                         }
                     }
-                    switch (CodePointSize) {
+                    switch (UTF8_GetCodeUnitSize(String[CodeUnitNum])) {
                         case 1:
                             DecodedString[CodePoint] =  String[CodeUnitNum - 1];
                             CodeUnitNum             += 1;
@@ -197,8 +199,7 @@ extern  "C" {
                         DecodedString[CodePoint]     = InvalidCodePointReplacementCharacter;
                         Log(Log_ERROR, __func__, U8("Codepoint U+%06X is invalid, overlaps Surrogate Pair Block, replaced with U+FFFD"), CodePoint);
                     }
-                    if (GlobalByteOrder == LSByteFirst) { // The string byte order does not match the main machines, we need to swap
-                        // Swap the endian as we encode
+                    if (GlobalByteOrder == LSByteFirst) {
                         DecodedString[CodePoint]     = SwapEndian32(String[CodePoint]);
                     }
                 } while (String[CodeUnitNum] != UnicodeNULLTerminator);
@@ -219,7 +220,7 @@ extern  "C" {
         uint64_t CodeUnitNum                           = 0ULL;
         UTF8    *EncodedString                         = NULL;
         if (String != NULL) {
-            uint64_t UTF8CodeUnits                     = UnicodeNULLTerminatorSize + UTF32_GetSizeInUTF8CodeUnits(String) + (IncludeBOM == true ? UTF8BOMSize : 0);
+            uint64_t UTF8CodeUnits                     = UnicodeNULLTerminatorSize + UTF32_GetSizeInUTF8CodeUnits(String) + (IncludeBOM == true ? UTF8BOMSizeInCodeUnits : 0);
             EncodedString                              = calloc(UTF8CodeUnits, sizeof(UTF8));
             if (EncodedString != NULL) {
                 do {
@@ -229,7 +230,8 @@ extern  "C" {
                     if (CodeUnitNum == 0 && IncludeBOM == Yes) {
                         EncodedString[CodeUnitNum]      = 0xEF;
                         EncodedString[CodeUnitNum += 1] = 0xBB;
-                        EncodedString[CodeUnitNum += 1] = 0xBF;
+                        EncodedString[CodeUnitNum += 2] = 0xBF;
+                        CodeUnitNum                    += UTF8BOMSizeInCodeUnits;
                     }
                     if (String[CodePoint] <= 0x7F) {
                         EncodedString[CodeUnitNum]      = String[CodePoint];
@@ -311,7 +313,7 @@ extern  "C" {
         UTF16   *EncodedString                         = NULL;
         if (String != NULL) {
             uint64_t CodeUnitNum                       = 0ULL;
-            uint64_t UTF16NumCodeUnits                 = UTF1632BOMSize + UTF32_GetSizeInUTF16CodeUnits(String) + UnicodeNULLTerminatorSize;
+            uint64_t UTF16NumCodeUnits                 = UTF1632BOMSizeInCodePoints + UTF32_GetSizeInUTF16CodeUnits(String) + UnicodeNULLTerminatorSize;
             EncodedString                              = calloc(UTF16NumCodeUnits, sizeof(UTF16));
             if (EncodedString != NULL) {
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < UTF16NumCodeUnits; CodeUnit++) {
@@ -597,7 +599,7 @@ extern  "C" {
         float    Mantissa2    = Mantissa;
         
         // Ok now we just need to get the strings size
-        uint64_t StringSize   = UTF1632BOMSize; // 1 to account for the BOM
+        uint64_t StringSize   = UTF1632BOMSizeInCodePoints; // 1 to account for the BOM
         if (Sign == -1) {
             StringSize       += 1;
         }
@@ -664,7 +666,7 @@ extern  "C" {
     
     UTF32 *UTF32_ExtractSubString(UTF32 *String, uint64_t Offset, uint64_t Length) {
         uint64_t  StringSize                            = UTF32_GetSizeInCodePoints(String);
-        uint64_t  ExtractedStringSize                   = Length + UTF1632BOMSize + UnicodeNULLTerminatorSize;
+        uint64_t  ExtractedStringSize                   = Length + UTF1632BOMSizeInCodePoints + UnicodeNULLTerminatorSize;
         UTF32    *ExtractedString                       = NULL;
         if (String != NULL && StringSize >= Length + Offset) {
             ExtractedString                             = calloc(ExtractedStringSize, sizeof(UTF32));
