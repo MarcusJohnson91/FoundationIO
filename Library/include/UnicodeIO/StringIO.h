@@ -266,6 +266,13 @@ extern  "C" {
      */
     bool                  UTF32_Compare(UTF32 *String1, UTF32 *String2);
     
+    /*!
+     @abstract                             "Removes all whitespace from the given string, from the beginning, end, and in the middle".
+     @param               String           "The string to strip".
+     @return                               "Returns the stripped string".
+     */
+    UTF32                *UTF32_StripWhiteSpace(UTF32 *String);
+    
     UTF32                *UTF32_FormatString(const uint64_t VarArgCount, UTF32 *Format, ...);
     
 #define                   FormatString(Format, ...) UTF32_FormatString(CountVariadicArguments(__VA_ARGS__), Format, __VA_ARGS__)

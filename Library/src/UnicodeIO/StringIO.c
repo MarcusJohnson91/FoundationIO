@@ -6,8 +6,7 @@
 
 #include "../include/Macros.h"         /* Included for NewLineWithNULLSize */
 #include "../include/Math.h"           /* Included for Integer functions */
-#include "../include/StringIO.h"       /* Included for UTF8 */
-#include "../include/StringIOTables.h" /* Included for the tables */
+#include "../include/StringIOTables.h" /* Included for the tables, and StringIO.h */
 #include "../include/Log.h"            /* Included for error logging */
 
 #ifdef  __cplusplus
@@ -471,18 +470,29 @@ extern  "C" {
         return StringsMatch;
     }
     
-    UTF32 *UTF32_PruneWhitespace(UTF32 *String) { // Prune leading, trailing, and in-between whitespace
-        uint64_t CodePoint       = 0ULL;
-        uint64_t ValidCodePoints = 0ULL;
-        UTF32   *StrippedString  = NULL;
+    UTF32 *UTF32_StripWhiteSpace(UTF32 *String) {
+        uint64_t CodePoint                                    = 0ULL;
+        uint64_t StrippedCodePoint                            = 0ULL;
+        uint64_t ValidCodePoints                              = 0ULL + UTF1632BOMSizeInCodePoints + UnicodeNULLTerminatorSize;
+        UTF32   *StrippedString                               = NULL;
         if (String != NULL) {
             do {
-                for (uint64_t Whitespace = 0ULL; Whitespace < 0; Whitespace++) {
+                for (uint64_t Whitespace = 0ULL; Whitespace < WhiteSpaceTableSize; Whitespace++) {
                     if (String[CodePoint] != WhiteSpaceTable[Whitespace] && String[CodePoint] != InvalidCodePointReplacementCharacter) {
-                        ValidCodePoints += 1;
+                        ValidCodePoints                      += 1;
                     }
                 }
-            } while (String[CodePoint] != UnicodeNULLTerminator);
+            } while (String[CodePoint] != UnicodeNULLTerminatorSize && String[CodePoint] != InvalidCodePointReplacementCharacter);
+            StrippedString                                    = calloc(ValidCodePoints, sizeof(UTF32));
+            if (StrippedString != NULL) {
+                do {
+                    for (uint64_t Whitespace = 0ULL; Whitespace < WhiteSpaceTableSize; Whitespace++) {
+                        if (String[CodePoint] != WhiteSpaceTable[Whitespace]) {
+                            StrippedString[StrippedCodePoint] = String[CodePoint];
+                        }
+                    }
+                } while (String[CodePoint] != UnicodeNULLTerminatorSize && String[CodePoint] != InvalidCodePointReplacementCharacter);
+            }
         }
         return StrippedString;
     }

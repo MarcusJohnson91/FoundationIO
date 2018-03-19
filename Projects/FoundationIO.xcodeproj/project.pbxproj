@@ -40,7 +40,7 @@
 		2CB77538203681C000C0F8DB /* StringIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = StringIO.c; path = ../libFoundationIO/src/StringIO.c; sourceTree = "<group>"; };
 		2CB77539203681C000C0F8DB /* GUUID.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GUUID.c; path = ../libFoundationIO/src/GUUID.c; sourceTree = "<group>"; };
 		2CB7753A203681C000C0F8DB /* BitIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BitIO.c; path = ../libFoundationIO/src/BitIO.c; sourceTree = "<group>"; };
-		2CBCBF85205861AF006AC334 /* StringIOTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StringIOTables.h; path = ../libFoundationIO/include/StringIOTables.h; sourceTree = "<group>"; };
+		2CBCBF85205861AF006AC334 /* StringIOTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = StringIOTables.h; path = ../libFoundationIO/include/StringIOTables.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
