@@ -452,19 +452,35 @@ extern  "C" {
     }
     
     bool UTF16_Compare(UTF16 *String1, UTF16 *String2, bool Normalize, bool CaseInsensitive) {
-        bool StringsMatch       = No;
+        bool StringsMatch          = No;
         if (String1 != NULL && String2 != NULL) {
-            UTF32 *String1UTF32 = UTF16_Decode(String1);
-            UTF32 *String2UTF32 = UTF16_Decode(String2);
-            if (Normalize == Yes) {
-                UTF32_NormalizeString(String1UTF32);
-                UTF32_NormalizeString(String2UTF32);
+            UTF32 *String1UTF32    = UTF16_Decode(String1);
+            UTF32 *String2UTF32    = UTF16_Decode(String2);
+            if (Normalize == Yes && CaseInsensitive == Yes) {
+                UTF32 *Normalized1 = UTF32_NormalizeString(String1UTF32);
+                UTF32 *Normalized2 = UTF32_NormalizeString(String2UTF32);
+                UTF32 *CaseFolded1 = UTF32_CaseFoldString(Normalized1);
+                UTF32 *CaseFolded2 = UTF32_CaseFoldString(Normalized2);
+                StringsMatch       = UTF32_Compare(CaseFolded1, CaseFolded2);
+                free(Normalized1);
+                free(Normalized2);
+                free(CaseFolded1);
+                free(CaseFolded2);
+            } else if (Normalize == Yes && CaseInsensitive == No) {
+                UTF32 *Normalized1 = UTF32_NormalizeString(String1UTF32);
+                UTF32 *Normalized2 = UTF32_NormalizeString(String2UTF32);
+                StringsMatch       = UTF32_Compare(Normalized1, Normalized2);
+                free(Normalized1);
+                free(Normalized2);
+            } else if (Normalize == No && CaseInsensitive == Yes) {
+                UTF32 *CaseFolded1 = UTF32_CaseFoldString(String1UTF32);
+                UTF32 *CaseFolded2 = UTF32_CaseFoldString(String2UTF32);
+                StringsMatch       = UTF32_Compare(CaseFolded1, CaseFolded2);
+                free(CaseFolded1);
+                free(CaseFolded2);
             }
-            if (CaseInsensitive == Yes) {
-                UTF32_CaseFoldString(String1UTF32);
-                UTF32_CaseFoldString(String2UTF32);
-            }
-            StringsMatch        = UTF32_Compare(String1UTF32, String2UTF32);
+            free(String1UTF32);
+            free(String2UTF32);
         } else if (String1 == NULL) {
             Log(Log_ERROR, __func__, U8("String1 Pointer is NULL"));
         } else if (String2 == NULL) {
