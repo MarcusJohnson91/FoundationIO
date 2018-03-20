@@ -194,13 +194,14 @@ extern  "C" {
      @remark                               "The string is reallocated at the end to remove unused space".
      @param               String2Normalize "The string to be normalized".
      */
-    void                  UTF32_NormalizeString(UTF32 *String2Normalize);
+    UTF32                *UTF32_NormalizeString(UTF32 *String2Normalize);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
      @param               String2CaseFold  "The string to be casefolded".
+     @return                               "Returns the case folded string".
      */
-    void                  UTF32_CaseFoldString(UTF32 *String2CaseFold);
+    UTF32                *UTF32_CaseFoldString(UTF32 *String2CaseFold);
     
     /*!
      @abstract                             "Finds a substring within string, starting at codepoint Offset, and ending at Offset + Length".
