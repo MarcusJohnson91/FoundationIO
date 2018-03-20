@@ -1,8 +1,6 @@
 #include <stdarg.h>                    /* Included for va_start, va_end */
 #include <stdint.h>                    /* Included for u/intX_t */
 #include <stdlib.h>                    /* Included for calloc, and free */
-#include <float.h>                     /* Included for */
-#include <limits.h>                    /* Included for */
 
 #include "../include/Macros.h"         /* Included for NewLineWithNULLSize */
 #include "../include/Math.h"           /* Included for Integer functions */
@@ -380,40 +378,69 @@ extern  "C" {
         }
     }
     
-    void UTF32_NormalizeString(UTF32 *String2Normalize) {
-        uint64_t CodePoint    = 1ULL; // Skip the BOM
-        if (String2Normalize != NULL) {
-            do {
-            } while (String2Normalize[CodePoint] != UnicodeNULLTerminator);
+    static UTF32 *UTF32_Compose(UTF32 *String) {
+        if (String != NULL) {
+            // Compose the bitch.
         } else {
-            Log(Log_ERROR, __func__, U8("String2Normalize Pointer is NULL"));
+            Log(Log_ERROR, __func__, "String Pointer is NULL");
         }
+        return NULL;
     }
     
-    void UTF32_CaseFoldString(UTF32 *String) {
-        uint64_t CodePoint = 1ULL;
+    static UTF32 *UTF32_Decompose(UTF32 *String, const bool Compatibility) {
+        if (String != NULL && (Compatibility == 0 || Compatibility == 1)) {
+            
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return NULL;
+    }
+    
+    UTF32 *UTF32_CaseFoldString(UTF32 *String) {
+        uint64_t CodePoint        = UTF1632BOMSizeInCodePoints;
+        UTF32   *CaseFoldedString = NULL;
         if (String != NULL) {
             do {
+                for (uint64_t CaseFoldCodePoint = 0; CaseFoldCodePoint < CaseFoldTableSize; CaseFoldCodePoint++) {
+                    if (String[CodePoint] == *CaseFoldTable[CaseFoldCodePoint][0]) {
+                        CaseFoldedString = UTF32_ReplaceSubString(String, *CaseFoldTable[CaseFoldCodePoint][1], CaseFoldCodePoint, 1);
+                    }
+                }
             } while (String[CodePoint] != UnicodeNULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
+        return CaseFoldedString;
     }
     
     bool UTF8_Compare(UTF8 *String1, UTF8 *String2, bool Normalize, bool CaseInsensitive) {
-        bool StringsMatch       = No;
+        bool StringsMatch          = No;
         if (String1 != NULL && String2 != NULL) {
-            UTF32 *String1UTF32 = UTF8_Decode(String1);
-            UTF32 *String2UTF32 = UTF8_Decode(String2);
-            if (Normalize == Yes) {
-                UTF32_NormalizeString(String1UTF32);
-                UTF32_NormalizeString(String2UTF32);
+            UTF32 *String1UTF32    = UTF8_Decode(String1);
+            UTF32 *String2UTF32    = UTF8_Decode(String2);
+            if (Normalize == Yes && CaseInsensitive == Yes) {
+                UTF32 *Normalized1 = UTF32_NormalizeString(String1UTF32);
+                UTF32 *Normalized2 = UTF32_NormalizeString(String2UTF32);
+                UTF32 *CaseFolded1 = UTF32_CaseFoldString(Normalized1);
+                UTF32 *CaseFolded2 = UTF32_CaseFoldString(Normalized2);
+                StringsMatch       = UTF32_Compare(CaseFolded1, CaseFolded2);
+                free(Normalized1);
+                free(Normalized2);
+                free(CaseFolded1);
+                free(CaseFolded2);
+            } else if (Normalize == Yes && CaseInsensitive == No) {
+                UTF32 *Normalized1 = UTF32_NormalizeString(String1UTF32);
+                UTF32 *Normalized2 = UTF32_NormalizeString(String2UTF32);
+                StringsMatch       = UTF32_Compare(Normalized1, Normalized2);
+                free(Normalized1);
+                free(Normalized2);
+            } else if (Normalize == No && CaseInsensitive == Yes) {
+                UTF32 *CaseFolded1 = UTF32_CaseFoldString(String1UTF32);
+                UTF32 *CaseFolded2 = UTF32_CaseFoldString(String2UTF32);
+                StringsMatch       = UTF32_Compare(CaseFolded1, CaseFolded2);
+                free(CaseFolded1);
+                free(CaseFolded2);
             }
-            if (CaseInsensitive == Yes) {
-                UTF32_CaseFoldString(String1UTF32);
-                UTF32_CaseFoldString(String2UTF32);
-            }
-            StringsMatch        = UTF32_Compare(String1UTF32, String2UTF32);
             free(String1UTF32);
             free(String2UTF32);
         } else if (String1 == NULL) {
@@ -495,6 +522,24 @@ extern  "C" {
             }
         }
         return StrippedString;
+    }
+    
+    UTF32 *UTF32_Normalize_NFC(UTF32 *String) {
+        UTF32 *Decomposed = UTF32_Decompose(String, No);
+        return UTF32_Compose(Decomposed);
+    }
+    
+    UTF32 *UTF32_Normalize_NFKC(UTF32 *String) {
+        UTF32 *Decomposed = UTF32_Decompose(String, Yes);
+        return UTF32_Compose(Decomposed);
+    }
+    
+    UTF32 *UTF32_Normalize_NFD(UTF32 *String) {
+        return UTF32_Decompose(String, No);
+    }
+    
+    UTF32 *UTF32_Normalize_NFKD(UTF32 *String) {
+        return UTF32_Decompose(String, Yes);
     }
     
     int64_t UTF32_String2Integer(UTF32 *String) {
@@ -728,38 +773,42 @@ extern  "C" {
         return ReplacedString;
     }
     
-    UTF32 *UTF32_FormatString(const uint64_t VarArgCount, UTF32 *Format, ...) {
-        /* So, first we need to break the Format string into the various printf specifiers, which start with a percent symbol */
-        
-        /* Get the size of the format string in CodePoints, normalize the string, then start counting the format specifiers */
-        
-        uint64_t  CodePoint                   = 0ULL;
-        uint64_t  CurrentSpecifier            = 0ULL;
-        uint8_t   CurrentFormatSpecifierTable = 0ULL;
-        uint64_t *SpecifierOffset             = calloc(VarArgCount, sizeof(uint64_t));
-        uint64_t *SpecifierSize               = calloc(VarArgCount, sizeof(uint64_t));
-        
-        // %05d means the format specifier is decimal, with 5 digits, with leading zeros if nessicary.
-        if (Format != NULL) {
-            do {
-                if (Format[CodePoint] == '%') {
-                    CurrentSpecifier += 1;
-                    /* Ok, so we need to get the size of this specifier, and it's offset */
-                    /* Compare the number of format specifier arguments to the VarArgCount, if VarArgCount is less than the number of found specifiers, ignore the last ones.
-                     
-                     Or, just count up until we reach VarArgCount */
-                    SpecifierOffset[CurrentSpecifier] = CodePoint;
-                    do {
-                        
-                    } while (Format[CodePoint + 1] == FormatSpecifierCodePoints[CurrentFormatSpecifierTable]);
-                }
-                CodePoint += 1;
-            } while (Format[CodePoint] != UnicodeNULLTerminator);
-        } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        }
-        return NULL;
-    }
+    /*
+     UTF32 *UTF32_FormatString(const uint64_t VarArgCount, UTF32 *Format, ...) {
+     /* So, first we need to break the Format string into the various printf specifiers, which start with a percent symbol
+     
+     Get the size of the format string in CodePoints, normalize the string, then start counting the format specifiers */
+    /*
+     uint64_t  CodePoint                   = 0ULL;
+     uint64_t  CurrentSpecifier            = 0ULL;
+     uint8_t   CurrentFormatSpecifierTable = 0ULL;
+     uint64_t *SpecifierOffset             = calloc(VarArgCount, sizeof(uint64_t));
+     uint64_t *SpecifierSize               = calloc(VarArgCount, sizeof(uint64_t));
+     
+     // %05d means the format specifier is decimal, with 5 digits, with leading zeros if nessicary.
+     if (Format != NULL) {
+     do {
+     if (Format[CodePoint] == '%') {
+     CurrentSpecifier += 1;
+     /* Ok, so we need to get the size of this specifier, and it's offset
+     Compare the number of format specifier arguments to the VarArgCount, if VarArgCount is less than the number of found specifiers, ignore the last ones.
+     
+     Or, just count up until we reach VarArgCount
+     */
+    /*
+     SpecifierOffset[CurrentSpecifier] = CodePoint;
+     do {
+     
+     } while (Format[CodePoint + 1] == FormatSpecifierCodePoints[CurrentFormatSpecifierTable]);
+     }
+     CodePoint += 1;
+     } while (Format[CodePoint] != UnicodeNULLTerminator);
+     } else {
+     Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+     }
+     return NULL;
+     }
+     */
     
 #ifdef  __cplusplus
 }
