@@ -303,7 +303,7 @@ extern  "C" {
         return DecodedString;
     }
     
-    UTF16 *UTF16_Encode(UTF32 *String, UnicodeByteOrder OutputByteOrder) {
+    UTF16 *UTF16_Encode(UTF32 *String, StringIOByteOrders OutputByteOrder) {
         if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
             GetRuntimeByteBitOrder();
         }
@@ -352,7 +352,7 @@ extern  "C" {
         return EncodedString;
     }
     
-    void UTF16_ConvertByteOrder(UTF16 *String2Convert, UnicodeByteOrder OutputByteOrder) {
+    void UTF16_ConvertByteOrder(UTF16 *String2Convert, StringIOByteOrders OutputByteOrder) {
         uint16_t UTF16ByteOrder                 = String2Convert[0];
         uint64_t CurrentCodeUnit                = 1LL;
         if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
@@ -365,7 +365,7 @@ extern  "C" {
         }
     }
     
-    void UTF32_ConvertByteOrder(UTF32 *String2Convert, UnicodeByteOrder OutputByteOrder) {
+    void UTF32_ConvertByteOrder(UTF32 *String2Convert, StringIOByteOrders OutputByteOrder) {
         if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
             GetRuntimeByteBitOrder();
         }
@@ -378,6 +378,16 @@ extern  "C" {
         }
     }
     
+    static UTF32 *UTF32_ReorderCombiningChars(UTF32 *String) {
+        UTF32 *ReorderedString = NULL;
+        if (String != NULL) {
+            /* The general idea here, is to go over the string and make sure that all of the combining characters are in the right order */
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return ReorderedString;
+    }
+    
     static UTF32 *UTF32_Compose(UTF32 *String) {
         if (String != NULL) {
             // Compose the bitch.
@@ -388,12 +398,20 @@ extern  "C" {
     }
     
     static UTF32 *UTF32_Decompose(UTF32 *String, const bool Compatibility) {
+        uint64_t CodePoint      = UTF1632BOMSizeInCodePoints;
+        UTF32 *DecomposedString = NULL;
         if (String != NULL && (Compatibility == 0 || Compatibility == 1)) {
-            
+            do {
+                for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < DecompositionTableSize; DecomposeCodePoint++) {
+                    if (String[DecomposeCodePoint] == *DecompositionTable[DecomposeCodePoint][0]) {
+                        DecomposedString = UTF32_ReplaceSubString(String, *DecompositionTable[DecomposeCodePoint][1], DecomposeCodePoint, 1);
+                    }
+                }
+            } while (String[CodePoint] != UnicodeNULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return NULL;
+        return DecomposedString;
     }
     
     UTF32 *UTF32_CaseFoldString(UTF32 *String) {
@@ -413,34 +431,24 @@ extern  "C" {
         return CaseFoldedString;
     }
     
-    bool UTF8_Compare(UTF8 *String1, UTF8 *String2, bool Normalize, bool CaseInsensitive) {
+    bool UTF8_Compare(UTF8 *String1, UTF8 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive) {
         bool StringsMatch          = No;
-        if (String1 != NULL && String2 != NULL) {
+        if (String1 != NULL && String2 != NULL && NormalizedForm != UnknownNormalizationForm) {
             UTF32 *String1UTF32    = UTF8_Decode(String1);
             UTF32 *String2UTF32    = UTF8_Decode(String2);
-            if (Normalize == Yes && CaseInsensitive == Yes) {
-                UTF32 *Normalized1 = UTF32_NormalizeString(String1UTF32);
-                UTF32 *Normalized2 = UTF32_NormalizeString(String2UTF32);
-                UTF32 *CaseFolded1 = UTF32_CaseFoldString(Normalized1);
-                UTF32 *CaseFolded2 = UTF32_CaseFoldString(Normalized2);
-                StringsMatch       = UTF32_Compare(CaseFolded1, CaseFolded2);
-                free(Normalized1);
-                free(Normalized2);
+            UTF32 *Normalized1     = UTF32_NormalizeString(String1UTF32, NormalizedForm);
+            UTF32 *Normalized2     = UTF32_NormalizeString(String2UTF32, NormalizedForm);
+            if (CaseInsensitive == Yes) {
+                UTF32 *CaseFolded1     = UTF32_CaseFoldString(Normalized1);
+                UTF32 *CaseFolded2     = UTF32_CaseFoldString(Normalized2);
+                StringsMatch           = UTF32_Compare(CaseFolded1, CaseFolded2);
                 free(CaseFolded1);
                 free(CaseFolded2);
-            } else if (Normalize == Yes && CaseInsensitive == No) {
-                UTF32 *Normalized1 = UTF32_NormalizeString(String1UTF32);
-                UTF32 *Normalized2 = UTF32_NormalizeString(String2UTF32);
-                StringsMatch       = UTF32_Compare(Normalized1, Normalized2);
-                free(Normalized1);
-                free(Normalized2);
-            } else if (Normalize == No && CaseInsensitive == Yes) {
-                UTF32 *CaseFolded1 = UTF32_CaseFoldString(String1UTF32);
-                UTF32 *CaseFolded2 = UTF32_CaseFoldString(String2UTF32);
-                StringsMatch       = UTF32_Compare(CaseFolded1, CaseFolded2);
-                free(CaseFolded1);
-                free(CaseFolded2);
+            } else {
+                StringsMatch           = UTF32_Compare(Normalized1, Normalized2);
             }
+            free(Normalized1);
+            free(Normalized2);
             free(String1UTF32);
             free(String2UTF32);
         } else if (String1 == NULL) {
@@ -451,34 +459,24 @@ extern  "C" {
         return StringsMatch;
     }
     
-    bool UTF16_Compare(UTF16 *String1, UTF16 *String2, bool Normalize, bool CaseInsensitive) {
+    bool UTF16_Compare(UTF16 *String1, UTF16 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive) {
         bool StringsMatch          = No;
-        if (String1 != NULL && String2 != NULL) {
+        if (String1 != NULL && String2 != NULL && NormalizedForm != UnknownNormalizationForm) {
             UTF32 *String1UTF32    = UTF16_Decode(String1);
             UTF32 *String2UTF32    = UTF16_Decode(String2);
-            if (Normalize == Yes && CaseInsensitive == Yes) {
-                UTF32 *Normalized1 = UTF32_NormalizeString(String1UTF32);
-                UTF32 *Normalized2 = UTF32_NormalizeString(String2UTF32);
-                UTF32 *CaseFolded1 = UTF32_CaseFoldString(Normalized1);
-                UTF32 *CaseFolded2 = UTF32_CaseFoldString(Normalized2);
-                StringsMatch       = UTF32_Compare(CaseFolded1, CaseFolded2);
-                free(Normalized1);
-                free(Normalized2);
+            UTF32 *Normalized1     = UTF32_NormalizeString(String1UTF32, NormalizedForm);
+            UTF32 *Normalized2     = UTF32_NormalizeString(String2UTF32, NormalizedForm);
+            if (CaseInsensitive == Yes) {
+                UTF32 *CaseFolded1     = UTF32_CaseFoldString(Normalized1);
+                UTF32 *CaseFolded2     = UTF32_CaseFoldString(Normalized2);
+                StringsMatch           = UTF32_Compare(CaseFolded1, CaseFolded2);
                 free(CaseFolded1);
                 free(CaseFolded2);
-            } else if (Normalize == Yes && CaseInsensitive == No) {
-                UTF32 *Normalized1 = UTF32_NormalizeString(String1UTF32);
-                UTF32 *Normalized2 = UTF32_NormalizeString(String2UTF32);
-                StringsMatch       = UTF32_Compare(Normalized1, Normalized2);
-                free(Normalized1);
-                free(Normalized2);
-            } else if (Normalize == No && CaseInsensitive == Yes) {
-                UTF32 *CaseFolded1 = UTF32_CaseFoldString(String1UTF32);
-                UTF32 *CaseFolded2 = UTF32_CaseFoldString(String2UTF32);
-                StringsMatch       = UTF32_Compare(CaseFolded1, CaseFolded2);
-                free(CaseFolded1);
-                free(CaseFolded2);
+            } else {
+                StringsMatch           = UTF32_Compare(Normalized1, Normalized2);
             }
+            free(Normalized1);
+            free(Normalized2);
             free(String1UTF32);
             free(String2UTF32);
         } else if (String1 == NULL) {
@@ -540,22 +538,24 @@ extern  "C" {
         return StrippedString;
     }
     
-    UTF32 *UTF32_Normalize_NFC(UTF32 *String) {
-        UTF32 *Decomposed = UTF32_Decompose(String, No);
-        return UTF32_Compose(Decomposed);
-    }
-    
-    UTF32 *UTF32_Normalize_NFKC(UTF32 *String) {
-        UTF32 *Decomposed = UTF32_Decompose(String, Yes);
-        return UTF32_Compose(Decomposed);
-    }
-    
-    UTF32 *UTF32_Normalize_NFD(UTF32 *String) {
-        return UTF32_Decompose(String, No);
-    }
-    
-    UTF32 *UTF32_Normalize_NFKD(UTF32 *String) {
-        return UTF32_Decompose(String, Yes);
+    UTF32 *UTF32_NormalizeString(UTF32 *String2Normalize, StringIONormalizationForms NormalizedForm) {
+        UTF32 *NormalizedString = NULL;
+        if (String2Normalize != NULL && NormalizedForm != UnknownNormalizationForm) {
+            if (NormalizedForm == NormalizationFormC) {
+                NormalizedString  = UTF32_Compose(UTF32_Decompose(String2Normalize, No));
+            } else if (NormalizedForm == NormalizationFormKC) {
+                NormalizedString  = UTF32_Compose(UTF32_Decompose(String2Normalize, Yes));
+            } else if (NormalizedForm == NormalizationFormD) {
+                NormalizedString  = UTF32_Decompose(String2Normalize, No);
+            } else if (NormalizedForm == NormalizationFormKD) {
+                NormalizedString  = UTF32_Decompose(String2Normalize, Yes);
+            }
+        } else if (String2Normalize == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (NormalizedForm == UnknownNormalizationForm) {
+            Log(Log_ERROR, __func__, U8("Unknown Normalization form"));
+        }
+        return NormalizedString;
     }
     
     int64_t UTF32_String2Integer(UTF32 *String) {
@@ -564,13 +564,11 @@ extern  "C" {
         uint8_t  Base      = 10;
         int64_t  Value     =  0;
         if (String != NULL) {
-            /*
-             for (uint8_t WhiteSpace = 0; WhiteSpace < WhitespaceTableSize; WhiteSpace++) {
-             if (String[CodePoint] == WhitespaceTable[WhiteSpace]) {
-             CodePoint    += 1;
-             }
-             }
-             */
+            for (uint64_t WhiteSpace = 0; WhiteSpace < WhiteSpaceTableSize; WhiteSpace++) {
+                if (String[CodePoint] == WhiteSpaceTable[WhiteSpace]) {
+                    CodePoint    += 1;
+                }
+            }
             if (String[CodePoint] == '0') {
                 if (String[CodePoint + 1] == 'b' || String[CodePoint + 1] == 'B') {
                     Base   = 2;
@@ -599,11 +597,10 @@ extern  "C" {
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        
         return (Sign < 0 ? Value * Sign : Value);
     }
     
-    UTF32 *UTF32_Integer2String(const Number2StringBases Base, const bool UpperCase, int64_t Integer2Convert) {
+    UTF32 *UTF32_Integer2String(const StringIOBases Base, const bool UpperCase, int64_t Integer2Convert) {
         int64_t  Sign            = 0LL;
         int64_t  Num             = Integer2Convert;
         uint8_t  NumDigits       = 0;
@@ -705,12 +702,48 @@ extern  "C" {
     }
     
     uint64_t UTF32_GetStringSizeInGraphemes(UTF32 *String) {
+        uint64_t NumGraphemes  = 0ULL;
+        uint64_t CodePoint     = 0ULL;
         if (String != NULL) {
             // Basically loop over the string counting just codepoints that are not combining codepoints.
+            do {
+                for (uint64_t GraphemeExtension = 0; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
+                    if (String[CodePoint] == GraphemeExtensionTable[GraphemeExtension]) {
+                        NumGraphemes += 1;
+                    }
+                }
+                CodePoint     += 1;
+            } while (String[CodePoint] != UnicodeNULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return 0;
+        return NumGraphemes;
+    }
+    
+    /*
+     I may need to add a function that will find decomposed substrings to be replaced by the composed forms, OR maybe I should just have a table that lists each codepoints combining character class and reorders them, then we can use regular find and replace?
+     */
+    void    UTF32_ReorderString(UTF32 *String) {
+        uint64_t CodePoint        = 0UL;
+        uint32_t CurrentCodePoint = 0UL;
+        if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
+            GetRuntimeByteBitOrder();
+        }
+        if (String != NULL) {
+            // The idea here is to loop over the string, checking if each codepoint is a combining character
+            uint32_t StringByteOrder = String[0];
+            do {
+                if (StringByteOrder == UTF32LE && GlobalByteOrder == MSByteFirst || StringByteOrder == UTF32BE && GlobalByteOrder == LSByteFirst) {
+                    // We need to swap the byte order for each cdepoint
+                    CurrentCodePoint = SwapEndian32(String[CodePoint]);
+                } else {
+                    CurrentCodePoint = String[CodePoint];
+                }
+                // If the current codepoint is a combining codepoint, we need to save the position of the last base character, and move it around based on that.
+            } while (String[CodePoint] != UnicodeNULLTerminator);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
     }
     
     int64_t UTF32_FindSubString(UTF32 *String, UTF32 *SubString, uint64_t Offset, int64_t Length) {
@@ -789,42 +822,61 @@ extern  "C" {
         return ReplacedString;
     }
     
-    /*
-     UTF32 *UTF32_FormatString(const uint64_t VarArgCount, UTF32 *Format, ...) {
-     /* So, first we need to break the Format string into the various printf specifiers, which start with a percent symbol
-     
-     Get the size of the format string in CodePoints, normalize the string, then start counting the format specifiers */
-    /*
-     uint64_t  CodePoint                   = 0ULL;
-     uint64_t  CurrentSpecifier            = 0ULL;
-     uint8_t   CurrentFormatSpecifierTable = 0ULL;
-     uint64_t *SpecifierOffset             = calloc(VarArgCount, sizeof(uint64_t));
-     uint64_t *SpecifierSize               = calloc(VarArgCount, sizeof(uint64_t));
-     
-     // %05d means the format specifier is decimal, with 5 digits, with leading zeros if nessicary.
-     if (Format != NULL) {
-     do {
-     if (Format[CodePoint] == '%') {
-     CurrentSpecifier += 1;
-     /* Ok, so we need to get the size of this specifier, and it's offset
-     Compare the number of format specifier arguments to the VarArgCount, if VarArgCount is less than the number of found specifiers, ignore the last ones.
-     
-     Or, just count up until we reach VarArgCount
-     */
-    /*
-     SpecifierOffset[CurrentSpecifier] = CodePoint;
-     do {
-     
-     } while (Format[CodePoint + 1] == FormatSpecifierCodePoints[CurrentFormatSpecifierTable]);
-     }
-     CodePoint += 1;
-     } while (Format[CodePoint] != UnicodeNULLTerminator);
-     } else {
-     Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-     }
-     return NULL;
-     }
-     */
+    UTF32 *UTF32_FormatString(const uint64_t VarArgCount, UTF32 *Format, ...) {
+        /* So, first we need to break the Format string into the various printf specifiers, which start with a percent symbol
+         
+         Get the size of the format string in CodePoints, normalize the string, then start counting the format specifiers */
+        uint64_t  CodePoint                   = 0ULL;
+        uint64_t  SpecifierStart              = 0ULL;
+        uint64_t  SpecifierEnd                = 0ULL;
+        uint64_t  CurrentSpecifier            = 0ULL;
+        uint8_t   FormatSpecifierIndex        = 0ULL;
+        uint64_t *SpecifierOffset             = calloc(VarArgCount, sizeof(uint64_t));
+        uint64_t *SpecifierSize               = calloc(VarArgCount, sizeof(uint64_t));
+        
+        // %05d means the format specifier is decimal, with 5 digits, with leading zeros if nessicary.
+        
+        /* The general idea is to loop looking for a percent codepoint, then loop until you find a valid format specifier character, everything in between those 2 is the format string. */
+        /* List of Format specifiers:
+         
+         */
+        if (Format != NULL) {
+            do {
+                /* Loop over the string looking for a format specifier start and end point, recording the offset in the string and length of the format specifier when found */
+                if (Format[CodePoint] == '%') {
+                    // Record the location of the
+                    SpecifierStart      = CodePoint;
+                }
+                for (uint8_t FormatSpecifier = 0; FormatSpecifier < FormatSpecifierTableSize; FormatSpecifier++) {
+                    if (Format[CodePoint] == FormatSpecifierTable[FormatSpecifier] && CodePoint > SpecifierStart) {
+                        SpecifierEnd    = CodePoint;
+                    }
+                }
+                CodePoint              += 1;
+            } while (Format[CodePoint] != UnicodeNULLTerminator);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return NULL;
+    }
+    
+    void WriteString(UTF32 *String2Write, FILE *OutputFile) {
+        if (OutputFile != NULL && String2Write != NULL) {
+#if   (FoundationIOTargetOS == POSIXOS)
+            UTF8  *EncodedString = UTF8_Encode(String2Write, No);
+            fputs(EncodedString, OutputFile);
+            free(EncodedString);
+#elif (FoundationIOTargetOS == WindowsOS)
+            UTF16 *EncodedString = UTF16_Encode(String2Write, UseNativeByteOrder);
+            fputws(EncodedString, OutputFile);
+            free(EncodedString);
+#endif
+        } else if (String2Write == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (OutputFile == NULL) {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+    }
     
 #ifdef  __cplusplus
 }
