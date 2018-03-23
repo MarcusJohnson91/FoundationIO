@@ -37,10 +37,6 @@ extern  "C" {
     static unsigned char  GlobalByteOrder = 0;
     static unsigned char  GlobalBitOrder  = 0;
     
-    //#include <locale.h>
-    
-    //extern char *Locale = setlocale(LC_ALL, "en_US.UTF-8");
-    
 #ifndef             UnknownOS
 #define             UnknownOS    0
 #endif
