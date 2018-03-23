@@ -120,11 +120,11 @@ extern   "C" {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate %d CommandLineSwitches"), NumSwitches);
             }
 #if   (FoundationIOTargetOS == POSIXOS)
-            struct winsize *WindowSize = calloc(1, sizeof(struct winsize));
+            struct winsize WindowSize;
             ioctl(0, TIOCGWINSZ, &WindowSize);
-            CLI->ConsoleWidth    = WindowSize->ws_row;
-            CLI->ConsoleHeight   = WindowSize->ws_col;
-            free(WindowSize);
+            CLI->ConsoleWidth    = WindowSize.ws_row;
+            CLI->ConsoleHeight   = WindowSize.ws_col;
+            Log(Log_DEBUG, __func__, U8("WindowWidth: %d, WindowHeight %d"), CLI->ConsoleWidth, CLI->ConsoleHeight);
 #elif (FoundationIOTargetOS == WindowsOS)
             CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
             GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
@@ -369,39 +369,10 @@ extern   "C" {
         return ArgumentSwitch;
     }
     
-    static int64_t GetSubStringsAbsolutePosition(int64_t StartOffset, int64_t StringSize, UTF8 *OptionString, UTF8 *SubString) {
-        int64_t SubStringPosition = -1LL;
-        if (OptionString != NULL && SubString != NULL) {
-            int64_t SubStringSize = UTF8_GetSizeInCodePoints(OptionString);
-            int64_t MatchingChars = 0ULL;
-            for (int64_t Char = StartOffset; Char < StringSize; Char++) {
-                for (int64_t SubChar = 0; SubChar < SubStringSize; SubChar++) {
-                    if (OptionString[Char] == SubString[SubChar]) { // IDK how to specify that the whole substring matches
-                        MatchingChars += 1;
-                        /*
-                         Loop over the string and substring, count the matching characters if you've got X matches and the SubString is X long, you've found the match. simply record the current position - X as the start
-                         */
-                    } else {
-                        MatchingChars = 0;
-                    }
-                    if (MatchingChars == SubStringSize) {
-                        SubStringPosition = (Char + StartOffset) - SubChar;
-                    }
-                }
-            }
-        } else if (OptionString == NULL) {
-            Log(Log_ERROR, __func__, U8("OptionString is NULL"));
-        } else if (SubString == NULL) {
-            Log(Log_ERROR, __func__, U8("SubString is NULL"));
-        }
-        return SubStringPosition;
-    }
-    
     void ParseCommandLineOptions(CommandLineIO *CLI, const uint64_t NumArgs, const UTF8 **Args) {
         if (CLI != NULL && CLI->MinOptions >= 1 && NumArgs >= CLI->MinOptions) {
             /* Ok, so the first thing we need to do is loop over the arguments, and loop over the actual bytes of each argument */
             int32_t  CurrentArgument      = 1LL;
-            
             do {
                 // Extract the first argument as a switch.
                 UTF8 *Argument            = Args[CurrentArgument];
