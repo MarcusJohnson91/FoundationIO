@@ -144,48 +144,48 @@ extern  "C" {
     }
     
     UTF32 *UTF8_Decode(UTF8 *String) {
-        uint8_t  CodePointSize      = 0;
-        uint64_t CodeUnitNum        = 0ULL;
-        uint64_t CodePoint          = 0ULL;
-        UTF32   *DecodedString      = NULL;
+        uint8_t  CodePointSize                       = 0;
+        uint64_t CodeUnitNum                         = 0ULL;
+        uint64_t CodePoint                           = 0ULL;
+        UTF32   *DecodedString                       = NULL;
         if (String != NULL) {
-            uint64_t NumCodePoints  = UTF1632BOMSizeInCodePoints + UTF8_GetSizeInCodePoints(String) + UnicodeNULLTerminatorSize;
+            uint64_t NumCodePoints                   = UTF1632BOMSizeInCodePoints + UTF8_GetSizeInCodePoints(String) + UnicodeNULLTerminatorSize;
             if (String[0] == 0xEF && String[1] == 0xBB && String[2] == 0xBF) { // We need to remove the BOM, and subtract it's size from the Num codepoints
-                NumCodePoints      -= UTF8BOMSizeInCodePoints;
-                CodeUnitNum        += UTF8BOMSizeInCodeUnits;
+                NumCodePoints                       -= UTF8BOMSizeInCodePoints;
+                CodeUnitNum                         += UTF8BOMSizeInCodeUnits;
             }
-            DecodedString           = calloc(NumCodePoints, sizeof(UTF32));
+            DecodedString                            = calloc(NumCodePoints, sizeof(UTF32));
             if (DecodedString != NULL) {
                 do {
                     if (CodePoint == 0) {
                         // set the Unicode BOM
                         if (GlobalByteOrder == LSByteFirst) {
-                            DecodedString[0] = UTF32LE;
+                            DecodedString[0]         = UTF32LE;
                         } else if (GlobalByteOrder == MSByteFirst) {
-                            DecodedString[0] = UTF32BE;
+                            DecodedString[0]         = UTF32BE;
                         }
                     }
                     switch (UTF8_GetCodeUnitSize(String[CodeUnitNum])) {
                         case 1:
-                            DecodedString[CodePoint] =  String[CodeUnitNum - 1];
+                            DecodedString[CodePoint] =  String[CodeUnitNum];
                             CodeUnitNum             += 1;
                             break;
                         case 2:
-                            DecodedString[CodePoint] = (String[CodeUnitNum - 1] & 0x1F) << 6;
-                            DecodedString[CodePoint] =  String[CodeUnitNum]     & 0x3F;
+                            DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x1F) << 6;
+                            DecodedString[CodePoint] =  String[CodeUnitNum + 1] & 0x3F;
                             CodeUnitNum             += 2;
                             break;
                         case 3:
-                            DecodedString[CodePoint] = (String[CodeUnitNum - 1] & 0x0F) << 12;
-                            DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x1F) << 6;
-                            DecodedString[CodePoint] = (String[CodeUnitNum + 1] & 0x1F);
+                            DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x0F) << 12;
+                            DecodedString[CodePoint] = (String[CodeUnitNum + 1] & 0x1F) << 6;
+                            DecodedString[CodePoint] = (String[CodeUnitNum + 2] & 0x1F);
                             CodeUnitNum             += 3;
                             break;
                         case 4:
-                            DecodedString[CodePoint] = (String[CodeUnitNum - 1] & 0x07) << 18;
-                            DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x3F) << 12;
-                            DecodedString[CodePoint] = (String[CodeUnitNum + 1] & 0x3F) <<  6;
-                            DecodedString[CodePoint] = (String[CodeUnitNum + 2] & 0x3F);
+                            DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x07) << 18;
+                            DecodedString[CodePoint] = (String[CodeUnitNum + 1] & 0x3F) << 12;
+                            DecodedString[CodePoint] = (String[CodeUnitNum + 2] & 0x3F) <<  6;
+                            DecodedString[CodePoint] = (String[CodeUnitNum + 3] & 0x3F);
                             CodeUnitNum             += 4;
                             break;
                     }
