@@ -1,168 +1,197 @@
-#!/bin/sh
+#!/bin/bash -x
 
 # License: Public Domain, Creative Commons 0 for municipalities that do not have the notion of a public domain
-
-# xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN']" -v "@cp" -v "@nv" ucd.all.flat.xml THIS WORKS
-
-# xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@gc = 'Lu' or @gc = flat.xmlv "@cp" ucd.all.flat.xml
 
 # We NEED XMLStarlet to work, so install it with: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 # Then call: brew install XMLStarlet
 
-# Then we're off, download the XMLUCD readme to check if it's newer than our version of Unicode.
-OutputFile="../include/StringIOTables.h"
-OutputFileExists=ls $OutputFile | echo $?
-UCD_README="https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt"
-curl $UCD_README -o "$UCD_Folder/readme.txt"
-
-StringIOVersion=grep 'UnicodeVersion [0-9]*.[0-9]*.[0-9]*' $OutputFile | tail -c 7
-ReadmeVersion=grep -Eom1 'Version [0-9]*.[0-9]*.[0-9]*' $UCD_README | tail -c 7
-
-if [$OutputFileExists == 0] && [StringIOTablesVersion >= ReadmeVersion]
-then
-# Do not update it
-exit 0
-else
-# Update
-rm -rf $OutputFile
-touch $OutputFile
-UCD_Folder=mktemp -d
-UCD_URL="https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip"
-curl $UCD_URL -o "$UCD_Folder/ucd.all.flat.zip" | cd "$UCD_Folder" | unzip ucd.all.flat.zip | rm -f ucd.all.flat.zip
-UCD_Data="$UCD_Folder/ucd.all.flat.xml"
-UnicodeVersion=xmllint --xpath "//*[local-name()='ucd']/*[local-name()='description']" ucd.all.flat.xml | sed "/^\/ >/d" | sed "s/<[^>]*.//g" | sed "s/Unicode //g"
-
-NumCharNodes=xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char)" ucd.all.flat.xml
-
-# ok so we need to extract either cp="", or (first-cp="" AND last-cp="")
-
-echo "#include <stdint.h>  /* Included for the u/intX_t types */" >> $OutputFile
-echo "#pragma once" >> $OutputFile
-echo "#ifndef FoundationIO_StringIOTables_h" >> $OutputFile
-echo "#define FoundationIO_StringIOTables_h" >> $OutputFile
-echo "#ifdef   __cplusplus" >> $OutputFile
-echo "extern   \"C\" {" >> $OutputFile
-echo "#endif" >> $OutputFile
-
-echo "#define UnicodeVersion " $UnicodeVersion >> $OutputFile
-
-CodePoint=0
-NumericValue=0
-while [CodePoint -lt $NumCharNodes]
-do
-# for each node,we need to check that it's attributes match the ones we're looking for, if there's a match, go ahead and extract the codepoint value and attribute value.
-NumeralTable[$CodePoint][$NumericValue] = xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[$CodePoint @nv != 'NaN']" -v "@cp" -v "@nv" ucd.all.flat.xml
-done
-
-# Extract WhiteSpace: xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[$CodePoint @WSpace == 'Y']" -v "@cp" ucd.all.flat.xml
-
-
-
-
-
-
-
-#!/bin/sh
-
-# License: Public Domain, Creative Commons 0 for municipalities that do not have the notion of a public domain
-
-# xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN']" -v "@cp" -v "@nv" ucd.all.flat.xml THIS WORKS
+# xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN']" -v "@cp" -v "@nv" ucd.all.flat.xmlstarletTHIS WORKS
 
 # xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@gc = 'Lu' or @gc = flat.xmlv "@cp" ucd.all.flat.xml
 
-# We NEED XMLStarlet to work, so install it with: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-# Then call: brew install XMLStarlet
-
 # Then we're off, download the XMLUCD readme to check if it's newer than our version of Unicode.
-OutputFile="../include/StringIOTables.h"
-OutputFileExists=ls $OutputFile | printf $?
-UCD_README="https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt"
-curl $UCD_README -o "$UCD_Folder/readme.txt"
 
-StringIOVersion=grep 'UnicodeVersion [0-9]*.[0-9]*.[0-9]*' $OutputFile | tail -c 7
-ReadmeVersion=grep -Eom1 'Version [0-9]*.[0-9]*.[0-9]*' $UCD_README | tail -c 7
+# Extract WhiteSpace: xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[$CodePoint @WSpace == 'Y']" -v "@cp" $UCD_Data
 
-if [$OutputFileExists == 0] && [StringIOTablesVersion >= ReadmeVersion]
-then
-# Do not update it
-exit 0
-else
-# Update
-rm -rf $OutputFile
-touch $OutputFile
-UCD_Folder=mktemp -d
-UCD_URL="https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip"
-curl $UCD_URL -o "$UCD_Folder/ucd.all.flat.zip" | cd "$UCD_Folder" | unzip ucd.all.flat.zip | rm -f ucd.all.flat.zip
-UCD_Data="$UCD_Folder/ucd.all.flat.xml"
-UnicodeVersion=xmllint --xpath "//*[local-name()='ucd']/*[local-name()='description']" ucd.all.flat.xml | sed "/^\/ >/d" | sed "s/<[^>]*.//g" | sed "s/Unicode //g"
-
-NumCharNodes=xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char)" ucd.all.flat.xml
-
-# ok so we need to extract either cp="", or (first-cp="" AND last-cp="")
-
-printf "#include <stdint.h>  /* Included for the u/intX_t types */\n" >> $OutputFile
-printf "\n"
-printf "#pragma once" >> $OutputFile
-printf "\n"
-printf "#ifndef FoundationIO_StringIOTables_h" >> $OutputFile
-printf "#define FoundationIO_StringIOTables_h" >> $OutputFile
-printf "\n"
-printf "#ifdef   __cplusplus" >> $OutputFile
-printf "extern   \"C\" {" >> $OutputFile
-printf "#endif" >> $OutputFile
-printf "\n"
-printf "#define UnicodeVersion %s\n" $UnicodeVersion >> $OutputFile
-printf "\n"
-
-CodePoint=0
-NumericValue=0
-while [CodePoint -lt $NumCharNodes]
-do
-# for each node,we need to check that it's attributes match the ones we're looking for, if there's a match, go ahead and extract the codepoint value and attribute value.
-NumberOfNumeralEntries=xmlstarlet sel -T -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[not(contains(@nv, 'NaN')) and not(contains(@nv, '/'))]" -v "concat(@cp, ' ', @nv)" -n ucd.all.flat.xml | wc -l
-
-NumeralTable[$CodePoint][$NumericValue] = xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[$CodePoint @nv != 'NaN']" -v "@cp" -v "@nv" ucd.all.flat.xml
-done
-
-# Extract WhiteSpace: xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[$CodePoint @WSpace == 'Y']" -v "@cp" ucd.all.flat.xml
-
-
-
-
-
-
-
-printf "\tconst static uint32_t Numerals[%d][2] = {\n", $NumberOfNumeralEntries >> $OutputFile
-for CodePoint in $NumberOfNumeralEntries
-do
-IFS=' '
-CodePoint = read -ra
-NumericValue = read -ra
-printf "{0x%6X, %d}, " "$CodePoint" "$NumericValue" >> $OutputFile
-done
-printf "\t};\n" >> $OutputFile
-
-printf "#ifdef   __cplusplus" >> $OutputFile
-printf "}" >> $OutputFile
-printf "#endif /* C++ */" >> $OutputFile
-
-printf "#endif  FoundationIO_StringIOTables_h" >> $OutputFile
-fi
-
-
-
-
-
-# Ok we're parsing the XML UCD, not straight text version.
+# Ok we're parsing the xml UCD, not straight text version.
 # for the number tables, look for class gc="Nd" (Numeral, Decimal), and get it's value from nv="X"
 
 #and generate the tables we need from there.
 
 #List of tables we need to extract:
 
-#Numerals
 #Precomposed
 #Uppercase
 #Lowercase
 #Combining
-#Whitespace
+
+# List of tables we need
+# Whitespace
+# Uppercase Lowercase
+# All the codepoints to be found, and the replacements for Compatibile Equilivilence, both Decomposed and Composed forms
+# All the codepoints to be found, and the replacements for Canonical   Equilivilence, both Decomposed and Composed forms
+# For the casefolding and Normalization tables, maybe I should just have it be string 2 string, so just a table of input strings, and output strings.
+# The only concern is the ordering of the codepoints in the input string when I'm scanning, I'd have to come up with a better algorithm to ensure that it's order independent
+
+# List of Grapheme Base codepoints.
+# List of Grapheme Extension codepoints.
+
+function CreateOutputFileTop {
+    # The output file does not exist, or it's version is out of date, so we need to generate it
+    rm -rf $OutputFile
+    touch $OutputFile
+#UCD_URL="https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip"
+#$(curl -N $UCD_URL -o "$UCD_Folder/ucd.all.flat.zip")
+    $(cd "$UCD_Folder")
+#$(unzip "$UCD_Folder/ucd.all.flat.zip" -d "$UCD_Folder")
+#$(rm -f "$UCD_Folder/ucd.all.flat.zip")
+    UCD_Data="$UCD_Folder/ucd.all.flat.xml"
+    printf "#include <stdint.h>                    /* Included for u/intX_t */\n\n" >> $OutputFile
+    printf "#include \"StringIO.h\"                  /* Included for UTF32, and U32 macro */\n\n" >> $OutputFile
+    printf "#pragma once\n\n" >> $OutputFile
+    printf "#ifndef FoundationIO_StringIOTables_H\n" >> $OutputFile
+    printf "#define FoundationIO_StringIOTables_H\n\n" >> $OutputFile
+    printf "#ifdef   __cplusplus\n" >> $OutputFile
+    printf "extern   \"C\" {\n" >> $OutputFile
+    printf "#endif\n\n" >> $OutputFile
+    printf "#define UnicodeVersion %s\n\n" $ReadmeVersion >> $OutputFile
+    FormatSpecifierTableSize=16
+    printf "#define FormatSpecifierTableSize %d\n\n" $FormatSpecifierTableSize >> $OutputFile
+    NumWhiteSpaceCodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@WSpace='Y'])" $UCD_Data)
+    printf "#define WhiteSpaceTableSize %d\n\n" $NumWhiteSpaceCodePoints >> $OutputFile
+    IntegerTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')])" $UCD_Data)
+    printf "#define IntegerTableSize %d\n\n" $IntegerTableSize >> $OutputFile
+    GraphemeExtensionSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Gr_Ext = 'Y'])" -n $UCD_Data)
+    printf "#define GraphemeExtensionTableSize %d\n\n" $GraphemeExtensionSize >> $OutputFile
+    CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != '' and @NFKC_CF != '#' and @NFKC_CF != @cp])" $UCD_Data)
+    printf "#define CaseFoldTableSize %d\n\n" $CaseFoldTableSize >> $OutputFile
+    DecompositionTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != '#' and (@dt = 'can' or @dt = 'com' or @dt = 'enc' or @dt = 'fin' or @dt = 'font' or @dt = 'fra' or @dt = 'init' or @dt = 'iso' or @dt = 'med' or @dt = 'nar' or @dt = 'nb' or @dt = 'sml' or @dt = 'sqr' or @dt = 'sub' or @dt = 'sup' or @dt = 'vert' or @dt = 'wide' or @dt = 'none')])" $UCD_Data)
+    printf "#define DecompositionTableSize %d\n\n" $DecompositionTableSize >> $OutputFile
+}
+
+function CreateFormatSpecifierTable {
+    IFS=$'\n'
+    printf "\tstatic const UTF32 FormatSpecifierTable[FormatSpecifierTableSize] = {\n" >> $OutputFile
+    printf "\t\t0x64, 0x69, 0x75, 0x66, 0x46, 0x65, 0x45, 0x67, 0x47, 0x78, 0x58, 0x6F, 0x73, 0x63, 0x61, 0x41\n" >> $OutputFile
+    printf "\t};\n\n" >> $OutputFile
+    unset IFS
+}
+
+function CreateWhiteSpaceTable {
+    IFS=$'\n'
+    printf "\tstatic const UTF32 WhiteSpaceTable[WhiteSpaceTableSize] = {\n" >> $OutputFile
+    WhiteSpace=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@WSpace = 'Y']" -v @cp -n $UCD_Data)
+    for line in $WhiteSpace; do
+        printf "\t\t0x%06X,\n" 0x$line >> $OutputFile
+    done
+    printf "\t};\n\n" >> $OutputFile
+    unset IFS
+}
+
+function CreateCaseFoldTable {
+    IFS=$'\n'
+    printf "\tstatic const UTF32 *CaseFoldTable[CaseFoldTableSize][2] = {\n" >> $OutputFile
+    CodePointAndReplacement=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@NFKC_CF != '' or @NFKC_CF != '#' and @NFKC_CF != @cp or @CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y']" -v @cp -o : -v @NFKC_CF -n $UCD_Data)
+#Adddition properties: CWCF, CWCM, CWL, CWKCF
+    for line in $CodePointAndReplacement; do
+        CodePoint=$(cut -d \: -f 1 <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
+        ReplacementString=$(sed -e 's/[^:]*://' -e 's/^0*//g' -e 's/ 0*/ /g' -e 's/^/\\x/g' -e 's/[[:space:]]/\\x/g' <<< $line)
+        $(printf "\t\t{0x%06X, U32(\"%s\")},\n" $CodePoint $ReplacementString >> $OutputFile)
+    done
+    printf "\t};\n\n" >> $OutputFile
+    unset IFS
+}
+
+function CreateDecompositionTable {
+    IFS=$'\n'
+    printf "\tstatic const UTF32 *DecompositionTable[DecompositionTableSize][2] = {\n" >> $OutputFile
+    CodePointAndReplacement=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dm != '#' and (@dt = 'can' or @dt = 'com' or @dt = 'enc' or @dt = 'fin' or @dt = 'font' or @dt = 'fra' or @dt = 'init' or @dt = 'iso' or @dt = 'med' or @dt = 'nar' or @dt = 'nb' or @dt = 'sml' or @dt = 'sqr' or @dt = 'sub' or @dt = 'sup' or @dt = 'vert' or @dt = 'wide' or @dt = 'none')]" -v @cp -o : -v @dm -n $UCD_Data)
+    for line in $CodePointAndReplacement; do
+        CodePoint=$(cut -d \: -f 1 <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
+        ReplacementString=$(sed -e 's/[^:]*://' -e 's/^0*//g' -e 's/ 0*/ /g' -e 's/^/\\x/g' -e 's/[[:space:]]/\\x/g' <<< $line)
+        $(printf "\t\t{0x%06X, U32(\"%s\")},\n" $CodePoint $ReplacementString >> $OutputFile)
+    done
+    printf "\t};\n\n" >> $OutputFile
+    unset IFS
+}
+
+function CreateIntegerTable {
+    IFS=$'\n'
+    printf "\tstatic const UTF32 *IntegerTable[IntegerTableSize][2] = {\n" >> $OutputFile
+    CodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -v "@cp" -o : -v "@nv" -n $UCD_Data)
+    for line in $CodePointAndValue; do
+        CodePoint=$(cut -d \: -f 1 <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
+        Value=$(sed -e 's/[^:]*://' -e 's/[[:space:]]/\\x/g' <<< $line)
+        $(printf "\t\t{0x%06X, %d},\n" $CodePoint $Value >> $OutputFile)
+    done
+    printf "\t};\n\n" >> $OutputFile
+    unset IFS
+}
+
+function CreateGraphemeBaseTable {
+    IFS=$'\n'
+    printf "\tstatic const UTF32 *GraphemeBaseTable[GraphemeBaseTableSize] = {\n" >> $OutputFile
+    CodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Gr_Base = 'Y']" -v "@cp" -n $UCD_Data)
+    for line in $CodePointAndValue; do
+        CodePoint=$(cut -d \: -f 1 <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
+        Value=$(sed -e 's/[^:]*://' -e 's/[[:space:]]/\\x/g' <<< $line)
+        $(printf "\t\t{0x%06X, %d},\n" $CodePoint $Value >> $OutputFile)
+    done
+    printf "\t};\n\n" >> $OutputFile
+    unset IFS
+}
+
+function CreateGraphemeExtensionTable {
+    IFS=$'\n'
+    printf "\tstatic const UTF32 GraphemeExtensionTable[GraphemeExtensionTableSize] = {\n" >> $OutputFile
+    CodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Gr_Ext = 'Y']" -v "@cp" -n $UCD_Data)
+    for line in $CodePoints; do
+        Value=$(sed -e 's/^/0x/g' $line)
+        $(printf "\t\t0x%06X,\n" $Value >> $OutputFile)
+    done
+    printf "\t};\n\n" >> $OutputFile
+    unset IFS
+}
+
+function CreateOutputFileBottom {
+    printf "#ifdef   __cplusplus\n" >> $OutputFile
+    printf "}\n" >> $OutputFile
+    printf "#endif /* C++ */\n\n" >> $OutputFile
+    printf "#endif /* FoundationIO_StringIOTables_H */\n" >> $OutputFile
+}
+
+function GetStringIOUnicodeVersion {
+#UCD_README="https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt"
+#UCD_Folder=$(mktemp -d)
+    UCD_Folder="/Users/Marcus/Desktop/UCDXML"
+#$(curl -N $UCD_README -o "$UCD_Folder/readme.txt")
+    ReadmeVersion=$(awk 'NR==1 {print $5}' $UCD_Folder/readme.txt)
+    if [ ! -f "$OutputFile" ]
+    then
+        StringIOVersion="0.0.0"
+    else
+        StringIOVersion=$(awk 'NR==12 {print $3}' $OutputFile)
+    fi
+}
+
+if [ $# -ne 1 ]
+    then echo "You forgot to include the output path for the tables"
+else
+    ARGUMENTS=$@
+    OutputFile=$ARGUMENTS
+    GetStringIOUnicodeVersion
+    if [ "$ReadmeVersion" -eq "$StringIOVersion" ]
+    then
+        exit 0
+    else
+        # The output file does not exist, or it's version is out of date, so we need to generate it
+        CreateOutputFileTop
+        CreateFormatSpecifierTable
+        CreateWhiteSpaceTable
+        CreateIntegerTable
+        CreateGraphemeExtensionTable
+        CreateCaseFoldTable
+        CreateDecompositionTable
+        CreateOutputFileBottom
+    fi
+fi

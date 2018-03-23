@@ -1,3 +1,8 @@
+#include <stdint.h>                   /* Included for u/intX_t */
+#include <stdio.h>                    /* Included for FILE */
+
+#include "Macros.h"                   /* Included for bool and Yes/No macros */
+
 /*!
  @header    StringIO.h
  @author    Marcus Johnson aka BumbleBritches57
@@ -5,10 +10,6 @@
  @version   0.8.0
  @brief     This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
  */
-
-#include <stdint.h>                   /* Included for u/intX_t */
-
-#include "Macros.h"                   /* Included for bool and Yes/No macros */
 
 #pragma once
 
@@ -19,91 +20,89 @@
 extern  "C" {
 #endif
     
-    typedef uint_least8_t   UTF8;
-    typedef uint_least16_t  UTF16;
-    typedef uint_least32_t  UTF32;
-    
-#ifndef             U8
-#define             U8(QuotedLiteral) u8##QuotedLiteral
+#ifndef                   U8
+#define                   U8(QuotedLiteral)                      u8##QuotedLiteral
 #endif
     
-#ifndef             U16
-#define             U16(QuotedLiteral) u##QuotedLiteral
+#ifndef                   U16
+#define                   U16(QuotedLiteral)                     u##QuotedLiteral
 #endif
     
-#ifndef             U32
-#define             U32(QuotedLiteral) U##QuotedLiteral
+#ifndef                   U32
+#define                   U32(QuotedLiteral)                     U##QuotedLiteral
 #endif
+    
+    typedef               uint_least8_t                          UTF8;
+    typedef               uint_least16_t                         UTF16;
+    typedef               uint_least32_t                         UTF32;
     
     typedef enum StringIOCommon {
-                                UTF8BOMSizeInCodeUnits               = 3,
-                                UTF8BOMSizeInCodePoints              = 1,
-                                UTF1632BOMSizeInCodePoints           = 1,
-                                UnicodeNULLTerminatorSize            = 1,
-                                UTF16LE                              = 0xFFFE,
-                                UTF16BE                              = 0xFEFF,
-                                UTF32LE                              = 0xFFFE,
-                                UTF32BE                              = 0xFEFF,
-                                UTF16HighSurrogateStart              = 0xD800,
-                                UTF16HighSurrogateEnd                = 0xDBFF,
-                                UTF16LowSurrogateStart               = 0xDC00,
-                                UTF16LowSurrogateEnd                 = 0xDFFF,
-                                InvalidCodePointReplacementCharacter = 0xFFFD,
-                                UnicodeMaxCodePoint                  = 0x10FFFF,
-                                UTF16MaxCodePoint                    = 0xFFFF,
-                                UTF16SurrogatePairModDividend        = 0x400,
-                                UTF16SurrogatePairStart              = 0x10000,
-                                UnicodeNULLTerminator                = 0x0,
+                          UTF8BOMSizeInCodeUnits               = 3,
+                          UTF8BOMSizeInCodePoints              = 1,
+                          UTF16LE                              = 0xFFFE,
+                          UTF16BE                              = 0xFEFF,
+                          UTF16HighSurrogateStart              = 0xD800,
+                          UTF16HighSurrogateEnd                = 0xDBFF,
+                          UTF16LowSurrogateStart               = 0xDC00,
+                          UTF16LowSurrogateEnd                 = 0xDFFF,
+                          UTF16MaxCodePoint                    = 0xFFFF,
+                          UTF16SurrogatePairModDividend        = 0x400,
+                          UTF16SurrogatePairStart              = 0x10000,
+                          InvalidCodePointReplacementCharacter = 0xFFFD,
+                          UTF1632BOMSizeInCodePoints           = 1,
+                          UTF32LE                              = 0xFFFE,
+                          UTF32BE                              = 0xFEFF,
+                          UnicodeMaxCodePoint                  = 0x10FFFF,
+                          UnicodeNULLTerminator                = 0x0,
+        UnicodeNULLTerminatorSize            = 1,
     } StringIOCommon;
     
-    typedef enum UnicodeCodePointTypes {
-                                UnknownCodePointType                 = 0,
-                                CaselessCodePoint                    = 1,
-                                UpperCaseCodePoint                   = 2,
-                                LowerCaseCodePoint                   = 3,
-                                NumericIntegerCodePoint              = 4,
-                                NumericDecimalCodePoint              = 5,
-                                CombiningCodePoint                   = 6,
-    } UnicodeCodePointTypes;
+    typedef enum StringIONormalizationForms {
+                          UnknownNormalizationForm             = 0,
+                          NormalizationFormD                   = 1,
+                          NormalizationFormC                   = 2,
+                          NormalizationFormKD                  = 3,
+                          NormalizationFormKC                  = 4,
+    } StringIONormalizationForms;
     
-    typedef enum Number2StringBases {
-                                Binary                               = 2,
-                                Octal                                = 8,
-                                Decimal                              = 10,
-                                Hex                                  = 16,
-    } Number2StringBases;
+    typedef enum StringIOBases {
+                          Binary                               = 2,
+                          Octal                                = 8,
+                          Decimal                              = 10,
+                          Hex                                  = 16,
+    } StringIOBases;
     
-    typedef enum FormatStringTypes {
-                                UnknownFormatStringType              = 0,
-                                SignedInteger8                       = 1,
-                                SignedInteger16                      = 2,
-                                SignedInteger32                      = 3,
-                                SignedInteger64                      = 4,
-                                UnsignedInteger8                     = 5,
-                                UnsignedInteger16                    = 6,
-                                UnsignedInteger32                    = 7,
-                                UnsignedInteger64                    = 8,
-                                Float16                              = 9,
-                                Float32                              = 10,
-                                Float64                              = 11,
-                                Float128                             = 12,
-                                String8                              = 13,
-                                String16                             = 14,
-                                String32                             = 15,
-    } FormatStringTypes;
+    typedef enum StringIOFormatType {
+                          UnknownFormatType                    = 0,
+                          SignedInteger8                       = 1,
+                          SignedInteger16                      = 2,
+                          SignedInteger32                      = 3,
+                          SignedInteger64                      = 4,
+                          UnsignedInteger8                     = 5,
+                          UnsignedInteger16                    = 6,
+                          UnsignedInteger32                    = 7,
+                          UnsignedInteger64                    = 8,
+                          Decimal16                            = 9,
+                          Decimal32                            = 10,
+                          Decimal64                            = 11,
+                          Decimal128                           = 12,
+                          String8                              = 13,
+                          String16                             = 14,
+                          String32                             = 15,
+    } StringIOFormatType;
     
-    typedef enum UnicodeBOMState {
-                                UnknownBOMState                      = 0,
-                                UnconditionallyAddBOM                = 1,
-                                UnconditionallyRemoveBOM             = 2,
-                                KeepTheBOMStateTheSame               = 3,
-    } UTF8BOMState;
+    typedef enum StringIOBOMStates {
+                          UnknownBOMState                      = 0,
+                          UnconditionallyAddBOM                = 1,
+                          UnconditionallyRemoveBOM             = 2,
+                          KeepTheBOMStateTheSame               = 3,
+    } StringIOBOMStates;
     
-    typedef enum UnicodeByteOrder {
-                                UseNativeByteOrder                   = 0,
-                                UseLEByteOrder                       = 1,
-                                UseBEByteOrder                       = 2,
-    } UnicodeByteOrder;
+    typedef enum StringIOByteOrders {
+                          UseNativeByteOrder                   = 0,
+                          UseLEByteOrder                       = 1,
+                          UseBEByteOrder                       = 2,
+    } StringIOByteOrders;
     
     /*!
      @abstract                             "Gets the number of Unicode codeunits in the UTF8 string".
@@ -173,28 +172,29 @@ extern  "C" {
      @abstract                             "Encodes a UTF32 *to a UTF16".
      @param               String           "The string to decode".
      */
-    UTF16                *UTF16_Encode(UTF32 *String, UnicodeByteOrder OutputByteOrder);
+    UTF16                *UTF16_Encode(UTF32 *String, StringIOByteOrders OutputByteOrder);
     
     /*!
      @abstract                             "Byteswaps a UTF16".
      @param               String2Convert   "The string to byteswap".
      @param               OutputByteOrder  "The byte order you want the string in".
      */
-    void                  UTF16_ConvertByteOrder(UTF16 *String2Convert, UnicodeByteOrder OutputByteOrder);
+    void                  UTF16_ConvertByteOrder(UTF16 *String2Convert, StringIOByteOrders OutputByteOrder);
     
     /*!
      @abstract                             "Byteswaps a UTF32".
      @param               String2Convert   "The string to byteswap".
      @param               OutputByteOrder  "The byte order you want the string in".
      */
-    void                  UTF32_ConvertByteOrder(UTF32 *String2Convert, UnicodeByteOrder OutputByteOrder);
+    void                  UTF32_ConvertByteOrder(UTF32 *String2Convert, StringIOByteOrders OutputByteOrder);
     
     /*!
      @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
      @remark                               "The string is reallocated at the end to remove unused space".
      @param               String2Normalize "The string to be normalized".
+     @param               NormalizedForm   "The type of normalization of use on String2Normalize"
      */
-    UTF32                *UTF32_NormalizeString(UTF32 *String2Normalize);
+    UTF32                *UTF32_NormalizeString(UTF32 *String2Normalize, StringIONormalizationForms NormalizedForm);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
@@ -243,7 +243,7 @@ extern  "C" {
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF32                *UTF32_Integer2String(const Number2StringBases Base, const bool UpperCase, int64_t Integer2Convert);
+    UTF32                *UTF32_Integer2String(const StringIOBases Base, const bool UpperCase, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts a string to a double, replaces strtod and atof".
@@ -258,9 +258,9 @@ extern  "C" {
     UTF32                *Decimal2String(double Decimal);
     
     /* High level functions */
-    bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2, bool Normalize, bool CaseInsensitive);
+    bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive);
     
-    bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2, bool Normalize, bool CaseInsensitive);
+    bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive);
     
     /*!
      @abstract                             "Compares String1 and String2 for equilivence".
@@ -274,9 +274,19 @@ extern  "C" {
      */
     UTF32                *UTF32_StripWhiteSpace(UTF32 *String);
     
+    /*!
+     @abstract                             "Formats a string according to the Format string, with all of it's options".
+     @remark                               "We've extended FormatString from printf by adding the B specifier, for binary".
+     @remark                               "We do not support the p or n specifiers".
+     @param               VarArgCount      "The macro automatically provides this information".
+     @param               Format           "A UTF32 encoded string containing the formatting string".
+     @return                               "Returns the formatted string".
+     */
     UTF32                *UTF32_FormatString(const uint64_t VarArgCount, UTF32 *Format, ...);
     
 #define                   FormatString(Format, ...) UTF32_FormatString(CountVariadicArguments(__VA_ARGS__), Format, __VA_ARGS__)
+    
+    void                  WriteString(UTF32 *String2Write, FILE *OutputFile);
     
 #ifdef  __cplusplus
 }

@@ -257,6 +257,10 @@ extern   "C" {
      */
     void                        CommandLineIO_Deinit(CommandLineIO *CLI);
     
+    void                        UTF8_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF8 **Arguments);
+    
+    void                        UTF16_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF16 **Arguments);
+    
     void                        DEBUGCommandLineOptions(CommandLineIO *CLI);
     
 #ifdef   __cplusplus

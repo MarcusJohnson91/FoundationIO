@@ -45,36 +45,14 @@ extern "C" {
         vsnprintf(VariadicString, StringSize, Description, VariadicArguments);
         va_end(VariadicArguments);
         
-        /*
-         Ok, well take Description and the Variadic arguments and send it all to FormatString in StringIO
-         After the string has been formatted, go ahead and do the platform dependent stuff, on POSIX encode it as UTF-8 and output it.
-         on Windows encode it as UTF-16, and output it.
-         
-         First things first, how do we get the variadic arguments? then we need to get their type from Description.
-         
-         Well, what we should do is count the number of printf placeholders in the Description String.
-         
-         Where should that go? in the string formatter it's self?
-         
-         What is the process?
-         
-         Read the Description string for printf placeholders, and count them up, then return an array of the various placeholders type to send off to that one function?
-         */
-        
-#if (FoundationIOTargetOS == POSIXOS)
-        // Encode the formatted string as UTF-8 and send to Log_LogFile or STDERR.
-#elif (FoundationIOTargetOS == WindowsOS)
-        // Encode the formatted string as UTF-16 and send to Log_LogFile or STDERR.
-#endif
-        
-        if (Log_LogFile == NULL) {
-            // Log to STDERR
-        }
-        
         if (Log_ProgramName != NULL) {
-            fprintf((Log_LogFile == NULL ? stderr : Log_LogFile), "%s: %s in %s: \"%s\"%s", Log_ProgramName, (Severity == Log_ERROR ? Error : Debug), FunctionName, VariadicString, NewLine);
+            UTF32 *FormattedString = FormatString(U32("%s: %s in %s: \"%s\"%s"), Log_ProgramName, (Severity == Log_ERROR ? Error : Debug), FunctionName, VariadicString, NewLine);
+            WriteString(FormattedString, Log_LogFile == NULL ? stderr : Log_LogFile);
+            free(FormattedString);
         } else {
-            fprintf((Log_LogFile == NULL ? stderr : Log_LogFile), "%s in %s: \"%s\"%s", (Severity == Log_ERROR ? Error : Debug), FunctionName, VariadicString, NewLine);
+            UTF32 *FormattedString = FormatString(U32("%s in %s: \"%s\"%s"), (Severity == Log_ERROR ? Error : Debug), FunctionName, VariadicString, NewLine);
+            WriteString(FormattedString, Log_LogFile == NULL ? stderr : Log_LogFile);
+            free(FormattedString);
         }
         free(VariadicString);
     }
