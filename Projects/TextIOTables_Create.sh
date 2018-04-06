@@ -108,12 +108,17 @@ function CreateDecompositionTable {
 
 function CreateIntegerTable {
     IFS=$'\n'
-    printf "\tstatic const UTF32 *IntegerTable[IntegerTableSize][2] = {\n" >> $OutputFile
     SortedCodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -v "@cp" -o : -v "@nv" -n $UCD_Data | sort -s -n -k 2 -t $':')
+    printf "\tstatic const UTF32 IntegerTableCodePoints[IntegerTableSize] = {\n" >> $OutputFile
     for line in $SortedCodePointAndValue; do
         CodePoint=$(cut -d \: -f 1 <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
+        $(printf "\t\t0x%06X,\n" $CodePoint >> $OutputFile)
+    done
+    printf "\t};\n\n" >> $OutputFile
+    printf "\tstatic const uint64_t IntegerTableValues[IntegerTableSize] = {\n" >> $OutputFile
+    for line in $SortedCodePointAndValue; do
         Value=$(sed -e 's/[^:]*://' <<< $line -e 's/[[:space:]]/\\x/g')
-        $(printf "\t\t{0x%06X, %d},\n" $CodePoint $Value >> $OutputFile)
+        $(printf "\t\t%d,\n" $Value >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
     unset IFS
