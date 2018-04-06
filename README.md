@@ -1,14 +1,20 @@
+# FoundationIO:
+- FoundationIO is a library containing many modules, like BitIO, CommandLineIO, StringIO, GUUID, and more.
+- BitIO is a module for reading, and writing bits from/to files/sockets.
+- CommandLineIO is a module for parsing command line arguments.
+- StringIO is a module for Unicode, including UTF-8 and UTF-16 en/de coding, as well as normalization, casefolding, string formatting, string splitting, etc.
+- Currently, there's no stable API, let alone ABI. I break shit constantly because i'm very indecisive.
 
-**FoundationIO:**
-========
-* FoundationIO is a library for reading, and writing bits
-* FoundationIO is designed for and tested on 64 bit CPUs (AMD64 and ARM64 to be specific), 32 bit operating systems and CPUs are not tested, and never will be.
-* I've tried keeping FoundationIO modern, minimalist, and easy to use. we require a C99 compiler.
-* FoundationIO is compatible with C++ through the C API.
-* Currently, there's no stable API, let alone ABI. I break shit constantly because i'm very indecisive.
+# Versioning:
+- FoundationIO and it's modules use Semantic Versioning (2.0.0)
+- Each module has a Major.Minor.Patch+COMMITID version string in it's header (well, it will, once we reach 1.0), for example: StringIO 1.2.37+105f43e6790acd105ddfe14832f3013d34bea4f9.
+- FoundationIO's overall version number also uses Semantive Versioning, but it's version number is the culmination of all of it's modules version numbers
+- FoundationIO->Major          = round((BitIO->Major + CommandLineIO->Major + StringIO->Major + Math->Major + Log->Major + GUUID->Major + Macros->Major) / NumModules)
+- FoundationIO->Minor          = round((BitIO->Minor + CommandLineIO->Minor + StringIO->Minor + Math->Minor + Log->Minor + GUUID->Minor + Macros->Minor) / NumModules)
+- FoundationIO->Patch          = round((BitIO->Patch + CommandLineIO->Patch + StringIO->Patch + Math->Patch + Log->Patch + GUUID->Patch + Macros->Patch) / NumModules)
+- FoundationIO->COMMITID = The latest commit id from any of the previously mentioned modules.
 
-License:
-=======
+# License:
 FoundationIO is released under the terms of the 3 clause [`Revised BSD`](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29) license.
 
 Here's a tl;dr of my license:
@@ -17,16 +23,14 @@ Here's a tl;dr of my license:
 * **Do** include in your acknowledgments a link to [FoundationIO on GitHub](https://www.github.com/MarcusJohnson91/FoundationIO).
 * **Don't** plagiarize FoundationIO.
 * **Don't** relicense FoundationIO.
-* **Don't** sue me if something goes wrong. I never have and never will guarantee FoundationIO works for anything, you figure out if it's right for you.
+* **Don't** sue me if something goes wrong, it's your responsibility to determine if FoundationIO is right for you.
 
-Compiling:
-=========
-* to use FoundationIO in your project, add it as a submodule with `git submodule add Dependencies/FoundationIO https://github.com/MarcusJohnson91/FoundationIO.git`, then include whatever library headers you want to use.
+# Compiling:
+* to use FoundationIO in your project, add it as a submodule with `git submodule add Dependencies/FoundationIO https://github.com/MarcusJohnson91/FoundationIO.git`, then include whatever module headers you want to use.
 * call `cmake` with `-G "Unix Makefiles"`, the cmake file is in the Projects folder.
 * Then compile the makefile with make like usual.
 
-How To Use FoundationIO:
-===================
+# How To Use FoundationIO:
 
 StringIO:
 ----------
@@ -58,7 +62,6 @@ CommandLineIO:
 - Switches may have slave switches, that is, a switch that can only be called in the context of it's master
 - SwitchHasArgMayHaveSlave (This type of switch is used when you require the user to give additional information beyond the mere existence of the switch)
 * The type of Options are:
--
 - To create a Master switch (that is a switch that depends on nothing but multiple switches depend on it) call `SetCLISwitchAsMaster`.
 * Call `ParseCommandLineIO` to parse argv's arguments for any matching switches.
 * At the end of `main()` call `DeinitCommandLineIO` to clean everything up.
@@ -75,7 +78,7 @@ BitIO:
 * When you're all done, call `DeinitBitInput`, `DeinitBitOutput`, and `DeinitBitBuffer`.
 
 Log:
--------
+====
 * Writes to a file you open with `Log_OpenFile`, if it's unset or otherwise inaccessible, all logs are printed to stderr.
 * The interface requires UTF8 which you can coerce your strings to be with the `u8` string literal prefix, or just calling the `U8` macro
 * Works on any platform that provides `stderr`, and `fprintf`.
@@ -88,7 +91,7 @@ GUUIDs:
 * A UUID is most significant byte first for each section.
 * A GUID is least significant byte first for each section, except the last 6 bytes which are most significant.
 
-* GUUIDTypes: BinaryUUID, BinaryGUID, UUIDString, GUIDString
+* `GUUIDTypes`: BinaryUUID, BinaryGUID, UUIDString, GUIDString
 
 `ReadGUUID`:  Reads a GUUID of GUUIDType from the BitBuffer, and returns a pointer to the new GUUID.
 
@@ -108,7 +111,12 @@ GUUIDs:
 
 TODO:
 -----
-* Write a WriteArray2BitBuffer and ReadBitBuffer2Array functions, that way I could theoretically at least use SIMD operations on the data.
-* Finish writing the UCD parsing script so I can add full support for case-mapping and de/normalization to StringIO.
-* Finalize the cmake build script.
+* BitIO:
+** Write a WriteArray2BitBuffer and ReadBitBuffer2Array functions, that way I could theoretically at least use SIMD operations on the data.
+* StringIO:
+** Finish writing the UCD parsing script so I can add full support for case-mapping and de/normalization to StringIO.
+** Finish the FormatString work.
+** Finish the SplitString work.
+* Cmake:
+** Finalize the cmake build script.
 
