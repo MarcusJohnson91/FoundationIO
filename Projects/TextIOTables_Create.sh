@@ -55,26 +55,16 @@ function CreateOutputFileTop {
     printf "extern   \"C\" {\n" >> $OutputFile
     printf "#endif\n\n" >> $OutputFile
     printf "#define UnicodeVersion %s\n\n" $ReadmeVersion >> $OutputFile
-    FormatSpecifierTableSize=16
-    printf "#define FormatSpecifierTableSize %d\n\n" $FormatSpecifierTableSize >> $OutputFile
     NumWhiteSpaceCodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@WSpace='Y'])" $UCD_Data)
     printf "#define WhiteSpaceTableSize %d\n\n" $NumWhiteSpaceCodePoints >> $OutputFile
     IntegerTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')])" $UCD_Data)
     printf "#define IntegerTableSize %d\n\n" $IntegerTableSize >> $OutputFile
-    GraphemeExtensionSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Gr_Ext = 'Y'])" -n $UCD_Data)
+    GraphemeExtensionSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Gr_Ext = 'Y'])" $UCD_Data)
     printf "#define GraphemeExtensionTableSize %d\n\n" $GraphemeExtensionSize >> $OutputFile
-    CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != '' and @NFKC_CF != '#' and @NFKC_CF != @cp])" $UCD_Data)
+    CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')])" $UCD_Data)
     printf "#define CaseFoldTableSize %d\n\n" $CaseFoldTableSize >> $OutputFile
-    DecompositionTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != '#' and (@dt = 'can' or @dt = 'com' or @dt = 'enc' or @dt = 'fin' or @dt = 'font' or @dt = 'fra' or @dt = 'init' or @dt = 'iso' or @dt = 'med' or @dt = 'nar' or @dt = 'nb' or @dt = 'sml' or @dt = 'sqr' or @dt = 'sub' or @dt = 'sup' or @dt = 'vert' or @dt = 'wide' or @dt = 'none')])" $UCD_Data)
+    DecompositionTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dm != '' and @dm != '#' and (@dt = 'can' or @dt = 'com' or @dt = 'enc' or @dt = 'fin' or @dt = 'font' or @dt = 'fra' or @dt = 'init' or @dt = 'iso' or @dt = 'med' or @dt = 'nar' or @dt = 'nb' or @dt = 'sml' or @dt = 'sqr' or @dt = 'sub' or @dt = 'sup' or @dt = 'vert' or @dt = 'wide' or @dt = 'none')])" $UCD_Data)
     printf "#define DecompositionTableSize %d\n\n" $DecompositionTableSize >> $OutputFile
-}
-
-function CreateFormatSpecifierTable {
-    IFS=$'\n'
-    printf "\tstatic const UTF32 FormatSpecifierTable[FormatSpecifierTableSize] = {\n" >> $OutputFile
-    printf "\t\t0x64, 0x69, 0x75, 0x66, 0x46, 0x65, 0x45, 0x67, 0x47, 0x78, 0x58, 0x6F, 0x73, 0x63, 0x61, 0x41\n" >> $OutputFile
-    printf "\t};\n\n" >> $OutputFile
-    unset IFS
 }
 
 function CreateWhiteSpaceTable {
@@ -82,7 +72,8 @@ function CreateWhiteSpaceTable {
     printf "\tstatic const UTF32 WhiteSpaceTable[WhiteSpaceTableSize] = {\n" >> $OutputFile
     WhiteSpace=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@WSpace = 'Y']" -v @cp -n $UCD_Data)
     for line in $WhiteSpace; do
-        printf "\t\t0x%06X,\n" 0x$line >> $OutputFile
+        Value=$(sed -e 's/^/0x/g' <<< $line)
+        $(printf "\t\t0x%06X,\n" $Value >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
     unset IFS
@@ -91,8 +82,8 @@ function CreateWhiteSpaceTable {
 function CreateCaseFoldTable {
     IFS=$'\n'
     printf "\tstatic const UTF32 *CaseFoldTable[CaseFoldTableSize][2] = {\n" >> $OutputFile
-    CodePointAndReplacement=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@NFKC_CF != '' or @NFKC_CF != '#' and @NFKC_CF != @cp or @CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y']" -v @cp -o : -v @NFKC_CF -n $UCD_Data)
-#Adddition properties: CWCF, CWCM, CWL, CWKCF
+    CodePointAndReplacement=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#']" -v @cp -o : -v @NFKC_CF -n $UCD_Data)
+#Adddition properties:  [or @CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')]
     for line in $CodePointAndReplacement; do
         CodePoint=$(cut -d \: -f 1 <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
         ReplacementString=$(sed -e 's/[^:]*://' -e 's/^0*//g' -e 's/ 0*/ /g' -e 's/^/\\x/g' -e 's/[[:space:]]/\\x/g' <<< $line)
@@ -118,10 +109,10 @@ function CreateDecompositionTable {
 function CreateIntegerTable {
     IFS=$'\n'
     printf "\tstatic const UTF32 *IntegerTable[IntegerTableSize][2] = {\n" >> $OutputFile
-    CodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -v "@cp" -o : -v "@nv" -n $UCD_Data)
-    for line in $CodePointAndValue; do
+    SortedCodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -v "@cp" -o : -v "@nv" -n $UCD_Data | sort -s -n -k 2 -t $':')
+    for line in $SortedCodePointAndValue; do
         CodePoint=$(cut -d \: -f 1 <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
-        Value=$(sed -e 's/[^:]*://' -e 's/[[:space:]]/\\x/g' <<< $line)
+        Value=$(sed -e 's/[^:]*://' <<< $line -e 's/[[:space:]]/\\x/g')
         $(printf "\t\t{0x%06X, %d},\n" $CodePoint $Value >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
@@ -146,7 +137,7 @@ function CreateGraphemeExtensionTable {
     printf "\tstatic const UTF32 GraphemeExtensionTable[GraphemeExtensionTableSize] = {\n" >> $OutputFile
     CodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Gr_Ext = 'Y']" -v "@cp" -n $UCD_Data)
     for line in $CodePoints; do
-        Value=$(sed -e 's/^/0x/g' $line)
+        Value=$(sed -e 's/^/0x/g' <<< $line)
         $(printf "\t\t0x%06X,\n" $Value >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
@@ -186,7 +177,6 @@ else
     else
         # The output file does not exist, or it's version is out of date, so we need to generate it
         CreateOutputFileTop
-        CreateFormatSpecifierTable
         CreateWhiteSpaceTable
         CreateIntegerTable
         CreateGraphemeExtensionTable

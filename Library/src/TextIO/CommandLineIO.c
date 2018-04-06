@@ -1,6 +1,5 @@
 #include <stdarg.h>                    /* Included for the variadic argument support macros */
 #include <stdint.h>                    /* Included for u/intX_t */
-//#include <stdio.h>                     /* Included for fprintf, STD IN/OUT/ERR, sprintf */
 #include <stdlib.h>                    /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 #include <string.h>                    /* Included for memset */
 
@@ -26,13 +25,6 @@ extern   "C" {
      */
     
     /*!
-     */
-    enum CommandLineIOConstants {
-                             NULLTerminator              = 0,
-                             NULLTerminatorSize          = 1,
-    };
-    
-    /*!
      @struct                 CommandLineSwitch
      @abstract                                           "Contains the data to support a switch".
      @constant               SwitchType                  "What type of switch is this"?
@@ -46,8 +38,8 @@ extern   "C" {
      @constant               PotentialSlaves             "Pointer to an array that contains the list of aloowable Slave switches".
      */
     typedef struct CommandLineSwitch {
-        UTF32               *Name;
-        UTF32               *Description;
+        UTF8                *Name;
+        UTF8                *Description;
         int64_t             *PotentialSlaves;
         int64_t              NumPotentialSlaves;
         int64_t              MaxConcurrentSlaves;
@@ -65,7 +57,7 @@ extern   "C" {
      */
     typedef struct CommandLineOption {
         int64_t             *OptionSlaves;
-        UTF32               *Argument;
+        UTF8                *Argument;
         int64_t              SwitchID;
         int64_t              NumOptionSlaves;
     } CommandLineOption;
@@ -90,14 +82,14 @@ extern   "C" {
      @constant               IsProprietary                 "Is this program proprietary"?
      */
     typedef struct CommandLineIO {
-        UTF32               *ProgramName;
-        UTF32               *ProgramAuthor;
-        UTF32               *ProgramDescription;
-        UTF32               *ProgramVersion;
-        UTF32               *ProgramCopyright;
-        UTF32               *ProgramLicenseName;
-        UTF32               *ProgramLicenseDescription;
-        UTF32               *ProgramLicenseURL;
+        UTF8                *ProgramName;
+        UTF8                *ProgramAuthor;
+        UTF8                *ProgramDescription;
+        UTF8                *ProgramVersion;
+        UTF8                *ProgramCopyright;
+        UTF8                *ProgramLicenseName;
+        UTF8                *ProgramLicenseDescription;
+        UTF8                *ProgramLicenseURL;
         CommandLineSwitch   *SwitchIDs;
         CommandLineOption   *OptionIDs;
         int64_t              NumSwitches;
@@ -141,7 +133,7 @@ extern   "C" {
     
     void CLISetName(CommandLineIO *CLI, UTF8 *Name) {
         if (CLI != NULL && Name != NULL) {
-            CLI->ProgramName     = UTF8_Decode(Name);
+            CLI->ProgramName     = UTF8_NormalizeString(Name, NormalizationFormKC);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Name == NULL) {
@@ -151,7 +143,7 @@ extern   "C" {
     
     void CLISetVersion(CommandLineIO *CLI, UTF8 *Version) {
         if (CLI != NULL && Version != NULL) {
-            CLI->ProgramVersion     = UTF8_Decode(Version);
+            CLI->ProgramVersion     = UTF8_NormalizeString(Version, NormalizationFormKC);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Version == NULL) {
@@ -161,7 +153,7 @@ extern   "C" {
     
     void CLISetDescription(CommandLineIO *CLI, UTF8 *Description) {
         if (CLI != NULL && Description != NULL) {
-            CLI->ProgramDescription     = UTF8_Decode(Description);
+            CLI->ProgramDescription     = UTF8_NormalizeString(Description, NormalizationFormKC);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Description == NULL) {
@@ -171,7 +163,7 @@ extern   "C" {
     
     void CLISetAuthor(CommandLineIO *CLI, UTF8 *Author) {
         if (CLI != NULL && Author != NULL) {
-            CLI->ProgramAuthor     = UTF8_Decode(Author);
+            CLI->ProgramAuthor     = UTF8_NormalizeString(Author, NormalizationFormKC);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Author == NULL) {
@@ -181,7 +173,7 @@ extern   "C" {
     
     void CLISetCopyright(CommandLineIO *CLI, UTF8 *Copyright) {
         if (CLI != NULL && Copyright != NULL) {
-            CLI->ProgramCopyright     = UTF8_Decode(Copyright);
+            CLI->ProgramCopyright     = UTF8_NormalizeString(Copyright, NormalizationFormKC);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Copyright == NULL) {
@@ -196,8 +188,11 @@ extern   "C" {
             } else if (LicenseType == ProprietaryLicense) {
                 CLI->IsProprietary             = Yes;
             }
-            CLI->ProgramLicenseName            = UTF8_Decode(Name);
-            CLI->ProgramLicenseURL             = UTF8_Decode(LicenseURL);
+            CLI->ProgramLicenseName            = UTF8_NormalizeString(Name, NormalizationFormKC);
+            UTF8 *CaseFoldedLicenseURL         = UTF8_CaseFoldString(LicenseURL);
+            UTF8 *NormalizedLicenseURL         = UTF8_NormalizeString(CaseFoldedLicenseURL, NormalizationFormKC);
+            free(CaseFoldedLicenseURL);
+            CLI->ProgramLicenseURL             = NormalizedLicenseURL;
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (LicenseType == UnknownLicenseType) {
@@ -231,7 +226,9 @@ extern   "C" {
     
     void CLISetSwitchName(CommandLineIO *CLI, const int64_t SwitchID, UTF8 *Name) {
         if (CLI != NULL && (SwitchID >= 0 && SwitchID <= CLI->NumSwitches - 1) && Name != NULL) {
-            CLI->SwitchIDs[SwitchID].Name = UTF32_CaseFoldString(UTF32_NormalizeString(UTF8_Decode(Name), NormalizationFormKC));
+            UTF8 *Normalized              = UTF8_NormalizeString(Name, NormalizationFormKC);
+            CLI->SwitchIDs[SwitchID].Name = UTF8_CaseFoldString(Normalized);
+            free(Normalized);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Name == NULL) {
@@ -243,7 +240,9 @@ extern   "C" {
     
     void CLISetSwitchDescription(CommandLineIO *CLI, const int64_t SwitchID, UTF8 *Description) {
         if (CLI != NULL && Description != NULL && SwitchID >= 0 && SwitchID <= CLI->NumSwitches - 1) {
-            CLI->SwitchIDs[SwitchID].Description     = UTF32_CaseFoldString(UTF32_NormalizeString(UTF8_Decode(Description), NormalizationFormKC));
+            UTF8 *Normalized                     = UTF8_NormalizeString(Description, NormalizationFormKC);
+            CLI->SwitchIDs[SwitchID].Description = UTF8_CaseFoldString(Normalized);
+            free(Normalized);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Description == NULL) {
@@ -314,16 +313,16 @@ extern   "C" {
     
     static inline void DisplayCLIHelp(CommandLineIO *CLI) {
         if (CLI != NULL) {
-            UTF32 *ProgramName = FormatString(U32("%s's Options (-|--|/):%s"), CLI->ProgramName, NewLine);
-            WriteString(ProgramName, stdout);
+            UTF8  *ProgramName = FormatStringUTF8(U8("%s's Options (-|--|/):%s"), CLI->ProgramName, NewLineUTF8);
+            UTF8_WriteString2File(ProgramName, stdout);
             for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                 CLISwitchTypes CurrentSwitchType = CLI->SwitchIDs[Switch].SwitchType;
-                UTF32 *SwitchInfo = FormatString(U32("%s: %s%s"), CLI->SwitchIDs[Switch].Name, CLI->SwitchIDs[Switch].Description, NewLine);
-                WriteString(SwitchInfo, stdout);
+                UTF8 *SwitchInfo = FormatStringUTF8(U8("%s: %s%s"), CLI->SwitchIDs[Switch].Name, CLI->SwitchIDs[Switch].Description, NewLineUTF8);
+                UTF8_WriteString2File(SwitchInfo, stdout);
                 if (CurrentSwitchType == SwitchMayHaveSlaves && CLI->SwitchIDs[Switch].NumPotentialSlaves > 0) {
                     for (int64_t SlaveSwitch = 0LL; SlaveSwitch < CLI->SwitchIDs[Switch].NumPotentialSlaves - 1; SlaveSwitch++) {
-                        UTF32 *SlaveSwitchInfo = FormatString(U32("\t%s: %s%s"), CLI->SwitchIDs[SlaveSwitch].Name, CLI->SwitchIDs[SlaveSwitch].Description, NewLine);
-                        WriteString(SlaveSwitchInfo, stdout);
+                        UTF8 *SlaveSwitchInfo = FormatStringUTF8(U8("\t%s: %s%s"), CLI->SwitchIDs[SlaveSwitch].Name, CLI->SwitchIDs[SlaveSwitch].Description, NewLineUTF8);
+                        UTF8_WriteString2File(SlaveSwitchInfo, stdout);
                     }
                 }
             }
@@ -335,15 +334,15 @@ extern   "C" {
     static inline void DisplayProgramBanner(CommandLineIO *CLI) {
         if (CLI != NULL) {
             if (CLI->ProgramName != NULL && CLI->ProgramVersion != NULL && CLI->ProgramAuthor != NULL && CLI->ProgramCopyright != NULL) {
-                UTF32 *FormattedString = FormatString(U32("%s, v. %s by %s © %s%s"), CLI->ProgramName, CLI->ProgramVersion, CLI->ProgramAuthor, CLI->ProgramCopyright, NewLine);
-                WriteString(FormattedString, stdout);
+                UTF8 *FormattedString = FormatStringUTF8(U8("%s, v. %s by %s © %s%s"), CLI->ProgramName, CLI->ProgramVersion, CLI->ProgramAuthor, CLI->ProgramCopyright, NewLineUTF8);
+                UTF8_WriteString2File(FormattedString, stdout);
             }
             if (CLI->ProgramDescription != NULL && CLI->ProgramLicenseName != NULL && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL && CLI->IsProprietary == No) {
-                UTF32 *FormattedString = FormatString(U32("%s, Released under the \"%s\" %s, available at: %s%s"), CLI->ProgramDescription, CLI->ProgramLicenseName, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, NewLine);
-                WriteString(FormattedString, stdout);
+                UTF8 *FormattedString = FormatStringUTF8(U8("%s, Released under the \"%s\" %s, available at: %s%s"), CLI->ProgramDescription, CLI->ProgramLicenseName, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, NewLineUTF8);
+                UTF8_WriteString2File(FormattedString, stdout);
             } else if (CLI->ProgramDescription != NULL && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL && CLI->IsProprietary == Yes) {
-                UTF32 *FormattedString = FormatString(U32("%s, By using this software, you agree to the End User License Agreement %s, available at: %s%s"), CLI->ProgramDescription, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, NewLine);
-                WriteString(FormattedString, stdout);
+                UTF8 *FormattedString = FormatStringUTF8(U8("%s, By using this software, you agree to the End User License Agreement %s, available at: %s%s"), CLI->ProgramDescription, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, NewLineUTF8);
+                UTF8_WriteString2File(FormattedString, stdout);
             }
         } else {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
@@ -388,7 +387,7 @@ extern   "C" {
                 for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                     // now compare ArgumentFlag to Switch
                     // Which string is smaller?
-                    if (UTF32_Compare(ArgumentFlag, CLI->SwitchIDs[Switch].Name) == Yes) { // ArgumentFlag matches this switch
+                    if (UTF8_Compare(ArgumentFlag, CLI->SwitchIDs[Switch].Name, NormalizationFormKC, Yes) == Yes) { // ArgumentFlag matches this switch
                         // Set up the Option here
                         CLI->NumOptions   += 1;
                         if (CLI->NumOptions == 1) {
@@ -406,7 +405,7 @@ extern   "C" {
                                 // Ok so now we loop over the values stores in PoentialSlaves, looking up their switch flags.
                                 UTF32 *PotentialSlaveFlag   = CLI->SwitchIDs[CLI->SwitchIDs[Switch].PotentialSlaves[Slave]].Name;
                                 // Now compare PotentialSlaveFlag to PotentialSlaveArg
-                                if (UTF32_Compare(PotentialSlaveArg, PotentialSlaveFlag) == Yes) {
+                                if (UTF8_Compare(PotentialSlaveArg, PotentialSlaveFlag, NormalizationFormKC, Yes) == Yes) {
                                     // We found a slave in the next argument so set the option up.
                                     CLI->OptionIDs[CLI->NumOptions - 1].NumOptionSlaves += 1;
                                     CLI->OptionIDs[CLI->NumOptions - 1].OptionSlaves[CLI->OptionIDs[CLI->NumOptions - 1].NumOptionSlaves - 1] = CLI->SwitchIDs[Switch].PotentialSlaves[Slave];
@@ -427,14 +426,39 @@ extern   "C" {
         }
     }
     
-    void UTF8_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF8 **Arguments) {
+    UTF8 *UTF8_CaseFoldString(UTF8 *String2CaseFold) {
+        if (String2CaseFold != NULL) {
+            // IDEK what I need to do, look up codepoints in a table and replace them with the found variants?
+        } else {
+            Log(Log_ERROR, __func__, U8("String2CaseFold Pointer is NULL"));
+        }
+        return NULL;
+    }
+    
+    UTF16 *UTF16_CaseFoldString(UTF16 *String2CaseFold) {
+        if (String2CaseFold != NULL) {
+            // IDEK what I need to do, look up codepoints in a table and replace them with the found variants?
+        } else {
+            Log(Log_ERROR, __func__, U8("String2CaseFold Pointer is NULL"));
+        }
+        return NULL;
+    }
+    
+    void UTF8_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, const UTF8 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             // Basically now we just loop over the arguments, decode, normalize, and casefold them.
-            UTF32 **Arguments32  = NULL;
-            for (int64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
-                Arguments32[Arg] = UTF32_NormalizeString(UTF32_CaseFoldString(UTF8_Decode(*Arguments[Arg])), NormalizationFormKC);
+            UTF32 **Arguments32  = calloc(NumArguments, sizeof(UTF32*));
+            for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
+                UTF8 *CaseFolded = UTF8_CaseFoldString(*Arguments[Arg]);
+                UTF8 *Normalized = UTF8_NormalizeString(CaseFolded, NormalizationFormKC);
+                free(CaseFolded);
+                Arguments32[Arg] = UTF8_Decode(Normalized);
             }
             UTF32_ParseCommandLineOptions(CLI, NumArguments, Arguments32);
+            for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
+                free(Arguments32[Arg]);
+            }
+            free(Arguments32);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions <= 1 || NumArguments <= 1) {
@@ -442,14 +466,20 @@ extern   "C" {
         }
     }
     
-    void UTF16_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF16 **Arguments) {
+    void UTF16_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, const UTF16 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
-            // Basically now we just loop over the arguments, decode, normalize, and casefold them.
-            UTF32 **Arguments32  = NULL;
+            UTF32 **Arguments32   = calloc(NumArguments, sizeof(UTF32*));
             for (int64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
-                Arguments32[Arg] = UTF32_NormalizeString(UTF32_CaseFoldString(UTF16_Decode(*Arguments[Arg])), NormalizationFormKC);
+                UTF16 *CaseFolded = UTF16_CaseFoldString(*Arguments[Arg]);
+                UTF16 *Normalized = UTF16_NormalizeString(CaseFolded, NormalizationFormKC);
+                free(CaseFolded);
+                Arguments32[Arg]  = UTF16_Decode(Normalized);
             }
             UTF32_ParseCommandLineOptions(CLI, NumArguments, Arguments32);
+            for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
+                free(Arguments32[Arg]);
+            }
+            free(Arguments32);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions <= 1 || NumArguments <= 1) {
@@ -656,7 +686,7 @@ extern   "C" {
                 UTF8 *Indicator             = calloc(CLI->ConsoleWidth, sizeof(UTF8));
                 memset(Indicator, '-', HalfOfTheIndicators);
                 sprintf(ActualStrings2Print[String], "[%s%s %d/%d %hhu/% %s]", Indicator, Strings[String], Numerator, Denominator, PercentComplete, Indicator);
-                fprintf(stdout, "%s%s", &ActualStrings2Print[String], NewLine);
+                fprintf(stdout, "%s%s", &ActualStrings2Print[String], NewLineUTF8);
                 free(Indicator);
             }
             free(StringSize);
@@ -669,45 +699,29 @@ extern   "C" {
     
     void CommandLineIO_Deinit(CommandLineIO *CLI) {
         if (CLI != NULL) {
-            if (CLI->SwitchIDs != NULL) {
+            if (CLI->NumSwitches > 0) {
                 for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                     free(CLI->SwitchIDs[Switch].Name);
                     free(CLI->SwitchIDs[Switch].Description);
                     free(CLI->SwitchIDs[Switch].PotentialSlaves);
                 }
-                free(CLI->SwitchIDs);
             }
-            if (CLI->OptionIDs != NULL) {
+            if (CLI->NumOptions > 0) {
                 for (int64_t Option = 0LL; Option <= CLI->NumOptions - 1; Option++) {
                     free(CLI->OptionIDs[Option].OptionSlaves);
                     free(CLI->OptionIDs[Option].Argument);
                 }
-                free(CLI->OptionIDs);
             }
-            if (CLI->ProgramName != NULL) {
-                free(CLI->ProgramName);
-            }
-            if (CLI->ProgramAuthor != NULL) {
-                free(CLI->ProgramAuthor);
-            }
-            if (CLI->ProgramDescription != NULL) {
-                free(CLI->ProgramDescription);
-            }
-            if (CLI->ProgramVersion != NULL) {
-                free(CLI->ProgramVersion);
-            }
-            if (CLI->ProgramCopyright != NULL) {
-                free(CLI->ProgramCopyright);
-            }
-            if (CLI->ProgramLicenseName != NULL) {
-                free(CLI->ProgramLicenseName);
-            }
-            if (CLI->ProgramLicenseDescription != NULL) {
-                free(CLI->ProgramLicenseDescription);
-            }
-            if (CLI->ProgramLicenseURL != NULL) {
-                free(CLI->ProgramLicenseURL);
-            }
+            free(CLI->SwitchIDs);
+            free(CLI->OptionIDs);
+            free(CLI->ProgramName);
+            free(CLI->ProgramAuthor);
+            free(CLI->ProgramDescription);
+            free(CLI->ProgramVersion);
+            free(CLI->ProgramCopyright);
+            free(CLI->ProgramLicenseName);
+            free(CLI->ProgramLicenseDescription);
+            free(CLI->ProgramLicenseURL);
             free(CLI);
         } else {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));

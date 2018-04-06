@@ -3,14 +3,6 @@
 
 #include "Macros.h"                   /* Included for bool and Yes/No macros */
 
-/*!
- @header    StringIO.h
- @author    Marcus Johnson aka BumbleBritches57
- @copyright 2017+
- @version   0.8.0
- @brief     This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
- */
-
 #pragma once
 
 #ifndef FoundationIO_StringIO_H
@@ -20,22 +12,33 @@
 extern  "C" {
 #endif
     
+    /*!
+     @header    StringIO.h
+     @author    Marcus Johnson aka BumbleBritches57
+     @copyright 2017+
+     @version   1.0.0
+     @brief     This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
+     */
+    
 #ifndef                   U8
-#define                   U8(QuotedLiteral)                      u8##QuotedLiteral
+#define                   U8(QuotedLiteral)                    u8##QuotedLiteral
 #endif
     
 #ifndef                   U16
-#define                   U16(QuotedLiteral)                     u##QuotedLiteral
+#define                   U16(QuotedLiteral)                   u##QuotedLiteral
 #endif
     
 #ifndef                   U32
-#define                   U32(QuotedLiteral)                     U##QuotedLiteral
+#define                   U32(QuotedLiteral)                   U##QuotedLiteral
 #endif
     
-    typedef               uint_least8_t                          UTF8;
-    typedef               uint_least16_t                         UTF16;
-    typedef               uint_least32_t                         UTF32;
+    typedef               uint_least8_t                        UTF8;
+    typedef               uint_least16_t                       UTF16;
+    typedef               uint_least32_t                       UTF32;
     
+    /*!
+     @enum                StringIOCommon
+     */
     typedef enum StringIOCommon {
                           UTF8BOMSizeInCodeUnits               = 3,
                           UTF8BOMSizeInCodePoints              = 1,
@@ -53,10 +56,16 @@ extern  "C" {
                           UTF32LE                              = 0xFFFE,
                           UTF32BE                              = 0xFEFF,
                           UnicodeMaxCodePoint                  = 0x10FFFF,
-                          UnicodeNULLTerminator                = 0x0,
-        UnicodeNULLTerminatorSize            = 1,
     } StringIOCommon;
     
+    /*!
+     @enum                StringIONormalizationForms
+     @constant            UnknownNormalizationForm             "Unknown Normalization Form".
+     @constant            NormalizationFormD                   "Decompose the String".
+     @constant            NormalizationFormC                   "Decompose, then Compose the String".
+     @constant            NormalizationFormKD                  "The same as NormalizationFormD, plus Kompatibility decompositions".
+     @constant            NormalizationFormKC                  "The same as NormalizationFormD, plus Kompatibility compositions".
+     */
     typedef enum StringIONormalizationForms {
                           UnknownNormalizationForm             = 0,
                           NormalizationFormD                   = 1,
@@ -65,6 +74,13 @@ extern  "C" {
                           NormalizationFormKC                  = 4,
     } StringIONormalizationForms;
     
+    /*!
+     @enum                StringIOBases
+     @constant            Binary                               "Base 2".
+     @constant            Octal                                "Base 8".
+     @constant            Decimal                              "Base 10".
+     @constant            Hex                                  "Base 16".
+     */
     typedef enum StringIOBases {
                           Binary                               = 2,
                           Octal                                = 8,
@@ -72,32 +88,26 @@ extern  "C" {
                           Hex                                  = 16,
     } StringIOBases;
     
-    typedef enum StringIOFormatType {
-                          UnknownFormatType                    = 0,
-                          SignedInteger8                       = 1,
-                          SignedInteger16                      = 2,
-                          SignedInteger32                      = 3,
-                          SignedInteger64                      = 4,
-                          UnsignedInteger8                     = 5,
-                          UnsignedInteger16                    = 6,
-                          UnsignedInteger32                    = 7,
-                          UnsignedInteger64                    = 8,
-                          Decimal16                            = 9,
-                          Decimal32                            = 10,
-                          Decimal64                            = 11,
-                          Decimal128                           = 12,
-                          String8                              = 13,
-                          String16                             = 14,
-                          String32                             = 15,
-    } StringIOFormatType;
-    
+    /*!
+     @enum                StringIOBOMStates
+     @constant            UnknownBOMState                      "It's unknown if the string contains a BOM".
+     @constant            AddBOM                               "Add a BOM even if there already is one".
+     @constant            RemoveBOM                            "Remove the BOM".
+     @constant            KeepBOM                              "Keep the BOM".
+     */
     typedef enum StringIOBOMStates {
                           UnknownBOMState                      = 0,
-                          UnconditionallyAddBOM                = 1,
-                          UnconditionallyRemoveBOM             = 2,
-                          KeepTheBOMStateTheSame               = 3,
+                          AddBOM                               = 1,
+                          RemoveBOM                            = 2,
+                          KeepBOM                              = 3,
     } StringIOBOMStates;
     
+    /*!
+     @enum                StringIOByteOrders
+     @constant            UseNativeByteOrder                   "Use the byte order of the host".
+     @constant            UseLEByteOrder                       "Use the little endian, Least-Significant-Byte First order".
+     @constant            UseBEByteOrder                       "Use the big endian, Most-Significant-Byte First order".
+     */
     typedef enum StringIOByteOrders {
                           UseNativeByteOrder                   = 0,
                           UseLEByteOrder                       = 1,
@@ -112,13 +122,6 @@ extern  "C" {
     uint64_t              UTF8_GetSizeInCodeUnits(UTF8 *String2Count);
     
     /*!
-     @abstract                             "Gets the number of Unicode codepoints in the string".
-     @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
-     @param               String           "The string to get the number of codepoints in".
-     */
-    uint64_t              UTF8_GetSizeInCodePoints(UTF8 *String);
-    
-    /*!
      @abstract                             "Gets the number of Unicode codeunits in the UTF8".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
      @param               String2Count     "The string to get the number of codepoints in".
@@ -128,27 +131,22 @@ extern  "C" {
     /*!
      @abstract                             "Gets the number of Unicode codepoints in the string".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
-     @param               String           "The string to get the number of codepoints in".
+     @param               String2Count     "The string to get the number of codepoints in".
      */
-    uint64_t              UTF16_GetSizeInCodePoints(UTF16 *String);
+    uint64_t              UTF8_GetSizeInCodePoints(UTF8 *String2Count);
     
     /*!
      @abstract                             "Gets the number of Unicode codepoints in the string".
-     @param               String           "The string to get the number of codepoints in".
+     @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
+     @param               String2Count     "The string to get the number of codepoints in".
      */
-    uint64_t              UTF32_GetSizeInCodePoints(UTF32 *String);
+    uint64_t              UTF16_GetSizeInCodePoints(UTF16 *String2Count);
     
     /*!
-     @abstract                             "Gets the number of Unicode code units in the string if it was encoded in UTF8".
-     @param               String           "The string to get the number of code units from".
+     @abstract                             "Gets the number of Unicode codepoints in the string".
+     @param               String2Count     "The string to get the number of codepoints in".
      */
-    uint64_t              UTF32_GetSizeInUTF8CodeUnits(UTF32 *String);
-    
-    /*!
-     @abstract                             "Gets the number of Unicode code units in the string if it was encoded in UTF16".
-     @param               String           "The string to get the number of code units from".
-     */
-    uint64_t              UTF32_GetSizeInUTF16CodeUnits(UTF32 *String);
+    uint64_t              UTF32_GetSizeInCodePoints(UTF32 *String2Count);
     
     /*!
      @abstract                             "Decodes a UTF8 string to a UTF32 string".
@@ -175,18 +173,12 @@ extern  "C" {
     UTF16                *UTF16_Encode(UTF32 *String, StringIOByteOrders OutputByteOrder);
     
     /*!
-     @abstract                             "Byteswaps a UTF16".
-     @param               String2Convert   "The string to byteswap".
-     @param               OutputByteOrder  "The byte order you want the string in".
+     @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
+     @remark                               "The string is reallocated at the end to remove unused space".
+     @param               String2Normalize "The string to be normalized".
+     @param               NormalizedForm   "The type of normalization of use on String2Normalize"
      */
-    void                  UTF16_ConvertByteOrder(UTF16 *String2Convert, StringIOByteOrders OutputByteOrder);
-    
-    /*!
-     @abstract                             "Byteswaps a UTF32".
-     @param               String2Convert   "The string to byteswap".
-     @param               OutputByteOrder  "The byte order you want the string in".
-     */
-    void                  UTF32_ConvertByteOrder(UTF32 *String2Convert, StringIOByteOrders OutputByteOrder);
+    UTF8                 *UTF8_NormalizeString(UTF8 *String2Normalize, StringIONormalizationForms NormalizedForm);
     
     /*!
      @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
@@ -194,14 +186,21 @@ extern  "C" {
      @param               String2Normalize "The string to be normalized".
      @param               NormalizedForm   "The type of normalization of use on String2Normalize"
      */
-    UTF32                *UTF32_NormalizeString(UTF32 *String2Normalize, StringIONormalizationForms NormalizedForm);
+    UTF16                *UTF16_NormalizeString(UTF16 *String2Normalize, StringIONormalizationForms NormalizedForm);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
      @param               String2CaseFold  "The string to be casefolded".
      @return                               "Returns the case folded string".
      */
-    UTF32                *UTF32_CaseFoldString(UTF32 *String2CaseFold);
+    UTF8                 *UTF8_CaseFoldString(UTF8 *String2CaseFold);
+    
+    /*!
+     @abstract                             "Casefolds string for case insensitive comparison".
+     @param               String2CaseFold  "The string to be casefolded".
+     @return                               "Returns the case folded string".
+     */
+    UTF16                *UTF16_CaseFoldString(UTF16 *String2CaseFold);
     
     /*!
      @abstract                             "Finds a substring within string, starting at codepoint Offset, and ending at Offset + Length".
@@ -212,7 +211,18 @@ extern  "C" {
      @param               Length           "How many codepoints should we search for the substring? -1 means all codepoints".
      @return                               "Returns the offset of the start of the substring in String, or -1 if a match wasn't found.".
      */
-    int64_t               UTF32_FindSubString(UTF32 *String, UTF32 *SubString, uint64_t Offset, int64_t Length);
+    int64_t               UTF8_FindSubString(UTF8 *String, UTF8 *SubString, uint64_t Offset, int64_t Length);
+    
+    /*!
+     @abstract                             "Finds a substring within string, starting at codepoint Offset, and ending at Offset + Length".
+     @remark                               "We do NOT casefold, or normalize the String or SubString, that's your job".
+     @param               String           "The string to search for SubString in".
+     @param               SubString        "The SubString to find in String".
+     @param               Offset           "Where in the string should we start looking for the substring"?
+     @param               Length           "How many codepoints should we search for the substring? -1 means all codepoints".
+     @return                               "Returns the offset of the start of the substring in String, or -1 if a match wasn't found.".
+     */
+    int64_t               UTF16_FindSubString(UTF16 *String, UTF16 *SubString, uint64_t Offset, int64_t Length);
     
     /*!
      @abstract                             "Extracts a SubString from String".
@@ -220,7 +230,33 @@ extern  "C" {
      @param               Offset           "The CodePoint to start extracting from".
      @param               Length           "The number of codepoints to extract".
      */
-    UTF32                *UTF32_ExtractSubString(UTF32 *String, uint64_t Offset, uint64_t Length);
+    UTF8                 *UTF8_ExtractSubString(UTF8 *String, uint64_t Offset, uint64_t Length);
+    
+    /*!
+     @abstract                             "Extracts a SubString from String".
+     @param               String           "The string to extract from".
+     @param               Offset           "The CodePoint to start extracting from".
+     @param               Length           "The number of codepoints to extract".
+     */
+    UTF16                *UTF16_ExtractSubString(UTF16 *String, uint64_t Offset, uint64_t Length);
+    
+    /*!
+     @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
+     @remark                               "Replaces strtok from the standard library".
+     @param               String2Split     "The string you want to be split".
+     @param               NumDelimiters    "The number of delimiter strings in Delimiters".
+     @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
+     */
+    UTF8                **UTF8_SplitString(UTF8 *String2Split, uint64_t NumDelimiters, UTF8 **Delimiters);
+    
+    /*!
+     @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
+     @remark                               "Replaces strtok from the standard library".
+     @param               String2Split     "The string you want to be split".
+     @param               NumDelimiters    "The number of delimiter strings in Delimiters".
+     @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
+     */
+    UTF16               **UTF16_SplitString(UTF16 *String2Split, uint64_t NumDelimiters, UTF16 **Delimiters);
     
     /*!
      @abstract                             "Replaces a section in String starting at Offset and ending at Offset + Length with Replacement".
@@ -229,13 +265,28 @@ extern  "C" {
      @param               Offset           "Where to start replacing String with Replacement".
      @param               Length           "The number of codepoints to replace, can be more or less than Replacement".
      */
-    UTF32                *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length);
+    UTF8                 *UTF8_ReplaceSubString(UTF8 *String, UTF8 *Replacement, uint64_t Offset, uint64_t Length);
+    
+    /*!
+     @abstract                             "Replaces a section in String starting at Offset and ending at Offset + Length with Replacement".
+     @param               String           "The string to edit".
+     @param               Replacement      "The string to splice in".
+     @param               Offset           "Where to start replacing String with Replacement".
+     @param               Length           "The number of codepoints to replace, can be more or less than Replacement".
+     */
+    UTF16                *UTF16_ReplaceSubString(UTF16 *String, UTF16 *Replacement, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Extracts a number from a string".
      @param               String           "The string to extract a number from".
      */
-    int64_t               UTF32_String2Integer(UTF32 *String);
+    int64_t               UTF8_String2Integer(UTF8 *String);
+    
+    /*!
+     @abstract                             "Extracts a number from a string".
+     @param               String           "The string to extract a number from".
+     */
+    int64_t               UTF16_String2Integer(UTF16 *String);
     
     /*!
      @abstract                             "Converts an integer to a string".
@@ -243,50 +294,105 @@ extern  "C" {
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF32                *UTF32_Integer2String(const StringIOBases Base, const bool UpperCase, int64_t Integer2Convert);
+    UTF8                 *UTF8_Integer2String(const StringIOBases Base, const bool UpperCase, int64_t Integer2Convert);
+    
+    /*!
+     @abstract                             "Converts an integer to a string".
+     @param               UpperCase        "If the Base is Hex, should the output string be upper case"?
+     @param               Base             "The base to output the integer in".
+     @param               Integer2Convert  "The number to convert into a string".
+     */
+    UTF16                *UTF16_Integer2String(const StringIOBases Base, const bool UpperCase, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts a string to a double, replaces strtod and atof".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
-    double                String2Decimal(UTF32 *String);
+    double                UTF8_String2Decimal(UTF8 *String);
+    
+    /*!
+     @abstract                             "Converts a string to a double, replaces strtod and atof".
+     @param               String           "The string composed of a decimal number to convert to a decimal".
+     */
+    double                UTF16_String2Decimal(UTF16 *String);
     
     /*!
      @abstract                             "Converts a double to a string, replaces strtod and atof".
      @param               Decimal          "The decimal number to convert to a string".
      */
-    UTF32                *Decimal2String(double Decimal);
+    UTF8                 *UTF8_Decimal2String(double Decimal);
     
-    /* High level functions */
-    bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive);
-    
-    bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive);
+    /*!
+     @abstract                             "Converts a double to a string, replaces strtod and atof".
+     @param               Decimal          "The decimal number to convert to a string".
+     */
+    UTF16                *UTF16_Decimal2String(double Decimal);
     
     /*!
      @abstract                             "Compares String1 and String2 for equilivence".
+     @remark                               "String1 and String2 MUST use the same Unicode encoding".
+     @param               String1          "String1 Pointer".
+     @param               String2          "String2 Pointer".
+     @param               NormalizedForm   "The normalization to use before comparing the strings".
+     @param               CaseInsensitive  "Should the strings be casefolded first"?
+     @return                               "Returns wether the strings match or not".
      */
-    bool                  UTF32_Compare(UTF32 *String1, UTF32 *String2);
+    bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive);
     
     /*!
-     @abstract                             "Removes all whitespace from the given string, from the beginning, end, and in the middle".
-     @param               String           "The string to strip".
-     @return                               "Returns the stripped string".
+     @abstract                             "Compares String1 and String2 for equilivence".
+     @remark                               "String1 and String2 MUST use the same Unicode encoding".
+     @param               String1          "String1 Pointer".
+     @param               String2          "String2 Pointer".
+     @param               NormalizedForm   "The normalization to use before comparing the strings".
+     @param               CaseInsensitive  "Should the strings be casefolded first"?
+     @return                               "Returns wether the strings match or not".
      */
-    UTF32                *UTF32_StripWhiteSpace(UTF32 *String);
+    bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive);
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
+     @remark                               "DO NOT CALL THIS FUNCTION DIRECTLY, CALL THE MACRO FormatStringUTF8".
      @remark                               "We've extended FormatString from printf by adding the B specifier, for binary".
      @remark                               "We do not support the p or n specifiers".
-     @param               VarArgCount      "The macro automatically provides this information".
-     @param               Format           "A UTF32 encoded string containing the formatting string".
-     @return                               "Returns the formatted string".
+     @param               Format           "A string with optional format specifiers".
+     @param               NumArguments     "Is automatically populated by the FormatString* macro".
+     @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
-    UTF32                *UTF32_FormatString(const uint64_t VarArgCount, UTF32 *Format, ...);
+    UTF8                 *UTF8_FormatString(UTF8 *Format, uint64_t NumArguments, ...);
     
-#define                   FormatString(Format, ...) UTF32_FormatString(CountVariadicArguments(__VA_ARGS__), Format, __VA_ARGS__)
+    #define FormatStringUTF8(Format, ...) UTF8_FormatString(Format, CountVariadicArguments(__VA_ARGS__), __VA_ARGS__)
     
-    void                  WriteString(UTF32 *String2Write, FILE *OutputFile);
+    /*!
+     @abstract                             "Formats a string according to the Format string, with all of it's options".
+     @remark                               "DO NOT CALL THIS FUNCTION DIRECTLY, CALL THE MACRO FormatStringUTF16".
+     @remark                               "We've extended FormatString from printf by adding the B specifier, for binary".
+     @remark                               "We do not support the p or n specifiers".
+     @param               Format           "A string with optional format specifiers".
+     @param               NumArguments     "Is automatically populated by the FormatString* macro".
+     @return                               "Returns the formatted string encoded using the UTF-16 format".
+     */
+    UTF16                *UTF16_FormatString(UTF16 *Format, uint64_t NumArguments, ...);
+    
+    #define FormatStringUTF16(Format, ...) UTF16_FormatString(Format, CountVariadicArguments(__VA_ARGS__), __VA_ARGS__)
+    
+    /*!
+     @abstract                             "Writes a UTF-8 encoded string to the OutputFile using the platform's default Unicode encoding".
+     @remark                               "On Windows, Strings are converted to UTF-16; on POSIX platforms (including Mac/iOS) strings are written as UTF-8".
+     @param               String2Write     "The string to write to OutputFile (including any newlines, etc)".
+     @param               OutputFile       "a valid FILE pointer, or STDIN/STDOUT/STDERR".
+     */
+    void                  UTF8_WriteString2File(UTF8 *String2Write, FILE *OutputFile);
+    
+    /*!
+     @abstract                             "Writes a UTF-16 encoded string to the OutputFile using the platform's default Unicode encoding".
+     @remark                               "On Windows, Strings are output as UTF-16; on POSIX platforms (including Mac/iOS) strings are written as UTF-8".
+     @param               String2Write     "The string to write to OutputFile (including any newlines, etc)".
+     @param               OutputFile       "a valid FILE pointer, or STDIN/STDOUT/STDERR".
+     */
+    void                  UTF16_WriteString2File(UTF16 *String2Write, FILE *OutputFile);
+    
+#define CompareStrings(String1, String2, NormalizedForm, CaseInsensitive) _Generic((String1, String2), UTF8*:UTF8_Compare, UTF16*:UTF16_Compare)(String1, String2, NormalizedForm, CaseInsensitive)
     
 #ifdef  __cplusplus
 }

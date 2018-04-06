@@ -3,9 +3,8 @@
 #include <stdio.h>                     /* Included for FILE */
 #include <stdlib.h>                    /* Included for calloc, free */
 
-#include "../include/Log.h"            /* Included for the Log declarations */
 #include "../include/Macros.h"         /* Included for NewLineWithNULLSize, FoundationIOTargetOS */
-#include "../include/StringIO.h"       /* Included for UTF8 */
+#include "../include/Log.h"            /* Included for the Log declarations */
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,12 +45,12 @@ extern "C" {
         va_end(VariadicArguments);
         
         if (Log_ProgramName != NULL) {
-            UTF32 *FormattedString = FormatString(U32("%s: %s in %s: \"%s\"%s"), Log_ProgramName, (Severity == Log_ERROR ? Error : Debug), FunctionName, VariadicString, NewLine);
-            WriteString(FormattedString, Log_LogFile == NULL ? stderr : Log_LogFile);
+            UTF8  *FormattedString = FormatStringUTF8(U8("%s: %s in %s: \"%s\"%s"), Log_ProgramName, (Severity == Log_ERROR ? Error : Debug), FunctionName, VariadicString, NewLineUTF8);
+            UTF8_WriteString2File(FormattedString, Log_LogFile == NULL ? stderr : Log_LogFile);
             free(FormattedString);
         } else {
-            UTF32 *FormattedString = FormatString(U32("%s in %s: \"%s\"%s"), (Severity == Log_ERROR ? Error : Debug), FunctionName, VariadicString, NewLine);
-            WriteString(FormattedString, Log_LogFile == NULL ? stderr : Log_LogFile);
+            UTF8  *FormattedString = FormatStringUTF8(U8("%s in %s: \"%s\"%s"), (Severity == Log_ERROR ? Error : Debug), FunctionName, VariadicString, NewLineUTF8);
+            UTF8_WriteString2File(FormattedString, Log_LogFile == NULL ? stderr : Log_LogFile);
             free(FormattedString);
         }
         free(VariadicString);

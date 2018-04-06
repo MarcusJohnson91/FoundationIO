@@ -12,12 +12,15 @@ extern   "C" {
 #endif
     
     /*!
-     @header    CommandLineIO.h
-     @author    Marcus Johnson aka BumbleBritches57
-     @copyright 2017+
-     @version   4.0.0
-     @brief     This header contains code for parsing command line options.
+     @header                    CommandLineIO.h
+     @author                    Marcus Johnson aka BumbleBritches57
+     @copyright                 2017+
+     @version                   1.0.0
+     @brief                     This header contains code for parsing command line options.
      */
+    
+    static const UTF8  UTF8_ParseCommandLineOptions_Delimiters[2][3]  = {u8"-", u8"--"};
+    static const UTF16 UTF16_ParseCommandLineOptions_Delimiters[2][3] = {u"-", u"--"};
     
     /*!
      @enum                      CLISwitchTypes
@@ -71,6 +74,14 @@ extern   "C" {
                                 ArgumentNotAllowed              = 16,
     } CLIArgumentTypes;
     
+    /*!
+     @enum                      CLILicenseTypes
+     @abstract                                                  "Defines the types of licenses".
+     @constant                  UnknownLicenseType              "Unknown Argument type".
+     @constant                  PermissiveLicense               "The Argument may have slaves, but it may not too".
+     @constant                  ProprietaryLicense              "The Argument can not have any slaves".
+     @constant                  CopyleftLicense                 "The Argument is a slave".
+     */
     typedef enum CLILicenseTypes {
                                 UnknownLicenseType              = 0,
                                 PermissiveLicense               = 1,
@@ -78,12 +89,20 @@ extern   "C" {
                                 CopyleftLicense                 = 3,
     } CLILicenseTypes;
     
-    typedef enum DelimiterTypes {
+    /*!
+     @enum                      CLILicenseTypes
+     @abstract                                                  "Defines the types of licenses".
+     @constant                  UnknownDelimiter                "Unknown delimiter".
+     @constant                  RangeDelimiter                  "Denotes a range using the double dot syntax (X..Y)".
+     @constant                  EqualDelimiter                  "Delimits 2 fields with an equal sign (SwitchName=Result)".
+     @constant                  ColonDelimiter                  "Delimits 2 fields with a colon (SwitchName:Result)".
+     */
+    typedef enum CLIDelimiterTypes {
                                 UnknownDelimiter                = 0,
                                 RangeDelimiter                  = 1,
                                 EqualDelimiter                  = 2,
                                 ColonDelimiter                  = 3,
-    } DelimiterTypes;
+    } CLIDelimiterTypes;
     
     /*!
      @typedef                   CommandLineIO
@@ -180,6 +199,12 @@ extern   "C" {
      */
     void                        CLISetSwitchType(CommandLineIO *CLI, int64_t SwitchID, CLISwitchTypes SwitchType);
     
+    /*!
+     @abstract                                                  "Sets SwitchID as accepting arguments of only a certain type".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     SwitchID                        "The switch to apply the ArgumentType to".
+     @param                     ArgumentType                    "The argument type from CLIArgumentTypes".
+     */
     void                        CLISetSwitchArgumentType(CommandLineIO *CLI, const int64_t SwitchID, CLIArgumentTypes ArgumentType);
     
     /*!
@@ -199,13 +224,20 @@ extern   "C" {
     void                        CLISetSwitchMaxConcurrentSlaves(CommandLineIO *CLI, const int64_t MasterID, const int64_t MaxActiveSlaves);
     
     /*!
-     @abstract                                                  "Parses argv for switches matching the ones contained in CLI".
-     @remark                                                    "Args[0] (the path for the original executable) is NEVER searched or used, and is assumed to exist, if it's not set it to NULL".
+     @abstract                                                  "Parses the Command Line Options as UTF-8 encoded strings".
      @param                     CLI                             "CommandLineIO Pointer".
-     @param                     NumArgs                         "The number of Arguments entered".
-     @param                     Args                            "An array of UTF-8 encoded strings, for WMain call UTF16_Decode and UTF8_Encode on each string".
+     @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to argc".
+     @param                     Arguments                       "An array of UTF-8 encoded arguments; equilivent to argv"
      */
-    void                        ParseCommandLineOptions(CommandLineIO *CLI, const uint64_t NumArgs, const UTF8 **Args);
+    void                        UTF8_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, const UTF8 **Arguments);
+    
+    /*!
+     @abstract                                                  "Parses the Command Line Options as UTF-16 encoded strings".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to __argc".
+     @param                     Arguments                       "An array of UTF-8 encoded arguments; equilivent to __wargv"
+     */
+    void                        UTF16_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, const UTF16 **Arguments);
     
     /*!
      @abstract                                                  "Displays on the screen the progress of X actions that are taking place"
@@ -253,13 +285,9 @@ extern   "C" {
     
     /*!
      @abstract                                                  "Deallocates the instance of CommandLineIO pointed to by CLI".
-     @param                     CLI                             "Pointer to the instance of CommandLineIO you want to delete".
+     @param                     CLI                             "CommandLineIO Pointer".
      */
     void                        CommandLineIO_Deinit(CommandLineIO *CLI);
-    
-    void                        UTF8_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF8 **Arguments);
-    
-    void                        UTF16_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF16 **Arguments);
     
     void                        DEBUGCommandLineOptions(CommandLineIO *CLI);
     

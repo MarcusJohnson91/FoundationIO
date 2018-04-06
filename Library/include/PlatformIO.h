@@ -14,7 +14,7 @@ extern  "C" {
      @header    Macros.h
      @author    Marcus Johnson aka BumbleBritches57
      @copyright 2017+
-     @version   2.0.0
+     @version   1.0.0
      @brief     This header contains preprocessor macros for generic functions in FoundationIO, and cross-platform compatibility.
      */
     
@@ -60,7 +60,9 @@ extern  "C" {
     
 #ifndef             NewLineWithNULLSize
 #define             NewLineWithNULLSize    1
-    static const char   NewLine[2]  = {0x0D, 0x00}; /* \r */
+static const uint_least8_t  NewLineUTF8[]  = u8"\r";
+static const uint_least16_t NewLineUTF16[] = u"\r";
+static const uint_least32_t NewLineUTF32[] = U"\r";
 #endif
     
 #elif    defined(_POSIX_C_SOURCE) || defined(__APPLE__) || defined(__MACH__) || defined(BSD) || defined(linux) || defined(__linux)
@@ -71,7 +73,9 @@ extern  "C" {
     
 #ifndef             NewLineWithNULLSize
 #define             NewLineWithNULLSize    1
-    static const char   NewLine[2]  = {0x0A, 0x00}; /* \n */
+static const uint_least8_t  NewLineUTF8[]  = u8"\n";
+static const uint_least16_t NewLineUTF16[] = u"\n";
+static const uint_least32_t NewLineUTF32[] = U"\n";
 #endif
     
 #ifndef typeof
@@ -91,8 +95,8 @@ extern  "C" {
 #define             FoundationIO_Tell(File) ftello(File)
 #endif
     
-#ifndef              FoundationIO_Seek
-#define              FoundationIO_Seek(File, Offset, Origin) fseeko(File, Offset, Origin)
+#ifndef             FoundationIO_Seek
+#define             FoundationIO_Seek(File, Offset, Origin) fseeko(File, Offset, Origin)
 #endif
     
 #elif    defined(_WIN32) || defined(__WIN32__) || defined(_WIN64) || defined(__WINDOWS__)
@@ -103,7 +107,9 @@ extern  "C" {
     
 #ifndef             NewLineWithNULLSize
 #define             NewLineWithNULLSize    2
-    static const char   NewLine[3]  = {0x0D, 0x0A, 0x00}; /* \r\n */
+static const uint_least8_t  NewLineUTF8[]  = u8"\r\n";
+static const uint_least16_t NewLineUTF16[] = u"\r\n";
+static const uint_least32_t NewLineUTF32[] = U"\r\n";
 #endif
     
 #ifndef typeof
@@ -120,14 +126,6 @@ extern  "C" {
     
 #ifndef             FoundationIO_Seek
 #define             FoundationIO_Seek(File, Offset, Origin) _fseeki64(File, Offset, Origin)
-#endif
-    
-#ifndef             strncasecmp
-#define             strncasecmp         _strnicmp
-#endif
-    
-#ifndef             strcasecmp
-#define             strcasecmp           stricmp
 #endif
     
 #elif
@@ -160,6 +158,16 @@ extern  "C" {
     } ByteBitOrders;
     
     void GetRuntimeByteBitOrder(void);
+    
+    /*!
+     @enum                      FoundationIOConstants
+     @constant                  NULLTerminator             "The value of a NULL terminator".
+     @constant                  NULLTerminatorSize         "The size of a NULL terminator".
+     */
+    typedef enum FoundationIOConstants {
+                                NULLTerminator             = 0,
+                                NULLTerminatorSize = 1,
+    } FoundationIOConstants;
     
 #ifdef  __cplusplus
 }

@@ -3,10 +3,10 @@
 #include <stdlib.h>                    /* Included for calloc, realloc, and free */
 #include <string.h>                    /* Included for memset, memmove */
 
-#include "../include/Macros.h"         /* Included for NewLineWithNULLSize */
+#include "../include/Macros.h"         /* Included for NewLineWithNULLSize, and GetRuntimeByteBitOrder */
 #include "../include/Math.h"           /* Included for Integer functions */
 #include "../include/Log.h"            /* Included for LogTypes */
-#include "../include/BitIO.h"
+#include "../include/BitIO.h"          /* Included for our declarations */
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,38 +69,49 @@ extern "C" {
         return Position;
     }
     
-    bool BitBuffer_IsAligned(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
+    uint64_t BitBuffer_GetBitsFree(BitBuffer *BitB) { // GetBitsAvailable focuses to much on a writing perspective, I need a good, solid word that applies to both reading and writing. GetBitsFree?
+        uint64_t BitsFree = 0ULL;
+        if (BitB != NULL) {
+            BitsFree      = BitB->NumBits - BitB->BitOffset;
+        } else {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        }
+        return BitsFree;
+    }
+    
+    bool BitBuffer_IsAligned(BitBuffer *BitB, const uint8_t AlignmentSize) {
         bool AlignmentStatus = No;
-        if (BitB != NULL && (BytesOfAlignment % 2 == 0 || BytesOfAlignment == 1)) {
-            if (BitB->BitOffset % (BytesOfAlignment * 8) == 0) {
+        if (BitB != NULL && (AlignmentSize == 1 || AlignmentSize % 2 == 0)) {
+            if (BitB->BitOffset % (AlignmentSize * 8) == 0) {
                 AlignmentStatus = Yes;
             }
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
-        } else if (BytesOfAlignment % 2 == 0 || BytesOfAlignment == 1) {
-            Log(Log_ERROR, __func__, U8("BytesOfAlignment: %d isn't an integer power of 2"), BytesOfAlignment);
+        } else if (AlignmentSize == 1 || AlignmentSize % 2 == 0) {
+            Log(Log_ERROR, __func__, U8("AlignmentSize: %d isn't an integer power of 2 (or 1)"), AlignmentSize);
         }
         return AlignmentStatus;
     }
     
-    void BitBuffer_Align(BitBuffer *BitB, const uint8_t BytesOfAlignment) {
-        if (BitB != NULL && (BytesOfAlignment % 2 == 0 || BytesOfAlignment == 1)) {
-            uint8_t Bits2Align = (BytesOfAlignment * 8) - (BitB->BitOffset % (BytesOfAlignment * 8));
-            if ((BitB->BitOffset + Bits2Align > BitB->NumBits) || (BitB->BitOffset + Bits2Align < BitB->NumBits)) {
-                BitB->Buffer   = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
-                BitB->NumBits += Bits2Align;
+    void BitBuffer_Align(BitBuffer *BitB, const uint8_t AlignmentSize) {
+        if (BitB != NULL && (AlignmentSize == 1 || AlignmentSize % 2 == 0)) {
+            uint8_t AlignmentSizeInBits = Bytes2Bits(AlignmentSize);
+            uint8_t Bits2Align          = AlignmentSizeInBits - (BitB->BitOffset % AlignmentSizeInBits);
+            if (BitB->BitOffset + Bits2Align > BitB->NumBits) {
+                BitB->Buffer            = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
+                BitB->NumBits          += Bits2Align;
             }
-            BitB->BitOffset   += Bits2Align;
+            BitB->BitOffset            += Bits2Align;
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
-        } else if (BytesOfAlignment % 2 == 0 || BytesOfAlignment == 1) {
-            Log(Log_ERROR, __func__, U8("BytesOfAlignment: %d isn't a power of 2 (or 1)"), BytesOfAlignment);
+        } else if (AlignmentSize == 1 || AlignmentSize % 2 == 0) {
+            Log(Log_ERROR, __func__, U8("AlignmentSize: %d isn't a power of 2 (or 1)"), AlignmentSize);
         }
     }
     
     void BitBuffer_Skip(BitBuffer *BitB, const int64_t Bits2Skip) {
         if (BitB != NULL) {
-            if ((BitB->BitOffset + Bits2Skip > BitB->NumBits) || (BitB->BitOffset + Bits2Skip < BitB->NumBits)) {
+            if (BitB->BitOffset + Bits2Skip > BitB->NumBits) {
                 BitB->Buffer    = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Skip, Yes));
                 BitB->NumBits  += Bits2Skip;
             }
@@ -110,10 +121,26 @@ extern "C" {
         }
     }
     
-    void BitBuffer_Update(BitInput *BitI, BitBuffer *BitB) {
+    void BitBuffer_Resize(BitBuffer *BitB, const uint64_t NewSize) { // We need to ensure that the new size is at least as large as the remaining bits
+        if (BitB != NULL && NewSize >= BitBuffer_GetBitsFree(BitB)) {
+            memset(BitB->Buffer, 0, Bits2Bytes(BitB->NumBits, No));
+            free(BitB->Buffer);
+            BitB->Buffer        = calloc(NewSize, sizeof(uint8_t));
+            if (BitB->Buffer != NULL) {
+                BitB->BitOffset = 0;
+                BitB->NumBits   = Bits2Bytes(NewSize, No);
+            } else {
+                Log(Log_ERROR, __func__, U8("Allocating %d bytes failed"), NewSize);
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        }
+    }
+    
+    void BitBuffer_Update(BitBuffer *BitB, BitInput *BitI) {
         if (BitI != NULL && BitB != NULL) {
             // Ok so we need to Get the number of bits that haven't yet been read from the buffer by subtracting BitOffset from NumBits.
-            uint64_t NumBits2Keep      = BitB->NumBits - BitB->BitOffset;
+            uint64_t NumBits2Keep      = BitBuffer_GetBitsFree(BitB);
             uint64_t BufferSizeInBytes = Bits2Bytes(BitB->NumBits, No);
             uint8_t *NewBuffer         = calloc(BufferSizeInBytes, sizeof(uint8_t));
             if (NewBuffer != NULL) {
@@ -127,22 +154,6 @@ extern "C" {
         } else if (BitI == NULL) {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         } else if (BitB == NULL) {
-            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
-        }
-    }
-    
-    void BitBuffer_Resize(BitBuffer *BitB, const uint64_t NewSizeInBytes) {
-        if (BitB != NULL) {
-            memset(BitB->Buffer, 0, Bits2Bytes(BitB->NumBits, No));
-            free(BitB->Buffer);
-            BitB->Buffer        = calloc(NewSizeInBytes, sizeof(uint8_t));
-            if (BitB->Buffer != NULL) {
-                BitB->BitOffset = 0;
-                BitB->NumBits   = Bits2Bytes(NewSizeInBytes, No);
-            } else {
-                Log(Log_ERROR, __func__, U8("Allocating %d bytes failed"), NewSizeInBytes);
-            }
-        } else {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         }
     }
@@ -285,6 +296,38 @@ extern "C" {
         return OutputData;
     }
     
+    UTF8    *ReadUTF8(BitBuffer *BitB, uint64_t StringSize) {
+        UTF8 *ExtractedString             = calloc(StringSize, sizeof(UTF8));
+        if (BitB != NULL && ExtractedString != NULL) {
+            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
+                ExtractedString[CodeUnit] = ExtractBits(MSByteFirst, LSBitFirst, BitB, 8);
+            }
+        }
+        return ExtractedString;
+    }
+    
+    UTF16   *ReadUTF16(ByteBitOrders StringByteOrder, BitBuffer *BitB, uint64_t StringSize) {
+        /* How do we handle the byte order? Well if it was written with a BOM we can read the BOM to figure out the encoded byte and bit order */
+        /* But if it wasn't... we'll need external information, ok so what information do we need? just the byte order. */
+        /* Ok, so if the StringByteOrder is set to UnknownByteFirst, read it from the BOM. */
+        UTF16 *ExtractedString                    = calloc(StringSize, sizeof(UTF16));
+        if (BitB != NULL && ExtractedString != NULL) {
+            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
+                if (StringByteOrder != UnknownByteFirst) {
+                    uint16_t BOM                  = PeekBits(MSByteFirst, LSBitFirst, BitB, 16);
+                    if (BOM != UTF16BE && BOM != UTF16LE) {
+                        ExtractedString[CodeUnit] = ExtractBits(LSByteFirst, LSBitFirst, BitB, 16);
+                    } else {
+                        ExtractedString[CodeUnit] = ExtractBits(MSByteFirst, LSBitFirst, BitB, 16);
+                    }
+                } else {
+                    ExtractedString[CodeUnit]     = ExtractBits(StringByteOrder, LSBitFirst, BitB, 16);
+                }
+            }
+        }
+        return ExtractedString;
+    }
+    
     void     WriteBits(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
         if (BitB != NULL && NumBits2Write >= 1 && NumBits2Write <= 64) {
             InsertBits(ByteOrder, BitOrder, BitB, NumBits2Write, Bits2Write);
@@ -328,16 +371,16 @@ extern "C" {
     }
     
     /*!
-     @param BitB        Pointer to BitBuffer the array will be written to
-     @param Array2Write The array to write to the BitBuffer
-     @param ElementSize The size of the type of array, uint16_t would be 16, etc.
-     @param NumElements2Write The number of elements from the array to write
-     @param ElementOffset which element should we start writing from?
-     @param OutputByteOrder the byte order the elements should be written in
-     @param OutputBitOrder  the bit order the elements should be written in
-     @param Bits2Write      The number of bits to write from each element, if only 14 bits are used, then just write 14 bits
+     @param BitB              "Pointer to BitBuffer the array will be written to".
+     @param Array2Write       "The array to write to the BitBuffer".
+     @param ElementSize       "The size of the type of array, uint16_t would be 16, etc".
+     @param NumElements2Write "The number of elements from the array to write".
+     @param ElementOffset     "which element should we start writing from"?
+     @param OutputByteOrder   "the byte order the elements should be written in".
+     @param OutputBitOrder    "the bit order the elements should be written in".
+     @param Bits2Write        "The number of bits to write from each element, if only 14 bits are used, then just write 14 bits".
      */
-    void    WriteArray2BitBuffer(BitBuffer *BitB, const void *Array2Write, const uint8_t ElementSize, const uint64_t NumElements2Write, const uint64_t ElementOffset) {
+    void     WriteArray2BitBuffer(BitBuffer *BitB, const void *Array2Write, const uint8_t ElementSize, const uint64_t NumElements2Write, const uint64_t ElementOffset) {
         
         if (BitB != NULL && Array2Write != NULL && ElementSize > 0 && NumElements2Write > 0) {
             
@@ -350,6 +393,48 @@ extern "C" {
         } else if (NumElements2Write == 0 || NumElements2Write > ElementOffset) {
             Log(Log_ERROR, __func__, U8("NumElements2Write %d makes no sense"), NumElements2Write);
         }
+    }
+    
+    void     WriteUTF8(BitBuffer *BitB, UTF8 *String2Write) {
+        // Get the size of the string then write it out, after making sure the buffer is big enough to contain it
+        if (BitB != NULL && String2Write != NULL) {
+            uint64_t StringSize    = UTF8_GetSizeInCodeUnits(String2Write);
+            uint64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
+            if (BitsAvailable >= (uint64_t) Bytes2Bits(StringSize)) {
+                for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
+                    InsertBits(MSByteFirst, LSBitFirst, BitB, 8, String2Write[CodeUnit]);
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("StringSize: %d bits is bigger than the buffer can contain: %d"), Bytes2Bits(StringSize), BitsAvailable);
+            }
+        } else if (BitB == NULL) {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        } else if (String2Write == NULL) {
+            Log(Log_ERROR, __func__, U8("String2Write Pointer is NULL"));
+        }
+    }
+    
+    void     WriteUTF16(ByteBitOrders StringByteOrder, BitBuffer *BitB, UTF16 *String2Write) {
+        // Get the size of the string then write it out, after making sure the buffer is big enough to contain it
+        if (BitB != NULL && String2Write != NULL) {
+            uint64_t StringSize    = UTF16_GetSizeInCodeUnits(String2Write);
+            uint64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
+            if (BitsAvailable >= (uint64_t) Bytes2Bits(StringSize)) { // If there's enough room to write the string, do it
+                for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
+                    if ((StringByteOrder == MSByteFirst && String2Write[0] == UTF16LE) || (StringByteOrder == LSByteFirst && String2Write[0] == UTF16BE)) {
+                        String2Write[CodeUnit] = SwapEndian16(String2Write[CodeUnit]);
+                    }
+                    InsertBits(StringByteOrder, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("StringSize: %d bits is bigger than the buffer can contain: %d"), Bytes2Bits(StringSize), BitsAvailable);
+            }
+        } else if (BitB == NULL) {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        } else if (String2Write == NULL) {
+            Log(Log_ERROR, __func__, U8("String2Write Pointer is NULL"));
+        }
+        
     }
     /* BitBuffer Resource Management */
     /* End BitBuffer section */
@@ -376,28 +461,28 @@ extern "C" {
     void BitInput_OpenFile(BitInput *BitI, UTF8 *Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType          = BitIOFile;
-            uint64_t Path2OpenSize  = UTF8_GetSizeInCodePoints(*Path2Open) + BitIONULLStringSize;
             if (BitI->FileSpecifierExists == Yes) {
-                FormatString(U32("%sllu"), UTF8_Decode(Path2Open), BitI->FileSpecifierNum);
-                UTF8 *NewPath       = calloc(Path2OpenSize, sizeof(UTF8));
-                snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitI->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
+                UTF8 *NewPath       = FormatStringUTF8(U8("%s%llu"), Path2Open, BitI->FileSpecifierNum);
+                if (NewPath != NULL) {
+                    BitI->File      = fopen(NewPath, U8("rb"));
+                }
                 free(NewPath);
-            }
+            } else {
 #if   (FoundationIOTargetOS == POSIXOS)
-            BitI->File              = fopen(Path2Open, U8("rb"));
+                BitI->File              = fopen(Path2Open, U8("rb"));
 #elif (FoundationIOTargetOS == WindowsOS)
-            UTF32 *Path32           = UTF8_Decode(Path2Open);
-            UTF16 *Path16           = UTF16_Encode(Path32, UseNativeByteOrder);
-            free(Path32);
-            BitI->File              = _wfopen(Path16, U16("rb"));
-            free(Path16);
+                UTF32 *Path32           = UTF8_Decode(Path2Open);
+                UTF16 *Path16           = UTF16_Encode(Path32, UseNativeByteOrder);
+                free(Path32);
+                BitI->File              = _wfopen(Path16, U16("rb"));
+                free(Path16);
 #endif
+            }
             if (BitI->File == NULL) {
                 Log(Log_ERROR, __func__, U8("Couldn't open file: Check that the file exists and the permissions are correct"));
             } else {
                 setvbuf(BitI->File, NULL, _IONBF, 0);
             }
-            
         } else if (BitI == NULL) {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         } else if (Path2Open == NULL) {
@@ -459,16 +544,6 @@ extern "C" {
         }
     }
     
-    fpos_t BitInput_BytesRemainingInFile(BitInput *BitI) {
-        fpos_t BytesLeft = 0LL;
-        if (BitI != NULL) {
-            BytesLeft = BitI->FileSize - BitI->FilePosition;
-        } else {
-            Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
-        }
-        return BytesLeft;
-    }
-    
     static void BitInput_FindFileSize(BitInput *BitI) {
         if (BitI != NULL) {
             FoundationIO_Seek(BitI->File, 0, SEEK_END);
@@ -505,6 +580,16 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         }
         return Position;
+    }
+    
+    fpos_t BitInput_BytesRemaining(BitInput *BitI) {
+        fpos_t BytesLeft = 0LL;
+        if (BitI != NULL) {
+            BytesLeft = BitI->FileSize - BitI->FilePosition;
+        } else {
+            Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
+        }
+        return BytesLeft;
     }
     
     void BitInput_Deinit(BitInput *BitI) {
