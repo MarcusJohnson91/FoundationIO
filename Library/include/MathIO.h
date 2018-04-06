@@ -1,12 +1,12 @@
 #include <stdbool.h>
 
 #if   (defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L)
-#include <tgmath.h>
+#include      <tgmath.h>
 #elif (!defined __STDC_NO_COMPLEX__)
-#include <math.h>
-#include <complex.h>
+#include_next <math.h>
+#include      <complex.h>
 #else
-#include <math.h>
+#include_next <math.h>
 #endif
 
 #pragma  once
@@ -19,11 +19,11 @@ extern   "C" {
 #endif
     
     /*!
-     @header    Math.h
-     @author    Marcus Johnson aka BumbleBritches57
-     @copyright 2017+
-     @version   1.0.0
-     @brief     This header contains code for specific mathematical functions used in FoundationIO and it's consumers.
+     @header                    Math.h
+     @author                    Marcus Johnson aka BumbleBritches57
+     @copyright                 2017+
+     @version                   1.0.0
+     @brief                     This header contains code for specific mathematical functions used in FoundationIO and it's consumers.
      */
     
     /*!
@@ -33,14 +33,20 @@ extern   "C" {
     bool                        IsNegative(const int64_t Integer);
     
     /*!
-     @abstract                                                  "Unsigned integer absolute value function".
-     @remark                                                    "Returning a signed absolute value integer is dumb. REQUIRES two's complement signed representation".
+     @abstract                                                  "Tells whether Input is even or odd".
+     @param                     Number2Check                    "The number to see if it's odd or even".
+     @return                                                    "True for odd, false for even".
+     */
+    bool                        IsOdd(const int64_t Number2Check);
+    
+    /*!
+     @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
      @param                     Value                           "The value to find the absolute value of".
      */
     uint64_t                    Absolute(const int64_t Value);
     
     /*!
-     @abstract                                                  "Integer Power function".
+     @abstract                                                  "Calculates the value of Base raised to Exponent's power (an integer version of the pow function)".
      @param                     Base                            "What base should the power be calculated in"?
      @param                     Exponent                        "How many times should the Base be raised"?
      @return                                                    "Returns the result of 1 *= Base, Exponent times".
@@ -48,34 +54,34 @@ extern   "C" {
     uint64_t                    Exponentiate(const uint64_t Base, const uint64_t Exponent);
     
     /*!
-     @abstract                                                  "Computes the number of bits required to hold a certain symbol".
-     @remark                                                    "Rounds up to the next integer number of bits to ensure all symbols can be contained in a single integer".
-     @param                     Base                            "The base, or radix to divide the exponent by".
-     @param                     Exponent                        "The exponent".
-     @return                                                    "Returns the number of bits required to store a symbol".
+     @abstract                                                  "Computes the number of symbols required to hold a certain value in Base X".
+     @remark                                                    "Rounds up to the next integer number of symbols".
+     @param                     Base                            "The base, or radix to contain the symbol".
+     @param                     Exponent                        "The value to calculate".
+     @return                                                    "Returns the number of symbols required to store an integer".
      */
     int64_t                     Logarithm(int64_t Base, int64_t Exponent);
     
     /*!
-     @abstract                                                  "Swap endian of 16 bit integers".
-     @param                     Data2Swap                       "Data to swap endian".
+     @abstract                                                  "Byte swaps a 16 bit integer".
+     @param                     Value2Swap                      "Data to swap endian".
      @return                                                    "Returns swapped uint16_t".
      */
-    uint16_t                    SwapEndian16(const uint16_t Data2Swap);
+    uint16_t                    SwapEndian16(const uint16_t Value2Swap);
     
     /*!
-     @abstract                                                  "Swap endian of 32 bit integers".
-     @param                     Data2Swap                       "Data to swap endian".
+     @abstract                                                  "Byte swaps a 32 bit integer".
+     @param                     Value2Swap                      "Data to swap endian".
      @return                                                    "Returns swapped uint32_t".
      */
-    uint32_t                    SwapEndian32(const uint32_t Data2Swap);
+    uint32_t                    SwapEndian32(const uint32_t Value2Swap);
     
     /*!
-     @abstract                                                  "Swap endian of 64 bit integers".
-     @param                     Data2Swap                       "Data to swap endian".
+     @abstract                                                  "Byte swaps a 64 bit integer".
+     @param                     Value2Swap                      "Data to swap endian".
      @return                                                    "Returns swapped uint64_t".
      */
-    uint64_t                    SwapEndian64(const uint64_t Data2Swap);
+    uint64_t                    SwapEndian64(const uint64_t Value2Swap);
     
     /*!
      @abstract                                                  "Computes the number of bits from the number of bytes".
@@ -91,13 +97,6 @@ extern   "C" {
      @return                                                    "Returns the number of bytes".
      */
     int64_t                     Bits2Bytes(const int64_t Bits, const bool RoundUp);
-    
-    /*!
-     @abstract                                                  "Tells whether Input is even or odd".
-     @param                     Number2Check                    "The number to see if it's odd or even".
-     @return                                                    "True for odd, false for even".
-     */
-    bool                        IsOdd(const int64_t Number2Check);
     
 #ifdef   __cplusplus
 }
