@@ -26,20 +26,20 @@
 
 /* Begin PBXFileReference section */
 		2CB774FF2036200700C0F8DB /* libFoundationIO.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFoundationIO.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		2CB775262036819500C0F8DB /* CommandLineIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommandLineIO.h; path = ../libFoundationIO/include/CommandLineIO.h; sourceTree = "<group>"; };
-		2CB775272036819500C0F8DB /* Macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Macros.h; path = ../libFoundationIO/include/Macros.h; sourceTree = "<group>"; };
-		2CB775282036819500C0F8DB /* BitIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BitIO.h; path = ../libFoundationIO/include/BitIO.h; sourceTree = "<group>"; };
-		2CB775292036819500C0F8DB /* StringIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = StringIO.h; path = ../libFoundationIO/include/StringIO.h; sourceTree = "<group>"; };
-		2CB7752A2036819600C0F8DB /* GUUID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GUUID.h; path = ../libFoundationIO/include/GUUID.h; sourceTree = "<group>"; };
-		2CB7752B2036819600C0F8DB /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Log.h; path = ../libFoundationIO/include/Log.h; sourceTree = "<group>"; };
-		2CB7752C2036819600C0F8DB /* Math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Math.h; path = ../libFoundationIO/include/Math.h; sourceTree = "<group>"; };
-		2CB77534203681C000C0F8DB /* Macros.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Macros.c; path = ../libFoundationIO/src/Macros.c; sourceTree = "<group>"; };
-		2CB77535203681C000C0F8DB /* Math.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Math.c; path = ../libFoundationIO/src/Math.c; sourceTree = "<group>"; };
-		2CB77536203681C000C0F8DB /* CommandLineIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = CommandLineIO.c; path = ../libFoundationIO/src/CommandLineIO.c; sourceTree = "<group>"; };
-		2CB77537203681C000C0F8DB /* Log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Log.c; path = ../libFoundationIO/src/Log.c; sourceTree = "<group>"; };
-		2CB77538203681C000C0F8DB /* StringIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = StringIO.c; path = ../libFoundationIO/src/StringIO.c; sourceTree = "<group>"; };
-		2CB77539203681C000C0F8DB /* GUUID.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GUUID.c; path = ../libFoundationIO/src/GUUID.c; sourceTree = "<group>"; };
-		2CB7753A203681C000C0F8DB /* BitIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BitIO.c; path = ../libFoundationIO/src/BitIO.c; sourceTree = "<group>"; };
+		2CB775262036819500C0F8DB /* CommandLineIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = CommandLineIO.h; path = ../libFoundationIO/include/CommandLineIO.h; sourceTree = "<group>"; };
+		2CB775272036819500C0F8DB /* Macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Macros.h; path = ../libFoundationIO/include/Macros.h; sourceTree = "<group>"; };
+		2CB775282036819500C0F8DB /* BitIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BitIO.h; path = ../libFoundationIO/include/BitIO.h; sourceTree = "<group>"; };
+		2CB775292036819500C0F8DB /* StringIO.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; lineEnding = 0; name = StringIO.h; path = ../libFoundationIO/include/StringIO.h; sourceTree = "<group>"; usesTabs = 0; };
+		2CB7752A2036819600C0F8DB /* GUUID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = GUUID.h; path = ../libFoundationIO/include/GUUID.h; sourceTree = "<group>"; };
+		2CB7752B2036819600C0F8DB /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Log.h; path = ../libFoundationIO/include/Log.h; sourceTree = "<group>"; };
+		2CB7752C2036819600C0F8DB /* Math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Math.h; path = ../libFoundationIO/include/Math.h; sourceTree = "<group>"; };
+		2CB77534203681C000C0F8DB /* Macros.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c; fileEncoding = 4; lineEnding = 0; name = Macros.c; path = ../libFoundationIO/src/Macros.c; sourceTree = "<group>"; };
+		2CB77535203681C000C0F8DB /* Math.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Math.c; path = ../libFoundationIO/src/Math.c; sourceTree = "<group>"; };
+		2CB77536203681C000C0F8DB /* CommandLineIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = CommandLineIO.c; path = ../libFoundationIO/src/CommandLineIO.c; sourceTree = "<group>"; };
+		2CB77537203681C000C0F8DB /* Log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Log.c; path = ../libFoundationIO/src/Log.c; sourceTree = "<group>"; };
+		2CB77538203681C000C0F8DB /* StringIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = StringIO.c; path = ../libFoundationIO/src/StringIO.c; sourceTree = "<group>"; };
+		2CB77539203681C000C0F8DB /* GUUID.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = GUUID.c; path = ../libFoundationIO/src/GUUID.c; sourceTree = "<group>"; };
+		2CB7753A203681C000C0F8DB /* BitIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = BitIO.c; path = ../libFoundationIO/src/BitIO.c; sourceTree = "<group>"; };
 		2CBCBF85205861AF006AC334 /* StringIOTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = StringIOTables.h; path = ../libFoundationIO/include/StringIOTables.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -275,6 +275,7 @@
 				);
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
+				USE_HEADERMAP = NO;
 				VALID_ARCHS = "arm64 x86_64";
 				WARNING_CFLAGS = (
 					"-ferror-limit=1024",
@@ -356,6 +357,7 @@
 				);
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
+				USE_HEADERMAP = NO;
 				VALID_ARCHS = "arm64 x86_64";
 				WARNING_CFLAGS = (
 					"-ferror-limit=1024",
@@ -425,7 +427,7 @@
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = all;
 				SUPPORTED_PLATFORMS = "macosx iphoneos";
-				USE_HEADERMAP = YES;
+				USE_HEADERMAP = NO;
 				VALIDATE_PRODUCT = YES;
 				WARNING_CFLAGS = (
 					"-ferror-limit=1024",
@@ -492,7 +494,7 @@
 				SKIP_INSTALL = YES;
 				STRIP_STYLE = all;
 				SUPPORTED_PLATFORMS = "macosx iphoneos";
-				USE_HEADERMAP = YES;
+				USE_HEADERMAP = NO;
 				VALIDATE_PRODUCT = YES;
 				WARNING_CFLAGS = (
 					"-ferror-limit=1024",
