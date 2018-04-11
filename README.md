@@ -34,6 +34,7 @@ Here's a tl;dr of my license:
 
 StringIO:
 ----------
+* StringIO is simply a NULL-terminated array, just like regular C strings, the only difference is that it's been expanded to hold larger codepoints; there's no fancy struct or anything else to get in the way; you can initalize StringIO strings the same way you'd initalize C strings.
 * StringIO provides FoundationIO with Unicode string handling, it supports decoding and encoding both UTF-8 (NOT CESU-8, WTF-8, or Java's Modified UTF-8) and UTF-16 (actual UTF-16 with surrogate pairs, not just UCS-2).
 * If you need any of those formats (CESU-8, WTF-8, or Java's mUTF-8, or UCS-2), feel free to send a pull request.
 * The functions in StringIO use UTF-32 internally.
@@ -117,6 +118,8 @@ TODO:
 ** Finish writing the UCD parsing script so I can add full support for case-mapping and de/normalization to StringIO.
 ** Finish the FormatString work.
 ** Finish the SplitString work.
+** Drop the byte order stuff from StringIO, we're gonna decode strings to the host byte order, and encode them that way as well (except for UTF-8 obviously).
+** Add a function for converting a UTF-16 string to byte order X for formats that specify that as part of their spec, with an option for removing the BOM.
 * Cmake:
 ** Finalize the cmake build script.
 
