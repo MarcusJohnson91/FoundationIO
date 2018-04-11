@@ -47,7 +47,7 @@ function CreateOutputFileTop {
 #$(rm -f "$UCD_Folder/ucd.all.flat.zip")
     UCD_Data="$UCD_Folder/ucd.all.flat.xml"
     printf "#include <stdint.h>                    /* Included for u/intX_t */\n\n" >> $OutputFile
-    printf "#include \"StringIO.h\"                  /* Included for UTF32, and U32 macro */\n\n" >> $OutputFile
+    printf "#include \"StringIO.h\"                  /* Included for UTF32 */\n\n" >> $OutputFile
     printf "#pragma once\n\n" >> $OutputFile
     printf "#ifndef FoundationIO_StringIOTables_H\n" >> $OutputFile
     printf "#define FoundationIO_StringIOTables_H\n\n" >> $OutputFile
@@ -87,7 +87,7 @@ function CreateCaseFoldTable {
     for line in $CodePointAndReplacement; do
         CodePoint=$(cut -d \: -f 1 <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
         ReplacementString=$(sed -e 's/[^:]*://' -e 's/^0*//g' -e 's/ 0*/ /g' -e 's/^/\\x/g' -e 's/[[:space:]]/\\x/g' <<< $line)
-        $(printf "\t\t{0x%06X, U32(\"%s\")},\n" $CodePoint $ReplacementString >> $OutputFile)
+        $(printf "\t\t{0x%06X, U\"%s\"},\n" $CodePoint $ReplacementString >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
     unset IFS
@@ -100,7 +100,7 @@ function CreateDecompositionTable {
     for line in $CodePointAndReplacement; do
         CodePoint=$(cut -d \: -f 1 <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
         ReplacementString=$(sed -e 's/[^:]*://' -e 's/^0*//g' -e 's/ 0*/ /g' -e 's/^/\\x/g' -e 's/[[:space:]]/\\x/g' <<< $line)
-        $(printf "\t\t{0x%06X, U32(\"%s\")},\n" $CodePoint $ReplacementString >> $OutputFile)
+        $(printf "\t\t{0x%06X, U\"%s\"},\n" $CodePoint $ReplacementString >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
     unset IFS
