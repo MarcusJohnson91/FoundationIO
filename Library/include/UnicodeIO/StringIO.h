@@ -352,29 +352,21 @@ extern  "C" {
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
-     @remark                               "DO NOT CALL THIS FUNCTION DIRECTLY, CALL THE MACRO FormatStringUTF8".
      @remark                               "We've extended FormatString from printf by adding the B specifier, for binary".
-     @remark                               "We do not support the p or n specifiers".
+     @remark                               "We do not support the n specifier for security purposes".
      @param               Format           "A string with optional format specifiers".
-     @param               NumArguments     "Is automatically populated by the FormatString* macro".
      @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
-    UTF8                 *UTF8_FormatString(UTF8 *Format, uint64_t NumArguments, ...);
-    
-    #define FormatStringUTF8(Format, ...) UTF8_FormatString(Format, CountVariadicArguments(__VA_ARGS__), __VA_ARGS__)
+    UTF8                 *UTF8_FormatString(UTF8 *Format, ...) __attribute__((__format__ (__printf__, 1, 2)));
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
-     @remark                               "DO NOT CALL THIS FUNCTION DIRECTLY, CALL THE MACRO FormatStringUTF16".
      @remark                               "We've extended FormatString from printf by adding the B specifier, for binary".
-     @remark                               "We do not support the p or n specifiers".
+     @remark                               "We do not support the n specifier for security purposes".
      @param               Format           "A string with optional format specifiers".
-     @param               NumArguments     "Is automatically populated by the FormatString* macro".
      @return                               "Returns the formatted string encoded using the UTF-16 format".
      */
-    UTF16                *UTF16_FormatString(UTF16 *Format, uint64_t NumArguments, ...);
-    
-    #define FormatStringUTF16(Format, ...) UTF16_FormatString(Format, CountVariadicArguments(__VA_ARGS__), __VA_ARGS__)
+    UTF16                *UTF16_FormatString(UTF16 *Format, ...) __attribute__((__format__ (__wprintf__, 1, 2)));
     
     /*!
      @abstract                             "Writes a UTF-8 encoded string to the OutputFile using the platform's default Unicode encoding".
