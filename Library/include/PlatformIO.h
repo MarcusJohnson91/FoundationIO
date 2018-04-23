@@ -121,7 +121,7 @@ static const uint_least32_t NewLineUTF32[] = U"\r\n";
 #endif
     
 #ifndef             FoundationIO_Tell
-#define             FoundationIO_Tell(File) _ftelli64(File)
+#define             FoundationIO_Tell(File)  _ftelli64(File)
 #endif
     
 #ifndef             FoundationIO_Seek
