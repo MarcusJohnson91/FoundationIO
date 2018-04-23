@@ -13,7 +13,7 @@
 #include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
 #elif (FoundationIOTargetOS == WindowsOS)
 #include <Windows.h>                   /* Included because WinCon needs it */
-#include <wincon.h>                    /* Included for getting the terminal size */
+#include <Wincon.h>                    /* Included for getting the terminal size */
 #endif
 
 #ifdef   __cplusplus
@@ -109,7 +109,7 @@ extern   "C" {
                 CLI->NumSwitches = NumSwitches;
             } else {
                 free(CLI);
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %d CommandLineSwitches"), NumSwitches);
+                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CommandLineSwitches"), NumSwitches);
             }
 #if   (FoundationIOTargetOS == POSIXOS)
             struct winsize WindowSize;
@@ -126,7 +126,7 @@ extern   "C" {
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("Couldn't allocate CommandLineIO"));
         } else if (NumSwitches == 0) {
-            Log(Log_ERROR, __func__, U8("NumSwitches %d must be greater than or equal to 1"), NumSwitches);
+            Log(Log_ERROR, __func__, U8("NumSwitches %lld must be greater than or equal to 1"), NumSwitches);
         }
         return CLI;
     }
@@ -210,7 +210,7 @@ extern   "C" {
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (MinOptions <= 0 || MinOptions > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("MinOptions %d is invalid, it should be between 0 and %d"), MinOptions, CLI->NumSwitches - 1);
+            Log(Log_ERROR, __func__, U8("MinOptions %lld is invalid, it should be between 0 and %lld"), MinOptions, CLI->NumSwitches - 1);
         }
     }
     
@@ -220,7 +220,7 @@ extern   "C" {
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (HelpSwitch >= 0 && HelpSwitch <= CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("HelpSwitch %d is invalid, it should be between 0 and %d"), HelpSwitch, CLI->NumSwitches - 1);
+            Log(Log_ERROR, __func__, U8("HelpSwitch %lld is invalid, it should be between 0 and %lld"), HelpSwitch, CLI->NumSwitches - 1);
         }
     }
     
@@ -234,7 +234,7 @@ extern   "C" {
         } else if (Name == NULL) {
             Log(Log_ERROR, __func__, U8("Name String is NULL"));
         } else if (SwitchID >= 0 && SwitchID <= CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %d is invalid, it should be between 0 and %d"), SwitchID, CLI->NumSwitches - 1);
+            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -248,7 +248,7 @@ extern   "C" {
         } else if (Description == NULL) {
             Log(Log_ERROR, __func__, U8("Description String is NULL"));
         } else if (SwitchID < 0 || SwitchID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %d is invalid, it should be between 0 and %d"), SwitchID, CLI->NumSwitches - 1);
+            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -263,9 +263,9 @@ extern   "C" {
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (SwitchType == UnknownSwitchType) {
-            Log(Log_ERROR, __func__, U8("You can not set SwitchID %d to UnknownSwitchType"), SwitchID);
+            Log(Log_ERROR, __func__, U8("You can not set SwitchID %lld to UnknownSwitchType"), SwitchID);
         } else if (SwitchID < 0 || SwitchID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %d is invalid, it should be between 0 and %d"), SwitchID, CLI->NumSwitches - 1);
+            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -275,9 +275,9 @@ extern   "C" {
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (ArgumentType == UnknownArgumentType) {
-            Log(Log_ERROR, __func__, U8("You can not set SwitchID %d to UnknownArgumentType"), SwitchID);
+            Log(Log_ERROR, __func__, U8("You can not set SwitchID %lld to UnknownArgumentType"), SwitchID);
         } else if (SwitchID < 0 || SwitchID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %d is invalid, it should be between 0 and %d"), SwitchID, CLI->NumSwitches - 1);
+            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -293,9 +293,9 @@ extern   "C" {
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (MasterID < 0 && MasterID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("MasterID %d is invalid, it should be between 0 and %d"), MasterID, CLI->NumSwitches - 1);
+            Log(Log_ERROR, __func__, U8("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
         } else if (SlaveID < 0 && SlaveID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("SlaveID %d is invalid, it should be between 0 and %d"), SlaveID, CLI->NumSwitches - 1);
+            Log(Log_ERROR, __func__, U8("SlaveID %lld is invalid, it should be between 0 and %lld"), SlaveID, CLI->NumSwitches - 1);
         }
     }
     
@@ -305,23 +305,23 @@ extern   "C" {
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (MasterID < 0 && MasterID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("MasterID %d is invalid, it should be between 0 and %d"), MasterID, CLI->NumSwitches - 1);
+            Log(Log_ERROR, __func__, U8("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
         } else if (MaxConcurrentSlaves < 0 && MaxConcurrentSlaves > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("MaxConcurrentSlaves %d is invalid, it should be between 0 and %d"), MasterID, CLI->NumSwitches - 1);
+            Log(Log_ERROR, __func__, U8("MaxConcurrentSlaves %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
         }
     }
     
     static inline void DisplayCLIHelp(CommandLineIO *CLI) {
         if (CLI != NULL) {
-            UTF8  *ProgramName = FormatStringUTF8(U8("%s's Options (-|--|/):%s"), CLI->ProgramName, NewLineUTF8);
+            UTF8  *ProgramName = UTF8_FormatString(U8("%s's Options (-|--|/):%s"), CLI->ProgramName, NewLineUTF8);
             UTF8_WriteString2File(ProgramName, stdout);
             for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                 CLISwitchTypes CurrentSwitchType = CLI->SwitchIDs[Switch].SwitchType;
-                UTF8 *SwitchInfo = FormatStringUTF8(U8("%s: %s%s"), CLI->SwitchIDs[Switch].Name, CLI->SwitchIDs[Switch].Description, NewLineUTF8);
+                UTF8 *SwitchInfo = UTF8_FormatString(U8("%s: %s%s"), CLI->SwitchIDs[Switch].Name, CLI->SwitchIDs[Switch].Description, NewLineUTF8);
                 UTF8_WriteString2File(SwitchInfo, stdout);
                 if (CurrentSwitchType == SwitchMayHaveSlaves && CLI->SwitchIDs[Switch].NumPotentialSlaves > 0) {
                     for (int64_t SlaveSwitch = 0LL; SlaveSwitch < CLI->SwitchIDs[Switch].NumPotentialSlaves - 1; SlaveSwitch++) {
-                        UTF8 *SlaveSwitchInfo = FormatStringUTF8(U8("\t%s: %s%s"), CLI->SwitchIDs[SlaveSwitch].Name, CLI->SwitchIDs[SlaveSwitch].Description, NewLineUTF8);
+                        UTF8 *SlaveSwitchInfo = UTF8_FormatString(U8("\t%s: %s%s"), CLI->SwitchIDs[SlaveSwitch].Name, CLI->SwitchIDs[SlaveSwitch].Description, NewLineUTF8);
                         UTF8_WriteString2File(SlaveSwitchInfo, stdout);
                     }
                 }
@@ -334,14 +334,14 @@ extern   "C" {
     static inline void DisplayProgramBanner(CommandLineIO *CLI) {
         if (CLI != NULL) {
             if (CLI->ProgramName != NULL && CLI->ProgramVersion != NULL && CLI->ProgramAuthor != NULL && CLI->ProgramCopyright != NULL) {
-                UTF8 *FormattedString = FormatStringUTF8(U8("%s, v. %s by %s © %s%s"), CLI->ProgramName, CLI->ProgramVersion, CLI->ProgramAuthor, CLI->ProgramCopyright, NewLineUTF8);
+                UTF8 *FormattedString = UTF8_FormatString(U8("%s, v. %s by %s © %s%s"), CLI->ProgramName, CLI->ProgramVersion, CLI->ProgramAuthor, CLI->ProgramCopyright, NewLineUTF8);
                 UTF8_WriteString2File(FormattedString, stdout);
             }
             if (CLI->ProgramDescription != NULL && CLI->ProgramLicenseName != NULL && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL && CLI->IsProprietary == No) {
-                UTF8 *FormattedString = FormatStringUTF8(U8("%s, Released under the \"%s\" %s, available at: %s%s"), CLI->ProgramDescription, CLI->ProgramLicenseName, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, NewLineUTF8);
+                UTF8 *FormattedString = UTF8_FormatString(U8("%s, Released under the \"%s\" %s, available at: %s%s"), CLI->ProgramDescription, CLI->ProgramLicenseName, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, NewLineUTF8);
                 UTF8_WriteString2File(FormattedString, stdout);
             } else if (CLI->ProgramDescription != NULL && CLI->ProgramLicenseDescription != NULL && CLI->ProgramLicenseURL != NULL && CLI->IsProprietary == Yes) {
-                UTF8 *FormattedString = FormatStringUTF8(U8("%s, By using this software, you agree to the End User License Agreement %s, available at: %s%s"), CLI->ProgramDescription, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, NewLineUTF8);
+                UTF8 *FormattedString = UTF8_FormatString(U8("%s, By using this software, you agree to the End User License Agreement %s, available at: %s%s"), CLI->ProgramDescription, CLI->ProgramLicenseDescription, CLI->ProgramLicenseURL, NewLineUTF8);
                 UTF8_WriteString2File(FormattedString, stdout);
             }
         } else {
@@ -422,7 +422,7 @@ extern   "C" {
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions <= 1 || NumArguments <= 1) {
-            Log(Log_ERROR, __func__, U8("You entered %d options, the minimum is %d"), NumArguments - 1, CLI->MinOptions);
+            Log(Log_ERROR, __func__, U8("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
         }
     }
     
@@ -462,7 +462,7 @@ extern   "C" {
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions <= 1 || NumArguments <= 1) {
-            Log(Log_ERROR, __func__, U8("You entered %d options, the minimum is %d"), NumArguments - 1, CLI->MinOptions);
+            Log(Log_ERROR, __func__, U8("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
         }
     }
     
@@ -483,7 +483,7 @@ extern   "C" {
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions <= 1 || NumArguments <= 1) {
-            Log(Log_ERROR, __func__, U8("You entered %d options, the minimum is %d"), NumArguments - 1, CLI->MinOptions);
+            Log(Log_ERROR, __func__, U8("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
         }
     }
     
@@ -576,9 +576,9 @@ extern   "C" {
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (OptionID < 0 || OptionID > CLI->NumOptions - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %d is invalid, it should be between 0 and %d"), OptionID, CLI->NumSwitches - 1);
+            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumSwitches - 1);
         } else if (NumSlaves < 0 || NumSlaves > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("NumSlaves %d is invalid, it should be between 0 and %d"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
+            Log(Log_ERROR, __func__, U8("NumSlaves %lld is invalid, it should be between 0 and %lld"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
         }
         return NumMatchingOptions;
     }
@@ -608,9 +608,9 @@ extern   "C" {
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (OptionID < 0 || OptionID > CLI->NumOptions - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %d is invalid, it should be between 0 and %d"), OptionID, CLI->NumSwitches - 1);
+            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumSwitches - 1);
         } else if (NumSlaves < 0 || NumSlaves > CLI->NumOptions - 1) {
-            Log(Log_ERROR, __func__, U8("NumSlaves %d is invalid, it should be between 0 and %d"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
+            Log(Log_ERROR, __func__, U8("NumSlaves %lld is invalid, it should be between 0 and %lld"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
         }
         return MatchingOption;
     }
@@ -622,7 +622,7 @@ extern   "C" {
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (OptionID < 0 || OptionID > CLI->NumOptions - 1) {
-            Log(Log_ERROR, __func__, U8("Option %d is outside the range 0 - %d"), OptionID, CLI->NumOptions - 1);
+            Log(Log_ERROR, __func__, U8("Option %lld is outside the range 0 - %lld"), OptionID, CLI->NumOptions - 1);
         }
         return Result;
     }
@@ -729,13 +729,13 @@ extern   "C" {
     }
     
     void DEBUGCommandLineOptions(CommandLineIO *CLI) {
-        Log(Log_DEBUG, __func__, U8("NumOptions %d"), CLI->NumOptions);
+        Log(Log_DEBUG, __func__, U8("NumOptions %lld"), CLI->NumOptions);
         for (int64_t Option = 0LL; Option <= CLI->NumOptions - 1; Option++) {
             if (CLI->OptionIDs[Option].SwitchID >= 0) {
-                Log(Log_DEBUG, __func__, U8("OptionID %d, OptionSwitchID %d, OptionFlag %s, OptionType %d, OptionArgument %s"), Option, CLI->OptionIDs[Option].SwitchID, CLI->SwitchIDs[CLI->OptionIDs[Option].SwitchID].Name, CLI->SwitchIDs[CLI->OptionIDs[Option].SwitchID].SwitchType, CLI->OptionIDs[Option].Argument);
+                Log(Log_DEBUG, __func__, U8("OptionID %lld, OptionSwitchID %lld, OptionFlag %s, OptionType %d, OptionArgument %s"), Option, CLI->OptionIDs[Option].SwitchID, CLI->SwitchIDs[CLI->OptionIDs[Option].SwitchID].Name, CLI->SwitchIDs[CLI->OptionIDs[Option].SwitchID].SwitchType, CLI->OptionIDs[Option].Argument);
                 if (CLI->OptionIDs[Option].NumOptionSlaves >= 1) {
                     for (int64_t OptionSlave = 0LL; OptionSlave < CLI->OptionIDs[Option].NumOptionSlaves; OptionSlave++) {
-                        Log(Log_DEBUG, __func__, U8("SlaveID %d"), OptionSlave);
+                        Log(Log_DEBUG, __func__, U8("SlaveID %lld"), OptionSlave);
                     }
                 }
             }
