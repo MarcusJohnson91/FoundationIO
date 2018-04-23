@@ -42,7 +42,7 @@ function CreateOutputFileTop {
     touch $OutputFile
 #UCD_URL="https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip"
 #$(curl -N $UCD_URL -o "$UCD_Folder/ucd.all.flat.zip")
-    $(cd "$UCD_Folder")
+#$(cd "$UCD_Folder")
 #$(unzip "$UCD_Folder/ucd.all.flat.zip" -d "$UCD_Folder")
 #$(rm -f "$UCD_Folder/ucd.all.flat.zip")
     UCD_Data="$UCD_Folder/ucd.all.flat.xml"
@@ -83,11 +83,22 @@ function CreateCaseFoldTable {
     IFS=$'\n'
     printf "\tstatic const UTF32 *CaseFoldTable[CaseFoldTableSize][2] = {\n" >> $OutputFile
     CodePointAndReplacement=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#']" -v @cp -o : -v @NFKC_CF -n $UCD_Data)
-#Adddition properties:  [or @CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')]
+    NULLTerminator=$(echo "\x0")
+#Addditional properties:  [or @CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')]
     for line in $CodePointAndReplacement; do
-        CodePoint=$(cut -d \: -f 1 <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
-        ReplacementString=$(sed -e 's/[^:]*://' -e 's/^0*//g' -e 's/ 0*/ /g' -e 's/^/\\x/g' -e 's/[[:space:]]/\\x/g' <<< $line)
-        $(printf "\t\t{0x%06X, U\"%s\"},\n" $CodePoint $ReplacementString >> $OutputFile)
+        CodePoint2BeReplaced=$(awk -F '[: ]' '{printf $1}' <<< "$line" | sed -e 's/^0*//g' -e 's/^/0x/')
+        ReplacementCodePoints=$(awk -F '[: ]' '{for (i = 2; i <= NF; i++) print "0x"$i}' <<< "$line")
+        ReplacementString=""
+        for CodePoint in $ReplacementCodePoints; do
+            if [ $(printf "%d" ${CodePoint}) -le 160 ]; then
+                ReplacementString+=$(sed -e 's/^0x//g' -e 's/^0*//g' -e 's/^/\\x/g' <<< $CodePoint)
+            elif [ $(printf "%d" ${CodePoint}) -le 65535 ]; then
+                ReplacementString+=$(sed -e 's/^0x//g' -e 's/^/\\u/g' <<< $CodePoint)
+            elif [ $(printf "%d" ${CodePoint}) -gt 65535 ]; then
+                ReplacementString+=$(sed -e 's/^0x//g' -e 's/[0-9a-fA-F]\{1,\}/0000000&/g;s/0*\([0-9a-fA-F]\{8,\}\)/\1/g' -e 's/^/\\U/g' <<< $CodePoint)
+            fi
+	    done
+        $(printf "\t\t{0x%06X, U\"%s%s\"},\n" $CodePoint2BeReplaced $ReplacementString $NULLTerminator >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
     unset IFS
@@ -97,10 +108,21 @@ function CreateDecompositionTable {
     IFS=$'\n'
     printf "\tstatic const UTF32 *DecompositionTable[DecompositionTableSize][2] = {\n" >> $OutputFile
     CodePointAndReplacement=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dm != '#' and (@dt = 'can' or @dt = 'com' or @dt = 'enc' or @dt = 'fin' or @dt = 'font' or @dt = 'fra' or @dt = 'init' or @dt = 'iso' or @dt = 'med' or @dt = 'nar' or @dt = 'nb' or @dt = 'sml' or @dt = 'sqr' or @dt = 'sub' or @dt = 'sup' or @dt = 'vert' or @dt = 'wide' or @dt = 'none')]" -v @cp -o : -v @dm -n $UCD_Data)
+    NULLTerminator=$(echo "\x0")
     for line in $CodePointAndReplacement; do
-        CodePoint=$(cut -d \: -f 1 <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
-        ReplacementString=$(sed -e 's/[^:]*://' -e 's/^0*//g' -e 's/ 0*/ /g' -e 's/^/\\x/g' -e 's/[[:space:]]/\\x/g' <<< $line)
-        $(printf "\t\t{0x%06X, U\"%s\"},\n" $CodePoint $ReplacementString >> $OutputFile)
+        CodePoint2BeReplaced=$(awk -F '[: ]' '{printf $1}' <<< "$line" | sed -e 's/^0*//g' -e 's/^/0x/')
+        ReplacementCodePoints=$(awk -F '[: ]' '{for (i = 2; i <= NF; i++) print "0x"$i}' <<< "$line")
+        ReplacementString=""
+        for CodePoint in $ReplacementCodePoints; do
+            if [ $(printf "%d" ${CodePoint}) -le 160 ]; then
+                ReplacementString+=$(sed -e 's/^0x//g' -e 's/^0*//g' -e 's/^/\\x/g' <<< $CodePoint)
+            elif [ $(printf "%d" ${CodePoint}) -le 65535 ]; then
+                ReplacementString+=$(sed -e 's/^0x//g' -e 's/^/\\u/g' <<< $CodePoint)
+            elif [ $(printf "%d" ${CodePoint}) -gt 65535 ]; then
+                ReplacementString+=$(sed -e 's/^0x//g' -e 's/[0-9a-fA-F]\{1,\}/0000000&/g;s/0*\([0-9a-fA-F]\{8,\}\)/\1/g' -e 's/^/\\U/g' <<< $CodePoint)
+            fi
+        done
+    $(printf "\t\t{0x%06X, U\"%s%s\"},\n" $CodePoint2BeReplaced $ReplacementString $NULLTerminator >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
     unset IFS
@@ -111,7 +133,7 @@ function CreateIntegerTable {
     SortedCodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -v "@cp" -o : -v "@nv" -n $UCD_Data | sort -s -n -k 2 -t $':')
     printf "\tstatic const UTF32 IntegerTableCodePoints[IntegerTableSize] = {\n" >> $OutputFile
     for line in $SortedCodePointAndValue; do
-        CodePoint=$(cut -d \: -f 1 <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
+        CodePoint=$(awk -F '[: ]' '{printf $1}' <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
         $(printf "\t\t0x%06X,\n" $CodePoint >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
@@ -129,7 +151,7 @@ function CreateGraphemeBaseTable {
     printf "\tstatic const UTF32 *GraphemeBaseTable[GraphemeBaseTableSize] = {\n" >> $OutputFile
     CodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Gr_Base = 'Y']" -v "@cp" -n $UCD_Data)
     for line in $CodePointAndValue; do
-        CodePoint=$(cut -d \: -f 1 <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
+        CodePoint=$(awk -F '[: ]' '{printf $1}' <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
         Value=$(sed -e 's/[^:]*://' -e 's/[[:space:]]/\\x/g' <<< $line)
         $(printf "\t\t{0x%06X, %d},\n" $CodePoint $Value >> $OutputFile)
     done
@@ -176,8 +198,8 @@ else
     ARGUMENTS=$@
     OutputFile=$ARGUMENTS
     GetStringIOUnicodeVersion
-    if [ "$ReadmeVersion" -eq "$StringIOVersion" ]
-    then
+#UCD_Folder="~/Desktop/UCDXML"
+    if [ $ReadmeVersion -eq $StringIOVersion ]; then
         exit 0
     else
         # The output file does not exist, or it's version is out of date, so we need to generate it
