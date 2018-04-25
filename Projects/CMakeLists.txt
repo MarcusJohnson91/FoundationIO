@@ -6,8 +6,7 @@ add_definitions(-D_LARGEFILE_SOURCE)
 add_definitions(-D_LARGEFILE64_SOURCE)
 add_definitions(-D_FILE_OFFSET_BITS=64)
 
-set(libFoundationIO_BUILD "${libFoundationIORoot}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
-set(ARCHIVE_OUTPUT_DIRECTORY "${libFoundationIO_BUILD}")
+set(ARCHIVE_OUTPUT_DIRECTORY "${libFoundationIORoot}/../BUILD/${ARCHITECTURE}/${BUILDTYPE})
 
 set(libFoundationIO_Dir "${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -30,6 +29,12 @@ set(libFoundationIO_Sources
 	"${libFoundationIO_Dir}/src/GUUID.c"
 	"${libFoundationIO_Dir}/src/Log.c"
 )
+
+if (UNIX)
+set(libMATH -lm)
+else (WIN32)
+set(libMATH)
+endif
 
 add_library(${project} [static|shared] ${libFoundationIO_Sources} ${libFoundationIO_Headers})
 
