@@ -149,6 +149,18 @@ extern  "C" {
     uint64_t              UTF32_GetSizeInCodePoints(UTF32 *String2Count);
     
     /*!
+     @abstract                             "Gets the number of user visible characters in a UTF-8 string".
+     @param               String           "The string to get the number of graphemes in".
+     */
+    uint64_t              UTF8_GetSizeInGraphemes(UTF8 *String);
+    
+    /*!
+     @abstract                             "Gets the number of user visible characters in a UTF-16 string".
+     @param               String           "The string to get the number of graphemes in".
+     */
+    uint64_t              UTF16_GetSizeInGraphemes(UTF16 *String);
+    
+    /*!
      @abstract                             "Decodes a UTF8 string to a UTF32 string".
      @param               String           "The string to decode".
      */
