@@ -20,20 +20,13 @@
 
 #List of tables we need to extract:
 
-#Precomposed
-#Uppercase
-#Lowercase
-#Combining
-
 # List of tables we need
 # Whitespace
-# Uppercase Lowercase
+# CaseFold
 # All the codepoints to be found, and the replacements for Compatibile Equilivilence, both Decomposed and Composed forms
 # All the codepoints to be found, and the replacements for Canonical   Equilivilence, both Decomposed and Composed forms
 # For the casefolding and Normalization tables, maybe I should just have it be string 2 string, so just a table of input strings, and output strings.
 # The only concern is the ordering of the codepoints in the input string when I'm scanning, I'd have to come up with a better algorithm to ensure that it's order independent
-
-# List of Grapheme Base codepoints.
 # List of Grapheme Extension codepoints.
 
 function CreateOutputFileTop {
@@ -65,6 +58,9 @@ function CreateOutputFileTop {
     printf "#define CaseFoldTableSize %d\n\n" $CaseFoldTableSize >> $OutputFile
     DecompositionTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dm != '' and @dm != '#' and (@dt = 'can' or @dt = 'com' or @dt = 'enc' or @dt = 'fin' or @dt = 'font' or @dt = 'fra' or @dt = 'init' or @dt = 'iso' or @dt = 'med' or @dt = 'nar' or @dt = 'nb' or @dt = 'sml' or @dt = 'sqr' or @dt = 'sub' or @dt = 'sup' or @dt = 'vert' or @dt = 'wide' or @dt = 'none')])" $UCD_Data)
     printf "#define DecompositionTableSize %d\n\n" $DecompositionTableSize >> $OutputFile
+
+    DecompositionCanonicalTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dt='can' and @dm!='none'])" $UCD_Data)
+    DecompositionKompatibilityTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dt='can' and @dm!='none'])" $UCD_Data)
 }
 
 function CreateWhiteSpaceTable {
@@ -104,7 +100,7 @@ function CreateCaseFoldTable {
     unset IFS
 }
 
-function CreateDecompositionTable {
+function CreateNormalizationTables {
     IFS=$'\n'
     printf "\tstatic const UTF32 *DecompositionTable[DecompositionTableSize][2] = {\n" >> $OutputFile
     CodePointAndReplacement=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dm != '#' and (@dt = 'can' or @dt = 'com' or @dt = 'enc' or @dt = 'fin' or @dt = 'font' or @dt = 'fra' or @dt = 'init' or @dt = 'iso' or @dt = 'med' or @dt = 'nar' or @dt = 'nb' or @dt = 'sml' or @dt = 'sqr' or @dt = 'sub' or @dt = 'sup' or @dt = 'vert' or @dt = 'wide' or @dt = 'none')]" -v @cp -o : -v @dm -n $UCD_Data)
@@ -141,19 +137,6 @@ function CreateIntegerTable {
     for line in $SortedCodePointAndValue; do
         Value=$(sed -e 's/[^:]*://' <<< $line -e 's/[[:space:]]/\\x/g')
         $(printf "\t\t%d,\n" $Value >> $OutputFile)
-    done
-    printf "\t};\n\n" >> $OutputFile
-    unset IFS
-}
-
-function CreateGraphemeBaseTable {
-    IFS=$'\n'
-    printf "\tstatic const UTF32 *GraphemeBaseTable[GraphemeBaseTableSize] = {\n" >> $OutputFile
-    CodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Gr_Base = 'Y']" -v "@cp" -n $UCD_Data)
-    for line in $CodePointAndValue; do
-        CodePoint=$(awk -F '[: ]' '{printf $1}' <<< $line | sed -e 's/^0*//g' -e 's/^/0x/')
-        Value=$(sed -e 's/[^:]*://' -e 's/[[:space:]]/\\x/g' <<< $line)
-        $(printf "\t\t{0x%06X, %d},\n" $CodePoint $Value >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
     unset IFS
@@ -208,7 +191,7 @@ else
         CreateIntegerTable
         CreateGraphemeExtensionTable
         CreateCaseFoldTable
-        CreateDecompositionTable
+        CreateNormalizationTables
         CreateOutputFileBottom
     fi
 fi
