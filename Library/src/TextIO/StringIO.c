@@ -64,7 +64,7 @@ extern  "C" {
         uint64_t UTF16CodeUnits     = 0ULL;
         if (String2Count != NULL) {
             do {
-                if (String2Count[CodePoint] > UTF16MaxCodePoint) {
+                if (String2Count[CodePoint] >= UTF16HighSurrogateStart && String2Count[CodePoint] <= UTF16LowSurrogateEnd) {
                     UTF16CodeUnits += 2;
                 } else {
                     UTF16CodeUnits += 1;
@@ -75,6 +75,36 @@ extern  "C" {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         return UTF16CodeUnits;
+    }
+    
+    uint64_t UTF32_GetSizeInCodePoints(UTF32 *String2Count) {
+        uint64_t NumCodePoints = 0ULL;
+        if (String2Count != NULL) {
+            do {
+                NumCodePoints += 1;
+            } while (String2Count[NumCodePoints] != NULLTerminator);
+        } else {
+            Log(Log_ERROR, __func__, U8("String2Count Pointer is NULL"));
+        }
+        return NumCodePoints;
+    }
+    
+    static uint64_t UTF32_GetSizeInGraphemes(UTF32 *String) {
+        uint64_t NumGraphemes  = 0ULL;
+        uint64_t CodePoint     = 0ULL;
+        if (String != NULL) {
+            do {
+                for (uint64_t GraphemeExtension = 0; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
+                    if (String[CodePoint] == GraphemeExtensionTable[GraphemeExtension]) {
+                        NumGraphemes += 1;
+                    }
+                }
+                CodePoint     += 1;
+            } while (String[CodePoint] != NULLTerminator);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return NumGraphemes;
     }
     
     static UTF32 *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length) {
@@ -144,19 +174,24 @@ extern  "C" {
         return NULL;
     }
     
-    static UTF32 *UTF32_Compose(UTF32 *String) {
-        if (String != NULL) {
+    static UTF32 *UTF32_Compose(UTF32 *String, bool Kompatibility) {
+        if (String != NULL && (Kompatibility == No || Kompatibility == Yes)) {
             // Compose the bitch.
+            if (Kompatibility == Yes) {
+                // Use the Kompatibility table
+            } else {
+                // Do not use the Kompatibility table
+            }
         } else {
             Log(Log_ERROR, __func__, "String Pointer is NULL");
         }
         return NULL;
     }
     
-    static UTF32 *UTF32_Decompose(UTF32 *String, const bool Compatibility) {
+    static UTF32 *UTF32_Decompose(UTF32 *String, const bool Kompatibility) {
         uint64_t CodePoint      = UTF1632BOMSizeInCodePoints;
         UTF32 *DecomposedString = NULL;
-        if (String != NULL && (Compatibility == 0 || Compatibility == 1)) {
+        if (String != NULL && (Kompatibility == No || Kompatibility == Yes)) {
             do {
                 for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < DecompositionTableSize; DecomposeCodePoint++) {
                     if (String[DecomposeCodePoint] == *DecompositionTable[DecomposeCodePoint][0]) {
@@ -175,13 +210,11 @@ extern  "C" {
         if (String2Normalize != NULL && NormalizedForm != UnknownNormalizationForm) {
             if (NormalizedForm == NormalizationFormC) {
                 UTF32 *Decomposed = UTF32_Decompose(String2Normalize, No);
-                NormalizedString  = UTF32_Compose(Decomposed);
+                NormalizedString  = UTF32_Compose(Decomposed, No);
                 free(Decomposed);
             } else if (NormalizedForm == NormalizationFormKC) {
                 UTF32 *Decomposed = UTF32_Decompose(String2Normalize, Yes);
-                UTF32 *Composed   = UTF32_Compose(Decomposed);
-                UTF32 *ComposedKC = UTF32_ComposeKC(Composed);
-                NormalizedString  = ComposedKC;
+                NormalizedString  = UTF32_Compose(Decomposed, Yes);
                 free(Decomposed);
             } else if (NormalizedForm == NormalizationFormD) {
                 NormalizedString  = UTF32_Decompose(String2Normalize, No);
@@ -491,13 +524,31 @@ extern  "C" {
         return NULL;
     }
     
+    UTF32 *AppendString(UTF32 *String1, UTF32 *String2) {
+        UTF32 *NewString = NULL;
+        if (String1 != NULL && String2 != NULL) {
+            // Get the size of String1, and String2; then add them together + 1 to get the final string, actually plus nothing because there's an extra BOM in string2.
+            uint64_t String1Size = UTF32_GetSizeInCodePoints(String1);
+            uint64_t String2Size = UTF32_GetSizeInCodePoints(String2);
+            uint64_t NewStringSize = String1Size + String2Size;// By pure happenstance, I don't need to account for the BOM or NULL.
+            NewString = calloc(NewStringSize, sizeof(UTF32));
+            // Ok, well then let's go ahead and start copying String1 until the end then String2 until it's end
+        } else if (String1 == NULL) {
+            Log(Log_ERROR, __func__, U8("String1 is NULL"));
+        } else if (String2 == NULL) {
+            Log(Log_ERROR, __func__, U8("String2 is NULL"));
+        }
+        return NewString;
+    }
+    
     UTF32 *UTF32_CaseFoldString(UTF32 *String) {
         uint64_t CodePoint        = UTF1632BOMSizeInCodePoints;
         UTF32   *CaseFoldedString = NULL;
         if (String != NULL) {
             do {
                 for (uint64_t CaseFoldCodePoint = 0; CaseFoldCodePoint < CaseFoldTableSize; CaseFoldCodePoint++) {
-                    if (String[CodePoint] == *CaseFoldTable[CaseFoldCodePoint][0]) {
+                    // We need to compare these as strings
+                    if (String[CodePoint] == CaseFoldTable[CaseFoldCodePoint][0]) {
                         CaseFoldedString = UTF32_ReplaceSubString(String, *CaseFoldTable[CaseFoldCodePoint][1], CaseFoldCodePoint, 1);
                     }
                 }
@@ -610,16 +661,28 @@ extern  "C" {
         return NumCodePoints;
     }
     
-    uint64_t UTF32_GetSizeInCodePoints(UTF32 *String2Count) {
-        uint64_t NumCodePoints = 0ULL;
-        if (String2Count != NULL) {
-            do {
-                NumCodePoints += 1;
-            } while (String2Count[NumCodePoints] != NULLTerminator);
+    uint64_t UTF8_GetSizeInGraphemes(UTF8 *String) {
+        uint64_t NumGraphemes  = 0ULL;
+        if (String != NULL) {
+            UTF32 *Decoded     = UTF8_Decode(String);
+            NumGraphemes       = UTF32_GetSizeInGraphemes(Decoded);
+            free(Decoded);
         } else {
-            Log(Log_ERROR, __func__, U8("String2Count Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return NumCodePoints;
+        return NumGraphemes;
+    }
+    
+    uint64_t UTF16_GetSizeInGraphemes(UTF16 *String) {
+        uint64_t NumGraphemes  = 0ULL;
+        if (String != NULL) {
+            UTF32 *Decoded     = UTF16_Decode(String);
+            NumGraphemes       = UTF32_GetSizeInGraphemes(Decoded);
+            free(Decoded);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return NumGraphemes;
     }
     
     UTF32 *UTF8_Decode(UTF8 *String) {
@@ -644,23 +707,23 @@ extern  "C" {
                             DecodedString[0]         = UTF32BE;
                         }
                     }
-                    switch (UTF8_GetCodeUnitSize(String[CodeUnitNum])) {
-                            case 1:
+                    switch (UTF8_GetCodeUnitSize(String[CodeUnitNum])) { // UTF-8 is MSB first, if the platform is LSB first, we need to swap as we read
+                        case 1:
                             DecodedString[CodePoint] =  String[CodeUnitNum];
                             CodeUnitNum             += 1;
                             break;
-                            case 2:
-                            DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x1F) << 6;
-                            DecodedString[CodePoint] =  String[CodeUnitNum + 1] & 0x3F;
+                        case 2:
+                            DecodedString[CodePoint] = (String[CodeUnitNum] & 0x1F) << 6;
+                            DecodedString[CodePoint] =  String[CodeUnitNum] & 0x3F;
                             CodeUnitNum             += 2;
                             break;
-                            case 3:
+                        case 3:
                             DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x0F) << 12;
                             DecodedString[CodePoint] = (String[CodeUnitNum + 1] & 0x1F) << 6;
                             DecodedString[CodePoint] = (String[CodeUnitNum + 2] & 0x1F);
                             CodeUnitNum             += 3;
                             break;
-                            case 4:
+                        case 4:
                             DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x07) << 18;
                             DecodedString[CodePoint] = (String[CodeUnitNum + 1] & 0x3F) << 12;
                             DecodedString[CodePoint] = (String[CodeUnitNum + 2] & 0x3F) <<  6;
@@ -668,6 +731,10 @@ extern  "C" {
                             CodeUnitNum             += 4;
                             break;
                     }
+                    if (GlobalByteOrder == LSByteFirst) {
+                        DecodedString[CodePoint]     = SwapEndian32(String[CodePoint]);
+                    }
+                    
                     if (CodePointSize > 1 && DecodedString[CodePoint] <= 0x7F) {
                         DecodedString[CodePoint]     = InvalidCodePointReplacementCharacter;
                         Log(Log_ERROR, __func__, U8("CodePoint %d is overlong, replaced with U+FFFD"), DecodedString[CodePoint]);
@@ -738,7 +805,7 @@ extern  "C" {
             EncodedString                              = calloc(UTF8CodeUnits, sizeof(UTF8));
             if (EncodedString != NULL) {
                 do {
-                    if ((String[0] == UTF32LE && GlobalByteOrder == MSByteFirst) || (String[0] == UTF32BE && GlobalByteOrder == LSByteFirst)) {
+                    if (GlobalByteOrder == LSByteFirst) {
                         String[CodePoint]              = SwapEndian32(String[CodePoint]);
                     }
                     if (CodeUnitNum == 0 && IncludeBOM == Yes) {
@@ -780,7 +847,7 @@ extern  "C" {
     }
     
     UTF16 *UTF16_Encode(UTF32 *String, StringIOByteOrders OutputByteOrder) {
-        if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
+        if (GlobalByteOrder == UnknownByteFirst) {
             GetRuntimeByteBitOrder();
         }
         UTF16   *EncodedString                         = NULL;
@@ -790,7 +857,7 @@ extern  "C" {
             EncodedString                              = calloc(UTF16NumCodeUnits, sizeof(UTF16));
             if (EncodedString != NULL) {
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < UTF16NumCodeUnits; CodeUnit++) {
-                    if ((String[0] == UTF16LE && GlobalByteOrder == MSByteFirst) || (String[0] == UTF16BE && GlobalByteOrder == LSByteFirst)) {
+                    if ((OutputByteOrder == UseBEByteOrder && GlobalByteOrder == LSByteFirst) || (OutputByteOrder == UseLEByteOrder && GlobalByteOrder == MSByteFirst)) {
                         String[CodeUnit]               = SwapEndian32(String[CodeUnit]);
                     }
                     if (CodeUnit == 0) {
@@ -826,25 +893,6 @@ extern  "C" {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         return EncodedString;
-    }
-    
-    uint64_t UTF32_GetStringSizeInGraphemes(UTF32 *String) {
-        uint64_t NumGraphemes  = 0ULL;
-        uint64_t CodePoint     = 0ULL;
-        if (String != NULL) {
-            // Basically loop over the string counting just codepoints that are not combining codepoints.
-            do {
-                for (uint64_t GraphemeExtension = 0; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
-                    if (String[CodePoint] == GraphemeExtensionTable[GraphemeExtension]) {
-                        NumGraphemes += 1;
-                    }
-                }
-                CodePoint     += 1;
-            } while (String[CodePoint] != NULLTerminator);
-        } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        }
-        return NumGraphemes;
     }
     
     UTF8 *UTF8_NormalizeString(UTF8 *String2Normalize, StringIONormalizationForms NormalizedForm) {
@@ -1024,34 +1072,35 @@ extern  "C" {
         return StringsMatch;
     }
     
-    UTF8 *UTF8_FormatString(UTF8 *Format, uint64_t NumArguments, ...) {
+    UTF8 *UTF8_FormatString(UTF8 *Format, ...) {
         UTF8 *Format8 = NULL;
         if (Format != NULL) {
             // Decode the Format string to UTF32, and try to see if any strings in the argument list are UTF8 encoded and decode them too.
             UTF32 *Format32           = UTF8_Decode(Format);
             va_list VariadicArguments;
-            va_start(VariadicArguments, NumArguments);
-            UTF32 *FormattedArguments = UTF32_FormatString(Format32, NumArguments, VariadicArguments);
+            va_start(VariadicArguments, Format);
+            UTF32 *FormattedString    = UTF32_FormatString(Format32, VariadicArguments);
             free(Format32);
             va_end(VariadicArguments);
-            Format8                   = UTF8_Encode(FormattedArguments, No);
+            Format8                   = UTF8_Encode(FormattedString, No);
+            free(FormattedString);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         return Format8;
     }
     
-    UTF16 *UTF16_FormatString(UTF16 *Format, uint64_t NumArguments, ...) {
+    UTF16 *UTF16_FormatString(UTF16 *Format, ...) {
         UTF16 *Format16 = NULL;
         if (Format != NULL) {
-            // Decode the Format string to UTF32, and try to see if any strings in the argument list are UTF16 encoded and decode them too.
             UTF32 *Format32           = UTF16_Decode(Format);
             va_list VariadicArguments;
-            va_start(VariadicArguments, NumArguments);
-            UTF32 *FormattedArguments = UTF32_FormatString(Format32, NumArguments, VariadicArguments);
+            va_start(VariadicArguments, Format);
+            UTF32 *FormattedString    = UTF32_FormatString(Format32, VariadicArguments);
             free(Format32);
             va_end(VariadicArguments);
-            Format16                  = UTF16_Encode(FormattedArguments, UseNativeByteOrder);
+            Format16                  = UTF16_Encode(FormattedString, UseNativeByteOrder);
+            free(FormattedString);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -1103,6 +1152,48 @@ extern  "C" {
             Log(Log_ERROR, __func__, U8("Delimiters Pointer is NULL"));
         }
         return NULL;
+    }
+    
+    UTF8 *UTF8_CaseFoldString(UTF8 *String2CaseFold) {
+        if (String2CaseFold != NULL) {
+            // IDEK what I need to do, look up codepoints in a table and replace them with the found variants?
+        } else {
+            Log(Log_ERROR, __func__, U8("String2CaseFold Pointer is NULL"));
+        }
+        return NULL;
+    }
+    
+    UTF16 *UTF16_CaseFoldString(UTF16 *String2CaseFold) {
+        if (String2CaseFold != NULL) {
+            // IDEK what I need to do, look up codepoints in a table and replace them with the found variants?
+        } else {
+            Log(Log_ERROR, __func__, U8("String2CaseFold Pointer is NULL"));
+        }
+        return NULL;
+    }
+    
+    void UTF8_DeinitStringArray(UTF8 **Strings, uint64_t NumStrings) {
+        if (Strings != NULL && NumStrings > 0) {
+            for (uint64_t String = 0; String < NumStrings - 1; String++) {
+                free(Strings[String]);
+            }
+        } else if (Strings == NULL) {
+            Log(Log_ERROR, __func__, U8("Strings Pointer is NULL"));
+        } else if (NumStrings == 0) {
+            Log(Log_ERROR, __func__, U8("There are no strings to deinit"));
+        }
+    }
+    
+    void UTF16_DeinitStringArray(UTF16 **Strings, uint64_t NumStrings) {
+        if (Strings != NULL && NumStrings > 0) {
+            for (uint64_t String = 0; String < NumStrings - 1; String++) {
+                free(Strings[String]);
+            }
+        } else if (Strings == NULL) {
+            Log(Log_ERROR, __func__, U8("Strings Pointer is NULL"));
+        } else if (NumStrings == 0) {
+            Log(Log_ERROR, __func__, U8("There are no strings to deinit"));
+        }
     }
     /* Public Functions */
     
