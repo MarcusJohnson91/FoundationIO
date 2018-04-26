@@ -105,7 +105,7 @@ extern  "C" {
         } else if (Replacement == NULL) {
             Log(Log_ERROR, __func__, U8("Replacement Pointer is NULL"));
         } else if (Length == 0) {
-            Log(Log_ERROR, __func__, U8("Length %d is too short"), Length);
+            Log(Log_ERROR, __func__, U8("Length %llu is too short"), Length);
         }
         return ReplacedString;
     }
@@ -425,7 +425,7 @@ extern  "C" {
         } else if (SubString == NULL) {
             Log(Log_ERROR, __func__, U8("SubString Pointer is NULL"));
         } else if (Length >= 1 && StringSize < Offset + Length) {
-            Log(Log_ERROR, __func__, U8("Offset %d + Length %d is larger than String %d"), Offset, Length, StringSize);
+            Log(Log_ERROR, __func__, U8("Offset %llu + Length %lld is larger than String %llu"), Offset, Length, StringSize);
         }
         return MatchingOffset;
     }
@@ -446,7 +446,7 @@ extern  "C" {
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         } else if (StringSize < Length + Offset) {
-            Log(Log_ERROR, __func__, U8("Length %d + Offset %d is larger than String %d"), Length, Offset, StringSize);
+            Log(Log_ERROR, __func__, U8("Offset %llu + Length %lld is larger than String %llu"), Length, Offset, StringSize);
         }
         return ExtractedString;
     }
@@ -670,13 +670,10 @@ extern  "C" {
                     }
                     if (CodePointSize > 1 && DecodedString[CodePoint] <= 0x7F) {
                         DecodedString[CodePoint]     = InvalidCodePointReplacementCharacter;
-                        Log(Log_ERROR, __func__, U8("CodePoint U+%06X is overlong, replaced with U+FFFD"), CodePoint);
+                        Log(Log_ERROR, __func__, U8("CodePoint %d is overlong, replaced with U+FFFD"), DecodedString[CodePoint]);
                     } else if (DecodedString[CodePoint] >= UTF16HighSurrogateStart && DecodedString[CodePoint] <= UTF16LowSurrogateEnd && DecodedString[CodePoint] != UTF32LE && DecodedString[CodePoint] != UTF32BE) {
                         DecodedString[CodePoint]     = InvalidCodePointReplacementCharacter;
-                        Log(Log_ERROR, __func__, U8("Codepoint U+%06X is invalid, overlaps Surrogate Pair Block, replaced with U+FFFD"), CodePoint);
-                    }
-                    if (GlobalByteOrder == LSByteFirst) {
-                        DecodedString[CodePoint]     = SwapEndian32(String[CodePoint]);
+                        Log(Log_ERROR, __func__, U8("Codepoint %d is invalid, because it overlaps the Surrogate Pair Block, it was replaced with U+FFFD"), DecodedString[CodePoint]);
                     }
                 } while (String[CodeUnitNum] != NULLTerminator);
             } else {
