@@ -26,9 +26,9 @@ extern "C" {
     
     /* Start BitBuffer section */
     typedef struct BitBuffer {
+        uint8_t   *Buffer;
         uint64_t   NumBits;
         uint64_t   BitOffset;
-        uint8_t   *Buffer;
     } BitBuffer;
     
     BitBuffer *BitBuffer_Init(const uint64_t BitBufferSize) {
@@ -462,7 +462,7 @@ extern "C" {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType          = BitIOFile;
             if (BitI->FileSpecifierExists == Yes) {
-                UTF8 *NewPath       = FormatStringUTF8(U8("%s%llu"), Path2Open, BitI->FileSpecifierNum);
+                UTF8 *NewPath       = UTF8_FormatString(U8("%s%llu"), Path2Open, BitI->FileSpecifierNum);
                 if (NewPath != NULL) {
                     BitI->File      = fopen(NewPath, U8("rb"));
                 }
