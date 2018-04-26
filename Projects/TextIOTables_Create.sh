@@ -50,6 +50,8 @@ function CreateOutputFileTop {
     printf "#define UnicodeVersion %s\n\n" $ReadmeVersion >> $OutputFile
     NumWhiteSpaceCodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@WSpace='Y'])" $UCD_Data)
     printf "#define WhiteSpaceTableSize %d\n\n" $NumWhiteSpaceCodePoints >> $OutputFile
+    CombiningCharacterClassTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@ccc!='0'])" $UCD_Data)
+    printf "#define CombiningCharacterClassTableSize %d\n\n" $CombiningCharacterClassTableSize >> $OutputFile
     IntegerTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')])" $UCD_Data)
     printf "#define IntegerTableSize %d\n\n" $IntegerTableSize >> $OutputFile
     GraphemeExtensionSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Gr_Ext = 'Y'])" $UCD_Data)
@@ -70,6 +72,19 @@ function CreateWhiteSpaceTable {
     for line in $WhiteSpace; do
         Value=$(sed -e 's/^/0x/g' <<< $line)
         $(printf "\t\t0x%06X,\n" $Value >> $OutputFile)
+    done
+    printf "\t};\n\n" >> $OutputFile
+    unset IFS
+}
+
+function CreateCombiningCharacterClassTable {
+    IFS=$'\n'
+    printf "\tstatic const UTF32 CombiningCharacterClassTable[CombiningCharacterClassTableSize][2] = {\n" >> $OutputFile
+    CombiningCharacterClassCodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@ccc != '0']" -v @cp -o : -v @ccc -n $UCD_Data | sort -s -n -k 2 -t :)
+    for line in $CombiningCharacterClassCodePointAndValue; do
+        CodePoint=$(awk -F '[: ]' '{printf $1}' <<< "$line" | sed -e 's/^/0x/g')
+        Value=$(awk -F '[: ]' '{printf $2}' <<< "$line")
+        $(printf "\t\t{0x%06X, %d},\n" $CodePoint $Value >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
     unset IFS
@@ -188,6 +203,7 @@ else
         # The output file does not exist, or it's version is out of date, so we need to generate it
         CreateOutputFileTop
         CreateWhiteSpaceTable
+        CreateCombiningCharacterClassTable
         CreateIntegerTable
         CreateGraphemeExtensionTable
         CreateCaseFoldTable
