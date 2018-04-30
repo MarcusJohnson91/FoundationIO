@@ -39,19 +39,19 @@ extern  "C" {
     
 #ifndef             UnknownOS
 #define             UnknownOS    0
-#endif
+#endif           /* UnknownOS */
     
 #ifndef             POSIXOS
 #define             POSIXOS      1
-#endif
+#endif           /* POSIXOS */
     
 #ifndef             WindowsOS
 #define             WindowsOS    2
-#endif
+#endif           /* WindowsOS */
     
 #ifndef             MacClassicOS
 #define             MacClassicOS 3
-#endif
+#endif           /* MacClassicOS */
     
 #if      defined(macintosh) || defined(Macintosh)
 #ifndef             FoundationIOTargetOS
@@ -60,9 +60,9 @@ extern  "C" {
     
 #ifndef             NewLineWithNULLSize
 #define             NewLineWithNULLSize    1
-static const uint_least8_t  NewLineUTF8[]  = u8"\r";
-static const uint_least16_t NewLineUTF16[] = u"\r";
-static const uint_least32_t NewLineUTF32[] = U"\r";
+#define             NewLineUTF8 u8"\r"
+#define             NewLineUTF16 u"\r"
+#define             NewLineUTF32 U"\r"
 #endif
     
 #elif    defined(_POSIX_C_SOURCE) || defined(__APPLE__) || defined(__MACH__) || defined(BSD) || defined(linux) || defined(__linux)
@@ -73,9 +73,9 @@ static const uint_least32_t NewLineUTF32[] = U"\r";
     
 #ifndef             NewLineWithNULLSize
 #define             NewLineWithNULLSize    1
-static const uint_least8_t  NewLineUTF8[]  = u8"\n";
-static const uint_least16_t NewLineUTF16[] = u"\n";
-static const uint_least32_t NewLineUTF32[] = U"\n";
+#define             NewLineUTF8 u8"\n"
+#define             NewLineUTF16 u"\n"
+#define             NewLineUTF32 U"\n"
 #endif
     
 #ifndef typeof
@@ -107,9 +107,9 @@ static const uint_least32_t NewLineUTF32[] = U"\n";
     
 #ifndef             NewLineWithNULLSize
 #define             NewLineWithNULLSize    2
-static const uint_least8_t  NewLineUTF8[]  = u8"\r\n";
-static const uint_least16_t NewLineUTF16[] = u"\r\n";
-static const uint_least32_t NewLineUTF32[] = U"\r\n";
+#define             NewLineUTF8 u8"\r\n"
+#define             NewLineUTF16 u"\r\n"
+#define             NewLineUTF32 U"\r\n"
 #endif
     
 #ifndef typeof
