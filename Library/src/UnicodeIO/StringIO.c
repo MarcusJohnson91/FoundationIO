@@ -183,7 +183,7 @@ extern  "C" {
                 // Do not use the Kompatibility table
             }
         } else {
-            Log(Log_ERROR, __func__, "String Pointer is NULL");
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         return NULL;
     }
