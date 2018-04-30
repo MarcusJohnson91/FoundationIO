@@ -9,17 +9,17 @@ extern  "C" {
     void GetRuntimeByteBitOrder(void) {
         uint8_t  BitOrderNumber  = 0x8;
         if (BitOrderNumber == 8) {
-            GlobalBitOrder = LSBitFirst;
+            GlobalBitOrder       = LSBitFirst;
         } else if (BitOrderNumber == 16) {
-            GlobalBitOrder = MSBitFirst;
+            GlobalBitOrder       = MSBitFirst;
         }
         
         uint16_t ByteOrderNumber = 0xFF00;
         uint8_t *ByteOrder       = (uint8_t*)&ByteOrderNumber;
         if (ByteOrder[0] == 0) {
-            GlobalByteOrder = LSByteFirst; // LittleEndian
+            GlobalByteOrder      = LSByteFirst; // LittleEndian
         } else {
-            GlobalByteOrder = MSByteFirst; // BigEndian
+            GlobalByteOrder      = MSByteFirst; // BigEndian
         }
     }
     

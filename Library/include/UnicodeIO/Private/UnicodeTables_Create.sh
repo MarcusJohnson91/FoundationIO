@@ -59,10 +59,10 @@ function CreateOutputFileTop {
     CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')])" $UCD_Data)
     printf "#define CaseFoldTableSize %d\n\n" $CaseFoldTableSize >> $OutputFile
     DecompositionTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dm != '' and @dm != '#' and (@dt = 'can' or @dt = 'com' or @dt = 'enc' or @dt = 'fin' or @dt = 'font' or @dt = 'fra' or @dt = 'init' or @dt = 'iso' or @dt = 'med' or @dt = 'nar' or @dt = 'nb' or @dt = 'sml' or @dt = 'sqr' or @dt = 'sub' or @dt = 'sup' or @dt = 'vert' or @dt = 'wide' or @dt = 'none')])" $UCD_Data)
-    printf "#define DecompositionTableSize %d\n\n" $DecompositionTableSize >> $OutputFile
-
-    DecompositionCanonicalTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dt='can' and @dm!='none'])" $UCD_Data)
-    DecompositionKompatibilityTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dt='can' and @dm!='none'])" $UCD_Data)
+    KompatibleDecompositionTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n $UCD_Data)
+    printf "#define KompatibleDecompositionTableSize %d\n\n" $KompatibleDecompositionTableSize >> $OutputFile
+    CanonicalDecompositionTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n $UCD_Data)
+    printf "#define CanonicalDecompositionTableSize %d\n\n" $CanonicalDecompositionTableSize >> $OutputFile
 }
 
 function CreateWhiteSpaceTable {
@@ -81,6 +81,32 @@ function CreateCombiningCharacterClassTable {
     IFS=$'\n'
     printf "\tstatic const UTF32 CombiningCharacterClassTable[CombiningCharacterClassTableSize][2] = {\n" >> $OutputFile
     CombiningCharacterClassCodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@ccc != '0']" -v @cp -o : -v @ccc -n $UCD_Data | sort -s -n -k 2 -t :)
+    for line in $CombiningCharacterClassCodePointAndValue; do
+        CodePoint=$(awk -F '[: ]' '{printf $1}' <<< "$line" | sed -e 's/^/0x/g')
+        Value=$(awk -F '[: ]' '{printf $2}' <<< "$line")
+        $(printf "\t\t{0x%06X, %d},\n" $CodePoint $Value >> $OutputFile)
+    done
+    printf "\t};\n\n" >> $OutputFile
+    unset IFS
+}
+
+function CreateKompatibleDecompositionTable {
+    IFS=$'\n'
+    printf "\tstatic const UTF32 KompatibleDecompositionTable[KompatibleDecompositionTableSize][2] = {\n" >> $OutputFile
+    CodePointAndKompatibleDecompositionString=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dt == 'can']" -v @cp -o : -v @ccc -n $UCD_Data | sort -s -n -k 2 -t :)
+    for line in $CodePointAndKompatibleDecompositionString; do
+        CodePoint=$(awk -F '[: ]' '{printf $1}' <<< "$line" | sed -e 's/^/0x/g')
+        KompatibleDecompositionString=$(awk -F '[: ]' '{printf $2}' <<< "$line")
+        $(printf "\t\t{0x%06X, %d},\n" $CodePoint $Value >> $OutputFile)
+    done
+    printf "\t};\n\n" >> $OutputFile
+    unset IFS
+}
+
+function CreateCanonicalDecompositionTable {
+    IFS=$'\n'
+    printf "\tstatic const UTF32 CanonicalDecompositionTable[CanonicalDecompositionTableSize][2] = {\n" >> $OutputFile
+    CombiningCharacterClassCodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dt == 'can']" -v @cp -o : -v @ccc -n $UCD_Data | sort -s -n -k 2 -t :)
     for line in $CombiningCharacterClassCodePointAndValue; do
         CodePoint=$(awk -F '[: ]' '{printf $1}' <<< "$line" | sed -e 's/^/0x/g')
         Value=$(awk -F '[: ]' '{printf $2}' <<< "$line")
