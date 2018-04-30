@@ -1,6 +1,7 @@
 #include <stdint.h>                   /* Included for u/intX_t */
 
 #include "StringIO.h"                 /* Included for UTF8, and the U8 macro */
+#include "Macros.h"
 
 #pragma once
 
@@ -47,7 +48,15 @@ extern "C" {
      @param                     FunctionName                    "Which function is calling Log?".
      @param                     Description                     "String describing what went wrong".
      */
-    extern void                 Log(LogTypes Severity, const UTF8 *FunctionName, const UTF8 *Description, ...) __attribute__((__format__ (__printf__, 3, 4)));
+#if     (FoundationIOTargetOS == POSIXOS)
+    void                 Log(LogTypes Severity, const UTF8 *FunctionName, const UTF8 *Description, ...) __attribute__((__format__ (__printf__, 3, 4)));
+#elif   (FoundationIOTargetOS == WindowsOS)
+#if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
+    void                 Log(LogTypes Severity, const UTF8 *FunctionName, __format_string const UTF8 *Description, ...);
+#elif    (_MSC_VER >= 1500)
+    void                 Log(LogTypes Severity, const UTF8 *FunctionName, _Printf_format_string_ const UTF8 *Description, ...);
+#endif /* _MSC_VER */
+#endif/* FoundationIOTargetOS */
     
     /*!
      @abstract                                                  "Closes the LogFile".

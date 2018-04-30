@@ -1,7 +1,7 @@
 #include <stdint.h>                   /* Included for u/intX_t */
 #include <stdio.h>                    /* Included for FILE */
 
-#include "Macros.h"                   /* Included for bool and Yes/No macros */
+#include "Macros.h"                   /* Included for bool and Yes/No macros, and NULLTerminator */
 
 #pragma once
 
@@ -369,7 +369,15 @@ extern  "C" {
      @param               Format           "A string with optional format specifiers".
      @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
-    UTF8                 *UTF8_FormatString(UTF8 *Format, ...) __attribute__((__format__ (__printf__, 1, 2)));
+#if     (FoundationIOTargetOS == POSIXOS)
+    UTF8                 *UTF8_FormatString(UTF8 *Format, ...) __attribute__((__format__(__printf__, 1, 2)));
+#elif   (FoundationIOTargetOS == WindowsOS)
+#if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
+    UTF8                 *UTF8_FormatString(__format_string UTF8 *Format, ...);
+#elif    (_MSC_VER >= 1500)
+    UTF8                 *UTF8_FormatString(_Printf_format_string_ UTF8 *Format, ...);
+#endif /* _MSC_VER */
+#endif/* FoundationIOTargetOS */
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
@@ -378,7 +386,15 @@ extern  "C" {
      @param               Format           "A string with optional format specifiers".
      @return                               "Returns the formatted string encoded using the UTF-16 format".
      */
-    UTF16                *UTF16_FormatString(UTF16 *Format, ...) __attribute__((__format__ (__wprintf__, 1, 2)));
+#if     (FoundationIOTargetOS == POSIXOS)
+    UTF16                *UTF16_FormatString(UTF16 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+#elif   (FoundationIOTargetOS == WindowsOS)
+#if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
+    UTF16                *UTF16_FormatString(__format_string UTF16 *Format, ...);
+#elif    (_MSC_VER >= 1500)
+    UTF16                *UTF16_FormatString(_Printf_format_string_ UTF16 *Format, ...);
+#endif /* _MSC_VER */
+#endif/* FoundationIOTargetOS */
     
     /*!
      @abstract                             "Writes a UTF-8 encoded string to the OutputFile using the platform's default Unicode encoding".
