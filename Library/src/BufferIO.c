@@ -41,7 +41,7 @@ extern "C" {
             if (BitB->Buffer != NULL) {
                 BitB->NumBits            = Bytes2Bits(BitBufferSize);
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %d bits for BitBuffer's buffer"), BitBufferSize);
+                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld bits for BitBuffer's buffer"), BitBufferSize);
             }
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("Couldn't allocate BitBuffer"));
@@ -130,7 +130,7 @@ extern "C" {
                 BitB->BitOffset = 0;
                 BitB->NumBits   = Bits2Bytes(NewSize, No);
             } else {
-                Log(Log_ERROR, __func__, U8("Allocating %d bytes failed"), NewSize);
+                Log(Log_ERROR, __func__, U8("Allocating %lld bytes failed"), NewSize);
             }
         } else {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
@@ -149,7 +149,7 @@ extern "C" {
                 free(BitB->Buffer);
                 BitB->Buffer           = NewBuffer;
             } else {
-                Log(Log_ERROR, __func__, U8("Allocating %d bytes failed"), BufferSizeInBytes);
+                Log(Log_ERROR, __func__, U8("Allocating %lld bytes failed"), BufferSizeInBytes);
             }
         } else if (BitI == NULL) {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
@@ -252,7 +252,7 @@ extern "C" {
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if ((Bits2Peek == 0 || Bits2Peek > 64) || (Bits2Peek > (BitB->BitOffset - BitB->NumBits))) {
-            Log(Log_ERROR, __func__, U8("Bits2Peek %d is greater than BitBuffer can provide %d, or greater than PeekBits can satisfy 1-64"), Bits2Peek, BitB->BitOffset);
+            Log(Log_ERROR, __func__, U8("Bits2Peek %d is greater than BitBuffer can provide %lld, or greater than PeekBits can satisfy 1-64"), Bits2Peek, BitB->BitOffset);
         }
         return OutputData;
     }
@@ -265,7 +265,7 @@ extern "C" {
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if ((Bits2Read == 0 || Bits2Read > 64) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
-            Log(Log_ERROR, __func__, U8("Bits2Read %d is greater than BitBuffer can provide %d, or greater than ReadBits can satisfy 1-64"), Bits2Read, BitB->BitOffset);
+            Log(Log_ERROR, __func__, U8("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than ReadBits can satisfy 1-64"), Bits2Read, BitB->BitOffset);
         }
         return OutputData;
     }
@@ -334,7 +334,7 @@ extern "C" {
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
-            Log(Log_ERROR, __func__, U8("NumBits2Write %d is greater than BitBuffer can provide %d, or greater than WriteBits can satisfy 1-64"), NumBits2Write);
+            Log(Log_ERROR, __func__, U8("NumBits2Write %d is greater than BitBuffer can provide %lld, or greater than WriteBits can satisfy 1-64"), NumBits2Write, BitB->NumBits);
         }
     }
     
@@ -391,7 +391,7 @@ extern "C" {
         } else if (ElementSize == 0 || ElementSize > 64) {
             Log(Log_ERROR, __func__, U8("ElementSize is %d, that doesn't make any sense"), ElementSize);
         } else if (NumElements2Write == 0 || NumElements2Write > ElementOffset) {
-            Log(Log_ERROR, __func__, U8("NumElements2Write %d makes no sense"), NumElements2Write);
+            Log(Log_ERROR, __func__, U8("NumElements2Write %lld makes no sense"), NumElements2Write);
         }
     }
     
@@ -405,7 +405,7 @@ extern "C" {
                     InsertBits(MSByteFirst, LSBitFirst, BitB, 8, String2Write[CodeUnit]);
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("StringSize: %d bits is bigger than the buffer can contain: %d"), Bytes2Bits(StringSize), BitsAvailable);
+                Log(Log_ERROR, __func__, U8("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
             }
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
@@ -427,7 +427,7 @@ extern "C" {
                     InsertBits(StringByteOrder, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("StringSize: %d bits is bigger than the buffer can contain: %d"), Bytes2Bits(StringSize), BitsAvailable);
+                Log(Log_ERROR, __func__, U8("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
             }
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
@@ -530,7 +530,7 @@ extern "C" {
                 if (BytesRead == Bytes2Read) {
                     Buffer2Read->NumBits = Bytes2Bits(BytesRead);
                 } else {
-                    Log(Log_ERROR, __func__, U8("Fread read: %d bytes, but you requested: %d"), BytesRead, Bytes2Read);
+                    Log(Log_ERROR, __func__, U8("Fread read: %lld bytes, but you requested: %lld"), BytesRead, Bytes2Read);
                 }
             } else {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate BitBuffer's buffer"));
@@ -540,7 +540,7 @@ extern "C" {
         } else if (Buffer2Read == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if (Bytes2Read > (BitI->FileSize - BitI->FilePosition)) {
-            Log(Log_ERROR, __func__, U8("You tried reading more data: % than is available: %d in the file"), Bytes2Read, BitI->FileSize - BitI->FilePosition);
+            Log(Log_ERROR, __func__, U8("You tried reading more data: %lld than is available: %lld in the file"), Bytes2Read, BitI->FileSize - BitI->FilePosition);
         }
     }
     
@@ -694,7 +694,7 @@ extern "C" {
 #endif
             }
             if (BytesWritten != NumBytes2Write) {
-                Log(Log_ERROR, __func__, U8("Fwrite wrote: %d bytes, but you requested: %d"), BytesWritten, NumBytes2Write);
+                Log(Log_ERROR, __func__, U8("Fwrite wrote: %lld bytes, but you requested: %lld"), BytesWritten, NumBytes2Write);
             } else {
                 Buffer2Write->NumBits -= Bytes2Bits(BytesWritten);
             }

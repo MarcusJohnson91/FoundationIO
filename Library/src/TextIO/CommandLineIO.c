@@ -353,7 +353,7 @@ extern   "C" {
         UTF8 ArgumentSwitch = NULL;
         if (ArgumentString != NULL) {
             uint8_t  ArgumentStringPrefixSize = 0;
-            uint32_t ArgumentStringSize       = UTF8_GetSizeInCodePoints(ArgumentString);
+            uint64_t ArgumentStringSize       = UTF32_GetSizeInCodePoints(ArgumentString);
             
             if (ArgumentStringSize >= 2) {
                 //Log(Log_DEBUG, __func__, U8("ArgumentString[0] = 0x%X, ArgumentString[1] = 0x%X"), ArgumentString[0], ArgumentString[1]);
@@ -424,24 +424,6 @@ extern   "C" {
         } else if (CLI->MinOptions <= 1 || NumArguments <= 1) {
             Log(Log_ERROR, __func__, U8("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
         }
-    }
-    
-    UTF8 *UTF8_CaseFoldString(UTF8 *String2CaseFold) {
-        if (String2CaseFold != NULL) {
-            // IDEK what I need to do, look up codepoints in a table and replace them with the found variants?
-        } else {
-            Log(Log_ERROR, __func__, U8("String2CaseFold Pointer is NULL"));
-        }
-        return NULL;
-    }
-    
-    UTF16 *UTF16_CaseFoldString(UTF16 *String2CaseFold) {
-        if (String2CaseFold != NULL) {
-            // IDEK what I need to do, look up codepoints in a table and replace them with the found variants?
-        } else {
-            Log(Log_ERROR, __func__, U8("String2CaseFold Pointer is NULL"));
-        }
-        return NULL;
     }
     
     void UTF8_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, const UTF8 **Arguments) {
@@ -685,7 +667,7 @@ extern   "C" {
                 // Now we go ahead and memset a string with the proper number of indicators
                 UTF8 *Indicator             = calloc(CLI->ConsoleWidth, sizeof(UTF8));
                 memset(Indicator, '-', HalfOfTheIndicators);
-                sprintf(ActualStrings2Print[String], "[%s%s %d/%d %hhu/% %s]", Indicator, Strings[String], Numerator, Denominator, PercentComplete, Indicator);
+                sprintf(ActualStrings2Print[String], "[%s%s %lld/%lld %hhu/%s %s]", Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF8);
                 fprintf(stdout, "%s%s", &ActualStrings2Print[String], NewLineUTF8);
                 free(Indicator);
             }
