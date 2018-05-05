@@ -14,13 +14,13 @@ extern "C" {
     } Container;
     
     Container *Container_Init(const uint64_t NumPlanes, const uint64_t NumElements, ContainerTypes ContainerType) {
-        Container *Container                 = NULL;
+        Container *NewContainer             = NULL;
         if (NumPlanes > 0 && NumElements > 0) {
-            Container                        = calloc(1, sizeof(Container));
-            if (Container != NULL) {
-                Container->NumPlanes         = NumPlanes;
-                Container->NumElements       = NumElements;
-                Container->ContainerType     = ContainerType;
+            NewContainer                    = calloc(1, sizeof(Container));
+            if (NewContainer != NULL) {
+                NewContainer->NumPlanes     = NumPlanes;
+                NewContainer->NumElements   = NumElements;
+                NewContainer->ContainerType = ContainerType;
             } else {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate a new vector"));
             }
@@ -29,7 +29,7 @@ extern "C" {
         } else if (NumElements == 0) {
             Log(Log_ERROR, __func__, U8("NumElemenets %lld does not make sense"), NumElements);
         }
-        return Container;
+        return NewContainer;
     }
     
     void Container_Attach(Container *Container, void *Array2Attach) {
