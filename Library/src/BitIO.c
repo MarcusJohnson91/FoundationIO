@@ -398,7 +398,7 @@ extern "C" {
     void     WriteUTF8(BitBuffer *BitB, UTF8 *String2Write) {
         // Get the size of the string then write it out, after making sure the buffer is big enough to contain it
         if (BitB != NULL && String2Write != NULL) {
-            uint64_t StringSize    = UTF8_GetSizeInCodeUnits(String2Write);
+            uint64_t StringSize    = UTF8_GetStringSizeInCodeUnits(String2Write);
             uint64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
             if (BitsAvailable >= (uint64_t) Bytes2Bits(StringSize)) {
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
@@ -417,7 +417,7 @@ extern "C" {
     void     WriteUTF16(ByteBitOrders StringByteOrder, BitBuffer *BitB, UTF16 *String2Write) {
         // Get the size of the string then write it out, after making sure the buffer is big enough to contain it
         if (BitB != NULL && String2Write != NULL) {
-            uint64_t StringSize    = UTF16_GetSizeInCodeUnits(String2Write);
+            uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(String2Write);
             uint64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
             if (BitsAvailable >= (uint64_t) Bytes2Bits(StringSize)) { // If there's enough room to write the string, do it
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
@@ -632,7 +632,7 @@ extern "C" {
     void BitOutput_OpenFile(BitOutput *BitO, UTF8 *Path2Open) {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType          = BitIOFile;
-            uint64_t Path2OpenSize  = UTF8_GetSizeInCodePoints(Path2Open) + BitIONULLStringSize;
+            uint64_t Path2OpenSize  = UTF8_GetStringSizeInCodePoints(Path2Open) + BitIONULLStringSize;
             if (BitO->FileSpecifierExists == Yes) {
                 UTF8 *NewPath       = calloc(Path2OpenSize, sizeof(UTF8));
                 snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
@@ -657,6 +657,27 @@ extern "C" {
         } else if (Path2Open == NULL) {
             Log(Log_ERROR, __func__, U8("Path2Open Pointer is NULL"));
         }
+    }
+    
+    int32_t BitOutput_RenameFile(UTF8 *OriginalPath, UTF8 *NewPath) {
+        int32_t ErrorCode     = 0L;
+        if (OriginalPath != NULL && NewPath != NULL) {
+#if   (FoundationIOTargetOS == POSIXOS)
+            ErrorCode         = rename(OriginalPath, NewPath);
+#elif (FoundationIOTargetOS == WindowsOS)
+            UTF32 *Original32 = UTF8_Decode(OriginalPath);
+            UTF32 *New32      = UTF8_Decode(NewPath);
+            UTF16 *Original16 = UTF16_Encode(Original32, UseLEByteOrder);
+            free(Original32);
+            UTF16 *New16      = UTF16_Encode(New32, UseLEByteOrder);
+            ErrorCode         = _wrename(Original16, New16);
+#endif
+        } else if (OriginalPath == NULL) {
+            Log(Log_ERROR, __func__, U8("OriginalPath Pointer is NULL"));
+        } else if (NewPath == NULL) {
+            Log(Log_ERROR, __func__, U8("NewPath Pointer is NULL"));
+        }
+        return ErrorCode;
     }
     
     void BitOutput_OpenSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol) {

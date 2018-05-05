@@ -343,6 +343,14 @@ extern   "C" {
     void                        BitOutput_OpenFile(BitOutput *BitO, UTF8 *Path2Open);
     
     /*!
+     @abstract                                                  "Opens an output file for writing".
+     @param                     OriginalPath                    "BitOutput Pointer".
+     @param                     NewPath                         "Path to the output file to open".
+     @return                                                    "Returns an error code from rename or _wrename".
+     */
+    int32_t                     BitOutput_RenameFile(UTF8 *OriginalPath, UTF8 *NewPath);
+    
+    /*!
      @abstract                                                  "Opens a socket for writing".
      @param                     BitO                            "BitOutput Pointer".
      @param                     Domain                          "What domain should communication take place on"?

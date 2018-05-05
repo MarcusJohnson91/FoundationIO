@@ -353,7 +353,7 @@ extern   "C" {
         UTF8 ArgumentSwitch = NULL;
         if (ArgumentString != NULL) {
             uint8_t  ArgumentStringPrefixSize = 0;
-            uint64_t ArgumentStringSize       = UTF32_GetSizeInCodePoints(ArgumentString);
+            uint64_t ArgumentStringSize       = UTF32_GetStringSizeInCodePoints(ArgumentString);
             
             if (ArgumentStringSize >= 2) {
                 //Log(Log_DEBUG, __func__, U8("ArgumentString[0] = 0x%X, ArgumentString[1] = 0x%X"), ArgumentString[0], ArgumentString[1]);
@@ -382,7 +382,7 @@ extern   "C" {
                 // Extract the first argument as a switch.
                 UTF32   *Argument         = Arguments[CurrentArgument];
                 UTF32   *ArgumentFlag     = ArgumentString2SwitchFlag(Argument);
-                uint64_t ArgumentFlagSize = UTF32_GetSizeInCodePoints(ArgumentFlag);
+                uint64_t ArgumentFlagSize = UTF32_GetStringSizeInCodePoints(ArgumentFlag);
                 // now loop over the switches
                 for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                     // now compare ArgumentFlag to Switch
@@ -612,7 +612,7 @@ extern   "C" {
     UTF8 *GetExtensionFromPath(UTF8 *Path) {
         UTF8 *ExtensionString                  = NULL;
         if (Path != NULL) {
-            uint64_t PathSize                  = UTF8_GetSizeInCodePoints(Path) + 1;
+            uint64_t PathSize                  = UTF8_GetStringSizeInCodePoints(Path) + 1;
             uint64_t ExtensionSize             = PathSize;
             uint64_t ExtensionDistanceFromEnd  = 0ULL;
             while (Path[ExtensionDistanceFromEnd] != 0x2E) {
@@ -653,7 +653,7 @@ extern   "C" {
             
             uint64_t *StringSize = calloc(NumItems2Display, sizeof(uint64_t));
             for (uint8_t Item = 0; Item < NumItems2Display; Item++) { // Get the size of the strings
-                StringSize[Item] = UTF8_GetSizeInCodePoints(Strings[Item]);
+                StringSize[Item] = UTF8_GetStringSizeInCodePoints(Strings[Item]);
                 // huh, well we need 2 characters for the brackets.
             }
             // Number of seperators for each string
