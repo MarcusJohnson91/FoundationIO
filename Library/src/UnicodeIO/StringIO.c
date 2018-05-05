@@ -974,7 +974,7 @@ extern  "C" {
     
     UTF16 *UTF16_Decimal2String(double Decimal) {
         UTF32 *String32 = UTF32_Decimal2String(Decimal);
-        UTF16 *String16 = UTF16_Encode(String32, UseNativeByteOrder);
+        UTF16 *String16 = UTF16_Encode(String32, UseLEByteOrder);
         free(String32);
         return String16;
     }
@@ -1099,7 +1099,7 @@ extern  "C" {
             UTF32 *FormattedString    = UTF32_FormatString(Format32, VariadicArguments);
             free(Format32);
             va_end(VariadicArguments);
-            Format16                  = UTF16_Encode(FormattedString, UseNativeByteOrder);
+            Format16                  = UTF16_Encode(FormattedString, UseLEByteOrder);
             free(FormattedString);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
