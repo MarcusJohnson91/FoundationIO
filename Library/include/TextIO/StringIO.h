@@ -52,7 +52,7 @@ extern  "C" {
                           UTF16SurrogatePairModDividend        = 0x400,
                           UTF16SurrogatePairStart              = 0x10000,
                           InvalidCodePointReplacementCharacter = 0xFFFD,
-                          UTF1632BOMSizeInCodePoints           = 1,
+                          UTF1632BOMSizeInCodeUnits            = 1,
                           UTF32LE                              = 0xFFFE,
                           UTF32BE                              = 0xFEFF,
                           UnicodeMaxCodePoint                  = 0x10FFFF,
@@ -114,51 +114,167 @@ extern  "C" {
                           UseBEByteOrder                       = 2,
     } StringIOByteOrders;
     
+    typedef enum CombiningCharacterClasses {
+                          CCCOverlay                           = 1,
+                          CCCNukta                             = 7,
+                          CCCKanaVoicing                       = 8,
+                          CCCVirama                            = 9,
+                          CCC10                                = 10,
+                          CCC11                                = 11,
+                          CCC12                                = 12,
+                          CCC13                                = 13,
+                          CCC14                                = 14,
+                          CCC15                                = 15,
+                          CCC16                                = 16,
+                          CCC17                                = 17,
+                          CCC18                                = 18,
+                          CCC19                                = 19,
+                          CCC20                                = 20,
+                          CCC21                                = 21,
+                          CCC22                                = 22,
+                          CCC23                                = 23,
+                          CCC24                                = 24,
+                          CCC25                                = 25,
+                          CCC26                                = 26,
+                          CCC27                                = 27,
+                          CCC28                                = 28,
+                          CCC29                                = 29,
+                          CCC30                                = 30,
+                          CCC31                                = 31,
+                          CCC32                                = 32,
+                          CCC33                                = 33,
+                          CCC34                                = 34,
+                          CCC35                                = 35,
+                          CCC36                                = 36,
+                          CCC84                                = 84,
+                          CCC91                                = 91,
+                          CCC103                               = 103,
+                          CCC107                               = 107,
+                          CCC118                               = 118,
+                          CCC122                               = 122,
+                          CCC129                               = 129,
+                          CCC130                               = 130,
+                          CCC132                               = 132,
+                          CCCAttachBelowLeft                   = 200,
+                          CCCAttachBelow                       = 202,
+                          CCCAttachAbove                       = 214,
+                          CCCAttachAboveRight                  = 216,
+                          CCCAttachBelowLeft2                  = 218,
+                          CCCAttachBelow2                      = 220,
+                          CCCAttachBelowRight2                 = 222,
+                          CCCAttachLeft                        = 224,
+                          CCCAttachRight                       = 226,
+                          CCCAttachAboveLeft2                  = 228,
+                          CCCAttachAbove2                      = 230,
+                          CCCAttachAboveRight2                 = 232,
+                          CCCAttachDoubleBelow                 = 233,
+                          CCCAttachDoubleAbove                 = 234,
+                          CCCAttachIOTASubscript               = 240,
+    } CombiningCharacterClasses;
+    
+    /* Basic String Property Functions */
+    /*!
+     @abstract                             "Returns the number of CodeUnits in the CodePoint".
+     @param               CodeUnit         "The leading codeunit for a codepoint".
+     */
+    uint8_t               UTF8_GetCodeUnitSize(UTF8 CodeUnit);
+    
+    /*!
+     @abstract                             "Returns the number of CodeUnits in the CodePoint".
+     @param               CodeUnit         "The leading codeunit for a codepoint".
+     */
+    uint8_t               UTF16_GetCodeUnitSize(UTF16 CodeUnit);
+    
     /*!
      @abstract                             "Gets the number of Unicode codeunits in the UTF8 string".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
-     @param               String2Count     "The string to get the number of codeunits in".
+     @param               String           "The string to get the number of codeunits in".
      */
-    uint64_t              UTF8_GetSizeInCodeUnits(UTF8 *String2Count);
+    uint64_t              UTF8_GetStringSizeInCodeUnits(UTF8 *String);
     
     /*!
      @abstract                             "Gets the number of Unicode codeunits in the UTF8".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
-     @param               String2Count     "The string to get the number of codepoints in".
+     @param               String           "The string to get the number of codepoints in".
      */
-    uint64_t              UTF16_GetSizeInCodeUnits(UTF16 *String2Count);
+    uint64_t              UTF16_GetStringSizeInCodeUnits(UTF16 *String);
     
     /*!
      @abstract                             "Gets the number of Unicode codepoints in the string".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
-     @param               String2Count     "The string to get the number of codepoints in".
+     @param               String           "The string to get the number of codepoints in".
      */
-    uint64_t              UTF8_GetSizeInCodePoints(UTF8 *String2Count);
+    uint64_t              UTF8_GetStringSizeInCodePoints(UTF8 *String);
     
     /*!
      @abstract                             "Gets the number of Unicode codepoints in the string".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
-     @param               String2Count     "The string to get the number of codepoints in".
+     @param               String           "The string to get the number of codepoints in".
      */
-    uint64_t              UTF16_GetSizeInCodePoints(UTF16 *String2Count);
+    uint64_t              UTF16_GetStringSizeInCodePoints(UTF16 *String);
     
     /*!
      @abstract                             "Gets the number of Unicode codepoints in the string".
-     @param               String2Count     "The string to get the number of codepoints in".
+     @param               String           "The string to get the number of codepoints in".
      */
-    uint64_t              UTF32_GetSizeInCodePoints(UTF32 *String2Count);
+    uint64_t              UTF32_GetStringSizeInCodePoints(UTF32 *String);
+    
+    /*!
+     @abstract                             "Gets the number of UTF-8 code units needed to store a UTF-32 string".
+     @param               String           "The string to get the number of codeunits for".
+     */
+    uint64_t              UTF32_GetStringSizeInUTF8CodeUnits(UTF32 *String);
+    
+    /*!
+     @abstract                             "Gets the number of UTF-16 code units needed to store a UTF-32 string".
+     @param               String           "The string to get the number of codeunits for".
+     */
+    uint64_t              UTF32_GetStringSizeInUTF16CodeUnits(UTF32 *String);
     
     /*!
      @abstract                             "Gets the number of user visible characters in a UTF-8 string".
+     @remark                               "This function just decodes the string and sends it off to the UTF32 version".
      @param               String           "The string to get the number of graphemes in".
      */
-    uint64_t              UTF8_GetSizeInGraphemes(UTF8 *String);
+    uint64_t              UTF8_GetStringSizeInGraphemes(UTF8 *String);
     
     /*!
      @abstract                             "Gets the number of user visible characters in a UTF-16 string".
+     @remark                               "This function just decodes the string and sends it off to the UTF32 version".
      @param               String           "The string to get the number of graphemes in".
      */
-    uint64_t              UTF16_GetSizeInGraphemes(UTF16 *String);
+    uint64_t              UTF16_GetStringSizeInGraphemes(UTF16 *String);
+    
+    /*!
+     @abstract                             "Gets the number of user visible characters in a UTF-32 string".
+     @param               String           "The string to get the number of graphemes in".
+     */
+    uint64_t              UTF32_GetStringSizeInGraphemes(UTF32 *String);
+    
+    /*!
+     @abstract                             "Adds the specified BOM to the string".
+     @param               String           "The string to add the BOM to".
+     */
+    UTF8                 *UTF8_AddBOM(UTF8 *String, StringIOByteOrders BOM2Add);
+    
+    /*!
+     @abstract                             "Adds the specified BOM to the string".
+     @param               String           "The string to add the BOM to".
+     */
+    UTF16                *UTF16_AddBOM(UTF16 *String, StringIOByteOrders BOM2Add);
+    
+    /*!
+     @abstract                             "Removes the BOM from the string".
+     @param               String           "The string to remove the BOM from".
+     */
+    UTF8                 *UTF8_RemoveBOM(UTF8 *String);
+    
+    /*!
+     @abstract                             "Removes the BOM from the string".
+     @param               String           "The string to remove the BOM from".
+     */
+    UTF16                *UTF16_RemoveBOM(UTF16 *String);
+    /* Basic String Property Functions */
     
     /*!
      @abstract                             "Decodes a UTF8 string to a UTF32 string".
@@ -185,34 +301,51 @@ extern  "C" {
     UTF16                *UTF16_Encode(UTF32 *String, StringIOByteOrders OutputByteOrder);
     
     /*!
-     @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
-     @remark                               "The string is reallocated at the end to remove unused space".
-     @param               String2Normalize "The string to be normalized".
-     @param               NormalizedForm   "The type of normalization of use on String2Normalize"
+     @abstract                             "Casefolds string for case insensitive comparison".
+     @param               String           "The string to be casefolded".
+     @return                               "Returns the case folded string".
      */
-    UTF8                 *UTF8_NormalizeString(UTF8 *String2Normalize, StringIONormalizationForms NormalizedForm);
-    
-    /*!
-     @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
-     @remark                               "The string is reallocated at the end to remove unused space".
-     @param               String2Normalize "The string to be normalized".
-     @param               NormalizedForm   "The type of normalization of use on String2Normalize"
-     */
-    UTF16                *UTF16_NormalizeString(UTF16 *String2Normalize, StringIONormalizationForms NormalizedForm);
+    UTF8                 *UTF8_CaseFoldString(UTF8 *String);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
-     @param               String2CaseFold  "The string to be casefolded".
+     @param               String           "The string to be casefolded".
      @return                               "Returns the case folded string".
      */
-    UTF8                 *UTF8_CaseFoldString(UTF8 *String2CaseFold);
+    UTF16                *UTF16_CaseFoldString(UTF16 *String);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
-     @param               String2CaseFold  "The string to be casefolded".
+     @param               String           "The string to be casefolded".
      @return                               "Returns the case folded string".
      */
-    UTF16                *UTF16_CaseFoldString(UTF16 *String2CaseFold);
+    UTF32                *UTF32_CaseFoldString(UTF32 *String);
+    
+    /*!
+     @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
+     @remark                               "The string is reallocated at the end to remove unused space".
+     @remark                               "This function simply decodes the string, sends it to the UTF32 version, then reencodes it".
+     @param               String           "The string to be normalized".
+     @param               NormalizedForm   "The type of normalization to use on the String".
+     */
+    UTF8                 *UTF8_NormalizeString(UTF8 *String, StringIONormalizationForms NormalizedForm);
+    
+    /*!
+     @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
+     @remark                               "The string is reallocated at the end to remove unused space".
+     @remark                               "This function simply decodes the string, sends it to the UTF32 version, then reencodes it".
+     @param               String           "The string to be normalized".
+     @param               NormalizedForm   "The type of normalization to use on the String".
+     */
+    UTF16                *UTF16_NormalizeString(UTF16 *String, StringIONormalizationForms NormalizedForm);
+    
+    /*!
+     @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
+     @remark                               "The string is reallocated at the end to remove unused space".
+     @param               String           "The string to be normalized".
+     @param               NormalizedForm   "The type of normalization to use on the String".
+     */
+    UTF32                *UTF32_NormalizeString(UTF32 *String, StringIONormalizationForms NormalizedForm);
     
     /*!
      @abstract                             "Finds a substring within string, starting at codepoint Offset, and ending at Offset + Length".
@@ -237,6 +370,17 @@ extern  "C" {
     int64_t               UTF16_FindSubString(UTF16 *String, UTF16 *SubString, uint64_t Offset, int64_t Length);
     
     /*!
+     @abstract                             "Finds a substring within string, starting at codepoint Offset, and ending at Offset + Length".
+     @remark                               "We do NOT casefold, or normalize the String or SubString, that's your job".
+     @param               String           "The string to search for SubString in".
+     @param               SubString        "The SubString to find in String".
+     @param               Offset           "Where in the string should we start looking for the substring"?
+     @param               Length           "How many codepoints should we search for the substring? -1 means all codepoints".
+     @return                               "Returns the offset of the start of the substring in String, or -1 if a match wasn't found.".
+     */
+    int64_t               UTF32_FindSubString(UTF32 *String, UTF32 *SubString, uint64_t Offset, int64_t Length);
+    
+    /*!
      @abstract                             "Extracts a SubString from String".
      @param               String           "The string to extract from".
      @param               Offset           "The CodePoint to start extracting from".
@@ -253,22 +397,12 @@ extern  "C" {
     UTF16                *UTF16_ExtractSubString(UTF16 *String, uint64_t Offset, uint64_t Length);
     
     /*!
-     @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
-     @remark                               "Replaces strtok from the standard library".
-     @param               String2Split     "The string you want to be split".
-     @param               NumDelimiters    "The number of delimiter strings in Delimiters".
-     @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
+     @abstract                             "Extracts a SubString from String".
+     @param               String           "The string to extract from".
+     @param               Offset           "The CodePoint to start extracting from".
+     @param               Length           "The number of codepoints to extract".
      */
-    UTF8                **UTF8_SplitString(UTF8 *String2Split, uint64_t NumDelimiters, UTF8 **Delimiters);
-    
-    /*!
-     @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
-     @remark                               "Replaces strtok from the standard library".
-     @param               String2Split     "The string you want to be split".
-     @param               NumDelimiters    "The number of delimiter strings in Delimiters".
-     @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
-     */
-    UTF16               **UTF16_SplitString(UTF16 *String2Split, uint64_t NumDelimiters, UTF16 **Delimiters);
+    UTF32                *UTF32_ExtractSubString(UTF32 *String, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Replaces a section in String starting at Offset and ending at Offset + Length with Replacement".
@@ -289,6 +423,42 @@ extern  "C" {
     UTF16                *UTF16_ReplaceSubString(UTF16 *String, UTF16 *Replacement, uint64_t Offset, uint64_t Length);
     
     /*!
+     @abstract                             "Replaces a section in String starting at Offset and ending at Offset + Length with Replacement".
+     @param               String           "The string to edit".
+     @param               Replacement      "The string to splice in".
+     @param               Offset           "Where to start replacing String with Replacement".
+     @param               Length           "The number of codepoints to replace, can be more or less than Replacement".
+     */
+    UTF32                *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length);
+    
+    /*!
+     @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
+     @remark                               "Replaces strtok from the standard library".
+     @param               String           "The string you want to be split".
+     @param               NumDelimiters    "The number of delimiter strings in Delimiters".
+     @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
+     */
+    UTF8                **UTF8_SplitString(UTF8 *String, uint64_t NumDelimiters, UTF8 **Delimiters);
+    
+    /*!
+     @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
+     @remark                               "Replaces strtok from the standard library".
+     @param               String           "The string you want to be split".
+     @param               NumDelimiters    "The number of delimiter strings in Delimiters".
+     @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
+     */
+    UTF16               **UTF16_SplitString(UTF16 *String, uint64_t NumDelimiters, UTF16 **Delimiters);
+    
+    /*!
+     @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
+     @remark                               "Replaces strtok from the standard library".
+     @param               String           "The string you want to be split".
+     @param               NumDelimiters    "The number of delimiter strings in Delimiters".
+     @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
+     */
+    UTF32               **UTF32_SplitString(UTF32 *String, uint64_t NumDelimiters, UTF32 **Delimiters);
+    
+    /*!
      @abstract                             "Extracts a number from a string".
      @param               String           "The string to extract a number from".
      */
@@ -299,6 +469,12 @@ extern  "C" {
      @param               String           "The string to extract a number from".
      */
     int64_t               UTF16_String2Integer(UTF16 *String);
+    
+    /*!
+     @abstract                             "Extracts a number from a string".
+     @param               String           "The string to extract a number from".
+     */
+    int64_t               UTF32_String2Integer(UTF32 *String);
     
     /*!
      @abstract                             "Converts an integer to a string".
@@ -317,6 +493,14 @@ extern  "C" {
     UTF16                *UTF16_Integer2String(const StringIOBases Base, const bool UpperCase, int64_t Integer2Convert);
     
     /*!
+     @abstract                             "Converts an integer to a string".
+     @param               UpperCase        "If the Base is Hex, should the output string be upper case"?
+     @param               Base             "The base to output the integer in".
+     @param               Integer2Convert  "The number to convert into a string".
+     */
+    UTF32                *UTF32_Integer2String(const StringIOBases Base, const bool UpperCase, int64_t Integer2Convert);
+    
+    /*!
      @abstract                             "Converts a string to a double, replaces strtod and atof".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
@@ -327,6 +511,12 @@ extern  "C" {
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
     double                UTF16_String2Decimal(UTF16 *String);
+    
+    /*!
+     @abstract                             "Converts a string to a double, replaces strtod and atof".
+     @param               String           "The string composed of a decimal number to convert to a decimal".
+     */
+    double                UTF32_String2Decimal(UTF32 *String);
     
     /*!
      @abstract                             "Converts a double to a string, replaces strtod and atof".
@@ -341,13 +531,40 @@ extern  "C" {
     UTF16                *UTF16_Decimal2String(double Decimal);
     
     /*!
+     @abstract                             "Converts a double to a string, replaces strtod and atof".
+     @param               Decimal          "The decimal number to convert to a string".
+     */
+    UTF32                *UTF32_Decimal2String(double Decimal);
+    
+    /*!
+     @abstract                             "Removes substrings (including single codepoints, but also strings) from a string".
+     @param               String           "The string to perform the trimming operations on".
+     @param               Strings2Remove   "An array of strings to remove from the String".
+     */
+    UTF8                 *UTF8_TrimString(UTF8 *String, UTF8 **Strings2Remove);
+    
+    /*!
+     @abstract                             "Removes substrings (including single codepoints, but also strings) from a string".
+     @param               String           "The string to perform the trimming operations on".
+     @param               Strings2Remove   "An array of strings to remove from the String".
+     */
+    UTF16                *UTF16_TrimString(UTF16 *String, UTF16 **Strings2Remove);
+    
+    /*!
+     @abstract                             "Removes substrings (including single codepoints, but also strings) from a string".
+     @param               String           "The string to perform the trimming operations on".
+     @param               Strings2Remove   "An array of strings to remove from the String".
+     */
+    UTF32                *UTF32_TrimString(UTF32 *String, UTF32 **Strings2Remove);
+    
+    /*!
      @abstract                             "Compares String1 and String2 for equilivence".
      @remark                               "String1 and String2 MUST use the same Unicode encoding".
      @param               String1          "String1 Pointer".
      @param               String2          "String2 Pointer".
      @param               NormalizedForm   "The normalization to use before comparing the strings".
      @param               CaseInsensitive  "Should the strings be casefolded first"?
-     @return                               "Returns wether the strings match or not".
+     @return                               "Returns whether the strings match or not".
      */
     bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive);
     
@@ -358,9 +575,18 @@ extern  "C" {
      @param               String2          "String2 Pointer".
      @param               NormalizedForm   "The normalization to use before comparing the strings".
      @param               CaseInsensitive  "Should the strings be casefolded first"?
-     @return                               "Returns wether the strings match or not".
+     @return                               "Returns whether the strings match or not".
      */
     bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive);
+    
+    /*!
+     @abstract                             "Compares String1 and String2 for equilivence".
+     @remark                               "String1 and String2 MUST use the same Unicode encoding".
+     @param               String1          "String1 Pointer".
+     @param               String2          "String2 Pointer".
+     @return                               "Returns whether the strings match or not".
+     */
+    bool                  UTF32_Compare(UTF32 *String1, UTF32 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive);
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
@@ -401,22 +627,67 @@ extern  "C" {
 #endif/* FoundationIOTargetOS */
     
     /*!
+     @abstract                             "Formats a string according to the Format string, with all of it's options".
+     @remark                               "We've extended FormatString from printf by adding the B specifier, for binary".
+     @remark                               "We do not support the n specifier for security purposes".
+     @param               Format           "A string with optional format specifiers".
+     @return                               "Returns the formatted string encoded using the UTF-32 format".
+     */
+    UTF32                *UTF32_FormatString(UTF32 *Format, va_list Arguments);
+    
+    /*!
      @abstract                             "Writes a UTF-8 encoded string to the OutputFile using the platform's default Unicode encoding".
      @remark                               "On Windows, Strings are converted to UTF-16; on POSIX platforms (including Mac/iOS) strings are written as UTF-8".
-     @param               String2Write     "The string to write to OutputFile (including any newlines, etc)".
+     @param               String           "The string to write to OutputFile (including any newlines, etc)".
      @param               OutputFile       "a valid FILE pointer, or STDIN/STDOUT/STDERR".
      */
-    void                  UTF8_WriteString2File(UTF8 *String2Write, FILE *OutputFile);
+    void                  UTF8_WriteString2File(UTF8 *String, FILE *OutputFile);
     
     /*!
      @abstract                             "Writes a UTF-16 encoded string to the OutputFile using the platform's default Unicode encoding".
      @remark                               "On Windows, Strings are output as UTF-16; on POSIX platforms (including Mac/iOS) strings are written as UTF-8".
-     @param               String2Write     "The string to write to OutputFile (including any newlines, etc)".
+     @param               String           "The string to write to OutputFile (including any newlines, etc)".
      @param               OutputFile       "a valid FILE pointer, or STDIN/STDOUT/STDERR".
      */
-    void                  UTF16_WriteString2File(UTF16 *String2Write, FILE *OutputFile);
+    void                  UTF16_WriteString2File(UTF16 *String, FILE *OutputFile);
     
-#define CompareStrings(String1, String2, NormalizedForm, CaseInsensitive) _Generic((String1, String2), UTF8*:UTF8_Compare, UTF16*:UTF16_Compare)(String1, String2, NormalizedForm, CaseInsensitive)
+    /*!
+     @abstract                             "Deinitalizes a UTF-8 encoded array of strings (like is returned by SplitString)".
+     @param               Strings          "An array of strings to deinitalize, all strings will be freed".
+     @param               NumStrings       "The number of strings in the array, I'm not sure if I'll just put this as the first parameter in the array itself, or have it be an external variable".
+     */
+    void                  UTF8_DeinitStringArray(UTF8 **Strings, uint64_t NumStrings);
+    
+    /*!
+     @abstract                             "Deinitalizes a UTF-16 encoded array of strings (like is returned by SplitString)".
+     @param               Strings          "An array of strings to deinitalize, all strings will be freed".
+     @param               NumStrings       "The number of strings in the array, I'm not sure if I'll just put this as the first parameter in the array itself, or have it be an external variable".
+     */
+    void                  UTF16_DeinitStringArray(UTF16 **Strings, uint64_t NumStrings);
+    
+    /*!
+     @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
+     @param               String           "The string to operate on".
+     @param               SubString2Remove "The substring to remove from the string".
+     @param               Instance2Remove  "The instance (-1 for all) of the substring in the string to remove".
+     */
+    UTF8                 *UTF8_RemoveSubString(UTF8 *String, UTF8 *SubString2Remove, int64_t Instance2Remove);
+    
+    /*!
+     @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
+     @param               String           "The string to operate on".
+     @param               SubString2Remove "The substring to remove from the string".
+     @param               Instance2Remove  "The instance (-1 for all) of the substring in the string to remove".
+     */
+    UTF16                *UTF16_RemoveSubString(UTF16 *String, UTF16 *SubString2Remove, int64_t Instance2Remove);
+    
+    /*!
+     @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
+     @param               String           "The string to operate on".
+     @param               SubString2Remove "The substring to remove from the string".
+     @param               Instance2Remove  "The instance (-1 for all) of the substring in the string to remove".
+     */
+    UTF32                *UTF32_RemoveSubString(UTF32 *String, UTF32 *SubString2Remove, int64_t Instance2Remove);
     
 #ifdef  __cplusplus
 }
