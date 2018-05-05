@@ -55,6 +55,8 @@ extern "C" {
     void                 Log(LogTypes Severity, const UTF8 *FunctionName, __format_string const UTF8 *Description, ...);
 #elif    (_MSC_VER >= 1500)
     void                 Log(LogTypes Severity, const UTF8 *FunctionName, _Printf_format_string_ const UTF8 *Description, ...);
+#else
+    void                 Log(LogTypes Severity, const UTF8 *FunctionName, const UTF8 *Description, ...);
 #endif /* _MSC_VER */
 #endif/* FoundationIOTargetOS */
     
