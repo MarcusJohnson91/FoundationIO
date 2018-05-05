@@ -3,10 +3,12 @@
 #if   (defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L)
 #include      <tgmath.h>
 #elif (!defined __STDC_NO_COMPLEX__)
+#if   (FoundationIOTargetOS == WindowsOS)
+#include      <math.h>
+#elif (FoundationIOTargetOS == POSIXOS)
 #include_next <math.h>
+#endif  /* FoundationIOTargetOS */
 #include      <complex.h>
-#else
-#include_next <math.h>
 #endif
 
 #pragma  once

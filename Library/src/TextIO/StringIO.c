@@ -1,9 +1,9 @@
 #include <stdarg.h>                    /* Included for va_start, va_end */
 #include <stdint.h>                    /* Included for u/intX_t */
-#include <stdlib.h>                    /* Included for calloc, and free */
+#include <stdlib.h>                    /* Included for calloc, free */
 
-#include "../include/StringIOTables.h" /* Included for the tables, and our declarations */
-#include "../include/Math.h"           /* Included for Integer functions */
+#include "../include/StringIOTables.h" /* Included for the tables, and StringIO declarations */
+#include "../include/Math.h"           /* Included for endian swapping */
 #include "../include/Log.h"            /* Included for error logging */
 
 #ifdef  __cplusplus
