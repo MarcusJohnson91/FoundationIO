@@ -244,9 +244,10 @@ extern   "C" {
      @abstract                                                  "Writes a UTF-16 encoded string to the BitBuffer".
      @param                     StringByteOrder                 "The byte order of the string to be read IF there's no BOM, if there is, use UnknownByteFirst".
      @param                     BitB                            "BitBuffer Pointer".
+     @param                     RemoveBOM                       "Should the byte order mark be skipped when writing the string"?
      @param                     String2Write                    "The string to write to the BitBuffer".
      */
-    void                        WriteUTF16(ByteBitOrders StringByteOrder, BitBuffer *BitB, UTF16 *String2Write);
+    void                        WriteUTF16(ByteBitOrders StringByteOrder, BitBuffer *BitB, bool RemoveBOM, UTF16 *String2Write);
     
     /*!
      @abstract                                                  "Deallocates the instance of BitBuffer pointed to by BitB".
