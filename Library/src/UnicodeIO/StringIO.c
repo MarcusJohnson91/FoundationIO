@@ -1217,6 +1217,8 @@ extern  "C" {
                         StringsMatch = No;
                     }
                 } while (CaseFolded1[CodePoint] != NULLTerminator && CaseFolded2[CodePoint] != NULLTerminator);
+                free(CaseFolded1);
+                free(CaseFolded2);
             } else {
                 do {
                     if (Normalized1[CodePoint] != Normalized2[CodePoint]) {
@@ -1224,6 +1226,8 @@ extern  "C" {
                     }
                 } while (Normalized1[CodePoint] != NULLTerminator && Normalized2[CodePoint] != NULLTerminator);
             }
+            free(Normalized1);
+            free(Normalized2);
         } else if (String1 == NULL) {
             Log(Log_ERROR, __func__, U8("String1 Pointer is NULL"));
         } else if (String2 == NULL) {
@@ -1233,12 +1237,15 @@ extern  "C" {
     }
     
     UTF8 *UTF8_RemoveSubString(UTF8 *String, UTF8 *SubString2Remove, int64_t Instance2Remove) {
-        UTF8 *TrimmedString = NULL;
+        UTF8 *TrimmedString         = NULL;
         if (String != NULL && SubString2Remove != NULL && Instance2Remove >= -1) {
             UTF32 *DecodedString    = UTF8_Decode(String);
             UTF32 *DecodedSubString = UTF8_Decode(SubString2Remove);
             UTF32 *Trimmed32        = UTF32_RemoveSubString(DecodedString, DecodedSubString, Instance2Remove);
             TrimmedString           = UTF8_Encode(Trimmed32, No);
+            free(DecodedString);
+            free(DecodedSubString);
+            free(Trimmed32);
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         } else if (SubString2Remove == NULL) {
@@ -1250,12 +1257,15 @@ extern  "C" {
     }
     
     UTF16 *UTF16_RemoveSubString(UTF16 *String, UTF16 *SubString2Remove, int64_t Instance2Remove) {
-        UTF16 *TrimmedString = NULL;
+        UTF16 *TrimmedString        = NULL;
         if (String != NULL && SubString2Remove != NULL && Instance2Remove >= -1) {
             UTF32 *DecodedString    = UTF16_Decode(String);
             UTF32 *DecodedSubString = UTF16_Decode(SubString2Remove);
             UTF32 *Trimmed32        = UTF32_RemoveSubString(DecodedString, DecodedSubString, Instance2Remove);
             TrimmedString           = UTF16_Encode(Trimmed32, UseLEByteOrder);
+            free(DecodedString);
+            free(DecodedSubString);
+            free(Trimmed32);
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         } else if (SubString2Remove == NULL) {
@@ -1300,14 +1310,13 @@ extern  "C" {
     UTF8 *UTF8_FormatString(UTF8 *Format, ...) {
         UTF8 *Format8 = NULL;
         if (Format != NULL) {
-            // Decode the Format string to UTF32, and try to see if any strings in the argument list are UTF8 encoded and decode them too.
             UTF32 *Format32           = UTF8_Decode(Format);
             va_list VariadicArguments;
             va_start(VariadicArguments, Format);
             UTF32 *FormattedString    = UTF32_FormatString(Format32, VariadicArguments);
-            free(Format32);
             va_end(VariadicArguments);
             Format8                   = UTF8_Encode(FormattedString, No);
+            free(Format32);
             free(FormattedString);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -1322,9 +1331,9 @@ extern  "C" {
             va_list VariadicArguments;
             va_start(VariadicArguments, Format);
             UTF32 *FormattedString    = UTF32_FormatString(Format32, VariadicArguments);
-            free(Format32);
             va_end(VariadicArguments);
             Format16                  = UTF16_Encode(FormattedString, UseLEByteOrder);
+            free(Format32);
             free(FormattedString);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -1375,16 +1384,16 @@ extern  "C" {
             FormatBase16DecimalL           = 35,
         } FormatSpecifierTypes;
         
-        uint64_t NumSpecifiers           = 0ULL;
-        uint64_t CurrentSpecifier        = 0ULL;
-        uint64_t FormatStringSize        = 0ULL;
+        uint64_t NumSpecifiers             = 0ULL;
+        uint64_t CurrentSpecifier          = 0ULL;
+        uint64_t FormatStringSize          = 0ULL;
         
         if (Format != NULL) {
-            FormatStringSize             = UTF32_GetStringSizeInCodePoints(Format);
+            FormatStringSize               = UTF32_GetStringSizeInCodePoints(Format);
             
             for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) {
                 if (Format[CodePoint] == U'%' || Format[CodePoint] == U'\\') {
-                    NumSpecifiers       += 1;
+                    NumSpecifiers         += 1;
                 }
             }
             
@@ -1616,8 +1625,8 @@ extern  "C" {
 #elif (FoundationIOTargetOS == WindowsOS)
             UTF32 *StringUTF32 = UTF8_Decode(String);
             UTF16 *StringUTF16 = UTF16_Encode(StringUTF32, UseLEByteOrder);
-            free(StringUTF32);
             fputws(StringUTF16, OutputFile);
+            free(StringUTF32);
             free(StringUTF16);
 #endif
         } else if (String == NULL) {
@@ -1630,11 +1639,10 @@ extern  "C" {
     void UTF16_WriteString2File(UTF16 *String, FILE *OutputFile) {
         if (String != NULL && OutputFile != NULL) {
 #if   (FoundationIOTargetOS == POSIXOS)
-            // Convert from UTF16 to UTF8 then output
             UTF32 *StringUTF32 = UTF16_Decode(String);
             UTF8  *StringUTF8  = UTF8_Encode(StringUTF32, No);
-            free(StringUTF32);
             fputs(StringUTF8, OutputFile);
+            free(StringUTF32);
             free(StringUTF8);
 #elif (FoundationIOTargetOS == WindowsOS)
             fputws(String, OutputFile);
