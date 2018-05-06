@@ -227,15 +227,15 @@ extern   "C" {
      @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to argc".
      @param                     Arguments                       "An array of UTF-8 encoded arguments; equilivent to argv"
      */
-    void                        UTF8_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, const UTF8 **Arguments);
+    void                        UTF8_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF8 **Arguments);
     
     /*!
      @abstract                                                  "Parses the Command Line Options as UTF-16 encoded strings".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to __argc".
-     @param                     Arguments                       "An array of UTF-8 encoded arguments; equilivent to __wargv"
+     @param                     Arguments                       "An array of UTF-16 encoded arguments; equilivent to __wargv"
      */
-    void                        UTF16_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, const UTF16 **Arguments);
+    void                        UTF16_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF16 **Arguments);
     
     /*!
      @abstract                                                  "Displays on the screen the progress of X actions that are taking place"
