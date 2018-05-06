@@ -525,8 +525,8 @@ extern  "C" {
         if (String != NULL) {
             UTF32 *String32   = UTF8_Decode(String);
             UTF32 *CaseFold32 = UTF32_CaseFoldString(String32);
-            free(String32);
             CaseFolded        = UTF8_Encode(CaseFold32, No);
+            free(String32);
             free(CaseFold32);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -539,8 +539,8 @@ extern  "C" {
         if (String != NULL) {
             UTF32 *String32   = UTF16_Decode(String);
             UTF32 *CaseFold32 = UTF32_CaseFoldString(String32);
-            free(String32);
             CaseFolded        = UTF16_Encode(CaseFold32, UseLEByteOrder);
+            free(String32);
             free(CaseFold32);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -625,8 +625,9 @@ extern  "C" {
         if (String != NULL && NormalizedForm != UnknownNormalizationForm) {
             UTF32 *String32           = UTF8_Decode(String);
             UTF32 *NormalizedString32 = UTF32_NormalizeString(String32, NormalizedForm);
-            free(String32);
             NormalizedString8         = UTF8_Encode(NormalizedString32, No);
+            free(String32);
+            free(NormalizedString32);
         }
         return NormalizedString8;
     }
@@ -636,8 +637,9 @@ extern  "C" {
         if (String != NULL && NormalizedForm != UnknownNormalizationForm) {
             UTF32 *String32           = UTF16_Decode(String);
             UTF32 *NormalizedString32 = UTF32_NormalizeString(String32, NormalizedForm);
+            NormalizedString16        = UTF16_Encode(String32, UseLEByteOrder);
             free(String32);
-            NormalizedString16        = UTF16_Encode(String, UseLEByteOrder);
+            free(NormalizedString32);
         }
         return NormalizedString16;
     }
@@ -725,8 +727,8 @@ extern  "C" {
         if (String != NULL) {
             UTF32 *String32    = UTF8_Decode(String);
             UTF32 *Extracted32 = UTF32_ExtractSubString(String32, Offset, Length);
-            free(String32);
             ExtractedSubString = UTF8_Encode(Extracted32, No);
+            free(String32);
             free(Extracted32);
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -739,8 +741,8 @@ extern  "C" {
         if (String != NULL) {
             UTF32 *String32    = UTF16_Decode(String);
             UTF32 *Extracted32 = UTF32_ExtractSubString(String32, Offset, Length);
-            free(String32);
             ExtractedSubString = UTF16_Encode(Extracted32, UseLEByteOrder);
+            free(String32);
             free(Extracted32);
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -775,9 +777,9 @@ extern  "C" {
             UTF32 *String32      = UTF8_Decode(String);
             UTF32 *Replacement32 = UTF8_Decode(Replacement);
             UTF32 *Replaced      = UTF32_ReplaceSubString(String32, Replacement32, Offset, Length);
+            ReplacedString       = UTF8_Encode(Replaced, No);
             free(String32);
             free(Replacement32);
-            ReplacedString       = UTF8_Encode(Replaced, No);
             free(Replaced);
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -795,9 +797,9 @@ extern  "C" {
             UTF32 *String32      = UTF16_Decode(String);
             UTF32 *Replacement32 = UTF16_Decode(Replacement);
             UTF32 *Replaced      = UTF32_ReplaceSubString(String32, Replacement32, Offset, Length);
+            ReplacedString       = UTF16_Encode(Replaced, UseLEByteOrder);
             free(String32);
             free(Replacement32);
-            ReplacedString       = UTF16_Encode(Replaced, UseLEByteOrder);
             free(Replaced);
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -1091,27 +1093,28 @@ extern  "C" {
          Should we support Binary Coded Decimal BCD?
          Invalid doubles return a NULL string
          */
-        UTF32   *OutputString = NULL;
-        int8_t   Sign         = Decimal < 0.0 ? -1 : 1;
-        int32_t *Exponent     = calloc(1, sizeof(int32_t));
-        int32_t  Exponent2    = Exponent;
-        float    Mantissa     = frexp(Decimal, Exponent);
-        float    Mantissa2    = Mantissa;
+        UTF32   *OutputString     = NULL;
+        int8_t   Sign             = Decimal < 0.0 ? -1 : 1;
+        int32_t *Exponent         = calloc(1, sizeof(int32_t));
+        float    Mantissa         = frexp(Decimal, Exponent);
+        int32_t  Exponent2        = Exponent;
+        free(Exponent);
+        float    Mantissa2        = Mantissa;
         
         // Ok now we just need to get the strings size
-        uint64_t StringSize   = UTF1632BOMSizeInCodeUnits; // 1 to account for the BOM
+        uint64_t StringSize       = UTF1632BOMSizeInCodeUnits; // 1 to account for the BOM
         if (Sign == -1) {
-            StringSize       += 1;
+            StringSize           += 1;
         }
         while (Exponent2 > 10) {
-            Exponent2        /= 10;
-            StringSize       +=  1;
+            Exponent2            /= 10;
+            StringSize           +=  1;
         }
         while (Mantissa2 > 0) {
-            Mantissa2        /= 10;
-            StringSize       +=  1;
+            Mantissa2            /= 10;
+            StringSize           +=  1;
         }
-        OutputString          = calloc(StringSize, sizeof(UTF32));
+        OutputString              = calloc(StringSize, sizeof(UTF32));
         if (OutputString != NULL) {
             // Now we go ahead and create the string
             if (GlobalByteOrder == LSByteFirst) {
@@ -1136,9 +1139,24 @@ extern  "C" {
     }
     
     UTF8  *UTF8_TrimString(UTF8 *String, UTF8 **Strings2Remove) {
-        UTF8 *Trimmed = NULL;
+        UTF8    *Trimmed                    = NULL;
+        uint64_t NumSubStrings              = 0ULL;
         if (String != NULL && Strings2Remove != NULL) {
-            // Loop over Strng2Trim looking at each codepoint. if codepoint X matches codepoint 0 from Strings2Remove Y, start looping over Strings2Remove Y making sure the whole string matches, if it does, remove that.
+            UTF32 *String32                 = UTF8_Decode(String);
+            NumSubStrings                   = Strings2Remove[0];
+            UTF32 **Strings2Remove32        = calloc(NumSubStrings + 1, sizeof(UTF32*));
+            Strings2Remove32[0]             = NumSubStrings;
+            for (uint64_t SubString = 1ULL; SubString < NumSubStrings; SubString++) {
+                Strings2Remove32[SubString] = UTF8_Decode(Strings2Remove[SubString]);
+            }
+            UTF32 *Trimmed32                = UTF32_TrimString(String32, Strings2Remove32);
+            Trimmed                         = UTF8_Encode(Trimmed32, No);
+            for (uint64_t SubString = 1ULL; SubString < NumSubStrings; SubString++) {
+                free(Strings2Remove32[SubString]);
+            }
+            free(String32);
+            free(Strings2Remove32);
+            free(Trimmed32);
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         } else if (Strings2Remove == NULL) {
@@ -1148,9 +1166,24 @@ extern  "C" {
     }
     
     UTF16 *UTF16_TrimString(UTF16 *String, UTF16 **Strings2Remove) {
-        UTF16 *Trimmed = NULL;
+        UTF16   *Trimmed                    = NULL;
+        uint64_t NumSubStrings              = 0ULL;
         if (String != NULL && Strings2Remove != NULL) {
-            // Loop over Strng2Trim looking at each codepoint. if codepoint X matches codepoint 0 from Strings2Remove Y, start looping over Strings2Remove Y making sure the whole string matches, if it does, remove that.
+            UTF32 *String32                 = UTF16_Decode(String);
+            NumSubStrings                   = Strings2Remove[0];
+            UTF32 **Strings2Remove32        = calloc(NumSubStrings + 1, sizeof(UTF32*));
+            Strings2Remove32[0]             = NumSubStrings;
+            for (uint64_t SubString = 1ULL; SubString < NumSubStrings; SubString++) {
+                Strings2Remove32[SubString] = UTF16_Decode(Strings2Remove[SubString]);
+            }
+            UTF32 *Trimmed32                = UTF32_TrimString(String32, Strings2Remove32);
+            Trimmed                         = UTF16_Encode(Trimmed32, UseLEByteOrder);
+            for (uint64_t SubString = 1ULL; SubString < NumSubStrings; SubString++) {
+                free(Strings2Remove32[SubString]);
+            }
+            free(String32);
+            free(Strings2Remove32);
+            free(Trimmed32);
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         } else if (Strings2Remove == NULL) {
@@ -1159,10 +1192,21 @@ extern  "C" {
         return Trimmed;
     }
     
-    UTF32 *UTF32_TrimString(UTF32 *String, UTF32 **Strings2Remove) { // How should this API be done? should we take in a array of strings to remove? also should we have an option to remove these strings from not just the start and end of the string, but
-        UTF32 *Trimmed = NULL;
+    UTF32 *UTF32_TrimString(UTF32 *String, UTF32 **Strings2Remove) {
+        UTF32   *Trimmed            = NULL;
+        uint64_t StringCodePoint    = 0ULL;
+        uint64_t SubStringCodePoint = 0ULL;
+        uint32_t NumStrings         = Strings2Remove[0];
         if (String != NULL && Strings2Remove != NULL) {
-            // Loop over Strng2Trim looking at each codepoint. if codepoint X matches codepoint 0 from Strings2Remove Y, start looping over Strings2Remove Y making sure the whole string matches, if it does, remove that.
+            for (uint32_t SubString = 1UL; SubString < NumStrings; SubString++) {
+                do {
+                    if (String[StringCodePoint] == Strings2Remove[SubString][SubStringCodePoint]) {
+                        // Make sure the whole substring matches a whole section
+                    }
+                    StringCodePoint    += 1;
+                    SubStringCodePoint += 1;
+                } while (String[StringCodePoint] != NULLTerminator && Strings2Remove[SubString][SubStringCodePoint] != NULLTerminator);
+            }
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         } else if (Strings2Remove == NULL) {
@@ -1652,6 +1696,11 @@ extern  "C" {
         } else if (OutputFile == NULL) {
             Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
         }
+    }
+    
+    UTF16 *UTF16_ConvertByteOrder(UTF16 *String, StringIOByteOrders OutputByteOrder) {
+        
+        return NULL;
     }
     
 #ifdef  __cplusplus
