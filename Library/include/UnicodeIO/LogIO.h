@@ -1,7 +1,4 @@
-#include <stdint.h>                   /* Included for u/intX_t */
-
-#include "StringIO.h"                 /* Included for UTF8, and the U8 macro */
-#include "Macros.h"
+#include "StringIO.h"                 /* Included for UTF8, U8 macro, bool, Yes/No macros, u/intX_t */
 
 #pragma once
 

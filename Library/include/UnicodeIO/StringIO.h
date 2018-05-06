@@ -1,7 +1,6 @@
-#include <stdint.h>                   /* Included for u/intX_t */
-#include <stdio.h>                    /* Included for FILE */
+#include <stdio.h>                    /* Included for FILE, fpos_t, SEEK SET/END/CUR macros */
 
-#include "Macros.h"                   /* Included for bool and Yes/No macros, and NULLTerminator */
+#include "Macros.h"                   /* Included for u/intX_t, bool, Yes/No macros, FoundationIOTargetOS, NULLTerminator */
 
 #pragma once
 

@@ -1,5 +1,4 @@
 #include <stdarg.h>                    /* Included for va_end, va_list, va_start */
-#include <stdint.h>                    /* Included for u/intX_t */
 #include <stdio.h>                     /* Included for FILE */
 #include <stdlib.h>                    /* Included for calloc, free */
 
