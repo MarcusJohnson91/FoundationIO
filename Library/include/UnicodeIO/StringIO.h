@@ -78,13 +78,15 @@ extern  "C" {
      @constant            Binary                               "Base 2".
      @constant            Octal                                "Base 8".
      @constant            Decimal                              "Base 10".
-     @constant            Hex                                  "Base 16".
+     @constant            HexUpper                             "Base 16, 0-9A-F".
+     @constant            HexLower                             "Base 16, 0-9a-f".
      */
     typedef enum StringIOBases {
                           Binary                               = 2,
                           Octal                                = 8,
                           Decimal                              = 10,
-                          Hex                                  = 16,
+                          HexUpper                             = 16,
+                          HewLower                             = 32,
     } StringIOBases;
     
     /*!
@@ -477,27 +479,24 @@ extern  "C" {
     
     /*!
      @abstract                             "Converts an integer to a string".
-     @param               UpperCase        "If the Base is Hex, should the output string be upper case"?
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF8                 *UTF8_Integer2String(const StringIOBases Base, const bool UpperCase, int64_t Integer2Convert);
+    UTF8                 *UTF8_Integer2String(const StringIOBases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts an integer to a string".
-     @param               UpperCase        "If the Base is Hex, should the output string be upper case"?
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF16                *UTF16_Integer2String(const StringIOBases Base, const bool UpperCase, int64_t Integer2Convert);
+    UTF16                *UTF16_Integer2String(const StringIOBases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts an integer to a string".
-     @param               UpperCase        "If the Base is Hex, should the output string be upper case"?
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF32                *UTF32_Integer2String(const StringIOBases Base, const bool UpperCase, int64_t Integer2Convert);
+    UTF32                *UTF32_Integer2String(const StringIOBases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts a string to a double, replaces strtod and atof".
