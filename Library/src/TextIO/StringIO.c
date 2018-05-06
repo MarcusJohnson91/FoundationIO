@@ -978,21 +978,21 @@ extern  "C" {
         return (Sign < 0 ? Value * Sign : Value);
     }
     
-    UTF8 *UTF8_Integer2String(const StringIOBases Base, const bool UpperCase, int64_t Integer2Convert) {
-        UTF32 *IntegerString32 = UTF32_Integer2String(Base, UpperCase, Integer2Convert);
+    UTF8 *UTF8_Integer2String(const StringIOBases Base, int64_t Integer2Convert) {
+        UTF32 *IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
         UTF8  *IntegerString8  = UTF8_Encode(IntegerString32, No);
         free(IntegerString32);
         return IntegerString8;
     }
     
-    UTF16 *UTF16_Integer2String(const StringIOBases Base, const bool UpperCase, int64_t Integer2Convert) {
-        UTF32 *IntegerString32 = UTF32_Integer2String(Base, UpperCase, Integer2Convert);
+    UTF16 *UTF16_Integer2String(const StringIOBases Base, int64_t Integer2Convert) {
+        UTF32 *IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
         UTF16 *IntegerString16 = UTF16_Encode(IntegerString32, UseLEByteOrder);
         free(IntegerString32);
         return IntegerString16;
     }
     
-    UTF32 *UTF32_Integer2String(const StringIOBases Base, const bool UpperCase, int64_t Integer2Convert) {
+    UTF32 *UTF32_Integer2String(const StringIOBases Base, int64_t Integer2Convert) {
         int64_t  Sign            = 0LL;
         int64_t  Num             = Integer2Convert;
         uint8_t  NumDigits       = 0;
@@ -1015,7 +1015,7 @@ extern  "C" {
                 // Ok, so we've clamped the looping, now all we need to do is malloc a string with NumDigits as it's size.
                 // Now we just AND the number with Bit to get it's value, if the value is a 1 write a 1, otherwise write a zero
                 int64_t CurrentDigit    = (Base == Decimal ? Absolute(Integer2Convert %= Base) : (Integer2Convert %= Base));
-                NumberString[CodePoint] = (UpperCase == Yes ? UpperNumerals[CurrentDigit] : LowerNumerals[CurrentDigit]);
+                NumberString[CodePoint] = (Base == HexUpper ? UpperNumerals[CurrentDigit] : LowerNumerals[CurrentDigit]);
             }
         }
         return NumberString;
