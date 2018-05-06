@@ -1,5 +1,3 @@
-#include <stdint.h>                   /* Included for u/intX_t */
-
 #include "StringIO.h"                 /* Included for UTF8 */
 
 #pragma  once

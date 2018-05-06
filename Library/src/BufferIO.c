@@ -1,11 +1,8 @@
-#include <stdint.h>                    /* Included for u/intX_t */
-#include <stdio.h>                     /* Included for the FILE type, SEEK SET/END/CUR macros */
 #include <stdlib.h>                    /* Included for calloc, realloc, and free */
 #include <string.h>                    /* Included for memset, memmove */
 
-#include "../include/Macros.h"         /* Included for NewLineWithNULLSize, and GetRuntimeByteBitOrder */
 #include "../include/Math.h"           /* Included for Integer functions */
-#include "../include/Log.h"            /* Included for LogTypes */
+#include "../include/Log.h"            /* Included for Log declarations */
 #include "../include/BitIO.h"          /* Included for our declarations */
 
 #ifdef __cplusplus

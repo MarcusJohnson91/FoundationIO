@@ -1,8 +1,4 @@
-#include <stdint.h>                   /* Included for u/intX_t */
-#include <stdio.h>                    /* Included for fpos_t */
-
-#include "Macros.h"                   /* Included for FoundationIOTargetOS */
-#include "StringIO.h"                 /* Included for UTF8, UTF16 */
+#include "StringIO.h"                 /* Included for UTF8, UTF16, FoundationIOTargetOS in Macros */
 
 #if   (FoundationIOTargetOS == POSIXOS)
 #include <sys/socket.h>               /* Included for connect, socket, sockaddr */

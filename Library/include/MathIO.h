@@ -1,4 +1,4 @@
-#include <stdbool.h>
+#include "Macros.h"                   /* Included for u/intX_t, bool, Yes/No macros, FoundationIOTargetOS, GetRuntimeByteBitOrder */
 
 #if   (defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L)
 #include      <tgmath.h>
