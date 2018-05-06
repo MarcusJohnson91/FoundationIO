@@ -424,7 +424,7 @@ extern   "C" {
         }
     }
     
-    void UTF8_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, const UTF8 **Arguments) {
+    void UTF8_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF8 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             // Basically now we just loop over the arguments, decode, normalize, and casefold them.
             UTF32 **Arguments32  = calloc(NumArguments, sizeof(UTF32*));
@@ -446,7 +446,7 @@ extern   "C" {
         }
     }
     
-    void UTF16_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, const UTF16 **Arguments) {
+    void UTF16_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF16 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             UTF32 **Arguments32   = calloc(NumArguments, sizeof(UTF32*));
             for (int64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
