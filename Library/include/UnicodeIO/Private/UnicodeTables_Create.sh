@@ -95,7 +95,7 @@ function CreateKompatibleDecompositionTable {
     NULLTerminator=$(echo "\x0")
     for line in $CodePointAndKompatibleDecompositionString; do
         CodePoint2BeReplaced=$(awk -F '[: ]' '{printf $1}' <<< "$line" | sed -e 's/^0*//g' -e 's/^/0x/')
-        KompatibleDecompositionString=$(awk -F '[: ]' '{for (i = 2; i <= NF; i++) print "0x$i"}' <<< "$line")
+        KompatibleDecompositionString=$(awk -F '[: ]' '{for (i = 2; i <= NF; i++) print "0x"$i}' <<< "$line")
         ReplacementString=""
         for CodePoint in $KompatibleDecompositionString; do
             Base10CodePoint=$(printf "%d" $CodePoint)
