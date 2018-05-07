@@ -316,7 +316,7 @@ extern  "C" {
         uint64_t CodePoint                           = 0ULL;
         UTF32   *DecodedString                       = NULL;
         if (String != NULL) {
-            uint64_t NumCodePoints                   = UTF1632BOMSizeInCodeUnits + UTF8_GetStringSizeInCodePoints(String) + NULLTerminatorSize;
+            uint64_t NumCodePoints                   = UTF8_GetStringSizeInCodePoints(String) + UTF1632BOMSizeInCodeUnits + NULLTerminatorSize;
             if (String[0] == 0xEF && String[1] == 0xBB && String[2] == 0xBF) { // We need to remove the BOM, and subtract it's size from the Num codepoints
                 NumCodePoints                       -= UTF8BOMSizeInCodePoints;
                 CodeUnitNum                         += UTF8BOMSizeInCodeUnits;
@@ -336,17 +336,20 @@ extern  "C" {
                         case 1:
                             DecodedString[CodePoint] =  String[CodeUnitNum];
                             CodeUnitNum             += 1;
+                            CodePoint               += 1;
                             break;
                         case 2:
                             DecodedString[CodePoint] = (String[CodeUnitNum] & 0x1F) << 6;
                             DecodedString[CodePoint] =  String[CodeUnitNum] & 0x3F;
                             CodeUnitNum             += 2;
+                            CodePoint               += 1;
                             break;
                         case 3:
                             DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x0F) << 12;
                             DecodedString[CodePoint] = (String[CodeUnitNum + 1] & 0x1F) << 6;
                             DecodedString[CodePoint] = (String[CodeUnitNum + 2] & 0x1F);
                             CodeUnitNum             += 3;
+                            CodePoint               += 1;
                             break;
                         case 4:
                             DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x07) << 18;
@@ -354,6 +357,7 @@ extern  "C" {
                             DecodedString[CodePoint] = (String[CodeUnitNum + 2] & 0x3F) <<  6;
                             DecodedString[CodePoint] = (String[CodeUnitNum + 3] & 0x3F);
                             CodeUnitNum             += 4;
+                            CodePoint               += 1;
                             break;
                     }
                     if (GlobalByteOrder == LSByteFirst) {
