@@ -411,7 +411,7 @@ extern "C" {
         }
     }
     
-    void     WriteUTF16(ByteBitOrders StringByteOrder, BitBuffer *BitB, bool RemoveBOM, UTF16 *String2Write) {
+    void     WriteUTF16(ByteBitOrders StringByteOrder, BitBuffer *BitB, UTF16 *String2Write) {
         // Get the size of the string then write it out, after making sure the buffer is big enough to contain it
         if (BitB != NULL && String2Write != NULL) {
             uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(String2Write);
