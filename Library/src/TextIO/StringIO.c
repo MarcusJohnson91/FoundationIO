@@ -11,7 +11,7 @@ extern  "C" {
 #endif
     
     /* Basic String Property Functions */
-    uint8_t UTF8_GetCodeUnitSize(UTF8 CodeUnit) {
+    uint8_t UTF8_GetCodePointSize(UTF8 CodeUnit) {
         uint8_t CodePointSize      = 0;
         if (((CodeUnit & 0x80) >> 7) == 0) {
             CodePointSize          = 1;
@@ -27,7 +27,7 @@ extern  "C" {
         return CodePointSize;
     }
     
-    uint8_t UTF16_GetCodeUnitSize(UTF16 CodeUnit) {
+    uint8_t UTF16_GetCodePointSize(UTF16 CodeUnit) {
         uint8_t CodePointSize = 0;
         if (CodeUnit < UTF16HighSurrogateStart || (CodeUnit > UTF16LowSurrogateEnd && CodeUnit <= UTF16MaxCodePoint)) {
             CodePointSize     = 1;
@@ -43,7 +43,7 @@ extern  "C" {
         uint8_t  CodeUnitSize          = 0ULL;
         if (String != NULL) {
             do {
-                CodeUnitSize           = UTF8_GetCodeUnitSize(String[CodeUnit]);
+                CodeUnitSize           = UTF8_GetCodePointSize(String[CodeUnit]);
                 StringSizeInCodeUnits += CodeUnitSize;
                 CodeUnit              += CodeUnitSize;
             } while (String[CodeUnit] != NULLTerminator);
@@ -59,7 +59,7 @@ extern  "C" {
         uint8_t  CodeUnitSize          = 0;
         if (String != NULL) {
             do {
-                CodeUnitSize           = UTF16_GetCodeUnitSize(String[CodeUnit]);
+                CodeUnitSize           = UTF16_GetCodePointSize(String[CodeUnit]);
                 StringSizeInCodeUnits += CodeUnitSize;
                 CodeUnit              += CodeUnitSize;
             } while (String[CodeUnit] != NULLTerminator);
@@ -75,7 +75,7 @@ extern  "C" {
         if (String != NULL) {
             do {
                 StringSizeInCodePoints += 1;
-                CodeUnit               += UTF8_GetCodeUnitSize(String[CodeUnit]);
+                CodeUnit               += UTF8_GetCodePointSize(String[CodeUnit]);
             } while (String[CodeUnit] != NULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String2Count Pointer is NULL"));
@@ -88,7 +88,7 @@ extern  "C" {
         uint64_t CodeUnit               = 0ULL;
         if (String != NULL) {
             do {
-                CodeUnit               += UTF16_GetCodeUnitSize(String[CodeUnit]);
+                CodeUnit               += UTF16_GetCodePointSize(String[CodeUnit]);
                 StringSizeInCodePoints += 1;
             } while (String[CodeUnit] != NULLTerminator);
         } else {
@@ -332,7 +332,7 @@ extern  "C" {
                             DecodedString[0]         = UTF32BE;
                         }
                     }
-                    switch (UTF8_GetCodeUnitSize(String[CodeUnitNum])) { // UTF-8 is MSB first, if the platform is LSB first, we need to swap as we read
+                    switch (UTF8_GetCodePointSize(String[CodeUnitNum])) { // UTF-8 is MSB first, if the platform is LSB first, we need to swap as we read
                         case 1:
                             DecodedString[CodePoint] =  String[CodeUnitNum];
                             CodeUnitNum             += 1;
