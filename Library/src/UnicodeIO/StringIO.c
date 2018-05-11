@@ -559,8 +559,8 @@ extern  "C" {
             do {
                 for (uint64_t CaseFoldCodePoint = 0; CaseFoldCodePoint < CaseFoldTableSize; CaseFoldCodePoint++) {
                     // We need to compare these as strings
-                    if (String[CodePoint] == *CaseFoldTable[CaseFoldCodePoint][0]) {
-                        CaseFoldedString = UTF32_ReplaceSubString(String, *CaseFoldTable[CaseFoldCodePoint][1], CaseFoldCodePoint, 1);
+                    if (String[CodePoint] == CaseFoldCodePoints[CaseFoldCodePoint]) {
+                        CaseFoldedString = UTF32_ReplaceSubString(String, CaseFoldStrings[CaseFoldCodePoint], CaseFoldCodePoint, 1);
                     }
                 }
             } while (String[CodePoint] != NULLTerminator);
@@ -577,16 +577,16 @@ extern  "C" {
             do {
                 if (Kompatibility == Yes) {
                     // Compose Kompatibility
-                    for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < KompatibleDecompositionTableSize; DecomposeCodePoint++) {
-                        if (String[DecomposeCodePoint] == *KompatibleDecompositionTable[DecomposeCodePoint][0]) {
-                            ComposedString = UTF32_ReplaceSubString(String, *KompatibleDecompositionTable[DecomposeCodePoint][1], DecomposeCodePoint, 1);
+                    for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < KompatibleNormalizationTableSize; DecomposeCodePoint++) {
+                        if (String[DecomposeCodePoint] == KompatibleNormalizationCodePoints[DecomposeCodePoint]) {
+                            ComposedString = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[DecomposeCodePoint], DecomposeCodePoint, 1);
                         }
                     }
                 } else {
                     // Compose Canonical
-                    for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < CanonicalDecompositionTableSize; DecomposeCodePoint++) {
-                        if (String[DecomposeCodePoint] == *CanonicalDecompositionTable[DecomposeCodePoint][0]) {
-                            ComposedString = UTF32_ReplaceSubString(String, *CanonicalDecompositionTable[DecomposeCodePoint][1], DecomposeCodePoint, 1);
+                    for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
+                        if (String[DecomposeCodePoint] == CanonicalNormalizationCodePoints[DecomposeCodePoint]) {
+                            ComposedString = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[DecomposeCodePoint], DecomposeCodePoint, 1);
                         }
                     }
                 }
@@ -598,26 +598,33 @@ extern  "C" {
     }
     
     static UTF32 *UTF32_Decompose(UTF32 *String, const bool Kompatibility) { // FIXME: Must use a stable sorting algorithm
-        uint64_t CodePoint        = UTF1632BOMSizeInCodeUnits;
+        uint64_t CodePoint        = 0ULL;
         UTF32   *DecomposedString = NULL;
         if (String != NULL && (Kompatibility == No || Kompatibility == Yes)) {
-            do {
-                if (Kompatibility == Yes) {
-                    // Decompose Kompatibility
-                    for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < KompatibleDecompositionTableSize; DecomposeCodePoint++) {
-                        if (String[DecomposeCodePoint] == *KompatibleDecompositionTable[DecomposeCodePoint][0]) {
-                            DecomposedString = UTF32_ReplaceSubString(String, *KompatibleDecompositionTable[DecomposeCodePoint][1], DecomposeCodePoint, 1);
+            if (Kompatibility == Yes) {
+                // Decompose Kompatibility
+                // We need to loop over the string, AND the Kompatibility table, so we need 2 loops.
+                do {
+                    uint32_t StringCodePoint    = String[CodePoint];
+                    for (uint64_t TableIndex = 0; TableIndex < KompatibleNormalizationTableSize; TableIndex++) {
+                        uint32_t TableCodePoint = KompatibleNormalizationCodePoints[TableIndex];
+                        if (StringCodePoint == TableCodePoint) {
+                            DecomposedString    = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[TableIndex], CodePoint, 1);
                         }
                     }
-                } else {
-                    // Decompose Canonical
-                    for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < CanonicalDecompositionTableSize; DecomposeCodePoint++) {
-                        if (String[DecomposeCodePoint] == *CanonicalDecompositionTable[DecomposeCodePoint][0]) {
-                            DecomposedString = UTF32_ReplaceSubString(String, *CanonicalDecompositionTable[DecomposeCodePoint][1], DecomposeCodePoint, 1);
+                    CodePoint += 1;
+                } while (String[CodePoint] != NULLTerminator);
+            } else {
+                // Decompose Canonical
+                do {
+                    for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
+                        if (String[CodePoint] == CanonicalNormalizationCodePoints[DecomposeCodePoint]) {
+                            DecomposedString = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[DecomposeCodePoint], DecomposeCodePoint, 1);
                         }
                     }
-                }
-            } while (String[CodePoint] != NULLTerminator);
+                    CodePoint += 1;
+                } while (String[CodePoint] != NULLTerminator);
+            }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
