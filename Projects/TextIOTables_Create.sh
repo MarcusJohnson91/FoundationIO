@@ -55,13 +55,12 @@ function CreateOutputFileTop {
     printf "#define IntegerTableSize %d\n\n" $IntegerTableSize >> $OutputFile
     GraphemeExtensionSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Gr_Ext = 'Y'])" $UCD_Data)
     printf "#define GraphemeExtensionTableSize %d\n\n" $GraphemeExtensionSize >> $OutputFile
-    KompatibleDecompositionTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat'])" -n $UCD_Data)
-    printf "#define KompatibleDecompositionTableSize %d\n\n" $KompatibleDecompositionTableSize >> $OutputFile
+    KompatibleNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat'])" -n $UCD_Data)
+    printf "#define KompatibleNormalizationTableSize %d\n\n" $KompatibleNormalizationTableSize >> $OutputFile
     CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')])" $UCD_Data)
     printf "#define CaseFoldTableSize %d\n\n" $CaseFoldTableSize >> $OutputFile
-    DecompositionTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dm != '' and @dm != '#' and (@dt = 'can' or @dt = 'com' or @dt = 'enc' or @dt = 'fin' or @dt = 'font' or @dt = 'fra' or @dt = 'init' or @dt = 'iso' or @dt = 'med' or @dt = 'nar' or @dt = 'nb' or @dt = 'sml' or @dt = 'sqr' or @dt = 'sub' or @dt = 'sup' or @dt = 'vert' or @dt = 'wide' or @dt = 'none')])" $UCD_Data)
-    CanonicalDecompositionTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n $UCD_Data)
-    printf "#define CanonicalDecompositionTableSize %d\n\n" $CanonicalDecompositionTableSize >> $OutputFile
+    CanonicalNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n $UCD_Data)
+    printf "#define CanonicalNormalizationTableSize %d\n\n" $CanonicalNormalizationTableSize >> $OutputFile
 }
 
 function CreateWhiteSpaceTable {
@@ -89,35 +88,52 @@ function CreateCombiningCharacterClassTable {
     unset IFS
 }
 
-function CreateCanonicalDecompositionTable {
+function CreateCanonicalNormalizationTables {
     IFS=$'\n'
-    printf "\tstatic const UTF32    CanonicalDecompositionTable[CanonicalDecompositionTableSize][2] = {\n" >> $OutputFile
-    CombiningCharacterClassCodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dt = 'can' and @ccc != '0']" -v @cp -o : -v @ccc -n $UCD_Data | sort -s -n -k 2 -t :)
-    for line in $CombiningCharacterClassCodePointAndValue; do
+    NULLTerminator=$(echo "\x0")
+    CanonicalNormalizationCodePointsAndStrings=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dm != @cp and @dt = 'can']" -v @cp -o : -v @dm -n $UCD_Data | sort -s -n -k 2 -t :)
+    printf "\tstatic const UTF32    CanonicalNormalizationCodePoints[CanonicalNormalizationTableSize] = {\n" >> $OutputFile
+    for line in $CanonicalNormalizationCodePointsAndStrings; do
         CodePoint=$(awk -F '[: ]' '{printf $1}' <<< "$line" | sed -e 's/^/0x/g')
-        Value=$(awk -F '[: ]' '{printf $2}' <<< "$line")
-        $(printf "\t\t{0x%06X, %d},\n" $CodePoint $Value >> $OutputFile)
+        $(printf "\t\t0x%06X,\n" $CodePoint >> $OutputFile)
+    done
+    printf "\t};\n\n" >> $OutputFile
+    printf "\tstatic const UTF32   *CanonicalNormalizationStrings[CanonicalNormalizationTableSize] = {\n" >> $OutputFile
+    for line in $CanonicalNormalizationCodePointsAndStrings; do
+        CanonicalNormalizationString=$(awk -F '[: ]' '{for (i = 2; i <= NF; i++) print "0x"$i}' <<< "$line")
+        ReplacementString=""
+        for CodePoint in $CanonicalNormalizationString; do
+            Base10CodePoint=$(printf "%d" $CodePoint)
+        if [ $Base10CodePoint -le 160 ]; then
+            ReplacementString+=$(printf "\x%X" $CodePoint)
+        elif [ $Base10CodePoint -le 65535 ]; then
+            ReplacementString+=$(printf "\u%04X" $CodePoint)
+        elif [ $Base10CodePoint -gt 65535 ]; then
+            ReplacementString+=$(printf "\U%08X" $CodePoint)
+        fi
+        done
+    $(printf "\t\tU\"%s%s\",\n" $ReplacementString $NULLTerminator >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
     unset IFS
 }
 
-function CreateKompatibleDecompositionTable {
+function CreateKompatibleNormalizationTables {
     IFS=$'\n'
     NULLTerminator=$(echo "\x0")
-    printf "\tstatic const UTF32    KompatibleDecompositionCodePoints[KompatibleDecompositionTableSize] = {\n" >> $OutputFile
-    CodePointAndKompatibleDecompositionString=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat']" -v @cp -o : -v @dm -n $UCD_Data | sort -s -n -k 2 -t :)
-    for line in $CodePointAndKompatibleDecompositionString; do
-        CodePoint2BeReplaced=$(awk -F '[: ]' '{printf $1}' <<< "$line" | sed -e 's/^0*//g' -e 's/^/0x/')
-        $(printf "\t\t0x%06X,\n" $CodePoint2BeReplaced >> $OutputFile)
+    KompatibleNormalizationCodePointsAndStrings=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat']" -v @cp -o : -v @dm -n $UCD_Data | sort -s -n -k 2 -t :)
+    printf "\tstatic const UTF32    KompatibleNormalizationCodePoints[KompatibleNormalizationTableSize] = {\n" >> $OutputFile
+    for line in $KompatibleNormalizationCodePointsAndStrings; do
+        CodePoint=$(awk -F '[: ]' '{printf $1}' <<< "$line" | sed -e 's/^/0x/g')
+        $(printf "\t\t0x%06X,\n" $CodePoint >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
-    printf "\tstatic const UTF32   *KompatibleDecompositionStrings[KompatibleDecompositionTableSize] = {\n" >> $OutputFile
-    for line in $CodePointAndKompatibleDecompositionString; do
-        KompatibleDecompositionString=$(awk -F '[: ]' '{for (i = 2; i <= NF; i++) print "0x"$i}' <<< "$line")
+    printf "\tstatic const UTF32   *KompatibleNormalizationStrings[KompatibleNormalizationTableSize] = {\n" >> $OutputFile
+    for line in $KompatibleNormalizationCodePointsAndStrings; do
+        KompatibleNormalizationString=$(awk -F '[: ]' '{for (i = 2; i <= NF; i++) print "0x"$i}' <<< "$line")
         ReplacementString=""
-        for CodePoint in $KompatibleDecompositionString; do
-            Base10CodePoint=$(printf "%d" $CodePoint)
+            for CodePoint in $KompatibleNormalizationString; do
+                Base10CodePoint=$(printf "%d" $CodePoint)
             if [ $Base10CodePoint -le 160 ]; then
                 ReplacementString+=$(printf "\x%X" $CodePoint)
             elif [ $Base10CodePoint -le 65535 ]; then
@@ -126,7 +142,7 @@ function CreateKompatibleDecompositionTable {
                 ReplacementString+=$(printf "\U%08X" $CodePoint)
             fi
         done
-        $(printf "\t\tU\"%s%s\",\n" $ReplacementString $NULLTerminator >> $OutputFile)
+    $(printf "\t\tU\"%s%s\",\n" $ReplacementString $NULLTerminator >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
     unset IFS
@@ -134,9 +150,9 @@ function CreateKompatibleDecompositionTable {
 
 function CreateCaseFoldTable {
     IFS=$'\n'
-    printf "\tstatic const UTF32    CaseFoldCodePoints[CaseFoldTableSize] = {\n" >> $OutputFile
-    CodePointAndReplacement=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#']" -v @cp -o : -v @NFKC_CF -n $UCD_Data)
     NULLTerminator=$(echo "\x0")
+    CodePointAndReplacement=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#']" -v @cp -o : -v @NFKC_CF -n $UCD_Data)
+    printf "\tstatic const UTF32    CaseFoldCodePoints[CaseFoldTableSize] = {\n" >> $OutputFile
 #Addditional properties:  [or @CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')]
     for line in $CodePointAndReplacement; do
         CodePoint2BeReplaced=$(awk -F '[: ]' '{printf $1}' <<< "$line" | sed -e 's/^0*//g' -e 's/^/0x/')
@@ -157,30 +173,6 @@ function CreateCaseFoldTable {
             fi
 	    done
         $(printf "\t\tU\"%s%s\",\n" $ReplacementString $NULLTerminator >> $OutputFile)
-    done
-    printf "\t};\n\n" >> $OutputFile
-    unset IFS
-}
-
-function CreateNormalizationTables {
-    IFS=$'\n'
-    printf "\tstatic const UTF32   *DecompositionTable[DecompositionTableSize][2] = {\n" >> $OutputFile
-    CodePointAndReplacement=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dm != '#' and (@dt = 'can' or @dt = 'com' or @dt = 'enc' or @dt = 'fin' or @dt = 'font' or @dt = 'fra' or @dt = 'init' or @dt = 'iso' or @dt = 'med' or @dt = 'nar' or @dt = 'nb' or @dt = 'sml' or @dt = 'sqr' or @dt = 'sub' or @dt = 'sup' or @dt = 'vert' or @dt = 'wide')]" -v @cp -o : -v @dm -n $UCD_Data)
-    NULLTerminator=$(echo "\x0")
-    for line in $CodePointAndReplacement; do
-        CodePoint2BeReplaced=$(awk -F '[: ]' '{printf $1}' <<< "$line" | sed -e 's/^0*//g' -e 's/^/0x/')
-        ReplacementCodePoints=$(awk -F '[: ]' '{for (i = 2; i <= NF; i++) print "0x"$i}' <<< "$line")
-        ReplacementString=""
-        for CodePoint in $ReplacementCodePoints; do
-            if [ $(printf "%d" ${CodePoint}) -le 160 ]; then
-                ReplacementString+=$(sed -e 's/^0x//g' -e 's/^0*//g' -e 's/^/\\x/g' <<< $CodePoint)
-            elif [ $(printf "%d" ${CodePoint}) -le 65535 ]; then
-                ReplacementString+=$(sed -e 's/^0x//g' -e 's/^/\\u/g' <<< $CodePoint)
-            elif [ $(printf "%d" ${CodePoint}) -gt 65535 ]; then
-                ReplacementString+=$(sed -e 's/^0x//g' -e 's/[0-9a-fA-F]\{1,\}/0000000&/g;s/0*\([0-9a-fA-F]\{8,\}\)/\1/g' -e 's/^/\\U/g' <<< $CodePoint)
-            fi
-        done
-    $(printf "\t\t{0x%06X, U\"%s%s\"},\n" $CodePoint2BeReplaced $ReplacementString $NULLTerminator >> $OutputFile)
     done
     printf "\t};\n\n" >> $OutputFile
     unset IFS
@@ -250,9 +242,9 @@ else
         # The output file does not exist, or it's version is out of date, so we need to generate it
         CreateOutputFileTop
         CreateWhiteSpaceTable
-        CreateKompatibleDecompositionTable
+        CreateKompatibleNormalizationTables
         CreateCombiningCharacterClassTable
-        CreateCanonicalDecompositionTable
+        CreateCanonicalNormalizationTables
         CreateIntegerTable
         CreateGraphemeExtensionTable
         CreateCaseFoldTable
