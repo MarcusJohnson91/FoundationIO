@@ -151,7 +151,7 @@ function CreateKompatibleNormalizationTables {
 function CreateCaseFoldTable {
     IFS=$'\n'
     NULLTerminator=$(echo "\x0")
-    CodePointAndReplacement=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#']" -v @cp -o : -v @NFKC_CF -n $UCD_Data)
+    CodePointAndReplacement=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@NFKC_CF != @cp and @NFKC_CF != '#']" -v @cp -o : -v @NFKC_CF -n $UCD_Data)
     printf "\tstatic const UTF32    CaseFoldCodePoints[CaseFoldTableSize] = {\n" >> $OutputFile
 #Addditional properties:  [or @CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')]
     for line in $CodePointAndReplacement; do
