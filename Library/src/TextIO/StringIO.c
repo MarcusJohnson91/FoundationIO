@@ -191,25 +191,29 @@ extern  "C" {
         return NumGraphemes;
     }
     
-    UTF8 *UTF8_AddBOM(UTF8 *String, StringIOByteOrders BOM2Add) {
-        UTF8 *StringWithBOM = NULL;
+    UTF8 *UTF8_AddBOM(UTF8 *String) {
+        UTF8 *StringWithBOM                         = NULL;
         if (String != NULL) {
             if (String[0] != 0xEF && String[1] != 0xBB && String[2] != 0xBF) {
-                // Reallocate the string and add 3 more codeunits
-            }
-            if (String[0] != UTF16LE && String[0] != UTF16BE) {
-                uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(String);
-                StringWithBOM       = calloc(StringSize + UTF1632BOMSizeInCodeUnits + NULLTerminatorSize, sizeof(UTF16));
+                uint64_t StringSizeInCodeUnits      = UTF8_GetStringSizeInCodeUnits(String) + UTF8BOMSizeInCodeUnits + NULLTerminatorSize;
+                StringWithBOM                       = calloc(StringSizeInCodeUnits, sizeof(UTF8));
                 if (StringWithBOM != NULL) {
-                    if (BOM2Add == UseNativeByteOrder) {
-                        GetRuntimeByteBitOrder();
-                        
+                    for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSizeInCodeUnits; CodeUnit++) {
+                        if (CodeUnit != 0 && CodeUnit != 1 && CodeUnit != 2) {
+                            StringWithBOM[CodeUnit] = String[CodeUnit - 2];
+                        } else if (CodeUnit == 0) {
+                            StringWithBOM[CodeUnit] = 0xEF;
+                        } else if (CodeUnit == 1) {
+                            StringWithBOM[CodeUnit] = 0xBB;
+                        } else if (CodeUnit == 2) {
+                            StringWithBOM[CodeUnit] = 0xBF;
+                        }
                     }
                 } else {
-                    Log(Log_ERROR, __func__, U8("StringWithBOM couldn't be allocated"));
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate StringWithBOM"));
                 }
             } else {
-                // We need to verify the String's byte order, how do we do that? well if a codeunit contains a high surrogate or low surrogate you can tell by it's value, otherwise look for code units who's value is less than 256, or greater than 256, that'll tell you which side of the string contains the low bits.
+                StringWithBOM = String;
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -218,21 +222,18 @@ extern  "C" {
     }
     
     UTF16 *UTF16_AddBOM(UTF16 *String, StringIOByteOrders BOM2Add) {
-        UTF16   *StringWithBOM = NULL;
-        uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(String);
-        uint16_t ByteOrder     = 0;
+        UTF16   *StringWithBOM        = NULL;
+        uint16_t ByteOrder            = 0;
         if (String != NULL) {
             if (String[0] != UTF16LE && String[0] != UTF16BE) {
-                uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(String);
-                StringWithBOM       = calloc(StringSize + UTF1632BOMSizeInCodeUnits + NULLTerminatorSize, sizeof(UTF16));
+                uint64_t StringSize   = UTF16_GetStringSizeInCodeUnits(String) + UTF1632BOMSizeInCodeUnits + NULLTerminatorSize;
+                StringWithBOM         = calloc(StringSize, sizeof(UTF16));
                 if (StringWithBOM != NULL) {
                     if (BOM2Add == UseNativeByteOrder) {
                         GetRuntimeByteBitOrder();
                         if (GlobalByteOrder == LSByteFirst) {
-                            // Lil endian
                             ByteOrder = UTF16LE;
                         } else if (GlobalByteOrder == MSByteFirst) {
-                            // Big endian
                             ByteOrder = UTF16BE;
                         }
                     } else {
@@ -260,15 +261,13 @@ extern  "C" {
     }
     
     UTF8 *UTF8_RemoveBOM(UTF8 *String) {
-        UTF8    *BOMLessString = NULL;
-        uint64_t StringSize    = 0ULL;
+        UTF8    *BOMLessString                      = NULL;
+        uint64_t StringSize                         = 0ULL;
         if (String != NULL) {
-            StringSize         = UTF8_GetStringSizeInCodeUnits(String);
-            // Check to see if there is a BOM in the first place, then remove it
+            StringSize                              = UTF8_GetStringSizeInCodeUnits(String);
             if (String[0] == 0xEF && String[1] == 0xBB && String[2] == 0xBF) {
-                BOMLessString  = calloc(StringSize - UTF8BOMSizeInCodeUnits + NULLTerminatorSize, sizeof(UTF8));
+                BOMLessString                       = calloc(StringSize - UTF8BOMSizeInCodeUnits + NULLTerminatorSize, sizeof(UTF8));
                 if (BOMLessString != NULL) {
-                    // Ok, so now we just start copying the string
                     for (uint64_t CodeUnit = 3ULL; CodeUnit < StringSize; CodeUnit++) {
                         BOMLessString[CodeUnit - 3] = String[CodeUnit];
                     }
@@ -285,15 +284,13 @@ extern  "C" {
     }
     
     UTF16 *UTF16_RemoveBOM(UTF16 *String) {
-        UTF16   *BOMLessString = NULL;
-        uint64_t StringSize    = 0ULL;
+        UTF16   *BOMLessString                      = NULL;
+        uint64_t StringSize                         = 0ULL;
         if (String != NULL) {
-            StringSize         = UTF16_GetStringSizeInCodeUnits(String);
-            // Check to see if there is a BOM in the first place, then remove it
+            StringSize                              = UTF16_GetStringSizeInCodeUnits(String);
             if (String[0] == UTF16BE || String[0] == UTF16LE) {
-                BOMLessString  = calloc(StringSize - UTF1632BOMSizeInCodeUnits + NULLTerminatorSize, sizeof(UTF16));
+                BOMLessString                       = calloc(StringSize - UTF1632BOMSizeInCodeUnits + NULLTerminatorSize, sizeof(UTF16));
                 if (BOMLessString != NULL) {
-                    // Ok, so now we just start copying the string
                     for (uint64_t CodeUnit = 1ULL; CodeUnit < StringSize; CodeUnit++) {
                         BOMLessString[CodeUnit - 1] = String[CodeUnit];
                     }
@@ -381,21 +378,22 @@ extern  "C" {
         return DecodedString;
     }
     
-    UTF32 *UTF16_Decode(UTF16 *String) { // We need to decode the string from UTF-16BE/LE to UTF-32Native
+    UTF32 *UTF16_Decode(UTF16 *String) {
         if (GlobalByteOrder == UnknownByteFirst || GlobalBitOrder == UnknownBitFirst) {
-            GetRuntimeByteBitOrder(); // so now we know the byte order of the running machine, all we need to do is get the UTF-16 string's byte order (hint, we should have a function for that), and then decode it properly.
+            GetRuntimeByteBitOrder();
         }
         uint64_t CodePoint                       = 0ULL;
         uint64_t CodeUnitNum                     = 0ULL;
-        UTF16    StringByteOrder                 = 0U;
         UTF32   *DecodedString                   = NULL;
         if (String != NULL) {
-            StringByteOrder                      = String[0];
             uint64_t UTF16CodeUnits              = UTF16_GetStringSizeInCodePoints(String) + NULLTerminatorSize;
+            if (String[0] != UTF16BE && String[0] != UTF16LE) {
+                UTF16CodeUnits                  += 1;
+            }
             DecodedString                        = calloc(UTF16CodeUnits, sizeof(UTF32));
             if (DecodedString != NULL) {
                 do {
-                    if ((StringByteOrder == UTF16LE && GlobalByteOrder == MSByteFirst) || (StringByteOrder == UTF16BE && GlobalByteOrder == LSByteFirst)) {
+                    if ((String[0] == UTF16LE && GlobalByteOrder == MSByteFirst) || (String[0] == UTF16BE && GlobalByteOrder == LSByteFirst)) {
                         String[CodePoint]        = SwapEndian16(String[CodePoint]);
                         if (CodePoint == 0) {
                             if (GlobalByteOrder == LSByteFirst) {
@@ -569,6 +567,32 @@ extern  "C" {
         return CaseFoldedString;
     }
     
+    static UTF32 *UTF32_Reorder(UTF32 *String) { // Stable sort
+        uint64_t CodePoint  = 1ULL;
+        uint32_t CodePointA = 0UL;
+        uint32_t CodePointB = 0UL;
+        if (String != NULL) {
+            do {
+                CodePointA = String[CodePoint - 1];
+                CodePointB = String[CodePoint];
+                for (uint64_t IndexA = 0ULL; IndexA < CombiningCharacterClassTableSize; IndexA++) {
+                    for (uint64_t IndexB = 0ULL; IndexB < CombiningCharacterClassTableSize; IndexB++) {
+                        if (CodePointA == CombiningCharacterClassTable[IndexA][0] && CodePointB == CombiningCharacterClassTable[IndexB][0]) {
+                            if (CombiningCharacterClassTable[IndexA][1] > CombiningCharacterClassTable[IndexB][1]) {
+                                String[CodePoint - 1] = CodePointB;
+                                String[CodePoint]     = CodePointA;
+                            }
+                        }
+                    }
+                }
+                CodePoint += 1;
+            } while (String[CodePoint] != NULLTerminator);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return NULL;
+    }
+    
     static UTF32 *UTF32_Compose(UTF32 *String, bool Kompatibility) { // FIXME: Must use a stable sorting algorithm
         uint64_t CodePoint      = UTF1632BOMSizeInCodeUnits;
         UTF32   *ComposedString = NULL;
@@ -595,25 +619,28 @@ extern  "C" {
     }
     
     static UTF32 *UTF32_Decompose(UTF32 *String, const bool Kompatibility) { // FIXME: Must use a stable sorting algorithm
-        uint64_t CodePoint        = 0ULL;
-        UTF32   *DecomposedString = NULL;
+        uint64_t CodePoint             = 0ULL;
+        UTF32   *DecomposedString      = NULL;
         if (String != NULL && (Kompatibility == No || Kompatibility == Yes)) {
+            UTF32 *Decomposed          = NULL;
             do {
                 if (Kompatibility == Yes) {
                     for (uint64_t Index = 0; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
-                            DecomposedString    = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
+                            Decomposed = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
                         }
                     }
                 } else {
                     for (uint64_t Index = 0; Index < CanonicalNormalizationTableSize; Index++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[Index]) {
-                            DecomposedString = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[Index], CodePoint, 1);
+                            Decomposed = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[Index], CodePoint, 1);
                         }
                     }
                 }
-                CodePoint += 1;
+                CodePoint             += 1;
             } while (String[CodePoint] != NULLTerminator);
+            DecomposedString           = UTF32_Reorder(Decomposed);
+            free(Decomposed);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -939,45 +966,55 @@ extern  "C" {
     }
     
     int64_t UTF32_String2Integer(UTF32 *String) {
-        uint64_t CodePoint =  0ULL;
-        int8_t   Sign      =  1;
-        uint8_t  Base      = 10;
-        int64_t  Value     =  0;
+        uint64_t CodePoint         =  0ULL;
+        int8_t   Sign              =  1;
+        int64_t  Value             =  0;
+        uint8_t  Base              = 10;
         if (String != NULL) {
-            for (uint64_t WhiteSpace = 0; WhiteSpace < WhiteSpaceTableSize; WhiteSpace++) {
-                if (String[CodePoint] == WhiteSpaceTable[WhiteSpace]) {
-                    CodePoint    += 1;
-                }
-            }
-            if (String[CodePoint] == '0') {
-                if (String[CodePoint + 1] == 'b' || String[CodePoint + 1] == 'B') {
-                    Base   = 2;
-                } else if (String[CodePoint + 1] == 'o' || String[CodePoint] == 'O') {
-                    Base   = 8;
-                } else if (String[CodePoint + 1] == 'x' || String[CodePoint] == 'X') {
-                    Base   = 16;
-                }
-            } else if (String[CodePoint] == '-') {
-                Sign       = -1;
-            }
+            UTF32 *Decomposed      = UTF32_NormalizeString(String, NormalizationFormKD);
             do {
-                Value     *= Base;
-                if (Base == 16 && (String[CodePoint] >= 0x41 && String[CodePoint] <= 0x46)) {
-                    Value += (String[CodePoint] - 50);
-                } else if (Base == 16 && (String[CodePoint] >= 0x61 && String[CodePoint] <= 0x66)) {
-                    Value += (String[CodePoint] - 82);
-                } else if ((Base == 10 || Base == 16) && (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39)) {
-                    Value += (String[CodePoint] - 48);
-                } else if (Base == 8 && (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x37)) {
-                    Value += (String[CodePoint] - 48);
-                } else if (Base == 2 && (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x31)) {
-                    Value += (String[CodePoint] - 48);
+                for (uint64_t WhiteSpace = 0; WhiteSpace < WhiteSpaceTableSize; WhiteSpace++) {
+                    if (Decomposed[CodePoint] == WhiteSpaceTable[WhiteSpace]) {
+                        CodePoint += 1;
+                    }
                 }
-            } while (String[CodePoint] != NULLTerminator);
+                for (uint64_t IntegerIndex = 0ULL; IntegerIndex < IntegerTableSize; IntegerIndex++) {
+                    if (Decomposed[CodePoint] == IntegerCodePoints[IntegerIndex]) {
+                        Value     += IntegerValues[IntegerIndex];
+                        CodePoint += 1;
+                    }
+                }
+                if (Decomposed[CodePoint] == '0') {
+                    if (Decomposed[CodePoint + 1] == U32('b') || Decomposed[CodePoint + 1] == U32('B')) {
+                        Base       = 2;
+                    } else if (Decomposed[CodePoint + 1] == U32('o') || Decomposed[CodePoint] == U32('O')) {
+                        Base       = 8;
+                    } else if (Decomposed[CodePoint + 1] == U32('x') || Decomposed[CodePoint] == U32('X')) {
+                        Base       = 16;
+                    }
+                } else if (String[CodePoint] == U32('-')) {
+                    Sign           = -1;
+                }
+                Value             *= Base;
+                if (Base == 16 && (String[CodePoint] >= 0x41 && String[CodePoint] <= 0x46)) {
+                    Value         += (String[CodePoint] - 50);
+                } else if (Base == 16 && (String[CodePoint] >= 0x61 && String[CodePoint] <= 0x66)) {
+                    Value         += (String[CodePoint] - 82);
+                } else if ((Base == 10 || Base == 16) && (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39)) {
+                    Value         += (String[CodePoint] - 48);
+                } else if (Base == 8 && (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x37)) {
+                    Value         += (String[CodePoint] - 48);
+                } else if (Base == 2 && (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x31)) {
+                    Value         += (String[CodePoint] - 48);
+                }
+                CodePoint         += 1;
+                Value             *= Sign;
+            } while (Decomposed[CodePoint] != NULLTerminator);
+            free(Decomposed);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return (Sign < 0 ? Value * Sign : Value);
+        return Value;
     }
     
     UTF8 *UTF8_Integer2String(const StringIOBases Base, int64_t Integer2Convert) {
