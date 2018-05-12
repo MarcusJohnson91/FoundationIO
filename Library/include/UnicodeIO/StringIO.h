@@ -253,10 +253,9 @@ extern  "C" {
     uint64_t              UTF32_GetStringSizeInGraphemes(UTF32 *String);
     
     /*!
-     @abstract                             "Adds the specified BOM to the string".
-     @param               String           "The string to add the BOM to".
+     @abstract                             "Adds the BOM to the UTF-8 string, UTF-8's only valid BOM is BE".
      */
-    UTF8                 *UTF8_AddBOM(UTF8 *String, StringIOByteOrders BOM2Add);
+    UTF8                 *UTF8_AddBOM(UTF8 *String);
     
     /*!
      @abstract                             "Adds the specified BOM to the string".
