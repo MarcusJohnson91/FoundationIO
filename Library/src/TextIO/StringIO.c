@@ -557,10 +557,9 @@ extern  "C" {
         UTF32   *CaseFoldedString = NULL;
         if (String != NULL) {
             do {
-                for (uint64_t CaseFoldCodePoint = 0; CaseFoldCodePoint < CaseFoldTableSize; CaseFoldCodePoint++) {
-                    // We need to compare these as strings
-                    if (String[CodePoint] == CaseFoldCodePoints[CaseFoldCodePoint]) {
-                        CaseFoldedString = UTF32_ReplaceSubString(String, CaseFoldStrings[CaseFoldCodePoint], CaseFoldCodePoint, 1);
+                for (uint64_t Index = 0; Index < CaseFoldTableSize; Index++) {
+                    if (String[CodePoint] == CaseFoldCodePoints[Index]) {
+                        CaseFoldedString = UTF32_ReplaceSubString(String, CaseFoldStrings[Index], CodePoint, 1);
                     }
                 }
             } while (String[CodePoint] != NULLTerminator);
@@ -576,17 +575,15 @@ extern  "C" {
         if (String != NULL && (Kompatibility == No || Kompatibility == Yes)) {
             do {
                 if (Kompatibility == Yes) {
-                    // Compose Kompatibility
-                    for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < KompatibleNormalizationTableSize; DecomposeCodePoint++) {
-                        if (String[DecomposeCodePoint] == KompatibleNormalizationCodePoints[DecomposeCodePoint]) {
-                            ComposedString = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[DecomposeCodePoint], DecomposeCodePoint, 1);
+                    for (uint64_t Index = 0; Index < KompatibleNormalizationTableSize; Index++) {
+                        if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
+                            ComposedString = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
                         }
                     }
                 } else {
-                    // Compose Canonical
                     for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
-                        if (String[DecomposeCodePoint] == CanonicalNormalizationCodePoints[DecomposeCodePoint]) {
-                            ComposedString = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[DecomposeCodePoint], DecomposeCodePoint, 1);
+                        if (String[CodePoint] == CanonicalNormalizationCodePoints[DecomposeCodePoint]) {
+                            ComposedString = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[DecomposeCodePoint], CodePoint, 1);
                         }
                     }
                 }
@@ -601,30 +598,22 @@ extern  "C" {
         uint64_t CodePoint        = 0ULL;
         UTF32   *DecomposedString = NULL;
         if (String != NULL && (Kompatibility == No || Kompatibility == Yes)) {
-            if (Kompatibility == Yes) {
-                // Decompose Kompatibility
-                // We need to loop over the string, AND the Kompatibility table, so we need 2 loops.
-                do {
-                    uint32_t StringCodePoint    = String[CodePoint];
-                    for (uint64_t TableIndex = 0; TableIndex < KompatibleNormalizationTableSize; TableIndex++) {
-                        uint32_t TableCodePoint = KompatibleNormalizationCodePoints[TableIndex];
-                        if (StringCodePoint == TableCodePoint) {
-                            DecomposedString    = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[TableIndex], CodePoint, 1);
+            do {
+                if (Kompatibility == Yes) {
+                    for (uint64_t Index = 0; Index < KompatibleNormalizationTableSize; Index++) {
+                        if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
+                            DecomposedString    = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
                         }
                     }
-                    CodePoint += 1;
-                } while (String[CodePoint] != NULLTerminator);
-            } else {
-                // Decompose Canonical
-                do {
-                    for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
-                        if (String[CodePoint] == CanonicalNormalizationCodePoints[DecomposeCodePoint]) {
-                            DecomposedString = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[DecomposeCodePoint], DecomposeCodePoint, 1);
+                } else {
+                    for (uint64_t Index = 0; Index < CanonicalNormalizationTableSize; Index++) {
+                        if (String[CodePoint] == CanonicalNormalizationCodePoints[Index]) {
+                            DecomposedString = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[Index], CodePoint, 1);
                         }
                     }
-                    CodePoint += 1;
-                } while (String[CodePoint] != NULLTerminator);
-            }
+                }
+                CodePoint += 1;
+            } while (String[CodePoint] != NULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -636,8 +625,9 @@ extern  "C" {
         if (String != NULL && NormalizedForm != UnknownNormalizationForm) {
             UTF32 *String32           = UTF8_Decode(String);
             UTF32 *NormalizedString32 = UTF32_NormalizeString(String32, NormalizedForm);
-            free(String32);
             NormalizedString8         = UTF8_Encode(NormalizedString32, No);
+            free(String32);
+            free(NormalizedString32);
         }
         return NormalizedString8;
     }
@@ -647,8 +637,9 @@ extern  "C" {
         if (String != NULL && NormalizedForm != UnknownNormalizationForm) {
             UTF32 *String32           = UTF16_Decode(String);
             UTF32 *NormalizedString32 = UTF32_NormalizeString(String32, NormalizedForm);
+            NormalizedString16        = UTF16_Encode(NormalizedString32, UseLEByteOrder);
             free(String32);
-            NormalizedString16        = UTF16_Encode(String, UseLEByteOrder);
+            free(NormalizedString32);
         }
         return NormalizedString16;
     }
@@ -736,8 +727,8 @@ extern  "C" {
         if (String != NULL) {
             UTF32 *String32    = UTF8_Decode(String);
             UTF32 *Extracted32 = UTF32_ExtractSubString(String32, Offset, Length);
-            free(String32);
             ExtractedSubString = UTF8_Encode(Extracted32, No);
+            free(String32);
             free(Extracted32);
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -750,8 +741,8 @@ extern  "C" {
         if (String != NULL) {
             UTF32 *String32    = UTF16_Decode(String);
             UTF32 *Extracted32 = UTF32_ExtractSubString(String32, Offset, Length);
-            free(String32);
             ExtractedSubString = UTF16_Encode(Extracted32, UseLEByteOrder);
+            free(String32);
             free(Extracted32);
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -781,15 +772,15 @@ extern  "C" {
     }
     
     UTF8  *UTF8_ReplaceSubString(UTF8 *String, UTF8 *Replacement, uint64_t Offset, uint64_t Length) {
-        UTF8 *ReplacedString     = NULL;
+        UTF8 *Replaced8          = NULL;
         if (String != NULL && Replacement != NULL && Length >= 1) {
             UTF32 *String32      = UTF8_Decode(String);
             UTF32 *Replacement32 = UTF8_Decode(Replacement);
-            UTF32 *Replaced      = UTF32_ReplaceSubString(String32, Replacement32, Offset, Length);
+            UTF32 *Replaced32    = UTF32_ReplaceSubString(String32, Replacement32, Offset, Length);
+            Replaced8            = UTF8_Encode(Replaced32, No);
             free(String32);
             free(Replacement32);
-            ReplacedString       = UTF8_Encode(Replaced, No);
-            free(Replaced);
+            free(Replaced32);
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         } else if (Replacement == NULL) {
@@ -797,19 +788,19 @@ extern  "C" {
         } else if (Length == 0) {
             Log(Log_ERROR, __func__, U8("Length %llu is too short"), Length);
         }
-        return ReplacedString;
+        return Replaced8;
     }
     
     UTF16 *UTF16_ReplaceSubString(UTF16 *String, UTF16 *Replacement, uint64_t Offset, uint64_t Length) {
-        UTF16 *ReplacedString    = NULL;
+        UTF16 *Replaced16        = NULL;
         if (String != NULL && Replacement != NULL && Length >= 1) {
             UTF32 *String32      = UTF16_Decode(String);
             UTF32 *Replacement32 = UTF16_Decode(Replacement);
-            UTF32 *Replaced      = UTF32_ReplaceSubString(String32, Replacement32, Offset, Length);
+            UTF32 *Replaced32    = UTF32_ReplaceSubString(String32, Replacement32, Offset, Length);
+            Replaced16           = UTF16_Encode(Replaced32, UseLEByteOrder);
             free(String32);
             free(Replacement32);
-            ReplacedString       = UTF16_Encode(Replaced, UseLEByteOrder);
-            free(Replaced);
+            free(Replaced32);
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         } else if (Replacement == NULL) {
@@ -817,7 +808,7 @@ extern  "C" {
         } else if (Length == 0) {
             Log(Log_ERROR, __func__, U8("Length %llu is too short"), Length);
         }
-        return ReplacedString;
+        return Replaced16;
     }
     
     UTF32 *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length) {
