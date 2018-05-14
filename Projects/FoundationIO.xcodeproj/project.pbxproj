@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2C9581542096D5620001BC92 /* ContainerIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC15D52091F2120070BCFC /* ContainerIO.c */; };
-		2C9581552096D5690001BC92 /* ContainerIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E72091F2290070BCFC /* ContainerIO.h */; };
+		2C9581552096D5690001BC92 /* ContainerIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E72091F2290070BCFC /* ContainerIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2CFC15DA2091F2130070BCFC /* GUUID.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC15D22091F2120070BCFC /* GUUID.c */; };
 		2CFC15DB2091F2130070BCFC /* Math.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC15D32091F2120070BCFC /* Math.c */; };
 		2CFC15DC2091F2130070BCFC /* StringIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC15D42091F2120070BCFC /* StringIO.c */; };
@@ -16,14 +16,14 @@
 		2CFC15DF2091F2130070BCFC /* BitIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC15D72091F2130070BCFC /* BitIO.c */; };
 		2CFC15E02091F2130070BCFC /* Macros.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC15D82091F2130070BCFC /* Macros.c */; };
 		2CFC15E12091F2130070BCFC /* CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC15D92091F2130070BCFC /* CommandLineIO.c */; };
-		2CFC15EB2091F22A0070BCFC /* StringIOTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E22091F2290070BCFC /* StringIOTables.h */; };
-		2CFC15EC2091F22A0070BCFC /* Math.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E32091F2290070BCFC /* Math.h */; };
-		2CFC15ED2091F22A0070BCFC /* Log.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E42091F2290070BCFC /* Log.h */; };
-		2CFC15EE2091F22A0070BCFC /* GUUID.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E52091F2290070BCFC /* GUUID.h */; };
-		2CFC15EF2091F22A0070BCFC /* BitIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E62091F2290070BCFC /* BitIO.h */; };
-		2CFC15F12091F22A0070BCFC /* Macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E82091F22A0070BCFC /* Macros.h */; };
-		2CFC15F22091F22A0070BCFC /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E92091F22A0070BCFC /* StringIO.h */; };
-		2CFC15F32091F22A0070BCFC /* CommandLineIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15EA2091F22A0070BCFC /* CommandLineIO.h */; };
+		2CFC15EB2091F22A0070BCFC /* StringIOTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E22091F2290070BCFC /* StringIOTables.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		2CFC15EC2091F22A0070BCFC /* Math.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E32091F2290070BCFC /* Math.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CFC15ED2091F22A0070BCFC /* Log.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E42091F2290070BCFC /* Log.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CFC15EE2091F22A0070BCFC /* GUUID.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E52091F2290070BCFC /* GUUID.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CFC15EF2091F22A0070BCFC /* BitIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E62091F2290070BCFC /* BitIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CFC15F12091F22A0070BCFC /* Macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E82091F22A0070BCFC /* Macros.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CFC15F22091F22A0070BCFC /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E92091F22A0070BCFC /* StringIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CFC15F32091F22A0070BCFC /* CommandLineIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15EA2091F22A0070BCFC /* CommandLineIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -121,15 +121,15 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CFC15F32091F22A0070BCFC /* CommandLineIO.h in Headers */,
-				2CFC15F12091F22A0070BCFC /* Macros.h in Headers */,
-				2CFC15ED2091F22A0070BCFC /* Log.h in Headers */,
-				2CFC15EC2091F22A0070BCFC /* Math.h in Headers */,
-				2CFC15EB2091F22A0070BCFC /* StringIOTables.h in Headers */,
-				2CFC15EE2091F22A0070BCFC /* GUUID.h in Headers */,
-				2C9581552096D5690001BC92 /* ContainerIO.h in Headers */,
 				2CFC15EF2091F22A0070BCFC /* BitIO.h in Headers */,
+				2CFC15F32091F22A0070BCFC /* CommandLineIO.h in Headers */,
+				2C9581552096D5690001BC92 /* ContainerIO.h in Headers */,
+				2CFC15EE2091F22A0070BCFC /* GUUID.h in Headers */,
+				2CFC15ED2091F22A0070BCFC /* Log.h in Headers */,
+				2CFC15F12091F22A0070BCFC /* Macros.h in Headers */,
+				2CFC15EC2091F22A0070BCFC /* Math.h in Headers */,
 				2CFC15F22091F22A0070BCFC /* StringIO.h in Headers */,
+				2CFC15EB2091F22A0070BCFC /* StringIOTables.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
