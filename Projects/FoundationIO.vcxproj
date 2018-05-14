@@ -19,22 +19,25 @@
         </ProjectConfiguration>
     </ItemGroup>
     <ItemGroup>
-        <ClInclude Include="..\libFoundationIO\include\Macros.h" />
-        <ClInclude Include="..\libFoundationIO\include\Math.h" />
-        <ClInclude Include="..\libFoundationIO\include\StringIO.h" />
-        <ClInclude Include="..\libFoundationIO\include\BitIO.h" />
-        <ClInclude Include="..\libFoundationIO\include\CommandLineIO.h" />
-        <ClInclude Include="..\libFoundationIO\include\Log.h" />
-        <ClInclude Include="..\libFoundationIO\include\GUUID.h" />
-    </ItemGroup>
-    <ItemGroup>
+        <ClCompile Include="..\libFoundationIO\src\BitIO.c" />
+        <ClCompile Include="..\libFoundationIO\src\CommandLineIO.c" />
+        <ClCompile Include="..\libFoundationIO\src\ContainerIO.c" />
+        <ClCompile Include="..\libFoundationIO\src\GUUID.c" />
+        <ClCompile Include="..\libFoundationIO\src\Log.c" />
         <ClCompile Include="..\libFoundationIO\src\Macros.c" />
         <ClCompile Include="..\libFoundationIO\src\Math.c" />
         <ClCompile Include="..\libFoundationIO\src\StringIO.c" />
-        <ClCompile Include="..\libFoundationIO\src\BitIO.c" />
-        <ClCompile Include="..\libFoundationIO\src\CommandLineIO.c" />
-        <ClCompile Include="..\libFoundationIO\src\Log.c" />
-        <ClCompile Include="..\libFoundationIO\src\GUUID.c" />
+    </ItemGroup>
+    <ItemGroup>
+        <ClInclude Include="..\libFoundationIO\include\BitIO.h" />
+        <ClInclude Include="..\libFoundationIO\include\CommandLineIO.h" />
+        <ClInclude Include="..\libFoundationIO\include\ContainerIO.h" />
+        <ClInclude Include="..\libFoundationIO\include\GUUID.h" />
+        <ClInclude Include="..\libFoundationIO\include\Log.h" />
+        <ClInclude Include="..\libFoundationIO\include\Macros.h" />
+        <ClInclude Include="..\libFoundationIO\include\Math.h" />
+        <ClInclude Include="..\libFoundationIO\include\StringIO.h" />
+        <ClInclude Include="..\libFoundationIO\include\StringIOTables.h" />
     </ItemGroup>
     <PropertyGroup Label="Globals">
         <VCProjectVersion>15.0</VCProjectVersion>
