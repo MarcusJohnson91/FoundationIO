@@ -96,11 +96,25 @@ extern   "C" {
     uint64_t                    BitBuffer_GetSize(BitBuffer *BitB);
     
     /*!
+     @abstract                                                  "Sets the size of the BitBuffer in bits".
+     @param                     BitB                            "BitBuffer Pointer".
+     @param                     Bits                            "The size of the BitBuffer in Bits".
+     */
+    void                        BitBuffer_SetSize(BitBuffer *BitB, uint64_t Bits);
+    
+    /*!
      @abstract                                                  "Gets the offset of the BitBuffer in bits".
      @param                     BitB                            "BitBuffer Pointer".
      @return                                                    "Returns the offset from the start of BitBuffer in bits".
      */
     uint64_t                    BitBuffer_GetPosition(BitBuffer *BitB);
+    
+    /*!
+     @abstract                                                  "Sets the offset of the BitBuffer in bits".
+     @param                     BitB                            "BitBuffer Pointer".
+     @param                     Offset                          "The offset of the BitBuffer in Bits".
+     */
+    void                        BitBuffer_SetPosition(BitBuffer *BitB, uint64_t Offset);
     
     /*!
      @abstract                                                  "Gets the number of bits that are free in the BitBuffer".
