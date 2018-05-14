@@ -58,7 +58,6 @@
 *.tli
 *.tlog
 *.tmp
-*.vcxproj.filters
 *.vcxproj.user
 *.vsp
 *.vspscc
