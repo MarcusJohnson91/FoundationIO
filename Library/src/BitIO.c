@@ -56,6 +56,14 @@ extern "C" {
         return BitBufferSize;
     }
     
+    void BitBuffer_SetSize(BitBuffer *BitB, uint64_t Bits) {
+        if (BitB != NULL) {
+            BitB->NumBits = Bits;
+        } else {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        }
+    }
+    
     uint64_t BitBuffer_GetPosition(BitBuffer *BitB) {
         uint64_t Position = 0ULL;
         if (BitB != NULL) {
@@ -64,6 +72,14 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         }
         return Position;
+    }
+    
+    void BitBuffer_SetPosition(BitBuffer *BitB, uint64_t Offset) {
+        if (BitB != NULL) {
+            BitB->BitOffset = Offset;
+        } else {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        }
     }
     
     uint64_t BitBuffer_GetBitsFree(BitBuffer *BitB) { // GetBitsAvailable focuses to much on a writing perspective, I need a good, solid word that applies to both reading and writing. GetBitsFree?
