@@ -1,5 +1,3 @@
-#include <stdio.h>                    /* Included for FILE, fpos_t, SEEK SET/END/CUR macros */
-
 #include "Macros.h"                   /* Included for u/intX_t, bool, Yes/No macros, FoundationIOTargetOS, NULLTerminator */
 
 #pragma once
@@ -51,7 +49,7 @@ extern  "C" {
                           UTF16SurrogatePairModDividend        = 0x400,
                           UTF16SurrogatePairStart              = 0x10000,
                           InvalidCodePointReplacementCharacter = 0xFFFD,
-                          UTF1632BOMSizeInCodeUnits            = 1,
+                          UTF16BOMSizeInCodeUnits              = 1,
                           UTF32LE                              = 0xFFFE,
                           UTF32BE                              = 0xFEFF,
                           UnicodeMaxCodePoint                  = 0x10FFFF,

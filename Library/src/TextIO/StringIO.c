@@ -1,10 +1,6 @@
-#include <stdarg.h>                    /* Included for va_start, va_end */
-#include <stdint.h>                    /* Included for u/intX_t */
-#include <stdlib.h>                    /* Included for calloc, free */
-
-#include "../include/StringIOTables.h" /* Included for the tables, and StringIO declarations */
-#include "../include/Math.h"           /* Included for endian swapping */
 #include "../include/Log.h"            /* Included for error logging */
+#include "../include/Math.h"           /* Included for endian swapping */
+#include "../include/StringIOTables.h" /* Included for the tables, and StringIO declarations */
 
 #ifdef  __cplusplus
 extern  "C" {
@@ -226,7 +222,7 @@ extern  "C" {
         uint16_t ByteOrder            = 0;
         if (String != NULL) {
             if (String[0] != UTF16LE && String[0] != UTF16BE) {
-                uint64_t StringSize   = UTF16_GetStringSizeInCodeUnits(String) + UTF1632BOMSizeInCodeUnits + NULLTerminatorSize;
+                uint64_t StringSize   = UTF16_GetStringSizeInCodeUnits(String) + UTF16BOMSizeInCodeUnits + NULLTerminatorSize;
                 StringWithBOM         = calloc(StringSize, sizeof(UTF16));
                 if (StringWithBOM != NULL) {
                     if (BOM2Add == UseNativeByteOrder) {
@@ -289,7 +285,7 @@ extern  "C" {
         if (String != NULL) {
             StringSize                              = UTF16_GetStringSizeInCodeUnits(String);
             if (String[0] == UTF16BE || String[0] == UTF16LE) {
-                BOMLessString                       = calloc(StringSize - UTF1632BOMSizeInCodeUnits + NULLTerminatorSize, sizeof(UTF16));
+                BOMLessString                       = calloc(StringSize - UTF16BOMSizeInCodeUnits + NULLTerminatorSize, sizeof(UTF16));
                 if (BOMLessString != NULL) {
                     for (uint64_t CodeUnit = 1ULL; CodeUnit < StringSize; CodeUnit++) {
                         BOMLessString[CodeUnit - 1] = String[CodeUnit];
@@ -308,12 +304,12 @@ extern  "C" {
     /* Basic String Property Functions */
     
     UTF32 *UTF8_Decode(UTF8 *String) {
-        uint8_t  CodePointSize                       = 0;
+        uint8_t  CodePointSizeInCodeUnits            = 0;
         uint64_t CodeUnitNum                         = 0ULL;
         uint64_t CodePoint                           = 0ULL;
         UTF32   *DecodedString                       = NULL;
         if (String != NULL) {
-            uint64_t NumCodePoints                   = UTF8_GetStringSizeInCodePoints(String) + UTF1632BOMSizeInCodeUnits + NULLTerminatorSize;
+            uint64_t NumCodePoints                   = UTF8_GetStringSizeInCodePoints(String) + NULLTerminatorSize;
             if (String[0] == 0xEF && String[1] == 0xBB && String[2] == 0xBF) { // We need to remove the BOM, and subtract it's size from the Num codepoints
                 NumCodePoints                       -= UTF8BOMSizeInCodePoints;
                 CodeUnitNum                         += UTF8BOMSizeInCodeUnits;
@@ -321,15 +317,8 @@ extern  "C" {
             DecodedString                            = calloc(NumCodePoints, sizeof(UTF32));
             if (DecodedString != NULL) {
                 do {
-                    if (CodePoint == 0) {
-                        // set the Unicode BOM
-                        if (GlobalByteOrder == LSByteFirst) {
-                            DecodedString[0]         = UTF32LE;
-                        } else if (GlobalByteOrder == MSByteFirst) {
-                            DecodedString[0]         = UTF32BE;
-                        }
-                    }
-                    switch (UTF8_GetCodePointSize(String[CodeUnitNum])) { // UTF-8 is MSB first, if the platform is LSB first, we need to swap as we read
+                    CodePointSizeInCodeUnits         = UTF8_GetCodePointSize(String[CodeUnitNum]);
+                    switch (CodePointSizeInCodeUnits) { // UTF-8 is MSB first, if the platform is LSB first, we need to swap as we read
                         case 1:
                             DecodedString[CodePoint] =  String[CodeUnitNum];
                             CodeUnitNum             += 1;
@@ -357,14 +346,9 @@ extern  "C" {
                             CodePoint               += 1;
                             break;
                     }
-                    if (GlobalByteOrder == LSByteFirst) {
-                        DecodedString[CodePoint]     = SwapEndian32(String[CodePoint]);
-                    }
-                    
-                    if (CodePointSize > 1 && DecodedString[CodePoint] <= 0x7F) {
-                        DecodedString[CodePoint]     = InvalidCodePointReplacementCharacter;
-                        Log(Log_ERROR, __func__, U8("CodePoint %d is overlong, replaced with U+FFFD"), DecodedString[CodePoint]);
-                    } else if (DecodedString[CodePoint] >= UTF16HighSurrogateStart && DecodedString[CodePoint] <= UTF16LowSurrogateEnd && DecodedString[CodePoint] != UTF32LE && DecodedString[CodePoint] != UTF32BE) {
+                    if (CodePointSizeInCodeUnits > 1 && DecodedString[CodePoint] <= 0x7F) {
+                        Log(Log_ERROR, __func__, U8("CodePoint %llu, U+%X is overlong"), CodePoint, DecodedString[CodePoint]);
+                    } else if (DecodedString[CodePoint] >= UTF16HighSurrogateStart && DecodedString[CodePoint] <= UTF16LowSurrogateEnd) {
                         DecodedString[CodePoint]     = InvalidCodePointReplacementCharacter;
                         Log(Log_ERROR, __func__, U8("Codepoint %d is invalid, because it overlaps the Surrogate Pair Block, it was replaced with U+FFFD"), DecodedString[CodePoint]);
                     }
@@ -480,7 +464,7 @@ extern  "C" {
         UTF16   *EncodedString                         = NULL;
         if (String != NULL) {
             uint64_t CodeUnitNum                       = 0ULL;
-            uint64_t UTF16NumCodeUnits                 = UTF1632BOMSizeInCodeUnits + UTF32_GetStringSizeInUTF16CodeUnits(String) + NULLTerminatorSize;
+            uint64_t UTF16NumCodeUnits                 = UTF16BOMSizeInCodeUnits + UTF32_GetStringSizeInUTF16CodeUnits(String) + NULLTerminatorSize;
             EncodedString                              = calloc(UTF16NumCodeUnits, sizeof(UTF16));
             if (EncodedString != NULL) {
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < UTF16NumCodeUnits; CodeUnit++) {
@@ -551,7 +535,7 @@ extern  "C" {
     }
     
     UTF32 *UTF32_CaseFoldString(UTF32 *String) {
-        uint64_t CodePoint        = UTF1632BOMSizeInCodeUnits;
+        uint64_t CodePoint        = 0ULL;
         UTF32   *CaseFoldedString = NULL;
         if (String != NULL) {
             do {
@@ -594,7 +578,7 @@ extern  "C" {
     }
     
     static UTF32 *UTF32_Compose(UTF32 *String, bool Kompatibility) { // FIXME: Must use a stable sorting algorithm
-        uint64_t CodePoint      = UTF1632BOMSizeInCodeUnits;
+        uint64_t CodePoint      = 0ULL;
         UTF32   *ComposedString = NULL;
         if (String != NULL && (Kompatibility == No || Kompatibility == Yes)) {
             do {
@@ -779,7 +763,7 @@ extern  "C" {
     
     UTF32 *UTF32_ExtractSubString(UTF32 *String, uint64_t Offset, uint64_t Length) {
         uint64_t  StringSize                            = UTF32_GetStringSizeInCodePoints(String);
-        uint64_t  ExtractedStringSize                   = Length + UTF1632BOMSizeInCodeUnits + NULLTerminatorSize;
+        uint64_t  ExtractedStringSize                   = Length + NULLTerminatorSize;
         UTF32    *ExtractedString                       = NULL;
         if (String != NULL && StringSize >= Length + Offset) {
             ExtractedString                             = calloc(ExtractedStringSize, sizeof(UTF32));
@@ -1039,9 +1023,6 @@ extern  "C" {
             Num                 /= Base;
             NumDigits           += 1;
         }
-        if (GlobalByteOrder == LSByteFirst) {
-            Integer2Convert      = SwapEndian64(Integer2Convert);
-        }
         if (Integer2Convert < 0 && Base == Decimal) {
             Sign                 = -1;
             NumDigits           +=  1;
@@ -1138,7 +1119,7 @@ extern  "C" {
         float    Mantissa2    = Mantissa;
         
         // Ok now we just need to get the strings size
-        uint64_t StringSize   = UTF1632BOMSizeInCodeUnits; // 1 to account for the BOM
+        uint64_t StringSize   = 0ULL;
         if (Sign == -1) {
             StringSize       += 1;
         }
@@ -1153,11 +1134,6 @@ extern  "C" {
         OutputString          = calloc(StringSize, sizeof(UTF32));
         if (OutputString != NULL) {
             // Now we go ahead and create the string
-            if (GlobalByteOrder == LSByteFirst) {
-                OutputString[0]   = UTF32LE;
-            } else if (GlobalByteOrder == MSByteFirst) {
-                OutputString[0]   = UTF32BE;
-            }
             if (Sign == -1) {
                 OutputString[1]   = '-';
             }
@@ -1381,9 +1357,54 @@ extern  "C" {
     }
     
     UTF32 *UTF32_FormatString(UTF32 *Format, va_list Arguments) {
-        /*
-         Make an array to store the offset, size, and type of the format specifiers, then start looping to get those results.
-         */
+        typedef enum FormatSpecifierFlags {
+            NoFormatFlag                   = 0,
+            LeftAlignFormatFlag            = 1,
+            PrependSignFormatFlag          = 2,
+            AlignSignsFormatFlag           = 3, // Prepend a space in front of positive ints, a minus for negative
+            PrependZerosFormatFlag         = 4,
+            DecimalPointFormatFlag         = 5, // Don't remove trailing zeros, or add a decimal point or prepend with non-zeros
+        } FormatSpecifierFlags;
+        
+        typedef enum FormatSpecifierMinWidths { // Width field
+            MinWidthIsNextArgument         = -1,
+            NoMinWidth                     = 0,
+            Width1                         = 1,
+            Width2                         = 2,
+            Width3                         = 3,
+            Width4                         = 4,
+            Width5                         = 5,
+            Width6                         = 6,
+            Width7                         = 7,
+            Width8                         = 8,
+            Width9                         = 9,
+        } FormatSpecifierMinWidths;
+        
+        typedef enum FormatSpecifierPrecision { // Precision field
+            MaxPrecisionIsNextArgument     = -1,
+            NoPrecisionFlag                = 0,
+            Precision1                     = 1,
+            Precision2                     = 2,
+            Precision3                     = 3,
+            Precision4                     = 4,
+            Precision5                     = 5,
+            Precision6                     = 6,
+            Precision7                     = 7,
+            Precision8                     = 8,
+            Precision9                     = 9,
+        } FormatSpecifierPrecision;
+        
+        typedef enum FormatSpecifierLength { // Length field
+            NoLengthFlag                   = 0,
+            CharPromoted2Int               = 1,
+            ShortPromoted2Int              = 2,
+            LongLengthSpecifier            = 3,
+            LongLongLengthSpecifier        = 4,
+            LongDoubleSpecifier            = 5,
+            Size_TSpecifiier               = 6,
+            IntMaxSpecifier                = 7,
+            PtrDiffSpecifier               = 8,
+        } FormatSpecifierLength;
         
         typedef enum FormatSpecifierTypes { // U = uppercase, L = lowercase
             UnknownSpecifierType           = 0,
@@ -1428,22 +1449,21 @@ extern  "C" {
         uint64_t FormatStringSize          = 0ULL;
         
         if (Format != NULL) {
-            FormatStringSize               = UTF32_GetStringSizeInCodePoints(Format);
+            FormatStringSize                                 = UTF32_GetStringSizeInCodePoints(Format);
             
             for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) {
-                if (Format[CodePoint] == U'%' || Format[CodePoint] == U'\\') {
-                    NumSpecifiers         += 1;
+                if ((Format[CodePoint] == U'%' && Format[CodePoint + 1] != U'%') || (Format[CodePoint] == U'\\' && Format[CodePoint + 1] != U'\\')) {
+                    NumSpecifiers                           += 1;
                 }
             }
-            
-            uint64_t                     *SpecifierOffset    = calloc(NumSpecifiers, sizeof(uint64_t));
-            uint64_t                     *SpecifierSize      = calloc(NumSpecifiers, sizeof(uint64_t));
-            uint64_t                     *SpecifierParameter = calloc(NumSpecifiers, sizeof(uint64_t));
-            uint64_t                     *SpecifierFlags     = calloc(NumSpecifiers, sizeof(uint64_t));
-            uint64_t                     *SpecifierWidth     = calloc(NumSpecifiers, sizeof(uint64_t));
-            uint64_t                     *SpecifierPrecision = calloc(NumSpecifiers, sizeof(uint64_t));
-            uint64_t                     *SpecifierLength    = calloc(NumSpecifiers, sizeof(uint64_t));
-            FormatSpecifierTypes         *SpecifierType      = calloc(NumSpecifiers, sizeof(FormatSpecifierTypes));
+            uint64_t                 *SpecifierOffset        = calloc(NumSpecifiers, sizeof(uint64_t));
+            uint64_t                 *SpecifierSize          = calloc(NumSpecifiers, sizeof(uint64_t));
+            uint64_t                 *SpecifierParameter     = calloc(NumSpecifiers, sizeof(uint64_t));
+            FormatSpecifierFlags     *SpecifierFlags         = calloc(NumSpecifiers, sizeof(FormatSpecifierFlags));
+            FormatSpecifierMinWidths *SpecifierWidth         = calloc(NumSpecifiers, sizeof(FormatSpecifierMinWidths));
+            FormatSpecifierPrecision *SpecifierPrecision     = calloc(NumSpecifiers, sizeof(FormatSpecifierPrecision));
+            FormatSpecifierLength    *SpecifierLength        = calloc(NumSpecifiers, sizeof(FormatSpecifierLength));
+            FormatSpecifierTypes     *SpecifierType          = calloc(NumSpecifiers, sizeof(FormatSpecifierTypes));
             
             UTF32 TypeSpecifiers[21] = {U'a', U'A', U'b', U'c', U'C', U'd', U'e', U'E', U'f', U'F', U'g', U'G', U'i', U'o', U'p', U's', U'S', U'u', U'x', U'X', U'%'};
             
@@ -1451,25 +1471,103 @@ extern  "C" {
             // So, that means we need to loop again.
             
             for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) {
-                for (uint64_t Type = 0ULL; Type < 21; Type++) {
-                    for (uint64_t Specifier = 0ULL; Specifier < NumSpecifiers; Specifier++) {
-                        if (Format[CodePoint] == U'%' || Format[CodePoint] == U'\\') {
-                            // Found the start of a format specifier, so set the SpecifierOffset
-                            SpecifierOffset[Specifier] = CodePoint;
-                        }
-                        if (Format[CodePoint] == TypeSpecifiers[Type]) {
-                            SpecifierSize[Specifier] = CodePoint - SpecifierSize[Specifier];
+                for (uint64_t Specifier = 0ULL; Specifier < NumSpecifiers; Specifier++) {
+                    if ((Format[CodePoint] == U'%' && Format[CodePoint + 1] != U'%') || (Format[CodePoint] == U'\\' && Format[CodePoint + 1] != U'\\')) {
+                        // Found the start of a format specifier, so set the SpecifierOffset
+                        SpecifierOffset[Specifier]       = CodePoint;
+                    }
+                    for (uint64_t Type = 0ULL; Type < 21; Type++) {
+                        if (Format[CodePoint + 1] == TypeSpecifiers[Type]) {
+                            SpecifierSize[Specifier]         = CodePoint - SpecifierSize[Specifier];
                         }
                     }
                 }
             }
             
             // 3rd loop, the logic needs to be while we're greater than or equal to SpecifierOffset but less than or equal to SpecifierSize, look for flags
-            
-            for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) {
+            for (uint64_t CodePoint = 1ULL; CodePoint < FormatStringSize; CodePoint++) {
                 for (uint64_t Specifier = 0ULL; Specifier < NumSpecifiers; Specifier++) {
                     while (CodePoint >= SpecifierOffset[Specifier] && CodePoint <= SpecifierOffset[Specifier] + SpecifierSize[Specifier]) {
                         // we're inside of a specifier, start reading this specifiers type, and with that info start creatng strings
+                        if (SpecifierSize[Specifier] == 1) {
+                            // we only have a type code
+                        } else {
+                            if (Format[CodePoint - 1] == U'-') { // Check for Flags
+                                SpecifierFlags[Specifier] = LeftAlignFormatFlag;
+                            } else if (Format[CodePoint - 1] == U'+') {
+                                SpecifierFlags[Specifier] = PrependSignFormatFlag;
+                            } else if (Format[CodePoint - 1] == U'\x20') {
+                                SpecifierFlags[Specifier] = AlignSignsFormatFlag;
+                            } else if (Format[CodePoint - 1] == U'0') {
+                                SpecifierFlags[Specifier] = PrependZerosFormatFlag;
+                            } else if (Format[CodePoint - 1] == U'#') {
+                                SpecifierFlags[Specifier] = DecimalPointFormatFlag;
+                            }
+                            
+                            if (Format[CodePoint - 1] == U'1') { // Width
+                                SpecifierWidth[Specifier] = 1;
+                            } else if (Format[CodePoint - 1] == U'2') {
+                                SpecifierWidth[Specifier] = 2;
+                            } else if (Format[CodePoint - 1] == U'3') {
+                                SpecifierWidth[Specifier] = 3;
+                            } else if (Format[CodePoint - 1] == U'4') {
+                                SpecifierWidth[Specifier] = 4;
+                            } else if (Format[CodePoint - 1] == U'5') {
+                                SpecifierWidth[Specifier] = 5;
+                            } else if (Format[CodePoint - 1] == U'6') {
+                                SpecifierWidth[Specifier] = 6;
+                            } else if (Format[CodePoint - 1] == U'7') {
+                                SpecifierWidth[Specifier] = 7;
+                            } else if (Format[CodePoint - 1] == U'8') {
+                                SpecifierWidth[Specifier] = 8;
+                            } else if (Format[CodePoint - 1] == U'9') {
+                                SpecifierWidth[Specifier] = 9;
+                            } else if (Format[CodePoint - 1] == U'*') {
+                                SpecifierWidth[Specifier] = MinWidthIsNextArgument;
+                            }
+                            
+                            if (Format[CodePoint - 1] == U'.') { // Precision
+                                if (Format[CodePoint] == U'1') {
+                                    SpecifierPrecision[Specifier] = 1;
+                                } else if (Format[CodePoint] == U'2') {
+                                    SpecifierPrecision[Specifier] = 2;
+                                } else if (Format[CodePoint] == U'3') {
+                                    SpecifierPrecision[Specifier] = 3;
+                                } else if (Format[CodePoint] == U'4') {
+                                    SpecifierPrecision[Specifier] = 4;
+                                } else if (Format[CodePoint] == U'5') {
+                                    SpecifierPrecision[Specifier] = 5;
+                                } else if (Format[CodePoint] == U'6') {
+                                    SpecifierPrecision[Specifier] = 6;
+                                } else if (Format[CodePoint] == U'7') {
+                                    SpecifierPrecision[Specifier] = 7;
+                                } else if (Format[CodePoint] == U'8') {
+                                    SpecifierPrecision[Specifier] = 8;
+                                } else if (Format[CodePoint] == U'9') {
+                                    SpecifierPrecision[Specifier] = 9;
+                                } else if (Format[CodePoint] == U'*') {
+                                    SpecifierPrecision[Specifier] = MaxPrecisionIsNextArgument;
+                                }
+                            }
+                            
+                            if (Format[CodePoint - 1] == U'h' && Format[CodePoint] == U'h') { // Length specifiers
+                                SpecifierLength[Specifier] = CharPromoted2Int;
+                            } else if (Format[CodePoint - 1] == U'l' && Format[CodePoint] == U'l') {
+                                SpecifierLength[Specifier] = LongLongLengthSpecifier;
+                            } else if (Format[CodePoint - 1] == U'h') {
+                                SpecifierLength[Specifier] = ShortPromoted2Int;
+                            } else if (Format[CodePoint - 1] == U'l') {
+                                SpecifierLength[Specifier] = LongLengthSpecifier;
+                            } else if (Format[CodePoint - 1] == U'L') {
+                                SpecifierLength[Specifier] = LongDoubleSpecifier;
+                            } else if (Format[CodePoint - 1] == U'z') {
+                                SpecifierLength[Specifier] = Size_TSpecifiier;
+                            } else if (Format[CodePoint - 1] == U'j') {
+                                SpecifierLength[Specifier] = IntMaxSpecifier;
+                            } else if (Format[CodePoint - 1] == U't') {
+                                SpecifierLength[Specifier] = PtrDiffSpecifier;
+                            }
+                        }
                     }
                 }
             }
