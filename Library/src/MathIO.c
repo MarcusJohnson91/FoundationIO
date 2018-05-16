@@ -1,7 +1,4 @@
-#include <stdint.h>                    /* Included for u/intX_t */
-
 #include "../include/Math.h"           /* Included for our declarations */
-#include "../include/Macros.h"         /* Included for the Yes/No macros */
 
 #ifdef   __cplusplus
 extern   "C" {

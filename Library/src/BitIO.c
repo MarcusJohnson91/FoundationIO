@@ -1,9 +1,6 @@
-#include <stdlib.h>                    /* Included for calloc, realloc, and free */
-#include <string.h>                    /* Included for memset, memmove */
-
-#include "../include/Math.h"           /* Included for Integer functions */
-#include "../include/Log.h"            /* Included for Log declarations */
 #include "../include/BitIO.h"          /* Included for our declarations */
+#include "../include/Log.h"            /* Included for Log declarations */
+#include "../include/Math.h"           /* Included for Integer functions */
 
 #ifdef __cplusplus
 extern "C" {

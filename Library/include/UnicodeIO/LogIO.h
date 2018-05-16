@@ -46,7 +46,7 @@ extern "C" {
      @param                     Description                     "String describing what went wrong".
      */
 #if     (FoundationIOTargetOS == POSIXOS)
-    void                 Log(LogTypes Severity, const UTF8 *FunctionName, const UTF8 *Description, ...) __attribute__((__format__ (__printf__, 3, 4)));
+    void                 Log(LogTypes Severity, const UTF8 *FunctionName, const UTF8 *Description, ...) __attribute__((__format__(__printf__, 3, 4)));
 #elif   (FoundationIOTargetOS == WindowsOS)
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     void                 Log(LogTypes Severity, const UTF8 *FunctionName, __format_string const UTF8 *Description, ...);

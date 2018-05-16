@@ -1,5 +1,9 @@
+#include <stdarg.h>                   /* Included for va_end, va_list, va_start */
 #include <stdbool.h>                  /* Included for bool */
 #include <stdint.h>                   /* Included for u/intX_t */
+#include <stdio.h>                    /* Included for FILE, fpos_t, SEEK SET/END/CUR macros */
+#include <stdlib.h>                   /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
+#include <string.h>                   /* Included for memset and memmove */
 
 #pragma once
 
@@ -166,7 +170,7 @@ extern  "C" {
      */
     typedef enum FoundationIOConstants {
                                 NULLTerminator             = 0,
-                                NULLTerminatorSize = 1,
+                                NULLTerminatorSize         = 1,
     } FoundationIOConstants;
     
 #ifdef  __cplusplus

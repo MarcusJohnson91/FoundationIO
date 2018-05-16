@@ -1,8 +1,3 @@
-#include <stdarg.h>                    /* Included for va_end, va_list, va_start */
-#include <stdio.h>                     /* Included for FILE */
-#include <stdlib.h>                    /* Included for calloc, free */
-
-#include "../include/Macros.h"         /* Included for NewLineWithNULLSize, FoundationIOTargetOS */
 #include "../include/Log.h"            /* Included for the Log declarations */
 
 #ifdef __cplusplus

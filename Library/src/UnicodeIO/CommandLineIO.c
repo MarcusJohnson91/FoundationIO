@@ -1,7 +1,3 @@
-#include <stdarg.h>                    /* Included for the variadic argument support macros */
-#include <stdlib.h>                    /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
-#include <string.h>                    /* Included for memset */
-
 #include "../include/CommandLineIO.h"  /* Included for the CommandLineIO declarations */
 #include "../include/Log.h"            /* Included for Log */
 
@@ -110,10 +106,14 @@ extern   "C" {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CommandLineSwitches"), NumSwitches);
             }
 #if   (FoundationIOTargetOS == POSIXOS)
-            struct winsize WindowSize;
-            ioctl(0, TIOCGWINSZ, &WindowSize);
-            CLI->ConsoleWidth    = WindowSize.ws_row;
-            CLI->ConsoleHeight   = WindowSize.ws_col;
+            struct winsize       *WindowSize = NULL;
+            if (WindowSize == NULL) {
+                WindowSize = (struct winsize *) calloc(1, sizeof(struct winsize));
+            }
+            ioctl(0, TIOCGWINSZ, WindowSize);
+            CLI->ConsoleWidth    = WindowSize->ws_row;
+            CLI->ConsoleHeight   = WindowSize->ws_col;
+            free(WindowSize);
             Log(Log_DEBUG, __func__, U8("WindowWidth: %d, WindowHeight %d"), CLI->ConsoleWidth, CLI->ConsoleHeight);
 #elif (FoundationIOTargetOS == WindowsOS)
             CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;

@@ -1,6 +1,5 @@
 #include "../include/ContainerIO.h"    /* Included for our declarations */
 #include "../include/Log.h"            /* Included for error reporting */
-#include <stdlib.h>                    /* Included for calloc, and free */
 
 #ifdef __cplusplus
 extern "C" {

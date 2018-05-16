@@ -1,6 +1,13 @@
-#include "Macros.h"                    /* Included for bool */
+#include "Macros.h"
 
-#pragma once
+#pragma  once
+
+#ifndef  FoundationIO_ContainerIO_H
+#define  FoundationIO_ContainerIO_H
+
+#ifdef   __cplusplus
+extern   "C" {
+#endif
 
 /*!
  @header    ContainerIO.h
@@ -9,13 +16,6 @@
  @version   1.0.0
  @brief     This header contains code for containers (type generic arrays)
  */
-
-#ifndef FoundationIO_ContainerIO_H
-#define FoundationIO_ContainerIO_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
     
     typedef enum ContainerTypes {
                 UInteger8Array  = 264,
@@ -66,8 +66,8 @@ extern "C" {
      */
     uint64_t   Container_GetNumPlanes(Container *Container);
     
-#ifdef __cplusplus
+#ifdef   __cplusplus
 }
 #endif
 
-#endif /* FoundationIO_ContainerIO_H */
+#endif   /* FoundationIO_CommandLineIO_H */

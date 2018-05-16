@@ -1,5 +1,3 @@
-#include <stdint.h>                    /* Included for u/intX_t */
-
 #include "../include/Macros.h"         /* Included for our declarations */
 
 #ifdef  __cplusplus
