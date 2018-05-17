@@ -66,6 +66,32 @@ extern   "C" {
      */
     uint64_t   Container_GetNumPlanes(Container *Container);
     
+    /*!
+     @abstract               "Initalizes an empty container".
+     @param    Container     "The container to access".
+     @param    Width         "The width to set".
+     */
+    void       Container_SetWidth(Container *Container, uint64_t Width);
+    
+    /*!
+     @abstract               "Initalizes an empty container".
+     @param    Container     "The container to access".
+     @param    Height        "The height to set".
+     */
+    void       Container_SetHeight(Container *Container, uint64_t Height);
+    
+    /*!
+     @abstract               "Initalizes an empty container".
+     @param    Container     "The container to access".
+     */
+    uint64_t   Container_GetWidth(Container *Container);
+    
+    /*!
+     @abstract               "Initalizes an empty container".
+     @param    Container     "The container to access".
+     */
+    uint64_t   Container_GetHeight(Container *Container);
+    
 #ifdef   __cplusplus
 }
 #endif

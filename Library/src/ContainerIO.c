@@ -29,6 +29,8 @@ extern "C" {
         void          *Elements;
         uint64_t       NumPlanes;
         uint64_t       NumElements;
+        uint64_t       Width;
+        uint64_t       Height;
         ContainerTypes ContainerType;
     } Container;
     
@@ -87,6 +89,42 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
         }
         return NumPlanes;
+    }
+    
+    void Container_SetWidth(Container *Container, uint64_t Width) {
+        if (Container != NULL) {
+            Container->Width = Width;
+        } else {
+            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
+        }
+    }
+    
+    void Container_SetHeight(Container *Container, uint64_t Height) {
+        if (Container != NULL) {
+            Container->Height = Height;
+        } else {
+            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
+        }
+    }
+    
+    uint64_t Container_GetWidth(Container *Container) {
+        uint64_t Width = 0ULL;
+        if (Container != NULL) {
+            Width      = Container->Width;
+        } else {
+            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
+        }
+        return Width;
+    }
+    
+    uint64_t Container_GetHeight(Container *Container) {
+        uint64_t Height = 0ULL;
+        if (Container != NULL) {
+            Height      = Container->Height;
+        } else {
+            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
+        }
+        return Height;
     }
     
 #ifdef __cplusplus
