@@ -1356,7 +1356,7 @@ extern  "C" {
         return Format16;
     }
     
-    UTF32 *UTF32_FormatString(UTF32 *Format, va_list Arguments) {
+    UTF32 *UTF32_FormatString(UTF32 *Format, va_list VariadicArguments) {
         typedef enum FormatSpecifierFlags {
             NoFormatFlag                   = 0,
             LeftAlignFormatFlag            = 1,
