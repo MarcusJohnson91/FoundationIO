@@ -628,7 +628,7 @@ extern  "C" {
      @param               Format           "A string with optional format specifiers".
      @return                               "Returns the formatted string encoded using the UTF-32 format".
      */
-    UTF32                *UTF32_FormatString(UTF32 *Format, va_list Arguments);
+    UTF32                *UTF32_FormatString(UTF32 *Format, va_list VariadicArguments);
     
     /*!
      @abstract                             "Writes a UTF-8 encoded string to the OutputFile using the platform's default Unicode encoding".

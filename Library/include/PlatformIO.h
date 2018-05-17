@@ -1,4 +1,4 @@
-#include <stdarg.h>                   /* Included for va_end, va_list, va_start */
+#include <stdarg.h>                   /* Included for va_list, va_copy, va_start, va_end */
 #include <stdbool.h>                  /* Included for bool */
 #include <stdint.h>                   /* Included for u/intX_t */
 #include <stdio.h>                    /* Included for FILE, fpos_t, SEEK SET/END/CUR macros */

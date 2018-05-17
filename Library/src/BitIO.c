@@ -479,13 +479,15 @@ extern "C" {
                 free(NewPath);
             } else {
 #if   (FoundationIOTargetOS == POSIXOS)
-                BitI->File              = fopen(Path2Open, U8("rb"));
+                BitI->File          = fopen(Path2Open, U8("rb"));
 #elif (FoundationIOTargetOS == WindowsOS)
-                UTF32 *Path32           = UTF8_Decode(Path2Open);
-                UTF16 *Path16           = UTF16_Encode(Path32, UseLEByteOrder);
-                free(Path32);
-                BitI->File              = _wfopen(Path16, U16("rb"));
-                free(Path16);
+                UTF8  *WinPath8     = UTF8_FormatString("//?/%s", Path2Open);
+                UTF32 *WinPath32    = UTF8_Decode(WinPath8);
+                UTF16 *WinPath16    = UTF16_Encode(WinPath32, UseLEByteOrder);
+                free(WinPath8);
+                free(WinPath32);
+                BitI->File          = _wfopen(Path16, U16("rb"));
+                free(WinPath16);
 #endif
             }
             if (BitI->File == NULL) {
