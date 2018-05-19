@@ -470,30 +470,52 @@ extern "C" {
     
     void BitInput_OpenFile(BitInput *BitI, UTF8 *Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
-            BitI->FileType          = BitIOFile;
-            if (BitI->FileSpecifierExists == Yes) {
-                UTF8 *NewPath       = UTF8_FormatString(U8("%s%llu"), Path2Open, BitI->FileSpecifierNum);
-                if (NewPath != NULL) {
-                    BitI->File      = fopen(NewPath, U8("rb"));
-                }
-                free(NewPath);
-            } else {
+            BitI->FileType         = BitIOFile;
+            uint64_t Path2OpenSize = UTF8_GetStringSizeInCodeUnits(Path2Open) + NULLTerminatorSize;
+            UTF8    *WinPath8      = NULL;
 #if   (FoundationIOTargetOS == POSIXOS)
-                BitI->File          = fopen(Path2Open, U8("rb"));
+            BitI->File             = fopen(Path2Open, U8("rb"));
 #elif (FoundationIOTargetOS == WindowsOS)
-                UTF8  *WinPath8     = UTF8_FormatString("//?/%s", Path2Open);
-                UTF32 *WinPath32    = UTF8_Decode(WinPath8);
-                UTF16 *WinPath16    = UTF16_Encode(WinPath32, UseLEByteOrder);
-                free(WinPath8);
-                free(WinPath32);
-                BitI->File          = _wfopen(Path16, U16("rb"));
-                free(WinPath16);
-#endif
-            }
-            if (BitI->File == NULL) {
-                Log(Log_ERROR, __func__, U8("Couldn't open file: Check that the file exists and the permissions are correct"));
+            if (Path2Open[0] != 0xEF && Path2Open[1] != 0xBB && Path2Open[2] != 0xBF) {
+                if (Path2Open[0] != U'/' && Path2Open[1] != U'/' && Path2Open[2] != U'?' && Path2Open[3] != U'/') {
+                    if (BitI->FileSpecifierExists == No) {
+                        WinPath8   = UTF8_FormatString("//?/%s", Path2Open);
+                    } else {
+                        WinPath8   = UTF8_FormatString("//?/%s%llu", Path2Open, BitI->FileSpecifierNum);
+                    }
+                } else {
+                    if (BitI->FileSpecifierExists == No) {
+                        WinPath8   = Path2Open;
+                    } else {
+                        WinPath8   = UTF8_FormatString("%s%llu", Path2Open, BitI->FileSpecifierNum);
+                    }
+                }
             } else {
+                if (Path2Open[3] != U'/' && Path2Open[4] != U'/' && Path2Open[5] != U'?' && Path2Open[6] != U'/') {
+                    if (BitI->FileSpecifierExists == No) {
+                        WinPath8   = UTF8_FormatString("//?/%s", Path2Open);
+                    } else {
+                        WinPath8   = UTF8_FormatString("//?/%s%llu", Path2Open, BitI->FileSpecifierNum);
+                    }
+                } else {
+                    if (BitI->FileSpecifierExists == No) {
+                        WinPath8   = Path2Open;
+                    } else {
+                        WinPath8   = UTF8_FormatString("%s%llu", Path2Open, BitI->FileSpecifierNum);
+                    }
+                }
+            }
+            UTF32 *WinPath32   = UTF8_Decode(WinPath8);
+            UTF16 *WinPath16   = UTF16_Encode(WinPath32, UseLEByteOrder);
+            free(WinPath8);
+            free(WinPath32);
+            BitI->File         = _wfopen(WinPath16, U16("rb"));
+            free(WinPath16);
+#endif
+            if (BitI->File != NULL) {
                 setvbuf(BitI->File, NULL, _IONBF, 0);
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't open file \"%s\": Check that the file exists and the permissions are correct"), Path2Open);
             }
         } else if (BitI == NULL) {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
@@ -504,8 +526,8 @@ extern "C" {
     
     void BitInput_OpenSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol) {
         if (BitI != NULL) {
-            BitI->FileType   = BitIOSocket;
-            BitI->Socket     = socket(Domain, Type, Protocol);
+            BitI->FileType = BitIOSocket;
+            BitI->Socket   = socket(Domain, Type, Protocol);
         } else {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         }
@@ -523,21 +545,17 @@ extern "C" {
     }
     
     void BitInput_Read2BitBuffer(BitInput *BitI, BitBuffer *Buffer2Read, const int64_t Bytes2Read) {
-        int64_t BytesRead             = 0ULL;
         if (BitI != NULL && Buffer2Read != NULL && Bytes2Read > (BitI->FileSize - BitI->FilePosition)) {
             if (Buffer2Read->Buffer  != NULL) {
                 free(Buffer2Read->Buffer);
             }
             Buffer2Read->Buffer       = calloc(Bytes2Read, sizeof(uint8_t));
             if (Buffer2Read->Buffer != NULL) {
+                int64_t BytesRead     = 0ULL;
                 if (BitI->FileType   == BitIOFile) {
                     BytesRead         = fread(Buffer2Read->Buffer, 1, Bytes2Read, BitI->File);
                 } else if (BitI->FileType == BitIOSocket) {
-#if   (FoundationIOTargetOS == POSIXOS)
-                    BytesRead         = read(BitI->Socket, Buffer2Read->Buffer, Bytes2Read);
-#elif (FoundationIOTargetOS == WindowsOS)
-                    BytesRead         = _read(BitI->Socket, Buffer2Read->Buffer, Bytes2Read);
-#endif
+                    FoundationIO_ReadSocket(BitI->Socket, Buffer2Read->Buffer, Bytes2Read);
                 }
                 if (BytesRead == Bytes2Read) {
                     Buffer2Read->NumBits = Bytes2Bits(BytesRead);
@@ -573,7 +591,7 @@ extern "C" {
             if (BitI->FileSize == 0) {
                 BitInput_FindFileSize(BitI);
             }
-            InputSize = BitI->FileSize;
+            InputSize    = BitI->FileSize;
         } else {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         }
@@ -583,11 +601,10 @@ extern "C" {
     fpos_t BitInput_GetFilePosition(BitInput *BitI) {
         fpos_t Position = 0LL;
         if (BitI != NULL) {
-            if (BitI->FilePosition != 0) {
-                Position = BitI->FilePosition;
-            } else {
+            if (BitI->FilePosition == 0) {
                 BitInput_FindFileSize(BitI);
             }
+            Position    = BitI->FilePosition;
         } else {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         }
@@ -597,7 +614,10 @@ extern "C" {
     fpos_t BitInput_BytesRemaining(BitInput *BitI) {
         fpos_t BytesLeft = 0LL;
         if (BitI != NULL) {
-            BytesLeft = BitI->FileSize - BitI->FilePosition;
+            if (BitI->FilePosition == 0) {
+                BitInput_FindFileSize(BitI);
+            }
+            BytesLeft    = BitI->FileSize - BitI->FilePosition;
         } else {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         }
@@ -609,11 +629,7 @@ extern "C" {
             if (BitI->FileType == BitIOFile) {
                 fclose(BitI->File);
             } else if (BitI->FileType == BitIOSocket) {
-#if   (FoundationIOTargetOS == POSIXOS)
-                close(BitI->Socket);
-#elif (FoundationIOTargetOS == WindowsOS)
-                _close(BitI->Socket);
-#endif          
+                FoundationIO_CloseSocket(BitI->Socket);
             }
             free(BitI);
         } else {
@@ -643,53 +659,58 @@ extern "C" {
     
     void BitOutput_OpenFile(BitOutput *BitO, UTF8 *Path2Open) {
         if (BitO != NULL && Path2Open != NULL) {
-            BitO->FileType          = BitIOFile;
-            uint64_t Path2OpenSize  = UTF8_GetStringSizeInCodePoints(Path2Open) + BitIONULLStringSize;
-            if (BitO->FileSpecifierExists == Yes) {
-                UTF8 *NewPath       = calloc(Path2OpenSize, sizeof(UTF8));
-                snprintf(NewPath, Path2OpenSize, "%s%llu", Path2Open, BitO->FileSpecifierNum); // FIXME: HANDLE FORMAT STRINGS BETTER
-                free(NewPath);
-            }
+            BitO->FileType         = BitIOFile;
+            uint64_t Path2OpenSize = UTF8_GetStringSizeInCodeUnits(Path2Open) + NULLTerminatorSize;
+            UTF8    *WinPath8      = NULL;
 #if   (FoundationIOTargetOS == POSIXOS)
-            BitO->File              = fopen(Path2Open, U8("wb"));
+            BitO->File             = fopen(Path2Open, U8("rb"));
 #elif (FoundationIOTargetOS == WindowsOS)
-            UTF32 *Path32           = UTF8_Decode(Path2Open);
-            UTF16 *Path16           = UTF16_Encode(Path32, UseLEByteOrder);
-            free(Path32);
-            BitO->File              = _wfopen(Path16, U16("rb"));
-            free(Path16);
+            if (Path2Open[0] != 0xEF && Path2Open[1] != 0xBB && Path2Open[2] != 0xBF) {
+                if (Path2Open[0] != U'/' && Path2Open[1] != U'/' && Path2Open[2] != U'?' && Path2Open[3] != U'/') {
+                    if (BitO->FileSpecifierExists == No) {
+                        WinPath8   = UTF8_FormatString("//?/%s", Path2Open);
+                    } else {
+                        WinPath8   = UTF8_FormatString("//?/%s%llu", Path2Open, BitI->FileSpecifierNum);
+                    }
+                } else {
+                    if (BitO->FileSpecifierExists == No) {
+                        WinPath8   = Path2Open;
+                    } else {
+                        WinPath8   = UTF8_FormatString("%s%llu", Path2Open, BitI->FileSpecifierNum);
+                    }
+                }
+            } else {
+                if (Path2Open[3] != U'/' && Path2Open[4] != U'/' && Path2Open[5] != U'?' && Path2Open[6] != U'/') {
+                    if (BitO->FileSpecifierExists == No) {
+                        WinPath8   = UTF8_FormatString("//?/%s", Path2Open);
+                    } else {
+                        WinPath8   = UTF8_FormatString("//?/%s%llu", Path2Open, BitI->FileSpecifierNum);
+                    }
+                } else {
+                    if (BitO->FileSpecifierExists == No) {
+                        WinPath8   = Path2Open;
+                    } else {
+                        WinPath8   = UTF8_FormatString("%s%llu", Path2Open, BitI->FileSpecifierNum);
+                    }
+                }
+            }
+            UTF32 *WinPath32   = UTF8_Decode(WinPath8);
+            UTF16 *WinPath16   = UTF16_Encode(WinPath32, UseLEByteOrder);
+            free(WinPath8);
+            free(WinPath32);
+            BitO->File         = _wfopen(WinPath16, U16("rb"));
+            free(WinPath16);
 #endif
             if (BitO->File != NULL) {
                 setvbuf(BitO->File, NULL, _IONBF, 0);
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't open output file; Check that the path exists and the permissions are correct"));
+                Log(Log_ERROR, __func__, U8("Couldn't open file \"%s\": Check that the file exists and the permissions are correct"), Path2Open);
             }
         } else if (BitO == NULL) {
             Log(Log_ERROR, __func__, U8("BitOutput Pointer is NULL"));
         } else if (Path2Open == NULL) {
             Log(Log_ERROR, __func__, U8("Path2Open Pointer is NULL"));
         }
-    }
-    
-    int32_t BitOutput_RenameFile(UTF8 *OriginalPath, UTF8 *NewPath) {
-        int32_t ErrorCode     = 0L;
-        if (OriginalPath != NULL && NewPath != NULL) {
-#if   (FoundationIOTargetOS == POSIXOS)
-            ErrorCode         = rename(OriginalPath, NewPath);
-#elif (FoundationIOTargetOS == WindowsOS)
-            UTF32 *Original32 = UTF8_Decode(OriginalPath);
-            UTF32 *New32      = UTF8_Decode(NewPath);
-            UTF16 *Original16 = UTF16_Encode(Original32, UseLEByteOrder);
-            free(Original32);
-            UTF16 *New16      = UTF16_Encode(New32, UseLEByteOrder);
-            ErrorCode         = _wrename(Original16, New16);
-#endif
-        } else if (OriginalPath == NULL) {
-            Log(Log_ERROR, __func__, U8("OriginalPath Pointer is NULL"));
-        } else if (NewPath == NULL) {
-            Log(Log_ERROR, __func__, U8("NewPath Pointer is NULL"));
-        }
-        return ErrorCode;
     }
     
     void BitOutput_OpenSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol) {
@@ -713,18 +734,14 @@ extern "C" {
     }
     
     void BitOutput_WriteBitBuffer(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write) {
-        uint64_t BytesWritten          = 0ULL;
         if (BitO != NULL && Buffer2Write != NULL) {
+            uint64_t BytesWritten      = 0ULL;
             uint64_t BufferBytes       = Bits2Bytes(Buffer2Write->NumBits, Yes);
             uint64_t NumBytes2Write    = (Bytes2Write > BufferBytes ? Bytes2Write : BufferBytes);
             if (BitO->FileType == BitIOFile) {
                 BytesWritten           = fwrite(Buffer2Write->Buffer, 1, NumBytes2Write, BitO->File);
             } else if (BitO->FileType == BitIOSocket) {
-#if   (FoundationIOTargetOS == POSIXOS)
-                BytesWritten           = write(BitO->Socket, Buffer2Write->Buffer, NumBytes2Write);
-#elif (FoundationIOTargetOS == WindowsOS)
-                BytesWritten           = _write(BitO->Socket, Buffer2Write->Buffer, NumBytes2Write);
-#endif
+                FoundationIO_WriteSocket(BitO->Socket, Buffer2Write->Buffer, NumBytes2Write);
             }
             if (BytesWritten != NumBytes2Write) {
                 Log(Log_ERROR, __func__, U8("Fwrite wrote: %lld bytes, but you requested: %lld"), BytesWritten, NumBytes2Write);
@@ -744,11 +761,7 @@ extern "C" {
             if (BitO->FileType == BitIOFile) {
                 fclose(BitO->File);
             } else if (BitO->FileType == BitIOSocket) {
-#if   (FoundationIOTargetOS == POSIXOS)
-                close(BitO->Socket);
-#elif (FoundationIOTargetOS == WindowsOS)
-                _close(BitO->Socket);
-#endif  
+                FoundationIO_CloseSocket(BitO->Socket);
             }
             free(BitO);
         } else {

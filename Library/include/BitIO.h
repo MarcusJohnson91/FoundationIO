@@ -26,17 +26,6 @@ extern   "C" {
      */
     
     /*!
-     @enum                      BitIOConstants
-     @abstract                                                  "BitIO compile time constants".
-     @constant                  BitIONullString                 "String terminating NULL character".
-     @constant                  BitIONULLStringSize             "How large is the NULL terminator for a string"?
-     */
-    enum BitIOConstants {
-                                BitIONULLString                 =  0,
-                                BitIONULLStringSize             =  1,
-    };
-    
-    /*!
      @enum                      BitInputOutputFileTypes
      @abstract                                                  "Is this BitInput or BitOutput connected to a File or Socket?".
      @constant                  BitIOUnknownFileType            "Unknown file type".
@@ -351,14 +340,6 @@ extern   "C" {
      @param                     Path2Open                       "Path to the output file to open".
      */
     void                        BitOutput_OpenFile(BitOutput *BitO, UTF8 *Path2Open);
-    
-    /*!
-     @abstract                                                  "Opens an output file for writing".
-     @param                     OriginalPath                    "BitOutput Pointer".
-     @param                     NewPath                         "Path to the output file to open".
-     @return                                                    "Returns an error code from rename or _wrename".
-     */
-    int32_t                     BitOutput_RenameFile(UTF8 *OriginalPath, UTF8 *NewPath);
     
     /*!
      @abstract                                                  "Opens a socket for writing".
