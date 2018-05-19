@@ -103,6 +103,18 @@ extern  "C" {
 #define             FoundationIO_Seek(File, Offset, Origin) fseeko(File, Offset, Origin)
 #endif
     
+#ifndef             FoundationIO_CloseSocket
+#define             FoundationIO_CloseSocket(Socket2Close) close(Socket2Close)
+#endif
+    
+#ifndef             FoundationIO_ReadSocket
+#define             FoundationIO_ReadSocket(Socket2Read, Buffer2Write, NumBytes) read(Socket2Read, Buffer2Write, NumBytes)
+#endif
+    
+#ifndef             FoundationIO_WriteSocket
+#define             FoundationIO_WriteSocket(Socket2Read, Buffer2Write, NumBytes) write(Socket2Read, Buffer2Write, NumBytes)
+#endif
+    
 #elif    defined(_WIN32) || defined(__WIN32__) || defined(_WIN64) || defined(__WINDOWS__)
     
 #ifndef             FoundationIOTargetOS
@@ -130,6 +142,18 @@ extern  "C" {
     
 #ifndef             FoundationIO_Seek
 #define             FoundationIO_Seek(File, Offset, Origin) _fseeki64(File, Offset, Origin)
+#endif
+    
+#ifndef             FoundationIO_CloseSocket
+#define             FoundationIO_CloseSocket(Socket2Close) _close(Socket2Close)
+#endif
+    
+#ifndef             FoundationIO_ReadSocket
+#define             FoundationIO_ReadSocket(Socket2Read, Buffer2Write, NumBytes) _read(Socket2Read, Buffer2Write, NumBytes)
+#endif
+    
+#ifndef             FoundationIO_WriteSocket
+#define             FoundationIO_WriteSocket(Socket2Read, Buffer2Write, NumBytes) _write(Socket2Read, Buffer2Write, NumBytes)
 #endif
     
 #elif
