@@ -214,7 +214,7 @@ extern  "C" {
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return NULL;
+        return StringWithBOM;
     }
     
     UTF16 *UTF16_AddBOM(UTF16 *String, StringIOByteOrders BOM2Add) {
@@ -253,7 +253,7 @@ extern  "C" {
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return NULL;
+        return StringWithBOM;
     }
     
     UTF8 *UTF8_RemoveBOM(UTF8 *String) {
