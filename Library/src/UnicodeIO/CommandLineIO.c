@@ -102,7 +102,6 @@ extern   "C" {
             if (CLI->SwitchIDs != NULL) {
                 CLI->NumSwitches = NumSwitches;
             } else {
-                free(CLI);
                 Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CommandLineSwitches"), NumSwitches);
             }
 #if   (FoundationIOTargetOS == POSIXOS)
@@ -114,13 +113,13 @@ extern   "C" {
             CLI->ConsoleWidth    = WindowSize->ws_row;
             CLI->ConsoleHeight   = WindowSize->ws_col;
             free(WindowSize);
-            Log(Log_DEBUG, __func__, U8("WindowWidth: %d, WindowHeight %d"), CLI->ConsoleWidth, CLI->ConsoleHeight);
 #elif (FoundationIOTargetOS == WindowsOS)
             CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
             GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
             CLI->ConsoleHeight   = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
             CLI->ConsoleWidth    = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
 #endif
+            Log(Log_DEBUG, __func__, U8("WindowWidth: %d, WindowHeight %d"), CLI->ConsoleWidth, CLI->ConsoleHeight);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("Couldn't allocate CommandLineIO"));
         } else if (NumSwitches == 0) {
@@ -207,7 +206,7 @@ extern   "C" {
             CLI->MinOptions = MinOptions;
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
-        } else if (MinOptions <= 0 || MinOptions > CLI->NumSwitches - 1) {
+        } else if (MinOptions < 0 || MinOptions > CLI->NumSwitches - 1) {
             Log(Log_ERROR, __func__, U8("MinOptions %lld is invalid, it should be between 0 and %lld"), MinOptions, CLI->NumSwitches - 1);
         }
     }
@@ -217,7 +216,7 @@ extern   "C" {
             CLI->HelpSwitch = HelpSwitch;
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
-        } else if (HelpSwitch >= 0 && HelpSwitch <= CLI->NumSwitches - 1) {
+        } else if (HelpSwitch < 0 || HelpSwitch > CLI->NumSwitches - 1) {
             Log(Log_ERROR, __func__, U8("HelpSwitch %lld is invalid, it should be between 0 and %lld"), HelpSwitch, CLI->NumSwitches - 1);
         }
     }
@@ -231,16 +230,14 @@ extern   "C" {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Name == NULL) {
             Log(Log_ERROR, __func__, U8("Name String is NULL"));
-        } else if (SwitchID >= 0 && SwitchID <= CLI->NumSwitches - 1) {
+        } else if (SwitchID < 0 || SwitchID > CLI->NumSwitches - 1) {
             Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
         }
     }
     
     void CLISetSwitchDescription(CommandLineIO *CLI, const int64_t SwitchID, UTF8 *Description) {
-        if (CLI != NULL && Description != NULL && SwitchID >= 0 && SwitchID <= CLI->NumSwitches - 1) {
-            UTF8 *Normalized                     = UTF8_NormalizeString(Description, NormalizationFormKC);
-            CLI->SwitchIDs[SwitchID].Description = UTF8_CaseFoldString(Normalized);
-            free(Normalized);
+        if (CLI != NULL && Description != NULL && (SwitchID >= 0 && SwitchID <= CLI->NumSwitches - 1)) {
+            CLI->SwitchIDs[SwitchID].Description = Description;
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Description == NULL) {
@@ -251,13 +248,8 @@ extern   "C" {
     }
     
     void CLISetSwitchType(CommandLineIO *CLI, const int64_t SwitchID, CLISwitchTypes SwitchType) {
-        if (CLI != NULL && SwitchType != UnknownSwitchType && SwitchID >= 0 && SwitchID <= CLI->NumSwitches - 1) {
-            CLI->SwitchIDs[SwitchID].SwitchType              = SwitchType;
-            if (SwitchType == SwitchCantHaveSlaves || SwitchType == SwitchIsASlave || SwitchType == ExistentialSwitch) {
-                CLI->SwitchIDs[SwitchID].MaxConcurrentSlaves = 0;
-                CLI->SwitchIDs[SwitchID].NumPotentialSlaves  = 0;
-                CLI->SwitchIDs[SwitchID].PotentialSlaves     = NULL;
-            }
+        if (CLI != NULL && SwitchType != UnknownSwitchType && (SwitchID >= 0 && SwitchID <= CLI->NumSwitches - 1)) {
+            CLI->SwitchIDs[SwitchID].SwitchType = SwitchType;
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (SwitchType == UnknownSwitchType) {
@@ -268,7 +260,7 @@ extern   "C" {
     }
     
     void CLISetSwitchArgumentType(CommandLineIO *CLI, const int64_t SwitchID, CLIArgumentTypes ArgumentType) {
-        if (CLI != NULL && ArgumentType != UnknownArgumentType && SwitchID >= 0 && SwitchID <= CLI->NumSwitches - 1) {
+        if (CLI != NULL && ArgumentType != UnknownArgumentType && (SwitchID >= 0 && SwitchID <= CLI->NumSwitches - 1)) {
             CLI->SwitchIDs[SwitchID].ArgumentType = ArgumentType;
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
@@ -280,31 +272,31 @@ extern   "C" {
     }
     
     void CLISetSwitchAsSlave(CommandLineIO *CLI, const int64_t MasterID, const int64_t SlaveID) {
-        if (CLI != NULL && MasterID >= 0 && MasterID <= CLI->NumSwitches - 1 && SlaveID >= 0 && SlaveID <= CLI->NumSwitches - 1) {
-            CLI->SwitchIDs[MasterID].NumPotentialSlaves += 1;
-            if (CLI->SwitchIDs[MasterID].PotentialSlaves != NULL) {
-                CLI->SwitchIDs[MasterID].PotentialSlaves = realloc(CLI->SwitchIDs[MasterID].PotentialSlaves, CLI->SwitchIDs[MasterID].NumPotentialSlaves * sizeof(int64_t));
+        if (CLI != NULL && (MasterID >= 0 && MasterID <= CLI->NumSwitches - 1) && (SlaveID >= 0 && SlaveID <= CLI->NumSwitches - 1)) {
+            if (CLI->SwitchIDs[MasterID].SwitchType == SwitchMayHaveSlaves && (CLI->SwitchIDs[MasterID].NumPotentialSlaves <= CLI->SwitchIDs[MasterID].MaxConcurrentSlaves)) {
+                CLI->SwitchIDs[MasterID].NumPotentialSlaves  += 1;
+                CLI->SwitchIDs[MasterID].PotentialSlaves      = realloc(CLI->SwitchIDs[MasterID].PotentialSlaves, CLI->SwitchIDs[MasterID].NumPotentialSlaves * sizeof(int64_t));
+                CLI->SwitchIDs[MasterID].PotentialSlaves[CLI->SwitchIDs[MasterID].NumPotentialSlaves - 1] = SlaveID;
             } else {
-                CLI->SwitchIDs[MasterID].PotentialSlaves = calloc(1, sizeof(int64_t));
+                Log(Log_ERROR, __func__, U8("MasterID %lld can not have any slaves"), MasterID);
             }
-            CLI->SwitchIDs[MasterID].PotentialSlaves[CLI->SwitchIDs[MasterID].NumPotentialSlaves - 1] = SlaveID;
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
-        } else if (MasterID < 0 && MasterID > CLI->NumSwitches - 1) {
+        } else if (MasterID < 0 || MasterID > CLI->NumSwitches - 1) {
             Log(Log_ERROR, __func__, U8("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
-        } else if (SlaveID < 0 && SlaveID > CLI->NumSwitches - 1) {
+        } else if (SlaveID < 0 || SlaveID > CLI->NumSwitches - 1) {
             Log(Log_ERROR, __func__, U8("SlaveID %lld is invalid, it should be between 0 and %lld"), SlaveID, CLI->NumSwitches - 1);
         }
     }
     
     void CLISetSwitchMaxConcurrentSlaves(CommandLineIO *CLI, const int64_t MasterID, const int64_t MaxConcurrentSlaves) {
-        if (CLI != NULL && MasterID >= 0 && MasterID <= CLI->NumSwitches - 1 && MaxConcurrentSlaves >= 0 && MaxConcurrentSlaves <= CLI->NumSwitches - 1) {
+        if (CLI != NULL && (MasterID >= 0 && MasterID <= CLI->NumSwitches - 1) && (MaxConcurrentSlaves >= 0 && MaxConcurrentSlaves <= CLI->NumSwitches - 1)) {
             CLI->SwitchIDs[MasterID].MaxConcurrentSlaves = MaxConcurrentSlaves;
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
-        } else if (MasterID < 0 && MasterID > CLI->NumSwitches - 1) {
+        } else if (MasterID < 0 || MasterID > CLI->NumSwitches - 1) {
             Log(Log_ERROR, __func__, U8("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
-        } else if (MaxConcurrentSlaves < 0 && MaxConcurrentSlaves > CLI->NumSwitches - 1) {
+        } else if (MaxConcurrentSlaves < 0 || MaxConcurrentSlaves > CLI->NumSwitches - 1) {
             Log(Log_ERROR, __func__, U8("MaxConcurrentSlaves %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
         }
     }
@@ -465,74 +457,6 @@ extern   "C" {
         } else if (CLI->MinOptions <= 1 || NumArguments <= 1) {
             Log(Log_ERROR, __func__, U8("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
         }
-    }
-    
-    static UTF8 SplitInlineArgument(const UTF8 *ArgumentString, const uint64_t ArgumentStringSize, uint64_t NumSplitArguments) {
-        UTF8 *StringPointers = NULL;
-        if (ArgumentString != NULL) {
-            /*
-             Ok, so we take in an argument string and it's size.
-             We output whatever the argument contains in multiple strings.
-             
-             if our InlineArgument is: --Input:LeftEye=/Users/Marcus/Desktop/ElephantsDream_Left_%05d.png
-             then we output          : Input LeftEye /Users/Marcus/Desktop/ElephantsDream_Left_%05d.png
-             Symbols to break strings apart with: (:|=|-|..|--|)
-             Theoretically this is simple.
-             
-             You simply loop over the string comparing each byte to those symbols until you get to the end of the string and you keep a count of the number of delimiters found, each's size, and offset from 0.
-             We need to do this in 2 passes, the first to find the number of delimiters there are.
-             */
-            uint64_t  NumDelimitersFound = 0ULL;
-            uint64_t  FoundStrings       = 0ULL;
-            uint64_t *SubStringSize      = NULL;
-            uint64_t *SubStringOffset    = NULL;
-            uint64_t  CurrentDelimiter   = 0ULL;
-            enum Delimiters { // 3d, 3a, 2e 2e
-                Colon     = 0x3A,
-                Equal     = 0x3D,
-                Hyphen    = 0x2D,
-                Period    = 0x2E,
-            };
-            for (uint64_t ArgumentByte = 0ULL; ArgumentByte < ArgumentStringSize; ArgumentByte++) {
-                uint8_t CurrentByte = ArgumentString[ArgumentByte];
-                uint8_t NextByte    = ArgumentString[ArgumentByte + 1];
-                if (CurrentByte == ':' || CurrentByte == '=' || (CurrentByte == '-' && NextByte == '-') || (CurrentByte == '.' && NextByte == '.') || CurrentByte == '-' || CurrentByte == '.') {
-                    NumDelimitersFound += 1;
-                    if ((CurrentByte == '-' && NextByte == '-') || (CurrentByte == '.' && NextByte == '.')) {
-                    }
-                }
-            }
-            SubStringSize   = calloc(NumDelimitersFound, sizeof(uint64_t));
-            SubStringOffset = calloc(NumDelimitersFound, sizeof(uint64_t));
-            for (uint64_t ArgumentByte = 0ULL; ArgumentByte < ArgumentStringSize; ArgumentByte++) {
-                uint8_t CurrentByte                       = ArgumentString[ArgumentByte];
-                uint8_t NextByte                          = ArgumentString[ArgumentByte + 1];
-                if (CurrentByte == ':' || CurrentByte == '=' || (CurrentByte == '-' && NextByte == '-') || (CurrentByte == '.' && NextByte == '.') || CurrentByte == '-' || CurrentByte == '.') {
-                    CurrentDelimiter                     += 1;
-                    if ((CurrentByte == '-' && NextByte == '-') || (CurrentByte == '.' && NextByte == '.')) {
-                        SubStringOffset[CurrentDelimiter] = NextByte;
-                        SubStringSize[CurrentDelimiter]   = SubStringOffset[CurrentDelimiter] - ArgumentStringSize;
-                    } else {
-                        SubStringOffset[CurrentDelimiter] = CurrentByte;
-                        SubStringSize[CurrentDelimiter]   = SubStringOffset[CurrentDelimiter] - ArgumentStringSize;
-                    }
-                }
-            }
-            // Ok, now we just go ahead and copy the substrings out
-            // and now we go ahead and create the number of srings found * their size, then put pointers to those strings into an array of pointers
-            FoundStrings              =  NumDelimitersFound - 1;
-            StringPointers            =  calloc(FoundStrings, sizeof(UTF8));
-            for (uint64_t String = 0ULL; String < FoundStrings; String++) {
-                // In here allocate a string for each found string
-                // Allocate the string here
-                UTF8 *StringPointer    =  calloc(SubStringSize[String], sizeof(UTF8));
-                StringPointers[String] = *StringPointer;
-            }
-            NumSplitArguments = FoundStrings;
-        } else {
-            Log(Log_ERROR, __func__, U8("ArgumentString Pointer is NULL"));
-        }
-        return StringPointers;
     }
     
     int64_t CLIGetNumMatchingOptions(CommandLineIO *CLI, const int64_t OptionID, const int64_t NumSlaves, const int64_t *SlaveIDs) {
