@@ -770,6 +770,192 @@ extern "C" {
     }
     /* BitOutput */
     
+    /* GUUID */
+    bool CompareGUUIDs(GUUIDTypes GUUIDType, const uint8_t *GUUID1, const uint8_t *GUUID2) {
+        uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? BinaryGUUIDSize - NULLTerminatorSize : BinaryGUUIDSize);
+        bool GUUIDsMatch        = Yes;
+        if (GUUID1 != NULL && GUUID2 != NULL && GUUIDType != UnknownGUUID) {
+            for (uint8_t BinaryGUUIDByte = 0; BinaryGUUIDByte < GUUIDSize; BinaryGUUIDByte++) {
+                if (GUUID1[BinaryGUUIDByte] != GUUID2[BinaryGUUIDByte]) {
+                    GUUIDsMatch = No;
+                }
+            }
+        } else if (GUUID1 == NULL) {
+            Log(Log_ERROR, __func__, U8("GUUID1 Pointer is NULL"));
+        } else if (GUUID2 == NULL) {
+            Log(Log_ERROR, __func__, U8("GUUID2 Pointer is NULL"));
+        } else if (GUUIDType == UnknownGUUID) {
+            Log(Log_ERROR, __func__, U8("UnknownGUUID is an invalid GUUID type"));
+        }
+        return GUUIDsMatch;
+    }
+    
+    uint8_t *ConvertGUUID(GUUIDTypes InputGUUIDType, GUUIDTypes OutputGUUIDType, const uint8_t *GUUID2Convert) {
+        uint8_t  OutputGUUIDSize = ((OutputGUUIDType == GUIDString || OutputGUUIDType == UUIDString) ? GUUIDStringSize : BinaryGUUIDSize);
+        uint8_t *ConvertedGUUID  = calloc(OutputGUUIDSize, sizeof(uint8_t));
+        if (ConvertedGUUID != NULL && GUUID2Convert != NULL && InputGUUIDType != UnknownGUUID && OutputGUUIDType != UnknownGUUID) {
+            bool ByteOrderDiffers = (((InputGUUIDType == GUIDString && OutputGUUIDType == UUIDString) || (InputGUUIDType == UUIDString && OutputGUUIDType == GUIDString) || (InputGUUIDType == BinaryUUID && OutputGUUIDType == BinaryGUID) || (InputGUUIDType == BinaryGUID && OutputGUUIDType == BinaryUUID)) ? Yes : No);
+            
+            bool TypeDiffers      = (((InputGUUIDType == GUIDString && OutputGUUIDType == BinaryGUID) || (InputGUUIDType == BinaryGUID && OutputGUUIDType == GUIDString) || (InputGUUIDType == UUIDString && OutputGUUIDType == BinaryUUID) || (InputGUUIDType == BinaryUUID && OutputGUUIDType == UUIDString)) ? Yes : No);
+            
+            if (ByteOrderDiffers == Yes) {
+                SwapGUUID(InputGUUIDType, *GUUID2Convert);
+            }
+            
+            if (TypeDiffers == Yes) {
+                // Convert from a string to a binary, or vice versa.
+                if ((InputGUUIDType == UUIDString || InputGUUIDType == GUIDString) && (OutputGUUIDType == BinaryUUID || OutputGUUIDType == BinaryGUID)) {
+                    // Convert from string to binary
+                    for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize; StringByte++) {
+                        for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize; BinaryByte++) {
+                            if (GUUID2Convert[StringByte] != 0x2D) {
+                                ConvertedGUUID[BinaryByte] = GUUID2Convert[StringByte];
+                            }
+                        }
+                    }
+                } else if ((InputGUUIDType == BinaryUUID || InputGUUIDType == BinaryGUID) || (OutputGUUIDType == UUIDString || OutputGUUIDType == GUIDString)) {
+                    // Convert from binary to string
+                    for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize; BinaryByte++) {
+                        for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize; StringByte++) {
+                            if (BinaryByte != 4 && BinaryByte != 7 && BinaryByte != 10 && BinaryByte != 13) {
+                                ConvertedGUUID[StringByte]  = GUUID2Convert[BinaryByte];
+                            } else {
+                                ConvertedGUUID[StringByte]  = '-';
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (ConvertedGUUID == NULL) {
+            Log(Log_ERROR, __func__, U8("Insufficent memory to allocate ConvertedGUUID"));
+        } else if (GUUID2Convert == NULL) {
+            Log(Log_ERROR, __func__, U8("GUUID2Convert Pointer is NULL"));
+        } else if (InputGUUIDType == UnknownGUUID) {
+            Log(Log_ERROR, __func__, U8("InputGUUIDType is invalid"));
+        } else if (OutputGUUIDType) {
+            Log(Log_ERROR, __func__, U8("OutputGUUIDType is invalid"));
+        }
+        return ConvertedGUUID;
+    }
+    
+    uint8_t *SwapGUUID(GUUIDTypes GUUIDType, uint8_t *GUUID2Swap) {
+        uint8_t *SwappedGUUID = NULL;
+        if (GUUID2Swap != NULL && GUUIDType != UnknownGUUID) {
+            if (GUUIDType == UUIDString || GUUIDType == GUIDString) {
+                SwappedGUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
+                if (SwappedGUUID != NULL) {
+                    SwappedGUUID[0]   = GUUID2Swap[3];
+                    SwappedGUUID[1]   = GUUID2Swap[2];
+                    SwappedGUUID[2]   = GUUID2Swap[1];
+                    SwappedGUUID[3]   = GUUID2Swap[0];
+                    
+                    SwappedGUUID[4]   = GUUID2Swap[4]; // Dash
+                    
+                    SwappedGUUID[5]   = GUUID2Swap[6];
+                    SwappedGUUID[6]   = GUUID2Swap[5];
+                    
+                    SwappedGUUID[7]   = GUUID2Swap[7]; // Dash
+                    
+                    SwappedGUUID[8]   = GUUID2Swap[9];
+                    SwappedGUUID[9]   = GUUID2Swap[8];
+                    
+                    SwappedGUUID[10]  = GUUID2Swap[10]; // Dash
+                    
+                    SwappedGUUID[11]  = GUUID2Swap[12];
+                    SwappedGUUID[12]  = GUUID2Swap[11];
+                    for (uint8_t EndBytes = 13; EndBytes < GUUIDStringSize - NULLTerminatorSize; EndBytes++) {
+                        SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
+                    }
+                } else {
+                    Log(Log_ERROR, __func__, U8("SwappedGUUID's Pointer is NULL"));
+                }
+            } else if (GUUIDType == BinaryUUID || GUUIDType == BinaryGUID) {
+                SwappedGUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
+                if (SwappedGUUID != NULL) {
+                    SwappedGUUID[0]   = GUUID2Swap[3];
+                    SwappedGUUID[1]   = GUUID2Swap[2];
+                    SwappedGUUID[2]   = GUUID2Swap[1];
+                    SwappedGUUID[3]   = GUUID2Swap[0];
+                    
+                    SwappedGUUID[4]   = GUUID2Swap[5];
+                    SwappedGUUID[5]   = GUUID2Swap[4];
+                    
+                    SwappedGUUID[6]   = GUUID2Swap[7];
+                    SwappedGUUID[7]   = GUUID2Swap[6];
+                    
+                    SwappedGUUID[8]   = GUUID2Swap[9];
+                    SwappedGUUID[9]   = GUUID2Swap[8];
+                    for (uint8_t EndBytes = 10; EndBytes < BinaryGUUIDSize; EndBytes++) {
+                        SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
+                    }
+                } else {
+                    Log(Log_ERROR, __func__, U8("SwappedGUUID's Pointer is NULL"));
+                }
+            }
+        } else if (GUUID2Swap == NULL) {
+            Log(Log_ERROR, __func__, U8("GUUID2Swap's Pointer is NULL"));
+        } else if (GUUIDType == UnknownGUUID) {
+            Log(Log_ERROR, __func__, U8("UnknownGUUID is an invalid GUUID type"));
+        }
+        return SwappedGUUID;
+    }
+    
+    uint8_t *ReadGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB) {
+        uint8_t ByteOrder = ((GUUIDType == GUIDString || GUUIDType == BinaryGUID) ? LSByteFirst : MSByteFirst);
+        uint8_t *GUUID = NULL;
+        if (GUUIDType != UnknownGUUID && BitB != NULL && (BitBuffer_GetSize(BitB) - BitBuffer_GetPosition(BitB)) >= BinaryGUUIDSize) {
+            if (GUUIDType == BinaryUUID || GUUIDType == BinaryGUID) {
+                // Read it from the BitBuffer as a string.
+                GUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
+                if (GUUID != NULL) {
+                    for (uint8_t Byte = 0; Byte < BinaryGUUIDSize - NULLTerminatorSize; Byte++) {
+                        GUUID[Byte] = ReadBits(ByteOrder, LSBitFirst, BitB, 8);
+                    }
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate GUIDString"));
+                }
+            } else if (GUUIDType == UUIDString || GUUIDType == GUIDString) {
+                GUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
+                if (GUUID != NULL) {
+                    uint32_t Section1    = ReadBits(ByteOrder, LSBitFirst, BitB, 32);
+                    BitBuffer_Skip(BitB, 8);
+                    uint16_t Section2    = ReadBits(ByteOrder, LSBitFirst, BitB, 16);
+                    BitBuffer_Skip(BitB, 8);
+                    uint16_t Section3    = ReadBits(ByteOrder, LSBitFirst, BitB, 16);
+                    BitBuffer_Skip(BitB, 8);
+                    uint16_t Section4    = ReadBits(ByteOrder, LSBitFirst, BitB, 16);
+                    BitBuffer_Skip(BitB, 8);
+                    uint64_t Section5    = ReadBits(ByteOrder, LSBitFirst, BitB, 48);
+                    sprintf((char*)UUIDString, "%d-%d-%d-%d-%llu", Section1, Section2, Section3, Section4, Section5);
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate UUIDString"));
+                }
+            }
+        }
+        return GUUID;
+    }
+    
+    void WriteGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB, const uint8_t *GUUID2Write) {
+        if (BitB != NULL && BitBuffer_GetPosition(BitB)  && GUUID2Write != NULL) { // TODO: Make sure that the BitBuffer can hold the GUUID
+            uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? BinaryGUUIDSize - NULLTerminatorSize : BinaryGUUIDSize);
+            uint8_t ByteOrder = ((GUUIDType == GUIDString || GUUIDType == BinaryGUID) ? LSByteFirst : MSByteFirst);
+            for (uint8_t Byte = 0; Byte < GUUIDSize; Byte++) {
+                WriteBits(ByteOrder, LSBitFirst, BitB, 8, GUUID2Write[Byte]);
+            }
+        } else if (BitB == NULL) {
+            Log(Log_ERROR, __func__, U8("BitBuffer's Pointer is NULL"));
+        } else if (GUUID2Write == NULL) {
+            Log(Log_ERROR, __func__, U8("GUUID2Write's Pointer is NULL"));
+        }
+    }
+    
+    void GUUID_Deinit(uint8_t *GUUID) {
+        if (GUUID != NULL) {
+            free(GUUID);
+        }
+    }
+    /* GUUID */
+    
 #ifdef __cplusplus
 }
 #endif

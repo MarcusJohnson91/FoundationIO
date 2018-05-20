@@ -52,6 +52,33 @@ extern   "C" {
     } UnaryTypes;
     
     /*!
+     @enum                      GUUIDConstants
+     @abstract                                                  "GUUID compile time constants".
+     @constant                  GUUIDStringSize                 "Size of a UUIDString or GUIDString including dashes, and null terminator".
+     @constant                  BinaryGUUIDSize                 "Size of a BinaryUUID or BinaryGUID".
+     */
+    enum GUUIDConstants {
+        GUUIDStringSize            = 20 + NULLTerminatorSize,
+        BinaryGUUIDSize            = 16,
+    };
+    
+    /*!
+     @enum                      GUUIDTypes
+     @constant                  UnknownGUUID                    "The GUUID type is unknown, invalid".
+     @constant                  GUIDString                      "The GUUID is a GUID string, aka little endian/Least Significant Byte first UUID with hyphens".
+     @constant                  UUIDString                      "The GUUID is a UUID string, aka big endian   /Most  Significant Byte first UUID with hyphens".
+     @constant                  BinaryGUID                      "The GUUID is a Binary GUID, aka little endian/Least Significant Byte first UUID without hyphens".
+     @constant                  BinaryUUID                      "The GUUID is a Binary UUID, aka big endian   /Most  Significant Byte First UUID without hypthns".
+     */
+    typedef enum GUUIDTypes {
+                                UnknownGUUID                    = 0,
+                                GUIDString                      = 1,
+                                UUIDString                      = 2,
+                                BinaryGUID                      = 3,
+                                BinaryUUID                      = 4,
+    } GUUIDTypes;
+    
+    /*!
      @typedef                   BitInput
      @abstract                                                  "Contains File/Socket pointers for reading to a BitBuffer".
      */
@@ -373,6 +400,52 @@ extern   "C" {
      */
     void                        BitOutput_Deinit(BitOutput *BitO);
     /* BitOutput */
+    
+    /* GUUID */
+    /*!
+     @abstract                                                  "Reads a BinaryGUUID/GUUIDString from the BitBuffer".
+     @param                     GUUIDType                       "The type of GUUID to read".
+     @param                     BitB                            "Pointer to an instance of BitBuffer".
+     @return                                                    "Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BinaryGUUIDSize or BinaryGUUIDSize bytes".
+     */
+    uint8_t                    *ReadGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB);
+    
+    /*!
+     @abstract                                                  "Compares GUUIDs for equilivence, GUUID1 and 2 HAVE to be the same type".
+     @param                     GUUID1                          "Pointer to a GUUID to be compared".
+     @param                     GUUID2                          "Pointer to a GUUID to be compared".
+     @return                                                    "Returns Yes if GUUID1 and GUUID2 match, No otherwise".
+     */
+    bool                        CompareGUUIDs(GUUIDTypes GUUIDType, const uint8_t *GUUID1, const uint8_t *GUUID2);
+    
+    /*!
+     @abstract                                                  "Converts a GUUID from one representation to another (String->Binary<-String/UUIG->GUID<-UUID)".
+     @param                     InputGUUIDType                  "What type of GUUID are we converting from"?
+     @param                     OutputGUUIDType                 "What type of GUUID are we converting to"?
+     @return                                                    "Returns the converted GUUID".
+     */
+    uint8_t                    *ConvertGUUID(GUUIDTypes InputGUUIDType, GUUIDTypes OutputGUUIDType, const uint8_t *GUUID2Convert);
+    
+    /*!
+     @abstract                                                  "Swaps the byte order of a BinaryGUUID or GUUIDString".
+     @param                     GUUIDType                       "Is this a GUUIDString or BinaryGUUID"?
+     @param                     GUUID2Swap                      "GUUID Pointer to swap".
+     @return                                                    "Returns a pointer to a swapped GUUID".
+     */
+    uint8_t                    *SwapGUUID(GUUIDTypes GUUIDType, uint8_t *GUUID2Swap);
+    
+    /*!
+     @abstract                                                  "Writes a GUUID to the BitBuffer".
+     @param                     BitB                            "Pointer to an instance of BitBuffer".
+     @param                     GUUID2Write                     "Pointer to the GUUID you want to write".
+     */
+    void                        WriteGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB, const uint8_t *GUUID2Write);
+    
+    /*!
+     @abstract                                                  "Frees a BinaryGUUID or GUUIDString".
+     */
+    void                        GUUID_Deinit(uint8_t *GUUID);
+    /* GUUID */
     
 #ifdef   __cplusplus
 }
