@@ -580,7 +580,7 @@ extern   "C" {
             }
             // Number of seperators for each string
             uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
-            UTF8     *ActualStrings2Print            = calloc(NumItems2Display * CLI->ConsoleWidth, sizeof(UTF8));
+            UTF8     *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF8*));
             for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
                 // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
                 NumProgressIndicatorsPerString[String] = CLI->ConsoleWidth - (2 + StringSize[String]); // what if it's not even?
@@ -589,8 +589,8 @@ extern   "C" {
                 // Now we go ahead and memset a string with the proper number of indicators
                 UTF8 *Indicator             = calloc(CLI->ConsoleWidth, sizeof(UTF8));
                 memset(Indicator, '-', HalfOfTheIndicators);
-                sprintf(ActualStrings2Print[String], "[%s%s %lld/%lld %hhu/%s %s]", Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF8);
-                fprintf(stdout, "%s%s", &ActualStrings2Print[String], NewLineUTF8);
+                UTF8 *FormattedString       = UTF8_FormatString("[%s%s %lld/%lld %hhu/%s %s]", Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF8);
+                UTF8_WriteString2File(FormattedString, stdout);
                 free(Indicator);
             }
             free(StringSize);

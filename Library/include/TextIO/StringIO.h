@@ -585,9 +585,8 @@ extern  "C" {
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
-     @remark                               "We've extended FormatString from printf by adding the B specifier, for binary".
-     @remark                               "We do not support the n specifier for security purposes".
-     @param               Format           "A string with optional format specifiers".
+     @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
+     @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
 #if     (FoundationIOTargetOS == POSIXOS)
@@ -604,10 +603,9 @@ extern  "C" {
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
-     @remark                               "We've extended FormatString from printf by adding the B specifier, for binary".
-     @remark                               "We do not support the n specifier for security purposes".
-     @param               Format           "A string with optional format specifiers".
-     @return                               "Returns the formatted string encoded using the UTF-16 format".
+     @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
+     @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
+     @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
 #if     (FoundationIOTargetOS == POSIXOS)
     UTF16                *UTF16_FormatString(UTF16 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
@@ -620,15 +618,6 @@ extern  "C" {
     UTF16                *UTF16_FormatString(UTF16 *Format, ...);
 #endif /* _MSC_VER */
 #endif/* FoundationIOTargetOS */
-    
-    /*!
-     @abstract                             "Formats a string according to the Format string, with all of it's options".
-     @remark                               "We've extended FormatString from printf by adding the B specifier, for binary".
-     @remark                               "We do not support the n specifier for security purposes".
-     @param               Format           "A string with optional format specifiers".
-     @return                               "Returns the formatted string encoded using the UTF-32 format".
-     */
-    UTF32                *UTF32_FormatString(UTF32 *Format, va_list VariadicArguments);
     
     /*!
      @abstract                             "Writes a UTF-8 encoded string to the OutputFile using the platform's default Unicode encoding".
