@@ -915,7 +915,6 @@ extern "C" {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate GUIDString"));
                 }
             } else if (GUUIDType == UUIDString || GUUIDType == GUIDString) {
-                GUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
                 if (GUUID != NULL) {
                     uint32_t Section1    = ReadBits(ByteOrder, LSBitFirst, BitB, 32);
                     BitBuffer_Skip(BitB, 8);
@@ -926,7 +925,7 @@ extern "C" {
                     uint16_t Section4    = ReadBits(ByteOrder, LSBitFirst, BitB, 16);
                     BitBuffer_Skip(BitB, 8);
                     uint64_t Section5    = ReadBits(ByteOrder, LSBitFirst, BitB, 48);
-                    sprintf((char*)UUIDString, "%d-%d-%d-%d-%llu", Section1, Section2, Section3, Section4, Section5);
+                    GUUID                = UTF8_FormatString(U8("%d-%d-%d-%d-%llu"), Section1, Section2, Section3, Section4, Section5);
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate UUIDString"));
                 }

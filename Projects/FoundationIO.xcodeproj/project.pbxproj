@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		2C9581542096D5620001BC92 /* ContainerIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC15D52091F2120070BCFC /* ContainerIO.c */; };
 		2C9581552096D5690001BC92 /* ContainerIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E72091F2290070BCFC /* ContainerIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2CFC15DA2091F2130070BCFC /* GUUID.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC15D22091F2120070BCFC /* GUUID.c */; };
 		2CFC15DB2091F2130070BCFC /* Math.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC15D32091F2120070BCFC /* Math.c */; };
 		2CFC15DC2091F2130070BCFC /* StringIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC15D42091F2120070BCFC /* StringIO.c */; };
 		2CFC15DE2091F2130070BCFC /* Log.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC15D62091F2120070BCFC /* Log.c */; };
@@ -19,7 +18,6 @@
 		2CFC15EB2091F22A0070BCFC /* StringIOTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E22091F2290070BCFC /* StringIOTables.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		2CFC15EC2091F22A0070BCFC /* Math.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E32091F2290070BCFC /* Math.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2CFC15ED2091F22A0070BCFC /* Log.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E42091F2290070BCFC /* Log.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2CFC15EE2091F22A0070BCFC /* GUUID.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E52091F2290070BCFC /* GUUID.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2CFC15EF2091F22A0070BCFC /* BitIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E62091F2290070BCFC /* BitIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2CFC15F12091F22A0070BCFC /* Macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E82091F22A0070BCFC /* Macros.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2CFC15F22091F22A0070BCFC /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CFC15E92091F22A0070BCFC /* StringIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -28,7 +26,6 @@
 
 /* Begin PBXFileReference section */
 		2CFC15C82091F1AE0070BCFC /* libFoundationIO.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFoundationIO.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		2CFC15D22091F2120070BCFC /* GUUID.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = GUUID.c; path = ../libFoundationIO/src/GUUID.c; sourceTree = "<group>"; };
 		2CFC15D32091F2120070BCFC /* Math.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Math.c; path = ../libFoundationIO/src/Math.c; sourceTree = "<group>"; };
 		2CFC15D42091F2120070BCFC /* StringIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = StringIO.c; path = ../libFoundationIO/src/StringIO.c; sourceTree = "<group>"; };
 		2CFC15D52091F2120070BCFC /* ContainerIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = ContainerIO.c; path = ../libFoundationIO/src/ContainerIO.c; sourceTree = "<group>"; };
@@ -39,7 +36,6 @@
 		2CFC15E22091F2290070BCFC /* StringIOTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = StringIOTables.h; path = ../libFoundationIO/include/StringIOTables.h; sourceTree = "<group>"; };
 		2CFC15E32091F2290070BCFC /* Math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Math.h; path = ../libFoundationIO/include/Math.h; sourceTree = "<group>"; };
 		2CFC15E42091F2290070BCFC /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Log.h; path = ../libFoundationIO/include/Log.h; sourceTree = "<group>"; };
-		2CFC15E52091F2290070BCFC /* GUUID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = GUUID.h; path = ../libFoundationIO/include/GUUID.h; sourceTree = "<group>"; };
 		2CFC15E62091F2290070BCFC /* BitIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BitIO.h; path = ../libFoundationIO/include/BitIO.h; sourceTree = "<group>"; };
 		2CFC15E72091F2290070BCFC /* ContainerIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ContainerIO.h; path = ../libFoundationIO/include/ContainerIO.h; sourceTree = "<group>"; };
 		2CFC15E82091F22A0070BCFC /* Macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Macros.h; path = ../libFoundationIO/include/Macros.h; sourceTree = "<group>"; };
@@ -89,7 +85,6 @@
 				2CFC15D72091F2130070BCFC /* BitIO.c */,
 				2CFC15D92091F2130070BCFC /* CommandLineIO.c */,
 				2CFC15D52091F2120070BCFC /* ContainerIO.c */,
-				2CFC15D22091F2120070BCFC /* GUUID.c */,
 				2CFC15D62091F2120070BCFC /* Log.c */,
 				2CFC15D82091F2130070BCFC /* Macros.c */,
 				2CFC15D32091F2120070BCFC /* Math.c */,
@@ -104,7 +99,6 @@
 				2CFC15E62091F2290070BCFC /* BitIO.h */,
 				2CFC15EA2091F22A0070BCFC /* CommandLineIO.h */,
 				2CFC15E72091F2290070BCFC /* ContainerIO.h */,
-				2CFC15E52091F2290070BCFC /* GUUID.h */,
 				2CFC15E42091F2290070BCFC /* Log.h */,
 				2CFC15E82091F22A0070BCFC /* Macros.h */,
 				2CFC15E32091F2290070BCFC /* Math.h */,
@@ -124,7 +118,6 @@
 				2CFC15EF2091F22A0070BCFC /* BitIO.h in Headers */,
 				2CFC15F32091F22A0070BCFC /* CommandLineIO.h in Headers */,
 				2C9581552096D5690001BC92 /* ContainerIO.h in Headers */,
-				2CFC15EE2091F22A0070BCFC /* GUUID.h in Headers */,
 				2CFC15ED2091F22A0070BCFC /* Log.h in Headers */,
 				2CFC15F12091F22A0070BCFC /* Macros.h in Headers */,
 				2CFC15EC2091F22A0070BCFC /* Math.h in Headers */,
@@ -190,7 +183,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CFC15DA2091F2130070BCFC /* GUUID.c in Sources */,
 				2C9581542096D5620001BC92 /* ContainerIO.c in Sources */,
 				2CFC15DE2091F2130070BCFC /* Log.c in Sources */,
 				2CFC15DF2091F2130070BCFC /* BitIO.c in Sources */,
@@ -256,6 +248,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MODULEMAP_FILE = ../libFoundationIO/module.modulemap;
+				MODULE_NAME = FoundationIO;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -302,6 +296,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_UNROLL_LOOPS = YES;
@@ -312,6 +307,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MODULEMAP_FILE = ../libFoundationIO/module.modulemap;
+				MODULE_NAME = FoundationIO;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
