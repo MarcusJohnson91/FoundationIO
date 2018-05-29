@@ -1,44 +1,10 @@
 #!/bin/bash -x
 
-# License: Public Domain, Creative Commons 0 for municipalities that do not have the notion of a public domain
-
-# We NEED XMLStarlet to work, so install it with: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-# Then call: brew install XMLStarlet
-
-# xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN']" -v "@cp" -v "@nv" ucd.all.flat.xmlstarletTHIS WORKS
-
-# xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@gc = 'Lu' or @gc = flat.xmlv "@cp" ucd.all.flat.xml
-
-# Then we're off, download the XMLUCD readme to check if it's newer than our version of Unicode.
-
-# Extract WhiteSpace: xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[$CodePoint @WSpace == 'Y']" -v "@cp" $UCD_Data
-
-# Ok we're parsing the xml UCD, not straight text version.
-# for the number tables, look for class gc="Nd" (Numeral, Decimal), and get it's value from nv="X"
-
-#and generate the tables we need from there.
-
-#List of tables we need to extract:
-
-# List of tables we need
-# Whitespace
-# CaseFold
-# All the codepoints to be found, and the replacements for Compatibile Equilivilence, both Decomposed and Composed forms
-# All the codepoints to be found, and the replacements for Canonical   Equilivilence, both Decomposed and Composed forms
-# For the casefolding and Normalization tables, maybe I should just have it be string 2 string, so just a table of input strings, and output strings.
-# The only concern is the ordering of the codepoints in the input string when I'm scanning, I'd have to come up with a better algorithm to ensure that it's order independent
-# List of Grapheme Extension codepoints.
+# License: Public Domain, Creative Commons 0 for municipalities that do not have the notion of a public domain.
+# Usage: ./MakeUnicodeTables.sh /HeaderPath/HeaderFile.h 
+# Dependencies: XMLStarlet (On Mac install Homebrew from brew.sh then call brew install xmlstarlet)
 
 function CreateOutputFileTop {
-    # The output file does not exist, or it's version is out of date, so we need to generate it
-    rm -rf $OutputFile
-    touch $OutputFile
-#UCD_URL="https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip"
-#$(curl -N $UCD_URL -o "$UCD_Folder/ucd.all.flat.zip")
-#$(cd "$UCD_Folder")
-#$(unzip "$UCD_Folder/ucd.all.flat.zip" -d "$UCD_Folder")
-#$(rm -f "$UCD_Folder/ucd.all.flat.zip")
-    UCD_Data="$UCD_Folder/ucd.all.flat.xml"
     printf "#include \"StringIO.h\"                  /* Included for our declarations */\n\n" >> $OutputFile
     printf "#pragma once\n\n" >> $OutputFile
     printf "#ifndef FoundationIO_StringIOTables_H\n" >> $OutputFile
@@ -121,7 +87,7 @@ CanonicalNormalizationCodePointsAndStrings=$(xmlstarlet select -N u="http://www.
 function CreateKompatibleNormalizationTables {
     IFS=$'\n'
     NULLTerminator=$(echo "\x0")
-KompatibleNormalizationCodePointsAndStrings=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[(@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat') and @dt != '' and @dt != '#' and @dt != 'none']" -v @cp -o : -v @dm -n $UCD_Data | sort -s -n -k 2 -t :)
+    KompatibleNormalizationCodePointsAndStrings=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[(@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat') and @dt != '' and @dt != '#' and @dt != 'none']" -v @cp -o : -v @dm -n $UCD_Data | sort -s -n -k 2 -t :)
     printf "\tstatic const UTF32    KompatibleNormalizationCodePoints[KompatibleNormalizationTableSize] = {\n" >> $OutputFile
     for line in $KompatibleNormalizationCodePointsAndStrings; do
         CodePoint=$(awk -F '[: ]' '{printf $1}' <<< "$line" | sed -e 's/^/0x/g')
@@ -216,39 +182,37 @@ function CreateOutputFileBottom {
     printf "#endif /* FoundationIO_StringIOTables_H */\n" >> $OutputFile
 }
 
-function GetStringIOUnicodeVersion {
-#UCD_README="https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt"
-#UCD_Folder=$(mktemp -d)
-    UCD_Folder="/Users/Marcus/Desktop/UCDXML"
-#$(curl -N $UCD_README -o "$UCD_Folder/readme.txt")
-    ReadmeVersion=$(awk 'NR==1 {print $5}' $UCD_Folder/readme.txt)
-    if [ ! -f "$OutputFile" ]
-    then
-        StringIOVersion="0.0.0"
-    else
-        StringIOVersion=$(awk 'NR==12 {print $3}' $OutputFile)
-    fi
-}
+OutputFile=$@
+StringIOVersion=$(grep '#define UnicodeVersion ' $OutputFile | awk '{print $3}')
+StringIOVMajor=$(awk -F "." '{print $1}' <<< $StringIOVersion)
+StringIOVMinor=$(awk -F "." '{print $2}' <<< $StringIOVersion)
+StringIOVPatch=$(awk -F "." '{print $3}' <<< $StringIOVersion)
+UCD_Folder=$(mktemp -d)
+curl -N https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt -o "$UCD_Folder/readme.txt"
+ReadMeVersion=$(grep 'XML Representation of Unicode ' "$UCD_Folder/readme.txt" | awk '{print $5}')
+ReadMeVMajor=$(awk -F "." '{print $1}' <<< $ReadMeVersion)
+ReadMeVMinor=$(awk -F "." '{print $2}' <<< $ReadMeVersion)
+ReadMeVPatch=$(awk -F "." '{print $3}' <<< $ReadMeVersion)
 
-if [ $# -ne 1 ]
-    then echo "You forgot to include the output path for the tables"
-else
-    ARGUMENTS=$@
-    OutputFile=$ARGUMENTS
-    GetStringIOUnicodeVersion
-#UCD_Folder="~/Desktop/UCDXML"
-    if [ $ReadmeVersion -eq $StringIOVersion ]; then
-        exit 0
-    else
-        # The output file does not exist, or it's version is out of date, so we need to generate it
-        CreateOutputFileTop
-        CreateWhiteSpaceTable
-        CreateKompatibleNormalizationTables
-        CreateCombiningCharacterClassTable
-        CreateCanonicalNormalizationTables
-        CreateIntegerTable
-        CreateGraphemeExtensionTable
-        CreateCaseFoldTables
-        CreateOutputFileBottom
-    fi
+if   [ $# -lt 1 ] || [ -z "$1" ]; then
+    echo "The first argument needs to be the file to contain the tables."
+elif [ -f $OutputFile ] && [ $StringIOVMajor -eq $ReadMeVMajor ] && [ $StringIOVMinor -eq $ReadMeVMinor ] && [ $StringIOVPatch -eq $ReadMeVPatch ]; then
+    echo "The Unicode tables are already up to date, exiting."
+elif [ ! -f $OutputFile ] || [ $StringIOVMajor -ne $ReadMeVMajor ] || [ $StringIOVMinor -ne $ReadMeVMinor ] || [ $StringIOVPatch -ne $ReadMeVPatch ]; then
+    rm -rf $OutputFile
+    touch $OutputFile
+    $(curl -N "https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" -o "$UCD_Folder/ucd.all.flat.zip")
+    $(unzip -q "$UCD_Folder/ucd.all.flat.zip" -d "$UCD_Folder")
+    $(rm -f "$UCD_Folder/ucd.all.flat.zip")
+    UCD_Data="$UCD_Folder/ucd.all.flat.xml"
+
+    CreateOutputFileTop
+    CreateWhiteSpaceTable
+    CreateCombiningCharacterClassTable
+    CreateIntegerTable
+    CreateGraphemeExtensionTable
+    CreateKompatibleNormalizationTables
+    CreateCaseFoldTables
+    CreateCanonicalNormalizationTables
+    CreateOutputFileBottom
 fi
