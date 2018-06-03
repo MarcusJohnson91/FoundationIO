@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # License: Public Domain, Creative Commons 0 for municipalities that do not have the notion of a public domain.
 # Usage (the HeaderFile WILL BE DELETED): ./MakeUnicodeTables.sh /HeaderPath/HeaderFile.h 
@@ -197,7 +197,7 @@ ReadMeVMinor=$(awk -F "." '{print $2}' <<< $ReadMeVersion)
 ReadMeVPatch=$(awk -F "." '{print $3}' <<< $ReadMeVersion)
 
 if   [ $# -ne 1 ] || [ -z "$1" ]; then
-    echo "The first argument needs to be the file to contain the tables."
+    echo "The first argument needs to be the file to contain the tables. (if it exists, it WILL be deleted)"
 elif [ $StringIOVMajor -eq $ReadMeVMajor ] && [ $StringIOVMinor -eq $ReadMeVMinor ] && [ $StringIOVPatch -eq $ReadMeVPatch ]; then
     echo "The Unicode tables are already up to date, exiting."
 elif [ $StringIOVMajor -lt $ReadMeVMajor ] || (( [ $StringIOVMajor -eq $ReadMeVMajor ] && [ $StringIOVMinor -lt $ReadMeVMinor ] )) || (( [ $StringIOVMajor -eq $ReadMeVMajor ] && [ $StringIOVMinor -eq $ReadMeVMinor ] && [ $StringIOVPatch -lt $ReadMeVPatch ] )); then
