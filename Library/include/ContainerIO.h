@@ -17,6 +17,7 @@ extern   "C" {
  @brief     This header contains code for containers (type generic arrays)
  */
     
+    typedef enum ContainerTypes {
                 UInteger8Array   = 264,
                 UInteger16Array  = 272,
                 UInteger32Array  = 288,
