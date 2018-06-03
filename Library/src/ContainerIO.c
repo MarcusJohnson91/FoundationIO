@@ -6,25 +6,6 @@ extern "C" {
 #endif
     
     
-    /* Features I need:
-     Support for multi-dimensional arrays of any type.
-     Doing various operations on those arrays, like getting the average, min, and max values from the array.
-     I don't think I'll need setting or extracting, I should be able to treat it like a normal array for that, tho I'd need to know it's type so maybe having it's own functions would be best?
-     
-     What exactly are my use cases for this?
-     
-     libPCM & libModernPNG could use it to reduce the amount of memory needed at runtime, which would require runtime type info, so macros are a no-go.
-     How would they use a generic array?
-     
-     libPCM would return a pointer to a generic array containing the array's size, type, and actual array to another function.
-     
-     libModernPNG would do much the same.
-     
-     So, who's job would it be? like, we have an image, of varying type, what do we do with it?
-     
-     Also, how do we do SIMD operations on a container? do we just extract a pointer from a container?
-     
-     */
     typedef struct Container {
         void          *Elements;
         uint64_t       NumPlanes;
@@ -35,7 +16,6 @@ extern "C" {
     } Container;
     
     Container *Container_Init(const uint64_t NumPlanes, const uint64_t NumElementsPerPlane, ContainerTypes ContainerType) {
-        
         Container *NewContainer             = NULL;
         if (NumPlanes > 0 && NumElementsPerPlane > 0) {
             NewContainer                    = calloc(1, sizeof(Container));

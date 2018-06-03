@@ -74,7 +74,7 @@ extern  "C" {
                 CodeUnit               += UTF8_GetCodePointSize(String[CodeUnit]);
             } while (String[CodeUnit] != NULLTerminator);
         } else {
-            Log(Log_ERROR, __func__, U8("String2Count Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         return StringSizeInCodePoints;
     }
@@ -88,7 +88,7 @@ extern  "C" {
                 StringSizeInCodePoints += 1;
             } while (String[CodeUnit] != NULLTerminator);
         } else {
-            Log(Log_ERROR, __func__, U8("String2Count Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         return StringSizeInCodePoints;
     }
@@ -396,7 +396,7 @@ extern  "C" {
                     }
                 } while (String[CodePoint] != NULLTerminator);
             } else {
-                Log(Log_ERROR, __func__, U8("DecodedString Pointer is NULL, not enough memory"));
+                Log(Log_ERROR, __func__, U8("DecodedString Pointer is NULL"));
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -449,7 +449,7 @@ extern  "C" {
                     }
                 } while (String[CodePoint] != NULLTerminator);
             } else {
-                Log(Log_ERROR, __func__, U8("String Pointer is NULL, not enough memory"));
+                Log(Log_ERROR, __func__, U8("Encoded Pointer is NULL"));
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -498,7 +498,7 @@ extern  "C" {
                     }
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("EncodedString Pointer is NULL, not enough memory"));
+                Log(Log_ERROR, __func__, U8("Encoded Pointer is NULL"));
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -968,7 +968,7 @@ extern  "C" {
                         CodePoint += 1;
                     }
                 }
-                if (Decomposed[CodePoint] == '0') {
+                if (Decomposed[CodePoint] == U32('0')) {
                     if (Decomposed[CodePoint + 1] == U32('b') || Decomposed[CodePoint + 1] == U32('B')) {
                         Base       = 2;
                     } else if (Decomposed[CodePoint + 1] == U32('o') || Decomposed[CodePoint] == U32('O')) {
@@ -1028,8 +1028,8 @@ extern  "C" {
             NumDigits           +=  1;
         }
         UTF32 *NumberString      = calloc(NumDigits + NULLTerminatorSize, sizeof(UTF32));
-        UTF32  UpperNumerals[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-        UTF32  LowerNumerals[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+        UTF32  UpperNumerals[16] = {U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('A'), U32('B'), U32('C'), U32('D'), U32('E'), U32('F')};
+        UTF32  LowerNumerals[16] = {U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'), U32('e'), U32('f')};
         if (NumberString != NULL) {
             for (uint64_t CodePoint = NumDigits - 1; CodePoint > 0; CodePoint--) {
                 // Ok, so we've clamped the looping, now all we need to do is malloc a string with NumDigits as it's size.
@@ -1080,7 +1080,7 @@ extern  "C" {
             bool IsNegative        = 0;
             for (uint8_t Whitespace = 0; Whitespace < 99; Whitespace++) {
                 do {
-                    if (String[CodePoint] == '-') {
+                    if (String[CodePoint] == U32('-')) {
                         IsNegative = Yes;
                     }
                     CodePoint     += 1;
@@ -1135,13 +1135,13 @@ extern  "C" {
         if (OutputString != NULL) {
             // Now we go ahead and create the string
             if (Sign == -1) {
-                OutputString[1]   = '-';
+                OutputString[1]   = U32('-');
             }
             // Now we start popping in the other variables, first is the Exponent.
             while (Exponent2 > 0) { // TODO: This assumes there's only 1 codepoint nessicary to express teh exponent
                 OutputString[2]   = Exponent2 /= 10;
             }
-            OutputString[3]       = '.';
+            OutputString[3]       = U32('.');
             // Now let's start popping in the Mantissa
             while (Mantissa > 0) { // TODO: This assumes there's only 1 codepoint nessicary to express teh exponent
                 OutputString[4]   = Mantissa /= 10;
@@ -1757,9 +1757,9 @@ extern  "C" {
     
     void UTF8_WriteString2File(UTF8 *String, FILE *OutputFile) {
         if (String != NULL && OutputFile != NULL) {
-#if   (FoundationIOTargetOS == POSIXOS)
+#if   (FoundationIOTargetOS == POSIX)
             fputs(String, OutputFile);
-#elif (FoundationIOTargetOS == WindowsOS)
+#elif (FoundationIOTargetOS == Windows)
             UTF32 *StringUTF32 = UTF8_Decode(String);
             UTF16 *StringUTF16 = UTF16_Encode(StringUTF32, UseLEByteOrder);
             fputws(StringUTF16, OutputFile);
@@ -1775,13 +1775,13 @@ extern  "C" {
     
     void UTF16_WriteString2File(UTF16 *String, FILE *OutputFile) {
         if (String != NULL && OutputFile != NULL) {
-#if   (FoundationIOTargetOS == POSIXOS)
+#if   (FoundationIOTargetOS == POSIX)
             UTF32 *StringUTF32 = UTF16_Decode(String);
             UTF8  *StringUTF8  = UTF8_Encode(StringUTF32, No);
             fputs(StringUTF8, OutputFile);
             free(StringUTF32);
             free(StringUTF8);
-#elif (FoundationIOTargetOS == WindowsOS)
+#elif (FoundationIOTargetOS == Windows)
             fputws(String, OutputFile);
 #endif
         } else if (String == NULL) {
