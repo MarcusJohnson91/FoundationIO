@@ -589,9 +589,9 @@ extern  "C" {
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
-#if     (FoundationIOTargetOS == POSIXOS)
+#if     (FoundationIOTargetOS == POSIX)
     UTF8                 *UTF8_FormatString(UTF8 *Format, ...) __attribute__((__format__(__printf__, 1, 2)));
-#elif   (FoundationIOTargetOS == WindowsOS)
+#elif   (FoundationIOTargetOS == Windows)
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF8                 *UTF8_FormatString(__format_string UTF8 *Format, ...);
 #elif    (_MSC_VER >= 1500)
@@ -607,9 +607,9 @@ extern  "C" {
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
-#if     (FoundationIOTargetOS == POSIXOS)
+#if     (FoundationIOTargetOS == POSIX)
     UTF16                *UTF16_FormatString(UTF16 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
-#elif   (FoundationIOTargetOS == WindowsOS)
+#elif   (FoundationIOTargetOS == Windows)
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF16                *UTF16_FormatString(__format_string UTF16 *Format, ...);
 #elif    (_MSC_VER >= 1500)

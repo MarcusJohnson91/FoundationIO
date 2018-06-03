@@ -17,18 +17,17 @@ extern   "C" {
  @brief     This header contains code for containers (type generic arrays)
  */
     
-    typedef enum ContainerTypes {
-                UInteger8Array  = 264,
-                UInteger16Array = 272,
-                UInteger32Array = 288,
-                UInteger64Array = 320,
-                SInteger8Array  = 520,
-                SInteger16Array = 528,
-                SInteger32Array = 544,
-                SInteger64Array = 576,
-                Decimal16Array  = 1040,
-                Decimal32Array  = 1056,
-                Decimal64Array  = 1088,
+                UInteger8Array   = 264,
+                UInteger16Array  = 272,
+                UInteger32Array  = 288,
+                UInteger64Array  = 320,
+                SInteger8Array   = 520,
+                SInteger16Array  = 528,
+                SInteger32Array  = 544,
+                SInteger64Array  = 576,
+                Decimal16Array   = 1040,
+                Decimal32Array   = 1056,
+                Decimal64Array   = 1088,
     } ContainerTypes;
     
     typedef struct Container Container;

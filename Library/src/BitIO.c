@@ -115,7 +115,7 @@ extern "C" {
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if (AlignmentSize == 1 || AlignmentSize % 2 == 0) {
-            Log(Log_ERROR, __func__, U8("AlignmentSize: %d isn't a power of 2 (or 1)"), AlignmentSize);
+            Log(Log_ERROR, __func__, U8("AlignmentSize: %d isn't a multiple of 2"), AlignmentSize);
         }
     }
     
@@ -161,10 +161,10 @@ extern "C" {
             } else {
                 Log(Log_ERROR, __func__, U8("Allocating %lld bytes failed"), BufferSizeInBytes);
             }
-        } else if (BitI == NULL) {
-            Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        } else if (BitI == NULL) {
+            Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         }
     }
     
@@ -210,7 +210,7 @@ extern "C" {
                 }
             }
         } else if (BitB == NULL) {
-            Log(Log_ERROR, __func__, U8("BitB's Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if (BitB->NumBits >= BitB->BitOffset + NumBits2Insert) {
             Log(Log_ERROR, __func__, U8("Not enough room in BitB to insert %d bits"), NumBits2Insert);
         }
@@ -248,7 +248,7 @@ extern "C" {
                 }
             }
         } else if (BitB == NULL) {
-            Log(Log_ERROR, __func__, U8("BitB's Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if (BitB->NumBits >= BitB->BitOffset + NumBits2Extract) {
             Log(Log_ERROR, __func__, U8("Not enough bits in BitB to extract %d bits"), NumBits2Extract);
         }
@@ -334,6 +334,8 @@ extern "C" {
                     ExtractedString[CodeUnit]     = ExtractBits(StringByteOrder, LSBitFirst, BitB, 16);
                 }
             }
+        } else if (BitB == NULL) {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         }
         return ExtractedString;
     }
@@ -397,7 +399,7 @@ extern "C" {
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if (Array2Write == NULL) {
-            Log(Log_ERROR, __func__, U8("Array2Write Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("Array Pointer is NULL"));
         } else if (ElementSize == 0 || ElementSize > 64) {
             Log(Log_ERROR, __func__, U8("ElementSize is %d, that doesn't make any sense"), ElementSize);
         } else if (NumElements2Write == 0 || NumElements2Write > ElementOffset) {
@@ -420,7 +422,7 @@ extern "C" {
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if (String2Write == NULL) {
-            Log(Log_ERROR, __func__, U8("String2Write Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
     }
     
@@ -442,7 +444,7 @@ extern "C" {
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if (String2Write == NULL) {
-            Log(Log_ERROR, __func__, U8("String2Write Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         
     }
@@ -473,35 +475,36 @@ extern "C" {
             BitI->FileType         = BitIOFile;
             uint64_t Path2OpenSize = UTF8_GetStringSizeInCodeUnits(Path2Open) + NULLTerminatorSize;
             UTF8    *WinPath8      = NULL;
-#if   (FoundationIOTargetOS == POSIXOS)
+#if   (FoundationIOTargetOS == POSIX)
             BitI->File             = fopen(Path2Open, U8("rb"));
-#elif (FoundationIOTargetOS == WindowsOS)
+#elif (FoundationIOTargetOS == Windows)
+            /* TODO: Windwos uses UTF-16, convert everything to that. */
             if (Path2Open[0] != 0xEF && Path2Open[1] != 0xBB && Path2Open[2] != 0xBF) {
-                if (Path2Open[0] != U'/' && Path2Open[1] != U'/' && Path2Open[2] != U'?' && Path2Open[3] != U'/') {
+                if (Path2Open[0] != U32('/') && Path2Open[1] != U32('/') && Path2Open[2] != U32('?') && Path2Open[3] != U32('/')) {
                     if (BitI->FileSpecifierExists == No) {
-                        WinPath8   = UTF8_FormatString("//?/%s", Path2Open);
+                        WinPath8   = UTF8_FormatString(U8("//?/%s"), Path2Open);
                     } else {
-                        WinPath8   = UTF8_FormatString("//?/%s%llu", Path2Open, BitI->FileSpecifierNum);
+                        WinPath8   = UTF8_FormatString(U8("//?/%s%llu"), Path2Open, BitI->FileSpecifierNum);
                     }
                 } else {
                     if (BitI->FileSpecifierExists == No) {
                         WinPath8   = Path2Open;
                     } else {
-                        WinPath8   = UTF8_FormatString("%s%llu", Path2Open, BitI->FileSpecifierNum);
+                        WinPath8   = UTF8_FormatString(U8("%s%llu"), Path2Open, BitI->FileSpecifierNum);
                     }
                 }
             } else {
-                if (Path2Open[3] != U'/' && Path2Open[4] != U'/' && Path2Open[5] != U'?' && Path2Open[6] != U'/') {
+                if (Path2Open[3] != U32('/') && Path2Open[4] != U32('/') && Path2Open[5] != U32('?') && Path2Open[6] != U32('/')) {
                     if (BitI->FileSpecifierExists == No) {
-                        WinPath8   = UTF8_FormatString("//?/%s", Path2Open);
+                        WinPath8   = UTF8_FormatString(U8("//?/%s"), Path2Open);
                     } else {
-                        WinPath8   = UTF8_FormatString("//?/%s%llu", Path2Open, BitI->FileSpecifierNum);
+                        WinPath8   = UTF8_FormatString(U8("//?/%s%llu"), Path2Open, BitI->FileSpecifierNum);
                     }
                 } else {
                     if (BitI->FileSpecifierExists == No) {
                         WinPath8   = Path2Open;
                     } else {
-                        WinPath8   = UTF8_FormatString("%s%llu", Path2Open, BitI->FileSpecifierNum);
+                        WinPath8   = UTF8_FormatString(U8("%s%llu"), Path2Open, BitI->FileSpecifierNum);
                     }
                 }
             }
@@ -520,7 +523,7 @@ extern "C" {
         } else if (BitI == NULL) {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         } else if (Path2Open == NULL) {
-            Log(Log_ERROR, __func__, U8("Path2Open Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
     }
     
@@ -662,35 +665,35 @@ extern "C" {
             BitO->FileType         = BitIOFile;
             uint64_t Path2OpenSize = UTF8_GetStringSizeInCodeUnits(Path2Open) + NULLTerminatorSize;
             UTF8    *WinPath8      = NULL;
-#if   (FoundationIOTargetOS == POSIXOS)
+#if   (FoundationIOTargetOS == POSIX)
             BitO->File             = fopen(Path2Open, U8("rb"));
-#elif (FoundationIOTargetOS == WindowsOS)
+#elif (FoundationIOTargetOS == Windows)
             if (Path2Open[0] != 0xEF && Path2Open[1] != 0xBB && Path2Open[2] != 0xBF) {
-                if (Path2Open[0] != U'/' && Path2Open[1] != U'/' && Path2Open[2] != U'?' && Path2Open[3] != U'/') {
+                if (Path2Open[0] != U32('/') && Path2Open[1] != U32('/') && Path2Open[2] != U32('?') && Path2Open[3] != U32('/')) {
                     if (BitO->FileSpecifierExists == No) {
-                        WinPath8   = UTF8_FormatString("//?/%s", Path2Open);
+                        WinPath8   = UTF8_FormatString(U8("//?/%s"), Path2Open);
                     } else {
-                        WinPath8   = UTF8_FormatString("//?/%s%llu", Path2Open, BitI->FileSpecifierNum);
+                        WinPath8   = UTF8_FormatString(U8("//?/%s%llu"), Path2Open, BitO->FileSpecifierNum);
                     }
                 } else {
                     if (BitO->FileSpecifierExists == No) {
                         WinPath8   = Path2Open;
                     } else {
-                        WinPath8   = UTF8_FormatString("%s%llu", Path2Open, BitI->FileSpecifierNum);
+                        WinPath8 = UTF8_FormatString(U8("%s%llu"), Path2Open, BitO->FileSpecifierNum);
                     }
                 }
             } else {
-                if (Path2Open[3] != U'/' && Path2Open[4] != U'/' && Path2Open[5] != U'?' && Path2Open[6] != U'/') {
+                if (Path2Open[3] != U32('/') && Path2Open[4] != U32('/') && Path2Open[5] != U32('?') && Path2Open[6] != U32('/')) {
                     if (BitO->FileSpecifierExists == No) {
-                        WinPath8   = UTF8_FormatString("//?/%s", Path2Open);
+                        WinPath8   = UTF8_FormatString(U8("//?/%s"), Path2Open);
                     } else {
-                        WinPath8   = UTF8_FormatString("//?/%s%llu", Path2Open, BitI->FileSpecifierNum);
+                        WinPath8   = UTF8_FormatString(U8("//?/%s%llu"), Path2Open, BitO->FileSpecifierNum);
                     }
                 } else {
                     if (BitO->FileSpecifierExists == No) {
                         WinPath8   = Path2Open;
                     } else {
-                        WinPath8   = UTF8_FormatString("%s%llu", Path2Open, BitI->FileSpecifierNum);
+                        WinPath8   = UTF8_FormatString(U8("%s%llu"), Path2Open, BitO->FileSpecifierNum);
                     }
                 }
             }
@@ -820,7 +823,7 @@ extern "C" {
                             if (BinaryByte != 4 && BinaryByte != 7 && BinaryByte != 10 && BinaryByte != 13) {
                                 ConvertedGUUID[StringByte]  = GUUID2Convert[BinaryByte];
                             } else {
-                                ConvertedGUUID[StringByte]  = '-';
+                                ConvertedGUUID[StringByte]  = U8('-');
                             }
                         }
                     }
@@ -829,7 +832,7 @@ extern "C" {
         } else if (ConvertedGUUID == NULL) {
             Log(Log_ERROR, __func__, U8("Insufficent memory to allocate ConvertedGUUID"));
         } else if (GUUID2Convert == NULL) {
-            Log(Log_ERROR, __func__, U8("GUUID2Convert Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("GUUID Pointer is NULL"));
         } else if (InputGUUIDType == UnknownGUUID) {
             Log(Log_ERROR, __func__, U8("InputGUUIDType is invalid"));
         } else if (OutputGUUIDType) {
@@ -867,7 +870,7 @@ extern "C" {
                         SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
                     }
                 } else {
-                    Log(Log_ERROR, __func__, U8("SwappedGUUID's Pointer is NULL"));
+                    Log(Log_ERROR, __func__, U8("SwappedGUUID Pointer is NULL"));
                 }
             } else if (GUUIDType == BinaryUUID || GUUIDType == BinaryGUID) {
                 SwappedGUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
@@ -889,11 +892,11 @@ extern "C" {
                         SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
                     }
                 } else {
-                    Log(Log_ERROR, __func__, U8("SwappedGUUID's Pointer is NULL"));
+                    Log(Log_ERROR, __func__, U8("SwappedGUUID Pointer is NULL"));
                 }
             }
         } else if (GUUID2Swap == NULL) {
-            Log(Log_ERROR, __func__, U8("GUUID2Swap's Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("GUUID2Swap Pointer is NULL"));
         } else if (GUUIDType == UnknownGUUID) {
             Log(Log_ERROR, __func__, U8("UnknownGUUID is an invalid GUUID type"));
         }
@@ -942,9 +945,9 @@ extern "C" {
                 WriteBits(ByteOrder, LSBitFirst, BitB, 8, GUUID2Write[Byte]);
             }
         } else if (BitB == NULL) {
-            Log(Log_ERROR, __func__, U8("BitBuffer's Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if (GUUID2Write == NULL) {
-            Log(Log_ERROR, __func__, U8("GUUID2Write's Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("GUUID2Write Pointer is NULL"));
         }
     }
     

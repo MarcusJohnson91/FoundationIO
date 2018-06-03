@@ -45,21 +45,21 @@ extern  "C" {
 #define             UnknownOS    0
 #endif           /* UnknownOS */
     
-#ifndef             POSIXOS
-#define             POSIXOS      1
-#endif           /* POSIXOS */
+#ifndef             POSIX
+#define             POSIX        1
+#endif           /* POSIX */
     
-#ifndef             WindowsOS
-#define             WindowsOS    2
-#endif           /* WindowsOS */
+#ifndef             Windows
+#define             Windows      2
+#endif           /* Windows */
     
-#ifndef             MacClassicOS
-#define             MacClassicOS 3
+#ifndef             MacClassic
+#define             MacClassic   3
 #endif           /* MacClassicOS */
     
 #if      defined(macintosh) || defined(Macintosh)
 #ifndef             FoundationIOTargetOS
-#define             FoundationIOTargetOS (MacClassicOS)
+#define             FoundationIOTargetOS (MacClassic)
 #endif
     
 #ifndef             NewLineWithNULLSize
@@ -72,7 +72,7 @@ extern  "C" {
 #elif    defined(_POSIX_C_SOURCE) || defined(__APPLE__) || defined(__MACH__) || defined(BSD) || defined(linux) || defined(__linux)
     
 #ifndef             FoundationIOTargetOS
-#define             FoundationIOTargetOS (POSIXOS)
+#define             FoundationIOTargetOS (POSIX)
 #endif
     
 #ifndef             NewLineWithNULLSize
@@ -118,7 +118,7 @@ extern  "C" {
 #elif    defined(_WIN32) || defined(__WIN32__) || defined(_WIN64) || defined(__WINDOWS__)
     
 #ifndef             FoundationIOTargetOS
-#define             FoundationIOTargetOS (WindowsOS)
+#define             FoundationIOTargetOS (Windows)
 #endif
     
 #ifndef             NewLineWithNULLSize

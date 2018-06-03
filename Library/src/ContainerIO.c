@@ -34,21 +34,22 @@ extern "C" {
         ContainerTypes ContainerType;
     } Container;
     
-    Container *Container_Init(const uint64_t NumPlanes, const uint64_t NumElements, ContainerTypes ContainerType) {
+    Container *Container_Init(const uint64_t NumPlanes, const uint64_t NumElementsPerPlane, ContainerTypes ContainerType) {
+        
         Container *NewContainer             = NULL;
-        if (NumPlanes > 0 && NumElements > 0) {
+        if (NumPlanes > 0 && NumElementsPerPlane > 0) {
             NewContainer                    = calloc(1, sizeof(Container));
             if (NewContainer != NULL) {
                 NewContainer->NumPlanes     = NumPlanes;
-                NewContainer->NumElements   = NumElements;
+                NewContainer->NumElements   = NumElementsPerPlane;
                 NewContainer->ContainerType = ContainerType;
             } else {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate a new vector"));
             }
         } else if (NumPlanes == 0) {
             Log(Log_ERROR, __func__, U8("NumPlanes %lld does not make sense"), NumPlanes);
-        } else if (NumElements == 0) {
-            Log(Log_ERROR, __func__, U8("NumElemenets %lld does not make sense"), NumElements);
+        } else if (NumElementsPerPlane == 0) {
+            Log(Log_ERROR, __func__, U8("NumElementsPerPlane %lld does not make sense"), NumElements);
         }
         return NewContainer;
     }
@@ -59,7 +60,7 @@ extern "C" {
         } else if (Container == NULL) {
             Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
         } else if (Array2Attach == NULL) {
-            Log(Log_ERROR, __func__, U8("Array2Attach Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("Array Pointer is NULL"));
         }
     }
     

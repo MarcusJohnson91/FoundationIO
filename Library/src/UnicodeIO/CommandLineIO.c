@@ -2,10 +2,10 @@
 #include "../include/Log.h"            /* Included for Log */
 
 
-#if   (FoundationIOTargetOS == POSIXOS)
+#if   (FoundationIOTargetOS == POSIX)
 #include <sys/ioctl.h>                 /* Included for the terminal size */
 #include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
-#elif (FoundationIOTargetOS == WindowsOS)
+#elif (FoundationIOTargetOS == Windows)
 #include <Windows.h>                   /* Included because WinCon needs it */
 #include <Wincon.h>                    /* Included for getting the terminal size */
 #endif
@@ -104,7 +104,7 @@ extern   "C" {
             } else {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CommandLineSwitches"), NumSwitches);
             }
-#if   (FoundationIOTargetOS == POSIXOS)
+#if   (FoundationIOTargetOS == POSIX)
             struct winsize       *WindowSize = NULL;
             if (WindowSize == NULL) {
                 WindowSize = (struct winsize *) calloc(1, sizeof(struct winsize));
@@ -113,7 +113,7 @@ extern   "C" {
             CLI->ConsoleWidth    = WindowSize->ws_row;
             CLI->ConsoleHeight   = WindowSize->ws_col;
             free(WindowSize);
-#elif (FoundationIOTargetOS == WindowsOS)
+#elif (FoundationIOTargetOS == Windows)
             CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
             GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
             CLI->ConsoleHeight   = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
@@ -347,9 +347,9 @@ extern   "C" {
             
             if (ArgumentStringSize >= 2) {
                 //Log(Log_DEBUG, __func__, U8("ArgumentString[0] = 0x%X, ArgumentString[1] = 0x%X"), ArgumentString[0], ArgumentString[1]);
-                if (ArgumentString[0] == '-' && ArgumentString[1] == '-') {
+                if (ArgumentString[0] == U8('-') && ArgumentString[1] == U8('-')) {
                     ArgumentStringPrefixSize  = 2;
-                } else if (ArgumentString[0] == '/' || ArgumentString[0] == '\\' || ArgumentString[0] == '-') {
+                } else if (ArgumentString[0] == U8('/') || ArgumentString[0] == U8('\\') || ArgumentString[0] == U8('-')) {
                     ArgumentStringPrefixSize    = 1;
                 }
             } else {
@@ -359,7 +359,7 @@ extern   "C" {
             ArgumentSwitch                 = calloc(ArgumentSwitchSize + NULLTerminatorSize, sizeof(UTF8));
             memcpy(ArgumentSwitch, &ArgumentString[ArgumentStringPrefixSize], ArgumentSwitchSize);
         } else {
-            Log(Log_ERROR, __func__, U8("OptionString Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         return ArgumentSwitch;
     }
@@ -551,7 +551,7 @@ extern   "C" {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate %lld bytes for the Extension String"), ExtensionSize);
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Path Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         return ExtensionString;
     }
@@ -588,7 +588,7 @@ extern   "C" {
                 uint8_t HalfOfTheIndicators = (PercentComplete / 2);
                 // Now we go ahead and memset a string with the proper number of indicators
                 UTF8 *Indicator             = calloc(CLI->ConsoleWidth, sizeof(UTF8));
-                memset(Indicator, '-', HalfOfTheIndicators);
+                memset(Indicator, U8('-'), HalfOfTheIndicators);
                 UTF8 *FormattedString       = UTF8_FormatString("[%s%s %lld/%lld %hhu/%s %s]", Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF8);
                 UTF8_WriteString2File(FormattedString, stdout);
                 free(Indicator);
