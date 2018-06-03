@@ -45,9 +45,9 @@ extern "C" {
      @param                     FunctionName                    "Which function is calling Log?".
      @param                     Description                     "String describing what went wrong".
      */
-#if     (FoundationIOTargetOS == POSIXOS)
+#if     (FoundationIOTargetOS == POSIX)
     void                 Log(LogTypes Severity, const UTF8 *FunctionName, const UTF8 *Description, ...) __attribute__((__format__(__printf__, 3, 4)));
-#elif   (FoundationIOTargetOS == WindowsOS)
+#elif   (FoundationIOTargetOS == Windows)
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     void                 Log(LogTypes Severity, const UTF8 *FunctionName, __format_string const UTF8 *Description, ...);
 #elif    (_MSC_VER >= 1500)

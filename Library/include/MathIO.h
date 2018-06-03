@@ -3,9 +3,9 @@
 #if   (defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L)
 #include      <tgmath.h>
 #elif (!defined __STDC_NO_COMPLEX__)
-#if   (FoundationIOTargetOS == WindowsOS)
+#if   (FoundationIOTargetOS == Windows)
 #include      <math.h>
-#elif (FoundationIOTargetOS == POSIXOS)
+#elif (FoundationIOTargetOS == POSIX)
 #include_next <math.h>
 #endif  /* FoundationIOTargetOS */
 #include      <complex.h>

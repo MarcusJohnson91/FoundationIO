@@ -15,9 +15,9 @@ extern "C" {
     
     void Log_OpenFile(UTF8 *restrict LogFilePath) {
         if (LogFilePath != NULL) {
-#if   (FoundationIOTargetOS == POSIXOS)
+#if   (FoundationIOTargetOS == POSIX)
             Log_LogFile   = fopen(LogFilePath, U8("a+"));
-#elif (FoundationIOTargetOS == WindowsOS)
+#elif (FoundationIOTargetOS == Windows)
             UTF32 *Path32 = UTF8_Decode(LogFilePath);
             UTF16 *Path16 = UTF16_Encode(Path32, UseLEByteOrder);
             free(Path32);

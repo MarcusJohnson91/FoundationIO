@@ -1,9 +1,9 @@
 #include "StringIO.h"                 /* Included for UTF8, UTF16, FoundationIOTargetOS in Macros */
 
-#if   (FoundationIOTargetOS == POSIXOS)
+#if   (FoundationIOTargetOS == POSIX)
 #include <sys/socket.h>               /* Included for connect, socket, sockaddr */
 #include <unistd.h>                   /* Included for read and shit */
-#elif (FoundationIOTargetOS == WindowsOS)
+#elif (FoundationIOTargetOS == Windows)
 #include <io.h>                       /* Included because WinSock needs it */
 #include <winsock.h>                  /* Included for the socket support on Windows */
 #endif
