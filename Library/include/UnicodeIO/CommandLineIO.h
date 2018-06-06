@@ -17,9 +17,6 @@ extern   "C" {
      @brief                     This header contains code for parsing command line options.
      */
     
-    static const UTF8  UTF8_ParseCommandLineOptions_Delimiters[2][3]  = {u8"-", u8"--"};
-    static const UTF16 UTF16_ParseCommandLineOptions_Delimiters[2][3] = {u"-", u"--"};
-    
     /*!
      @enum                      CLISwitchTypes
      @abstract                                                  "Defines the type of switch".

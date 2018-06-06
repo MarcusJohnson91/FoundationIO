@@ -8,27 +8,43 @@
 #ifdef   __cplusplus
 extern   "C" {
 #endif
-
-/*!
- @header    ContainerIO.h
- @author    Marcus Johnson aka BumbleBritches57
- @copyright 2018+
- @version   1.0.0
- @brief     This header contains code for containers (type generic arrays)
- */
     
+    /*!
+     @header    ContainerIO.h
+     @author    Marcus Johnson aka BumbleBritches57
+     @copyright 2018+
+     @version   1.0.0
+     @brief     This header contains code for containers (type generic arrays)
+     */
+    
+    /*!
+     @enum                      ContainerTypes
+     @constant                  UInteger8Array                  "Array of Unsigned Integers,  8 bits".
+     @constant                  UInteger16Array                 "Array of Unsigned Integers, 16 bits".
+     @constant                  UInteger32Array                 "Array of Unsigned Integers, 32 bits".
+     @constant                  UInteger64Array                 "Array of Unsigned Integers, 64 bits".
+     @constant                  SInteger8Array                  "Array of Signed Integers,    8 bits".
+     @constant                  SInteger16Array                 "Array of Signed Integers,   16 bits".
+     @constant                  SInteger32Array                 "Array of Signed Integers,   32 bits".
+     @constant                  SInteger64Array                 "Array of Signed Integers,   64 bits".
+     @constant                  Decimal16Array                  "Array of Floating Point,    16 bits".
+     @constant                  Decimal32Array                  "Array of Floating Point,    32 bits".
+     @constant                  Decimal64Array                  "Array of Floating Point,    64 bits".
+     @constant                  Decimal128Array                 "Array of Floating Point,   128 bits".
+     */
     typedef enum ContainerTypes {
-                UInteger8Array   = 264,
-                UInteger16Array  = 272,
-                UInteger32Array  = 288,
-                UInteger64Array  = 320,
-                SInteger8Array   = 520,
-                SInteger16Array  = 528,
-                SInteger32Array  = 544,
-                SInteger64Array  = 576,
-                Decimal16Array   = 1040,
-                Decimal32Array   = 1056,
-                Decimal64Array   = 1088,
+                                UInteger8Array                  = 264,
+                                UInteger16Array                 = 272,
+                                UInteger32Array                 = 288,
+                                UInteger64Array                 = 320,
+                                SInteger8Array                  = 520,
+                                SInteger16Array                 = 528,
+                                SInteger32Array                 = 544,
+                                SInteger64Array                 = 576,
+                                Decimal16Array                  = 1040,
+                                Decimal32Array                  = 1056,
+                                Decimal64Array                  = 1088,
+                                Decimal128Array                 = 1152,
     } ContainerTypes;
     
     typedef struct Container Container;

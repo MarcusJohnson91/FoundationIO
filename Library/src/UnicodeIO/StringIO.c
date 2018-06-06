@@ -187,6 +187,32 @@ extern  "C" {
         return NumGraphemes;
     }
     
+    bool  UTF8_StringIsValid(UTF8 *String) {
+        uint64_t CodeUnit    = 0ULL;
+        bool     IsValidUTF8 = No;
+        if (String != NULL) {
+            do {
+                uint8_t CodePointSize = (String[CodeUnit] & 0xF0) >> 4;
+                /*
+                if (String[CodeUnit] & 0x80 >> 7 == 1) {
+                    
+                }
+                 */
+                CodeUnit += 1;
+            } while (String[CodeUnit] != NULLTerminator);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return IsValidUTF8;
+    }
+    
+    bool UTF16_StringIsValid(UTF16 *String) {
+        if (String != NULL) {
+            
+        }
+        return No;
+    }
+    
     UTF8 *UTF8_AddBOM(UTF8 *String) {
         UTF8 *StringWithBOM                         = NULL;
         if (String != NULL) {
@@ -311,7 +337,7 @@ extern  "C" {
         if (String != NULL) {
             uint64_t NumCodePoints                   = UTF8_GetStringSizeInCodePoints(String) + NULLTerminatorSize;
             if (String[0] == 0xEF && String[1] == 0xBB && String[2] == 0xBF) { // We need to remove the BOM, and subtract it's size from the Num codepoints
-                NumCodePoints                       -= UTF8BOMSizeInCodePoints;
+                NumCodePoints                       -= UnicodeBOMSizeInCodePoints;
                 CodeUnitNum                         += UTF8BOMSizeInCodeUnits;
             }
             DecodedString                            = calloc(NumCodePoints, sizeof(UTF32));
@@ -349,7 +375,7 @@ extern  "C" {
                     if (CodePointSizeInCodeUnits > 1 && DecodedString[CodePoint] <= 0x7F) {
                         Log(Log_ERROR, __func__, U8("CodePoint %llu, U+%X is overlong"), CodePoint, DecodedString[CodePoint]);
                     } else if (DecodedString[CodePoint] >= UTF16HighSurrogateStart && DecodedString[CodePoint] <= UTF16LowSurrogateEnd) {
-                        DecodedString[CodePoint]     = InvalidCodePointReplacementCharacter;
+                        DecodedString[CodePoint]     = InvalidReplacementCodePoint;
                         Log(Log_ERROR, __func__, U8("Codepoint %d is invalid, because it overlaps the Surrogate Pair Block, it was replaced with U+FFFD"), DecodedString[CodePoint]);
                     }
                 } while (String[CodeUnitNum] != NULLTerminator);
@@ -444,7 +470,7 @@ extern  "C" {
                         EncodedString[CodeUnitNum + 3] = (0x80 &  (String[CodePoint] & 0x00003F));
                         CodeUnitNum                   += 4;
                     } else if (String[CodePoint] >= UTF16HighSurrogateStart && String[CodePoint] <= UTF16LowSurrogateEnd && String[CodePoint] != UTF32LE && String[CodePoint] != UTF32BE) {
-                        String[CodePoint]              = InvalidCodePointReplacementCharacter;
+                        String[CodePoint]              = InvalidReplacementCodePoint;
                         Log(Log_ERROR, __func__, U8("Codepoint %d is invalid, overlaps Surrogate Pair Block, replacing with U+FFFD"), String[CodePoint]);
                     }
                 } while (String[CodePoint] != NULLTerminator);
@@ -1322,13 +1348,92 @@ extern  "C" {
         return NULL;
     }
     
+    static uint64_t *UTF32_CountVariadicArguments(UTF32 *String) {
+        uint64_t CodePoint  = 0ULL;
+        uint64_t NumVarArgs = 0ULL;
+        if (String != NULL) {
+            do {
+                if (String[CodePoint] == U32('%') || String[CodePoint] == U32('\\')) {
+                    NumVarArgs += 1;
+                }
+                CodePoint += 1;
+            } while (String[CodePoint] != NULLTerminator);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return NumVarArgs;
+    }
+    
+    typedef enum StringTypes {
+        UnknownFormat = 0,
+        UTF8Format    = 1,
+        UTF16Format   = 2,
+    } StringTypes;
+    
+    typedef struct FormatSpecifier {
+        uint64_t Offset;
+        uint64_t Size;
+        
+        UTF32   *StringifiedArgument;
+    } FormatSpecifier;
+    
+    typedef struct FormatString {
+        StringTypes      StringType;
+        uint64_t         NumSpecifiers;
+        FormatSpecifier *Specifiers;
+    } FormatString;
+    
+    FormatString *FormatString_Init(uint64_t NumSpecifiers) {
+        FormatString *NewFormatString          = calloc(1, sizeof(FormatString));
+        if (NewFormatString != NULL) {
+            NewFormatString->Specifiers        = calloc(NumSpecifiers, sizeof(FormatSpecifier));
+            if (NewFormatString->Specifiers != NULL) {
+                NewFormatString->NumSpecifiers = NumSpecifiers;
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld Specifiers"), NumSpecifiers);
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("Couldn't allocate FormatString"));
+        }
+        return NewFormatString;
+    }
+    
+    static void UTF32_ParseFormatSpecifiers(UTF32 *Format, FormatString *Details, va_list VariadicArguments) {
+        uint64_t CurrentSpecifier = 0ULL;
+        uint64_t CodePoint        = 0ULL;
+        if (Format != NULL && Details != NULL) {
+            /*
+             Ok, so we loop over Format looking for Percent or backslash symbols, and for each one we parse it.
+             */
+            do {
+                if (Format[CodePoint] == U32('%') || Format[CodePoint] == U32('\\')) {
+                    Details->Specifiers[CurrentSpecifier].Offset = CodePoint;
+                    
+                    
+                    CurrentSpecifier += 1;
+                }
+                CodePoint += 1;
+            } while (Format[CodePoint] != NULLTerminator);
+        } else if (Format == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (Details == NULL) {
+            Log(Log_ERROR, __func__, U8("FormatString is NULL"));
+        }
+    }
+    
     UTF8 *UTF8_FormatString(UTF8 *Format, ...) {
         UTF8 *Format8 = NULL;
         if (Format != NULL) {
-            UTF32 *Format32           = UTF8_Decode(Format);
+            UTF32 *Format32              = UTF8_Decode(Format);
+            // Count the number of specifiers with a UTF32_* only function, then use that to initalize the formt string.
+            uint64_t NumVarArgs          = UTF32_CountVariadicArguments(Format32);
+            FormatString *VariadicString = FormatString_Init(NumVarArgs);
+            VariadicString->StringType   = UTF8Format;
+            UTF32_ParseFormatSpecifiers
+            
             va_list VariadicArguments;
             va_start(VariadicArguments, Format);
-            UTF32 *FormattedString    = UTF32_FormatString(Format32, VariadicArguments);
+            //UTF32 *FormattedString    = UTF32_FormatString(Format32, VariadicArguments);
             va_end(VariadicArguments);
             Format8                   = UTF8_Encode(FormattedString, No);
             free(Format32);
@@ -1356,382 +1461,385 @@ extern  "C" {
         return Format16;
     }
     
-    UTF32 *UTF32_FormatString(UTF32 *Format, va_list VariadicArguments) {
-        typedef enum FormatSpecifierFlags {
-            NoFormatFlag                   = 0,
-            LeftAlignFormatFlag            = 1,
-            PrependSignFormatFlag          = 2,
-            AlignSignsFormatFlag           = 3, // Prepend a space in front of positive ints, a minus for negative
-            PrependZerosFormatFlag         = 4,
-            DecimalPointFormatFlag         = 5, // Don't remove trailing zeros, or add a decimal point or prepend with non-zeros
-        } FormatSpecifierFlags;
-        
-        typedef enum FormatSpecifierMinWidths { // Width field
-            MinWidthIsNextArgument         = -1,
-            NoMinWidth                     = 0,
-            Width1                         = 1,
-            Width2                         = 2,
-            Width3                         = 3,
-            Width4                         = 4,
-            Width5                         = 5,
-            Width6                         = 6,
-            Width7                         = 7,
-            Width8                         = 8,
-            Width9                         = 9,
-        } FormatSpecifierMinWidths;
-        
-        typedef enum FormatSpecifierPrecision { // Precision field
-            MaxPrecisionIsNextArgument     = -1,
-            NoPrecisionFlag                = 0,
-            Precision1                     = 1,
-            Precision2                     = 2,
-            Precision3                     = 3,
-            Precision4                     = 4,
-            Precision5                     = 5,
-            Precision6                     = 6,
-            Precision7                     = 7,
-            Precision8                     = 8,
-            Precision9                     = 9,
-        } FormatSpecifierPrecision;
-        
-        typedef enum FormatSpecifierLength { // Length field
-            NoLengthFlag                   = 0,
-            CharPromoted2Int               = 1,
-            ShortPromoted2Int              = 2,
-            LongLengthSpecifier            = 3,
-            LongLongLengthSpecifier        = 4,
-            LongDoubleSpecifier            = 5,
-            Size_TSpecifiier               = 6,
-            IntMaxSpecifier                = 7,
-            PtrDiffSpecifier               = 8,
-        } FormatSpecifierLength;
-        
-        typedef enum FormatSpecifierTypes { // U = uppercase, L = lowercase
-            UnknownSpecifierType           = 0,
-            FormatCodePoint8               = 1,
-            FormatCodePoint16              = 2,
-            FormatCodePoint32              = 3,
-            FormatCodePointHex4            = 4,
-            FormatCodePointHex8            = 5,
-            FormatCodePointHexVariable     = 6,
-            FormatStringUTF8               = 7,
-            FormatStringUTF16              = 8,
-            FormatAlarmBell                = 9,
-            FormatNULLTerminatingChar      = 10,
-            FormatBackspace                = 11,
-            FormatFormFeed                 = 12,
-            FormatNewLine                  = 13,
-            FormatCarriageReturn           = 14,
-            FormatTab                      = 15,
-            FormatVerticalTab              = 16,
-            FormatApostrophe               = 17,
-            FormatQuote                    = 18,
-            FormatBackslash                = 19,
-            FormatPointer                  = 20,
-            FormatBase2Integer             = 21,
-            FormatUnsignedBase8Integer     = 22,
-            FormatSignedBase10Integer      = 23,
-            FormatUnsignedBase16IntegerU   = 24,
-            FormatUnsignedBase16IntegerL   = 25,
-            FormatUnsignedBase10Integer    = 26,
-            FormatBase10DecimalU           = 27,
-            FormatBase10DecimalL           = 28,
-            FormatScientificDecimalU       = 29,
-            FormatScientificDecimalL       = 30,
-            FormatShortestDecimalU         = 31,
-            FormatShortestDecimalL         = 32,
-            FormatBase16DecimalU           = 34,
-            FormatBase16DecimalL           = 35,
-        } FormatSpecifierTypes;
-        
-        uint64_t NumSpecifiers             = 0ULL;
-        uint64_t CurrentSpecifier          = 0ULL;
-        uint64_t FormatStringSize          = 0ULL;
-        
-        if (Format != NULL) {
-            FormatStringSize                                 = UTF32_GetStringSizeInCodePoints(Format);
-            
-            for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) {
-                if ((Format[CodePoint] == U'%' && Format[CodePoint + 1] != U'%') || (Format[CodePoint] == U'\\' && Format[CodePoint + 1] != U'\\')) {
-                    NumSpecifiers                           += 1;
-                }
-            }
-            uint64_t                 *SpecifierOffset        = calloc(NumSpecifiers, sizeof(uint64_t));
-            uint64_t                 *SpecifierSize          = calloc(NumSpecifiers, sizeof(uint64_t));
-            uint64_t                 *SpecifierParameter     = calloc(NumSpecifiers, sizeof(uint64_t));
-            FormatSpecifierFlags     *SpecifierFlags         = calloc(NumSpecifiers, sizeof(FormatSpecifierFlags));
-            FormatSpecifierMinWidths *SpecifierWidth         = calloc(NumSpecifiers, sizeof(FormatSpecifierMinWidths));
-            FormatSpecifierPrecision *SpecifierPrecision     = calloc(NumSpecifiers, sizeof(FormatSpecifierPrecision));
-            FormatSpecifierLength    *SpecifierLength        = calloc(NumSpecifiers, sizeof(FormatSpecifierLength));
-            FormatSpecifierTypes     *SpecifierType          = calloc(NumSpecifiers, sizeof(FormatSpecifierTypes));
-            
-            UTF32 TypeSpecifiers[21] = {U'a', U'A', U'b', U'c', U'C', U'd', U'e', U'E', U'f', U'F', U'g', U'G', U'i', U'o', U'p', U's', U'S', U'u', U'x', U'X', U'%'};
-            
-            // Ok, so we know how many specifiers there are, now we need to know their offsets and sizes.
-            // So, that means we need to loop again.
-            
-            for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) {
-                for (uint64_t Specifier = 0ULL; Specifier < NumSpecifiers; Specifier++) {
-                    if ((Format[CodePoint] == U'%' && Format[CodePoint + 1] != U'%') || (Format[CodePoint] == U'\\' && Format[CodePoint + 1] != U'\\')) {
-                        // Found the start of a format specifier, so set the SpecifierOffset
-                        SpecifierOffset[Specifier]       = CodePoint;
-                    }
-                    for (uint64_t Type = 0ULL; Type < 21; Type++) {
-                        if (Format[CodePoint + 1] == TypeSpecifiers[Type]) {
-                            SpecifierSize[Specifier]         = CodePoint - SpecifierSize[Specifier];
-                        }
-                    }
-                }
-            }
-            
-            // 3rd loop, the logic needs to be while we're greater than or equal to SpecifierOffset but less than or equal to SpecifierSize, look for flags
-            for (uint64_t CodePoint = 1ULL; CodePoint < FormatStringSize; CodePoint++) {
-                for (uint64_t Specifier = 0ULL; Specifier < NumSpecifiers; Specifier++) {
-                    while (CodePoint >= SpecifierOffset[Specifier] && CodePoint <= SpecifierOffset[Specifier] + SpecifierSize[Specifier]) {
-                        // we're inside of a specifier, start reading this specifiers type, and with that info start creatng strings
-                        if (SpecifierSize[Specifier] == 1) {
-                            // we only have a type code
-                        } else {
-                            if (Format[CodePoint - 1] == U'-') { // Check for Flags
-                                SpecifierFlags[Specifier] = LeftAlignFormatFlag;
-                            } else if (Format[CodePoint - 1] == U'+') {
-                                SpecifierFlags[Specifier] = PrependSignFormatFlag;
-                            } else if (Format[CodePoint - 1] == U'\x20') {
-                                SpecifierFlags[Specifier] = AlignSignsFormatFlag;
-                            } else if (Format[CodePoint - 1] == U'0') {
-                                SpecifierFlags[Specifier] = PrependZerosFormatFlag;
-                            } else if (Format[CodePoint - 1] == U'#') {
-                                SpecifierFlags[Specifier] = DecimalPointFormatFlag;
-                            }
-                            
-                            if (Format[CodePoint - 1] == U'1') { // Width
-                                SpecifierWidth[Specifier] = 1;
-                            } else if (Format[CodePoint - 1] == U'2') {
-                                SpecifierWidth[Specifier] = 2;
-                            } else if (Format[CodePoint - 1] == U'3') {
-                                SpecifierWidth[Specifier] = 3;
-                            } else if (Format[CodePoint - 1] == U'4') {
-                                SpecifierWidth[Specifier] = 4;
-                            } else if (Format[CodePoint - 1] == U'5') {
-                                SpecifierWidth[Specifier] = 5;
-                            } else if (Format[CodePoint - 1] == U'6') {
-                                SpecifierWidth[Specifier] = 6;
-                            } else if (Format[CodePoint - 1] == U'7') {
-                                SpecifierWidth[Specifier] = 7;
-                            } else if (Format[CodePoint - 1] == U'8') {
-                                SpecifierWidth[Specifier] = 8;
-                            } else if (Format[CodePoint - 1] == U'9') {
-                                SpecifierWidth[Specifier] = 9;
-                            } else if (Format[CodePoint - 1] == U'*') {
-                                SpecifierWidth[Specifier] = MinWidthIsNextArgument;
-                            }
-                            
-                            if (Format[CodePoint - 1] == U'.') { // Precision
-                                if (Format[CodePoint] == U'1') {
-                                    SpecifierPrecision[Specifier] = 1;
-                                } else if (Format[CodePoint] == U'2') {
-                                    SpecifierPrecision[Specifier] = 2;
-                                } else if (Format[CodePoint] == U'3') {
-                                    SpecifierPrecision[Specifier] = 3;
-                                } else if (Format[CodePoint] == U'4') {
-                                    SpecifierPrecision[Specifier] = 4;
-                                } else if (Format[CodePoint] == U'5') {
-                                    SpecifierPrecision[Specifier] = 5;
-                                } else if (Format[CodePoint] == U'6') {
-                                    SpecifierPrecision[Specifier] = 6;
-                                } else if (Format[CodePoint] == U'7') {
-                                    SpecifierPrecision[Specifier] = 7;
-                                } else if (Format[CodePoint] == U'8') {
-                                    SpecifierPrecision[Specifier] = 8;
-                                } else if (Format[CodePoint] == U'9') {
-                                    SpecifierPrecision[Specifier] = 9;
-                                } else if (Format[CodePoint] == U'*') {
-                                    SpecifierPrecision[Specifier] = MaxPrecisionIsNextArgument;
-                                }
-                            }
-                            
-                            if (Format[CodePoint - 1] == U'h' && Format[CodePoint] == U'h') { // Length specifiers
-                                SpecifierLength[Specifier] = CharPromoted2Int;
-                            } else if (Format[CodePoint - 1] == U'l' && Format[CodePoint] == U'l') {
-                                SpecifierLength[Specifier] = LongLongLengthSpecifier;
-                            } else if (Format[CodePoint - 1] == U'h') {
-                                SpecifierLength[Specifier] = ShortPromoted2Int;
-                            } else if (Format[CodePoint - 1] == U'l') {
-                                SpecifierLength[Specifier] = LongLengthSpecifier;
-                            } else if (Format[CodePoint - 1] == U'L') {
-                                SpecifierLength[Specifier] = LongDoubleSpecifier;
-                            } else if (Format[CodePoint - 1] == U'z') {
-                                SpecifierLength[Specifier] = Size_TSpecifiier;
-                            } else if (Format[CodePoint - 1] == U'j') {
-                                SpecifierLength[Specifier] = IntMaxSpecifier;
-                            } else if (Format[CodePoint - 1] == U't') {
-                                SpecifierLength[Specifier] = PtrDiffSpecifier;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            
-            for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) { // We know how many specifiers there are, now we need to figure out each ones properties.
-                if (Format[CodePoint] == '%') {
-                    // Ok so now we check for all of the various specifiers, flags, widhts, precisions, lengths, and types.
-                    
-                    switch (Format[CodePoint + 1]) { // Flags, + 1 needs to be replaced by a second loop
-                        case U'-':
-                            // Left align
-                            break;
-                        case U'+':
-                            // Prepend a sign symbol (+ or -) to a number
-                            break;
-                        case U' ':
-                            // Prepend a space for positive numbers or a - for negative ones
-                            break;
-                        case U'0':
-                            // When the width field exists, prepend 0's for numeric types, the default is to prepend spaces
-                            break;
-                            
-                        case U'#':
-                            // for g and G types, trailing 0's aren't removed, for f F e E g G types, the output always contains a decimal; for o, x X types o,ox, oX is prepended to non-zero numbers.
-                            break;
-                    }
-                    
-                    switch (Format[CodePoint + 1]) { // Width, + 1 needs to be replaced by a second loop
-                        case U'*': // Get the value from the field
-                            
-                            break;
-                            
-                        default:
-                            break;
-                    }
-                    
-                    /*
-                     So, we've found a percent symbol, lets start checking the next symbol against all the shit.
-                     */
-                    
-                    /*
-                     Control logic:
-                     
-                     Loop until we find a codepoint matching a type, which has to be last.
-                     
-                     
-                     */
-                    
-                    for (uint64_t Specifier = 1ULL; Specifier < FormatStringSize - CodePoint; Specifier++) {
-                        for (uint8_t Type = 0; Type < 21; Type++) {
-                            if (Format[CodePoint + Specifier] == TypeSpecifiers[Type]) {
-                                SpecifierSize[CurrentSpecifier] = Specifier;
-                            }
-                        }
-                    }
-                    
-                    switch (Format[CodePoint + 1]) { // Types
-                        case U'a':
-                            break;
-                        case U'A':
-                            break;
-                        case U'b': // Binary, extension
-                            break;
-                        case U'c':
-                            break;
-                        case U'C': // Windows extension for "wide" characters
-                            break;
-                        case U'd':
-                            break;
-                        case U'e':
-                            break;
-                        case U'E':
-                            break;
-                        case U'f':
-                            break;
-                        case U'F':
-                            break;
-                        case U'g':
-                            break;
-                        case U'G':
-                            break;
-                        case U'i':
-                            break;
-                        case U'o':
-                            break;
-                        case U'p':
-                            break;
-                        case U's':
-                            break;
-                        case U'S': // Windows extension for "wide" strings
-                            break;
-                        case U'u':
-                            break;
-                        case U'x':
-                            break;
-                        case U'X':
-                            break;
-                        case U'%':
-                            break;
-                    }
-                } else if (Format[CodePoint] == '\\') {
-                    // This is a lot easier, just look for the previously listed ones, and set the offsets and shit.
-                    SpecifierOffset[CurrentSpecifier] = CodePoint;
-                    SpecifierSize[CurrentSpecifier]   = 2; // 1 for the / and another for whatever character this matches
-                    switch (Format[CodePoint + 1]) {
-                        case U'0':  // NULL terminator
-                            SpecifierType[CurrentSpecifier] = FormatNULLTerminatingChar;
-                            break;
-                        case U'a':  // Alarm aka beep
-                            SpecifierType[CurrentSpecifier] = FormatAlarmBell;
-                            break;
-                        case U'b':  // Backspace
-                            SpecifierType[CurrentSpecifier] = FormatBackspace;
-                            break;
-                        case U'f':  // Form feed
-                            SpecifierType[CurrentSpecifier] = FormatFormFeed;
-                            break;
-                        case U'n':  // Newline
-                            SpecifierType[CurrentSpecifier] = FormatNewLine;
-                            break;
-                        case U'r':  // Carriage return
-                            SpecifierType[CurrentSpecifier] = FormatCarriageReturn;
-                            break;
-                        case U't':  // Horizontal tab
-                            SpecifierType[CurrentSpecifier] = FormatTab;
-                            break;
-                        case U'u':  // Unicode 4 digit codepoint
-                            SpecifierType[CurrentSpecifier] = FormatCodePointHex4;
-                            break;
-                        case U'U':  // Unicode 8 digit codepoint
-                            SpecifierType[CurrentSpecifier] = FormatCodePointHex8;
-                            break;
-                        case U'v':  // Vertical tab
-                            SpecifierType[CurrentSpecifier] = FormatVerticalTab;
-                            break;
-                        case U'x':  // Hex specifier
-                            SpecifierType[CurrentSpecifier] = FormatCodePointHexVariable;
-                            break;
-                        case U'\'': // Apostrophe
-                            SpecifierType[CurrentSpecifier] = FormatApostrophe;
-                            break;
-                        case U'"':  // Quote
-                            SpecifierType[CurrentSpecifier] = FormatQuote;
-                            break;
-                        case U'\\': // Backslash
-                            SpecifierType[CurrentSpecifier] = FormatBackslash;
-                            break;
-                    }
-                }
-                free(SpecifierOffset);
-                free(SpecifierSize);
-                free(SpecifierParameter);
-                free(SpecifierFlags);
-                free(SpecifierWidth);
-                free(SpecifierPrecision);
-                free(SpecifierLength);
-                free(SpecifierType);
-            }
-        } else {
-            Log(Log_ERROR, __func__, U8("Format Pointer is NULL"));
-        }
-        return NULL;
-    }
+    
+    
+    
+    
+    
+    /*
+     UTF32 *UTF32_FormatString(UTF32 *Format, va_list VariadicArguments) {
+     typedef enum FormatSpecifierFlags {
+     NoFormatFlag                   = 0,
+     LeftAlignFormatFlag            = 1,
+     PrependSignFormatFlag          = 2,
+     AlignSignsFormatFlag           = 3, // Prepend a space in front of positive ints, a minus for negative
+     PrependZerosFormatFlag         = 4,
+     DecimalPointFormatFlag         = 5, // Don't remove trailing zeros, or add a decimal point or prepend with non-zeros
+     } FormatSpecifierFlags;
+     
+     typedef enum FormatSpecifierMinWidths { // Width field
+     MinWidthIsNextArgument         = -1,
+     NoMinWidth                     = 0,
+     Width1                         = 1,
+     Width2                         = 2,
+     Width3                         = 3,
+     Width4                         = 4,
+     Width5                         = 5,
+     Width6                         = 6,
+     Width7                         = 7,
+     Width8                         = 8,
+     Width9                         = 9,
+     } FormatSpecifierMinWidths;
+     
+     typedef enum FormatSpecifierPrecision { // Precision field
+     MaxPrecisionIsNextArgument     = -1,
+     NoPrecisionFlag                = 0,
+     Precision1                     = 1,
+     Precision2                     = 2,
+     Precision3                     = 3,
+     Precision4                     = 4,
+     Precision5                     = 5,
+     Precision6                     = 6,
+     Precision7                     = 7,
+     Precision8                     = 8,
+     Precision9                     = 9,
+     } FormatSpecifierPrecision;
+     
+     typedef enum FormatSpecifierLength { // Length field
+     NoLengthFlag                   = 0,
+     CharPromoted2Int               = 1,
+     ShortPromoted2Int              = 2,
+     LongLengthSpecifier            = 3,
+     LongLongLengthSpecifier        = 4,
+     LongDoubleSpecifier            = 5,
+     Size_TSpecifiier               = 6,
+     IntMaxSpecifier                = 7,
+     PtrDiffSpecifier               = 8,
+     } FormatSpecifierLength;
+     
+     typedef enum FormatSpecifierTypes { // U = uppercase, L = lowercase
+     UnknownSpecifierType           = 0,
+     FormatCodePoint8               = 1,
+     FormatCodePoint16              = 2,
+     FormatCodePoint32              = 3,
+     FormatCodePointHex4            = 4,
+     FormatCodePointHex8            = 5,
+     FormatCodePointHexVariable     = 6,
+     FormatStringUTF8               = 7,
+     FormatStringUTF16              = 8,
+     FormatAlarmBell                = 9,
+     FormatNULLTerminatingChar      = 10,
+     FormatBackspace                = 11,
+     FormatFormFeed                 = 12,
+     FormatNewLine                  = 13,
+     FormatCarriageReturn           = 14,
+     FormatTab                      = 15,
+     FormatVerticalTab              = 16,
+     FormatApostrophe               = 17,
+     FormatQuote                    = 18,
+     FormatBackslash                = 19,
+     FormatPointer                  = 20,
+     FormatBase2Integer             = 21,
+     FormatUnsignedBase8Integer     = 22,
+     FormatSignedBase10Integer      = 23,
+     FormatUnsignedBase16IntegerU   = 24,
+     FormatUnsignedBase16IntegerL   = 25,
+     FormatUnsignedBase10Integer    = 26,
+     FormatBase10DecimalU           = 27,
+     FormatBase10DecimalL           = 28,
+     FormatScientificDecimalU       = 29,
+     FormatScientificDecimalL       = 30,
+     FormatShortestDecimalU         = 31,
+     FormatShortestDecimalL         = 32,
+     FormatBase16DecimalU           = 34,
+     FormatBase16DecimalL           = 35,
+     } FormatSpecifierTypes;
+     
+     uint64_t NumSpecifiers             = 0ULL;
+     uint64_t CurrentSpecifier          = 0ULL;
+     uint64_t FormatStringSize          = 0ULL;
+     
+     if (Format != NULL) {
+     FormatStringSize                                 = UTF32_GetStringSizeInCodePoints(Format);
+     
+     for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) {
+     if ((Format[CodePoint] == U32('%') && Format[CodePoint + 1] != U32('%')) || (Format[CodePoint] == U32('\\') && Format[CodePoint + 1] != U32('\\'))) {
+     NumSpecifiers                           += 1;
+     }
+     }
+     uint64_t                 *SpecifierOffset        = calloc(NumSpecifiers, sizeof(uint64_t));
+     uint64_t                 *SpecifierSize          = calloc(NumSpecifiers, sizeof(uint64_t));
+     uint64_t                 *SpecifierParameter     = calloc(NumSpecifiers, sizeof(uint64_t));
+     FormatSpecifierFlags     *SpecifierFlags         = calloc(NumSpecifiers, sizeof(FormatSpecifierFlags));
+     FormatSpecifierMinWidths *SpecifierWidth         = calloc(NumSpecifiers, sizeof(FormatSpecifierMinWidths));
+     FormatSpecifierPrecision *SpecifierPrecision     = calloc(NumSpecifiers, sizeof(FormatSpecifierPrecision));
+     FormatSpecifierLength    *SpecifierLength        = calloc(NumSpecifiers, sizeof(FormatSpecifierLength));
+     FormatSpecifierTypes     *SpecifierType          = calloc(NumSpecifiers, sizeof(FormatSpecifierTypes));
+     
+     UTF32 TypeSpecifiers[21] = {U32('a'), U32('A'), U32('b'), U32('c'), U32('C'), U32('d'), U32('e'), U32('E'), U32('f'), U32('F'), U32('g'), U32('G'), U32('i'), U32('o'), U32('p'), U32('s'), U32('S'), U32('u'), U32('x'), U32('X'), U32('%')};
+     
+     // Ok, so we know how many specifiers there are, now we need to know their offsets and sizes.
+     // So, that means we need to loop again.
+     
+     for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) {
+     for (uint64_t Specifier = 0ULL; Specifier < NumSpecifiers; Specifier++) {
+     if ((Format[CodePoint] == U32('%') && Format[CodePoint + 1] != U32('%')) || (Format[CodePoint] == U32('\\') && Format[CodePoint + 1] != U32('\\'))) {
+     // Found the start of a format specifier, so set the SpecifierOffset
+     SpecifierOffset[Specifier]       = CodePoint;
+     }
+     for (uint64_t Type = 0ULL; Type < 21; Type++) {
+     if (Format[CodePoint + 1] == TypeSpecifiers[Type]) {
+     SpecifierSize[Specifier]         = CodePoint - SpecifierSize[Specifier];
+     }
+     }
+     }
+     }
+     
+     // 3rd loop, the logic needs to be while we're greater than or equal to SpecifierOffset but less than or equal to SpecifierSize, look for flags
+     for (uint64_t CodePoint = 1ULL; CodePoint < FormatStringSize; CodePoint++) {
+     for (uint64_t Specifier = 0ULL; Specifier < NumSpecifiers; Specifier++) {
+     while (CodePoint >= SpecifierOffset[Specifier] && CodePoint <= SpecifierOffset[Specifier] + SpecifierSize[Specifier]) {
+     // we're inside of a specifier, start reading this specifiers type, and with that info start creatng strings
+     if (SpecifierSize[Specifier] == 1) {
+     // we only have a type code
+     } else {
+     if (Format[CodePoint - 1] == U32('-')) { // Check for Flags
+     SpecifierFlags[Specifier] = LeftAlignFormatFlag;
+     } else if (Format[CodePoint - 1] == U32('+')) {
+     SpecifierFlags[Specifier] = PrependSignFormatFlag;
+     } else if (Format[CodePoint - 1] == U32(' ')) {
+     SpecifierFlags[Specifier] = AlignSignsFormatFlag;
+     } else if (Format[CodePoint - 1] == U32('0')) {
+     SpecifierFlags[Specifier] = PrependZerosFormatFlag;
+     } else if (Format[CodePoint - 1] == U32('#')) {
+     SpecifierFlags[Specifier] = DecimalPointFormatFlag;
+     }
+     
+     if (Format[CodePoint - 1] == U32('1')) { // Width
+     SpecifierWidth[Specifier] = 1;
+     } else if (Format[CodePoint - 1] == U32('2')) {
+     SpecifierWidth[Specifier] = 2;
+     } else if (Format[CodePoint - 1] == U32('3')) {
+     SpecifierWidth[Specifier] = 3;
+     } else if (Format[CodePoint - 1] == U32('4')) {
+     SpecifierWidth[Specifier] = 4;
+     } else if (Format[CodePoint - 1] == U32('5')) {
+     SpecifierWidth[Specifier] = 5;
+     } else if (Format[CodePoint - 1] == U32('6')) {
+     SpecifierWidth[Specifier] = 6;
+     } else if (Format[CodePoint - 1] == U32('7')) {
+     SpecifierWidth[Specifier] = 7;
+     } else if (Format[CodePoint - 1] == U32('8')) {
+     SpecifierWidth[Specifier] = 8;
+     } else if (Format[CodePoint - 1] == U32('9')) {
+     SpecifierWidth[Specifier] = 9;
+     } else if (Format[CodePoint - 1] == U32('*')) {
+     SpecifierWidth[Specifier] = MinWidthIsNextArgument;
+     }
+     
+     if (Format[CodePoint - 1] == U32('.')) { // Precision
+     if (Format[CodePoint] == U32('1')) {
+     SpecifierPrecision[Specifier] = 1;
+     } else if (Format[CodePoint] == U32('2')) {
+     SpecifierPrecision[Specifier] = 2;
+     } else if (Format[CodePoint] == U32('3')) {
+     SpecifierPrecision[Specifier] = 3;
+     } else if (Format[CodePoint] == U32('4')) {
+     SpecifierPrecision[Specifier] = 4;
+     } else if (Format[CodePoint] == U32('5')) {
+     SpecifierPrecision[Specifier] = 5;
+     } else if (Format[CodePoint] == U32('6')) {
+     SpecifierPrecision[Specifier] = 6;
+     } else if (Format[CodePoint] == U32('7')) {
+     SpecifierPrecision[Specifier] = 7;
+     } else if (Format[CodePoint] == U32('8')) {
+     SpecifierPrecision[Specifier] = 8;
+     } else if (Format[CodePoint] == U32('9')) {
+     SpecifierPrecision[Specifier] = 9;
+     } else if (Format[CodePoint] == U32('*')) {
+     SpecifierPrecision[Specifier] = MaxPrecisionIsNextArgument;
+     }
+     }
+     
+     if (Format[CodePoint - 1] == U32('h') && Format[CodePoint] == U32('h')) { // Length specifiers
+     SpecifierLength[Specifier] = CharPromoted2Int;
+     } else if (Format[CodePoint - 1] == U32('l') && Format[CodePoint] == U32('l')) {
+     SpecifierLength[Specifier] = LongLongLengthSpecifier;
+     } else if (Format[CodePoint - 1] == U32('h')) {
+     SpecifierLength[Specifier] = ShortPromoted2Int;
+     } else if (Format[CodePoint - 1] == U32('l')) {
+     SpecifierLength[Specifier] = LongLengthSpecifier;
+     } else if (Format[CodePoint - 1] == U32('L')) {
+     SpecifierLength[Specifier] = LongDoubleSpecifier;
+     } else if (Format[CodePoint - 1] == U32('z')) {
+     SpecifierLength[Specifier] = Size_TSpecifiier;
+     } else if (Format[CodePoint - 1] == U32('j')) {
+     SpecifierLength[Specifier] = IntMaxSpecifier;
+     } else if (Format[CodePoint - 1] == U32('t')) {
+     SpecifierLength[Specifier] = PtrDiffSpecifier;
+     }
+     }
+     }
+     }
+     }
+     
+     
+     for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) { // We know how many specifiers there are, now we need to figure out each ones properties.
+     if (Format[CodePoint] == U32('%')) {
+     // Ok so now we check for all of the various specifiers, flags, widhts, precisions, lengths, and types.
+     
+     switch (Format[CodePoint + 1]) { // Flags, + 1 needs to be replaced by a second loop
+     case U32('-'):
+     // Left align
+     break;
+     case U32('+'):
+     // Prepend a sign symbol (+ or -) to a number
+     break;
+     case U32(' '):
+     // Prepend a space for positive numbers or a - for negative ones
+     break;
+     case U32('0'):
+     // When the width field exists, prepend 0's for numeric types, the default is to prepend spaces
+     break;
+     
+     case U32('#'):
+     // for g and G types, trailing 0's aren't removed, for f F e E g G types, the output always contains a decimal; for o, x X types o,ox, oX is prepended to non-zero numbers.
+     break;
+     }
+     
+     switch (Format[CodePoint + 1]) { // Width, + 1 needs to be replaced by a second loop
+     case U32('*'): // Get the value from the field
+     
+     break;
+     
+     default:
+     break;
+     }
+     
+     So, we've found a percent symbol, lets start checking the next symbol against all the shit.
+    
+     Control logic:
+     
+     Loop until we find a codepoint matching a type, which has to be last.
+     
+     
+     
+     for (uint64_t Specifier = 1ULL; Specifier < FormatStringSize - CodePoint; Specifier++) {
+     for (uint8_t Type = 0; Type < 21; Type++) {
+     if (Format[CodePoint + Specifier] == TypeSpecifiers[Type]) {
+     SpecifierSize[CurrentSpecifier] = Specifier;
+     }
+     }
+     }
+     
+     switch (Format[CodePoint + 1]) { // Types
+     case U32('a'):
+     break;
+     case U32('A'):
+     break;
+     case U32('b'): // Binary, extension
+     break;
+     case U32('c'):
+     break;
+     case U32('C'): // Windows extension for "wide" characters
+     break;
+     case U32('d'):
+     break;
+     case U32('e'):
+     break;
+     case U32('E'):
+     break;
+     case U32('f'):
+     break;
+     case U32('F'):
+     break;
+     case U32('g'):
+     break;
+     case U32('G'):
+     break;
+     case U32('i'):
+     break;
+     case U32('o'):
+     break;
+     case U32('p'):
+     break;
+     case U32('s'):
+     break;
+     case U32('S'): // Windows extension for "wide" strings
+     break;
+     case U32('u'):
+     break;
+     case U32('x'):
+     break;
+     case U32('X'):
+     break;
+     case U32('%'):
+     break;
+     }
+     } else if (Format[CodePoint] == U32('\\')) {
+     // This is a lot easier, just look for the previously listed ones, and set the offsets and shit.
+     SpecifierOffset[CurrentSpecifier] = CodePoint;
+     SpecifierSize[CurrentSpecifier]   = 2; // 1 for the / and another for whatever character this matches
+     switch (Format[CodePoint + 1]) {
+     case U32('0'):  // NULL terminator
+     SpecifierType[CurrentSpecifier] = FormatNULLTerminatingChar;
+     break;
+     case U32('a'):  // Alarm aka beep
+     SpecifierType[CurrentSpecifier] = FormatAlarmBell;
+     break;
+     case U32('b'):  // Backspace
+     SpecifierType[CurrentSpecifier] = FormatBackspace;
+     break;
+     case U32('f'):  // Form feed
+     SpecifierType[CurrentSpecifier] = FormatFormFeed;
+     break;
+     case U32('n'):  // Newline
+     SpecifierType[CurrentSpecifier] = FormatNewLine;
+     break;
+     case U32('r'):  // Carriage return
+     SpecifierType[CurrentSpecifier] = FormatCarriageReturn;
+     break;
+     case U32('t'):  // Horizontal tab
+     SpecifierType[CurrentSpecifier] = FormatTab;
+     break;
+     case U32('u'):  // Unicode 4 digit codepoint
+     SpecifierType[CurrentSpecifier] = FormatCodePointHex4;
+     break;
+     case U32('U'):  // Unicode 8 digit codepoint
+     SpecifierType[CurrentSpecifier] = FormatCodePointHex8;
+     break;
+     case U32('v'):  // Vertical tab
+     SpecifierType[CurrentSpecifier] = FormatVerticalTab;
+     break;
+     case U32('x'):  // Hex specifier
+     SpecifierType[CurrentSpecifier] = FormatCodePointHexVariable;
+     break;
+     case U32('\''): // Apostrophe
+     SpecifierType[CurrentSpecifier] = FormatApostrophe;
+     break;
+     case U32('"'):  // Quote
+     SpecifierType[CurrentSpecifier] = FormatQuote;
+     break;
+     case U32('\\'): // Backslash
+     SpecifierType[CurrentSpecifier] = FormatBackslash;
+     break;
+     }
+     }
+     free(SpecifierOffset);
+     free(SpecifierSize);
+     free(SpecifierParameter);
+     free(SpecifierFlags);
+     free(SpecifierWidth);
+     free(SpecifierPrecision);
+     free(SpecifierLength);
+     free(SpecifierType);
+     }
+     } else {
+     Log(Log_ERROR, __func__, U8("Format Pointer is NULL"));
+     }
+     return NULL;
+     }
+     */
     
     uint8_t UTF16_DetectByteOrder(UTF16 *String) { // UTF-16BE = U+AB30, UTF-16LE = U+30AB
         // UTF-32BE = U+1F984, UTF-32LE = U+84F901, UTF-16BE = 0xD83E 0xDD84

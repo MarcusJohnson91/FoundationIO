@@ -35,12 +35,31 @@ extern  "C" {
     
     /*!
      @enum                StringIOCommon
+     @constant            UTF8BOMSizeInCodeUnits               "The number of code units (8 bits) the UTF16 BOM takes".
+     @constant            UTF16BOMSizeInCodeUnits              "The number of code units (16 bits) the UTF16 BOM takes".
+     @constant            UnicodeBOMSizeInCodePoints           "The number of codepoints in a BOM".
+     @constant            UTF16LE                              "UTF16LE byte order mark".
+     @constant            UTF16BE                              "UTF16BE byte order mark".
+     @constant            UTF32LE                              "UTF32LE byte order mark".
+     @constant            UTF32BE                              "UTF32LE byte order mark".
+     @constant            UTF16HighSurrogateStart              "The value that marks the start of the High Surrogate range".
+     @constant            UTF16HighSurrogateEnd                "The value that marks the end   of the High Surrogate range".
+     @constant            UTF16LowSurrogateStart               "The value that marks the start of the Low  Surrogate range".
+     @constant            UTF16LowSurrogateEnd                 "The value that marks the end   of the Low  Surrogate range".
+     @constant            UTF16MaxCodePoint                    "The highest value that can be stored in a single UTF16 codeunit".
+     @constant            UTF16SurrogatePairModDividend        "The value to modulo the surrogate pair by to decode a High Surrogate".
+     @constant            UTF16SurrogatePairStart              "The first UTF-32 codepoint to require Surrogate Pairs in UTF-16".
+     @constant            InvalidReplacementCodePoint          "The codepoint to replace invalid codeunits".
+     @constant            UnicodeMaxCodePoint                  "The highest codepoint possible in Unicode, 1,114,111".
      */
     typedef enum StringIOCommon {
                           UTF8BOMSizeInCodeUnits               = 3,
-                          UTF8BOMSizeInCodePoints              = 1,
+                          UTF16BOMSizeInCodeUnits              = 1,
+                          UnicodeBOMSizeInCodePoints           = 1,
                           UTF16LE                              = 0xFFFE,
                           UTF16BE                              = 0xFEFF,
+                          UTF32LE                              = 0xFFFE,
+                          UTF32BE                              = 0xFEFF,
                           UTF16HighSurrogateStart              = 0xD800,
                           UTF16HighSurrogateEnd                = 0xDBFF,
                           UTF16LowSurrogateStart               = 0xDC00,
@@ -48,10 +67,7 @@ extern  "C" {
                           UTF16MaxCodePoint                    = 0xFFFF,
                           UTF16SurrogatePairModDividend        = 0x400,
                           UTF16SurrogatePairStart              = 0x10000,
-                          InvalidCodePointReplacementCharacter = 0xFFFD,
-                          UTF16BOMSizeInCodeUnits              = 1,
-                          UTF32LE                              = 0xFFFE,
-                          UTF32BE                              = 0xFEFF,
+                          InvalidReplacementCodePoint          = 0xFFFD,
                           UnicodeMaxCodePoint                  = 0x10FFFF,
     } StringIOCommon;
     

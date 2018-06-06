@@ -29,7 +29,7 @@ extern "C" {
         } else if (NumPlanes == 0) {
             Log(Log_ERROR, __func__, U8("NumPlanes %lld does not make sense"), NumPlanes);
         } else if (NumElementsPerPlane == 0) {
-            Log(Log_ERROR, __func__, U8("NumElementsPerPlane %lld does not make sense"), NumElements);
+            Log(Log_ERROR, __func__, U8("NumElementsPerPlane %lld does not make sense"), NumElementsPerPlane);
         }
         return NewContainer;
     }
