@@ -58,8 +58,8 @@ extern   "C" {
      @constant                  BinaryGUUIDSize                 "Size of a BinaryUUID or BinaryGUID".
      */
     enum GUUIDConstants {
-        GUUIDStringSize            = 20 + NULLTerminatorSize,
-        BinaryGUUIDSize            = 16,
+                                GUUIDStringSize                 = 20 + NULLTerminatorSize,
+                                BinaryGUUIDSize                 = 16,
     };
     
     /*!

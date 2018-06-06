@@ -472,47 +472,46 @@ extern "C" {
     
     void BitInput_OpenFile(BitInput *BitI, UTF8 *Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
-            BitI->FileType         = BitIOFile;
-            uint64_t Path2OpenSize = UTF8_GetStringSizeInCodeUnits(Path2Open) + NULLTerminatorSize;
-            UTF8    *WinPath8      = NULL;
-#if   (FoundationIOTargetOS == POSIX)
-            BitI->File             = fopen(Path2Open, U8("rb"));
-#elif (FoundationIOTargetOS == Windows)
-            /* TODO: Windwos uses UTF-16, convert everything to that. */
-            if (Path2Open[0] != 0xEF && Path2Open[1] != 0xBB && Path2Open[2] != 0xBF) {
-                if (Path2Open[0] != U32('/') && Path2Open[1] != U32('/') && Path2Open[2] != U32('?') && Path2Open[3] != U32('/')) {
-                    if (BitI->FileSpecifierExists == No) {
-                        WinPath8   = UTF8_FormatString(U8("//?/%s"), Path2Open);
-                    } else {
-                        WinPath8   = UTF8_FormatString(U8("//?/%s%llu"), Path2Open, BitI->FileSpecifierNum);
-                    }
-                } else {
-                    if (BitI->FileSpecifierExists == No) {
-                        WinPath8   = Path2Open;
-                    } else {
-                        WinPath8   = UTF8_FormatString(U8("%s%llu"), Path2Open, BitI->FileSpecifierNum);
-                    }
+            BitI->FileType                   = BitIOFile;
+            uint64_t Path2OpenSize           = UTF8_GetStringSizeInCodeUnits(Path2Open) + NULLTerminatorSize;
+            bool     ContainsFormatSpecifier = No;
+            UTF8    *Formatted               = NULL;
+            // Loop over the string checking for a percent symbol not followed by a second percent symbol, ifyou find it call forat
+            for (uint64_t CodeUnit = 1ULL; CodeUnit < Path2OpenSize - NULLTerminatorSize; CodeUnit++) {
+                if (Path2Open[CodeUnit - 1] == U8('%') && Path2Open[CodeUnit] != U8('%')) {
+                    ContainsFormatSpecifier  = Yes;
+                }
+            }
+            if (ContainsFormatSpecifier == Yes) {
+                Formatted                    = UTF8_FormatString(Path2Open, BitI->FileSpecifierNum);
+            } else {
+                Formatted                    = Path2Open;
+            }
+#if   (FoundationIOTargetOS == POSIX) // POSIX
+            BitI->File                       = fopen(Formatted, U8("rb"));
+#elif (FoundationIOTargetOS == Windows) // Windows
+            UTF8 *PathPrepended              = NULL;
+            UTF32 *WinPath32                 = UTF8_Decode(Formatted);
+            UTF32 *WinPath32Prepended        = NULL;
+            if (WinPath32[0] != UTF16LE && WinPath32[0] != UTF16BE) {
+                /* \\?\ */
+                if (WinPath32[0] != U32('\\') && WinPath32[1] != U32('\\') && WinPath32[2] != U32('\?') && WinPath32[3] != U32('\\')) {
+                    PathPrepended            = UTF8_ReplaceSubString(Path2Open, "//?/", 0, 0);
                 }
             } else {
-                if (Path2Open[3] != U32('/') && Path2Open[4] != U32('/') && Path2Open[5] != U32('?') && Path2Open[6] != U32('/')) {
-                    if (BitI->FileSpecifierExists == No) {
-                        WinPath8   = UTF8_FormatString(U8("//?/%s"), Path2Open);
-                    } else {
-                        WinPath8   = UTF8_FormatString(U8("//?/%s%llu"), Path2Open, BitI->FileSpecifierNum);
-                    }
+                if (WinPath32[0] != U32('\\') && WinPath32[1] != U32('\\') && WinPath32[2] != U32('\?') && WinPath32[3] != U32('\\'))) {
+                    PathPrepended            = UTF8_ReplaceSubString(Path2Open, "//?/", 0, 0);
                 } else {
                     if (BitI->FileSpecifierExists == No) {
-                        WinPath8   = Path2Open;
+                        PathPrepended        = Path2Open;
                     } else {
-                        WinPath8   = UTF8_FormatString(U8("%s%llu"), Path2Open, BitI->FileSpecifierNum);
+                        PathPrepended        = UTF8_FormatString(U8("%s%llu"), Path2Open, BitI->FileSpecifierNum);
                     }
                 }
             }
-            UTF32 *WinPath32   = UTF8_Decode(WinPath8);
-            UTF16 *WinPath16   = UTF16_Encode(WinPath32, UseLEByteOrder);
-            free(WinPath8);
+            UTF16 *WinPath16                 = UTF16_Encode(WinPath32, UseLEByteOrder);
             free(WinPath32);
-            BitI->File         = _wfopen(WinPath16, U16("rb"));
+            BitI->File                       = _wfopen(WinPath16, U16("rb"));
             free(WinPath16);
 #endif
             if (BitI->File != NULL) {
