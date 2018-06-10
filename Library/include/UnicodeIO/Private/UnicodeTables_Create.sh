@@ -55,7 +55,6 @@ function CreateCombiningCharacterClassTable {
 
 function CreateCanonicalNormalizationTables {
     IFS=$'\n'
-    NULLTerminator=$(echo "\x0")
     CanonicalNormalizationCodePointsAndStrings=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dm != @cp and @dm != '#' and @dt = 'can']" -v @cp -o : -v @dm -n $UCD_Data | LC_COLLATE=C sort -f -b -s -n -k 2 -t :)
     printf "    static const UTF32    CanonicalNormalizationCodePoints[CanonicalNormalizationTableSize] = {\n" >> $OutputFile
     for line in $CanonicalNormalizationCodePointsAndStrings; do
@@ -77,7 +76,7 @@ function CreateCanonicalNormalizationTables {
                 ReplacementString+=$(echo $(printf '\\U%08X' $CodePoint2))
             fi
         done
-    $(printf "        U\"%s%s\",\n" $ReplacementString $NULLTerminator >> $OutputFile)
+    $(printf "        U\"%s\",\n" $ReplacementString >> $OutputFile)
     done
     printf "    };\n\n" >> $OutputFile
     unset IFS
@@ -85,7 +84,6 @@ function CreateCanonicalNormalizationTables {
 
 function CreateKompatibleNormalizationTables {
     IFS=$'\n'
-    NULLTerminator=$(echo "\x0")
     KompatibleNormalizationCodePointsAndStrings=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[(@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat') and @dt != '' and @dt != '#' and @dt != 'none']" -v @cp -o : -v @dm -n $UCD_Data | LC_COLLATE=C sort -f -b -s -n -k 2 -t :)
     printf "    static const UTF32    KompatibleNormalizationCodePoints[KompatibleNormalizationTableSize] = {\n" >> $OutputFile
     for line in $KompatibleNormalizationCodePointsAndStrings; do
@@ -107,7 +105,7 @@ function CreateKompatibleNormalizationTables {
                 ReplacementString+=$(echo $(printf '\\U%08X' $CodePoint2))
             fi
         done
-    $(printf "        U\"%s%s\",\n" $ReplacementString $NULLTerminator >> $OutputFile)
+    $(printf "        U\"%s\",\n" $ReplacementString >> $OutputFile)
     done
     printf "    };\n\n" >> $OutputFile
     unset IFS
@@ -115,7 +113,6 @@ function CreateKompatibleNormalizationTables {
 
 function CreateCaseFoldTables {
     IFS=$'\n'
-    NULLTerminator=$(echo "\x0")
     CodePointAndReplacement=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')]" -v @cp -o : -v @NFKC_CF -n $UCD_Data)
     printf "    static const UTF32    CaseFoldCodePoints[CaseFoldTableSize] = {\n" >> $OutputFile
     for line in $CodePointAndReplacement; do
@@ -137,7 +134,7 @@ function CreateCaseFoldTables {
                 ReplacementString+=$(echo $(printf '\\U%08X' $CodePoint2))
             fi
 	    done
-        $(printf "        U\"%s%s\",\n" $ReplacementString $NULLTerminator >> $OutputFile)
+        $(printf "        U\"%s\",\n" $ReplacementString >> $OutputFile)
     done
     printf "    };\n\n" >> $OutputFile
     unset IFS
