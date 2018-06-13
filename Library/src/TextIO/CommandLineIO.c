@@ -347,9 +347,9 @@ extern   "C" {
             
             if (ArgumentStringSize >= 2) {
                 //Log(Log_DEBUG, __func__, U8("ArgumentString[0] = 0x%X, ArgumentString[1] = 0x%X"), ArgumentString[0], ArgumentString[1]);
-                if (ArgumentString[0] == U8('-') && ArgumentString[1] == U8('-')) {
+                if (ArgumentString[0] == U32('-') && ArgumentString[1] == U32('-')) {
                     ArgumentStringPrefixSize  = 2;
-                } else if (ArgumentString[0] == U8('/') || ArgumentString[0] == U8('\\') || ArgumentString[0] == U8('-')) {
+                } else if (ArgumentString[0] == U32('/') || ArgumentString[0] == U32('\\') || ArgumentString[0] == U32('-')) {
                     ArgumentStringPrefixSize    = 1;
                 }
             } else {
@@ -588,7 +588,7 @@ extern   "C" {
                 uint8_t HalfOfTheIndicators = (PercentComplete / 2);
                 // Now we go ahead and memset a string with the proper number of indicators
                 UTF8 *Indicator             = calloc(CLI->ConsoleWidth, sizeof(UTF8));
-                memset(Indicator, U8('-'), HalfOfTheIndicators);
+                memset(Indicator, '-', HalfOfTheIndicators);
                 UTF8 *FormattedString       = UTF8_FormatString("[%s%s %lld/%lld %hhu/%s %s]", Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF8);
                 UTF8_WriteString2File(FormattedString, stdout);
                 free(Indicator);

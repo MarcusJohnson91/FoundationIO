@@ -1,6 +1,7 @@
 #include "../include/BitIO.h"          /* Included for our declarations */
 #include "../include/Log.h"            /* Included for Log declarations */
 #include "../include/Math.h"           /* Included for Integer functions */
+#include "../include/StringIO.h"       /* Included for U(8|16|32) macros */
 
 #ifdef __cplusplus
 extern "C" {
@@ -478,7 +479,7 @@ extern "C" {
             UTF8    *Formatted               = NULL;
             // Loop over the string checking for a percent symbol not followed by a second percent symbol, ifyou find it call forat
             for (uint64_t CodeUnit = 1ULL; CodeUnit < Path2OpenSize - NULLTerminatorSize; CodeUnit++) {
-                if (Path2Open[CodeUnit - 1] == U8('%') && Path2Open[CodeUnit] != U8('%')) {
+                if (Path2Open[CodeUnit - 1] == '%' && Path2Open[CodeUnit] != '%') {
                     ContainsFormatSpecifier  = Yes;
                 }
             }
@@ -822,7 +823,7 @@ extern "C" {
                             if (BinaryByte != 4 && BinaryByte != 7 && BinaryByte != 10 && BinaryByte != 13) {
                                 ConvertedGUUID[StringByte]  = GUUID2Convert[BinaryByte];
                             } else {
-                                ConvertedGUUID[StringByte]  = U8('-');
+                                ConvertedGUUID[StringByte]  = '-';
                             }
                         }
                     }
