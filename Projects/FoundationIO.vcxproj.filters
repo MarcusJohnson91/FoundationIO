@@ -10,9 +10,6 @@
         <ClCompile Include="..\libFoundationIO\src\ContainerIO.c">
             <Filter>Source Files</Filter>
         </ClCompile>
-        <ClCompile Include="..\libFoundationIO\src\GUUID.c">
-            <Filter>Source Files</Filter>
-        </ClCompile>
         <ClCompile Include="..\libFoundationIO\src\Log.c">
             <Filter>Source Files</Filter>
         </ClCompile>
@@ -34,9 +31,6 @@
             <Filter>Header Files</Filter>
         </ClInclude>
         <ClInclude Include="..\libFoundationIO\include\ContainerIO.h">
-            <Filter>Header Files</Filter>
-        </ClInclude>
-        <ClInclude Include="..\libFoundationIO\include\GUUID.h">
             <Filter>Header Files</Filter>
         </ClInclude>
         <ClInclude Include="..\libFoundationIO\include\Log.h">
