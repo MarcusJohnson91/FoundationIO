@@ -1,6 +1,6 @@
+#include "../include/StringIOTables.h" /* Included for the tables, and StringIO declarations, NEEDS TO BE FIRST? */
 #include "../include/Log.h"            /* Included for error logging */
 #include "../include/Math.h"           /* Included for endian swapping */
-#include "../include/StringIOTables.h" /* Included for the tables, and StringIO declarations */
 
 #ifdef  __cplusplus
 extern  "C" {
@@ -194,9 +194,9 @@ extern  "C" {
             do {
                 uint8_t CodePointSize = (String[CodeUnit] & 0xF0) >> 4;
                 /*
-                if (String[CodeUnit] & 0x80 >> 7 == 1) {
-                    
-                }
+                 if (String[CodeUnit] & 0x80 >> 7 == 1) {
+                 
+                 }
                  */
                 CodeUnit += 1;
             } while (String[CodeUnit] != NULLTerminator);
@@ -883,6 +883,77 @@ extern  "C" {
         return ReplacedString;
     }
     
+    UTF8 *UTF8_RemoveSubString(UTF8 *String, UTF8 *SubString2Remove, int64_t Instance2Remove) {
+        UTF8 *TrimmedString         = NULL;
+        if (String != NULL && SubString2Remove != NULL && Instance2Remove >= -1) {
+            UTF32 *DecodedString    = UTF8_Decode(String);
+            UTF32 *DecodedSubString = UTF8_Decode(SubString2Remove);
+            UTF32 *Trimmed32        = UTF32_RemoveSubString(DecodedString, DecodedSubString, Instance2Remove);
+            TrimmedString           = UTF8_Encode(Trimmed32, No);
+            free(DecodedString);
+            free(DecodedSubString);
+            free(Trimmed32);
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (SubString2Remove == NULL) {
+            Log(Log_ERROR, __func__, U8("SubString2Remove Pointer is NULL"));
+        } else if (Instance2Remove < -1) {
+            Log(Log_ERROR, __func__, U8("Instance2Remove %lld is invalid"), Instance2Remove);
+        }
+        return TrimmedString;
+    }
+    
+    UTF16 *UTF16_RemoveSubString(UTF16 *String, UTF16 *SubString2Remove, int64_t Instance2Remove) {
+        UTF16 *TrimmedString        = NULL;
+        if (String != NULL && SubString2Remove != NULL && Instance2Remove >= -1) {
+            UTF32 *DecodedString    = UTF16_Decode(String);
+            UTF32 *DecodedSubString = UTF16_Decode(SubString2Remove);
+            UTF32 *Trimmed32        = UTF32_RemoveSubString(DecodedString, DecodedSubString, Instance2Remove);
+            TrimmedString           = UTF16_Encode(Trimmed32, UseLEByteOrder);
+            free(DecodedString);
+            free(DecodedSubString);
+            free(Trimmed32);
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (SubString2Remove == NULL) {
+            Log(Log_ERROR, __func__, U8("SubString2Remove Pointer is NULL"));
+        } else if (Instance2Remove < -1) {
+            Log(Log_ERROR, __func__, U8("Instance2Remove %lld is invalid"), Instance2Remove);
+        }
+        return TrimmedString;
+    }
+    
+    UTF32 *UTF32_RemoveSubString(UTF32 *String, UTF32 *SubString2Remove, int64_t Instance2Remove) {
+        uint64_t SubStringSize     = UTF32_GetStringSizeInCodePoints(SubString2Remove);
+        if (String != NULL && SubString2Remove != NULL) {
+            // Ok well we need to start counting how many instances there are, if instance = -1, we need to remove all.
+            uint64_t CodePoint     = 0ULL;
+            int64_t  FoundInstance = 0ULL;
+            /*
+             We need to know the size of the substring that way we can loop over the string properly.
+             
+             Then we need 2 loops, one for the main string, and one for the substring.
+             
+             Each time a non-matching codepoint is found in the string, we need to reset the substring back to the beginning.
+             */
+            
+            
+            do { // We need to get the size of SubString2Remove, and loop over it comparing
+                if (Instance2Remove == -1) {
+                    // Remove each and every instance of the substring
+                } else if (FoundInstance == Instance2Remove) {
+                    // Count the instances
+                }
+                CodePoint += 1;
+            } while (String[CodePoint] != NULLTerminator);
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (SubString2Remove == NULL) {
+            Log(Log_ERROR, __func__, U8("SubString2Remove Pointer is NULL"));
+        }
+        return NULL;
+    }
+    
     UTF8 **UTF8_SplitString(UTF8 *String, uint64_t NumDelimiters, UTF8 **Delimiters) {
         if (String != NULL && NumDelimiters > 0 && Delimiters != NULL) {
             // Decode String2Split, and make an array of decoded strings for the Delimiters
@@ -1118,25 +1189,21 @@ extern  "C" {
         return 0.0;
     }
     
-    UTF8 *UTF8_Decimal2String(double Decimal) {
-        UTF32 *String32 = UTF32_Decimal2String(Decimal);
+    UTF8 *UTF8_Decimal2String(const StringIOBases Base, double Decimal) {
+        UTF32 *String32 = UTF32_Decimal2String(Base, Decimal);
         UTF8  *String8  = UTF8_Encode(String32, No);
         free(String32);
         return String8;
     }
     
-    UTF16 *UTF16_Decimal2String(double Decimal) {
-        UTF32 *String32 = UTF32_Decimal2String(Decimal);
+    UTF16 *UTF16_Decimal2String(const StringIOBases Base, double Decimal) {
+        UTF32 *String32 = UTF32_Decimal2String(Base, Decimal);
         UTF16 *String16 = UTF16_Encode(String32, UseLEByteOrder);
         free(String32);
         return String16;
     }
     
-    UTF32 *UTF32_Decimal2String(double Decimal) {
-        /*
-         Should we support Binary Coded Decimal BCD?
-         Invalid doubles return a NULL string
-         */
+    UTF32 *UTF32_Decimal2String(const StringIOBases Base, double Decimal) {
         UTF32   *OutputString = NULL;
         int8_t   Sign         = Decimal < 0.0 ? -1 : 1;
         int32_t *Exponent     = calloc(1, sizeof(int32_t));
@@ -1277,113 +1344,76 @@ extern  "C" {
         return StringsMatch;
     }
     
-    UTF8 *UTF8_RemoveSubString(UTF8 *String, UTF8 *SubString2Remove, int64_t Instance2Remove) {
-        UTF8 *TrimmedString         = NULL;
-        if (String != NULL && SubString2Remove != NULL && Instance2Remove >= -1) {
-            UTF32 *DecodedString    = UTF8_Decode(String);
-            UTF32 *DecodedSubString = UTF8_Decode(SubString2Remove);
-            UTF32 *Trimmed32        = UTF32_RemoveSubString(DecodedString, DecodedSubString, Instance2Remove);
-            TrimmedString           = UTF8_Encode(Trimmed32, No);
-            free(DecodedString);
-            free(DecodedSubString);
-            free(Trimmed32);
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (SubString2Remove == NULL) {
-            Log(Log_ERROR, __func__, U8("SubString2Remove Pointer is NULL"));
-        } else if (Instance2Remove < -1) {
-            Log(Log_ERROR, __func__, U8("Instance2Remove %lld is invalid"), Instance2Remove);
-        }
-        return TrimmedString;
-    }
-    
-    UTF16 *UTF16_RemoveSubString(UTF16 *String, UTF16 *SubString2Remove, int64_t Instance2Remove) {
-        UTF16 *TrimmedString        = NULL;
-        if (String != NULL && SubString2Remove != NULL && Instance2Remove >= -1) {
-            UTF32 *DecodedString    = UTF16_Decode(String);
-            UTF32 *DecodedSubString = UTF16_Decode(SubString2Remove);
-            UTF32 *Trimmed32        = UTF32_RemoveSubString(DecodedString, DecodedSubString, Instance2Remove);
-            TrimmedString           = UTF16_Encode(Trimmed32, UseLEByteOrder);
-            free(DecodedString);
-            free(DecodedSubString);
-            free(Trimmed32);
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (SubString2Remove == NULL) {
-            Log(Log_ERROR, __func__, U8("SubString2Remove Pointer is NULL"));
-        } else if (Instance2Remove < -1) {
-            Log(Log_ERROR, __func__, U8("Instance2Remove %lld is invalid"), Instance2Remove);
-        }
-        return TrimmedString;
-    }
-    
-    UTF32 *UTF32_RemoveSubString(UTF32 *String, UTF32 *SubString2Remove, int64_t Instance2Remove) {
-        uint64_t SubStringSize     = UTF32_GetStringSizeInCodePoints(SubString2Remove);
-        if (String != NULL && SubString2Remove != NULL) {
-            // Ok well we need to start counting how many instances there are, if instance = -1, we need to remove all.
-            uint64_t CodePoint     = 0ULL;
-            int64_t  FoundInstance = 0ULL;
-            /*
-             We need to know the size of the substring that way we can loop over the string properly.
-             
-             Then we need 2 loops, one for the main string, and one for the substring.
-             
-             Each time a non-matching codepoint is found in the string, we need to reset the substring back to the beginning.
-             */
-            
-            
-            do { // We need to get the size of SubString2Remove, and loop over it comparing
-                if (Instance2Remove == -1) {
-                    // Remove each and every instance of the substring
-                } else if (FoundInstance == Instance2Remove) {
-                    // Count the instances
-                }
-                CodePoint += 1;
-            } while (String[CodePoint] != NULLTerminator);
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (SubString2Remove == NULL) {
-            Log(Log_ERROR, __func__, U8("SubString2Remove Pointer is NULL"));
-        }
-        return NULL;
-    }
-    
-    static uint64_t *UTF32_CountVariadicArguments(UTF32 *String) {
-        uint64_t CodePoint  = 0ULL;
-        uint64_t NumVarArgs = 0ULL;
-        if (String != NULL) {
-            do {
-                if (String[CodePoint] == U32('%') || String[CodePoint] == U32('\\')) {
-                    NumVarArgs += 1;
-                }
-                CodePoint += 1;
-            } while (String[CodePoint] != NULLTerminator);
-        } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        }
-        return NumVarArgs;
-    }
-    
     typedef enum StringTypes {
         UnknownFormat = 0,
         UTF8Format    = 1,
         UTF16Format   = 2,
     } StringTypes;
     
+    typedef enum FormatSpecifierFlags {
+        NoFormatFlag                   = 0,
+        LeftAlignFormatFlag            = 1,
+        RightAlignFormatFlag           = 2,
+        PrependSignFormatFlag          = 3,
+        AlignSignsFormatFlag           = 4, // Prepend a space in front of positive ints, a minus for negative
+        TellTypeFormatFlag             = 5,
+        PrependZerosFormatFlag         = 6, // Don't remove trailing zeros, or add a decimal point or prepend with non-zeros
+    } FormatSpecifierFlags;
+    
+    typedef enum FormatSpecifierLengths { // Length field
+        NoLengthFlag                   = 0,
+        CharPromoted2Int               = 1,
+        ShortPromoted2Int              = 2,
+        LongLengthSpecifier            = 3,
+        LongLongLengthSpecifier        = 4,
+        LongDoubleSpecifier            = 5,
+        Size_TSpecifiier               = 6,
+        IntMaxSpecifier                = 7,
+        PtrDiffSpecifier               = 8,
+    } FormatSpecifierLengths;
+    
+    typedef enum FormatSpecifierTypes { // U = uppercase, L = lowercase
+        UnknownSpecifierType           = 0,
+        FormatCodePoint8               = 1,
+        FormatCodePoint16              = 2,
+        FormatStringUTF8               = 3,
+        FormatStringUTF16              = 4,
+        FormatPercent                  = 5,
+        FormatBase2Integer             = 6,
+        FormatUnsignedBase8Integer     = 7,
+        FormatSignedBase10Integer      = 8,
+        FormatUnsignedBase16IntegerU   = 9,
+        FormatUnsignedBase16IntegerL   = 10,
+        FormatUnsignedBase10Integer    = 11,
+        FormatBase10DecimalU           = 12,
+        FormatBase10DecimalL           = 13,
+        FormatScientificDecimalU       = 14,
+        FormatScientificDecimalL       = 15,
+        FormatShortestDecimalU         = 16,
+        FormatShortestDecimalL         = 17,
+        FormatBase16DecimalU           = 18,
+        FormatBase16DecimalL           = 19,
+    } FormatSpecifierTypes;
+    
     typedef struct FormatSpecifier {
-        uint64_t Offset;
-        uint64_t Size;
+        uint64_t                  Offset;
+        uint64_t                  Size;
         
-        UTF32   *StringifiedArgument;
+        uint64_t                  MinWidth;
+        uint64_t                  Precision;
+        UTF32                    *String;
+        FormatSpecifierFlags      Flag;
+        FormatSpecifierLengths    Length;
+        FormatSpecifierTypes      Type;
     } FormatSpecifier;
     
     typedef struct FormatString {
-        StringTypes      StringType;
         uint64_t         NumSpecifiers;
         FormatSpecifier *Specifiers;
+        StringTypes      StringType;
     } FormatString;
     
-    FormatString *FormatString_Init(uint64_t NumSpecifiers) {
+    static FormatString *FormatString_Init(uint64_t NumSpecifiers) {
         FormatString *NewFormatString          = calloc(1, sizeof(FormatString));
         if (NewFormatString != NULL) {
             NewFormatString->Specifiers        = calloc(NumSpecifiers, sizeof(FormatSpecifier));
@@ -1398,44 +1428,222 @@ extern  "C" {
         return NewFormatString;
     }
     
-    static void UTF32_ParseFormatSpecifiers(UTF32 *Format, FormatString *Details, va_list VariadicArguments) {
-        uint64_t CurrentSpecifier = 0ULL;
-        uint64_t CodePoint        = 0ULL;
-        if (Format != NULL && Details != NULL) {
-            /*
-             Ok, so we loop over Format looking for Percent or backslash symbols, and for each one we parse it.
-             */
-            do {
-                if (Format[CodePoint] == U32('%') || Format[CodePoint] == U32('\\')) {
-                    Details->Specifiers[CurrentSpecifier].Offset = CodePoint;
-                    
-                    
-                    CurrentSpecifier += 1;
-                }
-                CodePoint += 1;
-            } while (Format[CodePoint] != NULLTerminator);
-        } else if (Format == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (Details == NULL) {
-            Log(Log_ERROR, __func__, U8("FormatString is NULL"));
+    static void FormatString_Deinit(FormatString *String2Deinit) {
+        if (String2Deinit != NULL) {
+            free(String2Deinit->Specifiers);
+            free(String2Deinit);
         }
+    }
+    
+    static FormatString *UTF32_ParseFormatSpecifiers(UTF32 *Format, StringTypes StringType) {
+        FormatString *Details      = NULL;
+        uint64_t NumSpecifiers     = 0ULL;
+        uint64_t FormatStringSize  = 0ULL;
+        if (Format != NULL && StringType != UnknownFormat) {
+            FormatStringSize       = UTF32_GetStringSizeInCodePoints(Format);
+            for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) { // Get the number of specifiers, and init.
+                if (Format[CodePoint] == U32('%')) {
+                    NumSpecifiers += 1;
+                }
+            }
+            Details = FormatString_Init(NumSpecifiers);
+            if (Details != NULL) {
+                for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) {
+                    if (Format[CodePoint] == U32('%')) {
+                        Details->NumSpecifiers += 1;
+                        Details->Specifiers[Details->NumSpecifiers - 1].Offset = CodePoint + 1;
+                        for (uint64_t EndCodePoint = 1ULL; EndCodePoint + CodePoint < FormatStringSize; EndCodePoint++) {
+                            UTF32 CurrentCodePoint = Format[CodePoint + EndCodePoint];
+                            if (CurrentCodePoint == U'd' || CurrentCodePoint == U'i' || CurrentCodePoint == U'o' || CurrentCodePoint == U'u' ||
+                                CurrentCodePoint == U'x' || CurrentCodePoint == U'X' || CurrentCodePoint == U'f' || CurrentCodePoint == U'F' ||
+                                CurrentCodePoint == U'e' || CurrentCodePoint == U'E' || CurrentCodePoint == U'g' || CurrentCodePoint == U'G' ||
+                                CurrentCodePoint == U'a' || CurrentCodePoint == U'A' || CurrentCodePoint == U'c' || CurrentCodePoint == U's' ||
+                                CurrentCodePoint == U'%' || CurrentCodePoint == U'n' || CurrentCodePoint == U'r' || CurrentCodePoint == U't' ||
+                                CurrentCodePoint == U'v') {
+                                
+                                Details->Specifiers[Details->NumSpecifiers - 1].Size = Details->Specifiers[Details->NumSpecifiers - 1].Offset - EndCodePoint;
+                            }
+                        }
+                    }
+                }
+                for (uint64_t Specifier = 0ULL; Specifier < Details->NumSpecifiers; Specifier++) {
+                    uint64_t SpecifierStart = Details->Specifiers[Specifier].Offset + 1;
+                    uint64_t SpecifierEnd   = Details->Specifiers[Specifier].Offset + Details->Specifiers[Specifier].Size;
+                    for (uint64_t CodePoint = SpecifierStart; CodePoint < SpecifierEnd; Specifier++) {
+                        if (CodePoint == SpecifierStart) { // Flags
+                            switch (Format[CodePoint]) {
+                                case U'-':
+                                    Details->Specifiers[Specifier].Flag = LeftAlignFormatFlag;
+                                    break;
+                                case U'+':
+                                    Details->Specifiers[Specifier].Flag = PrependSignFormatFlag;
+                                    break;
+                                case U' ':
+                                    Details->Specifiers[Specifier].Flag = AlignSignsFormatFlag;
+                                    break;
+                                case U'#':
+                                    Details->Specifiers[Specifier].Flag = TellTypeFormatFlag;
+                                    break;
+                                case U'0':
+                                    Details->Specifiers[Specifier].Flag = PrependZerosFormatFlag;
+                                    break;
+                                default:
+                                    Details->Specifiers[Specifier].Flag = RightAlignFormatFlag;
+                                    break;
+                            }
+                        }
+                        
+                        /* MinWidth */
+                        uint64_t MinWidthStart = CodePoint;
+                        uint64_t MinWidthEnd   = 0ULL;
+                        
+                        do {
+                            // Well I guess we just need to find the start and end of this minwidth parameter then call String2Integer on it, by copying it out?
+                            // How do we set the start and end points tho?
+                            MinWidthEnd = CodePoint;
+                        } while (Format[CodePoint] == U'0' || Format[CodePoint] == U'1' || Format[CodePoint] == U'2' || Format[CodePoint] == U'3' || Format[CodePoint] == U'4' || Format[CodePoint] == U'5' || Format[CodePoint] == U'6' || Format[CodePoint] == U'7' || Format[CodePoint] == U'8' || Format[CodePoint] == U'9');
+                        
+                        if (MinWidthEnd > 0) {
+                            // We found a MinWidth parameter, we need to cut out the section into a new string, and call String2Integer
+                            // First get the size of the string by taking End - Start, create a new string, copy intot he new string from the format string at thse offsets, then call String2Integer on that.
+                            UTF32 *MinWidthString                   = UTF32_ExtractSubString(Format, MinWidthStart, MinWidthEnd);
+                            Details->Specifiers[Specifier].MinWidth = UTF32_String2Integer(MinWidthString);
+                            free(MinWidthString);
+                        }
+                        /* MinWidth */
+                        
+                        /* Precision */
+                        if (Format[CodePoint] == U'.') {
+                            /* Now we basically do the same thing as we did in MinWidth, but this time for the Precision */
+                            // FIXME: we need to replace all this gobedy gook with ExtractSubString
+                            uint64_t PrecisionStart = CodePoint + 1;
+                            uint64_t PrecisionEnd   = 0ULL;
+                            do {
+                                PrecisionEnd        = CodePoint;
+                            } while (Format[CodePoint] == U'0' || Format[CodePoint] == U'1' || Format[CodePoint] == U'2' || Format[CodePoint] == U'3' || Format[CodePoint] == U'4' || Format[CodePoint] == U'5' || Format[CodePoint] == U'6' || Format[CodePoint] == U'7' || Format[CodePoint] == U'8' || Format[CodePoint] == U'9');
+                            
+                            if (PrecisionEnd > 0) {
+                                UTF32 *PrecisionString                   = UTF32_ExtractSubString(Format, PrecisionStart, PrecisionEnd);
+                                Details->Specifiers[Specifier].Precision = UTF32_String2Integer(PrecisionString);
+                                free(PrecisionString);
+                            }
+                        }
+                        /* Precision */
+                        
+                        /* Length */
+                        if (Format[CodePoint] == U32('h') && Format[CodePoint + 1] == U32('h')) { // Length specifiers
+                            Details->Specifiers[Specifier].Length = CharPromoted2Int;
+                        } else if (Format[CodePoint] == U32('l') && Format[CodePoint] == U32('l')) {
+                            Details->Specifiers[Specifier].Length = LongLongLengthSpecifier;
+                        } else if (Format[CodePoint] == U32('h')) {
+                            Details->Specifiers[Specifier].Length = ShortPromoted2Int;
+                        } else if (Format[CodePoint] == U32('l')) {
+                            Details->Specifiers[Specifier].Length = LongLengthSpecifier;
+                        } else if (Format[CodePoint] == U32('L')) {
+                            Details->Specifiers[Specifier].Length = LongDoubleSpecifier;
+                        } else if (Format[CodePoint] == U32('z')) {
+                            Details->Specifiers[Specifier].Length = Size_TSpecifiier;
+                        } else if (Format[CodePoint] == U32('j')) {
+                            Details->Specifiers[Specifier].Length = IntMaxSpecifier;
+                        } else if (Format[CodePoint] == U32('t')) {
+                            Details->Specifiers[Specifier].Length = PtrDiffSpecifier;
+                        }
+                        /* Length */
+                        
+                        /* Type */
+                        if (Format[CodePoint] == U32('d') || Format[CodePoint] == U32('i')) {
+                            Details->Specifiers[Specifier].Type   = FormatSignedBase10Integer;
+                        } else if (Format[CodePoint] == U32('u')) {
+                            Details->Specifiers[Specifier].Type   = FormatUnsignedBase10Integer;
+                        } else if (Format[CodePoint] == U32('x')) {
+                            Details->Specifiers[Specifier].Type   = FormatBase16DecimalL;
+                        } else if (Format[CodePoint] == U32('X')) {
+                            Details->Specifiers[Specifier].Type   = FormatBase16DecimalU;
+                        } else if (Format[CodePoint] == U32('o')) {
+                            Details->Specifiers[Specifier].Type   = FormatUnsignedBase8Integer;
+                        } else if (Format[CodePoint] == U32('s')) {
+                            if (Details->StringType == UTF8Format) {
+                                Details->Specifiers[Specifier].Type = FormatStringUTF8;
+                            } else if (Details->StringType == UTF16Format) {
+                                Details->Specifiers[Specifier].Type = FormatStringUTF16;
+                            }
+                        } else if (Format[CodePoint] == U32('c')) {
+                            if (Details->StringType == UTF8Format) {
+                                Details->Specifiers[Specifier].Type = FormatCodePoint8;
+                            } else if (Details->StringType == UTF16Format) {
+                                Details->Specifiers[Specifier].Type = FormatCodePoint16;
+                            }
+                        } else if (Format[CodePoint] == U32('%')) {
+                            // Just write  percent codepoint
+                            Details->Specifiers[Specifier].Type     = FormatPercent;
+                        } else if (Format[CodePoint] == U32('f')) {
+                            Details->Specifiers[Specifier].Type     = FormatBase10DecimalL;
+                        } else if (Format[CodePoint] == U32('F')) {
+                            Details->Specifiers[Specifier].Type     = FormatBase10DecimalU;
+                        } else if (Format[CodePoint] == U32('e')) {
+                            Details->Specifiers[Specifier].Type     = FormatScientificDecimalL;
+                        } else if (Format[CodePoint] == U32('E')) {
+                            Details->Specifiers[Specifier].Type     = FormatScientificDecimalU;
+                        } else if (Format[CodePoint] == U32('g')) {
+                            Details->Specifiers[Specifier].Type     = FormatShortestDecimalL;
+                        } else if (Format[CodePoint] == U32('G')) {
+                            Details->Specifiers[Specifier].Type     = FormatShortestDecimalU;
+                        } else if (Format[CodePoint] == U32('a')) {
+                            Details->Specifiers[Specifier].Type     = FormatBase16DecimalL;
+                        } else if (Format[CodePoint] == U32('A')) {
+                            Details->Specifiers[Specifier].Type     = FormatBase16DecimalU;
+                        }
+                        /* Type */
+                    }
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate FormatString"));
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Details;
+    }
+    
+    UTF32 *UTF32_FormatString(UTF32 *Format, FormatString *Details, va_list VariadicArguments) {
+        UTF32 *Formatted = Format;
+        if (Format != NULL) {
+            for (uint64_t Specifier = 0ULL; Specifier < Details->NumSpecifiers; Specifier++) { // Stringify each specifier
+                FormatSpecifierTypes Type = Details->Specifiers[Specifier].Type;
+                if (Type == FormatStringUTF8 || Type == FormatCodePoint8) {
+                    Details->Specifiers[Specifier].String = UTF8_Decode(va_arg(VariadicArguments, UTF8*));
+                } else if (Type == FormatStringUTF16 || Type == FormatCodePoint16) {
+                    Details->Specifiers[Specifier].String = UTF16_Decode(va_arg(VariadicArguments, UTF16*));
+                } else if (Type == FormatPercent) {
+                    Details->Specifiers[Specifier].String = U32("%");
+                } else if (Type == FormatBase10DecimalL) {
+                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(Decimal, va_arg(VariadicArguments, double));
+                } else if (Type == FormatBase10DecimalU) {
+                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(Decimal, va_arg(VariadicArguments, double));
+                } else if (Type == FormatBase16DecimalL) {
+                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(HexLower, va_arg(VariadicArguments, double));
+                } else if (Type == FormatBase16DecimalU) {
+                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(HexUpper, va_arg(VariadicArguments, double));
+                } else if (Type == FormatBase2Integer) {
+                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(Binary, va_arg(VariadicArguments, double));
+                } else if (Type == FormatScientificDecimalU)
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("FormatString Pointer is NULL"));
+        }
+        return Formatted;
     }
     
     UTF8 *UTF8_FormatString(UTF8 *Format, ...) {
         UTF8 *Format8 = NULL;
         if (Format != NULL) {
-            UTF32 *Format32              = UTF8_Decode(Format);
-            // Count the number of specifiers with a UTF32_* only function, then use that to initalize the formt string.
-            uint64_t NumVarArgs          = UTF32_CountVariadicArguments(Format32);
-            FormatString *VariadicString = FormatString_Init(NumVarArgs);
-            VariadicString->StringType   = UTF8Format;
-            UTF32_ParseFormatSpecifiers
-            
+            UTF32 *Format32               = UTF8_Decode(Format);
+            FormatString *Details         = UTF32_ParseFormatSpecifiers(Format32, UTF8Format);
             va_list VariadicArguments;
-            va_start(VariadicArguments, Format);
-            //UTF32 *FormattedString    = UTF32_FormatString(Format32, VariadicArguments);
+            UTF32 *FormattedString        = UTF32_FormatString(Format32, Details, VariadicArguments);
             va_end(VariadicArguments);
-            Format8                   = UTF8_Encode(FormattedString, No);
+            FormatString_Deinit(Details);
+            Format8                       = UTF8_Encode(FormattedString, No);
             free(Format32);
             free(FormattedString);
         } else {
@@ -1447,420 +1655,19 @@ extern  "C" {
     UTF16 *UTF16_FormatString(UTF16 *Format, ...) {
         UTF16 *Format16 = NULL;
         if (Format != NULL) {
-            UTF32 *Format32           = UTF16_Decode(Format);
+            UTF32 *Format32               = UTF16_Decode(Format);
+            FormatString *Details         = UTF32_ParseFormatSpecifiers(Format32, UTF16Format);
             va_list VariadicArguments;
-            va_start(VariadicArguments, Format);
-            UTF32 *FormattedString    = UTF32_FormatString(Format32, VariadicArguments);
+            UTF32 *FormattedString        = UTF32_FormatString(Format32, Details, VariadicArguments);
             va_end(VariadicArguments);
-            Format16                  = UTF16_Encode(FormattedString, UseLEByteOrder);
+            FormatString_Deinit(Details);
+            Format16                      = UTF16_Encode(FormattedString, UseLEByteOrder);
             free(Format32);
             free(FormattedString);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         return Format16;
-    }
-    
-    
-    
-    
-    
-    
-    /*
-     UTF32 *UTF32_FormatString(UTF32 *Format, va_list VariadicArguments) {
-     typedef enum FormatSpecifierFlags {
-     NoFormatFlag                   = 0,
-     LeftAlignFormatFlag            = 1,
-     PrependSignFormatFlag          = 2,
-     AlignSignsFormatFlag           = 3, // Prepend a space in front of positive ints, a minus for negative
-     PrependZerosFormatFlag         = 4,
-     DecimalPointFormatFlag         = 5, // Don't remove trailing zeros, or add a decimal point or prepend with non-zeros
-     } FormatSpecifierFlags;
-     
-     typedef enum FormatSpecifierMinWidths { // Width field
-     MinWidthIsNextArgument         = -1,
-     NoMinWidth                     = 0,
-     Width1                         = 1,
-     Width2                         = 2,
-     Width3                         = 3,
-     Width4                         = 4,
-     Width5                         = 5,
-     Width6                         = 6,
-     Width7                         = 7,
-     Width8                         = 8,
-     Width9                         = 9,
-     } FormatSpecifierMinWidths;
-     
-     typedef enum FormatSpecifierPrecision { // Precision field
-     MaxPrecisionIsNextArgument     = -1,
-     NoPrecisionFlag                = 0,
-     Precision1                     = 1,
-     Precision2                     = 2,
-     Precision3                     = 3,
-     Precision4                     = 4,
-     Precision5                     = 5,
-     Precision6                     = 6,
-     Precision7                     = 7,
-     Precision8                     = 8,
-     Precision9                     = 9,
-     } FormatSpecifierPrecision;
-     
-     typedef enum FormatSpecifierLength { // Length field
-     NoLengthFlag                   = 0,
-     CharPromoted2Int               = 1,
-     ShortPromoted2Int              = 2,
-     LongLengthSpecifier            = 3,
-     LongLongLengthSpecifier        = 4,
-     LongDoubleSpecifier            = 5,
-     Size_TSpecifiier               = 6,
-     IntMaxSpecifier                = 7,
-     PtrDiffSpecifier               = 8,
-     } FormatSpecifierLength;
-     
-     typedef enum FormatSpecifierTypes { // U = uppercase, L = lowercase
-     UnknownSpecifierType           = 0,
-     FormatCodePoint8               = 1,
-     FormatCodePoint16              = 2,
-     FormatCodePoint32              = 3,
-     FormatCodePointHex4            = 4,
-     FormatCodePointHex8            = 5,
-     FormatCodePointHexVariable     = 6,
-     FormatStringUTF8               = 7,
-     FormatStringUTF16              = 8,
-     FormatAlarmBell                = 9,
-     FormatNULLTerminatingChar      = 10,
-     FormatBackspace                = 11,
-     FormatFormFeed                 = 12,
-     FormatNewLine                  = 13,
-     FormatCarriageReturn           = 14,
-     FormatTab                      = 15,
-     FormatVerticalTab              = 16,
-     FormatApostrophe               = 17,
-     FormatQuote                    = 18,
-     FormatBackslash                = 19,
-     FormatPointer                  = 20,
-     FormatBase2Integer             = 21,
-     FormatUnsignedBase8Integer     = 22,
-     FormatSignedBase10Integer      = 23,
-     FormatUnsignedBase16IntegerU   = 24,
-     FormatUnsignedBase16IntegerL   = 25,
-     FormatUnsignedBase10Integer    = 26,
-     FormatBase10DecimalU           = 27,
-     FormatBase10DecimalL           = 28,
-     FormatScientificDecimalU       = 29,
-     FormatScientificDecimalL       = 30,
-     FormatShortestDecimalU         = 31,
-     FormatShortestDecimalL         = 32,
-     FormatBase16DecimalU           = 34,
-     FormatBase16DecimalL           = 35,
-     } FormatSpecifierTypes;
-     
-     uint64_t NumSpecifiers             = 0ULL;
-     uint64_t CurrentSpecifier          = 0ULL;
-     uint64_t FormatStringSize          = 0ULL;
-     
-     if (Format != NULL) {
-     FormatStringSize                                 = UTF32_GetStringSizeInCodePoints(Format);
-     
-     for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) {
-     if ((Format[CodePoint] == U32('%') && Format[CodePoint + 1] != U32('%')) || (Format[CodePoint] == U32('\\') && Format[CodePoint + 1] != U32('\\'))) {
-     NumSpecifiers                           += 1;
-     }
-     }
-     uint64_t                 *SpecifierOffset        = calloc(NumSpecifiers, sizeof(uint64_t));
-     uint64_t                 *SpecifierSize          = calloc(NumSpecifiers, sizeof(uint64_t));
-     uint64_t                 *SpecifierParameter     = calloc(NumSpecifiers, sizeof(uint64_t));
-     FormatSpecifierFlags     *SpecifierFlags         = calloc(NumSpecifiers, sizeof(FormatSpecifierFlags));
-     FormatSpecifierMinWidths *SpecifierWidth         = calloc(NumSpecifiers, sizeof(FormatSpecifierMinWidths));
-     FormatSpecifierPrecision *SpecifierPrecision     = calloc(NumSpecifiers, sizeof(FormatSpecifierPrecision));
-     FormatSpecifierLength    *SpecifierLength        = calloc(NumSpecifiers, sizeof(FormatSpecifierLength));
-     FormatSpecifierTypes     *SpecifierType          = calloc(NumSpecifiers, sizeof(FormatSpecifierTypes));
-     
-     UTF32 TypeSpecifiers[21] = {U32('a'), U32('A'), U32('b'), U32('c'), U32('C'), U32('d'), U32('e'), U32('E'), U32('f'), U32('F'), U32('g'), U32('G'), U32('i'), U32('o'), U32('p'), U32('s'), U32('S'), U32('u'), U32('x'), U32('X'), U32('%')};
-     
-     // Ok, so we know how many specifiers there are, now we need to know their offsets and sizes.
-     // So, that means we need to loop again.
-     
-     for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) {
-     for (uint64_t Specifier = 0ULL; Specifier < NumSpecifiers; Specifier++) {
-     if ((Format[CodePoint] == U32('%') && Format[CodePoint + 1] != U32('%')) || (Format[CodePoint] == U32('\\') && Format[CodePoint + 1] != U32('\\'))) {
-     // Found the start of a format specifier, so set the SpecifierOffset
-     SpecifierOffset[Specifier]       = CodePoint;
-     }
-     for (uint64_t Type = 0ULL; Type < 21; Type++) {
-     if (Format[CodePoint + 1] == TypeSpecifiers[Type]) {
-     SpecifierSize[Specifier]         = CodePoint - SpecifierSize[Specifier];
-     }
-     }
-     }
-     }
-     
-     // 3rd loop, the logic needs to be while we're greater than or equal to SpecifierOffset but less than or equal to SpecifierSize, look for flags
-     for (uint64_t CodePoint = 1ULL; CodePoint < FormatStringSize; CodePoint++) {
-     for (uint64_t Specifier = 0ULL; Specifier < NumSpecifiers; Specifier++) {
-     while (CodePoint >= SpecifierOffset[Specifier] && CodePoint <= SpecifierOffset[Specifier] + SpecifierSize[Specifier]) {
-     // we're inside of a specifier, start reading this specifiers type, and with that info start creatng strings
-     if (SpecifierSize[Specifier] == 1) {
-     // we only have a type code
-     } else {
-     if (Format[CodePoint - 1] == U32('-')) { // Check for Flags
-     SpecifierFlags[Specifier] = LeftAlignFormatFlag;
-     } else if (Format[CodePoint - 1] == U32('+')) {
-     SpecifierFlags[Specifier] = PrependSignFormatFlag;
-     } else if (Format[CodePoint - 1] == U32(' ')) {
-     SpecifierFlags[Specifier] = AlignSignsFormatFlag;
-     } else if (Format[CodePoint - 1] == U32('0')) {
-     SpecifierFlags[Specifier] = PrependZerosFormatFlag;
-     } else if (Format[CodePoint - 1] == U32('#')) {
-     SpecifierFlags[Specifier] = DecimalPointFormatFlag;
-     }
-     
-     if (Format[CodePoint - 1] == U32('1')) { // Width
-     SpecifierWidth[Specifier] = 1;
-     } else if (Format[CodePoint - 1] == U32('2')) {
-     SpecifierWidth[Specifier] = 2;
-     } else if (Format[CodePoint - 1] == U32('3')) {
-     SpecifierWidth[Specifier] = 3;
-     } else if (Format[CodePoint - 1] == U32('4')) {
-     SpecifierWidth[Specifier] = 4;
-     } else if (Format[CodePoint - 1] == U32('5')) {
-     SpecifierWidth[Specifier] = 5;
-     } else if (Format[CodePoint - 1] == U32('6')) {
-     SpecifierWidth[Specifier] = 6;
-     } else if (Format[CodePoint - 1] == U32('7')) {
-     SpecifierWidth[Specifier] = 7;
-     } else if (Format[CodePoint - 1] == U32('8')) {
-     SpecifierWidth[Specifier] = 8;
-     } else if (Format[CodePoint - 1] == U32('9')) {
-     SpecifierWidth[Specifier] = 9;
-     } else if (Format[CodePoint - 1] == U32('*')) {
-     SpecifierWidth[Specifier] = MinWidthIsNextArgument;
-     }
-     
-     if (Format[CodePoint - 1] == U32('.')) { // Precision
-     if (Format[CodePoint] == U32('1')) {
-     SpecifierPrecision[Specifier] = 1;
-     } else if (Format[CodePoint] == U32('2')) {
-     SpecifierPrecision[Specifier] = 2;
-     } else if (Format[CodePoint] == U32('3')) {
-     SpecifierPrecision[Specifier] = 3;
-     } else if (Format[CodePoint] == U32('4')) {
-     SpecifierPrecision[Specifier] = 4;
-     } else if (Format[CodePoint] == U32('5')) {
-     SpecifierPrecision[Specifier] = 5;
-     } else if (Format[CodePoint] == U32('6')) {
-     SpecifierPrecision[Specifier] = 6;
-     } else if (Format[CodePoint] == U32('7')) {
-     SpecifierPrecision[Specifier] = 7;
-     } else if (Format[CodePoint] == U32('8')) {
-     SpecifierPrecision[Specifier] = 8;
-     } else if (Format[CodePoint] == U32('9')) {
-     SpecifierPrecision[Specifier] = 9;
-     } else if (Format[CodePoint] == U32('*')) {
-     SpecifierPrecision[Specifier] = MaxPrecisionIsNextArgument;
-     }
-     }
-     
-     if (Format[CodePoint - 1] == U32('h') && Format[CodePoint] == U32('h')) { // Length specifiers
-     SpecifierLength[Specifier] = CharPromoted2Int;
-     } else if (Format[CodePoint - 1] == U32('l') && Format[CodePoint] == U32('l')) {
-     SpecifierLength[Specifier] = LongLongLengthSpecifier;
-     } else if (Format[CodePoint - 1] == U32('h')) {
-     SpecifierLength[Specifier] = ShortPromoted2Int;
-     } else if (Format[CodePoint - 1] == U32('l')) {
-     SpecifierLength[Specifier] = LongLengthSpecifier;
-     } else if (Format[CodePoint - 1] == U32('L')) {
-     SpecifierLength[Specifier] = LongDoubleSpecifier;
-     } else if (Format[CodePoint - 1] == U32('z')) {
-     SpecifierLength[Specifier] = Size_TSpecifiier;
-     } else if (Format[CodePoint - 1] == U32('j')) {
-     SpecifierLength[Specifier] = IntMaxSpecifier;
-     } else if (Format[CodePoint - 1] == U32('t')) {
-     SpecifierLength[Specifier] = PtrDiffSpecifier;
-     }
-     }
-     }
-     }
-     }
-     
-     
-     for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) { // We know how many specifiers there are, now we need to figure out each ones properties.
-     if (Format[CodePoint] == U32('%')) {
-     // Ok so now we check for all of the various specifiers, flags, widhts, precisions, lengths, and types.
-     
-     switch (Format[CodePoint + 1]) { // Flags, + 1 needs to be replaced by a second loop
-     case U32('-'):
-     // Left align
-     break;
-     case U32('+'):
-     // Prepend a sign symbol (+ or -) to a number
-     break;
-     case U32(' '):
-     // Prepend a space for positive numbers or a - for negative ones
-     break;
-     case U32('0'):
-     // When the width field exists, prepend 0's for numeric types, the default is to prepend spaces
-     break;
-     
-     case U32('#'):
-     // for g and G types, trailing 0's aren't removed, for f F e E g G types, the output always contains a decimal; for o, x X types o,ox, oX is prepended to non-zero numbers.
-     break;
-     }
-     
-     switch (Format[CodePoint + 1]) { // Width, + 1 needs to be replaced by a second loop
-     case U32('*'): // Get the value from the field
-     
-     break;
-     
-     default:
-     break;
-     }
-     
-     So, we've found a percent symbol, lets start checking the next symbol against all the shit.
-    
-     Control logic:
-     
-     Loop until we find a codepoint matching a type, which has to be last.
-     
-     
-     
-     for (uint64_t Specifier = 1ULL; Specifier < FormatStringSize - CodePoint; Specifier++) {
-     for (uint8_t Type = 0; Type < 21; Type++) {
-     if (Format[CodePoint + Specifier] == TypeSpecifiers[Type]) {
-     SpecifierSize[CurrentSpecifier] = Specifier;
-     }
-     }
-     }
-     
-     switch (Format[CodePoint + 1]) { // Types
-     case U32('a'):
-     break;
-     case U32('A'):
-     break;
-     case U32('b'): // Binary, extension
-     break;
-     case U32('c'):
-     break;
-     case U32('C'): // Windows extension for "wide" characters
-     break;
-     case U32('d'):
-     break;
-     case U32('e'):
-     break;
-     case U32('E'):
-     break;
-     case U32('f'):
-     break;
-     case U32('F'):
-     break;
-     case U32('g'):
-     break;
-     case U32('G'):
-     break;
-     case U32('i'):
-     break;
-     case U32('o'):
-     break;
-     case U32('p'):
-     break;
-     case U32('s'):
-     break;
-     case U32('S'): // Windows extension for "wide" strings
-     break;
-     case U32('u'):
-     break;
-     case U32('x'):
-     break;
-     case U32('X'):
-     break;
-     case U32('%'):
-     break;
-     }
-     } else if (Format[CodePoint] == U32('\\')) {
-     // This is a lot easier, just look for the previously listed ones, and set the offsets and shit.
-     SpecifierOffset[CurrentSpecifier] = CodePoint;
-     SpecifierSize[CurrentSpecifier]   = 2; // 1 for the / and another for whatever character this matches
-     switch (Format[CodePoint + 1]) {
-     case U32('0'):  // NULL terminator
-     SpecifierType[CurrentSpecifier] = FormatNULLTerminatingChar;
-     break;
-     case U32('a'):  // Alarm aka beep
-     SpecifierType[CurrentSpecifier] = FormatAlarmBell;
-     break;
-     case U32('b'):  // Backspace
-     SpecifierType[CurrentSpecifier] = FormatBackspace;
-     break;
-     case U32('f'):  // Form feed
-     SpecifierType[CurrentSpecifier] = FormatFormFeed;
-     break;
-     case U32('n'):  // Newline
-     SpecifierType[CurrentSpecifier] = FormatNewLine;
-     break;
-     case U32('r'):  // Carriage return
-     SpecifierType[CurrentSpecifier] = FormatCarriageReturn;
-     break;
-     case U32('t'):  // Horizontal tab
-     SpecifierType[CurrentSpecifier] = FormatTab;
-     break;
-     case U32('u'):  // Unicode 4 digit codepoint
-     SpecifierType[CurrentSpecifier] = FormatCodePointHex4;
-     break;
-     case U32('U'):  // Unicode 8 digit codepoint
-     SpecifierType[CurrentSpecifier] = FormatCodePointHex8;
-     break;
-     case U32('v'):  // Vertical tab
-     SpecifierType[CurrentSpecifier] = FormatVerticalTab;
-     break;
-     case U32('x'):  // Hex specifier
-     SpecifierType[CurrentSpecifier] = FormatCodePointHexVariable;
-     break;
-     case U32('\''): // Apostrophe
-     SpecifierType[CurrentSpecifier] = FormatApostrophe;
-     break;
-     case U32('"'):  // Quote
-     SpecifierType[CurrentSpecifier] = FormatQuote;
-     break;
-     case U32('\\'): // Backslash
-     SpecifierType[CurrentSpecifier] = FormatBackslash;
-     break;
-     }
-     }
-     free(SpecifierOffset);
-     free(SpecifierSize);
-     free(SpecifierParameter);
-     free(SpecifierFlags);
-     free(SpecifierWidth);
-     free(SpecifierPrecision);
-     free(SpecifierLength);
-     free(SpecifierType);
-     }
-     } else {
-     Log(Log_ERROR, __func__, U8("Format Pointer is NULL"));
-     }
-     return NULL;
-     }
-     */
-    
-    uint8_t UTF16_DetectByteOrder(UTF16 *String) { // UTF-16BE = U+AB30, UTF-16LE = U+30AB
-        // UTF-32BE = U+1F984, UTF-32LE = U+84F901, UTF-16BE = 0xD83E 0xDD84
-        
-        // So, for codepoints greater than 0x10000 we need to identify the high surrogate, which is between 0xD800 and 0xDBFF, and the low surrogate which is between 0xDC00 and 0xDFFF.
-        uint64_t CodeUnit = 0ULL;
-        if (String != NULL) {
-            // Should we trust the byte order mark if it exists? I'm thinking no. if someone calls this function, it's because they want to know the real byte order.
-            do {
-                if (String[CodeUnit] < 256) {
-                    
-                } else if (String[CodeUnit] >= 256 && (String[CodeUnit] < UTF16LowSurrogateStart)) {
-                    
-                } else if (String[CodeUnit] >= UTF16HighSurrogateStart && String[CodeUnit] <= UTF16HighSurrogateEnd) { // High surrogate
-                    
-                }
-            } while (String[CodeUnit] != NULLTerminator);
-        } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        }
-        return 0;
     }
     
     void UTF8_WriteString2File(UTF8 *String, FILE *OutputFile) {
@@ -1902,4 +1709,3 @@ extern  "C" {
 #ifdef  __cplusplus
 }
 #endif
-

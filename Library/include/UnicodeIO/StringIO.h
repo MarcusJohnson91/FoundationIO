@@ -100,7 +100,7 @@ extern  "C" {
                           Octal                                = 8,
                           Decimal                              = 10,
                           HexUpper                             = 16,
-                          HewLower                             = 32,
+                          HexLower                             = 32,
     } StringIOBases;
     
     /*!
@@ -533,19 +533,19 @@ extern  "C" {
      @abstract                             "Converts a double to a string, replaces strtod and atof".
      @param               Decimal          "The decimal number to convert to a string".
      */
-    UTF8                 *UTF8_Decimal2String(double Decimal);
+    UTF8                 *UTF8_Decimal2String(const StringIOBases Base, double Decimal);
     
     /*!
      @abstract                             "Converts a double to a string, replaces strtod and atof".
      @param               Decimal          "The decimal number to convert to a string".
      */
-    UTF16                *UTF16_Decimal2String(double Decimal);
+    UTF16                *UTF16_Decimal2String(const StringIOBases Base, double Decimal);
     
     /*!
      @abstract                             "Converts a double to a string, replaces strtod and atof".
      @param               Decimal          "The decimal number to convert to a string".
      */
-    UTF32                *UTF32_Decimal2String(double Decimal);
+    UTF32                *UTF32_Decimal2String(const StringIOBases Base, double Decimal);
     
     /*!
      @abstract                             "Removes substrings (including single codepoints, but also strings) from a string".
