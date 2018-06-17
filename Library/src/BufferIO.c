@@ -500,7 +500,7 @@ extern "C" {
                     PathPrepended            = UTF8_ReplaceSubString(Path2Open, "//?/", 0, 0);
                 }
             } else {
-                if (WinPath32[0] != U32('\\') && WinPath32[1] != U32('\\') && WinPath32[2] != U32('\?') && WinPath32[3] != U32('\\'))) {
+                if (WinPath32[0] != U32('\\') && WinPath32[1] != U32('\\') && WinPath32[2] != U32('\?') && WinPath32[3] != U32('\\')) {
                     PathPrepended            = UTF8_ReplaceSubString(Path2Open, "//?/", 0, 0);
                 } else {
                     if (BitI->FileSpecifierExists == No) {

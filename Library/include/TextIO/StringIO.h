@@ -89,18 +89,34 @@ extern  "C" {
     
     /*!
      @enum                StringIOBases
-     @constant            Binary                               "Base 2".
-     @constant            Octal                                "Base 8".
-     @constant            Decimal                              "Base 10".
-     @constant            HexUpper                             "Base 16, 0-9A-F".
-     @constant            HexLower                             "Base 16, 0-9a-f".
+     @constant            IntegerBase2                         "Base 2".
+     @constant            IntegerBase8                         "Base 8".
+     @constant            IntegerBase10                        "Base 10".
+     @constant            IntegerBase16U                       "Base 16, 0-9A-F".
+     @constant            IntegerHexL                          "Base 16, 0-9a-f".
+     @constant            FloatDecimalU                        "Base 10, 392.96".
+     @constant            FloatDecimalL                        "Base 10, 392.96".
+     @constant            FloatScientificU                     "Base 10, 392.96E+2".
+     @constant            FloatScientificL                     "Base 10, 392.96e+2".
+     @constant            FloatShortestU                       "Choose the shortest representation between Scientific and Decimal, Uppercase".
+     @constant            FloatShortestL                       "Choose the shortest representation between Scientific and Decimal, Lowercase".
+     @constant            FloatHexU                            "-188.60E+2".
+     @constant            FloatHexL                            "-188.60e+2".
      */
     typedef enum StringIOBases {
-                          Binary                               = 2,
-                          Octal                                = 8,
-                          Decimal                              = 10,
-                          HexUpper                             = 16,
-                          HexLower                             = 32,
+                          IntegerBase2                         = 2,
+                          IntegerBase8                         = 8,
+                          IntegerBase10                        = 10,
+                          IntegerBase16U                       = 16,
+                          IntegerBase16L                       = 32,
+                          FloatDecimalU                        = 64,
+                          FloatDecimalL                        = 128,
+                          FloatScientificU                     = 256,
+                          FloatScientificL                     = 512,
+                          FloatShortestU                       = 1024,
+                          FloatShortestL                       = 2048,
+                          FloatHexU                            = 4096,
+                          FloatHexL                            = 8192,
     } StringIOBases;
     
     /*!
