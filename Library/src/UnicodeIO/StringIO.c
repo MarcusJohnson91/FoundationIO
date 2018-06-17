@@ -883,6 +883,11 @@ extern  "C" {
         return ReplacedString;
     }
     
+    /*
+     Ok, we need to change the API for RelaceSubString.
+     If a SubString to be replaced, is smaller than what to replace it with, we need to go ahead and simply leave the string as it.
+     */
+    
     UTF8 *UTF8_RemoveSubString(UTF8 *String, UTF8 *SubString2Remove, int64_t Instance2Remove) {
         UTF8 *TrimmedString         = NULL;
         if (String != NULL && SubString2Remove != NULL && Instance2Remove >= -1) {
@@ -1120,7 +1125,7 @@ extern  "C" {
             Num                 /= Base;
             NumDigits           += 1;
         }
-        if (Integer2Convert < 0 && Base == Decimal) {
+        if (Integer2Convert < 0 && Base == IntegerBase10) {
             Sign                 = -1;
             NumDigits           +=  1;
         }
@@ -1131,8 +1136,8 @@ extern  "C" {
             for (uint64_t CodePoint = NumDigits - 1; CodePoint > 0; CodePoint--) {
                 // Ok, so we've clamped the looping, now all we need to do is malloc a string with NumDigits as it's size.
                 // Now we just AND the number with Bit to get it's value, if the value is a 1 write a 1, otherwise write a zero
-                int64_t CurrentDigit    = (Base == Decimal ? Absolute(Integer2Convert %= Base) : (Integer2Convert %= Base));
-                NumberString[CodePoint] = (Base == HexUpper ? UpperNumerals[CurrentDigit] : LowerNumerals[CurrentDigit]);
+                int64_t CurrentDigit    = (Base == IntegerBase10 ? Absolute(Integer2Convert %= Base) : (Integer2Convert %= Base));
+                NumberString[CodePoint] = (Base == IntegerBase16U ? UpperNumerals[CurrentDigit] : LowerNumerals[CurrentDigit]);
             }
         }
         return NumberString;
@@ -1203,13 +1208,29 @@ extern  "C" {
         return String16;
     }
     
-    UTF32 *UTF32_Decimal2String(const StringIOBases Base, double Decimal) {
+    UTF32 *UTF32_Decimal2String(const StringIOBases Base, double Number) {
         UTF32   *OutputString = NULL;
-        int8_t   Sign         = Decimal < 0.0 ? -1 : 1;
+        int8_t   Sign         = Number < 0.0 ? -1 : 1;
         int32_t *Exponent     = calloc(1, sizeof(int32_t));
         int32_t  Exponent2    = Exponent;
-        float    Mantissa     = frexp(Decimal, Exponent);
+        float    Mantissa     = frexp(Number, Exponent);
         float    Mantissa2    = Mantissa;
+        
+        if (Base == FloatDecimalL) { // Write the number as XXX.YY
+            
+        } else if (Base == FloatScientificU) { // Write the number as XXX.YYE(+|-)Z
+            
+        } else if (Base == FloatScientificL) { // Write the number as XXX.YYe(+|-)Z
+            
+        } else if (Base == FloatShortestU) { // Get the size of the string for both Decimal and hex representations, and chhoose the shortest.
+            
+        } else if (Base == FloatShortestL) { // Get the size of the string for both Decimal and hex representations, and choose the shortest.
+            
+        }
+        
+        
+        
+        
         
         // Ok now we just need to get the strings size
         uint64_t StringSize   = 0ULL;
@@ -1396,9 +1417,8 @@ extern  "C" {
     } FormatSpecifierTypes;
     
     typedef struct FormatSpecifier {
-        uint64_t                  Offset;
-        uint64_t                  Size;
-        
+        uint64_t                  StringOffset;
+        uint64_t                  StringSize;
         uint64_t                  MinWidth;
         uint64_t                  Precision;
         UTF32                    *String;
@@ -1451,7 +1471,7 @@ extern  "C" {
                 for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) {
                     if (Format[CodePoint] == U32('%')) {
                         Details->NumSpecifiers += 1;
-                        Details->Specifiers[Details->NumSpecifiers - 1].Offset = CodePoint + 1;
+                        Details->Specifiers[Details->NumSpecifiers - 1].StringOffset = CodePoint + 1;
                         for (uint64_t EndCodePoint = 1ULL; EndCodePoint + CodePoint < FormatStringSize; EndCodePoint++) {
                             UTF32 CurrentCodePoint = Format[CodePoint + EndCodePoint];
                             if (CurrentCodePoint == U'd' || CurrentCodePoint == U'i' || CurrentCodePoint == U'o' || CurrentCodePoint == U'u' ||
@@ -1461,14 +1481,14 @@ extern  "C" {
                                 CurrentCodePoint == U'%' || CurrentCodePoint == U'n' || CurrentCodePoint == U'r' || CurrentCodePoint == U't' ||
                                 CurrentCodePoint == U'v') {
                                 
-                                Details->Specifiers[Details->NumSpecifiers - 1].Size = Details->Specifiers[Details->NumSpecifiers - 1].Offset - EndCodePoint;
+                                Details->Specifiers[Details->NumSpecifiers - 1].StringSize = Details->Specifiers[Details->NumSpecifiers - 1].StringOffset - EndCodePoint;
                             }
                         }
                     }
                 }
                 for (uint64_t Specifier = 0ULL; Specifier < Details->NumSpecifiers; Specifier++) {
-                    uint64_t SpecifierStart = Details->Specifiers[Specifier].Offset + 1;
-                    uint64_t SpecifierEnd   = Details->Specifiers[Specifier].Offset + Details->Specifiers[Specifier].Size;
+                    uint64_t SpecifierStart = Details->Specifiers[Specifier].StringOffset + 1;
+                    uint64_t SpecifierEnd   = Details->Specifiers[Specifier].StringOffset + Details->Specifiers[Specifier].StringSize;
                     for (uint64_t CodePoint = SpecifierStart; CodePoint < SpecifierEnd; Specifier++) {
                         if (CodePoint == SpecifierStart) { // Flags
                             switch (Format[CodePoint]) {
@@ -1574,7 +1594,6 @@ extern  "C" {
                                 Details->Specifiers[Specifier].Type = FormatCodePoint16;
                             }
                         } else if (Format[CodePoint] == U32('%')) {
-                            // Just write  percent codepoint
                             Details->Specifiers[Specifier].Type     = FormatPercent;
                         } else if (Format[CodePoint] == U32('f')) {
                             Details->Specifiers[Specifier].Type     = FormatBase10DecimalL;
@@ -1617,16 +1636,18 @@ extern  "C" {
                 } else if (Type == FormatPercent) {
                     Details->Specifiers[Specifier].String = U32("%");
                 } else if (Type == FormatBase10DecimalL) {
-                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(Decimal, va_arg(VariadicArguments, double));
+                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(FloatDecimalL, va_arg(VariadicArguments, double));
                 } else if (Type == FormatBase10DecimalU) {
-                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(Decimal, va_arg(VariadicArguments, double));
+                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(FloatDecimalU, va_arg(VariadicArguments, double));
                 } else if (Type == FormatBase16DecimalL) {
-                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(HexLower, va_arg(VariadicArguments, double));
+                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(FloatHexL, va_arg(VariadicArguments, double));
                 } else if (Type == FormatBase16DecimalU) {
-                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(HexUpper, va_arg(VariadicArguments, double));
+                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(FloatHexU, va_arg(VariadicArguments, double));
                 } else if (Type == FormatBase2Integer) {
-                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(Binary, va_arg(VariadicArguments, double));
-                } else if (Type == FormatScientificDecimalU)
+                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(IntegerBinary, va_arg(VariadicArguments, double));
+                } else if (Type == FormatScientificDecimalU) {
+                    
+                }
             }
         } else {
             Log(Log_ERROR, __func__, U8("FormatString Pointer is NULL"));
