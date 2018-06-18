@@ -1644,7 +1644,7 @@ extern  "C" {
                 } else if (Type == FormatBase16DecimalU) {
                     Details->Specifiers[Specifier].String = UTF32_Decimal2String(FloatHexU, va_arg(VariadicArguments, double));
                 } else if (Type == FormatBase2Integer) {
-                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(IntegerBinary, va_arg(VariadicArguments, double));
+                    Details->Specifiers[Specifier].String = UTF32_Decimal2String(IntegerBase2, va_arg(VariadicArguments, double));
                 } else if (Type == FormatScientificDecimalU) {
                     
                 }
