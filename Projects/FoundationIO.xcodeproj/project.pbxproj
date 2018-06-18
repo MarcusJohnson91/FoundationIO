@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2C7C58DB20C42ADB0070B890 /* StringIOTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D320C42ADB0070B890 /* StringIOTables.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		2C7C58DB20C42ADB0070B890 /* StringIOTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D320C42ADB0070B890 /* StringIOTables.h */; };
 		2C7C58E320C42B5C0070B890 /* BitIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58C920C42AB30070B890 /* BitIO.c */; };
 		2C7C58E420C42B5C0070B890 /* CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58CB20C42AB30070B890 /* CommandLineIO.c */; };
 		2C7C58E520C42B5C0070B890 /* ContainerIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58C720C42AB30070B890 /* ContainerIO.c */; };
