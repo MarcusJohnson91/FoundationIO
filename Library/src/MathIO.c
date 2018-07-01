@@ -1,7 +1,7 @@
 #include "../include/Math.h"           /* Included for our declarations */
 
-#ifdef   __cplusplus
-extern   "C" {
+#ifdef __cplusplus
+extern "C" {
 #endif
     
     bool IsNegative(const int64_t Integer) {
@@ -74,6 +74,6 @@ extern   "C" {
         return Bytes;
     }
     
-#ifdef   __cplusplus
+#ifdef __cplusplus
 }
 #endif

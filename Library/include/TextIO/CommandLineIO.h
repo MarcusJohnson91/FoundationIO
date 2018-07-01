@@ -5,8 +5,8 @@
 #ifndef  FoundationIO_CommandLineIO_H
 #define  FoundationIO_CommandLineIO_H
 
-#ifdef   __cplusplus
-extern   "C" {
+#ifdef __cplusplus
+extern "C" {
 #endif
     
     /*!
@@ -286,7 +286,7 @@ extern   "C" {
     
     void                        DEBUGCommandLineOptions(CommandLineIO *CLI);
     
-#ifdef   __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

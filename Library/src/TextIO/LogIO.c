@@ -16,12 +16,12 @@ extern "C" {
     void Log_OpenFile(UTF8 *restrict LogFilePath) {
         if (LogFilePath != NULL) {
 #if   (FoundationIOTargetOS == POSIX)
-            Log_LogFile   = fopen(LogFilePath, U8("a+"));
+            Log_LogFile   = FoundationIO_FileOpen(LogFilePath, U8("a+"));
 #elif (FoundationIOTargetOS == Windows)
             UTF32 *Path32 = UTF8_Decode(LogFilePath);
             UTF16 *Path16 = UTF16_Encode(Path32, UseLEByteOrder);
             free(Path32);
-            Log_LogFile   = _wfopen(Path16, U16("rb"));
+            Log_LogFile   = FoundationIO_FileOpen(Path16, U16("rb"));
             free(Path16);
 #endif
         }
@@ -52,7 +52,7 @@ extern "C" {
     
     void Log_Deinit(void) {
         if (Log_LogFile != NULL) {
-            fclose(Log_LogFile);
+            FoundationIO_FileClose(Log_LogFile);
         }
         if (Log_ProgramName != NULL) {
             free(Log_ProgramName);
