@@ -1,20 +1,12 @@
 #include "StringIO.h"                 /* Included for UTF8, UTF16, FoundationIOTargetOS in Macros */
 
-#if   (FoundationIOTargetOS == POSIX)
-#include <sys/socket.h>               /* Included for connect, socket, sockaddr */
-#include <unistd.h>                   /* Included for read and shit */
-#elif (FoundationIOTargetOS == Windows)
-#include <io.h>                       /* Included because WinSock needs it */
-#include <winsock.h>                  /* Included for the socket support on Windows */
-#endif
-
 #pragma  once
 
 #ifndef  FoundationIO_BitIO_H
 #define  FoundationIO_BitIO_H
 
-#ifdef   __cplusplus
-extern   "C" {
+#ifdef __cplusplus
+extern "C" {
 #endif
     
     /*!
@@ -330,21 +322,21 @@ extern   "C" {
      @param                     BitI                            "BitInput Pointer".
      @return                                                    "Returns the value in BitI->FileSize if it exists".
      */
-    fpos_t                      BitInput_GetFileSize(BitInput *BitI);
+    int64_t                     BitInput_GetFileSize(BitInput *BitI);
     
     /*!
      @abstract                                                  "Gets the position of the BitInput file from the start".
      @param                     BitI                            "BitInput Pointer".
      @return                                                    "Returns the position of the file in bytes from the beginning"
      */
-    fpos_t                      BitInput_GetFilePosition(BitInput *BitI);
+    int64_t                     BitInput_GetFilePosition(BitInput *BitI);
     
     /*!
      @abstract                                                  "Computes the number of bytes left in the file".
      @param                     BitI                            "BitInput Pointer".
      @return                                                    "Returns the number of bytes left in the file".
      */
-    fpos_t                      BitInput_BytesRemaining(BitInput *BitI);
+    int64_t                     BitInput_BytesRemaining(BitInput *BitI);
     
     /*!
      @abstract                                                  "Deallocates BitInput".
@@ -447,7 +439,7 @@ extern   "C" {
     void                        GUUID_Deinit(uint8_t *GUUID);
     /* GUUID */
     
-#ifdef   __cplusplus
+#ifdef __cplusplus
 }
 #endif
 
