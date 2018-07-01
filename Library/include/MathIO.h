@@ -1,4 +1,4 @@
-#include "Macros.h"                   /* Included for u/intX_t, bool, Yes/No macros, FoundationIOTargetOS, GetRuntimeByteBitOrder */
+#include "Macros.h"                   /* Included for u/intX_t, bool, Yes/No macros, FoundationIOTargetOS */
 
 #if   (defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L)
 #include      <tgmath.h>
@@ -6,7 +6,7 @@
 #if   (FoundationIOTargetOS == Windows)
 #include      <math.h>
 #elif (FoundationIOTargetOS == POSIX)
-#include_next <math.h>
+#include      <math.h>
 #endif  /* FoundationIOTargetOS */
 #include      <complex.h>
 #endif
@@ -16,8 +16,8 @@
 #ifndef  FoundationIO_Math_H
 #define  FoundationIO_Math_H
 
-#ifdef   __cplusplus
-extern   "C" {
+#ifdef __cplusplus
+extern "C" {
 #endif
     
     /*!
@@ -100,7 +100,7 @@ extern   "C" {
      */
     int64_t                     Bits2Bytes(const int64_t Bits, const bool RoundUp);
     
-#ifdef   __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

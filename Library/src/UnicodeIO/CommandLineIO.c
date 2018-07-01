@@ -10,8 +10,8 @@
 #include <Wincon.h>                    /* Included for getting the terminal size */
 #endif
 
-#ifdef   __cplusplus
-extern   "C" {
+#ifdef __cplusplus
+extern "C" {
 #endif
     
     /*
@@ -646,6 +646,6 @@ extern   "C" {
         }
     }
     
-#ifdef   __cplusplus
+#ifdef __cplusplus
 }
 #endif

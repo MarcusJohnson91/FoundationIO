@@ -8,8 +8,8 @@ function CreateOutputFileTop {
     printf "#pragma once\n\n" >> $OutputFile
     printf "#ifndef FoundationIO_StringIOTables_H\n" >> $OutputFile
     printf "#define FoundationIO_StringIOTables_H\n\n" >> $OutputFile
-    printf "#ifdef   __cplusplus\n" >> $OutputFile
-    printf "extern   \"C\" {\n" >> $OutputFile
+    printf "#ifdef __cplusplus\n" >> $OutputFile
+    printf "extern \"C\" {\n" >> $OutputFile
     printf "#endif\n\n" >> $OutputFile
     printf "#define UnicodeVersion %s\n\n" $ReadMeVersion >> $OutputFile
     NumWhiteSpaceCodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@WSpace='Y'])" $UCD_Data)
@@ -171,7 +171,7 @@ function CreateGraphemeExtensionTable {
 }
 
 function CreateOutputFileBottom {
-    printf "#ifdef   __cplusplus\n" >> $OutputFile
+    printf "#ifdef __cplusplus\n" >> $OutputFile
     printf "}\n" >> $OutputFile
     printf "#endif /* C++ */\n\n" >> $OutputFile
     printf "#endif /* FoundationIO_StringIOTables_H */\n" >> $OutputFile
