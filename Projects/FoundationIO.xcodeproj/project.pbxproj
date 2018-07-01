@@ -12,7 +12,6 @@
 		2C7C58E420C42B5C0070B890 /* CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58CB20C42AB30070B890 /* CommandLineIO.c */; };
 		2C7C58E520C42B5C0070B890 /* ContainerIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58C720C42AB30070B890 /* ContainerIO.c */; };
 		2C7C58E620C42B5C0070B890 /* Log.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58C820C42AB30070B890 /* Log.c */; };
-		2C7C58E720C42B5C0070B890 /* Macros.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58CA20C42AB30070B890 /* Macros.c */; };
 		2C7C58E820C42B5C0070B890 /* Math.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58C520C42AB30070B890 /* Math.c */; };
 		2C7C58E920C42B5C0070B890 /* StringIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58C620C42AB30070B890 /* StringIO.c */; };
 		2C7C58EA20C42B8C0070B890 /* BitIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D720C42ADB0070B890 /* BitIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -30,7 +29,6 @@
 		2C7C58C720C42AB30070B890 /* ContainerIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = ContainerIO.c; path = ../libFoundationIO/src/ContainerIO.c; sourceTree = "<group>"; };
 		2C7C58C820C42AB30070B890 /* Log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Log.c; path = ../libFoundationIO/src/Log.c; sourceTree = "<group>"; };
 		2C7C58C920C42AB30070B890 /* BitIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = BitIO.c; path = ../libFoundationIO/src/BitIO.c; sourceTree = "<group>"; };
-		2C7C58CA20C42AB30070B890 /* Macros.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Macros.c; path = ../libFoundationIO/src/Macros.c; sourceTree = "<group>"; };
 		2C7C58CB20C42AB30070B890 /* CommandLineIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = CommandLineIO.c; path = ../libFoundationIO/src/CommandLineIO.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
 		2C7C58D320C42ADB0070B890 /* StringIOTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = StringIOTables.h; path = ../libFoundationIO/include/StringIOTables.h; sourceTree = "<group>"; };
 		2C7C58D420C42ADB0070B890 /* Math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Math.h; path = ../libFoundationIO/include/Math.h; sourceTree = "<group>"; };
@@ -86,7 +84,6 @@
 				2C7C58CB20C42AB30070B890 /* CommandLineIO.c */,
 				2C7C58C720C42AB30070B890 /* ContainerIO.c */,
 				2C7C58C820C42AB30070B890 /* Log.c */,
-				2C7C58CA20C42AB30070B890 /* Macros.c */,
 				2C7C58C520C42AB30070B890 /* Math.c */,
 				2C7C58C620C42AB30070B890 /* StringIO.c */,
 			);
@@ -187,7 +184,6 @@
 				2C7C58E420C42B5C0070B890 /* CommandLineIO.c in Sources */,
 				2C7C58E520C42B5C0070B890 /* ContainerIO.c in Sources */,
 				2C7C58E620C42B5C0070B890 /* Log.c in Sources */,
-				2C7C58E720C42B5C0070B890 /* Macros.c in Sources */,
 				2C7C58E820C42B5C0070B890 /* Math.c in Sources */,
 				2C7C58E920C42B5C0070B890 /* StringIO.c in Sources */,
 			);
@@ -379,6 +375,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CFLAGS = "-Wpadded";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
+				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
@@ -386,7 +383,7 @@
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = all;
-				STRIP_SWIFT_SYMBOLS = NO;
+				STRIP_SWIFT_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "macosx iphoneos";
 				USE_HEADERMAP = NO;
 				VALIDATE_PRODUCT = YES;
@@ -396,6 +393,7 @@
 					"-Weverything",
 					"-Wno-c99-compat",
 					"-Wno-conversion",
+					"-Wno-reserved-id-macro",
 				);
 			};
 			name = Debug;
@@ -447,12 +445,13 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CFLAGS = "-Wpadded";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
+				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 				STRIP_STYLE = all;
-				STRIP_SWIFT_SYMBOLS = NO;
+				STRIP_SWIFT_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "macosx iphoneos";
 				USE_HEADERMAP = NO;
 				VALIDATE_PRODUCT = YES;
@@ -462,6 +461,7 @@
 					"-Weverything",
 					"-Wno-c99-compat",
 					"-Wno-conversion",
+					"-Wno-reserved-id-macro",
 				);
 			};
 			name = Release;
