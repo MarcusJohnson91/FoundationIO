@@ -5,8 +5,8 @@
 #ifndef FoundationIO_StringIOTables_H
 #define FoundationIO_StringIOTables_H
 
-#ifdef   __cplusplus
-extern   "C" {
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 #define UnicodeVersion 11.0.0
@@ -48965,7 +48965,7 @@ extern   "C" {
         U"\U00029496",
     };
 
-#ifdef   __cplusplus
+#ifdef __cplusplus
 }
 #endif /* C++ */
 
