@@ -171,6 +171,16 @@ extern "C" {
     void                        BitBuffer_Update(BitBuffer *BitB, BitInput *BitI);
     
     /*!
+     @abstract                                                  "Reads fresh data to a BitBuffer from a BitInput".
+     @remark                                                    "Is NOT destructive, it will keep any unread data in the buffer".
+     @param                     Source                          "The BitBuffer to copy from".
+     @param                     Destination                     "The BitBuffer to copy to".
+     @param                     BitStart                        "The bit to start copying from (inclusive)".
+     @param                     BitEnd                          "The bit to end copying (inclusive)".
+     */
+    void                        BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, uint64_t BitStart, uint64_t BitEnd);
+    
+    /*!
      @abstract                                                  "Peeks (reads but without recording that it's been read) bits from BitBuffer".
      @param                     ByteOrder                       "What byte order are the bits in the BitBuffer"?
      @param                     BitOrder                        "What bit order are the bits in the BitBuffer"?

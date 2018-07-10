@@ -1,7 +1,6 @@
 #include "../include/CommandLineIO.h"  /* Included for the CommandLineIO declarations */
 #include "../include/Log.h"            /* Included for Log */
 
-
 #if   (FoundationIOTargetOS == POSIX)
 #include <sys/ioctl.h>                 /* Included for the terminal size */
 #include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
@@ -531,29 +530,60 @@ extern "C" {
         return Result;
     }
     
-    UTF8 *GetExtensionFromPath(UTF8 *Path) {
-        UTF8 *ExtensionString                  = NULL;
+    static UTF32 *UTF32_GetExtensionFromPath(UTF32 *Path) {
+        UTF32 *Extension = NULL;
         if (Path != NULL) {
-            uint64_t PathSize                  = UTF8_GetStringSizeInCodePoints(Path) + 1;
-            uint64_t ExtensionSize             = PathSize;
-            uint64_t ExtensionDistanceFromEnd  = 0ULL;
-            while (Path[ExtensionDistanceFromEnd] != 0x2E) {
-                ExtensionSize                 -= 1;
-                ExtensionDistanceFromEnd      += 1;
+            // The string has been decoded, all we gotta do is get the string's size in codepoints, and look backwards from there looking for a period.
+            uint64_t StringSize    = UTF32_GetStringSizeInCodePoints(Path);
+            uint64_t ExtensionSize = 0ULL;
+            for (uint64_t CodePoint = StringSize; CodePoint > 0; CodePoint--) {
+                if (Path[CodePoint] == U32('.')) {
+                    // Get the offset, by
+                    ExtensionSize = CodePoint - StringSize;
+                }
             }
-            ExtensionSize                      = PathSize - ExtensionDistanceFromEnd;
-            ExtensionString                    = calloc(ExtensionSize + NULLTerminatorSize, sizeof(UTF8));
-            if (ExtensionString != NULL) {
-                for (uint64_t ExtensionByte = 0LLU; ExtensionByte < ExtensionSize; ExtensionByte++) {
-                    ExtensionString[ExtensionByte] = Path[ExtensionByte + ExtensionDistanceFromEnd];
+            Extension = calloc(1, sizeof(UTF32) * (ExtensionSize + NULLTerminatorSize));
+            if (Extension != NULL) {
+                // Start copying the extension
+                for (uint64_t ExtCodePoint = 0ULL; ExtCodePoint < ExtensionSize; ExtCodePoint++) {
+                    for (uint64_t PathCodePoint = StringSize - ExtensionSize; PathCodePoint < StringSize; PathCodePoint++) {
+                        Extension[ExtCodePoint] = Path[PathCodePoint];
+                    }
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld bytes for the Extension String"), ExtensionSize);
+                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld codepoints for the Extension"), ExtensionSize);
             }
         } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("Path Pointer is NULL"));
         }
-        return ExtensionString;
+        return Extension;
+    }
+    
+    UTF16 *UTF16_GetExtensionFromPath(UTF16 *Path) {
+        UTF16 *Extension       = NULL;
+        if (Path != NULL) {
+            UTF32 *Decoded     = UTF16_Decode(Path);
+            UTF32 *Extension32 = UTF32_GetExtensionFromPath(Decoded);
+            free(Decoded);
+            Extension          = UTF16_Encode(Extension32, UseNativeByteOrder);
+            free(Extension32);
+        } else {
+            Log(Log_ERROR, __func__, U8("Path Pointer is NULL"));
+        }
+        return Extension;
+    }
+    
+    UTF8 *UTF8_GetExtensionFromPath(UTF8 *Path) {
+        UTF8 *Extension = NULL;
+        if (Path != NULL) {
+            UTF32 *Decoded     = UTF8_Decode(Path);
+            UTF32 *Extension32 = UTF32_GetExtensionFromPath(Decoded);
+            free(Decoded);
+            Extension          = UTF8_Encode(Extension32, No);
+        } else {
+            Log(Log_ERROR, __func__, U8("Path Pointer is NULL"));
+        }
+        return Extension;
     }
     
     void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF8 **Strings, uint64_t *Numerator, uint64_t *Denominator) {
