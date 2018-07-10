@@ -5,8 +5,8 @@
 #ifndef FoundationIO_StringIO_H
 #define FoundationIO_StringIO_H
 
-#ifdef  __cplusplus
-extern  "C" {
+#ifdef __cplusplus
+extern "C" {
 #endif
     
     /*!
@@ -212,7 +212,7 @@ extern  "C" {
     
     /*!
      @abstract                             "Returns the number of CodeUnits in the CodePoint".
-     @param               CodeUnit         "The leading codeunit for a codepoint".
+     @param               CodeUnit         "A codeunit for a codepoint".
      */
     uint8_t               UTF16_GetCodePointSize(UTF16 CodeUnit);
     
@@ -462,31 +462,55 @@ extern  "C" {
     UTF32                *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length);
     
     /*!
-     @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
-     @remark                               "Replaces strtok from the standard library".
-     @param               String           "The string you want to be split".
-     @param               NumDelimiters    "The number of delimiter strings in Delimiters".
-     @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
+     @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
+     @param               String           "The string to operate on".
+     @param               SubString2Remove "The substring to remove from the string".
+     @param               Instance2Remove  "The instance (0 for all) of the substring in the string to remove".
      */
-    UTF8                **UTF8_SplitString(UTF8 *String, uint64_t NumDelimiters, UTF8 **Delimiters);
+    UTF8                 *UTF8_RemoveSubString(UTF8 *String, UTF8 *SubString2Remove, uint64_t Instance2Remove);
+    
+    /*!
+     @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
+     @param               String           "The string to operate on".
+     @param               SubString2Remove "The substring to remove from the string".
+     @param               Instance2Remove  "The instance (0 for all) of the substring in the string to remove".
+     */
+    UTF16                *UTF16_RemoveSubString(UTF16 *String, UTF16 *SubString2Remove, uint64_t Instance2Remove);
+    
+    /*!
+     @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
+     @param               String           "The string to operate on".
+     @param               SubString2Remove "The substring to remove from the string".
+     @param               Instance2Remove  "The instance (0 for all) of the substring in the string to remove".
+     */
+    UTF32                *UTF32_RemoveSubString(UTF32 *String, UTF32 *SubString2Remove, uint64_t Instance2Remove);
     
     /*!
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
      @remark                               "Replaces strtok from the standard library".
      @param               String           "The string you want to be split".
-     @param               NumDelimiters    "The number of delimiter strings in Delimiters".
      @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
+     @param               DropDelimiters   "Should the delimiter be put into it's own string, or should the Strings array just contain the actual data"?
      */
-    UTF16               **UTF16_SplitString(UTF16 *String, uint64_t NumDelimiters, UTF16 **Delimiters);
+    UTF8                **UTF8_SplitString(UTF8 *String, UTF8 **Delimiters, bool DropDelimiters);
     
     /*!
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
      @remark                               "Replaces strtok from the standard library".
      @param               String           "The string you want to be split".
-     @param               NumDelimiters    "The number of delimiter strings in Delimiters".
      @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
+     @param               DropDelimiters   "Should the delimiter be put into it's own string, or should the Strings array just contain the actual data"?
      */
-    UTF32               **UTF32_SplitString(UTF32 *String, uint64_t NumDelimiters, UTF32 **Delimiters);
+    UTF16               **UTF16_SplitString(UTF16 *String, UTF16 **Delimiters, bool DropDelimiters);
+    
+    /*!
+     @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
+     @remark                               "Replaces strtok from the standard library".
+     @param               String           "The string you want to be split".
+     @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
+     @param               DropDelimiters   "Should the delimiter be put into it's own string, or should the Strings array just contain the actual data"?
+     */
+    UTF32               **UTF32_SplitString(UTF32 *String, UTF32 **Delimiters, bool DropDelimiters);
     
     /*!
      @abstract                             "Extracts a number from a string".
@@ -670,42 +694,16 @@ extern  "C" {
     /*!
      @abstract                             "Deinitalizes a UTF-8 encoded array of strings (like is returned by SplitString)".
      @param               Strings          "An array of strings to deinitalize, all strings will be freed".
-     @param               NumStrings       "The number of strings in the array, I'm not sure if I'll just put this as the first parameter in the array itself, or have it be an external variable".
      */
-    void                  UTF8_DeinitStringArray(UTF8 **Strings, uint64_t NumStrings);
+    void                  UTF8_DeinitStringArray(UTF8 **Strings);
     
     /*!
      @abstract                             "Deinitalizes a UTF-16 encoded array of strings (like is returned by SplitString)".
      @param               Strings          "An array of strings to deinitalize, all strings will be freed".
-     @param               NumStrings       "The number of strings in the array, I'm not sure if I'll just put this as the first parameter in the array itself, or have it be an external variable".
      */
-    void                  UTF16_DeinitStringArray(UTF16 **Strings, uint64_t NumStrings);
+    void                  UTF16_DeinitStringArray(UTF16 **Strings);
     
-    /*!
-     @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
-     @param               String           "The string to operate on".
-     @param               SubString2Remove "The substring to remove from the string".
-     @param               Instance2Remove  "The instance (-1 for all) of the substring in the string to remove".
-     */
-    UTF8                 *UTF8_RemoveSubString(UTF8 *String, UTF8 *SubString2Remove, int64_t Instance2Remove);
-    
-    /*!
-     @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
-     @param               String           "The string to operate on".
-     @param               SubString2Remove "The substring to remove from the string".
-     @param               Instance2Remove  "The instance (-1 for all) of the substring in the string to remove".
-     */
-    UTF16                *UTF16_RemoveSubString(UTF16 *String, UTF16 *SubString2Remove, int64_t Instance2Remove);
-    
-    /*!
-     @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
-     @param               String           "The string to operate on".
-     @param               SubString2Remove "The substring to remove from the string".
-     @param               Instance2Remove  "The instance (-1 for all) of the substring in the string to remove".
-     */
-    UTF32                *UTF32_RemoveSubString(UTF32 *String, UTF32 *SubString2Remove, int64_t Instance2Remove);
-    
-#ifdef  __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

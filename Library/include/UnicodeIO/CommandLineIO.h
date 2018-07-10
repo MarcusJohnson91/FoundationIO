@@ -235,6 +235,18 @@ extern "C" {
     void                        UTF16_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF16 **Arguments);
     
     /*!
+     @abstract                                                  "Returns the extension from Path as a string".
+     @param                     Path                            "The UTF-8 encoded string to extract the extension from".
+     */
+    UTF8                       *UTF8_GetExtensionFromPath(UTF8 *Path);
+    
+    /*!
+     @abstract                                                  "Returns the extension from Path as a string".
+     @param                     Path                            "The UTF-16 encoded string to extract the extension from".
+     */
+    UTF16                      *UTF16_GetExtensionFromPath(UTF16 *Path);
+    
+    /*!
      @abstract                                                  "Displays on the screen the progress of X actions that are taking place"
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     NumItems2Display                "The number of things you want to show the progress of".
@@ -271,12 +283,6 @@ extern "C" {
      @return                                                    "Returns the data after the switch, if the switch is resultless it will return 0".
      */
     UTF8                        CLIGetOptionResult(CommandLineIO const *CLI, const int64_t OptionID);
-    
-    /*!
-     @abstract                                                  "Returns the extension from Path as a string".
-     @param                     Path                            "The string to work on".
-     */
-    UTF8                       *GetExtensionFromPath(UTF8 *Path);
     
     /*!
      @abstract                                                  "Deallocates the instance of CommandLineIO pointed to by CLI".

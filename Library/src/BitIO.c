@@ -166,6 +166,30 @@ extern "C" {
         }
     }
     
+    void BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, uint64_t BitStart, uint64_t BitEnd) {
+        if (Source != NULL && Destination != NULL && BitStart < BitEnd && BitStart <= Source->NumBits && BitEnd <= Source->NumBits) {
+            uint64_t NumBits2Copy = BitEnd - BitStart;
+            if (BitStart % 8 == 0 && BitEnd % 8 == 0 && NumBits2Copy % 8 == 0) { // Multiple of 8, we can just copy the sumbitch as bytes
+                Destination->NumBits = NumBits2Copy;
+                for (uint64_t Byte = BitStart / 8; Byte < BitEnd / 8; Byte++) {
+                    Destination->Buffer[Byte - (BitStart / 8)] = Source->Buffer[Byte];
+                }
+            } else {
+                for (uint64_t Bit = BitStart; Bit < BitEnd / 8; Bit++) {
+                    Destination->Buffer[Bit / 8] = Source->Buffer[Bit / 8];
+                }
+            }
+        } else if (Source == NULL) {
+            Log(Log_ERROR, __func__, U8("Source Pointer is NULL"));
+        } else if (Destination == NULL) {
+            Log(Log_ERROR, __func__, U8("Destination Pointer is NULL"));
+        } else if (BitStart >= BitEnd) {
+            Log(Log_ERROR, __func__, U8("BitStart %lld is greater than or equal to BitEnd %lld"), BitStart, BitEnd);
+        } else if (BitStart >= Source->NumBits || BitEnd >= Source->NumBits) {
+            Log(Log_ERROR, __func__, U8("BitStart %lld or BitEnd %lld is greater than there are bits in Source %lld"), BitStart, BitEnd, Source->NumBits);
+        }
+    }
+    
     void BitBuffer_Deinit(BitBuffer *BitB) {
         if (BitB != NULL) {
             free(BitB->Buffer);

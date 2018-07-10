@@ -452,6 +452,14 @@ extern "C" {
         return Min;
     }
     
+    void Container_Resize(Container *Collection, uint64_t NewPlaneSize) {
+        if (Collection != NULL) {
+            
+        } else {
+            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
+        }
+    }
+    
 #ifdef __cplusplus
 }
 #endif
