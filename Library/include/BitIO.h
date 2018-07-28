@@ -209,16 +209,6 @@ extern "C" {
     uint64_t                    ReadUnary(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
     
     /*!
-     @abstract                                                  "Reads a Exp-Golomb encoded field from the BitBuffer".
-     @param                     ByteOrder                       "What byte order are the bits in the BitBuffer"?
-     @param                     BitOrder                        "What bit order are the bits in the BitBuffer"?
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding are we reading"?
-     @param                     StopBit                         "What bit is the stop bit"?
-     */
-    uint64_t                    ReadExpGolomb(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit);
-    
-    /*!
      @abstract                                                  "Reads a UTF-8 encoded string from the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     StringSize                      "Size of the string in CodeUnits".
@@ -253,17 +243,6 @@ extern "C" {
      @param                     UnaryBits2Write                 "Value to be written as Unary encoded".
      */
     void                        WriteUnary(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const uint8_t UnaryBits2Write);
-    
-    /*!
-     @abstract                                                  "Writes Exp-Golomb encoded fields to the BitBuffer".
-     @param                     ByteOrder                       "What byte order should the bits be in the BitBuffer"?
-     @param                     BitOrder                        "What bit order should the bits be in the BitBuffer"?
-     @param                     BitB                            "BitBuffer Pointer".
-     @param                     UnaryType                       "What type of Unary coding should we use"?
-     @param                     StopBit                         "What bit is the stop bit"?
-     @param                     Field2Write                     "Value to be encoded as Exp-Golomb and written".
-     */
-    void                        WriteExpGolomb(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const int64_t Field2Write);
     
     /*!
      @abstract                                                  "Reads a UTF-8 encoded string from the BitBuffer".

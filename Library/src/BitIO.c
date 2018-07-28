@@ -215,7 +215,7 @@ extern "C" {
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
                     uint64_t ByteOffset               = Bits2Bytes(BitB->BitOffset + 1, No);
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                    uint64_t ByteOffset               = Bits2Bytes(BitB->BitOffset + 1 + NumBits2Extract, No);
+                    uint64_t ByteOffset               = Bits2Bytes(BitB->BitOffset + 1 + NumBits2Insert, No);
 #endif
                     uint8_t  Bits2InsertForThisByte   = 8 - (BitB->BitOffset % 8);
                     uint8_t  BitMask                  = 0;
@@ -324,18 +324,6 @@ extern "C" {
         return (UnaryType == CountUnary ? OutputData + 1 : OutputData);
     }
     
-    uint64_t ReadExpGolomb(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit) {
-        uint64_t OutputData    = 0ULL;
-        if (BitB != NULL && (StopBit == 0 || StopBit == 1)) {
-            uint8_t Bits2Read  = Logarithm(2, ReadUnary(ByteOrder, BitOrder, BitB, UnaryType, StopBit));
-            OutputData         = ReadBits(ByteOrder, BitOrder, BitB, Bits2Read);
-            BitB->BitOffset   += OutputData;
-        } else if (BitB == NULL) {
-            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
-        }
-        return OutputData;
-    }
-    
     UTF8    *ReadUTF8(BitBuffer *BitB, uint64_t StringSize) {
         UTF8 *ExtractedString             = calloc(StringSize, sizeof(UTF8));
         if (BitB != NULL && ExtractedString != NULL) {
@@ -389,24 +377,6 @@ extern "C" {
             }
             InsertBits(ByteOrder, BitOrder, BitB, Logarithm(2, Field2Write), ~StopBit); // Writing the unary pary
             InsertBits(ByteOrder, BitOrder, BitB, 1, StopBit); // Writing the stop bit
-        } else {
-            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
-        }
-    }
-    
-    void     WriteExpGolomb(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const int64_t Field2Write) {
-        if (BitB != NULL) {
-            uint8_t NumBits2Write = Logarithm(2, Field2Write);
-            WriteUnary(ByteOrder, BitOrder, BitB, UnaryType, StopBit, NumBits2Write);
-            if (UnaryType == CountUnary) {
-                InsertBits(ByteOrder, BitOrder, BitB, NumBits2Write, Field2Write);
-            } else if (UnaryType == WholeUnary) {
-                if (Field2Write > 0) {
-                    InsertBits(ByteOrder, BitOrder, BitB, NumBits2Write, Field2Write * 2);
-                } else {
-                    InsertBits(ByteOrder, BitOrder, BitB, NumBits2Write, Absolute(Field2Write * 2) - 1);
-                }
-            }
         } else {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         }
