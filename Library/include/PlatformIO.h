@@ -1,11 +1,11 @@
-#if    defined(_POSIX_C_SOURCE) || defined(__APPLE__) || defined(__MACH__) || defined(BSD) || defined(linux) || defined(__linux)
+#if (defined(__APPLE__) && defined(__MACH__)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(__ANDROID__) || defined(__minix) || defined(__linux__) || defined(__unix__) || defined(_POSIX_C_SOURCE)
 #ifdef  _FILE_OFFSET_BITS
 #undef  _FILE_OFFSET_BITS
 #define _FILE_OFFSET_BITS 64
 #else
 #define _FILE_OFFSET_BITS 64
-#endif
-#endif
+#endif /* _FILE_OFFSET_BITS */
+#endif /* Various UNIX Platforms */
 
 #include <stdarg.h>                   /* Included for va_list, va_copy, va_start, va_end */
 #include <stdbool.h>                  /* Included for bool */
@@ -31,8 +31,6 @@ extern "C" {
      @brief     This header contains preprocessor macros for generic functions in FoundationIO, and cross-platform compatibility.
      */
     
-#ifndef            BoolYesNoTrueFalse
-#define            BoolYesNoTrueFalse
 #ifndef             Yes
 #define             Yes          1
 #endif           /* Yes */
@@ -45,28 +43,27 @@ extern "C" {
 #ifndef             False
 #define             False        0
 #endif           /* False */
-#endif           /* BoolYesNoTrueFalse */
     
-#ifndef             UnknownOS
-#define             UnknownOS    0
+#ifndef             FoundationIOOSUnknown
+#define             FoundationIOOSUnknown      0
 #endif           /* UnknownOS */
     
-#ifndef             POSIX
-#define             POSIX        1
+#ifndef             FoundationIOOSPOSIX
+#define             FoundationIOOSPOSIX        1
 #endif           /* POSIX */
     
-#ifndef             Windows
-#define             Windows      2
+#ifndef             FoundationIOOSWindows
+#define             FoundationIOOSWindows      2
 #endif           /* Windows */
     
-#ifndef             MacClassic
-#define             MacClassic   3
+#ifndef             FoundationIOOSMacClassic
+#define             FoundationIOOSMacClassic   3
 #endif           /* MacClassicOS */
     
-#if      defined(macintosh) || defined(Macintosh)
+#if defined(macintosh) || defined(Macintosh)
     
 #ifndef             FoundationIOTargetOS
-#define             FoundationIOTargetOS (MacClassic)
+#define             FoundationIOTargetOS FoundationIOOSMacClassic
 #endif           /* FoundationIOTargetOS */
     
 #ifndef             NewLineWithNULLSize
@@ -76,7 +73,7 @@ extern "C" {
 #ifndef             NewLineUTF8
 #define             NewLineUTF8  u8"\r"
 #endif
-   
+    
 #ifndef             NewLineUTF16
 #define             NewLineUTF16  u"\r"
 #endif
@@ -85,13 +82,13 @@ extern "C" {
 #define             NewLineUTF32  U"\r"
 #endif
     
-#elif    defined(_POSIX_C_SOURCE) || defined(__APPLE__) || defined(__MACH__) || defined(BSD) || defined(linux) || defined(__linux)
+#elif (defined(__APPLE__) && defined(__MACH__)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(__ANDROID__) || defined(__minix) || defined(__linux__) || defined(__unix__) || defined(_POSIX_C_SOURCE)
     
 #include <sys/socket.h>
 #include <unistd.h>
     
 #ifndef             FoundationIOTargetOS
-#define             FoundationIOTargetOS (POSIX)
+#define             FoundationIOTargetOS FoundationIOOSPOSIX
 #endif
     
 #ifndef             NewLineWithNULLSize
@@ -112,15 +109,6 @@ extern "C" {
     
 #ifndef             typeof
 #define             typeof(Variable)   __typeof__(Variable)
-#endif
-    
-#ifndef qNAN
-#define qNANBE 0x7FC00001
-#define qNANLE 0x1000C07F
-#endif
-    
-#ifndef NAN
-#define NAN qNANBE
 #endif
     
 #ifndef             FoundationIO_FileOpen
@@ -179,19 +167,14 @@ extern "C" {
 #define             FoundationIO_SocketClose(Socket2Close) close(Socket2Close)
 #endif
     
-#elif    defined(_WIN32) || defined(__WIN32__) || defined(_WIN64) || defined(__WINDOWS__)
-    
+#elif    defined(WIN32) || defined(WIN32) || defined(WINNT) || defined(_WIN32) ||  defined(_WIN64)
     
 #include <io.h>                       /* Included because WinSock needs it */
 #include <winsock.h>                  /* Included for the socket support on Windows */
     
 #ifndef             FoundationIOTargetOS
-#define             FoundationIOTargetOS (Windows)
+#define             FoundationIOTargetOS FoundationIOOSWindows
 #endif
-    
-#ifndef             FoundationIOTargetOS
-#define             FoundationIOTargetOS (MacClassic)
-#endif           /* FoundationIOTargetOS */
     
 #ifndef             NewLineWithNULLSize
 #define             NewLineWithNULLSize    2
@@ -273,10 +256,21 @@ extern "C" {
 #define             FoundationIO_SocketClose(Socket2Close) close(Socket2Close)
 #endif
     
+#ifndef             FoundationIOFormatStringAttribute
+#if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
+#include <sal.h>
+#define             FoundationIOFormatStringAttribute(ParamBeforeVarArgs, VarArgsParam) __format_string
+#elif    (_MSC_VER >= 1500)
+#define             FoundationIOFormatStringAttribute(ParamBeforeVarArgs, VarArgsParam) _Printf_format_string_
+#else
+#define             FoundationIOFormatStringAttribute(ParamBeforeVarArgs, VarArgsParam)
+#endif /* _MSC_VER */
+#endif /* FoundationIOFormatStringAttribute */
+    
 #else
     
 #ifndef             FoundationIOTargetOS
-#define             FoundationIOTargetOS (UnknownOS)
+#define             FoundationIOTargetOS FoundationIOOSUnknown
 #endif
     
 #endif   /* End OS detection */
@@ -293,21 +287,29 @@ extern "C" {
 #define FoundationIOCompileTimeByteOrderLE      2
 #endif
     
+#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
 #if   (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
 #define FoundationIOTargetByteOrder FoundationIOCompileTimeByteOrderBE
 #elif (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 #define FoundationIOTargetByteOrder FoundationIOCompileTimeByteOrderLE
-#else
-#if (_WIN32 || _WIN64)
+#endif /* __BYTE_ORDER__ */
+#elif (FoundationIOTargetOS == FoundationIOOSWindows)
 #define FoundationIOTargetByteOrder FoundationIOCompileTimeByteOrderLE
-#else
-#define FoundationIOTargetByteOrder FoundationIOCompileTimeByteOrderUnknown
-#endif
+#endif /* FoundationIOTargetOS */
+    
+#ifdef  FoundationIOPrivateCountVariadicArguments
+#undef  FoundationIOPrivateCountVariadicArguments
+#define FoundationIOPrivateCountVariadicArguments(_0, _1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, _9_, _10_, _11_, _12_, _13_, _14_, _15_, _16_, _17_, _18_, _19_, _20_, _21_, _22_, _23_, _24_, _25_, _26_, _27_, _28_, _29_, _30_, _31_, _32_, _33_, _34_, _35_, _36, _37, _38, _39, _40, _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, _51, _52, _53, _54, _55, _56, _57, _58, _59, _60, _61, _62, _63, _64, Count, ...)(Count)
+#elif !defined(FoundationIOPrivateCountVariadicArguments)
+#define FoundationIOPrivateCountVariadicArguments(_0, _1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, _9_, _10_, _11_, _12_, _13_, _14_, _15_, _16_, _17_, _18_, _19_, _20_, _21_, _22_, _23_, _24_, _25_, _26_, _27_, _28_, _29_, _30_, _31_, _32_, _33_, _34_, _35_, _36, _37, _38, _39, _40, _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, _51, _52, _53, _54, _55, _56, _57, _58, _59, _60, _61, _62, _63, _64, Count, ...)(Count)
 #endif
     
-#define PrivateCountVarArgs(_0, _1_, _2_, _3_, _4_, _5_, _6_, _7_, _8_, _9_, _10_, _11_, _12_, _13_, _14_, _15_, _16_, _17_, _18_, _19_, _20_, _21_, _22_, _23_, _24_, _25_, _26_, _27_, _28_, _29_, _30_, _31_, _32_, _33_, _34_, _35_, _36, _37, _38, _39, _40, _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, _51, _52, _53, _54, _55, _56, _57, _58, _59, _60, _61, _62, _63, _64, Count, ...)(Count)
-    
-#define CountVariadicArguments(...) PrivateCountVarArgs(0, __VA_ARGS__,64,63,62,61,60,59,58,57,56,55,54,53,52,51,50,49,48,47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
+#ifdef FoundationIOCountVariadicArguments
+#undef FoundationIOCountVariadicArguments
+#define FoundationIOCountVariadicArguments FoundationIOPrivateCountVariadicArguments(0, __VA_ARGS__,64,63,62,61,60,59,58,57,56,55,54,53,52,51,50,49,48,47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
+#elif !defined(FoundationIOCountVariadicArguments)
+#define FoundationIOCountVariadicArguments(...) FoundationIOPrivateCountVariadicArguments(0,__VA_ARGS__,64,63,62,61,60,59,58,57,56,55,54,53,52,51,50,49,48,47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
+#endif
     
     /*!
      @enum                      ByteBitOrders

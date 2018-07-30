@@ -1,10 +1,10 @@
 #include "../include/CommandLineIO.h"  /* Included for the CommandLineIO declarations */
 #include "../include/Log.h"            /* Included for Log */
 
-#if   (FoundationIOTargetOS == POSIX)
+#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
 #include <sys/ioctl.h>                 /* Included for the terminal size */
 #include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
-#elif (FoundationIOTargetOS == Windows)
+#elif (FoundationIOTargetOS == FoundationIOOSWindows)
 #include <Windows.h>                   /* Included because WinCon needs it */
 #include <Wincon.h>                    /* Included for getting the terminal size */
 #endif
@@ -95,15 +95,20 @@ extern "C" {
     } CommandLineIO;
     
     CommandLineIO *CommandLineIO_Init(const int64_t NumSwitches) {
-        CommandLineIO *CLI       = calloc(1, sizeof(CommandLineIO));
-        if (CLI != NULL && NumSwitches >= 0) {
-            CLI->SwitchIDs       = calloc(NumSwitches, sizeof(CommandLineSwitch));
-            if (CLI->SwitchIDs != NULL) {
-                CLI->NumSwitches = NumSwitches;
+        CommandLineIO *CLI           = NULL;
+        if (NumSwitches >= 0) {
+            CLI                      = calloc(1, sizeof(CommandLineIO));
+            if (CLI != NULL) {
+                CLI->SwitchIDs       = calloc(NumSwitches, sizeof(CommandLineSwitch));
+                if (CLI->SwitchIDs != NULL) {
+                    CLI->NumSwitches = NumSwitches;
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CommandLineSwitches"), NumSwitches);
+                }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CommandLineSwitches"), NumSwitches);
+                Log(Log_ERROR, __func__, U8("Couldn't allocate CommandLineIO"));
             }
-#if   (FoundationIOTargetOS == POSIX)
+#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
             struct winsize       *WindowSize = NULL;
             if (WindowSize == NULL) {
                 WindowSize = (struct winsize *) calloc(1, sizeof(struct winsize));
@@ -112,7 +117,7 @@ extern "C" {
             CLI->ConsoleWidth    = WindowSize->ws_row;
             CLI->ConsoleHeight   = WindowSize->ws_col;
             free(WindowSize);
-#elif (FoundationIOTargetOS == Windows)
+#elif (FoundationIOTargetOS == FoundationIOOSWindows)
             CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
             GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
             CLI->ConsoleHeight   = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
@@ -376,7 +381,7 @@ extern "C" {
                 for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                     // now compare ArgumentFlag to Switch
                     // Which string is smaller?
-                    if (UTF8_Compare(ArgumentFlag, CLI->SwitchIDs[Switch].Name, NormalizationFormKC, Yes) == Yes) { // ArgumentFlag matches this switch
+                    if (UTF32_Compare(ArgumentFlag, CLI->SwitchIDs[Switch].Name, NormalizationFormKC, Yes) == Yes) { // ArgumentFlag matches this switch
                         // Set up the Option here
                         CLI->NumOptions   += 1;
                         if (CLI->NumOptions == 1) {

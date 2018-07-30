@@ -15,26 +15,26 @@ extern "C" {
     
     void Log_OpenFile(UTF8 *restrict LogFilePath) {
         if (LogFilePath != NULL) {
-#if   (FoundationIOTargetOS == POSIX)
+#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
             Log_LogFile   = FoundationIO_FileOpen(LogFilePath, U8("a+"));
-#elif (FoundationIOTargetOS == Windows)
+#elif (FoundationIOTargetOS == FoundationIOOSWindows)
             UTF32 *Path32 = UTF8_Decode(LogFilePath);
             UTF16 *Path16 = UTF16_Encode(Path32, UseLEByteOrder);
-            free(Path32);
             Log_LogFile   = FoundationIO_FileOpen(Path16, U16("rb"));
+            free(Path32);
             free(Path16);
 #endif
         }
     }
     
-    void Log(LogTypes Severity, const UTF8 *FunctionName, const UTF8 *Description, ...) {
+    void Log(LogTypes Severity, const UTF8 *restrict FunctionName, const UTF8 *restrict Description, ...) {
         UTF8 Error[] = U8("ERROR");
         UTF8 Debug[] = U8("DEBUG");
         
         va_list VariadicArguments;
         va_start(VariadicArguments, Description);
         uint64_t   StringSize       = vsnprintf(NULL, 0, Description, VariadicArguments) + NewLineWithNULLSize;
-        UTF8 *VariadicString        = calloc(StringSize, sizeof(UTF8));
+        UTF8      *VariadicString   = calloc(StringSize, sizeof(UTF8));
         vsnprintf(VariadicString, StringSize, Description, VariadicArguments);
         va_end(VariadicArguments);
         
