@@ -10,11 +10,11 @@ extern "C" {
 #endif
     
     /*!
-     @header    Log.h
-     @author    Marcus Johnson aka BumbleBritches57
-     @copyright 2017+
-     @version   1.0.0
-     @brief     This header contains code for logging errors and debugging information.
+     @header                    Log.h
+     @author                    Marcus Johnson aka BumbleBritches57
+     @copyright                 2017+
+     @version                   1.0.0
+     @brief                     This header contains code for logging errors and debugging information.
      */
     
     /*!
@@ -45,15 +45,15 @@ extern "C" {
      @param                     FunctionName                    "Which function is calling Log?".
      @param                     Description                     "String describing what went wrong".
      */
-#if     (FoundationIOTargetOS == POSIX)
-    void                 Log(LogTypes Severity, const UTF8 *FunctionName, const UTF8 *Description, ...) __attribute__((__format__(__printf__, 3, 4)));
-#elif   (FoundationIOTargetOS == Windows)
+#if     (FoundationIOTargetOS == FoundationIOOSPOSIX)
+    void                 Log(LogTypes Severity, const UTF8 *restrict FunctionName, const UTF8 *restrict Description, ...) __attribute__((__format__(__printf__, 3, 4)));
+#elif   (FoundationIOTargetOS == FoundationIOOSWindows)
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     void                 Log(LogTypes Severity, const UTF8 *FunctionName, __format_string const UTF8 *Description, ...);
 #elif    (_MSC_VER >= 1500)
     void                 Log(LogTypes Severity, const UTF8 *FunctionName, _Printf_format_string_ const UTF8 *Description, ...);
 #else
-    void                 Log(LogTypes Severity, const UTF8 *FunctionName, const UTF8 *Description, ...);
+    void                 Log(LogTypes Severity, const UTF8 *FunctionName, FoundationIOFormatStringAttribute(3, 4) const UTF8 *Description, ...);
 #endif /* _MSC_VER */
 #endif/* FoundationIOTargetOS */
     

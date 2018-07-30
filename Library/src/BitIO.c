@@ -1,7 +1,6 @@
 #include "../include/BitIO.h"          /* Included for our declarations */
 #include "../include/Log.h"            /* Included for Log declarations */
 #include "../include/Math.h"           /* Included for Integer functions */
-#include "../include/StringIO.h"       /* Included for U(8|16|32) macros */
 
 #ifdef __cplusplus
 extern "C" {
@@ -392,6 +391,7 @@ extern "C" {
      @param OutputBitOrder    "the bit order the elements should be written in".
      @param Bits2Write        "The number of bits to write from each element, if only 14 bits are used, then just write 14 bits".
      */
+    // If we were to write a AudioContainer containing PCM samples, we'd need to make sure each element was written with the right bit and byte order
     void     WriteArray2BitBuffer(BitBuffer *BitB, const void *Array2Write, const uint8_t ElementSize, const uint64_t NumElements2Write, const uint64_t ElementOffset) {
         
         if (BitB != NULL && Array2Write != NULL && ElementSize > 0 && NumElements2Write > 0) {
@@ -487,9 +487,9 @@ extern "C" {
             } else {
                 Formatted                    = Path2Open;
             }
-#if   (FoundationIOTargetOS == POSIX)
+#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
             BitI->File                       = FoundationIO_FileOpen(Formatted, U8("rb"));
-#elif (FoundationIOTargetOS == Windows)
+#elif (FoundationIOTargetOS == FoundationIOOSWindows)
             UTF32 *Decoded                    = UTF8_Decode(Path2Open);
             UTF16 *Unchecked                  = UTF16_Encode(Decoded, UseLEByteOrder);
             free(Decoded);
@@ -661,9 +661,9 @@ extern "C" {
             BitO->FileType         = BitIOFile;
             uint64_t Path2OpenSize = UTF8_GetStringSizeInCodeUnits(Path2Open) + NULLTerminatorSize;
             UTF8    *WinPath8      = NULL;
-#if   (FoundationIOTargetOS == POSIX)
+#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
             BitO->File             = FoundationIO_FileOpen(Path2Open, U8("rb"));
-#elif (FoundationIOTargetOS == Windows)
+#elif (FoundationIOTargetOS == FoundationIOOSWindows)
             if (Path2Open[0] != 0xEF && Path2Open[1] != 0xBB && Path2Open[2] != 0xBF) {
                 if (Path2Open[0] != U32('/') && Path2Open[1] != U32('/') && Path2Open[2] != U32('?') && Path2Open[3] != U32('/')) {
                     if (BitO->FileSpecifierExists == No) {

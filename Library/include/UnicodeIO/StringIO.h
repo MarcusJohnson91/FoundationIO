@@ -30,12 +30,22 @@ extern "C" {
 #endif
     
     typedef               uint_least8_t                        UTF8;
+    
+#ifdef char16_t
+    typedef               char16_t                             UTF16;
+#else
     typedef               uint_least16_t                       UTF16;
+#endif
+    
+#ifdef char32_t
+    typedef               char32_t                             UTF32;
+#else
     typedef               uint_least32_t                       UTF32;
+#endif
     
     /*!
      @enum                StringIOCommon
-     @constant            UTF8BOMSizeInCodeUnits               "The number of code units (8 bits) the UTF16 BOM takes".
+     @constant            UTF8BOMSizeInCodeUnits               "The number of code units (8 bits) the UTF8 BOM takes".
      @constant            UTF16BOMSizeInCodeUnits              "The number of code units (16 bits) the UTF16 BOM takes".
      @constant            UnicodeBOMSizeInCodePoints           "The number of codepoints in a BOM".
      @constant            UTF16LE                              "UTF16LE byte order mark".
@@ -107,8 +117,8 @@ extern "C" {
                           IntegerBase2                         = 2,
                           IntegerBase8                         = 8,
                           IntegerBase10                        = 10,
-                          IntegerBase16U                       = 16,
-                          IntegerBase16L                       = 32,
+                          IntegerBase16L                       = 16,
+                          IntegerBase16U                       = 32,
                           FloatDecimalU                        = 64,
                           FloatDecimalL                        = 128,
                           FloatScientificU                     = 256,
@@ -490,66 +500,66 @@ extern "C" {
      @remark                               "Replaces strtok from the standard library".
      @param               String           "The string you want to be split".
      @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
-     @param               DropDelimiters   "Should the delimiter be put into it's own string, or should the Strings array just contain the actual data"?
      */
-    UTF8                **UTF8_SplitString(UTF8 *String, UTF8 **Delimiters, bool DropDelimiters);
+    UTF8                **UTF8_SplitString(UTF8 *String, UTF8 **Delimiters);
     
     /*!
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
      @remark                               "Replaces strtok from the standard library".
      @param               String           "The string you want to be split".
      @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
-     @param               DropDelimiters   "Should the delimiter be put into it's own string, or should the Strings array just contain the actual data"?
      */
-    UTF16               **UTF16_SplitString(UTF16 *String, UTF16 **Delimiters, bool DropDelimiters);
+    UTF16               **UTF16_SplitString(UTF16 *String, UTF16 **Delimiters);
     
     /*!
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
      @remark                               "Replaces strtok from the standard library".
      @param               String           "The string you want to be split".
      @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
-     @param               DropDelimiters   "Should the delimiter be put into it's own string, or should the Strings array just contain the actual data"?
      */
-    UTF32               **UTF32_SplitString(UTF32 *String, UTF32 **Delimiters, bool DropDelimiters);
+    UTF32               **UTF32_SplitString(UTF32 *String, UTF32 **Delimiters);
     
     /*!
      @abstract                             "Extracts a number from a string".
+     @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
-    int64_t               UTF8_String2Integer(UTF8 *String);
+    int64_t               UTF8_String2Integer(StringIOBases Base, UTF8 *String);
     
     /*!
      @abstract                             "Extracts a number from a string".
+     @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
-    int64_t               UTF16_String2Integer(UTF16 *String);
+    int64_t               UTF16_String2Integer(StringIOBases Base, UTF16 *String);
     
     /*!
      @abstract                             "Extracts a number from a string".
+     @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
-    int64_t               UTF32_String2Integer(UTF32 *String);
+    int64_t               UTF32_String2Integer(StringIOBases Base, UTF32 *String);
     
     /*!
      @abstract                             "Converts an integer to a string".
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF8                 *UTF8_Integer2String(const StringIOBases Base, int64_t Integer2Convert);
+    UTF8                 *UTF8_Integer2String(StringIOBases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts an integer to a string".
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF16                *UTF16_Integer2String(const StringIOBases Base, int64_t Integer2Convert);
+    UTF16                *UTF16_Integer2String(StringIOBases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts an integer to a string".
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF32                *UTF32_Integer2String(const StringIOBases Base, int64_t Integer2Convert);
+    UTF32                *UTF32_Integer2String(StringIOBases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts a string to a double, replaces strtod and atof".
@@ -645,9 +655,9 @@ extern "C" {
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
-#if     (FoundationIOTargetOS == POSIX)
-    UTF8                 *UTF8_FormatString(UTF8 *Format, ...) __attribute__((__format__(__printf__, 1, 2)));
-#elif   (FoundationIOTargetOS == Windows)
+#if     (FoundationIOTargetOS == FoundationIOOSPOSIX)
+    UTF8                 *UTF8_FormatString(UTF8 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+#elif   (FoundationIOTargetOS == FoundationIOOSWindows)
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF8                 *UTF8_FormatString(__format_string UTF8 *Format, ...);
 #elif    (_MSC_VER >= 1500)
@@ -657,15 +667,17 @@ extern "C" {
 #endif /* _MSC_VER */
 #endif/* FoundationIOTargetOS */
     
+    
+    
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
      @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
-#if     (FoundationIOTargetOS == POSIX)
+#if     (FoundationIOTargetOS == FoundationIOOSPOSIX)
     UTF16                *UTF16_FormatString(UTF16 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
-#elif   (FoundationIOTargetOS == Windows)
+#elif   (FoundationIOTargetOS == FoundationIOOSWindows)
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF16                *UTF16_FormatString(__format_string UTF16 *Format, ...);
 #elif    (_MSC_VER >= 1500)
