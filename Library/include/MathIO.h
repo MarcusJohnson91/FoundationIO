@@ -2,14 +2,9 @@
 
 #if   (defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L)
 #include      <tgmath.h>
-#elif (!defined __STDC_NO_COMPLEX__)
-#if   (FoundationIOTargetOS == Windows)
+#elif (defined __STDC_NO_COMPLEX__)
 #include      <math.h>
-#elif (FoundationIOTargetOS == POSIX)
-#include      <math.h>
-#endif  /* FoundationIOTargetOS */
-#include      <complex.h>
-#endif
+#endif /* __STDC_VERSION__ */
 
 #pragma  once
 
@@ -99,6 +94,25 @@ extern "C" {
      @return                                                    "Returns the number of bytes".
      */
     int64_t                     Bits2Bytes(const int64_t Bits, const bool RoundUp);
+    
+    /*!
+     @abstract                                                  "Extracts the sign from the decimal given as Number2Extract".
+     @param                     Number2Extract                  "The decimal number you want to get the sign from".
+     @return                                                    "Returns -1 if the sign is negative, otherwise 1".
+     */
+    int8_t                      ExtractSignFromDecimal(double Number2Extract);
+    
+    /*!
+     @abstract                                                  "Extracts the exponent from the decimal given as Number2Extract".
+     @param                     Number2Extract                  "The decimal number you want to get the exponent from".
+     */
+    int16_t                     ExtractExponentFromDecimal(double Number2Extract);
+    
+    /*!
+     @abstract                                                  "Extracts the mantissa from the decimal given as Number2Extract".
+     @param                     Number2Extract                  "The mantissa number you want to get the exponent from".
+     */
+    int64_t                     ExtractMantissaFromDecimal(double Number2Extract);
     
 #ifdef __cplusplus
 }

@@ -74,6 +74,32 @@ extern "C" {
         return Bytes;
     }
     
+    
+    int8_t ExtractSignFromDecimal(double Number2Extract) {
+        uint64_t *Sign1 = (uint64_t *) &Number2Extract;
+        uint64_t  Sign2 = *Sign1 >> 63;
+        return Sign2 == 1 ? -1 : 1;
+    }
+    
+    int16_t ExtractExponentFromDecimal(double Number2Extract) {
+        int8_t    Sign      = ExtractSignFromDecimal(Number2Extract);
+        uint64_t *Exponent1 = (uint64_t *) &Number2Extract;
+        int16_t   Exponent2 = *Exponent1 >> 52;
+        int16_t   Exponent3 = 0;
+        if (Sign == 1) {
+            Exponent3       = Exponent2 - 1022;
+        } else if (Sign == -1) {
+            Exponent3       = Exponent2 - 3070;
+        }
+        return Exponent3;
+    }
+    
+    int64_t ExtractMantissaFromDecimal(double Number2Extract) {
+        uint64_t *Mantissa1  = (uint64_t *) &Number2Extract;
+        uint64_t  Mantissa2  = *Mantissa1 & 0xFFFFFFFFFFFFFULL;
+        return Mantissa2;
+    }
+    
 #ifdef __cplusplus
 }
 #endif
