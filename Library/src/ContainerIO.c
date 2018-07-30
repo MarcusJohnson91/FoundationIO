@@ -1,463 +1,593 @@
 #include "../include/ContainerIO.h"    /* Included for our declarations */
 #include "../include/Log.h"            /* Included for error reporting */
+#include "../include/Math.h"           /* Included for Absolute */
+#include "../include/BitIO.h"          /* Included for BitBuffer */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
     
+    typedef struct AudioContainer {
+        union Samples {
+            uint32_t     **UInteger32;
+            int32_t      **SInteger32;
+            uint16_t     **UInteger16;
+            int16_t      **SInteger16;
+            uint8_t      **UInteger8;
+            int8_t       **SInteger8;
+        } Samples;
+        Audio_ChannelMask *ChannelMask; // Internal
+        uint64_t           NumSamples;
+        uint8_t            BitDepth;
+        uint8_t            NumChannels;
+        bool               IsUnsigned;
+    } AudioContainer;
     
-    typedef struct Container {
-        union           Elements {
-            uint64_t ***UInteger64;
-            int64_t  ***SInteger64;
-            uint32_t ***UInteger32;
-            int32_t  ***SInteger32;
-            uint16_t ***UInteger16;
-            int16_t  ***SInteger16;
-            uint8_t  ***UInteger8;
-            int8_t   ***SInteger8;
-        }               Elements;
-        uint64_t        NumPlanes;
-        uint64_t        Width;
-        uint64_t        Height;
-        ContainerTypes  ContainerType;
-    } Container;
+    typedef struct ImageContainer {
+        union Pixels {
+            uint16_t   ****UInteger16;
+            int16_t    ****SInteger16;
+            uint8_t    ****UInteger8;
+            int8_t     ****SInteger8;
+        } Pixels;
+        Image_ChannelMask *ChannelMask;
+        uint64_t           Width;
+        uint64_t           Height;
+        uint8_t            BitDepth;
+        uint8_t            NumChannels;
+        bool               Is3D;
+        bool               IsUnsigned;
+    } ImageContainer;
     
-    Container *Container_Init(ContainerTypes ContainerType, uint64_t NumPlanes, uint64_t Width, uint64_t Height) {
-        Container *Collection             = NULL;
-        if (NumPlanes > 0 && Width > 0 && Height > 0) {
-            Collection                    = calloc(1, sizeof(Container));
-            if (Collection != NULL) {
-                Collection->ContainerType = ContainerType;
-                Collection->NumPlanes     = NumPlanes;
-                Collection->Width         = Width;
-                Collection->Height        = Height;
-            } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate a new vector"));
-            }
-        } else if (NumPlanes == 0) {
-            Log(Log_ERROR, __func__, U8("NumPlanes %lld does not make sense"), NumPlanes);
-        } else if (Width == 0) {
-            Log(Log_ERROR, __func__, U8("Width %lld does not make sense"), Width);
-        } else if (Height == 0) {
-            Log(Log_ERROR, __func__, U8("Height %lld does not make sense"), Height);
-        }
-        return Collection;
-    }
-    
-    void Container_Attach(Container *Collection, void ***Array2Attach) {
-        if (Collection != NULL && Array2Attach != NULL ) {
-            if (Collection->ContainerType == UInteger64) {
-                Collection->Elements.UInteger64 = (uint64_t) Array2Attach;
-            } else if (Collection->ContainerType == SInteger64) {
-                Collection->Elements.SInteger64 = (int64_t) Array2Attach;
-            } else if (Collection->ContainerType == UInteger32) {
-                Collection->Elements.UInteger32 = (uint32_t) Array2Attach;
-            } else if (Collection->ContainerType == SInteger32) {
-                Collection->Elements.SInteger32 = (int32_t) Array2Attach;
-            } else if (Collection->ContainerType == UInteger16) {
-                Collection->Elements.UInteger16 = (uint16_t) Array2Attach;
-            } else if (Collection->ContainerType == SInteger16) {
-                Collection->Elements.SInteger16 = (int16_t) Array2Attach;
-            } else if (Collection->ContainerType == UInteger8) {
-                Collection->Elements.UInteger8 = (uint8_t) Array2Attach;
-            } else if (Collection->ContainerType == SInteger8) {
-                Collection->Elements.SInteger8 = (int8_t) Array2Attach;
-            }
-        } else if (Collection == NULL) {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
-        } else if (Array2Attach == NULL) {
-            Log(Log_ERROR, __func__, U8("Array Pointer is NULL"));
-        }
-    }
-    
-    uint8_t Container_GetElementSizeInBytes(Container *Collection) { // GetContainersElementSizeInBytes
-        uint8_t ElementSize = 0;
-        if (Collection != NULL) {
-            ElementSize     = (Collection->ContainerType & 0xFF) / 8;
-        }
-        return ElementSize;
-    }
-    
-    uint64_t Container_GetSize(Container *Collection) {
-        uint64_t Size = 0;
-        if (Collection != NULL) {
-            Size      = Collection->NumPlanes * Collection->Width * Collection->Height;
-        } else {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
-        }
-        return Size;
-    }
-    
-    uint64_t Container_GetNumPlanes(Container *Collection) {
-        uint64_t NumPlanes = 0;
-        if (Collection != NULL) {
-            NumPlanes      = Collection->NumPlanes;
-        } else {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
-        }
-        return NumPlanes;
-    }
-    
-    void Container_SetWidth(Container *Collection, uint64_t Width) {
-        if (Collection != NULL) {
-            Collection->Width = Width;
-        } else {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
-        }
-    }
-    
-    void Container_SetHeight(Container *Collection, uint64_t Height) {
-        if (Collection != NULL) {
-            Collection->Height = Height;
-        } else {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
-        }
-    }
-    
-    uint64_t Container_GetWidth(Container *Collection) {
-        uint64_t Width = 0ULL;
-        if (Collection != NULL) {
-            Width      = Collection->Width;
-        } else {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
-        }
-        return Width;
-    }
-    
-    uint64_t Container_GetHeight(Container *Collection) {
-        uint64_t Height = 0ULL;
-        if (Collection != NULL) {
-            Height      = Collection->Height;
-        } else {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
-        }
-        return Height;
-    }
-    
-    Container *Container_GenerateHistogram(Container *Collection) {
-        Container *Histogram = NULL;
-        if (Collection != NULL) {
-            Histogram = Container_Init(Collection->ContainerType, Collection->NumPlanes, Collection->Width, Collection->Height);
-            if (Histogram != NULL) {
-                void ***Data = NULL;
-                if (Collection->ContainerType == UInteger64) {
-                    Data = calloc(18446744073709551615, sizeof(uint64_t));
-                    Container_Attach(Histogram, Data);
-                } else if (Collection->ContainerType == SInteger64) {
-                    Data = calloc(18446744073709551615, sizeof(int64_t));
-                    Container_Attach(Histogram, Data);
-                } else if (Collection->ContainerType == UInteger32) {
-                    Data = calloc(4294967296, sizeof(uint32_t));
-                    Container_Attach(Histogram, Data);
-                } else if (Collection->ContainerType == SInteger32) {
-                    Data = calloc(4294967296, sizeof(int32_t));
-                    Container_Attach(Histogram, Data);
-                } else if (Collection->ContainerType == UInteger16) {
-                    Data = calloc(65536, sizeof(uint16_t));
-                    Container_Attach(Histogram, Data);
-                } else if (Collection->ContainerType == SInteger16) {
-                    Data = calloc(65536, sizeof(int16_t));
-                    Container_Attach(Histogram, Data);
-                } else if (Collection->ContainerType == UInteger8) {
-                    Data = calloc(256, sizeof(uint8_t));
-                    Container_Attach(Histogram, Data);
-                } else if (Collection->ContainerType == SInteger8) {
-                    Data = calloc(256, sizeof(int8_t));
-                    Container_Attach(Histogram, Data);
+    AudioContainer *AudioContainer_Init(bool IsUnsigned, uint8_t BitDepth, uint8_t NumChannels, uint64_t NumSamples) {
+        /* We need to create an enum that contans a channel mask as well
+           How should that work tho? the audo decoder should manage that for the user, and the extractor should just take in a mask saying which channel the user wants, and extract that, or remap it on the output...
+         */
+        AudioContainer *Audio = NULL;
+        if (BitDepth > 0 && NumChannels > 0 && NumSamples > 0) {
+            Audio = calloc(1, sizeof(AudioContainer));
+            if (Audio != NULL) {
+                Audio->BitDepth    = BitDepth;
+                Audio->NumChannels = NumChannels;
+                Audio->NumSamples  = NumSamples;
+                Audio->ChannelMask = calloc(NumChannels, sizeof(Audio_ChannelMask));
+                if (BitDepth <= 8 && IsUnsigned == Yes) {
+                    Audio->Samples.UInteger8 = calloc(NumChannels * NumSamples, sizeof(uint8_t));
+                } else if (BitDepth <= 8 && IsUnsigned == No) {
+                    Audio->Samples.SInteger8 = calloc(NumChannels * NumSamples, sizeof(int8_t));
+                } else if (BitDepth <= 16 && IsUnsigned == Yes) {
+                    Audio->Samples.UInteger16 = calloc(NumChannels * NumSamples, sizeof(uint16_t));
+                } else if (BitDepth <= 16 && IsUnsigned == No) {
+                    Audio->Samples.SInteger16 = calloc(NumChannels * NumSamples, sizeof(int16_t));
+                } else if (BitDepth <= 32 && IsUnsigned == Yes) {
+                    Audio->Samples.UInteger32 = calloc(NumChannels * NumSamples, sizeof(uint32_t));
+                } else if (BitDepth <= 32 && IsUnsigned == No) {
+                    Audio->Samples.SInteger32 = calloc(NumChannels * NumSamples, sizeof(int32_t));
                 }
-                // We need to use multi-threading here to return a container containing an array of the histogram of this array
-                if (Histogram->Elements.UInteger64 != NULL) {
-                    for (uint64_t Plane = 0; Plane < Collection->NumPlanes; Plane++) {
-                        for (uint64_t Width = 0; Width < Collection->Width; Width++) {
-                            for (uint64_t Height = 0; Height < Collection->Height; Height++) {
-                                Histogram->Elements.UInteger64[Plane][Width][Height] += 1;
-                            }
-                        }
-                    }
-                } else if (Histogram->Elements.SInteger64 != NULL) {
-                    for (uint64_t Plane = 0; Plane < Collection->NumPlanes; Plane++) {
-                        for (uint64_t Width = 0; Width < Collection->Width; Width++) {
-                            for (uint64_t Height = 0; Height < Collection->Height; Height++) {
-                                Histogram->Elements.SInteger64[Plane][Width][Height] += 1;
-                            }
-                        }
-                    }
-                } else if (Histogram->Elements.UInteger32 != NULL) {
-                    for (uint64_t Plane = 0; Plane < Collection->NumPlanes; Plane++) {
-                        for (uint64_t Width = 0; Width < Collection->Width; Width++) {
-                            for (uint64_t Height = 0; Height < Collection->Height; Height++) {
-                                Histogram->Elements.UInteger32[Plane][Width][Height] += 1;
-                            }
-                        }
-                    }
-                } else if (Histogram->Elements.SInteger32 != NULL) {
-                    for (uint64_t Plane = 0; Plane < Collection->NumPlanes; Plane++) {
-                        for (uint64_t Width = 0; Width < Collection->Width; Width++) {
-                            for (uint64_t Height = 0; Height < Collection->Height; Height++) {
-                                Histogram->Elements.SInteger32[Plane][Width][Height] += 1;
-                            }
-                        }
-                    }
-                } else if (Histogram->Elements.UInteger16 != NULL) {
-                    for (uint64_t Plane = 0; Plane < Collection->NumPlanes; Plane++) {
-                        for (uint64_t Width = 0; Width < Collection->Width; Width++) {
-                            for (uint64_t Height = 0; Height < Collection->Height; Height++) {
-                                Histogram->Elements.UInteger16[Plane][Width][Height] += 1;
-                            }
-                        }
-                    }
-                } else if (Histogram->Elements.SInteger16 != NULL) {
-                    for (uint64_t Plane = 0; Plane < Collection->NumPlanes; Plane++) {
-                        for (uint64_t Width = 0; Width < Collection->Width; Width++) {
-                            for (uint64_t Height = 0; Height < Collection->Height; Height++) {
-                                Histogram->Elements.SInteger16[Plane][Width][Height] += 1;
-                            }
-                        }
-                    }
-                } else if (Histogram->Elements.UInteger8  != NULL) {
-                    for (uint64_t Plane = 0; Plane < Collection->NumPlanes; Plane++) {
-                        for (uint64_t Width = 0; Width < Collection->Width; Width++) {
-                            for (uint64_t Height = 0; Height < Collection->Height; Height++) {
-                                Histogram->Elements.UInteger8[Plane][Width][Height] += 1;
-                            }
-                        }
-                    }
-                } else if (Histogram->Elements.SInteger8 != NULL) {
-                    for (uint64_t Plane = 0; Plane < Collection->NumPlanes; Plane++) {
-                        for (uint64_t Width = 0; Width < Collection->Width; Width++) {
-                            for (uint64_t Height = 0; Height < Collection->Height; Height++) {
-                                Histogram->Elements.SInteger8[Plane][Width][Height] += 1;
-                            }
-                        }
-                    }
-                } else {
-                    Log(Log_ERROR, __func__, U8("Histogram's Data Pointer is NULL"));
+                if (Audio->Samples.UInteger8 == NULL && Audio->Samples.SInteger8 == NULL && Audio->Samples.UInteger16 == NULL && Audio->Samples.SInteger16 == NULL && Audio->Samples.UInteger32 == NULL && Audio->Samples.SInteger32 == NULL) {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate room for the samples"));
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Histogram Pointer is NULL"));
+                Log(Log_ERROR, __func__, U8("Couldn't allocate the AudioContainer"));
             }
-        } else {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
+        } else if (BitDepth == 0) {
+            Log(Log_ERROR, __func__, U8("BitDepth %d is invalid"), BitDepth);
+        } else if (NumChannels == 0) {
+            Log(Log_ERROR, __func__, U8("NumChannels %d is invalid"), NumChannels);
+        } else if (NumSamples == 0) {
+            Log(Log_ERROR, __func__, U8("NumSamples %llu is invalid"), NumSamples);
         }
-        return Histogram;
+        return Audio;
     }
     
-    int64_t Container_GetAverage(Container *Collection, uint64_t Plane2Average) {
+    uint8_t AudioContainer_GetBitDepth(AudioContainer *Audio) {
+        uint8_t BitDepth = 0;
+        if (Audio != NULL) {
+            BitDepth = Audio->BitDepth;
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        }
+        return BitDepth;
+    }
+    
+    uint8_t AudioContainer_GetNumChannels(AudioContainer *Audio) {
+        uint8_t NumChannels = 0;
+        if (Audio != NULL) {
+            NumChannels = Audio->NumChannels;
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        }
+        return NumChannels;
+    }
+    
+    uint64_t AudioContainer_GetNumSamples(AudioContainer *Audio) {
+        uint8_t NumSamples = 0;
+        if (Audio != NULL) {
+            NumSamples = Audio->NumSamples;
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        }
+        return NumSamples;
+    }
+    
+    void AudioContainer_SetChannelMask(AudioContainer *Audio, uint8_t Channel, Audio_ChannelMask ChannelMask) {
+        if (Audio != NULL) {
+            Audio->ChannelMask[Channel] = ChannelMask;
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        }
+    }
+    
+    Audio_ChannelMask AudioContainer_GetChannelMask(AudioContainer *Audio, uint8_t Channel) {
+        Audio_ChannelMask ChannelMask = Audio_UnknownChannel;
+        if (Audio != NULL && Channel < Audio->NumChannels) {
+            ChannelMask = Audio->ChannelMask[Channel];
+        } else if (Audio == NULL) {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        } else if (Channel >= Audio->NumChannels) {
+            Log(Log_ERROR, __func__, U8("Channel %d is out of bounds %d"), Channel, Audio->NumChannels - 1);
+        }
+        return ChannelMask;
+    }
+    
+    uint8_t AudioContainer_GetChannel(AudioContainer *Audio, Audio_ChannelMask ChannelMask) {
+        uint8_t Channel = 0;
+        if (Audio != NULL) {
+            Channel = Audio->ChannelMask[ChannelMask];
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        }
+        return Channel;
+    }
+    
+    int64_t AudioContainer_GetAverage(AudioContainer *Audio, Audio_ChannelMask Channel) {
         int64_t Average = 0;
-        if (Collection != NULL && Plane2Average <= Collection->NumPlanes) {
-            if (Collection->ContainerType == UInteger64) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        Average += Collection->Elements.UInteger64[Plane2Average][X][Y];
-                    }
+        if (Audio != NULL) {
+            if (Audio->BitDepth <= 8 && Audio->IsUnsigned == Yes) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    Average += Audio->Samples.UInteger8[AudioContainer_GetChannel(Audio, Channel)][Sample];
                 }
-            } else if (Collection->ContainerType == SInteger64) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        Average += Collection->Elements.SInteger64[Plane2Average][X][Y];
-                    }
+            } else if (Audio->BitDepth <= 8 && Audio->IsUnsigned == No) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    Average += Audio->Samples.SInteger8[AudioContainer_GetChannel(Audio, Channel)][Sample];
                 }
-            } else if (Collection->ContainerType == UInteger32) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        Average += Collection->Elements.UInteger32[Plane2Average][X][Y];
-                    }
+            } else if (Audio->BitDepth <= 16 && Audio->IsUnsigned == Yes) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    Average += Audio->Samples.UInteger16[AudioContainer_GetChannel(Audio, Channel)][Sample];
                 }
-            } else if (Collection->ContainerType == SInteger32) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        Average += Collection->Elements.SInteger32[Plane2Average][X][Y];
-                    }
+            } else if (Audio->BitDepth <= 16 && Audio->IsUnsigned == No) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    Average += Audio->Samples.SInteger16[AudioContainer_GetChannel(Audio, Channel)][Sample];
                 }
-            } else if (Collection->ContainerType == UInteger16) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        Average += Collection->Elements.UInteger16[Plane2Average][X][Y];
-                    }
+            } else if (Audio->BitDepth <= 32 && Audio->IsUnsigned == Yes) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    Average += Audio->Samples.UInteger32[AudioContainer_GetChannel(Audio, Channel)][Sample];
                 }
-            } else if (Collection->ContainerType == SInteger16) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        Average += Collection->Elements.SInteger16[Plane2Average][X][Y];
-                    }
-                }
-            } else if (Collection->ContainerType == UInteger8) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        Average += Collection->Elements.UInteger8[Plane2Average][X][Y];
-                    }
-                }
-            } else if (Collection->ContainerType == SInteger8) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        Average += Collection->Elements.SInteger8[Plane2Average][X][Y];
-                    }
+            } else if (Audio->BitDepth <= 32 && Audio->IsUnsigned == No) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    Average += Audio->Samples.SInteger32[AudioContainer_GetChannel(Audio, Channel)][Sample];
                 }
             }
-            Average         /= (Collection->Width * Collection->Height);
+            Average /= Audio->NumSamples;
         } else {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
         }
         return Average;
     }
     
-    int64_t Container_GetMax(Container *Collection, uint64_t Plane2GetMax) {
-        int64_t Max = 0;
-        if (Collection != NULL && Plane2GetMax <= Collection->NumPlanes) {
-            if (Collection->ContainerType == UInteger64) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.UInteger64[Plane2GetMax][X][Y] < (uint64_t) Max) {
-                            Max = Collection->Elements.UInteger64[Plane2GetMax][X][Y];
-                        }
-                    }
-                    
-                }
-            } else if (Collection->ContainerType == SInteger64) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.SInteger64[Plane2GetMax][X][Y] > Max) {
-                            Max = Collection->Elements.SInteger64[Plane2GetMax][X][Y];
-                        }
+    int64_t AudioContainer_GetMax(AudioContainer *Audio, Audio_ChannelMask Channel) {
+        int64_t Maximum = 0;
+        if (Audio != NULL) {
+            // We need a channel map variable jesus.
+            if (Audio->BitDepth <= 8 && Audio->IsUnsigned == Yes) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    if (Audio->Samples.UInteger8[AudioContainer_GetChannel(Audio, Channel)][Sample] > Maximum) {
+                        Maximum = Audio->Samples.UInteger8[AudioContainer_GetChannel(Audio, Channel)][Sample];
                     }
                 }
-            } else if (Collection->ContainerType == UInteger32) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.UInteger32[Plane2GetMax][X][Y] > Max) {
-                            Max = Collection->Elements.UInteger32[Plane2GetMax][X][Y];
+            } else if (Audio->BitDepth <= 8 && Audio->IsUnsigned == No) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    if (Audio->Samples.SInteger8[AudioContainer_GetChannel(Audio, Channel)][Sample] > Maximum) {
+                        Maximum = Audio->Samples.SInteger8[AudioContainer_GetChannel(Audio, Channel)][Sample];
+                    }
+                }
+            } else if (Audio->BitDepth <= 16 && Audio->IsUnsigned == Yes) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    if (Audio->Samples.UInteger16[AudioContainer_GetChannel(Audio, Channel)][Sample] > Maximum) {
+                        Maximum = Audio->Samples.UInteger16[AudioContainer_GetChannel(Audio, Channel)][Sample];
+                    }
+                }
+            } else if (Audio->BitDepth <= 16 && Audio->IsUnsigned == No) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    if (Audio->Samples.SInteger16[AudioContainer_GetChannel(Audio, Channel)][Sample] > Maximum) {
+                        Maximum = Audio->Samples.SInteger16[AudioContainer_GetChannel(Audio, Channel)][Sample];
+                    }
+                }
+            } else if (Audio->BitDepth <= 32 && Audio->IsUnsigned == Yes) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    if (Audio->Samples.UInteger32[AudioContainer_GetChannel(Audio, Channel)][Sample] > Maximum) {
+                        Maximum = Audio->Samples.UInteger32[AudioContainer_GetChannel(Audio, Channel)][Sample];
+                    }
+                }
+            } else if (Audio->BitDepth <= 32 && Audio->IsUnsigned == No) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    if (Audio->Samples.SInteger32[AudioContainer_GetChannel(Audio, Channel)][Sample] > Maximum) {
+                        Maximum = Audio->Samples.SInteger32[AudioContainer_GetChannel(Audio, Channel)][Sample];
+                    }
+                }
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        }
+        return Maximum;
+    }
+    
+    int64_t AudioContainer_GetMin(AudioContainer *Audio, Audio_ChannelMask Channel) {
+        int64_t Minimum = 9223372036854775807;
+        if (Audio != NULL) {
+            if (Audio->BitDepth <= 8 && Audio->IsUnsigned == Yes) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    if (Audio->Samples.UInteger8[AudioContainer_GetChannel(Audio, Channel)][Sample] < Minimum) {
+                        Minimum = Audio->Samples.UInteger8[AudioContainer_GetChannel(Audio, Channel)][Sample];
+                    }
+                }
+            } else if (Audio->BitDepth <= 8 && Audio->IsUnsigned == No) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    if (Audio->Samples.SInteger8[AudioContainer_GetChannel(Audio, Channel)][Sample] < Minimum) {
+                        Minimum = Audio->Samples.SInteger8[AudioContainer_GetChannel(Audio, Channel)][Sample];
+                    }
+                }
+            } else if (Audio->BitDepth <= 16 && Audio->IsUnsigned == Yes) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    if (Audio->Samples.UInteger16[AudioContainer_GetChannel(Audio, Channel)][Sample] < Minimum) {
+                        Minimum = Audio->Samples.UInteger16[AudioContainer_GetChannel(Audio, Channel)][Sample];
+                    }
+                }
+            } else if (Audio->BitDepth <= 16 && Audio->IsUnsigned == No) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    if (Audio->Samples.SInteger16[AudioContainer_GetChannel(Audio, Channel)][Sample] < Minimum) {
+                        Minimum = Audio->Samples.SInteger16[AudioContainer_GetChannel(Audio, Channel)][Sample];
+                    }
+                }
+            } else if (Audio->BitDepth <= 32 && Audio->IsUnsigned == Yes) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    if (Audio->Samples.UInteger32[AudioContainer_GetChannel(Audio, Channel)][Sample] < Minimum) {
+                        Minimum = Audio->Samples.UInteger32[AudioContainer_GetChannel(Audio, Channel)][Sample];
+                    }
+                }
+            } else if (Audio->BitDepth <= 32 && Audio->IsUnsigned == No) {
+                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                    if (Audio->Samples.SInteger32[AudioContainer_GetChannel(Audio, Channel)][Sample] < Minimum) {
+                        Minimum = Audio->Samples.SInteger32[AudioContainer_GetChannel(Audio, Channel)][Sample];
+                    }
+                }
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        }
+        return Minimum;
+    }
+    
+    void AudioContainer_Deinit(AudioContainer *Audio) {
+        if (Audio != NULL) {
+            if (Audio->BitDepth <= 8 && Audio->IsUnsigned == Yes) {
+                free(Audio->Samples.UInteger8);
+            } else if (Audio->BitDepth <= 8 && Audio->IsUnsigned == No) {
+                free(Audio->Samples.SInteger8);
+            } else if (Audio->BitDepth <= 16 && Audio->IsUnsigned == Yes) {
+                free(Audio->Samples.UInteger16);
+            } else if (Audio->BitDepth <= 16 && Audio->IsUnsigned == No) {
+                free(Audio->Samples.SInteger16);
+            } else if (Audio->BitDepth <= 32 && Audio->IsUnsigned == Yes) {
+                free(Audio->Samples.UInteger32);
+            } else if (Audio->BitDepth <= 32 && Audio->IsUnsigned == No) {
+                free(Audio->Samples.SInteger32);
+            }
+            free(Audio);
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        }
+    }
+    
+    ImageContainer *ImageContainer_Init(bool Is3D, bool IsUnsigned, uint8_t BitDepth, uint8_t NumChannels, uint64_t Width, uint64_t Height) {
+        ImageContainer *Image = NULL;
+        if (BitDepth > 0 && NumChannels > 0 && Width > 0 && Height > 0) {
+            Image = calloc(1, sizeof(ImageContainer));
+            if (Image != NULL) {
+                Image->Is3D        = Is3D;
+                Image->IsUnsigned  = IsUnsigned;
+                Image->BitDepth    = BitDepth;
+                Image->NumChannels = NumChannels;
+                Image->Width       = Width;
+                Image->Height      = Height;
+                Image->ChannelMask = calloc(NumChannels, sizeof(Image_ChannelMask));
+                if (BitDepth <= 8 && IsUnsigned == Yes) {
+                    Image->Pixels.UInteger8 = calloc(Is3D == 0 ? 1 : 2 * NumChannels * Width * Height, sizeof(uint8_t));
+                } else if (BitDepth <= 8 && IsUnsigned == No) {
+                    Image->Pixels.SInteger8 = calloc(Is3D == 0 ? 1 : 2 * NumChannels * Width * Height, sizeof(int8_t));
+                } else if (BitDepth <= 16 && IsUnsigned == Yes) {
+                    Image->Pixels.UInteger16 = calloc(Is3D == 0 ? 1 : 2 * NumChannels * Width * Height, sizeof(uint16_t));
+                } else if (BitDepth <= 16 && IsUnsigned == No) {
+                    Image->Pixels.SInteger16 = calloc(Is3D == 0 ? 1 : 2 * NumChannels * Width * Height, sizeof(int16_t));
+                }
+                if (Image->Pixels.UInteger8 == NULL && Image->Pixels.SInteger8 == NULL && Image->Pixels.UInteger16 == NULL && Image->Pixels.SInteger16 == NULL) {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate room for the pixels"));
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate the ImageContainer"));
+            }
+        } else if (BitDepth == 0) {
+            Log(Log_ERROR, __func__, U8("BitDepth %d is invalid"), BitDepth);
+        } else if (NumChannels == 0) {
+            Log(Log_ERROR, __func__, U8("NumChannels %d is invalid"), NumChannels);
+        } else if (Width == 0) {
+            Log(Log_ERROR, __func__, U8("Width %llu is invalid"), Width);
+        } else if (Height == 0) {
+            Log(Log_ERROR, __func__, U8("Height %llu is invalid"), Height);
+        }
+        return Image;
+    }
+    
+    bool ImageContainer_Is3D(ImageContainer *Image) {
+        bool Is3D = No;
+        if (Image != NULL) {
+            Is3D = Image->Is3D;
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        }
+        return Is3D;
+    }
+    
+    uint8_t ImageContainer_GetBitDepth(ImageContainer *Image) {
+        uint8_t BitDepth = 0;
+        if (Image != NULL) {
+            BitDepth = Image->BitDepth;
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        }
+        return BitDepth;
+    }
+    
+    uint8_t ImageContainer_GetNumChannels(ImageContainer *Image) {
+        uint8_t NumChannels = 0;
+        if (Image != NULL) {
+            NumChannels = Image->NumChannels;
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        }
+        return NumChannels;
+    }
+    
+    uint64_t ImageContainer_GetWidth(ImageContainer *Image) {
+        uint64_t Width = 0;
+        if (Image != NULL) {
+            Width = Image->Width;
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        }
+        return Width;
+    }
+    
+    uint64_t ImageContainer_GetHeight(ImageContainer *Image) {
+        uint64_t Height = 0;
+        if (Image != NULL) {
+            Height = Image->Height;
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        }
+        return Height;
+    }
+    
+    void ImageContainer_SetChannelMask(ImageContainer *Image, uint8_t Index, Image_ChannelMask ChannelMask) {
+        if (Image != NULL && Index < Image->NumChannels) {
+            Image->ChannelMask[Index] = ChannelMask;
+        } else if (Image == NULL) {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        } else if (Index >= Image->NumChannels) {
+            Log(Log_ERROR, __func__, U8("Channel %d is out of bounds %d"), Index, Image->NumChannels - 1);
+        }
+    }
+    
+    Image_ChannelMask ImageContainer_GetChannelMask(ImageContainer *Image, uint8_t Index) {
+        Image_ChannelMask ChannelMask = Image_UnknownChannel;
+        if (Image != NULL && Index < Image->NumChannels) {
+            ChannelMask = Image->ChannelMask[Index];
+        } else if (Image == NULL) {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        } else if (Index >= Image->NumChannels) {
+            Log(Log_ERROR, __func__, U8("Channel %d is out of bounds %d"), Index, Image->NumChannels - 1);
+        }
+        return ChannelMask;
+    }
+    
+    uint8_t ImageContainer_GetView(ImageContainer *Image) {
+        uint8_t View = 0;
+        if (Image != NULL) {
+            View = Image->Is3D == Yes ? 1 : 0;
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        }
+        return View;
+    }
+    
+    uint8_t ImageContainer_GetChannel(ImageContainer *Image, Image_ChannelMask ChannelMask) {
+        uint8_t Channel = 0;
+        if (Image != NULL) {
+            Channel = Image->ChannelMask[ChannelMask];
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        }
+        return Channel;
+    }
+    
+    int64_t ImageContainer_GetAverage(ImageContainer *Image, Image_Views View, Image_ChannelMask Channel) {
+        int64_t Average = 0;
+        if (Image != NULL) {
+            if (Image->BitDepth <= 8 && Image->IsUnsigned == Yes) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        Average += Image->Pixels.UInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
+                    }
+                }
+            } else if (Image->BitDepth <= 8 && Image->IsUnsigned == No) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        Average += Image->Pixels.UInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
+                    }
+                }
+            } else if (Image->BitDepth <= 16 && Image->IsUnsigned == Yes) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        Average += Image->Pixels.UInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
+                    }
+                }
+            } else if (Image->BitDepth <= 16 && Image->IsUnsigned == No) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        Average += Image->Pixels.UInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
+                    }
+                }
+            } else if (Image->BitDepth <= 32 && Image->IsUnsigned == Yes) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        Average += Image->Pixels.UInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
+                    }
+                }
+            } else if (Image->BitDepth <= 32 && Image->IsUnsigned == No) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        Average += Image->Pixels.UInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
+                    }
+                }
+            }
+            Average /= Image->Width * Image->Height;
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        }
+        return Average;
+        
+    }
+    
+    int64_t ImageContainer_GetMax(ImageContainer *Image, Image_ChannelMask Channel) {
+        int64_t Maximum = 0;
+        if (Image != NULL) {
+            // We need a channel map variable jesus.
+            if (Image->BitDepth <= 8 && Image->IsUnsigned == Yes) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        if (Image->Pixels.UInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height] > Maximum) {
+                            Maximum = Image->Pixels.UInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
                         }
                     }
                 }
-            } else if (Collection->ContainerType == SInteger32) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.SInteger32[Plane2GetMax][X][Y] > Max) {
-                            Max = Collection->Elements.SInteger32[Plane2GetMax][X][Y];
+            } else if (Image->BitDepth <= 8 && Image->IsUnsigned == No) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        if (Image->Pixels.SInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height] > Maximum) {
+                            Maximum = Image->Pixels.SInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
                         }
                     }
                 }
-            } else if (Collection->ContainerType == UInteger16) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.UInteger16[Plane2GetMax][X][Y] > Max) {
-                            Max = Collection->Elements.UInteger16[Plane2GetMax][X][Y];
+            } else if (Image->BitDepth <= 16 && Image->IsUnsigned == Yes) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        if (Image->Pixels.UInteger16[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height] > Maximum) {
+                            Maximum = Image->Pixels.UInteger16[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
                         }
                     }
                 }
-            } else if (Collection->ContainerType == SInteger16) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.SInteger16[Plane2GetMax][X][Y] > Max) {
-                            Max = Collection->Elements.SInteger16[Plane2GetMax][X][Y];
-                        }
-                    }
-                }
-            } else if (Collection->ContainerType == UInteger8) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.UInteger8[Plane2GetMax][X][Y] > Max) {
-                            Max = Collection->Elements.UInteger8[Plane2GetMax][X][Y];
-                        }
-                    }
-                }
-            } else if (Collection->ContainerType == SInteger8) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.SInteger8[Plane2GetMax][X][Y] > Max) {
-                            Max = Collection->Elements.SInteger8[Plane2GetMax][X][Y];
+            } else if (Image->BitDepth <= 16 && Image->IsUnsigned == No) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        if (Image->Pixels.SInteger16[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height] > Maximum) {
+                            Maximum = Image->Pixels.SInteger16[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
                         }
                     }
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
-        return Max;
+        return Maximum;
     }
     
-    int64_t Container_GetMin(Container *Collection, uint64_t Plane2GetMin) {
-        int64_t Min = 0;
-        if (Collection != NULL && Plane2GetMin <= Collection->NumPlanes) {
-            if (Collection->ContainerType == UInteger64) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.UInteger64[Plane2GetMin][X][Y] < (uint64_t) Min) {
-                            Min = Collection->Elements.UInteger64[Plane2GetMin][X][Y];
-                        }
-                    }
-                    
-                }
-            } else if (Collection->ContainerType == SInteger64) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.SInteger64[Plane2GetMin][X][Y] < Min) {
-                            Min = Collection->Elements.SInteger64[Plane2GetMin][X][Y];
+    int64_t ImageContainer_GetMin(ImageContainer *Image, Image_Views View, Image_ChannelMask Channel) {
+        int64_t Minimum = 9223372036854775807;
+        if (Image != NULL) {
+            // We need a channel map variable jesus.
+            if (Image->BitDepth <= 8 && Image->IsUnsigned == Yes) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        if (Image->Pixels.UInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height] < Minimum) {
+                            Minimum = Image->Pixels.UInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
                         }
                     }
                 }
-            } else if (Collection->ContainerType == UInteger32) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.UInteger32[Plane2GetMin][X][Y] < Min) {
-                            Min = Collection->Elements.UInteger32[Plane2GetMin][X][Y];
+            } else if (Image->BitDepth <= 8 && Image->IsUnsigned == No) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        if (Image->Pixels.SInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height] < Minimum) {
+                            Minimum = Image->Pixels.SInteger8[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
                         }
                     }
                 }
-            } else if (Collection->ContainerType == SInteger32) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.SInteger32[Plane2GetMin][X][Y] < Min) {
-                            Min = Collection->Elements.SInteger32[Plane2GetMin][X][Y];
+            } else if (Image->BitDepth <= 16 && Image->IsUnsigned == Yes) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        if (Image->Pixels.UInteger16[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height] < Minimum) {
+                            Minimum = Image->Pixels.UInteger16[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
                         }
                     }
                 }
-            } else if (Collection->ContainerType == UInteger16) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.UInteger16[Plane2GetMin][X][Y] < Min) {
-                            Min = Collection->Elements.UInteger16[Plane2GetMin][X][Y];
-                        }
-                    }
-                }
-            } else if (Collection->ContainerType == SInteger16) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.SInteger16[Plane2GetMin][X][Y] < Min) {
-                            Min = Collection->Elements.SInteger16[Plane2GetMin][X][Y];
-                        }
-                    }
-                }
-            } else if (Collection->ContainerType == UInteger8) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.UInteger8[Plane2GetMin][X][Y] < Min) {
-                            Min = Collection->Elements.UInteger8[Plane2GetMin][X][Y];
-                        }
-                    }
-                }
-            } else if (Collection->ContainerType == SInteger8) {
-                for (uint64_t X = 0; X < Collection->Width; X++) {
-                    for (uint64_t Y = 0; Y < Collection->Height; Y++) {
-                        if (Collection->Elements.SInteger8[Plane2GetMin][X][Y] < Min) {
-                            Min = Collection->Elements.SInteger8[Plane2GetMin][X][Y];
+            } else if (Image->BitDepth <= 16 && Image->IsUnsigned == No) {
+                for (uint64_t Width = 0; Width < Image->Width; Width++) {
+                    for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                        if (Image->Pixels.SInteger16[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height] < Minimum) {
+                            Minimum = Image->Pixels.SInteger16[ImageContainer_GetView(Image)][ImageContainer_GetChannel(Image, Channel)][Width][Height];
                         }
                     }
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
-        return Min;
+        return Minimum;
     }
     
-    void Container_Resize(Container *Collection, uint64_t NewPlaneSize) {
-        if (Collection != NULL) {
-            
+    void ImageContainer_Deinit(ImageContainer *Image) {
+        if (Image != NULL) {
+            if (Image->BitDepth <= 8 && Image->IsUnsigned == Yes) {
+                free(Image->Pixels.UInteger8);
+            } else if (Image->BitDepth <= 8 && Image->IsUnsigned == No) {
+                free(Image->Pixels.SInteger8);
+            } else if (Image->BitDepth <= 16 && Image->IsUnsigned == Yes) {
+                free(Image->Pixels.UInteger16);
+            } else if (Image->BitDepth <= 16 && Image->IsUnsigned == No) {
+                free(Image->Pixels.SInteger16);
+            }
+            free(Image);
         } else {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
+    }
+    
+    
+    /* Audio/ImageContainer read/write2bitbuffer */
+    
+    AudioContainer *CreateAudioContainerFromBitBuffer() {
+        return NULL;
+    }
+    
+    ImageContainer *CreateImageContainerFromBitBuffer() {
+        return NULL;
+    }
+    
+    void WriteAudioContainer2BitBuffer(AudioContainer *Audio, BitBuffer *BitBuffer2Write) {
+        
+    }
+    
+    void WriteImageContainer2BitBuffer() {
+        
     }
     
 #ifdef __cplusplus
