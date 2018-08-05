@@ -102,7 +102,7 @@ extern "C" {
     
     void BitBuffer_Align(BitBuffer *BitB, const uint8_t AlignmentSize) {
         if (BitB != NULL && (AlignmentSize == 1 || AlignmentSize % 2 == 0)) {
-            uint8_t AlignmentSizeInBits = Bytes2Bits(AlignmentSize);
+            int64_t AlignmentSizeInBits = Bytes2Bits(AlignmentSize);
             uint8_t Bits2Align          = AlignmentSizeInBits - (BitB->BitOffset % AlignmentSizeInBits);
             if (BitB->BitOffset + Bits2Align > BitB->NumBits) {
                 BitB->Buffer            = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
@@ -374,7 +374,7 @@ extern "C" {
             if (UnaryType == CountUnary) {
                 Field2Write -= 1;
             }
-            InsertBits(ByteOrder, BitOrder, BitB, Logarithm(2, Field2Write), ~StopBit); // Writing the unary pary
+            InsertBits(ByteOrder, BitOrder, BitB, Logarithm(2, Field2Write), StopBit ^ 1); // Writing the unary pary
             InsertBits(ByteOrder, BitOrder, BitB, 1, StopBit); // Writing the stop bit
         } else {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
@@ -789,7 +789,7 @@ extern "C" {
         return GUUIDsMatch;
     }
     
-    uint8_t *ConvertGUUID(GUUIDTypes InputGUUIDType, GUUIDTypes OutputGUUIDType, const uint8_t *GUUID2Convert) {
+    uint8_t *ConvertGUUID(GUUIDTypes InputGUUIDType, GUUIDTypes OutputGUUIDType, uint8_t *GUUID2Convert) {
         uint8_t  OutputGUUIDSize = ((OutputGUUIDType == GUIDString || OutputGUUIDType == UUIDString) ? GUUIDStringSize : BinaryGUUIDSize);
         uint8_t *ConvertedGUUID  = calloc(OutputGUUIDSize, sizeof(uint8_t));
         if (ConvertedGUUID != NULL && GUUID2Convert != NULL && InputGUUIDType != UnknownGUUID && OutputGUUIDType != UnknownGUUID) {

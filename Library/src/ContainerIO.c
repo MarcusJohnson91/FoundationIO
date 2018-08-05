@@ -41,7 +41,7 @@ extern "C" {
     
     AudioContainer *AudioContainer_Init(bool IsUnsigned, uint8_t BitDepth, uint8_t NumChannels, uint64_t NumSamples) {
         /* We need to create an enum that contans a channel mask as well
-           How should that work tho? the audo decoder should manage that for the user, and the extractor should just take in a mask saying which channel the user wants, and extract that, or remap it on the output...
+         How should that work tho? the audo decoder should manage that for the user, and the extractor should just take in a mask saying which channel the user wants, and extract that, or remap it on the output...
          */
         AudioContainer *Audio = NULL;
         if (BitDepth > 0 && NumChannels > 0 && NumSamples > 0) {
@@ -101,7 +101,7 @@ extern "C" {
     }
     
     uint64_t AudioContainer_GetNumSamples(AudioContainer *Audio) {
-        uint8_t NumSamples = 0;
+        uint64_t NumSamples = 0;
         if (Audio != NULL) {
             NumSamples = Audio->NumSamples;
         } else {
@@ -586,7 +586,7 @@ extern "C" {
         
     }
     
-    void WriteImageContainer2BitBuffer() {
+    void WriteImageContainer2BitBuffer(ImageContainer *Image, BitBuffer *BitBuffer2Write) {
         
     }
     

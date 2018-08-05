@@ -192,7 +192,7 @@ extern "C" {
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     SwitchID                        "Which switch are we talking about"?
      */
-    void                        CLISetSwitchType(CommandLineIO *CLI, int64_t SwitchID, CLISwitchTypes SwitchType);
+    void                        CLISetSwitchType(CommandLineIO *CLI, const int64_t SwitchID, CLISwitchTypes SwitchType);
     
     /*!
      @abstract                                                  "Sets SwitchID as accepting arguments of only a certain type".
