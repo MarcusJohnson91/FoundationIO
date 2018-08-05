@@ -405,7 +405,7 @@ extern "C" {
      @param                     OutputGUUIDType                 "What type of GUUID are we converting to"?
      @return                                                    "Returns the converted GUUID".
      */
-    uint8_t                    *ConvertGUUID(GUUIDTypes InputGUUIDType, GUUIDTypes OutputGUUIDType, const uint8_t *GUUID2Convert);
+    uint8_t                    *ConvertGUUID(GUUIDTypes InputGUUIDType, GUUIDTypes OutputGUUIDType, uint8_t *GUUID2Convert);
     
     /*!
      @abstract                                                  "Swaps the byte order of a BinaryGUUID or GUUIDString".

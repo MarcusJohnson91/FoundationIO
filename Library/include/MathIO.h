@@ -78,7 +78,7 @@ extern "C" {
      @param                     Value2Swap                      "Data to swap endian".
      @return                                                    "Returns swapped uint64_t".
      */
-    uint64_t                    SwapEndian64(const uint64_t Value2Swap);
+    uint64_t  SwapEndian64(const uint64_t Value2Swap);
     
     /*!
      @abstract                                                  "Computes the number of bits from the number of bytes".

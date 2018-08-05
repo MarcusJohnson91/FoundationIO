@@ -112,7 +112,7 @@ extern "C" {
 #endif
     
 #ifndef             FoundationIO_FileOpen
-#define             FoundationIO_FileOpen(File2Open, FileModeString) fopen(File2Open, FileModeString)
+#define             FoundationIO_FileOpen(File2OpenPath, FileModeString) fopen(File2OpenPath, FileModeString)
 #endif
     
 #ifndef             FoundationIO_FileSeek
@@ -201,7 +201,10 @@ extern "C" {
 #endif
     
 #ifndef             FoundationIO_FileOpen
+#pragma warning(disable: 4996)
+#pragma warning(push)
 #define             FoundationIO_FileOpen(File2Open, FileModeString) _wfopen(File2Open, FileModeString)
+#pragma warning(pop)
 #endif
     
 #ifndef             FoundationIO_FileSeek

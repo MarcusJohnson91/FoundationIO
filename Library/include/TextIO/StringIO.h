@@ -293,6 +293,48 @@ extern "C" {
     uint64_t              UTF32_GetStringSizeInGraphemes(UTF32 *String);
     
     /*!
+     @abstract                             "Tells if the UTF-8 string pointed to by String has a Byte Order Mark at the beginning".
+     @param               String           "The string to get the BOM status from".
+     @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
+     */
+    bool                  UTF8_StringHasBOM(UTF8 *String);
+    
+    /*!
+     @abstract                             "Tells if the UTF-16 string pointed to by String has a Byte Order Mark at the beginning".
+     @param               String           "The string to get the BOM status from".
+     @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
+     */
+    bool                  UTF16_StringHasBOM(UTF16 *String);
+    
+    /*!
+     @abstract                             "Tells if the UTF-32 string pointed to by String has a Byte Order Mark at the beginning".
+     @param               String           "The string to get the BOM status from".
+     @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
+     */
+    bool                  UTF32_StringHasBOM(UTF32 *String);
+    
+    /*!
+     @abstract                             "Tells if the UTF-8 string pointed to by String is a valid UTF-8 encoded string".
+     @param               String           "The string to get the validity status from".
+     @return                               "Returns Yes if the string is valid, otherwise it returns No".
+     */
+    bool                  UTF8_IsStringValid(UTF8 *String);
+    
+    /*!
+     @abstract                             "Tells if the UTF-16 string pointed to by String is a valid UTF-16 encoded string".
+     @param               String           "The string to get the validity status from".
+     @return                               "Returns Yes if the string is valid, otherwise it returns No".
+     */
+    bool                  UTF16_IsStringValid(UTF16 *String);
+    
+    /*!
+     @abstract                             "Tells if the UTF-32 string pointed to by String is a valid UTF-32 encoded string".
+     @param               String           "The string to get the validity status from".
+     @return                               "Returns Yes if the string is valid, otherwise it returns No".
+     */
+    bool                  UTF32_IsStringValid(UTF32 *String);
+    
+    /*!
      @abstract                             "Adds the BOM to the UTF-8 string, UTF-8's only valid BOM is BE".
      */
     UTF8                 *UTF8_AddBOM(UTF8 *String);
@@ -331,8 +373,9 @@ extern "C" {
     /*!
      @abstract                             "Encodes a UTF32 string to a UTF8 string".
      @param               String           "The UTF32 string to encode to a UTF8 string".
+     @param               BOM              "KeepBOM is mapped to AddBOM here".
      */
-    UTF8                 *UTF8_Encode(UTF32 *String, const bool IncludeBOM);
+    UTF8                 *UTF8_Encode(UTF32 *String, StringIOBOMStates BOM);
     
     /*!
      @abstract                             "Encodes a UTF32 *to a UTF16".
@@ -499,7 +542,7 @@ extern "C" {
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
      @remark                               "Replaces strtok from the standard library".
      @param               String           "The string you want to be split".
-     @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
+     @param               Delimiters       "An StringArray containing the delimiters, one delimiter per string".
      */
     UTF8                **UTF8_SplitString(UTF8 *String, UTF8 **Delimiters);
     
@@ -507,7 +550,7 @@ extern "C" {
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
      @remark                               "Replaces strtok from the standard library".
      @param               String           "The string you want to be split".
-     @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
+     @param               Delimiters       "An StringArray containing the delimiters, one delimiter per string".
      */
     UTF16               **UTF16_SplitString(UTF16 *String, UTF16 **Delimiters);
     
@@ -515,7 +558,7 @@ extern "C" {
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
      @remark                               "Replaces strtok from the standard library".
      @param               String           "The string you want to be split".
-     @param               Delimiters       "An array of strings containing the delimiters, one delimiter per string".
+     @param               Delimiters       "An StringArray containing the delimiters, one delimiter per string".
      */
     UTF32               **UTF32_SplitString(UTF32 *String, UTF32 **Delimiters);
     
@@ -600,21 +643,21 @@ extern "C" {
     /*!
      @abstract                             "Removes substrings (including single codepoints, but also strings) from a string".
      @param               String           "The string to perform the trimming operations on".
-     @param               Strings2Remove   "An array of strings to remove from the String".
+     @param               Strings2Remove   "An StringArray to remove from the String".
      */
     UTF8                 *UTF8_TrimString(UTF8 *String, UTF8 **Strings2Remove);
     
     /*!
      @abstract                             "Removes substrings (including single codepoints, but also strings) from a string".
      @param               String           "The string to perform the trimming operations on".
-     @param               Strings2Remove   "An array of strings to remove from the String".
+     @param               Strings2Remove   "An StringArray to remove from the String".
      */
     UTF16                *UTF16_TrimString(UTF16 *String, UTF16 **Strings2Remove);
     
     /*!
      @abstract                             "Removes substrings (including single codepoints, but also strings) from a string".
      @param               String           "The string to perform the trimming operations on".
-     @param               Strings2Remove   "An array of strings to remove from the String".
+     @param               Strings2Remove   "An StringArray to remove from the String".
      */
     UTF32                *UTF32_TrimString(UTF32 *String, UTF32 **Strings2Remove);
     
@@ -648,6 +691,45 @@ extern "C" {
      @return                               "Returns whether the strings match or not".
      */
     bool                  UTF32_Compare(UTF32 *String1, UTF32 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive);
+    
+    UTF8 *UTF8_Clone(UTF8 *String);
+    
+    UTF16 *UTF16_Clone(UTF16 *String);
+    
+    UTF32 *UTF32_Clone(UTF32 *String);
+    
+    UTF8 *UTF8_Append(UTF8 *String, UTF8 *String2Append);
+    
+    UTF16 *UTF16_Append(UTF16 *String, UTF16 *String2Append);
+    
+    UTF32 *UTF32_Append(UTF32 *String, UTF32 *String2Append);
+    
+    /*!
+     @param Offset "In codepoints, not code units".
+     @remark       "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string"
+     */
+    UTF8 *UTF8_Insert(UTF8 *String, UTF8 *String2Insert, uint64_t Offset);
+    
+    /*!
+     @param Offset "In codepoints, not code units".
+     @remark       "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string"
+     */
+    UTF16 *UTF16_Insert(UTF16 *String, UTF16 *String2Insert, uint64_t Offset);
+    
+    /*!
+     @param Offset "In codepoints, not code units".
+     @remark       "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string"
+     */
+    UTF32 *UTF32_Insert(UTF32 *String, UTF32 *String2Insert, uint64_t Offset);
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
@@ -703,17 +785,115 @@ extern "C" {
      */
     void                  UTF16_WriteString2File(UTF16 *String, FILE *OutputFile);
     
-    /*!
-     @abstract                             "Deinitalizes a UTF-8 encoded array of strings (like is returned by SplitString)".
-     @param               Strings          "An array of strings to deinitalize, all strings will be freed".
-     */
-    void                  UTF8_DeinitStringArray(UTF8 **Strings);
+    /* StringArrays */
     
     /*!
-     @abstract                             "Deinitalizes a UTF-16 encoded array of strings (like is returned by SplitString)".
-     @param               Strings          "An array of strings to deinitalize, all strings will be freed".
+     @abstract                             "Initalizes a UTF-8 encoded StringArray".
+     @param               NumStrings       "How many strings will this StringArray contain"?
+     @return                               "Returns an empty StringArray with room for NumStrings pointers plus a null terminator".
      */
-    void                  UTF16_DeinitStringArray(UTF16 **Strings);
+    UTF8                **UTF8_StringArray_Init(uint64_t NumStrings);
+    
+    /*!
+     @abstract                             "Initalizes a UTF-16 encoded StringArray".
+     @param               NumStrings       "How many strings will this StringArray contain"?
+     @return                               "Returns an empty StringArray with room for NumStrings pointers plus a null terminator".
+     */
+    UTF16               **UTF16_StringArray_Init(uint64_t NumStrings);
+    
+    /*!
+     @abstract                             "Initalizes a UTF-32 encoded StringArray".
+     @param               NumStrings       "How many strings will this StringArray contain"?
+     @return                               "Returns an empty StringArray with room for NumStrings pointers plus a null terminator".
+     */
+    UTF32               **UTF32_StringArray_Init(uint64_t NumStrings);
+    
+    /*!
+     @abstract                             "Attaches a string to a StringArray at the specified position".
+     @param               StringArray      "The StringArray to attach the String to".
+     @param               String2Attach    "The String to attach".
+     @param               Index            "Which position should String2Attach be in"?
+     */
+    void                  UTF8_StringArray_Attach(UTF8 **StringArray, UTF8 *String2Attach, uint64_t Index);
+    
+    /*!
+     @abstract                             "Attaches a string to a StringArray at the specified position".
+     @param               StringArray      "The StringArray to attach the String to".
+     @param               String2Attach    "The String to attach".
+     @param               Index            "Which position should String2Attach be in"?
+     */
+    void                  UTF16_StringArray_Attach(UTF16 **StringArray, UTF16 *String2Attach, uint64_t Index);
+    
+    /*!
+     @abstract                             "Attaches a string to a StringArray at the specified position".
+     @param               StringArray      "The StringArray to attach the String to".
+     @param               String2Attach    "The String to attach".
+     @param               Index            "Which position should String2Attach be in"?
+     */
+    void                  UTF32_StringArray_Attach(UTF32 **StringArray, UTF32 *String2Attach, uint64_t Index);
+    
+    /*!
+     @abstract                             "Gets the number of strings in a StringArray".
+     @param               StringArray      "The StringArray to get the number of strings in".
+     @return                               "Returns the number of strings in StringArray".
+     */
+    uint64_t              UTF8_StringArray_GetNumStrings(UTF8 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the number of strings in a StringArray".
+     @param               StringArray      "The StringArray to get the number of strings in".
+     @return                               "Returns the number of strings in StringArray".
+     */
+    uint64_t              UTF16_StringArray_GetNumStrings(UTF16 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the number of strings in a StringArray".
+     @param               StringArray      "The StringArray to get the number of strings in".
+     @return                               "Returns the number of strings in StringArray".
+     */
+    uint64_t              UTF32_StringArray_GetNumStrings(UTF32 **StringArray);
+    
+    /*!
+     @abstract                             "Gets a string from a StringArray".
+     @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
+     @param               Index            "The string to extract".
+     @return                               "Returns a pointer to the specifier String".
+     */
+    UTF8                 *UTF8_StringArray_GetString(UTF8 **StringArray, uint64_t Index);
+    
+    /*!
+     @abstract                             "Gets a string from a StringArray".
+     @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
+     @param               Index            "The string to extract".
+     @return                               "Returns a pointer to the specifier String".
+     */
+    UTF16                *UTF16_StringArray_GetString(UTF16 **StringArray, uint64_t Index);
+    
+    /*!
+     @abstract                             "Gets a string from a StringArray".
+     @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
+     @param               Index            "The string to extract".
+     @return                               "Returns a pointer to the specifier String".
+     */
+    UTF32                *UTF32_StringArray_GetString(UTF32 **StringArray, uint64_t Index);
+    
+    /*!
+     @abstract                             "Deinitalizes a UTF-8 encoded StringArray (like is returned by SplitString)".
+     @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
+     */
+    void                  UTF8_StringArray_Deinit(UTF8 **StringArray);
+    
+    /*!
+     @abstract                             "Deinitalizes a UTF-16 encoded StringArray (like is returned by SplitString)".
+     @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
+     */
+    void                  UTF16_StringArray_Deinit(UTF16 **StringArray);
+    
+    /*!
+     @abstract                             "Deinitalizes a UTF-16 encoded StringArray (like is returned by SplitString)".
+     @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
+     */
+    void                  UTF32_StringArray_Deinit(UTF32 **StringArray);
     
 #ifdef __cplusplus
 }

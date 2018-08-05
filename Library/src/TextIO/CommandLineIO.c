@@ -343,14 +343,13 @@ extern "C" {
         }
     }
     
-    static UTF8 ArgumentString2SwitchFlag(UTF32 *ArgumentString) {
+    static UTF32 *ArgumentString2SwitchFlag(UTF32 *ArgumentString) {
         UTF8 ArgumentSwitch = NULL;
         if (ArgumentString != NULL) {
             uint8_t  ArgumentStringPrefixSize = 0;
             uint64_t ArgumentStringSize       = UTF32_GetStringSizeInCodePoints(ArgumentString);
             
             if (ArgumentStringSize >= 2) {
-                //Log(Log_DEBUG, __func__, U8("ArgumentString[0] = 0x%X, ArgumentString[1] = 0x%X"), ArgumentString[0], ArgumentString[1]);
                 if (ArgumentString[0] == U32('-') && ArgumentString[1] == U32('-')) {
                     ArgumentStringPrefixSize  = 2;
                 } else if (ArgumentString[0] == U32('/') || ArgumentString[0] == U32('\\') || ArgumentString[0] == U32('-')) {
@@ -361,7 +360,7 @@ extern "C" {
             }
             uint64_t ArgumentSwitchSize    = ArgumentStringSize - ArgumentStringPrefixSize;
             ArgumentSwitch                 = calloc(ArgumentSwitchSize + NULLTerminatorSize, sizeof(UTF8));
-            memcpy(ArgumentSwitch, &ArgumentString[ArgumentStringPrefixSize], ArgumentSwitchSize);
+            memcpy(ArgumentSwitch, ArgumentString[ArgumentStringPrefixSize], ArgumentSwitchSize);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -381,7 +380,7 @@ extern "C" {
                 for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                     // now compare ArgumentFlag to Switch
                     // Which string is smaller?
-                    if (UTF32_Compare(ArgumentFlag, CLI->SwitchIDs[Switch].Name, NormalizationFormKC, Yes) == Yes) { // ArgumentFlag matches this switch
+                    if (UTF32_Compare(ArgumentFlag, UTF8_Decode(CLI->SwitchIDs[Switch].Name), NormalizationFormKC, Yes) == Yes) { // ArgumentFlag matches this switch
                         // Set up the Option here
                         CLI->NumOptions   += 1;
                         if (CLI->NumOptions == 1) {
@@ -423,12 +422,14 @@ extern "C" {
     void UTF8_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF8 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             // Basically now we just loop over the arguments, decode, normalize, and casefold them.
-            UTF32 **Arguments32  = calloc(NumArguments, sizeof(UTF32*));
+            UTF32 **Arguments32     = calloc(NumArguments, sizeof(UTF32*));
             for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
-                UTF8 *CaseFolded = UTF8_CaseFoldString(*Arguments[Arg]);
-                UTF8 *Normalized = UTF8_NormalizeString(CaseFolded, NormalizationFormKC);
+                UTF32 *Decoded      = UTF8_Decode(Arguments[Arg]);
+                UTF32 *CaseFolded   = UTF32_CaseFoldString(Decoded);
+                free(Decoded);
+                UTF32 *Normalized   = UTF32_NormalizeString(CaseFolded, NormalizationFormKC);
                 free(CaseFolded);
-                Arguments32[Arg] = UTF8_Decode(Normalized);
+                Arguments32[Arg][0] = Normalized;
             }
             UTF32_ParseCommandLineOptions(CLI, NumArguments, Arguments32);
             for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
@@ -444,12 +445,14 @@ extern "C" {
     
     void UTF16_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF16 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
-            UTF32 **Arguments32   = calloc(NumArguments, sizeof(UTF32*));
-            for (int64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
-                UTF16 *CaseFolded = UTF16_CaseFoldString(*Arguments[Arg]);
-                UTF16 *Normalized = UTF16_NormalizeString(CaseFolded, NormalizationFormKC);
+            UTF32 **Arguments32     = calloc(NumArguments, sizeof(UTF32*));
+            for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
+                UTF32 *Decoded      = UTF16_Decode(Arguments[Arg]);
+                UTF32 *CaseFolded   = UTF32_CaseFoldString(Decoded);
+                free(Decoded);
+                UTF32 *Normalized   = UTF32_NormalizeString(CaseFolded, NormalizationFormKC);
                 free(CaseFolded);
-                Arguments32[Arg]  = UTF16_Decode(Normalized);
+                Arguments32[Arg][0] = Normalized;
             }
             UTF32_ParseCommandLineOptions(CLI, NumArguments, Arguments32);
             for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
