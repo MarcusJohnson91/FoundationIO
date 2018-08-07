@@ -2062,9 +2062,9 @@ extern "C" {
         uint64_t                  MinWidth;
         uint64_t                  Precision;
         UTF32                    *String;
-        FormatSpecifierFlags      Flag;
-        FormatSpecifierLengths    Length;
         FormatSpecifierTypes      Type;
+        FormatSpecifierLengths    Length;
+        FormatSpecifierFlags      Flag;
     } FormatSpecifier;
     
     typedef struct FormatString {
