@@ -59,9 +59,10 @@ extern "C" {
      @param           IsUnsigned     "Are the samples signed or not"?
      @param           BitDepth       "The number of actual bits to store a sample, e.g. 24 bit audio has a bit depth of 24, not 32".
      @param           NumChannels    "The number of channels in the audio".
+     @param           SampleRate     "The number of samples in one second of audio".
      @param           NumSamples     "NumSamples is the number of channel independent samples, e.g. X samples is BitDepth * NumChnnels * X".
      */
-    AudioContainer   *AudioContainer_Init(bool IsUnsigned, uint8_t BitDepth, uint8_t NumChannels, uint64_t NumSamples);
+    AudioContainer   *AudioContainer_Init(bool IsUnsigned, uint8_t BitDepth, uint8_t NumChannels, uint64_t SampleRate, uint64_t NumSamples);
     
     /*!
      @abstract                       "Sets the channel type for each channel index".
@@ -82,6 +83,12 @@ extern "C" {
      @param           Audio          "A pointer to an instance of an AudioContainer".
      */
     uint8_t           AudioContainer_GetNumChannels(AudioContainer *Audio);
+    
+    /*!
+     @abstract                       "Returns the number of channel-agnostic samples in one second".
+     @param           Audio          "A pointer to an instance of an AudioContainer".
+     */
+    uint64_t          AudioContainer_GetSampleRate(AudioContainer *Audio);
     
     /*!
      @abstract                       "Returns the number of channel-agnostic audio samples stored in the container".

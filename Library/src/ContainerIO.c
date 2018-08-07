@@ -18,6 +18,7 @@ extern "C" {
         } Samples;
         Audio_ChannelMask *ChannelMask; // Internal
         uint64_t           NumSamples;
+        uint64_t           SampleRate;
         uint8_t            BitDepth;
         uint8_t            NumChannels;
         bool               IsUnsigned;
@@ -39,7 +40,7 @@ extern "C" {
         bool               IsUnsigned;
     } ImageContainer;
     
-    AudioContainer *AudioContainer_Init(bool IsUnsigned, uint8_t BitDepth, uint8_t NumChannels, uint64_t NumSamples) {
+    AudioContainer *AudioContainer_Init(bool IsUnsigned, uint8_t BitDepth, uint8_t NumChannels, uint64_t SampleRate, uint64_t NumSamples) {
         /* We need to create an enum that contans a channel mask as well
          How should that work tho? the audo decoder should manage that for the user, and the extractor should just take in a mask saying which channel the user wants, and extract that, or remap it on the output...
          */
@@ -49,6 +50,7 @@ extern "C" {
             if (Audio != NULL) {
                 Audio->BitDepth    = BitDepth;
                 Audio->NumChannels = NumChannels;
+                Audio->SampleRate  = SampleRate;
                 Audio->NumSamples  = NumSamples;
                 Audio->ChannelMask = calloc(NumChannels, sizeof(Audio_ChannelMask));
                 if (BitDepth <= 8 && IsUnsigned == Yes) {
@@ -78,6 +80,16 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("NumSamples %llu is invalid"), NumSamples);
         }
         return Audio;
+    }
+    
+    uint64_t AudioContainer_GetSampleRate(AudioContainer *Audio) {
+        uint64_t SampleRate = 0ULL;
+        if (Audio != NULL) {
+            SampleRate      = Audio->SampleRate;
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        }
+        return SampleRate;
     }
     
     uint8_t AudioContainer_GetBitDepth(AudioContainer *Audio) {
