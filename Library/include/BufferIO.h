@@ -187,7 +187,7 @@ extern "C" {
      @param                     BitB                            "BitBuffer Pointer".
      @param                     Bits2Peek                       "The number of bits to peek from the BitBuffer".
      */
-    uint64_t                    PeekBits(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Peek);
+    uint64_t                    PeekBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Peek);
     
     /*!
      @abstract                                                  "Reads bits from BitBuffer".
@@ -196,7 +196,7 @@ extern "C" {
      @param                     BitB                            "BitBuffer Pointer".
      @param                     Bits2Read                       "The number of bits to read from the BitBuffer".
      */
-    uint64_t                    ReadBits(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Read);
+    uint64_t                    ReadBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Read);
     
     /*!
      @abstract                                                  "Reads unary encoded fields from the BitBuffer".
@@ -206,7 +206,7 @@ extern "C" {
      @param                     UnaryType                       "What type of Unary coding are we reading"?
      @param                     StopBit                         "Is the stop bit a one or a zero"?
      */
-    uint64_t                    ReadUnary(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
+    uint64_t                    ReadUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
     
     /*!
      @abstract                                                  "Reads a UTF-8 encoded string from the BitBuffer".
@@ -217,11 +217,11 @@ extern "C" {
     
     /*!
      @abstract                                                  "Reads a UTF-16 encoded string from the BitBuffer".
-     @param                     StringByteOrder                 "The Byte order of the string to be written IF there's no BOM, if there is, use UnknownByteFirst".
+     @param                     ByteOrder                       "The Byte order of the string to be written IF there's no BOM, if there is, use UnknownByteFirst".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     StringSize                      "Size of the string in CodeUnits".
      */
-    UTF16                      *ReadUTF16(ByteBitOrders StringByteOrder, BitBuffer *BitB, uint64_t StringSize);
+    UTF16                      *ReadUTF16(ByteOrders ByteOrder, BitBuffer *BitB, uint64_t StringSize);
     
     /*!
      @abstract                                                  "Writes bits to the BitBuffer".
@@ -231,7 +231,7 @@ extern "C" {
      @param                     NumBits2Write                   "How many bits from Bits2Write should we write?".
      @param                     Bits2Write                      "Contains the data to write into the BitBuffer".
      */
-    void                        WriteBits(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    void                        WriteBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
     
     /*!
      @abstract                                                  "Writes unary encoded bits to the BitBuffer".
@@ -242,7 +242,7 @@ extern "C" {
      @param                     StopBit                         "Is the stop bit a one or a zero"?
      @param                     UnaryBits2Write                 "Value to be written as Unary encoded".
      */
-    void                        WriteUnary(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const uint8_t UnaryBits2Write);
+    void                        WriteUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const uint8_t UnaryBits2Write);
     
     /*!
      @abstract                                                  "Reads a UTF-8 encoded string from the BitBuffer".
@@ -253,11 +253,11 @@ extern "C" {
     
     /*!
      @abstract                                                  "Writes a UTF-16 encoded string to the BitBuffer".
-     @param                     StringByteOrder                 "The byte order of the string to be read IF there's no BOM, if there is, use UnknownByteFirst".
+     @param                     ByteOrder                       "The byte order of the string to be read IF there's no BOM, if there is, use UnknownByteFirst".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     String2Write                    "The string to write to the BitBuffer".
      */
-    void                        WriteUTF16(ByteBitOrders StringByteOrder, BitBuffer *BitB, UTF16 *String2Write);
+    void                        WriteUTF16(ByteOrders ByteOrder, BitBuffer *BitB, UTF16 *String2Write);
     
     /*!
      @abstract                                                  "Deallocates the instance of BitBuffer pointed to by BitB".

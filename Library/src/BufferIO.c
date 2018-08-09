@@ -199,7 +199,7 @@ extern "C" {
     }
     
     /* BitBuffer Resource Management */
-    static inline void InsertBits(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
+    static inline void InsertBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
         // The number of bits to pop into each loop of the byte is 8 - (BitB->BitOffset % 8)
         if (BitB != NULL && BitB->NumBits >= BitB->BitOffset + NumBits2Insert) {
             uint8_t  Bits                         = NumBits2Insert;
@@ -241,7 +241,7 @@ extern "C" {
         }
     }
     
-    static inline uint64_t ExtractBits(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Extract) {
+    static inline uint64_t ExtractBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Extract) {
         uint64_t     ExtractedBits                = 0ULL;
         if (BitB != NULL && BitB->NumBits >= BitB->BitOffset + 1 + NumBits2Extract) {
             uint8_t  Bits                         = NumBits2Extract;
@@ -284,7 +284,7 @@ extern "C" {
         return ExtractedBits;
     }
     
-    uint64_t PeekBits(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Peek) {
+    uint64_t PeekBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Peek) {
         uint64_t OutputData = 0ULL;
         if (BitB != NULL && (Bits2Peek >= 1 && Bits2Peek <= 64) && (Bits2Peek <= (BitB->BitOffset - BitB->NumBits))) {
             OutputData      = ExtractBits(ByteOrder, BitOrder, BitB, Bits2Peek);
@@ -296,7 +296,7 @@ extern "C" {
         return OutputData;
     }
     
-    uint64_t ReadBits(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Read) {
+    uint64_t ReadBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Read) {
         uint64_t OutputData    = 0ULL;
         if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
             OutputData         = ExtractBits(ByteOrder, BitOrder, BitB, Bits2Read);
@@ -309,7 +309,7 @@ extern "C" {
         return OutputData;
     }
     
-    uint64_t ReadUnary(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit) {
+    uint64_t ReadUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit) {
         uint64_t OutputData    = 0ULL;
         if (BitB != NULL) {
             do {
@@ -333,14 +333,14 @@ extern "C" {
         return ExtractedString;
     }
     
-    UTF16   *ReadUTF16(ByteBitOrders StringByteOrder, BitBuffer *BitB, uint64_t StringSize) {
+    UTF16   *ReadUTF16(ByteOrders ByteOrder, BitBuffer *BitB, uint64_t StringSize) {
         /* How do we handle the byte order? Well if it was written with a BOM we can read the BOM to figure out the encoded byte and bit order */
         /* But if it wasn't... we'll need external information, ok so what information do we need? just the byte order. */
         /* Ok, so if the StringByteOrder is set to UnknownByteFirst, read it from the BOM. */
         UTF16 *ExtractedString                    = calloc(StringSize, sizeof(UTF16));
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                if (StringByteOrder != UnknownByteFirst) {
+                if (ByteOrder != UnknownByteOrder) {
                     uint16_t BOM                  = PeekBits(MSByteFirst, LSBitFirst, BitB, 16);
                     if (BOM != UTF16BE && BOM != UTF16LE) {
                         ExtractedString[CodeUnit] = ExtractBits(LSByteFirst, LSBitFirst, BitB, 16);
@@ -348,7 +348,7 @@ extern "C" {
                         ExtractedString[CodeUnit] = ExtractBits(MSByteFirst, LSBitFirst, BitB, 16);
                     }
                 } else {
-                    ExtractedString[CodeUnit]     = ExtractBits(StringByteOrder, LSBitFirst, BitB, 16);
+                    ExtractedString[CodeUnit]     = ExtractBits(ByteOrder, LSBitFirst, BitB, 16);
                 }
             }
         } else if (BitB == NULL) {
@@ -357,7 +357,7 @@ extern "C" {
         return ExtractedString;
     }
     
-    void     WriteBits(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
+    void     WriteBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
         if (BitB != NULL && NumBits2Write >= 1 && NumBits2Write <= 64) {
             InsertBits(ByteOrder, BitOrder, BitB, NumBits2Write, Bits2Write);
         } else if (BitB == NULL) {
@@ -367,7 +367,7 @@ extern "C" {
         }
     }
     
-    void     WriteUnary(ByteBitOrders ByteOrder, ByteBitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const uint8_t UnaryBits2Write) {
+    void     WriteUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const uint8_t UnaryBits2Write) {
         if (BitB != NULL) {
             StopBit         &= 1;
             uint8_t Field2Write = UnaryBits2Write;
@@ -426,17 +426,17 @@ extern "C" {
         }
     }
     
-    void     WriteUTF16(ByteBitOrders StringByteOrder, BitBuffer *BitB, UTF16 *String2Write) {
+    void     WriteUTF16(ByteOrders ByteOrder, BitBuffer *BitB, UTF16 *String2Write) {
         // Get the size of the string then write it out, after making sure the buffer is big enough to contain it
         if (BitB != NULL && String2Write != NULL) {
             uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(String2Write);
             uint64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
             if (BitsAvailable >= (uint64_t) Bytes2Bits(StringSize)) { // If there's enough room to write the string, do it
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                    if ((StringByteOrder == MSByteFirst && String2Write[0] == UTF16LE) || (StringByteOrder == LSByteFirst && String2Write[0] == UTF16BE)) {
+                    if ((ByteOrder == MSByteFirst && String2Write[0] == UTF16LE) || (ByteOrder == LSByteFirst && String2Write[0] == UTF16BE)) {
                         String2Write[CodeUnit] = SwapEndian16(String2Write[CodeUnit]);
                     }
-                    InsertBits(StringByteOrder, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
+                    InsertBits(ByteOrder, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
                 }
             } else {
                 Log(Log_ERROR, __func__, U8("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
