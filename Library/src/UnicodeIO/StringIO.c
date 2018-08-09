@@ -1595,14 +1595,14 @@ extern "C" {
                 OutputString[1]   = U32('-');
             }
             // Now we start popping in the other variables, first is the Exponent.
-            while (Exponent > 0) { // TODO: This assumes there's only 1 codepoint nessicary to express the exponent
+            while (Exponent > 0) { // TODO: This assumes there's only 1 codepoint necessary to express the exponent
                 for (uint64_t ExponentCodePoint = 0ULL; ExponentCodePoint < ExponentSize; ExponentCodePoint++) {
                     OutputString[ExponentCodePoint + StringSize]                 = Exponent /= 10;
                 }
             }
             OutputString[StringSize + ExponentSize + UnicodeBOMSizeInCodePoints] = U32('.');
             // Now let's start popping in the Mantissa
-            while (Mantissa > 0) { // TODO: This assumes there's only 1 codepoint nessicary to express the exponent
+            while (Mantissa > 0) { // TODO: This assumes there's only 1 codepoint necessary to express the exponent
                 for (uint64_t MantissaCodePoint = 0ULL; MantissaCodePoint < ExponentSize; MantissaCodePoint++) {
                     OutputString[StringSize + ExponentSize + MantissaCodePoint]  = Mantissa /= 10;
                 }

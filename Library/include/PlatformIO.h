@@ -315,22 +315,28 @@ extern "C" {
 #endif
     
     /*!
-     @enum                      ByteBitOrders
-     @constant                  UnknownBitFirst            "Unknown bit order".
-     @constant                  UnknownByteFirst           "Unknown byte order".
-     @constant                  LSBitFirst                 "Read from the Least Significant Bit  to the Most  Significant, aka right to left".
+     @enum                      ByteOrders
+     @constant                  UnknownByteOrder           "Unknown byte order".
      @constant                  LSByteFirst                "Read from the Least Significant Byte to the Most Significant, aka right to left".
-     @constant                  MSBitFirst                 "Read from the Most  Significant Bit  to the Least Significant, aka left to right".
      @constant                  MSByteFirst                "Read from the Most  Significant Byte to the Least Significant, aka left to right".
      */
-    typedef enum ByteBitOrders {
-                                UnknownBitFirst            = 0,
-                                UnknownByteFirst           = 1,
-                                LSBitFirst                 = 2,
-                                LSByteFirst                = 3,
-                                MSBitFirst                 = 4,
-                                MSByteFirst                = 5,
-    } ByteBitOrders;
+    typedef enum ByteOrders {
+                                UnknownByteOrder           = 0,
+                                LSByteFirst                = 1,
+                                MSByteFirst                = 2,
+    } ByteOrders;
+    
+    /*!
+     @enum                      BitOrders
+     @constant                  UnknownBitOrder            "Unknown bit order".
+     @constant                  LSBitFirst                 "Read from the Least Significant Bit  to the Most  Significant, aka right to left".
+     @constant                  MSBitFirst                 "Read from the Most  Significant Bit  to the Least Significant, aka left to right".
+     */
+    typedef enum BitOrders {
+                                UnknownBitOrder            = 0,
+                                LSBitFirst                 = 1,
+                                MSBitFirst                 = 2,
+    } BitOrders;
     
     /*!
      @enum                      FoundationIOConstants

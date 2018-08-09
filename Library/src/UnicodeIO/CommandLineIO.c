@@ -344,7 +344,7 @@ extern "C" {
     }
     
     static UTF32 *ArgumentString2SwitchFlag(UTF32 *ArgumentString) {
-        UTF8 ArgumentSwitch = NULL;
+        UTF8 *ArgumentSwitch = NULL;
         if (ArgumentString != NULL) {
             uint8_t  ArgumentStringPrefixSize = 0;
             uint64_t ArgumentStringSize       = UTF32_GetStringSizeInCodePoints(ArgumentString);
@@ -429,7 +429,7 @@ extern "C" {
                 free(Decoded);
                 UTF32 *Normalized   = UTF32_NormalizeString(CaseFolded, NormalizationFormKC);
                 free(CaseFolded);
-                Arguments32[Arg][0] = Normalized;
+                Arguments32[Arg]    = Normalized;
             }
             UTF32_ParseCommandLineOptions(CLI, NumArguments, Arguments32);
             for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
@@ -452,7 +452,7 @@ extern "C" {
                 free(Decoded);
                 UTF32 *Normalized   = UTF32_NormalizeString(CaseFolded, NormalizationFormKC);
                 free(CaseFolded);
-                Arguments32[Arg][0] = Normalized;
+                Arguments32[Arg]    = Normalized;
             }
             UTF32_ParseCommandLineOptions(CLI, NumArguments, Arguments32);
             for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
@@ -526,8 +526,8 @@ extern "C" {
         return MatchingOption;
     }
     
-    UTF8 CLIGetOptionResult(CommandLineIO const *CLI, const int64_t OptionID) {
-        UTF8 Result = NULL;
+    UTF8 *CLIGetOptionResult(CommandLineIO const *CLI, const int64_t OptionID) {
+        UTF8 *Result = NULL;
         if (CLI != NULL && OptionID >= 0 && OptionID <= CLI->NumOptions - 1) {
             Result = CLI->OptionIDs[OptionID].Argument;
         } else if (CLI == NULL) {
