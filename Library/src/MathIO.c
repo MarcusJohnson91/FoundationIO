@@ -74,7 +74,6 @@ extern "C" {
         return Bytes;
     }
     
-    
     int8_t ExtractSignFromDecimal(double Number2Extract) {
         uint64_t *Sign1 = (uint64_t *) &Number2Extract;
         uint64_t  Sign2 = *Sign1 >> 63;

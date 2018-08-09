@@ -282,7 +282,7 @@ extern "C" {
      @param                     OptionID                        "The option's result to return".
      @return                                                    "Returns the data after the switch, if the switch is resultless it will return 0".
      */
-    UTF8                        CLIGetOptionResult(CommandLineIO const *CLI, const int64_t OptionID);
+    UTF8                       *CLIGetOptionResult(CommandLineIO const *CLI, const int64_t OptionID);
     
     /*!
      @abstract                                                  "Deallocates the instance of CommandLineIO pointed to by CLI".
