@@ -290,6 +290,26 @@ extern "C" {
 #define FoundationIOCompileTimeByteOrderLE      2
 #endif
     
+#ifndef FoundationIOCompilerIsUnknown
+#define FoundationIOCompilerIsUnknown 0
+#endif
+    
+#ifndef FoundationIOCompilerIsClang
+#define FoundationIOCompilerIsClang 1
+#endif
+    
+#ifndef FoundationIOCompilerIsMSVC
+#define FoundationIOCompilerIsMSVC 2
+#endif
+    
+#ifndef FoundationIOCompiler
+#if   defined(__clang__)
+#define FoundationIOCompiler (FoundationIOCompilerIsClang)
+#elif defined(_MSC_VER)
+#define FoundationIOCompiler (FoundationIOCompilerIsMSVC)
+#endif
+#endif /* FoundationIOCompiler */
+    
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
 #if   (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
 #define FoundationIOTargetByteOrder FoundationIOCompileTimeByteOrderBE
