@@ -429,56 +429,64 @@ extern "C" {
     }
     /* Basic String Property Functions */
     
-    UTF32 *UTF8_Decode(UTF8 *String) { // CodeUnit = Input, CodePoint = Output
-        uint8_t  CodePointSizeInCodeUnits            = 0;
-        uint64_t CodeUnitNum                         = 0ULL;
-        uint64_t CodePoint                           = 0ULL;
-        UTF32   *DecodedString                       = NULL;
+    UTF32 *UTF8_Decode(UTF8 *String) {
+        uint64_t StringSize                              = 0ULL;
+        uint64_t CodePoint                               = 0ULL;
+        uint64_t CodeUnit                                = 0ULL;
+        UTF32   *DecodedString                           = NULL;
+        
         if (String != NULL) {
-            uint64_t NumCodePoints                   = UTF8_GetStringSizeInCodePoints(String) + NULLTerminatorSize;
-            if (String[0] == 0xEF && String[1] == 0xBB && String[2] == 0xBF) { // We need to remove the BOM, and subtract it's size from the Num codepoints
-                NumCodePoints                       -= UnicodeBOMSizeInCodePoints;
-                CodeUnitNum                         += UTF8BOMSizeInCodeUnits;
+            StringSize = UTF8_GetStringSizeInCodePoints(String);
+            if (String[0] != 0xEF && String[1] != 0xBB && String[2] != 0xBF) {
+                StringSize                              += UnicodeBOMSizeInCodePoints;
+            } else {
+                CodeUnit                                 = UTF8BOMSizeInCodeUnits;
             }
-            DecodedString                            = calloc(NumCodePoints, sizeof(UTF32));
+            DecodedString                                = calloc(StringSize, sizeof(UTF32));
             if (DecodedString != NULL) {
                 do {
-                    CodePointSizeInCodeUnits         = UTF8_GetCodePointSize(String[CodeUnitNum]);
-                    switch (CodePointSizeInCodeUnits) { // UTF-8 is MSB first, if the platform is LSB first, we need to swap as we read
-                        case 1:
-                            DecodedString[CodePoint] =  String[CodeUnitNum];
-                            CodeUnitNum             += 1;
-                            CodePoint               += 1;
-                            break;
-                        case 2:
-                            DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x1F) << 6;
-                            DecodedString[CodePoint] =  String[CodeUnitNum + 1] & 0x3F;
-                            CodeUnitNum             += 2;
-                            CodePoint               += 1;
-                            break;
-                        case 3:
-                            DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x0F) << 12;
-                            DecodedString[CodePoint] = (String[CodeUnitNum + 1] & 0x1F) << 6;
-                            DecodedString[CodePoint] = (String[CodeUnitNum + 2] & 0x1F);
-                            CodeUnitNum             += 3;
-                            CodePoint               += 1;
-                            break;
-                        case 4:
-                            DecodedString[CodePoint] = (String[CodeUnitNum]     & 0x07) << 18;
-                            DecodedString[CodePoint] = (String[CodeUnitNum + 1] & 0x3F) << 12;
-                            DecodedString[CodePoint] = (String[CodeUnitNum + 2] & 0x3F) <<  6;
-                            DecodedString[CodePoint] = (String[CodeUnitNum + 3] & 0x3F);
-                            CodeUnitNum             += 4;
-                            CodePoint               += 1;
-                            break;
+                    if (CodePoint == 0) {
+#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+                        DecodedString[0]                    = UTF32LE;
+#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+                        DecodedString[0]                    = UTF32BE;
+#endif
+                    } else {
+                        uint8_t CodePointSize            = UTF8_GetCodePointSize(String[CodeUnit]);
+                        switch (CodePointSize) {
+                            case 1:
+                                DecodedString[CodePoint] =  String[CodeUnit];
+                                CodeUnit                += 1;
+                                CodePoint               += 1;
+                                break;
+                            case 2:
+                                DecodedString[CodePoint] = (String[CodeUnit]     & 0x1F) << 6;
+                                DecodedString[CodePoint] =  String[CodeUnit + 1] & 0x3F;
+                                CodeUnit                += 2;
+                                CodePoint               += 1;
+                                break;
+                            case 3:
+                                DecodedString[CodePoint] = (String[CodeUnit]     & 0x0F) << 12;
+                                DecodedString[CodePoint] = (String[CodeUnit + 1] & 0x1F) << 6;
+                                DecodedString[CodePoint] = (String[CodeUnit + 2] & 0x1F);
+                                CodeUnit                += 3;
+                                CodePoint               += 1;
+                                break;
+                            case 4:
+                                DecodedString[CodePoint] = (String[CodeUnit]     & 0x07) << 18;
+                                DecodedString[CodePoint] = (String[CodeUnit + 1] & 0x3F) << 12;
+                                DecodedString[CodePoint] = (String[CodeUnit + 2] & 0x3F) <<  6;
+                                DecodedString[CodePoint] = (String[CodeUnit + 3] & 0x3F);
+                                CodeUnit                += 4;
+                                CodePoint               += 1;
+                                break;
+                        }
                     }
-                    if (CodePointSizeInCodeUnits > 1 && DecodedString[CodePoint] <= 0x7F) {
-                        Log(Log_ERROR, __func__, U8("CodePoint %llu, U+%X is overlong"), CodePoint, DecodedString[CodePoint]);
-                    } else if (DecodedString[CodePoint] >= UTF16HighSurrogateStart && DecodedString[CodePoint] <= UTF16LowSurrogateEnd) {
-                        DecodedString[CodePoint]     = InvalidReplacementCodePoint;
+                    if (DecodedString[CodePoint] >= UTF16HighSurrogateStart && DecodedString[CodePoint] <= UTF16LowSurrogateEnd) {
+                        DecodedString[CodePoint]         = InvalidReplacementCodePoint;
                         Log(Log_ERROR, __func__, U8("Codepoint %d is invalid, because it overlaps the Surrogate Pair Block, it was replaced with U+FFFD"), DecodedString[CodePoint]);
                     }
-                } while (String[CodeUnitNum] != NULLTerminator);
+                } while (DecodedString[CodePoint] != NULLTerminator && String[CodeUnit] != NULLTerminator);
             } else {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate DecodedString"));
             }
@@ -504,6 +512,7 @@ extern "C" {
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
                 StringsByteOrder = UTF16BE;
 #endif
+                NumCodePoints   += 1;
             }
             DecodedString                        = calloc(NumCodePoints, sizeof(UTF32));
             if (DecodedString != NULL) {
@@ -840,41 +849,76 @@ extern "C" {
     }
     
     UTF32 *UTF32_RemoveSubString(UTF32 *String, UTF32 *SubString2Remove, uint64_t Instance2Remove) {
-        uint64_t SubStringSize     = UTF32_GetStringSizeInCodePoints(SubString2Remove);
-        if (String != NULL && SubString2Remove != NULL) {
-            // Ok well we need to start counting how many instances there are, if instance = -1, we need to remove all.
-            uint64_t CodePoint     = 0ULL;
-            int64_t  FoundInstance = 0ULL;
-            /*
-             We need to know the size of the substring that way we can loop over the string properly.
-             
-             Then we need 2 loops, one for the main string, and one for the substring.
-             
-             Each time a non-matching codepoint is found in the string, we need to reset the substring back to the beginning.
-             */
+        UTF32 *EditedString = NULL;
+        if (String != NULL && SubString2Remove != NULL && Instance2Remove > 0) {
+            uint64_t StringSize       = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t SubStringSize    = UTF32_GetStringSizeInCodePoints(SubString2Remove);
+            uint64_t EditedStringSize = 0ULL;
             
-            do { // We need to get the size of SubString2Remove, and loop over it comparing
-                if (Instance2Remove == 0) {
-                    // Remove each and every instance of the substring
-                } else if (FoundInstance == Instance2Remove) {
-                    // Count the instances
+            uint64_t   NumInstances   = 0ULL;
+            uint64_t  *Instances      = NULL;
+            
+            for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                for (uint64_t SubStringCodePoint = 0ULL; SubStringCodePoint < SubStringSize; SubStringCodePoint++) {
+                    if (String[StringCodePoint] != SubString2Remove[SubStringCodePoint]) {
+                        break;
+                    } else {
+                        NumInstances += 1;
+                    }
                 }
-                CodePoint += 1;
-            } while (String[CodePoint] != NULLTerminator);
+            }
+            
+            Instances = calloc(NumInstances, sizeof(uint64_t));
+            if (Instances != NULL) {
+                for (uint64_t Instance = 0ULL; Instance < NumInstances; Instance++) {
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                        for (uint64_t RemoveCodePoint = 0ULL; RemoveCodePoint < SubStringSize; RemoveCodePoint++) {
+                            if (String[StringCodePoint] != SubString2Remove[RemoveCodePoint]) {
+                                break;
+                            } else {
+                                Instances[Instance] = StringCodePoint;
+                            }
+                        }
+                    }
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate the instances"));
+            }
+            
+            if (Instance2Remove >= 1) {
+                EditedStringSize = StringSize - SubStringSize;
+            } else if (Instance2Remove == 0xFFFFFFFFFFFFFFFF) {
+                EditedStringSize = StringSize - (NumInstances * SubStringSize);
+            }
+            
+            EditedString         = calloc(EditedStringSize, sizeof(UTF32));
+            if (EditedString != NULL) {
+                for (uint64_t EditedCodePoint = 0ULL; EditedCodePoint < EditedStringSize; EditedCodePoint++) {
+                    for (uint64_t Instance = 0ULL; Instance < NumInstances; Instance++) {
+                        if (EditedCodePoint < Instances[Instance] || EditedCodePoint > Instances[Instance] + SubStringSize) {
+                            EditedString[EditedCodePoint] = String[EditedCodePoint - (Instances[Instance] + SubStringSize)];
+                        }
+                    }
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate the edited string"));
+            }
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         } else if (SubString2Remove == NULL) {
             Log(Log_ERROR, __func__, U8("SubString2Remove Pointer is NULL"));
+        } else if (Instance2Remove == 0) {
+            Log(Log_ERROR, __func__, U8("Removing 0 instances of the SubString does not make sense"));
         }
-        return NULL;
+        return EditedString;
     }
     
-    bool UTF8_Compare(UTF8 *String1, UTF8 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive) {
+    bool UTF8_Compare(UTF8 *String1, UTF8 *String2) {
         bool StringsMatch          = No;
         if (String1 != NULL && String2 != NULL) {
             UTF32 *String1UTF32    = UTF8_Decode(String1);
             UTF32 *String2UTF32    = UTF8_Decode(String2);
-            StringsMatch           = UTF32_Compare(String1UTF32, String2UTF32, NormalizedForm, CaseInsensitive);
+            StringsMatch           = UTF32_Compare(String1UTF32, String2UTF32);
             free(String1UTF32);
             free(String2UTF32);
         } else if (String1 == NULL) {
@@ -885,12 +929,12 @@ extern "C" {
         return StringsMatch;
     }
     
-    bool UTF16_Compare(UTF16 *String1, UTF16 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive) {
+    bool UTF16_Compare(UTF16 *String1, UTF16 *String2) {
         bool StringsMatch          = No;
         if (String1 != NULL && String2 != NULL) {
             UTF32 *String1UTF32    = UTF16_Decode(String1);
             UTF32 *String2UTF32    = UTF16_Decode(String2);
-            StringsMatch           = UTF32_Compare(String1UTF32, String2UTF32, NormalizedForm, CaseInsensitive);
+            StringsMatch           = UTF32_Compare(String1UTF32, String2UTF32);
             free(String1UTF32);
             free(String2UTF32);
         } else if (String1 == NULL) {
@@ -901,31 +945,21 @@ extern "C" {
         return StringsMatch;
     }
     
-    bool UTF32_Compare(UTF32 *String1, UTF32 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive) {
+    bool UTF32_Compare(UTF32 *String1, UTF32 *String2) {
         uint64_t CodePoint           = 0ULL;
         bool StringsMatch            = Yes;
         if (String1 != NULL && String2 != NULL) {
-            UTF32 *Normalized1       = UTF32_NormalizeString(String1, NormalizedForm);
-            UTF32 *Normalized2       = UTF32_NormalizeString(String2, NormalizedForm);
-            if (CaseInsensitive == Yes) {
-                UTF32 *CaseFolded1   = UTF32_CaseFoldString(Normalized1);
-                UTF32 *CaseFolded2   = UTF32_CaseFoldString(Normalized2);
-                do {
-                    if (CaseFolded1[CodePoint] != CaseFolded2[CodePoint]) {
-                        StringsMatch = No;
-                    }
-                } while (CaseFolded1[CodePoint] != NULLTerminator && CaseFolded2[CodePoint] != NULLTerminator);
-                free(CaseFolded1);
-                free(CaseFolded2);
+            uint64_t String1Size     = UTF32_GetStringSizeInCodePoints(String1);
+            uint64_t String2Size     = UTF32_GetStringSizeInCodePoints(String2);
+            if (String1Size != String2Size) {
+                StringsMatch         = No;
             } else {
                 do {
-                    if (Normalized1[CodePoint] != Normalized2[CodePoint]) {
+                    if (String1[CodePoint] != String2[CodePoint]) {
                         StringsMatch = No;
                     }
-                } while (Normalized1[CodePoint] != NULLTerminator && Normalized2[CodePoint] != NULLTerminator);
+                } while (String1[CodePoint] != NULLTerminator && String2[CodePoint] != NULLTerminator);
             }
-            free(Normalized1);
-            free(Normalized2);
         } else if (String1 == NULL) {
             Log(Log_ERROR, __func__, U8("String1 Pointer is NULL"));
         } else if (String2 == NULL) {
@@ -1099,7 +1133,7 @@ extern "C" {
                         }
                     }
                 } else {
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate InsertedString"), Offset, StringSize);
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate InsertedString"));
                 }
             } else {
                 Log(Log_ERROR, __func__, U8("Offset %llu is greater than the string's size %llu"), Offset, StringSize);
@@ -1136,7 +1170,7 @@ extern "C" {
                         }
                     }
                 } else {
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate InsertedString"), Offset, StringSize);
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate InsertedString"));
                 }
             } else {
                 Log(Log_ERROR, __func__, U8("Offset %llu is greater than the string's size %llu"), Offset, StringSize);
@@ -1154,8 +1188,8 @@ extern "C" {
     UTF32 *UTF32_Insert(UTF32 *String, UTF32 *String2Insert, uint64_t Offset) {
         UTF32 *Inserted = NULL;
         if (String != NULL && String2Insert != NULL) {
-            uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(String);
-            uint64_t InsertSize = UTF16_GetStringSizeInCodeUnits(String2Insert);
+            uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t InsertSize = UTF32_GetStringSizeInCodePoints(String2Insert);
             if (Offset == 0xFFFFFFFFFFFFFFFF) {
                 Offset = StringSize;
             }
@@ -1173,7 +1207,7 @@ extern "C" {
                         }
                     }
                 } else {
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate InsertedString"), Offset, StringSize);
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate InsertedString"));
                 }
             } else {
                 Log(Log_ERROR, __func__, U8("Offset %llu is greater than the string's size %llu"), Offset, StringSize);
@@ -1237,7 +1271,14 @@ extern "C" {
             do {
                 for (uint64_t Index = 0; Index < CaseFoldTableSize; Index++) {
                     if (String[CodePoint] == CaseFoldCodePoints[Index]) {
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(push)
+#pragma warning(disable: 4090)
+#endif
                         CaseFoldedString = UTF32_ReplaceSubString(String, CaseFoldStrings[Index], CodePoint, 1);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(pop)
+#endif
                     }
                 }
             } while (String[CodePoint] != NULLTerminator);
@@ -1281,13 +1322,27 @@ extern "C" {
                 if (Kompatibility == Yes) {
                     for (uint64_t Index = 0; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(push)
+#pragma warning(disable: 4090)
+#endif
                             ComposedString = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(pop)
+#endif
                         }
                     }
                 } else {
                     for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[DecomposeCodePoint]) {
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(push)
+#pragma warning(disable: 4090)
+#endif
                             ComposedString = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[DecomposeCodePoint], CodePoint, 1);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(pop)
+#endif
                         }
                     }
                 }
@@ -1307,13 +1362,27 @@ extern "C" {
                 if (Kompatibility == Yes) {
                     for (uint64_t Index = 0; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(push)
+#pragma warning(disable: 4090)
+#endif
                             Decomposed = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(pop)
+#endif
                         }
                     }
                 } else {
                     for (uint64_t Index = 0; Index < CanonicalNormalizationTableSize; Index++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[Index]) {
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(push)
+#pragma warning(disable: 4090)
+#endif
                             Decomposed = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[Index], CodePoint, 1);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(pop)
+#endif
                         }
                     }
                 }
@@ -1376,7 +1445,7 @@ extern "C" {
     }
     /* Unicode Functions */
     
-    int64_t UTF8_String2Integer(StringIOBases Base, UTF8 *String) {
+    int64_t UTF8_String2Integer(StringIOBases Base, UTF8 *String) { // Replaces atoi, atol, strtol, strtoul,
         UTF32 *String32 = UTF8_Decode(String);
         int64_t Value   = UTF32_String2Integer(Base, String32);
         free(String32);
@@ -1391,52 +1460,56 @@ extern "C" {
     }
     
     int64_t UTF32_String2Integer(StringIOBases Base, UTF32 *String) {
-        uint64_t CodePoint         =  0ULL;
-        int8_t   Sign              =  1;
-        int64_t  Value             =  0;
+        uint64_t CodePoint = 0ULL;
+        int8_t   Sign      = 1;
+        int64_t  Value     = 0LL;
         if (String != NULL) {
-            UTF32 *Decomposed      = UTF32_NormalizeString(String, NormalizationFormKD);
-            do {
-                // Ok so we need to skip any leading whitespace, that's fairly simple, simply loop over anything that isn't a base Base digit
-                
-                for (uint64_t WhiteSpace = 0; WhiteSpace < WhiteSpaceTableSize; WhiteSpace++) {
-                    if (Decomposed[CodePoint] == WhiteSpaceTable[WhiteSpace]) {
-                        CodePoint += 1;
+            if (Base == IntegerBase2) {
+                do {
+                    if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x31) {
+                        Value <<= 1;
+                        Value   = String[CodePoint] - 0x30;
                     }
-                }
-                for (uint64_t IntegerIndex = 0ULL; IntegerIndex < IntegerTableSize; IntegerIndex++) {
-                    if (Decomposed[CodePoint] == IntegerCodePoints[IntegerIndex]) {
-                        Value     += IntegerValues[IntegerIndex];
-                        CodePoint += 1;
+                } while (String[CodePoint] != NULLTerminator);
+            } else if (Base == IntegerBase8) {
+                do {
+                    if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x37) {
+                        Value  *= 8;
+                        Value   = String[CodePoint] - 0x30;
                     }
-                }
-                if (Decomposed[CodePoint] == U32('0')) {
-                    if (Decomposed[CodePoint + 1] == U32('b') || Decomposed[CodePoint + 1] == U32('B')) {
-                        Base       = 2;
-                    } else if (Decomposed[CodePoint + 1] == U32('o') || Decomposed[CodePoint] == U32('O')) {
-                        Base       = 8;
-                    } else if (Decomposed[CodePoint + 1] == U32('x') || Decomposed[CodePoint] == U32('X')) {
-                        Base       = 16;
+                } while (String[CodePoint] != NULLTerminator);
+            } else if (Base == IntegerBase10) {
+                do {
+                    if (CodePoint == 1 && String[CodePoint] == U32('-')) {
+                        Sign    = -1;
                     }
-                } else if (String[CodePoint] == U32('-')) {
-                    Sign           = -1;
-                }
-                Value             *= Base;
-                if (Base == IntegerBase16U && (String[CodePoint] >= 0x41 && String[CodePoint] <= 0x46)) { // 0x41-0x46 = Upper
-                    Value         += (String[CodePoint] - 55);
-                } else if (Base == IntegerBase16L && (String[CodePoint] >= 0x61 && String[CodePoint] <= 0x66)) {
-                    Value         += (String[CodePoint] - 87);
-                } else if (Base == IntegerBase10 && (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39)) {
-                    Value         += (String[CodePoint] - 48);
-                } else if (Base == IntegerBase8 && (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x37)) {
-                    Value         += (String[CodePoint] - 48);
-                } else if (Base == IntegerBase2 && (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x31)) {
-                    Value         += (String[CodePoint] - 48);
-                }
-                CodePoint         += 1;
-                Value             *= Sign;
-            } while (Decomposed[CodePoint] != NULLTerminator);
-            free(Decomposed);
+                    if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
+                        Value  *= 10;
+                        Value   = String[CodePoint] - 0x30;
+                    }
+                } while (String[CodePoint] != NULLTerminator);
+            } else if (Base == IntegerBase16U) {
+                do {
+                    if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
+                        Value  *= 16;
+                        Value   = String[CodePoint] - 0x30;
+                    } else if (String[CodePoint] >= 0x41 && String[CodePoint] <= 0x46) {
+                        Value  *= 16;
+                        Value   = String[CodePoint] - 0x37;
+                    }
+                } while (String[CodePoint] != NULLTerminator);
+            } else if (Base == IntegerBase16L) {
+                do {
+                    if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
+                        Value <<= 16;
+                        Value   = String[CodePoint] - 0x30;
+                    } else if (String[CodePoint] >= 0x61 && String[CodePoint] <= 0x66) {
+                        Value <<= 16;
+                        Value   = String[CodePoint] - 0x51;
+                    }
+                } while (String[CodePoint] != NULLTerminator);
+            }
+            Value *= Sign;
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -1507,17 +1580,14 @@ extern "C" {
         return Decimal;
     }
     
-    double UTF32_String2Decimal(UTF32 *String) { // Replaces strtod and atof
-        /*
-         Invalid strings result in 0.0 since Mac doesn't support NaN.
-         */
-        uint64_t CodePoint = 0;
+    double UTF32_String2Decimal(UTF32 *String) { // Replaces strtod, strtof, strold, atof, and atof_l
+        uint64_t CodePoint  = 0ULL;
+        bool     IsNegative = No;
         if (String != NULL) {
             // Extract the sign bit
             // Extract the Significand
             // Extract the Base
             // Extract the Exponent
-            bool IsNegative        = 0;
             for (uint8_t Whitespace = 0; Whitespace < 99; Whitespace++) {
                 do {
                     if (String[CodePoint] == U32('-')) {
@@ -1546,16 +1616,57 @@ extern "C" {
         return String16;
     }
     
-    UTF32 *UTF32_Decimal2String(StringIOBases Base, double Number) { // OK, so our example number is -100.15 E2? -100 = -10^2 + 0.15
+    UTF32 *UTF32_Decimal2String(StringIOBases Base, double Number) {
         UTF32   *OutputString     = NULL;
         int8_t   Sign             = ExtractSignFromDecimal(Number);
         int16_t  Exponent         = ExtractExponentFromDecimal(Number);
         int16_t  Exponent2        = Absolute(Exponent);
-        uint16_t ExponentSize     = 0;
         uint64_t Mantissa         = ExtractMantissaFromDecimal(Number);
         uint64_t Mantissa2        = Absolute(Mantissa);
-        uint64_t MantissaSize     = 0;
+        uint16_t ExponentSize     = 0ULL;
+        uint64_t MantissaSize     = 0ULL;
         uint64_t StringSize       = 0ULL;
+        bool     IsDenormal       = No;
+        bool     IsNotANumber     = No;
+        bool     IsInfinite       = No;
+        
+        if (Exponent == 0x7FF && Mantissa > 0) {
+            IsNotANumber          = Yes;
+        } else if (Exponent == 0x7FF && Mantissa == 0) {
+            IsInfinite            = Yes;
+        } else if (Exponent == 0 && Mantissa >= 0) {
+            IsDenormal            = Yes;
+        }
+        
+        // The Number to write is 1024.0
+        // The Exponent's size is 4
+        // The Mantissa's size is 1?
+        
+        /*
+         Denorm = Exponent = 0,   Mantissa == Anything
+         NaN    = Exponent = Max, Mantissa >  0
+         Inf    = Exponent = Max, Mantissa == 0
+         */
+        
+        if (Base == FloatShortestU) { // Get the size of the string for both Decimal and Scientific representations, and choose the shortest.
+            
+            /*
+             Choose between Decimal and Scientific at will.
+             
+             Get the size of the string in both representations and go with the smallest
+             So, we need a way to figure out the size of each representation without actually doing it.
+             */
+        } else if (Base == FloatShortestL) { // Get the size of the string for both Decimal and Scientific representations, and choose the shortest.
+            /*
+             Choose between Decimal and Scientific at will.
+             
+             Get the size of the string in both representations and go with the smallest
+             So, we need a way to figure out the size of each representation without actually doing it.
+             */
+            
+        }
+        
+        
         
         if (Sign == -1) {
             StringSize           += 1;
@@ -1581,13 +1692,8 @@ extern "C" {
             StringSize += (2 + ExponentSize); // Add five for the decimal seperator, E, Sign, X.
         } else if (Base == FloatScientificL) { // Write the number as XXX.YYe(+|-)Z // -1.1 = -1.100000e+00
             StringSize += (2 + ExponentSize); // Add five for the decimal seperator, e, +, and X.
-        } else if (Base == FloatShortestU) { // Get the size of the string for both Decimal and hex representations, and choose the shortest.
-            // Get the size of the string in both representations and go with the smallest
-        } else if (Base == FloatShortestL) { // Get the size of the string for both Decimal and hex representations, and choose the shortest.
-            // Get the size of the string in both representations and go with the smallest
         }
         
-        // How many base 10 digits does 52 bits contain? 52 = 6.5 bytes, or 13 nibbles, where each nibble can contain 1 decimal digit, so 13 digits for the exponent
         OutputString              = calloc(StringSize + ExponentSize + MantissaSize, sizeof(UTF32));
         if (OutputString != NULL) {
             // Now we go ahead and create the string
@@ -1709,7 +1815,7 @@ extern "C" {
         if (StringArray != NULL) {
             do {
                 NumStrings += 1;
-            } while (StringArray[NumStrings] != NULLTerminator);
+            } while (StringArray[NumStrings][0] != NULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
         }
@@ -1721,7 +1827,7 @@ extern "C" {
         if (StringArray != NULL) {
             do {
                 NumStrings += 1;
-            } while (StringArray[NumStrings] != NULLTerminator);
+            } while (StringArray[NumStrings][0] != NULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
         }
@@ -1733,7 +1839,7 @@ extern "C" {
         if (StringArray != NULL) {
             do {
                 NumStrings += 1;
-            } while (StringArray[NumStrings] != NULLTerminator);
+            } while (StringArray[NumStrings][0] != NULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
         }
