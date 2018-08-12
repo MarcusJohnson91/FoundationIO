@@ -384,32 +384,6 @@ extern "C" {
         }
     }
     
-    /*!
-     @param BitB              "Pointer to BitBuffer the array will be written to".
-     @param Array2Write       "The array to write to the BitBuffer".
-     @param ElementSize       "The size of the type of array, uint16_t would be 16, etc".
-     @param NumElements2Write "The number of elements from the array to write".
-     @param ElementOffset     "which element should we start writing from"?
-     @param OutputByteOrder   "the byte order the elements should be written in".
-     @param OutputBitOrder    "the bit order the elements should be written in".
-     @param Bits2Write        "The number of bits to write from each element, if only 14 bits are used, then just write 14 bits".
-     */
-    // If we were to write a AudioContainer containing PCM samples, we'd need to make sure each element was written with the right bit and byte order
-    void     WriteArray2BitBuffer(BitBuffer *BitB, const void *Array2Write, const uint8_t ElementSize, const uint64_t NumElements2Write, const uint64_t ElementOffset) {
-        
-        if (BitB != NULL && Array2Write != NULL && ElementSize > 0 && NumElements2Write > 0) {
-            
-        } else if (BitB == NULL) {
-            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
-        } else if (Array2Write == NULL) {
-            Log(Log_ERROR, __func__, U8("Array Pointer is NULL"));
-        } else if (ElementSize == 0 || ElementSize > 64) {
-            Log(Log_ERROR, __func__, U8("ElementSize is %d, that doesn't make any sense"), ElementSize);
-        } else if (NumElements2Write == 0 || NumElements2Write > ElementOffset) {
-            Log(Log_ERROR, __func__, U8("NumElements2Write %lld makes no sense"), NumElements2Write);
-        }
-    }
-    
     void     WriteUTF8(BitBuffer *BitB, UTF8 *String2Write) {
         // Get the size of the string then write it out, after making sure the buffer is big enough to contain it
         if (BitB != NULL && String2Write != NULL) {
@@ -477,43 +451,17 @@ extern "C" {
     void BitInput_OpenFile(BitInput *BitI, UTF8 *Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType                   = BitIOFile;
-            uint64_t Path2OpenSize           = UTF8_GetStringSizeInCodeUnits(Path2Open) + NULLTerminatorSize;
-            bool     ContainsFormatSpecifier = No;
-            UTF8    *Formatted               = NULL;
-            // Loop over the string checking for a percent symbol not followed by a second percent symbol, ifyou find it call forat
-            for (uint64_t CodeUnit = 1ULL; CodeUnit < Path2OpenSize - NULLTerminatorSize; CodeUnit++) {
-                if (Path2Open[CodeUnit - 1] == U32('%') && Path2Open[CodeUnit] != U32('%')) {
-                    ContainsFormatSpecifier  = Yes;
-                }
-            }
-            if (ContainsFormatSpecifier == Yes) {
-                Formatted                    = UTF8_FormatString(Path2Open, BitI->FileSpecifierNum);
-            } else {
-                Formatted                    = Path2Open;
-            }
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
-            BitI->File                       = FoundationIO_FileOpen(Formatted, U8("rb"));
+            BitI->File                       = FoundationIO_FileOpen(Path2Open, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
-            UTF32 *Decoded                    = UTF8_Decode(Path2Open);
-            UTF16 *Unchecked                  = UTF16_Encode(Decoded, UseLEByteOrder);
-            free(Decoded);
-            UTF16 *Prepended                  = NULL;
-            if (Decoded[0] != UTF16LE && Decoded[0] != UTF16BE) {
-                /* \\?\ */
-                if ((Decoded[0] != U16('\\') || Decoded[0] != U16('/')) && (Decoded[1] != U16('\\') || Decoded[1] != U16('/')) && Decoded[2] != U16('\?') && (Decoded[3] != U16('\\') || Decoded[3] != U16('/'))) {
-                    Prepended                 = UTF16_ReplaceSubString(Unchecked, U16("//?/"), 0, 0);
-                }
-            } else {
-                if ((Decoded[0] != U16('\\') || Decoded[0] != U16('/')) && (Decoded[1] != U16('\\') || Decoded[1] != U16('/')) && Decoded[2] != U16('\?') && (Decoded[3] != U16('\\') || Decoded[3] != U16('/'))) {
-                    Prepended                 = UTF16_ReplaceSubString(Unchecked, U16("//?/"), 0, 0);
-                } else {
-                    if (BitI->FileSpecifierExists == Yes) {
-                        Prepended             = UTF16_FormatString(Unchecked, BitI->FileSpecifierNum);
-                    }
-                }
-            }
-            BitI->File                        = FoundationIO_FileOpen(Prepended, U16("rb"));
-            free(Prepended);
+            bool  StringHasBOM               = UTF8_StringHasBOM(Path2Open);
+            UTF32 *WinPath32                 = UTF8_Decode(Path2Open);
+            UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, U32("\\\\\?\\"), StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
+            free(WinPath32);
+            UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32, UseLEByteOrder);
+            free(WinPathLong32);
+            BitI->File                       = FoundationIO_FileOpen(WinPath16, U16("rb"));
+            free(WinPath16);
 #endif
             if (BitI->File != NULL) {
                 setvbuf(BitI->File, NULL, _IONBF, 0);
@@ -663,45 +611,16 @@ extern "C" {
     void BitOutput_OpenFile(BitOutput *BitO, UTF8 *Path2Open) {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType         = BitIOFile;
-            uint64_t Path2OpenSize = UTF8_GetStringSizeInCodeUnits(Path2Open) + NULLTerminatorSize;
-            UTF8    *WinPath8      = NULL;
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
             BitO->File             = FoundationIO_FileOpen(Path2Open, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
-            if (Path2Open[0] != 0xEF && Path2Open[1] != 0xBB && Path2Open[2] != 0xBF) {
-                if (Path2Open[0] != U32('/') && Path2Open[1] != U32('/') && Path2Open[2] != U32('?') && Path2Open[3] != U32('/')) {
-                    if (BitO->FileSpecifierExists == No) {
-                        WinPath8   = UTF8_FormatString(U8("//?/%s"), Path2Open);
-                    } else {
-                        WinPath8   = UTF8_FormatString(U8("//?/%s%llu"), Path2Open, BitO->FileSpecifierNum);
-                    }
-                } else {
-                    if (BitO->FileSpecifierExists == No) {
-                        WinPath8   = Path2Open;
-                    } else {
-                        WinPath8 = UTF8_FormatString(U8("%s%llu"), Path2Open, BitO->FileSpecifierNum);
-                    }
-                }
-            } else {
-                if (Path2Open[3] != U32('/') && Path2Open[4] != U32('/') && Path2Open[5] != U32('?') && Path2Open[6] != U32('/')) {
-                    if (BitO->FileSpecifierExists == No) {
-                        WinPath8   = UTF8_FormatString(U8("//?/%s"), Path2Open);
-                    } else {
-                        WinPath8   = UTF8_FormatString(U8("//?/%s%llu"), Path2Open, BitO->FileSpecifierNum);
-                    }
-                } else {
-                    if (BitO->FileSpecifierExists == No) {
-                        WinPath8   = Path2Open;
-                    } else {
-                        WinPath8   = UTF8_FormatString(U8("%s%llu"), Path2Open, BitO->FileSpecifierNum);
-                    }
-                }
-            }
-            UTF32 *WinPath32   = UTF8_Decode(WinPath8);
-            UTF16 *WinPath16   = UTF16_Encode(WinPath32, UseLEByteOrder);
-            free(WinPath8);
+            bool  StringHasBOM     = UTF8_StringHasBOM(Path2Open);
+            UTF32 *WinPath32       = UTF8_Decode(Path2Open);
+            UTF32 *WinPathLong32   = UTF32_Insert(WinPath32, U32("\\\\\?\\"), StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
             free(WinPath32);
-            BitO->File         = FoundationIO_FileOpen(WinPath16, U16("rb"));
+            UTF16 *WinPath16       = UTF16_Encode(WinPathLong32, UseLEByteOrder);
+            free(WinPathLong32);
+            BitO->File             = FoundationIO_FileOpen(WinPath16, U16("rb"));
             free(WinPath16);
 #endif
             if (BitO->File != NULL) {
