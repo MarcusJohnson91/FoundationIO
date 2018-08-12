@@ -11,7 +11,7 @@ extern "C" {
     
     /*!
      @header                    Log.h
-     @author                    Marcus Johnson aka BumbleBritches57
+     @author                    Marcus Johnson
      @copyright                 2017+
      @version                   1.0.0
      @brief                     This header contains code for logging errors and debugging information.

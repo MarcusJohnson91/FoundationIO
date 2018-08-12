@@ -13,10 +13,6 @@
 extern "C" {
 #endif
     
-    /*
-     Maybe what I should do, is remove the NULL pointer checking from the functions that set/get the value, to the functions that actually initalize the types in the first place.
-     */
-    
     /*!
      @struct                 CommandLineSwitch
      @abstract                                           "Contains the data to support a switch".
