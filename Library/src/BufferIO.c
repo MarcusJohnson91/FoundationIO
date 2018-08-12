@@ -128,6 +128,17 @@ extern "C" {
         }
     }
     
+    void BitBuffer_Clear(BitBuffer *BitB) {
+        if (BitB != NULL) {
+            uint64_t BufferSize = BitB->NumBits / 8;
+            for (uint64_t Byte = 0ULL; Byte < BufferSize; Byte++) {
+                BitB->Buffer[Byte] = 0;
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        }
+    }
+    
     void BitBuffer_Resize(BitBuffer *BitB, const uint64_t NewSize) { // We need to ensure that the new size is at least as large as the remaining bits
         if (BitB != NULL && NewSize >= BitBuffer_GetBitsFree(BitB)) {
             memset(BitB->Buffer, 0, Bits2Bytes(BitB->NumBits, No));
@@ -333,23 +344,15 @@ extern "C" {
         return ExtractedString;
     }
     
-    UTF16   *ReadUTF16(ByteOrders ByteOrder, BitBuffer *BitB, uint64_t StringSize) {
-        /* How do we handle the byte order? Well if it was written with a BOM we can read the BOM to figure out the encoded byte and bit order */
-        /* But if it wasn't... we'll need external information, ok so what information do we need? just the byte order. */
-        /* Ok, so if the StringByteOrder is set to UnknownByteFirst, read it from the BOM. */
+    UTF16   *ReadUTF16(BitBuffer *BitB, uint64_t StringSize) {
         UTF16 *ExtractedString                    = calloc(StringSize, sizeof(UTF16));
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                if (ByteOrder != UnknownByteOrder) {
-                    uint16_t BOM                  = PeekBits(MSByteFirst, LSBitFirst, BitB, 16);
-                    if (BOM != UTF16BE && BOM != UTF16LE) {
-                        ExtractedString[CodeUnit] = ExtractBits(LSByteFirst, LSBitFirst, BitB, 16);
-                    } else {
-                        ExtractedString[CodeUnit] = ExtractBits(MSByteFirst, LSBitFirst, BitB, 16);
-                    }
-                } else {
-                    ExtractedString[CodeUnit]     = ExtractBits(ByteOrder, LSBitFirst, BitB, 16);
-                }
+#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+                ExtractedString[CodeUnit] = ExtractBits(LSByteFirst, LSBitFirst, BitB, 16);
+#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+                ExtractedString[CodeUnit] = ExtractBits(MSByteFirst, LSBitFirst, BitB, 16);
+#endif
             }
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
@@ -426,17 +429,18 @@ extern "C" {
         }
     }
     
-    void     WriteUTF16(ByteOrders ByteOrder, BitBuffer *BitB, UTF16 *String2Write) {
+    void     WriteUTF16(BitBuffer *BitB, UTF16 *String2Write) {
         // Get the size of the string then write it out, after making sure the buffer is big enough to contain it
         if (BitB != NULL && String2Write != NULL) {
             uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(String2Write);
             uint64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
             if (BitsAvailable >= (uint64_t) Bytes2Bits(StringSize)) { // If there's enough room to write the string, do it
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                    if ((ByteOrder == MSByteFirst && String2Write[0] == UTF16LE) || (ByteOrder == LSByteFirst && String2Write[0] == UTF16BE)) {
-                        String2Write[CodeUnit] = SwapEndian16(String2Write[CodeUnit]);
-                    }
-                    InsertBits(ByteOrder, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
+#if    (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+                    InsertBits(LSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
+#elif  (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+                    InsertBits(MSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
+#endif
                 }
             } else {
                 Log(Log_ERROR, __func__, U8("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
@@ -770,6 +774,11 @@ extern "C" {
     /* BitOutput */
     
     /* GUUID */
+    enum GUUIDConstants {
+        GUUIDStringSize                 = 20 + NULLTerminatorSize,
+        BinaryGUUIDSize                 = 16,
+    };
+    
     bool CompareGUUIDs(GUUIDTypes GUUIDType, const uint8_t *GUUID1, const uint8_t *GUUID2) {
         uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? BinaryGUUIDSize - NULLTerminatorSize : BinaryGUUIDSize);
         bool GUUIDsMatch        = Yes;
@@ -798,7 +807,7 @@ extern "C" {
             bool TypeDiffers      = (((InputGUUIDType == GUIDString && OutputGUUIDType == BinaryGUID) || (InputGUUIDType == BinaryGUID && OutputGUUIDType == GUIDString) || (InputGUUIDType == UUIDString && OutputGUUIDType == BinaryUUID) || (InputGUUIDType == BinaryUUID && OutputGUUIDType == UUIDString)) ? Yes : No);
             
             if (ByteOrderDiffers == Yes) {
-                SwapGUUID(InputGUUIDType, *GUUID2Convert);
+                SwapGUUID(InputGUUIDType, GUUID2Convert);
             }
             
             if (TypeDiffers == Yes) {
