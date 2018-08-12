@@ -11,7 +11,7 @@ extern "C" {
     
     /*!
      @header                    CommandLineIO.h
-     @author                    Marcus Johnson aka BumbleBritches57
+     @author                    Marcus Johnson
      @copyright                 2017+
      @version                   1.0.0
      @brief                     This header contains code for parsing command line options.
@@ -115,136 +115,103 @@ extern "C" {
     /*!
      @abstract                                                  "Sets the name of the program".
      @param                     CLI                             "CommandLineIO Pointer".
-     @param                     Name                            "Pointer to a C string containing the name of the program you're building".
+     @param                     Name                            "The name of the program you're building".
      */
-    void                        CLISetName(CommandLineIO *CLI, UTF8 *Name);
+    void                        CommandLineIO_UTF8_SetName(CommandLineIO *CLI, UTF8 *Name);
     
     /*!
      @abstract                                                  "Sets the name of the program".
      @param                     CLI                             "CommandLineIO Pointer".
-     @param                     Version                         "Pointer to a C string contining the version of the program you're building".
+     @param                     Name                            "The name of the program you're building".
      */
-    void                        CLISetVersion(CommandLineIO *CLI, UTF8 *Version);
+    void                        CommandLineIO_UTF16_SetName(CommandLineIO *CLI, UTF16 *Name);
+    
+    /*!
+     @abstract                                                  "Sets the name of the program".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     Version                         "The version of the program you're building".
+     */
+    void                        CommandLineIO_UTF8_SetVersion(CommandLineIO *CLI, UTF8 *Version);
+    
+    /*!
+     @abstract                                                  "Sets the name of the program".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     Version                         "The version of the program you're building".
+     */
+    void                        CommandLineIO_UTF16_SetVersion(CommandLineIO *CLI, UTF16 *Version);
     
     /*!
      @abstract                                                  "Sets the description of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Description                     "Description of what the program does".
      */
-    void                        CLISetDescription(CommandLineIO *CLI, UTF8 *Description);
+    void                        CommandLineIO_UTF8_SetDescription(CommandLineIO *CLI, UTF8 *Description);
+    
+    /*!
+     @abstract                                                  "Sets the description of the program".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     Description                     "Description of what the program does".
+     */
+    void                        CommandLineIO_UTF16_SetDescription(CommandLineIO *CLI, UTF16 *Description);
     
     /*!
      @abstract                                                  "Sets the author of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Author                          "Author of this program".
      */
-    void                        CLISetAuthor(CommandLineIO *CLI, UTF8 *Author);
+    void                        CommandLineIO_UTF8_SetAuthor(CommandLineIO *CLI, UTF8 *Author);
+    
+    /*!
+     @abstract                                                  "Sets the author of the program".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     Author                          "Author of this program".
+     */
+    void                        CommandLineIO_UTF16_SetAuthor(CommandLineIO *CLI, UTF16 *Author);
     
     /*!
      @abstract                                                  "Sets the copyright years of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Copyright                       "The starting year this program was written dash (CURRENTYEAR)".
      */
-    void                        CLISetCopyright(CommandLineIO *CLI, UTF8 *Copyright);
+    void                        CommandLineIO_UTF8_SetCopyright(CommandLineIO *CLI, UTF8 *Copyright);
+    
+    /*!
+     @abstract                                                  "Sets the copyright years of the program".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     Copyright                       "The starting year this program was written dash (CURRENTYEAR)".
+     */
+    void                        CommandLineIO_UTF16_SetCopyright(CommandLineIO *CLI, UTF16 *Copyright);
     
     /*!
      @abstract                                                  "Sets the license of the program".
-     @remark                                                    "If your program is closed source, do NOT use the License options, use the EULA functions".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     LicenseType                     "What type of license is this software released under"?
      @param                     Name                            "What is the name of the license"?
      @param                     LicenseURL                      "The actual URL for the license".
      */
-    void                        CLISetLicense(CommandLineIO *CLI, CLILicenseTypes LicenseType, UTF8 *Name, UTF8 *LicenseURL);
+    void                        CommandLineIO_UTF8_SetLicense(CommandLineIO *CLI, CLILicenseTypes LicenseType, UTF8 *Name, UTF8 *LicenseURL);
     
     /*!
-     @abstract                                                  "What is the minimum number of switches your program needs to operate"?
+     @abstract                                                  "Sets the license of the program".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     LicenseType                     "What type of license is this software released under"?
+     @param                     Name                            "What is the name of the license"?
+     @param                     LicenseURL                      "The actual URL for the license".
+     */
+    void                        CommandLineIO_UTF16_SetLicense(CommandLineIO *CLI, CLILicenseTypes LicenseType, UTF16 *Name, UTF16 *LicenseURL);
+    
+    /*!
+     @abstract                                                  "What is the minimum number of options your program needs to operate"?
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     MinOptions                      "The minimum number of switches".
      */
-    void                        CLISetMinOptions(CommandLineIO *CLI, const int64_t MinOptions);
+    void                        CommandLineIO_SetMinOptions(CommandLineIO *CLI, const int64_t MinOptions);
     
     /*!
      @abstract                  CLI                             "CommandLineIO Pointer".
-     @param                     HelpSwitch                      "Which switch is the one to print all the Options"?
+     @param                     HelpSwitch                      "Which switch is the one to get help"?
      */
-    void                        CLISetHelpSwitch(CommandLineIO *CLI, const int64_t HelpSwitch);
-    
-    /*!
-     @abstract                                                  "Sets SwitchID's flag in the CommandLineIO instance pointed by CLI".
-     @remark                                                    "Just enter the number of characters you typed into the string not counting the quotes".
-     @param                     CLI                             "CommandLineIO Pointer".
-     @param                     SwitchID                        "The switch to set".
-     @param                     Name                            "The flag to identify an option with".
-     */
-    void                        CLISetSwitchName(CommandLineIO *CLI, const int64_t SwitchID, UTF8 *Name);
-    
-    /*!
-     @abstract                                                  "Sets SwitchDescription's flag in the CommandLineIO instance pointed by CLI".
-     @param                     CLI                             "CommandLineIO Pointer".
-     @param                     SwitchID                        "The switch to set".
-     @param                     Description                     "Pointer to a C string containing the description of what this program does".
-     */
-    void                        CLISetSwitchDescription(CommandLineIO *CLI, const int64_t SwitchID, UTF8 *Description);
-    
-    /*!
-     @abstract                                                  "Sets SwitchID's flag in the CommandLineIO instance pointed by CLI".
-     @param                     CLI                             "CommandLineIO Pointer".
-     @param                     SwitchID                        "Which switch are we talking about"?
-     */
-    void                        CLISetSwitchType(CommandLineIO *CLI, const int64_t SwitchID, CLISwitchTypes SwitchType);
-    
-    /*!
-     @abstract                                                  "Sets SwitchID as accepting arguments of only a certain type".
-     @param                     CLI                             "CommandLineIO Pointer".
-     @param                     SwitchID                        "The switch to apply the ArgumentType to".
-     @param                     ArgumentType                    "The argument type from CLIArgumentTypes".
-     */
-    void                        CLISetSwitchArgumentType(CommandLineIO *CLI, const int64_t SwitchID, CLIArgumentTypes ArgumentType);
-    
-    /*!
-     @abstract                                                  "Sets MetaFlag switch as a meta flag for switch SwitchID".
-     @param                     CLI                             "CommandLineIO Pointer".
-     @param                     MasterID                        "Which switch does the child/meta switch depend on"?
-     @param                     Slave                           "Which switch is the child switch"?
-     */
-    void                        CLISetSwitchAsSlave(CommandLineIO *CLI, const int64_t MasterID, const int64_t Slave);
-    
-    /*!
-     @abstract                                                  "How many Slave switches can be active in a master argument at once"?
-     @param                     CLI                             "CommandLineIO Pointer".
-     @param                     MasterID                        "Which switch are we talking about"?
-     @param                     MaxActiveSlaves                 "How many Slave switches can be active in an argument at once"?
-     */
-    void                        CLISetSwitchMaxConcurrentSlaves(CommandLineIO *CLI, const int64_t MasterID, const int64_t MaxActiveSlaves);
-    
-    /*!
-     @abstract                                                  "Parses the Command Line Options as UTF-8 encoded strings".
-     @param                     CLI                             "CommandLineIO Pointer".
-     @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to argc".
-     @param                     Arguments                       "An array of UTF-8 encoded arguments; equilivent to argv"
-     */
-    void                        UTF8_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF8 **Arguments);
-    
-    /*!
-     @abstract                                                  "Parses the Command Line Options as UTF-16 encoded strings".
-     @param                     CLI                             "CommandLineIO Pointer".
-     @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to __argc".
-     @param                     Arguments                       "An array of UTF-16 encoded arguments; equilivent to __wargv"
-     */
-    void                        UTF16_ParseCommandLineOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF16 **Arguments);
-    
-    /*!
-     @abstract                                                  "Returns the extension from Path as a string".
-     @param                     Path                            "The UTF-8 encoded string to extract the extension from".
-     */
-    UTF8                       *UTF8_GetExtensionFromPath(UTF8 *Path);
-    
-    /*!
-     @abstract                                                  "Returns the extension from Path as a string".
-     @param                     Path                            "The UTF-16 encoded string to extract the extension from".
-     */
-    UTF16                      *UTF16_GetExtensionFromPath(UTF16 *Path);
+    void                        CommandLineIO_SetHelpSwitch(CommandLineIO *CLI, const int64_t HelpSwitch);
     
     /*!
      @abstract                                                  "Displays on the screen the progress of X actions that are taking place"
@@ -254,7 +221,98 @@ extern "C" {
      @param                     Numerator                       "A pointer to an array of the number of X tasks that have been completed".
      @param                     Denominator                     "A pointer to an array of the number of X thats that there are to do".
      */
-    void                        CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF8 **Strings, uint64_t *Numerator, uint64_t *Denominator);
+    void                        CommandLineIO_UTF8_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF8 **Strings, uint64_t *Numerator, uint64_t *Denominator);
+    
+    /*!
+     @abstract                                                  "Displays on the screen the progress of X actions that are taking place"
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     NumItems2Display                "The number of things you want to show the progress of".
+     @param                     Strings                         "A pointer to an array of the strings describing what progress is being tracked".
+     @param                     Numerator                       "A pointer to an array of the number of X tasks that have been completed".
+     @param                     Denominator                     "A pointer to an array of the number of X thats that there are to do".
+     */
+    void                        CommandLineIO_UTF16_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF16 **Strings, uint64_t *Numerator, uint64_t *Denominator);
+    
+    /*!
+     @abstract                                                  "Sets SwitchID's flag in the CommandLineIO instance pointed by CLI".
+     @remark                                                    "Just enter the number of characters you typed into the string not counting the quotes".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     SwitchID                        "The switch to set".
+     @param                     Name                            "The flag to identify an option with".
+     */
+    void                        CommandLineIO_UTF8_Switch_SetName(CommandLineIO *CLI, const int64_t SwitchID, UTF8 *Name);
+    
+    /*!
+     @abstract                                                  "Sets SwitchID's flag in the CommandLineIO instance pointed by CLI".
+     @remark                                                    "Just enter the number of characters you typed into the string not counting the quotes".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     SwitchID                        "The switch to set".
+     @param                     Name                            "The flag to identify an option with".
+     */
+    void                        CommandLineIO_UTF16_Switch_SetName(CommandLineIO *CLI, const int64_t SwitchID, UTF16 *Name);
+    
+    /*!
+     @abstract                                                  "Sets SwitchDescription's flag in the CommandLineIO instance pointed by CLI".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     SwitchID                        "The switch to set".
+     @param                     Description                     "Pointer to a UTF-8 encoded string containing the description of what this program does".
+     */
+    void                        CommandLineIO_UTF8_Switch_SetDescription(CommandLineIO *CLI, const int64_t SwitchID, UTF8 *Description);
+    
+    /*!
+     @abstract                                                  "Sets SwitchDescription's flag in the CommandLineIO instance pointed by CLI".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     SwitchID                        "The switch to set".
+     @param                     Description                     "Pointer to a UTF-8 encoded string containing the description of what this program does".
+     */
+    void                        CommandLineIO_UTF16_Switch_SetDescription(CommandLineIO *CLI, const int64_t SwitchID, UTF16 *Description);
+    
+    /*!
+     @abstract                                                  "Sets SwitchID's flag in the CommandLineIO instance pointed by CLI".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     SwitchID                        "Which switch are we talking about"?
+     */
+    void                        CommandLineIO_Switch_SetType(CommandLineIO *CLI, const int64_t SwitchID, CLISwitchTypes SwitchType);
+    
+    /*!
+     @abstract                                                  "Sets SwitchID as accepting arguments of only a certain type".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     SwitchID                        "The switch to apply the ArgumentType to".
+     @param                     ArgumentType                    "The argument type from CLIArgumentTypes".
+     */
+    void                        CommandLineIO_Switch_SetArgumentType(CommandLineIO *CLI, const int64_t SwitchID, CLIArgumentTypes ArgumentType);
+    
+    /*!
+     @abstract                                                  "Sets MetaFlag switch as a meta flag for switch SwitchID".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     MasterID                        "Which switch does the child/meta switch depend on"?
+     @param                     Slave                           "Which switch is the child switch"?
+     */
+    void                        CommandLineIO_Switch_SetSlave(CommandLineIO *CLI, const int64_t MasterID, const int64_t Slave);
+    
+    /*!
+     @abstract                                                  "How many Slave switches can be active in a master argument at once"?
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     MasterID                        "Which switch are we talking about"?
+     @param                     MaxActiveSlaves                 "How many Slave switches can be active in an argument at once"?
+     */
+    void                        CommandLineIO_Switch_SetMaxConcurrentSlaves(CommandLineIO *CLI, const int64_t MasterID, const int64_t MaxActiveSlaves);
+    
+    /*!
+     @abstract                                                  "Parses the Command Line Options as UTF-8 encoded strings".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to argc".
+     @param                     Arguments                       "An array of UTF-8 encoded arguments; equilivent to argv"
+     */
+    void                        CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF8 **Arguments);
+    
+    /*!
+     @abstract                                                  "Parses the Command Line Options as UTF-16 encoded strings".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to __argc".
+     @param                     Arguments                       "An array of UTF-16 encoded arguments; equilivent to __wargv"
+     */
+    void                        CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF16 **Arguments);
     
     /*!
      @abstract                                                  "How many matching options are present in CommandLineIO (will also check for slave switches if present)".
@@ -264,7 +322,7 @@ extern "C" {
      @param                     SlaveIDs                        "Pointer to an array with all the slaves you want to mke sure are present".
      @return                                                    "Returns the argument number if there is no matching argument it will return -1".
      */
-    int64_t                     CLIGetNumMatchingOptions(CommandLineIO *CLI, const int64_t SwitchID, const int64_t NumSlaves, const int64_t *SlaveIDs);
+    int64_t                     CommandLineIO_GetNumMatchingOptions(CommandLineIO *CLI, const int64_t SwitchID, const int64_t NumSlaves, const int64_t *SlaveIDs);
     
     /*!
      @abstract                                                  "How many Master switches are present in the Options (will also check for slave switches if present)".
@@ -274,7 +332,7 @@ extern "C" {
      @param                     SlaveIDs                        "Pointer to an array with all the slaves you want to mke sure are present".
      @return                                                    "Returns the argument number if there is no matching argument it will return -1".
      */
-    int64_t                     CLIGetOptionNum(CommandLineIO *CLI, const int64_t SwitchID, const int64_t NumSlaves, const int64_t *SlaveIDs);
+    int64_t                     CommandLineIO_GetOptionNum(CommandLineIO *CLI, const int64_t SwitchID, const int64_t NumSlaves, const int64_t *SlaveIDs);
     
     /*!
      @abstract                                                  "Gets the data contained in Argument2Option".
@@ -282,15 +340,33 @@ extern "C" {
      @param                     OptionID                        "The option's result to return".
      @return                                                    "Returns the data after the switch, if the switch is resultless it will return 0".
      */
-    UTF8                       *CLIGetOptionResult(CommandLineIO const *CLI, const int64_t OptionID);
+    UTF8                       *CommandLineIO_UTF8_GetOptionResult(CommandLineIO const *CLI, const int64_t OptionID);
+    
+    /*!
+     @abstract                                                  "Gets the data contained in Argument2Option".
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     OptionID                        "The option's result to return".
+     @return                                                    "Returns the data after the switch, if the switch is resultless it will return 0".
+     */
+    UTF16                      *CommandLineIO_UTF16_GetOptionResult(CommandLineIO const *CLI, const int64_t OptionID);
+    
+    /*!
+     @abstract                                                  "Returns the extension from Path as a string".
+     @param                     Path                            "The UTF-8 encoded string to extract the extension from".
+     */
+    UTF8                       *CommandLineIO_UTF8_GetExtension(UTF8 *Path);
+    
+    /*!
+     @abstract                                                  "Returns the extension from Path as a string".
+     @param                     Path                            "The UTF-16 encoded string to extract the extension from".
+     */
+    UTF16                      *CommandLineIO_UTF16_GetExtension(UTF16 *Path);
     
     /*!
      @abstract                                                  "Deallocates the instance of CommandLineIO pointed to by CLI".
      @param                     CLI                             "CommandLineIO Pointer".
      */
     void                        CommandLineIO_Deinit(CommandLineIO *CLI);
-    
-    void                        DEBUGCommandLineOptions(CommandLineIO *CLI);
     
 #ifdef __cplusplus
 }

@@ -24,11 +24,11 @@ extern "C" {
 #endif
     
     /*!
-     @header    Macros.h
-     @author    Marcus Johnson aka BumbleBritches57
-     @copyright 2017+
-     @version   1.0.0
-     @brief     This header contains preprocessor macros for generic functions in FoundationIO, and cross-platform compatibility.
+     @header        Macros.h
+     @author        Marcus Johnson
+     @copyright     2017+
+     @version       1.0.0
+     @brief         This header contains preprocessor macros for generic functions in FoundationIO, and cross-platform compatibility.
      */
     
 #ifndef             Yes

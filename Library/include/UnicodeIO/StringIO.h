@@ -10,11 +10,11 @@ extern "C" {
 #endif
     
     /*!
-     @header    StringIO.h
-     @author    Marcus Johnson aka BumbleBritches57
-     @copyright 2017+
-     @version   1.0.0
-     @brief     This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
+     @header              StringIO.h
+     @author              Marcus Johnson
+     @copyright           2017+
+     @version             1.0.0
+     @brief               This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
      */
     
 #ifndef                   U8
@@ -563,79 +563,79 @@ extern "C" {
     UTF32               **UTF32_SplitString(UTF32 *String, UTF32 **Delimiters);
     
     /*!
-     @abstract                             "Extracts a number from a string".
+     @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
     int64_t               UTF8_String2Integer(StringIOBases Base, UTF8 *String);
     
     /*!
-     @abstract                             "Extracts a number from a string".
+     @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
     int64_t               UTF16_String2Integer(StringIOBases Base, UTF16 *String);
     
     /*!
-     @abstract                             "Extracts a number from a string".
+     @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
     int64_t               UTF32_String2Integer(StringIOBases Base, UTF32 *String);
     
     /*!
-     @abstract                             "Converts an integer to a string".
+     @abstract                             "Converts an integer to a string; replaces itoa".
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
     UTF8                 *UTF8_Integer2String(StringIOBases Base, int64_t Integer2Convert);
     
     /*!
-     @abstract                             "Converts an integer to a string".
+     @abstract                             "Converts an integer to a string; replaces itoa".
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
     UTF16                *UTF16_Integer2String(StringIOBases Base, int64_t Integer2Convert);
     
     /*!
-     @abstract                             "Converts an integer to a string".
+     @abstract                             "Converts an integer to a string; replaces itoa".
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
     UTF32                *UTF32_Integer2String(StringIOBases Base, int64_t Integer2Convert);
     
     /*!
-     @abstract                             "Converts a string to a double, replaces strtod and atof".
+     @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
     double                UTF8_String2Decimal(UTF8 *String);
     
     /*!
-     @abstract                             "Converts a string to a double, replaces strtod and atof".
+     @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
     double                UTF16_String2Decimal(UTF16 *String);
     
     /*!
-     @abstract                             "Converts a string to a double, replaces strtod and atof".
+     @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
     double                UTF32_String2Decimal(UTF32 *String);
     
     /*!
-     @abstract                             "Converts a double to a string, replaces strtod and atof".
+     @abstract                             "Converts a double to a string; replaces dtostr".
      @param               Decimal          "The decimal number to convert to a string".
      */
     UTF8                 *UTF8_Decimal2String(const StringIOBases Base, double Decimal);
     
     /*!
-     @abstract                             "Converts a double to a string, replaces strtod and atof".
+     @abstract                             "Converts a double to a string; replaces ftoa".
      @param               Decimal          "The decimal number to convert to a string".
      */
     UTF16                *UTF16_Decimal2String(const StringIOBases Base, double Decimal);
     
     /*!
-     @abstract                             "Converts a double to a string, replaces strtod and atof".
+     @abstract                             "Converts a double to a string; replaces ftoa".
      @param               Decimal          "The decimal number to convert to a string".
      */
     UTF32                *UTF32_Decimal2String(const StringIOBases Base, double Decimal);
@@ -663,34 +663,30 @@ extern "C" {
     
     /*!
      @abstract                             "Compares String1 and String2 for equilivence".
-     @remark                               "String1 and String2 MUST use the same Unicode encoding".
+     @remark                               "The caller needs to handle casefolding and normalization".
      @param               String1          "String1 Pointer".
      @param               String2          "String2 Pointer".
-     @param               NormalizedForm   "The normalization to use before comparing the strings".
-     @param               CaseInsensitive  "Should the strings be casefolded first"?
      @return                               "Returns whether the strings match or not".
      */
-    bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive);
+    bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2);
     
     /*!
      @abstract                             "Compares String1 and String2 for equilivence".
-     @remark                               "String1 and String2 MUST use the same Unicode encoding".
+     @remark                               "The caller needs to handle casefolding and normalization".
      @param               String1          "String1 Pointer".
      @param               String2          "String2 Pointer".
-     @param               NormalizedForm   "The normalization to use before comparing the strings".
-     @param               CaseInsensitive  "Should the strings be casefolded first"?
      @return                               "Returns whether the strings match or not".
      */
-    bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive);
+    bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2);
     
     /*!
      @abstract                             "Compares String1 and String2 for equilivence".
-     @remark                               "String1 and String2 MUST use the same Unicode encoding".
+     @remark                               "The caller needs to handle casefolding and normalization".
      @param               String1          "String1 Pointer".
      @param               String2          "String2 Pointer".
      @return                               "Returns whether the strings match or not".
      */
-    bool                  UTF32_Compare(UTF32 *String1, UTF32 *String2, StringIONormalizationForms NormalizedForm, bool CaseInsensitive);
+    bool                  UTF32_Compare(UTF32 *String1, UTF32 *String2);
     
     UTF8 *UTF8_Clone(UTF8 *String);
     
