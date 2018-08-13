@@ -19,12 +19,12 @@ extern "C" {
         Audio_ChannelMask  *ChannelMask;
         uint64_t            NumSamples;
         uint64_t            SampleRate;
+        uint64_t            NumChannels;
         uint8_t             BitDepth;
-        uint8_t             NumChannels;
         Audio_Types         Type;
     } AudioContainer;
     
-    AudioContainer *AudioContainer_Init(Audio_Types Type, uint8_t BitDepth, uint8_t NumChannels, uint64_t SampleRate, uint64_t NumSamples) {
+    AudioContainer *AudioContainer_Init(Audio_Types Type, uint8_t BitDepth, uint64_t NumChannels, uint64_t SampleRate, uint64_t NumSamples) {
         AudioContainer *Audio = NULL;
         if (BitDepth > 0 && NumChannels > 0 && NumSamples > 0) {
             Audio = calloc(1, sizeof(AudioContainer));
@@ -56,7 +56,7 @@ extern "C" {
         } else if (BitDepth == 0) {
             Log(Log_ERROR, __func__, U8("BitDepth %d is invalid"), BitDepth);
         } else if (NumChannels == 0) {
-            Log(Log_ERROR, __func__, U8("NumChannels %d is invalid"), NumChannels);
+            Log(Log_ERROR, __func__, U8("NumChannels %llu is invalid"), NumChannels);
         } else if (NumSamples == 0) {
             Log(Log_ERROR, __func__, U8("NumSamples %llu is invalid"), NumSamples);
         }
@@ -81,8 +81,8 @@ extern "C" {
         return BitDepth;
     }
     
-    uint8_t AudioContainer_GetNumChannels(AudioContainer *Audio) {
-        uint8_t NumChannels = 0;
+    uint64_t AudioContainer_GetNumChannels(AudioContainer *Audio) {
+        uint64_t NumChannels = 0;
         if (Audio != NULL) {
             NumChannels = Audio->NumChannels;
         } else {

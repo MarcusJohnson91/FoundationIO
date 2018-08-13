@@ -102,7 +102,7 @@ extern "C" {
      @param                 SampleRate     "The number of samples in one second of audio".
      @param                 NumSamples     "NumSamples is the number of channel independent samples, e.g. X samples is BitDepth * NumChnnels * X".
      */
-    AudioContainer         *AudioContainer_Init(Audio_Types Type, uint8_t BitDepth, uint8_t NumChannels, uint64_t SampleRate, uint64_t NumSamples);
+    AudioContainer         *AudioContainer_Init(Audio_Types Type, uint8_t BitDepth, uint64_t NumChannels, uint64_t SampleRate, uint64_t NumSamples);
     
     /*!
      @abstract                             "Sets the channel type for each channel index".
@@ -117,7 +117,7 @@ extern "C" {
      @abstract                             "Returns the number of audio channels".
      @param                 Audio          "A pointer to the instance of an AudioContainer in question".
      */
-    uint8_t                 AudioContainer_GetNumChannels(AudioContainer *Audio);
+    uint64_t                AudioContainer_GetNumChannels(AudioContainer *Audio);
     
     /*!
      @abstract                             "Returns the number of channel-agnostic samples in one second".
