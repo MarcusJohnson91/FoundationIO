@@ -2110,13 +2110,6 @@ extern "C" {
     }
     /* StringArray Functions */
     
-    typedef enum StringTypes {
-        UnknownFormat                  = 0,
-        UTF8Format                     = 1,
-        UTF16Format                    = 2,
-        UTF32Format                    = 3,
-    } StringTypes;
-    
     typedef enum FormatSpecifierFlags {
         NoFormatFlag                   = 0,
         LeftAlignFormatFlag            = 1,

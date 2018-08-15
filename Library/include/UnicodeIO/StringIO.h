@@ -155,6 +155,20 @@ extern "C" {
                           UseBEByteOrder                       = 2,
     } StringIOByteOrders;
     
+    /*!
+     @enum                StringTypes
+     @constant            UnknownFormat                        "Could be anything".
+     @constant            UTF8Format                           "The string is UTF-8 encoded".
+     @constant            UTF16Format                          "The string is UTF-15 encoded".
+     @constant            UTF32Format                          "The string is UTF-32 encoded".
+     */
+    typedef enum StringTypes {
+        UnknownFormat                  = 0,
+        UTF8Format                     = 1,
+        UTF16Format                    = 2,
+        UTF32Format                    = 3,
+    } StringTypes;
+    
     typedef enum CombiningCharacterClasses {
                           CCCOverlay                           = 1,
                           CCCNukta                             = 7,
