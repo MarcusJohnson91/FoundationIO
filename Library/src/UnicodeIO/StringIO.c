@@ -176,7 +176,7 @@ extern "C" {
         uint64_t CodePoint            = 0ULL;
         if (String != NULL) {
             do {
-                for (uint64_t GraphemeExtension = 0; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
+                for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
                     if (String[CodePoint] == GraphemeExtensionTable[GraphemeExtension]) {
                         NumGraphemes += 1;
                     }
@@ -666,7 +666,7 @@ extern "C" {
         uint64_t SubStringSize         = UTF32_GetStringSizeInCodePoints(SubString);
         int64_t  MatchingOffset        = 0LL;
         if (String != NULL && SubString != NULL && StringSize < Offset + Length) {
-            for (uint64_t SubCodePoint = 0; SubCodePoint < SubStringSize; SubCodePoint++) {
+            for (uint64_t SubCodePoint = 0ULL; SubCodePoint < SubStringSize; SubCodePoint++) {
                 for (uint64_t StringCodePoint = Offset; StringCodePoint < Offset + Length; StringCodePoint++) {
                     if (String[StringCodePoint] != SubString[SubCodePoint]) {
                         MatchingOffset = -1;
@@ -1269,7 +1269,7 @@ extern "C" {
         UTF32   *CaseFoldedString = NULL;
         if (String != NULL) {
             do {
-                for (uint64_t Index = 0; Index < CaseFoldTableSize; Index++) {
+                for (uint64_t Index = 0ULL; Index < CaseFoldTableSize; Index++) {
                     if (String[CodePoint] == CaseFoldCodePoints[Index]) {
 #if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 #pragma warning(push)
@@ -1320,7 +1320,7 @@ extern "C" {
         if (String != NULL && (Kompatibility == No || Kompatibility == Yes)) {
             do {
                 if (Kompatibility == Yes) {
-                    for (uint64_t Index = 0; Index < KompatibleNormalizationTableSize; Index++) {
+                    for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
 #if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 #pragma warning(push)
@@ -1333,7 +1333,7 @@ extern "C" {
                         }
                     }
                 } else {
-                    for (uint64_t DecomposeCodePoint = 0; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
+                    for (uint64_t DecomposeCodePoint = 0ULL; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[DecomposeCodePoint]) {
 #if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 #pragma warning(push)
@@ -1360,7 +1360,7 @@ extern "C" {
             UTF32 *Decomposed          = NULL;
             do {
                 if (Kompatibility == Yes) {
-                    for (uint64_t Index = 0; Index < KompatibleNormalizationTableSize; Index++) {
+                    for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
 #if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 #pragma warning(push)
@@ -1373,7 +1373,7 @@ extern "C" {
                         }
                     }
                 } else {
-                    for (uint64_t Index = 0; Index < CanonicalNormalizationTableSize; Index++) {
+                    for (uint64_t Index = 0ULL; Index < CanonicalNormalizationTableSize; Index++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[Index]) {
 #if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 #pragma warning(push)
