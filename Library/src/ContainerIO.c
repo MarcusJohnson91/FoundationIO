@@ -644,6 +644,155 @@ extern "C" {
         return Minimum;
     }
     
+    void ImageContainer_Flip(ImageContainer *Image, bool VerticalFlip, bool HorizontalFlip) {
+        if (Image != NULL) {
+            if (VerticalFlip == Yes) {
+                if (Image->Type == ImageContainer_2DUInteger8 || Image->Type == ImageContainer_3DUInteger8) {
+                    uint8_t  ****Array = (uint8_t****)  ImageContainer_GetArray(Image);
+                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                        for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                            for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
+                                for (uint64_t BottomLine = Image->Height; BottomLine > 0; BottomLine--) {
+                                    for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
+                                        uint8_t TopPixel            = Array[View][Width][TopLine][Channel];
+                                        uint8_t BottomPixel         = Array[View][Width][BottomLine][Channel];
+                                        
+                                        Array[View][Width][TopLine]    = BottomPixel;
+                                        Array[View][Width][BottomLine] = TopPixel;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (Image->Type == ImageContainer_2DSInteger8 || Image->Type == ImageContainer_3DSInteger8) {
+                    int8_t   ****Array = (int8_t****)   ImageContainer_GetArray(Image);
+                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                        for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                            for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
+                                for (uint64_t BottomLine = Image->Height; BottomLine > 0; BottomLine--) {
+                                    for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
+                                        int8_t  TopPixel            = Array[View][Width][TopLine][Channel];
+                                        int8_t  BottomPixel         = Array[View][Width][BottomLine][Channel];
+                                        
+                                        Array[View][Width][TopLine]    = BottomPixel;
+                                        Array[View][Width][BottomLine] = TopPixel;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (Image->Type == ImageContainer_2DUInteger16 || Image->Type == ImageContainer_3DUInteger16) {
+                    uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
+                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                        for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                            for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
+                                for (uint64_t BottomLine = Image->Height; BottomLine > 0; BottomLine--) {
+                                    for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
+                                        uint16_t TopPixel           = Array[View][Width][TopLine][Channel];
+                                        uint16_t BottomPixel        = Array[View][Width][BottomLine][Channel];
+                                        
+                                        Array[View][Width][TopLine]    = BottomPixel;
+                                        Array[View][Width][BottomLine] = TopPixel;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (Image->Type == ImageContainer_2DSInteger16 || Image->Type == ImageContainer_3DSInteger16) {
+                int16_t  ****Array = (int16_t****)  ImageContainer_GetArray(Image);
+                for (uint8_t View = 0; View < Image->NumViews; View++) {
+                    for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                        for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
+                            for (uint64_t BottomLine = Image->Height; BottomLine > 0; BottomLine--) {
+                                for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
+                                    int16_t TopPixel            = Array[View][Width][TopLine][Channel];
+                                    int16_t BottomPixel         = Array[View][Width][BottomLine][Channel];
+                                    
+                                    Array[View][Width][TopLine]    = BottomPixel;
+                                    Array[View][Width][BottomLine] = TopPixel;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (HorizontalFlip == Yes) {
+                if (Image->Type == ImageContainer_2DUInteger8 || Image->Type == ImageContainer_3DUInteger8) {
+                    uint8_t  ****Array = (uint8_t****)  ImageContainer_GetArray(Image);
+                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                        for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
+                            for (uint64_t Right = Image->Width; Right > 0; Right++) {
+                                for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
+                                    for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
+                                        uint8_t LeftPixel                   = Array[View][Left][Height][Channel];
+                                        uint8_t RightPixel                  = Array[View][Right][Height][Channel];
+                                        
+                                        Array[View][Left][Height][Channel]  = LeftPixel;
+                                        Array[View][Right][Height][Channel] = RightPixel;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (Image->Type == ImageContainer_2DSInteger8 || Image->Type == ImageContainer_3DSInteger8) {
+                    int8_t   ****Array = (int8_t****)   ImageContainer_GetArray(Image);
+                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                        for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
+                            for (uint64_t Right = Image->Width; Right > 0; Right++) {
+                                for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
+                                    for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
+                                        int8_t LeftPixel                    = Array[View][Left][Height][Channel];
+                                        int8_t RightPixel                   = Array[View][Right][Height][Channel];
+                                        
+                                        Array[View][Left][Height][Channel]  = LeftPixel;
+                                        Array[View][Right][Height][Channel] = RightPixel;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (Image->Type == ImageContainer_2DUInteger16 || Image->Type == ImageContainer_3DUInteger16) {
+                    uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
+                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                        for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
+                            for (uint64_t Right = Image->Width; Right > 0; Right++) {
+                                for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
+                                    for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
+                                        uint16_t LeftPixel                  = Array[View][Left][Height][Channel];
+                                        uint16_t RightPixel                 = Array[View][Right][Height][Channel];
+                                        
+                                        Array[View][Left][Height][Channel]  = LeftPixel;
+                                        Array[View][Right][Height][Channel] = RightPixel;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (Image->Type == ImageContainer_2DSInteger16 || Image->Type == ImageContainer_3DSInteger16) {
+                    int16_t ****Array  = (int16_t****) ImageContainer_GetArray(Image);
+                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                        for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
+                            for (uint64_t Right = Image->Width; Right > 0; Right++) {
+                                for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
+                                    for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
+                                        int16_t LeftPixel                   = Array[View][Left][Height][Channel];
+                                        int16_t RightPixel                  = Array[View][Right][Height][Channel];
+                                        
+                                        Array[View][Left][Height][Channel]  = LeftPixel;
+                                        Array[View][Right][Height][Channel] = RightPixel;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        }
+    }
+    
     void ImageContainer_Deinit(ImageContainer *Image) {
         if (Image != NULL) {
             if (Image->Type == ImageContainer_2DSInteger8 || Image->Type == ImageContainer_3DSInteger8) {

@@ -295,6 +295,14 @@ extern "C" {
     int64_t                 ImageContainer_GetMin(ImageContainer *Image, Image_Views ViewMask, Image_ChannelMask ChannelMask);
     
     /*!
+     @abstract                             "Rotates an Image, either Vertically, Horizontally, or both".
+     @param                 Image          "A pointer to the instance of an ImageContainer in question".
+     @param                 VerticalFlip   "Top becomes bottom and vice versa".
+     @param                 HorizontalFlip "left becomes right and vice versa".
+     */
+    void                    ImageContainer_Flip(ImageContainer *Image, bool VerticalFlip, bool HorizontalFlip);
+    
+    /*!
      @abstract                             "Deinitalizes the ImageContainer pointed to".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
