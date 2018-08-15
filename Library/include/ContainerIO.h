@@ -31,12 +31,12 @@ extern "C" {
     
     typedef enum Audio_Types {
         AudioContainer_UnknownType  = 0,
-        AudioContainer_SInteger8    = 1,
-        AudioContainer_UInteger8    = 2,
-        AudioContainer_SInteger16   = 3,
-        AudioContainer_UInteger16   = 4,
-        AudioContainer_SInteger32   = 5,
-        AudioContainer_UInteger32   = 6,
+        AudioContainer_UInteger8    = 1,
+        AudioContainer_SInteger8    = 2,
+        AudioContainer_UInteger16   = 3,
+        AudioContainer_SInteger16   = 4,
+        AudioContainer_UInteger32   = 5,
+        AudioContainer_SInteger32   = 6,
     } Audio_Types;
     
     typedef enum Image_Views {
@@ -82,14 +82,14 @@ extern "C" {
     
     typedef enum Image_Types {
         ImageContainer_UnknownType  = 0,
-        ImageContainer_2DSInteger8  = 1,
-        ImageContainer_2DUInteger8  = 2,
-        ImageContainer_2DSInteger16 = 3,
-        ImageContainer_2DUInteger16 = 4,
-        ImageContainer_3DSInteger8  = 5,
-        ImageContainer_3DUInteger8  = 6,
-        ImageContainer_3DSInteger16 = 7,
-        ImageContainer_3DUInteger16 = 8,
+        ImageContainer_2DUInteger8  = 1,
+        ImageContainer_2DSInteger8  = 2,
+        ImageContainer_2DUInteger16 = 3,
+        ImageContainer_2DSInteger16 = 4,
+        ImageContainer_3DUInteger8  = 5,
+        ImageContainer_3DSInteger8  = 6,
+        ImageContainer_3DUInteger16 = 7,
+        ImageContainer_3DSInteger16 = 8,
     } Image_Types;
     
     typedef struct          AudioContainer AudioContainer;
