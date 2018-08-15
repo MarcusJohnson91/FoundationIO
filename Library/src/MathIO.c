@@ -26,7 +26,7 @@ extern "C" {
     
     uint64_t Exponentiate(const uint64_t Base, const uint64_t Exponent) {
         uint64_t Result = 1ULL;
-        for (uint64_t i = 0; i < Exponent; i++) {
+        for (uint64_t i = 0ULL; i < Exponent; i++) {
             Result *= Base;
         }
         return Result;
