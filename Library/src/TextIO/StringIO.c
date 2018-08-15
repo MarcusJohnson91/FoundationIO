@@ -1011,106 +1011,6 @@ extern "C" {
         return Copy;
     }
     
-    UTF8 *UTF8_Append(UTF8 *String, UTF8 *String2Append) {
-        UTF8 *Appended  = NULL;
-        bool  AppendBOM = No;
-        if (String != NULL && String2Append != NULL) {
-            uint64_t StringSize   = UTF8_GetStringSizeInCodeUnits(String);
-            uint64_t AppendSize   = UTF8_GetStringSizeInCodeUnits(String2Append);
-            uint64_t AppendedSize = 0ULL;
-            
-            if (String2Append[0] == 0xEF && String2Append[1] == 0xBB && String2Append[2] == 0xBF) { // Skip the BOM when appending
-                AppendBOM = Yes;
-                AppendedSize = StringSize + AppendSize - UTF8BOMSizeInCodeUnits;
-            } else {
-                AppendedSize = StringSize + AppendSize;
-            }
-            Appended = calloc(AppendedSize, sizeof(UTF8));
-            if (Appended != NULL) {
-                for (uint64_t CodePoint = AppendBOM == No ? 0 : UTF8BOMSizeInCodeUnits; CodePoint < StringSize + AppendSize; CodePoint++) {
-                    if (CodePoint <= StringSize) {
-                        Appended[CodePoint] = String[CodePoint];
-                    } else if (CodePoint >= StringSize) {
-                        Appended[CodePoint] = String2Append[CodePoint - StringSize];
-                    }
-                }
-            } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate Appended string"));
-            }
-        } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        }
-        return Appended;
-    }
-    
-    UTF16 *UTF16_Append(UTF16 *String, UTF16 *String2Append) {
-        UTF16 *Appended  = NULL;
-        bool  AppendBOM = No;
-        if (String != NULL && String2Append != NULL) {
-            uint64_t StringSize   = UTF16_GetStringSizeInCodeUnits(String);
-            uint64_t AppendSize   = UTF16_GetStringSizeInCodeUnits(String2Append);
-            uint64_t AppendedSize = 0ULL;
-            
-            if (String2Append[0] == UTF16LE || String2Append[0] == UTF16BE) { // Skip the BOM when appending
-                AppendBOM = Yes;
-                AppendedSize = StringSize + AppendSize - UTF16BOMSizeInCodeUnits;
-            } else {
-                AppendedSize = StringSize + AppendSize;
-            }
-            Appended = calloc(AppendedSize, sizeof(UTF16));
-            if (Appended != NULL) {
-                for (uint64_t CodePoint = AppendBOM == No ? 0 : UTF16BOMSizeInCodeUnits; CodePoint < StringSize + AppendSize; CodePoint++) {
-                    if (CodePoint <= StringSize) {
-                        Appended[CodePoint] = String[CodePoint];
-                    } else if (CodePoint >= StringSize) {
-                        Appended[CodePoint] = String2Append[CodePoint - StringSize];
-                    }
-                }
-            } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate Appended string"));
-            }
-        } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        }
-        return Appended;
-    }
-    
-    UTF32 *UTF32_Append(UTF32 *String, UTF32 *String2Append) {
-        UTF32 *Appended  = NULL;
-        bool  AppendBOM = No;
-        if (String != NULL && String2Append != NULL) {
-            uint64_t StringSize   = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t AppendSize   = UTF32_GetStringSizeInCodePoints(String2Append);
-            uint64_t AppendedSize = 0ULL;
-            
-            if (String2Append[0] == UTF32LE || String2Append[0] == UTF32BE) { // Skip the BOM when appending
-                AppendBOM = Yes;
-                AppendedSize = StringSize + AppendSize - UnicodeBOMSizeInCodePoints;
-            } else {
-                AppendedSize = StringSize + AppendSize;
-            }
-            Appended = calloc(AppendedSize, sizeof(UTF32));
-            if (Appended != NULL) {
-                for (uint64_t CodePoint = AppendBOM == No ? 0 : UnicodeBOMSizeInCodePoints; CodePoint < StringSize + AppendSize; CodePoint++) {
-                    if (CodePoint <= StringSize) {
-                        Appended[CodePoint] = String[CodePoint];
-                    } else if (CodePoint >= StringSize) {
-                        Appended[CodePoint] = String2Append[CodePoint - StringSize];
-                    }
-                }
-            } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate Appended string"));
-            }
-        } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        }
-        return Appended;
-    }
-    
-    /*!
-     @param Offset "In codepoints, not code units".
-     @remark       "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string"
-     */
     UTF8 *UTF8_Insert(UTF8 *String, UTF8 *String2Insert, uint64_t Offset) {
         UTF8 *Inserted = NULL;
         if (String != NULL && String2Insert != NULL) {
@@ -1144,10 +1044,6 @@ extern "C" {
         return Inserted;
     }
     
-    /*!
-     @param Offset "In codepoints, not code units".
-     @remark       "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string"
-     */
     UTF16 *UTF16_Insert(UTF16 *String, UTF16 *String2Insert, uint64_t Offset) {
         UTF16 *Inserted = NULL;
         if (String != NULL && String2Insert != NULL) {
@@ -1181,10 +1077,6 @@ extern "C" {
         return Inserted;
     }
     
-    /*!
-     @param Offset "In codepoints, not code units".
-     @remark       "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string"
-     */
     UTF32 *UTF32_Insert(UTF32 *String, UTF32 *String2Insert, uint64_t Offset) {
         UTF32 *Inserted = NULL;
         if (String != NULL && String2Insert != NULL) {
@@ -1218,22 +1110,6 @@ extern "C" {
         return Inserted;
     }
     /* Medium Functions */
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     /* Fancy functions */
     UTF8 *UTF8_CaseFoldString(UTF8 *String) {

@@ -702,44 +702,59 @@ extern "C" {
      */
     bool                  UTF32_Compare(UTF32 *String1, UTF32 *String2);
     
-    UTF8 *UTF8_Clone(UTF8 *String);
-    
-    UTF16 *UTF16_Clone(UTF16 *String);
-    
-    UTF32 *UTF32_Clone(UTF32 *String);
-    
-    UTF8 *UTF8_Append(UTF8 *String, UTF8 *String2Append);
-    
-    UTF16 *UTF16_Append(UTF16 *String, UTF16 *String2Append);
-    
-    UTF32 *UTF32_Append(UTF32 *String, UTF32 *String2Append);
+    /*!
+     @abstract                             "Copies the String".
+     @remark                               "The caller needs to handle casefolding and normalization".
+     @param               String           "Pointer to the String to be copied".
+     @return                               "Returns A pointer to a copy of the String".
+     */
+    UTF8                 *UTF8_Clone(UTF8 *String);
     
     /*!
-     @param Offset "In codepoints, not code units".
-     @remark       "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string"
+     @abstract                             "Copies the String".
+     @remark                               "The caller needs to handle casefolding and normalization".
+     @param               String           "Pointer to the String to be copied".
+     @return                               "Returns A pointer to a copy of the String".
      */
-    UTF8 *UTF8_Insert(UTF8 *String, UTF8 *String2Insert, uint64_t Offset);
+    UTF16                *UTF16_Clone(UTF16 *String);
     
     /*!
-     @param Offset "In codepoints, not code units".
-     @remark       "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string"
+     @abstract                             "Copies the String".
+     @remark                               "The caller needs to handle casefolding and normalization".
+     @param               String           "Pointer to the String to be copied".
+     @return                               "Returns A pointer to a copy of the String".
      */
-    UTF16 *UTF16_Insert(UTF16 *String, UTF16 *String2Insert, uint64_t Offset);
+    UTF32                *UTF32_Clone(UTF32 *String);
     
     /*!
-     @param Offset "In codepoints, not code units".
-     @remark       "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string"
+     @abstract                             "Creates a copy of String, with String2Insert starting at Offset".
+     @remark                               "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string".
+     @param               String           "The string to manipulate".
+     @param               String2Insert    "The string to be inserted into the String".
+     @param               Offset           "In codepoints, not code units".
+     @return                               "Returns a pointer to a new string containing the original, and String2Insert at Offset".
      */
-    UTF32 *UTF32_Insert(UTF32 *String, UTF32 *String2Insert, uint64_t Offset);
+    UTF8                 *UTF8_Insert(UTF8 *String, UTF8 *String2Insert, uint64_t Offset);
     
+    /*!
+     @abstract                             "Creates a copy of String, with String2Insert starting at Offset".
+     @remark                               "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string".
+     @param               String           "The string to manipulate".
+     @param               String2Insert    "The string to be inserted into the String".
+     @param               Offset           "In codepoints, not code units".
+     @return                               "Returns a pointer to a new string containing the original, and String2Insert at Offset".
+     */
+    UTF16                *UTF16_Insert(UTF16 *String, UTF16 *String2Insert, uint64_t Offset);
     
-    
-    
-    
-    
-    
-    
-    
+    /*!
+     @abstract                             "Creates a copy of String, with String2Insert starting at Offset".
+     @remark                               "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string".
+     @param               String           "The string to manipulate".
+     @param               String2Insert    "The string to be inserted into the String".
+     @param               Offset           "In codepoints, not code units".
+     @return                               "Returns a pointer to a new string containing the original, and String2Insert at Offset".
+     */
+    UTF32                *UTF32_Insert(UTF32 *String, UTF32 *String2Insert, uint64_t Offset);
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
