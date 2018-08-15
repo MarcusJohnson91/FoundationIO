@@ -20,11 +20,11 @@ extern "C" {
         uint64_t            NumSamples;
         uint64_t            SampleRate;
         uint64_t            NumChannels;
-        uint8_t             BitDepth;
+        uint64_t            BitDepth;
         Audio_Types         Type;
     } AudioContainer;
     
-    AudioContainer *AudioContainer_Init(Audio_Types Type, uint8_t BitDepth, uint64_t NumChannels, uint64_t SampleRate, uint64_t NumSamples) {
+    AudioContainer *AudioContainer_Init(Audio_Types Type, uint64_t BitDepth, uint64_t NumChannels, uint64_t SampleRate, uint64_t NumSamples) {
         AudioContainer *Audio = NULL;
         if (BitDepth > 0 && NumChannels > 0 && NumSamples > 0) {
             Audio = calloc(1, sizeof(AudioContainer));
@@ -63,7 +63,7 @@ extern "C" {
         return Audio;
     }
     
-    void AudioContainer_SetChannelMask(AudioContainer *Audio, uint8_t Channel, Audio_ChannelMask ChannelMask) {
+    void AudioContainer_SetChannelMask(AudioContainer *Audio, uint64_t Channel, Audio_ChannelMask ChannelMask) {
         if (Audio != NULL) {
             Audio->ChannelMask[Channel] = ChannelMask;
         } else {
@@ -71,8 +71,8 @@ extern "C" {
         }
     }
     
-    uint8_t AudioContainer_GetBitDepth(AudioContainer *Audio) {
-        uint8_t BitDepth = 0;
+    uint64_t AudioContainer_GetBitDepth(AudioContainer *Audio) {
+        uint64_t BitDepth = 0ULL;
         if (Audio != NULL) {
             BitDepth = Audio->BitDepth;
         } else {
@@ -82,7 +82,7 @@ extern "C" {
     }
     
     uint64_t AudioContainer_GetNumChannels(AudioContainer *Audio) {
-        uint64_t NumChannels = 0;
+        uint64_t NumChannels = 0ULL;
         if (Audio != NULL) {
             NumChannels = Audio->NumChannels;
         } else {
@@ -92,7 +92,7 @@ extern "C" {
     }
     
     uint64_t AudioContainer_GetNumSamples(AudioContainer *Audio) {
-        uint64_t NumSamples = 0;
+        uint64_t NumSamples = 0ULL;
         if (Audio != NULL) {
             NumSamples = Audio->NumSamples;
         } else {
@@ -101,8 +101,8 @@ extern "C" {
         return NumSamples;
     }
     
-    uint8_t AudioContainer_GetChannelsIndex(AudioContainer *Audio, Audio_ChannelMask ChannelMask) {
-        uint8_t Channel = 0;
+    uint64_t AudioContainer_GetChannelsIndex(AudioContainer *Audio, Audio_ChannelMask ChannelMask) {
+        uint64_t Channel = 0ULL;
         if (Audio != NULL) {
             Channel = Audio->ChannelMask[ChannelMask];
         } else {
@@ -143,37 +143,37 @@ extern "C" {
         return AudioArray;
     }
     
-    int64_t AudioContainer_GetAverage(AudioContainer *Audio, uint8_t Channel) {
-        int64_t Average = 0;
+    int64_t AudioContainer_GetAverage(AudioContainer *Audio, uint64_t Channel) {
+        int64_t Average = 0LL;
         if (Audio != NULL) {
             if (Audio->Type == AudioContainer_UInteger8) {
                 uint8_t **Array = (uint8_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
             } else if (Audio->Type == AudioContainer_SInteger8) {
                 int8_t **Array = (int8_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
             } else if (Audio->Type == AudioContainer_UInteger16) {
                 uint16_t **Array = (uint16_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
             } else if (Audio->Type == AudioContainer_SInteger16) {
                 int16_t **Array = (int16_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
             } else if (Audio->Type == AudioContainer_UInteger32) {
                 uint32_t **Array = (uint32_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
             } else if (Audio->Type == AudioContainer_SInteger32) {
                 int32_t **Array = (int32_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
             }
@@ -184,47 +184,47 @@ extern "C" {
         return Average;
     }
     
-    int64_t AudioContainer_GetMax(AudioContainer *Audio, uint8_t Channel) {
-        int64_t Maximum = 0;
+    int64_t AudioContainer_GetMax(AudioContainer *Audio, uint64_t Channel) {
+        int64_t Maximum = 0LL;
         if (Audio != NULL && Channel < Audio->NumChannels) {
             if (Audio->Type == AudioContainer_UInteger8) {
                 uint8_t **Array = (uint8_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
                     }
                 }
             } else if (Audio->Type == AudioContainer_SInteger8) {
                 int8_t **Array = (int8_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
                     }
                 }
             } else if (Audio->Type == AudioContainer_UInteger16) {
                 uint16_t **Array = (uint16_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
                     }
                 }
             } else if (Audio->Type == AudioContainer_SInteger16) {
                 int16_t **Array = (int16_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
                     }
                 }
             } else if (Audio->Type == AudioContainer_UInteger32) {
                 uint32_t **Array = (uint32_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
                     }
                 }
             } else if (Audio->Type == AudioContainer_SInteger32) {
                 int32_t **Array = (int32_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
                     }
@@ -236,47 +236,47 @@ extern "C" {
         return Maximum;
     }
     
-    int64_t AudioContainer_GetMin(AudioContainer *Audio, uint8_t Channel) {
+    int64_t AudioContainer_GetMin(AudioContainer *Audio, uint64_t Channel) {
         int64_t Minimum = 9223372036854775807;
         if (Audio != NULL) {
             if (Audio->Type == AudioContainer_UInteger8) {
                 uint8_t **Array = (uint8_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
                 }
             } else if (Audio->Type == AudioContainer_SInteger8) {
                 int8_t **Array = (int8_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
                 }
             } else if (Audio->Type == AudioContainer_UInteger16) {
                 uint16_t **Array = (uint16_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
                 }
             } else if (Audio->Type == AudioContainer_SInteger16) {
                 int16_t **Array = (int16_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
                 }
             } else if (Audio->Type == AudioContainer_UInteger32) {
                 uint32_t **Array = (uint32_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
                 }
             } else if (Audio->Type == AudioContainer_SInteger32) {
                 int32_t **Array = (int32_t**) AudioContainer_GetArray(Audio);
-                for (uint64_t Sample = 0; Sample < Audio->NumSamples; Sample++) {
+                for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
@@ -320,13 +320,13 @@ extern "C" {
         Image_Views         *Views;
         uint64_t             Width;
         uint64_t             Height;
-        uint8_t              BitDepth;
-        uint8_t              NumChannels;
-        uint8_t              NumViews;
+        uint64_t             BitDepth;
+        uint64_t             NumChannels;
+        uint64_t             NumViews;
         Image_Types          Type;
     } ImageContainer;
     
-    ImageContainer *ImageContainer_Init(Image_Types Type, uint8_t BitDepth, uint8_t NumChannels, uint64_t Width, uint64_t Height) {
+    ImageContainer *ImageContainer_Init(Image_Types Type, uint64_t BitDepth, uint64_t NumChannels, uint64_t Width, uint64_t Height) {
         ImageContainer *Image = NULL;
         if (BitDepth > 0 && NumChannels > 0 && Width > 0 && Height > 0) {
             Image = calloc(1, sizeof(ImageContainer));
@@ -373,7 +373,7 @@ extern "C" {
         return Image;
     }
     
-    void ImageContainer_SetChannelMask(ImageContainer *Image, uint8_t Index, Image_ChannelMask ChannelMask) {
+    void ImageContainer_SetChannelMask(ImageContainer *Image, uint64_t Index, Image_ChannelMask ChannelMask) {
         if (Image != NULL && Index < Image->NumChannels) {
             Image->ChannelMask[Index] = ChannelMask;
         } else if (Image == NULL) {
@@ -384,7 +384,7 @@ extern "C" {
     }
     
     uint64_t ImageContainer_GetWidth(ImageContainer *Image) {
-        uint64_t Width = 0;
+        uint64_t Width = 0ULL;
         if (Image != NULL) {
             Width = Image->Width;
         } else {
@@ -394,7 +394,7 @@ extern "C" {
     }
     
     uint64_t ImageContainer_GetHeight(ImageContainer *Image) {
-        uint64_t Height = 0;
+        uint64_t Height = 0ULL;
         if (Image != NULL) {
             Height = Image->Height;
         } else {
@@ -403,8 +403,8 @@ extern "C" {
         return Height;
     }
     
-    uint8_t ImageContainer_GetBitDepth(ImageContainer *Image) {
-        uint8_t BitDepth = 0;
+    uint64_t ImageContainer_GetBitDepth(ImageContainer *Image) {
+        uint64_t BitDepth = 0ULL;
         if (Image != NULL) {
             BitDepth = Image->BitDepth;
         } else {
@@ -413,8 +413,8 @@ extern "C" {
         return BitDepth;
     }
     
-    uint8_t ImageContainer_GetNumChannels(ImageContainer *Image) {
-        uint8_t NumChannels = 0;
+    uint64_t ImageContainer_GetNumChannels(ImageContainer *Image) {
+        uint64_t NumChannels = 0ULL;
         if (Image != NULL) {
             if (Image->NumViews > 0) {
                 NumChannels = Image->NumChannels / Image->NumViews;
@@ -427,11 +427,11 @@ extern "C" {
         return NumChannels;
     }
     
-    uint8_t ImageContainer_GetChannelsIndex(ImageContainer *Image, Image_ChannelMask Mask) {
-        uint8_t Index = 0xFF;
+    uint64_t ImageContainer_GetChannelsIndex(ImageContainer *Image, Image_ChannelMask Mask) {
+        uint64_t Index = 0xFFFFFFFFFFFFFFFF;
         if (Image != NULL) {
-            Index     = Image->NumChannels;
-            for (uint8_t Channel = 0; Channel < Image->NumChannels; Channel++) {
+            Index      = Image->NumChannels;
+            for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
                 if (Image->ChannelMask[Channel] == Mask) {
                     Index = Channel;
                 }
@@ -442,21 +442,21 @@ extern "C" {
         return Index;
     }
     
-    uint8_t ImageContainer_GetNumViews(ImageContainer *Image) {
-        uint8_t NumViews = 0;
+    uint64_t ImageContainer_GetNumViews(ImageContainer *Image) {
+        uint64_t NumViews = 0ULL;
         if (Image != NULL) {
-            NumViews     = Image->NumViews;
+            NumViews      = Image->NumViews;
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return NumViews;
     }
     
-    uint8_t ImageContainer_GetViewsIndex(ImageContainer *Image, Image_Views View) {
-        uint8_t Index = 0xFF;
+    uint64_t ImageContainer_GetViewsIndex(ImageContainer *Image, Image_Views View) {
+        uint64_t Index = 0xFFFFFFFFFFFFFFFF;
         if (Image != NULL) {
-            Index     = Image->NumViews;
-            for (uint8_t ViewIndex = 0; ViewIndex < Image->NumViews; ViewIndex++) {
+            Index      = Image->NumViews;
+            for (uint64_t ViewIndex = 0ULL; ViewIndex < Image->NumViews; ViewIndex++) {
                 if (Image->Views[ViewIndex] == View) {
                     Index = ViewIndex;
                 }
@@ -498,34 +498,34 @@ extern "C" {
     int64_t ImageContainer_GetAverage(ImageContainer *Image, Image_Views ViewMask, Image_ChannelMask ChannelMask) {
         int64_t Average = 0LL;
         if (Image != NULL) {
-            uint8_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
-            uint8_t View    = ImageContainer_GetViewsIndex(Image, ViewMask);
+            uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
+            uint64_t View    = ImageContainer_GetViewsIndex(Image, ViewMask);
             if (Channel < Image->NumChannels) {
                 if (Image->Type == ImageContainer_2DUInteger8 || Image->Type == ImageContainer_3DUInteger8) {
                     uint8_t ****Array = (uint8_t****) ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0; Width < Image->Width; Width++) {
-                        for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                    for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                        for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             Average += Array[View][Width][Height][Channel];
                         }
                     }
                 } else if (Image->Type == ImageContainer_2DSInteger8 || Image->Type == ImageContainer_3DSInteger8) {
                     int8_t ****Array = (int8_t****) ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0; Width < Image->Width; Width++) {
-                        for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                    for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                        for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             Average += Array[View][Width][Height][Channel];
                         }
                     }
                 } else if (Image->Type == ImageContainer_2DUInteger16 || Image->Type == ImageContainer_3DUInteger16) {
                     uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0; Width < Image->Width; Width++) {
-                        for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                    for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                        for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             Average += Array[View][Width][Height][Channel];
                         }
                     }
                 } else if (Image->Type == ImageContainer_2DSInteger16 || Image->Type == ImageContainer_3DSInteger16) {
                     int16_t ****Array = (int16_t****) ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0; Width < Image->Width; Width++) {
-                        for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                    for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                        for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             Average += Array[View][Width][Height][Channel];
                         }
                     }
@@ -543,13 +543,13 @@ extern "C" {
     int64_t ImageContainer_GetMax(ImageContainer *Image, Image_Views ViewMask, Image_ChannelMask ChannelMask) {
         int64_t Maximum = -9223372036854775807LL;
         if (Image != NULL) {
-            uint8_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
-            uint8_t View    = ImageContainer_GetViewsIndex(Image, ViewMask);
+            uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
+            uint64_t View    = ImageContainer_GetViewsIndex(Image, ViewMask);
             if (Channel < Image->NumChannels) {
                 if (Image->Type == ImageContainer_2DUInteger8 || Image->Type == ImageContainer_3DUInteger8) {
                     uint8_t ****Array = (uint8_t****) ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0; Width < Image->Width; Width++) {
-                        for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                    for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                        for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             if (Array[View][Width][Height][Channel] > Maximum) {
                                 Maximum = Array[View][Width][Height][Channel];
                             }
@@ -557,8 +557,8 @@ extern "C" {
                     }
                 } else if (Image->Type == ImageContainer_2DSInteger8 || Image->Type == ImageContainer_3DSInteger8) {
                     int8_t ****Array = (int8_t****)  ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0; Width < Image->Width; Width++) {
-                        for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                    for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                        for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             if (Array[View][Width][Height][Channel] > Maximum) {
                                 Maximum = Array[View][Width][Height][Channel];
                             }
@@ -566,8 +566,8 @@ extern "C" {
                     }
                 } else if (Image->Type == ImageContainer_2DUInteger16 || Image->Type == ImageContainer_3DUInteger16) {
                     uint16_t ****Array = (uint16_t****)  ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0; Width < Image->Width; Width++) {
-                        for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                    for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                        for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             if (Array[View][Width][Height][Channel] > Maximum) {
                                 Maximum = Array[View][Width][Height][Channel];
                             }
@@ -575,8 +575,8 @@ extern "C" {
                     }
                 } else if (Image->Type == ImageContainer_2DSInteger16 || Image->Type == ImageContainer_3DSInteger16) {
                     int16_t  ****Array = (int16_t****)   ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0; Width < Image->Width; Width++) {
-                        for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                    for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                        for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             if (Array[View][Width][Height][Channel] > Maximum) {
                                 Maximum = Array[View][Width][Height][Channel];
                             }
@@ -595,13 +595,13 @@ extern "C" {
     int64_t ImageContainer_GetMin(ImageContainer *Image, Image_Views ViewMask, Image_ChannelMask ChannelMask) {
         int64_t Minimum = 9223372036854775807LL;
         if (Image != NULL) {
-            uint8_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
-            uint8_t View    = ImageContainer_GetViewsIndex(Image, ViewMask);
+            uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
+            uint64_t View    = ImageContainer_GetViewsIndex(Image, ViewMask);
             if (Channel < Image->NumChannels) {
                 if (Image->Type == ImageContainer_2DUInteger8 || Image->Type == ImageContainer_3DUInteger8) {
                     uint8_t  ****Array = (uint8_t****)  ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0; Width < Image->Width; Width++) {
-                        for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                    for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                        for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             if (Array[View][Width][Height][Channel] < Minimum) {
                                 Minimum = Array[View][Width][Height][Channel];
                             }
@@ -609,8 +609,8 @@ extern "C" {
                     }
                 } else if (Image->Type == ImageContainer_2DSInteger8 || Image->Type == ImageContainer_3DSInteger8) {
                     int8_t   ****Array = (int8_t****)   ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0; Width < Image->Width; Width++) {
-                        for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                    for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                        for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             if (Array[View][Width][Height][Channel] < Minimum) {
                                 Minimum = Array[View][Width][Height][Channel];
                             }
@@ -618,8 +618,8 @@ extern "C" {
                     }
                 } else if (Image->Type == ImageContainer_2DUInteger16 || Image->Type == ImageContainer_3DUInteger16) {
                     uint16_t  ****Array = (uint16_t****)  ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0; Width < Image->Width; Width++) {
-                        for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                    for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                        for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             if (Array[View][Width][Height][Channel] < Minimum) {
                                 Minimum = Array[View][Width][Height][Channel];
                             }
@@ -627,8 +627,8 @@ extern "C" {
                     }
                 } else if (Image->Type == ImageContainer_2DSInteger16 || Image->Type == ImageContainer_3DSInteger16) {
                     int16_t   ****Array = (int16_t****)   ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0; Width < Image->Width; Width++) {
-                        for (uint64_t Height = 0; Height < Image->Height; Height++) {
+                    for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
+                        for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             if (Array[View][Width][Height][Channel] < Minimum) {
                                 Minimum = Array[View][Width][Height][Channel];
                             }
@@ -649,10 +649,10 @@ extern "C" {
             if (VerticalFlip == Yes) {
                 if (Image->Type == ImageContainer_2DUInteger8 || Image->Type == ImageContainer_3DUInteger8) {
                     uint8_t  ****Array = (uint8_t****)  ImageContainer_GetArray(Image);
-                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                    for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                             for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
-                                for (uint64_t BottomLine = Image->Height; BottomLine > 0; BottomLine--) {
+                                for (uint64_t BottomLine = Image->Height; BottomLine > 0ULL; BottomLine--) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
                                         uint8_t TopPixel            = Array[View][Width][TopLine][Channel];
                                         uint8_t BottomPixel         = Array[View][Width][BottomLine][Channel];
@@ -666,10 +666,10 @@ extern "C" {
                     }
                 } else if (Image->Type == ImageContainer_2DSInteger8 || Image->Type == ImageContainer_3DSInteger8) {
                     int8_t   ****Array = (int8_t****)   ImageContainer_GetArray(Image);
-                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                    for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                             for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
-                                for (uint64_t BottomLine = Image->Height; BottomLine > 0; BottomLine--) {
+                                for (uint64_t BottomLine = Image->Height; BottomLine > 0ULL; BottomLine--) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
                                         int8_t  TopPixel            = Array[View][Width][TopLine][Channel];
                                         int8_t  BottomPixel         = Array[View][Width][BottomLine][Channel];
@@ -683,10 +683,10 @@ extern "C" {
                     }
                 } else if (Image->Type == ImageContainer_2DUInteger16 || Image->Type == ImageContainer_3DUInteger16) {
                     uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
-                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                    for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                             for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
-                                for (uint64_t BottomLine = Image->Height; BottomLine > 0; BottomLine--) {
+                                for (uint64_t BottomLine = Image->Height; BottomLine > 0ULL; BottomLine--) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
                                         uint16_t TopPixel           = Array[View][Width][TopLine][Channel];
                                         uint16_t BottomPixel        = Array[View][Width][BottomLine][Channel];
@@ -701,10 +701,10 @@ extern "C" {
                 }
             } else if (Image->Type == ImageContainer_2DSInteger16 || Image->Type == ImageContainer_3DSInteger16) {
                 int16_t  ****Array = (int16_t****)  ImageContainer_GetArray(Image);
-                for (uint8_t View = 0; View < Image->NumViews; View++) {
+                for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                         for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
-                            for (uint64_t BottomLine = Image->Height; BottomLine > 0; BottomLine--) {
+                            for (uint64_t BottomLine = Image->Height; BottomLine > 0ULL; BottomLine--) {
                                 for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
                                     int16_t TopPixel            = Array[View][Width][TopLine][Channel];
                                     int16_t BottomPixel         = Array[View][Width][BottomLine][Channel];
@@ -720,9 +720,9 @@ extern "C" {
             if (HorizontalFlip == Yes) {
                 if (Image->Type == ImageContainer_2DUInteger8 || Image->Type == ImageContainer_3DUInteger8) {
                     uint8_t  ****Array = (uint8_t****)  ImageContainer_GetArray(Image);
-                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                    for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
-                            for (uint64_t Right = Image->Width; Right > 0; Right++) {
+                            for (uint64_t Right = Image->Width; Right > 0ULL; Right++) {
                                 for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
                                         uint8_t LeftPixel                   = Array[View][Left][Height][Channel];
@@ -737,9 +737,9 @@ extern "C" {
                     }
                 } else if (Image->Type == ImageContainer_2DSInteger8 || Image->Type == ImageContainer_3DSInteger8) {
                     int8_t   ****Array = (int8_t****)   ImageContainer_GetArray(Image);
-                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                    for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
-                            for (uint64_t Right = Image->Width; Right > 0; Right++) {
+                            for (uint64_t Right = Image->Width; Right > 0ULL; Right++) {
                                 for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
                                         int8_t LeftPixel                    = Array[View][Left][Height][Channel];
@@ -754,9 +754,9 @@ extern "C" {
                     }
                 } else if (Image->Type == ImageContainer_2DUInteger16 || Image->Type == ImageContainer_3DUInteger16) {
                     uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
-                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                    for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
-                            for (uint64_t Right = Image->Width; Right > 0; Right++) {
+                            for (uint64_t Right = Image->Width; Right > 0ULL; Right++) {
                                 for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
                                         uint16_t LeftPixel                  = Array[View][Left][Height][Channel];
@@ -771,9 +771,9 @@ extern "C" {
                     }
                 } else if (Image->Type == ImageContainer_2DSInteger16 || Image->Type == ImageContainer_3DSInteger16) {
                     int16_t ****Array  = (int16_t****) ImageContainer_GetArray(Image);
-                    for (uint8_t View = 0; View < Image->NumViews; View++) {
+                    for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
-                            for (uint64_t Right = Image->Width; Right > 0; Right++) {
+                            for (uint64_t Right = Image->Width; Right > 0ULL; Right++) {
                                 for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
                                         int16_t LeftPixel                   = Array[View][Left][Height][Channel];

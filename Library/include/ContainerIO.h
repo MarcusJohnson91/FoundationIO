@@ -102,7 +102,7 @@ extern "C" {
      @param                 SampleRate     "The number of samples in one second of audio".
      @param                 NumSamples     "NumSamples is the number of channel independent samples, e.g. X samples is BitDepth * NumChnnels * X".
      */
-    AudioContainer         *AudioContainer_Init(Audio_Types Type, uint8_t BitDepth, uint64_t NumChannels, uint64_t SampleRate, uint64_t NumSamples);
+    AudioContainer         *AudioContainer_Init(Audio_Types Type, uint64_t BitDepth, uint64_t NumChannels, uint64_t SampleRate, uint64_t NumSamples);
     
     /*!
      @abstract                             "Sets the channel type for each channel index".
@@ -110,8 +110,7 @@ extern "C" {
      @param                 Index          "Which index does the channel mask apply to"?
      @param                 ChannelMask    "What is the channel mask"?
      */
-    void              AudioContainer_SetChannelMask(AudioContainer *Audio, uint8_t Index, Audio_ChannelMask ChannelMask);
-    void                    AudioContainer_SetChannelMask(AudioContainer *Audio, uint8_t Index, Audio_ChannelMask ChannelMask);
+    void                    AudioContainer_SetChannelMask(AudioContainer *Audio, uint64_t Index, Audio_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Returns the number of audio channels".
@@ -129,7 +128,7 @@ extern "C" {
      @abstract                             "Returns the number of bits required to represent a audio sample".
      @param                 Audio          "A pointer to the instance of an AudioContainer in question".
      */
-    uint8_t                 AudioContainer_GetBitDepth(AudioContainer *Audio);
+    uint64_t                AudioContainer_GetBitDepth(AudioContainer *Audio);
     
     /*!
      @abstract                             "Returns the number of channel-agnostic audio samples stored in the container".
@@ -147,7 +146,7 @@ extern "C" {
      @param                 Audio          "A pointer to the instance of an AudioContainer in question".
      @param                 ChannelMask    "The actual channel you're trying to get".
      */
-    uint8_t                 AudioContainer_GetChannelsIndex(AudioContainer *Audio, Audio_ChannelMask ChannelMask);
+    uint64_t                AudioContainer_GetChannelsIndex(AudioContainer *Audio, Audio_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Gets the type of the array contained by the AudioContainer".
@@ -167,21 +166,21 @@ extern "C" {
      @param                 Audio          "A pointer to the instance of an AudioContainer in question".
      @param                 Channel        "Which index should we get average"?
      */
-    int64_t                 AudioContainer_GetAverage(AudioContainer *Audio, uint8_t Channel);
+    int64_t                 AudioContainer_GetAverage(AudioContainer *Audio, uint64_t Channel);
     
     /*!
      @abstract                             "Returns the highest valued sample in the buffer".
      @param                 Audio          "A pointer to the instance of an AudioContainer in question".
      @param                 Channel        "Which index should we get the highest value from"?
      */
-    int64_t                 AudioContainer_GetMax(AudioContainer *Audio, uint8_t Channel);
+    int64_t                 AudioContainer_GetMax(AudioContainer *Audio, uint64_t Channel);
     
     /*!
      @abstract                             "Returns the lowest valued sample in the buffer".
      @param                 Audio          "A pointer to the instance of an AudioContainer in question".
      @param                 Channel        "Which index should we get the lowest value from"?
      */
-    int64_t                 AudioContainer_GetMin(AudioContainer *Audio, uint8_t Channel);
+    int64_t                 AudioContainer_GetMin(AudioContainer *Audio, uint64_t Channel);
     
     /*!
      @abstract                             "Deinitalizes an AudioContainer, and any samples stored within it".
@@ -200,7 +199,7 @@ extern "C" {
      @param                 Width          "The number of pixels making up one row".
      @param                 Height         "The number of pixels making up one column".
      */
-    ImageContainer         *ImageContainer_Init(Image_Types Type, uint8_t BitDepth, uint8_t NumChannels, uint64_t Width, uint64_t Height);
+    ImageContainer         *ImageContainer_Init(Image_Types Type, uint64_t BitDepth, uint64_t NumChannels, uint64_t Width, uint64_t Height);
     
     /*!
      @abstract                             "Sets the channel type for each channel index".
@@ -208,7 +207,7 @@ extern "C" {
      @param                 Index          "Which index does the channel mask apply to"?
      @param                 ChannelMask    "What is the channel mask"?
      */
-    void                    ImageContainer_SetChannelMask(ImageContainer *Image, uint8_t Index, Image_ChannelMask ChannelMask);
+    void                    ImageContainer_SetChannelMask(ImageContainer *Image, uint64_t Index, Image_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Returns the number of pixels in one row of this image".
@@ -226,14 +225,14 @@ extern "C" {
      @abstract                             "Returns the number of bits needed to represent the image in this container".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
-    uint8_t                 ImageContainer_GetBitDepth(ImageContainer *Image);
+    uint64_t                ImageContainer_GetBitDepth(ImageContainer *Image);
     
     /*!
      @abstract                             "Returns the number of channels contained in this image".
      @remark                               "If there are multiple views, it only returns the number of channels per view".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
-    uint8_t                 ImageContainer_GetNumChannels(ImageContainer *Image);
+    uint64_t                ImageContainer_GetNumChannels(ImageContainer *Image);
     
     /*!
      @abstract                             "Gets the channel index for the specified mask".
@@ -241,13 +240,13 @@ extern "C" {
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      @param                 ChannelMask    "Which channel are you trying to access"?
      */
-    uint8_t                 ImageContainer_GetChannelsIndex(ImageContainer *Image, Image_ChannelMask ChannelMask);
+    uint64_t                ImageContainer_GetChannelsIndex(ImageContainer *Image, Image_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Gets the number of views in an ImageContainer".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
-    uint8_t                 ImageContainer_GetNumViews(ImageContainer *Image);
+    uint64_t                ImageContainer_GetNumViews(ImageContainer *Image);
     
     /*!
      @abstract                             "Gets the views index for the specified mask".
@@ -255,7 +254,7 @@ extern "C" {
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      @param                 View           "Which view are you trying to access"?
      */
-    uint8_t                 ImageContainer_GetViewsIndex(ImageContainer *Image, Image_Views View);
+    uint64_t                ImageContainer_GetViewsIndex(ImageContainer *Image, Image_Views View);
     
     /*!
      @abstract                             "Gets the type of the array contained by the ImageContainer".
