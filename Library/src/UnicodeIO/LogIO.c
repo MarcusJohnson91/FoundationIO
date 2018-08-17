@@ -19,7 +19,7 @@ extern "C" {
             Log_LogFile   = FoundationIO_FileOpen(LogFilePath, U8("a+"));
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
             UTF32 *Path32 = UTF8_Decode(LogFilePath);
-            UTF16 *Path16 = UTF16_Encode(Path32, UseLEByteOrder);
+            UTF16 *Path16 = UTF16_Encode(Path32);
             Log_LogFile   = FoundationIO_FileOpen(Path16, U16("rb"));
             free(Path32);
             free(Path16);
