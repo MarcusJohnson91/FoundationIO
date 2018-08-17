@@ -237,6 +237,94 @@ extern "C" {
         return StringHasABOM;
     }
     
+    bool  UTF8_StringHasWinPathPrefix(UTF8 *String) {
+        bool StringHasWinPathPrefix = No;
+        if (String != NULL) {
+            UTF32 *String32         = UTF8_Decode(String);
+            StringHasWinPathPrefix  = UTF32_StringHasWinPathPrefix(String32);
+            free(String32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return StringHasWinPathPrefix;
+    }
+    
+    bool  UTF16_StringHasWinPathPrefix(UTF16 *String) {
+        bool StringHasWinPathPrefix = No;
+        if (String != NULL) {
+            UTF32 *String32         = UTF16_Decode(String);
+            StringHasWinPathPrefix  = UTF32_StringHasWinPathPrefix(String32);
+            free(String32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return StringHasWinPathPrefix;
+    }
+    
+    bool  UTF32_StringHasWinPathPrefix(UTF32 *String) {
+        bool StringHasLongPathPrefix = No;
+        if (String != NULL) {
+            uint64_t StringSize      = UTF32_GetStringSizeInCodePoints(String);
+            if (StringSize > UnicodeBOMSizeInCodePoints) {
+                bool StringHasBOM    = UTF32_StringHasBOM(String);
+                if (StringHasBOM && StringSize >= UTF8BOMSizeInCodeUnits + 4) { // 4 for "\\?\"
+                    if ((String[1] == U32('\\') || String[1] == U32('/')) && (String[2] == U32('\\') || String[2] == U32('/')) && (String[3] == U32('\?')) && (String[4] == U32('\\') || String[4] == U32('/'))) {
+                        StringHasLongPathPrefix = Yes;
+                    }
+                } else if (StringHasBOM == No && StringSize >= 4) {
+                    if ((String[0] == U32('\\') || String[0] == U32('/')) && (String[1] == U32('\\') || String[1] == U32('/')) && (String[2] == U32('\?')) &&
+                        (String[3] == U32('\\') || String[3] == U32('/'))) {
+                        StringHasLongPathPrefix = Yes;
+                    }
+                }
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return StringHasLongPathPrefix;
+    }
+    
+    bool UTF8_StringHasFormatSpecifier(UTF8 *String) {
+        bool StringContainsFormatSpecifier = No;
+        if (String != NULL) {
+            UTF32 *String32                = UTF8_Decode(String);
+            StringContainsFormatSpecifier  = UTF32_StringHasFormatSpecifier(String32);
+            free(String32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return StringContainsFormatSpecifier;
+    }
+    
+    bool UTF16_StringHasFormatSpecifier(UTF16 *String) {
+        bool StringContainsFormatSpecifier = No;
+        if (String != NULL) {
+            UTF32 *String32                = UTF16_Decode(String);
+            StringContainsFormatSpecifier  = UTF32_StringHasFormatSpecifier(String32);
+            free(String32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return StringContainsFormatSpecifier;
+    }
+    
+    bool UTF32_StringHasFormatSpecifier(UTF32 *String) {
+        bool StringContainsFormatSpecifier            = No;
+        if (String != NULL) {
+            uint64_t StringSize                       = UTF32_GetStringSizeInCodePoints(String);
+            if (StringSize > 2) {
+                for (uint64_t CodePoint = 2; CodePoint < StringSize; CodePoint++) {
+                    if (String[CodePoint - 2] != U32('%') && String[CodePoint - 1] == U32('%') && String[CodePoint] != U32('%')) {
+                        StringContainsFormatSpecifier = Yes;
+                    }
+                }
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return StringContainsFormatSpecifier;
+    }
+    
     bool  UTF8_IsStringValid(UTF8 *String) {
         uint64_t CodeUnit    = 0ULL;
         bool     IsValidUTF8 = Yes;
@@ -415,6 +503,29 @@ extern "C" {
                 if (BOMLessString != NULL) {
                     for (uint64_t CodeUnit = 1ULL; CodeUnit < StringSize; CodeUnit++) {
                         BOMLessString[CodeUnit - 1] = String[CodeUnit];
+                    }
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate BOMLessString"));
+                }
+            } else {
+                BOMLessString = String;
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return BOMLessString;
+    }
+    
+    UTF32 *UTF32_RemoveBOM(UTF32 *String) {
+        UTF32   *BOMLessString                   = NULL;
+        uint64_t StringSize                      = 0ULL;
+        if (String != NULL) {
+            StringSize                           = UTF32_GetStringSizeInCodePoints(String);
+            if (String[0] == UTF32LE || String[0] == UTF32BE) {
+                BOMLessString                    = calloc(StringSize - UnicodeBOMSizeInCodePoints + NULLTerminatorSize, sizeof(UTF16));
+                if (BOMLessString != NULL) {
+                    for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
+                        BOMLessString[CodePoint] = String[CodePoint + 1];
                     }
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate BOMLessString"));
@@ -808,7 +919,7 @@ extern "C" {
     }
     
     /*
-     Ok, we need to change the API for RelaceSubString.
+     Ok, we need to change the API for ReplaceSubString.
      If a SubString to be replaced, is smaller than what to replace it with, we need to go ahead and simply leave the string as it.
      */
     
@@ -2239,7 +2350,9 @@ extern "C" {
         return Details;
     }
     
-    static UTF32 *UTF32_FormatString(UTF32 *Format, FormatString *Details, va_list VariadicArguments) {
+    
+    
+    static UTF32 *FormatString_UTF32(UTF32 *Format, FormatString *Details, va_list VariadicArguments) {
         UTF32 *Formatted = Format;
         if (Format != NULL) {
             for (uint64_t Specifier = 0ULL; Specifier < Details->NumSpecifiers; Specifier++) { // Stringify each specifier
@@ -2286,7 +2399,7 @@ extern "C" {
             UTF32 *Format32               = UTF8_Decode(Format);
             FormatString *Details         = UTF32_ParseFormatSpecifiers(Format32, UTF8Format);
             va_list VariadicArguments;
-            UTF32 *FormattedString        = UTF32_FormatString(Format32, Details, VariadicArguments);
+            UTF32 *FormattedString        = FormatString_UTF32(Format32, Details, VariadicArguments);
             va_end(VariadicArguments);
             FormatString_Deinit(Details);
             Format8                       = UTF8_Encode(FormattedString, No);
@@ -2304,7 +2417,7 @@ extern "C" {
             UTF32 *Format32               = UTF16_Decode(Format);
             FormatString *Details         = UTF32_ParseFormatSpecifiers(Format32, UTF16Format);
             va_list VariadicArguments;
-            UTF32 *FormattedString        = UTF32_FormatString(Format32, Details, VariadicArguments);
+            UTF32 *FormattedString        = FormatString_UTF32(Format32, Details, VariadicArguments);
             va_end(VariadicArguments);
             FormatString_Deinit(Details);
             Format16                      = UTF16_Encode(FormattedString, UseLEByteOrder);
@@ -2314,6 +2427,20 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         return Format16;
+    }
+    
+    UTF32 *UTF32_FormatString(UTF32 *Format, ...) {
+        UTF32 *Format32 = NULL;
+        if (Format != NULL) {
+            FormatString *Details         = UTF32_ParseFormatSpecifiers(Format, UTF32Format);
+            va_list VariadicArguments;
+            Format32                      = FormatString_UTF32(Format, Details, VariadicArguments);
+            va_end(VariadicArguments);
+            FormatString_Deinit(Details);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Format32;
     }
     
     void UTF8_WriteString2File(UTF8 *String, FILE *OutputFile) {

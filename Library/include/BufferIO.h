@@ -272,7 +272,26 @@ extern "C" {
      @param                     BitI                            "BitInput Pointer".
      @param                     Path2Open                       "Path to the input file to open".
      */
-    void                        BitInput_OpenFile(BitInput *BitI, UTF8 *Path2Open);
+    void                        BitInput_UTF8_OpenFile(BitInput *BitI, UTF8 *Path2Open);
+    
+    /*!
+     @abstract                                                  "Opens an input file, pointed to by Path2Open".
+     @param                     BitI                            "BitInput Pointer".
+     @param                     Path2Open                       "Path to the input file to open".
+     */
+    void                        BitInput_UTF16_OpenFile(BitInput *BitI, UTF16 *Path2Open);
+    
+    /*!
+     @abstract                                                  "Is the file variable"?
+     @param                     BitI                            "BitInput Pointer".
+     */
+    bool                        BitInput_IsChangable(BitInput *BitI);
+    
+    /*!
+     @abstract                                                  "Closes the current file, and opens the next one in it's place".
+     @param                     BitI                            "BitInput Pointer".
+     */
+    void                        BitInput_ChangeFile(BitInput *BitI);
     
     /*!
      @abstract                                                  "Opens a socket for reading".
@@ -341,7 +360,26 @@ extern "C" {
      @param                     BitO                            "BitOutput Pointer".
      @param                     Path2Open                       "Path to the output file to open".
      */
-    void                        BitOutput_OpenFile(BitOutput *BitO, UTF8 *Path2Open);
+    void                        BitOutput_UTF8_OpenFile(BitOutput *BitO, UTF8 *Path2Open);
+    
+    /*!
+     @abstract                                                  "Opens an output file for writing".
+     @param                     BitO                            "BitOutput Pointer".
+     @param                     Path2Open                       "Path to the output file to open".
+     */
+    void                        BitOutput_UTF16_OpenFile(BitOutput *BitO, UTF16 *Path2Open);
+    
+    /*!
+     @abstract                                                  "Is the file variable"?
+     @param                     BitO                            "BitOutput Pointer".
+     */
+    bool                        BitOutput_IsChangable(BitOutput *BitO);
+    
+    /*!
+     @abstract                                                  "Closes the current file, and opens the next one in it's place".
+     @param                     BitO                            "BitOutput Pointer".
+     */
+    void                        BitOutput_ChangeFile(BitOutput *BitO);
     
     /*!
      @abstract                                                  "Opens a socket for writing".

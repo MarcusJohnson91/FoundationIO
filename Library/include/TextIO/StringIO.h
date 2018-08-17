@@ -328,6 +328,48 @@ extern "C" {
     bool                  UTF32_StringHasBOM(UTF32 *String);
     
     /*!
+     @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
+     @param               String           "The string to check".
+     @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
+     */
+    bool                  UTF8_StringHasWinPathPrefix(UTF8 *String);
+    
+    /*!
+     @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
+     @param               String           "The string to check".
+     @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
+     */
+    bool                  UTF16_StringHasWinPathPrefix(UTF16 *String);
+    
+    /*!
+     @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
+     @param               String           "The string to check".
+     @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
+     */
+    bool                  UTF32_StringHasWinPathPrefix(UTF32 *String);
+    
+    /*!
+     @abstract                             "Tells if the string pointed to by String contains a format specifier".
+     @param               String           "The string to check".
+     @return                               "Returns Yes if the string contains a format specifier, otherwise it returns No".
+     */
+    bool                  UTF8_StringHasFormatSpecifier(UTF8 *String);
+    
+    /*!
+     @abstract                             "Tells if the string pointed to by String contains a format specifier".
+     @param               String           "The string to check".
+     @return                               "Returns Yes if the string contains a format specifier, otherwise it returns No".
+     */
+    bool                  UTF16_StringHasFormatSpecifier(UTF16 *String);
+    
+    /*!
+     @abstract                             "Tells if the string pointed to by String contains a format specifier".
+     @param               String           "The string to check".
+     @return                               "Returns Yes if the string contains a format specifier, otherwise it returns No".
+     */
+    bool                  UTF32_StringHasFormatSpecifier(UTF32 *String);
+    
+    /*!
      @abstract                             "Tells if the UTF-8 string pointed to by String is a valid UTF-8 encoded string".
      @param               String           "The string to get the validity status from".
      @return                               "Returns Yes if the string is valid, otherwise it returns No".
@@ -370,6 +412,12 @@ extern "C" {
      @param               String           "The string to remove the BOM from".
      */
     UTF16                *UTF16_RemoveBOM(UTF16 *String);
+    
+    /*!
+     @abstract                             "Removes the BOM from the string".
+     @param               String           "The string to remove the BOM from".
+     */
+    UTF32                *UTF32_RemoveBOM(UTF32 *String);
     /* Basic String Property Functions */
     
     /*!
@@ -791,6 +839,24 @@ extern "C" {
     UTF16                *UTF16_FormatString(_Printf_format_string_ UTF16 *Format, ...);
 #else
     UTF16                *UTF16_FormatString(UTF16 *Format, ...);
+#endif /* _MSC_VER */
+#endif/* FoundationIOTargetOS */
+    
+    /*!
+     @abstract                             "Formats a string according to the Format string, with all of it's options".
+     @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
+     @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
+     @return                               "Returns the formatted string encoded using the UTF-8 format".
+     */
+#if     (FoundationIOTargetOS == FoundationIOOSPOSIX)
+    UTF32                *UTF32_FormatString(UTF32 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+#elif   (FoundationIOTargetOS == FoundationIOOSWindows)
+#if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
+    UTF32                *UTF32_FormatString(__format_string UTF32 *Format, ...);
+#elif    (_MSC_VER >= 1500)
+    UTF32                *UTF32_FormatString(_Printf_format_string_ UTF32 *Format, ...);
+#else
+    UTF32                *UTF32_FormatString(UTF32 *Format, ...);
 #endif /* _MSC_VER */
 #endif/* FoundationIOTargetOS */
     
