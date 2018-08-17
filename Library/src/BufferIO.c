@@ -453,7 +453,7 @@ extern "C" {
             UTF32 *WinPath32                 = UTF8_Decode(Path2Open);
             UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, U32("\\\\\?\\"), StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
             free(WinPath32);
-            UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32, UseLEByteOrder);
+            UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32);
             free(WinPathLong32);
             BitI->File                       = FoundationIO_FileOpen(WinPath16, U16("rb"));
             free(WinPath16);
@@ -480,7 +480,7 @@ extern "C" {
             UTF32 *WinPath32                 = UTF8_Decode(Path2Open);
             UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, U32("\\\\\?\\"), StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
             free(WinPath32);
-            UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32, UseLEByteOrder);
+            UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32);
             free(WinPathLong32);
             BitI->File                       = FoundationIO_FileOpen(WinPath16, U16("rb"));
             free(WinPath16);
@@ -688,9 +688,9 @@ extern "C" {
             if (StringHasPathPrefix == No) {
                 bool   StringHasBOM     = UTF8_StringHasBOM(Path2Open);
                 UTF32 *PrefixPath       = UTF32_Insert(Path32, U32("\\\\\?\\"), StringHasBOM == Yes ? UTF16BOMSizeInCodeUnits : 0);
-                BitO->OutputPath.Path16 = UTF16_Encode(PrefixPath, UseLEByteOrder);
+                BitO->OutputPath.Path16 = UTF16_Encode(PrefixPath);
             } else {
-                BitO->OutputPath.Path16 = UTF16_Encode(Path32, UseLEByteOrder);
+                BitO->OutputPath.Path16 = UTF16_Encode(Path32);
             }
             
             if (BitO->FileSpecifierExists == Yes) {
@@ -728,9 +728,9 @@ extern "C" {
             if (StringHasPathPrefix == No) {
                 bool   StringHasBOM     = UTF8_StringHasBOM(Path2Open);
                 UTF32 *PrefixPath       = UTF32_Insert(Path32, U32("\\\\\?\\"), StringHasBOM == Yes ? UTF16BOMSizeInCodeUnits : 0);
-                BitO->OutputPath.Path16 = UTF16_Encode(PrefixPath, UseLEByteOrder);
+                BitO->OutputPath.Path16 = UTF16_Encode(PrefixPath);
             } else {
-                BitO->OutputPath.Path16 = UTF16_Encode(Path32, UseLEByteOrder);
+                BitO->OutputPath.Path16 = UTF16_Encode(Path32);
             }
 #endif
         } else if (BitO == NULL) {

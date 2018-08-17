@@ -163,10 +163,10 @@ extern "C" {
      @constant            UTF32Format                          "The string is UTF-32 encoded".
      */
     typedef enum StringTypes {
-        UnknownFormat                  = 0,
-        UTF8Format                     = 1,
-        UTF16Format                    = 2,
-        UTF32Format                    = 3,
+                        UnknownFormat                          = 0,
+                        UTF8Format                             = 1,
+                        UTF16Format                            = 2,
+                        UTF32Format                            = 3,
     } StringTypes;
     
     typedef enum CombiningCharacterClasses {
@@ -402,6 +402,12 @@ extern "C" {
     UTF16                *UTF16_AddBOM(UTF16 *String, StringIOByteOrders BOM2Add);
     
     /*!
+     @abstract                             "Adds the specified BOM to the string".
+     @param               String           "The string to add the BOM to".
+     */
+    UTF32                *UTF32_AddBOM(UTF32 *String, StringIOByteOrders BOM2Add);
+    
+    /*!
      @abstract                             "Removes the BOM from the string".
      @param               String           "The string to remove the BOM from".
      */
@@ -435,15 +441,14 @@ extern "C" {
     /*!
      @abstract                             "Encodes a UTF32 string to a UTF8 string".
      @param               String           "The UTF32 string to encode to a UTF8 string".
-     @param               BOM              "KeepBOM is mapped to AddBOM here".
      */
-    UTF8                 *UTF8_Encode(UTF32 *String, StringIOBOMStates BOM);
+    UTF8                 *UTF8_Encode(UTF32 *String);
     
     /*!
-     @abstract                             "Encodes a UTF32 *to a UTF16".
-     @param               String           "The string to decode".
+     @abstract                             "Encodes a UTF32 string to a UTF16 string".
+     @param               String           "The string to encode".
      */
-    UTF16                *UTF16_Encode(UTF32 *String, StringIOByteOrders OutputByteOrder);
+    UTF16                *UTF16_Encode(UTF32 *String);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".

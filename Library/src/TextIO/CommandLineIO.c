@@ -574,23 +574,23 @@ extern "C" {
     
     static inline void CommandLineIO_UTF8_DisplayHelp(CommandLineIO *CLI) {
         if (CLI != NULL) {
-            UTF8 *Name = UTF8_Encode(CLI->ProgramName, No);
+            UTF8 *Name = UTF8_Encode(CLI->ProgramName);
             
             UTF8 *ProgramsOptions = UTF8_FormatString(U8("%s's Options (-|--|/):%s"), Name, NewLineUTF8);
             UTF8_WriteString2File(ProgramsOptions, stdout);
             for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                 CLISwitchTypes CurrentSwitchType = CLI->SwitchIDs[Switch].SwitchType;
                 
-                UTF8 *SwitchName        = UTF8_Encode(CLI->SwitchIDs[Switch].Name, No);
-                UTF8 *SwitchDescription = UTF8_Encode(CLI->SwitchIDs[Switch].Description, No);
+                UTF8 *SwitchName        = UTF8_Encode(CLI->SwitchIDs[Switch].Name);
+                UTF8 *SwitchDescription = UTF8_Encode(CLI->SwitchIDs[Switch].Description);
                 
                 UTF8 *SwitchInfo        = UTF8_FormatString(U8("%s: %s%s"), SwitchName, SwitchDescription, NewLineUTF8);
                 
                 UTF8_WriteString2File(SwitchInfo, stdout);
                 if (CurrentSwitchType == SwitchMayHaveSlaves && CLI->SwitchIDs[Switch].NumPotentialSlaves > 0) {
                     for (int64_t SlaveSwitch = 0LL; SlaveSwitch < CLI->SwitchIDs[Switch].NumPotentialSlaves - 1; SlaveSwitch++) {
-                        UTF8 *SlaveName        = UTF8_Encode(CLI->SwitchIDs[SlaveSwitch].Name, No);
-                        UTF8 *SlaveDescription = UTF8_Encode(CLI->SwitchIDs[SlaveSwitch].Description, No);
+                        UTF8 *SlaveName        = UTF8_Encode(CLI->SwitchIDs[SlaveSwitch].Name);
+                        UTF8 *SlaveDescription = UTF8_Encode(CLI->SwitchIDs[SlaveSwitch].Description);
                         
                         UTF8 *SlaveSwitchInfo  = UTF8_FormatString(U8("\t%s: %s%s"), SlaveName, SlaveDescription, NewLineUTF8);
                         
@@ -605,23 +605,23 @@ extern "C" {
     
     static inline void CommandLineIO_UTF16_DisplayHelp(CommandLineIO *CLI) {
         if (CLI != NULL) {
-            UTF16 *Name = UTF16_Encode(CLI->ProgramName, UseLEByteOrder);
+            UTF16 *Name = UTF16_Encode(CLI->ProgramName);
             
             UTF16 *ProgramsOptions = UTF16_FormatString(U16("%s's Options (-|--|/):%s"), Name, NewLineUTF16);
             UTF16_WriteString2File(ProgramsOptions, stdout);
             for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                 CLISwitchTypes CurrentSwitchType = CLI->SwitchIDs[Switch].SwitchType;
                 
-                UTF16 *SwitchName        = UTF16_Encode(CLI->SwitchIDs[Switch].Name, UseLEByteOrder);
-                UTF16 *SwitchDescription = UTF16_Encode(CLI->SwitchIDs[Switch].Description, UseLEByteOrder);
+                UTF16 *SwitchName        = UTF16_Encode(CLI->SwitchIDs[Switch].Name);
+                UTF16 *SwitchDescription = UTF16_Encode(CLI->SwitchIDs[Switch].Description);
                 
                 UTF16 *SwitchInfo        = UTF16_FormatString(U16("%s: %s%s"), SwitchName, SwitchDescription, NewLineUTF16);
                 
                 UTF16_WriteString2File(SwitchInfo, stdout);
                 if (CurrentSwitchType == SwitchMayHaveSlaves && CLI->SwitchIDs[Switch].NumPotentialSlaves > 0) {
                     for (int64_t SlaveSwitch = 0LL; SlaveSwitch < CLI->SwitchIDs[Switch].NumPotentialSlaves - 1; SlaveSwitch++) {
-                        UTF16 *SlaveName        = UTF16_Encode(CLI->SwitchIDs[SlaveSwitch].Name, UseLEByteOrder);
-                        UTF16 *SlaveDescription = UTF16_Encode(CLI->SwitchIDs[SlaveSwitch].Description, UseLEByteOrder);
+                        UTF16 *SlaveName        = UTF16_Encode(CLI->SwitchIDs[SlaveSwitch].Name);
+                        UTF16 *SlaveDescription = UTF16_Encode(CLI->SwitchIDs[SlaveSwitch].Description);
                         
                         UTF16 *SlaveSwitchInfo = UTF16_FormatString(U16("\t%s: %s%s"), SlaveName, SlaveDescription, NewLineUTF16);
                         
@@ -636,14 +636,14 @@ extern "C" {
     
     static inline void CommandLineIO_UTF8_DisplayBanner(CommandLineIO *CLI) {
         if (CLI != NULL) {
-            UTF8 *Name               = UTF8_Encode(CLI->ProgramName, RemoveBOM);
-            UTF8 *Version            = UTF8_Encode(CLI->ProgramVersion, RemoveBOM);
-            UTF8 *Author             = UTF8_Encode(CLI->ProgramAuthor, RemoveBOM);
-            UTF8 *Copyright          = UTF8_Encode(CLI->ProgramCopyright, RemoveBOM);
-            UTF8 *Description        = UTF8_Encode(CLI->ProgramDescription, RemoveBOM);
-            UTF8 *LicenseName        = UTF8_Encode(CLI->ProgramLicenseName, RemoveBOM);
-            UTF8 *LicenseDescription = UTF8_Encode(CLI->ProgramLicenseDescription, RemoveBOM);
-            UTF8 *LicenseURL         = UTF8_Encode(CLI->ProgramLicenseURL, RemoveBOM);
+            UTF8 *Name               = UTF8_Encode(CLI->ProgramName);
+            UTF8 *Version            = UTF8_Encode(CLI->ProgramVersion);
+            UTF8 *Author             = UTF8_Encode(CLI->ProgramAuthor);
+            UTF8 *Copyright          = UTF8_Encode(CLI->ProgramCopyright);
+            UTF8 *Description        = UTF8_Encode(CLI->ProgramDescription);
+            UTF8 *LicenseName        = UTF8_Encode(CLI->ProgramLicenseName);
+            UTF8 *LicenseDescription = UTF8_Encode(CLI->ProgramLicenseDescription);
+            UTF8 *LicenseURL         = UTF8_Encode(CLI->ProgramLicenseURL);
             
             if (Name != NULL && Version != NULL && Author != NULL && Copyright != NULL) {
                 UTF8 *FormattedString = UTF8_FormatString(U8("%s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, NewLineUTF8);
@@ -663,14 +663,14 @@ extern "C" {
     
     static inline void CommandLineIO_UTF16_DisplayBanner(CommandLineIO *CLI) {
         if (CLI != NULL) {
-            UTF16 *Name               = UTF16_Encode(CLI->ProgramName, UseLEByteOrder);
-            UTF16 *Version            = UTF16_Encode(CLI->ProgramVersion, UseLEByteOrder);
-            UTF16 *Author             = UTF16_Encode(CLI->ProgramAuthor, UseLEByteOrder);
-            UTF16 *Copyright          = UTF16_Encode(CLI->ProgramCopyright, UseLEByteOrder);
-            UTF16 *Description        = UTF16_Encode(CLI->ProgramDescription, UseLEByteOrder);
-            UTF16 *LicenseName        = UTF16_Encode(CLI->ProgramLicenseName, UseLEByteOrder);
-            UTF16 *LicenseDescription = UTF16_Encode(CLI->ProgramLicenseDescription, UseLEByteOrder);
-            UTF16 *LicenseURL         = UTF16_Encode(CLI->ProgramLicenseURL, UseLEByteOrder);
+            UTF16 *Name               = UTF16_Encode(CLI->ProgramName);
+            UTF16 *Version            = UTF16_Encode(CLI->ProgramVersion);
+            UTF16 *Author             = UTF16_Encode(CLI->ProgramAuthor);
+            UTF16 *Copyright          = UTF16_Encode(CLI->ProgramCopyright);
+            UTF16 *Description        = UTF16_Encode(CLI->ProgramDescription);
+            UTF16 *LicenseName        = UTF16_Encode(CLI->ProgramLicenseName);
+            UTF16 *LicenseDescription = UTF16_Encode(CLI->ProgramLicenseDescription);
+            UTF16 *LicenseURL         = UTF16_Encode(CLI->ProgramLicenseURL);
             
             if (Name != NULL && Version != NULL && Author != NULL && Copyright != NULL) {
                 UTF16 *FormattedString = UTF16_FormatString(U16("%s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, NewLineUTF16);
@@ -875,7 +875,7 @@ extern "C" {
     UTF8 *CommandLineIO_UTF8_GetOptionResult(CommandLineIO const *CLI, const int64_t OptionID) {
         UTF8 *Result = NULL;
         if (CLI != NULL && OptionID >= 0 && OptionID <= CLI->NumOptions - 1) {
-            Result = UTF8_Encode(CLI->OptionIDs[OptionID].Argument, RemoveBOM);
+            Result = UTF8_Encode(CLI->OptionIDs[OptionID].Argument);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (OptionID < 0 || OptionID > CLI->NumOptions - 1) {
@@ -887,7 +887,7 @@ extern "C" {
     UTF16 *CommandLineIO_UTF16_GetOptionResult(CommandLineIO const *CLI, const int64_t OptionID) {
         UTF16 *Result = NULL;
         if (CLI != NULL && OptionID >= 0 && OptionID <= CLI->NumOptions - 1) {
-            Result = UTF16_Encode(CLI->OptionIDs[OptionID].Argument, UseLEByteOrder);
+            Result = UTF16_Encode(CLI->OptionIDs[OptionID].Argument);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (OptionID < 0 || OptionID > CLI->NumOptions - 1) {
@@ -928,7 +928,7 @@ extern "C" {
             UTF32 *Decoded     = UTF8_Decode(Path);
             UTF32 *Extension32 = CommandLineIO_UTF32_GetExtension(Decoded);
             free(Decoded);
-            Extension          = UTF8_Encode(Extension32, No);
+            Extension          = UTF8_Encode(Extension32);
         } else {
             Log(Log_ERROR, __func__, U8("Path Pointer is NULL"));
         }
@@ -941,7 +941,7 @@ extern "C" {
             UTF32 *Decoded     = UTF16_Decode(Path);
             UTF32 *Extension32 = CommandLineIO_UTF32_GetExtension(Decoded);
             free(Decoded);
-            Extension          = UTF16_Encode(Extension32, UseLEByteOrder);
+            Extension          = UTF16_Encode(Extension32);
             free(Extension32);
         } else {
             Log(Log_ERROR, __func__, U8("Path Pointer is NULL"));

@@ -403,29 +403,12 @@ extern "C" {
     }
     
     UTF8 *UTF8_AddBOM(UTF8 *String) {
-        UTF8 *StringWithBOM                         = NULL;
+        UTF8 *StringWithBOM = NULL;
         if (String != NULL) {
-            if (String[0] != 0xEF && String[1] != 0xBB && String[2] != 0xBF) {
-                uint64_t StringSizeInCodeUnits      = UTF8_GetStringSizeInCodeUnits(String) + UTF8BOMSizeInCodeUnits + NULLTerminatorSize;
-                StringWithBOM                       = calloc(StringSizeInCodeUnits, sizeof(UTF8));
-                if (StringWithBOM != NULL) {
-                    for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSizeInCodeUnits; CodeUnit++) {
-                        if (CodeUnit != 0 && CodeUnit != 1 && CodeUnit != 2) {
-                            StringWithBOM[CodeUnit] = String[CodeUnit - 2];
-                        } else if (CodeUnit == 0) {
-                            StringWithBOM[CodeUnit] = 0xEF;
-                        } else if (CodeUnit == 1) {
-                            StringWithBOM[CodeUnit] = 0xBB;
-                        } else if (CodeUnit == 2) {
-                            StringWithBOM[CodeUnit] = 0xBF;
-                        }
-                    }
-                } else {
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate StringWithBOM"));
-                }
-            } else {
-                StringWithBOM = String;
-            }
+            UTF32 *String32  = UTF8_Decode(String);
+            UTF32 *BOMAdded  = UTF32_AddBOM(String32, UseBEByteOrder);
+            free(String32);
+            StringWithBOM    = UTF8_Encode(BOMAdded);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -433,29 +416,40 @@ extern "C" {
     }
     
     UTF16 *UTF16_AddBOM(UTF16 *String, StringIOByteOrders BOM2Add) {
-        UTF16   *StringWithBOM        = NULL;
-        uint16_t ByteOrder            = 0;
+        UTF16 *StringWithBOM = NULL;
         if (String != NULL) {
-            if (String[0] != UTF16LE && String[0] != UTF16BE) {
-                uint64_t StringSize   = UTF16_GetStringSizeInCodeUnits(String) + UTF16BOMSizeInCodeUnits + NULLTerminatorSize;
-                StringWithBOM         = calloc(StringSize, sizeof(UTF16));
+            UTF32 *String32  = UTF16_Decode(String);
+            UTF32 *BOMAdded  = UTF32_AddBOM(String32, BOM2Add);
+            free(String32);
+            StringWithBOM    = UTF16_Encode(BOMAdded);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return StringWithBOM;
+    }
+    
+    UTF32 *UTF32_AddBOM(UTF32 *String, StringIOByteOrders BOM2Add) {
+        UTF32   *StringWithBOM        = NULL;
+        UTF32    ByteOrder            = 0;
+        if (String != NULL) {
+            if (String[0] != UTF32LE && String[0] != UTF32BE) {
+                uint64_t StringSize   = UTF32_GetStringSizeInCodePoints(String) + UnicodeBOMSizeInCodePoints + NULLTerminatorSize;
+                StringWithBOM         = calloc(StringSize, sizeof(UTF32));
                 if (StringWithBOM != NULL) {
                     if (BOM2Add == UseNativeByteOrder) {
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                        ByteOrder = UTF16LE;
+                        ByteOrder     = UTF32LE;
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                        ByteOrder = UTF16BE;
+                        ByteOrder     = UTF32BE;
 #endif
-                    } else {
-#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                        ByteOrder = UTF16LE;
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                        ByteOrder = UTF16BE;
-#endif
+                    } else if (BOM2Add == UseLEByteOrder) {
+                        ByteOrder     = UTF32LE;
+                    } else if (BOM2Add == UseBEByteOrder) {
+                        ByteOrder     = UTF32BE;
                     }
                     StringWithBOM[0] = ByteOrder;
-                    for (uint64_t CodeUnit = 1ULL; CodeUnit < StringSize; CodeUnit++) {
-                        StringWithBOM[CodeUnit] = String[CodeUnit - 1];
+                    for (uint64_t CodePoint = 1ULL; CodePoint < StringSize; CodePoint++) {
+                        StringWithBOM[CodePoint] = String[CodePoint + 1];
                     }
                 } else {
                     Log(Log_ERROR, __func__, U8("StringWithBOM couldn't be allocated"));
@@ -648,17 +642,12 @@ extern "C" {
         return DecodedString;
     }
     
-    UTF8 *UTF8_Encode(UTF32 *String, StringIOBOMStates BOM) { // CodePoint = Input, CodeUnit = Output
+    UTF8 *UTF8_Encode(UTF32 *String) {
         uint64_t CodePoint                             = 0ULL;
         uint64_t CodeUnitNum                           = 0ULL;
         UTF8    *EncodedString                         = NULL;
         bool     AddBOM2String                         = No;
         if (String != NULL) {
-            if (BOM == AddBOM || BOM == KeepBOM) {
-                AddBOM2String = Yes;
-            } else {
-                AddBOM2String = No;
-            }
             uint64_t UTF8CodeUnits                     = NULLTerminatorSize + UTF32_GetStringSizeInUTF8CodeUnits(String) + (AddBOM2String == Yes ? UTF8BOMSizeInCodeUnits : 0);
             EncodedString                              = calloc(UTF8CodeUnits, sizeof(UTF8));
             if (EncodedString != NULL) {
@@ -702,32 +691,39 @@ extern "C" {
         return EncodedString;
     }
     
-    UTF16 *UTF16_Encode(UTF32 *String, StringIOByteOrders OutputByteOrder) { // CodePoint = Input, CodeUnit = Output
-        UTF16   *EncodedString                         = NULL;
+    UTF16 *UTF16_Encode(UTF32 *String) {
+        UTF16   *EncodedString                   = NULL;
         if (String != NULL) {
-            uint64_t CodePoint                         = 0ULL;
-            uint64_t NumCodeUnits                      = UTF32_GetStringSizeInUTF16CodeUnits(String) + NULLTerminatorSize;
-            if (String[0] != UTF16LE && String[0] != UTF16BE) {
-                NumCodeUnits                          += 1;
+            uint64_t CodePoint                   = 0ULL;
+            UTF32    ByteOrder                   = 0;
+            uint64_t NumCodeUnits                = UTF32_GetStringSizeInUTF16CodeUnits(String) + NULLTerminatorSize;
+            if (String[0] == UTF32LE || String[0] == UTF32BE) {
+                ByteOrder                        = String[0];
             }
-            EncodedString                              = calloc(NumCodeUnits, sizeof(UTF16));
+            EncodedString                        = calloc(NumCodeUnits, sizeof(UTF16));
             if (EncodedString != NULL) {
+                UTF32 CurrentCodePoint           = 0;
                 do {
-                    if (CodePoint == 0) {
-                        if (OutputByteOrder == UseNativeByteOrder) {
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                            EncodedString[0]       = UTF16LE;
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                            EncodedString[0]       = UTF16BE;
-#endif
-                        }
+                    if (ByteOrder == UTF32BE) {
+                        CurrentCodePoint         = SwapEndian32(String[CodePoint]);
                     } else {
-                        if (String[CodePoint] < UTF16HighSurrogateStart || (String[CodePoint] > UTF16LowSurrogateEnd && String[CodePoint] < UTF16MaxCodePoint)) {
-                            EncodedString[CodePoint]     = String[CodePoint];
-                        } else {
-                            EncodedString[CodePoint]     = ((String[CodePoint] - UTF16SurrogatePairStart) / UTF16SurrogatePairModDividend) + UTF16HighSurrogateStart;
-                            EncodedString[CodePoint + 1] = ((String[CodePoint] - UTF16SurrogatePairStart) % UTF16SurrogatePairModDividend) + UTF16LowSurrogateStart;
-                        }
+                        CurrentCodePoint         = String[CodePoint];
+                    }
+#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+                    if (ByteOrder == UTF32LE) {
+                        CurrentCodePoint         = SwapEndian32(String[CodePoint]);
+                    } else {
+                        CurrentCodePoint         = String[CodePoint];
+                    }
+#endif
+                    if (String[CodePoint] < UTF16HighSurrogateStart || (String[CodePoint] > UTF16LowSurrogateEnd && String[CodePoint] < UTF16MaxCodePoint)) {
+                        EncodedString[CodePoint] = String[CodePoint];
+                        CodePoint               += 1;
+                    } else {
+                        EncodedString[CodePoint] = ((String[CodePoint] - UTF16SurrogatePairStart) / UTF16SurrogatePairModDividend) + UTF16HighSurrogateStart;
+                        CodePoint               += 1;
+                        EncodedString[CodePoint] = ((String[CodePoint] - UTF16SurrogatePairStart) % UTF16SurrogatePairModDividend) + UTF16LowSurrogateStart;
                     }
                 } while (String[CodePoint] != NULLTerminator);
             } else {
@@ -799,7 +795,7 @@ extern "C" {
         if (String != NULL) {
             UTF32 *String32    = UTF8_Decode(String);
             UTF32 *Extracted32 = UTF32_ExtractSubString(String32, Offset, Length);
-            ExtractedSubString = UTF8_Encode(Extracted32, No);
+            ExtractedSubString = UTF8_Encode(Extracted32);
             free(String32);
             free(Extracted32);
         } else if (String == NULL) {
@@ -813,7 +809,7 @@ extern "C" {
         if (String != NULL) {
             UTF32 *String32    = UTF16_Decode(String);
             UTF32 *Extracted32 = UTF32_ExtractSubString(String32, Offset, Length);
-            ExtractedSubString = UTF16_Encode(Extracted32, UseLEByteOrder);
+            ExtractedSubString = UTF16_Encode(Extracted32);
             free(String32);
             free(Extracted32);
         } else if (String == NULL) {
@@ -849,7 +845,7 @@ extern "C" {
             UTF32 *String32      = UTF8_Decode(String);
             UTF32 *Replacement32 = UTF8_Decode(Replacement);
             UTF32 *Replaced32    = UTF32_ReplaceSubString(String32, Replacement32, Offset, Length);
-            Replaced8            = UTF8_Encode(Replaced32, No);
+            Replaced8            = UTF8_Encode(Replaced32);
             free(String32);
             free(Replacement32);
             free(Replaced32);
@@ -869,7 +865,7 @@ extern "C" {
             UTF32 *String32      = UTF16_Decode(String);
             UTF32 *Replacement32 = UTF16_Decode(Replacement);
             UTF32 *Replaced32    = UTF32_ReplaceSubString(String32, Replacement32, Offset, Length);
-            Replaced16           = UTF16_Encode(Replaced32, UseLEByteOrder);
+            Replaced16           = UTF16_Encode(Replaced32);
             free(String32);
             free(Replacement32);
             free(Replaced32);
@@ -929,7 +925,7 @@ extern "C" {
             UTF32 *DecodedString    = UTF8_Decode(String);
             UTF32 *DecodedSubString = UTF8_Decode(SubString2Remove);
             UTF32 *Trimmed32        = UTF32_RemoveSubString(DecodedString, DecodedSubString, Instance2Remove);
-            TrimmedString           = UTF8_Encode(Trimmed32, No);
+            TrimmedString           = UTF8_Encode(Trimmed32);
             free(DecodedString);
             free(DecodedSubString);
             free(Trimmed32);
@@ -947,7 +943,7 @@ extern "C" {
             UTF32 *DecodedString    = UTF16_Decode(String);
             UTF32 *DecodedSubString = UTF16_Decode(SubString2Remove);
             UTF32 *Trimmed32        = UTF32_RemoveSubString(DecodedString, DecodedSubString, Instance2Remove);
-            TrimmedString           = UTF16_Encode(Trimmed32, UseLEByteOrder);
+            TrimmedString           = UTF16_Encode(Trimmed32);
             free(DecodedString);
             free(DecodedSubString);
             free(Trimmed32);
@@ -1082,10 +1078,11 @@ extern "C" {
     UTF8 *UTF8_Clone(UTF8 *String) {
         UTF8 *Copy = NULL;
         if (String != NULL) {
-            bool   HasBOM   = UTF8_StringHasBOM(String);
             UTF32 *String32 = UTF8_Decode(String);
             UTF32 *Clone32  = UTF32_Clone(String32);
-            Copy            = UTF8_Encode(Clone32, HasBOM == Yes ? AddBOM : RemoveBOM);
+            free(String32);
+            Copy            = UTF8_Encode(Clone32);
+            free(Clone32);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -1097,7 +1094,9 @@ extern "C" {
         if (String != NULL) {
             UTF32 *String32 = UTF16_Decode(String);
             UTF32 *Clone32  = UTF32_Clone(String32);
-            Copy            = UTF16_Encode(Clone32, UseNativeByteOrder);
+            free(String32);
+            Copy            = UTF16_Encode(Clone32);
+            free(Clone32);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -1229,7 +1228,7 @@ extern "C" {
             UTF32 *String32   = UTF8_Decode(String);
             UTF32 *CaseFold32 = UTF32_CaseFoldString(String32);
             free(String32);
-            CaseFolded        = UTF8_Encode(CaseFold32, No);
+            CaseFolded        = UTF8_Encode(CaseFold32);
             free(CaseFold32);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -1243,7 +1242,7 @@ extern "C" {
             UTF32 *String32   = UTF16_Decode(String);
             UTF32 *CaseFold32 = UTF32_CaseFoldString(String32);
             free(String32);
-            CaseFolded        = UTF16_Encode(CaseFold32, UseLEByteOrder);
+            CaseFolded        = UTF16_Encode(CaseFold32);
             free(CaseFold32);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -1388,7 +1387,7 @@ extern "C" {
         if (String != NULL && NormalizedForm != UnknownNormalizationForm) {
             UTF32 *String32           = UTF8_Decode(String);
             UTF32 *NormalizedString32 = UTF32_NormalizeString(String32, NormalizedForm);
-            NormalizedString8         = UTF8_Encode(NormalizedString32, No);
+            NormalizedString8         = UTF8_Encode(NormalizedString32);
             free(String32);
             free(NormalizedString32);
         }
@@ -1400,7 +1399,7 @@ extern "C" {
         if (String != NULL && NormalizedForm != UnknownNormalizationForm) {
             UTF32 *String32           = UTF16_Decode(String);
             UTF32 *NormalizedString32 = UTF32_NormalizeString(String32, NormalizedForm);
-            NormalizedString16        = UTF16_Encode(NormalizedString32, UseLEByteOrder);
+            NormalizedString16        = UTF16_Encode(NormalizedString32);
             free(String32);
             free(NormalizedString32);
         }
@@ -1505,14 +1504,14 @@ extern "C" {
     
     UTF8 *UTF8_Integer2String(StringIOBases Base, int64_t Integer2Convert) {
         UTF32 *IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
-        UTF8  *IntegerString8  = UTF8_Encode(IntegerString32, No);
+        UTF8  *IntegerString8  = UTF8_Encode(IntegerString32);
         free(IntegerString32);
         return IntegerString8;
     }
     
     UTF16 *UTF16_Integer2String(StringIOBases Base, int64_t Integer2Convert) {
         UTF32 *IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
-        UTF16 *IntegerString16 = UTF16_Encode(IntegerString32, UseLEByteOrder);
+        UTF16 *IntegerString16 = UTF16_Encode(IntegerString32);
         free(IntegerString32);
         return IntegerString16;
     }
@@ -1591,14 +1590,14 @@ extern "C" {
     
     UTF8 *UTF8_Decimal2String(const StringIOBases Base, double Decimal) {
         UTF32 *String32 = UTF32_Decimal2String(Base, Decimal);
-        UTF8  *String8  = UTF8_Encode(String32, No);
+        UTF8  *String8  = UTF8_Encode(String32);
         free(String32);
         return String8;
     }
     
     UTF16 *UTF16_Decimal2String(const StringIOBases Base, double Decimal) {
         UTF32 *String32 = UTF32_Decimal2String(Base, Decimal);
-        UTF16 *String16 = UTF16_Encode(String32, UseLEByteOrder);
+        UTF16 *String16 = UTF16_Encode(String32);
         free(String32);
         return String16;
     }
@@ -1970,7 +1969,7 @@ extern "C" {
                 SplitString                     = calloc(NumStringParts + 1, sizeof(UTF8*));
                 if (SplitString != NULL) {
                     for (uint64_t StringPart = 0ULL; StringPart < NumStringParts; StringPart++) {
-                        SplitString[StringPart] = UTF8_Encode(SplitString32[StringPart], No);
+                        SplitString[StringPart] = UTF8_Encode(SplitString32[StringPart]);
                     }
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate space for the encoded string pieces"));
@@ -2005,7 +2004,7 @@ extern "C" {
                 SplitString                     = calloc(NumStringParts + 1, sizeof(UTF16*));
                 if (SplitString != NULL) {
                     for (uint64_t StringPart = 0ULL; StringPart < NumStringParts; StringPart++) {
-                        SplitString[StringPart] = UTF16_Encode(SplitString32[StringPart], UseNativeByteOrder);
+                        SplitString[StringPart] = UTF16_Encode(SplitString32[StringPart]);
                     }
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate space for the encoded string pieces"));
@@ -2402,7 +2401,7 @@ extern "C" {
             UTF32 *FormattedString        = FormatString_UTF32(Format32, Details, VariadicArguments);
             va_end(VariadicArguments);
             FormatString_Deinit(Details);
-            Format8                       = UTF8_Encode(FormattedString, No);
+            Format8                       = UTF8_Encode(FormattedString);
             free(Format32);
             free(FormattedString);
         } else {
@@ -2420,7 +2419,7 @@ extern "C" {
             UTF32 *FormattedString        = FormatString_UTF32(Format32, Details, VariadicArguments);
             va_end(VariadicArguments);
             FormatString_Deinit(Details);
-            Format16                      = UTF16_Encode(FormattedString, UseLEByteOrder);
+            Format16                      = UTF16_Encode(FormattedString);
             free(Format32);
             free(FormattedString);
         } else {
@@ -2449,7 +2448,7 @@ extern "C" {
             fputs(String, OutputFile);
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
             UTF32 *String32 = UTF8_Decode(String);
-            UTF16 *String16 = UTF16_Encode(String32, UseLEByteOrder);
+            UTF16 *String16 = UTF16_Encode(String32);
             fputws(String16, OutputFile);
             free(String32);
             free(String16);
@@ -2465,7 +2464,7 @@ extern "C" {
         if (String != NULL && OutputFile != NULL) {
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
             UTF32 *String32 = UTF16_Decode(String);
-            UTF8  *String8  = UTF8_Encode(String32, No);
+            UTF8  *String8  = UTF8_Encode(String32);
             free(String32);
             fputs(String8, OutputFile);
             free(String8);
