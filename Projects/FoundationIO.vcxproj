@@ -104,14 +104,14 @@
         <OutDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\</OutDir>
         <IntDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\Intermediate\</IntDir>
         <EnableManagedIncrementalBuild>false</EnableManagedIncrementalBuild>
-        <CodeAnalysisRuleSet>C:\Program Files (x86)\Visual Studio 2017\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
-        <RunCodeAnalysis>true</RunCodeAnalysis>
+        <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+        <RunCodeAnalysis>false</RunCodeAnalysis>
         <EnableCppCoreCheck>true</EnableCppCoreCheck>
         <ExtensionsToDeleteOnClean>*.bi;*.bsc;*.cache;*.cdf;*.exp;*.idb;*.ilk;*.iobj;*.ipdb;*.lib;*.lib.intermediate.manifest;*.lib.manifest;*.manifest;*.meta;*.metagen;*.obj;*.obj.enc;*.pch;*.pdb;*.pgc;*.pgd;*.rep;*.res;*.resources;*.rsp;*.sbr;*.tlb;*.tlh;*.tli;*.tlog;*.tmp;*.xdc;*.xml;*_manifest.rc;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-        <CodeAnalysisRuleSet>C:\Program Files (x86)\Visual Studio 2017\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
-        <RunCodeAnalysis>true</RunCodeAnalysis>
+        <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+        <RunCodeAnalysis>false</RunCodeAnalysis>
         <EnableCppCoreCheck>true</EnableCppCoreCheck>
         <ExtensionsToDeleteOnClean>*.bi;*.bsc;*.cache;*.cdf;*.exp;*.idb;*.ilk;*.iobj;*.ipdb;*.lib;*.lib.intermediate.manifest;*.lib.manifest;*.manifest;*.meta;*.metagen;*.obj;*.obj.enc;*.pch;*.pdb;*.pgc;*.pgd;*.rep;*.res;*.resources;*.rsp;*.sbr;*.tlb;*.tlh;*.tli;*.tlog;*.tmp;*.xdc;*.xml;*_manifest.rc;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
         <EnableManagedIncrementalBuild>false</EnableManagedIncrementalBuild>
@@ -122,14 +122,14 @@
         <OutDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\</OutDir>
         <IntDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\Intermediate\</IntDir>
         <EnableManagedIncrementalBuild>false</EnableManagedIncrementalBuild>
-        <CodeAnalysisRuleSet>C:\Program Files (x86)\Visual Studio 2017\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
-        <RunCodeAnalysis>true</RunCodeAnalysis>
+        <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+        <RunCodeAnalysis>false</RunCodeAnalysis>
         <EnableCppCoreCheck>true</EnableCppCoreCheck>
         <ExtensionsToDeleteOnClean>*.bi;*.bsc;*.cache;*.cdf;*.exp;*.idb;*.ilk;*.iobj;*.ipdb;*.lib;*.lib.intermediate.manifest;*.lib.manifest;*.manifest;*.meta;*.metagen;*.obj;*.obj.enc;*.pch;*.pdb;*.pgc;*.pgd;*.rep;*.res;*.resources;*.rsp;*.sbr;*.tlb;*.tlh;*.tli;*.tlog;*.tmp;*.xdc;*.xml;*_manifest.rc;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-        <CodeAnalysisRuleSet>C:\Program Files (x86)\Visual Studio 2017\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
-        <RunCodeAnalysis>true</RunCodeAnalysis>
+        <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+        <RunCodeAnalysis>false</RunCodeAnalysis>
         <EnableCppCoreCheck>true</EnableCppCoreCheck>
         <ExtensionsToDeleteOnClean>*.bi;*.bsc;*.cache;*.cdf;*.exp;*.idb;*.ilk;*.iobj;*.ipdb;*.lib;*.lib.intermediate.manifest;*.lib.manifest;*.manifest;*.meta;*.metagen;*.obj;*.obj.enc;*.pch;*.pdb;*.pgc;*.pgd;*.rep;*.res;*.resources;*.rsp;*.sbr;*.tlb;*.tlh;*.tli;*.tlog;*.tmp;*.xdc;*.xml;*_manifest.rc;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
         <EnableManagedIncrementalBuild>false</EnableManagedIncrementalBuild>
@@ -138,7 +138,7 @@
     </PropertyGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
         <ClCompile>
-            <WarningLevel>Level1</WarningLevel>
+            <WarningLevel>Level3</WarningLevel>
             <PrecompiledHeader>NotUsing</PrecompiledHeader>
             <Optimization>Full</Optimization>
             <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -175,7 +175,7 @@
             <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
             <BrowseInformation>true</BrowseInformation>
             <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-            <EnablePREfast>true</EnablePREfast>
+            <EnablePREfast>false</EnablePREfast>
             <CompileAsWinRT>false</CompileAsWinRT>
             <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
             <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
@@ -193,6 +193,7 @@
             <Verbose>true</Verbose>
             <Name>FoundationIO</Name>
             <ErrorReporting>SendErrorReport</ErrorReporting>
+            <UseUnicodeResponseFiles>true</UseUnicodeResponseFiles>
         </Lib>
         <Bscmake>
             <PreserveSbr>false</PreserveSbr>
@@ -200,7 +201,7 @@
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
         <ClCompile>
-            <WarningLevel>Level1</WarningLevel>
+            <WarningLevel>Level3</WarningLevel>
             <PrecompiledHeader>NotUsing</PrecompiledHeader>
             <Optimization>Full</Optimization>
             <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -237,7 +238,7 @@
             <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
             <BrowseInformation>true</BrowseInformation>
             <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-            <EnablePREfast>true</EnablePREfast>
+            <EnablePREfast>false</EnablePREfast>
             <CompileAsWinRT>false</CompileAsWinRT>
             <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
             <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
@@ -254,6 +255,7 @@
             <Verbose>true</Verbose>
             <Name>FoundationIO</Name>
             <ErrorReporting>SendErrorReport</ErrorReporting>
+            <UseUnicodeResponseFiles>true</UseUnicodeResponseFiles>
         </Lib>
         <Bscmake>
             <PreserveSbr>false</PreserveSbr>
@@ -261,7 +263,7 @@
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
         <ClCompile>
-            <WarningLevel>Level1</WarningLevel>
+            <WarningLevel>Level3</WarningLevel>
             <PrecompiledHeader>NotUsing</PrecompiledHeader>
             <Optimization>Full</Optimization>
             <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -298,7 +300,7 @@
             <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
             <BrowseInformation>true</BrowseInformation>
             <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-            <EnablePREfast>true</EnablePREfast>
+            <EnablePREfast>false</EnablePREfast>
             <CompileAsWinRT>false</CompileAsWinRT>
             <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
             <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
@@ -319,6 +321,7 @@
             <Name>FoundationIO</Name>
             <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
             <ErrorReporting>SendErrorReport</ErrorReporting>
+            <UseUnicodeResponseFiles>true</UseUnicodeResponseFiles>
         </Lib>
         <Bscmake>
             <PreserveSbr>false</PreserveSbr>
@@ -326,7 +329,7 @@
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
         <ClCompile>
-            <WarningLevel>Level1</WarningLevel>
+            <WarningLevel>Level3</WarningLevel>
             <PrecompiledHeader>NotUsing</PrecompiledHeader>
             <Optimization>Full</Optimization>
             <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -363,7 +366,7 @@
             <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
             <BrowseInformation>true</BrowseInformation>
             <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-            <EnablePREfast>true</EnablePREfast>
+            <EnablePREfast>false</EnablePREfast>
             <CompileAsWinRT>false</CompileAsWinRT>
             <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
             <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
@@ -383,6 +386,7 @@
             <Verbose>true</Verbose>
             <Name>FoundationIO</Name>
             <ErrorReporting>SendErrorReport</ErrorReporting>
+            <UseUnicodeResponseFiles>true</UseUnicodeResponseFiles>
         </Lib>
         <Bscmake>
             <PreserveSbr>false</PreserveSbr>
