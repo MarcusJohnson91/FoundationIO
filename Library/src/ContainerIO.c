@@ -55,7 +55,7 @@ extern "C" {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate the AudioContainer"));
             }
         } else if (BitDepth == 0) {
-            Log(Log_ERROR, __func__, U8("BitDepth %d is invalid"), BitDepth);
+            Log(Log_ERROR, __func__, U8("BitDepth %llu is invalid"), BitDepth);
         } else if (NumChannels == 0) {
             Log(Log_ERROR, __func__, U8("NumChannels %llu is invalid"), NumChannels);
         } else if (NumSamples == 0) {
@@ -363,9 +363,9 @@ extern "C" {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate the ImageContainer"));
             }
         } else if (BitDepth == 0) {
-            Log(Log_ERROR, __func__, U8("BitDepth %d is invalid"), BitDepth);
+            Log(Log_ERROR, __func__, U8("BitDepth %llu is invalid"), BitDepth);
         } else if (NumChannels == 0) {
-            Log(Log_ERROR, __func__, U8("NumChannels %d is invalid"), NumChannels);
+            Log(Log_ERROR, __func__, U8("NumChannels %llu is invalid"), NumChannels);
         } else if (Width == 0) {
             Log(Log_ERROR, __func__, U8("Width %llu is invalid"), Width);
         } else if (Height == 0) {
@@ -380,7 +380,7 @@ extern "C" {
         } else if (Image == NULL) {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         } else if (Index >= Image->NumChannels) {
-            Log(Log_ERROR, __func__, U8("Channel %d is out of bounds %d"), Index, Image->NumChannels - 1);
+            Log(Log_ERROR, __func__, U8("Channel %llu is out of bounds %llu"), Index, Image->NumChannels - 1);
         }
     }
     
