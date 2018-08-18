@@ -41,13 +41,13 @@ extern "C" {
     
     typedef               uint_least8_t                        UTF8;
     
-#ifdef char16_t
+#ifdef __STD_UTF_16__
     typedef               char16_t                             UTF16;
 #else
     typedef               uint_least16_t                       UTF16;
 #endif
     
-#ifdef char32_t
+#ifdef __STD_UTF_32__
     typedef               char32_t                             UTF32;
 #else
     typedef               uint_least32_t                       UTF32;
