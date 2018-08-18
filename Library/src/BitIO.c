@@ -684,7 +684,7 @@ extern "C" {
             }
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
             bool   StringHasPathPrefix  = UTF8_StringHasWinPathPrefix(Path2Open);
-            BitO->FileSpecifierExists   = UTF8_StringHasFormatSpecifier(PrefixPath);
+            BitO->FileSpecifierExists   = UTF8_StringHasFormatSpecifier(Path2Open);
             UTF32 *Path32               = UTF8_Decode(Path2Open);
             if (StringHasPathPrefix == No) {
                 bool   StringHasBOM     = UTF8_StringHasBOM(Path2Open);
@@ -721,13 +721,18 @@ extern "C" {
             }
             if (BitO->FileSpecifierExists == Yes) {
                 UTF32 *Formatted        = UTF32_FormatString(BitO->OutputPath.Path32, BitO->FileSpecifierNum);
+                UTF8  *Formatted8       = UTF8_Encode(Formatted);
+                FoundationIO_FileOpen(Formatted8, U8("rb"));
+            } else {
+                UTF8 *Formatted8        = UTF8_Encode(BitO->OutputPath.Path32);
+                FoundationIO_FileOpen(Formatted8, U8("rb"));
             }
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
-            bool   StringHasPathPrefix  = UTF8_StringHasWinPathPrefix(Path2Open);
-            BitO->FileSpecifierExists   = UTF8_StringHasFormatSpecifier(PrefixPath);
-            UTF32 *Path32               = UTF8_Decode(Path2Open);
+            bool   StringHasPathPrefix  = UTF16_StringHasWinPathPrefix(Path2Open);
+            BitO->FileSpecifierExists   = UTF16_StringHasFormatSpecifier(Path2Open);
+            UTF32 *Path32               = UTF16_Decode(Path2Open);
             if (StringHasPathPrefix == No) {
-                bool   StringHasBOM     = UTF8_StringHasBOM(Path2Open);
+                bool   StringHasBOM     = UTF16_StringHasBOM(Path2Open);
                 UTF32 *PrefixPath       = UTF32_Insert(Path32, U32("\\\\\?\\"), StringHasBOM == Yes ? UTF16BOMSizeInCodeUnits : 0);
                 BitO->OutputPath.Path16 = UTF16_Encode(PrefixPath);
             } else {
