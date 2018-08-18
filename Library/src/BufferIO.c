@@ -234,9 +234,9 @@ extern "C" {
                     }
                     Byte                              = BitB->Buffer[ByteOffset] & BitMask;
                     if (BitOrder == LSBitFirst) {
-                        Byte                          = Byte >> (8 - Bits2InsertForThisByte);
+                        Byte                        >>= 8 - Bits2InsertForThisByte;
                     } else if (BitOrder == MSBitFirst) {
-                        Byte                          = Byte << (8 - Bits2InsertForThisByte);
+                        Byte                        <<= 8 - Bits2InsertForThisByte;
                     }
                 }
             }
@@ -272,9 +272,9 @@ extern "C" {
                     }
                     Byte                              = BitB->Buffer[ByteOffset] & BitMask;
                     if (BitOrder == LSBitFirst) {
-                        Byte                          = Byte >> (8 - Bits2ExtractFromThisByte);
+                        Byte                        >>= 8 - Bits2ExtractFromThisByte;
                     } else if (BitOrder == MSBitFirst) {
-                        Byte                          = Byte << (8 - Bits2ExtractFromThisByte);
+                        Byte                        <<= 8 - Bits2ExtractFromThisByte;
                     }
                     ExtractedBits                     = Byte;
                 }
