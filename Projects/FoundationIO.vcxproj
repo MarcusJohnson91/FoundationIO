@@ -23,7 +23,6 @@
         <ClCompile Include="..\libFoundationIO\src\CommandLineIO.c" />
         <ClCompile Include="..\libFoundationIO\src\ContainerIO.c" />
         <ClCompile Include="..\libFoundationIO\src\Log.c" />
-        <ClCompile Include="..\libFoundationIO\src\Macros.c" />
         <ClCompile Include="..\libFoundationIO\src\Math.c" />
         <ClCompile Include="..\libFoundationIO\src\StringIO.c" />
     </ItemGroup>

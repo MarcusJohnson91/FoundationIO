@@ -13,9 +13,6 @@
         <ClCompile Include="..\libFoundationIO\src\Log.c">
             <Filter>Source Files</Filter>
         </ClCompile>
-        <ClCompile Include="..\libFoundationIO\src\Macros.c">
-            <Filter>Source Files</Filter>
-        </ClCompile>
         <ClCompile Include="..\libFoundationIO\src\Math.c">
             <Filter>Source Files</Filter>
         </ClCompile>
