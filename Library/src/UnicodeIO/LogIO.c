@@ -1,3 +1,4 @@
+#include "../include/Macros.h"
 #include "../include/Log.h"            /* Included for the Log declarations */
 
 #ifdef __cplusplus

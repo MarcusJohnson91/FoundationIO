@@ -1,3 +1,4 @@
+#include "../include/Macros.h"
 #include "../include/ContainerIO.h"    /* Included for our declarations */
 #include "../include/Log.h"            /* Included for error reporting */
 #include "../include/Math.h"           /* Included for Absolute */

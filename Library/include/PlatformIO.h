@@ -291,19 +291,19 @@ extern "C" {
 #endif
     
 #ifndef FoundationIOCompilerIsUnknown
-#define FoundationIOCompilerIsUnknown 0
+#define FoundationIOCompilerIsUnknown           0
 #endif
     
 #ifndef FoundationIOCompilerIsClang
-#define FoundationIOCompilerIsClang 1
+#define FoundationIOCompilerIsClang             1
 #endif
     
 #ifndef FoundationIOCompilerIsMSVC
-#define FoundationIOCompilerIsMSVC 2
+#define FoundationIOCompilerIsMSVC              2
 #endif
     
 #ifndef FoundationIOCompiler
-#if   defined(__clang__)
+#if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
 #define FoundationIOCompiler (FoundationIOCompilerIsClang)
 #elif defined(_MSC_VER)
 #define FoundationIOCompiler (FoundationIOCompilerIsMSVC)

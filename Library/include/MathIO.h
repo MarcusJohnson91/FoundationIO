@@ -1,6 +1,7 @@
-#include "Macros.h"                   /* Included for u/intX_t, bool, Yes/No macros, FoundationIOTargetOS */
+#include <stdint.h>
+#include <stdbool.h>
 
-#if   (defined __STDC_VERSION__ && __STDC_VERSION__ >= 201112L)
+#if   (defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L)
 #include      <tgmath.h>
 #elif (defined __STDC_NO_COMPLEX__)
 #include      <math.h>
@@ -78,7 +79,7 @@ extern "C" {
      @param                     Value2Swap                      "Data to swap endian".
      @return                                                    "Returns swapped uint64_t".
      */
-    uint64_t  SwapEndian64(const uint64_t Value2Swap);
+    uint64_t                    SwapEndian64(const uint64_t Value2Swap);
     
     /*!
      @abstract                                                  "Computes the number of bits from the number of bytes".

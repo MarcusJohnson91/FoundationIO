@@ -1,4 +1,5 @@
-#include "Macros.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 #pragma  once
 
