@@ -18,7 +18,7 @@
 		2C7C58EB20C42B8C0070B890 /* CommandLineIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58DA20C42ADB0070B890 /* CommandLineIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C7C58EC20C42B8C0070B890 /* ContainerIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D620C42ADB0070B890 /* ContainerIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C7C58ED20C42B8C0070B890 /* Log.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D520C42ADB0070B890 /* Log.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C7C58EE20C42B8C0070B890 /* Macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D820C42ADB0070B890 /* Macros.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2C7C58EE20C42B8C0070B890 /* Macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D820C42ADB0070B890 /* Macros.h */; };
 		2C7C58EF20C42B8C0070B890 /* Math.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D420C42ADB0070B890 /* Math.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C7C58F020C42B8C0070B890 /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D920C42ADB0070B890 /* StringIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
@@ -116,9 +116,9 @@
 				2C7C58EB20C42B8C0070B890 /* CommandLineIO.h in Headers */,
 				2C7C58EC20C42B8C0070B890 /* ContainerIO.h in Headers */,
 				2C7C58ED20C42B8C0070B890 /* Log.h in Headers */,
-				2C7C58EE20C42B8C0070B890 /* Macros.h in Headers */,
 				2C7C58EF20C42B8C0070B890 /* Math.h in Headers */,
 				2C7C58F020C42B8C0070B890 /* StringIO.h in Headers */,
+				2C7C58EE20C42B8C0070B890 /* Macros.h in Headers */,
 				2C7C58DB20C42ADB0070B890 /* StringIOTables.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -256,6 +256,7 @@
 				MODULE_NAME = FoundationIO;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
@@ -323,6 +324,7 @@
 				MODULEMAP_FILE = ../libFoundationIO/FoundationIO.modulemap;
 				MODULE_NAME = FoundationIO;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = "";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
@@ -370,14 +372,21 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GENERATE_PROFILING_CODE = YES;
 				INFOPLIST_OUTPUT_FORMAT = binary;
+				INSTALL_PATH = /usr/local/lib/FoundationIO;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LINKER_DISPLAYS_MANGLED_NAMES = YES;
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				OTHER_CFLAGS = "-Wpadded";
+				OTHER_CFLAGS = (
+					"-Wpadded",
+					"-ffunction-sections",
+					"-fdata-sections",
+				);
 				PLIST_FILE_OUTPUT_FORMAT = binary;
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
+				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/FoundationIO/Private;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = /usr/local/include/FoundationIO;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
@@ -441,14 +450,21 @@
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				INFOPLIST_OUTPUT_FORMAT = binary;
+				INSTALL_PATH = /usr/local/lib/FoundationIO;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LINKER_DISPLAYS_MANGLED_NAMES = YES;
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				OTHER_CFLAGS = "-Wpadded";
+				OTHER_CFLAGS = (
+					"-Wpadded",
+					"-ffunction-sections",
+					"-fdata-sections",
+				);
 				PLIST_FILE_OUTPUT_FORMAT = binary;
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
+				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/FoundationIO/Private;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = /usr/local/include/FoundationIO;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
