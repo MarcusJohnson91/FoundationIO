@@ -1,3 +1,4 @@
+#include "../include/Macros.h"
 #include "../include/Math.h"           /* Included for our declarations */
 
 #ifdef __cplusplus

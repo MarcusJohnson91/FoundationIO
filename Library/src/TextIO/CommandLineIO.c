@@ -1,3 +1,4 @@
+#include "../include/Macros.h"
 #include "../include/CommandLineIO.h"  /* Included for the CommandLineIO declarations */
 #include "../include/Log.h"            /* Included for Log */
 

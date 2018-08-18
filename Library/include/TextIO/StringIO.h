@@ -1,4 +1,14 @@
-#include "Macros.h"                   /* Included for u/intX_t, bool, Yes/No macros, FoundationIOTargetOS, NULLTerminator */
+#if (defined(__APPLE__) && defined(__MACH__)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(__ANDROID__) || defined(__minix) || defined(__linux__) || defined(__unix__) || defined(_POSIX_C_SOURCE)
+#ifdef  _FILE_OFFSET_BITS
+#undef  _FILE_OFFSET_BITS
+#define _FILE_OFFSET_BITS 64
+#else
+#define _FILE_OFFSET_BITS 64
+#endif /* _FILE_OFFSET_BITS */
+#endif /* Various UNIX Platforms */
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
 
 #pragma once
 
@@ -815,17 +825,17 @@ extern "C" {
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
-#if     (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
     UTF8                 *UTF8_FormatString(UTF8 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
-#elif   (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif defined(_MSC_VER)
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF8                 *UTF8_FormatString(__format_string UTF8 *Format, ...);
 #elif    (_MSC_VER >= 1500)
     UTF8                 *UTF8_FormatString(_Printf_format_string_ UTF8 *Format, ...);
 #else
     UTF8                 *UTF8_FormatString(UTF8 *Format, ...);
-#endif /* _MSC_VER */
-#endif/* FoundationIOTargetOS */
+#endif /* MSVC Version */
+#endif /* Compiler */
     
     
     
@@ -835,17 +845,17 @@ extern "C" {
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
-#if     (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
     UTF16                *UTF16_FormatString(UTF16 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
-#elif   (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif defined(_MSC_VER)
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF16                *UTF16_FormatString(__format_string UTF16 *Format, ...);
 #elif    (_MSC_VER >= 1500)
     UTF16                *UTF16_FormatString(_Printf_format_string_ UTF16 *Format, ...);
 #else
     UTF16                *UTF16_FormatString(UTF16 *Format, ...);
-#endif /* _MSC_VER */
-#endif/* FoundationIOTargetOS */
+#endif /* MSVC Version */
+#endif /* Compiler */
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
@@ -853,17 +863,17 @@ extern "C" {
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
-#if     (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
     UTF32                *UTF32_FormatString(UTF32 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
-#elif   (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif defined(_MSC_VER)
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF32                *UTF32_FormatString(__format_string UTF32 *Format, ...);
 #elif    (_MSC_VER >= 1500)
     UTF32                *UTF32_FormatString(_Printf_format_string_ UTF32 *Format, ...);
 #else
     UTF32                *UTF32_FormatString(UTF32 *Format, ...);
-#endif /* _MSC_VER */
-#endif/* FoundationIOTargetOS */
+#endif /* MSVC Version */
+#endif /* Compiler */
     
     /*!
      @abstract                             "Writes a UTF-8 encoded string to the OutputFile using the platform's default Unicode encoding".
