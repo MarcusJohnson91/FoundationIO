@@ -40,7 +40,13 @@ extern "C" {
      @abstract                                                  "Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in LogFile".
      @param                     LogFilePath                     "Path to the log file to open/create".
      */
-    extern void                 Log_OpenFile(UTF8 *restrict LogFilePath);
+    extern void                 Log_UTF8_OpenFile(UTF8 *LogFilePath);
+    
+    /*!
+     @abstract                                                  "Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in LogFile".
+     @param                     LogFilePath                     "Path to the log file to open/create".
+     */
+    extern void                 Log_UTF16_OpenFile(UTF16 *LogFilePath);
     
     /*!
      @abstract                                                  "Logs to the LogFile, which can be a user specified path, otherwise it's STDERR".
