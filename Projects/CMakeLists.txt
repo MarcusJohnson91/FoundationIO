@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
-project(libFoundationIO)
+project(FoundationIO)
 
 add_definitions(-D_LARGEFILE_SOURCE)
 add_definitions(-D_LARGEFILE64_SOURCE)
@@ -15,10 +15,8 @@ set(libFoundationIO_Headers
 	"${libFoundationIO_Dir}/include/CommandLineIO.h"
 	"${libFoundationIO_Dir}/include/ContainerIO.h"
 	"${libFoundationIO_Dir}/include/Log.h"
-	"${libFoundationIO_Dir}/include/Macros.h"
 	"${libFoundationIO_Dir}/include/Math.h"
 	"${libFoundationIO_Dir}/include/StringIO.h"
-	"${libFoundationIO_Dir}/include/StringIOTables.h"
 )
 
 set(libFoundationIO_Sources
@@ -26,7 +24,6 @@ set(libFoundationIO_Sources
 	"${libFoundationIO_Dir}/src/CommandLineIO.c"
 	"${libFoundationIO_Dir}/src/ContainerIO.c"
 	"${libFoundationIO_Dir}/src/Log.c"
-	"${libFoundationIO_Dir}/src/Macros.c"
 	"${libFoundationIO_Dir}/src/Math.c"
 	"${libFoundationIO_Dir}/src/StringIO.c"
 )
