@@ -38,10 +38,10 @@ extern "C" {
      @enum                      CLIOptionTypes
      @abstract                                                  "Defines the type of Option".
      @constant                  UnknownSwitchType               "Unknown Option type".
-     @constant                  SwitchHasArgMayHaveSlaves       "The Option may have slaves, but it may not too".
-     @constant                  SwitchHasArgNoSlaves            "The Option can not have any slaves".
-     @constant                  SwitchNoArgMayHaveSlaves        "The Option is a slave".
-     @constant                  SwitchNoArgNoSlaves             "The Option can not have any slaves, or any arguments, it just exists or doesn't exist".
+     @constant                  OptionHasArgMayHaveSlaves       "The Option may have slaves, but it may not too".
+     @constant                  OptionHasArgNoSlaves            "The Option can not have any slaves".
+     @constant                  OptionNoArgMayHaveSlaves        "The Option is a slave".
+     @constant                  OptionNoArgNoSlaves             "The Option can not have any slaves, or any arguments, it just exists or doesn't exist".
      */
     typedef enum CLIOptionTypes {
                                 UnknownOptionType               = 0,
