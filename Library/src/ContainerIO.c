@@ -36,17 +36,17 @@ extern "C" {
                 Audio->NumSamples  = NumSamples;
                 Audio->ChannelMask = calloc(NumChannels, sizeof(Audio_ChannelMask));
                 if (Type == AudioContainer_UInteger8) {
-                    Audio->Samples.UInteger8 = calloc(NumChannels * NumSamples, sizeof(uint8_t));
+                    Audio->Samples.UInteger8 = calloc(NumChannels * NumSamples, 1);
                 } else if (Type == AudioContainer_SInteger8) {
-                    Audio->Samples.SInteger8 = calloc(NumChannels * NumSamples, sizeof(int8_t));
+                    Audio->Samples.SInteger8 = calloc(NumChannels * NumSamples, 1);
                 } else if (Type == AudioContainer_UInteger16) {
-                    Audio->Samples.UInteger16 = calloc(NumChannels * NumSamples, sizeof(uint16_t));
+                    Audio->Samples.UInteger16 = calloc(NumChannels * NumSamples, 2);
                 } else if (Type == AudioContainer_SInteger16) {
-                    Audio->Samples.SInteger16 = calloc(NumChannels * NumSamples, sizeof(int16_t));
+                    Audio->Samples.SInteger16 = calloc(NumChannels * NumSamples, 2);
                 } else if (Type == AudioContainer_UInteger32) {
-                    Audio->Samples.UInteger32 = calloc(NumChannels * NumSamples, sizeof(uint32_t));
+                    Audio->Samples.UInteger32 = calloc(NumChannels * NumSamples, 4);
                 } else if (Type == AudioContainer_SInteger32) {
-                    Audio->Samples.SInteger32 = calloc(NumChannels * NumSamples, sizeof(int32_t));
+                    Audio->Samples.SInteger32 = calloc(NumChannels * NumSamples, 4);
                 }
                 if (Audio->Samples.UInteger8 == NULL && Audio->Samples.SInteger8 == NULL && Audio->Samples.UInteger16 == NULL && Audio->Samples.SInteger16 == NULL && Audio->Samples.UInteger32 == NULL && Audio->Samples.SInteger32 == NULL) {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate room for the samples"));
@@ -340,21 +340,21 @@ extern "C" {
                 Image->ChannelMask           = calloc(NumChannels, sizeof(Image_ChannelMask));
                 
                 if (Type == ImageContainer_2DUInteger8) {
-                    Image->Pixels.UInteger8  = calloc(NumChannels * Width * Height, sizeof(int8_t));
+                    Image->Pixels.UInteger8  = calloc(NumChannels * Width * Height, 1);
                 } else if (Type == ImageContainer_2DSInteger8) {
-                    Image->Pixels.SInteger8  = calloc(NumChannels * Width * Height, sizeof(uint8_t));
+                    Image->Pixels.SInteger8  = calloc(NumChannels * Width * Height, 1);
                 } else if (Type == ImageContainer_2DUInteger16) {
-                    Image->Pixels.UInteger8  = calloc(NumChannels * Width * Height, sizeof(uint16_t));
+                    Image->Pixels.UInteger16 = calloc(NumChannels * Width * Height, 2);
                 } else if (Type == ImageContainer_2DSInteger16) {
-                    Image->Pixels.SInteger8  = calloc(NumChannels * Width * Height, sizeof(int16_t));
+                    Image->Pixels.SInteger16 = calloc(NumChannels * Width * Height, 2);
                 } else if (Type == ImageContainer_3DUInteger8) {
-                    Image->Pixels.UInteger8  = calloc(2 * NumChannels * Width * Height, sizeof(int8_t));
+                    Image->Pixels.UInteger8  = calloc(2 * NumChannels * Width * Height, 1);
                 } else if (Type == ImageContainer_3DSInteger8) {
-                    Image->Pixels.SInteger8  = calloc(2 * NumChannels * Width * Height, sizeof(int8_t));
+                    Image->Pixels.SInteger8  = calloc(2 * NumChannels * Width * Height, 1);
                 } else if (Type == ImageContainer_3DUInteger16) {
-                    Image->Pixels.UInteger16 = calloc(2 * NumChannels * Width * Height, sizeof(uint16_t));
+                    Image->Pixels.UInteger16 = calloc(2 * NumChannels * Width * Height, 2);
                 } else if (Type == ImageContainer_3DSInteger16) {
-                    Image->Pixels.SInteger16 = calloc(2 * NumChannels * Width * Height, sizeof(int16_t));
+                    Image->Pixels.SInteger16 = calloc(2 * NumChannels * Width * Height, 2);
                 }
                 if (Image->Pixels.UInteger8 == NULL && Image->Pixels.SInteger8 == NULL && Image->Pixels.UInteger16 == NULL && Image->Pixels.SInteger16 == NULL) {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate room for the pixels"));
