@@ -40,59 +40,6 @@ extern "C" {
         AudioContainer_SInteger32   = 6,
     } Audio_Types;
     
-    typedef enum Image_Views {
-        UnknownView                 = 0,
-        View2D                      = 1,
-        LeftEyeView                 = 2,
-        RightEyeView                = 3,
-    } Image_Views;
-    
-    typedef enum Image_ChannelMask {
-        Image_UnknownChannel        =  0,
-        Grayscale2D                 =  1,
-        Red2D                       =  2,
-        Green2D                     =  3,
-        Green_2_2D                  =  4,
-        Blue2D                      =  5,
-        Alpha2D                     =  6,
-        Luma2D                      =  7,
-        Chroma_1_2D                 =  8,
-        Chroma_2_2D                 =  9,
-        Chroma_3_2D                 = 10,
-        Grayscale3D_L               = 11,
-        Red3D_L                     = 12,
-        Green3D_L                   = 13,
-        Blue3D_L                    = 14,
-        Green3D_2_L                 = 15,
-        Alpha3D_L                   = 16,
-        Luma3D_L                    = 17,
-        Chroma_1_3D_L               = 18,
-        Chroma_2_3D_L               = 19,
-        Chroma_3_3D_L               = 20,
-        Grayscale3D_R               = 21,
-        Red3D_R                     = 22,
-        Green3D_R                   = 23,
-        Blue3D_R                    = 24,
-        Green3D_2_R                 = 25,
-        Alpha3D_R                   = 26,
-        Luma3D_R                    = 27,
-        Chroma_1_3D_R               = 28,
-        Chroma_2_3D_R               = 29,
-        Chroma_3_3D_R               = 30,
-    } Image_ChannelMask;
-    
-    typedef enum Image_Types {
-        ImageContainer_UnknownType  = 0,
-        ImageContainer_2DUInteger8  = 1,
-        ImageContainer_2DSInteger8  = 2,
-        ImageContainer_2DUInteger16 = 3,
-        ImageContainer_2DSInteger16 = 4,
-        ImageContainer_3DUInteger8  = 5,
-        ImageContainer_3DSInteger8  = 6,
-        ImageContainer_3DUInteger16 = 7,
-        ImageContainer_3DSInteger16 = 8,
-    } Image_Types;
-    
     typedef struct          AudioContainer AudioContainer;
     
     /*!
@@ -188,6 +135,59 @@ extern "C" {
      @param                 Audio          "A pointer to the instance of an AudioContainer in question".
      */
     void                    AudioContainer_Deinit(AudioContainer *Audio);
+    
+    typedef enum Image_Views {
+        UnknownView                 = 0,
+        View2D                      = 1,
+        LeftEyeView                 = 2,
+        RightEyeView                = 3,
+    } Image_Views;
+    
+    typedef enum Image_ChannelMask {
+        Image_UnknownChannel        =  0,
+        Grayscale2D                 =  1,
+        Red2D                       =  2,
+        Green2D                     =  3,
+        Green_2_2D                  =  4,
+        Blue2D                      =  5,
+        Alpha2D                     =  6,
+        Luma2D                      =  7,
+        Chroma_1_2D                 =  8,
+        Chroma_2_2D                 =  9,
+        Chroma_3_2D                 = 10,
+        Grayscale3D_L               = 11,
+        Red3D_L                     = 12,
+        Green3D_L                   = 13,
+        Blue3D_L                    = 14,
+        Green3D_2_L                 = 15,
+        Alpha3D_L                   = 16,
+        Luma3D_L                    = 17,
+        Chroma_1_3D_L               = 18,
+        Chroma_2_3D_L               = 19,
+        Chroma_3_3D_L               = 20,
+        Grayscale3D_R               = 21,
+        Red3D_R                     = 22,
+        Green3D_R                   = 23,
+        Blue3D_R                    = 24,
+        Green3D_2_R                 = 25,
+        Alpha3D_R                   = 26,
+        Luma3D_R                    = 27,
+        Chroma_1_3D_R               = 28,
+        Chroma_2_3D_R               = 29,
+        Chroma_3_3D_R               = 30,
+    } Image_ChannelMask;
+    
+    typedef enum Image_Types {
+        ImageContainer_UnknownType  = 0,
+        ImageContainer_2DUInteger8  = 1,
+        ImageContainer_2DSInteger8  = 2,
+        ImageContainer_2DUInteger16 = 3,
+        ImageContainer_2DSInteger16 = 4,
+        ImageContainer_3DUInteger8  = 5,
+        ImageContainer_3DSInteger8  = 6,
+        ImageContainer_3DUInteger16 = 7,
+        ImageContainer_3DSInteger16 = 8,
+    } Image_Types;
     
     typedef struct          ImageContainer ImageContainer;
     
