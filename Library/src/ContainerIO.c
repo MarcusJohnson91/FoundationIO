@@ -125,18 +125,18 @@ extern "C" {
     void **AudioContainer_GetArray(AudioContainer *Audio) {
         void **AudioArray = NULL;
         if (Audio != NULL) {
-            if (Audio->Type == AudioContainer_SInteger8) {
-                AudioArray = (void**) Audio->Samples.SInteger8;
-            } else if (Audio->Type == AudioContainer_UInteger8) {
+            if (Audio->Type == AudioContainer_UInteger8) {
                 AudioArray = (void**) Audio->Samples.UInteger8;
-            } else if (Audio->Type == AudioContainer_SInteger16) {
-                AudioArray = (void**) Audio->Samples.SInteger16;
+            } else if (Audio->Type == AudioContainer_SInteger8) {
+                AudioArray = (void**) Audio->Samples.SInteger8;
             } else if (Audio->Type == AudioContainer_UInteger16) {
                 AudioArray = (void**) Audio->Samples.UInteger16;
-            } else if (Audio->Type == AudioContainer_SInteger32) {
-                AudioArray = (void**) Audio->Samples.SInteger32;
+            } else if (Audio->Type == AudioContainer_SInteger16) {
+                AudioArray = (void**) Audio->Samples.SInteger16;
             } else if (Audio->Type == AudioContainer_UInteger32) {
                 AudioArray = (void**) Audio->Samples.UInteger32;
+            } else if (Audio->Type == AudioContainer_SInteger32) {
+                AudioArray = (void**) Audio->Samples.SInteger32;
             }
         } else {
             Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
