@@ -437,7 +437,7 @@ extern "C" {
                 uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 uint8_t HalfOfTheIndicators = (PercentComplete / 2);
                 // Now we go ahead and memset a string with the proper number of indicators
-                UTF16 *Indicator            = calloc(CLI->ConsoleWidth, sizeof(UTF8));
+                UTF16 *Indicator            = calloc(CLI->ConsoleWidth, sizeof(UTF16));
                 memset(Indicator, '-', HalfOfTheIndicators);
                 UTF16 *FormattedString      = UTF16_FormatString(U16("[%s%s %lld/%lld %hhu/%s %s]"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF16);
                 UTF16_WriteString2File(FormattedString, stdout);
