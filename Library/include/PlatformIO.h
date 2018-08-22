@@ -335,30 +335,6 @@ extern "C" {
 #endif
     
     /*!
-     @enum                      ByteOrders
-     @constant                  UnknownByteOrder           "Unknown byte order".
-     @constant                  LSByteFirst                "Read from the Least Significant Byte to the Most Significant, aka right to left".
-     @constant                  MSByteFirst                "Read from the Most  Significant Byte to the Least Significant, aka left to right".
-     */
-    typedef enum ByteOrders {
-                                UnknownByteOrder           = 0,
-                                LSByteFirst                = 1,
-                                MSByteFirst                = 2,
-    } ByteOrders;
-    
-    /*!
-     @enum                      BitOrders
-     @constant                  UnknownBitOrder            "Unknown bit order".
-     @constant                  LSBitFirst                 "Read from the Least Significant Bit  to the Most  Significant, aka right to left".
-     @constant                  MSBitFirst                 "Read from the Most  Significant Bit  to the Least Significant, aka left to right".
-     */
-    typedef enum BitOrders {
-                                UnknownBitOrder            = 0,
-                                LSBitFirst                 = 1,
-                                MSBitFirst                 = 2,
-    } BitOrders;
-    
-    /*!
      @enum                      FoundationIOConstants
      @constant                  NULLTerminator             "The value of a NULL terminator".
      @constant                  NULLTerminatorSize         "The size  of a NULL terminator".
