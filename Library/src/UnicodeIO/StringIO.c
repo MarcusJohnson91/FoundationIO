@@ -2185,7 +2185,7 @@ extern "C" {
         FormatString *Details      = NULL;
         uint64_t NumSpecifiers     = 0ULL;
         uint64_t FormatStringSize  = 0ULL;
-        if (Format != NULL && StringType != UnknownFormat) {
+        if (Format != NULL && StringType != UnknownUnicodeFormat) {
             FormatStringSize       = UTF32_GetStringSizeInCodePoints(Format);
             for (uint64_t CodePoint = 0ULL; CodePoint < FormatStringSize; CodePoint++) { // Get the number of specifiers, and init.
                 if (Format[CodePoint] == U32('%')) {
