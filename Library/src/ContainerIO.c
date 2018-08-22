@@ -188,7 +188,7 @@ extern "C" {
     }
     
     int64_t AudioContainer_GetMax(AudioContainer *Audio, uint64_t Channel) {
-        int64_t Maximum = 0LL;
+        int64_t Maximum = INT64_MIN;
         if (Audio != NULL && Channel < Audio->NumChannels) {
             if (Audio->Type == AudioContainer_UInteger8) {
                 uint8_t **Array = (uint8_t**) AudioContainer_GetArray(Audio);
@@ -240,7 +240,7 @@ extern "C" {
     }
     
     int64_t AudioContainer_GetMin(AudioContainer *Audio, uint64_t Channel) {
-        int64_t Minimum = 9223372036854775807;
+        int64_t Minimum = INT64_MAX;
         if (Audio != NULL) {
             if (Audio->Type == AudioContainer_UInteger8) {
                 uint8_t **Array = (uint8_t**) AudioContainer_GetArray(Audio);
@@ -431,9 +431,9 @@ extern "C" {
     }
     
     uint64_t ImageContainer_GetChannelsIndex(ImageContainer *Image, Image_ChannelMask Mask) {
-        uint64_t Index = 0xFFFFFFFFFFFFFFFF;
+        uint64_t Index     = 0xFFFFFFFFFFFFFFFF;
         if (Image != NULL) {
-            Index      = Image->NumChannels;
+            Index         = Image->NumChannels;
             for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
                 if (Image->ChannelMask[Channel] == Mask) {
                     Index = Channel;
@@ -456,9 +456,9 @@ extern "C" {
     }
     
     uint64_t ImageContainer_GetViewsIndex(ImageContainer *Image, Image_Views View) {
-        uint64_t Index = 0xFFFFFFFFFFFFFFFF;
+        uint64_t Index    = 0xFFFFFFFFFFFFFFFF;
         if (Image != NULL) {
-            Index      = Image->NumViews;
+            Index         = Image->NumViews;
             for (uint64_t ViewIndex = 0ULL; ViewIndex < Image->NumViews; ViewIndex++) {
                 if (Image->Views[ViewIndex] == View) {
                     Index = ViewIndex;
@@ -546,7 +546,7 @@ extern "C" {
     }
     
     int64_t ImageContainer_GetMax(ImageContainer *Image, Image_Views ViewMask, Image_ChannelMask ChannelMask) {
-        int64_t Maximum = -9223372036854775807LL;
+        int64_t Maximum      = INT64_MIN;
         if (Image != NULL) {
             uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
             uint64_t View    = ImageContainer_GetViewsIndex(Image, ViewMask);
@@ -598,7 +598,7 @@ extern "C" {
     }
     
     int64_t ImageContainer_GetMin(ImageContainer *Image, Image_Views ViewMask, Image_ChannelMask ChannelMask) {
-        int64_t Minimum = 9223372036854775807LL;
+        int64_t Minimum      = INT64_MAX;
         if (Image != NULL) {
             uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
             uint64_t View    = ImageContainer_GetViewsIndex(Image, ViewMask);
