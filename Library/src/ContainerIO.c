@@ -389,7 +389,7 @@ extern "C" {
     uint64_t ImageContainer_GetWidth(ImageContainer *Image) {
         uint64_t Width = 0ULL;
         if (Image != NULL) {
-            Width = Image->Width;
+            Width      = Image->Width;
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
@@ -399,7 +399,7 @@ extern "C" {
     uint64_t ImageContainer_GetHeight(ImageContainer *Image) {
         uint64_t Height = 0ULL;
         if (Image != NULL) {
-            Height = Image->Height;
+            Height      = Image->Height;
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
@@ -409,7 +409,7 @@ extern "C" {
     uint64_t ImageContainer_GetBitDepth(ImageContainer *Image) {
         uint64_t BitDepth = 0ULL;
         if (Image != NULL) {
-            BitDepth = Image->BitDepth;
+            BitDepth      = Image->BitDepth;
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
@@ -420,9 +420,9 @@ extern "C" {
         uint64_t NumChannels = 0ULL;
         if (Image != NULL) {
             if (Image->NumViews > 0) {
-                NumChannels = Image->NumChannels / Image->NumViews;
+                NumChannels  = Image->NumChannels / Image->NumViews;
             } else {
-                NumChannels = Image->NumChannels;
+                NumChannels  = Image->NumChannels;
             }
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
@@ -473,7 +473,7 @@ extern "C" {
     Image_Types ImageContainer_GetType(ImageContainer *Image) {
         Image_Types Type = ImageContainer_UnknownType;
         if (Image != NULL) {
-            Type                 = Image->Type;
+            Type         = Image->Type;
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
@@ -499,7 +499,7 @@ extern "C" {
     }
     
     int64_t ImageContainer_GetAverage(ImageContainer *Image, Image_Views ViewMask, Image_ChannelMask ChannelMask) {
-        int64_t Average = 0LL;
+        int64_t Average      = 0LL;
         if (Image != NULL) {
             uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
             uint64_t View    = ImageContainer_GetViewsIndex(Image, ViewMask);
