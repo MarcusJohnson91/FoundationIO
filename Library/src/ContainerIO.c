@@ -178,7 +178,9 @@ extern "C" {
                     Average += Array[Channel][Sample];
                 }
             }
-            Average /= Audio->NumSamples;
+            if (Average != 0) {
+                Average /= Audio->NumSamples;
+            }
         } else {
             Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
         }
@@ -531,7 +533,9 @@ extern "C" {
                         }
                     }
                 }
-                Average /= Image->Width * Image->Height;
+                if (Average != 0) {
+                    Average /= Image->Width * Image->Height;
+                }
             } else {
                 Log(Log_ERROR, __func__, U8("You tried getting the average from a nonexistant channel"));
             }
