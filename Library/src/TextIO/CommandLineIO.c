@@ -385,7 +385,7 @@ extern "C" {
             }
             // Number of seperators for each string
             uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
-            UTF8     *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF8*));
+            UTF8     *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF8));
             for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
                 // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
                 NumProgressIndicatorsPerString[String] = CLI->ConsoleWidth - (2 + StringSize[String]); // what if it's not even?
@@ -430,7 +430,7 @@ extern "C" {
             }
             // Number of seperators for each string
             uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
-            UTF16    *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF16*));
+            UTF16    *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF16));
             for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
                 // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
                 NumProgressIndicatorsPerString[String] = CLI->ConsoleWidth - (2 + StringSize[String]); // what if it's not even?
