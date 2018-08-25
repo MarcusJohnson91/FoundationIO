@@ -659,11 +659,11 @@ extern "C" {
                             for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
                                 for (uint64_t BottomLine = Image->Height; BottomLine > 0ULL; BottomLine--) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
-                                        uint8_t TopPixel            = Array[View][Width][TopLine][Channel];
-                                        uint8_t BottomPixel         = Array[View][Width][BottomLine][Channel];
+                                        uint8_t TopPixel                        = Array[View][Width][TopLine][Channel];
+                                        uint8_t BottomPixel                     = Array[View][Width][BottomLine][Channel];
                                         
-                                        Array[View][Width][TopLine]    = BottomPixel;
-                                        Array[View][Width][BottomLine] = TopPixel;
+                                        Array[View][Width][TopLine][Channel]    = BottomPixel;
+                                        Array[View][Width][BottomLine][Channel] = TopPixel;
                                     }
                                 }
                             }
@@ -676,11 +676,11 @@ extern "C" {
                             for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
                                 for (uint64_t BottomLine = Image->Height; BottomLine > 0ULL; BottomLine--) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
-                                        int8_t  TopPixel            = Array[View][Width][TopLine][Channel];
-                                        int8_t  BottomPixel         = Array[View][Width][BottomLine][Channel];
+                                        int8_t TopPixel                         = Array[View][Width][TopLine][Channel];
+                                        int8_t BottomPixel                      = Array[View][Width][BottomLine][Channel];
                                         
-                                        Array[View][Width][TopLine]    = BottomPixel;
-                                        Array[View][Width][BottomLine] = TopPixel;
+                                        Array[View][Width][TopLine][Channel]    = BottomPixel;
+                                        Array[View][Width][BottomLine][Channel] = TopPixel;
                                     }
                                 }
                             }
@@ -693,11 +693,11 @@ extern "C" {
                             for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
                                 for (uint64_t BottomLine = Image->Height; BottomLine > 0ULL; BottomLine--) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
-                                        uint16_t TopPixel           = Array[View][Width][TopLine][Channel];
-                                        uint16_t BottomPixel        = Array[View][Width][BottomLine][Channel];
+                                        uint16_t TopPixel                       = Array[View][Width][TopLine][Channel];
+                                        uint16_t BottomPixel                    = Array[View][Width][BottomLine][Channel];
                                         
-                                        Array[View][Width][TopLine]    = BottomPixel;
-                                        Array[View][Width][BottomLine] = TopPixel;
+                                        Array[View][Width][TopLine][Channel]    = BottomPixel;
+                                        Array[View][Width][BottomLine][Channel] = TopPixel;
                                     }
                                 }
                             }
@@ -711,11 +711,11 @@ extern "C" {
                         for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
                             for (uint64_t BottomLine = Image->Height; BottomLine > 0ULL; BottomLine--) {
                                 for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
-                                    int16_t TopPixel            = Array[View][Width][TopLine][Channel];
-                                    int16_t BottomPixel         = Array[View][Width][BottomLine][Channel];
+                                    int16_t TopPixel                        = Array[View][Width][TopLine][Channel];
+                                    int16_t BottomPixel                     = Array[View][Width][BottomLine][Channel];
                                     
-                                    Array[View][Width][TopLine]    = BottomPixel;
-                                    Array[View][Width][BottomLine] = TopPixel;
+                                    Array[View][Width][TopLine][Channel]    = BottomPixel;
+                                    Array[View][Width][BottomLine][Channel] = TopPixel;
                                 }
                             }
                         }
