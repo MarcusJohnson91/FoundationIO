@@ -6,6 +6,7 @@
 #define _FILE_OFFSET_BITS 64
 #endif /* _FILE_OFFSET_BITS */
 #endif /* Various UNIX Platforms */
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -383,25 +384,25 @@ extern "C" {
     bool                  UTF32_StringHasWinPathPrefix(UTF32 *String);
     
     /*!
-     @abstract                             "Tells if the string pointed to by String contains a format specifier".
+     @abstract                             "Counts the number of Format Specifiers in String".
      @param               String           "The string to check".
-     @return                               "Returns Yes if the string contains a format specifier, otherwise it returns No".
+     @return                               "Returns the number of format specifiers found".
      */
-    bool                  UTF8_StringHasFormatSpecifier(UTF8 *String);
+    uint64_t              UTF8_NumFormatSpecifiers(UTF8 *String);
     
     /*!
-     @abstract                             "Tells if the string pointed to by String contains a format specifier".
+     @abstract                             "Counts the number of Format Specifiers in String".
      @param               String           "The string to check".
-     @return                               "Returns Yes if the string contains a format specifier, otherwise it returns No".
+     @return                               "Returns the number of format specifiers found".
      */
-    bool                  UTF16_StringHasFormatSpecifier(UTF16 *String);
+    uint64_t              UTF16_NumFormatSpecifiers(UTF16 *String);
     
     /*!
-     @abstract                             "Tells if the string pointed to by String contains a format specifier".
+     @abstract                             "Counts the number of Format Specifiers in String".
      @param               String           "The string to check".
-     @return                               "Returns Yes if the string contains a format specifier, otherwise it returns No".
+     @return                               "Returns the number of format specifiers found".
      */
-    bool                  UTF32_StringHasFormatSpecifier(UTF32 *String);
+    uint64_t              UTF32_NumFormatSpecifiers(UTF32 *String);
     
     /*!
      @abstract                             "Tells if the UTF-8 string pointed to by String is a valid UTF-8 encoded string".
