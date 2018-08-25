@@ -285,45 +285,44 @@ extern "C" {
         return StringHasLongPathPrefix;
     }
     
-    bool UTF8_StringHasFormatSpecifier(UTF8 *String) {
-        bool StringContainsFormatSpecifier = No;
+    uint64_t UTF8_NumFormatSpecifiers(UTF8 *String) {
+        uint64_t NumFormatSpecifiers = 0ULL;
         if (String != NULL) {
-            UTF32 *String32                = UTF8_Decode(String);
-            StringContainsFormatSpecifier  = UTF32_StringHasFormatSpecifier(String32);
+            UTF32 *String32          = UTF8_Decode(String);
+            NumFormatSpecifiers      = UTF32_NumFormatSpecifiers(String32);
             free(String32);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return StringContainsFormatSpecifier;
+        return NumFormatSpecifiers;
     }
     
-    bool UTF16_StringHasFormatSpecifier(UTF16 *String) {
-        bool StringContainsFormatSpecifier = No;
+    uint64_t UTF16_NumFormatSpecifiers(UTF16 *String) {
+        uint64_t NumFormatSpecifiers = 0ULL;
         if (String != NULL) {
-            UTF32 *String32                = UTF16_Decode(String);
-            StringContainsFormatSpecifier  = UTF32_StringHasFormatSpecifier(String32);
+            UTF32 *String32          = UTF16_Decode(String);
+            NumFormatSpecifiers      = UTF32_NumFormatSpecifiers(String32);
             free(String32);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return StringContainsFormatSpecifier;
+        return NumFormatSpecifiers;
     }
     
-    bool UTF32_StringHasFormatSpecifier(UTF32 *String) {
-        bool StringContainsFormatSpecifier            = No;
+    uint64_t UTF32_NumFormatSpecifiers(UTF32 *String) {
+        uint64_t NumFormatSpecifiers = 0ULL;
         if (String != NULL) {
-            uint64_t StringSize                       = UTF32_GetStringSizeInCodePoints(String);
-            if (StringSize > 2) {
-                for (uint64_t CodePoint = 2; CodePoint < StringSize; CodePoint++) {
-                    if (String[CodePoint - 2] != U32('%') && String[CodePoint - 1] == U32('%') && String[CodePoint] != U32('%')) {
-                        StringContainsFormatSpecifier = Yes;
-                    }
+            uint64_t CodePoint = 1ULL;
+            do {
+                if (String[CodePoint - 1] == U32('%') && String[CodePoint] != U32('%')) {
+                    NumFormatSpecifiers += 1;
                 }
-            }
+                CodePoint += 1;
+            } while (String[CodePoint] != NULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return StringContainsFormatSpecifier;
+        return NumFormatSpecifiers;
     }
     
     bool  UTF8_IsStringValid(UTF8 *String) {
@@ -2174,13 +2173,6 @@ extern "C" {
         return NewFormatString;
     }
     
-    static void FormatString_Deinit(FormatString *String2Deinit) {
-        if (String2Deinit != NULL) {
-            free(String2Deinit->Specifiers);
-            free(String2Deinit);
-        }
-    }
-    
     static FormatString *UTF32_ParseFormatSpecifiers(UTF32 *Format, StringTypes StringType) {
         FormatString *Details      = NULL;
         uint64_t NumSpecifiers     = 0ULL;
@@ -2350,7 +2342,15 @@ extern "C" {
         return Details;
     }
     
-    
+    static void FormatString_Deinit(FormatString *String2Deinit) {
+        if (String2Deinit != NULL) {
+            for (uint64_t Specifier = 0ULL; Specifier < String2Deinit->NumSpecifiers; Specifier++) {
+                free(String2Deinit->Specifiers[Specifier].String);
+            }
+            free(String2Deinit->Specifiers);
+            free(String2Deinit);
+        }
+    }
     
     static UTF32 *FormatString_UTF32(UTF32 *Format, FormatString *Details, va_list VariadicArguments) {
         UTF32 *Formatted = Format;

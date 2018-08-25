@@ -673,7 +673,7 @@ extern "C" {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType              = BitIOFile;
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
-            BitO->FileSpecifierExists   = UTF8_StringHasFormatSpecifier(Path2Open);
+            BitO->FileSpecifierExists   = UTF8_NumFormatSpecifiers(Path2Open) >= 1 ? Yes : No;
             if (BitO->FileSpecifierExists == Yes) {
                 BitO->OutputPath.Path8  = UTF8_Clone(Path2Open);
                 UTF8 *Formatted         = UTF8_FormatString(Path2Open, BitO->FileSpecifierNum);
@@ -684,7 +684,7 @@ extern "C" {
             }
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
             bool   StringHasPathPrefix  = UTF8_StringHasWinPathPrefix(Path2Open);
-            BitO->FileSpecifierExists   = UTF8_StringHasFormatSpecifier(Path2Open);
+            BitO->FileSpecifierExists   = UTF8_NumFormatSpecifiers(Path2Open) >= 1 ? Yes : No;
             UTF32 *Path32               = UTF8_Decode(Path2Open);
             if (StringHasPathPrefix == No) {
                 bool   StringHasBOM     = UTF8_StringHasBOM(Path2Open);
@@ -715,7 +715,7 @@ extern "C" {
             // Convert to UTF-8, and remove the BOM because fopen will silently fail if there's a BOM.
             UTF32 *Decoded              = UTF16_Decode(Path2Open);
             bool   PathHasBOM           = UTF32_StringHasBOM(Decoded);
-            BitO->FileSpecifierExists   = UTF32_StringHasFormatSpecifier(Decoded);
+            BitO->FileSpecifierExists   = UTF32_NumFormatSpecifiers(Decoded) >= 1 ? Yes : No;
             if (PathHasBOM == Yes) {
                 BitO->OutputPath.Path32 = UTF32_RemoveBOM(Decoded);
             }
@@ -729,7 +729,7 @@ extern "C" {
             }
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
             bool   StringHasPathPrefix  = UTF16_StringHasWinPathPrefix(Path2Open);
-            BitO->FileSpecifierExists   = UTF16_StringHasFormatSpecifier(Path2Open);
+            BitO->FileSpecifierExists   = UTF16_NumFormatSpecifiers(Path2Open) >= 1 ? Yes : No;
             UTF32 *Path32               = UTF16_Decode(Path2Open);
             if (StringHasPathPrefix == No) {
                 bool   StringHasBOM     = UTF16_StringHasBOM(Path2Open);
