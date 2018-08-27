@@ -979,13 +979,24 @@ extern "C" {
                 GUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
                 if (GUUID != NULL) {
                     for (uint8_t Byte = 0; Byte < BinaryGUUIDSize - NULLTerminatorSize; Byte++) {
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(push)
+#pragma warning(disable: 4090)
+#endif
                         GUUID[Byte] = ReadBits(ByteOrder, LSBitFirst, BitB, 8);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(pop)
+#endif
                     }
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate GUIDString"));
                 }
             } else if (GUUIDType == UUIDString || GUUIDType == GUIDString) {
                 if (GUUID != NULL) {
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(push)
+#pragma warning(disable: 4090)
+#endif
                     uint32_t Section1    = ReadBits(ByteOrder, LSBitFirst, BitB, 32);
                     BitBuffer_Skip(BitB, 8);
                     uint16_t Section2    = ReadBits(ByteOrder, LSBitFirst, BitB, 16);
@@ -995,6 +1006,9 @@ extern "C" {
                     uint16_t Section4    = ReadBits(ByteOrder, LSBitFirst, BitB, 16);
                     BitBuffer_Skip(BitB, 8);
                     uint64_t Section5    = ReadBits(ByteOrder, LSBitFirst, BitB, 48);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(pop)
+#endif
                     GUUID                = UTF8_FormatString(U8("%d-%d-%d-%d-%llu"), Section1, Section2, Section3, Section4, Section5);
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate UUIDString"));
