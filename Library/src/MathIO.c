@@ -33,7 +33,7 @@ extern "C" {
         return Result;
     }
     
-    int64_t Logarithm(int64_t Base, int64_t Exponent) {
+    int64_t  Logarithm(int64_t Base, int64_t Exponent) {
         int8_t Bits       = 0;
         if (Exponent == 0) {
             Bits          = 1;
@@ -46,26 +46,26 @@ extern "C" {
         return Bits;
     }
     
-    inline uint16_t SwapEndian16(const uint16_t Value2Swap) {
+    uint16_t SwapEndian16(const uint16_t Value2Swap) {
         return ((Value2Swap & 0xFF00) >> 8) | ((Value2Swap & 0x00FF) << 8);
     }
     
-    inline uint32_t SwapEndian32(const uint32_t Value2Swap) {
+    uint32_t SwapEndian32(const uint32_t Value2Swap) {
         return ((Value2Swap & 0xFF000000) >> 24) | ((Value2Swap & 0x00FF0000) >> 8) | ((Value2Swap & 0x0000FF00) << 8) | ((Value2Swap & 0x000000FF) << 24);
     }
     
-    inline uint64_t SwapEndian64(const uint64_t Value2Swap) {
+    uint64_t SwapEndian64(const uint64_t Value2Swap) {
         return (((Value2Swap & 0xFF00000000000000) >> 56) | ((Value2Swap & 0x00FF000000000000) >> 40) | \
                 ((Value2Swap & 0x0000FF0000000000) >> 24) | ((Value2Swap & 0x000000FF00000000) >>  8) | \
                 ((Value2Swap & 0x00000000FF000000) <<  8) | ((Value2Swap & 0x0000000000FF0000) << 24) | \
                 ((Value2Swap & 0x000000000000FF00) << 40) | ((Value2Swap & 0x00000000000000FF) << 56));
     }
     
-    int64_t Bytes2Bits(const int64_t Bytes) {
+    int64_t  Bytes2Bits(const int64_t Bytes) {
         return Bytes * 8;
     }
     
-    int64_t Bits2Bytes(const int64_t Bits, const bool RoundUp) {
+    int64_t  Bits2Bytes(const int64_t Bits, const bool RoundUp) {
         int64_t Bytes = 0ULL;
         if (RoundUp == No) {
             Bytes = Bits / 8;
@@ -75,13 +75,13 @@ extern "C" {
         return Bytes;
     }
     
-    int8_t ExtractSignFromDecimal(double Number2Extract) {
+    int8_t   ExtractSignFromDecimal(double Number2Extract) {
         uint64_t *Sign1 = (uint64_t *) &Number2Extract;
         uint64_t  Sign2 = *Sign1 >> 63;
         return Sign2 == 1 ? -1 : 1;
     }
     
-    int16_t ExtractExponentFromDecimal(double Number2Extract) {
+    int16_t  ExtractExponentFromDecimal(double Number2Extract) {
         int8_t    Sign      = ExtractSignFromDecimal(Number2Extract);
         uint64_t *Exponent1 = (uint64_t *) &Number2Extract;
         int16_t   Exponent2 = *Exponent1 >> 52;
@@ -94,7 +94,7 @@ extern "C" {
         return Exponent3;
     }
     
-    int64_t ExtractMantissaFromDecimal(double Number2Extract) {
+    int64_t  ExtractMantissaFromDecimal(double Number2Extract) {
         uint64_t *Mantissa1  = (uint64_t *) &Number2Extract;
         uint64_t  Mantissa2  = *Mantissa1 & 0xFFFFFFFFFFFFFULL;
         return Mantissa2;
