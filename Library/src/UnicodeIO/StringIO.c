@@ -1267,6 +1267,7 @@ extern "C" {
 #endif
                     }
                 }
+                CodePoint += 1;
             } while (String[CodePoint] != NULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -1332,6 +1333,7 @@ extern "C" {
                         }
                     }
                 }
+                CodePoint += 1;
             } while (String[CodePoint] != NULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
