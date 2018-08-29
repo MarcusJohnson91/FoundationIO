@@ -97,6 +97,27 @@ extern "C" {
     int64_t                     Bits2Bytes(const int64_t Bits, const bool RoundUp);
     
     /*!
+     @abstract                                                  "Swaps bits so the the MSB becoems the LSB, and vice versa".
+     @param                     Byte                            "The byte to swap the bits in".
+     @return                                                    "Returns the swapped byte".
+     */
+    uint8_t                     SwapBits(const uint8_t Byte);
+    
+    /*!
+     @abstract                                                  "Creates a bitmask favoring the right side".
+     @param                     Bits2Extract                    "The number of bits to mask".
+     @return                                                    "Returns the mask".
+     */
+    uint8_t                     CreateBitMaskLSBit(const uint8_t Bits2Extract);
+    
+    /*!
+     @abstract                                                  "Creates a bitmask favoring the left side".
+     @param                     Bits2Extract                    "The number of bits to mask".
+     @return                                                    "Returns the mask".
+     */
+    uint8_t                     CreateBitMaskMSBit(const uint8_t Bits2Extract);
+    
+    /*!
      @abstract                                                  "Extracts the sign from the decimal given as Number2Extract".
      @param                     Number2Extract                  "The decimal number you want to get the sign from".
      @return                                                    "Returns -1 if the sign is negative, otherwise 1".
