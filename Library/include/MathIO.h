@@ -52,13 +52,13 @@ extern "C" {
     uint64_t                    Exponentiate(const uint64_t Base, const uint64_t Exponent);
     
     /*!
-     @abstract                                                  "Computes the number of symbols required to hold a certain value in Base X".
+     @abstract                                                  "Computes the number of times Exponent fits into Base".
      @remark                                                    "Rounds up to the next integer number of symbols".
      @param                     Base                            "The base, or radix to contain the symbol".
      @param                     Exponent                        "The value to calculate".
      @return                                                    "Returns the number of symbols required to store an integer".
      */
-    int64_t                     Logarithm(int64_t Base, int64_t Exponent);
+    int64_t                     Logarithm(const uint64_t Base, const int64_t Exponent);
     
     /*!
      @abstract                                                  "Byte swaps a 16 bit integer".
