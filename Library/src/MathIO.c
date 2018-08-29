@@ -26,24 +26,35 @@ extern "C" {
     }
     
     uint64_t Exponentiate(const uint64_t Base, const uint64_t Exponent) {
-        uint64_t Result = 1ULL;
-        for (uint64_t i = 0ULL; i < Exponent; i++) {
-            Result *= Base;
-        }
-        return Result;
-    }
-    
-    int64_t  Logarithm(int64_t Base, int64_t Exponent) {
-        int8_t Bits       = 0;
-        if (Exponent == 0) {
-            Bits          = 1;
-        } else {
-            while (Exponent > 0) {
-                Bits     += 1;
-                Exponent /= Base;
+        int64_t Value      = 0;
+        int64_t Exponent2  = Exponent;
+        if (Base > 0 && Exponent > 0) {
+            while (Exponent2 > 0) {
+                Value     *= Base;
+                Exponent2 /= Base;
             }
         }
-        return Bits;
+        return Value;
+    }
+    
+    int64_t  Logarithm(const uint64_t Base, const int64_t Exponent) { // Ok, so we need to divide Exponent by Base.
+        // log2(8) == 3
+        // log10(100) == 2
+        // So basically, how many times does Exponent fit into base, rounded up.
+        uint64_t Result    = 0ULL;
+        int64_t  Exponent2 = Exponent;
+        if (Base > 1 && Exponent > 0) {
+            do {
+                Result    += 1;
+                Exponent2 -= Base;
+            } while (Exponent2 > Base);
+        } else if (Base > 1 && Exponent < 0) {
+            do {
+                Result    += 1;
+                Exponent2 += Base;
+            } while (Exponent2 < Base);
+        }
+        return Result;
     }
     
     uint16_t SwapEndian16(const uint16_t Value2Swap) {
@@ -58,7 +69,8 @@ extern "C" {
         return (((Value2Swap & 0xFF00000000000000) >> 56) | ((Value2Swap & 0x00FF000000000000) >> 40) | \
                 ((Value2Swap & 0x0000FF0000000000) >> 24) | ((Value2Swap & 0x000000FF00000000) >>  8) | \
                 ((Value2Swap & 0x00000000FF000000) <<  8) | ((Value2Swap & 0x0000000000FF0000) << 24) | \
-                ((Value2Swap & 0x000000000000FF00) << 40) | ((Value2Swap & 0x00000000000000FF) << 56));
+                ((Value2Swap & 0x000000000000FF00) << 40) | ((Value2Swap & 0x00000000000000FF) << 56)
+                );
     }
     
     int64_t  Bytes2Bits(const int64_t Bytes) {
