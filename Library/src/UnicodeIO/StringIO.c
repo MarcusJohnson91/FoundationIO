@@ -420,8 +420,8 @@ extern "C" {
         if (String != NULL) {
             UTF32 *String32  = UTF16_Decode(String);
             UTF32 *BOMAdded  = UTF32_AddBOM(String32, BOM2Add);
-            free(String32);
             StringWithBOM    = UTF16_Encode(BOMAdded);
+            free(String32);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -516,7 +516,7 @@ extern "C" {
         if (String != NULL) {
             StringSize                           = UTF32_GetStringSizeInCodePoints(String);
             if (String[0] == UTF32LE || String[0] == UTF32BE) {
-                BOMLessString                    = calloc(StringSize - UnicodeBOMSizeInCodePoints + NULLTerminatorSize, sizeof(UTF16));
+                BOMLessString                    = calloc(StringSize - UnicodeBOMSizeInCodePoints + NULLTerminatorSize, sizeof(UTF32));
                 if (BOMLessString != NULL) {
                     for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
                         BOMLessString[CodePoint] = String[CodePoint + 1];

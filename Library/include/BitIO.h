@@ -18,17 +18,17 @@ extern "C" {
      */
     
     /*!
-     @enum                      BitInputOutputFileTypes
+     @enum                      BitIOFileTypes
      @abstract                                                  "Is this BitInput or BitOutput connected to a File or Socket?".
      @constant                  BitIOUnknownFileType            "Unknown file type".
      @constant                  BitIOFile                       "This instance of BitInput/BitOutput is connected to a File".
      @constant                  BitIOSocket                     "This instance of BitInput/BitOutput is connected to a Socket".
      */
-    typedef enum BitInputOutputFileTypes {
+    typedef enum BitIOFileTypes {
                                 BitIOUnknownFileType            = 0,
                                 BitIOFile                       = 1,
                                 BitIOSocket                     = 2,
-    } BitInputOutputFileTypes;
+    } BitIOFileTypes;
     
     /*!
      @enum                      UnaryTypes
@@ -102,7 +102,7 @@ extern "C" {
     /*!
      @abstract                                                  "Gets the offset of the BitBuffer in bits".
      @param                     BitB                            "BitBuffer Pointer".
-     @return                                                    "Returns the offset from the start of BitBuffer in bits".
+     @return                                                    "Returns the offset from the start of the BitBuffer in bits".
      */
     uint64_t                    BitBuffer_GetPosition(BitBuffer *BitB);
     
@@ -114,7 +114,7 @@ extern "C" {
     void                        BitBuffer_SetPosition(BitBuffer *BitB, uint64_t Offset);
     
     /*!
-     @abstract                                                  "Gets the number of bits that are free in the BitBuffer".
+     @abstract                                                  "Gets the number of free bits in the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer".
      @return                                                    "Returns the offset from the start of BitBuffer in bits - the current offset".
      */
@@ -122,48 +122,49 @@ extern "C" {
     
     /*!
      @abstract                                                  "Gets if the BitBuffer's offset is aligned to boundary AlignmentSize".
+     @remark                                                    "Alignment means the offset of a BitBuffer is a multiple of AlignmentSize".
      @param                     BitB                            "BitBuffer Pointer".
-     @param                     AlignmentSize                   "The number of bits to check the alignment of".
+     @param                     AlignmentSize                   "The number of bytes to check the alignment of".
      @return                                                    "Returns whether the BitBuffer is aligned to AlignmentSize or not".
      */
-    bool                        BitBuffer_IsAligned(BitBuffer *BitB, const uint8_t AlignmentSize); // BytesOfAlignment = AlignmentSize
+    bool                        BitBuffer_IsAligned(BitBuffer *BitB, const uint8_t AlignmentSize);
     
     /*!
      @abstract                                                  "Aligns BitBuffer".
      @remark                                                    "Zero pads the BitBuffer's offset to a multiple of AlignmentSize".
      @param                     BitB                            "BitBuffer Pointer".
-     @param                     AlignmentSize                   "The alignment size in bits".
+     @param                     AlignmentSize                   "The alignment size in bytes".
      */
     void                        BitBuffer_Align(BitBuffer *BitB, const uint8_t AlignmentSize);
     
     /*!
-     @abstract                                                  "Seeks Forwards and backwards in BitBuffer".
+     @abstract                                                  "Seeks forwards and backwards in BitBuffer".
      @param                     BitB                            "BitBuffer Pointer".
-     @param                     Bits2Skip                       "The number of bits to skip".
+     @param                     Bits2Seek                       "The number of bits to seek".
      */
-    void                        BitBuffer_Skip(BitBuffer *BitB, const int64_t Bits2Skip);
+    void                        BitBuffer_Seek(BitBuffer *BitB, const int64_t Bits2Seek);
     
     /*!
-     @abstract                                                  "Sets the BitBuffer's array to zero".
+     @abstract                                                  "Zeros the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer".
      */
     void                        BitBuffer_Clear(BitBuffer *BitB);
     
     /*!
      @abstract                                                  "Changes the size of an already initalized BitBuffer".
-     @remark                                                    "Resizing a BitBuffer IS destructive, call BitBuffer_Update after this".
+     @remark                                                    "Resizing a BitBuffer IS NOT destructive".
      @param                     BitB                            "BitBuffer Pointer to resize".
-     @param                     NewSize                         "The new size of the internal buffer in bits".
+     @param                     NewSize                         "The new size of the internal buffer in bytes".
      */
     void                        BitBuffer_Resize(BitBuffer *BitB, const uint64_t NewSize);
     
     /*!
      @abstract                                                  "Reads fresh data to a BitBuffer from a BitInput".
-     @remark                                                    "Is NOT destructive, it will keep any unread data in the buffer".
-     @param                     BitB                            "The BitBuffer to update".
-     @param                     BitI                            "BitInput Pointer".
+     @remark                                                    "IS destructive, it will NOT keep any data in the buffer".
+     @param                     BitB                            "The BitBuffer to refresh".
+     @param                     BitI                            "The BitInput to refresh the BitBuffer with".
      */
-    void                        BitBuffer_Update(BitBuffer *BitB, BitInput *BitI);
+    void                        BitBuffer_Refresh(BitBuffer *BitB, BitInput *BitI);
     
     /*!
      @abstract                                                  "Copies BitBuffer Source to Destination".
@@ -182,7 +183,7 @@ extern "C" {
      @param                     BitB                            "BitBuffer Pointer".
      @param                     Bits2Peek                       "The number of bits to peek from the BitBuffer".
      */
-    uint64_t                    PeekBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Peek);
+    uint64_t                    BitBuffer_PeekBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Peek);
     
     /*!
      @abstract                                                  "Reads bits from BitBuffer".
@@ -191,7 +192,7 @@ extern "C" {
      @param                     BitB                            "BitBuffer Pointer".
      @param                     Bits2Read                       "The number of bits to read from the BitBuffer".
      */
-    uint64_t                    ReadBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Read);
+    uint64_t                    BitBuffer_ReadBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Read);
     
     /*!
      @abstract                                                  "Reads unary encoded fields from the BitBuffer".
@@ -201,21 +202,29 @@ extern "C" {
      @param                     UnaryType                       "What type of Unary coding are we reading"?
      @param                     StopBit                         "Is the stop bit a one or a zero"?
      */
-    uint64_t                    ReadUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
+    uint64_t                    BitBuffer_ReadUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
     
     /*!
      @abstract                                                  "Reads a UTF-8 encoded string from the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     StringSize                      "Size of the string in CodeUnits".
      */
-    UTF8                       *ReadUTF8(BitBuffer *BitB, uint64_t StringSize);
+    UTF8                       *BitBuffer_ReadUTF8(BitBuffer *BitB, uint64_t StringSize);
     
     /*!
      @abstract                                                  "Reads a UTF-16 encoded string from the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     StringSize                      "Size of the string in CodeUnits".
      */
-    UTF16                      *ReadUTF16(BitBuffer *BitB, uint64_t StringSize);
+    UTF16                      *BitBuffer_ReadUTF16(BitBuffer *BitB, uint64_t StringSize);
+    
+    /*!
+     @abstract                                                  "Reads a BinaryGUUID/GUUIDString from the BitBuffer".
+     @param                     GUUIDType                       "The type of GUUID to read".
+     @param                     BitB                            "Pointer to an instance of BitBuffer".
+     @return                                                    "Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BinaryGUUIDSize or BinaryGUUIDSize bytes".
+     */
+    uint8_t                    *BitBuffer_ReadGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType);
     
     /*!
      @abstract                                                  "Writes bits to the BitBuffer".
@@ -225,7 +234,7 @@ extern "C" {
      @param                     NumBits2Write                   "How many bits from Bits2Write should we write?".
      @param                     Bits2Write                      "the actual data to write".
      */
-    void                        WriteBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    void                        BitBuffer_WriteBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
     
     /*!
      @abstract                                                  "Writes unary encoded bits to the BitBuffer".
@@ -236,14 +245,14 @@ extern "C" {
      @param                     StopBit                         "Is the stop bit a one or a zero"?
      @param                     Bits2Write                      "the actual data to write".
      */
-    void                        WriteUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const uint8_t Bits2Write);
+    void                        BitBuffer_WriteUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const uint8_t Bits2Write);
     
     /*!
      @abstract                                                  "Writes a UTF-8 encoded string to the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     String2Write                    "The string to write to the BitBuffer".
      */
-    void                        WriteUTF8(BitBuffer *BitB, UTF8 *String2Write);
+    void                        BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write);
     
     /*!
      @abstract                                                  "Writes a UTF-16 encoded string to the BitBuffer".
@@ -251,10 +260,17 @@ extern "C" {
      @param                     BitB                            "BitBuffer Pointer".
      @param                     String2Write                    "The string to write to the BitBuffer".
      */
-    void                        WriteUTF16(BitBuffer *BitB, UTF16 *String2Write);
+    void                        BitBuffer_WriteUTF16(BitBuffer *BitB, UTF16 *String2Write);
     
     /*!
-     @abstract                                                  "Deallocates the BitBuffer".
+     @abstract                                                  "Writes a GUUID to the BitBuffer".
+     @param                     BitB                            "Pointer to an instance of BitBuffer".
+     @param                     GUUID2Write                     "Pointer to the GUUID you want to write".
+     */
+    void                        BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, const uint8_t *GUUID2Write);
+    
+    /*!
+     @abstract                                                  "Deinitalizes the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer you want to deinit".
      */
     void                        BitBuffer_Deinit(BitBuffer *BitB);
@@ -262,7 +278,7 @@ extern "C" {
     
     /* BitInput */
     /*!
-     @abstract                                                  "Initializes a BitInput structure".
+     @abstract                                                  "Initializes a BitInput".
      @return                                                    "Returns a pointer to said BitInput structure".
      */
     BitInput                   *BitInput_Init(void);
@@ -416,29 +432,21 @@ extern "C" {
     
     /* GUUID */
     /*!
-     @abstract                                                  "Reads a BinaryGUUID/GUUIDString from the BitBuffer".
-     @param                     GUUIDType                       "The type of GUUID to read".
-     @param                     BitB                            "Pointer to an instance of BitBuffer".
-     @return                                                    "Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BinaryGUUIDSize or BinaryGUUIDSize bytes".
-     */
-    uint8_t                    *ReadGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB);
-    
-    /*!
      @abstract                                                  "Compares GUUIDs for equilivence, GUUID1 and 2 HAVE to be the same type".
      @param                     GUUID1                          "Pointer to a GUUID to be compared".
      @param                     GUUID2                          "Pointer to a GUUID to be compared".
      @return                                                    "Returns Yes if GUUID1 and GUUID2 match, No otherwise".
      */
-    bool                        CompareGUUIDs(GUUIDTypes GUUIDType, const uint8_t *GUUID1, const uint8_t *GUUID2);
+    bool                        GUUID_Compare(GUUIDTypes GUUIDType, const uint8_t *GUUID1, const uint8_t *GUUID2);
     
     /*!
      @abstract                                                  "Converts a GUUID from one representation to another (String/Binary) || (UUID/GUID)".
      @remark                                                    "The original GUUID is untouched, the user needs to deinit it".
-     @param                     InputGUUIDType                  "What type of GUUID are we converting from"?
-     @param                     OutputGUUIDType                 "What type of GUUID are we converting to"?
+     @param                     InputType                       "What type of GUUID are we converting from"?
+     @param                     OutputType                      "What type of GUUID are we converting to"?
      @return                                                    "Returns the converted GUUID".
      */
-    uint8_t                    *ConvertGUUID(GUUIDTypes InputGUUIDType, GUUIDTypes OutputGUUIDType, uint8_t *GUUID2Convert);
+    uint8_t                    *GUUID_Convert(GUUIDTypes InputType, GUUIDTypes OutputType, uint8_t *GUUID2Convert);
     
     /*!
      @abstract                                                  "Swaps the byte order of a BinaryGUUID or GUUIDString".
@@ -447,17 +455,10 @@ extern "C" {
      @param                     GUUID2Swap                      "GUUID Pointer to swap".
      @return                                                    "Returns a pointer to a swapped GUUID".
      */
-    uint8_t                    *SwapGUUID(GUUIDTypes GUUIDType, uint8_t *GUUID2Swap);
+    uint8_t                    *GUUID_Swap(GUUIDTypes GUUIDType, uint8_t *GUUID2Swap);
     
     /*!
-     @abstract                                                  "Writes a GUUID to the BitBuffer".
-     @param                     BitB                            "Pointer to an instance of BitBuffer".
-     @param                     GUUID2Write                     "Pointer to the GUUID you want to write".
-     */
-    void                        WriteGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB, const uint8_t *GUUID2Write);
-    
-    /*!
-     @abstract                                                  "Frees a BinaryGUUID or GUUIDString".
+     @abstract                                                  "Frees a GUUID".
      */
     void                        GUUID_Deinit(uint8_t *GUUID);
     /* GUUID */

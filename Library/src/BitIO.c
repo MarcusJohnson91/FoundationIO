@@ -7,17 +7,16 @@
 extern "C" {
 #endif
     
-    static inline uint8_t SwapBits(const uint8_t Byte) {
-        return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
-    }
-    
-    static inline uint8_t CreateBitMaskLSBit(const uint8_t Bits2Extract) {
-        return (uint8_t) Exponentiate(2, Bits2Extract) << (8 - Bits2Extract);
-    }
-    
-    static inline uint8_t CreateBitMaskMSBit(const uint8_t Bits2Extract) {
-        return (uint8_t) Exponentiate(2, Bits2Extract) >> (8 - Bits2Extract);
-    }
+    /*!
+     @enum                      GUUIDConstants
+     @abstract                                                  "Constants for GUUID types".
+     @constant                  GUUIDStringSize                 "The size of a GUUID string".
+     @constant                  BinaryGUUIDSize                 "The dize of a BinaryGUUID".
+     */
+    enum GUUIDConstants {
+                                GUUIDStringSize                 = 20 + NULLTerminatorSize,
+                                BinaryGUUIDSize                 = 16,
+    };
     
     /* Start BitBuffer section */
     typedef struct BitBuffer {
@@ -25,6 +24,37 @@ extern "C" {
         uint64_t   NumBits;
         uint64_t   BitOffset;
     } BitBuffer;
+    
+    typedef struct BitInput {
+        union InputPath { // and lets make sure to copy the path
+            UTF32      *Path32;
+            UTF16      *Path16;
+            UTF8       *Path8;
+        } InputPath;
+        FILE           *File;
+        int64_t         FileSpecifierNum;
+        int64_t         FilePosition;
+        int64_t         FileSize;
+        int             Socket;
+        bool            FileSpecifierExists;
+        StringTypes     PathType;
+        BitIOFileTypes  FileType;
+    } BitInput;
+    
+    typedef struct BitOutput {
+        union OutputPath {
+            UTF32      *Path32;
+            UTF16      *Path16;
+            UTF8       *Path8;
+        } OutputPath;
+        FILE           *File;
+        int64_t         FileSpecifierNum;
+        int64_t         FilePosition;
+        int             Socket;
+        bool            FileSpecifierExists;
+        StringTypes     PathType;
+        BitIOFileTypes  FileType;
+    } BitOutput;
     
     BitBuffer *BitBuffer_Init(const uint64_t BitBufferSize) {
         BitBuffer *BitB                  = calloc(1, sizeof(BitBuffer));
@@ -103,13 +133,13 @@ extern "C" {
     
     void BitBuffer_Align(BitBuffer *BitB, const uint8_t AlignmentSize) {
         if (BitB != NULL && (AlignmentSize == 1 || AlignmentSize % 2 == 0)) {
-            int64_t AlignmentSizeInBits = Bytes2Bits(AlignmentSize);
-            uint8_t Bits2Align          = AlignmentSizeInBits - (BitB->BitOffset % AlignmentSizeInBits);
+            int64_t  AlignmentSizeInBits = Bytes2Bits(AlignmentSize);
+            uint64_t Bits2Align          = AlignmentSizeInBits - (BitB->BitOffset % AlignmentSizeInBits);
             if (BitB->BitOffset + Bits2Align > BitB->NumBits) {
-                BitB->Buffer            = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
-                BitB->NumBits          += Bits2Align;
+                BitB->Buffer             = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
+                BitB->NumBits           += Bits2Align;
             }
-            BitB->BitOffset            += Bits2Align;
+            BitB->BitOffset             += Bits2Align;
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if (AlignmentSize == 1 || AlignmentSize % 2 == 0) {
@@ -117,13 +147,15 @@ extern "C" {
         }
     }
     
-    void BitBuffer_Skip(BitBuffer *BitB, const int64_t Bits2Skip) {
+    void BitBuffer_Seek(BitBuffer *BitB, const int64_t Bits2Seek) {
         if (BitB != NULL) {
-            if (BitB->BitOffset + Bits2Skip > BitB->NumBits) {
-                BitB->Buffer    = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Skip, Yes));
-                BitB->NumBits  += Bits2Skip;
+            if (Bits2Seek > 0 && BitB->NumBits > BitB->BitOffset + Bits2Seek) {
+                BitB->NumBits  += Bits2Seek;
+            } else if (Bits2Seek < 0 && BitB->NumBits > BitB->BitOffset - Bits2Seek) {
+                BitB->NumBits  += Bits2Seek;
+            } else {
+                Log(Log_ERROR, __func__, U8("There's not enough bits in BitBuffer %lld to seek %lld bits"), BitB->NumBits, Bits2Seek);
             }
-            BitB->BitOffset    += Bits2Skip;
         } else {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         }
@@ -141,33 +173,38 @@ extern "C" {
     }
     
     void BitBuffer_Resize(BitBuffer *BitB, const uint64_t NewSize) {
-        if (BitB != NULL && NewSize >= BitBuffer_GetBitsFree(BitB)) {
-            memset(BitB->Buffer, 0, Bits2Bytes(BitB->NumBits, No));
-            free(BitB->Buffer);
-            BitB->Buffer        = calloc(NewSize, sizeof(uint8_t));
-            if (BitB->Buffer != NULL) {
+        if (BitB != NULL && NewSize * 8 >= BitB->BitOffset) {
+            uint8_t *NewBuffer  = realloc(BitB->Buffer, NewSize);
+            if (NewBuffer != NULL) {
+                BitB->Buffer    = NewBuffer;
                 BitB->BitOffset = 0;
-                BitB->NumBits   = Bits2Bytes(NewSize, No);
+                BitB->NumBits   = NewSize * 8;
             } else {
-                Log(Log_ERROR, __func__, U8("Allocating %lld bytes failed"), NewSize);
+                Log(Log_ERROR, __func__, U8("Reallocing the BitBuffer failed"));
             }
         } else {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         }
     }
     
-    void BitBuffer_Update(BitBuffer *BitB, BitInput *BitI) {
-        if (BitI != NULL && BitB != NULL) {
-            uint64_t NumBits2Keep      = BitBuffer_GetBitsFree(BitB);
-            uint64_t BufferSizeInBytes = Bits2Bytes(BitB->NumBits, No);
-            uint8_t *NewBuffer         = calloc(BufferSizeInBytes, sizeof(uint8_t));
-            if (NewBuffer != NULL) {
-                memmove(NewBuffer, BitB->Buffer + BufferSizeInBytes, Bits2Bytes(NumBits2Keep, No));
-                memset(BitB->Buffer, 0, BufferSizeInBytes);
-                free(BitB->Buffer);
-                BitB->Buffer           = NewBuffer;
-            } else {
-                Log(Log_ERROR, __func__, U8("Allocating %lld bytes failed"), BufferSizeInBytes);
+    void BitBuffer_Refresh(BitBuffer *BitB, BitInput *BitI) {
+        if (BitB != NULL && BitI != NULL) {
+            uint64_t Bytes2Read      = BitB->NumBits / 8;
+            uint64_t BytesRead       = 0ULL;
+            if (BitI->FileType == BitIOFile) {
+                BytesRead            = FoundationIO_FileRead(BitB->Buffer, 1, Bytes2Read, BitI->File);
+            } else if (BitI->FileType == BitIOSocket) {
+                BytesRead            = FoundationIO_SocketRead(BitI->Socket, BitB->Buffer, Bytes2Read);
+            }
+            if (BytesRead < Bytes2Read) {
+                uint8_t *Reallocated = realloc(BitB->Buffer, BytesRead);
+                if (Reallocated != NULL) {
+                    BitB->Buffer     = Reallocated;
+                    BitB->BitOffset  = 0;
+                    BitB->NumBits    = BytesRead * 8;
+                } else {
+                    Log(Log_ERROR, __func__, U8("Reallocating the BitBuffer failed"));
+                }
             }
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
@@ -200,17 +237,8 @@ extern "C" {
         }
     }
     
-    void BitBuffer_Deinit(BitBuffer *BitB) {
-        if (BitB != NULL) {
-            free(BitB->Buffer);
-            free(BitB);
-        } else {
-            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
-        }
-    }
-    
     /* BitBuffer Resource Management */
-    static inline void InsertBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
+    static void BitBuffer_InsertBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
         if (BitB != NULL && BitB->NumBits >= BitB->BitOffset + NumBits2Insert) {
             uint8_t  Bits                         = NumBits2Insert;
             while (Bits > 0) {
@@ -232,12 +260,12 @@ extern "C" {
                     } else if (BitOrder == MSBitFirst) {
                         BitMask                       = CreateBitMaskMSBit(Bits2InsertForThisByte);
                     }
-                    Byte                              = BitB->Buffer[ByteOffset] & BitMask;
                     if (BitOrder == LSBitFirst) {
                         Byte                        >>= 8 - Bits2InsertForThisByte;
                     } else if (BitOrder == MSBitFirst) {
                         Byte                        <<= 8 - Bits2InsertForThisByte;
                     }
+                    BitB->Buffer[ByteOffset]          = Byte & BitMask;
                 }
             }
         } else if (BitB == NULL) {
@@ -247,7 +275,7 @@ extern "C" {
         }
     }
     
-    static inline uint64_t ExtractBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Extract) {
+    static uint64_t BitBuffer_ExtractBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Extract) {
         uint64_t     ExtractedBits                = 0ULL;
         if (BitB != NULL && BitB->NumBits >= BitB->BitOffset + 1 + NumBits2Extract) {
             uint8_t  Bits                         = NumBits2Extract;
@@ -287,63 +315,84 @@ extern "C" {
         return ExtractedBits;
     }
     
-    uint64_t PeekBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Peek) {
+    uint64_t BitBuffer_PeekBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Peek) {
         uint64_t OutputData = 0ULL;
         if (BitB != NULL && (Bits2Peek >= 1 && Bits2Peek <= 64) && (Bits2Peek <= (BitB->BitOffset - BitB->NumBits))) {
-            OutputData      = ExtractBits(ByteOrder, BitOrder, BitB, Bits2Peek);
+            OutputData      = BitBuffer_ExtractBits(ByteOrder, BitOrder, BitB, Bits2Peek);
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if ((Bits2Peek == 0 || Bits2Peek > 64) || (Bits2Peek > (BitB->BitOffset - BitB->NumBits))) {
-            Log(Log_ERROR, __func__, U8("Bits2Peek %d is greater than BitBuffer can provide %lld, or greater than PeekBits can satisfy 1-64"), Bits2Peek, BitB->BitOffset);
+            Log(Log_ERROR, __func__, U8("Bits2Peek %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_PeekBits can satisfy 1-64"), Bits2Peek, BitB->BitOffset);
         }
         return OutputData;
     }
     
-    uint64_t ReadBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Read) {
+    uint64_t BitBuffer_ReadBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Read) {
         uint64_t OutputData    = 0ULL;
         if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
-            OutputData         = ExtractBits(ByteOrder, BitOrder, BitB, Bits2Read);
+            OutputData         = BitBuffer_ExtractBits(ByteOrder, BitOrder, BitB, Bits2Read);
             BitB->BitOffset   += Bits2Read;
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if ((Bits2Read == 0 || Bits2Read > 64) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
-            Log(Log_ERROR, __func__, U8("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than ReadBits can satisfy 1-64"), Bits2Read, BitB->BitOffset);
+            Log(Log_ERROR, __func__, U8("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_ReadBits can satisfy 1-64"), Bits2Read, BitB->BitOffset);
         }
         return OutputData;
     }
     
-    uint64_t ReadUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit) {
+    uint64_t BitBuffer_ReadUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit) {
         uint64_t OutputData    = 0ULL;
         if (BitB != NULL) {
             do {
                 OutputData    += 1;
-            } while (ExtractBits(ByteOrder, BitOrder, BitB, 1) != StopBit);
+            } while (BitBuffer_ExtractBits(ByteOrder, BitOrder, BitB, 1) != StopBit);
             BitB->BitOffset   += OutputData;
-            BitBuffer_Skip(BitB, 1);
+            BitBuffer_Seek(BitB, 1);
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         }
         return (UnaryType == CountUnary ? OutputData + 1 : OutputData);
     }
     
-    UTF8    *ReadUTF8(BitBuffer *BitB, uint64_t StringSize) {
+    UTF8    *BitBuffer_ReadUTF8(BitBuffer *BitB, uint64_t StringSize) {
         UTF8 *ExtractedString             = calloc(StringSize, sizeof(UTF8));
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                ExtractedString[CodeUnit] = ExtractBits(MSByteFirst, LSBitFirst, BitB, 8);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(push)
+#pragma warning(disable: 4090)
+#endif
+                ExtractedString[CodeUnit] = BitBuffer_ExtractBits(MSByteFirst, LSBitFirst, BitB, 8);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(pop)
+#endif
             }
         }
         return ExtractedString;
     }
     
-    UTF16   *ReadUTF16(BitBuffer *BitB, uint64_t StringSize) {
+    UTF16   *BitBuffer_ReadUTF16(BitBuffer *BitB, uint64_t StringSize) {
         UTF16 *ExtractedString                    = calloc(StringSize, sizeof(UTF16));
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                ExtractedString[CodeUnit] = ExtractBits(LSByteFirst, LSBitFirst, BitB, 16);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(push)
+#pragma warning(disable: 4090)
+#endif
+                ExtractedString[CodeUnit] = BitBuffer_ExtractBits(LSByteFirst, LSBitFirst, BitB, 16);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(pop)
+#endif
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                ExtractedString[CodeUnit] = ExtractBits(MSByteFirst, LSBitFirst, BitB, 16);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(push)
+#pragma warning(disable: 4090)
+#endif
+                ExtractedString[CodeUnit] = BitBuffer_ExtractBits(MSByteFirst, LSBitFirst, BitB, 16);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(pop)
+#endif
 #endif
             }
         } else if (BitB == NULL) {
@@ -352,37 +401,85 @@ extern "C" {
         return ExtractedString;
     }
     
-    void     WriteBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
+    uint8_t *BitBuffer_ReadGUUID(BitBuffer *BitB, GUUIDTypes GUUID2Read) {
+        uint8_t ByteOrder = ((GUUID2Read == GUIDString || GUUID2Read == BinaryGUID) ? LSByteFirst : MSByteFirst);
+        uint8_t *GUUID = NULL;
+        if (GUUID2Read != UnknownGUUID && BitB != NULL && (BitBuffer_GetSize(BitB) - BitBuffer_GetPosition(BitB)) >= BinaryGUUIDSize) {
+            if (GUUID2Read == BinaryUUID || GUUID2Read == BinaryGUID) {
+                // Read it from the BitBuffer as a string.
+                GUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
+                if (GUUID != NULL) {
+                    for (uint8_t Byte = 0; Byte < BinaryGUUIDSize - NULLTerminatorSize; Byte++) {
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(push)
+#pragma warning(disable: 4090)
+#endif
+                        GUUID[Byte] = BitBuffer_ReadBits(ByteOrder, LSBitFirst, BitB, 8);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(pop)
+#endif
+                    }
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate GUIDString"));
+                }
+            } else if (GUUID2Read == UUIDString || GUUID2Read == GUIDString) {
+                if (GUUID != NULL) {
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(push)
+#pragma warning(disable: 4090)
+#endif
+                    uint32_t Section1    = BitBuffer_ReadBits(ByteOrder, LSBitFirst, BitB, 32);
+                    BitBuffer_Seek(BitB, 8);
+                    uint16_t Section2    = BitBuffer_ReadBits(ByteOrder, LSBitFirst, BitB, 16);
+                    BitBuffer_Seek(BitB, 8);
+                    uint16_t Section3    = BitBuffer_ReadBits(ByteOrder, LSBitFirst, BitB, 16);
+                    BitBuffer_Seek(BitB, 8);
+                    uint16_t Section4    = BitBuffer_ReadBits(ByteOrder, LSBitFirst, BitB, 16);
+                    BitBuffer_Seek(BitB, 8);
+                    uint64_t Section5    = BitBuffer_ReadBits(ByteOrder, LSBitFirst, BitB, 48);
+#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#pragma warning(pop)
+#endif
+                    GUUID                = UTF8_FormatString(U8("%d-%d-%d-%d-%llu"), Section1, Section2, Section3, Section4, Section5);
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate UUIDString"));
+                }
+            }
+        }
+        return GUUID;
+    }
+    
+    void     BitBuffer_WriteBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
         if (BitB != NULL && NumBits2Write >= 1 && NumBits2Write <= 64) {
-            InsertBits(ByteOrder, BitOrder, BitB, NumBits2Write, Bits2Write);
+            BitBuffer_InsertBits(ByteOrder, BitOrder, BitB, NumBits2Write, Bits2Write);
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
-            Log(Log_ERROR, __func__, U8("NumBits2Write %d is greater than BitBuffer can provide %lld, or greater than WriteBits can satisfy 1-64"), NumBits2Write, BitB->NumBits);
+            Log(Log_ERROR, __func__, U8("NumBits2Write %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_WriteBits can satisfy 1-64"), NumBits2Write, BitB->NumBits);
         }
     }
     
-    void     WriteUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const uint8_t UnaryBits2Write) {
+    void     BitBuffer_WriteUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const uint8_t UnaryBits2Write) {
         if (BitB != NULL) {
             StopBit         &= 1;
             uint8_t Field2Write = UnaryBits2Write;
             if (UnaryType == CountUnary) {
                 Field2Write -= 1;
             }
-            InsertBits(ByteOrder, BitOrder, BitB, Logarithm(2, Field2Write), StopBit ^ 1);
-            InsertBits(ByteOrder, BitOrder, BitB, 1, StopBit);
+            BitBuffer_InsertBits(ByteOrder, BitOrder, BitB, Logarithm(2, Field2Write), StopBit ^ 1);
+            BitBuffer_InsertBits(ByteOrder, BitOrder, BitB, 1, StopBit);
         } else {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         }
     }
     
-    void     WriteUTF8(BitBuffer *BitB, UTF8 *String2Write) {
+    void     BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write) {
         if (BitB != NULL && String2Write != NULL) {
             uint64_t StringSize    = UTF8_GetStringSizeInCodeUnits(String2Write);
             uint64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
             if (BitsAvailable >= (uint64_t) Bytes2Bits(StringSize)) {
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                    InsertBits(MSByteFirst, LSBitFirst, BitB, 8, String2Write[CodeUnit]);
+                    BitBuffer_InsertBits(MSByteFirst, LSBitFirst, BitB, 8, String2Write[CodeUnit]);
                 }
             } else {
                 Log(Log_ERROR, __func__, U8("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
@@ -394,16 +491,16 @@ extern "C" {
         }
     }
     
-    void     WriteUTF16(BitBuffer *BitB, UTF16 *String2Write) {
+    void     BitBuffer_WriteUTF16(BitBuffer *BitB, UTF16 *String2Write) {
         if (BitB != NULL && String2Write != NULL) {
             uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(String2Write);
             uint64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
             if (BitsAvailable >= (uint64_t) Bytes2Bits(StringSize)) {
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
 #if    (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                    InsertBits(LSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
+                    BitBuffer_InsertBits(LSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
 #elif  (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                    InsertBits(MSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
+                    BitBuffer_InsertBits(MSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
 #endif
                 }
             } else {
@@ -414,28 +511,34 @@ extern "C" {
         } else if (String2Write == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        
+    }
+    
+    void BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, const uint8_t *GUUID2Write) {
+        if (BitB != NULL && BitBuffer_GetPosition(BitB)  && GUUID2Write != NULL) { // TODO: Make sure that the BitBuffer can hold the GUUID
+            uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? GUUIDStringSize - NULLTerminatorSize : BinaryGUUIDSize);
+            uint8_t ByteOrder = ((GUUIDType == GUIDString || GUUIDType == BinaryGUID) ? LSByteFirst : MSByteFirst);
+            for (uint8_t Byte = 0; Byte < GUUIDSize; Byte++) {
+                BitBuffer_WriteBits(ByteOrder, LSBitFirst, BitB, 8, GUUID2Write[Byte]);
+            }
+        } else if (BitB == NULL) {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        } else if (GUUID2Write == NULL) {
+            Log(Log_ERROR, __func__, U8("GUUID2Write Pointer is NULL"));
+        }
+    }
+    
+    void BitBuffer_Deinit(BitBuffer *BitB) {
+        if (BitB != NULL) {
+            free(BitB->Buffer);
+            free(BitB);
+        } else {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        }
     }
     /* BitBuffer Resource Management */
     /* End BitBuffer section */
     
     /* BitInput */
-    typedef struct BitInput {
-        union InputPath { // and lets make sure to copy the path
-            UTF32              *Path32;
-            UTF16              *Path16;
-            UTF8               *Path8;
-        } InputPath;
-        FILE                   *File;
-        uint64_t                FileSpecifierNum;
-        int64_t                 FileSize;
-        int64_t                 FilePosition;
-        int                     Socket;
-        bool                    FileSpecifierExists;
-        StringTypes             PathType;
-        BitInputOutputFileTypes FileType;
-    } BitInput;
-    
     BitInput *BitInput_Init(void) {
         BitInput *BitI = calloc(1, sizeof(BitInput));
         if (BitI == NULL) {
@@ -448,7 +551,22 @@ extern "C" {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType                   = BitIOFile;
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
-            BitI->File                       = FoundationIO_FileOpen(Path2Open, U8("rb"));
+            UTF32 *Path32                    = UTF8_Decode(Path2Open);
+            bool   PathHasBOM                = UTF32_StringHasBOM(Path32);
+            if (PathHasBOM) {
+                UTF32 *BOMLess               = UTF32_RemoveBOM(Path32);
+                free(Path32);
+                Path32                       = BOMLess;
+            }
+            bool  PathHasSpecifier           = UTF32_NumFormatSpecifiers(Path32);
+            if (PathHasSpecifier) {
+                UTF32 *Formatted             = UTF32_FormatString(Path32, BitI->FileSpecifierNum);
+                BitI->FileSpecifierNum      += 1;
+                free(Path32);
+                Path32                       = Formatted;
+            }
+            UTF8  *Path8                     = UTF8_Encode(Path32);
+            BitI->File                       = FoundationIO_FileOpen(Path8, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
             bool  StringHasBOM               = UTF8_StringHasBOM(Path2Open);
             UTF32 *WinPath32                 = UTF8_Decode(Path2Open);
@@ -475,10 +593,25 @@ extern "C" {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType                   = BitIOFile;
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
-            BitI->File                       = FoundationIO_FileOpen(Path2Open, U8("rb"));
+            UTF32 *Path32                    = UTF16_Decode(Path2Open);
+            bool   PathHasBOM                = UTF32_StringHasBOM(Path32);
+            if (PathHasBOM) {
+                UTF32 *BOMLess               = UTF32_RemoveBOM(Path32);
+                free(Path32);
+                Path32                       = BOMLess;
+            }
+            bool  PathHasSpecifier           = UTF32_NumFormatSpecifiers(Path32);
+            if (PathHasSpecifier) {
+                UTF32 *Formatted             = UTF32_FormatString(Path32, BitI->FileSpecifierNum);
+                BitI->FileSpecifierNum      += 1;
+                free(Path32);
+                Path32                       = Formatted;
+            }
+            UTF8  *Path8                     = UTF8_Encode(Path32);
+            BitI->File                       = FoundationIO_FileOpen(Path8, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
-            bool  StringHasBOM               = UTF8_StringHasBOM(Path2Open);
-            UTF32 *WinPath32                 = UTF8_Decode(Path2Open);
+            bool  StringHasBOM               = UTF16_StringHasBOM(Path2Open);
+            UTF32 *WinPath32                 = UTF16_Decode(Path2Open);
             UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, U32("\\\\\?\\"), StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
             free(WinPath32);
             UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32);
@@ -489,7 +622,11 @@ extern "C" {
             if (BitI->File != NULL) {
                 setvbuf(BitI->File, NULL, _IONBF, 0);
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't open file \"%s\": Check that the file exists and the permissions are correct"), Path2Open);
+                UTF32 *Path32                = UTF16_Decode(Path2Open);
+                UTF8  *Path8                 = UTF8_Encode(Path32);
+                free(Path32);
+                Log(Log_ERROR, __func__, U8("Couldn't open file \"%s\": Check that the file exists and the permissions are correct"), Path8);
+                free(Path8);
             }
         } else if (BitI == NULL) {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
@@ -597,7 +734,7 @@ extern "C" {
             if (BitI->FileSize == 0) {
                 BitInput_FindFileSize(BitI);
             }
-            InputSize    = BitI->FileSize;
+            InputSize     = BitI->FileSize;
         } else {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         }
@@ -646,21 +783,6 @@ extern "C" {
     
     
     /* BitOutput */
-    typedef struct BitOutput {
-        union OutputPath {
-            UTF32              *Path32;
-            UTF16              *Path16;
-            UTF8               *Path8;
-        } OutputPath;
-        FILE                   *File;
-        uint64_t                FileSpecifierNum;
-        int64_t                 FilePosition;
-        int                     Socket;
-        bool                    FileSpecifierExists;
-        BitInputOutputFileTypes FileType;
-        StringTypes             PathType;
-    } BitOutput;
-    
     BitOutput *BitOutput_Init(void) {
         BitOutput *BitO = calloc(1, sizeof(BitOutput));
         if (BitO == NULL) {
@@ -836,15 +958,10 @@ extern "C" {
     /* BitOutput */
     
     /* GUUID */
-    enum GUUIDConstants {
-        GUUIDStringSize                 = 20 + NULLTerminatorSize,
-        BinaryGUUIDSize                 = 16,
-    };
-    
-    bool CompareGUUIDs(GUUIDTypes GUUIDType, const uint8_t *GUUID1, const uint8_t *GUUID2) {
-        uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? BinaryGUUIDSize - NULLTerminatorSize : BinaryGUUIDSize);
+    bool GUUID_Compare(GUUIDTypes Type2Compare, const uint8_t *GUUID1, const uint8_t *GUUID2) {
+        uint8_t GUUIDSize = ((Type2Compare == GUIDString || Type2Compare == UUIDString) ? BinaryGUUIDSize - NULLTerminatorSize : BinaryGUUIDSize);
         bool GUUIDsMatch        = Yes;
-        if (GUUID1 != NULL && GUUID2 != NULL && GUUIDType != UnknownGUUID) {
+        if (GUUID1 != NULL && GUUID2 != NULL && Type2Compare != UnknownGUUID) {
             for (uint8_t BinaryGUUIDByte = 0; BinaryGUUIDByte < GUUIDSize; BinaryGUUIDByte++) {
                 if (GUUID1[BinaryGUUIDByte] != GUUID2[BinaryGUUIDByte]) {
                     GUUIDsMatch = No;
@@ -854,27 +971,27 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("GUUID1 Pointer is NULL"));
         } else if (GUUID2 == NULL) {
             Log(Log_ERROR, __func__, U8("GUUID2 Pointer is NULL"));
-        } else if (GUUIDType == UnknownGUUID) {
+        } else if (Type2Compare == UnknownGUUID) {
             Log(Log_ERROR, __func__, U8("UnknownGUUID is an invalid GUUID type"));
         }
         return GUUIDsMatch;
     }
     
-    uint8_t *ConvertGUUID(GUUIDTypes InputGUUIDType, GUUIDTypes OutputGUUIDType, uint8_t *GUUID2Convert) {
-        uint8_t  OutputGUUIDSize = ((OutputGUUIDType == GUIDString || OutputGUUIDType == UUIDString) ? GUUIDStringSize : BinaryGUUIDSize);
+    uint8_t *GUUID_Convert(GUUIDTypes InputType, GUUIDTypes OutputType, uint8_t *GUUID2Convert) {
+        uint8_t  OutputGUUIDSize = ((OutputType == GUIDString || OutputType == UUIDString) ? GUUIDStringSize : BinaryGUUIDSize);
         uint8_t *ConvertedGUUID  = calloc(OutputGUUIDSize, sizeof(uint8_t));
-        if (ConvertedGUUID != NULL && GUUID2Convert != NULL && InputGUUIDType != UnknownGUUID && OutputGUUIDType != UnknownGUUID) {
-            bool ByteOrderDiffers = (((InputGUUIDType == GUIDString && OutputGUUIDType == UUIDString) || (InputGUUIDType == UUIDString && OutputGUUIDType == GUIDString) || (InputGUUIDType == BinaryUUID && OutputGUUIDType == BinaryGUID) || (InputGUUIDType == BinaryGUID && OutputGUUIDType == BinaryUUID)) ? Yes : No);
+        if (ConvertedGUUID != NULL && GUUID2Convert != NULL && InputType != UnknownGUUID && OutputType != UnknownGUUID) {
+            bool ByteOrderDiffers = (((InputType == GUIDString && OutputType == UUIDString) || (InputType == UUIDString && OutputType == GUIDString) || (InputType == BinaryUUID && OutputType == BinaryGUID) || (InputType == BinaryGUID && OutputType == BinaryUUID)) ? Yes : No);
             
-            bool TypeDiffers      = (((InputGUUIDType == GUIDString && OutputGUUIDType == BinaryGUID) || (InputGUUIDType == BinaryGUID && OutputGUUIDType == GUIDString) || (InputGUUIDType == UUIDString && OutputGUUIDType == BinaryUUID) || (InputGUUIDType == BinaryUUID && OutputGUUIDType == UUIDString)) ? Yes : No);
+            bool TypeDiffers      = (((InputType == GUIDString && OutputType == BinaryGUID) || (InputType == BinaryGUID && OutputType == GUIDString) || (InputType == UUIDString && OutputType == BinaryUUID) || (InputType == BinaryUUID && OutputType == UUIDString)) ? Yes : No);
             
             if (ByteOrderDiffers == Yes) {
-                SwapGUUID(InputGUUIDType, GUUID2Convert);
+                GUUID_Swap(InputType, GUUID2Convert);
             }
             
             if (TypeDiffers == Yes) {
                 // Convert from a string to a binary, or vice versa.
-                if ((InputGUUIDType == UUIDString || InputGUUIDType == GUIDString) && (OutputGUUIDType == BinaryUUID || OutputGUUIDType == BinaryGUID)) {
+                if ((InputType == UUIDString || InputType == GUIDString) && (OutputType == BinaryUUID || OutputType == BinaryGUID)) {
                     // Convert from string to binary
                     for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize; StringByte++) {
                         for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize; BinaryByte++) {
@@ -883,8 +1000,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if ((InputGUUIDType == BinaryUUID || InputGUUIDType == BinaryGUID) || (OutputGUUIDType == UUIDString || OutputGUUIDType == GUIDString)) {
-                    // Convert from binary to string
+                } else if ((InputType == BinaryUUID || InputType == BinaryGUID) || (OutputType == UUIDString || OutputType == GUIDString)) {
                     for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize; BinaryByte++) {
                         for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize; StringByte++) {
                             if (BinaryByte != 4 && BinaryByte != 7 && BinaryByte != 10 && BinaryByte != 13) {
@@ -900,15 +1016,15 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("Insufficent memory to allocate ConvertedGUUID"));
         } else if (GUUID2Convert == NULL) {
             Log(Log_ERROR, __func__, U8("GUUID Pointer is NULL"));
-        } else if (InputGUUIDType == UnknownGUUID) {
-            Log(Log_ERROR, __func__, U8("InputGUUIDType is invalid"));
-        } else if (OutputGUUIDType) {
-            Log(Log_ERROR, __func__, U8("OutputGUUIDType is invalid"));
+        } else if (InputType == UnknownGUUID) {
+            Log(Log_ERROR, __func__, U8("InputType is invalid"));
+        } else if (OutputType == UnknownGUUID) {
+            Log(Log_ERROR, __func__, U8("OutputType is invalid"));
         }
         return ConvertedGUUID;
     }
     
-    uint8_t *SwapGUUID(GUUIDTypes GUUIDType, uint8_t *GUUID2Swap) {
+    uint8_t *GUUID_Swap(GUUIDTypes GUUIDType, uint8_t *GUUID2Swap) {
         uint8_t *SwappedGUUID = NULL;
         if (GUUID2Swap != NULL && GUUIDType != UnknownGUUID) {
             if (GUUIDType == UUIDString || GUUIDType == GUIDString) {
@@ -968,68 +1084,6 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("UnknownGUUID is an invalid GUUID type"));
         }
         return SwappedGUUID;
-    }
-    
-    uint8_t *ReadGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB) {
-        uint8_t ByteOrder = ((GUUIDType == GUIDString || GUUIDType == BinaryGUID) ? LSByteFirst : MSByteFirst);
-        uint8_t *GUUID = NULL;
-        if (GUUIDType != UnknownGUUID && BitB != NULL && (BitBuffer_GetSize(BitB) - BitBuffer_GetPosition(BitB)) >= BinaryGUUIDSize) {
-            if (GUUIDType == BinaryUUID || GUUIDType == BinaryGUID) {
-                // Read it from the BitBuffer as a string.
-                GUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
-                if (GUUID != NULL) {
-                    for (uint8_t Byte = 0; Byte < BinaryGUUIDSize - NULLTerminatorSize; Byte++) {
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(push)
-#pragma warning(disable: 4090)
-#endif
-                        GUUID[Byte] = ReadBits(ByteOrder, LSBitFirst, BitB, 8);
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(pop)
-#endif
-                    }
-                } else {
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate GUIDString"));
-                }
-            } else if (GUUIDType == UUIDString || GUUIDType == GUIDString) {
-                if (GUUID != NULL) {
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(push)
-#pragma warning(disable: 4090)
-#endif
-                    uint32_t Section1    = ReadBits(ByteOrder, LSBitFirst, BitB, 32);
-                    BitBuffer_Skip(BitB, 8);
-                    uint16_t Section2    = ReadBits(ByteOrder, LSBitFirst, BitB, 16);
-                    BitBuffer_Skip(BitB, 8);
-                    uint16_t Section3    = ReadBits(ByteOrder, LSBitFirst, BitB, 16);
-                    BitBuffer_Skip(BitB, 8);
-                    uint16_t Section4    = ReadBits(ByteOrder, LSBitFirst, BitB, 16);
-                    BitBuffer_Skip(BitB, 8);
-                    uint64_t Section5    = ReadBits(ByteOrder, LSBitFirst, BitB, 48);
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(pop)
-#endif
-                    GUUID                = UTF8_FormatString(U8("%d-%d-%d-%d-%llu"), Section1, Section2, Section3, Section4, Section5);
-                } else {
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate UUIDString"));
-                }
-            }
-        }
-        return GUUID;
-    }
-    
-    void WriteGUUID(GUUIDTypes GUUIDType, BitBuffer *BitB, const uint8_t *GUUID2Write) {
-        if (BitB != NULL && BitBuffer_GetPosition(BitB)  && GUUID2Write != NULL) { // TODO: Make sure that the BitBuffer can hold the GUUID
-            uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? GUUIDStringSize - NULLTerminatorSize : BinaryGUUIDSize);
-            uint8_t ByteOrder = ((GUUIDType == GUIDString || GUUIDType == BinaryGUID) ? LSByteFirst : MSByteFirst);
-            for (uint8_t Byte = 0; Byte < GUUIDSize; Byte++) {
-                WriteBits(ByteOrder, LSBitFirst, BitB, 8, GUUID2Write[Byte]);
-            }
-        } else if (BitB == NULL) {
-            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
-        } else if (GUUID2Write == NULL) {
-            Log(Log_ERROR, __func__, U8("GUUID2Write Pointer is NULL"));
-        }
     }
     
     void GUUID_Deinit(uint8_t *GUUID) {

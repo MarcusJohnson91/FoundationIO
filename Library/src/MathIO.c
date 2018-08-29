@@ -75,6 +75,18 @@ extern "C" {
         return Bytes;
     }
     
+    uint8_t  SwapBits(const uint8_t Byte) {
+        return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
+    }
+    
+    uint8_t  CreateBitMaskLSBit(const uint8_t Bits2Extract) {
+        return (uint8_t) Exponentiate(2, Bits2Extract) << (8 - Bits2Extract);
+    }
+    
+    uint8_t  CreateBitMaskMSBit(const uint8_t Bits2Extract) {
+        return (uint8_t) Exponentiate(2, Bits2Extract) >> (8 - Bits2Extract);
+    }
+    
     int8_t   ExtractSignFromDecimal(double Number2Extract) {
         uint64_t *Sign1 = (uint64_t *) &Number2Extract;
         uint64_t  Sign2 = *Sign1 >> 63;
