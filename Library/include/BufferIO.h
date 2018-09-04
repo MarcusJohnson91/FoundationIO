@@ -151,7 +151,7 @@ extern "C" {
     void                        BitBuffer_Clear(BitBuffer *BitB);
     
     /*!
-     @abstract                                                  "Changes the size of an already initalized BitBuffer".
+     @abstract                                                  "Changes the size of an already initialized BitBuffer".
      @remark                                                    "Resizing a BitBuffer IS NOT destructive".
      @param                     BitB                            "BitBuffer Pointer to resize".
      @param                     NewSize                         "The new size of the internal buffer in bytes".
@@ -432,7 +432,7 @@ extern "C" {
     
     /* GUUID */
     /*!
-     @abstract                                                  "Compares GUUIDs for equilivence, GUUID1 and 2 HAVE to be the same type".
+     @abstract                                                  "Compares GUUIDs for equivalence, GUUID1 and 2 HAVE to be the same type".
      @param                     GUUID1                          "Pointer to a GUUID to be compared".
      @param                     GUUID2                          "Pointer to a GUUID to be compared".
      @return                                                    "Returns Yes if GUUID1 and GUUID2 match, No otherwise".
