@@ -71,6 +71,36 @@ extern "C" {
         return BitB;
     }
     
+    void BitBuffer_Read(BitBuffer *BitB, BitInput *BitI) {
+        if (BitB != NULL && BitI != NULL) {
+            uint64_t Bytes2Read    = Bits2Bytes(BitB->NumBits - BitB->BitOffset, No);
+            uint8_t Bits2Save      = BitB->BitOffset % 8;
+            if (Bits2Save > 0) {
+                BitB->Buffer[0]    = 0;
+                uint8_t Saved      = BitB->Buffer[Bytes2Read + 1] & CreateBitMaskLSBit(Bits2Save);
+                BitB->Buffer[0]    = Saved;
+                BitB->BitOffset    = Bits2Save;
+            } else {
+                BitB->BitOffset    = 0;
+            }
+            for (int64_t Byte = Bits2Bytes(BitB->BitOffset, Yes); Byte < Bits2Bytes(BitB->NumBits, No); Byte++) {
+                BitB->Buffer[Byte] = 0;
+            }
+            uint64_t Bytes2Read2   = Bits2Bytes(BitB->NumBits - BitB->BitOffset, No);
+            uint64_t BytesRead     = 0ULL;
+            if (BitI->FileType == BitIOFile) {
+                BytesRead          = FoundationIO_FileRead(BitB->Buffer, 1, Bytes2Read2, BitI->File);
+            } else if (BitI->FileType == BitIOSocket) {
+                BytesRead          = FoundationIO_SocketRead(BitI->Socket, BitB->Buffer, Bytes2Read2);
+            }
+            BitB->NumBits          = (BytesRead * 8) + BitB->BitOffset;
+        } else if (BitB == NULL) {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        } else if (BitI == NULL) {
+            Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
+        }
+    }
+    
     uint64_t BitBuffer_GetSize(BitBuffer *BitB) {
         uint64_t BitBufferSize = 0ULL;
         if (BitB != NULL) {
@@ -354,6 +384,23 @@ extern "C" {
         return (UnaryType == CountUnary ? OutputData + 1 : OutputData);
     }
     
+    uint64_t BitBuffer_GetUTF8StringSize(BitBuffer *BitB) {
+        uint64_t StringSize     = 0ULL;
+        int64_t  OriginalOffset = 0LL;
+        uint8_t  CodeUnitSize   = 1;
+        if (BitB != NULL) {
+            OriginalOffset      = BitBuffer_GetPosition(BitB);
+            do {
+                CodeUnitSize    = UTF8_GetCodePointSize(BitBuffer_ExtractBits(MSByteFirst, LSBitFirst, BitB, 8));
+                StringSize     += CodeUnitSize;
+            } while (CodeUnitSize != 0);
+            BitBuffer_SetPosition(BitB, OriginalOffset);
+        } else {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        }
+        return StringSize;
+    }
+    
     UTF8    *BitBuffer_ReadUTF8(BitBuffer *BitB, uint64_t StringSize) {
         UTF8 *ExtractedString             = calloc(StringSize, sizeof(UTF8));
         if (BitB != NULL && ExtractedString != NULL) {
@@ -371,28 +418,31 @@ extern "C" {
         return ExtractedString;
     }
     
+    uint64_t BitBuffer_GetUTF16StringSize(BitBuffer *BitB) {
+        uint64_t StringSize     = 0ULL;
+        int64_t  OriginalOffset = 0LL;
+        uint8_t  CodeUnitSize   = 1;
+        if (BitB != NULL) {
+            OriginalOffset      = BitBuffer_GetPosition(BitB);
+            do {
+                CodeUnitSize    = UTF16_GetCodePointSize(BitBuffer_ExtractBits(MSByteFirst, LSBitFirst, BitB, 16));
+                StringSize     += CodeUnitSize;
+            } while (CodeUnitSize != 0);
+            BitBuffer_SetPosition(BitB, OriginalOffset);
+        } else {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        }
+        return StringSize;
+    }
+    
     UTF16   *BitBuffer_ReadUTF16(BitBuffer *BitB, uint64_t StringSize) {
-        UTF16 *ExtractedString                    = calloc(StringSize, sizeof(UTF16));
+        UTF16 *ExtractedString            = calloc(StringSize, sizeof(UTF16));
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(push)
-#pragma warning(disable: 4090)
-#endif
                 ExtractedString[CodeUnit] = BitBuffer_ExtractBits(LSByteFirst, LSBitFirst, BitB, 16);
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(pop)
-#endif
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(push)
-#pragma warning(disable: 4090)
-#endif
                 ExtractedString[CodeUnit] = BitBuffer_ExtractBits(MSByteFirst, LSBitFirst, BitB, 16);
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(pop)
-#endif
 #endif
             }
         } else if (BitB == NULL) {
@@ -524,6 +574,33 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if (GUUID2Write == NULL) {
             Log(Log_ERROR, __func__, U8("GUUID2Write Pointer is NULL"));
+        }
+    }
+    
+    void BitBuffer_Write(BitBuffer *BitB, BitOutput *BitO) {
+        if (BitB != NULL && BitO != NULL) {
+            uint64_t Bytes2Write  = Bits2Bytes(BitB->BitOffset, No);
+            uint64_t Bits2Keep    = BitB->BitOffset % 8;
+            uint64_t BytesWritten = 0ULL;
+            if (BitO->FileType == BitIOFile) {
+                BytesWritten = FoundationIO_FileWrite(BitB->Buffer, 1, Bytes2Write, BitO->File);
+            } else if (BitO->FileType == BitIOSocket) {
+                BytesWritten = FoundationIO_SocketWrite(BitO->Socket, BitB->Buffer, Bytes2Write);
+            }
+            if (BytesWritten == Bytes2Write) {
+                BitB->Buffer[0] = 0;
+                BitB->Buffer[0] = BitB->Buffer[Bytes2Write + 1] & (Exponentiate(2, Bits2Keep) << (8 - Bits2Keep));
+                BitB->BitOffset = Bits2Keep + 1;
+                for (int64_t Byte = Bits2Bytes(BitB->BitOffset, Yes); Byte < Bits2Bytes(BitB->NumBits, No); Byte++) {
+                    BitB->Buffer[Byte] = 0;
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Wrote %lld of %lld bits"), BytesWritten * 8, Bytes2Write * 8);
+            }
+        } else if (BitB == NULL) {
+            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
+        } else if (BitO == NULL) {
+            Log(Log_ERROR, __func__, U8("BitOutput Pointer is NULL"));
         }
     }
     
@@ -684,36 +761,6 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         } else if (SocketAddress == NULL) {
             Log(Log_ERROR, __func__, U8("SocketAddress Pointer is NULL"));
-        }
-    }
-    
-    void BitInput_Read2BitBuffer(BitInput *BitI, BitBuffer *Buffer2Read, const int64_t Bytes2Read) {
-        if (BitI != NULL && Buffer2Read != NULL && Bytes2Read > (BitI->FileSize - BitI->FilePosition)) {
-            if (Buffer2Read->Buffer  != NULL) {
-                free(Buffer2Read->Buffer);
-            }
-            Buffer2Read->Buffer       = calloc(Bytes2Read, sizeof(uint8_t));
-            if (Buffer2Read->Buffer != NULL) {
-                int64_t BytesRead     = 0ULL;
-                if (BitI->FileType   == BitIOFile) {
-                    BytesRead         = FoundationIO_FileRead(Buffer2Read->Buffer, 1, Bytes2Read, BitI->File);
-                } else if (BitI->FileType == BitIOSocket) {
-                    FoundationIO_SocketRead(BitI->Socket, Buffer2Read->Buffer, Bytes2Read);
-                }
-                if (BytesRead == Bytes2Read) {
-                    Buffer2Read->NumBits = Bytes2Bits(BytesRead);
-                } else {
-                    Log(Log_ERROR, __func__, U8("Fread read: %lld bytes, but you requested: %lld"), BytesRead, Bytes2Read);
-                }
-            } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate BitBuffer's buffer"));
-            }
-        } else if (BitI == NULL) {
-            Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
-        } else if (Buffer2Read == NULL) {
-            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
-        } else if (Bytes2Read > (BitI->FileSize - BitI->FilePosition)) {
-            Log(Log_ERROR, __func__, U8("You tried reading more data: %lld than is available: %lld in the file"), Bytes2Read, BitI->FileSize - BitI->FilePosition);
         }
     }
     
@@ -917,28 +964,6 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("BitOutput Pointer is NULL"));
         } else if (SocketAddress == NULL) {
             Log(Log_ERROR, __func__, U8("SocketAddress Pointer is NULL"));
-        }
-    }
-    
-    void BitOutput_WriteBitBuffer(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write) {
-        if (BitO != NULL && Buffer2Write != NULL) {
-            uint64_t BytesWritten      = 0ULL;
-            uint64_t BufferBytes       = Bits2Bytes(Buffer2Write->NumBits, Yes);
-            uint64_t NumBytes2Write    = (Bytes2Write > BufferBytes ? Bytes2Write : BufferBytes);
-            if (BitO->FileType == BitIOFile) {
-                BytesWritten           = FoundationIO_FileWrite(Buffer2Write->Buffer, 1, NumBytes2Write, BitO->File);
-            } else if (BitO->FileType == BitIOSocket) {
-                FoundationIO_SocketWrite(BitO->Socket, Buffer2Write->Buffer, NumBytes2Write);
-            }
-            if (BytesWritten != NumBytes2Write) {
-                Log(Log_ERROR, __func__, U8("Fwrite wrote: %lld bytes, but you requested: %lld"), BytesWritten, NumBytes2Write);
-            } else {
-                Buffer2Write->NumBits -= Bytes2Bits(BytesWritten);
-            }
-        } else if (BitO == NULL) {
-            Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
-        } else if (Buffer2Write == NULL) {
-            Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         }
     }
     
