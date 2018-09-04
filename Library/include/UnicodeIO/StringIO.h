@@ -55,27 +55,27 @@ extern "C" {
 #endif
     
     /*!
-     @enum                      ByteOrders
-     @constant                  UnknownByteOrder           "Unknown byte order".
-     @constant                  LSByteFirst                "Read from the Least Significant Byte to the Most Significant, aka right to left".
-     @constant                  MSByteFirst                "Read from the Most  Significant Byte to the Least Significant, aka left to right".
+     @enum                ByteOrders
+     @constant            UnknownByteOrder                     "Unknown byte order".
+     @constant            LSByteFirst                          "Read from the Least Significant Byte to the Most Significant, aka right to left".
+     @constant            MSByteFirst                          "Read from the Most  Significant Byte to the Least Significant, aka left to right".
      */
     typedef enum ByteOrders {
-        UnknownByteOrder           = 0,
-        LSByteFirst                = 1,
-        MSByteFirst                = 2,
+                          UnknownByteOrder                     = 0,
+                          LSByteFirst                          = 1,
+                          MSByteFirst                          = 2,
     } ByteOrders;
     
     /*!
-     @enum                      BitOrders
-     @constant                  UnknownBitOrder            "Unknown bit order".
-     @constant                  LSBitFirst                 "Read from the Least Significant Bit  to the Most  Significant, aka right to left".
-     @constant                  MSBitFirst                 "Read from the Most  Significant Bit  to the Least Significant, aka left to right".
+     @enum                BitOrders
+     @constant            UnknownBitOrder                      "Unknown bit order".
+     @constant            LSBitFirst                           "Read from the Least Significant Bit  to the Most  Significant, aka right to left".
+     @constant            MSBitFirst                           "Read from the Most  Significant Bit  to the Least Significant, aka left to right".
      */
     typedef enum BitOrders {
-        UnknownBitOrder            = 0,
-        LSBitFirst                 = 1,
-        MSBitFirst                 = 2,
+                          UnknownBitOrder                      = 0,
+                          LSBitFirst                           = 1,
+                          MSBitFirst                           = 2,
     } BitOrders;
     
     /*!
@@ -198,10 +198,10 @@ extern "C" {
      @constant            UTF32Format                          "The string is UTF-32 encoded".
      */
     typedef enum StringTypes {
-                        UnknownUnicodeFormat                   = 0,
-                        UTF8Format                             = 1,
-                        UTF16Format                            = 2,
-                        UTF32Format                            = 3,
+                          UnknownUnicodeFormat                 = 0,
+                          UTF8Format                           = 1,
+                          UTF16Format                          = 2,
+                          UTF32Format                          = 3,
     } StringTypes;
     
     typedef enum CombiningCharacterClasses {
@@ -764,7 +764,7 @@ extern "C" {
     UTF32                *UTF32_TrimString(UTF32 *String, UTF32 **Strings2Remove);
     
     /*!
-     @abstract                             "Compares String1 and String2 for equilivence".
+     @abstract                             "Compares String1 and String2 for equivalence".
      @remark                               "The caller needs to handle casefolding and normalization".
      @param               String1          "String1 Pointer".
      @param               String2          "String2 Pointer".
@@ -773,7 +773,7 @@ extern "C" {
     bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2);
     
     /*!
-     @abstract                             "Compares String1 and String2 for equilivence".
+     @abstract                             "Compares String1 and String2 for equivalence".
      @remark                               "The caller needs to handle casefolding and normalization".
      @param               String1          "String1 Pointer".
      @param               String2          "String2 Pointer".
@@ -782,7 +782,7 @@ extern "C" {
     bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2);
     
     /*!
-     @abstract                             "Compares String1 and String2 for equilivence".
+     @abstract                             "Compares String1 and String2 for equivalence".
      @remark                               "The caller needs to handle casefolding and normalization".
      @param               String1          "String1 Pointer".
      @param               String2          "String2 Pointer".
@@ -1009,19 +1009,19 @@ extern "C" {
     UTF32                *UTF32_StringArray_GetString(UTF32 **StringArray, uint64_t Index);
     
     /*!
-     @abstract                             "Deinitalizes a UTF-8 encoded StringArray (like is returned by SplitString)".
+     @abstract                             "Deinitializes a UTF-8 encoded StringArray (like is returned by SplitString)".
      @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
      */
     void                  UTF8_StringArray_Deinit(UTF8 **StringArray);
     
     /*!
-     @abstract                             "Deinitalizes a UTF-16 encoded StringArray (like is returned by SplitString)".
+     @abstract                             "Deinitializes a UTF-16 encoded StringArray (like is returned by SplitString)".
      @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
      */
     void                  UTF16_StringArray_Deinit(UTF16 **StringArray);
     
     /*!
-     @abstract                             "Deinitalizes a UTF-16 encoded StringArray (like is returned by SplitString)".
+     @abstract                             "Deinitializes a UTF-16 encoded StringArray (like is returned by SplitString)".
      @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
      */
     void                  UTF32_StringArray_Deinit(UTF32 **StringArray);
