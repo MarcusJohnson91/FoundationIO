@@ -148,15 +148,15 @@ extern "C" {
     }
     
     bool BitBuffer_IsAligned(BitBuffer *BitB, const uint8_t AlignmentSize) {
-        bool AlignmentStatus = No;
-        if (BitB != NULL && (AlignmentSize == 1 || AlignmentSize % 2 == 0)) {
+        bool AlignmentStatus    = No;
+        if (BitB != NULL && (AlignmentSize != 1 || AlignmentSize % 2 != 0)) {
             if (BitB->BitOffset % (AlignmentSize * 8) == 0) {
                 AlignmentStatus = Yes;
             }
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
-        } else if (AlignmentSize == 1 || AlignmentSize % 2 == 0) {
-            Log(Log_ERROR, __func__, U8("AlignmentSize: %d isn't an integer power of 2 (or 1)"), AlignmentSize);
+        } else if (AlignmentSize != 1 || AlignmentSize % 2 != 0) {
+            Log(Log_ERROR, __func__, U8("AlignmentSize: %d isn't 1 or an integer power of 2"), AlignmentSize);
         }
         return AlignmentStatus;
     }
@@ -525,10 +525,10 @@ extern "C" {
     
     void     BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write) {
         if (BitB != NULL && String2Write != NULL) {
-            uint64_t StringSize    = UTF8_GetStringSizeInCodeUnits(String2Write);
-            uint64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
-            if (BitsAvailable >= (uint64_t) Bytes2Bits(StringSize)) {
-                for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
+            int64_t StringSize    = UTF8_GetStringSizeInCodeUnits(String2Write);
+            int64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
+            if (BitsAvailable >= Bytes2Bits(StringSize)) {
+                for (int64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
                     BitBuffer_InsertBits(MSByteFirst, LSBitFirst, BitB, 8, String2Write[CodeUnit]);
                 }
             } else {
@@ -546,12 +546,23 @@ extern "C" {
             uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(String2Write);
             uint64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
             if (BitsAvailable >= (uint64_t) Bytes2Bits(StringSize)) {
-                for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
+                UTF16 ByteOrder    = String2Write[0];
+                if (ByteOrder == UTF16BE) {
+                    for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
 #if    (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                    BitBuffer_InsertBits(LSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
+                        BitBuffer_InsertBits(MSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
 #elif  (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                    BitBuffer_InsertBits(MSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
+                        BitBuffer_InsertBits(LSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
 #endif
+                    }
+                } else if (ByteOrder == UTF16LE) {
+                    for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
+#if    (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+                        BitBuffer_InsertBits(LSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
+#elif  (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+                        BitBuffer_InsertBits(MSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
+#endif
+                    }
                 }
             } else {
                 Log(Log_ERROR, __func__, U8("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
