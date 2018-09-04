@@ -131,7 +131,7 @@ extern "C" {
     int64_t                 AudioContainer_GetMin(AudioContainer *Audio, uint64_t Channel);
     
     /*!
-     @abstract                             "Deinitalizes an AudioContainer, and any samples stored within it".
+     @abstract                             "Deinitializes an AudioContainer, and any samples stored within it".
      @param                 Audio          "A pointer to the instance of an AudioContainer in question".
      */
     void                    AudioContainer_Deinit(AudioContainer *Audio);
@@ -303,7 +303,7 @@ extern "C" {
     void                    ImageContainer_Flip(ImageContainer *Image, bool VerticalFlip, bool HorizontalFlip);
     
     /*!
-     @abstract                             "Deinitalizes the ImageContainer pointed to".
+     @abstract                             "Deinitializes the ImageContainer pointed to".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
     void                    ImageContainer_Deinit(ImageContainer *Image);

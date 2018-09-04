@@ -128,7 +128,7 @@ extern "C" {
 #endif
     
 #ifndef             FoundationIO_FileWrite
-#define             FoundationIO_FileWrite(Input, ElementSize, NumElements2Read, File2Write) fwrite(Input, ElementSize, NumElements2Read, File2Write)
+#define             FoundationIO_FileWrite(Input, ElementSize, NumElements2Write, File2Write) fwrite(Input, ElementSize, NumElements2Write, File2Write)
 #endif
     
 #ifndef             FoundationIO_FileClose
@@ -160,7 +160,7 @@ extern "C" {
 #endif
     
 #ifndef             FoundationIO_SocketWrite
-#define             FoundationIO_SocketWrite(Socket2Read, Buffer2Write, NumBytes) write(Socket2Read, Buffer2Write, NumBytes)
+#define             FoundationIO_SocketWrite(Socket2Write, Buffer2Write, NumBytes) write(Socket2Write, Buffer2Write, NumBytes)
 #endif
     
 #ifndef             FoundationIO_SocketClose
