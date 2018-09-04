@@ -86,6 +86,13 @@ extern "C" {
     BitBuffer                  *BitBuffer_Init(const uint64_t BitBufferSize);
     
     /*!
+     @abstract                                                  "Reads data from BitInput to BitBuffer".
+     @param                     BitB                            "The BitBuffer to read to".
+     @param                     BitI                            "The BitInput to read from".
+     */
+    void                        BitBuffer_Read(BitBuffer *BitB, BitInput *BitI);
+    
+    /*!
      @abstract                                                  "Gets the size of the BitBuffer in bits".
      @param                     BitB                            "BitBuffer Pointer".
      @return                                                    "Returns the number of bits the buffer can hold max".
@@ -205,14 +212,30 @@ extern "C" {
     uint64_t                    BitBuffer_ReadUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
     
     /*!
+     @abstract                                                  "Reads data from the Bitbuffer until it stops matching the UTF-8 format".
+     @remark                                                    "Does NOT count any potential NULL terminator".
+     @param                     BitB                            "BitBuffer Pointer".
+     */
+    uint64_t                    BitBuffer_GetUTF8StringSize(BitBuffer *BitB);
+    
+    /*!
      @abstract                                                  "Reads a UTF-8 encoded string from the BitBuffer".
+     @remark                                                    "We read exactly StringSize bytes, you need to account for any null terminators, etc".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     StringSize                      "Size of the string in CodeUnits".
      */
     UTF8                       *BitBuffer_ReadUTF8(BitBuffer *BitB, uint64_t StringSize);
     
     /*!
+     @abstract                                                  "Reads data from the Bitbuffer until it stops matching the UTF-8 format".
+     @remark                                                    "Does NOT count any potential NULL terminator".
+     @param                     BitB                            "BitBuffer Pointer".
+     */
+    uint64_t                    BitBuffer_GetUTF16StringSize(BitBuffer *BitB);
+    
+    /*!
      @abstract                                                  "Reads a UTF-16 encoded string from the BitBuffer".
+     @remark                                                    "We read exactly StringSize * 2 bytes, you need to account for any null terminators, etc".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     StringSize                      "Size of the string in CodeUnits".
      */
@@ -270,7 +293,15 @@ extern "C" {
     void                        BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, const uint8_t *GUUID2Write);
     
     /*!
-     @abstract                                                  "Deinitalizes the BitBuffer".
+     @abstract                                                  "Writes a BitBuffer to BitOutput".
+     @remark                                                    "Only writes actually used water".
+     @param                     BitB                            "The BitBuffer to write".
+     @param                     BitO                            "The BitOutput to write from".
+     */
+    void                        BitBuffer_Write(BitBuffer *BitB, BitOutput *BitO);
+    
+    /*!
+     @abstract                                                  "Deinitializes the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer you want to deinit".
      */
     void                        BitBuffer_Deinit(BitBuffer *BitB);
@@ -332,15 +363,6 @@ extern "C" {
      @return                                                    "Returns the value in BitI->FileSize if it exists".
      */
     int64_t                     BitInput_GetFileSize(BitInput *BitI);
-    
-    /*!
-     @abstract                                                  "Reads Bytes2Read into Buffer2Read from BitInput".
-     @remark                                                    "If the BitBuffer Pointer is not new, all the old contents will be lost".
-     @param                     BitI                            "BitInput Pointer".
-     @param                     Buffer2Read                     "BitBuffer Pointer".
-     @param                     Bytes2Read                      "The number of bytes to read from the BitInput into the BitBuffer".
-     */
-    void                        BitInput_Read2BitBuffer(BitInput *BitI, BitBuffer *Buffer2Read, const int64_t Bytes2Read);
     
     /*!
      @abstract                                                  "Gets the position of the BitInput file from the start".
@@ -413,14 +435,6 @@ extern "C" {
      @param                     SocketSize                      "I honestly have no idea what this means".
      */
     void                        BitOutput_ConnectSocket(BitOutput *BitO, struct sockaddr *SocketAddress, const uint64_t SocketSize);
-    
-    /*!
-     @abstract                                                  "Writes a BitBuffer to a file".
-     @param                     BitO                            "BitOutput Pointer to write the buffer to".
-     @param                     Buffer2Write                    "The buffer to be written to the output file".
-     @param                     Bytes2Write                     "The number of bytes from the buffer to write to the file".
-     */
-    void                        BitOutput_WriteBitBuffer(BitOutput *BitO, BitBuffer *Buffer2Write, const uint64_t Bytes2Write);
     
     /*!
      @abstract                                                  "Deallocates the instance of BitOutput pointed to by BitO".
