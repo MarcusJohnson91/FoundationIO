@@ -96,6 +96,17 @@ extern "C" {
         if (NumSwitches >= 0) {
             CLI                      = calloc(1, sizeof(CommandLineIO));
             if (CLI != NULL) {
+#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+                struct winsize       WindowSize;
+                ioctl(0, TIOCGWINSZ, &WindowSize);
+                CLI->ConsoleWidth    = WindowSize.ws_row;
+                CLI->ConsoleHeight   = WindowSize.ws_col;
+#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+                CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
+                GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
+                CLI->ConsoleHeight   = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
+                CLI->ConsoleWidth    = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
+#endif
                 CLI->SwitchIDs       = calloc(NumSwitches, sizeof(CommandLineSwitch));
                 if (CLI->SwitchIDs != NULL) {
                     CLI->NumSwitches = NumSwitches;
@@ -105,22 +116,6 @@ extern "C" {
             } else {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate CommandLineIO"));
             }
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
-            struct winsize       *WindowSize = NULL;
-            if (WindowSize == NULL) {
-                WindowSize = (struct winsize *) calloc(1, sizeof(struct winsize));
-            }
-            ioctl(0, TIOCGWINSZ, WindowSize);
-            CLI->ConsoleWidth    = WindowSize->ws_row;
-            CLI->ConsoleHeight   = WindowSize->ws_col;
-            free(WindowSize);
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
-            CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
-            GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
-            CLI->ConsoleHeight   = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
-            CLI->ConsoleWidth    = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
-#endif
-            Log(Log_DEBUG, __func__, U8("WindowWidth: %d, WindowHeight %d"), CLI->ConsoleWidth, CLI->ConsoleHeight);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("Couldn't allocate CommandLineIO"));
         } else if (NumSwitches == 0) {
