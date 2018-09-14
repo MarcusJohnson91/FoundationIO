@@ -1,15 +1,5 @@
-#if (defined(__APPLE__) && defined(__MACH__)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(__ANDROID__) || defined(__minix) || defined(__linux__) || defined(__unix__) || defined(_POSIX_C_SOURCE)
-#ifdef  _FILE_OFFSET_BITS
-#undef  _FILE_OFFSET_BITS
-#define _FILE_OFFSET_BITS 64
-#else
-#define _FILE_OFFSET_BITS 64
-#endif /* _FILE_OFFSET_BITS */
-#endif /* Various UNIX Platforms */
-
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdio.h>
 
 #pragma once
 
@@ -53,30 +43,6 @@ extern "C" {
 #else
     typedef               uint_least32_t                       UTF32;
 #endif
-    
-    /*!
-     @enum                ByteOrders
-     @constant            UnknownByteOrder                     "Unknown byte order".
-     @constant            LSByteFirst                          "Read from the Least Significant Byte to the Most Significant, aka right to left".
-     @constant            MSByteFirst                          "Read from the Most  Significant Byte to the Least Significant, aka left to right".
-     */
-    typedef enum ByteOrders {
-                          UnknownByteOrder                     = 0,
-                          LSByteFirst                          = 1,
-                          MSByteFirst                          = 2,
-    } ByteOrders;
-    
-    /*!
-     @enum                BitOrders
-     @constant            UnknownBitOrder                      "Unknown bit order".
-     @constant            LSBitFirst                           "Read from the Least Significant Bit  to the Most  Significant, aka right to left".
-     @constant            MSBitFirst                           "Read from the Most  Significant Bit  to the Least Significant, aka left to right".
-     */
-    typedef enum BitOrders {
-                          UnknownBitOrder                      = 0,
-                          LSBitFirst                           = 1,
-                          MSBitFirst                           = 2,
-    } BitOrders;
     
     /*!
      @enum                StringIOCommon

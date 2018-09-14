@@ -1,5 +1,7 @@
-#include "../include/Macros.h"
+#include "../include/Macros.h"         /* Included for FoundationIO's macros */
+
 #include "../include/Math.h"           /* Included for our declarations */
+#include "../include/Log.h"
 
 #ifdef __cplusplus
 extern "C" {

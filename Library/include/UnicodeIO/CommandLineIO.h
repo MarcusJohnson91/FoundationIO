@@ -1,4 +1,4 @@
-#include "StringIO.h"                 /* Included for UTF8 */
+#include "StringIO.h"                 /* Included for UTF8, UTF16 */
 
 #pragma  once
 

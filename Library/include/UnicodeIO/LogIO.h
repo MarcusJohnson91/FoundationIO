@@ -1,6 +1,3 @@
-#include "stdint.h"
-#include "stdbool.h"
-
 #include "StringIO.h"                 /* Included for UTF8, U8 macro, bool, Yes/No macros, u/intX_t */
 
 #pragma once
