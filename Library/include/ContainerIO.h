@@ -271,6 +271,13 @@ extern "C" {
     void                ****ImageContainer_GetArray(ImageContainer *Image);
     
     /*!
+     @abstract                             "Sets a pointer to the array of pixels".
+     @param                 Image          "A pointer to the instance of an ImageContainer in question".
+     @param                 Array          "A pointer to the new array".
+     */
+    void                    ImageContainer_SetArray(ImageContainer *Image, void ****Array);
+    
+    /*!
      @abstract                             "Returns the average value (rounded) of the pixels in this image".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      @param                 ViewMask       "Which view are you trying to get the average from"?
@@ -301,6 +308,17 @@ extern "C" {
      @param                 HorizontalFlip "left becomes right and vice versa".
      */
     void                    ImageContainer_Flip(ImageContainer *Image, bool VerticalFlip, bool HorizontalFlip);
+    
+    /*!
+     @abstract                             "Crops an Image".
+     @remark                               "Allocates a new array and copies over just the content requested".
+     @param                 Image          "A pointer to the instance of an ImageContainer in question".
+     @param                 Top            "The offset from the top of the image".
+     @param                 Bottom         "The offset from the bottom of the image".
+     @param                 Left           "The offset from the left of the image".
+     @param                 Right          "The offset from the right of the image".
+     */
+    void                    ImageContainer_Crop(ImageContainer *Image, uint64_t Top, uint64_t Bottom, uint64_t Left, uint64_t Right);
     
     /*!
      @abstract                             "Deinitializes the ImageContainer pointed to".
