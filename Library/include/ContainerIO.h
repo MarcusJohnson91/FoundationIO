@@ -326,6 +326,36 @@ extern "C" {
      */
     void                    ImageContainer_Deinit(ImageContainer *Image);
     
+    typedef struct          ImageHistogram ImageHistogram;
+    
+    /*!
+     @abstract                             "Creates a ImageHistogram".
+     @param                 Image          "A pointer to the instance of an ImageContainer in question".
+     @return                               "Returns the newly created Histogram".
+     */
+    ImageHistogram         *ImageHistogram_Init(ImageContainer *Image);
+    
+    /*!
+     @abstract                             "Gets a pointer to the histogram data".
+     @param                 Histogram      "A pointer to the instance of an ImageHistogram in question".
+     @return                               "Returns a pointer to the histogram data".
+     */
+    void                 ***ImageHistogram_GetArray(ImageHistogram *Histogram);
+    
+    /*!
+     @abstract                             "Sets a pointer to the histogram data".
+     @param                 Histogram      "A pointer to the instance of an ImageHistogram in question".
+     @param                 Array          "A pointer to the histogram data".
+     */
+    void                    ImageHistogram_SetArray(ImageHistogram *Histogram, void ***Array);
+    
+    /*!
+     @abstract                             "Generates a histogram from an image".
+     @param                 Image          "A pointer to the instance of an ImageContainer in question".
+     @return                               "Returns the newly created Histogram".
+     */
+    ImageHistogram         *ImageHistogram_GenerateHistogram(ImageContainer *Image);
+    
 #ifdef __cplusplus
 }
 #endif

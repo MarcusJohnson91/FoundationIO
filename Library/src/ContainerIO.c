@@ -928,6 +928,189 @@ extern "C" {
         }
     }
     
+    typedef struct ImageHistogram {
+        uint64_t    NumEntries;
+        union I_Histogram {
+            uint16_t    ***UInteger16;
+            int16_t     ***SInteger16;
+            uint8_t     ***UInteger8;
+            int8_t      ***SInteger8;
+        } I_Histogram;
+        Image_Types Type;
+        // The array index is the pixel value, the array's value is simply it's count
+        // I_Histogram->UInteger16[View][Channel][Sample] = Count
+    } ImageHistogram;
+    
+    ImageHistogram *ImageHistogram_Init(ImageContainer *Image) {
+        ImageHistogram *Histogram                    = NULL;
+        if (Image != NULL) {
+            Histogram                                = calloc(1, sizeof(Histogram));
+            if (Histogram != NULL) {
+                if (Image->Type == ImageContainer_2DUInteger8 || Image->Type == ImageContainer_3DUInteger8) {
+                    Histogram->I_Histogram.UInteger8 = calloc(Image->NumChannels, Image->NumViews * Image->Height * Image->Width);
+                    if (Histogram->I_Histogram.UInteger8 != NULL) {
+                        Histogram->Type              = Image->Type;
+                        Histogram->NumEntries        = Image->Height * Image->Width;
+                    } else {
+                        free(Histogram->I_Histogram.UInteger8);
+                        free(Histogram);
+                        Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
+                    }
+                } else if (Image->Type == ImageContainer_2DSInteger8 || Image->Type == ImageContainer_3DSInteger8) {
+                    Histogram->I_Histogram.SInteger8 = calloc(Image->NumChannels, Image->NumViews * Image->Height * Image->Width);
+                    if (Histogram->I_Histogram.SInteger8 != NULL) {
+                        Histogram->Type              = Image->Type;
+                        Histogram->NumEntries        = Image->Height * Image->Width;
+                    } else {
+                        free(Histogram->I_Histogram.SInteger8);
+                        free(Histogram);
+                        Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
+                    }
+                } else if (Image->Type == ImageContainer_2DUInteger16 || Image->Type == ImageContainer_3DUInteger16) {
+                    Histogram->I_Histogram.UInteger16 = calloc(Image->NumChannels, Image->NumViews * Image->Height * Image->Width);
+                    if (Histogram->I_Histogram.UInteger16 != NULL) {
+                        Histogram->Type              = Image->Type;
+                        Histogram->NumEntries        = Image->Height * Image->Width;
+                    } else {
+                        free(Histogram->I_Histogram.UInteger16);
+                        free(Histogram);
+                        Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
+                    }
+                } else if (Image->Type == ImageContainer_2DSInteger16 || Image->Type == ImageContainer_3DSInteger16) {
+                    Histogram->I_Histogram.SInteger16 = calloc(Image->NumChannels, Image->NumViews * Image->Height * Image->Width);
+                    if (Histogram->I_Histogram.SInteger16 != NULL) {
+                        Histogram->Type              = Image->Type;
+                        Histogram->NumEntries        = Image->Height * Image->Width;
+                    } else {
+                        free(Histogram->I_Histogram.SInteger16);
+                        free(Histogram);
+                        Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
+                    }
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate ImageHistogram"));
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        }
+        return Histogram;
+    }
+    
+    void ***ImageHistogram_GetArray(ImageHistogram *Histogram) {
+        void ***Array = NULL;
+        if (Histogram != NULL) {
+            if (Histogram->Type == ImageContainer_2DUInteger8 || Histogram->Type == ImageContainer_3DUInteger8) {
+                Array = (void***) Histogram->I_Histogram.UInteger8;
+            } else if (Histogram->Type == ImageContainer_2DSInteger8 || Histogram->Type == ImageContainer_3DSInteger8) {
+                Array = (void***) Histogram->I_Histogram.SInteger8;
+            } else if (Histogram->Type == ImageContainer_2DUInteger16 || Histogram->Type == ImageContainer_3DUInteger16) {
+                Array = (void***) Histogram->I_Histogram.UInteger16;
+            } else if (Histogram->Type == ImageContainer_2DSInteger16 || Histogram->Type == ImageContainer_3DSInteger16) {
+                Array = (void***) Histogram->I_Histogram.SInteger16;
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
+        }
+        return Array;
+    }
+    
+    void ImageHistogram_SetArray(ImageHistogram *Histogram, void ***Array) {
+        if (Histogram != NULL && Array != NULL) {
+            if (Histogram->Type == ImageContainer_2DUInteger8 || Histogram->Type == ImageContainer_3DUInteger8) {
+                Histogram->I_Histogram.UInteger8  = (uint8_t***)  Array;
+            } else if (Histogram->Type == ImageContainer_2DSInteger8 || Histogram->Type == ImageContainer_3DSInteger8) {
+                Histogram->I_Histogram.SInteger8  = (int8_t***)   Array;
+            } else if (Histogram->Type == ImageContainer_2DUInteger16 || Histogram->Type == ImageContainer_3DUInteger16) {
+                Histogram->I_Histogram.UInteger16 = (uint16_t***) Array;
+            } else if (Histogram->Type == ImageContainer_2DSInteger16 || Histogram->Type == ImageContainer_3DSInteger16) {
+                Histogram->I_Histogram.SInteger16 = (int16_t***)  Array;
+            }
+        } else if (Histogram == NULL) {
+            Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
+        } else if (Array == NULL) {
+            Log(Log_ERROR, __func__, U8("Array Pointer is NULL"));
+        }
+    }
+    
+    // Now we need a HistogramPrune function well no we hould prune the histogram after creating it automatically
+    ImageHistogram *ImageHistogram_GenerateHistogram(ImageContainer *Image) {
+        ImageHistogram *Histogram       = NULL;
+        if (Image != NULL) {
+            Histogram                   = ImageHistogram_Init(Image);
+            if (Histogram != NULL) {
+                // Carry on, get the type, and start looping
+                // What matters? Type for the union, num channels, width, height
+                uint64_t NumViews       = ImageContainer_GetNumViews(Image);
+                uint64_t Width          = ImageContainer_GetWidth(Image);
+                uint64_t Height         = ImageContainer_GetHeight(Image);
+                uint64_t NumChannels    = ImageContainer_GetNumChannels(Image);
+                
+                if (Histogram->Type == ImageContainer_2DUInteger8 || Histogram->Type == ImageContainer_3DUInteger8) {
+                    uint8_t ****IArray  = (uint8_t****) Image->Pixels.UInteger8;
+                    uint8_t  ***HArray  = (uint8_t***)  Histogram->I_Histogram.UInteger8;
+                    
+                    for (uint64_t View = 0ULL; View < NumViews; View++) {
+                        for (uint64_t W = 0ULL; W < Width; W++) {
+                            for (uint64_t H = 0ULL; H < Height; H++) {
+                                for (uint64_t C = 0ULL; C < NumChannels; C++) {
+                                    uint8_t Sample           = IArray[View][W][H][C];
+                                    HArray[View][C][Sample] += 1;
+                                }
+                            }
+                        }
+                    }
+                } else if (Histogram->Type == ImageContainer_2DSInteger8 || Histogram->Type == ImageContainer_3DSInteger8) {
+                    int8_t ****IArray   = (int8_t****)   Image->Pixels.UInteger8;
+                    int8_t  ***HArray   = (int8_t***)    Histogram->I_Histogram.SInteger8;
+                    
+                    for (uint64_t View = 0ULL; View < NumViews; View++) {
+                        for (uint64_t W = 0ULL; W < Width; W++) {
+                            for (uint64_t H = 0ULL; H < Height; H++) {
+                                for (uint64_t C = 0ULL; C < NumChannels; C++) {
+                                    int8_t Sample            = IArray[View][W][H][C];
+                                    HArray[View][C][Sample] += 1;
+                                }
+                            }
+                        }
+                    }
+                } else if (Histogram->Type == ImageContainer_2DUInteger16 || Histogram->Type == ImageContainer_3DUInteger16) {
+                    uint16_t ****IArray = (uint16_t****) Image->Pixels.UInteger8;
+                    uint16_t ***HArray  = (uint16_t***)  Histogram->I_Histogram.UInteger16;
+                    
+                    for (uint64_t View = 0ULL; View < NumViews; View++) {
+                        for (uint64_t W = 0ULL; W < Width; W++) {
+                            for (uint64_t H = 0ULL; H < Height; H++) {
+                                for (uint64_t C = 0ULL; C < NumChannels; C++) {
+                                    uint16_t Sample          = IArray[View][W][H][C];
+                                    HArray[View][C][Sample] += 1;
+                                }
+                            }
+                        }
+                    }
+                } else if (Histogram->Type == ImageContainer_2DSInteger16 || Histogram->Type == ImageContainer_3DSInteger16) {
+                    int16_t ****IArray  = (int16_t****) Image->Pixels.UInteger8;
+                    int16_t  ***HArray  = (int16_t***)  Histogram->I_Histogram.SInteger16;
+                    
+                    for (uint64_t View = 0ULL; View < NumViews; View++) {
+                        for (uint64_t W = 0ULL; W < Width; W++) {
+                            for (uint64_t H = 0ULL; H < Height; H++) {
+                                for (uint64_t C = 0ULL; C < NumChannels; C++) {
+                                    int16_t Sample           = IArray[View][W][H][C];
+                                    HArray[View][C][Sample] += 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate ImageHistogram"));
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        }
+        return Histogram;
+    }
+    
 #ifdef __cplusplus
 }
 #endif
