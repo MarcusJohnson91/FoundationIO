@@ -19,25 +19,26 @@ extern "C" {
      */
     
     typedef enum Audio_ChannelMask {
-        Audio_UnknownChannel        = 0,
-        LeftChannel                 = 1,
-        CenterChannel               = 2,
-        RightChannel                = 4,
-        LFEChannel                  = 8,
-        SurroundLeftChannel         = 16,
-        SurroundRightChannel        = 32,
-        RearLeftChannel             = 64,
-        RearRightChannel            = 128,
+        AudioMask_Unknown           = 0,
+        AudioMask_FrontLeft         = 1,
+        AudioMask_FrontRight        = 2,
+        AudioMask_FrontCenter       = 4,
+        AudioMask_LFE               = 8,
+        AudioMask_SurroundLeft      = 16,
+        AudioMask_SurroundRight     = 32,
+        AudioMask_RearLeft          = 64,
+        AudioMask_RearRight         = 128,
+        AudioMask_RearCenter        = 256,
     } Audio_ChannelMask;
     
     typedef enum Audio_Types {
-        AudioContainer_UnknownType  = 0,
-        AudioContainer_UInteger8    = 1,
-        AudioContainer_SInteger8    = 2,
-        AudioContainer_UInteger16   = 3,
-        AudioContainer_SInteger16   = 4,
-        AudioContainer_UInteger32   = 5,
-        AudioContainer_SInteger32   = 6,
+        AudioType_Unknown           = 0,
+        AudioType_UInteger8         = 1,
+        AudioType_SInteger8         = 2,
+        AudioType_UInteger16        = 4,
+        AudioType_SInteger16        = 8,
+        AudioType_UInteger32        = 16,
+        AudioType_SInteger32        = 32,
     } Audio_Types;
     
     typedef struct          AudioContainer AudioContainer;
@@ -90,7 +91,7 @@ extern "C" {
      @param           Audio          "A pointer to the instance of an AudioContainer".
      @param           Index          "Which index does the channel mask apply to"?
      @abstract                             "Gets the index that channel X is in".
-     @remark                               "If the channel is not present in the stream, we return Audio_UnknownChannel".
+     @remark                               "If the channel is not present in the stream, we return AudioMask_Unknown".
      @param                 Audio          "A pointer to the instance of an AudioContainer in question".
      @param                 ChannelMask    "The actual channel you're trying to get".
      */
@@ -137,56 +138,56 @@ extern "C" {
     void                    AudioContainer_Deinit(AudioContainer *Audio);
     
     typedef enum Image_Views {
-        UnknownView                 = 0,
-        View2D                      = 1,
-        LeftEyeView                 = 2,
-        RightEyeView                = 4,
+        ImageView_Unknown           = 0,
+        ImageView_2D                = 1,
+        ImageView_3D_Left           = 2,
+        ImageView_3D_Right          = 4,
     } Image_Views;
     
     typedef enum Image_ChannelMask {
-        Image_UnknownChannel        = 0x0,
-        Luma2D                      = 0x1,
-        Chroma2D_1                  = 0x2,
-        Chroma2D_2                  = 0x4,
-        Chroma2D_3                  = 0x8,
-        Luma3D_L                    = 0x10,
-        Luma3D_R                    = 0x20,
-        Chroma3D_1_L                = 0x40,
-        Chroma3D_1_R                = 0x80,
-        Chroma3D_2_L                = 0x100,
-        Chroma3D_2_R                = 0x200,
-        Chroma3D_3_L                = 0x400,
-        Chroma3D_3_R                = 0x800,
-        Grayscale2D                 = 0x1000,
-        Red2D                       = 0x2000,
-        Green2D                     = 0x4000,
-        Blue2D                      = 0x8000,
-        Alpha2D                     = 0x10000,
-        Green_2_2D                  = 0x20000,
-        Grayscale3D_L               = 0x40000,
-        Grayscale3D_R               = 0x80000,
-        Red3D_L                     = 0x100000,
-        Red3D_R                     = 0x200000,
-        Green3D_L                   = 0x400000,
-        Green3D_R                   = 0x800000,
-        Blue3D_L                    = 0x1000000,
-        Blue3D_R                    = 0x2000000,
-        Alpha3D_L                   = 0x4000000,
-        Alpha3D_R                   = 0x8000000,
-        Green3D_2_L                 = 0x10000000,
-        Green3D_2_R                 = 0x20000000,
+        ImageMask_Unknown           = 0x0,
+        ImageMask_Luma2D            = 0x1,
+        ImageMask_Chroma2D_1        = 0x2,
+        ImageMask_Chroma2D_2        = 0x4,
+        ImageMask_Chroma2D_3        = 0x8,
+        ImageMask_Luma3D_L          = 0x10,
+        ImageMask_Luma3D_R          = 0x20,
+        ImageMask_Chroma3D_1_L      = 0x40,
+        ImageMask_Chroma3D_1_R      = 0x80,
+        ImageMask_Chroma3D_2_L      = 0x100,
+        ImageMask_Chroma3D_2_R      = 0x200,
+        ImageMask_Chroma3D_3_L      = 0x400,
+        ImageMask_Chroma3D_3_R      = 0x800,
+        ImageMask_Grayscale2D       = 0x1000,
+        ImageMask_Red2D             = 0x2000,
+        ImageMask_Green2D           = 0x4000,
+        ImageMask_Blue2D            = 0x8000,
+        ImageMask_Alpha2D           = 0x10000,
+        ImageMask_Green_2_2D        = 0x20000,
+        ImageMask_Grayscale3D_L     = 0x40000,
+        ImageMask_Grayscale3D_R     = 0x80000,
+        ImageMask_Red3D_L           = 0x100000,
+        ImageMask_Red3D_R           = 0x200000,
+        ImageMask_Green3D_L         = 0x400000,
+        ImageMask_Green3D_R         = 0x800000,
+        ImageMask_Blue3D_L          = 0x1000000,
+        ImageMask_Blue3D_R          = 0x2000000,
+        ImageMask_Alpha3D_L         = 0x4000000,
+        ImageMask_Alpha3D_R         = 0x8000000,
+        ImageMask_Green3D_2_L       = 0x10000000,
+        ImageMask_Green3D_2_R       = 0x20000000,
     } Image_ChannelMask;
     
     typedef enum Image_Types {
-        ImageContainer_UnknownType  = 0,
-        ImageContainer_2DUInteger8  = 1,
-        ImageContainer_2DSInteger8  = 2,
-        ImageContainer_2DUInteger16 = 3,
-        ImageContainer_2DSInteger16 = 4,
-        ImageContainer_3DUInteger8  = 5,
-        ImageContainer_3DSInteger8  = 6,
-        ImageContainer_3DUInteger16 = 7,
-        ImageContainer_3DSInteger16 = 8,
+        ImageType_Unknown           = 0,
+        ImageType_2DUInteger8       = 1,
+        ImageType_2DSInteger8       = 2,
+        ImageType_2DUInteger16      = 4,
+        ImageType_2DSInteger16      = 8,
+        ImageType_3DUInteger8       = 16,
+        ImageType_3DSInteger8       = 32,
+        ImageType_3DUInteger16      = 64,
+        ImageType_3DSInteger16      = 128,
     } Image_Types;
     
     typedef struct          ImageContainer ImageContainer;
@@ -272,7 +273,7 @@ extern "C" {
     
     /*!
      @abstract                             "Gets a pointer to the array of pixels".
-     @remark                               "You need to cast the pointer to the correct type you got from ImageContainer_GetType".
+     @remark                               "You need to cast the pointer to the correct type you got from ImageType_GetType".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
     void                ****ImageContainer_GetArray(ImageContainer *Image);
