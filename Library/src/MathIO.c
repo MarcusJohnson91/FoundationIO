@@ -90,27 +90,48 @@ extern "C" {
     }
     
     uint8_t  SwapBits(const uint8_t Byte) {
-        return ((Byte & 0x80 >> 7)|(Byte & 0x40 >> 5)|(Byte & 0x20 >> 3)|(Byte & 0x10 >> 1)|(Byte & 0x8 << 1)|(Byte & 0x4 << 3)|(Byte & 0x2 << 5)|(Byte & 0x1 << 7));
+        return (
+                (Byte & 0x80 >> 7) |
+                (Byte & 0x40 >> 5) |
+                (Byte & 0x20 >> 3) |
+                (Byte & 0x10 >> 1) |
+                (Byte & 0x08 << 1) |
+                (Byte & 0x04 << 3) |
+                (Byte & 0x02 << 5) |
+                (Byte & 0x01 << 7)
+                );
     }
     
-    uint8_t  CreateBitMaskLSBit(const uint8_t Bits2Extract) {
-        return (uint8_t) Exponentiate(2, Bits2Extract) << (8 - Bits2Extract);
+    uint8_t Bits2ExtractFromByte(uint64_t Offset) {
+        return 8 - (Offset % 8);
     }
     
-    uint8_t  CreateBitMaskMSBit(const uint8_t Bits2Extract) {
-        return (uint8_t) Exponentiate(2, Bits2Extract) >> (8 - Bits2Extract);
+    uint8_t CreateBitMask(const uint8_t NumBits2Select) {
+        uint8_t Mask = 0;
+#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+        Mask = Exponentiate(2, NumBits2Select) >> (8 - NumBits2Select);
+#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+        Mask = Exponentiate(2, NumBits2Select) << (8 - NumBits2Select);
+#endif
+        return Mask;
     }
     
-    int8_t   ExtractSignFromDecimal(double Number2Extract) {
+    int8_t   ExtractSignFromFloat(float Number2Extract) {
+        uint32_t *Sign1 = (uint32_t *) &Number2Extract;
+        uint32_t  Sign2 = (*Sign1 & 0x80000000) >> 31;
+        return Sign2 == 0 ? 1 : -1;
+    }
+    
+    int8_t   ExtractSignFromDouble(double Number2Extract) {
         uint64_t *Sign1 = (uint64_t *) &Number2Extract;
-        uint64_t  Sign2 = *Sign1 >> 63;
-        return Sign2 == 1 ? -1 : 1;
+        uint64_t  Sign2 = (*Sign1 & 0x8000000000000000) >> 63;
+        return Sign2 == 0 ? 1 : -1;
     }
     
-    int16_t  ExtractExponentFromDecimal(double Number2Extract) {
-        int8_t    Sign      = ExtractSignFromDecimal(Number2Extract);
-        uint64_t *Exponent1 = (uint64_t *) &Number2Extract;
-        int16_t   Exponent2 = *Exponent1 >> 52;
+    int16_t  ExtractExponentFromFloat(float Number2Extract) {
+        int8_t    Sign      = ExtractSignFromFloat(Number2Extract);
+        uint32_t *Exponent1 = (uint32_t *) &Number2Extract;
+        int16_t   Exponent2 = (*Exponent1 & 0x7F800000) >> 23;
         int16_t   Exponent3 = 0;
         if (Sign == 1) {
             Exponent3       = Exponent2 - 1022;
@@ -120,10 +141,29 @@ extern "C" {
         return Exponent3;
     }
     
-    int64_t  ExtractMantissaFromDecimal(double Number2Extract) {
+    int16_t  ExtractExponentFromDouble(double Number2Extract) {
+        int8_t    Sign      = ExtractSignFromDecimal(Number2Extract);
+        uint64_t *Exponent1 = (uint64_t *) &Number2Extract;
+        int16_t   Exponent2 = (*Exponent1 & 0x7FF0000000000000) >> 52;
+        int16_t   Exponent3 = 0;
+        if (Sign == 1) {
+            Exponent3       = Exponent2 - 1022;
+        } else if (Sign == -1) {
+            Exponent3       = Exponent2 - 3070;
+        }
+        return Exponent3;
+    }
+    
+    int32_t  ExtractMantissaFromFloat(float Number2Extract) {
+        uint32_t *Mantissa1  = (uint32_t *) &Number2Extract;
+        int32_t   Mantissa2  = *Mantissa1 & 0x7FFFFFULL;
+        return (Mantissa2 | 0x800000) - 127;
+    }
+    
+    int64_t  ExtractMantissaFromDouble(double Number2Extract) {
         uint64_t *Mantissa1  = (uint64_t *) &Number2Extract;
         uint64_t  Mantissa2  = *Mantissa1 & 0xFFFFFFFFFFFFFULL;
-        return Mantissa2;
+        return (Mantissa2 | 0x10000000000000) - 1023;
     }
     
 #ifdef __cplusplus
