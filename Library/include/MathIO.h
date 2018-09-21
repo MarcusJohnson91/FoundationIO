@@ -104,37 +104,60 @@ extern "C" {
     uint8_t                     SwapBits(const uint8_t Byte);
     
     /*!
-     @abstract                                                  "Creates a bitmask favoring the right side".
-     @param                     Bits2Extract                    "The number of bits to mask".
-     @return                                                    "Returns the mask".
+     @abstract                                                  "Calculates the number of bits of slack mod 8".
+     @param                     Offset                          "The offset to calculate the number of bits unaccounted for in the byte".
+     @return                                                    "Returns the number of unaccounted for bits".
      */
-    uint8_t                     CreateBitMaskLSBit(const uint8_t Bits2Extract);
+    uint8_t                     Bits2ExtractFromByte(uint64_t Offset);
     
     /*!
-     @abstract                                                  "Creates a bitmask favoring the left side".
-     @param                     Bits2Extract                    "The number of bits to mask".
+     @abstract                                                  "Creates a bitmask".
+     @param                     NumBits2Select                  "The number of bits to select".
      @return                                                    "Returns the mask".
      */
-    uint8_t                     CreateBitMaskMSBit(const uint8_t Bits2Extract);
+    uint8_t                     CreateBitMask(const uint8_t NumBits2Select);
     
     /*!
-     @abstract                                                  "Extracts the sign from the decimal given as Number2Extract".
-     @param                     Number2Extract                  "The decimal number you want to get the sign from".
+     @abstract                                                  "Extracts the sign from the float given as Number2Extract".
+     @param                     Number2Extract                  "The float number you want to get the sign from".
      @return                                                    "Returns -1 if the sign is negative, otherwise 1".
      */
-    int8_t                      ExtractSignFromDecimal(double Number2Extract);
+    int8_t                      ExtractSignFromFloat(float Number2Extract);
     
     /*!
-     @abstract                                                  "Extracts the exponent from the decimal given as Number2Extract".
+     @abstract                                                  "Extracts the sign from the double given as Number2Extract".
+     @param                     Number2Extract                  "The double number you want to get the sign from".
+     @return                                                    "Returns -1 if the sign is negative, otherwise 1".
+     */
+    int8_t                      ExtractSignFromDouble(double Number2Extract);
+    
+    /*!
+     @abstract                                                  "Extracts the exponent from the float given as Number2Extract".
      @param                     Number2Extract                  "The decimal number you want to get the exponent from".
      */
-    int16_t                     ExtractExponentFromDecimal(double Number2Extract);
+    int16_t                     ExtractExponentFromFloat(float Number2Extract);
     
     /*!
-     @abstract                                                  "Extracts the mantissa from the decimal given as Number2Extract".
+     @abstract                                                  "Extracts the exponent from the double given as Number2Extract".
+     @param                     Number2Extract                  "The decimal number you want to get the exponent from".
+     */
+    int16_t                     ExtractExponentFromDouble(double Number2Extract);
+    
+    /*!
+     @abstract                                                  "Extracts the mantissa from the float given as Number2Extract".
      @param                     Number2Extract                  "The mantissa number you want to get the exponent from".
      */
-    int64_t                     ExtractMantissaFromDecimal(double Number2Extract);
+    int32_t                     ExtractMantissaFromFloat(float Number2Extract);
+    
+    /*!
+     @abstract                                                  "Extracts the mantissa from the double given as Number2Extract".
+     @param                     Number2Extract                  "The mantissa number you want to get the exponent from".
+     */
+    int64_t                     ExtractMantissaFromDouble(double Number2Extract);
+    
+#define ExtractSignFromDecimal(Decimal)     _Generic((Decimal), float:ExtractSignFromFloat,     double:ExtractSignFromDouble)(Decimal)
+#define ExtractExponentFromDecimal(Decimal) _Generic((Decimal), float:ExtractExponentFromFloat, double:ExtractExponentFromDouble)(Decimal)
+#define ExtractMantissaFromDecimal(Decimal) _Generic((Decimal), float:ExtractMantissaFromFloat, double:ExtractMantissaFromDouble)(Decimal)
     
 #ifdef __cplusplus
 }
