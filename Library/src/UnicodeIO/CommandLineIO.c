@@ -4,6 +4,7 @@
 #include "../include/Log.h"            /* Included for Log */
 
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#include <signal.h>                    /* Included for SIGWINCH handling */
 #include <sys/ioctl.h>                 /* Included for the terminal size */
 #include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
@@ -87,8 +88,6 @@ extern "C" {
         int64_t              NumOptions;
         int64_t              MinOptions;
         int64_t              HelpSwitch;
-        uint16_t             ConsoleWidth;
-        uint16_t             ConsoleHeight;
         bool                 IsProprietary;
     } CommandLineIO;
     
@@ -97,17 +96,6 @@ extern "C" {
         if (NumSwitches >= 0) {
             CLI                      = calloc(1, sizeof(CommandLineIO));
             if (CLI != NULL) {
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
-                struct winsize       WindowSize;
-                ioctl(0, TIOCGWINSZ, &WindowSize);
-                CLI->ConsoleWidth    = WindowSize.ws_row;
-                CLI->ConsoleHeight   = WindowSize.ws_col;
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
-                CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
-                GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
-                CLI->ConsoleHeight   = ScreenBufferInfo.srWindow.Bottom - ScreenBufferInfo.srWindow.Top + 1;
-                CLI->ConsoleWidth    = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
-#endif
                 CLI->SwitchIDs       = calloc(NumSwitches, sizeof(CommandLineSwitch));
                 if (CLI->SwitchIDs != NULL) {
                     CLI->NumSwitches = NumSwitches;
@@ -117,12 +105,60 @@ extern "C" {
             } else {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate CommandLineIO"));
             }
-        } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("Couldn't allocate CommandLineIO"));
-        } else if (NumSwitches == 0) {
+        } else if (NumSwitches <= 0) {
             Log(Log_ERROR, __func__, U8("NumSwitches %lld must be greater than or equal to 1"), NumSwitches);
         }
         return CLI;
+    }
+    
+    uint64_t       CommandLineIO_GetTerminalWidth(void) {
+        uint64_t Width = 0ULL;
+#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+        struct winsize       WindowSize;
+        ioctl(0, TIOCGWINSZ, &WindowSize);
+        Width          = WindowSize.ws_row;
+#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+        CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
+        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
+        Width          = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
+#endif
+        return Width;
+    }
+    
+    uint64_t       CommandLineIO_GetTerminalHeight(void) {
+        uint64_t Height = 0ULL;
+#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+        struct winsize       WindowSize;
+        ioctl(0, TIOCGWINSZ, &WindowSize);
+        Height          = WindowSize.ws_row;
+#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+        CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
+        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
+        Height          = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
+#endif
+        return Height;
+    }
+    
+    bool           CommandLineIO_TerminalWasResized(void) {
+        bool SizeChanged = No;
+#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+        /*
+         We're creating a text UI to show the progress of the program.
+         The user resizes the window
+         that means we now need to re-get the size of the window so we can start redrawing it.
+         we get the signal in ShowProgress, if we get that signal, we need to call the Width and Height functions.
+         SIGWINCH
+         */
+        
+        struct winsize       WindowSize;
+        ioctl(0, TIOCGWINSZ, &WindowSize);
+        SizeChanged      = WindowSize.ws_row;
+#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+        CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
+        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
+        SizeChanged      = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
+#endif
+        return SizeChanged;
     }
     
     void CommandLineIO_UTF8_SetName(CommandLineIO *CLI, UTF8 *Name) {
@@ -384,12 +420,13 @@ extern "C" {
             UTF8     *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF8));
             for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
                 // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
-                NumProgressIndicatorsPerString[String] = CLI->ConsoleWidth - (2 + StringSize[String]); // what if it's not even?
-                uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
-                uint8_t HalfOfTheIndicators = (PercentComplete / 2);
+                NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
+                uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
+                uint64_t HalfOfTheIndicators = (PercentComplete / 2);
                 // Now we go ahead and memset a string with the proper number of indicators
-                UTF8 *Indicator             = calloc(CLI->ConsoleWidth, sizeof(UTF8));
-                memset(Indicator, '-', HalfOfTheIndicators);
+                UTF8 *Indicator             = calloc(CommandLineIO_GetTerminalWidth(), sizeof(UTF8));
+                memset(Indicator, '-', HalfOfTheIndicators); // The point is to set half of the string (minus the substrings) to a dash, so this should actually be Format.
+                // The format string should be an array of Z dashes.
                 UTF8 *FormattedString       = UTF8_FormatString(U8("[%s%s %lld/%lld %hhu/%s %s]"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF8);
                 UTF8_WriteString2File(FormattedString, stdout);
                 free(Indicator);
@@ -429,11 +466,11 @@ extern "C" {
             UTF16    *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF16));
             for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
                 // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
-                NumProgressIndicatorsPerString[String] = CLI->ConsoleWidth - (2 + StringSize[String]); // what if it's not even?
+                NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
                 uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 uint8_t HalfOfTheIndicators = (PercentComplete / 2);
                 // Now we go ahead and memset a string with the proper number of indicators
-                UTF16 *Indicator            = calloc(CLI->ConsoleWidth, sizeof(UTF16));
+                UTF16 *Indicator            = calloc(CommandLineIO_GetTerminalWidth, sizeof(UTF16));
                 memset(Indicator, '-', HalfOfTheIndicators);
                 UTF16 *FormattedString      = UTF16_FormatString(U16("[%s%s %lld/%lld %hhu/%s %s]"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF16);
                 UTF16_WriteString2File(FormattedString, stdout);

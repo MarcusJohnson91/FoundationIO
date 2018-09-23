@@ -113,6 +113,24 @@ extern "C" {
     CommandLineIO              *CommandLineIO_Init(const int64_t NumSwitches);
     
     /*!
+     @abstract                                                  "Creating a Text UI".
+     @return                                                    "Returns the width of the terminal in codepoints".
+     */
+    uint64_t                    CommandLineIO_GetTerminalWidth(void);
+    
+    /*!
+     @abstract                                                  "Creating a Text UI".
+     @return                                                    "Returns the height of the terminal in codepoints".
+     */
+    uint64_t                    CommandLineIO_GetTerminalHeight(void);
+    
+    /*!
+     @abstract                                                  "Creating a Text UI".
+     @return                                                    "Returns if the terminal has been resized, and therefore needs to be redrawn".
+     */
+    bool                        CommandLineIO_TerminalWasResized(void);
+    
+    /*!
      @abstract                                                  "Sets the name of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Name                            "The name of the program you're building".
