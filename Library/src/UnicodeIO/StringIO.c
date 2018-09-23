@@ -656,7 +656,7 @@ extern "C" {
             EncodedString                              = calloc(UTF8CodeUnits, sizeof(UTF8));
             if (EncodedString != NULL) {
                 do {
-                    if (CodeUnitNum == 0 && AddBOM == Yes) {
+                    if (CodeUnitNum == 0) {
                         EncodedString[CodeUnitNum]     = 0xEF;
                         EncodedString[CodeUnitNum + 1] = 0xBB;
                         EncodedString[CodeUnitNum + 2] = 0xBF;
@@ -1278,6 +1278,64 @@ extern "C" {
         }
         return CaseFoldedString;
     }
+    
+    typedef enum CombiningCharacterClasses {
+        CCCOverlay                           = 1,
+        CCCNukta                             = 7,
+        CCCKanaVoicing                       = 8,
+        CCCVirama                            = 9,
+        CCC10                                = 10,
+        CCC11                                = 11,
+        CCC12                                = 12,
+        CCC13                                = 13,
+        CCC14                                = 14,
+        CCC15                                = 15,
+        CCC16                                = 16,
+        CCC17                                = 17,
+        CCC18                                = 18,
+        CCC19                                = 19,
+        CCC20                                = 20,
+        CCC21                                = 21,
+        CCC22                                = 22,
+        CCC23                                = 23,
+        CCC24                                = 24,
+        CCC25                                = 25,
+        CCC26                                = 26,
+        CCC27                                = 27,
+        CCC28                                = 28,
+        CCC29                                = 29,
+        CCC30                                = 30,
+        CCC31                                = 31,
+        CCC32                                = 32,
+        CCC33                                = 33,
+        CCC34                                = 34,
+        CCC35                                = 35,
+        CCC36                                = 36,
+        CCC84                                = 84,
+        CCC91                                = 91,
+        CCC103                               = 103,
+        CCC107                               = 107,
+        CCC118                               = 118,
+        CCC122                               = 122,
+        CCC129                               = 129,
+        CCC130                               = 130,
+        CCC132                               = 132,
+        CCCAttachBelowLeft                   = 200,
+        CCCAttachBelow                       = 202,
+        CCCAttachAbove                       = 214,
+        CCCAttachAboveRight                  = 216,
+        CCCAttachBelowLeft2                  = 218,
+        CCCAttachBelow2                      = 220,
+        CCCAttachBelowRight2                 = 222,
+        CCCAttachLeft                        = 224,
+        CCCAttachRight                       = 226,
+        CCCAttachAboveLeft2                  = 228,
+        CCCAttachAbove2                      = 230,
+        CCCAttachAboveRight2                 = 232,
+        CCCAttachDoubleBelow                 = 233,
+        CCCAttachDoubleAbove                 = 234,
+        CCCAttachIOTASubscript               = 240,
+    } CombiningCharacterClasses;
     
     static UTF32 *UTF32_Reorder(UTF32 *String) { // Stable sort
         uint64_t CodePoint  = 1ULL;
