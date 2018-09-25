@@ -2,8 +2,7 @@
 
 #include "../include/ContainerIO.h"    /* Included for our declarations */
 #include "../include/Log.h"            /* Included for error reporting */
-#include "../include/Math.h"           /* Included for Absolute */
-#include "../include/BitIO.h"          /* Included for BitBuffer */
+#include "../include/StringIO.h"       /* Included for StringIO's declarations */
 
 #ifdef __cplusplus
 extern "C" {

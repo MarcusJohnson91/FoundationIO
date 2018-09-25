@@ -3,6 +3,7 @@
 #include "../include/BitIO.h"          /* Included for our declarations */
 #include "../include/Log.h"            /* Included for Log declarations */
 #include "../include/Math.h"           /* Included for Integer functions */
+#include "../include/StringIO.h"       /* Included for StringIO's declarations */
 
 #ifdef __cplusplus
 extern "C" {
