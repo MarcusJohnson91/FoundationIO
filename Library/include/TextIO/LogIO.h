@@ -1,4 +1,26 @@
-#include "StringIO.h"                 /* Included for UTF8, U8 macro, bool, Yes/No macros, u/intX_t */
+#include <stdint.h>
+#include <stdbool.h>
+
+/* Forward declare StringIO's types */
+#ifndef UTF8
+typedef               uint_least8_t                        UTF8;
+#endif
+
+#ifndef UTF16
+#ifdef __STD_UTF_16__
+typedef               char16_t                             UTF16;
+#else
+typedef               uint_least16_t                       UTF16;
+#endif
+#endif
+
+#ifndef UTF32
+#ifdef __STD_UTF_32__
+typedef               char32_t                             UTF32;
+#else
+typedef               uint_least32_t                       UTF32;
+#endif
+#endif
 
 #pragma once
 

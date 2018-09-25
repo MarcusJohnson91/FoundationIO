@@ -2,6 +2,7 @@
 
 #include "../include/CommandLineIO.h"  /* Included for the CommandLineIO declarations */
 #include "../include/Log.h"            /* Included for Log */
+#include "../include/StringIO.h"       /* Included for StringIO's declarations */
 
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
 #include <signal.h>                    /* Included for SIGWINCH handling */
