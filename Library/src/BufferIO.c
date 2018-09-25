@@ -79,7 +79,7 @@ extern "C" {
             uint8_t Bits2Save      = BitB->BitOffset % 8;
             if (Bits2Save > 0) {
                 BitB->Buffer[0]    = 0;
-                uint8_t Saved      = BitB->Buffer[Bytes2Read + 1] & CreateBitMaskLSBit(Bits2Save);
+                uint8_t Saved      = BitB->Buffer[Bytes2Read + 1] & CreateBitMask(Bits2Save);
                 BitB->Buffer[0]    = Saved;
                 BitB->BitOffset    = Bits2Save;
             } else {
@@ -287,11 +287,7 @@ extern "C" {
                     uint8_t  Bits2InsertForThisByte   = 8 - (BitB->BitOffset % 8);
                     uint8_t  BitMask                  = 0;
                     uint8_t  Byte                     = 0;
-                    if (BitOrder == LSBitFirst) {
-                        BitMask                       = CreateBitMaskLSBit(Bits2InsertForThisByte);
-                    } else if (BitOrder == MSBitFirst) {
-                        BitMask                       = CreateBitMaskMSBit(Bits2InsertForThisByte);
-                    }
+                    BitMask                           = BitB->Buffer[ByteOffset + 1] & CreateBitMask(Bits2InsertForThisByte);
                     if (BitOrder == LSBitFirst) {
                         Byte                        >>= 8 - Bits2InsertForThisByte;
                     } else if (BitOrder == MSBitFirst) {
@@ -325,11 +321,7 @@ extern "C" {
                     uint8_t  Bits2ExtractFromThisByte = 8 - (BitB->BitOffset % 8);
                     uint8_t  BitMask                  = 0;
                     uint8_t  Byte                     = 0;
-                    if (BitOrder == LSBitFirst) {
-                        BitMask                       = CreateBitMaskLSBit(Bits2ExtractFromThisByte);
-                    } else if (BitOrder == MSBitFirst) {
-                        BitMask                       = CreateBitMaskMSBit(Bits2ExtractFromThisByte);
-                    }
+                    BitMask                           = BitB->Buffer[ByteOffset + 1] & CreateBitMask(Bits2ExtractFromThisByte);
                     Byte                              = BitB->Buffer[ByteOffset] & BitMask;
                     if (BitOrder == LSBitFirst) {
                         Byte                        >>= 8 - Bits2ExtractFromThisByte;
