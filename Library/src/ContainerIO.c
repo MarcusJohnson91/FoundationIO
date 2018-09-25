@@ -340,7 +340,7 @@ extern "C" {
                 Image->NumChannels           = NumChannels;
                 Image->Width                 = Width;
                 Image->Height                = Height;
-                Image->ChannelMask           = calloc(NumChannels, sizeof(Image_ChannelMask));
+                Image->ChannelMask           = calloc(NumViews * NumChannels, sizeof(Image_ChannelMask));
                 
                 if (Type == ImageType_UInteger8) {
                     Image->Pixels.UInteger8  = calloc(NumViews * NumChannels * Width * Height, sizeof(uint8_t));
