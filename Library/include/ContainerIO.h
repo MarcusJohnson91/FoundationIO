@@ -180,28 +180,25 @@ extern "C" {
     
     typedef enum Image_Types {
         ImageType_Unknown           = 0,
-        ImageType_2DUInteger8       = 1,
-        ImageType_2DSInteger8       = 2,
-        ImageType_2DUInteger16      = 4,
-        ImageType_2DSInteger16      = 8,
-        ImageType_3DUInteger8       = 16,
-        ImageType_3DSInteger8       = 32,
-        ImageType_3DUInteger16      = 64,
-        ImageType_3DSInteger16      = 128,
+        ImageType_UInteger8         = 1,
+        ImageType_SInteger8         = 2,
+        ImageType_UInteger16        = 4,
+        ImageType_SInteger16        = 8,
     } Image_Types;
     
     typedef struct          ImageContainer ImageContainer;
     
     /*!
      @abstract                             "Initalizes an empty ImageContainer".
+     @remark                               "All channels in an image must have the same bit depth, padding will be added if necessary".
      @param                 Type           "The type of array to create".
      @param                 BitDepth       "The number of actual bits to store a sample, e.g. a 14 bit image has a bit depth of 14, not 16".
-     @remark                               "All channels in an image must have the same bit depth, padding will be added if necessary".
+     @param                 NumViews       "The number of views in the image, for example Stereoscopic 3D has 2 views".
      @param                 NumChannels    "The number of channels in the image".
      @param                 Width          "The number of pixels making up one row".
      @param                 Height         "The number of pixels making up one column".
      */
-    ImageContainer         *ImageContainer_Init(Image_Types Type, uint64_t BitDepth, uint64_t NumChannels, uint64_t Width, uint64_t Height);
+    ImageContainer         *ImageContainer_Init(Image_Types Type, uint64_t BitDepth, uint8_t NumViews, uint64_t NumChannels, uint64_t Width, uint64_t Height);
     
     /*!
      @abstract                             "Sets the channel type for each channel index".
