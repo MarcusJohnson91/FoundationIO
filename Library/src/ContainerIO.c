@@ -819,7 +819,7 @@ extern "C" {
         }
     }
     
-    void ImageContainer_Crop(ImageContainer *Image, uint64_t Top, uint64_t Bottom, uint64_t Left, uint64_t Right) {
+    void ImageContainer_Resize(ImageContainer *Image, int64_t Top, int64_t Bottom, int64_t Left, int64_t Right) {
         if (Image != NULL) {
             uint64_t NumChannels = ImageContainer_GetNumChannels(Image);
             uint64_t NumViews    = ImageContainer_GetNumViews(Image);
@@ -827,91 +827,83 @@ extern "C" {
             uint64_t Width       = ImageContainer_GetWidth(Image);
             Image_Types Type     = ImageContainer_GetType(Image);
             
-            if (Top <= Height && Bottom <= Height && Left <= Width && Right <= Width) {
-                if (Type == ImageType_SInteger8) {
-                    int8_t ****Array    = (int8_t****) ImageContainer_GetArray(Image);
-                    int8_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(int8_t));
-                    if (NewArray != NULL) {
-                        for (uint8_t View = 0; View < NumViews; View++) {
-                            for (uint64_t W = Left; W < Right; W++) {
-                                for (uint64_t H = Top; H < Bottom; H++) {
-                                    for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
-                                        NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
-                                    }
+            
+            // If top, bottom, left, or right is positive increase the canvas, if negative, decrease.
+            if (Type == ImageType_SInteger8) {
+                int8_t ****Array    = (int8_t****) ImageContainer_GetArray(Image);
+                int8_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(int8_t));
+                if (NewArray != NULL) {
+                    for (uint8_t View = 0; View < NumViews; View++) {
+                        for (uint64_t W = Left; W < Right; W++) {
+                            for (uint64_t H = Top; H < Bottom; H++) {
+                                for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
+                                    NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
                                 }
                             }
                         }
-                        ImageContainer_SetArray(Image, (void****) NewArray);
-                        free(Array);
-                    } else {
-                        Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
                     }
-                } else if (Type == ImageType_UInteger8) {
-                    uint8_t ****Array    = (uint8_t****) ImageContainer_GetArray(Image);
-                    uint8_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(uint8_t));
-                    if (NewArray != NULL) {
-                        for (uint8_t View = 0; View < NumViews; View++) {
-                            for (uint64_t W = Left; W < Right; W++) {
-                                for (uint64_t H = Top; H < Bottom; H++) {
-                                    for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
-                                        NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
-                                    }
-                                }
-                            }
-                        }
-                        ImageContainer_SetArray(Image, (void****) NewArray);
-                        free(Array);
-                    } else {
-                        Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
-                    }
-                } else if (Type == ImageType_SInteger16) {
-                    int16_t ****Array    = (int16_t****) ImageContainer_GetArray(Image);
-                    int16_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(int16_t));
-                    if (NewArray != NULL) {
-                        for (uint8_t View = 0; View < NumViews; View++) {
-                            for (uint64_t W = Left; W < Right; W++) {
-                                for (uint64_t H = Top; H < Bottom; H++) {
-                                    for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
-                                        NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
-                                    }
-                                }
-                            }
-                        }
-                        ImageContainer_SetArray(Image, (void****) NewArray);
-                        free(Array);
-                    } else {
-                        Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
-                    }
-                } else if (Type == ImageType_UInteger16) {
-                    uint16_t ****Array    = (uint16_t****) ImageContainer_GetArray(Image);
-                    uint16_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(uint16_t));
-                    if (NewArray != NULL) {
-                        for (uint8_t View = 0; View < NumViews; View++) {
-                            for (uint64_t W = Left; W < Right; W++) {
-                                for (uint64_t H = Top; H < Bottom; H++) {
-                                    for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
-                                        NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
-                                    }
-                                }
-                            }
-                        }
-                        ImageContainer_SetArray(Image, (void****) NewArray);
-                        free(Array);
-                    } else {
-                        Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
-                    }
+                    ImageContainer_SetArray(Image, (void****) NewArray);
+                    free(Array);
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
                 }
-            } else if (Top > Height) {
-                Log(Log_ERROR, __func__, U8("Top %llu is greater than the image's height %llu"), Top, Height);
-            } else if (Bottom > Height) {
-                Log(Log_ERROR, __func__, U8("Bottom %llu is greater than the image's height %llu"), Bottom, Height);
-            } else if (Left > Width) {
-                Log(Log_ERROR, __func__, U8("Left %llu is greater than the image's width %llu"), Left, Width);
-            } else if (Right > Width) {
-                Log(Log_ERROR, __func__, U8("Right %llu is greater than the image's width %llu"), Right, Width);
+            } else if (Type == ImageType_UInteger8) {
+                uint8_t ****Array    = (uint8_t****) ImageContainer_GetArray(Image);
+                uint8_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(uint8_t));
+                if (NewArray != NULL) {
+                    for (uint8_t View = 0; View < NumViews; View++) {
+                        for (uint64_t W = Left; W < Right; W++) {
+                            for (uint64_t H = Top; H < Bottom; H++) {
+                                for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
+                                    NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
+                                }
+                            }
+                        }
+                    }
+                    ImageContainer_SetArray(Image, (void****) NewArray);
+                    free(Array);
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
+                }
+            } else if (Type == ImageType_SInteger16) {
+                int16_t ****Array    = (int16_t****) ImageContainer_GetArray(Image);
+                int16_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(int16_t));
+                if (NewArray != NULL) {
+                    for (uint8_t View = 0; View < NumViews; View++) {
+                        for (uint64_t W = Left; W < Right; W++) {
+                            for (uint64_t H = Top; H < Bottom; H++) {
+                                for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
+                                    NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
+                                }
+                            }
+                        }
+                    }
+                    ImageContainer_SetArray(Image, (void****) NewArray);
+                    free(Array);
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
+                }
+            } else if (Type == ImageType_UInteger16) {
+                uint16_t ****Array    = (uint16_t****) ImageContainer_GetArray(Image);
+                uint16_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(uint16_t));
+                if (NewArray != NULL) {
+                    for (uint8_t View = 0; View < NumViews; View++) {
+                        for (uint64_t W = Left; W < Right; W++) {
+                            for (uint64_t H = Top; H < Bottom; H++) {
+                                for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
+                                    NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
+                                }
+                            }
+                        }
+                    }
+                    ImageContainer_SetArray(Image, (void****) NewArray);
+                    free(Array);
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
             }
-        } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
     }
     
