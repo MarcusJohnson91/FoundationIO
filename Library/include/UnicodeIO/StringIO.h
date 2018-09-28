@@ -1,5 +1,15 @@
-#include <stdint.h>
+#if (defined(__APPLE__) && defined(__MACH__)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(__ANDROID__) || defined(__minix) || defined(__linux__) || defined(__unix__) || defined(_POSIX_C_SOURCE)
+#ifdef  _FILE_OFFSET_BITS
+#undef  _FILE_OFFSET_BITS
+#define _FILE_OFFSET_BITS 64
+#else
+#define _FILE_OFFSET_BITS 64
+#endif /* _FILE_OFFSET_BITS */
+#endif /* Various UNIX Platforms */
+
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
 
 #pragma once
 
