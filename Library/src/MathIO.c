@@ -23,8 +23,32 @@ extern "C" {
         return X;
     }
     
-    uint64_t Absolute(const int64_t Value) {
-        return (Value >= 0 ? (uint64_t) Value : (uint64_t) ~Value + 1);
+    uint64_t Absolutei(const int64_t Value) {
+        return (Value >= 0 ? (uint64_t) Value : (uint64_t) ~Value + 1); // Assumes 2's complement
+    }
+    
+    uint64_t Absolutef(const float Value) {
+        return ExtractExponentFromFloat(Value);
+    }
+    
+    uint64_t Absoluted(const double Value) {
+        return ExtractExponentFromDouble(Value);
+    }
+    
+    int64_t  Floorf(const double Value) { // 1.3 = 1, -1.3
+        return (ExtractMantissaFromFloat(Value) > 0 ? (ExtractExponentFromFloat(Value) + 1) : ExtractExponentFromFloat(Value)) * ExtractSignFromFloat(Value);;
+    }
+    
+    int64_t  Floord(const double Value) { // 1.3 = 1, -1.3
+        return (ExtractMantissaFromDouble(Value) > 0 ? (ExtractExponentFromDouble(Value) + 1) : ExtractExponentFromDouble(Value)) * ExtractSignFromDouble(Value);;
+    }
+    
+    int64_t  Ceilf(const float Value) { // 1.3 = 2, -1.3 = -1
+        return (ExtractMantissaFromFloat(Value) > 0 ? (ExtractExponentFromFloat(Value) + 1) : ExtractExponentFromFloat(Value)) * ExtractSignFromFloat(Value);
+    }
+    
+    int64_t  Ceild(const double Value) { // 1.3 = 2, -1.3 = -1
+        return (ExtractMantissaFromDouble(Value) > 0 ? (ExtractExponentFromDouble(Value) + 1) : ExtractExponentFromDouble(Value)) * ExtractSignFromDouble(Value);
     }
     
     uint64_t Exponentiate(const uint64_t Base, const uint64_t Exponent) {

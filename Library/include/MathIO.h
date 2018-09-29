@@ -41,7 +41,43 @@ extern "C" {
      @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
      @param                     Value                           "The value to find the absolute value of".
      */
-    uint64_t                    Absolute(const int64_t Value);
+    uint64_t                    Absolutei(const int64_t Value);
+    
+    /*!
+     @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
+     @param                     Value                           "The value to find the absolute value of".
+     */
+    uint64_t                    Absolutef(const float Value);
+    
+    /*!
+     @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
+     @param                     Value                           "The value to find the absolute value of".
+     */
+    uint64_t                    Absoluted(const double Value);
+    
+    /*!
+     @abstract                                                  "Returns the Floor value of a decimal".
+     @param                     Value                           "The value to find the floor value of".
+     */
+    int64_t                     Floorf(const double Value);
+    
+    /*!
+     @abstract                                                  "Returns the Floor value of a decimal".
+     @param                     Value                           "The value to find the floor value of".
+     */
+    int64_t                     Floord(const double Value);
+    
+    /*!
+     @abstract                                                  "Returns the Ceiling value of a decimal".
+     @param                     Value                           "The value to find the ceil value of".
+     */
+    int64_t                     Ceilf(const float Value);
+    
+    /*!
+     @abstract                                                  "Returns the Ceiling value of a decimal".
+     @param                     Value                           "The value to find the ceil value of".
+     */
+    int64_t                     Ceild(const double Value);
     
     /*!
      @abstract                                                  "Calculates the value of Base raised to Exponent's power (an integer version of the pow function)".
@@ -155,6 +191,9 @@ extern "C" {
      */
     int64_t                     ExtractMantissaFromDouble(double Number2Extract);
     
+#define Absolute(Value)                     _Generic((Value), int16_t:Absolutei, int64_t:Absolutei, uint64_t:Absolutei, float:Absolutef, double:Absoluted)(Value)
+#define Floor(Value)                        _Generic((Value), float:Floorf, double:Floord)(Value)
+#define Ceil(Value)                         _Generic((Value), float:Ceilf, double:Ceild)(Value)
 #define ExtractSignFromDecimal(Decimal)     _Generic((Decimal), float:ExtractSignFromFloat,     double:ExtractSignFromDouble)(Decimal)
 #define ExtractExponentFromDecimal(Decimal) _Generic((Decimal), float:ExtractExponentFromFloat, double:ExtractExponentFromDouble)(Decimal)
 #define ExtractMantissaFromDecimal(Decimal) _Generic((Decimal), float:ExtractMantissaFromFloat, double:ExtractMantissaFromDouble)(Decimal)
