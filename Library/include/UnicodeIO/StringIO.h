@@ -120,9 +120,8 @@ extern "C" {
      @constant            IntegerBase8                         "Base 8".
      @constant            IntegerBase10                        "Base 10".
      @constant            IntegerBase16U                       "Base 16, 0-9A-F".
-     @constant            IntegerHexL                          "Base 16, 0-9a-f".
-     @constant            FloatDecimalU                        "Base 10, 392.96".
-     @constant            FloatDecimalL                        "Base 10, 392.96".
+     @constant            IntegerBase16L                       "Base 16, 0-9a-f".
+     @constant            FloatDecimal                         "Base 10, 392.96".
      @constant            FloatScientificU                     "Base 10, 392.96E+2".
      @constant            FloatScientificL                     "Base 10, 392.96e+2".
      @constant            FloatShortestU                       "Choose the shortest representation between Scientific and Decimal, Uppercase".
@@ -136,14 +135,13 @@ extern "C" {
                           IntegerBase10                        = 10,
                           IntegerBase16L                       = 16,
                           IntegerBase16U                       = 32,
-                          FloatDecimalU                        = 64,
-                          FloatDecimalL                        = 128,
-                          FloatScientificU                     = 256,
-                          FloatScientificL                     = 512,
-                          FloatShortestU                       = 1024,
-                          FloatShortestL                       = 2048,
-                          FloatHexU                            = 4096,
-                          FloatHexL                            = 8192,
+                          FloatDecimal                         = 64,
+                          FloatScientificU                     = 128,
+                          FloatScientificL                     = 256,
+                          FloatShortestU                       = 512,
+                          FloatShortestL                       = 1024,
+                          FloatHexU                            = 2048,
+                          FloatHexL                            = 4096,
     } StringIOBases;
     
     /*!
@@ -823,6 +821,24 @@ extern "C" {
     UTF32                *UTF32_FormatString(UTF32 *Format, ...);
 #endif /* MSVC Version */
 #endif /* Compiler */
+    
+    /*!
+     @abstract                             "Counts the number of format specifiers (percent prefixed tokens) in String".
+     @param               String           "The string to count the number of format specifiers contained within".
+     */
+    uint64_t              UTF8_GetNumFormatSpecifiers(UTF8 *String);
+    
+    /*!
+     @abstract                             "Counts the number of format specifiers (percent prefixed tokens) in String".
+     @param               String           "The string to count the number of format specifiers contained within".
+     */
+    uint64_t              UTF16_GetNumFormatSpecifiers(UTF16 *String);
+    
+    /*!
+     @abstract                             "Counts the number of format specifiers (percent prefixed tokens) in String".
+     @param               String           "The string to count the number of format specifiers contained within".
+     */
+    uint64_t              UTF32_GetNumFormatSpecifiers(UTF32 *String);
     
     /*!
      @abstract                             "Writes a UTF-8 encoded string to the OutputFile using the platform's default Unicode encoding".
