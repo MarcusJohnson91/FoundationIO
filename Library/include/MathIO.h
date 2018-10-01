@@ -191,9 +191,9 @@ extern "C" {
      */
     int64_t                     ExtractMantissaFromDouble(double Number2Extract);
     
-#define Absolute(Value)                     _Generic((Value), int16_t:Absolutei, int64_t:Absolutei, uint64_t:Absolutei, float:Absolutef, double:Absoluted)(Value)
-#define Floor(Value)                        _Generic((Value), float:Floorf, double:Floord)(Value)
-#define Ceil(Value)                         _Generic((Value), float:Ceilf, double:Ceild)(Value)
+#define Absolute(Value)                     _Generic((Value), uint8_t:Absolutei, int8_t:Absolutei, uint16_t:Absolutei, int16_t:Absolutei, uint32_t:Absolutei, int32_t:Absolutei, uint64_t:Absolutei, int64_t:Absolutei, float:Absolutef, double:Absoluted)(Value)
+#define Floor(Value)                        _Generic((Value), uint8_t:Floori, int8_t:Floori, uint16_t:Floori, int16_t:Floori, uint32_t:Floori, int32_t:Floori, uint64_t:Floori, int64_t:Floori, float:Floorf, double:Floord)(Value)
+#define Ceil(Value)                         _Generic((Value), uint8_t:Ceilf, int8_t:Ceilf, uint16_t:Ceilf, int16_t:Ceilf, uint32_t:Ceilf, int32_t:Ceilf, uint64_t:Ceild, int64_t:Ceild, float:Ceilf, double:Ceild)(Value)
 #define ExtractSignFromDecimal(Decimal)     _Generic((Decimal), float:ExtractSignFromFloat,     double:ExtractSignFromDouble)(Decimal)
 #define ExtractExponentFromDecimal(Decimal) _Generic((Decimal), float:ExtractExponentFromFloat, double:ExtractExponentFromDouble)(Decimal)
 #define ExtractMantissaFromDecimal(Decimal) _Generic((Decimal), float:ExtractMantissaFromFloat, double:ExtractMantissaFromDouble)(Decimal)
