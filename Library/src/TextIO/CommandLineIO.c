@@ -89,7 +89,7 @@ extern "C" {
         int64_t              NumOptions;
         int64_t              MinOptions;
         int64_t              HelpSwitch;
-        bool                 IsProprietary;
+        CLILicenseTypes      LicenseType;
     } CommandLineIO;
     
     CommandLineIO *CommandLineIO_Init(const int64_t NumSwitches) {
@@ -314,11 +314,7 @@ extern "C" {
     
     void CommandLineIO_UTF8_SetLicense(CommandLineIO *CLI, CLILicenseTypes LicenseType, UTF8 *Name, UTF8 *LicenseURL) {
         if (CLI != NULL && LicenseType != UnknownLicenseType && Name != NULL && LicenseURL != NULL) {
-            if (LicenseType == PermissiveLicense || LicenseType == CopyleftLicense) {
-                CLI->IsProprietary          = No;
-            } else if (LicenseType == ProprietaryLicense) {
-                CLI->IsProprietary          = Yes;
-            }
+            CLI->LicenseType                = LicenseType;
             UTF32 *DecodedName              = UTF8_Decode(Name);
             UTF32 *NormalizedName           = UTF32_NormalizeString(DecodedName, NormalizationFormKC);
             free(DecodedName);
@@ -345,11 +341,7 @@ extern "C" {
     
     void CommandLineIO_UTF16_SetLicense(CommandLineIO *CLI, CLILicenseTypes LicenseType, UTF16 *Name, UTF16 *LicenseURL) {
         if (CLI != NULL && LicenseType != UnknownLicenseType && Name != NULL && LicenseURL != NULL) {
-            if (LicenseType == PermissiveLicense || LicenseType == CopyleftLicense) {
-                CLI->IsProprietary          = No;
-            } else if (LicenseType == ProprietaryLicense) {
-                CLI->IsProprietary          = Yes;
-            }
+            CLI->LicenseType                = LicenseType;
             UTF32 *DecodedName              = UTF16_Decode(Name);
             UTF32 *NormalizedName           = UTF32_NormalizeString(DecodedName, NormalizationFormKC);
             free(DecodedName);
@@ -671,25 +663,74 @@ extern "C" {
     
     static inline void CommandLineIO_UTF8_DisplayBanner(CommandLineIO *CLI) {
         if (CLI != NULL) {
-            UTF8 *Name               = UTF8_Encode(CLI->ProgramName);
-            UTF8 *Version            = UTF8_Encode(CLI->ProgramVersion);
-            UTF8 *Author             = UTF8_Encode(CLI->ProgramAuthor);
-            UTF8 *Copyright          = UTF8_Encode(CLI->ProgramCopyright);
-            UTF8 *Description        = UTF8_Encode(CLI->ProgramDescription);
-            UTF8 *LicenseName        = UTF8_Encode(CLI->ProgramLicenseName);
-            UTF8 *LicenseDescription = UTF8_Encode(CLI->ProgramLicenseDescription);
-            UTF8 *LicenseURL         = UTF8_Encode(CLI->ProgramLicenseURL);
+            UTF8 *Name                  = UTF8_Encode(CLI->ProgramName);
+            UTF8 *Version               = UTF8_Encode(CLI->ProgramVersion);
+            UTF8 *Author                = UTF8_Encode(CLI->ProgramAuthor);
+            UTF8 *Copyright             = UTF8_Encode(CLI->ProgramCopyright);
+            UTF8 *Description           = UTF8_Encode(CLI->ProgramDescription);
+            UTF8 *LicenseName           = UTF8_Encode(CLI->ProgramLicenseName);
+            UTF8 *LicenseDescription    = UTF8_Encode(CLI->ProgramLicenseDescription);
+            UTF8 *LicenseURL            = UTF8_Encode(CLI->ProgramLicenseURL);
+            CLILicenseTypes LicenseType = CLI->LicenseType;
             
-            if (Name != NULL && Version != NULL && Author != NULL && Copyright != NULL) {
-                UTF8 *FormattedString = UTF8_FormatString(U8("%s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, NewLineUTF8);
+            if (Name != NULL) { // TrimSilence, v. 0.1.1 by Marcus Johnson © 2018+
+                UTF8 *NameString      = UTF8_FormatString(U8("%s,"), Name);
+                UTF8_WriteString2File(NameString, stdout);
+                
+                UTF8 *FormattedString = UTF8_FormatString(U8(" %s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, NewLineUTF16);
                 UTF8_WriteString2File(FormattedString, stdout);
             }
-            if (CLI->IsProprietary == No && Description != NULL && LicenseName != NULL && LicenseDescription != NULL && LicenseURL != NULL) {
-                UTF8 *FormattedString = UTF8_FormatString(U8("%s, Released under the \"%s\" %s, available at: %s%s"), Description, LicenseName, LicenseDescription, LicenseURL, NewLineUTF8);
-                UTF8_WriteString2File(FormattedString, stdout);
-            } else if (CLI->IsProprietary == Yes && Description != NULL && LicenseDescription != NULL && LicenseURL != NULL) {
-                UTF8 *FormattedString = UTF8_FormatString(U8("%s, By using this software, you agree to the End User License Agreement %s, available at: %s%s"), Description, LicenseDescription, LicenseURL, NewLineUTF8);
-                UTF8_WriteString2File(FormattedString, stdout);
+            
+            if (Version != NULL) {
+                UTF8 *VersionString   = UTF8_FormatString(U8(" v. %s"), Version);
+                UTF8_WriteString2File(VersionString, stdout);
+            }
+            
+            if (Author != NULL) {
+                UTF8 *AuthorString   = UTF8_FormatString(U8(" by %s"), Author);
+                UTF8_WriteString2File(AuthorString, stdout);
+            }
+            
+            if (Copyright != NULL) {
+                UTF8 *CopyrightString   = UTF8_FormatString(U8(" © %s\n"), Copyright);
+                UTF8_WriteString2File(CopyrightString, stdout);
+            }
+            
+            if (LicenseType == PermissiveLicense || LicenseType == CopyleftLicense) {
+                if (Description != NULL) {
+                    UTF8 *DescriptionString   = UTF8_FormatString(U8("%s"), Description);
+                    UTF8_WriteString2File(DescriptionString, stdout);
+                }
+                
+                if (LicenseName != NULL) { // Released under the "BSD 3 clause" license
+                    UTF8 *LicenseNameString   = UTF8_FormatString(U8(" Released under the \"%s\" license"), LicenseName);
+                    UTF8_WriteString2File(LicenseNameString, stdout);
+                }
+                
+                if (LicenseDescription != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                    UTF8 *LicenseDescriptionString   = UTF8_FormatString(U8(" %s,"), LicenseDescription);
+                    UTF8_WriteString2File(LicenseDescriptionString, stdout);
+                }
+                
+                if (LicenseURL != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                    UTF8 *LicenseURLString   = UTF8_FormatString(U8(" %s\n"), LicenseURL);
+                    UTF8_WriteString2File(LicenseURLString, stdout);
+                }
+            } else if (LicenseType == ProprietaryLicense) {
+                if (Description != NULL) {
+                    UTF8 *DescriptionString   = UTF8_FormatString(U8("%s"), Description);
+                    UTF8_WriteString2File(DescriptionString, stdout);
+                }
+                
+                if (LicenseDescription != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                    UTF8 *LicenseDescriptionString   = UTF8_FormatString(U8(" By using this software, you agree to the End User License Agreement %s,"), LicenseDescription);
+                    UTF8_WriteString2File(LicenseDescriptionString, stdout);
+                }
+                
+                if (LicenseURL != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                    UTF8 *LicenseURLString   = UTF8_FormatString(U8(" available at: %s\n"), LicenseURL);
+                    UTF8_WriteString2File(LicenseURLString, stdout);
+                }
             }
         } else {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
@@ -698,25 +739,74 @@ extern "C" {
     
     static inline void CommandLineIO_UTF16_DisplayBanner(CommandLineIO *CLI) {
         if (CLI != NULL) {
-            UTF16 *Name               = UTF16_Encode(CLI->ProgramName);
-            UTF16 *Version            = UTF16_Encode(CLI->ProgramVersion);
-            UTF16 *Author             = UTF16_Encode(CLI->ProgramAuthor);
-            UTF16 *Copyright          = UTF16_Encode(CLI->ProgramCopyright);
-            UTF16 *Description        = UTF16_Encode(CLI->ProgramDescription);
-            UTF16 *LicenseName        = UTF16_Encode(CLI->ProgramLicenseName);
-            UTF16 *LicenseDescription = UTF16_Encode(CLI->ProgramLicenseDescription);
-            UTF16 *LicenseURL         = UTF16_Encode(CLI->ProgramLicenseURL);
+            UTF16 *Name                 = UTF16_Encode(CLI->ProgramName);
+            UTF16 *Version              = UTF16_Encode(CLI->ProgramVersion);
+            UTF16 *Author               = UTF16_Encode(CLI->ProgramAuthor);
+            UTF16 *Copyright            = UTF16_Encode(CLI->ProgramCopyright);
+            UTF16 *Description          = UTF16_Encode(CLI->ProgramDescription);
+            UTF16 *LicenseName          = UTF16_Encode(CLI->ProgramLicenseName);
+            UTF16 *LicenseDescription   = UTF16_Encode(CLI->ProgramLicenseDescription);
+            UTF16 *LicenseURL           = UTF16_Encode(CLI->ProgramLicenseURL);
+            CLILicenseTypes LicenseType = CLI->LicenseType;
             
-            if (Name != NULL && Version != NULL && Author != NULL && Copyright != NULL) {
-                UTF16 *FormattedString = UTF16_FormatString(U16("%s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, NewLineUTF16);
+            if (Name != NULL) { // TrimSilence, v. 0.1.1 by Marcus Johnson © 2018+
+                UTF16 *NameString      = UTF16_FormatString(U16("%s,"), Name);
+                UTF16_WriteString2File(NameString, stdout);
+                
+                UTF16 *FormattedString = UTF16_FormatString(U16(" %s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, NewLineUTF16);
                 UTF16_WriteString2File(FormattedString, stdout);
             }
-            if (CLI->IsProprietary == No && Description != NULL && LicenseName != NULL && LicenseDescription != NULL && LicenseURL != NULL) {
-                UTF16 *FormattedString = UTF16_FormatString(U16("%s, Released under the \"%s\" %s, available at: %s%s"), Description, LicenseName, LicenseDescription, LicenseURL, NewLineUTF16);
-                UTF16_WriteString2File(FormattedString, stdout);
-            } else if (CLI->IsProprietary == Yes && Description != NULL && LicenseDescription != NULL && LicenseURL != NULL) {
-                UTF16 *FormattedString = UTF16_FormatString(U16("%s, By using this software, you agree to the End User License Agreement %s, available at: %s%s"), Description, LicenseDescription, LicenseURL, NewLineUTF16);
-                UTF16_WriteString2File(FormattedString, stdout);
+            
+            if (Version != NULL) {
+                UTF16 *VersionString   = UTF16_FormatString(U16(" v. %s"), Version);
+                UTF16_WriteString2File(VersionString, stdout);
+            }
+            
+            if (Author != NULL) {
+                UTF16 *AuthorString   = UTF16_FormatString(U16(" by %s"), Author);
+                UTF16_WriteString2File(AuthorString, stdout);
+            }
+            
+            if (Copyright != NULL) {
+                UTF16 *CopyrightString   = UTF16_FormatString(U16(" © %s\n"), Copyright);
+                UTF16_WriteString2File(CopyrightString, stdout);
+            }
+            
+            if (LicenseType == PermissiveLicense || LicenseType == CopyleftLicense) {
+                if (Description != NULL) {
+                    UTF16 *DescriptionString   = UTF16_FormatString(U16("%s"), Description);
+                    UTF16_WriteString2File(DescriptionString, stdout);
+                }
+                
+                if (LicenseName != NULL) { // Released under the "BSD 3 clause" license
+                    UTF16 *LicenseNameString   = UTF16_FormatString(U16(" Released under the \"%s\" license"), LicenseName);
+                    UTF16_WriteString2File(LicenseNameString, stdout);
+                }
+                
+                if (LicenseDescription != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                    UTF16 *LicenseDescriptionString   = UTF16_FormatString(U16(" %s,"), LicenseDescription);
+                    UTF16_WriteString2File(LicenseDescriptionString, stdout);
+                }
+                
+                if (LicenseURL != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                    UTF16 *LicenseURLString   = UTF16_FormatString(U16(" %s\n"), LicenseURL);
+                    UTF16_WriteString2File(LicenseURLString, stdout);
+                }
+            } else if (LicenseType == ProprietaryLicense) {
+                if (Description != NULL) {
+                    UTF16 *DescriptionString   = UTF16_FormatString(U16("%s"), Description);
+                    UTF16_WriteString2File(DescriptionString, stdout);
+                }
+                
+                if (LicenseDescription != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                    UTF16 *LicenseDescriptionString   = UTF16_FormatString(U16(" By using this software, you agree to the End User License Agreement %s,"), LicenseDescription);
+                    UTF16_WriteString2File(LicenseDescriptionString, stdout);
+                }
+                
+                if (LicenseURL != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                    UTF16 *LicenseURLString   = UTF16_FormatString(U16(" available at: %s\n"), LicenseURL);
+                    UTF16_WriteString2File(LicenseURLString, stdout);
+                }
             }
         } else {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
