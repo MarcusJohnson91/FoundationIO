@@ -827,10 +827,7 @@ extern "C" {
                 Log(Log_DEBUG, __func__, U8("ArgumentString is not an Argument string"));
             }
             uint64_t ArgumentSwitchSize    = ArgumentStringSize - ArgumentStringPrefixSize;
-            ArgumentSwitch                 = calloc(ArgumentSwitchSize + NULLTerminatorSize, sizeof(UTF32));
-            for (uint64_t SwitchByte = ArgumentStringPrefixSize; SwitchByte < ArgumentSwitchSize; SwitchByte++) {
-                ArgumentString[SwitchByte - ArgumentStringPrefixSize] = ArgumentString[SwitchByte];
-            }
+            ArgumentSwitch                 = UTF32_ExtractSubString(UTF32_CaseFoldString(ArgumentString), ArgumentStringPrefixSize, ArgumentStringSize);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
