@@ -237,7 +237,7 @@ extern "C" {
      @abstract                             "Gets the channel index for the specified mask".
      @remark                               "If the mask is not present in the ImageContainer, we return the number of channels, which is outside the valid range".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
-     @param                 ChannelMask    "Which channel are you trying to access"?
+     @param                 Mask           "Which channel are you trying to access"?
      */
     uint64_t                ImageContainer_GetChannelsIndex(ImageContainer *Image, Image_Views View, Image_ChannelMask Mask);
     
