@@ -883,14 +883,13 @@ extern "C" {
             } while (CurrentArgument < NumArguments);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
-        } else if (CLI->MinOptions <= 1 || NumArguments <= 1) {
+        } else if (CLI->MinOptions < 1 || NumArguments <= 1) {
             Log(Log_ERROR, __func__, U8("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
         }
     }
     
     void CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF8 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
-            // Basically now we just loop over the arguments, decode, normalize, and casefold them.
             UTF32 **Arguments32     = calloc(NumArguments, sizeof(UTF32*));
             for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
                 UTF32 *Decoded      = UTF8_Decode(Arguments[Arg]);
@@ -907,8 +906,8 @@ extern "C" {
             free(Arguments32);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
-        } else if (CLI->MinOptions <= 1 || NumArguments <= 1) {
-            Log(Log_ERROR, __func__, U8("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
+        } else if (CLI->MinOptions < 1 || NumArguments <= 1) {
+            CommandLineIO_UTF8_DisplayHelp(CLI);
         }
     }
     
@@ -930,8 +929,8 @@ extern "C" {
             free(Arguments32);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
-        } else if (CLI->MinOptions <= 1 || NumArguments <= 1) {
-            Log(Log_ERROR, __func__, U8("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
+        } else if (CLI->MinOptions < 1 || NumArguments <= 1) {
+            CommandLineIO_UTF16_DisplayHelp(CLI);
         }
     }
     
