@@ -47,8 +47,8 @@ extern "C" {
      @constant               Argument                    "If there is a path or other result expected for this switch's argument, it'll be here".
      */
     typedef struct CommandLineOption {
-        int64_t             *OptionSlaves;
         UTF32               *Argument;
+        int64_t             *OptionSlaves;
         int64_t              SwitchID;
         int64_t              NumOptionSlaves;
     } CommandLineOption;
