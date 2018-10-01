@@ -20,15 +20,13 @@ extern "C" {
     /*!
      @struct                 CommandLineSwitch
      @abstract                                           "Contains the data to support a switch".
-     @constant               SwitchType                  "What type of switch is this"?
-     @constant               ArgumentType                "What type of argument does this switch accept"?
      @constant               Name                        "What is this switch called, how do we identify it"?
      @constant               Description                 "Describe to the user what this switch does".
-     @constant               NameSize                    "What is the number of code units of this string"?
-     @constant               DescriptionSize             "What is the number of code units of this string"?
+     @constant               PotentialSlaves             "Pointer to an array that contains the list of aloowable Slave switches".
      @constant               NumPotentialSlaves          "How many potential slaves are there"?
      @constant               MaxConcurrentSlaves         "How many Slave switches can be active at once"?
-     @constant               PotentialSlaves             "Pointer to an array that contains the list of aloowable Slave switches".
+     @constant               SwitchType                  "What type of switch is this"?
+     @constant               ArgumentType                "What type of argument does this switch accept"?
      */
     typedef struct CommandLineSwitch {
         UTF32               *Name;
