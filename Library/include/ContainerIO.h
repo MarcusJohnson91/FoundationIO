@@ -31,14 +31,13 @@ extern "C" {
         AudioMask_RearCenter        = 256,
     } Audio_ChannelMask;
     
-    typedef enum Audio_Types {
+    typedef enum Audio_Types { // Let's make this mask ORable
         AudioType_Unknown           = 0,
-        AudioType_UInteger8         = 1,
-        AudioType_SInteger8         = 2,
-        AudioType_UInteger16        = 4,
-        AudioType_SInteger16        = 8,
-        AudioType_UInteger32        = 16,
-        AudioType_SInteger32        = 32,
+        AudioType_Unsigned          = 1,
+        AudioType_Signed            = 2,
+        AudioType_Integer8          = 4,
+        AudioType_Integer16         = 8,
+        AudioType_Integer32         = 16,
     } Audio_Types;
     
     typedef struct          AudioContainer AudioContainer;
@@ -137,53 +136,29 @@ extern "C" {
      */
     void                    AudioContainer_Deinit(AudioContainer *Audio);
     
-    typedef enum Image_Views {
-        ImageView_Unknown           = 0,
-        ImageView_2D                = 1,
-        ImageView_3D_Left           = 2,
-        ImageView_3D_Right          = 4,
-    } Image_Views;
-    
     typedef enum Image_ChannelMask {
-        ImageMask_Unknown           = 0x0,
-        ImageMask_Luma2D            = 0x1,
-        ImageMask_Chroma2D_1        = 0x2,
-        ImageMask_Chroma2D_2        = 0x4,
-        ImageMask_Chroma2D_3        = 0x8,
-        ImageMask_Luma3D_L          = 0x10,
-        ImageMask_Luma3D_R          = 0x20,
-        ImageMask_Chroma3D_1_L      = 0x40,
-        ImageMask_Chroma3D_1_R      = 0x80,
-        ImageMask_Chroma3D_2_L      = 0x100,
-        ImageMask_Chroma3D_2_R      = 0x200,
-        ImageMask_Chroma3D_3_L      = 0x400,
-        ImageMask_Chroma3D_3_R      = 0x800,
-        ImageMask_Grayscale2D       = 0x1000,
-        ImageMask_Red2D             = 0x2000,
-        ImageMask_Green2D           = 0x4000,
-        ImageMask_Blue2D            = 0x8000,
-        ImageMask_Alpha2D           = 0x10000,
-        ImageMask_Green_2_2D        = 0x20000,
-        ImageMask_Grayscale3D_L     = 0x40000,
-        ImageMask_Grayscale3D_R     = 0x80000,
-        ImageMask_Red3D_L           = 0x100000,
-        ImageMask_Red3D_R           = 0x200000,
-        ImageMask_Green3D_L         = 0x400000,
-        ImageMask_Green3D_R         = 0x800000,
-        ImageMask_Blue3D_L          = 0x1000000,
-        ImageMask_Blue3D_R          = 0x2000000,
-        ImageMask_Alpha3D_L         = 0x4000000,
-        ImageMask_Alpha3D_R         = 0x8000000,
-        ImageMask_Green3D_2_L       = 0x10000000,
-        ImageMask_Green3D_2_R       = 0x20000000,
+        ImageMask_Unknown           = 0,
+        ImageMask_2D                = 1,
+        ImageMask_3D_L              = 2,
+        ImageMask_3D_R              = 4,
+        ImageMask_Luma              = 8,
+        ImageMask_Chroma1           = 16,
+        ImageMask_Chroma2           = 32,
+        ImageMask_Chroma3           = 64,
+        ImageMask_Grayscale         = 128,
+        ImageMask_Red               = 256,
+        ImageMask_Green             = 512,
+        ImageMask_Blue              = 1024,
+        ImageMask_Alpha             = 2048,
+        ImageMask_Green2            = 4096,
     } Image_ChannelMask;
     
     typedef enum Image_Types {
         ImageType_Unknown           = 0,
-        ImageType_UInteger8         = 1,
-        ImageType_SInteger8         = 2,
-        ImageType_UInteger16        = 4,
-        ImageType_SInteger16        = 8,
+        ImageType_Unsigned          = 1,
+        ImageType_Signed            = 2,
+        ImageType_Integer8          = 4,
+        ImageType_Integer16         = 8,
     } Image_Types;
     
     typedef struct          ImageContainer ImageContainer;
@@ -239,7 +214,7 @@ extern "C" {
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      @param                 Mask           "Which channel are you trying to access"?
      */
-    uint64_t                ImageContainer_GetChannelsIndex(ImageContainer *Image, Image_Views View, Image_ChannelMask Mask);
+    uint64_t                ImageContainer_GetChannelsIndex(ImageContainer *Image, Image_ChannelMask Mask);
     
     /*!
      @abstract                             "Gets the channel mask for view X".
@@ -258,9 +233,9 @@ extern "C" {
      @abstract                             "Gets the views index for the specified mask".
      @remark                               "If the mask is not present in the ImageContainer, we return the number of views, which is outside the valid range".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
-     @param                 View           "Which view are you trying to access"?
+     @param                 Mask           "Which view are you trying to access"?
      */
-    uint64_t                ImageContainer_GetViewsIndex(ImageContainer *Image, Image_Views View);
+    uint64_t                ImageContainer_GetViewsIndex(ImageContainer *Image, Image_ChannelMask Mask);
     
     /*!
      @abstract                             "Gets the type of the array contained by the ImageContainer".
@@ -285,26 +260,23 @@ extern "C" {
     /*!
      @abstract                             "Returns the average value (rounded) of the pixels in this image".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
-     @param                 ViewMask       "Which view are you trying to get the average from"?
      @param                 ChannelMask    "Which channel should we get the average from"?
      */
-    int64_t                 ImageContainer_GetAverage(ImageContainer *Image, Image_Views ViewMask, Image_ChannelMask ChannelMask);
+    int64_t                 ImageContainer_GetAverage(ImageContainer *Image, Image_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Returns the highest value pixel in this image".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
-     @param                 ViewMask       "Which view are you trying to get the maximum from"?
      @param                 ChannelMask    "Which channel should we get the maximum from"?
      */
-    int64_t                 ImageContainer_GetMax(ImageContainer *Image, Image_Views ViewMask, Image_ChannelMask ChannelMask);
+    int64_t                 ImageContainer_GetMax(ImageContainer *Image, Image_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Returns the lowest value pixel in this image".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
-     @param                 ViewMask       "Which view are you trying to get the minimum from"?
      @param                 ChannelMask    "Which channel should we get the minimum from"?
      */
-    int64_t                 ImageContainer_GetMin(ImageContainer *Image, Image_Views ViewMask, Image_ChannelMask ChannelMask);
+    int64_t                 ImageContainer_GetMin(ImageContainer *Image, Image_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Rotates an Image, either Vertically, Horizontally, or both".

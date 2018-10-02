@@ -10,19 +10,19 @@ extern "C" {
     
     typedef struct AudioContainer {
         union Samples {
-            uint32_t      **UInteger32;
-            int32_t       **SInteger32;
-            uint16_t      **UInteger16;
-            int16_t       **SInteger16;
-            uint8_t       **UInteger8;
-            int8_t        **SInteger8;
+            uint32_t     **UInteger32;
+            int32_t      **SInteger32;
+            uint16_t     **UInteger16;
+            int16_t      **SInteger16;
+            uint8_t      **UInteger8;
+            int8_t       **SInteger8;
         } Samples;
-        Audio_ChannelMask  *ChannelMask;
-        uint64_t            NumSamples;
-        uint64_t            SampleRate;
-        uint64_t            NumChannels;
-        uint64_t            BitDepth;
-        Audio_Types         Type;
+        Audio_ChannelMask *ChannelMask;
+        uint64_t           NumSamples;
+        uint64_t           SampleRate;
+        uint64_t           NumChannels;
+        uint64_t           BitDepth;
+        Audio_Types        Type;
     } AudioContainer;
     
     AudioContainer *AudioContainer_Init(Audio_Types Type, uint64_t BitDepth, uint64_t NumChannels, uint64_t SampleRate, uint64_t NumSamples) {
@@ -35,17 +35,17 @@ extern "C" {
                 Audio->SampleRate  = SampleRate;
                 Audio->NumSamples  = NumSamples;
                 Audio->ChannelMask = calloc(NumChannels, sizeof(Audio_ChannelMask));
-                if (Type == AudioType_UInteger8) {
+                if (Type == (AudioType_Unsigned | AudioType_Integer8)) {
                     Audio->Samples.UInteger8 = calloc(NumChannels * NumSamples, 1);
-                } else if (Type == AudioType_SInteger8) {
+                } else if (Type == (AudioType_Signed | AudioType_Integer8)) {
                     Audio->Samples.SInteger8 = calloc(NumChannels * NumSamples, 1);
-                } else if (Type == AudioType_UInteger16) {
+                } else if (Type == (AudioType_Unsigned | AudioType_Integer16)) {
                     Audio->Samples.UInteger16 = calloc(NumChannels * NumSamples, 2);
-                } else if (Type == AudioType_SInteger16) {
+                } else if (Type == (AudioType_Signed | AudioType_Integer16)) {
                     Audio->Samples.SInteger16 = calloc(NumChannels * NumSamples, 2);
-                } else if (Type == AudioType_UInteger32) {
+                } else if (Type == (AudioType_Unsigned | AudioType_Integer32)) {
                     Audio->Samples.UInteger32 = calloc(NumChannels * NumSamples, 4);
-                } else if (Type == AudioType_SInteger32) {
+                } else if (Type == (AudioType_Signed | AudioType_Integer32)) {
                     Audio->Samples.SInteger32 = calloc(NumChannels * NumSamples, 4);
                 }
                 if (Audio->Samples.UInteger8 == NULL && Audio->Samples.SInteger8 == NULL && Audio->Samples.UInteger16 == NULL && Audio->Samples.SInteger16 == NULL && Audio->Samples.UInteger32 == NULL && Audio->Samples.SInteger32 == NULL) {
@@ -125,17 +125,17 @@ extern "C" {
     void **AudioContainer_GetArray(AudioContainer *Audio) {
         void **AudioArray = NULL;
         if (Audio != NULL) {
-            if (Audio->Type == AudioType_UInteger8) {
+            if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
                 AudioArray = (void**) Audio->Samples.UInteger8;
-            } else if (Audio->Type == AudioType_SInteger8) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
                 AudioArray = (void**) Audio->Samples.SInteger8;
-            } else if (Audio->Type == AudioType_UInteger16) {
+            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
                 AudioArray = (void**) Audio->Samples.UInteger16;
-            } else if (Audio->Type == AudioType_SInteger16) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer16)) {
                 AudioArray = (void**) Audio->Samples.SInteger16;
-            } else if (Audio->Type == AudioType_UInteger32) {
+            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
                 AudioArray = (void**) Audio->Samples.UInteger32;
-            } else if (Audio->Type == AudioType_SInteger32) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
                 AudioArray = (void**) Audio->Samples.SInteger32;
             }
         } else {
@@ -147,32 +147,32 @@ extern "C" {
     int64_t AudioContainer_GetAverage(AudioContainer *Audio, uint64_t Channel) {
         int64_t Average = 0LL;
         if (Audio != NULL) {
-            if (Audio->Type == AudioType_UInteger8) {
+            if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
                 uint8_t **Array = (uint8_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
-            } else if (Audio->Type == AudioType_SInteger8) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
                 int8_t **Array = (int8_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
-            } else if (Audio->Type == AudioType_UInteger16) {
+            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
                 uint16_t **Array = (uint16_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
-            } else if (Audio->Type == AudioType_SInteger16) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer16)) {
                 int16_t **Array = (int16_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
-            } else if (Audio->Type == AudioType_UInteger32) {
+            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
                 uint32_t **Array = (uint32_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
-            } else if (Audio->Type == AudioType_SInteger32) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
                 int32_t **Array = (int32_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
@@ -190,42 +190,42 @@ extern "C" {
     int64_t AudioContainer_GetMax(AudioContainer *Audio, uint64_t Channel) {
         int64_t Maximum = INT64_MIN;
         if (Audio != NULL && Channel < Audio->NumChannels) {
-            if (Audio->Type == AudioType_UInteger8) {
+            if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
                 uint8_t **Array = (uint8_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
                     }
                 }
-            } else if (Audio->Type == AudioType_SInteger8) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
                 int8_t **Array = (int8_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
                     }
                 }
-            } else if (Audio->Type == AudioType_UInteger16) {
+            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
                 uint16_t **Array = (uint16_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
                     }
                 }
-            } else if (Audio->Type == AudioType_SInteger16) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer16)) {
                 int16_t **Array = (int16_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
                     }
                 }
-            } else if (Audio->Type == AudioType_UInteger32) {
+            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
                 uint32_t **Array = (uint32_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
                     }
                 }
-            } else if (Audio->Type == AudioType_SInteger32) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
                 int32_t **Array = (int32_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
@@ -242,42 +242,42 @@ extern "C" {
     int64_t AudioContainer_GetMin(AudioContainer *Audio, uint64_t Channel) {
         int64_t Minimum = INT64_MAX;
         if (Audio != NULL) {
-            if (Audio->Type == AudioType_UInteger8) {
+            if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
                 uint8_t **Array = (uint8_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
                 }
-            } else if (Audio->Type == AudioType_SInteger8) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
                 int8_t **Array = (int8_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
                 }
-            } else if (Audio->Type == AudioType_UInteger16) {
+            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
                 uint16_t **Array = (uint16_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
                 }
-            } else if (Audio->Type == AudioType_SInteger16) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer16)) {
                 int16_t **Array = (int16_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
                 }
-            } else if (Audio->Type == AudioType_UInteger32) {
+            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
                 uint32_t **Array = (uint32_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
                 }
-            } else if (Audio->Type == AudioType_SInteger32) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
                 int32_t **Array = (int32_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
@@ -293,17 +293,17 @@ extern "C" {
     
     void AudioContainer_Deinit(AudioContainer *Audio) {
         if (Audio != NULL) {
-            if (Audio->Type == AudioType_UInteger8) {
+            if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
                 free(Audio->Samples.UInteger8);
-            } else if (Audio->Type == AudioType_SInteger8) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
                 free(Audio->Samples.SInteger8);
-            } else if (Audio->Type == AudioType_UInteger16) {
+            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
                 free(Audio->Samples.UInteger16);
-            } else if (Audio->Type == AudioType_SInteger16) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer16)) {
                 free(Audio->Samples.SInteger16);
-            } else if (Audio->Type == AudioType_UInteger32) {
+            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
                 free(Audio->Samples.UInteger32);
-            } else if (Audio->Type == AudioType_SInteger32) {
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
                 free(Audio->Samples.SInteger32);
             }
             free(Audio);
@@ -314,19 +314,18 @@ extern "C" {
     
     typedef struct ImageContainer {
         union Pixels {
-            uint16_t     ****UInteger16;
-            int16_t      ****SInteger16;
-            uint8_t      ****UInteger8;
-            int8_t       ****SInteger8;
+            uint16_t    ****UInteger16;
+            int16_t     ****SInteger16;
+            uint8_t     ****UInteger8;
+            int8_t      ****SInteger8;
         } Pixels;
-        Image_ChannelMask  **ChannelMask;
-        Image_Views         *Views;
-        uint64_t             Width;
-        uint64_t             Height;
-        uint64_t             BitDepth;
-        uint64_t             NumChannels;
-        uint64_t             NumViews;
-        Image_Types          Type;
+        Image_ChannelMask **ChannelMask;
+        uint64_t            Width;
+        uint64_t            Height;
+        uint64_t            BitDepth;
+        uint64_t            NumChannels;
+        uint64_t            NumViews;
+        Image_Types         Type;
     } ImageContainer;
     
     ImageContainer *ImageContainer_Init(Image_Types Type, uint64_t BitDepth, uint8_t NumViews, uint64_t NumChannels, uint64_t Width, uint64_t Height) {
@@ -342,13 +341,13 @@ extern "C" {
                 Image->Height                = Height;
                 Image->ChannelMask           = calloc(NumViews * NumChannels, sizeof(Image_ChannelMask));
                 
-                if (Type == ImageType_UInteger8) {
+                if (Type == (ImageType_Unsigned | ImageType_Integer8)) {
                     Image->Pixels.UInteger8  = calloc(NumViews * NumChannels * Width * Height, sizeof(uint8_t));
-                } else if (Type == ImageType_SInteger8) {
+                } else if (Type == (ImageType_Signed | ImageType_Integer8)) {
                     Image->Pixels.SInteger8  = calloc(NumViews * NumChannels * Width * Height, sizeof(int8_t));
-                } else if (Type == ImageType_UInteger16) {
+                } else if (Type == (ImageType_Unsigned | ImageType_Integer16)) {
                     Image->Pixels.UInteger16 = calloc(NumViews * NumChannels * Width * Height, sizeof(uint16_t));
-                } else if (Type == ImageType_SInteger16) {
+                } else if (Type == (ImageType_Signed | ImageType_Integer16)) {
                     Image->Pixels.SInteger16 = calloc(NumViews * NumChannels * Width * Height, sizeof(int16_t));
                 }
                 if (Image->Pixels.UInteger8 == NULL && Image->Pixels.SInteger8 == NULL && Image->Pixels.UInteger16 == NULL && Image->Pixels.SInteger16 == NULL) {
@@ -423,13 +422,15 @@ extern "C" {
         return NumChannels;
     }
     
-    uint64_t ImageContainer_GetChannelsIndex(ImageContainer *Image, Image_Views View, Image_ChannelMask Mask) {
-        uint64_t Index     = 0xFFFFFFFFFFFFFFFF;
+    uint64_t ImageContainer_GetChannelsIndex(ImageContainer *Image, Image_ChannelMask Mask) {
+        uint64_t Index                = 0ULL;
         if (Image != NULL) {
-            Index         = Image->NumChannels;
-            for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
-                if (Image->ChannelMask[View][Channel] == Mask) {
-                    Index = Channel;
+            Image_ChannelMask View    = Mask & 0x7;
+            Image_ChannelMask Channel = Mask - View;
+            Index                     = Image->NumChannels;
+            for (uint64_t Channels = 0ULL; Channels < Image->NumChannels; Channels++) {
+                if (Image->ChannelMask[View][Channels] == Channel) {
+                    Index             = Channel;
                 }
             }
         } else {
@@ -460,12 +461,12 @@ extern "C" {
         return NumViews;
     }
     
-    uint64_t ImageContainer_GetViewsIndex(ImageContainer *Image, Image_Views View) {
-        uint64_t Index    = 0xFFFFFFFFFFFFFFFF;
+    uint64_t ImageContainer_GetViewsIndex(ImageContainer *Image, Image_ChannelMask Mask) {
+        uint64_t Index    = 0ULL;
         if (Image != NULL) {
             Index         = Image->NumViews;
             for (uint64_t ViewIndex = 0ULL; ViewIndex < Image->NumViews; ViewIndex++) {
-                if (Image->Views[ViewIndex] == View) {
+                if (Image->ChannelMask[ViewIndex] == (Mask & 0x7)) {
                     Index = ViewIndex;
                 }
             }
@@ -488,13 +489,13 @@ extern "C" {
     void ****ImageContainer_GetArray(ImageContainer *Image) {
         void ****ImageArray = NULL;
         if (Image != NULL) {
-            if (Image->Type == ImageType_UInteger8) {
+            if (Image->Type == (ImageType_Unsigned | ImageType_Integer8)) {
                 ImageArray = (void****) Image->Pixels.UInteger8;
-            } else if (Image->Type == ImageType_SInteger8) {
+            } else if (Image->Type == (ImageType_Signed | ImageType_Integer8)) {
                 ImageArray = (void****) Image->Pixels.SInteger8;
-            } else if (Image->Type == ImageType_UInteger16) {
+            } else if (Image->Type == (ImageType_Unsigned | ImageType_Integer16)) {
                 ImageArray = (void****) Image->Pixels.UInteger16;
-            } else if (Image->Type == ImageType_SInteger16) {
+            } else if (Image->Type == (ImageType_Signed | ImageType_Integer16)) {
                 ImageArray = (void****) Image->Pixels.SInteger16;
             }
         } else {
@@ -505,13 +506,13 @@ extern "C" {
     
     void ImageContainer_SetArray(ImageContainer *Image, void ****Array) {
         if (Image != NULL) {
-            if (Image->Type == ImageType_UInteger8) {
+            if (Image->Type == (ImageType_Unsigned | ImageType_Integer8)) {
                 Image->Pixels.UInteger8 = (uint8_t****)   Array;
-            } else if (Image->Type == ImageType_SInteger8) {
+            } else if (Image->Type == (ImageType_Signed | ImageType_Integer8)) {
                 Image->Pixels.SInteger8 = (int8_t****)    Array;
-            } else if (Image->Type == ImageType_UInteger16) {
+            } else if (Image->Type == (ImageType_Unsigned | ImageType_Integer16)) {
                 Image->Pixels.UInteger16 = (uint16_t****) Array;
-            } else if (Image->Type == ImageType_SInteger16) {
+            } else if (Image->Type == (ImageType_Signed | ImageType_Integer16)) {
                 Image->Pixels.SInteger16 = (int16_t****)  Array;
             }
         } else {
@@ -519,34 +520,34 @@ extern "C" {
         }
     }
     
-    int64_t ImageContainer_GetAverage(ImageContainer *Image, Image_Views ViewMask, Image_ChannelMask ChannelMask) {
+    int64_t ImageContainer_GetAverage(ImageContainer *Image, Image_ChannelMask ChannelMask) {
         int64_t Average      = 0LL;
         if (Image != NULL) {
-            uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ViewMask, ChannelMask);
-            uint64_t View    = ImageContainer_GetViewsIndex(Image, ViewMask);
+            uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
+            uint64_t View    = ImageContainer_GetViewsIndex(Image, ChannelMask);
             if (Channel < Image->NumChannels) {
-                if (Image->Type == ImageType_UInteger8) {
+                if (Image->Type == (ImageType_Unsigned | ImageType_Integer8)) {
                     uint8_t ****Array = (uint8_t****) ImageContainer_GetArray(Image);
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                         for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             Average += Array[View][Width][Height][Channel];
                         }
                     }
-                } else if (Image->Type == ImageType_SInteger8) {
+                } else if (Image->Type == (ImageType_Signed | ImageType_Integer8)) {
                     int8_t ****Array = (int8_t****) ImageContainer_GetArray(Image);
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                         for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             Average += Array[View][Width][Height][Channel];
                         }
                     }
-                } else if (Image->Type == ImageType_UInteger16) {
+                } else if (Image->Type == (ImageType_Unsigned | ImageType_Integer16)) {
                     uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                         for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                             Average += Array[View][Width][Height][Channel];
                         }
                     }
-                } else if (Image->Type == ImageType_SInteger16) {
+                } else if (Image->Type == (ImageType_Signed | ImageType_Integer16)) {
                     int16_t ****Array = (int16_t****) ImageContainer_GetArray(Image);
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                         for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
@@ -566,13 +567,13 @@ extern "C" {
         return Average;
     }
     
-    int64_t ImageContainer_GetMax(ImageContainer *Image, Image_Views ViewMask, Image_ChannelMask ChannelMask) {
+    int64_t ImageContainer_GetMax(ImageContainer *Image, Image_ChannelMask ChannelMask) {
         int64_t Maximum      = INT64_MIN;
         if (Image != NULL) {
-            uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ViewMask, ChannelMask);
-            uint64_t View    = ImageContainer_GetViewsIndex(Image, ViewMask);
+            uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
+            uint64_t View    = ImageContainer_GetViewsIndex(Image, ChannelMask);
             if (Channel < Image->NumChannels) {
-                if (Image->Type == ImageType_UInteger8) {
+                if (Image->Type == (ImageType_Unsigned | ImageType_Integer8)) {
                     uint8_t ****Array = (uint8_t****) ImageContainer_GetArray(Image);
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                         for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
@@ -581,7 +582,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Image->Type == ImageType_SInteger8) {
+                } else if (Image->Type == (ImageType_Signed | ImageType_Integer8)) {
                     int8_t ****Array = (int8_t****)  ImageContainer_GetArray(Image);
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                         for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
@@ -590,7 +591,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Image->Type == ImageType_UInteger16) {
+                } else if (Image->Type == (ImageType_Unsigned | ImageType_Integer16)) {
                     uint16_t ****Array = (uint16_t****)  ImageContainer_GetArray(Image);
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                         for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
@@ -599,7 +600,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Image->Type == ImageType_SInteger16) {
+                } else if (Image->Type == (ImageType_Signed | ImageType_Integer16)) {
                     int16_t  ****Array = (int16_t****)   ImageContainer_GetArray(Image);
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                         for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
@@ -618,13 +619,13 @@ extern "C" {
         return Maximum;
     }
     
-    int64_t ImageContainer_GetMin(ImageContainer *Image, Image_Views ViewMask, Image_ChannelMask ChannelMask) {
+    int64_t ImageContainer_GetMin(ImageContainer *Image, Image_ChannelMask ChannelMask) {
         int64_t Minimum      = INT64_MAX;
         if (Image != NULL) {
-            uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ViewMask, ChannelMask);
-            uint64_t View    = ImageContainer_GetViewsIndex(Image, ViewMask);
+            uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
+            uint64_t View    = ImageContainer_GetViewsIndex(Image, ChannelMask);
             if (Channel < Image->NumChannels) {
-                if (Image->Type == ImageType_UInteger8) {
+                if (Image->Type == (ImageType_Unsigned | ImageType_Integer8)) {
                     uint8_t  ****Array = (uint8_t****)  ImageContainer_GetArray(Image);
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                         for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
@@ -633,7 +634,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Image->Type == ImageType_SInteger8) {
+                } else if (Image->Type == (ImageType_Signed | ImageType_Integer8)) {
                     int8_t   ****Array = (int8_t****)   ImageContainer_GetArray(Image);
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                         for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
@@ -642,7 +643,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Image->Type == ImageType_UInteger16) {
+                } else if (Image->Type == (ImageType_Unsigned | ImageType_Integer16)) {
                     uint16_t  ****Array = (uint16_t****)  ImageContainer_GetArray(Image);
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                         for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
@@ -651,7 +652,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Image->Type == ImageType_SInteger16) {
+                } else if (Image->Type == (ImageType_Signed | ImageType_Integer16)) {
                     int16_t   ****Array = (int16_t****)   ImageContainer_GetArray(Image);
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                         for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
@@ -673,7 +674,7 @@ extern "C" {
     void ImageContainer_Flip(ImageContainer *Image, bool VerticalFlip, bool HorizontalFlip) {
         if (Image != NULL) {
             if (VerticalFlip == Yes) {
-                if (Image->Type == ImageType_UInteger8) {
+                if (Image->Type == (ImageType_Unsigned | ImageType_Integer8)) {
                     uint8_t  ****Array = (uint8_t****)  ImageContainer_GetArray(Image);
                     for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
@@ -690,7 +691,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Image->Type == ImageType_SInteger8) {
+                } else if (Image->Type == (ImageType_Signed | ImageType_Integer8)) {
                     int8_t   ****Array = (int8_t****)   ImageContainer_GetArray(Image);
                     for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
@@ -707,7 +708,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Image->Type == ImageType_UInteger16) {
+                } else if (Image->Type == (ImageType_Unsigned | ImageType_Integer16)) {
                     uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
                     for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
@@ -725,7 +726,7 @@ extern "C" {
                         }
                     }
                 }
-            } else if (Image->Type == ImageType_SInteger16) {
+            } else if (Image->Type == (ImageType_Signed | ImageType_Integer16)) {
                 int16_t  ****Array = (int16_t****)  ImageContainer_GetArray(Image);
                 for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                     for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
@@ -744,7 +745,7 @@ extern "C" {
                 }
             }
             if (HorizontalFlip == Yes) {
-                if (Image->Type == ImageType_UInteger8) {
+                if (Image->Type == (ImageType_Unsigned | ImageType_Integer8)) {
                     uint8_t  ****Array = (uint8_t****)  ImageContainer_GetArray(Image);
                     for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
@@ -761,7 +762,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Image->Type == ImageType_SInteger8) {
+                } else if (Image->Type == (ImageType_Signed | ImageType_Integer8)) {
                     int8_t   ****Array = (int8_t****)   ImageContainer_GetArray(Image);
                     for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
@@ -778,7 +779,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Image->Type == ImageType_UInteger16) {
+                } else if (Image->Type == (ImageType_Unsigned | ImageType_Integer16)) {
                     uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
                     for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
@@ -795,7 +796,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Image->Type == ImageType_SInteger16) {
+                } else if (Image->Type == (ImageType_Signed | ImageType_Integer16)) {
                     int16_t ****Array  = (int16_t****) ImageContainer_GetArray(Image);
                     for (uint64_t View = 0ULL; View < Image->NumViews; View++) {
                         for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
@@ -829,25 +830,7 @@ extern "C" {
             
             
             // If top, bottom, left, or right is positive increase the canvas, if negative, decrease.
-            if (Type == ImageType_SInteger8) {
-                int8_t ****Array    = (int8_t****) ImageContainer_GetArray(Image);
-                int8_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(int8_t));
-                if (NewArray != NULL) {
-                    for (uint8_t View = 0; View < NumViews; View++) {
-                        for (uint64_t W = Left; W < Right; W++) {
-                            for (uint64_t H = Top; H < Bottom; H++) {
-                                for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
-                                    NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
-                                }
-                            }
-                        }
-                    }
-                    ImageContainer_SetArray(Image, (void****) NewArray);
-                    free(Array);
-                } else {
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
-                }
-            } else if (Type == ImageType_UInteger8) {
+            if (Type == (ImageType_Unsigned | ImageType_Integer8)) {
                 uint8_t ****Array    = (uint8_t****) ImageContainer_GetArray(Image);
                 uint8_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(uint8_t));
                 if (NewArray != NULL) {
@@ -865,9 +848,9 @@ extern "C" {
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
                 }
-            } else if (Type == ImageType_SInteger16) {
-                int16_t ****Array    = (int16_t****) ImageContainer_GetArray(Image);
-                int16_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(int16_t));
+            } else if (Type == (ImageType_Signed | ImageType_Integer8)) {
+                int8_t ****Array    = (int8_t****) ImageContainer_GetArray(Image);
+                int8_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(int8_t));
                 if (NewArray != NULL) {
                     for (uint8_t View = 0; View < NumViews; View++) {
                         for (uint64_t W = Left; W < Right; W++) {
@@ -883,7 +866,7 @@ extern "C" {
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
                 }
-            } else if (Type == ImageType_UInteger16) {
+            } else if (Type == (ImageType_Unsigned | ImageType_Integer16)) {
                 uint16_t ****Array    = (uint16_t****) ImageContainer_GetArray(Image);
                 uint16_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(uint16_t));
                 if (NewArray != NULL) {
@@ -901,22 +884,40 @@ extern "C" {
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
                 }
-            } else {
-                Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            } else if (Type == (ImageType_Signed | ImageType_Integer16)) {
+                int16_t ****Array    = (int16_t****) ImageContainer_GetArray(Image);
+                int16_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(int16_t));
+                if (NewArray != NULL) {
+                    for (uint8_t View = 0; View < NumViews; View++) {
+                        for (uint64_t W = Left; W < Right; W++) {
+                            for (uint64_t H = Top; H < Bottom; H++) {
+                                for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
+                                    NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
+                                }
+                            }
+                        }
+                    }
+                    ImageContainer_SetArray(Image, (void****) NewArray);
+                    free(Array);
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
+                }
             }
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
     }
     
     void ImageContainer_Deinit(ImageContainer *Image) {
         if (Image != NULL) {
-            if (Image->Type == ImageType_SInteger8) {
-                free(Image->Pixels.SInteger8);
-            } else if (Image->Type == ImageType_UInteger8) {
+            if (Image->Type == (ImageType_Unsigned | ImageType_Integer8)) {
                 free(Image->Pixels.UInteger8);
-            } else if (Image->Type == ImageType_SInteger16) {
-                free(Image->Pixels.SInteger16);
-            } else if (Image->Type == ImageType_UInteger16) {
+            } else if (Image->Type == (ImageType_Signed | ImageType_Integer8)) {
+                free(Image->Pixels.SInteger8);
+            } else if (Image->Type == (ImageType_Unsigned | ImageType_Integer16)) {
                 free(Image->Pixels.UInteger16);
+            } else if (Image->Type == (ImageType_Signed | ImageType_Integer16)) {
+                free(Image->Pixels.SInteger16);
             }
             free(Image);
         } else {
@@ -925,16 +926,14 @@ extern "C" {
     }
     
     typedef struct ImageHistogram {
-        uint64_t    NumEntries;
         union I_Histogram {
-            uint16_t    ***UInteger16;
-            int16_t     ***SInteger16;
-            uint8_t     ***UInteger8;
-            int8_t      ***SInteger8;
+            uint16_t ***UInteger16;
+            int16_t  ***SInteger16;
+            uint8_t  ***UInteger8;
+            int8_t   ***SInteger8;
         } I_Histogram;
-        Image_Types Type;
-        // The array index is the pixel value, the array's value is simply it's count
-        // I_Histogram->UInteger16[View][Channel][Sample] = Count
+        uint64_t        NumEntries;
+        Image_Types     Type;
     } ImageHistogram;
     
     ImageHistogram *ImageHistogram_Init(ImageContainer *Image) {
@@ -942,7 +941,7 @@ extern "C" {
         if (Image != NULL) {
             Histogram                                = calloc(1, sizeof(Histogram));
             if (Histogram != NULL) {
-                if (Image->Type == ImageType_UInteger8) {
+                if (Image->Type == (ImageType_Unsigned | ImageType_Integer8)) {
                     Histogram->I_Histogram.UInteger8 = calloc(Image->NumChannels, Image->NumViews * Image->Height * Image->Width);
                     if (Histogram->I_Histogram.UInteger8 != NULL) {
                         Histogram->Type              = Image->Type;
@@ -952,7 +951,7 @@ extern "C" {
                         free(Histogram);
                         Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
                     }
-                } else if (Image->Type == ImageType_SInteger8) {
+                } else if (Image->Type == (ImageType_Signed | ImageType_Integer8)) {
                     Histogram->I_Histogram.SInteger8 = calloc(Image->NumChannels, Image->NumViews * Image->Height * Image->Width);
                     if (Histogram->I_Histogram.SInteger8 != NULL) {
                         Histogram->Type              = Image->Type;
@@ -962,7 +961,7 @@ extern "C" {
                         free(Histogram);
                         Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
                     }
-                } else if (Image->Type == ImageType_UInteger16) {
+                } else if (Image->Type == (ImageType_Unsigned | ImageType_Integer16)) {
                     Histogram->I_Histogram.UInteger16 = calloc(Image->NumChannels, Image->NumViews * Image->Height * Image->Width);
                     if (Histogram->I_Histogram.UInteger16 != NULL) {
                         Histogram->Type              = Image->Type;
@@ -972,7 +971,7 @@ extern "C" {
                         free(Histogram);
                         Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
                     }
-                } else if (Image->Type == ImageType_SInteger16) {
+                } else if (Image->Type == (ImageType_Signed | ImageType_Integer16)) {
                     Histogram->I_Histogram.SInteger16 = calloc(Image->NumChannels, Image->NumViews * Image->Height * Image->Width);
                     if (Histogram->I_Histogram.SInteger16 != NULL) {
                         Histogram->Type              = Image->Type;
@@ -995,13 +994,13 @@ extern "C" {
     void ***ImageHistogram_GetArray(ImageHistogram *Histogram) {
         void ***Array = NULL;
         if (Histogram != NULL) {
-            if (Histogram->Type == ImageType_UInteger8) {
+            if (Histogram->Type == (ImageType_Unsigned | ImageType_Integer8)) {
                 Array = (void***) Histogram->I_Histogram.UInteger8;
-            } else if (Histogram->Type == ImageType_SInteger8) {
+            } else if (Histogram->Type == (ImageType_Signed | ImageType_Integer8)) {
                 Array = (void***) Histogram->I_Histogram.SInteger8;
-            } else if (Histogram->Type == ImageType_UInteger16) {
+            } else if (Histogram->Type == (ImageType_Unsigned | ImageType_Integer16)) {
                 Array = (void***) Histogram->I_Histogram.UInteger16;
-            } else if (Histogram->Type == ImageType_SInteger16) {
+            } else if (Histogram->Type == (ImageType_Signed | ImageType_Integer16)) {
                 Array = (void***) Histogram->I_Histogram.SInteger16;
             }
         } else {
@@ -1012,13 +1011,13 @@ extern "C" {
     
     void ImageHistogram_SetArray(ImageHistogram *Histogram, void ***Array) {
         if (Histogram != NULL && Array != NULL) {
-            if (Histogram->Type == ImageType_UInteger8) {
+            if (Histogram->Type == (ImageType_Unsigned | ImageType_Integer8)) {
                 Histogram->I_Histogram.UInteger8  = (uint8_t***)  Array;
-            } else if (Histogram->Type == ImageType_SInteger8) {
+            } else if (Histogram->Type == (ImageType_Signed | ImageType_Integer8)) {
                 Histogram->I_Histogram.SInteger8  = (int8_t***)   Array;
-            } else if (Histogram->Type == ImageType_UInteger16) {
+            } else if (Histogram->Type == (ImageType_Unsigned | ImageType_Integer16)) {
                 Histogram->I_Histogram.UInteger16 = (uint16_t***) Array;
-            } else if (Histogram->Type == ImageType_SInteger16) {
+            } else if (Histogram->Type == (ImageType_Signed | ImageType_Integer16)) {
                 Histogram->I_Histogram.SInteger16 = (int16_t***)  Array;
             }
         } else if (Histogram == NULL) {
@@ -1041,7 +1040,7 @@ extern "C" {
                 uint64_t Height         = ImageContainer_GetHeight(Image);
                 uint64_t NumChannels    = ImageContainer_GetNumChannels(Image);
                 
-                if (Histogram->Type == ImageType_UInteger8) {
+                if (Histogram->Type == (ImageType_Unsigned | ImageType_Integer8)) {
                     uint8_t ****IArray  = (uint8_t****) Image->Pixels.UInteger8;
                     uint8_t  ***HArray  = (uint8_t***)  Histogram->I_Histogram.UInteger8;
                     
@@ -1055,7 +1054,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Histogram->Type == ImageType_SInteger8) {
+                } else if (Histogram->Type == (ImageType_Signed | ImageType_Integer8)) {
                     int8_t ****IArray   = (int8_t****)   Image->Pixels.UInteger8;
                     int8_t  ***HArray   = (int8_t***)    Histogram->I_Histogram.SInteger8;
                     
@@ -1069,7 +1068,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Histogram->Type == ImageType_UInteger16) {
+                } else if (Histogram->Type == (ImageType_Unsigned | ImageType_Integer16)) {
                     uint16_t ****IArray = (uint16_t****) Image->Pixels.UInteger8;
                     uint16_t ***HArray  = (uint16_t***)  Histogram->I_Histogram.UInteger16;
                     
@@ -1083,7 +1082,7 @@ extern "C" {
                             }
                         }
                     }
-                } else if (Histogram->Type == ImageType_SInteger16) {
+                } else if (Histogram->Type == (ImageType_Signed | ImageType_Integer16)) {
                     int16_t ****IArray  = (int16_t****) Image->Pixels.UInteger8;
                     int16_t  ***HArray  = (int16_t***)  Histogram->I_Histogram.SInteger16;
                     
