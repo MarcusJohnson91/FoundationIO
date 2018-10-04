@@ -181,7 +181,7 @@ extern "C" {
      @param                 Index          "Which index does the channel mask apply to"?
      @param                 ChannelMask    "What is the channel mask"?
      */
-    void                    ImageContainer_SetChannelMask(ImageContainer *Image, uint64_t View, uint64_t Index, Image_ChannelMask ChannelMask);
+    void                    ImageContainer_SetChannelMask(ImageContainer *Image, uint64_t Index, Image_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Returns the number of pixels in one row of this image".
@@ -217,11 +217,10 @@ extern "C" {
     uint64_t                ImageContainer_GetChannelsIndex(ImageContainer *Image, Image_ChannelMask Mask);
     
     /*!
-     @abstract                             "Gets the channel mask for view X".
+     @abstract                             "Gets the channel mask".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
-     @param                 View2Get       "Which view are you trying to get the channel mask of"?
      */
-    uint32_t                ImageContainer_GetChannelMask(ImageContainer *Image, uint64_t View2Get);
+    uint32_t                ImageContainer_GetChannelMask(ImageContainer *Image);
     
     /*!
      @abstract                             "Gets the number of views in an ImageContainer".

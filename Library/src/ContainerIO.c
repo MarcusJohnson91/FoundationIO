@@ -319,7 +319,7 @@ extern "C" {
             uint8_t     ****UInteger8;
             int8_t      ****SInteger8;
         } Pixels;
-        Image_ChannelMask **ChannelMask;
+        Image_ChannelMask  *ChannelMask;
         uint64_t            Width;
         uint64_t            Height;
         uint64_t            BitDepth;
@@ -339,7 +339,7 @@ extern "C" {
                 Image->NumChannels           = NumChannels;
                 Image->Width                 = Width;
                 Image->Height                = Height;
-                Image->ChannelMask           = calloc(NumViews * NumChannels, sizeof(Image_ChannelMask));
+                Image->ChannelMask           = calloc(NumChannels, sizeof(Image_ChannelMask));
                 
                 if (Type == (ImageType_Unsigned | ImageType_Integer8)) {
                     Image->Pixels.UInteger8  = calloc(NumViews * NumChannels * Width * Height, sizeof(uint8_t));
@@ -368,9 +368,9 @@ extern "C" {
         return Image;
     }
     
-    void ImageContainer_SetChannelMask(ImageContainer *Image, uint64_t View, uint64_t Index, Image_ChannelMask ChannelMask) {
+    void ImageContainer_SetChannelMask(ImageContainer *Image, uint64_t Index, Image_ChannelMask ChannelMask) {
         if (Image != NULL && Index < Image->NumChannels) {
-            Image->ChannelMask[View][Index] = ChannelMask;
+            Image->ChannelMask[Index] = ChannelMask;
         } else if (Image == NULL) {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         } else if (Index >= Image->NumChannels) {
@@ -429,7 +429,7 @@ extern "C" {
             Image_ChannelMask Channel = Mask - View;
             Index                     = Image->NumChannels;
             for (uint64_t Channels = 0ULL; Channels < Image->NumChannels; Channels++) {
-                if (Image->ChannelMask[View][Channels] == Channel) {
+                if (Image->ChannelMask[Channels] == Channel) {
                     Index             = Channel;
                 }
             }
@@ -439,11 +439,11 @@ extern "C" {
         return Index;
     }
     
-    uint32_t ImageContainer_GetChannelMask(ImageContainer *Image, uint64_t View2Get) {
+    uint32_t ImageContainer_GetChannelMask(ImageContainer *Image) {
         uint32_t Mask     = 0;
         if (Image != NULL) {
             for (uint64_t Channel = 0ULL; Channel < Image->NumChannels; Channel++) {
-                Mask     |= Image->ChannelMask[View2Get][Channel];
+                Mask     |= Image->ChannelMask[Channel];
             }
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
@@ -462,6 +462,7 @@ extern "C" {
     }
     
     uint64_t ImageContainer_GetViewsIndex(ImageContainer *Image, Image_ChannelMask Mask) {
+        // So, Mask will contain say ImageMak_Red3D_L and we need to find the view that contains that mask
         uint64_t Index    = 0ULL;
         if (Image != NULL) {
             Index         = Image->NumViews;
