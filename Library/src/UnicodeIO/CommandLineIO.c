@@ -1025,7 +1025,7 @@ extern "C" {
                     ExtensionSize = CodePoint - StringSize;
                 }
             }
-            Extension = calloc(UnicodeBOMSizeInCodePoints + ExtensionSize + NULLTerminator , sizeof(UTF32));
+            Extension = calloc(UnicodeBOMSizeInCodePoints + ExtensionSize + NULLTerminatorSize , sizeof(UTF32));
             if (Extension != NULL) {
                 for (uint64_t ExtCodePoint = 0ULL; ExtCodePoint < ExtensionSize; ExtCodePoint++) {
                     for (uint64_t PathCodePoint = StringSize - ExtensionSize; PathCodePoint < StringSize; PathCodePoint++) {

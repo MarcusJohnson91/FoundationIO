@@ -43,14 +43,10 @@ extern "C" {
     
     uint64_t UTF8_GetStringSizeInCodeUnits(UTF8 *String) {
         uint64_t StringSizeInCodeUnits = 0ULL;
-        uint64_t CodeUnit              = 0ULL;
-        uint8_t  CodeUnitSize          = 0ULL;
         if (String != NULL) {
             do {
-                CodeUnitSize           = UTF8_GetCodePointSize(String[CodeUnit]);
-                StringSizeInCodeUnits += CodeUnitSize;
-                CodeUnit              += CodeUnitSize;
-            } while (String[CodeUnit] != NULLTerminator);
+                StringSizeInCodeUnits += 1;
+            } while (String[StringSizeInCodeUnits] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -59,14 +55,10 @@ extern "C" {
     
     uint64_t UTF16_GetStringSizeInCodeUnits(UTF16 *String) {
         uint64_t StringSizeInCodeUnits = 0ULL;
-        uint64_t CodeUnit              = 0ULL;
-        uint8_t  CodeUnitSize          = 0;
         if (String != NULL) {
             do {
-                CodeUnitSize           = UTF16_GetCodePointSize(String[CodeUnit]);
-                StringSizeInCodeUnits += CodeUnitSize;
-                CodeUnit              += CodeUnitSize;
-            } while (String[CodeUnit] != NULLTerminator);
+                StringSizeInCodeUnits += 1;
+            } while (String[StringSizeInCodeUnits] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -79,8 +71,8 @@ extern "C" {
         if (String != NULL) {
             do {
                 StringSizeInCodePoints += 1;
-                CodeUnit               += 1;
-            } while (String[CodeUnit] != NULLTerminator);
+                CodeUnit               += UTF8_GetStringSizeInCodeUnits(String[CodeUnit]);
+            } while (String[CodeUnit] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -92,9 +84,9 @@ extern "C" {
         uint64_t CodeUnit               = 0ULL;
         if (String != NULL) {
             do {
-                CodeUnit               += UTF16_GetCodePointSize(String[CodeUnit]);
                 StringSizeInCodePoints += 1;
-            } while (String[CodeUnit] != NULLTerminator);
+                CodeUnit               += UTF16_GetCodePointSizeInCodeUnits(String[CodeUnit]);
+            } while (String[CodeUnit] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -562,7 +554,7 @@ extern "C" {
                         DecodedString[0]                 = UTF32BE;
 #endif
                     } else {
-                        uint8_t CodePointSize            = UTF8_GetCodePointSize(String[CodeUnit]);
+                        uint8_t CodePointSize            = UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
                         switch (CodePointSize) {
                             case 1:
                                 DecodedString[CodePoint] =  String[CodeUnit];
