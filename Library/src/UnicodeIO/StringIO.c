@@ -11,7 +11,7 @@ extern "C" {
     /* API Design: All UTF-32 Strings will contain a BOM that we create anyway. */
     
     /* Basic String Property Functions */
-    uint8_t UTF8_GetCodePointSize(UTF8 CodeUnit) {
+    uint8_t UTF8_GetCodePointSizeInCodeUnits(UTF8 CodeUnit) {
         uint8_t CodePointSize      = 0;
         if (((CodeUnit & 0x80) >> 7) == 0) {
             CodePointSize          = 1;
@@ -29,7 +29,7 @@ extern "C" {
         return CodePointSize;
     }
     
-    uint8_t UTF16_GetCodePointSize(UTF16 CodeUnit) {
+    uint8_t UTF16_GetCodePointSizeInCodeUnits(UTF16 CodeUnit) {
         uint8_t CodePointSize = 0;
         if (CodeUnit < UTF16HighSurrogateStart || (CodeUnit > UTF16LowSurrogateEnd && CodeUnit <= UTF16MaxCodePoint)) {
             CodePointSize     = 1;
