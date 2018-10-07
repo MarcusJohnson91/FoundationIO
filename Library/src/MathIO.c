@@ -166,7 +166,7 @@ extern "C" {
     }
     
     int16_t  ExtractExponentFromDouble(double Number2Extract) {
-        int8_t    Sign      = ExtractSignFromDecimal(Number2Extract);
+        int8_t    Sign      = ExtractSignFromDouble(Number2Extract);
         uint64_t *Exponent1 = (uint64_t *) &Number2Extract;
         int16_t   Exponent2 = (*Exponent1 & 0x7FF0000000000000) >> 52;
         int16_t   Exponent3 = 0;

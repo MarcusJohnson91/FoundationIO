@@ -1598,7 +1598,7 @@ extern "C" {
         UTF32  LowerNumerals[16] = {U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'), U32('e'), U32('f')};
         if (NumberString != NULL) {
             for (uint64_t CodePoint = NumDigits - 1; CodePoint > 0; CodePoint--) {
-                int64_t CurrentDigit    = (Base == IntegerBase10 ? Absolute(Integer2Convert %= Base) : (Integer2Convert %= Base));
+                int64_t CurrentDigit    = (Base == IntegerBase10 ? Absolutei(Integer2Convert %= Base) : (Integer2Convert %= Base));
                 NumberString[CodePoint] = (Base == IntegerBase16U ? UpperNumerals[CurrentDigit] : LowerNumerals[CurrentDigit]);
             }
         }
@@ -1608,7 +1608,6 @@ extern "C" {
     double UTF8_String2Decimal(UTF8 *String) {
         double Decimal = 0.0;
         if (String != NULL) {
-            // Decode the string, then send it on over to UTF32_String2Decimal, then free the utf32 string
             UTF32 *String32 = UTF8_Decode(String);
             Decimal         = UTF32_String2Decimal(String32);
             free(String32);
@@ -1621,7 +1620,6 @@ extern "C" {
     double UTF16_String2Decimal(UTF16 *String) {
         double Decimal = 0.0;
         if (String != NULL) {
-            // Decode the string, then send it on over to UTF32_String2Decimal, then free the utf32 string
             UTF32 *String32 = UTF16_Decode(String);
             Decimal         = UTF32_String2Decimal(String32);
             free(String32);
@@ -1669,11 +1667,11 @@ extern "C" {
     
     UTF32 *UTF32_Decimal2String(StringIOBases Base, double Number) {
         UTF32   *OutputString     = NULL;
-        int8_t   Sign             = ExtractSignFromDecimal(Number);
-        int16_t  Exponent         = ExtractExponentFromDecimal(Number);
-        int16_t  Exponent2        = Absolute(Exponent);
-        uint64_t Mantissa         = ExtractMantissaFromDecimal(Number);
-        uint64_t Mantissa2        = Absolute(Mantissa);
+        int8_t   Sign             = ExtractSignFromDouble(Number);
+        int16_t  Exponent         = ExtractExponentFromDouble(Number);
+        int16_t  Exponent2        = Absolutei(Exponent);
+        uint64_t Mantissa         = ExtractMantissaFromDouble(Number);
+        uint64_t Mantissa2        = Absolutei(Mantissa);
         uint16_t ExponentSize     = 0ULL;
         uint64_t MantissaSize     = 0ULL;
         uint64_t StringSize       = 0ULL;
