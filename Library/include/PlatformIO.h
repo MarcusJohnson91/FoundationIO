@@ -336,11 +336,9 @@ extern "C" {
     
     /*!
      @enum                      FoundationIOConstants
-     @constant                  NULLTerminator             "The value of a NULL terminator".
      @constant                  NULLTerminatorSize         "The size  of a NULL terminator".
      */
     typedef enum FoundationIOConstants {
-                                NULLTerminator             = 0,
                                 NULLTerminatorSize         = 1,
     } FoundationIOConstants;
     
