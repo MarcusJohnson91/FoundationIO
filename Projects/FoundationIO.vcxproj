@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <ItemGroup Label="ProjectConfigurations">
-        <ProjectConfiguration Include="Debug|ARM64">
-            <Configuration>Debug</Configuration>
-            <Platform>ARM64</Platform>
+        <ProjectConfiguration Include="Release|x64">
+            <Configuration>Release</Configuration>
+            <Platform>x64</Platform>
         </ProjectConfiguration>
         <ProjectConfiguration Include="Debug|x64">
             <Configuration>Debug</Configuration>
@@ -13,9 +13,9 @@
             <Configuration>Release</Configuration>
             <Platform>ARM64</Platform>
         </ProjectConfiguration>
-        <ProjectConfiguration Include="Release|x64">
-            <Configuration>Release</Configuration>
-            <Platform>x64</Platform>
+		<ProjectConfiguration Include="Debug|ARM64">
+            <Configuration>Debug</Configuration>
+            <Platform>ARM64</Platform>
         </ProjectConfiguration>
     </ItemGroup>
     <ItemGroup>
@@ -44,43 +44,37 @@
         <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
     </PropertyGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
         <ConfigurationType>StaticLibrary</ConfigurationType>
-        <UseDebugLibraries>true</UseDebugLibraries>
+        <UseDebugLibraries>false</UseDebugLibraries>
         <CharacterSet>Unicode</CharacterSet>
         <WholeProgramOptimization>true</WholeProgramOptimization>
         <PlatformToolset>v141</PlatformToolset>
+		<UseOfMfc>false</UseOfMfc>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
         <ConfigurationType>StaticLibrary</ConfigurationType>
         <UseDebugLibraries>true</UseDebugLibraries>
         <CharacterSet>MultiByte</CharacterSet>
         <WholeProgramOptimization>true</WholeProgramOptimization>
         <PlatformToolset>v141</PlatformToolset>
-        <UseOfMfc>false</UseOfMfc>
-        <WindowsSDKDesktopARM64Support>true</WindowsSDKDesktopARM64Support>
+		<UseOfMfc>false</UseOfMfc>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
         <ConfigurationType>StaticLibrary</ConfigurationType>
-        <UseDebugLibraries>true</UseDebugLibraries>
-        <CharacterSet>Unicode</CharacterSet>
-        <WholeProgramOptimization>true</WholeProgramOptimization>
-        <PlatformToolset>v141</PlatformToolset>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
-        <ConfigurationType>StaticLibrary</ConfigurationType>
-        <UseDebugLibraries>true</UseDebugLibraries>
+        <UseDebugLibraries>false</UseDebugLibraries>
         <CharacterSet>Unicode</CharacterSet>
         <WholeProgramOptimization>true</WholeProgramOptimization>
         <PlatformToolset>v141</PlatformToolset>
         <UseOfMfc>false</UseOfMfc>
         <WindowsSDKDesktopARM64Support>true</WindowsSDKDesktopARM64Support>
     </PropertyGroup>
-    <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-        <CharacterSet>Unicode</CharacterSet>
-        <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
         <ConfigurationType>StaticLibrary</ConfigurationType>
+        <UseDebugLibraries>true</UseDebugLibraries>
+        <CharacterSet>Unicode</CharacterSet>
         <PlatformToolset>v141</PlatformToolset>
+        <UseOfMfc>false</UseOfMfc>
         <WindowsSDKDesktopARM64Support>true</WindowsSDKDesktopARM64Support>
     </PropertyGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -99,6 +93,15 @@
         <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     </ImportGroup>
     <PropertyGroup Label="UserMacros" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <OutDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\</OutDir>
+        <IntDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+        <EnableManagedIncrementalBuild>false</EnableManagedIncrementalBuild>
+        <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+        <RunCodeAnalysis>false</RunCodeAnalysis>
+        <EnableCppCoreCheck>true</EnableCppCoreCheck>
+        <ExtensionsToDeleteOnClean>*.bi;*.bsc;*.cache;*.cdf;*.exp;*.idb;*.ilk;*.iobj;*.ipdb;*.lib;*.lib.intermediate.manifest;*.lib.manifest;*.manifest;*.meta;*.metagen;*.obj;*.obj.enc;*.pch;*.pdb;*.pgc;*.pgd;*.rep;*.res;*.resources;*.rsp;*.sbr;*.tlb;*.tlh;*.tli;*.tlog;*.tmp;*.xdc;*.xml;*_manifest.rc;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
         <OutDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\</OutDir>
         <IntDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\Intermediate\</IntDir>
@@ -107,6 +110,15 @@
         <RunCodeAnalysis>false</RunCodeAnalysis>
         <EnableCppCoreCheck>true</EnableCppCoreCheck>
         <ExtensionsToDeleteOnClean>*.bi;*.bsc;*.cache;*.cdf;*.exp;*.idb;*.ilk;*.iobj;*.ipdb;*.lib;*.lib.intermediate.manifest;*.lib.manifest;*.manifest;*.meta;*.metagen;*.obj;*.obj.enc;*.pch;*.pdb;*.pgc;*.pgd;*.rep;*.res;*.resources;*.rsp;*.sbr;*.tlb;*.tlh;*.tli;*.tlog;*.tmp;*.xdc;*.xml;*_manifest.rc;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
+    </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+        <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+        <RunCodeAnalysis>false</RunCodeAnalysis>
+        <EnableCppCoreCheck>true</EnableCppCoreCheck>
+        <ExtensionsToDeleteOnClean>*.bi;*.bsc;*.cache;*.cdf;*.exp;*.idb;*.ilk;*.iobj;*.ipdb;*.lib;*.lib.intermediate.manifest;*.lib.manifest;*.manifest;*.meta;*.metagen;*.obj;*.obj.enc;*.pch;*.pdb;*.pgc;*.pgd;*.rep;*.res;*.resources;*.rsp;*.sbr;*.tlb;*.tlh;*.tli;*.tlog;*.tmp;*.xdc;*.xml;*_manifest.rc;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
+        <EnableManagedIncrementalBuild>false</EnableManagedIncrementalBuild>
+        <OutDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\</OutDir>
+        <IntDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\Intermediate\</IntDir>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
         <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -117,24 +129,137 @@
         <OutDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\</OutDir>
         <IntDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\Intermediate\</IntDir>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-        <OutDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\</OutDir>
-        <IntDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\Intermediate\</IntDir>
-        <EnableManagedIncrementalBuild>false</EnableManagedIncrementalBuild>
-        <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-        <RunCodeAnalysis>false</RunCodeAnalysis>
-        <EnableCppCoreCheck>true</EnableCppCoreCheck>
-        <ExtensionsToDeleteOnClean>*.bi;*.bsc;*.cache;*.cdf;*.exp;*.idb;*.ilk;*.iobj;*.ipdb;*.lib;*.lib.intermediate.manifest;*.lib.manifest;*.manifest;*.meta;*.metagen;*.obj;*.obj.enc;*.pch;*.pdb;*.pgc;*.pgd;*.rep;*.res;*.resources;*.rsp;*.sbr;*.tlb;*.tlh;*.tli;*.tlog;*.tmp;*.xdc;*.xml;*_manifest.rc;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-        <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-        <RunCodeAnalysis>false</RunCodeAnalysis>
-        <EnableCppCoreCheck>true</EnableCppCoreCheck>
-        <ExtensionsToDeleteOnClean>*.bi;*.bsc;*.cache;*.cdf;*.exp;*.idb;*.ilk;*.iobj;*.ipdb;*.lib;*.lib.intermediate.manifest;*.lib.manifest;*.manifest;*.meta;*.metagen;*.obj;*.obj.enc;*.pch;*.pdb;*.pgc;*.pgd;*.rep;*.res;*.resources;*.rsp;*.sbr;*.tlb;*.tlh;*.tli;*.tlog;*.tmp;*.xdc;*.xml;*_manifest.rc;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
-        <EnableManagedIncrementalBuild>false</EnableManagedIncrementalBuild>
-        <OutDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\</OutDir>
-        <IntDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\Intermediate\</IntDir>
-    </PropertyGroup>
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <ClCompile>
+            <WarningLevel>Level3</WarningLevel>
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+            <Optimization>Full</Optimization>
+            <FunctionLevelLinking>true</FunctionLevelLinking>
+            <IntrinsicFunctions>false</IntrinsicFunctions>
+            <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <MultiProcessorCompilation>true</MultiProcessorCompilation>
+            <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+            <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+            <PrecompiledHeaderFile />
+            <MinimalRebuild>false</MinimalRebuild>
+            <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+            <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+            <OmitFramePointers>false</OmitFramePointers>
+            <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+            <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+            <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+            <OpenMPSupport>true</OpenMPSupport>
+            <LanguageStandard>stdcpp17</LanguageStandard>
+            <CompileAs>CompileAsC</CompileAs>
+            <ErrorReporting>Send</ErrorReporting>
+            <WholeProgramOptimization>true</WholeProgramOptimization>
+            <CompileAsManaged>false</CompileAsManaged>
+            <DiagnosticsFormat>Caret</DiagnosticsFormat>
+            <SDLCheck>false</SDLCheck>
+            <StringPooling>true</StringPooling>
+            <ExceptionHandling>false</ExceptionHandling>
+            <StructMemberAlignment>Default</StructMemberAlignment>
+            <ControlFlowGuard>false</ControlFlowGuard>
+            <FloatingPointExceptions>false</FloatingPointExceptions>
+            <CreateHotpatchableImage>false</CreateHotpatchableImage>
+            <DisableLanguageExtensions>false</DisableLanguageExtensions>
+            <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+            <RuntimeTypeInfo>true</RuntimeTypeInfo>
+            <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+            <BrowseInformation>true</BrowseInformation>
+            <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+            <EnablePREfast>false</EnablePREfast>
+            <CompileAsWinRT>false</CompileAsWinRT>
+            <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+            <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+            <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
+        </ClCompile>
+        <Link>
+            <SubSystem>Windows</SubSystem>
+            <EnableCOMDATFolding>true</EnableCOMDATFolding>
+            <OptimizeReferences>true</OptimizeReferences>
+        </Link>
+        <ProjectReference>
+            <LinkLibraryDependencies>true</LinkLibraryDependencies>
+        </ProjectReference>
+        <Lib>
+            <SubSystem>Windows</SubSystem>
+            <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+            <Verbose>true</Verbose>
+            <Name>FoundationIO</Name>
+            <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
+            <ErrorReporting>SendErrorReport</ErrorReporting>
+            <UseUnicodeResponseFiles>true</UseUnicodeResponseFiles>
+        </Lib>
+        <Bscmake>
+            <PreserveSbr>false</PreserveSbr>
+        </Bscmake>
+    </ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+        <ClCompile>
+            <WarningLevel>Level3</WarningLevel>
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+            <Optimization>Full</Optimization>
+            <FunctionLevelLinking>true</FunctionLevelLinking>
+            <IntrinsicFunctions>false</IntrinsicFunctions>
+            <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <MultiProcessorCompilation>true</MultiProcessorCompilation>
+            <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+            <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+            <PrecompiledHeaderFile />
+            <MinimalRebuild>false</MinimalRebuild>
+            <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+            <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+            <OmitFramePointers>false</OmitFramePointers>
+            <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+            <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+            <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+            <OpenMPSupport>true</OpenMPSupport>
+            <LanguageStandard>stdcpp17</LanguageStandard>
+            <CompileAs>CompileAsC</CompileAs>
+            <ErrorReporting>Send</ErrorReporting>
+            <WholeProgramOptimization>true</WholeProgramOptimization>
+            <CompileAsManaged>false</CompileAsManaged>
+            <DiagnosticsFormat>Caret</DiagnosticsFormat>
+            <SDLCheck>false</SDLCheck>
+            <StringPooling>true</StringPooling>
+            <ExceptionHandling>false</ExceptionHandling>
+            <StructMemberAlignment>Default</StructMemberAlignment>
+            <ControlFlowGuard>false</ControlFlowGuard>
+            <FloatingPointExceptions>false</FloatingPointExceptions>
+            <CreateHotpatchableImage>false</CreateHotpatchableImage>
+            <DisableLanguageExtensions>false</DisableLanguageExtensions>
+            <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+            <RuntimeTypeInfo>true</RuntimeTypeInfo>
+            <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+            <BrowseInformation>true</BrowseInformation>
+            <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+            <EnablePREfast>false</EnablePREfast>
+            <CompileAsWinRT>false</CompileAsWinRT>
+            <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+            <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+            <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
+        </ClCompile>
+        <Link>
+            <SubSystem>Windows</SubSystem>
+            <EnableCOMDATFolding>true</EnableCOMDATFolding>
+            <OptimizeReferences>true</OptimizeReferences>
+        </Link>
+        <ProjectReference>
+            <LinkLibraryDependencies>true</LinkLibraryDependencies>
+        </ProjectReference>
+        <Lib>
+            <SubSystem>Windows</SubSystem>
+            <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+            <Verbose>true</Verbose>
+            <Name>FoundationIO</Name>
+            <ErrorReporting>SendErrorReport</ErrorReporting>
+            <UseUnicodeResponseFiles>true</UseUnicodeResponseFiles>
+        </Lib>
+        <Bscmake>
+            <PreserveSbr>false</PreserveSbr>
+        </Bscmake>
+    </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
         <ClCompile>
             <WarningLevel>Level3</WarningLevel>
@@ -244,137 +369,6 @@
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
-        </Link>
-        <ProjectReference>
-            <LinkLibraryDependencies>true</LinkLibraryDependencies>
-        </ProjectReference>
-        <Lib>
-            <SubSystem>Windows</SubSystem>
-            <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-            <Verbose>true</Verbose>
-            <Name>FoundationIO</Name>
-            <ErrorReporting>SendErrorReport</ErrorReporting>
-            <UseUnicodeResponseFiles>true</UseUnicodeResponseFiles>
-        </Lib>
-        <Bscmake>
-            <PreserveSbr>false</PreserveSbr>
-        </Bscmake>
-    </ItemDefinitionGroup>
-    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-        <ClCompile>
-            <WarningLevel>Level3</WarningLevel>
-            <PrecompiledHeader>NotUsing</PrecompiledHeader>
-            <Optimization>Full</Optimization>
-            <FunctionLevelLinking>true</FunctionLevelLinking>
-            <IntrinsicFunctions>false</IntrinsicFunctions>
-            <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-            <MultiProcessorCompilation>true</MultiProcessorCompilation>
-            <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-            <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-            <PrecompiledHeaderFile />
-            <MinimalRebuild>false</MinimalRebuild>
-            <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-            <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
-            <OmitFramePointers>false</OmitFramePointers>
-            <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
-            <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
-            <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-            <OpenMPSupport>true</OpenMPSupport>
-            <LanguageStandard>stdcpp17</LanguageStandard>
-            <CompileAs>CompileAsC</CompileAs>
-            <ErrorReporting>Send</ErrorReporting>
-            <WholeProgramOptimization>true</WholeProgramOptimization>
-            <CompileAsManaged>false</CompileAsManaged>
-            <DiagnosticsFormat>Caret</DiagnosticsFormat>
-            <SDLCheck>false</SDLCheck>
-            <StringPooling>true</StringPooling>
-            <ExceptionHandling>false</ExceptionHandling>
-            <StructMemberAlignment>Default</StructMemberAlignment>
-            <ControlFlowGuard>false</ControlFlowGuard>
-            <FloatingPointExceptions>false</FloatingPointExceptions>
-            <CreateHotpatchableImage>false</CreateHotpatchableImage>
-            <DisableLanguageExtensions>false</DisableLanguageExtensions>
-            <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
-            <RuntimeTypeInfo>true</RuntimeTypeInfo>
-            <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
-            <BrowseInformation>true</BrowseInformation>
-            <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-            <EnablePREfast>false</EnablePREfast>
-            <CompileAsWinRT>false</CompileAsWinRT>
-            <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-            <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
-            <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
-        </ClCompile>
-        <Link>
-            <SubSystem>Windows</SubSystem>
-            <EnableCOMDATFolding>true</EnableCOMDATFolding>
-            <OptimizeReferences>true</OptimizeReferences>
-        </Link>
-        <ProjectReference>
-            <LinkLibraryDependencies>true</LinkLibraryDependencies>
-        </ProjectReference>
-        <Lib>
-            <SubSystem>Windows</SubSystem>
-            <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-            <Verbose>true</Verbose>
-            <Name>FoundationIO</Name>
-            <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
-            <ErrorReporting>SendErrorReport</ErrorReporting>
-            <UseUnicodeResponseFiles>true</UseUnicodeResponseFiles>
-        </Lib>
-        <Bscmake>
-            <PreserveSbr>false</PreserveSbr>
-        </Bscmake>
-    </ItemDefinitionGroup>
-    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-        <ClCompile>
-            <WarningLevel>Level3</WarningLevel>
-            <PrecompiledHeader>NotUsing</PrecompiledHeader>
-            <Optimization>Full</Optimization>
-            <FunctionLevelLinking>true</FunctionLevelLinking>
-            <IntrinsicFunctions>false</IntrinsicFunctions>
-            <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-            <MultiProcessorCompilation>true</MultiProcessorCompilation>
-            <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-            <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-            <PrecompiledHeaderFile />
-            <MinimalRebuild>false</MinimalRebuild>
-            <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-            <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
-            <OmitFramePointers>false</OmitFramePointers>
-            <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
-            <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
-            <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-            <OpenMPSupport>true</OpenMPSupport>
-            <LanguageStandard>stdcpp17</LanguageStandard>
-            <CompileAs>CompileAsC</CompileAs>
-            <ErrorReporting>Send</ErrorReporting>
-            <WholeProgramOptimization>true</WholeProgramOptimization>
-            <CompileAsManaged>false</CompileAsManaged>
-            <DiagnosticsFormat>Caret</DiagnosticsFormat>
-            <SDLCheck>false</SDLCheck>
-            <StringPooling>true</StringPooling>
-            <ExceptionHandling>false</ExceptionHandling>
-            <StructMemberAlignment>Default</StructMemberAlignment>
-            <ControlFlowGuard>false</ControlFlowGuard>
-            <FloatingPointExceptions>false</FloatingPointExceptions>
-            <CreateHotpatchableImage>false</CreateHotpatchableImage>
-            <DisableLanguageExtensions>false</DisableLanguageExtensions>
-            <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
-            <RuntimeTypeInfo>true</RuntimeTypeInfo>
-            <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
-            <BrowseInformation>true</BrowseInformation>
-            <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-            <EnablePREfast>false</EnablePREfast>
-            <CompileAsWinRT>false</CompileAsWinRT>
-            <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-            <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
-            <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
-        </ClCompile>
-        <Link>
-            <SubSystem>Windows</SubSystem>
-            <EnableCOMDATFolding>true</EnableCOMDATFolding>
-            <OptimizeReferences>true</OptimizeReferences>
         </Link>
         <ProjectReference>
             <LinkLibraryDependencies>true</LinkLibraryDependencies>
