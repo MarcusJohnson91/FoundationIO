@@ -106,7 +106,7 @@ extern "C" {
         if (String != NULL) {
             do {
                 NumCodePoints += 1;
-            } while (String[NumCodePoints] != NULLTerminator);
+            } while (String[NumCodePoints] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -128,7 +128,7 @@ extern "C" {
                     UTF8CodeUnits    += 4;
                 }
                 CodePoint            += 1;
-            } while (String[CodePoint] != NULLTerminator);
+            } while (String[CodePoint] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -146,7 +146,7 @@ extern "C" {
                     UTF16CodeUnits += 2;
                 }
                 CodePoint          += 1;
-            } while (String[CodePoint] != NULLTerminator);
+            } while (String[CodePoint] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -188,7 +188,7 @@ extern "C" {
                     }
                 }
                 CodePoint            += 1;
-            } while (String[CodePoint] != NULLTerminator);
+            } while (String[CodePoint] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -323,7 +323,7 @@ extern "C" {
                     NumFormatSpecifiers += 1;
                 }
                 CodePoint += 1;
-            } while (String[CodePoint] != NULLTerminator);
+            } while (String[CodePoint] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -360,7 +360,7 @@ extern "C" {
                     }
                 }
                 CodeUnit += 1;
-            } while (String[CodeUnit] != NULLTerminator);
+            } while (String[CodeUnit] != NULL);
             if (IsValidUTF8 == No) {
                 Log(Log_ERROR, __func__, U8("String is invalid"));
             }
@@ -380,7 +380,7 @@ extern "C" {
                     break;
                 }
                 CodeUnit += 1;
-            } while (String[CodeUnit] != NULLTerminator);
+            } while (String[CodeUnit] != NULL);
             if (IsValidUTF16 == No) {
                 Log(Log_ERROR, __func__, U8("String is invalid"));
             }
@@ -400,7 +400,7 @@ extern "C" {
                     break;
                 }
                 CodePoint       += 1;
-            } while (String[CodePoint] != NULLTerminator);
+            } while (String[CodePoint] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -596,7 +596,7 @@ extern "C" {
                         DecodedString[CodePoint]         = InvalidReplacementCodePoint;
                         Log(Log_ERROR, __func__, U8("Codepoint %d is invalid, because it overlaps the Surrogate Pair Block, it was replaced with U+FFFD"), DecodedString[CodePoint]);
                     }
-                } while (DecodedString[CodePoint] != NULLTerminator && String[CodeUnit] != NULLTerminator);
+                } while (DecodedString[CodePoint] != NULL && String[CodeUnit] != NULL);
             } else {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate DecodedString"));
             }
@@ -637,7 +637,7 @@ extern "C" {
                         DecodedString[CodePoint] =  HighSurrogate + LowSurrogate + UTF16SurrogatePairStart;
                         CodeUnit += 2;
                     }
-                } while (String[CodeUnit] != NULLTerminator);
+                } while (String[CodeUnit] != NULL);
             } else {
                 Log(Log_ERROR, __func__, U8("DecodedString Pointer is NULL"));
             }
@@ -686,7 +686,7 @@ extern "C" {
                         String[CodePoint]              = InvalidReplacementCodePoint;
                         Log(Log_ERROR, __func__, U8("Codepoint %d is invalid, overlaps Surrogate Pair Block, replacing with U+FFFD"), String[CodePoint]);
                     }
-                } while (String[CodePoint] != NULLTerminator);
+                } while (String[CodePoint] != NULL);
             } else {
                 Log(Log_ERROR, __func__, U8("Encoded Pointer is NULL"));
             }
@@ -730,7 +730,7 @@ extern "C" {
                         CodePoint               += 1;
                         EncodedString[CodePoint] = ((String[CodePoint] - UTF16SurrogatePairStart) % UTF16SurrogatePairModDividend) + UTF16LowSurrogateStart;
                     }
-                } while (String[CodePoint] != NULLTerminator);
+                } while (String[CodePoint] != NULL);
             } else {
                 Log(Log_ERROR, __func__, U8("Encoded Pointer is NULL"));
             }
@@ -1070,7 +1070,7 @@ extern "C" {
                     if (String1[CodePoint] != String2[CodePoint]) {
                         StringsMatch = No;
                     }
-                } while (String1[CodePoint] != NULLTerminator && String2[CodePoint] != NULLTerminator);
+                } while (String1[CodePoint] != NULL && String2[CodePoint] != NULL);
             }
         } else if (String1 == NULL) {
             Log(Log_ERROR, __func__, U8("String1 Pointer is NULL"));
@@ -1273,7 +1273,7 @@ extern "C" {
                     }
                 }
                 CodePoint += 1;
-            } while (String[CodePoint] != NULLTerminator);
+            } while (String[CodePoint] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -1357,7 +1357,7 @@ extern "C" {
                     }
                 }
                 CodePoint += 1;
-            } while (String[CodePoint] != NULLTerminator);
+            } while (String[CodePoint] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -1397,7 +1397,7 @@ extern "C" {
                     }
                 }
                 CodePoint += 1;
-            } while (String[CodePoint] != NULLTerminator);
+            } while (String[CodePoint] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -1438,7 +1438,7 @@ extern "C" {
                     }
                 }
                 CodePoint             += 1;
-            } while (String[CodePoint] != NULLTerminator);
+            } while (String[CodePoint] != NULL);
             DecomposedString           = UTF32_Reorder(Decomposed);
             free(Decomposed);
         } else {
@@ -1521,14 +1521,14 @@ extern "C" {
                         Value <<= 1;
                         Value   = String[CodePoint] - 0x30;
                     }
-                } while (String[CodePoint] != NULLTerminator);
+                } while (String[CodePoint] != NULL);
             } else if (Base == IntegerBase8) {
                 do {
                     if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x37) {
                         Value  *= 8;
                         Value   = String[CodePoint] - 0x30;
                     }
-                } while (String[CodePoint] != NULLTerminator);
+                } while (String[CodePoint] != NULL);
             } else if (Base == IntegerBase10) {
                 do {
                     if (CodePoint == 1 && String[CodePoint] == U32('-')) {
@@ -1538,7 +1538,7 @@ extern "C" {
                         Value  *= 10;
                         Value   = String[CodePoint] - 0x30;
                     }
-                } while (String[CodePoint] != NULLTerminator);
+                } while (String[CodePoint] != NULL);
             } else if (Base == IntegerBase16U) {
                 do {
                     if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
@@ -1548,7 +1548,7 @@ extern "C" {
                         Value  *= 16;
                         Value   = String[CodePoint] - 0x37;
                     }
-                } while (String[CodePoint] != NULLTerminator);
+                } while (String[CodePoint] != NULL);
             } else if (Base == IntegerBase16L) {
                 do {
                     if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
@@ -1558,7 +1558,7 @@ extern "C" {
                         Value <<= 16;
                         Value   = String[CodePoint] - 0x51;
                     }
-                } while (String[CodePoint] != NULLTerminator);
+                } while (String[CodePoint] != NULL);
             }
             Value *= Sign;
         } else {
@@ -1643,7 +1643,7 @@ extern "C" {
                         IsNegative = Yes;
                     }
                     CodePoint     += 1;
-                } while (String[CodePoint] != NULLTerminator);
+                } while (String[CodePoint] != NULL);
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -1903,7 +1903,7 @@ extern "C" {
         if (StringArray != NULL) {
             do {
                 NumStrings += 1;
-            } while (StringArray[NumStrings][0] != NULLTerminator);
+            } while (StringArray[NumStrings] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
         }
@@ -1915,7 +1915,7 @@ extern "C" {
         if (StringArray != NULL) {
             do {
                 NumStrings += 1;
-            } while (StringArray[NumStrings][0] != NULLTerminator);
+            } while (StringArray[NumStrings] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
         }
@@ -1927,7 +1927,7 @@ extern "C" {
         if (StringArray != NULL) {
             do {
                 NumStrings += 1;
-            } while (StringArray[NumStrings][0] != NULLTerminator);
+            } while (StringArray[NumStrings] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
         }
