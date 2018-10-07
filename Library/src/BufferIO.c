@@ -385,7 +385,7 @@ extern "C" {
         if (BitB != NULL) {
             OriginalOffset      = BitBuffer_GetPosition(BitB);
             do {
-                CodeUnitSize    = UTF8_GetCodePointSize(BitBuffer_ExtractBits(MSByteFirst, LSBitFirst, BitB, 8));
+                CodeUnitSize    = UTF8_GetCodePointSizeInCodeUnits(BitBuffer_ExtractBits(MSByteFirst, LSBitFirst, BitB, 8));
                 StringSize     += CodeUnitSize;
             } while (CodeUnitSize != 0);
             BitBuffer_SetPosition(BitB, OriginalOffset);
@@ -419,7 +419,7 @@ extern "C" {
         if (BitB != NULL) {
             OriginalOffset      = BitBuffer_GetPosition(BitB);
             do {
-                CodeUnitSize    = UTF16_GetCodePointSize(BitBuffer_ExtractBits(MSByteFirst, LSBitFirst, BitB, 16));
+                CodeUnitSize    = UTF16_GetCodePointSizeInCodeUnits(BitBuffer_ExtractBits(MSByteFirst, LSBitFirst, BitB, 16));
                 StringSize     += CodeUnitSize;
             } while (CodeUnitSize != 0);
             BitBuffer_SetPosition(BitB, OriginalOffset);
