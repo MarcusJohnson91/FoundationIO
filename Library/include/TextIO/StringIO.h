@@ -189,13 +189,13 @@ extern "C" {
      @abstract                             "Returns the number of CodeUnits in the CodePoint".
      @param               CodeUnit         "The leading codeunit for a codepoint".
      */
-    uint8_t               UTF8_GetCodePointSize(UTF8 CodeUnit);
+    uint8_t               UTF8_GetCodePointSizeInCodeUnits(UTF8 CodeUnit);
     
     /*!
      @abstract                             "Returns the number of CodeUnits in the CodePoint".
      @param               CodeUnit         "A codeunit for a codepoint".
      */
-    uint8_t               UTF16_GetCodePointSize(UTF16 CodeUnit);
+    uint8_t               UTF16_GetCodePointSizeInCodeUnits(UTF16 CodeUnit);
     
     /*!
      @abstract                             "Gets the number of Unicode codeunits in the UTF8 string".
