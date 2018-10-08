@@ -13,7 +13,7 @@
             <Configuration>Release</Configuration>
             <Platform>ARM64</Platform>
         </ProjectConfiguration>
-		<ProjectConfiguration Include="Debug|ARM64">
+        <ProjectConfiguration Include="Debug|ARM64">
             <Configuration>Debug</Configuration>
             <Platform>ARM64</Platform>
         </ProjectConfiguration>
@@ -44,13 +44,13 @@
         <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
     </PropertyGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
         <ConfigurationType>StaticLibrary</ConfigurationType>
         <UseDebugLibraries>false</UseDebugLibraries>
         <CharacterSet>Unicode</CharacterSet>
         <WholeProgramOptimization>true</WholeProgramOptimization>
         <PlatformToolset>v141</PlatformToolset>
-		<UseOfMfc>false</UseOfMfc>
+        <UseOfMfc>false</UseOfMfc>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
         <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -58,9 +58,9 @@
         <CharacterSet>MultiByte</CharacterSet>
         <WholeProgramOptimization>true</WholeProgramOptimization>
         <PlatformToolset>v141</PlatformToolset>
-		<UseOfMfc>false</UseOfMfc>
+        <UseOfMfc>false</UseOfMfc>
     </PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
         <ConfigurationType>StaticLibrary</ConfigurationType>
         <UseDebugLibraries>false</UseDebugLibraries>
         <CharacterSet>Unicode</CharacterSet>
@@ -73,6 +73,7 @@
         <ConfigurationType>StaticLibrary</ConfigurationType>
         <UseDebugLibraries>true</UseDebugLibraries>
         <CharacterSet>Unicode</CharacterSet>
+        <WholeProgramOptimization>true</WholeProgramOptimization>
         <PlatformToolset>v141</PlatformToolset>
         <UseOfMfc>false</UseOfMfc>
         <WindowsSDKDesktopARM64Support>true</WindowsSDKDesktopARM64Support>
@@ -93,7 +94,7 @@
         <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     </ImportGroup>
     <PropertyGroup Label="UserMacros" />
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
         <OutDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\</OutDir>
         <IntDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\Intermediate\</IntDir>
         <EnableManagedIncrementalBuild>false</EnableManagedIncrementalBuild>
@@ -111,7 +112,7 @@
         <EnableCppCoreCheck>true</EnableCppCoreCheck>
         <ExtensionsToDeleteOnClean>*.bi;*.bsc;*.cache;*.cdf;*.exp;*.idb;*.ilk;*.iobj;*.ipdb;*.lib;*.lib.intermediate.manifest;*.lib.manifest;*.manifest;*.meta;*.metagen;*.obj;*.obj.enc;*.pch;*.pdb;*.pgc;*.pgd;*.rep;*.res;*.resources;*.rsp;*.sbr;*.tlb;*.tlh;*.tli;*.tlog;*.tmp;*.xdc;*.xml;*_manifest.rc;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
     </PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
         <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
         <RunCodeAnalysis>false</RunCodeAnalysis>
         <EnableCppCoreCheck>true</EnableCppCoreCheck>
@@ -140,7 +141,6 @@
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
             <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
             <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-            <PrecompiledHeaderFile />
             <MinimalRebuild>false</MinimalRebuild>
             <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
             <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
@@ -195,7 +195,7 @@
             <PreserveSbr>false</PreserveSbr>
         </Bscmake>
     </ItemDefinitionGroup>
-	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
         <ClCompile>
             <WarningLevel>Level3</WarningLevel>
             <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -206,7 +206,6 @@
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
             <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
             <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-            <PrecompiledHeaderFile />
             <MinimalRebuild>false</MinimalRebuild>
             <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
             <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
@@ -271,7 +270,6 @@
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
             <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
             <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-            <PrecompiledHeaderFile />
             <MinimalRebuild>false</MinimalRebuild>
             <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
             <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
@@ -334,7 +332,6 @@
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
             <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
             <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-            <PrecompiledHeaderFile />
             <MinimalRebuild>false</MinimalRebuild>
             <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
             <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
