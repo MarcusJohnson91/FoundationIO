@@ -410,14 +410,14 @@ extern "C" {
             uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
             UTF8     *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF8));
             for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
-                // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
+                                                                            // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 uint64_t HalfOfTheIndicators = (PercentComplete / 2);
                 // Now we go ahead and memset a string with the proper number of indicators
                 UTF8 *Indicator             = calloc(CommandLineIO_GetTerminalWidth(), sizeof(UTF8));
                 memset(Indicator, '-', HalfOfTheIndicators); // The point is to set half of the string (minus the substrings) to a dash, so this should actually be Format.
-                // The format string should be an array of Z dashes.
+                                                             // The format string should be an array of Z dashes.
                 UTF8 *FormattedString       = UTF8_FormatString(U8("[%s%s %lld/%lld %hhu/%s %s]"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF8);
                 UTF8_WriteString2File(FormattedString, stdout);
                 free(Indicator);
@@ -456,7 +456,7 @@ extern "C" {
             uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
             UTF16    *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF16));
             for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
-                // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
+                                                                            // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
                 uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 uint8_t HalfOfTheIndicators = (PercentComplete / 2);
@@ -705,12 +705,12 @@ extern "C" {
                     UTF8_WriteString2File(LicenseNameString, stdout);
                 }
                 
-                if (LicenseDescription != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                if (LicenseDescription != NULL) {
                     UTF8 *LicenseDescriptionString   = UTF8_FormatString(U8(" %s,"), LicenseDescription);
                     UTF8_WriteString2File(LicenseDescriptionString, stdout);
                 }
                 
-                if (LicenseURL != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                if (LicenseURL != NULL) {
                     UTF8 *LicenseURLString   = UTF8_FormatString(U8(" %s\n"), LicenseURL);
                     UTF8_WriteString2File(LicenseURLString, stdout);
                 }
@@ -720,12 +720,12 @@ extern "C" {
                     UTF8_WriteString2File(DescriptionString, stdout);
                 }
                 
-                if (LicenseDescription != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                if (LicenseDescription != NULL) {
                     UTF8 *LicenseDescriptionString   = UTF8_FormatString(U8(" By using this software, you agree to the End User License Agreement %s,"), LicenseDescription);
                     UTF8_WriteString2File(LicenseDescriptionString, stdout);
                 }
                 
-                if (LicenseURL != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                if (LicenseURL != NULL) {
                     UTF8 *LicenseURLString   = UTF8_FormatString(U8(" available at: %s\n"), LicenseURL);
                     UTF8_WriteString2File(LicenseURLString, stdout);
                 }
@@ -747,7 +747,7 @@ extern "C" {
             UTF16 *LicenseURL           = UTF16_Encode(CLI->ProgramLicenseURL);
             CLILicenseTypes LicenseType = CLI->LicenseType;
             
-            if (Name != NULL) { // TrimSilence, v. 0.1.1 by Marcus Johnson © 2018+
+            if (Name != NULL) {
                 UTF16 *NameString      = UTF16_FormatString(U16("%s,"), Name);
                 UTF16_WriteString2File(NameString, stdout);
                 
@@ -776,17 +776,17 @@ extern "C" {
                     UTF16_WriteString2File(DescriptionString, stdout);
                 }
                 
-                if (LicenseName != NULL) { // Released under the "BSD 3 clause" license
+                if (LicenseName != NULL) {
                     UTF16 *LicenseNameString   = UTF16_FormatString(U16(" Released under the \"%s\" license"), LicenseName);
                     UTF16_WriteString2File(LicenseNameString, stdout);
                 }
                 
-                if (LicenseDescription != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                if (LicenseDescription != NULL) {
                     UTF16 *LicenseDescriptionString   = UTF16_FormatString(U16(" %s,"), LicenseDescription);
                     UTF16_WriteString2File(LicenseDescriptionString, stdout);
                 }
                 
-                if (LicenseURL != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                if (LicenseURL != NULL) {
                     UTF16 *LicenseURLString   = UTF16_FormatString(U16(" %s\n"), LicenseURL);
                     UTF16_WriteString2File(LicenseURLString, stdout);
                 }
@@ -796,12 +796,12 @@ extern "C" {
                     UTF16_WriteString2File(DescriptionString, stdout);
                 }
                 
-                if (LicenseDescription != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                if (LicenseDescription != NULL) {
                     UTF16 *LicenseDescriptionString   = UTF16_FormatString(U16(" By using this software, you agree to the End User License Agreement %s,"), LicenseDescription);
                     UTF16_WriteString2File(LicenseDescriptionString, stdout);
                 }
                 
-                if (LicenseURL != NULL) { // Should this just be an enum, Copyright, Premissive, Copyleft?
+                if (LicenseURL != NULL) {
                     UTF16 *LicenseURLString   = UTF16_FormatString(U16(" available at: %s\n"), LicenseURL);
                     UTF16_WriteString2File(LicenseURLString, stdout);
                 }
@@ -836,18 +836,15 @@ extern "C" {
     
     static void CommandLineIO_UTF32_ParseOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF32 **Arguments) {
         if (CLI != NULL && CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions) {
-            /* Ok, so the first thing we need to do is loop over the arguments, and loop over the actual bytes of each argument */
             int32_t  CurrentArgument      = 1LL;
             do {
-                // Extract the first argument as a switch.
                 UTF32   *Argument         = Arguments[CurrentArgument];
                 UTF32   *ArgumentFlag     = ArgumentString2SwitchFlag(Argument);
-                // now loop over the switches
+                
                 for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
-                    // now compare ArgumentFlag to Switch
-                    // Which string is smaller?
-                    if (UTF32_Compare(ArgumentFlag, CLI->SwitchIDs[Switch].Name) == Yes) { // ArgumentFlag matches this switch
-                        // Set up the Option here
+                    
+                    if (UTF32_Compare(ArgumentFlag, CLI->SwitchIDs[Switch].Name) == Yes) {
+                        
                         CLI->NumOptions   += 1;
                         if (CLI->NumOptions == 1) {
                             CLI->OptionIDs = calloc(1, sizeof(CommandLineOption));
@@ -856,16 +853,13 @@ extern "C" {
                         }
                         CLI->OptionIDs[CLI->NumOptions - 1].SwitchID = Switch;
                         
-                        
-                        // so now we need to look over the current switch's MaxConcurrentSlaves and NumPotentialSlaves wait num potential slaves will be indexxed by the loop
                         for (int64_t ArgSlave = 1LL; ArgSlave < CLI->SwitchIDs[Switch].MaxConcurrentSlaves; ArgSlave++) {
                             UTF32 *PotentialSlaveArg        = Arguments[CurrentArgument + ArgSlave];
                             for (int64_t Slave = 0LL; Slave < CLI->SwitchIDs[Switch].NumPotentialSlaves; Slave++) {
-                                // Ok so now we loop over the values stores in PoentialSlaves, looking up their switch flags.
                                 UTF32 *PotentialSlaveFlag   = CLI->SwitchIDs[CLI->SwitchIDs[Switch].PotentialSlaves[Slave]].Name;
-                                // Now compare PotentialSlaveFlag to PotentialSlaveArg
+                                
                                 if (UTF32_Compare(PotentialSlaveArg, PotentialSlaveFlag) == Yes) {
-                                    // We found a slave in the next argument so set the option up.
+                                    
                                     CLI->OptionIDs[CLI->NumOptions - 1].NumOptionSlaves += 1;
                                     CLI->OptionIDs[CLI->NumOptions - 1].OptionSlaves[CLI->OptionIDs[CLI->NumOptions - 1].NumOptionSlaves - 1] = CLI->SwitchIDs[Switch].PotentialSlaves[Slave];
                                 }
@@ -963,8 +957,8 @@ extern "C" {
         int64_t MatchingOption = -1LL;
         if (CLI != NULL && OptionID >= 0 && OptionID <= CLI->NumOptions - 1 && NumSlaves >= 0 && NumSlaves <= CLI->NumOptions - 1) {
             bool AllOptionsMatch   = No;
-            for (int64_t Option = 0LL; Option < CLI->NumOptions - 1; Option++) { // Loop over all the options
-                if (CLI->OptionIDs[Option].SwitchID == OptionID) { // When a potential match is found, go ahead and check the slaves
+            for (int64_t Option = 0LL; Option < CLI->NumOptions - 1; Option++) {
+                if (CLI->OptionIDs[Option].SwitchID == OptionID) {
                     if (NumSlaves == 0 && CLI->OptionIDs[Option].NumOptionSlaves == 0) {
                         AllOptionsMatch       = Yes;
                         MatchingOption        = Option;
@@ -979,7 +973,6 @@ extern "C" {
                         }
                     }
                 }
-                //TODO: Now we just need to make sure that for switches like "-Input -RightEye" it doesn't return -Input -LeftEye
             }
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
