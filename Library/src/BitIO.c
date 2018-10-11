@@ -541,7 +541,7 @@ extern "C" {
             uint64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
             if (BitsAvailable >= (uint64_t) Bytes2Bits(StringSize)) {
                 UTF16 ByteOrder    = String2Write[0];
-                if (ByteOrder == UTF16BE) {
+                if (ByteOrder == UTF16BOM_BE) {
                     for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
 #if    (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
                         BitBuffer_InsertBits(MSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
@@ -549,7 +549,7 @@ extern "C" {
                         BitBuffer_InsertBits(LSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
 #endif
                     }
-                } else if (ByteOrder == UTF16LE) {
+                } else if (ByteOrder == UTF16BOM_LE) {
                     for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
 #if    (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
                         BitBuffer_InsertBits(LSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
