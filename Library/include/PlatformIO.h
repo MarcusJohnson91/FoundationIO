@@ -302,11 +302,17 @@ extern "C" {
 #define FoundationIOCompilerIsMSVC              2
 #endif
     
+#ifndef FoundationIOCompilerIsGCC
+#define FoundationIOCompilerIsGCC               3
+#endif
+    
 #ifndef FoundationIOCompiler
-#if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
+#if   defined(__clang__)
 #define FoundationIOCompiler (FoundationIOCompilerIsClang)
 #elif defined(_MSC_VER)
 #define FoundationIOCompiler (FoundationIOCompilerIsMSVC)
+#elif defined(__GNUC__) || defined(__GNUG__)
+#define FoundationIOCompiler (FoundationIOCompilerIsGCC)
 #endif
 #endif /* FoundationIOCompiler */
     
