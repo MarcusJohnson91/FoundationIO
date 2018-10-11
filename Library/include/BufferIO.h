@@ -325,7 +325,7 @@ extern "C" {
     
     /*!
      @abstract                                                  "Writes a UTF-16 encoded string to the BitBuffer".
-     @remark                                                    "Convert the string to UTF16BE or UTF16LE first".
+     @remark                                                    "Convert the string to UTF16BOM_BE or UTF16BOM_LE first".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     String2Write                    "The string to write to the BitBuffer".
      */

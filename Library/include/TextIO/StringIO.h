@@ -65,10 +65,10 @@ extern "C" {
      @constant            UTF8BOMSizeInCodeUnits               "The number of code units (8 bits) the UTF8 BOM takes".
      @constant            UTF16BOMSizeInCodeUnits              "The number of code units (16 bits) the UTF16 BOM takes".
      @constant            UnicodeBOMSizeInCodePoints           "The number of codepoints in a BOM".
-     @constant            UTF16LE                              "UTF16LE byte order mark".
-     @constant            UTF16BE                              "UTF16BE byte order mark".
-     @constant            UTF32LE                              "UTF32LE byte order mark".
-     @constant            UTF32BE                              "UTF32LE byte order mark".
+     @constant            UTF16BOM_LE                          "UTF16BOM_LE byte order mark".
+     @constant            UTF16BOM_BE                          "UTF16BOM_BE byte order mark".
+     @constant            UTF32BOM_LE                          "UTF32BOM_LE byte order mark".
+     @constant            UTF32BOM_BE                          "UTF32BOM_LE byte order mark".
      @constant            UTF16HighSurrogateStart              "The value that marks the start of the High Surrogate range".
      @constant            UTF16HighSurrogateEnd                "The value that marks the end   of the High Surrogate range".
      @constant            UTF16LowSurrogateStart               "The value that marks the start of the Low  Surrogate range".
@@ -83,10 +83,13 @@ extern "C" {
                           UTF8BOMSizeInCodeUnits               = 3,
                           UTF16BOMSizeInCodeUnits              = 1,
                           UnicodeBOMSizeInCodePoints           = 1,
-                          UTF16LE                              = 0xFFFE,
-                          UTF16BE                              = 0xFEFF,
-                          UTF32LE                              = 0xFFFE,
-                          UTF32BE                              = 0xFEFF,
+                          UTF8BOM_1                            = 0xEF,
+                          UTF8BOM_2                            = 0xBB,
+                          UTF8BOM_3                            = 0xBF,
+                          UTF16BOM_LE                          = 0xFFFE,
+                          UTF16BOM_BE                          = 0xFEFF,
+                          UTF32BOM_LE                          = 0xFFFE,
+                          UTF32BOM_BE                          = 0xFEFF,
                           UTF16HighSurrogateStart              = 0xD800,
                           UTF16HighSurrogateEnd                = 0xDBFF,
                           UTF16LowSurrogateStart               = 0xDC00,

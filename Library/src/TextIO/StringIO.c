@@ -429,20 +429,20 @@ extern "C" {
         UTF32   *StringWithBOM        = NULL;
         UTF32    ByteOrder            = 0;
         if (String != NULL) {
-            if (String[0] != UTF32LE && String[0] != UTF32BE) {
+            if (String[0] != UTF32BOM_LE && String[0] != UTF32BOM_BE) {
                 uint64_t StringSize   = UTF32_GetStringSizeInCodePoints(String) + UnicodeBOMSizeInCodePoints + NULLTerminatorSize;
                 StringWithBOM         = calloc(StringSize, sizeof(UTF32));
                 if (StringWithBOM != NULL) {
                     if (BOM2Add == UseNativeByteOrder) {
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                        ByteOrder     = UTF32LE;
+                        ByteOrder     = UTF32BOM_LE;
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                        ByteOrder     = UTF32BE;
+                        ByteOrder     = UTF32BOM_BE;
 #endif
                     } else if (BOM2Add == UseLEByteOrder) {
-                        ByteOrder     = UTF32LE;
+                        ByteOrder     = UTF32BOM_LE;
                     } else if (BOM2Add == UseBEByteOrder) {
-                        ByteOrder     = UTF32BE;
+                        ByteOrder     = UTF32BOM_BE;
                     }
                     StringWithBOM[0] = ByteOrder;
                     for (uint64_t CodePoint = 1ULL; CodePoint < StringSize; CodePoint++) {
@@ -539,19 +539,16 @@ extern "C" {
         
         if (String != NULL) {
             StringSize                                   = UTF8_GetStringSizeInCodePoints(String);
-            if (String[0] != 0xEF && String[1] != 0xBB && String[2] != 0xBF) {
-                StringSize                              += UnicodeBOMSizeInCodePoints;
-            } else {
-                CodeUnit                                 = UTF8BOMSizeInCodeUnits;
-            }
+            bool StringHasBOM                            = UTF8_StringHasBOM(String);
+            // If the string has a BOM, we just repace it, if not, we need to add room for it.
             DecodedString                                = calloc(StringSize, sizeof(UTF32));
             if (DecodedString != NULL) {
                 do {
                     if (CodePoint == 0) {
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                        DecodedString[0]                 = UTF32LE;
+                        DecodedString[0]                 = UTF32BOM_LE;
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                        DecodedString[0]                 = UTF32BE;
+                        DecodedString[0]                 = UTF32BOM_BE;
 #endif
                     } else {
                         uint8_t CodePointSize            = UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
@@ -598,23 +595,26 @@ extern "C" {
         return DecodedString;
     }
     
-    UTF32 *UTF16_Decode(UTF16 *String) {  // CodeUnit = Input, CodePoint = Output
-        uint64_t NumCodePoints                   = UTF16_GetStringSizeInCodePoints(String) + NULLTerminatorSize;
-        uint64_t CodePoint                       = 0ULL;
-        uint64_t CodeUnit                        = 0ULL;
+    UTF32 *UTF16_Decode(UTF16 *String) {
         UTF32   *DecodedString                   = NULL;
-        UTF16    StringsByteOrder                = 0;
         if (String != NULL) {
-            if (String[0] == UTF16LE || String[0] == UTF16BE) {
+            uint64_t NumCodePoints  = UTF16_GetStringSizeInCodePoints(String) + NULLTerminatorSize;
+            bool     StringHasBOM   = UTF16_StringHasBOM(String);
+            if (StringHasBOM == No) {
+                NumCodePoints      += 1;
+            }
+            uint64_t CodePoint                       = 0ULL;
+            uint64_t CodeUnit                        = 0ULL;
+            UTF16    StringsByteOrder                = 0;
+            
+            if (String[0] == UTF16BOM_LE || String[0] == UTF16BOM_BE) {
                 StringsByteOrder                 = String[0];
-                NumCodePoints                   += 1;
             } else {
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                StringsByteOrder = UTF16LE;
+                StringsByteOrder = UTF16BOM_LE;
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                StringsByteOrder = UTF16BE;
+                StringsByteOrder = UTF16BOM_BE;
 #endif
-                NumCodePoints   += 1;
             }
             DecodedString                        = calloc(NumCodePoints, sizeof(UTF32));
             if (DecodedString != NULL) {
@@ -694,7 +694,7 @@ extern "C" {
             uint64_t CodePoint                   = 0ULL;
             UTF32    ByteOrder                   = 0;
             uint64_t NumCodeUnits                = UTF32_GetStringSizeInUTF16CodeUnits(String) + NULLTerminatorSize;
-            if (String[0] == UTF32LE || String[0] == UTF32BE) {
+            if (String[0] == UTF32BOM_LE || String[0] == UTF32BOM_BE) {
                 ByteOrder                        = String[0];
             }
             EncodedString                        = calloc(NumCodeUnits, sizeof(UTF16));
@@ -702,13 +702,13 @@ extern "C" {
                 UTF32 CurrentCodePoint           = 0;
                 do {
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                    if (ByteOrder == UTF32BE) {
+                    if (ByteOrder == UTF32BOM_BE) {
                         CurrentCodePoint         = SwapEndian32(String[CodePoint]);
                     } else {
                         CurrentCodePoint         = String[CodePoint];
                     }
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                    if (ByteOrder == UTF32LE) {
+                    if (ByteOrder == UTF32BOM_LE) {
                         CurrentCodePoint         = SwapEndian32(String[CodePoint]);
                     } else {
                         CurrentCodePoint         = String[CodePoint];
@@ -1159,8 +1159,8 @@ extern "C" {
             if (Offset == 0xFFFFFFFFFFFFFFFF) {
                 Offset = StringSize;
             }
-            if (String2Insert[0] == 0xEF && String2Insert[1] == 0xBB && String2Insert[2] == 0xBF) {
-                InsertSize -= 3;
+            if (String2Insert[0] == UTF16BOM_LE || String2Insert[0] == UTF16BOM_BE) {
+                InsertSize -= UTF16BOMSizeInCodeUnits;
             }
             if (Offset <= StringSize) {
                 Inserted = calloc(StringSize + InsertSize, sizeof(UTF16));
@@ -1192,8 +1192,8 @@ extern "C" {
             if (Offset == 0xFFFFFFFFFFFFFFFF) {
                 Offset = StringSize;
             }
-            if (String2Insert[0] == 0xEF && String2Insert[1] == 0xBB && String2Insert[2] == 0xBF) {
-                InsertSize -= 3;
+            if (String2Insert[0] == UTF32BOM_LE || String2Insert[0] == UTF32BOM_BE) {
+                InsertSize -= UnicodeBOMSizeInCodePoints;
             }
             if (Offset <= StringSize) {
                 Inserted = calloc(StringSize + InsertSize, sizeof(UTF32));
