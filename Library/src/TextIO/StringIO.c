@@ -188,12 +188,11 @@ extern "C" {
     }
     
     bool UTF8_StringHasBOM(UTF8 *String) {
-        bool StringHasABOM = No;
+        bool StringHasABOM        = No;
         if (String != NULL) {
-            // Get String Size
-            uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(String);
+            uint64_t StringSize   = UTF8_GetStringSizeInCodeUnits(String);
             if (StringSize >= 3) {
-                if (String[0] == 0xEF && String[1] == 0xBB && String[2] == 0xBF) {
+                if (String[0] == UTF8BOM_1 && String[1] == UTF8BOM_2 && String[2] == UTF8BOM_3) {
                     StringHasABOM = Yes;
                 }
             }
@@ -204,14 +203,10 @@ extern "C" {
     }
     
     bool UTF16_StringHasBOM(UTF16 *String) {
-        bool StringHasABOM = No;
+        bool StringHasABOM    = No;
         if (String != NULL) {
-            // Get String Size
-            uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(String);
-            if (StringSize >= 1) {
-                if (String[0] == UTF16LE || String[0] == UTF16BE) {
-                    StringHasABOM = Yes;
-                }
+            if (String[0] == UTF16BOM_LE || String[0] == UTF16BOM_BE) {
+                StringHasABOM = Yes;
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -220,14 +215,10 @@ extern "C" {
     }
     
     bool UTF32_StringHasBOM(UTF32 *String) {
-        bool StringHasABOM = No;
+        bool StringHasABOM    = No;
         if (String != NULL) {
-            // Get String Size
-            uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
-            if (StringSize >= 1) {
-                if (String[0] == UTF32LE || String[0] == UTF32BE) {
-                    StringHasABOM = Yes;
-                }
+            if (String[0] == UTF32BOM_LE || String[0] == UTF32BOM_BE) {
+                StringHasABOM = Yes;
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -466,17 +457,16 @@ extern "C" {
         uint64_t StringSize                         = 0ULL;
         if (String != NULL) {
             StringSize                              = UTF8_GetStringSizeInCodeUnits(String);
-            if (String[0] == 0xEF && String[1] == 0xBB && String[2] == 0xBF) {
+            bool StringHasBOM                       = UTF8_StringHasBOM(String);
+            if (StringHasBOM) {
                 BOMLessString                       = calloc(StringSize - UTF8BOMSizeInCodeUnits + NULLTerminatorSize, sizeof(UTF8));
                 if (BOMLessString != NULL) {
-                    for (uint64_t CodeUnit = 3ULL; CodeUnit < StringSize; CodeUnit++) {
+                    for (uint64_t CodeUnit = 2ULL; CodeUnit < StringSize; CodeUnit++) {
                         BOMLessString[CodeUnit - 3] = String[CodeUnit];
                     }
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate BOMLessString"));
                 }
-            } else {
-                BOMLessString = String;
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -489,7 +479,8 @@ extern "C" {
         uint64_t StringSize                         = 0ULL;
         if (String != NULL) {
             StringSize                              = UTF16_GetStringSizeInCodeUnits(String);
-            if (String[0] == UTF16BE || String[0] == UTF16LE) {
+            bool StringHasBOM                       = UTF16_StringHasBOM(String);
+            if (StringHasBOM) {
                 BOMLessString                       = calloc(StringSize - UTF16BOMSizeInCodeUnits + NULLTerminatorSize, sizeof(UTF16));
                 if (BOMLessString != NULL) {
                     for (uint64_t CodeUnit = 1ULL; CodeUnit < StringSize; CodeUnit++) {
@@ -498,8 +489,6 @@ extern "C" {
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate BOMLessString"));
                 }
-            } else {
-                BOMLessString = String;
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -512,7 +501,8 @@ extern "C" {
         uint64_t StringSize                      = 0ULL;
         if (String != NULL) {
             StringSize                           = UTF32_GetStringSizeInCodePoints(String);
-            if (String[0] == UTF32LE || String[0] == UTF32BE) {
+            bool StringHasBOM                    = UTF32_StringHasBOM(String);
+            if (StringHasBOM) {
                 BOMLessString                    = calloc(StringSize - UnicodeBOMSizeInCodePoints + NULLTerminatorSize, sizeof(UTF32));
                 if (BOMLessString != NULL) {
                     for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
@@ -521,8 +511,6 @@ extern "C" {
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate BOMLessString"));
                 }
-            } else {
-                BOMLessString = String;
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -643,18 +631,11 @@ extern "C" {
         uint64_t CodePoint                             = 0ULL;
         uint64_t CodeUnitNum                           = 0ULL;
         UTF8    *EncodedString                         = NULL;
-        bool     AddBOM2String                         = No;
         if (String != NULL) {
-            uint64_t UTF8CodeUnits                     = NULLTerminatorSize + UTF32_GetStringSizeInUTF8CodeUnits(String) + (AddBOM2String == Yes ? UTF8BOMSizeInCodeUnits : 0);
+            uint64_t UTF8CodeUnits                     = NULLTerminatorSize + UTF32_GetStringSizeInUTF8CodeUnits(String);
             EncodedString                              = calloc(UTF8CodeUnits, sizeof(UTF8));
             if (EncodedString != NULL) {
                 do {
-                    if (CodeUnitNum == 0) {
-                        EncodedString[CodeUnitNum]     = 0xEF;
-                        EncodedString[CodeUnitNum + 1] = 0xBB;
-                        EncodedString[CodeUnitNum + 2] = 0xBF;
-                        CodeUnitNum                   += UTF8BOMSizeInCodeUnits;
-                    }
                     if (String[CodePoint] <= 0x7F) {
                         EncodedString[CodeUnitNum]     = String[CodePoint];
                         CodeUnitNum                   += 1;
@@ -1126,7 +1107,8 @@ extern "C" {
             if (Offset == 0xFFFFFFFFFFFFFFFF) {
                 Offset = StringSize;
             }
-            if (String2Insert[0] == 0xEF && String2Insert[1] == 0xBB && String2Insert[2] == 0xBF) {
+            bool StringHasBOM   = UTF8_StringHasBOM(String2Insert);
+            if (StringHasBOM == Yes) {
                 InsertSize -= 3;
             }
             if (Offset <= StringSize) {
