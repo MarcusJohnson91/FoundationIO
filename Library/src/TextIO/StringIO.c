@@ -15,15 +15,15 @@ extern "C" {
         uint8_t CodePointSize      = 0;
         if (((CodeUnit & 0x80) >> 7) == 0) {
             CodePointSize          = 1;
-        } else if (((CodeUnit & 0xF8) >> 3) == 0x1E) {
-            CodePointSize          = 4;
-        } else if (((CodeUnit & 0xF0) >> 4) == 0x0E) {
-            CodePointSize          = 3;
-        } else if (((CodeUnit & 0xE0) >> 5) == 0x06) {
-            CodePointSize          = 2;
         } else if (((CodeUnit & 0xC0) >> 6) == 0x02) {
             CodePointSize          = 1;
-        } else {
+        } else if (((CodeUnit & 0xE0) >> 5) == 0x06) {
+            CodePointSize          = 2;
+        } else if (((CodeUnit & 0xF0) >> 4) == 0x0E) {
+            CodePointSize          = 3;
+        } else if (((CodeUnit & 0xF8) >> 3) == 0x1E) {
+            CodePointSize          = 4;
+        }  else {
             CodePointSize          = 0;
         }
         return CodePointSize;
@@ -45,7 +45,7 @@ extern "C" {
         uint64_t StringSizeInCodeUnits = 0ULL;
         if (String != NULL) {
             do {
-                StringSizeInCodeUnits += 1;
+                StringSizeInCodeUnits += UTF8_GetCodePointSizeInCodeUnits(String[StringSizeInCodeUnits]);
             } while (String[StringSizeInCodeUnits] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -57,7 +57,7 @@ extern "C" {
         uint64_t StringSizeInCodeUnits = 0ULL;
         if (String != NULL) {
             do {
-                StringSizeInCodeUnits += 1;
+                StringSizeInCodeUnits += UTF16_GetCodePointSizeInCodeUnits(String[StringSizeInCodeUnits]);
             } while (String[StringSizeInCodeUnits] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -71,7 +71,7 @@ extern "C" {
         if (String != NULL) {
             do {
                 StringSizeInCodePoints += 1;
-                CodeUnit               += UTF8_GetStringSizeInCodeUnits(String[CodeUnit]);
+                CodeUnit               += UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
             } while (String[CodeUnit] != NULL);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -175,7 +175,7 @@ extern "C" {
         if (String != NULL) {
             do {
                 for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
-                    if (String[CodePoint] == GraphemeExtensionTable[GraphemeExtension]) {
+                    if (String[CodePoint] != GraphemeExtensionTable[GraphemeExtension]) {
                         NumGraphemes += 1;
                     }
                 }
@@ -318,29 +318,14 @@ extern "C" {
         bool     IsValidUTF8 = Yes;
         if (String != NULL) {
             do {
-                // Get the CodePoint size
-                // How about, instead we just get if it's a UTF-8 header?
-                bool IsUTF8Header = String[CodeUnit] & 0x80 >> 7;
-                if (IsUTF8Header == Yes) {
-                    // Do magic
-                } else {
-                    // idek
-                }
-                
-                
-                
-                if (String[CodeUnit] == 0xC0 || String[CodeUnit] == 0xC1 || (String[CodeUnit] >= 0xF5 && String[CodeUnit] <= 0xFF)) {
+                // Make sure no byte equals 0xC0 or 0xC1, or 0xF5 - 0xFF
+                // Test for Overlong encodings and shit.
+                uint8_t Byte = String[CodeUnit];
+                if (Byte == 0xC0 || Byte == 0xC1 || Byte == 0xF5 || Byte == 0xF6 || Byte == 0xF7 || Byte == 0xF8 || Byte == 0xF9 || Byte == 0xFA || Byte == 0xFB || Byte == 0xFC || Byte == 0xFD || Byte == 0xFE || Byte == 0xFF) {
                     IsValidUTF8 = No;
                     break;
                 } else {
-                    if (((String[CodeUnit] & 0x80) >> 7) == 1) {
-                        // Extract the top
-                        UTF8 Wat = (String[CodeUnit] & 0xF8) >> 3;
-                        if (Wat == 0x1F) {
-                            IsValidUTF8 = No;
-                            break;
-                        }
-                    }
+                    // If a codepoint is a header byte, verify that there are the required number of continuation code units afterwards.
                 }
                 CodeUnit += 1;
             } while (String[CodeUnit] != NULL);
@@ -358,7 +343,7 @@ extern "C" {
         bool     IsValidUTF16         = Yes;
         if (String != NULL) {
             do {
-                if ((String[CodeUnit - 1] >= UTF16HighSurrogateStart && String[CodeUnit - 1] <= UTF16HighSurrogateEnd) && (String[CodeUnit] >= UTF16LowSurrogateStart && String[CodeUnit] <= UTF16LowSurrogateEnd)) {
+                if ((String[CodeUnit - 1] >= UTF16HighSurrogateStart && String[CodeUnit - 1] <= UTF16HighSurrogateEnd) && (String[CodeUnit] <= UTF16LowSurrogateStart && String[CodeUnit] >= UTF16LowSurrogateEnd)) {
                     IsValidUTF16 = No;
                     break;
                 }
@@ -442,9 +427,6 @@ extern "C" {
                 } else {
                     Log(Log_ERROR, __func__, U8("StringWithBOM couldn't be allocated"));
                 }
-            } else {
-                // We need to verify the String's byte order, how do we do that? well if a codeunit contains a high surrogate or low surrogate you can tell by it's value, otherwise look for code units who's value is less than 256, or greater than 256, that'll tell you which side of the string contains the low bits.
-                StringWithBOM = String;
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -2522,15 +2504,12 @@ extern "C" {
                                         }
                                         
                                         
-                                        if () {
-                                            <#statements#>
-                                        }
                                         
                                         if (Format[Modifiers] == U32('h') && Format[Modifiers + 1] == U32('h')) {
                                             if (StringType == UTF8Format) {
-                                                Details->Specifiers[CurrentSpecifier - 1].TypeModifier = Modifier_CodePoint8;
+                                                Details->Specifiers[CurrentSpecifier - 1].TypeModifier = Modifier_UTF8;
                                             } else if (StringType == UTF16Format) {
-                                                Details->Specifiers[CurrentSpecifier - 1].TypeModifier = Modifier_CodePoint16;
+                                                Details->Specifiers[CurrentSpecifier - 1].TypeModifier = Modifier_UTF16;
                                             }
                                         } else if (Format[Modifiers] == U32('l') && Format[Modifiers + 1] == U32('l')) {
                                             Details->Specifiers[CurrentSpecifier - 1].BaseType         = Type_SInt64;
@@ -2576,10 +2555,10 @@ extern "C" {
             for (uint64_t Specifier = 0ULL; Specifier < Details->NumSpecifiers; Specifier++) { // Stringify each specifier
                 FormatSpecifierBaseTypes     BaseType = Details->Specifiers[Specifier].BaseType;
                 FormatSpecifierTypeModifiers Modifier = Details->Specifiers[Specifier].TypeModifier;
-                if (Modifier == Modifier_String8 || Modifier == Modifier_CodePoint8) {
+                if (BaseType == Type_String && Modifier == Modifier_UTF8) {
                     // Get the variadc argument, decode it to UTF-32, Replace the original specifier with this string
                     Formatted = UTF32_ReplaceSubString(Format, UTF8_Decode(va_arg(VariadicArguments, UTF8*)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
-                } else if (Modifier == Modifier_String16 || Modifier == Modifier_CodePoint16) {
+                } else if (BaseType == Type_String && Modifier == Modifier_UTF16) {
                     Formatted = UTF32_ReplaceSubString(Format, UTF16_Decode(va_arg(VariadicArguments, UTF16*)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
                 } else if (Modifier == Modifier_Percent) {
                     Formatted = UTF32_ReplaceSubString(Format, U32('%'), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
