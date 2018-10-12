@@ -1890,6 +1890,82 @@ extern "C" {
         return NumStrings;
     }
     
+    UTF32 **UTF8_StringArray_Decode(UTF8 **StringArray) {
+        UTF32 **Decoded             = NULL;
+        if (StringArray != NULL) {
+            uint64_t NumStrings     = UTF8_StringArray_GetNumStrings(StringArray);
+            Decoded                 = calloc(NumStrings + 1, sizeof(UTF32*));
+            if (Decoded != NULL) {
+                for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                    Decoded[String] = UTF8_Decode(StringArray[String]);
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate decoded StringArray"));
+            }
+            
+        } else {
+            Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return Decoded;
+    }
+    
+    UTF32 **UTF16_StringArray_Decode(UTF16 **StringArray) {
+        UTF32 **Decoded             = NULL;
+        if (StringArray != NULL) {
+            uint64_t NumStrings     = UTF16_StringArray_GetNumStrings(StringArray);
+            Decoded                 = calloc(NumStrings + 1, sizeof(UTF32*));
+            if (Decoded != NULL) {
+                for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                    Decoded[String] = UTF16_Decode(StringArray[String]);
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate decoded StringArray"));
+            }
+            
+        } else {
+            Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return Decoded;
+    }
+    
+    UTF8 **UTF8_StringArray_Encode(UTF32 **StringArray) {
+        UTF8 **Encoded             = NULL;
+        if (StringArray != NULL) {
+            uint64_t NumStrings     = UTF32_StringArray_GetNumStrings(StringArray);
+            Encoded                 = calloc(NumStrings + 1, sizeof(UTF8*));
+            if (Encoded != NULL) {
+                for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                    Encoded[String] = UTF8_Encode(StringArray[String]);
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate decoded StringArray"));
+            }
+            
+        } else {
+            Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return Encoded;
+    }
+    
+    UTF16 **UTF16_StringArray_Encode(UTF32 **StringArray) {
+        UTF16 **Encoded             = NULL;
+        if (StringArray != NULL) {
+            uint64_t NumStrings     = UTF32_StringArray_GetNumStrings(StringArray);
+            Encoded                 = calloc(NumStrings + 1, sizeof(UTF16*));
+            if (Encoded != NULL) {
+                for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                    Encoded[String] = UTF16_Encode(StringArray[String]);
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate decoded StringArray"));
+            }
+            
+        } else {
+            Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return Encoded;
+    }
+    
     UTF8 *UTF8_StringArray_GetString(UTF8 **StringArray, uint64_t Index) {
         UTF8 *String = NULL;
         if (StringArray != NULL) {

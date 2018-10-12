@@ -928,6 +928,34 @@ extern "C" {
     uint64_t              UTF32_StringArray_GetNumStrings(UTF32 **StringArray);
     
     /*!
+     @abstract                             "Decodes a StringArray to a UTF32_StringArray".
+     @param               StringArray      "The StringArray to decode".
+     @return                               "Returns the decoded StringArray".
+     */
+    UTF32               **UTF8_StringArray_Decode(UTF8 **StringArray);
+    
+    /*!
+     @abstract                             "Decodes a StringArray to a UTF32_StringArray".
+     @param               StringArray      "The StringArray to decode".
+     @return                               "Returns the decoded StringArray".
+     */
+    UTF32               **UTF16_StringArray_Decode(UTF16 **StringArray);
+    
+    /*!
+     @abstract                             "Encodes a StringArray to a UTF8_StringArray".
+     @param               StringArray      "The StringArray to encode".
+     @return                               "Returns the encoded StringArray".
+     */
+    UTF8                **UTF8_StringArray_Encode(UTF32 **StringArray);
+    
+    /*!
+     @abstract                             "Encodes a StringArray to a UTF16_StringArray".
+     @param               StringArray      "The StringArray to encode".
+     @return                               "Returns the encoded StringArray".
+     */
+    UTF16               **UTF16_StringArray_Encode(UTF32 **StringArray);
+    
+    /*!
      @abstract                             "Gets a string from a StringArray".
      @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
      @param               Index            "The string to extract".
