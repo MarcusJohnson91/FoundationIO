@@ -2525,6 +2525,8 @@ extern "C" {
                                     Details->Specifiers[CurrentSpecifier- 1].TypeModifier |= Modifier_UTF8;
                                 } else if (StringType == UTF16Format) {
                                     Details->Specifiers[CurrentSpecifier- 1].TypeModifier |= Modifier_UTF16;
+                                } else if (StringType == UTF32Format) {
+                                    Details->Specifiers[CurrentSpecifier- 1].TypeModifier |= Modifier_UTF32;
                                 }
                             } else if (Format[CodePoint] == U32('C')) {
                                 Details->Specifiers[CurrentSpecifier - 1].SpecifierLength = EndCodePoint - CodePoint;
@@ -2541,6 +2543,8 @@ extern "C" {
                                     Details->Specifiers[CurrentSpecifier- 1].TypeModifier |= Modifier_UTF8;
                                 } else if (StringType == UTF16Format) {
                                     Details->Specifiers[CurrentSpecifier- 1].TypeModifier |= Modifier_UTF16;
+                                } else if (StringType == UTF32Format) {
+                                    Details->Specifiers[CurrentSpecifier- 1].TypeModifier |= Modifier_UTF32;
                                 }
                             } else if (Format[CodePoint] == U32('S')) {
                                 Details->Specifiers[CurrentSpecifier - 1].SpecifierLength = EndCodePoint - CodePoint;
@@ -2645,113 +2649,494 @@ extern "C" {
             for (uint64_t Specifier = 0ULL; Specifier < Details->NumSpecifiers; Specifier++) { // Stringify each specifier
                 FormatSpecifierBaseTypes     BaseType = Details->Specifiers[Specifier].BaseType;
                 FormatSpecifierTypeModifiers Modifier = Details->Specifiers[Specifier].TypeModifier;
-                if (BaseType == Type_String && Modifier == Modifier_UTF8) {
-                    Formatted = UTF32_ReplaceSubString(Format, UTF8_Decode(va_arg(VariadicArguments, UTF8*)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
-                } else if (BaseType == Type_String && Modifier == Modifier_UTF16) {
-                    Formatted = UTF32_ReplaceSubString(Format, UTF16_Decode(va_arg(VariadicArguments, UTF16*)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
-                } else if (BaseType == Type_CodePoint && Modifier == Modifier_UTF8) {
-                    Formatted = UTF32_ReplaceSubString(Format, UTF8_Decode(va_arg(VariadicArguments, UTF8)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                if (BaseType == Type_CodePoint && Modifier == Modifier_UTF8) {
+                    uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                    uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                    UTF8    *Arg     = va_arg(VariadicArguments, UTF8);
+                    UTF32   *Arg32   = UTF8_Decode(Arg);
+                    UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                    free(Format);
+                    Format           = Format2;
+                    free(Arg);
+                    free(Arg32);
                 } else if (BaseType == Type_CodePoint && Modifier == Modifier_UTF16) {
-                    Formatted = UTF32_ReplaceSubString(Format, UTF16_Decode(va_arg(VariadicArguments, UTF16)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                    uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                    uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                    UTF16   *Arg     = va_arg(VariadicArguments, UTF16);
+                    UTF32   *Arg32   = UTF16_Decode(Arg);
+                    UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                    free(Format);
+                    Format           = Format2;
+                    free(Arg);
+                    free(Arg32);
+                } else if (BaseType == Type_CodePoint && Modifier == Modifier_UTF32) {
+                    uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                    uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                    UTF32   *Arg     = va_arg(VariadicArguments, UTF32);
+                    UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg, Offset, Length);
+                    free(Format);
+                    Format           = Format2;
+                    free(Arg);
+                } else if (BaseType == Type_String && Modifier == Modifier_UTF8) {
+                    uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                    uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                    UTF8    *Arg     = va_arg(VariadicArguments, UTF8*);
+                    UTF32   *Arg32   = UTF8_Decode(Arg);
+                    UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                    free(Format);
+                    Format           = Format2;
+                    free(Arg);
+                    free(Arg32);
+                } else if (BaseType == Type_String && Modifier == Modifier_UTF16) {
+                    uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                    uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                    UTF16   *Arg     = va_arg(VariadicArguments, UTF16*);
+                    UTF32   *Arg32   = UTF16_Decode(Arg);
+                    UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                    free(Format);
+                    Format           = Format2;
+                    free(Arg);
+                    free(Arg32);
+                } else if (BaseType == Type_String && Modifier == Modifier_UTF32) {
+                    uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                    uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                    UTF32   *Arg     = va_arg(VariadicArguments, UTF32*);
+                    UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg, Offset, Length);
+                    free(Format);
+                    Format           = Format2;
+                    free(Arg);
                 } else if (Modifier == Modifier_Percent) {
-                    Formatted = UTF32_ReplaceSubString(Format, U32('%'), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                    uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                    uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                    UTF32   *Format2 = UTF32_ReplaceSubString(Format, U32("%"), Offset, Length);
+                    free(Format);
+                    Format           = Format2;
                 } else if (BaseType == Type_Decimal) {
                     if (Modifier == (Modifier_Base10)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Decimal2String(Decimal | Base10, va_arg(VariadicArguments, float)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        double   Arg     = va_arg(VariadicArguments, double);
+                        UTF32   *Arg32   = UTF32_Decimal2String(Decimal | Base10, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_Scientific | Modifier_Uppercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Decimal2String(Scientific | Uppercase, va_arg(VariadicArguments, float)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        double   Arg     = va_arg(VariadicArguments, double);
+                        UTF32   *Arg32   = UTF32_Decimal2String(Scientific | Uppercase, Arg);
+                        free(Arg32);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
                     } else if (Modifier == (Modifier_Scientific | Modifier_Lowercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Decimal2String(Scientific | Lowercase, va_arg(VariadicArguments, float)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        double   Arg     = va_arg(VariadicArguments, double);
+                        UTF32   *Arg32   = UTF32_Decimal2String(Scientific | Lowercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_Shortest | Modifier_Uppercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Decimal2String(Shortest | Uppercase, va_arg(VariadicArguments, float)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        double   Arg     = va_arg(VariadicArguments, double);
+                        UTF32   *Arg32   = UTF32_Decimal2String(Shortest | Uppercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_Shortest | Modifier_Lowercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Decimal2String(Shortest | Uppercase, va_arg(VariadicArguments, float)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        double   Arg     = va_arg(VariadicArguments, double);
+                        UTF32   *Arg32   = UTF32_Decimal2String(Shortest | Lowercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_Base16 | Modifier_Uppercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Decimal2String(FloatHex | Uppercase, va_arg(VariadicArguments, float)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        double   Arg     = va_arg(VariadicArguments, double);
+                        UTF32   *Arg32   = UTF32_Decimal2String(FloatHex | Uppercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_Base16 | Modifier_Lowercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Decimal2String(FloatHex | Lowercase, va_arg(VariadicArguments, float)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        double   Arg     = va_arg(VariadicArguments, double);
+                        UTF32   *Arg32   = UTF32_Decimal2String(FloatHex | Lowercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     }
                 } else if (BaseType == Type_Integer) {
                     if (Modifier == (Modifier_8Bit | Modifier_Unsigned | Modifier_Base2)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base2, va_arg(VariadicArguments, uint8_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint8_t  Arg     = va_arg(VariadicArguments, uint8_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base2, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_8Bit | Modifier_Signed | Modifier_Base2)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base2, va_arg(VariadicArguments, int8_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int8_t   Arg     = va_arg(VariadicArguments, int8_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base2, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_16Bit | Modifier_Unsigned | Modifier_Base2)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base2, va_arg(VariadicArguments, uint16_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint16_t Arg     = va_arg(VariadicArguments, uint16_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base2, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_16Bit | Modifier_Signed | Modifier_Base2)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base2, va_arg(VariadicArguments, int16_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int16_t  Arg     = va_arg(VariadicArguments, int16_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base2, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_32Bit | Modifier_Unsigned | Modifier_Base2)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base2, va_arg(VariadicArguments, uint32_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint32_t Arg     = va_arg(VariadicArguments, uint32_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base2, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_32Bit | Modifier_Signed | Modifier_Base2)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base2, va_arg(VariadicArguments, int32_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int32_t  Arg     = va_arg(VariadicArguments, int32_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base2, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_64Bit | Modifier_Unsigned | Modifier_Base2)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base2, va_arg(VariadicArguments, uint64_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint64_t Arg     = va_arg(VariadicArguments, uint64_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base2, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_64Bit | Modifier_Signed | Modifier_Base2)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base2, va_arg(VariadicArguments, int64_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int64_t  Arg     = va_arg(VariadicArguments, int64_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base2, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_8Bit | Modifier_Unsigned | Modifier_Base8)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base8, va_arg(VariadicArguments, uint8_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint8_t  Arg     = va_arg(VariadicArguments, uint8_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base8, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_8Bit | Modifier_Signed | Modifier_Base8)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base8, va_arg(VariadicArguments, int8_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int8_t   Arg     = va_arg(VariadicArguments, int8_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base8, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_16Bit | Modifier_Unsigned | Modifier_Base8)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base8, va_arg(VariadicArguments, uint16_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint16_t Arg     = va_arg(VariadicArguments, uint16_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base8, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_16Bit | Modifier_Signed | Modifier_Base8)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base8, va_arg(VariadicArguments, int16_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int16_t  Arg     = va_arg(VariadicArguments, int16_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base8, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_32Bit | Modifier_Unsigned | Modifier_Base8)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base8, va_arg(VariadicArguments, uint32_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint32_t Arg     = va_arg(VariadicArguments, uint32_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base8, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_32Bit | Modifier_Signed | Modifier_Base8)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base8, va_arg(VariadicArguments, int32_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int32_t  Arg     = va_arg(VariadicArguments, int32_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base8, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_64Bit | Modifier_Unsigned | Modifier_Base8)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base8, va_arg(VariadicArguments, uint64_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint64_t Arg     = va_arg(VariadicArguments, uint64_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base8, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_64Bit | Modifier_Signed | Modifier_Base8)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base8, va_arg(VariadicArguments, int64_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int64_t  Arg     = va_arg(VariadicArguments, int64_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base8, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_8Bit | Modifier_Unsigned | Modifier_Base10)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base10, va_arg(VariadicArguments, uint8_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint8_t  Arg     = va_arg(VariadicArguments, uint8_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base10, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_8Bit | Modifier_Signed | Modifier_Base10)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base10, va_arg(VariadicArguments, int8_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int8_t   Arg     = va_arg(VariadicArguments, int8_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base10, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_16Bit | Modifier_Unsigned | Modifier_Base10)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base10, va_arg(VariadicArguments, uint16_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint16_t Arg     = va_arg(VariadicArguments, uint16_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base10, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_16Bit | Modifier_Signed | Modifier_Base10)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base10, va_arg(VariadicArguments, int16_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int16_t  Arg     = va_arg(VariadicArguments, int16_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base10, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_32Bit | Modifier_Unsigned | Modifier_Base10)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base10, va_arg(VariadicArguments, uint32_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
-                    } else if (Modifier == (Modifier_16Bit | Modifier_Signed | Modifier_Base10)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base10, va_arg(VariadicArguments, int32_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint32_t Arg     = va_arg(VariadicArguments, uint32_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base10, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
+                    } else if (Modifier == (Modifier_32Bit | Modifier_Signed | Modifier_Base10)) {
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int32_t  Arg     = va_arg(VariadicArguments, int32_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base10, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_64Bit | Modifier_Unsigned | Modifier_Base10)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base10, va_arg(VariadicArguments, uint64_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint64_t Arg     = va_arg(VariadicArguments, uint64_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base10, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_64Bit | Modifier_Signed | Modifier_Base10)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base10, va_arg(VariadicArguments, int64_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int64_t  Arg     = va_arg(VariadicArguments, int64_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base10, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_8Bit | Modifier_Unsigned | Modifier_Base16 | Modifier_Uppercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Uppercase, va_arg(VariadicArguments, uint8_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint8_t  Arg     = va_arg(VariadicArguments, uint8_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Uppercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_8Bit | Modifier_Signed | Modifier_Base16 | Modifier_Uppercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Uppercase, va_arg(VariadicArguments, int8_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int8_t   Arg     = va_arg(VariadicArguments, int8_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Uppercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_16Bit | Modifier_Unsigned | Modifier_Base16 | Modifier_Uppercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Uppercase, va_arg(VariadicArguments, uint16_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint16_t Arg     = va_arg(VariadicArguments, uint16_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Uppercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_16Bit | Modifier_Signed | Modifier_Base16 | Modifier_Uppercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Uppercase, va_arg(VariadicArguments, int16_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int16_t  Arg     = va_arg(VariadicArguments, int16_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Uppercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_32Bit | Modifier_Unsigned | Modifier_Base16 | Modifier_Uppercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Uppercase, va_arg(VariadicArguments, uint32_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint32_t Arg     = va_arg(VariadicArguments, uint32_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Uppercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_32Bit | Modifier_Signed | Modifier_Base16 | Modifier_Uppercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Uppercase, va_arg(VariadicArguments, int32_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int32_t  Arg     = va_arg(VariadicArguments, int32_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Uppercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     } else if (Modifier == (Modifier_64Bit | Modifier_Unsigned | Modifier_Base16 | Modifier_Uppercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Uppercase, va_arg(VariadicArguments, uint64_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
-                    } else if (Modifier == (Modifier_64Bit | Modifier_Unsigned | Modifier_Base16 | Modifier_Uppercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Uppercase, va_arg(VariadicArguments, int64_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
-                    } else if (Modifier == (Modifier_Base16 | Modifier_Lowercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Lowercase, va_arg(VariadicArguments, uint8_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
-                    } else if (Modifier == (Modifier_Base16 | Modifier_Lowercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Lowercase, va_arg(VariadicArguments, int8_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
-                    } else if (Modifier == (Modifier_Base16 | Modifier_Lowercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Lowercase, va_arg(VariadicArguments, uint16_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
-                    } else if (Modifier == (Modifier_Base16 | Modifier_Lowercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Lowercase, va_arg(VariadicArguments, int16_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
-                    } else if (Modifier == (Modifier_Base16 | Modifier_Lowercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Lowercase, va_arg(VariadicArguments, uint32_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
-                    } else if (Modifier == (Modifier_Base16 | Modifier_Lowercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Lowercase, va_arg(VariadicArguments, int32_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
-                    } else if (Modifier == (Modifier_Base16 | Modifier_Lowercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Lowercase, va_arg(VariadicArguments, uint64_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
-                    } else if (Modifier == (Modifier_Base16 | Modifier_Lowercase)) {
-                        Formatted = UTF32_ReplaceSubString(Format, UTF32_Integer2String(Integer | Base16 | Lowercase, va_arg(VariadicArguments, int64_t)), Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint64_t Arg     = va_arg(VariadicArguments, uint64_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Uppercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
+                    } else if (Modifier == (Modifier_64Bit | Modifier_Signed | Modifier_Base16 | Modifier_Uppercase)) {
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int64_t  Arg     = va_arg(VariadicArguments, int64_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Uppercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
+                    } else if (Modifier == (Modifier_8Bit | Modifier_Unsigned | Modifier_Base16 | Modifier_Lowercase)) {
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint8_t  Arg     = va_arg(VariadicArguments, uint8_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Lowercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
+                    } else if (Modifier == (Modifier_8Bit | Modifier_Signed | Modifier_Base16 | Modifier_Lowercase)) {
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int8_t   Arg     = va_arg(VariadicArguments, int8_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Lowercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
+                    } else if (Modifier == (Modifier_16Bit | Modifier_Unsigned | Modifier_Base16 | Modifier_Lowercase)) {
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint16_t Arg     = va_arg(VariadicArguments, uint16_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Lowercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
+                    } else if (Modifier == (Modifier_16Bit | Modifier_Signed | Modifier_Base16 | Modifier_Lowercase)) {
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int16_t  Arg     = va_arg(VariadicArguments, int16_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Lowercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
+                    } else if (Modifier == (Modifier_32Bit | Modifier_Unsigned | Modifier_Base16 | Modifier_Lowercase)) {
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint32_t Arg     = va_arg(VariadicArguments, uint32_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Lowercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
+                    } else if (Modifier == (Modifier_32Bit | Modifier_Signed | Modifier_Base16 | Modifier_Lowercase)) {
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int32_t   Arg    = va_arg(VariadicArguments, int32_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Lowercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
+                    } else if (Modifier == (Modifier_64Bit | Modifier_Unsigned | Modifier_Base16 | Modifier_Lowercase)) {
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        uint64_t Arg     = va_arg(VariadicArguments, uint64_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Lowercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
+                    } else if (Modifier == (Modifier_64Bit | Modifier_Signed | Modifier_Base16 | Modifier_Lowercase)) {
+                        uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
+                        uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
+                        int64_t  Arg     = va_arg(VariadicArguments, int64_t);
+                        UTF32   *Arg32   = UTF32_Integer2String(Integer | Base16 | Lowercase, Arg);
+                        UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
+                        free(Format);
+                        Format           = Format2;
+                        free(Arg32);
                     }
                 }
             }
