@@ -133,18 +133,17 @@ extern "C" {
      @constant            FloatHexL                            "-188.60e+2".
      */
     typedef enum StringIOBases {
-                          IntegerBase2                         = 2,
-                          IntegerBase8                         = 8,
-                          IntegerBase10                        = 10,
-                          IntegerBase16L                       = 16,
-                          IntegerBase16U                       = 32,
-                          FloatDecimal                         = 64,
-                          FloatScientificU                     = 128,
-                          FloatScientificL                     = 256,
-                          FloatShortestU                       = 512,
-                          FloatShortestL                       = 1024,
-                          FloatHexU                            = 2048,
-                          FloatHexL                            = 4096,
+                          Integer                              = 1,
+                          Decimal                              = 2,
+                          Base2                                = 4,
+                          Base8                                = 8,
+                          Base10                               = 16,
+                          Base16                               = 32,
+                          Uppercase                            = 64,
+                          Lowercase                            = 128,
+                          Scientific                           = 256,
+                          Shortest                             = 512,
+                          FloatHex                             = 1024,
     } StringIOBases;
     
     /*!
