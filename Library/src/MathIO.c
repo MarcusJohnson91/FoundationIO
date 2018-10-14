@@ -35,20 +35,76 @@ extern "C" {
         return ExtractExponentFromDouble(Value);
     }
     
-    int64_t  Floorf(const double Value) { // 1.3 = 1, -1.3
-        return (ExtractMantissaFromFloat(Value) > 0 ? (ExtractExponentFromFloat(Value) + 1) : ExtractExponentFromFloat(Value)) * ExtractSignFromFloat(Value);;
+    int64_t  Floorf(const float Value) {
+        int64_t  Result   = 0;
+        int8_t   Sign     = ExtractSignFromFloat(Value);
+        int32_t  Mantissa = ExtractMantissaFromFloat(Value);
+        int16_t  Exponent = ExtractExponentFromFloat(Value);
+        
+        if (Mantissa == 0) {
+            Result        =  Exponent * Sign;
+        } else {
+            if (Sign == -1) {
+                Result    = (Exponent * Sign) - 1;
+            } else {
+                Result    =  Exponent * Sign;
+            }
+        }
+        return Result;
     }
     
-    int64_t  Floord(const double Value) { // 1.3 = 1, -1.3
-        return (ExtractMantissaFromDouble(Value) > 0 ? (ExtractExponentFromDouble(Value) + 1) : ExtractExponentFromDouble(Value)) * ExtractSignFromDouble(Value);;
+    int64_t  Floord(const double Value) {
+        int64_t  Result   = 0;
+        int8_t   Sign     = ExtractSignFromDouble(Value);
+        int64_t  Mantissa = ExtractMantissaFromDouble(Value);
+        int16_t  Exponent = ExtractExponentFromDouble(Value);
+        
+        if (Mantissa == 0) {
+            Result        =  Exponent * Sign;
+        } else {
+            if (Sign == -1) {
+                Result    = (Exponent * Sign) - 1;
+            } else {
+                Result    =  Exponent * Sign;
+            }
+        }
+        return Result;
     }
     
-    int64_t  Ceilf(const float Value) { // 1.3 = 2, -1.3 = -1
-        return (ExtractMantissaFromFloat(Value) > 0 ? (ExtractExponentFromFloat(Value) + 1) : ExtractExponentFromFloat(Value)) * ExtractSignFromFloat(Value);
+    int64_t  Ceilf(const float Value) {
+        int64_t  Result   = 0;
+        int8_t   Sign     = ExtractSignFromFloat(Value);
+        int32_t  Mantissa = ExtractMantissaFromFloat(Value);
+        int16_t  Exponent = ExtractExponentFromFloat(Value);
+        
+        if (Mantissa == 0) {
+            Result        =  Exponent * Sign;
+        } else {
+            if (Sign == -1) {
+                Result    = (Exponent * Sign) - 1;
+            } else {
+                Result    =  Exponent * Sign;
+            }
+        }
+        return Result;
     }
     
-    int64_t  Ceild(const double Value) { // 1.3 = 2, -1.3 = -1
-        return (ExtractMantissaFromDouble(Value) > 0 ? (ExtractExponentFromDouble(Value) + 1) : ExtractExponentFromDouble(Value)) * ExtractSignFromDouble(Value);
+    int64_t  Ceild(const double Value) {
+        int64_t  Result   = 0;
+        int8_t   Sign     = ExtractSignFromDouble(Value);
+        int64_t  Mantissa = ExtractMantissaFromDouble(Value);
+        int16_t  Exponent = ExtractExponentFromDouble(Value);
+        
+        if (Mantissa == 0) {
+            Result        =  Exponent * Sign;
+        } else {
+            if (Sign == -1) {
+                Result    = (Exponent * Sign) - 1;
+            } else {
+                Result    =  Exponent * Sign;
+            }
+        }
+        return Result;
     }
     
     uint64_t Exponentiate(const uint64_t Base, const uint64_t Exponent) {
