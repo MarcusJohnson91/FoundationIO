@@ -59,7 +59,7 @@ extern "C" {
      @abstract                                                  "Returns the Floor value of a decimal".
      @param                     Value                           "The value to find the floor value of".
      */
-    int64_t                     Floorf(const double Value);
+    int64_t                     Floorf(const float Value);
     
     /*!
      @abstract                                                  "Returns the Floor value of a decimal".
