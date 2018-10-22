@@ -18,14 +18,14 @@ add_definitions(-D_LIB)
 add_definitions(-DUNICODE)
 add_definitions(-D_UNICODE)
 add_definitions(-D_ATL_ALLOW_CHAR_UNSIGNED)
-endif
+endif()
 
-set(libFoundationIO_Dir "${CMAKE_CURRENT_SOURCE_DIR}")
+set(libFoundationIO_Dir "${CMAKE_CURRENT_SOURCE_DIR}/libFoundationIO")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${libFoundationIO_Dir}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${libFoundationIO_Dir}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
 
-set(libFoundationIO_Headers 
+set(libFoundationIO_PublicHeaders
 	"${libFoundationIO_Dir}/include/BitIO.h"
 	"${libFoundationIO_Dir}/include/CommandLineIO.h"
 	"${libFoundationIO_Dir}/include/ContainerIO.h"
@@ -43,17 +43,10 @@ set(libFoundationIO_Sources
 	"${libFoundationIO_Dir}/src/StringIO.c"
 )
 
-if (UNIX)
-set(libMATH -lm)
-else (WIN32)
-set(libMATH)
-endif
+add_library(FoundationIO_Shared shared $(libFoundationIO_Sources) $(libFoundationIO_PublicHeaders))
+add_library(FoundationIO_Static static $libFoundationIO_Sources $libFoundationIO_PublicHeaders)
 
-add_library(${project} [static|shared] ${libFoundationIO_Sources} ${libFoundationIO_Headers})
-
-
-
-if (CMAKE_C_COMPILER_ID == AppleClang || CMAKE_C_COMPILER_ID == Clang || CMAKE_C_COMPILER_ID == GNU)
+if (CMAKE_C_COMPILER_ID MATCHES "AppleClang" OR CMAKE_C_COMPILER_ID MATCHES "Clang" OR CMAKE_C_COMPILER_ID MATCHES "GNU")
 	set(LINK_FLAGS "${LINK_FLAGS}" -flto)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" -std=c11 -ferror-limit=1024 -Weverything -fcolor-diagnostics -fconst-strings -fshort-enums -vectorize-loops -funroll-loops -funsigned-char -Wno-c99-compat -fstrict-enums)
 
@@ -61,9 +54,7 @@ if (CMAKE_C_COMPILER_ID == AppleClang || CMAKE_C_COMPILER_ID == Clang || CMAKE_C
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Os")
 	set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -g -Ofast")
 	set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -Os")
-endif(CMAKE_C_COMPILER_ID == AppleClang || CMAKE_C_COMPILER_ID == Clang || CMAKE_C_COMPILER_ID == GNU)
-
-if (CMAKE_C_COMPILER_ID == MSVC)
+elseif (CMAKE_C_COMPILER_ID MATCHES "MSVC")
 	set(LINK_FLAGS "${LINK_FLAGS}" /GL)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" /std:c++17 /GF /bigobj /Qpar /J /JMC /MP /Ox /Ob2 /Os /GT /MT /openmp /FAu /LTCG /p:CharacterSet=Unicode /p:UseOfMfc=false /p:WarningLevel=Level3 /p:PrecompiledHeader=NotUsing /p:FunctionLevelLinking=true /p:RuntimeLibrary=MultiThreaded)
 
@@ -71,4 +62,6 @@ if (CMAKE_C_COMPILER_ID == MSVC)
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /p:UseDebugLibraries=false")
 	set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} /p:UseDebugLibraries=true")
 	set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} /p:UseDebugLibraries=false")
-endif(CMAKE_C_COMPILER_ID == MSVC)
+endif(CMAKE_C_COMPILER_ID MATCHES "MSVC")
+
+target_link_libraries()
