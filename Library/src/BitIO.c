@@ -379,15 +379,15 @@ extern "C" {
     }
     
     uint64_t BitBuffer_GetUTF8StringSize(BitBuffer *BitB) {
-        uint64_t StringSize     = 0ULL;
-        int64_t  OriginalOffset = 0LL;
-        uint8_t  CodeUnitSize   = 1;
+        uint64_t StringSize           = 0ULL;
         if (BitB != NULL) {
-            OriginalOffset      = BitBuffer_GetPosition(BitB);
+            int64_t  OriginalOffset   = BitBuffer_GetPosition(BitB);
+            uint16_t CodeUnit8        = 1;
             do {
-                CodeUnitSize    = UTF8_GetCodePointSizeInCodeUnits(BitBuffer_ExtractBits(MSByteFirst, LSBitFirst, BitB, 8));
-                StringSize     += CodeUnitSize;
-            } while (CodeUnitSize != 0);
+                CodeUnit8             = BitBuffer_ReadBits(MSByteFirst, LSBitFirst, BitB, 8);
+                uint8_t  CodeUnitSize = UTF8_GetCodePointSizeInCodeUnits(CodeUnit8);
+                StringSize           += CodeUnitSize;
+            } while (CodeUnit8 != NULL);
             BitBuffer_SetPosition(BitB, OriginalOffset);
         } else {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
@@ -413,15 +413,15 @@ extern "C" {
     }
     
     uint64_t BitBuffer_GetUTF16StringSize(BitBuffer *BitB) {
-        uint64_t StringSize     = 0ULL;
-        int64_t  OriginalOffset = 0LL;
-        uint8_t  CodeUnitSize   = 1;
+        uint64_t StringSize           = 0ULL;
         if (BitB != NULL) {
-            OriginalOffset      = BitBuffer_GetPosition(BitB);
+            int64_t  OriginalOffset   = BitBuffer_GetPosition(BitB);
+            uint16_t CodeUnit16       = 1;
             do {
-                CodeUnitSize    = UTF16_GetCodePointSizeInCodeUnits(BitBuffer_ExtractBits(MSByteFirst, LSBitFirst, BitB, 16));
-                StringSize     += CodeUnitSize;
-            } while (CodeUnitSize != 0);
+                CodeUnit16            = BitBuffer_ReadBits(MSByteFirst, LSBitFirst, BitB, 16);
+                uint8_t  CodeUnitSize = UTF16_GetCodePointSizeInCodeUnits(CodeUnit16);
+                StringSize           += CodeUnitSize;
+            } while (CodeUnit16 != NULL);
             BitBuffer_SetPosition(BitB, OriginalOffset);
         } else {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
