@@ -24,7 +24,7 @@ extern "C" {
     }
     
     uint64_t Absolutei(const int64_t Value) {
-        return (Value >= 0 ? (uint64_t) Value : (uint64_t) ~Value + 1); // Assumes 2's complement
+       return (Value >= 0 ? (uint64_t) Value : (uint64_t) ~Value + 1);
     }
     
     uint64_t Absolutef(const float Value) {
@@ -119,10 +119,7 @@ extern "C" {
         return Value;
     }
     
-    int64_t  Logarithm(const uint64_t Base, const int64_t Exponent) { // Ok, so we need to divide Exponent by Base.
-        // log2(8) == 3
-        // log10(100) == 2
-        // So basically, how many times does Exponent fit into base, rounded up.
+    int64_t  Logarithm(const uint64_t Base, const int64_t Exponent) {
         uint64_t Result    = 0ULL;
         int64_t  Exponent2 = Exponent;
         if (Base > 1 && Exponent > 0) {
@@ -160,11 +157,15 @@ extern "C" {
     }
     
     int64_t  Bits2Bytes(const int64_t Bits, const bool RoundUp) {
-        int64_t Bytes = 0ULL;
-        if (RoundUp == No) {
-            Bytes = Bits / 8;
-        } else {
-            Bytes = (Bits / 8) + (8 - (Bits % 8));
+        uint64_t AbsoluteBits = Absolute(Bits);
+        int64_t  Bytes        = 0ULL;
+        if (RoundUp == Yes) {
+            Bytes             = (AbsoluteBits >> 3) + 1;
+        } else if (RoundUp == No) {
+            Bytes             = (AbsoluteBits >> 3);
+        }
+        if (Bits < 0) {
+            Bytes *= -1;
         }
         return Bytes;
     }
