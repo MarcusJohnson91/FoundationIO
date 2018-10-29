@@ -139,18 +139,17 @@ extern "C" {
     typedef enum Image_ChannelMask {
         ImageMask_Unknown           = 0,
         ImageMask_2D                = 1,
-        ImageMask_3D_L              = 2,
-        ImageMask_3D_R              = 4,
-        ImageMask_Luma              = 8,
-        ImageMask_Chroma1           = 16,
-        ImageMask_Chroma2           = 32,
-        ImageMask_Chroma3           = 64,
-        ImageMask_Grayscale         = 128,
+        ImageMask_Luma              = 2,
+        ImageMask_Chroma1           = 4,
+        ImageMask_Chroma2           = 8,
+        ImageMask_Chroma3           = 16,
+        ImageMask_Alpha             = 32,
+        ImageMask_3D_L              = 64,
+        ImageMask_3D_R              = 128,
         ImageMask_Red               = 256,
         ImageMask_Green             = 512,
         ImageMask_Blue              = 1024,
-        ImageMask_Alpha             = 2048,
-        ImageMask_Green2            = 4096,
+        ImageMask_Green2            = 2048,
     } Image_ChannelMask;
     
     typedef enum Image_Types {
