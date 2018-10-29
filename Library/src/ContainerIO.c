@@ -1107,6 +1107,23 @@ extern "C" {
         return Histogram;
     }
     
+    void ImageHistogram_Deinit(ImageHistogram *Histogram) {
+        if (Histogram != NULL) {
+            if (Histogram->Type == (ImageType_Unsigned | ImageType_Integer8)) {
+                free(Histogram->I_Histogram.UInteger8);
+            } else if (Histogram->Type == (ImageType_Signed | ImageType_Integer8)) {
+                free(Histogram->I_Histogram.SInteger8);
+            } else if (Histogram->Type == (ImageType_Unsigned | ImageType_Integer16)) {
+                free(Histogram->I_Histogram.UInteger16);
+            } else if (Histogram->Type == (ImageType_Signed | ImageType_Integer16)) {
+                free(Histogram->I_Histogram.SInteger16);
+            }
+            free(Histogram);
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
+        }
+    }
+    
 #ifdef __cplusplus
 }
 #endif

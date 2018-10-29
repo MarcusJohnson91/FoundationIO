@@ -332,6 +332,12 @@ extern "C" {
      */
     ImageHistogram         *ImageHistogram_GenerateHistogram(ImageContainer *Image);
     
+    /*!
+     @abstract                             "frees a ImageHistogram".
+     @param                 Histogram      "A pointer to the ImageHistogram to deinitalize".
+     */
+    void                    ImageHistogram_Deinit(ImageHistogram *Histogram);
+    
 #ifdef __cplusplus
 }
 #endif
