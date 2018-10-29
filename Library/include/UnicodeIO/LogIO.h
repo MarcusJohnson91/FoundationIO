@@ -7,7 +7,7 @@ typedef               uint_least8_t                        UTF8;
 #endif
 
 #ifndef UTF16
-#ifdef __STD_UTF_16__
+#ifdef  char16_t
 typedef               char16_t                             UTF16;
 #else
 typedef               uint_least16_t                       UTF16;
@@ -15,7 +15,7 @@ typedef               uint_least16_t                       UTF16;
 #endif
 
 #ifndef UTF32
-#ifdef __STD_UTF_32__
+#ifdef  char32_t
 typedef               char32_t                             UTF32;
 #else
 typedef               uint_least32_t                       UTF32;
