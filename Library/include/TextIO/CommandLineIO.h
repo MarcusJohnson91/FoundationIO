@@ -77,10 +77,11 @@ extern "C" {
      @enum                      CLIArgumentTypes
      @abstract                                                  "Defines the type of argument accepted by the Option".
      @constant                  UnknownArgumentType             "Unknown Argument type".
-     @constant                  ArgumentIsAPath                 "The Argument may have slaves, but it may not too".
-     @constant                  ArgumentIsAString               "The Argument can not have any slaves".
-     @constant                  ArgumentIsARange                "The Argument is a slave".
-     @constant                  ArgumentIsARatio                "The Argument can not have any slaves, or any arguments, it just exists or doesn't exist".
+     @constant                  ArgumentIsAPath                 "The Argument is a path on the filesystem".
+     @constant                  ArgumentIsAString               "The Argument is a string".
+     @constant                  ArgumentIsARange                "The Argument is a range between X and Y".
+     @constant                  ArgumentIsARatio                "The Argument is a ratio seperated by a / or \".
+     @constant                  ArgumentNotAllowed              "The Argument is not allowed".
      */
     typedef enum CLIArgumentTypes {
                                 UnknownArgumentType             = 0,
