@@ -1623,11 +1623,11 @@ extern "C" {
     
     UTF32 *UTF32_Decimal2String(StringIOBases Base, double Number) {
         UTF32   *OutputString     = NULL;
-        int8_t   Sign             = ExtractSignFromDouble(Number);
-        int16_t  Exponent         = ExtractExponentFromDouble(Number);
-        int16_t  Exponent2        = Absolutei(Exponent);
-        uint64_t Mantissa         = ExtractMantissaFromDouble(Number);
-        uint64_t Mantissa2        = Absolutei(Mantissa);
+        int8_t   Sign             = ExtractSign(Number);
+        int16_t  Exponent         = ExtractExponent(Number);
+        int16_t  Exponent2        = Absolute(Exponent);
+        uint64_t Mantissa         = ExtractMantissa(Number);
+        uint64_t Mantissa2        = Absolute(Mantissa);
         uint16_t ExponentSize     = 0ULL;
         uint64_t MantissaSize     = 0ULL;
         uint64_t StringSize       = 0ULL;

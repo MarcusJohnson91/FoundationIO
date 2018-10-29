@@ -28,18 +28,18 @@ extern "C" {
     }
     
     uint64_t Absolutef(const float Value) {
-        return ExtractExponentFromFloat(Value);
+        return (uint64_t) ExtractExponent(Value);
     }
     
     uint64_t Absoluted(const double Value) {
-        return ExtractExponentFromDouble(Value);
+        return (uint64_t) ExtractExponent(Value);
     }
     
     int64_t  Floorf(const float Value) {
         int64_t  Result   = 0;
-        int8_t   Sign     = ExtractSignFromFloat(Value);
-        int32_t  Mantissa = ExtractMantissaFromFloat(Value);
-        int16_t  Exponent = ExtractExponentFromFloat(Value);
+        int8_t   Sign     = ExtractSign(Value);
+        int32_t  Mantissa = ExtractMantissa(Value);
+        int16_t  Exponent = ExtractExponent(Value);
         
         if (Mantissa == 0) {
             Result        =  Exponent * Sign;
@@ -55,9 +55,9 @@ extern "C" {
     
     int64_t  Floord(const double Value) {
         int64_t  Result   = 0;
-        int8_t   Sign     = ExtractSignFromDouble(Value);
-        int64_t  Mantissa = ExtractMantissaFromDouble(Value);
-        int16_t  Exponent = ExtractExponentFromDouble(Value);
+        int8_t   Sign     = ExtractSign(Value);
+        int64_t  Mantissa = ExtractMantissa(Value);
+        int16_t  Exponent = ExtractExponent(Value);
         
         if (Mantissa == 0) {
             Result        =  Exponent * Sign;
@@ -73,9 +73,9 @@ extern "C" {
     
     int64_t  Ceilf(const float Value) {
         int64_t  Result   = 0;
-        int8_t   Sign     = ExtractSignFromFloat(Value);
-        int32_t  Mantissa = ExtractMantissaFromFloat(Value);
-        int16_t  Exponent = ExtractExponentFromFloat(Value);
+        int8_t   Sign     = ExtractSign(Value);
+        int32_t  Mantissa = ExtractMantissa(Value);
+        int16_t  Exponent = ExtractExponent(Value);
         
         if (Mantissa == 0) {
             Result        =  Exponent * Sign;
@@ -91,9 +91,9 @@ extern "C" {
     
     int64_t  Ceild(const double Value) {
         int64_t  Result   = 0;
-        int8_t   Sign     = ExtractSignFromDouble(Value);
-        int64_t  Mantissa = ExtractMantissaFromDouble(Value);
-        int16_t  Exponent = ExtractExponentFromDouble(Value);
+        int8_t   Sign     = ExtractSign(Value);
+        int64_t  Mantissa = ExtractMantissa(Value);
+        int16_t  Exponent = ExtractExponent(Value);
         
         if (Mantissa == 0) {
             Result        =  Exponent * Sign;
@@ -157,7 +157,7 @@ extern "C" {
     }
     
     int64_t  Bits2Bytes(const int64_t Bits, const bool RoundUp) {
-        uint64_t AbsoluteBits = Absolute(Bits);
+        uint64_t AbsoluteBits = Absolutei(Bits);
         int64_t  Bytes        = 0ULL;
         if (RoundUp == Yes) {
             Bytes             = (AbsoluteBits >> 3) + 1;
@@ -197,20 +197,24 @@ extern "C" {
         return Mask;
     }
     
-    int8_t   ExtractSignFromFloat(float Number2Extract) {
+    int8_t   ExtractSignI(int64_t Number2Extract) {
+        return (Number2Extract & 0x8000000000000000) >> 63 == 1 ? -1 : 1;
+    }
+    
+    int8_t   ExtractSignF(float Number2Extract) {
         uint32_t *Sign1 = (uint32_t *) &Number2Extract;
         uint32_t  Sign2 = (*Sign1 & 0x80000000) >> 31;
         return Sign2 == 0 ? 1 : -1;
     }
     
-    int8_t   ExtractSignFromDouble(double Number2Extract) {
+    int8_t   ExtractSignD(double Number2Extract) {
         uint64_t *Sign1 = (uint64_t *) &Number2Extract;
         uint64_t  Sign2 = (*Sign1 & 0x8000000000000000) >> 63;
         return Sign2 == 0 ? 1 : -1;
     }
     
-    int16_t  ExtractExponentFromFloat(float Number2Extract) {
-        int8_t    Sign      = ExtractSignFromFloat(Number2Extract);
+    int16_t  ExtractExponentF(float Number2Extract) {
+        int8_t    Sign      = ExtractSign(Number2Extract);
         uint32_t *Exponent1 = (uint32_t *) &Number2Extract;
         int16_t   Exponent2 = (*Exponent1 & 0x7F800000) >> 23;
         int16_t   Exponent3 = 0;
@@ -222,8 +226,8 @@ extern "C" {
         return Exponent3;
     }
     
-    int16_t  ExtractExponentFromDouble(double Number2Extract) {
-        int8_t    Sign      = ExtractSignFromDouble(Number2Extract);
+    int16_t  ExtractExponentD(double Number2Extract) {
+        int8_t    Sign      = ExtractSign(Number2Extract);
         uint64_t *Exponent1 = (uint64_t *) &Number2Extract;
         int16_t   Exponent2 = (*Exponent1 & 0x7FF0000000000000) >> 52;
         int16_t   Exponent3 = 0;
@@ -235,13 +239,13 @@ extern "C" {
         return Exponent3;
     }
     
-    int32_t  ExtractMantissaFromFloat(float Number2Extract) {
+    int32_t  ExtractMantissaF(float Number2Extract) {
         uint32_t *Mantissa1  = (uint32_t *) &Number2Extract;
         int32_t   Mantissa2  = *Mantissa1 & 0x7FFFFFULL;
         return (Mantissa2 | 0x800000) - 127;
     }
     
-    int64_t  ExtractMantissaFromDouble(double Number2Extract) {
+    int64_t  ExtractMantissaD(double Number2Extract) {
         uint64_t *Mantissa1  = (uint64_t *) &Number2Extract;
         uint64_t  Mantissa2  = *Mantissa1 & 0xFFFFFFFFFFFFFULL;
         return (Mantissa2 | 0x10000000000000) - 1023;

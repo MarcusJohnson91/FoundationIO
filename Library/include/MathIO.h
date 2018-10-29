@@ -154,49 +154,56 @@ extern "C" {
     uint8_t                     CreateBitMask(const uint8_t NumBits2Select);
     
     /*!
+     @abstract                                                  "Extracts the sign from the integer given as Number2Extract".
+     @param                     Number2Extract                  "The integer number you want to get the sign from".
+     @return                                                    "Returns -1 if the sign is negative, otherwise 1".
+     */
+    int8_t                      ExtractSignI(int64_t Number2Extract);
+    
+    /*!
      @abstract                                                  "Extracts the sign from the float given as Number2Extract".
      @param                     Number2Extract                  "The float number you want to get the sign from".
      @return                                                    "Returns -1 if the sign is negative, otherwise 1".
      */
-    int8_t                      ExtractSignFromFloat(float Number2Extract);
+    int8_t                      ExtractSignF(float Number2Extract);
     
     /*!
      @abstract                                                  "Extracts the sign from the double given as Number2Extract".
      @param                     Number2Extract                  "The double number you want to get the sign from".
      @return                                                    "Returns -1 if the sign is negative, otherwise 1".
      */
-    int8_t                      ExtractSignFromDouble(double Number2Extract);
+    int8_t                      ExtractSignD(double Number2Extract);
     
     /*!
      @abstract                                                  "Extracts the exponent from the float given as Number2Extract".
      @param                     Number2Extract                  "The decimal number you want to get the exponent from".
      */
-    int16_t                     ExtractExponentFromFloat(float Number2Extract);
+    int16_t                     ExtractExponentF(float Number2Extract);
     
     /*!
      @abstract                                                  "Extracts the exponent from the double given as Number2Extract".
      @param                     Number2Extract                  "The decimal number you want to get the exponent from".
      */
-    int16_t                     ExtractExponentFromDouble(double Number2Extract);
+    int16_t                     ExtractExponentD(double Number2Extract);
     
     /*!
      @abstract                                                  "Extracts the mantissa from the float given as Number2Extract".
      @param                     Number2Extract                  "The mantissa number you want to get the exponent from".
      */
-    int32_t                     ExtractMantissaFromFloat(float Number2Extract);
+    int32_t                     ExtractMantissaF(float Number2Extract);
     
     /*!
      @abstract                                                  "Extracts the mantissa from the double given as Number2Extract".
      @param                     Number2Extract                  "The mantissa number you want to get the exponent from".
      */
-    int64_t                     ExtractMantissaFromDouble(double Number2Extract);
+    int64_t                     ExtractMantissaD(double Number2Extract);
     
 #define Absolute(Value)                     _Generic((Value), uint8_t:Absolutei, int8_t:Absolutei, uint16_t:Absolutei, int16_t:Absolutei, uint32_t:Absolutei, int32_t:Absolutei, uint64_t:Absolutei, int64_t:Absolutei, float:Absolutef, double:Absoluted)(Value)
 #define Floor(Value)                        _Generic((Value), uint8_t:Floori, int8_t:Floori, uint16_t:Floori, int16_t:Floori, uint32_t:Floori, int32_t:Floori, uint64_t:Floori, int64_t:Floori, float:Floorf, double:Floord)(Value)
 #define Ceil(Value)                         _Generic((Value), uint8_t:Ceilf, int8_t:Ceilf, uint16_t:Ceilf, int16_t:Ceilf, uint32_t:Ceilf, int32_t:Ceilf, uint64_t:Ceild, int64_t:Ceild, float:Ceilf, double:Ceild)(Value)
-#define ExtractSignFromDecimal(Decimal)     _Generic((Decimal), float:ExtractSignFromFloat,     double:ExtractSignFromDouble)(Decimal)
-#define ExtractExponentFromDecimal(Decimal) _Generic((Decimal), float:ExtractExponentFromFloat, double:ExtractExponentFromDouble)(Decimal)
-#define ExtractMantissaFromDecimal(Decimal) _Generic((Decimal), float:ExtractMantissaFromFloat, double:ExtractMantissaFromDouble)(Decimal)
+#define ExtractSign(Decimal)     _Generic((Decimal), int8_t:ExtractSignI, int16_t:ExtractSignI, int32_t:ExtractSignI, int64_t:ExtractSignI, float:ExtractSignF,     double:ExtractSignD)(Decimal)
+#define ExtractExponent(Decimal) _Generic((Decimal), float:ExtractExponentF, double:ExtractExponentD)(Decimal)
+#define ExtractMantissa(Decimal) _Generic((Decimal), float:ExtractMantissaF, double:ExtractMantissaD)(Decimal)
     
 #ifdef __cplusplus
 }
