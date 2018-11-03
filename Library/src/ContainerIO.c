@@ -836,8 +836,8 @@ extern "C" {
                 uint8_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(uint8_t));
                 if (NewArray != NULL) {
                     for (uint8_t View = 0; View < NumViews; View++) {
-                        for (uint64_t W = Left; W < Right; W++) {
-                            for (uint64_t H = Top; H < Bottom; H++) {
+                        for (int64_t W = Left; W < Right; W++) {
+                            for (int64_t H = Top; H < Bottom; H++) {
                                 for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
                                     NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
                                 }
@@ -854,8 +854,8 @@ extern "C" {
                 int8_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(int8_t));
                 if (NewArray != NULL) {
                     for (uint8_t View = 0; View < NumViews; View++) {
-                        for (uint64_t W = Left; W < Right; W++) {
-                            for (uint64_t H = Top; H < Bottom; H++) {
+                        for (int64_t W = Left; W < Right; W++) {
+                            for (int64_t H = Top; H < Bottom; H++) {
                                 for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
                                     NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
                                 }
@@ -872,8 +872,8 @@ extern "C" {
                 uint16_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(uint16_t));
                 if (NewArray != NULL) {
                     for (uint8_t View = 0; View < NumViews; View++) {
-                        for (uint64_t W = Left; W < Right; W++) {
-                            for (uint64_t H = Top; H < Bottom; H++) {
+                        for (int64_t W = Left; W < Right; W++) {
+                            for (int64_t H = Top; H < Bottom; H++) {
                                 for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
                                     NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
                                 }
@@ -890,8 +890,8 @@ extern "C" {
                 int16_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(int16_t));
                 if (NewArray != NULL) {
                     for (uint8_t View = 0; View < NumViews; View++) {
-                        for (uint64_t W = Left; W < Right; W++) {
-                            for (uint64_t H = Top; H < Bottom; H++) {
+                        for (int64_t W = Left; W < Right; W++) {
+                            for (int64_t H = Top; H < Bottom; H++) {
                                 for (uint64_t Channel = 0ULL; Channel < NumChannels; Channel++) {
                                     NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
                                 }
