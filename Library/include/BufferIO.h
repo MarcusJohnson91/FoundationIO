@@ -127,7 +127,7 @@ extern "C" {
      @param                     BitBufferSize                   "The number of bytes to create the BitBuffer with".
      @return                                                    "Returns a pointer to the BitBuffer".
      */
-    BitBuffer                  *BitBuffer_Init(const uint64_t BitBufferSize);
+    BitBuffer                  *BitBuffer_Init(const int64_t BitBufferSize);
     
     /*!
      @abstract                                                  "Reads data from BitInput to BitBuffer".
