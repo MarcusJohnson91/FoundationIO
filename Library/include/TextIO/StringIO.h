@@ -857,7 +857,7 @@ extern "C" {
      @param               String           "The string to write to OutputFile (including any newlines, etc)".
      @param               OutputFile       "a valid FILE pointer, or STDIN/STDOUT/STDERR".
      */
-    void                  UTF8_WriteString2File(UTF8 *String, FILE *OutputFile);
+    void                  UTF8_WriteString(UTF8 *String, FILE *OutputFile);
     
     /*!
      @abstract                             "Writes a UTF-16 encoded string to the OutputFile using the platform's default Unicode encoding".
@@ -865,7 +865,17 @@ extern "C" {
      @param               String           "The string to write to OutputFile (including any newlines, etc)".
      @param               OutputFile       "a valid FILE pointer, or STDIN/STDOUT/STDERR".
      */
-    void                  UTF16_WriteString2File(UTF16 *String, FILE *OutputFile);
+    void                  UTF16_WriteString(UTF16 *String, FILE *OutputFile);
+    
+    /*!
+     @abstract                             "Writes a UTF-16 encoded string to the OutputFile using the platform's default Unicode encoding".
+     @remark                               "On Windows, Strings are output as UTF-16; on POSIX platforms (including Mac/iOS) strings are written as UTF-8".
+     @param               String           "The string to write to OutputFile (including any newlines, etc)".
+     @param               OutputFile       "a valid FILE pointer, or STDIN/STDOUT/STDERR".
+     */
+    void                  UTF32_WriteString(UTF32 *String, FILE *OutputFile);
+    
+#define WriteString(String) _Generic((String), UTF8*:UTF8_WriteString, UTF16*:UTF16_WriteString, UTF32*:UTF32_WriteString)(String)
     
     /* StringArrays */
     
