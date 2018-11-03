@@ -58,7 +58,7 @@ extern "C" {
         BitIOFileTypes  FileType;
     } BitOutput;
     
-    BitBuffer *BitBuffer_Init(const uint64_t BitBufferSize) {
+    BitBuffer *BitBuffer_Init(const int64_t BitBufferSize) {
         BitBuffer *BitB                  = calloc(1, sizeof(BitBuffer));
         if (BitB != NULL && BitBufferSize > 0) {
             BitB->Buffer                 = calloc(BitBufferSize, sizeof(uint8_t));
