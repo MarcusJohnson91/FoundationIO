@@ -3213,7 +3213,7 @@ extern "C" {
         return Format32;
     }
     
-    void UTF8_WriteString2File(UTF8 *String, FILE *OutputFile) {
+    void UTF8_WriteString(UTF8 *String, FILE *OutputFile) {
         if (String != NULL && OutputFile != NULL) {
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
             fputs(String, OutputFile);
@@ -3231,7 +3231,7 @@ extern "C" {
         }
     }
     
-    void UTF16_WriteString2File(UTF16 *String, FILE *OutputFile) {
+    void UTF16_WriteString(UTF16 *String, FILE *OutputFile) {
         if (String != NULL && OutputFile != NULL) {
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
             UTF32 *String32 = UTF16_Decode(String);
@@ -3241,6 +3241,25 @@ extern "C" {
             free(String8);
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
             fputws(String, OutputFile);
+#endif
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (OutputFile == NULL) {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+    }
+    
+    void UTF32_WriteString(UTF32 *String, FILE *OutputFile) {
+        if (String != NULL && OutputFile != NULL) {
+#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+            UTF8  *String8  = UTF8_Encode(String);
+            fputs(String8, OutputFile);
+            free(String8);
+#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+            // Encode to UTF16, then write with fputws
+            UTF16 *String16 = UTF16_Encode(String);
+            fputws(String16, OutputFile);
+            free(String16);
 #endif
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
