@@ -23,8 +23,8 @@ extern "C" {
     /* Start BitBuffer section */
     typedef struct BitBuffer {
         uint8_t   *Buffer;
-        uint64_t   NumBits;
-        uint64_t   BitOffset;
+        int64_t    BitOffset;
+        int64_t    NumBits;
     } BitBuffer;
     
     typedef struct BitInput {
@@ -166,7 +166,7 @@ extern "C" {
     void BitBuffer_Align(BitBuffer *BitB, const uint8_t AlignmentSize) {
         if (BitB != NULL && (AlignmentSize == 1 || AlignmentSize % 2 == 0)) {
             int64_t  AlignmentSizeInBits = Bytes2Bits(AlignmentSize);
-            uint64_t Bits2Align          = AlignmentSizeInBits - (BitB->BitOffset % AlignmentSizeInBits);
+            int64_t  Bits2Align          = AlignmentSizeInBits - (BitB->BitOffset % AlignmentSizeInBits);
             if (BitB->BitOffset + Bits2Align > BitB->NumBits) {
                 BitB->Buffer             = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
                 BitB->NumBits           += Bits2Align;
@@ -204,7 +204,7 @@ extern "C" {
         }
     }
     
-    void BitBuffer_Resize(BitBuffer *BitB, const uint64_t NewSize) {
+    void BitBuffer_Resize(BitBuffer *BitB, const int64_t NewSize) {
         if (BitB != NULL && NewSize * 8 >= BitB->BitOffset) {
             uint8_t *NewBuffer  = realloc(BitB->Buffer, NewSize);
             if (NewBuffer != NULL) {
@@ -245,16 +245,16 @@ extern "C" {
         }
     }
     
-    void BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, uint64_t BitStart, uint64_t BitEnd) {
+    void BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, int64_t BitStart, int64_t BitEnd) {
         if (Source != NULL && Destination != NULL && BitStart < BitEnd && BitStart <= Source->NumBits && BitEnd <= Source->NumBits) {
             uint64_t NumBits2Copy = BitEnd - BitStart;
             if (BitStart % 8 == 0 && BitEnd % 8 == 0 && NumBits2Copy % 8 == 0) {
                 Destination->NumBits = NumBits2Copy;
-                for (uint64_t Byte = BitStart / 8; Byte < BitEnd / 8; Byte++) {
+                for (int64_t Byte = BitStart / 8; Byte < BitEnd / 8; Byte++) {
                     Destination->Buffer[Byte - (BitStart / 8)] = Source->Buffer[Byte];
                 }
             } else {
-                for (uint64_t Bit = BitStart; Bit < BitEnd / 8; Bit++) {
+                for (int64_t Bit = BitStart; Bit < BitEnd / 8; Bit++) {
                     Destination->Buffer[Bit / 8] = Source->Buffer[Bit / 8];
                 }
             }
@@ -382,12 +382,12 @@ extern "C" {
         uint64_t StringSize           = 0ULL;
         if (BitB != NULL) {
             int64_t  OriginalOffset   = BitBuffer_GetPosition(BitB);
-            uint16_t CodeUnit8        = 1;
+            UTF8     CodeUnit8        = 1;
             do {
                 CodeUnit8             = BitBuffer_ReadBits(MSByteFirst, LSBitFirst, BitB, 8);
                 uint8_t  CodeUnitSize = UTF8_GetCodePointSizeInCodeUnits(CodeUnit8);
                 StringSize           += CodeUnitSize;
-            } while (CodeUnit8 != NULL);
+            } while (CodeUnit8 != 0);
             BitBuffer_SetPosition(BitB, OriginalOffset);
         } else {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
@@ -416,12 +416,12 @@ extern "C" {
         uint64_t StringSize           = 0ULL;
         if (BitB != NULL) {
             int64_t  OriginalOffset   = BitBuffer_GetPosition(BitB);
-            uint16_t CodeUnit16       = 1;
+            UTF16    CodeUnit16       = 1;
             do {
                 CodeUnit16            = BitBuffer_ReadBits(MSByteFirst, LSBitFirst, BitB, 16);
                 uint8_t  CodeUnitSize = UTF16_GetCodePointSizeInCodeUnits(CodeUnit16);
                 StringSize           += CodeUnitSize;
-            } while (CodeUnit16 != NULL);
+            } while (CodeUnit16 != 0);
             BitBuffer_SetPosition(BitB, OriginalOffset);
         } else {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));

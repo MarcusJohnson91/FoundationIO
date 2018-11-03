@@ -119,7 +119,7 @@ extern "C" {
         return Value;
     }
     
-    int64_t  Logarithm(const uint64_t Base, const int64_t Exponent) {
+    int64_t  Logarithm(const int64_t Base, const int64_t Exponent) {
         uint64_t Result    = 0ULL;
         int64_t  Exponent2 = Exponent;
         if (Base > 1 && Exponent > 0) {

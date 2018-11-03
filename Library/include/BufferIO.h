@@ -207,7 +207,7 @@ extern "C" {
      @param                     BitB                            "BitBuffer Pointer to resize".
      @param                     NewSize                         "The new size of the internal buffer in bytes".
      */
-    void                        BitBuffer_Resize(BitBuffer *BitB, const uint64_t NewSize);
+    void                        BitBuffer_Resize(BitBuffer *BitB, const int64_t NewSize);
     
     /*!
      @abstract                                                  "Reads fresh data to a BitBuffer from a BitInput".
@@ -225,7 +225,7 @@ extern "C" {
      @param                     BitStart                        "The bit to start copying from (inclusive)".
      @param                     BitEnd                          "The bit to end copying (inclusive)".
      */
-    void                        BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, uint64_t BitStart, uint64_t BitEnd);
+    void                        BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, int64_t BitStart, int64_t BitEnd);
     
     /*!
      @abstract                                                  "Peeks (reads but without recording that it's been read) bits from BitBuffer".

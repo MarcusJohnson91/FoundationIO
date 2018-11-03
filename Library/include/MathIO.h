@@ -94,7 +94,7 @@ extern "C" {
      @param                     Exponent                        "The value to calculate".
      @return                                                    "Returns the number of symbols required to store an integer".
      */
-    int64_t                     Logarithm(const uint64_t Base, const int64_t Exponent);
+    int64_t                     Logarithm(const int64_t Base, const int64_t Exponent);
     
     /*!
      @abstract                                                  "Byte swaps a 16 bit integer".
