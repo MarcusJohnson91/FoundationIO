@@ -17,7 +17,7 @@ extern "C" {
     
     bool IsOdd(const int64_t Number2Check) {
         bool X = No;
-        if (Number2Check % 2 == 0) {
+        if ((Number2Check & 1) == 1) {
             X = Yes;
         }
         return X;
@@ -197,58 +197,90 @@ extern "C" {
         return Mask;
     }
     
-    int8_t   ExtractSignI(int64_t Number2Extract) {
-        return (Number2Extract & 0x8000000000000000) >> 63 == 1 ? -1 : 1;
+    bool     NumberIsNormalF(float Decimal) {
+        bool IsNormal = No;
+        int16_t Exponent = ExtractExponent(Decimal);
+        if (Exponent >= 1 && Exponent <= 0xFE) {
+            IsNormal  = Yes;
+        }
+        return IsNormal;
     }
     
-    int8_t   ExtractSignF(float Number2Extract) {
-        uint32_t *Sign1 = (uint32_t *) &Number2Extract;
+    bool     NumberIsNormalD(double Decimal) {
+        bool IsNormal = No;
+        int16_t Exponent = ExtractExponent(Decimal);
+        if (Exponent >= 1 && Exponent <= 0x7FE) {
+            IsNormal  = Yes;
+        }
+        return IsNormal;
+    }
+    
+    bool     NumberHasDecimalPointF(float Decimal) { // IDK what to call this, basically anything less than 0x1FFF
+        bool HasDecimalPoint = No;
+        int16_t Mantissa = ExtractMantissa(Decimal);
+        if ((Mantissa & 0x1FFF) > 0) {
+            HasDecimalPoint  = Yes;
+        }
+        return HasDecimalPoint;
+    }
+    
+    bool     NumberHasDecimalPointD(float Decimal) { // IDK what to call this, basically anything less than 0x1FFF
+        bool HasDecimalPoint = No;
+        int16_t Mantissa = ExtractMantissa(Decimal);
+        if ((Mantissa & 0x7FFFFFFFFFF) > 0) {
+            HasDecimalPoint  = Yes;
+        }
+        // 1025   = 0x4090040000000000
+        // 1024.5 = 0x4090020000000000
+        
+        // 0x40000000000 = Where the decimal point starts, that's the highest set decimal requiring bit.
+        
+        // Anything in this group of bits requires a decimal point: 0x7FFFFFFFFFF
+        return HasDecimalPoint;
+    }
+    
+    int8_t   ExtractSignI(int64_t Sign2Extract) {
+        return (Sign2Extract & 0x8000000000000000) >> 63 == 1 ? -1 : 1;
+    }
+    
+    int8_t   ExtractSignF(float Sign2Extract) {
+        uint32_t *Sign1 = (uint32_t *) &Sign2Extract;
         uint32_t  Sign2 = (*Sign1 & 0x80000000) >> 31;
         return Sign2 == 0 ? 1 : -1;
     }
     
-    int8_t   ExtractSignD(double Number2Extract) {
-        uint64_t *Sign1 = (uint64_t *) &Number2Extract;
+    int8_t   ExtractSignD(double Sign2Extract) {
+        uint64_t *Sign1 = (uint64_t *) &Sign2Extract;
         uint64_t  Sign2 = (*Sign1 & 0x8000000000000000) >> 63;
         return Sign2 == 0 ? 1 : -1;
     }
     
-    int16_t  ExtractExponentF(float Number2Extract) {
-        int8_t    Sign      = ExtractSign(Number2Extract);
-        uint32_t *Exponent1 = (uint32_t *) &Number2Extract;
+    int16_t  ExtractExponentF(float Exponent2Extract) { // 1024.25 = 0x44800800
+        int8_t    Sign      = ExtractSign(Exponent2Extract);
+        uint32_t *Exponent1 = (uint32_t *) &Exponent2Extract;
         int16_t   Exponent2 = (*Exponent1 & 0x7F800000) >> 23;
-        int16_t   Exponent3 = 0;
-        if (Sign == 1) {
-            Exponent3       = Exponent2 - 1022;
-        } else if (Sign == -1) {
-            Exponent3       = Exponent2 - 3070;
-        }
+        int16_t   Exponent3 = Exponent2 - 127;
         return Exponent3;
     }
     
-    int16_t  ExtractExponentD(double Number2Extract) {
-        int8_t    Sign      = ExtractSign(Number2Extract);
-        uint64_t *Exponent1 = (uint64_t *) &Number2Extract;
+    int16_t  ExtractExponentD(double Exponent2Extract) {
+        int8_t    Sign      = ExtractSign(Exponent2Extract);
+        uint64_t *Exponent1 = (uint64_t *) &Exponent2Extract;
         int16_t   Exponent2 = (*Exponent1 & 0x7FF0000000000000) >> 52;
-        int16_t   Exponent3 = 0;
-        if (Sign == 1) {
-            Exponent3       = Exponent2 - 1022;
-        } else if (Sign == -1) {
-            Exponent3       = Exponent2 - 3070;
-        }
+        int16_t   Exponent3 = Exponent2 - 1023;
         return Exponent3;
     }
     
-    int32_t  ExtractMantissaF(float Number2Extract) {
+    int32_t  ExtractMantissaF(float Number2Extract) { // 0x44800800
         uint32_t *Mantissa1  = (uint32_t *) &Number2Extract;
-        int32_t   Mantissa2  = *Mantissa1 & 0x7FFFFFULL;
-        return (Mantissa2 | 0x800000) - 127;
+        int32_t   Mantissa2  = *Mantissa1 & 0x7FFFFFUL;
+        return (Mantissa2 | 0x800000);
     }
     
     int64_t  ExtractMantissaD(double Number2Extract) {
         uint64_t *Mantissa1  = (uint64_t *) &Number2Extract;
         uint64_t  Mantissa2  = *Mantissa1 & 0xFFFFFFFFFFFFFULL;
-        return (Mantissa2 | 0x10000000000000) - 1023;
+        return (Mantissa2 | 0x10000000000000);
     }
     
 #ifdef __cplusplus
