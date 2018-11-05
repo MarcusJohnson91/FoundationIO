@@ -128,18 +128,17 @@ extern "C" {
     
     /*!
      @enum                StringIOBases
-     @constant            IntegerBase2                         "Base 2".
-     @constant            IntegerBase8                         "Base 8".
-     @constant            IntegerBase10                        "Base 10".
-     @constant            IntegerBase16U                       "Base 16, 0-9A-F".
-     @constant            IntegerBase16L                       "Base 16, 0-9a-f".
-     @constant            FloatDecimal                         "Base 10, 392.96".
-     @constant            FloatScientificU                     "Base 10, 392.96E+2".
-     @constant            FloatScientificL                     "Base 10, 392.96e+2".
-     @constant            FloatShortestU                       "Choose the shortest representation between Scientific and Decimal, Uppercase".
-     @constant            FloatShortestL                       "Choose the shortest representation between Scientific and Decimal, Lowercase".
-     @constant            FloatHexU                            "-188.60E+2".
-     @constant            FloatHexL                            "-188.60e+2".
+     @constant            Integer                              "Integer".
+     @constant            Decimal                              "Decimal".
+     @constant            Base2                                "Base 2".
+     @constant            Base8                                "Base 8".
+     @constant            Base10                               "Base 10".
+     @constant            Base16                               "Base 16".
+     @constant            Uppercase                            "Digits 0-9A-F".
+     @constant            Lowercase                            "Digits 0-9a-f".
+     @constant            Scientific                           "392.96e+2 Scientific decimal representation, ".
+     @constant            Shortest                             "Use either Decimal or Scientific representation".
+     @constant            Hex                                  "1.3DEp42 where E is the exponent aka 10^X, and P is the power aka 2^Y"
      */
     typedef enum StringIOBases {
                           Integer                              = 1,
@@ -152,7 +151,7 @@ extern "C" {
                           Lowercase                            = 128,
                           Scientific                           = 256,
                           Shortest                             = 512,
-                          FloatHex                             = 1024,
+                          Hex                                  = 1024,
     } StringIOBases;
     
     /*!
