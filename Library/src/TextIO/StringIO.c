@@ -1558,7 +1558,7 @@ extern "C" {
         UTF32  LowerNumerals[16] = {U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'), U32('e'), U32('f')};
         if (NumberString != NULL) {
             for (uint64_t CodePoint = NumDigits - 1; CodePoint > 0; CodePoint--) {
-                int64_t CurrentDigit    = (Base == (Integer | Base10) ? Absolutei(Integer2Convert %= Base) : (Integer2Convert %= Base));
+                int64_t CurrentDigit    = (Base == (Integer | Base10) ? AbsoluteI(Integer2Convert %= Base) : (Integer2Convert %= Base));
                 NumberString[CodePoint] = (Base == (Integer | Base16 | Uppercase) ? UpperNumerals[CurrentDigit] : LowerNumerals[CurrentDigit]);
             }
         }
