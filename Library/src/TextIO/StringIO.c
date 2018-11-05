@@ -1657,8 +1657,25 @@ extern "C" {
          Inf    = Exponent = Max, Mantissa == 0
          */
         
-        if (Base == (Shortest | Uppercase)) { // Get the size of the string for both Decimal and Scientific representations, and choose the shortest.
+        /*
+         Algorithm table:
+         
+         Decimal:    Ryu
+         Scientific: IDK
+         Shortest:   Decimal or Scientific.
+         Hex:        IDK.
+         
+         So, for Shortest and Decimal, use Ryu.
+         for Hex and Scientific use a naive algorithm.
+         */
+        
+        if (Base == Shortest || Base == Decimal) { // Ryū to the rescue!
             
+        } else if (Base == Scientific || Base == Hex) { // 
+            
+        }
+        
+        if (Base == (Shortest | Uppercase)) { // Get the size of the string for both Decimal and Scientific representations, and choose the shortest.
             /*
              Choose between Decimal and Scientific at will.
              
@@ -1672,10 +1689,7 @@ extern "C" {
              Get the size of the string in both representations and go with the smallest
              So, we need a way to figure out the size of each representation without actually doing it.
              */
-            
         }
-        
-        
         
         if (Sign == -1) {
             StringSize           += 1;
@@ -1691,9 +1705,9 @@ extern "C" {
         
         if (Base == Decimal) { // Write the number as SXXX.MM // Exponent * Sign . Fraction, -1.1 = -1.100000
             StringSize += 1; // Add one for the decimal seperator
-        } else if (Base == (FloatHex | Uppercase)) { // Sign 0(x|X) . Fraction EP Exponent, -1.1 = -0X1.199999999999AP+0
+        } else if (Base == (Hex | Uppercase)) { // Sign 0(x|X) . Fraction EP Exponent, -1.1 = -0X1.199999999999AP+0
             StringSize += (5 + ExponentSize); // Add seven for the 0X, decimal seperator, AP, +, and 0.
-        } else if (Base == (FloatHex | Lowercase)) { // Sign 0(x|X) . Fraction EP Exponent, -1.1 = -0x1.199999999999ap+0
+        } else if (Base == (Hex | Lowercase)) { // Sign 0(x|X) . Fraction EP Exponent, -1.1 = -0x1.199999999999ap+0
             StringSize += (5 + ExponentSize); // Add seven for the 0x, decimal seperator, ap, +, and 0.
         } else if (Base == (Scientific | Uppercase)) { // Write the number as XXX.YYE(+|-)Z // -1.1 = -1.100000E+00
             StringSize += (2 + ExponentSize); // Add five for the decimal seperator, E, Sign, X.
@@ -1720,10 +1734,10 @@ extern "C" {
                     OutputString[StringSize + ExponentSize + MantissaCodePoint]  = Mantissa /= 10;
                 }
             }
-            if (Base == (FloatHex | Uppercase)) {
+            if (Base == (Hex | Uppercase)) {
                 OutputString[StringSize + ExponentSize + MantissaSize + 1] = U32('A');
                 OutputString[StringSize + ExponentSize + MantissaSize + 2] = U32('P');
-            } else if (Base == (FloatHex | Lowercase)) {
+            } else if (Base == (Hex | Lowercase)) {
                 OutputString[StringSize + ExponentSize + MantissaSize + 1] = U32('a');
                 OutputString[StringSize + ExponentSize + MantissaSize + 2] = U32('p');
             } else if (Base == (Scientific | Uppercase)) {
@@ -2763,7 +2777,7 @@ extern "C" {
                         uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
                         uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
                         double   Arg     = va_arg(VariadicArguments, double);
-                        UTF32   *Arg32   = UTF32_Decimal2String(FloatHex | Uppercase, Arg);
+                        UTF32   *Arg32   = UTF32_Decimal2String(Hex | Uppercase, Arg);
                         UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
                         free(Format);
                         Format           = Format2;
@@ -2772,7 +2786,7 @@ extern "C" {
                         uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
                         uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
                         double   Arg     = va_arg(VariadicArguments, double);
-                        UTF32   *Arg32   = UTF32_Decimal2String(FloatHex | Lowercase, Arg);
+                        UTF32   *Arg32   = UTF32_Decimal2String(Hex | Lowercase, Arg);
                         UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
                         free(Format);
                         Format           = Format2;
