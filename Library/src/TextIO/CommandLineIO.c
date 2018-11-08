@@ -9,14 +9,7 @@
 #include <sys/ioctl.h>                 /* Included for the terminal size */
 #include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
-#ifndef   WIN32_LEAN_AND_MEAN
-#define   WIN32_LEAN_AND_MEAN
-#endif /* WIN32_LEAN_AND_MEAN */
-#ifndef   VC_EXTRALEAN
-#define   VC_EXTRALEAN
-#endif /* VC_EXTRALEAN */
-#include <Windows.h>                   /* Included because WinCon needs it, and it needs it to be first */
-#include <Wincon.h>                    /* Included for getting the terminal size */
+#include <Wincon.h>                    /* Included for getting the terminal size, MAKE SURE Macros.h is included before this, it includes Windows.h */
 #endif
 
 #ifdef __cplusplus

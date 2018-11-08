@@ -91,9 +91,9 @@ extern "C" {
             uint64_t Bytes2Read2   = Bits2Bytes(BitB->NumBits - BitB->BitOffset, No);
             uint64_t BytesRead     = 0ULL;
             if (BitI->FileType == BitIOFile) {
-                BytesRead          = FoundationIO_FileRead(BitB->Buffer, 1, Bytes2Read2, BitI->File);
+                BytesRead          = FoundationIO_File_Read(BitB->Buffer, 1, Bytes2Read2, BitI->File);
             } else if (BitI->FileType == BitIOSocket) {
-                BytesRead          = FoundationIO_SocketRead(BitI->Socket, BitB->Buffer, Bytes2Read2);
+                BytesRead          = FoundationIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read2);
             }
             BitB->NumBits          = (BytesRead * 8) + BitB->BitOffset;
         } else if (BitB == NULL) {
@@ -224,9 +224,9 @@ extern "C" {
             uint64_t Bytes2Read      = BitB->NumBits / 8;
             uint64_t BytesRead       = 0ULL;
             if (BitI->FileType == BitIOFile) {
-                BytesRead            = FoundationIO_FileRead(BitB->Buffer, 1, Bytes2Read, BitI->File);
+                BytesRead            = FoundationIO_File_Read(BitB->Buffer, 1, Bytes2Read, BitI->File);
             } else if (BitI->FileType == BitIOSocket) {
-                BytesRead            = FoundationIO_SocketRead(BitI->Socket, BitB->Buffer, Bytes2Read);
+                BytesRead            = FoundationIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
             }
             if (BytesRead < Bytes2Read) {
                 uint8_t *Reallocated = realloc(BitB->Buffer, BytesRead);
@@ -588,9 +588,9 @@ extern "C" {
             uint64_t Bits2Keep    = BitB->BitOffset % 8;
             uint64_t BytesWritten = 0ULL;
             if (BitO->FileType == BitIOFile) {
-                BytesWritten = FoundationIO_FileWrite(BitB->Buffer, 1, Bytes2Write, BitO->File);
+                BytesWritten = FoundationIO_File_Write(BitB->Buffer, 1, Bytes2Write, BitO->File);
             } else if (BitO->FileType == BitIOSocket) {
-                BytesWritten = FoundationIO_SocketWrite(BitO->Socket, BitB->Buffer, Bytes2Write);
+                BytesWritten = FoundationIO_Socket_Write(BitO->Socket, BitB->Buffer, Bytes2Write);
             }
             if (BytesWritten == Bytes2Write) {
                 BitB->Buffer[0] = 0;
@@ -648,7 +648,7 @@ extern "C" {
                 Path32                       = Formatted;
             }
             UTF8  *Path8                     = UTF8_Encode(Path32);
-            BitI->File                       = FoundationIO_FileOpen(Path8, U8("rb"));
+            BitI->File                       = FoundationIO_File_Open(Path8, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
             bool  StringHasBOM               = UTF8_StringHasBOM(Path2Open);
             UTF32 *WinPath32                 = UTF8_Decode(Path2Open);
@@ -656,7 +656,7 @@ extern "C" {
             free(WinPath32);
             UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32);
             free(WinPathLong32);
-            BitI->File                       = FoundationIO_FileOpen(WinPath16, U16("rb"));
+            BitI->File                       = FoundationIO_File_Open(WinPath16, U16("rb"));
             free(WinPath16);
 #endif
             if (BitI->File != NULL) {
@@ -690,7 +690,7 @@ extern "C" {
                 Path32                       = Formatted;
             }
             UTF8  *Path8                     = UTF8_Encode(Path32);
-            BitI->File                       = FoundationIO_FileOpen(Path8, U8("rb"));
+            BitI->File                       = FoundationIO_File_Open(Path8, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
             bool  StringHasBOM               = UTF16_StringHasBOM(Path2Open);
             UTF32 *WinPath32                 = UTF16_Decode(Path2Open);
@@ -698,7 +698,7 @@ extern "C" {
             free(WinPath32);
             UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32);
             free(WinPathLong32);
-            BitI->File                       = FoundationIO_FileOpen(WinPath16, U16("rb"));
+            BitI->File                       = FoundationIO_File_Open(WinPath16, U16("rb"));
             free(WinPath16);
 #endif
             if (BitI->File != NULL) {
@@ -737,10 +737,10 @@ extern "C" {
                 fclose(BitI->File);
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
                 UTF8  *NewPath     = UTF8_FormatString(BitI->InputPath.Path8, BitI->FileSpecifierNum);
-                FoundationIO_FileOpen(NewPath, U8("rb"));
+                FoundationIO_File_Open(NewPath, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
                 UTF16 *NewPath     = UTF16_FormatString(BitI->InputPath.Path16, BitI->FileSpecifierNum);
-                FoundationIO_FileOpen(NewPath, U16("rb"));
+                FoundationIO_File_Open(NewPath, U16("rb"));
 #endif
                 free(NewPath);
             }
@@ -752,7 +752,7 @@ extern "C" {
     void BitInput_OpenSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol) {
         if (BitI != NULL) {
             BitI->FileType = BitIOSocket;
-            BitI->Socket   = FoundationIO_SocketCreate(Domain, Type, Protocol);
+            BitI->Socket   = FoundationIO_Socket_Create(Domain, Type, Protocol);
         } else {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         }
@@ -761,7 +761,7 @@ extern "C" {
     void BitInput_ConnectSocket(BitInput *BitI, struct sockaddr *SocketAddress, const uint64_t SocketSize) {
         if (BitI != NULL && SocketAddress != NULL) {
             BitI->FileType = BitIOSocket;
-            FoundationIO_SocketConnect(BitI->Socket, SocketAddress, SocketSize);
+            FoundationIO_Socket_Connect(BitI->Socket, SocketAddress, SocketSize);
         } else if (BitI == NULL) {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         } else if (SocketAddress == NULL) {
@@ -771,10 +771,10 @@ extern "C" {
     
     static void BitInput_FindFileSize(BitInput *BitI) {
         if (BitI != NULL) {
-            FoundationIO_FileSeek(BitI->File, 0, SEEK_END);
-            BitI->FileSize     = FoundationIO_FileGetSize(BitI->File);
-            FoundationIO_FileSeek(BitI->File, 0, SEEK_SET);
-            BitI->FilePosition = FoundationIO_FileGetSize(BitI->File);
+            FoundationIO_File_Seek(BitI->File, 0, SEEK_END);
+            BitI->FileSize     = FoundationIO_File_GetSize(BitI->File);
+            FoundationIO_File_Seek(BitI->File, 0, SEEK_SET);
+            BitI->FilePosition = FoundationIO_File_GetSize(BitI->File);
         } else {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         }
@@ -822,9 +822,9 @@ extern "C" {
     void BitInput_Deinit(BitInput *BitI) {
         if (BitI != NULL) {
             if (BitI->FileType == BitIOFile) {
-                FoundationIO_FileClose(BitI->File);
+                FoundationIO_File_Close(BitI->File);
             } else if (BitI->FileType == BitIOSocket) {
-                FoundationIO_SocketClose(BitI->Socket);
+                FoundationIO_Socket_Close(BitI->Socket);
             }
             free(BitI);
         } else {
@@ -851,10 +851,10 @@ extern "C" {
             if (BitO->FileSpecifierExists == Yes) {
                 BitO->OutputPath.Path8  = UTF8_Clone(Path2Open);
                 UTF8 *Formatted         = UTF8_FormatString(Path2Open, BitO->FileSpecifierNum);
-                BitO->File              = FoundationIO_FileOpen(Formatted, U8("rb"));
+                BitO->File              = FoundationIO_File_Open(Formatted, U8("rb"));
                 BitO->FileSpecifierNum += 1;
             } else {
-                BitO->File              = FoundationIO_FileOpen(BitO->OutputPath.Path8, U8("rb"));
+                BitO->File              = FoundationIO_File_Open(BitO->OutputPath.Path8, U8("rb"));
             }
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
             bool   StringHasPathPrefix  = UTF8_StringHasWinPathPrefix(Path2Open);
@@ -870,9 +870,9 @@ extern "C" {
             
             if (BitO->FileSpecifierExists == Yes) {
                 UTF16 *Formatted        = UTF16_FormatString(BitO->OutputPath.Path16, BitO->FileSpecifierNum);
-                BitO->File              = FoundationIO_FileOpen(Formatted, U16("rb"));
+                BitO->File              = FoundationIO_File_Open(Formatted, U16("rb"));
             } else {
-                BitO->File              = FoundationIO_FileOpen(BitO->OutputPath.Path16, U16("rb"));
+                BitO->File              = FoundationIO_File_Open(BitO->OutputPath.Path16, U16("rb"));
             }
 #endif
         } else if (BitO == NULL) {
@@ -896,10 +896,10 @@ extern "C" {
             if (BitO->FileSpecifierExists == Yes) {
                 UTF32 *Formatted        = UTF32_FormatString(BitO->OutputPath.Path32, BitO->FileSpecifierNum);
                 UTF8  *Formatted8       = UTF8_Encode(Formatted);
-                FoundationIO_FileOpen(Formatted8, U8("rb"));
+                FoundationIO_File_Open(Formatted8, U8("rb"));
             } else {
                 UTF8 *Formatted8        = UTF8_Encode(BitO->OutputPath.Path32);
-                FoundationIO_FileOpen(Formatted8, U8("rb"));
+                FoundationIO_File_Open(Formatted8, U8("rb"));
             }
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
             bool   StringHasPathPrefix  = UTF16_StringHasWinPathPrefix(Path2Open);
@@ -940,10 +940,10 @@ extern "C" {
                 fclose(BitO->File);
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
                 UTF8  *NewPath     = UTF8_FormatString(BitO->OutputPath.Path8, BitO->FileSpecifierNum);
-                FoundationIO_FileOpen(NewPath, U8("rb"));
+                FoundationIO_File_Open(NewPath, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
                 UTF16 *NewPath     = UTF16_FormatString(BitO->OutputPath.Path16, BitO->FileSpecifierNum);
-                FoundationIO_FileOpen(NewPath, U16("rb"));
+                FoundationIO_File_Open(NewPath, U16("rb"));
 #endif
                 free(NewPath);
             }
@@ -955,7 +955,7 @@ extern "C" {
     void BitOutput_OpenSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol) {
         if (BitO != NULL) {
             BitO->FileType  = BitIOSocket;
-            BitO->Socket    = FoundationIO_SocketCreate(Domain, Type, Protocol);
+            BitO->Socket    = FoundationIO_Socket_Create(Domain, Type, Protocol);
         } else {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         }
@@ -964,7 +964,7 @@ extern "C" {
     void BitOutput_ConnectSocket(BitOutput *BitO, struct sockaddr *SocketAddress, const uint64_t SocketSize) {
         if (BitO != NULL && SocketAddress != NULL) {
             BitO->FileType = BitIOSocket;
-            FoundationIO_SocketConnect(BitO->Socket, SocketAddress, SocketSize);
+            FoundationIO_Socket_Connect(BitO->Socket, SocketAddress, SocketSize);
         } else if (BitO == NULL) {
             Log(Log_ERROR, __func__, U8("BitOutput Pointer is NULL"));
         } else if (SocketAddress == NULL) {
@@ -976,9 +976,9 @@ extern "C" {
         if (BitO != NULL) {
             fflush(BitO->File);
             if (BitO->FileType == BitIOFile) {
-                FoundationIO_FileClose(BitO->File);
+                FoundationIO_File_Close(BitO->File);
             } else if (BitO->FileType == BitIOSocket) {
-                FoundationIO_SocketClose(BitO->Socket);
+                FoundationIO_Socket_Close(BitO->Socket);
             }
             free(BitO);
         } else {
