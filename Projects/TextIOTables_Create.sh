@@ -220,11 +220,11 @@ elif [ $StringIOVMajor -lt $ReadMeVMajor ] || (( [ $StringIOVMajor -eq $ReadMeVM
             CreateCanonicalNormalizationTables
             CreateCaseFoldTables
             CreateOutputFileBottom
-        else; then
+        else
             echo "Not enough free space to extract the UCD zip file, Aborting"
             exit 1
         fi
-    else; then
+    else
         echo "Not enough free space to download the UCD zip file, Aborting"
         exit 1
     fi
