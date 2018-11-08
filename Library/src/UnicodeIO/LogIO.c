@@ -22,9 +22,9 @@ extern "C" {
             bool PathHasBOM      = UTF8_StringHasBOM(LogFilePath);
             if (PathHasBOM) {
                 UTF8 *BOMLess    = UTF8_RemoveBOM(LogFilePath);
-                Log_LogFile      = FoundationIO_FileOpen(BOMLess, U8("a+"));
+                Log_LogFile      = FoundationIO_File_Open(BOMLess, U8("a+"));
             } else {
-                Log_LogFile      = FoundationIO_FileOpen(LogFilePath, U8("a+"));
+                Log_LogFile      = FoundationIO_File_Open(LogFilePath, U8("a+"));
             }
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
             UTF32 *Path32        = UTF8_Decode(LogFilePath);
@@ -36,23 +36,23 @@ extern "C" {
                 free(BOMLess);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
-                Log_LogFile      = FoundationIO_FileOpen(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
                 free(Path16);
             } else if (PathHasBOM == No && PathHasPrefix == Yes) {
                 UTF16 *Path16    = UTF16_Encode(Path32);
-                Log_LogFile      = FoundationIO_FileOpen(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
                 free(Path16);
             } else if (PathHasBOM == Yes && PathHasPrefix == Yes) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
                 UTF16 *Path16    = UTF16_Encode(BOMLess);
                 free(BOMLess);
-                Log_LogFile      = FoundationIO_FileOpen(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
                 free(Path16);
             } else if (PathHasBOM == No && PathHasPrefix == No) {
                 UTF32 *Prefixed  = UTF32_Insert(Path32, U32("\\\\\?\\"), 0);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
-                Log_LogFile      = FoundationIO_FileOpen(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
                 free(Path16);
             }
 #endif
@@ -67,11 +67,11 @@ extern "C" {
             if (PathHasBOM) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
                 UTF8 *Path8      = UTF8_Encode(BOMLess);
-                Log_LogFile      = FoundationIO_FileOpen(Path8, U8("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path8, U8("rb"));
                 free(Path8);
             } else {
                 UTF8  *Path8     = UTF8_Encode(Path32);
-                Log_LogFile      = FoundationIO_FileOpen(Path8, U8("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path8, U8("rb"));
                 free(Path8);
             }
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
@@ -84,23 +84,23 @@ extern "C" {
                 free(BOMLess);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
-                Log_LogFile      = FoundationIO_FileOpen(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
                 free(Path16);
             } else if (PathHasBOM == No && PathHasPrefix == Yes) {
                 UTF16 *Path16    = UTF16_Encode(Path32);
-                Log_LogFile      = FoundationIO_FileOpen(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
                 free(Path16);
             } else if (PathHasBOM == Yes && PathHasPrefix == Yes) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
                 UTF16 *Path16    = UTF16_Encode(BOMLess);
                 free(BOMLess);
-                Log_LogFile      = FoundationIO_FileOpen(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
                 free(Path16);
             } else if (PathHasBOM == No && PathHasPrefix == No) {
                 UTF32 *Prefixed  = UTF32_Insert(Path32, U32("\\\\\?\\"), 0);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
-                Log_LogFile      = FoundationIO_FileOpen(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
                 free(Path16);
             }
 #endif
@@ -134,7 +134,7 @@ extern "C" {
     
     void Log_Deinit(void) {
         if (Log_LogFile != NULL) {
-            FoundationIO_FileClose(Log_LogFile);
+            FoundationIO_File_Close(Log_LogFile);
         }
         if (Log_ProgramName != NULL) {
             free(Log_ProgramName);

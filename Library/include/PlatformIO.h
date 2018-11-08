@@ -84,8 +84,9 @@ extern "C" {
     
 #elif (defined(__APPLE__) && defined(__MACH__)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(__ANDROID__) || defined(__minix) || defined(__linux__) || defined(__unix__) || defined(_POSIX_C_SOURCE)
     
-#include <sys/socket.h>
-#include <unistd.h>
+#include <sys/socket.h> /* Included for socket support */
+#include <unistd.h>     /* Included for stdin/stdout/stderr */
+#include <dlfcn.h>      /* Included for shared library support */
     
 #ifndef             FoundationIOTargetOS
 #define             FoundationIOTargetOS FoundationIOOSPOSIX
@@ -108,68 +109,86 @@ extern "C" {
 #endif
     
 #ifndef             typeof
-#define             typeof(Variable)   __typeof__(Variable)
+#define             typeof(Variable)                                                           __typeof__(Variable)
 #endif
     
-#ifndef             FoundationIO_FileOpen
-#define             FoundationIO_FileOpen(File2OpenPath, FileModeString) fopen(File2OpenPath, FileModeString)
+#ifndef             FoundationIO_File_Open
+#define             FoundationIO_File_Open(File2OpenPath, FileModeString)                      fopen(File2OpenPath, FileModeString)
 #endif
     
-#ifndef             FoundationIO_FileSeek
-#define             FoundationIO_FileSeek(File, Offset, Origin) fseeko(File, Offset, Origin)
+#ifndef             FoundationIO_File_Seek
+#define             FoundationIO_File_Seek(File, Offset, Origin)                               fseeko(File, Offset, Origin)
 #endif
     
-#ifndef             FoundationIO_FileGetSize
-#define             FoundationIO_FileGetSize(File) ftello(File)
+#ifndef             FoundationIO_File_GetSize
+#define             FoundationIO_File_GetSize(File)                                            ftello(File)
 #endif
     
-#ifndef             FoundationIO_FileRead
-#define             FoundationIO_FileRead(Output, ElementSize, NumElements2Read, File2Read) fread(Output, ElementSize, NumElements2Read, File2Read)
+#ifndef             FoundationIO_File_Read
+#define             FoundationIO_File_Read(Output, ElementSize, NumElements2Read, File2Read)   fread(Output, ElementSize, NumElements2Read, File2Read)
 #endif
     
-#ifndef             FoundationIO_FileWrite
-#define             FoundationIO_FileWrite(Input, ElementSize, NumElements2Write, File2Write) fwrite(Input, ElementSize, NumElements2Write, File2Write)
+#ifndef             FoundationIO_File_Write
+#define             FoundationIO_File_Write(Input, ElementSize, NumElements2Write, File2Write) fwrite(Input, ElementSize, NumElements2Write, File2Write)
 #endif
     
-#ifndef             FoundationIO_FileClose
-#define             FoundationIO_FileClose(File2Close) fclose(File2Close)
+#ifndef             FoundationIO_File_Close
+#define             FoundationIO_File_Close(File2Close)                                        fclose(File2Close)
 #endif
     
-#ifndef             FoundationIO_SocketCreate
-#define             FoundationIO_SocketCreate(Family, Type, Protocol) socket(Family, Type, Protocol)
+#ifndef             FoundationIO_Socket_Create
+#define             FoundationIO_Socket_Create(Family, Type, Protocol)                         socket(Family, Type, Protocol)
 #endif
     
-#ifndef             FoundationIO_SocketBind
-#define             FoundationIO_SocketBind(Socket2Bind, Name, NameSize) bind(Socket2Bind, Name, NameSize)
+#ifndef             FoundationIO_Socket_Bind
+#define             FoundationIO_Socket_Bind(Socket2Bind, Name, NameSize)                      bind(Socket2Bind, Name, NameSize)
 #endif
     
-#ifndef             FoundationIO_SocketListen
-#define             FoundationIO_SocketListen(BoundUnconnectedSocket, BacklogSize) listen(BoundUnconnectedSocket, BacklogSize)
+#ifndef             FoundationIO_Socket_Listen
+#define             FoundationIO_Socket_Listen(BoundUnconnectedSocket, BacklogSize)            listen(BoundUnconnectedSocket, BacklogSize)
 #endif
     
-#ifndef             FoundationIO_SocketAccept
-#define             FoundationIO_SocketAccept(Socket2Accept, Name, NameSize) accept(Socket2Accept, Name, NameSize)
+#ifndef             FoundationIO_Socket_Accept
+#define             FoundationIO_Socket_Accept(Socket2Accept, Name, NameSize)                  accept(Socket2Accept, Name, NameSize)
 #endif
     
-#ifndef             FoundationIO_SocketConnect
-#define             FoundationIO_SocketConnect(Socket2Connect, Name, NameSize) connect(Socket2Connect, Name, NameSize)
+#ifndef             FoundationIO_Socket_Connect
+#define             FoundationIO_Socket_Connect(Socket2Connect, Name, NameSize)                connect(Socket2Connect, Name, NameSize)
 #endif
     
-#ifndef             FoundationIO_SocketRead
-#define             FoundationIO_SocketRead(Socket2Read, Buffer2Write, NumBytes) read(Socket2Read, Buffer2Write, NumBytes)
+#ifndef             FoundationIO_Socket_Read
+#define             FoundationIO_Socket_Read(Socket2Read, Buffer2Write, NumBytes)              read(Socket2Read, Buffer2Write, NumBytes)
 #endif
     
-#ifndef             FoundationIO_SocketWrite
-#define             FoundationIO_SocketWrite(Socket2Write, Buffer2Write, NumBytes) write(Socket2Write, Buffer2Write, NumBytes)
+#ifndef             FoundationIO_Socket_Write
+#define             FoundationIO_Socket_Write(Socket2Write, Buffer2Write, NumBytes)            write(Socket2Write, Buffer2Write, NumBytes)
 #endif
     
-#ifndef             FoundationIO_SocketClose
-#define             FoundationIO_SocketClose(Socket2Close) close(Socket2Close)
+#ifndef             FoundationIO_Socket_Close
+#define             FoundationIO_Socket_Close(Socket2Close)                                    close(Socket2Close)
+#endif
+    
+#ifndef             FoundationIO_SharedLibrary_Open
+#define             FoundationIO_SharedLibrary_Open(PathUTF8, Mode)                            dlopen(PathUTF8, Mode)
+#endif
+    
+#ifndef             FoundationIO_SharedLibrary_GetSymbol
+#define             FoundationIO_SharedLibrary_GetSymbol(LibraryAddress, Symbol)               dlsym(LibraryAddress, Symbol)
+#endif
+    
+#ifndef             FoundationIO_SharedLibrary_Close
+#define             FoundationIO_SharedLibrary_Close(LibraryAddress)                           dlclose(LibraryAddress)
 #endif
     
 #elif    defined(WIN32) || defined(WIN32) || defined(WINNT) || defined(_WIN32) ||  defined(_WIN64)
     
-#include <io.h>                       /* Included because WinSock needs it */
+#ifndef   WIN32_LEAN_AND_MEAN
+#define   WIN32_LEAN_AND_MEAN
+#endif /* WIN32_LEAN_AND_MEAN */
+#ifndef   VC_EXTRALEAN
+#define   VC_EXTRALEAN
+#endif /* VC_EXTRALEAN */
+#include <Windows.h>                  /* Included for Shared Library support, Winsock, WinCon */
 #include <winsock.h>                  /* Included for the socket support on Windows */
     
 #ifndef             FoundationIOTargetOS
@@ -193,78 +212,90 @@ extern "C" {
 #endif
     
 #ifndef             typeof
-#define             typeof(Variable)        __typeof(Variable)
+#define             typeof(Variable)                                                           __typeof(Variable)
 #endif
     
 #ifndef             restrict
-#define             restrict                __restrict
+#define             restrict                                                                   __restrict
 #endif
     
-#ifndef             FoundationIO_FileOpen
+#ifndef             FoundationIO_File_Open
 #pragma warning(disable: 4996)
 #pragma warning(push)
-#define             FoundationIO_FileOpen(File2Open, FileModeString) _wfopen(File2Open, FileModeString)
+#define             FoundationIO_File_Open(File2Open, FileModeString)                          _wfopen(File2Open, FileModeString)
 #pragma warning(pop)
 #endif
     
-#ifndef             FoundationIO_FileSeek
-#define             FoundationIO_FileSeek(File, Offset, Origin) _fseeki64(File, Offset, Origin)
+#ifndef             FoundationIO_File_Seek
+#define             FoundationIO_File_Seek(File, Offset, Origin)                               _fseeki64(File, Offset, Origin)
 #endif
     
-#ifndef             FoundationIO_FileGetSize
-#define             FoundationIO_FileGetSize(File)  _ftelli64(File)
+#ifndef             FoundationIO_File_GetSize
+#define             FoundationIO_File_GetSize(File)                                            _ftelli64(File)
 #endif
     
-#ifndef             FoundationIO_FileRead
-#define             FoundationIO_FileRead(Output, ElementSize, NumElements2Read, File2Read) fread(Output, ElementSize, NumElements2Read, File2Read)
+#ifndef             FoundationIO_File_Read
+#define             FoundationIO_File_Read(Output, ElementSize, NumElements2Read, File2Read)   fread(Output, ElementSize, NumElements2Read, File2Read)
 #endif
     
-#ifndef             FoundationIO_FileWrite
-#define             FoundationIO_FileWrite(Input, ElementSize, NumElements2Read, File2Write) fwrite(Input, ElementSize, NumElements2Read, File2Write)
+#ifndef             FoundationIO_File_Write
+#define             FoundationIO_File_Write(Input, ElementSize, NumElements2Read, File2Write)  fwrite(Input, ElementSize, NumElements2Read, File2Write)
 #endif
     
-#ifndef             FoundationIO_FileClose
-#define             FoundationIO_FileClose(File2Close) fclose(File2Close)
+#ifndef             FoundationIO_File_Close
+#define             FoundationIO_File_Close(File2Close)                                        fclose(File2Close)
 #endif
     
-#ifndef             FoundationIO_SocketCreate
-#define             FoundationIO_SocketCreate(Family, Type, Protocol) socket(Family, Type, Protocol)
+#ifndef             FoundationIO_Socket_Create
+#define             FoundationIO_Socket_Create(Family, Type, Protocol)                         socket(Family, Type, Protocol)
 #endif
     
-#ifndef             FoundationIO_SocketBind
-#define             FoundationIO_SocketBind(Socket2Bind, Name, NameSize) bind(Socket2Bind, Name, NameSize)
+#ifndef             FoundationIO_Socket_Bind
+#define             FoundationIO_Socket_Bind(Socket2Bind, Name, NameSize)                      bind(Socket2Bind, Name, NameSize)
 #endif
     
-#ifndef             FoundationIO_SocketListen
-#define             FoundationIO_SocketListen(BoundUnconnectedSocket, BacklogSize) listen(BoundUnconnectedSocket, BacklogSize)
+#ifndef             FoundationIO_Socket_Listen
+#define             FoundationIO_Socket_Listen(BoundUnconnectedSocket, BacklogSize)            listen(BoundUnconnectedSocket, BacklogSize)
 #endif
     
-#ifndef             FoundationIO_SocketAccept
-#define             FoundationIO_SocketAccept(Socket2Accept, Name, NameSize) accept(Socket2Accept, Name, NameSize)
+#ifndef             FoundationIO_Socket_Accept
+#define             FoundationIO_Socket_Accept(Socket2Accept, Name, NameSize)                  accept(Socket2Accept, Name, NameSize)
 #endif
     
-#ifndef             FoundationIO_SocketConnect
-#define             FoundationIO_SocketConnect(Socket2Connect, Name, NameSize) connect(Socket2Connect, Name, NameSize)
+#ifndef             FoundationIO_Socket_Connect
+#define             FoundationIO_Socket_Connect(Socket2Connect, Name, NameSize)                connect(Socket2Connect, Name, NameSize)
 #endif
     
-#ifndef             FoundationIO_SocketRead
-#define             FoundationIO_SocketRead(Socket2Read, Buffer2Write, NumBytes) read(Socket2Read, Buffer2Write, NumBytes)
+#ifndef             FoundationIO_Socket_Read
+#define             FoundationIO_Socket_Read(Socket2Read, Buffer2Write, NumBytes)              read(Socket2Read, Buffer2Write, NumBytes)
 #endif
     
-#ifndef             FoundationIO_SocketWrite
-#define             FoundationIO_SocketWrite(Socket2Read, Buffer2Write, NumBytes) write(Socket2Read, Buffer2Write, NumBytes)
+#ifndef             FoundationIO_Socket_Write
+#define             FoundationIO_Socket_Write(Socket2Read, Buffer2Write, NumBytes)             write(Socket2Read, Buffer2Write, NumBytes)
 #endif
     
-#ifndef             FoundationIO_SocketClose
-#define             FoundationIO_SocketClose(Socket2Close) close(Socket2Close)
+#ifndef             FoundationIO_Socket_Close
+#define             FoundationIO_Socket_Close(Socket2Close)                                    close(Socket2Close)
+#endif
+    
+#ifndef             FoundationIO_SharedLibrary_Open
+#define             FoundationIO_SharedLibrary_Open(PathUTF16, Mode)                           LoadLibraryEx(PathUTF16, NULL, Mode)
+#endif
+    
+#ifndef             FoundationIO_SharedLibrary_GetSymbol
+#define             FoundationIO_SharedLibrary_GetSymbol(LibraryAddress, Symbol)               GetProcAddress(LibraryAddress, Symbol)
+#endif
+    
+#ifndef             FoundationIO_SharedLibrary_Close
+#define             FoundationIO_SharedLibrary_Close(LibraryAddress)                           FreeLibrary(LibraryAddress)
 #endif
     
 #ifndef             FoundationIOFormatStringAttribute
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
 #include <sal.h>
-#define             FoundationIOFormatStringAttribute(ParamBeforeVarArgs, VarArgsParam) __format_string
+#define             FoundationIOFormatStringAttribute(ParamBeforeVarArgs, VarArgsParam)        __format_string
 #elif    (_MSC_VER >= 1500)
-#define             FoundationIOFormatStringAttribute(ParamBeforeVarArgs, VarArgsParam) _Printf_format_string_
+#define             FoundationIOFormatStringAttribute(ParamBeforeVarArgs, VarArgsParam)        _Printf_format_string_
 #else
 #define             FoundationIOFormatStringAttribute(ParamBeforeVarArgs, VarArgsParam)
 #endif /* _MSC_VER */
@@ -279,31 +310,31 @@ extern "C" {
 #endif   /* End OS detection */
     
 #ifndef FoundationIOCompileTimeByteOrderUnknown
-#define FoundationIOCompileTimeByteOrderUnknown 0
+#define FoundationIOCompileTimeByteOrderUnknown                                                0
 #endif
     
 #ifndef FoundationIOCompileTimeByteOrderBE
-#define FoundationIOCompileTimeByteOrderBE      1
+#define FoundationIOCompileTimeByteOrderBE                                                     1
 #endif
     
 #ifndef FoundationIOCompileTimeByteOrderLE
-#define FoundationIOCompileTimeByteOrderLE      2
+#define FoundationIOCompileTimeByteOrderLE                                                     2
 #endif
     
 #ifndef FoundationIOCompilerIsUnknown
-#define FoundationIOCompilerIsUnknown           0
+#define FoundationIOCompilerIsUnknown                                                          0
 #endif
     
 #ifndef FoundationIOCompilerIsClang
-#define FoundationIOCompilerIsClang             1
+#define FoundationIOCompilerIsClang                                                            1
 #endif
     
 #ifndef FoundationIOCompilerIsMSVC
-#define FoundationIOCompilerIsMSVC              2
+#define FoundationIOCompilerIsMSVC                                                             2
 #endif
     
 #ifndef FoundationIOCompilerIsGCC
-#define FoundationIOCompilerIsGCC               3
+#define FoundationIOCompilerIsGCC                                                              3
 #endif
     
 #ifndef FoundationIOCompiler
@@ -318,12 +349,12 @@ extern "C" {
     
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
 #if   (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-#define FoundationIOTargetByteOrder FoundationIOCompileTimeByteOrderBE
+#define FoundationIOTargetByteOrder  (FoundationIOCompileTimeByteOrderBE)
 #elif (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define FoundationIOTargetByteOrder FoundationIOCompileTimeByteOrderLE
+#define FoundationIOTargetByteOrder (FoundationIOCompileTimeByteOrderLE)
 #endif /* __BYTE_ORDER__ */
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
-#define FoundationIOTargetByteOrder FoundationIOCompileTimeByteOrderLE
+#define FoundationIOTargetByteOrder (FoundationIOCompileTimeByteOrderLE)
 #endif /* FoundationIOTargetOS */
     
 #ifdef  FoundationIOPrivateCountVariadicArguments
