@@ -255,8 +255,8 @@ extern "C" {
     uint8_t                     CreateBitMask(const uint8_t NumBits2Select);
     
 #define Absolute(Value)                     _Generic((Value), uint8_t:AbsoluteI, int8_t:AbsoluteI, uint16_t:AbsoluteI, int16_t:AbsoluteI, uint32_t:AbsoluteI, int32_t:AbsoluteI, uint64_t:AbsoluteI, int64_t:AbsoluteI, float:AbsoluteF, double:AbsoluteD)(Value)
-#define Floor(Value)                        _Generic((Value), uint8_t:FloorI, int8_t:FloorI, uint16_t:FloorI, int16_t:FloorI, uint32_t:FloorI, int32_t:FloorI, uint64_t:FloorI, int64_t:FloorI, float:FloorF, double:FloorD)(Value)
-#define Ceil(Value)                         _Generic((Value), float:CeilF, double:CeilD)(Value)
+#define Floor(Value)                        _Generic((Value),   float:FloorF, double:FloorD)(Value)
+#define Ceil(Value)                         _Generic((Value),   float:CeilF, double:CeilD)(Value)
 #define DecimalIsNormal(Decimal)            _Generic((Decimal), float:DecimalIsNormalF, double:DecimalIsNormalD)(Decimal)
 #define DecimalIsInfinity(Decimal)          _Generic((Decimal), float:DecimalIsInfinityF, double:DecimalIsInfinityD)(Decimal)
 #define DecimalIsNotANumber(Decimal)        _Generic((Decimal), float:DecimalIsNotANumberF, double:DecimalIsNotANumberD)(Decimal)
