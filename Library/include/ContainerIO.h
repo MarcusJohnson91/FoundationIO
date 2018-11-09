@@ -155,10 +155,8 @@ extern "C" {
     
     typedef enum Image_Types {
         ImageType_Unknown           = 0,
-        ImageType_Unsigned          = 1,
-        ImageType_Signed            = 2,
-        ImageType_Integer8          = 4,
-        ImageType_Integer16         = 8,
+        ImageType_Integer8          = 1,
+        ImageType_Integer16         = 2,
     } Image_Types;
     
     typedef struct          ImageContainer ImageContainer;
