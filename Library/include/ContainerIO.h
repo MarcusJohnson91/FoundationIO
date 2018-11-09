@@ -26,12 +26,13 @@ extern "C" {
         AudioMask_LFE               = 8,
         AudioMask_SurroundLeft      = 16,
         AudioMask_SurroundRight     = 32,
-        AudioMask_RearLeft          = 64,
-        AudioMask_RearRight         = 128,
-        AudioMask_RearCenter        = 256,
+        AudioMask_SurroundCenter    = 64,
+        AudioMask_RearLeft          = 128,
+        AudioMask_RearRight         = 256,
+        AudioMask_RearCenter        = 512,
     } Audio_ChannelMask;
     
-    typedef enum Audio_Types { // Let's make this mask ORable
+    typedef enum Audio_Types {
         AudioType_Unknown           = 0,
         AudioType_Unsigned          = 1,
         AudioType_Signed            = 2,
