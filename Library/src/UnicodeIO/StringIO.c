@@ -1220,14 +1220,7 @@ extern "C" {
             do {
                 for (uint64_t Index = 0ULL; Index < CaseFoldTableSize; Index++) {
                     if (String[CodePoint] == CaseFoldCodePoints[Index]) {
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(push)
-#pragma warning(disable: 4090)
-#endif
                         CaseFoldedString = UTF32_ReplaceSubString(String, CaseFoldStrings[Index], CodePoint, 1);
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(pop)
-#endif
                     }
                 }
                 CodePoint += 1;
@@ -1330,27 +1323,13 @@ extern "C" {
                 if (Kompatibility == Yes) {
                     for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(push)
-#pragma warning(disable: 4090)
-#endif
                             ComposedString = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(pop)
-#endif
                         }
                     }
                 } else {
                     for (uint64_t DecomposeCodePoint = 0ULL; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[DecomposeCodePoint]) {
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(push)
-#pragma warning(disable: 4090)
-#endif
                             ComposedString = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[DecomposeCodePoint], CodePoint, 1);
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(pop)
-#endif
                         }
                     }
                 }
@@ -1371,27 +1350,13 @@ extern "C" {
                 if (Kompatibility == Yes) {
                     for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(push)
-#pragma warning(disable: 4090)
-#endif
                             Decomposed = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(pop)
-#endif
                         }
                     }
                 } else {
                     for (uint64_t Index = 0ULL; Index < CanonicalNormalizationTableSize; Index++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[Index]) {
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(push)
-#pragma warning(disable: 4090)
-#endif
                             Decomposed = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[Index], CodePoint, 1);
-#if   (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#pragma warning(pop)
-#endif
                         }
                     }
                 }
