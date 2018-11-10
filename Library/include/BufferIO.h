@@ -2,21 +2,23 @@
 #include <stdbool.h>
 
 /* Forward declare StringIO's types */
-#ifdef  UTF8
-#undef  UTF8
-typedef               uint_least8_t                        UTF8;
-#elif !defined UTF8
-typedef               uint_least8_t                        UTF8;
+#ifndef UTF8
+typedef               unsigned char                        UTF8;
 #endif
 
-#ifdef  UTF16
-#undef  UTF16
-typedef               uint_least16_t                       UTF16;
-#elif !defined UTF16
+#ifndef UTF16
 #ifdef  char16_t
 typedef               char16_t                             UTF16;
 #else
 typedef               uint_least16_t                       UTF16;
+#endif
+#endif
+
+#ifndef UTF32
+#ifdef  char32_t
+typedef               char32_t                             UTF32;
+#else
+typedef               uint_least32_t                       UTF32;
 #endif
 #endif
 

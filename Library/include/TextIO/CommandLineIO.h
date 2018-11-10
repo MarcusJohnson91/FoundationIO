@@ -3,7 +3,7 @@
 
 /* Forward declare StringIO's types */
 #ifndef UTF8
-typedef               uint_least8_t                        UTF8;
+typedef               unsigned char                        UTF8;
 #endif
 
 #ifndef UTF16
