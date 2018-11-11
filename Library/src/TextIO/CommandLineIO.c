@@ -9,7 +9,7 @@
 #include <sys/ioctl.h>                 /* Included for the terminal size */
 #include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
-#include <Wincon.h>                    /* Included for getting the terminal size, MAKE SURE Macros.h is included before this, it includes Windows.h */
+#include <wincon.h>                    /* Included for getting the terminal size, MAKE SURE Macros.h is included before this, it includes Windows.h */
 #endif
 
 #ifdef __cplusplus
