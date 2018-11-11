@@ -823,7 +823,7 @@ extern "C" {
                     ArgumentStringPrefixSize  = 1;
                 }
             } else {
-                Log(Log_DEBUG, __func__, U8("ArgumentString is not an Argument string"));
+                Log(Log_ERROR, __func__, U8("ArgumentString is not an Argument string"));
             }
             uint64_t ArgumentSwitchSize    = ArgumentStringSize - ArgumentStringPrefixSize;
             ArgumentSwitch                 = UTF32_ExtractSubString(UTF32_CaseFoldString(ArgumentString), ArgumentStringPrefixSize, ArgumentStringSize);
