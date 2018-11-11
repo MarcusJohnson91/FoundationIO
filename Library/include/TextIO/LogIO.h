@@ -36,17 +36,17 @@ extern "C" {
      @author                    Marcus Johnson
      @copyright                 2017+
      @version                   1.0.0
-     @brief                     This header contains code for logging errors and debugging information.
+     @brief                     This header contains code for logging errors and testingR information.
      */
     
     /*!
      @enum                      LogTypes
      @constant                  Log_ERROR                       "An error occurred".
-     @constant                  Log_DEBUG                       "Information for debugging".
+     @constant                  Log_TEST                        "TestIO failed".
      */
     typedef enum LogTypes {
                                 Log_ERROR                       = 1,
-                                Log_DEBUG                       = 2,
+                                Log_TEST                        = 2,
     } LogTypes;
     
     /*!
