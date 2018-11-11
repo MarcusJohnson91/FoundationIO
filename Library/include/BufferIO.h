@@ -1,5 +1,5 @@
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 /* Forward declare StringIO's types */
 #ifndef UTF8

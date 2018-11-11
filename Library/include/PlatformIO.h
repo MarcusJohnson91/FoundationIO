@@ -84,9 +84,9 @@ extern "C" {
     
 #elif (defined(__APPLE__) && defined(__MACH__)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(__ANDROID__) || defined(__minix) || defined(__linux__) || defined(__unix__) || defined(_POSIX_C_SOURCE)
     
+#include <dlfcn.h>      /* Included for shared library support */
 #include <sys/socket.h> /* Included for socket support */
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
-#include <dlfcn.h>      /* Included for shared library support */
     
 #ifndef             FoundationIOTargetOS
 #define             FoundationIOTargetOS FoundationIOOSPOSIX
