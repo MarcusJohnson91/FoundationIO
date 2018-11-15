@@ -401,14 +401,14 @@ extern "C" {
              */
             
             uint64_t *StringSize = calloc(NumItems2Display, sizeof(uint64_t));
-            for (uint8_t Item = 0; Item < NumItems2Display; Item++) { // Get the size of the strings
+            for (uint8_t Item = 0; Item < NumItems2Display - 1; Item++) { // Get the size of the strings
                 StringSize[Item] = UTF8_GetStringSizeInCodePoints(Strings[Item]);
                 // huh, well we need 2 characters for the brackets.
             }
             // Number of seperators for each string
             uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
             UTF8     *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF8));
-            for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
+            for (uint8_t String = 0; String < NumItems2Display - 1; String++) { // Actually create the strings
                                                                             // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
@@ -447,14 +447,14 @@ extern "C" {
              */
             
             uint64_t *StringSize = calloc(NumItems2Display, sizeof(uint64_t));
-            for (uint8_t Item = 0; Item < NumItems2Display; Item++) { // Get the size of the strings
+            for (uint8_t Item = 0; Item < NumItems2Display - 1; Item++) { // Get the size of the strings
                 StringSize[Item] = UTF16_GetStringSizeInCodePoints(Strings[Item]);
                 // huh, well we need 2 characters for the brackets.
             }
             // Number of seperators for each string
             uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
             UTF16    *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF16));
-            for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
+            for (uint8_t String = 0; String < NumItems2Display - 1; String++) { // Actually create the strings
                                                                             // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
                 uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
@@ -854,7 +854,7 @@ extern "C" {
                         
                         for (int64_t ArgSlave = 1LL; ArgSlave < CLI->SwitchIDs[Switch].MaxConcurrentSlaves; ArgSlave++) {
                             UTF32 *PotentialSlaveArg        = Arguments[CurrentArgument + ArgSlave];
-                            for (int64_t Slave = 0LL; Slave < CLI->SwitchIDs[Switch].NumPotentialSlaves; Slave++) {
+                            for (int64_t Slave = 0LL; Slave < CLI->SwitchIDs[Switch].NumPotentialSlaves - 1; Slave++) {
                                 UTF32 *PotentialSlaveFlag   = CLI->SwitchIDs[CLI->SwitchIDs[Switch].PotentialSlaves[Slave]].Name;
                                 
                                 if (UTF32_Compare(PotentialSlaveArg, PotentialSlaveFlag) == Yes) {
@@ -873,7 +873,7 @@ extern "C" {
             } while (CurrentArgument < NumArguments);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
-        } else if (CLI->MinOptions < 1 || NumArguments <= 1) {
+        } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
             Log(Log_ERROR, __func__, U8("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
         }
     }
@@ -881,7 +881,7 @@ extern "C" {
     void CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF8 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             UTF32 **Arguments32     = calloc(NumArguments, sizeof(UTF32*));
-            for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
+            for (int64_t Arg = 0LL; Arg < NumArguments - 1; Arg++) {
                 UTF32 *Decoded      = UTF8_Decode(Arguments[Arg]);
                 UTF32 *CaseFolded   = UTF32_CaseFoldString(Decoded);
                 free(Decoded);
@@ -890,13 +890,13 @@ extern "C" {
                 Arguments32[Arg]    = Normalized;
             }
             CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, Arguments32);
-            for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
+            for (int64_t Arg = 0LL; Arg < NumArguments - 1; Arg++) {
                 free(Arguments32[Arg]);
             }
             free(Arguments32);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
-        } else if (CLI->MinOptions < 1 || NumArguments <= 1) {
+        } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
             CommandLineIO_UTF8_DisplayHelp(CLI);
         }
     }
@@ -904,7 +904,7 @@ extern "C" {
     void CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF16 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             UTF32 **Arguments32     = calloc(NumArguments, sizeof(UTF32*));
-            for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
+            for (int64_t Arg = 0LL; Arg < NumArguments - 1; Arg++) {
                 UTF32 *Decoded      = UTF16_Decode(Arguments[Arg]);
                 UTF32 *CaseFolded   = UTF32_CaseFoldString(Decoded);
                 free(Decoded);
@@ -913,13 +913,13 @@ extern "C" {
                 Arguments32[Arg]    = Normalized;
             }
             CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, Arguments32);
-            for (int64_t Arg = 0LL; Arg < NumArguments; Arg++) {
+            for (int64_t Arg = 0LL; Arg < NumArguments - 1; Arg++) {
                 free(Arguments32[Arg]);
             }
             free(Arguments32);
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
-        } else if (CLI->MinOptions < 1 || NumArguments <= 1) {
+        } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
             CommandLineIO_UTF16_DisplayHelp(CLI);
         }
     }
@@ -1019,8 +1019,8 @@ extern "C" {
             }
             Extension = calloc(UnicodeBOMSizeInCodePoints + ExtensionSize + NULLTerminatorSize , sizeof(UTF32));
             if (Extension != NULL) {
-                for (uint64_t ExtCodePoint = 0ULL; ExtCodePoint < ExtensionSize; ExtCodePoint++) {
-                    for (uint64_t PathCodePoint = StringSize - ExtensionSize; PathCodePoint < StringSize; PathCodePoint++) {
+                for (uint64_t ExtCodePoint = 0ULL; ExtCodePoint < ExtensionSize - 1; ExtCodePoint++) {
+                    for (uint64_t PathCodePoint = StringSize - ExtensionSize; PathCodePoint < StringSize - 1; PathCodePoint++) {
                         Extension[ExtCodePoint] = Path[PathCodePoint];
                     }
                 }
@@ -1070,7 +1070,7 @@ extern "C" {
                 }
             }
             if (CLI->NumOptions > 0) {
-                for (int64_t Option = 0LL; Option <= CLI->NumOptions - 1; Option++) {
+                for (int64_t Option = 0LL; Option < CLI->NumOptions - 1; Option++) {
                     free(CLI->OptionIDs[Option].OptionSlaves);
                     free(CLI->OptionIDs[Option].Argument);
                 }
