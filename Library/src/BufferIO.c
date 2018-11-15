@@ -27,12 +27,14 @@ extern "C" {
         int64_t    NumBits;
     } BitBuffer;
     
+    typedef union Path {
+        UTF32      *Path32;
+        UTF16      *Path16;
+        UTF8       *Path8;
+    } Path;
+    
     typedef struct BitInput {
-        union InputPath { // and lets make sure to copy the path
-            UTF32      *Path32;
-            UTF16      *Path16;
-            UTF8       *Path8;
-        } InputPath;
+        Path            InputPath;
         FILE           *File;
         int64_t         FileSpecifierNum;
         int64_t         FilePosition;
@@ -44,11 +46,7 @@ extern "C" {
     } BitInput;
     
     typedef struct BitOutput {
-        union OutputPath {
-            UTF32      *Path32;
-            UTF16      *Path16;
-            UTF8       *Path8;
-        } OutputPath;
+        Path            OutputPath;
         FILE           *File;
         int64_t         FileSpecifierNum;
         int64_t         FilePosition;
