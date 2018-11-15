@@ -196,7 +196,7 @@ extern "C" {
     void BitBuffer_Clear(BitBuffer *BitB) {
         if (BitB != NULL) {
             uint64_t BufferSize = BitB->NumBits / 8;
-            for (uint64_t Byte = 0ULL; Byte < BufferSize; Byte++) {
+            for (uint64_t Byte = 0ULL; Byte < BufferSize - 1; Byte++) {
                 BitB->Buffer[Byte] = 0;
             }
         } else {
@@ -228,7 +228,7 @@ extern "C" {
             } else if (BitI->FileType == BitIOSocket) {
                 BytesRead            = FoundationIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
             }
-            if (BytesRead < Bytes2Read) {
+            if (BytesRead != Bytes2Read) {
                 uint8_t *Reallocated = realloc(BitB->Buffer, BytesRead);
                 if (Reallocated != NULL) {
                     BitB->Buffer     = Reallocated;
@@ -501,7 +501,7 @@ extern "C" {
             int64_t StringSize    = UTF8_GetStringSizeInCodeUnits(String2Write);
             int64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
             if (BitsAvailable >= Bytes2Bits(StringSize)) {
-                for (int64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
+                for (int64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
                     BitBuffer_InsertBits(MSByteFirst, LSBitFirst, BitB, 8, String2Write[CodeUnit]);
                 }
             } else {
@@ -521,7 +521,7 @@ extern "C" {
             if (BitsAvailable >= (uint64_t) Bytes2Bits(StringSize)) {
                 UTF16 ByteOrder    = String2Write[0];
                 if (ByteOrder == UTF16BOM_BE) {
-                    for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
+                    for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
 #if    (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
                         BitBuffer_InsertBits(MSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
 #elif  (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
@@ -529,7 +529,7 @@ extern "C" {
 #endif
                     }
                 } else if (ByteOrder == UTF16BOM_LE) {
-                    for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
+                    for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
 #if    (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
                         BitBuffer_InsertBits(LSByteFirst, LSBitFirst, BitB, 16, String2Write[CodeUnit]);
 #elif  (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
@@ -551,7 +551,7 @@ extern "C" {
         if (BitB != NULL && BitBuffer_GetPosition(BitB)  && GUUID2Write != NULL) { // TODO: Make sure that the BitBuffer can hold the GUUID
             uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? GUUIDStringSize - NULLTerminatorSize : BinaryGUUIDSize);
             uint8_t ByteOrder = ((GUUIDType == GUIDString || GUUIDType == BinaryGUID) ? LSByteFirst : MSByteFirst);
-            for (uint8_t Byte = 0; Byte < GUUIDSize; Byte++) {
+            for (uint8_t Byte = 0; Byte < GUUIDSize - 1; Byte++) {
                 BitBuffer_WriteBits(ByteOrder, LSBitFirst, BitB, 8, GUUID2Write[Byte]);
             }
         } else if (BitB == NULL) {
@@ -971,7 +971,7 @@ extern "C" {
         uint8_t GUUIDSize = ((Type2Compare == GUIDString || Type2Compare == UUIDString) ? BinaryGUUIDSize - NULLTerminatorSize : BinaryGUUIDSize);
         bool GUUIDsMatch        = Yes;
         if (GUUID1 != NULL && GUUID2 != NULL && Type2Compare != UnknownGUUID) {
-            for (uint8_t BinaryGUUIDByte = 0; BinaryGUUIDByte < GUUIDSize; BinaryGUUIDByte++) {
+            for (uint8_t BinaryGUUIDByte = 0; BinaryGUUIDByte < GUUIDSize - 1; BinaryGUUIDByte++) {
                 if (GUUID1[BinaryGUUIDByte] != GUUID2[BinaryGUUIDByte]) {
                     GUUIDsMatch = No;
                 }
@@ -1001,16 +1001,16 @@ extern "C" {
             
             if (TypeDiffers == Yes) {
                 if ((InputType == UUIDString || InputType == GUIDString) && (OutputType == BinaryUUID || OutputType == BinaryGUID)) {
-                    for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize; StringByte++) {
-                        for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize; BinaryByte++) {
+                    for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize - 1; StringByte++) {
+                        for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize - 1; BinaryByte++) {
                             if (GUUID2Convert[StringByte] != Dash) {
                                 ConvertedGUUID[BinaryByte] = GUUID2Convert[StringByte];
                             }
                         }
                     }
                 } else if ((InputType == BinaryUUID || InputType == BinaryGUID) || (OutputType == UUIDString || OutputType == GUIDString)) {
-                    for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize; BinaryByte++) {
-                        for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize; StringByte++) {
+                    for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize - 1; BinaryByte++) {
+                        for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize - 1; StringByte++) {
                             if (BinaryByte != 4 && BinaryByte != 7 && BinaryByte != 10 && BinaryByte != 13) {
                                 ConvertedGUUID[StringByte]  = GUUID2Convert[BinaryByte];
                             } else {
@@ -1083,7 +1083,7 @@ extern "C" {
                     
                     SwappedGUUID[8]   = GUUID2Swap[9];
                     SwappedGUUID[9]   = GUUID2Swap[8];
-                    for (uint8_t EndBytes = 10; EndBytes < BinaryGUUIDSize; EndBytes++) {
+                    for (uint8_t EndBytes = 10; EndBytes < BinaryGUUIDSize - 1; EndBytes++) {
                         SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
                     }
                 } else {
