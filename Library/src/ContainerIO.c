@@ -794,10 +794,10 @@ extern "C" {
     }
     
     typedef struct ImageHistogram {
-        union I_Histogram {
+        union Histogram {
             uint16_t ***UInteger16;
             uint8_t  ***UInteger8;
-        } I_Histogram;
+        } Histogram;
         uint64_t        NumEntries;
         Image_Types     Type;
     } ImageHistogram;
@@ -808,22 +808,22 @@ extern "C" {
             Histogram                                = calloc(1, sizeof(Histogram));
             if (Histogram != NULL) {
                 if (Image->Type == ImageType_Integer8) {
-                    Histogram->I_Histogram.UInteger8 = calloc(Image->NumChannels, Image->NumViews * Image->Height * Image->Width);
-                    if (Histogram->I_Histogram.UInteger8 != NULL) {
+                    Histogram->Histogram.UInteger8 = calloc(Image->NumChannels, Image->NumViews * Image->Height * Image->Width);
+                    if (Histogram->Histogram.UInteger8 != NULL) {
                         Histogram->Type              = Image->Type;
                         Histogram->NumEntries        = Image->Height * Image->Width;
                     } else {
-                        free(Histogram->I_Histogram.UInteger8);
+                        free(Histogram->Histogram.UInteger8);
                         free(Histogram);
                         Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
                     }
                 } else if (Image->Type == ImageType_Integer16) {
-                    Histogram->I_Histogram.UInteger16 = calloc(Image->NumChannels, Image->NumViews * Image->Height * Image->Width);
-                    if (Histogram->I_Histogram.UInteger16 != NULL) {
+                    Histogram->Histogram.UInteger16 = calloc(Image->NumChannels, Image->NumViews * Image->Height * Image->Width);
+                    if (Histogram->Histogram.UInteger16 != NULL) {
                         Histogram->Type              = Image->Type;
                         Histogram->NumEntries        = Image->Height * Image->Width;
                     } else {
-                        free(Histogram->I_Histogram.UInteger16);
+                        free(Histogram->Histogram.UInteger16);
                         free(Histogram);
                         Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
                     }
@@ -841,9 +841,9 @@ extern "C" {
         void ***Array = NULL;
         if (Histogram != NULL) {
             if (Histogram->Type == ImageType_Integer8) {
-                Array = (void***) Histogram->I_Histogram.UInteger8;
+                Array = (void***) Histogram->Histogram.UInteger8;
             } else if (Histogram->Type == ImageType_Integer16) {
-                Array = (void***) Histogram->I_Histogram.UInteger16;
+                Array = (void***) Histogram->Histogram.UInteger16;
             }
         } else {
             Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
@@ -854,9 +854,9 @@ extern "C" {
     void ImageHistogram_SetArray(ImageHistogram *Histogram, void ***Array) {
         if (Histogram != NULL && Array != NULL) {
             if (Histogram->Type == ImageType_Integer8) {
-                Histogram->I_Histogram.UInteger8  = (uint8_t***)  Array;
+                Histogram->Histogram.UInteger8  = (uint8_t***)  Array;
             } else if (Histogram->Type == ImageType_Integer16) {
-                Histogram->I_Histogram.UInteger16 = (uint16_t***) Array;
+                Histogram->Histogram.UInteger16 = (uint16_t***) Array;
             }
         } else if (Histogram == NULL) {
             Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
@@ -877,12 +877,12 @@ extern "C" {
                 
                 if (Histogram->Type == ImageType_Integer8) {
                     uint8_t ****ImageArray  = (uint8_t****) Image->Pixels.UInteger8;
-                    uint8_t  ***HistArray   = (uint8_t***)  Histogram->I_Histogram.UInteger8;
+                    uint8_t  ***HistArray   = (uint8_t***)  Histogram->Histogram.UInteger8;
                     
-                    for (uint64_t View = 0ULL; View < NumViews; View++) {
+                    for (uint64_t View = 0ULL; View < NumViews - 1; View++) {
                         for (uint64_t W = 0ULL; W < Width; W++) {
                             for (uint64_t H = 0ULL; H < Height; H++) {
-                                for (uint64_t C = 0ULL; C < NumChannels; C++) {
+                                for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
                                     uint8_t Sample              = ImageArray[View][W][H][C];
                                     HistArray[View][C][Sample] += 1;
                                 }
@@ -891,12 +891,12 @@ extern "C" {
                     }
                 } else if (Histogram->Type == ImageType_Integer16) {
                     uint16_t ****ImageArray = (uint16_t****) Image->Pixels.UInteger16;
-                    uint16_t  ***HistArray  = (uint16_t***)  Histogram->I_Histogram.UInteger16;
+                    uint16_t  ***HistArray  = (uint16_t***)  Histogram->Histogram.UInteger16;
                     
-                    for (uint64_t View = 0ULL; View < NumViews; View++) {
+                    for (uint64_t View = 0ULL; View < NumViews - 1; View++) {
                         for (uint64_t W = 0ULL; W < Width; W++) {
                             for (uint64_t H = 0ULL; H < Height; H++) {
-                                for (uint64_t C = 0ULL; C < NumChannels; C++) {
+                                for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
                                     uint16_t Sample             = ImageArray[View][W][H][C];
                                     HistArray[View][C][Sample] += 1;
                                 }
@@ -916,9 +916,9 @@ extern "C" {
     void ImageHistogram_Deinit(ImageHistogram *Histogram) {
         if (Histogram != NULL) {
             if (Histogram->Type == ImageType_Integer8) {
-                free(Histogram->I_Histogram.UInteger8);
+                free(Histogram->Histogram.UInteger8);
             } else if (Histogram->Type == ImageType_Integer16) {
-                free(Histogram->I_Histogram.UInteger16);
+                free(Histogram->Histogram.UInteger16);
             }
             free(Histogram);
         } else {
