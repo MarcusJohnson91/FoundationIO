@@ -28,157 +28,157 @@ extern "C" {
      @abstract                                                  "Tells if the number is negative".
      @param                     Integer                         "The value to find the signedness of".
      */
-    bool                        IsNegative(const int64_t Integer);
+    bool                        IsNegative(int64_t Integer);
     
     /*!
      @abstract                                                  "Tells whether Input is even or odd".
      @param                     Number2Check                    "The number to see if it's odd or even".
      @return                                                    "True for odd, false for even".
      */
-    bool                        IsOdd(const int64_t Number2Check);
+    bool                        IsOdd(int64_t Number2Check);
     
     /*!
      @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
      @param                     Value                           "The value to find the absolute value of".
      */
-    uint64_t                    AbsoluteI(const int64_t Value);
+    uint64_t                    AbsoluteI(int64_t Value);
     
     /*!
      @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
      @param                     Value                           "The value to find the absolute value of".
      */
-    uint64_t                    AbsoluteF(const float Value);
+    uint64_t                    AbsoluteF(float Value);
     
     /*!
      @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
      @param                     Value                           "The value to find the absolute value of".
      */
-    uint64_t                    AbsoluteD(const double Value);
+    uint64_t                    AbsoluteD(double Value);
     
     /*!
      @abstract                                                  "Returns the Floor value of a decimal".
      @param                     Value                           "The value to find the floor value of".
      */
-    int64_t                     FloorF(const float Value);
+    int64_t                     FloorF(float Value);
     
     /*!
      @abstract                                                  "Returns the Floor value of a decimal".
      @param                     Value                           "The value to find the floor value of".
      */
-    int64_t                     FloorD(const double Value);
+    int64_t                     FloorD(double Value);
     
     /*!
      @abstract                                                  "Returns the Ceiling value of a decimal".
      @param                     Value                           "The value to find the ceil value of".
      */
-    int64_t                     CeilF(const float Value);
+    int64_t                     CeilF(float Value);
     
     /*!
      @abstract                                                  "Returns the Ceiling value of a decimal".
      @param                     Value                           "The value to find the ceil value of".
      */
-    int64_t                     CeilD(const double Value);
+    int64_t                     CeilD(double Value);
     
     /*!
      @abstract                                                  "Is the decimal normal"?
      @param                     Decimal                         "The decimal to test for normalcy".
      @return                                                    "Returns true if the decimal is normal, otherwise false".
      */
-    bool                        DecimalIsNormalF(const float Decimal);
+    bool                        DecimalIsNormalF(float Decimal);
     
     /*!
      @abstract                                                  "Is the decimal normal"?
      @param                     Decimal                         "The decimal to test for normalcy".
      @return                                                    "Returns true if the decimal is normal, otherwise false".
      */
-    bool                        DecimalIsNormalD(const double Decimal);
+    bool                        DecimalIsNormalD(double Decimal);
     
     /*!
      @abstract                                                  "Is the decimal +/- infinity"?
      @param                     Decimal                         "The decimal to test for infinity".
      @return                                                    "Returns true if the decimal is infinite, otherwise false".
      */
-    bool                        DecimalIsInfinityF(const float Decimal);
+    bool                        DecimalIsInfinityF(float Decimal);
     
     /*!
      @abstract                                                  "Is the decimal +/- infinity"?
      @param                     Decimal                         "The decimal to test for infinity".
      @return                                                    "Returns true if the decimal is infinite, otherwise false".
      */
-    bool                        DecimalIsInfinityD(const double Decimal);
+    bool                        DecimalIsInfinityD(double Decimal);
     
     /*!
      @abstract                                                  "Is the decimal not a number"?
      @param                     Decimal                         "The integer number you want to tell if it's a number or not".
      @return                                                    "Returns true if the decimal is not a number, otherwise false".
      */
-    bool                        DecimalIsNotANumberF(const float Decimal);
+    bool                        DecimalIsNotANumberF(float Decimal);
     
     /*!
      @abstract                                                  "Is the decimal not a number"?
      @param                     Decimal                         "The integer number you want to tell if it's a number or not".
      @return                                                    "Returns true if the decimal is not a number, otherwise false".
      */
-    bool                        DecimalIsNotANumberD(const double Decimal);
+    bool                        DecimalIsNotANumberD(double Decimal);
     
     /*!
      @abstract                                                  "Does the decimal contain a decimal point"?
      @param                     Decimal                         "The decimal you want to know if it contains all zeros for the fraction".
      @return                                                    "Returns true if the number's fraction bits are set, otherwise false".
      */
-    bool                        NumberHasDecimalPointF(const float Decimal);
+    bool                        NumberHasDecimalPointF(float Decimal);
     
     /*!
      @abstract                                                  "Does the decimal contain a decimal point"?
      @param                     Decimal                         "The decimal you want to know if it contains all zeros for the fraction".
      @return                                                    "Returns true if the number's fraction bits are set, otherwise false".
      */
-    bool                        NumberHasDecimalPointD(const double Decimal);
+    bool                        NumberHasDecimalPointD(double Decimal);
     
     /*!
      @abstract                                                  "Extracts the sign from the integer given as Number2Extract".
      @param                     Number2Extract                  "The integer number you want to get the sign from".
      @return                                                    "Returns -1 if the sign is negative, otherwise 1".
      */
-    int8_t                      ExtractSignI(const int64_t Number2Extract);
+    int8_t                      ExtractSignI(int64_t Number2Extract);
     
     /*!
      @abstract                                                  "Extracts the sign from the float given as Number2Extract".
      @param                     Number2Extract                  "The float number you want to get the sign from".
      @return                                                    "Returns -1 if the sign is negative, otherwise 1".
      */
-    int8_t                      ExtractSignF(const float Number2Extract);
+    int8_t                      ExtractSignF(float Number2Extract);
     
     /*!
      @abstract                                                  "Extracts the sign from the double given as Number2Extract".
      @param                     Number2Extract                  "The double number you want to get the sign from".
      @return                                                    "Returns -1 if the sign is negative, otherwise 1".
      */
-    int8_t                      ExtractSignD(const double Number2Extract);
+    int8_t                      ExtractSignD(double Number2Extract);
     
     /*!
      @abstract                                                  "Extracts the exponent from the float given as Number2Extract".
      @param                     Number2Extract                  "The decimal number you want to get the exponent from".
      */
-    int8_t                      ExtractExponentF(const float Number2Extract);
+    int8_t                      ExtractExponentF(float Number2Extract);
     
     /*!
      @abstract                                                  "Extracts the exponent from the double given as Number2Extract".
      @param                     Number2Extract                  "The decimal number you want to get the exponent from".
      */
-    int16_t                     ExtractExponentD(const double Number2Extract);
+    int16_t                     ExtractExponentD(double Number2Extract);
     
     /*!
      @abstract                                                  "Extracts the mantissa from the float given as Number2Extract".
      @param                     Number2Extract                  "The mantissa number you want to get the exponent from".
      */
-    int32_t                     ExtractMantissaF(const float Number2Extract);
+    int32_t                     ExtractMantissaF(float Number2Extract);
     
     /*!
      @abstract                                                  "Extracts the mantissa from the double given as Number2Extract".
      @param                     Number2Extract                  "The mantissa number you want to get the exponent from".
      */
-    int64_t                     ExtractMantissaD(const double Number2Extract);
+    int64_t                     ExtractMantissaD(double Number2Extract);
     
     /*!
      @abstract                                                  "Calculates the value of Base raised to Exponent's power (an integer version of the pow function)".
@@ -186,7 +186,7 @@ extern "C" {
      @param                     Exponent                        "How many times should the Base be raised"?
      @return                                                    "Returns the result of 1 *= Base, Exponent times".
      */
-    uint64_t                    Exponentiate(const uint64_t Base, const uint64_t Exponent);
+    uint64_t                    Exponentiate(uint64_t Base, uint64_t Exponent);
     
     /*!
      @abstract                                                  "Computes the number of times Exponent fits into Base".
@@ -195,35 +195,35 @@ extern "C" {
      @param                     Exponent                        "The value to calculate".
      @return                                                    "Returns the number of symbols required to store an integer".
      */
-    int64_t                     Logarithm(const int64_t Base, const int64_t Exponent);
+    int64_t                     Logarithm(int64_t Base, int64_t Exponent);
     
     /*!
      @abstract                                                  "Byte swaps a 16 bit integer".
      @param                     Value2Swap                      "Data to swap endian".
      @return                                                    "Returns swapped uint16_t".
      */
-    uint16_t                    SwapEndian16(const uint16_t Value2Swap);
+    uint16_t                    SwapEndian16(uint16_t Value2Swap);
     
     /*!
      @abstract                                                  "Byte swaps a 32 bit integer".
      @param                     Value2Swap                      "Data to swap endian".
      @return                                                    "Returns swapped uint32_t".
      */
-    uint32_t                    SwapEndian32(const uint32_t Value2Swap);
+    uint32_t                    SwapEndian32(uint32_t Value2Swap);
     
     /*!
      @abstract                                                  "Byte swaps a 64 bit integer".
      @param                     Value2Swap                      "Data to swap endian".
      @return                                                    "Returns swapped uint64_t".
      */
-    uint64_t                    SwapEndian64(const uint64_t Value2Swap);
+    uint64_t                    SwapEndian64(uint64_t Value2Swap);
     
     /*!
      @abstract                                                  "Computes the number of bits from the number of bytes".
      @param                     Bytes                           "The number of bytes you want to interpret as bits".
      @return                                                    "Returns the number of bits".
      */
-    int64_t                     Bytes2Bits(const int64_t Bytes);
+    int64_t                     Bytes2Bits(int64_t Bytes);
     
     /*!
      @abstract                                                  "Computes the number of bytes from the number of bits".
@@ -231,28 +231,28 @@ extern "C" {
      @param                     RoundUp                         "Should the resulting bytes be rounded up or down?".
      @return                                                    "Returns the number of bytes".
      */
-    int64_t                     Bits2Bytes(const int64_t Bits, const bool RoundUp);
+    int64_t                     Bits2Bytes(int64_t Bits, bool RoundUp);
     
     /*!
      @abstract                                                  "Swaps bits so the the MSB becoems the LSB, and vice versa".
      @param                     Byte                            "The byte to swap the bits in".
      @return                                                    "Returns the swapped byte".
      */
-    uint8_t                     SwapBits(const uint8_t Byte);
+    uint8_t                     SwapBits(uint8_t Byte);
     
     /*!
      @abstract                                                  "Calculates the number of bits of slack mod 8".
      @param                     Offset                          "The offset to calculate the number of bits unaccounted for in the byte".
      @return                                                    "Returns the number of unaccounted for bits".
      */
-    uint8_t                     Bits2ExtractFromByte(const uint64_t Offset);
+    uint8_t                     Bits2ExtractFromByte(uint64_t Offset);
     
     /*!
      @abstract                                                  "Creates a bitmask".
      @param                     NumBits2Select                  "The number of bits to select".
      @return                                                    "Returns the mask".
      */
-    uint8_t                     CreateBitMask(const uint8_t NumBits2Select);
+    uint8_t                     CreateBitMask(uint8_t NumBits2Select);
     
 #define Absolute(Value)                     _Generic((Value), uint8_t:AbsoluteI, int8_t:AbsoluteI, uint16_t:AbsoluteI, int16_t:AbsoluteI, uint32_t:AbsoluteI, int32_t:AbsoluteI, uint64_t:AbsoluteI, int64_t:AbsoluteI, float:AbsoluteF, double:AbsoluteD)(Value)
 #define Floor(Value)                        _Generic((Value),   float:FloorF, double:FloorD)(Value)
