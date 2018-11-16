@@ -79,8 +79,9 @@ extern "C" {
      @constant                  UnknownArgumentType             "Unknown Argument type".
      @constant                  ArgumentIsAPath                 "The Argument is a path on the filesystem".
      @constant                  ArgumentIsAString               "The Argument is a string".
-     @constant                  ArgumentIsARange                "The Argument is a range between X and Y".
+     @constant                  ArgumentIsARange                "The Argument is a range seperated by .. or :".
      @constant                  ArgumentIsARatio                "The Argument is a ratio seperated by a / or \".
+     @constant                  ArgumentIsASlave                "The Argument is the name of a slave switch".
      @constant                  ArgumentNotAllowed              "The Argument is not allowed".
      */
     typedef enum CLIArgumentTypes {
@@ -89,7 +90,8 @@ extern "C" {
                                 ArgumentIsAString               = 2,
                                 ArgumentIsARange                = 4,
                                 ArgumentIsARatio                = 8,
-                                ArgumentNotAllowed              = 16,
+                                ArgumentIsASlave                = 16,
+                                ArgumentNotAllowed              = 32,
     } CLIArgumentTypes;
     
     /*!
