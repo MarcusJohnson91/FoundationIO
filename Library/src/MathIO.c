@@ -133,6 +133,14 @@ extern "C" {
         return Result * Sign;
     }
     
+    int64_t  Min(int64_t Value1, int64_t Value2) {
+        return Value2 ^ ((Value1 ^ Value2) & -(Value1 < Value2));
+    }
+    
+    int64_t  Max(int64_t Value1, int64_t Value2) {
+        return Value1 ^ ((Value1 ^ Value2) & -(Value1 < Value2));
+    }
+    
     bool     DecimalIsNormalF(float Decimal) {
         bool IsNormal = No;
         int16_t Exponent = ExtractExponentF(Decimal);

@@ -91,6 +91,26 @@ extern "C" {
      */
     int64_t                     RoundD(double Value);
     
+#ifdef Min
+#undef Min
+#endif
+    
+    /*!
+     @abstract                                                  "Branchless and shiftless Min function".
+     @return                                                    "Returns the smaller value".
+     */
+    int64_t                     Min(int64_t Value1, int64_t Value2);
+    
+#ifdef Max
+#undef Max
+#endif
+    
+    /*!
+     @abstract                                                  "Branchless and shiftless Max function".
+     @return                                                    "Returns the larger value".
+     */
+    int64_t                     Max(int64_t Value1, int64_t Value2);
+    
     /*!
      @abstract                                                  "Is the decimal normal"?
      @param                     Decimal                         "The decimal to test for normalcy".
