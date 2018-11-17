@@ -3,6 +3,8 @@
 #include "../include/Log.h"            /* Included for the Log declarations */
 #include "../include/StringIO.h"       /* Included for StringIO's declarations */
 
+#include <stdarg.h>                    /* Included for va_list, va_copy, va_start, va_end */
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -4,6 +4,8 @@
 #include "../include/Log.h"            /* Included for error logging */
 #include "../include/Math.h"           /* Included for endian swapping */
 
+#include <stdarg.h>                    /* Included for va_list, va_copy, va_start, va_end */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
