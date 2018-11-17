@@ -10,28 +10,28 @@ extern "C" {
         return (Integer & 0x8000000000000000) >> 63;
     }
     
-    bool IsOdd(int64_t Number2Check) {
-        return Number2Check & 1;
+    bool IsOdd(int64_t Integer) {
+        return Integer & 1;
     }
     
-    uint64_t AbsoluteI(int64_t Value) {
-        bool Sign = Value >> 63;
-        return (Value ^ -Sign) + Sign;
+    uint64_t AbsoluteI(int64_t Integer) {
+        bool Sign = Integer >> 63;
+        return (Integer ^ -Sign) + Sign;
     }
     
-    uint64_t AbsoluteF(float Value) {
-        return (uint64_t) ExtractExponentF(Value);
+    uint64_t AbsoluteF(float Decimal) {
+        return (uint64_t) ExtractExponentF(Decimal);
     }
     
-    uint64_t AbsoluteD(double Value) {
-        return (uint64_t) ExtractExponentD(Value);
+    uint64_t AbsoluteD(double Decimal) {
+        return (uint64_t) ExtractExponentD(Decimal);
     }
     
-    int64_t  FloorF(float Value) {
+    int64_t  FloorF(float Decimal) {
         int64_t  Result   = 0;
-        int8_t   Sign     = ExtractSignF(Value);
-        int8_t   Exponent = ExtractExponentF(Value);
-        int32_t  Mantissa = ExtractMantissaF(Value);
+        int8_t   Sign     = ExtractSignF(Decimal);
+        int8_t   Exponent = ExtractExponentF(Decimal);
+        int32_t  Mantissa = ExtractMantissaF(Decimal);
         
         if (Mantissa == 0) {
             Result        =  Exponent * Sign;
@@ -45,11 +45,11 @@ extern "C" {
         return Result;
     }
     
-    int64_t  FloorD(double Value) {
+    int64_t  FloorD(double Decimal) {
         int64_t  Result   = 0;
-        int8_t   Sign     = ExtractSignD(Value);
-        int16_t  Exponent = ExtractExponentD(Value);
-        int64_t  Mantissa = ExtractMantissaD(Value);
+        int8_t   Sign     = ExtractSignD(Decimal);
+        int16_t  Exponent = ExtractExponentD(Decimal);
+        int64_t  Mantissa = ExtractMantissaD(Decimal);
         
         if (Mantissa == 0) {
             Result        =  Exponent * Sign;
@@ -63,11 +63,11 @@ extern "C" {
         return Result;
     }
     
-    int64_t  CeilF(float Value) {
+    int64_t  CeilF(float Decimal) {
         int64_t  Result   = 0;
-        int8_t   Sign     = ExtractSignF(Value);
-        int8_t   Exponent = ExtractExponentF(Value);
-        int32_t  Mantissa = ExtractMantissaF(Value);
+        int8_t   Sign     = ExtractSignF(Decimal);
+        int8_t   Exponent = ExtractExponentF(Decimal);
+        int32_t  Mantissa = ExtractMantissaF(Decimal);
         
         if (Mantissa == 0) {
             Result        =  Exponent * Sign;
@@ -81,11 +81,11 @@ extern "C" {
         return Result;
     }
     
-    int64_t  CeilD(double Value) {
+    int64_t  CeilD(double Decimal) {
         int64_t  Result   = 0;
-        int8_t   Sign     = ExtractSignD(Value);
-        int16_t  Exponent = ExtractExponentD(Value);
-        int64_t  Mantissa = ExtractMantissaD(Value);
+        int8_t   Sign     = ExtractSignD(Decimal);
+        int16_t  Exponent = ExtractExponentD(Decimal);
+        int64_t  Mantissa = ExtractMantissaD(Decimal);
         
         if (Mantissa == 0) {
             Result        =  Exponent * Sign;
@@ -99,11 +99,11 @@ extern "C" {
         return Result;
     }
     
-    int64_t  RoundF(float Value) {
+    int64_t  RoundF(float Decimal) {
         int64_t  Result   = 0;
-        int8_t   Sign     = ExtractSignF(Value);
-        int16_t  Exponent = ExtractExponentF(Value);
-        int64_t  Mantissa = ExtractMantissaF(Value);
+        int8_t   Sign     = ExtractSignF(Decimal);
+        int16_t  Exponent = ExtractExponentF(Decimal);
+        int64_t  Mantissa = ExtractMantissaF(Decimal);
         if (Mantissa >= 4096) { // 0.5
             Result        = Exponent + 1;
         } else {
@@ -112,11 +112,11 @@ extern "C" {
         return Result * Sign;
     }
     
-    int64_t  RoundD(double Value) {
+    int64_t  RoundD(double Decimal) {
         int64_t  Result   = 0;
-        int8_t   Sign     = ExtractSignD(Value);
-        int16_t  Exponent = ExtractExponentD(Value);
-        int64_t  Mantissa = ExtractMantissaD(Value);
+        int8_t   Sign     = ExtractSignD(Decimal);
+        int16_t  Exponent = ExtractExponentD(Decimal);
+        int64_t  Mantissa = ExtractMantissaD(Decimal);
         if (Mantissa >= 4096) { // 0.5
             Result        = Exponent + 1;
         } else {
@@ -125,12 +125,12 @@ extern "C" {
         return Result * Sign;
     }
     
-    int64_t  Min(int64_t Value1, int64_t Value2) {
-        return Value2 ^ ((Value1 ^ Value2) & -(Value1 < Value2));
+    int64_t  Min(int64_t Integer1, int64_t Integer2) {
+        return Integer2 ^ ((Integer1 ^ Integer2) & -(Integer1 < Integer2));
     }
     
-    int64_t  Max(int64_t Value1, int64_t Value2) {
-        return Value1 ^ ((Value1 ^ Value2) & -(Value1 < Value2));
+    int64_t  Max(int64_t Integer1, int64_t Integer2) {
+        return Integer1 ^ ((Integer1 ^ Integer2) & -(Integer1 < Integer2));
     }
     
     bool     DecimalIsNormalF(float Decimal) {
@@ -211,43 +211,43 @@ extern "C" {
         return HasDecimalPoint;
     }
     
-    int8_t   ExtractSignI(int64_t Sign2Extract) {
-        return (Sign2Extract & 0x8000000000000000) >> 63 == 1 ? -1 : 1;
+    int8_t   ExtractSignI(int64_t Integer) {
+        return (Integer & 0x8000000000000000) >> 63 == 1 ? -1 : 1;
     }
     
-    int8_t   ExtractSignF(float Sign2Extract) {
-        uint32_t *Sign1 = (uint32_t *) &Sign2Extract;
+    int8_t   ExtractSignF(float Decimal) {
+        uint32_t *Sign1 = (uint32_t *) &Decimal;
         uint32_t  Sign2 = (*Sign1 & 0x80000000) >> 31;
         return Sign2 == 0 ? 1 : -1;
     }
     
-    int8_t   ExtractSignD(double Sign2Extract) {
-        uint64_t *Sign1 = (uint64_t *) &Sign2Extract;
+    int8_t   ExtractSignD(double Decimal) {
+        uint64_t *Sign1 = (uint64_t *) &Decimal;
         uint64_t  Sign2 = (*Sign1 & 0x8000000000000000) >> 63;
         return Sign2 == 0 ? 1 : -1;
     }
     
-    int8_t  ExtractExponentF(float Exponent2Extract) {
-        int8_t    Sign      = ExtractSignF(Exponent2Extract);
-        uint32_t *Exponent1 = (uint32_t *) &Exponent2Extract;
+    int8_t  ExtractExponentF(float Decimal) {
+        int8_t    Sign      = ExtractSignF(Decimal);
+        uint32_t *Exponent1 = (uint32_t *) &Decimal;
         int8_t    Exponent2 = (*Exponent1 & 0x7F800000) >> 23;
         int8_t    Exponent3 = (Exponent2 - 127) * Sign;
         return Exponent3;
     }
     
-    int16_t  ExtractExponentD(double Exponent2Extract) {
-        int8_t    Sign      = ExtractSignD(Exponent2Extract);
-        uint64_t *Exponent1 = (uint64_t *) &Exponent2Extract;
+    int16_t  ExtractExponentD(double Decimal) {
+        int8_t    Sign      = ExtractSignD(Decimal);
+        uint64_t *Exponent1 = (uint64_t *) &Decimal;
         int16_t   Exponent2 = (*Exponent1 & 0x7FF0000000000000) >> 52;
         int16_t   Exponent3 = (Exponent2 - 1023) * Sign;
         return Exponent3;
     }
     
-    int32_t  ExtractMantissaF(float Number2Extract) {
-        uint32_t *Mantissa1  = (uint32_t *) &Number2Extract;
+    int32_t  ExtractMantissaF(float Decimal) {
+        uint32_t *Mantissa1  = (uint32_t *) &Decimal;
         int32_t   Mantissa2  = *Mantissa1 & 0x7FFFFFUL;
         int32_t   Mantissa3  = 0UL;
-        if (DecimalIsNormalF(Number2Extract)) {
+        if (DecimalIsNormalF(Decimal)) {
             Mantissa3        = Mantissa2 | 0x800000;
         } else {
             Mantissa3        = Mantissa2;
@@ -255,11 +255,11 @@ extern "C" {
         return Mantissa3;
     }
     
-    int64_t  ExtractMantissaD(double Number2Extract) {
-        uint64_t *Mantissa1  = (uint64_t *) &Number2Extract;
+    int64_t  ExtractMantissaD(double Decimal) {
+        uint64_t *Mantissa1  = (uint64_t *) &Decimal;
         uint64_t  Mantissa2  = *Mantissa1 & 0xFFFFFFFFFFFFFULL;
         int32_t   Mantissa3  = 0UL;
-        if (DecimalIsNormalD(Number2Extract)) {
+        if (DecimalIsNormalD(Decimal)) {
             Mantissa3        = Mantissa2 | 0x10000000000000;
         } else {
             Mantissa3        = Mantissa2;
@@ -296,19 +296,19 @@ extern "C" {
         return Result;
     }
     
-    uint16_t SwapEndian16(uint16_t Value2Swap) {
-        return ((Value2Swap & 0xFF00) >> 8) | ((Value2Swap & 0x00FF) << 8);
+    uint16_t SwapEndian16(uint16_t Integer) {
+        return ((Integer & 0xFF00) >> 8) | ((Integer & 0x00FF) << 8);
     }
     
-    uint32_t SwapEndian32(uint32_t Value2Swap) {
-        return ((Value2Swap & 0xFF000000) >> 24) | ((Value2Swap & 0x00FF0000) >> 8) | ((Value2Swap & 0x0000FF00) << 8) | ((Value2Swap & 0x000000FF) << 24);
+    uint32_t SwapEndian32(uint32_t Integer) {
+        return ((Integer & 0xFF000000) >> 24) | ((Integer & 0x00FF0000) >> 8) | ((Integer & 0x0000FF00) << 8) | ((Integer & 0x000000FF) << 24);
     }
     
-    uint64_t SwapEndian64(uint64_t Value2Swap) {
-        return (((Value2Swap & 0xFF00000000000000) >> 56) | ((Value2Swap & 0x00FF000000000000) >> 40) | \
-                ((Value2Swap & 0x0000FF0000000000) >> 24) | ((Value2Swap & 0x000000FF00000000) >>  8) | \
-                ((Value2Swap & 0x00000000FF000000) <<  8) | ((Value2Swap & 0x0000000000FF0000) << 24) | \
-                ((Value2Swap & 0x000000000000FF00) << 40) | ((Value2Swap & 0x00000000000000FF) << 56)
+    uint64_t SwapEndian64(uint64_t Integer) {
+        return (((Integer & 0xFF00000000000000) >> 56) | ((Integer & 0x00FF000000000000) >> 40) | \
+                ((Integer & 0x0000FF0000000000) >> 24) | ((Integer & 0x000000FF00000000) >>  8) | \
+                ((Integer & 0x00000000FF000000) <<  8) | ((Integer & 0x0000000000FF0000) << 24) | \
+                ((Integer & 0x000000000000FF00) << 40) | ((Integer & 0x00000000000000FF) << 56)
                 );
     }
     
