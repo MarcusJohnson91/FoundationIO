@@ -31,65 +31,65 @@ extern "C" {
     bool                        IsNegative(int64_t Integer);
     
     /*!
-     @abstract                                                  "Tells whether Input is even or odd".
-     @param                     Number2Check                    "The number to see if it's odd or even".
+     @abstract                                                  "Tells whether Integer is even or odd".
+     @param                     Integer                         "The number to see if it's odd or even".
      @return                                                    "True for odd, false for even".
      */
-    bool                        IsOdd(int64_t Number2Check);
+    bool                        IsOdd(int64_t Integer);
     
     /*!
      @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
-     @param                     Value                           "The value to find the absolute value of".
+     @param                     Integer                         "The value to find the absolute value of".
      */
-    uint64_t                    AbsoluteI(int64_t Value);
+    uint64_t                    AbsoluteI(int64_t Integer);
     
     /*!
      @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
-     @param                     Value                           "The value to find the absolute value of".
+     @param                     Decimal                         "The value to find the absolute value of".
      */
-    uint64_t                    AbsoluteF(float Value);
+    uint64_t                    AbsoluteF(float Decimal);
     
     /*!
      @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
-     @param                     Value                           "The value to find the absolute value of".
+     @param                     Decimal                         "The value to find the absolute value of".
      */
-    uint64_t                    AbsoluteD(double Value);
+    uint64_t                    AbsoluteD(double Decimal);
     
     /*!
      @abstract                                                  "Returns the Floor value of a decimal".
-     @param                     Value                           "The value to find the floor value of".
+     @param                     Decimal                         "The value to find the floor value of".
      */
-    int64_t                     FloorF(float Value);
+    int64_t                     FloorF(float Decimal);
     
     /*!
      @abstract                                                  "Returns the Floor value of a decimal".
-     @param                     Value                           "The value to find the floor value of".
+     @param                     Decimal                         "The value to find the floor value of".
      */
-    int64_t                     FloorD(double Value);
+    int64_t                     FloorD(double Decimal);
     
     /*!
      @abstract                                                  "Returns the Ceiling value of a decimal".
-     @param                     Value                           "The value to find the ceil value of".
+     @param                     Decimal                         "The value to find the ceil value of".
      */
-    int64_t                     CeilF(float Value);
+    int64_t                     CeilF(float Decimal);
     
     /*!
      @abstract                                                  "Returns the Ceiling value of a decimal".
-     @param                     Value                           "The value to find the ceil value of".
+     @param                     Decimal                         "The value to find the ceil value of".
      */
-    int64_t                     CeilD(double Value);
+    int64_t                     CeilD(double Decimal);
     
     /*!
      @abstract                                                  "Returns the rounded value of a decimal".
-     @param                     Value                           "The value to find the round value of".
+     @param                     Decimal                         "The value to find the round value of".
      */
-    int64_t                     RoundF(float Value);
+    int64_t                     RoundF(float Decimal);
     
     /*!
      @abstract                                                  "Returns the rounded value of a decimal".
-     @param                     Value                           "The value to find the round value of".
+     @param                     Decimal                         "The value to find the round value of".
      */
-    int64_t                     RoundD(double Value);
+    int64_t                     RoundD(double Decimal);
     
 #ifdef Min
 #undef Min
@@ -99,7 +99,7 @@ extern "C" {
      @abstract                                                  "Branchless and shiftless Min function".
      @return                                                    "Returns the smaller value".
      */
-    int64_t                     Min(int64_t Value1, int64_t Value2);
+    int64_t                     Min(int64_t Integer1, int64_t Integer2);
     
 #ifdef Max
 #undef Max
@@ -109,7 +109,7 @@ extern "C" {
      @abstract                                                  "Branchless and shiftless Max function".
      @return                                                    "Returns the larger value".
      */
-    int64_t                     Max(int64_t Value1, int64_t Value2);
+    int64_t                     Max(int64_t Integer1, int64_t Integer2);
     
     /*!
      @abstract                                                  "Is the decimal normal"?
@@ -168,49 +168,49 @@ extern "C" {
     bool                        NumberHasDecimalPointD(double Decimal);
     
     /*!
-     @abstract                                                  "Extracts the sign from the integer given as Number2Extract".
-     @param                     Number2Extract                  "The integer number you want to get the sign from".
+     @abstract                                                  "Extracts the sign from the integer given as Decimal".
+     @param                     Integer                         "The integer number you want to get the sign from".
      @return                                                    "Returns -1 if the sign is negative, otherwise 1".
      */
-    int8_t                      ExtractSignI(int64_t Number2Extract);
+    int8_t                      ExtractSignI(int64_t Integer);
     
     /*!
-     @abstract                                                  "Extracts the sign from the float given as Number2Extract".
-     @param                     Number2Extract                  "The float number you want to get the sign from".
+     @abstract                                                  "Extracts the sign from the float given as Decimal".
+     @param                     Decimal                         "The float number you want to get the sign from".
      @return                                                    "Returns -1 if the sign is negative, otherwise 1".
      */
-    int8_t                      ExtractSignF(float Number2Extract);
+    int8_t                      ExtractSignF(float Decimal);
     
     /*!
-     @abstract                                                  "Extracts the sign from the double given as Number2Extract".
-     @param                     Number2Extract                  "The double number you want to get the sign from".
+     @abstract                                                  "Extracts the sign from the double given as Decimal".
+     @param                     Decimal                         "The double number you want to get the sign from".
      @return                                                    "Returns -1 if the sign is negative, otherwise 1".
      */
-    int8_t                      ExtractSignD(double Number2Extract);
+    int8_t                      ExtractSignD(double Decimal);
     
     /*!
-     @abstract                                                  "Extracts the exponent from the float given as Number2Extract".
-     @param                     Number2Extract                  "The decimal number you want to get the exponent from".
+     @abstract                                                  "Extracts the exponent from the float given as Decimal".
+     @param                     Decimal                         "The decimal number you want to get the exponent from".
      */
-    int8_t                      ExtractExponentF(float Number2Extract);
+    int8_t                      ExtractExponentF(float Decimal);
     
     /*!
-     @abstract                                                  "Extracts the exponent from the double given as Number2Extract".
-     @param                     Number2Extract                  "The decimal number you want to get the exponent from".
+     @abstract                                                  "Extracts the exponent from the double given as Decimal".
+     @param                     Decimal                         "The decimal number you want to get the exponent from".
      */
-    int16_t                     ExtractExponentD(double Number2Extract);
+    int16_t                     ExtractExponentD(double Decimal);
     
     /*!
-     @abstract                                                  "Extracts the mantissa from the float given as Number2Extract".
-     @param                     Number2Extract                  "The mantissa number you want to get the exponent from".
+     @abstract                                                  "Extracts the mantissa from the float given as Decimal".
+     @param                     Decimal                         "The mantissa number you want to get the exponent from".
      */
-    int32_t                     ExtractMantissaF(float Number2Extract);
+    int32_t                     ExtractMantissaF(float Decimal);
     
     /*!
-     @abstract                                                  "Extracts the mantissa from the double given as Number2Extract".
-     @param                     Number2Extract                  "The mantissa number you want to get the exponent from".
+     @abstract                                                  "Extracts the mantissa from the double given as Decimal".
+     @param                     Decimal                         "The mantissa number you want to get the exponent from".
      */
-    int64_t                     ExtractMantissaD(double Number2Extract);
+    int64_t                     ExtractMantissaD(double Decimal);
     
     /*!
      @abstract                                                  "Calculates the value of Base raised to Exponent's power (an integer version of the pow function)".
