@@ -107,6 +107,32 @@ extern "C" {
         return Result;
     }
     
+    int64_t  RoundF(float Value) {
+        int64_t  Result   = 0;
+        int8_t   Sign     = ExtractSignF(Value);
+        int16_t  Exponent = ExtractExponentF(Value);
+        int64_t  Mantissa = ExtractMantissaF(Value);
+        if (Mantissa >= 4096) { // 0.5
+            Result        = Exponent + 1;
+        } else {
+            Result        = Exponent;
+        }
+        return Result * Sign;
+    }
+    
+    int64_t  RoundD(double Value) {
+        int64_t  Result   = 0;
+        int8_t   Sign     = ExtractSignF(Value);
+        int16_t  Exponent = ExtractExponentF(Value);
+        int64_t  Mantissa = ExtractMantissaF(Value);
+        if (Mantissa >= 4096) { // 0.5
+            Result        = Exponent + 1;
+        } else {
+            Result        = Exponent;
+        }
+        return Result * Sign;
+    }
+    
     bool     DecimalIsNormalF(float Decimal) {
         bool IsNormal = No;
         int16_t Exponent = ExtractExponentF(Decimal);
