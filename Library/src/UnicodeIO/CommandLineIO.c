@@ -4,6 +4,8 @@
 #include "../include/Log.h"            /* Included for Log */
 #include "../include/StringIO.h"       /* Included for StringIO's declarations */
 
+#include <string.h>                    /* Included for memset and memmove */
+
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
 #include <signal.h>                    /* Included for SIGWINCH handling */
 #include <sys/ioctl.h>                 /* Included for the terminal size */

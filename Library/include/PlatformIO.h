@@ -7,12 +7,10 @@
 #endif /* _FILE_OFFSET_BITS */
 #endif /* Various UNIX Platforms */
 
-#include <stdarg.h>                   /* Included for va_list, va_copy, va_start, va_end */
 #include <stdbool.h>                  /* Included for bool */
 #include <stdint.h>                   /* Included for u/intX_t */
 #include <stdio.h>                    /* Included for FILE, SEEK SET/END/CUR macros */
 #include <stdlib.h>                   /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
-#include <string.h>                   /* Included for memset and memmove */
 
 #pragma once
 
