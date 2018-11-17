@@ -122,9 +122,9 @@ extern "C" {
     
     int64_t  RoundD(double Value) {
         int64_t  Result   = 0;
-        int8_t   Sign     = ExtractSignF(Value);
-        int16_t  Exponent = ExtractExponentF(Value);
-        int64_t  Mantissa = ExtractMantissaF(Value);
+        int8_t   Sign     = ExtractSignD(Value);
+        int16_t  Exponent = ExtractExponentD(Value);
+        int64_t  Mantissa = ExtractMantissaD(Value);
         if (Mantissa >= 4096) { // 0.5
             Result        = Exponent + 1;
         } else {
