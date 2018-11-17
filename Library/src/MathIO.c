@@ -8,23 +8,16 @@ extern "C" {
 #endif
     
     bool IsNegative(int64_t Integer) {
-        if (Integer >= 0 && ~Integer >= 0) {
-            return No;
-        } else {
-            return Yes;
-        }
+        return (Integer & 0x8000000000000000) >> 63;
     }
     
     bool IsOdd(int64_t Number2Check) {
-        bool X = No;
-        if ((Number2Check & 1) == 1) {
-            X = Yes;
-        }
-        return X;
+        return Number2Check & 1;
     }
     
     uint64_t AbsoluteI(int64_t Value) {
-       return (Value >= 0 ? (uint64_t) Value : (uint64_t) ~Value + 1);
+        bool Sign = Value >> 63;
+        return (Value ^ -Sign) + Sign;
     }
     
     uint64_t AbsoluteF(float Value) {
