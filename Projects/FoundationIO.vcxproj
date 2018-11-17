@@ -67,7 +67,6 @@
         <WholeProgramOptimization>true</WholeProgramOptimization>
         <PlatformToolset>v141</PlatformToolset>
         <UseOfMfc>false</UseOfMfc>
-        <WindowsSDKDesktopARM64Support>true</WindowsSDKDesktopARM64Support>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
         <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -76,7 +75,6 @@
         <WholeProgramOptimization>true</WholeProgramOptimization>
         <PlatformToolset>v141</PlatformToolset>
         <UseOfMfc>false</UseOfMfc>
-        <WindowsSDKDesktopARM64Support>true</WindowsSDKDesktopARM64Support>
     </PropertyGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
     <ImportGroup Label="ExtensionSettings">
