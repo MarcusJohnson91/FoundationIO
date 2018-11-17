@@ -80,6 +80,18 @@ extern "C" {
     int64_t                     CeilD(double Value);
     
     /*!
+     @abstract                                                  "Returns the rounded value of a decimal".
+     @param                     Value                           "The value to find the round value of".
+     */
+    int64_t                     RoundF(float Value);
+    
+    /*!
+     @abstract                                                  "Returns the rounded value of a decimal".
+     @param                     Value                           "The value to find the round value of".
+     */
+    int64_t                     RoundD(double Value);
+    
+    /*!
      @abstract                                                  "Is the decimal normal"?
      @param                     Decimal                         "The decimal to test for normalcy".
      @return                                                    "Returns true if the decimal is normal, otherwise false".
@@ -257,6 +269,7 @@ extern "C" {
 #define Absolute(Value)                     _Generic((Value), uint8_t:AbsoluteI, int8_t:AbsoluteI, uint16_t:AbsoluteI, int16_t:AbsoluteI, uint32_t:AbsoluteI, int32_t:AbsoluteI, uint64_t:AbsoluteI, int64_t:AbsoluteI, float:AbsoluteF, double:AbsoluteD)(Value)
 #define Floor(Value)                        _Generic((Value),   float:FloorF, double:FloorD)(Value)
 #define Ceil(Value)                         _Generic((Value),   float:CeilF, double:CeilD)(Value)
+#define Round(Value)                        _Generic((Value),   float:RoundF, double:RoundD)(Value)
 #define DecimalIsNormal(Decimal)            _Generic((Decimal), float:DecimalIsNormalF, double:DecimalIsNormalD)(Decimal)
 #define DecimalIsInfinity(Decimal)          _Generic((Decimal), float:DecimalIsInfinityF, double:DecimalIsInfinityD)(Decimal)
 #define DecimalIsNotANumber(Decimal)        _Generic((Decimal), float:DecimalIsNotANumberF, double:DecimalIsNotANumberD)(Decimal)
