@@ -286,13 +286,14 @@ extern "C" {
     /*!
      @abstract                             "Resizes an Image".
      @remark                               "0 means keep the same, -1 means remove one, 1 means add one".
+     @remark                               "Left and Right are first because we use the Width, Height format".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      @param                 Top            "The offset from the top of the image".
      @param                 Bottom         "The offset from the bottom of the image".
      @param                 Left           "The offset from the left of the image".
      @param                 Right          "The offset from the right of the image".
      */
-    void                    ImageContainer_Resize(ImageContainer *Image, int64_t Top, int64_t Bottom, int64_t Left, int64_t Right);
+    void                    ImageContainer_Resize(ImageContainer *Image, int64_t Left, int64_t Right, int64_t Top, int64_t Bottom);
     
     /*!
      @abstract                             "Deinitializes the ImageContainer pointed to".
