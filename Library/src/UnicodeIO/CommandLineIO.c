@@ -100,9 +100,11 @@ extern "C" {
                 if (CLI->SwitchIDs != NULL) {
                     CLI->NumSwitches = NumSwitches;
                 } else {
+                    CommandLineIO_Deinit(CLI);
                     Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CommandLineSwitches"), NumSwitches);
                 }
             } else {
+                CommandLineIO_Deinit(CLI);
                 Log(Log_ERROR, __func__, U8("Couldn't allocate CommandLineIO"));
             }
         } else if (NumSwitches <= 0) {
@@ -1064,18 +1066,14 @@ extern "C" {
     
     void CommandLineIO_Deinit(CommandLineIO *CLI) {
         if (CLI != NULL) {
-            if (CLI->NumSwitches > 0) {
-                for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
-                    free(CLI->SwitchIDs[Switch].Name);
-                    free(CLI->SwitchIDs[Switch].Description);
-                    free(CLI->SwitchIDs[Switch].PotentialSlaves);
-                }
+            for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
+                free(CLI->SwitchIDs[Switch].Name);
+                free(CLI->SwitchIDs[Switch].Description);
+                free(CLI->SwitchIDs[Switch].PotentialSlaves);
             }
-            if (CLI->NumOptions > 0) {
-                for (int64_t Option = 0LL; Option < CLI->NumOptions - 1; Option++) {
-                    free(CLI->OptionIDs[Option].OptionSlaves);
-                    free(CLI->OptionIDs[Option].Argument);
-                }
+            for (int64_t Option = 0LL; Option < CLI->NumOptions - 1; Option++) {
+                free(CLI->OptionIDs[Option].OptionSlaves);
+                free(CLI->OptionIDs[Option].Argument);
             }
             free(CLI->SwitchIDs);
             free(CLI->OptionIDs);

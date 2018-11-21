@@ -63,6 +63,7 @@ extern "C" {
             if (BitB->Buffer != NULL) {
                 BitB->NumBits            = Bytes2Bits(BitBufferSize);
             } else {
+                BitBuffer_Deinit(BitB);
                 Log(Log_ERROR, __func__, U8("Couldn't allocate %lld bits for BitBuffer's buffer"), BitBufferSize);
             }
         } else if (BitB == NULL) {
@@ -601,6 +602,7 @@ extern "C" {
     BitInput *BitInput_Init(void) {
         BitInput *BitI = calloc(1, sizeof(BitInput));
         if (BitI == NULL) {
+            BitInput_Deinit(BitI);
             Log(Log_ERROR, __func__, U8("Couldn't allocate BitInput"));
         }
         return BitI;
@@ -815,6 +817,7 @@ extern "C" {
     BitOutput *BitOutput_Init(void) {
         BitOutput *BitO = calloc(1, sizeof(BitOutput));
         if (BitO == NULL) {
+            BitOutput_Deinit(BitO);
             Log(Log_ERROR, __func__, U8("Couldn't allocate BitOutput"));
         }
         return BitO;
