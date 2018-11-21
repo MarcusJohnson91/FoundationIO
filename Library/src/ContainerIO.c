@@ -3,6 +3,7 @@
 #include "../include/ContainerIO.h"    /* Included for our declarations */
 #include "../include/Log.h"            /* Included for error reporting */
 #include "../include/StringIO.h"       /* Included for StringIO's declarations */
+#include "../include/Math.h"           /* Included for Absolute */
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,30 +29,40 @@ extern "C" {
     AudioContainer *AudioContainer_Init(Audio_Types Type, uint64_t BitDepth, uint64_t NumChannels, uint64_t SampleRate, uint64_t NumSamples) {
         AudioContainer *Audio = NULL;
         if (BitDepth > 0 && NumChannels > 0 && NumSamples > 0) {
-            Audio = calloc(1, sizeof(AudioContainer));
+            Audio             = calloc(1, sizeof(AudioContainer));
             if (Audio != NULL) {
-                Audio->BitDepth    = BitDepth;
-                Audio->NumChannels = NumChannels;
-                Audio->SampleRate  = SampleRate;
-                Audio->NumSamples  = NumSamples;
-                Audio->ChannelMask = calloc(NumChannels, sizeof(Audio_ChannelMask));
-                if (Type == (AudioType_Unsigned | AudioType_Integer8)) {
-                    Audio->Samples.UInteger8 = calloc(NumChannels * NumSamples, 1);
-                } else if (Type == (AudioType_Signed | AudioType_Integer8)) {
-                    Audio->Samples.SInteger8 = calloc(NumChannels * NumSamples, 1);
-                } else if (Type == (AudioType_Unsigned | AudioType_Integer16)) {
-                    Audio->Samples.UInteger16 = calloc(NumChannels * NumSamples, 2);
-                } else if (Type == (AudioType_Signed | AudioType_Integer16)) {
-                    Audio->Samples.SInteger16 = calloc(NumChannels * NumSamples, 2);
-                } else if (Type == (AudioType_Unsigned | AudioType_Integer32)) {
-                    Audio->Samples.UInteger32 = calloc(NumChannels * NumSamples, 4);
-                } else if (Type == (AudioType_Signed | AudioType_Integer32)) {
-                    Audio->Samples.SInteger32 = calloc(NumChannels * NumSamples, 4);
+                void **Array           = calloc(NumChannels * NumSamples, Type / 4); // !!! DO NOT CHANGE AUDIO_TYPES WITHOUT CHANGING THE SIZE FIELD HERE
+                if (Array != NULL) {
+                    if (Type == (AudioType_Unsigned | AudioType_Integer8)) {
+                        Audio->Samples.UInteger8 = (uint8_t**)   Array;
+                    } else if (Type == (AudioType_Signed | AudioType_Integer8)) {
+                        Audio->Samples.SInteger8 = (int8_t**)    Array;
+                    } else if (Type == (AudioType_Unsigned | AudioType_Integer16)) {
+                        Audio->Samples.UInteger16 = (uint16_t**) Array;
+                    } else if (Type == (AudioType_Signed | AudioType_Integer16)) {
+                        Audio->Samples.SInteger16 = (int16_t**)  Array;
+                    } else if (Type == (AudioType_Unsigned | AudioType_Integer32)) {
+                        Audio->Samples.UInteger32 = (uint32_t**) Array;
+                    } else if (Type == (AudioType_Signed | AudioType_Integer32)) {
+                        Audio->Samples.SInteger32 = (int32_t**)  Array;
+                    }
+                } else {
+                    AudioContainer_Deinit(Audio);
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate the audio array"));
                 }
-                if (Audio->Samples.UInteger8 == NULL && Audio->Samples.SInteger8 == NULL && Audio->Samples.UInteger16 == NULL && Audio->Samples.SInteger16 == NULL && Audio->Samples.UInteger32 == NULL && Audio->Samples.SInteger32 == NULL) {
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate room for the samples"));
+                
+                Audio->ChannelMask = calloc(NumChannels, sizeof(Audio_ChannelMask));
+                if (Audio->ChannelMask != NULL) {
+                    Audio->BitDepth    = BitDepth;
+                    Audio->NumChannels = NumChannels;
+                    Audio->SampleRate  = SampleRate;
+                    Audio->NumSamples  = NumSamples;
+                } else {
+                    AudioContainer_Deinit(Audio);
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate ChannelMask"));
                 }
             } else {
+                AudioContainer_Deinit(Audio);
                 Log(Log_ERROR, __func__, U8("Couldn't allocate the AudioContainer"));
             }
         } else if (BitDepth == 0) {
@@ -306,6 +317,7 @@ extern "C" {
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
                 free(Audio->Samples.SInteger32);
             }
+            free(Audio->ChannelMask);
             free(Audio);
         } else {
             Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
@@ -314,16 +326,16 @@ extern "C" {
     
     typedef struct ImageContainer {
         union Pixels {
-            uint16_t    ****UInteger16;
-            uint8_t     ****UInteger8;
+            uint16_t   ****UInteger16;
+            uint8_t    ****UInteger8;
         } Pixels;
-        Image_ChannelMask  *ChannelMask;
-        uint64_t            Width;
-        uint64_t            Height;
-        uint64_t            BitDepth;
-        uint64_t            NumChannels;
-        uint64_t            NumViews;
-        Image_Types         Type;
+        Image_ChannelMask *ChannelMask;
+        uint64_t           Width;
+        uint64_t           Height;
+        uint64_t           BitDepth;
+        uint64_t           NumChannels;
+        uint64_t           NumViews;
+        Image_Types        Type;
     } ImageContainer;
     
     ImageContainer *ImageContainer_Init(Image_Types Type, uint64_t BitDepth, uint8_t NumViews, uint64_t NumChannels, uint64_t Width, uint64_t Height) {
@@ -331,23 +343,32 @@ extern "C" {
         if (BitDepth > 0 && NumChannels > 0 && Width > 0 && Height > 0) {
             Image = calloc(1, sizeof(ImageContainer));
             if (Image != NULL) {
-                Image->Type                  = Type;
-                Image->BitDepth              = BitDepth;
-                Image->NumViews              = NumViews;
-                Image->NumChannels           = NumChannels;
-                Image->Width                 = Width;
-                Image->Height                = Height;
-                Image->ChannelMask           = calloc(NumChannels, sizeof(Image_ChannelMask));
-                
-                if (Type == ImageType_Integer8) {
-                    Image->Pixels.UInteger8  = calloc(NumViews * NumChannels * Width * Height, sizeof(uint8_t));
-                } else if (Type == ImageType_Integer16) {
-                    Image->Pixels.UInteger16 = calloc(NumViews * NumChannels * Width * Height, sizeof(uint16_t));
-                }
-                if (Image->Pixels.UInteger8 == NULL && Image->Pixels.UInteger16 == NULL) {
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate room for the pixels"));
+                void ****Array = calloc(NumViews * NumChannels * Width * Height, Type); // !!!DO NOT CHANGE IMAGE_TYPES WITHOUT CHANGING THE SIZE FIELD HERE
+                if (Array != NULL) {
+                    if (Type == ImageType_Integer8) {
+                        Image->Pixels.UInteger8  = (uint8_t****)  Array;
+                    } else if (Type == ImageType_Integer16) {
+                        Image->Pixels.UInteger16 = (uint16_t****) Array;
+                    }
+                    
+                    Image->ChannelMask     = calloc(NumChannels, sizeof(Image_ChannelMask));
+                    if (Image->ChannelMask != NULL) {
+                        Image->Type        = Type;
+                        Image->BitDepth    = BitDepth;
+                        Image->NumViews    = NumViews;
+                        Image->NumChannels = NumChannels;
+                        Image->Width       = Width;
+                        Image->Height      = Height;
+                    } else {
+                        ImageContainer_Deinit(Image);
+                        Log(Log_ERROR, __func__, U8("Couldn't allocate channel mask"));
+                    }
+                } else {
+                    ImageContainer_Deinit(Image);
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate pixel array"));
                 }
             } else {
+                ImageContainer_Deinit(Image);
                 Log(Log_ERROR, __func__, U8("Couldn't allocate the ImageContainer"));
             }
         } else if (BitDepth == 0) {
@@ -616,7 +637,7 @@ extern "C" {
                     for (uint64_t View = 0ULL; View < Image->NumViews - 1; View++) {
                         for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
                             for (uint64_t TopLine = 0ULL; TopLine < Image->Height - 1; TopLine++) {
-                                for (uint64_t BottomLine = Image->Height; BottomLine > 0ULL; BottomLine--) {
+                                for (uint64_t BottomLine = Image->Height - 1; BottomLine > 0ULL; BottomLine--) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels - 1; Channel++) {
                                         uint8_t TopPixel                        = Array[View][Width][TopLine][Channel];
                                         uint8_t BottomPixel                     = Array[View][Width][BottomLine][Channel];
@@ -633,7 +654,7 @@ extern "C" {
                     for (uint64_t View = 0ULL; View < Image->NumViews - 1; View++) {
                         for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
                             for (uint64_t TopLine = 0ULL; TopLine < Image->Height - 1; TopLine++) {
-                                for (uint64_t BottomLine = Image->Height; BottomLine > 0ULL; BottomLine--) {
+                                for (uint64_t BottomLine = Image->Height - 1; BottomLine > 0ULL; BottomLine--) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels - 1; Channel++) {
                                         uint16_t TopPixel                       = Array[View][Width][TopLine][Channel];
                                         uint16_t BottomPixel                    = Array[View][Width][BottomLine][Channel];
@@ -651,15 +672,15 @@ extern "C" {
                 if (Image->Type == ImageType_Integer8) {
                     uint8_t  ****Array = (uint8_t****)  ImageContainer_GetArray(Image);
                     for (uint64_t View = 0ULL; View < Image->NumViews - 1; View++) {
-                        for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
-                            for (uint64_t Right = Image->Width; Right > 0ULL; Right++) {
+                        for (uint64_t Left = 0ULL; Left < Image->Width - 1; Left++) {
+                            for (uint64_t Right = Image->Width - 1; Right > 0ULL; Right++) {
                                 for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels - 1; Channel++) {
                                         uint8_t LeftPixel                   = Array[View][Left][Height][Channel];
                                         uint8_t RightPixel                  = Array[View][Right][Height][Channel];
                                         
-                                        Array[View][Left][Height][Channel]  = LeftPixel;
-                                        Array[View][Right][Height][Channel] = RightPixel;
+                                        Array[View][Left][Height][Channel]  = RightPixel;
+                                        Array[View][Right][Height][Channel] = LeftPixel;
                                     }
                                 }
                             }
@@ -669,14 +690,14 @@ extern "C" {
                     uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
                     for (uint64_t View = 0ULL; View < Image->NumViews - 1; View++) {
                         for (uint64_t Left = 0ULL; Left < Image->Width - 1; Left++) {
-                            for (uint64_t Right = Image->Width; Right > 0ULL; Right++) {
-                                for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
+                            for (uint64_t Right = Image->Width - 1; Right > 0ULL; Right++) {
+                                for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
                                     for (uint64_t Channel = 0ULL; Channel < Image->NumChannels - 1; Channel++) {
                                         uint16_t LeftPixel                  = Array[View][Left][Height][Channel];
                                         uint16_t RightPixel                 = Array[View][Right][Height][Channel];
                                         
-                                        Array[View][Left][Height][Channel]  = LeftPixel;
-                                        Array[View][Right][Height][Channel] = RightPixel;
+                                        Array[View][Left][Height][Channel]  = RightPixel;
+                                        Array[View][Right][Height][Channel] = LeftPixel;
                                     }
                                 }
                             }
@@ -689,7 +710,7 @@ extern "C" {
         }
     }
     
-    void ImageContainer_Resize(ImageContainer *Image, int64_t Top, int64_t Bottom, int64_t Left, int64_t Right) {
+    void ImageContainer_Resize(ImageContainer *Image, int64_t Left, int64_t Right, int64_t Top, int64_t Bottom) {
         if (Image != NULL) {
             uint64_t NumChannels = ImageContainer_GetNumChannels(Image);
             uint64_t NumViews    = ImageContainer_GetNumViews(Image);
@@ -697,83 +718,56 @@ extern "C" {
             uint64_t Width       = ImageContainer_GetWidth(Image);
             Image_Types Type     = ImageContainer_GetType(Image);
             
+            int64_t NewWidth     = 0;
+            int64_t NewHeight    = 0;
             
-            // If top, bottom, left, or right is positive increase the canvas, if negative, decrease.
-            if (Type == ImageType_Integer8) {
-                uint8_t ****Array    = (uint8_t****) ImageContainer_GetArray(Image);
-                if (Width > Top + Bottom) {
-                    // Do something
-                } else {
-                    
-                }
-                
-                if (Height > Left + Right) {
-                    // Do something
-                } else {
-                }
-                uint8_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(uint8_t));
-                if (NewArray != NULL) {
-                    for (uint8_t View = 0; View < NumViews - 1; View++) {
-                        for (int64_t W = Left; W < Right; W++) {
-                            for (int64_t H = Top; H < Bottom; H++) {
-                                for (uint64_t Channel = 0ULL; Channel < NumChannels - 1; Channel++) {
-                                    NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
+            int64_t LeftOffset   = AbsoluteI(Left);
+            int64_t RightOffset  = Width + Right;
+            int64_t TopOffset    = AbsoluteI(Top);
+            int64_t BottomOffset = Height + Bottom;
+            
+            
+            void ****New         = calloc(NumViews * NewWidth * NewHeight * NumChannels, Type);
+            if (New != NULL) {
+                if (Type == ImageType_Integer8) {
+                    uint8_t ****Array    = (uint8_t****) ImageContainer_GetArray(Image);
+                    uint8_t ****NewArray = (uint8_t****) New;
+                    if (Array != NULL) {
+                        for (uint8_t View = 0; View < NumViews - 1; View++) {
+                            for (int64_t W = LeftOffset; W < RightOffset; W++) {
+                                for (int64_t H = TopOffset; H < BottomOffset; H++) {
+                                    for (uint64_t Channel = 0ULL; Channel < NumChannels - 1; Channel++) {
+                                        NewArray[View][W - LeftOffset][H - TopOffset][Channel] = Array[View][W][H][Channel];
+                                    }
                                 }
                             }
                         }
+                        ImageContainer_SetArray(Image, (void****) NewArray);
+                        free(Array);
+                    } else {
+                        Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
                     }
-                    ImageContainer_SetArray(Image, (void****) NewArray);
-                    free(Array);
-                } else {
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
-                }
-            } else if (Type == ImageType_Integer16) {
-                uint16_t ****Array    = (uint16_t****) ImageContainer_GetArray(Image);
-                if (Width > Top + Bottom) {
-                    // Do something
-                } else {
-                    
-                }
-                
-                if (Height > Left + Right) {
-                    // Do something
-                } else {
-                }
-                uint16_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(uint16_t));
-                if (NewArray != NULL) {
-                    for (uint8_t View = 0; View < NumViews - 1; View++) {
-                        for (int64_t W = Left; W < Right; W++) {
-                            for (int64_t H = Top; H < Bottom; H++) {
-                                for (uint64_t Channel = 0ULL; Channel < NumChannels - 1; Channel++) {
-                                    NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
+                } else if (Type == ImageType_Integer16) {
+                    uint16_t ****Array    = (uint16_t****) ImageContainer_GetArray(Image);
+                    uint16_t ****NewArray = (uint16_t****) New;
+                    if (Array != NULL) {
+                        for (uint8_t View = 0; View < NumViews - 1; View++) {
+                            for (int64_t W = LeftOffset; W < RightOffset; W++) {
+                                for (int64_t H = TopOffset; H < BottomOffset; H++) {
+                                    for (uint64_t Channel = 0ULL; Channel < NumChannels - 1; Channel++) {
+                                        NewArray[View][W - LeftOffset][H - TopOffset][Channel] = Array[View][W][H][Channel];
+                                    }
                                 }
                             }
                         }
+                        ImageContainer_SetArray(Image, (void****) NewArray);
+                        free(Array);
+                    } else {
+                        Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
                     }
-                    ImageContainer_SetArray(Image, (void****) NewArray);
-                    free(Array);
-                } else {
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
                 }
-            } else if (Type == ImageType_Integer16) {
-                int16_t ****Array    = (int16_t****) ImageContainer_GetArray(Image);
-                
-                int16_t ****NewArray = calloc((Width - (Top + Bottom)) * (Height - (Left + Right)) * NumChannels * NumViews, sizeof(int16_t));
-                if (NewArray != NULL) {
-                    for (uint8_t View = 0; View < NumViews - 1; View++) {
-                        for (int64_t W = Left; W < Right; W++) {
-                            for (int64_t H = Top; H < Bottom; H++) {
-                                for (uint64_t Channel = 0ULL; Channel < NumChannels - 1; Channel++) {
-                                    NewArray[View][W][H][Channel] = Array[View][W + Left][H + Top][Channel];
-                                }
-                            }
-                        }
-                    }
-                    ImageContainer_SetArray(Image, (void****) NewArray);
-                    free(Array);
-                } else {
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
-                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate resized array"));
             }
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
@@ -787,6 +781,7 @@ extern "C" {
             } else if (Image->Type == ImageType_Integer16) {
                 free(Image->Pixels.UInteger16);
             }
+            free(Image->ChannelMask);
             free(Image);
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
@@ -813,8 +808,7 @@ extern "C" {
                         Histogram->Type              = Image->Type;
                         Histogram->NumEntries        = Image->Height * Image->Width;
                     } else {
-                        free(Histogram->Histogram.UInteger8);
-                        free(Histogram);
+                        ImageHistogram_Deinit(Histogram);
                         Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
                     }
                 } else if (Image->Type == ImageType_Integer16) {
@@ -823,12 +817,12 @@ extern "C" {
                         Histogram->Type              = Image->Type;
                         Histogram->NumEntries        = Image->Height * Image->Width;
                     } else {
-                        free(Histogram->Histogram.UInteger16);
-                        free(Histogram);
+                        ImageHistogram_Deinit(Histogram);
                         Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
                     }
                 }
             } else {
+                ImageHistogram_Deinit(Histogram);
                 Log(Log_ERROR, __func__, U8("Couldn't allocate ImageHistogram"));
             }
         } else {
