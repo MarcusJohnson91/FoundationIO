@@ -115,11 +115,8 @@ extern "C" {
         
         va_list VariadicArguments;
         va_start(VariadicArguments, Description);
-        uint64_t   StringSize       = vsnprintf(NULL, 0, Description, VariadicArguments) + NewLineWithNULLSize;
-        UTF8      *VariadicString   = calloc(StringSize, sizeof(UTF8));
-        vsnprintf(VariadicString, StringSize, Description, VariadicArguments);
+        UTF8 *VariadicString = UTF8_FormatString(Description, VariadicArguments);
         va_end(VariadicArguments);
-        
         
         
         if (Log_ProgramName != NULL) {
