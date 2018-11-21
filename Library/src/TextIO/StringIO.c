@@ -1782,7 +1782,7 @@ extern "C" {
     UTF8 **UTF8_StringArray_Init(uint64_t NumStrings) {
         UTF8 **StringArray = NULL;
         if (NumStrings > 0) {
-            StringArray    = calloc(NumStrings + 1, sizeof(UTF8*));
+            StringArray    = calloc(NumStrings, sizeof(UTF8*));
         } else {
             Log(Log_ERROR, __func__, U8("NumStrings %llu is invalid"), NumStrings);
         }
@@ -1792,7 +1792,7 @@ extern "C" {
     UTF16 **UTF16_StringArray_Init(uint64_t NumStrings) {
         UTF16 **StringArray = NULL;
         if (NumStrings > 0) {
-            StringArray    = calloc(NumStrings + 1, sizeof(UTF16*));
+            StringArray    = calloc(NumStrings, sizeof(UTF16*));
         } else {
             Log(Log_ERROR, __func__, U8("NumStrings %llu is invalid"), NumStrings);
         }
@@ -1802,7 +1802,7 @@ extern "C" {
     UTF32 **UTF32_StringArray_Init(uint64_t NumStrings) {
         UTF32 **StringArray = NULL;
         if (NumStrings > 0) {
-            StringArray    = calloc(NumStrings + 1, sizeof(UTF32*));
+            StringArray    = calloc(NumStrings, sizeof(UTF32*));
         } else {
             Log(Log_ERROR, __func__, U8("NumStrings %llu is invalid"), NumStrings);
         }
@@ -2313,6 +2313,13 @@ extern "C" {
         StringTypes      StringType;
     } FormatString;
     
+    static void FormatString_Deinit(FormatString *String2Deinit) {
+        if (String2Deinit != NULL) {
+            free(String2Deinit->Specifiers);
+            free(String2Deinit);
+        }
+    }
+    
     static FormatString *FormatString_Init(uint64_t NumSpecifiers) {
         FormatString *NewFormatString          = calloc(1, sizeof(FormatString));
         if (NewFormatString != NULL) {
@@ -2320,7 +2327,7 @@ extern "C" {
             if (NewFormatString->Specifiers != NULL) {
                 NewFormatString->NumSpecifiers = NumSpecifiers;
             } else {
-                free(NewFormatString);
+                FormatString_Deinit(NewFormatString);
                 Log(Log_ERROR, __func__, U8("Couldn't allocate %lld Specifiers"), NumSpecifiers);
             }
         } else {
@@ -2617,13 +2624,6 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         return Details;
-    }
-    
-    static void FormatString_Deinit(FormatString *String2Deinit) {
-        if (String2Deinit != NULL) {
-            free(String2Deinit->Specifiers);
-            free(String2Deinit);
-        }
     }
     
     static UTF32 *FormatString_UTF32(UTF32 *Format, FormatString *Details, va_list VariadicArguments) {
