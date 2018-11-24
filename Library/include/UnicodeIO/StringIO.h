@@ -785,8 +785,6 @@ extern "C" {
 #endif /* MSVC Version */
 #endif /* Compiler */
     
-    
-    
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
      @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
@@ -864,8 +862,6 @@ extern "C" {
      @param               OutputFile       "a valid FILE pointer, or STDIN/STDOUT/STDERR".
      */
     void                  UTF32_WriteString(UTF32 *String, FILE *OutputFile);
-    
-#define WriteString(String) _Generic((String), UTF8*:UTF8_WriteString, UTF16*:UTF16_WriteString, UTF32*:UTF32_WriteString)(String)
     
     /* StringArrays */
     
@@ -1004,6 +1000,38 @@ extern "C" {
      @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
      */
     void                  UTF32_StringArray_Deinit(UTF32 **StringArray);
+    
+#define GetStringSizeInCodeUnits(String)  _Generic((String), UTF8:UTF8_GetStringSizeInCodeUnits, UTF8*:UTF8_GetStringSizeInCodeUnits, UTF16:UTF16_GetStringSizeInCodeUnits, UTF16*:UTF16_GetStringSizeInCodeUnits)(String)
+    
+#define GetStringSizeInCodePoints(String) _Generic((String), UTF8:UTF8_GetStringSizeInCodePoints, UTF8*:UTF8_GetStringSizeInCodePoints, UTF16:UTF16_GetStringSizeInCodePoints, UTF16*:UTF16_GetStringSizeInCodePoints, UTF32:UTF32_GetStringSizeInCodePoints, UTF32*:UTF32_GetStringSizeInCodePoints)(String)
+    
+#define GetStringSizeInGraphemes(String)  _Generic((String), UTF8:UTF8_GetStringSizeInGraphemes, UTF8*:UTF8_GetStringSizeInGraphemes, UTF16:UTF16_GetStringSizeInGraphemes, UTF16*:UTF16_GetStringSizeInGraphemes, UTF32:UTF32_GetStringSizeInGraphemes, UTF32*:UTF32_GetStringSizeInGraphemes)(String)
+    
+#define StringHasBOM(String)              _Generic((String), UTF8:UTF8_StringHasBOM, UTF8*:UTF8_StringHasBOM, UTF16:UTF16_StringHasBOM, UTF16*:UTF16_StringHasBOM, UTF32:UTF32_StringHasBOM, UTF32*:UTF32_StringHasBOM)(String)
+    
+#define FormatString(String, ...)         _Generic((String), UTF8:UTF8_FormatString, UTF8*:UTF8_FormatString, UTF16:UTF16_FormatString, UTF16*:UTF16_FormatString, UTF32:UTF32_FormatString, UTF32*:UTF32_FormatString)(String, ...)
+    
+#define GetNumFormatSpecifiers(String)    _Generic((String), UTF8:UTF8_GetNumFormatSpecifiers, UTF8*:UTF8_GetNumFormatSpecifiers, UTF16:UTF16_GetNumFormatSpecifiers, UTF16*:UTF16_GetNumFormatSpecifiers, UTF32:UTF32_GetNumFormatSpecifiers, UTF32*:UTF32_GetNumFormatSpecifiers)(String)
+    
+#define WriteString(String)               _Generic((String), UTF8:UTF8_WriteString, UTF8*:UTF8_WriteString, UTF16:UTF16_WriteString, UTF16*:UTF16_WriteString, UTF32:UTF32_WriteString, UTF32*:UTF32_WriteString)(String)
+    
+#define Clone(String)                     _Generic((String), UTF8:UTF8_Clone, UTF8*:UTF8_Clone, UTF16:UTF16_Clone, UTF16*:UTF16_Clone, UTF32:UTF32_Clone, UTF32*:UTF32_Clone)(String)
+    
+#define Insert(String, Substring2Insert, Offset)                    _Generic((String), UTF8:UTF8_Insert, UTF8*:UTF8_Insert, UTF16:UTF16_Insert, UTF16*:UTF16_Insert, UTF32:UTF32_Insert, UTF32*:UTF32_Insert)(String, Substring2Insert, Offset)
+    
+#define Compare(String1, String2)         _Generic((String1), UTF8:UTF8_Compare, UTF8*:UTF8_Compare, UTF16:UTF16_Compare, UTF16*:UTF16_Compare, UTF32:UTF32_Compare, UTF32*:UTF32_Compare)(String1, String2)
+    
+#define Trim(String, Strings2Remove)      _Generic((String), UTF8:UTF8_TrimString, UTF8*:UTF8_TrimString, UTF16:UTF16_TrimString, UTF16*:UTF16_TrimString, UTF32:UTF32_TrimString, UTF32*:UTF32_TrimString)(String, Strings2Remove)
+    
+#define String2Decimal(String)            _Generic((String), UTF8:UTF8_String2Decimal, UTF8*:UTF8_String2Decimal, UTF16:UTF16_String2Decimal, UTF16*:UTF16_String2Decimal, UTF32:UTF32_String2Decimal, UTF32*:UTF32_String2Decimal)(String)
+    
+#define String2Integer(String)            _Generic((String), UTF8:UTF8_String2Integer, UTF8*:UTF8_String2Integer, UTF16:UTF16_String2Integer, UTF16*:UTF16_String2Integer, UTF32:UTF32_String2Integer, UTF32*:UTF32_String2Integer)(String)
+    
+#define SplitString(String, Delimiters)   _Generic((String), UTF8:UTF8_SplitString, UTF8*:UTF8_SplitString, UTF16:UTF16_SplitString, UTF16*:UTF16_SplitString, UTF32:UTF32_SplitString, UTF32*:UTF32_SplitString)(String, Delimiters)
+    
+#define Normalize(String)                 _Generic((String), UTF8:UTF8_NormalizeString, UTF8*:UTF8_NormalizeString, UTF16:UTF16_NormalizeString, UTF16*:UTF16_NormalizeString, UTF32:UTF32_NormalizeString, UTF32*:UTF32_NormalizeString)(String)
+    
+#define CaseFold(String)                  _Generic((String), UTF8:UTF8_CaseFold, UTF8*:UTF8_CaseFold, UTF16:UTF16_CaseFold, UTF16*:UTF16_CaseFold, UTF32:UTF32_CaseFold, UTF32*:UTF32_CaseFold)(String)
     
 #ifdef __cplusplus
 }
