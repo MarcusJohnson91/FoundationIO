@@ -56,7 +56,7 @@ extern "C" {
      @enum                      UnaryTypes
      @constant                  CountUnary                      "Supports whole numbers (including zero)".
      @constant                  TruncatedCountUnary             "Supports counting numbers (excluding zero)".
-     @constant                  WholeUnary                      "Supports all the integers including zero and negatives (up to 2^63 -1 anyway)".
+     @constant                  WholeUnary                      "Supports all the integers including zero and negatives (up to 2^63 anyway)".
      */
     typedef enum UnaryTypes {
                                 UnknownUnary                    = 0,
@@ -68,7 +68,7 @@ extern "C" {
     /*!
      @enum                      ByteOrders
      @constant                  UnknownByteOrder                "Unknown byte order".
-     @constant                  LSByteFirst                     "Read from the Least Significant Byte to the Most Significant, aka right to left".
+     @constant                  LSByteFirst                     "Read from the Least Significant Byte to the Most  Significant, aka right to left".
      @constant                  MSByteFirst                     "Read from the Most  Significant Byte to the Least Significant, aka left to right".
      */
     typedef enum ByteOrders {
@@ -80,8 +80,8 @@ extern "C" {
     /*!
      @enum                      BitOrders
      @constant                  UnknownBitOrder                 "Unknown bit order".
-     @constant                  LSBitFirst                      "Read from the Least Significant Bit  to the Most  Significant, aka right to left".
-     @constant                  MSBitFirst                      "Read from the Most  Significant Bit  to the Least Significant, aka left to right".
+     @constant                  LSBitFirst                      "Read from the Least Significant Bit to the Most  Significant, aka right to left".
+     @constant                  MSBitFirst                      "Read from the Most  Significant Bit to the Least Significant, aka left  to right".
      */
     typedef enum BitOrders {
                                 UnknownBitOrder                 = 0,
@@ -92,10 +92,10 @@ extern "C" {
     /*!
      @enum                      GUUIDTypes
      @constant                  UnknownGUUID                    "The GUUID type is unknown, invalid".
-     @constant                  GUIDString                      "The GUUID is a GUID string, aka little endian/Least Significant Byte first UUID with hyphens".
-     @constant                  UUIDString                      "The GUUID is a UUID string, aka big endian   /Most  Significant Byte first UUID with hyphens".
-     @constant                  BinaryGUID                      "The GUUID is a Binary GUID, aka little endian/Least Significant Byte first UUID without hyphens".
-     @constant                  BinaryUUID                      "The GUUID is a Binary UUID, aka big endian   /Most  Significant Byte First UUID without hypthns".
+     @constant                  GUIDString                      "The GUUID is a GUID string, aka LSByte first UUID with hyphens".
+     @constant                  UUIDString                      "The GUUID is a UUID string, aka MSByte first UUID with hyphens".
+     @constant                  BinaryGUID                      "The GUUID is a Binary GUID, aka LSByte first UUID without hyphens".
+     @constant                  BinaryUUID                      "The GUUID is a Binary UUID, aka MSByte first UUID without hypthns".
      */
     typedef enum GUUIDTypes {
                                 UnknownGUUID                    = 0,
