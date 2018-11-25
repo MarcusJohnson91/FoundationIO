@@ -278,10 +278,11 @@ extern "C" {
                         BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)] = Data2Insert & 0xFF << Byte * 8;
                     }
                 } else {
+                    uint64_t ByteOffset               = 0;
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE) // FIXME: Assuming all platforms use LE byte order
-                    uint64_t ByteOffset               = Bits2Bytes(BitB->BitOffset + 1, No);
+                    ByteOffset                        = Bits2Bytes(BitB->BitOffset + 1, No);
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                    uint64_t ByteOffset               = Bits2Bytes(BitB->BitOffset + 1 + NumBits2Insert, No);
+                    ByteOffset                        = Bits2Bytes(BitB->BitOffset + 1 + NumBits2Insert, No);
 #endif
                     uint8_t  Bits2InsertForThisByte   = 8 - (BitB->BitOffset % 8);
                     uint8_t  BitMask                  = 0;
@@ -312,10 +313,11 @@ extern "C" {
                         ExtractedBits = BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)];
                     }
                 } else {
+                    uint64_t ByteOffset               = 0;
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE) // FIXME: Assuming all platforms use LE byte order
-                    uint64_t ByteOffset               = Bits2Bytes(BitB->BitOffset + 1, No);
+                    ByteOffset                        = Bits2Bytes(BitB->BitOffset + 1, No);
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                    uint64_t ByteOffset               = Bits2Bytes(BitB->BitOffset + 1 + NumBits2Extract, No);
+                    ByteOffset                        = Bits2Bytes(BitB->BitOffset + 1 + NumBits2Extract, No);
 #endif
                     uint8_t  Bits2ExtractFromThisByte = 8 - (BitB->BitOffset % 8);
                     uint8_t  BitMask                  = 0;
@@ -562,7 +564,8 @@ extern "C" {
     
     void BitBuffer_Write(BitBuffer *BitB, BitOutput *BitO) {
         if (BitB != NULL && BitO != NULL) {
-            uint64_t Bytes2Write  = Bits2Bytes(BitB->BitOffset, No);
+            
+            uint64_t Bytes2Write  = Bits2Bytes(BitBuffer_GetPosition(BitB), No);
             uint64_t Bits2Keep    = BitB->BitOffset % 8;
             uint64_t BytesWritten = 0ULL;
             if (BitO->FileType == BitIOFile) {
@@ -717,11 +720,12 @@ extern "C" {
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
                 UTF8  *NewPath     = UTF8_FormatString(BitI->InputPath.Path8, BitI->FileSpecifierNum);
                 FoundationIO_File_Open(NewPath, U8("rb"));
+                free(NewPath);
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
                 UTF16 *NewPath     = UTF16_FormatString(BitI->InputPath.Path16, BitI->FileSpecifierNum);
                 FoundationIO_File_Open(NewPath, U16("rb"));
-#endif
                 free(NewPath);
+#endif
             }
         } else {
             Log(Log_ERROR, __func__, U8("BitOutput Pointer is NULL"));
@@ -921,11 +925,12 @@ extern "C" {
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
                 UTF8  *NewPath     = UTF8_FormatString(BitO->OutputPath.Path8, BitO->FileSpecifierNum);
                 FoundationIO_File_Open(NewPath, U8("rb"));
+                free(NewPath);
 #elif (FoundationIOTargetOS == FoundationIOOSWindows)
                 UTF16 *NewPath     = UTF16_FormatString(BitO->OutputPath.Path16, BitO->FileSpecifierNum);
                 FoundationIO_File_Open(NewPath, U16("rb"));
-#endif
                 free(NewPath);
+#endif
             }
         } else {
             Log(Log_ERROR, __func__, U8("BitOutput Pointer is NULL"));
