@@ -549,7 +549,7 @@ extern "C" {
     }
     
     void BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, const uint8_t *GUUID2Write) {
-        if (BitB != NULL && BitBuffer_GetPosition(BitB)  && GUUID2Write != NULL) { // TODO: Make sure that the BitBuffer can hold the GUUID
+        if (BitB != NULL && GUUID2Write != NULL) { // TODO: Make sure that the BitBuffer can hold the GUUID
             uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? GUUIDStringSize - NULLTerminatorSize : BinaryGUUIDSize);
             uint8_t ByteOrder = ((GUUIDType == GUIDString || GUUIDType == BinaryGUID) ? LSByteFirst : MSByteFirst);
             for (uint8_t Byte = 0; Byte < GUUIDSize - 1; Byte++) {
@@ -564,7 +564,6 @@ extern "C" {
     
     void BitBuffer_Write(BitBuffer *BitB, BitOutput *BitO) {
         if (BitB != NULL && BitO != NULL) {
-            
             uint64_t Bytes2Write  = Bits2Bytes(BitBuffer_GetPosition(BitB), No);
             uint64_t Bits2Keep    = BitB->BitOffset % 8;
             uint64_t BytesWritten = 0ULL;
@@ -869,14 +868,17 @@ extern "C" {
     void BitOutput_UTF16_OpenFile(BitOutput *BitO, UTF16 *Path2Open) {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType              = BitIOFile;
+            bool  PathHasBOM            = No;
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
             // Convert to UTF-8, and remove the BOM because fopen will silently fail if there's a BOM.
             UTF32 *Decoded              = UTF16_Decode(Path2Open);
-            bool   PathHasBOM           = UTF32_StringHasBOM(Decoded);
-            BitO->FileSpecifierExists   = UTF32_NumFormatSpecifiers(Decoded) >= 1 ? Yes : No;
+            PathHasBOM                  = UTF32_StringHasBOM(Decoded);
             if (PathHasBOM == Yes) {
                 BitO->OutputPath.Path32 = UTF32_RemoveBOM(Decoded);
+            } else {
+                BitO->OutputPath.Path32 = Decoded;
             }
+            BitO->FileSpecifierExists   = UTF32_NumFormatSpecifiers(BitO->OutputPath.Path32) >= 1 ? Yes : No;
             if (BitO->FileSpecifierExists == Yes) {
                 UTF32 *Formatted        = UTF32_FormatString(BitO->OutputPath.Path32, BitO->FileSpecifierNum);
                 UTF8  *Formatted8       = UTF8_Encode(Formatted);
