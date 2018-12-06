@@ -4,8 +4,6 @@
 #include "../include/Log.h"            /* Included for Log */
 #include "../include/StringIO.h"       /* Included for StringIO's declarations */
 
-#include <string.h>                    /* Included for memset and memmove */
-
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
 #include <signal.h>                    /* Included for SIGWINCH handling */
 #include <sys/ioctl.h>                 /* Included for the terminal size */
@@ -417,11 +415,9 @@ extern "C" {
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 uint64_t HalfOfTheIndicators = (PercentComplete / 2);
-                // Now we go ahead and memset a string with the proper number of indicators
-                UTF8 *Indicator             = calloc(CommandLineIO_GetTerminalWidth(), sizeof(UTF8));
-                memset(Indicator, '-', HalfOfTheIndicators); // The point is to set half of the string (minus the substrings) to a dash, so this should actually be Format.
-                                                             // The format string should be an array of Z dashes.
-                UTF8 *FormattedString       = UTF8_FormatString(U8("[%s%s %lld/%lld %hhu/%s %s]"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF8);
+                UTF8    *Indicator           = calloc(CommandLineIO_GetTerminalWidth(), sizeof(UTF8));
+                UTF8_SetString(Indicator, '-');
+                UTF8    *FormattedString     = UTF8_FormatString(U8("[%s%s %lld/%lld %hhu/%s %s]"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF8);
                 UTF8_WriteString(FormattedString, stdout);
                 free(Indicator);
             }
@@ -462,11 +458,9 @@ extern "C" {
                                                                             // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
                 uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
-                uint8_t HalfOfTheIndicators = (PercentComplete / 2);
-                // Now we go ahead and memset a string with the proper number of indicators
-                UTF16 *Indicator            = calloc(CommandLineIO_GetTerminalWidth, sizeof(UTF16));
-                memset(Indicator, '-', HalfOfTheIndicators);
-                UTF16 *FormattedString      = UTF16_FormatString(U16("[%s%s %lld/%lld %hhu/%s %s]"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF16);
+                UTF16  *Indicator           = calloc(CommandLineIO_GetTerminalWidth, sizeof(UTF16));
+                UTF16_SetString(Indicator, U16('-'));
+                UTF16  *FormattedString     = UTF16_FormatString(U16("[%s%s %lld/%lld %hhu/%s %s]"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF16);
                 UTF16_WriteString(FormattedString, stdout);
                 free(Indicator);
             }
