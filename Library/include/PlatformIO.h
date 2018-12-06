@@ -58,10 +58,6 @@ extern "C" {
 #define             FoundationIOOSMacClassic   4
 #endif           /* MacClassicOS */
     
-#ifndef             FoundationIOOSAppleMach
-#define             FoundationIOOSAppleMach    8
-#endif           /* iOS/MacOS */
-    
 #if defined(macintosh) || defined(Macintosh)
     
 #ifndef             FoundationIOTargetOS
@@ -90,11 +86,7 @@ extern "C" {
 #include <sys/socket.h> /* Included for socket support */
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
     
-#if defined(__APPLE__) && defined(__MACH__)
-#define FoundationIOTargetOS (FoundationIOOSAppleMach | FoundationIOOSPOSIX)
-#elif !defined(__APPLE__)
 #define FoundationIOTargetOS (FoundationIOOSPOSIX)
-#endif
     
 #ifndef             NewLineWithNULLSize
 #define             NewLineWithNULLSize    1
