@@ -19,12 +19,12 @@ extern "C" {
         return (Integer ^ -Sign) + Sign;
     }
     
-    uint64_t AbsoluteF(float Decimal) {
-        return (uint64_t) ExtractExponentF(Decimal);
+    uint8_t AbsoluteF(float Decimal) {
+        return (uint8_t) ExtractExponentF(Decimal);
     }
     
-    uint64_t AbsoluteD(double Decimal) {
-        return (uint64_t) ExtractExponentD(Decimal);
+    uint16_t AbsoluteD(double Decimal) {
+        return (uint16_t) ExtractExponentD(Decimal);
     }
     
     int64_t  FloorF(float Decimal) {
@@ -102,7 +102,7 @@ extern "C" {
     int64_t  RoundF(float Decimal) {
         int64_t  Result   = 0;
         int8_t   Sign     = ExtractSignF(Decimal);
-        int16_t  Exponent = ExtractExponentF(Decimal);
+        int8_t   Exponent = ExtractExponentF(Decimal);
         int64_t  Mantissa = ExtractMantissaF(Decimal);
         if (Mantissa >= 4096) { // 0.5
             Result        = Exponent + 1;
@@ -135,7 +135,7 @@ extern "C" {
     
     bool     DecimalIsNormalF(float Decimal) {
         bool IsNormal = No;
-        int16_t Exponent = ExtractExponentF(Decimal);
+        int8_t Exponent = ExtractExponentF(Decimal);
         if (Exponent >= 1 && Exponent <= 0xFE) {
             IsNormal  = Yes;
         }
@@ -186,7 +186,7 @@ extern "C" {
         bool   IsNotANumber = No;
         int8_t  Sign       = ExtractSignD(Decimal);
         int16_t Exponent   = (((uint64_t)Decimal) & 0x7FF0000000000000) >> 52;
-        int32_t Mantissa   = ExtractMantissaD(Decimal);
+        int64_t Mantissa   = ExtractMantissaD(Decimal);
         if (Sign == 1 && Exponent == 0x7FF && Mantissa > 0) {
             IsNotANumber   = Yes;
         }
@@ -195,7 +195,7 @@ extern "C" {
     
     bool     NumberHasDecimalPointF(float Decimal) {
         bool HasDecimalPoint = No;
-        int16_t Mantissa     = ExtractMantissaF(Decimal);
+        int32_t Mantissa     = ExtractMantissaF(Decimal);
         if ((Mantissa & 0x1FFF) > 0) {
             HasDecimalPoint  = Yes;
         }
@@ -204,7 +204,7 @@ extern "C" {
     
     bool     NumberHasDecimalPointD(double Decimal) {
         bool HasDecimalPoint = No;
-        int16_t Mantissa     = ExtractMantissaD(Decimal);
+        int64_t Mantissa     = ExtractMantissaD(Decimal);
         if ((Mantissa & 0x7FFFFFFFFFF) > 0) {
             HasDecimalPoint  = Yes;
         }

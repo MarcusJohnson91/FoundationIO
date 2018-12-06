@@ -47,13 +47,13 @@ extern "C" {
      @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
      @param                     Decimal                         "The value to find the absolute value of".
      */
-    uint64_t                    AbsoluteF(float Decimal);
+    uint8_t                     AbsoluteF(float Decimal);
     
     /*!
      @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
      @param                     Decimal                         "The value to find the absolute value of".
      */
-    uint64_t                    AbsoluteD(double Decimal);
+    uint16_t                    AbsoluteD(double Decimal);
     
     /*!
      @abstract                                                  "Returns the Floor value of a decimal".
