@@ -1184,6 +1184,123 @@ extern "C" {
         }
         return Inserted;
     }
+    
+    void UTF8_SetString(UTF8 *String, UTF8 *Setter) {
+        if (String != NULL && Setter != NULL) {
+            // Now get the size of the Set string, and loop over the String to set that many codepoints to the value.
+            
+            uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(String);
+            uint64_t SetterSize = UTF8_GetStringSizeInCodeUnits(Setter);
+            if (SetterSize < StringSize) {
+                // Do it
+                // Ok so what do we do?
+                // Loop over the String, and loop over the Setter, the string will be longer, so loop over it on the outside.
+                for (uint64_t StringCodeUnit = 0ULL; StringCodeUnit < StringSize; StringCodeUnit++) {
+                    for (uint64_t SetterCodeUnit = 0ULL; SetterCodeUnit < SetterSize; SetterCodeUnit++) {
+                        String[StringCodeUnit] = Setter[SetterCodeUnit];
+                    }
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Setter is larger than String"));
+            }
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (Setter == NULL) {
+            Log(Log_ERROR, __func__, U8("Setter Pointer is NULL"));
+        }
+    }
+    
+    void UTF16_SetString(UTF16 *String, UTF16 *Setter) {
+        if (String != NULL && Setter != NULL) {
+            // Now get the size of the Set string, and loop over the String to set that many codepoints to the value.
+            
+            uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(String);
+            uint64_t SetterSize = UTF16_GetStringSizeInCodeUnits(Setter);
+            if (SetterSize < StringSize) {
+                // Do it
+                // Ok so what do we do?
+                // Loop over the String, and loop over the Setter, the string will be longer, so loop over it on the outside.
+                for (uint64_t StringCodeUnit = 0ULL; StringCodeUnit < StringSize; StringCodeUnit++) {
+                    for (uint64_t SetterCodeUnit = 0ULL; SetterCodeUnit < SetterSize; SetterCodeUnit++) {
+                        String[StringCodeUnit] = Setter[SetterCodeUnit];
+                    }
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Setter is larger than String"));
+            }
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (Setter == NULL) {
+            Log(Log_ERROR, __func__, U8("Setter Pointer is NULL"));
+        }
+    }
+    
+    void UTF32_SetString(UTF32 *String, UTF32 *Setter) {
+        if (String != NULL && Setter != NULL) {
+            // Now get the size of the Set string, and loop over the String to set that many codepoints to the value.
+            
+            uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t SetterSize = UTF32_GetStringSizeInCodePoints(Setter);
+            if (SetterSize < StringSize) {
+                // Do it
+                // Ok so what do we do?
+                // Loop over the String, and loop over the Setter, the string will be longer, so loop over it on the outside.
+                for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                    for (uint64_t SetterCodePoint = 0ULL; SetterCodePoint < SetterSize; SetterCodePoint++) {
+                        String[StringCodePoint] = Setter[SetterCodePoint];
+                    }
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Setter is larger than String"));
+            }
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (Setter == NULL) {
+            Log(Log_ERROR, __func__, U8("Setter Pointer is NULL"));
+        }
+    }
+    
+    void UTF8_WriteString(UTF8 *String, FILE *OutputFile) {
+        if (String != NULL && OutputFile != NULL) {
+            uint64_t StringSize        = UTF8_GetStringSizeInCodePoints(String);
+            uint64_t CodePointsWritten = fwrite(String, sizeof(UTF8), StringSize, OutputFile);
+            if (CodePointsWritten < StringSize) {
+                Log(Log_ERROR, __func__, U8("Only wrote %lld codepoints of %lld"), CodePointsWritten, StringSize);
+            }
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (OutputFile == NULL) {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+    }
+    
+    void UTF16_WriteString(UTF16 *String, FILE *OutputFile) {
+        if (String != NULL && OutputFile != NULL) {
+            uint64_t StringSize        = UTF16_GetStringSizeInCodePoints(String);
+            uint64_t CodePointsWritten = fwrite(String, sizeof(UTF16), StringSize, OutputFile);
+            if (CodePointsWritten < StringSize) {
+                Log(Log_ERROR, __func__, U8("Only wrote %lld codepoints of %lld"), CodePointsWritten, StringSize);
+            }
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (OutputFile == NULL) {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+    }
+    
+    void UTF32_WriteString(UTF32 *String, FILE *OutputFile) {
+        if (String != NULL && OutputFile != NULL) {
+            uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t CodePointsWritten = fwrite(String, sizeof(UTF32), StringSize, OutputFile);
+            if (CodePointsWritten < StringSize) {
+                Log(Log_ERROR, __func__, U8("Only wrote %lld codepoints of %lld"), CodePointsWritten, StringSize);
+            }
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (OutputFile == NULL) {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+    }
     /* Medium Functions */
     
     /* Fancy functions */
@@ -3194,61 +3311,6 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         return Format32;
-    }
-    
-    void UTF8_WriteString(UTF8 *String, FILE *OutputFile) {
-        if (String != NULL && OutputFile != NULL) {
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
-            fputs(String, OutputFile);
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
-            UTF32 *String32 = UTF8_Decode(String);
-            UTF16 *String16 = UTF16_Encode(String32);
-            fputws(String16, OutputFile);
-            free(String32);
-            free(String16);
-#endif
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (OutputFile == NULL) {
-            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
-        }
-    }
-    
-    void UTF16_WriteString(UTF16 *String, FILE *OutputFile) {
-        if (String != NULL && OutputFile != NULL) {
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
-            UTF32 *String32 = UTF16_Decode(String);
-            UTF8  *String8  = UTF8_Encode(String32);
-            free(String32);
-            fputs(String8, OutputFile);
-            free(String8);
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
-            fputws(String, OutputFile);
-#endif
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (OutputFile == NULL) {
-            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
-        }
-    }
-    
-    void UTF32_WriteString(UTF32 *String, FILE *OutputFile) {
-        if (String != NULL && OutputFile != NULL) {
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
-            UTF8  *String8  = UTF8_Encode(String);
-            fputs(String8, OutputFile);
-            free(String8);
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
-            // Encode to UTF16, then write with fputws
-            UTF16 *String16 = UTF16_Encode(String);
-            fputws(String16, OutputFile);
-            free(String16);
-#endif
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (OutputFile == NULL) {
-            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
-        }
     }
     
 #ifdef __cplusplus

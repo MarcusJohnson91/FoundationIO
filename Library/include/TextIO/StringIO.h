@@ -768,6 +768,27 @@ extern "C" {
     UTF32                *UTF32_Insert(UTF32 *String, UTF32 *String2Insert, uint64_t Offset);
     
     /*!
+     @abstract                             "Fills a string with the contents of Setter".
+     @param               String           "The string to set".
+     @param               Setter           "A single copy of what to set the string to, could be a single code unit, or a string, MUST be smaller than the string".
+     */
+    void                  UTF8_SetString(UTF8 *String, UTF8 *Setter);
+    
+    /*!
+     @abstract                             "Fills a string with the contents of Setter".
+     @param               String           "The string to set".
+     @param               Setter           "A single copy of what to set the string to, could be a single code unit, or a string, MUST be smaller than the string".
+     */
+    void                  UTF16_SetString(UTF16 *String, UTF16 *Setter);
+    
+    /*!
+     @abstract                             "Fills a string with the contents of Setter".
+     @param               String           "The string to set".
+     @param               Setter           "A single copy of what to set the string to, could be a single code unit, or a string, MUST be smaller than the string".
+     */
+    void                  UTF32_SetString(UTF32 *String, UTF32 *Setter);
+    
+    /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
      @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
