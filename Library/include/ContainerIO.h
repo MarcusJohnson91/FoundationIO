@@ -245,14 +245,14 @@ extern "C" {
      @remark                               "You need to cast the pointer to the correct type you got from ImageType_GetType".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
-    void                ****ImageContainer_GetArray(ImageContainer *Image);
+    void                   *ImageContainer_GetArray(ImageContainer *Image);
     
     /*!
      @abstract                             "Sets a pointer to the array of pixels".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      @param                 Array          "A pointer to the new array".
      */
-    void                    ImageContainer_SetArray(ImageContainer *Image, void ****Array);
+    void                    ImageContainer_SetArray(ImageContainer *Image, void *Array);
     
     /*!
      @abstract                             "Returns the average value (rounded) of the pixels in this image".
@@ -315,14 +315,14 @@ extern "C" {
      @param                 Histogram      "A pointer to the instance of an ImageHistogram in question".
      @return                               "Returns a pointer to the histogram data".
      */
-    void                 ***ImageHistogram_GetArray(ImageHistogram *Histogram);
+    void                   *ImageHistogram_GetArray(ImageHistogram *Histogram);
     
     /*!
      @abstract                             "Sets a pointer to the histogram data".
      @param                 Histogram      "A pointer to the instance of an ImageHistogram in question".
      @param                 Array          "A pointer to the histogram data".
      */
-    void                    ImageHistogram_SetArray(ImageHistogram *Histogram, void ***Array);
+    void                    ImageHistogram_SetArray(ImageHistogram *Histogram, void *Array);
     
     /*!
      @abstract                             "Generates a histogram from an image".
