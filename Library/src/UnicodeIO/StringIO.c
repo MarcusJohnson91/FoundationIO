@@ -1716,8 +1716,6 @@ extern "C" {
         int16_t  Exponent2        = AbsoluteD(Exponent);
         uint64_t Mantissa         = ExtractMantissaD(Number);
         uint64_t Mantissa2        = AbsoluteD(Mantissa);
-        uint16_t ExponentSize     = 0ULL;
-        uint64_t MantissaSize     = 0ULL;
         uint64_t StringSize       = 0ULL;
         bool     IsDenormal       = No;
         bool     IsNotANumber     = No;
@@ -1729,6 +1727,12 @@ extern "C" {
             IsInfinite            = Yes;
         } else if (Exponent == 0 && Mantissa >= 0) {
             IsDenormal            = Yes;
+        }
+        
+        if (IsNotANumber) {
+            OutputString          = UTF32_Clone(U32("Not A Number"));
+        } else if (IsInfinite) {
+            OutputString          = UTF32_Clone(U32("Infinity"));
         }
         
         // The Number to write is 1024.0
@@ -1753,53 +1757,42 @@ extern "C" {
          for Hex and Scientific use a naive algorithm.
          */
         
-        if (Base == Shortest || Base == Decimal) { // Ryū to the rescue!
-            
-        } else if (Base == Scientific || Base == Hex) { // 
-            
+        uint8_t NumDigitsExponent = 0;
+        uint8_t NumDigitsMantissa = 0;
+        
+        if (Base == Base2) {
+            NumDigitsExponent = GetNumDigitsInBase(2, Exponent2);
+            NumDigitsMantissa = GetNumDigitsInBase(2, Mantissa2);
+        } else if (Base == Base8) {
+            NumDigitsExponent = GetNumDigitsInBase(8, Exponent2);
+            NumDigitsMantissa = GetNumDigitsInBase(8, Mantissa2);
+        } else if (Base == Base10) {
+            NumDigitsExponent = GetNumDigitsInBase(10, Exponent2);
+            NumDigitsMantissa = GetNumDigitsInBase(10, Mantissa2);
+        } else if (Base == Base16) {
+            NumDigitsExponent = GetNumDigitsInBase(16, Exponent2);
+            NumDigitsMantissa = GetNumDigitsInBase(16, Mantissa2);
         }
         
-        if (Base == (Shortest | Uppercase)) { // Get the size of the string for both Decimal and Scientific representations, and choose the shortest.
-            /*
-             Choose between Decimal and Scientific at will.
-             
-             Get the size of the string in both representations and go with the smallest
-             So, we need a way to figure out the size of each representation without actually doing it.
-             */
-        } else if (Base == (Shortest | Lowercase)) { // Get the size of the string for both Decimal and Scientific representations, and choose the shortest.
-            /*
-             Choose between Decimal and Scientific at will.
-             
-             Get the size of the string in both representations and go with the smallest
-             So, we need a way to figure out the size of each representation without actually doing it.
-             */
+        StringSize           += NumDigitsExponent + NumDigitsMantissa;
+        
+        if (Base == Base10 && Sign == -1) {
+            StringSize       += 1;
         }
         
-        if (Sign == -1) {
-            StringSize           += 1;
-        }
-        do {
-            Exponent2            /= 10;
-            ExponentSize         += 1;
-        } while (ExponentSize > 0);
-        do {
-            Mantissa2            /= 10;
-            MantissaSize         += 1;
-        } while (MantissaSize > 0);
-        
-        if (Base == Decimal) { // Write the number as SXXX.MM // Exponent * Sign . Fraction, -1.1 = -1.100000
-            StringSize += 1; // Add one for the decimal seperator
+        if (Base == Base10) { // Write the number as SXXX.MM // Exponent * Sign . Fraction, -1.1 = -1.100000
+            StringSize       += 1; // Add one for the decimal seperator
         } else if (Base == (Hex | Uppercase)) { // Sign 0(x|X) . Fraction EP Exponent, -1.1 = -0X1.199999999999AP+0
-            StringSize += (5 + ExponentSize); // Add seven for the 0X, decimal seperator, AP, +, and 0.
+            StringSize       += 5; // Add seven for the 0X, decimal seperator, AP, +, and 0.
         } else if (Base == (Hex | Lowercase)) { // Sign 0(x|X) . Fraction EP Exponent, -1.1 = -0x1.199999999999ap+0
-            StringSize += (5 + ExponentSize); // Add seven for the 0x, decimal seperator, ap, +, and 0.
+            StringSize       += 5; // Add seven for the 0x, decimal seperator, ap, +, and 0.
         } else if (Base == (Scientific | Uppercase)) { // Write the number as XXX.YYE(+|-)Z // -1.1 = -1.100000E+00
-            StringSize += (2 + ExponentSize); // Add five for the decimal seperator, E, Sign, X.
+            StringSize       += 2; // Add five for the decimal seperator, E, Sign, X.
         } else if (Base == (Scientific | Lowercase)) { // Write the number as XXX.YYe(+|-)Z // -1.1 = -1.100000e+00
-            StringSize += (2 + ExponentSize); // Add five for the decimal seperator, e, +, and X.
+            StringSize       += 2; // Add five for the decimal seperator, e, +, and X.
         }
         
-        OutputString              = calloc(StringSize + ExponentSize + MantissaSize, sizeof(UTF32));
+        OutputString          = calloc(StringSize, sizeof(UTF32));
         if (OutputString != NULL) {
             // Now we go ahead and create the string
             if (Sign == -1) {
@@ -1807,47 +1800,47 @@ extern "C" {
             }
             // Now we start popping in the other variables, first is the Exponent.
             while (Exponent > 0) { // TODO: This assumes there's only 1 codepoint necessary to express the exponent
-                for (uint64_t ExponentCodePoint = 0ULL; ExponentCodePoint < ExponentSize - 1; ExponentCodePoint++) {
+                for (uint64_t ExponentCodePoint = 0ULL; ExponentCodePoint < NumDigitsExponent - 1; ExponentCodePoint++) {
                     OutputString[ExponentCodePoint + StringSize]                 = Exponent /= 10;
                 }
             }
-            OutputString[StringSize + ExponentSize + UnicodeBOMSizeInCodePoints] = U32('.');
+            OutputString[StringSize + NumDigitsExponent + UnicodeBOMSizeInCodePoints] = U32('.');
             // Now let's start popping in the Mantissa
             while (Mantissa > 0) { // TODO: This assumes there's only 1 codepoint necessary to express the exponent
-                for (uint64_t MantissaCodePoint = 0ULL; MantissaCodePoint < ExponentSize - 1; MantissaCodePoint++) {
-                    OutputString[StringSize + ExponentSize + MantissaCodePoint]  = Mantissa /= 10;
+                for (uint64_t MantissaCodePoint = 0ULL; MantissaCodePoint < NumDigitsExponent - 1; MantissaCodePoint++) {
+                    OutputString[StringSize + NumDigitsExponent + MantissaCodePoint]  = Mantissa /= 10;
                 }
             }
             if (Base == (Hex | Uppercase)) {
-                OutputString[StringSize + ExponentSize + MantissaSize + 1] = U32('A');
-                OutputString[StringSize + ExponentSize + MantissaSize + 2] = U32('P');
+                OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 1] = U32('A');
+                OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = U32('P');
             } else if (Base == (Hex | Lowercase)) {
-                OutputString[StringSize + ExponentSize + MantissaSize + 1] = U32('a');
-                OutputString[StringSize + ExponentSize + MantissaSize + 2] = U32('p');
+                OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 1] = U32('a');
+                OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = U32('p');
             } else if (Base == (Scientific | Uppercase)) {
-                OutputString[StringSize + ExponentSize + MantissaSize + 1] = U32('E');
+                OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 1] = U32('E');
                 // Write the sign, if the number is positive, write a +, otherwise write a -
                 if (Sign == -1) {
-                    OutputString[StringSize + ExponentSize + MantissaSize + 2] = U32('-');
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = U32('-');
                 } else {
-                    OutputString[StringSize + ExponentSize + MantissaSize + 2] = U32('+');
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = U32('+');
                 }
                 // Write the Exponent
-                uint64_t ExponentSizeInDigits = Logarithm(2, Exponent);
-                for (uint64_t ExponentDigit = 0ULL; ExponentDigit < ExponentSizeInDigits - 1; ExponentDigit++) {
-                    OutputString[StringSize + ExponentSize + MantissaSize + 2 + ExponentDigit] = U32("Exponent"); // FIXME: "Exponent" is NOT right
+                uint64_t NumDigitsExponentInDigits = Logarithm(2, Exponent);
+                for (uint64_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits - 1; ExponentDigit++) {
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = U32("Exponent"); // FIXME: "Exponent" is NOT right
                 }
             } else if (Base == (Scientific | Lowercase)) {
-                OutputString[StringSize + ExponentSize + MantissaSize + 2] = U32('e');
+                OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = U32('e');
                 if (Sign == -1) {
-                    OutputString[StringSize + ExponentSize + MantissaSize + 2] = U32('-');
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = U32('-');
                 } else {
-                    OutputString[StringSize + ExponentSize + MantissaSize + 2] = U32('+');
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = U32('+');
                 }
                 // Write the Exponent
-                uint64_t ExponentSizeInDigits = Logarithm(2, Exponent);
-                for (uint64_t ExponentDigit = 0ULL; ExponentDigit < ExponentSizeInDigits - 1; ExponentDigit++) {
-                    OutputString[StringSize + ExponentSize + MantissaSize + 2 + ExponentDigit] = U32("Exponent"); // FIXME: "Exponent" is NOT right
+                uint64_t NumDigitsExponentInDigits = Logarithm(2, Exponent);
+                for (uint64_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits - 1; ExponentDigit++) {
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = U32("Exponent"); // FIXME: "Exponent" is NOT right
                 }
             }
         }
