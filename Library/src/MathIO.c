@@ -357,6 +357,28 @@ extern "C" {
         return Mask;
     }
     
+    /* Ryū specific math functions */
+    bool IsPowerOf2(uint64_t Value, uint8_t Shift) { // multipleOfPowerOf2
+        return (Value & ((1 << Shift) - 1) >> (Shift - 1)); // (16 & 31) >> 4
+    }
+    /* Ryū specific math functions */
+    
+    uint8_t GetNumDigitsInBase(uint8_t Base, int64_t Value) {
+        uint64_t Value2    = Absolute(Value);
+        uint8_t  NumDigits = 0;
+        do {
+            Value2        /= Base;
+            NumDigits     += 1;
+        } while (Value2 > 0);
+        return NumDigits;
+    }
+    
+    uint8_t GetNumBitsToRepresentValue(uint64_t Value) { // This name is so bad
+        return Value;
+        // If the value is a power of 2, shift by 1
+        // Otherwise shift by 1...
+    }
+    
 #ifdef __cplusplus
 }
 #endif
