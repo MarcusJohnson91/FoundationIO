@@ -286,6 +286,8 @@ extern "C" {
      */
     uint8_t                     CreateBitMask(uint8_t NumBits2Select);
     
+    uint8_t                     GetNumDigitsInBase(uint8_t Base, int64_t Value);
+    
 #define Absolute(Value)                     _Generic((Value), uint8_t:AbsoluteI, int8_t:AbsoluteI, uint16_t:AbsoluteI, int16_t:AbsoluteI, uint32_t:AbsoluteI, int32_t:AbsoluteI, uint64_t:AbsoluteI, int64_t:AbsoluteI, float:AbsoluteF, double:AbsoluteD)(Value)
 #define Floor(Value)                        _Generic((Value),   float:FloorF, double:FloorD)(Value)
 #define Ceil(Value)                         _Generic((Value),   float:CeilF, double:CeilD)(Value)
