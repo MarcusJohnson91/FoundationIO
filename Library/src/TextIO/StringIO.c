@@ -2454,7 +2454,7 @@ extern "C" {
     }
     
     static uint64_t ExtractDigitsFromFormatString(UTF32 *String, StringIOBases Base, uint64_t StartPosition) {
-        uint64_t Value = 0LL;
+        uint64_t Value = 0ULL;
         if (String != NULL) {
             uint64_t CodePoint = 0ULL;
             do {
@@ -2463,8 +2463,8 @@ extern "C" {
                         String[StartPosition + CodePoint] == U32('0') ||
                         String[StartPosition + CodePoint] == U32('1')
                         ) {
-                        Value  += (String[StartPosition + CodePoint] - 0x30);
                         Value <<= 1;
+                        Value  += (String[StartPosition + CodePoint] - 0x30);
                     }
                 } else if (Base == Base8) {
                     if (
@@ -2477,8 +2477,8 @@ extern "C" {
                         String[StartPosition + CodePoint] == U32('6') ||
                         String[StartPosition + CodePoint] == U32('7')
                         ) {
-                        Value  += (String[StartPosition + CodePoint] - 0x30);
                         Value <<= 3;
+                        Value  += (String[StartPosition + CodePoint] - 0x30);
                     }
                 } else if (Base == Base10) {
                     if (
@@ -2493,8 +2493,8 @@ extern "C" {
                         String[StartPosition + CodePoint] == U32('8') ||
                         String[StartPosition + CodePoint] == U32('9')
                         ) {
-                        Value  += (String[StartPosition + CodePoint] - 0x30);
-                        Value <<= 4;
+                        Value *= 10;
+                        Value += (String[StartPosition + CodePoint] - 0x30);
                     }
                 } else if (Base == (Base16 | Lowercase)) {
                     if (
@@ -2507,20 +2507,20 @@ extern "C" {
                         String[StartPosition + CodePoint] == U32('6') ||
                         String[StartPosition + CodePoint] == U32('7') ||
                         String[StartPosition + CodePoint] == U32('8') ||
-                        String[StartPosition + CodePoint] == U32('9') ||
-                        String[StartPosition + CodePoint] == U32('a') ||
-                        String[StartPosition + CodePoint] == U32('b') ||
-                        String[StartPosition + CodePoint] == U32('c') ||
-                        String[StartPosition + CodePoint] == U32('d') ||
-                        String[StartPosition + CodePoint] == U32('e') ||
-                        String[StartPosition + CodePoint] == U32('f')
+                        String[StartPosition + CodePoint] == U32('9')
                         ) {
-                        if (String[StartPosition + CodePoint] <= U32('9')) {
-                            Value += (String[StartPosition + CodePoint] - 0x30);
-                        } else {
-                            Value += (String[StartPosition + CodePoint] - 0x57);
-                        }
-                        Value    <<= 4;
+                        Value <<= 4;
+                        Value  += (String[StartPosition + CodePoint] - 0x30);
+                    } else if (
+                               String[StartPosition + CodePoint] == U32('a') ||
+                               String[StartPosition + CodePoint] == U32('b') ||
+                               String[StartPosition + CodePoint] == U32('c') ||
+                               String[StartPosition + CodePoint] == U32('d') ||
+                               String[StartPosition + CodePoint] == U32('e') ||
+                               String[StartPosition + CodePoint] == U32('f')
+                               ) {
+                        Value <<= 4;
+                        Value  += (String[StartPosition + CodePoint] - 0x37);
                     }
                 } else if (Base == (Base16 | Uppercase)) {
                     if (
@@ -2533,23 +2533,23 @@ extern "C" {
                         String[StartPosition + CodePoint] == U32('6') ||
                         String[StartPosition + CodePoint] == U32('7') ||
                         String[StartPosition + CodePoint] == U32('8') ||
-                        String[StartPosition + CodePoint] == U32('9') ||
-                        String[StartPosition + CodePoint] == U32('A') ||
-                        String[StartPosition + CodePoint] == U32('B') ||
-                        String[StartPosition + CodePoint] == U32('C') ||
-                        String[StartPosition + CodePoint] == U32('D') ||
-                        String[StartPosition + CodePoint] == U32('E') ||
-                        String[StartPosition + CodePoint] == U32('F')
+                        String[StartPosition + CodePoint] == U32('9')
                         ) {
-                        if (String[StartPosition + CodePoint] <= U32('9')) {
-                            Value += (String[StartPosition + CodePoint] - 0x30);
-                        } else {
-                            Value += (String[StartPosition + CodePoint] - 0x37);
-                        }
-                        Value    <<= 4;
+                        Value <<= 4;
+                        Value  += (String[StartPosition + CodePoint] - 0x30);
+                    } else if (
+                               String[StartPosition + CodePoint] == U32('A') ||
+                               String[StartPosition + CodePoint] == U32('B') ||
+                               String[StartPosition + CodePoint] == U32('C') ||
+                               String[StartPosition + CodePoint] == U32('D') ||
+                               String[StartPosition + CodePoint] == U32('E') ||
+                               String[StartPosition + CodePoint] == U32('F')
+                               ) {
+                        Value <<= 4;
+                        Value  += (String[StartPosition + CodePoint] - 0x37);
                     }
                 }
-                CodePoint     += 1;
+                CodePoint      += 1;
             } while (String[StartPosition + CodePoint] != StringIONULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
