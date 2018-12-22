@@ -2552,7 +2552,7 @@ extern "C" {
     
     static FormatString *UTF32_ParseFormatSpecifiers(UTF32 *Format, uint64_t NumSpecifiers, StringTypes StringType) {
         FormatString *Details             = NULL;
-        if (Format != NULL && StringType != UnknownUnicodeFormat) {
+        if (Format != NULL && StringType != UnknownStringType) {
             Details                       = FormatString_Init(NumSpecifiers);
             if (Details != NULL) {
                 uint64_t CurrentSpecifier = 0ULL;
