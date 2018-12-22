@@ -1848,11 +1848,15 @@ extern "C" {
     }
     
     uint64_t UTF8_GetNumFormatSpecifiers(UTF8 *String) {
-        uint64_t NumSpecifiers = 0ULL;
+        uint64_t NumSpecifiers     = 0ULL;
+        uint64_t CodePoint         = 0ULL;
         if (String != NULL) {
-            UTF32 *Decoded     = UTF8_Decode(String);
-            NumSpecifiers      = UTF32_GetNumFormatSpecifiers(Decoded);
-            free(Decoded);
+            do {
+                if (String[CodePoint] == '%') {
+                    NumSpecifiers += 1;
+                }
+                CodePoint         += 1;
+            } while (String[CodePoint] != 0);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -1860,11 +1864,15 @@ extern "C" {
     }
     
     uint64_t UTF16_GetNumFormatSpecifiers(UTF16 *String) {
-        uint64_t NumSpecifiers = 0ULL;
+        uint64_t NumSpecifiers     = 0ULL;
+        uint64_t CodePoint         = 0ULL;
         if (String != NULL) {
-            UTF32 *Decoded     = UTF16_Decode(String);
-            NumSpecifiers      = UTF32_GetNumFormatSpecifiers(Decoded);
-            free(Decoded);
+            do {
+                if (String[CodePoint] == U16('%')) {
+                    NumSpecifiers += 1;
+                }
+                CodePoint         += 1;
+            } while (String[CodePoint] != 0);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -1872,16 +1880,15 @@ extern "C" {
     }
     
     uint64_t UTF32_GetNumFormatSpecifiers(UTF32 *String) {
-        uint64_t NumSpecifiers = 0ULL;
+        uint64_t NumSpecifiers     = 0ULL;
+        uint64_t CodePoint         = 0ULL;
         if (String != NULL) {
-            uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
-            if (StringSize > 1) {
-                for (uint64_t CodePoint = 0ULL; CodePoint < StringSize - 1; CodePoint++) {
-                    if (String[CodePoint] == U32('%')) {
-                        NumSpecifiers += 1;
-                    }
+            do {
+                if (String[CodePoint] == U32('%')) {
+                    NumSpecifiers += 1;
                 }
-            }
+                CodePoint         += 1;
+            } while (String[CodePoint] != 0);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
