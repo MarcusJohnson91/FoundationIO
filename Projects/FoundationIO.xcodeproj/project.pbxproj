@@ -3,104 +3,244 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2C7C58DB20C42ADB0070B890 /* StringIOTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D320C42ADB0070B890 /* StringIOTables.h */; };
-		2C7C58E320C42B5C0070B890 /* BitIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58C920C42AB30070B890 /* BitIO.c */; };
-		2C7C58E420C42B5C0070B890 /* CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58CB20C42AB30070B890 /* CommandLineIO.c */; };
-		2C7C58E520C42B5C0070B890 /* ContainerIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58C720C42AB30070B890 /* ContainerIO.c */; };
-		2C7C58E620C42B5C0070B890 /* Log.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58C820C42AB30070B890 /* Log.c */; };
-		2C7C58E820C42B5C0070B890 /* Math.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58C520C42AB30070B890 /* Math.c */; };
-		2C7C58E920C42B5C0070B890 /* StringIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7C58C620C42AB30070B890 /* StringIO.c */; };
-		2C7C58EA20C42B8C0070B890 /* BitIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D720C42ADB0070B890 /* BitIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C7C58EB20C42B8C0070B890 /* CommandLineIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58DA20C42ADB0070B890 /* CommandLineIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C7C58EC20C42B8C0070B890 /* ContainerIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D620C42ADB0070B890 /* ContainerIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C7C58ED20C42B8C0070B890 /* Log.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D520C42ADB0070B890 /* Log.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C7C58EE20C42B8C0070B890 /* Macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D820C42ADB0070B890 /* Macros.h */; };
-		2C7C58EF20C42B8C0070B890 /* Math.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D420C42ADB0070B890 /* Math.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C7C58F020C42B8C0070B890 /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C7C58D920C42ADB0070B890 /* StringIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CA1BE4D21ABAFEC0035E9F9 /* ContainerIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE4621ABAFEC0035E9F9 /* ContainerIO.c */; };
+		2CA1BE4E21ABAFEC0035E9F9 /* Log.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE4721ABAFEC0035E9F9 /* Log.c */; };
+		2CA1BE4F21ABAFEC0035E9F9 /* Math.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE4821ABAFEC0035E9F9 /* Math.c */; };
+		2CA1BE5021ABAFEC0035E9F9 /* TestIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE4921ABAFEC0035E9F9 /* TestIO.c */; };
+		2CA1BE5121ABAFEC0035E9F9 /* StringIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE4A21ABAFEC0035E9F9 /* StringIO.c */; };
+		2CA1BE5221ABAFEC0035E9F9 /* CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE4B21ABAFEC0035E9F9 /* CommandLineIO.c */; };
+		2CA1BE5321ABAFEC0035E9F9 /* BitIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE4C21ABAFEC0035E9F9 /* BitIO.c */; };
+		2CA1BE5D21ABAFFA0035E9F9 /* BitIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5421ABAFFA0035E9F9 /* BitIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CA1BE5E21ABAFFA0035E9F9 /* Macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5521ABAFFA0035E9F9 /* Macros.h */; };
+		2CA1BE5F21ABAFFA0035E9F9 /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5621ABAFFA0035E9F9 /* StringIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CA1BE6021ABAFFA0035E9F9 /* StringIOTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5721ABAFFA0035E9F9 /* StringIOTables.h */; };
+		2CA1BE6121ABAFFA0035E9F9 /* ContainerIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5821ABAFFA0035E9F9 /* ContainerIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CA1BE6221ABAFFA0035E9F9 /* Log.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5921ABAFFA0035E9F9 /* Log.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CA1BE6321ABAFFA0035E9F9 /* Math.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5A21ABAFFA0035E9F9 /* Math.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CA1BE6421ABAFFA0035E9F9 /* CommandLineIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5B21ABAFFA0035E9F9 /* CommandLineIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CA1BE6521ABAFFA0035E9F9 /* TestIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5C21ABAFFA0035E9F9 /* TestIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CA1BE6A21ABB0120035E9F9 /* Test_BitIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE6621ABB00F0035E9F9 /* Test_BitIO.c */; };
+		2CA1BE6B21ABB0150035E9F9 /* Test_CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE6921ABB00F0035E9F9 /* Test_CommandLineIO.c */; };
+		2CA1BE6C21ABB0180035E9F9 /* Test_ContainerIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE6821ABB00F0035E9F9 /* Test_ContainerIO.c */; };
+		2CA1BE6D21ABB01C0035E9F9 /* Test_StringIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE6721ABB00F0035E9F9 /* Test_StringIO.c */; };
+		2CA1BE6F21ABB2530035E9F9 /* libFoundationIO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */; };
+		2CA1BE7021ABB35F0035E9F9 /* libFoundationIO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */; };
+		2CA1BE7121ABB3660035E9F9 /* libFoundationIO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */; };
+		2CA1BE7221ABB36D0035E9F9 /* libFoundationIO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		2CA1BE7321ABB3780035E9F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2CA1BE0721ABAF5C0035E9F9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2CA1BE0E21ABAF5C0035E9F9;
+			remoteInfo = FoundationIO2;
+		};
+		2CA1BE7521ABB37F0035E9F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2CA1BE0721ABAF5C0035E9F9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2CA1BE0E21ABAF5C0035E9F9;
+			remoteInfo = FoundationIO2;
+		};
+		2CA1BE7721ABB3850035E9F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2CA1BE0721ABAF5C0035E9F9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2CA1BE0E21ABAF5C0035E9F9;
+			remoteInfo = FoundationIO2;
+		};
+		2CA1BE7921ABB38C0035E9F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2CA1BE0721ABAF5C0035E9F9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2CA1BE0E21ABAF5C0035E9F9;
+			remoteInfo = FoundationIO2;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		2CA1BE1821ABAF8F0035E9F9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2CA1BE2321ABAFA20035E9F9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		2CA1BE2E21ABAFAC0035E9F9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		2CA1BE3921ABAFB70035E9F9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		2C7C58C520C42AB30070B890 /* Math.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Math.c; path = ../libFoundationIO/src/Math.c; sourceTree = "<group>"; };
-		2C7C58C620C42AB30070B890 /* StringIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = StringIO.c; path = ../libFoundationIO/src/StringIO.c; sourceTree = "<group>"; };
-		2C7C58C720C42AB30070B890 /* ContainerIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = ContainerIO.c; path = ../libFoundationIO/src/ContainerIO.c; sourceTree = "<group>"; };
-		2C7C58C820C42AB30070B890 /* Log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Log.c; path = ../libFoundationIO/src/Log.c; sourceTree = "<group>"; };
-		2C7C58C920C42AB30070B890 /* BitIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = BitIO.c; path = ../libFoundationIO/src/BitIO.c; sourceTree = "<group>"; };
-		2C7C58CB20C42AB30070B890 /* CommandLineIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = CommandLineIO.c; path = ../libFoundationIO/src/CommandLineIO.c; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.c; };
-		2C7C58D320C42ADB0070B890 /* StringIOTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = StringIOTables.h; path = ../libFoundationIO/include/StringIOTables.h; sourceTree = "<group>"; };
-		2C7C58D420C42ADB0070B890 /* Math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Math.h; path = ../libFoundationIO/include/Math.h; sourceTree = "<group>"; };
-		2C7C58D520C42ADB0070B890 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Log.h; path = ../libFoundationIO/include/Log.h; sourceTree = "<group>"; };
-		2C7C58D620C42ADB0070B890 /* ContainerIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ContainerIO.h; path = ../libFoundationIO/include/ContainerIO.h; sourceTree = "<group>"; };
-		2C7C58D720C42ADB0070B890 /* BitIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BitIO.h; path = ../libFoundationIO/include/BitIO.h; sourceTree = "<group>"; };
-		2C7C58D820C42ADB0070B890 /* Macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Macros.h; path = ../libFoundationIO/include/Macros.h; sourceTree = "<group>"; };
-		2C7C58D920C42ADB0070B890 /* StringIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = StringIO.h; path = ../libFoundationIO/include/StringIO.h; sourceTree = "<group>"; };
-		2C7C58DA20C42ADB0070B890 /* CommandLineIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = CommandLineIO.h; path = ../libFoundationIO/include/CommandLineIO.h; sourceTree = "<group>"; };
-		2CFC15C82091F1AE0070BCFC /* libFoundationIO.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFoundationIO.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFoundationIO.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2CA1BE1A21ABAF8F0035E9F9 /* Test_BitIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_BitIO; sourceTree = BUILT_PRODUCTS_DIR; };
+		2CA1BE2521ABAFA20035E9F9 /* Test_CommandLineIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_CommandLineIO; sourceTree = BUILT_PRODUCTS_DIR; };
+		2CA1BE3021ABAFAC0035E9F9 /* Test_ContainerIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_ContainerIO; sourceTree = BUILT_PRODUCTS_DIR; };
+		2CA1BE3B21ABAFB70035E9F9 /* Test_StringIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_StringIO; sourceTree = BUILT_PRODUCTS_DIR; };
+		2CA1BE4621ABAFEC0035E9F9 /* ContainerIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ContainerIO.c; path = ../libFoundationIO/src/ContainerIO.c; sourceTree = "<group>"; };
+		2CA1BE4721ABAFEC0035E9F9 /* Log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Log.c; path = ../libFoundationIO/src/Log.c; sourceTree = "<group>"; };
+		2CA1BE4821ABAFEC0035E9F9 /* Math.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Math.c; path = ../libFoundationIO/src/Math.c; sourceTree = "<group>"; };
+		2CA1BE4921ABAFEC0035E9F9 /* TestIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = TestIO.c; path = ../libFoundationIO/src/TestIO.c; sourceTree = "<group>"; };
+		2CA1BE4A21ABAFEC0035E9F9 /* StringIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = StringIO.c; path = ../libFoundationIO/src/StringIO.c; sourceTree = "<group>"; };
+		2CA1BE4B21ABAFEC0035E9F9 /* CommandLineIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = CommandLineIO.c; path = ../libFoundationIO/src/CommandLineIO.c; sourceTree = "<group>"; };
+		2CA1BE4C21ABAFEC0035E9F9 /* BitIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BitIO.c; path = ../libFoundationIO/src/BitIO.c; sourceTree = "<group>"; };
+		2CA1BE5421ABAFFA0035E9F9 /* BitIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BitIO.h; path = ../libFoundationIO/include/BitIO.h; sourceTree = "<group>"; };
+		2CA1BE5521ABAFFA0035E9F9 /* Macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Macros.h; path = ../libFoundationIO/include/Macros.h; sourceTree = "<group>"; };
+		2CA1BE5621ABAFFA0035E9F9 /* StringIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StringIO.h; path = ../libFoundationIO/include/StringIO.h; sourceTree = "<group>"; };
+		2CA1BE5721ABAFFA0035E9F9 /* StringIOTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StringIOTables.h; path = ../libFoundationIO/include/StringIOTables.h; sourceTree = "<group>"; };
+		2CA1BE5821ABAFFA0035E9F9 /* ContainerIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ContainerIO.h; path = ../libFoundationIO/include/ContainerIO.h; sourceTree = "<group>"; };
+		2CA1BE5921ABAFFA0035E9F9 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Log.h; path = ../libFoundationIO/include/Log.h; sourceTree = "<group>"; };
+		2CA1BE5A21ABAFFA0035E9F9 /* Math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Math.h; path = ../libFoundationIO/include/Math.h; sourceTree = "<group>"; };
+		2CA1BE5B21ABAFFA0035E9F9 /* CommandLineIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommandLineIO.h; path = ../libFoundationIO/include/CommandLineIO.h; sourceTree = "<group>"; };
+		2CA1BE5C21ABAFFA0035E9F9 /* TestIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestIO.h; path = ../libFoundationIO/include/TestIO.h; sourceTree = "<group>"; };
+		2CA1BE6621ABB00F0035E9F9 /* Test_BitIO.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = Test_BitIO.c; path = ../Tests/Test_BitIO.c; sourceTree = "<group>"; };
+		2CA1BE6721ABB00F0035E9F9 /* Test_StringIO.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = Test_StringIO.c; path = ../Tests/Test_StringIO.c; sourceTree = "<group>"; };
+		2CA1BE6821ABB00F0035E9F9 /* Test_ContainerIO.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = Test_ContainerIO.c; path = ../Tests/Test_ContainerIO.c; sourceTree = "<group>"; };
+		2CA1BE6921ABB00F0035E9F9 /* Test_CommandLineIO.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = Test_CommandLineIO.c; path = ../Tests/Test_CommandLineIO.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		2CFC15C52091F1AE0070BCFC /* Frameworks */ = {
+		2CA1BE0D21ABAF5C0035E9F9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2CA1BE1721ABAF8F0035E9F9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2CA1BE7221ABB36D0035E9F9 /* libFoundationIO.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2CA1BE2221ABAFA20035E9F9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2CA1BE7121ABB3660035E9F9 /* libFoundationIO.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2CA1BE2D21ABAFAC0035E9F9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2CA1BE7021ABB35F0035E9F9 /* libFoundationIO.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2CA1BE3821ABAFB70035E9F9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2CA1BE6F21ABB2530035E9F9 /* libFoundationIO.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2CFC15BF2091F1AE0070BCFC = {
+		2CA1BE0621ABAF5C0035E9F9 = {
 			isa = PBXGroup;
 			children = (
-				2CFC15CF2091F1DC0070BCFC /* FoundationIO */,
-				2CFC15C92091F1AE0070BCFC /* Products */,
+				2CA1BE4321ABAFCB0035E9F9 /* FoundationIO */,
+				2CA1BE4221ABAFC60035E9F9 /* Tests */,
+				2CA1BE1021ABAF5C0035E9F9 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		2CFC15C92091F1AE0070BCFC /* Products */ = {
+		2CA1BE1021ABAF5C0035E9F9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2CFC15C82091F1AE0070BCFC /* libFoundationIO.a */,
+				2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */,
+				2CA1BE1A21ABAF8F0035E9F9 /* Test_BitIO */,
+				2CA1BE2521ABAFA20035E9F9 /* Test_CommandLineIO */,
+				2CA1BE3021ABAFAC0035E9F9 /* Test_ContainerIO */,
+				2CA1BE3B21ABAFB70035E9F9 /* Test_StringIO */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		2CFC15CF2091F1DC0070BCFC /* FoundationIO */ = {
+		2CA1BE4221ABAFC60035E9F9 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				2CFC15D12091F1EA0070BCFC /* Headers */,
-				2CFC15D02091F1E30070BCFC /* Source */,
+				2CA1BE6621ABB00F0035E9F9 /* Test_BitIO.c */,
+				2CA1BE6921ABB00F0035E9F9 /* Test_CommandLineIO.c */,
+				2CA1BE6821ABB00F0035E9F9 /* Test_ContainerIO.c */,
+				2CA1BE6721ABB00F0035E9F9 /* Test_StringIO.c */,
+			);
+			name = Tests;
+			sourceTree = "<group>";
+		};
+		2CA1BE4321ABAFCB0035E9F9 /* FoundationIO */ = {
+			isa = PBXGroup;
+			children = (
+				2CA1BE4521ABAFD90035E9F9 /* Headers */,
+				2CA1BE4421ABAFD40035E9F9 /* Source */,
 			);
 			name = FoundationIO;
 			sourceTree = "<group>";
 		};
-		2CFC15D02091F1E30070BCFC /* Source */ = {
+		2CA1BE4421ABAFD40035E9F9 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				2C7C58C920C42AB30070B890 /* BitIO.c */,
-				2C7C58CB20C42AB30070B890 /* CommandLineIO.c */,
-				2C7C58C720C42AB30070B890 /* ContainerIO.c */,
-				2C7C58C820C42AB30070B890 /* Log.c */,
-				2C7C58C520C42AB30070B890 /* Math.c */,
-				2C7C58C620C42AB30070B890 /* StringIO.c */,
+				2CA1BE4C21ABAFEC0035E9F9 /* BitIO.c */,
+				2CA1BE4B21ABAFEC0035E9F9 /* CommandLineIO.c */,
+				2CA1BE4621ABAFEC0035E9F9 /* ContainerIO.c */,
+				2CA1BE4721ABAFEC0035E9F9 /* Log.c */,
+				2CA1BE4821ABAFEC0035E9F9 /* Math.c */,
+				2CA1BE4A21ABAFEC0035E9F9 /* StringIO.c */,
+				2CA1BE4921ABAFEC0035E9F9 /* TestIO.c */,
 			);
 			name = Source;
 			sourceTree = "<group>";
 		};
-		2CFC15D12091F1EA0070BCFC /* Headers */ = {
+		2CA1BE4521ABAFD90035E9F9 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
-				2C7C58D820C42ADB0070B890 /* Macros.h */,
-				2C7C58D720C42ADB0070B890 /* BitIO.h */,
-				2C7C58DA20C42ADB0070B890 /* CommandLineIO.h */,
-				2C7C58D620C42ADB0070B890 /* ContainerIO.h */,
-				2C7C58D520C42ADB0070B890 /* Log.h */,
-				2C7C58D420C42ADB0070B890 /* Math.h */,
-				2C7C58D920C42ADB0070B890 /* StringIO.h */,
-				2C7C58D320C42ADB0070B890 /* StringIOTables.h */,
+				2CA1BE5421ABAFFA0035E9F9 /* BitIO.h */,
+				2CA1BE5B21ABAFFA0035E9F9 /* CommandLineIO.h */,
+				2CA1BE5821ABAFFA0035E9F9 /* ContainerIO.h */,
+				2CA1BE5921ABAFFA0035E9F9 /* Log.h */,
+				2CA1BE5521ABAFFA0035E9F9 /* Macros.h */,
+				2CA1BE5A21ABAFFA0035E9F9 /* Math.h */,
+				2CA1BE5621ABAFFA0035E9F9 /* StringIO.h */,
+				2CA1BE5721ABAFFA0035E9F9 /* StringIOTables.h */,
+				2CA1BE5C21ABAFFA0035E9F9 /* TestIO.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
@@ -108,319 +248,598 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		2CFC15C62091F1AE0070BCFC /* Headers */ = {
+		2CA1BE0B21ABAF5C0035E9F9 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2C7C58EA20C42B8C0070B890 /* BitIO.h in Headers */,
-				2C7C58EB20C42B8C0070B890 /* CommandLineIO.h in Headers */,
-				2C7C58EC20C42B8C0070B890 /* ContainerIO.h in Headers */,
-				2C7C58F020C42B8C0070B890 /* StringIO.h in Headers */,
-				2C7C58ED20C42B8C0070B890 /* Log.h in Headers */,
-				2C7C58EF20C42B8C0070B890 /* Math.h in Headers */,
-				2C7C58EE20C42B8C0070B890 /* Macros.h in Headers */,
-				2C7C58DB20C42ADB0070B890 /* StringIOTables.h in Headers */,
+				2CA1BE5D21ABAFFA0035E9F9 /* BitIO.h in Headers */,
+				2CA1BE6221ABAFFA0035E9F9 /* Log.h in Headers */,
+				2CA1BE6521ABAFFA0035E9F9 /* TestIO.h in Headers */,
+				2CA1BE6421ABAFFA0035E9F9 /* CommandLineIO.h in Headers */,
+				2CA1BE6121ABAFFA0035E9F9 /* ContainerIO.h in Headers */,
+				2CA1BE5F21ABAFFA0035E9F9 /* StringIO.h in Headers */,
+				2CA1BE6321ABAFFA0035E9F9 /* Math.h in Headers */,
+				2CA1BE6021ABAFFA0035E9F9 /* StringIOTables.h in Headers */,
+				2CA1BE5E21ABAFFA0035E9F9 /* Macros.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		2CFC15C72091F1AE0070BCFC /* FoundationIO */ = {
+		2CA1BE0E21ABAF5C0035E9F9 /* FoundationIO */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 2CFC15CC2091F1AE0070BCFC /* Build configuration list for PBXNativeTarget "FoundationIO" */;
+			buildConfigurationList = 2CA1BE1321ABAF5C0035E9F9 /* Build configuration list for PBXNativeTarget "FoundationIO" */;
 			buildPhases = (
-				2CFC15C42091F1AE0070BCFC /* Sources */,
-				2CFC15C52091F1AE0070BCFC /* Frameworks */,
-				2CFC15C62091F1AE0070BCFC /* Headers */,
+				2CA1BE0B21ABAF5C0035E9F9 /* Headers */,
+				2CA1BE0C21ABAF5C0035E9F9 /* Sources */,
+				2CA1BE0D21ABAF5C0035E9F9 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = FoundationIO;
-			productName = FoundationIO;
-			productReference = 2CFC15C82091F1AE0070BCFC /* libFoundationIO.a */;
+			productName = FoundationIO2;
+			productReference = 2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */;
 			productType = "com.apple.product-type.library.static";
+		};
+		2CA1BE1921ABAF8F0035E9F9 /* Test_BitIO */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2CA1BE2021ABAF8F0035E9F9 /* Build configuration list for PBXNativeTarget "Test_BitIO" */;
+			buildPhases = (
+				2CA1BE1621ABAF8F0035E9F9 /* Sources */,
+				2CA1BE1721ABAF8F0035E9F9 /* Frameworks */,
+				2CA1BE1821ABAF8F0035E9F9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2CA1BE7421ABB3780035E9F9 /* PBXTargetDependency */,
+			);
+			name = Test_BitIO;
+			productName = Test_BitIO;
+			productReference = 2CA1BE1A21ABAF8F0035E9F9 /* Test_BitIO */;
+			productType = "com.apple.product-type.tool";
+		};
+		2CA1BE2421ABAFA20035E9F9 /* Test_CommandLineIO */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2CA1BE2921ABAFA20035E9F9 /* Build configuration list for PBXNativeTarget "Test_CommandLineIO" */;
+			buildPhases = (
+				2CA1BE2121ABAFA20035E9F9 /* Sources */,
+				2CA1BE2221ABAFA20035E9F9 /* Frameworks */,
+				2CA1BE2321ABAFA20035E9F9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2CA1BE7621ABB37F0035E9F9 /* PBXTargetDependency */,
+			);
+			name = Test_CommandLineIO;
+			productName = Test_CommandLineIO;
+			productReference = 2CA1BE2521ABAFA20035E9F9 /* Test_CommandLineIO */;
+			productType = "com.apple.product-type.tool";
+		};
+		2CA1BE2F21ABAFAC0035E9F9 /* Test_ContainerIO */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2CA1BE3421ABAFAC0035E9F9 /* Build configuration list for PBXNativeTarget "Test_ContainerIO" */;
+			buildPhases = (
+				2CA1BE2C21ABAFAC0035E9F9 /* Sources */,
+				2CA1BE2D21ABAFAC0035E9F9 /* Frameworks */,
+				2CA1BE2E21ABAFAC0035E9F9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2CA1BE7821ABB3850035E9F9 /* PBXTargetDependency */,
+			);
+			name = Test_ContainerIO;
+			productName = Test_ContainerIO;
+			productReference = 2CA1BE3021ABAFAC0035E9F9 /* Test_ContainerIO */;
+			productType = "com.apple.product-type.tool";
+		};
+		2CA1BE3A21ABAFB70035E9F9 /* Test_StringIO */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2CA1BE3F21ABAFB70035E9F9 /* Build configuration list for PBXNativeTarget "Test_StringIO" */;
+			buildPhases = (
+				2CA1BE3721ABAFB70035E9F9 /* Sources */,
+				2CA1BE3821ABAFB70035E9F9 /* Frameworks */,
+				2CA1BE3921ABAFB70035E9F9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2CA1BE7A21ABB38C0035E9F9 /* PBXTargetDependency */,
+			);
+			name = Test_StringIO;
+			productName = Test_StringIO;
+			productReference = 2CA1BE3B21ABAFB70035E9F9 /* Test_StringIO */;
+			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		2CFC15C02091F1AE0070BCFC /* Project object */ = {
+		2CA1BE0721ABAF5C0035E9F9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 1010;
-				ORGANIZATIONNAME = "Marcus Johnson";
+				ORGANIZATIONNAME = BumbleBritches57;
 				TargetAttributes = {
-					2CFC15C72091F1AE0070BCFC = {
-						CreatedOnToolsVersion = 9.2;
-						ProvisioningStyle = Automatic;
+					2CA1BE0E21ABAF5C0035E9F9 = {
+						CreatedOnToolsVersion = 10.1;
+					};
+					2CA1BE1921ABAF8F0035E9F9 = {
+						CreatedOnToolsVersion = 10.1;
+					};
+					2CA1BE2421ABAFA20035E9F9 = {
+						CreatedOnToolsVersion = 10.1;
+					};
+					2CA1BE2F21ABAFAC0035E9F9 = {
+						CreatedOnToolsVersion = 10.1;
+					};
+					2CA1BE3A21ABAFB70035E9F9 = {
+						CreatedOnToolsVersion = 10.1;
 					};
 				};
 			};
-			buildConfigurationList = 2CFC15C32091F1AE0070BCFC /* Build configuration list for PBXProject "FoundationIO" */;
-			compatibilityVersion = "Xcode 8.0";
+			buildConfigurationList = 2CA1BE0A21ABAF5C0035E9F9 /* Build configuration list for PBXProject "FoundationIO" */;
+			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 2CFC15BF2091F1AE0070BCFC;
-			productRefGroup = 2CFC15C92091F1AE0070BCFC /* Products */;
+			mainGroup = 2CA1BE0621ABAF5C0035E9F9;
+			productRefGroup = 2CA1BE1021ABAF5C0035E9F9 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2CFC15C72091F1AE0070BCFC /* FoundationIO */,
+				2CA1BE0E21ABAF5C0035E9F9 /* FoundationIO */,
+				2CA1BE1921ABAF8F0035E9F9 /* Test_BitIO */,
+				2CA1BE2421ABAFA20035E9F9 /* Test_CommandLineIO */,
+				2CA1BE2F21ABAFAC0035E9F9 /* Test_ContainerIO */,
+				2CA1BE3A21ABAFB70035E9F9 /* Test_StringIO */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		2CFC15C42091F1AE0070BCFC /* Sources */ = {
+		2CA1BE0C21ABAF5C0035E9F9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2C7C58E320C42B5C0070B890 /* BitIO.c in Sources */,
-				2C7C58E420C42B5C0070B890 /* CommandLineIO.c in Sources */,
-				2C7C58E520C42B5C0070B890 /* ContainerIO.c in Sources */,
-				2C7C58E620C42B5C0070B890 /* Log.c in Sources */,
-				2C7C58E820C42B5C0070B890 /* Math.c in Sources */,
-				2C7C58E920C42B5C0070B890 /* StringIO.c in Sources */,
+				2CA1BE5121ABAFEC0035E9F9 /* StringIO.c in Sources */,
+				2CA1BE4E21ABAFEC0035E9F9 /* Log.c in Sources */,
+				2CA1BE4F21ABAFEC0035E9F9 /* Math.c in Sources */,
+				2CA1BE5321ABAFEC0035E9F9 /* BitIO.c in Sources */,
+				2CA1BE5221ABAFEC0035E9F9 /* CommandLineIO.c in Sources */,
+				2CA1BE4D21ABAFEC0035E9F9 /* ContainerIO.c in Sources */,
+				2CA1BE5021ABAFEC0035E9F9 /* TestIO.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2CA1BE1621ABAF8F0035E9F9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2CA1BE6A21ABB0120035E9F9 /* Test_BitIO.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2CA1BE2121ABAFA20035E9F9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2CA1BE6B21ABB0150035E9F9 /* Test_CommandLineIO.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2CA1BE2C21ABAFAC0035E9F9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2CA1BE6C21ABB0180035E9F9 /* Test_ContainerIO.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2CA1BE3721ABAFB70035E9F9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2CA1BE6D21ABB01C0035E9F9 /* Test_StringIO.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		2CA1BE7421ABB3780035E9F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2CA1BE0E21ABAF5C0035E9F9 /* FoundationIO */;
+			targetProxy = 2CA1BE7321ABB3780035E9F9 /* PBXContainerItemProxy */;
+		};
+		2CA1BE7621ABB37F0035E9F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2CA1BE0E21ABAF5C0035E9F9 /* FoundationIO */;
+			targetProxy = 2CA1BE7521ABB37F0035E9F9 /* PBXContainerItemProxy */;
+		};
+		2CA1BE7821ABB3850035E9F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2CA1BE0E21ABAF5C0035E9F9 /* FoundationIO */;
+			targetProxy = 2CA1BE7721ABB3850035E9F9 /* PBXContainerItemProxy */;
+		};
+		2CA1BE7A21ABB38C0035E9F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2CA1BE0E21ABAF5C0035E9F9 /* FoundationIO */;
+			targetProxy = 2CA1BE7921ABB38C0035E9F9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
-		2CFC15CD2091F1AE0070BCFC /* Debug */ = {
+		2CA1BE1121ABAF5C0035E9F9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLY_RULES_IN_COPY_FILES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = NO;
 				CLANG_ENABLE_MODULE_DEBUGGING = NO;
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_LINK_OBJC_RUNTIME = NO;
-				CLANG_STATIC_ANALYZER_MODE = deep;
-				CLANG_STATIC_ANALYZER_MODE_ON_ANALYZE_ACTION = deep;
+				CLANG_LINK_OBJC_RUNTIME = YES;
 				CLANG_UNDEFINED_BEHAVIOR_SANITIZER_INTEGER = YES;
-				CLANG_WARN_ASSIGN_ENUM = NO;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_WARN_CXX0X_EXTENSIONS = NO;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_FLOAT_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = NO;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES_ERROR;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COMBINE_HIDPI_IMAGES = YES;
 				COMPILER_INDEX_STORE_ENABLE = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEPLOYMENT_POSTPROCESSING = YES;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				ENABLE_TESTABILITY = YES;
-				EXECUTABLE_PREFIX = lib;
 				GCC_CHAR_IS_UNSIGNED_CHAR = YES;
 				GCC_CW_ASM_SYNTAX = NO;
 				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 1;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
 				GCC_SHORT_ENUMS = YES;
-				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_UNROLL_LOOPS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
-				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = NO;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_LABEL = YES;
-				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_PROFILING_CODE = YES;
 				INFOPLIST_OUTPUT_FORMAT = binary;
-				INSTALL_PATH = /usr/local/lib/FoundationIO;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LINKER_DISPLAYS_MANGLED_NAMES = YES;
+				KEEP_PRIVATE_EXTERNS = YES;
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-ferror-limit=1024",
+					"-fvectorize",
+					"-funroll-loops",
 					"-funsigned-char",
 					"-Weverything",
-					"-Wno-c99-compat",
-					"-Wno-conversion",
-					"-Wno-reserved-id-macro",
-					"-ffunction-sections",
-					"-fdata-sections",
-					"-funroll-loops",
-					"-fvectorize",
-					"-Wpadded",
 					"-Wno-pointer-sign",
+					"-Wno-reserved-id-macro",
+					"-Wno-conversion",
+					"-Wno-c99-compat",
+					"-Wpadded",
 				);
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
-				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
-				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/FoundationIO/Private;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PUBLIC_HEADERS_FOLDER_PATH = /usr/local/include/FoundationIO;
-				RUN_CLANG_STATIC_ANALYZER = YES;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = debugging;
-				STRIP_SWIFT_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "macosx iphoneos";
+				SUPPORTED_PLATFORMS = "iphoneos macosx";
+				TVOS_DEPLOYMENT_TARGET = 10.0;
 				USE_HEADERMAP = NO;
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "arm64 x86_64";
-				WARNING_CFLAGS = "";
+				WATCHOS_DEPLOYMENT_TARGET = 3.0;
 			};
 			name = Debug;
 		};
-		2CFC15CE2091F1AE0070BCFC /* Release */ = {
+		2CA1BE1221ABAF5C0035E9F9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLY_RULES_IN_COPY_FILES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = NO;
 				CLANG_ENABLE_MODULE_DEBUGGING = NO;
 				CLANG_ENABLE_OBJC_ARC = NO;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_LINK_OBJC_RUNTIME = NO;
-				CLANG_STATIC_ANALYZER_MODE_ON_ANALYZE_ACTION = deep;
-				CLANG_WARN_ASSIGN_ENUM = NO;
+				CLANG_LINK_OBJC_RUNTIME = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_WARN_CXX0X_EXTENSIONS = NO;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_FLOAT_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = NO;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES_ERROR;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COMBINE_HIDPI_IMAGES = YES;
 				COMPILER_INDEX_STORE_ENABLE = YES;
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				EXECUTABLE_PREFIX = lib;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				GCC_CHAR_IS_UNSIGNED_CHAR = YES;
 				GCC_CW_ASM_SYNTAX = NO;
 				GCC_C_LANGUAGE_STANDARD = c11;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_SHORT_ENUMS = YES;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
 				GCC_UNROLL_LOOPS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES;
-				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = NO;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_LABEL = YES;
-				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_OUTPUT_FORMAT = binary;
-				INSTALL_PATH = /usr/local/lib/FoundationIO;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
-				LINKER_DISPLAYS_MANGLED_NAMES = YES;
+				KEEP_PRIVATE_EXTERNS = YES;
 				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
 				OTHER_CFLAGS = (
 					"-ferror-limit=1024",
+					"-fvectorize",
+					"-funroll-loops",
 					"-funsigned-char",
 					"-Weverything",
-					"-Wno-c99-compat",
-					"-Wno-conversion",
-					"-Wno-reserved-id-macro",
-					"-ffunction-sections",
-					"-fdata-sections",
-					"-funroll-loops",
-					"-fvectorize",
 					"-Wno-pointer-sign",
+					"-Wno-reserved-id-macro",
+					"-Wno-conversion",
+					"-Wno-c99-compat",
 				);
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
-				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
-				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/FoundationIO/Private;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PUBLIC_HEADERS_FOLDER_PATH = /usr/local/include/FoundationIO;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
-				STRIP_STYLE = debugging;
-				STRIP_SWIFT_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "macosx iphoneos";
+				SUPPORTED_PLATFORMS = "iphoneos macosx";
+				TVOS_DEPLOYMENT_TARGET = 10.0;
 				USE_HEADERMAP = NO;
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "arm64 x86_64";
-				WARNING_CFLAGS = "";
+				WATCHOS_DEPLOYMENT_TARGET = 3.0;
+			};
+			name = Release;
+		};
+		2CA1BE1421ABAF5C0035E9F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				EXECUTABLE_PREFIX = lib;
+				INSTALL_PATH = /usr/local/lib/FoundationIO;
+				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/lib/FoundationIO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = /usr/local/lib/FoundationIO;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		2CA1BE1521ABAF5C0035E9F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				EXECUTABLE_PREFIX = lib;
+				INSTALL_PATH = /usr/local/lib/FoundationIO;
+				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/lib/FoundationIO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = /usr/local/lib/FoundationIO;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		2CA1BE1E21ABAF8F0035E9F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2CA1BE1F21ABAF8F0035E9F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		2CA1BE2A21ABAFA20035E9F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2CA1BE2B21ABAFA20035E9F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		2CA1BE3521ABAFAC0035E9F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2CA1BE3621ABAFAC0035E9F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		2CA1BE4021ABAFB70035E9F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2CA1BE4121ABAFB70035E9F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2CFC15C32091F1AE0070BCFC /* Build configuration list for PBXProject "FoundationIO" */ = {
+		2CA1BE0A21ABAF5C0035E9F9 /* Build configuration list for PBXProject "FoundationIO" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2CFC15CD2091F1AE0070BCFC /* Debug */,
-				2CFC15CE2091F1AE0070BCFC /* Release */,
+				2CA1BE1121ABAF5C0035E9F9 /* Debug */,
+				2CA1BE1221ABAF5C0035E9F9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		2CFC15CC2091F1AE0070BCFC /* Build configuration list for PBXNativeTarget "FoundationIO" */ = {
+		2CA1BE1321ABAF5C0035E9F9 /* Build configuration list for PBXNativeTarget "FoundationIO" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2CFC15CD2091F1AE0070BCFC /* Debug */,
-				2CFC15CE2091F1AE0070BCFC /* Release */,
+				2CA1BE1421ABAF5C0035E9F9 /* Debug */,
+				2CA1BE1521ABAF5C0035E9F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2CA1BE2021ABAF8F0035E9F9 /* Build configuration list for PBXNativeTarget "Test_BitIO" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2CA1BE1E21ABAF8F0035E9F9 /* Debug */,
+				2CA1BE1F21ABAF8F0035E9F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2CA1BE2921ABAFA20035E9F9 /* Build configuration list for PBXNativeTarget "Test_CommandLineIO" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2CA1BE2A21ABAFA20035E9F9 /* Debug */,
+				2CA1BE2B21ABAFA20035E9F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2CA1BE3421ABAFAC0035E9F9 /* Build configuration list for PBXNativeTarget "Test_ContainerIO" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2CA1BE3521ABAFAC0035E9F9 /* Debug */,
+				2CA1BE3621ABAFAC0035E9F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2CA1BE3F21ABAFB70035E9F9 /* Build configuration list for PBXNativeTarget "Test_StringIO" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2CA1BE4021ABAFB70035E9F9 /* Debug */,
+				2CA1BE4121ABAFB70035E9F9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 2CFC15C02091F1AE0070BCFC /* Project object */;
+	rootObject = 2CA1BE0721ABAF5C0035E9F9 /* Project object */;
 }
