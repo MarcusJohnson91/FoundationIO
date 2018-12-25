@@ -2711,7 +2711,6 @@ extern "C" {
                                 if (Range == SpecifierEnd - 2) { // Check the type modifiers
                                     if (Format[Range - 1] == U32('h') && Format[Range] == U32('h')) {
                                         Details->Specifiers[Specifier].TypeModifier |= Modifier_8Bit;
-                                        
                                     } else if (Format[Range - 1] == U32('l') && Format[Range] == U32('l')) {
                                         Details->Specifiers[Specifier].TypeModifier |= Modifier_64Bit;
                                     }
