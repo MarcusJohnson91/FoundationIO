@@ -22,16 +22,30 @@ extern "C" {
         uint64_t           NumSamples;
         uint64_t           SampleRate;
         uint64_t           NumChannels;
-        uint64_t           BitDepth;
+        uint8_t            BitDepth;
         Audio_Types        Type;
     } AudioContainer;
     
-    AudioContainer *AudioContainer_Init(Audio_Types Type, uint64_t BitDepth, uint64_t NumChannels, uint64_t SampleRate, uint64_t NumSamples) {
-        AudioContainer *Audio = NULL;
-        if (BitDepth > 0 && NumChannels > 0 && NumSamples > 0) {
-            Audio             = calloc(1, sizeof(AudioContainer));
+    typedef struct AudioObject {
+        AudioContainer *Container;
+        AudioLocation  *Locations;
+        uint64_t        NumLocations;
+    } AudioObject;
+    
+    typedef struct AudioLocation {
+        uint64_t SampleOffset;
+        uint64_t Width;
+        uint64_t Height;
+        uint64_t Depth;
+    } AudioLocation;
+    
+    AudioContainer *AudioContainer_Init(Audio_Types Type, uint8_t BitDepth, Audio_ChannelMask ChannelMask, uint64_t SampleRate, uint64_t NumSamples) {
+        AudioContainer *Audio      = NULL;
+        if (BitDepth > 0 && NumSamples > 0) {
+            Audio                  = calloc(1, sizeof(AudioContainer));
             if (Audio != NULL) {
-                void **Array           = calloc(NumChannels * NumSamples, Type / 4); // !!! DO NOT CHANGE AUDIO_TYPES WITHOUT CHANGING THE SIZE FIELD HERE
+                uint8_t NumChannels = AudioContainer_GetNumChannels(ChannelMask);
+                void **Array       = calloc(NumChannels * NumSamples, Type / 4); // !!! DO NOT CHANGE AUDIO_TYPES WITHOUT CHANGING THE SIZE FIELD HERE
                 if (Array != NULL) {
                     if (Type == (AudioType_Unsigned | AudioType_Integer8)) {
                         Audio->Samples.UInteger8 = (uint8_t**)   Array;
@@ -66,9 +80,7 @@ extern "C" {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate the AudioContainer"));
             }
         } else if (BitDepth == 0) {
-            Log(Log_ERROR, __func__, U8("BitDepth %llu is invalid"), BitDepth);
-        } else if (NumChannels == 0) {
-            Log(Log_ERROR, __func__, U8("NumChannels %llu is invalid"), NumChannels);
+            Log(Log_ERROR, __func__, U8("BitDepth %d is invalid"), BitDepth);
         } else if (NumSamples == 0) {
             Log(Log_ERROR, __func__, U8("NumSamples %llu is invalid"), NumSamples);
         }
@@ -83,8 +95,8 @@ extern "C" {
         }
     }
     
-    uint64_t AudioContainer_GetBitDepth(AudioContainer *Audio) {
-        uint64_t BitDepth = 0ULL;
+    uint8_t AudioContainer_GetBitDepth(AudioContainer *Audio) {
+        uint8_t BitDepth = 0ULL;
         if (Audio != NULL) {
             BitDepth = Audio->BitDepth;
         } else {
@@ -93,13 +105,14 @@ extern "C" {
         return BitDepth;
     }
     
-    uint64_t AudioContainer_GetNumChannels(AudioContainer *Audio) {
-        uint64_t NumChannels = 0ULL;
-        if (Audio != NULL) {
-            NumChannels = Audio->NumChannels;
-        } else {
-            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
-        }
+    uint8_t AudioContainer_GetNumChannels(Audio_ChannelMask ChannelMask) {
+        uint8_t NumChannels  = 0;
+        do {
+            if ((ChannelMask & 1) == 1) {
+                NumChannels += 1;
+            }
+            ChannelMask    >>= 1;
+        } while (ChannelMask > 0);
         return NumChannels;
     }
     
@@ -332,17 +345,19 @@ extern "C" {
         Image_ChannelMask *ChannelMask;
         uint64_t           Width;
         uint64_t           Height;
-        uint64_t           BitDepth;
         uint64_t           NumChannels;
         uint64_t           NumViews;
+        uint64_t           CurrentPixel; // The idea is to map a flat pixel offset to a 4D array.
+        uint8_t            BitDepth;
         Image_Types        Type;
     } ImageContainer;
     
-    ImageContainer *ImageContainer_Init(Image_Types Type, uint64_t BitDepth, uint8_t NumViews, uint64_t NumChannels, uint64_t Width, uint64_t Height) {
+    ImageContainer *ImageContainer_Init(Image_Types Type, uint8_t BitDepth, uint8_t NumViews, Image_ChannelMask ChannelMask, uint64_t Width, uint64_t Height) {
         ImageContainer *Image = NULL;
-        if (BitDepth > 0 && NumChannels > 0 && Width > 0 && Height > 0) {
+        if (BitDepth > 0 && Width > 0 && Height > 0) {
             Image = calloc(1, sizeof(ImageContainer));
             if (Image != NULL) {
+                uint8_t NumChannels = ImageContainer_GetNumChannels(ChannelMask);
                 void *Array = calloc(NumViews * NumChannels * Width * Height, Type); // !!!DO NOT CHANGE IMAGE_TYPES WITHOUT CHANGING THE SIZE FIELD HERE
                 if (Array != NULL) {
                     if (Type == ImageType_Integer8) {
@@ -372,9 +387,7 @@ extern "C" {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate the ImageContainer"));
             }
         } else if (BitDepth == 0) {
-            Log(Log_ERROR, __func__, U8("BitDepth %llu is invalid"), BitDepth);
-        } else if (NumChannels == 0) {
-            Log(Log_ERROR, __func__, U8("NumChannels %llu is invalid"), NumChannels);
+            Log(Log_ERROR, __func__, U8("BitDepth %d is invalid"), BitDepth);
         } else if (Width == 0) {
             Log(Log_ERROR, __func__, U8("Width %llu is invalid"), Width);
         } else if (Height == 0) {
@@ -413,8 +426,8 @@ extern "C" {
         return Height;
     }
     
-    uint64_t ImageContainer_GetBitDepth(ImageContainer *Image) {
-        uint64_t BitDepth = 0ULL;
+    uint8_t ImageContainer_GetBitDepth(ImageContainer *Image) {
+        uint8_t BitDepth = 0ULL;
         if (Image != NULL) {
             BitDepth      = Image->BitDepth;
         } else {
@@ -423,17 +436,14 @@ extern "C" {
         return BitDepth;
     }
     
-    uint64_t ImageContainer_GetNumChannels(ImageContainer *Image) {
-        uint64_t NumChannels = 0ULL;
-        if (Image != NULL) {
-            if (Image->NumViews > 0) {
-                NumChannels  = Image->NumChannels / Image->NumViews;
-            } else {
-                NumChannels  = Image->NumChannels;
+    uint8_t ImageContainer_GetNumChannels(Image_ChannelMask ChannelMask) {
+        uint8_t NumChannels  = 0;
+        do {
+            if ((ChannelMask & 1) == 1) {
+                NumChannels += 1;
             }
-        } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
-        }
+            ChannelMask    >>= 1;
+        } while (ChannelMask > 0);
         return NumChannels;
     }
     
@@ -573,7 +583,7 @@ extern "C" {
             uint64_t NumViews    = ImageContainer_GetNumViews(Image);
             uint64_t Width       = ImageContainer_GetWidth(Image);
             uint64_t Height      = ImageContainer_GetHeight(Image);
-            uint64_t NumChannels = ImageContainer_GetNumChannels(Image);
+            uint8_t  NumChannels = ImageContainer_GetNumChannels(Image);
             
             // Pixel / NumViews / Width / Height = the offset into the array
             
@@ -779,7 +789,7 @@ extern "C" {
     
     void ImageContainer_Resize(ImageContainer *Image, int64_t Left, int64_t Right, int64_t Top, int64_t Bottom) {
         if (Image != NULL) {
-            uint64_t NumChannels = ImageContainer_GetNumChannels(Image);
+            uint8_t  NumChannels = ImageContainer_GetNumChannels(Image);
             uint64_t NumViews    = ImageContainer_GetNumViews(Image);
             uint64_t Height      = ImageContainer_GetHeight(Image);
             uint64_t Width       = ImageContainer_GetWidth(Image);
@@ -929,9 +939,9 @@ extern "C" {
     void ImageHistogram_SetArray(ImageHistogram *Histogram, void *Array) {
         if (Histogram != NULL && Array != NULL) {
             if (Histogram->Type == ImageType_Integer8) {
-                Histogram->Histogram.UInteger8  = (uint8_t***)  Array;
+                Histogram->Histogram.UInteger8  = (uint8_t*)  Array;
             } else if (Histogram->Type == ImageType_Integer16) {
-                Histogram->Histogram.UInteger16 = (uint16_t***) Array;
+                Histogram->Histogram.UInteger16 = (uint16_t*) Array;
             }
         } else if (Histogram == NULL) {
             Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
@@ -948,7 +958,7 @@ extern "C" {
                 uint64_t NumViews       = ImageContainer_GetNumViews(Image);
                 uint64_t Width          = ImageContainer_GetWidth(Image);
                 uint64_t Height         = ImageContainer_GetHeight(Image);
-                uint64_t NumChannels    = ImageContainer_GetNumChannels(Image);
+                uint8_t  NumChannels    = ImageContainer_GetNumChannels(Image);
                 
                 if (Histogram->Type == ImageType_Integer8) {
                     uint8_t *ImageArray  = (uint8_t*) Image->Pixels.UInteger8;

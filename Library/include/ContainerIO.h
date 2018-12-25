@@ -41,17 +41,23 @@ extern "C" {
         AudioType_Integer32         = 16,
     } Audio_Types;
     
-    typedef struct          AudioContainer AudioContainer;
+    typedef struct          AudioContainer   AudioContainer;
+    
+    typedef struct          AudioLocation    AudioLocation;
+    
+    typedef struct          AudioObject      AudioObject;
+    
+    typedef struct          AudioContainer3D AudioContainer3D;
     
     /*!
      @abstract                             "Initalizes an empty AudioContainer".
      @param                 Type           "A type from AudioContinerTypes".
      @param                 BitDepth       "The number of actual bits to store a sample, e.g. 24 bit audio has a bit depth of 24, not 32".
-     @param                 NumChannels    "The number of channels in the audio".
+     @param                 ChannelMask    "The ChannelMask".
      @param                 SampleRate     "The number of samples in one second of audio".
      @param                 NumSamples     "NumSamples is the number of channel independent samples, e.g. X samples is BitDepth * NumChnnels * X".
      */
-    AudioContainer         *AudioContainer_Init(Audio_Types Type, uint64_t BitDepth, uint64_t NumChannels, uint64_t SampleRate, uint64_t NumSamples);
+    AudioContainer         *AudioContainer_Init(Audio_Types Type, uint8_t BitDepth, Audio_ChannelMask ChannelMask, uint64_t SampleRate, uint64_t NumSamples);
     
     /*!
      @abstract                             "Sets the channel type for each channel index".
@@ -63,9 +69,9 @@ extern "C" {
     
     /*!
      @abstract                             "Returns the number of audio channels".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @param                 ChannelMask    "The channel mask".
      */
-    uint64_t                AudioContainer_GetNumChannels(AudioContainer *Audio);
+    uint8_t                 AudioContainer_GetNumChannels(Audio_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Returns the number of channel-agnostic samples in one second".
@@ -77,7 +83,7 @@ extern "C" {
      @abstract                             "Returns the number of bits required to represent a audio sample".
      @param                 Audio          "A pointer to the instance of an AudioContainer in question".
      */
-    uint64_t                AudioContainer_GetBitDepth(AudioContainer *Audio);
+    uint8_t                 AudioContainer_GetBitDepth(AudioContainer *Audio);
     
     /*!
      @abstract                             "Returns the number of channel-agnostic audio samples stored in the container".
@@ -167,11 +173,11 @@ extern "C" {
      @param                 Type           "The type of array to create".
      @param                 BitDepth       "The number of actual bits to store a sample, e.g. a 14 bit image has a bit depth of 14, not 16".
      @param                 NumViews       "The number of views in the image, for example Stereoscopic 3D has 2 views".
-     @param                 NumChannels    "The number of channels in the image".
+     @param                 ChannelMask    "The channel mask".
      @param                 Width          "The number of pixels making up one row".
      @param                 Height         "The number of pixels making up one column".
      */
-    ImageContainer         *ImageContainer_Init(Image_Types Type, uint64_t BitDepth, uint8_t NumViews, uint64_t NumChannels, uint64_t Width, uint64_t Height);
+    ImageContainer         *ImageContainer_Init(Image_Types Type, uint8_t BitDepth, uint8_t NumViews, Image_ChannelMask ChannelMask, uint64_t Width, uint64_t Height);
     
     /*!
      @abstract                             "Sets the channel type for each channel index".
@@ -197,14 +203,14 @@ extern "C" {
      @abstract                             "Returns the number of bits needed to represent the image in this container".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
-    uint64_t                ImageContainer_GetBitDepth(ImageContainer *Image);
+    uint8_t                 ImageContainer_GetBitDepth(ImageContainer *Image);
     
     /*!
      @abstract                             "Returns the number of channels contained in this image".
      @remark                               "If there are multiple views, it only returns the number of channels per view".
-     @param                 Image          "A pointer to the instance of an ImageContainer in question".
+     @param                 ChannelMask    "The channel mask".
      */
-    uint64_t                ImageContainer_GetNumChannels(ImageContainer *Image);
+    uint8_t                 ImageContainer_GetNumChannels(Image_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Gets the channel index for the specified mask".
