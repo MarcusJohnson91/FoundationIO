@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C2360D721D2C0830022AD81 /* ContainerIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C2360D021D2C0820022AD81 /* ContainerIO.h */; };
+		2C2360D821D2C0830022AD81 /* Math.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C2360D121D2C0820022AD81 /* Math.h */; };
+		2C2360D921D2C0830022AD81 /* TestIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C2360D221D2C0820022AD81 /* TestIO.h */; };
+		2C2360DA21D2C0830022AD81 /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C2360D321D2C0820022AD81 /* StringIO.h */; };
+		2C2360DB21D2C0830022AD81 /* Log.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C2360D421D2C0820022AD81 /* Log.h */; };
+		2C2360DC21D2C0830022AD81 /* BitIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C2360D521D2C0820022AD81 /* BitIO.h */; };
+		2C2360DD21D2C0830022AD81 /* CommandLineIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C2360D621D2C0830022AD81 /* CommandLineIO.h */; };
+		2C2360E021D2C08C0022AD81 /* StringIOTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C2360DE21D2C08C0022AD81 /* StringIOTables.h */; };
+		2C2360E121D2C08C0022AD81 /* Macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C2360DF21D2C08C0022AD81 /* Macros.h */; };
 		2CA1BE4D21ABAFEC0035E9F9 /* ContainerIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE4621ABAFEC0035E9F9 /* ContainerIO.c */; };
 		2CA1BE4E21ABAFEC0035E9F9 /* Log.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE4721ABAFEC0035E9F9 /* Log.c */; };
 		2CA1BE4F21ABAFEC0035E9F9 /* Math.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE4821ABAFEC0035E9F9 /* Math.c */; };
@@ -14,15 +23,6 @@
 		2CA1BE5121ABAFEC0035E9F9 /* StringIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE4A21ABAFEC0035E9F9 /* StringIO.c */; };
 		2CA1BE5221ABAFEC0035E9F9 /* CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE4B21ABAFEC0035E9F9 /* CommandLineIO.c */; };
 		2CA1BE5321ABAFEC0035E9F9 /* BitIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE4C21ABAFEC0035E9F9 /* BitIO.c */; };
-		2CA1BE5D21ABAFFA0035E9F9 /* BitIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5421ABAFFA0035E9F9 /* BitIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2CA1BE5E21ABAFFA0035E9F9 /* Macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5521ABAFFA0035E9F9 /* Macros.h */; };
-		2CA1BE5F21ABAFFA0035E9F9 /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5621ABAFFA0035E9F9 /* StringIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2CA1BE6021ABAFFA0035E9F9 /* StringIOTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5721ABAFFA0035E9F9 /* StringIOTables.h */; };
-		2CA1BE6121ABAFFA0035E9F9 /* ContainerIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5821ABAFFA0035E9F9 /* ContainerIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2CA1BE6221ABAFFA0035E9F9 /* Log.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5921ABAFFA0035E9F9 /* Log.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2CA1BE6321ABAFFA0035E9F9 /* Math.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5A21ABAFFA0035E9F9 /* Math.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2CA1BE6421ABAFFA0035E9F9 /* CommandLineIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5B21ABAFFA0035E9F9 /* CommandLineIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2CA1BE6521ABAFFA0035E9F9 /* TestIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA1BE5C21ABAFFA0035E9F9 /* TestIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2CA1BE6A21ABB0120035E9F9 /* Test_BitIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE6621ABB00F0035E9F9 /* Test_BitIO.c */; };
 		2CA1BE6B21ABB0150035E9F9 /* Test_CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE6921ABB00F0035E9F9 /* Test_CommandLineIO.c */; };
 		2CA1BE6C21ABB0180035E9F9 /* Test_ContainerIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE6821ABB00F0035E9F9 /* Test_ContainerIO.c */; };
@@ -104,6 +104,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2C2360D021D2C0820022AD81 /* ContainerIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ContainerIO.h; path = ../libFoundationIO/include/ContainerIO.h; sourceTree = "<group>"; };
+		2C2360D121D2C0820022AD81 /* Math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Math.h; path = ../libFoundationIO/include/Math.h; sourceTree = "<group>"; };
+		2C2360D221D2C0820022AD81 /* TestIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = TestIO.h; path = ../libFoundationIO/include/TestIO.h; sourceTree = "<group>"; };
+		2C2360D321D2C0820022AD81 /* StringIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = StringIO.h; path = ../libFoundationIO/include/StringIO.h; sourceTree = "<group>"; };
+		2C2360D421D2C0820022AD81 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Log.h; path = ../libFoundationIO/include/Log.h; sourceTree = "<group>"; };
+		2C2360D521D2C0820022AD81 /* BitIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BitIO.h; path = ../libFoundationIO/include/BitIO.h; sourceTree = "<group>"; };
+		2C2360D621D2C0830022AD81 /* CommandLineIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = CommandLineIO.h; path = ../libFoundationIO/include/CommandLineIO.h; sourceTree = "<group>"; };
+		2C2360DE21D2C08C0022AD81 /* StringIOTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = StringIOTables.h; path = ../libFoundationIO/include/StringIOTables.h; sourceTree = "<group>"; };
+		2C2360DF21D2C08C0022AD81 /* Macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Macros.h; path = ../libFoundationIO/include/Macros.h; sourceTree = "<group>"; };
 		2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libFoundationIO.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CA1BE1A21ABAF8F0035E9F9 /* Test_BitIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_BitIO; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CA1BE2521ABAFA20035E9F9 /* Test_CommandLineIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_CommandLineIO; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -116,15 +125,6 @@
 		2CA1BE4A21ABAFEC0035E9F9 /* StringIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = StringIO.c; path = ../libFoundationIO/src/StringIO.c; sourceTree = "<group>"; };
 		2CA1BE4B21ABAFEC0035E9F9 /* CommandLineIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = CommandLineIO.c; path = ../libFoundationIO/src/CommandLineIO.c; sourceTree = "<group>"; };
 		2CA1BE4C21ABAFEC0035E9F9 /* BitIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = BitIO.c; path = ../libFoundationIO/src/BitIO.c; sourceTree = "<group>"; };
-		2CA1BE5421ABAFFA0035E9F9 /* BitIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BitIO.h; path = ../libFoundationIO/include/BitIO.h; sourceTree = "<group>"; };
-		2CA1BE5521ABAFFA0035E9F9 /* Macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Macros.h; path = ../libFoundationIO/include/Macros.h; sourceTree = "<group>"; };
-		2CA1BE5621ABAFFA0035E9F9 /* StringIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StringIO.h; path = ../libFoundationIO/include/StringIO.h; sourceTree = "<group>"; };
-		2CA1BE5721ABAFFA0035E9F9 /* StringIOTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StringIOTables.h; path = ../libFoundationIO/include/StringIOTables.h; sourceTree = "<group>"; };
-		2CA1BE5821ABAFFA0035E9F9 /* ContainerIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ContainerIO.h; path = ../libFoundationIO/include/ContainerIO.h; sourceTree = "<group>"; };
-		2CA1BE5921ABAFFA0035E9F9 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Log.h; path = ../libFoundationIO/include/Log.h; sourceTree = "<group>"; };
-		2CA1BE5A21ABAFFA0035E9F9 /* Math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Math.h; path = ../libFoundationIO/include/Math.h; sourceTree = "<group>"; };
-		2CA1BE5B21ABAFFA0035E9F9 /* CommandLineIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CommandLineIO.h; path = ../libFoundationIO/include/CommandLineIO.h; sourceTree = "<group>"; };
-		2CA1BE5C21ABAFFA0035E9F9 /* TestIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestIO.h; path = ../libFoundationIO/include/TestIO.h; sourceTree = "<group>"; };
 		2CA1BE6621ABB00F0035E9F9 /* Test_BitIO.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = Test_BitIO.c; path = ../Tests/Test_BitIO.c; sourceTree = "<group>"; };
 		2CA1BE6721ABB00F0035E9F9 /* Test_StringIO.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = Test_StringIO.c; path = ../Tests/Test_StringIO.c; sourceTree = "<group>"; };
 		2CA1BE6821ABB00F0035E9F9 /* Test_ContainerIO.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = Test_ContainerIO.c; path = ../Tests/Test_ContainerIO.c; sourceTree = "<group>"; };
@@ -232,15 +232,15 @@
 		2CA1BE4521ABAFD90035E9F9 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
-				2CA1BE5421ABAFFA0035E9F9 /* BitIO.h */,
-				2CA1BE5B21ABAFFA0035E9F9 /* CommandLineIO.h */,
-				2CA1BE5821ABAFFA0035E9F9 /* ContainerIO.h */,
-				2CA1BE5921ABAFFA0035E9F9 /* Log.h */,
-				2CA1BE5521ABAFFA0035E9F9 /* Macros.h */,
-				2CA1BE5A21ABAFFA0035E9F9 /* Math.h */,
-				2CA1BE5621ABAFFA0035E9F9 /* StringIO.h */,
-				2CA1BE5721ABAFFA0035E9F9 /* StringIOTables.h */,
-				2CA1BE5C21ABAFFA0035E9F9 /* TestIO.h */,
+				2C2360D521D2C0820022AD81 /* BitIO.h */,
+				2C2360D621D2C0830022AD81 /* CommandLineIO.h */,
+				2C2360D021D2C0820022AD81 /* ContainerIO.h */,
+				2C2360D421D2C0820022AD81 /* Log.h */,
+				2C2360D121D2C0820022AD81 /* Math.h */,
+				2C2360D321D2C0820022AD81 /* StringIO.h */,
+				2C2360D221D2C0820022AD81 /* TestIO.h */,
+				2C2360DF21D2C08C0022AD81 /* Macros.h */,
+				2C2360DE21D2C08C0022AD81 /* StringIOTables.h */,
 			);
 			name = Headers;
 			sourceTree = "<group>";
@@ -252,15 +252,15 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CA1BE5D21ABAFFA0035E9F9 /* BitIO.h in Headers */,
-				2CA1BE6221ABAFFA0035E9F9 /* Log.h in Headers */,
-				2CA1BE6521ABAFFA0035E9F9 /* TestIO.h in Headers */,
-				2CA1BE6421ABAFFA0035E9F9 /* CommandLineIO.h in Headers */,
-				2CA1BE6121ABAFFA0035E9F9 /* ContainerIO.h in Headers */,
-				2CA1BE5F21ABAFFA0035E9F9 /* StringIO.h in Headers */,
-				2CA1BE6321ABAFFA0035E9F9 /* Math.h in Headers */,
-				2CA1BE6021ABAFFA0035E9F9 /* StringIOTables.h in Headers */,
-				2CA1BE5E21ABAFFA0035E9F9 /* Macros.h in Headers */,
+				2C2360E021D2C08C0022AD81 /* StringIOTables.h in Headers */,
+				2C2360DD21D2C0830022AD81 /* CommandLineIO.h in Headers */,
+				2C2360DC21D2C0830022AD81 /* BitIO.h in Headers */,
+				2C2360E121D2C08C0022AD81 /* Macros.h in Headers */,
+				2C2360D821D2C0830022AD81 /* Math.h in Headers */,
+				2C2360DB21D2C0830022AD81 /* Log.h in Headers */,
+				2C2360D921D2C0830022AD81 /* TestIO.h in Headers */,
+				2C2360D721D2C0830022AD81 /* ContainerIO.h in Headers */,
+				2C2360DA21D2C0830022AD81 /* StringIO.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
