@@ -23,6 +23,7 @@ extern "C" {
      @constant               Description                 "Describe to the user what this switch does".
      @constant               PotentialSlaves             "Pointer to an array that contains the list of aloowable Slave switches".
      @constant               NumPotentialSlaves          "How many potential slaves are there"?
+     @constant               MinConcurrentSlaves         "How many Slave switches must be active at once"?
      @constant               MaxConcurrentSlaves         "How many Slave switches can be active at once"?
      @constant               SwitchType                  "What type of switch is this"?
      @constant               ArgumentType                "What type of argument does this switch accept"?
@@ -32,6 +33,7 @@ extern "C" {
         UTF32               *Description;
         int64_t             *PotentialSlaves;
         int64_t              NumPotentialSlaves;
+        int64_t              MinConcurrentSlaves;
         int64_t              MaxConcurrentSlaves;
         CLISwitchTypes       SwitchType;
         CLIArgumentTypes     ArgumentType;
@@ -582,15 +584,23 @@ extern "C" {
         }
     }
     
+    void CommandLineIO_Switch_SetMinConcurrentSlaves(CommandLineIO *CLI, const int64_t MasterID, const int64_t MinConcurrentSlaves) {
+        if (CLI != NULL && (MasterID >= 0 && MasterID <= CLI->NumSwitches - 1)) {
+            CLI->SwitchIDs[MasterID].MaxConcurrentSlaves = MinConcurrentSlaves;
+        } else if (CLI == NULL) {
+            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+        } else if (MasterID < 0 || MasterID > CLI->NumSwitches - 1) {
+            Log(Log_ERROR, __func__, U8("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
+        }
+    }
+    
     void CommandLineIO_Switch_SetMaxConcurrentSlaves(CommandLineIO *CLI, const int64_t MasterID, const int64_t MaxConcurrentSlaves) {
-        if (CLI != NULL && (MasterID >= 0 && MasterID <= CLI->NumSwitches - 1) && (MaxConcurrentSlaves >= 0 && MaxConcurrentSlaves <= CLI->NumSwitches - 1)) {
+        if (CLI != NULL && (MasterID >= 0 && MasterID <= CLI->NumSwitches - 1)) {
             CLI->SwitchIDs[MasterID].MaxConcurrentSlaves = MaxConcurrentSlaves;
         } else if (CLI == NULL) {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (MasterID < 0 || MasterID > CLI->NumSwitches - 1) {
             Log(Log_ERROR, __func__, U8("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
-        } else if (MaxConcurrentSlaves < 0 || MaxConcurrentSlaves > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("MaxConcurrentSlaves %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
         }
     }
     
