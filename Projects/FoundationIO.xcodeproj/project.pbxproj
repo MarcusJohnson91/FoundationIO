@@ -27,10 +27,10 @@
 		2CA1BE6B21ABB0150035E9F9 /* Test_CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE6921ABB00F0035E9F9 /* Test_CommandLineIO.c */; };
 		2CA1BE6C21ABB0180035E9F9 /* Test_ContainerIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE6821ABB00F0035E9F9 /* Test_ContainerIO.c */; };
 		2CA1BE6D21ABB01C0035E9F9 /* Test_StringIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA1BE6721ABB00F0035E9F9 /* Test_StringIO.c */; };
-		2CA1BE6F21ABB2530035E9F9 /* libFoundationIO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */; };
-		2CA1BE7021ABB35F0035E9F9 /* libFoundationIO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */; };
-		2CA1BE7121ABB3660035E9F9 /* libFoundationIO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */; };
-		2CA1BE7221ABB36D0035E9F9 /* libFoundationIO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */; };
+		2CCC321221D8294A0064BC63 /* libFoundationIO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */; };
+		2CCC321A21D9104D0064BC63 /* libFoundationIO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */; };
+		2CCC321B21D910850064BC63 /* libFoundationIO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */; };
+		2CCC321C21D910A60064BC63 /* libFoundationIO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA1BE0F21ABAF5C0035E9F9 /* libFoundationIO.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -143,7 +143,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CA1BE7221ABB36D0035E9F9 /* libFoundationIO.a in Frameworks */,
+				2CCC321C21D910A60064BC63 /* libFoundationIO.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,7 +151,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CA1BE7121ABB3660035E9F9 /* libFoundationIO.a in Frameworks */,
+				2CCC321B21D910850064BC63 /* libFoundationIO.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,7 +159,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CA1BE7021ABB35F0035E9F9 /* libFoundationIO.a in Frameworks */,
+				2CCC321221D8294A0064BC63 /* libFoundationIO.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,7 +167,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CA1BE6F21ABB2530035E9F9 /* libFoundationIO.a in Frameworks */,
+				2CCC321A21D9104D0064BC63 /* libFoundationIO.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
