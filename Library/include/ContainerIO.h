@@ -210,7 +210,14 @@ extern "C" {
      @remark                               "If there are multiple views, it only returns the number of channels per view".
      @param                 ChannelMask    "The channel mask".
      */
-    uint8_t                 ImageContainer_GetNumChannels(Image_ChannelMask ChannelMask);
+    uint8_t                 ImageMask_GetNumChannels(Image_ChannelMask ChannelMask);
+    
+    /*!
+     @abstract                             "Returns the number of channels contained in this image".
+     @remark                               "If there are multiple views, it only returns the number of channels per view".
+     @param                 Image          "ImageContaienr Pointer".
+     */
+    uint8_t                 ImageContainer_GetNumChannels(ImageContainer *Image);
     
     /*!
      @abstract                             "Gets the channel index for the specified mask".
