@@ -143,6 +143,49 @@ extern "C" {
      */
     void                    AudioContainer_Deinit(AudioContainer *Audio);
     
+    typedef struct          AudioHistogram AudioHistogram;
+    
+    /*!
+     @abstract                             "Creates a AudioHistogram".
+     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @return                               "Returns the newly created Histogram".
+     */
+    AudioHistogram         *AudioHistogram_Init(AudioContainer *Audio);
+    
+    /*!
+     @abstract                             "Gets a pointer to the histogram data".
+     @param                 Histogram      "A pointer to the instance of an AudioHistogram in question".
+     @return                               "Returns a pointer to the histogram data".
+     */
+    void                   *AudioHistogram_GetArray(AudioHistogram *Histogram);
+    
+    /*!
+     @abstract                             "Sets a pointer to the histogram data".
+     @param                 Histogram      "A pointer to the instance of an AudioHistogram in question".
+     @param                 Array          "A pointer to the histogram data".
+     */
+    void                    AudioHistogram_SetArray(AudioHistogram *Histogram, void *Array);
+    
+    /*!
+     @abstract                             "Generates a histogram from an image".
+     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @return                               "Returns the newly created Histogram".
+     */
+    AudioHistogram         *AudioHistogram_GenerateHistogram(AudioContainer *Audio);
+    
+    /*!
+     @abstract                             "Sorts a histogram".
+     @param                 Histogram      "A pointer to the AudioHistogram in question".
+     @param                 SortAscending  "If true, sorts so the most common index is at the top".
+     */
+    void                    AudioHistogram_Sort(AudioHistogram *Histogram, bool SortAscending);
+    
+    /*!
+     @abstract                             "frees a AudioHistogram".
+     @param                 Histogram      "A pointer to the AudioHistogram to deinitalize".
+     */
+    void                    AudioHistogram_Deinit(AudioHistogram *Histogram);
+    
     typedef enum Image_ChannelMask {
         ImageMask_Unknown           = 0,
         ImageMask_2D                = 1,
@@ -343,6 +386,13 @@ extern "C" {
      @return                               "Returns the newly created Histogram".
      */
     ImageHistogram         *ImageHistogram_GenerateHistogram(ImageContainer *Image);
+    
+    /*!
+     @abstract                             "Sorts a histogram".
+     @param                 Histogram      "A pointer to the ImageHistogram in question".
+     @param                 SortAscending  "If true, sorts so the most common index is at the top".
+     */
+    void                    ImageHistogram_Sort(ImageHistogram *Histogram, bool SortAscending);
     
     /*!
      @abstract                             "frees a ImageHistogram".

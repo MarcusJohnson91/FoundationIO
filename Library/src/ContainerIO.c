@@ -3,7 +3,7 @@
 #include "../include/ContainerIO.h"    /* Included for our declarations */
 #include "../include/Log.h"            /* Included for error reporting */
 #include "../include/StringIO.h"       /* Included for StringIO's declarations */
-#include "../include/Math.h"           /* Included for Absolute */
+#include "../include/Math.h"           /* Included for Absolute, Max/Min */
 
 #ifdef __cplusplus
 extern "C" {
@@ -337,6 +337,247 @@ extern "C" {
         }
     }
     
+    typedef struct AudioContainer3D {
+        uint64_t     NumObjects;
+        AudioObject *AudioObjects;
+    } AudioContainer3D;
+    
+    AudioContainer3D *AudioContainer3D_Init(uint64_t NumObjects) {
+        AudioContainer3D *Container       = NULL;
+        if (NumObjects > 0) {
+            Container                     = calloc(1, sizeof(AudioContainer3D));
+            if (Container != NULL) {
+                Container->AudioObjects   = calloc(NumObjects, sizeof(AudioObject));
+                if (Container->AudioObjects != NULL) {
+                    Container->NumObjects = NumObjects;
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate %lld AudioObjects"), NumObjects);
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate AudioContainer3D"));
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("NumObjects %lld is invalid"), NumObjects);
+        }
+        return Container;
+    }
+    
+    void AudioContainer3D_SetObject(AudioContainer3D *Container, AudioObject *Object, uint64_t Index) {
+        if (Container != NULL && Object != NULL && Index >= 1) {
+            Container->AudioObjects[Index - 1] = *Object;
+        } else if (Container == NULL) {
+            Log(Log_ERROR, __func__, U8("AudioContainer3D Pointer is NULL"));
+        } else if (Object == NULL) {
+            Log(Log_ERROR, __func__, U8("AudioObject Pointer is NULL"));
+        } else if (Index == 0) {
+            Log(Log_ERROR, __func__, U8("Index needs to be a count, not an offset"));
+        }
+    }
+    
+    typedef struct AudioHistogram {
+        void          **Array; // Channel, Sample
+        uint64_t        NumEntries;
+        Audio_Types     Type;
+    } AudioHistogram;
+    
+    AudioHistogram *AudioHistogram_Init(AudioContainer *Audio) {
+        AudioHistogram *Histogram = NULL;
+        if (Audio != NULL) {
+            // Create a histogram for each sample value in each channel
+            Histogram             = calloc(1, sizeof(AudioHistogram));
+            if (Histogram != NULL) {
+                if (Audio->BitDepth <= 8) {
+                    Histogram->Array  = calloc(256 * Audio->NumChannels, sizeof(uint8_t));
+                    Histogram->NumEntries = 256;
+                } else if (Audio->BitDepth <= 16) {
+                    Histogram->Array  = calloc(65536 * Audio->NumChannels, sizeof(uint16_t));
+                    Histogram->NumEntries = 65536;
+                } else if (Audio->BitDepth <= 24) {
+                    Histogram->Array  = calloc(16777216 * Audio->NumChannels, sizeof(uint32_t));
+                    Histogram->NumEntries = 16777216;
+                }
+                
+                if (Histogram->Array != NULL) {
+                    Histogram->Type   = Audio->Type;
+                } else {
+                    AudioHistogram_Deinit(Histogram);
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate AudioHistogram Array"));
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate AudioHistogram"));
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        }
+        return Histogram;
+    }
+    
+    void *AudioHistogram_GetArray(AudioHistogram *Histogram) {
+        void *Array = NULL;
+        if (Histogram != NULL) {
+            Array   = Histogram->Array;
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioHistogram Pointer is NULL"));
+        }
+        return Array;
+    }
+    
+    void AudioHistogram_SetArray(AudioHistogram *Histogram, void *Array) {
+        if (Histogram != NULL) {
+            Histogram->Array = Array;
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioHistogram Pointer is NULL"));
+        }
+    }
+    
+    AudioHistogram *AudioHistogram_GenerateHistogram(AudioContainer *Audio) {
+        AudioHistogram *Histogram       = NULL;
+        if (Audio != NULL) {
+            Histogram                   = AudioHistogram_Init(Audio);
+            if (Histogram != NULL) {
+                uint8_t  NumChannels                             = AudioContainer_GetNumChannels(Audio);
+                
+                if (Histogram->Type == AudioType_Integer8) {
+                    uint8_t *SampleArray                         = (uint8_t*) Audio->Samples.UInteger8;
+                    uint8_t *HistArray                           = (uint8_t*) Histogram->Array;
+                    for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
+                        for (uint64_t S = 0ULL; S < Audio->NumSamples; S++) {
+                            uint8_t Sample                       = SampleArray[C * S];
+                            HistArray[C * S]                    += 1;
+                        }
+                    }
+                } else if (Histogram->Type == AudioType_Integer16) {
+                    uint16_t *SampleArray                        = (uint16_t*) Audio->Samples.UInteger16;
+                    uint16_t *HistArray                          = (uint16_t*) Histogram->Array;
+                    
+                    for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
+                        for (uint64_t S = 0ULL; S < Audio->NumSamples; S++) {
+                            uint16_t Sample                      = SampleArray[C * S];
+                            HistArray[C * S]                    += 1;
+                        }
+                    }
+                } else if (Histogram->Type == AudioType_Integer32) {
+                    uint32_t *SampleArray                        = (uint32_t*) Audio->Samples.UInteger16;
+                    uint32_t *HistArray                          = (uint32_t*) Histogram->Array;
+                    
+                    for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
+                        for (uint64_t S = 0ULL; S < Audio->NumSamples; S++) {
+                            uint16_t Sample                      = SampleArray[C * S];
+                            HistArray[C * S]                    += 1;
+                        }
+                    }
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate AudioHistogram"));
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        }
+        return Histogram;
+    }
+    
+    void AudioHistogram_Sort(AudioHistogram *Histogram, bool SortAscending) {
+        if (Histogram != NULL) {
+            uint64_t NumCores = FoundationIO_GetNumCPUCores(); // Now divide Histogram->NumEntries by NumCores (how do we handle rounding?)
+            if (SortAscending == Yes) { // Top to bottom
+                if (Histogram->Type == (AudioType_Integer8 | AudioType_Unsigned)) {
+                    uint8_t  *Audio = AudioHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Audio[Element - 1] = Max(Audio[Element - 1], Audio[Element]);
+                        }
+                    }
+                } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Unsigned)) {
+                    uint16_t *Audio = AudioHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Audio[Element - 1] = Max(Audio[Element - 1], Audio[Element]);
+                        }
+                    }
+                } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Unsigned)) {
+                    uint32_t *Audio = AudioHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Audio[Element - 1] = Max(Audio[Element - 1], Audio[Element]);
+                        }
+                    }
+                } else if (Histogram->Type == (AudioType_Integer8 | AudioType_Signed)) {
+                    int8_t  *Audio = AudioHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Audio[Element - 1] = Max(Audio[Element - 1], Audio[Element]);
+                        }
+                    }
+                } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Signed)) {
+                    int16_t *Audio = AudioHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Audio[Element - 1] = Max(Audio[Element - 1], Audio[Element]);
+                        }
+                    }
+                } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Signed)) {
+                    int32_t *Audio = AudioHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Audio[Element - 1] = Max(Audio[Element - 1], Audio[Element]);
+                        }
+                    }
+                }
+            } else { // Bottom to top
+                if (Histogram->Type == (AudioType_Integer8 | AudioType_Unsigned)) {
+                    uint8_t  *Audio = AudioHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Audio[Element - 1] = Min(Audio[Element - 1], Audio[Element]);
+                        }
+                    }
+                } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Unsigned)) {
+                    uint16_t *Audio = AudioHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Audio[Element - 1] = Min(Audio[Element - 1], Audio[Element]);
+                        }
+                    }
+                } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Unsigned)) {
+                    uint32_t *Audio = AudioHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Audio[Element - 1] = Min(Audio[Element - 1], Audio[Element]);
+                        }
+                    }
+                } else if (Histogram->Type == (AudioType_Integer8 | AudioType_Signed)) {
+                    int8_t  *Audio = AudioHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Audio[Element - 1] = Min(Audio[Element - 1], Audio[Element]);
+                        }
+                    }
+                } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Signed)) {
+                    int16_t *Audio = AudioHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Audio[Element - 1] = Min(Audio[Element - 1], Audio[Element]);
+                        }
+                    }
+                } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Signed)) {
+                    int32_t *Audio = AudioHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Audio[Element - 1] = Min(Audio[Element - 1], Audio[Element]);
+                        }
+                    }
+                }
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
+        }
+    }
+    
+    void AudioHistogram_Deinit(AudioHistogram *Histogram) {
+        free(Histogram->Array);
+        free(Histogram);
+    }
+    
     typedef struct ImageContainer {
         union Pixels {
             uint16_t      *UInteger16;
@@ -537,73 +778,6 @@ extern "C" {
             } else if (Image->Type == ImageType_Integer16) {
                 Image->Pixels.UInteger16 = (uint16_t*) Array;
             }
-        } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
-        }
-    }
-    
-    uint64_t ImageContainer_IteratePixel(ImageContainer *Image, uint64_t Pixel) {
-        if (Image != NULL) {
-            /*
-             Let's start at the top.
-             
-             I want to get the value of Pixel X, which is between 0 and NumViews * Width * Height * NumChannels
-             
-             Let's say it's a 3D 8x8 3 channel block with 12 bits per pixel
-             
-             In this block there are 2 * 8 * 8 * 3 subpixels, and (2 * 8 * 8 * 3 * BitDepth) / 8 bytes.
-             
-             NumPixels = 384 pixels
-             Bytes     = 576 bytes
-             
-             So we take in an absolute offset and return, what, exactly?
-             
-             Maybe what I should do is have GetPixel and SetPixel functions instead that do all this for the users?
-             
-             For example, Pixel = 24.
-             
-             Since Pixel is less than half, we're in view 0, we're in row 3 since 8 * 3 = 24, and column 8.
-             */
-        } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
-        }
-        return 0;
-    }
-    
-    uint64_t ImageContainer_IterateByte(ImageContainer *Image, uint64_t Byte) {
-        if (Image != NULL) {
-            /*
-             Map ByteX to
-             */
-        } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
-        }
-        return 0;
-    }
-    
-    uint64_t ImageContainer_GetPixel(ImageContainer *Image, uint64_t Pixel, uint8_t Channel) {
-        uint64_t Value = 0ULL;
-        if (Image != NULL) {
-            uint64_t NumViews    = ImageContainer_GetNumViews(Image);
-            uint64_t Width       = ImageContainer_GetWidth(Image);
-            uint64_t Height      = ImageContainer_GetHeight(Image);
-            uint8_t  NumChannels = ImageContainer_GetNumChannels(Image);
-            
-            // Pixel / NumViews / Width / Height = the offset into the array
-            
-            if (Pixel < NumViews * Width * Height) { // 3 * 8 * 8 = 192
-                                                     // View 0 for 2 views, what about 3 views tho?
-            }
-            
-        } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
-        }
-        return Value;
-    }
-    
-    void ImageContainer_SetPixel(ImageContainer *Image, uint64_t Pixel, uint8_t Channel, uint64_t Value) {
-        if (Image != NULL) {
-            
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
@@ -871,13 +1045,6 @@ extern "C" {
         }
     }
     
-    typedef union Histogram {
-        uint16_t   UInteger16;
-        uint8_t    UInteger8;
-    } Histogram;
-    
-    // Ok so it shouldn't be a union, what I actually want is a type agnostic array... so just a void pointer?
-    
     typedef struct ImageHistogram {
         void           *Array;
         uint64_t        NumEntries;
@@ -995,6 +1162,47 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return Histogram;
+    }
+    
+    void ImageHistogram_Sort(ImageHistogram *Histogram, bool SortAscending) {
+        if (Histogram != NULL) { // Our sorting algorithm will be stable, so values that are tied, will not be moved
+            uint64_t NumCores = FoundationIO_GetNumCPUCores();
+            if (SortAscending == Yes) { // Top to bottom
+                if (Histogram->Type == ImageType_Integer8) {
+                    uint8_t  *Image = ImageHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Image[Element - 1] = Max(Image[Element - 1], Image[Element]);
+                        }
+                    }
+                } else if (Histogram->Type == ImageType_Integer16) {
+                    uint16_t *Image = ImageHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Image[Element - 1] = Max(Image[Element - 1], Image[Element]);
+                        }
+                    }
+                }
+            } else { // Bottom to top
+                if (Histogram->Type == ImageType_Integer8) {
+                    uint8_t  *Image = ImageHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Image[Element - 1] = Min(Image[Element - 1], Image[Element]);
+                        }
+                    }
+                } else if (Histogram->Type == ImageType_Integer16) {
+                    uint16_t *Image = ImageHistogram_GetArray(Histogram);
+                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
+                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
+                            Image[Element - 1] = Min(Image[Element - 1], Image[Element]);
+                        }
+                    }
+                }
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
+        }
     }
     
     void ImageHistogram_Deinit(ImageHistogram *Histogram) {
