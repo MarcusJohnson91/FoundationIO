@@ -84,6 +84,7 @@ extern "C" {
     
 #include <dlfcn.h>      /* Included for shared library support */
 #include <sys/socket.h> /* Included for socket support */
+#include <sys/sysctl.h> /* Included for getting the number of CPU cores */
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
     
 #define FoundationIOTargetOS (FoundationIOOSPOSIX)
@@ -366,11 +367,28 @@ extern "C" {
     
     /*!
      @enum                      FoundationIOConstants
-     @constant                  NULLTerminatorSize         "The size  of a NULL terminator".
+     @constant                  NULLTerminatorSize         "The size of a NULL terminator".
      */
     typedef enum FoundationIOConstants {
                                 NULLTerminatorSize         = 1,
     } FoundationIOConstants;
+    
+    uint64_t FoundationIO_GetNumCPUCores() {
+        uint64_t NumCPUCores = 0ULL;
+#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+        int SysInfo[2]  = {CTL_HW, HW_AVAILCPU};
+        size_t   Length = 8;
+        sysctl(SysInfo, 2, &NumCPUCores, &Length, NULL, 0);
+        if (NumCPUCores < 1) {
+            NumCPUCores = 1;
+        }
+#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+        SYSTEM_INFO WinSysInfo;
+        GetSystemInfo(&WinSysInfo);
+        NumCPUCores = WinSysInfo.dwNumberOfProcessors;
+#endif
+        return NumCPUCores;
+    }
     
 #ifdef __cplusplus
 }
