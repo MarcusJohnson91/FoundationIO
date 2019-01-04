@@ -62,12 +62,11 @@ extern "C" {
     /*!
      @abstract                             "Initalizes an empty AudioContainer".
      @param                 Type           "A type from AudioContinerTypes".
-     @param                 BitDepth       "The number of actual bits to store a sample, e.g. 24 bit audio has a bit depth of 24, not 32".
      @param                 ChannelMask    "The ChannelMask".
      @param                 SampleRate     "The number of samples in one second of audio".
      @param                 NumSamples     "NumSamples is the number of channel independent samples, e.g. X samples is BitDepth * NumChnnels * X".
      */
-    AudioContainer         *AudioContainer_Init(Audio_Types Type, uint8_t BitDepth, Audio_ChannelMask ChannelMask, uint64_t SampleRate, uint64_t NumSamples);
+    AudioContainer         *AudioContainer_Init(Audio_Types Type, Audio_ChannelMask ChannelMask, uint64_t SampleRate, uint64_t NumSamples);
     
     /*!
      @abstract                             "Sets the channel type for each channel index".
@@ -75,7 +74,7 @@ extern "C" {
      @param                 Index          "Which index does the channel mask apply to"?
      @param                 ChannelMask    "What is the channel mask"?
      */
-    void                    AudioContainer_SetChannelMask(AudioContainer *Audio, uint64_t Index, Audio_ChannelMask ChannelMask);
+    void                    AudioContainer_SetChannelIndex(AudioContainer *Audio, uint64_t Index, Audio_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Returns the number of audio channels".
@@ -237,12 +236,11 @@ extern "C" {
      @abstract                             "Initalizes an empty ImageContainer".
      @remark                               "All channels in an image must have the same bit depth, padding will be added if necessary".
      @param                 Type           "The type of array to create".
-     @param                 BitDepth       "The number of actual bits to store a sample, e.g. a 14 bit image has a bit depth of 14, not 16".
      @param                 ChannelMask    "The channel mask".
      @param                 Width          "The number of pixels making up one row".
      @param                 Height         "The number of pixels making up one column".
      */
-    ImageContainer         *ImageContainer_Init(Image_Types Type, uint8_t BitDepth, Image_ChannelMask ChannelMask, uint64_t Width, uint64_t Height);
+    ImageContainer         *ImageContainer_Init(Image_Types Type, Image_ChannelMask ChannelMask, uint64_t Width, uint64_t Height);
     
     /*!
      @abstract                             "Sets the channel type for each channel index".
