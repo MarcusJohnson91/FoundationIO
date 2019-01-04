@@ -10,18 +10,11 @@ extern "C" {
 #endif
     
     typedef struct AudioContainer {
-        union Samples {
-            uint32_t     **UInteger32;
-            int32_t      **SInteger32;
-            uint16_t     **UInteger16;
-            int16_t      **SInteger16;
-            uint8_t      **UInteger8;
-            int8_t       **SInteger8;
-        } Samples;
-        Audio_ChannelMask *ChannelMask;
+        void             **Samples;
+        Audio_ChannelMask *ChannelIndex; // So basically it's type is AudioChannelMask and each index contains the enum matching the channel at that index in the array
         uint64_t           NumSamples;
         uint64_t           SampleRate;
-        uint64_t           NumChannels;
+        Audio_ChannelMask  ChannelMask;
         uint8_t            BitDepth;
         Audio_Types        Type;
     } AudioContainer;
@@ -40,41 +33,23 @@ extern "C" {
     } AudioLocation;
     
     AudioContainer *AudioContainer_Init(Audio_Types Type, uint8_t BitDepth, Audio_ChannelMask ChannelMask, uint64_t SampleRate, uint64_t NumSamples) {
-        AudioContainer *Audio      = NULL;
+        AudioContainer *Audio       = NULL;
         if (BitDepth > 0 && NumSamples > 0) {
-            Audio                  = calloc(1, sizeof(AudioContainer));
+            Audio                   = calloc(1, sizeof(AudioContainer));
             if (Audio != NULL) {
-                uint8_t NumChannels = AudioContainer_GetNumChannels(ChannelMask);
-                void **Array       = calloc(NumChannels * NumSamples, Type / 4); // !!! DO NOT CHANGE AUDIO_TYPES WITHOUT CHANGING THE SIZE FIELD HERE
+                uint8_t NumChannels = AudioMask_GetNumChannels(ChannelMask);
+                void **Array        = calloc(NumChannels * NumSamples, Type / 4); // !!! DO NOT CHANGE AUDIO_TYPES WITHOUT CHANGING THE SIZE FIELD HERE
                 if (Array != NULL) {
-                    if (Type == (AudioType_Unsigned | AudioType_Integer8)) {
-                        Audio->Samples.UInteger8 = (uint8_t**)   Array;
-                    } else if (Type == (AudioType_Signed | AudioType_Integer8)) {
-                        Audio->Samples.SInteger8 = (int8_t**)    Array;
-                    } else if (Type == (AudioType_Unsigned | AudioType_Integer16)) {
-                        Audio->Samples.UInteger16 = (uint16_t**) Array;
-                    } else if (Type == (AudioType_Signed | AudioType_Integer16)) {
-                        Audio->Samples.SInteger16 = (int16_t**)  Array;
-                    } else if (Type == (AudioType_Unsigned | AudioType_Integer32)) {
-                        Audio->Samples.UInteger32 = (uint32_t**) Array;
-                    } else if (Type == (AudioType_Signed | AudioType_Integer32)) {
-                        Audio->Samples.SInteger32 = (int32_t**)  Array;
-                    }
+                    Audio->Samples      = Array;
                 } else {
                     AudioContainer_Deinit(Audio);
                     Log(Log_ERROR, __func__, U8("Couldn't allocate the audio array"));
                 }
                 
-                Audio->ChannelMask = calloc(NumChannels, sizeof(Audio_ChannelMask));
-                if (Audio->ChannelMask != NULL) {
+                Audio->ChannelMask     = ChannelMask;
                     Audio->BitDepth    = BitDepth;
-                    Audio->NumChannels = NumChannels;
                     Audio->SampleRate  = SampleRate;
                     Audio->NumSamples  = NumSamples;
-                } else {
-                    AudioContainer_Deinit(Audio);
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate ChannelMask"));
-                }
             } else {
                 AudioContainer_Deinit(Audio);
                 Log(Log_ERROR, __func__, U8("Couldn't allocate the AudioContainer"));
@@ -89,7 +64,7 @@ extern "C" {
     
     void AudioContainer_SetChannelMask(AudioContainer *Audio, uint64_t Channel, Audio_ChannelMask ChannelMask) {
         if (Audio != NULL) {
-            Audio->ChannelMask[Channel] = ChannelMask;
+            Audio->ChannelIndex[Channel] = ChannelMask;
         } else {
             Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
         }
@@ -105,7 +80,18 @@ extern "C" {
         return BitDepth;
     }
     
-    uint8_t AudioContainer_GetNumChannels(Audio_ChannelMask ChannelMask) {
+    uint8_t AudioContainer_GetNumChannels(AudioContainer *Audio) {
+        uint8_t NumChannels        = 0;
+        if (Audio != NULL) {
+            Audio_ChannelMask Mask = Audio->ChannelMask;
+            NumChannels            = AudioMask_GetNumChannels(Mask);
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        }
+        return NumChannels;
+    }
+    
+    uint8_t AudioMask_GetNumChannels(Audio_ChannelMask ChannelMask) {
         uint8_t NumChannels  = 0;
         do {
             if ((ChannelMask & 1) == 1) {
@@ -126,14 +112,20 @@ extern "C" {
         return NumSamples;
     }
     
-    uint64_t AudioContainer_GetChannelsIndex(AudioContainer *Audio, Audio_ChannelMask ChannelMask) {
-        uint64_t Channel = 0ULL;
+    uint8_t AudioContainer_GetChannelsIndex(AudioContainer *Audio, Audio_ChannelMask ChannelMask) {
+        uint8_t ChannelIndex    = 0;
         if (Audio != NULL) {
-            Channel      = Audio->ChannelMask[ChannelMask];
+            uint8_t NumChannels = AudioContainer_GetNumChannels(Audio);
+            ChannelIndex        = NumChannels; // In case the mask is not present
+            for (uint8_t Channel = 0; Channel < ChannelIndex - 1; Channel++) {
+                if (Audio->ChannelIndex[Channel] == ChannelMask) {
+                    ChannelIndex = Channel;
+                }
+            }
         } else {
             Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
         }
-        return Channel;
+        return ChannelIndex;
     }
     
     Audio_Types AudioContainer_GetType(AudioContainer *Audio) {
@@ -149,19 +141,7 @@ extern "C" {
     void **AudioContainer_GetArray(AudioContainer *Audio) {
         void **AudioArray = NULL;
         if (Audio != NULL) {
-            if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
-                AudioArray = (void**) Audio->Samples.UInteger8;
-            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
-                AudioArray = (void**) Audio->Samples.SInteger8;
-            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
-                AudioArray = (void**) Audio->Samples.UInteger16;
-            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer16)) {
-                AudioArray = (void**) Audio->Samples.SInteger16;
-            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
-                AudioArray = (void**) Audio->Samples.UInteger32;
-            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
-                AudioArray = (void**) Audio->Samples.SInteger32;
-            }
+            AudioArray    = Audio->Samples;
         } else {
             Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
         }
@@ -213,7 +193,7 @@ extern "C" {
     
     int64_t AudioContainer_GetMax(AudioContainer *Audio, uint64_t Channel) {
         int64_t Maximum = INT64_MIN;
-        if (Audio != NULL && Channel < Audio->NumChannels - 1) {
+        if (Audio != NULL) {
             if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
                 uint8_t **Array = (uint8_t**) AudioContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
@@ -317,20 +297,8 @@ extern "C" {
     
     void AudioContainer_Deinit(AudioContainer *Audio) {
         if (Audio != NULL) {
-            if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
-                free(Audio->Samples.UInteger8);
-            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
-                free(Audio->Samples.SInteger8);
-            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
-                free(Audio->Samples.UInteger16);
-            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer16)) {
-                free(Audio->Samples.SInteger16);
-            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
-                free(Audio->Samples.UInteger32);
-            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
-                free(Audio->Samples.SInteger32);
-            }
-            free(Audio->ChannelMask);
+            free(Audio->Samples);
+            free(Audio->ChannelIndex);
             free(Audio);
         } else {
             Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
@@ -385,15 +353,16 @@ extern "C" {
         if (Audio != NULL) {
             // Create a histogram for each sample value in each channel
             Histogram             = calloc(1, sizeof(AudioHistogram));
+            uint8_t NumChannels   = AudioContainer_GetNumChannels(Audio);
             if (Histogram != NULL) {
                 if (Audio->BitDepth <= 8) {
-                    Histogram->Array  = calloc(256 * Audio->NumChannels, sizeof(uint8_t));
+                    Histogram->Array  = calloc(256 * NumChannels, sizeof(uint8_t));
                     Histogram->NumEntries = 256;
                 } else if (Audio->BitDepth <= 16) {
-                    Histogram->Array  = calloc(65536 * Audio->NumChannels, sizeof(uint16_t));
+                    Histogram->Array  = calloc(65536 * NumChannels, sizeof(uint16_t));
                     Histogram->NumEntries = 65536;
                 } else if (Audio->BitDepth <= 24) {
-                    Histogram->Array  = calloc(16777216 * Audio->NumChannels, sizeof(uint32_t));
+                    Histogram->Array  = calloc(16777216 * NumChannels, sizeof(uint32_t));
                     Histogram->NumEntries = 16777216;
                 }
                 
@@ -438,7 +407,7 @@ extern "C" {
                 uint8_t  NumChannels                             = AudioContainer_GetNumChannels(Audio);
                 
                 if (Histogram->Type == AudioType_Integer8) {
-                    uint8_t *SampleArray                         = (uint8_t*) Audio->Samples.UInteger8;
+                    uint8_t *SampleArray                         = (uint8_t*) Audio->Samples;
                     uint8_t *HistArray                           = (uint8_t*) Histogram->Array;
                     for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
                         for (uint64_t S = 0ULL; S < Audio->NumSamples; S++) {
@@ -447,7 +416,7 @@ extern "C" {
                         }
                     }
                 } else if (Histogram->Type == AudioType_Integer16) {
-                    uint16_t *SampleArray                        = (uint16_t*) Audio->Samples.UInteger16;
+                    uint16_t *SampleArray                        = (uint16_t*) Audio->Samples;
                     uint16_t *HistArray                          = (uint16_t*) Histogram->Array;
                     
                     for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
@@ -457,7 +426,7 @@ extern "C" {
                         }
                     }
                 } else if (Histogram->Type == AudioType_Integer32) {
-                    uint32_t *SampleArray                        = (uint32_t*) Audio->Samples.UInteger16;
+                    uint32_t *SampleArray                        = (uint32_t*) Audio->Samples;
                     uint32_t *HistArray                          = (uint32_t*) Histogram->Array;
                     
                     for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
@@ -579,40 +548,31 @@ extern "C" {
     }
     
     typedef struct ImageContainer {
-        union Pixels {
-            uint16_t      *UInteger16;
-            uint8_t       *UInteger8;
-        } Pixels;
-        Image_ChannelMask *ChannelMask;
+        void              *Pixels;
+        Image_ChannelMask *ChannelIndex;
         uint64_t           Width;
         uint64_t           Height;
-        uint64_t           NumViews;
-        uint64_t           CurrentPixel; // The idea is to map a flat pixel offset to a 4D array.
+        Image_ChannelMask  ChannelMask;
         uint8_t            BitDepth;
         Image_Types        Type;
     } ImageContainer;
     
-    ImageContainer *ImageContainer_Init(Image_Types Type, uint8_t BitDepth, uint8_t NumViews, Image_ChannelMask ChannelMask, uint64_t Width, uint64_t Height) {
+    ImageContainer *ImageContainer_Init(Image_Types Type, uint8_t BitDepth, Image_ChannelMask ChannelMask, uint64_t Width, uint64_t Height) {
         ImageContainer *Image = NULL;
         if (BitDepth > 0 && Width > 0 && Height > 0) {
             Image = calloc(1, sizeof(ImageContainer));
             if (Image != NULL) {
-                uint8_t NumChannels = ImageMask_GetNumChannels(ChannelMask);
-                void *Array = calloc(NumViews * NumChannels * Width * Height, Type); // !!!DO NOT CHANGE IMAGE_TYPES WITHOUT CHANGING THE SIZE FIELD HERE
+                uint8_t           NumViews    = ImageMask_GetNumViews(ChannelMask);
+                uint8_t           NumChannels = ImageMask_GetNumChannels(ChannelMask);
+                void *Array                   = calloc(NumViews * NumChannels * Width * Height, Type); // !!!DO NOT CHANGE IMAGE_TYPES WITHOUT CHANGING THE SIZE FIELD HERE
                 if (Array != NULL) {
-                    if (Type == ImageType_Integer8) {
-                        Image->Pixels.UInteger8  = (uint8_t*)  Array;
-                    } else if (Type == ImageType_Integer16) {
-                        Image->Pixels.UInteger16 = (uint16_t*) Array;
-                    }
-                    
-                    Image->ChannelMask     = calloc(NumChannels, sizeof(Image_ChannelMask));
-                    if (Image->ChannelMask != NULL) {
-                        Image->Type        = Type;
-                        Image->BitDepth    = BitDepth;
-                        Image->NumViews    = NumViews;
-                        Image->Width       = Width;
-                        Image->Height      = Height;
+                    Image->Pixels             = Array;
+                    Image->ChannelIndex       = calloc(NumChannels, sizeof(Image_ChannelMask));
+                    if (Image->ChannelIndex != NULL) {
+                        Image->Type           = Type;
+                        Image->BitDepth       = BitDepth;
+                        Image->Width          = Width;
+                        Image->Height         = Height;
                     } else {
                         ImageContainer_Deinit(Image);
                         Log(Log_ERROR, __func__, U8("Couldn't allocate channel mask"));
@@ -635,9 +595,10 @@ extern "C" {
         return Image;
     }
     
-    void ImageContainer_SetChannelMask(ImageContainer *Image, uint64_t Index, Image_ChannelMask ChannelMask) {
+    void ImageContainer_SetChannelIndex(ImageContainer *Image, uint64_t Index, Image_ChannelMask ChannelMask) {
         if (Image != NULL) {
-            Image->ChannelMask[Index] = ChannelMask;
+            
+            Image->ChannelIndex[Index] = ChannelMask;
         } else if (Image == NULL) {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
@@ -673,34 +634,58 @@ extern "C" {
         return BitDepth;
     }
     
-    uint8_t ImageMask_GetNumChannels(Image_ChannelMask ChannelMask) {
-        uint8_t NumChannels  = 0;
+    uint8_t ImageMask_GetNumViews(Image_ChannelMask ChannelMask) {
+        uint8_t NumViews            = 0;
+        Image_ChannelMask JustViews = ChannelMask & (ImageMask_2D | ImageMask_3D_L | ImageMask_3D_R);
         do {
-            if ((ChannelMask & 1) == 1) {
-                NumChannels += 1;
+            if ((JustViews & 1) == 1) {
+                NumViews           += 1;
             }
-            ChannelMask    >>= 1;
-        } while (ChannelMask > 0);
+            JustViews             >>= 1;
+        } while (JustViews > 0);
+        return NumViews;
+    }
+    
+    uint8_t ImageMask_GetNumChannels(Image_ChannelMask ChannelMask) {
+        uint8_t NumChannels            = 0;
+        Image_ChannelMask JustChannels = ChannelMask - (ImageMask_2D | ImageMask_3D_L | ImageMask_3D_R);
+        do {
+            if ((JustChannels & 1) == 1) {
+                NumChannels           += 1;
+            }
+            JustChannels             >>= 1;
+        } while (JustChannels > 0);
         return NumChannels;
     }
     
     uint8_t ImageContainer_GetNumChannels(ImageContainer *Image) {
-        uint8_t NumChannels    = 0;
-        Image_ChannelMask Mask = Image->ChannelMask;
-        NumChannels            = ImageMask_GetNumChannels(Mask);
+        uint8_t NumChannels        = 0;
+        if (Image != NULL) {
+            Image_ChannelMask Mask = Image->ChannelMask;
+            NumChannels            = ImageMask_GetNumChannels(Mask);
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        }
         return NumChannels;
     }
     
     uint64_t ImageContainer_GetChannelsIndex(ImageContainer *Image, Image_ChannelMask Mask) {
         uint64_t Index                = 0ULL;
         if (Image != NULL) {
-            Image_ChannelMask View    = Mask & 0x7;
-            Image_ChannelMask Channel = Mask - View;
-            uint64_t NumChannels      = ImageMask_GetNumChannels(Mask);
-            for (uint64_t Channels = 0ULL; Channels < NumChannels - 1; Channels++) {
-                if (Image->ChannelMask[Channels] == Channel) {
-                    Index             = Channel;
+            Image_ChannelMask Channel = Mask - (ImageMask_2D | ImageMask_3D_L | ImageMask_3D_R);
+            uint8_t NumViews          = ImageMask_GetNumViews(Mask);
+            uint8_t NumChannels       = ImageMask_GetNumChannels(Mask);
+            Index                     = NumChannels; // in case the channel isn't present, return this which is an invalid index
+            if (NumViews == 1 && NumChannels == 1) {
+                for (uint64_t Channels = 0ULL; Channels < NumChannels - 1; Channels++) {
+                    if (Image->ChannelIndex[Channels] == Channel) {
+                        Index         = Channels;
+                    }
                 }
+            } else if (NumViews != 1) {
+                Log(Log_ERROR, __func__, U8("Mask must contain 1 and only 1 view"));
+            } else if (NumChannels != 1) {
+                Log(Log_ERROR, __func__, U8("Mask must contain 1 and only 1 channel"));
             }
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
@@ -708,13 +693,10 @@ extern "C" {
         return Index;
     }
     
-    uint32_t ImageContainer_GetChannelMask(ImageContainer *Image) {
-        uint32_t Mask     = 0;
-        uint64_t NumChannels      = ImageMask_GetNumChannels(Mask);
+    Image_ChannelMask ImageContainer_GetChannelMask(ImageContainer *Image) {
+        Image_ChannelMask Mask    = 0;
         if (Image != NULL) {
-            for (uint64_t Channel = 0ULL; Channel < NumChannels - 1; Channel++) {
-                Mask     |= Image->ChannelMask[Channel];
-            }
+            Mask                  = Image->ChannelMask;
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
@@ -722,9 +704,10 @@ extern "C" {
     }
     
     uint64_t ImageContainer_GetNumViews(ImageContainer *Image) {
-        uint64_t NumViews = 0ULL;
+        uint64_t NumViews          = 0ULL;
         if (Image != NULL) {
-            NumViews      = Image->NumViews;
+            Image_ChannelMask Mask = Image->ChannelMask;
+            NumViews               = ImageMask_GetNumViews(Mask);
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
@@ -732,12 +715,13 @@ extern "C" {
     }
     
     uint64_t ImageContainer_GetViewsIndex(ImageContainer *Image, Image_ChannelMask Mask) {
-        // So, Mask will contain say ImageMak_Red3D_L and we need to find the view that contains that mask
-        uint64_t Index    = 0ULL;
+        uint64_t Index          = 0ULL;
         if (Image != NULL) {
-            Index         = Image->NumViews;
-            for (uint64_t ViewIndex = 0ULL; ViewIndex < Image->NumViews - 1; ViewIndex++) {
-                if (Image->ChannelMask[ViewIndex] == (Mask & 0x7)) {
+            uint8_t NumViews    = ImageContainer_GetNumViews(Image);
+            uint8_t NumChannels = ImageContainer_GetNumChannels(Image);
+            Index               = NumChannels;
+            for (uint64_t ViewIndex = 0ULL; ViewIndex < NumViews - 1; ViewIndex++) {
+                if (Image->ChannelIndex[ViewIndex] == (Mask & 0x7)) {
                     Index = ViewIndex;
                 }
             }
@@ -760,11 +744,7 @@ extern "C" {
     void *ImageContainer_GetArray(ImageContainer *Image) {
         void *ImageArray = NULL;
         if (Image != NULL) {
-            if (Image->Type == ImageType_Integer8) {
-                ImageArray = (void*) Image->Pixels.UInteger8;
-            } else if (Image->Type == ImageType_Integer16) {
-                ImageArray = (void*) Image->Pixels.UInteger16;
-            }
+            ImageArray   = Image->Pixels;
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
@@ -773,11 +753,7 @@ extern "C" {
     
     void ImageContainer_SetArray(ImageContainer *Image, void *Array) {
         if (Image != NULL) {
-            if (Image->Type == ImageType_Integer8) {
-                Image->Pixels.UInteger8  = (uint8_t*)  Array;
-            } else if (Image->Type == ImageType_Integer16) {
-                Image->Pixels.UInteger16 = (uint16_t*) Array;
-            }
+            Image->Pixels = Array;
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }
@@ -887,12 +863,12 @@ extern "C" {
     
     void ImageContainer_Flip(ImageContainer *Image, bool VerticalFlip, bool HorizontalFlip) {
         if (Image != NULL) {
-            uint64_t NumChannels = ImageContainer_GetNumChannels(Image);
-            
+            uint8_t NumChannels = ImageContainer_GetNumChannels(Image);
+            uint8_t NumViews    = ImageContainer_GetNumViews(Image);
             if (VerticalFlip == Yes) {
                 if (Image->Type == ImageType_Integer8) {
                     uint8_t  *Array = (uint8_t*)  ImageContainer_GetArray(Image);
-                    for (uint64_t View = 0ULL; View < Image->NumViews - 1; View++) {
+                    for (uint64_t View = 0ULL; View < NumViews - 1; View++) {
                         for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
                             for (uint64_t TopLine = 0ULL; TopLine < Image->Height - 1; TopLine++) {
                                 for (uint64_t BottomLine = Image->Height - 1; BottomLine > 0ULL; BottomLine--) {
@@ -909,7 +885,7 @@ extern "C" {
                     }
                 } else if (Image->Type == ImageType_Integer16) {
                     uint16_t *Array = (uint16_t*) ImageContainer_GetArray(Image);
-                    for (uint64_t View = 0ULL; View < Image->NumViews - 1; View++) {
+                    for (uint64_t View = 0ULL; View < NumViews - 1; View++) {
                         for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
                             for (uint64_t TopLine = 0ULL; TopLine < Image->Height - 1; TopLine++) {
                                 for (uint64_t BottomLine = Image->Height - 1; BottomLine > 0ULL; BottomLine--) {
@@ -929,7 +905,7 @@ extern "C" {
             if (HorizontalFlip == Yes) {
                 if (Image->Type == ImageType_Integer8) {
                     uint8_t  *Array = (uint8_t*)  ImageContainer_GetArray(Image);
-                    for (uint64_t View = 1ULL; View <= Image->NumViews; View++) {
+                    for (uint64_t View = 1ULL; View <= NumViews - 1; View++) {
                         for (uint64_t Left = 0ULL; Left < Image->Width - 1; Left++) {
                             for (uint64_t Right = Image->Width - 1; Right > 0ULL; Right++) {
                                 for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
@@ -946,7 +922,7 @@ extern "C" {
                     }
                 } else if (Image->Type == ImageType_Integer16) {
                     uint16_t *Array = (uint16_t*) ImageContainer_GetArray(Image);
-                    for (uint64_t View = 0ULL; View < Image->NumViews - 1; View++) {
+                    for (uint64_t View = 0ULL; View < NumViews - 1; View++) {
                         for (uint64_t Left = 0ULL; Left < Image->Width - 1; Left++) {
                             for (uint64_t Right = Image->Width - 1; Right > 0ULL; Right++) {
                                 for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
@@ -1033,12 +1009,8 @@ extern "C" {
     
     void ImageContainer_Deinit(ImageContainer *Image) {
         if (Image != NULL) {
-            if (Image->Type == ImageType_Integer8) {
-                free(Image->Pixels.UInteger8);
-            } else if (Image->Type == ImageType_Integer16) {
-                free(Image->Pixels.UInteger16);
-            }
-            free(Image->ChannelMask);
+            free(Image->Pixels);
+            free(Image->ChannelIndex);
             free(Image);
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
@@ -1127,7 +1099,7 @@ extern "C" {
                 uint8_t  NumChannels                             = ImageContainer_GetNumChannels(Image);
                 
                 if (Histogram->Type == ImageType_Integer8) {
-                    uint8_t *ImageArray                          = (uint8_t*) Image->Pixels.UInteger8;
+                    uint8_t *ImageArray                          = (uint8_t*) Image->Pixels;
                     uint8_t *HistArray                           = (uint8_t*) Histogram->Array;
                     
                     for (uint64_t View = 0ULL; View < NumViews - 1; View++) {
@@ -1141,7 +1113,7 @@ extern "C" {
                         }
                     }
                 } else if (Histogram->Type == ImageType_Integer16) {
-                    uint16_t *ImageArray                         = (uint16_t*) Image->Pixels.UInteger16;
+                    uint16_t *ImageArray                         = (uint16_t*) Image->Pixels;
                     uint16_t *HistArray                          = (uint16_t*) Histogram->Array;
                     
                     for (uint64_t View = 0ULL; View < NumViews - 1; View++) {
