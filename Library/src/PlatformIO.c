@@ -1,4 +1,5 @@
 #include "../include/Macros.h"
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -8,7 +9,7 @@ extern "C" {
         uint64_t NumCPUCores = 0ULL;
 #if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
         int SysInfo[2]  = {CTL_HW, HW_AVAILCPU};
-        uint64_t Length = 8;
+        size_t Length   = sizeof(int);
         sysctl(SysInfo, 2, &NumCPUCores, &Length, NULL, 0);
         if (NumCPUCores < 1) {
             NumCPUCores = 1;
