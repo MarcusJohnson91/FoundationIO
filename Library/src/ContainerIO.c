@@ -707,8 +707,8 @@ extern "C" {
         return Mask;
     }
     
-    uint64_t ImageContainer_GetNumViews(ImageContainer *Image) {
-        uint64_t NumViews          = 0ULL;
+    uint8_t ImageContainer_GetNumViews(ImageContainer *Image) {
+        uint8_t NumViews           = 0ULL;
         if (Image != NULL) {
             Image_ChannelMask Mask = Image->ChannelMask;
             NumViews               = ImageMask_GetNumViews(Mask);
@@ -951,7 +951,7 @@ extern "C" {
     void ImageContainer_Resize(ImageContainer *Image, int64_t Left, int64_t Right, int64_t Top, int64_t Bottom) {
         if (Image != NULL) {
             uint8_t  NumChannels = ImageContainer_GetNumChannels(Image);
-            uint64_t NumViews    = ImageContainer_GetNumViews(Image);
+            uint8_t  NumViews    = ImageContainer_GetNumViews(Image);
             uint64_t Height      = ImageContainer_GetHeight(Image);
             uint64_t Width       = ImageContainer_GetWidth(Image);
             Image_Types Type     = ImageContainer_GetType(Image);
@@ -1097,10 +1097,10 @@ extern "C" {
         if (Image != NULL) {
             Histogram                   = ImageHistogram_Init(Image);
             if (Histogram != NULL) {
-                uint64_t NumViews                                = ImageContainer_GetNumViews(Image);
+                uint8_t  NumViews                                = ImageContainer_GetNumViews(Image);
+                uint8_t  NumChannels                             = ImageContainer_GetNumChannels(Image);
                 uint64_t Width                                   = ImageContainer_GetWidth(Image);
                 uint64_t Height                                  = ImageContainer_GetHeight(Image);
-                uint8_t  NumChannels                             = ImageContainer_GetNumChannels(Image);
                 
                 if (Histogram->Type == ImageType_Integer8) {
                     uint8_t *ImageArray                          = (uint8_t*) Image->Pixels;
