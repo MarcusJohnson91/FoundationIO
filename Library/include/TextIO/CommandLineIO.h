@@ -334,6 +334,14 @@ extern "C" {
     void                        CommandLineIO_Switch_SetSlave(CommandLineIO *CLI, const int64_t MasterID, const int64_t Slave);
     
     /*!
+     @abstract                                                  "How many Slave switches must be active in a master argument at once"?
+     @param                     CLI                             "CommandLineIO Pointer".
+     @param                     MasterID                        "Which switch are we talking about"?
+     @param                     MinActiveSlaves                 "How many Slave switches must be active in an argument at once"?
+     */
+    void                        CommandLineIO_Switch_SetMinConcurrentSlaves(CommandLineIO *CLI, const int64_t MasterID, const int64_t MinActiveSlaves);
+    
+    /*!
      @abstract                                                  "How many Slave switches can be active in a master argument at once"?
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     MasterID                        "Which switch are we talking about"?
