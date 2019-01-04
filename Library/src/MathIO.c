@@ -364,7 +364,7 @@ extern "C" {
     /* Ryū specific math functions */
     
     uint8_t GetNumDigitsInBase(uint8_t Base, int64_t Value) {
-        uint64_t Value2    = Absolute(Value);
+        uint64_t Value2    = AbsoluteI(Value);
         uint8_t  NumDigits = 0;
         do {
             Value2        /= Base;
