@@ -134,10 +134,10 @@ extern "C" {
     }
     
     bool     DecimalIsNormalF(float Decimal) {
-        bool IsNormal = No;
+        bool   IsNormal = No;
         int8_t Exponent = ExtractExponentF(Decimal);
-        if (Exponent >= 1 && Exponent <= 0xFE) {
-            IsNormal  = Yes;
+        if (Exponent >= 1 && Exponent <= 0x7E) {
+            IsNormal    = Yes;
         }
         return IsNormal;
     }
