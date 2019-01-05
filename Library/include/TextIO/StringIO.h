@@ -666,21 +666,21 @@ extern "C" {
     UTF32                *UTF32_Decimal2String(const StringIOBases Base, double Decimal);
     
     /*!
-     @abstract                             "Removes substrings (including single codepoints, but also strings) from a string".
+     @abstract                             "Removes substrings (including single codepoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
     UTF8                 *UTF8_TrimString(UTF8 *String, UTF8 **Strings2Remove);
     
     /*!
-     @abstract                             "Removes substrings (including single codepoints, but also strings) from a string".
+     @abstract                             "Removes substrings (including single codepoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
     UTF16                *UTF16_TrimString(UTF16 *String, UTF16 **Strings2Remove);
     
     /*!
-     @abstract                             "Removes substrings (including single codepoints, but also strings) from a string".
+     @abstract                             "Removes substrings (including single codepoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
@@ -887,6 +887,62 @@ extern "C" {
     /* StringArrays */
     
     /*!
+     @abstract                             "Gets the size of each string in the StringArray in code units".
+     @param               StringArray      "The StringArray to get the size of each string".
+     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
+     */
+    uint64_t             *UTF8_StringArray_GetStringSizesInCodeUnits(UTF8 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the size of each string in the StringArray in code units".
+     @param               StringArray      "The StringArray to get the size of each string".
+     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
+     */
+    uint64_t             *UTF16_StringArray_GetStringSizesInCodeUnits(UTF16 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the size of each string in the StringArray in code points".
+     @param               StringArray      "The StringArray to get the size of each string".
+     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
+     */
+    uint64_t             *UTF8_StringArray_GetStringSizesInCodePoints(UTF8 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the size of each string in the StringArray in code points".
+     @param               StringArray      "The StringArray to get the size of each string".
+     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
+     */
+    uint64_t             *UTF16_StringArray_GetStringSizesInCodePoints(UTF16 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the size of each string in the StringArray in code points".
+     @param               StringArray      "The StringArray to get the size of each string".
+     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
+     */
+    uint64_t             *UTF32_StringArray_GetStringSizesInCodePoints(UTF32 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the number of strings in a StringArray".
+     @param               StringArray      "The StringArray to get the number of strings in".
+     @return                               "Returns the number of strings in StringArray".
+     */
+    uint64_t              UTF8_StringArray_GetNumStrings(UTF8 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the number of strings in a StringArray".
+     @param               StringArray      "The StringArray to get the number of strings in".
+     @return                               "Returns the number of strings in StringArray".
+     */
+    uint64_t              UTF16_StringArray_GetNumStrings(UTF16 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the number of strings in a StringArray".
+     @param               StringArray      "The StringArray to get the number of strings in".
+     @return                               "Returns the number of strings in StringArray".
+     */
+    uint64_t              UTF32_StringArray_GetNumStrings(UTF32 **StringArray);
+    
+    /*!
      @abstract                             "Initalizes a UTF-8 encoded StringArray".
      @param               NumStrings       "How many strings will this StringArray contain"?
      @return                               "Returns an empty StringArray with room for NumStrings pointers plus a null terminator".
@@ -932,27 +988,6 @@ extern "C" {
     void                  UTF32_StringArray_Attach(UTF32 **StringArray, UTF32 *String2Attach, uint64_t Index);
     
     /*!
-     @abstract                             "Gets the number of strings in a StringArray".
-     @param               StringArray      "The StringArray to get the number of strings in".
-     @return                               "Returns the number of strings in StringArray".
-     */
-    uint64_t              UTF8_StringArray_GetNumStrings(UTF8 **StringArray);
-    
-    /*!
-     @abstract                             "Gets the number of strings in a StringArray".
-     @param               StringArray      "The StringArray to get the number of strings in".
-     @return                               "Returns the number of strings in StringArray".
-     */
-    uint64_t              UTF16_StringArray_GetNumStrings(UTF16 **StringArray);
-    
-    /*!
-     @abstract                             "Gets the number of strings in a StringArray".
-     @param               StringArray      "The StringArray to get the number of strings in".
-     @return                               "Returns the number of strings in StringArray".
-     */
-    uint64_t              UTF32_StringArray_GetNumStrings(UTF32 **StringArray);
-    
-    /*!
      @abstract                             "Decodes a StringArray to a UTF32_StringArray".
      @param               StringArray      "The StringArray to decode".
      @return                               "Returns the decoded StringArray".
@@ -979,30 +1014,6 @@ extern "C" {
      @return                               "Returns the encoded StringArray".
      */
     UTF16               **UTF16_StringArray_Encode(UTF32 **StringArray);
-    
-    /*!
-     @abstract                             "Gets a string from a StringArray".
-     @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
-     @param               Index            "The string to extract".
-     @return                               "Returns a pointer to the specifier String".
-     */
-    UTF8                 *UTF8_StringArray_GetString(UTF8 **StringArray, uint64_t Index);
-    
-    /*!
-     @abstract                             "Gets a string from a StringArray".
-     @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
-     @param               Index            "The string to extract".
-     @return                               "Returns a pointer to the specifier String".
-     */
-    UTF16                *UTF16_StringArray_GetString(UTF16 **StringArray, uint64_t Index);
-    
-    /*!
-     @abstract                             "Gets a string from a StringArray".
-     @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
-     @param               Index            "The string to extract".
-     @return                               "Returns a pointer to the specifier String".
-     */
-    UTF32                *UTF32_StringArray_GetString(UTF32 **StringArray, uint64_t Index);
     
     /*!
      @abstract                             "Deinitializes a UTF-8 encoded StringArray (like is returned by SplitString)".
