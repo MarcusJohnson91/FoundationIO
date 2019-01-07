@@ -16,19 +16,19 @@ extern "C" {
     
     /* Basic String Property Functions */
     uint8_t UTF8_GetCodePointSizeInCodeUnits(UTF8 CodeUnit) {
-        uint8_t CodePointSize      = 0;
+        uint8_t CodePointSize = 0;
         if (((CodeUnit & 0x80) >> 7) == 0) {
-            CodePointSize          = 1;
+            CodePointSize     = 1;
         } else if (((CodeUnit & 0xF8) >> 3) == 0x1E) {
-            CodePointSize          = 4;
+            CodePointSize     = 4;
         } else if (((CodeUnit & 0xF0) >> 4) == 0x0E) {
-            CodePointSize          = 3;
+            CodePointSize     = 3;
         } else if (((CodeUnit & 0xE0) >> 5) == 0x06) {
-            CodePointSize          = 2;
+            CodePointSize     = 2;
         } else if (((CodeUnit & 0xC0) >> 6) == 0x02) {
-            CodePointSize          = 1;
+            CodePointSize     = 1;
         } else {
-            CodePointSize          = 0;
+            CodePointSize     = 0;
         }
         return CodePointSize;
     }
