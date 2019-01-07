@@ -418,7 +418,7 @@ extern "C" {
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 uint64_t HalfOfTheIndicators = (PercentComplete / 2);
                 UTF8    *Indicator           = calloc(CommandLineIO_GetTerminalWidth(), sizeof(UTF8));
-                UTF8_SetString(Indicator, '-');
+                UTF8_Insert(Indicator, '-', 0);
                 UTF8    *FormattedString     = UTF8_FormatString(U8("[%s%s %lld/%lld %hhu/%s %s]"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF8);
                 UTF8_WriteString(FormattedString, stdout);
                 free(Indicator);
@@ -461,7 +461,7 @@ extern "C" {
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
                 uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 UTF16  *Indicator           = calloc(CommandLineIO_GetTerminalWidth, sizeof(UTF16));
-                UTF16_SetString(Indicator, U16('-'));
+                UTF8_Insert(Indicator, U16('-'), 0);
                 UTF16  *FormattedString     = UTF16_FormatString(U16("[%s%s %lld/%lld %hhu/%s %s]"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF16);
                 UTF16_WriteString(FormattedString, stdout);
                 free(Indicator);
