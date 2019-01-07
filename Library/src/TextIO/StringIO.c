@@ -2003,7 +2003,7 @@ extern "C" {
     }
     
     UTF8 **UTF8_StringArray_Encode(UTF32 **StringArray) {
-        UTF8 **Encoded             = NULL;
+        UTF8 **Encoded              = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings     = UTF32_StringArray_GetNumStrings(StringArray);
             Encoded                 = calloc(NumStrings + 1, sizeof(UTF8*));
