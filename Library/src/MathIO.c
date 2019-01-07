@@ -19,6 +19,16 @@ extern "C" {
         return (Integer ^ -Sign) + Sign;
     }
     
+    typedef union Float2Integer {
+        float    Float;
+        uint32_t Integer;
+    } Float2Integer;
+    
+    typedef union Double2Integer {
+        double    Float;
+        uint64_t  Integer;
+    } Double2Integer;
+    
     uint8_t AbsoluteF(float Decimal) {
         return (uint8_t) ExtractExponentF(Decimal);
     }
@@ -216,55 +226,41 @@ extern "C" {
     }
     
     int8_t   ExtractSignF(float Decimal) {
-        uint32_t *Sign1 = (uint32_t *) &Decimal;
-        uint32_t  Sign2 = (*Sign1 & 0x80000000) >> 31;
-        return Sign2 == 0 ? 1 : -1;
+        Float2Integer Decimal2 = {.Float = Decimal};
+        int8_t Sign            = (Decimal2.Integer & 0x80000000) >> 31;
+        return Sign == 0 ? 1 : -1;
     }
     
     int8_t   ExtractSignD(double Decimal) {
-        uint64_t *Sign1 = (uint64_t *) &Decimal;
-        uint64_t  Sign2 = (*Sign1 & 0x8000000000000000) >> 63;
-        return Sign2 == 0 ? 1 : -1;
+        Double2Integer Decimal2 = {.Float = Decimal};
+        int8_t Sign             = (Decimal2.Integer & 0x8000000000000000) >> 63;
+        return Sign == 0 ? 1 : -1;
     }
     
     int8_t  ExtractExponentF(float Decimal) {
-        int8_t    Sign      = ExtractSignF(Decimal);
-        uint32_t *Exponent1 = (uint32_t *) &Decimal;
-        int8_t    Exponent2 = (*Exponent1 & 0x7F800000) >> 23;
-        int8_t    Exponent3 = (Exponent2 - 127) * Sign;
-        return Exponent3;
+        Float2Integer Decimal2 = {.Float = Decimal};
+        int8_t Sign            = ExtractSignF(Decimal);
+        int8_t Exponent        = (Decimal2.Integer & 0x7F800000) >> 23;
+        return (Exponent - 127) * Sign;
     }
     
     int16_t  ExtractExponentD(double Decimal) {
-        int8_t    Sign      = ExtractSignD(Decimal);
-        uint64_t *Exponent1 = (uint64_t *) &Decimal;
-        int16_t   Exponent2 = (*Exponent1 & 0x7FF0000000000000) >> 52;
-        int16_t   Exponent3 = (Exponent2 - 1023) * Sign;
-        return Exponent3;
+        Double2Integer Decimal2 = {.Float = Decimal};
+        int8_t  Sign            = ExtractSignD(Decimal);
+        int16_t Exponent        = (Decimal2.Integer & 0x7FF0000000000000) >> 52;
+        return (Exponent - 1023) * Sign;
     }
     
     int32_t  ExtractMantissaF(float Decimal) {
-        uint32_t *Mantissa1  = (uint32_t *) &Decimal;
-        int32_t   Mantissa2  = *Mantissa1 & 0x7FFFFFUL;
-        int32_t   Mantissa3  = 0UL;
-        if (DecimalIsNormalF(Decimal)) {
-            Mantissa3        = Mantissa2 | 0x800000;
-        } else {
-            Mantissa3        = Mantissa2;
-        }
-        return Mantissa3;
+        Float2Integer Decimal2 = {.Float = Decimal};
+        uint32_t Mantissa      = Decimal2.Integer & 0x7FFFFFUL;
+        return DecimalIsNormalF(Decimal) ? Mantissa |= 0x800000 : Mantissa;
     }
     
     int64_t  ExtractMantissaD(double Decimal) {
-        uint64_t *Mantissa1  = (uint64_t *) &Decimal;
-        uint64_t  Mantissa2  = *Mantissa1 & 0xFFFFFFFFFFFFFULL;
-        int32_t   Mantissa3  = 0UL;
-        if (DecimalIsNormalD(Decimal)) {
-            Mantissa3        = Mantissa2 | 0x10000000000000;
-        } else {
-            Mantissa3        = Mantissa2;
-        }
-        return Mantissa3;
+        Double2Integer Decimal2 = {.Float = Decimal};
+        uint32_t Mantissa       = Decimal2.Integer & 0xFFFFFFFFFFFFFULL;
+        return DecimalIsNormalF(Decimal) ? Mantissa |= 0x10000000000000 : Mantissa;
     }
     
     uint64_t Exponentiate(uint64_t Base, uint64_t Exponent) {
