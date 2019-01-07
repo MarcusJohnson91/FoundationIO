@@ -317,7 +317,7 @@ extern "C" {
      @abstract                             "Gets the number of views in an ImageContainer".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
-    uint64_t                ImageContainer_GetNumViews(ImageContainer *Image);
+    uint8_t                 ImageContainer_GetNumViews(ImageContainer *Image);
     
     /*!
      @abstract                             "Gets the views index for the specified mask".
