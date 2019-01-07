@@ -849,8 +849,7 @@ extern "C" {
                 UTF32   *ArgumentFlag     = ArgumentString2SwitchFlag(Argument);
                 
                 for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
-                    
-                    if (UTF32_Compare(ArgumentFlag, CLI->SwitchIDs[Switch].Name) == Yes) {
+                    if (UTF32_CompareSubstring(ArgumentFlag, CLI->SwitchIDs[Switch].Name, 0, 0) == Yes) {
                         
                         CLI->NumOptions   += 1;
                         if (CLI->NumOptions == 1) {
@@ -865,7 +864,7 @@ extern "C" {
                             for (int64_t Slave = 0LL; Slave < CLI->SwitchIDs[Switch].NumPotentialSlaves - 1; Slave++) {
                                 UTF32 *PotentialSlaveFlag   = CLI->SwitchIDs[CLI->SwitchIDs[Switch].PotentialSlaves[Slave]].Name;
                                 
-                                if (UTF32_Compare(PotentialSlaveArg, PotentialSlaveFlag) == Yes) {
+                                if (UTF32_CompareSubstring(PotentialSlaveArg, PotentialSlaveFlag, 0, 0) == Yes) {
                                     
                                     CLI->OptionIDs[CLI->NumOptions - 1].NumOptionSlaves += 1;
                                     CLI->OptionIDs[CLI->NumOptions - 1].OptionSlaves[CLI->OptionIDs[CLI->NumOptions - 1].NumOptionSlaves - 1] = CLI->SwitchIDs[Switch].PotentialSlaves[Slave];
