@@ -794,12 +794,11 @@ extern "C" {
 #if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
     UTF8                 *UTF8_FormatString(UTF8 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
 #elif defined(_MSC_VER)
+#include <sal.h>
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF8                 *UTF8_FormatString(__format_string UTF8 *Format, ...);
 #elif    (_MSC_VER >= 1500)
     UTF8                 *UTF8_FormatString(_Printf_format_string_ UTF8 *Format, ...);
-#else
-    UTF8                 *UTF8_FormatString(UTF8 *Format, ...);
 #endif /* MSVC Version */
 #endif /* Compiler */
     
@@ -812,12 +811,11 @@ extern "C" {
 #if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
     UTF16                *UTF16_FormatString(UTF16 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
 #elif defined(_MSC_VER)
+#include <sal.h>
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF16                *UTF16_FormatString(__format_string UTF16 *Format, ...);
 #elif    (_MSC_VER >= 1500)
     UTF16                *UTF16_FormatString(_Printf_format_string_ UTF16 *Format, ...);
-#else
-    UTF16                *UTF16_FormatString(UTF16 *Format, ...);
 #endif /* MSVC Version */
 #endif /* Compiler */
     
@@ -830,12 +828,11 @@ extern "C" {
 #if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
     UTF32                *UTF32_FormatString(UTF32 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
 #elif defined(_MSC_VER)
+#include <sal.h>
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF32                *UTF32_FormatString(__format_string UTF32 *Format, ...);
 #elif    (_MSC_VER >= 1500)
     UTF32                *UTF32_FormatString(_Printf_format_string_ UTF32 *Format, ...);
-#else
-    UTF32                *UTF32_FormatString(UTF32 *Format, ...);
 #endif /* MSVC Version */
 #endif /* Compiler */
     
