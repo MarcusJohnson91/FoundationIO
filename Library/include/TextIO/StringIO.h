@@ -669,52 +669,67 @@ extern "C" {
     UTF32                *UTF32_Decimal2String(const StringIOBases Base, double Decimal);
     
     /*!
-     @abstract                             "Removes substrings (including single codepoints) from a string".
-     @param               String           "The string to perform the trimming operations on".
-     @param               Strings2Remove   "An StringArray to remove from the String".
+     @enum                      TrimStringTypes
+     @abstract                                                  "Is this BitInput or BitOutput connected to a File or Socket?".
+     @constant                  TrimString_Unknown              "Unknown TrimString command".
+     @constant                  TrimString_StartEndRemoveAll    "Trim at the beginning and end, removing all occurrences found there".
+     @constant                  TrimString_BetweenValidKeep1    "Trim between start and end, removing all but 1 occurrence found between non-removable codepoints".
+     @constant                  TrimString_All                  "Remove all occurrences regardless of context".
      */
-    UTF8                 *UTF8_TrimString(UTF8 *String, UTF8 **Strings2Remove);
+    typedef enum TrimStringTypes {
+                                TrimString_Unknown              = 0,
+                                TrimString_StartEndRemoveAll    = 1,
+                                TrimString_BetweenValidKeep1    = 2,
+                                TrimString_RemoveAll            = 3,
+    } TrimStringTypes;
     
     /*!
      @abstract                             "Removes substrings (including single codepoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
-    UTF16                *UTF16_TrimString(UTF16 *String, UTF16 **Strings2Remove);
+    UTF8                 *UTF8_TrimString(UTF8 *String, TrimStringTypes Type, UTF8 **Strings2Remove);
     
     /*!
      @abstract                             "Removes substrings (including single codepoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
-    UTF32                *UTF32_TrimString(UTF32 *String, UTF32 **Strings2Remove);
+    UTF16                *UTF16_TrimString(UTF16 *String, TrimStringTypes Type, UTF16 **Strings2Remove);
     
     /*!
-     @abstract                             "Compares String1 and String2 for equivalence".
-     @remark                               "The caller needs to handle casefolding and normalization".
-     @param               String1          "String1 Pointer".
-     @param               String2          "String2 Pointer".
-     @return                               "Returns whether the strings match or not".
+     @abstract                             "Removes substrings (including single codepoints) from a string".
+     @param               String           "The string to perform the trimming operations on".
+     @param               Strings2Remove   "An StringArray to remove from the String".
      */
-    bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2);
+    UTF32                *UTF32_TrimString(UTF32 *String, TrimStringTypes Type, UTF32 **Strings2Remove);
     
     /*!
-     @abstract                             "Compares String1 and String2 for equivalence".
+     @abstract                             "Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence".
      @remark                               "The caller needs to handle casefolding and normalization".
-     @param               String1          "String1 Pointer".
-     @param               String2          "String2 Pointer".
-     @return                               "Returns whether the strings match or not".
+     @param               String           "The string to check".
+     @param               Substring        "The substring to check".
+     @return                               "Returns whether Substring matches at the given offsets".
      */
-    bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2);
+    bool                  UTF8_CompareSubstring(UTF8 *String, UTF8 *Substring, uint64_t StringOffset, uint64_t SubstringOffset);
     
     /*!
-     @abstract                             "Compares String1 and String2 for equivalence".
+     @abstract                             "Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence".
      @remark                               "The caller needs to handle casefolding and normalization".
-     @param               String1          "String1 Pointer".
-     @param               String2          "String2 Pointer".
-     @return                               "Returns whether the strings match or not".
+     @param               String           "The string to check".
+     @param               Substring        "The substring to check".
+     @return                               "Returns whether Substring matches at the given offsets".
      */
-    bool                  UTF32_Compare(UTF32 *String1, UTF32 *String2);
+    bool                  UTF16_CompareSubstring(UTF16 *String, UTF16 *Substring, uint64_t StringOffset, uint64_t SubstringOffset);
+    
+    /*!
+     @abstract                             "Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence".
+     @remark                               "The caller needs to handle casefolding and normalization".
+     @param               String           "The string to check".
+     @param               Substring        "The substring to check".
+     @return                               "Returns whether Substring matches at the given offsets".
+     */
+    bool                  UTF32_CompareSubstring(UTF32 *String, UTF32 *Substring, uint64_t StringOffset, uint64_t SubstringOffset);
     
     /*!
      @abstract                             "Copies the String".
@@ -769,27 +784,6 @@ extern "C" {
      @return                               "Returns a pointer to a new string containing the original, and String2Insert at Offset".
      */
     UTF32                *UTF32_Insert(UTF32 *String, UTF32 *String2Insert, uint64_t Offset);
-    
-    /*!
-     @abstract                             "Fills a string with the contents of Setter".
-     @param               String           "The string to set".
-     @param               Setter           "A single copy of what to set the string to, could be a single code unit, or a string, MUST be smaller than the string".
-     */
-    void                  UTF8_SetString(UTF8 *String, UTF8 *Setter);
-    
-    /*!
-     @abstract                             "Fills a string with the contents of Setter".
-     @param               String           "The string to set".
-     @param               Setter           "A single copy of what to set the string to, could be a single code unit, or a string, MUST be smaller than the string".
-     */
-    void                  UTF16_SetString(UTF16 *String, UTF16 *Setter);
-    
-    /*!
-     @abstract                             "Fills a string with the contents of Setter".
-     @param               String           "The string to set".
-     @param               Setter           "A single copy of what to set the string to, could be a single code unit, or a string, MUST be smaller than the string".
-     */
-    void                  UTF32_SetString(UTF32 *String, UTF32 *Setter);
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
