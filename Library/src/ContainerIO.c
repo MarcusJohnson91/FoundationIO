@@ -11,26 +11,13 @@ extern "C" {
     
     typedef struct AudioContainer {
         void             **Samples;
-        Audio_ChannelMask *ChannelIndex; // So basically it's type is AudioChannelMask and each index contains the enum matching the channel at that index in the array
+        Audio_ChannelMask *ChannelMap; // So basically it's type is AudioChannelMask and each index contains the enum matching the channel at that index in the array
         uint64_t           NumSamples;
         uint64_t           SampleRate;
         Audio_ChannelMask  ChannelMask;
         uint8_t            BitDepth;
         Audio_Types        Type;
     } AudioContainer;
-    
-    typedef struct AudioObject {
-        AudioContainer *Container;
-        AudioLocation  *Locations;
-        uint64_t        NumLocations;
-    } AudioObject;
-    
-    typedef struct AudioLocation {
-        uint64_t SampleOffset;
-        uint64_t Width;
-        uint64_t Height;
-        uint64_t Depth;
-    } AudioLocation;
     
     AudioContainer *AudioContainer_Init(Audio_Types Type, Audio_ChannelMask ChannelMask, uint64_t SampleRate, uint64_t NumSamples) {
         AudioContainer *Audio       = NULL;
@@ -59,11 +46,11 @@ extern "C" {
         return Audio;
     }
     
-    void AudioContainer_SetChannelIndex(AudioContainer *Audio, uint64_t Channel, Audio_ChannelMask ChannelMask) {
+    void AudioContainer_SetChannelMap(AudioContainer *Audio, uint64_t Channel, Audio_ChannelMask ChannelMask) {
         if (Audio != NULL) {
             uint8_t NumChannels              = AudioMask_GetNumChannels(ChannelMask);
             if (NumChannels == 1) {
-                Audio->ChannelIndex[Channel] = ChannelMask;
+                Audio->ChannelMap[Channel] = ChannelMask;
             } else {
                 Log(Log_ERROR, __func__, U8("ChannelMask must contain only 1 channel"));
             }
@@ -115,19 +102,19 @@ extern "C" {
     }
     
     uint8_t AudioContainer_GetChannelsIndex(AudioContainer *Audio, Audio_ChannelMask ChannelMask) {
-        uint8_t ChannelIndex    = 0;
+        uint8_t ChannelMap      = 0;
         if (Audio != NULL) {
             uint8_t NumChannels = AudioContainer_GetNumChannels(Audio);
-            ChannelIndex        = NumChannels; // In case the mask is not present
-            for (uint8_t Channel = 0; Channel < ChannelIndex - 1; Channel++) {
-                if (Audio->ChannelIndex[Channel] == ChannelMask) {
-                    ChannelIndex = Channel;
+            ChannelMap          = NumChannels; // In case the mask is not present
+            for (uint8_t Channel = 0; Channel < NumChannels - 1; Channel++) {
+                if (Audio->ChannelMap[Channel] == ChannelMask) {
+                    ChannelMap  = Channel;
                 }
             }
         } else {
             Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
         }
-        return ChannelIndex;
+        return ChannelMap;
     }
     
     Audio_Types AudioContainer_GetType(AudioContainer *Audio) {
@@ -300,7 +287,7 @@ extern "C" {
     void AudioContainer_Deinit(AudioContainer *Audio) {
         if (Audio != NULL) {
             free(Audio->Samples);
-            free(Audio->ChannelIndex);
+            free(Audio->ChannelMap);
             free(Audio);
         } else {
             Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
@@ -551,7 +538,7 @@ extern "C" {
     
     typedef struct ImageContainer {
         void              *Pixels;
-        Image_ChannelMask *ChannelIndex;
+        Image_ChannelMask *ChannelMap;
         uint64_t           Width;
         uint64_t           Height;
         Image_ChannelMask  ChannelMask;
@@ -569,14 +556,14 @@ extern "C" {
                 void *Array                   = calloc(NumViews * NumChannels * Width * Height, Type); // !!!DO NOT CHANGE IMAGE_TYPES WITHOUT CHANGING THE SIZE FIELD HERE
                 if (Array != NULL) {
                     Image->Pixels             = Array;
-                    Image->ChannelIndex       = calloc(NumChannels, sizeof(Image_ChannelMask));
-                    if (Image->ChannelIndex != NULL) {
+                    Image->ChannelMap         = calloc(NumViews * NumChannels, sizeof(Image_ChannelMask));
+                    if (Image->ChannelMap != NULL) {
                         Image->Type           = Type;
                         Image->Width          = Width;
                         Image->Height         = Height;
                     } else {
                         ImageContainer_Deinit(Image);
-                        Log(Log_ERROR, __func__, U8("Couldn't allocate channel mask"));
+                        Log(Log_ERROR, __func__, U8("Couldn't allocate channel map"));
                     }
                 } else {
                     ImageContainer_Deinit(Image);
@@ -594,12 +581,12 @@ extern "C" {
         return Image;
     }
     
-    void ImageContainer_SetChannelIndex(ImageContainer *Image, uint64_t Index, Image_ChannelMask ChannelMask) {
+    void ImageContainer_SetChannelMap(ImageContainer *Image, uint64_t Index, Image_ChannelMask ChannelMask) {
         if (Image != NULL) {
             uint8_t NumViews               = ImageMask_GetNumViews(ChannelMask);
             uint8_t NumChannels            = ImageMask_GetNumChannels(ChannelMask);
             if (NumViews == 1 && NumChannels == 1) {
-                Image->ChannelIndex[Index] = ChannelMask;
+                Image->ChannelMap[Index] = ChannelMask;
             } else {
                 Log(Log_ERROR, __func__, U8("ChannelMask must contain exactly 1 view and 1 channel"));
             }
@@ -682,7 +669,7 @@ extern "C" {
             Index                     = NumChannels; // in case the channel isn't present, return this which is an invalid index
             if (NumViews == 1 && NumChannels == 1) {
                 for (uint64_t Channels = 0ULL; Channels < NumChannels - 1; Channels++) {
-                    if (Image->ChannelIndex[Channels] == Channel) {
+                    if (Image->ChannelMap[Channels] == Channel) {
                         Index         = Channels;
                     }
                 }
@@ -725,7 +712,7 @@ extern "C" {
             uint8_t NumChannels = ImageContainer_GetNumChannels(Image);
             Index               = NumChannels;
             for (uint64_t ViewIndex = 0ULL; ViewIndex < NumViews - 1; ViewIndex++) {
-                if (Image->ChannelIndex[ViewIndex] == (Mask & 0x7)) {
+                if (Image->ChannelMap[ViewIndex] == (Mask & 0x7)) {
                     Index = ViewIndex;
                 }
             }
@@ -1014,7 +1001,7 @@ extern "C" {
     void ImageContainer_Deinit(ImageContainer *Image) {
         if (Image != NULL) {
             free(Image->Pixels);
-            free(Image->ChannelIndex);
+            free(Image->ChannelMap);
             free(Image);
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));

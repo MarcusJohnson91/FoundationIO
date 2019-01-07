@@ -40,6 +40,17 @@ extern "C" {
         AudioMask_RearLeft          = 128,
         AudioMask_RearRight         = 256,
         AudioMask_RearCenter        = 512,
+        AudioMask_FrontCenterLeft   = 1024,
+        AudioMask_FrontCenterRight  = 2048,
+        AudioMask_TopCenter         = 4096,
+        AudioMask_TopFrontLeft      = 8192,
+        AudioMask_TopFrontRight     = 16384,
+        AudioMask_TopFrontCenter    = 32768,
+        AudioMask_TopRearLeft       = 65536,
+        AudioMask_TopRearRight      = 131072,
+        AudioMask_TopRearCenter     = 262144,
+        AudioMask_StereoLeft        = 524288,  // RF64 extension
+        AudioMask_StereoRight       = 1048576, // RF64 extension for multichannel + stereodownmix
     } Audio_ChannelMask;
     
     typedef enum Audio_Types {
@@ -74,7 +85,7 @@ extern "C" {
      @param                 Index          "Which index does the channel mask apply to"?
      @param                 ChannelMask    "What is the channel mask"?
      */
-    void                    AudioContainer_SetChannelIndex(AudioContainer *Audio, uint64_t Index, Audio_ChannelMask ChannelMask);
+    void                    AudioContainer_SetChannelMap(AudioContainer *Audio, uint64_t Index, Audio_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Returns the number of audio channels".
@@ -248,7 +259,7 @@ extern "C" {
      @param                 Index          "Which index does the channel mask apply to"?
      @param                 ChannelMask    "What is the channel mask"?
      */
-    void                    ImageContainer_SetChannelIndex(ImageContainer *Image, uint64_t Index, Image_ChannelMask ChannelMask);
+    void                    ImageContainer_SetChannelMap(ImageContainer *Image, uint64_t Index, Image_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Returns the number of pixels in one row of this image".
