@@ -3299,7 +3299,7 @@ extern "C" {
                 free(Format32);
                 free(FormattedString);
             } else {
-                Format8                   = UTF8_Clone(Format);
+                Format8                   = Format;
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -3322,7 +3322,7 @@ extern "C" {
                 free(Format32);
                 free(FormattedString);
             } else {
-                Format16                  = UTF16_Clone(Format);
+                Format16                  = Format;
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -3343,7 +3343,7 @@ extern "C" {
                 free(Format32);
                 free(FormattedString);
             } else {
-                Format32                  = UTF32_Clone(Format);
+                Format32                  = Format;
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
