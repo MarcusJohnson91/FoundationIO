@@ -69,6 +69,7 @@ extern "C" {
      @constant            UTF16BOM_BE                          "UTF16BOM_BE byte order mark".
      @constant            UTF32BOM_LE                          "UTF32BOM_LE byte order mark".
      @constant            UTF32BOM_BE                          "UTF32BOM_LE byte order mark".
+     @constant            UnicodeWinPathPrefixSize             "Size of "//?/" in CodePoints and CodeUnits"
      @constant            UTF16HighSurrogateStart              "The value that marks the start of the High Surrogate range".
      @constant            UTF16HighSurrogateEnd                "The value that marks the end   of the High Surrogate range".
      @constant            UTF16LowSurrogateStart               "The value that marks the start of the Low  Surrogate range".
@@ -90,6 +91,8 @@ extern "C" {
                           UTF16BOM_BE                          = 0xFEFF,
                           UTF32BOM_LE                          = 0xFFFE,
                           UTF32BOM_BE                          = 0xFEFF,
+                           // "//?/"
+                          UnicodeWinPathPrefixSize             = 4,
                           UTF16HighSurrogateStart              = 0xD800,
                           UTF16HighSurrogateEnd                = 0xDBFF,
                           UTF16LowSurrogateStart               = 0xDC00,
