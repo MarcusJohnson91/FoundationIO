@@ -263,6 +263,44 @@ extern "C" {
         return DecimalIsNormalF(Decimal) ? Mantissa |= 0x10000000000000 : Mantissa;
     }
     
+    float InsertSignF(float Insertee, int8_t Sign) {
+        Float2Integer Insertee2 = {.Float = Insertee};
+        Insertee2.Integer      &= (Sign << 31);
+        return Insertee2.Float;
+    }
+    
+    double InsertSignD(double Insertee, bool Sign) {
+        Double2Integer Insertee2 = {.Float = Insertee};
+        Insertee2.Integer       &= (Sign << 63);
+        return Insertee2.Float;
+    }
+    
+    float InsertExponentF(float Insertee, int8_t Value) {
+        uint32_t Value2         = Value;
+        Float2Integer Insertee2 = {.Float = Insertee};
+        Insertee2.Integer      &= ((Value2 & 0xFF) << 23); // Value is 8 bits, and needs to be normalized to +/-
+        return Insertee2.Float;
+    }
+    
+    double InsertExponentD(double Insertee, int16_t Value) {
+        uint64_t Value2          = Value;
+        Double2Integer Insertee2 = {.Float = Insertee};
+        Insertee2.Integer       &= ((Value2 & 0x7FF) << 52);
+        return Insertee2.Float;
+    }
+    
+    float InsertMantissaF(float Insertee, uint32_t Value) {
+        Float2Integer Insertee2 = {.Float = Insertee};
+        Insertee2.Integer      &= (Value & 0x7FFFFFUL); // Value is 8 bits, and needs to be normalized to +/-
+        return Insertee2.Float;
+    }
+    
+    double InsertMantissaD(double Insertee, uint64_t Value) {
+        Double2Integer Insertee2 = {.Float = Insertee};
+        Insertee2.Integer       &= (Value & 0xFFFFFFFFFFFFFULL);
+        return Insertee2.Float;
+    }
+    
     uint64_t Exponentiate(uint64_t Base, uint64_t Exponent) {
         int64_t Value      = 0;
         int64_t Exponent2  = Exponent;
