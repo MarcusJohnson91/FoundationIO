@@ -1,8 +1,7 @@
 #include "../libFoundationIO/include/TestIO.h"
-#include "../libFoundationIO/include/Log.h"
-
 #include "../libFoundationIO/include/BitIO.h"
-#include "../libFoundationIO/include/Macros.h"
+#include "../libFoundationIO/include/Log.h"
+#include "../libFoundationIO/include/StringIO.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,6 +14,8 @@ extern "C" {
         BitInput  *BitI = BitInput_Init();
         BitOutput *BitO = BitOutput_Init();
         
+        BitInput_UTF8_OpenFile(BitI, U8("/Users/Marcus/Desktop/TestImages/21.ppm"));
+        BitOutput_UTF8_OpenFile(BitO, U8("/Users/Marcus/Desktop/TestImages/21.ppm"));
         return 0;
     }
     
