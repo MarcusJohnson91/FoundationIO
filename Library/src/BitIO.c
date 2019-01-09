@@ -16,7 +16,7 @@ extern "C" {
      @constant                  BinaryGUUIDSize                 "The dize of a BinaryGUUID".
      */
     enum GUUIDConstants {
-                                GUUIDStringSize                 = 20 + NULLTerminatorSize,
+                                GUUIDStringSize                 = 20,
                                 BinaryGUUIDSize                 = 16,
     };
     
@@ -441,7 +441,7 @@ extern "C" {
                 // Read it from the BitBuffer as a string.
                 GUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
                 if (GUUID != NULL) {
-                    for (uint8_t Byte = 0; Byte < BinaryGUUIDSize - NULLTerminatorSize; Byte++) {
+                    for (uint8_t Byte = 0; Byte < BinaryGUUIDSize - 1; Byte++) {
                         GUUID[Byte] = BitBuffer_ReadBits(ByteOrder, LSBitFirst, BitB, 8);
                     }
                 } else {
@@ -544,7 +544,7 @@ extern "C" {
     
     void BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, const uint8_t *GUUID2Write) {
         if (BitB != NULL && GUUID2Write != NULL) { // TODO: Make sure that the BitBuffer can hold the GUUID
-            uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? GUUIDStringSize - NULLTerminatorSize : BinaryGUUIDSize);
+            uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? GUUIDStringSize : BinaryGUUIDSize);
             uint8_t ByteOrder = ((GUUIDType == GUIDString || GUUIDType == BinaryGUID) ? LSByteFirst : MSByteFirst);
             for (uint8_t Byte = 0; Byte < GUUIDSize - 1; Byte++) {
                 BitBuffer_WriteBits(ByteOrder, LSBitFirst, BitB, 8, GUUID2Write[Byte]);
@@ -995,7 +995,7 @@ extern "C" {
     
     /* GUUID */
     bool GUUID_Compare(GUUIDTypes Type2Compare, const uint8_t *GUUID1, const uint8_t *GUUID2) {
-        uint8_t GUUIDSize = ((Type2Compare == GUIDString || Type2Compare == UUIDString) ? BinaryGUUIDSize - NULLTerminatorSize : BinaryGUUIDSize);
+        uint8_t GUUIDSize       = ((Type2Compare == GUIDString || Type2Compare == UUIDString) ? BinaryGUUIDSize : BinaryGUUIDSize);
         bool GUUIDsMatch        = Yes;
         if (GUUID1 != NULL && GUUID2 != NULL && Type2Compare != UnknownGUUID) {
             for (uint8_t BinaryGUUIDByte = 0; BinaryGUUIDByte < GUUIDSize - 1; BinaryGUUIDByte++) {
@@ -1088,7 +1088,7 @@ extern "C" {
                     
                     SwappedGUUID[13]  = Dash;
                     
-                    for (uint8_t EndBytes = 13; EndBytes < GUUIDStringSize - NULLTerminatorSize; EndBytes++) {
+                    for (uint8_t EndBytes = 13; EndBytes < GUUIDStringSize - 1; EndBytes++) {
                         SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
                     }
                 } else {
