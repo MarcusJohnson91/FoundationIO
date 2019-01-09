@@ -10,7 +10,8 @@
 extern "C" {
 #endif
     
-#define StringIONULLTerminator 0
+#define StringIONULLTerminator     (0)
+#define StringIONULLTerminatorSize (1)
     
     /* API Design: All UTF-32 Strings will contain a BOM that we create anyway. */
     
@@ -432,7 +433,7 @@ extern "C" {
         UTF32    ByteOrder            = 0;
         if (String != NULL) {
             if (String[0] != UTF32BOM_LE && String[0] != UTF32BOM_BE) {
-                uint64_t StringSize   = UTF32_GetStringSizeInCodePoints(String) + UnicodeBOMSizeInCodePoints + NULLTerminatorSize;
+                uint64_t StringSize   = UTF32_GetStringSizeInCodePoints(String) + UnicodeBOMSizeInCodePoints + StringIONULLTerminatorSize;
                 StringWithBOM         = calloc(StringSize, sizeof(UTF32));
                 if (StringWithBOM != NULL) {
                     if (BOM2Add == UseNativeByteOrder) {
@@ -467,7 +468,7 @@ extern "C" {
             StringSize                              = UTF8_GetStringSizeInCodeUnits(String);
             bool StringHasBOM                       = UTF8_StringHasBOM(String);
             if (StringHasBOM) {
-                BOMLessString                       = calloc(StringSize - UTF8BOMSizeInCodeUnits + NULLTerminatorSize, sizeof(UTF8));
+                BOMLessString                       = calloc(StringSize - UTF8BOMSizeInCodeUnits + StringIONULLTerminatorSize, sizeof(UTF8));
                 if (BOMLessString != NULL) {
                     for (uint64_t CodeUnit = 2ULL; CodeUnit < StringSize; CodeUnit++) {
                         BOMLessString[CodeUnit - 3] = String[CodeUnit];
@@ -489,7 +490,7 @@ extern "C" {
             StringSize                              = UTF16_GetStringSizeInCodeUnits(String);
             bool StringHasBOM                       = UTF16_StringHasBOM(String);
             if (StringHasBOM) {
-                BOMLessString                       = calloc(StringSize - UTF16BOMSizeInCodeUnits + NULLTerminatorSize, sizeof(UTF16));
+                BOMLessString                       = calloc(StringSize - UTF16BOMSizeInCodeUnits + StringIONULLTerminatorSize, sizeof(UTF16));
                 if (BOMLessString != NULL) {
                     for (uint64_t CodeUnit = 1ULL; CodeUnit < StringSize; CodeUnit++) {
                         BOMLessString[CodeUnit - 1] = String[CodeUnit];
@@ -511,7 +512,7 @@ extern "C" {
             StringSize                           = UTF32_GetStringSizeInCodePoints(String);
             bool StringHasBOM                    = UTF32_StringHasBOM(String);
             if (StringHasBOM) {
-                BOMLessString                    = calloc(StringSize - UnicodeBOMSizeInCodePoints + NULLTerminatorSize, sizeof(UTF32));
+                BOMLessString                    = calloc(StringSize - UnicodeBOMSizeInCodePoints + StringIONULLTerminatorSize, sizeof(UTF32));
                 if (BOMLessString != NULL) {
                     for (uint64_t CodePoint = 0ULL; CodePoint < StringSize - 1; CodePoint++) {
                         BOMLessString[CodePoint] = String[CodePoint + 1];
@@ -594,7 +595,7 @@ extern "C" {
     UTF32 *UTF16_Decode(UTF16 *String) {
         UTF32   *DecodedString                   = NULL;
         if (String != NULL) {
-            uint64_t NumCodePoints  = UTF16_GetStringSizeInCodePoints(String) + NULLTerminatorSize;
+            uint64_t NumCodePoints  = UTF16_GetStringSizeInCodePoints(String) + StringIONULLTerminatorSize;
             bool     StringHasBOM   = UTF16_StringHasBOM(String);
             if (StringHasBOM == No) {
                 NumCodePoints      += 1;
@@ -640,7 +641,7 @@ extern "C" {
         uint64_t CodeUnitNum                           = 0ULL;
         UTF8    *EncodedString                         = NULL;
         if (String != NULL) {
-            uint64_t UTF8CodeUnits                     = NULLTerminatorSize + UTF32_GetStringSizeInUTF8CodeUnits(String);
+            uint64_t UTF8CodeUnits                     = StringIONULLTerminatorSize + UTF32_GetStringSizeInUTF8CodeUnits(String);
             EncodedString                              = calloc(UTF8CodeUnits, sizeof(UTF8));
             if (EncodedString != NULL) {
                 do {
@@ -682,7 +683,7 @@ extern "C" {
         if (String != NULL) {
             uint64_t CodePoint                   = 0ULL;
             UTF32    ByteOrder                   = 0;
-            uint64_t NumCodeUnits                = UTF32_GetStringSizeInUTF16CodeUnits(String) + NULLTerminatorSize;
+            uint64_t NumCodeUnits                = UTF32_GetStringSizeInUTF16CodeUnits(String) + StringIONULLTerminatorSize;
             if (String[0] == UTF32BOM_LE || String[0] == UTF32BOM_BE) {
                 ByteOrder                        = String[0];
             }
@@ -806,7 +807,7 @@ extern "C" {
     
     UTF32 *UTF32_ExtractSubString(UTF32 *String, uint64_t Offset, uint64_t Length) {
         uint64_t  StringSize                            = UTF32_GetStringSizeInCodePoints(String);
-        uint64_t  ExtractedStringSize                   = Length + NULLTerminatorSize;
+        uint64_t  ExtractedStringSize                   = Length + StringIONULLTerminatorSize;
         UTF32    *ExtractedString                       = NULL;
         if (String != NULL && StringSize >= Length + Offset) {
             ExtractedString                             = calloc(ExtractedStringSize, sizeof(UTF32));
@@ -1539,7 +1540,7 @@ extern "C" {
             Sign                 = -1;
             NumDigits           +=  1;
         }
-        UTF32 *NumberString      = calloc(NumDigits + NULLTerminatorSize, sizeof(UTF32));
+        UTF32 *NumberString      = calloc(NumDigits + StringIONULLTerminatorSize, sizeof(UTF32));
         UTF32  UpperNumerals[16] = {U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('A'), U32('B'), U32('C'), U32('D'), U32('E'), U32('F')};
         UTF32  LowerNumerals[16] = {U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'), U32('e'), U32('f')};
         if (NumberString != NULL) {
@@ -1576,25 +1577,41 @@ extern "C" {
     }
     
     double UTF32_String2Decimal(UTF32 *String) { // Replaces strtod, strtof, strold, atof, and atof_l
-        uint64_t CodePoint  = 0ULL;
-        bool     IsNegative = No;
+        double   Value         = 0.0;
+        bool     IsNegative    = No;
         if (String != NULL) {
             // Extract the sign bit
             // Extract the Significand
             // Extract the Base
             // Extract the Exponent
-            for (uint8_t Whitespace = 0; Whitespace < 99; Whitespace++) {
-                do {
-                    if (String[CodePoint] == U32('-')) {
-                        IsNegative = Yes;
-                    }
-                    CodePoint     += 1;
-                } while (String[CodePoint] != StringIONULLTerminator);
+            uint64_t CodePoint = 0ULL;
+            for (uint8_t Whitespace = 0; Whitespace < WhiteSpaceTableSize; Whitespace++) {
+                if (String[CodePoint] == WhiteSpaceTable[Whitespace]) {
+                    CodePoint += 1;
+                }
             }
+            
+            if (String[CodePoint] == U32('-')) {
+                IsNegative = Yes;
+            }
+            
+            // Example string: 0.000065184798905 aka 1 / 15341
+            
+            do {
+                // Now we loop, taking in various characters looking for Decimal digits
+                CodePoint     += 1;
+            } while (String[CodePoint] != '.'); // Before the decimal
+            
+            do {
+                if (String[0] == U32('-')) {
+                    IsNegative = Yes;
+                }
+                CodePoint     += 1;
+            } while (String[CodePoint] != StringIONULLTerminator); // After the decimal
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return 0.0;
+        return Value;
     }
     
     UTF8 *UTF8_Decimal2String(const StringIOBases Base, double Decimal) {
