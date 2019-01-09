@@ -1,15 +1,4 @@
-#if (defined(__APPLE__) && defined(__MACH__)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(__ANDROID__) || defined(__minix) || defined(__linux__) || defined(__unix__) || defined(_POSIX_C_SOURCE)
-#ifdef  _FILE_OFFSET_BITS
-#undef  _FILE_OFFSET_BITS
-#define _FILE_OFFSET_BITS 64
-#else
-#define _FILE_OFFSET_BITS 64
-#endif /* _FILE_OFFSET_BITS */
-#endif /* Various UNIX Platforms */
-
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
+#include "Macros.h"
 
 #pragma once
 
@@ -91,8 +80,7 @@ extern "C" {
                           UTF16BOM_BE                          = 0xFEFF,
                           UTF32BOM_LE                          = 0xFFFE,
                           UTF32BOM_BE                          = 0xFEFF,
-                           // "//?/"
-                          UnicodeWinPathPrefixSize             = 4,
+                          UnicodeWinPathPrefixSize             = 4, // "//?/" or "\\?\"
                           UTF16HighSurrogateStart              = 0xD800,
                           UTF16HighSurrogateEnd                = 0xDBFF,
                           UTF16LowSurrogateStart               = 0xDC00,
