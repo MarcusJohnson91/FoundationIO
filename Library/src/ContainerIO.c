@@ -998,6 +998,71 @@ extern "C" {
         }
     }
     
+    ImageContainer *ImageContainer_Compare(ImageContainer *Reference, ImageContainer *Compare) {
+        ImageContainer *Difference     = NULL;
+        if (Reference != NULL && Compare != NULL) {
+            Image_Types RefType        = ImageContainer_GetType(Reference);
+            Image_Types ComType        = ImageContainer_GetType(Compare);
+            uint8_t     RefNumViews    = ImageContainer_GetNumViews(Reference);
+            uint8_t     ComNumViews    = ImageContainer_GetNumViews(Compare);
+            uint8_t     RefNumChannels = ImageContainer_GetNumChannels(Reference);
+            uint8_t     ComNumChannels = ImageContainer_GetNumChannels(Compare);
+            uint64_t    RefHeight      = ImageContainer_GetHeight(Reference);
+            uint64_t    ComHeight      = ImageContainer_GetHeight(Compare);
+            uint64_t    RefWidth       = ImageContainer_GetWidth(Reference);
+            uint64_t    ComWidth       = ImageContainer_GetWidth(Compare);
+            if (RefType == ComType && RefNumViews == ComNumViews && RefNumChannels == ComNumChannels && RefHeight == ComHeight && RefWidth == ComWidth) {
+                Difference          = ImageContainer_Init(RefType, ImageContainer_GetChannelMask(Reference), RefWidth, RefHeight);
+                if (Difference != NULL) {
+                    if (RefType == ImageType_Integer8 && ComType == ImageType_Integer8) {
+                        uint8_t *RefArray = ImageContainer_GetArray(Reference);
+                        uint8_t *ComArray = ImageContainer_GetArray(Compare);
+                        uint8_t *DifArray = ImageContainer_GetArray(Difference);
+                        for (uint8_t View = 0; View < RefNumViews - 1; View++) {
+                            for (uint64_t Width = 0ULL; Width < RefWidth - 1; Width++) {
+                                for (uint64_t Height = 0ULL; Height < RefHeight - 1; Height++) {
+                                    for (uint8_t Channel = 0; Channel < RefNumChannels - 1; Channel++) {
+                                        DifArray[View * Width * Height * Channel] = (RefArray[View * Width * Height * Channel] - ComArray[View * Width * Height * Channel]) % 256;
+                                    }
+                                }
+                            }
+                        }
+                    } else if (RefType == ImageType_Integer16 && ComType == ImageType_Integer16) {
+                        uint16_t *RefArray = ImageContainer_GetArray(Reference);
+                        uint16_t *ComArray = ImageContainer_GetArray(Compare);
+                        uint16_t *DifArray = ImageContainer_GetArray(Difference);
+                        for (uint8_t View = 0; View < RefNumViews - 1; View++) {
+                            for (uint64_t Width = 0ULL; Width < RefWidth - 1; Width++) {
+                                for (uint64_t Height = 0ULL; Height < RefHeight - 1; Height++) {
+                                    for (uint8_t Channel = 0; Channel < RefNumChannels - 1; Channel++) {
+                                        DifArray[View * Width * Height * Channel] = (RefArray[View * Width * Height * Channel] - ComArray[View * Width * Height * Channel]) % 65536;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't Allocate Difference"));
+                }
+            } else if (RefType != ComType) {
+                Log(Log_ERROR, __func__, U8("Reference Type %d does not match Compare Type %d"), RefType, ComType);
+            } else if (RefNumViews != ComNumViews) {
+                Log(Log_ERROR, __func__, U8("Reference NumViews %d does not match Compare NumViews %d"), RefNumViews, ComNumViews);
+            } else if (RefNumChannels != ComNumChannels) {
+                Log(Log_ERROR, __func__, U8("Reference NumChannels %d does not match Compare NumChannels %d"), RefNumChannels, ComNumChannels);
+            } else if (RefHeight != ComHeight) {
+                Log(Log_ERROR, __func__, U8("Reference Height %lld does not match Compare Height %lld"), RefHeight, ComHeight);
+            } else if (RefWidth != ComWidth) {
+                Log(Log_ERROR, __func__, U8("Reference Width %lld does not match Compare Width %lld"), RefWidth, ComWidth);
+            }
+        } else if (Reference == NULL) {
+            Log(Log_ERROR, __func__, U8("Reference Pointer is NULL"));
+        } else if (Compare == NULL) {
+            Log(Log_ERROR, __func__, U8("Compare Pointer is NULL"));
+        }
+        return Difference;
+    }
+    
     void ImageContainer_Deinit(ImageContainer *Image) {
         if (Image != NULL) {
             free(Image->Pixels);

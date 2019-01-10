@@ -389,6 +389,14 @@ extern "C" {
     void                    ImageContainer_Resize(ImageContainer *Image, int64_t Left, int64_t Right, int64_t Top, int64_t Bottom);
     
     /*!
+     @abstract                             "Compares two Images".
+     @param                 Reference      "A pointer to the reference ImageContainer".
+     @param                 Compare        "A pointer to the ImageContainer to compare to the Reference".
+     @return                               "Returns an ImageContainer containing (Reference - Compare) % 2^BitDepth".
+     */
+    ImageContainer         *ImageContainer_Compare(ImageContainer *Reference, ImageContainer *Compare);
+    
+    /*!
      @abstract                             "Deinitializes the ImageContainer pointed to".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
