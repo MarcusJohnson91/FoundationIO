@@ -28,38 +28,74 @@ extern "C" {
      @brief                 This header contains code for containers (type generic arrays)
      */
     
+    /*!
+     @enum                      Audio_ChannelMask
+     @abstract                                                  "Defines the Audio_Types values, OR-able".
+     @constant                  AudioMask_Unknown               "Invalid AudioMask, exists solely to tell when it hasn't been set".
+     @constant                  AudioMask_FrontLeft             "The channel's location is the front left".
+     @constant                  AudioMask_FrontRight            "The channel's location is the front right".
+     @constant                  AudioMask_FrontCenter           "The channel's location is the front center".
+     @constant                  AudioMask_LFE                   "The channel's contains the Low Frequency Effects for subwoofers".
+     @constant                  AudioMask_SurroundLeft          "The channel's location is the side left".
+     @constant                  AudioMask_SurroundRight         "The channel's location is the side right".
+     @constant                  AudioMask_SurroundCenter        "The channel's location is the side center".
+     @constant                  AudioMask_RearLeft              "The channel's location is the rear left".
+     @constant                  AudioMask_RearRight             "The channel's location is the rear right".
+     @constant                  AudioMask_RearCenter            "The channel's location is the rear center".
+     @constant                  AudioMask_FrontCenterLeft       "The channel's location is the front center left".
+     @constant                  AudioMask_FrontCenterRight      "The channel's location is the front center right".
+     @constant                  AudioMask_TopCenter             "The channel's location is the top center".
+     @constant                  AudioMask_TopFrontLeft          "The channel's location is the top front left".
+     @constant                  AudioMask_TopFrontRight         "The channel's location is the top front right".
+     @constant                  AudioMask_TopFrontCenter        "The channel's location is the top front center".
+     @constant                  AudioMask_TopRearLeft           "The channel's location is the top rear left".
+     @constant                  AudioMask_TopRearRight          "The channel's location is the top rear right".
+     @constant                  AudioMask_TopRearCenter         "The channel's location is the top rear center".
+     @constant                  AudioMask_StereoLeft            "RF64 Extension, Stereo Downmix, Left".
+     @constant                  AudioMask_StereoRight           "RF64 Extension, Stereo Downmix, Right".
+     */
     typedef enum Audio_ChannelMask {
-        AudioMask_Unknown           = 0,
-        AudioMask_FrontLeft         = 1,
-        AudioMask_FrontRight        = 2,
-        AudioMask_FrontCenter       = 4,
-        AudioMask_LFE               = 8,
-        AudioMask_SurroundLeft      = 16,
-        AudioMask_SurroundRight     = 32,
-        AudioMask_SurroundCenter    = 64,
-        AudioMask_RearLeft          = 128,
-        AudioMask_RearRight         = 256,
-        AudioMask_RearCenter        = 512,
-        AudioMask_FrontCenterLeft   = 1024,
-        AudioMask_FrontCenterRight  = 2048,
-        AudioMask_TopCenter         = 4096,
-        AudioMask_TopFrontLeft      = 8192,
-        AudioMask_TopFrontRight     = 16384,
-        AudioMask_TopFrontCenter    = 32768,
-        AudioMask_TopRearLeft       = 65536,
-        AudioMask_TopRearRight      = 131072,
-        AudioMask_TopRearCenter     = 262144,
-        AudioMask_StereoLeft        = 524288,  // RF64 extension
-        AudioMask_StereoRight       = 1048576, // RF64 extension for multichannel + stereodownmix
+                                AudioMask_Unknown               = 0,
+                                AudioMask_FrontLeft             = 1,
+                                AudioMask_FrontRight            = 2,
+                                AudioMask_FrontCenter           = 4,
+                                AudioMask_LFE                   = 8,
+                                AudioMask_SurroundLeft          = 16,
+                                AudioMask_SurroundRight         = 32,
+                                AudioMask_SurroundCenter        = 64,
+                                AudioMask_RearLeft              = 128,
+                                AudioMask_RearRight             = 256,
+                                AudioMask_RearCenter            = 512,
+                                AudioMask_FrontCenterLeft       = 1024,
+                                AudioMask_FrontCenterRight      = 2048,
+                                AudioMask_TopCenter             = 4096,
+                                AudioMask_TopFrontLeft          = 8192,
+                                AudioMask_TopFrontRight         = 16384,
+                                AudioMask_TopFrontCenter        = 32768,
+                                AudioMask_TopRearLeft           = 65536,
+                                AudioMask_TopRearRight          = 131072,
+                                AudioMask_TopRearCenter         = 262144,
+                                AudioMask_StereoLeft            = 524288,
+                                AudioMask_StereoRight           = 1048576,
     } Audio_ChannelMask;
     
+    /*!
+     @enum                      Audio_Types
+     @abstract                                                  "Defines the Audio_Types values, OR-able".
+     @constant                  AudioType_Unknown               "Invalid AudioType, exists solely to tell when it hasn't been set".
+     @constant                  AudioType_Unsigned              "The samples are unsigned".
+     @constant                  AudioType_Signed                "The samples are signed".
+     @constant                  AudioType_Integer8              "The samples values are between 0 and 255        for Unsigned, -128        and 127        for Signed".
+     @constant                  AudioType_Integer16             "The samples values are between 0 and 65535      for Unsigned, -32768      and 32767      for Signed".
+     @constant                  AudioType_Integer32             "The samples values are between 0 and 4294967295 for Unsigned, -2147483648 and 2147483647 for Signed".
+     */
     typedef enum Audio_Types {
-        AudioType_Unknown           = 0,
-        AudioType_Unsigned          = 1,
-        AudioType_Signed            = 2,
-        AudioType_Integer8          = 4,
-        AudioType_Integer16         = 8,
-        AudioType_Integer32         = 16,
+                                AudioType_Unknown               = 0,
+                                AudioType_Unsigned              = 1,
+                                AudioType_Signed                = 2,
+                                AudioType_Integer8              = 4,
+                                AudioType_Integer16             = 8,
+                                AudioType_Integer32             = 16,
     } Audio_Types;
     
     typedef struct          AudioContainer   AudioContainer;
@@ -219,26 +255,50 @@ extern "C" {
      */
     void                    AudioHistogram_Deinit(AudioHistogram *Histogram);
     
+    /*!
+     @enum                      Image_ChannelMask
+     @abstract                                                  "Defines the ChannelMask values".
+     @constant                  ImageMask_Unknown               "Invalid ImageMask, exists solely to tell when it hasn't been set".
+     @constant                  ImageMask_2D                    "The image has two dimensions".
+     @constant                  ImageMask_Luma                  "The channel contains the Luminance aka Brightness information, also used for single channel images".
+     @constant                  ImageMask_Chroma1               "The channel contains the Chrominance aka Color information".
+     @constant                  ImageMask_Chroma2               "The channel contains the Chrominance aka Color information".
+     @constant                  ImageMask_Chroma3               "The channel contains the Chrominance aka Color information".
+     @constant                  ImageMask_Alpha                 "The channel contains the Alpha aka transparency information".
+     @constant                  ImageMask_3D_L                  "The image has three dimensions, this one is the left".
+     @constant                  ImageMask_3D_R                  "The image has three dimensions, this one is the right".
+     @constant                  ImageMask_Red                   "The channel contains the Red    color information".
+     @constant                  ImageMask_Green                 "The channel contains the Green  color information".
+     @constant                  ImageMask_Blue                  "The channel contains the Blue   color information".
+     @constant                  ImageMask_Green2                "The channel contains the Green2 color information, for Bayer filtered images".
+     */
     typedef enum Image_ChannelMask {
-        ImageMask_Unknown           = 0,
-        ImageMask_2D                = 1,
-        ImageMask_Luma              = 2,
-        ImageMask_Chroma1           = 4,
-        ImageMask_Chroma2           = 8,
-        ImageMask_Chroma3           = 16,
-        ImageMask_Alpha             = 32,
-        ImageMask_3D_L              = 64,
-        ImageMask_3D_R              = 128,
-        ImageMask_Red               = 256,
-        ImageMask_Green             = 512,
-        ImageMask_Blue              = 1024,
-        ImageMask_Green2            = 2048,
+                                ImageMask_Unknown               = 0,
+                                ImageMask_2D                    = 1,
+                                ImageMask_Luma                  = 2,
+                                ImageMask_Chroma1               = 4,
+                                ImageMask_Chroma2               = 8,
+                                ImageMask_Chroma3               = 16,
+                                ImageMask_Alpha                 = 32,
+                                ImageMask_3D_L                  = 64,
+                                ImageMask_3D_R                  = 128,
+                                ImageMask_Red                   = 256,
+                                ImageMask_Green                 = 512,
+                                ImageMask_Blue                  = 1024,
+                                ImageMask_Green2                = 2048,
     } Image_ChannelMask;
     
+    /*!
+     @enum                      Image_Types
+     @abstract                                                  "Defines the type of image".
+     @constant                  ImageType_Unknown               "Invalid ImageType, exists solely to tell when it hasn't been set".
+     @constant                  ImageType_Integer8              "The pixels are unsigned 8  bit integers".
+     @constant                  ImageType_Integer16             "The pixels are unsigned 16 bit integers".
+     */
     typedef enum Image_Types {
-        ImageType_Unknown           = 0,
-        ImageType_Integer8          = 1,
-        ImageType_Integer16         = 2,
+                                ImageType_Unknown               = 0,
+                                ImageType_Integer8              = 1,
+                                ImageType_Integer16             = 2,
     } Image_Types;
     
     typedef struct          ImageContainer ImageContainer;
