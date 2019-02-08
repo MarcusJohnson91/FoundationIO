@@ -20,7 +20,7 @@ extern "C" {
     
     void Log_UTF8_OpenFile(UTF8 *LogFilePath) {
         if (LogFilePath != NULL) {
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
             bool PathHasBOM      = UTF8_StringHasBOM(LogFilePath);
             if (PathHasBOM) {
                 UTF8 *BOMLess    = UTF8_RemoveBOM(LogFilePath);
@@ -28,7 +28,7 @@ extern "C" {
             } else {
                 Log_LogFile      = FoundationIO_File_Open(LogFilePath, U8("a+"));
             }
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             UTF32 *Path32        = UTF8_Decode(LogFilePath);
             bool   PathHasBOM    = UTF32_StringHasBOM(Path32);
             bool   PathHasPrefix = UTF32_StringHasWinPathPrefix(Path32);
@@ -63,7 +63,7 @@ extern "C" {
     
     void Log_UTF16_OpenFile(UTF16 *LogFilePath) {
         if (LogFilePath != NULL) {
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
             UTF32 *Path32        = UTF16_Decode(LogFilePath);
             bool   PathHasBOM    = UTF32_StringHasBOM(Path32);
             if (PathHasBOM) {
@@ -76,7 +76,7 @@ extern "C" {
                 Log_LogFile      = FoundationIO_File_Open(Path8, U8("rb"));
                 free(Path8);
             }
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             UTF32 *Path32        = UTF16_Decode(LogFilePath);
             bool   PathHasBOM    = UTF32_StringHasBOM(Path32);
             bool   PathHasPrefix = UTF32_StringHasWinPathPrefix(Path32);

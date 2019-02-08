@@ -4,11 +4,11 @@
 #include "../include/Log.h"            /* Included for Log */
 #include "../include/StringIO.h"       /* Included for StringIO's declarations */
 
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
 #include <signal.h>                    /* Included for SIGWINCH handling */
 #include <sys/ioctl.h>                 /* Included for the terminal size */
 #include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #include <wincon.h>                    /* Included for getting the terminal size, MAKE SURE Macros.h is included before this, it includes Windows.h */
 #endif
 
@@ -115,11 +115,11 @@ extern "C" {
     
     uint64_t       CommandLineIO_GetTerminalWidth(void) {
         uint64_t Width = 0ULL;
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
         struct winsize       WindowSize;
         ioctl(0, TIOCGWINSZ, &WindowSize);
         Width          = WindowSize.ws_row;
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
         Width          = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
@@ -129,11 +129,11 @@ extern "C" {
     
     uint64_t       CommandLineIO_GetTerminalHeight(void) {
         uint64_t Height = 0ULL;
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
         struct winsize       WindowSize;
         ioctl(0, TIOCGWINSZ, &WindowSize);
         Height          = WindowSize.ws_row;
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
         Height          = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
@@ -143,7 +143,7 @@ extern "C" {
     
     bool           CommandLineIO_TerminalWasResized(void) {
         bool SizeChanged = No;
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
         /*
          We're creating a text UI to show the progress of the program.
          The user resizes the window
@@ -155,7 +155,7 @@ extern "C" {
         struct winsize       WindowSize;
         ioctl(0, TIOCGWINSZ, &WindowSize);
         SizeChanged      = WindowSize.ws_row;
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
         SizeChanged      = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;

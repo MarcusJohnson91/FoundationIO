@@ -46,22 +46,22 @@ extern "C" {
 #define             FoundationIOOSUnknown      0
 #endif           /* UnknownOS */
     
-#ifndef             FoundationIOOSPOSIX
-#define             FoundationIOOSPOSIX        1
+#ifndef             FoundationIOPOSIXOS
+#define             FoundationIOPOSIXOS        1
 #endif           /* POSIX */
     
-#ifndef             FoundationIOOSWindows
-#define             FoundationIOOSWindows      2
+#ifndef             FoundationIOWindowsOS
+#define             FoundationIOWindowsOS      2
 #endif           /* Windows */
     
-#ifndef             FoundationIOOSMacClassic
-#define             FoundationIOOSMacClassic   4
+#ifndef             FoundationIOMacClassicOS
+#define             FoundationIOMacClassicOS   4
 #endif           /* MacClassicOS */
     
 #if defined(macintosh) || defined(Macintosh)
     
 #ifndef             FoundationIOTargetOS
-#define             FoundationIOTargetOS FoundationIOOSMacClassic
+#define             FoundationIOTargetOS FoundationIOMacClassicOS
 #endif           /* FoundationIOTargetOS */
     
 #elif (defined(__APPLE__) && defined(__MACH__)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(__ANDROID__) || defined(__minix) || defined(__linux__) || defined(__unix__) || defined(_POSIX_C_SOURCE)
@@ -71,12 +71,12 @@ extern "C" {
 #include <sys/sysctl.h> /* Included for getting the number of CPU cores */
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
     
-#define FoundationIOTargetOS (FoundationIOOSPOSIX)
-    
+#define FoundationIOTargetOS (FoundationIOPOSIXOS)
+ /*
 #ifndef             typeof
 #define             typeof(Variable)                                                           __typeof__(Variable)
 #endif
-    
+    */
 #ifndef             FoundationIO_File_Open
 #define             FoundationIO_File_Open(File2OpenPath, FileModeString)                      fopen(File2OpenPath, FileModeString)
 #endif
@@ -157,7 +157,7 @@ extern "C" {
 #include <WinSock2.h>                 /* Included for the socket support on Windows */
     
 #ifndef             FoundationIOTargetOS
-#define             FoundationIOTargetOS FoundationIOOSWindows
+#define             FoundationIOTargetOS (FoundationIOWindowsOS)
 #endif
     
 #ifndef             typeof
@@ -293,31 +293,31 @@ extern "C" {
 #endif /* FoundationIOCompiler */
     
 #ifndef NewLineUTF8
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
 #define             NewLineUTF8                                            (u8"\n")
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #define             NewLineUTF8                                            (u8"\r\n")
-#elif (FoundationIOTargetOS == FoundationIOOSMacClassic)
+#elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
 #define             NewLineUTF8                                            (u8"\r")
 #endif /* TargetOS */
 #endif /* Ifndef NewLineUTF8 */
     
 #ifndef NewLineUTF16
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
 #define             NewLineUTF16                                           (u"\n")
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #define             NewLineUTF16                                           (u"\r\n")
-#elif (FoundationIOTargetOS == FoundationIOOSMacClassic)
+#elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
 #define             NewLineUTF16                                           (u"\r")
 #endif /* TargetOS */
 #endif /* Ifndef NewLineUTF16 */
     
 #ifndef NewLineUTF32
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
 #define             NewLineUTF32                                           (U"\n")
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #define             NewLineUTF32                                           (U"\r\n")
-#elif (FoundationIOTargetOS == FoundationIOOSMacClassic)
+#elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
 #define             NewLineUTF32                                           (U"\r")
 #endif /* TargetOS */
 #endif /* Ifndef NewLineUTF32 */

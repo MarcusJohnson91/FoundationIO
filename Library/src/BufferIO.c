@@ -607,7 +607,7 @@ extern "C" {
     void BitInput_UTF8_OpenFile(BitInput *BitI, UTF8 *Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType                   = BitIOFile;
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
             UTF32 *Path32                    = UTF8_Decode(Path2Open);
             bool   PathHasBOM                = UTF32_StringHasBOM(Path32);
             if (PathHasBOM) {
@@ -624,7 +624,7 @@ extern "C" {
             }
             UTF8  *Path8                     = UTF8_Encode(Path32);
             BitI->File                       = FoundationIO_File_Open(Path8, U8("rb"));
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             bool  StringHasBOM               = UTF8_StringHasBOM(Path2Open);
             UTF32 *WinPath32                 = UTF8_Decode(Path2Open);
             UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, U32("\\\\\?\\"), StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
@@ -649,7 +649,7 @@ extern "C" {
     void BitInput_UTF16_OpenFile(BitInput *BitI, UTF16 *Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType                   = BitIOFile;
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
             UTF32 *Path32                    = UTF16_Decode(Path2Open);
             bool   PathHasBOM                = UTF32_StringHasBOM(Path32);
             bool   PathHasWinPrefix          = UTF32_StringHasWinPathPrefix(Path32);
@@ -680,7 +680,7 @@ extern "C" {
             }
             UTF8  *Path8                     = UTF8_Encode(Path32);
             BitI->File                       = FoundationIO_File_Open(Path8, U8("rb"));
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             bool  StringHasBOM               = UTF16_StringHasBOM(Path2Open);
             UTF32 *WinPath32                 = UTF16_Decode(Path2Open);
             UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, U32("//?/"), StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
@@ -724,13 +724,13 @@ extern "C" {
                 BitI->FilePosition      = 0;
                 BitI->FileSpecifierNum += 1;
                 fclose(BitI->File);
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
                 UTF8 *Path8        = UTF8_Encode(BitI->InputPath);
                 UTF8  *NewPath     = UTF8_FormatString(Path8, BitI->FileSpecifierNum);
                 FoundationIO_File_Open(NewPath, U8("rb"));
                 free(NewPath);
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
-                UTF16 *Path16      = BitI->InputPath;
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+                UTF16 *Path16      = UTF16_Encode(BitI->InputPath);
                 UTF16 *NewPath     = UTF16_FormatString(Path16, BitI->FileSpecifierNum);
                 free(Path16);
                 FoundationIO_File_Open(NewPath, U16("rb"));
@@ -840,7 +840,7 @@ extern "C" {
     void BitOutput_UTF8_OpenFile(BitOutput *BitO, UTF8 *Path2Open) {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType              = BitIOFile;
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
             BitO->FileSpecifierExists   = UTF8_NumFormatSpecifiers(Path2Open) >= 1 ? Yes : No;
             if (BitO->FileSpecifierExists == Yes) {
                 BitO->OutputPath        = UTF8_Decode(Path2Open);
@@ -852,7 +852,7 @@ extern "C" {
                 BitO->File              = FoundationIO_File_Open(OutputPath, U8("rb"));
                 free(OutputPath);
             }
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             bool   StringHasPathPrefix  = UTF8_StringHasWinPathPrefix(Path2Open);
             BitO->FileSpecifierExists   = UTF8_NumFormatSpecifiers(Path2Open) >= 1 ? Yes : No;
             UTF32 *Path32               = UTF8_Decode(Path2Open);
@@ -883,7 +883,7 @@ extern "C" {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType              = BitIOFile;
             bool  PathHasBOM            = No;
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
             // Convert to UTF-8, and remove the BOM because fopen will silently fail if there's a BOM.
             UTF32 *Decoded              = UTF16_Decode(Path2Open);
             PathHasBOM                  = UTF32_StringHasBOM(Decoded);
@@ -901,7 +901,7 @@ extern "C" {
                 UTF8 *Formatted8        = UTF8_Encode(BitO->OutputPath);
                 FoundationIO_File_Open(Formatted8, U8("rb"));
             }
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             bool   StringHasPathPrefix  = UTF16_StringHasWinPathPrefix(Path2Open);
             BitO->FileSpecifierExists   = UTF16_NumFormatSpecifiers(Path2Open) >= 1 ? Yes : No;
             UTF32 *Path32               = UTF16_Decode(Path2Open);
@@ -939,13 +939,13 @@ extern "C" {
                 BitO->FilePosition      = 0;
                 BitO->FileSpecifierNum += 1;
                 fclose(BitO->File);
-#if   (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
                 UTF8  *OutputPath8      = UTF8_Encode(BitO->OutputPath);
                 UTF8  *NewPath          = UTF8_FormatString(OutputPath8, BitO->FileSpecifierNum);
                 FoundationIO_File_Open(NewPath, U8("rb"));
                 free(OutputPath8);
                 free(NewPath);
-#elif (FoundationIOTargetOS == FoundationIOOSWindows)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
                 UTF16 *OutputPath16     = UTF16_Encode(BitO->OutputPath);
                 UTF16 *NewPath          = UTF16_FormatString(OutputPath16, BitO->FileSpecifierNum);
                 FoundationIO_File_Open(NewPath, U16("rb"));

@@ -4,7 +4,13 @@
 #include "../include/Log.h"            /* Included for error reporting */
 #include "../include/StringIO.h"       /* Included for U8 macro */
 
+#if (FoundationIOTargetOS == FoundationIOPOSIXOS)
 #include <time.h>                      /* Included for timespec_get */
+#endif
+
+#if defined(__APPLE__) && defined(__MACH__)
+#include <mach/mach_time.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,11 +28,11 @@ extern "C" {
     
     uint64_t GetTimerFrequency(void) {
         uint64_t TimerFrequency = 0LL;
-#if   (FoundationIOTargetOS == FoundationIOOSWindows)
+#if   (FoundationIOTargetOS == FoundationIOWindowsOS)
         QueryPerformanceFrequency(TimerFrequency);
 #elif (defined(__APPLE__) && defined(__MACH__))
         
-#elif (FoundationIOTargetOS == FoundationIOOSPOSIX)
+#elif (FoundationIOTargetOS == FoundationIOPOSIXOS)
         clock_getres(TimerFrequency);
 #endif
         return TimerFrequency;
@@ -36,12 +42,11 @@ extern "C" {
         uint64_t Time        = 0ULL;
         uint64_t CurrentTime = 0ULL;
         for (uint8_t Loop = 1; Loop <= 3; Loop++) {
-#if   (FoundationIOTargetOS == FoundationIOOSWindows)
+#if   (FoundationIOTargetOS == FoundationIOWindowsOS)
             QueryPerformanceFrequency(CurrentTime);
 #elif (defined(__APPLE__) && defined(__MACH__))
-#include <mach/mach_time.h>
-            CurrentTime      = mach_absolute_time();
-#elif (FoundationIOTargetOS == FoundationIOOSPOSIX)
+            CurrentTime      = mach_absolute_time(); // or mach_continuous_time?
+#elif (FoundationIOTargetOS == FoundationIOPOSIXOS)
             clock_getres(CurrentTime);
 #endif
             Time            += CurrentTime;
