@@ -27,15 +27,15 @@ extern "C" {
                 uint8_t NumChannels = AudioMask_GetNumChannels(ChannelMask);
                 void **Array        = calloc(NumChannels * NumSamples, Type / 4); // !!! DO NOT CHANGE AUDIO_TYPES WITHOUT CHANGING THE SIZE FIELD HERE
                 if (Array != NULL) {
-                    Audio->Samples      = Array;
+                    Audio->Samples  = Array;
                 } else {
                     AudioContainer_Deinit(Audio);
                     Log(Log_ERROR, __func__, U8("Couldn't allocate the audio array"));
                 }
                 
-                Audio->ChannelMask = ChannelMask;
-                Audio->SampleRate  = SampleRate;
-                Audio->NumSamples  = NumSamples;
+                Audio->ChannelMask  = ChannelMask;
+                Audio->SampleRate   = SampleRate;
+                Audio->NumSamples   = NumSamples;
             } else {
                 AudioContainer_Deinit(Audio);
                 Log(Log_ERROR, __func__, U8("Couldn't allocate the AudioContainer"));
@@ -48,7 +48,7 @@ extern "C" {
     
     void AudioContainer_SetChannelMap(AudioContainer *Audio, uint64_t Channel, Audio_ChannelMask ChannelMask) {
         if (Audio != NULL) {
-            uint8_t NumChannels              = AudioMask_GetNumChannels(ChannelMask);
+            uint8_t NumChannels            = AudioMask_GetNumChannels(ChannelMask);
             if (NumChannels == 1) {
                 Audio->ChannelMap[Channel] = ChannelMask;
             } else {
@@ -62,7 +62,7 @@ extern "C" {
     uint8_t AudioContainer_GetBitDepth(AudioContainer *Audio) {
         uint8_t BitDepth = 0ULL;
         if (Audio != NULL) {
-            BitDepth = Audio->BitDepth;
+            BitDepth     = Audio->BitDepth;
         } else {
             Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
         }
@@ -94,7 +94,7 @@ extern "C" {
     uint64_t AudioContainer_GetNumSamples(AudioContainer *Audio) {
         uint64_t NumSamples = 0ULL;
         if (Audio != NULL) {
-            NumSamples = Audio->NumSamples;
+            NumSamples      = Audio->NumSamples;
         } else {
             Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
         }
@@ -120,7 +120,7 @@ extern "C" {
     Audio_Types AudioContainer_GetType(AudioContainer *Audio) {
         Audio_Types Type = AudioType_Unknown;
         if (Audio != NULL) {
-            Type                 = Audio->Type;
+            Type         = Audio->Type;
         } else {
             Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
         }
@@ -338,25 +338,24 @@ extern "C" {
     } AudioHistogram;
     
     AudioHistogram *AudioHistogram_Init(AudioContainer *Audio) {
-        AudioHistogram *Histogram = NULL;
+        AudioHistogram *Histogram         = NULL;
         if (Audio != NULL) {
             // Create a histogram for each sample value in each channel
-            Histogram             = calloc(1, sizeof(AudioHistogram));
-            uint8_t NumChannels   = AudioContainer_GetNumChannels(Audio);
+            Histogram                     = calloc(1, sizeof(AudioHistogram));
+            uint8_t NumChannels           = AudioContainer_GetNumChannels(Audio);
             if (Histogram != NULL) {
+                uint64_t NumValues        = Exponentiate(2, Audio->BitDepth);
                 if (Audio->BitDepth <= 8) {
-                    Histogram->Array  = calloc(256 * NumChannels, sizeof(uint8_t));
-                    Histogram->NumEntries = 256;
+                    Histogram->Array      = calloc(NumValues * NumChannels, sizeof(uint8_t));
                 } else if (Audio->BitDepth <= 16) {
-                    Histogram->Array  = calloc(65536 * NumChannels, sizeof(uint16_t));
-                    Histogram->NumEntries = 65536;
-                } else if (Audio->BitDepth <= 24) {
-                    Histogram->Array  = calloc(16777216 * NumChannels, sizeof(uint32_t));
-                    Histogram->NumEntries = 16777216;
+                    Histogram->Array      = calloc(NumValues * NumChannels, sizeof(uint16_t));
+                } else if (Audio->BitDepth <= 32) {
+                    Histogram->Array      = calloc(NumValues * NumChannels, sizeof(uint32_t));
                 }
                 
                 if (Histogram->Array != NULL) {
-                    Histogram->Type   = Audio->Type;
+                    Histogram->Type       = Audio->Type;
+                    Histogram->NumEntries = NumValues;
                 } else {
                     AudioHistogram_Deinit(Histogram);
                     Log(Log_ERROR, __func__, U8("Couldn't allocate AudioHistogram Array"));
@@ -389,9 +388,9 @@ extern "C" {
     }
     
     AudioHistogram *AudioHistogram_GenerateHistogram(AudioContainer *Audio) {
-        AudioHistogram *Histogram       = NULL;
+        AudioHistogram *Histogram                                = NULL;
         if (Audio != NULL) {
-            Histogram                   = AudioHistogram_Init(Audio);
+            Histogram                                            = AudioHistogram_Init(Audio);
             if (Histogram != NULL) {
                 uint8_t  NumChannels                             = AudioContainer_GetNumChannels(Audio);
                 
@@ -583,8 +582,8 @@ extern "C" {
     
     void ImageContainer_SetChannelMap(ImageContainer *Image, uint64_t Index, Image_ChannelMask ChannelMask) {
         if (Image != NULL) {
-            uint8_t NumViews               = ImageMask_GetNumViews(ChannelMask);
-            uint8_t NumChannels            = ImageMask_GetNumChannels(ChannelMask);
+            uint8_t NumViews             = ImageMask_GetNumViews(ChannelMask);
+            uint8_t NumChannels          = ImageMask_GetNumChannels(ChannelMask);
             if (NumViews == 1 && NumChannels == 1) {
                 Image->ChannelMap[Index] = ChannelMask;
             } else {
@@ -618,7 +617,7 @@ extern "C" {
     uint8_t ImageContainer_GetBitDepth(ImageContainer *Image) {
         uint8_t BitDepth = 0ULL;
         if (Image != NULL) {
-            BitDepth      = Image->BitDepth;
+            BitDepth     = Image->BitDepth;
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
         }

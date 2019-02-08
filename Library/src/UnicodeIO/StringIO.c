@@ -1715,7 +1715,7 @@ extern "C" {
         if (OutputString != NULL) {
             // Now we go ahead and create the string
             if (Sign == -1) {
-                OutputString[1]   = U32('-');
+                OutputString[1] = U32('-');
             }
             // Now we start popping in the other variables, first is the Exponent.
             while (Exponent > 0) { // TODO: This assumes there's only 1 codepoint necessary to express the exponent
