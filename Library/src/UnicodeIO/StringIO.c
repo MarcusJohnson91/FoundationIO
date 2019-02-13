@@ -3410,6 +3410,53 @@ extern "C" {
         return Format32;
     }
     
+    UTF8 **UTF8_DeformatString(FILE *Source, UTF8 *Format) {
+        UTF8 **StringArray = NULL;
+        if (Source != NULL && Format != NULL) {
+            UTF32 *Format32 = UTF8_Decode(Format);
+            UTF32 **Array32 = UTF32_DeformatString(Source, Format32);
+            free(Format32);
+            StringArray     = UTF8_StringArray_Encode(Array32);
+            free(Array32);
+        } else if (Source == NULL) {
+            Log(Log_ERROR, __func__, U8("Source Pointer is NULL"));
+        } else if (Format == NULL) {
+            Log(Log_ERROR, __func__, U8("Format String is NULL"));
+        }
+        return StringArray;
+    }
+    
+    UTF16 **UTF16_DeformatString(FILE *Source, UTF16 *Format) {
+        UTF16 **StringArray = NULL;
+        if (Source != NULL && Format != NULL) {
+            UTF32 *Format32 = UTF16_Decode(Format);
+            UTF32 **Array32 = UTF32_DeformatString(Source, Format32);
+            free(Format32);
+            StringArray     = UTF16_StringArray_Encode(Array32);
+            free(Array32);
+        } else if (Source == NULL) {
+            Log(Log_ERROR, __func__, U8("Source Pointer is NULL"));
+        } else if (Format == NULL) {
+            Log(Log_ERROR, __func__, U8("Format String is NULL"));
+        }
+        return StringArray;
+    }
+    
+    UTF32 **UTF32_DeformatString(FILE *Source, UTF32 *Format) {
+        UTF32 **StringArray = NULL;
+        if (Source != NULL && Format != NULL) {
+            /*
+             Read a line from Source, including the line terminator, I want to support Windows, Unix, and Unicode line endings here.
+             Once we have the line, compare it to the Format string and get the number of specifiers and all that stuff.
+             */
+        } else if (Source == NULL) {
+            Log(Log_ERROR, __func__, U8("Source Pointer is NULL"));
+        } else if (Format == NULL) {
+            Log(Log_ERROR, __func__, U8("Format String is NULL"));
+        }
+        return StringArray;
+    }
+    
 #ifdef __cplusplus
 }
 #endif

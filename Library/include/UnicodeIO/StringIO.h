@@ -832,6 +832,30 @@ extern "C" {
 #endif /* Compiler */
     
     /*!
+     @abstract                             "Splits a string based on the specifiers in Format".
+     @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
+     @param               Format           "A string with format specifiers".
+     @return                               "Returns a StringArray containing NumFormatSpecifiers strings, one string for each specifier".
+     */
+    UTF8                **UTF8_DeformatString(FILE *Source, UTF8 *Format);
+    
+    /*!
+     @abstract                             "Splits a string based on the specifiers in Format".
+     @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
+     @param               Format           "A string with format specifiers".
+     @return                               "Returns a StringArray containing NumFormatSpecifiers strings, one string for each specifier".
+     */
+    UTF16               **UTF16_DeformatString(FILE *Source, UTF16 *Format);
+    
+    /*!
+     @abstract                             "Splits a string based on the specifiers in Format".
+     @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
+     @param               Format           "A string with format specifiers".
+     @return                               "Returns a StringArray containing NumFormatSpecifiers strings, one string for each specifier".
+     */
+    UTF32               **UTF32_DeformatString(FILE *Source, UTF32 *Format);
+    
+    /*!
      @abstract                             "Counts the number of format specifiers (percent prefixed tokens) in String".
      @param               String           "The string to count the number of format specifiers contained within".
      */
