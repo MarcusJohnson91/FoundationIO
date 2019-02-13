@@ -801,7 +801,7 @@ extern "C" {
      @abstract                             "Formats a string according to the Format string, with all of it's options".
      @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
-     @return                               "Returns the formatted string encoded using the UTF-8 format".
+     @return                               "Returns the formatted string encoded using the UTF-16 format".
      */
 #if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
     UTF16                *UTF16_FormatString(UTF16 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
@@ -818,7 +818,7 @@ extern "C" {
      @abstract                             "Formats a string according to the Format string, with all of it's options".
      @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
-     @return                               "Returns the formatted string encoded using the UTF-8 format".
+     @return                               "Returns the formatted string encoded using the UTF-32 format".
      */
 #if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
     UTF32                *UTF32_FormatString(UTF32 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
