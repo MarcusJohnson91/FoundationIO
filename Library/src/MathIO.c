@@ -29,6 +29,26 @@ extern "C" {
         uint64_t  Integer;
     } Double2Integer;
     
+    uint32_t ConvertFloat2Integer(float Decimal) {
+        Float2Integer Integer = {.Float = Decimal};
+        return Integer.Integer;
+    }
+    
+    uint64_t ConvertDouble2Integer(double Decimal) {
+        Double2Integer Integer = {.Float = Decimal};
+        return Integer.Integer;
+    }
+    
+    float ConvertInteger2Float(uint32_t Integer) {
+        Float2Integer Float = {.Integer = Integer};
+        return Float.Float;
+    }
+    
+    double ConvertInteger2Double(uint64_t Integer) {
+        Double2Integer Float = {.Integer = Integer};
+        return Float.Float;
+    }
+    
     uint8_t AbsoluteF(float Decimal) {
         return (uint8_t) ExtractExponentF(Decimal);
     }
@@ -226,50 +246,51 @@ extern "C" {
     }
     
     int8_t   ExtractSignF(float Decimal) {
-        Float2Integer Decimal2 = {.Float = Decimal};
-        int8_t Sign            = (Decimal2.Integer & 0x80000000) >> 31;
-        return Sign == 0 ? 1 : -1;
+        uint32_t Integer       = ConvertFloat2Integer(Decimal);
+        int8_t   Sign          = (Integer & 0x80000000) >> 31;
+        return   Sign == 0 ? 1 : -1;
     }
     
     int8_t   ExtractSignD(double Decimal) {
-        Double2Integer Decimal2 = {.Float = Decimal};
-        int8_t Sign             = (Decimal2.Integer & 0x8000000000000000) >> 63;
+        uint64_t Integer        = ConvertDouble2Integer(Decimal);
+        int8_t Sign             = (Integer & 0x8000000000000000) >> 63;
         return Sign == 0 ? 1 : -1;
     }
     
     int8_t  ExtractExponentF(float Decimal) {
-        Float2Integer Decimal2 = {.Float = Decimal};
-        int8_t Sign            = ExtractSignF(Decimal);
-        int8_t Exponent        = (Decimal2.Integer & 0x7F800000) >> 23;
+        uint32_t Integer       = ConvertFloat2Integer(Decimal);
+        int8_t   Sign          = ExtractSignF(Decimal);
+        int8_t   Exponent      = (Integer & 0x7F800000) >> 23;
         return (Exponent - 127) * Sign;
     }
     
     int16_t  ExtractExponentD(double Decimal) {
-        Double2Integer Decimal2 = {.Float = Decimal};
-        int8_t  Sign            = ExtractSignD(Decimal);
-        int16_t Exponent        = (Decimal2.Integer & 0x7FF0000000000000) >> 52;
+        uint64_t Integer        = ConvertDouble2Integer(Decimal);
+        int8_t   Sign           = ExtractSignD(Decimal);
+        int16_t  Exponent       = (Integer & 0x7FF0000000000000) >> 52;
         return (Exponent - 1023) * Sign;
     }
     
     int32_t  ExtractMantissaF(float Decimal) {
-        Float2Integer Decimal2 = {.Float = Decimal};
-        uint32_t Mantissa      = Decimal2.Integer & 0x7FFFFFUL;
+        uint32_t Integer       = ConvertFloat2Integer(Decimal);
+        uint32_t Mantissa      = Integer & 0x7FFFFFUL;
         return DecimalIsNormalF(Decimal) ? Mantissa |= 0x800000 : Mantissa;
     }
     
     int64_t  ExtractMantissaD(double Decimal) {
-        Double2Integer Decimal2 = {.Float = Decimal};
-        uint32_t Mantissa       = Decimal2.Integer & 0xFFFFFFFFFFFFFULL;
+        uint64_t Integer        = ConvertDouble2Integer(Decimal);
+        uint64_t Mantissa       = Integer & 0xFFFFFFFFFFFFFULL;
         return DecimalIsNormalF(Decimal) ? Mantissa |= 0x10000000000000 : Mantissa;
     }
     
     float InsertSignF(float Insertee, int8_t Sign) {
         Float2Integer Insertee2 = {.Float = Insertee};
-        Insertee2.Integer      &= (Sign << 31);
+        int8_t Sign2            = Sign == -1 ? 1 : 0;
+        Insertee2.Integer      &= (Sign2 << 31);
         return Insertee2.Float;
     }
     
-    double InsertSignD(double Insertee, bool Sign) {
+    double InsertSignD(double Insertee, int8_t Sign) {
         Double2Integer Insertee2 = {.Float = Insertee};
         Insertee2.Integer       &= (Sign << 63);
         return Insertee2.Float;
@@ -392,8 +413,8 @@ extern "C" {
     }
     
     /* Ryū specific math functions */
-    bool IsPowerOf2(uint64_t Value, uint8_t Shift) { // multipleOfPowerOf2
-        return (Value & ((1 << Shift) - 1) >> (Shift - 1)); // (16 & 31) >> 4
+    bool IsPowerOfBase(uint8_t Base, uint64_t Value) {
+        return Value % Base == 0 ? Yes : No;
     }
     /* Ryū specific math functions */
     
