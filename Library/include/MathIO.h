@@ -38,6 +38,34 @@ extern "C" {
     bool                        IsOdd(int64_t Integer);
     
     /*!
+     @abstract                                                  "Converts a Float to an integer".
+     @param                     Decimal                         "The decimal to convert".
+     @return                                                    "Integer representation of the decimal".
+     */
+    uint32_t                    ConvertFloat2Integer(float Decimal);
+    
+    /*!
+     @abstract                                                  "Converts a Double to an integer".
+     @param                     Decimal                         "The decimal to convert".
+     @return                                                    "Integer representation of the decimal".
+     */
+    uint64_t                    ConvertDouble2Integer(double Decimal);
+    
+    /*!
+     @abstract                                                  "Converts a Integer to a Float".
+     @param                     Integer                         "The integer to convert".
+     @return                                                    "float representation of the integer".
+     */
+    float                       ConvertInteger2Float(uint32_t Integer);
+    
+    /*!
+     @abstract                                                  "Converts a Integer to a Double".
+     @param                     Integer                         "The integer to convert".
+     @return                                                    "double representation of the integer".
+     */
+    double                      ConvertInteger2Double(uint64_t Integer);
+    
+    /*!
      @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
      @param                     Integer                         "The value to find the absolute value of".
      */
@@ -286,6 +314,20 @@ extern "C" {
      */
     uint8_t                     CreateBitMask(uint8_t NumBits2Select);
     
+    /*!
+     @abstract                                                  "Value Mod Base, if the remainder is 0 Value is a power of the base".
+     @param                     Base                            "The base to check".
+     @param                     Value                           "The value to check".
+     @return                                                    "Returns true if there's no remainder, otherwise returns false".
+     */
+    bool                        IsPowerOfBase(uint8_t Base, uint64_t Value);
+    
+    /*!
+     @abstract                                                  "Gets the number of digits nessicary to store Value in Base".
+     @param                     Base                            "The base to check".
+     @param                     Value                           "The value to check".
+     @return                                                    "Returns the number of digits".
+     */
     uint8_t                     GetNumDigitsInBase(uint8_t Base, int64_t Value);
     
 #define Absolute(Value)                     _Generic((Value), uint8_t:AbsoluteI, int8_t:AbsoluteI, uint16_t:AbsoluteI, int16_t:AbsoluteI, uint32_t:AbsoluteI, int32_t:AbsoluteI, uint64_t:AbsoluteI, int64_t:AbsoluteI, float:AbsoluteF, double:AbsoluteD)(Value)
