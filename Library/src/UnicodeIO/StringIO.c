@@ -1153,7 +1153,85 @@ extern "C" {
         return Inserted;
     }
     
-    void UTF8_WriteString(UTF8 *String, FILE *OutputFile) {
+    UTF8 *UTF8_ReadCodePoint(FILE *Source) { // Replaces fgetc and getc
+        UTF8 *CodePoint           = NULL;
+        if (Source != NULL) {
+            UTF8 Byte             = {0};
+            fread(&Byte, sizeof(UTF8), 1, Source);
+            uint8_t CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Byte);
+            CodePoint             = calloc(CodePointSize, sizeof(UTF8));
+            fread(CodePoint, CodePointSize, 1, Source);
+        } else {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+        return CodePoint;
+    }
+    
+    UTF16 *UTF16_ReadCodePoint(FILE *Source) { // replaces fgetwc and getwc
+        UTF16 *CodePoint          = NULL;
+        if (Source != NULL) {
+            UTF16 CodeUnit        = 0;
+            fread(&CodeUnit, sizeof(UTF16), 1, Source);
+            uint8_t CodePointSize = UTF16_GetCodePointSizeInCodeUnits(CodeUnit);
+            CodePoint             = calloc(CodePointSize, sizeof(UTF16));
+            fread(CodePoint, CodePointSize, 1, Source);
+        } else {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+        return CodePoint;
+    }
+    
+    void UTF8_WriteCodePoint(FILE *Source, UTF8 *CodePoint) { // Replaces fputc and putc
+        if (Source != NULL) {
+            uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(CodePoint);
+            fwrite(CodePoint, StringSize, 1, Source);
+        } else {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+    }
+    
+    void UTF16_WriteCodePoint(FILE *Source, UTF16 *CodePoint) { // replaces fputwc and putwc
+        if (Source != NULL) {
+            uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(CodePoint);
+            fwrite(CodePoint, StringSize, 1, Source);
+        } else {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+    }
+    
+    UTF8 *UTF8_ReadLine(FILE *Source) { // Replaces Fgets
+        UTF8 *Line = NULL;
+        if (Source != NULL) {
+            // So we need to know the size of the string to get, so count the number of codeunits that don't match any line ending.
+            uint64_t StringSizeInCodeUnits  = 0ULL;
+            uint64_t StringSizeInCodePoints = 0ULL;
+            UTF32    CurrentCodePoint       = 1;
+            do {
+                /*
+                 Loop reading a codepoint each time until we find one that is a new line character.
+                 */
+                StringSizeInCodePoints     += 1;
+                CurrentCodePoint            = UTF8_Decode(UTF8_ReadCodePoint(Source));
+            } while (CurrentCodePoint != U32('\n') || CurrentCodePoint != StringIONULLTerminator);
+            // Now we need to allocate memory for that string
+            Line                            = calloc(StringSizeInCodeUnits, sizeof(UTF8));
+        } else {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+        return Line;
+    }
+    
+    UTF16 *UTF16_ReadLine(FILE *Source) { // Replaces Fgetws
+        UTF16 *Line = NULL;
+        if (Source != NULL) {
+            
+        } else {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+        return Line;
+    }
+    
+    void UTF8_WriteLine(UTF8 *String, FILE *OutputFile) { // Replaces Fputs and puts
         if (String != NULL && OutputFile != NULL) {
             uint64_t StringSize        = UTF8_GetStringSizeInCodePoints(String);
             uint64_t CodePointsWritten = fwrite(String, sizeof(UTF8), StringSize, OutputFile);
@@ -1167,7 +1245,7 @@ extern "C" {
         }
     }
     
-    void UTF16_WriteString(UTF16 *String, FILE *OutputFile) {
+    void UTF16_WriteLine(UTF16 *String, FILE *OutputFile) { // Replaces Fputws and putws
         if (String != NULL && OutputFile != NULL) {
             uint64_t StringSize        = UTF16_GetStringSizeInCodePoints(String);
             uint64_t CodePointsWritten = fwrite(String, sizeof(UTF16), StringSize, OutputFile);
@@ -1181,7 +1259,7 @@ extern "C" {
         }
     }
     
-    void UTF32_WriteString(UTF32 *String, FILE *OutputFile) {
+    void UTF32_WriteLine(UTF32 *String, FILE *OutputFile) {
         if (String != NULL && OutputFile != NULL) {
             uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
             uint64_t CodePointsWritten = fwrite(String, sizeof(UTF32), StringSize, OutputFile);
@@ -1431,6 +1509,7 @@ extern "C" {
     }
     /* Unicode Functions */
     
+    /* Number Conversions */
     int64_t UTF8_String2Integer(StringIOBases Base, UTF8 *String) { // Replaces atoi, atol, strtol, strtoul,
         int64_t Value = 0LL;
         if (String != NULL) {
@@ -1529,27 +1608,53 @@ extern "C" {
     }
     
     UTF32 *UTF32_Integer2String(StringIOBases Base, int64_t Integer2Convert) {
-        int64_t  Sign            = 0LL;
-        int64_t  Num             = Integer2Convert;
-        uint8_t  NumDigits       = 0;
-        while (Num > 0) {
-            Num                 /= Base;
-            NumDigits           += 1;
+        UTF32   *String              = NULL;
+        int64_t  Sign                = 0LL;
+        int64_t  Num                 = Integer2Convert;
+        uint8_t  NumDigits           = 0;
+        uint8_t  Radix               = 0;
+        
+        if ((Num & 0x8000000000000000) >> 63 == 1) { // Get sign
+            Sign                     = -1;
         }
-        if (Integer2Convert < 0 && Base == (Integer | Base10)) {
-            Sign                 = -1;
-            NumDigits           +=  1;
+        
+        if (Base == (Integer | Base2)) { // Get base
+            Radix                    = 2;
+        } else if (Base == (Integer | Base8)) {
+            Radix                    = 8;
+        } else if (Base == (Integer | Base10)) {
+            Radix                    = 10;
+        } else if (Base == (Integer | Base16)) {
+            Radix                    = 16;
+        } else if (Base == Decimal || Base == Scientific || Base == Hex || Base == Shortest) {
+            Log(Log_ERROR, __func__, U8("Invalid Base %d"), Base);
         }
-        UTF32 *NumberString      = calloc(NumDigits + StringIONULLTerminatorSize, sizeof(UTF32));
-        UTF32  UpperNumerals[16] = {U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('A'), U32('B'), U32('C'), U32('D'), U32('E'), U32('F')};
-        UTF32  LowerNumerals[16] = {U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'), U32('e'), U32('f')};
-        if (NumberString != NULL) {
+        
+        if (Integer2Convert < 0) { // Get the number of output digits
+            do {
+                Num                 *= Radix;
+                NumDigits           += 1;
+            } while (Num < 0);
+        } else if (Integer2Convert > 0) {
+            do {
+                Num                 /= Radix;
+                NumDigits           += 1;
+            } while (Num > 0);
+        } else {
+            NumDigits                = 1;
+        }
+        
+        String                       = calloc(NumDigits + StringIONULLTerminatorSize, sizeof(UTF32));
+        
+        UTF32  UpperNumerals[16]     = {U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('A'), U32('B'), U32('C'), U32('D'), U32('E'), U32('F')};
+        UTF32  LowerNumerals[16]     = {U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'), U32('e'), U32('f')};
+        if (String != NULL) {
             for (uint64_t CodePoint = NumDigits - 1; CodePoint > 0; CodePoint--) {
-                int64_t CurrentDigit    = (Base == (Integer | Base10) ? AbsoluteI(Integer2Convert %= Base) : (Integer2Convert %= Base));
-                NumberString[CodePoint] = (Base == (Integer | Base16 | Uppercase) ? UpperNumerals[CurrentDigit] : LowerNumerals[CurrentDigit]);
+                int64_t CurrentDigit = (Base == (Integer | Base10) ? AbsoluteI(Integer2Convert %= Base) : (Integer2Convert %= Base));
+                String[CodePoint]    = (Base == (Integer | Base16 | Uppercase) ? UpperNumerals[CurrentDigit] : LowerNumerals[CurrentDigit]);
             }
         }
-        return NumberString;
+        return String;
     }
     
     double UTF8_String2Decimal(UTF8 *String) {
@@ -1630,12 +1735,12 @@ extern "C" {
     
     UTF32 *UTF32_Decimal2String(StringIOBases Base, double Number) {
         UTF32   *OutputString     = NULL;
+        uint64_t StringSize       = 0ULL;
         int8_t   Sign             = ExtractSignD(Number);
         int16_t  Exponent         = ExtractExponentD(Number);
         int16_t  Exponent2        = AbsoluteD(Exponent);
         uint64_t Mantissa         = ExtractMantissaD(Number);
         uint64_t Mantissa2        = AbsoluteD(Mantissa);
-        uint64_t StringSize       = 0ULL;
         bool     IsDenormal       = No;
         bool     IsNotANumber     = No;
         bool     IsInfinite       = No;
@@ -1765,6 +1870,7 @@ extern "C" {
         }
         return OutputString;
     }
+    /* Number Conversions */
     
     uint64_t UTF8_GetNumFormatSpecifiers(UTF8 *String) {
         uint64_t NumSpecifiers     = 0ULL;
@@ -3445,6 +3551,12 @@ extern "C" {
     UTF32 **UTF32_DeformatString(FILE *Source, UTF32 *Format) {
         UTF32 **StringArray = NULL;
         if (Source != NULL && Format != NULL) {
+            uint64_t NumFormatSpecifiers = UTF32_GetNumFormatSpecifiers(Format);
+            if (NumFormatSpecifiers > 0) {
+                
+            } else {
+                // Return the read line
+            }
             /*
              Read a line from Source, including the line terminator, I want to support Windows, Unix, and Unicode line endings here.
              Once we have the line, compare it to the Format string and get the number of specifiers and all that stuff.
