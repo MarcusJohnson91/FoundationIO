@@ -1224,7 +1224,19 @@ extern "C" {
     UTF16 *UTF16_ReadLine(FILE *Source) { // Replaces Fgetws
         UTF16 *Line = NULL;
         if (Source != NULL) {
-            
+            // So we need to know the size of the string to get, so count the number of codeunits that don't match any line ending.
+            uint64_t StringSizeInCodeUnits  = 0ULL;
+            uint64_t StringSizeInCodePoints = 0ULL;
+            UTF32    CurrentCodePoint       = 1;
+            do {
+                /*
+                 Loop reading a codepoint each time until we find one that is a new line character.
+                 */
+                StringSizeInCodePoints     += 1;
+                CurrentCodePoint            = UTF16_Decode(UTF16_ReadCodePoint(Source));
+            } while (CurrentCodePoint != U32('\n') || CurrentCodePoint != StringIONULLTerminator);
+            // Now we need to allocate memory for that string
+            Line                            = calloc(StringSizeInCodeUnits, sizeof(UTF16));
         } else {
             Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
         }
@@ -1261,7 +1273,7 @@ extern "C" {
     
     void UTF32_WriteLine(UTF32 *String, FILE *OutputFile) {
         if (String != NULL && OutputFile != NULL) {
-            uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t StringSize        = UTF32_GetStringSizeInCodePoints(String);
             uint64_t CodePointsWritten = fwrite(String, sizeof(UTF32), StringSize, OutputFile);
             if (CodePointsWritten < StringSize) {
                 Log(Log_ERROR, __func__, U8("Only wrote %lld codepoints of %lld"), CodePointsWritten, StringSize);
