@@ -781,6 +781,70 @@ extern "C" {
     UTF32                *UTF32_Insert(UTF32 *String, UTF32 *String2Insert, uint64_t Offset);
     
     /*!
+     @abstract                             "Reads a CodePoint from Source".
+     @remark                               "Replaces Fgetc and getc".
+     @param               Source           "The file to read from".
+     @return                               "Returns the UTF-8 encoded codepoint which will be between 1-4 CodeUnits".
+     */
+    UTF8                 *UTF8_ReadCodePoint(FILE *Source);
+    
+    /*!
+     @abstract                             "Reads a CodePoint from Source".
+     @remark                               "Replaces Fgetwc and getwc".
+     @param               Source           "The file to read from".
+     @return                               "Returns the UTF-16 encoded codepoint which will be between 1-2 CodeUnits".
+     */
+    UTF16                *UTF16_ReadCodePoint(FILE *Source);
+    
+    /*!
+     @abstract                             "Writes a CodePoint to Source".
+     @remark                               "Replaces Fputc and putc".
+     @param               Source           "The file to write to".
+     @param               CodePoint        "An array of CodeUnits containing one codepoint".
+     */
+    void                  UTF8_WriteCodePoint(FILE *Source, UTF8 *CodePoint);
+    
+    /*!
+     @abstract                             "Writes a CodePoint to Source".
+     @remark                               "Replaces Fputwc and putwc".
+     @param               Source           "The file to write to".
+     @param               CodePoint        "An array of CodeUnits containing one codepoint".
+     */
+    void                  UTF16_WriteCodePoint(FILE *Source, UTF16 *CodePoint);
+    
+    /*!
+     @abstract                             "Reads a Line (Including mewline) from Source".
+     @remark                               "Replaces Fgets and gets".
+     @param               Source           "The file to read from".
+     @return                               "Returns the UTF-8 encoded line".
+     */
+    UTF8                 *UTF8_ReadLine(FILE *Source);
+    
+    /*!
+     @abstract                             "Reads a Line (Including mewline) from Source".
+     @remark                               "Replaces Fgetws and getws".
+     @param               Source           "The file to read from".
+     @return                               "Returns the UTF-16 encoded line".
+     */
+    UTF16                *UTF16_ReadLine(FILE *Source);
+    
+    /*!
+     @abstract                             "Writes a Line (Including mewline) to Source".
+     @remark                               "Replaces Fputs and puts".
+     @param               String           "The String to write".
+     @param               OutputFile       "The file to write the string to".
+     */
+    void                  UTF8_WriteLine(UTF8 *String, FILE *OutputFile);
+    
+    /*!
+     @abstract                             "Writes a Line (Including mewline) to Source".
+     @remark                               "Replaces Fputws and putws".
+     @param               String           "The String to write".
+     @param               OutputFile       "The file to write the string to".
+     */
+    void                  UTF16_WriteLine(UTF16 *String, FILE *OutputFile);
+    
+    /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
      @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
@@ -888,14 +952,6 @@ extern "C" {
      @param               OutputFile       "a valid FILE pointer, or STDIN/STDOUT/STDERR".
      */
     void                  UTF16_WriteLine(UTF16 *String, FILE *OutputFile);
-    
-    /*!
-     @abstract                             "Writes a UTF-16 encoded string to the OutputFile using the platform's default Unicode encoding".
-     @remark                               "On Windows, Strings are output as UTF-16; on POSIX platforms (including Mac/iOS) strings are written as UTF-8".
-     @param               String           "The string to write to OutputFile (including any newlines, etc)".
-     @param               OutputFile       "a valid FILE pointer, or STDIN/STDOUT/STDERR".
-     */
-    void                  UTF32_WriteLine(UTF32 *String, FILE *OutputFile);
     
     /* StringArrays */
     
@@ -1058,7 +1114,7 @@ extern "C" {
     
 #define GetNumFormatSpecifiers(String)    _Generic((String), UTF8:UTF8_GetNumFormatSpecifiers, UTF8*:UTF8_GetNumFormatSpecifiers, UTF16:UTF16_GetNumFormatSpecifiers, UTF16*:UTF16_GetNumFormatSpecifiers, UTF32:UTF32_GetNumFormatSpecifiers, UTF32*:UTF32_GetNumFormatSpecifiers)(String)
     
-#define WriteString(String)               _Generic((String), UTF8:UTF8_WriteLine, UTF8*:UTF8_WriteLine, UTF16:UTF16_WriteLine, UTF16*:UTF16_WriteLine, UTF32:UTF32_WriteLine, UTF32*:UTF32_WriteLine)(String)
+#define WriteString(String)               _Generic((String), UTF8:UTF8_WriteLine, UTF8*:UTF8_WriteLine, UTF16:UTF16_WriteLine, UTF16*:UTF16_WriteLine)(String)
     
 #define Clone(String)                     _Generic((String), UTF8:UTF8_Clone, UTF8*:UTF8_Clone, UTF16:UTF16_Clone, UTF16*:UTF16_Clone, UTF32:UTF32_Clone, UTF32*:UTF32_Clone)(String)
     
