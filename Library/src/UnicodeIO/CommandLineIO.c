@@ -16,6 +16,8 @@
 extern "C" {
 #endif
     
+#define NULLTerminatorSize (1)
+    
     /*!
      @struct                 CommandLineSwitch
      @abstract                                           "Contains the data to support a switch".
@@ -413,14 +415,14 @@ extern "C" {
             uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
             UTF8     *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF8));
             for (uint8_t String = 0; String < NumItems2Display - 1; String++) { // Actually create the strings
-                                                                            // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
+                                                                                // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 uint64_t HalfOfTheIndicators = (PercentComplete / 2);
                 UTF8    *Indicator           = calloc(CommandLineIO_GetTerminalWidth(), sizeof(UTF8));
-                UTF8_Insert(Indicator, '-', 0);
-                UTF8    *FormattedString     = UTF8_FormatString(U8("[%s%s %lld/%lld %hhu/%s %s]"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF8);
-                UTF8_WriteString(FormattedString, stdout);
+                UTF8    *IndicatorFinal      = UTF8_Insert(Indicator, "-", 0);
+                UTF8    *FormattedString     = UTF8_FormatString(U8("[%s%s %lld/%lld %hhu/%s %s]"), IndicatorFinal, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF8);
+                UTF8_WriteLine(FormattedString, stdout);
                 free(Indicator);
             }
             free(StringSize);
@@ -457,13 +459,13 @@ extern "C" {
             uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
             UTF16    *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF16));
             for (uint8_t String = 0; String < NumItems2Display - 1; String++) { // Actually create the strings
-                                                                            // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
+                                                                                // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
                 uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 UTF16  *Indicator           = calloc(CommandLineIO_GetTerminalWidth, sizeof(UTF16));
-                UTF8_Insert(Indicator, U16('-'), 0);
-                UTF16  *FormattedString     = UTF16_FormatString(U16("[%s%s %lld/%lld %hhu/%s %s]"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF16);
-                UTF16_WriteString(FormattedString, stdout);
+                UTF16  *IndicatorFinal      = UTF16_Insert(Indicator, U16("-"), 0);
+                UTF16  *FormattedString     = UTF16_FormatString(U16("[%s%s %lld/%lld %hhu/%s %s]"), IndicatorFinal, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF16);
+                UTF16_WriteLine(FormattedString, stdout);
                 free(Indicator);
             }
             free(StringSize);
@@ -609,7 +611,9 @@ extern "C" {
             UTF8 *Name = UTF8_Encode(CLI->ProgramName);
             
             UTF8 *ProgramsOptions = UTF8_FormatString(U8("%s's Options (-|--|/):%s"), Name, NewLineUTF8);
-            UTF8_WriteString(ProgramsOptions, stdout);
+            UTF8_WriteLine(ProgramsOptions, stdout);
+            free(Name);
+            free(ProgramsOptions);
             for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                 CLISwitchTypes CurrentSwitchType = CLI->SwitchIDs[Switch].SwitchType;
                 
@@ -618,7 +622,7 @@ extern "C" {
                 
                 UTF8 *SwitchInfo        = UTF8_FormatString(U8("%s: %s%s"), SwitchName, SwitchDescription, NewLineUTF8);
                 
-                UTF8_WriteString(SwitchInfo, stdout);
+                UTF8_WriteLine(SwitchInfo, stdout);
                 if (CurrentSwitchType == SwitchMayHaveSlaves && CLI->SwitchIDs[Switch].NumPotentialSlaves > 0) {
                     for (int64_t SlaveSwitch = 0LL; SlaveSwitch < CLI->SwitchIDs[Switch].NumPotentialSlaves - 1; SlaveSwitch++) {
                         UTF8 *SlaveName        = UTF8_Encode(CLI->SwitchIDs[SlaveSwitch].Name);
@@ -626,9 +630,16 @@ extern "C" {
                         
                         UTF8 *SlaveSwitchInfo  = UTF8_FormatString(U8("\t%s: %s%s"), SlaveName, SlaveDescription, NewLineUTF8);
                         
-                        UTF8_WriteString(SlaveSwitchInfo, stdout);
+                        UTF8_WriteLine(SlaveSwitchInfo, stdout);
+                        
+                        free(SlaveName);
+                        free(SlaveDescription);
+                        free(SlaveSwitchInfo);
                     }
                 }
+                free(SwitchName);
+                free(SwitchDescription);
+                free(SwitchInfo);
             }
         } else {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
@@ -640,7 +651,9 @@ extern "C" {
             UTF16 *Name = UTF16_Encode(CLI->ProgramName);
             
             UTF16 *ProgramsOptions = UTF16_FormatString(U16("%s's Options (-|--|/):%s"), Name, NewLineUTF16);
-            UTF16_WriteString(ProgramsOptions, stdout);
+            UTF16_WriteLine(ProgramsOptions, stdout);
+            free(Name);
+            free(ProgramsOptions);
             for (int64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
                 CLISwitchTypes CurrentSwitchType = CLI->SwitchIDs[Switch].SwitchType;
                 
@@ -649,7 +662,7 @@ extern "C" {
                 
                 UTF16 *SwitchInfo        = UTF16_FormatString(U16("%s: %s%s"), SwitchName, SwitchDescription, NewLineUTF16);
                 
-                UTF16_WriteString(SwitchInfo, stdout);
+                UTF16_WriteLine(SwitchInfo, stdout);
                 if (CurrentSwitchType == SwitchMayHaveSlaves && CLI->SwitchIDs[Switch].NumPotentialSlaves > 0) {
                     for (int64_t SlaveSwitch = 0LL; SlaveSwitch < CLI->SwitchIDs[Switch].NumPotentialSlaves - 1; SlaveSwitch++) {
                         UTF16 *SlaveName        = UTF16_Encode(CLI->SwitchIDs[SlaveSwitch].Name);
@@ -657,9 +670,15 @@ extern "C" {
                         
                         UTF16 *SlaveSwitchInfo = UTF16_FormatString(U16("\t%s: %s%s"), SlaveName, SlaveDescription, NewLineUTF16);
                         
-                        UTF16_WriteString(SlaveSwitchInfo, stdout);
+                        UTF16_WriteLine(SlaveSwitchInfo, stdout);
+                        free(SlaveName);
+                        free(SlaveDescription);
+                        free(SlaveSwitchInfo);
                     }
                 }
+                free(SwitchName);
+                free(SwitchDescription);
+                free(SwitchInfo);
             }
         } else {
             Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
@@ -680,61 +699,62 @@ extern "C" {
             
             if (Name != NULL) { // TrimSilence, v. 0.1.1 by Marcus Johnson © 2018+
                 UTF8 *NameString      = UTF8_FormatString(U8("%s,"), Name);
-                UTF8_WriteString(NameString, stdout);
+                UTF8_WriteLine(NameString, stdout);
+                free(NameString);
                 
                 UTF8 *FormattedString = UTF8_FormatString(U8(" %s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, NewLineUTF16);
-                UTF8_WriteString(FormattedString, stdout);
+                UTF8_WriteLine(FormattedString, stdout);
             }
             
             if (Version != NULL) {
                 UTF8 *VersionString   = UTF8_FormatString(U8(" v. %s"), Version);
-                UTF8_WriteString(VersionString, stdout);
+                UTF8_WriteLine(VersionString, stdout);
             }
             
             if (Author != NULL) {
                 UTF8 *AuthorString   = UTF8_FormatString(U8(" by %s"), Author);
-                UTF8_WriteString(AuthorString, stdout);
+                UTF8_WriteLine(AuthorString, stdout);
             }
             
             if (Copyright != NULL) {
                 UTF8 *CopyrightString   = UTF8_FormatString(U8(" © %s\n"), Copyright);
-                UTF8_WriteString(CopyrightString, stdout);
+                UTF8_WriteLine(CopyrightString, stdout);
             }
             
             if (LicenseType == PermissiveLicense || LicenseType == CopyleftLicense) {
                 if (Description != NULL) {
                     UTF8 *DescriptionString   = UTF8_FormatString(U8("%s"), Description);
-                    UTF8_WriteString(DescriptionString, stdout);
+                    UTF8_WriteLine(DescriptionString, stdout);
                 }
                 
                 if (LicenseName != NULL) { // Released under the "BSD 3 clause" license
                     UTF8 *LicenseNameString   = UTF8_FormatString(U8(" Released under the \"%s\" license"), LicenseName);
-                    UTF8_WriteString(LicenseNameString, stdout);
+                    UTF8_WriteLine(LicenseNameString, stdout);
                 }
                 
                 if (LicenseDescription != NULL) {
                     UTF8 *LicenseDescriptionString   = UTF8_FormatString(U8(" %s,"), LicenseDescription);
-                    UTF8_WriteString(LicenseDescriptionString, stdout);
+                    UTF8_WriteLine(LicenseDescriptionString, stdout);
                 }
                 
                 if (LicenseURL != NULL) {
                     UTF8 *LicenseURLString   = UTF8_FormatString(U8(" %s\n"), LicenseURL);
-                    UTF8_WriteString(LicenseURLString, stdout);
+                    UTF8_WriteLine(LicenseURLString, stdout);
                 }
             } else if (LicenseType == ProprietaryLicense) {
                 if (Description != NULL) {
                     UTF8 *DescriptionString   = UTF8_FormatString(U8("%s"), Description);
-                    UTF8_WriteString(DescriptionString, stdout);
+                    UTF8_WriteLine(DescriptionString, stdout);
                 }
                 
                 if (LicenseDescription != NULL) {
                     UTF8 *LicenseDescriptionString   = UTF8_FormatString(U8(" By using this software, you agree to the End User License Agreement %s,"), LicenseDescription);
-                    UTF8_WriteString(LicenseDescriptionString, stdout);
+                    UTF8_WriteLine(LicenseDescriptionString, stdout);
                 }
                 
                 if (LicenseURL != NULL) {
                     UTF8 *LicenseURLString   = UTF8_FormatString(U8(" available at: %s\n"), LicenseURL);
-                    UTF8_WriteString(LicenseURLString, stdout);
+                    UTF8_WriteLine(LicenseURLString, stdout);
                 }
             }
         } else {
@@ -756,61 +776,61 @@ extern "C" {
             
             if (Name != NULL) {
                 UTF16 *NameString      = UTF16_FormatString(U16("%s,"), Name);
-                UTF16_WriteString(NameString, stdout);
+                UTF16_WriteLine(NameString, stdout);
                 
                 UTF16 *FormattedString = UTF16_FormatString(U16(" %s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, NewLineUTF16);
-                UTF16_WriteString(FormattedString, stdout);
+                UTF16_WriteLine(FormattedString, stdout);
             }
             
             if (Version != NULL) {
                 UTF16 *VersionString   = UTF16_FormatString(U16(" v. %s"), Version);
-                UTF16_WriteString(VersionString, stdout);
+                UTF16_WriteLine(VersionString, stdout);
             }
             
             if (Author != NULL) {
                 UTF16 *AuthorString   = UTF16_FormatString(U16(" by %s"), Author);
-                UTF16_WriteString(AuthorString, stdout);
+                UTF16_WriteLine(AuthorString, stdout);
             }
             
             if (Copyright != NULL) {
                 UTF16 *CopyrightString   = UTF16_FormatString(U16(" © %s\n"), Copyright);
-                UTF16_WriteString(CopyrightString, stdout);
+                UTF16_WriteLine(CopyrightString, stdout);
             }
             
             if (LicenseType == PermissiveLicense || LicenseType == CopyleftLicense) {
                 if (Description != NULL) {
                     UTF16 *DescriptionString   = UTF16_FormatString(U16("%s"), Description);
-                    UTF16_WriteString(DescriptionString, stdout);
+                    UTF16_WriteLine(DescriptionString, stdout);
                 }
                 
                 if (LicenseName != NULL) {
                     UTF16 *LicenseNameString   = UTF16_FormatString(U16(" Released under the \"%s\" license"), LicenseName);
-                    UTF16_WriteString(LicenseNameString, stdout);
+                    UTF16_WriteLine(LicenseNameString, stdout);
                 }
                 
                 if (LicenseDescription != NULL) {
                     UTF16 *LicenseDescriptionString   = UTF16_FormatString(U16(" %s,"), LicenseDescription);
-                    UTF16_WriteString(LicenseDescriptionString, stdout);
+                    UTF16_WriteLine(LicenseDescriptionString, stdout);
                 }
                 
                 if (LicenseURL != NULL) {
                     UTF16 *LicenseURLString   = UTF16_FormatString(U16(" %s\n"), LicenseURL);
-                    UTF16_WriteString(LicenseURLString, stdout);
+                    UTF16_WriteLine(LicenseURLString, stdout);
                 }
             } else if (LicenseType == ProprietaryLicense) {
                 if (Description != NULL) {
                     UTF16 *DescriptionString   = UTF16_FormatString(U16("%s"), Description);
-                    UTF16_WriteString(DescriptionString, stdout);
+                    UTF16_WriteLine(DescriptionString, stdout);
                 }
                 
                 if (LicenseDescription != NULL) {
                     UTF16 *LicenseDescriptionString   = UTF16_FormatString(U16(" By using this software, you agree to the End User License Agreement %s,"), LicenseDescription);
-                    UTF16_WriteString(LicenseDescriptionString, stdout);
+                    UTF16_WriteLine(LicenseDescriptionString, stdout);
                 }
                 
                 if (LicenseURL != NULL) {
                     UTF16 *LicenseURLString   = UTF16_FormatString(U16(" available at: %s\n"), LicenseURL);
-                    UTF16_WriteString(LicenseURLString, stdout);
+                    UTF16_WriteLine(LicenseURLString, stdout);
                 }
             }
         } else {
@@ -873,6 +893,8 @@ extern "C" {
                             }
                             free(PotentialSlaveArg);
                         }
+                    } else {
+                        // Invalid argument error
                     }
                 }
                 free(Argument);
