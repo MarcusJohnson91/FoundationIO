@@ -1270,20 +1270,6 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
         }
     }
-    
-    void UTF32_WriteLine(UTF32 *String, FILE *OutputFile) {
-        if (String != NULL && OutputFile != NULL) {
-            uint64_t StringSize        = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t CodePointsWritten = fwrite(String, sizeof(UTF32), StringSize, OutputFile);
-            if (CodePointsWritten < StringSize) {
-                Log(Log_ERROR, __func__, U8("Only wrote %lld codepoints of %lld"), CodePointsWritten, StringSize);
-            }
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (OutputFile == NULL) {
-            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
-        }
-    }
     /* Medium Functions */
     
     /* Fancy functions */
