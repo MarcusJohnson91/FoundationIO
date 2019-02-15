@@ -1211,7 +1211,8 @@ extern "C" {
                  Loop reading a codepoint each time until we find one that is a new line character.
                  */
                 StringSizeInCodePoints     += 1;
-                CurrentCodePoint            = UTF8_Decode(UTF8_ReadCodePoint(Source));
+                UTF8 *CodePoint             = UTF8_ReadCodePoint(Source);
+                CurrentCodePoint            = UTF8_Decode(CodePoint);
             } while (CurrentCodePoint != U32('\n') || CurrentCodePoint != StringIONULLTerminator);
             // Now we need to allocate memory for that string
             Line                            = calloc(StringSizeInCodeUnits, sizeof(UTF8));
@@ -1233,7 +1234,8 @@ extern "C" {
                  Loop reading a codepoint each time until we find one that is a new line character.
                  */
                 StringSizeInCodePoints     += 1;
-                CurrentCodePoint            = UTF16_Decode(UTF16_ReadCodePoint(Source));
+                UTF16 *CodePoint            = UTF16_ReadCodePoint(Source);
+                CurrentCodePoint            = UTF16_Decode(CodePoint);
             } while (CurrentCodePoint != U32('\n') || CurrentCodePoint != StringIONULLTerminator);
             // Now we need to allocate memory for that string
             Line                            = calloc(StringSizeInCodeUnits, sizeof(UTF16));
