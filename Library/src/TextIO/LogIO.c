@@ -119,7 +119,6 @@ extern "C" {
         UTF8 *VariadicString = UTF8_FormatString(Description, VariadicArguments);
         va_end(VariadicArguments);
         
-        
         if (Log_ProgramName != NULL) {
             UTF8  *FormattedString = UTF8_FormatString(U8("%s: %s in %s: \"%s\"%s"), Log_ProgramName, (Severity == Log_ERROR ? Error : Test), FunctionName, VariadicString, NewLineUTF8);
             UTF8_WriteLine(FormattedString, Log_LogFile == NULL ? stderr : Log_LogFile);
