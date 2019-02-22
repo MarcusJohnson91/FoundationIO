@@ -34,8 +34,10 @@ set(libFoundationIO_PublicHeaders
 "${libFoundationIO_Dir}/include/CommandLineIO.h"
 "${libFoundationIO_Dir}/include/ContainerIO.h"
 "${libFoundationIO_Dir}/include/Log.h"
+"${libFoundationIO_Dir}/include/Macros.h"
 "${libFoundationIO_Dir}/include/Math.h"
 "${libFoundationIO_Dir}/include/StringIO.h"
+"${libFoundationIO_Dir}/include/TestIO.h"
 )
 
 set(libFoundationIO_Sources
@@ -43,8 +45,10 @@ set(libFoundationIO_Sources
 "${libFoundationIO_Dir}/src/CommandLineIO.c"
 "${libFoundationIO_Dir}/src/ContainerIO.c"
 "${libFoundationIO_Dir}/src/Log.c"
+"${libFoundationIO_Dir}/src/Macros.c"
 "${libFoundationIO_Dir}/src/Math.c"
 "${libFoundationIO_Dir}/src/StringIO.c"
+"${libFoundationIO_Dir}/src/TestIO.c"
 )
 
 add_library(FoundationIO ${libFoundationIO_Sources} ${libFoundationIO_PublicHeaders})
