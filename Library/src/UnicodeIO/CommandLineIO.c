@@ -16,8 +16,6 @@
 extern "C" {
 #endif
     
-#define NULLTerminatorSize (1)
-    
     /*!
      @struct                 CommandLineSwitch
      @abstract                                           "Contains the data to support a switch".
