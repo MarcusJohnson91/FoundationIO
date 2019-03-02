@@ -236,31 +236,31 @@ extern "C" {
     
     /*!
      @abstract                                                  "Peeks (reads but without recording that it's been read) bits from BitBuffer".
+     @param                     BitB                            "BitBuffer Pointer".
      @param                     ByteOrder                       "What byte order are the bits to be peeked"?
      @param                     BitOrder                        "What bit order are the bits to be peeked"?
-     @param                     BitB                            "BitBuffer Pointer".
      @param                     Bits2Peek                       "The number of bits to peek from the BitBuffer".
      */
-    uint64_t                    BitBuffer_PeekBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Peek);
+    uint64_t                    BitBuffer_PeekBits(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, const uint8_t Bits2Peek);
     
     /*!
      @abstract                                                  "Reads bits from BitBuffer".
+     @param                     BitB                            "BitBuffer Pointer".
      @param                     ByteOrder                       "What byte order are the bits to be read"?
      @param                     BitOrder                        "What bit order are the bits to be read"?
-     @param                     BitB                            "BitBuffer Pointer".
      @param                     Bits2Read                       "The number of bits to read from the BitBuffer".
      */
-    uint64_t                    BitBuffer_ReadBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t Bits2Read);
+    uint64_t                    BitBuffer_ReadBits(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, const uint8_t Bits2Read);
     
     /*!
      @abstract                                                  "Reads unary encoded fields from the BitBuffer".
+     @param                     BitB                            "BitBuffer Pointer".
      @param                     ByteOrder                       "What byte order are the bits to be read"?
      @param                     BitOrder                        "What bit order are the bits to be read"?
-     @param                     BitB                            "BitBuffer Pointer".
      @param                     UnaryType                       "What type of Unary coding are we reading"?
      @param                     StopBit                         "Is the stop bit a one or a zero"?
      */
-    uint64_t                    BitBuffer_ReadUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, const bool StopBit);
+    uint64_t                    BitBuffer_ReadUnary(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, UnaryTypes UnaryType, const bool StopBit);
     
     /*!
      @abstract                                                  "Reads data from the Bitbuffer until it stops matching the UTF-8 format".
@@ -294,32 +294,32 @@ extern "C" {
     
     /*!
      @abstract                                                  "Reads a BinaryGUUID/GUUIDString from the BitBuffer".
+     @param                     BitB                            "BitBuffer Pointer".
      @param                     GUUIDType                       "The type of GUUID to read".
-     @param                     BitB                            "Pointer to an instance of BitBuffer".
      @return                                                    "Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BinaryGUUIDSize or BinaryGUUIDSize bytes".
      */
     uint8_t                    *BitBuffer_ReadGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType);
     
     /*!
      @abstract                                                  "Writes bits to the BitBuffer".
+     @param                     BitB                            "BitBuffer Pointer".
      @param                     ByteOrder                       "What byte order should the Bits2Write be in"?
      @param                     BitOrder                        "What bit order should the Bits2Write be in"?
-     @param                     BitB                            "BitBuffer Pointer".
      @param                     NumBits2Write                   "How many bits from Bits2Write should we write?".
      @param                     Bits2Write                      "the actual data to write".
      */
-    void                        BitBuffer_WriteBits(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    void                        BitBuffer_WriteBits(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, const uint8_t NumBits2Write, const uint64_t Bits2Write);
     
     /*!
      @abstract                                                  "Writes unary encoded bits to the BitBuffer".
+     @param                     BitB                            "BitBuffer Pointer".
      @param                     ByteOrder                       "What byte order should the Bits2Write be in"?
      @param                     BitOrder                        "What bit order should the Bits2Write be in"?
-     @param                     BitB                            "BitBuffer Pointer".
      @param                     UnaryType                       "What type of Unary coding should we use"?
      @param                     StopBit                         "Is the stop bit a one or a zero"?
      @param                     Bits2Write                      "the actual data to write".
      */
-    void                        BitBuffer_WriteUnary(ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, UnaryTypes UnaryType, bool StopBit, const uint8_t Bits2Write);
+    void                        BitBuffer_WriteUnary(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, UnaryTypes UnaryType, bool StopBit, const uint8_t Bits2Write);
     
     /*!
      @abstract                                                  "Writes a UTF-8 encoded string to the BitBuffer".
@@ -338,7 +338,7 @@ extern "C" {
     
     /*!
      @abstract                                                  "Writes a GUUID to the BitBuffer".
-     @param                     BitB                            "Pointer to an instance of BitBuffer".
+     @param                     BitB                            "BitBuffer Pointer".
      @param                     GUUID2Write                     "Pointer to the GUUID you want to write".
      */
     void                        BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, const uint8_t *GUUID2Write);
