@@ -312,7 +312,14 @@ extern "C" {
      @param                     NumBits2Select                  "The number of bits to select".
      @return                                                    "Returns the mask".
      */
-    uint8_t                     CreateBitMask(uint8_t NumBits2Select);
+    uint8_t                     CreateBitMaskLSBit(const uint8_t NumBits2Select);
+    
+    /*!
+     @abstract                                                  "Creates a bitmask".
+     @param                     NumBits2Select                  "The number of bits to select".
+     @return                                                    "Returns the mask".
+     */
+    uint8_t                     CreateBitMaskMSBit(const uint8_t NumBits2Select);
     
     /*!
      @abstract                                                  "Value Mod Base, if the remainder is 0 Value is a power of the base".
