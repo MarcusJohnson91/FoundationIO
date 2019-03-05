@@ -263,74 +263,118 @@ extern "C" {
     }
     
     /* BitBuffer Resource Management */
-    static void BitBuffer_InsertBits(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, const uint8_t NumBits2Insert, uint64_t Data2Insert) {
-        if (BitB != NULL && BitB->NumBits >= BitB->BitOffset + NumBits2Insert) {
-            uint8_t  Bits                         = NumBits2Insert;
-            while (Bits > 0) {
-                if (NumBits2Insert % 8 == 0 && BitB->BitOffset % 8 == 0) {
-                    for (uint8_t Byte = 0; Byte < Bits2Bytes(Bits, No); Byte++) {
-                        BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)] = Data2Insert & 0xFF << Byte * 8;
-                    }
-                } else {
-                    uint64_t ByteOffset               = 0;
-#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE) // FIXME: Assuming all platforms use LE byte order
-                    ByteOffset                        = Bits2Bytes(BitB->BitOffset + 1, No);
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                    ByteOffset                        = Bits2Bytes(BitB->BitOffset + 1 + NumBits2Insert, No);
-#endif
-                    uint8_t  Bits2InsertForThisByte   = 8 - (BitB->BitOffset % 8);
-                    uint8_t  BitMask                  = 0;
-                    uint8_t  Byte                     = 0;
-                    BitMask                           = BitB->Buffer[ByteOffset + 1] & CreateBitMask(Bits2InsertForThisByte);
+    static void BitBuffer_AppendBits(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, const uint8_t NumBits2Append, uint64_t Bits2Append) {
+        if (BitB != NULL && ByteOrder != UnknownByteOrder && BitOrder != UnknownBitOrder) {
+            if (BitB->BitOffset + NumBits2Append <= BitB->NumBits) {
+                uint64_t NunBits2Add                    = NumBits2Append;
+                uint64_t ActualData                     = Bits2Append;
+                if (ByteOrder == LSByteFirst) {
                     if (BitOrder == LSBitFirst) {
-                        Byte                        >>= 8 - Bits2InsertForThisByte;
+                        do {
+                            uint8_t  NumBitsForThisByte = Min(NunBits2Add, 8 - (BitB->BitOffset % 8)); // 10, 3; 3
+                            uint8_t  Mask               = CreateBitMaskLSBit(NumBitsForThisByte); // (2^3) - 1
+                            uint64_t Data               = 0ULL;
+                            Data                        = (ActualData & Mask);
+                            uint64_t CurrentByte        = BitB->BitOffset % 8;
+                            BitB->Buffer[CurrentByte]  |= Data; // We may need to shift the Data around so it can lign up with the buffer's byte
+                            NunBits2Add                -= NumBitsForThisByte;
+                        } while (NunBits2Add > 0);
+                        
+                        /*
+                         Value       = 512 aka 0b1000000000
+                         Bits2Append = 10
+                         Output      = [00000000] [01000000]
+                         BitOffset   = 13
+                         BitsInByte1 = 3
+                         BitsInByte2 = 8
+                         Actual Data = 0[XXXXXXXX] 1[XXXXXYYY] 2[YYYYYYYZ] Y = Bits2Append
+                         Real Data   = 0[XXXXXXXX] 1[XXXXX000] 2[0000001Z] Y = Bits2Append
+                        */
                     } else if (BitOrder == MSBitFirst) {
-                        Byte                        <<= 8 - Bits2InsertForThisByte;
+#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+                        /*
+                         
+                         */
+#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+                        /*
+                         
+                         */
+#endif
+                        for (int64_t Byte = Bits2Bytes(BitB->BitOffset, No); Byte < Bits2Bytes(BitB->BitOffset + NumBits2Append, No); Byte++) {
+                            // Extract what you need from each byte
+                        }
                     }
-                    BitB->Buffer[ByteOffset]          = Byte & BitMask;
+                } else if (ByteOrder == MSByteFirst) {
+                    if (BitOrder == LSBitFirst) {
+#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+                        /*
+                         
+                         */
+#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+                        /*
+                         
+                         */
+#endif
+                    } else if (BitOrder == MSBitFirst) {
+#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+                        /*
+                         
+                         */
+#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+                        /*
+                         
+                         */
+#endif
+                    }
                 }
+            } else {
+                Log(Log_ERROR, __func__, U8("NumBits2Append %d is larger than the BitBuffer can provide %lld"), NumBits2Append, BitB->NumBits);
             }
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
-        } else if (BitB->NumBits >= BitB->BitOffset + NumBits2Insert) {
-            Log(Log_ERROR, __func__, U8("Not enough room in BitB to insert %d bits"), NumBits2Insert);
+        } else if (ByteOrder == UnknownByteOrder) {
+            Log(Log_ERROR, __func__, U8("ByteOrder Unknown is invalid"));
+        } else if (BitOrder == UnknownBitOrder) {
+            Log(Log_ERROR, __func__, U8("BitOrder Unknown is invalid"));
         }
     }
     
-    static uint64_t BitBuffer_ExtractBits(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, const uint8_t NumBits2Extract) { // ByteOrders ByteOrder, BitOrders BitOrder, BitBuffer *BitB, const uint8_t NumBits2Extract
+    static uint64_t BitBuffer_ExtractBits(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, const uint8_t NumBits2Extract) {
         uint64_t     ExtractedBits                    = 0ULL;
-        if (BitB != NULL && BitB->NumBits >= BitB->BitOffset + 1 + NumBits2Extract) {
-            uint8_t  Bits                             = NumBits2Extract;
-            while (Bits > 0) {
-                if (NumBits2Extract % 8 == 0 && BitB->BitOffset % 8 == 0) {
-                    for (uint8_t Byte = 0; Byte < Bits2Bytes(Bits, No); Byte++) {
-                        ExtractedBits                 = BitB->Buffer[Bits2Bytes(BitB->BitOffset, No)];
-                    }
-                } else {
-                    uint64_t ByteOffset               = 0;
-#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE) // FIXME: Assuming all platforms use LE byte order
-                    ByteOffset                        = Bits2Bytes(BitB->BitOffset + 1, No);
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                    ByteOffset                        = Bits2Bytes(BitB->BitOffset + 1 + NumBits2Extract, No);
-#endif
-                    uint8_t  Bits2ExtractFromThisByte = 8 - (BitB->BitOffset % 8);
-                    uint8_t  BitMask                  = 0;
-                    uint8_t  Byte                     = 0;
-                    BitMask                           = BitB->Buffer[ByteOffset + 1] & CreateBitMask(Bits2ExtractFromThisByte);
-                    Byte                              = BitB->Buffer[ByteOffset] & BitMask;
+        if (BitB != NULL && ByteOrder != UnknownByteOrder && BitOrder != UnknownBitOrder) {
+            if (BitB->BitOffset + NumBits2Extract <= BitB->NumBits) {
+                if (ByteOrder == LSByteFirst) {
                     if (BitOrder == LSBitFirst) {
-                        Byte                        >>= 8 - Bits2ExtractFromThisByte;
+                        // Start reading from the end, loop to the beginning
+                        for (int64_t Byte = Bits2Bytes(BitB->BitOffset + NumBits2Extract, No); Byte > Bits2Bytes(BitB->BitOffset, No); Byte--) {
+                            // Extract what you need from each byte, read the byte from lSBit first
+                            uint8_t CurrentBits = Bits2ExtractFromByte(BitB->BitOffset);
+                            uint8_t Mask        = CreateBitMaskLSBit(CurrentBits);
+                            uint8_t Bits        = BitB->Buffer[Byte] & Mask;
+
+                        }
                     } else if (BitOrder == MSBitFirst) {
-                        Byte                        <<= 8 - Bits2ExtractFromThisByte;
+                        // Start the byte at the end, and the bit at the beginning.
+                        for (int64_t Byte = Bits2Bytes(BitB->BitOffset, No); Byte < Bits2Bytes(BitB->BitOffset + NumBits2Extract, No); Byte++) {
+                            // Extract what you need from each byte
+                        }
                     }
-                    ExtractedBits                     = Byte;
+                } else if (ByteOrder == MSByteFirst) {
+                    if (BitOrder == LSBitFirst) {
+                        // Start the byte at the end, and the bit at the beginning
+                    } else if (BitOrder == MSBitFirst) {
+                        // Start reading from the beginning, read to the end
+                    }
                 }
+            } else {
+                Log(Log_ERROR, __func__, U8("NumBits2Extract %d is larger than the BitBuffer can provide %lld"), NumBits2Extract, BitB->NumBits);
             }
-            BitB->BitOffset                          += NumBits2Extract;
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
-        } else if (BitB->NumBits >= BitB->BitOffset + NumBits2Extract) {
-            Log(Log_ERROR, __func__, U8("Not enough bits in BitB to extract %d bits"), NumBits2Extract);
+        } else if (ByteOrder == UnknownByteOrder) {
+            Log(Log_ERROR, __func__, U8("ByteOrder Unknown is invalid"));
+        } else if (BitOrder == UnknownBitOrder) {
+            Log(Log_ERROR, __func__, U8("BitOrder Unknown is invalid"));
         }
         return ExtractedBits;
     }
@@ -469,7 +513,7 @@ extern "C" {
     
     void     BitBuffer_WriteBits(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, const uint8_t NumBits2Write, const uint64_t Bits2Write) {
         if (BitB != NULL && NumBits2Write >= 1 && NumBits2Write <= 64) {
-            BitBuffer_InsertBits(BitB, ByteOrder, BitOrder, NumBits2Write, Bits2Write);
+            BitBuffer_AppendBits(BitB, ByteOrder, BitOrder, NumBits2Write, Bits2Write);
         } else if (BitB == NULL) {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
@@ -484,8 +528,8 @@ extern "C" {
             if (UnaryType == CountUnary) {
                 Field2Write -= 1;
             }
-            BitBuffer_InsertBits(BitB, ByteOrder, BitOrder, Logarithm(2, Field2Write), StopBit ^ 1);
-            BitBuffer_InsertBits(BitB, ByteOrder, BitOrder, 1, StopBit);
+            BitBuffer_AppendBits(BitB, ByteOrder, BitOrder, Logarithm(2, Field2Write), StopBit ^ 1);
+            BitBuffer_AppendBits(BitB, ByteOrder, BitOrder, 1, StopBit);
         } else {
             Log(Log_ERROR, __func__, U8("BitBuffer Pointer is NULL"));
         }
@@ -497,7 +541,7 @@ extern "C" {
             int64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
             if (BitsAvailable >= Bytes2Bits(StringSize)) {
                 for (int64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
-                    BitBuffer_InsertBits(BitB, MSByteFirst, LSBitFirst, 8, String2Write[CodeUnit]);
+                    BitBuffer_AppendBits(BitB, MSByteFirst, LSBitFirst, 8, String2Write[CodeUnit]);
                 }
             } else {
                 Log(Log_ERROR, __func__, U8("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
@@ -518,17 +562,17 @@ extern "C" {
                 if (ByteOrder == UTF16BOM_BE) {
                     for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
 #if    (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                        BitBuffer_InsertBits(BitB, MSByteFirst, LSBitFirst, 16, String2Write[CodeUnit]);
+                        BitBuffer_AppendBits(BitB, MSByteFirst, LSBitFirst, 16, String2Write[CodeUnit]);
 #elif  (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                        BitBuffer_InsertBits(BitB, LSByteFirst, LSBitFirst, 16, String2Write[CodeUnit]);
+                        BitBuffer_AppendBits(BitB, LSByteFirst, LSBitFirst, 16, String2Write[CodeUnit]);
 #endif
                     }
                 } else if (ByteOrder == UTF16BOM_LE) {
                     for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
 #if    (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                        BitBuffer_InsertBits(BitB, LSByteFirst, LSBitFirst, 16, String2Write[CodeUnit]);
+                        BitBuffer_AppendBits(BitB, LSByteFirst, LSBitFirst, 16, String2Write[CodeUnit]);
 #elif  (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                        BitBuffer_InsertBits(BitB, MSByteFirst, LSBitFirst, 16, String2Write[CodeUnit]);
+                        BitBuffer_AppendBits(BitB, MSByteFirst, LSBitFirst, 16, String2Write[CodeUnit]);
 #endif
                     }
                 }
