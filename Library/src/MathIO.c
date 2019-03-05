@@ -402,12 +402,20 @@ extern "C" {
         return 8 - (Offset % 8);
     }
     
-    uint8_t CreateBitMask(uint8_t NumBits2Select) {
-        uint8_t Mask = 0;
-#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-        Mask = Exponentiate(2, NumBits2Select) >> (8 - NumBits2Select);
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-        Mask = Exponentiate(2, NumBits2Select) << (8 - NumBits2Select);
+    uint8_t CreateBitsMaskLSBit(const uint8_t Bits2Read) {
+#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+        uint8_t Mask = Exponentiate(2, Bits2Read);
+#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+        uint8_t Mask = Exponentiate(2, Bits2Read) >> (8 - Bits2Read);
+#endif
+        return Mask;
+    }
+    
+    uint8_t CreateBitsMaskMSBit(const uint8_t Bits2Read) {
+#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+        uint8_t Mask = Exponentiate(2, Bits2Read) >> (8 - Bits2Read);
+#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+        uint8_t Mask = Exponentiate(2, Bits2Read);
 #endif
         return Mask;
     }
