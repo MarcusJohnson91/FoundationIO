@@ -12,22 +12,37 @@ CreateOutputFileTop() {
     printf "extern \"C\" {\n" >> "$OutputFile"
     printf "#endif\n\n" >> "$OutputFile"
     printf "#define UnicodeVersion %s\n\n" "$ReadmeUnicodeVersion" >> "$OutputFile"
-    NumWhiteSpaceCodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@WSpace='Y'])" "$UCD_Data")
-    printf "#define WhiteSpaceTableSize %d\n\n" "$NumWhiteSpaceCodePoints" >> "$OutputFile"
     NumBiDirectionalControls=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Bidi_C='Y'])" "$UCD_Data")
     printf "#define BiDirectionalControlsTableSize %d\n\n" "$NumBiDirectionalControls" >> "$OutputFile"
+    NumWhiteSpaceCodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@WSpace='Y'])" "$UCD_Data")
+    printf "#define WhiteSpaceTableSize %d\n\n" "$NumWhiteSpaceCodePoints" >> "$OutputFile"
+    DecimalTableSize=$(xmlstarlet select -N u="http://www.unicode.org/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and contains(@nv, '/') and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')])" "$UCD_Data")
+    printf "#define DecimalTableSize %d\n\n" "$DecimalTableSize" >> "$OutputFile"
     CombiningCharacterClassTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@ccc != '0'])" "$UCD_Data")
     printf "#define CombiningCharacterClassTableSize %d\n\n" "$CombiningCharacterClassTableSize" >> "$OutputFile"
     IntegerTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')])" "$UCD_Data")
     printf "#define IntegerTableSize %d\n\n" "$IntegerTableSize" >> "$OutputFile"
     GraphemeExtensionSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Gr_Ext = 'Y'])" "$UCD_Data")
     printf "#define GraphemeExtensionTableSize %d\n\n" "$GraphemeExtensionSize" >> "$OutputFile"
-    CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')])" "$UCD_Data")
-    printf "#define CaseFoldTableSize %d\n\n" "$CaseFoldTableSize" >> "$OutputFile"
     KompatibleNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[(@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat') and @dt != '' and @dt != '#' and @dt != 'none'])" -n "$UCD_Data")
     printf "#define KompatibleNormalizationTableSize %d\n\n" "$KompatibleNormalizationTableSize" >> "$OutputFile"
+    CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')])" "$UCD_Data")
+    printf "#define CaseFoldTableSize %d\n\n" "$CaseFoldTableSize" >> "$OutputFile"
     CanonicalNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n "$UCD_Data")
     printf "#define CanonicalNormalizationTableSize %d\n\n" "$CanonicalNormalizationTableSize" >> "$OutputFile"
+}
+
+CreateBiDirectionalControlsTable() {
+    IFS='
+'
+    printf "    static const UTF32    BiDirectionalControlsTable[BiDirectionalControlsTableSize] = {\n" >> "$OutputFile"
+    BiDirectionalControls=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Bidi_C = 'Y']" -v @cp -n "$UCD_Data")
+    for line in $BiDirectionalControls; do
+        Value=$(echo "$line" | sed -e 's/^/0x/g')
+        printf "        0x%06X,\n" "$Value" >> "$OutputFile"
+    done
+    printf "    };\n\n" >> "$OutputFile"
+    unset IFS
 }
 
 CreateWhiteSpaceTable() {
@@ -43,14 +58,28 @@ CreateWhiteSpaceTable() {
     unset IFS
 }
 
-CreateBiDirectionalControlsTable() {
+CreateDecimalTables() {
     IFS='
 '
-    printf "    static const UTF32    BiDirectionalControlsTable[BiDirectionalControlsTableSize] = {\n" >> "$OutputFile"
-    BiDirectionalControls=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Bidi_C = 'Y']" -v @cp -n "$UCD_Data")
-    for line in $BiDirectionalControls; do
-        Value=$(echo "$line" | sed -e 's/^/0x/g')
-        printf "        0x%06X,\n" "$Value" >> "$OutputFile"
+    Slash='/'
+    Colon=':'
+    SortedCodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and contains(@nv, '/') and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -v "@cp" -o : -v "@nv" -n "$UCD_Data")
+    printf "    static const UTF32    DecimalCodePoints[DecimalTableSize] = {\n" >> "$OutputFile"
+    for line in $SortedCodePointAndValue; do
+        CodePoint=$(echo "$line" | awk -F '[:/]' '{printf "0x"$1}')
+        printf "        0x%06X,\n" "$CodePoint" >> "$OutputFile"
+    done
+    printf "    };\n\n" >> "$OutputFile"
+    printf "    static const int64_t  DecimalNumerators[DecimalTableSize] = {\n" >> "$OutputFile"
+    for line in $SortedCodePointAndValue; do
+        Numerator=$(echo "$line" | awk -F '[:/]' '{printf $2}')
+        printf "        %d,\n" "$Numerator" >> "$OutputFile"
+    done
+    printf "    };\n\n" >> "$OutputFile"
+    printf "    static const uint64_t DecimalDenominators[DecimalTableSize] = {\n" >> "$OutputFile"
+    for line in $SortedCodePointAndValue; do
+        Denominator=$(echo "$line" | awk -F '[:/]' '{printf $3}')
+        printf "        %d,\n" "$Denominator" >> "$OutputFile"
     done
     printf "    };\n\n" >> "$OutputFile"
     unset IFS
@@ -264,14 +293,15 @@ else
                 UCD_Data="$UCD_Folder/ucd.all.flat.xml"
 
                 CreateOutputFileTop
-                CreateWhiteSpaceTable
                 CreateBiDirectionalControlsTable
+                CreateWhiteSpaceTable
+                CreateDecimalTables
                 CreateCombiningCharacterClassTable
                 CreateIntegerTable
                 CreateGraphemeExtensionTable
                 CreateKompatibleNormalizationTables
-                CreateCanonicalNormalizationTables
                 CreateCaseFoldTables
+                CreateCanonicalNormalizationTables
                 CreateOutputFileBottom
             else
                 echo "Not enough free space to extract the XML UCD, aborting"
