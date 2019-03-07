@@ -213,7 +213,7 @@ if [ "$#" -ne 1 ] || [ -z "$1" ]; then
     echo "The first and only argument needs to be the file to write the tables. (if it exists, it WILL be IRRECOVERABLY DELETED)"
 else
     if [ -e "$OutputFile" ]; then
-        HeaderUnicodeVersion=$(grep '#define UnicodeVersion ' "$OutputFile" | awk '{printf "%s" $3}')
+        HeaderUnicodeVersion=$(grep '#define UnicodeVersion ' "$OutputFile" | awk '{printf $3}')
     else
         HeaderUnicodeVersion="-1.-1.-1"
     fi
