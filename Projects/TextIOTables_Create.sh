@@ -16,7 +16,7 @@ CreateOutputFileTop() {
     printf "#define BiDirectionalControlsTableSize %d\n\n" "$NumBiDirectionalControls" >> "$OutputFile"
     NumWhiteSpaceCodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@WSpace='Y'])" "$UCD_Data")
     printf "#define WhiteSpaceTableSize %d\n\n" "$NumWhiteSpaceCodePoints" >> "$OutputFile"
-    DecimalTableSize=$(xmlstarlet select -N u="http://www.unicode.org/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and contains(@nv, '/') and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')])" "$UCD_Data")
+    DecimalTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and contains(@nv, '/')])" "$UCD_Data")
     printf "#define DecimalTableSize %d\n\n" "$DecimalTableSize" >> "$OutputFile"
     CombiningCharacterClassTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@ccc != '0'])" "$UCD_Data")
     printf "#define CombiningCharacterClassTableSize %d\n\n" "$CombiningCharacterClassTableSize" >> "$OutputFile"
@@ -70,13 +70,13 @@ CreateDecimalTables() {
         printf "        0x%06X,\n" "$CodePoint" >> "$OutputFile"
     done
     printf "    };\n\n" >> "$OutputFile"
-    printf "    static const int64_t  DecimalNumerators[DecimalTableSize] = {\n" >> "$OutputFile"
+    printf "    static const int8_t   DecimalNumerators[DecimalTableSize] = {\n" >> "$OutputFile"
     for line in $SortedCodePointAndValue; do
         Numerator=$(echo "$line" | awk -F '[:/]' '{printf $2}')
         printf "        %d,\n" "$Numerator" >> "$OutputFile"
     done
     printf "    };\n\n" >> "$OutputFile"
-    printf "    static const uint64_t DecimalDenominators[DecimalTableSize] = {\n" >> "$OutputFile"
+    printf "    static const uint16_t DecimalDenominators[DecimalTableSize] = {\n" >> "$OutputFile"
     for line in $SortedCodePointAndValue; do
         Denominator=$(echo "$line" | awk -F '[:/]' '{printf $3}')
         printf "        %d,\n" "$Denominator" >> "$OutputFile"
