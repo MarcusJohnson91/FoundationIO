@@ -22,9 +22,9 @@ add_definitions(-D_ATL_ALLOW_CHAR_UNSIGNED)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "UNIX")
 
-set(libFoundationIO_Dir "${CMAKE_CURRENT_SOURCE_DIR}/libFoundationIO")
+set(libFoundationIO_Dir "${CMAKE_CURRENT_SOURCE_DIR}")
 
-set(Test_Dir "${CMAKE_CURRENT_SOURCE_DIR}/Tests")
+set(Test_Dir "${CMAKE_CURRENT_SOURCE_DIR}/../Tests")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${libFoundationIO_Dir}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${libFoundationIO_Dir}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
