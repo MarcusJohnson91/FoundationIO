@@ -294,6 +294,7 @@ extern "C" {
         }
     }
     
+    /*
     typedef struct AudioContainer3D {
         uint64_t     NumObjects;
         AudioObject *AudioObjects;
@@ -330,7 +331,7 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("Index needs to be a count, not an offset"));
         }
     }
-    
+    */
     typedef struct AudioHistogram {
         void          **Array; // Channel, Sample
         uint64_t        NumEntries;
