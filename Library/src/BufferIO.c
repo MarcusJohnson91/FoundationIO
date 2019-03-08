@@ -72,7 +72,7 @@ extern "C" {
             uint8_t Bits2Save      = BitB->BitOffset % 8;
             if (Bits2Save > 0) {
                 BitB->Buffer[0]    = 0;
-                uint8_t Saved      = BitB->Buffer[Bytes2Read + 1] & CreateBitMask(Bits2Save);
+                uint8_t Saved      = BitB->Buffer[Bytes2Read + 1] & CreateBitMaskLSBit(Bits2Save);
                 BitB->Buffer[0]    = Saved;
                 BitB->BitOffset    = Bits2Save;
             } else {
