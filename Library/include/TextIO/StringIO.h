@@ -1,3 +1,11 @@
+/*!
+ @header              StringIO.h
+ @author              Marcus Johnson
+ @copyright           2017+
+ @version             1.0.0
+ @brief               This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
+ */
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -11,14 +19,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
-    /*!
-     @header              StringIO.h
-     @author              Marcus Johnson
-     @copyright           2017+
-     @version             1.0.0
-     @brief               This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
-     */
     
 /* Forward declare StringIO's types */
 #ifndef               UTF8
