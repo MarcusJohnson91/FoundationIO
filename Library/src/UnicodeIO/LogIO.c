@@ -110,7 +110,7 @@ extern "C" {
         }
     }
     
-    void Log(LogTypes Severity, const UTF8 *restrict FunctionName, UTF8 *restrict Description, ...) {
+    void Log(const LogTypes Severity, const UTF8 *restrict FunctionName, UTF8 *restrict Description, ...) {
         UTF8 Error[] = U8("ERROR");
         UTF8 Test[]  = U8("TEST");
         

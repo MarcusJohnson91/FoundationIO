@@ -79,7 +79,7 @@ extern "C" {
      @param                     Description                     "String describing what went wrong".
      */
 #if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
-    void                 Log(LogTypes Severity, const UTF8 *restrict FunctionName, UTF8 *restrict Description, ...) __attribute__((__format__(__printf__, 3, 4)));
+    void                 Log(const LogTypes Severity, const UTF8 *restrict FunctionName, UTF8 *restrict Description, ...) __attribute__((__format__(__printf__, 3, 4)));
 #elif defined(_MSC_VER)
 #include <sal.h>
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
