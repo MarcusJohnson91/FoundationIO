@@ -1,3 +1,11 @@
+/*!
+ @header                ContainerIO.h
+ @author                Marcus Johnson
+ @copyright             2018+
+ @version               1.0.0
+ @brief                 This header contains code for containers (type generic arrays)
+ */
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -18,14 +26,6 @@ extern "C" {
      AudioObject is simply an AudioContainer with more metadata about where the sound should be played, when, etc.
      
      that's it.
-     */
-    
-    /*!
-     @header                ContainerIO.h
-     @author                Marcus Johnson
-     @copyright             2018+
-     @version               1.0.0
-     @brief                 This header contains code for containers (type generic arrays)
      */
     
     /*!

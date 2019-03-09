@@ -1,3 +1,11 @@
+/*!
+ @header              TestIO.h
+ @author              Marcus Johnson
+ @copyright           2019+
+ @version             1.0.0
+ @brief               This header contains types, functions, and tables for automated testing.
+ */
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -9,14 +17,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
-    /*!
-     @header              TestIO.h
-     @author              Marcus Johnson
-     @copyright           2019+
-     @version             1.0.0
-     @brief               This header contains types, functions, and tables for automated testing.
-     */
     
     /*!
      @abstract                                                  "Gets how accurate the clock is".

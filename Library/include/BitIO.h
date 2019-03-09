@@ -1,31 +1,13 @@
+/*!
+ @header                    BitIO.h
+ @author                    Marcus Johnson
+ @copyright                 2015+
+ @version                   1.0.0
+ @brief                     This header contains code for reading and writing files and sockets, and utilities to manage them.
+ */
+
 #include <stdbool.h>
 #include <stdint.h>
-
-/* Forward declare StringIO's types */
-#ifndef               UTF8
-#ifdef                char8_t
-typedef               char8_t                              UTF8;
-#else
-typedef               unsigned char                        UTF8;
-#endif /* char8_t */
-#endif /* UTF8 */
-
-#ifndef               UTF16
-#ifdef                char16_t
-typedef               char16_t                             UTF16;
-#else
-typedef               uint_least16_t                       UTF16;
-#endif /* char16_t */
-#endif /* UTF16 */
-
-#ifndef               UTF32
-#ifdef                char32_t
-typedef               char32_t                             UTF32;
-#else
-typedef               uint_least32_t                       UTF32;
-#endif /* char32_t */
-#endif /* UTF32 */
-/* Forward declare StringIO's types */
 
 #pragma  once
 
@@ -36,13 +18,31 @@ typedef               uint_least32_t                       UTF32;
 extern "C" {
 #endif
     
-    /*!
-     @header                    BitIO.h
-     @author                    Marcus Johnson
-     @copyright                 2015+
-     @version                   1.0.0
-     @brief                     This header contains code for reading and writing files and sockets, and utilities to manage them.
-     */
+    /* Forward declare StringIO's types */
+#ifndef               UTF8
+#ifdef                char8_t
+    typedef               char8_t                              UTF8;
+#else
+    typedef               unsigned char                        UTF8;
+#endif /* char8_t */
+#endif /* UTF8 */
+    
+#ifndef               UTF16
+#ifdef                char16_t
+    typedef               char16_t                             UTF16;
+#else
+    typedef               uint_least16_t                       UTF16;
+#endif /* char16_t */
+#endif /* UTF16 */
+    
+#ifndef               UTF32
+#ifdef                char32_t
+    typedef               char32_t                             UTF32;
+#else
+    typedef               uint_least32_t                       UTF32;
+#endif /* char32_t */
+#endif /* UTF32 */
+    /* Forward declare StringIO's types */
     
     /*!
      @enum                      BitIOFileTypes
