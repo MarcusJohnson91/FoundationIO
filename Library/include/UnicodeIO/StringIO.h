@@ -121,6 +121,7 @@ typedef               uint_least32_t                       UTF32;
     
     /*!
      @enum                StringIOBases
+     @constant            UnknownBase                          "Unknown base".
      @constant            Integer                              "Integer".
      @constant            Decimal                              "Decimal".
      @constant            Base2                                "Base 2".
@@ -134,6 +135,7 @@ typedef               uint_least32_t                       UTF32;
      @constant            Hex                                  "1.3DEp42 where E is the exponent aka 10^X, and P is the power aka 2^Y"
      */
     typedef enum StringIOBases {
+                          UnknownBase                          = 0,
                           Integer                              = 1,
                           Decimal                              = 2,
                           Base2                                = 4,
