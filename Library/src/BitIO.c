@@ -671,7 +671,7 @@ extern "C" {
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             bool  StringHasBOM               = UTF8_StringHasBOM(Path2Open);
             UTF32 *WinPath32                 = UTF8_Decode(Path2Open);
-            UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, U32("\\\\\?\\"), StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
+            UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, StringIOUNCPathPrefix, StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
             free(WinPath32);
             UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32);
             free(WinPathLong32);
@@ -696,7 +696,7 @@ extern "C" {
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
             UTF32 *Path32                    = UTF16_Decode(Path2Open);
             bool   PathHasBOM                = UTF32_StringHasBOM(Path32);
-            bool   PathHasWinPrefix          = UTF32_StringHasWinPathPrefix(Path32);
+            bool   PathHasWinPrefix          = UTF32_StringHasUNCPathPrefix(Path32);
             if (PathHasBOM == Yes && PathHasWinPrefix == Yes) {
                 UTF32 *BOMLess               = UTF32_RemoveBOM(Path32);
                 free(Path32);
@@ -704,12 +704,12 @@ extern "C" {
             } else if (PathHasBOM == Yes && PathHasWinPrefix == No) {
                 // Add WinPathPrefix, Remove BOM
                 UTF32 *BOMLess               = UTF32_RemoveBOM(Path32);
-                UTF32 *Prefix                = UTF32_Insert(BOMLess, U32("//?/"), 0);
+                UTF32 *Prefix                = UTF32_Insert(BOMLess, StringIOUNCPathPrefix, 0);
                 free(Path32);
                 Path32                       = Prefix;
             } else if (PathHasBOM == No && PathHasWinPrefix == No) {
                 // Add WinPathPrefix
-                UTF32 *Prefix                = UTF32_Insert(Path32, U32("//?/"), 0);
+                UTF32 *Prefix                = UTF32_Insert(Path32, StringIOUNCPathPrefix, 0);
                 free(Path32);
                 Path32                       = Prefix;
             }
@@ -727,7 +727,7 @@ extern "C" {
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             bool  StringHasBOM               = UTF16_StringHasBOM(Path2Open);
             UTF32 *WinPath32                 = UTF16_Decode(Path2Open);
-            UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, U32("//?/"), StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
+            UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, StringIOUNCPathPrefix, StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
             free(WinPath32);
             UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32);
             free(WinPathLong32);
@@ -897,13 +897,13 @@ extern "C" {
                 free(OutputPath);
             }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            bool   StringHasPathPrefix  = UTF8_StringHasWinPathPrefix(Path2Open);
+            bool   StringHasPathPrefix  = UTF8_StringHasUNCPathPrefix(Path2Open);
             BitO->FileSpecifierExists   = UTF8_NumFormatSpecifiers(Path2Open) >= 1 ? Yes : No;
             UTF32 *Path32               = UTF8_Decode(Path2Open);
             UTF16 *Path16               = NULL;
             if (StringHasPathPrefix == No) {
                 bool   StringHasBOM     = UTF8_StringHasBOM(Path2Open);
-                UTF32 *PrefixPath       = UTF32_Insert(Path32, U32("\\\\\?\\"), StringHasBOM == Yes ? UTF16BOMSizeInCodeUnits : 0);
+                UTF32 *PrefixPath       = UTF32_Insert(Path32, StringIOUNCPathPrefix, StringHasBOM == Yes ? UTF16BOMSizeInCodeUnits : 0);
                 Path16                  = UTF16_Encode(PrefixPath);
             } else {
                 Path16                  = UTF16_Encode(Path32);
@@ -946,13 +946,13 @@ extern "C" {
                 FoundationIO_File_Open(Formatted8, U8("rb"));
             }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            bool   StringHasPathPrefix  = UTF16_StringHasWinPathPrefix(Path2Open);
+            bool   StringHasPathPrefix  = UTF16_StringHasUNCPathPrefix(Path2Open);
             BitO->FileSpecifierExists   = UTF16_NumFormatSpecifiers(Path2Open) >= 1 ? Yes : No;
             UTF32 *Path32               = UTF16_Decode(Path2Open);
             UTF16 *Path16               = NULL;
             if (StringHasPathPrefix == No) {
                 bool   StringHasBOM     = UTF16_StringHasBOM(Path2Open);
-                UTF32 *PrefixPath       = UTF32_Insert(Path32, U32("\\\\\?\\"), StringHasBOM == Yes ? UTF16BOMSizeInCodeUnits : 0);
+                UTF32 *PrefixPath       = UTF32_Insert(Path32, StringIOUNCPathPrefix, StringHasBOM == Yes ? UTF16BOMSizeInCodeUnits : 0);
                 Path16                  = UTF16_Encode(PrefixPath);
             } else {
                 Path16                  = UTF16_Encode(Path32);

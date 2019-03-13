@@ -32,10 +32,10 @@ extern "C" {
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             UTF32 *Path32        = UTF8_Decode(LogFilePath);
             bool   PathHasBOM    = UTF32_StringHasBOM(Path32);
-            bool   PathHasPrefix = UTF32_StringHasWinPathPrefix(Path32);
+            bool   PathHasPrefix = UTF32_StringHasUNCPathPrefix(Path32);
             if (PathHasBOM == Yes && PathHasPrefix == No) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
-                UTF32 *Prefixed  = UTF32_Insert(BOMLess, U32("\\\\\?\\"), 0);
+                UTF32 *Prefixed  = UTF32_Insert(BOMLess, StringIOUNCPathPrefix, 0);
                 free(BOMLess);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
@@ -52,7 +52,7 @@ extern "C" {
                 Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
                 free(Path16);
             } else if (PathHasBOM == No && PathHasPrefix == No) {
-                UTF32 *Prefixed  = UTF32_Insert(Path32, U32("\\\\\?\\"), 0);
+                UTF32 *Prefixed  = UTF32_Insert(Path32, StringIOUNCPathPrefix, 0);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
                 Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
@@ -79,10 +79,10 @@ extern "C" {
                 free(Path8);
             }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            bool   PathHasPrefix = UTF32_StringHasWinPathPrefix(Path32);
+            bool   PathHasPrefix = UTF32_StringHasUNCPathPrefix(Path32);
             if (PathHasBOM == Yes && PathHasPrefix == No) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
-                UTF32 *Prefixed  = UTF32_Insert(BOMLess, U32("\\\\\?\\"), 0);
+                UTF32 *Prefixed  = UTF32_Insert(BOMLess, StringIOUNCPathPrefix, 0);
                 free(BOMLess);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
@@ -99,7 +99,7 @@ extern "C" {
                 Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
                 free(Path16);
             } else if (PathHasBOM == No && PathHasPrefix == No) {
-                UTF32 *Prefixed  = UTF32_Insert(Path32, U32("\\\\\?\\"), 0);
+                UTF32 *Prefixed  = UTF32_Insert(Path32, StringIOUNCPathPrefix, 0);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
                 Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));

@@ -231,73 +231,73 @@ extern "C" {
         return StringHasABOM;
     }
     
-    bool  UTF8_StringHasWinPathPrefix(UTF8 *String) {
-        bool StringHasWinPathPrefix = No;
+    bool  UTF8_StringHasUNCPathPrefix(UTF8 *String) {
+        bool StringHasUNCPathPrefix = No;
         if (String != NULL) {
             uint64_t StringSize     = UTF8_GetStringSizeInCodePoints(String);
             if (StringSize > UnicodeBOMSizeInCodePoints) {
                 bool StringHasBOM   = UTF8_StringHasBOM(String);
-                if (StringHasBOM && StringSize >= UTF8BOMSizeInCodeUnits + UnicodeWinPathPrefixSize) {
+                if (StringHasBOM && StringSize >= UTF8BOMSizeInCodeUnits + UnicodeUNCPathPrefixSize) {
                     // "//?/" or "\\?\"
                     if ((String[1] == '/' || String[1] == '\\') && (String[2] == '/' || String[2] == '\\') && String[3] == '?' && (String[4] == '/' || String[4] == '\\')) {
-                        StringHasWinPathPrefix = Yes;
+                        StringHasUNCPathPrefix = Yes;
                     }
                 } else if (StringHasBOM == No && StringSize >= 4) {
                     if ((String[0] == '/' || String[0] == '\\') && (String[1] == '/' || String[1] == '\\') && String[2] == '?' && (String[3] == '/' || String[3] == '\\')) {
-                        StringHasWinPathPrefix = Yes;
+                        StringHasUNCPathPrefix = Yes;
                     }
                 }
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return StringHasWinPathPrefix;
+        return StringHasUNCPathPrefix;
     }
     
-    bool  UTF16_StringHasWinPathPrefix(UTF16 *String) {
-        bool StringHasWinPathPrefix = No;
+    bool  UTF16_StringHasUNCPathPrefix(UTF16 *String) {
+        bool StringHasUNCPathPrefix = No;
         if (String != NULL) {
             uint64_t StringSize     = UTF16_GetStringSizeInCodePoints(String);
             if (StringSize > UnicodeBOMSizeInCodePoints) {
                 bool StringHasBOM   = UTF16_StringHasBOM(String);
-                if (StringHasBOM && StringSize >= UTF16BOMSizeInCodeUnits + UnicodeWinPathPrefixSize) {
+                if (StringHasBOM && StringSize >= UTF16BOMSizeInCodeUnits + UnicodeUNCPathPrefixSize) {
                     // "//?/" or "\\?\"
                     if ((String[1] == U16('/') || String[1] == U16('\\')) && (String[2] == U16('/') || String[2] == U16('\\')) && String[3] == U16('?') && (String[4] == U16('/') || String[4] == U16('\\'))) {
-                        StringHasWinPathPrefix = Yes;
+                        StringHasUNCPathPrefix = Yes;
                     }
                 } else if (StringHasBOM == No && StringSize >= 4) {
                     if ((String[0] == U16('/') || String[0] == U16('\\')) && (String[1] == U16('/') || String[1] == U16('\\')) && String[2] == U16('?') && (String[3] == U16('/') || String[3] == U16('\\'))) {
-                        StringHasWinPathPrefix = Yes;
+                        StringHasUNCPathPrefix = Yes;
                     }
                 }
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return StringHasWinPathPrefix;
+        return StringHasUNCPathPrefix;
     }
     
-    bool  UTF32_StringHasWinPathPrefix(UTF32 *String) {
-        bool StringHasWinPathPrefix = No;
+    bool  UTF32_StringHasUNCPathPrefix(UTF32 *String) {
+        bool StringHasUNCPathPrefix = No;
         if (String != NULL) {
             uint64_t StringSize     = UTF32_GetStringSizeInCodePoints(String);
             if (StringSize > UnicodeBOMSizeInCodePoints) {
                 bool StringHasBOM   = UTF32_StringHasBOM(String);
-                if (StringHasBOM && StringSize >= UnicodeBOMSizeInCodePoints + UnicodeWinPathPrefixSize) {
+                if (StringHasBOM && StringSize >= UnicodeBOMSizeInCodePoints + UnicodeUNCPathPrefixSize) {
                     // "//?/" or "\\?\"
                     if ((String[1] == U32('/') || String[1] == U32('\\')) && (String[2] == U32('/') || String[2] == U32('\\')) && String[3] == U32('?') && (String[4] == U32('/') || String[4] == U32('\\'))) {
-                        StringHasWinPathPrefix = Yes;
+                        StringHasUNCPathPrefix = Yes;
                     }
                 } else if (StringHasBOM == No && StringSize >= 4) {
                     if ((String[0] == U32('/') || String[0] == U32('\\')) && (String[1] == U32('/') || String[1] == U32('\\')) && String[2] == U32('?') && (String[3] == U32('/') || String[3] == U32('\\'))) {
-                        StringHasWinPathPrefix = Yes;
+                        StringHasUNCPathPrefix = Yes;
                     }
                 }
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return StringHasWinPathPrefix;
+        return StringHasUNCPathPrefix;
     }
     
     uint64_t UTF8_NumFormatSpecifiers(UTF8 *String) {
