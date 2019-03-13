@@ -60,6 +60,12 @@ typedef               uint_least32_t                       UTF32;
 #endif
 /* Define StringIO's Unicodeization macros */
     
+    /* Define UNC Path Prefix macro */
+#ifndef                   StringIOUNCPathPrefix
+#define                   StringIOUNCPathPrefix                (U"//?/")
+#endif
+    /* Define UNC Path Prefix macro */
+    
     /*!
      @enum                StringIOCommon
      @constant            UTF8BOMSizeInCodeUnits               "The number of code units (8 bits) the UTF8 BOM takes".
@@ -69,7 +75,7 @@ typedef               uint_least32_t                       UTF32;
      @constant            UTF16BOM_BE                          "UTF16BOM_BE byte order mark".
      @constant            UTF32BOM_LE                          "UTF32BOM_LE byte order mark".
      @constant            UTF32BOM_BE                          "UTF32BOM_LE byte order mark".
-     @constant            UnicodeWinPathPrefixSize             "Size of "//?/" in CodePoints and CodeUnits"
+     @constant            UnicodeUNCPathPrefixSize             "Size of "//?/" in CodePoints and CodeUnits"
      @constant            UTF16HighSurrogateStart              "The value that marks the start of the High Surrogate range".
      @constant            UTF16HighSurrogateEnd                "The value that marks the end   of the High Surrogate range".
      @constant            UTF16LowSurrogateStart               "The value that marks the start of the Low  Surrogate range".
@@ -91,7 +97,7 @@ typedef               uint_least32_t                       UTF32;
                           UTF16BOM_BE                          = 0xFEFF,
                           UTF32BOM_LE                          = 0xFFFE,
                           UTF32BOM_BE                          = 0xFEFF,
-                          UnicodeWinPathPrefixSize             = 4, // "//?/" or "\\?\"
+                          UnicodeUNCPathPrefixSize             = 4, // "//?/" or "\\?\"
                           UTF16HighSurrogateStart              = 0xD800,
                           UTF16HighSurrogateEnd                = 0xDBFF,
                           UTF16LowSurrogateStart               = 0xDC00,
@@ -294,21 +300,21 @@ typedef               uint_least32_t                       UTF32;
      @param               String           "The string to check".
      @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
      */
-    bool                  UTF8_StringHasWinPathPrefix(UTF8 *String);
+    bool                  UTF8_StringHasUNCPathPrefix(UTF8 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
      */
-    bool                  UTF16_StringHasWinPathPrefix(UTF16 *String);
+    bool                  UTF16_StringHasUNCPathPrefix(UTF16 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
      */
-    bool                  UTF32_StringHasWinPathPrefix(UTF32 *String);
+    bool                  UTF32_StringHasUNCPathPrefix(UTF32 *String);
     
     /*!
      @abstract                             "Counts the number of Format Specifiers in String".
