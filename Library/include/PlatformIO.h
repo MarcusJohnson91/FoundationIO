@@ -72,11 +72,7 @@ extern "C" {
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
     
 #define FoundationIOTargetOS (FoundationIOPOSIXOS)
- /*
-#ifndef             typeof
-#define             typeof(Variable)                                                           __typeof__(Variable)
-#endif
-    */
+
 #ifndef             FoundationIO_File_Open
 #define             FoundationIO_File_Open(File2OpenPath, FileModeString)                      fopen(File2OpenPath, FileModeString)
 #endif
