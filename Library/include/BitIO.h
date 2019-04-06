@@ -380,18 +380,6 @@ extern "C" {
     void                        BitInput_UTF16_OpenFile(BitInput *BitI, UTF16 *Path2Open);
     
     /*!
-     @abstract                                                  "Is the file variable"?
-     @param                     BitI                            "BitInput Pointer".
-     */
-    bool                        BitInput_IsChangable(BitInput *BitI);
-    
-    /*!
-     @abstract                                                  "Closes the current file, and opens the next one in it's place".
-     @param                     BitI                            "BitInput Pointer".
-     */
-    void                        BitInput_ChangeFile(BitInput *BitI);
-    
-    /*!
      @abstract                                                  "Opens a socket for reading".
      @param                     BitI                            "BitInput Pointer".
      @param                     Domain                          "What domain should communication take place on"?
@@ -413,21 +401,21 @@ extern "C" {
      @param                     BitI                            "BitInput Pointer".
      @return                                                    "Returns the value in BitI->FileSize if it exists".
      */
-    int64_t                     BitInput_GetFileSize(BitInput *BitI);
+    uint64_t                    BitInput_GetFileSize(BitInput *BitI);
     
     /*!
      @abstract                                                  "Gets the position of the BitInput file from the start".
      @param                     BitI                            "BitInput Pointer".
      @return                                                    "Returns the position of the file in bytes from the beginning"
      */
-    int64_t                     BitInput_GetFilePosition(BitInput *BitI);
+    uint64_t                    BitInput_GetFilePosition(BitInput *BitI);
     
     /*!
      @abstract                                                  "Computes the number of bytes left in the file".
      @param                     BitI                            "BitInput Pointer".
      @return                                                    "Returns the number of bytes left in the file".
      */
-    int64_t                     BitInput_BytesRemaining(BitInput *BitI);
+    uint64_t                    BitInput_BytesRemaining(BitInput *BitI);
     
     /*!
      @abstract                                                  "Deallocates BitInput".
@@ -457,18 +445,6 @@ extern "C" {
      @param                     Path2Open                       "Path to the output file to open".
      */
     void                        BitOutput_UTF16_OpenFile(BitOutput *BitO, UTF16 *Path2Open);
-    
-    /*!
-     @abstract                                                  "Is the file variable"?
-     @param                     BitO                            "BitOutput Pointer".
-     */
-    bool                        BitOutput_IsChangable(BitOutput *BitO);
-    
-    /*!
-     @abstract                                                  "Closes the current file, and opens the next one in it's place".
-     @param                     BitO                            "BitOutput Pointer".
-     */
-    void                        BitOutput_ChangeFile(BitOutput *BitO);
     
     /*!
      @abstract                                                  "Opens a socket for writing".
