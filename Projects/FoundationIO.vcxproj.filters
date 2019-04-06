@@ -1,57 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <ItemGroup>
-        <ClCompile Include="..\libFoundationIO\src\BitIO.c">
-            <Filter>Source Files</Filter>
-        </ClCompile>
-        <ClCompile Include="..\libFoundationIO\src\CommandLineIO.c">
-            <Filter>Source Files</Filter>
-        </ClCompile>
-        <ClCompile Include="..\libFoundationIO\src\ContainerIO.c">
-            <Filter>Source Files</Filter>
-        </ClCompile>
-        <ClCompile Include="..\libFoundationIO\src\Log.c">
-            <Filter>Source Files</Filter>
-        </ClCompile>
-        <ClCompile Include="..\libFoundationIO\src\Math.c">
-            <Filter>Source Files</Filter>
-        </ClCompile>
-        <ClCompile Include="..\libFoundationIO\src\StringIO.c">
-            <Filter>Source Files</Filter>
-        </ClCompile>
-    </ItemGroup>
-    <ItemGroup>
-        <ClInclude Include="..\libFoundationIO\include\BitIO.h">
-            <Filter>Header Files</Filter>
-        </ClInclude>
-        <ClInclude Include="..\libFoundationIO\include\CommandLineIO.h">
-            <Filter>Header Files</Filter>
-        </ClInclude>
-        <ClInclude Include="..\libFoundationIO\include\ContainerIO.h">
-            <Filter>Header Files</Filter>
-        </ClInclude>
-        <ClInclude Include="..\libFoundationIO\include\Log.h">
-            <Filter>Header Files</Filter>
-        </ClInclude>
-        <ClInclude Include="..\libFoundationIO\include\Macros.h">
-            <Filter>Header Files</Filter>
-        </ClInclude>
-        <ClInclude Include="..\libFoundationIO\include\Math.h">
-            <Filter>Header Files</Filter>
-        </ClInclude>
-        <ClInclude Include="..\libFoundationIO\include\StringIO.h">
-            <Filter>Header Files</Filter>
-        </ClInclude>
-        <ClInclude Include="..\libFoundationIO\include\StringIOTables.h">
-            <Filter>Header Files</Filter>
-        </ClInclude>
-    </ItemGroup>
-    <ItemGroup>
-        <Filter Include="Source Files">
-            <UniqueIdentifier>{0fbba5d8-a50e-4c0e-b528-47e5ffd69bb1}</UniqueIdentifier>
-        </Filter>
-        <Filter Include="Header Files">
-            <UniqueIdentifier>{05add13e-8113-412d-8d79-8e78e2479822}</UniqueIdentifier>
-        </Filter>
-    </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\libFoundationIO\src\BitIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libFoundationIO\src\CommandLineIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libFoundationIO\src\ContainerIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libFoundationIO\src\Log.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libFoundationIO\src\Math.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libFoundationIO\src\StringIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libFoundationIO\src\Macros.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libFoundationIO\src\TestIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\libFoundationIO\include\BitIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libFoundationIO\include\CommandLineIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libFoundationIO\include\ContainerIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libFoundationIO\include\Log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libFoundationIO\include\Macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libFoundationIO\include\Math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libFoundationIO\include\StringIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libFoundationIO\include\StringIOTables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libFoundationIO\include\TestIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{0fbba5d8-a50e-4c0e-b528-47e5ffd69bb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{05add13e-8113-412d-8d79-8e78e2479822}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
 </Project>
