@@ -20,6 +20,10 @@ extern "C" {
                                 BinaryGUUIDSize                 = 16,
     };
     
+#ifndef BitIONULLTerminator
+#define BitIONULLTerminator (0)
+#endif
+    
     /* Start BitBuffer section */
     typedef struct BitBuffer {
         uint8_t   *Buffer;
@@ -28,24 +32,18 @@ extern "C" {
     } BitBuffer;
     
     typedef struct BitInput {
-        UTF32          *InputPath;
         FILE           *File;
-        int64_t         FileSpecifierNum;
-        int64_t         FilePosition;
-        int64_t         FileSize;
+        uint64_t        FilePosition;
+        uint64_t        FileSize;
         int             Socket;
-        bool            FileSpecifierExists;
         StringTypes     PathType;
         BitIOFileTypes  FileType;
     } BitInput;
     
     typedef struct BitOutput {
-        UTF32          *OutputPath;
         FILE           *File;
-        int64_t         FileSpecifierNum;
-        int64_t         FilePosition;
+        uint64_t        FilePosition;
         int             Socket;
-        bool            FileSpecifierExists;
         StringTypes     PathType;
         BitIOFileTypes  FileType;
     } BitOutput;
@@ -537,12 +535,14 @@ extern "C" {
     
     void     BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write) {
         if (BitB != NULL && String2Write != NULL) {
-            int64_t StringSize    = UTF8_GetStringSizeInCodeUnits(String2Write);
-            int64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
+            int64_t  StringSize    = UTF8_GetStringSizeInCodeUnits(String2Write);
+            int64_t  BitsAvailable = BitBuffer_GetBitsFree(BitB);
+            uint64_t CodeUnit      = 0ULL;
             if (BitsAvailable >= Bytes2Bits(StringSize)) {
-                for (int64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
-                    BitBuffer_AppendBits(BitB, MSByteFirst, LSBitFirst, 8, String2Write[CodeUnit]);
-                }
+                do {
+                    BitBuffer_AppendBits(MSByteFirst, LSBitFirst, BitB, 8, String2Write[CodeUnit]);
+                    CodeUnit         += 1;
+                } while (String2Write[CodeUnit] != BitIONULLTerminator);
             } else {
                 Log(Log_ERROR, __func__, U8("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
             }
@@ -659,13 +659,6 @@ extern "C" {
                 free(Path32);
                 Path32                       = BOMLess;
             }
-            bool  PathHasSpecifier           = UTF32_NumFormatSpecifiers(Path32);
-            if (PathHasSpecifier) {
-                UTF32 *Formatted             = UTF32_FormatString(Path32, BitI->FileSpecifierNum);
-                BitI->FileSpecifierNum      += 1;
-                free(Path32);
-                Path32                       = Formatted;
-            }
             UTF8  *Path8                     = UTF8_Encode(Path32);
             BitI->File                       = FoundationIO_File_Open(Path8, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
@@ -713,15 +706,6 @@ extern "C" {
                 free(Path32);
                 Path32                       = Prefix;
             }
-            bool  PathHasSpecifier           = UTF32_NumFormatSpecifiers(Path32);
-            if (PathHasSpecifier) {
-                // We need to create a copy of the string now for changing the file later on
-                BitI->InputPath              = UTF32_Clone(Path32);
-                UTF32 *Formatted             = UTF32_FormatString(Path32, BitI->FileSpecifierNum);
-                BitI->FileSpecifierNum      += 1;
-                free(Path32);
-                Path32                       = Formatted;
-            }
             UTF8  *Path8                     = UTF8_Encode(Path32);
             BitI->File                       = FoundationIO_File_Open(Path8, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
@@ -750,42 +734,6 @@ extern "C" {
         }
     }
     
-    bool BitInput_IsChangable(BitInput *BitI) {
-        bool BitOutputIsChangable    = No;
-        if (BitI != NULL) {
-            if (BitI->FileSpecifierExists == Yes) {
-                BitOutputIsChangable = Yes;
-            }
-        } else {
-            Log(Log_ERROR, __func__, U8("BitOutput Pointer is NULL"));
-        }
-        return BitOutputIsChangable;
-    }
-    
-    void BitInput_ChangeFile(BitInput *BitI) {
-        if (BitI != NULL) {
-            if (BitI->FileSpecifierExists == Yes) {
-                BitI->FilePosition      = 0;
-                BitI->FileSpecifierNum += 1;
-                fclose(BitI->File);
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
-                UTF8 *Path8        = UTF8_Encode(BitI->InputPath);
-                UTF8  *NewPath     = UTF8_FormatString(Path8, BitI->FileSpecifierNum);
-                FoundationIO_File_Open(NewPath, U8("rb"));
-                free(NewPath);
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-                UTF16 *Path16      = UTF16_Encode(BitI->InputPath);
-                UTF16 *NewPath     = UTF16_FormatString(Path16, BitI->FileSpecifierNum);
-                free(Path16);
-                FoundationIO_File_Open(NewPath, U16("rb"));
-                free(NewPath);
-#endif
-            }
-        } else {
-            Log(Log_ERROR, __func__, U8("BitOutput Pointer is NULL"));
-        }
-    }
-    
     void BitInput_OpenSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol) {
         if (BitI != NULL) {
             BitI->FileType = BitIOSocket;
@@ -809,16 +757,16 @@ extern "C" {
     static void BitInput_FindFileSize(BitInput *BitI) {
         if (BitI != NULL) {
             FoundationIO_File_Seek(BitI->File, 0, SEEK_END);
-            BitI->FileSize     = FoundationIO_File_GetSize(BitI->File);
+            BitI->FileSize     = (uint64_t) FoundationIO_File_GetSize(BitI->File);
             FoundationIO_File_Seek(BitI->File, 0, SEEK_SET);
-            BitI->FilePosition = FoundationIO_File_GetSize(BitI->File);
+            BitI->FilePosition = (uint64_t) FoundationIO_File_GetSize(BitI->File);
         } else {
             Log(Log_ERROR, __func__, U8("BitInput Pointer is NULL"));
         }
     }
     
-    int64_t BitInput_GetFileSize(BitInput *BitI) {
-        int64_t InputSize = 0LL;
+    uint64_t BitInput_GetFileSize(BitInput *BitI) {
+        uint64_t InputSize = 0ULL;
         if (BitI != NULL) {
             if (BitI->FileSize == 0) {
                 BitInput_FindFileSize(BitI);
@@ -830,8 +778,8 @@ extern "C" {
         return InputSize;
     }
     
-    int64_t BitInput_GetFilePosition(BitInput *BitI) {
-        int64_t Position = 0LL;
+    uint64_t BitInput_GetFilePosition(BitInput *BitI) {
+        uint64_t Position = 0ULL;
         if (BitI != NULL) {
             if (BitI->FilePosition == 0) {
                 BitInput_FindFileSize(BitI);
@@ -843,8 +791,8 @@ extern "C" {
         return Position;
     }
     
-    int64_t BitInput_BytesRemaining(BitInput *BitI) {
-        int64_t BytesLeft = 0LL;
+    uint64_t BitInput_BytesRemaining(BitInput *BitI) {
+        uint64_t BytesLeft = 0ULL;
         if (BitI != NULL) {
             if (BitI->FilePosition == 0) {
                 BitInput_FindFileSize(BitI);
@@ -885,35 +833,25 @@ extern "C" {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType              = BitIOFile;
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
-            BitO->FileSpecifierExists   = UTF8_NumFormatSpecifiers(Path2Open) >= 1 ? Yes : No;
-            if (BitO->FileSpecifierExists == Yes) {
-                BitO->OutputPath        = UTF8_Decode(Path2Open);
-                UTF8 *Formatted         = UTF8_FormatString(Path2Open, BitO->FileSpecifierNum);
-                BitO->File              = FoundationIO_File_Open(Formatted, U8("rb"));
-                BitO->FileSpecifierNum += 1;
-            } else {
-                UTF8 *OutputPath        = UTF8_Encode(BitO->OutputPath);
-                BitO->File              = FoundationIO_File_Open(OutputPath, U8("rb"));
-                free(OutputPath);
-            }
+            BitO->File                  = FoundationIO_File_Open(Path2Open, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            bool   StringHasPathPrefix  = UTF8_StringHasUNCPathPrefix(Path2Open);
-            BitO->FileSpecifierExists   = UTF8_NumFormatSpecifiers(Path2Open) >= 1 ? Yes : No;
+            bool   PathIsAbsolute       = UTF8_PathIsAbsolute(Path2Open);
+            bool   PathHasUNCPrefix     = UTF8_StringHasUNCPathPrefix(Path2Open);
             UTF32 *Path32               = UTF8_Decode(Path2Open);
             UTF16 *Path16               = NULL;
-            if (StringHasPathPrefix == No) {
-                bool   StringHasBOM     = UTF8_StringHasBOM(Path2Open);
-                UTF32 *PrefixPath       = UTF32_Insert(Path32, StringIOUNCPathPrefix, StringHasBOM == Yes ? UTF16BOMSizeInCodeUnits : 0);
-                Path16                  = UTF16_Encode(PrefixPath);
+            if (PathIsAbsolute == Yes && PathHasUNCPrefix == No) {
+                UTF32 *UNCPrefixed      = UTF32_Insert(Path32, StringIOUNCPathPrefix, 0);
+                Path16                  = UTF16_Encode(UNCPrefixed);
+                free(UNCPrefixed);
+                FoundationIO_File_Open(Path16, U16("rb"));
+            } else if (PathIsAbsolute == No && PathHasUNCPrefix == Yes) {
+                UTF32 *Removed          = UTF32_RemoveSubString(Path32, StringIOUNCPathPrefix, 1);
+                Path16                  = UTF16_Encode(Removed);
+                free(Removed);
+                FoundationIO_File_Open(Path16, U16("rb"));
             } else {
                 Path16                  = UTF16_Encode(Path32);
-            }
-            
-            if (BitO->FileSpecifierExists == Yes) {
-                UTF16 *Formatted        = UTF16_FormatString(Path16, BitO->FileSpecifierNum);
-                BitO->File              = FoundationIO_File_Open(Formatted, U16("rb"));
-            } else {
-                BitO->File              = FoundationIO_File_Open(Path16, U16("rb"));
+                FoundationIO_File_Open(Path16, U16("rb"));
             }
 #endif
         } else if (BitO == NULL) {
@@ -931,20 +869,12 @@ extern "C" {
             // Convert to UTF-8, and remove the BOM because fopen will silently fail if there's a BOM.
             UTF32 *Decoded              = UTF16_Decode(Path2Open);
             PathHasBOM                  = UTF32_StringHasBOM(Decoded);
+            UTF8 *Fixed                 = NULL;
             if (PathHasBOM == Yes) {
-                BitO->OutputPath        = UTF32_RemoveBOM(Decoded);
-            } else {
-                BitO->OutputPath        = Decoded;
+                UTF32 *Fixed32          = UTF32_RemoveBOM(Decoded);
+                Fixed                   = UTF8_Encode(Fixed32);
             }
-            BitO->FileSpecifierExists   = UTF32_NumFormatSpecifiers(BitO->OutputPath) >= 1 ? Yes : No;
-            if (BitO->FileSpecifierExists == Yes) {
-                UTF32 *Formatted        = UTF32_FormatString(BitO->OutputPath, BitO->FileSpecifierNum);
-                UTF8  *Formatted8       = UTF8_Encode(Formatted);
-                FoundationIO_File_Open(Formatted8, U8("rb"));
-            } else {
-                UTF8 *Formatted8        = UTF8_Encode(BitO->OutputPath);
-                FoundationIO_File_Open(Formatted8, U8("rb"));
-            }
+            FoundationIO_File_Open(Fixed, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             bool   StringHasPathPrefix  = UTF16_StringHasUNCPathPrefix(Path2Open);
             BitO->FileSpecifierExists   = UTF16_NumFormatSpecifiers(Path2Open) >= 1 ? Yes : No;
@@ -962,43 +892,6 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("BitOutput Pointer is NULL"));
         } else if (Path2Open == NULL) {
             Log(Log_ERROR, __func__, U8("Path2Open Pointer is NULL"));
-        }
-    }
-    
-    bool BitOutput_IsChangable(BitOutput *BitO) {
-        bool BitOutputIsChangable    = No;
-        if (BitO != NULL) {
-            if (BitO->FileSpecifierExists == Yes) {
-                BitOutputIsChangable = Yes;
-            }
-        } else {
-            Log(Log_ERROR, __func__, U8("BitOutput Pointer is NULL"));
-        }
-        return BitOutputIsChangable;
-    }
-    
-    void BitOutput_ChangeFile(BitOutput *BitO) {
-        if (BitO != NULL) {
-            if (BitO->FileSpecifierExists == Yes) {
-                BitO->FilePosition      = 0;
-                BitO->FileSpecifierNum += 1;
-                fclose(BitO->File);
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
-                UTF8  *OutputPath8      = UTF8_Encode(BitO->OutputPath);
-                UTF8  *NewPath          = UTF8_FormatString(OutputPath8, BitO->FileSpecifierNum);
-                FoundationIO_File_Open(NewPath, U8("rb"));
-                free(OutputPath8);
-                free(NewPath);
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-                UTF16 *OutputPath16     = UTF16_Encode(BitO->OutputPath);
-                UTF16 *NewPath          = UTF16_FormatString(OutputPath16, BitO->FileSpecifierNum);
-                FoundationIO_File_Open(NewPath, U16("rb"));
-                free(NewPath);
-                free(OutputPath16);
-#endif
-            }
-        } else {
-            Log(Log_ERROR, __func__, U8("BitOutput Pointer is NULL"));
         }
     }
     
