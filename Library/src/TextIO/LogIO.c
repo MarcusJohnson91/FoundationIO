@@ -111,8 +111,7 @@ extern "C" {
     }
     
     void Log(const LogTypes Severity, const UTF8 *restrict FunctionName, UTF8 *restrict Description, ...) {
-        UTF8 Error[] = U8("ERROR");
-        UTF8 Test[]  = U8("TEST");
+        UTF8 *ErrorType[2] = {U8("ERROR"), U8("TEST")}; // So it doesn't branch
         
         va_list VariadicArguments;
         va_start(VariadicArguments, Description);
@@ -120,11 +119,11 @@ extern "C" {
         va_end(VariadicArguments);
         
         if (Log_ProgramName != NULL) {
-            UTF8  *FormattedString = UTF8_FormatString(U8("%s: %s in %s: \"%s\"%s"), Log_ProgramName, (Severity == Log_ERROR ? Error : Test), FunctionName, VariadicString, NewLineUTF8);
+            UTF8  *FormattedString = UTF8_FormatString(U8("%s: %s in %s: \"%s\"%s"), Log_ProgramName, ErrorType[Severity - 1], FunctionName, VariadicString, NewLineUTF8);
             UTF8_WriteLine(FormattedString, Log_LogFile == NULL ? stderr : Log_LogFile);
             free(FormattedString);
         } else {
-            UTF8  *FormattedString = UTF8_FormatString(U8("%s in %s: \"%s\"%s"), (Severity == Log_ERROR ? Error : Test), FunctionName, VariadicString, NewLineUTF8);
+            UTF8  *FormattedString = UTF8_FormatString(U8("%s in %s: \"%s\"%s"), ErrorType[Severity - 1], FunctionName, VariadicString, NewLineUTF8);
             UTF8_WriteLine(FormattedString, Log_LogFile == NULL ? stderr : Log_LogFile);
             free(FormattedString);
         }
