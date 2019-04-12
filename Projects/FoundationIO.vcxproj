@@ -43,12 +43,12 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{4595E7FD-A17A-47DC-B7C3-E67884442EA7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>libFoundationIO</RootNamespace>
+    <RootNamespace>FoundationIO</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -56,7 +56,7 @@
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -64,7 +64,7 @@
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -72,7 +72,7 @@
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -105,6 +105,7 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <EnableCppCoreCheck>true</EnableCppCoreCheck>
     <ExtensionsToDeleteOnClean>*.bi;*.bsc;*.cache;*.cdf;*.exp;*.idb;*.ilk;*.iobj;*.ipdb;*.lib;*.lib.intermediate.manifest;*.lib.manifest;*.manifest;*.meta;*.metagen;*.obj;*.obj.enc;*.pch;*.pdb;*.pgc;*.pgd;*.rep;*.res;*.resources;*.rsp;*.sbr;*.tlb;*.tlh;*.tli;*.tlog;*.tmp;*.xdc;*.xml;*_manifest.rc;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\</OutDir>
@@ -114,6 +115,7 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <EnableCppCoreCheck>true</EnableCppCoreCheck>
     <ExtensionsToDeleteOnClean>*.bi;*.bsc;*.cache;*.cdf;*.exp;*.idb;*.ilk;*.iobj;*.ipdb;*.lib;*.lib.intermediate.manifest;*.lib.manifest;*.manifest;*.meta;*.metagen;*.obj;*.obj.enc;*.pch;*.pdb;*.pgc;*.pgd;*.rep;*.res;*.resources;*.rsp;*.sbr;*.tlb;*.tlh;*.tli;*.tlog;*.tmp;*.xdc;*.xml;*_manifest.rc;$(ExtensionsToDeleteOnClean)</ExtensionsToDeleteOnClean>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -123,6 +125,7 @@
     <EnableManagedIncrementalBuild>false</EnableManagedIncrementalBuild>
     <OutDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -132,6 +135,7 @@
     <EnableManagedIncrementalBuild>false</EnableManagedIncrementalBuild>
     <OutDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)..\BUILD\$(Platform)\$(Configuration)\Intermediate\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -144,7 +148,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <MinimalRebuild>false</MinimalRebuild>
+      <MinimalRebuild>true</MinimalRebuild>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
@@ -153,7 +157,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <CompileAs>CompileAsC</CompileAs>
+      <CompileAs>Default</CompileAs>
       <ErrorReporting>Send</ErrorReporting>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <CompileAsManaged>false</CompileAsManaged>
@@ -164,10 +168,10 @@
       <StructMemberAlignment>Default</StructMemberAlignment>
       <ControlFlowGuard>false</ControlFlowGuard>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <CreateHotpatchableImage>true</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <EnforceTypeConversionRules>false</EnforceTypeConversionRules>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <BrowseInformation>true</BrowseInformation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -176,11 +180,22 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <SupportJustMyCode>true</SupportJustMyCode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <SetChecksum>true</SetChecksum>
+      <TurnOffAssemblyGeneration>true</TurnOffAssemblyGeneration>
+      <LinkStatus>true</LinkStatus>
+      <PreventDllBinding>false</PreventDllBinding>
+      <CreateHotPatchableImage>X64Image</CreateHotPatchableImage>
+      <ShowProgress>LinkVerbose</ShowProgress>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -197,6 +212,12 @@
     <Bscmake>
       <PreserveSbr>false</PreserveSbr>
     </Bscmake>
+    <Xdcmake>
+      <DocumentLibraryDependencies>false</DocumentLibraryDependencies>
+    </Xdcmake>
+    <Manifest>
+      <UpdateFileHashes>false</UpdateFileHashes>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <ClCompile>
@@ -209,7 +230,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <MinimalRebuild>false</MinimalRebuild>
+      <MinimalRebuild>true</MinimalRebuild>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
@@ -218,7 +239,7 @@
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <CompileAs>CompileAsC</CompileAs>
+      <CompileAs>Default</CompileAs>
       <ErrorReporting>Send</ErrorReporting>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <CompileAsManaged>false</CompileAsManaged>
@@ -229,10 +250,10 @@
       <StructMemberAlignment>Default</StructMemberAlignment>
       <ControlFlowGuard>false</ControlFlowGuard>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <CreateHotpatchableImage>true</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <EnforceTypeConversionRules>false</EnforceTypeConversionRules>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <BrowseInformation>true</BrowseInformation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -241,11 +262,21 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <SupportJustMyCode>true</SupportJustMyCode>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SetChecksum>true</SetChecksum>
+      <TurnOffAssemblyGeneration>true</TurnOffAssemblyGeneration>
+      <LinkStatus>true</LinkStatus>
+      <PreventDllBinding>false</PreventDllBinding>
+      <CreateHotPatchableImage>X64Image</CreateHotPatchableImage>
+      <ShowProgress>LinkVerbose</ShowProgress>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -261,6 +292,12 @@
     <Bscmake>
       <PreserveSbr>false</PreserveSbr>
     </Bscmake>
+    <Xdcmake>
+      <DocumentLibraryDependencies>false</DocumentLibraryDependencies>
+    </Xdcmake>
+    <Manifest>
+      <UpdateFileHashes>false</UpdateFileHashes>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -273,16 +310,16 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <MinimalRebuild>false</MinimalRebuild>
+      <MinimalRebuild>true</MinimalRebuild>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <CompileAs>CompileAsC</CompileAs>
+      <CompileAs>Default</CompileAs>
       <ErrorReporting>Send</ErrorReporting>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <CompileAsManaged>false</CompileAsManaged>
@@ -293,10 +330,10 @@
       <StructMemberAlignment>Default</StructMemberAlignment>
       <ControlFlowGuard>false</ControlFlowGuard>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <CreateHotpatchableImage>true</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <EnforceTypeConversionRules>false</EnforceTypeConversionRules>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <BrowseInformation>true</BrowseInformation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -305,9 +342,23 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <LargeAddressAware>true</LargeAddressAware>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <SetChecksum>true</SetChecksum>
+      <TurnOffAssemblyGeneration>true</TurnOffAssemblyGeneration>
+      <Profile>true</Profile>
+      <LinkStatus>true</LinkStatus>
+      <PreventDllBinding>false</PreventDllBinding>
+      <CreateHotPatchableImage>X64Image</CreateHotPatchableImage>
+      <ShowProgress>LinkVerbose</ShowProgress>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -323,6 +374,12 @@
     <Bscmake>
       <PreserveSbr>false</PreserveSbr>
     </Bscmake>
+    <Xdcmake>
+      <DocumentLibraryDependencies>false</DocumentLibraryDependencies>
+    </Xdcmake>
+    <Manifest>
+      <UpdateFileHashes>false</UpdateFileHashes>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <ClCompile>
@@ -335,7 +392,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <MinimalRebuild>false</MinimalRebuild>
+      <MinimalRebuild>true</MinimalRebuild>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
@@ -344,7 +401,7 @@
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <CompileAs>CompileAsC</CompileAs>
+      <CompileAs>Default</CompileAs>
       <ErrorReporting>Send</ErrorReporting>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <CompileAsManaged>false</CompileAsManaged>
@@ -355,10 +412,10 @@
       <StructMemberAlignment>Default</StructMemberAlignment>
       <ControlFlowGuard>false</ControlFlowGuard>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <CreateHotpatchableImage>true</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <EnforceTypeConversionRules>false</EnforceTypeConversionRules>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <BrowseInformation>true</BrowseInformation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -366,9 +423,22 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <LargeAddressAware>true</LargeAddressAware>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <SetChecksum>true</SetChecksum>
+      <TurnOffAssemblyGeneration>true</TurnOffAssemblyGeneration>
+      <Profile>true</Profile>
+      <LinkStatus>true</LinkStatus>
+      <PreventDllBinding>false</PreventDllBinding>
+      <CreateHotPatchableImage>X64Image</CreateHotPatchableImage>
+      <ShowProgress>LinkVerbose</ShowProgress>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -384,6 +454,12 @@
     <Bscmake>
       <PreserveSbr>false</PreserveSbr>
     </Bscmake>
+    <Xdcmake>
+      <DocumentLibraryDependencies>false</DocumentLibraryDependencies>
+    </Xdcmake>
+    <Manifest>
+      <UpdateFileHashes>false</UpdateFileHashes>
+    </Manifest>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
