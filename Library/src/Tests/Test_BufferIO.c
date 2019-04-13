@@ -16,6 +16,8 @@ extern "C" {
         
         BitInput_UTF8_OpenFile(BitI, U8("/Users/Marcus/Desktop/TestImages/21.ppm"));
         BitOutput_UTF8_OpenFile(BitO, U8("/Users/Marcus/Desktop/TestImages/21.ppm"));
+        
+        uint64_t FileSize = BitInput_GetFileSize(BitI);
         return 0;
     }
     
