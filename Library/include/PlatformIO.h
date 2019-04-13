@@ -58,6 +58,10 @@ extern "C" {
 #define             FoundationIOMacClassicOS   4
 #endif           /* MacClassicOS */
     
+#ifndef             FoundationIOAppleOS
+#define             FoundationIOAppleOS        8
+#endif           /* AppleOS (MacOS, iOS, TVOS, etc) */
+    
 #if defined(macintosh) || defined(Macintosh)
     
 #ifndef             FoundationIOTargetOS
@@ -71,7 +75,12 @@ extern "C" {
 #include <sys/sysctl.h> /* Included for getting the number of CPU cores */
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
     
+#ifndef FoundationIOTargetOS
+#if     (defined __APPLE__ && defined __MACH__)
+#define FoundationIOTargetOS (FoundationIOAppleOS)
+#else
 #define FoundationIOTargetOS (FoundationIOPOSIXOS)
+#endif
 
 #ifndef             FoundationIO_File_Open
 #define             FoundationIO_File_Open(File2OpenPath, FileModeString)                      fopen(File2OpenPath, FileModeString)
@@ -288,35 +297,51 @@ extern "C" {
 #define             FoundationIOTargetByteOrder                            (FoundationIOCompileTimeByteOrderLE)
 #endif /* FoundationIOCompiler */
     
-#ifndef NewLineUTF8
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#ifndef             NewLineUTF8
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
 #define             NewLineUTF8                                            (u8"\n")
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #define             NewLineUTF8                                            (u8"\r\n")
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
 #define             NewLineUTF8                                            (u8"\r")
 #endif /* TargetOS */
-#endif /* Ifndef NewLineUTF8 */
+#endif /* NewLineUTF8 */
     
-#ifndef NewLineUTF16
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#ifndef             NewLineUTF16
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
 #define             NewLineUTF16                                           (u"\n")
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #define             NewLineUTF16                                           (u"\r\n")
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
 #define             NewLineUTF16                                           (u"\r")
 #endif /* TargetOS */
-#endif /* Ifndef NewLineUTF16 */
+#endif /* NewLineUTF16 */
     
-#ifndef NewLineUTF32
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#ifndef             NewLineUTF32
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
 #define             NewLineUTF32                                           (U"\n")
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #define             NewLineUTF32                                           (U"\r\n")
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
 #define             NewLineUTF32                                           (U"\r")
 #endif /* TargetOS */
-#endif /* Ifndef NewLineUTF32 */
+#endif /* NewLineUTF32 */
+    
+#ifndef FoundationIOSTDVersion
+#define FoundationIOSTDVersion (__STDC_VERSION__)
+#endif
+    
+#ifndef FoundationIOSTDVersionC99
+#define FoundationIOSTDVersionC99 (199901L)
+#endif
+    
+#ifndef FoundationIOSTDVersionC11
+#define FoundationIOSTDVersionC11 (201112L)
+#endif
+    
+#ifndef FoundationIOSTDVersionC17
+#define FoundationIOSTDVersionC17 (201710L)
+#endif
     
     uint64_t FoundationIO_GetNumCPUCores(void);
     

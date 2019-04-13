@@ -3,11 +3,13 @@
  @author                    Marcus Johnson
  @copyright                 2017+
  @version                   1.0.0
- @brief                     This header contains code for parsing command line options.
+ @brief                     This header contains code for creating a command line interface.
  */
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#include "Macros.h"
 
 #pragma  once
 
@@ -18,30 +20,28 @@
 extern "C" {
 #endif
     
-#define NULLTerminatorSize (1)
-    
     /* Forward declare StringIO's types */
 #ifndef               UTF8
-#ifdef                char8_t
-    typedef               char8_t                              UTF8;
+#if (FoundationIOSTDVersion >= FoundationIOSTDVersionC2X && FoundationIOTargetOS != FoundationIOAppleOS)
+typedef               char8_t                              UTF8;
 #else
-    typedef               unsigned char                        UTF8;
+typedef               unsigned char                        UTF8;
 #endif /* char8_t */
 #endif /* UTF8 */
     
 #ifndef               UTF16
-#ifdef                char16_t
-    typedef               char16_t                             UTF16;
+#if (FoundationIOSTDVersion >= FoundationIOSTDVersionC11 && FoundationIOTargetOS != FoundationIOAppleOS)
+typedef               char16_t                             UTF16;
 #else
-    typedef               uint_least16_t                       UTF16;
+typedef               uint_least16_t                       UTF16;
 #endif /* char16_t */
 #endif /* UTF16 */
     
 #ifndef               UTF32
-#ifdef                char32_t
-    typedef               char32_t                             UTF32;
+#if (FoundationIOSTDVersion >= FoundationIOSTDVersionC11 && FoundationIOTargetOS != FoundationIOAppleOS)
+typedef               char32_t                             UTF32;
 #else
-    typedef               uint_least32_t                       UTF32;
+typedef               uint_least32_t                       UTF32;
 #endif /* char32_t */
 #endif /* UTF32 */
     /* Forward declare StringIO's types */
