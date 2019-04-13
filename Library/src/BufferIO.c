@@ -21,14 +21,14 @@ extern "C" {
     };
     
 #ifndef BitIONULLTerminator
-#define BitIONULLTerminator (0)
+#define BitIONULLTerminator     (0)
 #endif
     
     /* Start BitBuffer section */
     typedef struct BitBuffer {
         uint8_t   *Buffer;
-        int64_t    BitOffset;
-        int64_t    NumBits;
+        uint64_t   BitOffset;
+        uint64_t   NumBits;
     } BitBuffer;
     
     typedef struct BitInput {
@@ -236,16 +236,16 @@ extern "C" {
         }
     }
     
-    void BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, int64_t BitStart, int64_t BitEnd) {
+    void BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, uint64_t BitStart, uint64_t BitEnd) {
         if (Source != NULL && Destination != NULL && BitStart < BitEnd && BitStart <= Source->NumBits && BitEnd <= Source->NumBits) {
             uint64_t NumBits2Copy = BitEnd - BitStart;
             if (BitStart % 8 == 0 && BitEnd % 8 == 0 && NumBits2Copy % 8 == 0) {
                 Destination->NumBits = NumBits2Copy;
-                for (int64_t Byte = BitStart / 8; Byte < BitEnd / 8; Byte++) {
+                for (uint64_t Byte = BitStart / 8; Byte < BitEnd / 8; Byte++) {
                     Destination->Buffer[Byte - (BitStart / 8)] = Source->Buffer[Byte];
                 }
             } else {
-                for (int64_t Bit = BitStart; Bit < BitEnd / 8; Bit++) {
+                for (uint64_t Bit = BitStart; Bit < BitEnd / 8; Bit++) {
                     Destination->Buffer[Bit / 8] = Source->Buffer[Bit / 8];
                 }
             }
