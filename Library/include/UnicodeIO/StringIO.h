@@ -20,9 +20,9 @@
 extern "C" {
 #endif
     
-/* Forward declare StringIO's types */
+    /* Forward declare StringIO's types */
 #ifndef               UTF8
-#ifdef                char8_t
+#if (FoundationIOSTDVersion >= FoundationIOSTDVersionC2X && FoundationIOTargetOS != FoundationIOAppleOS)
 typedef               char8_t                              UTF8;
 #else
 typedef               unsigned char                        UTF8;
@@ -30,7 +30,7 @@ typedef               unsigned char                        UTF8;
 #endif /* UTF8 */
     
 #ifndef               UTF16
-#ifdef                char16_t
+#if (FoundationIOSTDVersion >= FoundationIOSTDVersionC11 && FoundationIOTargetOS != FoundationIOAppleOS)
 typedef               char16_t                             UTF16;
 #else
 typedef               uint_least16_t                       UTF16;
@@ -38,13 +38,13 @@ typedef               uint_least16_t                       UTF16;
 #endif /* UTF16 */
     
 #ifndef               UTF32
-#ifdef                char32_t
+#if (FoundationIOSTDVersion >= FoundationIOSTDVersionC11 && FoundationIOTargetOS != FoundationIOAppleOS)
 typedef               char32_t                             UTF32;
 #else
 typedef               uint_least32_t                       UTF32;
 #endif /* char32_t */
 #endif /* UTF32 */
-/* Forward declare StringIO's types */
+    /* Forward declare StringIO's types */
     
 /* Define StringIO's Unicodeization macros */
 #ifndef                   U8
