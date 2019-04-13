@@ -234,7 +234,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     BitStart                        "The bit to start copying from (inclusive)".
      @param                     BitEnd                          "The bit to end copying (inclusive)".
      */
-    void                        BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, int64_t BitStart, int64_t BitEnd);
+    void                        BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, uint64_t BitStart, uint64_t BitEnd);
     
     /*!
      @abstract                                                  "Peeks (reads but without recording that it's been read) bits from BitBuffer".
