@@ -7,11 +7,16 @@ extern "C" {
 #endif
     
     typedef enum Switches {
-        NumSwitches = 1,
+        Input       = 0,
+        Output      = 1,
+        NumSwitches = 2,
     } Switches;
     
     int main(int argc, const char *argv[]) {
         CommandLineIO *CLI = CommandLineIO_Init(NumSwitches);
+        
+        CommandLineIO_SetMinOptions(CLI, 2);
+        
         return 0;
     }
     
