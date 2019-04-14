@@ -651,7 +651,7 @@ extern "C" {
     void BitInput_UTF8_OpenFile(BitInput *BitI, UTF8 *Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType                   = BitIOFile;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
             UTF32 *Path32                    = UTF8_Decode(Path2Open);
             bool   PathHasBOM                = UTF32_StringHasBOM(Path32);
             if (PathHasBOM) {
@@ -686,7 +686,7 @@ extern "C" {
     void BitInput_UTF16_OpenFile(BitInput *BitI, UTF16 *Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType                   = BitIOFile;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
             UTF32 *Path32                    = UTF16_Decode(Path2Open);
             bool   PathHasBOM                = UTF32_StringHasBOM(Path32);
             bool   PathHasWinPrefix          = UTF32_StringHasUNCPathPrefix(Path32);
@@ -832,7 +832,7 @@ extern "C" {
     void BitOutput_UTF8_OpenFile(BitOutput *BitO, UTF8 *Path2Open) {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType              = BitIOFile;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
             BitO->File                  = FoundationIO_File_Open(Path2Open, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             bool   PathIsAbsolute       = UTF8_PathIsAbsolute(Path2Open);
@@ -865,7 +865,7 @@ extern "C" {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType              = BitIOFile;
             bool  PathHasBOM            = No;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
             // Convert to UTF-8, and remove the BOM because fopen will silently fail if there's a BOM.
             UTF32 *Decoded              = UTF16_Decode(Path2Open);
             PathHasBOM                  = UTF32_StringHasBOM(Decoded);
