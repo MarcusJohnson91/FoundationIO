@@ -4,7 +4,7 @@
 #include "../include/Log.h"            /* Included for Log */
 #include "../include/StringIO.h"       /* Included for StringIO's declarations */
 
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
 #include <signal.h>                    /* Included for SIGWINCH handling */
 #include <sys/ioctl.h>                 /* Included for the terminal size */
 #include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
@@ -115,7 +115,7 @@ extern "C" {
     
     uint64_t       CommandLineIO_GetTerminalWidth(void) {
         uint64_t Width = 0ULL;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
         struct winsize       WindowSize;
         ioctl(0, TIOCGWINSZ, &WindowSize);
         Width          = WindowSize.ws_row;
@@ -129,7 +129,7 @@ extern "C" {
     
     uint64_t       CommandLineIO_GetTerminalHeight(void) {
         uint64_t Height = 0ULL;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
         struct winsize       WindowSize;
         ioctl(0, TIOCGWINSZ, &WindowSize);
         Height          = WindowSize.ws_row;
@@ -143,7 +143,7 @@ extern "C" {
     
     bool           CommandLineIO_TerminalWasResized(void) {
         bool SizeChanged = No;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
         /*
          We're creating a text UI to show the progress of the program.
          The user resizes the window
