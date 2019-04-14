@@ -158,8 +158,8 @@ extern "C" {
 #ifndef   VC_EXTRALEAN
 #define   VC_EXTRALEAN
 #endif /* VC_EXTRALEAN */
-#include <Windows.h>                  /* Included for Shared Library support, Winsock, WinCon */
-#include <WinSock2.h>                 /* Included for the socket support on Windows */
+#include <Windows.h>                  /* Included for Shared Library support, WinCon, QueryPerformanceCounter, etc */
+#include <WinSock2.h>                 /* Included for socket support, Windows.h MUST be included before WinSock2 */
     
 #ifndef             FoundationIOTargetOS
 #define             FoundationIOTargetOS (FoundationIOWindowsOS)
