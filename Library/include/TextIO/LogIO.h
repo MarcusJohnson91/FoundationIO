@@ -80,9 +80,9 @@ typedef               uint_least32_t                       UTF32;
      @param                     FunctionName                    "Which function is calling Log?".
      @param                     Description                     "String describing what went wrong".
      */
-#if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
+#if   (FoundationIOCompiler == FoundationIOCompilerIsClang || FoundationIOCompiler == FoundationIOCompilerIsGCC)
     void                 Log(const LogTypes Severity, const UTF8 *restrict FunctionName, UTF8 *restrict Description, ...) __attribute__((__format__(__printf__, 3, 4)));
-#elif defined(_MSC_VER)
+#elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 #include <sal.h>
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     void                 Log(LogTypes Severity, const UTF8 *restrict FunctionName, __format_string UTF8 *restrict Description, ...);

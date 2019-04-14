@@ -343,6 +343,10 @@ extern "C" {
 #define FoundationIOSTDVersionC17 (201710L)
 #endif
     
+#ifndef FoundationIOSTDVersionC2X
+#define FoundationIOSTDVersionC2X (202002L)
+#endif
+    
     uint64_t FoundationIO_GetNumCPUCores(void);
     
 #ifdef __cplusplus
