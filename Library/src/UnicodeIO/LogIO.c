@@ -20,7 +20,7 @@ extern "C" {
     
     void Log_UTF8_OpenFile(UTF8 *LogFilePath) {
         if (LogFilePath != NULL) {
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
             bool PathHasBOM      = UTF8_StringHasBOM(LogFilePath);
             if (PathHasBOM) {
                 UTF8 *BOMLess    = UTF8_RemoveBOM(LogFilePath);
@@ -66,7 +66,7 @@ extern "C" {
         if (LogFilePath != NULL) {
             UTF32 *Path32        = UTF16_Decode(LogFilePath);
             bool   PathHasBOM    = UTF32_StringHasBOM(Path32);
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
             if (PathHasBOM) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
                 UTF8 *Path8      = UTF8_Encode(BOMLess);
