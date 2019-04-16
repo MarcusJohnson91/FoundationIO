@@ -26,10 +26,9 @@ set(libFoundationIO_Dir "${CMAKE_CURRENT_SOURCE_DIR}/../libFoundationIO")
 
 set(Test_Dir "${CMAKE_CURRENT_SOURCE_DIR}/../Tests")
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${libFoundationIO_Dir}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${libFoundationIO_Dir}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
-
-set(RUNTIME_OUTPUT_DIRECTORY "${libFoundationIO_Dir}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
+set(RUNTIME_OUTPUT_DIRECTORY       "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
 
 set(libFoundationIO_PublicHeaders
 "${libFoundationIO_Dir}/include/BitIO.h"
@@ -54,6 +53,7 @@ set(libFoundationIO_Sources
 )
 
 add_library(FoundationIO SHARED ${libFoundationIO_Sources} ${libFoundationIO_PublicHeaders})
+set_target_properties(FoundationIO PROPERTIES PREFIX "")
 
 add_executable(Test_BitIO "${Test_Dir}/Test_BitIO.c")
 add_executable(Test_CommandLineIO "${Test_Dir}/Test_CommandLineIO.c")
