@@ -1,5 +1,10 @@
 #include "../include/Macros.h"
+
+#if (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
 #include <stddef.h>
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#include <sysinfoapi.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,7 +21,7 @@ extern "C" {
         }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         SYSTEM_INFO WinSysInfo;
-        GetSystemInfo(&WinSysInfo);
+        GetSystemInfo(&WinSysInfo); // Might need to call GetNativeSystemInfo?
         NumCPUCores = WinSysInfo.dwNumberOfProcessors;
 #endif
         return NumCPUCores;
