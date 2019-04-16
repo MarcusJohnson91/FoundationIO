@@ -16,6 +16,9 @@
 extern "C" {
 #endif
     
+#define CommandLineIONULLTerminator     (0)
+#define CommandLineIONULLTerminatorSize (1)
+    
     /*!
      @struct                 CommandLineSwitch
      @abstract                                           "Contains the data to support a switch".
@@ -1044,7 +1047,7 @@ extern "C" {
                     ExtensionSize = CodePoint - StringSize;
                 }
             }
-            Extension = calloc(UnicodeBOMSizeInCodePoints + ExtensionSize + NULLTerminatorSize , sizeof(UTF32));
+            Extension = calloc(UnicodeBOMSizeInCodePoints + ExtensionSize + CommandLineIONULLTerminatorSize , sizeof(UTF32));
             if (Extension != NULL) {
                 for (uint64_t ExtCodePoint = 0ULL; ExtCodePoint < ExtensionSize - 1; ExtCodePoint++) {
                     for (uint64_t PathCodePoint = StringSize - ExtensionSize; PathCodePoint < StringSize - 1; PathCodePoint++) {
