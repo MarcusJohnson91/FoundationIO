@@ -80,7 +80,8 @@ extern "C" {
 #define FoundationIOTargetOS (FoundationIOAppleOS)
 #else
 #define FoundationIOTargetOS (FoundationIOPOSIXOS)
-#endif
+#endif /* Platform check */
+#endif /* FoundationIOTargetOS */
 
 #ifndef             FoundationIO_File_Open
 #define             FoundationIO_File_Open(File2OpenPath, FileModeString)                      fopen(File2OpenPath, FileModeString)
