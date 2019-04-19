@@ -1,12 +1,16 @@
 # FoundationIO:
-- FoundationIO is a library containing many modules, like BitIO, CommandLineIO, StringIO, GUUID, and more.
+- FoundationIO is a library containing many modules, namely BitIO, CommandLineIO, ContainerIO, StringIO, Log, and TestIO.
 - BitIO is a module for reading, and writing bits from/to files/sockets.
 - CommandLineIO is a module for parsing command line arguments.
 - StringIO is a module for Unicode, including UTF-8 and UTF-16 en/de coding, as well as normalization, casefolding, string formatting, string splitting, etc.
 - Currently, there's no stable API, let alone ABI. I break shit constantly because i'm very indecisive.
 
 # Versioning:
-- FoundationIO uses Semantic Versioning (2.0.0)
+- When complete, FoundationIO will use Semantic Versioning (Version X.Y.Z)
+- X is the major version number, it will only be incremented when API breaking changes occur.
+- Y is the minor version number, it will only be incremented when new features are added.
+- Z is the patch version number, it reflects bug fixes and optimizations.
+Al of this is theoretical until FoundationIO is at least version 1.0.0, it's currently beta, and I'm changing things fairly often.
 
 # License:
 FoundationIO is released under the terms of the 3 clause [`Revised BSD`](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29) license.
@@ -15,8 +19,8 @@ Here's a tl;dr of my license:
 
 * **Do** If you permanently fork FoundationIO, change the name.
 * **Do** include in your acknowledgments a link to [FoundationIO on GitHub](https://github.com/MarcusJohnson91/FoundationIO).
-* **Don't** plagiarize FoundationIO.
-* **Don't** relicense FoundationIO.
+* **Don't** plagiarize FoundationIO, you didn't write it, don't claim that you did.
+* **Don't** relicense FoundationIO, as the copyright holder, it's exclusively my choice what license to use.
 * **Don't** sue me if something goes wrong, it's your responsibility to determine if FoundationIO is right for you.
 
 # Compiling:
@@ -31,19 +35,19 @@ StringIO:
 ----------
 * StringIO is a module for Unicode, it supports UTF-8, UTF-16, and UTF-32; but NOT CESU-8, WTF-8, or Java's Modified UTF-8.
 * To create a Unicode string with StringIO simply include the StringIO header, and declare a string or character literal with the `UTF8`, `UTF16`, or `UTF32` type; then use the `U8()`, `U16()`, or `U32()` macro to ensure the literal is encoded by the compiler correctly.
-* The functions in StringIO use UTF-32 internally; all UTF-8 and UTF-16 calls are internally decoded to UTF-32 then reencoded to their original format.
-* StringIO is meant to provide basic support for Unicode strings, and some of the more advanced operations on them, like case mapping, and de/normalization, but some things will never be on the map, like REGEX. StringIO's primary purpose is suppoing input and output, not everything Unicode.
+* StringIO's types `UTF8`, `UTF16`, `UTF32` are forward declared in the `BitIO`, `CommandLineIO`, `Log` modules; but not the Unicode stringization macros, those are only declared in StringIO.
+* The functions in StringIO use UTF-32 internally; the vast majority of UTF-8 and UTF-16 functions are simply wrappers around the UTF-32 version.
+* StringIO is meant to provide basic support for Unicode strings, and some of the more advanced operations on them, like case mapping, and de/normalization, but some things will never be on the map, like REGEX. StringIO's primary purpose is supporting input and output, not everything Unicode.
 
 CommandLineIO:
 -------------
 * The CommandLineIO API is split in 2, there's UTF8, and UTF16 parallel functions. 
-* POSIX derived systems tend to support UTF-8, and Windows derived systems tend to support UTF-16; Apple's Cocoa supports both.
-* Create a function for setting all of your options, there's gonna be a lot of function calls.
-* Create an enum to hold all of your options. (Options are 0 indexed).
+* POSIX derived systems tend to support UTF-8, and Windows derived systems tend to support UTF-16; Apple's Cocoa supports both, but prefers UTF-8.
+* Options are zero indexed.
 * Initialize CommandLineIO with `CommandLineIO_Init`
 * CommandLineIO_UTF(8|16)_Set*, and CommandLineIO_Set* functions are for the overall program.
 * CommandLineIO_UTF(8|16)_Switch*, and CommandLineIO_Switch* functions are for individual switches.
-* Once you've created all of the options you need, can you've called your function to create the options are runtime, you need to call CommandLineIO_UTF(8|16)_ParseOptions.
+* Once you've created all of the options you need, and you've called your function to create the options at runtime, you need to call CommandLineIO_UTF(8|16)_ParseOptions.
 * If the program you're creating is for POSIX compatible systems, just use argc and argv as the arguments to CommandLineIO_UTF(8|16)_ParseOptions
 * If the program you're creating is for Windows, use the global variables __argc and __wargv, or you can call `GetCommandLineW` or `CommandLineToArgvW`
 * There is one caveat for Windows, and that is that CommandLineIO assumes that the first argument is the path to the currently running executable, and therefore skips it. For Windows, the arguments need to be padded to align with that.
@@ -64,15 +68,15 @@ CommandLineIO:
 - SwitchHasArgMayHaveSlave (This type of switch is used when you require the user to give additional information beyond the mere existence of the switch)
 
 * The type of Options are:
-- To create a Master switch (that is a switch that depends on nothing but multiple switches depend on it) call `SetCLISwitchAsMaster`.
+- To create a Master switch (that is a switch that depends on nothing) call `SetCLISwitchAsMaster`.
 * Call `ParseCommandLineIO` to parse argv's arguments for any matching switches.
-* At the end of `main()` call `DeinitCommandLineIO` to clean everything up.
+* At the end of `main()` call `CommandLineIO_Deinit` to clean everything up.
 
 BitIO:
 -----
-* To use BitIO in `main()` call `BitInput_Init` and `BitOutput_Init` for each file or socket you want to read from or write to.
+* To use BitIO call `BitInput_Init` and `BitOutput_Init` for each file or socket you want to read from or write to.
 * Reading and writing from/to files/sockets, requires a `BitBuffer` Init it with `BitBuffer_Init`.
-* To open a file call `Bit(Input|Output)_UTF(8|16)_OpenFile` (except for the log file, which uses `Log_UTF(8|16)_OpenFile`).
+* To open a file call `Bit(Input|Output)_UTF(8|16)_OpenFile` (except for the log file, which uses `Log_OpenFile`).
 * To get the size of a file from `BitInput` call `BitInput_GetFileSize`.
 * To read bits from a BitBuffer, use the `ReadBits`/`PeekBits/ReadUnary`.
 * To write bits to a BitBuffer use the `WriteBits/WriteUnary`.
@@ -82,7 +86,7 @@ BitIO:
 * When you're all done, call `BitInput_Deinit`, `BitOutput_Deinit`, and `BitBuffer_Deinit`.
 - GUUIDs:
 * A `GUUID` is just a handy way to refer to UUID/GUIDStrings, and BinaryUUID/GUIDs as one object.
-* A GUUIDString is 21 bytes long, and includes a NULL terminator,  and the dashes.
+* A GUUIDString is 21 bytes long, and includes a NULL terminator,  and dashes.
 * A BinaryGUUID is 16 bytes long, and does not contain a NULL terminator or the dashes.
 * A UUID is most significant byte first for each section.
 * A GUID is least significant byte first for each section, except the last 6 bytes which are most significant.
@@ -107,16 +111,12 @@ BitIO:
 `GUUID_Deinit`: When you've had enough of GUUID's nonsense, call this function to make your problems disappear.
 
 Log:
-====
-* Writes to a file you open with `Log_UTF(8|16)_OpenFile`, if it's unset or otherwise inaccessible, all logs are printed to `stderr`.
-* Works on any platform that provides `stderr`.
+-----
+* Writes to a file you open with `Log_OpenFile`, if it's unset or otherwise inaccessible, all logs are printed to `stderr`.
+* Works on any platform that provides `stderr`, and for ones that don't open a user specified file with `Log_OpenFile`
 
 TODO:
------
+====
 * StringIO:
-- Finish the `UTF(8|16|32)_FormatString` work.
-* Math
-- Create a bignum library, that way I can finish the `Decimal2String` and `String2Decimal` functions in StringIO.
-* Cmake:
-** Finalize the cmake build script.
-
+- Finish the `FormatString` work.
+- Finish the `Decimal2String` and `String2Decimal` functions in StringIO.
