@@ -2,7 +2,6 @@
 
 #include "../include/TestIO.h"         /* Included for our declarations */
 #include "../include/Log.h"            /* Included for error reporting */
-#include "../include/StringIO.h"       /* Included for U8 macro */
 
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
 #include <time.h>                      /* Included for timespec_get */

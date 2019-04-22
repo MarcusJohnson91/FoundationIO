@@ -46,6 +46,20 @@ typedef               uint_least32_t                       UTF32;
 #endif /* UTF32 */
     /* Forward declare StringIO's types */
     
+    /* Define StringIO's Unicodeization macros */
+#ifndef                   U8
+#define                   U8(QuotedLiteral)                    u8##QuotedLiteral
+#endif
+    
+#ifndef                   U16
+#define                   U16(QuotedLiteral)                   u##QuotedLiteral
+#endif
+    
+#ifndef                   U32
+#define                   U32(QuotedLiteral)                   U##QuotedLiteral
+#endif
+    /* Define StringIO's Unicodeization macros */
+    
     /*!
      @enum                      LogTypes
      @constant                  Log_ERROR                       "An error occurred".
