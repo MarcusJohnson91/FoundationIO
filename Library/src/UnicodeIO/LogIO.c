@@ -9,12 +9,12 @@
 extern "C" {
 #endif
     
-    static FILE *Log_LogFile      = NULL;
-    static UTF8 *Log_ProgramName  = NULL;
+    static FILE  *Log_LogFile      = NULL;
+    static UTF32 *Log_ProgramName  = NULL;
     
     void Log_SetProgramName(UTF8 *ProgramName) {
         if (ProgramName != NULL) {
-            Log_ProgramName = ProgramName;
+            Log_ProgramName        = UTF8_Decode(ProgramName);
         }
     }
     
@@ -110,7 +110,7 @@ extern "C" {
         }
     }
     
-    void Log(const LogTypes Severity, const UTF8 *restrict FunctionName, UTF8 *restrict Description, ...) {
+    void Log(LogTypes Severity, UTF8 *restrict FunctionName, UTF8 *restrict Description, ...) {
         UTF8 *ErrorType[2] = {U8("ERROR"), U8("TEST")}; // So it doesn't branch
         
         va_list VariadicArguments;

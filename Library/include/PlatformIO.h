@@ -139,18 +139,6 @@ extern "C" {
 #define             FoundationIO_Socket_Close(Socket2Close)                                    close(Socket2Close)
 #endif
     
-#ifndef             FoundationIO_SharedLibrary_Open
-#define             FoundationIO_SharedLibrary_Open(PathUTF8, Mode)                            dlopen(PathUTF8, Mode)
-#endif
-    
-#ifndef             FoundationIO_SharedLibrary_GetSymbol
-#define             FoundationIO_SharedLibrary_GetSymbol(LibraryAddress, Symbol)               dlsym(LibraryAddress, Symbol)
-#endif
-    
-#ifndef             FoundationIO_SharedLibrary_Close
-#define             FoundationIO_SharedLibrary_Close(LibraryAddress)                           dlclose(LibraryAddress)
-#endif
-    
 #elif    defined(WIN32) || defined(WIN32) || defined(WINNT) || defined(_WIN32) ||  defined(_WIN64)
     
 #ifndef   WIN32_LEAN_AND_MEAN
@@ -228,18 +216,6 @@ extern "C" {
     
 #ifndef             FoundationIO_Socket_Close
 #define             FoundationIO_Socket_Close(Socket2Close)                                    close(Socket2Close)
-#endif
-    
-#ifndef             FoundationIO_SharedLibrary_Open
-#define             FoundationIO_SharedLibrary_Open(PathUTF16, Mode)                           LoadLibraryEx(PathUTF16, NULL, Mode)
-#endif
-    
-#ifndef             FoundationIO_SharedLibrary_GetSymbol
-#define             FoundationIO_SharedLibrary_GetSymbol(LibraryAddress, Symbol)               GetProcAddress(LibraryAddress, Symbol)
-#endif
-    
-#ifndef             FoundationIO_SharedLibrary_Close
-#define             FoundationIO_SharedLibrary_Close(LibraryAddress)                           FreeLibrary(LibraryAddress)
 #endif
     
 #else

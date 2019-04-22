@@ -136,7 +136,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     BitBufferSize                   "The number of bytes to create the BitBuffer with".
      @return                                                    "Returns a pointer to the BitBuffer".
      */
-    BitBuffer                  *BitBuffer_Init(const uint64_t BitBufferSize);
+    BitBuffer                  *BitBuffer_Init(uint64_t BitBufferSize);
     
     /*!
      @abstract                                                  "Reads data from BitInput to BitBuffer".
@@ -187,7 +187,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     AlignmentSize                   "The number of bytes to check the alignment of".
      @return                                                    "Returns whether the BitBuffer is aligned to AlignmentSize or not".
      */
-    bool                        BitBuffer_IsAligned(BitBuffer *BitB, const uint8_t AlignmentSize);
+    bool                        BitBuffer_IsAligned(BitBuffer *BitB, uint8_t AlignmentSize);
     
     /*!
      @abstract                                                  "Aligns BitBuffer".
@@ -195,14 +195,14 @@ typedef               uint_least32_t                       UTF32;
      @param                     BitB                            "BitBuffer Pointer".
      @param                     AlignmentSize                   "The alignment size in bytes".
      */
-    void                        BitBuffer_Align(BitBuffer *BitB, const uint8_t AlignmentSize);
+    void                        BitBuffer_Align(BitBuffer *BitB, uint8_t AlignmentSize);
     
     /*!
      @abstract                                                  "Seeks forwards and backwards in BitBuffer".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     Bits2Seek                       "The number of bits to seek".
      */
-    void                        BitBuffer_Seek(BitBuffer *BitB, const int64_t Bits2Seek);
+    void                        BitBuffer_Seek(BitBuffer *BitB, int64_t Bits2Seek);
     
     /*!
      @abstract                                                  "Zeros the BitBuffer".
@@ -216,7 +216,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     BitB                            "BitBuffer Pointer to resize".
      @param                     NewSize                         "The new size of the internal buffer in bytes".
      */
-    void                        BitBuffer_Resize(BitBuffer *BitB, const uint64_t NewSize);
+    void                        BitBuffer_Resize(BitBuffer *BitB, uint64_t NewSize);
     
     /*!
      @abstract                                                  "Reads fresh data to a BitBuffer from a BitInput".
@@ -234,7 +234,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     BitStart                        "The bit to start copying from (inclusive)".
      @param                     BitEnd                          "The bit to end copying (inclusive)".
      */
-    void                        BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, const uint64_t BitStart, const uint64_t BitEnd);
+    void                        BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, uint64_t BitStart, uint64_t BitEnd);
     
     /*!
      @abstract                                                  "Peeks (reads but without recording that it's been read) bits from BitBuffer".
@@ -243,7 +243,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     BitOrder                        "What bit order are the bits to be peeked"?
      @param                     Bits2Peek                       "The number of bits to peek from the BitBuffer".
      */
-    uint64_t                    BitBuffer_PeekBits(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, const uint8_t Bits2Peek);
+    uint64_t                    BitBuffer_PeekBits(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, uint8_t Bits2Peek);
     
     /*!
      @abstract                                                  "Reads bits from BitBuffer".
@@ -252,7 +252,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     BitOrder                        "What bit order are the bits to be read"?
      @param                     Bits2Read                       "The number of bits to read from the BitBuffer".
      */
-    uint64_t                    BitBuffer_ReadBits(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, const uint8_t Bits2Read);
+    uint64_t                    BitBuffer_ReadBits(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, uint8_t Bits2Read);
     
     /*!
      @abstract                                                  "Reads unary encoded fields from the BitBuffer".
@@ -262,7 +262,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     UnaryType                       "What type of Unary coding are we reading"?
      @param                     StopBit                         "Is the stop bit a one or a zero"?
      */
-    uint64_t                    BitBuffer_ReadUnary(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, const UnaryTypes UnaryType, const bool StopBit);
+    uint64_t                    BitBuffer_ReadUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, bool StopBit);
     
     /*!
      @abstract                                                  "Reads data from the Bitbuffer until it stops matching the UTF-8 format".
@@ -277,7 +277,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     BitB                            "BitBuffer Pointer".
      @param                     StringSize                      "Size of the string in CodeUnits, not counting an optional null".
      */
-    UTF8                       *BitBuffer_ReadUTF8(BitBuffer *BitB, const uint64_t StringSize);
+    UTF8                       *BitBuffer_ReadUTF8(BitBuffer *BitB, uint64_t StringSize);
     
     /*!
      @abstract                                                  "Reads data from the Bitbuffer until it stops matching the UTF-8 format".
@@ -292,7 +292,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     BitB                            "BitBuffer Pointer".
      @param                     StringSize                      "Size of the string in CodeUnits, not counting an optional null".
      */
-    UTF16                      *BitBuffer_ReadUTF16(BitBuffer *BitB, const uint64_t StringSize);
+    UTF16                      *BitBuffer_ReadUTF16(BitBuffer *BitB, uint64_t StringSize);
     
     /*!
      @abstract                                                  "Reads a BinaryGUUID/GUUIDString from the BitBuffer".
@@ -300,7 +300,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     GUUIDType                       "The type of GUUID to read".
      @return                                                    "Returns a pointer to the BinaryGUUID/GUUIDString, it will contain BinaryGUUIDSize or BinaryGUUIDSize bytes".
      */
-    uint8_t                    *BitBuffer_ReadGUUID(BitBuffer *BitB, const GUUIDTypes GUUIDType);
+    uint8_t                    *BitBuffer_ReadGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType);
     
     /*!
      @abstract                                                  "Writes bits to the BitBuffer".
@@ -310,7 +310,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     NumBits2Write                   "How many bits from Bits2Write should we write?".
      @param                     Bits2Write                      "the actual data to write".
      */
-    void                        BitBuffer_WriteBits(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, const uint8_t NumBits2Write, const uint64_t Bits2Write);
+    void                        BitBuffer_WriteBits(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, uint8_t NumBits2Write, uint64_t Bits2Write);
     
     /*!
      @abstract                                                  "Writes unary encoded bits to the BitBuffer".
@@ -321,14 +321,14 @@ typedef               uint_least32_t                       UTF32;
      @param                     StopBit                         "Is the stop bit a one or a zero"?
      @param                     Bits2Write                      "the actual data to write".
      */
-    void                        BitBuffer_WriteUnary(BitBuffer *BitB, const ByteOrders ByteOrder, const BitOrders BitOrder, UnaryTypes UnaryType, bool StopBit, const uint8_t Bits2Write);
+    void                        BitBuffer_WriteUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, bool StopBit, uint8_t Bits2Write);
     
     /*!
      @abstract                                                  "Writes a UTF-8 encoded string to the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     String2Write                    "The string to write to the BitBuffer".
      */
-    void                        BitBuffer_WriteUTF8(BitBuffer *BitB, const UTF8 *String2Write);
+    void                        BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write);
     
     /*!
      @abstract                                                  "Writes a UTF-16 encoded string to the BitBuffer".
@@ -336,14 +336,14 @@ typedef               uint_least32_t                       UTF32;
      @param                     BitB                            "BitBuffer Pointer".
      @param                     String2Write                    "The string to write to the BitBuffer".
      */
-    void                        BitBuffer_WriteUTF16(BitBuffer *BitB, const UTF16 *String2Write);
+    void                        BitBuffer_WriteUTF16(BitBuffer *BitB, UTF16 *String2Write);
     
     /*!
      @abstract                                                  "Writes a GUUID to the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     GUUID2Write                     "Pointer to the GUUID you want to write".
      */
-    void                        BitBuffer_WriteGUUID(BitBuffer *BitB, const GUUIDTypes GUUIDType, const uint8_t *GUUID2Write);
+    void                        BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, uint8_t *GUUID2Write);
     
     /*!
      @abstract                                                  "Writes a BitBuffer to BitOutput".
@@ -372,14 +372,14 @@ typedef               uint_least32_t                       UTF32;
      @param                     BitI                            "BitInput Pointer".
      @param                     Path2Open                       "Path to the input file to open".
      */
-    void                        BitInput_UTF8_OpenFile(BitInput *BitI, const UTF8 *Path2Open);
+    void                        BitInput_UTF8_OpenFile(BitInput *BitI, UTF8 *Path2Open);
     
     /*!
      @abstract                                                  "Opens an input file, pointed to by Path2Open".
      @param                     BitI                            "BitInput Pointer".
      @param                     Path2Open                       "Path to the input file to open".
      */
-    void                        BitInput_UTF16_OpenFile(BitInput *BitI, const UTF16 *Path2Open);
+    void                        BitInput_UTF16_OpenFile(BitInput *BitI, UTF16 *Path2Open);
     
     /*!
      @abstract                                                  "Opens a socket for reading".
@@ -388,7 +388,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     Type                            "What type of Socket are you trying to open"?
      @param                     Protocol                        "What protocol are you trying to use over this socket"?
      */
-    void                        BitInput_OpenSocket(BitInput *BitI, const int Domain, const int Type, const int Protocol);
+    void                        BitInput_OpenSocket(BitInput *BitI, int Domain, int Type, int Protocol);
     
     /*!
      @abstract                                                  "Connects BitInput to a socket".
@@ -396,7 +396,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     SocketAddress                   "The address of the socket".
      @param                     SocketSize                      "I honest have no idea what this means".
      */
-    void                        BitInput_ConnectSocket(BitInput *BitI, struct sockaddr *SocketAddress, const uint64_t SocketSize);
+    void                        BitInput_ConnectSocket(BitInput *BitI, struct sockaddr *SocketAddress, uint64_t SocketSize);
     
     /*!
      @abstract                                                  "Gets the size of the BitInput file".
@@ -439,14 +439,14 @@ typedef               uint_least32_t                       UTF32;
      @param                     BitO                            "BitOutput Pointer".
      @param                     Path2Open                       "Path to the output file to open".
      */
-    void                        BitOutput_UTF8_OpenFile(BitOutput *BitO, const UTF8 *Path2Open);
+    void                        BitOutput_UTF8_OpenFile(BitOutput *BitO, UTF8 *Path2Open);
     
     /*!
      @abstract                                                  "Opens an output file for writing".
      @param                     BitO                            "BitOutput Pointer".
      @param                     Path2Open                       "Path to the output file to open".
      */
-    void                        BitOutput_UTF16_OpenFile(BitOutput *BitO, const UTF16 *Path2Open);
+    void                        BitOutput_UTF16_OpenFile(BitOutput *BitO, UTF16 *Path2Open);
     
     /*!
      @abstract                                                  "Opens a socket for writing".
@@ -455,7 +455,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     Type                            "What type of Socket are you trying to open"?
      @param                     Protocol                        "What protocol are you trying to use over this socket"?
      */
-    void                        BitOutput_OpenSocket(BitOutput *BitO, const int Domain, const int Type, const int Protocol);
+    void                        BitOutput_OpenSocket(BitOutput *BitO, int Domain, int Type, int Protocol);
     
     /*!
      @abstract                                                  "Connects BitOutput to a socket".
@@ -463,7 +463,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     SocketAddress                   "The address of the socket".
      @param                     SocketSize                      "I honestly have no idea what this means".
      */
-    void                        BitOutput_ConnectSocket(BitOutput *BitO, struct sockaddr *SocketAddress, const uint64_t SocketSize);
+    void                        BitOutput_ConnectSocket(BitOutput *BitO, struct sockaddr *SocketAddress, uint64_t SocketSize);
     
     /*!
      @abstract                                                  "Deallocates the instance of BitOutput pointed to by BitO".
@@ -480,7 +480,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     GUUID2                          "Pointer to a GUUID to be compared".
      @return                                                    "Returns Yes if GUUID1 and GUUID2 match, No otherwise".
      */
-    bool                        GUUID_Compare(const GUUIDTypes GUUIDType, const uint8_t *GUUID1, const uint8_t *GUUID2);
+    bool                        GUUID_Compare(GUUIDTypes GUUIDType, uint8_t *GUUID1, uint8_t *GUUID2);
     
     /*!
      @abstract                                                  "Converts a GUUID from one representation to another (String/Binary) || (UUID/GUID)".
@@ -489,7 +489,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     OutputType                      "What type of GUUID are we converting to"?
      @return                                                    "Returns the converted GUUID".
      */
-    uint8_t                    *GUUID_Convert(const GUUIDTypes InputType, const GUUIDTypes OutputType, const uint8_t *GUUID2Convert);
+    uint8_t                    *GUUID_Convert(GUUIDTypes InputType, GUUIDTypes OutputType, uint8_t *GUUID2Convert);
     
     /*!
      @abstract                                                  "Swaps the byte order of a BinaryGUUID or GUUIDString".
@@ -498,7 +498,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     GUUID2Swap                      "GUUID Pointer to swap".
      @return                                                    "Returns a pointer to a swapped GUUID".
      */
-    uint8_t                    *GUUID_Swap(const GUUIDTypes GUUIDType, const uint8_t *GUUID2Swap);
+    uint8_t                    *GUUID_Swap(GUUIDTypes GUUIDType, uint8_t *GUUID2Swap);
     
     /*!
      @abstract                                                  "Frees a GUUID".

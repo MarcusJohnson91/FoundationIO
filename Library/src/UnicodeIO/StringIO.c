@@ -537,6 +537,9 @@ extern "C" {
         if (String != NULL) {
             StringSize                                   = UTF8_GetStringSizeInCodePoints(String);
             bool StringHasBOM                            = UTF8_StringHasBOM(String);
+            if (StringHasBOM == No) {
+                StringSize                              += 1;
+            }
             // If the string has a BOM, we just repace it, if not, we need to add room for it.
             DecodedString                                = calloc(StringSize, sizeof(UTF32));
             if (DecodedString != NULL) {
@@ -646,7 +649,7 @@ extern "C" {
             if (EncodedString != NULL) {
                 do {
                     if (String[CodePoint] <= 0x7F) {
-                        EncodedString[CodeUnitNum]     = String[CodePoint];
+                        EncodedString[CodeUnitNum]     = String[CodePoint] & 0x7F;
                         CodeUnitNum                   += 1;
                     } else if (String[CodePoint] >= 0x80 && String[CodePoint] <= 0x7FF) {
                         EncodedString[CodeUnitNum]     = (0xC0 + ((String[CodePoint] & 0x7C0) >> 6));
@@ -705,12 +708,12 @@ extern "C" {
                     }
 #endif
                     if (String[CodePoint] < UTF16HighSurrogateStart || (String[CodePoint] > UTF16LowSurrogateEnd && String[CodePoint] < UTF16MaxCodePoint)) {
-                        EncodedString[CodePoint] = String[CodePoint];
+                        EncodedString[CodePoint] = String[CodePoint] & 0xFFFF;
                         CodePoint               += 1;
                     } else {
-                        EncodedString[CodePoint] = ((String[CodePoint] - UTF16SurrogatePairStart) / UTF16SurrogatePairModDividend) + UTF16HighSurrogateStart;
+                        EncodedString[CodePoint] = (((String[CodePoint] - UTF16SurrogatePairStart) / UTF16SurrogatePairModDividend) + UTF16HighSurrogateStart) & 0xFFFF;
                         CodePoint               += 1;
-                        EncodedString[CodePoint] = ((String[CodePoint] - UTF16SurrogatePairStart) % UTF16SurrogatePairModDividend) + UTF16LowSurrogateStart;
+                        EncodedString[CodePoint] = (((String[CodePoint] - UTF16SurrogatePairStart) % UTF16SurrogatePairModDividend) + UTF16LowSurrogateStart) & 0xFFFF;
                     }
                 } while (String[CodePoint] != StringIONULLTerminator);
             } else {
@@ -1205,7 +1208,7 @@ extern "C" {
             // So we need to know the size of the string to get, so count the number of codeunits that don't match any line ending.
             uint64_t StringSizeInCodeUnits  = 0ULL;
             uint64_t StringSizeInCodePoints = 0ULL;
-            UTF32    CurrentCodePoint       = 1;
+            UTF32   *CurrentCodePoint       = 1UL;
             do {
                 /*
                  Loop reading a codepoint each time until we find one that is a new line character.
@@ -1213,7 +1216,7 @@ extern "C" {
                 StringSizeInCodePoints     += 1;
                 UTF8 *CodePoint             = UTF8_ReadCodePoint(Source);
                 CurrentCodePoint            = UTF8_Decode(CodePoint);
-            } while (CurrentCodePoint != U32('\n') || CurrentCodePoint != StringIONULLTerminator);
+            } while (CurrentCodePoint[0] != U32('\n') || CurrentCodePoint[0] != StringIONULLTerminator);
             // Now we need to allocate memory for that string
             Line                            = calloc(StringSizeInCodeUnits, sizeof(UTF8));
         } else {
@@ -1228,7 +1231,7 @@ extern "C" {
             // So we need to know the size of the string to get, so count the number of codeunits that don't match any line ending.
             uint64_t StringSizeInCodeUnits  = 0ULL;
             uint64_t StringSizeInCodePoints = 0ULL;
-            UTF32    CurrentCodePoint       = 1;
+            UTF32   *CurrentCodePoint       = 1UL;
             do {
                 /*
                  Loop reading a codepoint each time until we find one that is a new line character.
@@ -1236,7 +1239,7 @@ extern "C" {
                 StringSizeInCodePoints     += 1;
                 UTF16 *CodePoint            = UTF16_ReadCodePoint(Source);
                 CurrentCodePoint            = UTF16_Decode(CodePoint);
-            } while (CurrentCodePoint != U32('\n') || CurrentCodePoint != StringIONULLTerminator);
+            } while (CurrentCodePoint[0] != U32('\n') || CurrentCodePoint[0] != StringIONULLTerminator);
             // Now we need to allocate memory for that string
             Line                            = calloc(StringSizeInCodeUnits, sizeof(UTF16));
         } else {
@@ -1431,7 +1434,7 @@ extern "C" {
         return ComposedString;
     }
     
-    static UTF32 *UTF32_Decompose(UTF32 *String, const bool Kompatibility) { // FIXME: Must use a stable sorting algorithm
+    static UTF32 *UTF32_Decompose(UTF32 *String, bool Kompatibility) { // FIXME: Must use a stable sorting algorithm
         uint64_t CodePoint             = 0ULL;
         UTF32   *DecomposedString      = NULL;
         if (String != NULL && (Kompatibility == No || Kompatibility == Yes)) {
@@ -1719,14 +1722,14 @@ extern "C" {
         return Value;
     }
     
-    UTF8 *UTF8_Decimal2String(const StringIOBases Base, double Decimal) {
+    UTF8 *UTF8_Decimal2String(StringIOBases Base, double Decimal) {
         UTF32 *String32 = UTF32_Decimal2String(Base, Decimal);
         UTF8  *String8  = UTF8_Encode(String32);
         free(String32);
         return String8;
     }
     
-    UTF16 *UTF16_Decimal2String(const StringIOBases Base, double Decimal) {
+    UTF16 *UTF16_Decimal2String(StringIOBases Base, double Decimal) {
         UTF32 *String32 = UTF32_Decimal2String(Base, Decimal);
         UTF16 *String16 = UTF16_Encode(String32);
         free(String32);
@@ -1739,8 +1742,8 @@ extern "C" {
         int8_t   Sign             = ExtractSignD(Number);
         int16_t  Exponent         = ExtractExponentD(Number);
         int16_t  Exponent2        = AbsoluteD(Exponent);
-        uint64_t Mantissa         = ExtractMantissaD(Number);
-        uint64_t Mantissa2        = AbsoluteD(Mantissa);
+        int64_t  Mantissa         = ExtractMantissaD(Number);
+        int64_t  Mantissa2        = AbsoluteD(Mantissa);
         bool     IsDenormal       = No;
         bool     IsNotANumber     = No;
         bool     IsInfinite       = No;
@@ -2717,6 +2720,22 @@ extern "C" {
         return Value;
     }
     
+    static StringIOBases ConvertTypeModifier2Base(FormatSpecifierTypeModifiers TypeModifier) {
+        StringIOBases Base = UnknownBase;
+        if (TypeModifier == Modifier_Base2) {
+            Base           = Base2;
+        } else if (TypeModifier == Modifier_Base8) {
+            Base           = Base8;
+        } else if (TypeModifier == Modifier_Base10) {
+            Base           = Base10;
+        } else if (TypeModifier == (Modifier_Base16 & Modifier_Lowercase)) {
+            Base           = Base16 ^ Lowercase;
+        } else if (TypeModifier == (Modifier_Base16 & Modifier_Uppercase)) {
+            Base           = Base16 ^ Uppercase;
+        }
+        return Base;
+    }
+    
     static FormatString *UTF32_ParseFormatSpecifiers(UTF32 *Format, uint64_t NumSpecifiers, StringTypes StringType) {
         FormatString *Details             = NULL;
         if (Format != NULL && StringType != UnknownStringType) {
@@ -2867,10 +2886,11 @@ extern "C" {
                                 }
                             } else {
                                 if (Format[Range] == U32('*')) { // Minimum width field
-                                    Details->Specifiers[Specifier].MinWidthFlag = Precision_Dot_Asterisk_NextArg;
+                                    Details->Specifiers[Specifier].MinWidthFlag = MinWidth_Asterisk_NextArg;
                                 } else {
-                                    Details->Specifiers[Specifier].MinWidthFlag = Precision_Dot_Number;
-                                    uint64_t Digits = ExtractDigitsFromFormatString(Format, Details->Specifiers[Specifier].TypeModifier, Range + 1);
+                                    Details->Specifiers[Specifier].MinWidthFlag = MinWidth_Digits;
+                                    // Convert (Details->Specifiers[Specifier].TypeModifier) to (StringIOBases)
+                                    uint64_t Digits = ExtractDigitsFromFormatString(Format, ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Range + 1);
                                     Details->Specifiers[Specifier].MinWidth     = Digits;
                                 }
                                 
@@ -2879,7 +2899,7 @@ extern "C" {
                                         Details->Specifiers[Specifier].PrecisionFlag = Precision_Dot_Asterisk_NextArg;
                                     } else {
                                         Details->Specifiers[Specifier].PrecisionFlag = Precision_Dot_Number;
-                                        uint64_t Digits = ExtractDigitsFromFormatString(Format, Details->Specifiers[Specifier].TypeModifier, Range + 1);
+                                        uint64_t Digits = ExtractDigitsFromFormatString(Format, ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Range + 1);
                                         Details->Specifiers[Specifier].Precision     = Digits;
                                     }
                                 }
@@ -2927,7 +2947,7 @@ extern "C" {
                 if (BaseType == Type_CodePoint && Modifier == Modifier_UTF8) {
                     uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
                     uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
-                    UTF8    *Arg     = va_arg(VariadicArguments, UTF8);
+                    UTF8    *Arg     = va_arg(VariadicArguments, UTF8*);
                     UTF32   *Arg32   = UTF8_Decode(Arg);
                     UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
                     free(Format);
@@ -2937,7 +2957,7 @@ extern "C" {
                 } else if (BaseType == Type_CodePoint && Modifier == Modifier_UTF16) {
                     uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
                     uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
-                    UTF16   *Arg     = va_arg(VariadicArguments, UTF16);
+                    UTF16   *Arg     = va_arg(VariadicArguments, UTF16*);
                     UTF32   *Arg32   = UTF16_Decode(Arg);
                     UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg32, Offset, Length);
                     free(Format);
@@ -2947,7 +2967,7 @@ extern "C" {
                 } else if (BaseType == Type_CodePoint && Modifier == Modifier_UTF32) {
                     uint64_t Offset  = Details->Specifiers[Specifier].SpecifierOffset;
                     uint64_t Length  = Details->Specifiers[Specifier].SpecifierLength;
-                    UTF32   *Arg     = va_arg(VariadicArguments, UTF32);
+                    UTF32   *Arg     = va_arg(VariadicArguments, UTF32*);
                     UTF32   *Format2 = UTF32_ReplaceSubString(Format, Arg, Offset, Length);
                     free(Format);
                     Format           = Format2;

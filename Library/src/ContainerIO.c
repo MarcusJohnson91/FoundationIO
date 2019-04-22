@@ -81,12 +81,13 @@ extern "C" {
     }
     
     uint8_t AudioMask_GetNumChannels(Audio_ChannelMask ChannelMask) {
-        uint8_t NumChannels  = 0;
+        uint8_t NumChannels            = 0;
+        Audio_ChannelMask ChannelMask2 = ChannelMask;
         do {
-            if ((ChannelMask & 1) == 1) {
-                NumChannels += 1;
+            if ((ChannelMask2 & 1) == 1) {
+                NumChannels           += 1;
             }
-            ChannelMask    >>= 1;
+            ChannelMask2             >>= 1;
         } while (ChannelMask > 0);
         return NumChannels;
     }
@@ -420,7 +421,7 @@ extern "C" {
                     
                     for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
                         for (uint64_t S = 0ULL; S < Audio->NumSamples; S++) {
-                            uint16_t Sample                      = SampleArray[C * S];
+                            uint32_t Sample                      = SampleArray[C * S];
                             HistArray[Sample]                   += 1;
                         }
                     }
@@ -442,42 +443,42 @@ extern "C" {
                     uint8_t  *Audio = AudioHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Audio[Element - 1] = Max(Audio[Element - 1], Audio[Element]);
+                            Audio[Element - 1] = (uint8_t) Max(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Unsigned)) {
                     uint16_t *Audio = AudioHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Audio[Element - 1] = Max(Audio[Element - 1], Audio[Element]);
+                            Audio[Element - 1] = (uint16_t) Max(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Unsigned)) {
                     uint32_t *Audio = AudioHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Audio[Element - 1] = Max(Audio[Element - 1], Audio[Element]);
+                            Audio[Element - 1] = (uint32_t) Max(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer8 | AudioType_Signed)) {
                     int8_t  *Audio = AudioHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Audio[Element - 1] = Max(Audio[Element - 1], Audio[Element]);
+                            Audio[Element - 1] = (int8_t) Max(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Signed)) {
                     int16_t *Audio = AudioHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Audio[Element - 1] = Max(Audio[Element - 1], Audio[Element]);
+                            Audio[Element - 1] = (int16_t) Max(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Signed)) {
                     int32_t *Audio = AudioHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Audio[Element - 1] = Max(Audio[Element - 1], Audio[Element]);
+                            Audio[Element - 1] = (int32_t) Max(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 }
@@ -486,42 +487,42 @@ extern "C" {
                     uint8_t  *Audio = AudioHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Audio[Element - 1] = Min(Audio[Element - 1], Audio[Element]);
+                            Audio[Element - 1] = (uint8_t) Min(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Unsigned)) {
                     uint16_t *Audio = AudioHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Audio[Element - 1] = Min(Audio[Element - 1], Audio[Element]);
+                            Audio[Element - 1] = (uint16_t) Min(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Unsigned)) {
                     uint32_t *Audio = AudioHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Audio[Element - 1] = Min(Audio[Element - 1], Audio[Element]);
+                            Audio[Element - 1] = (uint32_t) Min(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer8 | AudioType_Signed)) {
                     int8_t  *Audio = AudioHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Audio[Element - 1] = Min(Audio[Element - 1], Audio[Element]);
+                            Audio[Element - 1] = (int8_t) Min(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Signed)) {
                     int16_t *Audio = AudioHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Audio[Element - 1] = Min(Audio[Element - 1], Audio[Element]);
+                            Audio[Element - 1] = (int16_t) Min(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Signed)) {
                     int32_t *Audio = AudioHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Audio[Element - 1] = Min(Audio[Element - 1], Audio[Element]);
+                            Audio[Element - 1] = (int32_t) Min(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 }
@@ -1200,14 +1201,14 @@ extern "C" {
                     uint8_t  *Image = ImageHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Image[Element - 1] = Max(Image[Element - 1], Image[Element]);
+                            Image[Element - 1] = (uint8_t) Max(Image[Element - 1], Image[Element]);
                         }
                     }
                 } else if (Histogram->Type == ImageType_Integer16) {
                     uint16_t *Image = ImageHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Image[Element - 1] = Max(Image[Element - 1], Image[Element]);
+                            Image[Element - 1] = (uint16_t) Max(Image[Element - 1], Image[Element]);
                         }
                     }
                 }
@@ -1216,14 +1217,14 @@ extern "C" {
                     uint8_t  *Image = ImageHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Image[Element - 1] = Min(Image[Element - 1], Image[Element]);
+                            Image[Element - 1] = (uint8_t) Min(Image[Element - 1], Image[Element]);
                         }
                     }
                 } else if (Histogram->Type == ImageType_Integer16) {
                     uint16_t *Image = ImageHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Image[Element - 1] = Min(Image[Element - 1], Image[Element]);
+                            Image[Element - 1] = (uint16_t) Min(Image[Element - 1], Image[Element]);
                         }
                     }
                 }

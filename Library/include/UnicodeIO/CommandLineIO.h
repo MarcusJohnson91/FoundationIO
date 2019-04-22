@@ -142,7 +142,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     NumSwitches                     "The number of CommandLineSwitch structures to initalize".
      @return                                                    "Returns a pointer to an initialized CommandLineIO instance".
      */
-    CommandLineIO              *CommandLineIO_Init(const int64_t NumSwitches);
+    CommandLineIO              *CommandLineIO_Init(uint64_t NumSwitches);
     
     /*!
      @abstract                                                  "Creating a Text UI".
@@ -255,13 +255,13 @@ typedef               uint_least32_t                       UTF32;
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     MinOptions                      "The minimum number of switches".
      */
-    void                        CommandLineIO_SetMinOptions(CommandLineIO *CLI, const int64_t MinOptions);
+    void                        CommandLineIO_SetMinOptions(CommandLineIO *CLI, uint64_t MinOptions);
     
     /*!
      @abstract                  CLI                             "CommandLineIO Pointer".
      @param                     HelpSwitch                      "Which switch is the one to get help"?
      */
-    void                        CommandLineIO_SetHelpSwitch(CommandLineIO *CLI, const int64_t HelpSwitch);
+    void                        CommandLineIO_SetHelpSwitch(CommandLineIO *CLI, uint64_t HelpSwitch);
     
     /*!
      @abstract                                                  "Displays on the screen the progress of X actions that are taking place"
@@ -290,7 +290,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     SwitchID                        "The switch to set".
      @param                     Name                            "The flag to identify an option with".
      */
-    void                        CommandLineIO_UTF8_Switch_SetName(CommandLineIO *CLI, const int64_t SwitchID, UTF8 *Name);
+    void                        CommandLineIO_UTF8_Switch_SetName(CommandLineIO *CLI, uint64_t SwitchID, UTF8 *Name);
     
     /*!
      @abstract                                                  "Sets SwitchID's flag in the CommandLineIO instance pointed by CLI".
@@ -299,7 +299,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     SwitchID                        "The switch to set".
      @param                     Name                            "The flag to identify an option with".
      */
-    void                        CommandLineIO_UTF16_Switch_SetName(CommandLineIO *CLI, const int64_t SwitchID, UTF16 *Name);
+    void                        CommandLineIO_UTF16_Switch_SetName(CommandLineIO *CLI, uint64_t SwitchID, UTF16 *Name);
     
     /*!
      @abstract                                                  "Sets SwitchDescription's flag in the CommandLineIO instance pointed by CLI".
@@ -307,7 +307,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     SwitchID                        "The switch to set".
      @param                     Description                     "Pointer to a UTF-8 encoded string containing the description of what this program does".
      */
-    void                        CommandLineIO_UTF8_Switch_SetDescription(CommandLineIO *CLI, const int64_t SwitchID, UTF8 *Description);
+    void                        CommandLineIO_UTF8_Switch_SetDescription(CommandLineIO *CLI, uint64_t SwitchID, UTF8 *Description);
     
     /*!
      @abstract                                                  "Sets SwitchDescription's flag in the CommandLineIO instance pointed by CLI".
@@ -315,14 +315,14 @@ typedef               uint_least32_t                       UTF32;
      @param                     SwitchID                        "The switch to set".
      @param                     Description                     "Pointer to a UTF-8 encoded string containing the description of what this program does".
      */
-    void                        CommandLineIO_UTF16_Switch_SetDescription(CommandLineIO *CLI, const int64_t SwitchID, UTF16 *Description);
+    void                        CommandLineIO_UTF16_Switch_SetDescription(CommandLineIO *CLI, uint64_t SwitchID, UTF16 *Description);
     
     /*!
      @abstract                                                  "Sets SwitchID's flag in the CommandLineIO instance pointed by CLI".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     SwitchID                        "Which switch are we talking about"?
      */
-    void                        CommandLineIO_Switch_SetType(CommandLineIO *CLI, const int64_t SwitchID, CLISwitchTypes SwitchType);
+    void                        CommandLineIO_Switch_SetType(CommandLineIO *CLI, uint64_t SwitchID, CLISwitchTypes SwitchType);
     
     /*!
      @abstract                                                  "Sets SwitchID as accepting arguments of only a certain type".
@@ -330,7 +330,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     SwitchID                        "The switch to apply the ArgumentType to".
      @param                     ArgumentType                    "The argument type from CLIArgumentTypes".
      */
-    void                        CommandLineIO_Switch_SetArgumentType(CommandLineIO *CLI, const int64_t SwitchID, CLIArgumentTypes ArgumentType);
+    void                        CommandLineIO_Switch_SetArgumentType(CommandLineIO *CLI, uint64_t SwitchID, CLIArgumentTypes ArgumentType);
     
     /*!
      @abstract                                                  "Sets MetaFlag switch as a meta flag for switch SwitchID".
@@ -338,7 +338,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     MasterID                        "Which switch does the child/meta switch depend on"?
      @param                     Slave                           "Which switch is the child switch"?
      */
-    void                        CommandLineIO_Switch_SetSlave(CommandLineIO *CLI, const int64_t MasterID, const int64_t Slave);
+    void                        CommandLineIO_Switch_SetSlave(CommandLineIO *CLI, uint64_t MasterID, uint64_t Slave);
     
     /*!
      @abstract                                                  "How many Slave switches must be active in a master argument at once"?
@@ -346,7 +346,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     MasterID                        "Which switch are we talking about"?
      @param                     MinActiveSlaves                 "How many Slave switches must be active in an argument at once"?
      */
-    void                        CommandLineIO_Switch_SetMinConcurrentSlaves(CommandLineIO *CLI, const int64_t MasterID, const int64_t MinActiveSlaves);
+    void                        CommandLineIO_Switch_SetMinConcurrentSlaves(CommandLineIO *CLI, uint64_t MasterID, uint64_t MinActiveSlaves);
     
     /*!
      @abstract                                                  "How many Slave switches can be active in a master argument at once"?
@@ -354,7 +354,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     MasterID                        "Which switch are we talking about"?
      @param                     MaxActiveSlaves                 "How many Slave switches can be active in an argument at once"?
      */
-    void                        CommandLineIO_Switch_SetMaxConcurrentSlaves(CommandLineIO *CLI, const int64_t MasterID, const int64_t MaxActiveSlaves);
+    void                        CommandLineIO_Switch_SetMaxConcurrentSlaves(CommandLineIO *CLI, uint64_t MasterID, uint64_t MaxActiveSlaves);
     
     /*!
      @abstract                                                  "Parses the Command Line Options as UTF-8 encoded strings".
@@ -362,7 +362,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to argc".
      @param                     Arguments                       "An array of UTF-8 encoded arguments; equilivent to argv"
      */
-    void                        CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF8 **Arguments);
+    void                        CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, UTF8 **Arguments);
     
     /*!
      @abstract                                                  "Parses the Command Line Options as UTF-16 encoded strings".
@@ -370,7 +370,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to __argc".
      @param                     Arguments                       "An array of UTF-16 encoded arguments; equilivent to __wargv"
      */
-    void                        CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, const int64_t NumArguments, UTF16 **Arguments);
+    void                        CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, UTF16 **Arguments);
     
     /*!
      @abstract                                                  "How many matching options are present in CommandLineIO (will also check for slave switches if present)".
@@ -380,7 +380,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     SlaveIDs                        "Pointer to an array with all the slaves you want to mke sure are present".
      @return                                                    "Returns the argument number if there is no matching argument it will return -1".
      */
-    int64_t                     CommandLineIO_GetNumMatchingOptions(CommandLineIO *CLI, const int64_t SwitchID, const int64_t NumSlaves, const int64_t *SlaveIDs);
+    uint64_t                     CommandLineIO_GetNumMatchingOptions(CommandLineIO *CLI, uint64_t SwitchID, uint64_t NumSlaves, uint64_t *SlaveIDs);
     
     /*!
      @abstract                                                  "How many Master switches are present in the Options (will also check for slave switches if present)".
@@ -390,7 +390,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     SlaveIDs                        "Pointer to an array with all the slaves you want to mke sure are present".
      @return                                                    "Returns the argument number if there is no matching argument it will return -1".
      */
-    int64_t                     CommandLineIO_GetOptionNum(CommandLineIO *CLI, const int64_t SwitchID, const int64_t NumSlaves, const int64_t *SlaveIDs);
+    uint64_t                     CommandLineIO_GetOptionNum(CommandLineIO *CLI, uint64_t SwitchID, uint64_t NumSlaves, uint64_t *SlaveIDs);
     
     /*!
      @abstract                                                  "Gets the data contained in Argument2Option".
@@ -398,7 +398,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     OptionID                        "The option's result to return".
      @return                                                    "Returns the data after the switch, if the switch is resultless it will return 0".
      */
-    UTF8                       *CommandLineIO_UTF8_GetOptionResult(CommandLineIO const *CLI, const int64_t OptionID);
+    UTF8                       *CommandLineIO_UTF8_GetOptionResult(CommandLineIO *CLI, uint64_t OptionID);
     
     /*!
      @abstract                                                  "Gets the data contained in Argument2Option".
@@ -406,7 +406,7 @@ typedef               uint_least32_t                       UTF32;
      @param                     OptionID                        "The option's result to return".
      @return                                                    "Returns the data after the switch, if the switch is resultless it will return 0".
      */
-    UTF16                      *CommandLineIO_UTF16_GetOptionResult(CommandLineIO const *CLI, const int64_t OptionID);
+    UTF16                      *CommandLineIO_UTF16_GetOptionResult(CommandLineIO *CLI, uint64_t OptionID);
     
     /*!
      @abstract                                                  "Returns the extension from Path as a string".
