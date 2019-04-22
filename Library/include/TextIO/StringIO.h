@@ -661,19 +661,19 @@ typedef               uint_least32_t                       UTF32;
      @abstract                             "Converts a double to a string; replaces dtostr".
      @param               Decimal          "The decimal number to convert to a string".
      */
-    UTF8                 *UTF8_Decimal2String(const StringIOBases Base, double Decimal);
+    UTF8                 *UTF8_Decimal2String(StringIOBases Base, double Decimal);
     
     /*!
      @abstract                             "Converts a double to a string; replaces ftoa".
      @param               Decimal          "The decimal number to convert to a string".
      */
-    UTF16                *UTF16_Decimal2String(const StringIOBases Base, double Decimal);
+    UTF16                *UTF16_Decimal2String(StringIOBases Base, double Decimal);
     
     /*!
      @abstract                             "Converts a double to a string; replaces ftoa".
      @param               Decimal          "The decimal number to convert to a string".
      */
-    UTF32                *UTF32_Decimal2String(const StringIOBases Base, double Decimal);
+    UTF32                *UTF32_Decimal2String(StringIOBases Base, double Decimal);
     
     /*!
      @enum                      TrimStringTypes
