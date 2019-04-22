@@ -2,7 +2,6 @@
 
 #include "../include/ContainerIO.h"    /* Included for our declarations */
 #include "../include/Log.h"            /* Included for error reporting */
-#include "../include/StringIO.h"       /* Included for StringIO's declarations */
 #include "../include/Math.h"           /* Included for Absolute, Max/Min */
 
 #ifdef __cplusplus
