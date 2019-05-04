@@ -1,6 +1,6 @@
 #include "../include/Macros.h"         /* Included for FoundationIO's macros */
-
 #include "../include/Log.h"            /* Included for the Log declarations */
+
 #include "../include/StringIO.h"       /* Included for StringIO's declarations */
 
 #include <stdarg.h>                    /* Included for va_list, va_copy, va_start, va_end */
@@ -110,7 +110,7 @@ extern "C" {
         }
     }
     
-    void Log(LogTypes Severity, UTF8 *restrict FunctionName, UTF8 *restrict Description, ...) {
+    void Log(LogTypes Severity, UTF8 *FunctionName, UTF8 *Description, ...) {
         UTF8 *ErrorType[2] = {U8("ERROR"), U8("TEST")}; // So it doesn't branch
         
         va_list VariadicArguments;
