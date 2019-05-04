@@ -1,6 +1,6 @@
 #include "../include/Macros.h"         /* Included for FoundationIO's macros */
-
 #include "../include/StringIOTables.h" /* Included for the tables, and StringIO declarations, NEEDS TO BE FIRST? */
+
 #include "../include/Log.h"            /* Included for error logging */
 #include "../include/Math.h"           /* Included for endian swapping */
 

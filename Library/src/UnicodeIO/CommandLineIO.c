@@ -1,6 +1,6 @@
 #include "../include/Macros.h"         /* Included for FoundationIO's macros */
-
 #include "../include/CommandLineIO.h"  /* Included for the CommandLineIO declarations */
+
 #include "../include/Log.h"            /* Included for Log */
 #include "../include/StringIO.h"       /* Included for StringIO's declarations */
 
@@ -9,6 +9,13 @@
 #include <sys/ioctl.h>                 /* Included for the terminal size */
 #include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#ifndef   WIN32_LEAN_AND_MEAN
+#define   WIN32_LEAN_AND_MEAN
+#endif /* WIN32_LEAN_AND_MEAN */
+#ifndef   VC_EXTRALEAN
+#define   VC_EXTRALEAN
+#endif /* VC_EXTRALEAN */
+#include <Windows.h>                   /* Included because WinCon need it */
 #include <wincon.h>                    /* Included for getting the terminal size, MAKE SURE Macros.h is included before this, it includes Windows.h */
 #endif
 

@@ -1,6 +1,6 @@
 #include "../include/Macros.h"         /* Included for FoundationIO's macros */
-
 #include "../include/TestIO.h"         /* Included for our declarations */
+
 #include "../include/Log.h"            /* Included for error reporting */
 
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
@@ -8,6 +8,13 @@
 #elif (FoundationIOTargetOS == FoundationIOAppleOS)
 #include <mach/mach_time.h>
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#ifndef   WIN32_LEAN_AND_MEAN
+#define   WIN32_LEAN_AND_MEAN
+#endif /* WIN32_LEAN_AND_MEAN */
+#ifndef   VC_EXTRALEAN
+#define   VC_EXTRALEAN
+#endif /* VC_EXTRALEAN */
+#include <Windows.h>                   /* Included for WinBase.h */
 #include <winbase.h>                   /* Included for QueryPerformanceCounter, Windows.h MUST be included before winbase */
 #endif
 

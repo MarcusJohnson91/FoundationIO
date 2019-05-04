@@ -1,7 +1,7 @@
-#include "../libFoundationIO/include/TestIO.h"
 #include "../libFoundationIO/include/BitIO.h"
+
+#include "../libFoundationIO/include/TestIO.h"
 #include "../libFoundationIO/include/Log.h"
-#include "../libFoundationIO/include/StringIO.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,9 +25,9 @@ extern "C" {
         
         uint64_t FileSize    = BitInput_GetFileSize(BitI);
         
-        BitBuffer *BitB      = BitBuffer_Init(8);
-        BitBuffer_WriteBits(LSByteFirst, LSBitFirst, BitB, WrittenValueSize, WrittenValue);
-        uint64_t ReadValue   = BitBuffer_ReadBits(LSByteFirst, LSBitFirst, BitB, WrittenValueSize);
+        BitBuffer *BitB      = BitBuffer_Init(FileSize);
+        BitBuffer_WriteBits(BitB, LSByteFirst, LSBitFirst, WrittenValueSize, WrittenValue);
+        uint64_t ReadValue   = BitBuffer_ReadBits(BitB, LSByteFirst, LSBitFirst, WrittenValueSize);
         
         if (ReadValue != WrittenValue) {
             Log(Log_TEST, __func__, U8("Written Value %u does not match the Read Value %llu"), WrittenValue, ReadValue);

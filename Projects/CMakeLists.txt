@@ -9,18 +9,18 @@ set(FoundationIO_VERSION_PATCH 1)
 set(FoundationIO_VERSION ${FoundationIO_VERSION_MAJOR}.${FoundationIO_VERSION_MINOR}.${FoundationIO_VERSION_PATCH})
 endif(NOT FoundationIO_VERSION)
 
-if   (${CMAKE_SYSTEM_NAME} MATCHES "UNIX")
+if   (${CMAKE_SYSTEM_NAME} MATCHES "Darwin" OR ${CMAKE_SYSTEM_NAME} MATCHES "UNIX")
 set(libMATH -lm)
 add_definitions(-D_LARGEFILE_SOURCE)
 add_definitions(-D_LARGEFILE64_SOURCE)
 add_definitions(-D_FILE_OFFSET_BITS=64)
-else (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 add_definitions(-D_LIB)
 add_definitions(-DUNICODE)
 add_definitions(-D_UNICODE)
 add_definitions(-D_ATL_ALLOW_CHAR_UNSIGNED)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif(${CMAKE_SYSTEM_NAME} MATCHES "UNIX")
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin" OR ${CMAKE_SYSTEM_NAME} MATCHES "UNIX")
 
 set(libFoundationIO_Dir "${CMAKE_CURRENT_SOURCE_DIR}/../libFoundationIO")
 
@@ -52,7 +52,11 @@ set(libFoundationIO_Sources
 "${libFoundationIO_Dir}/src/TestIO.c"
 )
 
-add_library(FoundationIO SHARED ${libFoundationIO_Sources} ${libFoundationIO_PublicHeaders})
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE "${MinSizeRel}")
+endif()
+
+add_library(FoundationIO ${libFoundationIO_Sources} ${libFoundationIO_PublicHeaders})
 set_target_properties(FoundationIO PROPERTIES PREFIX "")
 
 add_executable(Test_BitIO "${Test_Dir}/Test_BitIO.c")
@@ -86,9 +90,15 @@ ${CMAKE_C_FLAGS} \
 -funsigned-char \
 -std=c11 \
 -Weverything \
+-Wno-assign-enum \
 -Wno-c99-compat \
--Wno-pointer-sign \
+-Wno-ignored-attributes \
+-Wno-incompatible-pointer-types-discards-qualifiers \
 -Wno-padded \
+-Wno-pointer-sign \
+-Wno-reserved-id-macro \
+-Wno-sign-conversion \
+-Wno-varargs \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
@@ -102,6 +112,7 @@ ${CMAKE_C_FLAGS} \
 set(CMAKE_C_FLAGS_RELEASE " \
 ${CMAKE_C_FLAGS} \
 -Ofast \
+-s \
 ")
 
 set(CMAKE_C_FLAGS_RELWITHDEBINFO " \
@@ -114,6 +125,29 @@ ${CMAKE_C_FLAGS} \
 set(CMAKE_C_FLAGS_MINSIZEREL " \
 ${CMAKE_C_FLAGS} \
 -Os \
+-s \
+")
+
+set(LINK_FLAGS ${LINK_FLAGS} "-flto=full")
+
+set(LINK_FLAGS_DEBUG " \
+${LINK_FLAGS} \
+-flto=full \
+")
+
+set(LINK_FLAGS_RELWITHDEBINFO " \
+${LINK_FLAGS} \
+-flto=full \
+")
+
+set(LINK_FLAGS_RELEASE " \
+${LINK_FLAGS} \
+-flto=full \
+")
+
+set(LINK_FLAGS_MINSIZEREL " \
+${LINK_FLAGS} \
+-flto=full \
 ")
 
 elseif (CMAKE_C_COMPILER_ID MATCHES "MSVC")
@@ -121,6 +155,8 @@ elseif (CMAKE_C_COMPILER_ID MATCHES "MSVC")
 set(LINK_FLAGS " \
 ${LINK_FLAGS} \
 /GL \
+/LTCG:INCREMENTAL
+/OPT:REF
 ")
 
 set(CMAKE_C_FLAGS " \
@@ -178,5 +214,26 @@ set(CMAKE_C_FLAGS_MINSIZEREL " \
 ${CMAKE_C_FLAGS} \
 /p:UseDebugLibraries=false \
 -Os \
+")
+
+set(LINK_FLAGS_DEBUG " \
+${LINK_FLAGS} \
+/DEBUG \
+")
+
+set(LINK_FLAGS_RELWITHDEBINFO " \
+${LINK_FLAGS} \
+/DEBUG \
+/RELEASE \
+")
+
+set(LINK_FLAGS_RELEASE " \
+${LINK_FLAGS} \
+/RELEASE \
+")
+
+set(LINK_FLAGS_MINSIZEREL " \
+${LINK_FLAGS} \
+/RELEASE \
 ")
 endif(CMAKE_C_COMPILER_ID MATCHES "AppleClang" OR CMAKE_C_COMPILER_ID MATCHES "Clang" OR CMAKE_C_COMPILER_ID MATCHES "GNU")

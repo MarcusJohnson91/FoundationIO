@@ -1,6 +1,7 @@
+#include "../libFoundationIO/include/StringIO.h"
+
 #include "../libFoundationIO/include/TestIO.h"
 #include "../libFoundationIO/include/Log.h"
-#include "../libFoundationIO/include/StringIO.h"
 
 #ifdef __cplusplus
 extern "C" {
