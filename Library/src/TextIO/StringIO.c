@@ -904,11 +904,6 @@ extern "C" {
         return ReplacedString;
     }
     
-    /*
-     Ok, we need to change the API for ReplaceSubString.
-     If a SubString to be replaced, is smaller than what to replace it with, we need to go ahead and simply leave the string as it.
-     */
-    
     UTF8 *UTF8_RemoveSubString(UTF8 *String, UTF8 *SubString2Remove, uint64_t Instance2Remove) {
         UTF8 *TrimmedString         = NULL;
         if (String != NULL && SubString2Remove != NULL) {
@@ -2849,17 +2844,17 @@ extern "C" {
                                     Details->Specifiers[CurrentSpecifier-1].TypeModifier += Modifier_UTF32;
                                 }
                             } else if (Format[CodePoint] == U32('S')) {
-                                Details->Specifiers[CurrentSpecifier - 1].SpecifierLength = EndCodePoint - CodePoint;
-                                Details->Specifiers[CurrentSpecifier - 1].BaseType        = Type_String;
+                                Details->Specifiers[CurrentSpecifier - 1].SpecifierLength  = EndCodePoint - CodePoint;
+                                Details->Specifiers[CurrentSpecifier - 1].BaseType         = Type_String;
                                 if (StringType == UTF8Format) {
                                     Details->Specifiers[CurrentSpecifier- 1].TypeModifier += Modifier_UTF16;
                                 } else if (StringType == UTF16Format) {
                                     Details->Specifiers[CurrentSpecifier- 1].TypeModifier += Modifier_UTF8;
                                 }
                             } else if (Format[CodePoint] == U32('%')) {
-                                Details->Specifiers[CurrentSpecifier - 1].SpecifierLength = EndCodePoint - CodePoint;
-                                Details->Specifiers[CurrentSpecifier - 1].BaseType        = Type_Literal;
-                                Details->Specifiers[CurrentSpecifier - 1].TypeModifier   += Modifier_Percent;
+                                Details->Specifiers[CurrentSpecifier - 1].SpecifierLength  = EndCodePoint - CodePoint;
+                                Details->Specifiers[CurrentSpecifier - 1].BaseType         = Type_Literal;
+                                Details->Specifiers[CurrentSpecifier - 1].TypeModifier    += Modifier_Percent;
                             }
                         }
                     }
