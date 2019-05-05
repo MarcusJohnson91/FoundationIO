@@ -15,6 +15,8 @@ extern "C" {
 
 #define WhiteSpaceTableSize 25
 
+#define CurrencyTableSize 62
+
 #define DecimalTableSize 123
 
 #define CombiningCharacterClassTableSize 862
@@ -70,6 +72,71 @@ extern "C" {
         0x00202F,
         0x00205F,
         0x003000,
+    };
+
+    static const UTF32    CurrencyTable[CurrencyTableSize] = {
+        0x000024,
+        0x0000A2,
+        0x0000A3,
+        0x0000A4,
+        0x0000A5,
+        0x00058F,
+        0x00060B,
+        0x0007FE,
+        0x0007FF,
+        0x0009F2,
+        0x0009F3,
+        0x0009FB,
+        0x000AF1,
+        0x000BF9,
+        0x000E3F,
+        0x0017DB,
+        0x0020A0,
+        0x0020A1,
+        0x0020A2,
+        0x0020A3,
+        0x0020A4,
+        0x0020A5,
+        0x0020A6,
+        0x0020A7,
+        0x0020A8,
+        0x0020A9,
+        0x0020AA,
+        0x0020AB,
+        0x0020AC,
+        0x0020AD,
+        0x0020AE,
+        0x0020AF,
+        0x0020B0,
+        0x0020B1,
+        0x0020B2,
+        0x0020B3,
+        0x0020B4,
+        0x0020B5,
+        0x0020B6,
+        0x0020B7,
+        0x0020B8,
+        0x0020B9,
+        0x0020BA,
+        0x0020BB,
+        0x0020BC,
+        0x0020BD,
+        0x0020BE,
+        0x0020BF,
+        0x00A838,
+        0x00FDFC,
+        0x00FE69,
+        0x00FF04,
+        0x00FFE0,
+        0x00FFE1,
+        0x00FFE5,
+        0x00FFE6,
+        0x011FDD,
+        0x011FDE,
+        0x011FDF,
+        0x011FE0,
+        0x01E2FF,
+        0x01ECB0,
     };
 
     static const UTF32    DecimalCodePoints[DecimalTableSize] = {

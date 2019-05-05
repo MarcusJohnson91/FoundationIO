@@ -16,6 +16,8 @@ CreateOutputFileTop() {
     printf "#define BiDirectionalControlsTableSize %d\n\n" "$NumBiDirectionalControls" >> "$OutputFile"
     NumWhiteSpaceCodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@WSpace='Y'])" "$UCD_Data")
     printf "#define WhiteSpaceTableSize %d\n\n" "$NumWhiteSpaceCodePoints" >> "$OutputFile"
+    NumCurrencyCodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@gc='Sc'])" "$UCD_Data")
+    printf "#define CurrencyTableSize %d\n\n" "$NumCurrencyCodePoints" >> "$OutputFile"
     DecimalTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and contains(@nv, '/')])" "$UCD_Data")
     printf "#define DecimalTableSize %d\n\n" "$DecimalTableSize" >> "$OutputFile"
     CombiningCharacterClassTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@ccc != '0'])" "$UCD_Data")
@@ -51,6 +53,19 @@ CreateWhiteSpaceTable() {
     printf "    static const UTF32    WhiteSpaceTable[WhiteSpaceTableSize] = {\n" >> "$OutputFile"
     WhiteSpace=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@WSpace = 'Y']" -v @cp -n "$UCD_Data")
     for line in $WhiteSpace; do
+        Value=$(echo "$line" | sed -e 's/^/0x/g')
+        printf "        0x%06X,\n" "$Value" >> "$OutputFile"
+    done
+    printf "    };\n\n" >> "$OutputFile"
+    unset IFS
+}
+
+CreateCurrencyTable() {
+    IFS='
+'
+    printf "    static const UTF32    CurrencyTable[CurrencyTableSize] = {\n" >> "$OutputFile"
+    Currency=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@gc = 'Sc']" -v @cp -n "$UCD_Data")
+    for line in $Currency; do
         Value=$(echo "$line" | sed -e 's/^/0x/g')
         printf "        0x%06X,\n" "$Value" >> "$OutputFile"
     done
@@ -295,6 +310,7 @@ else
                 CreateOutputFileTop
                 CreateBiDirectionalControlsTable
                 CreateWhiteSpaceTable
+                CreateCurrencyTable
                 CreateDecimalTables
                 CreateCombiningCharacterClassTable
                 CreateIntegerTable
