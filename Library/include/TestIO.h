@@ -28,6 +28,25 @@ extern "C" {
      */
     uint64_t                    GetTime(void);
     
+    /*!
+     @typedef                   Entropy
+     @abstract                                                  "Contains random data".
+     */
+    typedef struct              Entropy                          Entropy;
+    
+    /*!
+     @abstract                                                  "Initalizes our random data".
+     @param                     Size                            "Size has 1 added, and multiplies it by 32 to work with AES-256; the max buffer size is 8192 bytes".
+     */
+    Entropy                    *Entropy_Init(uint8_t Size);
+    
+    
+    /*!
+     @abstract                                                  "Deinitalizes our random data".
+     @param                     Entropy                         "Pointer to Entropy source to deinitalize".
+     */
+    void                        Entropy_Deinit(Entropy *Entropy);
+    
 #ifdef __cplusplus
 }
 #endif
