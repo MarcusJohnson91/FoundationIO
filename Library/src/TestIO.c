@@ -67,6 +67,81 @@ extern "C" {
      Being able to specify ranges and possibly even multiple range at once to create random numbers would be VERY useful, especially for testing Unicode strings.
      */
     
+    /* AES Encryption for Cryptographically ecure Random Number Generation, my idea is to generate a random number, encrypt it with AES, then use that as a seed for another round of random number generation which is finally output to the user, and I don't trust hardware implementations. */
+    
+    /* API:
+     GenerateRandomInteger_Insecure();
+     GenerateRandomInteger_Secure();
+     GenerateRandomCodePoint();
+     GenerateRandomDecimal_Insecure();
+     GenerateRandomDecimal_Secure();
+     */
+    
+    typedef enum EntropyConstants {
+        AES256Alignment          = 256 / 8,
+        AES192Alignment          = 192 / 8,
+        AES128Alignment          = 128 / 8,
+        AES256Rounds             = 14,
+        AES192Rounds             = 12,
+        AES128Rounds             = 10,
+        AESSubstitutionArraySize = 256,
+    } EntropyConstants;
+    
+    typedef struct Entropy {
+        uint8_t *Data;
+        uint64_t Size;
+        uint64_t Offset;
+    } Entropy;
+    
+    Entropy *Entropy_Init(uint8_t Size) {
+        Entropy *Entropy        = calloc(1, sizeof(Entropy));
+        if (Entropy != NULL) {
+            Entropy->Data       = calloc(Size * AES256Alignment, sizeof(uint8_t));
+            if (Entropy->Data != NULL) {
+                Entropy->Size   = Size * AES256Alignment;
+                Entropy->Offset = 0ULL;
+                /* Now we need to go ahead and get our entropy source, AES it, Mix it, re-AES it, and remix it */
+            } else {
+                Entropy_Deinit(Entropy);
+            }
+        }
+        return Entropy;
+    }
+    
+    static void Entropy_Encrypt(Entropy *Entropy) {
+        if (Entropy != NULL) {
+            
+        } else {
+            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+        }
+    }
+    
+    static void Entropy_Mix(Entropy *Entropy) {
+        if (Entropy != NULL) {
+            
+        } else {
+            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+        }
+    }
+    
+    void Entropy_Reseed(Entropy *Entropy) {
+        if (Entropy != NULL) {
+            // Reseed reads from whatever function there is, basically /dev/random on POSIX, AESes it, mixes it, re-AESes it, and re-mixes it.
+            for (uint64_t Byte = 0ULL; Byte < Entropy->Size; Byte++) { // Reset the entropy array
+                Entropy->Data[Byte] = 0;
+            }
+            
+            
+        } else {
+            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+        }
+    }
+    
+    void Entropy_Deinit(Entropy *Entropy) {
+        free(Entropy->Data);
+        free(Entropy);
+    }
+    
 #ifdef __cplusplus
 }
 #endif
