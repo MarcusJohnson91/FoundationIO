@@ -295,9 +295,27 @@ extern "C" {
     }
     
     /*
+     AudioObject: 4096 Samples, 24 bits per sample, MONO (all objects are mono), and then there's like effects and direction and shit.
+     AudioDirection:
+     
+     btw should this be called AudioVector because it's an actual vector.
+     
+     DIRECTION
+     */
+    
+    typedef struct AudioVector {
+        void       *Samples;
+        uint64_t    NumSamples;
+        uint64_t    SampleRate;
+        uint64_t    DirectionOffset;
+        uint64_t   *Direction;
+        uint64_t    NumDirections;
+        Audio_Types Type;
+    } AudioVector;
+    
     typedef struct AudioContainer3D {
         uint64_t     NumObjects;
-        AudioObject *AudioObjects;
+        AudioVector *Objects;
     } AudioContainer3D;
     
     AudioContainer3D *AudioContainer3D_Init(uint64_t NumObjects) {
@@ -305,8 +323,8 @@ extern "C" {
         if (NumObjects > 0) {
             Container                     = calloc(1, sizeof(AudioContainer3D));
             if (Container != NULL) {
-                Container->AudioObjects   = calloc(NumObjects, sizeof(AudioObject));
-                if (Container->AudioObjects != NULL) {
+                Container->Objects        = calloc(NumObjects, sizeof(AudioVector));
+                if (Container->Objects != NULL) {
                     Container->NumObjects = NumObjects;
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate %lld AudioObjects"), NumObjects);
@@ -320,18 +338,18 @@ extern "C" {
         return Container;
     }
     
-    void AudioContainer3D_SetObject(AudioContainer3D *Container, AudioObject *Object, uint64_t Index) {
-        if (Container != NULL && Object != NULL && Index >= 1) {
-            Container->AudioObjects[Index - 1] = *Object;
+    void AudioContainer3D_SetVector(AudioContainer3D *Container, AudioVector *Vector, uint64_t Index) {
+        if (Container != NULL && Vector != NULL && Index < Container->NumObjects) {
+            Container->Objects[Index - 1] = *Vector;
         } else if (Container == NULL) {
             Log(Log_ERROR, __func__, U8("AudioContainer3D Pointer is NULL"));
-        } else if (Object == NULL) {
-            Log(Log_ERROR, __func__, U8("AudioObject Pointer is NULL"));
-        } else if (Index == 0) {
-            Log(Log_ERROR, __func__, U8("Index needs to be a count, not an offset"));
+        } else if (Vector == NULL) {
+            Log(Log_ERROR, __func__, U8("AudioVector Pointer is NULL"));
+        } else if (Index >= Container->NumObjects) {
+            Log(Log_ERROR, __func__, U8("Index %llu is larger than %llu"), Index, Container->NumObjects);
         }
     }
-    */
+    
     typedef struct AudioHistogram {
         void          **Array; // Channel, Sample
         uint64_t        NumEntries;
