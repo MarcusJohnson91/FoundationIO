@@ -880,7 +880,7 @@ extern "C" {
             FoundationIO_File_Open(Fixed, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             bool   StringHasPathPrefix  = UTF16_StringHasUNCPathPrefix(Path2Open);
-            BitO->FileSpecifierExists   = UTF16_NumFormatSpecifiers(Path2Open) >= 1 ? Yes : No;
+            
             UTF32 *Path32               = UTF16_Decode(Path2Open);
             UTF16 *Path16               = NULL;
             if (StringHasPathPrefix == No) {
