@@ -21,7 +21,6 @@ extern "C" {
         setlocale(LC_MONETARY, NULL);
         setlocale(LC_NUMERIC, NULL);
         setlocale(LC_TIME, NULL);
-        setlocale(LC_MESSAGES, NULL);
     }
     
     UTF8 *Localization_UTF8_GetLanguage(void) {
@@ -267,7 +266,6 @@ extern "C" {
         UTF16 **GroupingSize             = NULL;
         lconv_Init();
         struct lconv *Locale           = localeconv();
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
         UTF8 *GroupingSizeString        = Locale->grouping;
         UTF8 *Delimiters[]              = {U8("/"), U8("\\")};
         
@@ -276,12 +274,6 @@ extern "C" {
         UTF8_StringArray_Deinit(GroupingSize8);
         GroupingSize                    = UTF16_StringArray_Encode(GroupingSize32);
         UTF32_StringArray_Deinit(GroupingSize32);
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        UTF16 *GroupingSizeString       = Locale->_W_grouping;
-        UTF16 *Delimiters[]             = {U16("/"), U16("\\")};
-        
-        GroupingSize                    = UTF16_SplitString(GroupingSizeString, Delimiters);
-#endif
         return GroupingSize;
     }
     
