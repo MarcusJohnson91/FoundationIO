@@ -22,6 +22,8 @@
     <ClCompile Include="..\libFoundationIO\src\BitIO.c" />
     <ClCompile Include="..\libFoundationIO\src\CommandLineIO.c" />
     <ClCompile Include="..\libFoundationIO\src\ContainerIO.c" />
+    <ClCompile Include="..\libFoundationIO\src\CryptographyIO.c" />
+    <ClCompile Include="..\libFoundationIO\src\LocalizationIO.c" />
     <ClCompile Include="..\libFoundationIO\src\Log.c" />
     <ClCompile Include="..\libFoundationIO\src\Macros.c" />
     <ClCompile Include="..\libFoundationIO\src\Math.c" />
@@ -32,6 +34,8 @@
     <ClInclude Include="..\libFoundationIO\include\BitIO.h" />
     <ClInclude Include="..\libFoundationIO\include\CommandLineIO.h" />
     <ClInclude Include="..\libFoundationIO\include\ContainerIO.h" />
+    <ClInclude Include="..\libFoundationIO\include\CryptographyIO.h" />
+    <ClInclude Include="..\libFoundationIO\include\LocalizationIO.h" />
     <ClInclude Include="..\libFoundationIO\include\Log.h" />
     <ClInclude Include="..\libFoundationIO\include\Macros.h" />
     <ClInclude Include="..\libFoundationIO\include\Math.h" />
