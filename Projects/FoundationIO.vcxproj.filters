@@ -25,6 +25,12 @@
     <ClCompile Include="..\libFoundationIO\src\TestIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\libFoundationIO\src\LocalizationIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libFoundationIO\src\CryptographyIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\libFoundationIO\include\BitIO.h">
@@ -52,6 +58,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\libFoundationIO\include\TestIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libFoundationIO\include\CryptographyIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libFoundationIO\include\LocalizationIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
