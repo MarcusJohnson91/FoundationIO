@@ -86,6 +86,8 @@ ${LINK_FLAGS} \
 
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
+-fPIC \
+-fPIE \
 -fcolor-diagnostics \
 -ferror-limit=1024 \
 -fshort-enums \
@@ -116,7 +118,6 @@ ${CMAKE_C_FLAGS} \
 set(CMAKE_C_FLAGS_RELEASE " \
 ${CMAKE_C_FLAGS} \
 -Ofast \
--s \
 ")
 
 set(CMAKE_C_FLAGS_RELWITHDEBINFO " \
@@ -129,7 +130,6 @@ ${CMAKE_C_FLAGS} \
 set(CMAKE_C_FLAGS_MINSIZEREL " \
 ${CMAKE_C_FLAGS} \
 -Os \
--s \
 ")
 
 set(LINK_FLAGS ${LINK_FLAGS} "-flto=full")
