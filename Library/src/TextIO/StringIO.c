@@ -3531,11 +3531,12 @@ extern "C" {
         return Format32;
     }
     
-    UTF8 **UTF8_DeformatString(FILE *Source, UTF8 *Format) {
+    UTF8 **UTF8_DeformatString(UTF8 *Format, UTF8 *Source) {
         UTF8 **StringArray = NULL;
         if (Source != NULL && Format != NULL) {
             UTF32 *Format32 = UTF8_Decode(Format);
-            UTF32 **Array32 = UTF32_DeformatString(Source, Format32);
+            UTF32 *Source32 = UTF8_Decode(Source);
+            UTF32 **Array32 = UTF32_DeformatString(Format32, Source32);
             free(Format32);
             StringArray     = UTF8_StringArray_Encode(Array32);
             free(Array32);
@@ -3547,11 +3548,12 @@ extern "C" {
         return StringArray;
     }
     
-    UTF16 **UTF16_DeformatString(FILE *Source, UTF16 *Format) {
+    UTF16 **UTF16_DeformatString(UTF16 *Format, UTF16 *Source) {
         UTF16 **StringArray = NULL;
         if (Source != NULL && Format != NULL) {
             UTF32 *Format32 = UTF16_Decode(Format);
-            UTF32 **Array32 = UTF32_DeformatString(Source, Format32);
+            UTF32 *Source32 = UTF16_Decode(Source);
+            UTF32 **Array32 = UTF32_DeformatString(Format32, Source32);
             free(Format32);
             StringArray     = UTF16_StringArray_Encode(Array32);
             free(Array32);
@@ -3563,19 +3565,23 @@ extern "C" {
         return StringArray;
     }
     
-    UTF32 **UTF32_DeformatString(FILE *Source, UTF32 *Format) {
+    UTF32 **UTF32_DeformatString(UTF32 *Format, UTF32 *Source) {
         UTF32 **StringArray = NULL;
         if (Source != NULL && Format != NULL) {
             uint64_t NumFormatSpecifiers = UTF32_GetNumFormatSpecifiers(Format);
             if (NumFormatSpecifiers > 0) {
-                
+                /*
+                 Read a line from Source, including the line terminator, I want to support Windows, Unix, and Unicode line endings here.
+                 Once we have the line, compare it to the Format string and get the number of specifiers and all that stuff.
+                 */
+                /*
+                 What we need to do is loop over the Format string and find the offset for each parameter, just like with FormatString
+                 */
             } else {
-                // Return the read line
+                UTF32 *SourceClone = UTF32_Clone(Source);
+                StringArray        = UTF32_StringArray_Init(1);
+                StringArray[0]     = SourceClone;
             }
-            /*
-             Read a line from Source, including the line terminator, I want to support Windows, Unix, and Unicode line endings here.
-             Once we have the line, compare it to the Format string and get the number of specifiers and all that stuff.
-             */
         } else if (Source == NULL) {
             Log(Log_ERROR, __func__, U8("Source Pointer is NULL"));
         } else if (Format == NULL) {
