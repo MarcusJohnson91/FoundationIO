@@ -300,6 +300,71 @@ extern "C" {
         return StringHasUNCPathPrefix;
     }
     
+    bool UTF8_PathIsAbsolute(UTF8 *String) {
+        if (String != NULL) {
+#if  (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+            if (String[0] == '/') {
+                PathIsAbsolute     = Yes;
+            }
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+            uint64_t StringSize    = UTF8_GetStringSizeInCodeUnits(String);
+            if (StringSize > 2) {
+                if (String[1] == ':') {
+                    PathIsAbsolute = Yes;
+                }
+            }
+#endif
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+    }
+    
+    bool UTF16_PathIsAbsolute(UTF16 *String) {
+        bool PathIsAbsolute        = No;
+        if (String != NULL) {
+#if  (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+            if (String[0] == U16('/')) {
+                PathIsAbsolute     = Yes;
+            }
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+            uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(String);
+            if (StringSize > 2) {
+                if (String[1] == U16(':')) {
+                    PathIsAbsolute = Yes;
+                }
+            }
+#endif
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return PathIsAbsolute;
+    }
+    
+    bool UTF32_PathIsAbsolute(UTF32 *String) {
+        bool PathIsAbsolute = No;
+        if (String != NULL) {
+            /*
+             On Windows an Absolute Path's second character is ':'
+             on POSIX an Absolute Path's first character is '/'
+             */
+#if  (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+            if (String[0] == U32('/')) {
+                PathIsAbsolute = Yes;
+            }
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+            uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
+            if (StringSize > 2) {
+                if (String[1] == U32(':')) {
+                    PathIsAbsolute = Yes;
+                }
+            }
+#endif
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return PathIsAbsolute;
+    }
+    
     uint64_t UTF8_NumFormatSpecifiers(UTF8 *String) {
         uint64_t NumFormatSpecifiers = 0ULL;
         if (String != NULL) {

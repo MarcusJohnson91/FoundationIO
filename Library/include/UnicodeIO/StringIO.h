@@ -317,6 +317,27 @@ typedef               uint_least32_t                       UTF32;
     bool                  UTF32_StringHasUNCPathPrefix(UTF32 *String);
     
     /*!
+     @abstract                             "Tells if the string pointed to by String starts with / on POSIX, or the second character is : on Windows".
+     @param               String           "The string to check".
+     @return                               "Returns Yes if the string starts with "/" or the second character is ":" on Windows, otherwise it returns No".
+     */
+    bool                  UTF8_PathIsAbsolute(UTF8 *String);
+    
+    /*!
+     @abstract                             "Tells if the string pointed to by String starts with / on POSIX, or the second character is : on Windows".
+     @param               String           "The string to check".
+     @return                               "Returns Yes if the string starts with "/" or the second character is ":" on Windows, otherwise it returns No".
+     */
+    bool                  UTF16_PathIsAbsolute(UTF16 *String);
+    
+    /*!
+     @abstract                             "Tells if the string pointed to by String starts with / on POSIX, or the second character is : on Windows".
+     @param               String           "The string to check".
+     @return                               "Returns Yes if the string starts with "/" or the second character is ":" on Windows, otherwise it returns No".
+     */
+    bool                  UTF32_PathIsAbsolute(UTF32 *String);
+    
+    /*!
      @abstract                             "Counts the number of Format Specifiers in String".
      @param               String           "The string to check".
      @return                               "Returns the number of format specifiers found".
