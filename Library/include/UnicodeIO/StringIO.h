@@ -62,7 +62,7 @@ typedef               uint_least32_t                       UTF32;
     
     /* Define UNC Path Prefix macro */
 #ifndef                   StringIOUNCPathPrefix
-#define                   StringIOUNCPathPrefix                (U"//?/")
+#define                   StringIOUNCPathPrefix                U32("//?/")
 #endif
     /* Define UNC Path Prefix macro */
     
