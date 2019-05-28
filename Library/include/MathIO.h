@@ -385,6 +385,14 @@ extern "C" {
      */
     uint8_t                     GetNumDigitsInBase(uint8_t Base, int64_t Value);
     
+    /*!
+     @abstract                                                  "Rotates Value by Bits2Rotate".
+     @param                     Value                           "The value to rotate".
+     @param                     Bits2Rotate                     "The number of bits to rotate".
+     @return                                                    "Returns the rotated value".
+     */
+    uint64_t                    RotateLeft(uint64_t Value, uint8_t Bits2Rotate);
+    
 #define Absolute(Value)                     _Generic((Value), uint8_t:AbsoluteI, int8_t:AbsoluteI, uint16_t:AbsoluteI, int16_t:AbsoluteI, uint32_t:AbsoluteI, int32_t:AbsoluteI, uint64_t:AbsoluteI, int64_t:AbsoluteI, float:AbsoluteF, double:AbsoluteD)(Value)
 #define Floor(Value)                        _Generic((Value),   float:FloorF, double:FloorD)(Value)
 #define Ceil(Value)                         _Generic((Value),   float:CeilF, double:CeilD)(Value)
