@@ -78,24 +78,18 @@ add_test(Test_CommandLineIO CONFIGURATIONS Debug Release)
 add_test(Test_ContainerIO CONFIGURATIONS Debug Release)
 add_test(Test_StringIO CONFIGURATIONS Debug Release)
 
-if (CMAKE_C_COMPILER_ID MATCHES "AppleClang" OR CMAKE_C_COMPILER_ID MATCHES "Clang" OR CMAKE_C_COMPILER_ID MATCHES "GNU")
-set(LINK_FLAGS " \
-${LINK_FLAGS} \
-/flto \
-")
+
+
+if (CMAKE_C_COMPILER_ID MATCHES "AppleClang" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
 -fPIC \
 -fPIE \
--fcolor-diagnostics \
--ferror-limit=1024 \
 -fshort-enums \
--fstrict-enums \
 -funroll-loops \
 -funsigned-char \
 -std=c11 \
--Weverything \
 -Wno-assign-enum \
 -Wno-c99-compat \
 -Wno-ignored-attributes \
@@ -105,6 +99,7 @@ ${CMAKE_C_FLAGS} \
 -Wno-reserved-id-macro \
 -Wno-sign-conversion \
 -Wno-varargs \
+-v \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
@@ -136,32 +131,82 @@ set(LINK_FLAGS ${LINK_FLAGS} "-flto=full")
 
 set(LINK_FLAGS_DEBUG " \
 ${LINK_FLAGS} \
--flto=full \
 ")
 
 set(LINK_FLAGS_RELWITHDEBINFO " \
 ${LINK_FLAGS} \
--flto=full \
 ")
 
 set(LINK_FLAGS_RELEASE " \
 ${LINK_FLAGS} \
--flto=full \
 ")
 
 set(LINK_FLAGS_MINSIZEREL " \
 ${LINK_FLAGS} \
--flto=full \
 ")
 
-elseif (CMAKE_C_COMPILER_ID MATCHES "MSVC")
+elseif (CMAKE_C_COMPILER_ID MATCHES "GNU")
 
-set(LINK_FLAGS " \
+set(CMAKE_C_FLAGS " \
+${CMAKE_C_FLAGS} \
+-fPIC \
+-fPIE \
+-fshort-enums \
+-funroll-loops \
+-funsigned-char \
+-std=c11 \
+-Wno-ignored-attributes \
+-Wno-padded \
+-Wno-pointer-sign \
+-Wno-sign-conversion \
+-Wno-varargs \
+-Wno-discarded-qualifier \
+")
+
+set(CMAKE_C_FLAGS_DEBUG " \
+${CMAKE_C_FLAGS} \
+-fsanitize=address,undefined \
+-DDEBUG=1 \
+-g \
+-O1 \
+")
+
+set(CMAKE_C_FLAGS_RELEASE " \
+${CMAKE_C_FLAGS} \
+-Ofast \
+")
+
+set(CMAKE_C_FLAGS_RELWITHDEBINFO " \
+${CMAKE_C_FLAGS} \
+-DDEBUG=1 \
+-g \
+-Ofast \
+")
+
+set(CMAKE_C_FLAGS_MINSIZEREL " \
+${CMAKE_C_FLAGS} \
+-Os \
+")
+
+set(LINK_FLAGS ${LINK_FLAGS} "-flto=full")
+
+set(LINK_FLAGS_DEBUG " \
 ${LINK_FLAGS} \
-/GL \
-/LTCG:INCREMENTAL
-/OPT:REF
 ")
+
+set(LINK_FLAGS_RELWITHDEBINFO " \
+${LINK_FLAGS} \
+")
+
+set(LINK_FLAGS_RELEASE " \
+${LINK_FLAGS} \
+")
+
+set(LINK_FLAGS_MINSIZEREL " \
+${LINK_FLAGS} \
+")
+
+elseif (MAKE_C_COMPILER_ID MATCHES "MSVC")
 
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
@@ -173,7 +218,6 @@ ${CMAKE_C_FLAGS} \
 /Gy \
 /JMC \
 /J \
-/LTCG \
 /MP \
 /MT \
 /Ob2 \
@@ -220,10 +264,19 @@ ${CMAKE_C_FLAGS} \
 -Os \
 ")
 
+set(LINK_FLAGS " \
+${LINK_FLAGS} \
+/GL \
+/LTCG:INCREMENTAL
+/OPT:REF
+/flto \
+")
+
 set(LINK_FLAGS_DEBUG " \
 ${LINK_FLAGS} \
 /DEBUG \
 ")
+
 
 set(LINK_FLAGS_RELWITHDEBINFO " \
 ${LINK_FLAGS} \
@@ -240,4 +293,5 @@ set(LINK_FLAGS_MINSIZEREL " \
 ${LINK_FLAGS} \
 /RELEASE \
 ")
-endif(CMAKE_C_COMPILER_ID MATCHES "AppleClang" OR CMAKE_C_COMPILER_ID MATCHES "Clang" OR CMAKE_C_COMPILER_ID MATCHES "GNU")
+
+endif (CMAKE_C_COMPILER_ID MATCHES "AppleClang" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
