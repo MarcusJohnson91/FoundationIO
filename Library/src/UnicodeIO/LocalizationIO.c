@@ -2,7 +2,7 @@
 #include "../include/LocalizationIO.h" /* Included for our Declarations */
 
 #include "../include/Log.h"            /* Included for error logging */
-#include "../include/StringIO.h"       /* Included for String conversion */
+#include "../include/UnicodeTables.h"  /* Included for Currency tables */
 
 #include <locale.h>
 

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C4B094122A21D93004E1B0F /* UnicodeTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C4B094022A21D93004E1B0F /* UnicodeTables.h */; };
 		2CA45B442283AA9B009BFC25 /* BitIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA45B0B2283A999009BFC25 /* BitIO.h */; };
 		2CA45B452283AA9B009BFC25 /* CommandLineIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA45B142283A99A009BFC25 /* CommandLineIO.h */; };
 		2CA45B462283AA9B009BFC25 /* ContainerIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA45B102283A99A009BFC25 /* ContainerIO.h */; };
@@ -16,7 +17,6 @@
 		2CA45B4A2283AA9B009BFC25 /* Macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA45B0C2283A999009BFC25 /* Macros.h */; };
 		2CA45B4B2283AA9B009BFC25 /* Math.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA45B132283A99A009BFC25 /* Math.h */; };
 		2CA45B4C2283AA9B009BFC25 /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA45B122283A99A009BFC25 /* StringIO.h */; };
-		2CA45B4D2283AA9B009BFC25 /* StringIOTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA45B0F2283A99A009BFC25 /* StringIOTables.h */; };
 		2CA45B4E2283AA9B009BFC25 /* TestIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CA45B0A2283A999009BFC25 /* TestIO.h */; };
 		2CA45B4F2283AA9B009BFC25 /* BitIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA45B282283A9D3009BFC25 /* BitIO.c */; };
 		2CA45B502283AA9B009BFC25 /* CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA45B262283A9D3009BFC25 /* CommandLineIO.c */; };
@@ -70,6 +70,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2C4B094022A21D93004E1B0F /* UnicodeTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnicodeTables.h; path = ../libFoundationIO/include/UnicodeTables.h; sourceTree = "<group>"; };
 		2CA1BE1A21ABAF8F0035E9F9 /* Test_BitIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_BitIO; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CA1BE2521ABAFA20035E9F9 /* Test_CommandLineIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_CommandLineIO; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CA1BE3021ABAFAC0035E9F9 /* Test_ContainerIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_ContainerIO; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -79,7 +80,6 @@
 		2CA45B0C2283A999009BFC25 /* Macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Macros.h; path = ../libFoundationIO/include/Macros.h; sourceTree = "<group>"; };
 		2CA45B0D2283A99A009BFC25 /* LocalizationIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = LocalizationIO.h; path = ../libFoundationIO/include/LocalizationIO.h; sourceTree = "<group>"; };
 		2CA45B0E2283A99A009BFC25 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Log.h; path = ../libFoundationIO/include/Log.h; sourceTree = "<group>"; };
-		2CA45B0F2283A99A009BFC25 /* StringIOTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = StringIOTables.h; path = ../libFoundationIO/include/StringIOTables.h; sourceTree = "<group>"; };
 		2CA45B102283A99A009BFC25 /* ContainerIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ContainerIO.h; path = ../libFoundationIO/include/ContainerIO.h; sourceTree = "<group>"; };
 		2CA45B112283A99A009BFC25 /* CryptographyIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = CryptographyIO.h; path = ../libFoundationIO/include/CryptographyIO.h; sourceTree = "<group>"; };
 		2CA45B122283A99A009BFC25 /* StringIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = StringIO.h; path = ../libFoundationIO/include/StringIO.h; sourceTree = "<group>"; };
@@ -211,7 +211,7 @@
 				2CA45B0C2283A999009BFC25 /* Macros.h */,
 				2CA45B132283A99A009BFC25 /* Math.h */,
 				2CA45B122283A99A009BFC25 /* StringIO.h */,
-				2CA45B0F2283A99A009BFC25 /* StringIOTables.h */,
+				2C4B094022A21D93004E1B0F /* UnicodeTables.h */,
 				2CA45B0A2283A999009BFC25 /* TestIO.h */,
 			);
 			name = Headers;
@@ -226,8 +226,8 @@
 			files = (
 				2CA45B482283AA9B009BFC25 /* LocalizationIO.h in Headers */,
 				2CA45B4A2283AA9B009BFC25 /* Macros.h in Headers */,
-				2CA45B4D2283AA9B009BFC25 /* StringIOTables.h in Headers */,
 				2CA45B462283AA9B009BFC25 /* ContainerIO.h in Headers */,
+				2C4B094122A21D93004E1B0F /* UnicodeTables.h in Headers */,
 				2CA45B452283AA9B009BFC25 /* CommandLineIO.h in Headers */,
 				2CA45B492283AA9B009BFC25 /* Log.h in Headers */,
 				2CA45B472283AA9B009BFC25 /* CryptographyIO.h in Headers */,

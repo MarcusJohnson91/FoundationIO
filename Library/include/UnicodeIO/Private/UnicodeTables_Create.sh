@@ -4,10 +4,21 @@
 # Dependencies: Curl, XMLStarlet (On Mac install Homebrew from brew.sh then call brew install xmlstarlet)
 
 CreateOutputFileTop() {
-    printf "#include \"StringIO.h\" /* Included for our declarations */\n\n" >> "$OutputFile"
+    printf "#include <stdint.h>\n\n" >> "$OutputFile"
+    printf "#ifndef   FoundationIO_StringType32\n" >> "$OutputFile"
+    printf "#define   FoundationIO_StringType32\n\n" >> "$OutputFile"
+    printf "#ifdef    UTF32\n" >> "$OutputFile"
+    printf "#undef    UTF32\n" >> "$OutputFile"
+    printf "#endif /* UTF32 */\n\n" >> "$OutputFile"
+    printf "#ifdef  __CHAR32_TYPE__\n" >> "$OutputFile"
+    printf "typedef   char32_t       UTF32;\n" >> "$OutputFile"
+    printf "#else\n" >> "$OutputFile"
+    printf "typedef   uint_least32_t UTF32;\n" >> "$OutputFile"
+    printf "#endif /* __CHAR32_TYPE__ */\n\n" >> "$OutputFile"
+    printf "#endif /* FoundationIO_StringType32 */\n" >> "$OutputFile"
     printf "#pragma once\n\n" >> "$OutputFile"
-    printf "#ifndef FoundationIO_StringIOTables_H\n" >> "$OutputFile"
-    printf "#define FoundationIO_StringIOTables_H\n\n" >> "$OutputFile"
+    printf "#ifndef FoundationIO_UnicodeTables_H\n" >> "$OutputFile"
+    printf "#define FoundationIO_UnicodeTables_H\n\n" >> "$OutputFile"
     printf "#ifdef __cplusplus\n" >> "$OutputFile"
     printf "extern \"C\" {\n" >> "$OutputFile"
     printf "#endif\n\n" >> "$OutputFile"
@@ -241,7 +252,7 @@ CreateOutputFileBottom() {
     printf "#ifdef __cplusplus\n" >> "$OutputFile"
     printf "}\n" >> "$OutputFile"
     printf "#endif /* C++ */\n\n" >> "$OutputFile"
-    printf "#endif /* FoundationIO_StringIOTables_H */\n" >> "$OutputFile"
+    printf "#endif /* FoundationIO_UnicodeTables_H */\n" >> "$OutputFile"
 }
 
 XMLStarletPath=$(command -v xmlstarlet)
