@@ -139,7 +139,7 @@ extern "C" {
 #define             FoundationIO_Socket_Close(Socket2Close)                                    close(Socket2Close)
 #endif
     
-#elif    defined(WIN32) || defined(WIN32) || defined(WINNT) || defined(_WIN32) ||  defined(_WIN64)
+#elif    defined(WIN32) || defined(_WIN32) || defined(_WIN64) || defined(WINNT)
     
 #ifndef   WIN32_LEAN_AND_MEAN
 #define   WIN32_LEAN_AND_MEAN
@@ -218,7 +218,7 @@ extern "C" {
 #define             FoundationIO_Socket_Close(Socket2Close)                                    close(Socket2Close)
 #endif
     
-#else
+#else /* Platform not detected */
     
 #ifndef             FoundationIOTargetOS
 #define             FoundationIOTargetOS FoundationIOOSUnknown
