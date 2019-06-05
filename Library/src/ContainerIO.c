@@ -68,8 +68,8 @@ extern "C" {
         return BitDepth;
     }
     
-    uint8_t AudioContainer_GetNumChannels(AudioContainer *Audio) {
-        uint8_t NumChannels        = 0;
+    uint64_t AudioContainer_GetNumChannels(AudioContainer *Audio) {
+        uint64_t NumChannels       = 0ULL;
         if (Audio != NULL) {
             Audio_ChannelMask Mask = Audio->ChannelMask;
             NumChannels            = AudioMask_GetNumChannels(Mask);
@@ -79,8 +79,8 @@ extern "C" {
         return NumChannels;
     }
     
-    uint8_t AudioMask_GetNumChannels(Audio_ChannelMask ChannelMask) {
-        uint8_t NumChannels            = 0;
+    uint64_t AudioMask_GetNumChannels(Audio_ChannelMask ChannelMask) {
+        uint64_t NumChannels           = 0ULL;
         Audio_ChannelMask ChannelMask2 = ChannelMask;
         do {
             if ((ChannelMask2 & 1) == 1) {
@@ -361,7 +361,7 @@ extern "C" {
         if (Audio != NULL) {
             // Create a histogram for each sample value in each channel
             Histogram                     = calloc(1, sizeof(AudioHistogram));
-            uint8_t NumChannels           = AudioContainer_GetNumChannels(Audio);
+            uint64_t NumChannels          = AudioContainer_GetNumChannels(Audio);
             if (Histogram != NULL) {
                 uint64_t NumValues        = Exponentiate(2, Audio->BitDepth);
                 if (Audio->BitDepth <= 8) {
@@ -655,8 +655,8 @@ extern "C" {
         return NumViews;
     }
     
-    uint8_t ImageMask_GetNumChannels(Image_ChannelMask ChannelMask) {
-        uint8_t NumChannels            = 0;
+    uint64_t ImageMask_GetNumChannels(Image_ChannelMask ChannelMask) {
+        uint64_t NumChannels           = 0ULL;
         Image_ChannelMask JustChannels = ChannelMask - (ImageMask_2D | ImageMask_3D_L | ImageMask_3D_R);
         do {
             if ((JustChannels & 1) == 1) {
@@ -667,8 +667,8 @@ extern "C" {
         return NumChannels;
     }
     
-    uint8_t ImageContainer_GetNumChannels(ImageContainer *Image) {
-        uint8_t NumChannels        = 0;
+    uint64_t ImageContainer_GetNumChannels(ImageContainer *Image) {
+        uint64_t NumChannels       = 0ULL;
         if (Image != NULL) {
             Image_ChannelMask Mask = Image->ChannelMask;
             NumChannels            = ImageMask_GetNumChannels(Mask);
