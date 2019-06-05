@@ -2648,33 +2648,33 @@ extern "C" {
         FormatSpecifierTypeModifiers TypeModifier;
     } FormatSpecifier;
     
-    typedef struct FormatString {
-        uint64_t         NumSpecifiers;
+    typedef struct FormatSpecifiers {
         FormatSpecifier *Specifiers;
+        uint64_t         NumSpecifiers;
         StringTypes      StringType;
-    } FormatString;
+    } FormatSpecifiers;
     
-    static void FormatString_Deinit(FormatString *String2Deinit) {
+    static void FormatSpecifiers_Deinit(FormatSpecifiers *String2Deinit) {
         if (String2Deinit != NULL) {
             free(String2Deinit->Specifiers);
             free(String2Deinit);
         }
     }
     
-    static FormatString *FormatString_Init(uint64_t NumSpecifiers) {
-        FormatString *NewFormatString          = calloc(1, sizeof(FormatString));
-        if (NewFormatString != NULL) {
-            NewFormatString->Specifiers        = calloc(NumSpecifiers, sizeof(FormatSpecifier));
-            if (NewFormatString->Specifiers != NULL) {
-                NewFormatString->NumSpecifiers = NumSpecifiers;
+    static FormatSpecifiers *FormatSpecifiers_Init(uint64_t NumSpecifiers) {
+        FormatSpecifiers *NewFormatSpecifiers          = calloc(1, sizeof(FormatSpecifiers));
+        if (NewFormatSpecifiers != NULL) {
+            NewFormatSpecifiers->Specifiers        = calloc(NumSpecifiers, sizeof(FormatSpecifier));
+            if (NewFormatSpecifiers->Specifiers != NULL) {
+                NewFormatSpecifiers->NumSpecifiers = NumSpecifiers;
             } else {
-                FormatString_Deinit(NewFormatString);
+                FormatSpecifiers_Deinit(NewFormatSpecifiers);
                 Log(Log_ERROR, __func__, U8("Couldn't allocate %lld Specifiers"), NumSpecifiers);
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Couldn't allocate FormatString"));
+            Log(Log_ERROR, __func__, U8("Couldn't allocate FormatSpecifiers"));
         }
-        return NewFormatString;
+        return NewFormatSpecifiers;
     }
     
     static uint64_t ExtractDigitsFromFormatString(UTF32 *String, StringIOBases Base, uint64_t StartPosition) {
@@ -2797,10 +2797,10 @@ extern "C" {
         return Base;
     }
     
-    static FormatString *UTF32_ParseFormatSpecifiers(UTF32 *Format, uint64_t NumSpecifiers, StringTypes StringType) {
-        FormatString *Details             = NULL;
+    static FormatSpecifiers *UTF32_ParseFormatSpecifiers(UTF32 *Format, uint64_t NumSpecifiers, StringTypes StringType) {
+        FormatSpecifiers *Details             = NULL;
         if (Format != NULL && StringType != UnknownStringType) {
-            Details                       = FormatString_Init(NumSpecifiers);
+            Details                       = FormatSpecifiers_Init(NumSpecifiers);
             if (Details != NULL) {
                 uint64_t CurrentSpecifier = 0ULL;
                 uint64_t StringSize       = UTF32_GetStringSizeInCodePoints(Format);
@@ -2991,7 +2991,7 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate FormatString"));
+                Log(Log_ERROR, __func__, U8("Couldn't allocate FormatSpecifiers"));
             }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -2999,7 +2999,7 @@ extern "C" {
         return Details;
     }
     
-    static UTF32 *FormatString_UTF32(UTF32 *Format, FormatString *Details, va_list VariadicArguments) {
+    static UTF32 *FormatString_UTF32(UTF32 *Format, FormatSpecifiers *Details, va_list VariadicArguments) {
         UTF32 *Formatted = Format;
         if (Format != NULL) {
             for (uint64_t Specifier = 0ULL; Specifier < Details->NumSpecifiers - 1; Specifier++) { // Stringify each specifier
@@ -3525,22 +3525,22 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("FormatString Pointer is NULL"));
+            Log(Log_ERROR, __func__, U8("FormatSpecifiers Pointer is NULL"));
         }
         return Formatted;
     }
     
     UTF8 *UTF8_FormatString(UTF8 *Format, ...) {
-        UTF8 *Format8 = NULL;
+        UTF8 *Format8                     = NULL;
         if (Format != NULL) {
             uint64_t NumSpecifiers        = UTF8_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 UTF32 *Format32           = UTF8_Decode(Format);
-                FormatString *Details     = UTF32_ParseFormatSpecifiers(Format32, NumSpecifiers, UTF8Format);
+                FormatSpecifiers *Details = UTF32_ParseFormatSpecifiers(Format32, NumSpecifiers, UTF8Format);
                 va_list VariadicArguments;
                 UTF32 *FormattedString    = FormatString_UTF32(Format32, Details, VariadicArguments);
                 va_end(VariadicArguments);
-                FormatString_Deinit(Details);
+                FormatSpecifiers_Deinit(Details);
                 Format8                   = UTF8_Encode(FormattedString);
                 free(Format32);
                 free(FormattedString);
@@ -3554,16 +3554,16 @@ extern "C" {
     }
     
     UTF16 *UTF16_FormatString(UTF16 *Format, ...) {
-        UTF16 *Format16 = NULL;
+        UTF16 *Format16                   = NULL;
         if (Format != NULL) {
             uint64_t NumSpecifiers        = UTF16_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 UTF32 *Format32           = UTF16_Decode(Format);
-                FormatString *Details     = UTF32_ParseFormatSpecifiers(Format32, NumSpecifiers, UTF16Format);
+                FormatSpecifiers *Details = UTF32_ParseFormatSpecifiers(Format32, NumSpecifiers, UTF16Format);
                 va_list VariadicArguments;
                 UTF32 *FormattedString    = FormatString_UTF32(Format32, Details, VariadicArguments);
                 va_end(VariadicArguments);
-                FormatString_Deinit(Details);
+                FormatSpecifiers_Deinit(Details);
                 Format16                  = UTF16_Encode(FormattedString);
                 free(Format32);
                 free(FormattedString);
@@ -3577,15 +3577,15 @@ extern "C" {
     }
     
     UTF32 *UTF32_FormatString(UTF32 *Format, ...) {
-        UTF32 *Format32 = NULL;
+        UTF32 *Format32                   = NULL;
         if (Format != NULL) {
             uint64_t NumSpecifiers        = UTF32_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
-                FormatString *Details     = UTF32_ParseFormatSpecifiers(Format32, NumSpecifiers, UTF32Format);
+                FormatSpecifiers *Details = UTF32_ParseFormatSpecifiers(Format32, NumSpecifiers, UTF32Format);
                 va_list VariadicArguments;
                 UTF32 *FormattedString    = FormatString_UTF32(Format32, Details, VariadicArguments);
                 va_end(VariadicArguments);
-                FormatString_Deinit(Details);
+                FormatSpecifiers_Deinit(Details);
                 free(Format32);
                 free(FormattedString);
             } else {
@@ -3597,15 +3597,29 @@ extern "C" {
         return Format32;
     }
     
+    static UTF32 **DeformatString_UTF32(UTF32 *Format, FormatSpecifiers *Details) {
+        UTF32 **Deformatted = NULL;
+        
+        return Deformatted;
+    }
+    
     UTF8 **UTF8_DeformatString(UTF8 *Format, UTF8 *Source) {
-        UTF8 **StringArray = NULL;
+        UTF8 **StringArray                = NULL;
         if (Source != NULL && Format != NULL) {
-            UTF32 *Format32 = UTF8_Decode(Format);
-            UTF32 *Source32 = UTF8_Decode(Source);
-            UTF32 **Array32 = UTF32_DeformatString(Format32, Source32);
-            free(Format32);
-            StringArray     = UTF8_StringArray_Encode(Array32);
-            free(Array32);
+            uint64_t NumSpecifiers        = UTF8_GetNumFormatSpecifiers(Format);
+            if (NumSpecifiers > 0) {
+                UTF32 *Format32           = UTF8_Decode(Format);
+                FormatSpecifiers *Details = UTF32_ParseFormatSpecifiers(Format32, NumSpecifiers, UTF8Format);
+                UTF32 **Strings32         = DeformatString_UTF32(Format32, Details);
+                free(Format32);
+                FormatSpecifiers_Deinit(Details);
+                StringArray               = UTF8_StringArray_Encode(Strings32);
+                free(Strings32);
+            } else {
+                UTF8  *SourceClone        = UTF8_Clone(Source);
+                StringArray               = UTF8_StringArray_Init(1);
+                StringArray[0]            = SourceClone;
+            }
         } else if (Source == NULL) {
             Log(Log_ERROR, __func__, U8("Source Pointer is NULL"));
         } else if (Format == NULL) {
@@ -3615,14 +3629,22 @@ extern "C" {
     }
     
     UTF16 **UTF16_DeformatString(UTF16 *Format, UTF16 *Source) {
-        UTF16 **StringArray = NULL;
+        UTF16 **StringArray               = NULL;
         if (Source != NULL && Format != NULL) {
-            UTF32 *Format32 = UTF16_Decode(Format);
-            UTF32 *Source32 = UTF16_Decode(Source);
-            UTF32 **Array32 = UTF32_DeformatString(Format32, Source32);
-            free(Format32);
-            StringArray     = UTF16_StringArray_Encode(Array32);
-            free(Array32);
+            uint64_t NumSpecifiers        = UTF16_GetNumFormatSpecifiers(Format);
+            if (NumSpecifiers > 0) {
+                UTF32 *Format32           = UTF16_Decode(Format);
+                FormatSpecifiers *Details = UTF32_ParseFormatSpecifiers(Format32, NumSpecifiers, UTF16Format);
+                UTF32 **Strings32         = DeformatString_UTF32(Format32, Details);
+                free(Format32);
+                FormatSpecifiers_Deinit(Details);
+                StringArray               = UTF16_StringArray_Encode(Strings32);
+                free(Strings32);
+            } else {
+                UTF16 *SourceClone        = UTF16_Clone(Source);
+                StringArray               = UTF16_StringArray_Init(1);
+                StringArray[0]            = SourceClone;
+            }
         } else if (Source == NULL) {
             Log(Log_ERROR, __func__, U8("Source Pointer is NULL"));
         } else if (Format == NULL) {
@@ -3632,21 +3654,17 @@ extern "C" {
     }
     
     UTF32 **UTF32_DeformatString(UTF32 *Format, UTF32 *Source) {
-        UTF32 **StringArray = NULL;
+        UTF32 **StringArray               = NULL;
         if (Source != NULL && Format != NULL) {
-            uint64_t NumFormatSpecifiers = UTF32_GetNumFormatSpecifiers(Format);
-            if (NumFormatSpecifiers > 0) {
-                /*
-                 Read a line from Source, including the line terminator, I want to support Windows, Unix, and Unicode line endings here.
-                 Once we have the line, compare it to the Format string and get the number of specifiers and all that stuff.
-                 */
-                /*
-                 What we need to do is loop over the Format string and find the offset for each parameter, just like with FormatString
-                 */
+            uint64_t NumSpecifiers        = UTF32_GetNumFormatSpecifiers(Format);
+            if (NumSpecifiers > 0) {
+                FormatSpecifiers *Details = UTF32_ParseFormatSpecifiers(Format, NumSpecifiers, UTF32Format);
+                StringArray               = DeformatString_UTF32(Format, Details);
+                FormatSpecifiers_Deinit(Details);
             } else {
-                UTF32 *SourceClone = UTF32_Clone(Source);
-                StringArray        = UTF32_StringArray_Init(1);
-                StringArray[0]     = SourceClone;
+                UTF32 *SourceClone        = UTF32_Clone(Source);
+                StringArray               = UTF32_StringArray_Init(1);
+                StringArray[0]            = SourceClone;
             }
         } else if (Source == NULL) {
             Log(Log_ERROR, __func__, U8("Source Pointer is NULL"));
