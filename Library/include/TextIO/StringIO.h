@@ -20,45 +20,56 @@
 extern "C" {
 #endif
     
-    /* Forward declare StringIO's types */
-#ifndef               UTF8
-#if (FoundationIOSTDVersion >= FoundationIOSTDVersionC2X && FoundationIOTargetOS != FoundationIOAppleOS)
-typedef               char8_t                              UTF8;
-#else
-typedef               unsigned char                        UTF8;
-#endif /* char8_t */
+#ifndef   FoundationIO_StringType8
+#define   FoundationIO_StringType8 (1)
+#ifdef    UTF8
+#undef    UTF8
 #endif /* UTF8 */
-    
-#ifndef               UTF16
-#if (FoundationIOSTDVersion >= FoundationIOSTDVersionC11 && FoundationIOTargetOS != FoundationIOAppleOS)
-typedef               char16_t                             UTF16;
+#if (defined __STDC_UTF_8__ && defined __CHAR8_TYPE__) && (!defined __APPLE__ && !defined __MACH__)
+    typedef               char8_t                              UTF8;
 #else
-typedef               uint_least16_t                       UTF16;
-#endif /* char16_t */
+    typedef               unsigned char                        UTF8;
+#endif /* __CHAR8_TYPE__ */
+#endif /* FoundationIO_StringType8 */
+    
+#ifndef   FoundationIO_StringType16
+#define   FoundationIO_StringType16 (2)
+#ifdef    UTF16
+#undef    UTF16
 #endif /* UTF16 */
-    
-#ifndef               UTF32
-#if (FoundationIOSTDVersion >= FoundationIOSTDVersionC11 && FoundationIOTargetOS != FoundationIOAppleOS)
-typedef               char32_t                             UTF32;
+#if (defined __STDC_UTF_16__ && defined __CHAR16_TYPE__) && (!defined __APPLE__ && !defined __MACH__)
+    typedef               char16_t                             UTF16;
 #else
-typedef               uint_least32_t                       UTF32;
-#endif /* char32_t */
+    typedef               uint_least16_t                       UTF16;
+#endif /* __CHAR16_TYPE__ */
+#endif /* FoundationIO_StringType16 */
+    
+#ifndef   FoundationIO_StringType32
+#define   FoundationIO_StringType32 (4)
+#ifdef    UTF32
+#undef    UTF32
 #endif /* UTF32 */
-    /* Forward declare StringIO's types */
+#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (!defined __APPLE__ && !defined __MACH__)
+    typedef               char32_t                             UTF32;
+#else
+    typedef               uint_least32_t                       UTF32;
+#endif /* __CHAR32_TYPE__ */
+#endif /* FoundationIO_StringType32 */
     
-/* Define StringIO's Unicodeization macros */
-#ifndef                   U8
+#ifndef                   FoundationIO_Unicodize8
+#define                   FoundationIO_Unicodize8              (1)
 #define                   U8(QuotedLiteral)                    u8##QuotedLiteral
-#endif
+#endif /* FoundationIO_Unicodize8 */
     
-#ifndef                   U16
-#define                   U16(QuotedLiteral)                   u##QuotedLiteral
-#endif
+#ifndef                   FoundationIO_Unicodize16
+#define                   FoundationIO_Unicodize16            (2)
+#define                   U16(QuotedLiteral)                  u##QuotedLiteral
+#endif /* FoundationIO_Unicodize16 */
     
-#ifndef                   U32
-#define                   U32(QuotedLiteral)                   U##QuotedLiteral
-#endif
-/* Define StringIO's Unicodeization macros */
+#ifndef                   FoundationIO_Unicodize32
+#define                   FoundationIO_Unicodize32            (4)
+#define                   U32(QuotedLiteral)                  U##QuotedLiteral
+#endif /* FoundationIO_Unicodize32 */
     
     /* Define UNC Path Prefix macro */
 #ifndef                   StringIOUNCPathPrefix
@@ -338,25 +349,25 @@ typedef               uint_least32_t                       UTF32;
     bool                  UTF32_PathIsAbsolute(UTF32 *String);
     
     /*!
-     @abstract                             "Counts the number of Format Specifiers in String".
+     @abstract                             "Tells if the string pointed to by String contains a Windows or UNIX style line ending".
      @param               String           "The string to check".
-     @return                               "Returns the number of format specifiers found".
+     @return                               "Returns Yes if the String contains a Windows or UNIX style line ending, otherwise no".
      */
-    uint64_t              UTF8_NumFormatSpecifiers(UTF8 *String);
+    bool                  UTF8_StringHasNewLine(UTF8 *String);
     
     /*!
-     @abstract                             "Counts the number of Format Specifiers in String".
+     @abstract                             "Tells if the string pointed to by String contains a Windows or UNIX style line ending".
      @param               String           "The string to check".
-     @return                               "Returns the number of format specifiers found".
+     @return                               "Returns Yes if the String contains a Windows or UNIX style line ending, otherwise no".
      */
-    uint64_t              UTF16_NumFormatSpecifiers(UTF16 *String);
+    bool                  UTF16_StringHasNewLine(UTF16 *String);
     
     /*!
-     @abstract                             "Counts the number of Format Specifiers in String".
+     @abstract                             "Tells if the string pointed to by String contains a Windows or UNIX style line ending".
      @param               String           "The string to check".
-     @return                               "Returns the number of format specifiers found".
+     @return                               "Returns Yes if the String contains a Windows or UNIX style line ending, otherwise no".
      */
-    uint64_t              UTF32_NumFormatSpecifiers(UTF32 *String);
+    bool                  UTF32_StringHasNewLine(UTF32 *String);
     
     /*!
      @abstract                             "Tells if the UTF-8 string pointed to by String is a valid UTF-8 encoded string".
@@ -814,6 +825,27 @@ typedef               uint_least32_t                       UTF32;
     UTF32                *UTF32_Insert(UTF32 *String, UTF32 *String2Insert, uint64_t Offset);
     
     /*!
+     @abstract                             "Reverses a string Grapheme by Grapheme".
+     @remark                               "It is your responsibility to free the returned string when you're done using it".
+     @param               String           "A string to reverse".
+     */
+    UTF8                *UTF8_Reverse(UTF8 *String);
+    
+    /*!
+     @abstract                             "Reverses a string Grapheme by Grapheme".
+     @remark                               "It is your responsibility to free the returned string when you're done using it".
+     @param               String           "A string to reverse".
+     */
+    UTF16                *UTF16_Reverse(UTF16 *String);
+    
+    /*!
+     @abstract                             "Reverses a string Grapheme by Grapheme".
+     @remark                               "It is your responsibility to free the returned string when you're done using it".
+     @param               String           "A string to reverse".
+     */
+    UTF32                *UTF32_Reverse(UTF32 *String);
+    
+    /*!
      @abstract                             "Reads a CodePoint from Source".
      @remark                               "Replaces Fgetc and getc".
      @param               Source           "The file to read from".
@@ -864,18 +896,39 @@ typedef               uint_least32_t                       UTF32;
     /*!
      @abstract                             "Writes a Line (Including mewline) to Source".
      @remark                               "Replaces Fputs and puts".
-     @param               String           "The String to write".
      @param               OutputFile       "The file to write the string to".
+     @param               String           "The String to write".
      */
-    void                  UTF8_WriteLine(UTF8 *String, FILE *OutputFile);
+    void                  UTF8_WriteLine(FILE *OutputFile, UTF8 *String);
     
     /*!
      @abstract                             "Writes a Line (Including mewline) to Source".
      @remark                               "Replaces Fputws and putws".
-     @param               String           "The String to write".
      @param               OutputFile       "The file to write the string to".
+     @param               String           "The String to write".
      */
-    void                  UTF16_WriteLine(UTF16 *String, FILE *OutputFile);
+    void                  UTF16_WriteLine(FILE *OutputFile, UTF16 *String);
+    
+    /*!
+     @abstract                             "Counts the number of Format Specifiers in String".
+     @param               String           "The string to check".
+     @return                               "Returns the number of format specifiers found".
+     */
+    uint64_t              UTF8_GetNumFormatSpecifiers(UTF8 *String);
+    
+    /*!
+     @abstract                             "Counts the number of Format Specifiers in String".
+     @param               String           "The string to check".
+     @return                               "Returns the number of format specifiers found".
+     */
+    uint64_t              UTF16_GetNumFormatSpecifiers(UTF16 *String);
+    
+    /*!
+     @abstract                             "Counts the number of Format Specifiers in String".
+     @param               String           "The string to check".
+     @return                               "Returns the number of format specifiers found".
+     */
+    uint64_t              UTF32_GetNumFormatSpecifiers(UTF32 *String);
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
@@ -956,98 +1009,6 @@ typedef               uint_least32_t                       UTF32;
     UTF32               **UTF32_DeformatString(UTF32 *Format, UTF32 *Source);
     
     /*!
-     @abstract                             "Counts the number of format specifiers (percent prefixed tokens) in String".
-     @param               String           "The string to count the number of format specifiers contained within".
-     */
-    uint64_t              UTF8_GetNumFormatSpecifiers(UTF8 *String);
-    
-    /*!
-     @abstract                             "Counts the number of format specifiers (percent prefixed tokens) in String".
-     @param               String           "The string to count the number of format specifiers contained within".
-     */
-    uint64_t              UTF16_GetNumFormatSpecifiers(UTF16 *String);
-    
-    /*!
-     @abstract                             "Counts the number of format specifiers (percent prefixed tokens) in String".
-     @param               String           "The string to count the number of format specifiers contained within".
-     */
-    uint64_t              UTF32_GetNumFormatSpecifiers(UTF32 *String);
-    
-    /*!
-     @abstract                             "Writes a UTF-8 encoded string to the OutputFile using the platform's default Unicode encoding".
-     @remark                               "On Windows, Strings are converted to UTF-16; on POSIX platforms (including Mac/iOS) strings are written as UTF-8".
-     @param               String           "The string to write to OutputFile (including any newlines, etc)".
-     @param               OutputFile       "a valid FILE pointer, or STDIN/STDOUT/STDERR".
-     */
-    void                  UTF8_WriteLine(UTF8 *String, FILE *OutputFile);
-    
-    /*!
-     @abstract                             "Writes a UTF-16 encoded string to the OutputFile using the platform's default Unicode encoding".
-     @remark                               "On Windows, Strings are output as UTF-16; on POSIX platforms (including Mac/iOS) strings are written as UTF-8".
-     @param               String           "The string to write to OutputFile (including any newlines, etc)".
-     @param               OutputFile       "a valid FILE pointer, or STDIN/STDOUT/STDERR".
-     */
-    void                  UTF16_WriteLine(UTF16 *String, FILE *OutputFile);
-    
-    /* StringArrays */
-    
-    /*!
-     @abstract                             "Gets the size of each string in the StringArray in code units".
-     @param               StringArray      "The StringArray to get the size of each string".
-     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
-     */
-    uint64_t             *UTF8_StringArray_GetStringSizesInCodeUnits(UTF8 **StringArray);
-    
-    /*!
-     @abstract                             "Gets the size of each string in the StringArray in code units".
-     @param               StringArray      "The StringArray to get the size of each string".
-     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
-     */
-    uint64_t             *UTF16_StringArray_GetStringSizesInCodeUnits(UTF16 **StringArray);
-    
-    /*!
-     @abstract                             "Gets the size of each string in the StringArray in code points".
-     @param               StringArray      "The StringArray to get the size of each string".
-     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
-     */
-    uint64_t             *UTF8_StringArray_GetStringSizesInCodePoints(UTF8 **StringArray);
-    
-    /*!
-     @abstract                             "Gets the size of each string in the StringArray in code points".
-     @param               StringArray      "The StringArray to get the size of each string".
-     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
-     */
-    uint64_t             *UTF16_StringArray_GetStringSizesInCodePoints(UTF16 **StringArray);
-    
-    /*!
-     @abstract                             "Gets the size of each string in the StringArray in code points".
-     @param               StringArray      "The StringArray to get the size of each string".
-     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
-     */
-    uint64_t             *UTF32_StringArray_GetStringSizesInCodePoints(UTF32 **StringArray);
-    
-    /*!
-     @abstract                             "Gets the number of strings in a StringArray".
-     @param               StringArray      "The StringArray to get the number of strings in".
-     @return                               "Returns the number of strings in StringArray".
-     */
-    uint64_t              UTF8_StringArray_GetNumStrings(UTF8 **StringArray);
-    
-    /*!
-     @abstract                             "Gets the number of strings in a StringArray".
-     @param               StringArray      "The StringArray to get the number of strings in".
-     @return                               "Returns the number of strings in StringArray".
-     */
-    uint64_t              UTF16_StringArray_GetNumStrings(UTF16 **StringArray);
-    
-    /*!
-     @abstract                             "Gets the number of strings in a StringArray".
-     @param               StringArray      "The StringArray to get the number of strings in".
-     @return                               "Returns the number of strings in StringArray".
-     */
-    uint64_t              UTF32_StringArray_GetNumStrings(UTF32 **StringArray);
-    
-    /*!
      @abstract                             "Initalizes a UTF-8 encoded StringArray".
      @param               NumStrings       "How many strings will this StringArray contain"?
      @return                               "Returns an empty StringArray with room for NumStrings pointers plus a null terminator".
@@ -1091,6 +1052,62 @@ typedef               uint_least32_t                       UTF32;
      @param               Index            "Which position should String2Attach be in"?
      */
     void                  UTF32_StringArray_Attach(UTF32 **StringArray, UTF32 *String2Attach, uint64_t Index);
+    
+    /*!
+     @abstract                             "Gets the number of strings in a StringArray".
+     @param               StringArray      "The StringArray to get the number of strings in".
+     @return                               "Returns the number of strings in StringArray".
+     */
+    uint64_t              UTF8_StringArray_GetNumStrings(UTF8 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the number of strings in a StringArray".
+     @param               StringArray      "The StringArray to get the number of strings in".
+     @return                               "Returns the number of strings in StringArray".
+     */
+    uint64_t              UTF16_StringArray_GetNumStrings(UTF16 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the number of strings in a StringArray".
+     @param               StringArray      "The StringArray to get the number of strings in".
+     @return                               "Returns the number of strings in StringArray".
+     */
+    uint64_t              UTF32_StringArray_GetNumStrings(UTF32 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the size of each string in the StringArray in code units".
+     @param               StringArray      "The StringArray to get the size of each string".
+     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
+     */
+    uint64_t             *UTF8_StringArray_GetStringSizesInCodeUnits(UTF8 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the size of each string in the StringArray in code units".
+     @param               StringArray      "The StringArray to get the size of each string".
+     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
+     */
+    uint64_t             *UTF16_StringArray_GetStringSizesInCodeUnits(UTF16 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the size of each string in the StringArray in code points".
+     @param               StringArray      "The StringArray to get the size of each string".
+     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
+     */
+    uint64_t             *UTF8_StringArray_GetStringSizesInCodePoints(UTF8 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the size of each string in the StringArray in code points".
+     @param               StringArray      "The StringArray to get the size of each string".
+     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
+     */
+    uint64_t             *UTF16_StringArray_GetStringSizesInCodePoints(UTF16 **StringArray);
+    
+    /*!
+     @abstract                             "Gets the size of each string in the StringArray in code points".
+     @param               StringArray      "The StringArray to get the size of each string".
+     @return                               "Returns an array containing NumStrings elements, where each element contains the size".
+     */
+    uint64_t             *UTF32_StringArray_GetStringSizesInCodePoints(UTF32 **StringArray);
     
     /*!
      @abstract                             "Decodes a StringArray to a UTF32_StringArray".
@@ -1150,7 +1167,7 @@ typedef               uint_least32_t                       UTF32;
     
 #define GetNumFormatSpecifiers(String)    _Generic((String), UTF8:UTF8_GetNumFormatSpecifiers, UTF8*:UTF8_GetNumFormatSpecifiers, UTF16:UTF16_GetNumFormatSpecifiers, UTF16*:UTF16_GetNumFormatSpecifiers, UTF32:UTF32_GetNumFormatSpecifiers, UTF32*:UTF32_GetNumFormatSpecifiers)(String)
     
-#define WriteString(String)               _Generic((String), UTF8:UTF8_WriteLine, UTF8*:UTF8_WriteLine, UTF16:UTF16_WriteLine, UTF16*:UTF16_WriteLine)(String)
+#define WriteString(Stream,String)        _Generic((String), UTF8:UTF8_WriteLine, UTF8*:UTF8_WriteLine, UTF16:UTF16_WriteLine, UTF16*:UTF16_WriteLine)(Stream,String)
     
 #define Clone(String)                     _Generic((String), UTF8:UTF8_Clone, UTF8*:UTF8_Clone, UTF16:UTF16_Clone, UTF16*:UTF16_Clone, UTF32:UTF32_Clone, UTF32*:UTF32_Clone)(String)
     
