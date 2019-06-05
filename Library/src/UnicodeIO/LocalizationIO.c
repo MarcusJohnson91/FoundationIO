@@ -23,13 +23,13 @@ extern "C" {
         setlocale(LC_TIME, NULL);
     }
     
-    UTF8 *Localization_UTF8_GetLanguage(void) {
+    UTF8 *Localize_UTF8_GetLanguage(void) {
         UTF8 *LanguageName     = NULL;
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
         UTF8 *LocaleAll        = setlocale(LC_ALL, NULL);
         uint64_t StringSize    = UTF8_GetStringSizeInCodeUnits(LocaleAll);
         if (StringSize > 0) {
-            int64_t Location   = 0LL;
+            uint64_t Location  = 0ULL;
             Location           = UTF8_FindSubString(LocaleAll, U8("-"), 0, -1);
             if (Location != 0xFFFFFFFFFFFFFFFF) {
                 // Get the location of the Dash, create a string that size, copy.
@@ -52,7 +52,7 @@ extern "C" {
         UTF16 *LocaleAll       = _wsetlocale(LC_ALL, NULL);
         uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(LocaleAll);
         if (StringSize > 0) {
-            int64_t Location   = 0LL;
+            uint64_t Location  = 0ULL;
             Location           = UTF16_FindSubString(LocaleAll, U16("-"), 0, -1);
             if (Location != 0xFFFFFFFFFFFFFFFF) {
                 LanguageName   = calloc(Location + 1, sizeof(UTF16));
@@ -73,7 +73,7 @@ extern "C" {
         return LanguageName;
     }
     
-    UTF16 *Localization_UTF16_GetLanguage(void) {
+    UTF16 *Localize_UTF16_GetLanguage(void) {
         UTF16 *LanguageName                            = NULL;
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
         /* Read from UTF8, convert to UTF16 */
@@ -81,7 +81,7 @@ extern "C" {
         UTF8 *LocaleAll                                = setlocale(LC_ALL, NULL);
         uint64_t StringSize                            = UTF8_GetStringSizeInCodeUnits(LocaleAll);
         if (StringSize > 0) {
-            int64_t Location                           = 0LL;
+            uint64_t Location                          = 0ULL;
             Location                                   = UTF8_FindSubString(LocaleAll, U8("-"), 0, -1);
             if (Location != 0xFFFFFFFFFFFFFFFF) {
                 // Get the location of the Dash, create a string that size, copy.
@@ -104,7 +104,7 @@ extern "C" {
         UTF16 *LocaleAll       = _wsetlocale(LC_ALL, NULL);
         uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(LocaleAll);
         if (StringSize > 0) {
-            int64_t Location   = 0LL;
+            uint64_t Location  = 0ULL;
             Location           = UTF16_FindSubString(LocaleAll, U8("-"), 0, -1);
             if (Location != 0xFFFFFFFFFFFFFFFF) {
                 LanguageName   = calloc(Location + 1, sizeof(UTF16));
@@ -125,7 +125,7 @@ extern "C" {
         return LanguageName;
     }
     
-    UTF8 *Localization_UTF8_GetRegion(void) {
+    UTF8 *Localize_UTF8_GetRegion(void) {
         UTF8 *Region        = NULL;
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
         /* Find the Start offset as the location of a - or _; find the end location as . */
@@ -142,7 +142,7 @@ extern "C" {
         return Region;
     }
     
-    UTF16 *Localization_UTF16_GetRegion(void) {
+    UTF16 *Localize_UTF16_GetRegion(void) {
         UTF16 *Region = NULL;
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
@@ -150,7 +150,7 @@ extern "C" {
         return Region;
     }
     
-    UTF8 *Localization_UTF8_GetEncoding(void) {
+    UTF8 *Localize_UTF8_GetEncoding(void) {
         UTF8 *Region = NULL;
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
         /* Get the StringSize, get the offset of . read everything between . and the end */
@@ -159,7 +159,7 @@ extern "C" {
         return Region;
     }
     
-    UTF16 *Localization_UTF16_GetEncoding(void) {
+    UTF16 *Localize_UTF16_GetEncoding(void) {
         UTF16 *Region = NULL;
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
         /* Get the StringSize, get the offset of . read everything between . and the end */
@@ -168,7 +168,7 @@ extern "C" {
         return Region;
     }
     
-    UTF8 *Localization_UTF8_GetDecimalSeperator(void) {
+    UTF8 *Localize_UTF8_GetDecimalSeperator(void) {
         UTF8 *DecimalSeperator = NULL;
         lconv_Init();
         struct lconv *Locale           = localeconv();
@@ -186,7 +186,7 @@ extern "C" {
         return DecimalSeperator;
     }
     
-    UTF16 *Localization_UTF16_GetDecimalSeperator(void) {
+    UTF16 *Localize_UTF16_GetDecimalSeperator(void) {
         UTF16 *DecimalSeperator        = NULL;
         lconv_Init();
         struct lconv *Locale           = localeconv();
@@ -204,7 +204,7 @@ extern "C" {
         return DecimalSeperator;
     }
     
-    UTF8 *Localization_UTF8_GetGroupingSeperator(void) {
+    UTF8 *Localize_UTF8_GetGroupingSeperator(void) {
         UTF8 *GroupingSeperator = NULL;
         lconv_Init();
         struct lconv *Locale           = localeconv();
@@ -222,7 +222,7 @@ extern "C" {
         return GroupingSeperator;
     }
     
-    UTF16 *Localization_UTF16_GetGroupingSeperator(void) {
+    UTF16 *Localize_UTF16_GetGroupingSeperator(void) {
         UTF16 *GroupingSeperator        = NULL;
         lconv_Init();
         struct lconv *Locale           = localeconv();
@@ -240,7 +240,7 @@ extern "C" {
         return GroupingSeperator;
     }
     
-    UTF8 **Localization_UTF8_GetGroupingSize(void) {
+    UTF8 **Localize_UTF8_GetGroupingSize(void) {
         UTF8    **GroupingSize          = NULL;
         lconv_Init();
         struct lconv *Locale           = localeconv();
@@ -262,7 +262,7 @@ extern "C" {
         return GroupingSize;
     }
     
-    UTF16 **Localization_UTF16_GetGroupingSize(void) {
+    UTF16 **Localize_UTF16_GetGroupingSize(void) {
         UTF16 **GroupingSize             = NULL;
         lconv_Init();
         struct lconv *Locale           = localeconv();
@@ -281,12 +281,86 @@ extern "C" {
     
     // Generic Currency Symbol: ¤
     
-    UTF8 *Localization_UTF8_GetCurrencySymbol(void) {
+    UTF8 *Localize_UTF8_GetCurrencySymbol(void) {
         UTF8 *CurrencySymbol = NULL;
         return CurrencySymbol;
     }
     
+    UTF16 *Localize_UTF16_GetCurrencySymbol(void) {
+        UTF16 *CurrencySymbol = NULL;
+        return CurrencySymbol;
+    }
+    
     /* Currency Section */
+    
+    
+    /* Delocalize - To remove localization information from a string */
+    /* What kinds of localization information should we remove? Strip currency formatting for one, possibly base conversion as well? */
+    
+    UTF8 *Delocalize_UTF8_Currency(UTF8 *String) {
+        UTF8 *Stripped = NULL;
+        if (String != NULL) {
+            UTF32 *String32   = UTF8_Decode(String);
+            UTF32 *Stripped32 = Delocalize_UTF32_Currency(String32);
+            free(String32);
+            Stripped          = UTF8_Encode(Stripped32);
+            free(Stripped32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Stripped;
+    }
+    
+    UTF16 *Delocalize_UTF16_Currency(UTF16 *String) {
+        UTF16 *Stripped = NULL;
+        if (String != NULL) {
+            UTF32 *String32   = UTF16_Decode(String);
+            UTF32 *Stripped32 = Delocalize_UTF32_Currency(String32);
+            free(String32);
+            Stripped          = UTF16_Encode(Stripped32);
+            free(Stripped32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Stripped;
+    }
+    
+    UTF32 *Delocalize_UTF32_Currency(UTF32 *String) { // This name is vague, what exactly are we doing, what is the point?
+                                                // This function exists to remove currency symbols and any brackets, parenthesis, etc and return only numbers in a language agnostic way
+        UTF32 *Stripped = NULL;
+        if (String != NULL) {
+            // Basically just loop over the string looking for any currency symbol or brackets or anything, and remove all of that
+            
+            // do while loop is all that's nessicary, if we see any codepoints to be removed smply increment the mount of the shit to remove variable and we'll allocate the coorect sized string afterwards
+            
+            uint64_t CodePoint         = 0ULL;
+            uint64_t CodePoints2Remove = 0ULL;
+            UTF32    CurrentCodePoint  = 1ULL;
+            do {
+                CurrentCodePoint       = String[CodePoint];
+                if (CurrentCodePoint == U32('(') || CurrentCodePoint == U32(')') || CurrentCodePoint == U32('[') || CurrentCodePoint == U32(']')) {
+                    CodePoints2Remove += 1;
+                }
+                for (uint64_t CurrencyCodePoint = 0ULL; CurrentCodePoint < CurrencyTableSize - 1; CurrentCodePoint++) {
+                    if (CurrentCodePoint == CurrencyTable[CurrencyCodePoint]) {
+                        CodePoints2Remove += 1;
+                    }
+                }
+                CodePoint += 1;
+            } while (String[CodePoint] != LocalizationIONULLTerminator); // Get the number of CodePoints to remove
+            
+            Stripped = calloc(CodePoint - CodePoints2Remove, sizeof(UTF32));
+            
+            if (Stripped != NULL) {
+                // Ok, so now we need to do the same thing but this time copying
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld codepoints"), CodePoint - CodePoints2Remove);
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Stripped;
+    }
     
 #ifdef __cplusplus
 }
