@@ -110,7 +110,7 @@ extern "C" {
         }
     }
     
-    void Log(LogTypes Severity, UTF8 *FunctionName, UTF8 *Description, ...) {
+    void Log(LogTypes Severity, const UTF8 *FunctionName, UTF8 *Description, ...) {
         UTF8 *ErrorType[2] = {U8("ERROR"), U8("TEST")}; // So it doesn't branch
         
         va_list VariadicArguments;
