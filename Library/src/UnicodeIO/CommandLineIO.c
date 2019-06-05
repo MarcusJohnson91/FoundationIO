@@ -425,7 +425,7 @@ extern "C" {
                 uint64_t HalfOfTheIndicators = (PercentComplete / 2);
                 UTF8    *Indicator           = calloc(CommandLineIO_GetTerminalWidth(), sizeof(UTF8));
                 UTF8    *IndicatorFinal      = UTF8_Insert(Indicator, "-", 0);
-                UTF8    *FormattedString     = UTF8_FormatString(U8("[%s%s %lld/%lld %hhu/%s %s]"), IndicatorFinal, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF8);
+                UTF8    *FormattedString     = UTF8_FormatString(U8("[%s%s %lld/%lld %hhu/%s %s]"), IndicatorFinal, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, FoundationIONewLine8);
                 UTF8_WriteLine(FormattedString, stdout);
                 free(Indicator);
             }
@@ -468,7 +468,7 @@ extern "C" {
                 uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 UTF16  *Indicator           = calloc(CommandLineIO_GetTerminalWidth(), sizeof(UTF16));
                 UTF16  *IndicatorFinal      = UTF16_Insert(Indicator, U16("-"), 0);
-                UTF16  *FormattedString     = UTF16_FormatString(U16("[%s%s %lld/%lld %hhu/%s %s]"), IndicatorFinal, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, NewLineUTF16);
+                UTF16  *FormattedString     = UTF16_FormatString(U16("[%s%s %lld/%lld %hhu/%s %s]"), IndicatorFinal, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, FoundationIONewLine16);
                 UTF16_WriteLine(FormattedString, stdout);
                 free(Indicator);
             }
@@ -614,7 +614,7 @@ extern "C" {
         if (CLI != NULL) {
             UTF8 *Name = UTF8_Encode(CLI->ProgramName);
             
-            UTF8 *ProgramsOptions = UTF8_FormatString(U8("%s's Options (-|--|/):%s"), Name, NewLineUTF8);
+            UTF8 *ProgramsOptions = UTF8_FormatString(U8("%s's Options (-|--|/):%s"), Name, FoundationIONewLine8);
             UTF8_WriteLine(ProgramsOptions, stdout);
             free(Name);
             free(ProgramsOptions);
@@ -624,7 +624,7 @@ extern "C" {
                 UTF8 *SwitchName        = UTF8_Encode(CLI->SwitchIDs[Switch].Name);
                 UTF8 *SwitchDescription = UTF8_Encode(CLI->SwitchIDs[Switch].Description);
                 
-                UTF8 *SwitchInfo        = UTF8_FormatString(U8("%s: %s%s"), SwitchName, SwitchDescription, NewLineUTF8);
+                UTF8 *SwitchInfo        = UTF8_FormatString(U8("%s: %s%s"), SwitchName, SwitchDescription, FoundationIONewLine8);
                 
                 UTF8_WriteLine(SwitchInfo, stdout);
                 if (CurrentSwitchType == SwitchMayHaveSlaves && CLI->SwitchIDs[Switch].NumPotentialSlaves > 0) {
@@ -632,7 +632,7 @@ extern "C" {
                         UTF8 *SlaveName        = UTF8_Encode(CLI->SwitchIDs[SlaveSwitch].Name);
                         UTF8 *SlaveDescription = UTF8_Encode(CLI->SwitchIDs[SlaveSwitch].Description);
                         
-                        UTF8 *SlaveSwitchInfo  = UTF8_FormatString(U8("\t%s: %s%s"), SlaveName, SlaveDescription, NewLineUTF8);
+                        UTF8 *SlaveSwitchInfo  = UTF8_FormatString(U8("\t%s: %s%s"), SlaveName, SlaveDescription, FoundationIONewLine8);
                         
                         UTF8_WriteLine(SlaveSwitchInfo, stdout);
                         
@@ -654,7 +654,7 @@ extern "C" {
         if (CLI != NULL) {
             UTF16 *Name = UTF16_Encode(CLI->ProgramName);
             
-            UTF16 *ProgramsOptions = UTF16_FormatString(U16("%s's Options (-|--|/):%s"), Name, NewLineUTF16);
+            UTF16 *ProgramsOptions = UTF16_FormatString(U16("%s's Options (-|--|/):%s"), Name, FoundationIONewLine16);
             UTF16_WriteLine(ProgramsOptions, stdout);
             free(Name);
             free(ProgramsOptions);
@@ -664,7 +664,7 @@ extern "C" {
                 UTF16 *SwitchName        = UTF16_Encode(CLI->SwitchIDs[Switch].Name);
                 UTF16 *SwitchDescription = UTF16_Encode(CLI->SwitchIDs[Switch].Description);
                 
-                UTF16 *SwitchInfo        = UTF16_FormatString(U16("%s: %s%s"), SwitchName, SwitchDescription, NewLineUTF16);
+                UTF16 *SwitchInfo        = UTF16_FormatString(U16("%s: %s%s"), SwitchName, SwitchDescription, FoundationIONewLine16);
                 
                 UTF16_WriteLine(SwitchInfo, stdout);
                 if (CurrentSwitchType == SwitchMayHaveSlaves && CLI->SwitchIDs[Switch].NumPotentialSlaves > 0) {
@@ -672,7 +672,7 @@ extern "C" {
                         UTF16 *SlaveName        = UTF16_Encode(CLI->SwitchIDs[SlaveSwitch].Name);
                         UTF16 *SlaveDescription = UTF16_Encode(CLI->SwitchIDs[SlaveSwitch].Description);
                         
-                        UTF16 *SlaveSwitchInfo = UTF16_FormatString(U16("\t%s: %s%s"), SlaveName, SlaveDescription, NewLineUTF16);
+                        UTF16 *SlaveSwitchInfo = UTF16_FormatString(U16("\t%s: %s%s"), SlaveName, SlaveDescription, FoundationIONewLine16);
                         
                         UTF16_WriteLine(SlaveSwitchInfo, stdout);
                         free(SlaveName);
@@ -706,7 +706,7 @@ extern "C" {
                 UTF8_WriteLine(NameString, stdout);
                 free(NameString);
                 
-                UTF8 *FormattedString = UTF8_FormatString(U8(" %s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, NewLineUTF16);
+                UTF8 *FormattedString = UTF8_FormatString(U8(" %s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, FoundationIONewLine16);
                 UTF8_WriteLine(FormattedString, stdout);
             }
             
@@ -782,7 +782,7 @@ extern "C" {
                 UTF16 *NameString      = UTF16_FormatString(U16("%s,"), Name);
                 UTF16_WriteLine(NameString, stdout);
                 
-                UTF16 *FormattedString = UTF16_FormatString(U16(" %s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, NewLineUTF16);
+                UTF16 *FormattedString = UTF16_FormatString(U16(" %s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, FoundationIONewLine16);
                 UTF16_WriteLine(FormattedString, stdout);
             }
             
