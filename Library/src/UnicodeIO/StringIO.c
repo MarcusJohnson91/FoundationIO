@@ -6,6 +6,7 @@
 #include "../include/Math.h"           /* Included for endian swapping */
 
 #include <stdarg.h>                    /* Included for va_list, va_copy, va_start, va_end */
+#include <wchar.h>                     /* Included for Fwide */
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,9 +15,20 @@ extern "C" {
 #define StringIONULLTerminator     (0)
 #define StringIONULLTerminatorSize (1)
     
-    /* API Design: All UTF-32 Strings will contain a BOM that we create anyway. */
     
-    /* Basic String Property Functions */
+    /*
+     StringIO Layout:
+     Basic Attribute Functions (size, etc).
+     Basic String Operations (Add/Remove BOM, Decode/Encode)
+     Path/URL
+     
+     ..
+     Format/Deformat
+     
+     */
+    
+    
+    
     uint8_t UTF8_GetCodePointSizeInCodeUnits(UTF8 CodeUnit) {
         uint8_t CodePointSize = 0;
         if (((CodeUnit & 0x80) >> 7) == 0) {
@@ -262,7 +274,6 @@ extern "C" {
             if (StringSize > UnicodeBOMSizeInCodePoints) {
                 bool StringHasBOM   = UTF16_StringHasBOM(String);
                 if (StringHasBOM && StringSize >= UTF16BOMSizeInCodeUnits + UnicodeUNCPathPrefixSize) {
-                    // "//?/" or "\\?\"
                     if ((String[1] == U16('/') || String[1] == U16('\\')) && (String[2] == U16('/') || String[2] == U16('\\')) && String[3] == U16('?') && (String[4] == U16('/') || String[4] == U16('\\'))) {
                         StringHasUNCPathPrefix = Yes;
                     }
@@ -285,7 +296,6 @@ extern "C" {
             if (StringSize > UnicodeBOMSizeInCodePoints) {
                 bool StringHasBOM   = UTF32_StringHasBOM(String);
                 if (StringHasBOM && StringSize >= UnicodeBOMSizeInCodePoints + UnicodeUNCPathPrefixSize) {
-                    // "//?/" or "\\?\"
                     if ((String[1] == U32('/') || String[1] == U32('\\')) && (String[2] == U32('/') || String[2] == U32('\\')) && String[3] == U32('?') && (String[4] == U32('/') || String[4] == U32('\\'))) {
                         StringHasUNCPathPrefix = Yes;
                     }
@@ -302,6 +312,7 @@ extern "C" {
     }
     
     bool UTF8_PathIsAbsolute(UTF8 *String) {
+        bool PathIsAbsolute = No;
         if (String != NULL) {
 #if  (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
             if (String[0] == '/') {
@@ -318,6 +329,7 @@ extern "C" {
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
+        return PathIsAbsolute;
     }
     
     bool UTF16_PathIsAbsolute(UTF16 *String) {
@@ -344,10 +356,6 @@ extern "C" {
     bool UTF32_PathIsAbsolute(UTF32 *String) {
         bool PathIsAbsolute = No;
         if (String != NULL) {
-            /*
-             On Windows an Absolute Path's second character is ':'
-             on POSIX an Absolute Path's first character is '/'
-             */
 #if  (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
             if (String[0] == U32('/')) {
                 PathIsAbsolute = Yes;
@@ -366,44 +374,50 @@ extern "C" {
         return PathIsAbsolute;
     }
     
-    uint64_t UTF8_NumFormatSpecifiers(UTF8 *String) {
-        uint64_t NumFormatSpecifiers = 0ULL;
+    bool UTF8_StringHasNewLine(UTF8 *String) {
+        bool StringHasNewLine = No;
         if (String != NULL) {
-            UTF32 *String32          = UTF8_Decode(String);
-            NumFormatSpecifiers      = UTF32_NumFormatSpecifiers(String32);
+            UTF32 *String32   = UTF8_Decode(String);
+            StringHasNewLine  = UTF32_StringHasNewLine(String32);
             free(String32);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return NumFormatSpecifiers;
+        return StringHasNewLine;
     }
     
-    uint64_t UTF16_NumFormatSpecifiers(UTF16 *String) {
-        uint64_t NumFormatSpecifiers = 0ULL;
+    bool UTF16_StringHasNewLine(UTF16 *String) {
+        bool StringHasNewLine = No;
         if (String != NULL) {
-            UTF32 *String32          = UTF16_Decode(String);
-            NumFormatSpecifiers      = UTF32_NumFormatSpecifiers(String32);
+            UTF32 *String32   = UTF16_Decode(String);
+            StringHasNewLine  = UTF32_StringHasNewLine(String32);
             free(String32);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return NumFormatSpecifiers;
+        return StringHasNewLine;
     }
     
-    uint64_t UTF32_NumFormatSpecifiers(UTF32 *String) {
-        uint64_t NumFormatSpecifiers = 0ULL;
+    bool UTF32_StringHasNewLine(UTF32 *String) {
+        bool StringHasNewLine            = No;
         if (String != NULL) {
-            uint64_t CodePoint = 1ULL;
+            uint64_t CodePoint           = 1ULL;
             do {
-                if (String[CodePoint - 1] == U32('%') && String[CodePoint] != U32('%')) {
-                    NumFormatSpecifiers += 1;
+                if (String[CodePoint] == 0x0A) { // MacOSX, Unix
+                    StringHasNewLine     = Yes;
                 }
-                CodePoint += 1;
+                if (String[CodePoint - 1] == 0x0D && String[CodePoint] == 0x0A) { // Windows
+                    StringHasNewLine     = Yes;
+                }
+                if (String[CodePoint] == 0x0D) { // Classic Mac
+                    StringHasNewLine     = Yes;
+                }
+                CodePoint               += 1;
             } while (String[CodePoint] != StringIONULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return NumFormatSpecifiers;
+        return StringHasNewLine;
     }
     
     bool UTF8_IsStringValid(UTF8 *String) {
@@ -592,7 +606,6 @@ extern "C" {
         }
         return BOMLessString;
     }
-    /* Basic String Property Functions */
     
     UTF32 *UTF8_Decode(UTF8 *String) {
         uint64_t StringSize                              = 0ULL;
@@ -664,22 +677,22 @@ extern "C" {
     UTF32 *UTF16_Decode(UTF16 *String) {
         UTF32   *DecodedString                   = NULL;
         if (String != NULL) {
-            uint64_t NumCodePoints  = UTF16_GetStringSizeInCodePoints(String) + StringIONULLTerminatorSize;
-            bool     StringHasBOM   = UTF16_StringHasBOM(String);
+            uint64_t NumCodePoints               = UTF16_GetStringSizeInCodePoints(String) + StringIONULLTerminatorSize;
+            bool     StringHasBOM                = UTF16_StringHasBOM(String);
             if (StringHasBOM == No) {
-                NumCodePoints      += 1;
+                NumCodePoints                   += 1;
             }
-            uint64_t CodePoint                       = 0ULL;
-            uint64_t CodeUnit                        = 0ULL;
-            UTF16    StringsByteOrder                = 0;
+            uint64_t CodePoint                   = 0ULL;
+            uint64_t CodeUnit                    = 0ULL;
+            UTF16    StringsByteOrder            = 0;
             
             if (String[0] == UTF16BOM_LE || String[0] == UTF16BOM_BE) {
                 StringsByteOrder                 = String[0];
             } else {
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                StringsByteOrder = UTF16BOM_LE;
+                StringsByteOrder                 = UTF16BOM_LE;
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                StringsByteOrder = UTF16BOM_BE;
+                StringsByteOrder                 = UTF16BOM_BE;
 #endif
             }
             DecodedString                        = calloc(NumCodePoints, sizeof(UTF32));
@@ -790,6 +803,280 @@ extern "C" {
         }
         return EncodedString;
     }
+    
+    UTF8 *UTF8_Clone(UTF8 *String) {
+        UTF8 *Copy = NULL;
+        if (String != NULL) {
+            UTF32 *String32 = UTF8_Decode(String);
+            UTF32 *Clone32  = UTF32_Clone(String32);
+            free(String32);
+            Copy            = UTF8_Encode(Clone32);
+            free(Clone32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Copy;
+    }
+    
+    UTF16 *UTF16_Clone(UTF16 *String) {
+        UTF16 *Copy = NULL;
+        if (String != NULL) {
+            UTF32 *String32 = UTF16_Decode(String);
+            UTF32 *Clone32  = UTF32_Clone(String32);
+            free(String32);
+            Copy            = UTF16_Encode(Clone32);
+            free(Clone32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Copy;
+    }
+    
+    UTF32 *UTF32_Clone(UTF32 *String) {
+        UTF32 *Copy = NULL;
+        if (String != NULL) {
+            uint64_t StringSizeInCodeUnits = UTF32_GetStringSizeInCodePoints(String);
+            Copy   = calloc(StringSizeInCodeUnits, sizeof(UTF32));
+            if (Copy != NULL) {
+                for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSizeInCodeUnits - 1; CodeUnit++) {
+                    Copy[CodeUnit] = String[CodeUnit];
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Copy Pointer is NULL"));
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Copy;
+    }
+    
+    UTF8 *UTF8_ReadCodePoint(FILE *Source) { // Replaces fgetc and getc
+        UTF8 *CodePoint           = NULL;
+        if (Source != NULL) {
+            UTF8 Byte             = {0};
+            fread(&Byte, sizeof(UTF8), 1, Source);
+            uint8_t CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Byte);
+            CodePoint             = calloc(CodePointSize, sizeof(UTF8));
+            fread(CodePoint, CodePointSize, 1, Source);
+        } else {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+        return CodePoint;
+    }
+    
+    UTF16 *UTF16_ReadCodePoint(FILE *Source) { // replaces fgetwc and getwc
+        UTF16 *CodePoint          = NULL;
+        if (Source != NULL) {
+            UTF16 CodeUnit        = 0;
+            fread(&CodeUnit, sizeof(UTF16), 1, Source);
+            uint8_t CodePointSize = UTF16_GetCodePointSizeInCodeUnits(CodeUnit);
+            CodePoint             = calloc(CodePointSize, sizeof(UTF16));
+            fread(CodePoint, CodePointSize, 1, Source);
+        } else {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+        return CodePoint;
+    }
+    
+    void UTF8_WriteCodePoint(FILE *Source, UTF8 *CodePoint) { // Replaces fputc and putc
+        if (Source != NULL) {
+            uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(CodePoint);
+            fwrite(CodePoint, StringSize, 1, Source);
+        } else {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+    }
+    
+    void UTF16_WriteCodePoint(FILE *Source, UTF16 *CodePoint) { // replaces fputwc and putwc
+        if (Source != NULL) {
+            uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(CodePoint);
+            fwrite(CodePoint, StringSize, 1, Source);
+        } else {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+    }
+    
+    UTF8 *UTF8_ReadLine(FILE *Source) { // Replaces Fgets
+        UTF8 *Line = NULL;
+        if (Source != NULL) {
+            // So we need to know the size of the string to get, so count the number of codeunits that don't match any line ending.
+            uint64_t StringSizeInCodeUnits  = 0ULL;
+            uint64_t StringSizeInCodePoints = 0ULL;
+            UTF32   *CurrentCodePoint       = 1UL;
+            do {
+                /*
+                 Loop reading a codepoint each time until we find one that is a new line character.
+                 */
+                StringSizeInCodePoints     += 1;
+                UTF8 *CodePoint             = UTF8_ReadCodePoint(Source);
+                CurrentCodePoint            = UTF8_Decode(CodePoint);
+            } while (CurrentCodePoint[0] != U32('\n') || CurrentCodePoint[0] != StringIONULLTerminator);
+            // Now we need to allocate memory for that string
+            Line                            = calloc(StringSizeInCodeUnits, sizeof(UTF8));
+        } else {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+        return Line;
+    }
+    
+    UTF16 *UTF16_ReadLine(FILE *Source) { // Replaces Fgetws
+        UTF16 *Line = NULL;
+        if (Source != NULL) {
+            // So we need to know the size of the string to get, so count the number of codeunits that don't match any line ending.
+            uint64_t StringSizeInCodeUnits  = 0ULL;
+            uint64_t StringSizeInCodePoints = 0ULL;
+            UTF32   *CurrentCodePoint       = 1UL;
+            do {
+                /*
+                 Loop reading a codepoint each time until we find one that is a new line character.
+                 */
+                StringSizeInCodePoints     += 1;
+                UTF16 *CodePoint            = UTF16_ReadCodePoint(Source);
+                CurrentCodePoint            = UTF16_Decode(CodePoint);
+            } while (CurrentCodePoint[0] != U32('\n') || CurrentCodePoint[0] != StringIONULLTerminator);
+            // Now we need to allocate memory for that string
+            Line                            = calloc(StringSizeInCodeUnits, sizeof(UTF16));
+        } else {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+        return Line;
+    }
+    
+    void UTF8_WriteLine(FILE *OutputFile, UTF8 *String) { // Replaces Fputs and puts
+        if (String != NULL && OutputFile != NULL) {
+            int  StreamMode            = fwide(OutputFile, 0);
+            uint64_t CodeUnit          = 0ULL;
+            uint64_t CodeUnitsWritten  = 0ULL;
+            bool     StringHasNewLine  = UTF8_StringHasNewLine(String);
+            if (StreamMode < 0) { // UTF-8
+                do {
+                    CodeUnitsWritten   = fwrite(&String[CodeUnit], sizeof(UTF8), 1, OutputFile);
+                } while (String[CodeUnit] != StringIONULLTerminator);
+                
+                if (StringHasNewLine == No) {
+                    fwrite(FoundationIONewLine8, FoundationIONewLineSize8, 1, OutputFile);
+                }
+            } else if (StreamMode > 0) { // UTF-16
+                UTF32 *String32        = UTF8_Decode(String);
+                UTF16 *String16        = UTF16_Encode(String32);
+                free(String32);
+                do {
+                    CodeUnitsWritten = fwrite(&String16[CodeUnit], sizeof(UTF16), 1, OutputFile);
+                } while (String[CodeUnit] != StringIONULLTerminator);
+                free(String16);
+                
+                if (StringHasNewLine == No) {
+                    fwrite(FoundationIONewLine16, FoundationIONewLineSize16, 1, OutputFile);
+                }
+            }
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (OutputFile == NULL) {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+    }
+    
+    void UTF16_WriteLine(FILE *OutputFile, UTF16 *String) { // Replaces Fputws and putws
+        if (String != NULL && OutputFile != NULL) {
+            int  StreamMode            = fwide(OutputFile, 0);
+            uint64_t CodeUnit          = 0ULL;
+            uint64_t CodeUnitsWritten  = 0ULL;
+            bool     StringHasNewLine  = UTF16_StringHasNewLine(String);
+            if (StreamMode > 0) { // UTF-16
+                do {
+                    CodeUnitsWritten   = fwrite(&String[CodeUnit], sizeof(UTF16), 1, OutputFile);
+                } while (String[CodeUnit] != StringIONULLTerminator);
+                
+                if (StringHasNewLine == No) {
+                    fwrite(FoundationIONewLine16, FoundationIONewLineSize16, 1, OutputFile);
+                }
+            } else if (StreamMode < 0) { // UTF-8
+                UTF32 *String32        = UTF16_Decode(String);
+                UTF8  *String8         = UTF8_Encode(String32);
+                free(String32);
+                do {
+                    CodeUnitsWritten   = fwrite(&String8[CodeUnit], sizeof(UTF8), 1, OutputFile);
+                } while (String[CodeUnit] != StringIONULLTerminator);
+                free(String8);
+                
+                if (StringHasNewLine == No) {
+                    fwrite(FoundationIONewLine8, FoundationIONewLineSize8, 1, OutputFile);
+                }
+            }
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (OutputFile == NULL) {
+            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
+        }
+    }
+    
+    UTF8 *UTF8_Reverse(UTF8 *String) {
+        UTF8 *Reversed        = NULL;
+        if (String != NULL) {
+            UTF32 *String32   = UTF8_Decode(String);
+            UTF32 *Reversed32 = UTF32_Reverse(String32);
+            free(String32);
+            Reversed          = UTF8_Encode(Reversed32);
+            free(Reversed32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Reversed;
+    }
+    
+    UTF16 *UTF16_Reverse(UTF16 *String) {
+        UTF16 *Reversed = NULL;
+        if (String != NULL) {
+            UTF32 *String32   = UTF16_Decode(String);
+            UTF32 *Reversed32 = UTF32_Reverse(String32);
+            free(String32);
+            Reversed          = UTF16_Encode(Reversed32);
+            free(Reversed32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Reversed;
+    }
+    
+    UTF32 *UTF32_Reverse(UTF32 *String) {
+        UTF32 *Reverse = NULL;
+        if (String != NULL) {
+            // Get the size of the string
+            // Copy from back to front
+            uint64_t StringSize = UTF32_GetStringSizeInGraphemes(String); // We need a function that will allow us to copy each Grapheme
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Reverse;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /* API Design: All UTF-32 Strings will contain a BOM that we create anyway. */
+    
+    /* Basic String Property Functions */
+    /* Basic String Property Functions */
+    
+    
     
     /* Medium Functions */
     int64_t UTF8_FindSubString(UTF8 *String, UTF8 *SubString, uint64_t Offset, int64_t Length) {
@@ -1071,52 +1358,6 @@ extern "C" {
         return EditedString;
     }
     
-    UTF8 *UTF8_Clone(UTF8 *String) {
-        UTF8 *Copy = NULL;
-        if (String != NULL) {
-            UTF32 *String32 = UTF8_Decode(String);
-            UTF32 *Clone32  = UTF32_Clone(String32);
-            free(String32);
-            Copy            = UTF8_Encode(Clone32);
-            free(Clone32);
-        } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        }
-        return Copy;
-    }
-    
-    UTF16 *UTF16_Clone(UTF16 *String) {
-        UTF16 *Copy = NULL;
-        if (String != NULL) {
-            UTF32 *String32 = UTF16_Decode(String);
-            UTF32 *Clone32  = UTF32_Clone(String32);
-            free(String32);
-            Copy            = UTF16_Encode(Clone32);
-            free(Clone32);
-        } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        }
-        return Copy;
-    }
-    
-    UTF32 *UTF32_Clone(UTF32 *String) {
-        UTF32 *Copy = NULL;
-        if (String != NULL) {
-            uint64_t StringSizeInCodeUnits = UTF32_GetStringSizeInCodePoints(String);
-            Copy   = calloc(StringSizeInCodeUnits, sizeof(UTF32));
-            if (Copy != NULL) {
-                for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSizeInCodeUnits - 1; CodeUnit++) {
-                    Copy[CodeUnit] = String[CodeUnit];
-                }
-            } else {
-                Log(Log_ERROR, __func__, U8("Copy Pointer is NULL"));
-            }
-        } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        }
-        return Copy;
-    }
-    
     UTF8 *UTF8_Insert(UTF8 *String, UTF8 *String2Insert, uint64_t Offset) {
         UTF8 *Inserted = NULL;
         if (String != NULL && String2Insert != NULL) {
@@ -1215,126 +1456,6 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
         return Inserted;
-    }
-    
-    UTF8 *UTF8_ReadCodePoint(FILE *Source) { // Replaces fgetc and getc
-        UTF8 *CodePoint           = NULL;
-        if (Source != NULL) {
-            UTF8 Byte             = {0};
-            fread(&Byte, sizeof(UTF8), 1, Source);
-            uint8_t CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Byte);
-            CodePoint             = calloc(CodePointSize, sizeof(UTF8));
-            fread(CodePoint, CodePointSize, 1, Source);
-        } else {
-            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
-        }
-        return CodePoint;
-    }
-    
-    UTF16 *UTF16_ReadCodePoint(FILE *Source) { // replaces fgetwc and getwc
-        UTF16 *CodePoint          = NULL;
-        if (Source != NULL) {
-            UTF16 CodeUnit        = 0;
-            fread(&CodeUnit, sizeof(UTF16), 1, Source);
-            uint8_t CodePointSize = UTF16_GetCodePointSizeInCodeUnits(CodeUnit);
-            CodePoint             = calloc(CodePointSize, sizeof(UTF16));
-            fread(CodePoint, CodePointSize, 1, Source);
-        } else {
-            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
-        }
-        return CodePoint;
-    }
-    
-    void UTF8_WriteCodePoint(FILE *Source, UTF8 *CodePoint) { // Replaces fputc and putc
-        if (Source != NULL) {
-            uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(CodePoint);
-            fwrite(CodePoint, StringSize, 1, Source);
-        } else {
-            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
-        }
-    }
-    
-    void UTF16_WriteCodePoint(FILE *Source, UTF16 *CodePoint) { // replaces fputwc and putwc
-        if (Source != NULL) {
-            uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(CodePoint);
-            fwrite(CodePoint, StringSize, 1, Source);
-        } else {
-            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
-        }
-    }
-    
-    UTF8 *UTF8_ReadLine(FILE *Source) { // Replaces Fgets
-        UTF8 *Line = NULL;
-        if (Source != NULL) {
-            // So we need to know the size of the string to get, so count the number of codeunits that don't match any line ending.
-            uint64_t StringSizeInCodeUnits  = 0ULL;
-            uint64_t StringSizeInCodePoints = 0ULL;
-            UTF32   *CurrentCodePoint       = 1UL;
-            do {
-                /*
-                 Loop reading a codepoint each time until we find one that is a new line character.
-                 */
-                StringSizeInCodePoints     += 1;
-                UTF8 *CodePoint             = UTF8_ReadCodePoint(Source);
-                CurrentCodePoint            = UTF8_Decode(CodePoint);
-            } while (CurrentCodePoint[0] != U32('\n') || CurrentCodePoint[0] != StringIONULLTerminator);
-            // Now we need to allocate memory for that string
-            Line                            = calloc(StringSizeInCodeUnits, sizeof(UTF8));
-        } else {
-            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
-        }
-        return Line;
-    }
-    
-    UTF16 *UTF16_ReadLine(FILE *Source) { // Replaces Fgetws
-        UTF16 *Line = NULL;
-        if (Source != NULL) {
-            // So we need to know the size of the string to get, so count the number of codeunits that don't match any line ending.
-            uint64_t StringSizeInCodeUnits  = 0ULL;
-            uint64_t StringSizeInCodePoints = 0ULL;
-            UTF32   *CurrentCodePoint       = 1UL;
-            do {
-                /*
-                 Loop reading a codepoint each time until we find one that is a new line character.
-                 */
-                StringSizeInCodePoints     += 1;
-                UTF16 *CodePoint            = UTF16_ReadCodePoint(Source);
-                CurrentCodePoint            = UTF16_Decode(CodePoint);
-            } while (CurrentCodePoint[0] != U32('\n') || CurrentCodePoint[0] != StringIONULLTerminator);
-            // Now we need to allocate memory for that string
-            Line                            = calloc(StringSizeInCodeUnits, sizeof(UTF16));
-        } else {
-            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
-        }
-        return Line;
-    }
-    
-    void UTF8_WriteLine(UTF8 *String, FILE *OutputFile) { // Replaces Fputs and puts
-        if (String != NULL && OutputFile != NULL) {
-            uint64_t StringSize        = UTF8_GetStringSizeInCodePoints(String);
-            uint64_t CodePointsWritten = fwrite(String, sizeof(UTF8), StringSize, OutputFile);
-            if (CodePointsWritten < StringSize) {
-                Log(Log_ERROR, __func__, U8("Only wrote %lld codepoints of %lld"), CodePointsWritten, StringSize);
-            }
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (OutputFile == NULL) {
-            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
-        }
-    }
-    
-    void UTF16_WriteLine(UTF16 *String, FILE *OutputFile) { // Replaces Fputws and putws
-        if (String != NULL && OutputFile != NULL) {
-            uint64_t StringSize        = UTF16_GetStringSizeInCodePoints(String);
-            uint64_t CodePointsWritten = fwrite(String, sizeof(UTF16), StringSize, OutputFile);
-            if (CodePointsWritten < StringSize) {
-                Log(Log_ERROR, __func__, U8("Only wrote %lld codepoints of %lld"), CodePointsWritten, StringSize);
-            }
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (OutputFile == NULL) {
-            Log(Log_ERROR, __func__, U8("FILE Pointer is NULL"));
-        }
     }
     /* Medium Functions */
     
@@ -1936,52 +2057,211 @@ extern "C" {
     }
     /* Number Conversions */
     
-    uint64_t UTF8_GetNumFormatSpecifiers(UTF8 *String) {
-        uint64_t NumSpecifiers     = 0ULL;
-        uint64_t CodePoint         = 0ULL;
-        if (String != NULL) {
-            do {
-                if (String[CodePoint] == '%') {
-                    NumSpecifiers += 1;
-                }
-                CodePoint         += 1;
-            } while (String[CodePoint] != 0);
-        } else {
+    bool UTF8_CompareSubstring(UTF8 *String, UTF8 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
+        bool SubstringMatchesAtOffset = No;
+        if (String != NULL && Substring != NULL) {
+            UTF32 *String32           = UTF8_Decode(String);
+            UTF32 *Sub32              = UTF8_Decode(Substring);
+            SubstringMatchesAtOffset  = UTF32_CompareSubstring(String32, Sub32, StringOffset, SubstringOffset);
+            free(String32);
+            free(Sub32);
+        } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (Substring == NULL) {
+            Log(Log_ERROR, __func__, U8("Substring Pointer is NULL"));
         }
-        return NumSpecifiers;
+        return SubstringMatchesAtOffset;
     }
     
-    uint64_t UTF16_GetNumFormatSpecifiers(UTF16 *String) {
-        uint64_t NumSpecifiers     = 0ULL;
-        uint64_t CodePoint         = 0ULL;
-        if (String != NULL) {
-            do {
-                if (String[CodePoint] == U16('%')) {
-                    NumSpecifiers += 1;
-                }
-                CodePoint         += 1;
-            } while (String[CodePoint] != 0);
-        } else {
+    bool UTF16_CompareSubstring(UTF16 *String, UTF16 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
+        bool SubstringMatchesAtOffset = No;
+        if (String != NULL && Substring != NULL) {
+            UTF32 *String32           = UTF16_Decode(String);
+            UTF32 *Sub32              = UTF16_Decode(Substring);
+            SubstringMatchesAtOffset  = UTF32_CompareSubstring(String32, Sub32, StringOffset, SubstringOffset);
+            free(String32);
+            free(Sub32);
+        } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (Substring == NULL) {
+            Log(Log_ERROR, __func__, U8("Substring Pointer is NULL"));
         }
-        return NumSpecifiers;
+        return SubstringMatchesAtOffset;
     }
     
-    uint64_t UTF32_GetNumFormatSpecifiers(UTF32 *String) {
-        uint64_t NumSpecifiers     = 0ULL;
-        uint64_t CodePoint         = 0ULL;
-        if (String != NULL) {
-            do {
-                if (String[CodePoint] == U32('%')) {
-                    NumSpecifiers += 1;
+    bool UTF32_CompareSubstring(UTF32 *String, UTF32 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
+        bool SubstringMatchesAtOffset = Yes;
+        if (String != NULL && Substring != NULL) {
+            uint64_t StringSize       = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t SubstringSize    = UTF32_GetStringSizeInCodePoints(Substring);
+            for (uint64_t StringCodePoint = StringOffset; StringCodePoint < StringSize - 1; StringCodePoint++) {
+                for (uint64_t SubstringCodePoint = SubstringOffset; SubstringCodePoint < SubstringSize - 1; SubstringCodePoint++) {
+                    if (String[StringCodePoint] != Substring[SubstringCodePoint]) {
+                        SubstringMatchesAtOffset = No;
+                        break;
+                    }
                 }
-                CodePoint         += 1;
-            } while (String[CodePoint] != 0);
-        } else {
+            }
+        } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (Substring == NULL) {
+            Log(Log_ERROR, __func__, U8("Substring Pointer is NULL"));
         }
-        return NumSpecifiers;
+        return SubstringMatchesAtOffset;
+    }
+    
+    UTF8  *UTF8_TrimString(UTF8 *String, TrimStringTypes Type, UTF8 **Strings2Remove) {
+        UTF8 *Trimmed = NULL;
+        if (String != NULL && Type != TrimString_Unknown && Strings2Remove != NULL) {
+            UTF32    *String32                  = UTF8_Decode(String);
+            UTF32   **Strings2Remove32          = UTF8_StringArray_Decode(Strings2Remove);
+            UTF32    *Trimmed32                 = UTF32_TrimString(String32, Type, Strings2Remove32);
+            UTF32_StringArray_Deinit(Strings2Remove32);
+            Trimmed                             = UTF8_Encode(Trimmed32);
+            free(String32);
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (Type == TrimString_Unknown) {
+            Log(Log_ERROR, __func__, U8("TrimString_Unknown is invalid"));
+        } else if (Strings2Remove == NULL) {
+            Log(Log_ERROR, __func__, U8("Strings2Remove Pointer is NULL"));
+        }
+        return Trimmed;
+    }
+    
+    UTF16 *UTF16_TrimString(UTF16 *String, TrimStringTypes Type, UTF16 **Strings2Remove) {
+        UTF16 *Trimmed = NULL;
+        if (String != NULL && Type != TrimString_Unknown && Strings2Remove != NULL) {
+            UTF32    *String32                  = UTF16_Decode(String);
+            UTF32   **Strings2Remove32          = UTF16_StringArray_Decode(Strings2Remove);
+            UTF32    *Trimmed32                 = UTF32_TrimString(String32, Type, Strings2Remove32);
+            UTF32_StringArray_Deinit(Strings2Remove32);
+            Trimmed                             = UTF16_Encode(Trimmed32);
+            free(String32);
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (Type == TrimString_Unknown) {
+            Log(Log_ERROR, __func__, U8("TrimString_Unknown is invalid"));
+        } else if (Strings2Remove == NULL) {
+            Log(Log_ERROR, __func__, U8("Strings2Remove Pointer is NULL"));
+        }
+        return Trimmed;
+    }
+    
+    UTF32 *UTF32_TrimString(UTF32 *String, TrimStringTypes Type, UTF32 **Strings2Remove) {
+        UTF32 *Trimmed = NULL;
+        if (String != NULL && Type != TrimString_Unknown && Strings2Remove != NULL) {
+            uint64_t   StringSize          = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t   NumRemovalStrings   = UTF32_StringArray_GetNumStrings(Strings2Remove);
+            uint64_t  *RemovalStringSizes  = UTF32_StringArray_GetStringSizesInCodePoints(Strings2Remove);
+            uint64_t   NumRemovalPoints    = 0ULL;
+            uint64_t   CurrentRemovalPoint = 0ULL;
+            uint64_t  *RemovalPointsStart  = NULL; // RemovalPoint[0] = {0, 6}; start and stop points
+            uint64_t  *RemovalPointsEnd    = NULL; // RemovalPoint[0] = {0, 6}; start and stop points
+            uint64_t   TrimmedStringSize   = 0ULL;
+            if (Type == TrimString_RemoveAll) {
+                for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
+                    for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
+                        bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                        if (SubstringFound) {
+                            NumRemovalPoints += 1;
+                        }
+                    }
+                }
+                
+                RemovalPointsStart                                  = calloc(NumRemovalPoints, sizeof(uint64_t));
+                RemovalPointsEnd                                    = calloc(NumRemovalPoints, sizeof(uint64_t));
+                
+                for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
+                    for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
+                        bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                        if (SubstringFound) {
+                            RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
+                            RemovalPointsEnd[CurrentRemovalPoint]   = RemovalStringSizes[RemovalString];
+                            CurrentRemovalPoint                    += 1;
+                        }
+                    }
+                }
+            } else {
+                if (Type == TrimString_StartEndRemoveAll) {
+                    // Loop over all the codepoints until you find one that is not on the list, then remove it; BUT JUST FOR THE BEGINNING AND END
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
+                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
+                            bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                            if (SubstringFound) {
+                                NumRemovalPoints += 1;
+                            }
+                        }
+                    }
+                    
+                    RemovalPointsStart                                  = calloc(NumRemovalPoints, sizeof(uint64_t));
+                    RemovalPointsEnd                                    = calloc(NumRemovalPoints, sizeof(uint64_t));
+                    
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
+                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
+                            bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                            if (SubstringFound) {
+                                RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
+                                RemovalPointsEnd[CurrentRemovalPoint]   = RemovalStringSizes[RemovalString];
+                                CurrentRemovalPoint                    += 1;
+                            }
+                        }
+                    }
+                }
+                if (Type == TrimString_BetweenValidKeep1) {
+                    // Loop over all the codepoints until you find one that is not on the list, then remove it.
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
+                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
+                            bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                            if (SubstringFound) {
+                                NumRemovalPoints += 1;
+                            }
+                        }
+                    }
+                    
+                    RemovalPointsStart                                  = calloc(NumRemovalPoints, sizeof(uint64_t));
+                    RemovalPointsEnd                                    = calloc(NumRemovalPoints, sizeof(uint64_t));
+                    
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
+                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
+                            bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                            if (SubstringFound) {
+                                RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
+                                RemovalPointsEnd[CurrentRemovalPoint]   = RemovalStringSizes[RemovalString];
+                                CurrentRemovalPoint                    += 1;
+                            }
+                        }
+                    }
+                }
+            }
+            // Actually build the string, regardless of mode.
+            TrimmedStringSize = StringSize;
+            for (uint64_t RemovalPoint = 0ULL; RemovalPoint < NumRemovalPoints - 1; RemovalPoint++) {
+                TrimmedStringSize     -= RemovalPointsEnd[RemovalPoint] - RemovalPointsStart[RemovalPoint];
+            }
+            
+            Trimmed                    = calloc(TrimmedStringSize, sizeof(UTF32));
+            if (Trimmed != NULL) {
+                for (uint64_t RemovalPoint = 0ULL; RemovalPoint < NumRemovalPoints - 1; RemovalPoint++) {
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
+                        for (uint64_t TrimmedCodePoint = 0ULL; TrimmedCodePoint < TrimmedStringSize - 1; TrimmedCodePoint++) {
+                            if (StringCodePoint < RemovalPointsStart[RemovalPoint] || StringCodePoint > RemovalPointsEnd[RemovalPoint]) {
+                                Trimmed[TrimmedCodePoint] = String[StringCodePoint];
+                            }
+                        }
+                    }
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate Trimmed string"));
+            }
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        } else if (Type == TrimString_Unknown) {
+            Log(Log_ERROR, __func__, U8("TrimString_Unknown is invalid"));
+        } else if (Strings2Remove == NULL) {
+            Log(Log_ERROR, __func__, U8("Strings2Remove Pointer is NULL"));
+        }
+        return Trimmed;
     }
     
     /* StringArray Functions */
@@ -2227,249 +2507,6 @@ extern "C" {
         return Encoded;
     }
     
-    void UTF8_StringArray_Deinit(UTF8 **StringArray) {
-        if (StringArray != NULL) {
-            uint64_t NumStrings = UTF8_StringArray_GetNumStrings(StringArray);
-            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
-                free(StringArray[String]);
-            }
-            free(StringArray);
-        } else {
-            Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
-        }
-    }
-    
-    void UTF16_StringArray_Deinit(UTF16 **StringArray) {
-        if (StringArray != NULL) {
-            uint64_t NumStrings = UTF16_StringArray_GetNumStrings(StringArray);
-            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
-                free(StringArray[String]);
-            }
-            free(StringArray);
-        } else {
-            Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
-        }
-    }
-    
-    void UTF32_StringArray_Deinit(UTF32 **StringArray) {
-        if (StringArray != NULL) {
-            uint64_t NumStrings = UTF32_StringArray_GetNumStrings(StringArray);
-            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
-                free(StringArray[String]);
-            }
-            free(StringArray);
-        } else {
-            Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
-        }
-    }
-    
-    bool UTF8_CompareSubstring(UTF8 *String, UTF8 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
-        bool SubstringMatchesAtOffset = No;
-        if (String != NULL && Substring != NULL) {
-            UTF32 *String32           = UTF8_Decode(String);
-            UTF32 *Sub32              = UTF8_Decode(Substring);
-            SubstringMatchesAtOffset  = UTF32_CompareSubstring(String32, Sub32, StringOffset, SubstringOffset);
-            free(String32);
-            free(Sub32);
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (Substring == NULL) {
-            Log(Log_ERROR, __func__, U8("Substring Pointer is NULL"));
-        }
-        return SubstringMatchesAtOffset;
-    }
-    
-    bool UTF16_CompareSubstring(UTF16 *String, UTF16 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
-        bool SubstringMatchesAtOffset = No;
-        if (String != NULL && Substring != NULL) {
-            UTF32 *String32           = UTF16_Decode(String);
-            UTF32 *Sub32              = UTF16_Decode(Substring);
-            SubstringMatchesAtOffset  = UTF32_CompareSubstring(String32, Sub32, StringOffset, SubstringOffset);
-            free(String32);
-            free(Sub32);
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (Substring == NULL) {
-            Log(Log_ERROR, __func__, U8("Substring Pointer is NULL"));
-        }
-        return SubstringMatchesAtOffset;
-    }
-    
-    bool UTF32_CompareSubstring(UTF32 *String, UTF32 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
-        bool SubstringMatchesAtOffset = Yes;
-        if (String != NULL && Substring != NULL) {
-            uint64_t StringSize       = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t SubstringSize    = UTF32_GetStringSizeInCodePoints(Substring);
-            for (uint64_t StringCodePoint = StringOffset; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                for (uint64_t SubstringCodePoint = SubstringOffset; SubstringCodePoint < SubstringSize - 1; SubstringCodePoint++) {
-                    if (String[StringCodePoint] != Substring[SubstringCodePoint]) {
-                        SubstringMatchesAtOffset = No;
-                        break;
-                    }
-                }
-            }
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (Substring == NULL) {
-            Log(Log_ERROR, __func__, U8("Substring Pointer is NULL"));
-        }
-        return SubstringMatchesAtOffset;
-    }
-    
-    UTF8  *UTF8_TrimString(UTF8 *String, TrimStringTypes Type, UTF8 **Strings2Remove) {
-        UTF8 *Trimmed = NULL;
-        if (String != NULL && Type != TrimString_Unknown && Strings2Remove != NULL) {
-            UTF32    *String32                  = UTF8_Decode(String);
-            UTF32   **Strings2Remove32          = UTF8_StringArray_Decode(Strings2Remove);
-            UTF32    *Trimmed32                 = UTF32_TrimString(String32, Type, Strings2Remove32);
-            UTF32_StringArray_Deinit(Strings2Remove32);
-            Trimmed                             = UTF8_Encode(Trimmed32);
-            free(String32);
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (Type == TrimString_Unknown) {
-            Log(Log_ERROR, __func__, U8("TrimString_Unknown is invalid"));
-        } else if (Strings2Remove == NULL) {
-            Log(Log_ERROR, __func__, U8("Strings2Remove Pointer is NULL"));
-        }
-        return Trimmed;
-    }
-    
-    UTF16 *UTF16_TrimString(UTF16 *String, TrimStringTypes Type, UTF16 **Strings2Remove) {
-        UTF16 *Trimmed = NULL;
-        if (String != NULL && Type != TrimString_Unknown && Strings2Remove != NULL) {
-            UTF32    *String32                  = UTF16_Decode(String);
-            UTF32   **Strings2Remove32          = UTF16_StringArray_Decode(Strings2Remove);
-            UTF32    *Trimmed32                 = UTF32_TrimString(String32, Type, Strings2Remove32);
-            UTF32_StringArray_Deinit(Strings2Remove32);
-            Trimmed                             = UTF16_Encode(Trimmed32);
-            free(String32);
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (Type == TrimString_Unknown) {
-            Log(Log_ERROR, __func__, U8("TrimString_Unknown is invalid"));
-        } else if (Strings2Remove == NULL) {
-            Log(Log_ERROR, __func__, U8("Strings2Remove Pointer is NULL"));
-        }
-        return Trimmed;
-    }
-    
-    UTF32 *UTF32_TrimString(UTF32 *String, TrimStringTypes Type, UTF32 **Strings2Remove) {
-        UTF32 *Trimmed = NULL;
-        if (String != NULL && Type != TrimString_Unknown && Strings2Remove != NULL) {
-            uint64_t   StringSize          = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t   NumRemovalStrings   = UTF32_StringArray_GetNumStrings(Strings2Remove);
-            uint64_t  *RemovalStringSizes  = UTF32_StringArray_GetStringSizesInCodePoints(Strings2Remove);
-            uint64_t   NumRemovalPoints    = 0ULL;
-            uint64_t   CurrentRemovalPoint = 0ULL;
-            uint64_t  *RemovalPointsStart  = NULL; // RemovalPoint[0] = {0, 6}; start and stop points
-            uint64_t  *RemovalPointsEnd    = NULL; // RemovalPoint[0] = {0, 6}; start and stop points
-            uint64_t   TrimmedStringSize   = 0ULL;
-            if (Type == TrimString_RemoveAll) {
-                for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                    for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
-                        bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
-                        if (SubstringFound) {
-                            NumRemovalPoints += 1;
-                        }
-                    }
-                }
-                
-                RemovalPointsStart                                  = calloc(NumRemovalPoints, sizeof(uint64_t));
-                RemovalPointsEnd                                    = calloc(NumRemovalPoints, sizeof(uint64_t));
-                
-                for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                    for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
-                        bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
-                        if (SubstringFound) {
-                            RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
-                            RemovalPointsEnd[CurrentRemovalPoint]   = RemovalStringSizes[RemovalString];
-                            CurrentRemovalPoint                    += 1;
-                        }
-                    }
-                }
-            } else {
-                if (Type == TrimString_StartEndRemoveAll) {
-                    // Loop over all the codepoints until you find one that is not on the list, then remove it; BUT JUST FOR THE BEGINNING AND END
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
-                            bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
-                            if (SubstringFound) {
-                                NumRemovalPoints += 1;
-                            }
-                        }
-                    }
-                    
-                    RemovalPointsStart                                  = calloc(NumRemovalPoints, sizeof(uint64_t));
-                    RemovalPointsEnd                                    = calloc(NumRemovalPoints, sizeof(uint64_t));
-                    
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
-                            bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
-                            if (SubstringFound) {
-                                RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
-                                RemovalPointsEnd[CurrentRemovalPoint]   = RemovalStringSizes[RemovalString];
-                                CurrentRemovalPoint                    += 1;
-                            }
-                        }
-                    }
-                }
-                if (Type == TrimString_BetweenValidKeep1) {
-                    // Loop over all the codepoints until you find one that is not on the list, then remove it.
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
-                            bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
-                            if (SubstringFound) {
-                                NumRemovalPoints += 1;
-                            }
-                        }
-                    }
-                    
-                    RemovalPointsStart                                  = calloc(NumRemovalPoints, sizeof(uint64_t));
-                    RemovalPointsEnd                                    = calloc(NumRemovalPoints, sizeof(uint64_t));
-                    
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
-                            bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
-                            if (SubstringFound) {
-                                RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
-                                RemovalPointsEnd[CurrentRemovalPoint]   = RemovalStringSizes[RemovalString];
-                                CurrentRemovalPoint                    += 1;
-                            }
-                        }
-                    }
-                }
-            }
-            // Actually build the string, regardless of mode.
-            TrimmedStringSize = StringSize;
-            for (uint64_t RemovalPoint = 0ULL; RemovalPoint < NumRemovalPoints - 1; RemovalPoint++) {
-                TrimmedStringSize     -= RemovalPointsEnd[RemovalPoint] - RemovalPointsStart[RemovalPoint];
-            }
-            
-            Trimmed                    = calloc(TrimmedStringSize, sizeof(UTF32));
-            if (Trimmed != NULL) {
-                for (uint64_t RemovalPoint = 0ULL; RemovalPoint < NumRemovalPoints - 1; RemovalPoint++) {
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                        for (uint64_t TrimmedCodePoint = 0ULL; TrimmedCodePoint < TrimmedStringSize - 1; TrimmedCodePoint++) {
-                            if (StringCodePoint < RemovalPointsStart[RemovalPoint] || StringCodePoint > RemovalPointsEnd[RemovalPoint]) {
-                                Trimmed[TrimmedCodePoint] = String[StringCodePoint];
-                            }
-                        }
-                    }
-                }
-            } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate Trimmed string"));
-            }
-        } else if (String == NULL) {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (Type == TrimString_Unknown) {
-            Log(Log_ERROR, __func__, U8("TrimString_Unknown is invalid"));
-        } else if (Strings2Remove == NULL) {
-            Log(Log_ERROR, __func__, U8("Strings2Remove Pointer is NULL"));
-        }
-        return Trimmed;
-    }
-    
     UTF8 **UTF8_SplitString(UTF8 *String, UTF8 **Delimiters) {
         UTF8 **SplitString        = NULL;
         if (String != NULL && Delimiters != NULL) {
@@ -2575,7 +2612,91 @@ extern "C" {
         }
         return SplitStrings;
     }
+    
+    void UTF8_StringArray_Deinit(UTF8 **StringArray) {
+        if (StringArray != NULL) {
+            uint64_t NumStrings = UTF8_StringArray_GetNumStrings(StringArray);
+            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+                free(StringArray[String]);
+            }
+            free(StringArray);
+        } else {
+            Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
+        }
+    }
+    
+    void UTF16_StringArray_Deinit(UTF16 **StringArray) {
+        if (StringArray != NULL) {
+            uint64_t NumStrings = UTF16_StringArray_GetNumStrings(StringArray);
+            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+                free(StringArray[String]);
+            }
+            free(StringArray);
+        } else {
+            Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
+        }
+    }
+    
+    void UTF32_StringArray_Deinit(UTF32 **StringArray) {
+        if (StringArray != NULL) {
+            uint64_t NumStrings = UTF32_StringArray_GetNumStrings(StringArray);
+            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+                free(StringArray[String]);
+            }
+            free(StringArray);
+        } else {
+            Log(Log_ERROR, __func__, U8("StringArray Pointer is NULL"));
+        }
+    }
     /* StringArray Functions */
+    
+    uint64_t UTF8_GetNumFormatSpecifiers(UTF8 *String) {
+        uint64_t NumSpecifiers     = 0ULL;
+        uint64_t CodePoint         = 0ULL;
+        if (String != NULL) {
+            do {
+                if (String[CodePoint] == '%') {
+                    NumSpecifiers += 1;
+                }
+                CodePoint         += 1;
+            } while (String[CodePoint] != 0);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return NumSpecifiers;
+    }
+    
+    uint64_t UTF16_GetNumFormatSpecifiers(UTF16 *String) {
+        uint64_t NumSpecifiers     = 0ULL;
+        uint64_t CodePoint         = 0ULL;
+        if (String != NULL) {
+            do {
+                if (String[CodePoint] == U16('%')) {
+                    NumSpecifiers += 1;
+                }
+                CodePoint         += 1;
+            } while (String[CodePoint] != 0);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return NumSpecifiers;
+    }
+    
+    uint64_t UTF32_GetNumFormatSpecifiers(UTF32 *String) {
+        uint64_t NumSpecifiers     = 0ULL;
+        uint64_t CodePoint         = 0ULL;
+        if (String != NULL) {
+            do {
+                if (String[CodePoint] == U32('%')) {
+                    NumSpecifiers += 1;
+                }
+                CodePoint         += 1;
+            } while (String[CodePoint] != 0);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return NumSpecifiers;
+    }
     
     typedef enum FormatSpecifierFlags {
         Flag_Unset                     = 0,
@@ -2619,7 +2740,7 @@ extern "C" {
         Modifier_Base8                 = 64,
         Modifier_Base10                = 128,
         Modifier_Base16                = 256,
-        Modifier_Decimal               = 512, // XX.YYY
+        Modifier_Decimal               = 512,  // XX.YYY
         Modifier_Scientific            = 1024, // XX.YYYE(+|-)Z
         Modifier_Shortest              = 2048, // Scientific, or Decimal, whichever is  shorter
         Modifier_Uppercase             = 4096,
@@ -2639,8 +2760,8 @@ extern "C" {
     typedef struct FormatSpecifier {
         uint64_t                     SpecifierOffset; // Start location in the format string
         uint64_t                     SpecifierLength; // Start - Size
-        uint64_t                     MinWidth;     // Actual Width
-        uint64_t                     Precision;    // Actual Precision
+        uint64_t                     MinWidth;        // Actual Width
+        uint64_t                     Precision;       // Actual Precision
         FormatSpecifierFlags         Flag;
         FormatSpecifierMinWidths     MinWidthFlag;
         FormatSpecifierPrecisions    PrecisionFlag;
