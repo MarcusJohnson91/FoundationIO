@@ -274,35 +274,45 @@ extern "C" {
 #define             FoundationIOTargetByteOrder                            (FoundationIOCompileTimeByteOrderLE)
 #endif /* FoundationIOCompiler */
     
-#ifndef             NewLineUTF8
+#ifndef             FoundationIONewLine8
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
-#define             NewLineUTF8                                            (u8"\n")
+#define             FoundationIONewLine8                                   (u8"\n")
+#define             FoundationIONewLineSize8                               (1)
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #define             NewLineUTF8                                            (u8"\r\n")
+#define             FoundationIONewLineSize8                               (2)
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
 #define             NewLineUTF8                                            (u8"\r")
+#define             FoundationIONewLineSize8                               (1)
 #endif /* TargetOS */
-#endif /* NewLineUTF8 */
+#endif /* FoundationIONewLine8 */
     
-#ifndef             NewLineUTF16
+#ifndef             FoundationIONewLine16
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
-#define             NewLineUTF16                                           (u"\n")
+#define             FoundationIONewLine16                                  (u"\n")
+#define             FoundationIONewLineSize16                              (1)
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-#define             NewLineUTF16                                           (u"\r\n")
+#define             FoundationIONewLine16                                  (u"\r\n")
+#define             FoundationIONewLineSize16                              (2)
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
-#define             NewLineUTF16                                           (u"\r")
+#define             FoundationIONewLine16                                  (u"\r")
+#define             FoundationIONewLineSize16                              (1)
 #endif /* TargetOS */
-#endif /* NewLineUTF16 */
+#endif /* FoundationIONewLine16 */
     
-#ifndef             NewLineUTF32
+    
+#ifndef             FoundationIONewLine32
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
-#define             NewLineUTF32                                           (U"\n")
+#define             FoundationIONewLine32                                  (u"\n")
+#define             FoundationIONewLineSize32                              (1)
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-#define             NewLineUTF32                                           (U"\r\n")
+#define             FoundationIONewLine32                                  (u"\r\n")
+#define             FoundationIONewLineSize32                              (2)
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
-#define             NewLineUTF32                                           (U"\r")
+#define             FoundationIONewLine32                                  (u"\r")
+#define             FoundationIONewLineSize32                              (1)
 #endif /* TargetOS */
-#endif /* NewLineUTF32 */
+#endif /* FoundationIONewLine32 */
     
 #ifndef FoundationIOSTDVersion
 #define FoundationIOSTDVersion (__STDC_VERSION__)
