@@ -20,31 +20,44 @@
 extern "C" {
 #endif
     
-    /* Forward declare StringIO's types */
-#ifndef               UTF8
-#if (FoundationIOSTDVersion >= FoundationIOSTDVersionC2X && FoundationIOTargetOS != FoundationIOAppleOS)
-typedef               char8_t                              UTF8;
-#else
-typedef               unsigned char                        UTF8;
-#endif /* char8_t */
+#ifndef   FoundationIO_StringType8
+#define   FoundationIO_StringType8 (1)
+#ifdef    UTF8
+#undef    UTF8
 #endif /* UTF8 */
-    
-#ifndef               UTF16
-#if (FoundationIOSTDVersion >= FoundationIOSTDVersionC11 && FoundationIOTargetOS != FoundationIOAppleOS)
-typedef               char16_t                             UTF16;
+#if (defined __STDC_UTF_8__ && defined __CHAR8_TYPE__ && __STDC_VERSION__ >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+    typedef   char8_t        UTF8;
 #else
-typedef               uint_least16_t                       UTF16;
-#endif /* char16_t */
+    typedef   unsigned char  UTF8;
+#endif /* __CHAR8_TYPE__ */
+#endif /* FoundationIO_StringType8 */
+    
+#ifndef   FoundationIO_StringType16
+#define   FoundationIO_StringType16 (2)
+#ifdef    UTF16
+#undef    UTF16
 #endif /* UTF16 */
-    
-#ifndef               UTF32
-#if (FoundationIOSTDVersion >= FoundationIOSTDVersionC11 && FoundationIOTargetOS != FoundationIOAppleOS)
-typedef               char32_t                             UTF32;
+#if (defined __STDC_UTF_16__ && defined __CHAR16_TYPE__ && __STDC_VERSION__ >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+    typedef                     char16_t                        UTF16;
 #else
-typedef               uint_least32_t                       UTF32;
-#endif /* char32_t */
-#endif /* UTF32 */
-    /* Forward declare StringIO's types */
+    typedef                     uint_least16_t                  UTF16;
+#endif /* __CHAR16_TYPE__ */
+#endif /* FoundationIO_StringType16 */
+    
+#ifndef                   FoundationIO_Unicodize8
+#define                   FoundationIO_Unicodize8             (1)
+#define                   U8(QuotedLiteral)                    u8##QuotedLiteral
+#endif /* FoundationIO_Unicodize8 */
+    
+#ifndef                   FoundationIO_Unicodize16
+#define                   FoundationIO_Unicodize16            (2)
+#define                   U16(QuotedLiteral)                  u##QuotedLiteral
+#endif /* FoundationIO_Unicodize16 */
+    
+#ifndef                   FoundationIO_Unicodize32
+#define                   FoundationIO_Unicodize32            (4)
+#define                   U32(QuotedLiteral)                  U##QuotedLiteral
+#endif /* FoundationIO_Unicodize32 */
     
     /*!
      @enum                      CLISwitchTypes
