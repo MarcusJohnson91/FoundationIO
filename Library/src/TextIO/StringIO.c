@@ -850,6 +850,39 @@ extern "C" {
         return Copy;
     }
     
+    void UTF8_Erase(UTF8 *String) {
+        if (String != NULL) {
+            uint64_t StringSize  = UTF8_GetStringSizeInCodePoints(String);
+            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
+                String[CodeUnit] = 0;
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+    }
+    
+    void UTF16_Erase(UTF16 *String) {
+        if (String != NULL) {
+            uint64_t StringSize  = UTF16_GetStringSizeInCodePoints(String);
+            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
+                String[CodeUnit] = 0;
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+    }
+    
+    void UTF32_Erase(UTF32 *String) {
+        if (String != NULL) {
+            uint64_t StringSize  = UTF32_GetStringSizeInCodePoints(String);
+            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
+                String[CodeUnit] = 0;
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+    }
+    
     UTF8 *UTF8_ReadCodePoint(FILE *Source) { // Replaces fgetc and getc
         UTF8 *CodePoint           = NULL;
         if (Source != NULL) {
