@@ -795,6 +795,24 @@ extern "C" {
     UTF32                *UTF32_Clone(UTF32 *String);
     
     /*!
+     @abstract                             "Securely erases a string".
+     @param               String           "Pointer to the String to be erased".
+     */
+    void                  UTF8_Erase(UTF8 *String);
+    
+    /*!
+     @abstract                             "Securely erases a string".
+     @param               String           "Pointer to the String to be erased".
+     */
+    void                  UTF16_Erase(UTF16 *String);
+    
+    /*!
+     @abstract                             "Securely erases a string".
+     @param               String           "Pointer to the String to be erased".
+     */
+    void                  UTF32_Erase(UTF32 *String);
+    
+    /*!
      @abstract                             "Creates a copy of String, with String2Insert starting at Offset".
      @remark                               "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string".
      @param               String           "The string to manipulate".
