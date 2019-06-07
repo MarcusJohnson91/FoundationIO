@@ -71,12 +71,6 @@ extern "C" {
 #define                   U32(QuotedLiteral)                  U##QuotedLiteral
 #endif /* FoundationIO_Unicodize32 */
     
-    /* Define UNC Path Prefix macro */
-#ifndef                   StringIOUNCPathPrefix
-#define                   StringIOUNCPathPrefix                U32("//?/")
-#endif
-    /* Define UNC Path Prefix macro */
-    
     /*!
      @enum                StringIOCommon
      @constant            UTF8BOMSizeInCodeUnits               "The number of code units (8 bits) the UTF8 BOM takes".
@@ -122,18 +116,18 @@ extern "C" {
     
     /*!
      @enum                StringIONormalizationForms
-     @constant            UnknownNormalizationForm             "Unknown Normalization Form".
-     @constant            NormalizationFormD                   "Decompose the String".
-     @constant            NormalizationFormC                   "Decompose, then Compose the String".
-     @constant            NormalizationFormKD                  "The same as NormalizationFormD, plus Kompatibility decompositions".
-     @constant            NormalizationFormKC                  "The same as NormalizationFormD, plus Kompatibility compositions".
+     @constant            NormalizationForm_Unknown             "Unknown Normalization Form".
+     @constant            NormalizationForm_CanonicalDecompose  "Decompose the String".
+     @constant            NormalizationForm_CanonicalCompose    "Decompose, then Compose the String".
+     @constant            NormalizationForm_KompatibleDecompose "NormalizationForm_CanonicalDecompose, plus Kompatibility decompositions".
+     @constant            NormalizationForm_KompatibleCompose   "NormalizationForm_CanonicalDecompose, plus Kompatibility compositions".
      */
     typedef enum StringIONormalizationForms {
-                          UnknownNormalizationForm             = 0,
-                          NormalizationFormD                   = 1,
-                          NormalizationFormC                   = 2,
-                          NormalizationFormKD                  = 3,
-                          NormalizationFormKC                  = 4,
+                          NormalizationForm_Unknown             = 0,
+                          NormalizationForm_CanonicalDecompose  = 1,
+                          NormalizationForm_CanonicalCompose    = 2,
+                          NormalizationForm_KompatibleDecompose = 3,
+                          NormalizationForm_KompatibleCompose   = 4,
     } StringIONormalizationForms;
     
     /*!
@@ -167,44 +161,18 @@ extern "C" {
     } StringIOBases;
     
     /*!
-     @enum                StringIOBOMStates
-     @constant            UnknownBOMState                      "It's unknown if the string contains a BOM".
-     @constant            AddBOM                               "Add a BOM even if there already is one".
-     @constant            RemoveBOM                            "Remove the BOM".
-     @constant            KeepBOM                              "Keep the BOM".
-     */
-    typedef enum StringIOBOMStates {
-                          UnknownBOMState                      = 0,
-                          AddBOM                               = 1,
-                          RemoveBOM                            = 2,
-                          KeepBOM                              = 3,
-    } StringIOBOMStates;
-    
-    /*!
      @enum                StringIOByteOrders
-     @constant            UseNativeByteOrder                   "Use the byte order of the host".
-     @constant            UseLEByteOrder                       "Use the little endian, Least-Significant-Byte First order".
-     @constant            UseBEByteOrder                       "Use the big endian, Most-Significant-Byte First order".
+     @constant            ByteOrder_Unknown                  "Byte order is unknown".
+     @constant            ByteOrder_Native                   "Use the byte order of the host".
+     @constant            ByteOrder_Little                   "Use the little endian, Least-Significant-Byte first order".
+     @constant            ByteOrder_Big                       "Use the big endian, Most-Significant-Byte first order".
      */
     typedef enum StringIOByteOrders {
-                          UseNativeByteOrder                   = 0,
-                          UseLEByteOrder                       = 1,
-                          UseBEByteOrder                       = 2,
+                          ByteOrder_Unknown                    = 0,
+                          ByteOrder_Native                     = 1,
+                          ByteOrder_Little                     = 2,
+                          ByteOrder_Big                        = 3,
     } StringIOByteOrders;
-    
-    /*!
-     @enum                StringTypes
-     @constant            UnknownStringType                    "Could be anything".
-     @constant            UTF8Format                           "The string is UTF-8 encoded".
-     @constant            UTF16Format                          "The string is UTF-15 encoded".
-     @constant            UTF32Format                          "The string is UTF-32 encoded".
-     */
-    typedef enum StringTypes {
-                          UnknownStringType                    = 0,
-                          UTF8Format                           = 1,
-                          UTF16Format                          = 2,
-                          UTF32Format                          = 3,
-    } StringTypes;
     
     /* Basic String Property Functions */
     /*!
@@ -290,42 +258,42 @@ extern "C" {
      @param               String           "The string to get the BOM status from".
      @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
      */
-    bool                  UTF8_StringHasBOM(UTF8 *String);
+    bool                  UTF8_HasBOM(UTF8 *String);
     
     /*!
      @abstract                             "Tells if the UTF-16 string pointed to by String has a Byte Order Mark at the beginning".
      @param               String           "The string to get the BOM status from".
      @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
      */
-    bool                  UTF16_StringHasBOM(UTF16 *String);
+    bool                  UTF16_HasBOM(UTF16 *String);
     
     /*!
      @abstract                             "Tells if the UTF-32 string pointed to by String has a Byte Order Mark at the beginning".
      @param               String           "The string to get the BOM status from".
      @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
      */
-    bool                  UTF32_StringHasBOM(UTF32 *String);
+    bool                  UTF32_HasBOM(UTF32 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
      */
-    bool                  UTF8_StringHasUNCPathPrefix(UTF8 *String);
+    bool                  UTF8_HasUNCPathPrefix(UTF8 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
      */
-    bool                  UTF16_StringHasUNCPathPrefix(UTF16 *String);
+    bool                  UTF16_HasUNCPathPrefix(UTF16 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
      */
-    bool                  UTF32_StringHasUNCPathPrefix(UTF32 *String);
+    bool                  UTF32_HasUNCPathPrefix(UTF32 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String starts with / on POSIX, or the second character is : on Windows".
@@ -353,45 +321,46 @@ extern "C" {
      @param               String           "The string to check".
      @return                               "Returns Yes if the String contains a Windows or UNIX style line ending, otherwise no".
      */
-    bool                  UTF8_StringHasNewLine(UTF8 *String);
+    bool                  UTF8_HasNewLine(UTF8 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String contains a Windows or UNIX style line ending".
      @param               String           "The string to check".
      @return                               "Returns Yes if the String contains a Windows or UNIX style line ending, otherwise no".
      */
-    bool                  UTF16_StringHasNewLine(UTF16 *String);
+    bool                  UTF16_HasNewLine(UTF16 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String contains a Windows or UNIX style line ending".
      @param               String           "The string to check".
      @return                               "Returns Yes if the String contains a Windows or UNIX style line ending, otherwise no".
      */
-    bool                  UTF32_StringHasNewLine(UTF32 *String);
+    bool                  UTF32_HasNewLine(UTF32 *String);
     
     /*!
      @abstract                             "Tells if the UTF-8 string pointed to by String is a valid UTF-8 encoded string".
      @param               String           "The string to get the validity status from".
      @return                               "Returns Yes if the string is valid, otherwise it returns No".
      */
-    bool                  UTF8_IsStringValid(UTF8 *String);
+    bool                  UTF8_IsValid(UTF8 *String);
     
     /*!
      @abstract                             "Tells if the UTF-16 string pointed to by String is a valid UTF-16 encoded string".
      @param               String           "The string to get the validity status from".
      @return                               "Returns Yes if the string is valid, otherwise it returns No".
      */
-    bool                  UTF16_IsStringValid(UTF16 *String);
+    bool                  UTF16_IsValid(UTF16 *String);
     
     /*!
      @abstract                             "Tells if the UTF-32 string pointed to by String is a valid UTF-32 encoded string".
      @param               String           "The string to get the validity status from".
      @return                               "Returns Yes if the string is valid, otherwise it returns No".
      */
-    bool                  UTF32_IsStringValid(UTF32 *String);
+    bool                  UTF32_IsValid(UTF32 *String);
     
     /*!
      @abstract                             "Adds the BOM to the UTF-8 string, UTF-8's only valid BOM is BE".
+     @param               String           "The string to add the BOM to".
      */
     UTF8                 *UTF8_AddBOM(UTF8 *String);
     
@@ -455,21 +424,21 @@ extern "C" {
      @param               String           "The string to be casefolded".
      @return                               "Returns the case folded string".
      */
-    UTF8                 *UTF8_CaseFoldString(UTF8 *String);
+    UTF8                 *UTF8_CaseFold(UTF8 *String);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
      @param               String           "The string to be casefolded".
      @return                               "Returns the case folded string".
      */
-    UTF16                *UTF16_CaseFoldString(UTF16 *String);
+    UTF16                *UTF16_CaseFold(UTF16 *String);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
      @param               String           "The string to be casefolded".
      @return                               "Returns the case folded string".
      */
-    UTF32                *UTF32_CaseFoldString(UTF32 *String);
+    UTF32                *UTF32_CaseFold(UTF32 *String);
     
     /*!
      @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
@@ -478,7 +447,7 @@ extern "C" {
      @param               String           "The string to be normalized".
      @param               NormalizedForm   "The type of normalization to use on the String".
      */
-    UTF8                 *UTF8_NormalizeString(UTF8 *String, StringIONormalizationForms NormalizedForm);
+    UTF8                 *UTF8_Normalize(UTF8 *String, StringIONormalizationForms NormalizedForm);
     
     /*!
      @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
@@ -487,7 +456,7 @@ extern "C" {
      @param               String           "The string to be normalized".
      @param               NormalizedForm   "The type of normalization to use on the String".
      */
-    UTF16                *UTF16_NormalizeString(UTF16 *String, StringIONormalizationForms NormalizedForm);
+    UTF16                *UTF16_Normalize(UTF16 *String, StringIONormalizationForms NormalizedForm);
     
     /*!
      @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
@@ -495,7 +464,7 @@ extern "C" {
      @param               String           "The string to be normalized".
      @param               NormalizedForm   "The type of normalization to use on the String".
      */
-    UTF32                *UTF32_NormalizeString(UTF32 *String, StringIONormalizationForms NormalizedForm);
+    UTF32                *UTF32_Normalize(UTF32 *String, StringIONormalizationForms NormalizedForm);
     
     /*!
      @abstract                             "Finds a substring within string, starting at codepoint Offset, and ending at Offset + Length".
@@ -611,7 +580,7 @@ extern "C" {
      @param               String           "The string you want to be split".
      @param               Delimiters       "An StringArray containing the delimiters, one delimiter per string".
      */
-    UTF8                **UTF8_SplitString(UTF8 *String, UTF8 **Delimiters);
+    UTF8                **UTF8_Split(UTF8 *String, UTF8 **Delimiters);
     
     /*!
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
@@ -619,7 +588,7 @@ extern "C" {
      @param               String           "The string you want to be split".
      @param               Delimiters       "An StringArray containing the delimiters, one delimiter per string".
      */
-    UTF16               **UTF16_SplitString(UTF16 *String, UTF16 **Delimiters);
+    UTF16               **UTF16_Split(UTF16 *String, UTF16 **Delimiters);
     
     /*!
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
@@ -627,7 +596,7 @@ extern "C" {
      @param               String           "The string you want to be split".
      @param               Delimiters       "An StringArray containing the delimiters, one delimiter per string".
      */
-    UTF32               **UTF32_SplitString(UTF32 *String, UTF32 **Delimiters);
+    UTF32               **UTF32_Split(UTF32 *String, UTF32 **Delimiters);
     
     /*!
      @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
@@ -727,21 +696,21 @@ extern "C" {
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
-    UTF8                 *UTF8_TrimString(UTF8 *String, TrimStringTypes Type, UTF8 **Strings2Remove);
+    UTF8                 *UTF8_Trim(UTF8 *String, TrimStringTypes Type, UTF8 **Strings2Remove);
     
     /*!
      @abstract                             "Removes substrings (including single codepoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
-    UTF16                *UTF16_TrimString(UTF16 *String, TrimStringTypes Type, UTF16 **Strings2Remove);
+    UTF16                *UTF16_Trim(UTF16 *String, TrimStringTypes Type, UTF16 **Strings2Remove);
     
     /*!
      @abstract                             "Removes substrings (including single codepoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
-    UTF32                *UTF32_TrimString(UTF32 *String, TrimStringTypes Type, UTF32 **Strings2Remove);
+    UTF32                *UTF32_Trim(UTF32 *String, TrimStringTypes Type, UTF32 **Strings2Remove);
     
     /*!
      @abstract                             "Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence".
@@ -1179,7 +1148,7 @@ extern "C" {
     
 #define GetStringSizeInGraphemes(String)  _Generic((String), UTF8:UTF8_GetStringSizeInGraphemes, UTF8*:UTF8_GetStringSizeInGraphemes, UTF16:UTF16_GetStringSizeInGraphemes, UTF16*:UTF16_GetStringSizeInGraphemes, UTF32:UTF32_GetStringSizeInGraphemes, UTF32*:UTF32_GetStringSizeInGraphemes)(String)
     
-#define StringHasBOM(String)              _Generic((String), UTF8:UTF8_StringHasBOM, UTF8*:UTF8_StringHasBOM, UTF16:UTF16_StringHasBOM, UTF16*:UTF16_StringHasBOM, UTF32:UTF32_StringHasBOM, UTF32*:UTF32_StringHasBOM)(String)
+#define StringHasBOM(String)              _Generic((String), UTF8:UTF8_HasBOM, UTF8*:UTF8_HasBOM, UTF16:UTF16_HasBOM, UTF16*:UTF16_HasBOM, UTF32:UTF32_HasBOM, UTF32*:UTF32_HasBOM)(String)
     
 #define FormatString(String, ...)         _Generic((String), UTF8:UTF8_FormatString, UTF8*:UTF8_FormatString, UTF16:UTF16_FormatString, UTF16*:UTF16_FormatString, UTF32:UTF32_FormatString, UTF32*:UTF32_FormatString)(String, ...)
     
@@ -1193,15 +1162,15 @@ extern "C" {
     
 #define Compare(String1, String2)         _Generic((String1), UTF8:UTF8_Compare, UTF8*:UTF8_Compare, UTF16:UTF16_Compare, UTF16*:UTF16_Compare, UTF32:UTF32_Compare, UTF32*:UTF32_Compare)(String1, String2)
     
-#define Trim(String, Strings2Remove)      _Generic((String), UTF8:UTF8_TrimString, UTF8*:UTF8_TrimString, UTF16:UTF16_TrimString, UTF16*:UTF16_TrimString, UTF32:UTF32_TrimString, UTF32*:UTF32_TrimString)(String, Strings2Remove)
+#define Trim(String, Strings2Remove)      _Generic((String), UTF8:UTF8_Trim, UTF8*:UTF8_Trim, UTF16:UTF16_Trim, UTF16*:UTF16_Trim, UTF32:UTF32_Trim, UTF32*:UTF32_Trim)(String, Strings2Remove)
     
 #define String2Decimal(String)            _Generic((String), UTF8:UTF8_String2Decimal, UTF8*:UTF8_String2Decimal, UTF16:UTF16_String2Decimal, UTF16*:UTF16_String2Decimal, UTF32:UTF32_String2Decimal, UTF32*:UTF32_String2Decimal)(String)
     
 #define String2Integer(String)            _Generic((String), UTF8:UTF8_String2Integer, UTF8*:UTF8_String2Integer, UTF16:UTF16_String2Integer, UTF16*:UTF16_String2Integer, UTF32:UTF32_String2Integer, UTF32*:UTF32_String2Integer)(String)
     
-#define SplitString(String, Delimiters)   _Generic((String), UTF8:UTF8_SplitString, UTF8*:UTF8_SplitString, UTF16:UTF16_SplitString, UTF16*:UTF16_SplitString, UTF32:UTF32_SplitString, UTF32*:UTF32_SplitString)(String, Delimiters)
+#define SplitString(String, Delimiters)   _Generic((String), UTF8:UTF8_Split, UTF8*:UTF8_Split, UTF16:UTF16_Split, UTF16*:UTF16_Split, UTF32:UTF32_Split, UTF32*:UTF32_Split)(String, Delimiters)
     
-#define Normalize(String)                 _Generic((String), UTF8:UTF8_NormalizeString, UTF8*:UTF8_NormalizeString, UTF16:UTF16_NormalizeString, UTF16*:UTF16_NormalizeString, UTF32:UTF32_NormalizeString, UTF32*:UTF32_NormalizeString)(String)
+#define Normalize(String)                 _Generic((String), UTF8:UTF8_Normalize, UTF8*:UTF8_Normalize, UTF16:UTF16_Normalize, UTF16*:UTF16_Normalize, UTF32:UTF32_Normalize, UTF32*:UTF32_Normalize)(String)
     
 #define CaseFold(String)                  _Generic((String), UTF8:UTF8_CaseFold, UTF8*:UTF8_CaseFold, UTF16:UTF16_CaseFold, UTF16*:UTF16_CaseFold, UTF32:UTF32_CaseFold, UTF32*:UTF32_CaseFold)(String)
     

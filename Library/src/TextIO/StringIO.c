@@ -27,8 +27,6 @@ extern "C" {
      
      */
     
-    
-    
     uint8_t UTF8_GetCodePointSizeInCodeUnits(UTF8 CodeUnit) {
         uint8_t CodePointSize = 0;
         if (((CodeUnit & 0x80) >> 7) == 0) {
@@ -205,7 +203,7 @@ extern "C" {
         return NumGraphemes;
     }
     
-    bool UTF8_StringHasBOM(UTF8 *String) {
+    bool UTF8_HasBOM(UTF8 *String) {
         bool StringHasABOM        = No;
         if (String != NULL) {
             uint64_t StringSize   = UTF8_GetStringSizeInCodeUnits(String);
@@ -220,7 +218,7 @@ extern "C" {
         return StringHasABOM;
     }
     
-    bool UTF16_StringHasBOM(UTF16 *String) {
+    bool UTF16_HasBOM(UTF16 *String) {
         bool StringHasABOM    = No;
         if (String != NULL) {
             if (String[0] == UTF16BOM_LE || String[0] == UTF16BOM_BE) {
@@ -232,7 +230,7 @@ extern "C" {
         return StringHasABOM;
     }
     
-    bool UTF32_StringHasBOM(UTF32 *String) {
+    bool UTF32_HasBOM(UTF32 *String) {
         bool StringHasABOM    = No;
         if (String != NULL) {
             if (String[0] == UTF32BOM_LE || String[0] == UTF32BOM_BE) {
@@ -244,12 +242,12 @@ extern "C" {
         return StringHasABOM;
     }
     
-    bool  UTF8_StringHasUNCPathPrefix(UTF8 *String) {
+    bool  UTF8_HasUNCPathPrefix(UTF8 *String) {
         bool StringHasUNCPathPrefix = No;
         if (String != NULL) {
             uint64_t StringSize     = UTF8_GetStringSizeInCodePoints(String);
             if (StringSize > UnicodeBOMSizeInCodePoints) {
-                bool StringHasBOM   = UTF8_StringHasBOM(String);
+                bool StringHasBOM   = UTF8_HasBOM(String);
                 if (StringHasBOM && StringSize >= UTF8BOMSizeInCodeUnits + UnicodeUNCPathPrefixSize) {
                     // "//?/" or "\\?\"
                     if ((String[1] == '/' || String[1] == '\\') && (String[2] == '/' || String[2] == '\\') && String[3] == '?' && (String[4] == '/' || String[4] == '\\')) {
@@ -267,12 +265,12 @@ extern "C" {
         return StringHasUNCPathPrefix;
     }
     
-    bool  UTF16_StringHasUNCPathPrefix(UTF16 *String) {
+    bool  UTF16_HasUNCPathPrefix(UTF16 *String) {
         bool StringHasUNCPathPrefix = No;
         if (String != NULL) {
             uint64_t StringSize     = UTF16_GetStringSizeInCodePoints(String);
             if (StringSize > UnicodeBOMSizeInCodePoints) {
-                bool StringHasBOM   = UTF16_StringHasBOM(String);
+                bool StringHasBOM   = UTF16_HasBOM(String);
                 if (StringHasBOM && StringSize >= UTF16BOMSizeInCodeUnits + UnicodeUNCPathPrefixSize) {
                     if ((String[1] == U16('/') || String[1] == U16('\\')) && (String[2] == U16('/') || String[2] == U16('\\')) && String[3] == U16('?') && (String[4] == U16('/') || String[4] == U16('\\'))) {
                         StringHasUNCPathPrefix = Yes;
@@ -289,12 +287,12 @@ extern "C" {
         return StringHasUNCPathPrefix;
     }
     
-    bool  UTF32_StringHasUNCPathPrefix(UTF32 *String) {
+    bool  UTF32_HasUNCPathPrefix(UTF32 *String) {
         bool StringHasUNCPathPrefix = No;
         if (String != NULL) {
             uint64_t StringSize     = UTF32_GetStringSizeInCodePoints(String);
             if (StringSize > UnicodeBOMSizeInCodePoints) {
-                bool StringHasBOM   = UTF32_StringHasBOM(String);
+                bool StringHasBOM   = UTF32_HasBOM(String);
                 if (StringHasBOM && StringSize >= UnicodeBOMSizeInCodePoints + UnicodeUNCPathPrefixSize) {
                     if ((String[1] == U32('/') || String[1] == U32('\\')) && (String[2] == U32('/') || String[2] == U32('\\')) && String[3] == U32('?') && (String[4] == U32('/') || String[4] == U32('\\'))) {
                         StringHasUNCPathPrefix = Yes;
@@ -374,11 +372,11 @@ extern "C" {
         return PathIsAbsolute;
     }
     
-    bool UTF8_StringHasNewLine(UTF8 *String) {
+    bool UTF8_HasNewLine(UTF8 *String) {
         bool StringHasNewLine = No;
         if (String != NULL) {
             UTF32 *String32   = UTF8_Decode(String);
-            StringHasNewLine  = UTF32_StringHasNewLine(String32);
+            StringHasNewLine  = UTF32_HasNewLine(String32);
             free(String32);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -386,11 +384,11 @@ extern "C" {
         return StringHasNewLine;
     }
     
-    bool UTF16_StringHasNewLine(UTF16 *String) {
+    bool UTF16_HasNewLine(UTF16 *String) {
         bool StringHasNewLine = No;
         if (String != NULL) {
             UTF32 *String32   = UTF16_Decode(String);
-            StringHasNewLine  = UTF32_StringHasNewLine(String32);
+            StringHasNewLine  = UTF32_HasNewLine(String32);
             free(String32);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
@@ -398,7 +396,7 @@ extern "C" {
         return StringHasNewLine;
     }
     
-    bool UTF32_StringHasNewLine(UTF32 *String) {
+    bool UTF32_HasNewLine(UTF32 *String) {
         bool StringHasNewLine            = No;
         if (String != NULL) {
             uint64_t CodePoint           = 1ULL;
@@ -420,7 +418,7 @@ extern "C" {
         return StringHasNewLine;
     }
     
-    bool UTF8_IsStringValid(UTF8 *String) {
+    bool UTF8_IsValid(UTF8 *String) {
         uint64_t CodeUnit    = 0ULL;
         bool     IsValidUTF8 = Yes;
         if (String != NULL) {
@@ -445,7 +443,7 @@ extern "C" {
         return IsValidUTF8;
     }
     
-    bool UTF16_IsStringValid(UTF16 *String) {
+    bool UTF16_IsValid(UTF16 *String) {
         uint64_t CodeUnit             = 1ULL;
         bool     IsValidUTF16         = Yes;
         if (String != NULL) {
@@ -465,7 +463,7 @@ extern "C" {
         return IsValidUTF16;
     }
     
-    bool UTF32_IsStringValid(UTF32 *String) {
+    bool UTF32_IsValid(UTF32 *String) {
         uint64_t CodePoint       = 0ULL;
         bool     IsValidUTF32    = Yes;
         if (String != NULL) {
@@ -486,7 +484,7 @@ extern "C" {
         UTF8 *StringWithBOM = NULL;
         if (String != NULL) {
             UTF32 *String32  = UTF8_Decode(String);
-            UTF32 *BOMAdded  = UTF32_AddBOM(String32, UseBEByteOrder);
+            UTF32 *BOMAdded  = UTF32_AddBOM(String32, ByteOrder_Big);
             free(String32);
             StringWithBOM    = UTF8_Encode(BOMAdded);
         } else {
@@ -516,15 +514,15 @@ extern "C" {
                 uint64_t StringSize   = UTF32_GetStringSizeInCodePoints(String) + UnicodeBOMSizeInCodePoints + StringIONULLTerminatorSize;
                 StringWithBOM         = calloc(StringSize, sizeof(UTF32));
                 if (StringWithBOM != NULL) {
-                    if (BOM2Add == UseNativeByteOrder) {
+                    if (BOM2Add == ByteOrder_Native) {
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
                         ByteOrder     = UTF32BOM_LE;
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
                         ByteOrder     = UTF32BOM_BE;
 #endif
-                    } else if (BOM2Add == UseLEByteOrder) {
+                    } else if (BOM2Add == ByteOrder_Little) {
                         ByteOrder     = UTF32BOM_LE;
-                    } else if (BOM2Add == UseBEByteOrder) {
+                    } else if (BOM2Add == ByteOrder_Big) {
                         ByteOrder     = UTF32BOM_BE;
                     }
                     StringWithBOM[0] = ByteOrder;
@@ -546,7 +544,7 @@ extern "C" {
         uint64_t StringSize                         = 0ULL;
         if (String != NULL) {
             StringSize                              = UTF8_GetStringSizeInCodeUnits(String);
-            bool StringHasBOM                       = UTF8_StringHasBOM(String);
+            bool StringHasBOM                       = UTF8_HasBOM(String);
             if (StringHasBOM) {
                 BOMLessString                       = calloc(StringSize - UTF8BOMSizeInCodeUnits + StringIONULLTerminatorSize, sizeof(UTF8));
                 if (BOMLessString != NULL) {
@@ -568,7 +566,7 @@ extern "C" {
         uint64_t StringSize                         = 0ULL;
         if (String != NULL) {
             StringSize                              = UTF16_GetStringSizeInCodeUnits(String);
-            bool StringHasBOM                       = UTF16_StringHasBOM(String);
+            bool StringHasBOM                       = UTF16_HasBOM(String);
             if (StringHasBOM) {
                 BOMLessString                       = calloc(StringSize - UTF16BOMSizeInCodeUnits + StringIONULLTerminatorSize, sizeof(UTF16));
                 if (BOMLessString != NULL) {
@@ -590,7 +588,7 @@ extern "C" {
         uint64_t StringSize                      = 0ULL;
         if (String != NULL) {
             StringSize                           = UTF32_GetStringSizeInCodePoints(String);
-            bool StringHasBOM                    = UTF32_StringHasBOM(String);
+            bool StringHasBOM                    = UTF32_HasBOM(String);
             if (StringHasBOM) {
                 BOMLessString                    = calloc(StringSize - UnicodeBOMSizeInCodePoints + StringIONULLTerminatorSize, sizeof(UTF32));
                 if (BOMLessString != NULL) {
@@ -615,7 +613,7 @@ extern "C" {
         
         if (String != NULL) {
             StringSize                                   = UTF8_GetStringSizeInCodePoints(String);
-            bool StringHasBOM                            = UTF8_StringHasBOM(String);
+            bool StringHasBOM                            = UTF8_HasBOM(String);
             if (StringHasBOM == No) {
                 StringSize                              += 1;
             }
@@ -678,7 +676,7 @@ extern "C" {
         UTF32   *DecodedString                   = NULL;
         if (String != NULL) {
             uint64_t NumCodePoints               = UTF16_GetStringSizeInCodePoints(String) + StringIONULLTerminatorSize;
-            bool     StringHasBOM                = UTF16_StringHasBOM(String);
+            bool     StringHasBOM                = UTF16_HasBOM(String);
             if (StringHasBOM == No) {
                 NumCodePoints                   += 1;
             }
@@ -980,7 +978,7 @@ extern "C" {
             int  StreamMode            = fwide(OutputFile, 0);
             uint64_t CodeUnit          = 0ULL;
             uint64_t CodeUnitsWritten  = 0ULL;
-            bool     StringHasNewLine  = UTF8_StringHasNewLine(String);
+            bool     StringHasNewLine  = UTF8_HasNewLine(String);
             if (StreamMode < 0) { // UTF-8
                 do {
                     CodeUnitsWritten   = fwrite(&String[CodeUnit], sizeof(UTF8), 1, OutputFile);
@@ -1014,7 +1012,7 @@ extern "C" {
             int  StreamMode            = fwide(OutputFile, 0);
             uint64_t CodeUnit          = 0ULL;
             uint64_t CodeUnitsWritten  = 0ULL;
-            bool     StringHasNewLine  = UTF16_StringHasNewLine(String);
+            bool     StringHasNewLine  = UTF16_HasNewLine(String);
             if (StreamMode > 0) { // UTF-16
                 do {
                     CodeUnitsWritten   = fwrite(&String[CodeUnit], sizeof(UTF16), 1, OutputFile);
@@ -1399,7 +1397,7 @@ extern "C" {
             if (Offset == 0xFFFFFFFFFFFFFFFF) {
                 Offset = StringSize;
             }
-            bool StringHasBOM   = UTF8_StringHasBOM(String2Insert);
+            bool StringHasBOM   = UTF8_HasBOM(String2Insert);
             if (StringHasBOM == Yes) {
                 InsertSize -= 3;
             }
@@ -1493,11 +1491,11 @@ extern "C" {
     /* Medium Functions */
     
     /* Fancy functions */
-    UTF8 *UTF8_CaseFoldString(UTF8 *String) {
+    UTF8 *UTF8_CaseFold(UTF8 *String) {
         UTF8 *CaseFolded      = NULL;
         if (String != NULL) {
             UTF32 *String32   = UTF8_Decode(String);
-            UTF32 *CaseFold32 = UTF32_CaseFoldString(String32);
+            UTF32 *CaseFold32 = UTF32_CaseFold(String32);
             free(String32);
             CaseFolded        = UTF8_Encode(CaseFold32);
             free(CaseFold32);
@@ -1511,7 +1509,7 @@ extern "C" {
         UTF16 *CaseFolded     = NULL;
         if (String != NULL) {
             UTF32 *String32   = UTF16_Decode(String);
-            UTF32 *CaseFold32 = UTF32_CaseFoldString(String32);
+            UTF32 *CaseFold32 = UTF32_CaseFold(String32);
             free(String32);
             CaseFolded        = UTF16_Encode(CaseFold32);
             free(CaseFold32);
@@ -1521,14 +1519,15 @@ extern "C" {
         return CaseFolded;
     }
     
-    UTF32 *UTF32_CaseFoldString(UTF32 *String) {
+    UTF32 *UTF32_CaseFold(UTF32 *String) {
         uint64_t CodePoint        = 0ULL;
         UTF32   *CaseFoldedString = NULL;
         if (String != NULL) {
             do {
                 for (uint64_t Index = 0ULL; Index < CaseFoldTableSize - 1; Index++) {
                     if (String[CodePoint] == CaseFoldCodePoints[Index]) {
-                        CaseFoldedString = UTF32_ReplaceSubString(String, CaseFoldStrings[Index], CodePoint, 1);
+                        uint64_t ReplacementSize = UTF32_GetStringSizeInCodePoints(&CaseFoldedString[Index]);
+                        CaseFoldedString         = UTF32_ReplaceSubString(String, CaseFoldStrings[Index], CodePoint, ReplacementSize);
                     }
                 }
                 CodePoint += 1;
@@ -1678,11 +1677,11 @@ extern "C" {
         return DecomposedString;
     }
     
-    UTF8 *UTF8_NormalizeString(UTF8 *String, StringIONormalizationForms NormalizedForm) {
+    UTF8 *UTF8_Normalize(UTF8 *String, StringIONormalizationForms NormalizedForm) {
         UTF8 *NormalizedString8       = NULL;
-        if (String != NULL && NormalizedForm != UnknownNormalizationForm) {
+        if (String != NULL && NormalizedForm != NormalizationForm_Unknown) {
             UTF32 *String32           = UTF8_Decode(String);
-            UTF32 *NormalizedString32 = UTF32_NormalizeString(String32, NormalizedForm);
+            UTF32 *NormalizedString32 = UTF32_Normalize(String32, NormalizedForm);
             NormalizedString8         = UTF8_Encode(NormalizedString32);
             free(String32);
             free(NormalizedString32);
@@ -1690,11 +1689,11 @@ extern "C" {
         return NormalizedString8;
     }
     
-    UTF16 *UTF16_NormalizeString(UTF16 *String, StringIONormalizationForms NormalizedForm) {
+    UTF16 *UTF16_Normalize(UTF16 *String, StringIONormalizationForms NormalizedForm) {
         UTF16 *NormalizedString16     = NULL;
-        if (String != NULL && NormalizedForm != UnknownNormalizationForm) {
+        if (String != NULL && NormalizedForm != NormalizationForm_Unknown) {
             UTF32 *String32           = UTF16_Decode(String);
-            UTF32 *NormalizedString32 = UTF32_NormalizeString(String32, NormalizedForm);
+            UTF32 *NormalizedString32 = UTF32_Normalize(String32, NormalizedForm);
             NormalizedString16        = UTF16_Encode(NormalizedString32);
             free(String32);
             free(NormalizedString32);
@@ -1702,25 +1701,25 @@ extern "C" {
         return NormalizedString16;
     }
     
-    UTF32 *UTF32_NormalizeString(UTF32 *String, StringIONormalizationForms NormalizedForm) {
+    UTF32 *UTF32_Normalize(UTF32 *String, StringIONormalizationForms NormalizedForm) {
         UTF32 *NormalizedString = NULL;
-        if (String != NULL && NormalizedForm != UnknownNormalizationForm) {
-            if (NormalizedForm == NormalizationFormC) {
+        if (String != NULL && NormalizedForm != NormalizationForm_Unknown) {
+            if (NormalizedForm == NormalizationForm_CanonicalCompose) {
                 UTF32 *Decomposed = UTF32_Decompose(String, No);
                 NormalizedString  = UTF32_Compose(Decomposed, No);
                 free(Decomposed);
-            } else if (NormalizedForm == NormalizationFormKC) {
+            } else if (NormalizedForm == NormalizationForm_KompatibleCompose) {
                 UTF32 *Decomposed = UTF32_Decompose(String, Yes);
                 NormalizedString  = UTF32_Compose(Decomposed, Yes);
                 free(Decomposed);
-            } else if (NormalizedForm == NormalizationFormD) {
+            } else if (NormalizedForm == NormalizationForm_CanonicalDecompose) {
                 NormalizedString  = UTF32_Decompose(String, No);
-            } else if (NormalizedForm == NormalizationFormKD) {
+            } else if (NormalizedForm == NormalizationForm_KompatibleDecompose) {
                 NormalizedString  = UTF32_Decompose(String, Yes);
             }
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
-        } else if (NormalizedForm == UnknownNormalizationForm) {
+        } else if (NormalizedForm == NormalizationForm_Unknown) {
             Log(Log_ERROR, __func__, U8("Unknown Normalization form"));
         }
         return NormalizedString;
@@ -2143,12 +2142,12 @@ extern "C" {
         return SubstringMatchesAtOffset;
     }
     
-    UTF8  *UTF8_TrimString(UTF8 *String, TrimStringTypes Type, UTF8 **Strings2Remove) {
+    UTF8  *UTF8_Trim(UTF8 *String, TrimStringTypes Type, UTF8 **Strings2Remove) {
         UTF8 *Trimmed = NULL;
         if (String != NULL && Type != TrimString_Unknown && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF8_Decode(String);
             UTF32   **Strings2Remove32          = UTF8_StringArray_Decode(Strings2Remove);
-            UTF32    *Trimmed32                 = UTF32_TrimString(String32, Type, Strings2Remove32);
+            UTF32    *Trimmed32                 = UTF32_Trim(String32, Type, Strings2Remove32);
             UTF32_StringArray_Deinit(Strings2Remove32);
             Trimmed                             = UTF8_Encode(Trimmed32);
             free(String32);
@@ -2162,12 +2161,12 @@ extern "C" {
         return Trimmed;
     }
     
-    UTF16 *UTF16_TrimString(UTF16 *String, TrimStringTypes Type, UTF16 **Strings2Remove) {
+    UTF16 *UTF16_Trim(UTF16 *String, TrimStringTypes Type, UTF16 **Strings2Remove) {
         UTF16 *Trimmed = NULL;
         if (String != NULL && Type != TrimString_Unknown && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF16_Decode(String);
             UTF32   **Strings2Remove32          = UTF16_StringArray_Decode(Strings2Remove);
-            UTF32    *Trimmed32                 = UTF32_TrimString(String32, Type, Strings2Remove32);
+            UTF32    *Trimmed32                 = UTF32_Trim(String32, Type, Strings2Remove32);
             UTF32_StringArray_Deinit(Strings2Remove32);
             Trimmed                             = UTF16_Encode(Trimmed32);
             free(String32);
@@ -2181,7 +2180,7 @@ extern "C" {
         return Trimmed;
     }
     
-    UTF32 *UTF32_TrimString(UTF32 *String, TrimStringTypes Type, UTF32 **Strings2Remove) {
+    UTF32 *UTF32_Trim(UTF32 *String, TrimStringTypes Type, UTF32 **Strings2Remove) {
         UTF32 *Trimmed = NULL;
         if (String != NULL && Type != TrimString_Unknown && Strings2Remove != NULL) {
             uint64_t   StringSize          = UTF32_GetStringSizeInCodePoints(String);
@@ -2540,12 +2539,12 @@ extern "C" {
         return Encoded;
     }
     
-    UTF8 **UTF8_SplitString(UTF8 *String, UTF8 **Delimiters) {
+    UTF8 **UTF8_Split(UTF8 *String, UTF8 **Delimiters) {
         UTF8 **SplitString        = NULL;
         if (String != NULL && Delimiters != NULL) {
             UTF32  *String32      = UTF8_Decode(String);
             UTF32 **Delimiters32  = UTF8_StringArray_Decode(Delimiters);
-            UTF32 **SplitString32 = UTF32_SplitString(String32, Delimiters32);
+            UTF32 **SplitString32 = UTF32_Split(String32, Delimiters32);
             free(String32);
             free(Delimiters32);
             SplitString           = UTF8_StringArray_Encode(SplitString32);
@@ -2557,12 +2556,12 @@ extern "C" {
         return SplitString;
     }
     
-    UTF16 **UTF16_SplitString(UTF16 *String, UTF16 **Delimiters) {
+    UTF16 **UTF16_Split(UTF16 *String, UTF16 **Delimiters) {
         UTF16 **SplitString       = NULL;
         if (String != NULL && Delimiters != NULL) {
             UTF32  *String32      = UTF16_Decode(String);
             UTF32 **Delimiters32  = UTF16_StringArray_Decode(Delimiters);
-            UTF32 **SplitString32 = UTF32_SplitString(String32, Delimiters32);
+            UTF32 **SplitString32 = UTF32_Split(String32, Delimiters32);
             free(String32);
             free(Delimiters32);
             SplitString           = UTF16_StringArray_Encode(SplitString32);
@@ -2574,7 +2573,7 @@ extern "C" {
         return SplitString;
     }
     
-    UTF32 **UTF32_SplitString(UTF32 *String, UTF32 **Delimiters) {
+    UTF32 **UTF32_Split(UTF32 *String, UTF32 **Delimiters) {
         UTF32    **SplitStrings    = NULL; // What we return, it's a 0 indexed array of strings
         uint64_t   StringSize      = 0ULL; // The size of the first parameter
         uint64_t   NumDelimiters   = 0ULL; // The number of delimiters in the second parameter
@@ -2801,6 +2800,13 @@ extern "C" {
         FormatSpecifierBaseTypes     BaseType;
         FormatSpecifierTypeModifiers TypeModifier;
     } FormatSpecifier;
+    
+    typedef enum StringTypes {
+        UnknownStringType                    = 0,
+        UTF8Format                           = 1,
+        UTF16Format                          = 2,
+        UTF32Format                          = 3,
+    } StringTypes;
     
     typedef struct FormatSpecifiers {
         FormatSpecifier *Specifiers;

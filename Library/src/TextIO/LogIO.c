@@ -12,6 +12,10 @@ extern "C" {
     static FILE  *Log_LogFile      = NULL;
     static UTF32 *Log_ProgramName  = NULL;
     
+#ifndef           UNCPathPrefix
+#define           UNCPathPrefix    U32("//?/")
+#endif
+    
     void Log_SetProgramName(UTF8 *ProgramName) {
         if (ProgramName != NULL) {
             Log_ProgramName        = UTF8_Decode(ProgramName);
@@ -21,7 +25,7 @@ extern "C" {
     void Log_UTF8_OpenFile(UTF8 *LogFilePath) {
         if (LogFilePath != NULL) {
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
-            bool PathHasBOM      = UTF8_StringHasBOM(LogFilePath);
+            bool PathHasBOM      = UTF8_HasBOM(LogFilePath);
             if (PathHasBOM) {
                 UTF8 *BOMLess    = UTF8_RemoveBOM(LogFilePath);
                 Log_LogFile      = FoundationIO_File_Open(BOMLess, U8("a+"));
@@ -31,11 +35,11 @@ extern "C" {
             }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             UTF32 *Path32        = UTF8_Decode(LogFilePath);
-            bool   PathHasBOM    = UTF32_StringHasBOM(Path32);
-            bool   PathHasPrefix = UTF32_StringHasUNCPathPrefix(Path32);
+            bool   PathHasBOM    = UTF32_HasBOM(Path32);
+            bool   PathHasPrefix = UTF32_HasUNCPathPrefix(Path32);
             if (PathHasBOM == Yes && PathHasPrefix == No) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
-                UTF32 *Prefixed  = UTF32_Insert(BOMLess, StringIOUNCPathPrefix, 0);
+                UTF32 *Prefixed  = UTF32_Insert(BOMLess, UNCPathPrefix, 0);
                 free(BOMLess);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
@@ -52,7 +56,7 @@ extern "C" {
                 Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
                 free(Path16);
             } else if (PathHasBOM == No && PathHasPrefix == No) {
-                UTF32 *Prefixed  = UTF32_Insert(Path32, StringIOUNCPathPrefix, 0);
+                UTF32 *Prefixed  = UTF32_Insert(Path32, UNCPathPrefix, 0);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
                 Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
@@ -65,7 +69,7 @@ extern "C" {
     void Log_UTF16_OpenFile(UTF16 *LogFilePath) {
         if (LogFilePath != NULL) {
             UTF32 *Path32        = UTF16_Decode(LogFilePath);
-            bool   PathHasBOM    = UTF32_StringHasBOM(Path32);
+            bool   PathHasBOM    = UTF32_HasBOM(Path32);
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
             if (PathHasBOM) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
@@ -79,10 +83,10 @@ extern "C" {
                 free(Path8);
             }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            bool   PathHasPrefix = UTF32_StringHasUNCPathPrefix(Path32);
+            bool   PathHasPrefix = UTF32_HasUNCPathPrefix(Path32);
             if (PathHasBOM == Yes && PathHasPrefix == No) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
-                UTF32 *Prefixed  = UTF32_Insert(BOMLess, StringIOUNCPathPrefix, 0);
+                UTF32 *Prefixed  = UTF32_Insert(BOMLess, UNCPathPrefix, 0);
                 free(BOMLess);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
@@ -99,7 +103,7 @@ extern "C" {
                 Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
                 free(Path16);
             } else if (PathHasBOM == No && PathHasPrefix == No) {
-                UTF32 *Prefixed  = UTF32_Insert(Path32, StringIOUNCPathPrefix, 0);
+                UTF32 *Prefixed  = UTF32_Insert(Path32, UNCPathPrefix, 0);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
                 Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));

@@ -20,8 +20,12 @@ extern "C" {
                                 BinaryGUUIDSize                 = 16,
     };
     
-#ifndef BitIONULLTerminator
-#define BitIONULLTerminator     (0)
+#ifndef                         BitIONULLTerminator
+#define                         BitIONULLTerminator             (0)
+#endif
+    
+#ifndef                         UNCPathPrefix
+#define                         UNCPathPrefix                   U32("//?/")
 #endif
     
     /* Start BitBuffer section */
@@ -654,7 +658,7 @@ extern "C" {
             BitI->FileType                   = BitIOFile;
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
             UTF32 *Path32                    = UTF8_Decode(Path2Open);
-            bool   PathHasBOM                = UTF32_StringHasBOM(Path32);
+            bool   PathHasBOM                = UTF32_HasBOM(Path32);
             if (PathHasBOM) {
                 UTF32 *BOMLess               = UTF32_RemoveBOM(Path32);
                 free(Path32);
@@ -663,9 +667,9 @@ extern "C" {
             UTF8  *Path8                     = UTF8_Encode(Path32);
             BitI->File                       = FoundationIO_File_Open(Path8, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            bool  StringHasBOM               = UTF8_StringHasBOM(Path2Open);
+            bool  StringHasBOM               = UTF8_HasBOM(Path2Open);
             UTF32 *WinPath32                 = UTF8_Decode(Path2Open);
-            UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, StringIOUNCPathPrefix, StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
+            UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, UNCPathPrefix, StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
             free(WinPath32);
             UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32);
             free(WinPathLong32);
@@ -691,8 +695,11 @@ extern "C" {
             UTF8  *Path8                     = NULL;
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
             Path32                           = UTF16_Decode(Path2Open);
-            bool   PathHasBOM                = UTF32_StringHasBOM(Path32);
-            bool   PathHasWinPrefix          = UTF32_StringHasUNCPathPrefix(Path32);
+            bool   PathHasBOM                = UTF16_HasBOM(Path2Open);
+            
+            bool   PathIsAbsolute            = UTF16_PathIsAbsolute(Path2Open);
+            
+            bool   PathHasWinPrefix          = UTF16_HasUNCPathPrefix(Path2Open);
             if (PathHasBOM == Yes && PathHasWinPrefix == Yes) {
                 UTF32 *BOMLess               = UTF32_RemoveBOM(Path32);
                 free(Path32);
@@ -700,21 +707,21 @@ extern "C" {
             } else if (PathHasBOM == Yes && PathHasWinPrefix == No) {
                 // Add WinPathPrefix, Remove BOM
                 UTF32 *BOMLess               = UTF32_RemoveBOM(Path32);
-                UTF32 *Prefix                = UTF32_Insert(BOMLess, StringIOUNCPathPrefix, 0);
+                UTF32 *Prefix                = UTF32_Insert(BOMLess, UNCPathPrefix, 0);
                 free(Path32);
                 Path32                       = Prefix;
             } else if (PathHasBOM == No && PathHasWinPrefix == No) {
                 // Add WinPathPrefix
-                UTF32 *Prefix                = UTF32_Insert(Path32, StringIOUNCPathPrefix, 0);
+                UTF32 *Prefix                = UTF32_Insert(Path32, UNCPathPrefix, 0);
                 free(Path32);
                 Path32                       = Prefix;
             }
             Path8                            = UTF8_Encode(Path32);
             BitI->File                       = FoundationIO_File_Open(Path8, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            bool  StringHasBOM               = UTF16_StringHasBOM(Path2Open);
+            bool  StringHasBOM               = UTF16_HasBOM(Path2Open);
             UTF32 *WinPath32                 = UTF16_Decode(Path2Open);
-            UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, StringIOUNCPathPrefix, StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
+            UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, UNCPathPrefix, StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
             free(WinPath32);
             UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32);
             free(WinPathLong32);
@@ -839,16 +846,16 @@ extern "C" {
             BitO->File                  = FoundationIO_File_Open(Path2Open, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             bool   PathIsAbsolute       = UTF8_PathIsAbsolute(Path2Open);
-            bool   PathHasUNCPrefix     = UTF8_StringHasUNCPathPrefix(Path2Open);
+            bool   PathHasUNCPrefix     = UTF8_HasUNCPathPrefix(Path2Open);
             UTF32 *Path32               = UTF8_Decode(Path2Open);
             UTF16 *Path16               = NULL;
             if (PathIsAbsolute == Yes && PathHasUNCPrefix == No) {
-                UTF32 *UNCPrefixed      = UTF32_Insert(Path32, StringIOUNCPathPrefix, 0);
+                UTF32 *UNCPrefixed      = UTF32_Insert(Path32, UNCPathPrefix, 0);
                 Path16                  = UTF16_Encode(UNCPrefixed);
                 free(UNCPrefixed);
                 FoundationIO_File_Open(Path16, U16("rb"));
             } else if (PathIsAbsolute == No && PathHasUNCPrefix == Yes) {
-                UTF32 *Removed          = UTF32_RemoveSubString(Path32, StringIOUNCPathPrefix, 1);
+                UTF32 *Removed          = UTF32_RemoveSubString(Path32, UNCPathPrefix, 1);
                 Path16                  = UTF16_Encode(Removed);
                 free(Removed);
                 FoundationIO_File_Open(Path16, U16("rb"));
@@ -871,7 +878,7 @@ extern "C" {
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
             // Convert to UTF-8, and remove the BOM because fopen will silently fail if there's a BOM.
             UTF32 *Decoded              = UTF16_Decode(Path2Open);
-            PathHasBOM                  = UTF32_StringHasBOM(Decoded);
+            PathHasBOM                  = UTF32_HasBOM(Decoded);
             UTF8 *Fixed                 = NULL;
             if (PathHasBOM == Yes) {
                 UTF32 *Fixed32          = UTF32_RemoveBOM(Decoded);
@@ -879,13 +886,13 @@ extern "C" {
             }
             FoundationIO_File_Open(Fixed, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            bool   StringHasPathPrefix  = UTF16_StringHasUNCPathPrefix(Path2Open);
+            bool   StringHasPathPrefix  = UTF16_HasUNCPathPrefix(Path2Open);
             
             UTF32 *Path32               = UTF16_Decode(Path2Open);
             UTF16 *Path16               = NULL;
             if (StringHasPathPrefix == No) {
-                bool   StringHasBOM     = UTF16_StringHasBOM(Path2Open);
-                UTF32 *PrefixPath       = UTF32_Insert(Path32, StringIOUNCPathPrefix, StringHasBOM == Yes ? UTF16BOMSizeInCodeUnits : 0);
+                bool   StringHasBOM     = UTF16_HasBOM(Path2Open);
+                UTF32 *PrefixPath       = UTF32_Insert(Path32, UNCPathPrefix, StringHasBOM == Yes ? UTF16BOMSizeInCodeUnits : 0);
                 Path16                  = UTF16_Encode(PrefixPath);
             } else {
                 Path16                  = UTF16_Encode(Path32);
