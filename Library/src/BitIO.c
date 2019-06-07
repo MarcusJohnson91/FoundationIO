@@ -187,9 +187,9 @@ extern "C" {
         }
     }
     
-    void BitBuffer_Clear(BitBuffer *BitB) {
+    void BitBuffer_Erase(BitBuffer *BitB) {
         if (BitB != NULL) {
-            uint64_t BufferSize = BitB->NumBits / 8;
+            uint64_t BufferSize = Bits2Bytes(BitB->NumBits, Yes);
             for (uint64_t Byte = 0ULL; Byte < BufferSize - 1; Byte++) {
                 BitB->Buffer[Byte] = 0;
             }

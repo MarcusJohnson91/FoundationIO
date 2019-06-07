@@ -213,10 +213,10 @@ extern "C" {
     void                        BitBuffer_Seek(BitBuffer *BitB, int64_t Bits2Seek);
     
     /*!
-     @abstract                                                  "Zeros the BitBuffer".
+     @abstract                                                  "Securely erases the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer".
      */
-    void                        BitBuffer_Clear(BitBuffer *BitB);
+    void                        BitBuffer_Erase(BitBuffer *BitB);
     
     /*!
      @abstract                                                  "Changes the size of an already initialized BitBuffer".
