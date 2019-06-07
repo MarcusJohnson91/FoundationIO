@@ -172,9 +172,9 @@ extern "C" {
     void CommandLineIO_UTF8_SetName(CommandLineIO *CLI, UTF8 *Name) {
         if (CLI != NULL && Name != NULL) {
             UTF32 *Decoded       = UTF8_Decode(Name);
-            UTF32 *Normalized    = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized    = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded    = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded    = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->ProgramName     = CaseFolded;
         } else if (CLI == NULL) {
@@ -187,9 +187,9 @@ extern "C" {
     void CommandLineIO_UTF16_SetName(CommandLineIO *CLI, UTF16 *Name) {
         if (CLI != NULL && Name != NULL) {
             UTF32 *Decoded       = UTF16_Decode(Name);
-            UTF32 *Normalized    = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized    = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded    = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded    = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->ProgramName     = CaseFolded;
         } else if (CLI == NULL) {
@@ -202,9 +202,9 @@ extern "C" {
     void CommandLineIO_UTF8_SetVersion(CommandLineIO *CLI, UTF8 *Version) {
         if (CLI != NULL && Version != NULL) {
             UTF32 *Decoded       = UTF8_Decode(Version);
-            UTF32 *Normalized    = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized    = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded    = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded    = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->ProgramVersion  = CaseFolded;
         } else if (CLI == NULL) {
@@ -217,9 +217,9 @@ extern "C" {
     void CommandLineIO_UTF16_SetVersion(CommandLineIO *CLI, UTF16 *Version) {
         if (CLI != NULL && Version != NULL) {
             UTF32 *Decoded       = UTF16_Decode(Version);
-            UTF32 *Normalized    = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized    = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded    = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded    = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->ProgramVersion  = CaseFolded;
         } else if (CLI == NULL) {
@@ -232,9 +232,9 @@ extern "C" {
     void CommandLineIO_UTF8_SetDescription(CommandLineIO *CLI, UTF8 *Description) {
         if (CLI != NULL && Description != NULL) {
             UTF32 *Decoded           = UTF8_Decode(Description);
-            UTF32 *Normalized        = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized        = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded        = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded        = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->ProgramDescription  = CaseFolded;
         } else if (CLI == NULL) {
@@ -247,9 +247,9 @@ extern "C" {
     void CommandLineIO_UTF16_SetDescription(CommandLineIO *CLI, UTF16 *Description) {
         if (CLI != NULL && Description != NULL) {
             UTF32 *Decoded           = UTF16_Decode(Description);
-            UTF32 *Normalized        = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized        = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded        = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded        = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->ProgramDescription  = CaseFolded;
         } else if (CLI == NULL) {
@@ -262,9 +262,9 @@ extern "C" {
     void CommandLineIO_UTF8_SetAuthor(CommandLineIO *CLI, UTF8 *Author) {
         if (CLI != NULL && Author != NULL) {
             UTF32 *Decoded      = UTF8_Decode(Author);
-            UTF32 *Normalized   = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized   = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded   = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded   = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->ProgramAuthor  = CaseFolded;
         } else if (CLI == NULL) {
@@ -277,9 +277,9 @@ extern "C" {
     void CommandLineIO_UTF16_SetAuthor(CommandLineIO *CLI, UTF16 *Author) {
         if (CLI != NULL && Author != NULL) {
             UTF32 *Decoded      = UTF16_Decode(Author);
-            UTF32 *Normalized   = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized   = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded   = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded   = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->ProgramAuthor  = CaseFolded;
         } else if (CLI == NULL) {
@@ -292,9 +292,9 @@ extern "C" {
     void CommandLineIO_UTF8_SetCopyright(CommandLineIO *CLI, UTF8 *Copyright) {
         if (CLI != NULL && Copyright != NULL) {
             UTF32 *Decoded        = UTF8_Decode(Copyright);
-            UTF32 *Normalized     = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized     = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded     = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded     = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->ProgramCopyright = CaseFolded;
         } else if (CLI == NULL) {
@@ -307,9 +307,9 @@ extern "C" {
     void CommandLineIO_UTF16_SetCopyright(CommandLineIO *CLI, UTF16 *Copyright) {
         if (CLI != NULL && Copyright != NULL) {
             UTF32 *Decoded        = UTF16_Decode(Copyright);
-            UTF32 *Normalized     = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized     = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded     = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded     = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->ProgramCopyright = CaseFolded;
         } else if (CLI == NULL) {
@@ -323,16 +323,16 @@ extern "C" {
         if (CLI != NULL && LicenseType != UnknownLicenseType && Name != NULL && LicenseURL != NULL) {
             CLI->LicenseType                = LicenseType;
             UTF32 *DecodedName              = UTF8_Decode(Name);
-            UTF32 *NormalizedName           = UTF32_NormalizeString(DecodedName, NormalizationFormKC);
+            UTF32 *NormalizedName           = UTF32_Normalize(DecodedName, NormalizationForm_KompatibleCompose);
             free(DecodedName);
-            UTF32 *CaseFoldedName           = UTF32_CaseFoldString(NormalizedName);
+            UTF32 *CaseFoldedName           = UTF32_CaseFold(NormalizedName);
             free(NormalizedName);
             CLI->ProgramLicenseName         = CaseFoldedName;
             
             UTF32 *DecodedLicenseURL        = UTF8_Decode(LicenseURL);
-            UTF32 *NormalizedLicenseURL     = UTF32_NormalizeString(DecodedLicenseURL, NormalizationFormKC);
+            UTF32 *NormalizedLicenseURL     = UTF32_Normalize(DecodedLicenseURL, NormalizationForm_KompatibleCompose);
             free(DecodedLicenseURL);
-            UTF32 *CaseFoldedLicenseURL     = UTF32_CaseFoldString(NormalizedLicenseURL);
+            UTF32 *CaseFoldedLicenseURL     = UTF32_CaseFold(NormalizedLicenseURL);
             free(NormalizedLicenseURL);
             CLI->ProgramLicenseURL          = CaseFoldedLicenseURL;
         } else if (CLI == NULL) {
@@ -350,16 +350,16 @@ extern "C" {
         if (CLI != NULL && LicenseType != UnknownLicenseType && Name != NULL && LicenseURL != NULL) {
             CLI->LicenseType                = LicenseType;
             UTF32 *DecodedName              = UTF16_Decode(Name);
-            UTF32 *NormalizedName           = UTF32_NormalizeString(DecodedName, NormalizationFormKC);
+            UTF32 *NormalizedName           = UTF32_Normalize(DecodedName, NormalizationForm_KompatibleCompose);
             free(DecodedName);
-            UTF32 *CaseFoldedName           = UTF32_CaseFoldString(NormalizedName);
+            UTF32 *CaseFoldedName           = UTF32_CaseFold(NormalizedName);
             free(NormalizedName);
             CLI->ProgramLicenseName         = CaseFoldedName;
             
             UTF32 *DecodedLicenseURL        = UTF16_Decode(LicenseURL);
-            UTF32 *NormalizedLicenseURL     = UTF32_NormalizeString(DecodedLicenseURL, NormalizationFormKC);
+            UTF32 *NormalizedLicenseURL     = UTF32_Normalize(DecodedLicenseURL, NormalizationForm_KompatibleCompose);
             free(DecodedLicenseURL);
-            UTF32 *CaseFoldedLicenseURL     = UTF32_CaseFoldString(NormalizedLicenseURL);
+            UTF32 *CaseFoldedLicenseURL     = UTF32_CaseFold(NormalizedLicenseURL);
             free(NormalizedLicenseURL);
             CLI->ProgramLicenseURL          = CaseFoldedLicenseURL;
         } else if (CLI == NULL) {
@@ -483,9 +483,9 @@ extern "C" {
     void CommandLineIO_UTF8_Switch_SetName(CommandLineIO *CLI, uint64_t SwitchID, UTF8 *Name) {
         if (CLI != NULL && SwitchID <= CLI->NumSwitches - 1 && Name != NULL) {
             UTF32 *Decoded                = UTF8_Decode(Name);
-            UTF32 *Normalized             = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized             = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded             = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded             = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->SwitchIDs[SwitchID].Name = CaseFolded;
         } else if (CLI == NULL) {
@@ -500,9 +500,9 @@ extern "C" {
     void CommandLineIO_UTF16_Switch_SetName(CommandLineIO *CLI, uint64_t SwitchID, UTF16 *Name) {
         if (CLI != NULL && SwitchID <= CLI->NumSwitches - 1 && Name != NULL) {
             UTF32 *Decoded                = UTF16_Decode(Name);
-            UTF32 *Normalized             = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized             = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded             = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded             = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->SwitchIDs[SwitchID].Name = CaseFolded;
         } else if (CLI == NULL) {
@@ -517,9 +517,9 @@ extern "C" {
     void CommandLineIO_UTF8_Switch_SetDescription(CommandLineIO *CLI, uint64_t SwitchID, UTF8 *Description) {
         if (CLI != NULL && Description != NULL && SwitchID <= CLI->NumSwitches - 1) {
             UTF32 *Decoded                       = UTF8_Decode(Description);
-            UTF32 *Normalized                    = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized                    = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded                    = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded                    = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->SwitchIDs[SwitchID].Description = CaseFolded;
         } else if (CLI == NULL) {
@@ -534,9 +534,9 @@ extern "C" {
     void CommandLineIO_UTF16_Switch_SetDescription(CommandLineIO *CLI, uint64_t SwitchID, UTF16 *Description) {
         if (CLI != NULL && Description != NULL && SwitchID <= CLI->NumSwitches - 1) {
             UTF32 *Decoded                       = UTF16_Decode(Description);
-            UTF32 *Normalized                    = UTF32_NormalizeString(Decoded, NormalizationFormKC);
+            UTF32 *Normalized                    = UTF32_Normalize(Decoded, NormalizationForm_KompatibleCompose);
             free(Decoded);
-            UTF32 *CaseFolded                    = UTF32_CaseFoldString(Normalized);
+            UTF32 *CaseFolded                    = UTF32_CaseFold(Normalized);
             free(Normalized);
             CLI->SwitchIDs[SwitchID].Description = CaseFolded;
         } else if (CLI == NULL) {
@@ -858,7 +858,7 @@ extern "C" {
                 Log(Log_ERROR, __func__, U8("ArgumentString is not an Argument string"));
             }
             uint64_t ArgumentSwitchSize    = ArgumentStringSize - ArgumentStringPrefixSize;
-            ArgumentSwitch                 = UTF32_ExtractSubString(UTF32_CaseFoldString(ArgumentString), ArgumentStringPrefixSize, ArgumentSwitchSize);
+            ArgumentSwitch                 = UTF32_ExtractSubString(UTF32_CaseFold(ArgumentString), ArgumentStringPrefixSize, ArgumentSwitchSize);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -916,9 +916,9 @@ extern "C" {
             UTF32 **Arguments32     = calloc(NumArguments, sizeof(UTF32*));
             for (uint64_t Arg = 0ULL; Arg < NumArguments - 1; Arg++) {
                 UTF32 *Decoded      = UTF8_Decode(Arguments[Arg]);
-                UTF32 *CaseFolded   = UTF32_CaseFoldString(Decoded);
+                UTF32 *CaseFolded   = UTF32_CaseFold(Decoded);
                 free(Decoded);
-                UTF32 *Normalized   = UTF32_NormalizeString(CaseFolded, NormalizationFormKC);
+                UTF32 *Normalized   = UTF32_Normalize(CaseFolded, NormalizationForm_KompatibleCompose);
                 free(CaseFolded);
                 Arguments32[Arg]    = Normalized;
             }
@@ -939,9 +939,9 @@ extern "C" {
             UTF32 **Arguments32     = calloc(NumArguments, sizeof(UTF32*));
             for (uint64_t Arg = 0ULL; Arg < NumArguments - 1; Arg++) {
                 UTF32 *Decoded      = UTF16_Decode(Arguments[Arg]);
-                UTF32 *CaseFolded   = UTF32_CaseFoldString(Decoded);
+                UTF32 *CaseFolded   = UTF32_CaseFold(Decoded);
                 free(Decoded);
-                UTF32 *Normalized   = UTF32_NormalizeString(CaseFolded, NormalizationFormKC);
+                UTF32 *Normalized   = UTF32_Normalize(CaseFolded, NormalizationForm_KompatibleCompose);
                 free(CaseFolded);
                 Arguments32[Arg]    = Normalized;
             }

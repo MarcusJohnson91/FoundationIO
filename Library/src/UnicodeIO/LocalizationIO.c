@@ -248,12 +248,12 @@ extern "C" {
         UTF8 *GroupingSizeString        = Locale->grouping;
         UTF8 *Delimiters[]              = {U8("/"), U8("\\")};
         
-        GroupingSize                    = UTF8_SplitString(GroupingSizeString, Delimiters);
+        GroupingSize                    = UTF8_Split(GroupingSizeString, Delimiters);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         UTF16 *GroupingSizeString       = Locale->grouping;
         UTF16 *Delimiters[]             = {U16("/"), U16("\\")};
         
-        UTF16 **GroupingSize16          = UTF16_SplitString(GroupingSizeString, Delimiters);
+        UTF16 **GroupingSize16          = UTF16_Split(GroupingSizeString, Delimiters);
         UTF32 **GroupingSize32          = UTF16_StringArray_Decode(GroupingSize16);
         UTF16_StringArray_Deinit(GroupingSize16);
         GroupingSize                    = UTF8_StringArray_Encode(GroupingSize32);
@@ -269,7 +269,7 @@ extern "C" {
         UTF8 *GroupingSizeString        = Locale->grouping;
         UTF8 *Delimiters[]              = {U8("/"), U8("\\")};
         
-        UTF8 **GroupingSize8            = UTF8_SplitString(GroupingSizeString, Delimiters);
+        UTF8 **GroupingSize8            = UTF8_Split(GroupingSizeString, Delimiters);
         UTF32 **GroupingSize32          = UTF8_StringArray_Decode(GroupingSize8);
         UTF8_StringArray_Deinit(GroupingSize8);
         GroupingSize                    = UTF16_StringArray_Encode(GroupingSize32);
