@@ -9,7 +9,7 @@ extern "C" {
 #endif
     
     typedef struct AudioContainer {
-        void             **Samples;
+        void             **Samples; // Channel, Sample
         Audio_ChannelMask *ChannelMap; // So basically it's type is AudioChannelMask and each index contains the enum matching the channel at that index in the array
         uint64_t           NumSamples;
         uint64_t           SampleRate;
@@ -284,6 +284,62 @@ extern "C" {
         return Minimum;
     }
     
+    void AudioContainer_Erase(AudioContainer *Audio) {
+        if (Audio != NULL) {
+            if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
+                uint8_t **Samples = (uint8_t**) AudioContainer_GetArray(Audio);
+                
+                for (uint64_t Channel = 0ULL; Channel < AudioContainer_GetNumChannels(Audio) - 1; Channel++) {
+                    for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
+                        Samples[Channel][Sample] = 0;
+                    }
+                }
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
+                int8_t **Samples  = (int8_t**) AudioContainer_GetArray(Audio);
+                
+                for (uint64_t Channel = 0ULL; Channel < AudioContainer_GetNumChannels(Audio) - 1; Channel++) {
+                    for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
+                        Samples[Channel][Sample] = 0;
+                    }
+                }
+            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
+                uint16_t **Samples  = (uint16_t**) AudioContainer_GetArray(Audio);
+                
+                for (uint64_t Channel = 0ULL; Channel < AudioContainer_GetNumChannels(Audio) - 1; Channel++) {
+                    for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
+                        Samples[Channel][Sample] = 0;
+                    }
+                }
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer16)) {
+                int16_t **Samples  = (int16_t**) AudioContainer_GetArray(Audio);
+                
+                for (uint64_t Channel = 0ULL; Channel < AudioContainer_GetNumChannels(Audio) - 1; Channel++) {
+                    for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
+                        Samples[Channel][Sample] = 0;
+                    }
+                }
+            } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
+                uint32_t **Samples  = (uint32_t**) AudioContainer_GetArray(Audio);
+                
+                for (uint64_t Channel = 0ULL; Channel < AudioContainer_GetNumChannels(Audio) - 1; Channel++) {
+                    for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
+                        Samples[Channel][Sample] = 0;
+                    }
+                }
+            } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
+                int32_t **Samples  = (int32_t**) AudioContainer_GetArray(Audio);
+                
+                for (uint64_t Channel = 0ULL; Channel < AudioContainer_GetNumChannels(Audio) - 1; Channel++) {
+                    for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
+                        Samples[Channel][Sample] = 0;
+                    }
+                }
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioContainer Pointer is NULL"));
+        }
+    }
+    
     void AudioContainer_Deinit(AudioContainer *Audio) {
         if (Audio != NULL) {
             free(Audio->Samples);
@@ -351,9 +407,10 @@ extern "C" {
     }
     
     typedef struct AudioHistogram {
-        void          **Array; // Channel, Sample
-        uint64_t        NumEntries;
-        Audio_Types     Type;
+        void              *Array; // Channel, Sample
+        uint64_t           NumEntries;
+        Audio_ChannelMask  ChannelMask;
+        Audio_Types        Type;
     } AudioHistogram;
     
     AudioHistogram *AudioHistogram_Init(AudioContainer *Audio) {
@@ -414,31 +471,31 @@ extern "C" {
                 uint8_t  NumChannels                             = AudioContainer_GetNumChannels(Audio);
                 
                 if (Histogram->Type == AudioType_Integer8) {
-                    uint8_t *SampleArray                         = (uint8_t*) Audio->Samples;
-                    uint8_t *HistArray                           = (uint8_t*) Histogram->Array;
+                    uint8_t **SampleArray                        = (uint8_t**) Audio->Samples;
+                    uint8_t *HistArray                           = (uint8_t*)  Histogram->Array;
                     for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
                         for (uint64_t S = 0ULL; S < Audio->NumSamples; S++) {
-                            uint8_t Sample                       = SampleArray[C * S];
+                            uint8_t Sample                       = SampleArray[C][S];
                             HistArray[Sample]                   += 1;
                         }
                     }
                 } else if (Histogram->Type == AudioType_Integer16) {
-                    uint16_t *SampleArray                        = (uint16_t*) Audio->Samples;
-                    uint16_t *HistArray                          = (uint16_t*) Histogram->Array;
+                    uint16_t **SampleArray                       = (uint16_t**) Audio->Samples;
+                    uint16_t  *HistArray                         = (uint16_t*)  Histogram->Array;
                     
                     for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
                         for (uint64_t S = 0ULL; S < Audio->NumSamples; S++) {
-                            uint16_t Sample                      = SampleArray[C * S];
+                            uint16_t Sample                      = SampleArray[C][S];
                             HistArray[Sample]                   += 1;
                         }
                     }
                 } else if (Histogram->Type == AudioType_Integer32) {
-                    uint32_t *SampleArray                        = (uint32_t*) Audio->Samples;
-                    uint32_t *HistArray                          = (uint32_t*) Histogram->Array;
+                    uint32_t **SampleArray                       = (uint32_t**) Audio->Samples;
+                    uint32_t  *HistArray                         = (uint32_t*)  Histogram->Array;
                     
                     for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
                         for (uint64_t S = 0ULL; S < Audio->NumSamples; S++) {
-                            uint32_t Sample                      = SampleArray[C * S];
+                            uint32_t Sample                      = SampleArray[C][S];
                             HistArray[Sample]                   += 1;
                         }
                     }
@@ -549,19 +606,75 @@ extern "C" {
         }
     }
     
+    void AudioHistogram_Erase(AudioHistogram *Histogram) {
+        if (Histogram != NULL) {
+            if (Histogram->Type == (AudioType_Unsigned | AudioType_Integer8)) {
+                uint8_t **Samples = (uint8_t**) AudioHistogram_GetArray(Histogram);
+                
+                for (uint64_t Channel = 0ULL; Channel < AudioMask_GetNumChannels(Histogram->ChannelMask) - 1; Channel++) {
+                    for (uint64_t Sample = 0ULL; Sample < Histogram->NumEntries - 1; Sample++) {
+                        Samples[Channel][Sample] = 0;
+                    }
+                }
+            } else if (Histogram->Type == (AudioType_Signed | AudioType_Integer8)) {
+                int8_t **Samples  = (int8_t**) AudioHistogram_GetArray(Histogram);
+                
+                for (uint64_t Channel = 0ULL; Channel < AudioMask_GetNumChannels(Histogram->ChannelMask) - 1; Channel++) {
+                    for (uint64_t Sample = 0ULL; Sample < Histogram->NumEntries - 1; Sample++) {
+                        Samples[Channel][Sample] = 0;
+                    }
+                }
+            } else if (Histogram->Type == (AudioType_Unsigned | AudioType_Integer16)) {
+                uint16_t **Samples  = (uint16_t**) AudioHistogram_GetArray(Histogram);
+                
+                for (uint64_t Channel = 0ULL; Channel < AudioMask_GetNumChannels(Histogram->ChannelMask) - 1; Channel++) {
+                    for (uint64_t Sample = 0ULL; Sample < Histogram->NumEntries - 1; Sample++) {
+                        Samples[Channel][Sample] = 0;
+                    }
+                }
+            } else if (Histogram->Type == (AudioType_Signed | AudioType_Integer16)) {
+                int16_t **Samples  = (int16_t**) AudioHistogram_GetArray(Histogram);
+                
+                for (uint64_t Channel = 0ULL; Channel < AudioMask_GetNumChannels(Histogram->ChannelMask) - 1; Channel++) {
+                    for (uint64_t Sample = 0ULL; Sample < Histogram->NumEntries - 1; Sample++) {
+                        Samples[Channel][Sample] = 0;
+                    }
+                }
+            } else if (Histogram->Type == (AudioType_Unsigned | AudioType_Integer32)) {
+                uint32_t **Samples  = (uint32_t**) AudioHistogram_GetArray(Histogram);
+                
+                for (uint64_t Channel = 0ULL; Channel < AudioMask_GetNumChannels(Histogram->ChannelMask) - 1; Channel++) {
+                    for (uint64_t Sample = 0ULL; Sample < Histogram->NumEntries - 1; Sample++) {
+                        Samples[Channel][Sample] = 0;
+                    }
+                }
+            } else if (Histogram->Type == (AudioType_Signed | AudioType_Integer32)) {
+                int32_t **Samples  = (int32_t**) AudioHistogram_GetArray(Histogram);
+                
+                for (uint64_t Channel = 0ULL; Channel < AudioMask_GetNumChannels(Histogram->ChannelMask) - 1; Channel++) {
+                    for (uint64_t Sample = 0ULL; Sample < Histogram->NumEntries - 1; Sample++) {
+                        Samples[Channel][Sample] = 0;
+                    }
+                }
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("AudioHistogram Pointer is NULL"));
+        }
+    }
+    
     void AudioHistogram_Deinit(AudioHistogram *Histogram) {
         free(Histogram->Array);
         free(Histogram);
     }
     
     typedef struct ImageContainer {
-        void              *Pixels;
-        Image_ChannelMask *ChannelMap;
-        uint64_t           Width;
-        uint64_t           Height;
-        Image_ChannelMask  ChannelMask;
-        uint8_t            BitDepth;
-        Image_Types        Type;
+        void              ****Pixels; // View, Width, Height, Channel
+        Image_ChannelMask    *ChannelMap;
+        uint64_t              Width;
+        uint64_t              Height;
+        Image_ChannelMask     ChannelMask;
+        uint8_t               BitDepth;
+        Image_Types           Type;
     } ImageContainer;
     
     ImageContainer *ImageContainer_Init(Image_Types Type, Image_ChannelMask ChannelMask, uint64_t Width, uint64_t Height) {
@@ -750,8 +863,8 @@ extern "C" {
         return Type;
     }
     
-    void *ImageContainer_GetArray(ImageContainer *Image) {
-        void *ImageArray = NULL;
+    void ****ImageContainer_GetArray(ImageContainer *Image) {
+        void ****ImageArray = NULL;
         if (Image != NULL) {
             ImageArray   = Image->Pixels;
         } else {
@@ -760,7 +873,7 @@ extern "C" {
         return ImageArray;
     }
     
-    void ImageContainer_SetArray(ImageContainer *Image, void *Array) {
+    void ImageContainer_SetArray(ImageContainer *Image, void ****Array) {
         if (Image != NULL) {
             Image->Pixels = Array;
         } else {
@@ -768,33 +881,38 @@ extern "C" {
         }
     }
     
-    int64_t ImageContainer_GetAverage(ImageContainer *Image, Image_ChannelMask ChannelMask) {
-        int64_t Average      = 0LL;
+    uint64_t ImageContainer_GetAverage(ImageContainer *Image, Image_ChannelMask ChannelMask) {
+        uint64_t Average         = 0ULL;
         if (Image != NULL) {
-            uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
-            uint64_t View    = ImageContainer_GetViewsIndex(Image, ChannelMask);
+            uint64_t View        = ImageContainer_GetViewsIndex(Image, ChannelMask);
+            uint64_t Channel     = ImageContainer_GetChannelsIndex(Image, ChannelMask);
+            uint64_t NumViews    = ImageMask_GetNumViews(ChannelMask);
             uint64_t NumChannels = ImageMask_GetNumChannels(ChannelMask);
-            if (Channel < NumChannels - 1) {
-                if (Image->Type == ImageType_Integer8) {
-                    uint8_t *Array = (uint8_t*) ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
-                        for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
-                            Average += Array[View * Width * Height * Channel];
+            if (View < NumViews - 1) {
+                if (Channel < NumChannels - 1) {
+                    if (Image->Type == ImageType_Integer8) {
+                        uint8_t ****Array = (uint8_t****) ImageContainer_GetArray(Image);
+                        for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
+                            for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
+                                Average += Array[View][Width][Height][Channel];
+                            }
+                        }
+                    } else if (Image->Type == ImageType_Integer16) {
+                        uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
+                        for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
+                            for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
+                                Average += Array[View][Width][Height][Channel];
+                            }
                         }
                     }
-                } else if (Image->Type == ImageType_Integer16) {
-                    uint16_t *Array = (uint16_t*) ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
-                        for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
-                            Average += Array[View * Width * Height * Channel];
-                        }
+                    if (Average != 0) {
+                        Average /= Image->Width * Image->Height;
                     }
-                }
-                if (Average != 0) {
-                    Average /= Image->Width * Image->Height;
+                } else {
+                    Log(Log_ERROR, __func__, U8("You tried getting the average from a nonexistant channel %lld"), Channel);
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("You tried getting the average from a nonexistant channel"));
+                Log(Log_ERROR, __func__, U8("You tried getting the average from a nonexistant view %lld"), View);
             }
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
@@ -802,33 +920,39 @@ extern "C" {
         return Average;
     }
     
-    int64_t ImageContainer_GetMax(ImageContainer *Image, Image_ChannelMask ChannelMask) {
-        int64_t Maximum      = INT64_MIN;
+    uint64_t ImageContainer_GetMax(ImageContainer *Image, Image_ChannelMask ChannelMask) {
+        uint64_t Maximum         = 0ULL;
         if (Image != NULL) {
-            uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
-            uint64_t View    = ImageContainer_GetViewsIndex(Image, ChannelMask);
-            if (Channel < ImageMask_GetNumChannels(ChannelMask) - 1) {
-                if (Image->Type == ImageType_Integer8) {
-                    uint8_t *Array = (uint8_t*) ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
-                        for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
-                            if (Array[View * Width * Height * Channel] > Maximum) {
-                                Maximum = Array[View * Width * Height * Channel];
+            uint64_t Channel     = ImageContainer_GetChannelsIndex(Image, ChannelMask);
+            uint64_t View        = ImageContainer_GetViewsIndex(Image, ChannelMask);
+            uint64_t NumViews    = ImageMask_GetNumViews(ChannelMask);
+            uint64_t NumChannels = ImageMask_GetNumChannels(ChannelMask);
+            if (View < NumViews - 1) {
+                if (Channel < NumChannels - 1) {
+                    if (Image->Type == ImageType_Integer8) {
+                        uint8_t ****Array = (uint8_t****) ImageContainer_GetArray(Image);
+                        for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
+                            for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
+                                if (Array[View][Width][Height][Channel] > Maximum) {
+                                    Maximum = Array[View][Width][Height][Channel];
+                                }
+                            }
+                        }
+                    } else if (Image->Type == ImageType_Integer16) {
+                        uint16_t ****Array = (uint16_t****)  ImageContainer_GetArray(Image);
+                        for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
+                            for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
+                                if (Array[View][Width][Height][Channel] > Maximum) {
+                                    Maximum = Array[View][Width][Height][Channel];
+                                }
                             }
                         }
                     }
-                } else if (Image->Type == ImageType_Integer16) {
-                    uint16_t *Array = (uint16_t*)  ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
-                        for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
-                            if (Array[View * Width * Height * Channel] > Maximum) {
-                                Maximum = Array[View * Width * Height * Channel];
-                            }
-                        }
-                    }
+                } else {
+                    Log(Log_ERROR, __func__, U8("You tried getting the max from a nonexistant channel"));
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("You tried getting the max from a nonexistant channel"));
+                Log(Log_ERROR, __func__, U8("You tried getting the average from a nonexistant view %lld"), View);
             }
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
@@ -836,33 +960,40 @@ extern "C" {
         return Maximum;
     }
     
-    int64_t ImageContainer_GetMin(ImageContainer *Image, Image_ChannelMask ChannelMask) {
-        int64_t Minimum      = INT64_MAX;
+    uint64_t ImageContainer_GetMin(ImageContainer *Image, Image_ChannelMask ChannelMask) {
+        uint64_t Minimum         = UINT64_MAX;
         if (Image != NULL) {
-            uint64_t Channel = ImageContainer_GetChannelsIndex(Image, ChannelMask);
-            uint64_t View    = ImageContainer_GetViewsIndex(Image, ChannelMask);
-            if (Channel < ImageMask_GetNumChannels(ChannelMask) - 1) {
-                if (Image->Type == ImageType_Integer8) {
-                    uint8_t  *Array = (uint8_t*)  ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
-                        for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
-                            if (Array[View * Width * Height * Channel] < Minimum) {
-                                Minimum = Array[View * Width * Height * Channel];
+            uint64_t Channel     = ImageContainer_GetChannelsIndex(Image, ChannelMask);
+            uint64_t View        = ImageContainer_GetViewsIndex(Image, ChannelMask);
+            uint64_t NumViews    = ImageMask_GetNumViews(ChannelMask);
+            uint64_t NumChannels = ImageMask_GetNumChannels(ChannelMask);
+            
+            if (View < NumViews - 1) {
+                if (Channel < NumChannels - 1) {
+                    if (Image->Type == ImageType_Integer8) {
+                        uint8_t ****Array = (uint8_t****) ImageContainer_GetArray(Image);
+                        for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
+                            for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
+                                if (Array[View][Width][Height][Channel] < Minimum) {
+                                    Minimum = Array[View][Width][Height][Channel];
+                                }
+                            }
+                        }
+                    } else if (Image->Type == ImageType_Integer16) {
+                        uint16_t ****Array = (uint16_t****)  ImageContainer_GetArray(Image);
+                        for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
+                            for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
+                                if (Array[View][Width][Height][Channel] < Minimum) {
+                                    Minimum = Array[View][Width][Height][Channel];
+                                }
                             }
                         }
                     }
-                } else if (Image->Type == ImageType_Integer16) {
-                    uint16_t  *Array = (uint16_t*)  ImageContainer_GetArray(Image);
-                    for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
-                        for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
-                            if (Array[View * Width * Height * Channel] < Minimum) {
-                                Minimum = Array[View * Width * Height * Channel];
-                            }
-                        }
-                    }
+                } else {
+                    Log(Log_ERROR, __func__, U8("You tried getting the max from a nonexistant channel"));
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("You tried getting the min from a nonexistant channel"));
+                Log(Log_ERROR, __func__, U8("You tried getting the average from a nonexistant view %lld"), View);
             }
         } else {
             Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
@@ -1081,6 +1212,38 @@ extern "C" {
         return Difference;
     }
     
+    void ImageContainer_Erase(ImageContainer *Image) {
+        if (Image != NULL) {
+            if (Image->Type == ImageType_Integer8) {
+                uint8_t ****Pixels = (uint8_t****) ImageContainer_GetArray(Image);
+                
+                for (uint64_t View = 0ULL; View < ImageContainer_GetNumViews(Image); View++) {
+                    for (uint64_t W = 0ULL; W < Image->Width - 1; W++) {
+                        for (uint64_t H = 0ULL; H < Image->Height; H++) {
+                            for (uint64_t Channel = 0ULL; Channel < ImageContainer_GetNumChannels(Image) - 1; Channel++) {
+                                Pixels[View][W][H][Channel] = 0;
+                            }
+                        }
+                    }
+                }
+            } else if (Image->Type == ImageType_Integer16) {
+                uint16_t ****Pixels = (uint16_t****) ImageContainer_GetArray(Image);
+                
+                for (uint64_t View = 0ULL; View < ImageContainer_GetNumViews(Image); View++) {
+                    for (uint64_t W = 0ULL; W < Image->Width - 1; W++) {
+                        for (uint64_t H = 0ULL; H < Image->Height; H++) {
+                            for (uint64_t Channel = 0ULL; Channel < ImageContainer_GetNumChannels(Image) - 1; Channel++) {
+                                Pixels[View][W][H][Channel] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+        }
+    }
+    
     void ImageContainer_Deinit(ImageContainer *Image) {
         if (Image != NULL) {
             free(Image->Pixels);
@@ -1092,9 +1255,13 @@ extern "C" {
     }
     
     typedef struct ImageHistogram {
-        void           *Array;
-        uint64_t        NumEntries;
-        Image_Types     Type;
+        void              ***Array; // View, Channel, Sample
+        Image_ChannelMask   *ChannelMap;
+        Image_ChannelMask    ChannelMask;
+        uint64_t             Width;
+        uint64_t             Height;
+        uint8_t              BitDepth;
+        Image_Types          Type;
     } ImageHistogram;
     
     ImageHistogram *ImageHistogram_Init(ImageContainer *Image) {
@@ -1102,27 +1269,30 @@ extern "C" {
         if (Image != NULL) {
             Histogram                                = calloc(1, sizeof(Histogram));
             if (Histogram != NULL) {
-                uint8_t NumViews                     = ImageContainer_GetNumViews(Image);
-                uint8_t NumChannels                  = ImageContainer_GetNumChannels(Image);
+                uint8_t  NumViews                    = ImageContainer_GetNumViews(Image);
+                uint8_t  NumChannels                 = ImageContainer_GetNumChannels(Image);
+                uint64_t NumPossibleColors           = Exponentiate(2, Image->BitDepth);
+                
+                Histogram->ChannelMap                = Image->ChannelMap;
+                Histogram->ChannelMask               = Image->ChannelMask;
+                Histogram->Height                    = Image->Height;
+                Histogram->Width                     = Image->Width;
+                Histogram->BitDepth                  = Image->BitDepth;
+                
                 if (Image->Type == ImageType_Integer8) {
-                    uint8_t *HistogramArray          = calloc(256 * NumViews * NumChannels, sizeof(uint8_t));
-                    
-                    Histogram->Array                 = HistogramArray;
+                    uint8_t ***HistogramArray        = calloc(NumViews * NumChannels * NumPossibleColors, sizeof(uint8_t));
                     if (HistogramArray != NULL) {
+                        Histogram->Array             = (void***) HistogramArray;
                         Histogram->Type              = Image->Type;
-                        Histogram->NumEntries        = NumViews * NumChannels;
                     } else {
                         ImageHistogram_Deinit(Histogram);
                         Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
                     }
                 } else if (Image->Type == ImageType_Integer16) {
-                    uint16_t *HistogramArray         = calloc(65536 * NumViews * NumChannels, sizeof(uint16_t));
-                    
-                    Histogram->Array                 = HistogramArray;
-                    
+                    uint16_t *HistogramArray         = calloc(NumViews * NumChannels * NumPossibleColors, sizeof(uint16_t));
                     if (HistogramArray != NULL) {
+                        Histogram->Array             = (void***) HistogramArray;
                         Histogram->Type              = Image->Type;
-                        Histogram->NumEntries        = NumViews * NumChannels * 65536;
                     } else {
                         ImageHistogram_Deinit(Histogram);
                         Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
@@ -1138,8 +1308,8 @@ extern "C" {
         return Histogram;
     }
     
-    void *ImageHistogram_GetArray(ImageHistogram *Histogram) {
-        void *Array = NULL;
+    void ***ImageHistogram_GetArray(ImageHistogram *Histogram) {
+        void ***Array = NULL;
         if (Histogram != NULL) {
             if (Histogram->Type == ImageType_Integer8) {
                 Array = Histogram->Array;
@@ -1152,7 +1322,7 @@ extern "C" {
         return Array;
     }
     
-    void ImageHistogram_SetArray(ImageHistogram *Histogram, void *Array) {
+    void ImageHistogram_SetArray(ImageHistogram *Histogram, void ***Array) {
         if (Histogram != NULL && Array != NULL) {
             Histogram->Array = Array;
         } else if (Histogram == NULL) {
@@ -1163,39 +1333,39 @@ extern "C" {
     }
     
     ImageHistogram *ImageHistogram_GenerateHistogram(ImageContainer *Image) {
-        ImageHistogram *Histogram       = NULL;
+        ImageHistogram *Histogram                               = NULL;
         if (Image != NULL) {
-            Histogram                   = ImageHistogram_Init(Image);
+            Histogram                                           = ImageHistogram_Init(Image);
             if (Histogram != NULL) {
-                uint8_t  NumViews                                = ImageContainer_GetNumViews(Image);
-                uint8_t  NumChannels                             = ImageContainer_GetNumChannels(Image);
-                uint64_t Width                                   = ImageContainer_GetWidth(Image);
-                uint64_t Height                                  = ImageContainer_GetHeight(Image);
+                uint8_t  NumViews                               = ImageContainer_GetNumViews(Image);
+                uint8_t  NumChannels                            = ImageContainer_GetNumChannels(Image);
+                uint64_t Width                                  = ImageContainer_GetWidth(Image);
+                uint64_t Height                                 = ImageContainer_GetHeight(Image);
                 
                 if (Histogram->Type == ImageType_Integer8) {
-                    uint8_t *ImageArray                          = (uint8_t*) Image->Pixels;
-                    uint8_t *HistArray                           = (uint8_t*) Histogram->Array;
+                    uint8_t ****ImageArray                      = (uint8_t****) Image->Pixels;
+                    uint8_t ***HistArray                        = (uint8_t***)  Histogram->Array;
                     
                     for (uint64_t View = 0ULL; View < NumViews - 1; View++) {
                         for (uint64_t W = 0ULL; W < Width; W++) {
                             for (uint64_t H = 0ULL; H < Height; H++) {
                                 for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
-                                    uint8_t Sample               = ImageArray[View * W * H * C];
-                                    HistArray[Sample]           += 1;
+                                    uint8_t Sample              = ImageArray[View][W][H][C];
+                                    HistArray[View][C][Sample] += 1;
                                 }
                             }
                         }
                     }
                 } else if (Histogram->Type == ImageType_Integer16) {
-                    uint16_t *ImageArray                         = (uint16_t*) Image->Pixels;
-                    uint16_t *HistArray                          = (uint16_t*) Histogram->Array;
+                    uint16_t ****ImageArray                     = (uint16_t****) Image->Pixels;
+                    uint16_t ***HistArray                       = (uint16_t***)  Histogram->Array;
                     
                     for (uint64_t View = 0ULL; View < NumViews - 1; View++) {
                         for (uint64_t W = 0ULL; W < Width; W++) {
                             for (uint64_t H = 0ULL; H < Height; H++) {
                                 for (uint64_t C = 0ULL; C < NumChannels - 1; C++) {
-                                    uint16_t Sample              = ImageArray[View * W * H * C];
-                                    HistArray[Sample]           += 1;
+                                    uint16_t Sample             = ImageArray[View][W][H][C];
+                                    HistArray[View][C][Sample] += 1;
                                 }
                             }
                         }
@@ -1212,36 +1382,83 @@ extern "C" {
     
     void ImageHistogram_Sort(ImageHistogram *Histogram, bool SortAscending) {
         if (Histogram != NULL) { // Our sorting algorithm will be stable, so values that are tied, will not be moved
-            uint64_t NumCores = FoundationIO_GetNumCPUCores();
             if (SortAscending == Yes) { // Top to bottom
                 if (Histogram->Type == ImageType_Integer8) {
-                    uint8_t  *Image = ImageHistogram_GetArray(Histogram);
-                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
-                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Image[Element - 1] = (uint8_t) Max(Image[Element - 1], Image[Element]);
+                    uint8_t ***Image = (uint8_t***) ImageHistogram_GetArray(Histogram);
+                    for (uint64_t View = 0ULL; View < ImageMask_GetNumViews(Histogram->ChannelMask) - 1; View++) {
+                        for (uint64_t Width = 0ULL; Width < Histogram->Width - 1; Width++) {
+                            for (uint64_t Height = 0ULL; Height < Histogram->Height - 1; Height++) {
+                                for (uint64_t Channel = 1ULL; Channel < ImageMask_GetNumChannels(Histogram->ChannelMask); Channel++) {
+                                    Image[View][Channel] = (uint8_t) Min(Image[View][Channel - 1], Image[View][Channel]);
+                                }
+                            }
                         }
                     }
                 } else if (Histogram->Type == ImageType_Integer16) {
-                    uint16_t *Image = ImageHistogram_GetArray(Histogram);
-                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
-                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Image[Element - 1] = (uint16_t) Max(Image[Element - 1], Image[Element]);
+                    uint16_t ***Image = (uint16_t***) ImageHistogram_GetArray(Histogram);
+                    for (uint64_t View = 0ULL; View < ImageMask_GetNumViews(Histogram->ChannelMask) - 1; View++) {
+                        for (uint64_t Width = 0ULL; Width < Histogram->Width - 1; Width++) {
+                            for (uint64_t Height = 0ULL; Height < Histogram->Height - 1; Height++) {
+                                for (uint64_t Channel = 1ULL; Channel < ImageMask_GetNumChannels(Histogram->ChannelMask); Channel++) {
+                                    Image[View][Channel] = (uint16_t) Min(Image[View][Channel - 1], Image[View][Channel]);
+                                }
+                            }
                         }
                     }
                 }
             } else { // Bottom to top
                 if (Histogram->Type == ImageType_Integer8) {
-                    uint8_t  *Image = ImageHistogram_GetArray(Histogram);
-                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
-                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Image[Element - 1] = (uint8_t) Min(Image[Element - 1], Image[Element]);
+                    uint8_t ***Image = (uint8_t***) ImageHistogram_GetArray(Histogram);
+                    for (uint64_t View = 0ULL; View < ImageMask_GetNumViews(Histogram->ChannelMask) - 1; View++) {
+                        for (uint64_t Width = 0ULL; Width < Histogram->Width - 1; Width++) {
+                            for (uint64_t Height = 0ULL; Height < Histogram->Height - 1; Height++) {
+                                for (uint64_t Channel = 1ULL; Channel < ImageMask_GetNumChannels(Histogram->ChannelMask); Channel++) {
+                                    Image[View][Channel] = (uint8_t) Min(Image[View][Channel - 1], Image[View][Channel]);
+                                }
+                            }
                         }
                     }
                 } else if (Histogram->Type == ImageType_Integer16) {
-                    uint16_t *Image = ImageHistogram_GetArray(Histogram);
-                    for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
-                        for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
-                            Image[Element - 1] = (uint16_t) Min(Image[Element - 1], Image[Element]);
+                    uint16_t ***Image = (uint16_t***) ImageHistogram_GetArray(Histogram);
+                    for (uint64_t View = 0ULL; View < ImageMask_GetNumViews(Histogram->ChannelMask) - 1; View++) {
+                        for (uint64_t Width = 0ULL; Width < Histogram->Width - 1; Width++) {
+                            for (uint64_t Height = 0ULL; Height < Histogram->Height - 1; Height++) {
+                                for (uint64_t Channel = 1ULL; Channel < ImageMask_GetNumChannels(Histogram->ChannelMask); Channel++) {
+                                    Image[View][Channel] = (uint16_t) Min(Image[View][Channel - 1], Image[View][Channel]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
+        }
+    }
+    
+    void ImageHistogram_Erase(ImageHistogram *Histogram) {
+        if (Histogram != NULL) {
+            if (Histogram->Type == ImageType_Integer8) {
+                uint8_t ****Pixels = (uint8_t****) ImageHistogram_GetArray(Histogram);
+                
+                for (uint64_t View = 0ULL; View < ImageMask_GetNumViews(Histogram->ChannelMask); View++) {
+                    for (uint64_t W = 0ULL; W < Histogram->Width - 1; W++) {
+                        for (uint64_t H = 0ULL; H < Histogram->Height - 1; H++) {
+                            for (uint64_t Channel = 0ULL; Channel < ImageMask_GetNumChannels(Histogram->ChannelMask) - 1; Channel++) {
+                                Pixels[View][W][H][Channel] = 0;
+                            }
+                        }
+                    }
+                }
+            } else if (Histogram->Type == ImageType_Integer16) {
+                uint16_t ****Pixels = (uint16_t****) ImageHistogram_GetArray(Histogram);
+                
+                for (uint64_t View = 0ULL; View < ImageMask_GetNumViews(Histogram->ChannelMask); View++) {
+                    for (uint64_t W = 0ULL; W < Histogram->Width - 1; W++) {
+                        for (uint64_t H = 0ULL; H < Histogram->Height - 1; H++) {
+                            for (uint64_t Channel = 0ULL; Channel < ImageMask_GetNumChannels(Histogram->ChannelMask) - 1; Channel++) {
+                                Pixels[View][W][H][Channel] = 0;
+                            }
                         }
                     }
                 }

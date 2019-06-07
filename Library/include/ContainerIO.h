@@ -259,6 +259,12 @@ extern "C" {
     int64_t                 AudioContainer_GetMin(AudioContainer *Audio, uint64_t Channel);
     
     /*!
+     @abstract                             "Securely erases an AudioContainer".
+     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     */
+    void                    AudioContainer_Erase(AudioContainer *Audio);
+    
+    /*!
      @abstract                             "Deinitializes an AudioContainer, and any samples stored within it".
      @param                 Audio          "A pointer to the instance of an AudioContainer in question".
      */
@@ -298,6 +304,12 @@ extern "C" {
      @param                 SortAscending  "If true, sorts so the most common index is at the top".
      */
     void                    AudioHistogram_Sort(AudioHistogram *Histogram, bool SortAscending);
+    
+    /*!
+     @abstract                             "Securely erases an AudioContainer".
+     @param                 Histogram      "A pointer to the instance of an AudioContainer in question".
+     */
+    void                    AudioHistogram_Erase(AudioHistogram *Histogram);
     
     /*!
      @abstract                             "frees a AudioHistogram".
@@ -400,35 +412,35 @@ extern "C" {
      @remark                               "You need to cast the pointer to the correct type you got from ImageType_GetType".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
-    void                   *ImageContainer_GetArray(ImageContainer *Image);
+    void                ****ImageContainer_GetArray(ImageContainer *Image);
     
     /*!
      @abstract                             "Sets a pointer to the array of pixels".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      @param                 Array          "A pointer to the new array".
      */
-    void                    ImageContainer_SetArray(ImageContainer *Image, void *Array);
+    void                    ImageContainer_SetArray(ImageContainer *Image, void ****Array);
     
     /*!
      @abstract                             "Returns the average value (rounded) of the pixels in this image".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      @param                 ChannelMask    "Which channel should we get the average from"?
      */
-    int64_t                 ImageContainer_GetAverage(ImageContainer *Image, Image_ChannelMask ChannelMask);
+    uint64_t                ImageContainer_GetAverage(ImageContainer *Image, Image_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Returns the highest value pixel in this image".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      @param                 ChannelMask    "Which channel should we get the maximum from"?
      */
-    int64_t                 ImageContainer_GetMax(ImageContainer *Image, Image_ChannelMask ChannelMask);
+    uint64_t                ImageContainer_GetMax(ImageContainer *Image, Image_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Returns the lowest value pixel in this image".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      @param                 ChannelMask    "Which channel should we get the minimum from"?
      */
-    int64_t                 ImageContainer_GetMin(ImageContainer *Image, Image_ChannelMask ChannelMask);
+    uint64_t                ImageContainer_GetMin(ImageContainer *Image, Image_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Rotates an Image, either Vertically, Horizontally, or both".
@@ -459,6 +471,12 @@ extern "C" {
     ImageContainer         *ImageContainer_Compare(ImageContainer *Reference, ImageContainer *Compare);
     
     /*!
+     @abstract                             "Securely erases an ImageContainer".
+     @param                 Image          "A pointer to the instance of an ImageContainer in question".
+     */
+    void                    ImageContainer_Erase(ImageContainer *Image);
+    
+    /*!
      @abstract                             "Deinitializes the ImageContainer pointed to".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
@@ -476,14 +494,14 @@ extern "C" {
      @param                 Histogram      "A pointer to the instance of an ImageHistogram in question".
      @return                               "Returns a pointer to the histogram data".
      */
-    void                   *ImageHistogram_GetArray(ImageHistogram *Histogram);
+    void                 ***ImageHistogram_GetArray(ImageHistogram *Histogram);
     
     /*!
      @abstract                             "Sets a pointer to the histogram data".
      @param                 Histogram      "A pointer to the instance of an ImageHistogram in question".
      @param                 Array          "A pointer to the histogram data".
      */
-    void                    ImageHistogram_SetArray(ImageHistogram *Histogram, void *Array);
+    void                    ImageHistogram_SetArray(ImageHistogram *Histogram, void ***Array);
     
     /*!
      @abstract                             "Generates a histogram from an image".
@@ -498,6 +516,12 @@ extern "C" {
      @param                 SortAscending  "If true, sorts so the most common index is at the top".
      */
     void                    ImageHistogram_Sort(ImageHistogram *Histogram, bool SortAscending);
+    
+    /*!
+     @abstract                             "Securely erases an ImageHistogram".
+     @param                 Histogram      "A pointer to the instance of an ImageContainer in question".
+     */
+    void                    ImageHistogram_Erase(ImageHistogram *Histogram);
     
     /*!
      @abstract                             "frees a ImageHistogram".
