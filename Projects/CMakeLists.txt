@@ -9,18 +9,17 @@ set(FoundationIO_VERSION_PATCH 1)
 set(FoundationIO_VERSION ${FoundationIO_VERSION_MAJOR}.${FoundationIO_VERSION_MINOR}.${FoundationIO_VERSION_PATCH})
 endif(NOT FoundationIO_VERSION)
 
-if   (${CMAKE_SYSTEM_NAME} MATCHES "Darwin" OR ${CMAKE_SYSTEM_NAME} MATCHES "UNIX")
+if   (${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 set(libMATH -lm)
 add_definitions(-D_LARGEFILE_SOURCE)
 add_definitions(-D_LARGEFILE64_SOURCE)
 add_definitions(-D_FILE_OFFSET_BITS=64)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-add_definitions(-D_LIB)
 add_definitions(-DUNICODE)
 add_definitions(-D_UNICODE)
 add_definitions(-D_ATL_ALLOW_CHAR_UNSIGNED)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin" OR ${CMAKE_SYSTEM_NAME} MATCHES "UNIX")
+endif(${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 set(libFoundationIO_Dir "${CMAKE_CURRENT_SOURCE_DIR}/../libFoundationIO")
 
@@ -56,9 +55,9 @@ set(libFoundationIO_Sources
 "${libFoundationIO_Dir}/src/TestIO.c"
 )
 
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "${MinSizeRel}")
-endif()
+endif(NOT CMAKE_BUILD_TYPE)
 
 add_library(FoundationIO ${libFoundationIO_Sources} ${libFoundationIO_PublicHeaders})
 set_target_properties(FoundationIO PROPERTIES PREFIX "")
@@ -89,7 +88,11 @@ ${CMAKE_C_FLAGS} \
 -fshort-enums \
 -funroll-loops \
 -funsigned-char \
--std=c11 \
+-std=c17 \
+-Weverything \
+-Wall \
+-Wextra \
+-Wpedantic \
 -Wno-assign-enum \
 -Wno-c99-compat \
 -Wno-ignored-attributes \
@@ -124,7 +127,7 @@ ${CMAKE_C_FLAGS} \
 
 set(CMAKE_C_FLAGS_MINSIZEREL " \
 ${CMAKE_C_FLAGS} \
--Os \
+-Oz \
 ")
 
 set(LINK_FLAGS ${LINK_FLAGS} "-flto=full")
@@ -154,7 +157,10 @@ ${CMAKE_C_FLAGS} \
 -fshort-enums \
 -funroll-loops \
 -funsigned-char \
--std=c11 \
+-std=c17 \
+-Wall \
+-Wextra \
+-Wpedantic \
 -Wno-ignored-attributes \
 -Wno-padded \
 -Wno-pointer-sign \
@@ -234,6 +240,7 @@ ${CMAKE_C_FLAGS} \
 /W3 \
 /Zc:rvalueCast \
 /Zc:wchar_t \
+/Wall \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
