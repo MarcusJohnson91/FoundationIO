@@ -153,7 +153,7 @@ extern "C" {
     UTF16                *Delocalize_UTF16_Currency(UTF16 *String);
     
     /*!
-     @abstract                             "Removes currency and grouping symbols from a string".
+     @abstract                             "Removes currency and grouping symbols from a string leaving only an integer value".
      @param               String           "The string to strip".
      @return                               "Returns the stripped string".
      */
