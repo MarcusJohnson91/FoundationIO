@@ -2122,10 +2122,10 @@ extern "C" {
     }
     
     bool UTF32_CompareSubstring(UTF32 *String, UTF32 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
-        bool SubstringMatchesAtOffset = Yes;
+        bool SubstringMatchesAtOffset            = Yes;
         if (String != NULL && Substring != NULL) {
-            uint64_t StringSize       = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t SubstringSize    = UTF32_GetStringSizeInCodePoints(Substring);
+            uint64_t StringSize                  = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t SubstringSize               = UTF32_GetStringSizeInCodePoints(Substring);
             for (uint64_t StringCodePoint = StringOffset; StringCodePoint < StringSize - 1; StringCodePoint++) {
                 for (uint64_t SubstringCodePoint = SubstringOffset; SubstringCodePoint < SubstringSize - 1; SubstringCodePoint++) {
                     if (String[StringCodePoint] != Substring[SubstringCodePoint]) {
@@ -2138,6 +2138,8 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         } else if (Substring == NULL) {
             Log(Log_ERROR, __func__, U8("Substring Pointer is NULL"));
+        } else {
+            SubstringMatchesAtOffset             = No;
         }
         return SubstringMatchesAtOffset;
     }
