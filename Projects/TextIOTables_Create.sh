@@ -9,13 +9,13 @@ CreateOutputFileTop() {
     printf "#define   FoundationIO_StringType32\n\n" >> "$OutputFile"
     printf "#ifdef    UTF32\n" >> "$OutputFile"
     printf "#undef    UTF32\n" >> "$OutputFile"
-    printf "#endif /* UTF32 */\n\n" >> "$OutputFile"
-    printf "#ifdef  __CHAR32_TYPE__\n" >> "$OutputFile"
+    printf "#endif /* UTF32 */\n" >> "$OutputFile"
+    printf "#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (! defined __APPLE__) && (! defined __MACH__))\n" >> "$OutputFile"
     printf "typedef   char32_t       UTF32;\n" >> "$OutputFile"
     printf "#else\n" >> "$OutputFile"
     printf "typedef   uint_least32_t UTF32;\n" >> "$OutputFile"
-    printf "#endif /* __CHAR32_TYPE__ */\n\n" >> "$OutputFile"
-    printf "#endif /* FoundationIO_StringType32 */\n" >> "$OutputFile"
+    printf "#endif /* __CHAR32_TYPE__ */\n" >> "$OutputFile"
+    printf "#endif /* FoundationIO_StringType32 */\n\n" >> "$OutputFile"
     printf "#pragma once\n\n" >> "$OutputFile"
     printf "#ifndef FoundationIO_UnicodeTables_H\n" >> "$OutputFile"
     printf "#define FoundationIO_UnicodeTables_H\n\n" >> "$OutputFile"
@@ -270,7 +270,7 @@ else
     if [ -e "$OutputFile" ]; then
         HeaderUnicodeVersion=$(grep '#define UnicodeVersion ' "$OutputFile" | awk '{printf $3}')
     else
-        HeaderUnicodeVersion="-1.-1.-1"
+        HeaderUnicodeVersion="0.0.0"
     fi
 
     HeaderUnicodeVMajor=$(echo $HeaderUnicodeVersion | awk -F "." '{printf $1}')
