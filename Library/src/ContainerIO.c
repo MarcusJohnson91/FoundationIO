@@ -361,17 +361,17 @@ extern "C" {
     
     typedef struct AudioVector {
         void       *Samples;
-        uint64_t    NumSamples;
+        uint64_t   *Direction;
         uint64_t    SampleRate;
         uint64_t    DirectionOffset;
-        uint64_t   *Direction;
+        uint64_t    NumSamples;
         uint64_t    NumDirections;
         Audio_Types Type;
     } AudioVector;
     
     typedef struct AudioContainer3D {
-        uint64_t     NumObjects;
         AudioVector *Objects;
+        uint64_t     NumObjects;
     } AudioContainer3D;
     
     AudioContainer3D *AudioContainer3D_Init(uint64_t NumObjects) {
@@ -1257,9 +1257,9 @@ extern "C" {
     typedef struct ImageHistogram {
         void              ***Array; // View, Channel, Sample
         Image_ChannelMask   *ChannelMap;
-        Image_ChannelMask    ChannelMask;
         uint64_t             Width;
         uint64_t             Height;
+        Image_ChannelMask    ChannelMask;
         uint8_t              BitDepth;
         Image_Types          Type;
     } ImageHistogram;
