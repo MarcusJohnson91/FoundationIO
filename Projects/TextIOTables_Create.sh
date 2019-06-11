@@ -258,8 +258,8 @@ CreateOutputFileBottom() {
 XMLStarletPath=$(command -v xmlstarlet)
 
 if [ -z "$XMLStarletPath" ]; then
-    echo "You need to install XMLStarlet, aborting."
-    exit 1
+    echo "You need to install XMLStarlet, exiting."
+    exit 0
 fi
 
 OutputFile=$@
@@ -293,16 +293,16 @@ else
         ReadmeUnicodeVMinor=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $2}')
         ReadmeUnicodeVPatch=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $3}')
     else
-        echo "Not enough free space to download the Readme, aborting."
-        exit 1
+        echo "Not enough free space to download the Readme, exiting."
+        exit 0
     fi
 
     if [ "$HeaderUnicodeVMajor" -ge "$ReadmeUnicodeVMajor" ] && [ "$HeaderUnicodeVMinor" -ge "$ReadmeUnicodeVMinor" ] && [ "$HeaderUnicodeVPatch" -ge "$ReadmeUnicodeVPatch" ]; then
         echo "The Unicode tables are already up to date, exiting."
+        exit 0
     fi
 
-    if [ "$HeaderUnicodeVMajor" -lt "$ReadmeUnicodeVMajor" ] || (( [ "$HeaderUnicodeVMajor" -eq "$ReadmeUnicodeVMajor" ] && [ "$HeaderUnicodeVMinor" -lt "$ReadmeUnicodeVMinor" ] )) || (( [ "$HeaderUnicodeVMajor" -eq "$ReadmeUnicodeVMajor" ] && [ "$HeaderUnicodeVMinor" -eq "$ReadmeUnicodeVMinor" ] && [ "$HeaderUnicodeVPatch" -lt "$ReadmeUnicodeVPatch" ] )); then #Update the header
-
+    if [ "$HeaderUnicodeVMajor" -lt "$ReadmeUnicodeVMajor" ] || (( [ "$HeaderUnicodeVMajor" -eq "$ReadmeUnicodeVMajor" ] && [ "$HeaderUnicodeVMinor" -lt "$ReadmeUnicodeVMinor" ] )) || (( [ "$HeaderUnicodeVMajor" -eq "$ReadmeUnicodeVMajor" ] && [ "$HeaderUnicodeVMinor" -eq "$ReadmeUnicodeVMinor" ] && [ "$HeaderUnicodeVPatch" -lt "$ReadmeUnicodeVPatch" ] )); then
         ZipFileSize=$(curl -sI "https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" | grep "Content-Length: " | awk '{printf $2}' | sed "s/$(printf '\r')\$//")
         if [ "$ZipFileSize" -lt "$FreeSpaceInBytes" ]; then
             curl -s -N "https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" -o "$UCD_Folder/ucd.all.flat.zip"
@@ -319,6 +319,7 @@ else
                 UCD_Data="$UCD_Folder/ucd.all.flat.xml"
 
                 CreateOutputFileTop
+
                 CreateBiDirectionalControlsTable
                 CreateWhiteSpaceTable
                 CreateCurrencyTable
@@ -329,14 +330,15 @@ else
                 CreateKompatibleNormalizationTables
                 CreateCaseFoldTables
                 CreateCanonicalNormalizationTables
+
                 CreateOutputFileBottom
             else
-                echo "Not enough free space to extract the XML UCD, aborting"
-                exit 1
+                echo "Not enough free space to extract the XML UCD, exiting"
+                exit 0
             fi
         else
-            echo "Not enough free space to download the UCD zip file, aborting"
-            exit 1
+            echo "Not enough free space to download the UCD zip file, exiting"
+            exit 0
         fi
     else
         echo "The Unicode tables are already up to date, exiting."
