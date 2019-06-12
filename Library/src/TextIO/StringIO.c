@@ -802,6 +802,30 @@ extern "C" {
         return EncodedString;
     }
     
+    UTF8 *UTF16_Convert(UTF16 *String) {
+        UTF8 *String8       = NULL;
+        if (String != NULL) {
+            UTF32 *String32 = UTF16_Decode(String);
+            String8         = UTF8_Encode(String32);
+            free(String32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return String8;
+    }
+    
+    UTF16 *UTF8_Convert(UTF8 *String) {
+        UTF16 *String16     = NULL;
+        if (String != NULL) {
+            UTF32 *String32 = UTF8_Decode(String);
+            String16        = UTF16_Encode(String32);
+            free(String32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return String16;
+    }
+    
     UTF8 *UTF8_Clone(UTF8 *String) {
         UTF8 *Copy = NULL;
         if (String != NULL) {

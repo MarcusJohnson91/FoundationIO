@@ -420,6 +420,18 @@ extern "C" {
     UTF16                *UTF16_Encode(UTF32 *String);
     
     /*!
+     @abstract                             "Converts a UTF16 string to a UTF8 string".
+     @param               String           "The string to convert".
+     */
+    UTF8                 *UTF16_Convert(UTF16 *String);
+    
+    /*!
+     @abstract                             "Converts a UTF8 string to a UTF16 string".
+     @param               String           "The string to convert".
+     */
+    UTF16                *UTF8_Convert(UTF8 *String);
+    
+    /*!
      @abstract                             "Casefolds string for case insensitive comparison".
      @param               String           "The string to be casefolded".
      @return                               "Returns the case folded string".
