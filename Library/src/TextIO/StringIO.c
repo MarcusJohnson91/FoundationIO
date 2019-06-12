@@ -1848,6 +1848,48 @@ extern "C" {
         return IntegerString16;
     }
     
+    static const UTF32 StringIOIntegerBase2Table[2] = {
+        U32('0'), U32('1')
+    };
+    
+    static const UTF32 StringIOIntegerBase8Table[8] = {
+        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7')
+    };
+    
+    static const UTF32 StringIOIntegerBase10Table[10] = {
+        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9')
+    };
+    
+    static const UTF32 StringIOIntegerBase16UppercaseTable[16] = {
+        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('A'), U32('B'), U32('C'), U32('D'), U32('E'), U32('F')
+    };
+    
+    static const UTF32 StringIOIntegerBase16LowercaseTable[16] = {
+        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'), U32('e'), U32('f')
+    };
+    
+    static const UTF32 StringIODecimalTable[11] = {
+        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('.')
+    };
+    
+    static const UTF32 StringIODecimalScientificUppercase[14] = {
+        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('E'), U32('.'), U32('+'), U32('-')
+    };
+    
+    static const UTF32 StringIODecimalScientificLowercase[14] = {
+        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('e'), U32('.'), U32('+'), U32('-')
+    };
+    
+    static const UTF32 StringIODecimalHexUppercase[21] = {
+        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('A'), U32('B'), U32('C'), U32('D'),
+        U32('E'), U32('F'), U32('P'), U32('X'), U32('.'), U32('+'), U32('-')
+    };
+    
+    static const UTF32 StringIODecimalHexLowercase[21] = {
+        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'),
+        U32('e'), U32('f'), U32('p'), U32('x'), U32('.'), U32('+'), U32('-')
+    };
+    
     UTF32 *UTF32_Integer2String(StringIOBases Base, int64_t Integer2Convert) {
         UTF32   *String              = NULL;
         int64_t  Sign                = 0LL;
@@ -1887,12 +1929,10 @@ extern "C" {
         
         String                       = calloc(NumDigits + StringIONULLTerminatorSize, sizeof(UTF32));
         
-        UTF32  UpperNumerals[16]     = {U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('A'), U32('B'), U32('C'), U32('D'), U32('E'), U32('F')};
-        UTF32  LowerNumerals[16]     = {U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'), U32('e'), U32('f')};
         if (String != NULL) {
             for (uint64_t CodePoint = NumDigits - 1; CodePoint > 0; CodePoint--) {
                 int64_t CurrentDigit = (Base == (Integer | Base10) ? AbsoluteI(Integer2Convert %= Base) : (Integer2Convert %= Base));
-                String[CodePoint]    = (Base == (Integer | Base16 | Uppercase) ? UpperNumerals[CurrentDigit] : LowerNumerals[CurrentDigit]);
+                String[CodePoint]    = (Base == (Integer | Base16 | Uppercase) ? StringIOIntegerBase16UppercaseTable[CurrentDigit] : StringIOIntegerBase16LowercaseTable[CurrentDigit]);
             }
         }
         return String;
@@ -2863,100 +2903,53 @@ extern "C" {
         return NewFormatSpecifiers;
     }
     
-    static uint64_t ExtractDigitsFromFormatString(UTF32 *String, StringIOBases Base, uint64_t StartPosition) {
+    static uint64_t UTF32_ExtractDigits(UTF32 *String, StringIOBases Base, uint64_t StartPosition) {
         uint64_t Value = 0ULL;
         if (String != NULL) {
             uint64_t CodePoint = 0ULL;
             do {
                 if (Base == Base2) {
-                    if (
-                        String[StartPosition + CodePoint] == U32('0') ||
-                        String[StartPosition + CodePoint] == U32('1')
-                        ) {
-                        Value <<= 1;
-                        Value  += (String[StartPosition + CodePoint] - 0x30);
+                    for (uint8_t Base2CodePoint = 0; Base2CodePoint < 2; Base2CodePoint++) {
+                        if (String[StartPosition + CodePoint] == StringIOIntegerBase2Table[Base2CodePoint]) {
+                            Value <<= 1;
+                            Value  += (String[StartPosition + CodePoint] - 0x30);
+                        }
                     }
                 } else if (Base == Base8) {
-                    if (
-                        String[StartPosition + CodePoint] == U32('0') ||
-                        String[StartPosition + CodePoint] == U32('1') ||
-                        String[StartPosition + CodePoint] == U32('2') ||
-                        String[StartPosition + CodePoint] == U32('3') ||
-                        String[StartPosition + CodePoint] == U32('4') ||
-                        String[StartPosition + CodePoint] == U32('5') ||
-                        String[StartPosition + CodePoint] == U32('6') ||
-                        String[StartPosition + CodePoint] == U32('7')
-                        ) {
-                        Value <<= 3;
-                        Value  += (String[StartPosition + CodePoint] - 0x30);
+                    for (uint8_t Base8CodePoint = 0; Base8CodePoint < 8; Base8CodePoint++) {
+                        if (String[StartPosition + CodePoint] == StringIOIntegerBase8Table[Base8CodePoint]) {
+                            Value <<= 3;
+                            Value  += (String[StartPosition + CodePoint] - 0x30);
+                        }
                     }
                 } else if (Base == Base10) {
-                    if (
-                        String[StartPosition + CodePoint] == U32('0') ||
-                        String[StartPosition + CodePoint] == U32('1') ||
-                        String[StartPosition + CodePoint] == U32('2') ||
-                        String[StartPosition + CodePoint] == U32('3') ||
-                        String[StartPosition + CodePoint] == U32('4') ||
-                        String[StartPosition + CodePoint] == U32('5') ||
-                        String[StartPosition + CodePoint] == U32('6') ||
-                        String[StartPosition + CodePoint] == U32('7') ||
-                        String[StartPosition + CodePoint] == U32('8') ||
-                        String[StartPosition + CodePoint] == U32('9')
-                        ) {
-                        Value *= 10;
-                        Value += (String[StartPosition + CodePoint] - 0x30);
-                    }
-                } else if (Base == (Base16 | Lowercase)) {
-                    if (
-                        String[StartPosition + CodePoint] == U32('0') ||
-                        String[StartPosition + CodePoint] == U32('1') ||
-                        String[StartPosition + CodePoint] == U32('2') ||
-                        String[StartPosition + CodePoint] == U32('3') ||
-                        String[StartPosition + CodePoint] == U32('4') ||
-                        String[StartPosition + CodePoint] == U32('5') ||
-                        String[StartPosition + CodePoint] == U32('6') ||
-                        String[StartPosition + CodePoint] == U32('7') ||
-                        String[StartPosition + CodePoint] == U32('8') ||
-                        String[StartPosition + CodePoint] == U32('9')
-                        ) {
-                        Value <<= 4;
-                        Value  += (String[StartPosition + CodePoint] - 0x30);
-                    } else if (
-                               String[StartPosition + CodePoint] == U32('a') ||
-                               String[StartPosition + CodePoint] == U32('b') ||
-                               String[StartPosition + CodePoint] == U32('c') ||
-                               String[StartPosition + CodePoint] == U32('d') ||
-                               String[StartPosition + CodePoint] == U32('e') ||
-                               String[StartPosition + CodePoint] == U32('f')
-                               ) {
-                        Value <<= 4;
-                        Value  += (String[StartPosition + CodePoint] - 0x37);
+                    for (uint8_t Base10CodePoint = 0; Base10CodePoint < 10; Base10CodePoint++) {
+                        if (String[StartPosition + CodePoint] == StringIOIntegerBase10Table[Base10CodePoint]) {
+                            Value *= 10;
+                            Value += (String[StartPosition + CodePoint] - 0x30);
+                        }
                     }
                 } else if (Base == (Base16 | Uppercase)) {
-                    if (
-                        String[StartPosition + CodePoint] == U32('0') ||
-                        String[StartPosition + CodePoint] == U32('1') ||
-                        String[StartPosition + CodePoint] == U32('2') ||
-                        String[StartPosition + CodePoint] == U32('3') ||
-                        String[StartPosition + CodePoint] == U32('4') ||
-                        String[StartPosition + CodePoint] == U32('5') ||
-                        String[StartPosition + CodePoint] == U32('6') ||
-                        String[StartPosition + CodePoint] == U32('7') ||
-                        String[StartPosition + CodePoint] == U32('8') ||
-                        String[StartPosition + CodePoint] == U32('9')
-                        ) {
-                        Value <<= 4;
-                        Value  += (String[StartPosition + CodePoint] - 0x30);
-                    } else if (
-                               String[StartPosition + CodePoint] == U32('A') ||
-                               String[StartPosition + CodePoint] == U32('B') ||
-                               String[StartPosition + CodePoint] == U32('C') ||
-                               String[StartPosition + CodePoint] == U32('D') ||
-                               String[StartPosition + CodePoint] == U32('E') ||
-                               String[StartPosition + CodePoint] == U32('F')
-                               ) {
-                        Value <<= 4;
-                        Value  += (String[StartPosition + CodePoint] - 0x37);
+                    for (uint8_t Base16CodePoint = 0; Base16CodePoint < 16; Base16CodePoint++) {
+                        if (String[StartPosition + CodePoint] == StringIOIntegerBase16UppercaseTable[Base16CodePoint]) {
+                            Value     <<= 4;
+                            if (String[StartPosition + CodePoint] >= U32('0') && String[StartPosition + CodePoint] <= U32('9')) {
+                                Value  += (String[StartPosition + CodePoint] - 0x30);
+                            } else if (String[StartPosition + CodePoint] >= U32('A') && String[StartPosition + CodePoint] <= U32('F')) {
+                                Value  += (String[StartPosition + CodePoint] - 0x37);
+                            }
+                        }
+                    }
+                } else if (Base == (Base16 | Lowercase)) {
+                    for (uint8_t Base16CodePoint = 0; Base16CodePoint < 16; Base16CodePoint++) {
+                        if (String[StartPosition + CodePoint] == StringIOIntegerBase16LowercaseTable[Base16CodePoint]) {
+                            Value     <<= 4;
+                            if (String[StartPosition + CodePoint] >= U32('0') && String[StartPosition + CodePoint] <= U32('9')) {
+                                Value  += (String[StartPosition + CodePoint] - 0x30);
+                            } else if (String[StartPosition + CodePoint] >= U32('a') && String[StartPosition + CodePoint] <= U32('f')) {
+                                Value  += (String[StartPosition + CodePoint] - 0x37);
+                            }
+                        }
                     }
                 }
                 CodePoint      += 1;
@@ -3137,7 +3130,7 @@ extern "C" {
                                 } else {
                                     Details->Specifiers[Specifier].MinWidthFlag = MinWidth_Digits;
                                     // Convert (Details->Specifiers[Specifier].TypeModifier) to (StringIOBases)
-                                    uint64_t Digits = ExtractDigitsFromFormatString(Format, ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Range + 1);
+                                    uint64_t Digits = UTF32_ExtractDigits(Format, ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Range + 1);
                                     Details->Specifiers[Specifier].MinWidth     = Digits;
                                 }
                                 
@@ -3146,7 +3139,7 @@ extern "C" {
                                         Details->Specifiers[Specifier].PrecisionFlag = Precision_Dot_Asterisk_NextArg;
                                     } else {
                                         Details->Specifiers[Specifier].PrecisionFlag = Precision_Dot_Number;
-                                        uint64_t Digits = ExtractDigitsFromFormatString(Format, ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Range + 1);
+                                        uint64_t Digits = UTF32_ExtractDigits(Format, ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Range + 1);
                                         Details->Specifiers[Specifier].Precision     = Digits;
                                     }
                                 }
@@ -3783,10 +3776,125 @@ extern "C" {
         return Format32;
     }
     
-    static UTF32 **DeformatString_UTF32(UTF32 *Format, FormatSpecifiers *Details) {
-        UTF32 **Deformatted = NULL;
-        
-        return Deformatted;
+    static uint64_t UTF32_CountNumDigits(UTF32 *String, uint64_t Offset, StringIOBases Base) {
+        uint64_t NumDigits      = 0ULL;
+        if (String != NULL) {
+            uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
+            if ((Base & Integer) == Integer) {
+                if ((Base & Base2) == Base2) {
+                    for (uint64_t CodePoint = Offset; CodePoint < StringSize; CodePoint++) {
+                        for (uint8_t Base2CodePoint = 0; Base2CodePoint < 2; Base2CodePoint++) {
+                            if (String[CodePoint] == StringIOIntegerBase2Table[Base2CodePoint]) {
+                                NumDigits += 1;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                } else if ((Base & Base8) == Base8) {
+                    for (uint64_t CodePoint = Offset; CodePoint < StringSize; CodePoint++) {
+                        for (uint8_t Base8CodePoint = 0; Base8CodePoint < 8; Base8CodePoint++) {
+                            if (String[CodePoint] == StringIOIntegerBase8Table[Base8CodePoint]) {
+                                NumDigits += 1;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                } else if ((Base & Base10) == Base10) {
+                    for (uint64_t CodePoint = Offset; CodePoint < StringSize; CodePoint++) {
+                        for (uint8_t Base10CodePoint = 0; Base10CodePoint < 10; Base10CodePoint++) {
+                            if (String[CodePoint] == StringIOIntegerBase10Table[Base10CodePoint]) {
+                                NumDigits += 1;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                } else if ((Base & Base16) == Base16) {
+                    if ((Base & Uppercase) == Uppercase) {
+                        for (uint64_t CodePoint = Offset; CodePoint < StringSize; CodePoint++) {
+                            for (uint8_t Base16UCodePoint = 0; Base16UCodePoint < 16; Base16UCodePoint++) {
+                                if (String[CodePoint] == StringIOIntegerBase16UppercaseTable[Base16UCodePoint]) {
+                                    NumDigits += 1;
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                    } else if ((Base & Lowercase) == Lowercase) {
+                        for (uint64_t CodePoint = Offset; CodePoint < StringSize; CodePoint++) {
+                            for (uint8_t Base16LCodePoint = 0; Base16LCodePoint < 16; Base16LCodePoint++) {
+                                if (String[CodePoint] == StringIOIntegerBase16LowercaseTable[Base16LCodePoint]) {
+                                    NumDigits += 1;
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if ((Base & Decimal) == Decimal) {
+                if ((Base & Uppercase) == Uppercase) {
+                    if (((Base & Scientific) == Scientific) || ((Base & Shortest) == Shortest)) { // 1.844674E+19, or regular decimal
+                        for (uint64_t CodePoint = Offset; CodePoint < StringSize; CodePoint++) {
+                            for (uint8_t ScientificCodePoint = 0; ScientificCodePoint < 14; ScientificCodePoint++) {
+                                if (String[CodePoint] == StringIODecimalScientificUppercase[ScientificCodePoint]) {
+                                    NumDigits += 1;
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                    } else if ((Base & Hex) == Hex) {
+                        for (uint64_t CodePoint = Offset; CodePoint < StringSize; CodePoint++) {
+                            for (uint8_t HexCodePoint = 0; HexCodePoint < 21; HexCodePoint++) {
+                                if (String[CodePoint] == StringIODecimalHexUppercase[HexCodePoint]) {
+                                    NumDigits += 1;
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } else if ((Base & Lowercase) == Lowercase) {
+                    if (((Base & Scientific) == Scientific) || ((Base & Shortest) == Shortest)) { // 1.844674E+19, or regular decimal
+                        for (uint64_t CodePoint = Offset; CodePoint < StringSize; CodePoint++) {
+                            for (uint8_t ScientificCodePoint = 0; ScientificCodePoint < 14; ScientificCodePoint++) {
+                                if (String[CodePoint] == StringIODecimalScientificLowercase[ScientificCodePoint]) {
+                                    NumDigits += 1;
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                    } else if ((Base & Hex) == Hex) {
+                        for (uint64_t CodePoint = Offset; CodePoint < StringSize; CodePoint++) {
+                            for (uint8_t HexCodePoint = 0; HexCodePoint < 21; HexCodePoint++) {
+                                if (String[CodePoint] == StringIODecimalHexLowercase[HexCodePoint]) {
+                                    NumDigits += 1;
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    for (uint64_t CodePoint = Offset; CodePoint < StringSize; CodePoint++) {
+                        for (uint8_t DecimalCodePoint = 0; DecimalCodePoint < 11; DecimalCodePoint++) {
+                            if (String[CodePoint] == StringIODecimalTable[DecimalCodePoint]) {
+                                NumDigits += 1;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (String == NULL) {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return NumDigits;
     }
     
     UTF8 **UTF8_DeformatString(UTF8 *Format, UTF8 *Source) {
