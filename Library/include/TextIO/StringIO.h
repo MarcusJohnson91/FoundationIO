@@ -608,6 +608,33 @@ extern "C" {
     UTF32                *UTF32_RemoveSubString(UTF32 *String, UTF32 *SubString2Remove, uint64_t Instance2Remove);
     
     /*!
+     @abstract                             "Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence".
+     @remark                               "The caller needs to handle casefolding and normalization".
+     @param               String           "The string to check".
+     @param               Substring        "The substring to check".
+     @return                               "Returns whether Substring matches at the given offsets".
+     */
+    bool                  UTF8_CompareSubString(UTF8 *String, UTF8 *Substring, uint64_t StringOffset, uint64_t SubstringOffset);
+    
+    /*!
+     @abstract                             "Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence".
+     @remark                               "The caller needs to handle casefolding and normalization".
+     @param               String           "The string to check".
+     @param               Substring        "The substring to check".
+     @return                               "Returns whether Substring matches at the given offsets".
+     */
+    bool                  UTF16_CompareSubString(UTF16 *String, UTF16 *Substring, uint64_t StringOffset, uint64_t SubstringOffset);
+    
+    /*!
+     @abstract                             "Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence".
+     @remark                               "The caller needs to handle casefolding and normalization".
+     @param               String           "The string to check".
+     @param               Substring        "The substring to check".
+     @return                               "Returns whether Substring matches at the given offsets".
+     */
+    bool                  UTF32_CompareSubString(UTF32 *String, UTF32 *Substring, uint64_t StringOffset, uint64_t SubstringOffset);
+    
+    /*!
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
      @remark                               "Replaces strtok from the standard library".
      @param               String           "The string you want to be split".
@@ -744,33 +771,6 @@ extern "C" {
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
     UTF32                *UTF32_Trim(UTF32 *String, TrimStringTypes Type, UTF32 **Strings2Remove);
-    
-    /*!
-     @abstract                             "Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence".
-     @remark                               "The caller needs to handle casefolding and normalization".
-     @param               String           "The string to check".
-     @param               Substring        "The substring to check".
-     @return                               "Returns whether Substring matches at the given offsets".
-     */
-    bool                  UTF8_CompareSubstring(UTF8 *String, UTF8 *Substring, uint64_t StringOffset, uint64_t SubstringOffset);
-    
-    /*!
-     @abstract                             "Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence".
-     @remark                               "The caller needs to handle casefolding and normalization".
-     @param               String           "The string to check".
-     @param               Substring        "The substring to check".
-     @return                               "Returns whether Substring matches at the given offsets".
-     */
-    bool                  UTF16_CompareSubstring(UTF16 *String, UTF16 *Substring, uint64_t StringOffset, uint64_t SubstringOffset);
-    
-    /*!
-     @abstract                             "Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence".
-     @remark                               "The caller needs to handle casefolding and normalization".
-     @param               String           "The string to check".
-     @param               Substring        "The substring to check".
-     @return                               "Returns whether Substring matches at the given offsets".
-     */
-    bool                  UTF32_CompareSubstring(UTF32 *String, UTF32 *Substring, uint64_t StringOffset, uint64_t SubstringOffset);
     
     /*!
      @abstract                             "Copies the String".
