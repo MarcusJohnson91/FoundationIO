@@ -6,11 +6,12 @@
 CreateOutputFileTop() {
     printf "#include <stdint.h>\n\n" >> "$OutputFile"
     printf "#ifndef   FoundationIO_StringType32\n" >> "$OutputFile"
-    printf "#define   FoundationIO_StringType32\n\n" >> "$OutputFile"
+    printf "#define   FoundationIO_StringType32\n" >> "$OutputFile"
     printf "#ifdef    UTF32\n" >> "$OutputFile"
     printf "#undef    UTF32\n" >> "$OutputFile"
     printf "#endif /* UTF32 */\n" >> "$OutputFile"
-    printf "#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (! defined __APPLE__) && (! defined __MACH__))\n" >> "$OutputFile"
+    echo   "#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (!defined __APPLE__) && (!defined __MACH__)" >> "$OutputFile"
+    # Printf doesn't want to work with the precending Macro, so this is my shitty workaround.
     printf "typedef   char32_t       UTF32;\n" >> "$OutputFile"
     printf "#else\n" >> "$OutputFile"
     printf "typedef   uint_least32_t UTF32;\n" >> "$OutputFile"
@@ -302,7 +303,7 @@ else
         exit 0
     fi
 
-    if [ "$HeaderUnicodeVMajor" -lt "$ReadmeUnicodeVMajor" ] && (( [ "$HeaderUnicodeVMajor" -eq "$ReadmeUnicodeVMajor" ] && [ "$HeaderUnicodeVMinor" -lt "$ReadmeUnicodeVMinor" ] )) && (( [ "$HeaderUnicodeVMajor" -eq "$ReadmeUnicodeVMajor" ] && [ "$HeaderUnicodeVMinor" -eq "$ReadmeUnicodeVMinor" ] && [ "$HeaderUnicodeVPatch" -lt "$ReadmeUnicodeVPatch" ] )); then
+    if [ "$HeaderUnicodeVMajor" -lt "$ReadmeUnicodeVMajor" ] || (( [ "$HeaderUnicodeVMajor" -eq "$ReadmeUnicodeVMajor" ] && [ "$HeaderUnicodeVMinor" -lt "$ReadmeUnicodeVMinor" ] )) || (( [ "$HeaderUnicodeVMajor" -eq "$ReadmeUnicodeVMajor" ] && [ "$HeaderUnicodeVMinor" -eq "$ReadmeUnicodeVMinor" ] && [ "$HeaderUnicodeVPatch" -lt "$ReadmeUnicodeVPatch" ] )); then
         ZipFileSize=$(curl -sI "https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" | grep "Content-Length: " | awk '{printf $2}' | sed "s/$(printf '\r')\$//")
         if [ "$ZipFileSize" -lt "$FreeSpaceInBytes" ]; then
             curl -s -N "https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" -o "$UCD_Folder/ucd.all.flat.zip"
