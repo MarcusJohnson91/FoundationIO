@@ -1237,6 +1237,80 @@ extern "C" {
         return ExtractedString;
     }
     
+    UTF8 *UTF8_ExtractGrapheme(UTF8 *String, uint64_t Grapheme2Extract) {
+        UTF8 *Grapheme        = NULL;
+        if (String != NULL) {
+            UTF32 *String32   = UTF8_Decode(String);
+            UTF32 *Grapheme32 = UTF32_ExtractGrapheme(String32, Grapheme2Extract);
+            free(String32);
+            Grapheme          = UTF8_Encode(Grapheme32);
+            free(Grapheme32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Grapheme;
+    }
+    
+    UTF16 *UTF16_ExtractGrapheme(UTF16 *String, uint64_t Grapheme2Extract) {
+        UTF16 *Grapheme        = NULL;
+        if (String != NULL) {
+            UTF32 *String32   = UTF16_Decode(String);
+            UTF32 *Grapheme32 = UTF32_ExtractGrapheme(String32, Grapheme2Extract);
+            free(String32);
+            Grapheme          = UTF16_Encode(Grapheme32);
+            free(Grapheme32);
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Grapheme;
+    }
+    
+    UTF32 *UTF32_ExtractGrapheme(UTF32 *String, uint64_t Grapheme2Extract) {
+        UTF32 *Grapheme                    = NULL;
+        if (String != NULL) {
+            uint64_t NumCodePointsInString = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t NumGraphemesInString  = UTF32_GetStringSizeInGraphemes(String);
+            uint64_t CurrentGrapheme       = 0ULL;
+            uint64_t CodePointStart        = 0ULL;
+            if (Grapheme2Extract < NumGraphemesInString) {
+                for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePointsInString - 1; CodePoint++) {
+                    for (uint64_t GraphemeCodePoint = 0ULL; GraphemeCodePoint < GraphemeExtensionTableSize - 1; GraphemeCodePoint++) {
+                        if (String[CodePoint] == GraphemeExtensionTable[GraphemeCodePoint]) {
+                            CurrentGrapheme                         += 1;
+                        }
+                        if (CurrentGrapheme == Grapheme2Extract) {
+                            CodePointStart                           = CodePoint;
+                            break;
+                        }
+                    }
+                }
+                uint64_t GraphemeSizeInCodePoints                    = 0ULL;
+                for (uint64_t CodePoint = CodePointStart; CodePoint < NumCodePointsInString - 1; CodePoint++) {
+                    for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize - 1; GraphemeExtension++) {
+                        if (String[CodePoint] == GraphemeExtensionTable[GraphemeExtension]) {
+                            GraphemeSizeInCodePoints                += 1;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                Grapheme                                             = calloc(GraphemeSizeInCodePoints, sizeof(UTF32));
+                if (Grapheme != NULL) {
+                    for (uint64_t GraphemeCodePoint = CodePointStart; GraphemeCodePoint < CodePointStart + GraphemeSizeInCodePoints; GraphemeCodePoint++) {
+                        Grapheme[GraphemeCodePoint - CodePointStart] = String[GraphemeCodePoint];
+                    }
+                } else {
+                    Log(Log_ERROR, __func__, U8("Couldn't allocate %llu CodePoints for the Grapheme"), GraphemeSizeInCodePoints);
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Grapheme %llu is greater than there are Graphemes %llu"), Grapheme2Extract, NumGraphemesInString);
+            }
+        } else {
+            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+        }
+        return Grapheme;
+    }
+    
     UTF8  *UTF8_ReplaceSubString(UTF8 *String, UTF8 *Replacement, uint64_t Offset, uint64_t Length) {
         UTF8 *Replaced8          = NULL;
         if (String != NULL && Replacement != NULL && Length >= 1) {

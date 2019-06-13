@@ -536,6 +536,27 @@ extern "C" {
     UTF32                *UTF32_ExtractSubString(UTF32 *String, uint64_t Offset, uint64_t Length);
     
     /*!
+     @abstract                             "Extracts a Grapheme from String".
+     @param               String           "The string to extract from".
+     @param               Grapheme         "The Grapheme to start extracting from".
+     */
+    UTF8                 *UTF8_ExtractGrapheme(UTF8 *String, uint64_t Grapheme);
+    
+    /*!
+     @abstract                             "Extracts a Grapheme from String".
+     @param               String           "The string to extract from".
+     @param               Grapheme         "The Grapheme to start extracting from".
+     */
+    UTF16                *UTF16_ExtractGrapheme(UTF16 *String, uint64_t Grapheme);
+    
+    /*!
+     @abstract                             "Extracts a Grapheme from String".
+     @param               String           "The string to extract from".
+     @param               Grapheme         "The Grapheme to start extracting from".
+     */
+    UTF32                *UTF32_ExtractGrapheme(UTF32 *String, uint64_t Grapheme);
+    
+    /*!
      @abstract                             "Replaces a section in String starting at Offset and ending at Offset + Length with Replacement".
      @param               String           "The string to edit".
      @param               Replacement      "The string to splice in".
