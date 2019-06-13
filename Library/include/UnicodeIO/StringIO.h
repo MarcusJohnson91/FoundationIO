@@ -1008,7 +1008,7 @@ extern "C" {
      @param               Source           "The string to extract the information from".
      @return                               "Returns a StringArray containing NumFormatSpecifiers strings, one string for each specifier".
      */
-    UTF8                **UTF8_DeformatString(UTF8 *Format, UTF8 *Source);
+    UTF8                **UTF8_Deformat(UTF8 *Format, UTF8 *Source);
     
     /*!
      @abstract                             "Splits a string based on the specifiers in Format".
@@ -1017,7 +1017,7 @@ extern "C" {
      @param               Source           "The string to extract the information from".
      @return                               "Returns a StringArray containing NumFormatSpecifiers strings, one string for each specifier".
      */
-    UTF16               **UTF16_DeformatString(UTF16 *Format, UTF16 *Source);
+    UTF16               **UTF16_Deformat(UTF16 *Format, UTF16 *Source);
     
     /*!
      @abstract                             "Splits a string based on the specifiers in Format".
@@ -1026,7 +1026,7 @@ extern "C" {
      @param               Source           "The string to extract the information from".
      @return                               "Returns a StringArray containing NumFormatSpecifiers strings, one string for each specifier".
      */
-    UTF32               **UTF32_DeformatString(UTF32 *Format, UTF32 *Source);
+    UTF32               **UTF32_Deformat(UTF32 *Format, UTF32 *Source);
     
     /*!
      @abstract                             "Initalizes a UTF-8 encoded StringArray".
