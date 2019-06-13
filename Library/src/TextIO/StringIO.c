@@ -3783,7 +3783,7 @@ extern "C" {
         return Formatted;
     }
     
-    UTF8 *UTF8_FormatString(UTF8 *Format, ...) {
+    UTF8 *UTF8_Format(UTF8 *Format, ...) {
         UTF8 *Format8                     = NULL;
         if (Format != NULL) {
             uint64_t NumSpecifiers        = UTF8_GetNumFormatSpecifiers(Format);
@@ -3806,7 +3806,7 @@ extern "C" {
         return Format8;
     }
     
-    UTF16 *UTF16_FormatString(UTF16 *Format, ...) {
+    UTF16 *UTF16_Format(UTF16 *Format, ...) {
         UTF16 *Format16                   = NULL;
         if (Format != NULL) {
             uint64_t NumSpecifiers        = UTF16_GetNumFormatSpecifiers(Format);
@@ -3829,7 +3829,7 @@ extern "C" {
         return Format16;
     }
     
-    UTF32 *UTF32_FormatString(UTF32 *Format, ...) {
+    UTF32 *UTF32_Format(UTF32 *Format, ...) {
         UTF32 *Format32                   = NULL;
         if (Format != NULL) {
             uint64_t NumSpecifiers        = UTF32_GetNumFormatSpecifiers(Format);

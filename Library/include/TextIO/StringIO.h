@@ -957,13 +957,13 @@ extern "C" {
      @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
 #if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
-    UTF8                 *UTF8_FormatString(UTF8 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+    UTF8                 *UTF8_Format(UTF8 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
 #elif defined(_MSC_VER)
 #include <sal.h>
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    UTF8                 *UTF8_FormatString(__format_string UTF8 *Format, ...);
+    UTF8                 *UTF8_Format(__format_string UTF8 *Format, ...);
 #elif    (_MSC_VER >= 1500)
-    UTF8                 *UTF8_FormatString(_Printf_format_string_ UTF8 *Format, ...);
+    UTF8                 *UTF8_Format(_Printf_format_string_ UTF8 *Format, ...);
 #endif /* MSVC Version */
 #endif /* Compiler */
     
@@ -974,13 +974,13 @@ extern "C" {
      @return                               "Returns the formatted string encoded using the UTF-16 format".
      */
 #if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
-    UTF16                *UTF16_FormatString(UTF16 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+    UTF16                *UTF16_Format(UTF16 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
 #elif defined(_MSC_VER)
 #include <sal.h>
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    UTF16                *UTF16_FormatString(__format_string UTF16 *Format, ...);
+    UTF16                *UTF16_Format(__format_string UTF16 *Format, ...);
 #elif    (_MSC_VER >= 1500)
-    UTF16                *UTF16_FormatString(_Printf_format_string_ UTF16 *Format, ...);
+    UTF16                *UTF16_Format(_Printf_format_string_ UTF16 *Format, ...);
 #endif /* MSVC Version */
 #endif /* Compiler */
     
@@ -991,13 +991,13 @@ extern "C" {
      @return                               "Returns the formatted string encoded using the UTF-32 format".
      */
 #if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
-    UTF32                *UTF32_FormatString(UTF32 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+    UTF32                *UTF32_Format(UTF32 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
 #elif defined(_MSC_VER)
 #include <sal.h>
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    UTF32                *UTF32_FormatString(__format_string UTF32 *Format, ...);
+    UTF32                *UTF32_Format(__format_string UTF32 *Format, ...);
 #elif    (_MSC_VER >= 1500)
-    UTF32                *UTF32_FormatString(_Printf_format_string_ UTF32 *Format, ...);
+    UTF32                *UTF32_Format(_Printf_format_string_ UTF32 *Format, ...);
 #endif /* MSVC Version */
 #endif /* Compiler */
     
@@ -1183,7 +1183,7 @@ extern "C" {
     
 #define StringHasBOM(String)              _Generic((String), UTF8:UTF8_HasBOM, UTF8*:UTF8_HasBOM, UTF16:UTF16_HasBOM, UTF16*:UTF16_HasBOM, UTF32:UTF32_HasBOM, UTF32*:UTF32_HasBOM)(String)
     
-#define FormatString(String, ...)         _Generic((String), UTF8:UTF8_FormatString, UTF8*:UTF8_FormatString, UTF16:UTF16_FormatString, UTF16*:UTF16_FormatString, UTF32:UTF32_FormatString, UTF32*:UTF32_FormatString)(String, ...)
+#define FormatString(String, ...)         _Generic((String), UTF8:UTF8_Format, UTF8*:UTF8_Format, UTF16:UTF16_Format, UTF16*:UTF16_Format, UTF32:UTF32_Format, UTF32*:UTF32_Format)(String, ...)
     
 #define GetNumFormatSpecifiers(String)    _Generic((String), UTF8:UTF8_GetNumFormatSpecifiers, UTF8*:UTF8_GetNumFormatSpecifiers, UTF16:UTF16_GetNumFormatSpecifiers, UTF16*:UTF16_GetNumFormatSpecifiers, UTF32:UTF32_GetNumFormatSpecifiers, UTF32*:UTF32_GetNumFormatSpecifiers)(String)
     
