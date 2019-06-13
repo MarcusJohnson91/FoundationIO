@@ -302,7 +302,7 @@ else
         exit 0
     fi
 
-    if [ "$HeaderUnicodeVMajor" -lt "$ReadmeUnicodeVMajor" ] || (( [ "$HeaderUnicodeVMajor" -eq "$ReadmeUnicodeVMajor" ] && [ "$HeaderUnicodeVMinor" -lt "$ReadmeUnicodeVMinor" ] )) || (( [ "$HeaderUnicodeVMajor" -eq "$ReadmeUnicodeVMajor" ] && [ "$HeaderUnicodeVMinor" -eq "$ReadmeUnicodeVMinor" ] && [ "$HeaderUnicodeVPatch" -lt "$ReadmeUnicodeVPatch" ] )); then
+    if [ "$HeaderUnicodeVMajor" -lt "$ReadmeUnicodeVMajor" ] && (( [ "$HeaderUnicodeVMajor" -eq "$ReadmeUnicodeVMajor" ] && [ "$HeaderUnicodeVMinor" -lt "$ReadmeUnicodeVMinor" ] )) && (( [ "$HeaderUnicodeVMajor" -eq "$ReadmeUnicodeVMajor" ] && [ "$HeaderUnicodeVMinor" -eq "$ReadmeUnicodeVMinor" ] && [ "$HeaderUnicodeVPatch" -lt "$ReadmeUnicodeVPatch" ] )); then
         ZipFileSize=$(curl -sI "https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" | grep "Content-Length: " | awk '{printf $2}' | sed "s/$(printf '\r')\$//")
         if [ "$ZipFileSize" -lt "$FreeSpaceInBytes" ]; then
             curl -s -N "https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" -o "$UCD_Folder/ucd.all.flat.zip"
