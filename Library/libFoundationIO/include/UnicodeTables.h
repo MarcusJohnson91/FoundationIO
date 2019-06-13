@@ -1,15 +1,27 @@
-#include "StringIO.h" /* Included for our declarations */
+#include <stdint.h>
+
+#ifndef   FoundationIO_StringType32
+#define   FoundationIO_StringType32
+#ifdef    UTF32
+#undef    UTF32
+#endif /* UTF32 */
+#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (!defined __APPLE__) && (!defined __MACH__)
+typedef   char32_t       UTF32;
+#else
+typedef   uint_least32_t UTF32;
+#endif /* __CHAR32_TYPE__ */
+#endif /* FoundationIO_StringType32 */
 
 #pragma once
 
-#ifndef FoundationIO_StringIOTables_H
-#define FoundationIO_StringIOTables_H
+#ifndef FoundationIO_UnicodeTables_H
+#define FoundationIO_UnicodeTables_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define UnicodeVersion 12.0.0
+#define UnicodeVersion 12.1.0
 
 #define BiDirectionalControlsTableSize 12
 
@@ -27,7 +39,7 @@ extern "C" {
 
 #define KompatibleNormalizationTableSize 2046
 
-#define CaseFoldTableSize 6141
+#define CaseFoldTableSize 6142
 
 #define CanonicalNormalizationTableSize 13232
 
@@ -12968,6 +12980,7 @@ extern "C" {
         0x0032FC,
         0x0032FD,
         0x0032FE,
+        0x0032FF,
         0x003300,
         0x003301,
         0x003302,
@@ -19112,6 +19125,7 @@ extern "C" {
         U"\u30F0",
         U"\u30F1",
         U"\u30F2",
+        U"\u4EE4\u548C",
         U"\u30A2\u30D1\u30FC\u30C8",
         U"\u30A2\u30EB\u30D5\u30A1",
         U"\u30A2\u30F3\u30DA\u30A2",
@@ -49640,4 +49654,4 @@ extern "C" {
 }
 #endif /* C++ */
 
-#endif /* FoundationIO_StringIOTables_H */
+#endif /* FoundationIO_UnicodeTables_H */
