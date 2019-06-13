@@ -20,7 +20,7 @@ extern "C" {
         return TestPassed;
     }
     
-    bool UTF8_TrimStringTest(void) {
+    bool UTF8_TrimTest(void) {
         bool TestPassed = true;
         /*
          Create a string with whitespace that needs to be cut down to size

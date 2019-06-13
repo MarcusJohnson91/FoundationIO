@@ -119,15 +119,15 @@ extern "C" {
         
         va_list VariadicArguments;
         va_start(VariadicArguments, Description);
-        UTF8 *VariadicString = UTF8_FormatString(Description, VariadicArguments);
+        UTF8 *VariadicString = UTF8_Format(Description, VariadicArguments);
         va_end(VariadicArguments);
         
         if (Log_ProgramName != NULL) {
-            UTF8  *FormattedString = UTF8_FormatString(U8("%s: %s in %s: \"%s\"%s"), Log_ProgramName, ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
+            UTF8  *FormattedString = UTF8_Format(U8("%s: %s in %s: \"%s\"%s"), Log_ProgramName, ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
             UTF8_WriteLine(FormattedString, Log_LogFile == NULL ? stderr : Log_LogFile);
             free(FormattedString);
         } else {
-            UTF8  *FormattedString = UTF8_FormatString(U8("%s in %s: \"%s\"%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
+            UTF8  *FormattedString = UTF8_Format(U8("%s in %s: \"%s\"%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
             UTF8_WriteLine(FormattedString, Log_LogFile == NULL ? stderr : Log_LogFile);
             free(FormattedString);
         }
