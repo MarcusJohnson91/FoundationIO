@@ -505,7 +505,7 @@ extern "C" {
                     uint16_t Section4    = (uint16_t) BitBuffer_ReadBits(BitB, ByteOrder, LSBitFirst, 16);
                     BitBuffer_Seek(BitB, 8);
                     uint64_t Section5    = (uint64_t) BitBuffer_ReadBits(BitB, ByteOrder, LSBitFirst, 48);
-                    GUUID                = UTF8_FormatString(U8("%d-%d-%d-%d-%llu"), Section1, Section2, Section3, Section4, Section5);
+                    GUUID                = UTF8_Format(U8("%d-%d-%d-%d-%llu"), Section1, Section2, Section3, Section4, Section5);
                 } else {
                     Log(Log_ERROR, __func__, U8("Couldn't allocate UUIDString"));
                 }
