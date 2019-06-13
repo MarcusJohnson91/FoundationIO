@@ -2227,12 +2227,12 @@ extern "C" {
     }
     /* Number Conversions */
     
-    bool UTF8_CompareSubstring(UTF8 *String, UTF8 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
+    bool UTF8_CompareSubString(UTF8 *String, UTF8 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
         bool SubstringMatchesAtOffset = No;
         if (String != NULL && Substring != NULL) {
             UTF32 *String32           = UTF8_Decode(String);
             UTF32 *Sub32              = UTF8_Decode(Substring);
-            SubstringMatchesAtOffset  = UTF32_CompareSubstring(String32, Sub32, StringOffset, SubstringOffset);
+            SubstringMatchesAtOffset  = UTF32_CompareSubString(String32, Sub32, StringOffset, SubstringOffset);
             free(String32);
             free(Sub32);
         } else if (String == NULL) {
@@ -2243,12 +2243,12 @@ extern "C" {
         return SubstringMatchesAtOffset;
     }
     
-    bool UTF16_CompareSubstring(UTF16 *String, UTF16 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
+    bool UTF16_CompareSubString(UTF16 *String, UTF16 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
         bool SubstringMatchesAtOffset = No;
         if (String != NULL && Substring != NULL) {
             UTF32 *String32           = UTF16_Decode(String);
             UTF32 *Sub32              = UTF16_Decode(Substring);
-            SubstringMatchesAtOffset  = UTF32_CompareSubstring(String32, Sub32, StringOffset, SubstringOffset);
+            SubstringMatchesAtOffset  = UTF32_CompareSubString(String32, Sub32, StringOffset, SubstringOffset);
             free(String32);
             free(Sub32);
         } else if (String == NULL) {
@@ -2259,7 +2259,7 @@ extern "C" {
         return SubstringMatchesAtOffset;
     }
     
-    bool UTF32_CompareSubstring(UTF32 *String, UTF32 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
+    bool UTF32_CompareSubString(UTF32 *String, UTF32 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
         bool SubstringMatchesAtOffset            = Yes;
         if (String != NULL && Substring != NULL) {
             uint64_t StringSize                  = UTF32_GetStringSizeInCodePoints(String);
@@ -2334,7 +2334,7 @@ extern "C" {
             if (Type == TrimString_RemoveAll) {
                 for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
                     for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
-                        bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                        bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
                         if (SubstringFound) {
                             NumRemovalPoints += 1;
                         }
@@ -2346,7 +2346,7 @@ extern "C" {
                 
                 for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
                     for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
-                        bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                        bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
                         if (SubstringFound) {
                             RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
                             RemovalPointsEnd[CurrentRemovalPoint]   = RemovalStringSizes[RemovalString];
@@ -2359,7 +2359,7 @@ extern "C" {
                     // Loop over all the codepoints until you find one that is not on the list, then remove it; BUT JUST FOR THE BEGINNING AND END
                     for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
                         for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
-                            bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                            bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
                             if (SubstringFound) {
                                 NumRemovalPoints += 1;
                             }
@@ -2371,7 +2371,7 @@ extern "C" {
                     
                     for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
                         for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
-                            bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                            bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
                             if (SubstringFound) {
                                 RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
                                 RemovalPointsEnd[CurrentRemovalPoint]   = RemovalStringSizes[RemovalString];
@@ -2384,7 +2384,7 @@ extern "C" {
                     // Loop over all the codepoints until you find one that is not on the list, then remove it.
                     for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
                         for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
-                            bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                            bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
                             if (SubstringFound) {
                                 NumRemovalPoints += 1;
                             }
@@ -2396,7 +2396,7 @@ extern "C" {
                     
                     for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
                         for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
-                            bool SubstringFound                         = UTF32_CompareSubstring(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                            bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
                             if (SubstringFound) {
                                 RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
                                 RemovalPointsEnd[CurrentRemovalPoint]   = RemovalStringSizes[RemovalString];
