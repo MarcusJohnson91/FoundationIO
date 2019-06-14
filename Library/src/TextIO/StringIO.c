@@ -1,6 +1,6 @@
 #include "../include/Macros.h"         /* Included for FoundationIO's macros */
 #include "../include/StringIO.h"       /* Included for our declarations */
-#include "../include/UnicodeTables.h"  /* Included for the tables, and StringIO declarations, NEEDS TO BE FIRST? */
+#include "../include/UnicodeTables.h"  /* Included for the Unicode tables */
 
 #include "../include/Log.h"            /* Included for error logging */
 #include "../include/Math.h"           /* Included for endian swapping */
@@ -1105,37 +1105,8 @@ extern "C" {
         return Reverse;
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    /* API Design: All UTF-32 Strings will contain a BOM that we create anyway. */
-    
-    /* Basic String Property Functions */
-    /* Basic String Property Functions */
-    
-    
-    
-    /* Medium Functions */
     int64_t UTF8_FindSubString(UTF8 *String, UTF8 *SubString, uint64_t Offset, int64_t Length) {
-        int64_t FoundOffset = 0LL;
+        int64_t FoundOffset    = 0LL;
         if (String != NULL && SubString != NULL) {
             UTF32 *String32    = UTF8_Decode(String);
             UTF32 *SubString32 = UTF8_Decode(SubString);
@@ -1586,9 +1557,7 @@ extern "C" {
         }
         return Inserted;
     }
-    /* Medium Functions */
     
-    /* Fancy functions */
     UTF8 *UTF8_CaseFold(UTF8 *String) {
         UTF8 *CaseFolded      = NULL;
         if (String != NULL) {
@@ -1822,9 +1791,7 @@ extern "C" {
         }
         return NormalizedString;
     }
-    /* Unicode Functions */
     
-    /* Number Conversions */
     int64_t UTF8_String2Integer(StringIOBases Base, UTF8 *String) { // Replaces atoi, atol, strtol, strtoul,
         int64_t Value = 0LL;
         if (String != NULL) {
@@ -1971,11 +1938,11 @@ extern "C" {
         uint8_t  NumDigits           = 0;
         uint8_t  Radix               = 0;
         
-        if ((Num & 0x8000000000000000) >> 63 == 1) { // Get sign
+        if ((Num & 0x8000000000000000) >> 63 == 1) {
             Sign                     = -1;
         }
         
-        if (Base == (Integer | Base2)) { // Get base
+        if (Base == (Integer | Base2)) {
             Radix                    = 2;
         } else if (Base == (Integer | Base8)) {
             Radix                    = 8;
@@ -1987,7 +1954,7 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("Invalid Base %d"), Base);
         }
         
-        if (Integer2Convert < 0) { // Get the number of output digits
+        if (Integer2Convert < 0) {
             do {
                 Num                 *= Radix;
                 NumDigits           += 1;
@@ -2040,10 +2007,6 @@ extern "C" {
         double   Value         = 0.0;
         bool     IsNegative    = No;
         if (String != NULL) {
-            // Extract the sign bit
-            // Extract the Significand
-            // Extract the Base
-            // Extract the Exponent
             uint64_t CodePoint = 0ULL;
             for (uint8_t Whitespace = 0; Whitespace < WhiteSpaceTableSize; Whitespace++) {
                 if (String[CodePoint] == WhiteSpaceTable[Whitespace]) {
@@ -2055,10 +2018,7 @@ extern "C" {
                 IsNegative = Yes;
             }
             
-            // Example string: 0.000065184798905 aka 1 / 15341
-            
             do {
-                // Now we loop, taking in various characters looking for Decimal digits
                 CodePoint     += 1;
             } while (String[CodePoint] != '.'); // Before the decimal
             
@@ -2067,7 +2027,7 @@ extern "C" {
                     IsNegative = Yes;
                 }
                 CodePoint     += 1;
-            } while (String[CodePoint] != StringIONULLTerminator); // After the decimal
+            } while (String[CodePoint] != StringIONULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -2096,17 +2056,9 @@ extern "C" {
         int16_t  Exponent2        = AbsoluteD(Exponent);
         int64_t  Mantissa         = ExtractMantissaD(Number);
         int64_t  Mantissa2        = AbsoluteD(Mantissa);
-        bool     IsDenormal       = No;
-        bool     IsNotANumber     = No;
-        bool     IsInfinite       = No;
-        
-        if (Exponent == 0x7FF && Mantissa > 0) {
-            IsNotANumber          = Yes;
-        } else if (Exponent == 0x7FF && Mantissa == 0) {
-            IsInfinite            = Yes;
-        } else if (Exponent == 0 && Mantissa >= 0) {
-            IsDenormal            = Yes;
-        }
+        bool     IsDenormal       = DecimalIsNormal(Number);
+        bool     IsNotANumber     = DecimalIsNotANumber(Number);
+        bool     IsInfinite       = DecimalIsInfinity(Number);
         
         if (IsNotANumber) {
             OutputString          = UTF32_Clone(U32("Not A Number"));
