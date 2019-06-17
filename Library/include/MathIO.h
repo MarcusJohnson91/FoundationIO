@@ -38,6 +38,20 @@ extern "C" {
     bool                        IsOdd(int64_t Integer);
     
     /*!
+     @abstract                                                  "Converts an integer to an array of bytes".
+     @param                     Integer                         "The integer to convert".
+     @param                     Bytes                           "Allocated array of bytes to contain the output bytes".
+     */
+    void                        GetBytesFromInteger(uint64_t Integer, uint8_t *Bytes);
+    
+    /*!
+     @abstract                                                  "Converts an array of bytes to an integer".
+     @param                     Bytes                           "The array of bytes to convert".
+     @return                                                    "Integer".
+     */
+    uint64_t                    GetIntegerFromBytes(uint8_t *Bytes);
+    
+    /*!
      @abstract                                                  "Converts a Float to an integer".
      @param                     Decimal                         "The decimal to convert".
      @return                                                    "Integer representation of the decimal".
@@ -119,25 +133,25 @@ extern "C" {
      */
     int64_t                     RoundD(double Decimal);
     
-#ifdef Min
-#undef Min
+#ifdef Minimum
+#undef Minimum
 #endif
     
     /*!
      @abstract                                                  "Branchless and shiftless Min function".
      @return                                                    "Returns the smaller value".
      */
-    int64_t                     Min(int64_t Integer1, int64_t Integer2);
+    int64_t                     Minimum(int64_t Integer1, int64_t Integer2);
     
-#ifdef Max
-#undef Max
+#ifdef Maximum
+#undef Maximum
 #endif
     
     /*!
      @abstract                                                  "Branchless and shiftless Max function".
      @return                                                    "Returns the larger value".
      */
-    int64_t                     Max(int64_t Integer1, int64_t Integer2);
+    int64_t                     Maximum(int64_t Integer1, int64_t Integer2);
     
     /*!
      @abstract                                                  "Is the decimal normal"?
@@ -398,8 +412,8 @@ extern "C" {
 #define Ceil(Value)                         _Generic((Value),   float:CeilF, double:CeilD)(Value)
 #define Round(Value)                        _Generic((Value),   float:RoundF, double:RoundD)(Value)
 #define DecimalIsNormal(Decimal)            _Generic((Decimal), float:DecimalIsNormalF, double:DecimalIsNormalD)(Decimal)
-#define DecimalIsInfinity(Decimal)          _Generic((Decimal), float:DecimalIsInfinityF, double:DecimalIsInfinityD)(Decimal)
 #define DecimalIsNotANumber(Decimal)        _Generic((Decimal), float:DecimalIsNotANumberF, double:DecimalIsNotANumberD)(Decimal)
+#define DecimalIsInfinity(Decimal)          _Generic((Decimal), float:DecimalIsInfinityF, double:DecimalIsInfinityD)(Decimal)
 #define NumberHasDecimalPoint(Decimal)      _Generic((Decimal), float:NumberHasDecimalPointF, double:NumberHasDecimalPointD)(Decimal)
 #define ExtractSign(Decimal)                _Generic((Decimal), int8_t:ExtractSignI, int16_t:ExtractSignI, int32_t:ExtractSignI, int64_t:ExtractSignI, float:ExtractSignF,     double:ExtractSignD)(Decimal)
 #define ExtractExponent(Decimal)            _Generic((Decimal), float:ExtractExponentF, double:ExtractExponentD)(Decimal)
