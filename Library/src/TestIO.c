@@ -23,6 +23,18 @@ extern "C" {
 #endif
     
     /*
+     Automatic test registration:
+     
+     Have the preprocessor somehow loop over all the test functions in the file and find the ones with TestState_Enabled set?
+     
+     Our logger will include the name of the function when an error or test is message is sent, so if a test passes or fails or whatever it'll tell us the name of the function so we don't need Name.
+     
+     really all we need to know is the number of enabled tests, the number of disabled tests, and the number of tests that passed.
+     
+     Test Enabled/Disabled of Total passed
+     */
+    
+    /*
      Design.
      
      So, we need a way to have there be various comparison functions, and a way to set the expected result, and it needs to be runtime checking not compile time so no macros except make a _Generic comparison function.
@@ -62,12 +74,17 @@ extern "C" {
     }
     
     /*
-     I need a high quality random number generator that is configurable.
+     Algorithm to generate random numbers:
      
-     Being able to specify ranges and possibly even multiple range at once to create random numbers would be VERY useful, especially for testing Unicode strings.
+     Read X bytes for the IV for a random number generator seed.
+     
+     seed a random number generator (good luck finding the deets on how the hell to make a random number generator)
+     
+     Mix the seeded data with AES.
+     
+     boom, you've got a array of random data.
+     
      */
-    
-    /* AES Encryption for Cryptographically ecure Random Number Generation, my idea is to generate a random number, encrypt it with AES, then use that as a seed for another round of random number generation which is finally output to the user, and I don't trust hardware implementations. */
     
     /* API:
      GenerateRandomInteger_Insecure();
@@ -76,71 +93,6 @@ extern "C" {
      GenerateRandomDecimal_Insecure();
      GenerateRandomDecimal_Secure();
      */
-    
-    typedef enum EntropyConstants {
-        AES256Alignment          = 256 / 8,
-        AES192Alignment          = 192 / 8,
-        AES128Alignment          = 128 / 8,
-        AES256Rounds             = 14,
-        AES192Rounds             = 12,
-        AES128Rounds             = 10,
-        AESSubstitutionArraySize = 256,
-    } EntropyConstants;
-    
-    typedef struct Entropy {
-        uint8_t *Data;
-        uint64_t Size;
-        uint64_t Offset;
-    } Entropy;
-    
-    Entropy *Entropy_Init(uint8_t Size) {
-        Entropy *Entropy        = calloc(1, sizeof(Entropy));
-        if (Entropy != NULL) {
-            Entropy->Data       = calloc(Size * AES256Alignment, sizeof(uint8_t));
-            if (Entropy->Data != NULL) {
-                Entropy->Size   = Size * AES256Alignment;
-                Entropy->Offset = 0ULL;
-                /* Now we need to go ahead and get our entropy source, AES it, Mix it, re-AES it, and remix it */
-            } else {
-                Entropy_Deinit(Entropy);
-            }
-        }
-        return Entropy;
-    }
-    
-    static void Entropy_Encrypt(Entropy *Entropy) {
-        if (Entropy != NULL) {
-            
-        } else {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
-        }
-    }
-    
-    static void Entropy_Mix(Entropy *Entropy) {
-        if (Entropy != NULL) {
-            
-        } else {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
-        }
-    }
-    
-    void Entropy_Reseed(Entropy *Entropy) {
-        if (Entropy != NULL) {
-            // Reseed reads from whatever function there is, basically /dev/random on POSIX, AESes it, mixes it, re-AESes it, and re-mixes it.
-            for (uint64_t Byte = 0ULL; Byte < Entropy->Size; Byte++) { // Reset the entropy array
-                Entropy->Data[Byte] = 0;
-            }
-            
-            
-        } else {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
-        }
-    }
-    
-    void Entropy_Deinit(Entropy *Entropy) {
-        free(Entropy->Data);
-        free(Entropy);
-    }
     
 #ifdef __cplusplus
 }
