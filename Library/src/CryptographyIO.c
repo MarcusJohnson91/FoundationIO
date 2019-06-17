@@ -208,23 +208,25 @@ extern "C" {
         uint64_t  BitOffset;
     } Entropy;
     
-    static void Entropy_Seed(Entropy *Entropy) {
-        if (Entropy != NULL) {
-            if (Entropy->EntropyPool != NULL) {
+    static void Entropy_Seed(Entropy *Random) {
+        if (Random != NULL) {
+            if (Random->EntropyPool != NULL) {
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
-                FILE *RandomFile          = fopen("/dev/urandom", "rb");
-                size_t BytesRead          = fread(Entropy->EntropyPool, Entropy->EntropySize, 1, RandomFile);
-                if (BytesRead != Entropy->EntropySize) {
-                    Log(Log_ERROR, __func__, U8("Failed to read random data, Enropy is extremely insecure, aborting"));
-                    abort();
-                }
-                fclose(RandomFile);
+                arc4random_buf(Random->EntropyPool, Random->EntropySize);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-                NTSTATUS Status           = BCryptGenRandom(NULL, Seed->EntropyPool, Entropy->EntropySize, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+                NTSTATUS Status           = BCryptGenRandom(NULL, Random->EntropyPool, Random->EntropySize, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
                 if (Status != STATUS_SUCCESS) {
                     Log(Log_ERROR, __func__, U8("Failed to read random data, Enropy is extremely insecure, aborting"));
                     abort();
                 }
+#else
+                FILE *RandomFile          = fopen("/dev/urandom", "rb");
+                size_t BytesRead          = fread(Random->EntropyPool, Random->EntropySize, 1, RandomFile);
+                if (BytesRead != Random->EntropySize) {
+                    Log(Log_ERROR, __func__, U8("Failed to read random data, Enropy is extremely insecure, aborting"));
+                    abort();
+                }
+                fclose(RandomFile);
 #endif
             }
         } else {
@@ -232,12 +234,12 @@ extern "C" {
         }
     }
     
-    static void Entropy_Mix(Entropy *Entropy) {
-        if (Entropy != NULL) {
+    static void Entropy_Mix(Entropy *Random) {
+        if (Random != NULL) {
             uint8_t *Bytes        = calloc(1, sizeof(uint64_t));
             
-            for (uint64_t Byte1 = 0ULL; Byte1 < (Entropy->EntropySize - 1) / 8; Byte1 += 8) {
-                uint64_t Integer  = GetIntegerFromBytes(&Entropy->EntropyPool[Byte1]);
+            for (uint64_t Byte1 = 0ULL; Byte1 < (Random->EntropySize - 1) / 8; Byte1 += 8) {
+                uint64_t Integer  = GetIntegerFromBytes(&Random->EntropyPool[Byte1]);
                 
                 uint64_t Mixed1   = Integer ^ Entropy_Seed1;
                 uint64_t Rotated1 = RotateLeft(Mixed1, Entropy_Rotate1);
@@ -253,7 +255,7 @@ extern "C" {
                 
                 GetBytesFromInteger(Rotated4, Bytes);
                 for (uint8_t Byte2 = 0; Byte2 < 8; Byte2++) {
-                    Entropy->EntropyPool[Byte1 + Byte2] = Bytes[Byte1 + Byte2];
+                    Random->EntropyPool[Byte1 + Byte2] = Bytes[Byte1 + Byte2];
                 }
             }
         } else {
@@ -261,30 +263,30 @@ extern "C" {
         }
     }
     
-    static uint64_t Entropy_ExtractBits(Entropy *Entropy, uint8_t NumBits) {
+    static uint64_t Entropy_ExtractBits(Entropy *Random, uint8_t NumBits) {
         uint64_t Bits                                 = 0ULL;
-        if (Entropy != NULL) {
-            if (Entropy->BitOffset >= NumBits) {
+        if (Random != NULL) {
+            if (NumBits < Bytes2Bits(Random->EntropySize) - Random->BitOffset) {
                 uint64_t Bits2Read                    = NumBits;
                 do {
-                    uint64_t EntropyByte              = Bits2Bytes(Entropy->BitOffset, No);
-                    uint8_t  BitsInEntropyByte        = 8 - (Entropy->BitOffset % 8);
+                    uint64_t EntropyByte              = Bits2Bytes(Random->BitOffset, No);
+                    uint8_t  BitsInEntropyByte        = 8 - (Random->BitOffset % 8);
                     uint8_t  Bits2ReadFromEntropyByte = 8 - (NumBits % 8);
                     uint8_t  Bits2Get                 = Minimum(BitsInEntropyByte, Bits2ReadFromEntropyByte);
                     Bits                            <<= Bits2Get;
 #if  (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                    Bits                              = Entropy->EntropyPool[EntropyByte] << CreateBitMaskLSBit(Bits2Get);
+                    Bits                              = Random->EntropyPool[EntropyByte] << CreateBitMaskLSBit(Bits2Get);
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                    Bits                              = Entropy->EntropyPool[EntropyByte] >> CreateBitMaskMSBit(Bits2Get);
+                    Bits                              = Random->EntropyPool[EntropyByte] >> CreateBitMaskMSBit(Bits2Get);
 #endif
                     Bits2Read                        -= Bits2Get;
                 } while (Bits2Read > 0);
-                Entropy->BitOffset                   += Bits2Read;
+                Random->BitOffset                    += Bits2Read;
             } else {
-                Entropy_Erase(Entropy);
-                Entropy_Seed(Entropy);
-                Entropy_Mix(Entropy);
-                Bits = Entropy_ExtractBits(Entropy, NumBits);
+                Entropy_Erase(Random);
+                Entropy_Seed(Random);
+                Entropy_Mix(Random);
+                Bits = Entropy_ExtractBits(Random, NumBits);
             }
         } else {
             Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
@@ -293,53 +295,55 @@ extern "C" {
     }
     
     Entropy *Entropy_Init(uint64_t EntropyPoolSize) {
-        Entropy *Entropy               = calloc(1, sizeof(Entropy));
-        if (Entropy != NULL) {
-            Entropy->EntropyPool       = calloc(EntropyPoolSize, sizeof(uint8_t));
-            if (Entropy->EntropyPool != NULL) {
-                Entropy->EntropySize   = EntropyPoolSize;
-                Entropy_Seed(Entropy);
-                Entropy_Mix(Entropy);
+        Entropy *Random               = calloc(1, sizeof(Entropy));
+        if (Random != NULL) {
+            Random->EntropyPool       = calloc(EntropyPoolSize, sizeof(uint8_t));
+            if (Random->EntropyPool != NULL) {
+                Random->EntropySize   = EntropyPoolSize;
+                Random->BitOffset     = 0ULL;
+                Entropy_Seed(Random);
+                Entropy_Mix(Random);
             } else {
+                Entropy_Deinit(Random);
                 Log(Log_ERROR, __func__, U8("Couldn't allocate EntropyPool"));
             }
         } else {
             Log(Log_ERROR, __func__, U8("Couldn't allocate Entropy"));
         }
-        return Entropy;
+        return Random;
     }
     
-    uint64_t Entropy_GetRemainingEntropy(Entropy *Entropy) {
+    uint64_t Entropy_GetRemainingEntropy(Entropy *Random) {
         uint64_t RemainingBits = 0ULL;
-        if (Entropy != NULL) {
-            RemainingBits      = Entropy->EntropySize - Entropy->BitOffset;
+        if (Random != NULL) {
+            RemainingBits      = Random->EntropySize - Random->BitOffset;
         } else {
-            Log(Log_ERROR, __func__, U8(""));
+            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
         }
         return RemainingBits;
     }
     
-    void Entropy_Erase(Entropy *Entropy) {
-        if (Entropy != NULL) {
-            for (uint64_t Byte = 0ULL; Byte < Entropy->EntropySize - 1; Byte++) {
-                Entropy->EntropyPool[Byte] = 0;
+    void Entropy_Erase(Entropy *Random) {
+        if (Random != NULL) {
+            for (uint64_t Byte = 0ULL; Byte < Random->EntropySize - 1; Byte++) {
+                Random->EntropyPool[Byte] = 0;
             }
-            Entropy->BitOffset             = 0;
+            Random->BitOffset             = 0;
         } else {
             Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
         }
     }
     
-    int64_t Entropy_GenerateIntegerInRange(Entropy *Entropy, int64_t MinValue, int64_t MaxValue) {
+    int64_t Entropy_GenerateIntegerInRange(Entropy *Random, int64_t MinValue, int64_t MaxValue) {
         int64_t RandomInteger                     = 0ULL;
-        if (Entropy != NULL) {
+        if (Random != NULL) {
             uint8_t Bits2Read                     = CeilD(Logarithm(2, Absolute(MaxValue) - Absolute(MinValue)));
-            int64_t GeneratedValue                = (int64_t) Entropy_ExtractBits(Entropy, Bits2Read);
+            int64_t GeneratedValue                = (int64_t) Entropy_ExtractBits(Random, Bits2Read);
             
             if (GeneratedValue < MinValue || GeneratedValue > MaxValue) {
                 uint8_t NumFixBits                = (CeilD(Logarithm(2, Maximum(GeneratedValue, MaxValue) - Minimum(GeneratedValue, MaxValue))) + Bits2Read);
                 NumFixBits                        = RoundD(NumFixBits / 2);
-                uint64_t FixBits                  = Entropy_ExtractBits(Entropy, NumFixBits);
+                uint64_t FixBits                  = Entropy_ExtractBits(Random, NumFixBits);
                 if (GeneratedValue < MinValue) {
                     GeneratedValue               += FixBits;
                 } else {
@@ -352,10 +356,10 @@ extern "C" {
         return RandomInteger;
     }
     
-    void Entropy_Deinit(Entropy *Entropy) {
-        if (Entropy != NULL) {
-            free(Entropy->EntropyPool);
-            free(Entropy);
+    void Entropy_Deinit(Entropy *Random) {
+        if (Random != NULL) {
+            free(Random->EntropyPool);
+            free(Random);
         }
     }
     
