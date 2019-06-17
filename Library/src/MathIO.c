@@ -28,6 +28,21 @@ extern "C" {
         uint64_t  Integer;
     } Double2Integer;
     
+    typedef union Integer2Bytes {
+        uint64_t Integer;
+        uint8_t  Bytes[8];
+    } Integer2Bytes;
+    
+    void GetBytesFromInteger(uint64_t Integer, uint8_t *Bytes) {
+        Integer2Bytes Data = {.Integer = Integer};
+        Bytes              = Data.Bytes;
+    }
+    
+    uint64_t GetIntegerFromBytes(uint8_t *Bytes) {
+        Integer2Bytes Data = {.Bytes = *Bytes};
+        return Data.Integer;
+    }
+    
     uint32_t ConvertFloat2Integer(float Decimal) {
         Float2Integer Integer = {.Float = Decimal};
         return Integer.Integer;
@@ -154,11 +169,11 @@ extern "C" {
         return Result * Sign;
     }
     
-    int64_t  Min(int64_t Integer1, int64_t Integer2) {
+    int64_t  Minimum(int64_t Integer1, int64_t Integer2) {
         return Integer2 ^ ((Integer1 ^ Integer2) & -(Integer1 < Integer2));
     }
     
-    int64_t  Max(int64_t Integer1, int64_t Integer2) {
+    int64_t  Maximum(int64_t Integer1, int64_t Integer2) {
         return Integer1 ^ ((Integer1 ^ Integer2) & -(Integer1 < Integer2));
     }
     
@@ -240,43 +255,43 @@ extern "C" {
         return HasDecimalPoint;
     }
     
-    int8_t   ExtractSignI(int64_t Integer) {
+    int8_t ExtractSignI(int64_t Integer) {
         return (Integer & 0x8000000000000000) >> 63 == 1 ? -1 : 1;
     }
     
-    int8_t   ExtractSignF(float Decimal) {
+    int8_t ExtractSignF(float Decimal) {
         uint32_t Integer       = ConvertFloat2Integer(Decimal);
         int8_t   Sign          = (Integer & 0x80000000) >> 31;
         return   Sign == 0 ? 1 : -1;
     }
     
-    int8_t   ExtractSignD(double Decimal) {
+    int8_t ExtractSignD(double Decimal) {
         uint64_t Integer        = ConvertDouble2Integer(Decimal);
         int8_t Sign             = (Integer & 0x8000000000000000) >> 63;
         return Sign == 0 ? 1 : -1;
     }
     
-    int8_t  ExtractExponentF(float Decimal) {
+    int8_t ExtractExponentF(float Decimal) {
         uint32_t Integer       = ConvertFloat2Integer(Decimal);
         int8_t   Sign          = ExtractSignF(Decimal);
         int8_t   Exponent      = (Integer & 0x7F800000) >> 23;
         return (Exponent - 127) * Sign;
     }
     
-    int16_t  ExtractExponentD(double Decimal) {
+    int16_t ExtractExponentD(double Decimal) {
         uint64_t Integer        = ConvertDouble2Integer(Decimal);
         int8_t   Sign           = ExtractSignD(Decimal);
         int16_t  Exponent       = (Integer & 0x7FF0000000000000) >> 52;
         return (Exponent - 1023) * Sign;
     }
     
-    int32_t  ExtractMantissaF(float Decimal) {
+    int32_t ExtractMantissaF(float Decimal) {
         uint32_t Integer       = ConvertFloat2Integer(Decimal);
         uint32_t Mantissa      = Integer & 0x7FFFFFUL;
         return DecimalIsNormalF(Decimal) ? Mantissa |= 0x800000 : Mantissa;
     }
     
-    int64_t  ExtractMantissaD(double Decimal) {
+    int64_t ExtractMantissaD(double Decimal) {
         uint64_t Integer        = ConvertDouble2Integer(Decimal);
         uint64_t Mantissa       = Integer & 0xFFFFFFFFFFFFFULL;
         return DecimalIsNormalD(Decimal) ? Mantissa |= 0x10000000000000 : Mantissa;
@@ -403,7 +418,7 @@ extern "C" {
         return 8 - (Offset % 8);
     }
     
-    uint8_t CreateBitMaskLSBit(uint8_t NumBits2Select) {
+    uint8_t CreateBitMaskLSBit(uint8_t NumBits2Select) { // 
 #if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
         uint8_t Mask = (uint8_t) Exponentiate(2, NumBits2Select);
 #elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
@@ -434,6 +449,12 @@ extern "C" {
             Value2        /= Base;
             NumDigits     += 1;
         } while (Value2 > 0);
+        return NumDigits;
+    }
+    
+    uint8_t NumDigitsInDecimal(double Decimal) {
+        uint8_t NumDigits = 0;
+        
         return NumDigits;
     }
     

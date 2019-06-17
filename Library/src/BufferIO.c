@@ -275,9 +275,8 @@ extern "C" {
                          So, the first byte should contain 3 bits from the LSBit of Bits2Append
                          */
                         do {
-                            
                             uint64_t ParameterMask      = 0ULL;
-                            uint8_t  NumBitsForThisByte = (uint8_t) Min(NunBits2Add, 8 - (BitB->BitOffset % 8)); // 10, 3; 3
+                            uint8_t  NumBitsForThisByte = (uint8_t) Minimum(NunBits2Add, 8 - (BitB->BitOffset % 8)); // 10, 3; 3
                             ParameterMask               = CreateBitMaskLSBit(NumBitsForThisByte) << ParameterOffset;
                             uint64_t Data               = 0ULL;
                             Data                        = (Bits2Append & ParameterMask);
