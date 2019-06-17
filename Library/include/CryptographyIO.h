@@ -63,29 +63,29 @@ extern "C" {
     
     /*!
      @abstract                             "The number of bits of entropy available".
-     @param           Entropy              "The Entropy pointer".
+     @param           Random               "The Entropy pointer".
      @return                               "Returns the the amount of entropy in bits".
      */
-    uint64_t          Entropy_GetRemainingEntropy(Entropy *Entropy);
+    uint64_t          Entropy_GetRemainingEntropy(Entropy *Random);
     
     /*!
      @abstract                             "The number of bits of entropy available".
-     @param           Entropy              "The Entropy pointer".
+     @param           Random               "The Entropy pointer".
      @return                               "Returns the the amount of entropy in bits".
      */
-    int64_t           Entropy_GenerateIntegerInRange(Entropy *Entropy, int64_t MinValue, int64_t MaxValue);
+    int64_t           Entropy_GenerateIntegerInRange(Entropy *Random, int64_t MinValue, int64_t MaxValue);
     
     /*!
      @abstract                             "Erases the entropy pool for sexurity reasons".
-     @param           Entropy              "The Entropy pointer".
+     @param           Random               "The Entropy pointer".
      */
-    void              Entropy_Erase(Entropy *Entropy);
+    void              Entropy_Erase(Entropy *Random);
     
     /*!
      @abstract                             "The number of bits of entropy available".
-     @param           Entropy              "The Entropy pointer".
+     @param           Random               "The Entropy pointer".
      */
-    void              Entropy_Deinit(Entropy *Entropy);
+    void              Entropy_Deinit(Entropy *Random);
     
 #ifdef __cplusplus
 }
