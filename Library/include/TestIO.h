@@ -18,6 +18,10 @@
 extern "C" {
 #endif
     
+#ifndef TestIO_RegisterTest
+#define TestIO_RegisterTest(FunctionName, ...)
+#endif
+    
     /*!
      @abstract                                                  "Gets how accurate the clock is".
      */
@@ -29,23 +33,32 @@ extern "C" {
     uint64_t                    GetTime(void);
     
     /*!
-     @typedef                   Entropy
-     @abstract                                                  "Contains random data".
+     @enum                      TestIO_TestStates
+     @abstract                                                  "Defines the state of each test".
+     @constant                  TestState_Unknown               "Invalid state".
+     @constant                  TestState_Enabled               "The test is enabled".
+     @constant                  TestState_Disabled              "The test is disabled".
      */
-    typedef struct              Entropy                          Entropy;
+    typedef enum TestIO_TestStates {
+                                TestState_Unknown               = 0,
+                                TestState_Enabled               = 1,
+                                TestState_Disabled              = 2,
+    } TestIO_TestStates;
     
     /*!
-     @abstract                                                  "Initalizes our random data".
-     @param                     Size                            "Size has 1 added, and multiplies it by 32 to work with AES-256; the max buffer size is 8192 bytes".
+     @enum                      TestIO_TestResults
+     @abstract                                                  "Defines the result of each test".
+     @constant                  TestResult_Unknown              "Invalid state".
+     @constant                  TestResult_Passed               "The test is enabled".
+     @constant                  TestResult_Failed               "The test is disabled".
+     @constant                  TestResult_Untested             "The test wasn't ran".
      */
-    Entropy                    *Entropy_Init(uint8_t Size);
-    
-    
-    /*!
-     @abstract                                                  "Deinitalizes our random data".
-     @param                     Entropy                         "Pointer to Entropy source to deinitalize".
-     */
-    void                        Entropy_Deinit(Entropy *Entropy);
+    typedef enum TestIO_TestResults {
+                                TestResult_Unknown              = 0,
+                                TestResult_Passed               = 1,
+                                TestResult_Failed               = 2,
+                                TestResult_Untested             = 3,
+    } TestIO_TestResults;
     
 #ifdef __cplusplus
 }
