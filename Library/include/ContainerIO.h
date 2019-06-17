@@ -21,9 +21,9 @@ extern "C" {
     /*
      3D Audio API:
      
-     AudioContainer contains X channel audio and metadata required like bit depth, sample rate, etc.
+     Audio2DContainer contains X channel audio and metadata required like bit depth, sample rate, etc.
      
-     AudioObject is simply an AudioContainer with more metadata about where the sound should be played, when, etc.
+     AudioObject is simply an Audio2DContainer with more metadata about where the sound should be played, when, etc.
      
      that's it.
      */
@@ -144,74 +144,60 @@ extern "C" {
                             ImageType_Integer16             = 2,
     } Image_Types;
     
-    typedef struct          AudioContainer   AudioContainer;
+    typedef struct          Audio2DContainer   Audio2DContainer;
     
-    typedef struct          AudioLocation    AudioLocation;
+    typedef struct          Audio2DHistogram   Audio2DHistogram;
     
-    typedef struct          AudioObject      AudioObject;
+    typedef struct          AudioVector        AudioVector;
     
-    typedef struct          AudioContainer3D AudioContainer3D;
+    typedef struct          Audio3DContainer   Audio3DContainer;
     
-    typedef struct          AudioHistogram   AudioHistogram;
+    typedef struct          Audio3DHistogram   Audio3DHistogram;
     
-    typedef struct          ImageContainer   ImageContainer;
+    typedef struct          ImageContainer     ImageContainer;
     
-    typedef struct          ImageHistogram   ImageHistogram;
+    typedef struct          ImageHistogram     ImageHistogram;
     
     /*!
-     @abstract                             "Initalizes an empty AudioContainer".
+     @abstract                             "Initalizes an empty Audio2DContainer".
      @param                 Type           "A type from AudioContinerTypes".
-     @param                 ChannelMask    "The ChannelMask".
+     @param                 NumChannels    "The number of channels".
+     @param                 ChannelMap     "Array of ChannelMasks, one array entry for each channel".
      @param                 SampleRate     "The number of samples in one second of audio".
-     @param                 NumSamples     "NumSamples is the number of channel independent samples, e.g. X samples is BitDepth * NumChnnels * X".
+     @param                 NumSamples     "NumSamples is the number of channel independent samples, e.g. X samples is BitDepth * NumChannels * X".
      */
-    AudioContainer         *AudioContainer_Init(Audio_Types Type, Audio_ChannelMask ChannelMask, uint64_t SampleRate, uint64_t NumSamples);
-    
-    /*!
-     @abstract                             "Sets the channel type for each channel index".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
-     @param                 Index          "Which index does the channel mask apply to"?
-     @param                 ChannelMask    "What is the channel mask"?
-     */
-    void                    AudioContainer_SetChannelMap(AudioContainer *Audio, uint64_t Index, Audio_ChannelMask ChannelMask);
+    Audio2DContainer       *Audio2DContainer_Init(Audio_Types Type, uint64_t NumChannels, Audio_ChannelMask *ChannelMap, uint64_t SampleRate, uint64_t NumSamples);
     
     /*!
      @abstract                             "Returns the number of audio channels".
-     @param                 Audio          "AudioContainer Pointer".
+     @param                 Audio          "Audio2DContainer Pointer".
      */
-    uint64_t                AudioContainer_GetNumChannels(AudioContainer *Audio);
+    uint64_t                Audio2DContainer_GetNumChannels(Audio2DContainer *Audio);
     
     /*!
      @abstract                             "Returns the number of audio channels".
+     @param                 Audio          "Audio2DContainer Pointer".
      @param                 ChannelMask    "The channel mask".
      */
-    uint64_t                AudioMask_GetNumChannels(Audio_ChannelMask ChannelMask);
-    
-    /*!
-     @abstract                             "Returns the number of audio channels".
-     @param                 Audio          "AudioContainer Pointer".
-     @param                 ChannelMask    "The channel mask".
-     */
-    uint8_t                 AudioContainer_GetIndex(AudioContainer *Audio, Audio_ChannelMask ChannelMask);
+    uint8_t                 Audio2DContainer_GetIndex(Audio2DContainer *Audio, Audio_ChannelMask ChannelMask);
     
     /*!
      @abstract                             "Returns the number of channel-agnostic samples in one second".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      */
-    uint64_t                AudioContainer_GetSampleRate(AudioContainer *Audio);
+    uint64_t                Audio2DContainer_GetSampleRate(Audio2DContainer *Audio);
     
     /*!
      @abstract                             "Returns the number of bits required to represent a audio sample".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      */
-    uint8_t                 AudioContainer_GetBitDepth(AudioContainer *Audio);
+    uint8_t                 Audio2DContainer_GetBitDepth(Audio2DContainer *Audio);
     
     /*!
      @abstract                             "Returns the number of channel-agnostic audio samples stored in the container".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      */
-    uint64_t          AudioContainer_GetNumSamples(AudioContainer *Audio);
-    uint64_t                AudioContainer_GetNumSamples(AudioContainer *Audio);
+    uint64_t                Audio2DContainer_GetNumSamples(Audio2DContainer *Audio);
     
     /*!
      @abstract                       "Sets the channel type for each channel index".
@@ -219,103 +205,83 @@ extern "C" {
      @param           Index          "Which index does the channel mask apply to"?
      @abstract                             "Gets the index that channel X is in".
      @remark                               "If the channel is not present in the stream, we return AudioMask_Unknown".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      @param                 ChannelMask    "The actual channel you're trying to get".
      */
-    uint8_t                 AudioContainer_GetChannelsIndex(AudioContainer *Audio, Audio_ChannelMask ChannelMask);
+    uint8_t                 Audio2DContainer_GetChannelsIndex(Audio2DContainer *Audio, Audio_ChannelMask ChannelMask);
     
     /*!
-     @abstract                             "Gets the type of the array contained by the AudioContainer".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @abstract                             "Gets the type of the array contained by the Audio2DContainer".
+     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      */
-    Audio_Types             AudioContainer_GetType(AudioContainer *Audio);
+    Audio_Types             Audio2DContainer_GetType(Audio2DContainer *Audio);
     
     /*!
      @abstract                             "Gets a pointer to the array of samples".
-     @remark                               "You need to cast the pointer to the correct type you got from AudioContainer_GetType".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @remark                               "You need to cast the pointer to the correct type you got from Audio2DContainer_GetType".
+     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      */
-    void                  **AudioContainer_GetArray(AudioContainer *Audio);
+    void                  **Audio2DContainer_GetArray(Audio2DContainer *Audio);
     
     /*!
      @abstract                             "Returns the average of the samples in the buffer".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      @param                 Channel        "Which index should we get average"?
      */
-    int64_t                 AudioContainer_GetAverage(AudioContainer *Audio, uint64_t Channel);
+    int64_t                 Audio2DContainer_GetAverage(Audio2DContainer *Audio, uint64_t Channel);
     
     /*!
      @abstract                             "Returns the highest valued sample in the buffer".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      @param                 Channel        "Which index should we get the highest value from"?
      */
-    int64_t                 AudioContainer_GetMax(AudioContainer *Audio, uint64_t Channel);
+    int64_t                 Audio2DContainer_GetMax(Audio2DContainer *Audio, uint64_t Channel);
     
     /*!
      @abstract                             "Returns the lowest valued sample in the buffer".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      @param                 Channel        "Which index should we get the lowest value from"?
      */
-    int64_t                 AudioContainer_GetMin(AudioContainer *Audio, uint64_t Channel);
+    int64_t                 Audio2DContainer_GetMin(Audio2DContainer *Audio, uint64_t Channel);
     
     /*!
-     @abstract                             "Securely erases an AudioContainer".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @abstract                             "Securely erases an Audio2DContainer".
+     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      */
-    void                    AudioContainer_Erase(AudioContainer *Audio);
+    void                    Audio2DContainer_Erase(Audio2DContainer *Audio);
     
     /*!
-     @abstract                             "Deinitializes an AudioContainer, and any samples stored within it".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
+     @abstract                             "Deinitializes an Audio2DContainer, and any samples stored within it".
+     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      */
-    void                    AudioContainer_Deinit(AudioContainer *Audio);
+    void                    Audio2DContainer_Deinit(Audio2DContainer *Audio);
     
     /*!
-     @abstract                             "Creates a AudioHistogram".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
-     @return                               "Returns the newly created Histogram".
+     @abstract                             "Initalizes an empty Audio3DContainer".
+     @param                 NumVectors     "Number of vectors to create".
+     @return                               "Returns a pointer to an Audio3DContainer".
      */
-    AudioHistogram         *AudioHistogram_Init(AudioContainer *Audio);
+    Audio3DContainer       *Audio3DContainer_Init(uint64_t NumVectors);
     
     /*!
-     @abstract                             "Gets a pointer to the histogram data".
-     @param                 Histogram      "A pointer to the instance of an AudioHistogram in question".
-     @return                               "Returns a pointer to the histogram data".
+     @abstract                             "Initalizes an empty Audio3DContainer".
+     @param                 Container      "The Audio3DContainer to add the AudioVector to".
+     @param                 Vector         "The AudioVector to add".
+     @param                 Index          "The order of the AudioVector".
      */
-    void                   *AudioHistogram_GetArray(AudioHistogram *Histogram);
+    void                    Audio3DContainer_SetVector(Audio3DContainer *Container, AudioVector *Vector, uint64_t Index);
     
     /*!
-     @abstract                             "Sets a pointer to the histogram data".
-     @param                 Histogram      "A pointer to the instance of an AudioHistogram in question".
-     @param                 Array          "A pointer to the histogram data".
+     @abstract                             "Securely erases an Audio3DContainer".
+     @param                 Container      "A pointer to the instance of the Audio3DContainer in question".
      */
-    void                    AudioHistogram_SetArray(AudioHistogram *Histogram, void *Array);
+    void                    Audio3DContainer_Erase(Audio3DContainer *Container);
     
     /*!
-     @abstract                             "Generates a histogram from an image".
-     @param                 Audio          "A pointer to the instance of an AudioContainer in question".
-     @return                               "Returns the newly created Histogram".
+     @abstract                             "frees a Audio3DContainer".
+     @param                 Container      "A pointer to the Audio3DContainer to deinitalize".
      */
-    AudioHistogram         *AudioHistogram_GenerateHistogram(AudioContainer *Audio);
-    
-    /*!
-     @abstract                             "Sorts a histogram".
-     @param                 Histogram      "A pointer to the AudioHistogram in question".
-     @param                 SortAscending  "If true, sorts so the most common index is at the top".
-     */
-    void                    AudioHistogram_Sort(AudioHistogram *Histogram, bool SortAscending);
-    
-    /*!
-     @abstract                             "Securely erases an AudioContainer".
-     @param                 Histogram      "A pointer to the instance of an AudioContainer in question".
-     */
-    void                    AudioHistogram_Erase(AudioHistogram *Histogram);
-    
-    /*!
-     @abstract                             "frees a AudioHistogram".
-     @param                 Histogram      "A pointer to the AudioHistogram to deinitalize".
-     */
-    void                    AudioHistogram_Deinit(AudioHistogram *Histogram);
+    void                    Audio3DContainer_Deinit(Audio3DContainer *Container);
     
     /*!
      @abstract                             "Initalizes an empty ImageContainer".
@@ -481,6 +447,69 @@ extern "C" {
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
     void                    ImageContainer_Deinit(ImageContainer *Image);
+    
+    /*!
+     @abstract                             "Creates a Audio2DHistogram".
+     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
+     @return                               "Returns the newly created Histogram".
+     */
+    Audio2DHistogram       *Audio2DHistogram_Init(Audio2DContainer *Audio);
+    
+    /*!
+     @abstract                             "Gets a pointer to the histogram data".
+     @param                 Histogram      "A pointer to the instance of an Audio2DHistogram in question".
+     @return                               "Returns a pointer to the histogram data".
+     */
+    void                   *Audio2DHistogram_GetArray(Audio2DHistogram *Histogram);
+    
+    /*!
+     @abstract                             "Sets a pointer to the histogram data".
+     @param                 Histogram      "A pointer to the instance of an Audio2DHistogram in question".
+     @param                 Array          "A pointer to the histogram data".
+     */
+    void                    Audio2DHistogram_SetArray(Audio2DHistogram *Histogram, void *Array);
+    
+    /*!
+     @abstract                             "Generates a histogram from an image".
+     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
+     @return                               "Returns the newly created Histogram".
+     */
+    Audio2DHistogram       *Audio2DHistogram_GenerateHistogram(Audio2DContainer *Audio);
+    
+    /*!
+     @abstract                             "Sorts a histogram".
+     @param                 Histogram      "A pointer to the Audio2DHistogram in question".
+     @param                 SortAscending  "If true, sorts so the most common index is at the top".
+     */
+    void                    Audio2DHistogram_Sort(Audio2DHistogram *Histogram, bool SortAscending);
+    
+    /*!
+     @abstract                             "Securely erases an Audio2DContainer".
+     @param                 Histogram      "A pointer to the instance of an Audio2DContainer in question".
+     */
+    void                    Audio2DHistogram_Erase(Audio2DHistogram *Histogram);
+    
+    /*!
+     @abstract                             "frees a Audio2DHistogram".
+     @param                 Histogram      "A pointer to the Audio2DHistogram to deinitalize".
+     */
+    void                    Audio2DHistogram_Deinit(Audio2DHistogram *Histogram);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     /*!
      @abstract                             "Creates a ImageHistogram".
