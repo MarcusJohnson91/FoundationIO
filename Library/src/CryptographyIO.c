@@ -279,11 +279,12 @@ extern "C" {
 #endif
                     Bits2Read                        -= Bits2Get;
                 } while (Bits2Read > 0);
+                Entropy->BitOffset                   += Bits2Read;
             } else {
                 Entropy_Erase(Entropy);
                 Entropy_Seed(Entropy);
                 Entropy_Mix(Entropy);
-                Entropy_ExtractBits(Entropy, NumBits);
+                Bits = Entropy_ExtractBits(Entropy, NumBits);
             }
         } else {
             Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
