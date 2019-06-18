@@ -15,7 +15,7 @@
 #define   VC_EXTRALEAN
 #endif /* VC_EXTRALEAN */
 #include <Windows.h>                   /* Included for WinBase.h */
-#include <winbase.h>                   /* Included for QueryPerformanceCounter, Windows.h MUST be included before winbase */
+#include <WinBase.h>                   /* Included for QueryPerformanceCounter, Windows.h MUST be included before winbase */
 #endif
 
 #ifdef __cplusplus

@@ -19,6 +19,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\libFoundationIO\include\BitIO.h" />
+    <ClInclude Include="..\libFoundationIO\include\CommandLineIO.h" />
+    <ClInclude Include="..\libFoundationIO\include\ContainerIO.h" />
+    <ClInclude Include="..\libFoundationIO\include\CryptographyIO.h" />
+    <ClInclude Include="..\libFoundationIO\include\LocalizationIO.h" />
+    <ClInclude Include="..\libFoundationIO\include\Log.h" />
+    <ClInclude Include="..\libFoundationIO\include\Macros.h" />
+    <ClInclude Include="..\libFoundationIO\include\Math.h" />
+    <ClInclude Include="..\libFoundationIO\include\StringIO.h" />
+    <ClInclude Include="..\libFoundationIO\include\TestIO.h" />
+    <ClInclude Include="..\libFoundationIO\include\UnicodeTables.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\libFoundationIO\src\BitIO.c" />
     <ClCompile Include="..\libFoundationIO\src\CommandLineIO.c" />
     <ClCompile Include="..\libFoundationIO\src\ContainerIO.c" />
@@ -29,19 +42,6 @@
     <ClCompile Include="..\libFoundationIO\src\Math.c" />
     <ClCompile Include="..\libFoundationIO\src\StringIO.c" />
     <ClCompile Include="..\libFoundationIO\src\TestIO.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\libFoundationIO\include\BitIO.h" />
-    <ClInclude Include="..\libFoundationIO\include\CommandLineIO.h" />
-    <ClInclude Include="..\libFoundationIO\include\ContainerIO.h" />
-    <ClInclude Include="..\libFoundationIO\include\CryptographyIO.h" />
-    <ClInclude Include="..\libFoundationIO\include\LocalizationIO.h" />
-    <ClInclude Include="..\libFoundationIO\include\Log.h" />
-    <ClInclude Include="..\libFoundationIO\include\Macros.h" />
-    <ClInclude Include="..\libFoundationIO\include\Math.h" />
-    <ClInclude Include="..\libFoundationIO\include\StringIO.h" />
-    <ClInclude Include="..\libFoundationIO\include\StringIOTables.h" />
-    <ClInclude Include="..\libFoundationIO\include\TestIO.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -191,7 +191,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <SetChecksum>true</SetChecksum>
@@ -273,7 +273,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SetChecksum>true</SetChecksum>
       <TurnOffAssemblyGeneration>true</TurnOffAssemblyGeneration>
@@ -350,7 +350,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <LargeAddressAware>true</LargeAddressAware>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -431,7 +431,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Ws2_32.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <LargeAddressAware>true</LargeAddressAware>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

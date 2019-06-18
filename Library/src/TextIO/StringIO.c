@@ -2044,9 +2044,9 @@ extern "C" {
         int16_t  Exponent2        = AbsoluteD(Exponent);
         int64_t  Mantissa         = ExtractMantissaD(Number);
         int64_t  Mantissa2        = AbsoluteD(Mantissa);
-        bool     IsDenormal       = DecimalIsNormal(Number);
-        bool     IsNotANumber     = DecimalIsNotANumber(Number);
-        bool     IsInfinite       = DecimalIsInfinity(Number);
+        bool     IsDenormal       = DecimalIsNormalD(Number);
+        bool     IsNotANumber     = DecimalIsNotANumberD(Number);
+        bool     IsInfinite       = DecimalIsInfinityD(Number);
         
         if (IsNotANumber) {
             OutputString          = UTF32_Clone(U32("Not A Number"));

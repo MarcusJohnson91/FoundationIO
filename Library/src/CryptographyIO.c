@@ -5,6 +5,12 @@
 #include "../include/Math.h"           /* Included for Bits2Bytes, etc */
 
 #if   (FoundationIOTargetOS == FoundationIOWindowsOS)
+#ifndef   WIN32_LEAN_AND_MEAN
+#define   WIN32_LEAN_AND_MEAN
+#endif /* WIN32_LEAN_AND_MEAN */
+#ifndef   VC_EXTRALEAN
+#define   VC_EXTRALEAN
+#endif /* VC_EXTRALEAN */
 #include <Windows.h>
 #include <BCrypt.h>
 #endif
@@ -215,7 +221,7 @@ extern "C" {
                 arc4random_buf(Random->EntropyPool, Random->EntropySize);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
                 NTSTATUS Status           = BCryptGenRandom(NULL, Random->EntropyPool, Random->EntropySize, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
-                if (Status != STATUS_SUCCESS) {
+                if (Status <= 0) {
                     Log(Log_ERROR, __func__, U8("Failed to read random data, Enropy is extremely insecure, aborting"));
                     abort();
                 }
@@ -338,8 +344,8 @@ extern "C" {
         if (Random != NULL) {
             // MinValue = 1, MaxValue = 8192
             // Min2 = 
-            int64_t Min2                          = Minimum(Absolute(MinValue), Absolute(MaxValue));
-            int64_t Max2                          = Maximum(Absolute(MaxValue), Absolute(MinValue));
+            int64_t Min2                          = Minimum(AbsoluteI(MinValue), AbsoluteI(MaxValue));
+            int64_t Max2                          = Maximum(AbsoluteI(MaxValue), AbsoluteI(MinValue));
             uint8_t Bits2Read                     = CeilD(Logarithm(2, Max2 - Min2));
             
             int64_t GeneratedValue                = (int64_t) Entropy_ExtractBits(Random, Bits2Read);

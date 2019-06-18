@@ -60,6 +60,9 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 add_library(FoundationIO ${libFoundationIO_Sources} ${libFoundationIO_PublicHeaders})
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+target_link_libraries(FoundationIO ws2_32 bcrypt)
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 set_target_properties(FoundationIO PROPERTIES PREFIX "")
 
 add_executable(Test_BitIO "${Test_Dir}/Test_BitIO.c")
@@ -80,8 +83,6 @@ add_test(Test_BitIO CONFIGURATIONS Debug Release)
 add_test(Test_CommandLineIO CONFIGURATIONS Debug Release)
 add_test(Test_ContainerIO CONFIGURATIONS Debug Release)
 add_test(Test_StringIO CONFIGURATIONS Debug Release)
-
-
 
 if (CMAKE_C_COMPILER_ID MATCHES "AppleClang" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 
