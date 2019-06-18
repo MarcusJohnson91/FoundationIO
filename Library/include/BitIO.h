@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include "Macros.h"
+#include "CryptographyIO.h"
 
 #pragma  once
 
@@ -482,6 +483,13 @@ extern "C" {
     /* BitOutput */
     
     /* GUUID */
+    /*!
+     @abstract                                                  "Generates a random GUUID".
+     @param                     Random                          "Pointer to Entropy".
+     @return                                                    "Returns the generated GUUID".
+     */
+    uint8_t                    *GUUID_Generate(Entropy *Random, GUUIDTypes GUUIDType);
+    
     /*!
      @abstract                                                  "Compares GUUIDs for equivalence, GUUID1 and 2 HAVE to be the same type".
      @param                     GUUID1                          "Pointer to a GUUID to be compared".
