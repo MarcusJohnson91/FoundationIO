@@ -4,6 +4,7 @@
 #include "../include/Log.h"            /* Included for Log declarations */
 #include "../include/Math.h"           /* Included for Integer functions */
 #include "../include/StringIO.h"       /* Included for StringIO's declarations */
+#include "../include/CryptographyIO.h" /* Included for GenerateIntegerInRange for GUUID_Generate */
 
 #ifdef __cplusplus
 extern "C" {
@@ -940,6 +941,39 @@ extern "C" {
     /* BitOutput */
     
     /* GUUID */
+    uint8_t *GUUID_Generate(Entropy *Random, GUUIDTypes GUUIDType) {
+        uint8_t *GUUID                   = 0;
+        if (Random != NULL && GUUIDType != UnknownGUUID) {
+            uint64_t LowBits             = Entropy_GenerateIntegerInRange(Random, 0, 0xFFFFFFFFFFFFFFFF);
+            uint64_t HighBits            = Entropy_GenerateIntegerInRange(Random, 0, 0xFFFFFFFFFFFFFFFF);
+            // Honestly I'll just convert from BinaryGUUID to GUUIDString if I have to
+            uint8_t *BinaryGUUIDData     = calloc(BinaryGUUIDSize, sizeof(uint8_t));
+            if (GUUID != NULL) {
+                for (uint8_t GUUIDByte = 0; GUUIDByte < BinaryGUUIDSize - 1; GUUIDByte++) {
+                    if (GUUIDByte < 8) {
+                        uint8_t Byte     = (LowBits  & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
+                        BinaryGUUIDData[GUUIDByte] = Byte;
+                    } else {
+                        uint8_t Byte     = (HighBits & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
+                        BinaryGUUIDData[GUUIDByte] = Byte;
+                    }
+                }
+                if (GUUIDType == GUIDString || GUUIDType == UUIDString) {
+                    GUUID                = GUUID_Convert(BinaryGUID, GUIDString, BinaryGUUIDData);
+                } else {
+                    GUUID                = BinaryGUUIDData;
+                }
+            } else {
+                Log(Log_ERROR, __func__, U8("Couldn't allocate GUUID"));
+            }
+        } else if (Random == NULL) {
+            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+        } else if (GUUIDType == UnknownGUUID) {
+            Log(Log_ERROR, __func__, U8("UnknownGUUID is an invalid GUUIDType"));
+        }
+        return GUUID;
+    }
+    
     bool GUUID_Compare(GUUIDTypes Type2Compare, uint8_t *GUUID1, uint8_t *GUUID2) {
         uint8_t GUUIDSize       = ((Type2Compare == GUIDString || Type2Compare == UUIDString) ? BinaryGUUIDSize : BinaryGUUIDSize);
         bool GUUIDsMatch        = Yes;
