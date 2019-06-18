@@ -157,7 +157,7 @@ extern "C" {
                 break;
             }
         }
-        Region16                                 = calloc(DotOffset - StartOffset + LocalizationIONULLTerminator, sizeof(UTF16));
+		UTF16 *Region16                          = calloc(DotOffset - StartOffset + LocalizationIONULLTerminator, sizeof(UTF16));
         if (Region16 != NULL) {
             for (uint64_t CodeUnit = StartOffset - 1; CodeUnit < DotOffset - 1; CodeUnit++) {
                 Region16[CodeUnit - StartOffset] = LocaleAll[CodeUnit - StartOffset];
@@ -527,7 +527,7 @@ extern "C" {
         CurrencySymbol                  = UTF8_Clone(Locale->currency_symbol);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         UTF8  *CurrencySymbol8          = UTF8_Clone(Locale->currency_symbol);
-        if (GroupingSeperator8 != NULL) {
+        if (CurrencySymbol8 != NULL) {
             UTF32 *CurrencySymbol32     = UTF8_Decode(CurrencySymbol8);
             CurrencySymbol              = UTF16_Encode(CurrencySymbol32);
             free(CurrencySymbol32);
