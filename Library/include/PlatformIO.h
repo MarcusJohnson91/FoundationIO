@@ -279,10 +279,10 @@ extern "C" {
 #define             FoundationIONewLine8                                   (u8"\n")
 #define             FoundationIONewLineSize8                               (1)
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-#define             NewLineUTF8                                            (u8"\r\n")
+#define             FoundationIONewLine8                                   (u8"\r\n")
 #define             FoundationIONewLineSize8                               (2)
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
-#define             NewLineUTF8                                            (u8"\r")
+#define             FoundationIONewLine8                                   (u8"\r")
 #define             FoundationIONewLineSize8                               (1)
 #endif /* TargetOS */
 #endif /* FoundationIONewLine8 */
