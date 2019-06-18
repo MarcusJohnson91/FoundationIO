@@ -137,6 +137,7 @@ extern "C" {
                 }
                 CodePoint            += 1;
             } while (String[CodePoint] != StringIONULLTerminator);
+            UTF8CodeUnits            += StringIONULLTerminatorSize;
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -155,6 +156,7 @@ extern "C" {
                 }
                 CodePoint          += 1;
             } while (String[CodePoint] != StringIONULLTerminator);
+            UTF16CodeUnits         += StringIONULLTerminatorSize;
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -721,10 +723,11 @@ extern "C" {
         uint64_t CodeUnitNum                           = 0ULL;
         UTF8    *EncodedString                         = NULL;
         if (String != NULL) {
-            uint64_t UTF8CodeUnits                     = StringIONULLTerminatorSize + UTF32_GetStringSizeInUTF8CodeUnits(String);
+            uint64_t StringSizeInCodePoints            = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t UTF8CodeUnits                     = UTF32_GetStringSizeInUTF8CodeUnits(String);
             EncodedString                              = calloc(UTF8CodeUnits, sizeof(UTF8));
             if (EncodedString != NULL) {
-                do {
+                for (uint64_t CodePoint = 0ULL; CodePoint < StringSizeInCodePoints - 1; CodePoint++) {
                     if (String[CodePoint] <= 0x7F) {
                         EncodedString[CodeUnitNum]     = String[CodePoint] & 0x7F;
                         CodeUnitNum                   += 1;
@@ -748,7 +751,7 @@ extern "C" {
                         String[CodePoint]              = InvalidReplacementCodePoint;
                         Log(Log_ERROR, __func__, U8("Codepoint %d is invalid, overlaps Surrogate Pair Block, replacing with U+FFFD"), String[CodePoint]);
                     }
-                } while (String[CodePoint] != StringIONULLTerminator);
+                }
             } else {
                 Log(Log_ERROR, __func__, U8("Encoded Pointer is NULL"));
             }
@@ -759,40 +762,25 @@ extern "C" {
     }
     
     UTF16 *UTF16_Encode(UTF32 *String) {
-        UTF16   *EncodedString                   = NULL;
+        UTF16   *EncodedString                           = NULL;
         if (String != NULL) {
-            uint64_t CodePoint                   = 0ULL;
-            UTF32    ByteOrder                   = 0;
-            uint64_t NumCodeUnits                = UTF32_GetStringSizeInUTF16CodeUnits(String) + StringIONULLTerminatorSize;
-            if (String[0] == UTF32BOM_LE || String[0] == UTF32BOM_BE) {
-                ByteOrder                        = String[0];
-            }
-            EncodedString                        = calloc(NumCodeUnits, sizeof(UTF16));
+            uint64_t StringSizeInCodePoints              = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t NumCodeUnits                        = UTF32_GetStringSizeInUTF16CodeUnits(String);
+            EncodedString                                = calloc(NumCodeUnits, sizeof(UTF16));
             if (EncodedString != NULL) {
-                UTF32 CurrentCodePoint           = 0;
-                do {
-#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                    if (ByteOrder == UTF32BOM_BE) {
-                        CurrentCodePoint         = SwapEndian32(String[CodePoint]);
-                    } else {
-                        CurrentCodePoint         = String[CodePoint];
+                for (uint64_t CodePoint = 0ULL; CodePoint < StringSizeInCodePoints - 1; CodePoint++) {
+                    for (uint64_t CodeUnit = 0ULL; CodeUnit < NumCodeUnits - 1; CodeUnit++) {
+                        if (String[CodePoint] < UTF16HighSurrogateStart || (String[CodePoint] > UTF16LowSurrogateEnd && String[CodePoint] < UTF16MaxCodePoint)) {
+                            EncodedString[CodeUnit]      = String[CodePoint];
+                        } else {
+                            UTF16 HighCodeUnit           = String[CodePoint] - (UTF16SurrogatePairStart / UTF16SurrogatePairModDividend) + UTF16HighSurrogateStart;
+                            EncodedString[CodeUnit]      = HighCodeUnit;
+                            UTF16 LowCodeUnit            = String[CodePoint] - (UTF16SurrogatePairStart % UTF16SurrogatePairModDividend) + UTF16LowSurrogateStart;
+                            EncodedString[CodeUnit + 1]  = LowCodeUnit;
+                            CodeUnit                    += 1;
+                        }
                     }
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                    if (ByteOrder == UTF32BOM_LE) {
-                        CurrentCodePoint         = SwapEndian32(String[CodePoint]);
-                    } else {
-                        CurrentCodePoint         = String[CodePoint];
-                    }
-#endif
-                    if (String[CodePoint] < UTF16HighSurrogateStart || (String[CodePoint] > UTF16LowSurrogateEnd && String[CodePoint] < UTF16MaxCodePoint)) {
-                        EncodedString[CodePoint] = String[CodePoint] & 0xFFFF;
-                        CodePoint               += 1;
-                    } else {
-                        EncodedString[CodePoint] = (((String[CodePoint] - UTF16SurrogatePairStart) / UTF16SurrogatePairModDividend) + UTF16HighSurrogateStart) & 0xFFFF;
-                        CodePoint               += 1;
-                        EncodedString[CodePoint] = (((String[CodePoint] - UTF16SurrogatePairStart) % UTF16SurrogatePairModDividend) + UTF16LowSurrogateStart) & 0xFFFF;
-                    }
-                } while (String[CodePoint] != StringIONULLTerminator);
+                }
             } else {
                 Log(Log_ERROR, __func__, U8("Encoded Pointer is NULL"));
             }
