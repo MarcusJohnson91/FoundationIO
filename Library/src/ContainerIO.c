@@ -403,30 +403,6 @@ extern "C" {
         }
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     typedef struct ImageContainer {
         void              ****Pixels; // View, Width, Height, Channel
         Image_ChannelMask    *ChannelMap;
