@@ -11,7 +11,7 @@ extern "C" {
         
         ImageHistogram *Hist  = ImageHistogram_Init(Image);
         
-        AudioContainer *Audio = AudioContainer_Init(AudioType_Unsigned | AudioType_Integer32, AudioMask_FrontLeft | AudioMask_FrontRight, 48000, 4096);
+        Audio2DContainer *Audio = Audio2DContainer_Init(AudioType_Unsigned | AudioType_Integer32, 2, AudioMask_FrontLeft | AudioMask_FrontRight, 48000, 4096);
         return 0;
     }
     

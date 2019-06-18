@@ -21,7 +21,7 @@ extern "C" {
         BitOutput *BitO      = BitOutput_Init();
         
         BitInput_UTF8_OpenFile(BitI, U8("/Users/Marcus/Desktop/TestImages/21.ppm"));
-        BitOutput_UTF8_OpenFile(BitO, U8("/Users/Marcus/Desktop/TestImages/21.ppm"));
+        BitOutput_UTF8_OpenFile(BitO, U8("/Users/Marcus/Desktop/TestImages/21.ppm.out"));
         
         uint64_t FileSize    = BitInput_GetFileSize(BitI);
         
