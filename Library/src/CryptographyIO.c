@@ -266,13 +266,12 @@ extern "C" {
     static uint64_t Entropy_ExtractBits(Entropy *Random, uint8_t NumBits) {
         uint64_t Bits                                 = 0ULL;
         if (Random != NULL) {
-            if (NumBits < Bytes2Bits(Random->EntropySize) - Random->BitOffset) {
+            if (NumBits <= Entropy_GetRemainingEntropy(Random)) {
                 uint64_t Bits2Read                    = NumBits;
                 do {
                     uint64_t EntropyByte              = Bits2Bytes(Random->BitOffset, No);
                     uint8_t  BitsInEntropyByte        = 8 - (Random->BitOffset % 8);
-                    uint8_t  Bits2ReadFromEntropyByte = 8 - (NumBits % 8);
-                    uint8_t  Bits2Get                 = Minimum(BitsInEntropyByte, Bits2ReadFromEntropyByte);
+                    uint8_t  Bits2Get                 = Minimum(BitsInEntropyByte, Bits2Read);
                     Bits                            <<= Bits2Get;
 #if  (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
                     Bits                              = Random->EntropyPool[EntropyByte] << CreateBitMaskLSBit(Bits2Get);
@@ -337,7 +336,12 @@ extern "C" {
     int64_t Entropy_GenerateIntegerInRange(Entropy *Random, int64_t MinValue, int64_t MaxValue) {
         int64_t RandomInteger                     = 0ULL;
         if (Random != NULL) {
-            uint8_t Bits2Read                     = CeilD(Logarithm(2, Absolute(MaxValue) - Absolute(MinValue)));
+            // MinValue = 1, MaxValue = 8192
+            // Min2 = 
+            int64_t Min2                          = Minimum(Absolute(MinValue), Absolute(MaxValue));
+            int64_t Max2                          = Maximum(Absolute(MaxValue), Absolute(MinValue));
+            uint8_t Bits2Read                     = CeilD(Logarithm(2, Max2 - Min2));
+            
             int64_t GeneratedValue                = (int64_t) Entropy_ExtractBits(Random, Bits2Read);
             
             if (GeneratedValue < MinValue || GeneratedValue > MaxValue) {
