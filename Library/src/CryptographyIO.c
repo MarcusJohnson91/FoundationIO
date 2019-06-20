@@ -214,6 +214,28 @@ extern "C" {
         uint64_t  BitOffset;
     } Entropy;
     
+    static uint64_t Seed(void) {
+        uint64_t Data             = 0ULL;
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+        arc4random_buf(&Data, 8);
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+        NTSTATUS Status           = BCryptGenRandom(NULL, &Data, 8, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+        if (Status <= 0) {
+            Log(Log_ERROR, __func__, U8("Failed to read random data, Entropy is extremely insecure, aborting"));
+            abort();
+        }
+#else
+        FILE *RandomFile          = fopen("/dev/urandom", "rb");
+        size_t BytesRead          = fread(&Data, 8, 1, RandomFile);
+        if (BytesRead != Random->EntropySize) {
+            Log(Log_ERROR, __func__, U8("Failed to read random data, Entropy is extremely insecure, aborting"));
+            abort();
+        }
+        fclose(RandomFile);
+#endif
+        return Data;
+    }
+    
     static void Entropy_Seed(Entropy *Random) {
         if (Random != NULL) {
             if (Random->EntropyPool != NULL) {
@@ -222,14 +244,14 @@ extern "C" {
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
                 NTSTATUS Status           = BCryptGenRandom(NULL, Random->EntropyPool, Random->EntropySize, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
                 if (Status <= 0) {
-                    Log(Log_ERROR, __func__, U8("Failed to read random data, Enropy is extremely insecure, aborting"));
+                    Log(Log_ERROR, __func__, U8("Failed to read random data, Entropy is extremely insecure, aborting"));
                     abort();
                 }
 #else
                 FILE *RandomFile          = fopen("/dev/urandom", "rb");
                 size_t BytesRead          = fread(Random->EntropyPool, Random->EntropySize, 1, RandomFile);
                 if (BytesRead != Random->EntropySize) {
-                    Log(Log_ERROR, __func__, U8("Failed to read random data, Enropy is extremely insecure, aborting"));
+                    Log(Log_ERROR, __func__, U8("Failed to read random data, Entropy is extremely insecure, aborting"));
                     abort();
                 }
                 fclose(RandomFile);
@@ -247,17 +269,28 @@ extern "C" {
             for (uint64_t Byte1 = 0ULL; Byte1 < (Random->EntropySize - 1) / 8; Byte1 += 8) {
                 uint64_t Integer  = GetIntegerFromBytes(&Random->EntropyPool[Byte1]);
                 
-                uint64_t Mixed1   = Integer ^ Entropy_Seed1;
-                uint64_t Rotated1 = RotateLeft(Mixed1, Entropy_Rotate1);
+                uint64_t Seed1    = Seed();
+                uint64_t Seed2    = Seed();
+                uint64_t Seed3    = Seed();
+                uint64_t Seed4    = Seed();
                 
-                uint64_t Mixed2   = Rotated1 & Entropy_Seed2;
-                uint64_t Rotated2 = RotateLeft(Mixed2, Entropy_Rotate2);
+                uint8_t  Rotate1  = Seed() % 64;
+                uint8_t  Rotate2  = Seed() % 64;
+                uint8_t  Rotate3  = Seed() % 64;
+                uint8_t  Rotate4  = Seed() % 64;
                 
-                uint64_t Mixed3   = Rotated2 | Entropy_Seed3;
-                uint64_t Rotated3 = RotateLeft(Mixed3, Entropy_Rotate3);
                 
-                uint64_t Mixed4   = Rotated3 | Entropy_Seed4;
-                uint64_t Rotated4 = RotateLeft(Mixed4, Entropy_Rotate4);
+                uint64_t Mixed1   = Integer ^ Seed1;
+                uint64_t Rotated1 = RotateLeft(Mixed1, Rotate1);
+                
+                uint64_t Mixed2   = Rotated1 & Seed2;
+                uint64_t Rotated2 = RotateLeft(Mixed2, Rotate2);
+                
+                uint64_t Mixed3   = Rotated2 | Seed3;
+                uint64_t Rotated3 = RotateLeft(Mixed3, Rotate3);
+                
+                uint64_t Mixed4   = Rotated3 | Seed4;
+                uint64_t Rotated4 = RotateLeft(Mixed4, Rotate4);
                 
                 GetBytesFromInteger(Rotated4, Bytes);
                 for (uint8_t Byte2 = 0; Byte2 < 8; Byte2++) {
@@ -342,8 +375,6 @@ extern "C" {
     int64_t Entropy_GenerateIntegerInRange(Entropy *Random, int64_t MinValue, int64_t MaxValue) {
         int64_t RandomInteger                     = 0ULL;
         if (Random != NULL) {
-            // MinValue = 1, MaxValue = 8192
-            // Min2 = 
             int64_t Min2                          = Minimum(AbsoluteI(MinValue), AbsoluteI(MaxValue));
             int64_t Max2                          = Maximum(AbsoluteI(MaxValue), AbsoluteI(MinValue));
             uint8_t Bits2Read                     = CeilD(Logarithm(2, Max2 - Min2));
