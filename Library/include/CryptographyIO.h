@@ -18,16 +18,6 @@
 extern "C" {
 #endif
     
-    // PLEASE! USE YOUR OWN SEEDS AND ROTATES with: od -vAx -N8 -tx8 < /dev/urandom
-    static const uint64_t Entropy_Seed1   = 0x996B01419E29C332;
-    static const uint64_t Entropy_Seed2   = 0x1F8FC6D7F904D5C2;
-    static const uint64_t Entropy_Seed3   = 0x2CB2699B18EBB96E;
-    static const uint64_t Entropy_Seed4   = 0xBD64B91757E88DB3;
-    static const uint8_t  Entropy_Rotate1 = 38;
-    static const uint8_t  Entropy_Rotate2 = 59;
-    static const uint8_t  Entropy_Rotate3 = 44;
-    static const uint8_t  Entropy_Rotate4 = 60;
-    
 #ifndef   FoundationIO_StringType8
 #define   FoundationIO_StringType8 (1)
 #ifdef    UTF8
@@ -40,17 +30,17 @@ extern "C" {
 #endif /* __CHAR8_TYPE__ */
 #endif /* FoundationIO_StringType8 */
     
-    typedef struct MD5 MD5;
+    typedef struct    MD5 MD5;
     
-    MD5  *MD5_Init(void);
+    MD5              *MD5_Init(void);
     
-    void  MD5_Process(uint32_t *State, uint32_t *Block);
+    void              MD5_Process(uint32_t *State, uint32_t *Block);
     
-    UTF8 *MD5_Finalize(MD5 *MD5);
+    UTF8             *MD5_Finalize(MD5 *MD5);
     
-    bool  MD5_Compare(uint8_t *Hash1, uint8_t *Hash2);
+    bool              MD5_Compare(uint8_t *Hash1, uint8_t *Hash2);
     
-    void  MD5_Deinit(MD5 *MD5);
+    void              MD5_Deinit(MD5 *MD5);
     
     typedef struct    Entropy Entropy;
     
