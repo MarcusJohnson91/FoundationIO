@@ -387,12 +387,12 @@ extern "C" {
         return Bytes * 8;
     }
     
-    int64_t  Bits2Bytes(int64_t Bits, bool RoundUp) {
+    int64_t  Bits2Bytes(int64_t Bits, RoundingTypes RoundingType) {
         uint64_t AbsoluteBits = AbsoluteI(Bits);
         int64_t  Bytes        = 0ULL;
-        if (RoundUp == Yes) {
+        if (RoundingType == RoundingType_Up) {
             Bytes             = (AbsoluteBits >> 3) + 1;
-        } else if (RoundUp == No) {
+        } else if (RoundingType == RoundingType_Down) {
             Bytes             = (AbsoluteBits >> 3);
         }
         if (Bits < 0) {

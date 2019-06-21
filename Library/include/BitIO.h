@@ -122,6 +122,16 @@ extern "C" {
     } GUUIDTypes;
     
     /*!
+     @enum                      Unary_StopBits
+     @constant                  StopBit_Zero                    "The stop bit is 0".
+     @constant                  StopBit_One                     "The stop bit is 1".
+     */
+    typedef enum Unary_StopBits {
+                                StopBit_Zero                    = 0,
+                                StopBit_One                     = 1,
+    } Unary_StopBits;
+    
+    /*!
      @typedef                   BitInput
      @abstract                                                  "Contains File/Socket pointers for reading to a BitBuffer".
      */
@@ -271,7 +281,7 @@ extern "C" {
      @param                     UnaryType                       "What type of Unary coding are we reading"?
      @param                     StopBit                         "Is the stop bit a one or a zero"?
      */
-    uint64_t                    BitBuffer_ReadUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, bool StopBit);
+    uint64_t                    BitBuffer_ReadUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, Unary_StopBits StopBit);
     
     /*!
      @abstract                                                  "Reads data from the Bitbuffer until it stops matching the UTF-8 format".
@@ -330,7 +340,7 @@ extern "C" {
      @param                     StopBit                         "Is the stop bit a one or a zero"?
      @param                     Bits2Write                      "the actual data to write".
      */
-    void                        BitBuffer_WriteUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, bool StopBit, uint8_t Bits2Write);
+    void                        BitBuffer_WriteUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, Unary_StopBits StopBit, uint8_t Bits2Write);
     
     /*!
      @abstract                                                  "Writes a UTF-8 encoded string to the BitBuffer".

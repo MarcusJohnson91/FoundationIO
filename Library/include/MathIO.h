@@ -25,6 +25,19 @@ extern "C" {
      */
     
     /*!
+     @enum                  RoundingTypes
+     @abstract                                              "Defines the type of flipping".
+     @constant              RoundingType_Unknown            "Invalid ImageType, exists solely to tell when it hasn't been set".
+     @constant              RoundingType_Down               "Flip the imge vertically, up and down".
+     @constant              RoundingType_Up                 "Flip the image horizontally, side to side".
+     */
+    typedef enum RoundingTypes {
+                            RoundingType_Unknown            = 0,
+                            RoundingType_Down               = 1,
+                            RoundingType_Up                 = 2,
+    } RoundingTypes;
+    
+    /*!
      @abstract                                                  "Tells if the number is negative".
      @param                     Integer                         "The value to find the signedness of".
      */
@@ -350,10 +363,10 @@ extern "C" {
     /*!
      @abstract                                                  "Computes the number of bytes from the number of bits".
      @param                     Bits                            "The bits to convert to bytes".
-     @param                     RoundUp                         "Should the resulting bytes be rounded up or down?".
+     @param                     RoundingType                    "The type of rounding to do".
      @return                                                    "Returns the number of bytes".
      */
-    int64_t                     Bits2Bytes(int64_t Bits, bool RoundUp);
+    int64_t                     Bits2Bytes(int64_t Bits, RoundingTypes RoundingType);
     
     /*!
      @abstract                                                  "Swaps bits so the the MSB becoems the LSB, and vice versa".

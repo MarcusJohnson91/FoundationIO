@@ -70,7 +70,7 @@ extern "C" {
     
     void BitBuffer_Read(BitBuffer *BitB, BitInput *BitI) {
         if (BitB != NULL && BitI != NULL) {
-            uint64_t Bytes2Read    = Bits2Bytes(BitB->NumBits - BitB->BitOffset, No);
+            uint64_t Bytes2Read    = Bits2Bytes(BitB->NumBits - BitB->BitOffset, RoundingType_Down);
             uint8_t Bits2Save      = BitB->BitOffset % 8;
             if (Bits2Save > 0) {
                 BitB->Buffer[0]    = 0;
@@ -80,10 +80,10 @@ extern "C" {
             } else {
                 BitB->BitOffset    = 0;
             }
-            for (uint64_t Byte = (uint64_t) Bits2Bytes(BitB->BitOffset, Yes); Byte < (uint64_t) Bits2Bytes(BitB->NumBits, No); Byte++) {
+            for (uint64_t Byte = (uint64_t) Bits2Bytes(BitB->BitOffset, RoundingType_Up); Byte < (uint64_t) Bits2Bytes(BitB->NumBits, RoundingType_Down); Byte++) {
                 BitB->Buffer[Byte] = 0;
             }
-            uint64_t Bytes2Read2   = Bits2Bytes(BitB->NumBits - BitB->BitOffset, No);
+            uint64_t Bytes2Read2   = Bits2Bytes(BitB->NumBits - BitB->BitOffset, RoundingType_Down);
             uint64_t BytesRead     = 0ULL;
             if (BitI->FileType == BitIOFile) {
                 BytesRead          = FoundationIO_File_Read(BitB->Buffer, 1, Bytes2Read2, BitI->File);
@@ -163,7 +163,7 @@ extern "C" {
             int64_t  AlignmentSizeInBits = Bytes2Bits(AlignmentSize);
             int64_t  Bits2Align          = AlignmentSizeInBits - (BitB->BitOffset % AlignmentSizeInBits);
             if (BitB->BitOffset + Bits2Align > BitB->NumBits) {
-                BitB->Buffer             = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, Yes));
+                BitB->Buffer             = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, RoundingType_Up));
                 BitB->NumBits           += Bits2Align;
             }
             BitB->BitOffset             += Bits2Align;
@@ -190,7 +190,7 @@ extern "C" {
     
     void BitBuffer_Erase(BitBuffer *BitB) {
         if (BitB != NULL) {
-            uint64_t BufferSize = Bits2Bytes(BitB->NumBits, Yes);
+            uint64_t BufferSize = Bits2Bytes(BitB->NumBits, RoundingType_Up);
             for (uint64_t Byte = 0ULL; Byte < BufferSize - 1; Byte++) {
                 BitB->Buffer[Byte] = 0;
             }
@@ -349,7 +349,7 @@ extern "C" {
                 if (ByteOrder == LSByteFirst) {
                     if (BitOrder == LSBitFirst) {
                         // Start reading from the end, loop to the beginning
-                        for (uint64_t Byte = (uint64_t) Bits2Bytes(BitB->BitOffset + NumBits2Extract, No); Byte > (uint64_t) Bits2Bytes(BitB->BitOffset, No); Byte--) {
+                        for (uint64_t Byte = (uint64_t) Bits2Bytes(BitB->BitOffset + NumBits2Extract, RoundingType_Down); Byte > (uint64_t) Bits2Bytes(BitB->BitOffset, RoundingType_Down); Byte--) {
                             // Extract what you need from each byte, read the byte from lSBit first
                             uint8_t CurrentBits = Bits2ExtractFromByte(BitB->BitOffset);
                             uint8_t Mask        = CreateBitMaskLSBit(CurrentBits);
@@ -358,7 +358,7 @@ extern "C" {
                         }
                     } else if (BitOrder == MSBitFirst) {
                         // Start the byte at the end, and the bit at the beginning.
-                        for (uint64_t Byte = (uint64_t) Bits2Bytes(BitB->BitOffset, No); Byte < (uint64_t) Bits2Bytes(BitB->BitOffset + NumBits2Extract, No); Byte++) {
+                        for (uint64_t Byte = (uint64_t) Bits2Bytes(BitB->BitOffset, RoundingType_Down); Byte < (uint64_t) Bits2Bytes(BitB->BitOffset + NumBits2Extract, RoundingType_Down); Byte++) {
                             // Extract what you need from each byte
                         }
                     }
@@ -407,7 +407,7 @@ extern "C" {
         return OutputData;
     }
     
-    uint64_t BitBuffer_ReadUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, bool StopBit) {
+    uint64_t BitBuffer_ReadUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, Unary_StopBits StopBit) {
         uint64_t OutputData    = 0ULL;
         if (BitB != NULL) {
             do {
@@ -524,7 +524,7 @@ extern "C" {
         }
     }
     
-    void     BitBuffer_WriteUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, bool StopBit, uint8_t UnaryBits2Write) {
+    void     BitBuffer_WriteUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, Unary_StopBits StopBit, uint8_t UnaryBits2Write) {
         if (BitB != NULL) {
             StopBit         &= 1;
             uint8_t Field2Write = UnaryBits2Write;
@@ -607,7 +607,7 @@ extern "C" {
     
     void BitBuffer_Write(BitBuffer *BitB, BitOutput *BitO) {
         if (BitB != NULL && BitO != NULL) {
-            uint64_t Bytes2Write  = Bits2Bytes(BitBuffer_GetPosition(BitB), No);
+            uint64_t Bytes2Write  = Bits2Bytes(BitBuffer_GetPosition(BitB), RoundingType_Down);
             uint64_t Bits2Keep    = BitB->BitOffset % 8;
             uint64_t BytesWritten = 0ULL;
             if (BitO->FileType == BitIOFile) {
@@ -619,7 +619,7 @@ extern "C" {
                 BitB->Buffer[0] = 0;
                 BitB->Buffer[0] = BitB->Buffer[Bytes2Write + 1] & (Exponentiate(2, Bits2Keep) << (8 - Bits2Keep));
                 BitB->BitOffset = Bits2Keep + 1;
-                for (uint64_t Byte = (uint64_t) Bits2Bytes(BitB->BitOffset, Yes); Byte < (uint64_t) Bits2Bytes(BitB->NumBits, No); Byte++) {
+                for (uint64_t Byte = (uint64_t) Bits2Bytes(BitB->BitOffset, RoundingType_Up); Byte < (uint64_t) Bits2Bytes(BitB->NumBits, RoundingType_Down); Byte++) {
                     BitB->Buffer[Byte] = 0;
                 }
             } else {

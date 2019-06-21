@@ -308,7 +308,7 @@ extern "C" {
             if (NumBits <= Entropy_GetRemainingEntropy(Random)) {
                 uint64_t Bits2Read                    = NumBits;
                 do {
-                    uint64_t EntropyByte              = Bits2Bytes(Random->BitOffset, No);
+                    uint64_t EntropyByte              = Bits2Bytes(Random->BitOffset, RoundingType_Down);
                     uint8_t  BitsInEntropyByte        = 8 - (Random->BitOffset % 8);
                     uint8_t  Bits2Get                 = Minimum(BitsInEntropyByte, Bits2Read);
                     Bits                            <<= Bits2Get;

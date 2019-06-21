@@ -737,11 +737,11 @@ extern "C" {
         return Minimum;
     }
     
-    void ImageContainer_Flip(ImageContainer *Image, bool VerticalFlip, bool HorizontalFlip) {
+    void ImageContainer_Flip(ImageContainer *Image, FlipTypes FlipType) {
         if (Image != NULL) {
             uint8_t NumChannels = ImageContainer_GetNumChannels(Image);
             uint8_t NumViews    = ImageContainer_GetNumViews(Image);
-            if (VerticalFlip == Yes) {
+            if (FlipType == FlipType_Vertical || FlipType == FlipType_VerticalAndHorizontal) {
                 if (Image->Type == ImageType_Integer8) {
                     uint8_t  *Array = (uint8_t*)  ImageContainer_GetArray(Image);
                     for (uint64_t View = 0ULL; View < NumViews - 1; View++) {
@@ -778,7 +778,7 @@ extern "C" {
                     }
                 }
             }
-            if (HorizontalFlip == Yes) {
+            if (FlipType == FlipType_Horizontal || FlipType == FlipType_VerticalAndHorizontal) {
                 if (Image->Type == ImageType_Integer8) {
                     uint8_t  *Array = (uint8_t*)  ImageContainer_GetArray(Image);
                     for (uint64_t View = 1ULL; View <= NumViews - 1; View++) {

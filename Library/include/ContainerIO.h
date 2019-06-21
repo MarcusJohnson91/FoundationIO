@@ -144,6 +144,21 @@ extern "C" {
                             ImageType_Integer16             = 2,
     } Image_Types;
     
+    /*!
+     @enum                  FlipTypes
+     @abstract                                              "Defines the type of flipping".
+     @constant              FlipType_Unknown                "Invalid ImageType, exists solely to tell when it hasn't been set".
+     @constant              FlipType_Vertical               "Flip the imge vertically, up and down".
+     @constant              FlipType_Horizontal             "Flip the image horizontally, side to side".
+     @constant              FlipType_VerticalAndHorizontal  "Flip the image in both ways".
+     */
+    typedef enum FlipTypes {
+                            FlipType_Unknown                = 0,
+                            FlipType_Vertical               = 1,
+                            FlipType_Horizontal             = 2,
+                            FlipType_VerticalAndHorizontal  = 3,
+    } FlipTypes;
+    
     typedef struct          Audio2DContainer   Audio2DContainer;
     
     typedef struct          Audio2DHistogram   Audio2DHistogram;
@@ -411,10 +426,9 @@ extern "C" {
     /*!
      @abstract                             "Rotates an Image, either Vertically, Horizontally, or both".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
-     @param                 VerticalFlip   "Top becomes bottom and vice versa".
-     @param                 HorizontalFlip "left becomes right and vice versa".
+     @param                 FlipType       "The type of flipping to use".
      */
-    void                    ImageContainer_Flip(ImageContainer *Image, bool VerticalFlip, bool HorizontalFlip);
+    void                    ImageContainer_Flip(ImageContainer *Image, FlipTypes FlipType);
     
     /*!
      @abstract                             "Resizes an Image".
