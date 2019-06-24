@@ -18,11 +18,6 @@
 extern "C" {
 #endif
     
-#ifndef TestIONULLTerminator
-#define TestIONULLTerminator (0)
-#define TestIONULLTerminatorSize (1)
-#endif
-    
 #ifndef TestIO_RegisterTest
 #define TestIO_RegisterTest(FunctionName, ...)
 #endif

@@ -23,9 +23,6 @@
 extern "C" {
 #endif
     
-#define CommandLineIONULLTerminator     (0)
-#define CommandLineIONULLTerminatorSize (1)
-    
     /*!
      @struct                 CommandLineSwitch
      @abstract                                           "Contains the data to support a switch".
@@ -576,7 +573,7 @@ extern "C" {
         if (CLI != NULL && MasterID <= CLI->NumSwitches - 1 && SlaveID <= CLI->NumSwitches - 1) {
             if (CLI->SwitchIDs[MasterID].SwitchType == SwitchMayHaveSlaves && (CLI->SwitchIDs[MasterID].NumPotentialSlaves <= CLI->SwitchIDs[MasterID].MaxConcurrentSlaves)) {
                 CLI->SwitchIDs[MasterID].NumPotentialSlaves  += 1;
-                CLI->SwitchIDs[MasterID].PotentialSlaves      = realloc(CLI->SwitchIDs[MasterID].PotentialSlaves, CLI->SwitchIDs[MasterID].NumPotentialSlaves * sizeof(int64_t));
+                CLI->SwitchIDs[MasterID].PotentialSlaves      = realloc(CLI->SwitchIDs[MasterID].PotentialSlaves, CLI->SwitchIDs[MasterID].NumPotentialSlaves * sizeof(uint64_t));
                 CLI->SwitchIDs[MasterID].PotentialSlaves[CLI->SwitchIDs[MasterID].NumPotentialSlaves - 1] = SlaveID;
             } else {
                 Log(Log_ERROR, __func__, U8("MasterID %lld can not have any slaves"), MasterID);
@@ -1050,7 +1047,7 @@ extern "C" {
                     ExtensionSize = CodePoint - StringSize;
                 }
             }
-            Extension = calloc(UnicodeBOMSizeInCodePoints + ExtensionSize + CommandLineIONULLTerminatorSize, sizeof(UTF32));
+            Extension = calloc(UnicodeBOMSizeInCodePoints + ExtensionSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
             if (Extension != NULL) {
                 for (uint64_t ExtCodePoint = 0ULL; ExtCodePoint < ExtensionSize - 1; ExtCodePoint++) {
                     for (uint64_t PathCodePoint = StringSize - ExtensionSize; PathCodePoint < StringSize - 1; PathCodePoint++) {

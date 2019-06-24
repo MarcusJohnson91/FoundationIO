@@ -12,10 +12,6 @@ extern "C" {
     static FILE  *Log_LogFile      = NULL;
     static UTF32 *Log_ProgramName  = NULL;
     
-#ifndef           UNCPathPrefix
-#define           UNCPathPrefix    U32("//?/")
-#endif
-    
     void Log_SetProgramName(UTF8 *ProgramName) {
         if (ProgramName != NULL) {
             Log_ProgramName        = UTF8_Decode(ProgramName);
