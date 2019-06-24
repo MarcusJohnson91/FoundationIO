@@ -1,4 +1,3 @@
-#include "../include/Macros.h"         /* Included for FoundationIO's macros */
 #include "../include/Math.h"           /* Included for our declarations */
 
 #ifdef __cplusplus
