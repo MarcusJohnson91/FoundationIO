@@ -464,9 +464,9 @@ extern "C" {
         UTF16 *ExtractedString            = calloc(StringSize, sizeof(UTF16));
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
-#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
                 ExtractedString[CodeUnit] = BitBuffer_ExtractBits(BitB, LSByteFirst, LSBitFirst, 16);
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
                 ExtractedString[CodeUnit] = BitBuffer_ExtractBits(BitB, MSByteFirst, LSBitFirst, 16);
 #endif
             }
@@ -562,17 +562,17 @@ extern "C" {
                 UTF16 ByteOrder    = String2Write[0];
                 if (ByteOrder == UTF16BOM_BE) {
                     for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
-#if    (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+#if    (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
                         BitBuffer_AppendBits(BitB, MSByteFirst, LSBitFirst, 16, String2Write[CodeUnit]);
-#elif  (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+#elif  (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
                         BitBuffer_AppendBits(BitB, LSByteFirst, LSBitFirst, 16, String2Write[CodeUnit]);
 #endif
                     }
                 } else if (ByteOrder == UTF16BOM_LE) {
                     for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
-#if    (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+#if    (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
                         BitBuffer_AppendBits(BitB, LSByteFirst, LSBitFirst, 16, String2Write[CodeUnit]);
-#elif  (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+#elif  (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
                         BitBuffer_AppendBits(BitB, MSByteFirst, LSBitFirst, 16, String2Write[CodeUnit]);
 #endif
                     }

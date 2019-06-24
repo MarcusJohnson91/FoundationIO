@@ -514,9 +514,9 @@ extern "C" {
                 StringWithBOM         = calloc(StringSize, sizeof(UTF32));
                 if (StringWithBOM != NULL) {
                     if (BOM2Add == ByteOrder_Native) {
-#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
                         ByteOrder     = UTF32BOM_LE;
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
                         ByteOrder     = UTF32BOM_BE;
 #endif
                     } else if (BOM2Add == ByteOrder_Little) {
@@ -621,9 +621,9 @@ extern "C" {
             if (DecodedString != NULL) {
                 do {
                     if (CodePoint == 0) {
-#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
                         DecodedString[0]                 = UTF32BOM_LE;
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
                         DecodedString[0]                 = UTF32BOM_BE;
 #endif
                     } else {
@@ -686,9 +686,9 @@ extern "C" {
             if (String[0] == UTF16BOM_LE || String[0] == UTF16BOM_BE) {
                 StringsByteOrder                 = String[0];
             } else {
-#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
                 StringsByteOrder                 = UTF16BOM_LE;
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
                 StringsByteOrder                 = UTF16BOM_BE;
 #endif
             }

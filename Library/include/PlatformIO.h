@@ -230,12 +230,12 @@ extern "C" {
 #define             FoundationIOCompileTimeByteOrderUnknown                (0)
 #endif
     
-#ifndef             FoundationIOCompileTimeByteOrderBE
-#define             FoundationIOCompileTimeByteOrderBE                     (1)
+#ifndef             FoundationIOByteOrderBE
+#define             FoundationIOByteOrderBE                     (1)
 #endif
     
-#ifndef             FoundationIOCompileTimeByteOrderLE
-#define             FoundationIOCompileTimeByteOrderLE                     (2)
+#ifndef             FoundationIOByteOrderLE
+#define             FoundationIOByteOrderLE                     (2)
 #endif
     
 #ifndef             FoundationIOCompilerIsUnknown
@@ -266,12 +266,12 @@ extern "C" {
     
 #if   (FoundationIOCompiler == FoundationIOCompilerIsClang || FoundationIOCompiler == FoundationIOCompilerIsGCC)
 #if   (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-#define             FoundationIOTargetByteOrder                            (FoundationIOCompileTimeByteOrderBE)
+#define             FoundationIOTargetByteOrder                            (FoundationIOByteOrderBE)
 #elif (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define             FoundationIOTargetByteOrder                            (FoundationIOCompileTimeByteOrderLE)
+#define             FoundationIOTargetByteOrder                            (FoundationIOByteOrderLE)
 #endif /* __BYTE_ORDER__ */
 #elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#define             FoundationIOTargetByteOrder                            (FoundationIOCompileTimeByteOrderLE)
+#define             FoundationIOTargetByteOrder                            (FoundationIOByteOrderLE)
 #endif /* FoundationIOCompiler */
     
 #ifndef             FoundationIONewLine8
