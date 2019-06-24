@@ -1,5 +1,4 @@
-#include <stdbool.h>
-#include <stdint.h>
+#include "../include/Macros.h"
 
 #if   (defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L)
 #include <tgmath.h>
@@ -403,14 +402,6 @@ extern "C" {
      @return                                                    "Returns true if there's no remainder, otherwise returns false".
      */
     bool                        IsPowerOfBase(uint8_t Base, uint64_t Value);
-    
-    /*!
-     @abstract                                                  "Gets the number of digits nessicary to store Value in Base".
-     @param                     Base                            "The base to check".
-     @param                     Value                           "The value to check".
-     @return                                                    "Returns the number of digits".
-     */
-    uint8_t                     GetNumDigitsInBase(uint8_t Base, int64_t Value);
     
     /*!
      @abstract                                                  "Rotates Value by Bits2Rotate".
