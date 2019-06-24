@@ -133,10 +133,10 @@ extern "C" {
         if (Data != NULL && PacketArray != NULL) {
             // Perform Padding and Size appending here as well as breaking it into packets.
             
-#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
+#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
             // So we need to read the data and reorder the bytes.
             // if NumBytes is not a multiple of 56, we need to pad it out to the next 56 bytes.
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
+#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
             
 #endif
         } else if (PacketArray == NULL) {
@@ -311,12 +311,18 @@ extern "C" {
                     uint64_t EntropyByte              = Bits2Bytes(Random->BitOffset, RoundingType_Down);
                     uint8_t  BitsInEntropyByte        = 8 - (Random->BitOffset % 8);
                     uint8_t  Bits2Get                 = Minimum(BitsInEntropyByte, Bits2Read);
+                    uint8_t  BitMask                  = 0;
+#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
+                    BitMask                           = CreateBitMaskLSBit(Bits2Get);
+#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
+                    BitMask                           = CreateBitMaskMSBit(Bits2Get);
+#emdif
+                    uint8_t  BitMask                  = CreateBitMask(Bits2Get);
+                    uint8_t  Shift                    = 8 - Bits2Get;
+                    uint8_t  ExtractedBits            = Random->EntropyPool[EntropyByte] & (BitMask << Shift);
+                    uint8_t  ApplyBits                = Random->EntropyPool[EntropyByte] & (BitMask >> Shift);
                     Bits                            <<= Bits2Get;
-#if  (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-                    Bits                              = Random->EntropyPool[EntropyByte] << CreateBitMaskLSBit(Bits2Get);
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-                    Bits                              = Random->EntropyPool[EntropyByte] >> CreateBitMaskMSBit(Bits2Get);
-#endif
+                    Bits                              = ApplyBits;
                     Bits2Read                        -= Bits2Get;
                 } while (Bits2Read > 0);
                 Random->BitOffset                    += Bits2Read;
