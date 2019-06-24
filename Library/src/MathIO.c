@@ -39,8 +39,8 @@ extern "C" {
         Bytes              = Data.Bytes;
     }
     
-    uint64_t GetIntegerFromBytes(uint8_t *Bytes) {
-        Integer2Bytes Data = {.Bytes = *Bytes};
+    uint64_t GetIntegerFromBytes(uint64_t *Bytes) {
+        Integer2Bytes Data = {.Integer = *Bytes};
         return Data.Integer;
     }
     

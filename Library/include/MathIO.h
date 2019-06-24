@@ -61,7 +61,7 @@ extern "C" {
      @param                     Bytes                           "The array of bytes to convert".
      @return                                                    "Integer".
      */
-    uint64_t                    GetIntegerFromBytes(uint8_t *Bytes);
+    uint64_t                    GetIntegerFromBytes(uint64_t *Bytes);
     
     /*!
      @abstract                                                  "Converts a Float to an integer".
