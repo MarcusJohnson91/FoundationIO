@@ -213,26 +213,22 @@ extern "C" {
         uint64_t  BitOffset;
     } Entropy;
     
-    static uint64_t Seed(void) {
-        uint64_t Data             = 0ULL;
+    static int64_t Entropy_BaseSeed(uint8_t NumBytes) {
+        int64_t RandomValue = 0LL;
+        if (NumBytes <= 8) {
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
-        arc4random_buf(&Data, 8);
+            arc4random_buf(&RandomValue, NumBytes);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        NTSTATUS Status           = BCryptGenRandom(NULL, &Data, 8, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
-        if (Status <= 0) {
-            Log(Log_ERROR, __func__, U8("Failed to read random data, Entropy is extremely insecure, aborting"));
-            abort();
-        }
+            BCryptGenRandom(NULL, &RandomValue, NumBytes, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
 #else
-        FILE *RandomFile          = fopen("/dev/urandom", "rb");
-        size_t BytesRead          = fread(&Data, 8, 1, RandomFile);
-        if (BytesRead != Random->EntropySize) {
-            Log(Log_ERROR, __func__, U8("Failed to read random data, Entropy is extremely insecure, aborting"));
-            abort();
-        }
-        fclose(RandomFile);
+            FILE *RandomFile          = fopen("/dev/urandom", "rb");
+            size_t BytesRead          = fread(&RandomValue, NumBytes, 1, RandomFile);
+            fclose(RandomFile);
 #endif
-        return Data;
+        } else {
+            Log(Log_ERROR, __func__, U8("Can't return more than 8 bytes"));
+        }
+        return RandomValue;
     }
     
     static void Entropy_Seed(Entropy *Random) {
@@ -263,20 +259,18 @@ extern "C" {
     
     static void Entropy_Mix(Entropy *Random) {
         if (Random != NULL) {
-            uint8_t *Bytes        = calloc(8, sizeof(uint8_t));
-            
-            for (uint64_t Byte1 = 0ULL; Byte1 < (Random->EntropySize - 1) / 8; Byte1 += 8) {
-                uint64_t Integer  = GetIntegerFromBytes(&Random->EntropyPool[Byte1]);
+            for (uint64_t Word = 0ULL; Word < Random->EntropySize / 8; Word++) {
+                uint64_t Integer  = (int64_t) Random->EntropyPool;
                 
-                uint64_t Seed1    = Seed();
-                uint64_t Seed2    = Seed();
-                uint64_t Seed3    = Seed();
-                uint64_t Seed4    = Seed();
+                uint64_t Seed1    = Entropy_BaseSeed(8);
+                uint64_t Seed2    = Entropy_BaseSeed(8);
+                uint64_t Seed3    = Entropy_BaseSeed(8);
+                uint64_t Seed4    = Entropy_BaseSeed(8);
                 
-                uint8_t  Rotate1  = Seed() % 64;
-                uint8_t  Rotate2  = Seed() % 64;
-                uint8_t  Rotate3  = Seed() % 64;
-                uint8_t  Rotate4  = Seed() % 64;
+                uint8_t  Rotate1  = Entropy_BaseSeed(1) % 64;
+                uint8_t  Rotate2  = Entropy_BaseSeed(1) % 64;
+                uint8_t  Rotate3  = Entropy_BaseSeed(1) % 64;
+                uint8_t  Rotate4  = Entropy_BaseSeed(1) % 64;
                 
                 
                 uint64_t Mixed1   = Integer ^ Seed1;
@@ -291,10 +285,14 @@ extern "C" {
                 uint64_t Mixed4   = Rotated3 | Seed4;
                 uint64_t Rotated4 = RotateLeft(Mixed4, Rotate4);
                 
-                GetBytesFromInteger(Rotated4, Bytes);
-                for (uint8_t Byte2 = 0; Byte2 < 8; Byte2++) {
-                    Random->EntropyPool[Byte1 + Byte2] = Bytes[Byte1 + Byte2];
-                }
+                Random->EntropyPool[Word + 0] = (Rotated4 & 0xFF00000000000000) >> 56;
+                Random->EntropyPool[Word + 1] = (Rotated4 & 0x00FF000000000000) >> 48;
+                Random->EntropyPool[Word + 2] = (Rotated4 & 0x0000FF0000000000) >> 40;
+                Random->EntropyPool[Word + 3] = (Rotated4 & 0x000000FF00000000) >> 32;
+                Random->EntropyPool[Word + 4] = (Rotated4 & 0x00000000FF000000) >> 24;
+                Random->EntropyPool[Word + 5] = (Rotated4 & 0x0000000000FF0000) >> 16;
+                Random->EntropyPool[Word + 6] = (Rotated4 & 0x000000000000FF00) >> 8;
+                Random->EntropyPool[Word + 7] = (Rotated4 & 0x00000000000000FF) >> 0;
             }
         } else {
             Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
@@ -306,6 +304,7 @@ extern "C" {
         if (Random != NULL) {
             if (NumBits <= Entropy_GetRemainingEntropy(Random)) {
                 uint64_t Bits2Read                    = NumBits;
+                
                 do {
                     uint64_t EntropyByte              = Bits2Bytes(Random->BitOffset, RoundingType_Down);
                     uint8_t  BitsInEntropyByte        = 8 - (Random->BitOffset % 8);
@@ -319,8 +318,10 @@ extern "C" {
 #endif
                     uint8_t  ExtractedBits            = Random->EntropyPool[EntropyByte] & BitMask;
                     uint8_t  ApplyBits                = ExtractedBits >> Shift;
+                    
                     Bits                            <<= Bits2Get;
-                    Bits                              = ApplyBits;
+                    Bits                             |= ApplyBits;
+                    
                     Bits2Read                        -= Bits2Get;
                     Random->BitOffset                += Bits2Get;
                 } while (Bits2Read > 0);
@@ -381,16 +382,16 @@ extern "C" {
         if (Random != NULL) {
             uint8_t Bits2Read                     = Logarithm(2, MaxValue - MinValue);
             
-            int64_t GeneratedValue                = (int64_t) Entropy_ExtractBits(Random, Bits2Read);
+            RandomInteger                         = Entropy_ExtractBits(Random, Bits2Read);
             
-            if (GeneratedValue < MinValue || GeneratedValue > MaxValue) {
-                uint8_t NumFixBits                = (CeilD(Logarithm(2, Maximum(GeneratedValue, MaxValue) - Minimum(GeneratedValue, MaxValue))) + Bits2Read);
+            if (RandomInteger < MinValue || RandomInteger > MaxValue) {
+                uint8_t NumFixBits                = (CeilD(Logarithm(2, Maximum(RandomInteger, MaxValue) - Minimum(RandomInteger, MaxValue))) + Bits2Read);
                 NumFixBits                        = RoundD(NumFixBits / 2);
                 uint64_t FixBits                  = Entropy_ExtractBits(Random, NumFixBits);
-                if (GeneratedValue < MinValue) {
-                    GeneratedValue               += FixBits;
+                if (RandomInteger < MinValue) {
+                    RandomInteger                += FixBits;
                 } else {
-                    GeneratedValue               -= FixBits;
+                    RandomInteger                -= FixBits;
                 }
             }
         } else {
