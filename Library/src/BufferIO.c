@@ -1,4 +1,3 @@
-#include "../include/Macros.h"         /* Included for FoundationIO's macros */
 #include "../include/BitIO.h"          /* Included for our declarations */
 
 #include "../include/Log.h"            /* Included for Log declarations */

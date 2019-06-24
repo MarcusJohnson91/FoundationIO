@@ -1,4 +1,3 @@
-#include "../include/Macros.h"         /* Included for FoundationIO's macros */
 #include "../include/StringIO.h"       /* Included for our declarations */
 #include "../include/UnicodeTables.h"  /* Included for the Unicode tables */
 

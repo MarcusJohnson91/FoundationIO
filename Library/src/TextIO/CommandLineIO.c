@@ -1,4 +1,3 @@
-#include "../include/Macros.h"         /* Included for FoundationIO's macros */
 #include "../include/CommandLineIO.h"  /* Included for the CommandLineIO declarations */
 
 #include "../include/Log.h"            /* Included for Log */
@@ -16,7 +15,7 @@
 #define   VC_EXTRALEAN
 #endif /* VC_EXTRALEAN */
 #include <Windows.h>                   /* Included because WinCon need it */
-#include <wincon.h>                    /* Included for getting the terminal size, MAKE SURE Macros.h is included before this, it includes Windows.h */
+#include <wincon.h>                    /* Included for getting the terminal size */
 #endif
 
 #ifdef __cplusplus
