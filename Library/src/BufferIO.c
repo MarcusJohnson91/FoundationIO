@@ -21,10 +21,6 @@ extern "C" {
                                 BinaryGUUIDSize                 = 16,
     };
     
-#ifndef                         BitIONULLTerminator
-#define                         BitIONULLTerminator             (0)
-#endif
-    
 #ifndef                         UNCPathPrefix
 #define                         UNCPathPrefix                   U32("//?/")
 #endif
@@ -547,7 +543,7 @@ extern "C" {
                 do {
                     BitBuffer_AppendBits(BitB, MSByteFirst, LSBitFirst, 8, String2Write[CodeUnit]);
                     CodeUnit         += 1;
-                } while (String2Write[CodeUnit] != BitIONULLTerminator);
+                } while (String2Write[CodeUnit] != FoundationIONULLTerminator);
             } else {
                 Log(Log_ERROR, __func__, U8("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
             }

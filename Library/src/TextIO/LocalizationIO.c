@@ -10,11 +10,6 @@
 extern "C" {
 #endif
     
-#ifndef LocalizationIONULLTerminator
-#define LocalizationIONULLTerminator     (0)
-#define LocalizationIONULLTerminatorSize (1)
-#endif
-    
     static void lconv_Init(void) {
         setlocale(LC_ALL, NULL);
         setlocale(LC_COLLATE, NULL);
@@ -136,13 +131,13 @@ extern "C" {
                 break;
             }
         }
-        Region                                 = calloc(DotOffset - StartOffset + LocalizationIONULLTerminator, sizeof(UTF8));
+        Region                                 = calloc(DotOffset - StartOffset + FoundationIONULLTerminatorSize, sizeof(UTF8));
         if (Region != NULL) {
             for (uint64_t CodeUnit = StartOffset - 1; CodeUnit < DotOffset - 1; CodeUnit++) {
                 Region[CodeUnit - StartOffset] = LocaleAll[CodeUnit - StartOffset];
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + LocalizationIONULLTerminatorSize);
+            Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
         }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         UTF16    *LocaleAll                      = _wsetlocale(LC_ALL, NULL);
@@ -157,13 +152,13 @@ extern "C" {
                 break;
             }
         }
-		UTF16 *Region16                          = calloc(DotOffset - StartOffset + LocalizationIONULLTerminator, sizeof(UTF16));
+		UTF16 *Region16                          = calloc(DotOffset - StartOffset + FoundationIONULLTerminatorSize, sizeof(UTF16));
         if (Region16 != NULL) {
             for (uint64_t CodeUnit = StartOffset - 1; CodeUnit < DotOffset - 1; CodeUnit++) {
                 Region16[CodeUnit - StartOffset] = LocaleAll[CodeUnit - StartOffset];
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + LocalizationIONULLTerminatorSize);
+            Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
         }
         UTF32 *Region32                          = UTF16_Decode(Region16);
         free(Region16);
@@ -188,13 +183,13 @@ extern "C" {
                 break;
             }
         }
-        UTF8 *Region8                            = calloc(DotOffset - StartOffset + LocalizationIONULLTerminator, sizeof(UTF8));
+        UTF8 *Region8                            = calloc(DotOffset - StartOffset + FoundationIONULLTerminatorSize, sizeof(UTF8));
         if (Region8 != NULL) {
             for (uint64_t CodeUnit = StartOffset - 1; CodeUnit < DotOffset - 1; CodeUnit++) {
                 Region8[CodeUnit - StartOffset]  = LocaleAll[CodeUnit - StartOffset];
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + LocalizationIONULLTerminatorSize);
+            Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
         }
         UTF32 *Region32                          = UTF8_Decode(Region8);
         free(Region8);
@@ -213,13 +208,13 @@ extern "C" {
                 break;
             }
         }
-        Region                                 = calloc(DotOffset - StartOffset + LocalizationIONULLTerminator, sizeof(UTF16));
+        Region                                 = calloc(DotOffset - StartOffset + FoundationIONULLTerminatorSize, sizeof(UTF16));
         if (Region != NULL) {
             for (uint64_t CodeUnit = StartOffset - 1; CodeUnit < DotOffset - 1; CodeUnit++) {
                 Region[CodeUnit - StartOffset] = LocaleAll[CodeUnit - StartOffset];
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + LocalizationIONULLTerminatorSize);
+            Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
         }
 #endif
         return Region;
@@ -599,7 +594,7 @@ extern "C" {
             
             uint64_t StrippedStringSize    = StringSize - CodePoints2Remove;
             
-            Stripped                       = calloc(StrippedStringSize + LocalizationIONULLTerminatorSize, sizeof(UTF32));
+            Stripped                       = calloc(StrippedStringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
             if (Stripped != NULL) {
                 for (uint64_t Original = 0ULL; Original < StringSize - 1; Original++) {
                     for (uint64_t StrippedCodePoint = 0ULL; StrippedCodePoint < StrippedStringSize - 1; StrippedCodePoint++) {

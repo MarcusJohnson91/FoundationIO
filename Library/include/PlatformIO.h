@@ -334,6 +334,11 @@ extern "C" {
 #define FoundationIOSTDVersionC2X (202002L)
 #endif
     
+#ifndef FoundationIONULLTerminator
+#define FoundationIONULLTerminator     (0)
+#define FoundationIONULLTerminatorSize (1)
+#endif
+    
     uint64_t FoundationIO_GetNumCPUCores(void);
     
 #ifdef __cplusplus
