@@ -263,7 +263,7 @@ extern "C" {
     
     static void Entropy_Mix(Entropy *Random) {
         if (Random != NULL) {
-            uint8_t *Bytes        = calloc(1, sizeof(uint64_t));
+            uint8_t *Bytes        = calloc(8, sizeof(uint8_t));
             
             for (uint64_t Byte1 = 0ULL; Byte1 < (Random->EntropySize - 1) / 8; Byte1 += 8) {
                 uint64_t Integer  = GetIntegerFromBytes(&Random->EntropyPool[Byte1]);
@@ -311,25 +311,24 @@ extern "C" {
                     uint8_t  BitsInEntropyByte        = 8 - (Random->BitOffset % 8);
                     uint8_t  Bits2Get                 = Minimum(BitsInEntropyByte, Bits2Read);
                     uint8_t  BitMask                  = 0;
-#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
-                    BitMask                           = CreateBitMaskLSBit(Bits2Get);
-#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
-                    BitMask                           = CreateBitMaskMSBit(Bits2Get);
-#emdif
-                    uint8_t  BitMask                  = CreateBitMask(Bits2Get);
                     uint8_t  Shift                    = 8 - Bits2Get;
-                    uint8_t  ExtractedBits            = Random->EntropyPool[EntropyByte] & (BitMask << Shift);
-                    uint8_t  ApplyBits                = Random->EntropyPool[EntropyByte] & (BitMask >> Shift);
+#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
+                    BitMask                           = CreateBitMaskLSBit(Bits2Get) << Shift;
+#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
+                    BitMask                           = CreateBitMaskMSBit(Bits2Get) >> Shift;
+#endif
+                    uint8_t  ExtractedBits            = Random->EntropyPool[EntropyByte] & BitMask;
+                    uint8_t  ApplyBits                = ExtractedBits >> Shift;
                     Bits                            <<= Bits2Get;
                     Bits                              = ApplyBits;
                     Bits2Read                        -= Bits2Get;
+                    Random->BitOffset                += Bits2Get;
                 } while (Bits2Read > 0);
-                Random->BitOffset                    += Bits2Read;
             } else {
                 Entropy_Erase(Random);
                 Entropy_Seed(Random);
                 Entropy_Mix(Random);
-                Bits = Entropy_ExtractBits(Random, NumBits);
+                Bits                                  = Entropy_ExtractBits(Random, NumBits);
             }
         } else {
             Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
@@ -380,9 +379,7 @@ extern "C" {
     int64_t Entropy_GenerateIntegerInRange(Entropy *Random, int64_t MinValue, int64_t MaxValue) {
         int64_t RandomInteger                     = 0ULL;
         if (Random != NULL) {
-            int64_t Min2                          = Minimum(AbsoluteI(MinValue), AbsoluteI(MaxValue));
-            int64_t Max2                          = Maximum(AbsoluteI(MaxValue), AbsoluteI(MinValue));
-            uint8_t Bits2Read                     = CeilD(Logarithm(2, Max2 - Min2));
+            uint8_t Bits2Read                     = Logarithm(2, MaxValue - MinValue);
             
             int64_t GeneratedValue                = (int64_t) Entropy_ExtractBits(Random, Bits2Read);
             

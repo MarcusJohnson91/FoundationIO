@@ -13,8 +13,10 @@ extern "C" {
     }
     
     uint64_t AbsoluteI(int64_t Integer) {
-        bool Sign = Integer >> 63;
-        return (Integer ^ -Sign) + Sign;
+        uint64_t AbsoluteValue = 0ULL;
+        bool     Sign          = (Integer & 0x8000000000000000) >> 63;
+        AbsoluteValue          = (Integer ^ (-Sign)) + Sign;
+        return AbsoluteValue;
     }
     
     typedef union Float2Integer {
@@ -169,11 +171,17 @@ extern "C" {
     }
     
     int64_t  Minimum(int64_t Integer1, int64_t Integer2) {
-        return Integer2 ^ ((Integer1 ^ Integer2) & -(Integer1 < Integer2));
+        int64_t Min1    = Integer1 ^ Integer2;
+        int64_t Min2    = -(Integer1 < Integer2);
+        int64_t Min3    = Integer2 ^ (Min1 & Min2);
+        return  Min3;  // Integer2 ^ ((Integer1 ^ Integer2) & -(Integer1 < Integer2));
     }
     
     int64_t  Maximum(int64_t Integer1, int64_t Integer2) {
-        return Integer1 ^ ((Integer1 ^ Integer2) & -(Integer1 < Integer2));
+        int64_t Max1    = Integer1 ^ Integer2;
+        int64_t Max2    = -(Integer1 < Integer2);
+        int64_t Max3    = Integer1 ^ (Max1 & Max2);
+        return Max3; // Integer1 ^ ((Integer1 ^ Integer2) & -(Integer1 < Integer2));
     }
     
     bool     DecimalIsNormalF(float Decimal) {
@@ -335,31 +343,24 @@ extern "C" {
     }
     
     uint64_t Exponentiate(uint64_t Base, uint64_t Exponent) {
-        int64_t Value      = 0;
-        int64_t Exponent2  = Exponent;
-        if (Base > 0 && Exponent > 0) {
-            while (Exponent2 > 0) {
+        int64_t Value      = Base;
+        int64_t Exponent2  = Exponent - 1;
+        if (Base > 0 && Exponent2 > 0) {
+            do { // 2 * 2 * 2 * 2 * 2 * 2 * 2 = 256
                 Value     *= Base;
-                Exponent2 /= Base;
-            }
+                Exponent2 -= 1;
+            } while (Exponent2 > 0);
         }
         return Value;
     }
     
     int64_t  Logarithm(int64_t Base, int64_t Exponent) {
-        uint64_t Result    = 0ULL;
+        uint64_t Result    = 1ULL;
         int64_t  Exponent2 = Exponent;
-        if (Base > 1 && Exponent > 0) {
-            do {
-                Result    += 1;
-                Exponent2 -= Base;
-            } while (Exponent2 > Base);
-        } else if (Base > 1 && Exponent < 0) {
-            do {
-                Result    += 1;
-                Exponent2 += Base;
-            } while (Exponent2 < Base);
-        }
+        do {
+            Result        += 1;
+            Exponent2     /= Base;
+        } while (Exponent2 > Base);
         return Result;
     }
     
@@ -417,21 +418,29 @@ extern "C" {
         return 8 - (Offset % 8);
     }
     
-    uint8_t CreateBitMaskLSBit(uint8_t NumBits2Select) { // 
-#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-        uint8_t Mask = (uint8_t) Exponentiate(2, NumBits2Select);
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-        uint8_t Mask = (uint8_t) Exponentiate(2, NumBits2Select) >> (8 - NumBits2Select);
+    uint8_t CreateBitMaskLSBit(uint8_t NumBits2Select) { //
+        uint8_t Mask        = 0;
+        if (NumBits2Select <= 8) {
+            uint8_t PreMask = (uint8_t) (Exponentiate(2, NumBits2Select) - 1);
+#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
+            Mask            = PreMask;
+#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
+            Mask            = PreMask >> (8 - NumBits2Select);
 #endif
+        }
         return Mask;
     }
     
     uint8_t CreateBitMaskMSBit(uint8_t NumBits2Select) {
-#if   (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderLE)
-        uint8_t Mask = (uint8_t) Exponentiate(2, NumBits2Select) >> (8 - NumBits2Select);
-#elif (FoundationIOTargetByteOrder == FoundationIOCompileTimeByteOrderBE)
-        uint8_t Mask = (uint8_t) Exponentiate(2, NumBits2Select);
+        uint8_t Mask        = 0;
+        if (NumBits2Select <= 8) {
+            uint8_t PreMask = (uint8_t) (Exponentiate(2, NumBits2Select) - 1);
+#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
+            Mask            = PreMask >> (8 - NumBits2Select);
+#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
+            Mask            = PreMask;
 #endif
+        }
         return Mask;
     }
     
@@ -441,16 +450,6 @@ extern "C" {
     }
     /* Ryū specific math functions */
     
-    uint8_t GetNumDigitsInBase(uint8_t Base, int64_t Value) {
-        uint64_t Value2    = AbsoluteI(Value);
-        uint8_t  NumDigits = 0;
-        do {
-            Value2        /= Base;
-            NumDigits     += 1;
-        } while (Value2 > 0);
-        return NumDigits;
-    }
-    
     uint8_t NumDigitsInDecimal(double Decimal) {
         uint8_t NumDigits = 0;
         
@@ -458,7 +457,7 @@ extern "C" {
     }
     
     uint64_t RotateLeft(uint64_t Value, uint8_t Bits2Rotate) {
-        return (Value << Bits2Rotate) | (Value >> (64 - Bits2Rotate));
+        return (Value << Bits2Rotate) | (Value >> (63 - Bits2Rotate));
     }
     
 #ifdef __cplusplus

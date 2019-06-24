@@ -2091,17 +2091,17 @@ extern "C" {
         uint8_t NumDigitsMantissa = 0;
         
         if ((Base & Base2) == Base2) {
-            NumDigitsExponent = GetNumDigitsInBase(2, Exponent2);
-            NumDigitsMantissa = GetNumDigitsInBase(2, Mantissa2);
+            NumDigitsExponent = Exponentiate(2, Exponent2);
+            NumDigitsMantissa = Exponentiate(2, Mantissa2);
         } else if ((Base & Base8) == Base8) {
-            NumDigitsExponent = GetNumDigitsInBase(8, Exponent2);
-            NumDigitsMantissa = GetNumDigitsInBase(8, Mantissa2);
+            NumDigitsExponent = Exponentiate(8, Exponent2);
+            NumDigitsMantissa = Exponentiate(8, Mantissa2);
         } else if ((Base & Base10) == Base10) {
-            NumDigitsExponent = GetNumDigitsInBase(10, Exponent2);
-            NumDigitsMantissa = GetNumDigitsInBase(10, Mantissa2);
+            NumDigitsExponent = Exponentiate(10, Exponent2);
+            NumDigitsMantissa = Exponentiate(10, Mantissa2);
         } else if ((Base & Base16) == Base16) {
-            NumDigitsExponent = GetNumDigitsInBase(16, Exponent2);
-            NumDigitsMantissa = GetNumDigitsInBase(16, Mantissa2);
+            NumDigitsExponent = Exponentiate(16, Exponent2);
+            NumDigitsMantissa = Exponentiate(16, Mantissa2);
         }
         
         StringSize           += NumDigitsExponent + NumDigitsMantissa;
