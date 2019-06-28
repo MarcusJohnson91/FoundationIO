@@ -365,7 +365,7 @@ extern "C" {
      @param                     RoundingType                    "The type of rounding to do".
      @return                                                    "Returns the number of bytes".
      */
-    int64_t                     Bits2Bytes(int64_t Bits, RoundingTypes RoundingType);
+    uint64_t                    Bits2Bytes(uint64_t Bits, RoundingTypes RoundingType);
     
     /*!
      @abstract                                                  "Swaps bits so the the MSB becoems the LSB, and vice versa".

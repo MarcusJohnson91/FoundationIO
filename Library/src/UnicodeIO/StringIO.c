@@ -43,7 +43,7 @@ extern "C" {
     
     uint8_t UTF16_GetCodePointSizeInCodeUnits(UTF16 CodeUnit) {
         uint8_t CodePointSize = 0;
-        if (CodeUnit < UTF16HighSurrogateStart || (CodeUnit > UTF16LowSurrogateEnd && CodeUnit <= UTF16MaxCodePoint)) {
+        if (CodeUnit < UTF16HighSurrogateStart || (CodeUnit > UTF16LowSurrogateEnd && CodeUnit <= UTF16MaxCodeUnit)) {
             CodePointSize     = 1;
         } else if (CodeUnit >= UTF16HighSurrogateStart && CodeUnit <= UTF16LowSurrogateEnd) {
             CodePointSize     = 2;
@@ -69,8 +69,8 @@ extern "C" {
         uint64_t StringSizeInCodeUnits = 0ULL;
         if (String != NULL) {
             do {
-                StringSizeInCodeUnits += UTF16_GetCodePointSizeInCodeUnits(String[StringSizeInCodeUnits]);
-            } while (String[StringSizeInCodeUnits] != FoundationIONULLTerminator);
+                StringSizeInCodeUnits += 1;
+            } while (String[StringSizeInCodeUnits + 1] != FoundationIONULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -92,17 +92,20 @@ extern "C" {
     }
     
     uint64_t UTF16_GetStringSizeInCodePoints(UTF16 *String) {
-        uint64_t StringSizeInCodePoints = 0ULL;
-        uint64_t CodeUnit               = 0ULL;
+        uint64_t NumCodePoints             = 0ULL;
         if (String != NULL) {
-            do {
-                StringSizeInCodePoints += 1;
-                CodeUnit               += UTF16_GetCodePointSizeInCodeUnits(String[CodeUnit]);
-            } while (String[CodeUnit] != FoundationIONULLTerminator);
+            uint64_t StringSizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(String);
+            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSizeInCodeUnits; CodeUnit++) {
+                if (String[CodeUnit] <= UTF16MaxCodeUnit && (String[CodeUnit] < UTF16HighSurrogateStart || String[CodeUnit] > UTF16LowSurrogateEnd)) {
+                    NumCodePoints         += 1;
+                } else if (String[CodeUnit] >= UTF16HighSurrogateStart && String[CodeUnit] <= UTF16HighSurrogateEnd) {
+                    NumCodePoints         += 1; // Only count the high surrogates, not the low surrogates so that the codepoint count is accurate
+                }
+            }
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
-        return StringSizeInCodePoints;
+        return NumCodePoints;
     }
     
     uint64_t UTF32_GetStringSizeInCodePoints(UTF32 *String) {
@@ -145,7 +148,7 @@ extern "C" {
         uint64_t UTF16CodeUnits     = 0ULL;
         if (String != NULL) {
             do {
-                if (String[CodePoint] < UTF16HighSurrogateStart || (String[CodePoint] > UTF16LowSurrogateEnd && String[CodePoint] <= UTF16MaxCodePoint)) {
+                if (String[CodePoint] < UTF16HighSurrogateStart || (String[CodePoint] > UTF16LowSurrogateEnd && String[CodePoint] <= UTF16MaxCodeUnit)) {
                     UTF16CodeUnits += 1;
                 } else if (String[CodePoint] >= UTF16HighSurrogateStart && String[CodePoint] <= UTF16LowSurrogateEnd) {
                     UTF16CodeUnits += 2;
@@ -694,15 +697,14 @@ extern "C" {
             DecodedString                        = calloc(NumCodePoints, sizeof(UTF32));
             if (DecodedString != NULL) {
                 do {
-                    if (String[CodeUnit] < UTF16HighSurrogateStart || (String[CodeUnit] > UTF16LowSurrogateEnd && String[CodeUnit] <= UTF16MaxCodePoint)) {
-                        UTF16 CodePoint2Swap     = String[CodeUnit];
-                        DecodedString[CodePoint] = SwapEndian16(CodePoint2Swap);
-                        CodeUnit += 1;
-                    } else {
-                        UTF16 HighSurrogate      = (SwapEndian16(String[CodeUnit])     - UTF16HighSurrogateStart) * UTF16SurrogatePairModDividend;
-                        UTF16 LowSurrogate       =  SwapEndian16(String[CodeUnit + 1]) - UTF16LowSurrogateStart;
-                        DecodedString[CodePoint] =  HighSurrogate + LowSurrogate + UTF16SurrogatePairStart;
-                        CodeUnit += 2;
+                    if (String[CodeUnit] <= UTF16MaxCodeUnit && (String[CodeUnit < UTF16HighSurrogateStart] || String[CodeUnit] > UTF16LowSurrogateEnd)) {
+                        DecodedString[CodePoint] = String[CodeUnit];
+                        CodeUnit                += 1;
+                    } else if (String[CodeUnit] >= UTF16HighSurrogateStart || String[CodeUnit] <= UTF16LowSurrogateEnd) {
+                        UTF16 HighSurrogate      = String[CodeUnit];
+                        UTF16 LowSurrogate       = String[CodeUnit + 1];
+                        DecodedString[CodePoint] = (UTF16MaxCodeUnit + 1) + ((HighSurrogate & 0x3FF) << 10) | (LowSurrogate & 0x3FF);
+                        CodeUnit                += 2;
                     }
                 } while (String[CodeUnit] != FoundationIONULLTerminator);
             } else {
@@ -736,7 +738,7 @@ extern "C" {
                         EncodedString[CodeUnitNum + 1] = (0x80 + ((String[CodePoint] & 0x000FC0) >>  6));
                         EncodedString[CodeUnitNum + 2] = (0x80 +  (String[CodePoint] & 0x00003F));
                         CodeUnitNum                   += 3;
-                    } else if (String[CodePoint] > UTF16MaxCodePoint && String[CodePoint] <= UnicodeMaxCodePoint) {
+                    } else if (String[CodePoint] > UTF16MaxCodeUnit && String[CodePoint] <= UnicodeMaxCodePoint) {
                         EncodedString[CodeUnitNum]     = (0xF0 + ((String[CodePoint] & 0x1C0000) >> 18));
                         EncodedString[CodeUnitNum + 1] = (0x80 + ((String[CodePoint] & 0x03F000) >> 12));
                         EncodedString[CodeUnitNum + 2] = (0x80 + ((String[CodePoint] & 0x000FC0) >>  6));
@@ -766,14 +768,17 @@ extern "C" {
             if (EncodedString != NULL) {
                 for (uint64_t CodePoint = 0ULL; CodePoint < StringSizeInCodePoints - 1; CodePoint++) {
                     for (uint64_t CodeUnit = 0ULL; CodeUnit < NumCodeUnits - 1; CodeUnit++) {
-                        if (String[CodePoint] < UTF16HighSurrogateStart || (String[CodePoint] > UTF16LowSurrogateEnd && String[CodePoint] < UTF16MaxCodePoint)) {
-                            EncodedString[CodeUnit]      = String[CodePoint];
-                        } else {
-                            UTF16 HighCodeUnit           = String[CodePoint] - (UTF16SurrogatePairStart / UTF16SurrogatePairModDividend) + UTF16HighSurrogateStart;
+                        if (String[CodePoint] > UTF16MaxCodeUnit) {
+                            uint32_t Ranged              = String[CodePoint] - UTF16SurrogatePairStart; // 0xF0731
+                            UTF16    HighCodeUnit        = UTF16HighSurrogateStart + ((Ranged & 0xFFC00) >> 10);
+                            UTF16    LowCodeUnit         = UTF16LowSurrogateStart  + (Ranged & 0x3FF);
+                            
                             EncodedString[CodeUnit]      = HighCodeUnit;
-                            UTF16 LowCodeUnit            = String[CodePoint] - (UTF16SurrogatePairStart % UTF16SurrogatePairModDividend) + UTF16LowSurrogateStart;
                             EncodedString[CodeUnit + 1]  = LowCodeUnit;
-                            CodeUnit                    += 1;
+                            
+                            CodeUnit                    += 2;
+                        } else {
+                            EncodedString[CodeUnit]      = String[CodePoint] & 0xFFFF;
                         }
                     }
                 }
@@ -2935,13 +2940,13 @@ extern "C" {
         uint64_t                        MinWidth;        // Actual Width
         uint64_t                        Precision;       // Actual Precision
         uint64_t                        PositionalArg;   // Argument number to substitute
-        uint8_t                         OctalSeqSize;    // Octal Sequence Size, Max 3
+        FormatSpecifier_TypeModifiers   TypeModifier;
         FormatSpecifier_Flags           Flag;
         FormatSpecifier_MinWidths       MinWidthFlag;
         FormatSpecifier_Precisions      PrecisionFlag;
         FormatSpecifier_BaseTypes       BaseType;
-        FormatSpecifier_TypeModifiers   TypeModifier;
         FormatSpecifier_EscapeSequences EscapeType;
+        uint8_t                         OctalSeqSize;    // Octal Sequence Size, Max 3
     } FormatSpecifier;
     
     typedef struct FormatSpecifiers {

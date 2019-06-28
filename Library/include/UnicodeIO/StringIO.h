@@ -85,7 +85,7 @@ extern "C" {
      @constant            UTF16HighSurrogateEnd                "The value that marks the end   of the High Surrogate range".
      @constant            UTF16LowSurrogateStart               "The value that marks the start of the Low  Surrogate range".
      @constant            UTF16LowSurrogateEnd                 "The value that marks the end   of the Low  Surrogate range".
-     @constant            UTF16MaxCodePoint                    "The highest value that can be stored in a single UTF16 codeunit".
+     @constant            UTF16MaxCodeUnit                     "The highest value that can be stored in a single UTF16 codeunit".
      @constant            UTF16SurrogatePairModDividend        "The value to modulo the surrogate pair by to decode a High Surrogate".
      @constant            UTF16SurrogatePairStart              "The first UTF-32 codepoint to require Surrogate Pairs in UTF-16".
      @constant            InvalidReplacementCodePoint          "The codepoint to replace invalid codeunits".
@@ -107,7 +107,7 @@ extern "C" {
                           UTF16HighSurrogateEnd                = 0xDBFF,
                           UTF16LowSurrogateStart               = 0xDC00,
                           UTF16LowSurrogateEnd                 = 0xDFFF,
-                          UTF16MaxCodePoint                    = 0xFFFF,
+                          UTF16MaxCodeUnit                     = 0xFFFF,
                           UTF16SurrogatePairModDividend        = 0x400,
                           UTF16SurrogatePairStart              = 0x10000,
                           InvalidReplacementCodePoint          = 0xFFFD,
@@ -930,6 +930,14 @@ extern "C" {
     void                  UTF16_WriteLine(FILE *OutputFile, UTF16 *String);
     
     /*!
+     @abstract                             "Writes a Line (Including mewline) to Source".
+     @remark                               "Replaces Fputws and putws".
+     @param               OutputFile       "The file to write the string to".
+     @param               String           "The String to write".
+     */
+    void                  UTF32_WriteLine(FILE *OutputFile, UTF32 *String);
+    
+    /*!
      @abstract                             "Counts the number of Format Specifiers in String".
      @param               String           "The string to check".
      @return                               "Returns the number of format specifiers found".
@@ -1187,7 +1195,7 @@ extern "C" {
     
 #define GetNumFormatSpecifiers(String)    _Generic((String), UTF8:UTF8_GetNumFormatSpecifiers, UTF8*:UTF8_GetNumFormatSpecifiers, UTF16:UTF16_GetNumFormatSpecifiers, UTF16*:UTF16_GetNumFormatSpecifiers, UTF32:UTF32_GetNumFormatSpecifiers, UTF32*:UTF32_GetNumFormatSpecifiers)(String)
     
-#define WriteString(Stream,String)        _Generic((String), UTF8:UTF8_WriteLine, UTF8*:UTF8_WriteLine, UTF16:UTF16_WriteLine, UTF16*:UTF16_WriteLine)(Stream,String)
+#define WriteString(Stream,String)        _Generic((String), UTF8:UTF8_WriteLine, UTF8*:UTF8_WriteLine, UTF16:UTF16_WriteLine, UTF16*:UTF16_WriteLine, UTF32:UTF32_WriteLine, UTF32*:UTF32_WriteLine)(Stream, String)
     
 #define Clone(String)                     _Generic((String), UTF8:UTF8_Clone, UTF8*:UTF8_Clone, UTF16:UTF16_Clone, UTF16*:UTF16_Clone, UTF32:UTF32_Clone, UTF32*:UTF32_Clone)(String)
     

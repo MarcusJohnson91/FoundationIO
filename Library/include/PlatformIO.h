@@ -326,8 +326,8 @@ extern "C" {
 #define FoundationIOSTDVersionC11 (201112L)
 #endif
     
-#ifndef FoundationIOSTDVersionC17
-#define FoundationIOSTDVersionC17 (201710L)
+#ifndef FoundationIOSTDVersionC18
+#define FoundationIOSTDVersionC18 (201710L)
 #endif
     
 #ifndef FoundationIOSTDVersionC2X

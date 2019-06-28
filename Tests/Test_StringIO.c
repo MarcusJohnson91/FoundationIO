@@ -18,19 +18,19 @@ extern "C" {
         } else {
             Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
         }
-        
         return CodePoint;
     }
     
     UTF32 *UTF32_GenerateString(Entropy *Random) {
         UTF32 *String                 = 0UL;
         if (Random != NULL) {
-            uint16_t NumCodePoints    = Entropy_GenerateIntegerInRange(Random, 1, 8192);
-            String                    = calloc(NumCodePoints + TestIONULLTerminatorSize, sizeof(UTF32));
+            int64_t NumCodePoints     = Entropy_GenerateIntegerInRange(Random, 1, 8192);
+            String                    = calloc(NumCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
             if (String != NULL) {
                 for (uint16_t CodePoint = 0; CodePoint < NumCodePoints - 1; CodePoint++) {
                     String[CodePoint] = UTF32_GenerateCodePoint(Random);
                 }
+                WriteString(stderr, String);
             } else {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate string with %lu CodePoints"), NumCodePoints);
             }
