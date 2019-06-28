@@ -533,10 +533,10 @@ extern "C" {
         return StringSize;
     }
     
-    UTF8    *BitBuffer_ReadUTF8(BitBuffer *BitB, uint64_t StringSize) {
-        UTF8 *ExtractedString             = calloc(StringSize, sizeof(UTF8));
+    UTF8 *BitBuffer_ReadUTF8(BitBuffer *BitB, uint64_t StringSize) {
+        UTF8 *ExtractedString             = calloc(StringSize + FoundationIONULLTerminatorSize, sizeof(UTF8));
         if (BitB != NULL && ExtractedString != NULL) {
-            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
+            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
                 ExtractedString[CodeUnit] = BitBuffer_Extract_LSByteLSBit(BitB, 8);
             }
         }
@@ -560,7 +560,7 @@ extern "C" {
         return StringSize;
     }
     
-    UTF16   *BitBuffer_ReadUTF16(BitBuffer *BitB, uint64_t StringSize) {
+    UTF16 *BitBuffer_ReadUTF16(BitBuffer *BitB, uint64_t StringSize) {
         UTF16 *ExtractedString            = calloc(StringSize, sizeof(UTF16));
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
@@ -606,7 +606,7 @@ extern "C" {
         return GUUID;
     }
     
-    void     BitBuffer_WriteBits(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, uint8_t NumBits2Write, uint64_t Bits2Write) {
+    void BitBuffer_WriteBits(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, uint8_t NumBits2Write, uint64_t Bits2Write) {
         if (BitB != NULL) {
             if (ByteOrder == LSByteFirst) {
                 if (BitOrder == LSBitFirst) {
@@ -628,7 +628,7 @@ extern "C" {
         }
     }
     
-    void     BitBuffer_WriteUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, Unary_StopBits StopBit, uint8_t UnaryBits2Write) {
+    void BitBuffer_WriteUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, Unary_StopBits StopBit, uint8_t UnaryBits2Write) {
         if (BitB != NULL) {
             StopBit            &= 1;
             uint8_t Field2Write = UnaryBits2Write;
@@ -658,7 +658,7 @@ extern "C" {
         }
     }
     
-    void     BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write) {
+    void BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write) {
         if (BitB != NULL && String2Write != NULL) {
             int64_t  StringSize    = UTF8_GetStringSizeInCodeUnits(String2Write);
             int64_t  BitsAvailable = BitBuffer_GetBitsFree(BitB);

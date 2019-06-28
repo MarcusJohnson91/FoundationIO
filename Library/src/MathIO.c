@@ -387,17 +387,13 @@ extern "C" {
         return Bytes * 8;
     }
     
-    int64_t  Bits2Bytes(int64_t Bits, RoundingTypes RoundingType) {
-        uint64_t AbsoluteBits = AbsoluteI(Bits);
-        int64_t  Bytes        = 0ULL;
+    uint64_t Bits2Bytes(uint64_t Bits, RoundingTypes RoundingType) {
+        uint64_t Bytes        = Bits / 8;
+        
         if (RoundingType == RoundingType_Up) {
-            Bytes             = (AbsoluteBits >> 3) + 1;
-        } else if (RoundingType == RoundingType_Down) {
-            Bytes             = (AbsoluteBits >> 3);
+            Bytes            += 1;
         }
-        if (Bits < 0) {
-            Bytes *= -1;
-        }
+        
         return Bytes;
     }
     
@@ -418,7 +414,7 @@ extern "C" {
         return 8 - (Offset % 8);
     }
     
-    uint8_t CreateBitMaskLSBit(uint8_t NumBits2Select) { //
+    uint8_t CreateBitMaskLSBit(uint8_t NumBits2Select) {
         uint8_t Mask        = 0;
         if (NumBits2Select <= 8) {
             uint8_t PreMask = (uint8_t) (Exponentiate(2, NumBits2Select) - 1);

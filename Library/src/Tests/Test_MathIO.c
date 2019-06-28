@@ -7,8 +7,8 @@
 extern "C" {
 #endif
     
-    void Test_Minimum(void) {
-        Entropy *Random = Entropy_Init(4096);
+    void Test_MinMax(void) {
+        Entropy *Random      = Entropy_Init(4096);
         
         for (uint16_t Loop = 0; Loop < 512; Loop++) {
             int64_t Integer1 = Entropy_GenerateIntegerInRange(Random, INT64_MIN, INT64_MAX);
@@ -26,8 +26,19 @@ extern "C" {
         }
     }
     
+    void Test_Decimals() {
+        Entropy *Random  = Entropy_Init(4096);
+        
+        double  Decimal  = Entropy_GenerateDecimal(Random);
+        double  Ceiled   = CeilD(Decimal);
+        double  Floored  = FloorD(Decimal);
+        printf("Ceiled: %F\n", Ceiled);
+        printf("Floored: %F\n", Floored);
+    }
+    
     int main() {
-        Test_Minimum();
+        Test_Decimals();
+        //Test_MinMax();
         return EXIT_SUCCESS;
     }
     

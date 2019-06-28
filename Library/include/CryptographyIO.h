@@ -59,11 +59,18 @@ extern "C" {
     uint64_t          Entropy_GetRemainingEntropy(Entropy *Random);
     
     /*!
-     @abstract                             "The number of bits of entropy available".
+     @abstract                             "Generates an integer between MinValue and MaxValue, inclusive".
      @param           Random               "The Entropy pointer".
-     @return                               "Returns the the amount of entropy in bits".
+     @return                               "Returns an integer matching those characteristics".
      */
     int64_t           Entropy_GenerateIntegerInRange(Entropy *Random, int64_t MinValue, int64_t MaxValue);
+    
+    /*!
+     @abstract                             "Generates a Decimal".
+     @param           Random               "The Entropy pointer".
+     @return                               "Returns the generated decimal".
+     */
+    double            Entropy_GenerateDecimal(Entropy *Random);
     
     /*!
      @abstract                             "Erases the entropy pool for sexurity reasons".

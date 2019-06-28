@@ -301,21 +301,21 @@ extern "C" {
     
     static uint64_t Entropy_ExtractBits(Entropy *Random, uint8_t NumBits) {
         uint64_t Bits                                 = 0ULL;
-        if (Random != NULL) {
+        if (Random != NULL && NumBits > 0) {
             if (NumBits <= Entropy_GetRemainingEntropy(Random)) {
                 uint64_t Bits2Read                    = NumBits;
                 
                 do {
-                    uint64_t EntropyByte              = Bits2Bytes(Random->BitOffset, RoundingType_Down);
-                    uint8_t  BitsInEntropyByte        = 8 - (Random->BitOffset % 8);
+                    uint8_t  BitsInEntropyByte        = Bits2ExtractFromByte(Random->BitOffset);
                     uint8_t  Bits2Get                 = Minimum(BitsInEntropyByte, Bits2Read);
-                    uint8_t  BitMask                  = 0;
                     uint8_t  Shift                    = 8 - Bits2Get;
+                    uint8_t  BitMask                  = 0;
 #if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
                     BitMask                           = CreateBitMaskLSBit(Bits2Get) << Shift;
 #elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
                     BitMask                           = CreateBitMaskMSBit(Bits2Get) >> Shift;
 #endif
+                    uint64_t EntropyByte              = Bits2Bytes(Random->BitOffset, RoundingType_Down);
                     uint8_t  ExtractedBits            = Random->EntropyPool[EntropyByte] & BitMask;
                     uint8_t  ApplyBits                = ExtractedBits >> Shift;
                     
@@ -331,8 +331,10 @@ extern "C" {
                 Entropy_Mix(Random);
                 Bits                                  = Entropy_ExtractBits(Random, NumBits);
             }
-        } else {
+        } else if (Random == NULL) {
             Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+        } else if (NumBits == 0) {
+            Log(Log_ERROR, __func__, U8("Reading zero bits does not make sense"));
         }
         return Bits;
     }
@@ -380,7 +382,12 @@ extern "C" {
     int64_t Entropy_GenerateIntegerInRange(Entropy *Random, int64_t MinValue, int64_t MaxValue) {
         int64_t RandomInteger                     = 0ULL;
         if (Random != NULL) {
-            uint8_t Bits2Read                     = Logarithm(2, MaxValue - MinValue);
+            uint8_t Bits2Read                     = 0;
+            if (MaxValue > MinValue) {
+                Bits2Read                         = Logarithm(2, MaxValue - MinValue);
+            } else if (MinValue == MaxValue) {
+                Bits2Read                         = MaxValue;
+            }
             
             RandomInteger                         = Entropy_ExtractBits(Random, Bits2Read);
             
@@ -398,6 +405,22 @@ extern "C" {
             Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
         }
         return RandomInteger;
+    }
+    
+    double Entropy_GenerateDecimal(Entropy *Random) {
+        double Decimal        = 0.0;
+        if (Random != NULL) {
+            int8_t   Sign     = Entropy_GenerateIntegerInRange(Random, 1, 1) == 1 ? 1 : -1;
+            int16_t  Exponent = Entropy_GenerateIntegerInRange(Random, -1023, 1023);
+            uint64_t Mantissa = Entropy_GenerateIntegerInRange(Random, 0, 4503599627370496);
+            
+            Decimal           = InsertSignD(Decimal, Sign);
+            Decimal           = InsertExponentD(Decimal, Exponent);
+            Decimal           = InsertMantissaD(Decimal, Mantissa);
+        } else {
+            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+        }
+        return Decimal;
     }
     
     void Entropy_Deinit(Entropy *Random) {
