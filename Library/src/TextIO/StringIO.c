@@ -1837,53 +1837,73 @@ extern "C" {
         uint64_t CodePoint = 0ULL;
         int8_t   Sign      = 1;
         int64_t  Value     = 0LL;
-        if (String != NULL && Base != Decimal) {
+        if (String != NULL && Base != Decimal) { // We need to skip WhiteSpace
             if (Base == (Integer | Base2)) {
                 do {
-                    if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x31) {
-                        Value <<= 1;
-                        Value   = String[CodePoint] - 0x30;
+                    for (uint8_t WhiteSpace = 0; WhiteSpace < WhiteSpaceTableSize; WhiteSpace++) {
+                        if (String[CodePoint] != WhiteSpaceTable[WhiteSpace]) {
+                            if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x31) {
+                                Value <<= 1;
+                                Value   = String[CodePoint] - 0x30;
+                            }
+                        }
                     }
                 } while (String[CodePoint] != FoundationIONULLTerminator);
             } else if (Base == (Integer | Base8)) {
                 do {
-                    if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x37) {
-                        Value  *= 8;
-                        Value   = String[CodePoint] - 0x30;
+                    for (uint8_t WhiteSpace = 0; WhiteSpace < WhiteSpaceTableSize; WhiteSpace++) {
+                        if (String[CodePoint] != WhiteSpaceTable[WhiteSpace]) {
+                            if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x37) {
+                                Value  *= 8;
+                                Value   = String[CodePoint] - 0x30;
+                            }
+                        }
                     }
                 } while (String[CodePoint] != FoundationIONULLTerminator);
             } else if (Base == (Integer | Base10)) {
                 do {
-                    if (CodePoint == 1 && String[CodePoint] == U32('-')) {
-                        Sign    = -1;
-                    }
-                    if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
-                        Value  *= 10;
-                        Value   = String[CodePoint] - 0x30;
+                    for (uint8_t WhiteSpace = 0; WhiteSpace < WhiteSpaceTableSize; WhiteSpace++) {
+                        if (String[CodePoint] != WhiteSpaceTable[WhiteSpace]) {
+                            if (CodePoint == 1 && String[CodePoint] == U32('-')) {
+                                Sign    = -1;
+                            }
+                            if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
+                                Value  *= 10;
+                                Value   = String[CodePoint] - 0x30;
+                            }
+                        }
                     }
                 } while (String[CodePoint] != FoundationIONULLTerminator);
             } else if (Base == (Integer | Base16 | Uppercase)) {
                 do {
-                    if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
-                        Value  *= 16;
-                        Value   = String[CodePoint] - 0x30;
-                    } else if (String[CodePoint] >= 0x41 && String[CodePoint] <= 0x46) {
-                        Value  *= 16;
-                        Value   = String[CodePoint] - 0x37;
+                    for (uint8_t WhiteSpace = 0; WhiteSpace < WhiteSpaceTableSize; WhiteSpace++) {
+                        if (String[CodePoint] != WhiteSpaceTable[WhiteSpace]) {
+                            if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
+                                Value <<= 4;
+                                Value   = String[CodePoint] - 0x30;
+                            } else if (String[CodePoint] >= 0x41 && String[CodePoint] <= 0x46) {
+                                Value <<= 4;
+                                Value   = String[CodePoint] - 0x37;
+                            }
+                        }
                     }
                 } while (String[CodePoint] != FoundationIONULLTerminator);
             } else if (Base == (Integer | Base16 | Lowercase)) {
                 do {
-                    if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
-                        Value <<= 16;
-                        Value   = String[CodePoint] - 0x30;
-                    } else if (String[CodePoint] >= 0x61 && String[CodePoint] <= 0x66) {
-                        Value <<= 16;
-                        Value   = String[CodePoint] - 0x51;
+                    for (uint8_t WhiteSpace = 0; WhiteSpace < WhiteSpaceTableSize; WhiteSpace++) {
+                        if (String[CodePoint] != WhiteSpaceTable[WhiteSpace]) {
+                            if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
+                                Value <<= 4;
+                                Value   = String[CodePoint] - 0x30;
+                            } else if (String[CodePoint] >= 0x61 && String[CodePoint] <= 0x66) {
+                                Value <<= 4;
+                                Value   = String[CodePoint] - 0x51;
+                            }
+                        }
                     }
                 } while (String[CodePoint] != FoundationIONULLTerminator);
             }
-            Value *= Sign;
+            Value                      *= Sign;
         } else if (String == NULL) {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         } else if (Base == Decimal) {
