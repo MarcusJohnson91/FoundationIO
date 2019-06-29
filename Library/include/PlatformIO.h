@@ -338,6 +338,10 @@ extern "C" {
 #define FoundationIONULLTerminator     (0)
 #define FoundationIONULLTerminatorSize (1)
 #endif
+
+#ifndef UNCPathPrefix
+#define UNCPathPrefix                   U32("//?/")
+#endif
     
     uint64_t FoundationIO_GetNumCPUCores(void);
     
