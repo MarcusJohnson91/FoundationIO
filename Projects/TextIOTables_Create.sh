@@ -11,7 +11,7 @@ CreateOutputFileTop() {
     printf "#undef    UTF32\n" >> "$OutputFile"
     printf "#endif /* UTF32 */\n" >> "$OutputFile"
     echo   "#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (!defined __APPLE__) && (!defined __MACH__)" >> "$OutputFile"
-    # Printf doesn't want to work with the precending Macro, so this is my shitty workaround.
+    # Printf doesn't want to work with the precending Macro, so using echo instead is my shitty workaround.
     printf "typedef   char32_t       UTF32;\n" >> "$OutputFile"
     printf "#else\n" >> "$OutputFile"
     printf "typedef   uint_least32_t UTF32;\n" >> "$OutputFile"
@@ -52,7 +52,7 @@ CreateBiDirectionalControlsTable() {
     printf "    static const UTF32    BiDirectionalControlsTable[BiDirectionalControlsTableSize] = {\n" >> "$OutputFile"
     BiDirectionalControls=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Bidi_C = 'Y']" -v @cp -n "$UCD_Data")
     for line in $BiDirectionalControls; do
-        Value=$(echo "$line" | sed -e 's/^/0x/g')
+        Value=$(echo "$line" | awk -F ":" '{printf "0x"$1}')
         printf "        0x%06X,\n" "$Value" >> "$OutputFile"
     done
     printf "    };\n\n" >> "$OutputFile"
@@ -65,7 +65,7 @@ CreateWhiteSpaceTable() {
     printf "    static const UTF32    WhiteSpaceTable[WhiteSpaceTableSize] = {\n" >> "$OutputFile"
     WhiteSpace=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@WSpace = 'Y']" -v @cp -n "$UCD_Data")
     for line in $WhiteSpace; do
-        Value=$(echo "$line" | sed -e 's/^/0x/g')
+        Value=$(echo "$line" | awk -F ":" '{printf "0x"$1}')
         printf "        0x%06X,\n" "$Value" >> "$OutputFile"
     done
     printf "    };\n\n" >> "$OutputFile"
@@ -78,7 +78,7 @@ CreateCurrencyTable() {
     printf "    static const UTF32    CurrencyTable[CurrencyTableSize] = {\n" >> "$OutputFile"
     Currency=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@gc = 'Sc']" -v @cp -n "$UCD_Data")
     for line in $Currency; do
-        Value=$(echo "$line" | sed -e 's/^/0x/g')
+        Value=$(echo "$line" | awk -F ":" '{printf "0x"$1}')
         printf "        0x%06X,\n" "$Value" >> "$OutputFile"
     done
     printf "    };\n\n" >> "$OutputFile"
@@ -152,7 +152,7 @@ CreateGraphemeExtensionTable() {
     printf "    static const UTF32    GraphemeExtensionTable[GraphemeExtensionTableSize] = {\n" >> "$OutputFile"
     CodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Gr_Ext = 'Y']" -v "@cp" -n "$UCD_Data")
     for line in $CodePoints; do
-        Value=$(echo "$line" | sed -e 's/^/0x/g')
+        Value=$(echo "$line" | awk -F ":" '{printf "0x"$1}')
         printf "        0x%06X,\n" "$Value" >> "$OutputFile"
     done
     printf "    };\n\n" >> "$OutputFile"
