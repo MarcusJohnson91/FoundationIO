@@ -20,10 +20,6 @@ extern "C" {
                                 BinaryGUUIDSize                 = 16,
     };
     
-#ifndef                         UNCPathPrefix
-#define                         UNCPathPrefix                   U32("//?/")
-#endif
-    
     /* Start BitBuffer section */
     typedef struct BitBuffer {
         uint8_t   *Buffer;
