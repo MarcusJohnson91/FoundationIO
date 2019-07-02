@@ -88,8 +88,6 @@ CreateCurrencyTable() {
 CreateDecimalTables() {
     IFS='
 '
-    Slash='/'
-    Colon=':'
     SortedCodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and contains(@nv, '/') and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -v "@cp" -o : -v "@nv" -n "$UCD_Data")
     printf "    static const UTF32    DecimalCodePoints[DecimalTableSize] = {\n" >> "$OutputFile"
     for line in $SortedCodePointAndValue; do
@@ -129,7 +127,6 @@ CreateCombiningCharacterClassTable() {
 CreateIntegerTable() {
     IFS='
 '
-    Colon=':'
     SortedCodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -v "@cp" -o : -v "@nv" -n "$UCD_Data")
     printf "    static const UTF32    IntegerCodePoints[IntegerTableSize] = {\n" >> "$OutputFile"
     for line in $SortedCodePointAndValue; do
