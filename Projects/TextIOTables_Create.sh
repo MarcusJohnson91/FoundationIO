@@ -170,17 +170,19 @@ CreateCanonicalNormalizationTables() {
     for line2 in $CanonicalNormalizationCodePointsAndStrings; do
         CanonicalNormalizationString=$(echo "$line2" | awk -F '[: ]' '{for (i = 2; i <= NF; i++) print "0x"$i}')
         ReplacementString=""
+        ReplacementCodePoint=""
         for CodePoint2 in $CanonicalNormalizationString; do # CodePoint2 is already prefixed with 0x
             DecimalCodePoint=$(printf "%d" "$CodePoint2")
             if [ "$DecimalCodePoint" -le 160 ]; then
-                ReplacementString+=$(printf '\\x%X' "$CodePoint2")
+                ReplacementCodePoint=$(printf '\\x%X' "$CodePoint2")
             elif [ "$DecimalCodePoint" -le 65535 ]; then
-                ReplacementString+=$(printf '\\u%04X' "$CodePoint2")
+                ReplacementCodePoint=$(printf '\\u%04X' "$CodePoint2")
             elif [ "$DecimalCodePoint" -gt 65535 ]; then
-                ReplacementString+=$(printf '\\U%08X' "$CodePoint2")
+                ReplacementCodePoint=$(printf '\\U%08X' "$CodePoint2")
             fi
+            ReplacementString="$ReplacementString""$ReplacementCodePoint"
         done
-    printf "        U\"%s\",\n" $ReplacementString >> "$OutputFile"
+    printf "        U\"%s\",\n" "$ReplacementString" >> "$OutputFile"
     done
     printf "    };\n\n" >> "$OutputFile"
     unset IFS
@@ -200,17 +202,19 @@ CreateKompatibleNormalizationTables() {
     for line2 in $KompatibleNormalizationCodePointsAndStrings; do
         KompatibleNormalizationString=$(echo "$line2" | awk -F '[: ]' '{for (i = 2; i <= NF; i++) print "0x"$i}')
         ReplacementString=""
+        ReplacementCodePoint=""
         for CodePoint2 in $KompatibleNormalizationString; do
             DecimalCodePoint=$(printf "%d" "$CodePoint2")
             if [ "$DecimalCodePoint" -le 160 ]; then
-                ReplacementString+=$(printf '\\x%X' "$CodePoint2")
+                ReplacementCodePoint=$(printf '\\x%X' "$CodePoint2")
             elif [ "$DecimalCodePoint" -le 65535 ]; then
-                ReplacementString+=$(printf '\\u%04X' "$CodePoint2")
+                ReplacementCodePoint=$(printf '\\u%04X' "$CodePoint2")
             elif [ "$DecimalCodePoint" -gt 65535 ]; then
-                ReplacementString+=$(printf '\\U%08X' "$CodePoint2")
+                ReplacementCodePoint=$(printf '\\U%08X' "$CodePoint2")
             fi
+            ReplacementString="$ReplacementString""$ReplacementCodePoint"
         done
-    printf "        U\"%s\",\n" $ReplacementString >> "$OutputFile"
+    printf "        U\"%s\",\n" "$ReplacementString" >> "$OutputFile"
     done
     printf "    };\n\n" >> "$OutputFile"
     unset IFS
@@ -230,17 +234,19 @@ CreateCaseFoldTables() {
     for line2 in $CodePointAndReplacement; do
         ReplacementCodePoints=$(echo "$line2" | awk -F '[: ]' '{for (i = 2; i <= NF; i++) print "0x"$i}')
         ReplacementString=""
+        ReplacementCodePoint=""
         for CodePoint2 in $ReplacementCodePoints; do
             DecimalCodePoint=$(printf "%d" "$CodePoint2")
             if [ "$DecimalCodePoint" -le 160 ]; then
-                ReplacementString+=$(printf '\\x%X' "$CodePoint2")
+                ReplacementCodePoint=$(printf '\\x%X' "$CodePoint2")
             elif [ "$DecimalCodePoint" -le 65535 ]; then
-                ReplacementString+=$(printf '\\u%04X' "$CodePoint2")
+                ReplacementCodePoint=$(printf '\\u%04X' "$CodePoint2")
             elif [ "$DecimalCodePoint" -gt 65535 ]; then
-                ReplacementString+=$(printf '\\U%08X' "$CodePoint2")
+                ReplacementCodePoint=$(printf '\\U%08X' "$CodePoint2")
             fi
+            ReplacementString="$ReplacementString""$ReplacementCodePoint"
 	    done
-        printf "        U\"%s\",\n" $ReplacementString >> "$OutputFile"
+        printf "        U\"%s\",\n" "$ReplacementString" >> "$OutputFile"
     done
     printf "    };\n\n" >> "$OutputFile"
     unset IFS
@@ -262,7 +268,7 @@ fi
 
 OutputFile=$@
 
-if [ "$#" -ne 1 ] || [ -z "$1" ]; then
+if [ "$#" -ne 1 ] -o [ -z "$1" ]; then
     echo "The first and only argument needs to be the file to write the tables. (if it exists, it WILL be IRRECOVERABLY DELETED)"
 else
     if [ -e "$OutputFile" ]; then
