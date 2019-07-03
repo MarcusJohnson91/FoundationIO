@@ -453,7 +453,7 @@ extern "C" {
     }
     
     uint64_t RotateLeft(uint64_t Value, uint8_t Bits2Rotate) {
-        return (Value << Bits2Rotate) | (Value >> (63 - Bits2Rotate));
+        return (Value << Bits2Rotate) | (Value >> (64 - Bits2Rotate));
     }
     
 #ifdef __cplusplus
