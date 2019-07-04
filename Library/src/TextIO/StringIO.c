@@ -70,7 +70,7 @@ extern "C" {
         if (String != NULL) {
             do {
                 StringSizeInCodeUnits += 1;
-            } while (String[StringSizeInCodeUnits + 1] != FoundationIONULLTerminator);
+            } while (String[StringSizeInCodeUnits] != FoundationIONULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -94,14 +94,15 @@ extern "C" {
     uint64_t UTF16_GetStringSizeInCodePoints(UTF16 *String) {
         uint64_t NumCodePoints             = 0ULL;
         if (String != NULL) {
-            uint64_t StringSizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(String);
-            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSizeInCodeUnits; CodeUnit++) {
+            uint64_t CodeUnit              = 0ULL;
+            do {
                 if (String[CodeUnit] <= UTF16MaxCodeUnit && (String[CodeUnit] < UTF16HighSurrogateStart || String[CodeUnit] > UTF16LowSurrogateEnd)) {
                     NumCodePoints         += 1;
                 } else if (String[CodeUnit] >= UTF16HighSurrogateStart && String[CodeUnit] <= UTF16HighSurrogateEnd) {
                     NumCodePoints         += 1; // Only count the high surrogates, not the low surrogates so that the codepoint count is accurate
                 }
-            }
+                CodeUnit                  += 1;
+            } while (String[CodeUnit] != FoundationIONULLTerminator);
         } else {
             Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
         }
@@ -148,9 +149,9 @@ extern "C" {
         uint64_t UTF16CodeUnits     = 0ULL;
         if (String != NULL) {
             do {
-                if (String[CodePoint] < UTF16HighSurrogateStart || (String[CodePoint] > UTF16LowSurrogateEnd && String[CodePoint] <= UTF16MaxCodeUnit)) {
+                if (String[CodePoint] <= UTF16MaxCodeUnit) {
                     UTF16CodeUnits += 1;
-                } else if (String[CodePoint] >= UTF16HighSurrogateStart && String[CodePoint] <= UTF16LowSurrogateEnd) {
+                } else if (String[CodePoint] > UTF16MaxCodeUnit && String[CodePoint] <= UnicodeMaxCodePoint) {
                     UTF16CodeUnits += 2;
                 }
                 CodePoint          += 1;
@@ -703,7 +704,7 @@ extern "C" {
                     } else if (String[CodeUnit] >= UTF16HighSurrogateStart || String[CodeUnit] <= UTF16LowSurrogateEnd) {
                         UTF16 HighSurrogate      = String[CodeUnit];
                         UTF16 LowSurrogate       = String[CodeUnit + 1];
-                        DecodedString[CodePoint] = (UTF16MaxCodeUnit + 1) + ((HighSurrogate & 0x3FF) << 10) | (LowSurrogate & 0x3FF);
+                        DecodedString[CodePoint] = (UTF16MaxCodeUnit + 1) + ((HighSurrogate & UTF16SurrogateMask) << UTF16SurrogateShift) | (LowSurrogate & UTF16SurrogateMask);
                         CodeUnit                += 2;
                     }
                 } while (String[CodeUnit] != FoundationIONULLTerminator);
@@ -762,26 +763,26 @@ extern "C" {
     UTF16 *UTF16_Encode(UTF32 *String) {
         UTF16   *EncodedString                           = NULL;
         if (String != NULL) {
-            uint64_t StringSizeInCodePoints              = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t CodePoint                           = 0ULL;
+            uint64_t CodeUnit                            = 0ULL;
             uint64_t NumCodeUnits                        = UTF32_GetStringSizeInUTF16CodeUnits(String);
             EncodedString                                = calloc(NumCodeUnits, sizeof(UTF16));
             if (EncodedString != NULL) {
-                for (uint64_t CodePoint = 0ULL; CodePoint < StringSizeInCodePoints - 1; CodePoint++) {
-                    for (uint64_t CodeUnit = 0ULL; CodeUnit < NumCodeUnits - 1; CodeUnit++) {
-                        if (String[CodePoint] > UTF16MaxCodeUnit) {
-                            uint32_t Ranged              = String[CodePoint] - UTF16SurrogatePairStart; // 0xF0731
-                            UTF16    HighCodeUnit        = UTF16HighSurrogateStart + ((Ranged & 0xFFC00) >> 10);
-                            UTF16    LowCodeUnit         = UTF16LowSurrogateStart  + (Ranged & 0x3FF);
-                            
-                            EncodedString[CodeUnit]      = HighCodeUnit;
-                            EncodedString[CodeUnit + 1]  = LowCodeUnit;
-                            
-                            CodeUnit                    += 2;
-                        } else {
-                            EncodedString[CodeUnit]      = String[CodePoint] & 0xFFFF;
-                        }
+                do {
+                    if (String[CodePoint] > UTF16MaxCodeUnit) {
+                        uint32_t Ranged              = String[CodePoint] - UTF16SurrogatePairStart; // 0xF0731
+                        UTF16    HighCodeUnit        = UTF16HighSurrogateStart + (Ranged & (UTF16SurrogateMask << UTF16SurrogateShift) >> UTF16SurrogateShift);
+                        UTF16    LowCodeUnit         = UTF16LowSurrogateStart  + (Ranged &  UTF16SurrogateMask);
+                        
+                        EncodedString[CodeUnit]      = HighCodeUnit;
+                        EncodedString[CodeUnit + 1]  = LowCodeUnit;
+                        CodeUnit                    += 2;
+                    } else {
+                        EncodedString[CodeUnit]      = String[CodePoint] & UTF16MaxCodeUnit;
+                        CodeUnit                    += 1;
                     }
-                }
+                    CodePoint                       += 1;
+                } while (String[CodePoint] != FoundationIONULLTerminator && EncodedString[CodeUnit] != FoundationIONULLTerminator);
             } else {
                 Log(Log_ERROR, __func__, U8("Encoded Pointer is NULL"));
             }
