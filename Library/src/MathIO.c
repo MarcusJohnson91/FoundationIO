@@ -452,7 +452,7 @@ extern "C" {
         return NumDigits;
     }
     
-    uint64_t RotateLeft(uint64_t Value, uint8_t Bits2Rotate) {
+    uint64_t RotateLeft(uint64_t Value, uint8_t Bits2Rotate) __attribute__((no_sanitize("shift-exponent"))) {
         return (Value << Bits2Rotate) | (Value >> (64 - Bits2Rotate));
     }
     
