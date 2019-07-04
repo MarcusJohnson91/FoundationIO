@@ -103,6 +103,8 @@ extern "C" {
                           UTF32BOM_LE                          = 0xFFFE,
                           UTF32BOM_BE                          = 0xFEFF,
                           UnicodeUNCPathPrefixSize             = 4, // "//?/" or "\\?\"
+                          UTF16SurrogateMask                   = 0x3FF,
+                          UTF16SurrogateShift                  = 10,
                           UTF16HighSurrogateStart              = 0xD800,
                           UTF16HighSurrogateEnd                = 0xDBFF,
                           UTF16LowSurrogateStart               = 0xDC00,
