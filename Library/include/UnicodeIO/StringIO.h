@@ -558,6 +558,12 @@ extern "C" {
      */
     UTF32                *UTF32_ExtractGrapheme(UTF32 *String, uint64_t Grapheme);
     
+    bool UTF8_Compare(UTF8 *String1, UTF8 *String2);
+    
+    bool UTF16_Compare(UTF16 *String1, UTF16 *String2);
+    
+    bool UTF32_Compare(UTF32 *String1, UTF32 *String2);
+    
     /*!
      @abstract                             "Replaces a section in String starting at Offset and ending at Offset + Length with Replacement".
      @param               String           "The string to edit".

@@ -2204,6 +2204,63 @@ extern "C" {
     }
     /* Number Conversions */
     
+    bool UTF8_Compare(UTF8 *String1, UTF8 *String2) {
+        bool StringsMatch = No;
+        if (String1 != NULL && String2 != NULL) {
+            UTF32 *String1_32 = UTF8_Decode(String1);
+            UTF32 *String2_32 = UTF8_Decode(String2);
+            StringsMatch      = UTF32_Compare(String1_32, String2_32);
+            free(String1_32);
+            free(String2_32);
+        } else if (String1 == NULL) {
+            Log(Log_ERROR, __func__, U8("String1 Pointer is NULL"));
+        } else if (String2 == NULL) {
+            Log(Log_ERROR, __func__, U8("String2 Pointer is NULL"));
+        }
+        return StringsMatch;
+    }
+    
+    bool UTF16_Compare(UTF16 *String1, UTF16 *String2) {
+        bool StringsMatch = No;
+        if (String1 != NULL && String2 != NULL) {
+            UTF32 *String1_32 = UTF16_Decode(String1);
+            UTF32 *String2_32 = UTF16_Decode(String2);
+            StringsMatch      = UTF32_Compare(String1_32, String2_32);
+            free(String1_32);
+            free(String2_32);
+        } else if (String1 == NULL) {
+            Log(Log_ERROR, __func__, U8("String1 Pointer is NULL"));
+        } else if (String2 == NULL) {
+            Log(Log_ERROR, __func__, U8("String2 Pointer is NULL"));
+        }
+        return StringsMatch;
+    }
+    
+    bool UTF32_Compare(UTF32 *String1, UTF32 *String2) {
+        bool StringsMatch                    = No;
+        if (String1 != NULL && String2 != NULL) {
+            uint64_t String1SizeInCodePoints = UTF32_GetStringSizeInCodePoints(String1);
+            uint64_t String2SizeInCodePoints = UTF32_GetStringSizeInCodePoints(String2);
+            if (String1SizeInCodePoints == String2SizeInCodePoints) {
+                for (uint64_t CodePoint = 0ULL; CodePoint < (String1SizeInCodePoints + String2SizeInCodePoints) / 2; CodePoint++) {
+                    UTF32 CodePoint1         = String1[CodePoint];
+                    UTF32 CodePoint2         = String2[CodePoint];
+                    if (CodePoint1 != CodePoint2) {
+                        StringsMatch         = No;
+                        break;
+                    } else {
+                        StringsMatch         = Yes;
+                    }
+                }
+            }
+        } else if (String1 == NULL) {
+            Log(Log_ERROR, __func__, U8("String1 Pointer is NULL"));
+        } else if (String2 == NULL) {
+            Log(Log_ERROR, __func__, U8("String2 Pointer is NULL"));
+        }
+        return StringsMatch;
+    }
+    
     bool UTF8_CompareSubString(UTF8 *String, UTF8 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
         bool SubstringMatchesAtOffset = No;
         if (String != NULL && Substring != NULL) {
@@ -2237,15 +2294,16 @@ extern "C" {
     }
     
     bool UTF32_CompareSubString(UTF32 *String, UTF32 *Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
-        bool SubstringMatchesAtOffset            = Yes;
+        bool SubstringMatchesAtOffset            = No;
         if (String != NULL && Substring != NULL) {
             uint64_t StringSize                  = UTF32_GetStringSizeInCodePoints(String);
             uint64_t SubstringSize               = UTF32_GetStringSizeInCodePoints(Substring);
-            for (uint64_t StringCodePoint = StringOffset; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                for (uint64_t SubstringCodePoint = SubstringOffset; SubstringCodePoint < SubstringSize - 1; SubstringCodePoint++) {
+            for (uint64_t StringCodePoint = StringOffset; StringCodePoint < StringSize; StringCodePoint++) {
+                for (uint64_t SubstringCodePoint = SubstringOffset; SubstringCodePoint < SubstringSize; SubstringCodePoint++) {
                     if (String[StringCodePoint] != Substring[SubstringCodePoint]) {
-                        SubstringMatchesAtOffset = No;
                         break;
+                    } else {
+                        SubstringMatchesAtOffset = Yes;
                     }
                 }
             }
