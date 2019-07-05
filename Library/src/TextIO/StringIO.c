@@ -608,63 +608,46 @@ extern "C" {
     }
     
     UTF32 *UTF8_Decode(UTF8 *String) {
-        uint64_t StringSize                              = 0ULL;
-        uint64_t CodePoint                               = 0ULL;
-        uint64_t CodeUnit                                = 0ULL;
-        UTF32   *DecodedString                           = NULL;
+        uint64_t StringSize                          = 0ULL;
+        uint64_t CodePoint                           = 0ULL;
+        uint64_t CodeUnit                            = 0ULL;
+        UTF32   *DecodedString                       = NULL;
         
         if (String != NULL) {
-            StringSize                                   = UTF8_GetStringSizeInCodePoints(String);
-            bool StringHasBOM                            = UTF8_HasBOM(String);
-            if (StringHasBOM == No) {
-                StringSize                              += 1;
-            }
-            // If the string has a BOM, we just repace it, if not, we need to add room for it.
-            DecodedString                                = calloc(StringSize, sizeof(UTF32));
+            StringSize                               = UTF8_GetStringSizeInCodePoints(String);
+            DecodedString                            = calloc(StringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
             if (DecodedString != NULL) {
                 do {
-                    if (CodePoint == 0) {
-#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
-                        DecodedString[0]                 = UTF32BOM_LE;
-#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
-                        DecodedString[0]                 = UTF32BOM_BE;
-#endif
-                    } else {
-                        uint8_t CodePointSize            = UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
-                        switch (CodePointSize) {
-                            case 1:
-                                DecodedString[CodePoint] =  String[CodeUnit];
-                                CodeUnit                += 1;
-                                CodePoint               += 1;
-                                break;
-                            case 2:
-                                DecodedString[CodePoint] = (String[CodeUnit]     & 0x1F) << 6;
-                                DecodedString[CodePoint] =  String[CodeUnit + 1] & 0x3F;
-                                CodeUnit                += 2;
-                                CodePoint               += 1;
-                                break;
-                            case 3:
-                                DecodedString[CodePoint] = (String[CodeUnit]     & 0x0F) << 12;
-                                DecodedString[CodePoint] = (String[CodeUnit + 1] & 0x1F) << 6;
-                                DecodedString[CodePoint] = (String[CodeUnit + 2] & 0x1F);
-                                CodeUnit                += 3;
-                                CodePoint               += 1;
-                                break;
-                            case 4:
-                                DecodedString[CodePoint] = (String[CodeUnit]     & 0x07) << 18;
-                                DecodedString[CodePoint] = (String[CodeUnit + 1] & 0x3F) << 12;
-                                DecodedString[CodePoint] = (String[CodeUnit + 2] & 0x3F) <<  6;
-                                DecodedString[CodePoint] = (String[CodeUnit + 3] & 0x3F);
-                                CodeUnit                += 4;
-                                CodePoint               += 1;
-                                break;
-                        }
+                    uint8_t CodePointSize            = UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
+                    switch (CodePointSize) {
+                        case 1:
+                            DecodedString[CodePoint] =  String[CodeUnit] & 0x7F;
+                            CodeUnit                += 1;
+                            CodePoint               += 1;
+                            break;
+                        case 2:
+                            DecodedString[CodePoint] |= (String[CodeUnit]     & 0x1F) << 6;
+                            DecodedString[CodePoint] |= (String[CodeUnit + 1] & 0x3F) << 0;
+                            CodeUnit                 += 2;
+                            CodePoint                += 1;
+                            break;
+                        case 3:
+                            DecodedString[CodePoint] |= (String[CodeUnit]     & 0x0F) << 12;
+                            DecodedString[CodePoint] |= (String[CodeUnit + 1] & 0x1F) << 6;
+                            DecodedString[CodePoint] |= (String[CodeUnit + 2] & 0x1F) << 0;
+                            CodeUnit                 += 3;
+                            CodePoint                += 1;
+                            break;
+                        case 4:
+                            DecodedString[CodePoint] |= (String[CodeUnit]     & 0x07) << 18;
+                            DecodedString[CodePoint] |= (String[CodeUnit + 1] & 0x3F) << 12;
+                            DecodedString[CodePoint] |= (String[CodeUnit + 2] & 0x3F) <<  6;
+                            DecodedString[CodePoint] |= (String[CodeUnit + 3] & 0x3F) <<  0;
+                            CodeUnit                 += 4;
+                            CodePoint                += 1;
+                            break;
                     }
-                    if (DecodedString[CodePoint] >= UTF16HighSurrogateStart && DecodedString[CodePoint] <= UTF16LowSurrogateEnd) {
-                        DecodedString[CodePoint]         = InvalidReplacementCodePoint;
-                        Log(Log_ERROR, __func__, U8("Codepoint %d is invalid, because it overlaps the Surrogate Pair Block, it was replaced with U+FFFD"), DecodedString[CodePoint]);
-                    }
-                } while (DecodedString[CodePoint] != FoundationIONULLTerminator && String[CodeUnit] != FoundationIONULLTerminator);
+                } while (String[CodeUnit] != FoundationIONULLTerminator && CodePoint < StringSize);
             } else {
                 Log(Log_ERROR, __func__, U8("Couldn't allocate DecodedString"));
             }
@@ -717,8 +700,7 @@ extern "C" {
         return DecodedString;
     }
     
-    UTF8 *UTF8_Encode(UTF32 *String) {
-        uint64_t CodePoint                             = 0ULL;
+    UTF8 *UTF8_Encode(UTF32 *String) { // 0x000bfdff
         uint64_t CodeUnitNum                           = 0ULL;
         UTF8    *EncodedString                         = NULL;
         if (String != NULL) {
@@ -726,29 +708,29 @@ extern "C" {
             uint64_t UTF8CodeUnits                     = UTF32_GetStringSizeInUTF8CodeUnits(String);
             EncodedString                              = calloc(UTF8CodeUnits, sizeof(UTF8));
             if (EncodedString != NULL) {
-                for (uint64_t CodePoint = 0ULL; CodePoint < StringSizeInCodePoints - 1; CodePoint++) {
+                for (uint64_t CodePoint = 0ULL; CodePoint < StringSizeInCodePoints; CodePoint++) {
                     if (String[CodePoint] <= 0x7F) {
                         EncodedString[CodeUnitNum]     = String[CodePoint] & 0x7F;
                         CodeUnitNum                   += 1;
-                    } else if (String[CodePoint] >= 0x80 && String[CodePoint] <= 0x7FF) {
-                        EncodedString[CodeUnitNum]     = (0xC0 + ((String[CodePoint] & 0x7C0) >> 6));
-                        EncodedString[CodeUnitNum + 1] = (0x80 +  (String[CodePoint] & 0x03F));
+                    } else if (String[CodePoint] <= 0x7FF) {
+                        EncodedString[CodeUnitNum]     = 0xC0 | (String[CodePoint] & ((0x1F << 6) >> 6));
+                        EncodedString[CodeUnitNum + 1] = 0x80 | (String[CodePoint] & 0x3F);
                         CodeUnitNum                   += 2;
-                    }  else if (String[CodePoint] >= 0x800 && (String[CodePoint] < UTF16HighSurrogateStart || String[CodePoint] > UTF16LowSurrogateEnd)) {
-                        EncodedString[CodeUnitNum]     = (0xE0 + ((String[CodePoint] & 0x03F000) >> 12));
-                        EncodedString[CodeUnitNum + 1] = (0x80 + ((String[CodePoint] & 0x000FC0) >>  6));
-                        EncodedString[CodeUnitNum + 2] = (0x80 +  (String[CodePoint] & 0x00003F));
+                    }  else if (String[CodePoint] <= UTF16MaxCodeUnit) {
+                        EncodedString[CodeUnitNum]     = 0xE0 | (String[CodePoint] & ((0x0F << 12) >> 12));
+                        EncodedString[CodeUnitNum + 1] = 0x80 | (String[CodePoint] & ((0x3F << 6) >> 6));
+                        EncodedString[CodeUnitNum + 2] = 0x80 | (String[CodePoint] &   0x3F);
                         CodeUnitNum                   += 3;
-                    } else if (String[CodePoint] > UTF16MaxCodeUnit && String[CodePoint] <= UnicodeMaxCodePoint) {
-                        EncodedString[CodeUnitNum]     = (0xF0 + ((String[CodePoint] & 0x1C0000) >> 18));
-                        EncodedString[CodeUnitNum + 1] = (0x80 + ((String[CodePoint] & 0x03F000) >> 12));
-                        EncodedString[CodeUnitNum + 2] = (0x80 + ((String[CodePoint] & 0x000FC0) >>  6));
-                        EncodedString[CodeUnitNum + 3] = (0x80 +  (String[CodePoint] & 0x00003F));
+                    } else if (String[CodePoint] <= UnicodeMaxCodePoint) { // 0x000bfdff
+                        uint8_t CodeUnit1              = (String[CodePoint] & 0x1C0000) >> 18; // 2
+                        EncodedString[CodeUnitNum]     = 0xF0 | CodeUnit1; // F2
+                        uint8_t CodeUnit2              = (String[CodePoint] & 0x3F000) >> 12; // 0x3F
+                        EncodedString[CodeUnitNum + 1] = 0x80 | CodeUnit2; // BF
+                        uint8_t CodeUnit3              = (String[CodePoint] & 0xFC0) >> 6; // 0x37
+                        EncodedString[CodeUnitNum + 2] = 0x80 | CodeUnit3; // B7
+                        uint8_t CodeUnit4              = (String[CodePoint] & 0x3F); // 0x3F
+                        EncodedString[CodeUnitNum + 3] = 0x80 | CodeUnit4; // BF
                         CodeUnitNum                   += 4;
-                    }
-                    if ((String[CodePoint] >= UTF16HighSurrogateStart && String[CodePoint] <= UTF16LowSurrogateEnd) || String[CodePoint] > UnicodeMaxCodePoint) {
-                        String[CodePoint]              = InvalidReplacementCodePoint;
-                        Log(Log_ERROR, __func__, U8("Codepoint %d is invalid, overlaps Surrogate Pair Block, replacing with U+FFFD"), String[CodePoint]);
                     }
                 }
             } else {
