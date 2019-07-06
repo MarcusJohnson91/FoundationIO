@@ -1,8 +1,8 @@
-#include "../include/Macros.h"         /* Included for FoundationIO's macros */
 #include "../include/ContainerIO.h"    /* Included for our declarations */
 
 #include "../include/Log.h"            /* Included for error reporting */
 #include "../include/Math.h"           /* Included for Absolute, Max/Min */
+#include "../include/StringIO.h"       /* Included for UTF32 string handling */
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,7 +19,7 @@ extern "C" {
     } Audio2DContainer;
     
     Audio2DContainer *Audio2DContainer_Init(Audio_Types Type, uint64_t NumChannels, Audio_ChannelMask *ChannelMap, uint64_t SampleRate, uint64_t NumSamples) {
-        Audio2DContainer *Audio       = NULL;
+        Audio2DContainer *Audio     = NULL;
         if (NumSamples > 0) {
             Audio                   = calloc(1, sizeof(Audio2DContainer));
             if (Audio != NULL) {
