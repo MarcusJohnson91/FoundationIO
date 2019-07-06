@@ -58,12 +58,12 @@ extern "C" {
     
     /*!
      @enum                      LogTypes
-     @constant                  Log_ERROR                       "An error occurred".
-     @constant                  Log_TEST                        "TestIO failed".
+     @constant                  Log_DEBUG                       "A internal error happened because there's a bug".
+     @constant                  Log_USER                        "An error occured because the user misused something".
      */
     typedef enum LogTypes {
-                                Log_ERROR                       = 1,
-                                Log_TEST                        = 2,
+                                Log_DEBUG                       = 1,
+                                Log_USER                        = 2,
     } LogTypes;
     
     /*!

@@ -136,7 +136,7 @@ extern "C" {
                 Region[CodeUnit - StartOffset] = LocaleAll[CodeUnit - StartOffset];
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
+            Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
         }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         UTF16    *LocaleAll                      = _wsetlocale(LC_ALL, NULL);
@@ -157,7 +157,7 @@ extern "C" {
                 Region16[CodeUnit - StartOffset] = LocaleAll[CodeUnit - StartOffset];
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
+            Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
         }
         UTF32 *Region32                          = UTF16_Decode(Region16);
         free(Region16);
@@ -188,7 +188,7 @@ extern "C" {
                 Region8[CodeUnit - StartOffset]  = LocaleAll[CodeUnit - StartOffset];
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
+            Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
         }
         UTF32 *Region32                          = UTF8_Decode(Region8);
         free(Region8);
@@ -213,7 +213,7 @@ extern "C" {
                 Region[CodeUnit - StartOffset] = LocaleAll[CodeUnit - StartOffset];
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
+            Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
         }
 #endif
         return Region;
@@ -240,7 +240,7 @@ extern "C" {
                     Region[EncodingCodePoint]   = Lang[EncodingCodePoint + DotOffset];
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
             }
             
         } else {
@@ -259,7 +259,7 @@ extern "C" {
                     Region[EncodingCodePoint]   = Language[EncodingCodePoint + DotOffset];
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
             }
         }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
@@ -281,7 +281,7 @@ extern "C" {
                     Region[EncodingCodePoint]   = Lang[EncodingCodePoint + DotOffset];
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
             }
         } else {
             UTF16    *Language                  = _wgetenv(U16("LANGUAGE"));
@@ -299,7 +299,7 @@ extern "C" {
                     Region16[EncodingCodePoint] = Language[EncodingCodePoint + DotOffset];
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
             }
             UTF32 *Region32                     = UTF16_Decode(Region16);
             free(Region16);
@@ -332,7 +332,7 @@ extern "C" {
                     Region8[EncodingCodePoint] = Lang[EncodingCodePoint + DotOffset];
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
             }
             UTF32 *Region32                   = UTF8_Decode(Region8);
             free(Region8);
@@ -354,7 +354,7 @@ extern "C" {
                     Region8[EncodingCodePoint] = Language[EncodingCodePoint + DotOffset];
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
             }
             UTF32 *Region32                    = UTF8_Decode(Region8);
             free(Region8);
@@ -380,7 +380,7 @@ extern "C" {
                     Region[EncodingCodePoint]  = Lang[EncodingCodePoint + DotOffset];
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
             }
         } else {
             UTF16    *Language                 = _wgetenv(U16("LANGUAGE"));
@@ -398,7 +398,7 @@ extern "C" {
                     Region[EncodingCodePoint]  = Language[EncodingCodePoint + DotOffset];
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
             }
         }
 #endif
@@ -558,7 +558,7 @@ extern "C" {
             Stripped          = UTF8_Encode(Stripped32);
             free(Stripped32);
         } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
         return Stripped;
     }
@@ -572,7 +572,7 @@ extern "C" {
             Stripped          = UTF16_Encode(Stripped32);
             free(Stripped32);
         } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
         return Stripped;
     }
@@ -605,10 +605,10 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate stripped string"));
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate stripped string"));
             }
         } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
         return Stripped;
     }

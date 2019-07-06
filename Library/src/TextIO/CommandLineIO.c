@@ -106,11 +106,11 @@ extern "C" {
                 CLI->NumSwitches = NumSwitches;
             } else {
                 CommandLineIO_Deinit(CLI);
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld CommandLineSwitches"), NumSwitches);
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CommandLineSwitches"), NumSwitches);
             }
         } else {
             CommandLineIO_Deinit(CLI);
-            Log(Log_ERROR, __func__, U8("Couldn't allocate CommandLineIO"));
+            Log(Log_DEBUG, __func__, U8("Couldn't allocate CommandLineIO"));
         }
         return CLI;
     }
@@ -174,9 +174,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramName     = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Name == NULL) {
-            Log(Log_ERROR, __func__, U8("The Name string is NULL"));
+            Log(Log_DEBUG, __func__, U8("The Name string is NULL"));
         }
     }
     
@@ -189,9 +189,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramName     = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Name == NULL) {
-            Log(Log_ERROR, __func__, U8("The Name string is NULL"));
+            Log(Log_DEBUG, __func__, U8("The Name string is NULL"));
         }
     }
     
@@ -204,9 +204,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramVersion  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Version == NULL) {
-            Log(Log_ERROR, __func__, U8("The Version String is NULL"));
+            Log(Log_DEBUG, __func__, U8("The Version String is NULL"));
         }
     }
     
@@ -219,9 +219,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramVersion  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Version == NULL) {
-            Log(Log_ERROR, __func__, U8("The Version String is NULL"));
+            Log(Log_DEBUG, __func__, U8("The Version String is NULL"));
         }
     }
     
@@ -234,9 +234,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramDescription  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Description == NULL) {
-            Log(Log_ERROR, __func__, U8("The Description String is NULL"));
+            Log(Log_DEBUG, __func__, U8("The Description String is NULL"));
         }
     }
     
@@ -249,9 +249,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramDescription  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Description == NULL) {
-            Log(Log_ERROR, __func__, U8("The Description String is NULL"));
+            Log(Log_DEBUG, __func__, U8("The Description String is NULL"));
         }
     }
     
@@ -264,9 +264,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramAuthor  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Author == NULL) {
-            Log(Log_ERROR, __func__, U8("The Author String is NULL"));
+            Log(Log_DEBUG, __func__, U8("The Author String is NULL"));
         }
     }
     
@@ -279,9 +279,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramAuthor  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Author == NULL) {
-            Log(Log_ERROR, __func__, U8("The Author String is NULL"));
+            Log(Log_DEBUG, __func__, U8("The Author String is NULL"));
         }
     }
     
@@ -294,9 +294,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramCopyright = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Copyright == NULL) {
-            Log(Log_ERROR, __func__, U8("The Copyright String is NULL"));
+            Log(Log_DEBUG, __func__, U8("The Copyright String is NULL"));
         }
     }
     
@@ -309,9 +309,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramCopyright = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Copyright == NULL) {
-            Log(Log_ERROR, __func__, U8("The Copyright String is NULL"));
+            Log(Log_DEBUG, __func__, U8("The Copyright String is NULL"));
         }
     }
     
@@ -332,13 +332,13 @@ extern "C" {
             free(NormalizedLicenseURL);
             CLI->ProgramLicenseURL          = CaseFoldedLicenseURL;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (LicenseType == UnknownLicenseType) {
-            Log(Log_ERROR, __func__, U8("The LicenseType Is Invalid"));
+            Log(Log_DEBUG, __func__, U8("The LicenseType Is Invalid"));
         } else if (Name == NULL) {
-            Log(Log_ERROR, __func__, U8("License Name Pointer is Invalid"));
+            Log(Log_DEBUG, __func__, U8("License Name Pointer is Invalid"));
         } else if (LicenseURL == NULL) {
-            Log(Log_ERROR, __func__, U8("The License URL must be set"));
+            Log(Log_DEBUG, __func__, U8("The License URL must be set"));
         }
     }
     
@@ -359,13 +359,13 @@ extern "C" {
             free(NormalizedLicenseURL);
             CLI->ProgramLicenseURL          = CaseFoldedLicenseURL;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (LicenseType == UnknownLicenseType) {
-            Log(Log_ERROR, __func__, U8("The LicenseType Is Invalid"));
+            Log(Log_DEBUG, __func__, U8("The LicenseType Is Invalid"));
         } else if (Name == NULL) {
-            Log(Log_ERROR, __func__, U8("License Name Pointer is Invalid"));
+            Log(Log_DEBUG, __func__, U8("License Name Pointer is Invalid"));
         } else if (LicenseURL == NULL) {
-            Log(Log_ERROR, __func__, U8("The License URL must be set"));
+            Log(Log_DEBUG, __func__, U8("The License URL must be set"));
         }
     }
     
@@ -373,9 +373,9 @@ extern "C" {
         if (CLI != NULL && MinOptions <= CLI->NumSwitches - 1) {
             CLI->MinOptions = MinOptions;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (MinOptions > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("MinOptions %lld is invalid, it should be between 0 and %lld"), MinOptions, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("MinOptions %lld is invalid, it should be between 0 and %lld"), MinOptions, CLI->NumSwitches - 1);
         }
     }
     
@@ -383,9 +383,9 @@ extern "C" {
         if (CLI != NULL && HelpSwitch <= CLI->NumSwitches - 1) {
             CLI->HelpSwitch = HelpSwitch;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (HelpSwitch > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("HelpSwitch %lld is invalid, it should be between 0 and %lld"), HelpSwitch, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("HelpSwitch %lld is invalid, it should be between 0 and %lld"), HelpSwitch, CLI->NumSwitches - 1);
         }
     }
     
@@ -429,7 +429,7 @@ extern "C" {
             free(NumProgressIndicatorsPerString);
             free(ActualStrings2Print);
         } else {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         }
     }
     
@@ -472,7 +472,7 @@ extern "C" {
             free(NumProgressIndicatorsPerString);
             free(ActualStrings2Print);
         } else {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         }
     }
     
@@ -485,11 +485,11 @@ extern "C" {
             free(Normalized);
             CLI->SwitchIDs[SwitchID].Name = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Name == NULL) {
-            Log(Log_ERROR, __func__, U8("Name String is NULL"));
+            Log(Log_DEBUG, __func__, U8("Name String is NULL"));
         } else if (SwitchID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -502,11 +502,11 @@ extern "C" {
             free(Normalized);
             CLI->SwitchIDs[SwitchID].Name = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Name == NULL) {
-            Log(Log_ERROR, __func__, U8("Name String is NULL"));
+            Log(Log_DEBUG, __func__, U8("Name String is NULL"));
         } else if (SwitchID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -519,11 +519,11 @@ extern "C" {
             free(Normalized);
             CLI->SwitchIDs[SwitchID].Description = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Description == NULL) {
-            Log(Log_ERROR, __func__, U8("Description String is NULL"));
+            Log(Log_DEBUG, __func__, U8("Description String is NULL"));
         } else if (SwitchID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -536,11 +536,11 @@ extern "C" {
             free(Normalized);
             CLI->SwitchIDs[SwitchID].Description = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (Description == NULL) {
-            Log(Log_ERROR, __func__, U8("Description String is NULL"));
+            Log(Log_DEBUG, __func__, U8("Description String is NULL"));
         } else if (SwitchID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -548,11 +548,11 @@ extern "C" {
         if (CLI != NULL && SwitchType != UnknownSwitchType && SwitchID <= CLI->NumSwitches - 1) {
             CLI->SwitchIDs[SwitchID].SwitchType = SwitchType;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (SwitchType == UnknownSwitchType) {
-            Log(Log_ERROR, __func__, U8("You can not set SwitchID %lld to UnknownSwitchType"), SwitchID);
+            Log(Log_DEBUG, __func__, U8("You can not set SwitchID %lld to UnknownSwitchType"), SwitchID);
         } else if (SwitchID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -560,11 +560,11 @@ extern "C" {
         if (CLI != NULL && ArgumentType != UnknownArgumentType && SwitchID <= CLI->NumSwitches - 1) {
             CLI->SwitchIDs[SwitchID].ArgumentType = ArgumentType;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (ArgumentType == UnknownArgumentType) {
-            Log(Log_ERROR, __func__, U8("You can not set SwitchID %lld to UnknownArgumentType"), SwitchID);
+            Log(Log_DEBUG, __func__, U8("You can not set SwitchID %lld to UnknownArgumentType"), SwitchID);
         } else if (SwitchID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches - 1);
         }
     }
     
@@ -575,14 +575,14 @@ extern "C" {
                 CLI->SwitchIDs[MasterID].PotentialSlaves      = realloc(CLI->SwitchIDs[MasterID].PotentialSlaves, CLI->SwitchIDs[MasterID].NumPotentialSlaves * sizeof(uint64_t));
                 CLI->SwitchIDs[MasterID].PotentialSlaves[CLI->SwitchIDs[MasterID].NumPotentialSlaves - 1] = SlaveID;
             } else {
-                Log(Log_ERROR, __func__, U8("MasterID %lld can not have any slaves"), MasterID);
+                Log(Log_DEBUG, __func__, U8("MasterID %lld can not have any slaves"), MasterID);
             }
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (MasterID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
         } else if (SlaveID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("SlaveID %lld is invalid, it should be between 0 and %lld"), SlaveID, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("SlaveID %lld is invalid, it should be between 0 and %lld"), SlaveID, CLI->NumSwitches - 1);
         }
     }
     
@@ -590,9 +590,9 @@ extern "C" {
         if (CLI != NULL && MasterID <= CLI->NumSwitches - 1) {
             CLI->SwitchIDs[MasterID].MaxConcurrentSlaves = MinConcurrentSlaves;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (MasterID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
         }
     }
     
@@ -600,9 +600,9 @@ extern "C" {
         if (CLI != NULL && MasterID <= CLI->NumSwitches - 1) {
             CLI->SwitchIDs[MasterID].MaxConcurrentSlaves = MaxConcurrentSlaves;
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (MasterID > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumSwitches - 1);
         }
     }
     
@@ -642,7 +642,7 @@ extern "C" {
                 free(SwitchInfo);
             }
         } else {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         }
     }
     
@@ -681,7 +681,7 @@ extern "C" {
                 free(SwitchInfo);
             }
         } else {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         }
     }
     
@@ -758,7 +758,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         }
     }
     
@@ -834,7 +834,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         }
     }
     
@@ -851,12 +851,12 @@ extern "C" {
                     ArgumentStringPrefixSize  = 1;
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("ArgumentString is not an Argument string"));
+                Log(Log_DEBUG, __func__, U8("ArgumentString is not an Argument string"));
             }
             uint64_t ArgumentSwitchSize    = ArgumentStringSize - ArgumentStringPrefixSize;
             ArgumentSwitch                 = UTF32_ExtractSubString(UTF32_CaseFold(ArgumentString), ArgumentStringPrefixSize, ArgumentSwitchSize);
         } else {
-            Log(Log_ERROR, __func__, U8("String Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
         return ArgumentSwitch;
     }
@@ -901,9 +901,9 @@ extern "C" {
                 free(ArgumentFlag);
             } while (CurrentArgument < NumArguments);
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
-            Log(Log_ERROR, __func__, U8("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
+            Log(Log_DEBUG, __func__, U8("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
         }
     }
     
@@ -924,7 +924,7 @@ extern "C" {
             }
             free(Arguments32);
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
             CommandLineIO_UTF8_DisplayHelp(CLI);
         }
@@ -947,7 +947,7 @@ extern "C" {
             }
             free(Arguments32);
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
             CommandLineIO_UTF16_DisplayHelp(CLI);
         }
@@ -972,11 +972,11 @@ extern "C" {
                 }
             }
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumSwitches - 1);
         } else if (NumSlaves > CLI->NumSwitches - 1) {
-            Log(Log_ERROR, __func__, U8("NumSlaves %lld is invalid, it should be between 0 and %lld"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
+            Log(Log_DEBUG, __func__, U8("NumSlaves %lld is invalid, it should be between 0 and %lld"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
         }
         return NumMatchingOptions;
     }
@@ -1003,11 +1003,11 @@ extern "C" {
                 }
             }
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Log_ERROR, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumSwitches - 1);
+            Log(Log_DEBUG, __func__, U8("SwitchID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumSwitches - 1);
         } else if (NumSlaves > CLI->NumOptions - 1) {
-            Log(Log_ERROR, __func__, U8("NumSlaves %lld is invalid, it should be between 0 and %lld"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
+            Log(Log_DEBUG, __func__, U8("NumSlaves %lld is invalid, it should be between 0 and %lld"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
         }
         return MatchingOption;
     }
@@ -1017,9 +1017,9 @@ extern "C" {
         if (CLI != NULL && OptionID <= CLI->NumOptions - 1) {
             Result = UTF8_Encode(CLI->OptionIDs[OptionID].Argument);
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Log_ERROR, __func__, U8("Option %lld is outside the range 0 - %lld"), OptionID, CLI->NumOptions - 1);
+            Log(Log_DEBUG, __func__, U8("Option %lld is outside the range 0 - %lld"), OptionID, CLI->NumOptions - 1);
         }
         return Result;
     }
@@ -1029,9 +1029,9 @@ extern "C" {
         if (CLI != NULL && OptionID <= CLI->NumOptions - 1) {
             Result = UTF16_Encode(CLI->OptionIDs[OptionID].Argument);
         } else if (CLI == NULL) {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Log_ERROR, __func__, U8("Option %lld is outside the range 0 - %lld"), OptionID, CLI->NumOptions - 1);
+            Log(Log_DEBUG, __func__, U8("Option %lld is outside the range 0 - %lld"), OptionID, CLI->NumOptions - 1);
         }
         return Result;
     }
@@ -1054,10 +1054,10 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate %lld codepoints for the Extension"), ExtensionSize);
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld codepoints for the Extension"), ExtensionSize);
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Path Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Path Pointer is NULL"));
         }
         return Extension;
     }
@@ -1070,7 +1070,7 @@ extern "C" {
             free(Decoded);
             Extension          = UTF8_Encode(Extension32);
         } else {
-            Log(Log_ERROR, __func__, U8("Path Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Path Pointer is NULL"));
         }
         return Extension;
     }
@@ -1084,7 +1084,7 @@ extern "C" {
             Extension          = UTF16_Encode(Extension32);
             free(Extension32);
         } else {
-            Log(Log_ERROR, __func__, U8("Path Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Path Pointer is NULL"));
         }
         return Extension;
     }
@@ -1112,7 +1112,7 @@ extern "C" {
             free(CLI->ProgramLicenseURL);
             free(CLI);
         } else {
-            Log(Log_ERROR, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
         }
     }
     
