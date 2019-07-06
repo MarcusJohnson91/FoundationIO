@@ -96,7 +96,7 @@ extern "C" {
             MD5->Hash[2] = 0x98BADCFE;
             MD5->Hash[3] = 0x10325476;
         } else {
-            Log(Log_ERROR, __func__, U8("Couldn't allocate MD5"));
+            Log(Log_DEBUG, __func__, U8("Couldn't allocate MD5"));
         }
         return MD5;
     }
@@ -139,9 +139,9 @@ extern "C" {
             
 #endif
         } else if (PacketArray == NULL) {
-            Log(Log_ERROR, __func__, U8("PacketArray Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("PacketArray Pointer is NULL"));
         } else if (Data == NULL) {
-            Log(Log_ERROR, __func__, U8("Data Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Data Pointer is NULL"));
         }
         return PacketArray;
     }
@@ -180,7 +180,7 @@ extern "C" {
         if (MD5 != NULL) {
             
         } else {
-            Log(Log_ERROR, __func__, U8("MD5 Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("MD5 Pointer is NULL"));
         }
         return Hash;
     }
@@ -196,9 +196,9 @@ extern "C" {
                 }
             }
         } else if (Hash1 == NULL) {
-            Log(Log_ERROR, __func__, U8("Hash1 Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Hash1 Pointer is NULL"));
         } else if (Hash2 == NULL) {
-            Log(Log_ERROR, __func__, U8("Hash2 Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Hash2 Pointer is NULL"));
         }
         return HashesMatch;
     }
@@ -226,7 +226,7 @@ extern "C" {
             fclose(RandomFile);
 #endif
         } else {
-            Log(Log_ERROR, __func__, U8("Can't return more than 8 bytes"));
+            Log(Log_DEBUG, __func__, U8("Can't return more than 8 bytes"));
         }
         return RandomValue;
     }
@@ -239,21 +239,21 @@ extern "C" {
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
                 NTSTATUS Status           = BCryptGenRandom(NULL, Random->EntropyPool, Random->EntropySize, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
                 if (Status <= 0) {
-                    Log(Log_ERROR, __func__, U8("Failed to read random data, Entropy is extremely insecure, aborting"));
+                    Log(Log_DEBUG, __func__, U8("Failed to read random data, Entropy is extremely insecure, aborting"));
                     abort();
                 }
 #else
                 FILE *RandomFile          = fopen("/dev/urandom", "rb");
                 size_t BytesRead          = fread(Random->EntropyPool, Random->EntropySize, 1, RandomFile);
                 if (BytesRead != Random->EntropySize) {
-                    Log(Log_ERROR, __func__, U8("Failed to read random data, Entropy is extremely insecure, aborting"));
+                    Log(Log_DEBUG, __func__, U8("Failed to read random data, Entropy is extremely insecure, aborting"));
                     abort();
                 }
                 fclose(RandomFile);
 #endif
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         }
     }
     
@@ -295,7 +295,7 @@ extern "C" {
                 Random->EntropyPool[Word + 7] = (Rotated4 & 0x00000000000000FF) >> 0;
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         }
     }
     
@@ -332,9 +332,9 @@ extern "C" {
                 Bits                                  = Entropy_ExtractBits(Random, NumBits);
             }
         } else if (Random == NULL) {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         } else if (NumBits == 0) {
-            Log(Log_ERROR, __func__, U8("Reading zero bits does not make sense"));
+            Log(Log_DEBUG, __func__, U8("Reading zero bits does not make sense"));
         }
         return Bits;
     }
@@ -350,10 +350,10 @@ extern "C" {
                 Entropy_Mix(Random);
             } else {
                 Entropy_Deinit(Random);
-                Log(Log_ERROR, __func__, U8("Couldn't allocate EntropyPool"));
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate EntropyPool"));
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Couldn't allocate Entropy"));
+            Log(Log_DEBUG, __func__, U8("Couldn't allocate Entropy"));
         }
         return Random;
     }
@@ -363,7 +363,7 @@ extern "C" {
         if (Random != NULL) {
             RemainingBits      = Random->EntropySize - Random->BitOffset;
         } else {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         }
         return RemainingBits;
     }
@@ -375,7 +375,7 @@ extern "C" {
             }
             Random->BitOffset             = 0;
         } else {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         }
     }
     
@@ -402,7 +402,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         }
         return RandomInteger;
     }
@@ -418,7 +418,7 @@ extern "C" {
             Decimal           = InsertExponentD(Decimal, Exponent);
             Decimal           = InsertMantissaD(Decimal, Mantissa);
         } else {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         }
         return Decimal;
     }

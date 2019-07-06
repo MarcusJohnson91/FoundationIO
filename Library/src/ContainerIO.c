@@ -28,17 +28,17 @@ extern "C" {
                     Audio->Samples  = Array;
                 } else {
                     Audio2DContainer_Deinit(Audio);
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate the audio array"));
+                    Log(Log_DEBUG, __func__, U8("Couldn't allocate the audio array"));
                 }
                 
                 Audio->SampleRate   = SampleRate;
                 Audio->NumSamples   = NumSamples;
             } else {
                 Audio2DContainer_Deinit(Audio);
-                Log(Log_ERROR, __func__, U8("Couldn't allocate the Audio2DContainer"));
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate the Audio2DContainer"));
             }
         } else if (NumSamples == 0) {
-            Log(Log_ERROR, __func__, U8("NumSamples %llu is invalid"), NumSamples);
+            Log(Log_DEBUG, __func__, U8("NumSamples %llu is invalid"), NumSamples);
         }
         return Audio;
     }
@@ -48,7 +48,7 @@ extern "C" {
         if (Audio != NULL) {
             BitDepth     = Audio->BitDepth;
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
         return BitDepth;
     }
@@ -58,7 +58,7 @@ extern "C" {
         if (Audio != NULL) {
             NumChannels            = Audio->NumChannels;
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
         return NumChannels;
     }
@@ -68,7 +68,7 @@ extern "C" {
         if (Audio != NULL) {
             SampleRate      = Audio->SampleRate;
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
         return SampleRate;
     }
@@ -78,7 +78,7 @@ extern "C" {
         if (Audio != NULL) {
             NumSamples      = Audio->NumSamples;
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
         return NumSamples;
     }
@@ -94,7 +94,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
         return ChannelMap;
     }
@@ -104,7 +104,7 @@ extern "C" {
         if (Audio != NULL) {
             Type         = Audio->Type;
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
         return Type;
     }
@@ -114,7 +114,7 @@ extern "C" {
         if (Audio != NULL) {
             AudioArray    = Audio->Samples;
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
         return AudioArray;
     }
@@ -157,7 +157,7 @@ extern "C" {
                 Average /= Audio->NumSamples;
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
         return Average;
     }
@@ -209,7 +209,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
         return Maximum;
     }
@@ -261,7 +261,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
         return Minimum;
     }
@@ -318,7 +318,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
     }
     
@@ -328,7 +328,7 @@ extern "C" {
             free(Audio->ChannelMap);
             free(Audio);
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
     }
     
@@ -356,13 +356,13 @@ extern "C" {
                 if (Container->Vectors != NULL) {
                     Container->NumVectors = NumVectors;
                 } else {
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate %lld AudioObjects"), NumVectors);
+                    Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld AudioObjects"), NumVectors);
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate Audio3DContainer"));
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate Audio3DContainer"));
             }
         } else {
-            Log(Log_ERROR, __func__, U8("NumVectors %lld is invalid"), NumVectors);
+            Log(Log_DEBUG, __func__, U8("NumVectors %lld is invalid"), NumVectors);
         }
         return Container;
     }
@@ -371,11 +371,11 @@ extern "C" {
         if (Container != NULL && Vector != NULL && Index < Container->NumVectors) {
             Container->Vectors[Index - 1] = *Vector;
         } else if (Container == NULL) {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Container Pointer is NULL"));
         } else if (Vector == NULL) {
-            Log(Log_ERROR, __func__, U8("Vector Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Vector Pointer is NULL"));
         } else if (Index >= Container->NumVectors) {
-            Log(Log_ERROR, __func__, U8("Index %llu is larger than %llu"), Index, Container->NumVectors);
+            Log(Log_DEBUG, __func__, U8("Index %llu is larger than %llu"), Index, Container->NumVectors);
         }
     }
     
@@ -388,7 +388,7 @@ extern "C" {
                 Container->Vectors[Vector].Samples                   = 0;
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Container Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Container Pointer is NULL"));
         }
     }
     
@@ -430,20 +430,20 @@ extern "C" {
                         Image->Height         = Height;
                     } else {
                         ImageContainer_Deinit(Image);
-                        Log(Log_ERROR, __func__, U8("Couldn't allocate channel map"));
+                        Log(Log_DEBUG, __func__, U8("Couldn't allocate channel map"));
                     }
                 } else {
                     ImageContainer_Deinit(Image);
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate pixel array"));
+                    Log(Log_DEBUG, __func__, U8("Couldn't allocate pixel array"));
                 }
             } else {
                 ImageContainer_Deinit(Image);
-                Log(Log_ERROR, __func__, U8("Couldn't allocate the ImageContainer"));
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate the ImageContainer"));
             }
         } else if (Width == 0) {
-            Log(Log_ERROR, __func__, U8("Width %llu is invalid"), Width);
+            Log(Log_DEBUG, __func__, U8("Width %llu is invalid"), Width);
         } else if (Height == 0) {
-            Log(Log_ERROR, __func__, U8("Height %llu is invalid"), Height);
+            Log(Log_DEBUG, __func__, U8("Height %llu is invalid"), Height);
         }
         return Image;
     }
@@ -455,10 +455,10 @@ extern "C" {
             if (NumViews == 1 && NumChannels == 1) {
                 Image->ChannelMap[Index] = ChannelMask;
             } else {
-                Log(Log_ERROR, __func__, U8("ChannelMask must contain exactly 1 view and 1 channel"));
+                Log(Log_DEBUG, __func__, U8("ChannelMask must contain exactly 1 view and 1 channel"));
             }
         } else if (Image == NULL) {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
     }
     
@@ -467,7 +467,7 @@ extern "C" {
         if (Image != NULL) {
             Width      = Image->Width;
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return Width;
     }
@@ -477,7 +477,7 @@ extern "C" {
         if (Image != NULL) {
             Height      = Image->Height;
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return Height;
     }
@@ -487,7 +487,7 @@ extern "C" {
         if (Image != NULL) {
             BitDepth     = Image->BitDepth;
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return BitDepth;
     }
@@ -522,7 +522,7 @@ extern "C" {
             Image_ChannelMask Mask = Image->ChannelMask;
             NumChannels            = ImageMask_GetNumChannels(Mask);
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return NumChannels;
     }
@@ -541,12 +541,12 @@ extern "C" {
                     }
                 }
             } else if (NumViews != 1) {
-                Log(Log_ERROR, __func__, U8("Mask must contain 1 and only 1 view"));
+                Log(Log_DEBUG, __func__, U8("Mask must contain 1 and only 1 view"));
             } else if (NumChannels != 1) {
-                Log(Log_ERROR, __func__, U8("Mask must contain 1 and only 1 channel"));
+                Log(Log_DEBUG, __func__, U8("Mask must contain 1 and only 1 channel"));
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return Index;
     }
@@ -556,7 +556,7 @@ extern "C" {
         if (Image != NULL) {
             Mask                  = Image->ChannelMask;
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return Mask;
     }
@@ -567,7 +567,7 @@ extern "C" {
             Image_ChannelMask Mask = Image->ChannelMask;
             NumViews               = ImageMask_GetNumViews(Mask);
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return NumViews;
     }
@@ -584,7 +584,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return Index;
     }
@@ -594,7 +594,7 @@ extern "C" {
         if (Image != NULL) {
             Type         = Image->Type;
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return Type;
     }
@@ -604,7 +604,7 @@ extern "C" {
         if (Image != NULL) {
             ImageArray   = Image->Pixels;
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return ImageArray;
     }
@@ -613,7 +613,7 @@ extern "C" {
         if (Image != NULL) {
             Image->Pixels = Array;
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
     }
     
@@ -645,13 +645,13 @@ extern "C" {
                         Average /= Image->Width * Image->Height;
                     }
                 } else {
-                    Log(Log_ERROR, __func__, U8("You tried getting the average from a nonexistant channel %lld"), Channel);
+                    Log(Log_DEBUG, __func__, U8("You tried getting the average from a nonexistant channel %lld"), Channel);
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("You tried getting the average from a nonexistant view %lld"), View);
+                Log(Log_DEBUG, __func__, U8("You tried getting the average from a nonexistant view %lld"), View);
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return Average;
     }
@@ -685,13 +685,13 @@ extern "C" {
                         }
                     }
                 } else {
-                    Log(Log_ERROR, __func__, U8("You tried getting the max from a nonexistant channel"));
+                    Log(Log_DEBUG, __func__, U8("You tried getting the max from a nonexistant channel"));
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("You tried getting the average from a nonexistant view %lld"), View);
+                Log(Log_DEBUG, __func__, U8("You tried getting the average from a nonexistant view %lld"), View);
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return Maximum;
     }
@@ -726,13 +726,13 @@ extern "C" {
                         }
                     }
                 } else {
-                    Log(Log_ERROR, __func__, U8("You tried getting the max from a nonexistant channel"));
+                    Log(Log_DEBUG, __func__, U8("You tried getting the max from a nonexistant channel"));
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("You tried getting the average from a nonexistant view %lld"), View);
+                Log(Log_DEBUG, __func__, U8("You tried getting the average from a nonexistant view %lld"), View);
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return Minimum;
     }
@@ -816,7 +816,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
     }
     
@@ -854,7 +854,7 @@ extern "C" {
                         ImageContainer_SetArray(Image, (void*) NewArray);
                         free(Array);
                     } else {
-                        Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
+                        Log(Log_DEBUG, __func__, U8("Couldn't allocate an array for the cropped image"));
                     }
                 } else if (Type == ImageType_Integer16) {
                     uint16_t *Array    = (uint16_t*) ImageContainer_GetArray(Image);
@@ -872,14 +872,14 @@ extern "C" {
                         ImageContainer_SetArray(Image, (void*) NewArray);
                         free(Array);
                     } else {
-                        Log(Log_ERROR, __func__, U8("Couldn't allocate an array for the cropped image"));
+                        Log(Log_DEBUG, __func__, U8("Couldn't allocate an array for the cropped image"));
                     }
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate resized array"));
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate resized array"));
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
     }
     
@@ -927,23 +927,23 @@ extern "C" {
                         }
                     }
                 } else {
-                    Log(Log_ERROR, __func__, U8("Couldn't Allocate Difference"));
+                    Log(Log_DEBUG, __func__, U8("Couldn't Allocate Difference"));
                 }
             } else if (RefType != ComType) {
-                Log(Log_ERROR, __func__, U8("Reference Type %d does not match Compare Type %d"), RefType, ComType);
+                Log(Log_DEBUG, __func__, U8("Reference Type %d does not match Compare Type %d"), RefType, ComType);
             } else if (RefNumViews != ComNumViews) {
-                Log(Log_ERROR, __func__, U8("Reference NumViews %d does not match Compare NumViews %d"), RefNumViews, ComNumViews);
+                Log(Log_DEBUG, __func__, U8("Reference NumViews %d does not match Compare NumViews %d"), RefNumViews, ComNumViews);
             } else if (RefNumChannels != ComNumChannels) {
-                Log(Log_ERROR, __func__, U8("Reference NumChannels %d does not match Compare NumChannels %d"), RefNumChannels, ComNumChannels);
+                Log(Log_DEBUG, __func__, U8("Reference NumChannels %d does not match Compare NumChannels %d"), RefNumChannels, ComNumChannels);
             } else if (RefHeight != ComHeight) {
-                Log(Log_ERROR, __func__, U8("Reference Height %lld does not match Compare Height %lld"), RefHeight, ComHeight);
+                Log(Log_DEBUG, __func__, U8("Reference Height %lld does not match Compare Height %lld"), RefHeight, ComHeight);
             } else if (RefWidth != ComWidth) {
-                Log(Log_ERROR, __func__, U8("Reference Width %lld does not match Compare Width %lld"), RefWidth, ComWidth);
+                Log(Log_DEBUG, __func__, U8("Reference Width %lld does not match Compare Width %lld"), RefWidth, ComWidth);
             }
         } else if (Reference == NULL) {
-            Log(Log_ERROR, __func__, U8("Reference Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Reference Pointer is NULL"));
         } else if (Compare == NULL) {
-            Log(Log_ERROR, __func__, U8("Compare Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Compare Pointer is NULL"));
         }
         return Difference;
     }
@@ -976,7 +976,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
     }
     
@@ -986,7 +986,7 @@ extern "C" {
             free(Image->ChannelMap);
             free(Image);
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
     }
     
@@ -1018,13 +1018,13 @@ extern "C" {
                     Histogram->NumEntries = NumValues;
                 } else {
                     Audio2DHistogram_Deinit(Histogram);
-                    Log(Log_ERROR, __func__, U8("Couldn't allocate Audio2DHistogram Array"));
+                    Log(Log_DEBUG, __func__, U8("Couldn't allocate Audio2DHistogram Array"));
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate Audio2DHistogram"));
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate Audio2DHistogram"));
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
         return Histogram;
     }
@@ -1034,7 +1034,7 @@ extern "C" {
         if (Histogram != NULL) {
             Array   = Histogram->Array;
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DHistogram Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DHistogram Pointer is NULL"));
         }
         return Array;
     }
@@ -1043,7 +1043,7 @@ extern "C" {
         if (Histogram != NULL) {
             Histogram->Array = Array;
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DHistogram Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DHistogram Pointer is NULL"));
         }
     }
     
@@ -1085,10 +1085,10 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate Audio2DHistogram"));
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate Audio2DHistogram"));
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DContainer Pointer is NULL"));
         }
         return Histogram;
     }
@@ -1186,7 +1186,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageHistogram Pointer is NULL"));
         }
     }
     
@@ -1242,7 +1242,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Audio2DHistogram Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Audio2DHistogram Pointer is NULL"));
         }
     }
     
@@ -1283,7 +1283,7 @@ extern "C" {
                         Histogram->Type              = Image->Type;
                     } else {
                         ImageHistogram_Deinit(Histogram);
-                        Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
+                        Log(Log_DEBUG, __func__, U8("Couldn't allocate Histogram array"));
                     }
                 } else if (Image->Type == ImageType_Integer16) {
                     uint16_t ***HistogramArray       = calloc(NumViews * NumChannels * NumPossibleColors, sizeof(uint16_t));
@@ -1292,15 +1292,15 @@ extern "C" {
                         Histogram->Type              = Image->Type;
                     } else {
                         ImageHistogram_Deinit(Histogram);
-                        Log(Log_ERROR, __func__, U8("Couldn't allocate Histogram array"));
+                        Log(Log_DEBUG, __func__, U8("Couldn't allocate Histogram array"));
                     }
                 }
             } else {
                 ImageHistogram_Deinit(Histogram);
-                Log(Log_ERROR, __func__, U8("Couldn't allocate ImageHistogram"));
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate ImageHistogram"));
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return Histogram;
     }
@@ -1314,7 +1314,7 @@ extern "C" {
                 Array = Histogram->Array;
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageHistogram Pointer is NULL"));
         }
         return Array;
     }
@@ -1323,9 +1323,9 @@ extern "C" {
         if (Histogram != NULL && Array != NULL) {
             Histogram->Array = Array;
         } else if (Histogram == NULL) {
-            Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageHistogram Pointer is NULL"));
         } else if (Array == NULL) {
-            Log(Log_ERROR, __func__, U8("Array Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Array Pointer is NULL"));
         }
     }
     
@@ -1369,10 +1369,10 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate ImageHistogram"));
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate ImageHistogram"));
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageContainer Pointer is NULL"));
         }
         return Histogram;
     }
@@ -1429,7 +1429,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageHistogram Pointer is NULL"));
         }
     }
     
@@ -1461,7 +1461,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageHistogram Pointer is NULL"));
         }
     }
     
@@ -1470,7 +1470,7 @@ extern "C" {
             free(Histogram->Array);
             free(Histogram);
         } else {
-            Log(Log_ERROR, __func__, U8("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("ImageHistogram Pointer is NULL"));
         }
     }
     
