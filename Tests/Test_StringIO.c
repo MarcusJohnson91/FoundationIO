@@ -16,7 +16,7 @@ extern "C" {
             UTF32  CodePointLow  = Entropy_GenerateIntegerInRange(Random, UTF16LowSurrogateEnd + 1, UnicodeMaxCodePoint); //  E000..10FFFF
             CodePoint            = CodePointLow | CodePointHigh; // D7FE..101FFF = 0xF4801
         } else {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         }
         return CodePoint;
     }
@@ -24,7 +24,7 @@ extern "C" {
     UTF32 *UTF32_GenerateString(Entropy *Random) {
         UTF32 *String                 = 0UL;
         if (Random != NULL) {
-            int64_t NumCodePoints     = Entropy_GenerateIntegerInRange(Random, 1, 8192);
+            uint16_t NumCodePoints    = Entropy_GenerateIntegerInRange(Random, 1, 8192);
             String                    = calloc(NumCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
             if (String != NULL) {
                 for (uint16_t CodePoint = 0; CodePoint < NumCodePoints - 1; CodePoint++) {
@@ -32,26 +32,28 @@ extern "C" {
                 }
                 WriteString(stderr, String);
             } else {
-                Log(Log_ERROR, __func__, U8("Couldn't allocate string with %lu CodePoints"), NumCodePoints);
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate string with %lu CodePoints"), NumCodePoints);
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         }
         return String;
     }
     
     void UTF8_EncodeDecodeTest(Entropy *Random) {
         if (Random != NULL) {
-            UTF32    *GeneratedString = UTF32_GenerateString(Random);
-            UTF8     *Generated8      = UTF8_Encode(GeneratedString);
-            printf("%s\n", Generated8);
-            UTF32    *Decoded8        = UTF8_Decode(Generated8);
-            bool      StringsMatch    = UTF32_CompareSubString(GeneratedString, Decoded8, 0, 0);
+            UTF32    *GeneratedString  = UTF32_GenerateString(Random);
+            UTF8     *Generated8       = UTF8_Encode(GeneratedString);
+            uint64_t  Generated8Units  = UTF8_GetStringSizeInCodeUnits(Generated8);
+            uint64_t  Generated8Points = UTF8_GetStringSizeInCodePoints(Generated8);
+            printf("StringSizeInCodeUnits: %llu\nStringSizeInCodePoints %llu\n", Generated8Units, Generated8Points);
+            UTF32    *Decoded8         = UTF8_Decode(Generated8);
+            bool      StringsMatch     = UTF32_Compare(GeneratedString, Decoded8);
             if (StringsMatch == No) {
-                Log(Log_TEST, __func__, U8("Strings DO NOT match!"));
+                Log(Log_DEBUG, __func__, U8("Strings DO NOT match!"));
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         }
     }
     
@@ -62,12 +64,22 @@ extern "C" {
             UTF32    *Decoded16       = UTF16_Decode(Generated16);
             bool      StringsMatch    = UTF32_CompareSubString(GeneratedString, Decoded16, 0, 0);
             if (StringsMatch == No) {
-                Log(Log_TEST, __func__, U8("Strings DO NOT match!"));
+                Log(Log_DEBUG, __func__, U8("Strings DO NOT match!"));
             }
         } else {
-            Log(Log_ERROR, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         }
-        
+    }
+    
+    void FormatTest(Entropy *Random) {
+        if (Random != NULL) {
+            uint8_t       X = 27;
+            UTF8 *Formatted = UTF8_Format(U8("X equals: %d in hex: %#x\nMemory address for x: (%p) \n"), X, X, &X);
+            // "X equals: %d in hex: %#x\nMemory address for x: (%p) \n"
+            UTF8_WriteLine(stdout, Formatted);
+        } else {
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+        }
     }
     
     bool UTF8_BasicTest(void) {
@@ -77,14 +89,8 @@ extern "C" {
         uint64_t  TestStringSize = UTF32_GetStringSizeInCodePoints(TestString32);
         if (TestStringSize != 7) {
             TestPassed           = false;
-            Log(Log_TEST, __func__, U8("String \"%s\" is supposed to be 7 CodePoints long, but is actually %llu"), TestString8, TestStringSize);
+            Log(Log_DEBUG, __func__, U8("String \"%s\" is supposed to be 7 CodePoints long, but is actually %llu"), TestString8, TestStringSize);
         }
-        return TestPassed;
-    }
-    
-    bool UTF8_TrimTest(void) {
-        bool TestPassed = true;
-        
         return TestPassed;
     }
     
@@ -92,9 +98,10 @@ extern "C" {
         bool TestSuitePassed      = true;
         Entropy  *Random          = Entropy_Init(64);
         
+        FormatTest(Random);
         
         //UTF8_EncodeDecodeTest(Random);
-        UTF16_EncodeDecodeTest(Random);
+        //UTF16_EncodeDecodeTest(Random);
         
         return TestSuitePassed;
     }
