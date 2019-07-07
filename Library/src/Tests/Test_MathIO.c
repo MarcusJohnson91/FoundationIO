@@ -18,10 +18,10 @@ extern "C" {
             int64_t Maximum1 = Maximum(Integer1, Integer2);
             
             if (Minimum1 > Maximum1) {
-                Log(Log_TEST, __func__, U8("Minimum/Maximum failed!"));
+                Log(Log_DEBUG, __func__, U8("Minimum/Maximum failed!"));
             } else {
-                Log(Log_TEST, __func__, U8("Min/Max FAILED"));
-                //Log(Log_TEST, __func__, U8("Minimum: %d is smaller than Maximum %d, Test Passed"), Minimum1, Maximum1);
+                Log(Log_DEBUG, __func__, U8("Min/Max FAILED"));
+                //Log(Log_DEBUG, __func__, U8("Minimum: %d is smaller than Maximum %d, Test Passed"), Minimum1, Maximum1);
             }
         }
     }
