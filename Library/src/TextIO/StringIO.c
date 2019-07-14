@@ -1577,7 +1577,7 @@ extern "C" {
         return CaseFolded;
     }
     
-    UTF16 *UTF16_CaseFoldString(UTF16 *String) {
+    UTF16 *UTF16_CaseFold(UTF16 *String) {
         UTF16 *CaseFolded     = NULL;
         if (String != NULL) {
             UTF32 *String32   = UTF16_Decode(String);
