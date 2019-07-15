@@ -167,44 +167,68 @@ extern "C" {
         if (Audio != NULL) {
             if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
                 uint8_t **Array = (uint8_t**) Audio2DContainer_GetArray(Audio);
+                uint8_t   Max   = Exponentiate(2, Audio->BitDepth);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
+                    }
+                    if (Array[Channel][Sample] == Max) {
+                        break;
                     }
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
                 int8_t **Array = (int8_t**) Audio2DContainer_GetArray(Audio);
+                int8_t   Max   = Exponentiate(2, Audio->BitDepth - 1);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
+                    }
+                    if (Array[Channel][Sample] == Max) {
+                        break;
                     }
                 }
             } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
                 uint16_t **Array = (uint16_t**) Audio2DContainer_GetArray(Audio);
+                uint16_t   Max   = Exponentiate(2, Audio->BitDepth);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
+                    }
+                    if (Array[Channel][Sample] == Max) {
+                        break;
                     }
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer16)) {
                 int16_t **Array = (int16_t**) Audio2DContainer_GetArray(Audio);
+                int16_t   Max   = Exponentiate(2, Audio->BitDepth - 1);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
+                    }
+                    if (Array[Channel][Sample] == Max) {
+                        break;
                     }
                 }
             } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
                 uint32_t **Array = (uint32_t**) Audio2DContainer_GetArray(Audio);
+                uint32_t   Max   = Exponentiate(2, Audio->BitDepth);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
                     }
+                    if (Array[Channel][Sample] == Max) {
+                        break;
+                    }
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
                 int32_t **Array = (int32_t**) Audio2DContainer_GetArray(Audio);
+                int32_t   Max   = Exponentiate(2, Audio->BitDepth - 1);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
                         Maximum = Array[Channel][Sample];
+                    }
+                    if (Array[Channel][Sample] == Max) {
+                        break;
                     }
                 }
             }
@@ -223,12 +247,18 @@ extern "C" {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
+                    if (Array[Channel][Sample] == 0) {
+                        break;
+                    }
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
                 int8_t **Array = (int8_t**) Audio2DContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
+                    }
+                    if (Array[Channel][Sample] == -128) {
+                        break;
                     }
                 }
             } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
@@ -237,12 +267,18 @@ extern "C" {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
+                    if (Array[Channel][Sample] == 0) {
+                        break;
+                    }
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer16)) {
                 int16_t **Array = (int16_t**) Audio2DContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
+                    }
+                    if (Array[Channel][Sample] == -32768) {
+                        break;
                     }
                 }
             } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
@@ -251,12 +287,18 @@ extern "C" {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
                     }
+                    if (Array[Channel][Sample] == 0) {
+                        break;
+                    }
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
                 int32_t **Array = (int32_t**) Audio2DContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples - 1; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
+                    }
+                    if (Array[Channel][Sample] == -2147483648) {
+                        break;
                     }
                 }
             }
@@ -667,19 +709,27 @@ extern "C" {
                 if (Channel < NumChannels - 1) {
                     if (Image->Type == ImageType_Integer8) {
                         uint8_t ****Array = (uint8_t****) ImageContainer_GetArray(Image);
+                        uint8_t      Max  = Exponentiate(2, Image->BitDepth);
                         for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
                             for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
                                 if (Array[View][Width][Height][Channel] > Maximum) {
                                     Maximum = Array[View][Width][Height][Channel];
+                                    if (Array[View][Width][Height][Channel] == Max) {
+                                        break;
+                                    }
                                 }
                             }
                         }
                     } else if (Image->Type == ImageType_Integer16) {
                         uint16_t ****Array = (uint16_t****)  ImageContainer_GetArray(Image);
+                        uint16_t     Max   = Exponentiate(2, Image->BitDepth);
                         for (uint64_t Width = 0ULL; Width < Image->Width - 1; Width++) {
                             for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
                                 if (Array[View][Width][Height][Channel] > Maximum) {
                                     Maximum = Array[View][Width][Height][Channel];
+                                    if (Array[View][Width][Height][Channel] == Max) {
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -712,6 +762,9 @@ extern "C" {
                             for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
                                 if (Array[View][Width][Height][Channel] < Minimum) {
                                     Minimum = Array[View][Width][Height][Channel];
+                                    if (Array[View][Width][Height][Channel] == 0) {
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -721,6 +774,9 @@ extern "C" {
                             for (uint64_t Height = 0ULL; Height < Image->Height - 1; Height++) {
                                 if (Array[View][Width][Height][Channel] < Minimum) {
                                     Minimum = Array[View][Width][Height][Channel];
+                                    if (Array[View][Width][Height][Channel] == 0) {
+                                        break;
+                                    }
                                 }
                             }
                         }
