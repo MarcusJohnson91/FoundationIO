@@ -94,15 +94,26 @@ extern "C" {
         return TestPassed;
     }
     
+    bool UTF8_FormatTest(void) {
+        bool TestPassed    = false;
+        UTF8 *Formatted    = UTF8_Format(U8("Num bytes read %llu does not match num bytes requested %llu"), 14, 28);
+        printf("%s\n", Formatted);
+        UTF8 *FormatAnswer = U8("Num bytes read 14 does not match num bytes requested 28");
+        TestPassed         = UTF8_Compare(Formatted, FormatAnswer);
+        return TestPassed;
+    }
+    
     int main(int argc, const char *argv[]) {
         bool TestSuitePassed      = true;
+        /*
         Entropy  *Random          = Entropy_Init(64);
         
         FormatTest(Random);
         
         //UTF8_EncodeDecodeTest(Random);
         //UTF16_EncodeDecodeTest(Random);
-        
+        */
+        TestSuitePassed = UTF8_FormatTest();
         return TestSuitePassed;
     }
     
