@@ -212,9 +212,9 @@ extern "C" {
      @abstract                                                  "Aligns BitBuffer".
      @remark                                                    "Zero pads the BitBuffer's offset to a multiple of AlignmentSize".
      @param                     BitB                            "BitBuffer Pointer".
-     @param                     AlignmentSize                   "The alignment size in bytes".
+     @param                     AlignmentSizeInBytes            "The alignment size in bytes".
      */
-    void                        BitBuffer_Align(BitBuffer *BitB, uint8_t AlignmentSize);
+    void                        BitBuffer_Align(BitBuffer *BitB, uint8_t AlignmentSizeInBytes);
     
     /*!
      @abstract                                                  "Seeks forwards and backwards in BitBuffer".
