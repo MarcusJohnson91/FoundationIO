@@ -268,9 +268,9 @@ extern "C" {
             uint8_t Bits2Read                     = NumBits2Extract;
             do {
                 uint8_t  BitsInByte               = Bits2ExtractFromByte(BitB->BitOffset + Bits2Read);
-                uint8_t  Bits2Get                 = Minimum(BitsInByte, Bits2Read);
+                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Read);
                 uint8_t  Shift                    = 8 - Bits2Get;
-                uint8_t  BitMask                  = CreateBitMaskLSBit(Bits2Get) << Shift;
+                uint8_t  BitMask                  = (uint8_t) (CreateBitMaskLSBit(Bits2Get) << Shift);
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset + Bits2Read, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
                 uint8_t  ApplyBits                = ExtractedBits >> Shift;
@@ -291,12 +291,12 @@ extern "C" {
             uint8_t Bits2Read                     = NumBits2Extract;
             do {
                 uint8_t  BitsInByte               = Bits2ExtractFromByte(BitB->BitOffset + Bits2Read);
-                uint8_t  Bits2Get                 = Minimum(BitsInByte, Bits2Read);
+                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Read);
                 uint8_t  Shift                    = 8 - Bits2Get;
                 uint8_t  BitMask                  = CreateBitMaskMSBit(Bits2Get) >> Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset + Bits2Read, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
-                uint8_t  ApplyBits                = ExtractedBits << Shift;
+                uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
                 
                 Extracted                       <<= Bits2Get;
                 Extracted                        |= ApplyBits;
@@ -314,9 +314,9 @@ extern "C" {
             uint8_t Bits2Read                     = NumBits2Extract;
             do {
                 uint8_t  BitsInByte               = Bits2ExtractFromByte(BitB->BitOffset);
-                uint8_t  Bits2Get                 = Minimum(BitsInByte, Bits2Read);
+                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Read);
                 uint8_t  Shift                    = 8 - Bits2Get;
-                uint8_t  BitMask                  = CreateBitMaskLSBit(Bits2Get) << Shift;
+                uint8_t  BitMask                  = (uint8_t) (CreateBitMaskLSBit(Bits2Get) << Shift);
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
                 uint8_t  ApplyBits                = ExtractedBits >> Shift;
@@ -337,12 +337,12 @@ extern "C" {
             uint8_t Bits2Read                     = NumBits2Extract;
             do {
                 uint8_t  BitsInByte               = Bits2ExtractFromByte(BitB->BitOffset);
-                uint8_t  Bits2Get                 = Minimum(BitsInByte, Bits2Read);
+                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Read);
                 uint8_t  Shift                    = 8 - Bits2Get;
                 uint8_t  BitMask                  = CreateBitMaskMSBit(Bits2Get) >> Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
-                uint8_t  ApplyBits                = ExtractedBits << Shift;
+                uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
                 
                 Extracted                       <<= Bits2Get;
                 Extracted                        |= ApplyBits;
@@ -359,12 +359,12 @@ extern "C" {
             uint8_t Bits2Write                    = NumBits2Append;
             do {
                 uint8_t  BitsInByte               = BitB->BitOffset % 8;
-                uint8_t  Bits2Get                 = Minimum(BitsInByte, Bits2Write);
+                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Write);
                 uint8_t  Shift                    = 8 - Bits2Get;
                 uint8_t  BitMask                  = CreateBitMaskMSBit(Bits2Get) >> Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
                 uint8_t  ExtractedBits            = Data2Append & BitMask;
-                uint8_t  ApplyBits                = ExtractedBits << Shift;
+                uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
                 BitB->Buffer[Byte]               |= ApplyBits;
                 
                 Bits2Write                       -= Bits2Get;
@@ -378,12 +378,12 @@ extern "C" {
             uint8_t Bits2Write                    = NumBits2Append;
             do {
                 uint8_t  BitsInByte               = BitB->BitOffset % 8;
-                uint8_t  Bits2Get                 = Minimum(BitsInByte, Bits2Write);
+                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Write);
                 uint8_t  Shift                    = 8 - Bits2Get;
                 uint8_t  BitMask                  = CreateBitMaskMSBit(Bits2Get) >> Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
                 uint8_t  ExtractedBits            = Data2Append & BitMask;
-                uint8_t  ApplyBits                = ExtractedBits << Shift;
+                uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
                 BitB->Buffer[Byte]               |= ApplyBits;
                 
                 Bits2Write                       -= Bits2Get;
@@ -397,12 +397,12 @@ extern "C" {
             uint8_t Bits2Write                    = NumBits2Append;
             do {
                 uint8_t  BitsInByte               = BitB->BitOffset % 8;
-                uint8_t  Bits2Get                 = Minimum(BitsInByte, Bits2Write);
+                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Write);
                 uint8_t  Shift                    = 8 - Bits2Get;
                 uint8_t  BitMask                  = CreateBitMaskMSBit(Bits2Get) >> Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
                 uint8_t  ExtractedBits            = Data2Append & BitMask;
-                uint8_t  ApplyBits                = ExtractedBits << Shift;
+                uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
                 BitB->Buffer[Byte]               |= ApplyBits;
                 
                 Bits2Write                       -= Bits2Get;
@@ -416,12 +416,12 @@ extern "C" {
             uint8_t Bits2Write                    = NumBits2Append;
             do {
                 uint8_t  BitsInByte               = BitB->BitOffset % 8;
-                uint8_t  Bits2Get                 = Minimum(BitsInByte, Bits2Write);
+                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Write);
                 uint8_t  Shift                    = 8 - Bits2Get;
                 uint8_t  BitMask                  = CreateBitMaskMSBit(Bits2Get) >> Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
                 uint8_t  ExtractedBits            = Data2Append & BitMask;
-                uint8_t  ApplyBits                = ExtractedBits << Shift;
+                uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
                 BitB->Buffer[Byte]               |= ApplyBits;
                 
                 Bits2Write                       -= Bits2Get;
@@ -490,17 +490,17 @@ extern "C" {
             do {
                 if (ByteOrder == LSByteFirst) {
                     if (BitOrder == LSBitFirst) {
-                        CurrentBit          = BitBuffer_Extract_LSByteLSBit(BitB, 1);
+                        CurrentBit          = (uint8_t) BitBuffer_Extract_LSByteLSBit(BitB, 1);
                     } else if (BitOrder == MSBitFirst) {
-                        CurrentBit          = BitBuffer_Extract_LSByteMSBit(BitB, 1);
+                        CurrentBit          = (uint8_t) BitBuffer_Extract_LSByteMSBit(BitB, 1);
                     }
                 } else if (ByteOrder == MSByteFirst) {
                     if (BitOrder == LSBitFirst) {
                         // Start the byte at the end, and the bit at the beginning
-                        CurrentBit         = BitBuffer_Extract_MSByteLSBit(BitB, 1);
+                        CurrentBit         = (uint8_t) BitBuffer_Extract_MSByteLSBit(BitB, 1);
                     } else if (BitOrder == MSBitFirst) {
                         // Start reading from the beginning, read to the end
-                        CurrentBit         = BitBuffer_Extract_MSByteMSBit(BitB, 1);
+                        CurrentBit         = (uint8_t) BitBuffer_Extract_MSByteMSBit(BitB, 1);
                     }
                 }
                 OutputData    += 1;
@@ -533,7 +533,7 @@ extern "C" {
         UTF8 *ExtractedString             = calloc(StringSize + FoundationIONULLTerminatorSize, sizeof(UTF8));
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                ExtractedString[CodeUnit] = BitBuffer_Extract_LSByteLSBit(BitB, 8);
+                ExtractedString[CodeUnit] = (UTF8) BitBuffer_Extract_LSByteLSBit(BitB, 8);
             }
         }
         return ExtractedString;
@@ -560,7 +560,7 @@ extern "C" {
         UTF16 *ExtractedString            = calloc(StringSize, sizeof(UTF16));
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
-                ExtractedString[CodeUnit] = BitBuffer_Extract_LSByteLSBit(BitB, 8);
+                ExtractedString[CodeUnit] = (UTF16) BitBuffer_Extract_LSByteLSBit(BitB, 16);
             }
         } else if (BitB == NULL) {
             Log(Log_DEBUG, __func__, U8("BitBuffer Pointer is NULL"));
@@ -569,7 +569,6 @@ extern "C" {
     }
     
     uint8_t *BitBuffer_ReadGUUID(BitBuffer *BitB, GUUIDTypes GUUID2Read) {
-        uint8_t ByteOrder = ((GUUID2Read == GUIDString || GUUID2Read == BinaryGUID) ? LSByteFirst : MSByteFirst);
         uint8_t *GUUID = NULL;
         if (GUUID2Read != UnknownGUUID && BitB != NULL && (BitBuffer_GetSize(BitB) - BitBuffer_GetPosition(BitB)) >= BinaryGUUIDSize) {
             if (GUUID2Read == BinaryUUID || GUUID2Read == BinaryGUID) {
@@ -797,10 +796,9 @@ extern "C" {
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
             Path32                           = UTF16_Decode(Path2Open);
             bool   PathHasBOM                = UTF16_HasBOM(Path2Open);
-            
-            bool   PathIsAbsolute            = UTF16_PathIsAbsolute(Path2Open);
-            
+            //bool   PathIsAbsolute            = UTF16_PathIsAbsolute(Path2Open);
             bool   PathHasWinPrefix          = UTF16_HasUNCPathPrefix(Path2Open);
+            
             if (PathHasBOM == Yes && PathHasWinPrefix == Yes) {
                 UTF32 *BOMLess               = UTF32_RemoveBOM(Path32);
                 free(Path32);
@@ -854,7 +852,7 @@ extern "C" {
         }
     }
     
-    void BitInput_ConnectSocket(BitInput *BitI, struct sockaddr *SocketAddress, uint64_t SocketSize) {
+    void BitInput_ConnectSocket(BitInput *BitI, struct sockaddr *SocketAddress, uint32_t SocketSize) {
         if (BitI != NULL && SocketAddress != NULL) {
             BitI->FileType = BitIOSocket;
             FoundationIO_Socket_Connect(BitI->Socket, SocketAddress, SocketSize);
