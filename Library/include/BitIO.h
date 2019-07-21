@@ -415,7 +415,7 @@ extern "C" {
      @param                     SocketAddress                   "The address of the socket".
      @param                     SocketSize                      "I honest have no idea what this means".
      */
-    void                        BitInput_ConnectSocket(BitInput *BitI, struct sockaddr *SocketAddress, uint64_t SocketSize);
+    void                        BitInput_ConnectSocket(BitInput *BitI, struct sockaddr *SocketAddress, uint32_t SocketSize);
     
     /*!
      @abstract                                                  "Gets the size of the BitInput file".
