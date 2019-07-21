@@ -404,6 +404,14 @@ extern "C" {
     bool                        IsPowerOfBase(uint8_t Base, uint64_t Value);
     
     /*!
+     @abstract                                                  "Value Mod Base, if the remainder is 0 Value is a power of the base".
+     @param                     Base                            "The base to check".
+     @param                     Integer                         "The value to check".
+     @return                                                    "Returns true if there's no remainder, otherwise returns false".
+     */
+    uint8_t                     NumDigitsInInteger(uint8_t Base, int64_t Integer);
+    
+    /*!
      @abstract                                                  "Rotates Value by Bits2Rotate".
      @param                     Value                           "The value to rotate".
      @param                     Bits2Rotate                     "The number of bits to rotate".
