@@ -101,25 +101,25 @@ extern "C" {
         return MD5;
     }
     
-    static void MD5_A(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint32_t Shift, uint32_t AC) { // 11/FF
+    static void MD5_A(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) { // 11/FF
         A += ((B & C) | (~B & D)) + X + AC;
         A  = (uint32_t) RotateLeft(A, Shift);
         A += B;
     }
     
-    static void MD5_B(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint32_t Shift, uint32_t AC) { // 22/GG
+    static void MD5_B(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) { // 22/GG
         A += ((B & D) | (C & ~D)) + X + AC;
         A  = (uint32_t) RotateLeft(A, Shift);
         A += B;
     }
     
-    static void MD5_C(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint32_t Shift, uint32_t AC) { // 33/HH
+    static void MD5_C(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) { // 33/HH
         A += (B ^ C ^ D) + X + AC;
         A  = (uint32_t) RotateLeft(A, Shift);
         A += B;
     }
     
-    static void MD5_D(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint32_t Shift, uint32_t AC) { // 44/II
+    static void MD5_D(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) { // 44/II
         A += (C ^ (B | ~D)) + X + AC;
         A  = (uint32_t) RotateLeft(A, Shift);
         A += B;
@@ -153,10 +153,10 @@ extern "C" {
         uint32_t Index4 = 0;
         
         for (uint8_t Round = 0; Round < 64; Round++) {
-            uint32_t Index1 = State[MD5ParameterTable[(Round / 4) + 0]];
-            uint32_t Index2 = State[MD5ParameterTable[(Round / 4) + 1]];
-            uint32_t Index3 = State[MD5ParameterTable[(Round / 4) + 2]];
-            uint32_t Index4 = State[MD5ParameterTable[(Round / 4) + 3]];
+            Index1      = State[MD5ParameterTable[(Round / 4) + 0]];
+            Index2      = State[MD5ParameterTable[(Round / 4) + 1]];
+            Index3      = State[MD5ParameterTable[(Round / 4) + 2]];
+            Index4      = State[MD5ParameterTable[(Round / 4) + 3]];
             
             if (Round < 16) {
                 MD5_A(Index1, Index2, Index3, Index4, Packet[MD5BlockIndexTable[Round]], MD5ShiftTable[Round], MD5GeneratedConstants[Round]);
@@ -307,13 +307,13 @@ extern "C" {
                 
                 do {
                     uint8_t  BitsInEntropyByte        = Bits2ExtractFromByte(Random->BitOffset);
-                    uint8_t  Bits2Get                 = Minimum(BitsInEntropyByte, Bits2Read);
+                    uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInEntropyByte, Bits2Read);
                     uint8_t  Shift                    = 8 - Bits2Get;
                     uint8_t  BitMask                  = 0;
 #if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
-                    BitMask                           = CreateBitMaskLSBit(Bits2Get) << Shift;
+                    BitMask                           = (uint8_t) (CreateBitMaskLSBit(Bits2Get) << Shift);
 #elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
-                    BitMask                           = CreateBitMaskMSBit(Bits2Get) >> Shift;
+                    BitMask                           = (uint8_t) (CreateBitMaskMSBit(Bits2Get) >> Shift);
 #endif
                     uint64_t EntropyByte              = Bits2Bytes(Random->BitOffset, RoundingType_Down);
                     uint8_t  ExtractedBits            = Random->EntropyPool[EntropyByte] & BitMask;
@@ -384,9 +384,9 @@ extern "C" {
         if (Random != NULL) {
             uint8_t Bits2Read                     = 0;
             if (MaxValue > MinValue) {
-                Bits2Read                         = Logarithm(2, MaxValue - MinValue);
+                Bits2Read                         = (uint8_t) Logarithm(2, MaxValue - MinValue);
             } else if (MinValue == MaxValue) {
-                Bits2Read                         = MaxValue;
+                Bits2Read                         = (uint8_t) Logarithm(2, MinValue - MaxValue);;
             }
             
             RandomInteger                         = Entropy_ExtractBits(Random, Bits2Read);
