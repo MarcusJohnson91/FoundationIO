@@ -446,9 +446,29 @@ extern "C" {
     }
     /* Ryū specific math functions */
     
+    uint8_t NumDigitsInInteger(uint8_t Base, int64_t Integer) {
+        uint8_t NumDigits = 0;
+        if (Integer < 0 && Integer < Base) {
+            do {
+                Integer   *= Base;
+                NumDigits += 1;
+            } while (Integer < 0);
+        } else if (Integer > 0 && Integer > Base) {
+            do {
+                Integer   /= Base;
+                NumDigits += 1;
+            } while (Integer > 0);
+        } else {
+            NumDigits = 1;
+        }
+        return NumDigits;
+    }
+    
     uint8_t NumDigitsInDecimal(double Decimal) {
         uint8_t NumDigits = 0;
-        
+        /*
+         Extract the Exponent, extract the Mantissa, check if the Mantissa isn't empty, add a digit for the decimal seperator.
+         */
         return NumDigits;
     }
     
