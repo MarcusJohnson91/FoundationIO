@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
-project(FoundationIO)
+project(FoundationIO C)
+
+if (${CMAKE_CONFIGURATION_TYPES} MATCHES "Debug" OR ${CMAKE_CONFIGURATION_TYPES} MATCHES "RelWithDebInfo")
+enable_testing()
+endif (${CMAKE_CONFIGURATION_TYPES} MATCHES "Debug" OR ${CMAKE_CONFIGURATION_TYPES} MATCHES "RelWithDebInfo")
 
 if(NOT FoundationIO_VERSION)
 set(FoundationIO_VERSION_MAJOR 0)
@@ -63,8 +67,10 @@ add_library(FoundationIO ${libFoundationIO_Sources} ${libFoundationIO_PublicHead
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 target_link_libraries(FoundationIO ws2_32 bcrypt)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
 set_target_properties(FoundationIO PROPERTIES PREFIX "")
 
+if (${CMAKE_CONFIGURATION_TYPES} MATCHES "Debug" OR ${CMAKE_CONFIGURATION_TYPES} MATCHES "RelWithDebInfo")
 add_executable(Test_BitIO "${Test_Dir}/Test_BitIO.c")
 add_executable(Test_CommandLineIO "${Test_Dir}/Test_CommandLineIO.c")
 add_executable(Test_ContainerIO "${Test_Dir}/Test_ContainerIO.c")
@@ -79,12 +85,13 @@ target_link_libraries(Test_StringIO FoundationIO)
 target_link_libraries(Test_Math FoundationIO)
 target_link_libraries(Test_CryptographyIO FoundationIO)
 
-add_test(Test_BitIO CONFIGURATIONS Debug Release)
-add_test(Test_CommandLineIO CONFIGURATIONS Debug Release)
-add_test(Test_ContainerIO CONFIGURATIONS Debug Release)
-add_test(Test_StringIO CONFIGURATIONS Debug Release)
+add_test(Test_BitIO CONFIGURATIONS Debug RelWithDebInfo)
+add_test(Test_CommandLineIO CONFIGURATIONS Debug RelWithDebInfo)
+add_test(Test_ContainerIO CONFIGURATIONS Debug RelWithDebInfo)
+add_test(Test_StringIO CONFIGURATIONS Debug RelWithDebInfo)
+endif (${CMAKE_CONFIGURATION_TYPES} MATCHES "Debug" OR ${CMAKE_CONFIGURATION_TYPES} MATCHES "RelWithDebInfo")
 
-if (CMAKE_C_COMPILER_ID MATCHES "AppleClang" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
+if (${CMAKE_C_COMPILER_ID} MATCHES "AppleClang" OR ${CMAKE_C_COMPILER_ID} MATCHES "Clang")
 
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
@@ -153,7 +160,7 @@ set(LINK_FLAGS_MINSIZEREL " \
 ${LINK_FLAGS} \
 ")
 
-elseif (CMAKE_C_COMPILER_ID MATCHES "GNU")
+elseif (${CMAKE_C_COMPILER_ID} MATCHES "GNU")
 
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
@@ -217,7 +224,7 @@ set(LINK_FLAGS_MINSIZEREL " \
 ${LINK_FLAGS} \
 ")
 
-elseif (MAKE_C_COMPILER_ID MATCHES "MSVC")
+elseif (${MAKE_C_COMPILER_ID} MATCHES "MSVC")
 
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
@@ -306,4 +313,4 @@ ${LINK_FLAGS} \
 /RELEASE \
 ")
 
-endif (CMAKE_C_COMPILER_ID MATCHES "AppleClang" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
+endif (${CMAKE_C_COMPILER_ID} MATCHES "AppleClang" OR ${CMAKE_C_COMPILER_ID} MATCHES "Clang")
