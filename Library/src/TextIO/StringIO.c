@@ -1330,9 +1330,9 @@ extern "C" {
     
     UTF32 *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length) {
         UTF32 *ReplacedString                 = NULL;
-        if (String != NULL && Replacement != NULL && Length >= 1) {
+        if (String != NULL && Replacement != NULL) {
             uint64_t StringSize               = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t ReplacementStringSize    = UTF32_GetStringSizeInCodePoints(Replacement);
+            uint64_t ReplacementStringSize    = UTF32_GetStringSizeInCodePoints(Replacement) == 0 ? 1 : UTF32_GetStringSizeInCodePoints(Replacement);
             uint64_t NewStringSize            = (StringSize + ReplacementStringSize) - Length;
             ReplacedString                    = calloc(NewStringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
             if (ReplacedString != NULL) {
@@ -1371,8 +1371,6 @@ extern "C" {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         } else if (Replacement == NULL) {
             Log(Log_DEBUG, __func__, U8("Replacement Pointer is NULL"));
-        } else if (Length == 0) {
-            Log(Log_DEBUG, __func__, U8("Length %llu is too short"), Length);
         }
         return ReplacedString;
     }
@@ -3280,7 +3278,7 @@ extern "C" {
                             Details->Specifiers[Specifier].SpecifierLength = 1; // 1 to account for the percent
                             CodePoint2                                     = CodePoint + 1;
                             /*
-                             W have to disambiguate between Flag 0, and Octal, or even Hex input.
+                             We have to disambiguate between Flag 0, and Octal, or even Hex input.
                              
                              Specifier is the only Mandatory field, everything else is Optional.
                              */
@@ -3760,20 +3758,17 @@ extern "C" {
                         UTF32   *Arg32                 = UTF8_Decode(Arg);
                         UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                         Formatted                      = Format2;
-                        free(Arg);
                         free(Arg32);
                     } else if ((Modifier & Modifier_UTF16) == Modifier_UTF16) {
                         UTF16   *Arg                   = va_arg(VariadicArguments, UTF16*);
                         UTF32   *Arg32                 = UTF16_Decode(Arg);
                         UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                         Formatted                      = Format2;
-                        free(Arg);
                         free(Arg32);
                     } else if ((Modifier & Modifier_UTF32) == Modifier_UTF32) {
                         UTF32   *Arg                   = va_arg(VariadicArguments, UTF32*);
                         UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg, SpecifierOffset, SpecifierLength);
                         Formatted                      = Format2;
-                        free(Arg);
                     }
                 } else if (BaseType == BaseType_String) {
                     if ((Modifier & Modifier_UTF8) == Modifier_UTF8) {
@@ -3781,20 +3776,17 @@ extern "C" {
                         UTF32   *Arg32                 = UTF8_Decode(Arg);
                         UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                         Formatted                      = Format2;
-                        free(Arg);
                         free(Arg32);
                     } else if ((Modifier & Modifier_UTF16) == Modifier_UTF16) {
                         UTF16   *Arg                   = va_arg(VariadicArguments, UTF16*);
                         UTF32   *Arg32                 = UTF16_Decode(Arg);
                         UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                         Formatted                      = Format2;
-                        free(Arg);
                         free(Arg32);
                     } else if ((Modifier & Modifier_UTF32) == Modifier_UTF32) {
                         UTF32   *Arg                   = va_arg(VariadicArguments, UTF32*);
                         UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg, SpecifierOffset, SpecifierLength);
                         Formatted                      = Format2;
-                        free(Arg);
                     }
                 } else if (BaseType == BaseType_Integer) {
                     if ((Modifier & Modifier_Unsigned) == Modifier_Unsigned) {
@@ -3869,7 +3861,6 @@ extern "C" {
                     // TODO: Figure out what the hell this is.
                 }
             }
-            Formatted = FormatTemp;
         } else if (Format == NULL) {
             Log(Log_DEBUG, __func__, U8("Format Pointer is NULL"));
         } else if (Details == NULL) {
