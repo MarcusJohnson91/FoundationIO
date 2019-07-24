@@ -2,9 +2,13 @@ cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
 project(FoundationIO C)
 
-if (${CMAKE_CONFIGURATION_TYPES} MATCHES "Debug" OR ${CMAKE_CONFIGURATION_TYPES} MATCHES "RelWithDebInfo")
+if (NOT ${BUILD_SHARED_LIBS})
+BUILD_SHARED_LIBS()
+endif (NOT ${BUILD_SHARED_LIBS})
+
+if (CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
 enable_testing()
-endif (${CMAKE_CONFIGURATION_TYPES} MATCHES "Debug" OR ${CMAKE_CONFIGURATION_TYPES} MATCHES "RelWithDebInfo")
+endif (CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
 
 if(NOT FoundationIO_VERSION)
 set(FoundationIO_VERSION_MAJOR 0)
@@ -70,7 +74,7 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 set_target_properties(FoundationIO PROPERTIES PREFIX "")
 
-if (${CMAKE_CONFIGURATION_TYPES} MATCHES "Debug" OR ${CMAKE_CONFIGURATION_TYPES} MATCHES "RelWithDebInfo")
+if (CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
 add_executable(Test_BitIO "${Test_Dir}/Test_BitIO.c")
 add_executable(Test_CommandLineIO "${Test_Dir}/Test_CommandLineIO.c")
 add_executable(Test_ContainerIO "${Test_Dir}/Test_ContainerIO.c")
@@ -89,7 +93,7 @@ add_test(Test_BitIO CONFIGURATIONS Debug RelWithDebInfo)
 add_test(Test_CommandLineIO CONFIGURATIONS Debug RelWithDebInfo)
 add_test(Test_ContainerIO CONFIGURATIONS Debug RelWithDebInfo)
 add_test(Test_StringIO CONFIGURATIONS Debug RelWithDebInfo)
-endif (${CMAKE_CONFIGURATION_TYPES} MATCHES "Debug" OR ${CMAKE_CONFIGURATION_TYPES} MATCHES "RelWithDebInfo")
+endif (CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
 
 if (${CMAKE_C_COMPILER_ID} MATCHES "AppleClang" OR ${CMAKE_C_COMPILER_ID} MATCHES "Clang")
 
