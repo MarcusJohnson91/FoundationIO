@@ -115,7 +115,6 @@ extern "C" {
             do {
                 NumCodePoints += 1;
             } while (String[NumCodePoints] != FoundationIONULLTerminator);
-            NumCodePoints -= FoundationIONULLTerminatorSize;
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
@@ -1332,19 +1331,31 @@ extern "C" {
         UTF32 *ReplacedString                 = NULL;
         if (String != NULL && Replacement != NULL) {
             uint64_t StringSize               = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t ReplacementStringSize    = UTF32_GetStringSizeInCodePoints(Replacement) == 0 ? 1 : UTF32_GetStringSizeInCodePoints(Replacement);
+            uint64_t ReplacementStringSize    = UTF32_GetStringSizeInCodePoints(Replacement);
             uint64_t NewStringSize            = (StringSize + ReplacementStringSize) - Length;
             ReplacedString                    = calloc(NewStringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
             if (ReplacedString != NULL) {
-                uint64_t ReplacementOffset    = 0ULL;
+                uint64_t ReplacementCodePoint = 0ULL;
                 for (uint64_t CodePoint = 0ULL; CodePoint < NewStringSize; CodePoint++) {
-                    if (CodePoint < Offset || CodePoint > Offset + Minimum(Length, ReplacementStringSize)) {
+                    if (CodePoint < Offset) {
                         ReplacedString[CodePoint] = String[CodePoint];
+                    } else if (CodePoint >= Offset && CodePoint <= Offset + Length) {
+                        ReplacedString[CodePoint] = Replacement[ReplacementCodePoint];
+                        ReplacementCodePoint += 1;
                     } else {
-                        ReplacedString[CodePoint] = Replacement[ReplacementOffset];
-                        ReplacementOffset        += 1;
+                        ReplacedString[CodePoint] = String[CodePoint];
                     }
                 }
+                /*
+                 If CodePoint is less than Offset, copy from String.
+                 if CodePoint is greater than Offset and less than Offset + Length, copy from Replacement
+                 otherwise copy from string
+                 */
+                
+                
+                
+                
+                
                 /*
                  Example String: "Wat = %llu"
                  Result  String: "Wat = 14"
@@ -1975,47 +1986,51 @@ extern "C" {
         uint64_t Num                  = AbsoluteI(Integer2Convert);
         uint8_t  Radix                = 0;
         uint8_t  NumDigits            = 0;
-        if ((Num & 0x8000000000000000) >> 63 == 1) {
-            Sign                      = -1;
-            NumDigits                +=  1;
-        }
         
-        if ((Base & Integer) == Integer && (Base & Base2) == Base2) {
-            Radix                     = 2;
-        } else if ((Base & Integer) == Integer && (Base & Base8) == Base8) {
-            Radix                     = 8;
-        } else if ((Base & Integer) == Integer && (Base & Base10) == Base10) {
-            Radix                     = 10;
-        } else if ((Base & Integer) == Integer && (Base & Base16) == Base16) {
-            Radix                     = 16;
-        }
-        
-        NumDigits                    += NumDigitsInInteger(Radix, Integer2Convert) + FoundationIONULLTerminatorSize;
-        
-        String                        = calloc(NumDigits, sizeof(UTF32));
-        
-        if (String != NULL) {
-            for (uint64_t CodePoint = NumDigits - FoundationIONULLTerminatorSize; CodePoint > 0; CodePoint--) {
-                uint8_t Digit         = (Num % Radix) == 0 ? 1 : (Num % Radix);
-                Num                  -= Digit == Radix - 1 ? Radix + 1 : (Num % Radix);
-                if ((Base & Base2) == Base2) {
-                    String[CodePoint] = StringIOIntegerBase2Table[Digit];
-                } else if ((Base & Base8) == Base8) {
-                    String[CodePoint] = StringIOIntegerBase8Table[Digit];
-                } else if ((Base & Base10) == Base10) {
-                    if (CodePoint == 0 && Sign == -1) {
-                        String[CodePoint] = U32('-');
-                    } else {
-                        String[CodePoint] = StringIOIntegerBase10Table[Digit];
-                    }
-                } else if ((Base & Base16) == Base16) {
-                    if ((Base & Uppercase) == Uppercase) {
-                        String[CodePoint] = StringIOIntegerBase16UppercaseTable[Digit];
-                    } else if ((Base & Lowercase) == Lowercase) {
-                        String[CodePoint] = StringIOIntegerBase16LowercaseTable[Digit];
+        if ((Base & Integer) == Integer) {
+            if ((Integer2Convert & 0x8000000000000000) >> 63 == 1) {
+                Sign                      = -1;
+                NumDigits                +=  1;
+            }
+            
+            if ((Base & Base2) == Base2) {
+                Radix                     = 2;
+            } else if ((Base & Base8) == Base8) {
+                Radix                     = 8;
+            } else if ((Base & Base10) == Base10) {
+                Radix                     = 10;
+            } else if ((Base & Base16) == Base16) {
+                Radix                     = 16;
+            }
+            NumDigits                    += NumDigitsInInteger(Radix, Integer2Convert);
+            
+            String                        = calloc(NumDigits + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            
+            if (String != NULL) {
+                for (uint64_t CodePoint = NumDigits; CodePoint > 0; CodePoint--) {
+                    uint8_t Digit             = Num % Radix;
+                    Num                      /= Radix;
+                    if ((Base & Base2) == Base2) {
+                        String[CodePoint - 1]     = StringIOIntegerBase2Table[Digit];
+                    } else if ((Base & Base8) == Base8) {
+                        String[CodePoint - 1]     = StringIOIntegerBase8Table[Digit];
+                    } else if ((Base & Base10) == Base10) {
+                        if (CodePoint == 1 && Sign == -1) {
+                            String[CodePoint - 1] = U32('-');
+                        } else {
+                            String[CodePoint - 1] = StringIOIntegerBase10Table[Digit];
+                        }
+                    } else if ((Base & Base16) == Base16) {
+                        if ((Base & Uppercase) == Uppercase) {
+                            String[CodePoint - 1] = StringIOIntegerBase16UppercaseTable[Digit];
+                        } else if ((Base & Lowercase) == Lowercase) {
+                            String[CodePoint - 1] = StringIOIntegerBase16LowercaseTable[Digit];
+                        }
                     }
                 }
             }
+        } else {
+            Log(Log_DEBUG, __func__, U8("Base is not an integer, exiting"));
         }
         return String;
     }
@@ -3695,56 +3710,56 @@ extern "C" {
                     UTF32 *EscapeString                = NULL;
                     switch (Details->Specifiers[Specifier].EscapeType) {
                         case EscapeSequence_Beep:
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, U32("\x07"), SpecifierOffset, SpecifierLength);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\x07"), SpecifierOffset, SpecifierLength);
                             break;
                         case EscapeSequence_Backspace:
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, U32("\x08"), SpecifierOffset, SpecifierLength);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\x08"), SpecifierOffset, SpecifierLength);
                             break;
                         case EscapeSequence_FormFeed:
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, U32("\x0C"), SpecifierOffset, SpecifierLength);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\x0C"), SpecifierOffset, SpecifierLength);
                             break;
                         case EscapeSequence_NewLine:
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, FoundationIONewLine32, SpecifierOffset, SpecifierLength);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, FoundationIONewLine32, SpecifierOffset, SpecifierLength);
                             break;
                         case EscapeSequence_CarriageReturn:
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, U32("\x0D"), SpecifierOffset, SpecifierLength);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\x0D"), SpecifierOffset, SpecifierLength);
                             break;
                         case EscapeSequence_Tab:
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, U32("\x09"), SpecifierOffset, SpecifierLength);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\x09"), SpecifierOffset, SpecifierLength);
                             break;
                         case EscapeSequence_VerticalTab:
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, U32("\x0B"), SpecifierOffset, SpecifierLength);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\x0B"), SpecifierOffset, SpecifierLength);
                             break;
                         case EscapeSequence_Backslash:
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, U32("\\"), SpecifierOffset, SpecifierLength);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\\"), SpecifierOffset, SpecifierLength);
                             break;
                         case EscapeSequence_Apostrophe:
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, U32("\'"), SpecifierOffset, SpecifierLength);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\'"), SpecifierOffset, SpecifierLength);
                             break;
                         case EscapeSequence_Quote:
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, U32("\""), SpecifierOffset, SpecifierLength);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\""), SpecifierOffset, SpecifierLength);
                             break;
                         case EscapeSequence_QuestionMark:
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, U32("\?"), SpecifierOffset, SpecifierLength);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\?"), SpecifierOffset, SpecifierLength);
                             break;
                         case EscapeSequence_Octal:
                             EscapeString               = UTF32_ExtractSubString(FormatTemp, SpecifierOffset, Details->Specifiers[Specifier].OctalSeqSize);
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, EscapeString, SpecifierOffset, Details->Specifiers[Specifier].OctalSeqSize + 1);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, EscapeString, SpecifierOffset, Details->Specifiers[Specifier].OctalSeqSize + 1);
                             free(EscapeString);
                             break;
                         case EscapeSequence_Hexadecimal:
                             EscapeString               = UTF32_ExtractSubString(FormatTemp, SpecifierOffset, SpecifierLength);
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, EscapeString, SpecifierOffset, SpecifierLength + 1);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, EscapeString, SpecifierOffset, SpecifierLength + 1);
                             free(EscapeString);
                             break;
                         case EscapeSequence_Unicode4:
                             EscapeString               = UTF32_ExtractSubString(FormatTemp, SpecifierOffset, 4);
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, EscapeString, SpecifierOffset, 4);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, EscapeString, SpecifierOffset, 4);
                             free(EscapeString);
                             break;
                         case EscapeSequence_Unicode8:
                             EscapeString               = UTF32_ExtractSubString(FormatTemp, SpecifierOffset, 8);
-                            Formatted                  = UTF32_ReplaceSubString(FormatTemp, EscapeString, SpecifierOffset, 8);
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, EscapeString, SpecifierOffset, 8);
                             free(EscapeString);
                             break;
                         case EscapeSequence_Unknown:
@@ -3756,104 +3771,88 @@ extern "C" {
                     if ((Modifier & Modifier_UTF8) == Modifier_UTF8) {
                         UTF8    *Arg                   = va_arg(VariadicArguments, UTF8*);
                         UTF32   *Arg32                 = UTF8_Decode(Arg);
-                        UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                        Formatted                      = Format2;
+                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                         free(Arg32);
                     } else if ((Modifier & Modifier_UTF16) == Modifier_UTF16) {
                         UTF16   *Arg                   = va_arg(VariadicArguments, UTF16*);
                         UTF32   *Arg32                 = UTF16_Decode(Arg);
-                        UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                        Formatted                      = Format2;
+                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                         free(Arg32);
                     } else if ((Modifier & Modifier_UTF32) == Modifier_UTF32) {
                         UTF32   *Arg                   = va_arg(VariadicArguments, UTF32*);
-                        UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg, SpecifierOffset, SpecifierLength);
-                        Formatted                      = Format2;
+                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg, SpecifierOffset, SpecifierLength);
                     }
                 } else if (BaseType == BaseType_String) {
                     if ((Modifier & Modifier_UTF8) == Modifier_UTF8) {
                         UTF8    *Arg                   = va_arg(VariadicArguments, UTF8*);
                         UTF32   *Arg32                 = UTF8_Decode(Arg);
-                        UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                        Formatted                      = Format2;
+                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                         free(Arg32);
                     } else if ((Modifier & Modifier_UTF16) == Modifier_UTF16) {
                         UTF16   *Arg                   = va_arg(VariadicArguments, UTF16*);
                         UTF32   *Arg32                 = UTF16_Decode(Arg);
-                        UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                        Formatted                      = Format2;
+                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                         free(Arg32);
                     } else if ((Modifier & Modifier_UTF32) == Modifier_UTF32) {
                         UTF32   *Arg                   = va_arg(VariadicArguments, UTF32*);
-                        UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg, SpecifierOffset, SpecifierLength);
-                        Formatted                      = Format2;
+                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg, SpecifierOffset, SpecifierLength);
                     }
                 } else if (BaseType == BaseType_Integer) {
                     if ((Modifier & Modifier_Unsigned) == Modifier_Unsigned) {
                         if ((Length & Length_8Bit) == Length_8Bit) {
                             uint8_t  Arg               = va_arg(VariadicArguments, uint8_t);
                             UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            UTF32   *Format2           = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            Formatted                  = Format2;
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                             free(Arg32);
                         } else if ((Length & Length_16Bit) == Length_16Bit) {
                             uint16_t Arg               = va_arg(VariadicArguments, uint16_t);
                             UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            UTF32   *Format2           = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            Formatted                  = Format2;
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                             free(Arg32);
                         } else if ((Length & Length_32Bit) == Length_32Bit) {
                             uint32_t Arg               = va_arg(VariadicArguments, uint32_t);
                             UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            UTF32   *Format2           = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            Formatted                  = Format2;
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                             free(Arg32);
                         } else if ((Length & Length_64Bit) == Length_64Bit) {
                             uint64_t Arg               = va_arg(VariadicArguments, uint64_t);
                             UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            UTF32   *Format2           = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            Formatted                  = Format2;
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                             free(Arg32);
                         }
                     } else if ((Modifier & Modifier_Signed) == Modifier_Signed) {
                         if ((Length & Length_8Bit) == Length_8Bit) {
                             int8_t   Arg               = va_arg(VariadicArguments, int8_t);
                             UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            UTF32   *Format2           = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            Formatted                  = Format2;
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                             free(Arg32);
                         } else if ((Length & Length_16Bit) == Length_16Bit) {
                             int16_t  Arg               = va_arg(VariadicArguments, int16_t);
                             UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            UTF32   *Format2           = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            Formatted                  = Format2;
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                             free(Arg32);
                         } else if ((Length & Length_32Bit) == Length_32Bit) {
                             int32_t  Arg               = va_arg(VariadicArguments, int32_t);
                             UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            UTF32   *Format2           = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            Formatted                  = Format2;
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                             free(Arg32);
                         } else if ((Length & Length_64Bit) == Length_64Bit) {
                             int64_t  Arg               = va_arg(VariadicArguments, int64_t);
                             UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            UTF32   *Format2           = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            Formatted                  = Format2;
+                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                             free(Arg32);
                         }
                     }
                 } else if (BaseType == BaseType_Decimal) {
                     if ((Length & Length_32Bit) == Length_32Bit) {
                         float    Arg                   = va_arg(VariadicArguments, float);
-                        UTF32   *Arg32                 = UTF32_Decimal2String(Base, Arg);
-                        UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                        Formatted                      = Format2;
+                        UTF32   *Arg32                 = UTF32_Decimal2String(Base, (double) Arg);
+                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                         free(Arg32);
                     } else if ((Length & Length_64Bit) == Length_64Bit) {
                         double   Arg                   = va_arg(VariadicArguments, double);
                         UTF32   *Arg32                 = UTF32_Decimal2String(Base, Arg);
-                        UTF32   *Format2               = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                        Formatted                      = Format2;
+                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                         free(Arg32);
                     }
                 } else if (BaseType == BaseType_Positional) {
@@ -3861,6 +3860,7 @@ extern "C" {
                     // TODO: Figure out what the hell this is.
                 }
             }
+            Formatted                                    = FormatTemp;
         } else if (Format == NULL) {
             Log(Log_DEBUG, __func__, U8("Format Pointer is NULL"));
         } else if (Details == NULL) {
