@@ -96,9 +96,9 @@ extern "C" {
     
     bool UTF8_FormatTest(void) {
         bool TestPassed    = false;
-        UTF8 *Formatted    = UTF8_Format(U8("Ten Thousand Four Hundred Twenty = %llu????????"), 10420);
+        UTF8 *Formatted    = UTF8_Format(U8("One Thousand Twenty Four = %llu????????"), 1024);
         printf("%s\n", Formatted);
-        UTF8 *FormatAnswer = U8("Ten Thousand Four Hundred Twenty = 10420????????"); // Twenty Seven = 27???????
+        UTF8 *FormatAnswer = U8("One Thousand Twenty Four = 1024????????"); // Twenty Seven = 27???????
         TestPassed         = UTF8_Compare(Formatted, FormatAnswer);
         return TestPassed;
     }
