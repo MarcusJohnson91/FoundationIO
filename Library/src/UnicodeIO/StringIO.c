@@ -1354,18 +1354,18 @@ extern "C" {
                             NewString[CodePoint]      = String[CodePoint + ReplacementCodePoint];
                             CodePoint                += 1;
                         }
-                    } else if (ReplacementStringSize > Offset + Maximum(Length, ReplacementStringSize)) {
+                    } else if (ReplacementStringSize > Length) { // This is off by 6 at the end
                         if (CodePoint < Offset) {
                             NewString[CodePoint]      = String[CodePoint];
                             CodePoint                += 1;
-                        } else if (CodePoint >= Offset && CodePoint < Offset + ReplacementStringSize) {
+                        } else if (CodePoint >= Offset && CodePoint < Offset + Length) {
                             do {
                                 NewString[CodePoint]  = Replacement[ReplacementCodePoint];
                                 CodePoint            += 1;
                                 ReplacementCodePoint += 1;
                             } while(Replacement[ReplacementCodePoint] != FoundationIONULLTerminator);
-                        } else if (CodePoint >= Offset + ReplacementStringSize) {
-                            NewString[CodePoint]      = String[CodePoint + ReplacementCodePoint];
+                        } else if (CodePoint >= Offset + Length) {
+                            NewString[CodePoint]      = String[CodePoint - (ReplacementStringSize - Length)];
                             CodePoint                += 1;
                         }
                     }
