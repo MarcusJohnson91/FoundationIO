@@ -277,26 +277,26 @@ extern "C" {
 #ifndef             FoundationIONewLine8
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
 #define             FoundationIONewLine8                                   (u8"\n")
-#define             FoundationIONewLineSize8                               (1)
+#define             FoundationIONewLine8Size                               (1)
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #define             FoundationIONewLine8                                   (u8"\r\n")
-#define             FoundationIONewLineSize8                               (2)
+#define             FoundationIONewLine8Size                               (2)
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
 #define             FoundationIONewLine8                                   (u8"\r")
-#define             FoundationIONewLineSize8                               (1)
+#define             FoundationIONewLine8Size                               (1)
 #endif /* TargetOS */
 #endif /* FoundationIONewLine8 */
     
 #ifndef             FoundationIONewLine16
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
 #define             FoundationIONewLine16                                  (u"\n")
-#define             FoundationIONewLineSize16                              (1)
+#define             FoundationIONewLine16Size                              (1)
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #define             FoundationIONewLine16                                  (u"\r\n")
-#define             FoundationIONewLineSize16                              (2)
+#define             FoundationIONewLine16Size                              (2)
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
 #define             FoundationIONewLine16                                  (u"\r")
-#define             FoundationIONewLineSize16                              (1)
+#define             FoundationIONewLine16Size                              (1)
 #endif /* TargetOS */
 #endif /* FoundationIONewLine16 */
     
@@ -304,13 +304,13 @@ extern "C" {
 #ifndef             FoundationIONewLine32
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
 #define             FoundationIONewLine32                                  (U"\n")
-#define             FoundationIONewLineSize32                              (1)
+#define             FoundationIONewLine32Size                              (1)
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #define             FoundationIONewLine32                                  (U"\r\n")
-#define             FoundationIONewLineSize32                              (2)
+#define             FoundationIONewLine32Size                              (2)
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
 #define             FoundationIONewLine32                                  (U"\r")
-#define             FoundationIONewLineSize32                              (1)
+#define             FoundationIONewLine32Size                              (1)
 #endif /* TargetOS */
 #endif /* FoundationIONewLine32 */
     
