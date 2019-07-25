@@ -1338,13 +1338,11 @@ extern "C" {
                 uint64_t CodePoint            = 0ULL;
                 uint64_t ReplacementCodePoint = 0ULL;
                 do {
-                    if (ReplacementStringSize <= Length) {
+                    if (ReplacementStringSize < Length) {
                         if (CodePoint < Offset) {
                             NewString[CodePoint]      = String[CodePoint];
                             CodePoint                += 1;
-                        } else if (CodePoint >= Offset && CodePoint < Offset + ReplacementStringSize) { // This Logic is incorrect
-                            // The latter statement shouldn't be executing, if it's equal to the Offset replace
-                            // for codepoints beyond the Offset what do we do?
+                        } else if (CodePoint >= Offset && CodePoint < Offset + ReplacementStringSize) {
                             do {
                                 NewString[CodePoint]  = Replacement[ReplacementCodePoint];
                                 CodePoint            += 1;
@@ -1354,7 +1352,7 @@ extern "C" {
                             NewString[CodePoint]      = String[CodePoint + ReplacementCodePoint];
                             CodePoint                += 1;
                         }
-                    } else if (ReplacementStringSize > Length) { // This is off by 6 at the end
+                    } else if (ReplacementStringSize > Length) {
                         if (CodePoint < Offset) {
                             NewString[CodePoint]      = String[CodePoint];
                             CodePoint                += 1;
@@ -1365,7 +1363,21 @@ extern "C" {
                                 ReplacementCodePoint += 1;
                             } while(Replacement[ReplacementCodePoint] != FoundationIONULLTerminator);
                         } else if (CodePoint >= Offset + Length) {
-                            NewString[CodePoint]      = String[CodePoint - (ReplacementStringSize - Length)];
+                            NewString[CodePoint]      = String[CodePoint + (ReplacementStringSize - Length)];
+                            CodePoint                += 1;
+                        }
+                    } else { // ReplacementStringSize == Length
+                        if (CodePoint < Offset) {
+                            NewString[CodePoint]      = String[CodePoint];
+                            CodePoint                += 1;
+                        } else if (CodePoint >= Offset && CodePoint < Offset + Length) {
+                            do {
+                                NewString[CodePoint]  = Replacement[ReplacementCodePoint];
+                                CodePoint            += 1;
+                                ReplacementCodePoint += 1;
+                            } while(Replacement[ReplacementCodePoint] != FoundationIONULLTerminator);
+                        } else if (CodePoint >= Offset + Length) {
+                            NewString[CodePoint]      = String[CodePoint];
                             CodePoint                += 1;
                         }
                     }
