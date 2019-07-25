@@ -971,29 +971,29 @@ extern "C" {
     
     void UTF8_WriteLine(FILE *OutputFile, UTF8 *String) { // Replaces Fputs and puts
         if (String != NULL && OutputFile != NULL) {
-            int  StreamMode            = fwide(OutputFile, 0);
-            uint64_t CodeUnit          = 0ULL;
+            int8_t   StreamMode        = (int8_t) fwide(OutputFile, 0);
+            uint64_t StringSize        = UTF8_GetStringSizeInCodeUnits(String);
             uint64_t CodeUnitsWritten  = 0ULL;
             bool     StringHasNewLine  = UTF8_HasNewLine(String);
             if (StreamMode < 0) { // UTF-8
-                do {
-                    CodeUnitsWritten   = fwrite(&String[CodeUnit], sizeof(UTF8), 1, OutputFile);
-                } while (String[CodeUnit] != FoundationIONULLTerminator);
-                
+                CodeUnitsWritten       = fwrite(String, StringSize, sizeof(UTF8), OutputFile);
                 if (StringHasNewLine == No) {
-                    fwrite(FoundationIONewLine8, FoundationIONewLineSize8, 1, OutputFile);
+                    fwrite(FoundationIONewLine8, FoundationIONewLine8Size, 1, OutputFile);
+                }
+                if (CodeUnitsWritten != StringSize) {
+                    Log(Log_DEBUG, __func__, U8("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             } else if (StreamMode > 0) { // UTF-16
                 UTF32 *String32        = UTF8_Decode(String);
                 UTF16 *String16        = UTF16_Encode(String32);
                 free(String32);
-                do {
-                    CodeUnitsWritten = fwrite(&String16[CodeUnit], sizeof(UTF16), 1, OutputFile);
-                } while (String[CodeUnit] != FoundationIONULLTerminator);
+                fwrite(String16, StringSize, sizeof(UTF16), OutputFile);
                 free(String16);
-                
                 if (StringHasNewLine == No) {
-                    fwrite(FoundationIONewLine16, FoundationIONewLineSize16, 1, OutputFile);
+                    fwrite(FoundationIONewLine16, FoundationIONewLine16Size, 1, OutputFile);
+                }
+                if (CodeUnitsWritten != StringSize) {
+                    Log(Log_DEBUG, __func__, U8("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             }
         } else if (String == NULL) {
@@ -1005,29 +1005,29 @@ extern "C" {
     
     void UTF16_WriteLine(FILE *OutputFile, UTF16 *String) { // Replaces Fputws and putws
         if (String != NULL && OutputFile != NULL) {
-            int  StreamMode            = fwide(OutputFile, 0);
-            uint64_t CodeUnit          = 0ULL;
+            int8_t   StreamMode        = (int8_t) fwide(OutputFile, 0);
+            uint64_t StringSize        = UTF16_GetStringSizeInCodeUnits(String);
             uint64_t CodeUnitsWritten  = 0ULL;
             bool     StringHasNewLine  = UTF16_HasNewLine(String);
             if (StreamMode > 0) { // UTF-16
-                do {
-                    CodeUnitsWritten   = fwrite(&String[CodeUnit], sizeof(UTF16), 1, OutputFile);
-                } while (String[CodeUnit] != FoundationIONULLTerminator);
-                
+                CodeUnitsWritten       = fwrite(String, StringSize, sizeof(UTF16), OutputFile);
                 if (StringHasNewLine == No) {
-                    fwrite(FoundationIONewLine16, FoundationIONewLineSize16, 1, OutputFile);
+                    fwrite(FoundationIONewLine16, FoundationIONewLine16Size, 1, OutputFile);
+                }
+                if (CodeUnitsWritten != StringSize) {
+                    Log(Log_DEBUG, __func__, U8("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             } else if (StreamMode < 0) { // UTF-8
                 UTF32 *String32        = UTF16_Decode(String);
                 UTF8  *String8         = UTF8_Encode(String32);
                 free(String32);
-                do {
-                    CodeUnitsWritten   = fwrite(&String8[CodeUnit], sizeof(UTF8), 1, OutputFile);
-                } while (String[CodeUnit] != FoundationIONULLTerminator);
+                CodeUnitsWritten       = fwrite(String8, StringSize, sizeof(UTF8), OutputFile);
                 free(String8);
-                
                 if (StringHasNewLine == No) {
-                    fwrite(FoundationIONewLine8, FoundationIONewLineSize8, 1, OutputFile);
+                    fwrite(FoundationIONewLine16, FoundationIONewLine16Size, 1, OutputFile);
+                }
+                if (CodeUnitsWritten != StringSize) {
+                    Log(Log_DEBUG, __func__, U8("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             }
         } else if (String == NULL) {
@@ -1050,7 +1050,7 @@ extern "C" {
                 } while (String[CodeUnit] != FoundationIONULLTerminator);
                 
                 if (StringHasNewLine == No) {
-                    fwrite(FoundationIONewLine16, FoundationIONewLineSize16, 1, OutputFile);
+                    fwrite(FoundationIONewLine16, FoundationIONewLine16Size, 1, OutputFile);
                 }
             } else if (StreamMode < 0) { // UTF-8
                 UTF8  *String8         = UTF8_Encode(String);
@@ -1060,7 +1060,7 @@ extern "C" {
                 free(String8);
                 
                 if (StringHasNewLine == No) {
-                    fwrite(FoundationIONewLine8, FoundationIONewLineSize8, 1, OutputFile);
+                    fwrite(FoundationIONewLine8, FoundationIONewLine8Size, 1, OutputFile);
                 }
             }
         } else if (String == NULL) {
@@ -1328,62 +1328,53 @@ extern "C" {
     }
     
     UTF32 *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length) {
-        UTF32 *ReplacedString                 = NULL;
+        UTF32 *NewString                      = NULL;
         if (String != NULL && Replacement != NULL) {
             uint64_t StringSize               = UTF32_GetStringSizeInCodePoints(String);
             uint64_t ReplacementStringSize    = UTF32_GetStringSizeInCodePoints(Replacement);
             uint64_t NewStringSize            = (StringSize + ReplacementStringSize) - Length;
-            ReplacedString                    = calloc(NewStringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
-            if (ReplacedString != NULL) {
+            NewString                         = calloc(NewStringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            if (NewString != NULL) {
+                uint64_t CodePoint            = 0ULL;
                 uint64_t ReplacementCodePoint = 0ULL;
-                for (uint64_t CodePoint = 0ULL; CodePoint < NewStringSize; CodePoint++) {
-                    if (CodePoint < Offset) {
-                        ReplacedString[CodePoint] = String[CodePoint];
-                    } else if (CodePoint >= Offset && CodePoint <= Offset + Length) {
-                        ReplacedString[CodePoint] = Replacement[ReplacementCodePoint];
-                        ReplacementCodePoint += 1;
-                    } else {
-                        ReplacedString[CodePoint] = String[CodePoint];
+                do {
+                    if (ReplacementStringSize <= Length) {
+                        if (CodePoint < Offset) {
+                            NewString[CodePoint]      = String[CodePoint];
+                            CodePoint                += 1;
+                        } else if (CodePoint >= Offset && CodePoint <= Offset + Length) {
+                            do {
+                                NewString[CodePoint]  = Replacement[ReplacementCodePoint];
+                                CodePoint            += 1;
+                                ReplacementCodePoint += 1;
+                            } while(Replacement[ReplacementCodePoint] != FoundationIONULLTerminator);
+                        } else if (CodePoint > Offset + ReplacementStringSize) {
+                            NewString[CodePoint]      = String[CodePoint - Length];
+                            CodePoint                += 1;
+                        }
+                    } else if (ReplacementStringSize > Offset + Maximum(Length, ReplacementStringSize)) {
+                        if (CodePoint < Offset) {
+                            NewString[CodePoint]      = String[CodePoint];
+                            CodePoint                += 1;
+                        } else if (CodePoint >= Offset && CodePoint <= Offset + Length) {
+                            do {
+                                NewString[CodePoint]  = Replacement[ReplacementCodePoint];
+                                CodePoint            += 1;
+                                ReplacementCodePoint += 1;
+                            } while(Replacement[ReplacementCodePoint] != FoundationIONULLTerminator);
+                        } else if (CodePoint > Offset + ReplacementStringSize) {
+                            NewString[CodePoint]      = String[CodePoint - Length];
+                            CodePoint                += 1;
+                        }
                     }
-                }
-                /*
-                 If CodePoint is less than Offset, copy from String.
-                 if CodePoint is greater than Offset and less than Offset + Length, copy from Replacement
-                 otherwise copy from string
-                 */
-                
-                
-                
-                
-                
-                /*
-                 Example String: "Wat = %llu"
-                 Result  String: "Wat = 14"
-                 
-                 Offset          = 6
-                 Length          = 4
-                 ReplacementSize = 2
-                 
-                 Copy CodePoints 0-5
-                 ReplaceCodePoints 6-9
-                 
-                 Example2: "Wat = %llu"
-                 Result2:  "Wat = 12646"
-                 
-                 Offset          = 6
-                 Length          = 4
-                 ReplacementSize = 5
-                 
-                 Copy CodePoints 0-5
-                 ReplaceCodePoints 6-9
-                 */
+                } while (CodePoint < NewStringSize);
             }
         } else if (String == NULL) {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         } else if (Replacement == NULL) {
             Log(Log_DEBUG, __func__, U8("Replacement Pointer is NULL"));
         }
-        return ReplacedString;
+        return NewString;
     }
     
     UTF8 *UTF8_RemoveSubString(UTF8 *String, UTF8 *SubString2Remove, uint64_t Instance2Remove) {
@@ -2871,15 +2862,22 @@ extern "C" {
     /* StringArray Functions */
     
     uint64_t UTF8_GetNumFormatSpecifiers(UTF8 *String) {
-        uint64_t NumSpecifiers     = 0ULL;
-        uint64_t CodeUnit          = 0ULL;
+        uint64_t StringSizeInCodeUnits = UTF8_GetStringSizeInCodeUnits(String);
+        uint64_t NumSpecifiers         = 0ULL;
+        uint64_t CodeUnit              = 0ULL;
         if (String != NULL) {
             do {
-                if (String[CodeUnit] == '%' || String[CodeUnit] == '/' || String[CodeUnit] == '\\') {
-                    NumSpecifiers += 1;
+                if (CodeUnit + 1 < StringSizeInCodeUnits) {
+                    if (String[CodeUnit] == '%' && String[CodeUnit + 1] == '%') {
+                        NumSpecifiers += 1;
+                        CodeUnit      += 2;
+                    }
                 }
-                CodeUnit          += 1;
-            } while (String[CodeUnit] != FoundationIONULLTerminator);
+                if (String[CodeUnit] == '%' || String[CodeUnit] == '\\') {
+                    NumSpecifiers     += 1;
+                }
+                CodeUnit              += 1;
+            } while (CodeUnit < StringSizeInCodeUnits);
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
@@ -2887,15 +2885,22 @@ extern "C" {
     }
     
     uint64_t UTF16_GetNumFormatSpecifiers(UTF16 *String) {
-        uint64_t NumSpecifiers     = 0ULL;
-        uint64_t CodeUnit          = 0ULL;
+        uint64_t StringSizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(String);
+        uint64_t NumSpecifiers         = 0ULL;
+        uint64_t CodeUnit              = 0ULL;
         if (String != NULL) {
             do {
-                if (String[CodeUnit] == U16('%') || String[CodeUnit] == U16('\\')) {
-                    NumSpecifiers += 1;
+                if (CodeUnit + 1 < StringSizeInCodeUnits) {
+                    if (String[CodeUnit] == U16('%') && String[CodeUnit + 1] == U16('%')) {
+                        NumSpecifiers += 1;
+                        CodeUnit      += 2;
+                    }
                 }
-                CodeUnit          += 1;
-            } while (String[CodeUnit] != FoundationIONULLTerminator);
+                if (String[CodeUnit] == U16('%') || String[CodeUnit] == U16('\\')) {
+                    NumSpecifiers     += 1;
+                }
+                CodeUnit              += 1;
+            } while (CodeUnit < StringSizeInCodeUnits);
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
@@ -2903,15 +2908,22 @@ extern "C" {
     }
     
     uint64_t UTF32_GetNumFormatSpecifiers(UTF32 *String) {
-        uint64_t NumSpecifiers     = 0ULL;
-        uint64_t CodePoint         = 0ULL;
+        uint64_t StringSizeInCodeUnits = UTF32_GetStringSizeInCodePoints(String);
+        uint64_t NumSpecifiers         = 0ULL;
+        uint64_t CodeUnit              = 0ULL;
         if (String != NULL) {
             do {
-                if (String[CodePoint] == U32('%') || String[CodePoint] == U32('\\')) {
-                    NumSpecifiers += 1;
+                if (CodeUnit + 1 < StringSizeInCodeUnits) {
+                    if (String[CodeUnit] == U32('%') && String[CodeUnit + 1] == U32('%')) {
+                        NumSpecifiers += 1;
+                        CodeUnit      += 2;
+                    }
                 }
-                CodePoint         += 1;
-            } while (String[CodePoint] != FoundationIONULLTerminator);
+                if (String[CodeUnit] == U32('%') || String[CodeUnit] == U32('\\')) {
+                    NumSpecifiers     += 1;
+                }
+                CodeUnit              += 1;
+            } while (CodeUnit < StringSizeInCodeUnits);
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
@@ -3817,6 +3829,10 @@ extern "C" {
                         } else if ((Length & Length_64Bit) == Length_64Bit) {
                             uint64_t Arg               = va_arg(VariadicArguments, uint64_t);
                             UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
+                            UTF8    *Arg8              = UTF8_Encode(Arg32);
+                            UTF8_WriteLine(stdout, Arg8);
+                            UTF8_WriteLine(stdout, "\n");
+                            free(Arg8);
                             FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                             free(Arg32);
                         }
