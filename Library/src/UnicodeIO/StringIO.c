@@ -1342,28 +1342,30 @@ extern "C" {
                         if (CodePoint < Offset) {
                             NewString[CodePoint]      = String[CodePoint];
                             CodePoint                += 1;
-                        } else if (CodePoint >= Offset && CodePoint <= Offset + Length) {
+                        } else if (CodePoint >= Offset && CodePoint < Offset + ReplacementStringSize) { // This Logic is incorrect
+                            // The latter statement shouldn't be executing, if it's equal to the Offset replace
+                            // for codepoints beyond the Offset what do we do?
                             do {
                                 NewString[CodePoint]  = Replacement[ReplacementCodePoint];
                                 CodePoint            += 1;
                                 ReplacementCodePoint += 1;
                             } while(Replacement[ReplacementCodePoint] != FoundationIONULLTerminator);
-                        } else if (CodePoint > Offset + ReplacementStringSize) {
-                            NewString[CodePoint]      = String[CodePoint - Length];
+                        } else if (CodePoint >= Offset + ReplacementStringSize) {
+                            NewString[CodePoint]      = String[CodePoint + ReplacementCodePoint];
                             CodePoint                += 1;
                         }
                     } else if (ReplacementStringSize > Offset + Maximum(Length, ReplacementStringSize)) {
                         if (CodePoint < Offset) {
                             NewString[CodePoint]      = String[CodePoint];
                             CodePoint                += 1;
-                        } else if (CodePoint >= Offset && CodePoint <= Offset + Length) {
+                        } else if (CodePoint >= Offset && CodePoint < Offset + ReplacementStringSize) {
                             do {
                                 NewString[CodePoint]  = Replacement[ReplacementCodePoint];
                                 CodePoint            += 1;
                                 ReplacementCodePoint += 1;
                             } while(Replacement[ReplacementCodePoint] != FoundationIONULLTerminator);
-                        } else if (CodePoint > Offset + ReplacementStringSize) {
-                            NewString[CodePoint]      = String[CodePoint - Length];
+                        } else if (CodePoint >= Offset + ReplacementStringSize) {
+                            NewString[CodePoint]      = String[CodePoint + ReplacementCodePoint];
                             CodePoint                += 1;
                         }
                     }
@@ -3829,10 +3831,6 @@ extern "C" {
                         } else if ((Length & Length_64Bit) == Length_64Bit) {
                             uint64_t Arg               = va_arg(VariadicArguments, uint64_t);
                             UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            UTF8    *Arg8              = UTF8_Encode(Arg32);
-                            UTF8_WriteLine(stdout, Arg8);
-                            UTF8_WriteLine(stdout, "\n");
-                            free(Arg8);
                             FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
                             free(Arg32);
                         }

@@ -96,9 +96,9 @@ extern "C" {
     
     bool UTF8_FormatTest(void) {
         bool TestPassed    = false;
-        UTF8 *Formatted    = UTF8_Format(U8("Twenty Seven = %llu?"), 27);
+        UTF8 *Formatted    = UTF8_Format(U8("Twenty Seven = %llu????????"), 27);
         printf("%s\n", Formatted);
-        UTF8 *FormatAnswer = U8("Fourteen = 14");
+        UTF8 *FormatAnswer = U8("Twenty Seven = 27????????"); // Twenty Seven = 27???????
         TestPassed         = UTF8_Compare(Formatted, FormatAnswer);
         return TestPassed;
     }
