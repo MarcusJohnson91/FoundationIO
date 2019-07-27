@@ -407,14 +407,14 @@ extern "C" {
              */
             
             uint64_t *StringSize = calloc(NumItems2Display, sizeof(uint64_t));
-            for (uint8_t Item = 0; Item < NumItems2Display - 1; Item++) { // Get the size of the strings
+            for (uint8_t Item = 0; Item < NumItems2Display; Item++) { // Get the size of the strings
                 StringSize[Item] = UTF8_GetStringSizeInCodePoints(Strings[Item]);
                 // huh, well we need 2 characters for the brackets.
             }
             // Number of seperators for each string
             uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
             UTF8     *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF8));
-            for (uint8_t String = 0; String < NumItems2Display - 1; String++) { // Actually create the strings
+            for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
                                                                                 // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
@@ -451,14 +451,14 @@ extern "C" {
              */
             
             uint64_t *StringSize = calloc(NumItems2Display, sizeof(uint64_t));
-            for (uint8_t Item = 0; Item < NumItems2Display - 1; Item++) { // Get the size of the strings
+            for (uint8_t Item = 0; Item < NumItems2Display; Item++) { // Get the size of the strings
                 StringSize[Item] = UTF16_GetStringSizeInCodePoints(Strings[Item]);
                 // huh, well we need 2 characters for the brackets.
             }
             // Number of seperators for each string
             uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
             UTF16    *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF16));
-            for (uint8_t String = 0; String < NumItems2Display - 1; String++) { // Actually create the strings
+            for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
                                                                                 // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
                 uint8_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
@@ -614,7 +614,7 @@ extern "C" {
             UTF8_WriteLine(stdout, ProgramsOptions);
             free(Name);
             free(ProgramsOptions);
-            for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches - 1; Switch++) {
+            for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
                 CLISwitchTypes CurrentSwitchType = CLI->SwitchIDs[Switch].SwitchType;
                 
                 UTF8 *SwitchName        = UTF8_Encode(CLI->SwitchIDs[Switch].Name);
@@ -654,7 +654,7 @@ extern "C" {
             UTF16_WriteLine(stdout, ProgramsOptions);
             free(Name);
             free(ProgramsOptions);
-            for (uint64_t Switch = 0LL; Switch < CLI->NumSwitches - 1; Switch++) {
+            for (uint64_t Switch = 0LL; Switch < CLI->NumSwitches; Switch++) {
                 CLISwitchTypes CurrentSwitchType = CLI->SwitchIDs[Switch].SwitchType;
                 
                 UTF16 *SwitchName        = UTF16_Encode(CLI->SwitchIDs[Switch].Name);
@@ -868,7 +868,7 @@ extern "C" {
                 UTF32   *Argument         = Arguments[CurrentArgument];
                 UTF32   *ArgumentFlag     = ArgumentString2SwitchFlag(Argument);
                 
-                for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches - 1; Switch++) {
+                for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
                     if (UTF32_CompareSubString(ArgumentFlag, CLI->SwitchIDs[Switch].Name, 0, 0) == Yes) {
                         
                         CLI->NumOptions   += 1;
@@ -910,7 +910,7 @@ extern "C" {
     void CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, UTF8 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             UTF32 **Arguments32     = calloc(NumArguments, sizeof(UTF32*));
-            for (uint64_t Arg = 0ULL; Arg < NumArguments - 1; Arg++) {
+            for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
                 UTF32 *Decoded      = UTF8_Decode(Arguments[Arg]);
                 UTF32 *CaseFolded   = UTF32_CaseFold(Decoded);
                 free(Decoded);
@@ -919,7 +919,7 @@ extern "C" {
                 Arguments32[Arg]    = Normalized;
             }
             CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, Arguments32);
-            for (uint64_t Arg = 0ULL; Arg < NumArguments - 1; Arg++) {
+            for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
                 free(Arguments32[Arg]);
             }
             free(Arguments32);
@@ -933,7 +933,7 @@ extern "C" {
     void CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, UTF16 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             UTF32 **Arguments32     = calloc(NumArguments, sizeof(UTF32*));
-            for (uint64_t Arg = 0ULL; Arg < NumArguments - 1; Arg++) {
+            for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
                 UTF32 *Decoded      = UTF16_Decode(Arguments[Arg]);
                 UTF32 *CaseFolded   = UTF32_CaseFold(Decoded);
                 free(Decoded);
@@ -942,7 +942,7 @@ extern "C" {
                 Arguments32[Arg]    = Normalized;
             }
             CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, Arguments32);
-            for (uint64_t Arg = 0ULL; Arg < NumArguments - 1; Arg++) {
+            for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
                 free(Arguments32[Arg]);
             }
             free(Arguments32);
@@ -956,13 +956,13 @@ extern "C" {
     uint64_t CommandLineIO_GetNumMatchingOptions(CommandLineIO *CLI, uint64_t OptionID, uint64_t NumSlaves, uint64_t *SlaveIDs) {
         uint64_t NumMatchingOptions = 0LL;
         if (CLI != NULL && OptionID <= CLI->NumOptions - 1 && NumSlaves <= CLI->NumSwitches - 1) {
-            for (uint64_t Option = 0ULL; Option <= CLI->NumOptions - 1; Option++) {
+            for (uint64_t Option = 0ULL; Option <= CLI->NumOptions; Option++) {
                 if (CLI->OptionIDs[Option].SwitchID == OptionID) {
                     if (NumSlaves == 0) {
                         NumMatchingOptions               += 1;
                     } else if (NumSlaves > 0 && CLI->OptionIDs[Option].NumOptionSlaves > 0) {
-                        for (uint64_t ParamSlave = 0ULL; ParamSlave < NumSlaves - 1; ParamSlave++) {
-                            for (uint64_t OptionSlave = 0ULL; OptionSlave < CLI->OptionIDs[Option].NumOptionSlaves - 1; OptionSlave++) {
+                        for (uint64_t ParamSlave = 0ULL; ParamSlave < NumSlaves; ParamSlave++) {
+                            for (uint64_t OptionSlave = 0ULL; OptionSlave < CLI->OptionIDs[Option].NumOptionSlaves; OptionSlave++) {
                                 if (SlaveIDs[ParamSlave] == CLI->OptionIDs[Option].OptionSlaves[OptionSlave]) {
                                     NumMatchingOptions   += 1;
                                 }
@@ -985,14 +985,14 @@ extern "C" {
         uint64_t MatchingOption = -1LL;
         if (CLI != NULL && OptionID <= CLI->NumOptions - 1 && NumSlaves <= CLI->NumOptions - 1) {
             bool AllOptionsMatch   = No;
-            for (uint64_t Option = 0ULL; Option < CLI->NumOptions - 1; Option++) {
+            for (uint64_t Option = 0ULL; Option < CLI->NumOptions; Option++) {
                 if (CLI->OptionIDs[Option].SwitchID == OptionID) {
                     if (NumSlaves == 0 && CLI->OptionIDs[Option].NumOptionSlaves == 0) {
                         AllOptionsMatch       = Yes;
                         MatchingOption        = Option;
                     } else {
-                        for (uint64_t ParamSlave = 0ULL; ParamSlave < NumSlaves - 1; ParamSlave++) {
-                            for (uint64_t OptionSlave = 0ULL; OptionSlave < CLI->OptionIDs[Option].NumOptionSlaves - 1; OptionSlave++) {
+                        for (uint64_t ParamSlave = 0ULL; ParamSlave < NumSlaves; ParamSlave++) {
+                            for (uint64_t OptionSlave = 0ULL; OptionSlave < CLI->OptionIDs[Option].NumOptionSlaves; OptionSlave++) {
                                 if (SlaveIDs[ParamSlave] == CLI->OptionIDs[Option].OptionSlaves[OptionSlave]) {
                                     AllOptionsMatch       = Yes;
                                     MatchingOption        = Option;
@@ -1048,8 +1048,8 @@ extern "C" {
             }
             Extension = calloc(UnicodeBOMSizeInCodePoints + ExtensionSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
             if (Extension != NULL) {
-                for (uint64_t ExtCodePoint = 0ULL; ExtCodePoint < ExtensionSize - 1; ExtCodePoint++) {
-                    for (uint64_t PathCodePoint = StringSize - ExtensionSize; PathCodePoint < StringSize - 1; PathCodePoint++) {
+                for (uint64_t ExtCodePoint = 0ULL; ExtCodePoint < ExtensionSize; ExtCodePoint++) {
+                    for (uint64_t PathCodePoint = StringSize - ExtensionSize; PathCodePoint < StringSize; PathCodePoint++) {
                         Extension[ExtCodePoint] = Path[PathCodePoint];
                     }
                 }
@@ -1091,12 +1091,12 @@ extern "C" {
     
     void CommandLineIO_Deinit(CommandLineIO *CLI) {
         if (CLI != NULL) {
-            for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches - 1; Switch++) {
+            for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
                 free(CLI->SwitchIDs[Switch].Name);
                 free(CLI->SwitchIDs[Switch].Description);
                 free(CLI->SwitchIDs[Switch].PotentialSlaves);
             }
-            for (uint64_t Option = 0ULL; Option < CLI->NumOptions - 1; Option++) {
+            for (uint64_t Option = 0ULL; Option < CLI->NumOptions; Option++) {
                 free(CLI->OptionIDs[Option].OptionSlaves);
                 free(CLI->OptionIDs[Option].Argument);
             }

@@ -123,7 +123,7 @@ extern "C" {
         uint64_t  StringSize                   = UTF8_GetStringSizeInCodeUnits(LocaleAll);
         uint64_t  StartOffset                  = 0ULL;
         uint64_t  DotOffset                    = 0ULL;
-        for (uint64_t CodeUnit = StringSize - 1; CodeUnit > 0; CodeUnit--) {
+        for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
             if (LocaleAll[CodeUnit] == '.') {
                 DotOffset                      = CodeUnit;
             } else if (LocaleAll[CodeUnit] == '-' || LocaleAll[CodeUnit] == '_') {
@@ -133,7 +133,7 @@ extern "C" {
         }
         Region                                 = calloc(DotOffset - StartOffset + FoundationIONULLTerminatorSize, sizeof(UTF8));
         if (Region != NULL) {
-            for (uint64_t CodeUnit = StartOffset - 1; CodeUnit < DotOffset - 1; CodeUnit++) {
+            for (uint64_t CodeUnit = StartOffset; CodeUnit < DotOffset; CodeUnit++) {
                 Region[CodeUnit - StartOffset] = LocaleAll[CodeUnit - StartOffset];
             }
         } else {
@@ -144,7 +144,7 @@ extern "C" {
         uint64_t  StringSize                     = UTF16_GetStringSizeInCodeUnits(LocaleAll);
         uint64_t  StartOffset                    = 0ULL;
         uint64_t  DotOffset                      = 0ULL;
-        for (uint64_t CodeUnit = StringSize - 1; CodeUnit > 0; CodeUnit--) {
+        for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
             if (LocaleAll[CodeUnit] == '.') {
                 DotOffset                        = CodeUnit;
             } else if (LocaleAll[CodeUnit] == '-' || LocaleAll[CodeUnit] == '_') {
@@ -154,7 +154,7 @@ extern "C" {
         }
 		UTF16 *Region16                          = calloc(DotOffset - StartOffset + FoundationIONULLTerminatorSize, sizeof(UTF16));
         if (Region16 != NULL) {
-            for (uint64_t CodeUnit = StartOffset - 1; CodeUnit < DotOffset - 1; CodeUnit++) {
+            for (uint64_t CodeUnit = StartOffset; CodeUnit < DotOffset; CodeUnit++) {
                 Region16[CodeUnit - StartOffset] = LocaleAll[CodeUnit - StartOffset];
             }
         } else {
@@ -175,7 +175,7 @@ extern "C" {
         uint64_t  StringSize                     = UTF8_GetStringSizeInCodeUnits(LocaleAll);
         uint64_t  StartOffset                    = 0ULL;
         uint64_t  DotOffset                      = 0ULL;
-        for (uint64_t CodeUnit = StringSize - 1; CodeUnit > 0; CodeUnit--) {
+        for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
             if (LocaleAll[CodeUnit] == '.') {
                 DotOffset                        = CodeUnit;
             } else if (LocaleAll[CodeUnit] == '-' || LocaleAll[CodeUnit] == '_') {
@@ -185,7 +185,7 @@ extern "C" {
         }
         UTF8 *Region8                            = calloc(DotOffset - StartOffset + FoundationIONULLTerminatorSize, sizeof(UTF8));
         if (Region8 != NULL) {
-            for (uint64_t CodeUnit = StartOffset - 1; CodeUnit < DotOffset - 1; CodeUnit++) {
+            for (uint64_t CodeUnit = StartOffset; CodeUnit < DotOffset; CodeUnit++) {
                 Region8[CodeUnit - StartOffset]  = LocaleAll[CodeUnit - StartOffset];
             }
         } else {
@@ -200,7 +200,7 @@ extern "C" {
         uint64_t  StringSize                   = UTF16_GetStringSizeInCodeUnits(LocaleAll);
         uint64_t  StartOffset                  = 0ULL;
         uint64_t  DotOffset                    = 0ULL;
-        for (uint64_t CodeUnit = StringSize - 1; CodeUnit > 0; CodeUnit--) {
+        for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
             if (LocaleAll[CodeUnit] == '.') {
                 DotOffset                      = CodeUnit;
             } else if (LocaleAll[CodeUnit] == '-' || LocaleAll[CodeUnit] == '_') {
@@ -210,7 +210,7 @@ extern "C" {
         }
         Region                                 = calloc(DotOffset - StartOffset + FoundationIONULLTerminatorSize, sizeof(UTF16));
         if (Region != NULL) {
-            for (uint64_t CodeUnit = StartOffset - 1; CodeUnit < DotOffset - 1; CodeUnit++) {
+            for (uint64_t CodeUnit = StartOffset; CodeUnit < DotOffset; CodeUnit++) {
                 Region[CodeUnit - StartOffset] = LocaleAll[CodeUnit - StartOffset];
             }
         } else {
@@ -228,7 +228,7 @@ extern "C" {
         
         if (Lang != NULL) {
             uint64_t StringSize                 = UTF8_GetStringSizeInCodeUnits(Lang);
-            for (uint64_t CodeUnit = StringSize - 1; CodeUnit > 0; CodeUnit--) {
+            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
                 if (Lang[CodeUnit] == '.') {
                     DotOffset                   = CodeUnit;
                     break;
@@ -237,7 +237,7 @@ extern "C" {
             uint64_t EncodingSize               = StringSize - DotOffset;
             Region                              = calloc(EncodingSize, sizeof(UTF8));
             if (Region != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize - 1; EncodingCodePoint++) {
+                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
                     Region[EncodingCodePoint]   = Lang[EncodingCodePoint + DotOffset];
                 }
             } else {
@@ -247,7 +247,7 @@ extern "C" {
         } else {
             UTF8     *Language                  = getenv(U8("LANGUAGE"));
             uint64_t  StringSize                = UTF8_GetStringSizeInCodeUnits(Language);
-            for (uint64_t CodeUnit = StringSize - 1; CodeUnit > 0; CodeUnit--) {
+            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
                 if (Language[CodeUnit] == '.') {
                     DotOffset                   = CodeUnit;
                     break;
@@ -256,7 +256,7 @@ extern "C" {
             uint64_t EncodingSize               = StringSize - DotOffset;
             Region                              = calloc(EncodingSize, sizeof(UTF8));
             if (Region != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize - 1; EncodingCodePoint++) {
+                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
                     Region[EncodingCodePoint]   = Language[EncodingCodePoint + DotOffset];
                 }
             } else {
@@ -269,7 +269,7 @@ extern "C" {
         
         if (Lang != NULL) {
             uint64_t StringSize                 = UTF16_GetStringSizeInCodeUnits(Lang);
-            for (uint64_t CodeUnit = StringSize - 1; CodeUnit > 0; CodeUnit--) {
+            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
                 if (Lang[CodeUnit] == U16('.')) {
                     DotOffset                   = CodeUnit;
                     break;
@@ -278,7 +278,7 @@ extern "C" {
             uint64_t EncodingSize               = StringSize - DotOffset;
             Region                              = calloc(EncodingSize, sizeof(UTF16));
             if (Region != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize - 1; EncodingCodePoint++) {
+                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
                     Region[EncodingCodePoint]   = Lang[EncodingCodePoint + DotOffset];
                 }
             } else {
@@ -287,7 +287,7 @@ extern "C" {
         } else {
             UTF16    *Language                  = _wgetenv(U16("LANGUAGE"));
             uint64_t  StringSize                = UTF16_GetStringSizeInCodeUnits(Language);
-            for (uint64_t CodeUnit = StringSize - 1; CodeUnit > 0; CodeUnit--) {
+            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
                 if (Language[CodeUnit] == U16('.')) {
                     DotOffset                   = CodeUnit;
                     break;
@@ -296,7 +296,7 @@ extern "C" {
             uint64_t EncodingSize               = StringSize - DotOffset;
             UTF16 *Region16                     = calloc(EncodingSize, sizeof(UTF16));
             if (Region16 != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize - 1; EncodingCodePoint++) {
+                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
                     Region16[EncodingCodePoint] = Language[EncodingCodePoint + DotOffset];
                 }
             } else {
@@ -320,7 +320,7 @@ extern "C" {
         
         if (Lang != NULL) {
             uint64_t StringSize                = UTF8_GetStringSizeInCodeUnits(Lang);
-            for (uint64_t CodeUnit = StringSize - 1; CodeUnit > 0; CodeUnit--) {
+            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
                 if (Lang[CodeUnit] == '.') {
                     DotOffset                  = CodeUnit;
                     break;
@@ -329,7 +329,7 @@ extern "C" {
             uint64_t EncodingSize              = StringSize - DotOffset;
             UTF8    *Region8                   = calloc(EncodingSize, sizeof(UTF8));
             if (Region8 != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize - 1; EncodingCodePoint++) {
+                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
                     Region8[EncodingCodePoint] = Lang[EncodingCodePoint + DotOffset];
                 }
             } else {
@@ -342,7 +342,7 @@ extern "C" {
         } else {
             UTF8     *Language                = getenv(U8("LANGUAGE"));
             uint64_t  StringSize              = UTF8_GetStringSizeInCodeUnits(Language);
-            for (uint64_t CodeUnit = StringSize - 1; CodeUnit > 0; CodeUnit--) {
+            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
                 if (Language[CodeUnit] == '.') {
                     DotOffset                 = CodeUnit;
                     break;
@@ -351,7 +351,7 @@ extern "C" {
             uint64_t EncodingSize              = StringSize - DotOffset;
             UTF8    *Region8                   = calloc(EncodingSize, sizeof(UTF8));
             if (Region8 != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize - 1; EncodingCodePoint++) {
+                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
                     Region8[EncodingCodePoint] = Language[EncodingCodePoint + DotOffset];
                 }
             } else {
@@ -368,7 +368,7 @@ extern "C" {
         
         if (Lang != NULL) {
             uint64_t StringSize                = UTF16_GetStringSizeInCodeUnits(Lang);
-            for (uint64_t CodeUnit = StringSize - 1; CodeUnit > 0; CodeUnit--) {
+            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
                 if (Lang[CodeUnit] == U16('.')) {
                     DotOffset                  = CodeUnit;
                     break;
@@ -377,7 +377,7 @@ extern "C" {
             uint64_t EncodingSize              = StringSize - DotOffset;
             Region                             = calloc(EncodingSize, sizeof(UTF16));
             if (Region != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize - 1; EncodingCodePoint++) {
+                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
                     Region[EncodingCodePoint]  = Lang[EncodingCodePoint + DotOffset];
                 }
             } else {
@@ -386,7 +386,7 @@ extern "C" {
         } else {
             UTF16    *Language                 = _wgetenv(U16("LANGUAGE"));
             uint64_t  StringSize               = UTF16_GetStringSizeInCodeUnits(Language);
-            for (uint64_t CodeUnit = StringSize - 1; CodeUnit > 0; CodeUnit--) {
+            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
                 if (Language[CodeUnit] == U16('.')) {
                     DotOffset                  = CodeUnit;
                     break;
@@ -395,7 +395,7 @@ extern "C" {
             uint64_t EncodingSize              = StringSize - DotOffset;
             Region                             = calloc(EncodingSize, sizeof(UTF16));
             if (Region != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize - 1; EncodingCodePoint++) {
+                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
                     Region[EncodingCodePoint]  = Language[EncodingCodePoint + DotOffset];
                 }
             } else {
@@ -584,8 +584,8 @@ extern "C" {
             uint64_t StringSize            = UTF32_GetStringSizeInCodePoints(String);
             uint64_t CodePoints2Remove     = 0ULL;
             
-            for (uint64_t CodePoint = 0ULL; CodePoint < StringSize - 1; CodePoint++) {
-                for (uint8_t CurrencySymbol = 0; CurrencySymbol < CurrencyTableSize - 1; CurrencySymbol++) {
+            for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
+                for (uint8_t CurrencySymbol = 0; CurrencySymbol < CurrencyTableSize; CurrencySymbol++) {
                     if (String[CodePoint] == CurrencyTable[CurrencySymbol]) {
                         CodePoints2Remove += 1;
                     }
@@ -596,9 +596,9 @@ extern "C" {
             
             Stripped                       = calloc(StrippedStringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
             if (Stripped != NULL) {
-                for (uint64_t Original = 0ULL; Original < StringSize - 1; Original++) {
-                    for (uint64_t StrippedCodePoint = 0ULL; StrippedCodePoint < StrippedStringSize - 1; StrippedCodePoint++) {
-                        for (uint8_t CurrencySymbol = 0ULL; CurrencySymbol < CurrencyTableSize - 1; CurrencySymbol++) {
+                for (uint64_t Original = 0ULL; Original < StringSize; Original++) {
+                    for (uint64_t StrippedCodePoint = 0ULL; StrippedCodePoint < StrippedStringSize; StrippedCodePoint++) {
+                        for (uint8_t CurrencySymbol = 0ULL; CurrencySymbol < CurrencyTableSize; CurrencySymbol++) {
                             if (String[Original] != CurrencyTable[CurrencySymbol]) {
                                  Stripped[StrippedCodePoint] = String[Original];
                             }

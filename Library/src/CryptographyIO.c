@@ -370,7 +370,7 @@ extern "C" {
     
     void Entropy_Erase(Entropy *Random) {
         if (Random != NULL) {
-            for (uint64_t Byte = 0ULL; Byte < Random->EntropySize - 1; Byte++) {
+            for (uint64_t Byte = 0ULL; Byte < Random->EntropySize; Byte++) {
                 Random->EntropyPool[Byte] = 0;
             }
             Random->BitOffset             = 0;
