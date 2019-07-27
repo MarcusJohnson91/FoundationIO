@@ -11,18 +11,6 @@
 extern "C" {
 #endif
     
-    
-    /*
-     StringIO Layout:
-     Basic Attribute Functions (size, etc).
-     Basic String Operations (Add/Remove BOM, Decode/Encode)
-     Path/URL
-     
-     ..
-     Format/Deformat
-     
-     */
-    
     uint8_t UTF8_GetCodePointSizeInCodeUnits(UTF8 CodeUnit) {
         uint8_t CodePointSize = 0;
         if (((CodeUnit & 0x80) >> 7) == 0) {
@@ -35,8 +23,6 @@ extern "C" {
             CodePointSize     = 2;
         } else if (((CodeUnit & 0xC0) >> 6) == 0x02) {
             CodePointSize     = 1;
-        } else {
-            CodePointSize     = 0;
         }
         return CodePointSize;
     }
@@ -192,7 +178,7 @@ extern "C" {
         uint64_t CodePoint            = 0ULL;
         if (String != NULL) {
             do {
-                for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize - 1; GraphemeExtension++) {
+                for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
                     if (String[CodePoint] != GraphemeExtensionTable[GraphemeExtension]) {
                         NumGraphemes += 1;
                     }
@@ -594,7 +580,7 @@ extern "C" {
             if (StringHasBOM) {
                 BOMLessString                    = calloc(StringSize - UnicodeBOMSizeInCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
                 if (BOMLessString != NULL) {
-                    for (uint64_t CodePoint = 0ULL; CodePoint < StringSize - 1; CodePoint++) {
+                    for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
                         BOMLessString[CodePoint] = String[CodePoint + 1];
                     }
                 } else {
@@ -832,7 +818,7 @@ extern "C" {
             uint64_t StringSizeInCodeUnits = UTF32_GetStringSizeInCodePoints(String);
             Copy   = calloc(StringSizeInCodeUnits, sizeof(UTF32));
             if (Copy != NULL) {
-                for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSizeInCodeUnits - 1; CodeUnit++) {
+                for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSizeInCodeUnits; CodeUnit++) {
                     Copy[CodeUnit] = String[CodeUnit];
                 }
             } else {
@@ -847,7 +833,7 @@ extern "C" {
     void UTF8_Erase(UTF8 *String) {
         if (String != NULL) {
             uint64_t StringSize  = UTF8_GetStringSizeInCodePoints(String);
-            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
+            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
                 String[CodeUnit] = 0;
             }
         } else {
@@ -858,7 +844,7 @@ extern "C" {
     void UTF16_Erase(UTF16 *String) {
         if (String != NULL) {
             uint64_t StringSize  = UTF16_GetStringSizeInCodePoints(String);
-            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
+            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
                 String[CodeUnit] = 0;
             }
         } else {
@@ -869,12 +855,77 @@ extern "C" {
     void UTF32_Erase(UTF32 *String) {
         if (String != NULL) {
             uint64_t StringSize  = UTF32_GetStringSizeInCodePoints(String);
-            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
+            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
                 String[CodeUnit] = 0;
             }
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
+    }
+    
+    UTF8 *UTF8_Truncate(UTF8 *String, uint64_t MaxCodeUnits) {
+        UTF8 *Truncated = NULL;
+        if (String != NULL) {
+            uint64_t StringSize     = UTF8_GetStringSizeInCodeUnits(String);
+            uint64_t CodeUnitOffset = MaxCodeUnits;
+            uint64_t CodeUnit       = 0ULL;
+            if (MaxCodeUnits <= StringSize) {
+                CodeUnitOffset     -= UTF8_GetCodePointSizeInCodeUnits(String[MaxCodeUnits]);
+                Truncated           = calloc(CodeUnitOffset + FoundationIONULLTerminatorSize, sizeof(UTF8));
+                if (Truncated != NULL) {
+                    do {
+                        Truncated[CodeUnit]  = String[CodeUnit];
+                        CodeUnit            += 1;
+                    } while (CodeUnit < MaxCodeUnits);
+                }
+            }
+        } else if (String == NULL) {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return Truncated;
+    }
+    
+    UTF16 *UTF16_Truncate(UTF16 *String, uint64_t MaxCodeUnits) {
+        UTF16 *Truncated = NULL;
+        if (String != NULL) {
+            uint64_t StringSize     = UTF16_GetStringSizeInCodeUnits(String);
+            uint64_t CodeUnitOffset = MaxCodeUnits;
+            uint64_t CodeUnit       = 0ULL;
+            if (MaxCodeUnits <= StringSize) {
+                CodeUnitOffset     -= UTF16_GetCodePointSizeInCodeUnits(String[MaxCodeUnits]);
+                Truncated           = calloc(CodeUnitOffset + FoundationIONULLTerminatorSize, sizeof(UTF16));
+                if (Truncated != NULL) {
+                    do {
+                        Truncated[CodeUnit]  = String[CodeUnit];
+                        CodeUnit            += 1;
+                    } while (CodeUnit < MaxCodeUnits);
+                }
+            }
+        } else if (String == NULL) {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return Truncated;
+    }
+    
+    UTF32 *UTF32_Truncate(UTF32 *String, uint64_t MaxCodePoints) {
+        UTF32 *Truncated = NULL;
+        if (String != NULL) {
+            uint64_t StringSize      = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t CodePointOffset = MaxCodePoints;
+            uint64_t CodePoint       = 0ULL;
+            if (MaxCodePoints <= StringSize) {
+                Truncated            = calloc(CodePointOffset + FoundationIONULLTerminatorSize, sizeof(UTF16));
+                if (Truncated != NULL) {
+                    do {
+                        Truncated[CodePoint]  = String[CodePoint];
+                        CodePoint            += 1;
+                    } while (CodePoint < MaxCodePoints);
+                }
+            }
+        } else if (String == NULL) {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return Truncated;
     }
     
     UTF8 *UTF8_ReadCodePoint(FILE *Source) { // Replaces fgetc and getc
@@ -892,6 +943,34 @@ extern "C" {
     }
     
     UTF16 *UTF16_ReadCodePoint(FILE *Source) { // replaces fgetwc and getwc
+        UTF16 *CodePoint          = NULL;
+        if (Source != NULL) {
+            UTF16 CodeUnit        = 0;
+            fread(&CodeUnit, sizeof(UTF16), 1, Source);
+            uint8_t CodePointSize = UTF16_GetCodePointSizeInCodeUnits(CodeUnit);
+            CodePoint             = calloc(CodePointSize, sizeof(UTF16));
+            fread(CodePoint, CodePointSize, 1, Source);
+        } else {
+            Log(Log_DEBUG, __func__, U8("FILE Pointer is NULL"));
+        }
+        return CodePoint;
+    }
+    
+    UTF8 *UTF8_ReadGraphemeFromFile(FILE *Source) { // Replaces fgetc and getc
+        UTF8 *CodePoint           = NULL;
+        if (Source != NULL) {
+            UTF8 Byte             = {0};
+            fread(&Byte, sizeof(UTF8), 1, Source);
+            uint8_t CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Byte);
+            CodePoint             = calloc(CodePointSize, sizeof(UTF8));
+            fread(CodePoint, CodePointSize, 1, Source);
+        } else {
+            Log(Log_DEBUG, __func__, U8("FILE Pointer is NULL"));
+        }
+        return CodePoint;
+    }
+    
+    UTF16 *UTF16_ReadGraphemeFromFile(FILE *Source) { // replaces fgetwc and getwc
         UTF16 *CodePoint          = NULL;
         if (Source != NULL) {
             UTF16 CodeUnit        = 0;
@@ -1249,8 +1328,8 @@ extern "C" {
             uint64_t CurrentGrapheme       = 0ULL;
             uint64_t CodePointStart        = 0ULL;
             if (Grapheme2Extract < NumGraphemesInString) {
-                for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePointsInString - 1; CodePoint++) {
-                    for (uint64_t GraphemeCodePoint = 0ULL; GraphemeCodePoint < GraphemeExtensionTableSize - 1; GraphemeCodePoint++) {
+                for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePointsInString; CodePoint++) {
+                    for (uint64_t GraphemeCodePoint = 0ULL; GraphemeCodePoint < GraphemeExtensionTableSize; GraphemeCodePoint++) {
                         if (String[CodePoint] == GraphemeExtensionTable[GraphemeCodePoint]) {
                             CurrentGrapheme                         += 1;
                         }
@@ -1261,8 +1340,8 @@ extern "C" {
                     }
                 }
                 uint64_t GraphemeSizeInCodePoints                    = 0ULL;
-                for (uint64_t CodePoint = CodePointStart; CodePoint < NumCodePointsInString - 1; CodePoint++) {
-                    for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize - 1; GraphemeExtension++) {
+                for (uint64_t CodePoint = CodePointStart; CodePoint < NumCodePointsInString; CodePoint++) {
+                    for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
                         if (String[CodePoint] == GraphemeExtensionTable[GraphemeExtension]) {
                             GraphemeSizeInCodePoints                += 1;
                         } else {
@@ -1289,7 +1368,7 @@ extern "C" {
     
     UTF8  *UTF8_ReplaceSubString(UTF8 *String, UTF8 *Replacement, uint64_t Offset, uint64_t Length) {
         UTF8 *Replaced8          = NULL;
-        if (String != NULL && Replacement != NULL && Length >= 1) {
+        if (String != NULL && Replacement != NULL) {
             UTF32 *String32      = UTF8_Decode(String);
             UTF32 *Replacement32 = UTF8_Decode(Replacement);
             UTF32 *Replaced32    = UTF32_ReplaceSubString(String32, Replacement32, Offset, Length);
@@ -1301,15 +1380,13 @@ extern "C" {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         } else if (Replacement == NULL) {
             Log(Log_DEBUG, __func__, U8("Replacement Pointer is NULL"));
-        } else if (Length == 0) {
-            Log(Log_DEBUG, __func__, U8("Length %llu is too short"), Length);
         }
         return Replaced8;
     }
     
     UTF16 *UTF16_ReplaceSubString(UTF16 *String, UTF16 *Replacement, uint64_t Offset, uint64_t Length) {
         UTF16 *Replaced16        = NULL;
-        if (String != NULL && Replacement != NULL && Length >= 1) {
+        if (String != NULL && Replacement != NULL) {
             UTF32 *String32      = UTF16_Decode(String);
             UTF32 *Replacement32 = UTF16_Decode(Replacement);
             UTF32 *Replaced32    = UTF32_ReplaceSubString(String32, Replacement32, Offset, Length);
@@ -1321,8 +1398,6 @@ extern "C" {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         } else if (Replacement == NULL) {
             Log(Log_DEBUG, __func__, U8("Replacement Pointer is NULL"));
-        } else if (Length == 0) {
-            Log(Log_DEBUG, __func__, U8("Length %llu is too short"), Length);
         }
         return Replaced16;
     }
@@ -1437,8 +1512,8 @@ extern "C" {
             uint64_t   NumInstances   = 0ULL;
             uint64_t  *Instances      = NULL;
             
-            for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                for (uint64_t SubStringCodePoint = 0ULL; SubStringCodePoint < SubStringSize - 1; SubStringCodePoint++) {
+            for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                for (uint64_t SubStringCodePoint = 0ULL; SubStringCodePoint < SubStringSize; SubStringCodePoint++) {
                     if (String[StringCodePoint] != SubString2Remove[SubStringCodePoint]) {
                         break;
                     } else {
@@ -1449,9 +1524,9 @@ extern "C" {
             
             Instances = calloc(NumInstances, sizeof(uint64_t));
             if (Instances != NULL) {
-                for (uint64_t Instance = 0ULL; Instance < NumInstances - 1; Instance++) {
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                        for (uint64_t RemoveCodePoint = 0ULL; RemoveCodePoint < SubStringSize - 1; RemoveCodePoint++) {
+                for (uint64_t Instance = 0ULL; Instance < NumInstances; Instance++) {
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                        for (uint64_t RemoveCodePoint = 0ULL; RemoveCodePoint < SubStringSize; RemoveCodePoint++) {
                             if (String[StringCodePoint] != SubString2Remove[RemoveCodePoint]) {
                                 break;
                             } else {
@@ -1472,8 +1547,8 @@ extern "C" {
             
             EditedString         = calloc(EditedStringSize, sizeof(UTF32));
             if (EditedString != NULL) {
-                for (uint64_t EditedCodePoint = 0ULL; EditedCodePoint < EditedStringSize - 1; EditedCodePoint++) {
-                    for (uint64_t Instance = 0ULL; Instance < NumInstances - 1; Instance++) {
+                for (uint64_t EditedCodePoint = 0ULL; EditedCodePoint < EditedStringSize; EditedCodePoint++) {
+                    for (uint64_t Instance = 0ULL; Instance < NumInstances; Instance++) {
                         if (EditedCodePoint < Instances[Instance] || EditedCodePoint > Instances[Instance] + SubStringSize) {
                             EditedString[EditedCodePoint] = String[EditedCodePoint - (Instances[Instance] + SubStringSize)];
                         }
@@ -1495,31 +1570,12 @@ extern "C" {
     UTF8 *UTF8_Insert(UTF8 *String, UTF8 *String2Insert, uint64_t Offset) {
         UTF8 *Inserted = NULL;
         if (String != NULL && String2Insert != NULL) {
-            uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(String);
-            uint64_t InsertSize = UTF8_GetStringSizeInCodeUnits(String2Insert);
-            if (Offset == 0xFFFFFFFFFFFFFFFF) {
-                Offset = StringSize;
-            }
-            bool StringHasBOM   = UTF8_HasBOM(String2Insert);
-            if (StringHasBOM == Yes) {
-                InsertSize -= 3;
-            }
-            if (Offset <= StringSize) {
-                Inserted = calloc(StringSize + InsertSize, sizeof(UTF8));
-                if (Inserted != NULL) {
-                    for (uint64_t CodePoint = 0ULL; CodePoint < StringSize + InsertSize; CodePoint++) {
-                        if (CodePoint < Offset || CodePoint > Offset + InsertSize) {
-                            Inserted[CodePoint] = String[CodePoint];
-                        } else {
-                            Inserted[CodePoint] = String2Insert[CodePoint - StringSize];
-                        }
-                    }
-                } else {
-                    Log(Log_DEBUG, __func__, U8("Couldn't allocate InsertedString"));
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Offset %llu is greater than the string's size %llu"), Offset, StringSize);
-            }
+            UTF32 *String32   = UTF8_Decode(String);
+            UTF32 *Insert32   = UTF8_Decode(String2Insert);
+            UTF32 *Inserted32 = UTF32_Insert(String32, Insert32, Offset);
+            free(String32);
+            free(Insert32);
+            Inserted          = UTF8_Encode(Inserted32);
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
@@ -1529,30 +1585,12 @@ extern "C" {
     UTF16 *UTF16_Insert(UTF16 *String, UTF16 *String2Insert, uint64_t Offset) {
         UTF16 *Inserted = NULL;
         if (String != NULL && String2Insert != NULL) {
-            uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(String);
-            uint64_t InsertSize = UTF16_GetStringSizeInCodeUnits(String2Insert);
-            if (Offset == 0xFFFFFFFFFFFFFFFF) {
-                Offset = StringSize;
-            }
-            if (String2Insert[0] == UTF16BOM_LE || String2Insert[0] == UTF16BOM_BE) {
-                InsertSize -= UTF16BOMSizeInCodeUnits;
-            }
-            if (Offset <= StringSize) {
-                Inserted = calloc(StringSize + InsertSize, sizeof(UTF16));
-                if (Inserted != NULL) {
-                    for (uint64_t CodePoint = 0ULL; CodePoint < StringSize + InsertSize; CodePoint++) {
-                        if (CodePoint < Offset || CodePoint > Offset + InsertSize) {
-                            Inserted[CodePoint] = String[CodePoint];
-                        } else {
-                            Inserted[CodePoint] = String2Insert[CodePoint - StringSize];
-                        }
-                    }
-                } else {
-                    Log(Log_DEBUG, __func__, U8("Couldn't allocate InsertedString"));
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Offset %llu is greater than the string's size %llu"), Offset, StringSize);
-            }
+            UTF32 *String32   = UTF16_Decode(String);
+            UTF32 *Insert32   = UTF16_Decode(String2Insert);
+            UTF32 *Inserted32 = UTF32_Insert(String32, Insert32, Offset);
+            free(String32);
+            free(Insert32);
+            Inserted          = UTF16_Encode(Inserted32);
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
@@ -1565,13 +1603,10 @@ extern "C" {
             uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
             uint64_t InsertSize = UTF32_GetStringSizeInCodePoints(String2Insert);
             if (Offset == 0xFFFFFFFFFFFFFFFF) {
-                Offset = StringSize;
-            }
-            if (String2Insert[0] == UTF32BOM_LE || String2Insert[0] == UTF32BOM_BE) {
-                InsertSize -= UnicodeBOMSizeInCodePoints;
+                Offset          = StringSize;
             }
             if (Offset <= StringSize) {
-                Inserted = calloc(StringSize + InsertSize, sizeof(UTF32));
+                Inserted        = calloc(StringSize + InsertSize, sizeof(UTF32));
                 if (Inserted != NULL) {
                     for (uint64_t CodePoint = 0ULL; CodePoint < StringSize + InsertSize; CodePoint++) {
                         if (CodePoint < Offset || CodePoint > Offset + InsertSize) {
@@ -1625,7 +1660,7 @@ extern "C" {
         UTF32   *CaseFoldedString = NULL;
         if (String != NULL) {
             do {
-                for (uint64_t Index = 0ULL; Index < CaseFoldTableSize - 1; Index++) {
+                for (uint64_t Index = 0ULL; Index < CaseFoldTableSize; Index++) {
                     if (String[CodePoint] == CaseFoldCodePoints[Index]) {
                         uint64_t ReplacementSize = UTF32_GetStringSizeInCodePoints(&CaseFoldedString[Index]);
                         CaseFoldedString         = UTF32_ReplaceSubString(String, CaseFoldStrings[Index], CodePoint, ReplacementSize);
@@ -1705,8 +1740,8 @@ extern "C" {
             do {
                 CodePointA = String[CodePoint - 1];
                 CodePointB = String[CodePoint];
-                for (uint64_t IndexA = 0ULL; IndexA < CombiningCharacterClassTableSize - 1; IndexA++) {
-                    for (uint64_t IndexB = 0ULL; IndexB < CombiningCharacterClassTableSize - 1; IndexB++) {
+                for (uint64_t IndexA = 0ULL; IndexA < CombiningCharacterClassTableSize; IndexA++) {
+                    for (uint64_t IndexB = 0ULL; IndexB < CombiningCharacterClassTableSize; IndexB++) {
                         if (CodePointA == CombiningCharacterClassTable[IndexA][0] && CodePointB == CombiningCharacterClassTable[IndexB][0]) {
                             if (CombiningCharacterClassTable[IndexA][1] > CombiningCharacterClassTable[IndexB][1]) {
                                 String[CodePoint - 1] = CodePointB;
@@ -1729,13 +1764,13 @@ extern "C" {
         if (String != NULL && (Kompatibility == No || Kompatibility == Yes)) {
             do {
                 if (Kompatibility == Yes) {
-                    for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize - 1; Index++) {
+                    for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
                             ComposedString = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
                         }
                     }
                 } else {
-                    for (uint64_t DecomposeCodePoint = 0ULL; DecomposeCodePoint < CanonicalNormalizationTableSize - 1; DecomposeCodePoint++) {
+                    for (uint64_t DecomposeCodePoint = 0ULL; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[DecomposeCodePoint]) {
                             ComposedString = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[DecomposeCodePoint], CodePoint, 1);
                         }
@@ -1756,13 +1791,13 @@ extern "C" {
             UTF32 *Decomposed          = NULL;
             do {
                 if (Kompatibility == Yes) {
-                    for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize - 1; Index++) {
+                    for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
                             Decomposed = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
                         }
                     }
                 } else {
-                    for (uint64_t Index = 0ULL; Index < CanonicalNormalizationTableSize - 1; Index++) {
+                    for (uint64_t Index = 0ULL; Index < CanonicalNormalizationTableSize; Index++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[Index]) {
                             Decomposed = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[Index], CodePoint, 1);
                         }
@@ -2174,14 +2209,14 @@ extern "C" {
             }
             // Now we start popping in the other variables, first is the Exponent.
             while (Exponent > 0) { // TODO: This assumes there's only 1 codepoint necessary to express the exponent
-                for (uint64_t ExponentCodePoint = 0ULL; ExponentCodePoint < NumDigitsExponent - 1; ExponentCodePoint++) {
+                for (uint64_t ExponentCodePoint = 0ULL; ExponentCodePoint < NumDigitsExponent; ExponentCodePoint++) {
                     OutputString[ExponentCodePoint + StringSize]                 = Exponent /= 10;
                 }
             }
             OutputString[StringSize + NumDigitsExponent + UnicodeBOMSizeInCodePoints] = U32('.');
             // Now let's start popping in the Mantissa
             while (Mantissa > 0) { // TODO: This assumes there's only 1 codepoint necessary to express the exponent
-                for (uint64_t MantissaCodePoint = 0ULL; MantissaCodePoint < NumDigitsExponent - 1; MantissaCodePoint++) {
+                for (uint64_t MantissaCodePoint = 0ULL; MantissaCodePoint < NumDigitsExponent; MantissaCodePoint++) {
                     OutputString[StringSize + NumDigitsExponent + MantissaCodePoint]  = Mantissa /= 10;
                 }
             }
@@ -2201,7 +2236,7 @@ extern "C" {
                 }
                 // Write the Exponent
                 uint16_t NumDigitsExponentInDigits = (uint16_t) Logarithm(2, Exponent);
-                for (uint64_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits - 1; ExponentDigit++) {
+                for (uint64_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits; ExponentDigit++) {
                     OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = U32("Exponent"); // FIXME: "Exponent" is NOT right
                 }
             } else if (Base == (Scientific | Lowercase)) {
@@ -2213,7 +2248,7 @@ extern "C" {
                 }
                 // Write the Exponent
                 uint64_t NumDigitsExponentInDigits = (uint16_t) Logarithm(2, Exponent);
-                for (uint64_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits - 1; ExponentDigit++) {
+                for (uint64_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits; ExponentDigit++) {
                     OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = U32("Exponent"); // FIXME: "Exponent" is NOT right
                 }
             }
@@ -2385,8 +2420,8 @@ extern "C" {
             uint64_t  *RemovalPointsEnd    = NULL; // RemovalPoint[0] = {0, 6}; start and stop points
             uint64_t   TrimmedStringSize   = 0ULL;
             if (Type == TrimString_RemoveAll) {
-                for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                    for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
+                for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                    for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
                         bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
                         if (SubstringFound) {
                             NumRemovalPoints += 1;
@@ -2397,8 +2432,8 @@ extern "C" {
                 RemovalPointsStart                                  = calloc(NumRemovalPoints, sizeof(uint64_t));
                 RemovalPointsEnd                                    = calloc(NumRemovalPoints, sizeof(uint64_t));
                 
-                for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                    for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
+                for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                    for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
                         bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
                         if (SubstringFound) {
                             RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
@@ -2410,8 +2445,8 @@ extern "C" {
             } else {
                 if (Type == TrimString_StartEndRemoveAll) {
                     // Loop over all the codepoints until you find one that is not on the list, then remove it; BUT JUST FOR THE BEGINNING AND END
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
                             bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
                             if (SubstringFound) {
                                 NumRemovalPoints += 1;
@@ -2422,8 +2457,8 @@ extern "C" {
                     RemovalPointsStart                                  = calloc(NumRemovalPoints, sizeof(uint64_t));
                     RemovalPointsEnd                                    = calloc(NumRemovalPoints, sizeof(uint64_t));
                     
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
                             bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
                             if (SubstringFound) {
                                 RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
@@ -2435,8 +2470,8 @@ extern "C" {
                 }
                 if (Type == TrimString_BetweenValidKeep1) {
                     // Loop over all the codepoints until you find one that is not on the list, then remove it.
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
                             bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
                             if (SubstringFound) {
                                 NumRemovalPoints += 1;
@@ -2447,8 +2482,8 @@ extern "C" {
                     RemovalPointsStart                                  = calloc(NumRemovalPoints, sizeof(uint64_t));
                     RemovalPointsEnd                                    = calloc(NumRemovalPoints, sizeof(uint64_t));
                     
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings - 1; RemovalString++) {
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
                             bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
                             if (SubstringFound) {
                                 RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
@@ -2461,15 +2496,15 @@ extern "C" {
             }
             // Actually build the string, regardless of mode.
             TrimmedStringSize = StringSize;
-            for (uint64_t RemovalPoint = 0ULL; RemovalPoint < NumRemovalPoints - 1; RemovalPoint++) {
+            for (uint64_t RemovalPoint = 0ULL; RemovalPoint < NumRemovalPoints; RemovalPoint++) {
                 TrimmedStringSize     -= RemovalPointsEnd[RemovalPoint] - RemovalPointsStart[RemovalPoint];
             }
             
             Trimmed                    = calloc(TrimmedStringSize, sizeof(UTF32));
             if (Trimmed != NULL) {
-                for (uint64_t RemovalPoint = 0ULL; RemovalPoint < NumRemovalPoints - 1; RemovalPoint++) {
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
-                        for (uint64_t TrimmedCodePoint = 0ULL; TrimmedCodePoint < TrimmedStringSize - 1; TrimmedCodePoint++) {
+                for (uint64_t RemovalPoint = 0ULL; RemovalPoint < NumRemovalPoints; RemovalPoint++) {
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                        for (uint64_t TrimmedCodePoint = 0ULL; TrimmedCodePoint < TrimmedStringSize; TrimmedCodePoint++) {
                             if (StringCodePoint < RemovalPointsStart[RemovalPoint] || StringCodePoint > RemovalPointsEnd[RemovalPoint]) {
                                 Trimmed[TrimmedCodePoint] = String[StringCodePoint];
                             }
@@ -2591,7 +2626,7 @@ extern "C" {
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF8_StringArray_GetNumStrings(StringArray);
             StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
-            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringArraySizes[String] = UTF8_GetStringSizeInCodeUnits(StringArray[String]);
             }
         } else {
@@ -2605,7 +2640,7 @@ extern "C" {
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF16_StringArray_GetNumStrings(StringArray);
             StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
-            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringArraySizes[String] = UTF16_GetStringSizeInCodeUnits(StringArray[String]);
             }
         } else {
@@ -2619,7 +2654,7 @@ extern "C" {
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF8_StringArray_GetNumStrings(StringArray);
             StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
-            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringArraySizes[String] = UTF8_GetStringSizeInCodePoints(StringArray[String]);
             }
         } else {
@@ -2633,7 +2668,7 @@ extern "C" {
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF16_StringArray_GetNumStrings(StringArray);
             StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
-            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringArraySizes[String] = UTF16_GetStringSizeInCodePoints(StringArray[String]);
             }
         } else {
@@ -2647,7 +2682,7 @@ extern "C" {
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF32_StringArray_GetNumStrings(StringArray);
             StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
-            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringArraySizes[String] = UTF32_GetStringSizeInCodePoints(StringArray[String]);
             }
         } else {
@@ -2662,7 +2697,7 @@ extern "C" {
             uint64_t NumStrings     = UTF8_StringArray_GetNumStrings(StringArray);
             Decoded                 = calloc(NumStrings + 1, sizeof(UTF32*));
             if (Decoded != NULL) {
-                for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+                for (uint64_t String = 0ULL; String < NumStrings; String++) {
                     Decoded[String] = UTF8_Decode(StringArray[String]);
                 }
             } else {
@@ -2681,7 +2716,7 @@ extern "C" {
             uint64_t NumStrings     = UTF16_StringArray_GetNumStrings(StringArray);
             Decoded                 = calloc(NumStrings + 1, sizeof(UTF32*));
             if (Decoded != NULL) {
-                for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+                for (uint64_t String = 0ULL; String < NumStrings; String++) {
                     Decoded[String] = UTF16_Decode(StringArray[String]);
                 }
             } else {
@@ -2700,7 +2735,7 @@ extern "C" {
             uint64_t NumStrings     = UTF32_StringArray_GetNumStrings(StringArray);
             Encoded                 = calloc(NumStrings + 1, sizeof(UTF8*));
             if (Encoded != NULL) {
-                for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+                for (uint64_t String = 0ULL; String < NumStrings; String++) {
                     Encoded[String] = UTF8_Encode(StringArray[String]);
                 }
             } else {
@@ -2719,7 +2754,7 @@ extern "C" {
             uint64_t NumStrings     = UTF32_StringArray_GetNumStrings(StringArray);
             Encoded                 = calloc(NumStrings + 1, sizeof(UTF16*));
             if (Encoded != NULL) {
-                for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+                for (uint64_t String = 0ULL; String < NumStrings; String++) {
                     Encoded[String] = UTF16_Encode(StringArray[String]);
                 }
             } else {
@@ -2779,7 +2814,7 @@ extern "C" {
             NumDelimiters          = UTF32_StringArray_GetNumStrings(Delimiters);
             DelimitersSize         = calloc(NumDelimiters, sizeof(uint64_t));
             if (DelimitersSize != NULL) {
-                for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters - 1; Delimiter++) {
+                for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters; Delimiter++) {
                     DelimitersSize[Delimiter] = UTF32_GetStringSizeInCodePoints(Delimiters[Delimiter]);
                 }
             } else {
@@ -2787,9 +2822,9 @@ extern "C" {
             }
             // Check if the current delimiter is larger than the string, if so, it can't match.
             // Well we need to loop over the string NumDelimiters times, so Delimiters, String, DelimiterString
-            for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters - 1; Delimiter++) {
+            for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters; Delimiter++) {
                 for (uint64_t DelimiterCodePoint = 0ULL; DelimiterCodePoint < DelimitersSize[Delimiter]; DelimiterCodePoint++) {
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
                         // Ok, so now we need to count the number of split strings we're gonna have, and their sizes in codepoints.
                         // Example: "/Users/Marcus/Desktop/Elephants Dream/%05d.png"
                         // Delimiters: 1, "/"
@@ -2804,9 +2839,9 @@ extern "C" {
             SplitSizes   = calloc(NumSplitStrings, sizeof(uint64_t));
             SplitOffsets = calloc(NumSplitStrings, sizeof(uint64_t));
             
-            for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters - 1; Delimiter++) {
-                for (uint64_t DelimiterCodePoint = 0ULL; DelimiterCodePoint < DelimitersSize[Delimiter] - 1; DelimiterCodePoint++) {
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize - 1; StringCodePoint++) {
+            for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters; Delimiter++) {
+                for (uint64_t DelimiterCodePoint = 0ULL; DelimiterCodePoint < DelimitersSize[Delimiter]; DelimiterCodePoint++) {
+                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
                         if (String[StringCodePoint] == Delimiters[Delimiter][DelimiterCodePoint]) {
                             if (DelimitersSize[Delimiter] > 1) {
                                 // We need to make sure the delimiter matches entirely
@@ -2841,7 +2876,7 @@ extern "C" {
     void UTF8_StringArray_Deinit(UTF8 **StringArray) {
         if (StringArray != NULL) {
             uint64_t NumStrings = UTF8_StringArray_GetNumStrings(StringArray);
-            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 free(StringArray[String]);
             }
             free(StringArray);
@@ -2853,7 +2888,7 @@ extern "C" {
     void UTF16_StringArray_Deinit(UTF16 **StringArray) {
         if (StringArray != NULL) {
             uint64_t NumStrings = UTF16_StringArray_GetNumStrings(StringArray);
-            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 free(StringArray[String]);
             }
             free(StringArray);
@@ -2865,7 +2900,7 @@ extern "C" {
     void UTF32_StringArray_Deinit(UTF32 **StringArray) {
         if (StringArray != NULL) {
             uint64_t NumStrings = UTF32_StringArray_GetNumStrings(StringArray);
-            for (uint64_t String = 0ULL; String < NumStrings - 1; String++) {
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 free(StringArray[String]);
             }
             free(StringArray);

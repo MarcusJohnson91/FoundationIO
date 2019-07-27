@@ -9,40 +9,20 @@
 extern "C" {
 #endif
     
-    UTF32 UTF32_GenerateCodePoint(Entropy *Random) {
-        UTF32 CodePoint          = 0UL;
-        if (Random != NULL) {
-            UTF32  CodePointHigh = Entropy_GenerateIntegerInRange(Random, 1, UTF16HighSurrogateStart - 1); // 1..D7FF
-            UTF32  CodePointLow  = Entropy_GenerateIntegerInRange(Random, UTF16LowSurrogateEnd + 1, UnicodeMaxCodePoint); //  E000..10FFFF
-            CodePoint            = CodePointLow | CodePointHigh; // D7FE..101FFF = 0xF4801
-        } else {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
-        }
-        return CodePoint;
-    }
+    /*
+     Colorize Text API:
+     
+     Colorize(Color, String)
+     
+     Where Color is an enum contining a list of possible colors.
+     
+     Let's put it in CommandLineIO
+     */
     
-    UTF32 *UTF32_GenerateString(Entropy *Random) {
-        UTF32 *String                 = 0UL;
+    void Test_UTF8_EncodeDecode(Entropy *Random) {
         if (Random != NULL) {
-            uint16_t NumCodePoints    = Entropy_GenerateIntegerInRange(Random, 1, 8192);
-            String                    = calloc(NumCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
-            if (String != NULL) {
-                for (uint16_t CodePoint = 0; CodePoint < NumCodePoints - 1; CodePoint++) {
-                    String[CodePoint] = UTF32_GenerateCodePoint(Random);
-                }
-                WriteString(stderr, String);
-            } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate string with %lu CodePoints"), NumCodePoints);
-            }
-        } else {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
-        }
-        return String;
-    }
-    
-    void UTF8_EncodeDecodeTest(Entropy *Random) {
-        if (Random != NULL) {
-            UTF32    *GeneratedString  = UTF32_GenerateString(Random);
+            uint64_t  NumCodePoints    = Entropy_GenerateIntegerInRange(Random, 1, 65535);
+            UTF32    *GeneratedString  = UTF32_GenerateString(Random, NumCodePoints);
             UTF8     *Generated8       = UTF8_Encode(GeneratedString);
             uint64_t  Generated8Units  = UTF8_GetStringSizeInCodeUnits(Generated8);
             uint64_t  Generated8Points = UTF8_GetStringSizeInCodePoints(Generated8);
@@ -57,9 +37,10 @@ extern "C" {
         }
     }
     
-    void UTF16_EncodeDecodeTest(Entropy *Random) {
+    void Test_UTF16_EncodeDecode(Entropy *Random) {
         if (Random != NULL) {
-            UTF32    *GeneratedString = UTF32_GenerateString(Random);
+            uint64_t  NumCodePoints    = Entropy_GenerateIntegerInRange(Random, 1, 65535);
+            UTF32    *GeneratedString = UTF32_GenerateString(Random, NumCodePoints);
             UTF16    *Generated16     = UTF16_Encode(GeneratedString);
             UTF32    *Decoded16       = UTF16_Decode(Generated16);
             bool      StringsMatch    = UTF32_CompareSubString(GeneratedString, Decoded16, 0, 0);
@@ -71,18 +52,18 @@ extern "C" {
         }
     }
     
-    void FormatTest(Entropy *Random) {
-        if (Random != NULL) {
-            uint8_t       X = 27;
-            UTF8 *Formatted = UTF8_Format(U8("X equals: %d in hex: %#x\nMemory address for x: (%p) \n"), X, X, &X);
-            // "X equals: %d in hex: %#x\nMemory address for x: (%p) \n"
-            UTF8_WriteLine(stdout, Formatted);
-        } else {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+    void Test_UTF8_Insert(void) {
+        UTF8 *Original = U8("Original");
+        UTF8 *Insertee = U8("Insert");
+        UTF8 *Inserted = UTF8_Insert(Original, Insertee, 0);
+        UTF8 *Correct  = U8("InsertOriginal");
+        bool Matches   = UTF8_Compare(Inserted, Correct);
+        if (Matches == No) {
+            Log(Log_DEBUG, __func__, U8("Strings do not match"));
         }
     }
     
-    bool UTF8_BasicTest(void) {
+    bool Test_UTF8_Properties(void) {
         bool      TestPassed     = true;
         UTF8     *TestString8    = U8("Size: 7");
         UTF32    *TestString32   = UTF8_Decode(TestString8);
@@ -94,26 +75,124 @@ extern "C" {
         return TestPassed;
     }
     
-    bool UTF8_FormatTest(void) {
-        bool TestPassed    = false;
-        UTF8 *Formatted    = UTF8_Format(U8("One Thousand Twenty Four = %llu????????"), 1024);
-        printf("%s\n", Formatted);
-        UTF8 *FormatAnswer = U8("One Thousand Twenty Four = 1024????????"); // Twenty Seven = 27???????
-        TestPassed         = UTF8_Compare(Formatted, FormatAnswer);
+    bool Test_UTF8_Format(void) {
+        /*
+         TestIO Notes:
+         
+         It'd be useful if there was a way to store the number of test successes vs test failures
+         
+         
+         Another interesting thing to note:
+         
+         We're gonna have to have a test function for each function in StringIO.
+         
+         So, all the testing functions will start with Test_XXXXXXXXXXXXXXXX
+         
+         TestIO should also contain all of the Generate functions that, for example CodePoints, Strings, etc.
+         */
+        
+        bool TestPassed     = false;
+        
+        UTF8 *Percent       = UTF8_Format("%%");
+        bool PercentTest    = UTF8_Compare(Percent, U8("%"));
+        if (PercentTest == No) {
+            Log(Log_DEBUG, __func__, U8("PercentTest Failed"));
+        }
+        
+        UTF8 *Smaller       = UTF8_Format("%llu", 132);
+        bool SmallerTest    = UTF8_Compare(Smaller, U8("123"));
+        if (SmallerTest == No) {
+            Log(Log_DEBUG, __func__, U8("SmallerTest Failed"));
+        }
+        
+        UTF8 *Equal         = UTF8_Format("%llu", 1094);
+        bool EqualTest      = UTF8_Compare(Equal, U8("1094"));
+        if (EqualTest == No) {
+            Log(Log_DEBUG, __func__, U8("EqualTest Failed"));
+        }
+        
+        UTF8 *Longer        = UTF8_Format("%llu", 99999);
+        bool LongerTest     = UTF8_Compare(Longer, U8("99999"));
+        if (LongerTest == No) {
+            Log(Log_DEBUG, __func__, U8("LongerTest Failed"));
+        }
         return TestPassed;
     }
     
+    bool Test_UTF8_Deformat(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
+    bool Test_UTF8_Reverse(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
+    bool Test_UTF8_Clone(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
+    bool Test_UTF8_Trim(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
+    bool Test_UTF8_Strip(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
+    bool Test_UTF8_String2Decimal(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
+    bool Test_UTF8_Decimal2String(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
+    bool Test_UTF8_String2Integer(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
+    bool Test_UTF8_Integer2String(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
+    bool Test_UTF8_Split(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
+    bool Test_UTF8_CompareSubString(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
+    bool Test_UTF8_FindSubString(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
+    bool Test_UTF8_ExtractSubString(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
+    bool Test_UTF8_RemoveSubString(void) {
+        bool TestSuitePassed = false;
+        return TestSuitePassed;
+    }
+    
     int main(int argc, const char *argv[]) {
-        bool TestSuitePassed      = true;
-        /*
-        Entropy  *Random          = Entropy_Init(64);
+        bool TestSuitePassed      = false;
         
-        FormatTest(Random);
-        
-        //UTF8_EncodeDecodeTest(Random);
-        //UTF16_EncodeDecodeTest(Random);
-        */
-        TestSuitePassed = UTF8_FormatTest();
+        TestSuitePassed = Test_UTF8_Format();
         return TestSuitePassed;
     }
     
