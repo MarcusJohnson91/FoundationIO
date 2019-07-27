@@ -1,5 +1,5 @@
 #include "../include/TestIO.h"         /* Included for our declarations */
-
+#include "../include/CryptographyIO.h" /* Included for Entropy */
 #include "../include/Log.h"            /* Included for error reporting */
 
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
@@ -70,6 +70,35 @@ extern "C" {
             Time            /= Loop;
         }
         return Time;
+    }
+    
+    static UTF32 UTF32_GenerateCodePoint(Entropy *Random) {
+        UTF32 CodePoint          = 0UL;
+        if (Random != NULL) {
+            UTF32  CodePointHigh = (UTF32) Entropy_GenerateIntegerInRange(Random, 1, 0xD7FF); // 1..D7FF
+            UTF32  CodePointLow  = (UTF32) Entropy_GenerateIntegerInRange(Random, 0xE000, 0x10FFFF); //  E000..10FFFF
+            CodePoint            = CodePointLow | CodePointHigh; // D7FE..101FFF = 0xF4801
+        } else {
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+        }
+        return CodePoint;
+    }
+    
+    UTF32 *UTF32_GenerateString(Entropy *Random, uint64_t NumCodePoints) {
+        UTF32 *String                 = 0UL;
+        if (Random != NULL) {
+            String                    = calloc(NumCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            if (String != NULL) {
+                for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePoints; CodePoint++) {
+                    String[CodePoint] = UTF32_GenerateCodePoint(Random);
+                }
+            } else {
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate string with %llu CodePoints"), NumCodePoints);
+            }
+        } else {
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+        }
+        return String;
     }
     
     /*
