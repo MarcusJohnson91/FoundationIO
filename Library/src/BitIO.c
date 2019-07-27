@@ -183,7 +183,7 @@ extern "C" {
     void BitBuffer_Erase(BitBuffer *BitB) {
         if (BitB != NULL) {
             uint64_t BufferSize = Bits2Bytes(BitB->NumBits, RoundingType_Up);
-            for (uint64_t Byte = 0ULL; Byte < BufferSize - 1; Byte++) {
+            for (uint64_t Byte = 0ULL; Byte < BufferSize; Byte++) {
                 BitB->Buffer[Byte] = 0;
             }
         } else {
@@ -559,7 +559,7 @@ extern "C" {
     UTF16 *BitBuffer_ReadUTF16(BitBuffer *BitB, uint64_t StringSize) {
         UTF16 *ExtractedString            = calloc(StringSize, sizeof(UTF16));
         if (BitB != NULL && ExtractedString != NULL) {
-            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize - 1; CodeUnit++) {
+            for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
                 ExtractedString[CodeUnit] = (UTF16) BitBuffer_Extract_LSByteLSBit(BitB, 16);
             }
         } else if (BitB == NULL) {
@@ -575,7 +575,7 @@ extern "C" {
                 // Read it from the BitBuffer as a string.
                 GUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
                 if (GUUID != NULL) {
-                    for (uint8_t Byte = 0; Byte < BinaryGUUIDSize - 1; Byte++) {
+                    for (uint8_t Byte = 0; Byte < BinaryGUUIDSize; Byte++) {
                         GUUID[Byte]      = (uint8_t) BitBuffer_Extract_LSByteLSBit(BitB, 8);
                     }
                 } else {
@@ -696,7 +696,7 @@ extern "C" {
     void BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, uint8_t *GUUID2Write) {
         if (BitB != NULL && GUUID2Write != NULL) { // TODO: Make sure that the BitBuffer can hold the GUUID
             uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? GUUIDStringSize : BinaryGUUIDSize);
-            for (uint8_t Byte = 0; Byte < GUUIDSize - 1; Byte++) {
+            for (uint8_t Byte = 0; Byte < GUUIDSize; Byte++) {
                 BitBuffer_Append_LSByteLSBit(BitB, 8, GUUID2Write[Byte]);
             }
         } else if (BitB == NULL) {
@@ -1055,7 +1055,7 @@ extern "C" {
             // Honestly I'll just convert from BinaryGUUID to GUUIDString if I have to
             uint8_t *BinaryGUUIDData     = calloc(BinaryGUUIDSize, sizeof(uint8_t));
             if (GUUID != NULL) {
-                for (uint8_t GUUIDByte = 0; GUUIDByte < BinaryGUUIDSize - 1; GUUIDByte++) {
+                for (uint8_t GUUIDByte = 0; GUUIDByte < BinaryGUUIDSize; GUUIDByte++) {
                     if (GUUIDByte < 8) {
                         uint8_t Byte     = (LowBits  & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
                         BinaryGUUIDData[GUUIDByte] = Byte;
@@ -1084,7 +1084,7 @@ extern "C" {
         uint8_t GUUIDSize       = ((Type2Compare == GUIDString || Type2Compare == UUIDString) ? BinaryGUUIDSize : BinaryGUUIDSize);
         bool GUUIDsMatch        = Yes;
         if (GUUID1 != NULL && GUUID2 != NULL && Type2Compare != UnknownGUUID) {
-            for (uint8_t BinaryGUUIDByte = 0; BinaryGUUIDByte < GUUIDSize - 1; BinaryGUUIDByte++) {
+            for (uint8_t BinaryGUUIDByte = 0; BinaryGUUIDByte < GUUIDSize; BinaryGUUIDByte++) {
                 if (GUUID1[BinaryGUUIDByte] != GUUID2[BinaryGUUIDByte]) {
                     GUUIDsMatch = No;
                 }
@@ -1114,16 +1114,16 @@ extern "C" {
             
             if (TypeDiffers == Yes) {
                 if ((InputType == UUIDString || InputType == GUIDString) && (OutputType == BinaryUUID || OutputType == BinaryGUID)) {
-                    for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize - 1; StringByte++) {
-                        for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize - 1; BinaryByte++) {
+                    for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize; StringByte++) {
+                        for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize; BinaryByte++) {
                             if (GUUID2Convert[StringByte] != Dash) {
                                 ConvertedGUUID[BinaryByte] = GUUID2Convert[StringByte];
                             }
                         }
                     }
                 } else if ((InputType == BinaryUUID || InputType == BinaryGUID) || (OutputType == UUIDString || OutputType == GUIDString)) {
-                    for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize - 1; BinaryByte++) {
-                        for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize - 1; StringByte++) {
+                    for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize; BinaryByte++) {
+                        for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize; StringByte++) {
                             if (BinaryByte != 4 && BinaryByte != 7 && BinaryByte != 10 && BinaryByte != 13) {
                                 ConvertedGUUID[StringByte]  = GUUID2Convert[BinaryByte];
                             } else {
@@ -1174,7 +1174,7 @@ extern "C" {
                     
                     SwappedGUUID[13]  = Dash;
                     
-                    for (uint8_t EndBytes = 13; EndBytes < GUUIDStringSize - 1; EndBytes++) {
+                    for (uint8_t EndBytes = 13; EndBytes < GUUIDStringSize; EndBytes++) {
                         SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
                     }
                 } else {
@@ -1196,7 +1196,7 @@ extern "C" {
                     
                     SwappedGUUID[8]   = GUUID2Swap[9];
                     SwappedGUUID[9]   = GUUID2Swap[8];
-                    for (uint8_t EndBytes = 10; EndBytes < BinaryGUUIDSize - 1; EndBytes++) {
+                    for (uint8_t EndBytes = 10; EndBytes < BinaryGUUIDSize; EndBytes++) {
                         SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
                     }
                 } else {
