@@ -44,6 +44,18 @@ extern "C" {
 #endif /* __CHAR16_TYPE__ */
 #endif /* FoundationIO_StringType16 */
     
+#ifndef   FoundationIO_StringType32
+#define   FoundationIO_StringType32 (4)
+#ifdef    UTF32
+#undef    UTF32
+#endif /* UTF32 */
+#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__ && __STDC_VERSION__ >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+    typedef               char32_t         UTF32;
+#else
+    typedef               uint_least32_t   UTF32;
+#endif /* __CHAR32_TYPE__ */
+#endif /* FoundationIO_StringType32 */
+    
     /* Define StringIO's Unicodeization macros */
 #ifndef                         FoundationIO_Unicodize8
 #define                         FoundationIO_Unicodize8         (1)

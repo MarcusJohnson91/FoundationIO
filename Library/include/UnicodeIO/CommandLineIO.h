@@ -44,6 +44,18 @@ extern "C" {
 #endif /* __CHAR16_TYPE__ */
 #endif /* FoundationIO_StringType16 */
     
+#ifndef   FoundationIO_StringType32
+#define   FoundationIO_StringType32 (4)
+#ifdef    UTF32
+#undef    UTF32
+#endif /* UTF32 */
+#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__ && __STDC_VERSION__ >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+    typedef               char32_t         UTF32;
+#else
+    typedef               uint_least32_t   UTF32;
+#endif /* __CHAR32_TYPE__ */
+#endif /* FoundationIO_StringType32 */
+    
 #ifndef                   FoundationIO_Unicodize8
 #define                   FoundationIO_Unicodize8             (1)
 #define                   U8(QuotedLiteral)                    u8##QuotedLiteral
@@ -143,6 +155,12 @@ extern "C" {
                                 EqualDelimiter                  = 2,
                                 ColonDelimiter                  = 3,
     } CLIDelimiterTypes;
+    
+    typedef enum CLIStringColorizationColors {
+        Colorize_Unknown        = 0,
+        Colorize_Foreground_Red = 1,
+        Colorize_Background_Red = 2,
+    } ;
     
     /*!
      @typedef                   CommandLineIO

@@ -481,6 +481,51 @@ extern "C" {
     UTF32                *UTF32_Normalize(UTF32 *String, StringIONormalizationForms NormalizedForm);
     
     /*!
+     @abstract                             "Extracts a Grapheme from String".
+     @param               String           "The string to extract from".
+     @param               Grapheme         "The Grapheme to start extracting from".
+     */
+    UTF8                 *UTF8_ExtractGrapheme(UTF8 *String, uint64_t Grapheme);
+    
+    /*!
+     @abstract                             "Extracts a Grapheme from String".
+     @param               String           "The string to extract from".
+     @param               Grapheme         "The Grapheme to start extracting from".
+     */
+    UTF16                *UTF16_ExtractGrapheme(UTF16 *String, uint64_t Grapheme);
+    
+    /*!
+     @abstract                             "Extracts a Grapheme from String".
+     @param               String           "The string to extract from".
+     @param               Grapheme         "The Grapheme to start extracting from".
+     */
+    UTF32                *UTF32_ExtractGrapheme(UTF32 *String, uint64_t Grapheme);
+    
+    /*!
+     @abstract                             "Compares String1 to String2".
+     @param               String1          "String1 for comparison".
+     @param               String2          "String2 for comparison".
+     @return                               "Returns true if the strings match exactly, otherwise false".
+     */
+    bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2);
+    
+    /*!
+     @abstract                             "Compares String1 to String2".
+     @param               String1          "String1 for comparison".
+     @param               String2          "String2 for comparison".
+     @return                               "Returns true if the strings match exactly, otherwise false".
+     */
+    bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2);
+    
+    /*!
+     @abstract                             "Compares String1 to String2".
+     @param               String1          "String1 for comparison".
+     @param               String2          "String2 for comparison".
+     @return                               "Returns true if the strings match exactly, otherwise false".
+     */
+    bool                  UTF32_Compare(UTF32 *String1, UTF32 *String2);
+    
+    /*!
      @abstract                             "Finds a substring within string, starting at codepoint Offset, and ending at Offset + Length".
      @remark                               "We do NOT casefold, or normalize the String or SubString, that's your job".
      @param               String           "The string to search for SubString in".
@@ -536,33 +581,6 @@ extern "C" {
      @param               Length           "The number of codepoints to extract".
      */
     UTF32                *UTF32_ExtractSubString(UTF32 *String, uint64_t Offset, uint64_t Length);
-    
-    /*!
-     @abstract                             "Extracts a Grapheme from String".
-     @param               String           "The string to extract from".
-     @param               Grapheme         "The Grapheme to start extracting from".
-     */
-    UTF8                 *UTF8_ExtractGrapheme(UTF8 *String, uint64_t Grapheme);
-    
-    /*!
-     @abstract                             "Extracts a Grapheme from String".
-     @param               String           "The string to extract from".
-     @param               Grapheme         "The Grapheme to start extracting from".
-     */
-    UTF16                *UTF16_ExtractGrapheme(UTF16 *String, uint64_t Grapheme);
-    
-    /*!
-     @abstract                             "Extracts a Grapheme from String".
-     @param               String           "The string to extract from".
-     @param               Grapheme         "The Grapheme to start extracting from".
-     */
-    UTF32                *UTF32_ExtractGrapheme(UTF32 *String, uint64_t Grapheme);
-    
-    bool UTF8_Compare(UTF8 *String1, UTF8 *String2);
-    
-    bool UTF16_Compare(UTF16 *String1, UTF16 *String2);
-    
-    bool UTF32_Compare(UTF32 *String1, UTF32 *String2);
     
     /*!
      @abstract                             "Replaces a section in String starting at Offset and ending at Offset + Length with Replacement".
@@ -781,6 +799,27 @@ extern "C" {
     UTF32                *UTF32_Trim(UTF32 *String, TrimStringTypes Type, UTF32 **Strings2Remove);
     
     /*!
+     @abstract                             "Strips all instances of Strings2Remove from String".
+     @param               String           "The string to perform the strip operation on".
+     @param               Strings2Remove   "An StringArray to remove from the String".
+     */
+    UTF8                 *UTF8_Strip(UTF8 *String, UTF8 **Strings2Remove);
+    
+    /*!
+     @abstract                             "Strips all instances of Strings2Remove from String".
+     @param               String           "The string to perform the strip operation on".
+     @param               Strings2Remove   "An StringArray to remove from the String".
+     */
+    UTF16                *UTF16_Strip(UTF16 *String, UTF16 **Strings2Remove);
+    
+    /*!
+     @abstract                             "Strips all instances of Strings2Remove from String".
+     @param               String           "The string to perform the strip operation on".
+     @param               Strings2Remove   "An StringArray to remove from the String".
+     */
+    UTF32                *UTF32_Strip(UTF32 *String, UTF32 **Strings2Remove);
+    
+    /*!
      @abstract                             "Copies the String".
      @remark                               "The caller needs to handle casefolding and normalization".
      @param               String           "Pointer to the String to be copied".
@@ -823,6 +862,33 @@ extern "C" {
     void                  UTF32_Erase(UTF32 *String);
     
     /*!
+     @abstract                             "Cuts a string down to MaxCodeUnits CodeUnits".
+     @remark                               "MaxCodeUnits DOES NOT include the NULL Terminator".
+     @param               String           "The string to truncate".
+     @param               MaxCodeUnits     "The maxiumum amount of CodeUnits in the string, not counting the null terminator".
+     @return                               "Returns the truncated, null terminated copy of String".
+     */
+    UTF8                 *UTF8_Truncate(UTF8 *String, uint64_t MaxCodeUnits);
+    
+    /*!
+     @abstract                             "Cuts a string down to MaxCodeUnits CodeUnits".
+     @remark                               "MaxCodeUnits DOES NOT include the NULL Terminator".
+     @param               String           "The string to truncate".
+     @param               MaxCodeUnits     "The maxiumum amount of CodeUnits in the string, not counting the null terminator".
+     @return                               "Returns the truncated, null terminated copy of String".
+     */
+    UTF16                *UTF16_Truncate(UTF16 *String, uint64_t MaxCodeUnits);
+    
+    /*!
+     @abstract                             "Cuts a string down to MaxCodePoints CodePoints".
+     @remark                               "MaxCodePoints DOES NOT include the NULL Terminator".
+     @param               String           "The string to truncate".
+     @param               MaxCodePoints    "The maxiumum amount of CodePoints in the string, not counting the null terminator".
+     @return                               "Returns the truncated, null terminated copy of String".
+     */
+    UTF32                *UTF32_Truncate(UTF32 *String, uint64_t MaxCodePoints);
+    
+    /*!
      @abstract                             "Creates a copy of String, with String2Insert starting at Offset".
      @remark                               "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string".
      @param               String           "The string to manipulate".
@@ -857,7 +923,7 @@ extern "C" {
      @remark                               "It is your responsibility to free the returned string when you're done using it".
      @param               String           "A string to reverse".
      */
-    UTF8                *UTF8_Reverse(UTF8 *String);
+    UTF8                 *UTF8_Reverse(UTF8 *String);
     
     /*!
      @abstract                             "Reverses a string Grapheme by Grapheme".
