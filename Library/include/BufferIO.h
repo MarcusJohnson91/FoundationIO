@@ -45,6 +45,18 @@ extern "C" {
 #endif /* __CHAR16_TYPE__ */
 #endif /* FoundationIO_StringType16 */
     
+#ifndef   FoundationIO_StringType32
+#define   FoundationIO_StringType32 (4)
+#ifdef    UTF32
+#undef    UTF32
+#endif /* UTF32 */
+#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__ && __STDC_VERSION__ >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+    typedef               char32_t         UTF32;
+#else
+    typedef               uint_least32_t   UTF32;
+#endif /* __CHAR32_TYPE__ */
+#endif /* FoundationIO_StringType32 */
+    
 #ifndef                         FoundationIO_Unicodize8
 #define                         FoundationIO_Unicodize8         (1)
 #define                         U8(QuotedLiteral)               u8##QuotedLiteral
@@ -54,6 +66,11 @@ extern "C" {
 #define                         FoundationIO_Unicodize16        (2)
 #define                         U16(QuotedLiteral)              u##QuotedLiteral
 #endif /* FoundationIO_Unicodize16 */
+    
+#ifndef                         FoundationIO_Unicodize32
+#define                         FoundationIO_Unicodize32        (4)
+#define                         U32(QuotedLiteral)              U##QuotedLiteral
+#endif /* FoundationIO_Unicodize32 */
     
     /*!
      @enum                      BitIOFileTypes

@@ -9,6 +9,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "Macros.h"
+
 #pragma once
 
 #ifndef FoundationIO_TestIO_H
@@ -18,19 +20,21 @@
 extern "C" {
 #endif
     
+#ifndef   FoundationIO_StringType32
+#define   FoundationIO_StringType32 (4)
+#ifdef    UTF32
+#undef    UTF32
+#endif /* UTF32 */
+#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__ && __STDC_VERSION__ >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+    typedef               char32_t         UTF32;
+#else
+    typedef               uint_least32_t   UTF32;
+#endif /* __CHAR32_TYPE__ */
+#endif /* FoundationIO_StringType32 */
+    
 #ifndef TestIO_RegisterTest
 #define TestIO_RegisterTest(FunctionName, ...)
 #endif
-    
-    /*!
-     @abstract                                                  "Gets how accurate the clock is".
-     */
-    uint64_t                    GetTimerFrequency(void);
-    
-    /*!
-     @abstract                                                  "Gets the time from the highest frequency timer for each platform".
-     */
-    uint64_t                    GetTime(void);
     
     /*!
      @enum                      TestIO_TestStates
@@ -59,6 +63,25 @@ extern "C" {
                                 TestResult_Failed               = 2,
                                 TestResult_Untested             = 3,
     } TestIO_TestResults;
+    
+    typedef struct Entropy Entropy; // Forward declare Entropy from CryptographyIO
+    
+    /*!
+     @abstract                                                  "Gets how accurate the clock is".
+     */
+    uint64_t                    GetTimerFrequency(void);
+    
+    /*!
+     @abstract                                                  "Gets the time from the highest frequency timer for each platform".
+     */
+    uint64_t                    GetTime(void);
+    
+    /*!
+     @abstract                                                  "Generates a valid UTF-32 string, containing up to 8192 CodePoints".
+     @param                     Random                          "Pointer to an instance of Entropy, from CryptographyIO".
+     @param                     NumCodePoints                   "The number of CodePoints, for the String's size".
+     */
+    UTF32                      *UTF32_GenerateString(Entropy *Random, uint64_t NumCodePoints);
     
 #ifdef __cplusplus
 }

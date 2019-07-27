@@ -9,6 +9,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "Macros.h"
+
 #pragma once
 
 #ifndef FoundationIO_CryptographyIO_H
