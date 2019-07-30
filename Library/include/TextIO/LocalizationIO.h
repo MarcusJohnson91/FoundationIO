@@ -56,41 +56,68 @@ extern "C" {
 #endif /* __CHAR32_TYPE__ */
 #endif /* FoundationIO_StringType32 */
     
-    /*!
-     @abstract                             "Creates a string containing the language code (en for englisn, etc)".
-     @return                               "Returns the string".
+    /*
+     Windows appears to use ISO 639-2, Mac appears to use a mix of SO-639 1 and 2.
      */
-    UTF8                 *Localize_UTF8_GetLanguage(void);
+    
+    typedef enum LocalizationIO_LanguageIDs {
+        LanguageID_Unknown    = 0,
+        LanguageID_Default    = 1, // Equilivent to "C" locale
+        LanguageID_English    = 2,
+        LanguageID_Swedish    = 3,
+        LanguageID_Norwegian  = 4,
+        LanguageID_Icelandic  = 5,
+        LanguageID_German     = 4,
+        LanguageID_Welsh      = 5,
+        LanguageID_French     = 6,
+        LanguageID_Lithuanian = 7,
+        LanguageID_Russian    = 8,
+        LanguageID_Polish     = 9,
+        LanguageID_Danish     = 10,
+    } LocalizationIO_LanguageIDs;
+    
+    typedef enum LocalizationIO_RegionIDs {
+        RegionID_Unknown       = 0,
+        RegionID_UnitedStates  = 1,
+        RegionID_Default       = RegionID_UnitedStates,
+        RegionID_Canada        = 2,
+        RegionID_Mexico        = 3,
+        RegionID_UnitedKingdom = 4,
+        RegionID_Sweden        = 5,
+        RegionID_Denmark       = 6,
+        RegionID_Norway        = 7,
+        RegionID_Finland       = 8,
+        RegionID_Estonia       = 9,
+        RegionID_Latvia        = 10,
+        RegionID_Lithuania     = 11,
+        RegionID_Poland        = 12,
+        RegionID_Russia        = 13,
+    } LocalizationIO_RegionIDs;
+    
+    typedef enum LocalizationIO_EncodingIDs {
+        EncodingID_Unknown     = 0,
+        EncodingID_UTF8        = 1,
+        EncodingID_UTF16       = 2,
+        EncodingID_UTF32       = 3,
+    } LocalizationIO_EncodingIDs;
     
     /*!
      @abstract                             "Creates a string containing the language code (en for englisn, etc)".
-     @return                               "Returns the string".
+     @return                               "Returns the LanguageID".
      */
-    UTF16                *Localize_UTF16_GetLanguage(void);
+     LocalizationIO_LanguageIDs Localize_GetLanguageID(void);
     
     /*!
      @abstract                             "Creates a string containing the region code (us for America, etc)".
-     @return                               "Returns the string".
+     @return                               "Returns the RegionID".
      */
-    UTF8                 *Localize_UTF8_GetRegion(void);
+    LocalizationIO_RegionIDs    Localize_GetRegionID(void);
     
     /*!
-     @abstract                             "Creates a string containing the region code (us for America, etc)".
-     @return                               "Returns the string".
+     @abstract                             "Gets the encoding".
+     @return                               "Returns the EncodingID".
      */
-    UTF16                *Localize_UTF16_GetRegion(void);
-    
-    /*!
-     @abstract                             "Creates a string containing the encoding (UTF-16 for UTF-16, etc)".
-     @return                               "Returns the string".
-     */
-    UTF8                 *Localize_UTF8_GetEncoding(void);
-    
-    /*!
-     @abstract                             "Creates a string containing the encoding (UTF-8 for UTF-8, etc)".
-     @return                               "Returns the string".
-     */
-    UTF16                *Localize_UTF16_GetEncoding(void);
+    LocalizationIO_EncodingIDs  Localize_GetEncodingID(void);
     
     /*!
      @abstract                             "Creates a string containing the symbol to seperate the main value from the decimal (XXX.YYY)".
