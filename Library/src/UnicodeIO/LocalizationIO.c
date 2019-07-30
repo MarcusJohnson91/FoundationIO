@@ -19,391 +19,124 @@ extern "C" {
         setlocale(LC_TIME, NULL);
     }
     
-    UTF8 *Localize_UTF8_GetLanguage(void) {
-        UTF8 *LanguageName     = NULL;
+    LocalizationIO_LanguageIDs Localize_GetLanguageID(void) {
+        LocalizationIO_LanguageIDs LanguageID = LanguageID_Unknown;
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
         UTF8 *LocaleAll        = setlocale(LC_ALL, NULL);
+        uint8_t EndOffset      = UTF8_FindSubString(LocaleAll, U8("_"), 0, 1);
+        // Now copy the string from 0 to EndOffset
+        UTF8 *LanguageString   = UTF8_ExtractSubString(LocaleAll, 0, EndOffset);
+        // Now we get the size of the language string
         uint64_t StringSize    = UTF8_GetStringSizeInCodeUnits(LocaleAll);
-        if (StringSize > 0) {
-            uint64_t Location  = 0ULL;
-            Location           = UTF8_FindSubString(LocaleAll, U8("-"), 0, -1);
-            if (Location != 0xFFFFFFFFFFFFFFFF) {
-                LanguageName   = calloc(Location + 1, sizeof(UTF8));
-                for (uint64_t LanguageCodeUnit = 0ULL; LanguageCodeUnit < Location; LanguageCodeUnit++) {
-                    LanguageName[LanguageCodeUnit] = LocaleAll[LanguageCodeUnit];
-                }
-            } else {
-                Location       = UTF8_FindSubString(LocaleAll, U8("_"), 0, -1);
-                if (Location != 0xFFFFFFFFFFFFFFFF) {
-                    LanguageName   = calloc(Location + 1, sizeof(UTF8));
-                    for (uint64_t LanguageCodeUnit = 0ULL; LanguageCodeUnit < Location; LanguageCodeUnit++) {
-                        LanguageName[LanguageCodeUnit] = LocaleAll[LanguageCodeUnit];
-                    }
-                }
+        if (StringSize == 2) { // ISO-639-1
+            
+            
+            
+            
+            
+            
+            
+            if (UTF8_Compare(LanguageString, U8("en"))) {
+                LanguageID     = LanguageID_English;
+            } else if (UTF8_Compare(LanguageString, U8("de"))) {
+                LanguageID     = LanguageID_German;
+            } else if (UTF8_Compare(LanguageString, U8("sv"))) {
+                LanguageID     = LanguageID_Swedish;
+            } else if (UTF8_Compare(LanguageString, U8("da"))) {
+                LanguageID     = LanguageID_Danish;
+            } else if (UTF8_Compare(LanguageString, U8("is"))) {
+                LanguageID     = LanguageID_Icelandic;
             }
-        }
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        UTF16 *LocaleAll       = _wsetlocale(LC_ALL, NULL);
-        uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(LocaleAll);
-        if (StringSize > 0) {
-            uint64_t Location  = 0ULL;
-            Location           = UTF16_FindSubString(LocaleAll, U16("-"), 0, -1);
-            if (Location != 0xFFFFFFFFFFFFFFFF) {
-                LanguageName   = calloc(Location + 1, sizeof(UTF16));
-                for (uint64_t LanguageCodeUnit = 0ULL; LanguageCodeUnit < Location; LanguageCodeUnit++) {
-                    LanguageName[LanguageCodeUnit] = LocaleAll[LanguageCodeUnit];
-                }
-            } else {
-                Location       = UTF16_FindSubString(LocaleAll, U16("_"), 0, -1);
-                if (Location != 0xFFFFFFFFFFFFFFFF) {
-                    LanguageName   = calloc(Location + 1, sizeof(UTF16));
-                    for (uint64_t LanguageCodeUnit = 0ULL; LanguageCodeUnit < Location; LanguageCodeUnit++) {
-                        LanguageName[LanguageCodeUnit] = LocaleAll[LanguageCodeUnit];
-                    }
-                }
-            }
-        }
-#endif
-        return LanguageName;
-    }
-    
-    UTF16 *Localize_UTF16_GetLanguage(void) {
-        UTF16 *LanguageName                            = NULL;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
-        UTF8 *LanguageName8                            = NULL;
-        UTF8 *LocaleAll                                = setlocale(LC_ALL, NULL);
-        uint64_t StringSize                            = UTF8_GetStringSizeInCodeUnits(LocaleAll);
-        if (StringSize > 0) {
-            uint64_t Location                          = 0ULL;
-            Location                                   = UTF8_FindSubString(LocaleAll, U8("-"), 0, -1);
-            if (Location != 0xFFFFFFFFFFFFFFFF) {
-                LanguageName8                          = calloc(Location + 1, sizeof(UTF8));
-                for (uint64_t LanguageCodeUnit = 0ULL; LanguageCodeUnit < Location; LanguageCodeUnit++) {
-                    LanguageName[LanguageCodeUnit]     = LocaleAll[LanguageCodeUnit];
-                }
-            } else {
-                Location                               = UTF8_FindSubString(LocaleAll, U8("_"), 0, -1);
-                if (Location != 0xFFFFFFFFFFFFFFFF) {
-                    LanguageName8                      = calloc(Location + 1, sizeof(UTF8));
-                    for (uint64_t LanguageCodeUnit = 0ULL; LanguageCodeUnit < Location; LanguageCodeUnit++) {
-                        LanguageName[LanguageCodeUnit] = LocaleAll[LanguageCodeUnit];
-                    }
-                }
-            }
-        }
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        UTF16 *LocaleAll       = _wsetlocale(LC_ALL, NULL);
-        uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(LocaleAll);
-        if (StringSize > 0) {
-            uint64_t Location  = 0ULL;
-            Location           = UTF16_FindSubString(LocaleAll, U8("-"), 0, -1);
-            if (Location != 0xFFFFFFFFFFFFFFFF) {
-                LanguageName   = calloc(Location + 1, sizeof(UTF16));
-                for (uint64_t LanguageCodeUnit = 0ULL; LanguageCodeUnit < Location; LanguageCodeUnit++) {
-                    LanguageName[LanguageCodeUnit] = LocaleAll[LanguageCodeUnit];
-                }
-            } else {
-                Location       = UTF16_FindSubString(LocaleAll, U8("_"), 0, -1);
-                if (Location != 0xFFFFFFFFFFFFFFFF) {
-                    LanguageName   = calloc(Location + 1, sizeof(UTF16));
-                    for (uint64_t LanguageCodeUnit = 0ULL; LanguageCodeUnit < Location; LanguageCodeUnit++) {
-                        LanguageName[LanguageCodeUnit] = LocaleAll[LanguageCodeUnit];
-                    }
-                }
-            }
-        }
-#endif
-        return LanguageName;
-    }
-    
-    UTF8 *Localize_UTF8_GetRegion(void) {
-        UTF8 *Region                           = NULL;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
-        UTF8     *LocaleAll                    = setlocale(LC_ALL, NULL);
-        uint64_t  StringSize                   = UTF8_GetStringSizeInCodeUnits(LocaleAll);
-        uint64_t  StartOffset                  = 0ULL;
-        uint64_t  DotOffset                    = 0ULL;
-        for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
-            if (LocaleAll[CodeUnit] == '.') {
-                DotOffset                      = CodeUnit;
-            } else if (LocaleAll[CodeUnit] == '-' || LocaleAll[CodeUnit] == '_') {
-                StartOffset                    = CodeUnit;
-                break;
-            }
-        }
-        Region                                 = calloc(DotOffset - StartOffset + FoundationIONULLTerminatorSize, sizeof(UTF8));
-        if (Region != NULL) {
-            for (uint64_t CodeUnit = StartOffset; CodeUnit < DotOffset; CodeUnit++) {
-                Region[CodeUnit - StartOffset] = LocaleAll[CodeUnit - StartOffset];
-            }
-        } else {
-            Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
-        }
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        UTF16    *LocaleAll                      = _wsetlocale(LC_ALL, NULL);
-        uint64_t  StringSize                     = UTF16_GetStringSizeInCodeUnits(LocaleAll);
-        uint64_t  StartOffset                    = 0ULL;
-        uint64_t  DotOffset                      = 0ULL;
-        for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
-            if (LocaleAll[CodeUnit] == '.') {
-                DotOffset                        = CodeUnit;
-            } else if (LocaleAll[CodeUnit] == '-' || LocaleAll[CodeUnit] == '_') {
-                StartOffset                      = CodeUnit;
-                break;
-            }
-        }
-		UTF16 *Region16                          = calloc(DotOffset - StartOffset + FoundationIONULLTerminatorSize, sizeof(UTF16));
-        if (Region16 != NULL) {
-            for (uint64_t CodeUnit = StartOffset; CodeUnit < DotOffset; CodeUnit++) {
-                Region16[CodeUnit - StartOffset] = LocaleAll[CodeUnit - StartOffset];
-            }
-        } else {
-            Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
-        }
-        UTF32 *Region32                          = UTF16_Decode(Region16);
-        free(Region16);
-        Region                                   = UTF8_Encode(Region32);
-        free(Region32);
-#endif
-        return Region;
-    }
-    
-    UTF16 *Localize_UTF16_GetRegion(void) {
-        UTF16 *Region = NULL;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
-        UTF8     *LocaleAll                      = setlocale(LC_ALL, NULL);
-        uint64_t  StringSize                     = UTF8_GetStringSizeInCodeUnits(LocaleAll);
-        uint64_t  StartOffset                    = 0ULL;
-        uint64_t  DotOffset                      = 0ULL;
-        for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
-            if (LocaleAll[CodeUnit] == '.') {
-                DotOffset                        = CodeUnit;
-            } else if (LocaleAll[CodeUnit] == '-' || LocaleAll[CodeUnit] == '_') {
-                StartOffset                      = CodeUnit;
-                break;
-            }
-        }
-        UTF8 *Region8                            = calloc(DotOffset - StartOffset + FoundationIONULLTerminatorSize, sizeof(UTF8));
-        if (Region8 != NULL) {
-            for (uint64_t CodeUnit = StartOffset; CodeUnit < DotOffset; CodeUnit++) {
-                Region8[CodeUnit - StartOffset]  = LocaleAll[CodeUnit - StartOffset];
-            }
-        } else {
-            Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
-        }
-        UTF32 *Region32                          = UTF8_Decode(Region8);
-        free(Region8);
-        Region                                   = UTF16_Encode(Region32);
-        free(Region32);
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        UTF16    *LocaleAll                    = _wsetlocale(LC_ALL, NULL);
-        uint64_t  StringSize                   = UTF16_GetStringSizeInCodeUnits(LocaleAll);
-        uint64_t  StartOffset                  = 0ULL;
-        uint64_t  DotOffset                    = 0ULL;
-        for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
-            if (LocaleAll[CodeUnit] == '.') {
-                DotOffset                      = CodeUnit;
-            } else if (LocaleAll[CodeUnit] == '-' || LocaleAll[CodeUnit] == '_') {
-                StartOffset                    = CodeUnit;
-                break;
-            }
-        }
-        Region                                 = calloc(DotOffset - StartOffset + FoundationIONULLTerminatorSize, sizeof(UTF16));
-        if (Region != NULL) {
-            for (uint64_t CodeUnit = StartOffset; CodeUnit < DotOffset; CodeUnit++) {
-                Region[CodeUnit - StartOffset] = LocaleAll[CodeUnit - StartOffset];
-            }
-        } else {
-            Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), DotOffset - StartOffset + FoundationIONULLTerminatorSize);
-        }
-#endif
-        return Region;
-    }
-    
-    UTF8 *Localize_UTF8_GetEncoding(void) {
-        UTF8 *Region                            = NULL;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
-        UTF8    *Lang                           = getenv(U8("LANG"));
-        uint64_t DotOffset                      = 0ULL;
-        
-        if (Lang != NULL) {
-            uint64_t StringSize                 = UTF8_GetStringSizeInCodeUnits(Lang);
-            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
-                if (Lang[CodeUnit] == '.') {
-                    DotOffset                   = CodeUnit;
-                    break;
-                }
-            }
-            uint64_t EncodingSize               = StringSize - DotOffset;
-            Region                              = calloc(EncodingSize, sizeof(UTF8));
-            if (Region != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
-                    Region[EncodingCodePoint]   = Lang[EncodingCodePoint + DotOffset];
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
-            }
+        } else if (StringSize == 3) { // ISO-639-2
             
         } else {
-            UTF8     *Language                  = getenv(U8("LANGUAGE"));
-            uint64_t  StringSize                = UTF8_GetStringSizeInCodeUnits(Language);
-            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
-                if (Language[CodeUnit] == '.') {
-                    DotOffset                   = CodeUnit;
-                    break;
-                }
-            }
-            uint64_t EncodingSize               = StringSize - DotOffset;
-            Region                              = calloc(EncodingSize, sizeof(UTF8));
-            if (Region != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
-                    Region[EncodingCodePoint]   = Language[EncodingCodePoint + DotOffset];
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
-            }
+            Log(Log_DEBUG, __func__, U8("Invalid Language string length %llu"), StringSize);
         }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        UTF16    *Lang                          = _wgetenv(U16("LANG"));
-        uint64_t  DotOffset                     = 0ULL;
-        
-        if (Lang != NULL) {
-            uint64_t StringSize                 = UTF16_GetStringSizeInCodeUnits(Lang);
-            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
-                if (Lang[CodeUnit] == U16('.')) {
-                    DotOffset                   = CodeUnit;
-                    break;
-                }
-            }
-            uint64_t EncodingSize               = StringSize - DotOffset;
-            Region                              = calloc(EncodingSize, sizeof(UTF16));
-            if (Region != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
-                    Region[EncodingCodePoint]   = Lang[EncodingCodePoint + DotOffset];
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
-            }
-        } else {
-            UTF16    *Language                  = _wgetenv(U16("LANGUAGE"));
-            uint64_t  StringSize                = UTF16_GetStringSizeInCodeUnits(Language);
-            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
-                if (Language[CodeUnit] == U16('.')) {
-                    DotOffset                   = CodeUnit;
-                    break;
-                }
-            }
-            uint64_t EncodingSize               = StringSize - DotOffset;
-            UTF16 *Region16                     = calloc(EncodingSize, sizeof(UTF16));
-            if (Region16 != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
-                    Region16[EncodingCodePoint] = Language[EncodingCodePoint + DotOffset];
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
-            }
-            UTF32 *Region32                     = UTF16_Decode(Region16);
-            free(Region16);
-            Region                              = UTF8_Encode(Region32);
-            free(Region32);
-            
-        }
 #endif
-        return Region;
+        return LanguageID;
     }
     
-    UTF16 *Localize_UTF16_GetEncoding(void) {
-        UTF16 *Region                          = NULL;
+    LocalizationIO_RegionIDs Localize_GetRegionID(void) {
+        LocalizationIO_RegionIDs RegionID = RegionID_Unknown;
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
-        UTF8    *Lang                          = getenv(U8("LANG"));
-        uint64_t DotOffset                     = 0ULL;
+        UTF8 *LocaleAll        = setlocale(LC_ALL, NULL);
         
-        if (Lang != NULL) {
-            uint64_t StringSize                = UTF8_GetStringSizeInCodeUnits(Lang);
-            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
-                if (Lang[CodeUnit] == '.') {
-                    DotOffset                  = CodeUnit;
-                    break;
-                }
-            }
-            uint64_t EncodingSize              = StringSize - DotOffset;
-            UTF8    *Region8                   = calloc(EncodingSize, sizeof(UTF8));
-            if (Region8 != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
-                    Region8[EncodingCodePoint] = Lang[EncodingCodePoint + DotOffset];
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
-            }
-            UTF32 *Region32                   = UTF8_Decode(Region8);
-            free(Region8);
-            Region                            = UTF16_Encode(Region32);
-            free(Region32);
-        } else {
-            UTF8     *Language                = getenv(U8("LANGUAGE"));
-            uint64_t  StringSize              = UTF8_GetStringSizeInCodeUnits(Language);
-            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
-                if (Language[CodeUnit] == '.') {
-                    DotOffset                 = CodeUnit;
-                    break;
-                }
-            }
-            uint64_t EncodingSize              = StringSize - DotOffset;
-            UTF8    *Region8                   = calloc(EncodingSize, sizeof(UTF8));
-            if (Region8 != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
-                    Region8[EncodingCodePoint] = Language[EncodingCodePoint + DotOffset];
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
-            }
-            UTF32 *Region32                    = UTF8_Decode(Region8);
-            free(Region8);
-            Region                             = UTF16_Encode(Region32);
-            free(Region32);
+        
+        
+        
+        
+        uint64_t StringSize    = UTF8_GetStringSizeInCodeUnits(LocaleAll);
+        if (StringSize == 2) { // ISO-639-1
+            
+        } else if (StringSize == 3) { // ISO-639-2
+            
         }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        UTF16    *Lang                         = _wgetenv(U16("LANG"));
-        uint64_t  DotOffset                    = 0ULL;
-        
-        if (Lang != NULL) {
-            uint64_t StringSize                = UTF16_GetStringSizeInCodeUnits(Lang);
-            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
-                if (Lang[CodeUnit] == U16('.')) {
-                    DotOffset                  = CodeUnit;
-                    break;
+#endif
+        return RegionID;
+    }
+    
+    LocalizationIO_EncodingIDs Localize_GetEncodingID(void) {
+        LocalizationIO_EncodingIDs Encoding = EncodingID_Unknown;
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+        lconv_Init();
+        UTF8 *LocaleString              = getenv(U8("LANG"));
+        if (LocaleString != NULL) {
+            uint64_t StringSize         = UTF8_GetStringSizeInCodeUnits(LocaleString);
+            uint64_t Offset             = UTF8_FindSubString(LocaleString, U8("."), 0, 1);
+            UTF8    *EncodingString     = UTF8_ExtractSubString(LocaleString, Offset, StringSize - Offset);
+            uint64_t EncodingStringSize = UTF8_GetStringSizeInCodeUnits(EncodingString);
+            if (EncodingStringSize == 4) {
+                if (UTF8_Compare(EncodingString, U8("utf8")) || UTF8_Compare(EncodingString, U8("UTF8"))) {
+                    Encoding            = EncodingID_UTF8;
+                }
+            } else if (EncodingStringSize == 5) {
+                if (UTF8_Compare(EncodingString, U8("utf-8")) || UTF8_Compare(EncodingString, U8("UTF-8")) || UTF8_Compare(EncodingString, U8("utf_8")) || UTF8_Compare(EncodingString, U8("UTF_8"))) {
+                    Encoding            = EncodingID_UTF8;
+                } else if (UTF8_Compare(EncodingString, U8("utf16")) || UTF8_Compare(EncodingString, U8("UTF16"))) {
+                    Encoding            = EncodingID_UTF16;
+                } else if (UTF8_Compare(EncodingString, U8("utf32")) || UTF8_Compare(EncodingString, U8("UTF32"))) {
+                    Encoding            = EncodingID_UTF32;
+                }
+            } else if (EncodingStringSize == 6) {
+                if (UTF8_Compare(EncodingString, U8("utf-16")) || UTF8_Compare(EncodingString, U8("UTF-16")) || UTF8_Compare(EncodingString, U8("utf_16")) || UTF8_Compare(EncodingString, U8("UTF_16"))) {
+                    Encoding            = EncodingID_UTF16;
+                } else if (UTF8_Compare(EncodingString, U8("utf-32")) || UTF8_Compare(EncodingString, U8("UTF-32")) || UTF8_Compare(EncodingString, U8("utf_32")) || UTF8_Compare(EncodingString, U8("UTF_32"))) {
+                    Encoding            = EncodingID_UTF32;
                 }
             }
-            uint64_t EncodingSize              = StringSize - DotOffset;
-            Region                             = calloc(EncodingSize, sizeof(UTF16));
-            if (Region != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
-                    Region[EncodingCodePoint]  = Lang[EncodingCodePoint + DotOffset];
+        }
+#elif (FoundationIOTargetOS == FoundtionIOWindowsOS)
+        lconv_Init();
+        UTF16 *LocaleString             = getenv(U16("LANG"));
+        if (LocaleString != NULL) {
+            uint64_t StringSize         = UTF16_GetStringSizeInCodeUnits(LocaleString);
+            uint64_t Offset             = UTF16_FindSubString(LocaleString, U16("."), 0, 1);
+            UTF8    *EncodingString     = UTF16_ExtractSubString(LocaleString, Offset, StringSize - Offset);
+            uint64_t EncodingStringSize = UTF16_GetStringSizeInCodeUnits(EncodingString);
+            if (EncodingStringSize == 4) {
+                if (UTF16_Compare(EncodingString, U16("utf8")) || UTF16_Compare(EncodingString, U16("UTF8"))) {
+                    Encoding            = EncodingID_UTF8;
                 }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
-            }
-        } else {
-            UTF16    *Language                 = _wgetenv(U16("LANGUAGE"));
-            uint64_t  StringSize               = UTF16_GetStringSizeInCodeUnits(Language);
-            for (uint64_t CodeUnit = StringSize; CodeUnit > 0; CodeUnit--) {
-                if (Language[CodeUnit] == U16('.')) {
-                    DotOffset                  = CodeUnit;
-                    break;
+            } else if (EncodingStringSize == 5) {
+                if (UTF16_Compare(EncodingString, U16("utf-8")) || UTF16_Compare(EncodingString, U16("UTF-8")) || UTF16_Compare(EncodingString, U16("utf_8")) || UTF16_Compare(EncodingString, U16("UTF_8"))) {
+                    Encoding            = EncodingID_UTF8;
+                } else if (UTF16_Compare(EncodingString, U16("utf16")) || UTF16_Compare(EncodingString, U16("UTF16"))) {
+                    Encoding            = EncodingID_UTF16;
+                } else if (UTF16_Compare(EncodingString, U16("utf32")) || UTF16_Compare(EncodingString, U16("UTF32"))) {
+                    Encoding            = EncodingID_UTF32;
                 }
-            }
-            uint64_t EncodingSize              = StringSize - DotOffset;
-            Region                             = calloc(EncodingSize, sizeof(UTF16));
-            if (Region != NULL) {
-                for (uint64_t EncodingCodePoint = 0ULL; EncodingCodePoint < EncodingSize; EncodingCodePoint++) {
-                    Region[EncodingCodePoint]  = Language[EncodingCodePoint + DotOffset];
+            } else if (EncodingStringSize == 6) {
+                if (UTF16_Compare(EncodingString, U16("utf-16")) || UTF16_Compare(EncodingString, U16("UTF-16")) || UTF16_Compare(EncodingString, U16("utf_16")) || UTF16_Compare(EncodingString, U16("UTF_16"))) {
+                    Encoding            = EncodingID_UTF16;
+                } else if (UTF16_Compare(EncodingString, U16("utf-32")) || UTF16_Compare(EncodingString, U16("UTF-32")) || UTF16_Compare(EncodingString, U16("utf_32")) || UTF16_Compare(EncodingString, U16("UTF_32"))) {
+                    Encoding            = EncodingID_UTF32;
                 }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld CodeUnits"), EncodingSize);
             }
         }
 #endif
-        return Region;
+        return Encoding;
     }
     
     UTF8 *Localize_UTF8_GetDecimalSeperator(void) {
