@@ -940,20 +940,20 @@ extern "C" {
     UTF32                *UTF32_Reverse(UTF32 *String);
     
     /*!
-     @abstract                             "Reads a CodePoint from Source".
+     @abstract                             "Reads a Grapheme from Source".
      @remark                               "Replaces Fgetc and getc".
      @param               Source           "The file to read from".
      @return                               "Returns the UTF-8 encoded codepoint which will be between 1-4 CodeUnits".
      */
-    UTF8                 *UTF8_ReadCodePoint(FILE *Source);
+    UTF8                 *UTF8_ReadGrapheme(FILE *Source);
     
     /*!
-     @abstract                             "Reads a CodePoint from Source".
+     @abstract                             "Reads a Grapheme from Source".
      @remark                               "Replaces Fgetwc and getwc".
      @param               Source           "The file to read from".
      @return                               "Returns the UTF-16 encoded codepoint which will be between 1-2 CodeUnits".
      */
-    UTF16                *UTF16_ReadCodePoint(FILE *Source);
+    UTF16                *UTF16_ReadGrapheme(FILE *Source);
     
     /*!
      @abstract                             "Writes a CodePoint to Source".
@@ -961,7 +961,7 @@ extern "C" {
      @param               Source           "The file to write to".
      @param               CodePoint        "An array of CodeUnits containing one codepoint".
      */
-    void                  UTF8_WriteCodePoint(FILE *Source, UTF8 *CodePoint);
+    void                  UTF8_WriteGrapheme(FILE *Source, UTF8 *CodePoint);
     
     /*!
      @abstract                             "Writes a CodePoint to Source".
@@ -969,7 +969,7 @@ extern "C" {
      @param               Source           "The file to write to".
      @param               CodePoint        "An array of CodeUnits containing one codepoint".
      */
-    void                  UTF16_WriteCodePoint(FILE *Source, UTF16 *CodePoint);
+    void                  UTF16_WriteGrapheme(FILE *Source, UTF16 *CodePoint);
     
     /*!
      @abstract                             "Reads a Line (Including mewline) from Source".
@@ -1004,14 +1004,6 @@ extern "C" {
     void                  UTF16_WriteLine(FILE *OutputFile, UTF16 *String);
     
     /*!
-     @abstract                             "Writes a Line (Including mewline) to Source".
-     @remark                               "Replaces Fputws and putws".
-     @param               OutputFile       "The file to write the string to".
-     @param               String           "The String to write".
-     */
-    void                  UTF32_WriteLine(FILE *OutputFile, UTF32 *String);
-    
-    /*!
      @abstract                             "Counts the number of Format Specifiers in String".
      @param               String           "The string to check".
      @return                               "Returns the number of format specifiers found".
@@ -1031,6 +1023,15 @@ extern "C" {
      @return                               "Returns the number of format specifiers found".
      */
     uint64_t              UTF32_GetNumFormatSpecifiers(UTF32 *String);
+    
+    /*!
+     @abstract                             "Counts the number of Digits in String starting at Offset (inclusive)".
+     @param               Base             "The base the string is in".
+     @param               String           "The string to check".
+     @param               Offset           "Where to start looking for digits".
+     @return                               "Returns the number of format specifiers found".
+     */
+    uint64_t              UTF32_GetNumDigits(StringIOBases Base, UTF32 *String, uint64_t Offset);
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
@@ -1269,7 +1270,7 @@ extern "C" {
     
 #define GetNumFormatSpecifiers(String)    _Generic((String), UTF8:UTF8_GetNumFormatSpecifiers, UTF8*:UTF8_GetNumFormatSpecifiers, UTF16:UTF16_GetNumFormatSpecifiers, UTF16*:UTF16_GetNumFormatSpecifiers, UTF32:UTF32_GetNumFormatSpecifiers, UTF32*:UTF32_GetNumFormatSpecifiers)(String)
     
-#define WriteString(Stream,String)        _Generic((String), UTF8:UTF8_WriteLine, UTF8*:UTF8_WriteLine, UTF16:UTF16_WriteLine, UTF16*:UTF16_WriteLine, UTF32:UTF32_WriteLine, UTF32*:UTF32_WriteLine)(Stream, String)
+#define WriteString(Stream,String)        _Generic((String), UTF8:UTF8_WriteLine, UTF8*:UTF8_WriteLine, UTF16:UTF16_WriteLine, UTF16*:UTF16_WriteLine)(Stream, String)
     
 #define Clone(String)                     _Generic((String), UTF8:UTF8_Clone, UTF8*:UTF8_Clone, UTF16:UTF16_Clone, UTF16*:UTF16_Clone, UTF32:UTF32_Clone, UTF32*:UTF32_Clone)(String)
     

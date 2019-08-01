@@ -191,6 +191,149 @@ extern "C" {
         return NumGraphemes;
     }
     
+    uint64_t UTF8_GetNumFormatSpecifiers(UTF8 *String) {
+        uint64_t StringSizeInCodeUnits = UTF8_GetStringSizeInCodeUnits(String);
+        uint64_t NumSpecifiers         = 0ULL;
+        uint64_t CodeUnit              = 0ULL;
+        if (String != NULL) {
+            do {
+                if (CodeUnit + 1 < StringSizeInCodeUnits) {
+                    if (String[CodeUnit] == '%' && String[CodeUnit + 1] == '%') {
+                        NumSpecifiers += 1;
+                        CodeUnit      += 2;
+                    }
+                }
+                if (String[CodeUnit] == '%' || String[CodeUnit] == '\\') {
+                    NumSpecifiers     += 1;
+                }
+                CodeUnit              += 1;
+            } while (CodeUnit < StringSizeInCodeUnits);
+        } else {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return NumSpecifiers;
+    }
+    
+    uint64_t UTF16_GetNumFormatSpecifiers(UTF16 *String) {
+        uint64_t StringSizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(String);
+        uint64_t NumSpecifiers         = 0ULL;
+        uint64_t CodeUnit              = 0ULL;
+        if (String != NULL) {
+            do {
+                if (CodeUnit + 1 < StringSizeInCodeUnits) {
+                    if (String[CodeUnit] == U16('%') && String[CodeUnit + 1] == U16('%')) {
+                        NumSpecifiers += 1;
+                        CodeUnit      += 2;
+                    }
+                }
+                if (String[CodeUnit] == U16('%') || String[CodeUnit] == U16('\\')) {
+                    NumSpecifiers     += 1;
+                }
+                CodeUnit              += 1;
+            } while (CodeUnit < StringSizeInCodeUnits);
+        } else {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return NumSpecifiers;
+    }
+    
+    uint64_t UTF32_GetNumFormatSpecifiers(UTF32 *String) {
+        uint64_t StringSizeInCodeUnits = UTF32_GetStringSizeInCodePoints(String);
+        uint64_t NumSpecifiers         = 0ULL;
+        uint64_t CodeUnit              = 0ULL;
+        if (String != NULL) {
+            do {
+                if (CodeUnit + 1 < StringSizeInCodeUnits) {
+                    if (String[CodeUnit] == U32('%') && String[CodeUnit + 1] == U32('%')) {
+                        NumSpecifiers += 1;
+                        CodeUnit      += 2;
+                    }
+                }
+                if (String[CodeUnit] == U32('%') || String[CodeUnit] == U32('\\')) {
+                    NumSpecifiers     += 1;
+                }
+                CodeUnit              += 1;
+            } while (CodeUnit < StringSizeInCodeUnits);
+        } else {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return NumSpecifiers;
+    }
+    
+    UTF8 *UTF8_ExtractGrapheme(UTF8 *String, uint64_t Grapheme2Extract) {
+        UTF8 *Grapheme        = NULL;
+        if (String != NULL) {
+            UTF32 *String32   = UTF8_Decode(String);
+            UTF32 *Grapheme32 = UTF32_ExtractGrapheme(String32, Grapheme2Extract);
+            free(String32);
+            Grapheme          = UTF8_Encode(Grapheme32);
+            free(Grapheme32);
+        } else {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return Grapheme;
+    }
+    
+    UTF16 *UTF16_ExtractGrapheme(UTF16 *String, uint64_t Grapheme2Extract) {
+        UTF16 *Grapheme        = NULL;
+        if (String != NULL) {
+            UTF32 *String32   = UTF16_Decode(String);
+            UTF32 *Grapheme32 = UTF32_ExtractGrapheme(String32, Grapheme2Extract);
+            free(String32);
+            Grapheme          = UTF16_Encode(Grapheme32);
+            free(Grapheme32);
+        } else {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return Grapheme;
+    }
+    
+    UTF32 *UTF32_ExtractGrapheme(UTF32 *String, uint64_t Grapheme2Extract) {
+        UTF32 *Grapheme                    = NULL;
+        if (String != NULL) {
+            uint64_t NumCodePointsInString = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t NumGraphemesInString  = UTF32_GetStringSizeInGraphemes(String);
+            uint64_t CurrentGrapheme       = 0ULL;
+            uint64_t CodePointStart        = 0ULL;
+            if (Grapheme2Extract < NumGraphemesInString) {
+                for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePointsInString; CodePoint++) {
+                    for (uint64_t GraphemeCodePoint = 0ULL; GraphemeCodePoint < GraphemeExtensionTableSize; GraphemeCodePoint++) {
+                        if (String[CodePoint] == GraphemeExtensionTable[GraphemeCodePoint]) {
+                            CurrentGrapheme                         += 1;
+                        }
+                        if (CurrentGrapheme == Grapheme2Extract) {
+                            CodePointStart                           = CodePoint;
+                            break;
+                        }
+                    }
+                }
+                uint64_t GraphemeSizeInCodePoints                    = 0ULL;
+                for (uint64_t CodePoint = CodePointStart; CodePoint < NumCodePointsInString; CodePoint++) {
+                    for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
+                        if (String[CodePoint] == GraphemeExtensionTable[GraphemeExtension]) {
+                            GraphemeSizeInCodePoints                += 1;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                Grapheme                                             = calloc(GraphemeSizeInCodePoints, sizeof(UTF32));
+                if (Grapheme != NULL) {
+                    for (uint64_t GraphemeCodePoint = CodePointStart; GraphemeCodePoint < CodePointStart + GraphemeSizeInCodePoints; GraphemeCodePoint++) {
+                        Grapheme[GraphemeCodePoint - CodePointStart] = String[GraphemeCodePoint];
+                    }
+                } else {
+                    Log(Log_DEBUG, __func__, U8("Couldn't allocate %llu CodePoints for the Grapheme"), GraphemeSizeInCodePoints);
+                }
+            } else {
+                Log(Log_DEBUG, __func__, U8("Grapheme %llu is greater than there are Graphemes %llu"), Grapheme2Extract, NumGraphemesInString);
+            }
+        } else {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return Grapheme;
+    }
+    
     bool UTF8_HasBOM(UTF8 *String) {
         bool StringHasABOM        = No;
         if (String != NULL) {
@@ -928,10 +1071,10 @@ extern "C" {
         return Truncated;
     }
     
-    UTF8 *UTF8_ReadCodePoint(FILE *Source) { // Replaces fgetc and getc
+    UTF8 *UTF8_ReadGrapheme(FILE *Source) {
         UTF8 *CodePoint           = NULL;
         if (Source != NULL) {
-            UTF8 Byte             = {0};
+            UTF8 Byte             = 0;
             fread(&Byte, sizeof(UTF8), 1, Source);
             uint8_t CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Byte);
             CodePoint             = calloc(CodePointSize, sizeof(UTF8));
@@ -942,7 +1085,7 @@ extern "C" {
         return CodePoint;
     }
     
-    UTF16 *UTF16_ReadCodePoint(FILE *Source) { // replaces fgetwc and getwc
+    UTF16 *UTF16_ReadGrapheme(FILE *Source) {
         UTF16 *CodePoint          = NULL;
         if (Source != NULL) {
             UTF16 CodeUnit        = 0;
@@ -959,7 +1102,7 @@ extern "C" {
     UTF8 *UTF8_ReadGraphemeFromFile(FILE *Source) { // Replaces fgetc and getc
         UTF8 *CodePoint           = NULL;
         if (Source != NULL) {
-            UTF8 Byte             = {0};
+            UTF8 Byte             = 0;
             fread(&Byte, sizeof(UTF8), 1, Source);
             uint8_t CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Byte);
             CodePoint             = calloc(CodePointSize, sizeof(UTF8));
@@ -984,7 +1127,7 @@ extern "C" {
         return CodePoint;
     }
     
-    void UTF8_WriteCodePoint(FILE *Source, UTF8 *CodePoint) { // Replaces fputc and putc
+    void UTF8_WriteGrapheme(FILE *Source, UTF8 *CodePoint) { // Replaces fputc and putc
         if (Source != NULL) {
             uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(CodePoint);
             fwrite(CodePoint, StringSize, 1, Source);
@@ -993,7 +1136,7 @@ extern "C" {
         }
     }
     
-    void UTF16_WriteCodePoint(FILE *Source, UTF16 *CodePoint) { // replaces fputwc and putwc
+    void UTF16_WriteGrapheme(FILE *Source, UTF16 *CodePoint) { // replaces fputwc and putwc
         if (Source != NULL) {
             uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(CodePoint);
             fwrite(CodePoint, StringSize, 1, Source);
@@ -1014,7 +1157,7 @@ extern "C" {
                  Loop reading a codepoint each time until we find one that is a new line character.
                  */
                 StringSizeInCodePoints     += 1;
-                UTF8 *CodePoint             = UTF8_ReadCodePoint(Source);
+                UTF8 *CodePoint             = UTF8_ReadGrapheme(Source);
                 CurrentCodePoint            = UTF8_Decode(CodePoint);
             } while (CurrentCodePoint[0] != U32('\n') || CurrentCodePoint[0] != FoundationIONULLTerminator); // FIXME: Use our newline array
             // Now we need to allocate memory for that string
@@ -1037,7 +1180,7 @@ extern "C" {
                  Loop reading a codepoint each time until we find one that is a new line character.
                  */
                 StringSizeInCodePoints     += 1;
-                UTF16 *CodePoint            = UTF16_ReadCodePoint(Source);
+                UTF16 *CodePoint            = UTF16_ReadGrapheme(Source);
                 CurrentCodePoint            = UTF16_Decode(CodePoint);
             } while (CurrentCodePoint[0] != U32('\n') || CurrentCodePoint[0] != FoundationIONULLTerminator);
             // Now we need to allocate memory for that string
@@ -1107,39 +1250,6 @@ extern "C" {
                 }
                 if (CodeUnitsWritten != StringSize) {
                     Log(Log_DEBUG, __func__, U8("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
-                }
-            }
-        } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
-        } else if (OutputFile == NULL) {
-            Log(Log_DEBUG, __func__, U8("FILE Pointer is NULL"));
-        }
-    }
-    
-    void UTF32_WriteLine(FILE *OutputFile, UTF32 *String) { // Replaces Fputws and putws
-        if (String != NULL && OutputFile != NULL) {
-            int      StreamMode        = fwide(OutputFile, 0);
-            uint64_t CodeUnit          = 0ULL;
-            uint64_t CodeUnitsWritten  = 0ULL;
-            bool     StringHasNewLine  = UTF32_HasNewLine(String);
-            if (StreamMode > 0) { // UTF-16
-                UTF16 *String16        = UTF16_Encode(String);
-                do {
-                    CodeUnitsWritten   = fwrite(&String16[CodeUnit], sizeof(UTF16), 1, OutputFile);
-                } while (String[CodeUnit] != FoundationIONULLTerminator);
-                
-                if (StringHasNewLine == No) {
-                    fwrite(FoundationIONewLine16, FoundationIONewLine16Size, 1, OutputFile);
-                }
-            } else if (StreamMode < 0) { // UTF-8
-                UTF8  *String8         = UTF8_Encode(String);
-                do {
-                    CodeUnitsWritten   = fwrite(&String8[CodeUnit], sizeof(UTF8), 1, OutputFile);
-                } while (String[CodeUnit] != FoundationIONULLTerminator);
-                free(String8);
-                
-                if (StringHasNewLine == No) {
-                    fwrite(FoundationIONewLine8, FoundationIONewLine8Size, 1, OutputFile);
                 }
             }
         } else if (String == NULL) {
@@ -1290,80 +1400,6 @@ extern "C" {
             Log(Log_DEBUG, __func__, U8("Offset %llu + Length %lld is larger than String %llu"), Length, Offset, StringSize);
         }
         return ExtractedString;
-    }
-    
-    UTF8 *UTF8_ExtractGrapheme(UTF8 *String, uint64_t Grapheme2Extract) {
-        UTF8 *Grapheme        = NULL;
-        if (String != NULL) {
-            UTF32 *String32   = UTF8_Decode(String);
-            UTF32 *Grapheme32 = UTF32_ExtractGrapheme(String32, Grapheme2Extract);
-            free(String32);
-            Grapheme          = UTF8_Encode(Grapheme32);
-            free(Grapheme32);
-        } else {
-            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
-        }
-        return Grapheme;
-    }
-    
-    UTF16 *UTF16_ExtractGrapheme(UTF16 *String, uint64_t Grapheme2Extract) {
-        UTF16 *Grapheme        = NULL;
-        if (String != NULL) {
-            UTF32 *String32   = UTF16_Decode(String);
-            UTF32 *Grapheme32 = UTF32_ExtractGrapheme(String32, Grapheme2Extract);
-            free(String32);
-            Grapheme          = UTF16_Encode(Grapheme32);
-            free(Grapheme32);
-        } else {
-            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
-        }
-        return Grapheme;
-    }
-    
-    UTF32 *UTF32_ExtractGrapheme(UTF32 *String, uint64_t Grapheme2Extract) {
-        UTF32 *Grapheme                    = NULL;
-        if (String != NULL) {
-            uint64_t NumCodePointsInString = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t NumGraphemesInString  = UTF32_GetStringSizeInGraphemes(String);
-            uint64_t CurrentGrapheme       = 0ULL;
-            uint64_t CodePointStart        = 0ULL;
-            if (Grapheme2Extract < NumGraphemesInString) {
-                for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePointsInString; CodePoint++) {
-                    for (uint64_t GraphemeCodePoint = 0ULL; GraphemeCodePoint < GraphemeExtensionTableSize; GraphemeCodePoint++) {
-                        if (String[CodePoint] == GraphemeExtensionTable[GraphemeCodePoint]) {
-                            CurrentGrapheme                         += 1;
-                        }
-                        if (CurrentGrapheme == Grapheme2Extract) {
-                            CodePointStart                           = CodePoint;
-                            break;
-                        }
-                    }
-                }
-                uint64_t GraphemeSizeInCodePoints                    = 0ULL;
-                for (uint64_t CodePoint = CodePointStart; CodePoint < NumCodePointsInString; CodePoint++) {
-                    for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
-                        if (String[CodePoint] == GraphemeExtensionTable[GraphemeExtension]) {
-                            GraphemeSizeInCodePoints                += 1;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                Grapheme                                             = calloc(GraphemeSizeInCodePoints, sizeof(UTF32));
-                if (Grapheme != NULL) {
-                    for (uint64_t GraphemeCodePoint = CodePointStart; GraphemeCodePoint < CodePointStart + GraphemeSizeInCodePoints; GraphemeCodePoint++) {
-                        Grapheme[GraphemeCodePoint - CodePointStart] = String[GraphemeCodePoint];
-                    }
-                } else {
-                    Log(Log_DEBUG, __func__, U8("Couldn't allocate %llu CodePoints for the Grapheme"), GraphemeSizeInCodePoints);
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Grapheme %llu is greater than there are Graphemes %llu"), Grapheme2Extract, NumGraphemesInString);
-            }
-        } else {
-            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
-        }
-        return Grapheme;
     }
     
     UTF8  *UTF8_ReplaceSubString(UTF8 *String, UTF8 *Replacement, uint64_t Offset, uint64_t Length) {
@@ -2524,249 +2560,6 @@ extern "C" {
         return Trimmed;
     }
     
-    /* StringArray Functions */
-    UTF8 **UTF8_StringArray_Init(uint64_t NumStrings) {
-        UTF8 **StringArray = NULL;
-        if (NumStrings > 0) {
-            StringArray    = calloc(NumStrings, sizeof(UTF8*));
-        } else {
-            Log(Log_DEBUG, __func__, U8("NumStrings %llu is invalid"), NumStrings);
-        }
-        return StringArray;
-    }
-    
-    UTF16 **UTF16_StringArray_Init(uint64_t NumStrings) {
-        UTF16 **StringArray = NULL;
-        if (NumStrings > 0) {
-            StringArray    = calloc(NumStrings, sizeof(UTF16*));
-        } else {
-            Log(Log_DEBUG, __func__, U8("NumStrings %llu is invalid"), NumStrings);
-        }
-        return StringArray;
-    }
-    
-    UTF32 **UTF32_StringArray_Init(uint64_t NumStrings) {
-        UTF32 **StringArray = NULL;
-        if (NumStrings > 0) {
-            StringArray    = calloc(NumStrings, sizeof(UTF32*));
-        } else {
-            Log(Log_DEBUG, __func__, U8("NumStrings %llu is invalid"), NumStrings);
-        }
-        return StringArray;
-    }
-    
-    void UTF8_StringArray_Attach(UTF8 **StringArray, UTF8 *String2Attach, uint64_t Index) {
-        if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
-            StringArray[Index] = String2Attach;
-        } else if (StringArray == NULL) {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        } else if (String2Attach == NULL) {
-            Log(Log_DEBUG, __func__, U8("String2Attach Pointer is NULL"));
-        }
-    }
-    
-    void UTF16_StringArray_Attach(UTF16 **StringArray, UTF16 *String2Attach, uint64_t Index) {
-        if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
-            StringArray[Index] = String2Attach;
-        } else if (StringArray == NULL) {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        } else if (String2Attach == NULL) {
-            Log(Log_DEBUG, __func__, U8("String2Attach Pointer is NULL"));
-        }
-    }
-    
-    void UTF32_StringArray_Attach(UTF32 **StringArray, UTF32 *String2Attach, uint64_t Index) {
-        if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
-            StringArray[Index] = String2Attach;
-        } else if (StringArray == NULL) {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        } else if (String2Attach == NULL) {
-            Log(Log_DEBUG, __func__, U8("String2Attach Pointer is NULL"));
-        }
-    }
-    
-    uint64_t UTF8_StringArray_GetNumStrings(UTF8 **StringArray) {
-        uint64_t NumStrings = 0ULL;
-        if (StringArray != NULL) {
-            do {
-                NumStrings += 1;
-            } while (StringArray[NumStrings] != NULL);
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-        return NumStrings;
-    }
-    
-    uint64_t UTF16_StringArray_GetNumStrings(UTF16 **StringArray) {
-        uint64_t NumStrings = 0ULL;
-        if (StringArray != NULL) {
-            do {
-                NumStrings += 1;
-            } while (StringArray[NumStrings] != NULL);
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-        return NumStrings;
-    }
-    
-    uint64_t UTF32_StringArray_GetNumStrings(UTF32 **StringArray) {
-        uint64_t NumStrings = 0ULL;
-        if (StringArray != NULL) {
-            do {
-                NumStrings += 1;
-            } while (StringArray[NumStrings] != NULL);
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-        return NumStrings;
-    }
-    
-    uint64_t *UTF8_StringArray_GetStringSizesInCodeUnits(UTF8 **StringArray) {
-        uint64_t *StringArraySizes       = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings          = UTF8_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
-            for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringArraySizes[String] = UTF8_GetStringSizeInCodeUnits(StringArray[String]);
-            }
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-        return StringArraySizes;
-    }
-    
-    uint64_t *UTF16_StringArray_GetStringSizesInCodeUnits(UTF16 **StringArray) {
-        uint64_t *StringArraySizes       = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings          = UTF16_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
-            for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringArraySizes[String] = UTF16_GetStringSizeInCodeUnits(StringArray[String]);
-            }
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-        return StringArraySizes;
-    }
-    
-    uint64_t *UTF8_StringArray_GetStringSizesInCodePoints(UTF8 **StringArray) {
-        uint64_t *StringArraySizes       = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings          = UTF8_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
-            for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringArraySizes[String] = UTF8_GetStringSizeInCodePoints(StringArray[String]);
-            }
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-        return StringArraySizes;
-    }
-    
-    uint64_t *UTF16_StringArray_GetStringSizesInCodePoints(UTF16 **StringArray) {
-        uint64_t *StringArraySizes       = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings          = UTF16_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
-            for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringArraySizes[String] = UTF16_GetStringSizeInCodePoints(StringArray[String]);
-            }
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-        return StringArraySizes;
-    }
-    
-    uint64_t *UTF32_StringArray_GetStringSizesInCodePoints(UTF32 **StringArray) {
-        uint64_t *StringArraySizes       = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings          = UTF32_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
-            for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringArraySizes[String] = UTF32_GetStringSizeInCodePoints(StringArray[String]);
-            }
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-        return StringArraySizes;
-    }
-    
-    UTF32 **UTF8_StringArray_Decode(UTF8 **StringArray) {
-        UTF32 **Decoded             = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings     = UTF8_StringArray_GetNumStrings(StringArray);
-            Decoded                 = calloc(NumStrings + 1, sizeof(UTF32*));
-            if (Decoded != NULL) {
-                for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                    Decoded[String] = UTF8_Decode(StringArray[String]);
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate decoded StringArray"));
-            }
-            
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-        return Decoded;
-    }
-    
-    UTF32 **UTF16_StringArray_Decode(UTF16 **StringArray) {
-        UTF32 **Decoded             = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings     = UTF16_StringArray_GetNumStrings(StringArray);
-            Decoded                 = calloc(NumStrings + 1, sizeof(UTF32*));
-            if (Decoded != NULL) {
-                for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                    Decoded[String] = UTF16_Decode(StringArray[String]);
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate decoded StringArray"));
-            }
-            
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-        return Decoded;
-    }
-    
-    UTF8 **UTF8_StringArray_Encode(UTF32 **StringArray) {
-        UTF8 **Encoded              = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings     = UTF32_StringArray_GetNumStrings(StringArray);
-            Encoded                 = calloc(NumStrings + 1, sizeof(UTF8*));
-            if (Encoded != NULL) {
-                for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                    Encoded[String] = UTF8_Encode(StringArray[String]);
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate decoded StringArray"));
-            }
-            
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-        return Encoded;
-    }
-    
-    UTF16 **UTF16_StringArray_Encode(UTF32 **StringArray) {
-        UTF16 **Encoded             = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings     = UTF32_StringArray_GetNumStrings(StringArray);
-            Encoded                 = calloc(NumStrings + 1, sizeof(UTF16*));
-            if (Encoded != NULL) {
-                for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                    Encoded[String] = UTF16_Encode(StringArray[String]);
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate decoded StringArray"));
-            }
-            
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-        return Encoded;
-    }
-    
     UTF8 **UTF8_Split(UTF8 *String, UTF8 **Delimiters) {
         UTF8 **SplitString        = NULL;
         if (String != NULL && Delimiters != NULL) {
@@ -2871,112 +2664,6 @@ extern "C" {
             Log(Log_DEBUG, __func__, U8("Delimiters Pointer is NULL"));
         }
         return SplitStrings;
-    }
-    
-    void UTF8_StringArray_Deinit(UTF8 **StringArray) {
-        if (StringArray != NULL) {
-            uint64_t NumStrings = UTF8_StringArray_GetNumStrings(StringArray);
-            for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                free(StringArray[String]);
-            }
-            free(StringArray);
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-    }
-    
-    void UTF16_StringArray_Deinit(UTF16 **StringArray) {
-        if (StringArray != NULL) {
-            uint64_t NumStrings = UTF16_StringArray_GetNumStrings(StringArray);
-            for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                free(StringArray[String]);
-            }
-            free(StringArray);
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-    }
-    
-    void UTF32_StringArray_Deinit(UTF32 **StringArray) {
-        if (StringArray != NULL) {
-            uint64_t NumStrings = UTF32_StringArray_GetNumStrings(StringArray);
-            for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                free(StringArray[String]);
-            }
-            free(StringArray);
-        } else {
-            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
-        }
-    }
-    /* StringArray Functions */
-    
-    uint64_t UTF8_GetNumFormatSpecifiers(UTF8 *String) {
-        uint64_t StringSizeInCodeUnits = UTF8_GetStringSizeInCodeUnits(String);
-        uint64_t NumSpecifiers         = 0ULL;
-        uint64_t CodeUnit              = 0ULL;
-        if (String != NULL) {
-            do {
-                if (CodeUnit + 1 < StringSizeInCodeUnits) {
-                    if (String[CodeUnit] == '%' && String[CodeUnit + 1] == '%') {
-                        NumSpecifiers += 1;
-                        CodeUnit      += 2;
-                    }
-                }
-                if (String[CodeUnit] == '%' || String[CodeUnit] == '\\') {
-                    NumSpecifiers     += 1;
-                }
-                CodeUnit              += 1;
-            } while (CodeUnit < StringSizeInCodeUnits);
-        } else {
-            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
-        }
-        return NumSpecifiers;
-    }
-    
-    uint64_t UTF16_GetNumFormatSpecifiers(UTF16 *String) {
-        uint64_t StringSizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(String);
-        uint64_t NumSpecifiers         = 0ULL;
-        uint64_t CodeUnit              = 0ULL;
-        if (String != NULL) {
-            do {
-                if (CodeUnit + 1 < StringSizeInCodeUnits) {
-                    if (String[CodeUnit] == U16('%') && String[CodeUnit + 1] == U16('%')) {
-                        NumSpecifiers += 1;
-                        CodeUnit      += 2;
-                    }
-                }
-                if (String[CodeUnit] == U16('%') || String[CodeUnit] == U16('\\')) {
-                    NumSpecifiers     += 1;
-                }
-                CodeUnit              += 1;
-            } while (CodeUnit < StringSizeInCodeUnits);
-        } else {
-            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
-        }
-        return NumSpecifiers;
-    }
-    
-    uint64_t UTF32_GetNumFormatSpecifiers(UTF32 *String) {
-        uint64_t StringSizeInCodeUnits = UTF32_GetStringSizeInCodePoints(String);
-        uint64_t NumSpecifiers         = 0ULL;
-        uint64_t CodeUnit              = 0ULL;
-        if (String != NULL) {
-            do {
-                if (CodeUnit + 1 < StringSizeInCodeUnits) {
-                    if (String[CodeUnit] == U32('%') && String[CodeUnit + 1] == U32('%')) {
-                        NumSpecifiers += 1;
-                        CodeUnit      += 2;
-                    }
-                }
-                if (String[CodeUnit] == U32('%') || String[CodeUnit] == U32('\\')) {
-                    NumSpecifiers     += 1;
-                }
-                CodeUnit              += 1;
-            } while (CodeUnit < StringSizeInCodeUnits);
-        } else {
-            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
-        }
-        return NumSpecifiers;
     }
     
     typedef enum FormatSpecifier_EscapeSequences {
@@ -3117,7 +2804,7 @@ extern "C" {
         return NewFormatSpecifiers;
     }
     
-    static uint64_t UTF32_GetNumDigits(UTF32 *String, StringIOBases Base, uint64_t Offset) {
+    uint64_t UTF32_GetNumDigits(StringIOBases Base, UTF32 *String, uint64_t Offset) {
         uint64_t NumDigits      = 0ULL;
         if (String != NULL) {
             uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
@@ -3127,8 +2814,6 @@ extern "C" {
                         for (uint8_t Base2CodePoint = 0; Base2CodePoint < 2; Base2CodePoint++) {
                             if (String[CodePoint] == StringIOIntegerBase2Table[Base2CodePoint]) {
                                 NumDigits += 1;
-                            } else {
-                                break;
                             }
                         }
                     }
@@ -3137,8 +2822,6 @@ extern "C" {
                         for (uint8_t Base8CodePoint = 0; Base8CodePoint < 8; Base8CodePoint++) {
                             if (String[CodePoint] == StringIOIntegerBase8Table[Base8CodePoint]) {
                                 NumDigits += 1;
-                            } else {
-                                break;
                             }
                         }
                     }
@@ -3147,8 +2830,6 @@ extern "C" {
                         for (uint8_t Base10CodePoint = 0; Base10CodePoint < 10; Base10CodePoint++) {
                             if (String[CodePoint] == StringIOIntegerBase10Table[Base10CodePoint]) {
                                 NumDigits += 1;
-                            } else {
-                                break;
                             }
                         }
                     }
@@ -3158,8 +2839,6 @@ extern "C" {
                             for (uint8_t Base16UCodePoint = 0; Base16UCodePoint < 16; Base16UCodePoint++) {
                                 if (String[CodePoint] == StringIOIntegerBase16UppercaseTable[Base16UCodePoint]) {
                                     NumDigits += 1;
-                                } else {
-                                    break;
                                 }
                             }
                         }
@@ -3168,8 +2847,6 @@ extern "C" {
                             for (uint8_t Base16LCodePoint = 0; Base16LCodePoint < 16; Base16LCodePoint++) {
                                 if (String[CodePoint] == StringIOIntegerBase16LowercaseTable[Base16LCodePoint]) {
                                     NumDigits += 1;
-                                } else {
-                                    break;
                                 }
                             }
                         }
@@ -3182,8 +2859,6 @@ extern "C" {
                             for (uint8_t ScientificCodePoint = 0; ScientificCodePoint < 14; ScientificCodePoint++) {
                                 if (String[CodePoint] == StringIODecimalScientificUppercase[ScientificCodePoint]) {
                                     NumDigits += 1;
-                                } else {
-                                    break;
                                 }
                             }
                         }
@@ -3192,8 +2867,6 @@ extern "C" {
                             for (uint8_t HexCodePoint = 0; HexCodePoint < 21; HexCodePoint++) {
                                 if (String[CodePoint] == StringIODecimalHexUppercase[HexCodePoint]) {
                                     NumDigits += 1;
-                                } else {
-                                    break;
                                 }
                             }
                         }
@@ -3204,8 +2877,6 @@ extern "C" {
                             for (uint8_t ScientificCodePoint = 0; ScientificCodePoint < 14; ScientificCodePoint++) {
                                 if (String[CodePoint] == StringIODecimalScientificLowercase[ScientificCodePoint]) {
                                     NumDigits += 1;
-                                } else {
-                                    break;
                                 }
                             }
                         }
@@ -3214,8 +2885,6 @@ extern "C" {
                             for (uint8_t HexCodePoint = 0; HexCodePoint < 21; HexCodePoint++) {
                                 if (String[CodePoint] == StringIODecimalHexLowercase[HexCodePoint]) {
                                     NumDigits += 1;
-                                } else {
-                                    break;
                                 }
                             }
                         }
@@ -3225,8 +2894,6 @@ extern "C" {
                         for (uint8_t DecimalCodePoint = 0; DecimalCodePoint < 11; DecimalCodePoint++) {
                             if (String[CodePoint] == StringIODecimalTable[DecimalCodePoint]) {
                                 NumDigits += 1;
-                            } else {
-                                break;
                             }
                         }
                     }
@@ -3997,6 +3664,302 @@ extern "C" {
         return Format32;
     }
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /* StringArray Functions */
+    UTF8 **UTF8_StringArray_Init(uint64_t NumStrings) {
+        UTF8 **StringArray = NULL;
+        if (NumStrings > 0) {
+            StringArray    = calloc(NumStrings, sizeof(UTF8*));
+        } else {
+            Log(Log_DEBUG, __func__, U8("NumStrings %llu is invalid"), NumStrings);
+        }
+        return StringArray;
+    }
+    
+    UTF16 **UTF16_StringArray_Init(uint64_t NumStrings) {
+        UTF16 **StringArray = NULL;
+        if (NumStrings > 0) {
+            StringArray    = calloc(NumStrings, sizeof(UTF16*));
+        } else {
+            Log(Log_DEBUG, __func__, U8("NumStrings %llu is invalid"), NumStrings);
+        }
+        return StringArray;
+    }
+    
+    UTF32 **UTF32_StringArray_Init(uint64_t NumStrings) {
+        UTF32 **StringArray = NULL;
+        if (NumStrings > 0) {
+            StringArray    = calloc(NumStrings, sizeof(UTF32*));
+        } else {
+            Log(Log_DEBUG, __func__, U8("NumStrings %llu is invalid"), NumStrings);
+        }
+        return StringArray;
+    }
+    
+    void UTF8_StringArray_Attach(UTF8 **StringArray, UTF8 *String2Attach, uint64_t Index) {
+        if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
+            StringArray[Index] = String2Attach;
+        } else if (StringArray == NULL) {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        } else if (String2Attach == NULL) {
+            Log(Log_DEBUG, __func__, U8("String2Attach Pointer is NULL"));
+        }
+    }
+    
+    void UTF16_StringArray_Attach(UTF16 **StringArray, UTF16 *String2Attach, uint64_t Index) {
+        if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
+            StringArray[Index] = String2Attach;
+        } else if (StringArray == NULL) {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        } else if (String2Attach == NULL) {
+            Log(Log_DEBUG, __func__, U8("String2Attach Pointer is NULL"));
+        }
+    }
+    
+    void UTF32_StringArray_Attach(UTF32 **StringArray, UTF32 *String2Attach, uint64_t Index) {
+        if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
+            StringArray[Index] = String2Attach;
+        } else if (StringArray == NULL) {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        } else if (String2Attach == NULL) {
+            Log(Log_DEBUG, __func__, U8("String2Attach Pointer is NULL"));
+        }
+    }
+    
+    uint64_t UTF8_StringArray_GetNumStrings(UTF8 **StringArray) {
+        uint64_t NumStrings = 0ULL;
+        if (StringArray != NULL) {
+            do {
+                NumStrings += 1;
+            } while (StringArray[NumStrings] != NULL);
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return NumStrings;
+    }
+    
+    uint64_t UTF16_StringArray_GetNumStrings(UTF16 **StringArray) {
+        uint64_t NumStrings = 0ULL;
+        if (StringArray != NULL) {
+            do {
+                NumStrings += 1;
+            } while (StringArray[NumStrings] != NULL);
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return NumStrings;
+    }
+    
+    uint64_t UTF32_StringArray_GetNumStrings(UTF32 **StringArray) {
+        uint64_t NumStrings = 0ULL;
+        if (StringArray != NULL) {
+            do {
+                NumStrings += 1;
+            } while (StringArray[NumStrings] != NULL);
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return NumStrings;
+    }
+    
+    uint64_t *UTF8_StringArray_GetStringSizesInCodeUnits(UTF8 **StringArray) {
+        uint64_t *StringArraySizes       = NULL;
+        if (StringArray != NULL) {
+            uint64_t NumStrings          = UTF8_StringArray_GetNumStrings(StringArray);
+            StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                StringArraySizes[String] = UTF8_GetStringSizeInCodeUnits(StringArray[String]);
+            }
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return StringArraySizes;
+    }
+    
+    uint64_t *UTF16_StringArray_GetStringSizesInCodeUnits(UTF16 **StringArray) {
+        uint64_t *StringArraySizes       = NULL;
+        if (StringArray != NULL) {
+            uint64_t NumStrings          = UTF16_StringArray_GetNumStrings(StringArray);
+            StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                StringArraySizes[String] = UTF16_GetStringSizeInCodeUnits(StringArray[String]);
+            }
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return StringArraySizes;
+    }
+    
+    uint64_t *UTF8_StringArray_GetStringSizesInCodePoints(UTF8 **StringArray) {
+        uint64_t *StringArraySizes       = NULL;
+        if (StringArray != NULL) {
+            uint64_t NumStrings          = UTF8_StringArray_GetNumStrings(StringArray);
+            StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                StringArraySizes[String] = UTF8_GetStringSizeInCodePoints(StringArray[String]);
+            }
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return StringArraySizes;
+    }
+    
+    uint64_t *UTF16_StringArray_GetStringSizesInCodePoints(UTF16 **StringArray) {
+        uint64_t *StringArraySizes       = NULL;
+        if (StringArray != NULL) {
+            uint64_t NumStrings          = UTF16_StringArray_GetNumStrings(StringArray);
+            StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                StringArraySizes[String] = UTF16_GetStringSizeInCodePoints(StringArray[String]);
+            }
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return StringArraySizes;
+    }
+    
+    uint64_t *UTF32_StringArray_GetStringSizesInCodePoints(UTF32 **StringArray) {
+        uint64_t *StringArraySizes       = NULL;
+        if (StringArray != NULL) {
+            uint64_t NumStrings          = UTF32_StringArray_GetNumStrings(StringArray);
+            StringArraySizes             = calloc(NumStrings, sizeof(uint64_t));
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                StringArraySizes[String] = UTF32_GetStringSizeInCodePoints(StringArray[String]);
+            }
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return StringArraySizes;
+    }
+    
+    UTF32 **UTF8_StringArray_Decode(UTF8 **StringArray) {
+        UTF32 **Decoded             = NULL;
+        if (StringArray != NULL) {
+            uint64_t NumStrings     = UTF8_StringArray_GetNumStrings(StringArray);
+            Decoded                 = calloc(NumStrings + 1, sizeof(UTF32*));
+            if (Decoded != NULL) {
+                for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                    Decoded[String] = UTF8_Decode(StringArray[String]);
+                }
+            } else {
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate decoded StringArray"));
+            }
+            
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return Decoded;
+    }
+    
+    UTF32 **UTF16_StringArray_Decode(UTF16 **StringArray) {
+        UTF32 **Decoded             = NULL;
+        if (StringArray != NULL) {
+            uint64_t NumStrings     = UTF16_StringArray_GetNumStrings(StringArray);
+            Decoded                 = calloc(NumStrings + 1, sizeof(UTF32*));
+            if (Decoded != NULL) {
+                for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                    Decoded[String] = UTF16_Decode(StringArray[String]);
+                }
+            } else {
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate decoded StringArray"));
+            }
+            
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return Decoded;
+    }
+    
+    UTF8 **UTF8_StringArray_Encode(UTF32 **StringArray) {
+        UTF8 **Encoded              = NULL;
+        if (StringArray != NULL) {
+            uint64_t NumStrings     = UTF32_StringArray_GetNumStrings(StringArray);
+            Encoded                 = calloc(NumStrings + 1, sizeof(UTF8*));
+            if (Encoded != NULL) {
+                for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                    Encoded[String] = UTF8_Encode(StringArray[String]);
+                }
+            } else {
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate decoded StringArray"));
+            }
+            
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return Encoded;
+    }
+    
+    UTF16 **UTF16_StringArray_Encode(UTF32 **StringArray) {
+        UTF16 **Encoded             = NULL;
+        if (StringArray != NULL) {
+            uint64_t NumStrings     = UTF32_StringArray_GetNumStrings(StringArray);
+            Encoded                 = calloc(NumStrings + 1, sizeof(UTF16*));
+            if (Encoded != NULL) {
+                for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                    Encoded[String] = UTF16_Encode(StringArray[String]);
+                }
+            } else {
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate decoded StringArray"));
+            }
+            
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+        return Encoded;
+    }
+    
+    void UTF8_StringArray_Deinit(UTF8 **StringArray) {
+        if (StringArray != NULL) {
+            uint64_t NumStrings = UTF8_StringArray_GetNumStrings(StringArray);
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                free(StringArray[String]);
+            }
+            free(StringArray);
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+    }
+    
+    void UTF16_StringArray_Deinit(UTF16 **StringArray) {
+        if (StringArray != NULL) {
+            uint64_t NumStrings = UTF16_StringArray_GetNumStrings(StringArray);
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                free(StringArray[String]);
+            }
+            free(StringArray);
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+    }
+    
+    void UTF32_StringArray_Deinit(UTF32 **StringArray) {
+        if (StringArray != NULL) {
+            uint64_t NumStrings = UTF32_StringArray_GetNumStrings(StringArray);
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                free(StringArray[String]);
+            }
+            free(StringArray);
+        } else {
+            Log(Log_DEBUG, __func__, U8("StringArray Pointer is NULL"));
+        }
+    }
+    
     static UTF32 **DeformatString_UTF32(UTF32 *Format, UTF32 *Result, FormatSpecifiers *Details) {
         UTF32 **Deformatted                            = NULL;
         uint64_t NumStrings                            = 0ULL;
@@ -4109,6 +4072,7 @@ extern "C" {
         }
         return StringArray;
     }
+    /* StringArray Functions */
     
 #ifdef __cplusplus
 }
