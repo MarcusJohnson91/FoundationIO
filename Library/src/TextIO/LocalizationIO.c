@@ -221,7 +221,7 @@ extern "C" {
         GroupingSize                    = UTF8_Split(GroupingSizeString, Delimiters);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         UTF16 *GroupingSizeString       = Locale->grouping;
-        UTF16 *Delimiters[]             = {U16("/"), U16("\\")};
+        UTF16 *Delimiters[2]            = {U16("/"), U16("\\")};
         
         UTF16 **GroupingSize16          = UTF16_Split(GroupingSizeString, Delimiters);
         UTF32 **GroupingSize32          = UTF16_StringArray_Decode(GroupingSize16);
@@ -283,68 +283,157 @@ extern "C" {
         return CurrencySymbol;
     }
     
-    UTF8 *Delocalize_UTF8_Currency(UTF8 *String) {
-        UTF8 *Stripped        = NULL;
+    UTF8 *UTF8_DelocalizeInteger(UTF8 *String) {
+        UTF8 *Delocalized = NULL;
         if (String != NULL) {
-            UTF32 *String32   = UTF8_Decode(String);
-            UTF32 *Stripped32 = Delocalize_UTF32_Currency(String32);
+            UTF32 *String32      = UTF8_Decode(String);
+            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(String32);
             free(String32);
-            Stripped          = UTF8_Encode(Stripped32);
-            free(Stripped32);
+            Delocalized          = UTF8_Encode(Delocalized32);
+            free(Delocalized32);
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
-        return Stripped;
+        return Delocalized;
     }
     
-    UTF16 *Delocalize_UTF16_Currency(UTF16 *String) {
-        UTF16 *Stripped       = NULL;
+    UTF16 *UTF16_DelocalizeInteger(UTF16 *String) {
+        UTF16 *Delocalized = NULL;
         if (String != NULL) {
-            UTF32 *String32   = UTF16_Decode(String);
-            UTF32 *Stripped32 = Delocalize_UTF32_Currency(String32);
+            UTF32 *String32      = UTF16_Decode(String);
+            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(String32);
             free(String32);
-            Stripped          = UTF16_Encode(Stripped32);
-            free(Stripped32);
+            Delocalized          = UTF16_Encode(Delocalized32);
+            free(Delocalized32);
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
-        return Stripped;
+        return Delocalized;
     }
     
-    UTF32 *Delocalize_UTF32_Currency(UTF32 *String) {
-        UTF32 *Stripped                    = NULL;
+    UTF32 *UTF32_DelocalizeInteger(UTF32 *String) {
+        UTF32 *Delocalized       = NULL;
         if (String != NULL) {
-            uint64_t StringSize            = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t CodePoints2Remove     = 0ULL;
-            
-            for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
-                for (uint8_t CurrencySymbol = 0; CurrencySymbol < CurrencyTableSize; CurrencySymbol++) {
-                    if (String[CodePoint] == CurrencyTable[CurrencySymbol]) {
-                        CodePoints2Remove += 1;
+            uint64_t OGCodePoint = 0ULL;
+            uint64_t DeCodePoint = 0ULL;
+            uint64_t NumDigits   = UTF32_GetNumDigits(Base10, String, 0);
+            Delocalized          = calloc(NumDigits + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            if (Delocalized != NULL) {
+                do {
+                    if (
+                        String[OGCodePoint] == U32('0') ||
+                        String[OGCodePoint] == U32('1') ||
+                        String[OGCodePoint] == U32('2') ||
+                        String[OGCodePoint] == U32('3') ||
+                        String[OGCodePoint] == U32('4') ||
+                        String[OGCodePoint] == U32('5') ||
+                        String[OGCodePoint] == U32('6') ||
+                        String[OGCodePoint] == U32('7') ||
+                        String[OGCodePoint] == U32('8') ||
+                        String[OGCodePoint] == U32('9')
+                        ) {
+                        OGCodePoint += 1;
+                        Delocalized[DeCodePoint] = String[OGCodePoint];
                     }
-                }
-            }
-            
-            uint64_t StrippedStringSize    = StringSize - CodePoints2Remove;
-            
-            Stripped                       = calloc(StrippedStringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
-            if (Stripped != NULL) {
-                for (uint64_t Original = 0ULL; Original < StringSize; Original++) {
-                    for (uint64_t StrippedCodePoint = 0ULL; StrippedCodePoint < StrippedStringSize; StrippedCodePoint++) {
-                        for (uint8_t CurrencySymbol = 0ULL; CurrencySymbol < CurrencyTableSize; CurrencySymbol++) {
-                            if (String[Original] != CurrencyTable[CurrencySymbol]) {
-                                 Stripped[StrippedCodePoint] = String[Original];
-                            }
-                        }
-                    }
-                }
+                } while (String[OGCodePoint] != FoundationIONULLTerminator && DeCodePoint < NumDigits);
             } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate stripped string"));
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate delocaized string"));
             }
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
-        return Stripped;
+        return Delocalized;
+    }
+    
+    UTF8 *UTF8_DelocalizeDecimal(UTF8 *String) {
+        UTF8 *Delocalized = NULL;
+        if (String != NULL) {
+            UTF32 *String32      = UTF8_Decode(String);
+            UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(String32);
+            free(String32);
+            Delocalized          = UTF8_Encode(Delocalized32);
+            free(Delocalized32);
+        } else {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return Delocalized;
+    }
+    
+    UTF16 *UTF16_DelocalizeDecimal(UTF16 *String) {
+        UTF16 *Delocalized = NULL;
+        if (String != NULL) {
+            UTF32 *String32      = UTF16_Decode(String);
+            UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(String32);
+            free(String32);
+            Delocalized          = UTF16_Encode(Delocalized32);
+            free(Delocalized32);
+        } else {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return Delocalized;
+    }
+    
+    UTF32 *UTF32_DelocalizeDecimal(UTF32 *String) {
+        UTF32 *Delocalized       = NULL;
+        if (String != NULL) {
+            uint64_t StringSize       = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t CodePoint        = StringSize;
+            UTF32    DecimalSeperator = 0ULL;
+            do {
+                if (
+                    String[CodePoint] != U32('0') ||
+                    String[CodePoint] != U32('1') ||
+                    String[CodePoint] != U32('2') ||
+                    String[CodePoint] != U32('3') ||
+                    String[CodePoint] != U32('4') ||
+                    String[CodePoint] != U32('5') ||
+                    String[CodePoint] != U32('6') ||
+                    String[CodePoint] != U32('7') ||
+                    String[CodePoint] != U32('8') ||
+                    String[CodePoint] != U32('9') ||
+                    String[CodePoint] != U32('e') ||
+                    String[CodePoint] != U32('E') ||
+                    String[CodePoint] != U32('+') ||
+                    String[CodePoint] != U32('-')
+                    ) {
+                    DecimalSeperator   = String[CodePoint];
+                    break;
+                }
+                CodePoint             -= 1;
+            } while (CodePoint > 0);
+            
+            uint64_t NumDigits         = UTF32_GetNumDigits(Decimal, String, 0);
+            Delocalized                = calloc(NumDigits + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            
+            
+            CodePoint                  = 0ULL;
+            do {
+                if (
+                    String[CodePoint] == U32('0') ||
+                    String[CodePoint] == U32('1') ||
+                    String[CodePoint] == U32('2') ||
+                    String[CodePoint] == U32('3') ||
+                    String[CodePoint] == U32('4') ||
+                    String[CodePoint] == U32('5') ||
+                    String[CodePoint] == U32('6') ||
+                    String[CodePoint] == U32('7') ||
+                    String[CodePoint] == U32('8') ||
+                    String[CodePoint] == U32('9') ||
+                    String[CodePoint] == U32('e') ||
+                    String[CodePoint] == U32('E') ||
+                    String[CodePoint] == U32('+') ||
+                    String[CodePoint] == U32('-') ||
+                    String[CodePoint] == DecimalSeperator
+                    ) {
+                    Delocalized[CodePoint] = String[CodePoint];
+                }
+                CodePoint             += 1;
+            } while (String[CodePoint] != FoundationIONULLTerminator);
+        } else {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+            
+        return Delocalized;
     }
     
 #ifdef __cplusplus
