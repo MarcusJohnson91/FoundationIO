@@ -61,45 +61,61 @@ extern "C" {
      */
     
     typedef enum LocalizationIO_LanguageIDs {
-        LanguageID_Unknown    = 0,
-        LanguageID_Default    = 1, // Equilivent to "C" locale
-        LanguageID_English    = 2,
-        LanguageID_Swedish    = 3,
-        LanguageID_Norwegian  = 4,
-        LanguageID_Icelandic  = 5,
-        LanguageID_German     = 4,
-        LanguageID_Welsh      = 5,
-        LanguageID_French     = 6,
-        LanguageID_Lithuanian = 7,
-        LanguageID_Russian    = 8,
-        LanguageID_Polish     = 9,
-        LanguageID_Danish     = 10,
+        LanguageID_Unknown          = 0,
+        LanguageID_Default          = 1, // Equilivent to "C" locale
+        LanguageID_English          = 2,
+        LanguageID_Swedish          = 3,
+        LanguageID_Norwegian        = 4,
+        LanguageID_Icelandic        = 5,
+        LanguageID_German           = 4,
+        LanguageID_Welsh            = 5,
+        LanguageID_French           = 6,
+        LanguageID_Lithuanian       = 7,
+        LanguageID_Russian          = 8,
+        LanguageID_Polish           = 9,
+        LanguageID_Danish           = 10,
     } LocalizationIO_LanguageIDs;
     
     typedef enum LocalizationIO_RegionIDs {
-        RegionID_Unknown       = 0,
-        RegionID_UnitedStates  = 1,
-        RegionID_Default       = RegionID_UnitedStates,
-        RegionID_Canada        = 2,
-        RegionID_Mexico        = 3,
-        RegionID_UnitedKingdom = 4,
-        RegionID_Sweden        = 5,
-        RegionID_Denmark       = 6,
-        RegionID_Norway        = 7,
-        RegionID_Finland       = 8,
-        RegionID_Estonia       = 9,
-        RegionID_Latvia        = 10,
-        RegionID_Lithuania     = 11,
-        RegionID_Poland        = 12,
-        RegionID_Russia        = 13,
+        RegionID_Unknown            = 0,
+        RegionID_Default            = 1, // Default is "C"
+        RegionID_UnitedStates       = 2,
+        RegionID_Canada             = 3,
+        RegionID_Mexico             = 4,
+        RegionID_UnitedKingdom      = 5,
+        RegionID_Sweden             = 6,
+        RegionID_Denmark            = 7,
+        RegionID_Norway             = 8,
+        RegionID_Finland            = 9,
+        RegionID_Estonia            = 10,
+        RegionID_Latvia             = 11,
+        RegionID_Lithuania          = 12,
+        RegionID_Poland             = 13,
+        RegionID_Russia             = 14,
     } LocalizationIO_RegionIDs;
     
     typedef enum LocalizationIO_EncodingIDs {
-        EncodingID_Unknown     = 0,
-        EncodingID_UTF8        = 1,
-        EncodingID_UTF16       = 2,
-        EncodingID_UTF32       = 3,
+        EncodingID_Unknown          = 0,
+        EncodingID_UTF8             = 1,
+        EncodingID_UTF16            = 2,
+        EncodingID_UTF32            = 3,
     } LocalizationIO_EncodingIDs;
+    
+    typedef enum LocalizationIO_DecimalSeperators {
+        DecimalSeperator_Unknown    = 0,
+        DecimalSeperator_Period     = 1,
+        DecimalSeperator_Comma      = 2,
+        DecimalSeperator_Apostrophe = 3,
+    } LocalizationIO_DecimalSeperators;
+    
+    typedef enum LocalizationIO_GroupSeperators {
+        GroupSeperator_Unknown      = 0,
+        GroupSeperator_Comma        = 1,
+        GroupSeperator_Period       = 2,
+        GroupSeperator_Underscore   = 3,
+        GroupSeperator_Space        = 4,
+        
+    } LocalizationIO_GroupSeperators;
     
     /*!
      @abstract                             "Creates a string containing the language code (en for englisn, etc)".
@@ -168,25 +184,46 @@ extern "C" {
     UTF16                *Localize_UTF16_GetCurrencySymbol(void);
     
     /*!
-     @abstract                             "Removes currency and grouping symbols from a string".
-     @param               String           "The string to strip".
-     @return                               "Returns the stripped string".
+     @abstract                             "Creates a string containing just the base 10 digits from String".
+     @param              String            "The string to Delocalize".
+     @return                               "Returns the delocalized string".
      */
-    UTF8                 *Delocalize_UTF8_Currency(UTF8 *String);
+    UTF8                 *UTF8_DelocalizeInteger(UTF8 *String);
     
     /*!
-     @abstract                             "Removes currency and grouping symbols from a string".
-     @param               String           "The string to strip".
-     @return                               "Returns the stripped string".
+     @abstract                             "Creates a string containing just the base 10 digits from String".
+     @param              String            "The string to Delocalize".
+     @return                               "Returns the delocalized string".
      */
-    UTF16                *Delocalize_UTF16_Currency(UTF16 *String);
+    UTF16                *UTF16_DelocalizeInteger(UTF16 *String);
     
     /*!
-     @abstract                             "Removes currency and grouping symbols from a string leaving only an integer value".
-     @param               String           "The string to strip".
-     @return                               "Returns the stripped string".
+     @abstract                             "Creates a string containing just the base 10 digits from String".
+     @param              String            "The string to Delocalize".
+     @return                               "Returns the delocalized string".
      */
-    UTF32                *Delocalize_UTF32_Currency(UTF32 *String);
+    UTF32                *UTF32_DelocalizeInteger(UTF32 *String);
+    
+    /*!
+     @abstract                             "Creates a string containing just the base 10 digits from String".
+     @param              String            "The string to Delocalize".
+     @return                               "Returns the delocalized string".
+     */
+    UTF8                 *UTF8_DelocalizeDecimal(UTF8 *String);
+    
+    /*!
+     @abstract                             "Creates a string containing just the base 10 digits from String".
+     @param              String            "The string to Delocalize".
+     @return                               "Returns the delocalized string".
+     */
+    UTF16                *UTF16_DelocalizeDecimal(UTF16 *String);
+    
+    /*!
+     @abstract                             "Creates a string containing just the base 10 digits from String".
+     @param              String            "The string to Delocalize".
+     @return                               "Returns the delocalized string".
+     */
+    UTF32                *UTF32_DelocalizeDecimal(UTF32 *String);
     
 #ifdef __cplusplus
 }
