@@ -75,9 +75,9 @@ extern "C" {
     static UTF32 UTF32_GenerateCodePoint(Entropy *Random) {
         UTF32 CodePoint          = 0UL;
         if (Random != NULL) {
-            //UTF32  CodePointHigh = (UTF32) Entropy_GenerateIntegerInRange(Random, 1, 0xD7FF); // 1..D7FF
-           // UTF32  CodePointLow  = (UTF32) Entropy_GenerateIntegerInRange(Random, 0xE000, 0x10FFFF); //  E000..10FFFF
-            //CodePoint            = CodePointLow | CodePointHigh; // D7FE..101FFF = 0xF4801
+            UTF32  CodePointHigh = (UTF32) Entropy_GenerateIntegerInRange(Random, 1, 0xD7FF);
+            UTF32  CodePointLow  = (UTF32) Entropy_GenerateIntegerInRange(Random, 0xE000, 0x10FFFF);
+            CodePoint            = CodePointLow | CodePointHigh;
         } else {
             Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         }
