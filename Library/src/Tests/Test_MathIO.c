@@ -8,9 +8,11 @@ extern "C" {
 #endif
     
     void Test_Logarithm(void) {
-        int64_t  Value   = -4096;
-        uint8_t  NumBits = Logarithm(2, Value);
-        if (NumBits != 13) {
+        Entropy *Random  = Entropy_Init(64 * 6 * 1000000);
+        uint8_t  NumBits = Entropy_GenerateInteger(Random, 6);
+        int64_t  Value   = Entropy_GenerateInteger(Random, NumBits);
+        uint8_t  LogCeil = Logarithm(2, Value);
+        if (LogCeil != NumBits) {
             Log(Log_DEBUG, __func__, U8("NumBits %llu is incorrect"), NumBits);
         }
     }
