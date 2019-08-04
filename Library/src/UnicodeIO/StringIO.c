@@ -3419,176 +3419,132 @@ extern "C" {
         UTF32 *FormatTemp                                = Format;
         if (Format != NULL && Details != NULL) {
             for (uint64_t Specifier = 0ULL; Specifier < Details->NumSpecifiers; Specifier++) {
-                FormatSpecifier_BaseTypes       BaseType = Details->Specifiers[Specifier].BaseType;
-                FormatSpecifier_TypeModifiers   Modifier = Details->Specifiers[Specifier].TypeModifier;
-                FormatSpecifier_LengthModifiers Length   = Details->Specifiers[Specifier].LengthModifier;
-                uint64_t SpecifierOffset                 = Details->Specifiers[Specifier].SpecifierOffset;
-                uint64_t SpecifierLength                 = Details->Specifiers[Specifier].SpecifierLength;
-                StringIOBases Base                       = ConvertTypeModifier2Base(Modifier);
-                
-                if (Details->HasPositionalArgs == Yes) {
-                    // Start saving the variadic arguments
-                }
-                
-                if (BaseType == BaseType_Literal) {
-                    if (Modifier == Modifier_Percent) {
-                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, U32("%"), SpecifierOffset, SpecifierLength);
-                    }
-                } else if (BaseType == BaseType_EscapeSequence) {
-                    UTF32 *EscapeString                = NULL;
+                if (Details->Specifiers[Specifier].BaseType == BaseType_Literal && Details->Specifiers[Specifier].TypeModifier == Modifier_Percent) {
+                    Details->Specifiers[Specifier].Argument = U32("%");
+                } else if (Details->Specifiers[Specifier].BaseType == BaseType_EscapeSequence) {
                     switch (Details->Specifiers[Specifier].EscapeType) {
                         case EscapeSequence_Beep:
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\x07"), SpecifierOffset, SpecifierLength);
+                            Details->Specifiers[Specifier].Argument = U32("\x07");
                             break;
                         case EscapeSequence_Backspace:
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\x08"), SpecifierOffset, SpecifierLength);
-                            break;
-                        case EscapeSequence_FormFeed:
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\x0C"), SpecifierOffset, SpecifierLength);
-                            break;
-                        case EscapeSequence_NewLine:
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, FoundationIONewLine32, SpecifierOffset, SpecifierLength);
-                            break;
-                        case EscapeSequence_CarriageReturn:
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\x0D"), SpecifierOffset, SpecifierLength);
+                            Details->Specifiers[Specifier].Argument = U32("\x08");
                             break;
                         case EscapeSequence_Tab:
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\x09"), SpecifierOffset, SpecifierLength);
+                            Details->Specifiers[Specifier].Argument = U32("\x09");
                             break;
                         case EscapeSequence_VerticalTab:
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\x0B"), SpecifierOffset, SpecifierLength);
+                            Details->Specifiers[Specifier].Argument = U32("\x0B");
+                            break;
+                        case EscapeSequence_FormFeed:
+                            Details->Specifiers[Specifier].Argument = U32("\x0C");
+                            break;
+                        case EscapeSequence_CarriageReturn:
+                            Details->Specifiers[Specifier].Argument = U32("\x0D");
+                            break;
+                        case EscapeSequence_NewLine:
+                            Details->Specifiers[Specifier].Argument = FoundationIONewLine32;
                             break;
                         case EscapeSequence_Backslash:
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\\"), SpecifierOffset, SpecifierLength);
+                            Details->Specifiers[Specifier].Argument = U32("\\");
                             break;
                         case EscapeSequence_Apostrophe:
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\'"), SpecifierOffset, SpecifierLength);
+                            Details->Specifiers[Specifier].Argument = U32("\'");
                             break;
                         case EscapeSequence_Quote:
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\""), SpecifierOffset, SpecifierLength);
+                            Details->Specifiers[Specifier].Argument = U32("\"");
                             break;
                         case EscapeSequence_QuestionMark:
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, U32("\?"), SpecifierOffset, SpecifierLength);
+                            Details->Specifiers[Specifier].Argument = U32("\?");
                             break;
                         case EscapeSequence_Octal:
-                            EscapeString               = UTF32_ExtractSubString(FormatTemp, SpecifierOffset, Details->Specifiers[Specifier].OctalSeqSize);
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, EscapeString, SpecifierOffset, Details->Specifiers[Specifier].OctalSeqSize + 1);
-                            free(EscapeString);
+                            Details->Specifiers[Specifier].Argument = UTF32_ExtractSubString(Format, Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].OctalSeqSize);
                             break;
                         case EscapeSequence_Hexadecimal:
-                            EscapeString               = UTF32_ExtractSubString(FormatTemp, SpecifierOffset, SpecifierLength);
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, EscapeString, SpecifierOffset, SpecifierLength + 1);
-                            free(EscapeString);
+                            Details->Specifiers[Specifier].Argument = UTF32_ExtractSubString(Format, Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
                             break;
                         case EscapeSequence_Unicode4:
-                            EscapeString               = UTF32_ExtractSubString(FormatTemp, SpecifierOffset, 4);
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, EscapeString, SpecifierOffset, 4);
-                            free(EscapeString);
+                            Details->Specifiers[Specifier].Argument = UTF32_ExtractSubString(Format, Details->Specifiers[Specifier].SpecifierOffset, 4);
                             break;
                         case EscapeSequence_Unicode8:
-                            EscapeString               = UTF32_ExtractSubString(FormatTemp, SpecifierOffset, 8);
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, EscapeString, SpecifierOffset, 8);
-                            free(EscapeString);
+                            Details->Specifiers[Specifier].Argument = UTF32_ExtractSubString(Format, Details->Specifiers[Specifier].SpecifierOffset, 8);
                             break;
                         case EscapeSequence_Unknown:
-                        default:
                             Log(Log_DEBUG, __func__, U8("Unknown Escape Sequence: %d"), Details->Specifiers[Specifier].EscapeType);
                             break;
                     }
-                } else if (BaseType == BaseType_Character) {
-                    if ((Modifier & Modifier_UTF8) == Modifier_UTF8) {
-                        UTF8    *Arg                   = va_arg(VariadicArguments, UTF8*);
-                        UTF32   *Arg32                 = UTF8_Decode(Arg);
-                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                        free(Arg32);
-                    } else if ((Modifier & Modifier_UTF16) == Modifier_UTF16) {
-                        UTF16   *Arg                   = va_arg(VariadicArguments, UTF16*);
-                        UTF32   *Arg32                 = UTF16_Decode(Arg);
-                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                        free(Arg32);
-                    } else if ((Modifier & Modifier_UTF32) == Modifier_UTF32) {
-                        UTF32   *Arg                   = va_arg(VariadicArguments, UTF32*);
-                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg, SpecifierOffset, SpecifierLength);
+                } else if (Details->Specifiers[Specifier].BaseType == BaseType_Character) {
+                    if ((Details->Specifiers[Specifier].TypeModifier & Modifier_UTF8) == Modifier_UTF8) {
+                        UTF8 VariadicArgument                   = va_arg(VariadicArguments, UTF8);
+                        Details->Specifiers[Specifier].Argument = (UTF32) VariadicArgument;
+                    } else if ((Details->Specifiers[Specifier].TypeModifier & Modifier_UTF16) == Modifier_UTF16) {
+                        UTF16 VariadicArgument                  = va_arg(VariadicArguments, UTF16);
+                        Details->Specifiers[Specifier].Argument = (UTF32) VariadicArgument;
+                    } else if ((Details->Specifiers[Specifier].TypeModifier & Modifier_UTF32) == Modifier_UTF32) {
+                        UTF32 VariadicArgument                  = va_arg(VariadicArguments, UTF32);
+                        Details->Specifiers[Specifier].Argument = (UTF32) VariadicArgument;
                     }
-                } else if (BaseType == BaseType_String) {
-                    if ((Modifier & Modifier_UTF8) == Modifier_UTF8) {
-                        UTF8    *Arg                   = va_arg(VariadicArguments, UTF8*);
-                        UTF32   *Arg32                 = UTF8_Decode(Arg);
-                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                        free(Arg32);
-                    } else if ((Modifier & Modifier_UTF16) == Modifier_UTF16) {
-                        UTF16   *Arg                   = va_arg(VariadicArguments, UTF16*);
-                        UTF32   *Arg32                 = UTF16_Decode(Arg);
-                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                        free(Arg32);
-                    } else if ((Modifier & Modifier_UTF32) == Modifier_UTF32) {
-                        UTF32   *Arg                   = va_arg(VariadicArguments, UTF32*);
-                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg, SpecifierOffset, SpecifierLength);
+                } else if (Details->Specifiers[Specifier].BaseType == BaseType_String) {
+                    if ((Details->Specifiers[Specifier].TypeModifier & Modifier_UTF8) == Modifier_UTF8) {
+                        UTF8  *VariadicArgument                 = va_arg(VariadicArguments, UTF8*);
+                        UTF32 *VariadicArgument32               = UTF8_Decode(VariadicArgument);
+                        Details->Specifiers[Specifier].Argument = VariadicArgument32;
+                    } else if ((Details->Specifiers[Specifier].TypeModifier & Modifier_UTF16) == Modifier_UTF16) {
+                        UTF16 *VariadicArgument                 = va_arg(VariadicArguments, UTF16*);
+                        UTF32 *VariadicArgument32               = UTF16_Decode(VariadicArgument);
+                        Details->Specifiers[Specifier].Argument = VariadicArgument32;
+                    } else if ((Details->Specifiers[Specifier].TypeModifier & Modifier_UTF32) == Modifier_UTF32) {
+                        Details->Specifiers[Specifier].Argument = va_arg(VariadicArguments, UTF32*);
                     }
-                } else if (BaseType == BaseType_Integer) {
-                    if ((Modifier & Modifier_Unsigned) == Modifier_Unsigned) {
-                        if ((Length & Length_8Bit) == Length_8Bit) {
-                            uint8_t  Arg               = va_arg(VariadicArguments, uint8_t);
-                            UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            free(Arg32);
-                        } else if ((Length & Length_16Bit) == Length_16Bit) {
-                            uint16_t Arg               = va_arg(VariadicArguments, uint16_t);
-                            UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            free(Arg32);
-                        } else if ((Length & Length_32Bit) == Length_32Bit) {
-                            uint32_t Arg               = va_arg(VariadicArguments, uint32_t);
-                            UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            free(Arg32);
-                        } else if ((Length & Length_64Bit) == Length_64Bit) {
-                            uint64_t Arg               = va_arg(VariadicArguments, uint64_t);
-                            UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            free(Arg32);
+                } else if (Details->Specifiers[Specifier].BaseType == BaseType_Integer) {
+                    if ((Details->Specifiers[Specifier].TypeModifier & Modifier_Unsigned) == Modifier_Unsigned) {
+                        if ((Details->Specifiers[Specifier].LengthModifier & Length_8Bit) == Length_8Bit) {
+                            uint8_t  Arg                            = va_arg(VariadicArguments, uint8_t);
+                            Details->Specifiers[Specifier].Argument = UTF32_Integer2String(ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Arg);
+                        } else if ((Details->Specifiers[Specifier].LengthModifier & Length_16Bit) == Length_16Bit) {
+                            uint16_t  Arg                           = va_arg(VariadicArguments, uint16_t);
+                            Details->Specifiers[Specifier].Argument = UTF32_Integer2String(ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Arg);
+                        } else if ((Details->Specifiers[Specifier].LengthModifier & Length_32Bit) == Length_32Bit) {
+                            uint32_t  Arg                           = va_arg(VariadicArguments, uint32_t);
+                            Details->Specifiers[Specifier].Argument = UTF32_Integer2String(ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Arg);
+                        } else if ((Details->Specifiers[Specifier].LengthModifier & Length_64Bit) == Length_64Bit) {
+                            uint64_t  Arg                           = va_arg(VariadicArguments, uint64_t);
+                            Details->Specifiers[Specifier].Argument = UTF32_Integer2String(ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Arg);
                         }
-                    } else if ((Modifier & Modifier_Signed) == Modifier_Signed) {
-                        if ((Length & Length_8Bit) == Length_8Bit) {
-                            int8_t   Arg               = va_arg(VariadicArguments, int8_t);
-                            UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            free(Arg32);
-                        } else if ((Length & Length_16Bit) == Length_16Bit) {
-                            int16_t  Arg               = va_arg(VariadicArguments, int16_t);
-                            UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            free(Arg32);
-                        } else if ((Length & Length_32Bit) == Length_32Bit) {
-                            int32_t  Arg               = va_arg(VariadicArguments, int32_t);
-                            UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            free(Arg32);
-                        } else if ((Length & Length_64Bit) == Length_64Bit) {
-                            int64_t  Arg               = va_arg(VariadicArguments, int64_t);
-                            UTF32   *Arg32             = UTF32_Integer2String(Base, Arg);
-                            FormatTemp                 = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                            free(Arg32);
+                    } else if ((Details->Specifiers[Specifier].TypeModifier & Modifier_Signed) == Modifier_Signed) {
+                        if ((Details->Specifiers[Specifier].LengthModifier & Length_8Bit) == Length_8Bit) {
+                            int8_t  Arg                             = va_arg(VariadicArguments, int8_t);
+                            Details->Specifiers[Specifier].Argument = UTF32_Integer2String(ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Arg);
+                        } else if ((Details->Specifiers[Specifier].LengthModifier & Length_16Bit) == Length_16Bit) {
+                            int16_t  Arg                            = va_arg(VariadicArguments, int16_t);
+                            Details->Specifiers[Specifier].Argument = UTF32_Integer2String(ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Arg);
+                        } else if ((Details->Specifiers[Specifier].LengthModifier & Length_32Bit) == Length_32Bit) {
+                            int32_t  Arg                            = va_arg(VariadicArguments, int32_t);
+                            Details->Specifiers[Specifier].Argument = UTF32_Integer2String(ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Arg);
+                        } else if ((Details->Specifiers[Specifier].LengthModifier & Length_64Bit) == Length_64Bit) {
+                            int64_t  Arg                            = va_arg(VariadicArguments, int64_t);
+                            Details->Specifiers[Specifier].Argument = UTF32_Integer2String(ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Arg);
                         }
+                    } 
+                } else if (Details->Specifiers[Specifier].BaseType == BaseType_Decimal) {
+                    if ((Details->Specifiers[Specifier].LengthModifier & Length_32Bit) == Length_32Bit) {
+                        float    Arg                            = va_arg(VariadicArguments, float);
+                        Details->Specifiers[Specifier].Argument = UTF32_Decimal2String(ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), (double) Arg);
+                    } else if ((Details->Specifiers[Specifier].LengthModifier & Length_64Bit) == Length_64Bit) {
+                        double   Arg                            = va_arg(VariadicArguments, double);
+                        Details->Specifiers[Specifier].Argument = UTF32_Decimal2String(ConvertTypeModifier2Base(Details->Specifiers[Specifier].TypeModifier), Arg);
                     }
-                } else if (BaseType == BaseType_Decimal) {
-                    if ((Length & Length_32Bit) == Length_32Bit) {
-                        float    Arg                   = va_arg(VariadicArguments, float);
-                        UTF32   *Arg32                 = UTF32_Decimal2String(Base, (double) Arg);
-                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                        free(Arg32);
-                    } else if ((Length & Length_64Bit) == Length_64Bit) {
-                        double   Arg                   = va_arg(VariadicArguments, double);
-                        UTF32   *Arg32                 = UTF32_Decimal2String(Base, Arg);
-                        FormatTemp                     = UTF32_ReplaceSubString(FormatTemp, Arg32, SpecifierOffset, SpecifierLength);
-                        free(Arg32);
-                    }
-                } else if (BaseType == BaseType_Positional) {
+                } else if (Details->Specifiers[Specifier].BaseType == BaseType_Positional) {
                     // No fucking clue lol.
                     // TODO: Figure out what the hell this is.
                 }
             }
-            Formatted                                    = FormatTemp;
+            
+            for (uint64_t Specifier = 0ULL; Specifier < Details->NumSpecifiers; Specifier++) {
+                FormatTemp = UTF32_ReplaceSubString(Format, Details->Specifiers[Specifier].Argument, Details->Specifiers[Specifier].SpecifierOffset, Details->Specifiers[Specifier].SpecifierLength);
+                
+                Details->Specifiers[Specifier].SpecifierOffset += UTF32_GetStringSizeInCodePoints(Details->Specifiers[Specifier].Argument);
+            }
+            Formatted                                           = FormatTemp;
         } else if (Format == NULL) {
             Log(Log_DEBUG, __func__, U8("Format Pointer is NULL"));
         } else if (Details == NULL) {
