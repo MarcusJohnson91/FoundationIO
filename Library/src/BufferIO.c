@@ -168,6 +168,11 @@ extern "C" {
     
     void BitBuffer_Seek(BitBuffer *BitB, int64_t Bits2Seek) {
         if (BitB != NULL) {
+            BitB->BitOffset += Bits2Seek;
+            
+            
+            
+            /*
             if (Bits2Seek > 0 && BitB->NumBits > BitB->BitOffset + Bits2Seek) {
                 BitB->NumBits  += Bits2Seek;
             } else if (Bits2Seek < 0 && BitB->NumBits > BitB->BitOffset - Bits2Seek) {
@@ -175,6 +180,7 @@ extern "C" {
             } else {
                 Log(Log_DEBUG, __func__, U8("There's not enough bits in BitBuffer %lld to seek %lld bits"), BitB->NumBits, Bits2Seek);
             }
+             */
         } else {
             Log(Log_DEBUG, __func__, U8("BitBuffer Pointer is NULL"));
         }
@@ -267,9 +273,9 @@ extern "C" {
              */
             uint8_t Bits2Read                     = NumBits2Extract;
             do {
-                uint8_t  BitsInByte               = Bits2ExtractFromByte(BitB->BitOffset + Bits2Read);
-                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Read);
-                uint8_t  Shift                    = 8 - Bits2Get;
+                uint8_t  BitsInCurrentByte        = Bits2ExtractFromByte(BitB->BitOffset + Bits2Read);
+                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
+                uint8_t  Shift                    = BitsInCurrentByte - Bits2Get;
                 uint8_t  BitMask                  = (uint8_t) (CreateBitMaskLSBit(Bits2Get) << Shift);
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset + Bits2Read, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
@@ -290,9 +296,9 @@ extern "C" {
         if (NumBits2Extract > 0) {
             uint8_t Bits2Read                     = NumBits2Extract;
             do {
-                uint8_t  BitsInByte               = Bits2ExtractFromByte(BitB->BitOffset + Bits2Read);
-                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Read);
-                uint8_t  Shift                    = 8 - Bits2Get;
+                uint8_t  BitsInCurrentByte        = Bits2ExtractFromByte(BitB->BitOffset + Bits2Read);
+                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
+                uint8_t  Shift                    = BitsInCurrentByte - Bits2Get;
                 uint8_t  BitMask                  = CreateBitMaskMSBit(Bits2Get) >> Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset + Bits2Read, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
@@ -313,9 +319,9 @@ extern "C" {
         if (NumBits2Extract > 0) {
             uint8_t Bits2Read                     = NumBits2Extract;
             do {
-                uint8_t  BitsInByte               = Bits2ExtractFromByte(BitB->BitOffset);
-                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Read);
-                uint8_t  Shift                    = 8 - Bits2Get;
+                uint8_t  BitsInCurrentByte        = Bits2ExtractFromByte(BitB->BitOffset);
+                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
+                uint8_t  Shift                    = BitsInCurrentByte - Bits2Get;
                 uint8_t  BitMask                  = (uint8_t) (CreateBitMaskLSBit(Bits2Get) << Shift);
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
@@ -336,9 +342,9 @@ extern "C" {
         if (NumBits2Extract > 0) {
             uint8_t Bits2Read                     = NumBits2Extract;
             do {
-                uint8_t  BitsInByte               = Bits2ExtractFromByte(BitB->BitOffset);
-                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Read);
-                uint8_t  Shift                    = 8 - Bits2Get;
+                uint8_t  BitsInCurrentByte        = Bits2ExtractFromByte(BitB->BitOffset);
+                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
+                uint8_t  Shift                    = BitsInCurrentByte - Bits2Get;
                 uint8_t  BitMask                  = CreateBitMaskMSBit(Bits2Get) >> Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
@@ -356,14 +362,15 @@ extern "C" {
     
     static void BitBuffer_Append_LSByteLSBit(BitBuffer *BitB, uint8_t NumBits2Append, uint64_t Data2Append) {
         if (NumBits2Append > 0) {
-            uint8_t Bits2Write                    = NumBits2Append;
+            uint8_t  Bits2Write                   = NumBits2Append;
+            uint64_t Data2Write                   = Data2Append;
             do {
-                uint8_t  BitsInByte               = BitB->BitOffset % 8;
-                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Write);
-                uint8_t  Shift                    = 8 - Bits2Get;
-                uint8_t  BitMask                  = CreateBitMaskMSBit(Bits2Get) >> Shift;
+                uint8_t  BitsInCurrentByte        = 8 - (BitB->BitOffset % 8);
+                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInCurrentByte, Bits2Write);
+                uint8_t  Shift                    = BitsInCurrentByte - Bits2Get;
+                uint8_t  BitMask                  = CreateBitMaskLSBit(Bits2Get) >> Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
-                uint8_t  ExtractedBits            = Data2Append & BitMask;
+                uint8_t  ExtractedBits            = Data2Write & BitMask;
                 uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
                 BitB->Buffer[Byte]               |= ApplyBits;
                 
@@ -375,57 +382,63 @@ extern "C" {
     
     static void BitBuffer_Append_LSByteMSBit(BitBuffer *BitB, uint8_t NumBits2Append, uint64_t Data2Append) {
         if (NumBits2Append > 0) {
-            uint8_t Bits2Write                    = NumBits2Append;
+            uint8_t  Bits2Write                    = NumBits2Append;
+            uint64_t Data2Write                    = Data2Append;
             do {
-                uint8_t  BitsInByte               = BitB->BitOffset % 8;
-                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Write);
-                uint8_t  Shift                    = 8 - Bits2Get;
-                uint8_t  BitMask                  = CreateBitMaskMSBit(Bits2Get) >> Shift;
-                uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
-                uint8_t  ExtractedBits            = Data2Append & BitMask;
-                uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
-                BitB->Buffer[Byte]               |= ApplyBits;
+                uint8_t  BitsInCurrentByte         = 8 - (BitB->BitOffset % 8);
+                uint8_t  Bits2Append2CurrentByte   = (uint8_t) Minimum(BitsInCurrentByte, Bits2Write);
+                uint64_t ExtractBitMask            = CreateBitMaskMSBit(Bits2Append2CurrentByte) << (Bits2Write - Bits2Append2CurrentByte);
+                uint8_t  ExtractedBits             = (Data2Write & ExtractBitMask) >> (Bits2Write - Bits2Append2CurrentByte);
+                if (BitsInCurrentByte > Bits2Append2CurrentByte) {
+                    ExtractedBits                <<= BitsInCurrentByte - Bits2Append2CurrentByte;
+                }
+                BitB->Buffer[(BitB->BitOffset + Bits2Write) / 8] |= ExtractedBits;
                 
-                Bits2Write                       -= Bits2Get;
-                BitB->BitOffset                  += Bits2Get;
+                Data2Write                       >>= Bits2Append2CurrentByte;
+                Bits2Write                        -= Bits2Append2CurrentByte;
+                BitB->BitOffset                   += Bits2Append2CurrentByte;
             } while (Bits2Write > 0);
         }
     }
     
     static void BitBuffer_Append_MSByteLSBit(BitBuffer *BitB, uint8_t NumBits2Append, uint64_t Data2Append) {
         if (NumBits2Append > 0) {
-            uint8_t Bits2Write                    = NumBits2Append;
+            uint8_t  Bits2Write                    = NumBits2Append;
+            uint64_t Data2Write                    = Data2Append;
             do {
-                uint8_t  BitsInByte               = BitB->BitOffset % 8;
-                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Write);
-                uint8_t  Shift                    = 8 - Bits2Get;
-                uint8_t  BitMask                  = CreateBitMaskMSBit(Bits2Get) >> Shift;
-                uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
-                uint8_t  ExtractedBits            = Data2Append & BitMask;
-                uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
-                BitB->Buffer[Byte]               |= ApplyBits;
+                uint8_t BitsInCurrentByte          = 8 - (BitB->BitOffset % 8);
+                uint8_t Bits2Append2CurrentByte    = (uint8_t) Minimum(BitsInCurrentByte, Bits2Write);
+                uint8_t ExtractBitMask             = CreateBitMaskLSBit(Bits2Append2CurrentByte);
+                uint8_t ExtractedBits              = Data2Write & ExtractBitMask;
+                if (BitsInCurrentByte > Bits2Append2CurrentByte) {
+                    ExtractedBits                <<= BitsInCurrentByte - Bits2Append2CurrentByte;
+                }
+                BitB->Buffer[BitB->BitOffset / 8] |= ExtractedBits;
                 
-                Bits2Write                       -= Bits2Get;
-                BitB->BitOffset                  += Bits2Get;
+                Data2Write                       >>= Bits2Append2CurrentByte;
+                Bits2Write                        -= Bits2Append2CurrentByte;
+                BitB->BitOffset                   += Bits2Append2CurrentByte;
             } while (Bits2Write > 0);
         }
     }
     
     static void BitBuffer_Append_MSByteMSBit(BitBuffer *BitB, uint8_t NumBits2Append, uint64_t Data2Append) {
         if (NumBits2Append > 0) {
-            uint8_t Bits2Write                    = NumBits2Append;
+            uint8_t  Bits2Write                    = NumBits2Append;
+            uint64_t Data2Write                    = Data2Append;
             do {
-                uint8_t  BitsInByte               = BitB->BitOffset % 8;
-                uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInByte, Bits2Write);
-                uint8_t  Shift                    = 8 - Bits2Get;
-                uint8_t  BitMask                  = CreateBitMaskMSBit(Bits2Get) >> Shift;
-                uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
-                uint8_t  ExtractedBits            = Data2Append & BitMask;
-                uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
-                BitB->Buffer[Byte]               |= ApplyBits;
+                uint8_t  BitsInCurrentByte         = 8 - (BitB->BitOffset % 8);
+                uint8_t  Bits2Append2CurrentByte   = (uint8_t) Minimum(BitsInCurrentByte, Bits2Write);
+                uint64_t ExtractBitMask            = CreateBitMaskMSBit(Bits2Append2CurrentByte) << (Bits2Write - Bits2Append2CurrentByte);
+                uint8_t  ExtractedBits             = (Data2Write & ExtractBitMask) >> (Bits2Write - Bits2Append2CurrentByte);
+                if (BitsInCurrentByte > Bits2Append2CurrentByte) {
+                    ExtractedBits                <<= BitsInCurrentByte - Bits2Append2CurrentByte;
+                }
+                BitB->Buffer[BitB->BitOffset / 8] |= ExtractedBits;
                 
-                Bits2Write                       -= Bits2Get;
-                BitB->BitOffset                  += Bits2Get;
+                Data2Write                       >>= Bits2Append2CurrentByte;
+                Bits2Write                        -= Bits2Append2CurrentByte;
+                BitB->BitOffset                   += Bits2Append2CurrentByte;
             } while (Bits2Write > 0);
         }
     }
@@ -1050,8 +1063,8 @@ extern "C" {
     uint8_t *GUUID_Generate(Entropy *Random, GUUIDTypes GUUIDType) {
         uint8_t *GUUID                   = 0;
         if (Random != NULL && GUUIDType != UnknownGUUID) {
-            uint64_t LowBits             = Entropy_GenerateIntegerInRange(Random, 0, 0xFFFFFFFFFFFFFFFF);
-            uint64_t HighBits            = Entropy_GenerateIntegerInRange(Random, 0, 0xFFFFFFFFFFFFFFFF);
+            uint64_t LowBits             = Entropy_GenerateIntegerInRange(Random, 64);
+            uint64_t HighBits            = Entropy_GenerateIntegerInRange(Random, 64);
             // Honestly I'll just convert from BinaryGUUID to GUUIDString if I have to
             uint8_t *BinaryGUUIDData     = calloc(BinaryGUUIDSize, sizeof(uint8_t));
             if (GUUID != NULL) {

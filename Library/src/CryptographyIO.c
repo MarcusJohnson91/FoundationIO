@@ -379,28 +379,10 @@ extern "C" {
         }
     }
     
-    int64_t Entropy_GenerateIntegerInRange(Entropy *Random, int64_t MinValue, int64_t MaxValue) {
+    int64_t Entropy_GenerateIntegerInRange(Entropy *Random, uint8_t NumEntropyBits) { // What if we hange this to specify the number of bits to read directly?
         int64_t RandomInteger                     = 0ULL;
         if (Random != NULL) {
-            uint8_t Bits2Read                     = 0;
-            if (MaxValue > MinValue) {
-                Bits2Read                         = (uint8_t) Logarithm(2, MaxValue - MinValue);
-            } else if (MinValue == MaxValue) {
-                Bits2Read                         = (uint8_t) Logarithm(2, MinValue - MaxValue);;
-            }
-            
-            RandomInteger                         = Entropy_ExtractBits(Random, Bits2Read);
-            
-            if (RandomInteger < MinValue || RandomInteger > MaxValue) {
-                uint8_t NumFixBits                = (CeilD(Logarithm(2, Maximum(RandomInteger, MaxValue) - Minimum(RandomInteger, MaxValue))) + Bits2Read);
-                NumFixBits                        = RoundD(NumFixBits / 2);
-                uint64_t FixBits                  = Entropy_ExtractBits(Random, NumFixBits);
-                if (RandomInteger < MinValue) {
-                    RandomInteger                += FixBits;
-                } else {
-                    RandomInteger                -= FixBits;
-                }
-            }
+            RandomInteger                         = Entropy_ExtractBits(Random, NumEntropyBits);
         } else {
             Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         }
@@ -410,9 +392,9 @@ extern "C" {
     double Entropy_GenerateDecimal(Entropy *Random) {
         double Decimal        = 0.0;
         if (Random != NULL) {
-            int8_t   Sign     = Entropy_GenerateIntegerInRange(Random, 1, 1) == 1 ? 1 : -1;
-            int16_t  Exponent = Entropy_GenerateIntegerInRange(Random, -1023, 1023);
-            uint64_t Mantissa = Entropy_GenerateIntegerInRange(Random, 0, 4503599627370496);
+            int8_t   Sign     = Entropy_GenerateIntegerInRange(Random, 1) == 1 ? 1 : -1;
+            int16_t  Exponent = Entropy_GenerateIntegerInRange(Random, 11);
+            uint64_t Mantissa = Entropy_GenerateIntegerInRange(Random, 52);
             
             Decimal           = InsertSignD(Decimal, Sign);
             Decimal           = InsertExponentD(Decimal, Exponent);

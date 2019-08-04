@@ -346,21 +346,27 @@ extern "C" {
         int64_t Value      = Base;
         int64_t Exponent2  = Exponent - 1;
         if (Base > 0 && Exponent2 > 0) {
-            do { // 2 * 2 * 2 * 2 * 2 * 2 * 2 = 256
-                Value     *= Base;
+            while (Exponent2 != 0) {
                 Exponent2 -= 1;
-            } while (Exponent2 > 0);
+                Value     *= Base;
+            }
+        } else {
+            Value          = 1;
         }
         return Value;
     }
     
     int64_t  Logarithm(int64_t Base, int64_t Exponent) {
-        uint64_t Result    = 1ULL;
+        uint64_t Result    = 0ULL;
         int64_t  Exponent2 = Exponent;
-        do {
-            Result        += 1;
-            Exponent2     /= Base;
-        } while (Exponent2 > Base);
+        if (Exponent2 != 0) {
+            while (Exponent2 != 0) {
+                Result    += 1;
+                Exponent2 /= Base;
+            }
+        } else {
+            Result         = 1;
+        }
         return Result;
     }
     
@@ -416,26 +422,18 @@ extern "C" {
     
     uint8_t CreateBitMaskLSBit(uint8_t NumBits2Select) {
         uint8_t Mask        = 0;
+        static const uint8_t Table[8] = {0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF};
         if (NumBits2Select <= 8) {
-            uint8_t PreMask = (uint8_t) (Exponentiate(2, NumBits2Select) - 1);
-#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
-            Mask            = PreMask;
-#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
-            Mask            = PreMask >> (8 - NumBits2Select);
-#endif
+            Mask            = Table[NumBits2Select - 1];
         }
         return Mask;
     }
     
     uint8_t CreateBitMaskMSBit(uint8_t NumBits2Select) {
         uint8_t Mask        = 0;
+        static const uint8_t Table[8] = {0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC, 0xFE, 0xFF};
         if (NumBits2Select <= 8) {
-            uint8_t PreMask = (uint8_t) (Exponentiate(2, NumBits2Select) - 1);
-#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
-            Mask            = PreMask >> (8 - NumBits2Select);
-#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
-            Mask            = PreMask;
-#endif
+            Mask            = Table[NumBits2Select - 1];
         }
         return Mask;
     }

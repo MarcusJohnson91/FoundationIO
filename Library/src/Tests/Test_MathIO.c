@@ -7,12 +7,21 @@
 extern "C" {
 #endif
     
+    void Test_Logarithm(void) {
+        int64_t  Value   = -4096;
+        uint8_t  NumBits = Logarithm(2, Value);
+        if (NumBits != 13) {
+            Log(Log_DEBUG, __func__, U8("NumBits %llu is incorrect"), NumBits);
+        }
+    }
+    
     void Test_MinMax(void) {
         Entropy *Random      = Entropy_Init(4096);
         
         for (uint16_t Loop = 0; Loop < 512; Loop++) {
-            int64_t Integer1 = Entropy_GenerateIntegerInRange(Random, INT64_MIN, INT64_MAX);
-            int64_t Integer2 = Entropy_GenerateIntegerInRange(Random, INT64_MIN, INT64_MAX);
+            uint8_t NumBits  = Entropy_GenerateIntegerInRange(Random, 8);
+            int64_t Integer1 = Entropy_GenerateIntegerInRange(Random, NumBits);
+            int64_t Integer2 = Entropy_GenerateIntegerInRange(Random, NumBits);
             
             int64_t Minimum1 = Minimum(Integer1, Integer2);
             int64_t Maximum1 = Maximum(Integer1, Integer2);
@@ -37,7 +46,8 @@ extern "C" {
     }
     
     int main() {
-        Test_Decimals();
+        Test_Logarithm();
+        //Test_Decimals();
         //Test_MinMax();
         return EXIT_SUCCESS;
     }
