@@ -121,7 +121,7 @@ extern "C" {
         if (Log_ProgramName != NULL) {
             FormattedString   = UTF8_Format(U8("%s: %s in %s; \"%s\"%s"), Log_ProgramName, ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
         } else {
-            FormattedString   = UTF8_Format(U8("%s in %s; \"%s\"%s"), FunctionName, VariadicString, FoundationIONewLine8);
+            FormattedString   = UTF8_Format(U8("%s: %s - \"%s\"%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
         }
         
         if (Severity == Log_USER) {
