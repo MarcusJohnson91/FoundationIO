@@ -24,6 +24,8 @@ extern "C" {
                 Log(Log_DEBUG, __func__, U8("Written bits %lld doesn't match Read bits %lld"), RandomInteger, ReadInteger);
                 TestPassed           = No;
                 break;
+            } else {
+                Log(Log_DEBUG, __func__, U8("Success: WrittenBits %lld MATCHES ReadBits %lld!"), RandomInteger, ReadInteger);
             }
             BitBuffer_Erase(BitB); // Clear the BitBuffer in between each run just to be sure.
         }
@@ -78,8 +80,7 @@ extern "C" {
         }
          */
         //Test_WriteBits();
-        Test_BitBuffer();
-        return 0;
+        return Test_BitBuffer();
     }
     
 #ifdef __cplusplus
