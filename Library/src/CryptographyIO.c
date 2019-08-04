@@ -368,6 +368,60 @@ extern "C" {
         return RemainingBits;
     }
     
+    int64_t Entropy_GenerateInteger(Entropy *Random, uint8_t NumBits) {
+        int64_t GeneratedInteger = 0LL;
+        if (Random != NULL && NumBits >= 1 && NumBits <= 64) {
+            GeneratedInteger     = Entropy_ExtractBits(Random, NumBits);
+        } else if (Random == NULL) {
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+        } else if (NumBits == 0) {
+            Log(Log_DEBUG, __func__, U8("Generating an integer 0 bits long is invalid"));
+        } else if (NumBits > 64) {
+            Log(Log_DEBUG, __func__, U8("Generating an integer %u bits long is invalid"), NumBits);
+        }
+        return GeneratedInteger;
+    }
+    
+    int64_t Entropy_GenerateIntegerInRange(Entropy *Random, int64_t MinValue, int64_t MaxValue) { // What if we hange this to specify the number of bits to read directly?
+        int64_t RandomInteger                     = 0ULL;
+        if (Random != NULL && MinValue <= MaxValue) {
+            uint8_t Bits2Read                     = (uint8_t) Logarithm(2, Minimum(MinValue, MaxValue) - Maximum(MinValue, MaxValue));
+            RandomInteger                         = Entropy_ExtractBits(Random, Bits2Read);
+            
+            if (RandomInteger < MinValue || RandomInteger > MaxValue) {
+                uint8_t NumFixBits                = (CeilD(Logarithm(2, Maximum(RandomInteger, MaxValue) - Minimum(RandomInteger, MaxValue))) + Bits2Read);
+                NumFixBits                        = RoundD(NumFixBits / 2);
+                uint64_t FixBits                  = Entropy_ExtractBits(Random, NumFixBits);
+                if (RandomInteger < MinValue) {
+                    RandomInteger                += FixBits;
+                } else {
+                    RandomInteger                -= FixBits;
+                }
+            }
+        } else if (Random == NULL) {
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+        } else if (MinValue > MaxValue) {
+            Log(Log_DEBUG, __func__, U8("MinValud %lld is greater than MaxValue %lld"), MinValue, MaxValue);
+        }
+        return RandomInteger;
+    }
+    
+    double Entropy_GenerateDecimal(Entropy *Random) {
+        double Decimal        = 0.0;
+        if (Random != NULL) {
+            int8_t   Sign     = Entropy_GenerateInteger(Random, 1) == 1 ? 1 : -1;
+            int16_t  Exponent = Entropy_GenerateIntegerInRange(Random, -1023, 1023);
+            uint64_t Mantissa = Entropy_GenerateInteger(Random, 52);
+            
+            Decimal           = InsertSignD(Decimal, Sign);
+            Decimal           = InsertExponentD(Decimal, Exponent);
+            Decimal           = InsertMantissaD(Decimal, Mantissa);
+        } else {
+            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+        }
+        return Decimal;
+    }
+    
     void Entropy_Erase(Entropy *Random) {
         if (Random != NULL) {
             for (uint64_t Byte = 0ULL; Byte < Random->EntropySize; Byte++) {
@@ -377,32 +431,6 @@ extern "C" {
         } else {
             Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
         }
-    }
-    
-    int64_t Entropy_GenerateIntegerInRange(Entropy *Random, uint8_t NumEntropyBits) { // What if we hange this to specify the number of bits to read directly?
-        int64_t RandomInteger                     = 0ULL;
-        if (Random != NULL) {
-            RandomInteger                         = Entropy_ExtractBits(Random, NumEntropyBits);
-        } else {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
-        }
-        return RandomInteger;
-    }
-    
-    double Entropy_GenerateDecimal(Entropy *Random) {
-        double Decimal        = 0.0;
-        if (Random != NULL) {
-            int8_t   Sign     = Entropy_GenerateIntegerInRange(Random, 1) == 1 ? 1 : -1;
-            int16_t  Exponent = Entropy_GenerateIntegerInRange(Random, 11);
-            uint64_t Mantissa = Entropy_GenerateIntegerInRange(Random, 52);
-            
-            Decimal           = InsertSignD(Decimal, Sign);
-            Decimal           = InsertExponentD(Decimal, Exponent);
-            Decimal           = InsertMantissaD(Decimal, Mantissa);
-        } else {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
-        }
-        return Decimal;
     }
     
     void Entropy_Deinit(Entropy *Random) {

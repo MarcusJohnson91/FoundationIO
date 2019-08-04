@@ -19,9 +19,9 @@ extern "C" {
         Entropy *Random      = Entropy_Init(4096);
         
         for (uint16_t Loop = 0; Loop < 512; Loop++) {
-            uint8_t NumBits  = Entropy_GenerateIntegerInRange(Random, 8);
-            int64_t Integer1 = Entropy_GenerateIntegerInRange(Random, NumBits);
-            int64_t Integer2 = Entropy_GenerateIntegerInRange(Random, NumBits);
+            uint8_t NumBits  = Entropy_GenerateInteger(Random, 8);
+            int64_t Integer1 = Entropy_GenerateInteger(Random, NumBits);
+            int64_t Integer2 = Entropy_GenerateInteger(Random, NumBits);
             
             int64_t Minimum1 = Minimum(Integer1, Integer2);
             int64_t Maximum1 = Maximum(Integer1, Integer2);

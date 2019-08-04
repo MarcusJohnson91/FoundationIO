@@ -61,8 +61,18 @@ extern "C" {
     uint64_t          Entropy_GetRemainingEntropy(Entropy *Random);
     
     /*!
+     @abstract                             "Generates an integer occupying NumBits".
+     @param           Random               "The Entropy pointer".
+     @param           NumBits              "The number of bits for the integer to take up, between 1 and 64".
+     @return                               "Returns an integer matching those characteristics".
+     */
+    int64_t           Entropy_GenerateInteger(Entropy *Random, uint8_t NumBits);
+    
+    /*!
      @abstract                             "Generates an integer between MinValue and MaxValue, inclusive".
      @param           Random               "The Entropy pointer".
+     @param           MinValue             "The minimum valid value in the range, inclusive".
+     @param           MaxValue             "The maximum valud value in the range, inclusive".
      @return                               "Returns an integer matching those characteristics".
      */
     int64_t           Entropy_GenerateIntegerInRange(Entropy *Random, int64_t MinValue, int64_t MaxValue);

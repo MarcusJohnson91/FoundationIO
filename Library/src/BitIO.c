@@ -1063,8 +1063,8 @@ extern "C" {
     uint8_t *GUUID_Generate(Entropy *Random, GUUIDTypes GUUIDType) {
         uint8_t *GUUID                   = 0;
         if (Random != NULL && GUUIDType != UnknownGUUID) {
-            uint64_t LowBits             = Entropy_GenerateIntegerInRange(Random, 64);
-            uint64_t HighBits            = Entropy_GenerateIntegerInRange(Random, 64);
+            uint64_t LowBits             = Entropy_GenerateInteger(Random, 64);
+            uint64_t HighBits            = Entropy_GenerateInteger(Random, 64);
             // Honestly I'll just convert from BinaryGUUID to GUUIDString if I have to
             uint8_t *BinaryGUUIDData     = calloc(BinaryGUUIDSize, sizeof(uint8_t));
             if (GUUID != NULL) {

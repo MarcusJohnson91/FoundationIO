@@ -21,7 +21,7 @@ extern "C" {
     
     void Test_UTF8_EncodeDecode(Entropy *Random) {
         if (Random != NULL) {
-            uint64_t  NumCodePoints    = Entropy_GenerateIntegerInRange(Random, 16);
+            uint64_t  NumCodePoints    = Entropy_GenerateInteger(Random, 16);
             UTF32    *GeneratedString  = UTF32_GenerateString(Random, NumCodePoints);
             UTF8     *Generated8       = UTF8_Encode(GeneratedString);
             uint64_t  Generated8Units  = UTF8_GetStringSizeInCodeUnits(Generated8);
@@ -39,7 +39,7 @@ extern "C" {
     
     void Test_UTF16_EncodeDecode(Entropy *Random) {
         if (Random != NULL) {
-            uint64_t  NumCodePoints   = Entropy_GenerateIntegerInRange(Random, 16);
+            uint64_t  NumCodePoints   = Entropy_GenerateInteger(Random, 16);
             UTF32    *GeneratedString = UTF32_GenerateString(Random, NumCodePoints);
             UTF16    *Generated16     = UTF16_Encode(GeneratedString);
             UTF32    *Decoded16       = UTF16_Decode(Generated16);

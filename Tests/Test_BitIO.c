@@ -14,8 +14,8 @@ extern "C" {
         Entropy   *Random            = Entropy_Init(8000000);
         
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
-            uint8_t    NumBits2Extract = Entropy_GenerateIntegerInRange(Random, 6);
-            int64_t    RandomInteger   = Entropy_GenerateIntegerInRange(Random, NumBits2Extract);
+            uint8_t    NumBits2Extract = Entropy_GenerateInteger(Random, 6);
+            int64_t    RandomInteger   = Entropy_GenerateInteger(Random, NumBits2Extract);
             
             BitBuffer_WriteBits(BitB, MSByteFirst, MSBitFirst, NumBits2Extract, RandomInteger);
             BitBuffer_Seek(BitB, -NumBits2Extract);
@@ -34,8 +34,8 @@ extern "C" {
     bool Test_WriteBits(void) {
         bool TestPassed          = Yes;
         BitBuffer *BitB          = BitBuffer_Init(8);
-        //Entropy   *Random        = Entropy_Init(8);
-        int64_t    RandomInteger = 512; // Entropy_GenerateIntegerInRange(Random, INT64_MIN, INT64_MAX);
+        Entropy   *Random        = Entropy_Init(8);
+        int64_t    RandomInteger = Entropy_GenerateInteger(Random, 64);
         uint8_t    NumBits       = Logarithm(2, RandomInteger);
         
         BitBuffer_WriteBits(BitB, MSByteFirst, MSBitFirst, NumBits, RandomInteger);
