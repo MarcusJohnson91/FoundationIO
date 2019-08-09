@@ -91,30 +91,73 @@ extern "C" {
          TestIO should also contain all of the Generate functions that, for example CodePoints, Strings, etc.
          */
         
-        bool TestPassed     = false;
+        bool TestPassed                        = false;
         
-        UTF8 *Percent       = UTF8_Format("%%");
-        bool PercentTest    = UTF8_Compare(Percent, U8("%"));
+        UTF8 *Positional                       = UTF8_Format("NumArgs: %2$llu, %1$s", U8("Positional"), 2);
+        bool  PositionalTest                   = UTF8_Compare(Positional, U8("NumArgs: 2, Positional"));
+        if (PositionalTest == No) {
+            Log(Log_DEBUG, __func__, U8("PositionalTest Failed"));
+        }
+        
+        UTF8 *PositionPrecision                = UTF8_Format("%.*f", 2, 0.33333333);
+        bool PositionPrecisionTest             = UTF8_Compare(PositionPrecision, U8("0.33"));
+        if (PositionPrecisionTest == No) {
+            Log(Log_DEBUG, __func__, U8("PositionPrecisionTest Failed"));
+        }
+        
+        UTF8 *StringPrecision                  = UTF8_Format("%.3s", U8("FooBar"));
+        bool StringPrecisionTest               = UTF8_Compare(StringPrecision, U8("Foo"));
+        if (StringPrecisionTest == No) {
+            Log(Log_DEBUG, __func__, U8("StringPreicisonTest Failed"));
+        }
+        
+        UTF8 *Padding                          = UTF8_Format("%10.5i", 9);
+        bool  PaddingTest                      = UTF8_Compare(Padding, U8("     00009"));
+        if (PaddingTest == No) {
+            Log(Log_DEBUG, __func__, U8("PaddingTest Failed"));
+        }
+        
+        UTF8 *SpaceAlign                       = UTF8_Format("% d", 4);
+        bool SpaceAlignTest                    = UTF8_Compare(SpaceAlign, U8(" 4"));
+        if (SpaceAlignTest == No) {
+            Log(Log_DEBUG, __func__, U8("SpaceAlignTest Failed"));
+        }
+        
+        UTF8 *ZeroLeftAlign                    = UTF8_Format("%05d", 4);
+        bool ZeroLeftAlignTest                 = UTF8_Compare(ZeroLeftAlign, U8("00004"));
+        if (ZeroLeftAlignTest == No) {
+            Log(Log_DEBUG, __func__, U8("ZeroLeftAlignTest Failed"));
+        }
+        
+        UTF8 *Percent                          = UTF8_Format("%%");
+        bool PercentTest                       = UTF8_Compare(Percent, U8("%"));
         if (PercentTest == No) {
             Log(Log_DEBUG, __func__, U8("PercentTest Failed"));
         }
         
-        UTF8 *Smaller       = UTF8_Format("%llu", 132);
-        bool SmallerTest    = UTF8_Compare(Smaller, U8("123"));
+        UTF8 *Smaller                          = UTF8_Format("%llu", 123);
+        bool SmallerTest                       = UTF8_Compare(Smaller, U8("123"));
         if (SmallerTest == No) {
             Log(Log_DEBUG, __func__, U8("SmallerTest Failed"));
         }
         
-        UTF8 *Equal         = UTF8_Format("%llu", 1094);
-        bool EqualTest      = UTF8_Compare(Equal, U8("1094"));
+        UTF8 *Equal                            = UTF8_Format("%llu", 1094);
+        bool EqualTest                         = UTF8_Compare(Equal, U8("1094"));
         if (EqualTest == No) {
             Log(Log_DEBUG, __func__, U8("EqualTest Failed"));
         }
         
-        UTF8 *Longer        = UTF8_Format("%llu", 99999);
-        bool LongerTest     = UTF8_Compare(Longer, U8("99999"));
+        // Equal and Smaller fail, but Longer works, and Smaller works sometimes?
+        UTF8 *Longer                           = UTF8_Format("%llu", 99999);
+        bool LongerTest                        = UTF8_Compare(Longer, U8("99999"));
         if (LongerTest == No) {
             Log(Log_DEBUG, __func__, U8("LongerTest Failed"));
+        }
+        
+        UTF8 *DoubleSpecifier                  = UTF8_Format("%llu:%llu", 1, 2);
+        bool  DoubleSpecifierTest              = UTF8_Compare(DoubleSpecifier, U8("1:2"));
+        if (DoubleSpecifierTest == No) {
+            Log(Log_DEBUG, __func__, U8("DoubleSpecifierTest Failed"));
         }
         return TestPassed;
     }
@@ -192,7 +235,7 @@ extern "C" {
     int main(int argc, const char *argv[]) {
         bool TestSuitePassed      = false;
         
-        TestSuitePassed = Test_UTF8_Format();
+        TestSuitePassed           = Test_UTF8_Format();
         return TestSuitePassed;
     }
     

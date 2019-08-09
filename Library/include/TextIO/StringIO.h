@@ -686,6 +686,7 @@ extern "C" {
     
     /*!
      @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
+     @remark                               "If the number can be negatiev, check for a minus before extracting the digits as a substring".
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
@@ -693,6 +694,7 @@ extern "C" {
     
     /*!
      @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
+     @remark                               "If the number can be negatiev, check for a minus before extracting the digits as a substring".
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
@@ -700,6 +702,7 @@ extern "C" {
     
     /*!
      @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
+     @remark                               "If the number can be negatiev, check for a minus before extracting the digits as a substring".
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
