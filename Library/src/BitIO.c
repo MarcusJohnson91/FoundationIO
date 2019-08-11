@@ -570,7 +570,7 @@ extern "C" {
     }
     
     UTF16 *BitBuffer_ReadUTF16(BitBuffer *BitB, uint64_t StringSize) {
-        UTF16 *ExtractedString            = calloc(StringSize, sizeof(UTF16));
+        UTF16 *ExtractedString            = calloc(StringSize + FoundationIONULLTerminatorSize, sizeof(UTF16));
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
                 ExtractedString[CodeUnit] = (UTF16) BitBuffer_Extract_LSByteLSBit(BitB, 16);
