@@ -68,6 +68,38 @@ extern "C" {
 #endif /* FoundationIO_Unicodize16 */
     /* Define StringIO's Unicodeization macros */
     
+#if (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#undef LOG_EMERG
+#undef LOG_ALERT
+#undef LOG_CRIT
+#undef LOG_ERR
+#undef LOG_WARNING
+#undef LOG_NOTICE
+#undef LOG_INFO
+#undef LOG_DEBUG
+#undef LOG_KERN
+#undef LOG_USER
+#undef LOG_MAIL
+#undef LOG_DAEMON
+#undef LOG_AUTH
+#undef LOG_SYSLOG
+#undef LOG_LPR
+#undef LOG_NEWS
+#undef LOG_UUCP
+#undef LOG_CRON
+#undef LOG_AUTHPRIV
+#undef LOG_FTP
+#undef LOG_NTP
+#undef LOG_LOCAL0
+#undef LOG_LOCAL1
+#undef LOG_LOCAL2
+#undef LOG_LOCAL3
+#undef LOG_LOCAL4
+#undef LOG_LOCAL5
+#undef LOG_LOCAL6
+#undef LOG_LOCAL7
+#endif
+    
     /*!
      @enum                      LogTypes
      @constant                  Log_DEBUG                       "A internal error happened because there's a bug".
