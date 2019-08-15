@@ -221,9 +221,9 @@ extern "C" {
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             BCryptGenRandom(NULL, &RandomValue, NumBytes, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
 #else
-            FILE *RandomFile          = fopen("/dev/urandom", "rb");
+            FILE *RandomFile          = FoundationIO_File_Open(U8("/dev/urandom"), "rb");
             size_t BytesRead          = fread(&RandomValue, NumBytes, 1, RandomFile);
-            fclose(RandomFile);
+            FoundationIO_File_Close(RandomFile);
 #endif
         } else {
             Log(Log_DEBUG, __func__, U8("Can't return more than 8 bytes"));
@@ -243,13 +243,12 @@ extern "C" {
                     abort();
                 }
 #else
-                FILE *RandomFile          = fopen("/dev/urandom", "rb");
+                FILE *RandomFile          = FoundationIO_File_Open(U8("/dev/urandom"), U8("rb"));
                 size_t BytesRead          = fread(Random->EntropyPool, Random->EntropySize, 1, RandomFile);
                 if (BytesRead != Random->EntropySize) {
                     Log(Log_DEBUG, __func__, U8("Failed to read random data, Entropy is extremely insecure, aborting"));
-                    abort();
                 }
-                fclose(RandomFile);
+                FoundationIO_File_Close(RandomFile);
 #endif
             }
         } else {
