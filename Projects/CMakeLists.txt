@@ -64,16 +64,17 @@ set(libFoundationIO_Sources
 "${libFoundationIO_Dir}/src/Math.c"
 "${libFoundationIO_Dir}/src/StringIO.c"
 "${libFoundationIO_Dir}/src/TestIO.c"
+"${libFoundationIO_Dir}/src/FormatIO.c"
 )
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "${MinSizeRel}")
 endif(NOT CMAKE_BUILD_TYPE)
 
-add_library(FoundationIO ${libFoundationIO_Sources} ${libFoundationIO_PublicHeaders})
-if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-target_link_libraries(FoundationIO ws2_32 bcrypt)
-endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+add_library(FoundationIO ${libFoundationIO_Sources} ${PUBLIC_HEADER})
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+        target_link_libraries(FoundationIO ws2_32 bcrypt)
+    endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 set_target_properties(FoundationIO PROPERTIES PREFIX "")
 
