@@ -2,19 +2,22 @@ cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
 project(FoundationIO C)
 
-if (NOT ${BUILD_SHARED_LIBS})
+if (NOT BUILD_SHARED_LIBS)
 BUILD_SHARED_LIBS()
-endif (NOT ${BUILD_SHARED_LIBS})
+endif (NOT BUILD_SHARED_LIBS)
 
 if (CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
 enable_testing()
 endif (CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
 
 if(NOT FoundationIO_VERSION)
-set(FoundationIO_VERSION_MAJOR 0)
-set(FoundationIO_VERSION_MINOR 9)
-set(FoundationIO_VERSION_PATCH 1)
-set(FoundationIO_VERSION ${FoundationIO_VERSION_MAJOR}.${FoundationIO_VERSION_MINOR}.${FoundationIO_VERSION_PATCH})
+
+EXECUTE_PROCESS(COMMAND ${GIT_EXECUTABLE} git rev-parse --abbrev-ref HEAD WORKING_DIRECTORY CMAKE_CURRENT_SOURCE_DIR OUTPUT_VARIABLE GIT_BRANCH_NAME RESULT_VARIABLE STDOUT ERROR_VARIABLE STDOUT)
+
+EXECUTE_PROCESS(COMMAND ${GIT_EXECUTABLE} git rev-parse --verify ${GIT_BRANCH_NAME} WORKING_DIRECTORY CMAKE_CURRENT_SOURCE_DIR OUTPUT_VARIABLE GIT_COMMIT_ID RESULT_VARIABLE STDOUT ERROR_VARIABLE STDOUT)
+
+set(FoundationIO_VERSION_CommitID ${GIT_COMMIT_ID})
+set(FoundationIO_VERSION ${FoundationIO_VERSION_MAJOR}.${FoundationIO_VERSION_MINOR}.${FoundationIO_VERSION_CommitID})
 endif(NOT FoundationIO_VERSION)
 
 if   (${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -37,7 +40,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHI
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
 set(RUNTIME_OUTPUT_DIRECTORY       "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
 
-set(libFoundationIO_PublicHeaders
+set(PUBLIC_HEADER
 "${libFoundationIO_Dir}/include/BitIO.h"
 "${libFoundationIO_Dir}/include/CommandLineIO.h"
 "${libFoundationIO_Dir}/include/ContainerIO.h"
@@ -93,7 +96,31 @@ add_test(Test_BitIO CONFIGURATIONS Debug RelWithDebInfo)
 add_test(Test_CommandLineIO CONFIGURATIONS Debug RelWithDebInfo)
 add_test(Test_ContainerIO CONFIGURATIONS Debug RelWithDebInfo)
 add_test(Test_StringIO CONFIGURATIONS Debug RelWithDebInfo)
+add_test(Test_Math CONFIGURATIONS Debug RelWithDebInfo)
+add_test(Test_CryptographyIO CONFIGURATIONS Debug RelWithDebInfo)
 endif (CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(CMAKE_INSTALL_PREFIX "/usr/local/Packages/FoundationIO")
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    if (${CMAKE_GENERATOR_PLATFORM} MATCHES "x64")
+        set(CMAKE_INSTALL_PREFIX "%ProgramFiles%\FoundationIO\")
+    elseif (${CMAKE_GENERATOR_PLATFORM} MATCHES "x86")
+        set(CMAKE_INSTALL_PREFIX "%ProgramFiles(x86)%\FoundationIO\")
+    endif (${CMAKE_GENERATOR_PLATFORM} MATCHES "x64")
+endif (${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+install(TARGETS FoundationIO DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(TARGETS PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+
+if(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
+    install(TARGETS Test_BitIO          DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS Test_CommandLineIO  DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS Test_ContainerIO    DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS Test_StringIO       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS Test_Math           DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS Test_CryptographyIO DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+endif(CMAKE_CONFIGURATION_TYPES MATCHES "Release" OR CMAKE_CONFIGURATION_TYPES MATCHES "MinSizeRel")
 
 if (${CMAKE_C_COMPILER_ID} MATCHES "AppleClang" OR ${CMAKE_C_COMPILER_ID} MATCHES "Clang")
 
@@ -124,6 +151,7 @@ ${CMAKE_C_FLAGS} \
 set(CMAKE_C_FLAGS_DEBUG " \
 ${CMAKE_C_FLAGS} \
 -fsanitize=address,undefined \
+-fno-omit-frame-pointer \
 -DDEBUG=1 \
 -g \
 -O1 \
@@ -136,6 +164,8 @@ ${CMAKE_C_FLAGS} \
 
 set(CMAKE_C_FLAGS_RELWITHDEBINFO " \
 ${CMAKE_C_FLAGS} \
+-fsanitize=address,undefined \
+-fno-omit-frame-pointer \
 -DDEBUG=1 \
 -g \
 -Ofast \
@@ -200,6 +230,8 @@ ${CMAKE_C_FLAGS} \
 
 set(CMAKE_C_FLAGS_RELWITHDEBINFO " \
 ${CMAKE_C_FLAGS} \
+-fsanitize=address,undefined \
+-fno-omit-frame-pointer \
 -DDEBUG=1 \
 -g \
 -Ofast \
