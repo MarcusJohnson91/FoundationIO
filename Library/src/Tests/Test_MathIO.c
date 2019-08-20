@@ -7,6 +7,21 @@
 extern "C" {
 #endif
     
+    void Test_CountDigits(void) {
+        Entropy *Random        = Entropy_Init(8 * 1000000);
+        for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
+            uint8_t  NumBits   = Entropy_GenerateInteger(Random, 6);
+            int64_t  Value     = Entropy_GenerateInteger(Random, NumBits);
+            uint8_t  LogCeil   = Logarithm(10, -Value) - 1;
+            uint8_t  NumDigits = NumDigitsInInteger(10, -Value);
+            /*
+            if (LogCeil != NumDigits) {
+                //Log(Log_DEBUG, __func__, U8("NumBits %llu is incorrect"), NumBits);
+            }
+             */
+        }
+    }
+    
     void Test_Logarithm(void) {
         Entropy *Random      = Entropy_Init(64 * 6 * 1000000);
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
@@ -50,7 +65,7 @@ extern "C" {
     }
     
     int main() {
-        Test_Logarithm();
+        Test_CountDigits();
         //Test_Decimals();
         //Test_MinMax();
         return EXIT_SUCCESS;
