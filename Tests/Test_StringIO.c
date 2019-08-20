@@ -93,8 +93,8 @@ extern "C" {
         
         bool TestPassed                        = false;
         
-        UTF8 *Positional                       = UTF8_Format("NumArgs: %2$llu, %1$s", U8("Positional"), 2);
-        bool  PositionalTest                   = UTF8_Compare(Positional, U8("NumArgs: 2, Positional"));
+        UTF8 *Positional                       = UTF8_Format("NumArgs: %2$llu, %1$s EXTEND THE STRING PAST THE SPECIFIERS TO MAKE SURE THE BREAK WORKS", U8("Positional"), 2);
+        bool  PositionalTest                   = UTF8_Compare(Positional, U8("NumArgs: 2, Positional")); // "NumArgs: -$llu, Positi"
         if (PositionalTest == No) {
             Log(Log_DEBUG, __func__, U8("PositionalTest Failed"));
         }
