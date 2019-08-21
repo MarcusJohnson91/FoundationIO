@@ -605,7 +605,22 @@ extern "C" {
                     uint16_t Section4    = (uint16_t) BitBuffer_Extract_LSByteLSBit(BitB, 16);
                     BitBuffer_Seek(BitB, 8);
                     uint64_t Section5    = (uint64_t) BitBuffer_Extract_LSByteLSBit(BitB, 48);
-                    GUUID                = UTF8_Format(U8("%d-%d-%d-%d-%llu"), Section1, Section2, Section3, Section4, Section5);
+                    for (uint8_t Byte = 0; Byte < GUUIDStringSize; Byte++) {
+                        if (Byte <= 3) {
+                            GUUID[Byte]  = Section1 & (0xFF << (Byte * 8));
+                        } else if (Byte >= 5 && Byte <= 7) {
+                            GUUID[Byte]  = Section2 & ((0xFF << (Byte / 4) * 8));
+                        } else if (Byte >= 9 && Byte <= 11) {
+                            GUUID[Byte]  = Section3 & ((0xFF << (Byte / 8) * 8));
+                        } else if (Byte >= 13 && Byte <= 15) {
+                            GUUID[Byte]  = Section4 & ((0xFF << (Byte / 12) * 8));
+                        } else if (Byte >= 17 && Byte <= 21) {
+                            GUUID[Byte]  = Section5 & ((0xFF << (Byte / 16) * 8));
+                        } else {
+                            GUUID[Byte]  = '-';
+                        }
+                    }
+                    //GUUID                = UTF8_Format(U8("%d-%d-%d-%d-%llu"), Section1, Section2, Section3, Section4, Section5);
                 } else {
                     Log(Log_DEBUG, __func__, U8("Couldn't allocate UUIDString"));
                 }
