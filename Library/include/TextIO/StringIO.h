@@ -1038,7 +1038,7 @@ extern "C" {
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
-     @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
+     @remark                               "Recognized extensions: b/B = binary, MSBit and byte first, N is removed from output, C/lc. S/ls = UTF-16; Uc/Us/UC/US = UTF-32".
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
@@ -1055,7 +1055,7 @@ extern "C" {
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
-     @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
+     @remark                               "Recognized extensions: b/B = binary, MSBit and byte first, N is removed from output, C/lc. S/ls = UTF-16; Uc/Us/UC/US = UTF-32".
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                               "Returns the formatted string encoded using the UTF-16 format".
      */
@@ -1072,7 +1072,7 @@ extern "C" {
     
     /*!
      @abstract                             "Formats a string according to the Format string, with all of it's options".
-     @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
+     @remark                               "Recognized extensions: b/B = binary, MSBit and byte first, N is removed from output, C/lc. S/ls = UTF-16; Uc/Us/UC/US = UTF-32".
      @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                               "Returns the formatted string encoded using the UTF-32 format".
      */
