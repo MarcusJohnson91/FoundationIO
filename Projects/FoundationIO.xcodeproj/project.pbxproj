@@ -11,7 +11,7 @@
 		2C35220A22B59652001590DF /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA45B402283AA29009BFC25 /* FoundationIO.dylib */; };
 		2C35220D22B5965B001590DF /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA45B402283AA29009BFC25 /* FoundationIO.dylib */; };
 		2C35221222B59669001590DF /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CA45B402283AA29009BFC25 /* FoundationIO.dylib */; };
-		2C4B094122A21D93004E1B0F /* UnicodeTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C4B094022A21D93004E1B0F /* UnicodeTables.h */; };
+		2C4CB8432311A63B00D737CC /* UnicodeTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C4CB8422311A63B00D737CC /* UnicodeTables.h */; };
 		2C55753122AAE25D00FD2266 /* CryptographyIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CA45B222283A9D3009BFC25 /* CryptographyIO.c */; };
 		2C5CE6F6230B98A8008B100E /* FormatIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C5CE6F5230B98A8008B100E /* FormatIO.c */; };
 		2C5CE6F8230B990C008B100E /* FormatIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C5CE6F7230B990C008B100E /* FormatIO.h */; };
@@ -147,7 +147,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2C4B094022A21D93004E1B0F /* UnicodeTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnicodeTables.h; path = ../libFoundationIO/include/UnicodeTables.h; sourceTree = "<group>"; };
+		2C4CB8422311A63B00D737CC /* UnicodeTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnicodeTables.h; path = ../libFoundationIO/include/Private/UnicodeTables.h; sourceTree = "<group>"; };
 		2C5CE6F5230B98A8008B100E /* FormatIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = FormatIO.c; path = ../libFoundationIO/src/FormatIO.c; sourceTree = "<group>"; };
 		2C5CE6F7230B990C008B100E /* FormatIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = FormatIO.h; path = ../libFoundationIO/include/FormatIO.h; sourceTree = "<group>"; };
 		2CA1BE1A21ABAF8F0035E9F9 /* Test_BitIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_BitIO; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -244,6 +244,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2C4CB8412311A62900D737CC /* Private */ = {
+			isa = PBXGroup;
+			children = (
+				2C4CB8422311A63B00D737CC /* UnicodeTables.h */,
+			);
+			name = Private;
+			sourceTree = "<group>";
+		};
 		2CA1BE0621ABAF5C0035E9F9 = {
 			isa = PBXGroup;
 			children = (
@@ -310,6 +318,7 @@
 		2CA1BE4521ABAFD90035E9F9 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				2C4CB8412311A62900D737CC /* Private */,
 				2CA45B0B2283A999009BFC25 /* BitIO.h */,
 				2CA45B142283A99A009BFC25 /* CommandLineIO.h */,
 				2CA45B102283A99A009BFC25 /* ContainerIO.h */,
@@ -319,7 +328,6 @@
 				2CA45B0C2283A999009BFC25 /* Macros.h */,
 				2CA45B132283A99A009BFC25 /* Math.h */,
 				2CA45B122283A99A009BFC25 /* StringIO.h */,
-				2C4B094022A21D93004E1B0F /* UnicodeTables.h */,
 				2CA45B0A2283A999009BFC25 /* TestIO.h */,
 				2C5CE6F7230B990C008B100E /* FormatIO.h */,
 			);
@@ -336,7 +344,6 @@
 				2CA45B482283AA9B009BFC25 /* LocalizationIO.h in Headers */,
 				2CA45B4A2283AA9B009BFC25 /* Macros.h in Headers */,
 				2CA45B462283AA9B009BFC25 /* ContainerIO.h in Headers */,
-				2C4B094122A21D93004E1B0F /* UnicodeTables.h in Headers */,
 				2CA45B452283AA9B009BFC25 /* CommandLineIO.h in Headers */,
 				2CA45B492283AA9B009BFC25 /* Log.h in Headers */,
 				2CA45B472283AA9B009BFC25 /* CryptographyIO.h in Headers */,
@@ -345,6 +352,7 @@
 				2C5CE6F8230B990C008B100E /* FormatIO.h in Headers */,
 				2CA45B442283AA9B009BFC25 /* BitIO.h in Headers */,
 				2CA45B4C2283AA9B009BFC25 /* StringIO.h in Headers */,
+				2C4CB8432311A63B00D737CC /* UnicodeTables.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -732,6 +740,8 @@
 					"-fno-optimize-sibling-calls",
 					"-fno-omit-frame-pointer",
 					"-fsanitize-address-use-after-scope",
+					"-fsanitize-memory-track-origins",
+					"-fsanitize=pointer-overflow",
 				);
 				OTHER_LDFLAGS = "-v";
 				OTHER_LIBTOOLFLAGS = "-v";
