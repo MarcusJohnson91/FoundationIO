@@ -1,9 +1,9 @@
-#include "../include/Macros.h"         /* Included for FoundationIOSTDVersion */
-#include "../include/LocalizationIO.h" /* Included for our Declarations */
+#include "../include/Macros.h"                 /* Included for FoundationIOSTDVersion */
+#include "../include/LocalizationIO.h"         /* Included for our Declarations */
 
-#include "../include/Log.h"            /* Included for error logging */
-#include "../include/UnicodeTables.h"  /* Included for Currency tables */
-#include "../include/StringIO.h"       /* Included for UTF8_GetStringSizeInCideUnits */
+#include "../include/Log.h"                    /* Included for error logging */
+#include "../include/Private/UnicodeTables.h"  /* Included for Currency tables */
+#include "../include/StringIO.h"               /* Included for UTF8_GetStringSizeInCideUnits */
 #include <locale.h>
 
 #ifdef __cplusplus
