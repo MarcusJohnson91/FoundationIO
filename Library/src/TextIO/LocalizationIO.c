@@ -316,7 +316,7 @@ extern "C" {
         if (String != NULL) {
             uint64_t OGCodePoint = 0ULL;
             uint64_t DeCodePoint = 0ULL;
-            uint64_t NumDigits   = UTF32_GetNumDigits(Integer | Base10, String, 0);
+            uint64_t NumDigits   = UTF32_GetNumDigits(Base_Integer_Radix10, String, 0);
             Delocalized          = calloc(NumDigits + FoundationIONULLTerminatorSize, sizeof(UTF32));
             if (Delocalized != NULL) {
                 do {
@@ -402,7 +402,7 @@ extern "C" {
                 CodePoint             -= 1;
             } while (CodePoint > 0);
             
-            uint64_t NumDigits         = UTF32_GetNumDigits(Decimal | Hex, String, 0);
+            uint64_t NumDigits         = UTF32_GetNumDigits(Base_Decimal_Hex_Uppercase, String, 0);
             Delocalized                = calloc(NumDigits + FoundationIONULLTerminatorSize, sizeof(UTF32));
             
             
@@ -432,7 +432,7 @@ extern "C" {
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
-            
+        
         return Delocalized;
     }
     

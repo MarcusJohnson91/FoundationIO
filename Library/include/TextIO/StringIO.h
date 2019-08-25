@@ -134,32 +134,34 @@ extern "C" {
     
     /*!
      @enum                StringIOBases
-     @constant            UnknownBase                          "Unknown base".
-     @constant            Integer                              "Integer".
-     @constant            Decimal                              "Decimal".
-     @constant            Base2                                "Base 2".
-     @constant            Base8                                "Base 8".
-     @constant            Base10                               "Base 10".
-     @constant            Base16                               "Base 16".
-     @constant            Uppercase                            "Digits 0-9A-F".
-     @constant            Lowercase                            "Digits 0-9a-f".
-     @constant            Scientific                           "392.96e+2 Scientific decimal representation, ".
-     @constant            Shortest                             "Use either Decimal or Scientific representation".
-     @constant            Hex                                  "1.3DEp42 where E is the exponent aka 10^X, and P is the power aka 2^Y"
+     @constant            Base_Unknown                         "Unknown base".
+     @constant            Base_Integer_Radix2                  "Integer, Binary".
+     @constant            Base_Integer_Radix8                  "Integer, Octal".
+     @constant            Base_Integer_Radix10                 "Integer, Base10".
+     @constant            Base_Integer_Radix16_Uppercase       "Integer, Base16, Uppercase".
+     @constant            Base_Integer_Radix16_Lowercase       "Integer, Base16, Lowercase".
+     @constant            Base_Decimal_Radix10                 "Decimal, Base10, example: 3.14".
+     @constant            Base_Decimal_Scientific_Uppercase    "Decimal, Decimal+Exponent, Uppercase".
+     @constant            Base_Decimal_Scientific_Lowercase    "Decimal, Decimal+Exponent, Lowercase".
+     @constant            Base_Decimal_Shortest_Uppercase      "Decimal, Base10 or Scientific, Uppercase".
+     @constant            Base_Decimal_Shortest_Lowercase      "Decimal, Base10 or Scientific, Lowercase".
+     @constant            Base_Decimal_Hex_Uppercase           "Decimal, 1.3DEp42, Uppercase".
+     @constant            Base_Decimal_Hex_Lowercase           "Decimal, 1.3DEp42, Lowercase".
      */
     typedef enum StringIOBases {
-                          UnknownBase                          = 0,
-                          Integer                              = 1,
-                          Decimal                              = 2,
-                          Base2                                = 4,
-                          Base8                                = 8,
-                          Base10                               = 16,
-                          Base16                               = 32,
-                          Uppercase                            = 64,
-                          Lowercase                            = 128,
-                          Scientific                           = 256,
-                          Shortest                             = 512,
-                          Hex                                  = 1024,
+                          Base_Unknown                         = 0,
+                          Base_Integer_Radix2                  = 1,
+                          Base_Integer_Radix8                  = 2,
+                          Base_Integer_Radix10                 = 3,
+                          Base_Integer_Radix16_Uppercase       = 4,
+                          Base_Integer_Radix16_Lowercase       = 5,
+                          Base_Decimal_Radix10                 = 6,
+                          Base_Decimal_Scientific_Uppercase    = 7,
+                          Base_Decimal_Scientific_Lowercase    = 8,
+                          Base_Decimal_Shortest_Uppercase      = 9,
+                          Base_Decimal_Shortest_Lowercase      = 10,
+                          Base_Decimal_Hex_Uppercase           = 11,
+                          Base_Decimal_Hex_Lowercase           = 12,
     } StringIOBases;
     
     /*!
