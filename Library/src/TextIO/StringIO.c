@@ -2414,7 +2414,7 @@ extern "C" {
         if (String != NULL && Type != TrimString_Unknown && Strings2Remove != NULL) {
             uint64_t   StringSize          = UTF32_GetStringSizeInCodePoints(String);
             uint64_t   NumRemovalStrings   = UTF32_StringArray_GetNumStrings(Strings2Remove);
-            uint64_t **RemovalStringSizes  = UTF32_StringArray_GetStringSizesInCodePoints(Strings2Remove);
+            uint64_t  *RemovalStringSizes  = UTF32_StringArray_GetStringSizesInCodePoints(Strings2Remove);
             uint64_t   NumRemovalPoints    = 0ULL;
             uint64_t   CurrentRemovalPoint = 0ULL;
             uint64_t  *RemovalPointsStart  = NULL; // RemovalPoint[0] = {0, 6}; start and stop points
@@ -2739,22 +2739,22 @@ extern "C" {
     }
     
     UTF8 *UTF8_Format(UTF8 *Format, ...) {
-        UTF8 *Format8                     = NULL;
+        UTF8 *Format8                        = NULL;
         if (Format != NULL) {
-            uint64_t NumSpecifiers        = UTF8_GetNumFormatSpecifiers(Format);
+            uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
-                UTF32 *Format32           = UTF8_Decode(Format);
-                FormatSpecifiers *Details = UTF32_ParseFormatString(Format32, NumSpecifiers, UTF8Format);
+                UTF32 *Format32              = UTF8_Decode(Format);
+                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, UTF8Format);
                 va_list VariadicArguments;
                 va_start(VariadicArguments, Format);
-                UTF32 *FormattedString    = FormatString_UTF32(Format32, Details, VariadicArguments);
+                UTF32 *FormattedString       = FormatString_UTF32(Format32, Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
                 free(Format32);
-                FormatSpecifiers_Deinit(Details);
-                Format8                   = UTF8_Encode(FormattedString);
+                FormatSpecifiers_Deinit(Specifiers);
+                Format8                      = UTF8_Encode(FormattedString);
                 free(FormattedString);
             } else {
-                Format8                   = Format;
+                Format8                      = Format;
             }
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
@@ -2763,22 +2763,22 @@ extern "C" {
     }
     
     UTF16 *UTF16_Format(UTF16 *Format, ...) {
-        UTF16 *Format16                   = NULL;
+        UTF16 *Format16                      = NULL;
         if (Format != NULL) {
-            uint64_t NumSpecifiers        = UTF16_GetNumFormatSpecifiers(Format);
+            uint64_t NumSpecifiers           = UTF16_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
-                UTF32 *Format32           = UTF16_Decode(Format);
-                FormatSpecifiers *Details = UTF32_ParseFormatString(Format32, NumSpecifiers, UTF16Format);
+                UTF32 *Format32              = UTF16_Decode(Format);
+                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, UTF16Format);
                 va_list VariadicArguments;
                 va_start(VariadicArguments, Format);
-                UTF32 *FormattedString    = FormatString_UTF32(Format32, Details, VariadicArguments);
+                UTF32 *FormattedString       = FormatString_UTF32(Format32, Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
                 free(Format32);
-                FormatSpecifiers_Deinit(Details);
-                Format16                  = UTF16_Encode(FormattedString);
+                FormatSpecifiers_Deinit(Specifiers);
+                Format16                     = UTF16_Encode(FormattedString);
                 free(FormattedString);
             } else {
-                Format16                  = Format;
+                Format16                     = Format;
             }
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
@@ -2787,18 +2787,18 @@ extern "C" {
     }
     
     UTF32 *UTF32_Format(UTF32 *Format, ...) {
-        UTF32 *FormattedString            = NULL;
+        UTF32 *FormattedString               = NULL;
         if (Format != NULL) {
-            uint64_t NumSpecifiers        = UTF32_GetNumFormatSpecifiers(Format);
+            uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
-                FormatSpecifiers *Details = UTF32_ParseFormatString(Format, NumSpecifiers, UTF32Format);
+                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format, NumSpecifiers, UTF32Format);
                 va_list VariadicArguments;
                 va_start(VariadicArguments, Format);
-                FormattedString           = FormatString_UTF32(Format, Details, VariadicArguments);
+                FormattedString              = FormatString_UTF32(Format, Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
-                FormatSpecifiers_Deinit(Details);
+                FormatSpecifiers_Deinit(Specifiers);
             } else {
-                FormattedString           = Format;
+                FormattedString              = Format;
             }
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
@@ -2903,8 +2903,8 @@ extern "C" {
         return NumStrings;
     }
     
-    uint64_t **UTF8_StringArray_GetStringSizesInCodeUnits(UTF8 **StringArray) {
-        uint64_t **StringArraySizes       = NULL;
+    uint64_t *UTF8_StringArray_GetStringSizesInCodeUnits(UTF8 **StringArray) {
+        uint64_t *StringArraySizes       = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF8_StringArray_GetNumStrings(StringArray);
             StringArraySizes             = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
@@ -2917,8 +2917,8 @@ extern "C" {
         return StringArraySizes;
     }
     
-    uint64_t **UTF16_StringArray_GetStringSizesInCodeUnits(UTF16 **StringArray) {
-        uint64_t **StringArraySizes       = NULL;
+    uint64_t *UTF16_StringArray_GetStringSizesInCodeUnits(UTF16 **StringArray) {
+        uint64_t *StringArraySizes       = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF16_StringArray_GetNumStrings(StringArray);
             StringArraySizes             = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
@@ -2931,8 +2931,8 @@ extern "C" {
         return StringArraySizes;
     }
     
-    uint64_t **UTF8_StringArray_GetStringSizesInCodePoints(UTF8 **StringArray) {
-        uint64_t **StringArraySizes       = NULL;
+    uint64_t *UTF8_StringArray_GetStringSizesInCodePoints(UTF8 **StringArray) {
+        uint64_t *StringArraySizes       = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF8_StringArray_GetNumStrings(StringArray);
             StringArraySizes             = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
@@ -2945,8 +2945,8 @@ extern "C" {
         return StringArraySizes;
     }
     
-    uint64_t **UTF16_StringArray_GetStringSizesInCodePoints(UTF16 **StringArray) {
-        uint64_t **StringArraySizes       = NULL;
+    uint64_t *UTF16_StringArray_GetStringSizesInCodePoints(UTF16 **StringArray) {
+        uint64_t *StringArraySizes       = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF16_StringArray_GetNumStrings(StringArray);
             StringArraySizes             = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
@@ -2959,8 +2959,8 @@ extern "C" {
         return StringArraySizes;
     }
     
-    uint64_t **UTF32_StringArray_GetStringSizesInCodePoints(UTF32 **StringArray) {
-        uint64_t **StringArraySizes       = NULL;
+    uint64_t *UTF32_StringArray_GetStringSizesInCodePoints(UTF32 **StringArray) {
+        uint64_t *StringArraySizes       = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF32_StringArray_GetNumStrings(StringArray);
             StringArraySizes             = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
@@ -2977,7 +2977,7 @@ extern "C" {
         UTF32 **Decoded             = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings     = UTF8_StringArray_GetNumStrings(StringArray);
-            Decoded                 = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF32*));
+            Decoded                 = UTF32_StringArray_Init(NumStrings);
             if (Decoded != NULL) {
                 for (uint64_t String = 0ULL; String < NumStrings; String++) {
                     Decoded[String] = UTF8_Decode(StringArray[String]);
@@ -2996,7 +2996,7 @@ extern "C" {
         UTF32 **Decoded             = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings     = UTF16_StringArray_GetNumStrings(StringArray);
-            Decoded                 = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF32*));
+            Decoded                 = UTF32_StringArray_Init(NumStrings);
             if (Decoded != NULL) {
                 for (uint64_t String = 0ULL; String < NumStrings; String++) {
                     Decoded[String] = UTF16_Decode(StringArray[String]);
@@ -3015,7 +3015,7 @@ extern "C" {
         UTF8 **Encoded              = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings     = UTF32_StringArray_GetNumStrings(StringArray);
-            Encoded                 = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF8*));
+            Encoded                 = UTF8_StringArray_Init(NumStrings);
             if (Encoded != NULL) {
                 for (uint64_t String = 0ULL; String < NumStrings; String++) {
                     Encoded[String] = UTF8_Encode(StringArray[String]);
@@ -3034,7 +3034,7 @@ extern "C" {
         UTF16 **Encoded             = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings     = UTF32_StringArray_GetNumStrings(StringArray);
-            Encoded                 = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF16*));
+            Encoded                 = UTF16_StringArray_Init(NumStrings);
             if (Encoded != NULL) {
                 for (uint64_t String = 0ULL; String < NumStrings; String++) {
                     Encoded[String] = UTF16_Encode(StringArray[String]);
@@ -3086,23 +3086,19 @@ extern "C" {
     }
     
     UTF8 **UTF8_Deformat(UTF8 *Format, UTF8 *Result) {
-        UTF8 **StringArray                = NULL;
+        UTF8 **StringArray                   = NULL;
         if (Format != NULL && Result != NULL) {
-            uint64_t NumSpecifiers        = UTF8_GetNumFormatSpecifiers(Format);
+            uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
-                UTF32 *Format32           = UTF8_Decode(Format);
-                FormatSpecifiers *Details = UTF32_ParseFormatString(Format32, NumSpecifiers, UTF8Format);
-                UTF32 *Result32           = UTF8_Decode(Result);
-                UTF32 **Strings32         = DeformatString_UTF32(Format32, Result32, Details);
+                UTF32 *Format32              = UTF8_Decode(Format);
+                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, UTF8Format);
+                UTF32 *Result32              = UTF8_Decode(Result);
+                UTF32 **Strings32            = DeformatString_UTF32(Format32, Result32, Specifiers);
                 free(Format32);
                 free(Result32);
-                FormatSpecifiers_Deinit(Details);
-                StringArray               = UTF8_StringArray_Encode(Strings32);
+                FormatSpecifiers_Deinit(Specifiers);
+                StringArray                  = UTF8_StringArray_Encode(Strings32);
                 free(Strings32);
-            } else {
-                UTF8  *SourceClone        = UTF8_Clone(Result);
-                StringArray               = UTF8_StringArray_Init(1);
-                StringArray[0]            = SourceClone;
             }
         } else if (Format == NULL) {
             Log(Log_DEBUG, __func__, U8("Format Pointer is NULL"));
@@ -3113,23 +3109,19 @@ extern "C" {
     }
     
     UTF16 **UTF16_Deformat(UTF16 *Format, UTF16 *Result) {
-        UTF16 **StringArray               = NULL;
+        UTF16 **StringArray                  = NULL;
         if (Format != NULL && Result != NULL) {
-            uint64_t NumSpecifiers        = UTF16_GetNumFormatSpecifiers(Format);
+            uint64_t NumSpecifiers           = UTF16_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
-                UTF32 *Format32           = UTF16_Decode(Format);
-                FormatSpecifiers *Details = UTF32_ParseFormatString(Format32, NumSpecifiers, UTF16Format);
-                UTF32 *Result32           = UTF16_Decode(Result);
-                UTF32 **Strings32         = DeformatString_UTF32(Format32, Result32, Details);
+                UTF32 *Format32              = UTF16_Decode(Format);
+                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, UTF16Format);
+                UTF32 *Result32              = UTF16_Decode(Result);
+                UTF32 **Strings32            = DeformatString_UTF32(Format32, Result32, Specifiers);
                 free(Format32);
                 free(Result32);
-                FormatSpecifiers_Deinit(Details);
-                StringArray               = UTF16_StringArray_Encode(Strings32);
+                FormatSpecifiers_Deinit(Specifiers);
+                StringArray                  = UTF16_StringArray_Encode(Strings32);
                 free(Strings32);
-            } else {
-                UTF16 *SourceClone        = UTF16_Clone(Result);
-                StringArray               = UTF16_StringArray_Init(1);
-                StringArray[0]            = SourceClone;
             }
         } else if (Format == NULL) {
             Log(Log_DEBUG, __func__, U8("Format Pointer is NULL"));
@@ -3140,16 +3132,13 @@ extern "C" {
     }
     
     UTF32 **UTF32_Deformat(UTF32 *Format, UTF32 *Result) {
-        UTF32 **StringArray               = NULL;
+        UTF32 **StringArray                  = NULL;
         if (Format != NULL && Result != NULL) {
-            uint64_t NumSpecifiers        = UTF32_GetNumFormatSpecifiers(Format);
+            uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
-                FormatSpecifiers *Details = UTF32_ParseFormatString(Format, NumSpecifiers, UTF32Format);
-                StringArray               = DeformatString_UTF32(Format, Result, Details);
-                FormatSpecifiers_Deinit(Details);
-            } else {
-                StringArray               = UTF32_StringArray_Init(1);
-                StringArray[0]            = Result;
+                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format, NumSpecifiers, UTF32Format);
+                StringArray                  = DeformatString_UTF32(Format, Result, Specifiers);
+                FormatSpecifiers_Deinit(Specifiers);
             }
         } else if (Format == NULL) {
             Log(Log_DEBUG, __func__, U8("Format Pointer is NULL"));
