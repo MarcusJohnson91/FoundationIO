@@ -7,6 +7,9 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{05add13e-8113-412d-8d79-8e78e2479822}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Private">
+      <UniqueIdentifier>{2264dcef-d145-4526-a25f-8d3d33788b15}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\libFoundationIO\include\BitIO.h">
@@ -39,8 +42,11 @@
     <ClInclude Include="..\libFoundationIO\include\TestIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libFoundationIO\include\UnicodeTables.h">
+    <ClInclude Include="..\libFoundationIO\include\FormatIO.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\libFoundationIO\include\Private\UnicodeTables.h">
+      <Filter>Header Files\Private</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -72,6 +78,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\libFoundationIO\src\TestIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libFoundationIO\src\FormatIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
