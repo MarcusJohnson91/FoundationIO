@@ -113,10 +113,31 @@ BitIO:
 Log:
 -----
 * Writes to a file you open with `Log_OpenFile`, if it's unset or otherwise inaccessible, all logs are printed to `stderr`.
-* Works on any platform that provides `stderr`, and for ones that don't open a user specified file with `Log_OpenFile`
+* Works on any platform that provides `stderr`.
+
+FormatIO:
+-----------
+* FormatIO is composed of the UTF(8|16|32)_Format and UTF(8|16|32)_Deformat functions.
+* Technically FormatIO is the internal implementation, the public declaration is in StringIO, but it warrants having it's own section.
+* FormatIO's API is a bit different than the standard library.
+- *_Format returns a pointer to the formatted string.
+- *_Deformat returns a StringArray (just like argv), where each string starts at the offset of the specifier and ends whenever the type and modifier make sense for it to end
+
+* Supported Extensions:
+- POSIX: Positional arguments using the trailing dollar sign syntax, lc/ls for UTF-16 characters/strings (when called from UTF8_De/Format)
+- Microsoft: C/S type specifiers for UTF-16 characters/strings (when called from UTF8_De/Format).
+- FoundationIO: I created the U type modifier before c/s or C/S, it extends De/Format with UTF-32 argument support, so implementing custom struct formatters is easier.
+- Various: 
+- b/B for 0b/0B prefixed binary strings.
+- p/P it prints the value of a pointer in Hex, using upper or lowercase, determinded by the case of the type.
+
+* Unsupported Extensions:
+- the n specifier is unsupported because FormatIO's API doesn't require or allow such a thing, though the parser will remove any n specifiers it finds from the output string.
+- Microsoft's l32/l64 (ell) specifiers are not supported, it's non-standard, and l/ll(u|d|i) already supports 32/64 bit integer arguments.
+
 
 TODO:
 ====
 * StringIO:
-- Finish the `FormatString` work.
+- Finish the `Format/Deformat` work.
 - Finish the `Decimal2String` and `String2Decimal` functions in StringIO.
