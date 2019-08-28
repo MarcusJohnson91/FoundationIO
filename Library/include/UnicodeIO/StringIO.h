@@ -1187,35 +1187,35 @@ extern "C" {
      @param               StringArray      "The StringArray to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t            **UTF8_StringArray_GetStringSizesInCodeUnits(UTF8 **StringArray);
+    uint64_t             *UTF8_StringArray_GetStringSizesInCodeUnits(UTF8 **StringArray);
     
     /*!
      @abstract                             "Gets the size of each string in the StringArray in code units".
      @param               StringArray      "The StringArray to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t            **UTF16_StringArray_GetStringSizesInCodeUnits(UTF16 **StringArray);
+    uint64_t             *UTF16_StringArray_GetStringSizesInCodeUnits(UTF16 **StringArray);
     
     /*!
      @abstract                             "Gets the size of each string in the StringArray in code points".
      @param               StringArray      "The StringArray to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t            **UTF8_StringArray_GetStringSizesInCodePoints(UTF8 **StringArray);
+    uint64_t             *UTF8_StringArray_GetStringSizesInCodePoints(UTF8 **StringArray);
     
     /*!
      @abstract                             "Gets the size of each string in the StringArray in code points".
      @param               StringArray      "The StringArray to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t            **UTF16_StringArray_GetStringSizesInCodePoints(UTF16 **StringArray);
+    uint64_t             *UTF16_StringArray_GetStringSizesInCodePoints(UTF16 **StringArray);
     
     /*!
      @abstract                             "Gets the size of each string in the StringArray in code points".
      @param               StringArray      "The StringArray to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t            **UTF32_StringArray_GetStringSizesInCodePoints(UTF32 **StringArray);
+    uint64_t             *UTF32_StringArray_GetStringSizesInCodePoints(UTF32 **StringArray);
     
     /*!
      @abstract                             "Decodes a StringArray to a UTF32_StringArray".
