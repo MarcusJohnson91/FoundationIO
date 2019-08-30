@@ -1,8 +1,9 @@
-#include <stdarg.h>                    /* Included for va_list, va_copy, va_start, va_end */
+#include <stdarg.h>                          /* Included for va_list, va_copy, va_start, va_end */
 
-#include "../include/StringIO.h"       /* Included for StringIOBases */
+#include "../include/StringIO.h"             /* Included for StringIOBases */
 #include "../include/FormatIO.h"
 #include "../include/Log.h"
+#include "../include/Private/NumberTables.h" /* Included for the Number tables */
 
 #ifdef __cplusplus
 extern "C" {
@@ -127,57 +128,6 @@ extern "C" {
         }
         return Specifiers;
     }
-    
-#define FormatIOIntegerTableBase2Size        2
-#define FormatIOIntegerTableBase8Size        8
-#define FormatIOIntegerTableBase10Size      10
-#define FormatIOIntegerTableBase16Size      16
-#define FormatIODecimalTableSize            11
-#define FormatIODecimalTableScientificSize  14
-#define FormatIODecimalTableHexadecimalSize 21
-    
-    
-    static const UTF32 FormatIOIntegerTableBase2[FormatIOIntegerTableBase2Size] = {
-        U32('0'), U32('1')
-    };
-    
-    static const UTF32 FormatIOIntegerTableBase8[FormatIOIntegerTableBase8Size] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7')
-    };
-    
-    static const UTF32 FormatIOIntegerTableBase10[FormatIOIntegerTableBase10Size] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9')
-    };
-    
-    static const UTF32 FormatIOIntegerTableUppercaseBase16[FormatIOIntegerTableBase16Size] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('A'), U32('B'), U32('C'), U32('D'), U32('E'), U32('F')
-    };
-    
-    static const UTF32 FormatIOIntegerTableLowercaseBase16[FormatIOIntegerTableBase16Size] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'), U32('e'), U32('f')
-    };
-    
-    static const UTF32 FormatIODecimalTable[FormatIODecimalTableSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('.')
-    };
-    
-    static const UTF32 FormatIODecimalScientificUppercase[FormatIODecimalTableScientificSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('E'), U32('.'), U32('+'), U32('-')
-    };
-    
-    static const UTF32 FormatIODecimalScientificLowercase[FormatIODecimalTableScientificSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('e'), U32('.'), U32('+'), U32('-')
-    };
-    
-    static const UTF32 FormatIODecimalHexUppercase[FormatIODecimalTableHexadecimalSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('A'), U32('B'), U32('C'), U32('D'),
-        U32('E'), U32('F'), U32('P'), U32('X'), U32('.'), U32('+'), U32('-')
-    };
-    
-    static const UTF32 FormatIODecimalHexLowercase[FormatIODecimalTableHexadecimalSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'),
-        U32('e'), U32('f'), U32('p'), U32('x'), U32('.'), U32('+'), U32('-')
-    };
     
     static StringIOBases ConvertTypeModifier2Base(FormatSpecifier_TypeModifiers TypeModifier) {
         StringIOBases Base = Base_Unknown;
