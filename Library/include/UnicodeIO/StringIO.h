@@ -612,6 +612,30 @@ extern "C" {
     UTF32                *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length);
     
     /*!
+     @abstract                             "Reallocates String and copies it except for the CodePoints between Offset and Length (inclusive)".
+     @param               String           "The string to operate on".
+     @param               Offset           "The first CodePoint to remove".
+     @param               Length           "The last CodePoint to remove minus Offset".
+     */
+    UTF8                 *UTF8_Stitch(UTF8 *String, uint64_t Offset, uint64_t Length);
+    
+    /*!
+     @abstract                             "Reallocates String and copies it except for the CodePoints between Offset and Length (inclusive)".
+     @param               String           "The string to operate on".
+     @param               Offset           "The first CodePoint to remove".
+     @param               Length           "The last CodePoint to remove minus Offset".
+     */
+    UTF16                *UTF16_Stitch(UTF16 *String, uint64_t Offset, uint64_t Length);
+    
+    /*!
+     @abstract                             "Reallocates String and copies it except for the CodePoints between Offset and Length (inclusive)".
+     @param               String           "The string to operate on".
+     @param               Offset           "The first CodePoint to remove".
+     @param               Length           "The last CodePoint to remove minus Offset".
+     */
+    UTF32                *UTF32_Stitch(UTF32 *String, uint64_t Offset, uint64_t Length);
+    
+    /*!
      @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
      @param               String           "The string to operate on".
      @param               SubString2Remove "The substring to remove from the string".

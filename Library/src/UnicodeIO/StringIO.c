@@ -1466,6 +1466,66 @@ extern "C" {
         return NewString;
     }
     
+    UTF8 *UTF8_Stitch(UTF8 *String, uint64_t Offset, uint64_t Length) {
+        UTF8 *Stitched = NULL;
+        if (String != NULL) {
+            UTF32 *Decoded    = UTF8_Decode(String);
+            UTF32 *Stitched32 = UTF32_Stitch(Decoded, Offset, Length);
+            free(Decoded);
+            Stitched          = UTF8_Encode(Stitched32);
+        } else {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return Stitched;
+    }
+    
+    UTF16 *UTF16_Stitch(UTF16 *String, uint64_t Offset, uint64_t Length) {
+        UTF16 *Stitched       = NULL;
+        if (String != NULL) {
+            UTF32 *Decoded    = UTF16_Decode(String);
+            UTF32 *Stitched32 = UTF32_Stitch(Decoded, Offset, Length);
+            free(Decoded);
+            Stitched          = UTF16_Encode(Stitched32);
+            free(Stitched32);
+        } else {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return Stitched;
+    }
+    
+    UTF32 *UTF32_Stitch(UTF32 *String, uint64_t Offset, uint64_t Length) {
+        UTF32 *Stitched = NULL;
+        if (String != NULL) {
+            uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
+            if (Offset <= StringSize && Length <= StringSize && Offset + Length <= StringSize) {
+                uint64_t StitchedSize = StringSize - (Length + 1);
+                Stitched              = calloc(StitchedSize, sizeof(UTF32));
+                if (Stitched != NULL) {
+                    uint64_t CodePoint = 0ULL;
+                    while (CodePoint < StitchedSize && CodePoint + Length < StringSize) {
+                        if (CodePoint < Offset) {
+                            Stitched[CodePoint] = String[CodePoint];
+                        } else if (CodePoint > Offset + Length) {
+                            Stitched[CodePoint] = String[CodePoint + (Length + 1)];
+                        }
+                        CodePoint += 1;
+                    }
+                } else {
+                    Log(Log_DEBUG, __func__, U8("Could not allocate Stitched string, size: %llu"), StitchedSize);
+                }
+            } else if (Offset > StringSize) {
+                Log(Log_DEBUG, __func__, U8("Offset %llu is greater than the String's size %llu"), Offset, StringSize);
+            } else if (Length > StringSize) {
+                Log(Log_DEBUG, __func__, U8("Length %llu is greater than the String's size %llu"), Length, StringSize);
+            } else if (Offset + Length > StringSize) {
+                Log(Log_DEBUG, __func__, U8("Offset + Length %llu is greater than the String's size %llu"), Offset + Length, StringSize);
+            }
+        } else {
+            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+        }
+        return NULL;
+    }
+    
     UTF8 *UTF8_RemoveSubString(UTF8 *String, UTF8 *SubString2Remove, uint64_t Instance2Remove) {
         UTF8 *TrimmedString         = NULL;
         if (String != NULL && SubString2Remove != NULL) {
