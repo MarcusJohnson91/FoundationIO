@@ -2,6 +2,7 @@
 
 #if (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
 #include <stddef.h>
+#include <unistd.h>
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #include <sysinfoapi.h>
 #endif
@@ -25,6 +26,21 @@ extern "C" {
         NumCPUCores = WinSysInfo.dwNumberOfProcessors;
 #endif
         return NumCPUCores;
+    }
+    
+    uint64_t FoundationIO_GetTotalMemoryInBytes(void) {
+        uint64_t TotalMemory = 0ULL;
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+        uint64_t NumPages    = (uint64_t) sysconf(_SC_PHYS_PAGES);
+        uint64_t PageSize    = (uint64_t) sysconf(_SC_PAGE_SIZE);
+        TotalMemory          = NumPages * PageSize;
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+        MEMORYSTATUSEX MemoryStatus;
+        MemoryStatus.dwLength(sizeof(MemoryStatus));
+        GlobalMemoryStatusEx(&MemoryStatus);
+        TotalMemory          = MemoryStatus.ullTotalPhys;
+#endif
+        return TotalMemory;
     }
     
 #ifdef __cplusplus
