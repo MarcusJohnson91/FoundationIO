@@ -345,6 +345,8 @@ extern "C" {
     
     uint64_t FoundationIO_GetNumCPUCores(void);
     
+    uint64_t FoundationIO_GetTotalMemoryInBytes(void);
+    
 #ifdef __cplusplus
 }
 #endif
