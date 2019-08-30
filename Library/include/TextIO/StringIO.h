@@ -75,7 +75,7 @@ extern "C" {
      @enum                StringIOCommon
      @constant            UTF8BOMSizeInCodeUnits               "The number of code units (8 bits) the UTF8 BOM takes".
      @constant            UTF16BOMSizeInCodeUnits              "The number of code units (16 bits) the UTF16 BOM takes".
-     @constant            UnicodeBOMSizeInCodePoints           "The number of codepoints in a BOM".
+     @constant            UnicodeBOMSizeInCodePoints           "The number of CodePoints in a BOM".
      @constant            UTF16BOM_LE                          "UTF16BOM_LE byte order mark".
      @constant            UTF16BOM_BE                          "UTF16BOM_BE byte order mark".
      @constant            UTF32BOM_LE                          "UTF32BOM_LE byte order mark".
@@ -85,11 +85,11 @@ extern "C" {
      @constant            UTF16HighSurrogateEnd                "The value that marks the end   of the High Surrogate range".
      @constant            UTF16LowSurrogateStart               "The value that marks the start of the Low  Surrogate range".
      @constant            UTF16LowSurrogateEnd                 "The value that marks the end   of the Low  Surrogate range".
-     @constant            UTF16MaxCodeUnit                     "The highest value that can be stored in a single UTF16 codeunit".
+     @constant            UTF16MaxCodeUnit                     "The highest value that can be stored in a single UTF16 CodeUnit".
      @constant            UTF16SurrogatePairModDividend        "The value to modulo the surrogate pair by to decode a High Surrogate".
-     @constant            UTF16SurrogatePairStart              "The first UTF-32 codepoint to require Surrogate Pairs in UTF-16".
-     @constant            InvalidReplacementCodePoint          "The codepoint to replace invalid codeunits".
-     @constant            UnicodeMaxCodePoint                  "The highest codepoint possible in Unicode, 1,114,111".
+     @constant            UTF16SurrogatePairStart              "The first UTF-32 CodePoint to require Surrogate Pairs in UTF-16".
+     @constant            InvalidReplacementCodePoint          "The CodePoint to replace invalid codeunits".
+     @constant            UnicodeMaxCodePoint                  "The highest CodePoint possible in Unicode, 1,114,111".
      */
     typedef enum StringIOCommon {
                           UTF8BOMSizeInCodeUnits               = 3,
@@ -181,15 +181,15 @@ extern "C" {
     /* Basic String Property Functions */
     /*!
      @abstract                             "Returns the number of CodeUnits in the CodePoint".
-     @param               CodeUnit         "The leading codeunit for a codepoint".
+     @param               CodeUnit         "The leading CodeUnit for a CodePoint".
      */
-    uint8_t               UTF8_GetCodePointSizeInCodeUnits(UTF8 CodeUnit);
+    uint8_t               UTF8_GetCodePointsizeInCodeUnits(UTF8 CodeUnit);
     
     /*!
      @abstract                             "Returns the number of CodeUnits in the CodePoint".
-     @param               CodeUnit         "A codeunit for a codepoint".
+     @param               CodeUnit         "A CodeUnit for a CodePoint".
      */
-    uint8_t               UTF16_GetCodePointSizeInCodeUnits(UTF16 CodeUnit);
+    uint8_t               UTF16_GetCodePointsizeInCodeUnits(UTF16 CodeUnit);
     
     /*!
      @abstract                             "Gets the number of Unicode codeunits in the UTF8 string".
@@ -201,27 +201,27 @@ extern "C" {
     /*!
      @abstract                             "Gets the number of Unicode codeunits in the UTF8".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
-     @param               String           "The string to get the number of codepoints in".
+     @param               String           "The string to get the number of CodePoints in".
      */
     uint64_t              UTF16_GetStringSizeInCodeUnits(UTF16 *String);
     
     /*!
-     @abstract                             "Gets the number of Unicode codepoints in the string".
+     @abstract                             "Gets the number of Unicode CodePoints in the string".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
-     @param               String           "The string to get the number of codepoints in".
+     @param               String           "The string to get the number of CodePoints in".
      */
     uint64_t              UTF8_GetStringSizeInCodePoints(UTF8 *String);
     
     /*!
-     @abstract                             "Gets the number of Unicode codepoints in the string".
+     @abstract                             "Gets the number of Unicode CodePoints in the string".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
-     @param               String           "The string to get the number of codepoints in".
+     @param               String           "The string to get the number of CodePoints in".
      */
     uint64_t              UTF16_GetStringSizeInCodePoints(UTF16 *String);
     
     /*!
-     @abstract                             "Gets the number of Unicode codepoints in the string".
-     @param               String           "The string to get the number of codepoints in".
+     @abstract                             "Gets the number of Unicode CodePoints in the string".
+     @param               String           "The string to get the number of CodePoints in".
      */
     uint64_t              UTF32_GetStringSizeInCodePoints(UTF32 *String);
     
@@ -457,7 +457,7 @@ extern "C" {
     UTF32                *UTF32_CaseFold(UTF32 *String);
     
     /*!
-     @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
+     @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining CodePoints in lexiographic order".
      @remark                               "The string is reallocated at the end to remove unused space".
      @remark                               "This function simply decodes the string, sends it to the UTF32 version, then reencodes it".
      @param               String           "The string to be normalized".
@@ -466,7 +466,7 @@ extern "C" {
     UTF8                 *UTF8_Normalize(UTF8 *String, StringIONormalizationForms NormalizedForm);
     
     /*!
-     @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
+     @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining CodePoints in lexiographic order".
      @remark                               "The string is reallocated at the end to remove unused space".
      @remark                               "This function simply decodes the string, sends it to the UTF32 version, then reencodes it".
      @param               String           "The string to be normalized".
@@ -475,7 +475,7 @@ extern "C" {
     UTF16                *UTF16_Normalize(UTF16 *String, StringIONormalizationForms NormalizedForm);
     
     /*!
-     @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining codepoints in lexiographic order".
+     @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining CodePoints in lexiographic order".
      @remark                               "The string is reallocated at the end to remove unused space".
      @param               String           "The string to be normalized".
      @param               NormalizedForm   "The type of normalization to use on the String".
@@ -528,34 +528,34 @@ extern "C" {
     bool                  UTF32_Compare(UTF32 *String1, UTF32 *String2);
     
     /*!
-     @abstract                             "Finds a substring within string, starting at codepoint Offset, and ending at Offset + Length".
+     @abstract                             "Finds a substring within string, starting at CodePoint Offset, and ending at Offset + Length".
      @remark                               "We do NOT casefold, or normalize the String or SubString, that's your job".
      @param               String           "The string to search for SubString in".
      @param               SubString        "The SubString to find in String".
      @param               Offset           "Where in the string should we start looking for the substring"?
-     @param               Length           "How many codepoints should we search for the substring? -1 means all codepoints".
+     @param               Length           "How many CodePoints should we search for the substring? -1 means all CodePoints".
      @return                               "Returns the offset of the start of the substring in String, or -1 if a match wasn't found.".
      */
     int64_t               UTF8_FindSubString(UTF8 *String, UTF8 *SubString, uint64_t Offset, int64_t Length);
     
     /*!
-     @abstract                             "Finds a substring within string, starting at codepoint Offset, and ending at Offset + Length".
+     @abstract                             "Finds a substring within string, starting at CodePoint Offset, and ending at Offset + Length".
      @remark                               "We do NOT casefold, or normalize the String or SubString, that's your job".
      @param               String           "The string to search for SubString in".
      @param               SubString        "The SubString to find in String".
      @param               Offset           "Where in the string should we start looking for the substring"?
-     @param               Length           "How many codepoints should we search for the substring? -1 means all codepoints".
+     @param               Length           "How many CodePoints should we search for the substring? -1 means all CodePoints".
      @return                               "Returns the offset of the start of the substring in String, or -1 if a match wasn't found.".
      */
     int64_t               UTF16_FindSubString(UTF16 *String, UTF16 *SubString, uint64_t Offset, int64_t Length);
     
     /*!
-     @abstract                             "Finds a substring within string, starting at codepoint Offset, and ending at Offset + Length".
+     @abstract                             "Finds a substring within string, starting at CodePoint Offset, and ending at Offset + Length".
      @remark                               "We do NOT casefold, or normalize the String or SubString, that's your job".
      @param               String           "The string to search for SubString in".
      @param               SubString        "The SubString to find in String".
      @param               Offset           "Where in the string should we start looking for the substring"?
-     @param               Length           "How many codepoints should we search for the substring? -1 means all codepoints".
+     @param               Length           "How many CodePoints should we search for the substring? -1 means all CodePoints".
      @return                               "Returns the offset of the start of the substring in String, or -1 if a match wasn't found.".
      */
     int64_t               UTF32_FindSubString(UTF32 *String, UTF32 *SubString, uint64_t Offset, int64_t Length);
@@ -564,7 +564,7 @@ extern "C" {
      @abstract                             "Extracts a SubString from String".
      @param               String           "The string to extract from".
      @param               Offset           "The CodePoint to start extracting from".
-     @param               Length           "The number of codepoints to extract".
+     @param               Length           "The number of CodePoints to extract".
      */
     UTF8                 *UTF8_ExtractSubString(UTF8 *String, uint64_t Offset, uint64_t Length);
     
@@ -572,7 +572,7 @@ extern "C" {
      @abstract                             "Extracts a SubString from String".
      @param               String           "The string to extract from".
      @param               Offset           "The CodePoint to start extracting from".
-     @param               Length           "The number of codepoints to extract".
+     @param               Length           "The number of CodePoints to extract".
      */
     UTF16                *UTF16_ExtractSubString(UTF16 *String, uint64_t Offset, uint64_t Length);
     
@@ -580,7 +580,7 @@ extern "C" {
      @abstract                             "Extracts a SubString from String".
      @param               String           "The string to extract from".
      @param               Offset           "The CodePoint to start extracting from".
-     @param               Length           "The number of codepoints to extract".
+     @param               Length           "The number of CodePoints to extract".
      */
     UTF32                *UTF32_ExtractSubString(UTF32 *String, uint64_t Offset, uint64_t Length);
     
@@ -589,7 +589,7 @@ extern "C" {
      @param               String           "The string to edit".
      @param               Replacement      "The string to splice in".
      @param               Offset           "Where to start replacing String with Replacement".
-     @param               Length           "The number of codepoints to replace, can be more or less than Replacement".
+     @param               Length           "The number of CodePoints to replace, can be more or less than Replacement".
      */
     UTF8                 *UTF8_ReplaceSubString(UTF8 *String, UTF8 *Replacement, uint64_t Offset, uint64_t Length);
     
@@ -598,7 +598,7 @@ extern "C" {
      @param               String           "The string to edit".
      @param               Replacement      "The string to splice in".
      @param               Offset           "Where to start replacing String with Replacement".
-     @param               Length           "The number of codepoints to replace, can be more or less than Replacement".
+     @param               Length           "The number of CodePoints to replace, can be more or less than Replacement".
      */
     UTF16                *UTF16_ReplaceSubString(UTF16 *String, UTF16 *Replacement, uint64_t Offset, uint64_t Length);
     
@@ -607,7 +607,7 @@ extern "C" {
      @param               String           "The string to edit".
      @param               Replacement      "The string to splice in".
      @param               Offset           "Where to start replacing String with Replacement".
-     @param               Length           "The number of codepoints to replace, can be more or less than Replacement".
+     @param               Length           "The number of CodePoints to replace, can be more or less than Replacement".
      */
     UTF32                *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length);
     
@@ -772,7 +772,7 @@ extern "C" {
      @abstract                                                  "Is this BitInput or BitOutput connected to a File or Socket?".
      @constant                  TrimString_Unknown              "Unknown TrimString command".
      @constant                  TrimString_StartEndRemoveAll    "Trim at the beginning and end, removing all occurrences found there".
-     @constant                  TrimString_BetweenValidKeep1    "Trim between start and end, removing all but 1 occurrence found between non-removable codepoints".
+     @constant                  TrimString_BetweenValidKeep1    "Trim between start and end, removing all but 1 occurrence found between non-removable CodePoints".
      @constant                  TrimString_All                  "Remove all occurrences regardless of context".
      */
     typedef enum TrimStringTypes {
@@ -783,21 +783,21 @@ extern "C" {
     } TrimStringTypes;
     
     /*!
-     @abstract                             "Removes substrings (including single codepoints) from a string".
+     @abstract                             "Removes substrings (including single CodePoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
     UTF8                 *UTF8_Trim(UTF8 *String, TrimStringTypes Type, UTF8 **Strings2Remove);
     
     /*!
-     @abstract                             "Removes substrings (including single codepoints) from a string".
+     @abstract                             "Removes substrings (including single CodePoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
     UTF16                *UTF16_Trim(UTF16 *String, TrimStringTypes Type, UTF16 **Strings2Remove);
     
     /*!
-     @abstract                             "Removes substrings (including single codepoints) from a string".
+     @abstract                             "Removes substrings (including single CodePoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
@@ -898,7 +898,7 @@ extern "C" {
      @remark                               "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string".
      @param               String           "The string to manipulate".
      @param               String2Insert    "The string to be inserted into the String".
-     @param               Offset           "In codepoints, not code units".
+     @param               Offset           "In CodePoints, not code units".
      @return                               "Returns a pointer to a new string containing the original, and String2Insert at Offset".
      */
     UTF8                 *UTF8_Insert(UTF8 *String, UTF8 *String2Insert, uint64_t Offset);
@@ -908,7 +908,7 @@ extern "C" {
      @remark                               "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string".
      @param               String           "The string to manipulate".
      @param               String2Insert    "The string to be inserted into the String".
-     @param               Offset           "In codepoints, not code units".
+     @param               Offset           "In CodePoints, not code units".
      @return                               "Returns a pointer to a new string containing the original, and String2Insert at Offset".
      */
     UTF16                *UTF16_Insert(UTF16 *String, UTF16 *String2Insert, uint64_t Offset);
@@ -918,7 +918,7 @@ extern "C" {
      @remark                               "An offset of 0xFFFFFFFFFFFFFFFF means the end of the string".
      @param               String           "The string to manipulate".
      @param               String2Insert    "The string to be inserted into the String".
-     @param               Offset           "In codepoints, not code units".
+     @param               Offset           "In CodePoints, not code units".
      @return                               "Returns a pointer to a new string containing the original, and String2Insert at Offset".
      */
     UTF32                *UTF32_Insert(UTF32 *String, UTF32 *String2Insert, uint64_t Offset);
@@ -948,7 +948,7 @@ extern "C" {
      @abstract                             "Reads a Grapheme from Source".
      @remark                               "Replaces Fgetc and getc".
      @param               Source           "The file to read from".
-     @return                               "Returns the UTF-8 encoded codepoint which will be between 1-4 CodeUnits".
+     @return                               "Returns the UTF-8 encoded CodePoint which will be between 1-4 CodeUnits".
      */
     UTF8                 *UTF8_ReadGraphemeFromFile(FILE *Source);
     
@@ -956,7 +956,7 @@ extern "C" {
      @abstract                             "Reads a Grapheme from Source".
      @remark                               "Replaces Fgetwc and getwc".
      @param               Source           "The file to read from".
-     @return                               "Returns the UTF-16 encoded codepoint which will be between 1-2 CodeUnits".
+     @return                               "Returns the UTF-16 encoded CodePoint which will be between 1-2 CodeUnits".
      */
     UTF16                *UTF16_ReadGraphemeFromFile(FILE *Source);
     
@@ -964,7 +964,7 @@ extern "C" {
      @abstract                             "Writes a CodePoint to Source".
      @remark                               "Replaces Fputc and putc".
      @param               Source           "The file to write to".
-     @param               CodePoint        "An array of CodeUnits containing one codepoint".
+     @param               CodePoint        "An array of CodeUnits containing one CodePoint".
      */
     void                  UTF8_WriteGrapheme(FILE *Source, UTF8 *CodePoint);
     
@@ -972,7 +972,7 @@ extern "C" {
      @abstract                             "Writes a CodePoint to Source".
      @remark                               "Replaces Fputwc and putwc".
      @param               Source           "The file to write to".
-     @param               CodePoint        "An array of CodeUnits containing one codepoint".
+     @param               CodePoint        "An array of CodeUnits containing one CodePoint".
      */
     void                  UTF16_WriteGrapheme(FILE *Source, UTF16 *CodePoint);
     
