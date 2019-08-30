@@ -1,5 +1,6 @@
 #include "../include/StringIO.h"               /* Included for our declarations */
 #include "../include/Private/UnicodeTables.h"  /* Included for the Unicode tables */
+#include "../include/Private/NumberTables.h"   /* Included for the Number tables */
 
 #include "../include/Log.h"                    /* Included for error logging */
 #include "../include/Math.h"                   /* Included for endian swapping */
@@ -1945,57 +1946,6 @@ extern "C" {
         return Value;
     }
     
-#define StringIOIntegerTableBase2Size        2
-#define StringIOIntegerTableBase8Size        8
-#define StringIOIntegerTableBase10Size      10
-#define StringIOIntegerTableBase16Size      16
-#define StringIODecimalTableSize            11
-#define StringIODecimalTableScientificSize  14
-#define StringIODecimalTableHexadecimalSize 21
-    
-    
-    static const UTF32 StringIOIntegerTableBase2[StringIOIntegerTableBase2Size] = {
-        U32('0'), U32('1')
-    };
-    
-    static const UTF32 StringIOIntegerTableBase8[StringIOIntegerTableBase8Size] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7')
-    };
-    
-    static const UTF32 StringIOIntegerTableBase10[StringIOIntegerTableBase10Size] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9')
-    };
-    
-    static const UTF32 StringIOIntegerTableUppercaseBase16[StringIOIntegerTableBase16Size] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('A'), U32('B'), U32('C'), U32('D'), U32('E'), U32('F')
-    };
-    
-    static const UTF32 StringIOIntegerTableLowercaseBase16[StringIOIntegerTableBase16Size] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'), U32('e'), U32('f')
-    };
-    
-    static const UTF32 StringIODecimalTable[StringIODecimalTableSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('.')
-    };
-    
-    static const UTF32 StringIODecimalScientificUppercase[StringIODecimalTableScientificSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('E'), U32('.'), U32('+'), U32('-')
-    };
-    
-    static const UTF32 StringIODecimalScientificLowercase[StringIODecimalTableScientificSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('e'), U32('.'), U32('+'), U32('-')
-    };
-    
-    static const UTF32 StringIODecimalHexUppercase[StringIODecimalTableHexadecimalSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('A'), U32('B'), U32('C'), U32('D'),
-        U32('E'), U32('F'), U32('P'), U32('X'), U32('.'), U32('+'), U32('-')
-    };
-    
-    static const UTF32 StringIODecimalHexLowercase[StringIODecimalTableHexadecimalSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'),
-        U32('e'), U32('f'), U32('p'), U32('x'), U32('.'), U32('+'), U32('-')
-    };
-    
     int64_t UTF32_String2Integer(StringIOBases Base, UTF32 *String) {
         uint64_t CodePoint = 0ULL;
         int8_t   Sign      = 1;
@@ -2003,8 +1953,8 @@ extern "C" {
         if (String != NULL) {
             if (Base == Base_Integer_Radix2) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t Digit = 0; Digit < StringIOIntegerTableBase2Size; Digit++) {
-                        if (String[CodePoint] == StringIOIntegerTableBase2[Digit]) {
+                    for (uint8_t Digit = 0; Digit < IntegerTableBase2Size; Digit++) {
+                        if (String[CodePoint] == IntegerTableBase2[Digit]) {
                             if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x31) {
                                 Value <<= 1;
                                 Value  += String[CodePoint] - 0x30;
@@ -2015,8 +1965,8 @@ extern "C" {
                 }
             } else if (Base == Base_Integer_Radix8) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t Digit = 0; Digit < StringIOIntegerTableBase8Size; Digit++) {
-                        if (String[CodePoint] == StringIOIntegerTableBase8[Digit]) {
+                    for (uint8_t Digit = 0; Digit < IntegerTableBase8Size; Digit++) {
+                        if (String[CodePoint] == IntegerTableBase8[Digit]) {
                             if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x37) {
                                 Value  *= 8;
                                 Value  += String[CodePoint] - 0x30;
@@ -2027,10 +1977,10 @@ extern "C" {
                 }
             } else if (Base == Base_Integer_Radix10) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t Digit = 0; Digit < StringIOIntegerTableBase10Size; Digit++) {
+                    for (uint8_t Digit = 0; Digit < IntegerTableBase10Size; Digit++) {
                         if (CodePoint == 0 && String[CodePoint] == U32('-')) {
                             Sign        = -1;
-                        } else if (String[CodePoint] == StringIOIntegerTableBase10[Digit]) {
+                        } else if (String[CodePoint] == IntegerTableBase10[Digit]) {
                             Value      *= 10;
                             Value      += String[CodePoint] - 0x30;
                         }
@@ -2039,8 +1989,8 @@ extern "C" {
                 }
             } else if (Base == Base_Integer_Radix16_Uppercase) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t Digit = 0; Digit < StringIOIntegerTableBase16Size; Digit++) {
-                        if (String[CodePoint] == StringIOIntegerTableUppercaseBase16[Digit]) {
+                    for (uint8_t Digit = 0; Digit < IntegerTableBase16Size; Digit++) {
+                        if (String[CodePoint] == IntegerTableUppercaseBase16[Digit]) {
                             if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
                                 Value <<= 4;
                                 Value  += String[CodePoint] - 0x30;
@@ -2054,8 +2004,8 @@ extern "C" {
                 }
             } else if (Base == Base_Integer_Radix16_Lowercase) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t Digit = 0; Digit < StringIOIntegerTableBase16Size; Digit++) {
-                        if (String[CodePoint] == StringIOIntegerTableLowercaseBase16[Digit]) {
+                    for (uint8_t Digit = 0; Digit < IntegerTableBase16Size; Digit++) {
+                        if (String[CodePoint] == IntegerTableLowercaseBase16[Digit]) {
                             if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
                                 Value <<= 4;
                                 Value  += String[CodePoint] - 0x30;
@@ -2121,19 +2071,19 @@ extern "C" {
                 uint8_t Digit                 = Num % Radix;
                 Num                          /= Radix;
                 if (Base == Base_Integer_Radix2) {
-                    String[CodePoint - 1]     = StringIOIntegerTableBase2[Digit];
+                    String[CodePoint - 1]     = IntegerTableBase2[Digit];
                 } else if (Base == Base_Integer_Radix8) {
-                    String[CodePoint - 1]     = StringIOIntegerTableBase8[Digit];
+                    String[CodePoint - 1]     = IntegerTableBase8[Digit];
                 } else if (Base == Base_Integer_Radix10) {
-                    if (Sign != -1 && CodePoint != 1) {
-                        String[CodePoint - 1] = StringIOIntegerTableBase10[Digit];
-                    } else {
+                    if (Sign == -1 && CodePoint == 1) {
                         String[CodePoint - 1] = U32('-');
+                    } else {
+                        String[CodePoint - 1] = IntegerTableBase10[Digit];
                     }
                 } else if (Base == Base_Integer_Radix16_Uppercase) {
-                    String[CodePoint - 1]     = StringIOIntegerTableUppercaseBase16[Digit];
+                    String[CodePoint - 1]     = IntegerTableUppercaseBase16[Digit];
                 } else if (Base == Base_Integer_Radix16_Lowercase) {
-                    String[CodePoint - 1]     = StringIOIntegerTableLowercaseBase16[Digit];
+                    String[CodePoint - 1]     = IntegerTableLowercaseBase16[Digit];
                 }
             }
         } else {
@@ -2699,8 +2649,8 @@ extern "C" {
             
             if (Base == Base_Integer_Radix2) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t Base2CodePoint = 0; Base2CodePoint < StringIOIntegerTableBase2Size; Base2CodePoint++) {
-                        if (String[CodePoint] == StringIOIntegerTableBase2[Base2CodePoint]) {
+                    for (uint8_t Base2CodePoint = 0; Base2CodePoint < IntegerTableBase2Size; Base2CodePoint++) {
+                        if (String[CodePoint] == IntegerTableBase2[Base2CodePoint]) {
                             NumDigits += 1;
                         }
                     }
@@ -2708,8 +2658,8 @@ extern "C" {
                 }
             } else if (Base == Base_Integer_Radix8) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t Base8CodePoint = 0; Base8CodePoint < StringIOIntegerTableBase8Size; Base8CodePoint++) {
-                        if (String[CodePoint] == StringIOIntegerTableBase8[Base8CodePoint]) {
+                    for (uint8_t Base8CodePoint = 0; Base8CodePoint < IntegerTableBase8Size; Base8CodePoint++) {
+                        if (String[CodePoint] == IntegerTableBase8[Base8CodePoint]) {
                             NumDigits += 1;
                         }
                     }
@@ -2717,11 +2667,11 @@ extern "C" {
                 }
             } else if (Base == Base_Integer_Radix10) {
                 while (String[CodePoint] != FoundationIONULLTerminator && ValidDigit == Yes) {
-                    for (uint8_t Base10CodePoint = 0; Base10CodePoint < StringIOIntegerTableBase10Size; Base10CodePoint++) {
-                        if (String[CodePoint] == StringIOIntegerTableBase10[Base10CodePoint]) {
+                    for (uint8_t Base10CodePoint = 0; Base10CodePoint < IntegerTableBase10Size; Base10CodePoint++) {
+                        if (String[CodePoint] == IntegerTableBase10[Base10CodePoint]) {
                             NumDigits += 1;
                             break;
-                        } else if (Base10CodePoint == StringIOIntegerTableBase10Size - 1) {
+                        } else if (Base10CodePoint == IntegerTableBase10Size - 1) {
                             ValidDigit = No;
                             break;
                         }
@@ -2730,8 +2680,8 @@ extern "C" {
                 }
             } else if (Base == Base_Integer_Radix16_Uppercase) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t Base16UCodePoint = 0; Base16UCodePoint < StringIOIntegerTableBase16Size; Base16UCodePoint++) {
-                        if (String[CodePoint] == StringIOIntegerTableUppercaseBase16[Base16UCodePoint]) {
+                    for (uint8_t Base16UCodePoint = 0; Base16UCodePoint < IntegerTableBase16Size; Base16UCodePoint++) {
+                        if (String[CodePoint] == IntegerTableUppercaseBase16[Base16UCodePoint]) {
                             NumDigits += 1;
                         }
                     }
@@ -2739,8 +2689,8 @@ extern "C" {
                 }
             } else if (Base == Base_Integer_Radix16_Lowercase) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t Base16LCodePoint = 0; Base16LCodePoint < StringIOIntegerTableBase16Size; Base16LCodePoint++) {
-                        if (String[CodePoint] == StringIOIntegerTableLowercaseBase16[Base16LCodePoint]) {
+                    for (uint8_t Base16LCodePoint = 0; Base16LCodePoint < IntegerTableBase16Size; Base16LCodePoint++) {
+                        if (String[CodePoint] == IntegerTableLowercaseBase16[Base16LCodePoint]) {
                             NumDigits += 1;
                         }
                     }
@@ -2748,8 +2698,8 @@ extern "C" {
                 }
             } else if (Base == Base_Decimal_Radix10) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t DecimalCodePoint = 0; DecimalCodePoint < StringIODecimalTableSize; DecimalCodePoint++) {
-                        if (String[CodePoint] == StringIODecimalTable[DecimalCodePoint]) {
+                    for (uint8_t DecimalCodePoint = 0; DecimalCodePoint < DecimalTableBase10Size; DecimalCodePoint++) {
+                        if (String[CodePoint] == DecimalTable[DecimalCodePoint]) {
                             NumDigits += 1;
                         }
                     }
@@ -2757,8 +2707,8 @@ extern "C" {
                 }
             } else if (Base == Base_Decimal_Scientific_Uppercase || Base == Base_Decimal_Shortest_Uppercase) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t ScientificCodePoint = 0; ScientificCodePoint < StringIODecimalTableScientificSize; ScientificCodePoint++) {
-                        if (String[CodePoint] == StringIODecimalScientificUppercase[ScientificCodePoint]) {
+                    for (uint8_t ScientificCodePoint = 0; ScientificCodePoint < DecimalTableScientificSize; ScientificCodePoint++) {
+                        if (String[CodePoint] == DecimalScientificUppercase[ScientificCodePoint]) {
                             NumDigits += 1;
                         }
                     }
@@ -2766,8 +2716,8 @@ extern "C" {
                 }
             } else if (Base == Base_Decimal_Scientific_Lowercase || Base == Base_Decimal_Shortest_Lowercase) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t ScientificCodePoint = 0; ScientificCodePoint < StringIODecimalTableScientificSize; ScientificCodePoint++) {
-                        if (String[CodePoint] == StringIODecimalScientificLowercase[ScientificCodePoint]) {
+                    for (uint8_t ScientificCodePoint = 0; ScientificCodePoint < DecimalTableScientificSize; ScientificCodePoint++) {
+                        if (String[CodePoint] == DecimalScientificLowercase[ScientificCodePoint]) {
                             NumDigits += 1;
                         }
                     }
@@ -2775,8 +2725,8 @@ extern "C" {
                 }
             } else if (Base == Base_Decimal_Hex_Uppercase) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t HexCodePoint = 0; HexCodePoint < StringIODecimalTableHexadecimalSize; HexCodePoint++) {
-                        if (String[CodePoint] == StringIODecimalHexUppercase[HexCodePoint]) {
+                    for (uint8_t HexCodePoint = 0; HexCodePoint < DecimalTableHexadecimalSize; HexCodePoint++) {
+                        if (String[CodePoint] == DecimalHexUppercase[HexCodePoint]) {
                             NumDigits += 1;
                         }
                     }
@@ -2784,8 +2734,8 @@ extern "C" {
                 }
             } else if (Base == Base_Decimal_Hex_Lowercase) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t HexCodePoint = 0; HexCodePoint < StringIODecimalTableHexadecimalSize; HexCodePoint++) {
-                        if (String[CodePoint] == StringIODecimalHexLowercase[HexCodePoint]) {
+                    for (uint8_t HexCodePoint = 0; HexCodePoint < DecimalTableHexadecimalSize; HexCodePoint++) {
+                        if (String[CodePoint] == DecimalHexLowercase[HexCodePoint]) {
                             NumDigits += 1;
                         }
                     }

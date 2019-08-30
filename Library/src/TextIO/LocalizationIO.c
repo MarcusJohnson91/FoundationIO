@@ -320,18 +320,7 @@ extern "C" {
             Delocalized          = calloc(NumDigits + FoundationIONULLTerminatorSize, sizeof(UTF32));
             if (Delocalized != NULL) {
                 do {
-                    if (
-                        String[OGCodePoint] == U32('0') ||
-                        String[OGCodePoint] == U32('1') ||
-                        String[OGCodePoint] == U32('2') ||
-                        String[OGCodePoint] == U32('3') ||
-                        String[OGCodePoint] == U32('4') ||
-                        String[OGCodePoint] == U32('5') ||
-                        String[OGCodePoint] == U32('6') ||
-                        String[OGCodePoint] == U32('7') ||
-                        String[OGCodePoint] == U32('8') ||
-                        String[OGCodePoint] == U32('9')
-                        ) {
+                    if (String[OGCodePoint] >= U32('0') && String[OGCodePoint] <= U32('9')) {
                         OGCodePoint += 1;
                         Delocalized[DeCodePoint] = String[OGCodePoint];
                     }
