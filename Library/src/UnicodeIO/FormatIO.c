@@ -93,10 +93,10 @@ extern "C" {
     } FormatSpecifier;
     
     typedef struct FormatSpecifiers {
-        FormatSpecifier             *Specifiers;
-        uint64_t                     NumSpecifiers;
-        uint64_t                     NumDuplicateSpecifiers;
-        FormatSpecifier_StringTypes  StringType;
+        FormatSpecifier     *Specifiers;
+        uint64_t             NumSpecifiers;
+        uint64_t             NumDuplicateSpecifiers;
+        StringIOStringTypes  StringType;
     } FormatSpecifiers;
     
     void FormatSpecifiers_Deinit(FormatSpecifiers *Specifiers) {
@@ -167,7 +167,7 @@ extern "C" {
         return Base;
     }
     
-    static FormatSpecifiers *UTF32_Specifiers_GetOffsetAndLength(UTF32 *Format, uint64_t NumSpecifiers, FormatSpecifier_StringTypes Type) {
+    static FormatSpecifiers *UTF32_Specifiers_GetOffsetAndLength(UTF32 *Format, uint64_t NumSpecifiers, StringIOStringTypes Type) {
         FormatSpecifiers *Specifiers      = NULL;
         if (Format != NULL) {
             Specifiers                    = FormatSpecifiers_Init(NumSpecifiers);
@@ -288,11 +288,11 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF8;
                             }
                         } else {
-                            if (Specifiers->StringType == UTF8Format) {
+                            if (Specifiers->StringType == StringType_UTF8) {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF8;
-                            } else if (Specifiers->StringType == UTF16Format) {
+                            } else if (Specifiers->StringType == StringType_UTF16) {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
-                            } else if (Specifiers->StringType == UTF32Format) {
+                            } else if (Specifiers->StringType == StringType_UTF32) {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
                             }
                         }
@@ -311,11 +311,11 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
                             }
                         } else {
-                            if (Specifiers->StringType == UTF8Format) {
+                            if (Specifiers->StringType == StringType_UTF8) {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF8;
-                            } else if (Specifiers->StringType == UTF16Format) {
+                            } else if (Specifiers->StringType == StringType_UTF16) {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
-                            } else if (Specifiers->StringType == UTF32Format) {
+                            } else if (Specifiers->StringType == StringType_UTF32) {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
                             }
                         }
@@ -381,11 +381,11 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF8;
                             }
                         } else {
-                            if (Specifiers->StringType == UTF8Format) {
+                            if (Specifiers->StringType == StringType_UTF8) {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF8;
-                            } else if (Specifiers->StringType == UTF16Format) {
+                            } else if (Specifiers->StringType == StringType_UTF16) {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
-                            } else if (Specifiers->StringType == UTF32Format) {
+                            } else if (Specifiers->StringType == StringType_UTF32) {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
                             }
                         }
@@ -404,11 +404,11 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
                             }
                         } else {
-                            if (Specifiers->StringType == UTF8Format) {
+                            if (Specifiers->StringType == StringType_UTF8) {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF8;
-                            } else if (Specifiers->StringType == UTF16Format) {
+                            } else if (Specifiers->StringType == StringType_UTF16) {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
-                            } else if (Specifiers->StringType == UTF32Format) {
+                            } else if (Specifiers->StringType == StringType_UTF32) {
                                 Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
                             }
                         }
@@ -620,7 +620,7 @@ extern "C" {
         }
     }
     
-    FormatSpecifiers *UTF32_ParseFormatString(UTF32 *Format, uint64_t NumSpecifiers, FormatSpecifier_StringTypes StringType) {
+    FormatSpecifiers *UTF32_ParseFormatString(UTF32 *Format, uint64_t NumSpecifiers, StringIOStringTypes StringType) {
         FormatSpecifiers *Specifiers      = NULL;
         if (Format != NULL) {
             Specifiers                    = UTF32_Specifiers_GetOffsetAndLength(Format, NumSpecifiers, StringType);

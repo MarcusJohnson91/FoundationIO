@@ -169,7 +169,7 @@ extern "C" {
      @constant            ByteOrder_Unknown                  "Byte order is unknown".
      @constant            ByteOrder_Native                   "Use the byte order of the host".
      @constant            ByteOrder_Little                   "Use the little endian, Least-Significant-Byte first order".
-     @constant            ByteOrder_Big                       "Use the big endian, Most-Significant-Byte first order".
+     @constant            ByteOrder_Big                      "Use the big endian, Most-Significant-Byte first order".
      */
     typedef enum StringIOByteOrders {
                           ByteOrder_Unknown                    = 0,
@@ -177,6 +177,20 @@ extern "C" {
                           ByteOrder_Little                     = 2,
                           ByteOrder_Big                        = 3,
     } StringIOByteOrders;
+    
+    /*!
+     @enum                StringIOStringTypes
+     @constant            StringType_Unknown                 "Byte order is unknown".
+     @constant            StringType_UTF8                    "Use the byte order of the host".
+     @constant            StringType_UTF16                   "Use the little endian, Least-Significant-Byte first order".
+     @constant            StringType_UTF32                   "Use the big endian, Most-Significant-Byte first order".
+     */
+    typedef enum StringIOStringTypes {
+                          StringType_Unknown                   = 0,
+                          StringType_UTF8                      = 1,
+                          StringType_UTF16                     = 2,
+                          StringType_UTF32                     = 4,
+    } StringIOStringTypes;
     
     /* Basic String Property Functions */
     /*!
