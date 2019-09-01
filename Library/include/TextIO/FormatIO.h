@@ -73,18 +73,11 @@ extern "C" {
     
     typedef struct FormatSpecifiers FormatSpecifiers;
     
-    typedef enum FormatSpecifier_StringTypes {
-        StringType_Unknown             = 0,
-        UTF8Format                     = 1,
-        UTF16Format                    = 2,
-        UTF32Format                    = 3,
-    } FormatSpecifier_StringTypes;
-    
     FormatSpecifiers *FormatSpecifiers_Init(uint64_t NumSpecifiers);
     
     UTF32            *FormatString_UTF32(UTF32 *Format, FormatSpecifiers *Specifiers, va_list VariadicArguments);
     
-    FormatSpecifiers *UTF32_ParseFormatString(UTF32 *Format, uint64_t NumSpecifiers, FormatSpecifier_StringTypes StringType);
+    FormatSpecifiers *UTF32_ParseFormatString(UTF32 *Format, uint64_t NumSpecifiers, StringIOStringTypes StringType);
     
     UTF32           **DeformatString_UTF32(UTF32 *Format, UTF32 *Result, FormatSpecifiers *Specifiers);
     

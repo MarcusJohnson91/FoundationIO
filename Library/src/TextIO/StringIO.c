@@ -1053,25 +1053,33 @@ extern "C" {
         return Truncated;
     }
     
+    static StringIOStringTypes StringIO_GetStreamOrientation(FILE *File) {
+        StringIOStringTypes StringType = StringType_Unknown;
+        int Orientation                = fwide(File, 0);
+        if (Orientation < 0) {
+            StringType                 = StringType_UTF8;
+        } else if (Orientation > 0) {
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+            StringType                 = StringType_UTF32;
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+            StringType                 = StringType_UTF16;
+#endif
+        }
+        return StringType;
+    }
+    
     UTF8 *UTF8_ReadGraphemeFromFile(FILE *Source) {
         UTF8 *Grapheme                         = NULL;
         if (Source != NULL) {
             bool     GraphemeFound             = No;
             uint64_t CodePointSizeInCodeUnits  = 0ULL;
-            uint64_t GraphemeSizeInCodePoints  = 0ULL;
             UTF8     CodeUnit                  = 0;
-            /*
-             While loop reading bytes until wehave a grapheme
-             */
             while (GraphemeFound == No) {
                 fread(&CodeUnit, sizeof(UTF8), 1, Source);
                 CodePointSizeInCodeUnits     += UTF8_GetCodePointSizeInCodeUnits(CodeUnit);
-                // Now back up, read the CodePoint, decode it, check to see if it's a Grapheme Extension codepoint
                 fseek(Source, CodePointSizeInCodeUnits, SEEK_CUR);
                 Grapheme          = calloc(CodePointSizeInCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
-                // now use fread to read that many bytes
                 fread(&Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits, Source);
-                // Now decode
                 UTF32 *CodePoint  = UTF8_Decode(Grapheme);
                 for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
                     if (CodePoint[0] == GraphemeExtensionTable[GraphemeExtension]) {
@@ -1101,19 +1109,25 @@ extern "C" {
         return CodePoint;
     }
     
-    void UTF8_WriteGrapheme(FILE *Source, UTF8 *CodePoint) { // Replaces fputc and putc
+    void UTF8_WriteGrapheme(FILE *Source, UTF8 *CodePoint) {
         if (Source != NULL) {
-            uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(CodePoint);
-            fwrite(CodePoint, StringSize, 1, Source);
+            uint64_t StringSize       = UTF8_GetStringSizeInCodeUnits(CodePoint);
+            uint64_t CodeUnitsWritten = FoundationIO_File_Write(CodePoint, sizeof(UTF8), StringSize, Source);
+            if (CodeUnitsWritten != StringSize) {
+                Log(Log_DEBUG, __func__, U8("CodeUnitsWritten %llu does not match the size of the string %llu"), CodeUnitsWritten, StringSize);
+            }
         } else {
             Log(Log_DEBUG, __func__, U8("FILE Pointer is NULL"));
         }
     }
     
-    void UTF16_WriteGrapheme(FILE *Source, UTF16 *CodePoint) { // replaces fputwc and putwc
+    void UTF16_WriteGrapheme(FILE *Source, UTF16 *CodePoint) {
         if (Source != NULL) {
-            uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(CodePoint);
-            fwrite(CodePoint, StringSize, 1, Source);
+            uint64_t StringSize       = UTF16_GetStringSizeInCodeUnits(CodePoint);
+            uint64_t CodeUnitsWritten = FoundationIO_File_Write(CodePoint, sizeof(UTF16), StringSize, Source);
+            if (CodeUnitsWritten != StringSize) {
+                Log(Log_DEBUG, __func__, U8("CodeUnitsWritten %llu does not match the size of the string %llu"), CodeUnitsWritten, StringSize);
+            }
         } else {
             Log(Log_DEBUG, __func__, U8("FILE Pointer is NULL"));
         }
@@ -1167,19 +1181,19 @@ extern "C" {
     
     void UTF8_WriteLine(FILE *OutputFile, UTF8 *String) { // Replaces Fputs and puts
         if (String != NULL && OutputFile != NULL) {
-            int8_t   StreamMode        = (int8_t) fwide(OutputFile, 0);
+            StringIOStringTypes Type   = StringIO_GetStreamOrientation(OutputFile);
             uint64_t StringSize        = UTF8_GetStringSizeInCodeUnits(String);
             uint64_t CodeUnitsWritten  = 0ULL;
             bool     StringHasNewLine  = UTF8_HasNewLine(String);
-            if (StreamMode < 0) { // UTF-8
-                CodeUnitsWritten       = fwrite(String, StringSize, sizeof(UTF8), OutputFile);
+            if (Type == StringType_UTF8) { // UTF-8
+                CodeUnitsWritten       = FoundationIO_File_Write(String, sizeof(UTF8), StringSize, OutputFile);
                 if (StringHasNewLine == No) {
                     fwrite(FoundationIONewLine8, FoundationIONewLine8Size, 1, OutputFile);
                 }
                 if (CodeUnitsWritten != StringSize) {
                     Log(Log_DEBUG, __func__, U8("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
-            } else if (StreamMode > 0) { // UTF-16
+            } else if (Type == StringType_UTF16) { // UTF-16
                 UTF32 *String32        = UTF8_Decode(String);
                 UTF16 *String16        = UTF16_Encode(String32);
                 free(String32);
@@ -1199,13 +1213,13 @@ extern "C" {
         }
     }
     
-    void UTF16_WriteLine(FILE *OutputFile, UTF16 *String) { // Replaces Fputws and putws
+    void UTF16_WriteLine(FILE *OutputFile, UTF16 *String) {
         if (String != NULL && OutputFile != NULL) {
-            int8_t   StreamMode        = (int8_t) fwide(OutputFile, 0);
+            StringIOStringTypes Type   = StringIO_GetStreamOrientation(OutputFile);
             uint64_t StringSize        = UTF16_GetStringSizeInCodeUnits(String);
             uint64_t CodeUnitsWritten  = 0ULL;
             bool     StringHasNewLine  = UTF16_HasNewLine(String);
-            if (StreamMode > 0) { // UTF-16
+            if (Type == StringType_UTF16) { // UTF-16
                 CodeUnitsWritten       = fwrite(String, StringSize, sizeof(UTF16), OutputFile);
                 if (StringHasNewLine == No) {
                     fwrite(FoundationIONewLine16, FoundationIONewLine16Size, 1, OutputFile);
@@ -1213,7 +1227,7 @@ extern "C" {
                 if (CodeUnitsWritten != StringSize) {
                     Log(Log_DEBUG, __func__, U8("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
-            } else if (StreamMode < 0) { // UTF-8
+            } else if (Type == StringType_UTF8) { // UTF-8
                 UTF32 *String32        = UTF16_Decode(String);
                 UTF8  *String8         = UTF8_Encode(String32);
                 free(String32);
@@ -2733,7 +2747,7 @@ extern "C" {
             uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 UTF32 *Format32              = UTF8_Decode(Format);
-                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, UTF8Format);
+                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF8);
                 va_list VariadicArguments;
                 va_start(VariadicArguments, Format);
                 UTF32 *FormattedString       = FormatString_UTF32(Format32, Specifiers, VariadicArguments);
@@ -2757,7 +2771,7 @@ extern "C" {
             uint64_t NumSpecifiers           = UTF16_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 UTF32 *Format32              = UTF16_Decode(Format);
-                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, UTF16Format);
+                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF16);
                 va_list VariadicArguments;
                 va_start(VariadicArguments, Format);
                 UTF32 *FormattedString       = FormatString_UTF32(Format32, Specifiers, VariadicArguments);
@@ -2780,7 +2794,7 @@ extern "C" {
         if (Format != NULL) {
             uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
-                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format, NumSpecifiers, UTF32Format);
+                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format, NumSpecifiers, StringType_UTF32);
                 va_list VariadicArguments;
                 va_start(VariadicArguments, Format);
                 FormattedString              = FormatString_UTF32(Format, Specifiers, VariadicArguments);
@@ -3080,7 +3094,7 @@ extern "C" {
             uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 UTF32 *Format32              = UTF8_Decode(Format);
-                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, UTF8Format);
+                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF8);
                 UTF32 *Result32              = UTF8_Decode(Result);
                 UTF32 **Strings32            = DeformatString_UTF32(Format32, Result32, Specifiers);
                 free(Format32);
@@ -3103,7 +3117,7 @@ extern "C" {
             uint64_t NumSpecifiers           = UTF16_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 UTF32 *Format32              = UTF16_Decode(Format);
-                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, UTF16Format);
+                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF16);
                 UTF32 *Result32              = UTF16_Decode(Result);
                 UTF32 **Strings32            = DeformatString_UTF32(Format32, Result32, Specifiers);
                 free(Format32);
@@ -3125,7 +3139,7 @@ extern "C" {
         if (Format != NULL && Result != NULL) {
             uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
-                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format, NumSpecifiers, UTF32Format);
+                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format, NumSpecifiers, StringType_UTF32);
                 StringArray                  = DeformatString_UTF32(Format, Result, Specifiers);
                 FormatSpecifiers_Deinit(Specifiers);
             }
