@@ -4,7 +4,7 @@
 
 #include "../include/Log.h"                    /* Included for error logging */
 #include "../include/Math.h"                   /* Included for endian swapping */
-#include "../include/FormatIO.h"               /* Included for the String formatting code */
+#include "../include/Private/FormatIO.h"       /* Included for the String formatting code */
 
 #include <stdarg.h>                            /* Included for va_list, va_copy, va_start, va_end */
 #include <wchar.h>                             /* Included for Fwide */
