@@ -75,6 +75,23 @@ extern "C" {
         return TestPassed;
     }
     
+    bool Test_ReplaceSubString() {
+        bool TestPassed = No;
+        
+        UTF32 *Replacement = U32("987654321");
+        UTF32 *String      = U32("123456789");
+        UTF32 *Replaced    = UTF32_ReplaceSubString(String, Replacement, 0, 0);
+        
+        return TestPassed;
+    }
+    
+    bool Test_UTF8_Stitch(void) {
+        bool TestPassed = No;
+        UTF8 *BananaBread = UTF8_Stitch(U8("Banana WAT Bread"), 8, 4);
+        TestPassed        = UTF8_Compare(BananaBread, U8("Banana Bread"));
+        return TestPassed;
+    }
+    
     bool Test_UTF8_Format(void) {
         /*
          TestIO Notes:
@@ -93,10 +110,41 @@ extern "C" {
         
         bool TestPassed                        = false;
         
-        UTF8 *Positional                       = UTF8_Format("NumArgs: %2$llu, %1$s EXTEND THE STRING PAST THE SPECIFIERS TO MAKE SURE THE BREAK WORKS", U8("Positional"), 2);
-        bool  PositionalTest                   = UTF8_Compare(Positional, U8("NumArgs: 2, Positional")); // "NumArgs: -$llu, Positi"
-        if (PositionalTest == No) {
-            Log(Log_DEBUG, __func__, U8("PositionalTest Failed"));
+        UTF8 *Positional1                      = UTF8_Format(U8("NumArgs: %1$llu, Equal: %llu, Type: %3$s"), 3, 1234, U8("Positional"));
+        bool  Positional1Test                  = UTF8_Compare(Positional1, U8("NumArgs: 3, Equal: 1234, Type: Positional"));
+        if (Positional1Test == No) {
+            Log(Log_DEBUG, __func__, U8("Positional1Test Failed"));
+        }
+        /*
+         "NumArgs: %1$llu, Equal: %llu, Type: %3$s"  StringSize: 40
+         "NumArgs: 3, Equal: 1234, Type: Positional" StringSize: 41
+         "NumArgs: 3, Equal: 1234, Type: "
+         "NumArgs: 3, Equal: 1234, Type: %3Position" Offset is 2 later than it should be (negative instead of positive?)
+         "NumArgs: 3, Equal: 1234, Type: Positional"
+         
+         Let's operate under the theory that the last character being 1 is from 1234 for the second argument which is just way off from the offset.
+         
+         and with that theory, "1" actually equals "1234" is just stopped before it was done.
+         
+         it's 11 or 12 CodePoint farther than it should be.
+         
+         The offset for the first argument is correct.
+         
+         Firt off, just add Length, not (Length + 1) cuz it's aready moved to the following codepoint so no need to bump it up
+         */
+        
+        
+        UTF8 *Positional2                      = UTF8_Format(U8("NumArgs: %1$llu, Type: %2$s, %2$s"), 2, U8("Positional"));
+        bool  Positional2Test                  = UTF8_Compare(Positional2, U8("NumArgs: 2, Type: Positional, Positional"));
+        if (Positional2Test == No) {
+            Log(Log_DEBUG, __func__, U8("Positional2Test Failed"));
+        }
+        
+        
+        UTF8 *Positional3                      = UTF8_Format("NumArgs: %2$llu, %1$s EXTEND THE STRING PAST THE SPECIFIERS TO MAKE SURE THE BREAK WORKS", U8("Positional"), 2);
+        bool  Positional3Test                  = UTF8_Compare(Positional3, U8("NumArgs: 2, Positional")); // "NumArgs: -$llu, Positi"
+        if (Positional3Test == No) {
+            Log(Log_DEBUG, __func__, U8("Positional3Test Failed"));
         }
         
         UTF8 *PositionPrecision                = UTF8_Format("%.*f", 2, 0.33333333);
@@ -236,6 +284,7 @@ extern "C" {
         bool TestSuitePassed      = false;
         
         TestSuitePassed           = Test_UTF8_Format();
+        TestSuitePassed           = Test_UTF8_Stitch();
         return TestSuitePassed;
     }
     

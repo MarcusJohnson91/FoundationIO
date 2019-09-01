@@ -169,18 +169,6 @@ extern "C" {
     void BitBuffer_Seek(BitBuffer *BitB, int64_t Bits2Seek) {
         if (BitB != NULL) {
             BitB->BitOffset += Bits2Seek;
-            
-            
-            
-            /*
-            if (Bits2Seek > 0 && BitB->NumBits > BitB->BitOffset + Bits2Seek) {
-                BitB->NumBits  += Bits2Seek;
-            } else if (Bits2Seek < 0 && BitB->NumBits > BitB->BitOffset - Bits2Seek) {
-                BitB->NumBits  += Bits2Seek;
-            } else {
-                Log(Log_DEBUG, __func__, U8("There's not enough bits in BitBuffer %lld to seek %lld bits"), BitB->NumBits, Bits2Seek);
-            }
-             */
         } else {
             Log(Log_DEBUG, __func__, U8("BitBuffer Pointer is NULL"));
         }
@@ -441,6 +429,22 @@ extern "C" {
                 BitB->BitOffset                   += Bits2Append2CurrentByte;
             } while (Bits2Write > 0);
         }
+    }
+    
+    static UTF32 *Format_BitBuffer(BitBuffer *BitB, uint8_t Length) {
+        UTF32 *BitBufferString = NULL;
+        if (BitB != NULL && Length >= 1 && Length <= 64) {
+            BitBuffer_Seek(BitB, BitB->BitOffset - Length);
+            uint64_t Bits    = BitBuffer_ReadBits(BitB, MSByteFirst, MSBitFirst, Length);
+            BitBufferString  = UTF32_Format(U32("BitBuffer: %llP, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), BitB, BitB->NumBits, BitB->BitOffset, Bits);
+        } else if (BitB == NULL) {
+            Log(Log_DEBUG, __func__, U8("BitBuffer Pointer is NULL"));
+        } else if (Length == 0) {
+            Log(Log_DEBUG, __func__, U8("Length is zero, less than the minimum of 1"));
+        } else if (Length > 64) {
+            Log(Log_DEBUG, __func__, U8("Length: %llu is greater than 64 bits, the maximum"), Length);
+        }
+        return BitBufferString;
     }
     
     uint64_t BitBuffer_PeekBits(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, uint8_t Bits2Peek) {

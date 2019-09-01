@@ -599,19 +599,17 @@ extern "C" {
             uint64_t  NumDuplicateSpecifiers      = 0ULL;
             uint64_t *SpecifierCounts             = calloc(Specifiers->NumSpecifiers, sizeof(uint64_t));
             if (SpecifierCounts != NULL) {
-                for (uint64_t Specifier = 0ULL; Specifier< Specifiers->NumSpecifiers; Specifier++) {
+                for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
                     if (Specifiers->Specifiers[Specifier].IsPositional == Yes) {
                         uint64_t Position           = Specifiers->Specifiers[Specifier].PositionalArg;
                         SpecifierCounts[Position]  += 1;
-                    } else {
-                        SpecifierCounts[Specifier] += 1;
                     }
                 }
-            }
-            
-            for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
-                if (SpecifierCounts[Specifier] >= 2) {
-                    NumDuplicateSpecifiers += 1;
+                
+                for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
+                    if (SpecifierCounts[Specifier] >= 2) {
+                        NumDuplicateSpecifiers += 1;
+                    }
                 }
             }
             
@@ -660,24 +658,24 @@ extern "C" {
         return String;
     }
     
-    void Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments) {
+    void Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments) __attribute__((no_sanitize("signed-integer-overflow", "integer"))) {
         if (Specifiers != NULL) {
-            uint64_t                        Position  = 0x7FFFFFFFFFFFFFFE;
-            uint64_t                        Specifier = 0ULL;
-            FormatSpecifier_BaseTypes       BaseType  = BaseType_Unknown;
-            FormatSpecifier_TypeModifiers   Modifier  = Modifier_Unknown;
-            FormatSpecifier_LengthModifiers Length    = Length_Unknown;
-            while (Specifier < Specifiers->NumSpecifiers - Specifiers->NumDuplicateSpecifiers) {
-                if (Specifiers->Specifiers[Specifier].IsPositional && Specifiers->Specifiers[Specifier].Argument == NULL) {
-                    Position                          = Specifiers->Specifiers[Specifier].PositionalArg;
-                    BaseType                          = Specifiers->Specifiers[Position].BaseType;
-                    Modifier                          = Specifiers->Specifiers[Position].TypeModifier;
-                    Length                            = Specifiers->Specifiers[Position].LengthModifier;
+            uint64_t                        Position   = 0x7FFFFFFFFFFFFFFE;
+            uint64_t                        Specifier0 = 0ULL;
+            FormatSpecifier_BaseTypes       BaseType   = BaseType_Unknown;
+            FormatSpecifier_TypeModifiers   Modifier   = Modifier_Unknown;
+            FormatSpecifier_LengthModifiers Length     = Length_Unknown;
+            while (Specifier0 < Specifiers->NumSpecifiers - Specifiers->NumDuplicateSpecifiers) {
+                if (Specifiers->Specifiers[Specifier0].IsPositional && Specifiers->Specifiers[Specifier0].Argument == NULL) {
+                    Position                           = Specifiers->Specifiers[Specifier0].PositionalArg;
+                    BaseType                           = Specifiers->Specifiers[Position].BaseType;
+                    Modifier                           = Specifiers->Specifiers[Position].TypeModifier;
+                    Length                             = Specifiers->Specifiers[Position].LengthModifier;
                 } else {
-                    Position                          = Specifier;
-                    BaseType                          = Specifiers->Specifiers[Position].BaseType;
-                    Modifier                          = Specifiers->Specifiers[Position].TypeModifier;
-                    Length                            = Specifiers->Specifiers[Position].LengthModifier;
+                    Position                           = Specifier0;
+                    BaseType                           = Specifiers->Specifiers[Position].BaseType;
+                    Modifier                           = Specifiers->Specifiers[Position].TypeModifier;
+                    Length                             = Specifiers->Specifiers[Position].LengthModifier;
                 }
                 
                 if (Specifiers->Specifiers[Position].MinWidthFlag == MinWidth_Asterisk_NextArg) {
@@ -687,43 +685,45 @@ extern "C" {
                     Specifiers->Specifiers[Position].Precision = va_arg(Arguments, uint32_t);
                 }
                 
+                StringIOBases Base                                         = ConvertTypeModifier2Base(Modifier);
+                
                 if ((BaseType & BaseType_Integer) == BaseType_Integer) {
                     if ((Modifier & Modifier_Unsigned) == Modifier_Unsigned) {
                         if ((Length & Length_8Bit) == Length_8Bit) {
                             uint8_t   Arg                                  = va_arg(Arguments, uint8_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(ConvertTypeModifier2Base(Modifier), Arg);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((Length & Length_16Bit) == Length_16Bit) {
                             uint16_t  Arg                                  = va_arg(Arguments, uint16_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(ConvertTypeModifier2Base(Modifier), Arg);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((Length & Length_32Bit) == Length_32Bit) {
                             uint32_t  Arg                                  = va_arg(Arguments, uint32_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(ConvertTypeModifier2Base(Modifier), Arg);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((Length & Length_64Bit) == Length_64Bit) {
                             uint64_t  Arg                                  = va_arg(Arguments, uint64_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(ConvertTypeModifier2Base(Modifier), Arg);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         }
                     } else if ((Modifier & Modifier_Signed) == Modifier_Signed) {
                         if ((Length & Length_8Bit) == Length_8Bit) {
                             int8_t    Arg                                  = va_arg(Arguments, uint8_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(ConvertTypeModifier2Base(Modifier), Arg);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((Length & Length_16Bit) == Length_16Bit) {
                             int16_t   Arg                                  = va_arg(Arguments, uint16_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(ConvertTypeModifier2Base(Modifier), Arg);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((Length & Length_32Bit) == Length_32Bit) {
                             int32_t   Arg                                  = va_arg(Arguments, uint32_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(ConvertTypeModifier2Base(Modifier), Arg);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((Length & Length_64Bit) == Length_64Bit) {
                             int64_t   Arg                                  = va_arg(Arguments, uint64_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(ConvertTypeModifier2Base(Modifier), Arg);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         }
                     }
                 } else if ((BaseType & BaseType_Decimal) == BaseType_Decimal) {
                     if ((Length & Length_32Bit) == Length_32Bit) {
                         float    Arg                                       = va_arg(Arguments, float);
-                        Specifiers->Specifiers[Position].Argument          = UTF32_Decimal2String(ConvertTypeModifier2Base(Modifier), (double) Arg);
+                        Specifiers->Specifiers[Position].Argument          = UTF32_Decimal2String(Base, (double) Arg);
                     } else if ((Length & Length_64Bit) == Length_64Bit) {
                         double   Arg                                       = va_arg(Arguments, double);
-                        Specifiers->Specifiers[Position].Argument          = UTF32_Decimal2String(ConvertTypeModifier2Base(Modifier), Arg);
+                        Specifiers->Specifiers[Position].Argument          = UTF32_Decimal2String(Base, Arg);
                     }
                 } else if ((BaseType & BaseType_Character) == BaseType_Character) {
                     if ((Modifier & Modifier_UTF8) == Modifier_UTF8) {
@@ -763,7 +763,7 @@ extern "C" {
                 } else if ((BaseType & BaseType_Literal) == BaseType_Literal && Modifier == Modifier_Percent) {
                     Specifiers->Specifiers[Position].Argument              = UTF32_Clone(U32("%"));
                 }
-                Specifier                                                 += 1;
+                Specifier0                                                 += 1;
             }
             
             if (Specifiers->NumDuplicateSpecifiers > 0) {
@@ -782,29 +782,45 @@ extern "C" {
                 }
             }
             
-            for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers - 1; Specifier++) { // Fix the Offsets
-                uint64_t                   ArgumentSize  = UTF32_GetStringSizeInCodePoints(Specifiers->Specifiers[Specifier].Argument);
-                FormatSpecifier_MinWidths  MinWidthFlag  = Specifiers->Specifiers[Specifier].MinWidthFlag;
-                FormatSpecifier_Precisions PrecisionFlag = Specifiers->Specifiers[Specifier].PrecisionFlag;
-                if (MinWidthFlag != MinWidth_Unknown) {
-                    uint64_t MinimumWidth = Specifiers->Specifiers[Specifier].MinWidth;
-                    if (MinimumWidth > ArgumentSize) {
-                        Specifiers->Specifiers[Specifier + 1].Offset = Specifiers->Specifiers[Specifier].Offset + (MinimumWidth - ArgumentSize);
+            uint64_t Specifier1                                = 0ULL;
+            while (Specifier1 < Specifiers->NumSpecifiers) {
+                uint64_t ReplacementSize                       = UTF32_GetStringSizeInCodePoints(Specifiers->Specifiers[Specifier1].Argument);
+                uint64_t MinimumWidth                          = Specifiers->Specifiers[Specifier1].MinWidth;
+                uint64_t Precision                             = Specifiers->Specifiers[Specifier1].Precision;
+                uint64_t Length                                = Specifiers->Specifiers[Specifier1].Length;
+                int64_t  Skip                                  = 0;
+                if (Specifiers->Specifiers[Specifier1].MinWidthFlag != MinWidth_Unknown) {
+                    if (ReplacementSize < MinimumWidth) {
+                        Skip                                  += MinimumWidth - ReplacementSize;
                     }
                 }
-                if (PrecisionFlag != Precision_Unknown) {
-                    uint64_t Precision = Specifiers->Specifiers[Specifier].Precision;
-                    if (Precision < ArgumentSize) {
-                        Specifiers->Specifiers[Specifier + 1].Offset = Specifiers->Specifiers[Specifier].Offset + (ArgumentSize - Precision);
+                if (Specifiers->Specifiers[Specifier1].PrecisionFlag != Precision_Unknown) {
+                    if (ReplacementSize > Precision) {
+                        Skip                                  -= ReplacementSize - Precision;
                     }
                 }
-                if (MinWidthFlag == MinWidth_Unknown && PrecisionFlag == Precision_Unknown) {
-                    if (ArgumentSize < Specifiers->Specifiers[Specifier].Length) {
-                        Specifiers->Specifiers[Specifier + 1].Offset -= (Specifiers->Specifiers[Specifier].Length - ArgumentSize);
-                    } else {
-                        Specifiers->Specifiers[Specifier + 1].Offset += (ArgumentSize - Specifiers->Specifiers[Specifier].Length);
-                    }
+                
+                if (ReplacementSize < Length + 1) { // "%1$llu" -> "1"
+                    /*
+                     Length: 5
+                     ReplacementSize: 1
+                     */
+                    Skip                                      += (ReplacementSize - Length) - 1; // Good
+                } else { // "%3$s" -> "Positional"
+                    /*
+                     Length: 3
+                     ReplacementSize: 10
+                     Skip 6?
+                     */
+                    Skip                                      += (ReplacementSize - (Length + 1));
                 }
+                
+                uint64_t Specifier2                            = Specifier1 + 1;
+                while (Specifier2 < Specifiers->NumSpecifiers) {
+                    Specifiers->Specifiers[Specifier2].Offset += Skip;
+                    Specifier2                                += 1;
+                }
+                Specifier1                                    += 1;
             }
         } else {
             Log(Log_DEBUG, __func__, U8("FormatSpecifiers Pointer is NULL"));
@@ -819,18 +835,6 @@ extern "C" {
             /*
              "%s %3$llu %5$llu %llu %llu"
              */
-            for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
-                if (Specifiers->Specifiers[Specifier].IsPositional == Yes) {
-                    uint64_t Position                                          = Specifiers->Specifiers[Specifier].PositionalArg;
-                    if (Position < Specifiers->NumSpecifiers) {
-                        if (Specifiers->Specifiers[Specifier].Argument == NULL) {
-                            Specifiers->Specifiers[Specifier].Argument         = UTF32_Clone(Specifiers->Specifiers[Position].Argument);
-                        }
-                    } else {
-                        Log(Log_DEBUG, __func__, U8("Position %llu is greater than there are Specifiers %llu, invalid"), Position, Specifiers->NumSpecifiers);
-                    }
-                }
-            }
             
             for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
                 UTF32    *OriginalTemp = FormatTemp;
@@ -838,7 +842,7 @@ extern "C" {
                 uint64_t  Offset       = Specifiers->Specifiers[Specifier].Offset;
                 uint64_t  Length       = Specifiers->Specifiers[Specifier].Length;
                 
-                FormatTemp             = UTF32_ReplaceSubString(FormatTemp, Argument, Offset, Length);
+                FormatTemp             = UTF32_ReplaceSubString(OriginalTemp, Argument, Offset, Length);
                 if (OriginalTemp != Format) {
                     free(OriginalTemp);
                 }
