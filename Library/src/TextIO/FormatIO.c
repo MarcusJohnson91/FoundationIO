@@ -1,7 +1,7 @@
 #include <stdarg.h>                          /* Included for va_list, va_copy, va_start, va_end */
 
 #include "../include/StringIO.h"             /* Included for StringIOBases */
-#include "../include/FormatIO.h"
+#include "../include/Private/FormatIO.h"
 #include "../include/Log.h"
 #include "../include/Private/NumberTables.h" /* Included for the Number tables */
 
