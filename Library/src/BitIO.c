@@ -253,12 +253,6 @@ extern "C" {
     static uint64_t BitBuffer_Extract_LSByteLSBit(BitBuffer *BitB, uint8_t NumBits2Extract) {
         uint64_t Extracted = 0ULL;
         if (NumBits2Extract > 0) {
-            // Value = 0x0000AC44, LSByte, LSBit, 32 bits, written as 0x44AC0000
-            /*
-             Value = 0x0000AC44
-             Wrote = 0x44AC0000
-             So, Start reading from BitOffset + NumBits2Read, end reading at BitOffset
-             */
             uint8_t Bits2Read                     = NumBits2Extract;
             do {
                 uint8_t  BitsInCurrentByte        = Bits2ExtractFromByte(BitB->BitOffset + Bits2Read);
@@ -458,10 +452,8 @@ extern "C" {
                 }
             } else if (ByteOrder == MSByteFirst) {
                 if (BitOrder == LSBitFirst) {
-                    // Start the byte at the end, and the bit at the beginning
                     OutputData         = BitBuffer_Extract_MSByteLSBit(BitB, Bits2Peek);
                 } else if (BitOrder == MSBitFirst) {
-                    // Start reading from the beginning, read to the end
                     OutputData         = BitBuffer_Extract_MSByteMSBit(BitB, Bits2Peek);
                 }
             }
@@ -485,10 +477,8 @@ extern "C" {
                 }
             } else if (ByteOrder == MSByteFirst) {
                 if (BitOrder == LSBitFirst) {
-                    // Start the byte at the end, and the bit at the beginning
                     OutputData         = BitBuffer_Extract_MSByteLSBit(BitB, Bits2Read);
                 } else if (BitOrder == MSBitFirst) {
-                    // Start reading from the beginning, read to the end
                     OutputData         = BitBuffer_Extract_MSByteMSBit(BitB, Bits2Read);
                 }
             }
@@ -513,10 +503,8 @@ extern "C" {
                     }
                 } else if (ByteOrder == MSByteFirst) {
                     if (BitOrder == LSBitFirst) {
-                        // Start the byte at the end, and the bit at the beginning
                         CurrentBit         = (uint8_t) BitBuffer_Extract_MSByteLSBit(BitB, 1);
                     } else if (BitOrder == MSBitFirst) {
-                        // Start reading from the beginning, read to the end
                         CurrentBit         = (uint8_t) BitBuffer_Extract_MSByteMSBit(BitB, 1);
                     }
                 }
@@ -589,7 +577,6 @@ extern "C" {
         uint8_t *GUUID = NULL;
         if (GUUID2Read != UnknownGUUID && BitB != NULL && (BitBuffer_GetSize(BitB) - BitBuffer_GetPosition(BitB)) >= BinaryGUUIDSize) {
             if (GUUID2Read == BinaryUUID || GUUID2Read == BinaryGUID) {
-                // Read it from the BitBuffer as a string.
                 GUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
                 if (GUUID != NULL) {
                     for (uint8_t Byte = 0; Byte < BinaryGUUIDSize; Byte++) {
@@ -624,7 +611,6 @@ extern "C" {
                             GUUID[Byte]  = '-';
                         }
                     }
-                    //GUUID                = UTF8_Format(U8("%d-%d-%d-%d-%llu"), Section1, Section2, Section3, Section4, Section5);
                 } else {
                     Log(Log_DEBUG, __func__, U8("Couldn't allocate UUIDString"));
                 }
@@ -726,10 +712,13 @@ extern "C" {
     }
     
     void BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, uint8_t *GUUID2Write) {
-        if (BitB != NULL && GUUID2Write != NULL) { // TODO: Make sure that the BitBuffer can hold the GUUID
-            uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? GUUIDStringSize : BinaryGUUIDSize);
-            for (uint8_t Byte = 0; Byte < GUUIDSize; Byte++) {
-                BitBuffer_Append_LSByteLSBit(BitB, 8, GUUID2Write[Byte]);
+        if (BitB != NULL && GUUID2Write != NULL) {
+            static const uint8_t GUUIDSizeInBits[4] = {168, 168, 128, 128};
+            if (BitB->BitOffset + GUUIDSizeInBits[GUUIDType] <= BitB->NumBits) {
+                uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? GUUIDStringSize : BinaryGUUIDSize);
+                for (uint8_t Byte = 0; Byte < GUUIDSize; Byte++) {
+                    BitBuffer_Append_LSByteLSBit(BitB, 8, GUUID2Write[Byte]);
+                }
             }
         } else if (BitB == NULL) {
             Log(Log_DEBUG, __func__, U8("BitBuffer Pointer is NULL"));
@@ -828,7 +817,6 @@ extern "C" {
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
             Path32                           = UTF16_Decode(Path2Open);
             bool   PathHasBOM                = UTF16_HasBOM(Path2Open);
-            //bool   PathIsAbsolute            = UTF16_PathIsAbsolute(Path2Open);
             bool   PathHasWinPrefix          = UTF16_HasUNCPathPrefix(Path2Open);
             
             if (PathHasBOM == Yes && PathHasWinPrefix == Yes) {
@@ -836,13 +824,11 @@ extern "C" {
                 free(Path32);
                 Path32                       = BOMLess;
             } else if (PathHasBOM == Yes && PathHasWinPrefix == No) {
-                // Add WinPathPrefix, Remove BOM
                 UTF32 *BOMLess               = UTF32_RemoveBOM(Path32);
                 UTF32 *Prefix                = UTF32_Insert(BOMLess, UNCPathPrefix, 0);
                 free(Path32);
                 Path32                       = Prefix;
             } else if (PathHasBOM == No && PathHasWinPrefix == No) {
-                // Add WinPathPrefix
                 UTF32 *Prefix                = UTF32_Insert(Path32, UNCPathPrefix, 0);
                 free(Path32);
                 Path32                       = Prefix;
@@ -1014,7 +1000,6 @@ extern "C" {
             BitO->FileType              = BitIOFile;
             bool  PathHasBOM            = No;
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
-            // Convert to UTF-8, and remove the BOM because fopen will silently fail if there's a BOM.
             UTF32 *Decoded              = UTF16_Decode(Path2Open);
             PathHasBOM                  = UTF32_HasBOM(Decoded);
             UTF8 *Fixed                 = NULL;
@@ -1084,7 +1069,6 @@ extern "C" {
         if (Random != NULL && GUUIDType != UnknownGUUID) {
             uint64_t LowBits             = Entropy_GenerateInteger(Random, 64);
             uint64_t HighBits            = Entropy_GenerateInteger(Random, 64);
-            // Honestly I'll just convert from BinaryGUUID to GUUIDString if I have to
             uint8_t *BinaryGUUIDData     = calloc(BinaryGUUIDSize, sizeof(uint8_t));
             if (GUUID != NULL) {
                 for (uint8_t GUUIDByte = 0; GUUIDByte < BinaryGUUIDSize; GUUIDByte++) {

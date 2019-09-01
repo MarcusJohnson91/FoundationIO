@@ -9,8 +9,8 @@ extern "C" {
 #endif
     
     typedef struct Audio2DContainer {
-        void             **Samples;    // Channel, Sample
-        Audio_ChannelMask *ChannelMap; // So basically it's type is AudioChannelMask and each index contains the enum matching the channel at that index in the array
+        void             **Samples;
+        Audio_ChannelMask *ChannelMap;
         uint64_t           NumChannels;
         uint64_t           NumSamples;
         uint64_t           SampleRate;
@@ -23,7 +23,7 @@ extern "C" {
         if (NumSamples > 0) {
             Audio                   = calloc(1, sizeof(Audio2DContainer));
             if (Audio != NULL) {
-                void **Array        = calloc(NumChannels * NumSamples, Type / 4); // !!! DO NOT CHANGE AUDIO_TYPES WITHOUT CHANGING THE SIZE FIELD HERE
+                void **Array        = calloc(NumChannels * NumSamples, Type / 4);
                 if (Array != NULL) {
                     Audio->Samples  = Array;
                 } else {
@@ -87,7 +87,7 @@ extern "C" {
         uint8_t ChannelMap      = 0;
         if (Audio != NULL) {
             uint8_t NumChannels = Audio2DContainer_GetNumChannels(Audio);
-            ChannelMap          = NumChannels; // In case the mask is not present
+            ChannelMap          = NumChannels;
             for (uint8_t Channel = 0; Channel < NumChannels; Channel++) {
                 if (Audio->ChannelMap[Channel] == ChannelMask) {
                     ChannelMap  = Channel;
@@ -446,7 +446,7 @@ extern "C" {
     }
     
     typedef struct ImageContainer {
-        void              ****Pixels; // View, Width, Height, Channel
+        void              ****Pixels;
         Image_ChannelMask    *ChannelMap;
         uint64_t              Width;
         uint64_t              Height;
@@ -462,7 +462,7 @@ extern "C" {
             if (Image != NULL) {
                 uint8_t           NumViews    = ImageMask_GetNumViews(ChannelMask);
                 uint8_t           NumChannels = ImageMask_GetNumChannels(ChannelMask);
-                void *Array                   = calloc(NumViews * NumChannels * Width * Height, Type); // !!!DO NOT CHANGE IMAGE_TYPES WITHOUT CHANGING THE SIZE FIELD HERE
+                void *Array                   = calloc(NumViews * NumChannels * Width * Height, Type);
                 if (Array != NULL) {
                     Image->Pixels             = Array;
                     Image->ChannelMap         = calloc(NumViews * NumChannels, sizeof(Image_ChannelMask));
@@ -575,7 +575,7 @@ extern "C" {
             Image_ChannelMask Channel = Mask - (ImageMask_2D | ImageMask_3D_L | ImageMask_3D_R);
             uint8_t NumViews          = ImageMask_GetNumViews(Mask);
             uint8_t NumChannels       = ImageMask_GetNumChannels(Mask);
-            Index                     = NumChannels; // in case the channel isn't present, return this which is an invalid index
+            Index                     = NumChannels;
             if (NumViews == 1 && NumChannels == 1) {
                 for (uint64_t Channels = 0ULL; Channels < NumChannels; Channels++) {
                     if (Image->ChannelMap[Channels] == Channel) {
@@ -1047,7 +1047,7 @@ extern "C" {
     }
     
     typedef struct Audio2DHistogram {
-        void              *Array; // Channel, Sample
+        void              *Array;
         uint64_t           NumEntries;
         uint64_t           NumChannels;
         Audio_ChannelMask *ChannelMap;
@@ -1151,7 +1151,7 @@ extern "C" {
     
     void Audio2DHistogram_Sort(Audio2DHistogram *Histogram, bool SortAscending) {
         if (Histogram != NULL) {
-            uint64_t NumCores = FoundationIO_GetNumCPUCores(); // Now divide Histogram->NumEntries by NumCores (how do we handle rounding?)
+            uint64_t NumCores = FoundationIO_GetNumCPUCores();
             if (SortAscending == Yes) { // Top to bottom
                 if (Histogram->Type == (AudioType_Integer8 | AudioType_Unsigned)) {
                     uint8_t  *Audio = Audio2DHistogram_GetArray(Histogram);
@@ -1196,7 +1196,7 @@ extern "C" {
                         }
                     }
                 }
-            } else { // Bottom to top
+            } else {
                 if (Histogram->Type == (AudioType_Integer8 | AudioType_Unsigned)) {
                     uint8_t  *Audio = Audio2DHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
@@ -1308,7 +1308,7 @@ extern "C" {
     }
     
     typedef struct ImageHistogram {
-        void              ***Array; // View, Channel, Sample
+        void              ***Array;
         Image_ChannelMask   *ChannelMap;
         uint64_t             Width;
         uint64_t             Height;
@@ -1434,7 +1434,7 @@ extern "C" {
     }
     
     void ImageHistogram_Sort(ImageHistogram *Histogram, bool SortAscending) {
-        if (Histogram != NULL) { // Our sorting algorithm will be stable, so values that are tied, will not be moved
+        if (Histogram != NULL) {
             if (SortAscending == Yes) { // Top to bottom
                 if (Histogram->Type == ImageType_Integer8) {
                     uint8_t ***Image = (uint8_t***) ImageHistogram_GetArray(Histogram);

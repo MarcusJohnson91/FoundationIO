@@ -84,7 +84,7 @@ extern "C" {
     typedef struct MD5 {
         uint64_t FileSize;
         uint8_t  Data2Hash[64];
-        uint32_t Hash[4];       // Contains the current hash; aka Buffer
+        uint32_t Hash[4];
         uint32_t Bits[2];
     } MD5;
     
@@ -101,49 +101,28 @@ extern "C" {
         return MD5;
     }
     
-    static void MD5_A(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) { // 11/FF
+    static void MD5_A(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += ((B & C) | (~B & D)) + X + AC;
         A  = (uint32_t) RotateLeft(A, Shift);
         A += B;
     }
     
-    static void MD5_B(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) { // 22/GG
+    static void MD5_B(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += ((B & D) | (C & ~D)) + X + AC;
         A  = (uint32_t) RotateLeft(A, Shift);
         A += B;
     }
     
-    static void MD5_C(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) { // 33/HH
+    static void MD5_C(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += (B ^ C ^ D) + X + AC;
         A  = (uint32_t) RotateLeft(A, Shift);
         A += B;
     }
     
-    static void MD5_D(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) { // 44/II
+    static void MD5_D(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += (C ^ (B | ~D)) + X + AC;
         A  = (uint32_t) RotateLeft(A, Shift);
         A += B;
-    }
-    
-    uint32_t **MD5_Packetize(uint8_t *Data, uint64_t NumBytes) { // Returns a array of Packets.
-        uint64_t NumBits       = Bytes2Bits(NumBytes);
-        uint32_t NumPackets    = NumBits / 448; // NumBytes = 271, 271 * 8 = 2168, 2168 / 448 =
-        uint32_t **PacketArray = calloc(NumBytes / 56, sizeof(uint32_t));
-        if (Data != NULL && PacketArray != NULL) {
-            // Perform Padding and Size appending here as well as breaking it into packets.
-            
-#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
-            // So we need to read the data and reorder the bytes.
-            // if NumBytes is not a multiple of 56, we need to pad it out to the next 56 bytes.
-#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
-            
-#endif
-        } else if (PacketArray == NULL) {
-            Log(Log_DEBUG, __func__, U8("PacketArray Pointer is NULL"));
-        } else if (Data == NULL) {
-            Log(Log_DEBUG, __func__, U8("Data Pointer is NULL"));
-        }
-        return PacketArray;
     }
     
     void MD5_Process(uint32_t *State, uint32_t *Packet) {
@@ -381,7 +360,7 @@ extern "C" {
         return GeneratedInteger;
     }
     
-    int64_t Entropy_GenerateIntegerInRange(Entropy *Random, int64_t MinValue, int64_t MaxValue) { // What if we hange this to specify the number of bits to read directly?
+    int64_t Entropy_GenerateIntegerInRange(Entropy *Random, int64_t MinValue, int64_t MaxValue) {
         int64_t RandomInteger                     = 0ULL;
         if (Random != NULL && MinValue <= MaxValue) {
             uint8_t Bits2Read                     = (uint8_t) Logarithm(2, Minimum(MinValue, MaxValue) - Maximum(MinValue, MaxValue));
