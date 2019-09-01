@@ -255,34 +255,16 @@ extern "C" {
     
     void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF32 **Strings, uint64_t *Numerator, uint64_t *Denominator) {
         if (CLI != NULL) {
-            /*
-             How do we get the window size? I want to be able to resize the window
-             I want the bar to have an even number of dashes on each side with the number in the middle.
-             like this:
-             [--                        Shot U/V 2%                              ]
-             [-----                    Frame W/X 10%                             ] 10.5% gets rounded down to 10 which is 5 dashes
-             [-------------------------Block Y/Z 51%-                            ] 50.5% gets rounded up to 51 which is 26 dashes
-             FormatString: "[%s" "%s %d/%d %d%" "%s]", FirstDashes. String[Index], Numerator, Denominator, DerivedPercentage, LastDashes
-             
-             So we need to know the length of String[Index] in Graphemes, after being composed.
-             */
-            /*
-             Ok, so we know the width of the console, now we need to figure out the sizes of each of the strings
-             */
-            
             uint64_t *StringSize = calloc(NumItems2Display + FoundationIONULLTerminatorSize, sizeof(uint64_t));
-            for (uint8_t Item = 0; Item < NumItems2Display; Item++) { // Get the size of the strings
+            for (uint8_t Item = 0; Item < NumItems2Display; Item++) {
                 StringSize[Item] = UTF32_GetStringSizeInCodePoints(Strings[Item]);
-                // huh, well we need 2 characters for the brackets.
             }
-            // Number of seperators for each string
+            
             uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
             UTF8     *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF8));
-            for (uint8_t String = 0; String < NumItems2Display; String++) { // Actually create the strings
-                                                                                // Subtract 2 for the brackets, + the size of each string from the actual width of the console window
-                NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]); // what if it's not even?
+            for (uint8_t String = 0; String < NumItems2Display; String++) {
+                NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]);
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
-                //uint64_t HalfOfTheIndicators = (PercentComplete / 2);
                 UTF8    *Indicator           = calloc(CommandLineIO_GetTerminalWidth(), sizeof(UTF8));
                 UTF8    *IndicatorFinal      = UTF8_Insert(Indicator, "-", 0);
                 UTF8    *FormattedString     = UTF8_Format(U8("[%s%s %lld/%lld %hhu/%s %s]"), IndicatorFinal, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, FoundationIONewLine8);
@@ -436,7 +418,7 @@ extern "C" {
             UTF8 *LicenseURL            = UTF8_Encode(CLI->ProgramLicenseURL);
             CommandLineIO_LicenseTypes LicenseType = CLI->LicenseType;
             
-            if (Name != NULL) { // TrimSilence, v. 0.1.1 by Marcus Johnson © 2018+
+            if (Name != NULL) {
                 UTF8 *NameString      = UTF8_Format(U8("%s,"), Name);
                 UTF8_WriteLine(stdout, NameString);
                 free(NameString);
@@ -466,7 +448,7 @@ extern "C" {
                     UTF8_WriteLine(stdout, DescriptionString);
                 }
                 
-                if (LicenseName != NULL) { // Released under the "BSD 3 clause" license
+                if (LicenseName != NULL) {
                     UTF8 *LicenseNameString   = UTF8_Format(U8(" Released under the \"%s\" license"), LicenseName);
                     UTF8_WriteLine(stdout, LicenseNameString);
                 }
@@ -585,7 +567,7 @@ extern "C" {
                             free(PotentialSlaveArg);
                         }
                     } else {
-                        // Invalid argument error
+                        // Tell the user that their string wasn't found as a valid argument, or suggest a similar one, or support argument compaction automtically.
                     }
                 }
                 free(Argument);

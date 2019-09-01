@@ -149,7 +149,7 @@ extern "C" {
         int8_t   Sign     = ExtractSignF(Decimal);
         int8_t   Exponent = ExtractExponentF(Decimal);
         int64_t  Mantissa = ExtractMantissaF(Decimal);
-        if (Mantissa >= 4096) { // 0.5
+        if (Mantissa >= 4096) {
             Result        = Exponent + 1;
         } else {
             Result        = Exponent;
@@ -162,7 +162,7 @@ extern "C" {
         int8_t   Sign     = ExtractSignD(Decimal);
         int16_t  Exponent = ExtractExponentD(Decimal);
         int64_t  Mantissa = ExtractMantissaD(Decimal);
-        if (Mantissa >= 4096) { // 0.5
+        if (Mantissa >= 4096) {
             Result        = Exponent + 1;
         } else {
             Result        = Exponent;
@@ -174,14 +174,14 @@ extern "C" {
         int64_t Min1    = Integer1 ^ Integer2;
         int64_t Min2    = -(Integer1 < Integer2);
         int64_t Min3    = Integer2 ^ (Min1 & Min2);
-        return  Min3;  // Integer2 ^ ((Integer1 ^ Integer2) & -(Integer1 < Integer2));
+        return  Min3;
     }
     
     int64_t  Maximum(int64_t Integer1, int64_t Integer2) {
         int64_t Max1    = Integer1 ^ Integer2;
         int64_t Max2    = -(Integer1 < Integer2);
         int64_t Max3    = Integer1 ^ (Max1 & Max2);
-        return Max3; // Integer1 ^ ((Integer1 ^ Integer2) & -(Integer1 < Integer2));
+        return Max3;
     }
     
     bool     DecimalIsNormalF(float Decimal) {
@@ -319,7 +319,7 @@ extern "C" {
     float InsertExponentF(float Insertee, int8_t Value) {
         uint32_t Value2         = Value;
         Float2Integer Insertee2 = {.Float = Insertee};
-        Insertee2.Integer      &= ((Value2 & 0xFF) << 23); // Value is 8 bits, and needs to be normalized to +/-
+        Insertee2.Integer      &= ((Value2 & 0xFF) << 23);
         return Insertee2.Float;
     }
     
@@ -332,7 +332,7 @@ extern "C" {
     
     float InsertMantissaF(float Insertee, uint32_t Value) {
         Float2Integer Insertee2 = {.Float = Insertee};
-        Insertee2.Integer      &= (Value & 0x7FFFFFUL); // Value is 8 bits, and needs to be normalized to +/-
+        Insertee2.Integer      &= (Value & 0x7FFFFFUL);
         return Insertee2.Float;
     }
     
@@ -382,10 +382,10 @@ extern "C" {
     
     uint64_t SwapEndian64(uint64_t Integer) {
         uint64_t Swapped = (uint64_t) (((Integer & 0xFF00000000000000) >> 56) | ((Integer & 0x00FF000000000000) >> 40) | \
-                ((Integer & 0x0000FF0000000000) >> 24) | ((Integer & 0x000000FF00000000) >>  8) | \
-                ((Integer & 0x00000000FF000000) <<  8) | ((Integer & 0x0000000000FF0000) << 24) | \
-                ((Integer & 0x000000000000FF00) << 40) | ((Integer & 0x00000000000000FF) << 56)
-                );
+                                       ((Integer & 0x0000FF0000000000) >> 24) | ((Integer & 0x000000FF00000000) >>  8) | \
+                                       ((Integer & 0x00000000FF000000) <<  8) | ((Integer & 0x0000000000FF0000) << 24) | \
+                                       ((Integer & 0x000000000000FF00) << 40) | ((Integer & 0x00000000000000FF) << 56)
+                                       );
         return Swapped;
     }
     
@@ -445,28 +445,17 @@ extern "C" {
     /* Ryū specific math functions */
     
     uint8_t NumDigitsInInteger(uint8_t Base, int64_t Integer) {
-        uint8_t NumDigits = 0;
-        if (Integer < 0 && Integer < Base) {
-            do {
-                Integer   *= Base;
-                NumDigits += 1;
-            } while (Integer < 0);
-        } else if (Integer > 0 && Integer > Base) {
-            do {
-                Integer   /= Base;
-                NumDigits += 1;
-            } while (Integer > 0);
-        } else {
-            NumDigits = 1;
+        uint8_t NumDigits = 1;
+        int64_t Integer2  = Integer / Base;
+        while (Integer2 != 0) {
+            Integer2     /= Base;
+            NumDigits    += 1;
         }
         return NumDigits;
     }
     
     uint8_t NumDigitsInDecimal(double Decimal) {
         uint8_t NumDigits = 0;
-        /*
-         Extract the Exponent, extract the Mantissa, check if the Mantissa isn't empty, add a digit for the decimal seperator.
-         */
         return NumDigits;
     }
     

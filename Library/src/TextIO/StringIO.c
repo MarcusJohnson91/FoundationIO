@@ -70,7 +70,6 @@ extern "C" {
         uint64_t CodeUnit               = 0ULL;
         if (String != NULL) {
             while (String[CodeUnit] != FoundationIONULLTerminator) {
-                // A safer way to do this would be to check that each CodeUnit is either ASCII or a leading code unit, otherwise don't count
                 StringSizeInCodePoints += 1;
                 CodeUnit               += UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
             }
@@ -88,7 +87,7 @@ extern "C" {
                 if (String[CodeUnit] <= UTF16MaxCodeUnit && (String[CodeUnit] < UTF16HighSurrogateStart || String[CodeUnit] > UTF16LowSurrogateEnd)) {
                     NumCodePoints         += 1;
                 } else if (String[CodeUnit] >= UTF16HighSurrogateStart && String[CodeUnit] <= UTF16HighSurrogateEnd) {
-                    NumCodePoints         += 1; // Only count the high surrogates, not the low surrogates so that the codepoint count is accurate
+                    NumCodePoints         += 1;
                 }
                 CodeUnit                  += 1;
             }
@@ -359,14 +358,25 @@ extern "C" {
             uint64_t StringSize     = UTF8_GetStringSizeInCodePoints(String);
             if (StringSize > UnicodeBOMSizeInCodePoints) {
                 bool StringHasBOM   = UTF8_HasBOM(String);
-                if (StringHasBOM && StringSize >= UTF8BOMSizeInCodeUnits + UnicodeUNCPathPrefixSize) {
-                    // "//?/" or "\\?\"
-                    if ((String[1] == '/' || String[1] == '\\') && (String[2] == '/' || String[2] == '\\') && String[3] == '?' && (String[4] == '/' || String[4] == '\\')) {
-                        StringHasUNCPathPrefix = Yes;
+                if (StringHasBOM == Yes && StringSize >= UTF8BOMSizeInCodeUnits + UnicodeUNCPathPrefixSize) {
+                    uint8_t CodeUnit   = UTF8BOMSizeInCodeUnits + 1;
+                    uint8_t PrefixByte = 0;
+                    while (String[CodeUnit] == UNCPathPrefix[PrefixByte]) {
+                        if (PrefixByte == UTF8BOMSizeInCodeUnits + 4) {
+                            StringHasUNCPathPrefix = Yes;
+                        }
+                        PrefixByte    += 1;
+                        CodeUnit      += 1;
                     }
                 } else if (StringHasBOM == No && StringSize >= 4) {
-                    if ((String[0] == '/' || String[0] == '\\') && (String[1] == '/' || String[1] == '\\') && String[2] == '?' && (String[3] == '/' || String[3] == '\\')) {
-                        StringHasUNCPathPrefix = Yes;
+                    uint8_t CodeUnit   = 0;
+                    uint8_t PrefixByte = 0;
+                    while (String[CodeUnit] == UNCPathPrefix[PrefixByte]) {
+                        if (PrefixByte == 4) {
+                            StringHasUNCPathPrefix = Yes;
+                        }
+                        PrefixByte    += 1;
+                        CodeUnit      += 1;
                     }
                 }
             }
@@ -382,13 +392,25 @@ extern "C" {
             uint64_t StringSize     = UTF16_GetStringSizeInCodePoints(String);
             if (StringSize > UnicodeBOMSizeInCodePoints) {
                 bool StringHasBOM   = UTF16_HasBOM(String);
-                if (StringHasBOM && StringSize >= UTF16BOMSizeInCodeUnits + UnicodeUNCPathPrefixSize) {
-                    if ((String[1] == U16('/') || String[1] == U16('\\')) && (String[2] == U16('/') || String[2] == U16('\\')) && String[3] == U16('?') && (String[4] == U16('/') || String[4] == U16('\\'))) {
-                        StringHasUNCPathPrefix = Yes;
+                if (StringHasBOM == Yes && StringSize >= UTF16BOMSizeInCodeUnits + UnicodeUNCPathPrefixSize) {
+                    uint8_t CodeUnit   = UTF16BOMSizeInCodeUnits + 1;
+                    uint8_t PrefixByte = 0;
+                    while (String[CodeUnit] == UNCPathPrefix[PrefixByte]) {
+                        if (PrefixByte == UTF16BOMSizeInCodeUnits + 4) {
+                            StringHasUNCPathPrefix = Yes;
+                        }
+                        PrefixByte    += 1;
+                        CodeUnit      += 1;
                     }
                 } else if (StringHasBOM == No && StringSize >= 4) {
-                    if ((String[0] == U16('/') || String[0] == U16('\\')) && (String[1] == U16('/') || String[1] == U16('\\')) && String[2] == U16('?') && (String[3] == U16('/') || String[3] == U16('\\'))) {
-                        StringHasUNCPathPrefix = Yes;
+                    uint8_t CodeUnit   = 0;
+                    uint8_t PrefixByte = 0;
+                    while (String[CodeUnit] == UNCPathPrefix[PrefixByte]) {
+                        if (PrefixByte == 4) {
+                            StringHasUNCPathPrefix = Yes;
+                        }
+                        PrefixByte    += 1;
+                        CodeUnit      += 1;
                     }
                 }
             }
@@ -402,15 +424,28 @@ extern "C" {
         bool StringHasUNCPathPrefix = No;
         if (String != NULL) {
             uint64_t StringSize     = UTF32_GetStringSizeInCodePoints(String);
+            
             if (StringSize > UnicodeBOMSizeInCodePoints) {
                 bool StringHasBOM   = UTF32_HasBOM(String);
-                if (StringHasBOM && StringSize >= UnicodeBOMSizeInCodePoints + UnicodeUNCPathPrefixSize) {
-                    if ((String[1] == U32('/') || String[1] == U32('\\')) && (String[2] == U32('/') || String[2] == U32('\\')) && String[3] == U32('?') && (String[4] == U32('/') || String[4] == U32('\\'))) {
-                        StringHasUNCPathPrefix = Yes;
+                if (StringHasBOM == Yes && StringSize >= UnicodeBOMSizeInCodePoints + UnicodeUNCPathPrefixSize) {
+                    uint8_t CodeUnit   = UnicodeBOMSizeInCodePoints + 1;
+                    uint8_t PrefixByte = 0;
+                    while (String[CodeUnit] == UNCPathPrefix[PrefixByte]) {
+                        if (PrefixByte == UnicodeBOMSizeInCodePoints + 4) {
+                            StringHasUNCPathPrefix = Yes;
+                        }
+                        PrefixByte    += 1;
+                        CodeUnit      += 1;
                     }
                 } else if (StringHasBOM == No && StringSize >= 4) {
-                    if ((String[0] == U32('/') || String[0] == U32('\\')) && (String[1] == U32('/') || String[1] == U32('\\')) && String[2] == U32('?') && (String[3] == U32('/') || String[3] == U32('\\'))) {
-                        StringHasUNCPathPrefix = Yes;
+                    uint8_t CodeUnit   = 0;
+                    uint8_t PrefixByte = 0;
+                    while (String[CodeUnit] == UNCPathPrefix[PrefixByte]) {
+                        if (PrefixByte == 4) {
+                            StringHasUNCPathPrefix = Yes;
+                        }
+                        PrefixByte    += 1;
+                        CodeUnit      += 1;
                     }
                 }
             }
@@ -424,7 +459,7 @@ extern "C" {
         bool PathIsAbsolute = No;
         if (String != NULL) {
 #if  (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
-            if (String[0] == '/') {
+            if (String[0] == '/') { // Assumes there is no BOM
                 PathIsAbsolute     = Yes;
             }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
@@ -512,13 +547,13 @@ extern "C" {
         if (String != NULL) {
             uint64_t CodePoint           = 1ULL;
             while (String[CodePoint] != FoundationIONULLTerminator) {
-                if (String[CodePoint] == 0x0A) { // MacOSX, Unix
+                if (String[CodePoint] == 0x0A) {
                     StringHasNewLine     = Yes;
                 }
-                if (String[CodePoint - 1] == 0x0D && String[CodePoint] == 0x0A) { // Windows
+                if (String[CodePoint - 1] == 0x0D && String[CodePoint] == 0x0A) {
                     StringHasNewLine     = Yes;
                 }
-                if (String[CodePoint] == 0x0D) { // Classic Mac
+                if (String[CodePoint] == 0x0D) {
                     StringHasNewLine     = Yes;
                 }
                 CodePoint               += 1;

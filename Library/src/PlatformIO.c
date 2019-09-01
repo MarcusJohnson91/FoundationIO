@@ -22,7 +22,7 @@ extern "C" {
         }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         SYSTEM_INFO WinSysInfo;
-        GetSystemInfo(&WinSysInfo); // Might need to call GetNativeSystemInfo?
+        GetNativeSystemInfo(&WinSysInfo);
         NumCPUCores = WinSysInfo.dwNumberOfProcessors;
 #endif
         return NumCPUCores;

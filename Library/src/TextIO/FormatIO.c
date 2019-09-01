@@ -800,18 +800,9 @@ extern "C" {
                     }
                 }
                 
-                if (ReplacementSize < Length + 1) { // "%1$llu" -> "1"
-                    /*
-                     Length: 5
-                     ReplacementSize: 1
-                     */
-                    Skip                                      += (ReplacementSize - Length) - 1; // Good
-                } else { // "%3$s" -> "Positional"
-                    /*
-                     Length: 3
-                     ReplacementSize: 10
-                     Skip 6?
-                     */
+                if (ReplacementSize < Length + 1) {
+                    Skip                                      += (ReplacementSize - Length) - 1;
+                } else {
                     Skip                                      += (ReplacementSize - (Length + 1));
                 }
                 
@@ -832,9 +823,6 @@ extern "C" {
         UTF32 *FormatTemp                                                      = Format;
         if (Format != NULL && Specifiers != NULL) {
             Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
-            /*
-             "%s %3$llu %5$llu %llu %llu"
-             */
             
             for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
                 UTF32    *OriginalTemp = FormatTemp;
@@ -842,7 +830,17 @@ extern "C" {
                 uint64_t  Offset       = Specifiers->Specifiers[Specifier].Offset;
                 uint64_t  Length       = Specifiers->Specifiers[Specifier].Length;
                 
-                FormatTemp             = UTF32_ReplaceSubString(OriginalTemp, Argument, Offset, Length);
+                if ((Specifiers->Specifiers[Specifier].BaseType & BaseType_Unsupported) != BaseType_Unsupported) {
+                    FormatTemp         = UTF32_ReplaceSubString(OriginalTemp, Argument, Offset, Length);
+                } else if (Specifiers->Specifiers[Specifier].BaseType == BaseType_Unsupported) {
+                    if (Offset > 0 && Offset + Length + 1 != FoundationIONULLTerminator) {
+                        if (OriginalTemp[Offset - 1] == U32(' ') && OriginalTemp[Offset + Length + 1] == U32(' ')) { // Remove all traces f the unsupported specifier
+                            Length    += 1;
+                        }
+                    }
+                    FormatTemp         = UTF32_Stitch(OriginalTemp, Offset, Length);
+                }
+                
                 if (OriginalTemp != Format) {
                     free(OriginalTemp);
                 }

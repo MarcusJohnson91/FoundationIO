@@ -24,18 +24,9 @@ extern "C" {
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
         UTF8 *LocaleAll        = setlocale(LC_ALL, NULL);
         uint8_t EndOffset      = UTF8_FindSubString(LocaleAll, U8("_"), 0, 1);
-        // Now copy the string from 0 to EndOffset
         UTF8 *LanguageString   = UTF8_ExtractSubString(LocaleAll, 0, EndOffset);
-        // Now we get the size of the language string
         uint64_t StringSize    = UTF8_GetStringSizeInCodeUnits(LocaleAll);
         if (StringSize == 2) { // ISO-639-1
-            
-            
-            
-            
-            
-            
-            
             if (UTF8_Compare(LanguageString, U8("en"))) {
                 LanguageID     = LanguageID_English;
             } else if (UTF8_Compare(LanguageString, U8("de"))) {
