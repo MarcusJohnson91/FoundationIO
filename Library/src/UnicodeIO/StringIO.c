@@ -1413,50 +1413,29 @@ extern "C" {
     }
     
     UTF32 *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length) {
-        UTF32 *NewString                          = NULL;
+        UTF32 *NewString                            = NULL;
         if (String != NULL && Replacement != NULL) {
-            uint64_t StringSize                   = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t ReplacementSize              = UTF32_GetStringSizeInCodePoints(Replacement);
-            uint64_t NewStringSize                = (StringSize + ReplacementSize) - Length;
-            NewString                             = calloc(NewStringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            uint64_t StringSize                     = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t ReplacementSize                = UTF32_GetStringSizeInCodePoints(Replacement);
+            uint64_t NewStringSize                  = (StringSize + ReplacementSize) - (Length + 1);
+            NewString                               = calloc(NewStringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
             if (NewString != NULL) {
-                uint64_t CodePoint                = 0ULL;
-                uint64_t ReplacementCodePoint     = 0ULL;
-                while (CodePoint < NewStringSize) {
-                    
-                    /*
-                     Shorter:
-                     String1      = "NumArgs = %llu, Invalid"
-                     Replacement1 = "1"
-                     Offset       = 11
-                     Output       = ""
-                     
-                     Equal:
-                     String2      = "NumArgs = %llu, Invalid"
-                     Replacement2 = "1234"
-                     Offset       = 11
-                     Output       = ""
-                     
-                     Longer:
-                     String3      = "NumArgs = %llu, Invalid"
-                     Replacement3 = "12345"
-                     Offset       = 11
-                     Output       = "NumArgs = 12345, Invalid"
-                     */
-                    
-                    if (CodePoint < Offset) {
-                        NewString[CodePoint]      = String[CodePoint];
-                        CodePoint                += 1;
-                    } else if (CodePoint >= Offset && CodePoint < Offset + Minimum(ReplacementSize, Length)) {
-                        while(Replacement[ReplacementCodePoint] != FoundationIONULLTerminator) {
-                            NewString[CodePoint]  = Replacement[ReplacementCodePoint];
-                            CodePoint            += 1;
-                            ReplacementCodePoint += 1;
-                        }
-                    } else {
-                        NewString[CodePoint]      = String[CodePoint + Minimum(ReplacementSize, Length)];
-                        CodePoint                += 1;
+                uint64_t NewCodePoint               = 0ULL;
+                uint64_t StringCodePoint            = 0ULL;
+                uint64_t ReplacementCodePoint       = 0ULL;
+                
+                while (NewCodePoint < NewStringSize) { // StringCodePoint + Length + 1 < StringSize
+                    if (NewCodePoint < Offset) {
+                        NewString[NewCodePoint]     = String[StringCodePoint];
+                        StringCodePoint            += 1;
+                    } else if (NewCodePoint >= Offset && NewCodePoint < Offset + ReplacementSize) {
+                        NewString[NewCodePoint]     = Replacement[ReplacementCodePoint];
+                        ReplacementCodePoint       += 1;
+                    } else if (NewCodePoint >= Offset + ReplacementSize) {
+                        NewString[NewCodePoint]     = String[StringCodePoint + Length + 1];
+                        StringCodePoint            += 1;
                     }
+                    NewCodePoint                   += 1;
                 }
             }
         } else if (String == NULL) {
@@ -1499,7 +1478,7 @@ extern "C" {
         if (String != NULL) {
             uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
             if (Offset <= StringSize && Length <= StringSize && Offset + Length <= StringSize) {
-                uint64_t StitchedSize = StringSize - (Length + 1);
+                uint64_t StitchedSize = StringSize - Length;
                 Stitched              = calloc(StitchedSize, sizeof(UTF32));
                 if (Stitched != NULL) {
                     uint64_t CodePoint = 0ULL;
@@ -1507,7 +1486,7 @@ extern "C" {
                         if (CodePoint < Offset) {
                             Stitched[CodePoint] = String[CodePoint];
                         } else if (CodePoint > Offset + Length) {
-                            Stitched[CodePoint] = String[CodePoint + (Length + 1)];
+                            Stitched[CodePoint] = String[CodePoint + Length];
                         }
                         CodePoint += 1;
                     }
@@ -2048,7 +2027,7 @@ extern "C" {
         uint8_t  Radix                = 0;
         uint8_t  NumDigits            = 0;
         
-        if ((Integer2Convert & 0x8000000000000000) == 0x8000000000000000) { // Signed
+        if (Integer2Convert < 0) { // Signed
             Sign                      = -1;
             NumDigits                +=  1;
         }
