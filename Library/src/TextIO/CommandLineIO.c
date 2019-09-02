@@ -265,7 +265,7 @@ extern "C" {
             for (uint8_t String = 0; String < NumItems2Display; String++) {
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]);
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
-                UTF8    *Indicator           = calloc(CommandLineIO_GetTerminalWidth(), sizeof(UTF8));
+                UTF8    *Indicator           = UTF8_Init(CommandLineIO_GetTerminalWidth());
                 UTF8    *IndicatorFinal      = UTF8_Insert(Indicator, "-", 0);
                 UTF8    *FormattedString     = UTF8_Format(U8("[%s%s %lld/%lld %hhu/%s %s]"), IndicatorFinal, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, FoundationIONewLine8);
                 UTF8_WriteLine(stdout, FormattedString);
@@ -582,7 +582,7 @@ extern "C" {
     
     void CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, UTF8 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
-            UTF32 **Arguments32     = calloc(NumArguments, sizeof(UTF32*));
+            UTF32 **Arguments32     = UTF32_StringArray_Init(NumArguments);
             for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
                 UTF32 *Decoded      = UTF8_Decode(Arguments[Arg]);
                 UTF32 *CaseFolded   = UTF32_CaseFold(Decoded);
@@ -716,10 +716,10 @@ extern "C" {
             uint64_t ExtensionSize = 0ULL;
             for (uint64_t CodePoint = StringSize; CodePoint > 0; CodePoint--) {
                 if (Path[CodePoint] == U32('.')) {
-                    ExtensionSize = CodePoint - StringSize;
+                    ExtensionSize  = CodePoint - StringSize;
                 }
             }
-            Extension = calloc(UnicodeBOMSizeInCodePoints + ExtensionSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            Extension              = UTF32_Init(ExtensionSize);
             if (Extension != NULL) {
                 for (uint64_t ExtCodePoint = 0ULL; ExtCodePoint < ExtensionSize; ExtCodePoint++) {
                     for (uint64_t PathCodePoint = StringSize - ExtensionSize; PathCodePoint < StringSize; PathCodePoint++) {

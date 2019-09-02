@@ -635,7 +635,7 @@ extern "C" {
     }
     
     static UTF8 *UTF8_CodeUnit2String(UTF8 CodeUnit) {
-        UTF8 *String  = calloc(1 + FoundationIONULLTerminatorSize, sizeof(UTF8));
+        UTF8 *String  = UTF8_Init(1);
         if (String != NULL) {
             String[0] = CodeUnit;
         }
@@ -643,7 +643,7 @@ extern "C" {
     }
     
     static UTF16 *UTF16_CodeUnit2String(UTF16 CodeUnit) {
-        UTF16 *String  = calloc(1 + FoundationIONULLTerminatorSize, sizeof(UTF16));
+        UTF16 *String  = UTF16_Init(1);
         if (String != NULL) {
             String[0] = CodeUnit;
         }
@@ -651,7 +651,7 @@ extern "C" {
     }
     
     static UTF32 *UTF32_CodeUnit2String(UTF32 CodeUnit) {
-        UTF32 *String  = calloc(1 + FoundationIONULLTerminatorSize, sizeof(UTF32));
+        UTF32 *String  = UTF32_Init(1);
         if (String != NULL) {
             String[0] = CodeUnit;
         }

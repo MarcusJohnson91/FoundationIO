@@ -192,6 +192,24 @@ extern "C" {
                           StringType_UTF32                     = 4,
     } StringIOStringTypes;
     
+    /*!
+     @abstract                             "Allocates a UTF8 string plus a NULL terminator".
+     @param               NumCodeUnits     "The size of the string not counting the NULL terminator".
+     */
+    UTF8                 *UTF8_Init(uint64_t NumCodeUnits);
+    
+    /*!
+     @abstract                             "Allocates a UTF8 string plus a NULL terminator".
+     @param               NumCodeUnits     "The size of the string not counting the NULL terminator".
+     */
+    UTF16                *UTF16_Init(uint64_t NumCodeUnits);
+    
+    /*!
+     @abstract                             "Allocates a UTF8 string plus a NULL terminator".
+     @param               NumCodePoints    "The size of the string not counting the NULL terminator".
+     */
+    UTF32                *UTF32_Init(uint64_t NumCodePoints);
+    
     /* Basic String Property Functions */
     /*!
      @abstract                             "Returns the number of CodeUnits in the CodePoint".

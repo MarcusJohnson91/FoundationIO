@@ -308,7 +308,7 @@ extern "C" {
             uint64_t OGCodePoint = 0ULL;
             uint64_t DeCodePoint = 0ULL;
             uint64_t NumDigits   = UTF32_GetNumDigits(Base_Integer_Radix10, String, 0);
-            Delocalized          = calloc(NumDigits + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            Delocalized          = UTF32_Init(NumDigits);
             if (Delocalized != NULL) {
                 do {
                     if (String[OGCodePoint] >= U32('0') && String[OGCodePoint] <= U32('9')) {
@@ -383,8 +383,7 @@ extern "C" {
             } while (CodePoint > 0);
             
             uint64_t NumDigits         = UTF32_GetNumDigits(Base_Decimal_Hex_Uppercase, String, 0);
-            Delocalized                = calloc(NumDigits + FoundationIONULLTerminatorSize, sizeof(UTF32));
-            
+            Delocalized                = UTF32_Init(NumDigits);
             
             CodePoint                  = 0ULL;
             while (String[CodePoint] != FoundationIONULLTerminator) {
