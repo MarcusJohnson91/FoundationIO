@@ -535,7 +535,7 @@ extern "C" {
     }
     
     UTF8 *BitBuffer_ReadUTF8(BitBuffer *BitB, uint64_t StringSize) {
-        UTF8 *ExtractedString             = calloc(StringSize + FoundationIONULLTerminatorSize, sizeof(UTF8));
+        UTF8 *ExtractedString             = UTF8_Init(StringSize);
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
                 ExtractedString[CodeUnit] = (UTF8) BitBuffer_Extract_LSByteLSBit(BitB, 8);
@@ -562,7 +562,7 @@ extern "C" {
     }
     
     UTF16 *BitBuffer_ReadUTF16(BitBuffer *BitB, uint64_t StringSize) {
-        UTF16 *ExtractedString            = calloc(StringSize + FoundationIONULLTerminatorSize, sizeof(UTF16));
+        UTF16 *ExtractedString            = UTF16_Init(StringSize);
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
                 ExtractedString[CodeUnit] = (UTF16) BitBuffer_Extract_LSByteLSBit(BitB, 16);

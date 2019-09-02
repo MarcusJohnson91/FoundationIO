@@ -13,6 +13,24 @@
 extern "C" {
 #endif
     
+    UTF8 *UTF8_Init(uint64_t NumCodeUnits) {
+        UTF8 *String = NULL;
+        String       = calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
+        return String;
+    }
+    
+    UTF16 *UTF16_Init(uint64_t NumCodeUnits) {
+        UTF16 *String = NULL;
+        String        = calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF16));
+        return String;
+    }
+    
+    UTF32 *UTF32_Init(uint64_t NumCodePoints) {
+        UTF32 *String = NULL;
+        String        = calloc(NumCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
+        return String;
+    }
+    
     uint8_t UTF8_GetCodePointSizeInCodeUnits(UTF8 CodeUnit) {
         uint8_t CodePointSize = 0;
         if (((CodeUnit & 0x80) >> 7) == 0) {
@@ -296,7 +314,7 @@ extern "C" {
                         }
                     }
                 }
-                Grapheme                                             = calloc(GraphemeSizeInCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
+                Grapheme                                             = UTF32_Init(GraphemeSizeInCodePoints);
                 if (Grapheme != NULL) {
                     for (uint64_t GraphemeCodePoint = CodePointStart; GraphemeCodePoint < CodePointStart + GraphemeSizeInCodePoints; GraphemeCodePoint++) {
                         Grapheme[GraphemeCodePoint - CodePointStart] = String[GraphemeCodePoint];
@@ -651,8 +669,8 @@ extern "C" {
         UTF32    ByteOrder            = 0;
         if (String != NULL) {
             if (String[0] != UTF32BOM_LE && String[0] != UTF32BOM_BE) {
-                uint64_t StringSize   = UTF32_GetStringSizeInCodePoints(String) + UnicodeBOMSizeInCodePoints + FoundationIONULLTerminatorSize;
-                StringWithBOM         = calloc(StringSize + UnicodeBOMSizeInCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
+                uint64_t StringSize   = UTF32_GetStringSizeInCodePoints(String);
+                StringWithBOM         = UTF32_Init(StringSize + UnicodeBOMSizeInCodePoints);
                 if (StringWithBOM != NULL) {
                     if (BOM2Add == ByteOrder_Native) {
 #if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
@@ -686,7 +704,7 @@ extern "C" {
             StringSize                              = UTF8_GetStringSizeInCodeUnits(String);
             bool StringHasBOM                       = UTF8_HasBOM(String);
             if (StringHasBOM) {
-                BOMLessString                       = calloc(StringSize - UTF8BOMSizeInCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
+                BOMLessString                       = UTF8_Init(StringSize - UTF8BOMSizeInCodeUnits);
                 if (BOMLessString != NULL) {
                     for (uint64_t CodeUnit = 2ULL; CodeUnit < StringSize; CodeUnit++) {
                         BOMLessString[CodeUnit - 3] = String[CodeUnit];
@@ -708,7 +726,7 @@ extern "C" {
             StringSize                              = UTF16_GetStringSizeInCodeUnits(String);
             bool StringHasBOM                       = UTF16_HasBOM(String);
             if (StringHasBOM) {
-                BOMLessString                       = calloc(StringSize - UTF16BOMSizeInCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF16));
+                BOMLessString                       = UTF16_Init(StringSize - UTF16BOMSizeInCodeUnits);
                 if (BOMLessString != NULL) {
                     for (uint64_t CodeUnit = 1ULL; CodeUnit < StringSize; CodeUnit++) {
                         BOMLessString[CodeUnit - 1] = String[CodeUnit];
@@ -730,7 +748,7 @@ extern "C" {
             StringSize                           = UTF32_GetStringSizeInCodePoints(String);
             bool StringHasBOM                    = UTF32_HasBOM(String);
             if (StringHasBOM) {
-                BOMLessString                    = calloc(StringSize - UnicodeBOMSizeInCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
+                BOMLessString                    = UTF32_Init(StringSize - UnicodeBOMSizeInCodePoints);
                 if (BOMLessString != NULL) {
                     for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
                         BOMLessString[CodePoint] = String[CodePoint + 1];
@@ -753,7 +771,7 @@ extern "C" {
         
         if (String != NULL) {
             StringSize                               = UTF8_GetStringSizeInCodePoints(String);
-            DecodedString                            = calloc(StringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            DecodedString                            = UTF32_Init(StringSize);
             if (DecodedString != NULL) {
                 while (String[CodeUnit] != FoundationIONULLTerminator) {
                     uint8_t CodePointSize            = UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
@@ -816,7 +834,7 @@ extern "C" {
                 StringsByteOrder                 = UTF16BOM_BE;
 #endif
             }
-            DecodedString                        = calloc(NumCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            DecodedString                        = UTF32_Init(NumCodePoints);
             if (DecodedString != NULL) {
                 while (String[CodeUnit] != FoundationIONULLTerminator) {
                     if (String[CodeUnit] <= UTF16MaxCodeUnit && (String[CodeUnit < UTF16HighSurrogateStart] || String[CodeUnit] > UTF16LowSurrogateEnd)) {
@@ -844,7 +862,7 @@ extern "C" {
         if (String != NULL) {
             uint64_t StringSizeInCodePoints            = UTF32_GetStringSizeInCodePoints(String);
             uint64_t UTF8CodeUnits                     = UTF32_GetStringSizeInUTF8CodeUnits(String);
-            EncodedString                              = calloc(UTF8CodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
+            EncodedString                              = UTF8_Init(UTF8CodeUnits);
             if (EncodedString != NULL) {
                 for (uint64_t CodePoint = 0ULL; CodePoint < StringSizeInCodePoints; CodePoint++) {
                     if (String[CodePoint] <= 0x7F) {
@@ -886,7 +904,7 @@ extern "C" {
             uint64_t CodePoint                           = 0ULL;
             uint64_t CodeUnit                            = 0ULL;
             uint64_t NumCodeUnits                        = UTF32_GetStringSizeInUTF16CodeUnits(String);
-            EncodedString                                = calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF16));
+            EncodedString                                = UTF16_Init(NumCodeUnits);
             if (EncodedString != NULL) {
                 while (CodeUnit < NumCodeUnits) {
                     if (String[CodePoint] > UTF16MaxCodeUnit) {
@@ -940,7 +958,7 @@ extern "C" {
         UTF8 *Copy = NULL;
         if (String != NULL) {
             uint64_t StringSizeInCodeUnits = UTF8_GetStringSizeInCodeUnits(String);
-            Copy    = calloc(StringSizeInCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
+            Copy                           = UTF8_Init(StringSizeInCodeUnits);
             if (Copy != NULL) {
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSizeInCodeUnits; CodeUnit++) {
                     Copy[CodeUnit] = String[CodeUnit];
@@ -958,7 +976,7 @@ extern "C" {
         UTF16 *Copy = NULL;
         if (String != NULL) {
             uint64_t StringSizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(String);
-            Copy    = calloc(StringSizeInCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF16));
+            Copy                           = UTF16_Init(StringSizeInCodeUnits);
             if (Copy != NULL) {
                 for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSizeInCodeUnits; CodeUnit++) {
                     Copy[CodeUnit] = String[CodeUnit];
@@ -976,7 +994,7 @@ extern "C" {
         UTF32 *Copy = NULL;
         if (String != NULL) {
             uint64_t StringSizeInCodePoints = UTF32_GetStringSizeInCodePoints(String);
-            Copy    = calloc(StringSizeInCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            Copy                            = UTF32_Init(StringSizeInCodePoints);
             if (Copy != NULL) {
                 for (uint64_t CodePoint = 0ULL; CodePoint < StringSizeInCodePoints; CodePoint++) {
                     Copy[CodePoint] = String[CodePoint];
@@ -1023,7 +1041,7 @@ extern "C" {
         }
     }
     
-    UTF8 *UTF8_Truncate(UTF8 *String, uint64_t MaxCodeUnits) {
+    UTF8 *UTF8_Truncate(UTF8 *String, uint64_t MaxCodeUnits) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
         UTF8 *Truncated = NULL;
         if (String != NULL) {
             uint64_t StringSize     = UTF8_GetStringSizeInCodeUnits(String);
@@ -1045,7 +1063,7 @@ extern "C" {
         return Truncated;
     }
     
-    UTF16 *UTF16_Truncate(UTF16 *String, uint64_t MaxCodeUnits) {
+    UTF16 *UTF16_Truncate(UTF16 *String, uint64_t MaxCodeUnits) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
         UTF16 *Truncated = NULL;
         if (String != NULL) {
             uint64_t StringSize     = UTF16_GetStringSizeInCodeUnits(String);
@@ -1067,7 +1085,7 @@ extern "C" {
         return Truncated;
     }
     
-    UTF32 *UTF32_Truncate(UTF32 *String, uint64_t MaxCodePoints) {
+    UTF32 *UTF32_Truncate(UTF32 *String, uint64_t MaxCodePoints) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
         UTF32 *Truncated = NULL;
         if (String != NULL) {
             uint64_t StringSize      = UTF32_GetStringSizeInCodePoints(String);
@@ -1110,12 +1128,13 @@ extern "C" {
             uint64_t CodePointSizeInCodeUnits  = 0ULL;
             UTF8     CodeUnit                  = 0;
             while (GraphemeFound == No) {
-                fread(&CodeUnit, sizeof(UTF8), 1, Source);
+                FoundationIO_File_Read(&CodeUnit, sizeof(UTF8), 1, Source);
                 CodePointSizeInCodeUnits     += UTF8_GetCodePointSizeInCodeUnits(CodeUnit);
-                fseek(Source, CodePointSizeInCodeUnits, SEEK_CUR);
-                Grapheme          = calloc(CodePointSizeInCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
+                FoundationIO_File_Seek(Source, CodePointSizeInCodeUnits, SEEK_CUR);
+                Grapheme                      = UTF8_Init(CodePointSizeInCodeUnits);
+                FoundationIO_File_Read(&Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits, Source);
                 fread(&Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits, Source);
-                UTF32 *CodePoint  = UTF8_Decode(Grapheme);
+                UTF32 *CodePoint              = UTF8_Decode(Grapheme);
                 for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
                     if (CodePoint[0] == GraphemeExtensionTable[GraphemeExtension]) {
                         // Read another CodePoint
@@ -1136,7 +1155,7 @@ extern "C" {
             UTF16 CodeUnit        = 0;
             fread(&CodeUnit, sizeof(UTF16), 1, Source);
             uint8_t CodePointSize = UTF16_GetCodePointSizeInCodeUnits(CodeUnit);
-            CodePoint             = calloc(CodePointSize + FoundationIONULLTerminatorSize, sizeof(UTF16));
+            CodePoint             = UTF16_Init(CodePointSize);
             fread(CodePoint, CodePointSize, 1, Source);
         } else {
             Log(Log_DEBUG, __func__, U8("FILE Pointer is NULL"));
@@ -1184,7 +1203,7 @@ extern "C" {
                 CurrentCodePoint            = UTF8_Decode(CodePoint);
             } // FIXME: Use our newline array
             // Now we need to allocate memory for that string
-            Line                            = calloc(StringSizeInCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
+            Line                            = UTF8_Init(StringSizeInCodeUnits);
         } else {
             Log(Log_DEBUG, __func__, U8("FILE Pointer is NULL"));
         }
@@ -1207,7 +1226,7 @@ extern "C" {
                 CurrentCodePoint            = UTF16_Decode(CodePoint);
             }
             // Now we need to allocate memory for that string
-            Line                            = calloc(StringSizeInCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF16));
+            Line                            = UTF16_Init(StringSizeInCodeUnits);
         } else {
             Log(Log_DEBUG, __func__, U8("FILE Pointer is NULL"));
         }
@@ -1409,7 +1428,7 @@ extern "C" {
         uint64_t  ExtractedStringSize                   = Length + FoundationIONULLTerminatorSize;
         UTF32    *ExtractedString                       = NULL;
         if (String != NULL && StringSize >= Length + Offset) {
-            ExtractedString                             = calloc(ExtractedStringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            ExtractedString                             = UTF32_Init(ExtractedStringSize);
             if (ExtractedString != NULL) {
                 for (uint64_t CodePoint = Offset; CodePoint < Offset + Length; CodePoint++) {
                     ExtractedString[CodePoint - Offset] = String[CodePoint];
@@ -1467,7 +1486,7 @@ extern "C" {
             uint64_t StringSize                     = UTF32_GetStringSizeInCodePoints(String);
             uint64_t ReplacementSize                = UTF32_GetStringSizeInCodePoints(Replacement);
             uint64_t NewStringSize                  = (StringSize + ReplacementSize) - (Length + 1);
-            NewString                               = calloc(NewStringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            NewString                               = UTF32_Init(NewStringSize);
             if (NewString != NULL) {
                 uint64_t NewCodePoint               = 0ULL;
                 uint64_t StringCodePoint            = 0ULL;
@@ -1528,7 +1547,7 @@ extern "C" {
             uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
             if (Offset <= StringSize && Length <= StringSize && Offset + Length <= StringSize) {
                 uint64_t StitchedSize = StringSize - Length;
-                Stitched              = calloc(StitchedSize, sizeof(UTF32));
+                Stitched              = UTF32_Init(StitchedSize);
                 if (Stitched != NULL) {
                     uint64_t CodePoint = 0ULL;
                     while (CodePoint < StitchedSize && CodePoint + Length < StringSize) {
@@ -1634,7 +1653,7 @@ extern "C" {
                 EditedStringSize = StringSize - (NumInstances * SubStringSize);
             }
             
-            EditedString         = calloc(EditedStringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            EditedString         = UTF32_Init(EditedStringSize);
             if (EditedString != NULL) {
                 for (uint64_t EditedCodePoint = 0ULL; EditedCodePoint < EditedStringSize; EditedCodePoint++) {
                     for (uint64_t Instance = 0ULL; Instance < NumInstances; Instance++) {
@@ -1695,7 +1714,7 @@ extern "C" {
                 Offset          = StringSize;
             }
             if (Offset <= StringSize) {
-                Inserted        = calloc(StringSize + InsertSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
+                Inserted        = UTF32_Init(StringSize + InsertSize);
                 if (Inserted != NULL) {
                     for (uint64_t CodePoint = 0ULL; CodePoint < StringSize + InsertSize; CodePoint++) {
                         if (CodePoint < Offset || CodePoint > Offset + InsertSize) {
@@ -2092,7 +2111,7 @@ extern "C" {
         }
         NumDigits                    += NumDigitsInInteger(Radix, Integer2Convert);
         
-        String                        = calloc(NumDigits + FoundationIONULLTerminatorSize, sizeof(UTF32));
+        String                        = UTF32_Init(NumDigits);
         
         if (String != NULL) {
             for (uint64_t CodePoint = NumDigits; CodePoint > 0; CodePoint--) {
@@ -2240,7 +2259,7 @@ extern "C" {
             StringSize       += 2;
         }
         
-        OutputString          = calloc(StringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
+        OutputString          = UTF32_Init(StringSize);
         if (OutputString != NULL) {
             // Now we go ahead and create the string
             if (Sign == -1) {
@@ -2539,7 +2558,7 @@ extern "C" {
                 TrimmedStringSize     -= RemovalPointsEnd[RemovalPoint] - RemovalPointsStart[RemovalPoint];
             }
             
-            Trimmed                    = calloc(TrimmedStringSize + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            Trimmed                    = UTF32_Init(TrimmedStringSize);
             if (Trimmed != NULL) {
                 for (uint64_t RemovalPoint = 0ULL; RemovalPoint < NumRemovalPoints; RemovalPoint++) {
                     for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
@@ -2785,8 +2804,9 @@ extern "C" {
                 FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF8);
                 va_list VariadicArguments;
                 va_start(VariadicArguments, Format);
-                UTF32 *FormattedString       = FormatString_UTF32(Format32, Specifiers, VariadicArguments);
+                Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
+                UTF32 *FormattedString       = FormatString_UTF32(Format32, Specifiers);
                 free(Format32);
                 FormatSpecifiers_Deinit(Specifiers);
                 Format8                      = UTF8_Encode(FormattedString);
@@ -2809,8 +2829,9 @@ extern "C" {
                 FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF16);
                 va_list VariadicArguments;
                 va_start(VariadicArguments, Format);
-                UTF32 *FormattedString       = FormatString_UTF32(Format32, Specifiers, VariadicArguments);
+                Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
+                UTF32 *FormattedString       = FormatString_UTF32(Format32, Specifiers);
                 free(Format32);
                 FormatSpecifiers_Deinit(Specifiers);
                 Format16                     = UTF16_Encode(FormattedString);
@@ -2832,8 +2853,9 @@ extern "C" {
                 FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format, NumSpecifiers, StringType_UTF32);
                 va_list VariadicArguments;
                 va_start(VariadicArguments, Format);
-                FormattedString              = FormatString_UTF32(Format, Specifiers, VariadicArguments);
+                Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
+                FormattedString              = FormatString_UTF32(Format, Specifiers);
                 FormatSpecifiers_Deinit(Specifiers);
             } else {
                 FormattedString              = Format;

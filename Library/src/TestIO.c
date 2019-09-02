@@ -1,6 +1,7 @@
 #include "../include/TestIO.h"         /* Included for our declarations */
 #include "../include/CryptographyIO.h" /* Included for Entropy */
 #include "../include/Log.h"            /* Included for error reporting */
+#include "../include/StringIO.h"       /* Included for UTFX_Init functions */
 
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
 #include <time.h>                      /* Included for timespec_get */
@@ -87,7 +88,7 @@ extern "C" {
     UTF32 *UTF32_GenerateString(Entropy *Random, uint64_t NumCodePoints) {
         UTF32 *String                 = 0UL;
         if (Random != NULL) {
-            String                    = calloc(NumCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
+            String                    = UTF32_Init(NumCodePoints);
             if (String != NULL) {
                 for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePoints; CodePoint++) {
                     String[CodePoint] = UTF32_GenerateCodePoint(Random);
