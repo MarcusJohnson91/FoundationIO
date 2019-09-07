@@ -438,6 +438,15 @@ extern "C" {
         return Mask;
     }
     
+    uint8_t CountBitsSet(uint64_t Value) {
+        uint8_t NumBitsSet = 0; // V
+        while(Value != 0) {
+            Value         &= Value - 1;
+            NumBitsSet    += 1;
+        }
+        return NumBitsSet;
+    }
+    
     /* Ryū specific math functions */
     bool IsPowerOfBase(uint8_t Base, uint64_t Value) {
         return Value % Base == 0 ? Yes : No;
