@@ -396,6 +396,13 @@ extern "C" {
     uint8_t                     CreateBitMaskMSBit(uint8_t NumBits2Select);
     
     /*!
+     @abstract                                                  "Counts the number of bits set to 1 in Value".
+     @param                     Value                           "The number of bits to select".
+     @return                                                    "Returns the number of set bits".
+     */
+    uint8_t                     CountBitsSet(uint64_t Value);
+    
+    /*!
      @abstract                                                  "Value Mod Base, if the remainder is 0 Value is a power of the base".
      @param                     Base                            "The base to check".
      @param                     Value                           "The value to check".
