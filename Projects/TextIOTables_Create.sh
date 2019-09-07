@@ -88,21 +88,21 @@ CreateCurrencyTable() {
 CreateDecimalTables() {
     IFS='
 '
-    SortedCodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and contains(@nv, '/') and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -v "@cp" -o : -v "@nv" -n "$UCD_Data")
+    CodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and contains(@nv, '/') and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -v "@cp" -o : -v "@nv" -n "$UCD_Data")
     printf "    static const UTF32    DecimalCodePoints[DecimalTableSize] = {\n" >> "$OutputFile"
-    for line in $SortedCodePointAndValue; do
+    for line in $CodePointAndValue; do
         CodePoint=$(echo "$line" | awk -F '[:/]' '{printf "0x"$1}')
         printf "        0x%06X,\n" "$CodePoint" >> "$OutputFile"
     done
     printf "    };\n\n" >> "$OutputFile"
     printf "    static const int8_t   DecimalNumerators[DecimalTableSize] = {\n" >> "$OutputFile"
-    for line in $SortedCodePointAndValue; do
+    for line in $CodePointAndValue; do
         Numerator=$(echo "$line" | awk -F '[:/]' '{printf $2}')
         printf "        %d,\n" "$Numerator" >> "$OutputFile"
     done
     printf "    };\n\n" >> "$OutputFile"
     printf "    static const uint16_t DecimalDenominators[DecimalTableSize] = {\n" >> "$OutputFile"
-    for line in $SortedCodePointAndValue; do
+    for line in $CodePointAndValue; do
         Denominator=$(echo "$line" | awk -F '[:/]' '{printf $3}')
         printf "        %d,\n" "$Denominator" >> "$OutputFile"
     done
@@ -127,15 +127,15 @@ CreateCombiningCharacterClassTable() {
 CreateIntegerTable() {
     IFS='
 '
-    SortedCodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -v "@cp" -o : -v "@nv" -n "$UCD_Data")
+    CodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -v "@cp" -o : -v "@nv" -n "$UCD_Data")
     printf "    static const UTF32    IntegerCodePoints[IntegerTableSize] = {\n" >> "$OutputFile"
-    for line in $SortedCodePointAndValue; do
+    for line in $CodePointAndValue; do
         CodePoint=$(echo "$line" | awk -F ":" '{printf "0x"$1}')
         printf "        0x%06X,\n" "$CodePoint" >> "$OutputFile"
     done
     printf "    };\n\n" >> "$OutputFile"
     printf "    static const uint64_t IntegerValues[IntegerTableSize] = {\n" >> "$OutputFile"
-    for line2 in $SortedCodePointAndValue; do
+    for line2 in $CodePointAndValue; do
         Value=$(echo "$line2" | awk -F ":" '{printf $2}')
         printf "        %d,\n" "$Value" >> "$OutputFile"
     done
