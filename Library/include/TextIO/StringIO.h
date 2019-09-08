@@ -90,6 +90,8 @@ extern "C" {
      @constant            UTF16SurrogatePairStart              "The first UTF-32 CodePoint to require Surrogate Pairs in UTF-16".
      @constant            InvalidReplacementCodePoint          "The CodePoint to replace invalid codeunits".
      @constant            UnicodeMaxCodePoint                  "The highest CodePoint possible in Unicode, 1,114,111".
+     @constant            UTF8MaxCodeUnits                     "The maximum number of codeunits per codepoint".
+     @constant            UTF16MaxCodeUnits                    "The maximum number of codeunits per codepoint".
      */
     typedef enum StringIOCommon {
                           UTF8BOMSizeInCodeUnits               = 3,
@@ -114,6 +116,8 @@ extern "C" {
                           UTF16SurrogatePairStart              = 0x10000,
                           InvalidReplacementCodePoint          = 0xFFFD,
                           UnicodeMaxCodePoint                  = 0x10FFFF,
+                          UTF8MaxCodeUnits                     = 4,
+                          UTF16MaxCodeUnits                    = 2,
     } StringIOCommon;
     
     /*!
@@ -215,13 +219,13 @@ extern "C" {
      @abstract                             "Returns the number of CodeUnits in the CodePoint".
      @param               CodeUnit         "The leading CodeUnit for a CodePoint".
      */
-    uint8_t               UTF8_GetCodePointsizeInCodeUnits(UTF8 CodeUnit);
+    uint8_t               UTF8_GetCodePointSizeInCodeUnits(UTF8 CodeUnit);
     
     /*!
      @abstract                             "Returns the number of CodeUnits in the CodePoint".
      @param               CodeUnit         "A CodeUnit for a CodePoint".
      */
-    uint8_t               UTF16_GetCodePointsizeInCodeUnits(UTF16 CodeUnit);
+    uint8_t               UTF16_GetCodePointSizeInCodeUnits(UTF16 CodeUnit);
     
     /*!
      @abstract                             "Gets the number of Unicode codeunits in the UTF8 string".
@@ -926,28 +930,28 @@ extern "C" {
      @abstract                             "Cuts a string down to MaxCodeUnits CodeUnits".
      @remark                               "MaxCodeUnits DOES NOT include the NULL Terminator".
      @param               String           "The string to truncate".
-     @param               MaxCodeUnits     "The maxiumum amount of CodeUnits in the string, not counting the null terminator".
+     @param               NumGraphemes     "The maxiumum amount of CodeUnits in the string, not counting the null terminator".
      @return                               "Returns the truncated, null terminated copy of String".
      */
-    UTF8                 *UTF8_Truncate(UTF8 *String, uint64_t MaxCodeUnits);
+    UTF8                 *UTF8_Truncate(UTF8 *String, uint64_t NumGraphemes);
     
     /*!
      @abstract                             "Cuts a string down to MaxCodeUnits CodeUnits".
      @remark                               "MaxCodeUnits DOES NOT include the NULL Terminator".
      @param               String           "The string to truncate".
-     @param               MaxCodeUnits     "The maxiumum amount of CodeUnits in the string, not counting the null terminator".
+     @param               NumGraphemes     "The maxiumum amount of CodeUnits in the string, not counting the null terminator".
      @return                               "Returns the truncated, null terminated copy of String".
      */
-    UTF16                *UTF16_Truncate(UTF16 *String, uint64_t MaxCodeUnits);
+    UTF16                *UTF16_Truncate(UTF16 *String, uint64_t NumGraphemes);
     
     /*!
      @abstract                             "Cuts a string down to MaxCodePoints CodePoints".
      @remark                               "MaxCodePoints DOES NOT include the NULL Terminator".
      @param               String           "The string to truncate".
-     @param               MaxCodePoints    "The maxiumum amount of CodePoints in the string, not counting the null terminator".
+     @param               NumGraphemes     "The maxiumum amount of CodePoints in the string, not counting the null terminator".
      @return                               "Returns the truncated, null terminated copy of String".
      */
-    UTF32                *UTF32_Truncate(UTF32 *String, uint64_t MaxCodePoints);
+    UTF32                *UTF32_Truncate(UTF32 *String, uint64_t NumGraphemes);
     
     /*!
      @abstract                             "Creates a copy of String, with String2Insert starting at Offset".
@@ -1171,6 +1175,24 @@ extern "C" {
      @return                               "Returns a StringArray containing NumFormatSpecifiers strings, one string for each specifier".
      */
     UTF32               **UTF32_Deformat(UTF32 *Format, UTF32 *Source);
+    
+    /*!
+     @abstract                             "Deinitializes String".
+     @param               String           "The string to deinitialize".
+     */
+    void                  UTF8_Deinit(UTF8 *String);
+    
+    /*!
+     @abstract                             "Deinitializes String".
+     @param               String           "The string to deinitialize".
+     */
+    void                  UTF16_Deinit(UTF16 *String);
+    
+    /*!
+     @abstract                             "Deinitializes String".
+     @param               String           "The string to deinitialize".
+     */
+    void                  UTF32_Deinit(UTF32 *String);
     
     /*!
      @abstract                             "Initalizes a UTF-8 encoded StringArray".
