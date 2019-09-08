@@ -133,16 +133,18 @@ extern "C" {
          Firt off, just add Length, not (Length + 1) cuz it's aready moved to the following codepoint so no need to bump it up
          */
         
-        
-        UTF8 *Positional2                      = UTF8_Format(U8("NumArgs: %1$llu, Type: %2$s, %2$s"), 2, U8("Positional"));
-        bool  Positional2Test                  = UTF8_Compare(Positional2, U8("NumArgs: 2, Type: Positional, Positional"));
+        /*
+        UTF8 *Positional2                      = UTF8_Format(U8("%2$s: NumArgs: %1$llu, Type: %2$s"), 2, U8("Positional"));
+        bool  Positional2Test                  = UTF8_Compare(Positional2, U8("Positional: NumArgs: 2, Type: Positional"));
         if (Positional2Test == No) {
             Log(Log_DEBUG, __func__, U8("Positional2Test Failed"));
         }
+        */
         
-        
-        UTF8 *Positional3                      = UTF8_Format("NumArgs: %2$llu, %1$s EXTEND THE STRING PAST THE SPECIFIERS TO MAKE SURE THE BREAK WORKS", U8("Positional"), 2);
-        bool  Positional3Test                  = UTF8_Compare(Positional3, U8("NumArgs: 2, Positional")); // "NumArgs: -$llu, Positi"
+        UTF8 *Positional3                      = UTF8_Format(U8("NumArgs: %2$llu, %1$s EXTEND THE STRING"), U8("Positional"), 2); // Remapping isn't working.
+        bool  Positional3Test                  = UTF8_Compare(Positional3, U8("NumArgs: 2, Positional EXTEND THE STRING"));
+        // "NumArgs: -$llu, Positi"
+        // "NumArgs: Positional, %12XTEND THE STRING"
         if (Positional3Test == No) {
             Log(Log_DEBUG, __func__, U8("Positional3Test Failed"));
         }
@@ -282,9 +284,10 @@ extern "C" {
     
     int main(int argc, const char *argv[]) {
         bool TestSuitePassed      = false;
-        
-        TestSuitePassed           = Test_UTF8_Format();
-        TestSuitePassed           = Test_UTF8_Stitch();
+        Entropy *Random           = Entropy_Init(8000000);
+        Test_UTF8_EncodeDecode(Random);
+        //TestSuitePassed           = Test_UTF8_Format();
+        //TestSuitePassed           = Test_UTF8_Stitch();
         return TestSuitePassed;
     }
     
