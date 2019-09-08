@@ -76,9 +76,11 @@ extern "C" {
     
     FormatSpecifiers *FormatSpecifiers_Init(uint64_t NumSpecifiers);
     
-    UTF32            *FormatString_UTF32(UTF32 *Format, FormatSpecifiers *Specifiers, va_list VariadicArguments);
+    UTF32            *FormatString_UTF32(UTF32 *Format, FormatSpecifiers *Specifiers);
     
     FormatSpecifiers *UTF32_ParseFormatString(UTF32 *Format, uint64_t NumSpecifiers, StringIOStringTypes StringType);
+    
+    void              Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments);
     
     UTF32           **DeformatString_UTF32(UTF32 *Format, UTF32 *Result, FormatSpecifiers *Specifiers);
     
