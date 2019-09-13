@@ -458,7 +458,7 @@ extern "C" {
     ImageContainer *ImageContainer_Init(Image_Types Type, Image_ChannelMask ChannelMask, uint64_t Width, uint64_t Height) {
         ImageContainer *Image = NULL;
         if (Width > 0 && Height > 0) {
-            Image = calloc(1, sizeof(ImageContainer));
+            Image                             = calloc(1, sizeof(ImageContainer));
             if (Image != NULL) {
                 uint8_t           NumViews    = ImageMask_GetNumViews(ChannelMask);
                 uint8_t           NumChannels = ImageMask_GetNumChannels(ChannelMask);
