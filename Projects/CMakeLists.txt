@@ -121,7 +121,7 @@ if(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHE
     install(TARGETS Test_StringIO       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     install(TARGETS Test_Math           DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     install(TARGETS Test_CryptographyIO DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-endif(CMAKE_CONFIGURATION_TYPES MATCHES "Release" OR CMAKE_CONFIGURATION_TYPES MATCHES "MinSizeRel")
+endif(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
 
 if (${CMAKE_C_COMPILER_ID} MATCHES "AppleClang" OR ${CMAKE_C_COMPILER_ID} MATCHES "Clang")
 
@@ -146,6 +146,7 @@ ${CMAKE_C_FLAGS} \
 -Wno-reserved-id-macro \
 -Wno-sign-conversion \
 -Wno-varargs \
+-Wsuggest-attribute=const \
 -v \
 ")
 
