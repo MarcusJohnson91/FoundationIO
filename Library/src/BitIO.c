@@ -3,7 +3,7 @@
 #include "../include/Log.h"            /* Included for Log declarations */
 #include "../include/Math.h"           /* Included for Integer functions */
 #include "../include/StringIO.h"       /* Included for StringIO's declarations */
-#include "../include/CryptographyIO.h" /* Included for GenerateIntegerInRange for GUUID_Generate */
+#include "../include/CryptographyIO.h" /* Included for Entropy_GenerateInteger for GUUID_Generate */
 
 #ifdef __cplusplus
 extern "C" {
