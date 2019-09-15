@@ -19,31 +19,32 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\libFoundationIO\include\BitIO.h" />
-    <ClInclude Include="..\libFoundationIO\include\CommandLineIO.h" />
-    <ClInclude Include="..\libFoundationIO\include\ContainerIO.h" />
-    <ClInclude Include="..\libFoundationIO\include\CryptographyIO.h" />
-    <ClInclude Include="..\libFoundationIO\include\FormatIO.h" />
-    <ClInclude Include="..\libFoundationIO\include\LocalizationIO.h" />
-    <ClInclude Include="..\libFoundationIO\include\Log.h" />
-    <ClInclude Include="..\libFoundationIO\include\Macros.h" />
-    <ClInclude Include="..\libFoundationIO\include\Math.h" />
-    <ClInclude Include="..\libFoundationIO\include\Private\UnicodeTables.h" />
-    <ClInclude Include="..\libFoundationIO\include\StringIO.h" />
-    <ClInclude Include="..\libFoundationIO\include\TestIO.h" />
+    <ClInclude Include="..\Library\include\BitIO.h" />
+    <ClInclude Include="..\Library\include\CommandLineIO.h" />
+    <ClInclude Include="..\Library\include\ContainerIO.h" />
+    <ClInclude Include="..\Library\include\CryptographyIO.h" />
+    <ClInclude Include="..\Library\include\LocalizationIO.h" />
+    <ClInclude Include="..\Library\include\Log.h" />
+    <ClInclude Include="..\Library\include\Macros.h" />
+    <ClInclude Include="..\Library\include\Math.h" />
+    <ClInclude Include="..\Library\include\StringIO.h" />
+    <ClInclude Include="..\Library\include\TestIO.h" />
+    <ClInclude Include="..\Library\include\Private\UnicodeTables.h" />
+    <ClInclude Include="..\Library\include\Private\NumberTables.h" />
+    <ClInclude Include="..\Library\include\Private\FormatIO.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\libFoundationIO\src\BitIO.c" />
-    <ClCompile Include="..\libFoundationIO\src\CommandLineIO.c" />
-    <ClCompile Include="..\libFoundationIO\src\ContainerIO.c" />
-    <ClCompile Include="..\libFoundationIO\src\CryptographyIO.c" />
-    <ClCompile Include="..\libFoundationIO\src\FormatIO.c" />
-    <ClCompile Include="..\libFoundationIO\src\LocalizationIO.c" />
-    <ClCompile Include="..\libFoundationIO\src\Log.c" />
-    <ClCompile Include="..\libFoundationIO\src\Macros.c" />
-    <ClCompile Include="..\libFoundationIO\src\Math.c" />
-    <ClCompile Include="..\libFoundationIO\src\StringIO.c" />
-    <ClCompile Include="..\libFoundationIO\src\TestIO.c" />
+    <ClCompile Include="..\Library\src\BitIO.c" />
+    <ClCompile Include="..\Library\src\CommandLineIO.c" />
+    <ClCompile Include="..\Library\src\ContainerIO.c" />
+    <ClCompile Include="..\Library\src\CryptographyIO.c" />
+    <ClCompile Include="..\Library\src\FormatIO.c" />
+    <ClCompile Include="..\Library\src\LocalizationIO.c" />
+    <ClCompile Include="..\Library\src\Log.c" />
+    <ClCompile Include="..\Library\src\Macros.c" />
+    <ClCompile Include="..\Library\src\Math.c" />
+    <ClCompile Include="..\Library\src\StringIO.c" />
+    <ClCompile Include="..\Library\src\TestIO.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -470,5 +471,4 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-</Project>
 </Project>
