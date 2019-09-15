@@ -343,6 +343,18 @@ extern "C" {
 #define UNCPathPrefix                   U32("//?/")
 #endif
     
+#ifndef FoundationIO_ImmutablePointer2MutableData
+#define FoundationIO_ImmutablePointer2MutableData(Type, VariableName)   Type *const VariableName
+#endif
+    
+#ifndef FoundationIO_MutablePointer2ImmutableData
+#define FoundationIO_MutablePointer2ImmutableData(Type, VariableName)   Type const *VariableName
+#endif
+    
+#ifndef FoundationIO_ImmutablePointer2ImmutableData
+#define FoundationIO_ImmutablePointer2ImmutableData(Type, VariableName) Type const *const VariableName
+#endif
+    
     uint64_t FoundationIO_GetNumCPUCores(void);
     
     uint64_t FoundationIO_GetTotalMemoryInBytes(void);
