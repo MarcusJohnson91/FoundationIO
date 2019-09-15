@@ -1,8 +1,8 @@
-#include "../libFoundationIO/include/BitIO.h"
+#include "../Library/include/BitIO.h"
 
-#include "../libFoundationIO/include/TestIO.h"
-#include "../libFoundationIO/include/Log.h"
-#include "../libFoundationIO/include/Math.h"
+#include "../Library/include/TestIO.h"
+#include "../Library/include/Log.h"
+#include "../Library/include/Math.h"
 
 #ifdef __cplusplus
 extern "C" {

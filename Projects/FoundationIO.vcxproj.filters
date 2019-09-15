@@ -12,75 +12,78 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\libFoundationIO\include\BitIO.h">
+    <ClInclude Include="..\Library\include\BitIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libFoundationIO\include\CommandLineIO.h">
+    <ClInclude Include="..\Library\include\CommandLineIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libFoundationIO\include\ContainerIO.h">
+    <ClInclude Include="..\Library\include\ContainerIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libFoundationIO\include\CryptographyIO.h">
+    <ClInclude Include="..\Library\include\CryptographyIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libFoundationIO\include\LocalizationIO.h">
+    <ClInclude Include="..\Library\include\LocalizationIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libFoundationIO\include\Log.h">
+    <ClInclude Include="..\Library\include\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libFoundationIO\include\Macros.h">
+    <ClInclude Include="..\Library\include\Macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libFoundationIO\include\Math.h">
+    <ClInclude Include="..\Library\include\Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libFoundationIO\include\StringIO.h">
+    <ClInclude Include="..\Library\include\StringIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libFoundationIO\include\TestIO.h">
+    <ClInclude Include="..\Library\include\TestIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\libFoundationIO\include\FormatIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\libFoundationIO\include\Private\UnicodeTables.h">
+    <ClInclude Include="..\Library\include\FormatIO.h">
       <Filter>Header Files\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\Private\UnicodeTables.h">
+      <Filter>Header Files\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\Private\NumberTables.h">
+        <Filter>Header Files\Private</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\libFoundationIO\src\BitIO.c">
+    <ClCompile Include="..\Library\src\BitIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libFoundationIO\src\CommandLineIO.c">
+    <ClCompile Include="..\Library\src\CommandLineIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libFoundationIO\src\ContainerIO.c">
+    <ClCompile Include="..\Library\src\ContainerIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libFoundationIO\src\CryptographyIO.c">
+    <ClCompile Include="..\Library\src\CryptographyIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libFoundationIO\src\LocalizationIO.c">
+    <ClCompile Include="..\Library\src\LocalizationIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libFoundationIO\src\Log.c">
+    <ClCompile Include="..\Library\src\Log.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libFoundationIO\src\Macros.c">
+    <ClCompile Include="..\Library\src\Macros.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libFoundationIO\src\Math.c">
+    <ClCompile Include="..\Library\src\Math.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libFoundationIO\src\StringIO.c">
+    <ClCompile Include="..\Library\src\StringIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libFoundationIO\src\TestIO.c">
+    <ClCompile Include="..\Library\src\TestIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\libFoundationIO\src\FormatIO.c">
+    <ClCompile Include="..\Library\src\FormatIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

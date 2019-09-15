@@ -1,9 +1,9 @@
-#include "../libFoundationIO/include/StringIO.h"
+#include "../Library/include/StringIO.h"
 
-#include "../libFoundationIO/include/TestIO.h"
-#include "../libFoundationIO/include/Log.h"
+#include "../Library/include/TestIO.h"
+#include "../Library/include/Log.h"
 
-#include "../libFoundationIO/include/CryptographyIO.h"
+#include "../Library/include/CryptographyIO.h"
 
 #ifdef __cplusplus
 extern "C" {
