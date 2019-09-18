@@ -85,9 +85,9 @@ extern "C" {
         return TestPassed;
     }
     
-    bool Test_UTF8_Stitch(void) {
+    bool Test_UTF8_StitchSubString(void) {
         bool TestPassed = No;
-        UTF8 *BananaBread = UTF8_Stitch(U8("Banana WAT Bread"), 8, 4);
+        UTF8 *BananaBread = UTF8_StitchSubString(U8("Banana WAT Bread"), 8, 4);
         TestPassed        = UTF8_Compare(BananaBread, U8("Banana Bread"));
         return TestPassed;
     }
@@ -287,7 +287,7 @@ extern "C" {
         Entropy *Random           = Entropy_Init(8000000);
         Test_UTF8_EncodeDecode(Random);
         //TestSuitePassed           = Test_UTF8_Format();
-        //TestSuitePassed           = Test_UTF8_Stitch();
+        //TestSuitePassed           = Test_UTF8_StitchSubString();
         return TestSuitePassed;
     }
     

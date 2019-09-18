@@ -31,7 +31,7 @@ extern "C" {
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             UTF32 *Path32        = UTF8_Decode(LogFilePath);
             bool   PathHasBOM    = UTF32_HasBOM(Path32);
-            bool   PathHasPrefix = UTF32_HasUNCPathPrefix(Path32);
+            bool   PathHasPrefix = UTF32_IsUNCPath(Path32);
             if (PathHasBOM == Yes && PathHasPrefix == No) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
                 UTF32 *Prefixed  = UTF32_Insert(BOMLess, UNCPathPrefix, 0);
@@ -78,7 +78,7 @@ extern "C" {
                 free(Path8);
             }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            bool   PathHasPrefix = UTF32_HasUNCPathPrefix(Path32);
+            bool   PathHasPrefix = UTF32_IsUNCPath(Path32);
             if (PathHasBOM == Yes && PathHasPrefix == No) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
                 UTF32 *Prefixed  = UTF32_Insert(BOMLess, UNCPathPrefix, 0);

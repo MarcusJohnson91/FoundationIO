@@ -579,8 +579,8 @@ extern "C" {
         return StringHasABOM;
     }
     
-    bool  UTF8_HasUNCPathPrefix(UTF8 *String) {
-        bool StringHasUNCPathPrefix = No;
+    bool  UTF8_IsUNCPath(UTF8 *String) {
+        bool StringIsUNCPath = No;
         if (String != NULL) {
             uint64_t StringSize     = UTF8_GetStringSizeInCodePoints(String);
             if (StringSize > UnicodeBOMSizeInCodePoints) {
@@ -590,7 +590,7 @@ extern "C" {
                     uint8_t PrefixByte = 0;
                     while (String[CodeUnit] == UNCPathPrefix[PrefixByte]) {
                         if (PrefixByte == UTF8BOMSizeInCodeUnits + 4) {
-                            StringHasUNCPathPrefix = Yes;
+                            StringIsUNCPath = Yes;
                         }
                         PrefixByte    += 1;
                         CodeUnit      += 1;
@@ -600,7 +600,7 @@ extern "C" {
                     uint8_t PrefixByte = 0;
                     while (String[CodeUnit] == UNCPathPrefix[PrefixByte]) {
                         if (PrefixByte == 4) {
-                            StringHasUNCPathPrefix = Yes;
+                            StringIsUNCPath = Yes;
                         }
                         PrefixByte    += 1;
                         CodeUnit      += 1;
@@ -610,11 +610,11 @@ extern "C" {
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
-        return StringHasUNCPathPrefix;
+        return StringIsUNCPath;
     }
     
-    bool  UTF16_HasUNCPathPrefix(UTF16 *String) {
-        bool StringHasUNCPathPrefix = No;
+    bool  UTF16_IsUNCPath(UTF16 *String) {
+        bool StringIsUNCPath = No;
         if (String != NULL) {
             uint64_t StringSize     = UTF16_GetStringSizeInCodePoints(String);
             if (StringSize > UnicodeBOMSizeInCodePoints) {
@@ -624,7 +624,7 @@ extern "C" {
                     uint8_t PrefixByte = 0;
                     while (String[CodeUnit] == UNCPathPrefix[PrefixByte]) {
                         if (PrefixByte == UTF16BOMSizeInCodeUnits + 4) {
-                            StringHasUNCPathPrefix = Yes;
+                            StringIsUNCPath = Yes;
                         }
                         PrefixByte    += 1;
                         CodeUnit      += 1;
@@ -634,7 +634,7 @@ extern "C" {
                     uint8_t PrefixByte = 0;
                     while (String[CodeUnit] == UNCPathPrefix[PrefixByte]) {
                         if (PrefixByte == 4) {
-                            StringHasUNCPathPrefix = Yes;
+                            StringIsUNCPath = Yes;
                         }
                         PrefixByte    += 1;
                         CodeUnit      += 1;
@@ -644,11 +644,11 @@ extern "C" {
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
-        return StringHasUNCPathPrefix;
+        return StringIsUNCPath;
     }
     
-    bool  UTF32_HasUNCPathPrefix(UTF32 *String) {
-        bool StringHasUNCPathPrefix = No;
+    bool  UTF32_IsUNCPath(UTF32 *String) {
+        bool StringIsUNCPath = No;
         if (String != NULL) {
             uint64_t StringSize     = UTF32_GetStringSizeInCodePoints(String);
             
@@ -659,7 +659,7 @@ extern "C" {
                     uint8_t PrefixByte = 0;
                     while (String[CodeUnit] == UNCPathPrefix[PrefixByte]) {
                         if (PrefixByte == UnicodeBOMSizeInCodePoints + 4) {
-                            StringHasUNCPathPrefix = Yes;
+                            StringIsUNCPath = Yes;
                         }
                         PrefixByte    += 1;
                         CodeUnit      += 1;
@@ -669,7 +669,7 @@ extern "C" {
                     uint8_t PrefixByte = 0;
                     while (String[CodeUnit] == UNCPathPrefix[PrefixByte]) {
                         if (PrefixByte == 4) {
-                            StringHasUNCPathPrefix = Yes;
+                            StringIsUNCPath = Yes;
                         }
                         PrefixByte    += 1;
                         CodeUnit      += 1;
@@ -679,10 +679,10 @@ extern "C" {
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
         }
-        return StringHasUNCPathPrefix;
+        return StringIsUNCPath;
     }
     
-    bool UTF8_PathIsAbsolute(UTF8 *String) {
+    bool UTF8_IsAbsolutePath(UTF8 *String) {
         bool PathIsAbsolute = No;
         if (String != NULL) {
 #if  (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
@@ -703,7 +703,7 @@ extern "C" {
         return PathIsAbsolute;
     }
     
-    bool UTF16_PathIsAbsolute(UTF16 *String) {
+    bool UTF16_IsAbsolutePath(UTF16 *String) {
         bool PathIsAbsolute        = No;
         if (String != NULL) {
 #if  (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
@@ -724,7 +724,7 @@ extern "C" {
         return PathIsAbsolute;
     }
     
-    bool UTF32_PathIsAbsolute(UTF32 *String) {
+    bool UTF32_IsAbsolutePath(UTF32 *String) {
         bool PathIsAbsolute = No;
         if (String != NULL) {
 #if  (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
@@ -1712,11 +1712,11 @@ extern "C" {
         return NewString;
     }
     
-    UTF8 *UTF8_Stitch(UTF8 *String, uint64_t Offset, uint64_t Length) {
+    UTF8 *UTF8_StitchSubString(UTF8 *String, uint64_t Offset, uint64_t Length) {
         UTF8 *Stitched = NULL;
         if (String != NULL) {
             UTF32 *Decoded    = UTF8_Decode(String);
-            UTF32 *Stitched32 = UTF32_Stitch(Decoded, Offset, Length);
+            UTF32 *Stitched32 = UTF32_StitchSubString(Decoded, Offset, Length);
             free(Decoded);
             Stitched          = UTF8_Encode(Stitched32);
         } else {
@@ -1725,11 +1725,11 @@ extern "C" {
         return Stitched;
     }
     
-    UTF16 *UTF16_Stitch(UTF16 *String, uint64_t Offset, uint64_t Length) {
+    UTF16 *UTF16_StitchSubString(UTF16 *String, uint64_t Offset, uint64_t Length) {
         UTF16 *Stitched       = NULL;
         if (String != NULL) {
             UTF32 *Decoded    = UTF16_Decode(String);
-            UTF32 *Stitched32 = UTF32_Stitch(Decoded, Offset, Length);
+            UTF32 *Stitched32 = UTF32_StitchSubString(Decoded, Offset, Length);
             free(Decoded);
             Stitched          = UTF16_Encode(Stitched32);
             free(Stitched32);
@@ -1739,7 +1739,7 @@ extern "C" {
         return Stitched;
     }
     
-    UTF32 *UTF32_Stitch(UTF32 *String, uint64_t Offset, uint64_t Length) {
+    UTF32 *UTF32_StitchSubString(UTF32 *String, uint64_t Offset, uint64_t Length) {
         UTF32 *Stitched = NULL;
         if (String != NULL) {
             uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
@@ -2337,11 +2337,11 @@ extern "C" {
         return String;
     }
     
-    double UTF8_String2Decimal(UTF8 *String) {
+    double UTF8_String2Decimal(StringIOBases Base, UTF8 *String) {
         double Decimal = 0.0;
         if (String != NULL) {
             UTF32 *String32 = UTF8_Decode(String);
-            Decimal         = UTF32_String2Decimal(String32);
+            Decimal         = UTF32_String2Decimal(Base, String32);
             free(String32);
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
@@ -2349,11 +2349,11 @@ extern "C" {
         return Decimal;
     }
     
-    double UTF16_String2Decimal(UTF16 *String) {
+    double UTF16_String2Decimal(StringIOBases Base, UTF16 *String) {
         double Decimal = 0.0;
         if (String != NULL) {
             UTF32 *String32 = UTF16_Decode(String);
-            Decimal         = UTF32_String2Decimal(String32);
+            Decimal         = UTF32_String2Decimal(Base, String32);
             free(String32);
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
@@ -2361,7 +2361,7 @@ extern "C" {
         return Decimal;
     }
     
-    double UTF32_String2Decimal(UTF32 *String) { // Replaces strtod, strtof, strold, atof, and atof_l
+    double UTF32_String2Decimal(StringIOBases Base, UTF32 *String) { // Replaces strtod, strtof, strold, atof, and atof_l
         double   Value         = 0.0;
         bool     IsNegative    = No;
         if (String != NULL) {

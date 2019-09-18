@@ -282,67 +282,46 @@ extern "C" {
     uint64_t              UTF32_GetStringSizeInGraphemes(UTF32 *String);
     
     /*!
-     @abstract                             "Tells if the UTF-8 string pointed to by String has a Byte Order Mark at the beginning".
-     @param               String           "The string to get the BOM status from".
-     @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
+     @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
+     @param               String           "The string to check".
+     @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
      */
-    bool                  UTF8_HasBOM(UTF8 *String);
-    
-    /*!
-     @abstract                             "Tells if the UTF-16 string pointed to by String has a Byte Order Mark at the beginning".
-     @param               String           "The string to get the BOM status from".
-     @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
-     */
-    bool                  UTF16_HasBOM(UTF16 *String);
-    
-    /*!
-     @abstract                             "Tells if the UTF-32 string pointed to by String has a Byte Order Mark at the beginning".
-     @param               String           "The string to get the BOM status from".
-     @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
-     */
-    bool                  UTF32_HasBOM(UTF32 *String);
+    bool                  UTF8_IsUNCPath(UTF8 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
      */
-    bool                  UTF8_HasUNCPathPrefix(UTF8 *String);
+    bool                  UTF16_IsUNCPath(UTF16 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
      */
-    bool                  UTF16_HasUNCPathPrefix(UTF16 *String);
-    
-    /*!
-     @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
-     @param               String           "The string to check".
-     @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
-     */
-    bool                  UTF32_HasUNCPathPrefix(UTF32 *String);
+    bool                  UTF32_IsUNCPath(UTF32 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String starts with / on POSIX, or the second character is : on Windows".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string starts with "/" or the second character is ":" on Windows, otherwise it returns No".
      */
-    bool                  UTF8_PathIsAbsolute(UTF8 *String);
+    bool                  UTF8_IsAbsolutePath(UTF8 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String starts with / on POSIX, or the second character is : on Windows".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string starts with "/" or the second character is ":" on Windows, otherwise it returns No".
      */
-    bool                  UTF16_PathIsAbsolute(UTF16 *String);
+    bool                  UTF16_IsAbsolutePath(UTF16 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String starts with / on POSIX, or the second character is : on Windows".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string starts with "/" or the second character is ":" on Windows, otherwise it returns No".
      */
-    bool                  UTF32_PathIsAbsolute(UTF32 *String);
+    bool                  UTF32_IsAbsolutePath(UTF32 *String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String contains a Windows or UNIX style line ending".
@@ -385,6 +364,27 @@ extern "C" {
      @return                               "Returns Yes if the string is valid, otherwise it returns No".
      */
     bool                  UTF32_IsValid(UTF32 *String);
+    
+    /*!
+     @abstract                             "Tells if the UTF-8 string pointed to by String has a Byte Order Mark at the beginning".
+     @param               String           "The string to get the BOM status from".
+     @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
+     */
+    bool                  UTF8_HasBOM(UTF8 *String);
+    
+    /*!
+     @abstract                             "Tells if the UTF-16 string pointed to by String has a Byte Order Mark at the beginning".
+     @param               String           "The string to get the BOM status from".
+     @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
+     */
+    bool                  UTF16_HasBOM(UTF16 *String);
+    
+    /*!
+     @abstract                             "Tells if the UTF-32 string pointed to by String has a Byte Order Mark at the beginning".
+     @param               String           "The string to get the BOM status from".
+     @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
+     */
+    bool                  UTF32_HasBOM(UTF32 *String);
     
     /*!
      @abstract                             "Adds the BOM to the UTF-8 string, UTF-8's only valid BOM is BE".
@@ -448,16 +448,16 @@ extern "C" {
     UTF16                *UTF16_Encode(UTF32 *String);
     
     /*!
-     @abstract                             "Converts a UTF16 string to a UTF8 string".
-     @param               String           "The string to convert".
-     */
-    UTF8                 *UTF16_Convert(UTF16 *String);
-    
-    /*!
      @abstract                             "Converts a UTF8 string to a UTF16 string".
      @param               String           "The string to convert".
      */
     UTF16                *UTF8_Convert(UTF8 *String);
+    
+    /*!
+     @abstract                             "Converts a UTF16 string to a UTF8 string".
+     @param               String           "The string to convert".
+     */
+    UTF8                 *UTF16_Convert(UTF16 *String);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
@@ -641,7 +641,7 @@ extern "C" {
      @param               Offset           "The first CodePoint to remove".
      @param               Length           "The last CodePoint to remove minus Offset".
      */
-    UTF8                 *UTF8_Stitch(UTF8 *String, uint64_t Offset, uint64_t Length);
+    UTF8                 *UTF8_StitchSubString(UTF8 *String, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Reallocates String and copies it except for the CodePoints between Offset and Length (inclusive)".
@@ -649,7 +649,7 @@ extern "C" {
      @param               Offset           "The first CodePoint to remove".
      @param               Length           "The last CodePoint to remove minus Offset".
      */
-    UTF16                *UTF16_Stitch(UTF16 *String, uint64_t Offset, uint64_t Length);
+    UTF16                *UTF16_StitchSubString(UTF16 *String, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Reallocates String and copies it except for the CodePoints between Offset and Length (inclusive)".
@@ -657,7 +657,7 @@ extern "C" {
      @param               Offset           "The first CodePoint to remove".
      @param               Length           "The last CodePoint to remove minus Offset".
      */
-    UTF32                *UTF32_Stitch(UTF32 *String, uint64_t Offset, uint64_t Length);
+    UTF32                *UTF32_StitchSubString(UTF32 *String, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
@@ -783,19 +783,19 @@ extern "C" {
      @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
-    double                UTF8_String2Decimal(UTF8 *String);
+    double                UTF8_String2Decimal(StringIOBases Base, UTF8 *String);
     
     /*!
      @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
-    double                UTF16_String2Decimal(UTF16 *String);
+    double                UTF16_String2Decimal(StringIOBases Base, UTF16 *String);
     
     /*!
      @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
-    double                UTF32_String2Decimal(UTF32 *String);
+    double                UTF32_String2Decimal(StringIOBases Base, UTF32 *String);
     
     /*!
      @abstract                             "Converts a double to a string; replaces dtostr".
