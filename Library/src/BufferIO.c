@@ -817,7 +817,7 @@ extern "C" {
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
             Path32                           = UTF16_Decode(Path2Open);
             bool   PathHasBOM                = UTF16_HasBOM(Path2Open);
-            bool   PathHasWinPrefix          = UTF16_HasUNCPathPrefix(Path2Open);
+            bool   PathHasWinPrefix          = UTF16_IsUNCPath(Path2Open);
             
             if (PathHasBOM == Yes && PathHasWinPrefix == Yes) {
                 UTF32 *BOMLess               = UTF32_RemoveBOM(Path32);
@@ -969,8 +969,8 @@ extern "C" {
                 free(BOMLess);
             }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            bool   PathIsAbsolute       = UTF8_PathIsAbsolute(Path2Open);
-            bool   PathHasUNCPrefix     = UTF8_HasUNCPathPrefix(Path2Open);
+            bool   PathIsAbsolute       = UTF8_IsAbsolutePath(Path2Open);
+            bool   PathHasUNCPrefix     = UTF8_IsUNCPath(Path2Open);
             UTF32 *Path32               = UTF8_Decode(Path2Open);
             UTF16 *Path16               = NULL;
             if (PathIsAbsolute == Yes && PathHasUNCPrefix == No) {
@@ -1009,7 +1009,7 @@ extern "C" {
             }
             FoundationIO_File_Open(Fixed, U8("rb"));
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            bool   StringHasPathPrefix  = UTF16_HasUNCPathPrefix(Path2Open);
+            bool   StringHasPathPrefix  = UTF16_IsUNCPath(Path2Open);
             
             UTF32 *Path32               = UTF16_Decode(Path2Open);
             UTF16 *Path16               = NULL;

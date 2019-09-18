@@ -864,7 +864,7 @@ extern "C" {
                             Length    += 1;
                         }
                     }
-                    FormatTemp         = UTF32_Stitch(OriginalTemp, Offset, Length);
+                    FormatTemp         = UTF32_StitchSubString(OriginalTemp, Offset, Length);
                 }
                 
                 if (OriginalTemp != Format) {
