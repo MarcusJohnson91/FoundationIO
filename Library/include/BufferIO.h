@@ -9,8 +9,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "Macros.h"
-#include "CryptographyIO.h"
+#include "../include/Macros.h"
+#include "../include/CryptographyIO.h"
 
 #pragma  once
 
