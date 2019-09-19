@@ -13,6 +13,11 @@
 #else
 #define _FILE_OFFSET_BITS 64
 #endif /* _FILE_OFFSET_BITS */
+
+#ifndef FoundationIOSTDVersion
+#define FoundationIOSTDVersion (__STDC_VERSION__)
+#endif
+
 #endif /* Various UNIX Platforms */
 
 #include <stdbool.h>                  /* Included for bool */
@@ -139,6 +144,10 @@ extern "C" {
 #define             FoundationIO_Socket_Close(Socket2Close)                                    close(Socket2Close)
 #endif
     
+#ifndef FoundationIOSTDVersion
+#define FoundationIOSTDVersion (__STDC_VERSION__)
+#endif
+    
 #elif    defined(WIN32) || defined(_WIN32) || defined(_WIN64) || defined(WINNT)
     
 #ifndef   WIN32_LEAN_AND_MEAN
@@ -216,6 +225,10 @@ extern "C" {
     
 #ifndef             FoundationIO_Socket_Close
 #define             FoundationIO_Socket_Close(Socket2Close)                                    close(Socket2Close)
+#endif
+    
+#ifndef FoundationIOSTDVersion
+#define FoundationIOSTDVersion (__cplusplus)
 #endif
     
 #else /* Platform not detected */
@@ -313,10 +326,6 @@ extern "C" {
 #define             FoundationIONewLine32Size                              (1)
 #endif /* TargetOS */
 #endif /* FoundationIONewLine32 */
-    
-#ifndef FoundationIOSTDVersion
-#define FoundationIOSTDVersion (__STDC_VERSION__)
-#endif
     
 #ifndef FoundationIOSTDVersionC99
 #define FoundationIOSTDVersionC99 (199901L)
