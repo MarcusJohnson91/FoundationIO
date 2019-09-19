@@ -1,10 +1,14 @@
 #include "Macros.h"
 
-#if   (defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L)
+#if   (FoundationIOSTDVersion >= FoundationIOSTDVersionC99)
 #include <tgmath.h>
-#elif (defined __STDC_NO_COMPLEX__)
+#if (defined __STDC_NO_COMPLEX__)
 #include <math.h>
-#endif /* __STDC_VERSION__ */
+#elif (defined __STDC_COMPLEX__)
+#include <math.h>
+#include <complex.h>
+#endif /* Complex */
+#endif /* Version check */
 
 #pragma  once
 

@@ -25,7 +25,7 @@ extern "C" {
 #ifdef    UTF8
 #undef    UTF8
 #endif /* UTF8 */
-#if (defined __STDC_UTF_8__ && defined __CHAR8_TYPE__ && __STDC_VERSION__ >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+#if (defined __STDC_UTF_8__ && defined __CHAR8_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
     typedef   char8_t        UTF8;
 #else
     typedef   unsigned char  UTF8;
@@ -37,7 +37,7 @@ extern "C" {
 #ifdef    UTF16
 #undef    UTF16
 #endif /* UTF16 */
-#if (defined __STDC_UTF_16__ && defined __CHAR16_TYPE__ && __STDC_VERSION__ >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+#if (defined __STDC_UTF_16__ && defined __CHAR16_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
     typedef                     char16_t                        UTF16;
 #else
     typedef                     uint_least16_t                  UTF16;
