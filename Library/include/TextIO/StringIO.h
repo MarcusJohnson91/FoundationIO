@@ -73,51 +73,51 @@ extern "C" {
     
     /*!
      @enum                StringIOCommon
-     @constant            UTF8BOMSizeInCodeUnits               "The number of code units (8 bits) the UTF8 BOM takes".
-     @constant            UTF16BOMSizeInCodeUnits              "The number of code units (16 bits) the UTF16 BOM takes".
-     @constant            UnicodeBOMSizeInCodePoints           "The number of CodePoints in a BOM".
-     @constant            UTF16BOM_LE                          "UTF16BOM_LE byte order mark".
-     @constant            UTF16BOM_BE                          "UTF16BOM_BE byte order mark".
-     @constant            UTF32BOM_LE                          "UTF32BOM_LE byte order mark".
-     @constant            UTF32BOM_BE                          "UTF32BOM_LE byte order mark".
-     @constant            UnicodeUNCPathPrefixSize             "Size of "//?/" in CodePoints and CodeUnits"
-     @constant            UTF16HighSurrogateStart              "The value that marks the start of the High Surrogate range".
-     @constant            UTF16HighSurrogateEnd                "The value that marks the end   of the High Surrogate range".
-     @constant            UTF16LowSurrogateStart               "The value that marks the start of the Low  Surrogate range".
-     @constant            UTF16LowSurrogateEnd                 "The value that marks the end   of the Low  Surrogate range".
-     @constant            UTF16MaxCodeUnit                     "The highest value that can be stored in a single UTF16 CodeUnit".
-     @constant            UTF16SurrogatePairModDividend        "The value to modulo the surrogate pair by to decode a High Surrogate".
-     @constant            UTF16SurrogatePairStart              "The first UTF-32 CodePoint to require Surrogate Pairs in UTF-16".
-     @constant            InvalidReplacementCodePoint          "The CodePoint to replace invalid codeunits".
-     @constant            UnicodeMaxCodePoint                  "The highest CodePoint possible in Unicode, 1,114,111".
-     @constant            UTF8MaxCodeUnits                     "The maximum number of codeunits per codepoint".
-     @constant            UTF16MaxCodeUnits                    "The maximum number of codeunits per codepoint".
+     @constant            UTF8BOMSizeInCodeUnits                "The number of code units (8 bits) the UTF8 BOM takes".
+     @constant            UTF16BOMSizeInCodeUnits               "The number of code units (16 bits) the UTF16 BOM takes".
+     @constant            UnicodeBOMSizeInCodePoints            "The number of CodePoints in a BOM".
+     @constant            UTF16BOM_LE                           "UTF16BOM_LE byte order mark".
+     @constant            UTF16BOM_BE                           "UTF16BOM_BE byte order mark".
+     @constant            UTF32BOM_LE                           "UTF32BOM_LE byte order mark".
+     @constant            UTF32BOM_BE                           "UTF32BOM_LE byte order mark".
+     @constant            UnicodeUNCPathPrefixSize              "Size of "//?/" in CodePoints and CodeUnits"
+     @constant            UTF16HighSurrogateStart               "The value that marks the start of the High Surrogate range".
+     @constant            UTF16HighSurrogateEnd                 "The value that marks the end   of the High Surrogate range".
+     @constant            UTF16LowSurrogateStart                "The value that marks the start of the Low  Surrogate range".
+     @constant            UTF16LowSurrogateEnd                  "The value that marks the end   of the Low  Surrogate range".
+     @constant            UTF16MaxCodeUnit                      "The highest value that can be stored in a single UTF16 CodeUnit".
+     @constant            UTF16SurrogatePairModDividend         "The value to modulo the surrogate pair by to decode a High Surrogate".
+     @constant            UTF16SurrogatePairStart               "The first UTF-32 CodePoint to require Surrogate Pairs in UTF-16".
+     @constant            InvalidReplacementCodePoint           "The CodePoint to replace invalid codeunits".
+     @constant            UnicodeMaxCodePoint                   "The highest CodePoint possible in Unicode, 1,114,111".
+     @constant            UTF8MaxCodeUnits                      "The maximum number of codeunits per codepoint".
+     @constant            UTF16MaxCodeUnits                     "The maximum number of codeunits per codepoint".
      */
     typedef enum StringIOCommon {
-                          UTF8BOMSizeInCodeUnits               = 3,
-                          UTF16BOMSizeInCodeUnits              = 1,
-                          UnicodeBOMSizeInCodePoints           = 1,
-                          UTF8BOM_1                            = 0xEF,
-                          UTF8BOM_2                            = 0xBB,
-                          UTF8BOM_3                            = 0xBF,
-                          UTF16BOM_LE                          = 0xFFFE,
-                          UTF16BOM_BE                          = 0xFEFF,
-                          UTF32BOM_LE                          = 0xFFFE,
-                          UTF32BOM_BE                          = 0xFEFF,
-                          UnicodeUNCPathPrefixSize             = 4, // "//?/" or "\\?\"
-                          UTF16SurrogateMask                   = 0x3FF,
-                          UTF16SurrogateShift                  = 10,
-                          UTF16HighSurrogateStart              = 0xD800,
-                          UTF16HighSurrogateEnd                = 0xDBFF,
-                          UTF16LowSurrogateStart               = 0xDC00,
-                          UTF16LowSurrogateEnd                 = 0xDFFF,
-                          UTF16MaxCodeUnit                     = 0xFFFF,
-                          UTF16SurrogatePairModDividend        = 0x400,
-                          UTF16SurrogatePairStart              = 0x10000,
-                          InvalidReplacementCodePoint          = 0xFFFD,
-                          UnicodeMaxCodePoint                  = 0x10FFFF,
-                          UTF8MaxCodeUnits                     = 4,
-                          UTF16MaxCodeUnits                    = 2,
+                          UTF8BOMSizeInCodeUnits                = 3,
+                          UTF16BOMSizeInCodeUnits               = 1,
+                          UnicodeBOMSizeInCodePoints            = 1,
+                          UTF8BOM_1                             = 0xEF,
+                          UTF8BOM_2                             = 0xBB,
+                          UTF8BOM_3                             = 0xBF,
+                          UTF16BOM_LE                           = 0xFFFE,
+                          UTF16BOM_BE                           = 0xFEFF,
+                          UTF32BOM_LE                           = 0xFFFE,
+                          UTF32BOM_BE                           = 0xFEFF,
+                          UnicodeUNCPathPrefixSize              = 4, // "//?/" or "\\?\"
+                          UTF16SurrogateMask                    = 0x3FF,
+                          UTF16SurrogateShift                   = 10,
+                          UTF16HighSurrogateStart               = 0xD800,
+                          UTF16HighSurrogateEnd                 = 0xDBFF,
+                          UTF16LowSurrogateStart                = 0xDC00,
+                          UTF16LowSurrogateEnd                  = 0xDFFF,
+                          UTF16MaxCodeUnit                      = 0xFFFF,
+                          UTF16SurrogatePairModDividend         = 0x400,
+                          UTF16SurrogatePairStart               = 0x10000,
+                          InvalidReplacementCodePoint           = 0xFFFD,
+                          UnicodeMaxCodePoint                   = 0x10FFFF,
+                          UTF8MaxCodeUnits                      = 4,
+                          UTF16MaxCodeUnits                     = 2,
     } StringIOCommon;
     
     /*!
@@ -138,63 +138,78 @@ extern "C" {
     
     /*!
      @enum                StringIOBases
-     @constant            Base_Unknown                         "Unknown base".
-     @constant            Base_Integer_Radix2                  "Integer, Binary".
-     @constant            Base_Integer_Radix8                  "Integer, Octal".
-     @constant            Base_Integer_Radix10                 "Integer, Base10".
-     @constant            Base_Integer_Radix16_Uppercase       "Integer, Base16, Uppercase".
-     @constant            Base_Integer_Radix16_Lowercase       "Integer, Base16, Lowercase".
-     @constant            Base_Decimal_Radix10                 "Decimal, Base10, example: 3.14".
-     @constant            Base_Decimal_Scientific_Uppercase    "Decimal, Decimal+Exponent, Uppercase".
-     @constant            Base_Decimal_Scientific_Lowercase    "Decimal, Decimal+Exponent, Lowercase".
-     @constant            Base_Decimal_Shortest_Uppercase      "Decimal, Base10 or Scientific, Uppercase".
-     @constant            Base_Decimal_Shortest_Lowercase      "Decimal, Base10 or Scientific, Lowercase".
-     @constant            Base_Decimal_Hex_Uppercase           "Decimal, 1.3DEp42, Uppercase".
-     @constant            Base_Decimal_Hex_Lowercase           "Decimal, 1.3DEp42, Lowercase".
+     @constant            Base_Unknown                          "Unknown base".
+     @constant            Base_Integer_Radix2                   "Integer, Binary".
+     @constant            Base_Integer_Radix8                   "Integer, Octal".
+     @constant            Base_Integer_Radix10                  "Integer, Base10".
+     @constant            Base_Integer_Radix16_Uppercase        "Integer, Base16, Uppercase".
+     @constant            Base_Integer_Radix16_Lowercase        "Integer, Base16, Lowercase".
+     @constant            Base_Decimal_Radix10                  "Decimal, Base10, example: 3.14".
+     @constant            Base_Decimal_Scientific_Uppercase     "Decimal, Decimal+Exponent, Uppercase".
+     @constant            Base_Decimal_Scientific_Lowercase     "Decimal, Decimal+Exponent, Lowercase".
+     @constant            Base_Decimal_Shortest_Uppercase       "Decimal, Base10 or Scientific, Uppercase".
+     @constant            Base_Decimal_Shortest_Lowercase       "Decimal, Base10 or Scientific, Lowercase".
+     @constant            Base_Decimal_Hex_Uppercase            "Decimal, 1.3DEp42, Uppercase".
+     @constant            Base_Decimal_Hex_Lowercase            "Decimal, 1.3DEp42, Lowercase".
      */
     typedef enum StringIOBases {
-                          Base_Unknown                         = 0,
-                          Base_Integer_Radix2                  = 1,
-                          Base_Integer_Radix8                  = 2,
-                          Base_Integer_Radix10                 = 3,
-                          Base_Integer_Radix16_Uppercase       = 4,
-                          Base_Integer_Radix16_Lowercase       = 5,
-                          Base_Decimal_Radix10                 = 6,
-                          Base_Decimal_Scientific_Uppercase    = 7,
-                          Base_Decimal_Scientific_Lowercase    = 8,
-                          Base_Decimal_Shortest_Uppercase      = 9,
-                          Base_Decimal_Shortest_Lowercase      = 10,
-                          Base_Decimal_Hex_Uppercase           = 11,
-                          Base_Decimal_Hex_Lowercase           = 12,
+                          Base_Unknown                          = 0,
+                          Base_Integer_Radix2                   = 1,
+                          Base_Integer_Radix8                   = 2,
+                          Base_Integer_Radix10                  = 3,
+                          Base_Integer_Radix16_Uppercase        = 4,
+                          Base_Integer_Radix16_Lowercase        = 5,
+                          Base_Decimal_Radix10                  = 6,
+                          Base_Decimal_Scientific_Uppercase     = 7,
+                          Base_Decimal_Scientific_Lowercase     = 8,
+                          Base_Decimal_Shortest_Uppercase       = 9,
+                          Base_Decimal_Shortest_Lowercase       = 10,
+                          Base_Decimal_Hex_Uppercase            = 11,
+                          Base_Decimal_Hex_Lowercase            = 12,
     } StringIOBases;
     
     /*!
      @enum                StringIOByteOrders
-     @constant            ByteOrder_Unknown                  "Byte order is unknown".
-     @constant            ByteOrder_Native                   "Use the byte order of the host".
-     @constant            ByteOrder_Little                   "Use the little endian, Least-Significant-Byte first order".
-     @constant            ByteOrder_Big                      "Use the big endian, Most-Significant-Byte first order".
+     @constant            ByteOrder_Unknown                     "Byte order is unknown".
+     @constant            ByteOrder_Native                      "Use the byte order of the host".
+     @constant            ByteOrder_Little                      "Use the little endian, Least-Significant-Byte first order".
+     @constant            ByteOrder_Big                         "Use the big endian, Most-Significant-Byte first order".
      */
     typedef enum StringIOByteOrders {
-                          ByteOrder_Unknown                    = 0,
-                          ByteOrder_Native                     = 1,
-                          ByteOrder_Little                     = 2,
-                          ByteOrder_Big                        = 3,
+                          ByteOrder_Unknown                     = 0,
+                          ByteOrder_Native                      = 1,
+                          ByteOrder_Little                      = 2,
+                          ByteOrder_Big                         = 3,
     } StringIOByteOrders;
     
     /*!
      @enum                StringIOStringTypes
-     @constant            StringType_Unknown                 "Byte order is unknown".
-     @constant            StringType_UTF8                    "Use the byte order of the host".
-     @constant            StringType_UTF16                   "Use the little endian, Least-Significant-Byte first order".
-     @constant            StringType_UTF32                   "Use the big endian, Most-Significant-Byte first order".
+     @constant            StringType_Unknown                    "Byte order is unknown".
+     @constant            StringType_UTF8                       "Use the byte order of the host".
+     @constant            StringType_UTF16                      "Use the little endian, Least-Significant-Byte first order".
+     @constant            StringType_UTF32                      "Use the big endian, Most-Significant-Byte first order".
      */
     typedef enum StringIOStringTypes {
-                          StringType_Unknown                   = 0,
-                          StringType_UTF8                      = 1,
-                          StringType_UTF16                     = 2,
-                          StringType_UTF32                     = 4,
+                          StringType_Unknown                    = 0,
+                          StringType_UTF8                       = 1,
+                          StringType_UTF16                      = 2,
+                          StringType_UTF32                      = 4,
     } StringIOStringTypes;
+    
+    /*!
+     @enum                TrimStringTypes
+     @abstract                                                  "Is this BitInput or BitOutput connected to a File or Socket?".
+     @constant            TrimString_Unknown                    "Unknown TrimString command".
+     @constant            TrimString_StartEndRemoveAll          "Trim at the beginning and end, removing all occurrences found there".
+     @constant            TrimString_BetweenValidKeep1          "Trim between start and end, removing all but 1 occurrence found between non-removable CodePoints".
+     @constant            TrimString_All                        "Remove all occurrences regardless of context".
+     */
+    typedef enum TrimStringTypes {
+                          TrimString_Unknown                    = 0,
+                          TrimString_StartEndRemoveAll          = 1,
+                          TrimString_BetweenValidKeep1          = 2,
+                          TrimString_RemoveAll                  = 3,
+    } TrimStringTypes;
     
     /*!
      @abstract                             "Allocates a UTF8 string plus a NULL terminator".
@@ -814,21 +829,6 @@ extern "C" {
      @param               Decimal          "The decimal number to convert to a string".
      */
     UTF32                *UTF32_Decimal2String(StringIOBases Base, double Decimal);
-    
-    /*!
-     @enum                      TrimStringTypes
-     @abstract                                                  "Is this BitInput or BitOutput connected to a File or Socket?".
-     @constant                  TrimString_Unknown              "Unknown TrimString command".
-     @constant                  TrimString_StartEndRemoveAll    "Trim at the beginning and end, removing all occurrences found there".
-     @constant                  TrimString_BetweenValidKeep1    "Trim between start and end, removing all but 1 occurrence found between non-removable CodePoints".
-     @constant                  TrimString_All                  "Remove all occurrences regardless of context".
-     */
-    typedef enum TrimStringTypes {
-                                TrimString_Unknown              = 0,
-                                TrimString_StartEndRemoveAll    = 1,
-                                TrimString_BetweenValidKeep1    = 2,
-                                TrimString_RemoveAll            = 3,
-    } TrimStringTypes;
     
     /*!
      @abstract                             "Removes substrings (including single CodePoints) from a string".
