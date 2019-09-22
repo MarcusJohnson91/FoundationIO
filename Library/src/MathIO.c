@@ -447,11 +447,9 @@ extern "C" {
         return NumBitsSet;
     }
     
-    /* Ryū specific math functions */
     bool IsPowerOfBase(uint8_t Base, uint64_t Value) {
         return Value % Base == 0 ? Yes : No;
     }
-    /* Ryū specific math functions */
     
     uint8_t NumDigitsInInteger(uint8_t Base, int64_t Integer) {
         uint8_t NumDigits = 1;

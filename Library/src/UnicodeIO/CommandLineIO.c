@@ -44,23 +44,6 @@ extern "C" {
         CommandLineIO_ArgumentTypes   ArgumentType;
     } CommandLineOption;
     
-    /*!
-     @struct                 CommandLineIO
-     @abstract                                             "Contains all the information, and relationships between switches on the command line".
-     @constant               ProgramName                   "What is the name of this program"?
-     @constant               ProgramAuthor                 "Who wrote this program"?
-     @constant               ProgramDescription            "What does this program do"?
-     @constant               ProgramVersion                "What is the version of this program"?
-     @constant               ProgramCopyright              "String containing the copyright years like "2015 - 2017"".
-     @constant               ProgramLicenseName            "Short name of the license, like "3-clause BSD", etc".
-     @constant               ProgramLicenseDescription     "Describe the license or EULA".
-     @constant               ProgramLicenseURL             "URL for the EULA, ToS, or Open source license".
-     @constant               NumOptions                    "The number of Options present in argv, after extracting any Slave switches".
-     @constant               MinOptions                    "The minimum number of switches to accept without dumping the help".
-     @constant               HelpOption                    "Which option displays the help"?
-     @constant               Options                       "Pointer to an array of Options".
-     @constant               LicenseType                   "What license is this program released under"?
-     */
     typedef struct CommandLineIO {
         UTF32                      *ProgramName;
         UTF32                      *ProgramAuthor;

@@ -428,9 +428,6 @@ extern "C" {
                         Specifiers->Specifiers[Specifier].BaseType             |= BaseType_Literal;
                         Specifiers->Specifiers[Specifier].TypeModifier         |= Modifier_Percent;
                         break;
-                    default:
-                        Log(Log_DEBUG, __func__, U8("Unknown Format Specifier %s"), Format[Offset + Length]);
-                        break;
                 }
                 Specifier += 1;
             }
@@ -675,17 +672,6 @@ extern "C" {
                     Length                             = Specifiers->Specifiers[Position].LengthModifier;
                 }
                 
-                /*
-                 Specifier                               = 0
-                 Specifiers->Specifiers[0].IsPositional  = Yes
-                 Specifiers->Specifiers[0].PositionalArg = 1
-                 
-                 Specifiers->Specifiers[1].BaseType      = BaseType_Integer
-                 Specifiers->Specifiers[1].TypeModifier  = Modifier_Unsigned | Modifier_64Bit
-                 
-                 
-                 */
-                
                 if (Specifiers->Specifiers[Position].MinWidthFlag == MinWidth_Asterisk_NextArg) {
                     Specifiers->Specifiers[Position].MinWidth              = va_arg(Arguments, uint32_t);
                 }
@@ -843,19 +829,6 @@ extern "C" {
                 uint64_t  Offset       = Specifiers->Specifiers[Specifier].Offset;
                 uint64_t  Length       = Specifiers->Specifiers[Specifier].Length;
                 
-                // Wait, it needs to substitute arguments in just Specifier order tho...
-                /*
-                if (Specifiers->Specifiers[Specifier].IsPositional == Yes) {
-                    uint64_t Position  = Specifiers->Specifiers[Specifier].PositionalArg;
-                    Argument           = Specifiers->Specifiers[Position].Argument;
-                    Offset             = Specifiers->Specifiers[Specifier].Offset;
-                    Length             = Specifiers->Specifiers[Specifier].Length;
-                } else {
-                    Argument           = Specifiers->Specifiers[Specifier].Argument;
-                    Offset             = Specifiers->Specifiers[Specifier].Offset;
-                    Length             = Specifiers->Specifiers[Specifier].Length;
-                }
-                */
                 if ((Specifiers->Specifiers[Specifier].BaseType & BaseType_Unsupported) != BaseType_Unsupported) {
                     FormatTemp         = UTF32_ReplaceSubString(OriginalTemp, Argument, Offset, Length);
                 } else if (Specifiers->Specifiers[Specifier].BaseType == BaseType_Unsupported) {

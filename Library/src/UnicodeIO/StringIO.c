@@ -292,31 +292,31 @@ extern "C" {
                 while (CodeUnits[CodeUnit + (CodePointSize - 1)] != FoundationIONULLTerminator) {
                     switch (CodePointSize) {
                         case 1:
-                        CodePoint                 =  CodeUnits[CodeUnit] & 0x7F;
-                        CodeUnit                 += 1;
-                        CodePoint                += 1;
-                        break;
+                            CodePoint                 =  CodeUnits[CodeUnit] & 0x7F;
+                            CodeUnit                 += 1;
+                            CodePoint                += 1;
+                            break;
                         case 2:
-                        CodePoint                |= (CodeUnits[CodeUnit]     & 0x1F) << 6;
-                        CodePoint                |= (CodeUnits[CodeUnit + 1] & 0x3F) << 0;
-                        CodeUnit                 += 2;
-                        CodePoint                += 1;
-                        break;
+                            CodePoint                |= (CodeUnits[CodeUnit]     & 0x1F) << 6;
+                            CodePoint                |= (CodeUnits[CodeUnit + 1] & 0x3F) << 0;
+                            CodeUnit                 += 2;
+                            CodePoint                += 1;
+                            break;
                         case 3:
-                        CodePoint                |= (CodeUnits[CodeUnit]     & 0x0F) << 12;
-                        CodePoint                |= (CodeUnits[CodeUnit + 1] & 0x1F) << 6;
-                        CodePoint                |= (CodeUnits[CodeUnit + 2] & 0x1F) << 0;
-                        CodeUnit                 += 3;
-                        CodePoint                += 1;
-                        break;
+                            CodePoint                |= (CodeUnits[CodeUnit]     & 0x0F) << 12;
+                            CodePoint                |= (CodeUnits[CodeUnit + 1] & 0x1F) << 6;
+                            CodePoint                |= (CodeUnits[CodeUnit + 2] & 0x1F) << 0;
+                            CodeUnit                 += 3;
+                            CodePoint                += 1;
+                            break;
                         case 4:
-                        CodePoint                |= (CodeUnits[CodeUnit]     & 0x07) << 18;
-                        CodePoint                |= (CodeUnits[CodeUnit + 1] & 0x3F) << 12;
-                        CodePoint                |= (CodeUnits[CodeUnit + 2] & 0x3F) <<  6;
-                        CodePoint                |= (CodeUnits[CodeUnit + 3] & 0x3F) <<  0;
-                        CodeUnit                 += 4;
-                        CodePoint                += 1;
-                        break;
+                            CodePoint                |= (CodeUnits[CodeUnit]     & 0x07) << 18;
+                            CodePoint                |= (CodeUnits[CodeUnit + 1] & 0x3F) << 12;
+                            CodePoint                |= (CodeUnits[CodeUnit + 2] & 0x3F) <<  6;
+                            CodePoint                |= (CodeUnits[CodeUnit + 3] & 0x3F) <<  0;
+                            CodeUnit                 += 4;
+                            CodePoint                += 1;
+                            break;
                     }
                 }
             } else {
@@ -336,7 +336,6 @@ extern "C" {
             while (String[CodeUnit] != FoundationIONULLTerminator) {
                 UTF8 Byte             = String[CodeUnit];
                 uint8_t CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Byte);
-                /* Extract X codeunits from the string at OffsetX */
                 for (uint8_t Byte = 0; Byte < CodePointSize; Byte++) {
                     CodeUnits[Byte]   = String[CodeUnit + Byte];
                 }
@@ -982,6 +981,7 @@ extern "C" {
             if (DecodedString != NULL) {
                 for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
                     DecodedString[CodePoint]         = UTF8_DecodeCodePoint(&String[CodeUnit]);
+                    CodeUnit                        += UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
                 }
             } else {
                 Log(Log_DEBUG, __func__, U8("Couldn't allocate DecodedString"));
@@ -1393,14 +1393,11 @@ extern "C" {
             uint64_t StringSizeInCodePoints = 0ULL;
             UTF32   *CurrentCodePoint       = 1UL;
             while (CurrentCodePoint[0] != U32('\n') || CurrentCodePoint[0] != FoundationIONULLTerminator) {
-                /*
-                 Loop reading a codepoint each time until we find one that is a new line character.
-                 */
                 StringSizeInCodePoints     += 1;
                 UTF8 *CodePoint             = UTF8_ReadGraphemeFromFile(Source);
                 CurrentCodePoint            = UTF8_Decode(CodePoint);
-            } // FIXME: Use our newline array
-            // Now we need to allocate memory for that string
+            }
+            
             Line                            = UTF8_Init(StringSizeInCodeUnits);
         } else {
             Log(Log_DEBUG, __func__, U8("FILE Pointer is NULL"));
@@ -1416,14 +1413,10 @@ extern "C" {
             uint64_t StringSizeInCodePoints = 0ULL;
             UTF32   *CurrentCodePoint       = 1UL;
             while (CurrentCodePoint[0] != U32('\n') || CurrentCodePoint[0] != FoundationIONULLTerminator) {
-                /*
-                 Loop reading a codepoint each time until we find one that is a new line character.
-                 */
                 StringSizeInCodePoints     += 1;
                 UTF16 *CodePoint            = UTF16_ReadGraphemeFromFile(Source);
                 CurrentCodePoint            = UTF16_Decode(CodePoint);
             }
-            // Now we need to allocate memory for that string
             Line                            = UTF16_Init(StringSizeInCodeUnits);
         } else {
             Log(Log_DEBUG, __func__, U8("FILE Pointer is NULL"));

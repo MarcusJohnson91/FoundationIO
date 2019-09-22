@@ -5,13 +5,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    /*
-    void Test_MD5(void) {
-        
-    }
-    */
+    
     int main() {
-        //Test_MD5();
         return EXIT_SUCCESS;
     }
     

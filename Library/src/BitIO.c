@@ -9,17 +9,6 @@
 extern "C" {
 #endif
     
-    /*!
-     @enum                      GUUIDConstants
-     @abstract                                                  "Constants for GUUID types".
-     @constant                  GUUIDStringSize                 "The size of a GUUID string".
-     @constant                  BinaryGUUIDSize                 "The dize of a BinaryGUUID".
-     */
-    enum GUUIDConstants {
-                                GUUIDStringSize                 = 20,
-                                BinaryGUUIDSize                 = 16,
-    };
-    
     /* Start BitBuffer section */
     typedef struct BitBuffer {
         uint8_t   *Buffer;
@@ -572,6 +561,11 @@ extern "C" {
         }
         return ExtractedString;
     }
+    
+    typedef enum GUUIDConstants {
+        GUUIDStringSize                 = 20,
+        BinaryGUUIDSize                 = 16,
+    } GUUIDConstants;
     
     uint8_t *BitBuffer_ReadGUUID(BitBuffer *BitB, GUUIDTypes GUUID2Read) {
         uint8_t *GUUID = NULL;

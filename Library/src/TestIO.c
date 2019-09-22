@@ -32,17 +32,15 @@ extern "C" {
      really all we need to know is the number of enabled tests, the number of disabled tests, and the number of tests that passed.
      
      Test Enabled/Disabled of Total passed
-     */
-    
-    /*
+     
      Design.
      
      So, we need a way to have there be various comparison functions, and a way to set the expected result, and it needs to be runtime checking not compile time so no macros except make a _Generic comparison function.
+     
+     We need a very high resolution timer so we can compare performance.
+     
+     we might also want to have a good randomnes generator (maybe even Unicode)
      */
-    
-    // We need a very high resolution timer so we can compare performance.
-    
-    // we might also want to have a good randomnes generator (maybe even Unicode)
     
     uint64_t GetTimerFrequency(void) {
         uint64_t TimerFrequency = 0LL;
@@ -101,27 +99,6 @@ extern "C" {
         }
         return String;
     }
-    
-    /*
-     Algorithm to generate random numbers:
-     
-     Read X bytes for the IV for a random number generator seed.
-     
-     seed a random number generator (good luck finding the deets on how the hell to make a random number generator)
-     
-     Mix the seeded data with AES.
-     
-     boom, you've got a array of random data.
-     
-     */
-    
-    /* API:
-     GenerateRandomInteger_Insecure();
-     GenerateRandomInteger_Secure();
-     GenerateRandomCodePoint();
-     GenerateRandomDecimal_Insecure();
-     GenerateRandomDecimal_Secure();
-     */
     
 #ifdef __cplusplus
 }
