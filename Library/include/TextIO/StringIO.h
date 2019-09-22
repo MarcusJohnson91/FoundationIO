@@ -49,7 +49,7 @@ extern "C" {
 #ifdef    UTF32
 #undef    UTF32
 #endif /* UTF32 */
-#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (!defined __APPLE__ && !defined __MACH__)
+#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (FoundationIOTargetOS != FoundationIOAppleOS)
     typedef               char32_t                             UTF32;
 #else
     typedef               uint_least32_t                       UTF32;

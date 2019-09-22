@@ -15,9 +15,9 @@ extern "C" {
             uint8_t  LogCeil   = Logarithm(10, -Value) - 1;
             uint8_t  NumDigits = NumDigitsInInteger(10, -Value);
             /*
-            if (LogCeil != NumDigits) {
-                //Log(Log_DEBUG, __func__, U8("NumBits %llu is incorrect"), NumBits);
-            }
+             if (LogCeil != NumDigits) {
+             //Log(Log_DEBUG, __func__, U8("NumBits %llu is incorrect"), NumBits);
+             }
              */
         }
     }
@@ -47,9 +47,6 @@ extern "C" {
             
             if (Minimum1 > Maximum1) {
                 Log(Log_DEBUG, __func__, U8("Minimum/Maximum failed!"));
-            } else {
-                Log(Log_DEBUG, __func__, U8("Min/Max FAILED"));
-                //Log(Log_DEBUG, __func__, U8("Minimum: %d is smaller than Maximum %d, Test Passed"), Minimum1, Maximum1);
             }
         }
     }

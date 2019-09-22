@@ -134,12 +134,12 @@ extern "C" {
          */
         
         /*
-        UTF8 *Positional2                      = UTF8_Format(U8("%2$s: NumArgs: %1$llu, Type: %2$s"), 2, U8("Positional"));
-        bool  Positional2Test                  = UTF8_Compare(Positional2, U8("Positional: NumArgs: 2, Type: Positional"));
-        if (Positional2Test == No) {
-            Log(Log_DEBUG, __func__, U8("Positional2Test Failed"));
-        }
-        */
+         UTF8 *Positional2                      = UTF8_Format(U8("%2$s: NumArgs: %1$llu, Type: %2$s"), 2, U8("Positional"));
+         bool  Positional2Test                  = UTF8_Compare(Positional2, U8("Positional: NumArgs: 2, Type: Positional"));
+         if (Positional2Test == No) {
+         Log(Log_DEBUG, __func__, U8("Positional2Test Failed"));
+         }
+         */
         
         UTF8 *Positional3                      = UTF8_Format(U8("NumArgs: %2$llu, %1$s EXTEND THE STRING"), U8("Positional"), 2); // Remapping isn't working.
         bool  Positional3Test                  = UTF8_Compare(Positional3, U8("NumArgs: 2, Positional EXTEND THE STRING"));
