@@ -420,26 +420,8 @@ extern "C" {
         return 8 - (Offset % 8);
     }
     
-    uint8_t CreateBitMaskLSBit(uint8_t NumBits2Select) {
-        uint8_t Mask        = 0;
-        static const uint8_t Table[8] = {0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF};
-        if (NumBits2Select <= 8) {
-            Mask            = Table[NumBits2Select - 1];
-        }
-        return Mask;
-    }
-    
-    uint8_t CreateBitMaskMSBit(uint8_t NumBits2Select) {
-        uint8_t Mask        = 0;
-        static const uint8_t Table[8] = {0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC, 0xFE, 0xFF};
-        if (NumBits2Select <= 8) {
-            Mask            = Table[NumBits2Select - 1];
-        }
-        return Mask;
-    }
-    
     uint8_t CountBitsSet(uint64_t Value) {
-        uint8_t NumBitsSet = 0; // V
+        uint8_t NumBitsSet = 0;
         while(Value != 0) {
             Value         &= Value - 1;
             NumBitsSet    += 1;
