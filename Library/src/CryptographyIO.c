@@ -1,7 +1,8 @@
-#include "../include/CryptographyIO.h" /* Included for our Declarations */
+#include "../include/CryptographyIO.h"       /* Included for our Declarations */
 
-#include "../include/Log.h"            /* Included for error logging */
-#include "../include/Math.h"           /* Included for Bits2Bytes, etc */
+#include "../include/Log.h"                  /* Included for error logging */
+#include "../include/Math.h"                 /* Included for Bits2Bytes, etc */
+#include "../include/Private/NumberTables.h" /* Included for BitMaskTables */
 
 #if   (FoundationIOTargetOS == FoundationIOWindowsOS)
 #ifndef   WIN32_LEAN_AND_MEAN
@@ -283,26 +284,23 @@ extern "C" {
             if (NumBits <= Entropy_GetRemainingEntropy(Random)) {
                 uint64_t Bits2Read                    = NumBits;
                 
-                do {
+                while (Bits2Read > 0) {
                     uint8_t  BitsInEntropyByte        = Bits2ExtractFromByte(Random->BitOffset);
                     uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInEntropyByte, Bits2Read);
                     uint8_t  Shift                    = 8 - Bits2Get;
                     uint8_t  BitMask                  = 0;
 #if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
-                    BitMask                           = (uint8_t) (CreateBitMaskLSBit(Bits2Get) << Shift);
+                    BitMask                           = (uint8_t) (LSBitMaskTable[Bits2Get - 1] << Shift);
 #elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
-                    BitMask                           = (uint8_t) (CreateBitMaskMSBit(Bits2Get) >> Shift);
+                    BitMask                           = (uint8_t) (MSBitMaskTable[Bits2Get - 1] >> Shift);
 #endif
-                    uint64_t EntropyByte              = Bits2Bytes(Random->BitOffset, RoundingType_Down);
-                    uint8_t  ExtractedBits            = Random->EntropyPool[EntropyByte] & BitMask;
-                    uint8_t  ApplyBits                = ExtractedBits >> Shift;
+                    uint8_t  ExtractedBits            = Random->EntropyPool[Bits2Bytes(Random->BitOffset, RoundingType_Down)] & BitMask;
                     
-                    Bits                            <<= Bits2Get;
-                    Bits                             |= ApplyBits;
+                    Bits                             |= ExtractedBits >> Shift;
                     
                     Bits2Read                        -= Bits2Get;
                     Random->BitOffset                += Bits2Get;
-                } while (Bits2Read > 0);
+                }
             } else {
                 Entropy_Erase(Random);
                 Entropy_Seed(Random);

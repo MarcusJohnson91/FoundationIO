@@ -33,6 +33,7 @@ extern "C" {
 #define DecimalTableBase10Size      11
 #define DecimalTableScientificSize  14
 #define DecimalTableHexadecimalSize 21
+#define BitMaskTableSize             8
     
     static const UTF32 IntegerTableBase2[IntegerTableBase2Size] = {
         U32('0'), U32('1')
@@ -75,6 +76,11 @@ extern "C" {
         U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'),
         U32('e'), U32('f'), U32('p'), U32('x'), U32('.'), U32('+'), U32('-')
     };
+    
+    static const uint8_t MSBitMaskTable[BitMaskTableSize] = {0xFF, 0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC, 0xFE};
+    // {0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC, 0xFE, 0xFF};
+    
+    static const uint8_t LSBitMaskTable[BitMaskTableSize] = {0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF};
     
 #ifdef __cplusplus
 }
