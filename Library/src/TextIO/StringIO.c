@@ -58,7 +58,7 @@ extern "C" {
     
     uint8_t UTF16_GetCodePointSizeInCodeUnits(UTF16 CodeUnit) {
         uint8_t CodePointSize = 0;
-        if (CodeUnit < UTF16HighSurrogateStart || (CodeUnit > UTF16LowSurrogateEnd && CodeUnit <= UTF16MaxCodeUnit)) {
+        if (CodeUnit < UTF16HighSurrogateStart || (CodeUnit > UTF16LowSurrogateEnd && CodeUnit <= UTF16MaxCodeUnitValue)) {
             CodePointSize     = 1;
         } else if (CodeUnit >= UTF16HighSurrogateStart && CodeUnit <= UTF16LowSurrogateEnd) {
             CodePointSize     = 2;
@@ -111,7 +111,7 @@ extern "C" {
         if (String != NULL) {
             uint64_t CodeUnit              = 0ULL;
             while (String[CodeUnit] != FoundationIONULLTerminator) {
-                if (String[CodeUnit] <= UTF16MaxCodeUnit && (String[CodeUnit] < UTF16HighSurrogateStart || String[CodeUnit] > UTF16LowSurrogateEnd)) {
+                if (String[CodeUnit] <= UTF16MaxCodeUnitValue && (String[CodeUnit] < UTF16HighSurrogateStart || String[CodeUnit] > UTF16LowSurrogateEnd)) {
                     NumCodePoints         += 1;
                 } else if (String[CodeUnit] >= UTF16HighSurrogateStart && String[CodeUnit] <= UTF16HighSurrogateEnd) {
                     NumCodePoints         += 1;
@@ -163,9 +163,9 @@ extern "C" {
         uint64_t UTF16CodeUnits     = 0ULL;
         if (String != NULL) {
             while (String[CodePoint] != FoundationIONULLTerminator) {
-                if (String[CodePoint] <= UTF16MaxCodeUnit) {
+                if (String[CodePoint] <= UTF16MaxCodeUnitValue) {
                     UTF16CodeUnits += 1;
-                } else if (String[CodePoint] > UTF16MaxCodeUnit && String[CodePoint] <= UnicodeMaxCodePoint) {
+                } else if (String[CodePoint] > UTF16MaxCodeUnitValue && String[CodePoint] <= UnicodeMaxCodePoint) {
                     UTF16CodeUnits += 2;
                 }
                 CodePoint          += 1;
@@ -280,47 +280,28 @@ extern "C" {
     }
     
     UTF32 UTF8_DecodeCodePoint(UTF8 *CodeUnits) {
-        UTF32 CodePoint                           = 0;
+        UTF32 CodePoint                       = 0;
         if (CodeUnits != NULL) {
-            uint8_t NumCodeUnits                  = 0;
-            while (CodeUnits[NumCodeUnits] != FoundationIONULLTerminator) {
-                NumCodeUnits                     += 1;
-            }
-            uint8_t CodeUnit                      = 0;
-            uint8_t CodePointSize                 = UTF8_GetCodePointSizeInCodeUnits(CodeUnits[CodeUnit]);
-            if (NumCodeUnits >= CodePointSize) {
-                while (CodeUnits[CodeUnit + (CodePointSize - 1)] != FoundationIONULLTerminator) {
-                    switch (CodePointSize) {
-                        case 1:
-                            CodePoint                 =  CodeUnits[CodeUnit] & 0x7F;
-                            CodeUnit                 += 1;
-                            CodePoint                += 1;
-                            break;
-                        case 2:
-                            CodePoint                |= (CodeUnits[CodeUnit]     & 0x1F) << 6;
-                            CodePoint                |= (CodeUnits[CodeUnit + 1] & 0x3F) << 0;
-                            CodeUnit                 += 2;
-                            CodePoint                += 1;
-                            break;
-                        case 3:
-                            CodePoint                |= (CodeUnits[CodeUnit]     & 0x0F) << 12;
-                            CodePoint                |= (CodeUnits[CodeUnit + 1] & 0x1F) << 6;
-                            CodePoint                |= (CodeUnits[CodeUnit + 2] & 0x1F) << 0;
-                            CodeUnit                 += 3;
-                            CodePoint                += 1;
-                            break;
-                        case 4:
-                            CodePoint                |= (CodeUnits[CodeUnit]     & 0x07) << 18;
-                            CodePoint                |= (CodeUnits[CodeUnit + 1] & 0x3F) << 12;
-                            CodePoint                |= (CodeUnits[CodeUnit + 2] & 0x3F) <<  6;
-                            CodePoint                |= (CodeUnits[CodeUnit + 3] & 0x3F) <<  0;
-                            CodeUnit                 += 4;
-                            CodePoint                += 1;
-                            break;
-                    }
-                }
-            } else {
-                Log(Log_DEBUG, __func__, U8("NumCodeUnits %u does not equal CodePointSize %u"), NumCodeUnits, CodePointSize);
+            uint8_t CodePointSize             = UTF8_GetCodePointSizeInCodeUnits(CodeUnits[0]);
+            switch (CodePointSize) {
+                case 1:
+                    CodePoint                 =  CodeUnits[0] & 0x7F;
+                    break;
+                case 2:
+                    CodePoint                |= (CodeUnits[0] & 0x1F) << 6;
+                    CodePoint                |= (CodeUnits[1] & 0x3F) << 0;
+                    break;
+                case 3:
+                    CodePoint                |= (CodeUnits[0] & 0x0F) << 12;
+                    CodePoint                |= (CodeUnits[1] & 0x1F) << 6;
+                    CodePoint                |= (CodeUnits[2] & 0x1F) << 0;
+                    break;
+                case 4:
+                    CodePoint                |= (CodeUnits[0] & 0x07) << 18;
+                    CodePoint                |= (CodeUnits[1] & 0x3F) << 12;
+                    CodePoint                |= (CodeUnits[2] & 0x3F) <<  6;
+                    CodePoint                |= (CodeUnits[3] & 0x3F) <<  0;
+                    break;
             }
         } else {
             Log(Log_DEBUG, __func__, U8("CodeUnits Pointer is NULL"));
@@ -972,19 +953,26 @@ extern "C" {
     }
     
     UTF32 *UTF8_Decode(UTF8 *String) {
-        uint64_t StringSize                          = 0ULL;
-        uint64_t CodeUnit                            = 0ULL;
         UTF32   *DecodedString                       = NULL;
         if (String != NULL) {
-            StringSize                               = UTF8_GetStringSizeInCodePoints(String);
+            uint64_t CodeUnit                        = 0ULL;
+            uint64_t StringSize                      = UTF8_GetStringSizeInCodePoints(String);
+            UTF8    *CodeUnits                       = UTF8_Init(UTF8MaxCodeUnits);
             DecodedString                            = UTF32_Init(StringSize);
-            if (DecodedString != NULL) {
+            if (DecodedString != NULL && CodeUnits != NULL) {
                 for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
-                    DecodedString[CodePoint]         = UTF8_DecodeCodePoint(&String[CodeUnit]);
-                    CodeUnit                        += UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
+                    uint8_t CodePointSize            = UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
+                    for (uint8_t CodePointUnit = 0; CodePointUnit < CodePointSize; CodePointUnit++) {
+                        CodeUnits[CodePointUnit]     = String[CodeUnit + CodePointUnit];
+                    }
+                    
+                    DecodedString[CodePoint]         = UTF8_DecodeCodePoint(CodeUnits);
+                    CodeUnit                        += CodePointSize;
                 }
-            } else {
+            } else if (DecodedString == NULL) {
                 Log(Log_DEBUG, __func__, U8("Couldn't allocate DecodedString"));
+            } else if (CodeUnits == NULL) {
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate CodeUnits to decode each CodePoint"));
             }
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
@@ -993,11 +981,18 @@ extern "C" {
     }
     
     UTF32 UTF16_DecodeCodePoint(UTF16 *CodeUnits) {
-        UTF32 CodePoint                          = 0;
+        UTF32 CodePoint                       = 0;
         if (CodeUnits != NULL) {
-            uint8_t NumCodeUnits                 = 0;
-            while (CodeUnits[NumCodeUnits] != FoundationIONULLTerminator) {
-                NumCodeUnits                    += 1;
+            uint8_t CodePointSize             = UTF16_GetCodePointSizeInCodeUnits(CodeUnits[0]);
+            switch (CodePointSize) {
+                case 1:
+                    CodePoint                 =  CodeUnits[0];
+                    break;
+                case 2:
+                    CodePoint                |= UTF16MaxCodeUnitValue + 1;
+                    CodePoint                |= (CodeUnits[0] & UTF16SurrogateMask) << UTF16SurrogateShift;
+                    CodePoint                |= (CodeUnits[1] & UTF16SurrogateMask);
+                    break;
             }
         } else {
             Log(Log_DEBUG, __func__, U8("CodeUnits Pointer is NULL"));
@@ -1015,9 +1010,9 @@ extern "C" {
             uint8_t NumBitsInByte0   = CountBitsSet(CodeUnit & 0xFF);
             uint8_t NumBitsInByte1   = CountBitsSet((CodeUnit & 0xFF00) >> 8);
             if (NumBitsInByte0 >= NumBitsInByte1) {
-                ByteOrder            = ByteOrder_Big;
-            } else {
                 ByteOrder            = ByteOrder_Little;
+            } else {
+                ByteOrder            = ByteOrder_Big;
             }
         }
         return ByteOrder;
@@ -1043,27 +1038,26 @@ extern "C" {
     }
     
     UTF32 *UTF16_Decode(UTF16 *String) {
-        UTF32   *DecodedString                   = NULL;
+        UTF32   *DecodedString                       = NULL;
         if (String != NULL) {
-            uint64_t NumCodePoints               = UTF16_GetStringSizeInCodePoints(String) + FoundationIONULLTerminatorSize;
-            uint64_t CodePoint                   = 0ULL;
-            uint64_t CodeUnit                    = 0ULL;
-            StringIOByteOrders ByteOrder         = UTF16_GetByteOrder(String[0]);
-            DecodedString                        = UTF32_Init(NumCodePoints);
-            if (DecodedString != NULL) {
-                while (String[CodeUnit] != FoundationIONULLTerminator) {
-                    if (String[CodeUnit] <= UTF16MaxCodeUnit && (String[CodeUnit < UTF16HighSurrogateStart] || String[CodeUnit] > UTF16LowSurrogateEnd)) {
-                        DecodedString[CodePoint] = String[CodeUnit];
-                        CodeUnit                += 1;
-                    } else if (String[CodeUnit] >= UTF16HighSurrogateStart || String[CodeUnit] <= UTF16LowSurrogateEnd) {
-                        UTF16 HighSurrogate      = String[CodeUnit];
-                        UTF16 LowSurrogate       = String[CodeUnit + 1];
-                        DecodedString[CodePoint] = (UTF16MaxCodeUnit + 1) + ((HighSurrogate & UTF16SurrogateMask) << UTF16SurrogateShift) | (LowSurrogate & UTF16SurrogateMask);
-                        CodeUnit                += 2;
+            uint64_t CodeUnit                        = 0ULL;
+            uint64_t StringSize                      = UTF16_GetStringSizeInCodePoints(String);
+            UTF16   *CodeUnits                       = UTF16_Init(UTF16MaxCodeUnits);
+            DecodedString                            = UTF32_Init(StringSize);
+            if (DecodedString != NULL && CodeUnits != NULL) {
+                for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
+                    uint8_t CodePointSize            = UTF16_GetCodePointSizeInCodeUnits(String[CodeUnit]);
+                    for (uint8_t CodePointUnit = 0; CodePointUnit < CodePointSize; CodePointUnit++) {
+                        CodeUnits[CodePointUnit]     = String[CodeUnit + CodePointUnit];
                     }
+                    
+                    DecodedString[CodePoint]         = UTF16_DecodeCodePoint(CodeUnits);
+                    CodeUnit                        += CodePointSize;
                 }
-            } else {
-                Log(Log_DEBUG, __func__, U8("DecodedString Pointer is NULL"));
+            } else if (DecodedString == NULL) {
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate DecodedString"));
+            } else if (CodeUnits == NULL) {
+                Log(Log_DEBUG, __func__, U8("Couldn't allocate CodeUnits to decode each CodePoint"));
             }
         } else {
             Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
@@ -1071,7 +1065,7 @@ extern "C" {
         return DecodedString;
     }
     
-    UTF8 *UTF8_Encode(UTF32 *String) { // 0x000bfdff
+    UTF8 *UTF8_Encode(UTF32 *String) {
         uint64_t CodeUnitNum                           = 0ULL;
         UTF8    *EncodedString                         = NULL;
         if (String != NULL) {
@@ -1087,7 +1081,7 @@ extern "C" {
                         EncodedString[CodeUnitNum]     = 0xC0 | (String[CodePoint] & ((0x1F << 6) >> 6));
                         EncodedString[CodeUnitNum + 1] = 0x80 | (String[CodePoint] & 0x3F);
                         CodeUnitNum                   += 2;
-                    }  else if (String[CodePoint] <= UTF16MaxCodeUnit) {
+                    }  else if (String[CodePoint] <= UTF16MaxCodeUnitValue) {
                         EncodedString[CodeUnitNum]     = 0xE0 | (String[CodePoint] & ((0x0F << 12) >> 12));
                         EncodedString[CodeUnitNum + 1] = 0x80 | (String[CodePoint] & ((0x3F << 6) >> 6));
                         EncodedString[CodeUnitNum + 2] = 0x80 | (String[CodePoint] &   0x3F);
@@ -1122,7 +1116,7 @@ extern "C" {
             EncodedString                                = UTF16_Init(NumCodeUnits);
             if (EncodedString != NULL) {
                 while (CodeUnit < NumCodeUnits) {
-                    if (String[CodePoint] > UTF16MaxCodeUnit) {
+                    if (String[CodePoint] > UTF16MaxCodeUnitValue) {
                         uint32_t Ranged              = String[CodePoint] - UTF16SurrogatePairStart; // 0xF0731
                         UTF16    HighCodeUnit        = UTF16HighSurrogateStart + (Ranged & (UTF16SurrogateMask << UTF16SurrogateShift) >> UTF16SurrogateShift);
                         UTF16    LowCodeUnit         = UTF16LowSurrogateStart  + (Ranged &  UTF16SurrogateMask);
@@ -1131,7 +1125,7 @@ extern "C" {
                         EncodedString[CodeUnit + 1]  = LowCodeUnit;
                         CodeUnit                    += 2;
                     } else {
-                        EncodedString[CodeUnit]      = String[CodePoint] & UTF16MaxCodeUnit;
+                        EncodedString[CodeUnit]      = String[CodePoint] & UTF16MaxCodeUnitValue;
                         CodeUnit                    += 1;
                     }
                     CodePoint                       += 1;
@@ -1616,10 +1610,9 @@ extern "C" {
     
     UTF32 *UTF32_ExtractSubString(UTF32 *String, uint64_t Offset, uint64_t Length) {
         uint64_t  StringSize                            = UTF32_GetStringSizeInCodePoints(String);
-        uint64_t  ExtractedStringSize                   = Length + FoundationIONULLTerminatorSize;
         UTF32    *ExtractedString                       = NULL;
         if (String != NULL && StringSize >= Length + Offset) {
-            ExtractedString                             = UTF32_Init(ExtractedStringSize);
+            ExtractedString                             = UTF32_Init(Length);
             if (ExtractedString != NULL) {
                 for (uint64_t CodePoint = Offset; CodePoint < Offset + Length; CodePoint++) {
                     ExtractedString[CodePoint - Offset] = String[CodePoint];

@@ -85,7 +85,7 @@ extern "C" {
      @constant            UTF16HighSurrogateEnd                 "The value that marks the end   of the High Surrogate range".
      @constant            UTF16LowSurrogateStart                "The value that marks the start of the Low  Surrogate range".
      @constant            UTF16LowSurrogateEnd                  "The value that marks the end   of the Low  Surrogate range".
-     @constant            UTF16MaxCodeUnit                      "The highest value that can be stored in a single UTF16 CodeUnit".
+     @constant            UTF16MaxCodeUnitValue                 "The highest value that can be stored in a single UTF16 CodeUnit".
      @constant            UTF16SurrogatePairModDividend         "The value to modulo the surrogate pair by to decode a High Surrogate".
      @constant            UTF16SurrogatePairStart               "The first UTF-32 CodePoint to require Surrogate Pairs in UTF-16".
      @constant            InvalidReplacementCodePoint           "The CodePoint to replace invalid codeunits".
@@ -111,7 +111,7 @@ extern "C" {
                           UTF16HighSurrogateEnd                 = 0xDBFF,
                           UTF16LowSurrogateStart                = 0xDC00,
                           UTF16LowSurrogateEnd                  = 0xDFFF,
-                          UTF16MaxCodeUnit                      = 0xFFFF,
+                          UTF16MaxCodeUnitValue                 = 0xFFFF,
                           UTF16SurrogatePairModDividend         = 0x400,
                           UTF16SurrogatePairStart               = 0x10000,
                           InvalidReplacementCodePoint           = 0xFFFD,
