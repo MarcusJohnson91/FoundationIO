@@ -23,10 +23,10 @@ extern "C" {
             bool PathHasBOM      = UTF8_HasBOM(LogFilePath);
             if (PathHasBOM) {
                 UTF8 *BOMLess    = UTF8_RemoveBOM(LogFilePath);
-                Log_LogFile      = FoundationIO_File_Open(BOMLess, U8("a+"));
+                Log_LogFile      = FoundationIO_File_Open(BOMLess, UTF8String("a+"));
                 free(BOMLess);
             } else {
-                Log_LogFile      = FoundationIO_File_Open(LogFilePath, U8("a+"));
+                Log_LogFile      = FoundationIO_File_Open(LogFilePath, UTF8String("a+"));
             }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             UTF32 *Path32        = UTF8_Decode(LogFilePath);
@@ -34,27 +34,27 @@ extern "C" {
             bool   PathHasPrefix = UTF32_IsUNCPath(Path32);
             if (PathHasBOM == Yes && PathHasPrefix == No) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
-                UTF32 *Prefixed  = UTF32_Insert(BOMLess, UNCPathPrefix, 0);
+                UTF32 *Prefixed  = UTF32_Insert(BOMLess, UNCPathPrefix32, 0);
                 free(BOMLess);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
-                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, UTF16String("rb"));
                 free(Path16);
             } else if (PathHasBOM == No && PathHasPrefix == Yes) {
                 UTF16 *Path16    = UTF16_Encode(Path32);
-                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, UTF16String("rb"));
                 free(Path16);
             } else if (PathHasBOM == Yes && PathHasPrefix == Yes) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
                 UTF16 *Path16    = UTF16_Encode(BOMLess);
                 free(BOMLess);
-                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, UTF16String("rb"));
                 free(Path16);
             } else if (PathHasBOM == No && PathHasPrefix == No) {
-                UTF32 *Prefixed  = UTF32_Insert(Path32, UNCPathPrefix, 0);
+                UTF32 *Prefixed  = UTF32_Insert(Path32, UNCPathPrefix32, 0);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
-                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, UTF16String("rb"));
                 free(Path16);
             }
 #endif
@@ -70,38 +70,38 @@ extern "C" {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
                 UTF8 *Path8      = UTF8_Encode(BOMLess);
                 free(BOMLess);
-                Log_LogFile      = FoundationIO_File_Open(Path8, U8("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path8, UTF8String("rb"));
                 free(Path8);
             } else {
                 UTF8 *Path8      = UTF8_Encode(Path32);
-                Log_LogFile      = FoundationIO_File_Open(Path8, U8("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path8, UTF8String("rb"));
                 free(Path8);
             }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             bool   PathHasPrefix = UTF32_IsUNCPath(Path32);
             if (PathHasBOM == Yes && PathHasPrefix == No) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
-                UTF32 *Prefixed  = UTF32_Insert(BOMLess, UNCPathPrefix, 0);
+                UTF32 *Prefixed  = UTF32_Insert(BOMLess, UNCPathPrefix32, 0);
                 free(BOMLess);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
-                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, UTF16String("rb"));
                 free(Path16);
             } else if (PathHasBOM == No && PathHasPrefix == Yes) {
                 UTF16 *Path16    = UTF16_Encode(Path32);
-                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, UTF16String("rb"));
                 free(Path16);
             } else if (PathHasBOM == Yes && PathHasPrefix == Yes) {
                 UTF32 *BOMLess   = UTF32_RemoveBOM(Path32);
                 UTF16 *Path16    = UTF16_Encode(BOMLess);
                 free(BOMLess);
-                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, UTF16String("rb"));
                 free(Path16);
             } else if (PathHasBOM == No && PathHasPrefix == No) {
-                UTF32 *Prefixed  = UTF32_Insert(Path32, UNCPathPrefix, 0);
+                UTF32 *Prefixed  = UTF32_Insert(Path32, UNCPathPrefix32, 0);
                 UTF16 *Path16    = UTF16_Encode(Prefixed);
                 free(Prefixed);
-                Log_LogFile      = FoundationIO_File_Open(Path16, U16("rb"));
+                Log_LogFile      = FoundationIO_File_Open(Path16, UTF16String("rb"));
                 free(Path16);
             }
 #endif
@@ -117,11 +117,11 @@ extern "C" {
         
         UTF8 *FormattedString = NULL;
         
-        UTF8 *ErrorType[2]    = {U8("ERROR"), U8("Mistake")};
+        UTF8 *ErrorType[2]    = {UTF8String("ERROR"), UTF8String("Mistake")};
         if (Log_ProgramName != NULL) {
-            FormattedString   = UTF8_Format(U8("%s: %s in %s; \"%s\"%s"), Log_ProgramName, ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
+            FormattedString   = UTF8_Format(UTF8String("%s: %s in %s; \"%s\"%s"), Log_ProgramName, ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
         } else {
-            FormattedString   = UTF8_Format(U8("%s: %s - \"%s\"%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
+            FormattedString   = UTF8_Format(UTF8String("%s: %s - \"%s\"%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
         }
         
         if (Severity == Log_USER) {

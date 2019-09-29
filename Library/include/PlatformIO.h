@@ -347,9 +347,17 @@ extern "C" {
 #define FoundationIONULLTerminator     (0)
 #define FoundationIONULLTerminatorSize (1)
 #endif
+    
+#ifndef UNCPathPrefix8
+#define UNCPathPrefix8                    UTF8String("//?/")
+#endif
+    
+#ifndef UNCPathPrefix16
+#define UNCPathPrefix16                   UTF16String("//?/")
+#endif
 
-#ifndef UNCPathPrefix
-#define UNCPathPrefix                   U32("//?/")
+#ifndef UNCPathPrefix32
+#define UNCPathPrefix32                   UTF32String("//?/")
 #endif
     
 #ifndef FoundationIO_ImmutablePointer2MutableData
