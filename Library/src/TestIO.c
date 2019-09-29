@@ -54,14 +54,19 @@ extern "C" {
         return TimerFrequency;
     }
     
-    uint64_t GetTime(void) {
+    uint64_t GetTime_Elapsed(void) {
         uint64_t Time        = 0ULL;
         uint64_t CurrentTime = 0ULL;
+#if (FoundationIOTargetOS == FoundationIOPOSIXOS)
+        struct timespec       *TimeSpec;
+#endif
+        
+        
         for (uint8_t Loop = 1; Loop <= 3; Loop++) {
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
-            clock_getres(CurrentTime);
+            clock_gettime(CLOCK_MONOTONIC, TimeSpec);
 #elif (FoundationIOTargetOS == FoundationIOAppleOS)
-            CurrentTime      = mach_absolute_time(); // or mach_continuous_time?
+            CurrentTime      = mach_continuous_time();
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             QueryPerformanceFrequency(CurrentTime);
 #endif
@@ -78,7 +83,7 @@ extern "C" {
             UTF32  CodePointLow  = (UTF32) Entropy_GenerateIntegerInRange(Random, 0xE000, 0x10FFFF);
             CodePoint            = CodePointLow | CodePointHigh;
         } else {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Entropy Pointer is NULL"));
         }
         return CodePoint;
     }
@@ -92,10 +97,10 @@ extern "C" {
                     String[CodePoint] = UTF32_GenerateCodePoint(Random);
                 }
             } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate string with %llu CodePoints"), NumCodePoints);
+                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate string with %llu CodePoints"), NumCodePoints);
             }
         } else {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Entropy Pointer is NULL"));
         }
         return String;
     }

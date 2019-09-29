@@ -97,7 +97,7 @@ extern "C" {
             MD5->Hash[2] = 0x98BADCFE;
             MD5->Hash[3] = 0x10325476;
         } else {
-            Log(Log_DEBUG, __func__, U8("Couldn't allocate MD5"));
+            Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate MD5"));
         }
         return MD5;
     }
@@ -160,7 +160,7 @@ extern "C" {
         if (MD5 != NULL) {
             
         } else {
-            Log(Log_DEBUG, __func__, U8("MD5 Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("MD5 Pointer is NULL"));
         }
         return Hash;
     }
@@ -176,9 +176,9 @@ extern "C" {
                 }
             }
         } else if (Hash1 == NULL) {
-            Log(Log_DEBUG, __func__, U8("Hash1 Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Hash1 Pointer is NULL"));
         } else if (Hash2 == NULL) {
-            Log(Log_DEBUG, __func__, U8("Hash2 Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Hash2 Pointer is NULL"));
         }
         return HashesMatch;
     }
@@ -201,12 +201,12 @@ extern "C" {
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             BCryptGenRandom(NULL, &RandomValue, NumBytes, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
 #else
-            FILE *RandomFile          = FoundationIO_File_Open(U8("/dev/urandom"), "rb");
+            FILE *RandomFile          = FoundationIO_File_Open(UTF8String("/dev/urandom"), "rb");
             size_t BytesRead          = fread(&RandomValue, NumBytes, 1, RandomFile);
             FoundationIO_File_Close(RandomFile);
 #endif
         } else {
-            Log(Log_DEBUG, __func__, U8("Can't return more than 8 bytes"));
+            Log(Log_DEBUG, __func__, UTF8String("Can't return more than 8 bytes"));
         }
         return RandomValue;
     }
@@ -219,20 +219,20 @@ extern "C" {
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
                 NTSTATUS Status           = BCryptGenRandom(NULL, Random->EntropyPool, Random->EntropySize, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
                 if (Status <= 0) {
-                    Log(Log_DEBUG, __func__, U8("Failed to read random data, Entropy is extremely insecure, aborting"));
+                    Log(Log_DEBUG, __func__, UTF8String("Failed to read random data, Entropy is extremely insecure, aborting"));
                     abort();
                 }
 #else
-                FILE *RandomFile          = FoundationIO_File_Open(U8("/dev/urandom"), U8("rb"));
+                FILE *RandomFile          = FoundationIO_File_Open(UTF8String("/dev/urandom"), UTF8String("rb"));
                 size_t BytesRead          = fread(Random->EntropyPool, Random->EntropySize, 1, RandomFile);
                 if (BytesRead != Random->EntropySize) {
-                    Log(Log_DEBUG, __func__, U8("Failed to read random data, Entropy is extremely insecure, aborting"));
+                    Log(Log_DEBUG, __func__, UTF8String("Failed to read random data, Entropy is extremely insecure, aborting"));
                 }
                 FoundationIO_File_Close(RandomFile);
 #endif
             }
         } else {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Entropy Pointer is NULL"));
         }
     }
     
@@ -274,7 +274,7 @@ extern "C" {
                 Random->EntropyPool[Word + 7] = (Rotated4 & 0x00000000000000FF) >> 0;
             }
         } else {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Entropy Pointer is NULL"));
         }
     }
     
@@ -285,18 +285,16 @@ extern "C" {
                 uint64_t Bits2Read                    = NumBits;
                 
                 while (Bits2Read > 0) {
-                    uint8_t  BitsInEntropyByte        = Bits2ExtractFromByte(Random->BitOffset);
-                    uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInEntropyByte, Bits2Read);
-                    uint8_t  Shift                    = 8 - Bits2Get;
-                    uint8_t  BitMask                  = 0;
-#if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
-                    BitMask                           = (uint8_t) (LSBitMaskTable[Bits2Get - 1] << Shift);
-#elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
-                    BitMask                           = (uint8_t) (MSBitMaskTable[Bits2Get - 1] >> Shift);
-#endif
-                    uint8_t  ExtractedBits            = Random->EntropyPool[Bits2Bytes(Random->BitOffset, RoundingType_Down)] & BitMask;
+                    uint8_t  BitsInCurrentByte        = Bits2ExtractFromByte(Random->BitOffset);
+                    uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
+                    uint8_t  Shift                    = BitsInCurrentByte - Bits2Get;
+                    uint8_t  BitMask                  = BitMaskTable[Bits2Get - 1] << Shift;
+                    uint64_t Byte                     = Bits2Bytes(Random->BitOffset, RoundingType_Down);
+                    uint8_t  ExtractedBits            = Random->EntropyPool[Byte] & BitMask;
+                    ExtractedBits                   >>= Shift;
                     
-                    Bits                             |= ExtractedBits >> Shift;
+                    Bits                            <<= Bits2Get;
+                    Bits                             |= ExtractedBits;
                     
                     Bits2Read                        -= Bits2Get;
                     Random->BitOffset                += Bits2Get;
@@ -308,9 +306,9 @@ extern "C" {
                 Bits                                  = Entropy_ExtractBits(Random, NumBits);
             }
         } else if (Random == NULL) {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Entropy Pointer is NULL"));
         } else if (NumBits == 0) {
-            Log(Log_DEBUG, __func__, U8("Reading zero bits does not make sense"));
+            Log(Log_DEBUG, __func__, UTF8String("Reading zero bits does not make sense"));
         }
         return Bits;
     }
@@ -326,10 +324,10 @@ extern "C" {
                 Entropy_Mix(Random);
             } else {
                 Entropy_Deinit(Random);
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate EntropyPool"));
+                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate EntropyPool"));
             }
         } else {
-            Log(Log_DEBUG, __func__, U8("Couldn't allocate Entropy"));
+            Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate Entropy"));
         }
         return Random;
     }
@@ -339,7 +337,7 @@ extern "C" {
         if (Random != NULL) {
             RemainingBits      = Random->EntropySize - Random->BitOffset;
         } else {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Entropy Pointer is NULL"));
         }
         return RemainingBits;
     }
@@ -349,11 +347,11 @@ extern "C" {
         if (Random != NULL && NumBits >= 1 && NumBits <= 64) {
             GeneratedInteger     = Entropy_ExtractBits(Random, NumBits);
         } else if (Random == NULL) {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Entropy Pointer is NULL"));
         } else if (NumBits == 0) {
-            Log(Log_DEBUG, __func__, U8("Generating an integer 0 bits long is invalid"));
+            Log(Log_DEBUG, __func__, UTF8String("Generating an integer 0 bits long is invalid"));
         } else if (NumBits > 64) {
-            Log(Log_DEBUG, __func__, U8("Generating an integer %u bits long is invalid"), NumBits);
+            Log(Log_DEBUG, __func__, UTF8String("Generating an integer %u bits long is invalid"), NumBits);
         }
         return GeneratedInteger;
     }
@@ -375,9 +373,9 @@ extern "C" {
                 }
             }
         } else if (Random == NULL) {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Entropy Pointer is NULL"));
         } else if (MinValue > MaxValue) {
-            Log(Log_DEBUG, __func__, U8("MinValud %lld is greater than MaxValue %lld"), MinValue, MaxValue);
+            Log(Log_DEBUG, __func__, UTF8String("MinValud %lld is greater than MaxValue %lld"), MinValue, MaxValue);
         }
         return RandomInteger;
     }
@@ -393,7 +391,7 @@ extern "C" {
             Decimal           = InsertExponentD(Decimal, Exponent);
             Decimal           = InsertMantissaD(Decimal, Mantissa);
         } else {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Entropy Pointer is NULL"));
         }
         return Decimal;
     }
@@ -405,7 +403,7 @@ extern "C" {
             }
             Random->BitOffset             = 0;
         } else {
-            Log(Log_DEBUG, __func__, U8("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Entropy Pointer is NULL"));
         }
     }
     

@@ -422,8 +422,9 @@ extern "C" {
     
     uint8_t CountBitsSet(uint64_t Value) {
         uint8_t NumBitsSet = 0;
-        while(Value != 0) {
-            Value         &= Value - 1;
+        uint64_t Value2    = Value;
+        while (Value2 != 0) {
+            Value2        &= Value2 - 1;
             NumBitsSet    += 1;
         }
         return NumBitsSet;

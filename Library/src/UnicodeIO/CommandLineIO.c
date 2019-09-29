@@ -69,11 +69,11 @@ extern "C" {
                 CLI->NumOptions = NumOptions;
             } else {
                 CommandLineIO_Deinit(CLI);
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate %llu Options"), NumOptions);
+                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate %llu Options"), NumOptions);
             }
         } else {
             CommandLineIO_Deinit(CLI);
-            Log(Log_DEBUG, __func__, U8("Couldn't allocate CommandLineIO"));
+            Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate CommandLineIO"));
         }
         return CLI;
     }
@@ -135,9 +135,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramName     = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Name == NULL) {
-            Log(Log_DEBUG, __func__, U8("The Name string is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("The Name string is NULL"));
         }
     }
     
@@ -148,9 +148,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramVersion  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Version == NULL) {
-            Log(Log_DEBUG, __func__, U8("The Version String is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("The Version String is NULL"));
         }
     }
     
@@ -161,9 +161,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramDescription  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Description == NULL) {
-            Log(Log_DEBUG, __func__, U8("The Description String is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("The Description String is NULL"));
         }
     }
     
@@ -174,9 +174,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramAuthor  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Author == NULL) {
-            Log(Log_DEBUG, __func__, U8("The Author String is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("The Author String is NULL"));
         }
     }
     
@@ -187,9 +187,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramCopyright = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Copyright == NULL) {
-            Log(Log_DEBUG, __func__, U8("The Copyright String is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("The Copyright String is NULL"));
         }
     }
     
@@ -206,13 +206,13 @@ extern "C" {
             free(NormalizedLicenseURL);
             CLI->ProgramLicenseURL          = CaseFoldedLicenseURL;
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (LicenseType == LicenseType_Unknown) {
-            Log(Log_DEBUG, __func__, U8("The LicenseType Is Invalid"));
+            Log(Log_DEBUG, __func__, UTF8String("The LicenseType Is Invalid"));
         } else if (Name == NULL) {
-            Log(Log_DEBUG, __func__, U8("License Name Pointer is Invalid"));
+            Log(Log_DEBUG, __func__, UTF8String("License Name Pointer is Invalid"));
         } else if (LicenseURL == NULL) {
-            Log(Log_DEBUG, __func__, U8("The License URL must be set"));
+            Log(Log_DEBUG, __func__, UTF8String("The License URL must be set"));
         }
     }
     
@@ -220,9 +220,9 @@ extern "C" {
         if (CLI != NULL && MinOptions < CLI->NumOptions) {
             CLI->MinOptions = MinOptions;
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (MinOptions > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("MinOptions %lld is invalid, it should be between 0 and %lld"), MinOptions, CLI->NumOptions);
+            Log(Log_DEBUG, __func__, UTF8String("MinOptions %lld is invalid, it should be between 0 and %lld"), MinOptions, CLI->NumOptions);
         }
     }
     
@@ -230,9 +230,9 @@ extern "C" {
         if (CLI != NULL && HelpOption < CLI->NumOptions) {
             CLI->HelpOption = HelpOption;
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (HelpOption > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("HelpSwitch %lld is invalid, it should be between 0 and %lld"), HelpOption, CLI->NumOptions);
+            Log(Log_DEBUG, __func__, UTF8String("HelpSwitch %lld is invalid, it should be between 0 and %lld"), HelpOption, CLI->NumOptions);
         }
     }
     
@@ -250,7 +250,7 @@ extern "C" {
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 UTF8    *Indicator           = UTF8_Init(CommandLineIO_GetTerminalWidth());
                 UTF8    *IndicatorFinal      = UTF8_Insert(Indicator, "-", 0);
-                UTF8    *FormattedString     = UTF8_Format(U8("[%s%s %lld/%lld %hhu/%s %s]"), IndicatorFinal, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, FoundationIONewLine8);
+                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%s %lld/%lld %hhu/%s %s]"), IndicatorFinal, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, FoundationIONewLine8);
                 UTF8_WriteLine(stdout, FormattedString);
                 free(Indicator);
             }
@@ -258,7 +258,7 @@ extern "C" {
             free(NumProgressIndicatorsPerString);
             free(ActualStrings2Print);
         } else {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         }
     }
     
@@ -269,11 +269,11 @@ extern "C" {
             free(Normalized);
             CLI->OptionIDs[OptionID].Name = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Name == NULL) {
-            Log(Log_DEBUG, __func__, U8("Name String is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Name String is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
+            Log(Log_DEBUG, __func__, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
         }
     }
     
@@ -284,11 +284,11 @@ extern "C" {
             free(Normalized);
             CLI->OptionIDs[OptionID].Description = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Description == NULL) {
-            Log(Log_DEBUG, __func__, U8("Description String is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Description String is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
+            Log(Log_DEBUG, __func__, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
         }
     }
     
@@ -300,14 +300,14 @@ extern "C" {
                 CLI->OptionIDs[MasterID].Slaves            = realloc(CLI->OptionIDs[MasterID].Slaves, CLI->OptionIDs[MasterID].NumOptionSlaves * sizeof(uint64_t));
                 CLI->OptionIDs[MasterID].Slaves[NumSlaves] = SlaveID;
             } else {
-                Log(Log_DEBUG, __func__, U8("MasterID %lld can not have any slaves"), MasterID);
+                Log(Log_DEBUG, __func__, UTF8String("MasterID %lld can not have any slaves"), MasterID);
             }
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (MasterID > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumOptions - 1);
+            Log(Log_DEBUG, __func__, UTF8String("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumOptions - 1);
         } else if (SlaveID > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("SlaveID %lld is invalid, it should be between 0 and %lld"), SlaveID, CLI->NumOptions - 1);
+            Log(Log_DEBUG, __func__, UTF8String("SlaveID %lld is invalid, it should be between 0 and %lld"), SlaveID, CLI->NumOptions - 1);
         }
     }
     
@@ -315,11 +315,11 @@ extern "C" {
         if (CLI != NULL && OptionType != OptionType_Unknown && OptionID < CLI->NumOptions - 1) {
             CLI->OptionIDs[OptionID].OptionType = OptionType;
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (OptionType == OptionType_Unknown) {
-            Log(Log_DEBUG, __func__, U8("You can not set OptionID %lld to OptionType_Unknown"), OptionID);
+            Log(Log_DEBUG, __func__, UTF8String("You can not set OptionID %lld to OptionType_Unknown"), OptionID);
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
+            Log(Log_DEBUG, __func__, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
         }
     }
     
@@ -328,12 +328,12 @@ extern "C" {
             if (OptionID < CLI->NumOptions) {
                 CLI->OptionIDs[OptionID].Status = Status;
             } else {
-                Log(Log_DEBUG, __func__, U8("OptionID %llu is invalid"), OptionID);
+                Log(Log_DEBUG, __func__, UTF8String("OptionID %llu is invalid"), OptionID);
             }
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Status == OptionStatus_Unknown) {
-            Log(Log_DEBUG, __func__, U8("Status is Unknown"));
+            Log(Log_DEBUG, __func__, UTF8String("Status is Unknown"));
         }
     }
     
@@ -341,11 +341,11 @@ extern "C" {
         if (CLI != NULL && ArgumentType != ArgumentType_Unknown && OptionID < CLI->NumOptions) {
             CLI->OptionIDs[OptionID].ArgumentType = ArgumentType;
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (ArgumentType == ArgumentType_Unknown) {
-            Log(Log_DEBUG, __func__, U8("You can not set OptionID %lld to ArgumentType_Unknown"), OptionID);
+            Log(Log_DEBUG, __func__, UTF8String("You can not set OptionID %lld to ArgumentType_Unknown"), OptionID);
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
+            Log(Log_DEBUG, __func__, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
         }
     }
     
@@ -353,7 +353,7 @@ extern "C" {
         if (CLI != NULL) {
             UTF8 *Name = UTF8_Encode(CLI->ProgramName);
             
-            UTF8 *ProgramsOptions = UTF8_Format(U8("%s's Options (-|--|/):%s"), Name, FoundationIONewLine8);
+            UTF8 *ProgramsOptions = UTF8_Format(UTF8String("%s's Options (-|--|/):%s"), Name, FoundationIONewLine8);
             UTF8_WriteLine(stdout, ProgramsOptions);
             free(Name);
             free(ProgramsOptions);
@@ -363,7 +363,7 @@ extern "C" {
                 UTF8 *SwitchName        = UTF8_Encode(CLI->OptionIDs[Switch].Name);
                 UTF8 *SwitchDescription = UTF8_Encode(CLI->OptionIDs[Switch].Description);
                 
-                UTF8 *SwitchInfo        = UTF8_Format(U8("%s: %s%s"), SwitchName, SwitchDescription, FoundationIONewLine8);
+                UTF8 *SwitchInfo        = UTF8_Format(UTF8String("%s: %s%s"), SwitchName, SwitchDescription, FoundationIONewLine8);
                 
                 UTF8_WriteLine(stdout, SwitchInfo);
                 if (CurrentSwitchType == OptionType_PotentialSlaves && CLI->OptionIDs[Switch].NumOptionSlaves > 0) {
@@ -371,7 +371,7 @@ extern "C" {
                         UTF8 *SlaveName        = UTF8_Encode(CLI->OptionIDs[SlaveSwitch].Name);
                         UTF8 *SlaveDescription = UTF8_Encode(CLI->OptionIDs[SlaveSwitch].Description);
                         
-                        UTF8 *SlaveSwitchInfo  = UTF8_Format(U8("\t%s: %s%s"), SlaveName, SlaveDescription, FoundationIONewLine8);
+                        UTF8 *SlaveSwitchInfo  = UTF8_Format(UTF8String("\t%s: %s%s"), SlaveName, SlaveDescription, FoundationIONewLine8);
                         
                         UTF8_WriteLine(stdout, SlaveSwitchInfo);
                         
@@ -385,7 +385,7 @@ extern "C" {
                 free(SwitchInfo);
             }
         } else {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         }
     }
     
@@ -402,67 +402,67 @@ extern "C" {
             CommandLineIO_LicenseTypes LicenseType = CLI->LicenseType;
             
             if (Name != NULL) {
-                UTF8 *NameString      = UTF8_Format(U8("%s,"), Name);
+                UTF8 *NameString      = UTF8_Format(UTF8String("%s,"), Name);
                 UTF8_WriteLine(stdout, NameString);
                 free(NameString);
                 
-                UTF8 *FormattedString = UTF8_Format(U8(" %s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, FoundationIONewLine16);
+                UTF8 *FormattedString = UTF8_Format(UTF8String(" %s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, FoundationIONewLine16);
                 UTF8_WriteLine(stdout, FormattedString);
             }
             
             if (Version != NULL) {
-                UTF8 *VersionString   = UTF8_Format(U8(" v. %s"), Version);
+                UTF8 *VersionString   = UTF8_Format(UTF8String(" v. %s"), Version);
                 UTF8_WriteLine(stdout, VersionString);
             }
             
             if (Author != NULL) {
-                UTF8 *AuthorString   = UTF8_Format(U8(" by %s"), Author);
+                UTF8 *AuthorString   = UTF8_Format(UTF8String(" by %s"), Author);
                 UTF8_WriteLine(stdout, AuthorString);
             }
             
             if (Copyright != NULL) {
-                UTF8 *CopyrightString   = UTF8_Format(U8(" © %s\n"), Copyright);
+                UTF8 *CopyrightString   = UTF8_Format(UTF8String(" © %s\n"), Copyright);
                 UTF8_WriteLine(stdout, CopyrightString);
             }
             
             if (LicenseType == LicenseType_Permissive || LicenseType == LicenseType_Copyleft) {
                 if (Description != NULL) {
-                    UTF8 *DescriptionString   = UTF8_Format(U8("%s"), Description);
+                    UTF8 *DescriptionString   = UTF8_Format(UTF8String("%s"), Description);
                     UTF8_WriteLine(stdout, DescriptionString);
                 }
                 
                 if (LicenseName != NULL) {
-                    UTF8 *LicenseNameString   = UTF8_Format(U8(" Released under the \"%s\" license"), LicenseName);
+                    UTF8 *LicenseNameString   = UTF8_Format(UTF8String(" Released under the \"%s\" license"), LicenseName);
                     UTF8_WriteLine(stdout, LicenseNameString);
                 }
                 
                 if (LicenseDescription != NULL) {
-                    UTF8 *LicenseDescriptionString   = UTF8_Format(U8(" %s,"), LicenseDescription);
+                    UTF8 *LicenseDescriptionString   = UTF8_Format(UTF8String(" %s,"), LicenseDescription);
                     UTF8_WriteLine(stdout, LicenseDescriptionString);
                 }
                 
                 if (LicenseURL != NULL) {
-                    UTF8 *LicenseURLString   = UTF8_Format(U8(" %s\n"), LicenseURL);
+                    UTF8 *LicenseURLString   = UTF8_Format(UTF8String(" %s\n"), LicenseURL);
                     UTF8_WriteLine(stdout, LicenseURLString);
                 }
             } else if (LicenseType == LicenseType_Proprietary) {
                 if (Description != NULL) {
-                    UTF8 *DescriptionString   = UTF8_Format(U8("%s"), Description);
+                    UTF8 *DescriptionString   = UTF8_Format(UTF8String("%s"), Description);
                     UTF8_WriteLine(stdout, DescriptionString);
                 }
                 
                 if (LicenseDescription != NULL) {
-                    UTF8 *LicenseDescriptionString   = UTF8_Format(U8(" By using this software, you agree to the End User License Agreement %s,"), LicenseDescription);
+                    UTF8 *LicenseDescriptionString   = UTF8_Format(UTF8String(" By using this software, you agree to the End User License Agreement %s,"), LicenseDescription);
                     UTF8_WriteLine(stdout, LicenseDescriptionString);
                 }
                 
                 if (LicenseURL != NULL) {
-                    UTF8 *LicenseURLString   = UTF8_Format(U8(" available at: %s\n"), LicenseURL);
+                    UTF8 *LicenseURLString   = UTF8_Format(UTF8String(" available at: %s\n"), LicenseURL);
                     UTF8_WriteLine(stdout, LicenseURLString);
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         }
     }
     
@@ -473,18 +473,18 @@ extern "C" {
             uint64_t ArgumentStringSize       = UTF32_GetStringSizeInCodePoints(ArgumentString);
             
             if (ArgumentStringSize >= 2) {
-                if (ArgumentString[0] == U32('-') && ArgumentString[1] == U32('-')) {
+                if (ArgumentString[0] == UTF32Character('-') && ArgumentString[1] == UTF32Character('-')) {
                     ArgumentStringPrefixSize  = 2;
-                } else if (ArgumentString[0] == U32('/') || ArgumentString[0] == U32('\\') || ArgumentString[0] == U32('-')) {
+                } else if (ArgumentString[0] == UTF32Character('/') || ArgumentString[0] == UTF32Character('\\') || ArgumentString[0] == UTF32Character('-')) {
                     ArgumentStringPrefixSize  = 1;
                 }
             } else {
-                Log(Log_DEBUG, __func__, U8("ArgumentString is not an Argument string"));
+                Log(Log_DEBUG, __func__, UTF8String("ArgumentString is not an Argument string"));
             }
             uint64_t ArgumentSwitchSize    = ArgumentStringSize - ArgumentStringPrefixSize;
             ArgumentSwitch                 = UTF32_ExtractSubString(UTF32_CaseFold(ArgumentString), ArgumentStringPrefixSize, ArgumentSwitchSize);
         } else {
-            Log(Log_DEBUG, __func__, U8("String Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
         }
         return ArgumentSwitch;
     }
@@ -511,7 +511,7 @@ extern "C" {
                 ArgumentArray[Argument] = UTF16_Decode((UTF16*) Arguments);
             }
         } else {
-            Log(Log_DEBUG, __func__, U8("Couldnt allocate %llu arguments"), NumArguments);
+            Log(Log_DEBUG, __func__, UTF8String("Couldnt allocate %llu arguments"), NumArguments);
         }
 #endif
         return ArgumentArray;
@@ -557,9 +557,9 @@ extern "C" {
                 free(ArgumentFlag);
             } while (CurrentArgument < NumArguments);
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
-            Log(Log_DEBUG, __func__, U8("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
+            Log(Log_DEBUG, __func__, UTF8String("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
         }
     }
     
@@ -580,7 +580,7 @@ extern "C" {
             }
             free(Arguments32);
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
             CommandLineIO_DisplayHelp(CLI);
         }
@@ -603,7 +603,7 @@ extern "C" {
             }
             free(Arguments32);
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
             CommandLineIO_DisplayHelp(CLI);
         }
@@ -628,11 +628,11 @@ extern "C" {
                 }
             }
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
+            Log(Log_DEBUG, __func__, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
         } else if (NumSlaves > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("NumSlaves %lld is invalid, it should be between 0 and %lld"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
+            Log(Log_DEBUG, __func__, UTF8String("NumSlaves %lld is invalid, it should be between 0 and %lld"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
         }
         return NumMatchingOptions;
     }
@@ -659,11 +659,11 @@ extern "C" {
                 }
             }
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
+            Log(Log_DEBUG, __func__, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
         } else if (NumSlaves > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("NumSlaves %lld is invalid, it should be between 0 and %lld"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
+            Log(Log_DEBUG, __func__, UTF8String("NumSlaves %lld is invalid, it should be between 0 and %lld"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
         }
         return MatchingOption;
     }
@@ -673,9 +673,9 @@ extern "C" {
         if (CLI != NULL && OptionID <= CLI->NumOptions - 1) {
             Result = UTF8_Encode(CLI->OptionIDs[OptionID].Argument);
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("Option %lld is outside the range 0 - %lld"), OptionID, CLI->NumOptions - 1);
+            Log(Log_DEBUG, __func__, UTF8String("Option %lld is outside the range 0 - %lld"), OptionID, CLI->NumOptions - 1);
         }
         return Result;
     }
@@ -685,9 +685,9 @@ extern "C" {
         if (CLI != NULL && OptionID <= CLI->NumOptions - 1) {
             Result = UTF16_Encode(CLI->OptionIDs[OptionID].Argument);
         } else if (CLI == NULL) {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Log_DEBUG, __func__, U8("Option %lld is outside the range 0 - %lld"), OptionID, CLI->NumOptions - 1);
+            Log(Log_DEBUG, __func__, UTF8String("Option %lld is outside the range 0 - %lld"), OptionID, CLI->NumOptions - 1);
         }
         return Result;
     }
@@ -698,7 +698,7 @@ extern "C" {
             uint64_t StringSize    = UTF32_GetStringSizeInCodePoints(Path);
             uint64_t ExtensionSize = 0ULL;
             for (uint64_t CodePoint = StringSize; CodePoint > 0; CodePoint--) {
-                if (Path[CodePoint] == U32('.')) {
+                if (Path[CodePoint] == UTF32Character('.')) {
                     ExtensionSize  = CodePoint - StringSize;
                 }
             }
@@ -710,10 +710,10 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, __func__, U8("Couldn't allocate %lld codepoints for the Extension"), ExtensionSize);
+                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate %lld codepoints for the Extension"), ExtensionSize);
             }
         } else {
-            Log(Log_DEBUG, __func__, U8("Path Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Path Pointer is NULL"));
         }
         return Extension;
     }
@@ -726,7 +726,7 @@ extern "C" {
             free(Decoded);
             Extension          = UTF8_Encode(Extension32);
         } else {
-            Log(Log_DEBUG, __func__, U8("Path Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Path Pointer is NULL"));
         }
         return Extension;
     }
@@ -740,7 +740,7 @@ extern "C" {
             Extension          = UTF16_Encode(Extension32);
             free(Extension32);
         } else {
-            Log(Log_DEBUG, __func__, U8("Path Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("Path Pointer is NULL"));
         }
         return Extension;
     }
@@ -764,7 +764,7 @@ extern "C" {
             free(CLI->ProgramLicenseURL);
             free(CLI);
         } else {
-            Log(Log_DEBUG, __func__, U8("CommandLineIO Pointer is NULL"));
+            Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         }
     }
     

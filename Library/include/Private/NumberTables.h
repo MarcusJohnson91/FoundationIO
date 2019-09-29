@@ -23,7 +23,8 @@ extern "C" {
     
 #ifndef                   FoundationIO_Unicodize32
 #define                   FoundationIO_Unicodize32            (4)
-#define                   U32(QuotedLiteral)                  U##QuotedLiteral
+#define                   UTF32String(Literal)                (UTF32*) U##Literal
+#define                   UTF32Character(Literal)             (UTF32) U##Literal
 #endif /* FoundationIO_Unicodize32 */
     
 #define IntegerTableBase2Size        2
@@ -36,51 +37,57 @@ extern "C" {
 #define BitMaskTableSize             8
     
     static const UTF32 IntegerTableBase2[IntegerTableBase2Size] = {
-        U32('0'), U32('1')
+        UTF32Character('0'), UTF32Character('1')
     };
     
     static const UTF32 IntegerTableBase8[IntegerTableBase8Size] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7')
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'),
+        UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7')
     };
     
     static const UTF32 IntegerTableBase10[IntegerTableBase10Size] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9')
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'),
+        UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'),
+        UTF32Character('8'), UTF32Character('9')
     };
     
     static const UTF32 IntegerTableUppercaseBase16[IntegerTableBase16Size] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('A'), U32('B'), U32('C'), U32('D'), U32('E'), U32('F')
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'),
+        UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'),
+        UTF32Character('8'), UTF32Character('9'), UTF32Character('A'), UTF32Character('B'),
+        UTF32Character('C'), UTF32Character('D'), UTF32Character('E'), UTF32Character('F')
     };
     
     static const UTF32 IntegerTableLowercaseBase16[IntegerTableBase16Size] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'), U32('e'), U32('f')
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'),
+        UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'),
+        UTF32Character('8'), UTF32Character('9'), UTF32Character('a'), UTF32Character('b'),
+        UTF32Character('c'), UTF32Character('d'), UTF32Character('e'), UTF32Character('f')
     };
     
     static const UTF32 DecimalTable[DecimalTableBase10Size] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('.')
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'), UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'), UTF32Character('8'), UTF32Character('9'), UTF32Character('.')
     };
     
     static const UTF32 DecimalScientificUppercase[DecimalTableScientificSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('E'), U32('.'), U32('+'), U32('-')
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'), UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'), UTF32Character('8'), UTF32Character('9'), UTF32Character('E'), UTF32Character('.'), UTF32Character('+'), UTF32Character('-')
     };
     
     static const UTF32 DecimalScientificLowercase[DecimalTableScientificSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('e'), U32('.'), U32('+'), U32('-')
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'), UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'), UTF32Character('8'), UTF32Character('9'), UTF32Character('e'), UTF32Character('.'), UTF32Character('+'), UTF32Character('-')
     };
     
     static const UTF32 DecimalHexUppercase[DecimalTableHexadecimalSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('A'), U32('B'), U32('C'), U32('D'),
-        U32('E'), U32('F'), U32('P'), U32('X'), U32('.'), U32('+'), U32('-')
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'), UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'), UTF32Character('8'), UTF32Character('9'), UTF32Character('A'), UTF32Character('B'), UTF32Character('C'), UTF32Character('D'),
+        UTF32Character('E'), UTF32Character('F'), UTF32Character('P'), UTF32Character('X'), UTF32Character('.'), UTF32Character('+'), UTF32Character('-')
     };
     
     static const UTF32 DecimalHexLowercase[DecimalTableHexadecimalSize] = {
-        U32('0'), U32('1'), U32('2'), U32('3'), U32('4'), U32('5'), U32('6'), U32('7'), U32('8'), U32('9'), U32('a'), U32('b'), U32('c'), U32('d'),
-        U32('e'), U32('f'), U32('p'), U32('x'), U32('.'), U32('+'), U32('-')
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'), UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'), UTF32Character('8'), UTF32Character('9'), UTF32Character('a'), UTF32Character('b'), UTF32Character('c'), UTF32Character('d'),
+        UTF32Character('e'), UTF32Character('f'), UTF32Character('p'), UTF32Character('x'), UTF32Character('.'), UTF32Character('+'), UTF32Character('-')
     };
     
-    static const uint8_t MSBitMaskTable[BitMaskTableSize] = {0xFF, 0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC, 0xFE};
-    // {0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC, 0xFE, 0xFF};
-    
-    static const uint8_t LSBitMaskTable[BitMaskTableSize] = {0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF};
+    static const uint8_t BitMaskTable[BitMaskTableSize] = {0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF};
     
 #ifdef __cplusplus
 }

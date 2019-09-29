@@ -58,17 +58,20 @@ extern "C" {
     
 #ifndef                   FoundationIO_Unicodize8
 #define                   FoundationIO_Unicodize8              (1)
-#define                   U8(QuotedLiteral)                    u8##QuotedLiteral
+#define                   UTF8String(Literal)                  (const UTF8*) u8##Literal
+#define                   UTF8Character(Literal)               (const UTF8)  u8##Literal
 #endif /* FoundationIO_Unicodize8 */
     
 #ifndef                   FoundationIO_Unicodize16
 #define                   FoundationIO_Unicodize16            (2)
-#define                   U16(QuotedLiteral)                  u##QuotedLiteral
+#define                   UTF16String(Literal)                (UTF16*) u##Literal
+#define                   UTF16Character(Literal)             (UTF16)  u##Literal
 #endif /* FoundationIO_Unicodize16 */
     
 #ifndef                   FoundationIO_Unicodize32
 #define                   FoundationIO_Unicodize32            (4)
-#define                   U32(QuotedLiteral)                  U##QuotedLiteral
+#define                   UTF32String(Literal)                (UTF32*) U##Literal
+#define                   UTF32Character(Literal)             (UTF32) U##Literal
 #endif /* FoundationIO_Unicodize32 */
     
     /*!
