@@ -715,6 +715,7 @@
 					"-funsigned-char",
 					"-Wno-varargs",
 					"-Wno-incompatible-pointer-types-discards-qualifiers",
+					"-Wno-ignored-attributes",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -877,7 +878,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-v";
 				OTHER_LIBTOOLFLAGS = "-v";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
@@ -973,7 +974,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-v";
 				OTHER_LIBTOOLFLAGS = "-v";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
@@ -1004,6 +1005,7 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1016,6 +1018,7 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -1028,6 +1031,7 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1040,6 +1044,7 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -1052,6 +1057,7 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1064,6 +1070,7 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -1076,6 +1083,7 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1088,6 +1096,7 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -1100,6 +1109,7 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1112,6 +1122,7 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -1124,6 +1135,7 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1136,6 +1148,7 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
