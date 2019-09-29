@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "../../include/Macros.h"
+#include "../include/Macros.h"
 
 
 #pragma once
@@ -88,6 +88,84 @@ extern "C" {
     UTF32           **DeformatString_UTF32(UTF32 *Format, UTF32 *Result, FormatSpecifiers *Specifiers);
     
     void              FormatSpecifiers_Deinit(FormatSpecifiers *Specifiers);
+    
+    /*!
+     @abstract                             "Formats a string according to the Format string, with all of it's options".
+     @remark                               "Recognized extensions: b/B = binary, MSBit and byte first, N is removed from output, C/lc. S/ls = UTF-16; Uc/Us/UC/US = UTF-32".
+     @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
+     @return                               "Returns the formatted string encoded using the UTF-8 format".
+     */
+#if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
+    UTF8                 *UTF8_Format(UTF8 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+#elif defined(_MSC_VER)
+#include <sal.h>
+#if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
+    UTF8                 *UTF8_Format(__format_string UTF8 *Format, ...);
+#elif    (_MSC_VER >= 1500)
+    UTF8                 *UTF8_Format(_Printf_format_string_ UTF8 *Format, ...);
+#endif /* MSVC Version */
+#endif /* Compiler */
+    
+    /*!
+     @abstract                             "Formats a string according to the Format string, with all of it's options".
+     @remark                               "Recognized extensions: b/B = binary, MSBit and byte first, N is removed from output, C/lc. S/ls = UTF-16; Uc/Us/UC/US = UTF-32".
+     @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
+     @return                               "Returns the formatted string encoded using the UTF-16 format".
+     */
+#if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
+    UTF16                *UTF16_Format(UTF16 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+#elif defined(_MSC_VER)
+#include <sal.h>
+#if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
+    UTF16                *UTF16_Format(__format_string UTF16 *Format, ...);
+#elif    (_MSC_VER >= 1500)
+    UTF16                *UTF16_Format(_Printf_format_string_ UTF16 *Format, ...);
+#endif /* MSVC Version */
+#endif /* Compiler */
+    
+    /*!
+     @abstract                             "Formats a string according to the Format string, with all of it's options".
+     @remark                               "Recognized extensions: b/B = binary, MSBit and byte first, N is removed from output, C/lc. S/ls = UTF-16; Uc/Us/UC/US = UTF-32".
+     @param               Format           "A string with optional format specifiers, all variadic strings need to match Format's type".
+     @return                               "Returns the formatted string encoded using the UTF-32 format".
+     */
+#if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
+    UTF32                *UTF32_Format(UTF32 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+#elif defined(_MSC_VER)
+#include <sal.h>
+#if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
+    UTF32                *UTF32_Format(__format_string UTF32 *Format, ...);
+#elif    (_MSC_VER >= 1500)
+    UTF32                *UTF32_Format(_Printf_format_string_ UTF32 *Format, ...);
+#endif /* MSVC Version */
+#endif /* Compiler */
+    
+    /*!
+     @abstract                             "Splits a string based on the specifiers in Format".
+     @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
+     @param               Format           "A string with format specifiers".
+     @param               Source           "The string to extract the information from".
+     @return                               "Returns a StringArray containing NumFormatSpecifiers strings, one string for each specifier".
+     */
+    UTF8                **UTF8_Deformat(UTF8 *Format, UTF8 *Source);
+    
+    /*!
+     @abstract                             "Splits a string based on the specifiers in Format".
+     @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
+     @param               Format           "A string with format specifiers".
+     @param               Source           "The string to extract the information from".
+     @return                               "Returns a StringArray containing NumFormatSpecifiers strings, one string for each specifier".
+     */
+    UTF16               **UTF16_Deformat(UTF16 *Format, UTF16 *Source);
+    
+    /*!
+     @abstract                             "Splits a string based on the specifiers in Format".
+     @remark                               "Extensions: B = Binary, the n specifier is unsupported, but it is removed from the output".
+     @param               Format           "A string with format specifiers".
+     @param               Source           "The string to extract the information from".
+     @return                               "Returns a StringArray containing NumFormatSpecifiers strings, one string for each specifier".
+     */
+    UTF32               **UTF32_Deformat(UTF32 *Format, UTF32 *Source);
     
 #ifdef __cplusplus
 }

@@ -43,7 +43,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\FormatIO.h">
-      <Filter>Header Files\Private</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\Private\UnicodeTables.h">
       <Filter>Header Files\Private</Filter>

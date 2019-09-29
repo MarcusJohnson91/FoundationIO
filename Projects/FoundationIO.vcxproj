@@ -29,9 +29,9 @@
     <ClInclude Include="..\Library\include\Math.h" />
     <ClInclude Include="..\Library\include\StringIO.h" />
     <ClInclude Include="..\Library\include\TestIO.h" />
+    <ClInclude Include="..\Library\include\FormatIO.h" />
     <ClInclude Include="..\Library\include\Private\UnicodeTables.h" />
     <ClInclude Include="..\Library\include\Private\NumberTables.h" />
-    <ClInclude Include="..\Library\include\Private\FormatIO.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Library\src\BitIO.c" />
