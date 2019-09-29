@@ -51,6 +51,7 @@ set(PUBLIC_HEADER
 "${libFoundationIO_Dir}/include/Math.h"
 "${libFoundationIO_Dir}/include/StringIO.h"
 "${libFoundationIO_Dir}/include/TestIO.h"
+"${libFoundationIO_Dir}/include/FormatIO.h"
 )
 
 set(libFoundationIO_Sources

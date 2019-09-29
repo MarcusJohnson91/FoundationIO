@@ -4,7 +4,7 @@
 
 #include "../include/Log.h"                    /* Included for error logging */
 #include "../include/Math.h"                   /* Included for endian swapping */
-#include "../include/Private/FormatIO.h"       /* Included for the String formatting code */
+#include "../include/FormatIO.h"               /* Included for the String formatting code */
 
 #include <stdarg.h>                            /* Included for va_list, va_copy, va_start, va_end */
 #include <wchar.h>                             /* Included for Fwide */
@@ -12,6 +12,34 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
+    /*
+     
+     So, we decode each codepoint in a string, then look to see if it's a GraphemeExtender.
+     
+     if it is a graphemeextender we copy the previous, and current codepoints as well as
+     
+     So what we really need is functions that will tell you the size of a CodePoint in CodeUnits, and Grapheme in CodePoints.
+     
+     with those you can build up a ExtractGrapheme function, and then you rebase EVERYTHING on top of that.
+     
+     
+     
+     --------------------
+     
+     Grapheme steps:
+     
+     GetCodePoint from string as CodeUnits
+     
+     DecodeCodePoint from CodeUnits
+     
+     lookup CodePoint in tables
+     
+     repeat that process until you have a whole grapheme.
+     
+     What do we do tho once we have a grapheme?
+     
+     */
     
     UTF8 *UTF8_Init(uint64_t NumCodeUnits) {
         UTF8 *String = NULL;
@@ -68,6 +96,124 @@ extern "C" {
         return CodePointSize;
     }
     
+    static UTF32 UTF8_DecodeCodePoint(UTF8 *CodeUnits) {
+        UTF32 CodePoint                       = 0;
+        if (CodeUnits != NULL) {
+            uint8_t CodePointSize             = UTF8_GetCodePointSizeInCodeUnits(CodeUnits[0]);
+            switch (CodePointSize) {
+                case 1:
+                    CodePoint                 =  CodeUnits[0] & 0x7F;
+                    break;
+                case 2:
+                    CodePoint                |= (CodeUnits[0] & 0x1F) << 6;
+                    CodePoint                |= (CodeUnits[1] & 0x3F) << 0;
+                    break;
+                case 3:
+                    CodePoint                |= (CodeUnits[0] & 0x0F) << 12;
+                    CodePoint                |= (CodeUnits[1] & 0x1F) << 6;
+                    CodePoint                |= (CodeUnits[2] & 0x1F) << 0;
+                    break;
+                case 4:
+                    CodePoint                |= (CodeUnits[0] & 0x07) << 18;
+                    CodePoint                |= (CodeUnits[1] & 0x3F) << 12;
+                    CodePoint                |= (CodeUnits[2] & 0x3F) <<  6;
+                    CodePoint                |= (CodeUnits[3] & 0x3F) <<  0;
+                    break;
+            }
+        } else {
+            Log(Log_DEBUG, __func__, UTF8String("CodeUnits Pointer is NULL"));
+        }
+        return CodePoint;
+    }
+    
+    uint64_t UTF8_GetGraphemeSizeInCodeUnits(UTF8 *String, uint64_t OffsetInCodeUnits) {
+        uint64_t GraphemeSize         = 1ULL;
+        if (String != NULL) {
+            uint64_t CodeUnit         = OffsetInCodeUnits;
+            UTF8    *CodeUnits        = UTF8_Init(UTF8MaxCodeUnits);
+            while (String[CodeUnit] != FoundationIONULLTerminator) {
+                UTF8 Byte             = String[CodeUnit];
+                uint8_t CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Byte);
+                for (uint8_t Byte = 0; Byte < CodePointSize; Byte++) {
+                    CodeUnits[Byte]   = String[CodeUnit + Byte];
+                }
+                UTF32 CodePoint1      = UTF8_DecodeCodePoint(CodeUnits);
+                for (uint64_t GraphemeExt = 0ULL; GraphemeExt < GraphemeExtensionTableSize; GraphemeExt++) {
+                    if (CodePoint1 == GraphemeExtensionTable[GraphemeExt]) {
+                        GraphemeSize += 1;
+                        CodeUnit     += 1;
+                    }
+                }
+            }
+        } else {
+            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+        }
+        return GraphemeSize;
+    }
+    
+    static UTF32 UTF16_DecodeCodePoint(UTF16 *CodeUnits) {
+        UTF32 CodePoint                       = 0;
+        if (CodeUnits != NULL) {
+            uint8_t CodePointSize             = UTF16_GetCodePointSizeInCodeUnits(CodeUnits[0]);
+            switch (CodePointSize) {
+                case 1:
+                    CodePoint                 =  CodeUnits[0];
+                    break;
+                case 2:
+                    CodePoint                |= UTF16MaxCodeUnitValue + 1;
+                    CodePoint                |= (CodeUnits[0] & UTF16SurrogateMask) << UTF16SurrogateShift;
+                    CodePoint                |= (CodeUnits[1] & UTF16SurrogateMask);
+                    break;
+            }
+        } else {
+            Log(Log_DEBUG, __func__, UTF8String("CodeUnits Pointer is NULL"));
+        }
+        return CodePoint;
+    }
+    
+    uint64_t UTF16_GetGraphemeSizeInCodeUnits(UTF16 *String, uint64_t OffsetInCodeUnits) {
+        uint64_t GraphemeSize         = 1ULL;
+        if (String != NULL) {
+            uint64_t CodeUnit         = OffsetInCodeUnits;
+            UTF16   *CodeUnits        = UTF16_Init(UTF16MaxCodeUnits);
+            while (String[CodeUnit] != FoundationIONULLTerminator) {
+                UTF16 Byte            = String[CodeUnit];
+                uint8_t CodePointSize = UTF16_GetCodePointSizeInCodeUnits(Byte);
+                for (uint8_t Byte = 0; Byte < CodePointSize; Byte++) {
+                    CodeUnits[Byte]   = String[CodeUnit + Byte];
+                }
+                UTF32 CodePoint1      = UTF16_DecodeCodePoint(CodeUnits);
+                for (uint64_t GraphemeExt = 0ULL; GraphemeExt < GraphemeExtensionTableSize; GraphemeExt++) {
+                    if (CodePoint1 == GraphemeExtensionTable[GraphemeExt]) {
+                        GraphemeSize += 1;
+                        CodeUnit     += 1;
+                    }
+                }
+            }
+        } else {
+            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+        }
+        return GraphemeSize;
+    }
+    
+    uint64_t UTF32_GetGraphemeSizeInCodePoints(UTF32 *String, uint64_t OffsetInCodePoints) {
+        uint64_t NumCodePoints         = 1ULL;
+        if (String != NULL) {
+            uint64_t CodePoint         = OffsetInCodePoints;
+            while (String[CodePoint] != FoundationIONULLTerminator) {
+                for (uint64_t GraphemeExt = 0ULL; GraphemeExt < GraphemeExtensionTableSize; GraphemeExt++) {
+                    while (String[CodePoint] == GraphemeExtensionTable[GraphemeExt]) {
+                        NumCodePoints += 1;
+                        CodePoint     += 1;
+                    }
+                }
+            }
+        } else {
+            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+        }
+        return NumCodePoints;
+    }
+    
     uint64_t UTF8_GetStringSizeInCodeUnits(UTF8 *String) {
         uint64_t StringSizeInCodeUnits = 0ULL;
         if (String != NULL) {
@@ -90,6 +236,46 @@ extern "C" {
             Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
         }
         return StringSizeInCodeUnits;
+    }
+    
+    static uint64_t UTF32_GetStringSizeInUTF8CodeUnits(UTF32 *String) {
+        uint64_t CodePoint            = 0ULL;
+        uint64_t UTF8CodeUnits        = 0ULL;
+        if (String != NULL) {
+            while (String[CodePoint] != FoundationIONULLTerminator) {
+                if (String[CodePoint] <= 0x7F) {
+                    UTF8CodeUnits    += 1;
+                } else if (String[CodePoint] >= 0x80 && String[CodePoint] <= 0x7FF) {
+                    UTF8CodeUnits    += 2;
+                } else if (String[CodePoint] >= 0x800 && String[CodePoint] <= 0xFFFF) {
+                    UTF8CodeUnits    += 3;
+                } else if (String[CodePoint] >= 0x10000 && String[CodePoint] <= UnicodeMaxCodePoint) {
+                    UTF8CodeUnits    += 4;
+                }
+                CodePoint            += 1;
+            }
+        } else {
+            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+        }
+        return UTF8CodeUnits;
+    }
+    
+    static uint64_t UTF32_GetStringSizeInUTF16CodeUnits(UTF32 *String) {
+        uint64_t CodePoint          = 0ULL;
+        uint64_t UTF16CodeUnits     = 0ULL;
+        if (String != NULL) {
+            while (String[CodePoint] != FoundationIONULLTerminator) {
+                if (String[CodePoint] <= UTF16MaxCodeUnitValue) {
+                    UTF16CodeUnits += 1;
+                } else if (String[CodePoint] > UTF16MaxCodeUnitValue && String[CodePoint] <= UnicodeMaxCodePoint) {
+                    UTF16CodeUnits += 2;
+                }
+                CodePoint          += 1;
+            }
+        } else {
+            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+        }
+        return UTF16CodeUnits;
     }
     
     uint64_t UTF8_GetStringSizeInCodePoints(UTF8 *String) {
@@ -136,59 +322,57 @@ extern "C" {
         return NumCodePoints;
     }
     
-    static uint64_t UTF32_GetStringSizeInUTF8CodeUnits(UTF32 *String) {
+    uint64_t UTF8_GetStringSizeInGraphemes(UTF8 *String) {
+        uint64_t NumGraphemes  = 1ULL;
+        if (String != NULL) {
+            UTF32 *Decoded     = UTF8_Decode(String);
+            NumGraphemes       = UTF32_GetStringSizeInGraphemes(Decoded);
+            UTF32_Deinit(Decoded);
+        } else {
+            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+        }
+        return NumGraphemes;
+    }
+    
+    uint64_t UTF16_GetStringSizeInGraphemes(UTF16 *String) {
+        uint64_t NumGraphemes  = 1ULL;
+        if (String != NULL) {
+            UTF32 *Decoded     = UTF16_Decode(String);
+            NumGraphemes       = UTF32_GetStringSizeInGraphemes(Decoded);
+            UTF32_Deinit(Decoded);
+        } else {
+            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+        }
+        return NumGraphemes;
+    }
+    
+    static bool UTF32_CodePointIsGraphemeExtender(UTF32 CodePoint) {
+        bool IsGraphemeExtender    = No;
+        for (uint64_t GraphemeExtender = 0ULL; GraphemeExtender < GraphemeExtensionTableSize; GraphemeExtender++) {
+            if (CodePoint == GraphemeExtensionTable[GraphemeExtender]) {
+                IsGraphemeExtender = Yes;
+                break;
+            }
+        }
+        return IsGraphemeExtender;
+    }
+    
+    uint64_t UTF32_GetStringSizeInGraphemes(UTF32 *String) {
+        uint64_t NumGraphemes         = 1ULL;
         uint64_t CodePoint            = 0ULL;
-        uint64_t UTF8CodeUnits        = 0ULL;
         if (String != NULL) {
             while (String[CodePoint] != FoundationIONULLTerminator) {
-                if (String[CodePoint] <= 0x7F) {
-                    UTF8CodeUnits    += 1;
-                } else if (String[CodePoint] >= 0x80 && String[CodePoint] <= 0x7FF) {
-                    UTF8CodeUnits    += 2;
-                } else if (String[CodePoint] >= 0x800 && String[CodePoint] <= 0xFFFF) {
-                    UTF8CodeUnits    += 3;
-                } else if (String[CodePoint] >= 0x10000 && String[CodePoint] <= UnicodeMaxCodePoint) {
-                    UTF8CodeUnits    += 4;
+                while (UTF32_CodePointIsGraphemeExtender(String[CodePoint]) == Yes) {
+                    CodePoint        += 1;
                 }
+                NumGraphemes         += 1;
                 CodePoint            += 1;
             }
         } else {
             Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
         }
-        return UTF8CodeUnits;
+        return NumGraphemes;
     }
-    
-    static uint64_t UTF32_GetStringSizeInUTF16CodeUnits(UTF32 *String) {
-        uint64_t CodePoint          = 0ULL;
-        uint64_t UTF16CodeUnits     = 0ULL;
-        if (String != NULL) {
-            while (String[CodePoint] != FoundationIONULLTerminator) {
-                if (String[CodePoint] <= UTF16MaxCodeUnitValue) {
-                    UTF16CodeUnits += 1;
-                } else if (String[CodePoint] > UTF16MaxCodeUnitValue && String[CodePoint] <= UnicodeMaxCodePoint) {
-                    UTF16CodeUnits += 2;
-                }
-                CodePoint          += 1;
-            }
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
-        }
-        return UTF16CodeUnits;
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     static UTF8 *UTF8_ExtractCodePoint(UTF8 *String, uint64_t Offset, uint64_t StringSize) {
         UTF8 *CodeUnits                     = NULL;
@@ -251,199 +435,6 @@ extern "C" {
             Log(Log_DEBUG, __func__, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
         }
         return CodePoint;
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    static bool UTF32_CodePointIsGraphemeExtender(UTF32 CodePoint) {
-        bool IsGraphemeExtender    = No;
-        for (uint64_t GraphemeExtender = 0ULL; GraphemeExtender < GraphemeExtensionTableSize; GraphemeExtender++) {
-            if (CodePoint == GraphemeExtensionTable[GraphemeExtender]) {
-                IsGraphemeExtender = Yes;
-                break;
-            }
-        }
-        return IsGraphemeExtender;
-    }
-    
-    static UTF32 UTF8_DecodeCodePoint(UTF8 *CodeUnits) {
-        UTF32 CodePoint                       = 0;
-        if (CodeUnits != NULL) {
-            uint8_t CodePointSize             = UTF8_GetCodePointSizeInCodeUnits(CodeUnits[0]);
-            switch (CodePointSize) {
-                case 1:
-                    CodePoint                 =  CodeUnits[0] & 0x7F;
-                    break;
-                case 2:
-                    CodePoint                |= (CodeUnits[0] & 0x1F) << 6;
-                    CodePoint                |= (CodeUnits[1] & 0x3F) << 0;
-                    break;
-                case 3:
-                    CodePoint                |= (CodeUnits[0] & 0x0F) << 12;
-                    CodePoint                |= (CodeUnits[1] & 0x1F) << 6;
-                    CodePoint                |= (CodeUnits[2] & 0x1F) << 0;
-                    break;
-                case 4:
-                    CodePoint                |= (CodeUnits[0] & 0x07) << 18;
-                    CodePoint                |= (CodeUnits[1] & 0x3F) << 12;
-                    CodePoint                |= (CodeUnits[2] & 0x3F) <<  6;
-                    CodePoint                |= (CodeUnits[3] & 0x3F) <<  0;
-                    break;
-            }
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("CodeUnits Pointer is NULL"));
-        }
-        return CodePoint;
-    }
-    
-    uint64_t UTF8_GetGraphemeSizeInCodeUnits(UTF8 *String, uint64_t OffsetInCodeUnits) {
-        uint64_t GraphemeSize         = 1ULL;
-        if (String != NULL) {
-            uint64_t CodeUnit         = OffsetInCodeUnits;
-            UTF8    *CodeUnits        = calloc(UTF8MaxCodeUnits, sizeof(UTF8));
-            while (String[CodeUnit] != FoundationIONULLTerminator) {
-                UTF8 Byte             = String[CodeUnit];
-                uint8_t CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Byte);
-                for (uint8_t Byte = 0; Byte < CodePointSize; Byte++) {
-                    CodeUnits[Byte]   = String[CodeUnit + Byte];
-                }
-                UTF32 CodePoint1      = UTF8_DecodeCodePoint(CodeUnits);
-                for (uint64_t GraphemeExt = 0ULL; GraphemeExt < GraphemeExtensionTableSize; GraphemeExt++) {
-                    if (CodePoint1 == GraphemeExtensionTable[GraphemeExt]) {
-                        GraphemeSize += 1;
-                        CodeUnit     += 1;
-                    }
-                }
-            }
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
-        }
-        return GraphemeSize;
-    }
-    
-    uint64_t UTF16_GetGraphemeSizeInCodeUnits(UTF16 *String, uint64_t OffsetInCodeUnits) {
-        uint64_t NumCodeUnits = 1ULL;
-        return NumCodeUnits;
-    }
-    
-    uint64_t UTF32_GetGraphemeSizeInCodePoints(UTF32 *String, uint64_t OffsetInCodePoints) {
-        uint64_t NumCodePoints  = 1ULL;
-        if (String != NULL) {
-            uint64_t CodePoint = OffsetInCodePoints;
-            while (String[CodePoint] != FoundationIONULLTerminator) {
-                for (uint64_t GraphemeExt = 0ULL; GraphemeExt < GraphemeExtensionTableSize; GraphemeExt++) {
-                    while (String[CodePoint] == GraphemeExtensionTable[GraphemeExt]) {
-                        NumCodePoints += 1;
-                        CodePoint     += 1;
-                    }
-                }
-            }
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
-        }
-        return NumCodePoints;
-    }
-    
-    uint64_t UTF8_GetStringSizeInGraphemes(UTF8 *String) {
-        uint64_t NumGraphemes  = 1ULL;
-        if (String != NULL) {
-            UTF32 *Decoded     = UTF8_Decode(String);
-            NumGraphemes       = UTF32_GetStringSizeInGraphemes(Decoded);
-            UTF32_Deinit(Decoded);
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
-        }
-        return NumGraphemes;
-    }
-    
-    uint64_t UTF16_GetStringSizeInGraphemes(UTF16 *String) {
-        uint64_t NumGraphemes  = 1ULL;
-        if (String != NULL) {
-            UTF32 *Decoded     = UTF16_Decode(String);
-            NumGraphemes       = UTF32_GetStringSizeInGraphemes(Decoded);
-            UTF32_Deinit(Decoded);
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
-        }
-        return NumGraphemes;
-    }
-    
-    uint64_t UTF32_GetStringSizeInGraphemes(UTF32 *String) {
-        uint64_t NumGraphemes         = 1ULL;
-        uint64_t CodePoint            = 0ULL;
-        if (String != NULL) {
-            while (String[CodePoint] != FoundationIONULLTerminator) {
-                while (UTF32_CodePointIsGraphemeExtender(String[CodePoint]) == Yes) {
-                    CodePoint        += 1;
-                }
-                NumGraphemes         += 1;
-                CodePoint            += 1;
-            }
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
-        }
-        return NumGraphemes;
-    }
-    
-    uint64_t UTF8_GetNumFormatSpecifiers(UTF8 *String) {
-        uint64_t NumSpecifiers         = 0ULL;
-        uint64_t CodeUnit              = 0ULL;
-        if (String != NULL) {
-            while (String[CodeUnit] != FoundationIONULLTerminator) {
-                if (String[CodeUnit] == '%') {
-                    NumSpecifiers     += 1;
-                }
-                CodeUnit              += 1;
-            }
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
-        }
-        return NumSpecifiers;
-    }
-    
-    uint64_t UTF16_GetNumFormatSpecifiers(UTF16 *String) {
-        uint64_t NumSpecifiers         = 0ULL;
-        uint64_t CodeUnit              = 0ULL;
-        if (String != NULL) {
-            while (String[CodeUnit] != FoundationIONULLTerminator) {
-                if (String[CodeUnit] == UTF16Character('%')) {
-                    NumSpecifiers     += 1;
-                }
-                CodeUnit              += 1;
-            }
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
-        }
-        return NumSpecifiers;
-    }
-    
-    uint64_t UTF32_GetNumFormatSpecifiers(UTF32 *String) {
-        uint64_t NumSpecifiers         = 0ULL;
-        uint64_t CodePoint             = 0ULL;
-        if (String != NULL) {
-            while (String[CodePoint] != FoundationIONULLTerminator) {
-                if (String[CodePoint] == UTF32Character('%')) {
-                    NumSpecifiers     += 1;
-                }
-                CodePoint             += 1;
-            }
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
-        }
-        return NumSpecifiers;
     }
     
     UTF8 *UTF8_ExtractGrapheme(UTF8 *String, uint64_t Grapheme2Extract) {
@@ -519,6 +510,23 @@ extern "C" {
         }
         return Grapheme;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     bool UTF8_HasBOM(UTF8 *String) {
         bool StringHasABOM        = No;
@@ -978,26 +986,6 @@ extern "C" {
             Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
         }
         return DecodedString;
-    }
-    
-    static UTF32 UTF16_DecodeCodePoint(UTF16 *CodeUnits) {
-        UTF32 CodePoint                       = 0;
-        if (CodeUnits != NULL) {
-            uint8_t CodePointSize             = UTF16_GetCodePointSizeInCodeUnits(CodeUnits[0]);
-            switch (CodePointSize) {
-                case 1:
-                    CodePoint                 =  CodeUnits[0];
-                    break;
-                case 2:
-                    CodePoint                |= UTF16MaxCodeUnitValue + 1;
-                    CodePoint                |= (CodeUnits[0] & UTF16SurrogateMask) << UTF16SurrogateShift;
-                    CodePoint                |= (CodeUnits[1] & UTF16SurrogateMask);
-                    break;
-            }
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("CodeUnits Pointer is NULL"));
-        }
-        return CodePoint;
     }
     
     StringIOByteOrders UTF16_GetByteOrder(UTF16 CodeUnit) {
@@ -2979,77 +2967,6 @@ extern "C" {
         return NumDigits;
     }
     
-    UTF8 *UTF8_Format(UTF8 *Format, ...) {
-        UTF8 *Format8                        = NULL;
-        if (Format != NULL) {
-            uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
-            if (NumSpecifiers > 0) {
-                UTF32 *Format32              = UTF8_Decode(Format);
-                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF8);
-                va_list VariadicArguments;
-                va_start(VariadicArguments, Format);
-                Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
-                va_end(VariadicArguments);
-                UTF32 *FormattedString       = FormatString_UTF32(Format32, Specifiers);
-                UTF32_Deinit(Format32);
-                FormatSpecifiers_Deinit(Specifiers);
-                Format8                      = UTF8_Encode(FormattedString);
-                UTF32_Deinit(FormattedString);
-            } else {
-                Format8                      = Format;
-            }
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
-        }
-        return Format8;
-    }
-    
-    UTF16 *UTF16_Format(UTF16 *Format, ...) {
-        UTF16 *Format16                      = NULL;
-        if (Format != NULL) {
-            uint64_t NumSpecifiers           = UTF16_GetNumFormatSpecifiers(Format);
-            if (NumSpecifiers > 0) {
-                UTF32 *Format32              = UTF16_Decode(Format);
-                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF16);
-                va_list VariadicArguments;
-                va_start(VariadicArguments, Format);
-                Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
-                va_end(VariadicArguments);
-                UTF32 *FormattedString       = FormatString_UTF32(Format32, Specifiers);
-                UTF32_Deinit(Format32);
-                FormatSpecifiers_Deinit(Specifiers);
-                Format16                     = UTF16_Encode(FormattedString);
-                UTF32_Deinit(FormattedString);
-            } else {
-                Format16                     = Format;
-            }
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
-        }
-        return Format16;
-    }
-    
-    UTF32 *UTF32_Format(UTF32 *Format, ...) {
-        UTF32 *FormattedString               = NULL;
-        if (Format != NULL) {
-            uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
-            if (NumSpecifiers > 0) {
-                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format, NumSpecifiers, StringType_UTF32);
-                va_list VariadicArguments;
-                va_start(VariadicArguments, Format);
-                Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
-                va_end(VariadicArguments);
-                FormattedString              = FormatString_UTF32(Format, Specifiers);
-                FormatSpecifiers_Deinit(Specifiers);
-            } else {
-                FormattedString              = Format;
-            }
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
-        }
-        return FormattedString;
-    }
-    
     void UTF8_Deinit(UTF8 *String) {
         if (String != NULL) {
             free(String);
@@ -3345,69 +3262,6 @@ extern "C" {
         } else {
             Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
         }
-    }
-    
-    UTF8 **UTF8_Deformat(UTF8 *Format, UTF8 *Result) {
-        UTF8 **StringArray                   = NULL;
-        if (Format != NULL && Result != NULL) {
-            uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
-            if (NumSpecifiers > 0) {
-                UTF32 *Format32              = UTF8_Decode(Format);
-                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF8);
-                UTF32 *Result32              = UTF8_Decode(Result);
-                UTF32 **Strings32            = DeformatString_UTF32(Format32, Result32, Specifiers);
-                UTF32_Deinit(Format32);
-                UTF32_Deinit(Result32);
-                FormatSpecifiers_Deinit(Specifiers);
-                StringArray                  = UTF8_StringArray_Encode(Strings32);
-                UTF32_StringArray_Deinit(Strings32);
-            }
-        } else if (Format == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Format Pointer is NULL"));
-        } else if (Result == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Result String is NULL"));
-        }
-        return StringArray;
-    }
-    
-    UTF16 **UTF16_Deformat(UTF16 *Format, UTF16 *Result) {
-        UTF16 **StringArray                  = NULL;
-        if (Format != NULL && Result != NULL) {
-            uint64_t NumSpecifiers           = UTF16_GetNumFormatSpecifiers(Format);
-            if (NumSpecifiers > 0) {
-                UTF32 *Format32              = UTF16_Decode(Format);
-                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF16);
-                UTF32 *Result32              = UTF16_Decode(Result);
-                UTF32 **Strings32            = DeformatString_UTF32(Format32, Result32, Specifiers);
-                UTF32_Deinit(Format32);
-                UTF32_Deinit(Result32);
-                FormatSpecifiers_Deinit(Specifiers);
-                StringArray                  = UTF16_StringArray_Encode(Strings32);
-                UTF32_StringArray_Deinit(Strings32);
-            }
-        } else if (Format == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Format Pointer is NULL"));
-        } else if (Result == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Result String is NULL"));
-        }
-        return StringArray;
-    }
-    
-    UTF32 **UTF32_Deformat(UTF32 *Format, UTF32 *Result) {
-        UTF32 **StringArray                  = NULL;
-        if (Format != NULL && Result != NULL) {
-            uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
-            if (NumSpecifiers > 0) {
-                FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format, NumSpecifiers, StringType_UTF32);
-                StringArray                  = DeformatString_UTF32(Format, Result, Specifiers);
-                FormatSpecifiers_Deinit(Specifiers);
-            }
-        } else if (Format == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Format Pointer is NULL"));
-        } else if (Result == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Result String is NULL"));
-        }
-        return StringArray;
     }
     /* StringArray Functions */
     
