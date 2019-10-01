@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include "../include/Macros.h"
+#include "../include/CryptographyIO.h"
 
 #pragma once
 
@@ -31,10 +32,6 @@ extern "C" {
     typedef               uint_least32_t   UTF32;
 #endif /* __CHAR32_TYPE__ */
 #endif /* FoundationIO_StringType32 */
-    
-#ifndef TestIO_RegisterTest
-#define TestIO_RegisterTest(FunctionName, ...)
-#endif
     
     /*!
      @enum                      TestIO_TestStates
@@ -64,7 +61,17 @@ extern "C" {
                                 TestResult_Untested             = 3,
     } TestIO_TestResults;
     
-    typedef struct Entropy Entropy; // Forward declare Entropy from CryptographyIO
+#ifndef TESTIO_ARGUMENT
+#define TESTIO_ARGUMENT(...) __VA_ARGS__
+#endif
+    
+#ifndef TESTIO_CAT
+#define TESTIO_CAT(TOKEN1, TOKEN2, TOKEN3) TOKEN1 ## TOKEN2 ## _ ## TOKEN3
+#endif
+    
+#ifndef TestIO_CreateFunctionName
+#define TestIO_CreateFunctionName(Module, Function) TESTIO_CAT(Test_, Module, Function)
+#endif
     
     /*!
      @abstract                                                  "Gets how accurate the clock is".
@@ -74,7 +81,7 @@ extern "C" {
     /*!
      @abstract                                                  "Gets the time from the highest frequency timer for each platform".
      */
-    uint64_t                    GetTime(void);
+    uint64_t                    GetTime_Elapsed(void);
     
     /*!
      @abstract                                                  "Generates a valid UTF-32 string, containing up to 8192 CodePoints".
