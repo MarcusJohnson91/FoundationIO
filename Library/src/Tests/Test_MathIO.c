@@ -57,8 +57,6 @@ extern "C" {
         double  Decimal  = Entropy_GenerateDecimal(Random);
         double  Ceiled   = CeilD(Decimal);
         double  Floored  = FloorD(Decimal);
-        printf("Ceiled: %F\n", Ceiled);
-        printf("Floored: %F\n", Floored);
     }
     
     int main() {

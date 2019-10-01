@@ -655,7 +655,70 @@ extern "C" {
         return String;
     }
     
-    void Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments) __attribute__((no_sanitize("signed-integer-overflow", "integer"))) {
+    static void Format_Specifiers_FixOffset(FormatSpecifiers *Specifiers) __attribute__((no_sanitize("signed-integer-overflow", "integer"))) {
+        if (Specifiers != NULL) {
+            /*
+             Specifier0:
+             ReplacementSize: 1
+             Length+%:        6
+             Position:        0
+             Before:          "NumArgs: %1$llu, Equal: %llu, Type: %3$s"
+             After:           "NumArgs: 3, Equal: %llu, Type: %3$s"
+             Skip:            Replacement - (Length + 1) = -5
+             
+             Specifier1:
+             ReplacementSize: 4
+             Length+%:        4 # Skip is Equal
+             Position:        1
+             Before:          "NumArgs: 3, Equal: %llu, Type: %3$s"
+             After:           "NumArgs: 3, Equal: 1234, Type: %3$s"
+             Skip:            Replacement - (Length + 1) = 0
+             
+             Specifier2:
+             ReplacementSize: 10
+             Length+%:        4 # Skip is Negative?
+             Position:        2
+             Before:          "NumArgs: 3, Equal: 1234, Type: %3$s"
+             After:           "NumArgs: 3, Equal: 1234, Type: Positional"
+             Skip:            Replacement - (Length + 1) = 6
+             
+             The goal here is to figure out where the new string returns to the non-replacement text so we can copy that stuff properly.
+             */
+            
+            for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers - 1; Specifier++) { // Last element can't be reached
+                int64_t  Skip                                  = 0; // FIXME: What if we Didn't reset it each time, and removed the loop and accumulated it here?
+                uint64_t Position                              = Specifier;
+                if (Specifiers->Specifiers[Specifier].IsPositional == Yes) {
+                    Position                                   = Specifiers->Specifiers[Specifier].PositionalArg;
+                } else {
+                    Position                                   = Specifier;
+                }
+                
+                uint64_t ReplacementSize                       = UTF32_GetStringSizeInCodePoints(Specifiers->Specifiers[Position].Argument);
+                uint64_t MinimumWidth                          = Specifiers->Specifiers[Position].MinWidth;
+                uint64_t Precision                             = Specifiers->Specifiers[Position].Precision;
+                uint64_t Length                                = Specifiers->Specifiers[Position].Length + 1; // Plus 1 to account for the %
+                if (Specifiers->Specifiers[Position].MinWidthFlag != MinWidth_Unknown) {
+                    if (ReplacementSize < MinimumWidth) {
+                        Skip                                  += MinimumWidth - ReplacementSize;
+                    }
+                }
+                if (Specifiers->Specifiers[Position].PrecisionFlag != Precision_Unknown) {
+                    if (ReplacementSize > Precision) {
+                        Skip                                  -= ReplacementSize - Precision;
+                    }
+                }
+                Skip                                          += ReplacementSize - Length;
+                for (uint64_t Specifier2 = Specifier + 1; Specifier2 < Specifiers->NumSpecifiers; Specifier2++) {
+                    Specifiers->Specifiers[Specifier2].Offset += Skip;
+                }
+            }
+        } else {
+            Log(Log_DEBUG, __func__, UTF8String("FormatSpecifiers Pointer is NULL"));
+        }
+    }
+    
+    void Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments) {
         if (Specifiers != NULL) {
             uint64_t                        Specifier0 = 0ULL;
             uint64_t                        Position   = 0x7FFFFFFFFFFFFFFE;
@@ -761,7 +824,7 @@ extern "C" {
                     Specifiers->Specifiers[Position].Argument              = UTF32_Clone(UTF32String("%"));
                 }
                 Specifier0                                                 += 1;
-            } // This works fine
+            }
             
             if (Specifiers->NumDuplicateSpecifiers > 0) {
                 for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
@@ -777,45 +840,6 @@ extern "C" {
                         Specifiers->Specifiers[Specifier].Argument         = UTF32_Clone(Specifiers->Specifiers[Position].Argument);
                     }
                 }
-            }
-            
-            uint64_t Specifier1                                = 0ULL;
-            while (Specifier1 < Specifiers->NumSpecifiers) { // This is where it's going wrong.
-                uint64_t Position                              = 0ULL;
-                if (Specifiers->Specifiers[Specifier1].IsPositional == Yes) {
-                    Position                                   = Specifiers->Specifiers[Specifier1].PositionalArg;
-                } else {
-                    Position                                   = Specifier1;
-                }
-                
-                uint64_t ReplacementSize                       = UTF32_GetStringSizeInCodePoints(Specifiers->Specifiers[Position].Argument);
-                uint64_t MinimumWidth                          = Specifiers->Specifiers[Position].MinWidth;
-                uint64_t Precision                             = Specifiers->Specifiers[Position].Precision;
-                uint64_t Length                                = Specifiers->Specifiers[Position].Length;
-                int64_t  Skip                                  = 0;
-                if (Specifiers->Specifiers[Position].MinWidthFlag != MinWidth_Unknown) {
-                    if (ReplacementSize < MinimumWidth) {
-                        Skip                                  += MinimumWidth - ReplacementSize;
-                    }
-                }
-                if (Specifiers->Specifiers[Position].PrecisionFlag != Precision_Unknown) {
-                    if (ReplacementSize > Precision) {
-                        Skip                                  -= ReplacementSize - Precision;
-                    }
-                }
-                
-                if (ReplacementSize < Length + 1) {
-                    Skip                                      += (ReplacementSize - Length) - 1;
-                } else {
-                    Skip                                      += (ReplacementSize - (Length + 1));
-                }
-                
-                uint64_t Specifier2                            = Specifier1 + 1;
-                while (Specifier2 < Specifiers->NumSpecifiers) {
-                    Specifiers->Specifiers[Specifier2].Offset += Skip;
-                    Specifier2                                += 1;
-                }
-                Specifier1                                    += 1;
             }
         } else {
             Log(Log_DEBUG, __func__, UTF8String("FormatSpecifiers Pointer is NULL"));
@@ -953,6 +977,7 @@ extern "C" {
                 va_start(VariadicArguments, Format);
                 Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
+                Format_Specifiers_FixOffset(Specifiers);
                 UTF32 *FormattedString       = FormatString_UTF32(Format32, Specifiers);
                 UTF32_Deinit(Format32);
                 FormatSpecifiers_Deinit(Specifiers);
@@ -978,6 +1003,7 @@ extern "C" {
                 va_start(VariadicArguments, Format);
                 Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
+                Format_Specifiers_FixOffset(Specifiers);
                 UTF32 *FormattedString       = FormatString_UTF32(Format32, Specifiers);
                 UTF32_Deinit(Format32);
                 FormatSpecifiers_Deinit(Specifiers);
@@ -1002,6 +1028,7 @@ extern "C" {
                 va_start(VariadicArguments, Format);
                 Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
+                Format_Specifiers_FixOffset(Specifiers);
                 FormattedString              = FormatString_UTF32(Format, Specifiers);
                 FormatSpecifiers_Deinit(Specifiers);
             } else {
@@ -1020,6 +1047,7 @@ extern "C" {
             if (NumSpecifiers > 0) {
                 UTF32 *Format32              = UTF8_Decode(Format);
                 FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF8);
+                Format_Specifiers_FixOffset(Specifiers);
                 UTF32 *Result32              = UTF8_Decode(Result);
                 UTF32 **Strings32            = DeformatString_UTF32(Format32, Result32, Specifiers);
                 UTF32_Deinit(Format32);
@@ -1043,6 +1071,7 @@ extern "C" {
             if (NumSpecifiers > 0) {
                 UTF32 *Format32              = UTF16_Decode(Format);
                 FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF16);
+                Format_Specifiers_FixOffset(Specifiers);
                 UTF32 *Result32              = UTF16_Decode(Result);
                 UTF32 **Strings32            = DeformatString_UTF32(Format32, Result32, Specifiers);
                 UTF32_Deinit(Format32);
@@ -1065,6 +1094,7 @@ extern "C" {
             uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format, NumSpecifiers, StringType_UTF32);
+                Format_Specifiers_FixOffset(Specifiers);
                 StringArray                  = DeformatString_UTF32(Format, Result, Specifiers);
                 FormatSpecifiers_Deinit(Specifiers);
             }

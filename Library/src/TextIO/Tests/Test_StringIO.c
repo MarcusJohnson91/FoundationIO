@@ -24,9 +24,6 @@ extern "C" {
             uint64_t  NumCodePoints    = Entropy_GenerateInteger(Random, 16);
             UTF32    *GeneratedString  = UTF32_GenerateString(Random, NumCodePoints);
             UTF8     *Generated8       = UTF8_Encode(GeneratedString);
-            //uint64_t  Generated8Units  = UTF8_GetStringSizeInCodeUnits(Generated8);
-            //uint64_t  Generated8Points = UTF8_GetStringSizeInCodePoints(Generated8);
-            //printf("StringSizeInCodeUnits: %llu\nStringSizeInCodePoints %llu\n", Generated8Units, Generated8Points);
             UTF32    *Decoded8         = UTF8_Decode(Generated8);
             bool      StringsMatch     = UTF32_Compare(GeneratedString, Decoded8);
             if (StringsMatch == No) {
@@ -110,8 +107,9 @@ extern "C" {
         
         bool TestPassed                        = false;
         
-        UTF16 *Positional1                     = UTF16_Format(UTF16String("NumArgs: %1$llu, Equal: %llu, Type: %3$s"), 3, 1234, UTF16String("Positional"));
+        UTF16 *Positional1                     = UTF16_Format(UTF16String("NumArgs: %1$llu, Equal: %llu, Type: %3$S"), 3, 1234, UTF16String("Positional"));
         bool  Positional1Test                  = UTF16_Compare(Positional1, UTF16String("NumArgs: 3, Equal: 1234, Type: Positional"));
+        // "NumArgs: 3, Equal: 1234, Type: Positional"
         if (Positional1Test == No) {
             Log(Log_DEBUG, __func__, UTF8String("Positional1Test Failed"));
         }
