@@ -1,11 +1,9 @@
 #include "../include/StringIO.h"               /* Included for our declarations */
-#include "../include/Private/UnicodeTables.h"  /* Included for the Unicode tables */
-#include "../include/Private/NumberTables.h"   /* Included for the Number tables */
-
 #include "../include/Log.h"                    /* Included for error logging */
 #include "../include/Math.h"                   /* Included for endian swapping */
 #include "../include/FormatIO.h"               /* Included for the String formatting code */
-
+#include "../include/Private/UnicodeTables.h"  /* Included for the Unicode tables */
+#include "../include/Private/NumberTables.h"   /* Included for the Number tables */
 #include <stdarg.h>                            /* Included for va_list, va_copy, va_start, va_end */
 #include <wchar.h>                             /* Included for Fwide */
 
@@ -145,6 +143,7 @@ extern "C" {
                     }
                 }
             }
+            free(CodeUnits);
         } else {
             Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
         }
@@ -190,6 +189,7 @@ extern "C" {
                     }
                 }
             }
+            free(CodeUnits);
         } else {
             Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
         }
@@ -300,7 +300,8 @@ extern "C" {
                 if (String[CodeUnit] <= UTF16MaxCodeUnitValue && (String[CodeUnit] < UTF16HighSurrogateStart || String[CodeUnit] > UTF16LowSurrogateEnd)) {
                     NumCodePoints         += 1;
                 } else if (String[CodeUnit] >= UTF16HighSurrogateStart && String[CodeUnit] <= UTF16HighSurrogateEnd) {
-                    NumCodePoints         += 1;
+                    NumCodePoints         += 2;
+                    CodeUnit              += 1;
                 }
                 CodeUnit                  += 1;
             }
@@ -982,6 +983,7 @@ extern "C" {
             } else if (CodeUnits == NULL) {
                 Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate CodeUnits to decode each CodePoint"));
             }
+            free(CodeUnits);
         } else {
             Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
         }
@@ -1047,6 +1049,7 @@ extern "C" {
             } else if (CodeUnits == NULL) {
                 Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate CodeUnits to decode each CodePoint"));
             }
+            free(CodeUnits);
         } else {
             Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
         }

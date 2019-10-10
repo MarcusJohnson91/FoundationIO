@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include "../include/Macros.h"
+#include "../include/StringIO.h"
 
 
 #pragma once

@@ -1,5 +1,4 @@
-#include "../include/CryptographyIO.h"       /* Included for our Declarations */
-
+#include "../include/CryptographyIO.h"       /* Included for our declarations */
 #include "../include/Log.h"                  /* Included for error logging */
 #include "../include/Math.h"                 /* Included for Bits2Bytes, etc */
 #include "../include/Private/NumberTables.h" /* Included for BitMaskTables */
