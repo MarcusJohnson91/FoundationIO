@@ -1,7 +1,6 @@
 #include "../include/Log.h"            /* Included for the Log declarations */
-
 #include "../include/StringIO.h"       /* Included for StringIO's declarations */
-
+#include "../include/FormatIO.h"       /* Included for the Formatter */
 #include <stdarg.h>                    /* Included for va_list, va_copy, va_start, va_end */
 
 #ifdef __cplusplus
@@ -113,15 +112,14 @@ extern "C" {
         va_list VariadicArguments;
         va_start(VariadicArguments, Description);
         UTF8 *VariadicString  = UTF8_Format(Description, VariadicArguments);
-        va_end(VariadicArguments);
         
         UTF8 *FormattedString = NULL;
         
         UTF8 *ErrorType[2]    = {UTF8String("ERROR"), UTF8String("Mistake")};
         if (Log_ProgramName != NULL) {
-            FormattedString   = UTF8_Format(UTF8String("%s: %s in %s; \"%s\"%s"), Log_ProgramName, ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
+            FormattedString   = UTF8_Format(UTF8String("%s in %s's %s: %s%Us"), Log_ProgramName, ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine32);
         } else {
-            FormattedString   = UTF8_Format(UTF8String("%s: %s - \"%s\"%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
+            FormattedString   = UTF8_Format(UTF8String("%s in %s: %Us"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine32);
         }
         
         if (Severity == Log_USER) {
@@ -135,6 +133,7 @@ extern "C" {
         }
         free(VariadicString);
         free(FormattedString);
+        va_end(VariadicArguments);
     }
     
     void Log_Deinit(void) {

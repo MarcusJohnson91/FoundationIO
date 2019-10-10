@@ -1,4 +1,5 @@
 #include "../Library/include/StringIO.h"
+#include "../Library/include/FormatIO.h"
 
 #include "../Library/include/TestIO.h"
 #include "../Library/include/Log.h"
@@ -89,6 +90,20 @@ extern "C" {
         return TestPassed;
     }
     
+    bool Test_Deformat(void) {
+        bool TestPassed = No;
+        UTF8 **DeformatTest1 = UTF8_Deformat(UTF8String("NumArgs: %1$llu, Equal: %llu, Type: %3$s"), UTF16String("NumArgs: 3, Equal: 1234, Type: Positional"));
+        bool  SubString1     = UTF8_Compare(DeformatTest1[0], UTF8String("3"));
+        bool  SubString2     = UTF8_Compare(DeformatTest1[1], UTF8String("1234"));
+        bool  SubString3     = UTF8_Compare(DeformatTest1[2], UTF8String("Positional"));
+        if (SubString1 == No || SubString2 == No || SubString3 == No) {
+            Log(Log_DEBUG, __func__, UTF8String("SubString doesn't match"));
+        } else {
+            TestPassed       = Yes;
+        }
+        return TestPassed;
+    }
+    
     bool Test_UTF8_Format(void) {
         /*
          TestIO Notes:
@@ -107,8 +122,8 @@ extern "C" {
         
         bool TestPassed                        = false;
         
-        UTF16 *Positional1                     = UTF16_Format(UTF16String("NumArgs: %1$llu, Equal: %llu, Type: %3$S"), 3, 1234, UTF16String("Positional"));
-        bool  Positional1Test                  = UTF16_Compare(Positional1, UTF16String("NumArgs: 3, Equal: 1234, Type: Positional"));
+        UTF8 *Positional1                      = UTF8_Format(UTF8String("NumArgs: %1$llu, Equal: %llu, Type: %3$s"), 3, 1234, UTF8String("Positional"));
+        bool  Positional1Test                  = UTF8_Compare(Positional1, UTF16String("NumArgs: 3, Equal: 1234, Type: Positional"));
         // "NumArgs: 3, Equal: 1234, Type: Positional"
         if (Positional1Test == No) {
             Log(Log_DEBUG, __func__, UTF8String("Positional1Test Failed"));
@@ -282,9 +297,10 @@ extern "C" {
     
     int main(int argc, const char *argv[]) {
         bool TestSuitePassed      = false;
-        Entropy *Random           = Entropy_Init(8000000);
+        //Entropy *Random           = Entropy_Init(8000000);
+        TestSuitePassed           = Test_Deformat();
         //Test_UTF8_EncodeDecode(Random);
-        TestSuitePassed           = Test_UTF8_Format();
+        //TestSuitePassed           = Test_UTF8_Format();
         //TestSuitePassed           = Test_UTF8_StitchSubString();
         return TestSuitePassed;
     }

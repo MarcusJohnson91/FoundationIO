@@ -1,7 +1,7 @@
-#include "../include/CommandLineIO.h"  /* Included for the CommandLineIO declarations */
-
-#include "../include/Log.h"            /* Included for Log */
+#include "../include/CommandLineIO.h"  /* Included for our declarations */
+#include "../include/Log.h"            /* Included for Logging */
 #include "../include/StringIO.h"       /* Included for StringIO's declarations */
+#include "../include/FormatIO.h"       /* Included for Formatter */
 
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
 #include <signal.h>                    /* Included for SIGWINCH handling */
@@ -250,7 +250,7 @@ extern "C" {
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 UTF8    *Indicator           = UTF8_Init(CommandLineIO_GetTerminalWidth());
                 UTF8    *IndicatorFinal      = UTF8_Insert(Indicator, "-", 0);
-                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%s %lld/%lld %hhu/%s %s]"), IndicatorFinal, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, FoundationIONewLine8);
+                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%s %lld/%lld %hhu/%Us %s]"), IndicatorFinal, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, FoundationIONewLine32);
                 UTF8_WriteLine(stdout, FormattedString);
                 free(Indicator);
             }
@@ -353,7 +353,7 @@ extern "C" {
         if (CLI != NULL) {
             UTF8 *Name = UTF8_Encode(CLI->ProgramName);
             
-            UTF8 *ProgramsOptions = UTF8_Format(UTF8String("%s's Options (-|--|/):%s"), Name, FoundationIONewLine8);
+            UTF8 *ProgramsOptions = UTF8_Format(UTF8String("%s's Options (-|--|/):%Us"), Name, FoundationIONewLine32);
             UTF8_WriteLine(stdout, ProgramsOptions);
             free(Name);
             free(ProgramsOptions);
@@ -363,7 +363,7 @@ extern "C" {
                 UTF8 *SwitchName        = UTF8_Encode(CLI->OptionIDs[Switch].Name);
                 UTF8 *SwitchDescription = UTF8_Encode(CLI->OptionIDs[Switch].Description);
                 
-                UTF8 *SwitchInfo        = UTF8_Format(UTF8String("%s: %s%s"), SwitchName, SwitchDescription, FoundationIONewLine8);
+                UTF8 *SwitchInfo        = UTF8_Format(UTF8String("%s: %s%Us"), SwitchName, SwitchDescription, FoundationIONewLine32);
                 
                 UTF8_WriteLine(stdout, SwitchInfo);
                 if (CurrentSwitchType == OptionType_PotentialSlaves && CLI->OptionIDs[Switch].NumOptionSlaves > 0) {
@@ -371,7 +371,7 @@ extern "C" {
                         UTF8 *SlaveName        = UTF8_Encode(CLI->OptionIDs[SlaveSwitch].Name);
                         UTF8 *SlaveDescription = UTF8_Encode(CLI->OptionIDs[SlaveSwitch].Description);
                         
-                        UTF8 *SlaveSwitchInfo  = UTF8_Format(UTF8String("\t%s: %s%s"), SlaveName, SlaveDescription, FoundationIONewLine8);
+                        UTF8 *SlaveSwitchInfo  = UTF8_Format(UTF8String("\t%s: %s%Us"), SlaveName, SlaveDescription, FoundationIONewLine32);
                         
                         UTF8_WriteLine(stdout, SlaveSwitchInfo);
                         

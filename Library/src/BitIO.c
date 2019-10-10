@@ -1,6 +1,5 @@
 #include "../include/BitIO.h"                /* Included for our declarations */
-
-#include "../include/Log.h"                  /* Included for Log declarations */
+#include "../include/Log.h"                  /* Included for Logging */
 #include "../include/Math.h"                 /* Included for Integer functions */
 #include "../include/StringIO.h"             /* Included for StringIO's declarations */
 #include "../include/CryptographyIO.h"       /* Included for Entropy_GenerateInteger for GUUID_Generate */
