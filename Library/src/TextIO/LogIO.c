@@ -131,7 +131,6 @@ extern "C" {
         if (Log_LogFile != NULL) {
             UTF8_WriteLine(Log_LogFile, FormattedString);
         }
-        free(VariadicString);
         free(FormattedString);
         va_end(VariadicArguments);
     }
