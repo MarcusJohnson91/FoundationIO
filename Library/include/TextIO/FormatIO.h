@@ -97,7 +97,7 @@ extern "C" {
      @return                               "Returns the formatted string encoded using the UTF-8 format".
      */
 #if   defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
-    UTF8                 *UTF8_Format(UTF8 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+    UTF8                 *UTF8_Format(UTF8 *Format, ...) __attribute__((__format__(__printf__, 1, 2)));
 #elif defined(_MSC_VER)
 #include <sal.h>
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)

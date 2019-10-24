@@ -2888,16 +2888,8 @@ extern "C" {
                     CodePoint         += 1;
                 }
             } else if (Base == Base_Integer_Radix10) {
-                while (String[CodePoint] != FoundationIONULLTerminator && ValidDigit == Yes) {
-                    for (uint8_t Base10CodePoint = 0; Base10CodePoint < IntegerTableBase10Size; Base10CodePoint++) {
-                        if (String[CodePoint] == IntegerTableBase10[Base10CodePoint]) {
-                            NumDigits += 1;
-                            break;
-                        } else if (Base10CodePoint == IntegerTableBase10Size - 1) {
-                            ValidDigit = No;
-                            break;
-                        }
-                    }
+                while (String[CodePoint] != FoundationIONULLTerminator && (String[CodePoint] >= '0' && String[CodePoint] < '9')) {
+                    NumDigits         += 1;
                     CodePoint         += 1;
                 }
             } else if (Base == Base_Integer_Radix16_Uppercase) {
@@ -2968,6 +2960,21 @@ extern "C" {
             Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
         }
         return NumDigits;
+    }
+    
+    uint64_t UTF32_GetSubStringLength(UTF32 *Format, UTF32 *Formatted, uint64_t Offset) {
+        uint64_t Length        = 0ULL;
+        if (Format != NULL && Formatted != NULL) {
+            uint64_t CodePoint = Offset;
+            while (Format[CodePoint] != Formatted[Offset] && Format[CodePoint] != FoundationIONULLTerminator && Formatted[CodePoint] != FoundationIONULLTerminator) {
+                Length        += 1;
+            }
+        } else if (Format == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("Format String Poitner is NUlL"));
+        } else if (Formatted == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("Formatted String Pointer is NULL"));
+        }
+        return Length;
     }
     
     void UTF8_Deinit(UTF8 *String) {
@@ -3229,6 +3236,34 @@ extern "C" {
             Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
         }
         return Encoded;
+    }
+    
+    void UTF8_StringArray_Print(UTF8 **StringArray) {
+        if (StringArray != NULL) {
+            // Get the number of strings
+            // Print each string
+            uint64_t NumStrings = UTF8_StringArray_GetNumStrings(StringArray);
+            printf("\nStringArray: NumStrings = %llu\n", NumStrings);
+            fflush(stdout);
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                printf("%s\n", StringArray[String]);
+                fflush(stdout);
+            }
+            /*
+             StringArray: NumStrings
+             String0
+             String...
+             StringNum
+             */
+        }
+    }
+    
+    void UTF16_StringArray_Print(UTF16 **StringArray) {
+        uint64_t NumStrings = UTF16_StringArray_GetNumStrings(StringArray);
+        printf("StringArray: NumStrings = %llu", NumStrings);
+        for (uint64_t String = 0ULL; String < NumStrings; String++) {
+            printf("%ls", (wchar_t*) StringArray[String]);
+        }
     }
     
     void UTF8_StringArray_Deinit(UTF8 **StringArray) {

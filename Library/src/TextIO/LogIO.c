@@ -124,12 +124,15 @@ extern "C" {
         
         if (Severity == Log_USER) {
             UTF8_WriteLine(stdout, FormattedString);
+            fflush(stdout);
         } else if (Severity == Log_DEBUG) {
             UTF8_WriteLine(stderr, FormattedString);
+            fflush(stderr);
         }
         
         if (Log_LogFile != NULL) {
             UTF8_WriteLine(Log_LogFile, FormattedString);
+            fflush(Log_LogFile);
         }
         free(FormattedString);
         va_end(VariadicArguments);

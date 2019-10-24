@@ -208,7 +208,7 @@ extern "C" {
                                     case UTF32Character('u'):
                                     case UTF32Character('x'):
                                     case UTF32Character('X'):
-                                        Specifiers->Specifiers[Specifier].Length = CodePoint2 - CodePoint;
+                                        Specifiers->Specifiers[Specifier].Length = (CodePoint2 - CodePoint) + 1;
                                         CodePoint                                = CodePoint2;
                                         break;
                                 }
@@ -683,9 +683,8 @@ extern "C" {
              
              The goal here is to figure out where the new string returns to the non-replacement text so we can copy that stuff properly.
              */
-            
-            for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers - 1; Specifier++) { // Last element can't be reached
-                int64_t  Skip                                  = 0; // FIXME: What if we Didn't reset it each time, and removed the loop and accumulated it here?
+            int64_t  Skip                                      = 0;
+            for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers - 1; Specifier++) {
                 uint64_t Position                              = Specifier;
                 if (Specifiers->Specifiers[Specifier].IsPositional == Yes) {
                     Position                                   = Specifiers->Specifiers[Specifier].PositionalArg;
@@ -693,10 +692,14 @@ extern "C" {
                     Position                                   = Specifier;
                 }
                 
-                uint64_t ReplacementSize                       = UTF32_GetStringSizeInCodePoints(Specifiers->Specifiers[Position].Argument);
+                UTF32   *Argument                              = Specifiers->Specifiers[Position].Argument;
+                uint64_t ReplacementSize                       = 0ULL;
+                if (Argument != NULL) {
+                    ReplacementSize                            = UTF32_GetStringSizeInCodePoints(Argument);
+                }
                 uint64_t MinimumWidth                          = Specifiers->Specifiers[Position].MinWidth;
                 uint64_t Precision                             = Specifiers->Specifiers[Position].Precision;
-                uint64_t Length                                = Specifiers->Specifiers[Position].Length + 1; // Plus 1 to account for the %
+                uint64_t Length                                = Specifiers->Specifiers[Position].Length + 1; // Add 1 for the %
                 if (Specifiers->Specifiers[Position].MinWidthFlag != MinWidth_Unknown) {
                     if (ReplacementSize < MinimumWidth) {
                         Skip                                  += MinimumWidth - ReplacementSize;
@@ -708,10 +711,9 @@ extern "C" {
                     }
                 }
                 Skip                                          += ReplacementSize - Length;
-                for (uint64_t Specifier2 = Specifier + 1; Specifier2 < Specifiers->NumSpecifiers; Specifier2++) {
-                    Specifiers->Specifiers[Specifier2].Offset += Skip;
-                }
+                Specifiers->Specifiers[Specifier + 1].Offset  += Skip;
             }
+            //Specifiers->Specifiers[Specifiers->NumSpecifiers - 1].Offset += Skip;
         } else {
             Log(Log_DEBUG, __func__, UTF8String("FormatSpecifiers Pointer is NULL"));
         }
@@ -879,15 +881,8 @@ extern "C" {
         return Formatted;
     }
     
-    UTF32 **DeformatString_UTF32(UTF32 *Format, UTF32 *Result, FormatSpecifiers *Specifiers) {
-        UTF32 **Deformatted                            = NULL;
-        uint64_t NumStrings                            = 0ULL;
-        for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
-            if (Specifiers->Specifiers[Specifier].BaseType != BaseType_Literal && Specifiers->Specifiers[Specifier].TypeModifier != Modifier_Percent) {
-                NumStrings                            += 1;
-            }
-        }
-        Deformatted                                    = UTF32_StringArray_Init(NumStrings);
+    UTF32 **DeformatString_UTF32(UTF32 *Format, UTF32 *Formatted, FormatSpecifiers *Specifiers) {
+        UTF32 **Deformatted                            = UTF32_StringArray_Init(Specifiers->NumSpecifiers);
         if (Deformatted != NULL) {
             for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) { // Stringify each specifier
                 FormatSpecifier_BaseTypes     BaseType = Specifiers->Specifiers[Specifier].BaseType;
@@ -896,19 +891,32 @@ extern "C" {
                 uint64_t                      Length   = 0ULL;
                 if (BaseType == BaseType_Integer || BaseType == BaseType_Decimal) {
                     StringIOBases             Base     = ConvertTypeModifier2Base(Modifier);
-                    Length                             = UTF32_GetNumDigits(Base, Result, Offset);
-                    Deformatted[Specifier]             = UTF32_ExtractSubString(Result, Offset, Length);
-                    Length                             = 0ULL;
+                    Length                             = UTF32_GetNumDigits(Base, Formatted, Offset); // For Specifier 1 Offset = 19, not 18
+                    Deformatted[Specifier]             = UTF32_ExtractSubString(Formatted, Offset, Length);
                 } else if (BaseType == BaseType_Character) { // Character = Grapheme
-                    Deformatted[Specifier]             = UTF32_ExtractGrapheme(Result, Offset);
+                    Deformatted[Specifier]             = UTF32_ExtractGrapheme(Formatted, Offset);
                 } else if (BaseType == BaseType_String) {
                     uint64_t SubstringStart            = Specifiers->Specifiers[Specifier].Offset + Specifiers->Specifiers[Specifier].Length;
                     uint64_t SubstringEnd              = Specifiers->Specifiers[Specifier].Offset;
                     
                     UTF32 *SubString                   = UTF32_ExtractSubString(Format, SubstringStart, SubstringEnd);
-                    uint64_t EndOffset                 = UTF32_FindSubString(Result, SubString, Specifiers->Specifiers[Specifier].Offset, -1);
+                    uint64_t EndOffset                 = UTF32_FindSubString(Formatted, SubString, Specifiers->Specifiers[Specifier].Offset, -1);
                     UTF32_Deinit(SubString);
-                    Deformatted[Specifier]             = UTF32_ExtractSubString(Result, SubstringStart, EndOffset);
+                    Deformatted[Specifier]             = UTF32_ExtractSubString(Formatted, SubstringStart, EndOffset);
+                }
+                
+                
+                if ((BaseType & BaseType_Integer) == BaseType_Integer || (BaseType & BaseType_Decimal) == BaseType_Decimal || (BaseType & BaseType_Pointer) == BaseType_Pointer) {
+                    StringIOBases             Base     = ConvertTypeModifier2Base(Modifier);
+                    Length                             = UTF32_GetNumDigits(Base, Formatted, Offset + 1);
+                    Deformatted[Specifier]             = UTF32_ExtractSubString(Formatted, Offset + 1, Length);
+                } else if ((BaseType & BaseType_Character) == BaseType_Character) { // Character = Grapheme?
+                    Deformatted[Specifier]             = UTF32_ExtractGrapheme(Formatted, Offset);
+                } else if ((BaseType & BaseType_String) == BaseType_String) {
+                    uint64_t Length                    = UTF32_GetSubStringLength(Format, Formatted, Offset);
+                    Deformatted[Specifier]             = UTF32_ExtractSubString(Formatted, Offset, Length);
+                } else if ((BaseType & BaseType_Literal) == BaseType_Literal && Modifier == Modifier_Percent) {
+                    Deformatted[Specifier]             = UTF32_Clone(UTF32String("%"));
                 }
             }
         } else {
@@ -1039,68 +1047,68 @@ extern "C" {
         return FormattedString;
     }
     
-    UTF8 **UTF8_Deformat(UTF8 *Format, UTF8 *Result) {
+    UTF8 **UTF8_Deformat(UTF8 *Format, UTF8 *Formatted) {
         UTF8 **StringArray                   = NULL;
-        if (Format != NULL && Result != NULL) {
+        if (Format != NULL && Formatted != NULL) {
             uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 UTF32 *Format32              = UTF8_Decode(Format);
                 FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF8);
-                Format_Specifiers_FixOffset(Specifiers);
-                UTF32 *Result32              = UTF8_Decode(Result);
-                UTF32 **Strings32            = DeformatString_UTF32(Format32, Result32, Specifiers);
+                Format_Specifiers_FixOffset(Specifiers); // FIXME: Do we need this?
+                UTF32 *Formatted32           = UTF8_Decode(Formatted);
+                UTF32 **Strings32            = DeformatString_UTF32(Format32, Formatted32, Specifiers);
                 UTF32_Deinit(Format32);
-                UTF32_Deinit(Result32);
+                UTF32_Deinit(Formatted32);
                 FormatSpecifiers_Deinit(Specifiers);
                 StringArray                  = UTF8_StringArray_Encode(Strings32);
                 UTF32_StringArray_Deinit(Strings32);
             }
         } else if (Format == NULL) {
             Log(Log_DEBUG, __func__, UTF8String("Format Pointer is NULL"));
-        } else if (Result == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Result String is NULL"));
+        } else if (Formatted == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("Formatted String is NULL"));
         }
         return StringArray;
     }
     
-    UTF16 **UTF16_Deformat(UTF16 *Format, UTF16 *Result) {
+    UTF16 **UTF16_Deformat(UTF16 *Format, UTF16 *Formatted) {
         UTF16 **StringArray                  = NULL;
-        if (Format != NULL && Result != NULL) {
+        if (Format != NULL && Formatted != NULL) {
             uint64_t NumSpecifiers           = UTF16_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 UTF32 *Format32              = UTF16_Decode(Format);
                 FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format32, NumSpecifiers, StringType_UTF16);
                 Format_Specifiers_FixOffset(Specifiers);
-                UTF32 *Result32              = UTF16_Decode(Result);
-                UTF32 **Strings32            = DeformatString_UTF32(Format32, Result32, Specifiers);
+                UTF32 *Formatted32           = UTF16_Decode(Formatted);
+                UTF32 **Strings32            = DeformatString_UTF32(Format32, Formatted32, Specifiers);
                 UTF32_Deinit(Format32);
-                UTF32_Deinit(Result32);
+                UTF32_Deinit(Formatted32);
                 FormatSpecifiers_Deinit(Specifiers);
                 StringArray                  = UTF16_StringArray_Encode(Strings32);
                 UTF32_StringArray_Deinit(Strings32);
             }
         } else if (Format == NULL) {
             Log(Log_DEBUG, __func__, UTF8String("Format Pointer is NULL"));
-        } else if (Result == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Result String is NULL"));
+        } else if (Formatted == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("Formatted String is NULL"));
         }
         return StringArray;
     }
     
-    UTF32 **UTF32_Deformat(UTF32 *Format, UTF32 *Result) {
+    UTF32 **UTF32_Deformat(UTF32 *Format, UTF32 *Formatted) {
         UTF32 **StringArray                  = NULL;
-        if (Format != NULL && Result != NULL) {
+        if (Format != NULL && Formatted != NULL) {
             uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 FormatSpecifiers *Specifiers = UTF32_ParseFormatString(Format, NumSpecifiers, StringType_UTF32);
                 Format_Specifiers_FixOffset(Specifiers);
-                StringArray                  = DeformatString_UTF32(Format, Result, Specifiers);
+                StringArray                  = DeformatString_UTF32(Format, Formatted, Specifiers);
                 FormatSpecifiers_Deinit(Specifiers);
             }
         } else if (Format == NULL) {
             Log(Log_DEBUG, __func__, UTF8String("Format Pointer is NULL"));
-        } else if (Result == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Result String is NULL"));
+        } else if (Formatted == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("Formatted String is NULL"));
         }
         return StringArray;
     }
