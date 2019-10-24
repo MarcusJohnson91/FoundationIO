@@ -1,6 +1,7 @@
 #include "../include/CryptographyIO.h"       /* Included for our declarations */
 #include "../include/Log.h"                  /* Included for error logging */
 #include "../include/Math.h"                 /* Included for Bits2Bytes, etc */
+#include "../include/BitIO.h"                /* Included for BitBuffer for CRC32 and Adler32 */
 #include "../include/Private/NumberTables.h" /* Included for BitMaskTables */
 
 #if   (FoundationIOTargetOS == FoundationIOWindowsOS)
@@ -411,6 +412,55 @@ extern "C" {
             free(Random->EntropyPool);
             free(Random);
         }
+    }
+    
+    uint32_t Adler32(BitBuffer *BitB, uint64_t Start, uint64_t NumBytes) {
+        uint32_t Output = 0;
+        if (BitB != NULL && Start * 8 < BitBuffer_GetSize(BitB) && (Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
+            uint16_t A = 1;
+            uint16_t B = 0;
+            
+            for (uint64_t Byte = Start; Byte < NumBytes - 1; Byte++) {
+                uint8_t Value = BitBuffer_ReadBits(BitB, MSByteFirst, LSBitFirst, 8);
+                A = (A + Value) % 65521;
+                B = (B + A)     % 65521;
+            }
+            
+            Output = (B << 16) | A;
+        } else if (BitB == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+        } else if (Start * 8 < BitBuffer_GetSize(BitB)) {
+            Log(Log_DEBUG, __func__, UTF8String("Start: %lld is larger than the BitBuffer %lld"), Start * 8, BitBuffer_GetSize(BitB));
+        } else if ((Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
+            Log(Log_DEBUG, __func__, UTF8String("End: %lld is larger than the BitBuffer %lld"), (Start + NumBytes) * 8, BitBuffer_GetSize(BitB));
+        }
+        return Output;
+    }
+    
+    uint32_t CRC32(BitBuffer *BitB, uint64_t Start, uint64_t NumBytes) {
+        uint32_t Output = -1;
+        if (BitB != NULL && Start * 8 < BitBuffer_GetSize(BitB) && (Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
+            for (uint64_t Byte = Start; Byte < NumBytes - 1; Byte++) {
+                uint32_t Polynomial = 0x82608EDB;
+                uint8_t  Data       = BitBuffer_ReadBits(BitB, MSByteFirst, LSBitFirst, 8);
+                
+                Output               ^= Data;
+                for (uint8_t Bit = 0; Bit < 8; Bit++) {
+                    if (Output & 1) {
+                        Output = (Output >> 1) ^ Polynomial;
+                    } else {
+                        Output >>= 1;
+                    }
+                }
+            }
+        } else if (BitB == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+        } else if (Start * 8 < BitBuffer_GetSize(BitB)) {
+            Log(Log_DEBUG, __func__, UTF8String("Start: %lld is larger than the BitBuffer %lld"), Start * 8, BitBuffer_GetSize(BitB));
+        } else if ((Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
+            Log(Log_DEBUG, __func__, UTF8String("End: %lld is larger than the BitBuffer %lld"), (Start + NumBytes) * 8, BitBuffer_GetSize(BitB));
+        }
+        return ~Output;
     }
     
 #ifdef __cplusplus
