@@ -1087,7 +1087,16 @@ extern "C" {
      @param               Offset           "Where to start looking for digits".
      @return                               "Returns the number of format specifiers found".
      */
-    uint64_t              UTF32_GetNumDigits(StringIOBases Base, UTF32 *String, uint64_t Offset);
+    uint64_t              UTF32_GetNumDigits(StringIOBases Base, UTF32 *String, uint64_t Offset); // Format/Deformat
+    
+    /*!
+     @abstract                             "Gets a substring from Offset to where Format and Formatted start matching".
+     @param               Format           "The base the string is in".
+     @param               Formatted        "The string to check".
+     @param               Offset           "Where to start looking for digits".
+     @return                               "Returns the SubString".
+     */
+    uint64_t              UTF32_GetSubStringLength(UTF32 *Format, UTF32 *Formatted, uint64_t Offset);
     
     /*!
      @abstract                             "Deinitializes String".
@@ -1235,6 +1244,10 @@ extern "C" {
      @return                               "Returns the encoded StringArray".
      */
     UTF16               **UTF16_StringArray_Encode(UTF32 **StringArray);
+    
+    void                  UTF8_StringArray_Print(UTF8 **StringArray);
+    
+    void                  UTF16_StringArray_Print(UTF16 **StringArray);
     
     /*!
      @abstract                             "Deinitializes a UTF-8 encoded StringArray (like is returned by SplitString)".
