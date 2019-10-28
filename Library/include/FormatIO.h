@@ -80,13 +80,13 @@ extern "C" {
     
     FormatSpecifiers *FormatSpecifiers_Init(uint64_t NumSpecifiers);
     
-    UTF32            *FormatString_UTF32(UTF32 *Format, FormatSpecifiers *Specifiers);
+    UTF32            *FormatString_UTF32(FormatSpecifiers *Specifiers, UTF32 *Format);
     
-    FormatSpecifiers *UTF32_ParseFormatString(UTF32 *Format, uint64_t NumSpecifiers, StringIOStringTypes StringType);
+    void              UTF32_ParseFormatString(FormatSpecifiers *Specifiers, UTF32 *Format, uint64_t NumSpecifiers, StringIOStringTypes StringType);
     
     void              Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments);
     
-    UTF32           **DeformatString_UTF32(UTF32 *Format, UTF32 *Result, FormatSpecifiers *Specifiers);
+    UTF32           **DeformatString_UTF32(FormatSpecifiers *Specifiers, UTF32 *Format, UTF32 *Result);
     
     void              FormatSpecifiers_Deinit(FormatSpecifiers *Specifiers);
     

@@ -375,7 +375,7 @@ extern "C" {
         return NumGraphemes;
     }
     
-    static UTF8 *UTF8_ExtractCodePoint(UTF8 *String, uint64_t Offset, uint64_t StringSize) {
+    UTF8 *UTF8_ExtractCodePoint(UTF8 *String, uint64_t Offset, uint64_t StringSize) {
         UTF8 *CodeUnits                     = NULL;
         if (String != NULL && Offset < StringSize) {
             uint8_t CodePointSize           = UTF8_GetCodePointSizeInCodeUnits(String[Offset]);
@@ -397,7 +397,7 @@ extern "C" {
         return CodeUnits;
     }
     
-    static UTF16 *UTF16_ExtractCodePoint(UTF16 *String, uint64_t Offset, uint64_t StringSize) {
+    UTF16 *UTF16_ExtractCodePoint(UTF16 *String, uint64_t Offset, uint64_t StringSize) {
         UTF16 *CodeUnits                     = NULL;
         if (String != NULL && Offset < StringSize) {
             uint8_t CodePointSize           = UTF16_GetCodePointSizeInCodeUnits(String[Offset]);
@@ -419,7 +419,7 @@ extern "C" {
         return CodeUnits;
     }
     
-    static UTF32 *UTF32_ExtractCodePoint(UTF32 *String, uint64_t Offset, uint64_t StringSize) {
+    UTF32 *UTF32_ExtractCodePoint(UTF32 *String, uint64_t Offset, uint64_t StringSize) {
         UTF32 *CodePoint         = NULL;
         if (String != NULL && Offset < StringSize) {
             if (Offset + 1 <= StringSize) {
@@ -1667,7 +1667,7 @@ extern "C" {
                 uint64_t StringCodePoint            = 0ULL;
                 uint64_t ReplacementCodePoint       = 0ULL;
                 
-                while (NewCodePoint < NewStringSize) { // StringCodePoint + Length + 1 < StringSize
+                while (NewCodePoint < NewStringSize && StringCodePoint < StringSize) { // StringCodePoint + Length + 1 < StringSize
                     if (NewCodePoint < Offset) {
                         NewString[NewCodePoint]     = String[StringCodePoint];
                         StringCodePoint            += 1;
@@ -2966,8 +2966,10 @@ extern "C" {
         uint64_t Length        = 0ULL;
         if (Format != NULL && Formatted != NULL) {
             uint64_t CodePoint = Offset;
-            while (Format[CodePoint] != Formatted[Offset] && Format[CodePoint] != FoundationIONULLTerminator && Formatted[CodePoint] != FoundationIONULLTerminator) {
-                Length        += 1;
+            
+            while ((Format[CodePoint] != Formatted[CodePoint]) && (Format[CodePoint] != FoundationIONULLTerminator && Formatted[CodePoint] != FoundationIONULLTerminator)) {
+                CodePoint += 1;
+                Length    += 1;
             }
         } else if (Format == NULL) {
             Log(Log_DEBUG, __func__, UTF8String("Format String Poitner is NUlL"));
