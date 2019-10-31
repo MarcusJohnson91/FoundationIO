@@ -6,15 +6,12 @@
  @brief               This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "../include/Macros.h"
+#include "../../include/Macros.h"
 
 #pragma once
 
-#ifndef FoundationIO_StringIO_H
-#define FoundationIO_StringIO_H
+#ifndef FoundationIO_UnicodeIO_StringIO_H
+#define FoundationIO_UnicodeIO_StringIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -1271,4 +1268,4 @@ extern "C" {
 }
 #endif
 
-#endif  /* FoundationIO_StringIO_H */
+#endif  /* FoundationIO_UnicodeIO_StringIO_H */

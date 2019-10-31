@@ -1,8 +1,8 @@
-#include "../include/FormatIO.h"             /* Included for our declarations */
-#include "../include/StringIO.h"             /* Included for StringIOBases */
-#include "../include/Log.h"                  /* Included for Logging */
-#include "../include/Private/NumberTables.h" /* Included for the Number tables */
-#include <stdarg.h>                          /* Included for va_list, va_copy, va_start, va_end */
+#include "../../include/Private/NumberTables.h"        /* Included for the Number tables */
+#include "../../include/UnicodeIO/FormatIO.h"          /* Included for our declarations */
+#include "../../include/UnicodeIO/LogIO.h"             /* Included for Logging */
+#include "../../include/UnicodeIO/StringIO.h"          /* Included for StringIOBases */
+#include <stdarg.h>                                    /* Included for va_list, va_copy, va_start, va_end */
 
 #ifdef __cplusplus
 extern "C" {

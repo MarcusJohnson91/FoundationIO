@@ -6,15 +6,12 @@
  @brief               This header contains types, functions, and tables for cryptography and hashing.
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "../include/Macros.h"
+#include "../../include/Macros.h"
 
 #pragma once
 
-#ifndef FoundationIO_LocalizationIO_H
-#define FoundationIO_LocalizationIO_H
+#ifndef FoundationIO_UnicodeIO_LocalizationIO_H
+#define FoundationIO_UnicodeIO_LocalizationIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -229,5 +226,4 @@ extern "C" {
 }
 #endif
 
-#endif /* FoundationIO_LocalizationIO_H */
-
+#endif /* FoundationIO_UnicodeIO_LocalizationIO_H */

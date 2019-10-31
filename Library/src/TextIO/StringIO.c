@@ -1,11 +1,11 @@
-#include "../include/StringIO.h"               /* Included for our declarations */
-#include "../include/Log.h"                    /* Included for error logging */
-#include "../include/Math.h"                   /* Included for endian swapping */
-#include "../include/FormatIO.h"               /* Included for the String formatting code */
-#include "../include/Private/UnicodeTables.h"  /* Included for the Unicode tables */
-#include "../include/Private/NumberTables.h"   /* Included for the Number tables */
-#include <stdarg.h>                            /* Included for va_list, va_copy, va_start, va_end */
-#include <wchar.h>                             /* Included for Fwide */
+#include "../../include/Math.h"                          /* Included for endian swapping */
+#include "../../include/Private/NumberTables.h"          /* Included for the Number tables */
+#include "../../include/Private/UnicodeTables.h"         /* Included for the Unicode tables */
+#include "../../include/UnicodeIO/FormatIO.h"            /* Included for the String formatting code */
+#include "../../include/UnicodeIO/LogIO.h"               /* Included for error logging */
+#include "../../include/UnicodeIO/StringIO.h"            /* Included for our declarations */
+#include <stdarg.h>                                      /* Included for va_list, va_copy, va_start, va_end */
+#include <wchar.h>                                       /* Included for Fwide */
 
 #ifdef __cplusplus
 extern "C" {

@@ -6,9 +6,6 @@
  @brief               This header contains types, functions, and tables for automated testing.
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include "../include/Macros.h"
 #include "../include/CryptographyIO.h"
 
