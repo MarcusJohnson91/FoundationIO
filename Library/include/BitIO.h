@@ -1,13 +1,10 @@
 /*!
- @header                    BitIO.h
- @author                    Marcus Johnson
- @copyright                 2015+
- @version                   1.0.0
- @brief                     This header contains code for reading and writing files and sockets, and utilities to manage them.
+ @header              BitIO.h
+ @author              Marcus Johnson
+ @copyright           2015+
+ @version             1.0.0
+ @brief               This header contains code for reading and writing files and sockets, and utilities to manage them.
  */
-
-#include <stdbool.h>
-#include <stdint.h>
 
 #include "../include/Macros.h"
 #include "../include/CryptographyIO.h"

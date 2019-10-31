@@ -1,13 +1,12 @@
 /*!
- @header                ContainerIO.h
- @author                Marcus Johnson
- @copyright             2018+
- @version               1.0.0
- @brief                 This header contains code for containers (type generic arrays)
+ @header              ContainerIO.h
+ @author              Marcus Johnson
+ @copyright           2018+
+ @version             1.0.0
+ @brief               This header contains code for containers (type generic arrays)
  */
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "../include/Macros.h"
 
 #pragma  once
 

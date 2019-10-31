@@ -1,6 +1,6 @@
 #include "../Library/include/TestIO.h"
-#include "../Library/include/Log.h"
-#include "../Library/include/CommandLineIO.h"
+#include "../Library/include/UnicodeIO/CommandLineIO.h"
+#include "../Library/include/UnicodeIO/LogIO.h"
 
 #ifdef __cplusplus
 extern "C" {

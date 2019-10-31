@@ -1,20 +1,17 @@
 /*!
- @header                    Log.h
- @author                    Marcus Johnson
- @copyright                 2017+
- @version                   1.0.0
- @brief                     This header contains code for logging errors and testingR information.
+ @header              LogIO.h
+ @author              Marcus Johnson
+ @copyright           2017+
+ @version             1.0.0
+ @brief               This header contains code for logging errors and testingR information.
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "../include/Macros.h"
+#include "../../include/Macros.h"
 
 #pragma once
 
-#ifndef FoundationIO_Log_H
-#define FoundationIO_Log_H
+#ifndef FoundationIO_UnicodeIO_LogIO_H
+#define FoundationIO_UnicodeIO_LogIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -160,4 +157,4 @@ extern "C" {
 }
 #endif
 
-#endif /* FoundationIO_Log_H */
+#endif /* FoundationIO_UnicodeIO_LogIO_H */

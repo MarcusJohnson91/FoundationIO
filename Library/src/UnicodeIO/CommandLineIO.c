@@ -1,7 +1,7 @@
-#include "../include/CommandLineIO.h"  /* Included for our declarations */
-#include "../include/Log.h"            /* Included for Logging */
-#include "../include/StringIO.h"       /* Included for StringIO's declarations */
-#include "../include/FormatIO.h"       /* Included for Formatter */
+#include "../../include/UnicodeIO/CommandLineIO.h"  /* Included for our declarations */
+#include "../../include/UnicodeIO/FormatIO.h"       /* Included for Formatter */
+#include "../../include/UnicodeIO/LogIO.h"          /* Included for Logging */
+#include "../../include/UnicodeIO/StringIO.h"       /* Included for StringIO's declarations */
 
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
 #include <signal.h>                    /* Included for SIGWINCH handling */
@@ -767,6 +767,12 @@ extern "C" {
             Log(Log_DEBUG, __func__, UTF8String("CommandLineIO Pointer is NULL"));
         }
     }
+    
+    // Colorize a String using ANSI control codes:
+    // Colorize/Decolorize
+    
+    
+    
     
 #ifdef __cplusplus
 }

@@ -42,30 +42,30 @@ set(RUNTIME_OUTPUT_DIRECTORY       "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHI
 
 set(PUBLIC_HEADER
 "${libFoundationIO_Dir}/include/BitIO.h"
-"${libFoundationIO_Dir}/include/CommandLineIO.h"
 "${libFoundationIO_Dir}/include/ContainerIO.h"
 "${libFoundationIO_Dir}/include/CryptographyIO.h"
-"${libFoundationIO_Dir}/include/LocalizationIO.h"
-"${libFoundationIO_Dir}/include/Log.h"
 "${libFoundationIO_Dir}/include/Macros.h"
 "${libFoundationIO_Dir}/include/Math.h"
-"${libFoundationIO_Dir}/include/StringIO.h"
 "${libFoundationIO_Dir}/include/TestIO.h"
-"${libFoundationIO_Dir}/include/FormatIO.h"
+"${libFoundationIO_Dir}/include/UnicodeIO/CommandLineIO.h"
+"${libFoundationIO_Dir}/include/UnicodeIO/LocalizationIO.h"
+"${libFoundationIO_Dir}/include/UnicodeIO/LogIO.h"
+"${libFoundationIO_Dir}/include/UnicodeIO/StringIO.h"
+"${libFoundationIO_Dir}/include/UnicodeIO/FormatIO.h"
 )
 
 set(libFoundationIO_Sources
 "${libFoundationIO_Dir}/src/BitIO.c"
-"${libFoundationIO_Dir}/src/CommandLineIO.c"
 "${libFoundationIO_Dir}/src/ContainerIO.c"
 "${libFoundationIO_Dir}/src/CryptographyIO.c"
-"${libFoundationIO_Dir}/src/LocalizationIO.c"
-"${libFoundationIO_Dir}/src/Log.c"
 "${libFoundationIO_Dir}/src/Macros.c"
 "${libFoundationIO_Dir}/src/Math.c"
-"${libFoundationIO_Dir}/src/StringIO.c"
 "${libFoundationIO_Dir}/src/TestIO.c"
-"${libFoundationIO_Dir}/src/FormatIO.c"
+"${libFoundationIO_Dir}/src/UnicodeIO/CommandLineIO.c"
+"${libFoundationIO_Dir}/src/UnicodeIO/LocalizationIO.c"
+"${libFoundationIO_Dir}/src/UnicodeIO/LogIO.c"
+"${libFoundationIO_Dir}/src/UnicodeIO/StringIO.c"
+"${libFoundationIO_Dir}/src/UnicodeIO/FormatIO.c"
 )
 
 if(NOT CMAKE_BUILD_TYPE)

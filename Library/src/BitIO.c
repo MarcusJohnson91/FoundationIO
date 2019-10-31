@@ -1,9 +1,9 @@
 #include "../include/BitIO.h"                /* Included for our declarations */
-#include "../include/Log.h"                  /* Included for Logging */
-#include "../include/Math.h"                 /* Included for Integer functions */
-#include "../include/StringIO.h"             /* Included for StringIO's declarations */
 #include "../include/CryptographyIO.h"       /* Included for Entropy_GenerateInteger for GUUID_Generate */
+#include "../include/Math.h"                 /* Included for Integer functions */
 #include "../include/Private/NumberTables.h" /* Included for BitMaskTables */
+#include "../include/UnicodeIO/LogIO.h"      /* Included for Logging */
+#include "../include/UnicodeIO/StringIO.h"   /* Included for StringIO's declarations */
 
 #ifdef __cplusplus
 extern "C" {

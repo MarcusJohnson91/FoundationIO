@@ -1,9 +1,9 @@
 /*!
- @header        Macros.h
- @author        Marcus Johnson
- @copyright     2017+
- @version       1.0.0
- @brief         This header contains preprocessor macros for generic functions in FoundationIO, and cross-platform compatibility.
+ @header              Macros.h
+ @author              Marcus Johnson
+ @copyright           2017+
+ @version             1.0.0
+ @brief               This header contains preprocessor macros for generic functions in FoundationIO, and cross-platform compatibility.
  */
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(__ANDROID__) || defined(__minix) || defined(__linux__) || defined(__unix__) || defined(_POSIX_C_SOURCE) || (defined(__APPLE__) && defined(__MACH__))

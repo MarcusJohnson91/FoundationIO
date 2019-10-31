@@ -1,7 +1,7 @@
-#include "../include/Log.h"            /* Included for the Log declarations */
-#include "../include/StringIO.h"       /* Included for StringIO's declarations */
-#include "../include/FormatIO.h"       /* Included for the Formatter */
-#include <stdarg.h>                    /* Included for va_list, va_copy, va_start, va_end */
+#include "../../include/UnicodeIO/FormatIO.h"    /* Included for the Formatter */
+#include "../../include/UnicodeIO/LogIO.h"       /* Included for the Log declarations */
+#include "../../include/UnicodeIO/StringIO.h"    /* Included for StringIO's declarations */
+#include <stdarg.h>                              /* Included for va_list, va_copy, va_start, va_end */
 
 #ifdef __cplusplus
 extern "C" {

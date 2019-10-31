@@ -10,6 +10,14 @@
 #endif /* Complex */
 #endif /* Version check */
 
+/*!
+ @header              Math.h
+ @author              Marcus Johnson
+ @copyright           2017+
+ @version             1.0.0
+ @brief               This header contains code for specific mathematical functions used in FoundationIO and it's consumers.
+ */
+
 #pragma  once
 
 #ifndef  FoundationIO_Math_H
@@ -18,14 +26,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
-    /*!
-     @header                    Math.h
-     @author                    Marcus Johnson
-     @copyright                 2017+
-     @version                   1.0.0
-     @brief                     This header contains code for specific mathematical functions used in FoundationIO and it's consumers.
-     */
     
     /*!
      @enum                  RoundingTypes

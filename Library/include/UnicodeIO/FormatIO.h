@@ -6,17 +6,13 @@
  @brief               This header contains types, functions, and tables for string formatting/deformatting
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "../include/Macros.h"
-#include "../include/StringIO.h"
-
+#include "../../include/Macros.h"
+#include "../../include/UnicodeIO/StringIO.h"
 
 #pragma once
 
-#ifndef FoundationIO_FormatIO_H
-#define FoundationIO_FormatIO_H
+#ifndef FoundationIO_UnicodeIO_FormatIO_H
+#define FoundationIO_UnicodeIO_FormatIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -172,4 +168,4 @@ extern "C" {
 }
 #endif
 
-#endif /* FoundationIO_FormatIO_H */
+#endif /* FoundationIO_UnicodeIO_FormatIO_H */

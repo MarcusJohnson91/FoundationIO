@@ -15,19 +15,10 @@
     <ClInclude Include="..\Library\include\BitIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\CommandLineIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Library\include\ContainerIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\CryptographyIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\LocalizationIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\Macros.h">
@@ -36,14 +27,23 @@
     <ClInclude Include="..\Library\include\Math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\StringIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Library\include\TestIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\FormatIO.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Library\include\UnicodeIO\CommandLineIO.h">
+      <Filter>Header Files\UnicodeIO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\UnicodeIO\LocalizationIO.h">
+      <Filter>Header Files\UnicodeIO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\UnicodeIO\LogIO.h">
+      <Filter>Header Files\UnicodeIO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\UnicodeIO\StringIO.h">
+      <Filter>Header Files\UnicodeIO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\UnicodeIO\FormatIO.h">
+      <Filter>Header Files\UnicodeIO</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\Private\UnicodeTables.h">
       <Filter>Header Files\Private</Filter>
@@ -56,19 +56,10 @@
     <ClCompile Include="..\Library\src\BitIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Library\src\CommandLineIO.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Library\src\ContainerIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\src\CryptographyIO.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Library\src\LocalizationIO.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Library\src\Log.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\src\Macros.c">
@@ -77,14 +68,23 @@
     <ClCompile Include="..\Library\src\Math.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Library\src\StringIO.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Library\src\TestIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Library\src\FormatIO.c">
+    <ClCompile Include="..\Library\src\UnicodeIO\CommandLineIO.c">
+      <Filter>Source Files\UnicodeIO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\src\UnicodeIO\LocalizationIO.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\src\UnicodeIO\LogIO.c">
+      <Filter>Source Files\UnicodeIO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\src\UnicodeIO\StringIO.c">
+      <Filter>Source Files\UnicodeIO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\src\UnicodeIO\FormatIO.c">
+      <Filter>Source Files\UnicodeIO</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

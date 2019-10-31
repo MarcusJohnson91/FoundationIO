@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-# Usage (the HeaderFile WILL BE IRRECOVERABLY DELETED): ./MakeUnicodeTables.sh /HeaderPath/HeaderFile.h
+# Usage (the HeaderFile WILL BE IRRECOVERABLY DELETED): ./UnicodeTables_Create.sh /HeaderPath/HeaderFile.h
 # Dependencies: Curl, XMLStarlet (On Mac install Homebrew from brew.sh then call brew install xmlstarlet)
 
 CreateOutputFileTop() {

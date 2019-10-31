@@ -6,9 +6,6 @@
  @brief               This header contains types, functions, and tables for cryptography and hashing.
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include "../include/Macros.h"
 
 #pragma once

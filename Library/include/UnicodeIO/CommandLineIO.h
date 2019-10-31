@@ -1,20 +1,17 @@
 /*!
- @header                    CommandLineIO.h
- @author                    Marcus Johnson
- @copyright                 2017+
- @version                   1.0.0
- @brief                     This header contains code for creating a command line interface.
+ @header              CommandLineIO.h
+ @author              Marcus Johnson
+ @copyright           2017+
+ @version             1.0.0
+ @brief               This header contains code for creating a command line interface.
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include "../include/Macros.h"
+#include "../../include/Macros.h"
 
 #pragma  once
 
-#ifndef  FoundationIO_CommandLineIO_H
-#define  FoundationIO_CommandLineIO_H
+#ifndef  FoundationIO_UnicodeIO_CommandLineIO_H
+#define  FoundationIO_UnicodeIO_CommandLineIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -365,4 +362,4 @@ extern "C" {
 }
 #endif
 
-#endif   /* FoundationIO_CommandLineIO_H */
+#endif   /* FoundationIO_UnicodeIO_CommandLineIO_H */

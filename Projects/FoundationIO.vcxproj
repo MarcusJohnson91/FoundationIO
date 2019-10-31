@@ -20,31 +20,31 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Library\include\BitIO.h" />
-    <ClInclude Include="..\Library\include\CommandLineIO.h" />
     <ClInclude Include="..\Library\include\ContainerIO.h" />
     <ClInclude Include="..\Library\include\CryptographyIO.h" />
-    <ClInclude Include="..\Library\include\LocalizationIO.h" />
-    <ClInclude Include="..\Library\include\Log.h" />
     <ClInclude Include="..\Library\include\Macros.h" />
     <ClInclude Include="..\Library\include\Math.h" />
-    <ClInclude Include="..\Library\include\StringIO.h" />
-    <ClInclude Include="..\Library\include\TestIO.h" />
-    <ClInclude Include="..\Library\include\FormatIO.h" />
-    <ClInclude Include="..\Library\include\Private\UnicodeTables.h" />
     <ClInclude Include="..\Library\include\Private\NumberTables.h" />
+    <ClInclude Include="..\Library\include\Private\UnicodeTables.h" />
+    <ClInclude Include="..\Library\include\TestIO.h" />
+    <ClInclude Include="..\Library\include\UnicodeIO\CommandLineIO.h" />
+    <ClInclude Include="..\Library\include\UnicodeIO\FormatIO.h" />
+    <ClInclude Include="..\Library\include\UnicodeIO\LocalizationIO.h" />
+    <ClInclude Include="..\Library\include\UnicodeIO\LogIO.h" />
+    <ClInclude Include="..\Library\include\UnicodeIO\StringIO.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Library\src\BitIO.c" />
-    <ClCompile Include="..\Library\src\CommandLineIO.c" />
     <ClCompile Include="..\Library\src\ContainerIO.c" />
     <ClCompile Include="..\Library\src\CryptographyIO.c" />
-    <ClCompile Include="..\Library\src\FormatIO.c" />
-    <ClCompile Include="..\Library\src\LocalizationIO.c" />
-    <ClCompile Include="..\Library\src\Log.c" />
     <ClCompile Include="..\Library\src\Macros.c" />
     <ClCompile Include="..\Library\src\Math.c" />
-    <ClCompile Include="..\Library\src\StringIO.c" />
     <ClCompile Include="..\Library\src\TestIO.c" />
+    <ClCompile Include="..\Library\src\UnicodeIO\CommandLineIO.c" />
+    <ClCompile Include="..\Library\src\UnicodeIO\FormatIO.c" />
+    <ClCompile Include="..\Library\src\UnicodeIO\LocalizationIO.c" />
+    <ClCompile Include="..\Library\src\UnicodeIO\LogIO.c" />
+    <ClCompile Include="..\Library\src\UnicodeIO\StringIO.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

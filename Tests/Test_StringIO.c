@@ -1,10 +1,8 @@
-#include "../Library/include/StringIO.h"
-#include "../Library/include/FormatIO.h"
-
-#include "../Library/include/TestIO.h"
-#include "../Library/include/Log.h"
-
 #include "../Library/include/CryptographyIO.h"
+#include "../Library/include/TestIO.h"
+#include "../Library/include/UnicodeIO/FormatIO.h"
+#include "../Library/include/UnicodeIO/LogIO.h"
+#include "../Library/include/UnicodeIO/StringIO.h"
 
 #ifdef __cplusplus
 extern "C" {

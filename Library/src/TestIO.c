@@ -1,7 +1,7 @@
-#include "../include/TestIO.h"         /* Included for our declarations */
-#include "../include/CryptographyIO.h" /* Included for Entropy */
-#include "../include/Log.h"            /* Included for error reporting */
-#include "../include/StringIO.h"       /* Included for UTFX_Init functions */
+#include "../include/CryptographyIO.h"           /* Included for Entropy */
+#include "../include/TestIO.h"                   /* Included for our declarations */
+#include "../include/UnicodeIO/LogIO.h"          /* Included for error reporting */
+#include "../include/UnicodeIO/StringIO.h"       /* Included for UTFX_Init functions */
 
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
 #include <time.h>                      /* Included for timespec_get */
