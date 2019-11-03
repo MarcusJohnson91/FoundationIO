@@ -11,7 +11,7 @@
 #endif /* Version check */
 
 /*!
- @header              Math.h
+ @header              MathIO.h
  @author              Marcus Johnson
  @copyright           2017+
  @version             1.0.0
@@ -20,8 +20,8 @@
 
 #pragma  once
 
-#ifndef  FoundationIO_Math_H
-#define  FoundationIO_Math_H
+#ifndef  FoundationIO_MathIO_H
+#define  FoundationIO_MathIO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -446,4 +446,4 @@ extern "C" {
 }
 #endif
 
-#endif   /* FoundationIO_Math_H */
+#endif   /* FoundationIO_MathIO_H */
