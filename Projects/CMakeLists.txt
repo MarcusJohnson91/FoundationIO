@@ -45,7 +45,7 @@ set(PUBLIC_HEADER
 "${libFoundationIO_Dir}/include/ContainerIO.h"
 "${libFoundationIO_Dir}/include/CryptographyIO.h"
 "${libFoundationIO_Dir}/include/Macros.h"
-"${libFoundationIO_Dir}/include/Math.h"
+"${libFoundationIO_Dir}/include/MathIO.h"
 "${libFoundationIO_Dir}/include/TestIO.h"
 "${libFoundationIO_Dir}/include/UnicodeIO/CommandLineIO.h"
 "${libFoundationIO_Dir}/include/UnicodeIO/LocalizationIO.h"
@@ -59,7 +59,7 @@ set(libFoundationIO_Sources
 "${libFoundationIO_Dir}/src/ContainerIO.c"
 "${libFoundationIO_Dir}/src/CryptographyIO.c"
 "${libFoundationIO_Dir}/src/Macros.c"
-"${libFoundationIO_Dir}/src/Math.c"
+"${libFoundationIO_Dir}/src/MathIO.c"
 "${libFoundationIO_Dir}/src/TestIO.c"
 "${libFoundationIO_Dir}/src/UnicodeIO/CommandLineIO.c"
 "${libFoundationIO_Dir}/src/UnicodeIO/LocalizationIO.c"
@@ -84,21 +84,21 @@ add_executable(Test_BitIO "${Test_Dir}/Test_BitIO.c")
 add_executable(Test_CommandLineIO "${Test_Dir}/Test_CommandLineIO.c")
 add_executable(Test_ContainerIO "${Test_Dir}/Test_ContainerIO.c")
 add_executable(Test_StringIO "${Test_Dir}/Test_StringIO.c")
-add_executable(Test_Math "${Test_Dir}/Test_Math.c")
+add_executable(Test_MathIO "${Test_Dir}/Test_MathIO.c")
 add_executable(Test_CryptographyIO "${Test_Dir}/Test_CryptographyIO.c")
 
 target_link_libraries(Test_BitIO FoundationIO)
 target_link_libraries(Test_CommandLineIO FoundationIO)
 target_link_libraries(Test_ContainerIO FoundationIO)
 target_link_libraries(Test_StringIO FoundationIO)
-target_link_libraries(Test_Math FoundationIO)
+target_link_libraries(Test_MathIO FoundationIO)
 target_link_libraries(Test_CryptographyIO FoundationIO)
 
 add_test(Test_BitIO CONFIGURATIONS Debug RelWithDebInfo)
 add_test(Test_CommandLineIO CONFIGURATIONS Debug RelWithDebInfo)
 add_test(Test_ContainerIO CONFIGURATIONS Debug RelWithDebInfo)
 add_test(Test_StringIO CONFIGURATIONS Debug RelWithDebInfo)
-add_test(Test_Math CONFIGURATIONS Debug RelWithDebInfo)
+add_test(Test_MathIO CONFIGURATIONS Debug RelWithDebInfo)
 add_test(Test_CryptographyIO CONFIGURATIONS Debug RelWithDebInfo)
 endif (CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
 
@@ -120,7 +120,7 @@ if(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHE
     install(TARGETS Test_CommandLineIO  DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     install(TARGETS Test_ContainerIO    DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     install(TARGETS Test_StringIO       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-    install(TARGETS Test_Math           DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS Test_MathIO         DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     install(TARGETS Test_CryptographyIO DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
 

@@ -1,4 +1,4 @@
-#include "../include/Math.h"           /* Included for our declarations */
+#include "../include/MathIO.h"           /* Included for our declarations */
 
 #ifdef __cplusplus
 extern "C" {

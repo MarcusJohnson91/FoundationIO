@@ -1,4 +1,4 @@
-#include "../../include/Math.h"                          /* Included for endian swapping */
+#include "../../include/MathIO.h"                          /* Included for endian swapping */
 #include "../../include/Private/NumberTables.h"          /* Included for the Number tables */
 #include "../../include/Private/UnicodeTables.h"         /* Included for the Unicode tables */
 #include "../../include/UnicodeIO/FormatIO.h"            /* Included for the String formatting code */

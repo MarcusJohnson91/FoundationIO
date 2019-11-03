@@ -76,7 +76,7 @@ extern "C" {
     typedef struct FormatSpecifier {
         UTF32                          *Argument;        // The actual argument contained in the va_list
         uint64_t                        Offset;          // Start location in the format string
-        uint64_t                        Length;          // Start - Size
+        uint64_t                        Length;          // (CurrentCodePoint - Offset) + 1
         uint64_t                        MinWidth;        // Actual Width
         uint64_t                        Precision;       // Actual Precision
         uint64_t                        PositionalArg;   // Argument number to substitute

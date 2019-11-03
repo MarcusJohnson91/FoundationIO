@@ -24,7 +24,7 @@
     <ClInclude Include="..\Library\include\Macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\Math.h">
+    <ClInclude Include="..\Library\include\MathIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\TestIO.h">
@@ -65,7 +65,7 @@
     <ClCompile Include="..\Library\src\Macros.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Library\src\Math.c">
+    <ClCompile Include="..\Library\src\MathIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\src\TestIO.c">

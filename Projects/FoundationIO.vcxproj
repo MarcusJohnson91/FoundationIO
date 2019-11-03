@@ -23,7 +23,7 @@
     <ClInclude Include="..\Library\include\ContainerIO.h" />
     <ClInclude Include="..\Library\include\CryptographyIO.h" />
     <ClInclude Include="..\Library\include\Macros.h" />
-    <ClInclude Include="..\Library\include\Math.h" />
+    <ClInclude Include="..\Library\include\MathIO.h" />
     <ClInclude Include="..\Library\include\Private\NumberTables.h" />
     <ClInclude Include="..\Library\include\Private\UnicodeTables.h" />
     <ClInclude Include="..\Library\include\TestIO.h" />
@@ -38,7 +38,7 @@
     <ClCompile Include="..\Library\src\ContainerIO.c" />
     <ClCompile Include="..\Library\src\CryptographyIO.c" />
     <ClCompile Include="..\Library\src\Macros.c" />
-    <ClCompile Include="..\Library\src\Math.c" />
+    <ClCompile Include="..\Library\src\MathIO.c" />
     <ClCompile Include="..\Library\src\TestIO.c" />
     <ClCompile Include="..\Library\src\UnicodeIO\CommandLineIO.c" />
     <ClCompile Include="..\Library\src\UnicodeIO\FormatIO.c" />

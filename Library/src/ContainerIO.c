@@ -1,5 +1,5 @@
 #include "../include/ContainerIO.h"        /* Included for our declarations */
-#include "../include/Math.h"               /* Included for Absolute, Max/Min */
+#include "../include/MathIO.h"               /* Included for Absolute, Max/Min */
 #include "../include/UnicodeIO/LogIO.h"    /* Included for error reporting */
 #include "../include/UnicodeIO/StringIO.h" /* Included for UTF32 string handling */
 
