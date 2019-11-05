@@ -1,4 +1,4 @@
-#include "../../include/Private/NumberTables.h"        /* Included for the Number tables */
+#include "../../include/UnicodeIO/Private/NumberTables.h"        /* Included for the Number tables */
 #include "../../include/UnicodeIO/FormatIO.h"          /* Included for our declarations */
 #include "../../include/UnicodeIO/LogIO.h"             /* Included for Logging */
 #include "../../include/UnicodeIO/StringIO.h"          /* Included for StringIOBases */

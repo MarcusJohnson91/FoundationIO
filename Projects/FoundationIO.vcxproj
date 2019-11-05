@@ -24,8 +24,8 @@
     <ClInclude Include="..\Library\include\CryptographyIO.h" />
     <ClInclude Include="..\Library\include\Macros.h" />
     <ClInclude Include="..\Library\include\MathIO.h" />
-    <ClInclude Include="..\Library\include\Private\NumberTables.h" />
-    <ClInclude Include="..\Library\include\Private\UnicodeTables.h" />
+    <ClInclude Include="..\Library\include\UnicodeIO\Private\NumberTables.h" />
+    <ClInclude Include="..\Library\include\UnicodeIO\Private\UnicodeTables.h" />
     <ClInclude Include="..\Library\include\TestIO.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\CommandLineIO.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\FormatIO.h" />
