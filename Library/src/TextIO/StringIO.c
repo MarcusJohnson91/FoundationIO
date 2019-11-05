@@ -1,6 +1,6 @@
 #include "../../include/MathIO.h"                          /* Included for endian swapping */
-#include "../../include/Private/NumberTables.h"          /* Included for the Number tables */
-#include "../../include/Private/UnicodeTables.h"         /* Included for the Unicode tables */
+#include "../../include/UnicodeIO/Private/NumberTables.h"          /* Included for the Number tables */
+#include "../../include/UnicodeIO/Private/UnicodeTables.h"         /* Included for the Unicode tables */
 #include "../../include/UnicodeIO/FormatIO.h"            /* Included for the String formatting code */
 #include "../../include/UnicodeIO/LogIO.h"               /* Included for error logging */
 #include "../../include/UnicodeIO/StringIO.h"            /* Included for our declarations */

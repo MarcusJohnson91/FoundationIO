@@ -45,11 +45,11 @@
     <ClInclude Include="..\Library\include\UnicodeIO\FormatIO.h">
       <Filter>Header Files\UnicodeIO</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\Private\UnicodeTables.h">
-      <Filter>Header Files\Private</Filter>
+    <ClInclude Include="..\Library\include\UnicodeIO\Private\UnicodeTables.h">
+      <Filter>Header Files\UnicodeIO\Private</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\Private\NumberTables.h">
-        <Filter>Header Files\Private</Filter>
+    <ClInclude Include="..\Library\include\UnicodeIO\Private\NumberTables.h">
+        <Filter>Header Files\UnicodeIO\Private</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

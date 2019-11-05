@@ -1,5 +1,5 @@
 #include "../../include/Macros.h"                           /* Included for FoundationIOSTDVersion */
-#include "../../include/Private/UnicodeTables.h"            /* Included for Currency tables */
+#include "../../include/UnicodeIO/Private/UnicodeTables.h"            /* Included for Currency tables */
 #include "../../include/UnicodeIO/LocalizationIO.h"         /* Included for our declarations */
 #include "../../include/UnicodeIO/LogIO.h"                  /* Included for error logging */
 #include "../../include/UnicodeIO/StringIO.h"               /* Included for UTF8_GetStringSizeInCideUnits */
