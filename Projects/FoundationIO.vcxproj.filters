@@ -7,50 +7,18 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{05add13e-8113-412d-8d79-8e78e2479822}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Private">
-      <UniqueIdentifier>{2264dcef-d145-4526-a25f-8d3d33788b15}</UniqueIdentifier>
+    <Filter Include="Source Files\UnicodeIO">
+      <UniqueIdentifier>{a9d16bf7-d9c9-46eb-9aad-22e78a12aa6a}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\Library\include\BitIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\ContainerIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\CryptographyIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\Macros.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\MathIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\TestIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\UnicodeIO\CommandLineIO.h">
-      <Filter>Header Files\UnicodeIO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\UnicodeIO\LocalizationIO.h">
-      <Filter>Header Files\UnicodeIO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\UnicodeIO\LogIO.h">
-      <Filter>Header Files\UnicodeIO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\UnicodeIO\StringIO.h">
-      <Filter>Header Files\UnicodeIO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\UnicodeIO\FormatIO.h">
-      <Filter>Header Files\UnicodeIO</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\UnicodeIO\Private\UnicodeTables.h">
-      <Filter>Header Files\UnicodeIO\Private</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\UnicodeIO\Private\NumberTables.h">
-        <Filter>Header Files\UnicodeIO\Private</Filter>
-    </ClInclude>
+    <Filter Include="Header Files\UnicodeIO">
+      <UniqueIdentifier>{c48625fe-e5fe-4383-b7e1-0db3e425d9c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UnicodeIO\Private">
+      <UniqueIdentifier>{574ed4c7-5d61-43b5-bb46-69615eca2c3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Private">
+      <UniqueIdentifier>{740037f6-bead-4f44-974e-4ec3fcb11fe9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Library\src\BitIO.c">
@@ -74,8 +42,11 @@
     <ClCompile Include="..\Library\src\UnicodeIO\CommandLineIO.c">
       <Filter>Source Files\UnicodeIO</Filter>
     </ClCompile>
+    <ClCompile Include="..\Library\src\UnicodeIO\FormatIO.c">
+      <Filter>Source Files\UnicodeIO</Filter>
+    </ClCompile>
     <ClCompile Include="..\Library\src\UnicodeIO\LocalizationIO.c">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\UnicodeIO</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\src\UnicodeIO\LogIO.c">
       <Filter>Source Files\UnicodeIO</Filter>
@@ -83,8 +54,49 @@
     <ClCompile Include="..\Library\src\UnicodeIO\StringIO.c">
       <Filter>Source Files\UnicodeIO</Filter>
     </ClCompile>
-    <ClCompile Include="..\Library\src\UnicodeIO\FormatIO.c">
-      <Filter>Source Files\UnicodeIO</Filter>
-    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Library\include\BitIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\ContainerIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\CryptographyIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\Macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\MathIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\TestIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\UnicodeIO\CommandLineIO.h">
+      <Filter>Header Files\UnicodeIO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\UnicodeIO\FormatIO.h">
+      <Filter>Header Files\UnicodeIO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\UnicodeIO\LocalizationIO.h">
+      <Filter>Header Files\UnicodeIO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\UnicodeIO\LogIO.h">
+      <Filter>Header Files\UnicodeIO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\UnicodeIO\StringIO.h">
+      <Filter>Header Files\UnicodeIO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\UnicodeIO\Private\NumberTables.h">
+      <Filter>Header Files\UnicodeIO\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\UnicodeIO\Private\UnicodeTables.h">
+      <Filter>Header Files\UnicodeIO\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\Private\Constants.h">
+      <Filter>Header Files\Private</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
