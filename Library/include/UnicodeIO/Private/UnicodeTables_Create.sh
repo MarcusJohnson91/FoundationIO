@@ -3,66 +3,65 @@
 # Usage (the HeaderFile WILL BE IRRECOVERABLY DELETED): ./UnicodeTables_Create.sh /HeaderPath/HeaderFile.h
 # Dependencies: Curl, XMLStarlet (On Mac install Homebrew from brew.sh then call brew install xmlstarlet)
 
-CreateNumberTable() {
-echo "#define IntegerTableBase2Size        2" >> "$OutputFile"
-echo "#define IntegerTableBase8Size        8" >> "$OutputFile"
-echo "#define IntegerTableBase10Size      10" >> "$OutputFile"
-echo "#define IntegerTableBase16Size      16" >> "$OutputFile"
-
-echo "#define DecimalTableSignsSize        3" >> "$OutputFile"
-echo "#define DecimalGroupingTableSize     4" >> "$OutputFile"
-
-echo "#define DecimalTableScientificSize  11" >> "$OutputFile"
-echo "#define DecimalTableHexadecimalSize 18" >> "$OutputFile"
+CreateNumberTables() {
+						    printf "#define IntegerTableBase2Size        2" >> "$OutputFile"
+																		    printf "#define IntegerTableBase8Size        8" >> "$OutputFile"
+    printf "#define IntegerTableBase10Size      10" >> "$OutputFile"
+    printf "#define IntegerTableBase16Size      16" >> "$OutputFile"
+    printf "#define DecimalTableBase10Size      11" >> "$OutputFile"
+    printf "#define DecimalTableScientificSize  14" >> "$OutputFile"
+    printf "#define DecimalTableHexadecimalSize 21" >> "$OutputFile"
     
-	printf "    static const UTF32 IntegerTableBase2[IntegerTableBase2Size] = {\n"
-	printf "        U'0', U'1'\n"
-	printf "    };\n"
-
-	printf "    static const UTF32 IntegerTableBase8[IntegerTableBase8Size] = {\n"
-	printf "        U'0', U'1', U'2', U'3', U'4', U'5', U'6', U'7'\n"
-	printf "    };\n"
-
-	printf "    static const UTF32 IntegerTableBase10[IntegerTableBase10Size] = {\n"
-	printf "        U'0', U'1', U'2', U'3', U'4', U'5', U'6', U'7', U'8', U'9'\n"
-	printf "    };\n"
+     printf "    tstatic const UTF32 IntegerTableBase2[IntegerTableBase2Size] = {\n"
+     printf "\t\tU'0', U'1'
+    printf "\t};"
     
-    printf "    static const UTF32 IntegerTableUppercaseBase16[IntegerTableBase16Size] = {\n"
-	printf "        U'0', U'1', U'2', U'3', U'4', U'5', U'6', U'7', U'8', U'9',\n"
-	printf "        U'A', U'B', U'C', U'D', U'E', U'F'\n"
-	printf "    };\n"
-
-	printf "    static const UTF32 IntegerTableLowercaseBase16[IntegerTableBase16Size] = {\n"
-	printf "        U'0', U'1', U'2', U'3', U'4', U'5', U'6', U'7', U'8', U'9',\n"
-	printf "        U'a', U'b', U'c', U'd', U'e', U'f'\n"
-	printf "    };\n"
-
-
-	printf "    static const UTF32 DecimalTableSigns[DecimalTableSignsSize] = {\n"
-	printf "        U'+', U'-',\n"
-	printf "    };\n"
-
-	printf "    static const UTF32 DecimalGroupingTable[DecimalGroupingTableSize] = {\n"
-	printf "        U'.', U',', U' ', U'\''\n"
-	printf "    };\n"
-
-	printf "    static const UTF32 DecimalScientificUppercase[DecimalTableScientificSize] = {\n"
-	printf "        U'0', U'1', U'2', U'3', U'4', U'5', U'6', U'7', U'8', U'9', U'E'\n"
-	printf "    };\n"
-
-	printf "    static const UTF32 DecimalScientificLowercase[DecimalTableScientificSize] = {\n"
-	printf "        U'0', U'1', U'2', U'3', U'4', U'5', U'6', U'7', U'8', U'9', U'e'\n"
-	printf "    };\n"
-
-	printf "    static const UTF32 DecimalHexUppercase[DecimalTableHexadecimalSize] = {\n"
-	printf "        U'0', U'1', U'2', U'3', U'4', U'5', U'6', U'7', U'8', U'9', U'A',
-	printf "        U'B', U'C', U'D', U'E', U'F', U'P', U'X'\n"
-	printf "    };\n"
-
-	printf "    static const UTF32 DecimalHexLowercase[DecimalTableHexadecimalSize] = {\n"
-	printf "        U'0', U'1', U'2', U'3', U'4', U'5', U'6', U'7', U'8', U'9', U'a'\n"
-	printf "        U'b', U'c', U'd', U'e', U'f', U'p', U'x'\n"
-	printf "    };\n"
+    static const UTF32 IntegerTableBase8[IntegerTableBase8Size] = {
+        , , UTF32Character('2'), UTF32Character('3'),
+        UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7')
+    };
+    
+    static const UTF32 IntegerTableBase10[IntegerTableBase10Size] = {
+        UTF32Character('0'), UTF32Character('1''(2'), UTF32Character('3'),
+        '', UTF32Character('5'), UTF32Character('6'), UTF32Character('7'),
+        UTF32Character('8'), UTF32Character('9')
+    };
+    
+    static const UTF32 IntegerTableUppercaseBase16[IntegerTableBase16Size] = {
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'),
+        UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'),
+        UTF32Character('8'), UTF32Character('9'), UTF32Character('A'), UTF32Character('B'),
+        UTF32Character('C'), UTF32Character('D'), UTF32Character('E'), UTF32Character('F')
+    };
+    
+    static const UTF32 IntegerTableLowercaseBase16[IntegerTableBase16Size] = {
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'),
+        UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'),
+        UTF32Character('8'), UTF32Character('9'), UTF32Character('a'), UTF32Character('b'),
+        UTF32Character('c'), UTF32Character('d'), UTF32Character('e'), UTF32Character('f')
+    };
+    
+    static const UTF32 DecimalTable[DecimalTableBase10Size] = {
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'), UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'), UTF32Character('8'), UTF32Character('9'), UTF32Character('.')
+    };
+    
+    static const UTF32 DecimalScientificUppercase[DecimalTableScientificSize] = {
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'), UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'), UTF32Character('8'), UTF32Character('9'), UTF32Character('E'), UTF32Character('.'), UTF32Character('+'), UTF32Character('-')
+    };
+    
+    static const UTF32 DecimalScientificLowercase[DecimalTableScientificSize] = {
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'), UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'), UTF32Character('8'), UTF32Character('9'), UTF32Character('e'), UTF32Character('.'), UTF32Character('+'), UTF32Character('-')
+    };
+    
+    static const UTF32 DecimalHexUppercase[DecimalTableHexadecimalSize] = {
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'), UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'), UTF32Character('8'), UTF32Character('9'), UTF32Character('A'), UTF32Character('B'), UTF32Character('C'), UTF32Character('D'),
+        UTF32Character('E'), UTF32Character('F'), UTF32Character('P'), UTF32Character('X'), UTF32Character('.'), UTF32Character('+'), UTF32Character('-')
+    };
+    
+    static const UTF32 DecimalHexLowercase[DecimalTableHexadecimalSize] = {
+        UTF32Character('0'), UTF32Character('1'), UTF32Character('2'), UTF32Character('3'), UTF32Character('4'), UTF32Character('5'), UTF32Character('6'), UTF32Character('7'), UTF32Character('8'), UTF32Character('9'), UTF32Character('a'), UTF32Character('b'), UTF32Character('c'), UTF32Character('d'),
+        UTF32Character('e'), UTF32Character('f'), UTF32Character('p'), UTF32Character('x'), UTF32Character('.'), UTF32Character('+'), UTF32Character('-')
+    };
 }
 
 CreateOutputFileTop() {
@@ -72,7 +71,7 @@ CreateOutputFileTop() {
     printf "#ifdef    UTF32\n" >> "$OutputFile"
     printf "#undef    UTF32\n" >> "$OutputFile"
     printf "#endif /* UTF32 */\n" >> "$OutputFile"
-    echo   "#if '('defined __STDC_UTF_32__ && defined __CHAR32_TYPE__')' && '('!defined __APPLE__')' && '('!defined __MACH__')'" >> "$OutputFile"
+    echo   "#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (!defined __APPLE__) && (!defined __MACH__)" >> "$OutputFile"
     # Printf doesn't want to work with the precending Macro, so using echo instead is my shitty workaround.
     printf "typedef   char32_t       UTF32;\n" >> "$OutputFile"
     printf "#else\n" >> "$OutputFile"
@@ -331,7 +330,7 @@ fi
 OutputFile=$@
 
 if [ "$#" -ne 1 ] -o [ -z "$1" ]; then
-    echo "The first and only argument needs to be the file to write the tables. '('if it exists, it WILL be IRRECOVERABLY DELETED')'"
+    echo "The first and only argument needs to be the file to write the tables. (if it exists, it WILL be IRRECOVERABLY DELETED)"
 else
     if [ -e "$OutputFile" ]; then
         HeaderUnicodeVersion=$(grep '#define UnicodeVersion ' "$OutputFile" | awk '{printf $3}')
@@ -385,8 +384,6 @@ else
                 UCD_Data="$UCD_Folder/ucd.all.flat.xml"
 
                 CreateOutputFileTop
-
-				CreateNumberTable
 
                 CreateBiDirectionalControlsTable
                 CreateWhiteSpaceTable
