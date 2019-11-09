@@ -1,8 +1,9 @@
-#include "../include/BitIO.h"                /* Included for BitBuffer for CRC32 and Adler32 */
+##include "../include/BitIO.h"                /* Included for BitBuffer for CRC32 and Adler32 */
 #include "../include/CryptographyIO.h"       /* Included for our declarations */
-#include "../include/MathIO.h"                 /* Included for Bits2Bytes, etc */
-#include "../include/UnicodeIO/Private/NumberTables.h" /* Included for BitMaskTables */
+#include "../include/MathIO.h"               /* Included for Bits2Bytes, etc */
+#include "../include/Private/Constants.h"    /* Included for BitMaskTables */
 #include "../include/UnicodeIO/LogIO.h"      /* Included for error logging */
+#include <stdlib.h>                          /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 
 #if   (FoundationIOTargetOS == FoundationIOWindowsOS)
 #ifndef   WIN32_LEAN_AND_MEAN

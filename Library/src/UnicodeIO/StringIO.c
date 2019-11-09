@@ -1,9 +1,11 @@
 #include "../../include/MathIO.h"                          /* Included for endian swapping */
+#include "../../include/Private/Constants.h"               /* Included for Integer/Decimal Tables*/
 #include "../../include/UnicodeIO/Private/UnicodeTables.h" /* Included for the Unicode tables */
 #include "../../include/UnicodeIO/FormatIO.h"              /* Included for the String formatting code */
 #include "../../include/UnicodeIO/LogIO.h"                 /* Included for error logging */
 #include "../../include/UnicodeIO/StringIO.h"              /* Included for our declarations */
 #include <stdarg.h>                                        /* Included for va_list, va_copy, va_start, va_end */
+#include <stdlib.h>                                        /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 #include <wchar.h>                                         /* Included for Fwide */
 
 #ifdef __cplusplus
@@ -2198,10 +2200,10 @@ extern "C" {
                 }
             } else if (Base == Base_Integer_Radix10) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
-                    for (uint8_t Digit = 0; Digit < IntegerTableBase10Size; Digit++) {
+                    for (uint8_t Digit = 0; Digit < TableBase10Size; Digit++) {
                         if (CodePoint == 0 && String[CodePoint] == UTF32Character('-')) {
                             Sign        = -1;
-                        } else if (String[CodePoint] == IntegerTableBase10[Digit]) {
+                        } else if (String[CodePoint] == TableBase10[Digit]) {
                             Value      *= 10;
                             Value      += String[CodePoint] - 0x30;
                         }
@@ -2299,7 +2301,7 @@ extern "C" {
                     if (Sign == -1 && CodePoint == 1) {
                         String[CodePoint - 1] = UTF32Character('-');
                     } else {
-                        String[CodePoint - 1] = IntegerTableBase10[Digit];
+                        String[CodePoint - 1] = TableBase10[Digit];
                     }
                 } else if (Base == Base_Integer_Radix16_Uppercase) {
                     String[CodePoint - 1]     = IntegerTableUppercaseBase16[Digit];
@@ -2912,7 +2914,7 @@ extern "C" {
             } else if (Base == Base_Decimal_Radix10) {
                 while (String[CodePoint] != FoundationIONULLTerminator) {
                     for (uint8_t DecimalCodePoint = 0; DecimalCodePoint < DecimalTableBase10Size; DecimalCodePoint++) {
-                        if (String[CodePoint] == DecimalTable[DecimalCodePoint]) {
+                        if (String[CodePoint] == TableBase10[DecimalCodePoint]) {
                             NumDigits += 1;
                         }
                     }

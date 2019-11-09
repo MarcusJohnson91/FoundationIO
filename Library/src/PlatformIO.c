@@ -1,4 +1,5 @@
 #include "../include/Macros.h"
+#include <stdlib.h>                   /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 
 #if (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
 #include <stddef.h>
@@ -35,9 +36,8 @@ extern "C" {
         uint64_t PageSize    = (uint64_t) sysconf(_SC_PAGE_SIZE);
         TotalMemory          = NumPages * PageSize;
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        MEMORYSTATUSEX MemoryStatus;
-        MemoryStatus.dwLength(sizeof(MemoryStatus));
-        GlobalMemoryStatusEx(&MemoryStatus);
+		MEMORYSTATUSEX MemoryStatus;
+		GlobalMemoryStatusEx(&MemoryStatus);
         TotalMemory          = MemoryStatus.ullTotalPhys;
 #endif
         return TotalMemory;

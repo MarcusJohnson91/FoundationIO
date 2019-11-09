@@ -1,8 +1,9 @@
-#include "../../include/UnicodeIO/Private/NumberTables.h"        /* Included for the Number tables */
+#include "../../include/Private/Constants.h"           /* Included for the Number tables */
 #include "../../include/UnicodeIO/FormatIO.h"          /* Included for our declarations */
 #include "../../include/UnicodeIO/LogIO.h"             /* Included for Logging */
 #include "../../include/UnicodeIO/StringIO.h"          /* Included for StringIOBases */
 #include <stdarg.h>                                    /* Included for va_list, va_copy, va_start, va_end */
+#include <stdlib.h>                                    /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 
 #ifdef __cplusplus
 extern "C" {
@@ -672,7 +673,11 @@ extern "C" {
         return String;
     }
     
-    static void Specifiers_CorrectOffset(FormatSpecifiers *Specifiers) __attribute__((no_sanitize("signed-integer-overflow", "integer"))) {
+#if (FoundationIOCompiler != FoundationIOCompilerIsMSVC)
+	static void Specifiers_CorrectOffset(FormatSpecifiers *Specifiers) __attribute__((no_sanitize("signed-integer-overflow", "integer"))) {
+#else
+	static void Specifiers_CorrectOffset(FormatSpecifiers *Specifiers) {
+#endif
         if (Specifiers != NULL) {
             /*
              Specifier0:

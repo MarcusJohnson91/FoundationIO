@@ -43,7 +43,6 @@
     <ClInclude Include="..\Library\include\UnicodeIO\FormatIO.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\LocalizationIO.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\LogIO.h" />
-    <ClInclude Include="..\Library\include\UnicodeIO\Private\NumberTables.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\Private\UnicodeTables.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\StringIO.h" />
   </ItemGroup>

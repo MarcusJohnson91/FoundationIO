@@ -2,6 +2,7 @@
 #include "../include/TestIO.h"                   /* Included for our declarations */
 #include "../include/UnicodeIO/LogIO.h"          /* Included for error reporting */
 #include "../include/UnicodeIO/StringIO.h"       /* Included for UTFX_Init functions */
+#include <stdlib.h>                              /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
 #include <time.h>                      /* Included for timespec_get */

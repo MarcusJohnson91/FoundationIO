@@ -7,7 +7,6 @@
  */
 
 #include "../include/Macros.h"
-#include "../include/CryptographyIO.h"
 
 #pragma  once
 
@@ -165,6 +164,12 @@ extern "C" {
      @abstract                                                  "Contains variables and a pointer to a buffer for reading and writing bits".
      */
     typedef struct              BitBuffer                       BitBuffer;
+
+	/*!
+	@typedef                    Entropy
+	@abstract                                                   "Forward declaration from CryptographyIO".
+	*/
+	typedef struct              Entropy                         Entropy;
     
     /* BitBuffer */
     /*!

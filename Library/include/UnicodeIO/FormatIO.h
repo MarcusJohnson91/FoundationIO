@@ -7,7 +7,6 @@
  */
 
 #include "../../include/Macros.h"
-#include "../../include/UnicodeIO/StringIO.h"
 
 #pragma once
 
@@ -71,8 +70,22 @@ extern "C" {
 #define                   UTF32String(Literal)                (UTF32*) U##Literal
 #define                   UTF32Character(Literal)             (UTF32) U##Literal
 #endif /* FoundationIO_Unicodize32 */
+
+	/*!
+	 @enum                StringIOStringTypes
+	 @constant            StringType_Unknown                    "Byte order is unknown".
+	 @constant            StringType_UTF8                       "Use the byte order of the host".
+	 @constant            StringType_UTF16                      "Use the little endian, Least-Significant-Byte first order".
+	 @constant            StringType_UTF32                      "Use the big endian, Most-Significant-Byte first order".
+	 */
+	typedef enum StringIOStringTypes {
+		StringType_Unknown = 0,
+		StringType_UTF8 = 1,
+		StringType_UTF16 = 2,
+		StringType_UTF32 = 4,
+	} StringIOStringTypes;
     
-    typedef struct FormatSpecifiers FormatSpecifiers;
+    typedef struct    FormatSpecifiers FormatSpecifiers;
     
     FormatSpecifiers *FormatSpecifiers_Init(uint64_t NumSpecifiers);
     

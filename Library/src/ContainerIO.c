@@ -1,7 +1,7 @@
 #include "../include/ContainerIO.h"        /* Included for our declarations */
-#include "../include/MathIO.h"               /* Included for Absolute, Max/Min */
+#include "../include/MathIO.h"             /* Included for Absolute, Max/Min */
 #include "../include/UnicodeIO/LogIO.h"    /* Included for error reporting */
-#include "../include/UnicodeIO/StringIO.h" /* Included for UTF32 string handling */
+#include <stdlib.h>                        /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 
 #ifdef __cplusplus
 extern "C" {

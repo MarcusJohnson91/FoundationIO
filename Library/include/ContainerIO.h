@@ -189,13 +189,6 @@ extern "C" {
     uint64_t                Audio2DContainer_GetNumChannels(Audio2DContainer *Audio);
     
     /*!
-     @abstract                             "Returns the number of audio channels".
-     @param                 Audio          "Audio2DContainer Pointer".
-     @param                 ChannelMask    "The channel mask".
-     */
-    uint8_t                 Audio2DContainer_GetIndex(Audio2DContainer *Audio, Audio_ChannelMask ChannelMask);
-    
-    /*!
      @abstract                             "Returns the number of channel-agnostic samples in one second".
      @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      */
@@ -507,22 +500,6 @@ extern "C" {
      @param                 Histogram      "A pointer to the Audio2DHistogram to deinitalize".
      */
     void                    Audio2DHistogram_Deinit(Audio2DHistogram *Histogram);
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     /*!
      @abstract                             "Creates a ImageHistogram".

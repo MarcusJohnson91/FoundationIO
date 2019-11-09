@@ -28,16 +28,16 @@ extern "C" {
 #endif
     
     /*!
-     @enum                  RoundingTypes
-     @abstract                                              "Defines the type of flipping".
-     @constant              RoundingType_Unknown            "Invalid ImageType, exists solely to tell when it hasn't been set".
-     @constant              RoundingType_Down               "Flip the imge vertically, up and down".
-     @constant              RoundingType_Up                 "Flip the image horizontally, side to side".
+     @enum                      RoundingTypes
+     @abstract                                                  "Defines the type of flipping".
+     @constant                  RoundingType_Unknown            "Invalid ImageType, exists solely to tell when it hasn't been set".
+     @constant                  RoundingType_Down               "Flip the imge vertically, up and down".
+     @constant                  RoundingType_Up                 "Flip the image horizontally, side to side".
      */
     typedef enum RoundingTypes {
-                            RoundingType_Unknown            = 0,
-                            RoundingType_Down               = 1,
-                            RoundingType_Up                 = 2,
+                                RoundingType_Unknown            = 0,
+                                RoundingType_Down               = 1,
+							    RoundingType_Up                 = 2,
     } RoundingTypes;
     
     /*!

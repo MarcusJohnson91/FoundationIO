@@ -23,7 +23,6 @@
 #include <stdbool.h>                  /* Included for bool */
 #include <stdint.h>                   /* Included for u/intX_t */
 #include <stdio.h>                    /* Included for FILE, SEEK SET/END/CUR macros */
-#include <stdlib.h>                   /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 
 #pragma once
 
@@ -305,7 +304,7 @@ extern "C" {
 #define             FoundationIONewLine16                                  (u'\n')
 #define             FoundationIONewLine16Size                              (1)
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-#define             FoundationIONewLine16                                  (u'\r\n')
+#define             FoundationIONewLine16                                  (u"\r\n")
 #define             FoundationIONewLine16Size                              (2)
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
 #define             FoundationIONewLine16                                  (u'\r')
@@ -319,7 +318,7 @@ extern "C" {
 #define             FoundationIONewLine32                                  (U'\n')
 #define             FoundationIONewLine32Size                              (1)
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-#define             FoundationIONewLine32                                  (U'\r\n')
+#define             FoundationIONewLine32                                  (U"\r\n")
 #define             FoundationIONewLine32Size                              (2)
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
 #define             FoundationIONewLine32                                  (U'\r')
@@ -349,15 +348,15 @@ extern "C" {
 #endif
     
 #ifndef UNCPathPrefix8
-#define UNCPathPrefix8                    UTF8String("//?/")
+#define UNCPathPrefix8                    u8"//?/"
 #endif
     
 #ifndef UNCPathPrefix16
-#define UNCPathPrefix16                   UTF16String("//?/")
+#define UNCPathPrefix16                   u"//?/"
 #endif
 
 #ifndef UNCPathPrefix32
-#define UNCPathPrefix32                   UTF32String("//?/")
+#define UNCPathPrefix32                   U"//?/"
 #endif
     
 #ifndef FoundationIO_ImmutablePointer2MutableData
