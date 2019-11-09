@@ -7,7 +7,6 @@
  */
 
 #include "../include/Macros.h"
-#include "../include/CryptographyIO.h"
 
 #pragma once
 
@@ -69,6 +68,8 @@ extern "C" {
 #ifndef TestIO_CreateFunctionName
 #define TestIO_CreateFunctionName(Module, Function) TESTIO_CAT(Test_, Module, Function)
 #endif
+
+	typedef                     Entropy                         Entropy; // Forward declare CrytoographyIO's Entropy type
     
     /*!
      @abstract                                                  "Gets how accurate the clock is".

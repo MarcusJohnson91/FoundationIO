@@ -449,7 +449,11 @@ extern "C" {
         return NumDigits;
     }
     
-    uint64_t RotateLeft(uint64_t Value, uint8_t Bits2Rotate) __attribute__((no_sanitize("shift-exponent"))) {
+#if (FoundationIOCompiler != FoundationIOCompilerIsMSVC)
+	uint64_t RotateLeft(uint64_t Value, uint8_t Bits2Rotate) __attribute__((no_sanitize("shift-exponent"))) {
+#else
+	uint64_t RotateLeft(uint64_t Value, uint8_t Bits2Rotate) {
+#endif
         return (Value << Bits2Rotate) | (Value >> (64 - Bits2Rotate));
     }
     

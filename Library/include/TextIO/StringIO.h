@@ -183,20 +183,6 @@ extern "C" {
     } StringIOByteOrders;
     
     /*!
-     @enum                StringIOStringTypes
-     @constant            StringType_Unknown                    "Byte order is unknown".
-     @constant            StringType_UTF8                       "Use the byte order of the host".
-     @constant            StringType_UTF16                      "Use the little endian, Least-Significant-Byte first order".
-     @constant            StringType_UTF32                      "Use the big endian, Most-Significant-Byte first order".
-     */
-    typedef enum StringIOStringTypes {
-                          StringType_Unknown                    = 0,
-                          StringType_UTF8                       = 1,
-                          StringType_UTF16                      = 2,
-                          StringType_UTF32                      = 4,
-    } StringIOStringTypes;
-    
-    /*!
      @enum                TrimStringTypes
      @abstract                                                  "Is this BitInput or BitOutput connected to a File or Socket?".
      @constant            TrimString_Unknown                    "Unknown TrimString command".

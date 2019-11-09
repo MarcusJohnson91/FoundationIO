@@ -1,9 +1,10 @@
 #include "../include/BitIO.h"                /* Included for our declarations */
 #include "../include/CryptographyIO.h"       /* Included for Entropy_GenerateInteger for GUUID_Generate */
-#include "../include/MathIO.h"                 /* Included for Integer functions */
-#include "../include/UnicodeIO/Private/NumberTables.h" /* Included for BitMaskTables */
+#include "../include/MathIO.h"               /* Included for Integer functions */
+#include "../include/Private/Constants.h"    /* Included for BitMaskTables */
 #include "../include/UnicodeIO/LogIO.h"      /* Included for Logging */
 #include "../include/UnicodeIO/StringIO.h"   /* Included for StringIO's declarations */
+#include <stdlib.h>                          /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 
 #ifdef __cplusplus
 extern "C" {
@@ -464,8 +465,7 @@ extern "C" {
         UTF32 *BitBufferString = NULL;
         if (BitB != NULL && Length >= 1 && Length <= 64) {
             BitBuffer_Seek(BitB, BitB->BitOffset - Length);
-            uint64_t Bits    = BitBuffer_ReadBits(BitB, MSByteFirst, MSBitFirst, Length);
-            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %P, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), BitB, BitB->NumBits, BitB->BitOffset, Bits);
+            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %P, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), BitB, BitB->NumBits, BitB->BitOffset, BitBuffer_ReadBits(BitB, MSByteFirst, MSBitFirst, Length));
         } else if (BitB == NULL) {
             Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
         } else if (Length == 0) {
