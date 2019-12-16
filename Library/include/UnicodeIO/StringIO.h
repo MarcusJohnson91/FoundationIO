@@ -73,6 +73,9 @@ extern "C" {
     
     /*!
      @enum                StringIOCommon
+     @constant            UTF8CodeUnitSizeInBits                "The size of a single code unit in bits".
+     @constant            UTF16CodeUnitSizeInBits               "The size of a single code unit in bits".
+     @constant            UTF32CodeUnitSizeInBits               "The size of a single code unit in bits".
      @constant            UTF8BOMSizeInCodeUnits                "The number of code units (8 bits) the UTF8 BOM takes".
      @constant            UTF16BOMSizeInCodeUnits               "The number of code units (16 bits) the UTF16 BOM takes".
      @constant            UnicodeBOMSizeInCodePoints            "The number of CodePoints in a BOM".
@@ -94,6 +97,9 @@ extern "C" {
      @constant            UTF16MaxCodeUnits                     "The maximum number of codeunits per codepoint".
      */
     typedef enum StringIOCommon {
+                          UTF8CodeUnitSizeInBits                = 8,
+                          UTF16CodeUnitSizeInBits               = 16,
+                          UTF32CodeUnitSizeInBits               = 32,
                           UTF8BOMSizeInCodeUnits                = 3,
                           UTF16BOMSizeInCodeUnits               = 1,
                           UnicodeBOMSizeInCodePoints            = 1,
