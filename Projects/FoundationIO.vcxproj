@@ -155,13 +155,12 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <MinimalRebuild>true</MinimalRebuild>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <CompileAs>Default</CompileAs>
@@ -175,7 +174,6 @@
       <StructMemberAlignment>Default</StructMemberAlignment>
       <ControlFlowGuard>false</ControlFlowGuard>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>true</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <EnforceTypeConversionRules>false</EnforceTypeConversionRules>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -237,7 +235,6 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <MinimalRebuild>true</MinimalRebuild>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
@@ -257,7 +254,6 @@
       <StructMemberAlignment>Default</StructMemberAlignment>
       <ControlFlowGuard>false</ControlFlowGuard>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>true</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <EnforceTypeConversionRules>false</EnforceTypeConversionRules>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -317,13 +313,12 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <MinimalRebuild>true</MinimalRebuild>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <CompileAs>Default</CompileAs>
@@ -337,7 +332,6 @@
       <StructMemberAlignment>Default</StructMemberAlignment>
       <ControlFlowGuard>false</ControlFlowGuard>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>true</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <EnforceTypeConversionRules>false</EnforceTypeConversionRules>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -399,7 +393,6 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <MinimalRebuild>true</MinimalRebuild>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
@@ -419,7 +412,6 @@
       <StructMemberAlignment>Default</StructMemberAlignment>
       <ControlFlowGuard>false</ControlFlowGuard>
       <FloatingPointExceptions>false</FloatingPointExceptions>
-      <CreateHotpatchableImage>true</CreateHotpatchableImage>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <EnforceTypeConversionRules>false</EnforceTypeConversionRules>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
