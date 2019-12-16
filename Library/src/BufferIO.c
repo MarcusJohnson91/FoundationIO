@@ -711,15 +711,22 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write) {
+    void BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write, String_WriteTypes WriteType) {
         if (BitB != NULL && String2Write != NULL) {
-            int64_t  StringSize    = UTF8_GetStringSizeInCodeUnits(String2Write);
+            uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(String2Write);
+            if (WriteType == WriteType_NULLTerminator) {
+                StringSize     += UTF8CodeUnitSizeInBits;
+            }
+
             int64_t  BitsAvailable = BitBuffer_GetBitsFree(BitB);
             uint64_t CodeUnit      = 0ULL;
             if (BitsAvailable >= Bytes2Bits(StringSize)) {
                 while (String2Write[CodeUnit] != FoundationIONULLTerminator) {
-                    BitBuffer_Append_MSByteLSBit(BitB, 8, String2Write[CodeUnit]);
+                    BitBuffer_Append_MSByteLSBit(BitB, UTF8CodeUnitSizeInBits, String2Write[CodeUnit]);
                     CodeUnit         += 1;
+                }
+                if (WriteType == WriteType_NULLTerminator) {
+                    BitBuffer_Append_MSByteLSBit(BitB, UTF8CodeUnitSizeInBits, 0); // NULL Terminator
                 }
             } else {
                 Log(Log_DEBUG, __func__, UTF8String("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
@@ -731,15 +738,22 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteUTF16(BitBuffer *BitB, UTF16 *String2Write) {
+    void BitBuffer_WriteUTF16(BitBuffer *BitB, UTF16 *String2Write, String_WriteTypes WriteType) {
         if (BitB != NULL && String2Write != NULL) {
-            uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(String2Write);
-            uint64_t BitsAvailable = BitBuffer_GetBitsFree(BitB);
-            if (BitsAvailable >= (uint64_t) Bytes2Bits(StringSize)) {
-                uint64_t CodeUnit = 0ULL;
+            uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(String2Write);
+            if (WriteType == WriteType_NULLTerminator) {
+                StringSize += UTF16CodeUnitSizeInBits / 8; // Size in bytes, not bits
+            }
+
+            int64_t  BitsAvailable = BitBuffer_GetBitsFree(BitB);
+            uint64_t CodeUnit = 0ULL;
+            if (BitsAvailable >= Bytes2Bits(StringSize)) {
                 while (String2Write[CodeUnit] != FoundationIONULLTerminator) {
-                    BitBuffer_Append_LSByteLSBit(BitB, 16, String2Write[CodeUnit]);
-                    CodeUnit     += 1;
+                    BitBuffer_Append_LSByteLSBit(BitB, UTF16CodeUnitSizeInBits, String2Write[CodeUnit]);
+                    CodeUnit += 1;
+                }
+                if (WriteType == WriteType_NULLTerminator) {
+                    BitBuffer_Append_LSByteLSBit(BitB, UTF16CodeUnitSizeInBits, 0); // NULL Terminator
                 }
             } else {
                 Log(Log_DEBUG, __func__, UTF8String("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);

@@ -146,6 +146,16 @@ extern "C" {
                                 StopBit_Zero                    = 0,
                                 StopBit_One                     = 1,
     } Unary_StopBits;
+
+    /*!
+     @enum                      String_WriteTypes
+     @constant                  WriteType_NULLTerminator        "Write the NULL Terminator".
+     @constant                  WriteType_Sized                 "Do not write the null terminaotr, there's a size field".
+     */
+    typedef enum String_WriteTypes {
+                                WriteType_NULLTerminator = 1,
+                                WriteType_Sized          = 2,
+    } String_WriteTypes;
     
     /*!
      @typedef                   BitInput
@@ -368,16 +378,18 @@ extern "C" {
      @abstract                                                  "Writes a UTF-8 encoded string to the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     String2Write                    "The string to write to the BitBuffer".
+     @param                     WriteType                       "Should the NULL terminator be written"?
      */
-    void                        BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write);
+    void                        BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write, String_WriteTypes WriteType);
     
     /*!
      @abstract                                                  "Writes a UTF-16 encoded string to the BitBuffer".
      @remark                                                    "Convert the string to UTF16BOM_BE or UTF16BOM_LE first".
      @param                     BitB                            "BitBuffer Pointer".
      @param                     String2Write                    "The string to write to the BitBuffer".
+     @param                     WriteType                       "Should the NULL terminator be written"?
      */
-    void                        BitBuffer_WriteUTF16(BitBuffer *BitB, UTF16 *String2Write);
+    void                        BitBuffer_WriteUTF16(BitBuffer *BitB, UTF16 *String2Write, String_WriteTypes WriteType);
     
     /*!
      @abstract                                                  "Writes a GUUID to the BitBuffer".
