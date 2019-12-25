@@ -44,7 +44,14 @@ extern "C" {
      @abstract                                                  "Tells if the number is negative".
      @param                     Integer                         "The value to find the signedness of".
      */
-    bool                        IsNegative(int64_t Integer);
+#ifdef                          IsNegative
+#undef                          IsNegative
+#endif
+    bool                        IsNegative8(int8_t Integer);
+    bool                        IsNegative16(int16_t Integer);
+    bool                        IsNegative32(int32_t Integer);
+    bool                        IsNegative64(int64_t Integer);
+#define                         IsNegative(Integer) _Generic(Integer, int8_t:IsNegative8, uint8_t:IsNegative8, int16_t:IsNegative16, uint16_t:IsNegative16, int32_t:IsNegative32, uint32_t:IsNegative32, int64_t:IsNegative64, uint64_t:IsNegative64)(Integer)
     
     /*!
      @abstract                                                  "Tells whether Integer is even or odd".
@@ -96,77 +103,66 @@ extern "C" {
     double                      ConvertInteger2Double(uint64_t Integer);
     
     /*!
-     @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
+     @abstract                                                  "Returns the absolute value of a number (removes the sign)".
      @param                     Integer                         "The value to find the absolute value of".
      */
-    uint64_t                    AbsoluteI(int64_t Integer);
-    
-    /*!
-     @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
-     @param                     Decimal                         "The value to find the absolute value of".
-     */
-    uint8_t                     AbsoluteF(float Decimal);
-    
-    /*!
-     @abstract                                                  "Returns the absolute value of an integer (removes the sign)".
-     @param                     Decimal                         "The value to find the absolute value of".
-     */
-    uint16_t                    AbsoluteD(double Decimal);
-    
-    /*!
-     @abstract                                                  "Returns the Floor value of a decimal".
-     @param                     Decimal                         "The value to find the floor value of".
-     */
-    int64_t                     FloorF(float Decimal);
-    
-    /*!
-     @abstract                                                  "Returns the Floor value of a decimal".
-     @param                     Decimal                         "The value to find the floor value of".
-     */
-    int64_t                     FloorD(double Decimal);
-    
-    /*!
-     @abstract                                                  "Returns the Ceiling value of a decimal".
-     @param                     Decimal                         "The value to find the ceil value of".
-     */
-    int64_t                     CeilF(float Decimal);
-    
-    /*!
-     @abstract                                                  "Returns the Ceiling value of a decimal".
-     @param                     Decimal                         "The value to find the ceil value of".
-     */
-    int64_t                     CeilD(double Decimal);
-    
-    /*!
-     @abstract                                                  "Returns the rounded value of a decimal".
-     @param                     Decimal                         "The value to find the round value of".
-     */
-    int64_t                     RoundF(float Decimal);
-    
-    /*!
-     @abstract                                                  "Returns the rounded value of a decimal".
-     @param                     Decimal                         "The value to find the round value of".
-     */
-    int64_t                     RoundD(double Decimal);
-    
-#ifdef Minimum
-#undef Minimum
+#ifdef                          Absolute
+#undef                          Absolute
 #endif
+    uint64_t                    AbsoluteI(int64_t Integer);
+    uint8_t                     AbsoluteF(float Decimal);
+    uint16_t                    AbsoluteD(double Decimal);
+#define                         Absolute(Value) _Generic(Value, int8_t:AbsoluteI, uint8_t:AbsoluteI, int16_t:AbsoluteI, uint16_t:AbsoluteI, int32_t:AbsoluteI, uint32_t:AbsoluteI, int64_t:AbsoluteI, uint64_t:AbsoluteI, float:AbsoluteF, double:AbsoluteD)(Value)
+    
+    /*!
+     @abstract                                                  "Returns the Floor value of a decimal".
+     @param                     Decimal                         "The value to find the floor value of".
+     */
+#ifdef                          Floor
+#undef                          Floor
+#endif
+    int64_t                     FloorF(float Decimal);
+    int64_t                     FloorD(double Decimal);
+#define                         Floor(Value)                   _Generic((Value), float:FloorF, double:FloorD)(Value)
+    
+    /*!
+     @abstract                                                  "Returns the Ceiling value of a decimal".
+     @param                     Decimal                         "The value to find the ceil value of".
+     */
+#ifdef                          Ceil
+#undef                          Ceil
+#endif
+    int64_t                     CeilF(float Decimal);
+    int64_t                     CeilD(double Decimal);
+#define                         Ceil(Value)                    _Generic((Value), float:CeilF, double:CeilD)(Value)
+    
+    /*!
+     @abstract                                                  "Returns the rounded value of a decimal".
+     @param                     Decimal                         "The value to find the round value of".
+     */
+#ifdef                          Round
+#undef                          Round
+#endif
+    int64_t                     RoundF(float Decimal);
+    int64_t                     RoundD(double Decimal);
+#define                         Round(Value)                   _Generic((Value), float:RoundF, double:RoundD)(Value)
     
     /*!
      @abstract                                                  "Branchless and shiftless Min function".
      @return                                                    "Returns the smaller value".
      */
-    int64_t                     Minimum(int64_t Integer1, int64_t Integer2);
-    
-#ifdef Maximum
-#undef Maximum
+#ifdef                          Minimum
+#undef                          Minimum
 #endif
+    int64_t                     Minimum(int64_t Integer1, int64_t Integer2);
     
     /*!
      @abstract                                                  "Branchless and shiftless Max function".
      @return                                                    "Returns the larger value".
      */
+#ifdef                          Maximum
+#undef                          Maximum
+#endif
     int64_t                     Maximum(int64_t Integer1, int64_t Integer2);
     
     /*!
@@ -174,101 +170,83 @@ extern "C" {
      @param                     Decimal                         "The decimal to test for normalcy".
      @return                                                    "Returns true if the decimal is normal, otherwise false".
      */
+#ifdef                          DecimalIsNormal
+#undef                          DecimalIsNormal
+#endif
     bool                        DecimalIsNormalF(float Decimal);
-    
-    /*!
-     @abstract                                                  "Is the decimal normal"?
-     @param                     Decimal                         "The decimal to test for normalcy".
-     @return                                                    "Returns true if the decimal is normal, otherwise false".
-     */
     bool                        DecimalIsNormalD(double Decimal);
+#define                         DecimalIsNormal(Decimal)       _Generic((Decimal), float:DecimalIsNormalF, double:DecimalIsNormalD)(Decimal)
     
     /*!
      @abstract                                                  "Is the decimal +/- infinity"?
      @param                     Decimal                         "The decimal to test for infinity".
      @return                                                    "Returns true if the decimal is infinite, otherwise false".
      */
+#ifdef                          DecimalIsInfinity
+#undef                          DecimalIsInfinity
+#endif
     bool                        DecimalIsInfinityF(float Decimal);
-    
-    /*!
-     @abstract                                                  "Is the decimal +/- infinity"?
-     @param                     Decimal                         "The decimal to test for infinity".
-     @return                                                    "Returns true if the decimal is infinite, otherwise false".
-     */
     bool                        DecimalIsInfinityD(double Decimal);
+#define                         DecimalIsInfinity(Decimal)     _Generic((Decimal), float:DecimalIsInfinityF, double:DecimalIsInfinityD)(Decimal)
     
     /*!
      @abstract                                                  "Is the decimal not a number"?
      @param                     Decimal                         "The integer number you want to tell if it's a number or not".
      @return                                                    "Returns true if the decimal is not a number, otherwise false".
      */
+#ifdef                          DecimalIsNotANumber
+#undef                          DecimalIsNotANumber
+#endif
     bool                        DecimalIsNotANumberF(float Decimal);
-    
-    /*!
-     @abstract                                                  "Is the decimal not a number"?
-     @param                     Decimal                         "The integer number you want to tell if it's a number or not".
-     @return                                                    "Returns true if the decimal is not a number, otherwise false".
-     */
     bool                        DecimalIsNotANumberD(double Decimal);
-    
+#define                         DecimalIsNotANumber(Decimal)   _Generic((Decimal), float:DecimalIsNotANumberF, double:DecimalIsNotANumberD)(Decimal)
+
     /*!
      @abstract                                                  "Does the decimal contain a decimal point"?
      @param                     Decimal                         "The decimal you want to know if it contains all zeros for the fraction".
      @return                                                    "Returns true if the number's fraction bits are set, otherwise false".
      */
+#ifdef                          DecimalIsNotANumber
+#undef                          DecimalIsNotANumber
+#endif
     bool                        NumberHasDecimalPointF(float Decimal);
-    
-    /*!
-     @abstract                                                  "Does the decimal contain a decimal point"?
-     @param                     Decimal                         "The decimal you want to know if it contains all zeros for the fraction".
-     @return                                                    "Returns true if the number's fraction bits are set, otherwise false".
-     */
     bool                        NumberHasDecimalPointD(double Decimal);
+#define                         NumberHasDecimalPoint(Decimal) _Generic((Decimal), float:NumberHasDecimalPointF, double:NumberHasDecimalPointD)(Decimal)
     
     /*!
-     @abstract                                                  "Extracts the sign from the integer given as Decimal".
-     @param                     Integer                         "The integer number you want to get the sign from".
+     @abstract                                                  "Extracts the sign from the Number".
+     @param                     Number                          "The Number you want to get the sign from".
      @return                                                    "Returns -1 if the sign is negative, otherwise 1".
      */
-    int8_t                      ExtractSignI(int64_t Integer);
+#ifdef                          ExtractSign
+#undef                          ExtractSign
+#endif
+    int8_t                      ExtractSignI(int64_t Number);
+    int8_t                      ExtractSignF(float Number);
+    int8_t                      ExtractSignD(double Number);
+#define                         ExtractSign(Number)           _Generic(Number, int8_t:ExtractSignI, int16_t:ExtractSignI, int32_t:ExtractSignI, int64_t:ExtractSignI, float:ExtractSignF, double:ExtractSignD)(Number)
     
     /*!
-     @abstract                                                  "Extracts the sign from the float given as Decimal".
-     @param                     Decimal                         "The float number you want to get the sign from".
-     @return                                                    "Returns -1 if the sign is negative, otherwise 1".
-     */
-    int8_t                      ExtractSignF(float Decimal);
-    
-    /*!
-     @abstract                                                  "Extracts the sign from the double given as Decimal".
-     @param                     Decimal                         "The double number you want to get the sign from".
-     @return                                                    "Returns -1 if the sign is negative, otherwise 1".
-     */
-    int8_t                      ExtractSignD(double Decimal);
-    
-    /*!
-     @abstract                                                  "Extracts the exponent from the float given as Decimal".
+     @abstract                                                  "Extracts the exponent from the given Decimal".
      @param                     Decimal                         "The decimal number you want to get the exponent from".
      */
+#ifdef                          ExtractExponent
+#undef                          ExtractExponent
+#endif
     int8_t                      ExtractExponentF(float Decimal);
-    
-    /*!
-     @abstract                                                  "Extracts the exponent from the double given as Decimal".
-     @param                     Decimal                         "The decimal number you want to get the exponent from".
-     */
     int16_t                     ExtractExponentD(double Decimal);
+#define                         ExtractExponent(Decimal)       _Generic(Decimal, float:ExtractExponentF, double:ExtractExponentD)(Decimal)
     
     /*!
      @abstract                                                  "Extracts the mantissa from the float given as Decimal".
      @param                     Decimal                         "The mantissa number you want to get the exponent from".
      */
+#ifdef                          ExtractMantissa
+#undef                          ExtractMantissa
+#endif
     int32_t                     ExtractMantissaF(float Decimal);
-    
-    /*!
-     @abstract                                                  "Extracts the mantissa from the double given as Decimal".
-     @param                     Decimal                         "The mantissa number you want to get the exponent from".
-     */
     int64_t                     ExtractMantissaD(double Decimal);
+#define                         ExtractMantissa(Decimal)       _Generic((Decimal), float:ExtractMantissaF, double:ExtractMantissaD)(Decimal)
     
     /*!
      @abstract                                                  "Inserts the sign to the float given as Decimal".
@@ -276,31 +254,25 @@ extern "C" {
      @param                     Sign                            "The sign to insert".
      @return                                                    "Returns the edited decimal".
      */
+#ifdef                          InsertSign
+#undef                          InsertSign
+#endif
     float                       InsertSignF(float Decimal, int8_t Sign);
-    
-    /*!
-     @abstract                                                  "Inserts the sign to the double given as Decimal".
-     @param                     Decimal                         "The Decimal you want to edit the sign of".
-     @param                     Sign                            "The sign to insert".
-     @return                                                    "Returns the edited decimal".
-     */
     double                      InsertSignD(double Decimal, int8_t Sign);
-    
+#define                         InsertSign(Decimal)       _Generic((Decimal), float:ExtractMantissaF, double:ExtractMantissaD)(Decimal)
+
     /*!
      @abstract                                                  "Inserts the exponent to the float given as Decimal".
      @param                     Decimal                         "The Decimal you want to edit the exponent of".
      @param                     Exponent                        "The exponent to insert".
      @return                                                    "Returns the edited decimal".
      */
+#ifdef                          InsertExponent
+#undef                          InsertExponent
+#endif
     float                       InsertExponentF(float Decimal, int8_t Exponent);
-    
-    /*!
-     @abstract                                                  "Inserts the exponent to the double given as Decimal".
-     @param                     Decimal                         "The Decimal you want to edit the exponent of".
-     @param                     Exponent                        "The exponent to insert".
-     @return                                                    "Returns the edited decimal".
-     */
     double                      InsertExponentD(double Decimal, int16_t Exponent);
+#define                         InsertExponent(Decimal, Exponent) _Generic(Decimal, float:InsertExponentF, double:InsertExponentD)(Decimal, Exponent)
     
     /*!
      @abstract                                                  "Inserts the mantissa to the float given as Decimal".
@@ -308,15 +280,12 @@ extern "C" {
      @param                     Mantissa                        "The mantissa to insert".
      @return                                                    "Returns the edited decimal".
      */
+#ifdef                          InsertMantissa
+#undef                          InsertMantissa
+#endif
     float                       InsertMantissaF(float Decimal, uint32_t Mantissa);
-    
-    /*!
-     @abstract                                                  "Inserts the mantissa to the float given as Decimal".
-     @param                     Decimal                         "The Decimal you want to edit the mantissa of".
-     @param                     Mantissa                        "The mantissa to insert".
-     @return                                                    "Returns the edited decimal".
-     */
     double                      InsertMantissaD(double Decimal, uint64_t Mantissa);
+#define                         InsertMantissa(Decimal, Mantissa) _Generic(Decimal, float:InsertMantissaF, double:InsertMantissaD)(Decimal, Mantissa)
     
     /*!
      @abstract                                                  "Calculates the value of Base raised to Exponent's power (an integer version of the pow function)".
@@ -336,25 +305,17 @@ extern "C" {
     int64_t                     Logarithm(int64_t Base, int64_t Exponent);
     
     /*!
-     @abstract                                                  "Byte swaps a 16 bit integer".
+     @abstract                                                  "Byte swaps an integer".
      @param                     Value2Swap                      "Data to swap endian".
-     @return                                                    "Returns swapped uint16_t".
+     @return                                                    "Returns swapped data".
      */
+#ifdef                          SwapEndian
+#undef                          SwapEndian
+#endif
     uint16_t                    SwapEndian16(uint16_t Value2Swap);
-    
-    /*!
-     @abstract                                                  "Byte swaps a 32 bit integer".
-     @param                     Value2Swap                      "Data to swap endian".
-     @return                                                    "Returns swapped uint32_t".
-     */
     uint32_t                    SwapEndian32(uint32_t Value2Swap);
-    
-    /*!
-     @abstract                                                  "Byte swaps a 64 bit integer".
-     @param                     Value2Swap                      "Data to swap endian".
-     @return                                                    "Returns swapped uint64_t".
-     */
     uint64_t                    SwapEndian64(uint64_t Value2Swap);
+#define                         SwapEndiamn(Value2Swap)        _Generic(Value2Swap, int16_t:SwapEndian16, uint16_t:SwapEndian16, int32_t:SwapEndian32, uint32_t:SwapEndian32, int64_t:SwapEndian64, uint64_t:SwapEndian64)(Value2Swap)
     
     /*!
      @abstract                                                  "Computes the number of bits from the number of bytes".
@@ -429,18 +390,6 @@ extern "C" {
      @return                                                    "Returns the rotated value".
      */
     uint64_t                    RotateLeft(uint64_t Value, uint8_t Bits2Rotate);
-    
-#define Absolute(Value)                     _Generic((Value), uint8_t:AbsoluteI, int8_t:AbsoluteI, uint16_t:AbsoluteI, int16_t:AbsoluteI, uint32_t:AbsoluteI, int32_t:AbsoluteI, uint64_t:AbsoluteI, int64_t:AbsoluteI, float:AbsoluteF, double:AbsoluteD)(Value)
-#define Floor(Value)                        _Generic((Value),   float:FloorF, double:FloorD)(Value)
-#define Ceil(Value)                         _Generic((Value),   float:CeilF, double:CeilD)(Value)
-#define Round(Value)                        _Generic((Value),   float:RoundF, double:RoundD)(Value)
-#define DecimalIsNormal(Decimal)            _Generic((Decimal), float:DecimalIsNormalF, double:DecimalIsNormalD)(Decimal)
-#define DecimalIsNotANumber(Decimal)        _Generic((Decimal), float:DecimalIsNotANumberF, double:DecimalIsNotANumberD)(Decimal)
-#define DecimalIsInfinity(Decimal)          _Generic((Decimal), float:DecimalIsInfinityF, double:DecimalIsInfinityD)(Decimal)
-#define NumberHasDecimalPoint(Decimal)      _Generic((Decimal), float:NumberHasDecimalPointF, double:NumberHasDecimalPointD)(Decimal)
-#define ExtractSign(Decimal)                _Generic((Decimal), int8_t:ExtractSignI, int16_t:ExtractSignI, int32_t:ExtractSignI, int64_t:ExtractSignI, float:ExtractSignF,     double:ExtractSignD)(Decimal)
-#define ExtractExponent(Decimal)            _Generic((Decimal), float:ExtractExponentF, double:ExtractExponentD)(Decimal)
-#define ExtractMantissa(Decimal)            _Generic((Decimal), float:ExtractMantissaF, double:ExtractMantissaD)(Decimal)
     
 #ifdef __cplusplus
 }
