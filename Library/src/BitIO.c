@@ -471,7 +471,7 @@ extern "C" {
         } else if (Length == 0) {
             Log(Log_DEBUG, __func__, UTF8String("Length is zero, less than the minimum of 1"));
         } else if (Length > 64) {
-            Log(Log_DEBUG, __func__, UTF8String("Length: %llu is greater than 64 bits, the maximum"), Length);
+            Log(Log_DEBUG, __func__, UTF8String("Length: %u is greater than 64 bits, the maximum"), Length);
         }
         return BitBufferString;
     }

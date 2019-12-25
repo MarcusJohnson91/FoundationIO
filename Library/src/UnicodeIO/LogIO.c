@@ -118,9 +118,9 @@ extern "C" {
         
         UTF8 *ErrorType[2]    = {UTF8String("ERROR"), UTF8String("Mistake")};
         if (Log_ProgramName != NULL) {
-            FormattedString   = UTF8_Format(UTF8String("%s in %s's %s: %s%Us"), Log_ProgramName, ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine32);
+            FormattedString   = UTF8_Format(UTF8String("%Us in %s's %s: %s%s"), *Log_ProgramName, ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
         } else {
-            FormattedString   = UTF8_Format(UTF8String("%s in %s: %Us"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine32);
+            FormattedString   = UTF8_Format(UTF8String("%s in %s: %s%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
         }
         
         if (Severity == Log_USER) {
