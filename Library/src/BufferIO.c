@@ -4,6 +4,7 @@
 #include "../include/Private/Constants.h"    /* Included for BitMaskTables */
 #include "../include/UnicodeIO/LogIO.h"      /* Included for Logging */
 #include "../include/UnicodeIO/StringIO.h"   /* Included for StringIO's declarations */
+#include "../include/UnicodeIO/FormatIO.h"   /* Included for UTF32_Format */
 #include <stdlib.h>                          /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 
 #ifdef __cplusplus
