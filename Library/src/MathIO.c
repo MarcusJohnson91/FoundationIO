@@ -4,7 +4,19 @@
 extern "C" {
 #endif
     
-    bool IsNegative(int64_t Integer) {
+    bool IsNegative8(int8_t Integer) {
+        return (Integer & 0x80) >> 7;
+    }
+    
+    bool IsNegative16(int16_t Integer) {
+        return (Integer & 0x8000) >> 15;
+    }
+    
+    bool IsNegative32(int32_t Integer) {
+        return (Integer & 0x80000000) >> 31;
+    }
+    
+    bool IsNegative64(int64_t Integer) {
         return (Integer & 0x8000000000000000) >> 63;
     }
     
