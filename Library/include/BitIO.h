@@ -34,7 +34,7 @@ extern "C" {
 #ifdef    UTF16
 #undef    UTF16
 #endif /* UTF16 */
-#if (defined __STDC_UTF_16__ && defined __CHAR16_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+#if (defined __STDC_UTF_16__ && defined __CHAR16_TYPE__) && (FoundationIOSTDVersion >= FoundationIOSTDVersionC2X)
     typedef                     char16_t                        UTF16;
 #else
     typedef                     uint_least16_t                  UTF16;

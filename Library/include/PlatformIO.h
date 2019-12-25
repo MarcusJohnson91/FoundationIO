@@ -339,7 +339,7 @@ extern "C" {
 #endif
     
 #ifndef FoundationIOSTDVersionC2X
-#define FoundationIOSTDVersionC2X (202002L)
+#define FoundationIOSTDVersionC2X (202202L)
 #endif
     
 #ifndef FoundationIONULLTerminator
