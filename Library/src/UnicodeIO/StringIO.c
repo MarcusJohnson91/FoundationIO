@@ -44,7 +44,7 @@ extern "C" {
         UTF8 *String = NULL;
         String       = calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
         if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Allocation failure: Couldn't allocate %u bytes"), (NumCodeUnits * sizeof(UTF8)) + FoundationIONULLTerminatorSize);
+            Log(Log_DEBUG, __func__, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF8)) + FoundationIONULLTerminatorSize);
         }
         return String;
     }
@@ -53,7 +53,7 @@ extern "C" {
         UTF16 *String = NULL;
         String        = calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF16));
         if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Allocation failure: Couldn't allocate %u bytes"), (NumCodeUnits * sizeof(UTF16)) + FoundationIONULLTerminatorSize);
+            Log(Log_DEBUG, __func__, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF16)) + FoundationIONULLTerminatorSize);
         }
         return String;
     }
@@ -62,7 +62,7 @@ extern "C" {
         UTF32 *String = NULL;
         String        = calloc(NumCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
         if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Allocation failure: Couldn't allocate %u bytes"), (NumCodePoints * sizeof(UTF32)) + FoundationIONULLTerminatorSize);
+            Log(Log_DEBUG, __func__, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodePoints * sizeof(UTF32)) + FoundationIONULLTerminatorSize);
         }
         return String;
     }
@@ -129,14 +129,8 @@ extern "C" {
         uint64_t GraphemeSize         = 1ULL;
         if (String != NULL) {
             uint64_t CodeUnit         = OffsetInCodeUnits;
-            UTF8    *CodeUnits        = UTF8_Init(UTF8MaxCodeUnits);
             while (String[CodeUnit] != FoundationIONULLTerminator) {
-                UTF8 Byte             = String[CodeUnit];
-                uint8_t CodePointSize = UTF8_GetCodePointSizeInCodeUnits(Byte);
-                for (uint8_t Byte = 0; Byte < CodePointSize; Byte++) {
-                    CodeUnits[Byte]   = String[CodeUnit + Byte];
-                }
-                UTF32 CodePoint1      = UTF8_DecodeCodePoint(CodeUnits);
+                UTF32 CodePoint1      = UTF8_DecodeCodePoint(&String[CodeUnit]);
                 for (uint64_t GraphemeExt = 0ULL; GraphemeExt < GraphemeExtensionTableSize; GraphemeExt++) {
                     if (CodePoint1 == GraphemeExtensionTable[GraphemeExt]) {
                         GraphemeSize += 1;
@@ -144,7 +138,6 @@ extern "C" {
                     }
                 }
             }
-            free(CodeUnits);
         } else {
             Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
         }
@@ -429,7 +422,7 @@ extern "C" {
                     CodePoint[0] = String[Offset];
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("CodePoint is %u bytes, which is larger than StringSize: %llu at Offset: %llu"), sizeof(UTF32), StringSize, Offset);
+                Log(Log_DEBUG, __func__, UTF8String("CodePoint is %lu bytes, which is larger than StringSize: %llu at Offset: %llu"), sizeof(UTF32), StringSize, Offset);
             }
         } else if (String == NULL) {
             Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
@@ -967,24 +960,15 @@ extern "C" {
         if (String != NULL) {
             uint64_t CodeUnit                        = 0ULL;
             uint64_t StringSize                      = UTF8_GetStringSizeInCodePoints(String);
-            UTF8    *CodeUnits                       = UTF8_Init(UTF8MaxCodeUnits);
             DecodedString                            = UTF32_Init(StringSize);
-            if (DecodedString != NULL && CodeUnits != NULL) {
+            if (DecodedString != NULL) {
                 for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
-                    uint8_t CodePointSize            = UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
-                    for (uint8_t CodePointUnit = 0; CodePointUnit < CodePointSize; CodePointUnit++) {
-                        CodeUnits[CodePointUnit]     = String[CodeUnit + CodePointUnit];
-                    }
-                    
-                    DecodedString[CodePoint]         = UTF8_DecodeCodePoint(CodeUnits);
-                    CodeUnit                        += CodePointSize;
+                    CodeUnit                        += UTF8_GetCodePointSizeInCodeUnits(String[CodePoint]);
+                    DecodedString[CodePoint]         = UTF8_DecodeCodePoint(&String[CodeUnit]);
                 }
             } else if (DecodedString == NULL) {
                 Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate DecodedString"));
-            } else if (CodeUnits == NULL) {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate CodeUnits to decode each CodePoint"));
             }
-            free(CodeUnits);
         } else {
             Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
         }
@@ -1033,24 +1017,15 @@ extern "C" {
         if (String != NULL) {
             uint64_t CodeUnit                        = 0ULL;
             uint64_t StringSize                      = UTF16_GetStringSizeInCodePoints(String);
-            UTF16   *CodeUnits                       = UTF16_Init(UTF16MaxCodeUnits);
             DecodedString                            = UTF32_Init(StringSize);
-            if (DecodedString != NULL && CodeUnits != NULL) {
+            if (DecodedString != NULL) {
                 for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
-                    uint8_t CodePointSize            = UTF16_GetCodePointSizeInCodeUnits(String[CodeUnit]);
-                    for (uint8_t CodePointUnit = 0; CodePointUnit < CodePointSize; CodePointUnit++) {
-                        CodeUnits[CodePointUnit]     = String[CodeUnit + CodePointUnit];
-                    }
-                    
-                    DecodedString[CodePoint]         = UTF16_DecodeCodePoint(CodeUnits);
-                    CodeUnit                        += CodePointSize;
+                    CodeUnit                        += UTF16_GetCodePointSizeInCodeUnits(String[CodeUnit]);
+                    DecodedString[CodePoint]         = UTF16_DecodeCodePoint(&String[CodeUnit]);
                 }
             } else if (DecodedString == NULL) {
                 Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate DecodedString"));
-            } else if (CodeUnits == NULL) {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate CodeUnits to decode each CodePoint"));
             }
-            free(CodeUnits);
         } else {
             Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
         }
@@ -1377,7 +1352,7 @@ extern "C" {
             // So we need to know the size of the string to get, so count the number of codeunits that don't match any line ending.
             uint64_t StringSizeInCodeUnits  = 0ULL;
             uint64_t StringSizeInCodePoints = 0ULL;
-            UTF32   *CurrentCodePoint       = 1UL;
+            UTF32   *CurrentCodePoint       = NULL;
             while (CurrentCodePoint[0] != UTF32Character('\n') || CurrentCodePoint[0] != FoundationIONULLTerminator) {
                 StringSizeInCodePoints     += 1;
                 UTF8 *CodePoint             = UTF8_ReadGraphemeFromFile(Source);
@@ -1397,7 +1372,7 @@ extern "C" {
             // So we need to know the size of the string to get, so count the number of codeunits that don't match any line ending.
             uint64_t StringSizeInCodeUnits  = 0ULL;
             uint64_t StringSizeInCodePoints = 0ULL;
-            UTF32   *CurrentCodePoint       = 1UL;
+            UTF32   *CurrentCodePoint       = NULL;
             while (CurrentCodePoint[0] != UTF32Character('\n') || CurrentCodePoint[0] != FoundationIONULLTerminator) {
                 StringSizeInCodePoints     += 1;
                 UTF16 *CodePoint            = UTF16_ReadGraphemeFromFile(Source);
@@ -2470,8 +2445,9 @@ extern "C" {
                 }
                 // Write the Exponent
                 uint16_t NumDigitsExponentInDigits = (uint16_t) Logarithm(2, Exponent);
+                UTF32 *ExponentString              = UTF32_Integer2String(Base_Integer_Radix10, Exponent);
                 for (uint64_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits; ExponentDigit++) {
-                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = UTF32String("Exponent"); // FIXME: "Exponent" is NOT right
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = ExponentString[ExponentDigit]; // FIXME: "Exponent" is NOT right
                 }
             } else if (Base == Base_Decimal_Scientific_Lowercase) {
                 OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('e');
@@ -2481,9 +2457,10 @@ extern "C" {
                     OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2] = UTF32Character('+');
                 }
                 // Write the Exponent
-                uint64_t NumDigitsExponentInDigits = (uint16_t) Logarithm(2, Exponent);
+                uint16_t NumDigitsExponentInDigits = (uint16_t) Logarithm(2, Exponent);
+                UTF32 *ExponentString              = UTF32_Integer2String(Base_Integer_Radix10, Exponent);
                 for (uint64_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits; ExponentDigit++) {
-                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = UTF32String("Exponent"); // FIXME: "Exponent" is NOT right
+                    OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = ExponentString[ExponentDigit]; // FIXME: "Exponent" is NOT right
                 }
             }
         }
