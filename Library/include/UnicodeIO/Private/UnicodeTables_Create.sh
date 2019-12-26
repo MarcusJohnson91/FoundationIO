@@ -4,14 +4,13 @@
 # Dependencies: Curl, XMLStarlet (On Mac install Homebrew from brew.sh then call brew install xmlstarlet)
 
 CreateHeaderFileTop() {
-    printf "#include <stdint.h>\n\n" >> "$HeaderFile"
+    printf "#include "../../Macros.h"\n\n" >> "$HeaderFile"
     printf "#ifndef   FoundationIO_StringType32\n" >> "$HeaderFile"
     printf "#define   FoundationIO_StringType32\n" >> "$HeaderFile"
     printf "#ifdef    UTF32\n" >> "$HeaderFile"
     printf "#undef    UTF32\n" >> "$HeaderFile"
     printf "#endif /* UTF32 */\n" >> "$HeaderFile"
-    echo   "#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (!defined __APPLE__) && (!defined __MACH__)" >> "$HeaderFile"
-    # Printf doesn't want to work with the precending Macro, so using echo instead is my shitty workaround.
+    printf "#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (FoundationIOTargetOS != FoundationIOAppleOS)" >> "$HeaderFile"
     printf "typedef   char32_t       UTF32;\n" >> "$HeaderFile"
     printf "#else\n" >> "$HeaderFile"
     printf "typedef   uint_least32_t UTF32;\n" >> "$HeaderFile"
