@@ -251,7 +251,7 @@ extern "C" {
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 UTF8    *Indicator           = UTF8_Init(CommandLineIO_GetTerminalWidth());
                 UTF8    *IndicatorFinal      = UTF8_Insert(Indicator, "-", 0);
-                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%Us %llu/%llu %llu/%s%Us]"), IndicatorFinal, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, FoundationIONewLine8);
+                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%Us %llu/%llu %llu/%s%s]"), IndicatorFinal, *Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, FoundationIONewLine8);
                 UTF8_WriteLine(stdout, FormattedString);
                 free(Indicator);
             }
