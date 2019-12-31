@@ -40,6 +40,24 @@ extern "C" {
      
      */
     
+    /*
+     
+     Grapheme Rules:
+     
+     Do not break between consecutive CR and LF
+     
+     Whitespace can not occur within a Grapheme
+     
+     Word, Line, Sentence boundaries can not occur within a Grapheme
+     
+     SO NOT BREEAK:
+     
+     U+200C
+     
+     U+200D
+     
+     */
+    
     UTF8 *UTF8_Init(uint64_t NumCodeUnits) {
         UTF8 *String = NULL;
         String       = calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
