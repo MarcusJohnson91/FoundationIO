@@ -844,7 +844,7 @@ extern "C" {
                         Specifiers->Specifiers[Position].Argument          = UTF32_Integer2String(Base_Integer_Radix16_Uppercase, Value);
                     }
                 } else if ((BaseType & BaseType_Literal) == BaseType_Literal && Modifier == Modifier_Percent) {
-                    Specifiers->Specifiers[Position].Argument              = UTF32_Clone(UTF32String("%"));
+                    Specifiers->Specifiers[Position].Argument              = UTF32String("%");
                 }
                 Specifier0                                                 += 1;
             }
