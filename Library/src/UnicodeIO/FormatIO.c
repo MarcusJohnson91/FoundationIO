@@ -673,10 +673,10 @@ extern "C" {
         return String;
     }
     
-#if (FoundationIOCompiler != FoundationIOCompilerIsMSVC)
-	static void Specifiers_CorrectOffset(FormatSpecifiers *Specifiers) __attribute__((no_sanitize("signed-integer-overflow", "integer"))) {
-#else
+#if (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 	static void Specifiers_CorrectOffset(FormatSpecifiers *Specifiers) {
+#else
+	static void Specifiers_CorrectOffset(FormatSpecifiers *Specifiers)  __attribute__((no_sanitize("signed-integer-overflow", "integer"))) {
 #endif
         if (Specifiers != NULL) {
             /*
@@ -714,11 +714,9 @@ extern "C" {
                 }
                 
                 UTF32   *Argument                                 = Specifiers->Specifiers[Position].Argument;
-                uint64_t ReplacementSize                          = 0ULL;
+                uint64_t ReplacementSize                          = 1ULL;
                 if (Argument != NULL) {
                     ReplacementSize                               = UTF32_GetStringSizeInCodePoints(Argument);
-                } else {
-                    ReplacementSize                               = 1; // Literals are always single CodePoints
                 }
                 uint64_t MinimumWidth                             = Specifiers->Specifiers[Position].MinWidth;
                 uint64_t Precision                                = Specifiers->Specifiers[Position].Precision;
@@ -994,7 +992,9 @@ extern "C" {
                 va_start(VariadicArguments, Format);
                 Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
-                Specifiers_CorrectOffset(Specifiers);
+                if (NumSpecifiers > 1) {
+                    Specifiers_CorrectOffset(Specifiers);
+                }
                 UTF32 *FormattedString       = FormatString_UTF32(Specifiers, Format32);
                 FormatSpecifiers_Deinit(Specifiers);
                 UTF32_Deinit(Format32);
@@ -1021,7 +1021,9 @@ extern "C" {
                 va_start(VariadicArguments, Format);
                 Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
-                Specifiers_CorrectOffset(Specifiers);
+                if (NumSpecifiers > 1) {
+                    Specifiers_CorrectOffset(Specifiers);
+                }
                 UTF32 *FormattedString       = FormatString_UTF32(Specifiers, Format32);
                 FormatSpecifiers_Deinit(Specifiers);
                 UTF32_Deinit(Format32);
@@ -1047,7 +1049,9 @@ extern "C" {
                 va_start(VariadicArguments, Format);
                 Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
-                Specifiers_CorrectOffset(Specifiers);
+                if (NumSpecifiers > 1) {
+                    Specifiers_CorrectOffset(Specifiers);
+                }
                 FormattedString              = FormatString_UTF32(Specifiers, Format);
                 FormatSpecifiers_Deinit(Specifiers);
             } else {
@@ -1067,7 +1071,9 @@ extern "C" {
                 UTF32 *Format32              = UTF8_Decode(Format);
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
                 UTF32_ParseFormatString(Specifiers, Format32, NumSpecifiers, StringType_UTF8);
-                Specifiers_CorrectOffset(Specifiers);
+                if (NumSpecifiers > 1) {
+                    Specifiers_CorrectOffset(Specifiers);
+                }
                 UTF32 *Formatted32           = UTF8_Decode(Formatted);
                 UTF32 **Strings32            = DeformatString_UTF32(Specifiers, Format32, Formatted32);
                 FormatSpecifiers_Deinit(Specifiers);
@@ -1092,7 +1098,9 @@ extern "C" {
                 UTF32 *Format32              = UTF16_Decode(Format);
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
                 UTF32_ParseFormatString(Specifiers, Format32, NumSpecifiers, StringType_UTF16);
-                Specifiers_CorrectOffset(Specifiers);
+                if (NumSpecifiers > 1) {
+                    Specifiers_CorrectOffset(Specifiers);
+                }
                 UTF32 *Formatted32           = UTF16_Decode(Formatted);
                 UTF32 **Strings32            = DeformatString_UTF32(Specifiers, Format32, Formatted32);
                 FormatSpecifiers_Deinit(Specifiers);
@@ -1116,7 +1124,9 @@ extern "C" {
             if (NumSpecifiers > 0) {
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
                 UTF32_ParseFormatString(Specifiers, Format, NumSpecifiers, StringType_UTF32);
-                Specifiers_CorrectOffset(Specifiers);
+                if (NumSpecifiers > 1) {
+                    Specifiers_CorrectOffset(Specifiers);
+                }
                 StringArray                  = DeformatString_UTF32(Specifiers, Format, Formatted);
                 FormatSpecifiers_Deinit(Specifiers);
             }
