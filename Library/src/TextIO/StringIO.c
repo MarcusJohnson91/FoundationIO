@@ -113,7 +113,7 @@ extern "C" {
         return CodePointSize;
     }
     
-    static UTF32 UTF8_DecodeCodePoint(UTF8 *CodeUnits) {
+    UTF32 UTF8_DecodeCodePoint(UTF8 *CodeUnits) {
         UTF32 CodePoint                       = 0;
         if (CodeUnits != NULL) {
             uint8_t CodePointSize             = UTF8_GetCodePointSizeInCodeUnits(CodeUnits[0]);
@@ -162,7 +162,7 @@ extern "C" {
         return GraphemeSize;
     }
     
-    static UTF32 UTF16_DecodeCodePoint(UTF16 *CodeUnits) {
+    UTF32 UTF16_DecodeCodePoint(UTF16 *CodeUnits) {
         UTF32 CodePoint                       = 0;
         if (CodeUnits != NULL) {
             uint8_t CodePointSize             = UTF16_GetCodePointSizeInCodeUnits(CodeUnits[0]);
@@ -1051,13 +1051,13 @@ extern "C" {
     }
     
     UTF8 *UTF8_Encode(UTF32 *String) {
-        uint64_t CodeUnitNum                           = 0ULL;
         UTF8    *EncodedString                         = NULL;
         if (String != NULL) {
             uint64_t StringSizeInCodePoints            = UTF32_GetStringSizeInCodePoints(String);
             uint64_t UTF8CodeUnits                     = UTF32_GetStringSizeInUTF8CodeUnits(String);
             EncodedString                              = UTF8_Init(UTF8CodeUnits);
             if (EncodedString != NULL) {
+                uint64_t CodeUnitNum                   = 0ULL;
                 for (uint64_t CodePoint = 0ULL; CodePoint < StringSizeInCodePoints; CodePoint++) {
                     if (String[CodePoint] <= 0x7F) {
                         EncodedString[CodeUnitNum]     = String[CodePoint] & 0x7F;

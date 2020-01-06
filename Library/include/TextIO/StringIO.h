@@ -235,6 +235,18 @@ extern "C" {
     uint8_t               UTF16_GetCodePointSizeInCodeUnits(UTF16 CodeUnit);
     
     /*!
+     @abstract                             "Decodes a CodePoint from UTF-8 CodeUnits".
+     @param               CodeUnits        "Must start at a leading codeunit and be followed by at least as many trailing codeunits as indicitated by the leading code unit".
+     */
+    UTF32                 UTF8_DecodeCodePoint(UTF8 *CodeUnits);
+    
+    /*!
+     @abstract                             "Decodes a CodePoint from UTF-16 CodeUnits".
+     @param               CodeUnits        "Must start at a leading codeunit and be followed by at least as many trailing codeunits as indicitated by the leading code unit".
+     */
+    UTF32                 UTF16_DecodeCodePoint(UTF16 *CodeUnits);
+    
+    /*!
      @abstract                             "Gets the number of Unicode codeunits in the UTF8 string".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
      @param               String           "The string to get the number of codeunits in".
