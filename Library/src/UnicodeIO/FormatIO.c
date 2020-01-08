@@ -673,69 +673,21 @@ extern "C" {
         return String;
     }
     
-#if (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-	static void Specifiers_CorrectOffset(FormatSpecifiers *Specifiers) {
-#else
-	static void Specifiers_CorrectOffset(FormatSpecifiers *Specifiers)  __attribute__((no_sanitize("signed-integer-overflow", "integer"))) {
-#endif
-        if (Specifiers != NULL) {
-            /*
-             Specifier0:
-             ReplacementSize: 1
-             Length+%:        6
-             Position:        0
-             Before:          "NumArgs: %1$llu, Equal: %llu, Type: %3$s"
-             After:           "NumArgs: 3, Equal: %llu, Type: %3$s"
-             Skip:            Replacement - (Length + 1) = -5
-             
-             Specifier1:
-             ReplacementSize: 4
-             Length+%:        4 # Skip is Equal
-             Position:        1
-             Before:          "NumArgs: 3, Equal: %llu, Type: %3$s"
-             After:           "NumArgs: 3, Equal: 1234, Type: %3$s"
-             Skip:            Replacement - (Length + 1) = 0
-             
-             Specifier2:
-             ReplacementSize: 10
-             Length+%:        4 # Skip is Negative?
-             Position:        2
-             Before:          "NumArgs: 3, Equal: 1234, Type: %3$s"
-             After:           "NumArgs: 3, Equal: 1234, Type: Positional"
-             Skip:            Replacement - (Length + 1) = 6
-             
-             The goal here is to figure out where the new string returns to the non-replacement text so we can copy that stuff properly.
-             */
-            int64_t  Correction                                   = 0;
-            for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
-                uint64_t Position                                 = Specifier;
-                if (Specifiers->Specifiers[Specifier].IsPositional == Yes) {
-                    Position                                      = Specifiers->Specifiers[Specifier].PositionalArg;
-                }
-                
-                UTF32   *Argument                                 = Specifiers->Specifiers[Position].Argument;
-                uint64_t ReplacementSize                          = 1ULL;
-                if (Argument != NULL) {
-                    ReplacementSize                               = UTF32_GetStringSizeInCodePoints(Argument);
-                }
-                uint64_t MinimumWidth                             = Specifiers->Specifiers[Position].MinWidth;
-                uint64_t Precision                                = Specifiers->Specifiers[Position].Precision;
-                uint64_t Length                                   = Specifiers->Specifiers[Position].Length;
-                if ((Specifiers->Specifiers[Position].PrecisionFlag != Precision_Unknown) && (ReplacementSize < MinimumWidth)) {
-                    Correction                                   += MinimumWidth - ReplacementSize;
-                }
-                if ((Specifiers->Specifiers[Position].PrecisionFlag != Precision_Unknown) && (ReplacementSize > Precision)) {
-                    Correction                                   -= ReplacementSize - Precision;
-                }
-                Correction                                       += (ReplacementSize - Length);
-                if (Specifier >= 1 && Specifier < Specifiers->NumSpecifiers) {
-                    Specifiers->Specifiers[Specifier].Offset     += Correction;
-                    // We should just not reset it between loops and apply it to all loops after
-                    // So just set it here to Specifier + 1, now when the main loop is at the end it'll overflow, so we need to make sure that doesn't happen.
+	static void Specifiers_CorrectOffset(FormatSpecifiers *Specifiers, UTF32 *Format, uint64_t CurrentSpecifier) {
+        if (Specifiers != NULL && Format != NULL && CurrentSpecifier < Specifiers->NumSpecifiers) {
+            uint64_t CodePoint                                      = 0ULL;
+            while (Format[CodePoint] != FoundationIONULLTerminator) {
+                CodePoint                                          += 1;
+                if (Format[CodePoint] == UTF32Character('%')) {
+                    Specifiers->Specifiers[CurrentSpecifier].Offset = CodePoint;
                 }
             }
-        } else {
+        } else if (Specifiers == NULL) {
             Log(Log_DEBUG, __func__, UTF8String("FormatSpecifiers Pointer is NULL"));
+        } else if (Format == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("Format Pointer is NULL"));
+        } else if (CurrentSpecifier >= Specifiers->NumSpecifiers) {
+            Log(Log_DEBUG, __func__, UTF8String("CurrentSpecifier is not a valid index"), CurrentSpecifier);
         }
     }
     
@@ -872,6 +824,13 @@ extern "C" {
         UTF32 *FormatTemp              = Format;
         if (Format != NULL && Specifiers != NULL) {
             for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
+                if (Specifier > 0) {
+                    Specifiers_CorrectOffset(Specifiers, Format, Specifier);
+                }
+                
+                
+                
+                
                 UTF32    *OriginalTemp = FormatTemp;
                 UTF32    *Argument     = Specifiers->Specifiers[Specifier].Argument;
                 uint64_t  Offset       = Specifiers->Specifiers[Specifier].Offset;
@@ -992,9 +951,6 @@ extern "C" {
                 va_start(VariadicArguments, Format);
                 Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
-                if (NumSpecifiers > 1) {
-                    Specifiers_CorrectOffset(Specifiers);
-                }
                 UTF32 *FormattedString       = FormatString_UTF32(Specifiers, Format32);
                 FormatSpecifiers_Deinit(Specifiers);
                 UTF32_Deinit(Format32);
@@ -1021,9 +977,6 @@ extern "C" {
                 va_start(VariadicArguments, Format);
                 Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
-                if (NumSpecifiers > 1) {
-                    Specifiers_CorrectOffset(Specifiers);
-                }
                 UTF32 *FormattedString       = FormatString_UTF32(Specifiers, Format32);
                 FormatSpecifiers_Deinit(Specifiers);
                 UTF32_Deinit(Format32);
@@ -1049,9 +1002,6 @@ extern "C" {
                 va_start(VariadicArguments, Format);
                 Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
-                if (NumSpecifiers > 1) {
-                    Specifiers_CorrectOffset(Specifiers);
-                }
                 FormattedString              = FormatString_UTF32(Specifiers, Format);
                 FormatSpecifiers_Deinit(Specifiers);
             } else {
@@ -1071,9 +1021,6 @@ extern "C" {
                 UTF32 *Format32              = UTF8_Decode(Format);
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
                 UTF32_ParseFormatString(Specifiers, Format32, NumSpecifiers, StringType_UTF8);
-                if (NumSpecifiers > 1) {
-                    Specifiers_CorrectOffset(Specifiers);
-                }
                 UTF32 *Formatted32           = UTF8_Decode(Formatted);
                 UTF32 **Strings32            = DeformatString_UTF32(Specifiers, Format32, Formatted32);
                 FormatSpecifiers_Deinit(Specifiers);
@@ -1098,9 +1045,6 @@ extern "C" {
                 UTF32 *Format32              = UTF16_Decode(Format);
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
                 UTF32_ParseFormatString(Specifiers, Format32, NumSpecifiers, StringType_UTF16);
-                if (NumSpecifiers > 1) {
-                    Specifiers_CorrectOffset(Specifiers);
-                }
                 UTF32 *Formatted32           = UTF16_Decode(Formatted);
                 UTF32 **Strings32            = DeformatString_UTF32(Specifiers, Format32, Formatted32);
                 FormatSpecifiers_Deinit(Specifiers);
@@ -1124,9 +1068,6 @@ extern "C" {
             if (NumSpecifiers > 0) {
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
                 UTF32_ParseFormatString(Specifiers, Format, NumSpecifiers, StringType_UTF32);
-                if (NumSpecifiers > 1) {
-                    Specifiers_CorrectOffset(Specifiers);
-                }
                 StringArray                  = DeformatString_UTF32(Specifiers, Format, Formatted);
                 FormatSpecifiers_Deinit(Specifiers);
             }
