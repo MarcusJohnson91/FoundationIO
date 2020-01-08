@@ -272,40 +272,19 @@ extern "C" {
                             Specifiers->Specifiers[Specifier].TypeModifier         |= (Modifier_Unsigned | Modifier_Base2 | Modifier_Uppercase);
                             break;
                         case UTF32Character('c'):
-                            Specifiers->Specifiers[Specifier].BaseType             |= BaseType_CodeUnit;
-                            if (Length > 2) {
-                                uint64_t PreviousCodePoint = CodePoint - 1;
-                                if (Format[PreviousCodePoint] == UTF32Character('l') || Format[PreviousCodePoint] == UTF32Character('L')) {
-                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
-                                    Specifiers->Specifiers[Specifier].ModifierSize += 1;
-                                } else if (Format[PreviousCodePoint] == UTF32Character('U')) {
-                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
-                                    Specifiers->Specifiers[Specifier].ModifierSize += 1;
-                                } else {
-                                    if (Specifiers->StringType == StringType_UTF8) {
-                                        Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF8;
-                                    } else if (Specifiers->StringType == StringType_UTF16) {
-                                        Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
-                                    } else if (Specifiers->StringType == StringType_UTF32) {
-                                        Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
-                                    }
-                                }
-                            } else {
-                                if (Specifiers->StringType == StringType_UTF8) {
-                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF8;
-                                } else if (Specifiers->StringType == StringType_UTF16) {
-                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
-                                } else if (Specifiers->StringType == StringType_UTF32) {
-                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
-                                }
-                            }
-                            break;
                         case UTF32Character('C'):
                             Specifiers->Specifiers[Specifier].BaseType             |= BaseType_CodeUnit;
-                            if (Length > 2) {
-                                uint64_t PreviousCodePoint = (Offset + Length) - 1;
-                                if (Format[PreviousCodePoint] == UTF32Character('l') || Format[PreviousCodePoint] == UTF32Character('L')) {
-                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF8;
+                            if (Offset > 0) {
+                                uint64_t PreviousCodePoint                          = CodePoint - 1;
+                                if (Format[PreviousCodePoint] == UTF32Character('l')) {
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
+#endif
+                                    Specifiers->Specifiers[Specifier].ModifierSize += 1;
+                                } else if (Format[PreviousCodePoint] == UTF32Character('u')) {
+                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
                                     Specifiers->Specifiers[Specifier].ModifierSize += 1;
                                 } else if (Format[PreviousCodePoint] == UTF32Character('U')) {
                                     Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
@@ -377,40 +356,19 @@ extern "C" {
                             Specifiers->Specifiers[Specifier].TypeModifier         |= Modifier_Uppercase;
                             break;
                         case UTF32Character('s'):
-                            Specifiers->Specifiers[Specifier].BaseType             |= BaseType_String;
-                            if (Length > 2) {
-                                uint64_t PreviousCodePoint = (Offset + Length) - 1;
-                                if (Format[PreviousCodePoint] == UTF32Character('l') || Format[PreviousCodePoint] == UTF32Character('L')) {
-                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
-                                    Specifiers->Specifiers[Specifier].ModifierSize += 1;
-                                } else if (Format[PreviousCodePoint] == UTF32Character('U')) {
-                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
-                                    Specifiers->Specifiers[Specifier].ModifierSize += 1;
-                                } else {
-                                    if (Specifiers->StringType == StringType_UTF8) {
-                                        Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF8;
-                                    } else if (Specifiers->StringType == StringType_UTF16) {
-                                        Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
-                                    } else if (Specifiers->StringType == StringType_UTF32) {
-                                        Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
-                                    }
-                                }
-                            } else {
-                                if (Specifiers->StringType == StringType_UTF8) {
-                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF8;
-                                } else if (Specifiers->StringType == StringType_UTF16) {
-                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
-                                } else if (Specifiers->StringType == StringType_UTF32) {
-                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
-                                }
-                            }
-                            break;
                         case UTF32Character('S'):
                             Specifiers->Specifiers[Specifier].BaseType             |= BaseType_String;
-                            if (Length > 2) {
-                                uint64_t PreviousCodePoint = (Offset + Length) - 1;
-                                if (Format[PreviousCodePoint] == UTF32Character('l') || Format[PreviousCodePoint] == UTF32Character('L')) {
-                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF8;
+                            if (Offset > 0) {
+                                uint64_t PreviousCodePoint                          = CodePoint - 1;
+                                if (Format[PreviousCodePoint] == UTF32Character('l')) {
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
+#endif
+                                    Specifiers->Specifiers[Specifier].ModifierSize += 1;
+                                } else if (Format[PreviousCodePoint] == UTF32Character('u')) {
+                                    Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF16;
                                     Specifiers->Specifiers[Specifier].ModifierSize += 1;
                                 } else if (Format[PreviousCodePoint] == UTF32Character('U')) {
                                     Specifiers->Specifiers[Specifier].TypeModifier |= Modifier_UTF32;
