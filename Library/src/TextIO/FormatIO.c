@@ -608,11 +608,12 @@ extern "C" {
                 
                 if ((BaseType & BaseType_Integer) == BaseType_Integer) {
                     if ((Modifier & Modifier_Unsigned) == Modifier_Unsigned) {
+                        /* 8 and 16 bit types are promoted automatically */
                         if ((Length & Length_8Bit) == Length_8Bit) {
-                            uint8_t   Arg                                  = va_arg(Arguments, uint8_t);
+                            uint8_t   Arg                                  = (uint8_t) va_arg(Arguments, uint32_t);
                             Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((Length & Length_16Bit) == Length_16Bit) {
-                            uint16_t  Arg                                  = va_arg(Arguments, uint16_t);
+                            uint16_t  Arg                                  = (uint16_t) va_arg(Arguments, uint32_t);
                             Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((Length & Length_32Bit) == Length_32Bit) {
                             uint32_t  Arg                                  = va_arg(Arguments, uint32_t);
@@ -622,36 +623,38 @@ extern "C" {
                             Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         }
                     } else if ((Modifier & Modifier_Signed) == Modifier_Signed) {
+                        /* 8 and 16 bit types are promoted automatically */
                         if ((Length & Length_8Bit) == Length_8Bit) {
-                            int8_t    Arg                                  = va_arg(Arguments, uint8_t);
+                            int8_t    Arg                                  = (int8_t) va_arg(Arguments, int32_t);
                             Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((Length & Length_16Bit) == Length_16Bit) {
-                            int16_t   Arg                                  = va_arg(Arguments, uint16_t);
+                            int16_t   Arg                                  = (int16_t) va_arg(Arguments, int32_t);
                             Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((Length & Length_32Bit) == Length_32Bit) {
-                            int32_t   Arg                                  = va_arg(Arguments, uint32_t);
+                            int32_t   Arg                                  = va_arg(Arguments, int32_t);
                             Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((Length & Length_64Bit) == Length_64Bit) {
-                            int64_t   Arg                                  = va_arg(Arguments, uint64_t);
+                            int64_t   Arg                                  = va_arg(Arguments, int64_t);
                             Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         }
                     }
                 } else if ((BaseType & BaseType_Decimal) == BaseType_Decimal) {
                     if ((Length & Length_32Bit) == Length_32Bit) {
-                        float    Arg                                       = va_arg(Arguments, float);
-                        Specifiers->Specifiers[Position].Argument          = UTF32_Decimal2String(Base, (double) Arg);
-                    } else if ((Length & Length_64Bit) == Length_64Bit) {
+                        float    Arg                                       = (float) va_arg(Arguments, double);
+                        Specifiers->Specifiers[Position].Argument          = UTF32_Decimal2String(Base, Arg);
+                    }
+                    if ((Length & Length_64Bit) == Length_64Bit) {
                         double   Arg                                       = va_arg(Arguments, double);
                         Specifiers->Specifiers[Position].Argument          = UTF32_Decimal2String(Base, Arg);
                     }
                 } else if ((BaseType & BaseType_CodeUnit) == BaseType_CodeUnit) {
                     if ((Modifier & Modifier_UTF8) == Modifier_UTF8) {
-                        UTF8  VariadicArgument                             = va_arg(Arguments, UTF8);
+                        UTF8  VariadicArgument                             = (UTF8) va_arg(Arguments, uint32_t);
                         UTF8 *String                                       = UTF8_CodeUnit2String(VariadicArgument);
                         Specifiers->Specifiers[Position].Argument          = UTF8_Decode(String);
                         UTF8_Deinit(String);
                     } else if ((Modifier & Modifier_UTF16) == Modifier_UTF16) {
-                        UTF16  VariadicArgument                            = va_arg(Arguments, UTF16);
+                        UTF16  VariadicArgument                            = (UTF16) va_arg(Arguments, uint32_t);
                         UTF16 *String                                      = UTF16_CodeUnit2String(VariadicArgument);
                         Specifiers->Specifiers[Position].Argument          = UTF16_Decode(String);
                         UTF16_Deinit(String);
