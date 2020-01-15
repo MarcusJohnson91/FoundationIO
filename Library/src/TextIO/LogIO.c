@@ -109,7 +109,7 @@ extern "C" {
         }
     }
     
-    void Log(LogTypes Severity, const UTF8 *FunctionName, UTF8 *Description, ...) {
+    void Log(LogTypes Severity, UTF8 *FunctionName, UTF8 *Description, ...) {
         va_list VariadicArguments;
         va_start(VariadicArguments, Description);
         UTF8 *VariadicString  = UTF8_Format(Description, VariadicArguments);
@@ -120,7 +120,8 @@ extern "C" {
         if (Log_ProgramName != NULL) {
             FormattedString   = UTF8_Format(UTF8String("%Us in %s's %s: %s%s"), *Log_ProgramName, ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
         } else {
-            FormattedString   = UTF8_Format(UTF8String("%s in %s: %s%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
+            //FormattedString   = UTF8_Format(UTF8String("%s in %s: %s%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
+            printf(UTF8String("%s in %s: %s%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
         }
         
         if (Severity == Log_USER) {
