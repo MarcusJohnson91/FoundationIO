@@ -121,8 +121,8 @@ extern "C" {
         
         bool TestPassed                        = false;
         
-        UTF8 *Positional1                      = UTF8_Format(UTF8String("NumArgs: %1$llu, Equal: %llu, Type: %3$s"), 3, 1234, UTF8String("Positional"));
-        bool  Positional1Test                  = UTF8_Compare(Positional1, UTF16String("NumArgs: 3, Equal: 1234, Type: Positional"));
+        UTF8 *Positional1                      = UTF8_Format(UTF8String("NumArgs: %1$d, Equal: %2$d, Type: %3$s"), 3, 1234, UTF8String("Positional"));
+        bool  Positional1Test                  = UTF8_Compare(Positional1, UTF8String("NumArgs: 3, Equal: 1234, Type: Positional"));
         // "NumArgs: 3, Equal: 1234, Type: Positional"
         if (Positional1Test == No) {
             Log(Log_DEBUG, __func__, UTF8String("Positional1Test Failed"));
@@ -153,7 +153,7 @@ extern "C" {
          }
          */
         
-        UTF8 *Positional3                      = UTF8_Format(UTF8String("NumArgs: %2$llu, %1$s EXTEND THE STRING"), UTF8String("Positional"), 2); // Remapping isn't working.
+        UTF8 *Positional3                      = UTF8_Format(UTF8String("NumArgs: %2$d, %1$s EXTEND THE STRING"), UTF8String("Positional"), 2); // Remapping isn't working.
         bool  Positional3Test                  = UTF8_Compare(Positional3, UTF8String("NumArgs: 2, Positional EXTEND THE STRING"));
         // "NumArgs: -$llu, Positi"
         // "NumArgs: Positional, %12XTEND THE STRING"
@@ -197,26 +197,26 @@ extern "C" {
             Log(Log_DEBUG, __func__, UTF8String("PercentTest Failed"));
         }
         
-        UTF8 *Smaller                          = UTF8_Format(UTF8String("%llu"), 123);
+        UTF8 *Smaller                          = UTF8_Format(UTF8String("%d"), 123);
         bool SmallerTest                       = UTF8_Compare(Smaller, UTF8String("123"));
         if (SmallerTest == No) {
             Log(Log_DEBUG, __func__, UTF8String("SmallerTest Failed"));
         }
         
-        UTF8 *Equal                            = UTF8_Format(UTF8String("%llu"), 1094);
+        UTF8 *Equal                            = UTF8_Format(UTF8String("%d"), 1094);
         bool EqualTest                         = UTF8_Compare(Equal, UTF8String("1094"));
         if (EqualTest == No) {
             Log(Log_DEBUG, __func__, UTF8String("EqualTest Failed"));
         }
         
         // Equal and Smaller fail, but Longer works, and Smaller works sometimes?
-        UTF8 *Longer                           = UTF8_Format(UTF8String("%llu"), 99999);
+        UTF8 *Longer                           = UTF8_Format(UTF8String("%d"), 99999);
         bool LongerTest                        = UTF8_Compare(Longer, UTF8String("99999"));
         if (LongerTest == No) {
             Log(Log_DEBUG, __func__, UTF8String("LongerTest Failed"));
         }
         
-        UTF8 *DoubleSpecifier                  = UTF8_Format(UTF8String("%llu:%llu"), 1, 2);
+        UTF8 *DoubleSpecifier                  = UTF8_Format(UTF8String("%d:%d"), 1, 2);
         bool  DoubleSpecifierTest              = UTF8_Compare(DoubleSpecifier, UTF8String("1:2"));
         if (DoubleSpecifierTest == No) {
             Log(Log_DEBUG, __func__, UTF8String("DoubleSpecifierTest Failed"));
@@ -297,7 +297,7 @@ extern "C" {
     int main(int argc, const char *argv[]) {
         bool TestSuitePassed      = false;
         //Entropy *Random           = Entropy_Init(8000000);
-        TestSuitePassed           = Test_Deformat();
+        TestSuitePassed           = Test_UTF8_Format();
         //Test_UTF8_EncodeDecode(Random);
         //TestSuitePassed           = Test_UTF8_Format();
         //TestSuitePassed           = Test_UTF8_StitchSubString();
