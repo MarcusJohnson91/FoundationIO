@@ -91,7 +91,7 @@ extern "C" {
     
     UTF32            *FormatString_UTF32(FormatSpecifiers *Specifiers, UTF32 *Format);
     
-    void              UTF32_ParseFormatString(FormatSpecifiers *Specifiers, UTF32 *Format, uint64_t NumSpecifiers, StringIOStringTypes StringType);
+    void              UTF32_ParseFormatString(FormatSpecifiers *Specifiers, UTF32 *Format, StringIOStringTypes StringType);
     
     void              Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments);
     
