@@ -166,7 +166,7 @@ extern "C" {
         return Base;
     }
     
-    static FormatSpecifiers *UTF32_Specifiers_GetOffsetAndLength(FormatSpecifiers *Specifiers, UTF32 *Format, uint64_t NumSpecifiers, StringIOStringTypes Type) {
+    static FormatSpecifiers *UTF32_Specifiers_GetOffsetAndLength(FormatSpecifiers *Specifiers, UTF32 *Format, StringIOStringTypes Type) {
         if (Specifiers != NULL && Format != NULL) {
             Specifiers->StringType    = Type;
             uint64_t StringSize       = UTF32_GetStringSizeInCodePoints(Format);
@@ -511,9 +511,9 @@ extern "C" {
         }
     }
     
-    void UTF32_ParseFormatString(FormatSpecifiers *Specifiers, UTF32 *Format, uint64_t NumSpecifiers, StringIOStringTypes StringType) {
+    void UTF32_ParseFormatString(FormatSpecifiers *Specifiers, UTF32 *Format, StringIOStringTypes StringType) {
         if (Format != NULL) {
-            UTF32_Specifiers_GetOffsetAndLength(Specifiers, Format, NumSpecifiers, StringType);
+            UTF32_Specifiers_GetOffsetAndLength(Specifiers, Format, StringType);
             UTF32_Specifiers_GetType(Format, Specifiers);
             UTF32_Specifiers_GetModifiers(Format, Specifiers);
             UTF32_Specifiers_GetFlagsWidthPrecisionPosition(Format, Specifiers);
@@ -804,14 +804,15 @@ extern "C" {
         if (Format != NULL) {
             uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
-                UTF32 *Format32              = UTF8_Decode(Format);
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
-                UTF32_ParseFormatString(Specifiers, Format32, NumSpecifiers, StringType_UTF8);
+                UTF32 *Format32              = UTF8_Decode(Format);
+                UTF32_ParseFormatString(Specifiers, Format32, StringType_UTF8);
                 va_list VariadicArguments;
                 va_start(VariadicArguments, Format);
                 Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
                 UTF32 *FormattedString       = FormatString_UTF32(Specifiers, Format32);
+                printf("%ls\n", (wchar_t*) FormattedString);
                 FormatSpecifiers_Deinit(Specifiers);
                 UTF32_Deinit(Format32);
                 Format8                      = UTF8_Encode(FormattedString);
@@ -832,7 +833,7 @@ extern "C" {
             if (NumSpecifiers > 0) {
                 UTF32 *Format32              = UTF16_Decode(Format);
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
-                UTF32_ParseFormatString(Specifiers, Format32, NumSpecifiers, StringType_UTF16);
+                UTF32_ParseFormatString(Specifiers, Format32, StringType_UTF16);
                 va_list VariadicArguments;
                 va_start(VariadicArguments, Format);
                 Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
@@ -857,7 +858,7 @@ extern "C" {
             uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
-                UTF32_ParseFormatString(Specifiers, Format, NumSpecifiers, StringType_UTF32);
+                UTF32_ParseFormatString(Specifiers, Format, StringType_UTF32);
                 va_list VariadicArguments;
                 va_start(VariadicArguments, Format);
                 Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
@@ -880,7 +881,7 @@ extern "C" {
             if (NumSpecifiers > 0) {
                 UTF32 *Format32              = UTF8_Decode(Format);
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
-                UTF32_ParseFormatString(Specifiers, Format32, NumSpecifiers, StringType_UTF8);
+                UTF32_ParseFormatString(Specifiers, Format32, StringType_UTF8);
                 UTF32 *Formatted32           = UTF8_Decode(Formatted);
                 UTF32 **Strings32            = DeformatString_UTF32(Specifiers, Format32, Formatted32);
                 FormatSpecifiers_Deinit(Specifiers);
@@ -904,7 +905,7 @@ extern "C" {
             if (NumSpecifiers > 0) {
                 UTF32 *Format32              = UTF16_Decode(Format);
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
-                UTF32_ParseFormatString(Specifiers, Format32, NumSpecifiers, StringType_UTF16);
+                UTF32_ParseFormatString(Specifiers, Format32, StringType_UTF16);
                 UTF32 *Formatted32           = UTF16_Decode(Formatted);
                 UTF32 **Strings32            = DeformatString_UTF32(Specifiers, Format32, Formatted32);
                 FormatSpecifiers_Deinit(Specifiers);
@@ -927,7 +928,7 @@ extern "C" {
             uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
-                UTF32_ParseFormatString(Specifiers, Format, NumSpecifiers, StringType_UTF32);
+                UTF32_ParseFormatString(Specifiers, Format, StringType_UTF32);
                 StringArray                  = DeformatString_UTF32(Specifiers, Format, Formatted);
                 FormatSpecifiers_Deinit(Specifiers);
             }
