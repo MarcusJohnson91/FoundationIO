@@ -88,7 +88,7 @@ extern "C" {
     } Audio_Types;
     
     /*!
-     @enum                  Image_ChannelMask
+     @enum                  ImageChannelMask
      @abstract                                              "Defines the ChannelMask values".
      @constant              ImageMask_Unknown               "Invalid ImageMask, exists solely to tell when it hasn't been set".
      @constant              ImageMask_2D                    "The image has two dimensions".
@@ -104,7 +104,7 @@ extern "C" {
      @constant              ImageMask_Blue                  "The channel contains the Blue   color information".
      @constant              ImageMask_Green2                "The channel contains the Green2 color information, for Bayer filtered images".
      */
-    typedef enum Image_ChannelMask {
+    typedef enum ImageChannelMask {
                             ImageMask_Unknown               = 0,
                             ImageMask_2D                    = 1,
                             ImageMask_Luma                  = 2,
@@ -118,7 +118,7 @@ extern "C" {
                             ImageMask_Green                 = 512,
                             ImageMask_Blue                  = 1024,
                             ImageMask_Green2                = 2048,
-    } Image_ChannelMask;
+    } ImageChannelMask;
     
     /*!
      @enum                  Image_Types

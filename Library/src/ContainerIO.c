@@ -1019,17 +1019,17 @@ extern "C" {
     
     /* ImageContainer */
     typedef struct ImageChannelMap {
-        Image_ChannelMask **Map; // Map[View][Channel]
+        ImageChannelMask  **Map; // Map[View][Channel]
         uint8_t             NumChannels;
         uint8_t             NumViews;
     } ImageChannelMap;
     
     ImageChannelMap *ImageChannelMap_Init(uint8_t NumViews, uint8_t NumChannels) {
-        ImageChannelMap *ChannelMap = calloc(1, sizeof(Image_ChannelMask));
+        ImageChannelMap *ChannelMap = calloc(1, sizeof(ImageChannelMask));
         if (ChannelMap != NULL) {
             ChannelMap->NumViews    = NumViews;
             ChannelMap->NumChannels = NumChannels;
-            ChannelMap->Map         = calloc(NumViews * NumChannels, sizeof(Image_ChannelMask));
+            ChannelMap->Map         = calloc(NumViews * NumChannels, sizeof(ImageChannelMask));
         } else {
             Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate ImageChannelMap"));
         }
