@@ -475,6 +475,15 @@ extern "C" {
     uint8_t                 ImageChannelMap_GetNumChannels(ImageChannelMap *ChannelMap);
     
     /*!
+     @abstract                             "Gets the index of the Mask".
+     @remark                               "If the Mask isn't present, NumChannels is returned which is an invalid index".
+     @param                 ChannelMap     "The ChannelMap to read".
+     @param                 Mask           "The color you want to find the index of".
+     @return                               "Returns the Index".
+     */
+    uint8_t                 ImageChannelMap_GetChannelsIndex(ImageChannelMap *ChannelMap, ImageChannelMask Mask);
+    
+    /*!
      @abstract                             "Sets a ChannelMap".
      @param                 ChannelMap     "The ChannelMap to read".
      @param                 Index          "The index of the channel".
