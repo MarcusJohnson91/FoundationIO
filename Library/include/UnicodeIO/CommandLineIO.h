@@ -23,9 +23,9 @@ extern "C" {
 #undef    UTF8
 #endif /* UTF8 */
 #if (defined __STDC_UTF_8__ && defined __CHAR8_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
-    typedef   char8_t        UTF8;
+    typedef                     char8_t                         UTF8;
 #else
-    typedef   unsigned char  UTF8;
+    typedef                     unsigned char                   UTF8;
 #endif /* __CHAR8_TYPE__ */
 #endif /* FoundationIO_StringType8 */
     
@@ -47,28 +47,28 @@ extern "C" {
 #undef    UTF32
 #endif /* UTF32 */
 #if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
-    typedef               char32_t         UTF32;
+    typedef                     char32_t                        UTF32;
 #else
-    typedef               uint_least32_t   UTF32;
+    typedef                     uint_least32_t                  UTF32;
 #endif /* __CHAR32_TYPE__ */
 #endif /* FoundationIO_StringType32 */
     
-#ifndef                   FoundationIO_Unicodize8
-#define                   FoundationIO_Unicodize8              (1)
-#define                   UTF8String(Literal)                  (const UTF8*) u8##Literal
-#define                   UTF8Character(Literal)               (const UTF8)  u8##Literal
+#ifndef                         FoundationIO_Unicodize8
+#define                         FoundationIO_Unicodize8         (1)
+#define                         UTF8String(Literal)             (const UTF8*) u8##Literal
+#define                         UTF8Character(Literal)          (const UTF8)  u8##Literal
 #endif /* FoundationIO_Unicodize8 */
     
-#ifndef                   FoundationIO_Unicodize16
-#define                   FoundationIO_Unicodize16            (2)
-#define                   UTF16String(Literal)                (UTF16*) u##Literal
-#define                   UTF16Character(Literal)             (UTF16)  u##Literal
+#ifndef                         FoundationIO_Unicodize16
+#define                         FoundationIO_Unicodize16        (2)
+#define                         UTF16String(Literal)            (UTF16*) u##Literal
+#define                         UTF16Character(Literal)         (UTF16)  u##Literal
 #endif /* FoundationIO_Unicodize16 */
     
-#ifndef                   FoundationIO_Unicodize32
-#define                   FoundationIO_Unicodize32            (4)
-#define                   UTF32String(Literal)                (UTF32*) U##Literal
-#define                   UTF32Character(Literal)             (UTF32) U##Literal
+#ifndef                         FoundationIO_Unicodize32
+#define                         FoundationIO_Unicodize32        (4)
+#define                         UTF32String(Literal)            (UTF32*) U##Literal
+#define                         UTF32Character(Literal)         (UTF32) U##Literal
 #endif /* FoundationIO_Unicodize32 */
     
     /*!
@@ -149,7 +149,7 @@ extern "C" {
     typedef struct              CommandLineIO                   CommandLineIO;
     
     /*!
-     @abstract                                                  "Initializes a CommandLineIO instance".
+     @abstract                                                  "Creates a CommandLineIO instance".
      @param                     NumOptions                      "The number of CommandLineOption structures to initalize".
      @return                                                    "Returns a pointer to an initialized CommandLineIO instance".
      */

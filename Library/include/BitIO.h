@@ -19,14 +19,14 @@ extern "C" {
     
 #ifndef   FoundationIO_StringType8
 #define   FoundationIO_StringType8 (1)
-    #ifdef    UTF8
-    #undef    UTF8
-    #endif /* UTF8 */
-        #if (defined __STDC_UTF_8__ && defined __CHAR8_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
-    typedef   char8_t        UTF8;
-        #else
-    typedef   unsigned char  UTF8;
-        #endif /* __CHAR8_TYPE__ */
+#ifdef    UTF8
+#undef    UTF8
+#endif /* UTF8 */
+#if (defined __STDC_UTF_8__ && defined __CHAR8_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+    typedef               char8_t                               UTF8;
+#else
+    typedef               unsigned char                         UTF8;
+#endif /* __CHAR8_TYPE__ */
 #endif /* FoundationIO_StringType8 */
     
 #ifndef   FoundationIO_StringType16
@@ -34,10 +34,10 @@ extern "C" {
 #ifdef    UTF16
 #undef    UTF16
 #endif /* UTF16 */
-#if (defined __STDC_UTF_16__ && defined __CHAR16_TYPE__) && (FoundationIOSTDVersion >= FoundationIOSTDVersionC2X)
-    typedef                     char16_t                        UTF16;
+#if (defined __STDC_UTF_16__ && defined __CHAR16_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+    typedef               char16_t                              UTF16;
 #else
-    typedef                     uint_least16_t                  UTF16;
+    typedef               uint_least16_t                        UTF16;
 #endif /* __CHAR16_TYPE__ */
 #endif /* FoundationIO_StringType16 */
     
@@ -47,28 +47,28 @@ extern "C" {
 #undef    UTF32
 #endif /* UTF32 */
 #if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
-    typedef               char32_t         UTF32;
+    typedef               char32_t                              UTF32;
 #else
-    typedef               uint_least32_t   UTF32;
+    typedef               uint_least32_t                        UTF32;
 #endif /* __CHAR32_TYPE__ */
 #endif /* FoundationIO_StringType32 */
     
 #ifndef                   FoundationIO_Unicodize8
-#define                   FoundationIO_Unicodize8              (1)
-#define                   UTF8String(Literal)                  (const UTF8*) u8##Literal
-#define                   UTF8Character(Literal)               (const UTF8)  u8##Literal
+#define                   FoundationIO_Unicodize8               (1)
+#define                   UTF8String(Literal)                   (const UTF8*) u8##Literal
+#define                   UTF8Character(Literal)                (const UTF8)  u8##Literal
 #endif /* FoundationIO_Unicodize8 */
     
 #ifndef                   FoundationIO_Unicodize16
-#define                   FoundationIO_Unicodize16            (2)
-#define                   UTF16String(Literal)                (UTF16*) u##Literal
-#define                   UTF16Character(Literal)             (UTF16)  u##Literal
+#define                   FoundationIO_Unicodize16              (2)
+#define                   UTF16String(Literal)                  (UTF16*) u##Literal
+#define                   UTF16Character(Literal)               (UTF16)  u##Literal
 #endif /* FoundationIO_Unicodize16 */
     
 #ifndef                   FoundationIO_Unicodize32
-#define                   FoundationIO_Unicodize32            (4)
-#define                   UTF32String(Literal)                (UTF32*) U##Literal
-#define                   UTF32Character(Literal)             (UTF32) U##Literal
+#define                   FoundationIO_Unicodize32              (4)
+#define                   UTF32String(Literal)                  (UTF32*) U##Literal
+#define                   UTF32Character(Literal)               (UTF32) U##Literal
 #endif /* FoundationIO_Unicodize32 */
     
     /*!
@@ -183,7 +183,7 @@ extern "C" {
     
     /* BitBuffer */
     /*!
-     @abstract                                                  "Initializes a BitBuffer".
+     @abstract                                                  "Creates a BitBuffer".
      @param                     BitBufferSize                   "The number of bytes to create the BitBuffer with".
      @return                                                    "Returns a pointer to the BitBuffer".
      */
@@ -407,7 +407,7 @@ extern "C" {
     void                        BitBuffer_Write(BitBuffer *BitB, BitOutput *BitO);
     
     /*!
-     @abstract                                                  "Deinitializes the BitBuffer".
+     @abstract                                                  "Deletes the BitBuffer".
      @param                     BitB                            "BitBuffer Pointer you want to deinit".
      */
     void                        BitBuffer_Deinit(BitBuffer *BitB);
@@ -415,7 +415,7 @@ extern "C" {
     
     /* BitInput */
     /*!
-     @abstract                                                  "Initializes a BitInput".
+     @abstract                                                  "Creates a BitInput".
      @return                                                    "Returns a pointer to said BitInput structure".
      */
     BitInput                   *BitInput_Init(void);
@@ -482,7 +482,7 @@ extern "C" {
     
     /* BitOutput */
     /*!
-     @abstract                                                  "Initializes a BitOutput structure".
+     @abstract                                                  "Creates a BitOutput structure".
      @return                                                    "Returns a pointer to said BitOutput structure".
      */
     BitOutput                  *BitOutput_Init(void);

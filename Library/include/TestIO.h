@@ -16,16 +16,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
 #ifndef   FoundationIO_StringType32
 #define   FoundationIO_StringType32 (4)
 #ifdef    UTF32
 #undef    UTF32
 #endif /* UTF32 */
 #if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
-    typedef               char32_t         UTF32;
+    typedef                     char32_t                        UTF32;
 #else
-    typedef               uint_least32_t   UTF32;
+    typedef                     uint_least32_t                  UTF32;
 #endif /* __CHAR32_TYPE__ */
 #endif /* FoundationIO_StringType32 */
     
