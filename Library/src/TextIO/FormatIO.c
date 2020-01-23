@@ -72,7 +72,7 @@ extern "C" {
         Length_64Bit                   = 8,
         Length_SizeType                = 16, // Modifier_Size
         Length_PointerDiff             = 32, // Modifier_PointerDiff
-        Length_IntMax                  = 64,
+        Length_IntMax                  = 64, // Largest Integer type, 64 bit
     } FormatSpecifier_LengthModifiers;
     
     typedef struct FormatSpecifier {
@@ -235,6 +235,7 @@ extern "C" {
                 uint64_t CodePoint = (Offset + Length) - 1;
                 
                 if (Offset != 0x7FFFFFFFFFFFFFFE && Length != 0x7FFFFFFFFFFFFFFE) {
+                    /* TODO: Rewrite this so it can support overlapping modifiers and base types */
                     switch (Format[CodePoint]) {
                         case UTF32Character('a'):
                         case UTF32Character('A'):
@@ -306,12 +307,12 @@ extern "C" {
                         } else if (Format[CodePoint - 1] != UTF32Character('l') && Format[CodePoint] == UTF32Character('l')) {
                             Specifiers->Specifiers[Specifier].LengthModifier   |= Length_32Bit;
                             Specifiers->Specifiers[Specifier].ModifierSize     += 1;
-                        } else if (Format[CodePoint - 1] != UTF32Character('h') && Format[CodePoint] == UTF32Character('h')) {
-                            Specifiers->Specifiers[Specifier].LengthModifier   |= Length_16Bit;
-                            Specifiers->Specifiers[Specifier].ModifierSize     += 1;
                         } else if (Format[CodePoint - 1] == UTF32Character('h') && Format[CodePoint] == UTF32Character('h')) {
                             Specifiers->Specifiers[Specifier].LengthModifier   |= Length_8Bit;
                             Specifiers->Specifiers[Specifier].ModifierSize     += 2;
+                        } else if (Format[CodePoint - 1] != UTF32Character('h') && Format[CodePoint] == UTF32Character('h')) {
+                            Specifiers->Specifiers[Specifier].LengthModifier   |= Length_16Bit;
+                            Specifiers->Specifiers[Specifier].ModifierSize     += 1;
                         } else if (Format[CodePoint] == UTF32Character('j')) {
                             Specifiers->Specifiers[Specifier].LengthModifier   |= Length_IntMax;
                             Specifiers->Specifiers[Specifier].ModifierSize     += 1;
@@ -577,7 +578,7 @@ extern "C" {
         }
     }
     
-    void Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments) {
+    static void Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments) {
         if (Specifiers != NULL) {
             uint64_t                        Specifier0                     = 0ULL;
             uint64_t                        Position                       = 0x7FFFFFFFFFFFFFFE;
