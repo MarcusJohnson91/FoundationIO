@@ -515,6 +515,13 @@ extern "C" {
     ImageChannelMap        *ImageContainer_GetChannelMap(ImageContainer *Image);
     
     /*!
+     @abstract                             "Sets the channel mask".
+     @param                 Image          "A pointer to the instance of an ImageContainer in question".
+     @param                 ChannelMap     "The new channel map to set to the Image".
+     */
+    void                    ImageContainer_SetChannelMap(ImageContainer *Image, ImageChannelMap *ChannelMap);
+    
+    /*!
      @abstract                             "Gets the type of the array contained by the ImageContainer".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */

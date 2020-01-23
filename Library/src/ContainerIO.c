@@ -1144,6 +1144,17 @@ extern "C" {
         return Map;
     }
     
+    void ImageContainer_SetChannelMap(ImageContainer *Image, ImageChannelMap *ChannelMap) {
+        if (Image != NULL && ChannelMap != NULL) {
+            free(Image->ChannelMap);
+            Image->ChannelMap = ChannelMap;
+        } else if (Image == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+        } else if (ChannelMap == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("ChannelMap Pointer is NULL"));
+        }
+    }
+    
     Image_Types ImageContainer_GetType(ImageContainer *Image) {
         Image_Types Type = ImageType_Unknown;
         if (Image != NULL) {
