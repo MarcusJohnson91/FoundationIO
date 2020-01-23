@@ -334,6 +334,12 @@ extern "C" {
      */
     AudioChannelMask        AudioChannelMap_GetMask(AudioChannelMap *ChannelMap, uint64_t Index);
     
+   /*!
+    @abstract                              "Finds the lowest index in the ChannelMap that is unused".
+    @param                  ChannelMap     "Pointer to the ChannelMap".
+    */
+    uint64_t                AudioChannelMap_GetLowestUnusedIndex(AudioChannelMap *ChannelMap);
+    
     /*!
      @abstract                             "Deletes a ChannelMap".
      @param                 ChannelMap     "The AudioChannelMap to delete".

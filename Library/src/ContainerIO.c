@@ -46,6 +46,24 @@ extern "C" {
         return ChannelMask;
     }
     
+    uint64_t AudioChannelMap_GetLowestUnusedIndex(AudioChannelMap *ChannelMap) {
+        uint64_t Index       = 0xFFFFFFFFFFFFFFFF;
+        if (ChannelMap != NULL) {
+            Index            = ChannelMap->NumChannels;
+            uint64_t Channel = 0ULL;
+            while (Channel < ChannelMap->NumChannels) {
+                if (ChannelMap->Map[Channel] != AudioMask_Unknown) {
+                    Index    = Channel;
+                    break;
+                }
+                Channel     += 1;
+            }
+        } else if (ChannelMap == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("ChannelMap Pointer is NULL"));
+        }
+        return Index;
+    }
+    
     void AudioChannelMap_Deinit(AudioChannelMap *ChannelMap) {
         if (ChannelMap != NULL) {
             free(ChannelMap->Map);
