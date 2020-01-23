@@ -475,6 +475,14 @@ extern "C" {
     uint8_t                 ImageChannelMap_GetNumChannels(ImageChannelMap *ChannelMap);
     
     /*!
+     @abstract                             "Sets a ChannelMap".
+     @param                 ChannelMap     "The ChannelMap to read".
+     @param                 Index          "The index of the channel".
+     @param                 Mask           "The ChannelMask for the Index"
+     */
+    void                    ImageChannelMap_AddMask(ImageChannelMap *ChannelMap, uint8_t Index, ImageChannelMask Mask);
+    
+    /*!
      @abstract                             "Destroys an AudioVectorHistogram".
      @param                 ChannelMap     "The ChannelMap to destroy".
      */

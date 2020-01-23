@@ -1056,6 +1056,18 @@ extern "C" {
         return NumViews;
     }
     
+    void ImageChannelMap_AddMask(ImageChannelMap *ChannelMap, uint8_t Index, ImageChannelMask Mask) {
+        if (ChannelMap != NULL && Index < ChannelMap->NumChannels) {
+            for (uint8_t View = 0; View < ChannelMap->NumViews; View++) {
+                ChannelMap->Map[View][Index] = Mask;
+            }
+        } else if (ChannelMap == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("ImageChannelMap Pointer is NULL"));
+        } else if (Index >= ChannelMap->NumChannels) {
+            Log(Log_DEBUG, __func__, UTF8String("Index: %hhu is Invalid"), Index);
+        }
+    }
+    
     void ImageChannelMap_Deinit(ImageChannelMap *ChannelMap) {
         if (ChannelMap != NULL) {
             free(ChannelMap->Map);
