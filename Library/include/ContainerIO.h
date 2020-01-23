@@ -189,26 +189,6 @@ extern "C" {
     Audio2DContainer       *Audio2DContainer_Init(Audio_Types Type, AudioChannelMap *ChannelMap, uint64_t SampleRate, uint64_t NumSamples);
     
     /*!
-     @abstract                             "Gets a pointer to the ChannelMap".
-     @param                 Audio          "Audio2DContainer Pointer".
-     @return                               "Returns a pointer to the ChannelMap".
-     */
-    AudioChannelMap        *Audio2DContainer_GetChannelMap(Audio2DContainer *Audio);
-    
-    /*!
-     @abstract                             "Returns the number of audio channels".
-     @param                 Audio          "Audio2DContainer Pointer".
-     */
-    uint64_t                Audio2DContainer_GetNumChannels(Audio2DContainer *Audio);
-    
-    /*!
-     @abstract                             "Returns the ChannelMask for Index".
-     @param                 ChannelMap     "Audio2DContainer Pointer".
-     @param                 Index          "The channel index to get the mask for".
-     */
-    AudioChannelMask        AudioChannelMap_GetMask(AudioChannelMap *ChannelMap, uint64_t Index);
-    
-    /*!
      @abstract                             "Returns the number of channel-agnostic samples in one second".
      @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      */
@@ -327,12 +307,32 @@ extern "C" {
     AudioChannelMap        *AudioChannelMap_Init(uint64_t NumChannels);
     
     /*!
+     @abstract                             "Gets a pointer to the ChannelMap".
+     @param                 Audio          "Audio2DContainer Pointer".
+     @return                               "Returns a pointer to the ChannelMap".
+     */
+    AudioChannelMap        *Audio2DContainer_GetChannelMap(Audio2DContainer *Audio);
+    
+    /*!
+     @abstract                             "Returns the number of audio channels".
+     @param                 Audio          "Audio2DContainer Pointer".
+     */
+    uint64_t                Audio2DContainer_GetNumChannels(Audio2DContainer *Audio);
+    
+    /*!
      @abstract                             "Adds a AudioChannelMask at the specified Index to the ChannelMap".
      @param                 ChannelMap     "The number of channels".
      @param                 Index          "The index in the ChannelMap to add the mask".
      @param                 Mask           "The ChannelMask for the index".
      */
     void                    AudioChannelMap_AddMask(AudioChannelMap *ChannelMap, uint64_t Index, AudioChannelMask Mask);
+    
+    /*!
+     @abstract                             "Returns the ChannelMask for Index".
+     @param                 ChannelMap     "Audio2DContainer Pointer".
+     @param                 Index          "The channel index to get the mask for".
+     */
+    AudioChannelMask        AudioChannelMap_GetMask(AudioChannelMap *ChannelMap, uint64_t Index);
     
     /*!
      @abstract                             "Deletes a ChannelMap".
