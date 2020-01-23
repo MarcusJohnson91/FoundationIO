@@ -121,7 +121,7 @@ extern "C" {
         
         bool TestPassed                        = false;
         
-        UTF8 *Positional1                      = UTF8_Format(UTF8String("NumArgs: %1$d, Equal: %2$d, Type: %3$s"), 3, 1234, UTF8String("Positional"));
+        UTF8 *Positional1                      = UTF8_Format(UTF8String("NumArgs: %1$u, Equal: %2$u, Type: %3$s"), 3, 1234, UTF8String("Positional"));
         bool  Positional1Test                  = UTF8_Compare(Positional1, UTF8String("NumArgs: 3, Equal: 1234, Type: Positional"));
         // "NumArgs: 3, Equal: 1234, Type: Positional"
         if (Positional1Test == No) {

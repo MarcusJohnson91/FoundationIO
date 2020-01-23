@@ -524,23 +524,6 @@ extern "C" {
         return Grapheme;
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     bool UTF8_HasBOM(UTF8 *String) {
         bool StringHasABOM        = No;
         if (String != NULL) {

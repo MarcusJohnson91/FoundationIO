@@ -23,9 +23,9 @@ extern "C" {
 #undef    UTF8
 #endif /* UTF8 */
 #if (defined __STDC_UTF_8__ && defined __CHAR8_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
-    typedef   char8_t        UTF8;
+    typedef               char8_t                               UTF8;
 #else
-    typedef   unsigned char  UTF8;
+    typedef               unsigned char                         UTF8;
 #endif /* __CHAR8_TYPE__ */
 #endif /* FoundationIO_StringType8 */
     
@@ -35,9 +35,9 @@ extern "C" {
 #undef    UTF16
 #endif /* UTF16 */
 #if (defined __STDC_UTF_16__ && defined __CHAR16_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
-    typedef                     char16_t                        UTF16;
+    typedef               char16_t                              UTF16;
 #else
-    typedef                     uint_least16_t                  UTF16;
+    typedef               uint_least16_t                        UTF16;
 #endif /* __CHAR16_TYPE__ */
 #endif /* FoundationIO_StringType16 */
     
@@ -46,29 +46,29 @@ extern "C" {
 #ifdef    UTF32
 #undef    UTF32
 #endif /* UTF32 */
-#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (FoundationIOTargetOS != FoundationIOAppleOS)
-    typedef               char32_t                             UTF32;
+#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+    typedef               char32_t                              UTF32;
 #else
-    typedef               uint_least32_t                       UTF32;
+    typedef               uint_least32_t                        UTF32;
 #endif /* __CHAR32_TYPE__ */
 #endif /* FoundationIO_StringType32 */
     
 #ifndef                   FoundationIO_Unicodize8
-#define                   FoundationIO_Unicodize8              (1)
-#define                   UTF8String(Literal)                  (const UTF8*) u8##Literal
-#define                   UTF8Character(Literal)               (const UTF8)  u8##Literal
+#define                   FoundationIO_Unicodize8               (1)
+#define                   UTF8String(Literal)                   (const UTF8*) u8##Literal
+#define                   UTF8Character(Literal)                (const UTF8)  u8##Literal
 #endif /* FoundationIO_Unicodize8 */
     
 #ifndef                   FoundationIO_Unicodize16
-#define                   FoundationIO_Unicodize16            (2)
-#define                   UTF16String(Literal)                (UTF16*) u##Literal
-#define                   UTF16Character(Literal)             (UTF16)  u##Literal
+#define                   FoundationIO_Unicodize16              (2)
+#define                   UTF16String(Literal)                  (UTF16*) u##Literal
+#define                   UTF16Character(Literal)               (UTF16)  u##Literal
 #endif /* FoundationIO_Unicodize16 */
     
 #ifndef                   FoundationIO_Unicodize32
-#define                   FoundationIO_Unicodize32            (4)
-#define                   UTF32String(Literal)                (UTF32*) U##Literal
-#define                   UTF32Character(Literal)             (UTF32) U##Literal
+#define                   FoundationIO_Unicodize32              (4)
+#define                   UTF32String(Literal)                  (UTF32*) U##Literal
+#define                   UTF32Character(Literal)               (UTF32) U##Literal
 #endif /* FoundationIO_Unicodize32 */
     
     /*!
@@ -204,19 +204,19 @@ extern "C" {
     } TrimStringTypes;
     
     /*!
-     @abstract                             "Allocates a UTF8 string plus a NULL terminator".
+     @abstract                             "Creates a UTF8 string plus a NULL terminator".
      @param               NumCodeUnits     "The size of the string not counting the NULL terminator".
      */
     UTF8                 *UTF8_Init(uint64_t NumCodeUnits);
     
     /*!
-     @abstract                             "Allocates a UTF8 string plus a NULL terminator".
+     @abstract                             "Creates a UTF8 string plus a NULL terminator".
      @param               NumCodeUnits     "The size of the string not counting the NULL terminator".
      */
     UTF16                *UTF16_Init(uint64_t NumCodeUnits);
     
     /*!
-     @abstract                             "Allocates a UTF8 string plus a NULL terminator".
+     @abstract                             "Creates a UTF8 string plus a NULL terminator".
      @param               NumCodePoints    "The size of the string not counting the NULL terminator".
      */
     UTF32                *UTF32_Init(uint64_t NumCodePoints);
@@ -1100,39 +1100,39 @@ extern "C" {
     uint64_t              UTF32_GetSubStringLength(UTF32 *Format, UTF32 *Formatted, uint64_t Offset);
     
     /*!
-     @abstract                             "Deinitializes String".
+     @abstract                             "Deletes String".
      @param               String           "The string to deinitialize".
      */
     void                  UTF8_Deinit(UTF8 *String);
     
     /*!
-     @abstract                             "Deinitializes String".
+     @abstract                             "Deletes String".
      @param               String           "The string to deinitialize".
      */
     void                  UTF16_Deinit(UTF16 *String);
     
     /*!
-     @abstract                             "Deinitializes String".
+     @abstract                             "Deletes String".
      @param               String           "The string to deinitialize".
      */
     void                  UTF32_Deinit(UTF32 *String);
     
     /*!
-     @abstract                             "Initalizes a UTF-8 encoded StringArray".
+     @abstract                             "Creates a UTF-8 encoded StringArray".
      @param               NumStrings       "How many strings will this StringArray contain"?
      @return                               "Returns an empty StringArray with room for NumStrings pointers plus a null terminator".
      */
     UTF8                **UTF8_StringArray_Init(uint64_t NumStrings);
     
     /*!
-     @abstract                             "Initalizes a UTF-16 encoded StringArray".
+     @abstract                             "Creates a UTF-16 encoded StringArray".
      @param               NumStrings       "How many strings will this StringArray contain"?
      @return                               "Returns an empty StringArray with room for NumStrings pointers plus a null terminator".
      */
     UTF16               **UTF16_StringArray_Init(uint64_t NumStrings);
     
     /*!
-     @abstract                             "Initalizes a UTF-32 encoded StringArray".
+     @abstract                             "Creates a UTF-32 encoded StringArray".
      @param               NumStrings       "How many strings will this StringArray contain"?
      @return                               "Returns an empty StringArray with room for NumStrings pointers plus a null terminator".
      */
@@ -1251,19 +1251,19 @@ extern "C" {
     void                  UTF16_StringArray_Print(UTF16 **StringArray);
     
     /*!
-     @abstract                             "Deinitializes a UTF-8 encoded StringArray (like is returned by SplitString)".
+     @abstract                             "Deletes a UTF-8 encoded StringArray (like is returned by SplitString)".
      @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
      */
     void                  UTF8_StringArray_Deinit(UTF8 **StringArray);
     
     /*!
-     @abstract                             "Deinitializes a UTF-16 encoded StringArray (like is returned by SplitString)".
+     @abstract                             "Deletes a UTF-16 encoded StringArray (like is returned by SplitString)".
      @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
      */
     void                  UTF16_StringArray_Deinit(UTF16 **StringArray);
     
     /*!
-     @abstract                             "Deinitializes a UTF-16 encoded StringArray (like is returned by SplitString)".
+     @abstract                             "Deletes a UTF-16 encoded StringArray (like is returned by SplitString)".
      @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
      */
     void                  UTF32_StringArray_Deinit(UTF32 **StringArray);

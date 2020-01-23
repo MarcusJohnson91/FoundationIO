@@ -48,10 +48,10 @@ set(PUBLIC_HEADER
 "${libFoundationIO_Dir}/include/MathIO.h"
 "${libFoundationIO_Dir}/include/TestIO.h"
 "${libFoundationIO_Dir}/include/UnicodeIO/CommandLineIO.h"
+"${libFoundationIO_Dir}/include/UnicodeIO/FormatIO.h"
 "${libFoundationIO_Dir}/include/UnicodeIO/LocalizationIO.h"
 "${libFoundationIO_Dir}/include/UnicodeIO/LogIO.h"
 "${libFoundationIO_Dir}/include/UnicodeIO/StringIO.h"
-"${libFoundationIO_Dir}/include/UnicodeIO/FormatIO.h"
 )
 
 set(libFoundationIO_Sources
@@ -62,10 +62,10 @@ set(libFoundationIO_Sources
 "${libFoundationIO_Dir}/src/MathIO.c"
 "${libFoundationIO_Dir}/src/TestIO.c"
 "${libFoundationIO_Dir}/src/UnicodeIO/CommandLineIO.c"
+"${libFoundationIO_Dir}/src/UnicodeIO/FormatIO.c"
 "${libFoundationIO_Dir}/src/UnicodeIO/LocalizationIO.c"
 "${libFoundationIO_Dir}/src/UnicodeIO/LogIO.c"
 "${libFoundationIO_Dir}/src/UnicodeIO/StringIO.c"
-"${libFoundationIO_Dir}/src/UnicodeIO/FormatIO.c"
 )
 
 if(NOT CMAKE_BUILD_TYPE)
