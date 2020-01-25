@@ -3,7 +3,6 @@
 #include "../include/MathIO.h"               /* Included for Bits2Bytes, etc */
 #include "../include/Private/Constants.h"    /* Included for BitMaskTables */
 #include "../include/UnicodeIO/LogIO.h"      /* Included for error logging */
-#include <stdlib.h>                          /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 
 #if   (FoundationIOTargetOS == FoundationIOWindowsOS)
 #ifndef   WIN32_LEAN_AND_MEAN

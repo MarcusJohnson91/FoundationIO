@@ -23,6 +23,7 @@
 #include <stdbool.h>                  /* Included for bool */
 #include <stdint.h>                   /* Included for u/intX_t */
 #include <stdio.h>                    /* Included for FILE, SEEK SET/END/CUR macros */
+#include <stdlib.h>                   /* Included for calloc/free */
 
 #pragma once
 

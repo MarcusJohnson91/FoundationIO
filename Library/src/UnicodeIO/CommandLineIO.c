@@ -2,7 +2,6 @@
 #include "../../include/UnicodeIO/FormatIO.h"       /* Included for Formatter */
 #include "../../include/UnicodeIO/LogIO.h"          /* Included for Logging */
 #include "../../include/UnicodeIO/StringIO.h"       /* Included for StringIO's declarations */
-#include <stdlib.h>                                 /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
 #include <signal.h>                    /* Included for SIGWINCH handling */

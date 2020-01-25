@@ -2,7 +2,6 @@
 #include "../../include/UnicodeIO/LogIO.h"       /* Included for the Log declarations */
 #include "../../include/UnicodeIO/StringIO.h"    /* Included for StringIO's declarations */
 #include <stdarg.h>                              /* Included for va_list, va_copy, va_start, va_end */
-#include <stdlib.h>                              /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 
 #ifdef __cplusplus
 extern "C" {

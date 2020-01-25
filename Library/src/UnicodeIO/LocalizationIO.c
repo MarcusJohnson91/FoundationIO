@@ -3,7 +3,6 @@
 #include "../../include/UnicodeIO/LocalizationIO.h"         /* Included for our declarations */
 #include "../../include/UnicodeIO/LogIO.h"                  /* Included for error logging */
 #include "../../include/UnicodeIO/StringIO.h"               /* Included for UTF8_GetStringSizeInCideUnits */
-#include <stdlib.h>                                         /* Included for the EXIT_FAILURE and EXIT_SUCCESS macros, calloc, realloc, and free */
 #include <locale.h>
 
 #ifdef __cplusplus
