@@ -21,12 +21,6 @@ extern "C" {
             BitBuffer_WriteBits(BitB, ByteOrder, BitOrder, NumBits2Extract, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Extract));
             int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder, BitOrder, NumBits2Extract);
-            /*
-            if (RandomInteger != ReadInteger) {
-                Log(Log_DEBUG, __func__, UTF8String("ByteOrder=%d, BitOrder=%d; Written bits %lld doesn't match Read bits %lld"), ByteOrder, BitOrder, RandomInteger, ReadInteger);
-                TestPassed           = No;
-            }
-             */
             BitBuffer_Erase(BitB); // Clear the BitBuffer in between each run just to be sure.
         }
         
