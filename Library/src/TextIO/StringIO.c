@@ -5,7 +5,6 @@
 #include "../../include/UnicodeIO/LogIO.h"                 /* Included for error logging */
 #include "../../include/UnicodeIO/StringIO.h"              /* Included for our declarations */
 #include <stdarg.h>                                        /* Included for va_list, va_copy, va_start, va_end */
-#include <wchar.h>                                         /* Included for Fwide */
 
 #ifdef __cplusplus
 extern "C" {

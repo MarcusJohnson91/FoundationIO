@@ -329,10 +329,10 @@ extern "C" {
                     case BaseType_CodeUnit:
                     case BaseType_String:
                         if (Format[CodePoint] == UTF32Character('l')) {
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
-                            Specifiers->Specifiers[Specifier].TypeModifier     |= Modifier_UTF32;
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-                            Specifiers->Specifiers[Specifier].TypeModifier     |= Modifier_UTF16;
+#if   (FoundationIOWCharSize > 65535)
+Specifiers->Specifiers[Specifier].TypeModifier     |= Modifier_UTF32;
+#else 
+Specifiers->Specifiers[Specifier].TypeModifier     |= Modifier_UTF16;
 #endif
                             Specifiers->Specifiers[Specifier].ModifierSize     += 1;
                         } else if (Format[CodePoint] == UTF32Character('u')) {
