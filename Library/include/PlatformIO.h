@@ -24,6 +24,7 @@
 #include <stdint.h>                   /* Included for u/intX_t */
 #include <stdio.h>                    /* Included for FILE, SEEK SET/END/CUR macros */
 #include <stdlib.h>                   /* Included for calloc/free */
+#include <wchar.h> /* Included for WCHAR_MAX */
 
 #pragma once
 
@@ -375,6 +376,12 @@ extern "C" {
     uint64_t FoundationIO_GetNumCPUCores(void);
     
     uint64_t FoundationIO_GetTotalMemoryInBytes(void);
+    
+#if (WCHAR_MIN < 0)
+#define FoundationIOWCharSize ((WCHAR_MAX * 2) + 1)
+#else
+#define FoundationIOWCharSize (WCHAR_MAX)
+#endif
     
 #ifdef __cplusplus
 }
