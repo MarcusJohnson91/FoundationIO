@@ -961,8 +961,8 @@ extern "C" {
             DecodedString                            = UTF32_Init(StringSize);
             if (DecodedString != NULL) {
                 for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
-                    CodeUnit                        += UTF8_GetCodePointSizeInCodeUnits(String[CodePoint]);
                     DecodedString[CodePoint]         = UTF8_DecodeCodePoint(&String[CodeUnit]);
+                    CodeUnit                        += UTF8_GetCodePointSizeInCodeUnits(String[CodePoint]);
                 }
             } else if (DecodedString == NULL) {
                 Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate DecodedString"));
@@ -1018,8 +1018,8 @@ extern "C" {
             DecodedString                            = UTF32_Init(StringSize);
             if (DecodedString != NULL) {
                 for (uint64_t CodePoint = 0ULL; CodePoint < StringSize; CodePoint++) {
-                    CodeUnit                        += UTF16_GetCodePointSizeInCodeUnits(String[CodeUnit]);
                     DecodedString[CodePoint]         = UTF16_DecodeCodePoint(&String[CodeUnit]);
+                    CodeUnit                        += UTF16_GetCodePointSizeInCodeUnits(String[CodeUnit]);
                 }
             } else if (DecodedString == NULL) {
                 Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate DecodedString"));
