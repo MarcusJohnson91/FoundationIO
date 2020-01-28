@@ -39,9 +39,9 @@ extern "C" {
         uint64_t                      OptionID;
         uint64_t                      NumIncompatibleOptions;
         uint64_t                      NumOptionSlaves;
+        CommandLineIO_ArgumentTypes   ArgumentType;
         CommandLineIO_OptionTypes     OptionType;
         CommandLineIO_OptionStatuses  Status;
-        CommandLineIO_ArgumentTypes   ArgumentType;
     } CommandLineOption;
     
     typedef struct CommandLineIO {
