@@ -20,11 +20,12 @@
 
 #endif /* Various UNIX Platforms */
 
+#include <stdarg.h>                   /* Included for va_list, va_copy */
 #include <stdbool.h>                  /* Included for bool */
 #include <stdint.h>                   /* Included for u/intX_t */
 #include <stdio.h>                    /* Included for FILE, SEEK SET/END/CUR macros */
 #include <stdlib.h>                   /* Included for calloc/free */
-#include <wchar.h> /* Included for WCHAR_MAX */
+#include <wchar.h>                    /* Included for WCHAR_MAX */
 
 #pragma once
 
