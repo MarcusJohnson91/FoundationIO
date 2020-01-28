@@ -2,7 +2,7 @@
 #include "../../include/UnicodeIO/FormatIO.h"          /* Included for our declarations */
 #include "../../include/UnicodeIO/LogIO.h"             /* Included for Logging */
 #include "../../include/UnicodeIO/StringIO.h"          /* Included for StringIOBases */
-#include <stdarg.h>                                    /* Included for va_list, va_copy, va_start, va_end */
+#include "../../include/MathIO.h"                      /* Included for Logarithm */
 
 #ifdef __cplusplus
 extern "C" {

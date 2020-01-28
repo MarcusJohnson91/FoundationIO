@@ -4,7 +4,6 @@
 #include "../../include/UnicodeIO/FormatIO.h"              /* Included for the String formatting code */
 #include "../../include/UnicodeIO/LogIO.h"                 /* Included for error logging */
 #include "../../include/UnicodeIO/StringIO.h"              /* Included for our declarations */
-#include <stdarg.h>                                        /* Included for va_list, va_copy, va_start, va_end */
 
 #ifdef __cplusplus
 extern "C" {
