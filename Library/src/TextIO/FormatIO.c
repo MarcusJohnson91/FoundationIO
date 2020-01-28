@@ -304,6 +304,29 @@ extern "C" {
                                 }
                             }
                             break;
+                        case UTF32Character('s'):
+                            Specifiers->Specifiers[Specifier].End                        = CodePoint;
+                            Specifiers->Specifiers[Specifier].BaseType                   = BaseType_String;
+                            if (CodePoint >= 1 && Format[CodePoint - 1] == UTF32Character('l')) {
+#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+                                Specifiers->Specifiers[Specifier].TypeModifier           = Modifier_UTF32;
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+                                Specifiers->Specifiers[Specifier].TypeModifier           = Modifier_UTF16;
+#endif
+                            } else if (CodePoint >= 1 && Format[CodePoint - 1] == UTF32Character('u')) {
+                                Specifiers->Specifiers[Specifier].TypeModifier           = Modifier_UTF16;
+                            } else if (CodePoint >= 1 && Format[CodePoint - 1] == UTF32Character('U')) {
+                                Specifiers->Specifiers[Specifier].TypeModifier           = Modifier_UTF32;
+                            } else {
+                                if (Specifiers->StringType == StringType_UTF8) {
+                                    Specifiers->Specifiers[Specifier].TypeModifier       = Modifier_UTF8;
+                                } else if (Specifiers->StringType == StringType_UTF16) {
+                                    Specifiers->Specifiers[Specifier].TypeModifier       = Modifier_UTF16;
+                                } else if (Specifiers->StringType == StringType_UTF32) {
+                                    Specifiers->Specifiers[Specifier].TypeModifier       = Modifier_UTF32;
+                                }
+                            }
+                            break;
                         case UTF32Character('S'):
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_String;
@@ -570,7 +593,7 @@ extern "C" {
                                     Log(Log_USER, __func__, UTF8String("Positional Argument: %llu is greater than NL_ARGMAX: %d"), Value, NL_ARGMAX);
                                 }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-                                if (Value <= NL_ARGMAX) {
+                                if (Value <= _ARGMAX) {
                                     Specifiers->Specifiers[Specifier].PositionalArg = Value;
                                 } else {
                                     Log(Log_USER, __func__, UTF8String("Positional Argument: %llu is greater than _ARGMAX: %d"), Value, _ARGMAX);
@@ -600,12 +623,6 @@ extern "C" {
                             break;
                     }
                 }
-                
-                /*
-                 
-                 Look for '.', '*', '$'
-                 
-                 */
                 
                 Specifier              = 0ULL;
                 while (Specifier < Specifiers->NumSpecifiers) {
