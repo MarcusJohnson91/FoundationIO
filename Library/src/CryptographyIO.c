@@ -84,9 +84,9 @@ extern "C" {
     
     typedef struct MD5 {
         uint64_t FileSize;
-        uint8_t  Data2Hash[64];
         uint32_t Hash[4];
         uint32_t Bits[2];
+        uint8_t  Data2Hash[64];
     } MD5;
     
     MD5 *MD5_Init(void) {
