@@ -96,11 +96,11 @@ extern "C" {
     
     /*!
      @abstract                                                  "Parses the format specifiers".
-     @param               Specifiers                            "The Format Specifiers".
      @param               Format                                "The string to substitute the specifiers with".
+     @param               Specifiers                            "The Format Specifiers".
      @param               StringType                            "The original encoding of the Format string".
      */
-    void                  UTF32_ParseFormatString(FormatSpecifiers *Specifiers, UTF32 *Format, StringIOStringTypes StringType);
+    void                  UTF32_ParseFormatSpecifiers(UTF32 *Format, FormatSpecifiers *Specifiers, StringIOStringTypes StringType);
     
     /*!
      @abstract                                                  "Formats a UTF-32 encoded string".
