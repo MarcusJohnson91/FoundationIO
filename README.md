@@ -24,12 +24,65 @@ Here's a tl;dr of my license:
 * **Don't** sue me if something goes wrong, it's your responsibility to determine if FoundationIO is right for you.
 
 # Compiling:
-* to use FoundationIO in your project, add it as a submodule with `git submodule add Dependencies/FoundationIO git@gitlab.com:MarcusJohnson91/FoundationIO.git`, then include whatever module headers you want to use.
-* call `cmake` with `-G "Unix Makefiles"`, the cmake file is in `/libFoundationIO`
-* Then compile the makefile with make like usual.
-* There is an Xcode and Visual Studio project in the `Projects` folder, tho the Visual Studio project may be out of date.
+* to use FoundationIO in your project, add it as a submodule with `git submodule add git@github.com:MarcusJohnson91/FoundationIO.git Dependencies/FoundationIO`, then include whatever module headers you want to use.
+* call `cmake` with `-G "Unix Makefiles" -B"$(PWD)/../BUILD"`, the cmake file is in `/Projects`
+* There is an Xcode and Visual Studio project in the `Projects` folder.
 
 # How To Use FoundationIO:
+
+BitIO:
+-----
+* To use BitIO call `BitInput_Init` and `BitOutput_Init` for each file or socket you want to read from or write to.
+* Reading and writing from/to files/sockets, requires a `BitBuffer` Init it with `BitBuffer_Init`.
+* To open a file call `Bit(Input|Output)_UTF(8|16)_OpenFile` (except for the log file, which uses `Log_OpenFile`).
+* To get the size of a file from `BitInput` call `BitInput_GetFileSize`.
+* To read bits from a BitBuffer, use the `ReadBits`/`PeekBits/ReadUnary`.
+* To write bits to a BitBuffer use the `WriteBits/WriteUnary`.
+* To pull in fresh data from a file, call `BitBuffer_Update`.
+* To read a UTF-8 or UTF-16 string, call `ReadUTF(8|16)`. (You need to know the size of the string when you call ReadUTF(8|16)).
+* To write a UTF-8 or UTF-16 string, call `WriteUTF(8|16)`. (The NULL terminator is NOT written, for that just call `BitBuffer_Skip`).
+* When you're all done, call `BitInput_Deinit`, `BitOutput_Deinit`, and `BitBuffer_Deinit`.
+- GUUIDs:
+* A `GUUID` is just a handy way to refer to UUID/GUIDStrings, and BinaryUUID/GUIDs as one object.
+* A GUUIDString is 21 bytes long, and includes a NULL terminator,  and dashes.
+* A BinaryGUUID is 16 bytes long, and does not contain a NULL terminator or the dashes.
+* A UUID is most significant byte first for each section.
+* A GUID is least significant byte first for each section, except the last 6 bytes which are most significant.
+* GUID's are used by Windows, while UUIDs are used by Unix derivatives.
+
+`GUUIDTypes`: BinaryUUID, BinaryGUID, UUIDString, GUIDString
+
+`ReadGUUID`:  Reads a GUUID of GUUIDType from the BitBuffer, and returns a pointer to the new GUUID.
+
+`WriteGUUID`: Writes a GUUID of GUUIDType from a pointer into the BitBuffer.
+
+`CompareGUUIDs`: Compares GUUIDs of the same GUUIDType to each other
+
+`ConvertGUUIDString2BinaryGUUID`: Converts a GUUIDString to a BinaryGUUID (without swapping).
+
+`ConvertBinaryGUUID2GUUIDString`: Converts a BinaryGUUID to a GUUIDString (without swapping).
+
+`SwapGUUIDString`: Converts a GUUIDString to a GUUIDString of the opposite byte order.
+
+`SwapBinaryGUUID`: Converts a BinaryGUUID to a BinaryGUUID of the opposite byte order.
+
+`GUUID_Deinit`: When you've had enough of GUUID's nonsense, call this function to make your problems disappear.
+
+ContainerIO:
+--------------
+* ContainerIO is a module that controls and manipulates Media containers
+
+** ImageContainer: Supports 2D/3D images of any dimensions and any number of channels using any channel layout, and supports runtime selection of 8-16 bit containers depending on the needs of each image.
+
+** ImageHistogram: 
+
+** Audio2DContainer: Supports audio with any number of channels and ay channel layout, bitdepth, sample rate.
+
+** Audio3DContainer: Work in Progress, will support 3D audio based solely on where the sound is located.
+
+UnicodeIO:
+------------
+* UnicodeIO isn't actually a real thing, it's just a way to help organize all the files, so the UnicodeIO folders contain FoundationIO's text related components.
 
 StringIO:
 ----------
@@ -72,45 +125,7 @@ CommandLineIO:
 * Call `ParseCommandLineIO` to parse argv's arguments for any matching switches.
 * At the end of `main()` call `CommandLineIO_Deinit` to clean everything up.
 
-BitIO:
------
-* To use BitIO call `BitInput_Init` and `BitOutput_Init` for each file or socket you want to read from or write to.
-* Reading and writing from/to files/sockets, requires a `BitBuffer` Init it with `BitBuffer_Init`.
-* To open a file call `Bit(Input|Output)_UTF(8|16)_OpenFile` (except for the log file, which uses `Log_OpenFile`).
-* To get the size of a file from `BitInput` call `BitInput_GetFileSize`.
-* To read bits from a BitBuffer, use the `ReadBits`/`PeekBits/ReadUnary`.
-* To write bits to a BitBuffer use the `WriteBits/WriteUnary`.
-* To pull in fresh data from a file, call `BitBuffer_Update`.
-* To read a UTF-8 or UTF-16 string, call `ReadUTF(8|16)`. (You need to know the size of the string when you call ReadUTF(8|16)).
-* To write a UTF-8 or UTF-16 string, call `WriteUTF(8|16)`. (The NULL terminator is NOT written, for that just call `BitBuffer_Skip`).
-* When you're all done, call `BitInput_Deinit`, `BitOutput_Deinit`, and `BitBuffer_Deinit`.
-- GUUIDs:
-* A `GUUID` is just a handy way to refer to UUID/GUIDStrings, and BinaryUUID/GUIDs as one object.
-* A GUUIDString is 21 bytes long, and includes a NULL terminator,  and dashes.
-* A BinaryGUUID is 16 bytes long, and does not contain a NULL terminator or the dashes.
-* A UUID is most significant byte first for each section.
-* A GUID is least significant byte first for each section, except the last 6 bytes which are most significant.
-* GUID's are used by Windows, while UUIDs are used by Unix derivatives.
-
-* `GUUIDTypes`: BinaryUUID, BinaryGUID, UUIDString, GUIDString
-
-`ReadGUUID`:  Reads a GUUID of GUUIDType from the BitBuffer, and returns a pointer to the new GUUID.
-
-`WriteGUUID`: Writes a GUUID of GUUIDType from a pointer into the BitBuffer.
-
-`CompareGUUIDs`: Compares GUUIDs of the same GUUIDType to each other
-
-`ConvertGUUIDString2BinaryGUUID`: Converts a GUUIDString to a BinaryGUUID (without swapping).
-
-`ConvertBinaryGUUID2GUUIDString`: Converts a BinaryGUUID to a GUUIDString (without swapping).
-
-`SwapGUUIDString`: Converts a GUUIDString to a GUUIDString of the opposite byte order.
-
-`SwapBinaryGUUID`: Converts a BinaryGUUID to a BinaryGUUID of the opposite byte order.
-
-`GUUID_Deinit`: When you've had enough of GUUID's nonsense, call this function to make your problems disappear.
-
-Log:
+LogIO:
 -----
 * Writes to a file you open with `Log_OpenFile`, if it's unset or otherwise inaccessible, all logs are printed to `stderr`.
 * Works on any platform that provides `stderr`.
@@ -118,23 +133,20 @@ Log:
 FormatIO:
 -----------
 * FormatIO is composed of the UTF(8|16|32)_Format and UTF(8|16|32)_Deformat functions.
-* Technically FormatIO is the internal implementation, the public declaration is in StringIO, but it warrants having it's own section.
 * FormatIO's API is a bit different than the standard library.
 - *_Format returns a pointer to the formatted string.
 - *_Deformat returns a StringArray (just like argv), where each string starts at the offset of the specifier and ends whenever the type and modifier make sense for it to end
 
 * Supported Extensions:
-- POSIX: Positional arguments using the trailing dollar sign syntax, lc/ls for UTF-16 characters/strings (when called from UTF8_De/Format)
-- Microsoft: C/S type specifiers for UTF-16 characters/strings (when called from UTF8_De/Format).
-- FoundationIO: I created the U type modifier before c/s or C/S, it extends De/Format with UTF-32 argument support, so implementing custom struct formatters is easier.
-- Various: 
-- b/B for 0b/0B prefixed binary strings.
-- p/P it prints the value of a pointer in Hex, using upper or lowercase, determinded by the case of the type.
-
+- Wide Character Support: lc/ls and C/S specifiers supported, Windows = UTF-16, POSIX = UTF-32.
+- Positional Formatters: %X$Y format
+- Pointer Formatters: %p/%P lower/upper case hexadecimal pointer.
+- Binary Formatters: %b/%B 0bX/0BX prefixed binary strings.
+* Custom Extensions:
+- %uc/%us, %Uc/%Us: u = UTF-16, U = UTF-32 regardless of platform.
 * Unsupported Extensions:
 - the n specifier is unsupported because FormatIO's API doesn't require or allow such a thing, though the parser will remove any n specifiers it finds from the output string.
 - Microsoft's l32/l64 (ell) specifiers are not supported, it's non-standard, and l/ll(u|d|i) already supports 32/64 bit integer arguments.
-
 
 TODO:
 ====
