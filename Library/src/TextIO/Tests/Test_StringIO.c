@@ -121,6 +121,13 @@ extern "C" {
         
         bool TestPassed                        = false;
         
+        uint8_t Octal                          = 014; // 12, 0xC
+        UTF8 *Positional0                      = UTF8_Format(UTF8String("%03u"), Octal);
+        bool  Positional0Test                  = UTF8_Compare(Positional0, UTF8String("014"));
+        if (Positional0Test == No) {
+            Log(Log_DEBUG, __func__, UTF8String("Positional0Test Failed"));
+        }
+        
         UTF8 *Positional1                      = UTF8_Format(UTF8String("NumArgs: %1$u, Equal: %2$u, Type: %3$s"), 3, 1234, UTF8String("Positional"));
         bool  Positional1Test                  = UTF8_Compare(Positional1, UTF8String("NumArgs: 3, Equal: 1234, Type: Positional"));
         // "NumArgs: 3, Equal: 1234, Type: Positional"
