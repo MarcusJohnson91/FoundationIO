@@ -21,6 +21,7 @@ extern "C" {
     LocalizationIO_LanguageIDs Localize_GetLanguageID(void) {
         LocalizationIO_LanguageIDs LanguageID = LanguageID_Unknown;
 #if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+        /* POSIX uses ISO 639-1 if possible, otherwise ISO 639-2 */
         UTF8 *LocaleAll        = setlocale(LC_ALL, NULL);
         uint8_t EndOffset      = UTF8_FindSubString(LocaleAll, UTF8String("_"), 0, 1);
         UTF8 *LanguageString   = UTF8_ExtractSubString(LocaleAll, 0, EndOffset);
