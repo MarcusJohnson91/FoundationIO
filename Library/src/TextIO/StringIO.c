@@ -333,7 +333,7 @@ extern "C" {
     }
     
     uint64_t UTF8_GetStringSizeInGraphemes(UTF8 *String) {
-        uint64_t NumGraphemes  = 1ULL;
+        uint64_t NumGraphemes  = 0ULL;
         if (String != NULL) {
             UTF32 *Decoded     = UTF8_Decode(String);
             NumGraphemes       = UTF32_GetStringSizeInGraphemes(Decoded);
@@ -345,7 +345,7 @@ extern "C" {
     }
     
     uint64_t UTF16_GetStringSizeInGraphemes(UTF16 *String) {
-        uint64_t NumGraphemes  = 1ULL;
+        uint64_t NumGraphemes  = 0ULL;
         if (String != NULL) {
             UTF32 *Decoded     = UTF16_Decode(String);
             NumGraphemes       = UTF32_GetStringSizeInGraphemes(Decoded);
@@ -368,10 +368,20 @@ extern "C" {
     }
     
     uint64_t UTF32_GetStringSizeInGraphemes(UTF32 *String) {
-        uint64_t NumGraphemes         = 1ULL;
+        uint64_t NumGraphemes         = 0ULL;
         uint64_t CodePoint            = 0ULL;
         if (String != NULL) {
             while (String[CodePoint] != FoundationIONULLTerminator) {
+                /*
+                 
+                 So, basically we need to look at multiple codepoints at once
+                 
+                 for example Region Indicators, all region indicators that touch each other as a single grapheme
+                 
+                 */
+                
+                
+                
                 while (UTF32_CodePointIsGraphemeExtender(String[CodePoint]) == Yes) {
                     CodePoint        += 1;
                 }
