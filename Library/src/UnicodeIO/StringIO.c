@@ -1593,6 +1593,71 @@ extern "C" {
         return ExtractedString;
     }
     
+    UTF8 *UTF8_PadString(UTF8 *String, UTF8 *Padding, uint64_t Times2Pad) {
+        UTF8 *Padded           = NULL;
+        if (String != NULL && Padding != NULL) {
+            UTF32 *String32    = UTF8_Decode(String);
+            UTF32 *Padding32   = UTF8_Decode(Padding);
+            UTF32 *Padded32    = UTF32_PadString(String32, Padding32, Times2Pad);
+            free(String32);
+            free(Padding32);
+            Padded             = UTF8_Encode(Padded32);
+        } else if (String == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+        } else if (Padding == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("Padding Pointer is NULL"));
+        }
+        return Padded;
+    }
+    
+    UTF16 *UTF16_PadString(UTF16 *String, UTF16 *Padding, uint64_t Times2Pad) {
+        UTF16 *Padded          = NULL;
+        if (String != NULL && Padding != NULL) {
+            UTF32 *String32    = UTF16_Decode(String);
+            UTF32 *Padding32   = UTF16_Decode(Padding);
+            UTF32 *Padded32    = UTF32_PadString(String32, Padding32, Times2Pad);
+            free(String32);
+            free(Padding32);
+            Padded             = UTF16_Encode(Padded32);
+        } else if (String == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+        } else if (Padding == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("Padding Pointer is NULL"));
+        }
+        return Padded;
+    }
+    
+    UTF32 *UTF32_PadString(UTF32 *String, UTF32 *Padding, uint64_t Times2Pad) {
+        UTF32 *Padded                        = NULL;
+        if (String != NULL && Padding != NULL) {
+            uint64_t StringSize              = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t PaddingSize             = UTF32_GetStringSizeInCodePoints(Padding);
+            uint64_t PaddedSize              = StringSize + (PaddingSize * Times2Pad);
+            Padded                           = UTF32_Init(PaddedSize);
+            
+            uint64_t PaddedCodePoint         = 0ULL;
+            uint64_t StringCodePoint         = 0ULL;
+            uint64_t PaddingCodePoint        = 0ULL;
+            while (PaddedCodePoint < PaddedSize && StringCodePoint < StringSize) {
+                while (PaddingCodePoint < Times2Pad * PaddingSize) {
+                    Padded[PaddedCodePoint]  = Padding[PaddingCodePoint];
+                    PaddedCodePoint         += 1;
+                    PaddingCodePoint        += 1;
+                }
+                if (PaddedCodePoint >= (PaddingSize * Times2Pad)) {
+                    Padded[PaddedCodePoint] += String[StringCodePoint];
+                    PaddedCodePoint         += 1;
+                    StringCodePoint         += 1;
+                }
+            }
+        } else if (String == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+        } else if (Padding == NULL) {
+            Log(Log_DEBUG, __func__, UTF8String("Padding Pointer is NULL"));
+        }
+        return Padded;
+    }
+    
     UTF8  *UTF8_ReplaceSubString(UTF8 *String, UTF8 *Replacement, uint64_t Offset, uint64_t Length) {
         UTF8 *Replaced8          = NULL;
         if (String != NULL && Replacement != NULL) {

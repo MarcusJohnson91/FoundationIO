@@ -571,6 +571,33 @@ extern "C" {
     bool                  UTF32_Compare(UTF32 *String1, UTF32 *String2);
     
     /*!
+     @abstract                             "Prependes Padding to String".
+     @param               String           "String to pad".
+     @param               Padding          "The string to prepend".
+     @param               Times2Pad        "The number of times for Padding to be duplicated".
+     @return                               "Returns a new string containing Padding Times2Pad times + String".
+     */
+    UTF8                 *UTF8_PadString(UTF8 *String, UTF8 *Padding, uint64_t Times2Pad);
+    
+    /*!
+     @abstract                             "Prependes Padding to String".
+     @param               String           "String to pad".
+     @param               Padding          "The string to prepend".
+     @param               Times2Pad        "The number of times for Padding to be duplicated".
+     @return                               "Returns a new string containing Padding Times2Pad times + String".
+     */
+    UTF16                *UTF16_PadString(UTF16 *String, UTF16 *Padding, uint64_t Times2Pad);
+    
+    /*!
+     @abstract                             "Prependes Padding to String".
+     @param               String           "String to pad".
+     @param               Padding          "The string to prepend".
+     @param               Times2Pad        "The number of times for Padding to be duplicated".
+     @return                               "Returns a new string containing Padding Times2Pad times + String".
+     */
+    UTF32                *UTF32_PadString(UTF32 *String, UTF32 *Padding, uint64_t Times2Pad);
+    
+    /*!
      @abstract                             "Finds a substring within string, starting at CodePoint Offset, and ending at Offset + Length".
      @remark                               "We do NOT casefold, or normalize the String or SubString, that's your job".
      @param               String           "The string to search for SubString in".
