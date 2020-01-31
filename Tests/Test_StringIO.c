@@ -121,11 +121,13 @@ extern "C" {
         
         bool TestPassed                        = false;
         
-        uint8_t Octal                          = 014; // 12, 0xC
-        UTF8 *Positional0                      = UTF8_Format(UTF8String("%03u"), Octal);
-        bool  Positional0Test                  = UTF8_Compare(Positional0, UTF8String("014"));
-        if (Positional0Test == No) {
-            Log(Log_DEBUG, __func__, UTF8String("Positional0Test Failed"));
+        uint8_t OctalValue                     = 014; // 12, 0xC
+        UTF8   *Octal                          = UTF8_Format(UTF8String("%03o"), OctalValue);
+        bool    OctalTest                      = UTF8_Compare(Octal, UTF8String("014"));
+        if (OctalTest == No) {
+            Log(Log_DEBUG, __func__, UTF8String("OctalTest Failed"));
+        } else {
+            Log(Log_DEBUG, __func__, UTF8String("OctalTest Passed"));
         }
         
         UTF8 *Positional1                      = UTF8_Format(UTF8String("NumArgs: %1$u, Equal: %2$u, Type: %3$s"), 3, 1234, UTF8String("Positional"));
@@ -133,6 +135,8 @@ extern "C" {
         // "NumArgs: 3, Equal: 1234, Type: Positional"
         if (Positional1Test == No) {
             Log(Log_DEBUG, __func__, UTF8String("Positional1Test Failed"));
+        } else {
+            Log(Log_DEBUG, __func__, UTF8String("Positional1Test Passed"));
         }
         /*
          "NumArgs: %1$llu, Equal: %llu, Type: %3$s"  StringSize: 40
