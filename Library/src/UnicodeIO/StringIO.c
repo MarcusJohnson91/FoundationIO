@@ -59,7 +59,7 @@ extern "C" {
         UTF8 *String = NULL;
         String       = calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
         if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF8)) + FoundationIONULLTerminatorSize);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF8)) + FoundationIONULLTerminatorSize);
         }
         return String;
     }
@@ -68,7 +68,7 @@ extern "C" {
         UTF16 *String = NULL;
         String        = calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF16));
         if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF16)) + FoundationIONULLTerminatorSize);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF16)) + FoundationIONULLTerminatorSize);
         }
         return String;
     }
@@ -77,7 +77,7 @@ extern "C" {
         UTF32 *String = NULL;
         String        = calloc(NumCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
         if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodePoints * sizeof(UTF32)) + FoundationIONULLTerminatorSize);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodePoints * sizeof(UTF32)) + FoundationIONULLTerminatorSize);
         }
         return String;
     }
@@ -135,7 +135,7 @@ extern "C" {
                     break;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("CodeUnits Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodeUnits Pointer is NULL"));
         }
         return CodePoint;
     }
@@ -154,7 +154,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return GraphemeSize;
     }
@@ -174,7 +174,7 @@ extern "C" {
                     break;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("CodeUnits Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodeUnits Pointer is NULL"));
         }
         return CodePoint;
     }
@@ -200,7 +200,7 @@ extern "C" {
             }
             free(CodeUnits);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return GraphemeSize;
     }
@@ -218,7 +218,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumCodePoints;
     }
@@ -230,7 +230,7 @@ extern "C" {
                 StringSizeInCodeUnits += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringSizeInCodeUnits;
     }
@@ -242,7 +242,7 @@ extern "C" {
                 StringSizeInCodeUnits += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringSizeInCodeUnits;
     }
@@ -264,7 +264,7 @@ extern "C" {
                 CodePoint            += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return UTF8CodeUnits;
     }
@@ -282,7 +282,7 @@ extern "C" {
                 CodePoint          += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return UTF16CodeUnits;
     }
@@ -296,7 +296,7 @@ extern "C" {
                 CodeUnit               += UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringSizeInCodePoints;
     }
@@ -315,7 +315,7 @@ extern "C" {
                 CodeUnit                  += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumCodePoints;
     }
@@ -327,7 +327,7 @@ extern "C" {
                 NumCodePoints += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumCodePoints;
     }
@@ -339,7 +339,7 @@ extern "C" {
             NumGraphemes       = UTF32_GetStringSizeInGraphemes(Decoded);
             UTF32_Deinit(Decoded);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumGraphemes;
     }
@@ -351,7 +351,7 @@ extern "C" {
             NumGraphemes       = UTF32_GetStringSizeInGraphemes(Decoded);
             UTF32_Deinit(Decoded);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumGraphemes;
     }
@@ -389,7 +389,7 @@ extern "C" {
                 CodePoint            += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumGraphemes;
     }
@@ -406,12 +406,12 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("CodePoint is %u bytes, which is larger than StringSize: %llu at Offset: %llu"), CodePointSize, StringSize, Offset);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodePoint is %u bytes, which is larger than StringSize: %llu at Offset: %llu"), CodePointSize, StringSize, Offset);
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Offset > StringSize) {
-            Log(Log_DEBUG, __func__, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
         }
         return CodeUnits;
     }
@@ -428,12 +428,12 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("CodePoint is %u bytes, which is larger than StringSize: %llu at Offset: %llu"), CodePointSize, StringSize, Offset);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodePoint is %u bytes, which is larger than StringSize: %llu at Offset: %llu"), CodePointSize, StringSize, Offset);
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Offset > StringSize) {
-            Log(Log_DEBUG, __func__, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
         }
         return CodeUnits;
     }
@@ -447,12 +447,12 @@ extern "C" {
                     CodePoint[0] = String[Offset];
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("CodePoint is %lu bytes, which is larger than StringSize: %llu at Offset: %llu"), sizeof(UTF32), StringSize, Offset);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodePoint is %lu bytes, which is larger than StringSize: %llu at Offset: %llu"), sizeof(UTF32), StringSize, Offset);
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Offset > StringSize) {
-            Log(Log_DEBUG, __func__, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
         }
         return CodePoint;
     }
@@ -466,7 +466,7 @@ extern "C" {
             Grapheme          = UTF8_Encode(Grapheme32);
             free(Grapheme32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Grapheme;
     }
@@ -480,7 +480,7 @@ extern "C" {
             Grapheme          = UTF16_Encode(Grapheme32);
             free(Grapheme32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Grapheme;
     }
@@ -520,13 +520,13 @@ extern "C" {
                         Grapheme[GraphemeCodePoint - CodePointStart] = String[GraphemeCodePoint];
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate %llu CodePoints for the Grapheme"), GraphemeSizeInCodePoints);
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate %llu CodePoints for the Grapheme"), GraphemeSizeInCodePoints);
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Grapheme %llu is greater than there are Graphemes %llu"), Grapheme2Extract, NumGraphemesInString);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Grapheme %llu is greater than there are Graphemes %llu"), Grapheme2Extract, NumGraphemesInString);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Grapheme;
     }
@@ -541,7 +541,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringHasABOM;
     }
@@ -553,7 +553,7 @@ extern "C" {
                 StringHasABOM = Yes;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringHasABOM;
     }
@@ -565,7 +565,7 @@ extern "C" {
                 StringHasABOM = Yes;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringHasABOM;
     }
@@ -599,7 +599,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringIsUNCPath;
     }
@@ -633,7 +633,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringIsUNCPath;
     }
@@ -668,7 +668,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringIsUNCPath;
     }
@@ -689,7 +689,7 @@ extern "C" {
             }
 #endif
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return PathIsAbsolute;
     }
@@ -710,7 +710,7 @@ extern "C" {
             }
 #endif
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return PathIsAbsolute;
     }
@@ -731,7 +731,7 @@ extern "C" {
             }
 #endif
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return PathIsAbsolute;
     }
@@ -743,7 +743,7 @@ extern "C" {
             StringHasNewLine  = UTF32_HasNewLine(String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringHasNewLine;
     }
@@ -755,7 +755,7 @@ extern "C" {
             StringHasNewLine  = UTF32_HasNewLine(String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringHasNewLine;
     }
@@ -777,7 +777,7 @@ extern "C" {
                 CodePoint               += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringHasNewLine;
     }
@@ -799,7 +799,7 @@ extern "C" {
                 CodeUnit += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return IsValidUTF8;
     }
@@ -816,7 +816,7 @@ extern "C" {
                 CodeUnit += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return IsValidUTF16;
     }
@@ -833,7 +833,7 @@ extern "C" {
                 CodePoint       += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return IsValidUTF32;
     }
@@ -846,7 +846,7 @@ extern "C" {
             free(String32);
             StringWithBOM    = UTF8_Encode(BOMAdded);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringWithBOM;
     }
@@ -859,7 +859,7 @@ extern "C" {
             StringWithBOM    = UTF16_Encode(BOMAdded);
             free(String32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringWithBOM;
     }
@@ -888,11 +888,11 @@ extern "C" {
                         StringWithBOM[CodePoint] = String[CodePoint + 1];
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("StringWithBOM couldn't be allocated"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringWithBOM couldn't be allocated"));
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringWithBOM;
     }
@@ -910,11 +910,11 @@ extern "C" {
                         BOMLessString[CodeUnit - 3] = String[CodeUnit];
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate BOMLessString"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BOMLessString"));
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return BOMLessString;
     }
@@ -932,11 +932,11 @@ extern "C" {
                         BOMLessString[CodeUnit - 1] = String[CodeUnit];
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate BOMLessString"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BOMLessString"));
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return BOMLessString;
     }
@@ -954,11 +954,11 @@ extern "C" {
                         BOMLessString[CodePoint] = String[CodePoint + 1];
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate BOMLessString"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BOMLessString"));
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return BOMLessString;
     }
@@ -975,10 +975,10 @@ extern "C" {
                     CodeUnit                        += UTF8_GetCodePointSizeInCodeUnits(String[CodePoint]);
                 }
             } else if (DecodedString == NULL) {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate DecodedString"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate DecodedString"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return DecodedString;
     }
@@ -1032,10 +1032,10 @@ extern "C" {
                     CodeUnit                        += UTF16_GetCodePointSizeInCodeUnits(String[CodeUnit]);
                 }
             } else if (DecodedString == NULL) {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate DecodedString"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate DecodedString"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return DecodedString;
     }
@@ -1074,10 +1074,10 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Encoded Pointer is NULL"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Encoded Pointer is NULL"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return EncodedString;
     }
@@ -1106,10 +1106,10 @@ extern "C" {
                     CodePoint                       += 1;
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Encoded Pointer is NULL"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Encoded Pointer is NULL"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return EncodedString;
     }
@@ -1121,7 +1121,7 @@ extern "C" {
             String8         = UTF8_Encode(String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return String8;
     }
@@ -1133,7 +1133,7 @@ extern "C" {
             String16        = UTF16_Encode(String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return String16;
     }
@@ -1148,10 +1148,10 @@ extern "C" {
                     Copy[CodeUnit] = String[CodeUnit];
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Copy Pointer is NULL"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Copy Pointer is NULL"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Copy;
     }
@@ -1166,10 +1166,10 @@ extern "C" {
                     Copy[CodeUnit] = String[CodeUnit];
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Copy Pointer is NULL"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Copy Pointer is NULL"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Copy;
     }
@@ -1184,10 +1184,10 @@ extern "C" {
                     Copy[CodePoint] = String[CodePoint];
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Copy Pointer is NULL"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Copy Pointer is NULL"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Copy;
     }
@@ -1199,7 +1199,7 @@ extern "C" {
                 String[CodeUnit] = 0;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
@@ -1210,7 +1210,7 @@ extern "C" {
                 String[CodeUnit] = 0;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
@@ -1221,7 +1221,7 @@ extern "C" {
                 String[CodeUnit] = 0;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
@@ -1234,7 +1234,7 @@ extern "C" {
             Truncated          = UTF8_Encode(Truncated32);
             free(Truncated32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Truncated;
     }
@@ -1248,7 +1248,7 @@ extern "C" {
             Truncated          = UTF16_Encode(Truncated32);
             free(Truncated32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Truncated;
     }
@@ -1268,7 +1268,7 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Truncated;
     }
@@ -1311,7 +1311,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("FILE Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
         return Grapheme;
     }
@@ -1325,7 +1325,7 @@ extern "C" {
             CodePoint             = UTF16_Init(CodePointSize);
             fread(CodePoint, CodePointSize, 1, Source);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("FILE Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
         return CodePoint;
     }
@@ -1335,10 +1335,10 @@ extern "C" {
             uint64_t StringSize       = UTF8_GetStringSizeInCodeUnits(CodePoint);
             uint64_t CodeUnitsWritten = FoundationIO_File_Write(CodePoint, sizeof(UTF8), StringSize, Source);
             if (CodeUnitsWritten != StringSize) {
-                Log(Log_DEBUG, __func__, UTF8String("CodeUnitsWritten %llu does not match the size of the string %llu"), CodeUnitsWritten, StringSize);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodeUnitsWritten %llu does not match the size of the string %llu"), CodeUnitsWritten, StringSize);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("FILE Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
     }
     
@@ -1347,10 +1347,10 @@ extern "C" {
             uint64_t StringSize       = UTF16_GetStringSizeInCodeUnits(CodePoint);
             uint64_t CodeUnitsWritten = FoundationIO_File_Write(CodePoint, sizeof(UTF16), StringSize, Source);
             if (CodeUnitsWritten != StringSize) {
-                Log(Log_DEBUG, __func__, UTF8String("CodeUnitsWritten %llu does not match the size of the string %llu"), CodeUnitsWritten, StringSize);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodeUnitsWritten %llu does not match the size of the string %llu"), CodeUnitsWritten, StringSize);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("FILE Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
     }
     
@@ -1369,7 +1369,7 @@ extern "C" {
             
             Line                            = UTF8_Init(StringSizeInCodeUnits);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("FILE Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
         return Line;
     }
@@ -1388,7 +1388,7 @@ extern "C" {
             }
             Line                            = UTF16_Init(StringSizeInCodeUnits);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("FILE Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
         return Line;
     }
@@ -1405,7 +1405,7 @@ extern "C" {
                     fwrite(FoundationIONewLine8, FoundationIONewLine8Size, 1, OutputFile);
                 }
                 if (CodeUnitsWritten != StringSize) {
-                    Log(Log_DEBUG, __func__, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             } else if (Type == StringType_UTF16) { // UTF-16
                 UTF32 *String32        = UTF8_Decode(String);
@@ -1417,13 +1417,13 @@ extern "C" {
                     fwrite(FoundationIONewLine16, FoundationIONewLine16Size, 1, OutputFile);
                 }
                 if (CodeUnitsWritten != StringSize) {
-                    Log(Log_DEBUG, __func__, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (OutputFile == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("FILE Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
     }
     
@@ -1439,7 +1439,7 @@ extern "C" {
                     fwrite(FoundationIONewLine16, FoundationIONewLine16Size, 1, OutputFile);
                 }
                 if (CodeUnitsWritten != StringSize) {
-                    Log(Log_DEBUG, __func__, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             } else if (Type == StringType_UTF8) { // UTF-8
                 UTF32 *String32        = UTF16_Decode(String);
@@ -1451,13 +1451,13 @@ extern "C" {
                     fwrite(FoundationIONewLine16, FoundationIONewLine16Size, 1, OutputFile);
                 }
                 if (CodeUnitsWritten != StringSize) {
-                    Log(Log_DEBUG, __func__, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (OutputFile == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("FILE Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
     }
     
@@ -1470,7 +1470,7 @@ extern "C" {
             Reversed          = UTF8_Encode(Reversed32);
             free(Reversed32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Reversed;
     }
@@ -1484,7 +1484,7 @@ extern "C" {
             Reversed          = UTF16_Encode(Reversed32);
             free(Reversed32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Reversed;
     }
@@ -1496,7 +1496,7 @@ extern "C" {
             // Copy from back to front
             uint64_t StringSize = UTF32_GetStringSizeInGraphemes(String); // We need a function that will allow us to copy each Grapheme
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Reverse;
     }
@@ -1510,9 +1510,9 @@ extern "C" {
             free(String32);
             free(SubString32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (SubString == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("SubString Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SubString Pointer is NULL"));
         }
         return FoundOffset;
     }
@@ -1526,9 +1526,9 @@ extern "C" {
             free(String32);
             free(SubString32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (SubString == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("SubString Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SubString Pointer is NULL"));
         }
         return FoundOffset;
     }
@@ -1546,11 +1546,11 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (SubString == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("SubString Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SubString Pointer is NULL"));
         } else if (Length >= 1 && StringSize < Offset + Length) {
-            Log(Log_DEBUG, __func__, UTF8String("Offset %llu + Length %lld is larger than String %llu"), Offset, Length, StringSize);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu + Length %lld is larger than String %llu"), Offset, Length, StringSize);
         }
         return MatchingOffset;
     }
@@ -1564,7 +1564,7 @@ extern "C" {
             free(String32);
             free(Extracted32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return ExtractedSubString;
     }
@@ -1578,7 +1578,7 @@ extern "C" {
             free(String32);
             free(Extracted32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return ExtractedSubString;
     }
@@ -1593,12 +1593,12 @@ extern "C" {
                     ExtractedString[CodePoint - Offset] = String[CodePoint];
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate ExtractedString"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate ExtractedString"));
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (StringSize < Length + Offset) {
-            Log(Log_DEBUG, __func__, UTF8String("Offset %llu + Length %lld is larger than String %llu"), Length, Offset, StringSize);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu + Length %lld is larger than String %llu"), Length, Offset, StringSize);
         }
         return ExtractedString;
     }
@@ -1613,9 +1613,9 @@ extern "C" {
             free(Padding32);
             Padded             = UTF8_Encode(Padded32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Padding == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Padding Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Padding Pointer is NULL"));
         }
         return Padded;
     }
@@ -1630,9 +1630,9 @@ extern "C" {
             free(Padding32);
             Padded             = UTF16_Encode(Padded32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Padding == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Padding Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Padding Pointer is NULL"));
         }
         return Padded;
     }
@@ -1661,9 +1661,9 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Padding == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Padding Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Padding Pointer is NULL"));
         }
         return Padded;
     }
@@ -1679,9 +1679,9 @@ extern "C" {
             free(Replacement32);
             free(Replaced32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Replacement == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Replacement Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Replacement Pointer is NULL"));
         }
         return Replaced8;
     }
@@ -1697,9 +1697,9 @@ extern "C" {
             free(Replacement32);
             free(Replaced32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Replacement == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Replacement Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Replacement Pointer is NULL"));
         }
         return Replaced16;
     }
@@ -1709,7 +1709,7 @@ extern "C" {
         if (String != NULL && Replacement != NULL) {
             uint64_t StringSize                     = UTF32_GetStringSizeInCodePoints(String);
             uint64_t ReplacementSize                = UTF32_GetStringSizeInCodePoints(Replacement);
-            uint64_t NewStringSize                  = (StringSize + ReplacementSize) - Length;
+            uint64_t NewStringSize                  = (StringSize + ReplacementSize) - Length; // Length may be longer than StringSize + ReplacementSize
             NewString                               = UTF32_Init(NewStringSize);
             if (NewString != NULL) {
                 uint64_t NewCodePoint               = 0ULL;
@@ -1741,9 +1741,9 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Replacement == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Replacement Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Replacement Pointer is NULL"));
         }
         return NewString;
     }
@@ -1756,7 +1756,7 @@ extern "C" {
             free(Decoded);
             Stitched          = UTF8_Encode(Stitched32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Stitched;
     }
@@ -1770,7 +1770,7 @@ extern "C" {
             Stitched          = UTF16_Encode(Stitched32);
             free(Stitched32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Stitched;
     }
@@ -1793,17 +1793,17 @@ extern "C" {
                         CodePoint += 1;
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("Could not allocate Stitched string, size: %llu"), StitchedSize);
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Could not allocate Stitched string, size: %llu"), StitchedSize);
                 }
             } else if (Offset > StringSize) {
-                Log(Log_DEBUG, __func__, UTF8String("Offset %llu is greater than the String's size %llu"), Offset, StringSize);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is greater than the String's size %llu"), Offset, StringSize);
             } else if (Length > StringSize) {
-                Log(Log_DEBUG, __func__, UTF8String("Length %llu is greater than the String's size %llu"), Length, StringSize);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Length %llu is greater than the String's size %llu"), Length, StringSize);
             } else if (Offset + Length > StringSize) {
-                Log(Log_DEBUG, __func__, UTF8String("Offset + Length %llu is greater than the String's size %llu"), Offset + Length, StringSize);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset + Length %llu is greater than the String's size %llu"), Offset + Length, StringSize);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NULL;
     }
@@ -1819,9 +1819,9 @@ extern "C" {
             free(DecodedSubString);
             free(Trimmed32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (SubString2Remove == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("SubString2Remove Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SubString2Remove Pointer is NULL"));
         }
         return TrimmedString;
     }
@@ -1837,9 +1837,9 @@ extern "C" {
             free(DecodedSubString);
             free(Trimmed32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (SubString2Remove == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("SubString2Remove Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SubString2Remove Pointer is NULL"));
         }
         return TrimmedString;
     }
@@ -1878,7 +1878,7 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate the instances"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate the instances"));
             }
             
             if (Instance2Remove >= 1) {
@@ -1897,14 +1897,14 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate the edited string"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate the edited string"));
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (SubString2Remove == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("SubString2Remove Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SubString2Remove Pointer is NULL"));
         } else if (Instance2Remove == 0) {
-            Log(Log_DEBUG, __func__, UTF8String("Removing 0 instances of the SubString does not make sense"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Removing 0 instances of the SubString does not make sense"));
         }
         return EditedString;
     }
@@ -1919,7 +1919,7 @@ extern "C" {
             free(Insert32);
             Inserted          = UTF8_Encode(Inserted32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Inserted;
     }
@@ -1934,7 +1934,7 @@ extern "C" {
             free(Insert32);
             Inserted          = UTF16_Encode(Inserted32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Inserted;
     }
@@ -1958,13 +1958,13 @@ extern "C" {
                         }
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate InsertedString"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate InsertedString"));
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Offset %llu is greater than the string's size %llu"), Offset, StringSize);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is greater than the string's size %llu"), Offset, StringSize);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Inserted;
     }
@@ -1978,7 +1978,7 @@ extern "C" {
             CaseFolded        = UTF8_Encode(CaseFold32);
             free(CaseFold32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return CaseFolded;
     }
@@ -1992,7 +1992,7 @@ extern "C" {
             CaseFolded        = UTF16_Encode(CaseFold32);
             free(CaseFold32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return CaseFolded;
     }
@@ -2011,7 +2011,7 @@ extern "C" {
                 CodePoint += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return CaseFoldedString;
     }
@@ -2095,7 +2095,7 @@ extern "C" {
                 CodePoint += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NULL;
     }
@@ -2121,7 +2121,7 @@ extern "C" {
                 CodePoint += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return ComposedString;
     }
@@ -2150,7 +2150,7 @@ extern "C" {
             DecomposedString           = UTF32_Reorder(Decomposed);
             free(Decomposed);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return DecomposedString;
     }
@@ -2196,9 +2196,9 @@ extern "C" {
                 NormalizedString  = UTF32_Decompose(String, Yes);
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (NormalizedForm == NormalizationForm_Unknown) {
-            Log(Log_DEBUG, __func__, UTF8String("Unknown Normalization form"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Unknown Normalization form"));
         }
         return NormalizedString;
     }
@@ -2210,7 +2210,7 @@ extern "C" {
             Value           = UTF32_String2Integer(Base, String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Value;
     }
@@ -2222,7 +2222,7 @@ extern "C" {
             Value           = UTF32_String2Integer(Base, String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Value;
     }
@@ -2301,9 +2301,9 @@ extern "C" {
             }
             Value                      *= Sign;
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Base == Base_Decimal_Radix10 || Base == Base_Decimal_Shortest_Uppercase || Base == Base_Decimal_Hex_Uppercase || Base == Base_Decimal_Scientific_Uppercase || Base == Base_Decimal_Shortest_Lowercase || Base == Base_Decimal_Hex_Lowercase || Base == Base_Decimal_Scientific_Lowercase) {
-            Log(Log_DEBUG, __func__, UTF8String("Decimals are invalid input for this function"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Decimals are invalid input for this function"));
         }
         return Value;
     }
@@ -2368,7 +2368,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Base is not an integer, exiting"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Base is not an integer, exiting"));
         }
         return String;
     }
@@ -2380,7 +2380,7 @@ extern "C" {
             Decimal         = UTF32_String2Decimal(Base, String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Decimal;
     }
@@ -2392,7 +2392,7 @@ extern "C" {
             Decimal         = UTF32_String2Decimal(Base, String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Decimal;
     }
@@ -2423,7 +2423,7 @@ extern "C" {
                 CodePoint     += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Value;
     }
@@ -2560,9 +2560,9 @@ extern "C" {
             free(String1_32);
             free(String2_32);
         } else if (String1 == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String1 Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String1 Pointer is NULL"));
         } else if (String2 == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String2 Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String2 Pointer is NULL"));
         }
         return StringsMatch;
     }
@@ -2576,9 +2576,9 @@ extern "C" {
             free(String1_32);
             free(String2_32);
         } else if (String1 == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String1 Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String1 Pointer is NULL"));
         } else if (String2 == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String2 Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String2 Pointer is NULL"));
         }
         return StringsMatch;
     }
@@ -2601,9 +2601,9 @@ extern "C" {
                 }
             }
         } else if (String1 == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String1 Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String1 Pointer is NULL"));
         } else if (String2 == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String2 Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String2 Pointer is NULL"));
         }
         return StringsMatch;
     }
@@ -2617,9 +2617,9 @@ extern "C" {
             free(String32);
             free(Sub32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Substring == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Substring Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Substring Pointer is NULL"));
         }
         return SubstringMatchesAtOffset;
     }
@@ -2633,9 +2633,9 @@ extern "C" {
             UTF32_Deinit(String32);
             UTF32_Deinit(Sub32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Substring == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Substring Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Substring Pointer is NULL"));
         }
         return SubstringMatchesAtOffset;
     }
@@ -2655,9 +2655,9 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Substring == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Substring Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Substring Pointer is NULL"));
         } else {
             SubstringMatchesAtOffset             = No;
         }
@@ -2674,11 +2674,11 @@ extern "C" {
             Trimmed                             = UTF8_Encode(Trimmed32);
             UTF32_Deinit(String32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Type == TrimString_Unknown) {
-            Log(Log_DEBUG, __func__, UTF8String("TrimString_Unknown is invalid"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("TrimString_Unknown is invalid"));
         } else if (Strings2Remove == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Strings2Remove Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Strings2Remove Pointer is NULL"));
         }
         return Trimmed;
     }
@@ -2693,11 +2693,11 @@ extern "C" {
             Trimmed                             = UTF16_Encode(Trimmed32);
             UTF32_Deinit(String32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Type == TrimString_Unknown) {
-            Log(Log_DEBUG, __func__, UTF8String("TrimString_Unknown is invalid"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("TrimString_Unknown is invalid"));
         } else if (Strings2Remove == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Strings2Remove Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Strings2Remove Pointer is NULL"));
         }
         return Trimmed;
     }
@@ -2806,14 +2806,14 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate Trimmed string"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate Trimmed string"));
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Type == TrimString_Unknown) {
-            Log(Log_DEBUG, __func__, UTF8String("TrimString_Unknown is invalid"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("TrimString_Unknown is invalid"));
         } else if (Strings2Remove == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Strings2Remove Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Strings2Remove Pointer is NULL"));
         }
         return Trimmed;
     }
@@ -2828,9 +2828,9 @@ extern "C" {
             UTF32_StringArray_Deinit(Delimiters32);
             SplitString           = UTF8_StringArray_Encode(SplitString32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Delimiters == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Delimiters Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Delimiters Pointer is NULL"));
         }
         return SplitString;
     }
@@ -2845,9 +2845,9 @@ extern "C" {
             UTF32_StringArray_Deinit(Delimiters32);
             SplitString           = UTF16_StringArray_Encode(SplitString32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Delimiters == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Delimiters Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Delimiters Pointer is NULL"));
         }
         return SplitString;
     }
@@ -2869,7 +2869,7 @@ extern "C" {
                     DelimitersSize[Delimiter] = UTF32_GetStringSizeInCodePoints(Delimiters[Delimiter]);
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate space for the delimiter sizes"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate space for the delimiter sizes"));
             }
             // Check if the current delimiter is larger than the string, if so, it can't match.
             // Well we need to loop over the string NumDelimiters times, so Delimiters, String, DelimiterString
@@ -2917,9 +2917,9 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Delimiters == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Delimiters Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Delimiters Pointer is NULL"));
         }
         return SplitStrings;
     }
@@ -3018,7 +3018,7 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumDigits;
     }
@@ -3033,9 +3033,9 @@ extern "C" {
                 Length    += 1;
             }
         } else if (Format == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Format String Poitner is NUlL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Format String Poitner is NUlL"));
         } else if (Formatted == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Formatted String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Formatted String Pointer is NULL"));
         }
         return Length;
     }
@@ -3064,7 +3064,7 @@ extern "C" {
         if (NumStrings > 0) {
             StringArray    = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF8*));
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("NumStrings %llu is invalid"), NumStrings);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
         return StringArray;
     }
@@ -3074,7 +3074,7 @@ extern "C" {
         if (NumStrings > 0) {
             StringArray    = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF16*));
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("NumStrings %llu is invalid"), NumStrings);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
         return StringArray;
     }
@@ -3084,7 +3084,7 @@ extern "C" {
         if (NumStrings > 0) {
             StringArray    = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF32*));
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("NumStrings %llu is invalid"), NumStrings);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
         return StringArray;
     }
@@ -3093,9 +3093,9 @@ extern "C" {
         if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
             StringArray[Index] = String2Attach;
         } else if (StringArray == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         } else if (String2Attach == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String2Attach Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String2Attach Pointer is NULL"));
         }
     }
     
@@ -3103,9 +3103,9 @@ extern "C" {
         if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
             StringArray[Index] = String2Attach;
         } else if (StringArray == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         } else if (String2Attach == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String2Attach Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String2Attach Pointer is NULL"));
         }
     }
     
@@ -3113,9 +3113,9 @@ extern "C" {
         if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
             StringArray[Index] = String2Attach;
         } else if (StringArray == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         } else if (String2Attach == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String2Attach Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String2Attach Pointer is NULL"));
         }
     }
     
@@ -3126,7 +3126,7 @@ extern "C" {
                 NumStrings += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return NumStrings;
     }
@@ -3138,7 +3138,7 @@ extern "C" {
                 NumStrings += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return NumStrings;
     }
@@ -3150,7 +3150,7 @@ extern "C" {
                 NumStrings += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return NumStrings;
     }
@@ -3164,7 +3164,7 @@ extern "C" {
                 StringArraySizes[String] = UTF8_GetStringSizeInCodeUnits(StringArray[String]);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return StringArraySizes;
     }
@@ -3178,7 +3178,7 @@ extern "C" {
                 StringArraySizes[String] = UTF16_GetStringSizeInCodeUnits(StringArray[String]);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return StringArraySizes;
     }
@@ -3192,7 +3192,7 @@ extern "C" {
                 StringArraySizes[String] = UTF8_GetStringSizeInCodePoints(StringArray[String]);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return StringArraySizes;
     }
@@ -3206,7 +3206,7 @@ extern "C" {
                 StringArraySizes[String] = UTF16_GetStringSizeInCodePoints(StringArray[String]);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return StringArraySizes;
     }
@@ -3220,7 +3220,7 @@ extern "C" {
                 StringArraySizes[String] = UTF32_GetStringSizeInCodePoints(StringArray[String]);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return StringArraySizes;
     }
@@ -3235,11 +3235,11 @@ extern "C" {
                     Decoded[String] = UTF8_Decode(StringArray[String]);
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate decoded StringArray"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
             }
             
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return Decoded;
     }
@@ -3254,11 +3254,11 @@ extern "C" {
                     Decoded[String] = UTF16_Decode(StringArray[String]);
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate decoded StringArray"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
             }
             
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return Decoded;
     }
@@ -3273,11 +3273,11 @@ extern "C" {
                     Encoded[String] = UTF8_Encode(StringArray[String]);
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate decoded StringArray"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
             }
             
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return Encoded;
     }
@@ -3292,11 +3292,11 @@ extern "C" {
                     Encoded[String] = UTF16_Encode(StringArray[String]);
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate decoded StringArray"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
             }
             
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return Encoded;
     }
@@ -3337,7 +3337,7 @@ extern "C" {
             }
             free(StringArray);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
     }
     
@@ -3349,7 +3349,7 @@ extern "C" {
             }
             free(StringArray);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
     }
     
@@ -3361,7 +3361,7 @@ extern "C" {
             }
             free(StringArray);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("StringArray Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
     }
     /* StringArray Functions */

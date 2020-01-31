@@ -83,7 +83,7 @@ extern "C" {
             UTF32  CodePointLow  = (UTF32) Entropy_GenerateIntegerInRange(Random, 0xE000, 0x10FFFF);
             CodePoint            = CodePointLow | CodePointHigh;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
         }
         return CodePoint;
     }
@@ -97,10 +97,10 @@ extern "C" {
                     String[CodePoint] = UTF32_GenerateCodePoint(Random);
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate string with %llu CodePoints"), NumCodePoints);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate string with %llu CodePoints"), NumCodePoints);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
         }
         return String;
     }

@@ -131,10 +131,10 @@ extern "C" {
                 }
             } else {
                 FormatSpecifiers_Deinit(Specifiers);
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate %llu Specifiers"), NumSpecifiers);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate %llu Specifiers"), NumSpecifiers);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate FormatSpecifiers"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate FormatSpecifiers"));
         }
         return Specifiers;
     }
@@ -599,13 +599,13 @@ extern "C" {
                                 if (Value <= NL_ARGMAX) {
                                     Specifiers->Specifiers[Specifier].Position = Value;
                                 } else {
-                                    Log(Log_USER, __func__, UTF8String("Positional Argument: %llu is greater than NL_ARGMAX: %d"), Value, NL_ARGMAX);
+                                    Log(Log_USER, FoundationIOFunctionName, UTF8String("Positional Argument: %llu is greater than NL_ARGMAX: %d"), Value, NL_ARGMAX);
                                 }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
                                 if (Value <= _ARGMAX) {
                                     Specifiers->Specifiers[Specifier].Position = Value;
                                 } else {
-                                    Log(Log_USER, __func__, UTF8String("Positional Argument: %llu is greater than _ARGMAX: %d"), Value, _ARGMAX);
+                                    Log(Log_USER, FoundationIOFunctionName, UTF8String("Positional Argument: %llu is greater than _ARGMAX: %d"), Value, _ARGMAX);
                                 }
 #endif
                             }
@@ -657,35 +657,9 @@ extern "C" {
                 Specifier += 1;
             }
         } else if (Specifiers == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("FormatSpecifiers Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
         } else if (Format == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
-        }
-    }
-    
-    static void UTF32_Specifiers_GetDuplicateSpecifiers(FormatSpecifiers *Specifiers) {
-        if (Specifiers != NULL) {
-            uint64_t  NumDuplicateSpecifiers      = 0ULL;
-            uint64_t *SpecifierCounts             = calloc(Specifiers->NumSpecifiers, sizeof(uint64_t));
-            if (SpecifierCounts != NULL) {
-                for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
-                    if (Specifiers->Specifiers[Specifier].IsPositional == Yes) {
-                        uint64_t Position           = Specifiers->Specifiers[Specifier].PositionalArg;
-                        SpecifierCounts[Position]  += 1;
-                    }
-                }
-                
-                for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
-                    if (SpecifierCounts[Specifier] >= 2) {
-                        NumDuplicateSpecifiers += 1;
-                    }
-                }
-            }
-            
-            Specifiers->NumDuplicateSpecifiers = NumDuplicateSpecifiers;
-            free(SpecifierCounts);
-        } else {
-            Log(Log_DEBUG, __func__, UTF8String("FormatSpecifiers Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
@@ -849,7 +823,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("FormatSpecifiers Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
         }
     }
     
@@ -865,7 +839,7 @@ extern "C" {
                 CodePoint       += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return FirstPercent;
     }
@@ -950,9 +924,9 @@ extern "C" {
             
             Formatted                                   = FormattedStrings[Specifiers->NumSpecifiers];
         } else if (Format == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Format Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Format Pointer is NULL"));
         } else if (Specifiers == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("FormatSpecifiers Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
         }
         return Formatted;
     }
@@ -983,7 +957,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("FormatSpecifiers Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
         }
         return Deformatted;
     }
@@ -999,7 +973,7 @@ extern "C" {
                 CodeUnit              += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumSpecifiers;
     }
@@ -1015,7 +989,7 @@ extern "C" {
                 CodeUnit              += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumSpecifiers;
     }
@@ -1031,7 +1005,7 @@ extern "C" {
                 CodePoint             += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumSpecifiers;
     }
@@ -1059,7 +1033,7 @@ extern "C" {
                 Format8                      = Format;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Format8;
     }
@@ -1085,7 +1059,7 @@ extern "C" {
                 Format16                     = Format;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Format16;
     }
@@ -1107,7 +1081,7 @@ extern "C" {
                 FormattedString              = Format;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return FormattedString;
     }
@@ -1129,9 +1103,9 @@ extern "C" {
                 UTF32_StringArray_Deinit(Strings32);
             }
         } else if (Format == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Format Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Format Pointer is NULL"));
         } else if (Formatted == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Formatted String is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Formatted String is NULL"));
         }
         return StringArray;
     }
@@ -1153,9 +1127,9 @@ extern "C" {
                 UTF32_StringArray_Deinit(Strings32);
             }
         } else if (Format == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Format Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Format Pointer is NULL"));
         } else if (Formatted == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Formatted String is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Formatted String is NULL"));
         }
         return StringArray;
     }
@@ -1171,9 +1145,9 @@ extern "C" {
                 FormatSpecifiers_Deinit(Specifiers);
             }
         } else if (Format == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Format Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Format Pointer is NULL"));
         } else if (Formatted == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Formatted String is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Formatted String is NULL"));
         }
         return StringArray;
     }

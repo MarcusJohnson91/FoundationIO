@@ -17,7 +17,7 @@ extern "C" {
             ChannelMap->NumChannels = NumChannels;
             ChannelMap->Map         = calloc(NumChannels, sizeof(AudioChannelMask));
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate AudioChannelMap"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate AudioChannelMap"));
         }
         return ChannelMap;
     }
@@ -26,9 +26,9 @@ extern "C" {
         if (ChannelMap != NULL && Index < ChannelMap->NumChannels) {
             ChannelMap->Map[Index] = Mask;
         } else if (ChannelMap == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("ChannelMap Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ChannelMap Pointer is NULL"));
         } else if (Index >= ChannelMap->NumChannels) {
-            Log(Log_DEBUG, __func__, UTF8String("Index %llu is greather than there are channels %llu"), Index, ChannelMap->NumChannels);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Index %llu is greather than there are channels %llu"), Index, ChannelMap->NumChannels);
         }
     }
     
@@ -37,9 +37,9 @@ extern "C" {
         if (ChannelMap != NULL && Index < ChannelMap->NumChannels) {
             ChannelMask = ChannelMap->Map[Index];
         } else if (ChannelMap == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("ChannelMap Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ChannelMap Pointer is NULL"));
         } else if (Index >= ChannelMap->NumChannels) {
-            Log(Log_DEBUG, __func__, UTF8String("Index %llu is greather than there are channels %llu"), Index, ChannelMap->NumChannels);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Index %llu is greather than there are channels %llu"), Index, ChannelMap->NumChannels);
         }
         return ChannelMask;
     }
@@ -57,7 +57,7 @@ extern "C" {
                 Channel     += 1;
             }
         } else if (ChannelMap == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("ChannelMap Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ChannelMap Pointer is NULL"));
         }
         return Index;
     }
@@ -67,7 +67,7 @@ extern "C" {
             free(ChannelMap->Map);
             free(ChannelMap);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ChannelMap Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ChannelMap Pointer is NULL"));
         }
     }
     
@@ -91,17 +91,17 @@ extern "C" {
                     Audio->Samples = Array;
                 } else {
                     Audio2DContainer_Deinit(Audio);
-                    Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate the audio array"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate the audio array"));
                 }
                 
                 Audio->SampleRate  = SampleRate;
                 Audio->NumSamples  = NumSamples;
             } else {
                 Audio2DContainer_Deinit(Audio);
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate the Audio2DContainer"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate the Audio2DContainer"));
             }
         } else if (NumSamples == 0) {
-            Log(Log_DEBUG, __func__, UTF8String("NumSamples %llu is invalid"), NumSamples);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumSamples %llu is invalid"), NumSamples);
         }
         return Audio;
     }
@@ -111,7 +111,7 @@ extern "C" {
         if (Audio != NULL) {
             Map              = Audio->ChannelMap;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
         return Map;
     }
@@ -127,7 +127,7 @@ extern "C" {
                 BitDepth = 32;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
         return BitDepth;
     }
@@ -137,7 +137,7 @@ extern "C" {
         if (Audio != NULL) {
             NumChannels = Audio->NumChannels;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
         return NumChannels;
     }
@@ -147,7 +147,7 @@ extern "C" {
         if (Audio != NULL) {
             SampleRate = Audio->SampleRate;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
         return SampleRate;
     }
@@ -157,7 +157,7 @@ extern "C" {
         if (Audio != NULL) {
             NumSamples = Audio->NumSamples;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
         return NumSamples;
     }
@@ -167,7 +167,7 @@ extern "C" {
         if (Audio != NULL) {
             Type = Audio->Type;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
         return Type;
     }
@@ -177,7 +177,7 @@ extern "C" {
         if (Audio != NULL) {
             AudioArray = Audio->Samples;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
         return AudioArray;
     }
@@ -220,7 +220,7 @@ extern "C" {
                 Average /= Audio->NumSamples;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
         return Average;
     }
@@ -296,7 +296,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
         return Maximum;
     }
@@ -366,7 +366,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
         return Minimum;
     }
@@ -423,7 +423,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
     }
     
@@ -433,7 +433,7 @@ extern "C" {
             free(Audio->ChannelMap);
             free(Audio);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
     }
     
@@ -474,13 +474,13 @@ extern "C" {
                     Histogram->NumEntries = NumValues;
                 } else {
                     Audio2DHistogram_Deinit(Histogram);
-                    Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate Audio2DHistogram Array"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate Audio2DHistogram Array"));
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate Audio2DHistogram"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate Audio2DHistogram"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
         return Histogram;
     }
@@ -490,7 +490,7 @@ extern "C" {
         if (Histogram != NULL) {
             Array = Histogram->Array;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DHistogram Pointer is NULL"));
         }
         return Array;
     }
@@ -499,7 +499,7 @@ extern "C" {
         if (Histogram != NULL) {
             Histogram->Array = Array;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DHistogram Pointer is NULL"));
         }
     }
     
@@ -541,10 +541,10 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate Audio2DHistogram"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate Audio2DHistogram"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DContainer Pointer is NULL"));
         }
         return Histogram;
     }
@@ -642,7 +642,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageHistogram Pointer is NULL"));
         }
     }
     
@@ -698,7 +698,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Audio2DHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DHistogram Pointer is NULL"));
         }
     }
     
@@ -729,7 +729,7 @@ extern "C" {
         if (Vector != NULL) {
             Array = Vector->Samples;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("AudioVector Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AudioVector Pointer is NULL"));
         }
         return Array;
     }
@@ -738,9 +738,9 @@ extern "C" {
         if (Vector != NULL && Array != NULL) {
             Vector->Samples = Array;
         } else if (Vector == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("AudioVector Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AudioVector Pointer is NULL"));
         } else if (Array == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Array Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Array Pointer is NULL"));
         }
     }
     
@@ -808,7 +808,7 @@ extern "C" {
                 Histogram->Histogram = calloc(Histogram->NumSamples, sizeof(uint64_t));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("AudioVector Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AudioVector Pointer is NULL"));
         }
         return Histogram;
     }
@@ -818,7 +818,7 @@ extern "C" {
         if (Histogram != NULL) {
             Array = Histogram->Histogram;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("AudioVectorHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AudioVectorHistogram Pointer is NULL"));
         }
         return Array;
     }
@@ -827,9 +827,9 @@ extern "C" {
         if (Histogram != NULL && Array != NULL) {
             Histogram->Histogram = Array;
         } else if (Histogram == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("AudioVectorHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AudioVectorHistogram Pointer is NULL"));
         } else if (Array == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Array Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Array Pointer is NULL"));
         }
     }
     
@@ -861,7 +861,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("AudioVector Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AudioVector Pointer is NULL"));
         }
         return Histogram;
     }
@@ -932,7 +932,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageHistogram Pointer is NULL"));
         }
     }
     
@@ -942,7 +942,7 @@ extern "C" {
                 Histogram->Histogram[Sample] = 0;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("AudioVectorHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AudioVectorHistogram Pointer is NULL"));
         }
     }
     
@@ -951,7 +951,7 @@ extern "C" {
             free(Histogram->Histogram);
             free(Histogram);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("AudioVectorHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AudioVectorHistogram Pointer is NULL"));
         }
     }
     
@@ -969,11 +969,11 @@ extern "C" {
         if (Container != NULL && Vector != NULL && Index < Container->NumVectors) {
             Container->Vectors[Index] = *Vector;
         } else if (Container == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Container Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Container Pointer is NULL"));
         } else if (Vector == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Vector Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Vector Pointer is NULL"));
         } else if (Index >= Container->NumVectors) {
-            Log(Log_DEBUG, __func__, UTF8String("Index %llu is larger than %llu"), Index, Container->NumVectors);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Index %llu is larger than %llu"), Index, Container->NumVectors);
         }
     }
     
@@ -982,9 +982,9 @@ extern "C" {
         if (Container != NULL && Index < Container->NumVectors) {
             Vector          = &Container->Vectors[Index];
         } else if (Container == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Container Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Container Pointer is NULL"));
         } else if (Index >= Container->NumVectors) {
-            Log(Log_DEBUG, __func__, UTF8String("Index %llu is larger than %llu"), Index, Container->NumVectors);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Index %llu is larger than %llu"), Index, Container->NumVectors);
         }
         return Vector;
     }
@@ -999,7 +999,7 @@ extern "C" {
                 Container->Vectors[Vector].Samples = 0;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Container Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Container Pointer is NULL"));
         }
     }
     
@@ -1029,7 +1029,7 @@ extern "C" {
             ChannelMap->NumChannels = NumChannels;
             ChannelMap->Map         = calloc(NumViews * NumChannels, sizeof(ImageChannelMask));
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate ImageChannelMap"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate ImageChannelMap"));
         }
         return ChannelMap;
     }
@@ -1039,7 +1039,7 @@ extern "C" {
         if (ChannelMap != NULL) {
             NumViews     = ChannelMap->NumViews;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ChannelMap Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ChannelMap Pointer is NULL"));
         }
         return NumViews;
     }
@@ -1049,7 +1049,7 @@ extern "C" {
         if (ChannelMap != NULL) {
             NumViews     = ChannelMap->NumChannels;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ChannelMap Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ChannelMap Pointer is NULL"));
         }
         return NumViews;
     }
@@ -1065,9 +1065,9 @@ extern "C" {
                 }
             }
         } else if (ChannelMap == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("ImageChannelMap Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageChannelMap Pointer is NULL"));
         } else if (Mask == ImageMask_Unknown) {
-            Log(Log_DEBUG, __func__, UTF8String("ImageMask_Unknown is invalid"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageMask_Unknown is invalid"));
         }
         return Index;
     }
@@ -1078,9 +1078,9 @@ extern "C" {
                 ChannelMap->Map[View][Index] = Mask;
             }
         } else if (ChannelMap == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("ImageChannelMap Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageChannelMap Pointer is NULL"));
         } else if (Index >= ChannelMap->NumChannels) {
-            Log(Log_DEBUG, __func__, UTF8String("Index: %hhu is Invalid"), Index);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Index: %hhu is Invalid"), Index);
         }
     }
     
@@ -1089,7 +1089,7 @@ extern "C" {
             free(ChannelMap->Map);
             free(ChannelMap);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ChannelMap Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ChannelMap Pointer is NULL"));
         }
     }
     
@@ -1114,16 +1114,16 @@ extern "C" {
                     Image->ChannelMap = ChannelMap;
                 } else {
                     ImageContainer_Deinit(Image);
-                    Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate pixel array"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate pixel array"));
                 }
             } else {
                 ImageContainer_Deinit(Image);
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate the ImageContainer"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate the ImageContainer"));
             }
         } else if (Width == 0) {
-            Log(Log_DEBUG, __func__, UTF8String("Width %llu is invalid"), Width);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Width %llu is invalid"), Width);
         } else if (Height == 0) {
-            Log(Log_DEBUG, __func__, UTF8String("Height %llu is invalid"), Height);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Height %llu is invalid"), Height);
         }
         return Image;
     }
@@ -1133,7 +1133,7 @@ extern "C" {
         if (Image != NULL) {
             Width = Image->Width;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
         return Width;
     }
@@ -1143,7 +1143,7 @@ extern "C" {
         if (Image != NULL) {
             Height = Image->Height;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
         return Height;
     }
@@ -1157,7 +1157,7 @@ extern "C" {
                 BitDepth = 16;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
         return BitDepth;
     }
@@ -1167,7 +1167,7 @@ extern "C" {
         if (Image != NULL) {
             Map = Image->ChannelMap;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
         return Map;
     }
@@ -1177,9 +1177,9 @@ extern "C" {
             free(Image->ChannelMap);
             Image->ChannelMap = ChannelMap;
         } else if (Image == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         } else if (ChannelMap == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("ChannelMap Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ChannelMap Pointer is NULL"));
         }
     }
     
@@ -1188,7 +1188,7 @@ extern "C" {
         if (Image != NULL) {
             Type = Image->Type;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
         return Type;
     }
@@ -1198,7 +1198,7 @@ extern "C" {
         if (Image != NULL) {
             ImageArray = Image->Pixels;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
         return ImageArray;
     }
@@ -1207,7 +1207,7 @@ extern "C" {
         if (Image != NULL) {
             Image->Pixels = Array;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
     }
     
@@ -1238,13 +1238,13 @@ extern "C" {
                         Average /= Image->Width * Image->Height;
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("Channel: %hhu is invalid"), Channel);
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Channel: %hhu is invalid"), Channel);
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("View: %hhu is invalid"), View);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("View: %hhu is invalid"), View);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
         return Average;
     }
@@ -1285,13 +1285,13 @@ extern "C" {
                         }
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("You tried getting the max from a nonexistant channel"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("You tried getting the max from a nonexistant channel"));
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("You tried getting the average from a nonexistant view %hhu"), View);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("You tried getting the average from a nonexistant view %hhu"), View);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
         return Maximum;
     }
@@ -1331,13 +1331,13 @@ extern "C" {
                         }
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("You tried getting the max from a nonexistant channel"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("You tried getting the max from a nonexistant channel"));
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("You tried getting the average from a nonexistant view %hhu"), View);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("You tried getting the average from a nonexistant view %hhu"), View);
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
         return Minimum;
     }
@@ -1422,7 +1422,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
     }
     
@@ -1461,7 +1461,7 @@ extern "C" {
                         ImageContainer_SetArray(Image, (void *) NewArray);
                         free(Array);
                     } else {
-                        Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate an array for the cropped image"));
+                        Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate an array for the cropped image"));
                     }
                 } else if (Type == ImageType_Integer16) {
                     uint16_t *Array = (uint16_t *) ImageContainer_GetArray(Image);
@@ -1479,14 +1479,14 @@ extern "C" {
                         ImageContainer_SetArray(Image, (void *) NewArray);
                         free(Array);
                     } else {
-                        Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate an array for the cropped image"));
+                        Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate an array for the cropped image"));
                     }
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate resized array"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate resized array"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
     }
     
@@ -1536,23 +1536,23 @@ extern "C" {
                         }
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("Couldn't Allocate Difference"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't Allocate Difference"));
                 }
             } else if (RefType != ComType) {
-                Log(Log_DEBUG, __func__, UTF8String("Reference Type %d does not match Compare Type %d"), RefType, ComType);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Reference Type %d does not match Compare Type %d"), RefType, ComType);
             } else if (RefNumViews != ComNumViews) {
-                Log(Log_DEBUG, __func__, UTF8String("Reference NumViews %d does not match Compare NumViews %d"), RefNumViews, ComNumViews);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Reference NumViews %d does not match Compare NumViews %d"), RefNumViews, ComNumViews);
             } else if (RefNumChans != ComNumChans) {
-                Log(Log_DEBUG, __func__, UTF8String("Reference NumChannels %d does not match Compare NumChannels %d"), RefNumChans, ComNumChans);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Reference NumChannels %d does not match Compare NumChannels %d"), RefNumChans, ComNumChans);
             } else if (RefHeight != ComHeight) {
-                Log(Log_DEBUG, __func__, UTF8String("Reference Height %lld does not match Compare Height %lld"), RefHeight, ComHeight);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Reference Height %lld does not match Compare Height %lld"), RefHeight, ComHeight);
             } else if (RefWidth != ComWidth) {
-                Log(Log_DEBUG, __func__, UTF8String("Reference Width %lld does not match Compare Width %lld"), RefWidth, ComWidth);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Reference Width %lld does not match Compare Width %lld"), RefWidth, ComWidth);
             }
         } else if (Reference == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Reference Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Reference Pointer is NULL"));
         } else if (Compare == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Compare Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Compare Pointer is NULL"));
         }
         return Difference;
     }
@@ -1589,7 +1589,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
     }
     
@@ -1599,7 +1599,7 @@ extern "C" {
             free(Image->ChannelMap);
             free(Image);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
     }
     
@@ -1632,7 +1632,7 @@ extern "C" {
                         Histogram->Type  = Image->Type;
                     } else {
                         ImageHistogram_Deinit(Histogram);
-                        Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate Histogram array"));
+                        Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate Histogram array"));
                     }
                 } else if (Image->Type == ImageType_Integer16) {
                     uint16_t ***HistogramArray = calloc(NumViews * NumChannels * NumPossibleColors, sizeof(uint16_t));
@@ -1641,15 +1641,15 @@ extern "C" {
                         Histogram->Type  = Image->Type;
                     } else {
                         ImageHistogram_Deinit(Histogram);
-                        Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate Histogram array"));
+                        Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate Histogram array"));
                     }
                 }
             } else {
                 ImageHistogram_Deinit(Histogram);
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate ImageHistogram"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate ImageHistogram"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
         return Histogram;
     }
@@ -1663,7 +1663,7 @@ extern "C" {
                 Array = Histogram->Array;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageHistogram Pointer is NULL"));
         }
         return Array;
     }
@@ -1672,9 +1672,9 @@ extern "C" {
         if (Histogram != NULL && Array != NULL) {
             Histogram->Array = Array;
         } else if (Histogram == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageHistogram Pointer is NULL"));
         } else if (Array == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Array Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Array Pointer is NULL"));
         }
     }
     
@@ -1719,10 +1719,10 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate ImageHistogram"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate ImageHistogram"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageContainer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
         return Histogram;
     }
@@ -1790,7 +1790,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageHistogram Pointer is NULL"));
         }
     }
     
@@ -1826,7 +1826,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageHistogram Pointer is NULL"));
         }
     }
     
@@ -1835,7 +1835,7 @@ extern "C" {
             free(Histogram->Array);
             free(Histogram);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageHistogram Pointer is NULL"));
         }
     }
     
@@ -1844,7 +1844,7 @@ extern "C" {
         if (Histogram != NULL) {
             Map              = Histogram->ChannelMap;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("ImageHistogram Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageHistogram Pointer is NULL"));
         }
         return Map;
     }

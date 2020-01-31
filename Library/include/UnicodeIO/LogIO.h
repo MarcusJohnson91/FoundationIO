@@ -71,6 +71,10 @@ extern "C" {
 #define                   UTF32Character(Literal)               (UTF32) U##Literal
 #endif /* FoundationIO_Unicodize32 */
     
+#ifndef                   FoundationIOFunctionName
+#define                   FoundationIOFunctionName              (UTF8*) __func__
+#endif /* FoundationIOFunctionName */
+    
 #if (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
 #undef LOG_EMERG
 #undef LOG_ALERT

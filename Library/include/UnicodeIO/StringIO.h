@@ -71,6 +71,10 @@ extern "C" {
 #define                   UTF32Character(Literal)               (UTF32) U##Literal
 #endif /* FoundationIO_Unicodize32 */
     
+#ifndef                   FoundationIOFunctionName
+#define                   FoundationIOFunctionName              (UTF8*) __func__
+#endif /* FoundationIOFunctionName */
+    
     /*!
      @enum                StringIOCommon
      @constant            UTF8CodeUnitSizeInBits                "The size of a single code unit in bits".
