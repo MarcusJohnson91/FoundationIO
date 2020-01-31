@@ -141,8 +141,10 @@ extern "C" {
      @param                     FunctionName                    "Which function is calling Log?".
      @param                     Description                     "String describing what went wrong".
      */
-#if   (FoundationIOCompiler == FoundationIOCompilerIsClang || FoundationIOCompiler == FoundationIOCompilerIsGCC)
+#if   (FoundationIOCompiler == FoundationIOCompilerIsClang)
     void                        Log(LogTypes Severity, UTF8 *FunctionName, UTF8 *Description, ...) __attribute__((__format__(__printf__, 3, 4)));
+#elif (FoundationIOCompiler == FoundationIOCompilerIsGCC)
+    void                        Log(LogTypes Severity, UTF8 *FunctionName, UTF8 *Description, ...);
 #elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 #include <sal.h>
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
