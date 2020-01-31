@@ -41,10 +41,10 @@ extern "C" {
             } else {
                 BitBuffer_Deinit(BitB);
                 BitB                     = NULL;
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate %lld bits for BitBuffer's buffer"), BitBufferSize);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate %lld bits for BitBuffer's buffer"), BitBufferSize);
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate BitBuffer"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BitBuffer"));
         }
         return BitB;
     }
@@ -71,12 +71,12 @@ extern "C" {
             if (BytesRead == Bytes2Read) {
                 BitB->NumBits      = (BytesRead * 8) + BitB->BitOffset;
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Num bytes read %llu does not match num bytes requested %llu"), BytesRead, Bytes2Read);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Num bytes read %llu does not match num bytes requested %llu"), BytesRead, Bytes2Read);
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (BitI == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitInput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
     }
     
@@ -85,7 +85,7 @@ extern "C" {
         if (BitB != NULL) {
             BitBufferSize      = BitB->NumBits;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return BitBufferSize;
     }
@@ -94,7 +94,7 @@ extern "C" {
         if (BitB != NULL) {
             BitB->NumBits = Bits;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
@@ -103,7 +103,7 @@ extern "C" {
         if (BitB != NULL) {
             Position = BitB->BitOffset;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return Position;
     }
@@ -112,7 +112,7 @@ extern "C" {
         if (BitB != NULL) {
             BitB->BitOffset = Offset;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
@@ -121,7 +121,7 @@ extern "C" {
         if (BitB != NULL) {
             BitsFree      = BitB->NumBits - BitB->BitOffset;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return BitsFree;
     }
@@ -133,9 +133,9 @@ extern "C" {
                 AlignmentStatus = Yes;
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (AlignmentSize != 1 || AlignmentSize % 2 != 0) {
-            Log(Log_DEBUG, __func__, UTF8String("AlignmentSize: %d isn't 1 or an integer power of 2"), AlignmentSize);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AlignmentSize: %d isn't 1 or an integer power of 2"), AlignmentSize);
         }
         return AlignmentStatus;
     }
@@ -150,9 +150,9 @@ extern "C" {
             }
             BitB->BitOffset             += Bits2Align;
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (AlignmentSize == 1 || AlignmentSize % 2 == 0) {
-            Log(Log_DEBUG, __func__, UTF8String("AlignmentSize: %d isn't a multiple of 2"), AlignmentSize);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AlignmentSize: %d isn't a multiple of 2"), AlignmentSize);
         }
     }
     
@@ -160,7 +160,7 @@ extern "C" {
         if (BitB != NULL) {
             BitB->BitOffset += Bits2Seek;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
@@ -171,7 +171,7 @@ extern "C" {
                 BitB->Buffer[Byte] = 0;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
@@ -183,10 +183,10 @@ extern "C" {
                 BitB->BitOffset = 0;
                 BitB->NumBits   = NewSize * 8;
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Reallocing the BitBuffer failed"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Reallocing the BitBuffer failed"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
@@ -206,13 +206,13 @@ extern "C" {
                     BitB->BitOffset  = 0;
                     BitB->NumBits    = BytesRead * 8;
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("Reallocating the BitBuffer failed"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Reallocating the BitBuffer failed"));
                 }
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (BitI == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitInput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
     }
     
@@ -230,13 +230,13 @@ extern "C" {
                 }
             }
         } else if (Source == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Source Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Source Pointer is NULL"));
         } else if (Destination == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Destination Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Destination Pointer is NULL"));
         } else if (BitStart >= BitEnd) {
-            Log(Log_DEBUG, __func__, UTF8String("BitStart %lld is greater than or equal to BitEnd %lld"), BitStart, BitEnd);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitStart %lld is greater than or equal to BitEnd %lld"), BitStart, BitEnd);
         } else if (BitStart >= Source->NumBits || BitEnd >= Source->NumBits) {
-            Log(Log_DEBUG, __func__, UTF8String("BitStart %lld or BitEnd %lld is greater than there are bits in Source %lld"), BitStart, BitEnd, Source->NumBits);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitStart %lld or BitEnd %lld is greater than there are bits in Source %lld"), BitStart, BitEnd, Source->NumBits);
         }
     }
     
@@ -467,11 +467,11 @@ extern "C" {
             BitBuffer_Seek(BitB, BitB->BitOffset - Length);
             BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %P, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), BitB, BitB->NumBits, BitB->BitOffset, BitBuffer_ReadBits(BitB, MSByteFirst, MSBitFirst, Length));
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (Length == 0) {
-            Log(Log_DEBUG, __func__, UTF8String("Length is zero, less than the minimum of 1"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Length is zero, less than the minimum of 1"));
         } else if (Length > 64) {
-            Log(Log_DEBUG, __func__, UTF8String("Length: %u is greater than 64 bits, the maximum"), Length);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Length: %u is greater than 64 bits, the maximum"), Length);
         }
         return BitBufferString;
     }
@@ -494,9 +494,9 @@ extern "C" {
             }
             BitB->BitOffset -= Bits2Peek;
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if ((Bits2Peek == 0 || Bits2Peek > 64) || (Bits2Peek > (BitB->BitOffset - BitB->NumBits))) {
-            Log(Log_DEBUG, __func__, UTF8String("Bits2Peek %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_PeekBits can satisfy 1-64"), Bits2Peek, BitB->BitOffset);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Bits2Peek %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_PeekBits can satisfy 1-64"), Bits2Peek, BitB->BitOffset);
         }
         return OutputData;
     }
@@ -518,9 +518,9 @@ extern "C" {
                 }
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if ((Bits2Read == 0 || Bits2Read > 64) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
-            Log(Log_DEBUG, __func__, UTF8String("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 1-64"), Bits2Read, BitB->BitOffset);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 1-64"), Bits2Read, BitB->BitOffset);
         }
         return OutputData;
     }
@@ -547,7 +547,7 @@ extern "C" {
             } while (CurrentBit != StopBit);
             BitBuffer_Seek(BitB, 1);
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return (UnaryType == CountUnary ? OutputData + 1 : OutputData);
     }
@@ -564,7 +564,7 @@ extern "C" {
             }
             BitBuffer_SetPosition(BitB, OriginalOffset);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return StringSize;
     }
@@ -591,7 +591,7 @@ extern "C" {
             }
             BitBuffer_SetPosition(BitB, OriginalOffset);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return StringSize;
     }
@@ -603,7 +603,7 @@ extern "C" {
                 ExtractedString[CodeUnit] = (UTF16) BitBuffer_Extract_LSByteLSBit(BitB, 16);
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return ExtractedString;
     }
@@ -623,7 +623,7 @@ extern "C" {
                         GUUID[Byte]      = (uint8_t) BitBuffer_Extract_LSByteLSBit(BitB, 8);
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate GUIDString"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate GUIDString"));
                 }
             } else if (GUUID2Read == UUIDString || GUUID2Read == GUIDString) {
                 if (GUUID != NULL) {
@@ -652,7 +652,7 @@ extern "C" {
                         }
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate UUIDString"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate UUIDString"));
                 }
             }
         }
@@ -675,9 +675,9 @@ extern "C" {
                 }
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
-            Log(Log_DEBUG, __func__, UTF8String("NumBits2Write %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_WriteBits can satisfy 1-64"), NumBits2Write, BitB->NumBits);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumBits2Write %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_WriteBits can satisfy 1-64"), NumBits2Write, BitB->NumBits);
         }
     }
     
@@ -707,7 +707,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
@@ -729,12 +729,12 @@ extern "C" {
                     BitBuffer_Append_MSByteLSBit(BitB, UTF8CodeUnitSizeInBits, 0); // NULL Terminator
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (String2Write == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
@@ -756,12 +756,12 @@ extern "C" {
                     BitBuffer_Append_LSByteLSBit(BitB, UTF16CodeUnitSizeInBits, 0); // NULL Terminator
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (String2Write == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
@@ -775,9 +775,9 @@ extern "C" {
                 }
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (GUUID2Write == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("GUUID2Write Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("GUUID2Write Pointer is NULL"));
         }
     }
     
@@ -799,12 +799,12 @@ extern "C" {
                     BitB->Buffer[Byte] = 0;
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Wrote %lld of %lld bits"), BytesWritten * 8, Bytes2Write * 8);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %lld of %lld bits"), BytesWritten * 8, Bytes2Write * 8);
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (BitO == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitOutput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
         }
     }
     
@@ -813,7 +813,7 @@ extern "C" {
             free(BitB->Buffer);
             free(BitB);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     /* BitBuffer Resource Management */
@@ -824,7 +824,7 @@ extern "C" {
         BitInput *BitI = calloc(1, sizeof(BitInput));
         if (BitI == NULL) {
             BitInput_Deinit(BitI);
-            Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate BitInput"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BitInput"));
         }
         return BitI;
     }
@@ -854,12 +854,12 @@ extern "C" {
             if (BitI->File != NULL) {
                 setvbuf(BitI->File, NULL, _IONBF, 0);
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't open file \"%s\": Check that the file exists and the permissions are correct"), Path2Open);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't open file \"%s\": Check that the file exists and the permissions are correct"), Path2Open);
             }
         } else if (BitI == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitInput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         } else if (Path2Open == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
@@ -905,13 +905,13 @@ extern "C" {
                 Path32                       = UTF16_Decode(Path2Open);
                 Path8                        = UTF8_Encode(Path32);
                 free(Path32);
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't open file \"%s\": Check that the file exists and the permissions are correct"), Path8);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't open file \"%s\": Check that the file exists and the permissions are correct"), Path8);
                 free(Path8);
             }
         } else if (BitI == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitInput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         } else if (Path2Open == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
@@ -920,7 +920,7 @@ extern "C" {
             BitI->FileType = BitIOSocket;
             BitI->Socket   = FoundationIO_Socket_Create(Domain, Type, Protocol);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitInput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
     }
     
@@ -929,9 +929,9 @@ extern "C" {
             BitI->FileType = BitIOSocket;
             FoundationIO_Socket_Connect(BitI->Socket, SocketAddress, SocketSize);
         } else if (BitI == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitInput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         } else if (SocketAddress == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("SocketAddress Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SocketAddress Pointer is NULL"));
         }
     }
     
@@ -942,7 +942,7 @@ extern "C" {
             FoundationIO_File_Seek(BitI->File, 0, SEEK_SET);
             BitI->FilePosition = (uint64_t) FoundationIO_File_GetSize(BitI->File);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitInput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
     }
     
@@ -954,7 +954,7 @@ extern "C" {
             }
             InputSize     = BitI->FileSize;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitInput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
         return InputSize;
     }
@@ -967,7 +967,7 @@ extern "C" {
             }
             Position    = BitI->FilePosition;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitInput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
         return Position;
     }
@@ -980,7 +980,7 @@ extern "C" {
             }
             BytesLeft    = BitI->FileSize - BitI->FilePosition;
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitInput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
         return BytesLeft;
     }
@@ -994,7 +994,7 @@ extern "C" {
             }
             free(BitI);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitInput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
     }
     /* BitInput */
@@ -1005,7 +1005,7 @@ extern "C" {
         BitOutput *BitO = calloc(1, sizeof(BitOutput));
         if (BitO == NULL) {
             BitOutput_Deinit(BitO);
-            Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate BitOutput"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BitOutput"));
         }
         return BitO;
     }
@@ -1043,9 +1043,9 @@ extern "C" {
             }
 #endif
         } else if (BitO == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitOutput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
         } else if (Path2Open == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Path2Open Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Path2Open Pointer is NULL"));
         }
     }
     
@@ -1076,9 +1076,9 @@ extern "C" {
             }
 #endif
         } else if (BitO == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitOutput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
         } else if (Path2Open == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Path2Open Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Path2Open Pointer is NULL"));
         }
     }
     
@@ -1087,7 +1087,7 @@ extern "C" {
             BitO->FileType  = BitIOSocket;
             BitO->Socket    = FoundationIO_Socket_Create(Domain, Type, Protocol);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitInput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
     }
     
@@ -1096,9 +1096,9 @@ extern "C" {
             BitO->FileType = BitIOSocket;
             FoundationIO_Socket_Connect(BitO->Socket, SocketAddress, SocketSize);
         } else if (BitO == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("BitOutput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
         } else if (SocketAddress == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("SocketAddress Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SocketAddress Pointer is NULL"));
         }
     }
     
@@ -1112,7 +1112,7 @@ extern "C" {
             }
             free(BitO);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("BitOutput Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
         }
     }
     /* BitOutput */
@@ -1140,12 +1140,12 @@ extern "C" {
                     GUUID                = BinaryGUUIDData;
                 }
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate GUUID"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate GUUID"));
             }
         } else if (Random == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Entropy Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
         } else if (GUUIDType == UnknownGUUID) {
-            Log(Log_DEBUG, __func__, UTF8String("UnknownGUUID is an invalid GUUIDType"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("UnknownGUUID is an invalid GUUIDType"));
         }
         return GUUID;
     }
@@ -1160,11 +1160,11 @@ extern "C" {
                 }
             }
         } else if (GUUID1 == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("GUUID1 Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("GUUID1 Pointer is NULL"));
         } else if (GUUID2 == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("GUUID2 Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("GUUID2 Pointer is NULL"));
         } else if (Type2Compare == UnknownGUUID) {
-            Log(Log_DEBUG, __func__, UTF8String("UnknownGUUID is an invalid GUUID type"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("UnknownGUUID is an invalid GUUID type"));
         }
         return GUUIDsMatch;
     }
@@ -1204,13 +1204,13 @@ extern "C" {
                 }
             }
         } else if (ConvertedGUUID == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("Insufficent memory to allocate ConvertedGUUID"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Insufficent memory to allocate ConvertedGUUID"));
         } else if (GUUID2Convert == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("GUUID Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("GUUID Pointer is NULL"));
         } else if (InputType == UnknownGUUID) {
-            Log(Log_DEBUG, __func__, UTF8String("InputType is invalid"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("InputType is invalid"));
         } else if (OutputType == UnknownGUUID) {
-            Log(Log_DEBUG, __func__, UTF8String("OutputType is invalid"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("OutputType is invalid"));
         }
         return ConvertedGUUID;
     }
@@ -1248,7 +1248,7 @@ extern "C" {
                         SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("SwappedGUUID Pointer is NULL"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SwappedGUUID Pointer is NULL"));
                 }
             } else if (GUUIDType == BinaryUUID || GUUIDType == BinaryGUID) {
                 SwappedGUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
@@ -1270,13 +1270,13 @@ extern "C" {
                         SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
                     }
                 } else {
-                    Log(Log_DEBUG, __func__, UTF8String("SwappedGUUID Pointer is NULL"));
+                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SwappedGUUID Pointer is NULL"));
                 }
             }
         } else if (GUUID2Swap == NULL) {
-            Log(Log_DEBUG, __func__, UTF8String("GUUID2Swap Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("GUUID2Swap Pointer is NULL"));
         } else if (GUUIDType == UnknownGUUID) {
-            Log(Log_DEBUG, __func__, UTF8String("UnknownGUUID is an invalid GUUID type"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("UnknownGUUID is an invalid GUUID type"));
         }
         return SwappedGUUID;
     }

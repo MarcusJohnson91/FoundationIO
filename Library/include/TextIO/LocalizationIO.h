@@ -71,6 +71,10 @@ extern "C" {
 #define                   UTF32Character(Literal)               (UTF32) U##Literal
 #endif /* FoundationIO_Unicodize32 */
     
+#ifndef                   FoundationIOFunctionName
+#define                   FoundationIOFunctionName              (UTF8*) __func__
+#endif /* FoundationIOFunctionName */
+    
     /*
      Windows appears to use ISO 639-2, Mac appears to use a mix of ISO-639 1 and 2.
      */

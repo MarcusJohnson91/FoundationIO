@@ -41,7 +41,7 @@ extern "C" {
         } else if (StringSize == 3) { // ISO-639-2
             
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("Invalid Language string length %llu"), StringSize);
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Invalid Language string length %llu"), StringSize);
         }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #endif
@@ -283,7 +283,7 @@ extern "C" {
             Delocalized          = UTF8_Encode(Delocalized32);
             free(Delocalized32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Delocalized;
     }
@@ -297,7 +297,7 @@ extern "C" {
             Delocalized          = UTF16_Encode(Delocalized32);
             free(Delocalized32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Delocalized;
     }
@@ -317,10 +317,10 @@ extern "C" {
                     }
                 } while (String[OGCodePoint] != FoundationIONULLTerminator && DeCodePoint < NumDigits);
             } else {
-                Log(Log_DEBUG, __func__, UTF8String("Couldn't allocate delocaized string"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate delocaized string"));
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Delocalized;
     }
@@ -334,7 +334,7 @@ extern "C" {
             Delocalized          = UTF8_Encode(Delocalized32);
             free(Delocalized32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Delocalized;
     }
@@ -348,7 +348,7 @@ extern "C" {
             Delocalized          = UTF16_Encode(Delocalized32);
             free(Delocalized32);
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Delocalized;
     }
@@ -409,7 +409,7 @@ extern "C" {
                 CodePoint             += 1;
             }
         } else {
-            Log(Log_DEBUG, __func__, UTF8String("String Pointer is NULL"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         
         return Delocalized;
