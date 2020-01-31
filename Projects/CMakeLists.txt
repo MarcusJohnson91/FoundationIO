@@ -133,7 +133,7 @@ ${CMAKE_C_FLAGS} \
 -fshort-enums \
 -funroll-loops \
 -funsigned-char \
--std=c17 \
+-std=c18 \
 -Weverything \
 -Wall \
 -Wextra \
@@ -206,7 +206,7 @@ ${CMAKE_C_FLAGS} \
 -fshort-enums \
 -funroll-loops \
 -funsigned-char \
--std=c17 \
+-std=c18 \
 -Wall \
 -Wextra \
 -Wpedantic \
@@ -215,7 +215,6 @@ ${CMAKE_C_FLAGS} \
 -Wno-pointer-sign \
 -Wno-sign-conversion \
 -Wno-varargs \
--Wno-discarded-qualifier \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
