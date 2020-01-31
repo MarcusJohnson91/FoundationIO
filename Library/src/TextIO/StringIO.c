@@ -1704,30 +1704,40 @@ extern "C" {
         return Replaced16;
     }
     
-    UTF32 *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length) {
+    UTF32 *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length) { // 1: "%03o", 2: "014"
         UTF32 *NewString                            = NULL;
         if (String != NULL && Replacement != NULL) {
             uint64_t StringSize                     = UTF32_GetStringSizeInCodePoints(String);
             uint64_t ReplacementSize                = UTF32_GetStringSizeInCodePoints(Replacement);
-            uint64_t NewStringSize                  = (StringSize + ReplacementSize) - (Length + 1);
+            uint64_t NewStringSize                  = (StringSize + ReplacementSize) - Length;
             NewString                               = UTF32_Init(NewStringSize);
             if (NewString != NULL) {
                 uint64_t NewCodePoint               = 0ULL;
                 uint64_t StringCodePoint            = 0ULL;
                 uint64_t ReplacementCodePoint       = 0ULL;
                 
-                while (NewCodePoint < NewStringSize && StringCodePoint < StringSize) { // StringCodePoint + Length + 1 < StringSize
-                    if (NewCodePoint < Offset) {
-                        NewString[NewCodePoint]     = String[StringCodePoint];
-                        StringCodePoint            += 1;
-                    } else if (NewCodePoint >= Offset && NewCodePoint < Offset + ReplacementSize) {
-                        NewString[NewCodePoint]     = Replacement[ReplacementCodePoint];
-                        ReplacementCodePoint       += 1;
-                    } else if (NewCodePoint >= Offset + ReplacementSize) {
-                        NewString[NewCodePoint]     = String[StringCodePoint + Length + 1];
-                        StringCodePoint            += 1;
+                /*
+                 
+                 Theres 2 cases to pay attention to:
+                 
+                 ReplacementString is shorter than Length:
+                 
+                 
+                 ReplacementString is longer than length:
+                 
+                 */
+                
+                while (NewCodePoint < NewStringSize && StringCodePoint < StringSize) {
+                    if (NewCodePoint >= Offset && NewCodePoint <= ReplacementSize) {
+                        NewString[NewCodePoint] = Replacement[ReplacementCodePoint];
+                        NewCodePoint           += 1;
+                        ReplacementCodePoint   += 1;
+                    } else {
+                        NewString[NewCodePoint] = String[StringCodePoint];
+                        NewCodePoint           += 1;
+                        StringCodePoint        += 1;
                     }
-                    NewCodePoint                   += 1;
+                    //NewCodePoint               += 1;
                 }
             }
         } else if (String == NULL) {
