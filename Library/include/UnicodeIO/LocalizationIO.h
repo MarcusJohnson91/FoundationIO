@@ -55,8 +55,8 @@ extern "C" {
     
 #ifndef                   FoundationIO_Unicodize8
 #define                   FoundationIO_Unicodize8               (1)
-#define                   UTF8String(Literal)                   (const UTF8*) u8##Literal
-#define                   UTF8Character(Literal)                (const UTF8)  u8##Literal
+#define                   UTF8String(Literal)                   (UTF8*) u8##Literal
+#define                   UTF8Character(Literal)                (UTF8)  u8##Literal
 #endif /* FoundationIO_Unicodize8 */
     
 #ifndef                   FoundationIO_Unicodize16
