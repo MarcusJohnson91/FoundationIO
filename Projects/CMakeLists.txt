@@ -31,7 +31,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
-set(libFoundationIO_Dir "${CMAKE_CURRENT_SOURCE_DIR}/../Library")
+set(Library_Dir "${CMAKE_CURRENT_SOURCE_DIR}/../Library")
 
 set(Test_Dir "${CMAKE_CURRENT_SOURCE_DIR}/../Tests")
 
@@ -40,38 +40,38 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHI
 set(RUNTIME_OUTPUT_DIRECTORY       "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
 
 set(PUBLIC_HEADER
-"${libFoundationIO_Dir}/include/BitIO.h"
-"${libFoundationIO_Dir}/include/ContainerIO.h"
-"${libFoundationIO_Dir}/include/CryptographyIO.h"
-"${libFoundationIO_Dir}/include/Macros.h"
-"${libFoundationIO_Dir}/include/MathIO.h"
-"${libFoundationIO_Dir}/include/TestIO.h"
-"${libFoundationIO_Dir}/include/UnicodeIO/CommandLineIO.h"
-"${libFoundationIO_Dir}/include/UnicodeIO/FormatIO.h"
-"${libFoundationIO_Dir}/include/UnicodeIO/LocalizationIO.h"
-"${libFoundationIO_Dir}/include/UnicodeIO/LogIO.h"
-"${libFoundationIO_Dir}/include/UnicodeIO/StringIO.h"
+"${Library_Dir}/include/BitIO.h"
+"${Library_Dir}/include/ContainerIO.h"
+"${Library_Dir}/include/CryptographyIO.h"
+"${Library_Dir}/include/Macros.h"
+"${Library_Dir}/include/MathIO.h"
+"${Library_Dir}/include/TestIO.h"
+"${Library_Dir}/include/UnicodeIO/CommandLineIO.h"
+"${Library_Dir}/include/UnicodeIO/FormatIO.h"
+"${Library_Dir}/include/UnicodeIO/LocalizationIO.h"
+"${Library_Dir}/include/UnicodeIO/LogIO.h"
+"${Library_Dir}/include/UnicodeIO/StringIO.h"
 )
 
-set(libFoundationIO_Sources
-"${libFoundationIO_Dir}/src/BitIO.c"
-"${libFoundationIO_Dir}/src/ContainerIO.c"
-"${libFoundationIO_Dir}/src/CryptographyIO.c"
-"${libFoundationIO_Dir}/src/Macros.c"
-"${libFoundationIO_Dir}/src/MathIO.c"
-"${libFoundationIO_Dir}/src/TestIO.c"
-"${libFoundationIO_Dir}/src/UnicodeIO/CommandLineIO.c"
-"${libFoundationIO_Dir}/src/UnicodeIO/FormatIO.c"
-"${libFoundationIO_Dir}/src/UnicodeIO/LocalizationIO.c"
-"${libFoundationIO_Dir}/src/UnicodeIO/LogIO.c"
-"${libFoundationIO_Dir}/src/UnicodeIO/StringIO.c"
+set(Library_Sources
+"${Library_Dir}/src/BitIO.c"
+"${Library_Dir}/src/ContainerIO.c"
+"${Library_Dir}/src/CryptographyIO.c"
+"${Library_Dir}/src/Macros.c"
+"${Library_Dir}/src/MathIO.c"
+"${Library_Dir}/src/TestIO.c"
+"${Library_Dir}/src/UnicodeIO/CommandLineIO.c"
+"${Library_Dir}/src/UnicodeIO/FormatIO.c"
+"${Library_Dir}/src/UnicodeIO/LocalizationIO.c"
+"${Library_Dir}/src/UnicodeIO/LogIO.c"
+"${Library_Dir}/src/UnicodeIO/StringIO.c"
 )
 
 if(NOT ${CMAKE_BUILD_TYPE})
     set(CMAKE_BUILD_TYPE "${MinSizeRel}")
 endif(NOT ${CMAKE_BUILD_TYPE})
 
-add_library(FoundationIO ${libFoundationIO_Sources} ${PUBLIC_HEADER})
+add_library(FoundationIO ${Library_Sources} ${PUBLIC_HEADER})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(FoundationIO ws2_32 bcrypt)
