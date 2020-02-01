@@ -72,7 +72,7 @@ extern "C" {
 #endif /* FoundationIO_Unicodize32 */
     
 #ifndef                   FoundationIOFunctionName
-#define                   FoundationIOFunctionName              (UTF8*) __func__
+#define                   FoundationIOFunctionName              (const UTF8*) __func__
 #endif /* FoundationIOFunctionName */
     
     /*

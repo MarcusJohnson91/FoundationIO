@@ -8,6 +8,7 @@ extern "C" {
     
     static FILE  *Log_LogFile      = NULL;
     static UTF32 *Log_ProgramName  = NULL;
+    static UTF8  *Log_Path         = UTF8String("/Users/Marcus/Desktop/FormatIO_Test.log");
     
     void Log_SetProgramName(UTF8 *ProgramName) {
         if (ProgramName != NULL) {
@@ -107,7 +108,11 @@ extern "C" {
         }
     }
     
-    void Log(LogTypes Severity, UTF8 *FunctionName, UTF8 *Description, ...) {
+    void Log(LogTypes Severity, const UTF8 *FunctionName, UTF8 *Description, ...) {
+        if (Log_Path != NULL && Log_LogFile == NULL) {
+            Log_UTF8_OpenFile(Log_Path);
+        }
+        
         va_list VariadicArguments;
         va_start(VariadicArguments, Description);
         UTF8 *VariadicString  = UTF8_Format(Description, VariadicArguments);
@@ -118,17 +123,12 @@ extern "C" {
         if (Log_ProgramName != NULL) {
             FormattedString   = UTF8_Format(UTF8String("%Us in %s's %s: %s%s"), *Log_ProgramName, ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
         } else {
-            //FormattedString   = UTF8_Format(UTF8String("%s in %s: %s%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
-            printf(UTF8String("%s in %s: %s%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
+            FormattedString   = UTF8_Format(UTF8String("%s in %s: %s%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
+            //printf(UTF8String("%s in %s: %s%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
         }
         
-        if (Severity == Log_USER) {
-            UTF8_WriteLine(stdout, FormattedString);
-            fflush(stdout);
-        } else if (Severity == Log_DEBUG) {
-            UTF8_WriteLine(stderr, FormattedString);
-            fflush(stderr);
-        }
+        UTF8_WriteLine(Severity == Log_USER ? stdout : stderr, FormattedString);
+        fflush(stdout);
         
         if (Log_LogFile != NULL) {
             UTF8_WriteLine(Log_LogFile, FormattedString);
