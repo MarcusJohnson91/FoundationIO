@@ -16,7 +16,7 @@ extern "C" {
             uint8_t  NumDigits = NumDigitsInInteger(10, -Value);
             /*
              if (LogCeil != NumDigits) {
-             //Log(Log_DEBUG, __func__, UTF8String("NumBits %llu is incorrect"), NumBits);
+             //Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumBits %llu is incorrect"), NumBits);
              }
              */
         }
@@ -29,7 +29,7 @@ extern "C" {
             int64_t  Value   = Entropy_GenerateInteger(Random, NumBits);
             uint8_t  LogCeil = Logarithm(2, Value);
             if (LogCeil != NumBits) {
-                Log(Log_DEBUG, __func__, UTF8String("NumBits %llu is incorrect"), NumBits);
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumBits %llu is incorrect"), NumBits);
             }
         }
     }
@@ -46,7 +46,7 @@ extern "C" {
             int64_t Maximum1 = Maximum(Integer1, Integer2);
             
             if (Minimum1 > Maximum1) {
-                Log(Log_DEBUG, __func__, UTF8String("Minimum/Maximum failed!"));
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Minimum/Maximum failed!"));
             }
         }
     }

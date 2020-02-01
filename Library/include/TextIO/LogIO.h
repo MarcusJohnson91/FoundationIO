@@ -72,7 +72,7 @@ extern "C" {
 #endif /* FoundationIO_Unicodize32 */
     
 #ifndef                   FoundationIOFunctionName
-#define                   FoundationIOFunctionName              (UTF8*) __func__
+#define                   FoundationIOFunctionName              (const UTF8*) __func__
 #endif /* FoundationIOFunctionName */
     
 #if (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
@@ -142,9 +142,9 @@ extern "C" {
      @param                     Description                     "String describing what went wrong".
      */
 #if   (FoundationIOCompiler == FoundationIOCompilerIsClang)
-    void                        Log(LogTypes Severity, UTF8 *FunctionName, UTF8 *Description, ...) __attribute__((__format__(__printf__, 3, 4)));
+    void                        Log(LogTypes Severity, const UTF8 *FunctionName, UTF8 *Description, ...) __attribute__((__format__(__printf__, 3, 4)));
 #elif (FoundationIOCompiler == FoundationIOCompilerIsGCC)
-    void                        Log(LogTypes Severity, UTF8 *FunctionName, UTF8 *Description, ...);
+    void                        Log(LogTypes Severity, const UTF8 *FunctionName, UTF8 *Description, ...);
 #elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 #include <sal.h>
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
