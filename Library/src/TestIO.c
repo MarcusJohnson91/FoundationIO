@@ -3,9 +3,9 @@
 #include "../include/UnicodeIO/LogIO.h"          /* Included for error reporting */
 #include "../include/UnicodeIO/StringIO.h"       /* Included for UTFX_Init functions */
 
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && ((FoundationIOTargetOS & FoundationIOAppleOS) != FoundationIOAppleOS))
 #include <time.h>                      /* Included for timespec_get */
-#elif (FoundationIOTargetOS == FoundationIOAppleOS)
+#elif (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && ((FoundationIOTargetOS & FoundationIOAppleOS) == FoundationIOAppleOS))
 #include <mach/mach_time.h>
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #ifndef   WIN32_LEAN_AND_MEAN
@@ -42,12 +42,54 @@ extern "C" {
      we might also want to have a good randomnes generator (maybe even Unicode)
      */
     
+    /*
+     
+     Catch2 Layout:
+     
+     TEST_CASE -> INTERNAL_CATCH_TESTCASE -> INTERNAL_CATCH_TESTCASE -> INTERNAL_CATCH_TESTCASE2 ->
+     
+     #define INTERNAL_CATCH_TESTCASE2(TestName, ...)                                                                                                                                     \
+     static void TestName();                                                                                                                                                         \
+     CATCH_INTERNAL_START_WARNINGS_SUPPRESSION                                                                                                                                       \
+     CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                                        \
+     namespace {                                                                                                                                                                     \
+     Catch::AutoReg INTERNAL_CATCH_UNIQUE_NAME(autoRegistrar)(Catch::makeTestInvoker(&TestName), CATCH_INTERNAL_LINEINFO, Catch::StringRef(), Catch::NameAndTags {__VA_ARGS__}); \
+     }                                                                                                                                                                   \
+    CATCH_INTERNAL_STOP_WARNINGS_SUPPRESSION                                                                                                                                        \
+    static void TestName()
+     
+     TestIO Layout:
+     
+     ? -> ?? -> ??? -> TestIO_CreateFunction(FunctionBeingTested, TestNumber, ...)
+     
+     Should _Generic be involved?
+     
+     #define TestIO_String_CreateFunction(FunctionBeingTested, TestNumber, ...) \
+     static bool FunctionBeingTested##TestNumber(void) { \
+     
+     #define TestIO_TestString(FunctionName, ReturnType, SolutionString, TestString, TestArguments ...) \
+     Hmm we need to get the type name from the FunctionName and we need to know if it's a pointer or not, well really just copy the return type?
+     ReturnType Result = FunctionName(TestString, TestArguments);
+     
+     
+     
+     */
+    
+    //typedef struct TestIORegistry {
+        /*
+         
+         Well, we need to know the test function names, as well as if they're enabled or not
+         
+         */
+        //void Function_RegisterTestCase(void);
+    //} TestIORegistry;
+    
     uint64_t GetTimerFrequency(void) {
         uint64_t TimerFrequency = 0LL;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
-        clock_getres(TimerFrequency);
-#elif (FoundationIOTargetOS == FoundationIOAppleOS)
-        
+#if ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+        struct timespec Resolution;
+        clock_getres(CLOCK_MONOTONIC, &Resolution);
+        TimerFrequency = Resolution.tv_nsec;
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         QueryPerformanceFrequency(TimerFrequency);
 #endif
@@ -57,16 +99,12 @@ extern "C" {
     uint64_t GetTime_Elapsed(void) {
         uint64_t Time        = 0ULL;
         uint64_t CurrentTime = 0ULL;
-#if (FoundationIOTargetOS == FoundationIOPOSIXOS)
-        struct timespec       *TimeSpec;
-#endif
-        
-        
         for (uint8_t Loop = 1; Loop <= 3; Loop++) {
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS)
+#if   ((FoundationIOTargetOS & FoundationIOAppleOS) == FoundationIOAppleOS)
+                CurrentTime      = mach_continuous_time();
+#elif (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && ((FoundationIOTargetOS & FoundationIOLinuxOS) == FoundationIOLinuxOS))
+            struct timespec *TimeSpec = NULL;
             clock_gettime(CLOCK_MONOTONIC, TimeSpec);
-#elif (FoundationIOTargetOS == FoundationIOAppleOS)
-            CurrentTime      = mach_continuous_time();
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             QueryPerformanceFrequency(CurrentTime);
 #endif

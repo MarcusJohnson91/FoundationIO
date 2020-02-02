@@ -1,7 +1,7 @@
-#include "../../include/Macros.h"                           /* Included for FoundationIOSTDVersion */
-#include "../../include/UnicodeIO/Private/UnicodeTables.h"  /* Included for Currency tables */
+#include "../../include/Macros.h"                           /* Included for FoundationIOStandardVersion */
 #include "../../include/UnicodeIO/LocalizationIO.h"         /* Included for our declarations */
 #include "../../include/UnicodeIO/LogIO.h"                  /* Included for error logging */
+#include "../../include/UnicodeIO/Private/UnicodeTables.h"  /* Included for Currency tables */
 #include "../../include/UnicodeIO/StringIO.h"               /* Included for UTF8_GetStringSizeInCideUnits */
 #include <locale.h>
 
@@ -20,7 +20,7 @@ extern "C" {
     
     LocalizationIO_LanguageIDs Localize_GetLanguageID(void) {
         LocalizationIO_LanguageIDs LanguageID = LanguageID_Unknown;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         /* POSIX uses ISO 639-1 if possible, otherwise ISO 639-2 */
         UTF8 *LocaleAll        = setlocale(LC_ALL, NULL);
         uint8_t EndOffset      = UTF8_FindSubString(LocaleAll, UTF8String("_"), 0, 1);
@@ -50,12 +50,8 @@ extern "C" {
     
     LocalizationIO_RegionIDs Localize_GetRegionID(void) {
         LocalizationIO_RegionIDs RegionID = RegionID_Unknown;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         UTF8 *LocaleAll        = setlocale(LC_ALL, NULL);
-        
-        
-        
-        
         
         uint64_t StringSize    = UTF8_GetStringSizeInCodeUnits(LocaleAll);
         if (StringSize == 2) { // ISO-639-1
@@ -70,7 +66,7 @@ extern "C" {
     
     LocalizationIO_EncodingIDs Localize_GetEncodingID(void) {
         LocalizationIO_EncodingIDs Encoding = EncodingID_Unknown;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         lconv_Init();
         UTF8 *LocaleString              = getenv(UTF8String("LANG"));
         if (LocaleString != NULL) {
@@ -134,7 +130,7 @@ extern "C" {
         UTF8 *DecimalSeperator         = NULL;
         lconv_Init();
         struct lconv *Locale           = localeconv();
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         DecimalSeperator               = UTF8_Clone(Locale->decimal_point);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         UTF16 *DecimalSeperator16      = UTF16_Clone(Locale->_W_decimal_point);
@@ -152,7 +148,7 @@ extern "C" {
         UTF16 *DecimalSeperator        = NULL;
         lconv_Init();
         struct lconv *Locale           = localeconv();
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         UTF8  *DecimalSeperator8       = UTF8_Clone(Locale->decimal_point);
         if (DecimalSeperator8 != NULL) {
             UTF32 *DecimalSeperator32  = UTF8_Decode(DecimalSeperator8);
@@ -170,7 +166,7 @@ extern "C" {
         UTF8 *GroupingSeperator         = NULL;
         lconv_Init();
         struct lconv *Locale            = localeconv();
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         GroupingSeperator               = UTF8_Clone(Locale->thousands_sep);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         UTF16 *GroupingSeperator16      = UTF16_Clone(Locale->_W_thousands_sep);
@@ -188,7 +184,7 @@ extern "C" {
         UTF16 *GroupingSeperator        = NULL;
         lconv_Init();
         struct lconv *Locale            = localeconv();
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         UTF8  *GroupingSeperator8       = UTF8_Clone(Locale->thousands_sep);
         if (GroupingSeperator8 != NULL) {
             UTF32 *GroupingSeperator32  = UTF8_Decode(GroupingSeperator8);
@@ -206,7 +202,7 @@ extern "C" {
         UTF8    **GroupingSize          = NULL;
         lconv_Init();
         struct lconv *Locale            = localeconv();
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         UTF8 *GroupingSizeString        = Locale->grouping;
         UTF8 *Delimiters[]              = {UTF8String("/"), UTF8String("\\")};
         GroupingSize                    = UTF8_Split(GroupingSizeString, Delimiters);
@@ -242,7 +238,7 @@ extern "C" {
         UTF8 *CurrencySymbol            = NULL;
         lconv_Init();
         struct lconv *Locale            = localeconv();
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         CurrencySymbol                  = UTF8_Clone(Locale->currency_symbol);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         UTF8  *CurrencySymbol8          = UTF8_Clone(Locale->currency_symbol);
@@ -260,7 +256,7 @@ extern "C" {
         UTF16 *CurrencySymbol           = NULL;
         lconv_Init();
         struct lconv *Locale            = localeconv();
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         UTF8  *CurrencySymbol8          = UTF8_Clone(Locale->currency_symbol);
         if (CurrencySymbol8 != NULL) {
             UTF32 *CurrencySymbol32     = UTF8_Decode(CurrencySymbol8);

@@ -1,8 +1,8 @@
 #include "../../include/MathIO.h"                          /* Included for endian swapping */
 #include "../../include/Private/Constants.h"               /* Included for Integer/Decimal Tables*/
-#include "../../include/UnicodeIO/Private/UnicodeTables.h" /* Included for the Unicode tables */
 #include "../../include/UnicodeIO/FormatIO.h"              /* Included for the String formatting code */
 #include "../../include/UnicodeIO/LogIO.h"                 /* Included for error logging */
+#include "../../include/UnicodeIO/Private/UnicodeTables.h" /* Included for the Unicode tables */
 #include "../../include/UnicodeIO/StringIO.h"              /* Included for our declarations */
 
 #ifdef __cplusplus
@@ -676,7 +676,7 @@ extern "C" {
     bool UTF8_IsAbsolutePath(UTF8 *String) {
         bool PathIsAbsolute = No;
         if (String != NULL) {
-#if  (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if  ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
             if (String[0] == '/') { // Assumes there is no BOM
                 PathIsAbsolute     = Yes;
             }
@@ -697,7 +697,7 @@ extern "C" {
     bool UTF16_IsAbsolutePath(UTF16 *String) {
         bool PathIsAbsolute        = No;
         if (String != NULL) {
-#if  (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if  ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
             if (String[0] == UTF16Character('/')) {
                 PathIsAbsolute     = Yes;
             }
@@ -718,7 +718,7 @@ extern "C" {
     bool UTF32_IsAbsolutePath(UTF32 *String) {
         bool PathIsAbsolute = No;
         if (String != NULL) {
-#if  (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if  ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
             if (String[0] == UTF32Character('/')) {
                 PathIsAbsolute = Yes;
             }
@@ -1279,7 +1279,7 @@ extern "C" {
         if (Orientation < 0) {
             StringType                 = StringType_UTF8;
         } else if (Orientation > 0) {
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
             StringType                 = StringType_UTF32;
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             StringType                 = StringType_UTF16;

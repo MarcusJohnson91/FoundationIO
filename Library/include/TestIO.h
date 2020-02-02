@@ -21,7 +21,7 @@ extern "C" {
 #ifdef    UTF32
 #undef    UTF32
 #endif /* UTF32 */
-#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (FoundationIOStandardVersion >= FoundationIOStandardVersionC2X))
     typedef                     char32_t                        UTF32;
 #else
     typedef                     uint_least32_t                  UTF32;

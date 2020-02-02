@@ -22,7 +22,7 @@ extern "C" {
 #ifdef    UTF8
 #undef    UTF8
 #endif /* UTF8 */
-#if (defined __STDC_UTF_8__ && defined __CHAR8_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (FoundationIOStandardVersion >= FoundationIOStandardVersionC2X))
     typedef               char8_t                               UTF8;
 #else
     typedef               unsigned char                         UTF8;
@@ -34,7 +34,7 @@ extern "C" {
 #ifdef    UTF16
 #undef    UTF16
 #endif /* UTF16 */
-#if (defined __STDC_UTF_16__ && defined __CHAR16_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (FoundationIOStandardVersion >= FoundationIOStandardVersionC2X))
     typedef               char16_t                              UTF16;
 #else
     typedef               uint_least16_t                        UTF16;
@@ -46,7 +46,7 @@ extern "C" {
 #ifdef    UTF32
 #undef    UTF32
 #endif /* UTF32 */
-#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (FoundationIOStandardVersion >= FoundationIOStandardVersionC2X))
     typedef               char32_t                              UTF32;
 #else
     typedef               uint_least32_t                        UTF32;
@@ -75,7 +75,7 @@ extern "C" {
 #define                   FoundationIOFunctionName              (const UTF8*) __func__
 #endif /* FoundationIOFunctionName */
     
-#if (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
 #undef LOG_EMERG
 #undef LOG_ALERT
 #undef LOG_CRIT
@@ -105,7 +105,7 @@ extern "C" {
 #undef LOG_LOCAL5
 #undef LOG_LOCAL6
 #undef LOG_LOCAL7
-#endif
+#endif /* If POSIX */
     
     /*!
      @enum                      LogTypes

@@ -461,7 +461,7 @@ extern "C" {
         return NumDigits;
     }
     
-#if (FoundationIOCompiler != FoundationIOCompilerIsMSVC)
+#if (FoundationIOCompiler == FoundationIOCompilerIsClang)
 	uint64_t RotateLeft(uint64_t Value, uint8_t Bits2Rotate) __attribute__((no_sanitize("shift-exponent"))) {
 #else
 	uint64_t RotateLeft(uint64_t Value, uint8_t Bits2Rotate) {

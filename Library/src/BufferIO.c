@@ -2,9 +2,9 @@
 #include "../include/CryptographyIO.h"       /* Included for Entropy_GenerateInteger for GUUID_Generate */
 #include "../include/MathIO.h"               /* Included for Integer functions */
 #include "../include/Private/Constants.h"    /* Included for BitMaskTables */
+#include "../include/UnicodeIO/FormatIO.h"   /* Included for UTF32_Format */
 #include "../include/UnicodeIO/LogIO.h"      /* Included for Logging */
 #include "../include/UnicodeIO/StringIO.h"   /* Included for StringIO's declarations */
-#include "../include/UnicodeIO/FormatIO.h"   /* Included for UTF32_Format */
 
 #ifdef __cplusplus
 extern "C" {
@@ -832,7 +832,7 @@ extern "C" {
     void BitInput_UTF8_OpenFile(BitInput *BitI, UTF8 *Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType                   = BitIOFile;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
             bool PathHasBOM                  = UTF8_HasBOM(Path2Open);
             if (PathHasBOM == No) {
                 BitI->File                   = FoundationIO_File_Open(Path2Open, UTF8String("rb"));
@@ -868,7 +868,7 @@ extern "C" {
             BitI->FileType                   = BitIOFile;
             UTF32 *Path32                    = NULL;
             UTF8  *Path8                     = NULL;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
             Path32                           = UTF16_Decode(Path2Open);
             bool   PathHasBOM                = UTF16_HasBOM(Path2Open);
             bool   PathHasWinPrefix          = UTF16_IsUNCPath(Path2Open);
@@ -1013,7 +1013,7 @@ extern "C" {
     void BitOutput_UTF8_OpenFile(BitOutput *BitO, UTF8 *Path2Open) {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType                   = BitIOFile;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
             bool PathHasBOM                  = UTF8_HasBOM(Path2Open);
             if (PathHasBOM == No) {
                 BitO->File                   = FoundationIO_File_Open(Path2Open, UTF8String("rb"));
@@ -1053,7 +1053,7 @@ extern "C" {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType              = BitIOFile;
             bool  PathHasBOM            = No;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
             UTF32 *Decoded              = UTF16_Decode(Path2Open);
             PathHasBOM                  = UTF32_HasBOM(Decoded);
             UTF8 *Fixed                 = NULL;

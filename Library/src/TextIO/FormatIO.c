@@ -1,8 +1,8 @@
+#include "../../include/MathIO.h"                      /* Included for Logarithm */
 #include "../../include/Private/Constants.h"           /* Included for the Number tables */
 #include "../../include/UnicodeIO/FormatIO.h"          /* Included for our declarations */
 #include "../../include/UnicodeIO/LogIO.h"             /* Included for Logging */
 #include "../../include/UnicodeIO/StringIO.h"          /* Included for StringIOBases */
-#include "../../include/MathIO.h"                      /* Included for Logarithm */
 
 #ifdef __cplusplus
 extern "C" {
@@ -264,7 +264,7 @@ extern "C" {
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_CodeUnit;
                             if (CodePoint >= 1 && Format[CodePoint - 1] == UTF32Character('l')) {
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
                                 Specifiers->Specifiers[Specifier].TypeModifier           = Modifier_UTF32;
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
                                 Specifiers->Specifiers[Specifier].TypeModifier           = Modifier_UTF16;
@@ -287,7 +287,7 @@ extern "C" {
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_String;
                             if (CodePoint >= 1 && Format[CodePoint - 1] == UTF32Character('l')) {
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
                                 Specifiers->Specifiers[Specifier].TypeModifier           = Modifier_UTF32;
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
                                 Specifiers->Specifiers[Specifier].TypeModifier           = Modifier_UTF16;
@@ -310,7 +310,7 @@ extern "C" {
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_String;
                             if (CodePoint >= 1 && Format[CodePoint - 1] == UTF32Character('l')) {
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
                                 Specifiers->Specifiers[Specifier].TypeModifier           = Modifier_UTF32;
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
                                 Specifiers->Specifiers[Specifier].TypeModifier           = Modifier_UTF16;
@@ -333,7 +333,7 @@ extern "C" {
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_String;
                             if (CodePoint >= 1 && Format[CodePoint - 1] == UTF32Character('l')) {
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
                                 Specifiers->Specifiers[Specifier].TypeModifier           = Modifier_UTF32;
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
                                 Specifiers->Specifiers[Specifier].TypeModifier           = Modifier_UTF16;
@@ -582,7 +582,7 @@ extern "C" {
                             if (CodePoint >= 1 && Format[CodePoint - 1] == UTF32Character('*')) {
                                 Specifiers->Specifiers[Specifier].PositionFlag = Position_Asterisk_NextArg;
                             } else if (CodePoint >= 1 && Format[CodePoint - 1] >= UTF32Character('0') && Format[CodePoint - 1] <= UTF32Character('9')) {
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
                                 uint8_t  MaxDigits              = Logarithm(10, NL_ARGMAX);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
                                 uint8_t  MaxDigits              = Logarithm(10, _ARGMAX);
@@ -595,7 +595,7 @@ extern "C" {
                                 uint64_t NumPossibleCodePoints  = PotentialDigitLocation - CodePoint;
                                 uint8_t  NumDigits2Read         = Minimum(NumPossibleCodePoints, MaxDigits);
                                 uint64_t Value                  = UTF32_String2Integer(Base_Integer_Radix10, &Format[CodePoint - NumDigits2Read]);
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
                                 if (Value <= NL_ARGMAX) {
                                     Specifiers->Specifiers[Specifier].Position = Value;
                                 } else {

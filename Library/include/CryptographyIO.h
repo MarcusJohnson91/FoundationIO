@@ -22,7 +22,7 @@ extern "C" {
 #ifdef    UTF8
 #undef    UTF8
 #endif /* UTF8 */
-#if (defined __STDC_UTF_8__ && defined __CHAR8_TYPE__ && FoundationIOSTDVersion >= FoundationIOSTDVersionC2X) && (FoundationIOTargetOS != FoundationIOAppleOS)
+#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (FoundationIOStandardVersion >= FoundationIOStandardVersionC2X))
     typedef           char8_t              UTF8;
 #else
     typedef           unsigned char        UTF8;
