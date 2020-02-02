@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "../Macros.h"
 
 #pragma once
 
@@ -14,7 +14,7 @@ extern "C" {
 #ifdef    UTF32
 #undef    UTF32
 #endif /* UTF32 */
-#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (FoundationIOTargetOS != FoundationIOAppleOS)
+#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (FoundationIOStandardVersion >= FoundationIOStandardVersionC2X))
 	typedef               char32_t                             UTF32;
 #else
 	typedef               uint_least32_t                       UTF32;

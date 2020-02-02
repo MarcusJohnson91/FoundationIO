@@ -1,6 +1,6 @@
 #include "../include/Macros.h"
 
-#if   (FoundationIOSTDVersion >= FoundationIOSTDVersionC99)
+#if   (FoundationIOStandardVersion >= FoundationIOStandardVersionC99)
 #include <tgmath.h>
 #if (defined __STDC_NO_COMPLEX__)
 #include <math.h>

@@ -1,6 +1,6 @@
 #include "../include/Macros.h"
 
-#if (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
 #include <stddef.h>
 #include <unistd.h>
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
@@ -13,7 +13,9 @@ extern "C" {
     
     uint64_t FoundationIO_GetNumCPUCores(void) {
         uint64_t NumCPUCores = 0ULL;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
+#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && ((FoundationIOTargetOS & FoundationIOAppleOS) != FoundationIOAppleOS))
+        NumCPUCores          = sysconf(_SC_NPROCESSORS_ONLN);
+#elif (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) || ((FoundationIOTargetOS & FoundationIOAppleOS) == FoundationIOAppleOS))
         int SysInfo[2]  = {CTL_HW, HW_AVAILCPU};
         size_t Length   = sizeof(int);
         sysctl(SysInfo, 2, &NumCPUCores, &Length, NULL, 0);
@@ -30,7 +32,7 @@ extern "C" {
     
     uint64_t FoundationIO_GetTotalMemoryInBytes(void) {
         uint64_t TotalMemory = 0ULL;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         uint64_t NumPages    = (uint64_t) sysconf(_SC_PHYS_PAGES);
         uint64_t PageSize    = (uint64_t) sysconf(_SC_PAGE_SIZE);
         TotalMemory          = NumPages * PageSize;

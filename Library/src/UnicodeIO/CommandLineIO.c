@@ -3,10 +3,13 @@
 #include "../../include/UnicodeIO/LogIO.h"          /* Included for Logging */
 #include "../../include/UnicodeIO/StringIO.h"       /* Included for StringIO's declarations */
 
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
+#if (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (((FoundationIOTargetOS & FoundationIOLinuxOS) != FoundationIOLinuxOS)))
 #include <signal.h>                    /* Included for SIGWINCH handling */
 #include <sys/ioctl.h>                 /* Included for the terminal size */
 #include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
+#elif (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (((FoundationIOTargetOS & FoundationIOLinuxOS) == FoundationIOLinuxOS)))
+#include <signal.h>                    /* Included for SIGWINCH handling */
+#include <sys/ioctl.h>                 /* Included for the terminal size */
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
 #ifndef   WIN32_LEAN_AND_MEAN
 #define   WIN32_LEAN_AND_MEAN
@@ -80,7 +83,7 @@ extern "C" {
     
     uint64_t       CommandLineIO_GetTerminalWidth(void) {
         uint64_t Width = 0ULL;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         struct winsize       WindowSize;
         ioctl(0, TIOCGWINSZ, &WindowSize);
         Width          = WindowSize.ws_row;
@@ -94,7 +97,7 @@ extern "C" {
     
     uint64_t       CommandLineIO_GetTerminalHeight(void) {
         uint64_t Height = 0ULL;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         struct winsize       WindowSize;
         ioctl(0, TIOCGWINSZ, &WindowSize);
         Height          = WindowSize.ws_row;
@@ -108,7 +111,7 @@ extern "C" {
     
     bool           CommandLineIO_TerminalWasResized(void) {
         bool SizeChanged = No;
-#if   (FoundationIOTargetOS == FoundationIOPOSIXOS) || (FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         /*
          We're creating a text UI to show the progress of the program.
          The user resizes the window
@@ -491,9 +494,9 @@ extern "C" {
     
     uint64_t CommandLineIO_GetNumArguments(int argc) {
         uint64_t NumArguments = 0ULL;
-#if (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         NumArguments          = (uint64_t) argc;
-#elif   (FoundationIOTargetOS == FoundationIOWindowsOS)
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         NumArguments          = (uint64_t) __argc;
 #endif
         return NumArguments;
@@ -501,9 +504,9 @@ extern "C" {
     
     UTF32 **CommandLineIO_GetArgumentArray(void **Arguments) {
         UTF32 **ArgumentArray           = NULL;
-#if (FoundationIOTargetOS == FoundationIOPOSIXOS || FoundationIOTargetOS == FoundationIOAppleOS)
-        ArgumentArray                   = UTF8_StringArray_Decode((UTF8**) Arguments);
-#elif   (FoundationIOTargetOS == FoundationIOWindowsOS)
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+        ArgumentArray                   = (UTF32**) UTF8_StringArray_Decode((UTF8**) Arguments);
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         uint64_t NumArguments           = (uint64_t) __argc;
         ArgumentArray                   = UTF32_StringArray_Init(NumArguments);
         if (ArgumentArray != NULL) {
