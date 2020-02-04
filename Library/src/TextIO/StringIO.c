@@ -57,7 +57,7 @@ extern "C" {
     
     UTF8 *UTF8_Init(uint64_t NumCodeUnits) {
         UTF8 *String = NULL;
-        String       = calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
+        String       = (UTF8*) calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
         if (String == NULL) {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF8)) + FoundationIONULLTerminatorSize);
         }
@@ -66,7 +66,7 @@ extern "C" {
     
     UTF16 *UTF16_Init(uint64_t NumCodeUnits) {
         UTF16 *String = NULL;
-        String        = calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF16));
+        String        = (UTF16*) calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF16));
         if (String == NULL) {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF16)) + FoundationIONULLTerminatorSize);
         }
@@ -75,7 +75,7 @@ extern "C" {
     
     UTF32 *UTF32_Init(uint64_t NumCodePoints) {
         UTF32 *String = NULL;
-        String        = calloc(NumCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
+        String        = (UTF32*) calloc(NumCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
         if (String == NULL) {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodePoints * sizeof(UTF32)) + FoundationIONULLTerminatorSize);
         }
@@ -983,7 +983,7 @@ extern "C" {
         return DecodedString;
     }
     
-    StringIOByteOrders UTF16_GetByteOrder(UTF16 CodeUnit) {
+    static StringIOByteOrders UTF16_GetByteOrder(UTF16 CodeUnit) {
         StringIOByteOrders ByteOrder = ByteOrder_Unknown;
         if (CodeUnit == UTF16BOM_LE) {
             ByteOrder                = ByteOrder_Little;
@@ -1001,7 +1001,7 @@ extern "C" {
         return ByteOrder;
     }
     
-    StringIOByteOrders UTF32_GetByteOrder(UTF32 CodeUnit) {
+    static StringIOByteOrders UTF32_GetByteOrder(UTF32 CodeUnit) {
         StringIOByteOrders ByteOrder = ByteOrder_Unknown;
         if (CodeUnit == UTF32BOM_LE) {
             ByteOrder                = ByteOrder_Little;
@@ -1082,7 +1082,7 @@ extern "C" {
         return EncodedString;
     }
     
-    UTF16 *UTF16_Encode(UTF32 *String) {
+    UTF16 *UTF16_Encode(UTF32 *String) { // make UTF16_EncodeCodePoint
         UTF16   *EncodedString                           = NULL;
         if (String != NULL) {
             uint64_t CodePoint                           = 0ULL;
@@ -1709,7 +1709,27 @@ extern "C" {
         if (String != NULL && Replacement != NULL) {
             uint64_t StringSize                     = UTF32_GetStringSizeInCodePoints(String);
             uint64_t ReplacementSize                = UTF32_GetStringSizeInCodePoints(Replacement);
-            uint64_t NewStringSize                  = (StringSize + ReplacementSize) - Length; // Length may be longer than StringSize + ReplacementSize
+            uint64_t NewStringSize                  = (StringSize + ReplacementSize) - Length;
+            
+            /*
+             
+             Length may be longer than StringSize + ReplacementSize
+             
+             "%s" "1"
+             
+             "%s" "123"
+             
+             StringSize      = 2
+             
+             Length          = 2
+             
+             Length is the portion of the String to be replaced, so should it be subtracted?
+             
+             ReplacementSize = 1, 3
+             
+             So, if
+             
+             */
             NewString                               = UTF32_Init(NewStringSize);
             if (NewString != NULL) {
                 uint64_t NewCodePoint               = 0ULL;
@@ -1864,7 +1884,7 @@ extern "C" {
                 }
             }
             
-            Instances = calloc(NumInstances, sizeof(uint64_t));
+            Instances = (uint64_t*) calloc(NumInstances, sizeof(uint64_t));
             if (Instances != NULL) {
                 for (uint64_t Instance = 0ULL; Instance < NumInstances; Instance++) {
                     for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
@@ -2723,8 +2743,8 @@ extern "C" {
                     }
                 }
                 
-                RemovalPointsStart                                  = calloc(NumRemovalPoints, sizeof(uint64_t));
-                RemovalPointsEnd                                    = calloc(NumRemovalPoints, sizeof(uint64_t));
+                RemovalPointsStart                                  = (uint64_t*) calloc(NumRemovalPoints, sizeof(uint64_t));
+                RemovalPointsEnd                                    = (uint64_t*) calloc(NumRemovalPoints, sizeof(uint64_t));
                 
                 for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
                     for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
@@ -2748,8 +2768,8 @@ extern "C" {
                         }
                     }
                     
-                    RemovalPointsStart                                  = calloc(NumRemovalPoints, sizeof(uint64_t));
-                    RemovalPointsEnd                                    = calloc(NumRemovalPoints, sizeof(uint64_t));
+                    RemovalPointsStart                                  = (uint64_t*) calloc(NumRemovalPoints, sizeof(uint64_t));
+                    RemovalPointsEnd                                    = (uint64_t*) calloc(NumRemovalPoints, sizeof(uint64_t));
                     
                     for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
                         for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
@@ -2773,8 +2793,8 @@ extern "C" {
                         }
                     }
                     
-                    RemovalPointsStart                                  = calloc(NumRemovalPoints, sizeof(uint64_t));
-                    RemovalPointsEnd                                    = calloc(NumRemovalPoints, sizeof(uint64_t));
+                    RemovalPointsStart                                  = (uint64_t*) calloc(NumRemovalPoints, sizeof(uint64_t));
+                    RemovalPointsEnd                                    = (uint64_t*) calloc(NumRemovalPoints, sizeof(uint64_t));
                     
                     for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
                         for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
@@ -2863,7 +2883,7 @@ extern "C" {
         if (String != NULL && Delimiters != NULL) {
             StringSize             = UTF32_GetStringSizeInCodePoints(String);
             NumDelimiters          = UTF32_StringArray_GetNumStrings(Delimiters);
-            DelimitersSize         = calloc(NumDelimiters + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+            DelimitersSize         = (uint64_t*) calloc(NumDelimiters + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             if (DelimitersSize != NULL) {
                 for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters; Delimiter++) {
                     DelimitersSize[Delimiter] = UTF32_GetStringSizeInCodePoints(Delimiters[Delimiter]);
@@ -2887,8 +2907,8 @@ extern "C" {
                 }
             }
             
-            SplitSizes   = calloc(NumSplitStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
-            SplitOffsets = calloc(NumSplitStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+            SplitSizes   = (uint64_t*) calloc(NumSplitStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+            SplitOffsets = (uint64_t*) calloc(NumSplitStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             
             for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters; Delimiter++) {
                 for (uint64_t DelimiterCodePoint = 0ULL; DelimiterCodePoint < DelimitersSize[Delimiter]; DelimiterCodePoint++) {
@@ -3062,7 +3082,7 @@ extern "C" {
     UTF8 **UTF8_StringArray_Init(uint64_t NumStrings) {
         UTF8 **StringArray = NULL;
         if (NumStrings > 0) {
-            StringArray    = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF8*));
+            StringArray    = (UTF8**) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF8*));
         } else {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
@@ -3072,7 +3092,7 @@ extern "C" {
     UTF16 **UTF16_StringArray_Init(uint64_t NumStrings) {
         UTF16 **StringArray = NULL;
         if (NumStrings > 0) {
-            StringArray    = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF16*));
+            StringArray     = (UTF16**) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF16*));
         } else {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
@@ -3082,7 +3102,7 @@ extern "C" {
     UTF32 **UTF32_StringArray_Init(uint64_t NumStrings) {
         UTF32 **StringArray = NULL;
         if (NumStrings > 0) {
-            StringArray    = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF32*));
+            StringArray     = (UTF32**) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF32*));
         } else {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
@@ -3159,7 +3179,7 @@ extern "C" {
         uint64_t *StringArraySizes       = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF8_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+            StringArraySizes             = (uint64_t*) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringArraySizes[String] = UTF8_GetStringSizeInCodeUnits(StringArray[String]);
             }
@@ -3173,7 +3193,7 @@ extern "C" {
         uint64_t *StringArraySizes       = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF16_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+            StringArraySizes             = (uint64_t*) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringArraySizes[String] = UTF16_GetStringSizeInCodeUnits(StringArray[String]);
             }
@@ -3187,7 +3207,7 @@ extern "C" {
         uint64_t *StringArraySizes       = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF8_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+            StringArraySizes             = (uint64_t*) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringArraySizes[String] = UTF8_GetStringSizeInCodePoints(StringArray[String]);
             }
@@ -3201,7 +3221,7 @@ extern "C" {
         uint64_t *StringArraySizes       = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF16_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+            StringArraySizes             =(uint64_t*)  calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringArraySizes[String] = UTF16_GetStringSizeInCodePoints(StringArray[String]);
             }
@@ -3215,7 +3235,7 @@ extern "C" {
         uint64_t *StringArraySizes       = NULL;
         if (StringArray != NULL) {
             uint64_t NumStrings          = UTF32_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+            StringArraySizes             = (uint64_t*) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringArraySizes[String] = UTF32_GetStringSizeInCodePoints(StringArray[String]);
             }

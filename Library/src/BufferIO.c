@@ -33,9 +33,9 @@ extern "C" {
     } BitOutput;
     
     BitBuffer *BitBuffer_Init(uint64_t BitBufferSize) {
-        BitBuffer *BitB                  = calloc(1, sizeof(BitBuffer));
+        BitBuffer *BitB                  = (BitBuffer*) calloc(1, sizeof(BitBuffer));
         if (BitB != NULL && BitBufferSize > 0) {
-            BitB->Buffer                 = calloc(BitBufferSize, sizeof(uint8_t));
+            BitB->Buffer                 = (uint8_t*) calloc(BitBufferSize, sizeof(uint8_t));
             if (BitB->Buffer != NULL) {
                 BitB->NumBits            = Bytes2Bits(BitBufferSize);
             } else {
@@ -145,7 +145,7 @@ extern "C" {
             int64_t  AlignmentSizeInBits = Bytes2Bits(AlignmentSize);
             int64_t  Bits2Align          = AlignmentSizeInBits - (BitB->BitOffset % AlignmentSizeInBits);
             if (BitB->BitOffset + Bits2Align > BitB->NumBits) {
-                BitB->Buffer             = realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, RoundingType_Up));
+                BitB->Buffer             = (uint8_t*) realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, RoundingType_Up));
                 BitB->NumBits           += Bits2Align;
             }
             BitB->BitOffset             += Bits2Align;
@@ -177,7 +177,7 @@ extern "C" {
     
     void BitBuffer_Resize(BitBuffer *BitB, uint64_t NewSize) {
         if (BitB != NULL && NewSize * 8 >= BitB->BitOffset) {
-            uint8_t *NewBuffer  = realloc(BitB->Buffer, NewSize);
+            uint8_t *NewBuffer  = (uint8_t*) realloc(BitB->Buffer, NewSize);
             if (NewBuffer != NULL) {
                 BitB->Buffer    = NewBuffer;
                 BitB->BitOffset = 0;
@@ -200,7 +200,7 @@ extern "C" {
                 BytesRead            = FoundationIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
             }
             if (BytesRead != Bytes2Read) {
-                uint8_t *Reallocated = realloc(BitB->Buffer, BytesRead);
+                uint8_t *Reallocated = (uint8_t*) realloc(BitB->Buffer, BytesRead);
                 if (Reallocated != NULL) {
                     BitB->Buffer     = Reallocated;
                     BitB->BitOffset  = 0;
@@ -617,7 +617,7 @@ extern "C" {
         uint8_t *GUUID = NULL;
         if (GUUID2Read != UnknownGUUID && BitB != NULL && (BitBuffer_GetSize(BitB) - BitBuffer_GetPosition(BitB)) >= BinaryGUUIDSize) {
             if (GUUID2Read == BinaryUUID || GUUID2Read == BinaryGUID) {
-                GUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
+                GUUID                    = (uint8_t*) calloc(BinaryGUUIDSize, sizeof(uint8_t));
                 if (GUUID != NULL) {
                     for (uint8_t Byte = 0; Byte < BinaryGUUIDSize; Byte++) {
                         GUUID[Byte]      = (uint8_t) BitBuffer_Extract_LSByteLSBit(BitB, 8);
@@ -683,7 +683,7 @@ extern "C" {
     
     void BitBuffer_WriteUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, Unary_StopBits StopBit, uint8_t UnaryBits2Write) {
         if (BitB != NULL) {
-            StopBit            &= 1;
+            uint8_t EndBit      = StopBit == StopBit_Zero ? 0 : 1;
             uint8_t Field2Write = UnaryBits2Write;
             if (UnaryType == CountUnary) {
                 Field2Write -= 1;
@@ -692,18 +692,18 @@ extern "C" {
             if (ByteOrder == LSByteFirst) {
                 if (BitOrder == LSBitFirst) {
                     BitBuffer_Append_LSByteLSBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
-                    BitBuffer_Append_LSByteLSBit(BitB, 1, StopBit);
+                    BitBuffer_Append_LSByteLSBit(BitB, 1, EndBit);
                 } else if (BitOrder == MSBitFirst) {
                     BitBuffer_Append_LSByteMSBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
-                    BitBuffer_Append_LSByteMSBit(BitB, 1, StopBit);
+                    BitBuffer_Append_LSByteMSBit(BitB, 1, EndBit);
                 }
             } else if (ByteOrder == MSByteFirst) {
                 if (BitOrder == LSBitFirst) {
                     BitBuffer_Append_MSByteLSBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
-                    BitBuffer_Append_MSByteLSBit(BitB, 1, StopBit);
+                    BitBuffer_Append_MSByteLSBit(BitB, 1, EndBit);
                 } else if (BitOrder == MSBitFirst) {
                     BitBuffer_Append_MSByteMSBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
-                    BitBuffer_Append_MSByteMSBit(BitB, 1, StopBit);
+                    BitBuffer_Append_MSByteMSBit(BitB, 1, EndBit);
                 }
             }
         } else {
@@ -821,7 +821,7 @@ extern "C" {
     
     /* BitInput */
     BitInput *BitInput_Init(void) {
-        BitInput *BitI = calloc(1, sizeof(BitInput));
+        BitInput *BitI = (BitInput*) calloc(1, sizeof(BitInput));
         if (BitI == NULL) {
             BitInput_Deinit(BitI);
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BitInput"));
@@ -1002,7 +1002,7 @@ extern "C" {
     
     /* BitOutput */
     BitOutput *BitOutput_Init(void) {
-        BitOutput *BitO = calloc(1, sizeof(BitOutput));
+        BitOutput *BitO = (BitOutput*) calloc(1, sizeof(BitOutput));
         if (BitO == NULL) {
             BitOutput_Deinit(BitO);
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BitOutput"));
@@ -1123,7 +1123,7 @@ extern "C" {
         if (Random != NULL && GUUIDType != UnknownGUUID) {
             uint64_t LowBits             = Entropy_GenerateInteger(Random, 64);
             uint64_t HighBits            = Entropy_GenerateInteger(Random, 64);
-            uint8_t *BinaryGUUIDData     = calloc(BinaryGUUIDSize, sizeof(uint8_t));
+            uint8_t *BinaryGUUIDData     = (uint8_t*) calloc(BinaryGUUIDSize, sizeof(uint8_t));
             if (GUUID != NULL) {
                 for (uint8_t GUUIDByte = 0; GUUIDByte < BinaryGUUIDSize; GUUIDByte++) {
                     if (GUUIDByte < 8) {
@@ -1172,7 +1172,7 @@ extern "C" {
     uint8_t *GUUID_Convert(GUUIDTypes InputType, GUUIDTypes OutputType, uint8_t *GUUID2Convert) {
         uint8_t  Dash = '-';
         uint8_t  OutputGUUIDSize = ((OutputType == GUIDString || OutputType == UUIDString) ? GUUIDStringSize : BinaryGUUIDSize);
-        uint8_t *ConvertedGUUID  = calloc(OutputGUUIDSize, sizeof(uint8_t));
+        uint8_t *ConvertedGUUID  = (uint8_t*) calloc(OutputGUUIDSize, sizeof(uint8_t));
         if (ConvertedGUUID != NULL && GUUID2Convert != NULL && InputType != UnknownGUUID && OutputType != UnknownGUUID) {
             bool ByteOrderDiffers = (((InputType == GUIDString && OutputType == UUIDString) || (InputType == UUIDString && OutputType == GUIDString) || (InputType == BinaryUUID && OutputType == BinaryGUID) || (InputType == BinaryGUID && OutputType == BinaryUUID)) ? Yes : No);
             
@@ -1220,7 +1220,7 @@ extern "C" {
         if (GUUID2Swap != NULL && GUUIDType != UnknownGUUID) {
             uint8_t Dash = '-';
             if (GUUIDType == UUIDString || GUUIDType == GUIDString) {
-                SwappedGUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
+                SwappedGUUID          = (uint8_t*) calloc(BinaryGUUIDSize, sizeof(uint8_t));
                 if (SwappedGUUID != NULL) {
                     SwappedGUUID[0]   = GUUID2Swap[3];
                     SwappedGUUID[1]   = GUUID2Swap[2];
@@ -1251,7 +1251,7 @@ extern "C" {
                     Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SwappedGUUID Pointer is NULL"));
                 }
             } else if (GUUIDType == BinaryUUID || GUUIDType == BinaryGUID) {
-                SwappedGUUID = calloc(BinaryGUUIDSize, sizeof(uint8_t));
+                SwappedGUUID          = (uint8_t*) calloc(BinaryGUUIDSize, sizeof(uint8_t));
                 if (SwappedGUUID != NULL) {
                     SwappedGUUID[0]   = GUUID2Swap[3];
                     SwappedGUUID[1]   = GUUID2Swap[2];
