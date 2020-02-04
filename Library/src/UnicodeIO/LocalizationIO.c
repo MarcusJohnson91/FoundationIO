@@ -22,10 +22,10 @@ extern "C" {
         LocalizationIO_LanguageIDs LanguageID = LanguageID_Unknown;
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         /* POSIX uses ISO 639-1 if possible, otherwise ISO 639-2 */
-        UTF8 *LocaleAll        = setlocale(LC_ALL, NULL);
-        uint8_t EndOffset      = UTF8_FindSubString(LocaleAll, UTF8String("_"), 0, 1);
-        UTF8 *LanguageString   = UTF8_ExtractSubString(LocaleAll, 0, EndOffset);
-        uint64_t StringSize    = UTF8_GetStringSizeInCodeUnits(LocaleAll);
+        UTF8     *LocaleAll      = setlocale(LC_ALL, NULL);
+        uint64_t  EndOffset      = UTF8_FindSubString(LocaleAll, UTF8String("_"), 0, 1);
+        UTF8     *LanguageString = UTF8_ExtractSubString(LocaleAll, 0, EndOffset);
+        uint64_t  StringSize     = UTF8_GetStringSizeInCodeUnits(LocaleAll);
         if (StringSize == 2) { // ISO-639-1
             if (UTF8_Compare(LanguageString, UTF8String("en"))) {
                 LanguageID     = LanguageID_English;

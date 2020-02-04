@@ -90,16 +90,16 @@ extern "C" {
     } MD5;
     
     MD5 *MD5_Init(void) {
-        MD5 *MD5         = calloc(1, sizeof(MD5));
-        if (MD5 != NULL) {
-            MD5->Hash[0] = 0x67452301;
-            MD5->Hash[1] = 0xEFCDAB89;
-            MD5->Hash[2] = 0x98BADCFE;
-            MD5->Hash[3] = 0x10325476;
+        MD5 *Hash         = (MD5*) calloc(1, sizeof(MD5));
+        if (Hash != NULL) {
+            Hash->Hash[0] = 0x67452301;
+            Hash->Hash[1] = 0xEFCDAB89;
+            Hash->Hash[2] = 0x98BADCFE;
+            Hash->Hash[3] = 0x10325476;
         } else {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate MD5"));
         }
-        return MD5;
+        return Hash;
     }
     
     static void MD5_A(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
@@ -156,7 +156,7 @@ extern "C" {
     }
     
     UTF8 *MD5_Finalize(MD5 *MD5) {
-        UTF8 *Hash = calloc(MD5HashSize * 2, sizeof(UTF8));
+        UTF8 *Hash = (UTF8*) calloc(MD5HashSize * 2, sizeof(UTF8));
         if (MD5 != NULL) {
             
         } else {
@@ -204,7 +204,7 @@ extern "C" {
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             BCryptGenRandom(NULL, &RandomValue, NumBytes, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
 #else
-            FILE *RandomFile          = FoundationIO_File_Open(UTF8String("/dev/urandom"), "rb");
+            FILE *RandomFile          = FoundationIO_File_Open(UTF8String("/dev/urandom"), UTF8String("rb"));
             size_t BytesRead          = fread(&RandomValue, NumBytes, 1, RandomFile);
             FoundationIO_File_Close(RandomFile);
 #endif
@@ -317,9 +317,9 @@ extern "C" {
     }
     
     Entropy *Entropy_Init(uint64_t EntropyPoolSize) {
-        Entropy *Random               = calloc(1, sizeof(Entropy));
+        Entropy *Random               = (Entropy*) calloc(1, sizeof(Entropy));
         if (Random != NULL) {
-            Random->EntropyPool       = calloc(EntropyPoolSize, sizeof(uint8_t));
+            Random->EntropyPool       = (uint8_t*) calloc(EntropyPoolSize, sizeof(uint8_t));
             if (Random->EntropyPool != NULL) {
                 Random->EntropySize   = EntropyPoolSize;
                 Random->BitOffset     = 0ULL;

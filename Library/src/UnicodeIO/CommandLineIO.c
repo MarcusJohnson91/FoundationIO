@@ -65,9 +65,9 @@ extern "C" {
     
     CommandLineIO *CommandLineIO_Init(uint64_t NumOptions) {
         CommandLineIO *CLI       = NULL;
-        CLI                      = calloc(1, sizeof(CommandLineIO));
+        CLI                      = (CommandLineIO*) calloc(1, sizeof(CommandLineIO));
         if (CLI != NULL) {
-            CLI->OptionIDs       = calloc(NumOptions, sizeof(CommandLineOption));
+            CLI->OptionIDs       = (CommandLineOption*) calloc(NumOptions, sizeof(CommandLineOption));
             if (CLI->OptionIDs != NULL) {
                 CLI->NumOptions = NumOptions;
             } else {
@@ -241,18 +241,18 @@ extern "C" {
     
     void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF32 **Strings, uint64_t *Numerator, uint64_t *Denominator) {
         if (CLI != NULL) {
-            uint64_t *StringSize = calloc(NumItems2Display + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+            uint64_t *StringSize = (uint64_t*) calloc(NumItems2Display + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             for (uint8_t Item = 0; Item < NumItems2Display; Item++) {
                 StringSize[Item] = UTF32_GetStringSizeInCodePoints(Strings[Item]);
             }
             
-            uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
-            UTF8     *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF8));
+            uint64_t *NumProgressIndicatorsPerString = (uint64_t*) calloc(NumItems2Display, sizeof(uint64_t));
+            UTF8     *ActualStrings2Print            = (UTF8*) calloc(NumItems2Display, sizeof(UTF8));
             for (uint8_t String = 0; String < NumItems2Display; String++) {
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]);
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 UTF8    *Indicator           = UTF8_Init(CommandLineIO_GetTerminalWidth());
-                UTF8    *IndicatorFinal      = UTF8_Insert(Indicator, "-", 0);
+                UTF8    *IndicatorFinal      = UTF8_Insert(Indicator, UTF8String("-"), 0);
                 UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%Us %llu/%llu %llu/%s%s]"), IndicatorFinal, *Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, FoundationIONewLine8);
                 UTF8_WriteLine(stdout, FormattedString);
                 free(Indicator);
@@ -300,7 +300,7 @@ extern "C" {
             if (CLI->OptionIDs[MasterID].OptionType == OptionType_PotentialSlaves) {
                 CLI->OptionIDs[MasterID].NumOptionSlaves  += 1;
                 uint64_t NumSlaves                         = CLI->OptionIDs[MasterID].NumOptionSlaves - 1;
-                CLI->OptionIDs[MasterID].Slaves            = realloc(CLI->OptionIDs[MasterID].Slaves, CLI->OptionIDs[MasterID].NumOptionSlaves * sizeof(uint64_t));
+                CLI->OptionIDs[MasterID].Slaves            = (uint64_t*) realloc(CLI->OptionIDs[MasterID].Slaves, CLI->OptionIDs[MasterID].NumOptionSlaves * sizeof(uint64_t));
                 CLI->OptionIDs[MasterID].Slaves[NumSlaves] = SlaveID;
             } else {
                 Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("MasterID %lld can not have any slaves"), MasterID);
@@ -532,9 +532,9 @@ extern "C" {
                         
                         CLI->NumOptions   += 1;
                         if (CLI->NumOptions == 1) {
-                            CLI->OptionIDs = calloc(1, sizeof(CommandLineOption));
+                            CLI->OptionIDs = (CommandLineOption*) calloc(1, sizeof(CommandLineOption));
                         } else {
-                            CLI->OptionIDs = realloc(CLI->OptionIDs, CLI->NumOptions * sizeof(CommandLineOption));
+                            CLI->OptionIDs = (CommandLineOption*) realloc(CLI->OptionIDs, CLI->NumOptions * sizeof(CommandLineOption));
                         }
                         CLI->OptionIDs[CLI->NumOptions - 1].OptionID = Switch;
                         
@@ -591,7 +591,7 @@ extern "C" {
     
     void CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, UTF16 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
-            UTF32 **Arguments32     = calloc(NumArguments, sizeof(UTF32*));
+            UTF32 **Arguments32     = UTF32_StringArray_Init(NumArguments);
             for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
                 UTF32 *Decoded      = UTF16_Decode(Arguments[Arg]);
                 UTF32 *CaseFolded   = UTF32_CaseFold(Decoded);

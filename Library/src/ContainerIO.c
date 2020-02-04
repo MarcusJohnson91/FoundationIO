@@ -12,10 +12,10 @@ extern "C" {
     } AudioChannelMap;
     
     AudioChannelMap *AudioChannelMap_Init(uint64_t NumChannels) {
-        AudioChannelMap *ChannelMap = calloc(1, sizeof(AudioChannelMap));
+        AudioChannelMap *ChannelMap = (AudioChannelMap*) calloc(1, sizeof(AudioChannelMap));
         if (ChannelMap != NULL) {
             ChannelMap->NumChannels = NumChannels;
-            ChannelMap->Map         = calloc(NumChannels, sizeof(AudioChannelMask));
+            ChannelMap->Map         = (AudioChannelMask*) calloc(NumChannels, sizeof(AudioChannelMask));
         } else {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate AudioChannelMap"));
         }
@@ -84,9 +84,9 @@ extern "C" {
     Audio2DContainer *Audio2DContainer_Init(Audio_Types Type, AudioChannelMap *ChannelMap, uint64_t SampleRate, uint64_t NumSamples) {
         Audio2DContainer *Audio    = NULL;
         if (NumSamples > 0) {
-            Audio                  = calloc(1, sizeof(Audio2DContainer));
+            Audio                  = (Audio2DContainer*) calloc(1, sizeof(Audio2DContainer));
             if (Audio != NULL) {
-                void **Array       = calloc(ChannelMap->NumChannels * NumSamples, Type / 4);
+                void **Array       = (void**) calloc(ChannelMap->NumChannels * NumSamples, Type / 4);
                 if (Array != NULL) {
                     Audio->Samples = Array;
                 } else {
@@ -186,17 +186,17 @@ extern "C" {
         int64_t Average = 0LL;
         if (Audio != NULL) {
             if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
-                uint8_t **Array = (uint8_t **) Audio2DContainer_GetArray(Audio);
+                uint8_t **Array = (uint8_t**) Audio2DContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
-                int8_t **Array = (int8_t **) Audio2DContainer_GetArray(Audio);
+                int8_t **Array = (int8_t**) Audio2DContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
             } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
-                uint16_t **Array = (uint16_t **) Audio2DContainer_GetArray(Audio);
+                uint16_t **Array = (uint16_t**) Audio2DContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
@@ -206,12 +206,12 @@ extern "C" {
                     Average += Array[Channel][Sample];
                 }
             } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
-                uint32_t **Array = (uint32_t **) Audio2DContainer_GetArray(Audio);
+                uint32_t **Array = (uint32_t**) Audio2DContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
-                int32_t **Array = (int32_t **) Audio2DContainer_GetArray(Audio);
+                int32_t **Array = (int32_t**) Audio2DContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     Average += Array[Channel][Sample];
                 }
@@ -229,7 +229,7 @@ extern "C" {
         int64_t Maximum = INT64_MIN;
         if (Audio != NULL) {
             if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
-                uint8_t **Array = (uint8_t **) Audio2DContainer_GetArray(Audio);
+                uint8_t **Array = (uint8_t**) Audio2DContainer_GetArray(Audio);
                 uint8_t   Max   = Exponentiate(2, Audio2DContainer_GetBitDepth(Audio)) - 1;
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
@@ -240,7 +240,7 @@ extern "C" {
                     }
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
-                int8_t **Array = (int8_t **) Audio2DContainer_GetArray(Audio);
+                int8_t **Array = (int8_t**) Audio2DContainer_GetArray(Audio);
                 int8_t   Max   = Exponentiate(2, Audio2DContainer_GetBitDepth(Audio) - 1) - 1;
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
@@ -251,7 +251,7 @@ extern "C" {
                     }
                 }
             } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
-                uint16_t **Array = (uint16_t **) Audio2DContainer_GetArray(Audio);
+                uint16_t **Array = (uint16_t**) Audio2DContainer_GetArray(Audio);
                 uint16_t   Max   = Exponentiate(2, Audio2DContainer_GetBitDepth(Audio)) - 1;
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
@@ -273,7 +273,7 @@ extern "C" {
                     }
                 }
             } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
-                uint32_t **Array = (uint32_t **) Audio2DContainer_GetArray(Audio);
+                uint32_t **Array = (uint32_t**) Audio2DContainer_GetArray(Audio);
                 uint32_t   Max   = Exponentiate(2, Audio2DContainer_GetBitDepth(Audio)) - 1;
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
@@ -284,7 +284,7 @@ extern "C" {
                     }
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
-                int32_t **Array = (int32_t **) Audio2DContainer_GetArray(Audio);
+                int32_t **Array = (int32_t**) Audio2DContainer_GetArray(Audio);
                 int32_t   Max   = Exponentiate(2, Audio2DContainer_GetBitDepth(Audio) - 1) - 1;
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] > Maximum) {
@@ -305,7 +305,7 @@ extern "C" {
         int64_t Minimum = INT64_MAX;
         if (Audio != NULL) {
             if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
-                uint8_t **Array = (uint8_t **) Audio2DContainer_GetArray(Audio);
+                uint8_t **Array = (uint8_t**) Audio2DContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
@@ -315,7 +315,7 @@ extern "C" {
                     }
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
-                int8_t **Array = (int8_t **) Audio2DContainer_GetArray(Audio);
+                int8_t **Array = (int8_t**) Audio2DContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
@@ -325,7 +325,7 @@ extern "C" {
                     }
                 }
             } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
-                uint16_t **Array = (uint16_t **) Audio2DContainer_GetArray(Audio);
+                uint16_t **Array = (uint16_t**) Audio2DContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
@@ -345,7 +345,7 @@ extern "C" {
                     }
                 }
             } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
-                uint32_t **Array = (uint32_t **) Audio2DContainer_GetArray(Audio);
+                uint32_t **Array = (uint32_t**) Audio2DContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
@@ -355,7 +355,7 @@ extern "C" {
                     }
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
-                int32_t **Array = (int32_t **) Audio2DContainer_GetArray(Audio);
+                int32_t **Array = (int32_t**) Audio2DContainer_GetArray(Audio);
                 for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
                     if (Array[Channel][Sample] < Minimum) {
                         Minimum = Array[Channel][Sample];
@@ -374,7 +374,7 @@ extern "C" {
     void Audio2DContainer_Erase(Audio2DContainer *Audio) {
         if (Audio != NULL) {
             if (Audio->Type == (AudioType_Unsigned | AudioType_Integer8)) {
-                uint8_t **Samples = (uint8_t **) Audio2DContainer_GetArray(Audio);
+                uint8_t **Samples = (uint8_t**) Audio2DContainer_GetArray(Audio);
                 
                 for (uint64_t Channel = 0ULL; Channel < Audio2DContainer_GetNumChannels(Audio); Channel++) {
                     for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
@@ -382,7 +382,7 @@ extern "C" {
                     }
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer8)) {
-                int8_t **Samples = (int8_t **) Audio2DContainer_GetArray(Audio);
+                int8_t **Samples = (int8_t**) Audio2DContainer_GetArray(Audio);
                 
                 for (uint64_t Channel = 0ULL; Channel < Audio2DContainer_GetNumChannels(Audio); Channel++) {
                     for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
@@ -390,7 +390,7 @@ extern "C" {
                     }
                 }
             } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer16)) {
-                uint16_t **Samples = (uint16_t **) Audio2DContainer_GetArray(Audio);
+                uint16_t **Samples = (uint16_t**) Audio2DContainer_GetArray(Audio);
                 
                 for (uint64_t Channel = 0ULL; Channel < Audio2DContainer_GetNumChannels(Audio); Channel++) {
                     for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
@@ -406,7 +406,7 @@ extern "C" {
                     }
                 }
             } else if (Audio->Type == (AudioType_Unsigned | AudioType_Integer32)) {
-                uint32_t **Samples = (uint32_t **) Audio2DContainer_GetArray(Audio);
+                uint32_t **Samples = (uint32_t**) Audio2DContainer_GetArray(Audio);
                 
                 for (uint64_t Channel = 0ULL; Channel < Audio2DContainer_GetNumChannels(Audio); Channel++) {
                     for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
@@ -414,7 +414,7 @@ extern "C" {
                     }
                 }
             } else if (Audio->Type == (AudioType_Signed | AudioType_Integer32)) {
-                int32_t **Samples = (int32_t **) Audio2DContainer_GetArray(Audio);
+                int32_t **Samples = (int32_t**) Audio2DContainer_GetArray(Audio);
                 
                 for (uint64_t Channel = 0ULL; Channel < Audio2DContainer_GetNumChannels(Audio); Channel++) {
                     for (uint64_t Sample = 0ULL; Sample < Audio->NumSamples; Sample++) {
@@ -456,17 +456,17 @@ extern "C" {
     Audio2DHistogram *Audio2DHistogram_Init(Audio2DContainer *Audio) {
         Audio2DHistogram *Histogram  = NULL;
         if (Audio != NULL) {
-            Histogram                = calloc(1, sizeof(Audio2DHistogram));
+            Histogram                = (Audio2DHistogram*) calloc(1, sizeof(Audio2DHistogram));
             if (Histogram != NULL) {
                 uint8_t  NumChannels = Audio2DContainer_GetNumChannels(Audio);
                 uint64_t NumValues   = Exponentiate(2, Audio2DContainer_GetBitDepth(Audio)) - 1;
                 
                 if ((Audio->Type & AudioType_Integer8) == AudioType_Integer8) {
-                    Histogram->Array = calloc(NumValues * NumChannels, sizeof(uint8_t));
+                    Histogram->Array = (uint8_t*) calloc(NumValues * NumChannels, sizeof(uint8_t));
                 } else if ((Audio->Type & AudioType_Integer16) == AudioType_Integer16) {
-                    Histogram->Array = calloc(NumValues * NumChannels, sizeof(uint16_t));
+                    Histogram->Array = (uint16_t*) calloc(NumValues * NumChannels, sizeof(uint16_t));
                 } else if ((Audio->Type & AudioType_Integer32) == AudioType_Integer32) {
-                    Histogram->Array = calloc(NumValues * NumChannels, sizeof(uint32_t));
+                    Histogram->Array = (uint32_t*) calloc(NumValues * NumChannels, sizeof(uint32_t));
                 }
                 
                 if (Histogram->Array != NULL) {
@@ -497,7 +497,7 @@ extern "C" {
     
     void Audio2DHistogram_SetArray(Audio2DHistogram *Histogram, void *Array) {
         if (Histogram != NULL) {
-            Histogram->Array = Array;
+            Histogram->Array = (void*) Array;
         } else {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Audio2DHistogram Pointer is NULL"));
         }
@@ -511,8 +511,8 @@ extern "C" {
                 uint8_t NumChannels = Audio2DContainer_GetNumChannels(Audio);
                 
                 if (Histogram->Type == AudioType_Integer8) {
-                    uint8_t **SampleArray = (uint8_t **) Audio->Samples;
-                    uint8_t * HistArray   = (uint8_t *) Histogram->Array;
+                    uint8_t **SampleArray = (uint8_t**) Audio->Samples;
+                    uint8_t  *HistArray   = (uint8_t*) Histogram->Array;
                     for (uint64_t C = 0ULL; C < NumChannels; C++) {
                         for (uint64_t S = 0ULL; S < Audio->NumSamples; S++) {
                             uint8_t Sample = SampleArray[C][S];
@@ -520,8 +520,8 @@ extern "C" {
                         }
                     }
                 } else if (Histogram->Type == AudioType_Integer16) {
-                    uint16_t **SampleArray = (uint16_t **) Audio->Samples;
-                    uint16_t * HistArray   = (uint16_t *) Histogram->Array;
+                    uint16_t **SampleArray = (uint16_t**) Audio->Samples;
+                    uint16_t  *HistArray   = (uint16_t*) Histogram->Array;
                     
                     for (uint64_t C = 0ULL; C < NumChannels; C++) {
                         for (uint64_t S = 0ULL; S < Audio->NumSamples; S++) {
@@ -530,8 +530,8 @@ extern "C" {
                         }
                     }
                 } else if (Histogram->Type == AudioType_Integer32) {
-                    uint32_t **SampleArray = (uint32_t **) Audio->Samples;
-                    uint32_t * HistArray   = (uint32_t *) Histogram->Array;
+                    uint32_t **SampleArray = (uint32_t**) Audio->Samples;
+                    uint32_t * HistArray   = (uint32_t*) Histogram->Array;
                     
                     for (uint64_t C = 0ULL; C < NumChannels; C++) {
                         for (uint64_t S = 0ULL; S < Audio->NumSamples; S++) {
@@ -554,42 +554,42 @@ extern "C" {
             uint64_t NumCores = FoundationIO_GetNumCPUCores();
             if (Sort == SortType_Ascending) { // Top to bottom
                 if (Histogram->Type == (AudioType_Integer8 | AudioType_Unsigned)) {
-                    uint8_t *Audio = Audio2DHistogram_GetArray(Histogram);
+                    uint8_t *Audio = (uint8_t*) Audio2DHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
                             Audio[Element - 1] = (uint8_t) Maximum(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Unsigned)) {
-                    uint16_t *Audio = Audio2DHistogram_GetArray(Histogram);
+                    uint16_t *Audio = (uint16_t*) Audio2DHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
                             Audio[Element - 1] = (uint16_t) Maximum(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Unsigned)) {
-                    uint32_t *Audio = Audio2DHistogram_GetArray(Histogram);
+                    uint32_t *Audio = (uint32_t*) Audio2DHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
                             Audio[Element - 1] = (uint32_t) Maximum(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer8 | AudioType_Signed)) {
-                    int8_t *Audio = Audio2DHistogram_GetArray(Histogram);
+                    int8_t *Audio = (int8_t*) Audio2DHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
                             Audio[Element - 1] = (int8_t) Maximum(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Signed)) {
-                    int16_t *Audio = Audio2DHistogram_GetArray(Histogram);
+                    int16_t *Audio = (int16_t*) Audio2DHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
                             Audio[Element - 1] = (int16_t) Maximum(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Signed)) {
-                    int32_t *Audio = Audio2DHistogram_GetArray(Histogram);
+                    int32_t *Audio = (int32_t*) Audio2DHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
                             Audio[Element - 1] = (int32_t) Maximum(Audio[Element - 1], Audio[Element]);
@@ -598,42 +598,42 @@ extern "C" {
                 }
             } else if (Sort == SortType_Descending) {
                 if (Histogram->Type == (AudioType_Integer8 | AudioType_Unsigned)) {
-                    uint8_t *Audio = Audio2DHistogram_GetArray(Histogram);
+                    uint8_t *Audio = (uint8_t*) Audio2DHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
                             Audio[Element - 1] = (uint8_t) Minimum(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Unsigned)) {
-                    uint16_t *Audio = Audio2DHistogram_GetArray(Histogram);
+                    uint16_t *Audio = (uint16_t*) Audio2DHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
                             Audio[Element - 1] = (uint16_t) Minimum(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Unsigned)) {
-                    uint32_t *Audio = Audio2DHistogram_GetArray(Histogram);
+                    uint32_t *Audio = (uint32_t*) Audio2DHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
                             Audio[Element - 1] = (uint32_t) Minimum(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer8 | AudioType_Signed)) {
-                    int8_t *Audio = Audio2DHistogram_GetArray(Histogram);
+                    int8_t *Audio = (int8_t*) Audio2DHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
                             Audio[Element - 1] = (int8_t) Minimum(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Signed)) {
-                    int16_t *Audio = Audio2DHistogram_GetArray(Histogram);
+                    int16_t *Audio = (int16_t*) Audio2DHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
                             Audio[Element - 1] = (int16_t) Minimum(Audio[Element - 1], Audio[Element]);
                         }
                     }
                 } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Signed)) {
-                    int32_t *Audio = Audio2DHistogram_GetArray(Histogram);
+                    int32_t *Audio = (int32_t*) Audio2DHistogram_GetArray(Histogram);
                     for (uint64_t Core = 0ULL; Core < NumCores; Core++) {
                         for (uint64_t Element = 1ULL; Element < Histogram->NumEntries / NumCores; Element++) {
                             Audio[Element - 1] = (int32_t) Minimum(Audio[Element - 1], Audio[Element]);
@@ -649,7 +649,7 @@ extern "C" {
     void Audio2DHistogram_Erase(Audio2DHistogram *Histogram) {
         if (Histogram != NULL) {
             if (Histogram->Type == (AudioType_Unsigned | AudioType_Integer8)) {
-                uint8_t **Samples = (uint8_t **) Audio2DHistogram_GetArray(Histogram);
+                uint8_t **Samples = (uint8_t**) Audio2DHistogram_GetArray(Histogram);
                 
                 for (uint64_t Channel = 0ULL; Channel < Histogram->NumChannels; Channel++) {
                     for (uint64_t Sample = 0ULL; Sample < Histogram->NumEntries; Sample++) {
@@ -657,7 +657,7 @@ extern "C" {
                     }
                 }
             } else if (Histogram->Type == (AudioType_Signed | AudioType_Integer8)) {
-                int8_t **Samples = (int8_t **) Audio2DHistogram_GetArray(Histogram);
+                int8_t **Samples = (int8_t**) Audio2DHistogram_GetArray(Histogram);
                 
                 for (uint64_t Channel = 0ULL; Channel < Histogram->NumChannels; Channel++) {
                     for (uint64_t Sample = 0ULL; Sample < Histogram->NumEntries; Sample++) {
@@ -665,7 +665,7 @@ extern "C" {
                     }
                 }
             } else if (Histogram->Type == (AudioType_Unsigned | AudioType_Integer16)) {
-                uint16_t **Samples = (uint16_t **) Audio2DHistogram_GetArray(Histogram);
+                uint16_t **Samples = (uint16_t**) Audio2DHistogram_GetArray(Histogram);
                 
                 for (uint64_t Channel = 0ULL; Channel < Histogram->NumChannels; Channel++) {
                     for (uint64_t Sample = 0ULL; Sample < Histogram->NumEntries; Sample++) {
@@ -681,7 +681,7 @@ extern "C" {
                     }
                 }
             } else if (Histogram->Type == (AudioType_Unsigned | AudioType_Integer32)) {
-                uint32_t **Samples = (uint32_t **) Audio2DHistogram_GetArray(Histogram);
+                uint32_t **Samples = (uint32_t**) Audio2DHistogram_GetArray(Histogram);
                 
                 for (uint64_t Channel = 0ULL; Channel < Histogram->NumChannels; Channel++) {
                     for (uint64_t Sample = 0ULL; Sample < Histogram->NumEntries; Sample++) {
@@ -689,7 +689,7 @@ extern "C" {
                     }
                 }
             } else if (Histogram->Type == (AudioType_Signed | AudioType_Integer32)) {
-                int32_t **Samples = (int32_t **) Audio2DHistogram_GetArray(Histogram);
+                int32_t **Samples = (int32_t**) Audio2DHistogram_GetArray(Histogram);
                 
                 for (uint64_t Channel = 0ULL; Channel < Histogram->NumChannels; Channel++) {
                     for (uint64_t Sample = 0ULL; Sample < Histogram->NumEntries; Sample++) {
@@ -720,7 +720,7 @@ extern "C" {
     } AudioVector;
     
     AudioVector *AudioVector_Init(void) {
-        AudioVector *Vector = calloc(1, sizeof(AudioVector));
+        AudioVector *Vector = (AudioVector*) calloc(1, sizeof(AudioVector));
         return Vector;
     }
     
@@ -736,7 +736,7 @@ extern "C" {
     
     void AudioVector_SetArray(AudioVector *Vector, void *Array) {
         if (Vector != NULL && Array != NULL) {
-            Vector->Samples = Array;
+            Vector->Samples = (void*) Array;
         } else if (Vector == NULL) {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AudioVector Pointer is NULL"));
         } else if (Array == NULL) {
@@ -747,19 +747,19 @@ extern "C" {
     void AudioVector_Erase(AudioVector *Vector) {
         if (Vector != NULL) {
             if ((Vector->Type & AudioType_Integer8) == AudioType_Integer8) {
-                uint8_t *Samples = (uint8_t *) Vector->Samples;
+                uint8_t *Samples = (uint8_t*) Vector->Samples;
                 
                 for (uint64_t Sample = 0ULL; Sample < Vector->NumSamples; Sample++) {
                     Samples[Sample] = 0;
                 }
             } else if ((Vector->Type & AudioType_Integer16) == AudioType_Integer16) {
-                uint16_t *Samples = (uint16_t *) Vector->Samples;
+                uint16_t *Samples = (uint16_t*) Vector->Samples;
                 
                 for (uint64_t Sample = 0ULL; Sample < Vector->NumSamples; Sample++) {
                     Samples[Sample] = 0;
                 }
             } else if ((Vector->Type & AudioType_Integer32) == AudioType_Integer32) {
-                uint32_t *Samples = (uint32_t *) Vector->Samples;
+                uint32_t *Samples = (uint32_t*) Vector->Samples;
                 
                 for (uint64_t Sample = 0ULL; Sample < Vector->NumSamples; Sample++) {
                     Samples[Sample] = 0;
@@ -774,7 +774,7 @@ extern "C" {
             Vector->NumDirections   = 0;
             Vector->NumSamples      = 0;
             Vector->SampleRate      = 0;
-            Vector->Type            = 0;
+            Vector->Type            = AudioType_Unknown;
         }
     }
     
@@ -793,19 +793,19 @@ extern "C" {
     } AudioVectorHistogram;
     
     AudioVectorHistogram *AudioVectorHistogram_Init(AudioVector *Vector) {
-        AudioVectorHistogram *Histogram = calloc(1, sizeof(AudioVectorHistogram));
+        AudioVectorHistogram *Histogram = (AudioVectorHistogram*) calloc(1, sizeof(AudioVectorHistogram));
         if (Vector != NULL) {
             Histogram->Type = Vector->Type;
             
             if ((Histogram->Type & AudioType_Integer8) == AudioType_Integer8) {
                 Histogram->NumSamples = Minimum(256, Vector->NumSamples);
-                Histogram->Histogram = calloc(Histogram->NumSamples, sizeof(uint64_t));
+                Histogram->Histogram  = (uint64_t*) calloc(Histogram->NumSamples, sizeof(uint64_t));
             } else if ((Histogram->Type & AudioType_Integer16) == AudioType_Integer16) {
                 Histogram->NumSamples = Minimum(65536, Vector->NumSamples);
-                Histogram->Histogram = calloc(Histogram->NumSamples, sizeof(uint64_t));
+                Histogram->Histogram  = (uint64_t*) calloc(Histogram->NumSamples, sizeof(uint64_t));
             } else if ((Histogram->Type & AudioType_Integer32) == AudioType_Integer32) {
                 Histogram->NumSamples = Vector->NumSamples;
-                Histogram->Histogram = calloc(Histogram->NumSamples, sizeof(uint64_t));
+                Histogram->Histogram  = (uint64_t*) calloc(Histogram->NumSamples, sizeof(uint64_t));
             }
         } else {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AudioVector Pointer is NULL"));
@@ -825,7 +825,7 @@ extern "C" {
     
     void AudioVectorHistogram_SetArray(AudioVectorHistogram *Histogram, void *Array) {
         if (Histogram != NULL && Array != NULL) {
-            Histogram->Histogram = Array;
+            Histogram->Histogram = (uint64_t*) Array;
         } else if (Histogram == NULL) {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AudioVectorHistogram Pointer is NULL"));
         } else if (Array == NULL) {
@@ -839,21 +839,21 @@ extern "C" {
             Histogram = AudioVectorHistogram_Init(Vector);
             
             if ((Vector->Type & AudioType_Integer8) == AudioType_Integer8) {
-                uint8_t *Samples = (uint8_t *) AudioVector_GetArray(Vector);
+                uint8_t *Samples = (uint8_t*) AudioVector_GetArray(Vector);
                 
                 for (uint64_t Sample = 0; Sample < Vector->NumSamples; Sample++) {
                     uint64_t Value = (uint64_t) Samples[Sample];
                     Histogram->Histogram[Value] += 1;
                 }
             } else if ((Vector->Type & AudioType_Integer16) == AudioType_Integer16) {
-                uint16_t *Samples = (uint16_t *) AudioVector_GetArray(Vector);
+                uint16_t *Samples = (uint16_t*) AudioVector_GetArray(Vector);
                 
                 for (uint64_t Sample = 0; Sample < Vector->NumSamples; Sample++) {
                     uint64_t Value = (uint64_t) Samples[Sample];
                     Histogram->Histogram[Value] += 1;
                 }
             } else if ((Vector->Type & AudioType_Integer32) == AudioType_Integer32) {
-                uint32_t *Samples = (uint32_t *) AudioVector_GetArray(Vector);
+                uint32_t *Samples = (uint32_t*) AudioVector_GetArray(Vector);
                 
                 for (uint64_t Sample = 0; Sample < Vector->NumSamples; Sample++) {
                     uint64_t Value = (uint64_t) Samples[Sample];
@@ -869,63 +869,63 @@ extern "C" {
     void AudioVectorHistogram_Sort(AudioVectorHistogram *Histogram, SortTypes Sort) {
         if (Sort == SortType_Ascending) { // Top to bottom
             if (Histogram->Type == (AudioType_Integer8 | AudioType_Unsigned)) {
-                uint8_t *Audio = AudioVectorHistogram_GetArray(Histogram);
+                uint8_t *Audio = (uint8_t*) AudioVectorHistogram_GetArray(Histogram);
                 for (uint64_t Sample = 1ULL; Sample < Histogram->NumSamples; Sample++) {
                     Audio[Sample - 1] = (uint8_t) Maximum(Audio[Sample - 1], Audio[Sample]);
                 }
             } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Unsigned)) {
-                uint16_t *Audio = AudioVectorHistogram_GetArray(Histogram);
+                uint16_t *Audio = (uint16_t*) AudioVectorHistogram_GetArray(Histogram);
                 for (uint64_t Sample = 1ULL; Sample < Histogram->NumSamples; Sample++) {
                     Audio[Sample - 1] = (uint8_t) Maximum(Audio[Sample - 1], Audio[Sample]);
                 }
             } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Unsigned)) {
-                uint32_t *Audio = AudioVectorHistogram_GetArray(Histogram);
+                uint32_t *Audio = (uint32_t*) AudioVectorHistogram_GetArray(Histogram);
                 for (uint64_t Sample = 1ULL; Sample < Histogram->NumSamples; Sample++) {
                     Audio[Sample - 1] = (uint8_t) Maximum(Audio[Sample - 1], Audio[Sample]);
                 }
             } else if (Histogram->Type == (AudioType_Integer8 | AudioType_Signed)) {
-                int8_t *Audio = AudioVectorHistogram_GetArray(Histogram);
+                int8_t *Audio = (int8_t*) AudioVectorHistogram_GetArray(Histogram);
                 for (uint64_t Sample = 1ULL; Sample < Histogram->NumSamples; Sample++) {
                     Audio[Sample - 1] = (uint8_t) Maximum(Audio[Sample - 1], Audio[Sample]);
                 }
             } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Signed)) {
-                int16_t *Audio = AudioVectorHistogram_GetArray(Histogram);
+                int16_t *Audio = (int16_t*) AudioVectorHistogram_GetArray(Histogram);
                 for (uint64_t Sample = 1ULL; Sample < Histogram->NumSamples; Sample++) {
                     Audio[Sample - 1] = (uint8_t) Maximum(Audio[Sample - 1], Audio[Sample]);
                 }
             } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Signed)) {
-                int32_t *Audio = AudioVectorHistogram_GetArray(Histogram);
+                int32_t *Audio = (int32_t*) AudioVectorHistogram_GetArray(Histogram);
                 for (uint64_t Sample = 1ULL; Sample < Histogram->NumSamples; Sample++) {
                     Audio[Sample - 1] = (uint8_t) Maximum(Audio[Sample - 1], Audio[Sample]);
                 }
             } else if (Sort == SortType_Descending) {
                 if (Histogram->Type == (AudioType_Integer8 | AudioType_Unsigned)) {
-                    uint8_t *Audio = AudioVectorHistogram_GetArray(Histogram);
+                    uint8_t *Audio = (uint8_t*) AudioVectorHistogram_GetArray(Histogram);
                     for (uint64_t Sample = 1ULL; Sample < Histogram->NumSamples; Sample++) {
                         Audio[Sample - 1] = (uint8_t) Minimum(Audio[Sample - 1], Audio[Sample]);
                     }
                 } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Unsigned)) {
-                    uint16_t *Audio = AudioVectorHistogram_GetArray(Histogram);
+                    uint16_t *Audio = (uint16_t*) AudioVectorHistogram_GetArray(Histogram);
                     for (uint64_t Sample = 1ULL; Sample < Histogram->NumSamples; Sample++) {
                         Audio[Sample - 1] = (uint16_t) Minimum(Audio[Sample - 1], Audio[Sample]);
                     }
                 } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Unsigned)) {
-                    uint32_t *Audio = AudioVectorHistogram_GetArray(Histogram);
+                    uint32_t *Audio = (uint32_t*) AudioVectorHistogram_GetArray(Histogram);
                     for (uint64_t Sample = 1ULL; Sample < Histogram->NumSamples; Sample++) {
                         Audio[Sample - 1] = (uint32_t) Minimum(Audio[Sample - 1], Audio[Sample]);
                     }
                 } else if (Histogram->Type == (AudioType_Integer8 | AudioType_Signed)) {
-                    int8_t *Audio = AudioVectorHistogram_GetArray(Histogram);
+                    int8_t *Audio = (int8_t*) AudioVectorHistogram_GetArray(Histogram);
                     for (uint64_t Sample = 1ULL; Sample < Histogram->NumSamples; Sample++) {
                         Audio[Sample - 1] = (int8_t) Minimum(Audio[Sample - 1], Audio[Sample]);
                     }
                 } else if (Histogram->Type == (AudioType_Integer16 | AudioType_Signed)) {
-                    int16_t *Audio = AudioVectorHistogram_GetArray(Histogram);
+                    int16_t *Audio = (int16_t*) AudioVectorHistogram_GetArray(Histogram);
                     for (uint64_t Sample = 1ULL; Sample < Histogram->NumSamples; Sample++) {
                         Audio[Sample - 1] = (int16_t) Minimum(Audio[Sample - 1], Audio[Sample]);
                     }
                 } else if (Histogram->Type == (AudioType_Integer32 | AudioType_Signed)) {
-                    int32_t *Audio = AudioVectorHistogram_GetArray(Histogram);
+                    int32_t *Audio = (int32_t*) AudioVectorHistogram_GetArray(Histogram);
                     for (uint64_t Sample = 1ULL; Sample < Histogram->NumSamples; Sample++) {
                         Audio[Sample - 1] = (int32_t) Minimum(Audio[Sample - 1], Audio[Sample]);
                     }
@@ -961,7 +961,7 @@ extern "C" {
     } Audio3DContainer;
     
     Audio3DContainer *Audio3DContainer_Init(void) {
-        Audio3DContainer *Container = calloc(1, sizeof(Audio3DContainer));
+        Audio3DContainer *Container = (Audio3DContainer*) calloc(1, sizeof(Audio3DContainer));
         return Container;
     }
     
@@ -1023,11 +1023,11 @@ extern "C" {
     } ImageChannelMap;
     
     ImageChannelMap *ImageChannelMap_Init(uint8_t NumViews, uint8_t NumChannels) {
-        ImageChannelMap *ChannelMap = calloc(1, sizeof(ImageChannelMask));
+        ImageChannelMap *ChannelMap = (ImageChannelMap*) calloc(1, sizeof(ImageChannelMask));
         if (ChannelMap != NULL) {
             ChannelMap->NumViews    = NumViews;
             ChannelMap->NumChannels = NumChannels;
-            ChannelMap->Map         = calloc(NumViews * NumChannels, sizeof(ImageChannelMask));
+            ChannelMap->Map         = (ImageChannelMask**) calloc(NumViews * NumChannels, sizeof(ImageChannelMask));
         } else {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate ImageChannelMap"));
         }
@@ -1104,13 +1104,13 @@ extern "C" {
     ImageContainer *ImageContainer_Init(Image_Types Type, ImageChannelMap *ChannelMap, uint64_t Width, uint64_t Height) {
         ImageContainer *Image         = NULL;
         if (Width > 0 && Height > 0) {
-            Image                     = calloc(1, sizeof(ImageContainer));
+            Image                     = (ImageContainer*) calloc(1, sizeof(ImageContainer));
             if (Image != NULL) {
                 uint8_t NumViews      = ImageChannelMap_GetNumViews(ChannelMap);
                 uint8_t NumChannels   = ImageChannelMap_GetNumChannels(ChannelMap);
-                void *Array           = calloc(NumViews * NumChannels * Width * Height, Type);
+                void *Array           = (void*) calloc(NumViews * NumChannels * Width * Height, Type);
                 if (Array != NULL) {
-                    Image->Pixels     = Array;
+                    Image->Pixels     = (void****) Array;
                     Image->ChannelMap = ChannelMap;
                 } else {
                     ImageContainer_Deinit(Image);
@@ -1205,7 +1205,7 @@ extern "C" {
     
     void ImageContainer_SetArray(ImageContainer *Image, void ****Array) {
         if (Image != NULL) {
-            Image->Pixels = Array;
+            Image->Pixels = (void****) Array;
         } else {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageContainer Pointer is NULL"));
         }
@@ -1220,14 +1220,14 @@ extern "C" {
             if (View < NumViews - 1) {
                 if (Channel < NumChannels - 1) {
                     if (Image->Type == ImageType_Integer8) {
-                        uint8_t ****Array = (uint8_t ****) ImageContainer_GetArray(Image);
+                        uint8_t ****Array = (uint8_t****) ImageContainer_GetArray(Image);
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                             for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                                 Average += Array[View][Width][Height][Channel];
                             }
                         }
                     } else if (Image->Type == ImageType_Integer16) {
-                        uint16_t ****Array = (uint16_t ****) ImageContainer_GetArray(Image);
+                        uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                             for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                                 Average += Array[View][Width][Height][Channel];
@@ -1258,7 +1258,7 @@ extern "C" {
             if (View < NumViews - 1) {
                 if (Channel < NumChannels - 1) {
                     if (Image->Type == ImageType_Integer8) {
-                        uint8_t ****Array = (uint8_t ****) ImageContainer_GetArray(Image);
+                        uint8_t ****Array = (uint8_t****) ImageContainer_GetArray(Image);
                         uint8_t Max = Exponentiate(2, ImageContainer_GetBitDepth(Image)) - 1;
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                             for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
@@ -1271,7 +1271,7 @@ extern "C" {
                             }
                         }
                     } else if (Image->Type == ImageType_Integer16) {
-                        uint16_t ****Array = (uint16_t ****) ImageContainer_GetArray(Image);
+                        uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
                         uint16_t Max = Exponentiate(2, ImageContainer_GetBitDepth(Image)) - 1;
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                             for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
@@ -1306,7 +1306,7 @@ extern "C" {
             if (View < NumViews - 1) {
                 if (Channel < NumChannels - 1) {
                     if (Image->Type == ImageType_Integer8) {
-                        uint8_t ****Array = (uint8_t ****) ImageContainer_GetArray(Image);
+                        uint8_t ****Array = (uint8_t****) ImageContainer_GetArray(Image);
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                             for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                                 if (Array[View][Width][Height][Channel] < Minimum) {
@@ -1318,7 +1318,7 @@ extern "C" {
                             }
                         }
                     } else if (Image->Type == ImageType_Integer16) {
-                        uint16_t ****Array = (uint16_t ****) ImageContainer_GetArray(Image);
+                        uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                             for (uint64_t Height = 0ULL; Height < Image->Height; Height++) {
                                 if (Array[View][Width][Height][Channel] < Minimum) {
@@ -1349,7 +1349,7 @@ extern "C" {
             uint8_t          NumChannels = ImageChannelMap_GetNumChannels(Map);
             if (FlipType == FlipType_Vertical || FlipType == FlipType_VerticalAndHorizontal) {
                 if (Image->Type == ImageType_Integer8) {
-                    uint8_t *Array = (uint8_t *) ImageContainer_GetArray(Image);
+                    uint8_t *Array = (uint8_t*) ImageContainer_GetArray(Image);
                     for (uint64_t View = 0ULL; View < NumViews; View++) {
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                             for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
@@ -1366,7 +1366,7 @@ extern "C" {
                         }
                     }
                 } else if (Image->Type == ImageType_Integer16) {
-                    uint16_t *Array = (uint16_t *) ImageContainer_GetArray(Image);
+                    uint16_t *Array = (uint16_t*) ImageContainer_GetArray(Image);
                     for (uint64_t View = 0ULL; View < NumViews; View++) {
                         for (uint64_t Width = 0ULL; Width < Image->Width; Width++) {
                             for (uint64_t TopLine = 0ULL; TopLine < Image->Height; TopLine++) {
@@ -1386,7 +1386,7 @@ extern "C" {
             }
             if (FlipType == FlipType_Horizontal || FlipType == FlipType_VerticalAndHorizontal) {
                 if (Image->Type == ImageType_Integer8) {
-                    uint8_t *Array = (uint8_t *) ImageContainer_GetArray(Image);
+                    uint8_t *Array = (uint8_t*) ImageContainer_GetArray(Image);
                     for (uint64_t View = 1ULL; View <= NumViews; View++) {
                         for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
                             for (uint64_t Right = Image->Width; Right > 0ULL; Right++) {
@@ -1403,7 +1403,7 @@ extern "C" {
                         }
                     }
                 } else if (Image->Type == ImageType_Integer16) {
-                    uint16_t *Array = (uint16_t *) ImageContainer_GetArray(Image);
+                    uint16_t *Array = (uint16_t*) ImageContainer_GetArray(Image);
                     for (uint64_t View = 0ULL; View < NumViews; View++) {
                         for (uint64_t Left = 0ULL; Left < Image->Width; Left++) {
                             for (uint64_t Right = Image->Width; Right > 0ULL; Right++) {
@@ -1443,11 +1443,11 @@ extern "C" {
             int64_t TopOffset    = AbsoluteI(Top);
             int64_t BottomOffset = Height + Bottom;
             
-            void *New = calloc(NumViews * NewWidth * NewHeight * NumChannels, Type);
+            void ****New = (void****) calloc(NumViews * NewWidth * NewHeight * NumChannels, Type);
             if (New != NULL) {
                 if (Type == ImageType_Integer8) {
-                    uint8_t *Array = (uint8_t *) ImageContainer_GetArray(Image);
-                    uint8_t *NewArray = (uint8_t *) New;
+                    uint8_t ****Array = (uint8_t****) ImageContainer_GetArray(Image);
+                    uint8_t ****NewArray = (uint8_t****) New;
                     if (Array != NULL) {
                         for (uint8_t View = 0; View < NumViews; View++) {
                             for (int64_t W = LeftOffset; W < RightOffset; W++) {
@@ -1458,14 +1458,14 @@ extern "C" {
                                 }
                             }
                         }
-                        ImageContainer_SetArray(Image, (void *) NewArray);
+                        ImageContainer_SetArray(Image, (void ****) NewArray);
                         free(Array);
                     } else {
                         Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate an array for the cropped image"));
                     }
                 } else if (Type == ImageType_Integer16) {
-                    uint16_t *Array = (uint16_t *) ImageContainer_GetArray(Image);
-                    uint16_t *NewArray = (uint16_t *) New;
+                    uint16_t ****Array = (uint16_t****) ImageContainer_GetArray(Image);
+                    uint16_t ****NewArray = (uint16_t****) New;
                     if (Array != NULL) {
                         for (uint8_t View = 1; View <= NumViews; View++) {
                             for (int64_t W = LeftOffset; W < RightOffset; W++) {
@@ -1476,7 +1476,7 @@ extern "C" {
                                 }
                             }
                         }
-                        ImageContainer_SetArray(Image, (void *) NewArray);
+                        ImageContainer_SetArray(Image, (void****) NewArray);
                         free(Array);
                     } else {
                         Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate an array for the cropped image"));
@@ -1509,9 +1509,9 @@ extern "C" {
                 Difference               = ImageContainer_Init(RefType, RefMap, RefWidth, RefHeight);
                 if (Difference != NULL) {
                     if (RefType == ImageType_Integer8 && ComType == ImageType_Integer8) {
-                        uint8_t ****RefArray = (uint8_t ****) ImageContainer_GetArray(Reference);
-                        uint8_t ****ComArray = (uint8_t ****) ImageContainer_GetArray(Compare);
-                        uint8_t ****DifArray = (uint8_t ****) ImageContainer_GetArray(Difference);
+                        uint8_t ****RefArray = (uint8_t****) ImageContainer_GetArray(Reference);
+                        uint8_t ****ComArray = (uint8_t****) ImageContainer_GetArray(Compare);
+                        uint8_t ****DifArray = (uint8_t****) ImageContainer_GetArray(Difference);
                         for (uint8_t View = 0; View < RefNumViews; View++) {
                             for (uint64_t Width = 0ULL; Width < RefWidth; Width++) {
                                 for (uint64_t Height = 0ULL; Height < RefHeight; Height++) {
@@ -1522,9 +1522,9 @@ extern "C" {
                             }
                         }
                     } else if (RefType == ImageType_Integer16 && ComType == ImageType_Integer16) {
-                        uint16_t ****RefArray = (uint16_t ****) ImageContainer_GetArray(Reference);
-                        uint16_t ****ComArray = (uint16_t ****) ImageContainer_GetArray(Compare);
-                        uint16_t ****DifArray = (uint16_t ****) ImageContainer_GetArray(Difference);
+                        uint16_t ****RefArray = (uint16_t****) ImageContainer_GetArray(Reference);
+                        uint16_t ****ComArray = (uint16_t****) ImageContainer_GetArray(Compare);
+                        uint16_t ****DifArray = (uint16_t****) ImageContainer_GetArray(Difference);
                         for (uint8_t View = 0; View < RefNumViews; View++) {
                             for (uint64_t Width = 0ULL; Width < RefWidth; Width++) {
                                 for (uint64_t Height = 0ULL; Height < RefHeight; Height++) {
@@ -1564,7 +1564,7 @@ extern "C" {
             uint8_t          NumViews    = ImageChannelMap_GetNumViews(Map);
             
             if (Image->Type == ImageType_Integer8) {
-                uint8_t ****Pixels = (uint8_t ****) ImageContainer_GetArray(Image);
+                uint8_t ****Pixels = (uint8_t****) ImageContainer_GetArray(Image);
                 
                 for (uint64_t View = 0ULL; View < NumViews; View++) {
                     for (uint64_t W = 0ULL; W < Image->Width; W++) {
@@ -1576,7 +1576,7 @@ extern "C" {
                     }
                 }
             } else if (Image->Type == ImageType_Integer16) {
-                uint16_t ****Pixels = (uint16_t ****) ImageContainer_GetArray(Image);
+                uint16_t ****Pixels = (uint16_t****) ImageContainer_GetArray(Image);
                 
                 for (uint64_t View = 0ULL; View < NumViews; View++) {
                     for (uint64_t W = 0ULL; W < Image->Width; W++) {
@@ -1614,7 +1614,7 @@ extern "C" {
     ImageHistogram *ImageHistogram_Init(ImageContainer *Image) {
         ImageHistogram *Histogram = NULL;
         if (Image != NULL) {
-            Histogram = calloc(1, sizeof(Histogram));
+            Histogram                              = (ImageHistogram*) calloc(1, sizeof(ImageHistogram));
             if (Histogram != NULL) {
                 ImageChannelMap *Map               = ImageContainer_GetChannelMap(Image);
                 uint8_t          NumViews          = ImageChannelMap_GetNumViews(Map);
@@ -1626,7 +1626,7 @@ extern "C" {
                 Histogram->Width       = Image->Width;
                 
                 if (Image->Type == ImageType_Integer8) {
-                    uint8_t ***HistogramArray = calloc(NumViews * NumChannels * NumPossibleColors, sizeof(uint8_t));
+                    uint8_t ***HistogramArray = (uint8_t***) calloc(NumViews * NumChannels * NumPossibleColors, sizeof(uint8_t));
                     if (HistogramArray != NULL) {
                         Histogram->Array = (void ***) HistogramArray;
                         Histogram->Type  = Image->Type;
@@ -1635,7 +1635,7 @@ extern "C" {
                         Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate Histogram array"));
                     }
                 } else if (Image->Type == ImageType_Integer16) {
-                    uint16_t ***HistogramArray = calloc(NumViews * NumChannels * NumPossibleColors, sizeof(uint16_t));
+                    uint16_t ***HistogramArray = (uint16_t***) calloc(NumViews * NumChannels * NumPossibleColors, sizeof(uint16_t));
                     if (HistogramArray != NULL) {
                         Histogram->Array = (void ***) HistogramArray;
                         Histogram->Type  = Image->Type;
@@ -1670,7 +1670,7 @@ extern "C" {
     
     void ImageHistogram_SetArray(ImageHistogram *Histogram, void ***Array) {
         if (Histogram != NULL && Array != NULL) {
-            Histogram->Array = Array;
+            Histogram->Array = (void***) Array;
         } else if (Histogram == NULL) {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("ImageHistogram Pointer is NULL"));
         } else if (Array == NULL) {
@@ -1690,8 +1690,8 @@ extern "C" {
                 uint64_t         Height      = ImageContainer_GetHeight(Image);
                 
                 if (Histogram->Type == ImageType_Integer8) {
-                    uint8_t ****ImageArray = (uint8_t ****) Image->Pixels;
-                    uint8_t *** HistArray  = (uint8_t ***) Histogram->Array;
+                    uint8_t ****ImageArray = (uint8_t****) Image->Pixels;
+                    uint8_t *** HistArray  = (uint8_t***) Histogram->Array;
                     
                     for (uint64_t View = 0ULL; View < NumViews; View++) {
                         for (uint64_t W = 0ULL; W < Width; W++) {
@@ -1704,8 +1704,8 @@ extern "C" {
                         }
                     }
                 } else if (Histogram->Type == ImageType_Integer16) {
-                    uint16_t ****ImageArray = (uint16_t ****) Image->Pixels;
-                    uint16_t *** HistArray  = (uint16_t ***) Histogram->Array;
+                    uint16_t ****ImageArray = (uint16_t****) Image->Pixels;
+                    uint16_t *** HistArray  = (uint16_t***) Histogram->Array;
                     
                     for (uint64_t View = 0ULL; View < NumViews; View++) {
                         for (uint64_t W = 0ULL; W < Width; W++) {
@@ -1734,7 +1734,7 @@ extern "C" {
             uint8_t          NumViews    = ChannelMap->NumViews;
             if (Sort == SortType_Ascending) { // Top to bottom
                 if (Histogram->Type == ImageType_Integer8) {
-                    uint8_t ***Image = (uint8_t ***) ImageHistogram_GetArray(Histogram);
+                    uint8_t ***Image = (uint8_t***) ImageHistogram_GetArray(Histogram);
                     for (uint64_t View = 0ULL; View < NumViews; View++) {
                         for (uint64_t Width = 0ULL; Width < Histogram->Width; Width++) {
                             for (uint64_t Height = 0ULL; Height < Histogram->Height; Height++) {
@@ -1747,7 +1747,7 @@ extern "C" {
                         }
                     }
                 } else if (Histogram->Type == ImageType_Integer16) {
-                    uint16_t ***Image = (uint16_t ***) ImageHistogram_GetArray(Histogram);
+                    uint16_t ***Image = (uint16_t***) ImageHistogram_GetArray(Histogram);
                     for (uint64_t View = 0ULL; View < NumViews; View++) {
                         for (uint64_t Width = 0ULL; Width < Histogram->Width; Width++) {
                             for (uint64_t Height = 0ULL; Height < Histogram->Height; Height++) {
@@ -1762,7 +1762,7 @@ extern "C" {
                 }
             } else if (Sort == SortType_Descending) { // Bottom to top
                 if (Histogram->Type == ImageType_Integer8) {
-                    uint8_t ***Image = (uint8_t ***) ImageHistogram_GetArray(Histogram);
+                    uint8_t ***Image = (uint8_t***) ImageHistogram_GetArray(Histogram);
                     for (uint64_t View = 0ULL; View < NumViews; View++) {
                         for (uint64_t Width = 0ULL; Width < Histogram->Width; Width++) {
                             for (uint64_t Height = 0ULL; Height < Histogram->Height; Height++) {
@@ -1775,7 +1775,7 @@ extern "C" {
                         }
                     }
                 } else if (Histogram->Type == ImageType_Integer16) {
-                    uint16_t ***Image = (uint16_t ***) ImageHistogram_GetArray(Histogram);
+                    uint16_t ***Image = (uint16_t***) ImageHistogram_GetArray(Histogram);
                     for (uint64_t View = 0ULL; View < NumViews; View++) {
                         for (uint64_t Width = 0ULL; Width < Histogram->Width; Width++) {
                             for (uint64_t Height = 0ULL; Height < Histogram->Height; Height++) {
@@ -1801,7 +1801,7 @@ extern "C" {
             uint8_t          NumViews    = ChannelMap->NumViews;
             
             if (Histogram->Type == ImageType_Integer8) {
-                uint8_t ****Pixels = (uint8_t ****) ImageHistogram_GetArray(Histogram);
+                uint8_t ****Pixels = (uint8_t****) ImageHistogram_GetArray(Histogram);
                 
                 for (uint64_t View = 0ULL; View < NumViews; View++) {
                     for (uint64_t W = 0ULL; W < Histogram->Width; W++) {
@@ -1813,7 +1813,7 @@ extern "C" {
                     }
                 }
             } else if (Histogram->Type == ImageType_Integer16) {
-                uint16_t ****Pixels = (uint16_t ****) ImageHistogram_GetArray(Histogram);
+                uint16_t ****Pixels = (uint16_t****) ImageHistogram_GetArray(Histogram);
                 
                 for (uint64_t View = 0ULL; View < NumViews; View++) {
                     for (uint64_t W = 0ULL; W < Histogram->Width; W++) {
