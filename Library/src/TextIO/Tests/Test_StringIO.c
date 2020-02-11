@@ -71,12 +71,12 @@ extern "C" {
         return TestPassed;
     }
     
-    bool Test_ReplaceSubString() {
+    bool Test_SubstituteSubString() {
         bool TestPassed = No;
         
         UTF32 *Replacement = UTF32String("987654321");
         UTF32 *String      = UTF32String("123456789");
-        UTF32 *Replaced    = UTF32_ReplaceSubString(String, Replacement, 0, 0);
+        UTF32 *Replaced    = UTF32_SubstituteSubString(String, Replacement, 0, 0);
         
         return TestPassed;
     }

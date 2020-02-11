@@ -659,31 +659,31 @@ extern "C" {
     UTF32                *UTF32_ExtractSubString(UTF32 *String, uint64_t Offset, uint64_t Length);
     
     /*!
-     @abstract                             "Replaces a section in String starting at Offset and ending at Offset + Length with Replacement".
+     @abstract                             "Substitutes a section in String starting at Offset and ending at Offset + Length with Replacement".
      @param               String           "The string to edit".
-     @param               Replacement      "The string to splice in".
-     @param               Offset           "Where to start replacing String with Replacement".
-     @param               Length           "The number of CodePoints to replace, can be more or less than Replacement".
+     @param               Substitution     "The string to splice in".
+     @param               Offset           "Where to start replacing String with Substituion".
+     @param               Length           "The number of CodePoints to substitute, can be more or less than Substituion".
      */
-    UTF8                 *UTF8_ReplaceSubString(UTF8 *String, UTF8 *Replacement, uint64_t Offset, uint64_t Length);
+    UTF8                 *UTF8_SubstituteSubString(UTF8 *String, UTF8 *Substitution, uint64_t Offset, uint64_t Length);
     
     /*!
-     @abstract                             "Replaces a section in String starting at Offset and ending at Offset + Length with Replacement".
+     @abstract                             "Substitutes a section in String starting at Offset and ending at Offset + Length with Replacement".
      @param               String           "The string to edit".
-     @param               Replacement      "The string to splice in".
-     @param               Offset           "Where to start replacing String with Replacement".
-     @param               Length           "The number of CodePoints to replace, can be more or less than Replacement".
+     @param               Substitution     "The string to splice in".
+     @param               Offset           "Where to start replacing String with Substituion".
+     @param               Length           "The number of CodePoints to substitute, can be more or less than Substituion".
      */
-    UTF16                *UTF16_ReplaceSubString(UTF16 *String, UTF16 *Replacement, uint64_t Offset, uint64_t Length);
+    UTF16                *UTF16_SubstituteSubString(UTF16 *String, UTF16 *Substitution, uint64_t Offset, uint64_t Length);
     
     /*!
-     @abstract                             "Replaces a section in String starting at Offset and ending at Offset + Length with Replacement".
+     @abstract                             "Substitutes a section in String starting at Offset and ending at Offset + Length with Replacement".
      @param               String           "The string to edit".
-     @param               Replacement      "The string to splice in".
-     @param               Offset           "Where to start replacing String with Replacement".
-     @param               Length           "The number of CodePoints to replace, can be more or less than Replacement".
+     @param               Substitution     "The string to splice in".
+     @param               Offset           "Where to start replacing String with Substituion".
+     @param               Length           "The number of CodePoints to substitute, can be more or less than Substituion".
      */
-    UTF32                *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length);
+    UTF32                *UTF32_SubstituteSubString(UTF32 *String, UTF32 *Substitution, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Reallocates String and copies it except for the CodePoints between Offset and Length (inclusive)".
