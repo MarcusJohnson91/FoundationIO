@@ -881,7 +881,7 @@ extern "C" {
                 if ((BaseType & BaseType_Remove) == BaseType_Remove) {
                     FormattedStrings[Specifier + 1]      = UTF32_StitchSubString(FormattedStrings[Specifier], Start, End - Start);
                 } else if ((BaseType & BaseType_Literal) == BaseType_Literal) {
-                    FormattedStrings[Specifier + 1]      = UTF32_ReplaceSubString(FormattedStrings[Specifier], UTF32String("%"), Start, End - Start);
+                    FormattedStrings[Specifier + 1]      = UTF32_SubstituteSubString(FormattedStrings[Specifier], UTF32String("%"), Start, End - Start);
                 } else {
                     if (PrecisionType != Precision_Unknown) {
                         // IDK
@@ -908,10 +908,10 @@ extern "C" {
                         }
                     }
                     
-                    UTF32 *Argument                                       = Specifiers->Specifiers[Specifier].Argument;
+                    UTF32 *Argument                                        = Specifiers->Specifiers[Specifier].Argument;
                     
-                    FormattedStrings[Specifier + 1]                        = UTF32_ReplaceSubString(FormattedStrings[Specifier], Argument, Start, End - Start);
-                    printf("Formatted: \"%ls\"\n", (wchar_t*) FormattedStrings[Specifier + 1]);
+                    FormattedStrings[Specifier + 1]                        = UTF32_SubstituteSubString(FormattedStrings[Specifier], Argument, Start, End);
+                    //printf("Formatted: \"%ls\"\n", (wchar_t*) FormattedStrings[Specifier + 1]);
                 }
             }
             

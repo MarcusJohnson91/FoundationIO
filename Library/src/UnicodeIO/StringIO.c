@@ -1668,102 +1668,77 @@ extern "C" {
         return Padded;
     }
     
-    UTF8  *UTF8_ReplaceSubString(UTF8 *String, UTF8 *Replacement, uint64_t Offset, uint64_t Length) {
-        UTF8 *Replaced8          = NULL;
-        if (String != NULL && Replacement != NULL) {
-            UTF32 *String32      = UTF8_Decode(String);
-            UTF32 *Replacement32 = UTF8_Decode(Replacement);
-            UTF32 *Replaced32    = UTF32_ReplaceSubString(String32, Replacement32, Offset, Length);
-            Replaced8            = UTF8_Encode(Replaced32);
+    UTF8  *UTF8_SubstituteSubString(UTF8 *String, UTF8 *Substitution, uint64_t Offset, uint64_t Length) {
+        UTF8 *Replaced8           = NULL;
+        if (String != NULL && Substitution != NULL) {
+            UTF32 *String32       = UTF8_Decode(String);
+            UTF32 *Substitution32 = UTF8_Decode(Substitution);
+            UTF32 *Replaced32     = UTF32_SubstituteSubString(String32, Substitution32, Offset, Length);
+            Replaced8             = UTF8_Encode(Replaced32);
             free(String32);
-            free(Replacement32);
+            free(Substitution32);
             free(Replaced32);
         } else if (String == NULL) {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
-        } else if (Replacement == NULL) {
+        } else if (Substitution == NULL) {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Replacement Pointer is NULL"));
         }
         return Replaced8;
     }
     
-    UTF16 *UTF16_ReplaceSubString(UTF16 *String, UTF16 *Replacement, uint64_t Offset, uint64_t Length) {
-        UTF16 *Replaced16        = NULL;
-        if (String != NULL && Replacement != NULL) {
-            UTF32 *String32      = UTF16_Decode(String);
-            UTF32 *Replacement32 = UTF16_Decode(Replacement);
-            UTF32 *Replaced32    = UTF32_ReplaceSubString(String32, Replacement32, Offset, Length);
-            Replaced16           = UTF16_Encode(Replaced32);
+    UTF16 *UTF16_SubstituteSubString(UTF16 *String, UTF16 *Substitution, uint64_t Offset, uint64_t Length) {
+        UTF16 *Replaced16         = NULL;
+        if (String != NULL && Substitution != NULL) {
+            UTF32 *String32       = UTF16_Decode(String);
+            UTF32 *Substitution32 = UTF16_Decode(Substitution);
+            UTF32 *Replaced32     = UTF32_SubstituteSubString(String32, Substitution32, Offset, Length);
+            Replaced16            = UTF16_Encode(Replaced32);
             free(String32);
-            free(Replacement32);
+            free(Substitution32);
             free(Replaced32);
         } else if (String == NULL) {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
-        } else if (Replacement == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Replacement Pointer is NULL"));
+        } else if (Substitution == NULL) {
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Substitution Pointer is NULL"));
         }
         return Replaced16;
     }
     
-    UTF32 *UTF32_ReplaceSubString(UTF32 *String, UTF32 *Replacement, uint64_t Offset, uint64_t Length) { // 1: "%03o", 2: "014"
+    UTF32 *UTF32_SubstituteSubString(UTF32 *String, UTF32 *Substitution, uint64_t Offset, uint64_t Length) {
         UTF32 *NewString                            = NULL;
-        if (String != NULL && Replacement != NULL) {
+        if (String != NULL && Substitution != NULL) {
+            //printf("%ls\n", (wchar_t*) String);
             uint64_t StringSize                     = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t ReplacementSize                = UTF32_GetStringSizeInCodePoints(Replacement);
-            uint64_t NewStringSize                  = (StringSize + ReplacementSize) - Length;
+            uint64_t SubstitutionSize               = UTF32_GetStringSizeInCodePoints(Substitution);
+            uint64_t NewStringSize                  = (StringSize - Length) + SubstitutionSize;
             
-            /*
-             
-             Length may be longer than StringSize + ReplacementSize
-             
-             "%s" "1"
-             
-             "%s" "123"
-             
-             StringSize      = 2
-             
-             Length          = 2
-             
-             Length is the portion of the String to be replaced, so should it be subtracted?
-             
-             ReplacementSize = 1, 3
-             
-             So, if
-             
-             */
             NewString                               = UTF32_Init(NewStringSize);
             if (NewString != NULL) {
                 uint64_t NewCodePoint               = 0ULL;
                 uint64_t StringCodePoint            = 0ULL;
-                uint64_t ReplacementCodePoint       = 0ULL;
+                uint64_t SubstitutionCodePoint      = 0ULL;
                 
-                /*
-                 
-                 Theres 2 cases to pay attention to:
-                 
-                 ReplacementString is shorter than Length:
-                 
-                 
-                 ReplacementString is longer than length:
-                 
-                 */
-                
-                while (NewCodePoint < NewStringSize && StringCodePoint < StringSize) {
-                    if (NewCodePoint >= Offset && NewCodePoint <= ReplacementSize) {
-                        NewString[NewCodePoint] = Replacement[ReplacementCodePoint];
+                while (NewCodePoint < NewStringSize) {
+                    /*
+                     While NewCodePoint < NewStringSize
+                     AND ReplacementCodePoint < ReplacementSize AND NewCodePoint >= Offset
+                     OR StringCodePoint < StringSize
+                     */
+                    if (SubstitutionCodePoint < SubstitutionSize && NewCodePoint >= Offset) {
+                        NewString[NewCodePoint] = Substitution[SubstitutionCodePoint];
                         NewCodePoint           += 1;
-                        ReplacementCodePoint   += 1;
-                    } else {
+                        SubstitutionCodePoint  += 1;
+                    } else if (StringCodePoint < StringSize) {
                         NewString[NewCodePoint] = String[StringCodePoint];
                         NewCodePoint           += 1;
                         StringCodePoint        += 1;
                     }
-                    //NewCodePoint               += 1;
                 }
             }
         } else if (String == NULL) {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
-        } else if (Replacement == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Replacement Pointer is NULL"));
+        } else if (Substitution == NULL) {
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Substitution Pointer is NULL"));
         }
         return NewString;
     }
@@ -2025,7 +2000,7 @@ extern "C" {
                 for (uint64_t Index = 0ULL; Index < CaseFoldTableSize; Index++) {
                     if (String[CodePoint] == CaseFoldCodePoints[Index]) {
                         uint64_t ReplacementSize = UTF32_GetStringSizeInCodePoints(&CaseFoldedString[Index]);
-                        CaseFoldedString         = UTF32_ReplaceSubString(String, CaseFoldStrings[Index], CodePoint, ReplacementSize);
+                        CaseFoldedString         = UTF32_SubstituteSubString(String, CaseFoldStrings[Index], CodePoint, ReplacementSize);
                     }
                 }
                 CodePoint += 1;
@@ -2128,13 +2103,13 @@ extern "C" {
                 if (Kompatibility == Yes) {
                     for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
-                            ComposedString = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
+                            ComposedString = UTF32_SubstituteSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
                         }
                     }
                 } else {
                     for (uint64_t DecomposeCodePoint = 0ULL; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[DecomposeCodePoint]) {
-                            ComposedString = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[DecomposeCodePoint], CodePoint, 1);
+                            ComposedString = UTF32_SubstituteSubString(String, CanonicalNormalizationStrings[DecomposeCodePoint], CodePoint, 1);
                         }
                     }
                 }
@@ -2155,13 +2130,13 @@ extern "C" {
                 if (Kompatibility == Yes) {
                     for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
-                            Decomposed = UTF32_ReplaceSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
+                            Decomposed = UTF32_SubstituteSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
                         }
                     }
                 } else {
                     for (uint64_t Index = 0ULL; Index < CanonicalNormalizationTableSize; Index++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[Index]) {
-                            Decomposed = UTF32_ReplaceSubString(String, CanonicalNormalizationStrings[Index], CodePoint, 1);
+                            Decomposed = UTF32_SubstituteSubString(String, CanonicalNormalizationStrings[Index], CodePoint, 1);
                         }
                     }
                 }
