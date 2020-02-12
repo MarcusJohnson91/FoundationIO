@@ -1,4 +1,4 @@
-#include "../Macros.h"
+#include "Macros.h"
 
 #pragma once
 
@@ -38,6 +38,24 @@ extern "C" {
 #define DecimalTableHexadecimalSize 21
 
 #define MathSeperatorTableSize       4
+    
+    /*!
+     @enum       FoundationIOBases
+     @abstract                       "Defines the type of option".
+     */
+    typedef enum FoundationIOBases {
+                 Base_Unknown        = 0,
+                 Base_Integer        = 1,   // Integer
+                 Base_Radix2         = 2,   // Integer Only
+                 Base_Radix8         = 4,   // Integer Only
+                 Base_Decimal        = 8,   // Decimal
+                 Base_Radix10        = 16,  // Integer | Decimal
+                 Base_Radix16        = 32,  // Integer | Decimal
+                 Base_Uppercase      = 64,  // Only compatible with Base_Radix16
+                 Base_Lowercase      = 128, // Only compatible with Base_Radix16
+                 Base_Scientific     = 256, // Decimal Only
+                 Base_Shortest       = 512, // Decimal Only
+    } FoundationIOBases;
 
 	static const uint8_t BitMaskTable[BitMaskTableSize] = {
 		0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF

@@ -20,7 +20,6 @@ if(NOT FoundationIO_VERSION)
 endif(NOT FoundationIO_VERSION)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(libMATH -lm)
     add_definitions(-D_LARGEFILE_SOURCE)
     add_definitions(-D_LARGEFILE64_SOURCE)
     add_definitions(-D_FILE_OFFSET_BITS=64)
@@ -46,6 +45,7 @@ set(PUBLIC_HEADER
 "${Library_Dir}/include/Macros.h"
 "${Library_Dir}/include/MathIO.h"
 "${Library_Dir}/include/TestIO.h"
+"${Library_Dir}/include/Constants.h"
 "${Library_Dir}/include/UnicodeIO/CommandLineIO.h"
 "${Library_Dir}/include/UnicodeIO/FormatIO.h"
 "${Library_Dir}/include/UnicodeIO/LocalizationIO.h"
@@ -105,11 +105,11 @@ endif(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MAT
 if(${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CMAKE_INSTALL_PREFIX "/usr/local/Packages/FoundationIO")
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    if(CMAKE_GENERATOR_PLATFORM MATCHES "x64")
+    if(${CMAKE_GENERATOR_PLATFORM} MATCHES "x64")
         set(CMAKE_INSTALL_PREFIX "%ProgramFiles%\FoundationIO\")
-    elseif(CMAKE_GENERATOR_PLATFORM MATCHES "x86")
+    elseif(${CMAKE_GENERATOR_PLATFORM} MATCHES "x86")
         set(CMAKE_INSTALL_PREFIX "%ProgramFiles(x86)%\FoundationIO\")
-    endif(CMAKE_GENERATOR_PLATFORM MATCHES "x64")
+    endif(${CMAKE_GENERATOR_PLATFORM} MATCHES "x64")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 install(TARGETS FoundationIO DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
@@ -206,7 +206,7 @@ ${CMAKE_C_FLAGS} \
 -fshort-enums \
 -funroll-loops \
 -funsigned-char \
--std=c18 \
+-std=c2x \
 -Wall \
 -Wextra \
 -Wpedantic \
@@ -244,7 +244,7 @@ ${CMAKE_C_FLAGS} \
 -Os \
 ")
 
-set(LINK_FLAGS ${LINK_FLAGS} "-flto=full")
+set(LINK_FLAGS ${LINK_FLAGS} "-flto=full -lm")
 
 set(LINK_FLAGS_DEBUG " \
 ${LINK_FLAGS} \

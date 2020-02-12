@@ -1,7 +1,7 @@
 #include "../include/BitIO.h"                /* Included for our declarations */
 #include "../include/CryptographyIO.h"       /* Included for Entropy_GenerateInteger for GUUID_Generate */
 #include "../include/MathIO.h"               /* Included for Integer functions */
-#include "../include/Private/Constants.h"    /* Included for BitMaskTables */
+#include "../include/Constants.h"            /* Included for BitMaskTables */
 #include "../include/UnicodeIO/FormatIO.h"   /* Included for UTF32_Format */
 #include "../include/UnicodeIO/LogIO.h"      /* Included for Logging */
 #include "../include/UnicodeIO/StringIO.h"   /* Included for StringIO's declarations */
