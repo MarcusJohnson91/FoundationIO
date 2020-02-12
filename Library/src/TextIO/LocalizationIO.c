@@ -270,11 +270,11 @@ extern "C" {
         return CurrencySymbol;
     }
     
-    UTF8 *UTF8_DelocalizeInteger(UTF8 *String) {
+    UTF8 *UTF8_DelocalizeInteger(FoundationIOBases Base, UTF8 *String) {
         UTF8 *Delocalized = NULL;
         if (String != NULL) {
             UTF32 *String32      = UTF8_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(String32);
+            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(Base, String32);
             free(String32);
             Delocalized          = UTF8_Encode(Delocalized32);
             free(Delocalized32);
@@ -284,11 +284,11 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF16 *UTF16_DelocalizeInteger(UTF16 *String) {
+    UTF16 *UTF16_DelocalizeInteger(FoundationIOBases Base, UTF16 *String) {
         UTF16 *Delocalized = NULL;
         if (String != NULL) {
             UTF32 *String32      = UTF16_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(String32);
+            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(Base, String32);
             free(String32);
             Delocalized          = UTF16_Encode(Delocalized32);
             free(Delocalized32);
@@ -298,20 +298,20 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF32 *UTF32_DelocalizeInteger(UTF32 *String) {
+    UTF32 *UTF32_DelocalizeInteger(FoundationIOBases Base, UTF32 *String) {
         UTF32 *Delocalized       = NULL;
         if (String != NULL) {
             uint64_t OGCodePoint = 0ULL;
             uint64_t DeCodePoint = 0ULL;
-            uint64_t NumDigits   = UTF32_GetNumDigits(Base_Integer_Radix10, String, 0);
+            uint64_t NumDigits   = UTF32_GetNumDigits(Base, String, 0);
             Delocalized          = UTF32_Init(NumDigits);
             if (Delocalized != NULL) {
-                do {
+                while (String[OGCodePoint] != FoundationIONULLTerminator && DeCodePoint < NumDigits) {
                     if (String[OGCodePoint] >= UTF32Character('0') && String[OGCodePoint] <= UTF32Character('9')) {
                         OGCodePoint += 1;
                         Delocalized[DeCodePoint] = String[OGCodePoint];
                     }
-                } while (String[OGCodePoint] != FoundationIONULLTerminator && DeCodePoint < NumDigits);
+                }
             } else {
                 Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate delocaized string"));
             }
@@ -378,7 +378,7 @@ extern "C" {
                 CodePoint             -= 1;
             } while (CodePoint > 0);
             
-            uint64_t NumDigits         = UTF32_GetNumDigits(Base_Decimal_Hex_Uppercase, String, 0);
+            uint64_t NumDigits         = UTF32_GetNumDigits(Base_Decimal | Base_Radix16 | Base_Uppercase, String, 0);
             Delocalized                = UTF32_Init(NumDigits);
             
             CodePoint                  = 0ULL;

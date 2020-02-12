@@ -1,7 +1,7 @@
 #include "../include/BitIO.h"                /* Included for BitBuffer for CRC32 and Adler32 */
 #include "../include/CryptographyIO.h"       /* Included for our declarations */
 #include "../include/MathIO.h"               /* Included for Bits2Bytes, etc */
-#include "../include/Private/Constants.h"    /* Included for BitMaskTables */
+#include "../include/Constants.h"            /* Included for BitMaskTables */
 #include "../include/UnicodeIO/LogIO.h"      /* Included for error logging */
 
 #if   (FoundationIOTargetOS == FoundationIOWindowsOS)

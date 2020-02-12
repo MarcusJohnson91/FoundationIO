@@ -7,6 +7,7 @@
  */
 
 #include "../../include/Macros.h"
+#include "../Constants.h"
 
 #pragma once
 
@@ -145,38 +146,6 @@ extern "C" {
                           NormalizationForm_KompatibleDecompose = 3,
                           NormalizationForm_KompatibleCompose   = 4,
     } StringIONormalizationForms;
-    
-    /*!
-     @enum                StringIOBases
-     @constant            Base_Unknown                          "Unknown base".
-     @constant            Base_Integer_Radix2                   "Integer, Binary".
-     @constant            Base_Integer_Radix8                   "Integer, Octal".
-     @constant            Base_Integer_Radix10                  "Integer, Base10".
-     @constant            Base_Integer_Radix16_Uppercase        "Integer, Base16, Uppercase".
-     @constant            Base_Integer_Radix16_Lowercase        "Integer, Base16, Lowercase".
-     @constant            Base_Decimal_Radix10                  "Decimal, Base10, example: 3.14".
-     @constant            Base_Decimal_Scientific_Uppercase     "Decimal, Decimal+Exponent, Uppercase".
-     @constant            Base_Decimal_Scientific_Lowercase     "Decimal, Decimal+Exponent, Lowercase".
-     @constant            Base_Decimal_Shortest_Uppercase       "Decimal, Base10 or Scientific, Uppercase".
-     @constant            Base_Decimal_Shortest_Lowercase       "Decimal, Base10 or Scientific, Lowercase".
-     @constant            Base_Decimal_Hex_Uppercase            "Decimal, 1.3DEp42, Uppercase".
-     @constant            Base_Decimal_Hex_Lowercase            "Decimal, 1.3DEp42, Lowercase".
-     */
-    typedef enum StringIOBases {
-                          Base_Unknown                          = 0,
-                          Base_Integer_Radix2                   = 1,
-                          Base_Integer_Radix8                   = 2,
-                          Base_Integer_Radix10                  = 3,
-                          Base_Integer_Radix16_Uppercase        = 4,
-                          Base_Integer_Radix16_Lowercase        = 5,
-                          Base_Decimal_Radix10                  = 6,
-                          Base_Decimal_Scientific_Uppercase     = 7,
-                          Base_Decimal_Scientific_Lowercase     = 8,
-                          Base_Decimal_Shortest_Uppercase       = 9,
-                          Base_Decimal_Shortest_Lowercase       = 10,
-                          Base_Decimal_Hex_Uppercase            = 11,
-                          Base_Decimal_Hex_Lowercase            = 12,
-    } StringIOBases;
     
     /*!
      @enum                StringIOByteOrders
@@ -790,7 +759,7 @@ extern "C" {
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
-    int64_t               UTF8_String2Integer(StringIOBases Base, UTF8 *String);
+    int64_t               UTF8_String2Integer(FoundationIOBases Base, UTF8 *String);
     
     /*!
      @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
@@ -798,7 +767,7 @@ extern "C" {
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
-    int64_t               UTF16_String2Integer(StringIOBases Base, UTF16 *String);
+    int64_t               UTF16_String2Integer(FoundationIOBases Base, UTF16 *String);
     
     /*!
      @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
@@ -806,64 +775,64 @@ extern "C" {
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
-    int64_t               UTF32_String2Integer(StringIOBases Base, UTF32 *String);
+    int64_t               UTF32_String2Integer(FoundationIOBases Base, UTF32 *String);
     
     /*!
      @abstract                             "Converts an integer to a string; replaces itoa".
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF8                 *UTF8_Integer2String(StringIOBases Base, int64_t Integer2Convert);
+    UTF8                 *UTF8_Integer2String(FoundationIOBases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts an integer to a string; replaces itoa".
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF16                *UTF16_Integer2String(StringIOBases Base, int64_t Integer2Convert);
+    UTF16                *UTF16_Integer2String(FoundationIOBases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts an integer to a string; replaces itoa".
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF32                *UTF32_Integer2String(StringIOBases Base, int64_t Integer2Convert);
+    UTF32                *UTF32_Integer2String(FoundationIOBases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
-    double                UTF8_String2Decimal(StringIOBases Base, UTF8 *String);
+    double                UTF8_String2Decimal(FoundationIOBases Base, UTF8 *String);
     
     /*!
      @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
-    double                UTF16_String2Decimal(StringIOBases Base, UTF16 *String);
+    double                UTF16_String2Decimal(FoundationIOBases Base, UTF16 *String);
     
     /*!
      @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
-    double                UTF32_String2Decimal(StringIOBases Base, UTF32 *String);
+    double                UTF32_String2Decimal(FoundationIOBases Base, UTF32 *String);
     
     /*!
      @abstract                             "Converts a double to a string; replaces dtostr".
      @param               Decimal          "The decimal number to convert to a string".
      */
-    UTF8                 *UTF8_Decimal2String(StringIOBases Base, double Decimal);
+    UTF8                 *UTF8_Decimal2String(FoundationIOBases Base, double Decimal);
     
     /*!
      @abstract                             "Converts a double to a string; replaces ftoa".
      @param               Decimal          "The decimal number to convert to a string".
      */
-    UTF16                *UTF16_Decimal2String(StringIOBases Base, double Decimal);
+    UTF16                *UTF16_Decimal2String(FoundationIOBases Base, double Decimal);
     
     /*!
      @abstract                             "Converts a double to a string; replaces ftoa".
      @param               Decimal          "The decimal number to convert to a string".
      */
-    UTF32                *UTF32_Decimal2String(StringIOBases Base, double Decimal);
+    UTF32                *UTF32_Decimal2String(FoundationIOBases Base, double Decimal);
     
     /*!
      @abstract                             "Removes substrings (including single CodePoints) from a string".
@@ -1119,7 +1088,7 @@ extern "C" {
      @param               Offset           "Where to start looking for digits".
      @return                               "Returns the number of format specifiers found".
      */
-    uint64_t              UTF32_GetNumDigits(StringIOBases Base, UTF32 *String, uint64_t Offset); // Format/Deformat
+    uint64_t              UTF32_GetNumDigits(FoundationIOBases Base, UTF32 *String, uint64_t Offset); // Format/Deformat
     
     /*!
      @abstract                             "Gets a substring from Offset to where Format and Formatted start matching".
