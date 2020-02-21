@@ -6,68 +6,77 @@
  @brief               This header contains preprocessor macros for generic functions in FoundationIO, and cross-platform compatibility.
  */
 
-#ifndef               FoundationIOOSUnknown
-#define               FoundationIOOSUnknown      0
-#endif                /* UnknownOS */
+#pragma once
 
-#ifndef               FoundationIOMacClassicOS
-#define               FoundationIOMacClassicOS   1
-#endif                /* MacClassicOS */
+#ifndef FoundationIO_Macros_H
+#define FoundationIO_Macros_H
 
-#ifndef               FoundationIOWindowsOS
-#define               FoundationIOWindowsOS      2
-#endif                /* Windows */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#ifndef               FoundationIOPOSIXOS
-#define               FoundationIOPOSIXOS        4
-#endif                /* POSIX */
+#ifndef             FoundationIOOSUnknown
+#define             FoundationIOOSUnknown                                                     (0)
+#endif              /* UnknownOS */
 
-#ifndef               FoundationIOAppleOS
-#define               FoundationIOAppleOS        8
-#endif                /* AppleOS (MacOS, iOS, TVOS, etc) */
+#ifndef             FoundationIOMacClassicOS
+#define             FoundationIOMacClassicOS                                                  (1)
+#endif              /* MacClassicOS */
 
-#ifndef               FoundationIOBSDOS
-#define               FoundationIOBSDOS          16
-#endif                /* BSD (FreeBSD, OpenBSD, NetBSD, DragonFlyBSD, etc) */
+#ifndef             FoundationIOWindowsOS
+#define             FoundationIOWindowsOS                                                     (2)
+#endif              /* Windows */
 
-#ifndef               FoundationIOLinuxOS
-#define               FoundationIOLinuxOS        32
-#endif                /* BSD (Linux, Ubuntu, Android, etc) */
+#ifndef             FoundationIOPOSIXOS
+#define             FoundationIOPOSIXOS                                                       (4)
+#endif              /* POSIX */
+
+#ifndef             FoundationIOAppleOS
+#define             FoundationIOAppleOS                                                       (8)
+#endif              /* AppleOS (MacOS, iOS, TVOS, etc) */
+
+#ifndef             FoundationIOBSDOS
+#define             FoundationIOBSDOS                                                         (16)
+#endif              /* BSD (FreeBSD, OpenBSD, NetBSD, DragonFlyBSD, etc) */
+
+#ifndef             FoundationIOLinuxOS
+#define             FoundationIOLinuxOS                                                       (32)
+#endif              /* BSD (Linux, Ubuntu, Android, etc) */
 
 #if ((defined Macintosh) || (defined macintosh))
-#define FoundationIOTargetOS (FoundationIOMacClassicOS)
+#define             FoundationIOTargetOS                                                      (FoundationIOMacClassicOS)
 #endif
 
 #if ((defined _WIN16) || (defined _WIN32) || (defined _WIN64))
-#define FoundationIOTargetOS (FoundationIOWindowsOS)
+#define             FoundationIOTargetOS                                                      (FoundationIOWindowsOS)
 #endif
 
 #if (defined(__APPLE__) && defined(__MACH__))
-#define FoundationIOTargetOS (FoundationIOPOSIXOS + FoundationIOAppleOS)
+#define             FoundationIOTargetOS                                                      (FoundationIOPOSIXOS + FoundationIOAppleOS)
 #endif
 
 #if (defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__))
-#define FoundationIOTargetOS (FoundationIOPOSIXOS + FoundationIOBSDOS)
+#define             FoundationIOTargetOS                                                      (FoundationIOPOSIXOS + FoundationIOBSDOS)
 #endif
 
 #if (defined(__linux__) || defined(__ANDROID__) || defined(__gnu_linux__))
-#define FoundationIOTargetOS (FoundationIOPOSIXOS + FoundationIOLinuxOS)
+#define             FoundationIOTargetOS                                                      (FoundationIOPOSIXOS + FoundationIOLinuxOS)
 #endif
 
 #if (defined(__unix__) || defined(unix))
-#define FoundationIOTargetOS (FoundationIOPOSIXOS)
+#define             FoundationIOTargetOS                                                      (FoundationIOPOSIXOS)
 #endif
 
 #if (FoundationIOTargetOS == FoundationIOUnknownOS)
-#define FoundationIOTargetOS (FoundationIOPOSIXOS)
+#define             FoundationIOTargetOS                                                      (FoundationIOPOSIXOS)
 #endif
 
 #if ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-#ifdef  _FILE_OFFSET_BITS
-#undef  _FILE_OFFSET_BITS
-#define _FILE_OFFSET_BITS 64
+#ifdef              _FILE_OFFSET_BITS
+#undef              _FILE_OFFSET_BITS
+#define             _FILE_OFFSET_BITS                                                         (64)
 #else
-#define _FILE_OFFSET_BITS 64
+#define             _FILE_OFFSET_BITS                                                         (64)
 #endif /* _FILE_OFFSET_BITS */
 #endif /* FoundationIOTargetOS */
 
@@ -77,87 +86,78 @@
 #include <stdio.h>                    /* Included for FILE, SEEK SET/END/CUR macros */
 #include <stdlib.h>                   /* Included for calloc/free */
 #include <wchar.h>                    /* Included for WCHAR_MAX */
-
-#pragma once
-
-#ifndef FoundationIO_Macros_H
-#define FoundationIO_Macros_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
     
 #ifndef             Yes
-#define             Yes          1
+#define             Yes                                                                       (1)
 #elif
 #undef              Yes
-#define             Yes          1
+#define             Yes                                                                       (1)
 #endif           /* Yes */
     
 #ifndef             No
-#define             No           0
+#define             No                                                                        (0)
 #elif
 #undef              No
-#define             No           0
+#define             No                                                                        (0)
 #endif           /* No */
     
 #ifndef             True
-#define             True         1
+#define             True                                                                      (1)
 #elif
 #undef              True
-#define             True         1
+#define             True                                                                      (1)
 #endif           /* True */
     
 #ifndef             False
-#define             False        0
+#define             False                                                                     (0)
 #elif
 #undef              False
-#define             False        0
+#define             False                                                                     (0)
 #endif           /* False */
     
 #ifndef             FoundationIOStandardVersionC99
-#define             FoundationIOStandardVersionC99 (199901L)
+#define             FoundationIOStandardVersionC99                                            (199901L)
 #endif
     
 #ifndef             FoundationIOStandardVersionC11
-#define             FoundationIOStandardVersionC11 (201112L)
+#define             FoundationIOStandardVersionC11                                            (201112L)
 #endif
     
 #ifndef             FoundationIOStandardVersionC18
-#define             FoundationIOStandardVersionC18 (201710L)
+#define             FoundationIOStandardVersionC18                                            (201710L)
 #endif
     
 #ifndef             FoundationIOStandardVersionC2X
-#define             FoundationIOStandardVersionC2X (202102L)
+#define             FoundationIOStandardVersionC2X                                            (202102L)
 #endif
     
 #ifndef             FoundationIOStandardVersion
-#define             FoundationIOStandardVersion (__STDC_VERSION__)
+#define             FoundationIOStandardVersion                                               (__STDC_VERSION__)
 #endif
     
 #ifndef             FoundationIOCompilerIsUnknown
-#define             FoundationIOCompilerIsUnknown                          (0)
+#define             FoundationIOCompilerIsUnknown                                             (0)
 #endif
     
 #ifndef             FoundationIOCompilerIsClang
-#define             FoundationIOCompilerIsClang                            (1)
+#define             FoundationIOCompilerIsClang                                               (1)
 #endif
     
 #ifndef             FoundationIOCompilerIsMSVC
-#define             FoundationIOCompilerIsMSVC                             (2)
+#define             FoundationIOCompilerIsMSVC                                                (2)
 #endif
     
 #ifndef             FoundationIOCompilerIsGCC
-#define             FoundationIOCompilerIsGCC                              (3)
+#define             FoundationIOCompilerIsGCC                                                 (3)
 #endif
     
 #ifndef             FoundationIOCompiler
 #if   defined(__clang__)
-#define             FoundationIOCompiler                                   (FoundationIOCompilerIsClang)
+#define             FoundationIOCompiler                                                      (FoundationIOCompilerIsClang)
 #elif defined(_MSC_VER)
-#define             FoundationIOCompiler                                   (FoundationIOCompilerIsMSVC)
+#define             FoundationIOCompiler                                                      (FoundationIOCompilerIsMSVC)
 #elif defined(__GNUC__) || defined(__GNUG__)
-#define             FoundationIOCompiler                                   (FoundationIOCompilerIsGCC)
+#define             FoundationIOCompiler                                                      (FoundationIOCompilerIsGCC)
 #endif
 #endif /* FoundationIOCompiler */
     
@@ -227,12 +227,12 @@ extern "C" {
 #endif /* FoundationIOTargetOS is some kind of POSIX */
     
 #if (FoundationIOTargetOS == FoundationIOWindowsOS)
-#ifndef   WIN32_LEAN_AND_MEAN
-#define   WIN32_LEAN_AND_MEAN
-#endif /* WIN32_LEAN_AND_MEAN */
-#ifndef   VC_EXTRALEAN
-#define   VC_EXTRALEAN
-#endif /* VC_EXTRALEAN */
+#ifndef             WIN32_LEAN_AND_MEAN
+#define             WIN32_LEAN_AND_MEAN
+#endif             /* WIN32_LEAN_AND_MEAN */
+#ifndef             VC_EXTRALEAN
+#define             VC_EXTRALEAN
+#endif             /* VC_EXTRALEAN */
 #include <Windows.h>                  /* Included for Shared Library support, WinCon, QueryPerformanceCounter, etc */
 #include <WinSock2.h>                 /* Included for socket support, Windows.h MUST be included before WinSock2 */
     
@@ -294,112 +294,108 @@ extern "C" {
     
 #endif /* FoundationIOTargetOS is some kind of Windows */
     
-    
-    
-    
-    
-    
-    
 #ifndef             FoundationIOCompileTimeByteOrderUnknown
-#define             FoundationIOCompileTimeByteOrderUnknown                (0)
+#define             FoundationIOCompileTimeByteOrderUnknown                                   (0)
 #endif
     
 #ifndef             FoundationIOByteOrderBE
-#define             FoundationIOByteOrderBE                                (1)
+#define             FoundationIOByteOrderBE                                                   (1)
 #endif
     
 #ifndef             FoundationIOByteOrderLE
-#define             FoundationIOByteOrderLE                                (2)
+#define             FoundationIOByteOrderLE                                                   (2)
 #endif
     
 #if   (FoundationIOCompiler == FoundationIOCompilerIsClang || FoundationIOCompiler == FoundationIOCompilerIsGCC)
 #if   (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-#define             FoundationIOTargetByteOrder                            (FoundationIOByteOrderBE)
+#define             FoundationIOTargetByteOrder                                               (FoundationIOByteOrderBE)
 #elif (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define             FoundationIOTargetByteOrder                            (FoundationIOByteOrderLE)
+#define             FoundationIOTargetByteOrder                                               (FoundationIOByteOrderLE)
 #endif /* __BYTE_ORDER__ */
 #elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#define             FoundationIOTargetByteOrder                            (FoundationIOByteOrderLE)
+#define             FoundationIOTargetByteOrder                                               (FoundationIOByteOrderLE)
 #endif /* FoundationIOCompiler */
     
 #ifndef             FoundationIONewLine8
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-#define             FoundationIONewLine8                                   (u8"\n")
-#define             FoundationIONewLine8Size                               (1)
+#define             FoundationIONewLine8                                                      (u8"\n")
+#define             FoundationIONewLine8Size                                                  (1)
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-#define             FoundationIONewLine8                                   (u8"\r\n")
-#define             FoundationIONewLine8Size                               (2)
+#define             FoundationIONewLine8                                                      (u8"\r\n")
+#define             FoundationIONewLine8Size                                                  (2)
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
-#define             FoundationIONewLine8                                   (u8"\r")
-#define             FoundationIONewLine8Size                               (1)
+#define             FoundationIONewLine8                                                      (u8"\r")
+#define             FoundationIONewLine8Size                                                  (1)
 #endif /* TargetOS */
 #endif /* FoundationIONewLine8 */
     
 #ifndef             FoundationIONewLine16
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-#define             FoundationIONewLine16                                  (u"\n")
-#define             FoundationIONewLine16Size                              (1)
+#define             FoundationIONewLine16                                                     (u"\n")
+#define             FoundationIONewLine16Size                                                 (1)
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-#define             FoundationIONewLine16                                  (u"\r\n")
-#define             FoundationIONewLine16Size                              (2)
+#define             FoundationIONewLine16                                                     (u"\r\n")
+#define             FoundationIONewLine16Size                                                 (2)
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
-#define             FoundationIONewLine16                                  (u"\r")
-#define             FoundationIONewLine16Size                              (1)
+#define             FoundationIONewLine16                                                     (u"\r")
+#define             FoundationIONewLine16Size                                                 (1)
 #endif /* TargetOS */
 #endif /* FoundationIONewLine16 */
     
     
 #ifndef             FoundationIONewLine32
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-#define             FoundationIONewLine32                                  (U"\n")
-#define             FoundationIONewLine32Size                              (1)
+#define             FoundationIONewLine32                                                     (U"\n")
+#define             FoundationIONewLine32Size                                                 (1)
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-#define             FoundationIONewLine32                                  (U"\r\n")
-#define             FoundationIONewLine32Size                              (2)
+#define             FoundationIONewLine32                                                     (U"\r\n")
+#define             FoundationIONewLine32Size                                                 (2)
 #elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
-#define             FoundationIONewLine32                                  (U"\r")
-#define             FoundationIONewLine32Size                              (1)
+#define             FoundationIONewLine32                                                     (U"\r")
+#define             FoundationIONewLine32Size                                                 (1)
 #endif /* TargetOS */
 #endif /* FoundationIONewLine32 */
     
-#ifndef FoundationIONULLTerminator
-#define FoundationIONULLTerminator     (0)
-#define FoundationIONULLTerminatorSize (1)
+#ifndef             FoundationIONULLTerminator
+#define             FoundationIONULLTerminator                                                (0)
+#endif
+#ifndef             FoundationIONULLTerminatorSize
+#define             FoundationIONULLTerminatorSize                                            (1)
 #endif
     
-#ifndef UNCPathPrefix8
-#define UNCPathPrefix8                    (u8"//?/")
+#ifndef             UNCPathPrefix8
+#define             UNCPathPrefix8                                                            (u8"//?/")
 #endif
     
-#ifndef UNCPathPrefix16
-#define UNCPathPrefix16                   (u"//?/")
+#ifndef             UNCPathPrefix16
+#define             UNCPathPrefix16                                                           (u"//?/")
 #endif
 
-#ifndef UNCPathPrefix32
-#define UNCPathPrefix32                   (U"//?/")
+#ifndef             UNCPathPrefix32
+#define             UNCPathPrefix32                                                           (U"//?/")
 #endif
     
-#ifndef FoundationIO_ImmutablePointer2MutableData
-#define FoundationIO_ImmutablePointer2MutableData(Type, VariableName)   Type *const VariableName
+#ifndef             FoundationIO_ImmutablePointer2MutableData
+#define             FoundationIO_ImmutablePointer2MutableData(Type, VariableName)              Type *const VariableName
 #endif
     
-#ifndef FoundationIO_MutablePointer2ImmutableData
-#define FoundationIO_MutablePointer2ImmutableData(Type, VariableName)   Type const *VariableName
+#ifndef             FoundationIO_MutablePointer2ImmutableData
+#define             FoundationIO_MutablePointer2ImmutableData(Type, VariableName)              Type const *VariableName
 #endif
     
-#ifndef FoundationIO_ImmutablePointer2ImmutableData
-#define FoundationIO_ImmutablePointer2ImmutableData(Type, VariableName) Type const *const VariableName
+#ifndef             FoundationIO_ImmutablePointer2ImmutableData
+#define             FoundationIO_ImmutablePointer2ImmutableData(Type, VariableName)            Type const *const VariableName
 #endif
     
-#if (WCHAR_MIN < 0)
-#define FoundationIOWideCharSize ((WCHAR_MAX * 2) + 1)
+#if                (WCHAR_MIN < 0)
+#define             FoundationIOWideCharSize ((WCHAR_MAX * 2) + 1)
 #else
-#define FoundationIOWideCharSize (WCHAR_MAX)
+#define             FoundationIOWideCharSize (WCHAR_MAX)
 #endif
     
-    uint64_t FoundationIO_GetNumCPUCores(void);
+    uint64_t        FoundationIO_GetNumCPUCores(void);
     
-    uint64_t FoundationIO_GetTotalMemoryInBytes(void);
+    uint64_t        FoundationIO_GetTotalMemoryInBytes(void);
     
 #ifdef __cplusplus
 }
