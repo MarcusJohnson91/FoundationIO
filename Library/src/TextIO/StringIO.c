@@ -2183,71 +2183,49 @@ extern "C" {
         if (String != NULL) {
             if ((Base & Base_Integer) == Base_Integer) {
                 if ((Base & Base_Radix2) == Base_Radix2) {
-                    while (String[CodePoint] != FoundationIONULLTerminator) {
-                        for (uint8_t Digit = 0; Digit < IntegerTableBase2Size; Digit++) {
-                            if (String[CodePoint] == IntegerTableBase2[Digit]) {
-                                if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x31) {
-                                    Value <<= 1;
-                                    Value  += String[CodePoint] - 0x30;
-                                }
-                            }
-                        }
-                        CodePoint          += 1;
+                    while (String[CodePoint] != FoundationIONULLTerminator && (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('1'))) {
+                        Value    <<= 1;
+                        Value     += String[CodePoint] - 0x30;
+                        CodePoint += 1;
                     }
                 } else if ((Base & Base_Radix8) == Base_Radix8) {
-                    while (String[CodePoint] != FoundationIONULLTerminator) {
-                        for (uint8_t Digit = 0; Digit < IntegerTableBase8Size; Digit++) {
-                            if (String[CodePoint] == IntegerTableBase8[Digit]) {
-                                if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x37) {
-                                    Value  *= 8;
-                                    Value  += String[CodePoint] - 0x30;
-                                }
-                            }
-                        }
-                        CodePoint          += 1;
+                    while (String[CodePoint] != FoundationIONULLTerminator && (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('7'))) {
+                        Value     *= 8;
+                        Value     += String[CodePoint] - 0x30;
+                        CodePoint += 1;
                     }
                 } else if ((Base & Base_Radix10) == Base_Radix10) {
-                    while (String[CodePoint] != FoundationIONULLTerminator) {
-                        for (uint8_t Digit = 0; Digit < TableBase10Size; Digit++) {
-                            if (CodePoint == 0 && String[CodePoint] == UTF32Character('-')) {
+                    while (String[CodePoint] != FoundationIONULLTerminator && ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (CodePoint == 0 && String[CodePoint] == UTF32Character('-')))) {
+                            if (CodePoint == 0 && String[CodePoint] == UTF32Character('-')) { // FIXME: Sign discovery needs work
                                 Sign        = -1;
-                            } else if (String[CodePoint] == TableBase10[Digit]) {
+                            } else if (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) {
                                 Value      *= 10;
                                 Value      += String[CodePoint] - 0x30;
                             }
-                        }
                         CodePoint          += 1;
                     }
                 } else if ((Base & Base_Radix16) == Base_Radix16) {
                     if ((Base & Base_Uppercase) == Base_Uppercase) {
-                        while (String[CodePoint] != FoundationIONULLTerminator) {
-                            for (uint8_t Digit = 0; Digit < IntegerTableBase16Size; Digit++) {
-                                if (String[CodePoint] == IntegerTableUppercaseBase16[Digit]) {
-                                    if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
-                                        Value <<= 4;
-                                        Value  += String[CodePoint] - 0x30;
-                                    } else if (String[CodePoint] >= 0x41 && String[CodePoint] <= 0x46) {
-                                        Value <<= 4;
-                                        Value  += String[CodePoint] - 0x37;
-                                    }
-                                }
+                        while (String[CodePoint] != FoundationIONULLTerminator && ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] >= UTF32Character('A') && String[CodePoint] <= UTF32Character('F')))) {
+                            if (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) {
+                                Value <<= 4;
+                                Value  += String[CodePoint] - 0x30;
+                            } else if (String[CodePoint] >= UTF32Character('a') && String[CodePoint] <= UTF32Character('f')) {
+                                Value <<= 4;
+                                Value  += String[CodePoint] - 0x41;
                             }
-                            CodePoint          += 1;
+                            CodePoint  += 1;
                         }
                     } else if ((Base & Base_Lowercase) == Base_Lowercase) {
-                        while (String[CodePoint] != FoundationIONULLTerminator) {
-                            for (uint8_t Digit = 0; Digit < IntegerTableBase16Size; Digit++) {
-                                if (String[CodePoint] == IntegerTableLowercaseBase16[Digit]) {
-                                    if (String[CodePoint] >= 0x30 && String[CodePoint] <= 0x39) {
-                                        Value <<= 4;
-                                        Value  += String[CodePoint] - 0x30;
-                                    } else if (String[CodePoint] >= 0x61 && String[CodePoint] <= 0x66) {
-                                        Value <<= 4;
-                                        Value  += String[CodePoint] - 0x51;
-                                    }
-                                }
+                        while (String[CodePoint] != FoundationIONULLTerminator && ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] >= UTF32Character('a') && String[CodePoint] <= UTF32Character('f')))) {
+                            if (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) {
+                                Value <<= 4;
+                                Value  += String[CodePoint] - 0x30;
+                            } else if (String[CodePoint] >= UTF32Character('a') && String[CodePoint] <= UTF32Character('f')) {
+                                Value <<= 4;
+                                Value  += String[CodePoint] - 0x61;
                             }
-                            CodePoint          += 1;
+                            CodePoint  += 1;
                         }
                     }
                 }
@@ -2287,44 +2265,49 @@ extern "C" {
             NumDigits                +=  1;
         }
         
-        if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix2) == Base_Radix2) {
-            Radix                     = 2;
-        } else if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix8) == Base_Radix8) {
-            Radix                     = 8;
-        } else if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix10) == Base_Radix10) {
-            Radix                     = 10;
-        } else if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix16) == Base_Radix16) {
-            Radix                     = 16;
-        }
-        NumDigits                    += NumDigitsInInteger(Radix, Integer2Convert);
-        
-        String                        = UTF32_Init(NumDigits);
-        
-        if (String != NULL) {
-            for (uint64_t CodePoint = NumDigits; CodePoint > 0; CodePoint--) {
-                uint8_t Digit                 = Num % Radix;
-                Num                          /= Radix;
-                if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix2) == Base_Radix2) {
-                    String[CodePoint - 1]     = IntegerTableBase2[Digit];
-                } else if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix8) == Base_Radix8) {
-                    String[CodePoint - 1]     = IntegerTableBase8[Digit];
-                } else if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix10) == Base_Radix10) {
-                    if (Sign == -1 && CodePoint == 1) {
-                        String[CodePoint - 1] = UTF32Character('-');
-                    } else {
-                        String[CodePoint - 1] = TableBase10[Digit];
+        if ((Base & Base_Integer) == Base_Integer) {
+            if ((Base & Base_Radix2) == Base_Radix2) {
+                Radix                 = 2;
+            } else if ((Base & Base_Radix8) == Base_Radix8) {
+                Radix                 = 8;
+            } else if ((Base & Base_Radix10) == Base_Radix10) {
+                Radix                 = 10;
+            } else if ((Base & Base_Radix16) == Base_Radix16) {
+                Radix                 = 16;
+            }
+            
+            NumDigits                    += NumDigitsInInteger(Radix, Integer2Convert);
+            
+            String                        = UTF32_Init(NumDigits);
+            
+            if (String != NULL) {
+                for (uint64_t CodePoint = NumDigits; CodePoint > 0; CodePoint--) {
+                    uint8_t Digit                 = Num % Radix;
+                    Num                          /= Radix;
+                    if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix2) == Base_Radix2) {
+                        String[CodePoint - 1]     = IntegerTableBase2[Digit];
+                    } else if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix8) == Base_Radix8) {
+                        String[CodePoint - 1]     = IntegerTableBase8[Digit];
+                    } else if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix10) == Base_Radix10) {
+                        if (Sign == -1 && CodePoint == 1) {
+                            String[CodePoint - 1] = UTF32Character('-');
+                        } else {
+                            String[CodePoint - 1] = TableBase10[Digit];
+                        }
+                    } else if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix16) == Base_Radix16) {
+                        if ((Base & Base_Uppercase) == Base_Uppercase) {
+                            String[CodePoint - 1] = IntegerTableUppercaseBase16[Digit];
+                        } else if ((Base & Base_Lowercase) == Base_Lowercase) {
+                            String[CodePoint - 1] = IntegerTableLowercaseBase16[Digit];
+                        }
+                        Radix                     = 16;
                     }
-                } else if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix16) == Base_Radix16) {
-                    if ((Base & Base_Uppercase) == Base_Uppercase) {
-                        String[CodePoint - 1] = IntegerTableUppercaseBase16[Digit];
-                    } else if ((Base & Base_Lowercase) == Base_Lowercase) {
-                        String[CodePoint - 1] = IntegerTableLowercaseBase16[Digit];
-                    }
-                    Radix                     = 16;
                 }
+            } else {
+                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Base is not an integer, exiting"));
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Base is not an integer, exiting"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Base: %hu is not an integer"), Base);
         }
         return String;
     }
