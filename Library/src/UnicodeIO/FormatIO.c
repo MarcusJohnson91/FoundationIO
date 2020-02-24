@@ -80,8 +80,8 @@ extern "C" {
     
     typedef enum FormatSpecifier_Precisions {
         Precision_Unknown              = 0,
-        Precision_Inline_Digits        = 1,
-        Precision_Dot_Asterisk_NextArg = 2,
+        Precision_Asterisk_NextArg     = 1,
+        Precision_Inline_Digits        = 2,
     } FormatSpecifier_Precisions;
     
     typedef struct FormatSpecifier {
@@ -622,7 +622,7 @@ extern "C" {
                             break;
                         case UTF32Character('*'):
                             if (CodePoint - 1 >= 0 && Format[CodePoint - 1] == UTF32Character('.')) {
-                                Specifiers->Specifiers[Specifier].PrecisionFlag = Precision_Dot_Asterisk_NextArg;
+                                Specifiers->Specifiers[Specifier].PrecisionFlag = Precision_Asterisk_NextArg;
                             } else if (Format[CodePoint + 1] != FoundationIONULLTerminator && Format[CodePoint + 1] == UTF32Character('$')) {
                                 Specifiers->Specifiers[Specifier].PositionFlag  = Position_Asterisk_NextArg;
                             } else {
@@ -753,7 +753,7 @@ extern "C" {
                 if (MinWidthType == MinWidth_Asterisk_NextArg) {
                     Specifiers->Specifiers[Position].MinWidth              = va_arg(Arguments, uint32_t);
                 }
-                if (PrecisionType == Precision_Dot_Asterisk_NextArg) {
+                if (PrecisionType == Precision_Asterisk_NextArg) {
                     Specifiers->Specifiers[Position].Precision             = va_arg(Arguments, uint32_t);
                 }
                 
@@ -843,16 +843,12 @@ extern "C" {
                 }
             }
             
-            /*
-             Loop over NumSpecifiers.
-             if this Specifier's argument is NULL, find the position with the argument then copy that argument
-             */
-            
-            if (Specifiers->NumUniqueSpecifiers < Specifiers->NumSpecifiers) { // Copy Unique arguments to the duplicates
-                for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
-                    for (uint64_t Specifier2 = 1ULL; Specifier2 < Specifiers->NumSpecifiers; Specifier++) {
-                        if (Specifiers->Specifiers[Specifier].PositionFlag != Position_Unknown && Specifiers->Specifiers[Specifier2].Argument == NULL) {
-                            Specifiers->Specifiers[Specifier2].Argument    = UTF32_Clone(Specifiers->Specifiers[Specifiers->Specifiers[Specifier].Position].Argument);
+            if (Specifiers->NumUniqueSpecifiers < Specifiers->NumSpecifiers) {
+                for (uint64_t Unique = 0; Unique < Specifiers->NumUniqueSpecifiers; Unique++) {
+                    uint64_t ValidArgument = Specifiers->Specifiers[UniqueSpecifiers[Unique]].Position;
+                    for (uint64_t InvalidArgument = 0ULL; InvalidArgument < Specifiers->NumSpecifiers; InvalidArgument++) {
+                        if (Specifiers->Specifiers[InvalidArgument].Position == ValidArgument && Specifiers->Specifiers[InvalidArgument].Argument == NULL) {
+                            Specifiers->Specifiers[InvalidArgument].Argument = UTF32_Clone(Specifiers->Specifiers[UniqueSpecifiers[Unique]].Argument);
                         }
                     }
                 }
@@ -885,44 +881,6 @@ extern "C" {
             UTF32 **FormattedStrings   = UTF32_StringArray_Init(Specifiers->NumSpecifiers + 2); // + 2 = Format Parameter, and Formatted result
             FormattedStrings[0]        = Format;
             
-            /*
-             
-             What's the overall gameplan?
-             
-             Well, all Specifiers need to be substituted (taking into account Positional Duplicates), actually duplicates no longer matter.
-             
-             
-             So, loop over each specifier, substituting each Argument for each specifier in the string.
-             
-             We need a StringArray with X string pointers, where X is NumSpecifiers + Format + Formatted
-             
-             At th end when we deallocate most of these strings we need to loop starting at 1 and ending at -1
-             
-             then we should set the return variable to the address of the Formatted parameter, then null that slot in the StringArray, then NULL the Format parameter; then deinit the whole thing
-             
-             */
-            
-            /*
-             
-             In format strings containing the "%n$" form of conversion specification, numbered arguments in the argument list can be referenced from the format string as many times as required.
-             
-             Duplicate arguments are Positional Arguments with the same position listed more than once
-             
-             */
-            
-            /*
-             
-             This function needs a TON of work.
-             
-             Gotta handle all the weird flag edge cases and all kinds of stuff
-             
-             Where do we start?
-             
-             Well, for each Specifier, we need to loop until we find the first percent symbol and set that to the Start of each specifier
-             
-             So let's write a function for that
-             */
-            
             for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
                 uint64_t                      NewStart           = UTF32_LocateFirstPercent(Format);
                 uint64_t                      StartEndDifference = Specifiers->Specifiers[Specifier].Start - NewStart;
@@ -931,11 +889,9 @@ extern "C" {
                 uint64_t                      Start              = Specifiers->Specifiers[Specifier].Start;
                 uint64_t                      End                = Specifiers->Specifiers[Specifier].End;
                 
-                UTF32                        *Argument           = Specifiers->Specifiers[Specifier].Argument;
                 FormatSpecifier_BaseTypes     BaseType           = Specifiers->Specifiers[Specifier].BaseType;
                 FormatSpecifier_Precisions    PrecisionType      = Specifiers->Specifiers[Specifier].PrecisionFlag;
                 FormatSpecifier_TypeModifiers ModifierType       = Specifiers->Specifiers[Specifier].TypeModifier;
-                //FormatSpecifier_Positions     PositionType       = Specifiers->Specifiers[Specifier].PositionFlag;
                 FormatSpecifier_MinWidths     MinWidthType       = Specifiers->Specifiers[Specifier].MinWidthFlag;
                 FormatSpecifier_Flags         FlagType           = Specifiers->Specifiers[Specifier].Flag;
                 
@@ -944,9 +900,7 @@ extern "C" {
                 } else if ((BaseType & BaseType_Literal) == BaseType_Literal && (ModifierType & Modifier_Percent) == Modifier_Percent) {
                     FormattedStrings[Specifier + 1]      = UTF32_SubstituteSubString(FormattedStrings[Specifier], UTF32String("%"), Start, End - Start);
                 } else {
-                    if (PrecisionType != Precision_Unknown) {
-                        // Cut or extend the string so it fits
-                    } else if (MinWidthType != MinWidth_Unknown) {
+                    if (MinWidthType != MinWidth_Unknown) {
                         uint64_t MinWidth                                  = Specifiers->Specifiers[Specifier].MinWidth;
                         uint64_t ArgSize                                   = UTF32_GetStringSizeInCodePoints(Specifiers->Specifiers[Specifier].Argument);
                         uint64_t PadSize                                   = 0ULL;
@@ -955,7 +909,6 @@ extern "C" {
                             if (FlagType == Flag_Zero_Pad) {
                                 UTF32 *OriginalArg                         = Specifiers->Specifiers[Specifier].Argument;
                                 Specifiers->Specifiers[Specifier].Argument = UTF32_PadString(OriginalArg, UTF32String("0"), PadSize);
-                                //printf("Argument: \"%ls\"\n", (wchar_t*) Specifiers->Specifiers[Specifier].Argument);
                                 UTF32_Deinit(OriginalArg);
                             } else if (FlagType == Flag_Space_Pad) {
                                 UTF32 *OriginalArg                         = Specifiers->Specifiers[Specifier].Argument;
@@ -965,12 +918,14 @@ extern "C" {
                                 UTF32_Deinit(Padded);
                             }
                         }
+                    } else if (PrecisionType != Precision_Unknown) {
+                        // Cut or extend the string so it fits
                     }
                     
                     UTF32 *Argument                                        = Specifiers->Specifiers[Specifier].Argument;
                     
-                    FormattedStrings[Specifier + 1]                        = UTF32_SubstituteSubString(FormattedStrings[Specifier], Argument, Start, End);
-                    //printf("Formatted: \"%ls\"\n", (wchar_t*) FormattedStrings[Specifier + 1]);
+                    FormattedStrings[Specifier + 1]                        = UTF32_SubstituteSubString(FormattedStrings[Specifier], Argument, Start, End - Start);
+                    printf("Formatted: \"%ls\"\n", (wchar_t*) FormattedStrings[Specifier + 1]);
                 }
             }
             
