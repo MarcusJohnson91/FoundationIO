@@ -1682,6 +1682,7 @@ extern "C" {
                         NewString[NewCodePoint] = Substitution[SubstitutionCodePoint];
                         NewCodePoint           += 1;
                         SubstitutionCodePoint  += 1;
+                        StringCodePoint        += 1;
                     } else if (StringCodePoint < StringSize) {
                         NewString[NewCodePoint] = String[StringCodePoint];
                         NewCodePoint           += 1;
