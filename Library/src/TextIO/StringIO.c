@@ -1673,16 +1673,14 @@ extern "C" {
                 uint64_t SubstitutionCodePoint      = 0ULL;
                 
                 while (NewCodePoint < NewStringSize) {
-                    /*
-                     While NewCodePoint < NewStringSize
-                     AND ReplacementCodePoint < ReplacementSize AND NewCodePoint >= Offset
-                     OR StringCodePoint < StringSize
-                     */
-                    if (SubstitutionCodePoint < SubstitutionSize && NewCodePoint >= Offset) {
+                    if (NewCodePoint >= Offset && SubstitutionCodePoint < SubstitutionSize) {
                         NewString[NewCodePoint] = Substitution[SubstitutionCodePoint];
                         NewCodePoint           += 1;
                         SubstitutionCodePoint  += 1;
                         StringCodePoint        += 1;
+                        if (Length > SubstitutionSize && SubstitutionCodePoint == SubstitutionSize) {
+                            StringCodePoint    += Length - SubstitutionSize;
+                        }
                     } else if (StringCodePoint < StringSize) {
                         NewString[NewCodePoint] = String[StringCodePoint];
                         NewCodePoint           += 1;
