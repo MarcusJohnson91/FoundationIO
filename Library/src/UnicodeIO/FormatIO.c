@@ -861,7 +861,7 @@ extern "C" {
             FormattedStrings[0]        = Format;
             
             for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
-                uint64_t                      NewStart           = UTF32_LocateFirstPercent(Format);
+                uint64_t                      NewStart           = UTF32_LocateFirstPercent(FormattedStrings[Specifier]);
                 uint64_t                      StartEndDifference = Specifiers->Specifiers[Specifier].Start - NewStart;
                 Specifiers->Specifiers[Specifier].Start          = NewStart;
                 Specifiers->Specifiers[Specifier].End           -= StartEndDifference;
@@ -912,7 +912,7 @@ extern "C" {
                 UTF32_Deinit(FormattedStrings[Specifier]);
             }
             
-            Formatted                                   = FormattedStrings[Specifiers->NumSpecifiers - 1];
+            Formatted                                   = FormattedStrings[Specifiers->NumSpecifiers];
         } else if (Format == NULL) {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Format Pointer is NULL"));
         } else if (Specifiers == NULL) {

@@ -133,14 +133,19 @@ extern "C" {
         UTF8 *HushLittleBabyResult2 = UTF8String("Hush little baby don't say a word, Momma's gonna buy you a Mockingbird; And if that Mockingbird don't sing, Momma's gonna buy you a Diamond ring; and if that Diamond ring turns brass, Momma's gonna buy you a looking glass");
         
         UTF8 *DuplicatePosition2Dad            = UTF8_Format(UTF8String("Hush little baby don't say a word, %1$s's gonna buy you a Mockingbird; And if that Mockingbird don't s%2$s, %1$s's gonna buy you a Diamond r%2$s; and if that Diamond r%2$s turns br%3$s, %1$s's gonna buy you a looking gl%3$s"), HLBParent1, HLBRhyme1Ending, HLBRhyme2Ending); // %1$ = 3, %2$ = 3, %3$ = 2, Dupes = 5
-        UTF8 *DuplicatePosition2Mom            = UTF8_Format(UTF8String("Hush little baby don't say a word, %1$s's gonna buy you a Mockingbird; And if that Mockingbird don't s%2$s, %1$s's gonna buy you a Diamond r%2$s; and if that Diamond r%2$s turns br%3$s, %1$s's gonna buy you a looking gl%3$s"), HLBParent2, HLBRhyme1Ending, HLBRhyme2Ending);
-        
         bool  DuplicatePosition2Test1          = UTF8_Compare(DuplicatePosition2Dad, HushLittleBabyResult1);
-        bool  DuplicatePosition2Test2          = UTF8_Compare(DuplicatePosition2Mom, HushLittleBabyResult2);
-        if (DuplicatePosition2Test1 == No && DuplicatePosition2Test2 == No) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Rhyme Politional Test Failed"));
+        if (DuplicatePosition2Test1 == No) {
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Rhyme Positional Test Failed"));
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Rhyme Politional Test Passed"));
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Rhyme Positional Test Passed"));
+        }
+        
+        UTF8 *DuplicatePosition2Mom            = UTF8_Format(UTF8String("Hush little baby don't say a word, %1$s's gonna buy you a Mockingbird; And if that Mockingbird don't s%2$s, %1$s's gonna buy you a Diamond r%2$s; and if that Diamond r%2$s turns br%3$s, %1$s's gonna buy you a looking gl%3$s"), HLBParent2, HLBRhyme1Ending, HLBRhyme2Ending);
+        bool  DuplicatePosition2Test2          = UTF8_Compare(DuplicatePosition2Mom, HushLittleBabyResult2);
+        if (DuplicatePosition2Test2 == No) {
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Rhyme Positional Test Failed"));
+        } else {
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Rhyme Positional Test Passed"));
         }
         
         
