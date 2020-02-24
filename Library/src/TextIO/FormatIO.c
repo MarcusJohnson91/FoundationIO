@@ -8,7 +8,7 @@
 extern "C" {
 #endif
     
-    typedef enum FormatSpecifier_TypeModifiers { // MSVC supports capital C and S for "wide" aka UTF-16 characters/strings
+    typedef enum FormatSpecifier_TypeModifiers {
         Modifier_Unknown               = 0,
         Modifier_Percent               = 1,
         Modifier_UTF8                  = 2,
@@ -61,9 +61,9 @@ extern "C" {
         Length_16Bit                   = 2,
         Length_32Bit                   = 4,
         Length_64Bit                   = 8,
-        Length_SizeType                = 16, // Modifier_Size
-        Length_PointerDiff             = 32, // Modifier_PointerDiff
-        Length_IntMax                  = 64, // Largest Integer type, 64 bit
+        Length_SizeType                = 16,
+        Length_PointerDiff             = 32,
+        Length_IntMax                  = 64,
     } FormatSpecifier_LengthModifiers;
     
     typedef enum FormatSpecifier_MinWidths {
@@ -85,12 +85,12 @@ extern "C" {
     } FormatSpecifier_Precisions;
     
     typedef struct FormatSpecifier {
-        UTF32                          *Argument;        // The actual argument contained in the va_list
-        uint64_t                        Start;           // Start location in the format string
-        uint64_t                        End;             // (CurrentCodePoint - Offset) + 1
-        uint64_t                        MinWidth;        // Actual Width
-        uint64_t                        Precision;       // Actual Precision
-        uint64_t                        Position;        // Argument number to substitute
+        UTF32                          *Argument;
+        uint64_t                        Start;
+        uint64_t                        End;
+        uint64_t                        MinWidth;
+        uint64_t                        Precision;
+        uint64_t                        Position;
         FormatSpecifier_TypeModifiers   TypeModifier;
         FormatSpecifier_Flags           Flag;
         FormatSpecifier_BaseTypes       BaseType;
@@ -533,39 +533,19 @@ extern "C" {
                     CodePoint                                                           += 1;
                 }
                 
-                /*
-                 Positional Arguments: "%5$.2d"
-                 
-                 Limit: POSIX = NL_ARGMAX, Windows = _ARGMAX
-                 
-                 How do I convert those values into a real digit limit?
-                 
-                 Well, it's base-10, so 65535 = 5 base-10 digits; 128 = 3 base 10 digits
-                 
-                 Conversions can be applied to the nth argument after the format in the argument list, rather than to the next unused argument. In this case, the conversion specifier character % (see below) is replaced by the sequence "%n$", where n is a decimal integer in the range [1,{NL_ARGMAX}], giving the position of the argument in the argument list. This feature provides for the definition of format strings that select arguments in an order appropriate to specific languages (see the EXAMPLES section).
-                 
-                 The format can contain either numbered argument conversion specifications (that is, "%n$" and "*m$"), or unnumbered argument conversion specifications (that is, % and * ), but not both. The only exception to this is that %% can be mixed with the "%n$" form. The results of mixing numbered and unnumbered argument specifications in a format string are undefined. When numbered argument specifications are used, specifying the Nth argument requires that all the leading arguments, from the first to the (N-1)th, are specified in the format string.
-                 
-                 In format strings containing the "%n$" form of conversion specification, numbered arguments in the argument list can be referenced from the format string as many times as required. [Option End]
-                 
-                 In format strings containing the % form of conversion specification, each conversion specification uses the first unused argument in the argument list.
-                 */
-                
-                
-                
                 uint64_t CodePoint2        = 0ULL;
                 uint64_t NumDigits         = 0ULL;
                 CodePoint                  = Specifiers->Specifiers[Specifier].Start + 1;
                 while (CodePoint < 0x7FFFFFFFFFFFFFFE && Format[CodePoint] != FoundationIONULLTerminator && CodePoint < Specifiers->Specifiers[Specifier].End) {
                     switch (Format[CodePoint]) {
                         case UTF32Character(' '):
-                            Specifiers->Specifiers[Specifier].Flag          = Flag_Space_Pad; // if there is no sign, pad positive ; + outweighs space
+                            Specifiers->Specifiers[Specifier].Flag          = Flag_Space_Pad;
                             break;
                         case UTF32Character('\''):
-                            Specifiers->Specifiers[Specifier].Flag          = Flag_Apostrophe_ExponentGroup; // The non-monetary grouping character is used.
+                            Specifiers->Specifiers[Specifier].Flag          = Flag_Apostrophe_ExponentGroup;
                             break;
                         case UTF32Character('+'):
-                            Specifiers->Specifiers[Specifier].Flag          = Flag_Plus_AddSign; // ALWAYS add sign
+                            Specifiers->Specifiers[Specifier].Flag          = Flag_Plus_AddSign;
                             break;
                         case UTF32Character('-'):
                             Specifiers->Specifiers[Specifier].Flag          = Flag_Minus_LeftJustify;
@@ -601,7 +581,7 @@ extern "C" {
                                 while (Format[PotentialDigitLocation] != UTF32Character('%')) {
                                     PotentialDigitLocation     -= 1;
                                 }
-                                PotentialDigitLocation         += 1; // Add one so it's right after the %
+                                PotentialDigitLocation         += 1;
                                 uint64_t NumPossibleCodePoints  = CodePoint - PotentialDigitLocation;
                                 uint8_t  NumDigits2Read         = Minimum(NumPossibleCodePoints, MaxDigits);
                                 uint64_t Value                  = UTF32_String2Integer(Base_Integer | Base_Radix10, &Format[CodePoint - NumDigits2Read]);
@@ -638,7 +618,6 @@ extern "C" {
                         case UTF32Character('7'):
                         case UTF32Character('8'):
                         case UTF32Character('9'):
-                            // This is the first noticed digit, so just start looking forward for digits
                             while (Format[CodePoint2] != FoundationIONULLTerminator && Format[CodePoint2] >= UTF32Character('0') && Format[CodePoint2] <= UTF32Character('9')) {
                                 CodePoint2 += 1;
                                 NumDigits  += 1;
@@ -658,13 +637,13 @@ extern "C" {
                     }
                     CodePoint += 1;
                 }
-                CodePoint      = Specifiers->Specifiers[Specifier].End + 1; // So specifiers don't overlap
+                CodePoint      = Specifiers->Specifiers[Specifier].End + 1;
                 Specifier     += 1;
             }
             
             uint64_t Specifier1 = 0;
             uint64_t Specifier2 = 0;
-            for (Specifier1 = 0ULL; Specifier1 < Specifiers->NumSpecifiers; Specifier1++) { // Dupe = 5
+            for (Specifier1 = 0ULL; Specifier1 < Specifiers->NumSpecifiers; Specifier1++) {
                 for (Specifier2 = 0ULL; Specifier2 < Specifier1; Specifier2++) {
                     if (Specifiers->Specifiers[Specifier1].PositionFlag != Position_Unknown && Specifiers->Specifiers[Specifier1].Position == Specifiers->Specifiers[Specifier2].Position) {
                         break;
@@ -878,7 +857,7 @@ extern "C" {
     UTF32 *FormatString_UTF32(FormatSpecifiers *Specifiers, UTF32 *Format) {
         UTF32 *Formatted               = NULL;
         if (Format != NULL && Specifiers != NULL) {
-            UTF32 **FormattedStrings   = UTF32_StringArray_Init(Specifiers->NumSpecifiers + 2); // + 2 = Format Parameter, and Formatted result
+            UTF32 **FormattedStrings   = UTF32_StringArray_Init(Specifiers->NumSpecifiers + 2);
             FormattedStrings[0]        = Format;
             
             for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
@@ -930,10 +909,10 @@ extern "C" {
             }
             
             for (uint64_t Specifier = 1ULL; Specifier < Specifiers->NumSpecifiers - 1; Specifier++) {
-                UTF32_Deinit(FormattedStrings[Specifier]); // Multi specifiers?
+                UTF32_Deinit(FormattedStrings[Specifier]);
             }
             
-            Formatted                                   = FormattedStrings[Specifiers->NumSpecifiers];
+            Formatted                                   = FormattedStrings[Specifiers->NumSpecifiers - 1];
         } else if (Format == NULL) {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Format Pointer is NULL"));
         } else if (Specifiers == NULL) {
@@ -945,18 +924,14 @@ extern "C" {
     UTF32 **DeformatString_UTF32(FormatSpecifiers *Specifiers, UTF32 *Format, UTF32 *Formatted) {
         UTF32 **Deformatted                            = UTF32_StringArray_Init(Specifiers->NumSpecifiers);
         if (Deformatted != NULL) {
-            for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) { // Stringify each specifier
+            for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
                 FormatSpecifier_BaseTypes     BaseType = Specifiers->Specifiers[Specifier].BaseType;
                 FormatSpecifier_TypeModifiers Modifier = Specifiers->Specifiers[Specifier].TypeModifier;
-                uint64_t                      Start    = Specifiers->Specifiers[Specifier].Start + 1; // Start always starts at the Percent so always add 1
+                uint64_t                      Start    = Specifiers->Specifiers[Specifier].Start + 1;
                 
                 if ((BaseType & BaseType_Integer) == BaseType_Integer || (BaseType & BaseType_Decimal) == BaseType_Decimal || (BaseType & BaseType_Pointer) == BaseType_Pointer) {
                     FoundationIOBases  Base            = ConvertTypeModifier2Base(Modifier);
                     uint64_t           SubStringLength = UTF32_GetNumDigits(Base, Formatted, Start);
-                    // Start is 1 long  for Specifier 0
-                    // Start is 2 short for Specifier 1
-                    // Start is 5 short for Specifier 2
-                    // Cascading failure, CorrectOffset is wrong
                     Deformatted[Specifier]             = UTF32_ExtractSubString(Formatted, Start, SubStringLength);
                 } else if ((BaseType & BaseType_CodeUnit) == BaseType_CodeUnit) {
                     Deformatted[Specifier]             = UTF32_CodeUnit2String(Formatted[Start]);
@@ -1028,15 +1003,12 @@ extern "C" {
             if (NumSpecifiers > 0) {
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
                 UTF32 *Format32              = UTF8_Decode(Format);
-                // printf("UTF-8  :%s\n", Format);
-                // printf("UTF-32 :%ls\n", (wchar_t*) Format32);
                 UTF32_ParseFormatSpecifiers(Format32, Specifiers, StringType_UTF8);
                 va_list VariadicArguments;
                 va_start(VariadicArguments, Format);
                 Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
                 va_end(VariadicArguments);
                 UTF32 *FormattedString       = FormatString_UTF32(Specifiers, Format32);
-                //printf("Formatted: \"%ls\"\n", (wchar_t*) FormattedString);
                 FormatSpecifiers_Deinit(Specifiers);
                 UTF32_Deinit(Format32);
                 Format8                      = UTF8_Encode(FormattedString);
