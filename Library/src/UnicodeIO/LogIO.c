@@ -113,28 +113,43 @@ extern "C" {
             Log_UTF8_OpenFile(Log_Path);
         }
         
-        va_list VariadicArguments;
-        va_start(VariadicArguments, Description);
-        UTF8 *VariadicString  = UTF8_Format(Description, VariadicArguments);
+        UTF32 *Error   = UTF32String("ERROR");
+        UTF32 *Mistake = UTF32String("Mistake");
         
-        UTF8 *FormattedString = NULL;
-        
-        UTF8 *ErrorType[2]    = {UTF8String("ERROR"), UTF8String("Mistake")};
+        UTF32 *SecurityName   = NULL;
         if (Log_ProgramName != NULL) {
-            FormattedString   = UTF8_Format(UTF8String("%Us in %s's %s: %s%s"), *Log_ProgramName, ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
+            SecurityName      = UTF32_Format(UTF32String("%Us's %Us in %s: "), Log_ProgramName, Severity == Log_DEBUG ? Error : Mistake, FunctionName);
         } else {
-            FormattedString   = UTF8_Format(UTF8String("%s in %s: %s%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
-            //printf(UTF8String("%s in %s: %s%s"), ErrorType[Severity - 1], FunctionName, VariadicString, FoundationIONewLine8);
+            SecurityName      = UTF32_Format(UTF32String("%Us in %s: "), Severity == Log_DEBUG ? Error : Mistake, FunctionName);
+            // "ERROR in %s: "
+            // "ERRORn %s: "; Ate " i" aka 2 codepoints too far?
         }
         
-        UTF8_WriteLine(Severity == Log_USER ? stdout : stderr, FormattedString);
+        UTF32 *Description32  = UTF8_Decode(Description);
+        UTF32 *Description2   = UTF32_Insert(Description32, SecurityName, 0);
+        free(SecurityName);
+        free(Description32);
+        
+        uint64_t NumVariadicArguments = UTF32_GetNumFormatSpecifiers(Description2);
+        FormatSpecifiers *Specifiers  = FormatSpecifiers_Init(NumVariadicArguments);
+        UTF32_ParseFormatSpecifiers(Description2, Specifiers, StringType_UTF32);
+        va_list VariadicArguments;
+        va_start(VariadicArguments, Description);
+        Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
+        va_end(VariadicArguments);
+        
+        UTF32 *FormattedString32 = FormatString_UTF32(Specifiers, Description2);
+        UTF8  *FormattedString8  = UTF8_Encode(FormattedString32);
+        
+        UTF8_WriteLine(Severity == Log_USER ? stdout : stderr, FormattedString8);
         fflush(stdout);
         
         if (Log_LogFile != NULL) {
-            UTF8_WriteLine(Log_LogFile, FormattedString);
+            UTF8_WriteLine(Log_LogFile, FormattedString8);
             fflush(Log_LogFile);
         }
-        free(FormattedString);
+        free(FormattedString32);
+        free(FormattedString8);
         va_end(VariadicArguments);
     }
     

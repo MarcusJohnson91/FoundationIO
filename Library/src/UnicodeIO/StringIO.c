@@ -1661,7 +1661,6 @@ extern "C" {
     UTF32 *UTF32_SubstituteSubString(UTF32 *String, UTF32 *Substitution, uint64_t Offset, uint64_t Length) {
         UTF32 *NewString                            = NULL;
         if (String != NULL && Substitution != NULL) {
-            //printf("%ls\n", (wchar_t*) String);
             uint64_t StringSize                     = UTF32_GetStringSizeInCodePoints(String);
             uint64_t SubstitutionSize               = UTF32_GetStringSizeInCodePoints(Substitution);
             uint64_t NewStringSize                  = (StringSize - Length) + SubstitutionSize;
@@ -1673,18 +1672,17 @@ extern "C" {
                 uint64_t SubstitutionCodePoint      = 0ULL;
                 
                 while (NewCodePoint < NewStringSize) {
-                    if (NewCodePoint >= Offset && SubstitutionCodePoint < SubstitutionSize) {
-                        NewString[NewCodePoint] = Substitution[SubstitutionCodePoint];
-                        NewCodePoint           += 1;
-                        SubstitutionCodePoint  += 1;
-                        StringCodePoint        += 1;
-                        if (Length > SubstitutionSize && SubstitutionCodePoint == SubstitutionSize) {
-                            StringCodePoint    += Length - SubstitutionSize;
+                    if (NewCodePoint == Offset) {
+                        while (SubstitutionCodePoint < SubstitutionSize) {
+                            NewString[NewCodePoint] = Substitution[SubstitutionCodePoint];
+                            NewCodePoint           += 1;
+                            SubstitutionCodePoint  += 1;
                         }
-                    } else if (StringCodePoint < StringSize) {
-                        NewString[NewCodePoint] = String[StringCodePoint];
-                        NewCodePoint           += 1;
-                        StringCodePoint        += 1;
+                        StringCodePoint            += Length;
+                    } else {
+                        NewString[NewCodePoint]     = String[StringCodePoint];
+                        NewCodePoint               += 1;
+                        StringCodePoint            += 1;
                     }
                 }
             }

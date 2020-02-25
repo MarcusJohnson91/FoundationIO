@@ -684,7 +684,7 @@ extern "C" {
         return String;
     }
     
-    static void Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments) {
+    void Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments) {
         if (Specifiers != NULL) {
             uint64_t                        Position                       = 0ULL;
             uint64_t                        NumSpecifiers                  = 0ULL;
@@ -717,9 +717,6 @@ extern "C" {
                 if (Specifiers->NumUniqueSpecifiers < Specifiers->NumSpecifiers) {
                     Position                                               = UniqueSpecifiers[UniqueSpecifier2];
                     UniqueSpecifier2                                      += 1;
-                } else {
-                    NumSpecifiers                                          = Specifiers->NumSpecifiers;
-                    Position                                              += 1;
                 }
                 BaseType                                                   = Specifiers->Specifiers[Position].BaseType;
                 ModifierType                                               = Specifiers->Specifiers[Position].TypeModifier;
@@ -820,6 +817,9 @@ extern "C" {
                 } else if ((BaseType & BaseType_Literal) == BaseType_Literal && ModifierType == Modifier_Percent) {
                     Specifiers->Specifiers[Position].Argument              = UTF32String("%");
                 }
+                if (Specifiers->NumSpecifiers == Specifiers->NumUniqueSpecifiers) {
+                    Position += 1;
+                }
             }
             
             if (Specifiers->NumUniqueSpecifiers < Specifiers->NumSpecifiers) {
@@ -857,14 +857,21 @@ extern "C" {
     UTF32 *FormatString_UTF32(FormatSpecifiers *Specifiers, UTF32 *Format) {
         UTF32 *Formatted               = NULL;
         if (Format != NULL && Specifiers != NULL) {
-            UTF32 **FormattedStrings   = UTF32_StringArray_Init(Specifiers->NumSpecifiers + 2);
+            UTF32 *FormattedStrings[Specifiers->NumSpecifiers + 2];
             FormattedStrings[0]        = Format;
             
             for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
-                uint64_t                      NewStart           = UTF32_LocateFirstPercent(FormattedStrings[Specifier]);
-                uint64_t                      StartEndDifference = Specifiers->Specifiers[Specifier].Start - NewStart;
+                /*
+                 Find the codepoint that contains '%', record the location.
+                 
+                 
+                 
+                 */
+                int64_t                       CurrentStart       = (int64_t) Specifiers->Specifiers[Specifier].Start;
+                int64_t                       NewStart           = (int64_t) UTF32_LocateFirstPercent(FormattedStrings[Specifier]);
+                int64_t                       StartEndDifference = (int64_t) (NewStart - CurrentStart);
                 Specifiers->Specifiers[Specifier].Start          = NewStart;
-                Specifiers->Specifiers[Specifier].End           -= StartEndDifference;
+                Specifiers->Specifiers[Specifier].End           += (int64_t) StartEndDifference;
                 uint64_t                      Start              = Specifiers->Specifiers[Specifier].Start;
                 uint64_t                      End                = Specifiers->Specifiers[Specifier].End;
                 
@@ -875,9 +882,9 @@ extern "C" {
                 FormatSpecifier_Flags         FlagType           = Specifiers->Specifiers[Specifier].Flag;
                 
                 if ((BaseType & BaseType_Remove) == BaseType_Remove && (ModifierType & Modifier_N) == Modifier_N) {
-                    FormattedStrings[Specifier + 1]      = UTF32_StitchSubString(FormattedStrings[Specifier], Start, End - Start);
+                    FormattedStrings[Specifier + 1]             = UTF32_StitchSubString(FormattedStrings[Specifier], Start, End - Start);
                 } else if ((BaseType & BaseType_Literal) == BaseType_Literal && (ModifierType & Modifier_Percent) == Modifier_Percent) {
-                    FormattedStrings[Specifier + 1]      = UTF32_SubstituteSubString(FormattedStrings[Specifier], UTF32String("%"), Start, End - Start);
+                    FormattedStrings[Specifier + 1]             = UTF32_SubstituteSubString(FormattedStrings[Specifier], UTF32String("%"), Start, End - Start);
                 } else {
                     if (MinWidthType != MinWidth_Unknown) {
                         uint64_t MinWidth                                  = Specifiers->Specifiers[Specifier].MinWidth;
