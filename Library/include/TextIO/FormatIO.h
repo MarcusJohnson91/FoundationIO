@@ -175,6 +175,13 @@ extern "C" {
 #endif /* FoundationIOCompiler */
     
     /*!
+     @abstract                                                  "Gets the Variadic Arguments from a Va_list, and adds them to FormatSpecifiers".
+     @param               Specifiers                            "Type to hold the Specifiers' data".
+     @param               Arguments                             "The variadic arguments".
+     */
+    void                  Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments);
+    
+    /*!
      @abstract                                                  "Splits a string based on the specifiers in Format".
      @param               Format                                "A string with format specifiers".
      @param               Source                                "The string to extract the information from".

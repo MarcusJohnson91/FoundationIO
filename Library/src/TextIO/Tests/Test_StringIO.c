@@ -121,6 +121,35 @@ extern "C" {
         
         bool TestPassed                        = false;
         
+        UTF32 *Test1     = UTF32_SubstituteSubString(UTF32String("surr %1$s ound"), UTF32String("3"), 5, 4);
+        printf("%ls\n", (wchar_t*) Test1);
+        bool  Test1Match = UTF32_Compare(Test1, UTF32String("surr 3 ound"));
+        if (Test1Match == No) {
+            printf("%s\n", UTF8String("Test1 Failed"));
+        } else {
+            printf("%s\n", UTF8String("Test1 Passed"));
+        }
+        
+        UTF32 *Test2 = UTF32_SubstituteSubString(UTF32String("surr %s ound"), UTF32String("12"), 5, 2);
+        printf("%ls\n", (wchar_t*) Test2);
+        bool  Test2Match = UTF32_Compare(Test2, UTF32String("surr 12 ound"));
+        if (Test2Match == No) {
+            printf("%s\n", UTF8String("Test2 Failed"));
+        } else {
+            printf("%s\n", UTF8String("Test2 Passed"));
+        }
+        
+        UTF32 *Test3 = UTF32_SubstituteSubString(UTF32String("surr %llu ound"), UTF32String("1,234,567"), 5, 4);
+        printf("%ls\n", (wchar_t*) Test3);
+        bool  Test3Match = UTF32_Compare(Test3, UTF32String("surr 1,234,567 ound"));
+        if (Test3Match == No) {
+            printf("%s\n", UTF8String("Test3 Failed"));
+        } else {
+            printf("%s\n", UTF8String("Test3 Passed"));
+        }
+        
+        // Test UTF32_SubstituteSubString
+        
         
         // Duplicate Specifiers, something where repition would be helpful
         
