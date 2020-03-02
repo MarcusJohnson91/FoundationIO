@@ -5,13 +5,6 @@
 - StringIO is a module for Unicode, including UTF-8 and UTF-16 en/de coding, as well as normalization, casefolding, string formatting, string splitting, etc.
 - Currently, there's no stable API, let alone ABI. I break shit constantly because i'm very indecisive.
 
-# Versioning:
-- When complete, FoundationIO will use Semantic Versioning (Version X.Y.Z)
-- X is the major version number, it will only be incremented when API breaking changes occur.
-- Y is the minor version number, it will only be incremented when new features are added.
-- Z is the patch version number, it reflects bug fixes and optimizations.
-Al of this is theoretical until FoundationIO is at least version 1.0.0, it's currently beta, and I'm changing things fairly often.
-
 # License:
 FoundationIO is released under the terms of the 3 clause [`Revised BSD`](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29) license.
 
@@ -136,20 +129,19 @@ FormatIO:
 * FormatIO's API is a bit different than the standard library.
 - *_Format returns a pointer to the formatted string.
 - *_Deformat returns a StringArray (just like argv), where each string starts at the offset of the specifier and ends whenever the type and modifier make sense for it to end
-
 * Supported Extensions:
-- Wide Character Support: lc/ls and C/S specifiers supported, Windows = UTF-16, POSIX = UTF-32.
-- Positional Formatters: %X$Y format
+- Wide Character Support: POSIX extensions `lc`/`ls` and Microsoft extensions `C`/`S`.
+- Positional Formatters: %X$Y format, where X is the position, and Y is the rest of the specifier (flags, modifiers, type specifier, etc)
 - Pointer Formatters: %p/%P lower/upper case hexadecimal pointer.
-- Binary Formatters: %b/%B 0bX/0BX prefixed binary strings.
+- Binary Formatters: %b/%B 0bx/0BX prefixed binary strings.
 * Custom Extensions:
-- %uc/%us, %Uc/%Us: u = UTF-16, U = UTF-32 regardless of platform.
+- `uc`/`us`, `Uc`/`Us`: u = UTF-16, U = UTF-32 regardless of platform.
 * Unsupported Extensions:
-- the n specifier is unsupported because FormatIO's API doesn't require or allow such a thing, though the parser will remove any n specifiers it finds from the output string.
-- Microsoft's l32/l64 (ell) specifiers are not supported, it's non-standard, and l/ll(u|d|i) already supports 32/64 bit integer arguments.
+- Microsoft's `Z` type specifier for "ASCIIString" or "UnicodeString" is not and likely will not be supported.
+- the `n` specifier is unsupported because FormatIO's API doesn't require the user to allocate a destination pointer, though the parser will remove any `n` specifiers it finds from the output string.
 
 TODO:
 ====
 * StringIO:
 - Finish the `Format/Deformat` work.
-- Finish the `Decimal2String` and `String2Decimal` functions in StringIO.
+- Finish the `Decimal2String` and `String2Decimal` :  Based on Ryu, but it's a lot of work, so it's taking a while.
