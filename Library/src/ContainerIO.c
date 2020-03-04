@@ -78,6 +78,7 @@ extern "C" {
         uint64_t           NumChannels;
         uint64_t           NumSamples;
         uint64_t           SampleRate;
+        uint64_t           Offset;
         Audio_Types        Type;
     } Audio2DContainer;
     
