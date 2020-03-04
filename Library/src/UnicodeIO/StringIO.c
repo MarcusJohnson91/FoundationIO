@@ -141,8 +141,8 @@ extern "C" {
             while (String[CodeUnit] != FoundationIONULLTerminator) {
                 UTF16 Byte            = String[CodeUnit];
                 uint8_t CodePointSize = UTF16_GetCodePointSizeInCodeUnits(Byte);
-                for (uint8_t Byte = 0; Byte < CodePointSize; Byte++) {
-                    CodeUnits[Byte]   = String[CodeUnit + Byte];
+                for (uint8_t Index = 0; Index < CodePointSize; Index++) {
+                    CodeUnits[Index]  = String[CodeUnit + Index];
                 }
                 UTF32 CodePoint1      = UTF16_DecodeCodePoint(CodeUnits);
                 for (uint64_t GraphemeExt = 0ULL; GraphemeExt < GraphemeExtensionTableSize; GraphemeExt++) {
