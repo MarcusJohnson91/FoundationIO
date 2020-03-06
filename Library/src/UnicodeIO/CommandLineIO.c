@@ -2,6 +2,7 @@
 #include "../../include/UnicodeIO/FormatIO.h"       /* Included for Formatter */
 #include "../../include/UnicodeIO/LogIO.h"          /* Included for Logging */
 #include "../../include/UnicodeIO/StringIO.h"       /* Included for StringIO's declarations */
+#include "../../include/MathIO.h"                   /* Included for Logarithm */
 
 #if (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (((FoundationIOTargetOS & FoundationIOLinuxOS) != FoundationIOLinuxOS)))
 #include <signal.h>                    /* Included for SIGWINCH handling */
@@ -748,6 +749,92 @@ extern "C" {
         return Extension;
     }
     
+    UTF8 *CommandLineIO_UTF8_Colorize(UTF8 *String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
+        UTF8 *Colorized    = NULL;
+        UTF32 *String32    = UTF8_Decode(String);
+        UTF32 *Colorized32 = CommandLineIO_UTF32_Colorize(String32, ColorType, Red, Green, Blue);
+        UTF32_Deinit(String32);
+        Colorized          = UTF8_Encode(Colorized32);
+        UTF32_Deinit(Colorized32);
+        return Colorized;
+    }
+    
+    UTF16 *CommandLineIO_UTF16_Colorize(UTF16 *String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
+        UTF16 *Colorized   = NULL;
+        UTF32 *String32    = UTF16_Decode(String);
+        UTF32 *Colorized32 = CommandLineIO_UTF32_Colorize(String32, ColorType, Red, Green, Blue);
+        UTF32_Deinit(String32);
+        Colorized          = UTF16_Encode(Colorized32);
+        UTF32_Deinit(Colorized32);
+        return Colorized;
+    }
+    
+    UTF32 *CommandLineIO_UTF32_Colorize(UTF32 *String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
+        UTF32 *Colorized = NULL;
+        uint8_t DigitSize = 0;
+        DigitSize       += Logarithm(10, Red);
+        DigitSize       += Logarithm(10, Green);
+        DigitSize       += Logarithm(10, Blue);
+        UTF32 *IntegerR  = UTF32_Integer2String(Base_Integer | Base_Radix10, Red);
+        UTF32 *IntegerG  = UTF32_Integer2String(Base_Integer | Base_Radix10, Green);
+        UTF32 *IntegerB  = UTF32_Integer2String(Base_Integer | Base_Radix10, Blue);
+        DigitSize       += 8;
+        if ((ColorType & ColorType_Foreground) == ColorType_Foreground) {
+            UTF32 *Formatted = UTF32_Format(UTF32String("%c[38;2;%d;%d;%d;m"), UTF32Character('\x1B'), IntegerR, IntegerG, IntegerB);
+            Colorized        = UTF32_Insert(String, Formatted, 0);
+            UTF32_Deinit(Formatted);
+        } else if ((ColorType & ColorType_Background) == ColorType_Background) {
+            UTF32 *Formatted = UTF32_Format(UTF32String("%c[48;2;%d;%d;%dm"), UTF32Character('\x1B'), IntegerR, IntegerG, IntegerB);
+            Colorized        = UTF32_Insert(String, Formatted, 0);
+            UTF32_Deinit(Formatted);
+        }
+        UTF32_Deinit(IntegerR);
+        UTF32_Deinit(IntegerG);
+        UTF32_Deinit(IntegerB);
+        return Colorized;
+    }
+    
+    UTF8 *CommandLineIO_UTF8_Decolorize(UTF8 *String) {
+        UTF8  *Decolorized   = NULL;
+        UTF32 *String32      = UTF8_Decode(String);
+        UTF32 *Decolorized32 = CommandLineIO_UTF32_Decolorize(String32);
+        UTF32_Deinit(String32);
+        Decolorized          = UTF8_Encode(Decolorized32);
+        UTF32_Deinit(Decolorized32);
+        return Decolorized;
+    }
+    
+    UTF16 *CommandLineIO_UTF16_Decolorize(UTF16 *String) {
+        UTF16 *Decolorized   = NULL;
+        UTF32 *String32      = UTF16_Decode(String);
+        UTF32 *Decolorized32 = CommandLineIO_UTF32_Decolorize(String32);
+        UTF32_Deinit(String32);
+        Decolorized          = UTF16_Encode(Decolorized32);
+        UTF32_Deinit(Decolorized32);
+        return Decolorized;
+    }
+    
+    UTF32 *CommandLineIO_UTF32_Decolorize(UTF32 *String) {
+        UTF32    *Decolorized          = NULL;
+        uint64_t  EscapeSequenceSize   = 0;
+        uint64_t  EscapeSequenceOffset = 0;
+        uint64_t  CodePoint            = 0;
+        while (String[CodePoint] != FoundationIONULLTerminator) {
+            if (String[CodePoint] == UTF32Character('\x1B')) {
+                EscapeSequenceOffset   = CodePoint;
+                EscapeSequenceSize    += 1;
+                CodePoint             += 1;
+            } else if (String[CodePoint] == UTF32Character('m')) {
+                EscapeSequenceSize    += 1;
+                CodePoint             += 1;
+            } else {
+                CodePoint             += 1;
+            }
+        }
+        Decolorized                    = UTF32_StitchSubString(String, EscapeSequenceOffset, EscapeSequenceSize);
+        return Decolorized;
+    }
+    
     void CommandLineIO_Deinit(CommandLineIO *CLI) {
         if (CLI != NULL) {
             for (uint64_t Option = 0ULL; Option < CLI->NumOptions; Option++) {
@@ -770,12 +857,6 @@ extern "C" {
             Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         }
     }
-    
-    // Colorize a String using ANSI control codes:
-    // Colorize/Decolorize
-    
-    
-    
     
 #ifdef __cplusplus
 }
