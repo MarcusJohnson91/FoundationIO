@@ -150,6 +150,23 @@ extern "C" {
     } CommandLineIO_LicenseTypes;
     
     /*!
+     @enum                      CommandLineIO_ColorTypes
+     @abstract                                                  "Defines the types of colorizing".
+     @constant                  ColorType_Unknwon               "Unknown colorize type".
+     @constant                  ColorType_Foreground            "Make this color the foreground".
+     @constant                  ColorType_Background            "Make this color the background".
+     @constant                  ColorType_Bold                  "Make this text bold".
+     @constant                  ColorType_Underlined            "Make this text underlined".
+     */
+    typedef enum CommandLineIO_ColorTypes {
+                                ColorType_Unknwon               = 0,
+                                ColorType_Foreground            = 1,
+                                ColorType_Background            = 2,
+                                ColorType_Bold                  = 4,
+                                ColorType_Underlined            = 8,
+    } CommandLineIO_ColorTypes;
+    
+    /*!
      @typedef                   CommandLineIO
      @abstract                                                  "Contains all the information, and relationships between options and Options on the command line".
      */
@@ -358,6 +375,60 @@ extern "C" {
      @return                                                    "Returns the data after the option, if the option is resultless it will return 0".
      */
     UTF16                      *CommandLineIO_UTF16_GetOptionResult(CommandLineIO *CLI, uint64_t OptionID);
+    
+    /*!
+     @abstract                                                  "Makes a string colorful".
+     @param                     String                          "The text to colorize".
+     @param                     ColorType                       "The color options".
+     @param                     Red                             "The amount of red in the color,   0-255".
+     @param                     Green                           "The amount of green in the color, 0-255".
+     @param                     Blue                            "The amount of blue in the color,  0-255".
+     @return                                                    "Returns the text but with color".
+     */
+    UTF8                       *CommandLineIO_UTF8_Colorize(UTF8 *String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
+    
+    /*!
+     @abstract                                                  "Makes a string colorful".
+     @param                     String                          "The text to colorize".
+     @param                     ColorType                       "The color options".
+     @param                     Red                             "The amount of red in the color,   0-255".
+     @param                     Green                           "The amount of green in the color, 0-255".
+     @param                     Blue                            "The amount of blue in the color,  0-255".
+     @return                                                    "Returns the text but with color".
+     */
+    UTF16                      *CommandLineIO_UTF16_Colorize(UTF16 *String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
+    
+    /*!
+     @abstract                                                  "Makes a string colorful".
+     @param                     String                          "The text to colorize".
+     @param                     ColorType                       "The color options".
+     @param                     Red                             "The amount of red in the color,   0-255".
+     @param                     Green                           "The amount of green in the color, 0-255".
+     @param                     Blue                            "The amount of blue in the color,  0-255".
+     @return                                                    "Returns the text but with color".
+     */
+    UTF32                      *CommandLineIO_UTF32_Colorize(UTF32 *String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
+    
+    /*!
+     @abstract                                                  Strips color escape sequences from the string".
+     @param                     String                          "The string to decolorize".
+     @return                                                    "Returns the text without color".
+     */
+    UTF8                       *CommandLineIO_UTF8_Decolorize(UTF8 *String);
+    
+    /*!
+     @abstract                                                  Strips color escape sequences from the string".
+     @param                     String                          "The string to decolorize".
+     @return                                                    "Returns the text without color".
+     */
+    UTF16                      *CommandLineIO_UTF16_Decolorize(UTF16 *String);
+    
+    /*!
+     @abstract                                                  Strips color escape sequences from the string".
+     @param                     String                          "The string to decolorize".
+     @return                                                    "Returns the text without color".
+     */
+    UTF32                      *CommandLineIO_UTF32_Decolorize(UTF32 *String);
     
     /*!
      @abstract                                                  "Deallocates the instance of CommandLineIO pointed to by CLI".
