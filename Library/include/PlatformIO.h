@@ -67,10 +67,6 @@ extern "C" {
 #define             FoundationIOTargetOS                                                      (FoundationIOPOSIXOS)
 #endif
 
-#if (FoundationIOTargetOS == FoundationIOUnknownOS)
-#define             FoundationIOTargetOS                                                      (FoundationIOPOSIXOS)
-#endif
-
 #if ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
 #ifdef              _FILE_OFFSET_BITS
 #undef              _FILE_OFFSET_BITS

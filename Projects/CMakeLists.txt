@@ -146,8 +146,8 @@ ${CMAKE_C_FLAGS} \
 -Wno-pointer-sign \
 -Wno-reserved-id-macro \
 -Wno-sign-conversion \
--Wno-varargs \
 -Wsuggest-attribute=const \
+-Wenum-conversion \
 -v \
 ")
 
