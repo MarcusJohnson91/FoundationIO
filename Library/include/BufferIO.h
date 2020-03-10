@@ -8,10 +8,10 @@
 
 #include "../include/Macros.h"
 
-#pragma  once
+#pragma once
 
-#ifndef  FoundationIO_BitIO_H
-#define  FoundationIO_BitIO_H
+#ifndef FoundationIO_BitIO_H
+#define FoundationIO_BitIO_H
 
 #ifdef __cplusplus
 extern "C" {
