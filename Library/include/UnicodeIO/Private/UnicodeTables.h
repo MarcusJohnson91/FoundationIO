@@ -1,11 +1,11 @@
-#include <stdint.h>
+#include "../../Macros.h"
 
 #ifndef   FoundationIO_StringType32
 #define   FoundationIO_StringType32
 #ifdef    UTF32
 #undef    UTF32
 #endif /* UTF32 */
-#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (FoundationIOStandardVersion >= FoundationIOStandardVersionC2X))
+#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && ((FoundationIOTargetOS & FoundationIOAppleOS) != FoundationIOAppleOS)
 typedef   char32_t       UTF32;
 #else
 typedef   uint_least32_t UTF32;
@@ -21,27 +21,41 @@ typedef   uint_least32_t UTF32;
 extern "C" {
 #endif
 
-#define UnicodeVersion 12.1.0
+#define ScriptHash 2df3102ca55223d85b87ba4a281a2241e6bbf951
+
+#define UnicodeVersion 13.0.0
+
+#define LineBreakTableSize 7
 
 #define BiDirectionalControlsTableSize 12
 
-#define WhiteSpaceTableSize 25
+#define WordBreakTableSize 18
 
 #define CurrencyTableSize 62
 
 #define DecimalTableSize 123
 
-#define CombiningCharacterClassTableSize 862
+#define CombiningCharacterClassTableSize 872
 
-#define IntegerTableSize 1712
+#define IntegerTableSize 1739
 
-#define GraphemeExtensionTableSize 1965
+#define GraphemeExtensionTableSize 1979
 
-#define KompatibleNormalizationTableSize 2046
+#define KompatibleNormalizationTableSize 2056
 
-#define CaseFoldTableSize 6142
+#define CaseFoldTableSize 6156
 
-#define CanonicalNormalizationTableSize 13232
+#define CanonicalNormalizationTableSize 13233
+
+    static const UTF32    LineBreakTable[LineBreakTableSize] = {
+        0x00000A,
+        0x00000B,
+        0x00000C,
+        0x00000D,
+        0x000085,
+        0x002028,
+        0x002029,
+    };
 
     static const UTF32    BiDirectionalControlsTable[BiDirectionalControlsTableSize] = {
         0x00061C,
@@ -58,16 +72,11 @@ extern "C" {
         0x002069,
     };
 
-    static const UTF32    WhiteSpaceTable[WhiteSpaceTableSize] = {
-        0x000009,
-        0x00000A,
-        0x00000B,
-        0x00000C,
-        0x00000D,
+    static const UTF32    WordBreakTable[WordBreakTableSize] = {
         0x000020,
-        0x000085,
         0x0000A0,
         0x001680,
+        0x002000,
         0x002000,
         0x002001,
         0x002002,
@@ -79,8 +88,6 @@ extern "C" {
         0x002008,
         0x002009,
         0x00200A,
-        0x002028,
-        0x002029,
         0x00202F,
         0x00205F,
         0x003000,
@@ -954,6 +961,8 @@ extern "C" {
         {0x001ABB, 230},
         {0x001ABC, 230},
         {0x001ABD, 220},
+        {0x001ABF, 220},
+        {0x001AC0, 220},
         {0x001B34, 7},
         {0x001B44, 9},
         {0x001B6B, 230},
@@ -1147,6 +1156,7 @@ extern "C" {
         {0x00A6F0, 230},
         {0x00A6F1, 230},
         {0x00A806, 9},
+        {0x00A82C, 9},
         {0x00A8C4, 9},
         {0x00A8E0, 230},
         {0x00A8E1, 230},
@@ -1219,6 +1229,8 @@ extern "C" {
         {0x010D25, 230},
         {0x010D26, 230},
         {0x010D27, 230},
+        {0x010EAB, 230},
+        {0x010EAC, 230},
         {0x010F46, 220},
         {0x010F47, 220},
         {0x010F48, 230},
@@ -1274,6 +1286,9 @@ extern "C" {
         {0x01172B, 9},
         {0x011839, 9},
         {0x01183A, 7},
+        {0x01193D, 9},
+        {0x01193E, 9},
+        {0x011943, 7},
         {0x0119E0, 9},
         {0x011A34, 9},
         {0x011A47, 9},
@@ -1295,6 +1310,8 @@ extern "C" {
         {0x016B34, 230},
         {0x016B35, 230},
         {0x016B36, 230},
+        {0x016FF0, 6},
+        {0x016FF1, 6},
         {0x01BC9E, 1},
         {0x01D165, 216},
         {0x01D166, 216},
@@ -2465,6 +2482,13 @@ extern "C" {
         0x010F52,
         0x010F53,
         0x010F54,
+        0x010FC5,
+        0x010FC6,
+        0x010FC7,
+        0x010FC8,
+        0x010FC9,
+        0x010FCA,
+        0x010FCB,
         0x011052,
         0x011053,
         0x011054,
@@ -2626,6 +2650,16 @@ extern "C" {
         0x0118F0,
         0x0118F1,
         0x0118F2,
+        0x011950,
+        0x011951,
+        0x011952,
+        0x011953,
+        0x011954,
+        0x011955,
+        0x011956,
+        0x011957,
+        0x011958,
+        0x011959,
         0x011C50,
         0x011C51,
         0x011C52,
@@ -3091,6 +3125,16 @@ extern "C" {
         0x01F10A,
         0x01F10B,
         0x01F10C,
+        0x01FBF0,
+        0x01FBF1,
+        0x01FBF2,
+        0x01FBF3,
+        0x01FBF4,
+        0x01FBF5,
+        0x01FBF6,
+        0x01FBF7,
+        0x01FBF8,
+        0x01FBF9,
         0x020001,
         0x020064,
         0x0200E2,
@@ -4184,6 +4228,13 @@ extern "C" {
         2,
         3,
         4,
+        10,
+        20,
+        100,
+        1,
+        2,
+        3,
+        4,
         5,
         6,
         7,
@@ -4341,6 +4392,16 @@ extern "C" {
         70,
         80,
         90,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
         0,
         1,
         2,
@@ -4806,6 +4867,16 @@ extern "C" {
         9,
         0,
         0,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
         7,
         4,
         4,
@@ -5241,6 +5312,7 @@ extern "C" {
         0x000B43,
         0x000B44,
         0x000B4D,
+        0x000B55,
         0x000B56,
         0x000B57,
         0x000B62,
@@ -5290,6 +5362,7 @@ extern "C" {
         0x000D57,
         0x000D62,
         0x000D63,
+        0x000D81,
         0x000DCA,
         0x000DCF,
         0x000DD2,
@@ -5528,6 +5601,8 @@ extern "C" {
         0x001ABC,
         0x001ABD,
         0x001ABE,
+        0x001ABF,
+        0x001AC0,
         0x001B00,
         0x001B01,
         0x001B02,
@@ -5769,6 +5844,7 @@ extern "C" {
         0x00A80B,
         0x00A825,
         0x00A826,
+        0x00A82C,
         0x00A8C4,
         0x00A8C5,
         0x00A8E0,
@@ -5909,6 +5985,8 @@ extern "C" {
         0x010D25,
         0x010D26,
         0x010D27,
+        0x010EAB,
+        0x010EAC,
         0x010F46,
         0x010F47,
         0x010F48,
@@ -5977,6 +6055,7 @@ extern "C" {
         0x0111CA,
         0x0111CB,
         0x0111CC,
+        0x0111CF,
         0x01122F,
         0x011230,
         0x011231,
@@ -6092,6 +6171,11 @@ extern "C" {
         0x011837,
         0x011839,
         0x01183A,
+        0x011930,
+        0x01193B,
+        0x01193C,
+        0x01193E,
+        0x011943,
         0x0119D4,
         0x0119D5,
         0x0119D6,
@@ -6231,6 +6315,7 @@ extern "C" {
         0x016F90,
         0x016F91,
         0x016F92,
+        0x016FE4,
         0x01BC9D,
         0x01BC9E,
         0x01D165,
@@ -8839,6 +8924,16 @@ extern "C" {
         0x01F246,
         0x01F247,
         0x01F248,
+        0x01FBF0,
+        0x01FBF1,
+        0x01FBF2,
+        0x01FBF3,
+        0x01FBF4,
+        0x01FBF5,
+        0x01FBF6,
+        0x01FBF7,
+        0x01FBF8,
+        0x01FBF9,
     };
 
     static const UTF32   *KompatibleNormalizationStrings[KompatibleNormalizationTableSize] = {
@@ -10888,6 +10983,16 @@ extern "C" {
         U"\u3014\u76D7\u3015",
         U"\u3014\u52DD\u3015",
         U"\u3014\u6557\u3015",
+        U"\x30",
+        U"\x31",
+        U"\x32",
+        U"\x33",
+        U"\x34",
+        U"\x35",
+        U"\x36",
+        U"\x37",
+        U"\x38",
+        U"\x39",
     };
 
     static const UTF32    CaseFoldCodePoints[CaseFoldTableSize] = {
@@ -13356,12 +13461,16 @@ extern "C" {
         0x00A7C4,
         0x00A7C5,
         0x00A7C6,
+        0x00A7C7,
+        0x00A7C9,
+        0x00A7F5,
         0x00A7F8,
         0x00A7F9,
         0x00AB5C,
         0x00AB5D,
         0x00AB5E,
         0x00AB5F,
+        0x00AB69,
         0x00AB70,
         0x00AB71,
         0x00AB72,
@@ -16491,6 +16600,16 @@ extern "C" {
         0x01F248,
         0x01F250,
         0x01F251,
+        0x01FBF0,
+        0x01FBF1,
+        0x01FBF2,
+        0x01FBF3,
+        0x01FBF4,
+        0x01FBF5,
+        0x01FBF6,
+        0x01FBF7,
+        0x01FBF8,
+        0x01FBF9,
         0x02F800,
         0x02F801,
         0x02F802,
@@ -19501,12 +19620,16 @@ extern "C" {
         U"\uA794",
         U"\u0282",
         U"\u1D8E",
+        U"\uA7C8",
+        U"\uA7CA",
+        U"\uA7F6",
         U"\u0127",
         U"\u0153",
         U"\uA727",
         U"\uAB37",
         U"\u026B",
         U"\uAB52",
+        U"\u028D",
         U"\u13A0",
         U"\u13A1",
         U"\u13A2",
@@ -22636,6 +22759,16 @@ extern "C" {
         U"\u3014\u6557\u3015",
         U"\u5F97",
         U"\u53EF",
+        U"\x30",
+        U"\x31",
+        U"\x32",
+        U"\x33",
+        U"\x34",
+        U"\x35",
+        U"\x36",
+        U"\x37",
+        U"\x38",
+        U"\x39",
         U"\u4E3D",
         U"\u4E38",
         U"\u4E41",
@@ -35858,6 +35991,7 @@ extern "C" {
         0x0114BE,
         0x0115BA,
         0x0115BB,
+        0x011938,
         0x01D15E,
         0x01D15F,
         0x01D160,
@@ -49093,6 +49227,7 @@ extern "C" {
         U"\U000114B9\U000114BD",
         U"\U000115B8\U000115AF",
         U"\U000115B9\U000115AF",
+        U"\U00011935\U00011930",
         U"\U0001D157\U0001D165",
         U"\U0001D158\U0001D165",
         U"\U0001D15F\U0001D16E",
