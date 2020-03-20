@@ -36,6 +36,36 @@ extern "C" {
         return String;
     }
     
+    void UTF8_Set(UTF8 *String, UTF8 Value, uint64_t NumCodeUnits) {
+        if (String != NULL) {
+            for (uint64_t CodeUnit = 0ULL; CodeUnit < NumCodeUnits; CodeUnit++) {
+                String[CodeUnit] = Value;
+            }
+        } else {
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+        }
+    }
+    
+    void UTF16_Set(UTF16 *String, UTF16 Value, uint64_t NumCodeUnits) {
+        if (String != NULL) {
+            for (uint64_t CodeUnit = 0ULL; CodeUnit < NumCodeUnits; CodeUnit++) {
+                String[CodeUnit] = Value;
+            }
+        } else {
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+        }
+    }
+    
+    void UTF32_Set(UTF32 *String, UTF32 Value, uint64_t NumCodePoints) {
+        if (String != NULL) {
+            for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePoints; CodePoint++) {
+                String[CodePoint] = Value;
+            }
+        } else {
+            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+        }
+    }
+    
     uint8_t UTF8_GetCodePointSizeInCodeUnits(UTF8 CodeUnit) {
         uint8_t CodePointSize = 0;
         if (((CodeUnit & 0x80) >> 7) == 0) {
