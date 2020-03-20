@@ -104,18 +104,30 @@ extern "C" {
                     break;
                 case 2:
                     CodePoint                |= (CodeUnits[0] & 0x1F) << 6;
-                    CodePoint                |= (CodeUnits[1] & 0x3F) << 0;
+                    if (CodeUnits[1] != FoundationIONULLTerminator) {
+                        CodePoint            |= (CodeUnits[1] & 0x3F) << 0;
+                    }
                     break;
                 case 3:
                     CodePoint                |= (CodeUnits[0] & 0x0F) << 12;
-                    CodePoint                |= (CodeUnits[1] & 0x1F) << 6;
-                    CodePoint                |= (CodeUnits[2] & 0x1F) << 0;
+                    if (CodeUnits[1] != FoundationIONULLTerminator) {
+                        CodePoint            |= (CodeUnits[1] & 0x1F) << 6;
+                    }
+                    if (CodeUnits[2] != FoundationIONULLTerminator) {
+                        CodePoint            |= (CodeUnits[2] & 0x1F) << 0;
+                    }
                     break;
                 case 4:
                     CodePoint                |= (CodeUnits[0] & 0x07) << 18;
-                    CodePoint                |= (CodeUnits[1] & 0x3F) << 12;
-                    CodePoint                |= (CodeUnits[2] & 0x3F) <<  6;
-                    CodePoint                |= (CodeUnits[3] & 0x3F) <<  0;
+                    if (CodeUnits[1] != FoundationIONULLTerminator) {
+                        CodePoint            |= (CodeUnits[1] & 0x3F) << 12;
+                    }
+                    if (CodeUnits[2] != FoundationIONULLTerminator) {
+                        CodePoint            |= (CodeUnits[2] & 0x3F) <<  6;
+                    }
+                    if (CodeUnits[3] != FoundationIONULLTerminator) {
+                        CodePoint            |= (CodeUnits[3] & 0x3F) <<  0;
+                    }
                     break;
             }
         } else {
@@ -154,7 +166,9 @@ extern "C" {
                 case 2:
                     CodePoint                |= UTF16MaxCodeUnitValue + 1;
                     CodePoint                |= (CodeUnits[0] & UTF16SurrogateMask) << UTF16SurrogateShift;
-                    CodePoint                |= (CodeUnits[1] & UTF16SurrogateMask);
+                    if (CodeUnits[1] != FoundationIONULLTerminator) {
+                        CodePoint            |= (CodeUnits[1] & UTF16SurrogateMask);
+                    }
                     break;
             }
         } else {
