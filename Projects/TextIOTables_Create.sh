@@ -4,30 +4,35 @@
 # Dependencies: Curl, XMLStarlet (On Mac install Homebrew from brew.sh then call brew install xmlstarlet)
 
 CreateHeaderFileTop() {
-    printf "#include "../../Macros.h"\n\n" >> "$HeaderFile"
-    printf "#ifndef   FoundationIO_StringType32\n" >> "$HeaderFile"
-    printf "#define   FoundationIO_StringType32\n" >> "$HeaderFile"
-    printf "#ifdef    UTF32\n" >> "$HeaderFile"
-    printf "#undef    UTF32\n" >> "$HeaderFile"
-    printf "#endif /* UTF32 */\n" >> "$HeaderFile"
-    printf "#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && (FoundationIOTargetOS != FoundationIOAppleOS)" >> "$HeaderFile"
-    printf "typedef   char32_t       UTF32;\n" >> "$HeaderFile"
-    printf "#else\n" >> "$HeaderFile"
-    printf "typedef   uint_least32_t UTF32;\n" >> "$HeaderFile"
-    printf "#endif /* __CHAR32_TYPE__ */\n" >> "$HeaderFile"
-    printf "#endif /* FoundationIO_StringType32 */\n\n" >> "$HeaderFile"
-    printf "#pragma once\n\n" >> "$HeaderFile"
-    printf "#ifndef FoundationIO_UnicodeTables_H\n" >> "$HeaderFile"
-    printf "#define FoundationIO_UnicodeTables_H\n\n" >> "$HeaderFile"
-    printf "#ifdef __cplusplus\n" >> "$HeaderFile"
-    printf "extern \"C\" {\n" >> "$HeaderFile"
-    printf "#endif\n\n" >> "$HeaderFile"
-	printf "#define ScriptHash %s\n\n" $(md5 $0) >> "$HeaderFile"
+    {
+        printf "#include \"../../Macros.h\"\n\n"
+        printf "#ifndef   FoundationIO_StringType32\n"
+        printf "#define   FoundationIO_StringType32\n"
+        printf "#ifdef    UTF32\n"
+        printf "#undef    UTF32\n"
+        printf "#endif /* UTF32 */\n"
+        printf "#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && ((FoundationIOTargetOS & FoundationIOAppleOS) != FoundationIOAppleOS)\n"
+        printf "typedef   char32_t       UTF32;\n"
+        printf "#else\n"
+        printf "typedef   uint_least32_t UTF32;\n"
+        printf "#endif /* __CHAR32_TYPE__ */\n"
+        printf "#endif /* FoundationIO_StringType32 */\n\n"
+        printf "#pragma once\n\n"
+        printf "#ifndef FoundationIO_UnicodeTables_H\n"
+        printf "#define FoundationIO_UnicodeTables_H\n\n"
+        printf "#ifdef __cplusplus\n"
+        printf "extern \"C\" {\n"
+        printf "#endif\n\n"
+    } >> "$HeaderFile"
+    ScriptSHA=$(shasum $0 | awk '{print $1}')
+	printf "#define ScriptHash %s\n\n" "$ScriptSHA" >> "$HeaderFile"
     printf "#define UnicodeVersion %s\n\n" "$ReadmeUnicodeVersion" >> "$HeaderFile"
+    NumLineBreakCodePoints=7
+    printf "#define LineBreakTableSize %d\n\n" "$NumLineBreakCodePoints" >> "$HeaderFile"
     NumBiDirectionalControls=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Bidi_C='Y'])" "$UCD_Data")
     printf "#define BiDirectionalControlsTableSize %d\n\n" "$NumBiDirectionalControls" >> "$HeaderFile"
-    NumWhiteSpaceCodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@WSpace='Y'])" "$UCD_Data")
-    printf "#define WhiteSpaceTableSize %d\n\n" "$NumWhiteSpaceCodePoints" >> "$HeaderFile"
+    NumWordBreakCodePoints=18
+    printf "#define WordBreakTableSize %d\n\n" "$NumWordBreakCodePoints" >> "$HeaderFile"
     NumCurrencyCodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@gc='Sc'])" "$UCD_Data")
     printf "#define CurrencyTableSize %d\n\n" "$NumCurrencyCodePoints" >> "$HeaderFile"
     DecimalTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and contains(@nv, '/')])" "$UCD_Data")
@@ -46,6 +51,20 @@ CreateHeaderFileTop() {
     printf "#define CanonicalNormalizationTableSize %d\n\n" "$CanonicalNormalizationTableSize" >> "$HeaderFile"
 }
 
+CreateLineBreakTable() {
+    {
+        printf "    static const UTF32    LineBreakTable[LineBreakTableSize] = {\n"
+        printf "        0x00000A,\n"
+        printf "        0x00000B,\n"
+        printf "        0x00000C,\n"
+        printf "        0x00000D,\n"
+        printf "        0x000085,\n"
+        printf "        0x002028,\n"
+        printf "        0x002029,\n"
+        printf "    };\n\n"
+    } >> "$HeaderFile"
+}
+
 CreateBiDirectionalControlsTable() {
     IFS='
 '
@@ -59,17 +78,29 @@ CreateBiDirectionalControlsTable() {
     unset IFS
 }
 
-CreateWhiteSpaceTable() {
-    IFS='
-'
-    printf "    static const UTF32    WhiteSpaceTable[WhiteSpaceTableSize] = {\n" >> "$HeaderFile"
-    WhiteSpace=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@WSpace = 'Y']" -v @cp -n "$UCD_Data")
-    for line in $WhiteSpace; do
-        Value=$(echo "$line" | awk -F ":" '{printf "0x"$1}')
-        printf "        0x%06X,\n" "$Value" >> "$HeaderFile"
-    done
-    printf "    };\n\n" >> "$HeaderFile"
-    unset IFS
+CreateWordBreakTable() {
+    {
+        printf "    static const UTF32    WordBreakTable[WordBreakTableSize] = {\n"
+        printf "        0x000020,\n"
+        printf "        0x0000A0,\n"
+        printf "        0x001680,\n"
+        printf "        0x002000,\n"
+        printf "        0x002000,\n"
+        printf "        0x002001,\n"
+        printf "        0x002002,\n"
+        printf "        0x002003,\n"
+        printf "        0x002004,\n"
+        printf "        0x002005,\n"
+        printf "        0x002006,\n"
+        printf "        0x002007,\n"
+        printf "        0x002008,\n"
+        printf "        0x002009,\n"
+        printf "        0x00200A,\n"
+        printf "        0x00202F,\n"
+        printf "        0x00205F,\n"
+        printf "        0x003000,\n"
+        printf "    };\n\n"
+    } >> "$HeaderFile"
 }
 
 CreateCurrencyTable() {
@@ -253,10 +284,12 @@ CreateCaseFoldTables() {
 }
 
 CreateHeaderFileBottom() {
-    printf "#ifdef __cplusplus\n" >> "$HeaderFile"
-    printf "}\n" >> "$HeaderFile"
-    printf "#endif /* C++ */\n\n" >> "$HeaderFile"
-    printf "#endif /* FoundationIO_UnicodeTables_H */\n" >> "$HeaderFile"
+    {
+        printf "#ifdef __cplusplus\n"
+        printf "}\n"
+        printf "#endif /* C++ */\n\n"
+        printf "#endif /* FoundationIO_UnicodeTables_H */\n"
+    } >> "$HeaderFile"
 }
 
 DownloadUCD() {
@@ -275,20 +308,21 @@ DownloadUCD() {
 
             UCD_Data="$UCD_Folder/ucd.all.flat.xml"
 		else
-			echo "Couldn't extract UCD, aborting."
+			echo "Couldn't extract UCD, Exiting."
 			exit 0
 		fi
 	else
-		echo "Couldn't download UCD, aborting."
+		echo "Couldn't download UCD, Exiting."
 		exit 0
 	fi
 }
 
-CreateHeader() {
+CreateTables() {
 	CreateHeaderFileTop
 
+    CreateLineBreakTable
     CreateBiDirectionalControlsTable
-    CreateWhiteSpaceTable
+    CreateWordBreakTable
     CreateCurrencyTable
     CreateDecimalTables
     CreateCombiningCharacterClassTable
@@ -307,70 +341,80 @@ CreateHeader() {
 # If the file does not exist create it and start downloading the UCd and writing the tables
 
 HeaderFile=$1
+TempFolder=$(mktemp -d)
+TempPath=$(dirname "$TempFolder")
+rmdir "$TempFolder"
+FreeSpaceInBytes=$(df -H "$TempPath" | awk '{printf $7}' | cut -c 6-)
 
 if [ $# -eq 1 ]; then
-	XMLStarletPath=$(which xmlstarlet)
-	UnzipPath=$(which unzip)
-	CurlPath=$(which curl)
-	MD5Path=$(which md5)
+	XMLStarletPath=$(command -v xmlstarlet)
+	UnzipPath=$(command -v unzip)
+	CurlPath=$(command -v curl)
+	SHAPath=$(command -v shasum)
 	
-	if [ "$XMLStarletPath" -ne "" -a "$UnzipPath" -ne "" -a "CurlPath" -ne "" -a "$MD5Path" -ne "" ]; then
+	if [ -n "$XMLStarletPath" ] && [ -n "$UnzipPath" ] && [ -n "$CurlPath" ] && [ -n "$SHAPath" ]; then
 		# We're good, we can now test if the headerfile exists.
 		UCD_Folder=$(mktemp -d)
-		if [ -e "$HeaderFile" ]; then
-			HeaderScriptHash=$(grep '#define ScriptHash ' "$HeaderFile" | awk '{printf $3}')
-			ScriptHash=$(md5 $0)
-			
-			if [ "$HeaderScriptHash" -ne "$ScriptHash" ]; then
-				rm "$HeaderFile"
-				touch "$HeaderFile"
-				DownloadUCD
-				CreateHeader
-			else
-				ReadmeSize=$(curl -sI "https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt" | grep "Content-Length: " | awk '{printf $2}' | sed "s/$(printf '\r')\$//")			
-				
-				ReadmeUnicodeVersion=$(grep 'XML Representation of Unicode ' "$UCD_Folder/readme.txt" | awk '{printf $5}')
-				ReadmeUnicodeVMajor=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $1}')
-				ReadmeUnicodeVMinor=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $2}')
-				ReadmeUnicodeVPatch=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $3}')
-				
-				HeaderUnicodeVersion=$(grep '#define UnicodeVersion ' "$HeaderFile" | awk '{printf $3}')
-				HeaderUnicodeVMajor=$(echo $HeaderUnicodeVersion | awk -F "." '{printf $1}')
-				HeaderUnicodeVMinor=$(echo $HeaderUnicodeVersion | awk -F "." '{printf $2}')
-				HeaderUnicodeVPatch=$(echo $HeaderUnicodeVersion | awk -F "." '{printf $3}')
-				
-				if [ "$HeaderUnicodeVPatch" -lt "$ReadmeUnicodeVPatch" -o "$HeaderUnicodeVMinor" -lt "$ReadmeUnicodeVMinor" -o "$HeaderUnicodeVMajor" -lt "$ReadmeUnicodeVMajor" ]; then
-					rm "$HeaderFile"
-					touch "$HeaderFile"
-					DownloadUCD
-					CreateHeader
-				else
-					echo "The Unicode tables are already up to date, exiting."
-					exit 0
-				fi
-			fi
-		else
-			touch "$HeaderFile"
-			CreateHeader
-		fi
-	else
-		echo "You must install the following packages:"
-		if [ "$CurlPath" -eq "" ]; then
-			echo "Curl"
-		fi
-		
-		if [ "$MD5Path" -eq "" ]; then
-			echo "MD5"
-		fi
-		
-		if [ "$UnzipPath" -eq "" ]; then
-			echo "Unzip"
-		fi
-		
-		if [ "$XMLStarletPath" -eq "" ]; then
-			echo "XMLStarlet"
-		fi
-	fi
+        
+        ReadmeSize=$(curl -sI "https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt" | grep "Content-Length: " | awk '{printf $2}' | sed "s/$(printf '\r')\$//")
+        if [ "$ReadmeSize" -lt "$FreeSpaceInBytes" ]; then
+            curl -s "https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt" -o "$UCD_Folder/readme.txt"
+            ReadmeUnicodeVersion=$(grep 'XML Representation of Unicode ' "$UCD_Folder/readme.txt" | awk '{printf $5}')
+            ReadmeUnicodeVMajor=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $1}')
+            ReadmeUnicodeVMinor=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $2}')
+            ReadmeUnicodeVPatch=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $3}')
+            
+            if [ -e "$HeaderFile" ]; then
+                HeaderScriptHash=$(grep '#define ScriptHash ' "$HeaderFile" | awk '{printf $3}')
+                
+                HeaderUnicodeVersion=$(grep '#define UnicodeVersion ' "$HeaderFile" | awk '{printf $3}')
+                HeaderUnicodeVMajor=$(echo "$HeaderUnicodeVersion" | awk -F "." '{printf $1}')
+                HeaderUnicodeVMinor=$(echo "$HeaderUnicodeVersion" | awk -F "." '{printf $2}')
+                HeaderUnicodeVPatch=$(echo "$HeaderUnicodeVersion" | awk -F "." '{printf $3}')
+                
+                if [ "$HeaderScriptHash" != "$ScriptSHA" ]; then
+                    rm "$HeaderFile"
+                    touch "$HeaderFile"
+                    DownloadUCD
+                    CreateTables
+                elif [ "$HeaderUnicodeVPatch" -lt "$ReadmeUnicodeVPatch" ] || [ "$HeaderUnicodeVMinor" -lt "$ReadmeUnicodeVMinor" ] || [ "$HeaderUnicodeVMajor" -lt "$ReadmeUnicodeVMajor" ]; then
+                    rm "$HeaderFile"
+                    touch "$HeaderFile"
+                    DownloadUCD
+                    CreateTables
+                else
+                    echo "The Unicode tables are already up to date, Exiting."
+                    exit 0
+                fi
+            else
+                touch "$HeaderFile"
+                DownloadUCD
+                CreateTables
+            fi
+        else
+            echo "Not enough free space to download the ReadMe, Exiting."
+            exit 0
+        fi
+    else
+        echo "You must install the following tools:"
+        if [ -z "$CurlPath" ]; then
+            echo "Curl"
+        fi
+        
+        if [ -z "$SHAPath" ]; then
+            echo "SHASum"
+        fi
+        
+        if [ -z "$UnzipPath" ]; then
+            echo "Unzip"
+        fi
+        
+        if [ -z "$XMLStarletPath" ]; then
+            echo "XMLStarlet"
+        fi
+    fi
 else
-	echo "The first argument must be the header file to overwrite, and the only argument present."
+	echo "The first and only argument must be the header file to overwrite."
 fi
+
+# Unicode CLDR Parsing too; download: http://unicode.org/Public/cldr/latest/cldr-common-X.X.zip en.xml from /common/main
