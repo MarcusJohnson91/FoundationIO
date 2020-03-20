@@ -194,7 +194,30 @@ extern "C" {
      */
     UTF32                *UTF32_Init(uint64_t NumCodePoints);
     
-    /* Basic String Property Functions */
+    /*!
+     @abstract                             "Sets NumCodeUnits to Value".
+     @param               String           "The string to set".
+     @param               Value            "The value to set each CodeUnit to".
+     @param               NumCodeUnits     "The size of the string not counting the NULL terminator".
+     */
+    void                  UTF8_Set(UTF8 *String, UTF8 Value, uint64_t NumCodeUnits);
+    
+    /*!
+     @abstract                             "Sets NumCodeUnits to Value".
+     @param               String           "The string to set".
+     @param               Value            "The value to set each CodeUnit to".
+     @param               NumCodeUnits     "The size of the string not counting the NULL terminator".
+     */
+    void                  UTF16_Set(UTF16 *String, UTF16 Value, uint64_t NumCodeUnits);
+    
+    /*!
+     @abstract                             "Sets NumCodeUnits to Value".
+     @param               String           "The string to set".
+     @param               Value            "The value to set each CodePoint to".
+     @param               NumCodePoints    "The size of the string not counting the NULL terminator".
+     */
+    void                  UTF32_Set(UTF32 *String, UTF32 Value, uint64_t NumCodePoints);
+    
     /*!
      @abstract                             "Returns the number of CodeUnits in the CodePoint".
      @param               CodeUnit         "The leading CodeUnit for a CodePoint".
