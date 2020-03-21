@@ -294,14 +294,6 @@ extern "C" {
     void                        CommandLineIO_Option_SetDescription(CommandLineIO *CLI, uint64_t OptionID, UTF32 *Description);
     
     /*!
-     @abstract                                                  "Sets OptionDescription's flag in the CommandLineIO instance pointed by CLI".
-     @param                     CLI                             "CommandLineIO Pointer".
-     @param                     OptionID                        "the option to set".
-     @param                     Description                     "Pointer to a UTF-8 encoded string containing the description of what this program does".
-     */
-    void                        CommandLineIO_UTF16_Option_SetDescription(CommandLineIO *CLI, uint64_t OptionID, UTF16 *Description);
-    
-    /*!
      @abstract                                                  "Sets OptionID's flag in the CommandLineIO instance pointed by CLI".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     OptionID                        "Which option are we talking about"?
