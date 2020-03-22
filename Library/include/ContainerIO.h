@@ -295,7 +295,7 @@ extern "C" {
     
     /*!
      @abstract                             "frees a Audio2DHistogram".
-     @param                 Histogram      "A pointer to the Audio2DHistogram to deinitalize".
+     @param                 Histogram      "A pointer to the Audio2DHistogram to deinitialize".
      */
     void                    Audio2DHistogram_Deinit(Audio2DHistogram *Histogram);
     
@@ -375,7 +375,7 @@ extern "C" {
     
     /*!
      @abstract                             "frees a Audio3DContainer".
-     @param                 Container      "A pointer to the Audio3DContainer to deinitalize".
+     @param                 Container      "A pointer to the Audio3DContainer to deinitialize".
      */
     void                    Audio3DContainer_Deinit(Audio3DContainer *Container);
     
@@ -386,7 +386,7 @@ extern "C" {
     
     /*!
      @abstract                             "Gets a Pointer to an AudioVector".
-     @param                 Vector         "A pointer to the Audio3DContainer to deinitalize".
+     @param                 Vector         "A pointer to the Audio3DContainer to deinitialize".
      */
     void                   *AudioVector_GetArray(AudioVector *Vector);
     
@@ -663,13 +663,13 @@ extern "C" {
     
     /*!
      @abstract                             "frees a ImageHistogram".
-     @param                 Histogram      "A pointer to the ImageHistogram to deinitalize".
+     @param                 Histogram      "A pointer to the ImageHistogram to deinitialize".
      */
     void                    ImageHistogram_Deinit(ImageHistogram *Histogram);
     
     /*!
      @abstract                             "Gets a pointer to an ImageChannelMap from an ImageHistogram".
-     @param                 Histogram      "A pointer to the ImageHistogram to deinitalize".
+     @param                 Histogram      "A pointer to the ImageHistogram to deinitialize".
      @return                               "Returns a pointer to the ImageChannelMap".
      */
     ImageChannelMap        *ImageHistogram_GetChannelMap(ImageHistogram *Histogram);

@@ -1275,19 +1275,19 @@ extern "C" {
     
     /*!
      @abstract                             "Deletes a UTF-8 encoded StringArray (like is returned by SplitString)".
-     @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
+     @param               StringArray      "An StringArray to deinitialize, all strings will be freed".
      */
     void                  UTF8_StringArray_Deinit(UTF8 **StringArray);
     
     /*!
      @abstract                             "Deletes a UTF-16 encoded StringArray (like is returned by SplitString)".
-     @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
+     @param               StringArray      "An StringArray to deinitialize, all strings will be freed".
      */
     void                  UTF16_StringArray_Deinit(UTF16 **StringArray);
     
     /*!
      @abstract                             "Deletes a UTF-16 encoded StringArray (like is returned by SplitString)".
-     @param               StringArray      "An StringArray to deinitalize, all strings will be freed".
+     @param               StringArray      "An StringArray to deinitialize, all strings will be freed".
      */
     void                  UTF32_StringArray_Deinit(UTF32 **StringArray);
     
