@@ -6,7 +6,8 @@
  @brief               This header contains types, functions, and tables for cryptography and hashing.
  */
 
-#include "../include/Macros.h"
+#include "Macros.h"
+#include "UnicodeIO/UnicodeTypes.h"
 
 #pragma once
 
@@ -16,18 +17,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
-#ifndef   FoundationIO_StringType8
-#define   FoundationIO_StringType8 (1)
-#ifdef    UTF8
-#undef    UTF8
-#endif /* UTF8 */
-#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (FoundationIOStandardVersion >= FoundationIOStandardVersionC2X))
-    typedef           char8_t              UTF8;
-#else
-    typedef           unsigned char        UTF8;
-#endif /* __CHAR8_TYPE__ */
-#endif /* FoundationIO_StringType8 */
     
     typedef struct    MD5 MD5;
     

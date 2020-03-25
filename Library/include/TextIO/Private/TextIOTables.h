@@ -1,16 +1,5 @@
 #include "../../Macros.h"
-
-#ifndef   FoundationIO_StringType32
-#define   FoundationIO_StringType32
-#ifdef    UTF32
-#undef    UTF32
-#endif /* UTF32 */
-#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && ((FoundationIOTargetOS & FoundationIOAppleOS) != FoundationIOAppleOS)
-typedef   char32_t       UTF32;
-#else
-typedef   uint_least32_t UTF32;
-#endif /* __CHAR32_TYPE__ */
-#endif /* FoundationIO_StringType32 */
+#include "../UnicodeTypes.h"
 
 #pragma once
 

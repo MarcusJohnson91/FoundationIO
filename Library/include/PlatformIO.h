@@ -127,8 +127,32 @@ extern "C" {
 #define             FoundationIOStandardVersionC2X                                            (202102L)
 #endif
     
-#ifndef             FoundationIOStandardVersion
-#define             FoundationIOStandardVersion                                               (__STDC_VERSION__)
+#ifndef             FoundationIOStandardVersionC
+#define             FoundationIOStandardVersionC                                              (__STDC_VERSION__)
+#endif
+    
+#ifndef             FoundationIOStandardVersionCXX98
+#define             FoundationIOStandardVersionCXX98                                          (199711L)
+#endif
+    
+#ifndef             FoundationIOStandardVersionCXX11
+#define             FoundationIOStandardVersionCXX11                                          (201103L)
+#endif
+    
+#ifndef             FoundationIOStandardVersionCXX14
+#define             FoundationIOStandardVersionCXX14                                          (201402L)
+#endif
+    
+#ifndef             FoundationIOStandardVersionCXX17
+#define             FoundationIOStandardVersionCXX17                                          (201703L)
+#endif
+    
+#ifndef             FoundationIOStandardVersionCXX20
+#define             FoundationIOStandardVersionCXX20                                          (202002L)
+#endif
+    
+#ifndef             FoundationIOStandardVersionCXX
+#define             FoundationIOStandardVersionCXX                                            (__cplusplus)
 #endif
     
 #ifndef             FoundationIOCompilerIsUnknown

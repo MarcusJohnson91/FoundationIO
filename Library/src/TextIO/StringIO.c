@@ -2382,11 +2382,6 @@ extern "C" {
         bool     IsNegative    = No;
         if (String != NULL) {
             uint64_t CodePoint = 0ULL;
-            for (uint8_t Whitespace = 0; Whitespace < WhiteSpaceTableSize; Whitespace++) {
-                if (String[CodePoint] == WhiteSpaceTable[Whitespace]) {
-                    CodePoint += 1;
-                }
-            }
             
             if (String[CodePoint] == UTF32Character('-')) {
                 IsNegative = Yes;

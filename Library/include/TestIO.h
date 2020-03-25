@@ -6,8 +6,9 @@
  @brief               This header contains types, functions, and tables for automated testing.
  */
 
-#include "../include/Macros.h"                   /* Included for Platform Independence macros */
-#include "../include/CryptographyIO.h"           /* Included for Entropy */
+#include "Macros.h"                   /* Included for Platform Independence macros */
+#include "CryptographyIO.h"           /* Included for Entropy */
+#include "UnicodeIO/UnicodeTypes.h"
 
 #pragma once
 
@@ -17,17 +18,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#ifndef   FoundationIO_StringType32
-#define   FoundationIO_StringType32 (4)
-#ifdef    UTF32
-#undef    UTF32
-#endif /* UTF32 */
-#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (FoundationIOStandardVersion >= FoundationIOStandardVersionC2X))
-    typedef                     char32_t                        UTF32;
-#else
-    typedef                     uint_least32_t                  UTF32;
-#endif /* __CHAR32_TYPE__ */
-#endif /* FoundationIO_StringType32 */
     
     /*!
      @enum                      TestIO_TestStates
