@@ -6,7 +6,8 @@
  @brief               This header contains code for containers (type generic arrays)
  */
 
-#include "../include/Macros.h"
+#include "Macros.h"
+#include "UnicodeIO/UnicodeTypes.h"
 
 #pragma  once
 

@@ -5,24 +5,8 @@
 
 CreateHeaderFileTop() {
     {
-        printf "#include \"../../Macros.h\"\n\n"
-        printf "#ifndef   FoundationIO_StringType32\n"
-        printf "#define   FoundationIO_StringType32\n"
-        printf "#ifdef    UTF32\n"
-        printf "#undef    UTF32\n"
-        printf "#endif /* UTF32 */\n"
-        printf "#if (defined __STDC_UTF_32__ && defined __CHAR32_TYPE__) && ((FoundationIOTargetOS & FoundationIOAppleOS) != FoundationIOAppleOS)\n"
-        printf "typedef   char32_t       UTF32;\n"
-        printf "#else\n"
-        printf "typedef   uint_least32_t UTF32;\n"
-        printf "#endif /* __CHAR32_TYPE__ */\n"
-        printf "#endif /* FoundationIO_StringType32 */\n\n"
-        printf "#pragma once\n\n"
-        printf "#ifndef FoundationIO_UnicodeTables_H\n"
-        printf "#define FoundationIO_UnicodeTables_H\n\n"
-        printf "#ifdef __cplusplus\n"
-        printf "extern \"C\" {\n"
-        printf "#endif\n\n"
+        printf "#include \"../../Macros.h\"\n"
+        printf "#include \"../UnicodeTypes.h\"\n\n"
     } >> "$HeaderFile"
     ScriptSHA=$(shasum $0 | awk '{print $1}')
 	printf "#define ScriptHash %s\n\n" "$ScriptSHA" >> "$HeaderFile"

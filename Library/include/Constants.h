@@ -1,4 +1,13 @@
+/*!
+ @header              Constants.h
+ @author              Marcus Johnson
+ @copyright           2020+
+ @version             1.0.0
+ @brief               This header contains tables and enums used across FoundationIO.
+ */
+
 #include "Macros.h"
+#include "UnicodeIO/UnicodeTypes.h" /* Included for UTF32 */
 
 #pragma once
 
@@ -8,18 +17,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#ifndef   FoundationIO_StringType32
-#define   FoundationIO_StringType32 (4)
-#ifdef    UTF32
-#undef    UTF32
-#endif /* UTF32 */
-#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (FoundationIOStandardVersion >= FoundationIOStandardVersionC2X))
-	typedef               char32_t                             UTF32;
-#else
-	typedef               uint_least32_t                       UTF32;
-#endif /* __CHAR32_TYPE__ */
-#endif /* FoundationIO_StringType32 */
 
 #define BitMaskTableSize             8
 
