@@ -8,14 +8,6 @@
 # License:
 FoundationIO is released under the terms of the 3 clause [`Revised BSD`](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29) license.
 
-Here's a tl;dr of my license:
-
-* **Do** If you permanently fork FoundationIO, change the name.
-* **Do** include in your acknowledgments a link to [FoundationIO on GitHub](https://github.com/MarcusJohnson91/FoundationIO).
-* **Don't** plagiarize FoundationIO, you didn't write it, don't claim that you did.
-* **Don't** relicense FoundationIO, as the copyright holder, it's exclusively my choice what license to use.
-* **Don't** sue me if something goes wrong, it's your responsibility to determine if FoundationIO is right for you.
-
 # Compiling:
 * to use FoundationIO in your project, add it as a submodule with `git submodule add git@github.com:MarcusJohnson91/FoundationIO.git Dependencies/FoundationIO`, then include whatever module headers you want to use.
 * call `cmake` with `-G "Unix Makefiles" -B"$(PWD)/../BUILD"`, the cmake file is in `/Projects`
