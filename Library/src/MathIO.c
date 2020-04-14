@@ -84,7 +84,7 @@ extern "C" {
         return (uint16_t) ExtractExponentD(Decimal);
     }
     
-    int64_t  FloorF(float Decimal) {
+    int16_t FloorF(float Decimal) {
         int64_t  Result   = 0;
         int8_t   Sign     = ExtractSignF(Decimal);
         int8_t   Exponent = ExtractExponentF(Decimal);
@@ -102,7 +102,7 @@ extern "C" {
         return Result;
     }
     
-    int64_t  FloorD(double Decimal) {
+    int32_t FloorD(double Decimal) {
         int64_t  Result   = 0;
         int8_t   Sign     = ExtractSignD(Decimal);
         int16_t  Exponent = ExtractExponentD(Decimal);
@@ -120,7 +120,7 @@ extern "C" {
         return Result;
     }
     
-    int64_t  CeilF(float Decimal) {
+    int16_t CeilF(float Decimal) {
         int64_t  Result   = 0;
         int8_t   Sign     = ExtractSignF(Decimal);
         int8_t   Exponent = ExtractExponentF(Decimal);
@@ -138,7 +138,7 @@ extern "C" {
         return Result;
     }
     
-    int64_t  CeilD(double Decimal) {
+    int32_t CeilD(double Decimal) {
         int64_t  Result   = 0;
         int8_t   Sign     = ExtractSignD(Decimal);
         int16_t  Exponent = ExtractExponentD(Decimal);
@@ -156,7 +156,7 @@ extern "C" {
         return Result;
     }
     
-    int64_t  RoundF(float Decimal) {
+    int16_t RoundF(float Decimal) {
         int64_t  Result   = 0;
         int8_t   Sign     = ExtractSignF(Decimal);
         int8_t   Exponent = ExtractExponentF(Decimal);
@@ -169,7 +169,7 @@ extern "C" {
         return Result * Sign;
     }
     
-    int64_t  RoundD(double Decimal) {
+    int32_t RoundD(double Decimal) {
         int64_t  Result   = 0;
         int8_t   Sign     = ExtractSignD(Decimal);
         int16_t  Exponent = ExtractExponentD(Decimal);
@@ -290,14 +290,14 @@ extern "C" {
         return Sign == 0 ? 1 : -1;
     }
     
-    int8_t ExtractExponentF(float Decimal) {
+    int16_t ExtractExponentF(float Decimal) {
         uint32_t Integer       = ConvertFloat2Integer(Decimal);
         int8_t   Sign          = ExtractSignF(Decimal);
         int8_t   Exponent      = (Integer & 0x7F800000) >> 23;
         return (Exponent - 127) * Sign;
     }
     
-    int16_t ExtractExponentD(double Decimal) {
+    int32_t ExtractExponentD(double Decimal) {
         uint64_t Integer        = ConvertDouble2Integer(Decimal);
         int8_t   Sign           = ExtractSignD(Decimal);
         int16_t  Exponent       = (Integer & 0x7FF0000000000000) >> 52;
@@ -405,7 +405,7 @@ extern "C" {
         return Bytes * 8;
     }
     
-    uint64_t Bits2Bytes(uint64_t Bits, RoundingTypes RoundingType) {
+    uint64_t Bits2Bytes(uint64_t Bits, MathIO_RoundingTypes RoundingType) {
         uint64_t Bytes        = Bits / 8;
         
         if (RoundingType == RoundingType_Up) {
