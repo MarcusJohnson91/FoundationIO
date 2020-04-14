@@ -155,6 +155,22 @@ extern "C" {
 #define             FoundationIOStandardVersionCXX                                            (__cplusplus)
 #endif
     
+#ifndef             FoundationIOLanguageIsC
+#define             FoundationIOLanguageIsC                                                   (1)
+#endif
+    
+#ifndef             FoundationIOLanguageIsCXX
+#define             FoundationIOLanguageIsCXX                                                 (2)
+#endif
+    
+#ifndef             FoundationIOLanguage
+#if (defined __cplusplus)
+#define             FoundationIOLanguage                                                      FoundationIOLanguageIsCXX
+#else
+#define             FoundationIOLanguage                                                      FoundationIOLanguageIsC
+#endif
+#endif
+    
 #ifndef             FoundationIOCompilerIsUnknown
 #define             FoundationIOCompilerIsUnknown                                             (0)
 #endif
