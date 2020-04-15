@@ -150,7 +150,14 @@ extern "C" {
             int64_t  AlignmentSizeInBits = Bytes2Bits(AlignmentSize);
             int64_t  Bits2Align          = AlignmentSizeInBits - (BitB->BitOffset % AlignmentSizeInBits);
             if (BitB->BitOffset + Bits2Align > BitB->NumBits) {
+                uint8_t *Buffer_Old      = BitB->Buffer;
                 BitB->Buffer             = (uint8_t*) realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, RoundingType_Up));
+                if (BitB->Buffer != NULL) {
+                    free(Buffer_Old);
+                } else {
+                    BitB->Buffer         = Buffer_Old;
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Realloc failed"));
+                }
                 BitB->NumBits           += Bits2Align;
             }
             BitB->BitOffset             += Bits2Align;
@@ -185,13 +192,15 @@ extern "C" {
     
     void BitBuffer_Resize(BitBuffer *BitB, uint64_t NewSize) {
         if (BitB != NULL && NewSize * 8 >= BitB->BitOffset) {
-            uint8_t *NewBuffer  = (uint8_t*) realloc(BitB->Buffer, NewSize);
-            if (NewBuffer != NULL) {
-                BitB->Buffer    = NewBuffer;
+            uint8_t *Buffer_Old = BitB->Buffer;
+            BitB->Buffer        = (uint8_t*) realloc(BitB->Buffer, NewSize);
+            if (BitB->Buffer != NULL) {
                 BitB->BitOffset = 0;
                 BitB->NumBits   = NewSize * 8;
+                free(Buffer_Old);
             } else {
-                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Reallocing the BitBuffer failed"));
+                BitB->Buffer    = Buffer_Old;
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Realloc failed"));
             }
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
@@ -208,13 +217,15 @@ extern "C" {
                 BytesRead            = FoundationIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
             }
             if (BytesRead != Bytes2Read) {
-                uint8_t *Reallocated = (uint8_t*) realloc(BitB->Buffer, BytesRead);
-                if (Reallocated != NULL) {
-                    BitB->Buffer     = Reallocated;
+                uint8_t *Buffer_Old  = BitB->Buffer;
+                BitB->Buffer         = (uint8_t*) realloc(BitB->Buffer, BytesRead);
+                if (BitB->Buffer != NULL) {
                     BitB->BitOffset  = 0;
                     BitB->NumBits    = BytesRead * 8;
+                    free(Buffer_Old);
                 } else {
-                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Reallocating the BitBuffer failed"));
+                    BitB->Buffer    = Buffer_Old;
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Realloc failed"));
                 }
             }
         } else if (BitB == NULL) {
