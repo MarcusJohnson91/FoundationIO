@@ -509,20 +509,68 @@ extern "C" {
         return OutputData;
     }
     
-    uint64_t BitBuffer_ReadBits(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t Bits2Read) {
-        uint64_t OutputData    = 0ULL;
+    uint8_t BitBuffer_ReadBits8(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t Bits2Read) {
+        uint8_t OutputData    = 0U;
         if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
             if (ByteOrder == BitIO_ByteOrder_LSByte) {
                 if (BitOrder == BitIO_BitOrder_LSBit) {
-                    OutputData          = BitBuffer_Extract_LSByteLSBit(BitB, Bits2Read);
+                    OutputData          = (uint8_t) BitBuffer_Extract_LSByteLSBit(BitB, Bits2Read);
                 } else if (BitOrder == BitIO_BitOrder_MSBit) {
-                    OutputData          = BitBuffer_Extract_LSByteMSBit(BitB, Bits2Read);
+                    OutputData          = (uint8_t) BitBuffer_Extract_LSByteMSBit(BitB, Bits2Read);
                 }
             } else if (ByteOrder == BitIO_ByteOrder_MSByte) {
                 if (BitOrder == BitIO_BitOrder_LSBit) {
-                    OutputData         = BitBuffer_Extract_MSByteLSBit(BitB, Bits2Read);
+                    OutputData         = (uint8_t) BitBuffer_Extract_MSByteLSBit(BitB, Bits2Read);
                 } else if (BitOrder == BitIO_BitOrder_MSBit) {
-                    OutputData         = BitBuffer_Extract_MSByteMSBit(BitB, Bits2Read);
+                    OutputData         = (uint8_t) BitBuffer_Extract_MSByteMSBit(BitB, Bits2Read);
+                }
+            }
+        } else if (BitB == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+        } else if ((Bits2Read == 0 || Bits2Read > 64) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 1-64"), Bits2Read, BitB->BitOffset);
+        }
+        return OutputData;
+    }
+    
+    uint16_t BitBuffer_ReadBits16(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t Bits2Read) {
+        uint16_t OutputData    = 0U;
+        if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
+            if (ByteOrder == BitIO_ByteOrder_LSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
+                    OutputData          = (uint16_t) BitBuffer_Extract_LSByteLSBit(BitB, Bits2Read);
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                    OutputData          = (uint16_t) BitBuffer_Extract_LSByteMSBit(BitB, Bits2Read);
+                }
+            } else if (ByteOrder == BitIO_ByteOrder_MSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
+                    OutputData         = (uint16_t) BitBuffer_Extract_MSByteLSBit(BitB, Bits2Read);
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                    OutputData         = (uint16_t) BitBuffer_Extract_MSByteMSBit(BitB, Bits2Read);
+                }
+            }
+        } else if (BitB == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+        } else if ((Bits2Read == 0 || Bits2Read > 64) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 1-64"), Bits2Read, BitB->BitOffset);
+        }
+        return OutputData;
+    }
+    
+    uint32_t BitBuffer_ReadBits32(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t Bits2Read) {
+        uint32_t OutputData    = 0UL;
+        if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
+            if (ByteOrder == BitIO_ByteOrder_LSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
+                    OutputData          = (uint32_t) BitBuffer_Extract_LSByteLSBit(BitB, Bits2Read);
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                    OutputData          = (uint32_t) BitBuffer_Extract_LSByteMSBit(BitB, Bits2Read);
+                }
+            } else if (ByteOrder == BitIO_ByteOrder_MSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
+                    OutputData         = (uint32_t) BitBuffer_Extract_MSByteLSBit(BitB, Bits2Read);
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                    OutputData         = (uint32_t) BitBuffer_Extract_MSByteMSBit(BitB, Bits2Read);
                 }
             }
         } else if (BitB == NULL) {
