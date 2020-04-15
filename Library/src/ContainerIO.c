@@ -655,6 +655,52 @@ extern "C" {
         }
     }
     
+    Audio2DContainer *Audio2DContainer_Upsample(Audio2DContainer *Container2Upsample, uint64_t SampleRate, uint8_t BitDepth) {
+        Audio2DContainer *Upsammpled = NULL;
+        if (Container2Upsample != NULL && SampleRate > 0 && BitDepth > 0) {
+            
+        } else if (Container2Upsample == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Container Pointer is NULL"));
+        } else if (SampleRate == 0) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SampleRate: 0 is invalid"));
+        } else if (BitDepth == 0) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitDepth: 0 is invalid"));
+        }
+        return Upsammpled;
+    }
+    
+    Audio2DContainer *Audio2DContainer_Mix(Audio2DContainer *Container1, Audio2DContainer *Container2) {
+        Audio2DContainer *Mixed = NULL;
+        if (Container1 != NULL && Container2 != NULL) {
+            // Get the sample rate bitdepth numchannels etc for each container
+            uint64_t Container1_NumChannels = Audio2DContainer_GetNumChannels(Container1);
+            uint64_t Container1_SampleRate  = Audio2DContainer_GetSampleRate(Container1);
+            uint8_t  Container1_BitDepth    = Audio2DContainer_GetBitDepth(Container1);
+            uint64_t Container2_NumChannels = Audio2DContainer_GetNumChannels(Container2);
+            uint64_t Container2_SampleRate  = Audio2DContainer_GetSampleRate(Container2);
+            uint8_t  Container2_BitDepth    = Audio2DContainer_GetBitDepth(Container2);
+            
+            uint64_t New_NumChannels        = Maximum(Container1_NumChannels, Container2_NumChannels);
+            uint64_t New_SampleRate         = Maximum(Container1_SampleRate, Container2_SampleRate);
+            uint8_t  New_BitDepth           = Maximum(Container1_BitDepth, Container2_BitDepth);
+            
+            
+            
+            /*
+             
+             Now we need to take the highest value from either container and double it and create our new container with those variables
+             
+             then we need to upsample
+             
+             */
+        } else if (Container1 == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Container1 Pointer is NULL"));
+        } else if (Container2 == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Container2 Pointer is NULL"));
+        }
+        return Mixed;
+    }
+    
     uint8_t Audio2DHistogram_Erase(Audio2DHistogram *Histogram, uint8_t NewValue) {
         uint8_t Verification = 0xFE;
         if (Histogram != NULL) {
@@ -1012,6 +1058,31 @@ extern "C" {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Index %llu is larger than %llu"), Index, Container->NumVectors);
         }
         return Vector;
+    }
+    
+    uint64_t Audio3DContainer_GetTotalNumSamples(Audio3DContainer *Container) {
+        uint64_t NumSamples = 0ULL;
+        if (Container != NULL) {
+            for (uint64_t Vector = 0ULL; Vector < Container->NumVectors; Vector++) {
+                NumSamples += Container->Vectors[Vector].NumSamples;
+            }
+        } else {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Audio3DContainer Pointer is NULL"));
+        }
+        return NumSamples;
+    }
+    
+    Audio2DContainer *Audio3DContainer_Mix2Audio2DContainer(Audio3DContainer *Audio3D, AudioChannelMap *ChannelMap, ContainerIO_AudioTypes Type, uint64_t SampleRate) {
+        Audio2DContainer *Audio2D = NULL;
+        if (Audio3D != NULL && ChannelMap != NULL) {
+            uint64_t NumSamples   = Audio3DContainer_GetTotalNumSamples(Audio3D);
+            Audio2D               = Audio2DContainer_Init(Type, ChannelMap, SampleRate, /*Calculate this from all the vectors */ 0);
+        } else if (Audio3D == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Audio3DContainer Pointer is NULL"));
+        } else if (ChannelMap == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("AudioChannelMap Pointer is NULL"));
+        }
+        return Audio2D;
     }
     
     uint8_t Audio3DContainer_Erase(Audio3DContainer *Container, uint8_t NewValue) {

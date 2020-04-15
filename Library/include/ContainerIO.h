@@ -373,6 +373,21 @@ extern "C" {
     AudioVector            *Audio3DContainer_GetVector(Audio3DContainer *Container, uint64_t Index);
     
     /*!
+     @abstract                                   Gets the total number of samples in the Audio3DContainer.
+     @param                 Container            The Audio3DContainer to get the total number of samples from.
+     */
+    uint64_t                Audio3DContainer_GetTotalNumSamples(Audio3DContainer *Container);
+    
+    /*!
+     @abstract                                   Downmixes 3D audio to 2D audio.
+     @param                 Audio3D              The Audio3DContainer to get the total number of samples from.
+     @param                 ChannelMap           The ChannelMap to create the downmix with.
+     @param                 Type                 The type of the audio, should this be gleaned from the 3D audio?
+     */
+    Audio2DContainer       *Audio3DContainer_Mix2Audio2DContainer(Audio3DContainer *Audio3D, AudioChannelMap *ChannelMap, ContainerIO_AudioTypes Type, uint64_t SampleRate);
+    
+    
+    /*!
      @abstract                             "Securely erases an Audio3DContainer".
      @param                 Container      "A pointer to the instance of the Audio3DContainer in question".
      @param                 NewValue       "The value to set each codeunit to while erasing".
