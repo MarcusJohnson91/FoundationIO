@@ -500,10 +500,10 @@ extern "C" {
     UTF32 **CommandLineIO_GetArgumentArray(void **Arguments) {
         UTF32 **ArgumentArray           = NULL;
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-        ArgumentArray                   = (UTF32**) UTF8_StringArray_Decode((UTF8**) Arguments);
+        ArgumentArray                   = (UTF32**) UTF8_StringSet_Decode((UTF8**) Arguments);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         uint64_t NumArguments           = (uint64_t) __argc;
-        ArgumentArray                   = UTF32_StringArray_Init(NumArguments);
+        ArgumentArray                   = UTF32_StringSet_Init(NumArguments);
         if (ArgumentArray != NULL) {
             for (uint64_t Argument = 0ULL; Argument < NumArguments; Argument++) {
                 ArgumentArray[Argument] = UTF16_Decode((UTF16*) Arguments);
@@ -563,7 +563,7 @@ extern "C" {
     
     void CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, UTF8 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
-            UTF32 **Arguments32     = UTF32_StringArray_Init(NumArguments);
+            UTF32 **Arguments32     = UTF32_StringSet_Init(NumArguments);
             for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
                 UTF32 *Decoded      = UTF8_Decode(Arguments[Arg]);
                 UTF32 *CaseFolded   = UTF32_CaseFold(Decoded);
@@ -586,7 +586,7 @@ extern "C" {
     
     void CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, UTF16 **Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
-            UTF32 **Arguments32     = UTF32_StringArray_Init(NumArguments);
+            UTF32 **Arguments32     = UTF32_StringSet_Init(NumArguments);
             for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
                 UTF32 *Decoded      = UTF16_Decode(Arguments[Arg]);
                 UTF32 *CaseFolded   = UTF32_CaseFold(Decoded);

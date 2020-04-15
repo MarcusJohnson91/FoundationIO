@@ -2780,9 +2780,9 @@ extern "C" {
         UTF8 *Trimmed = NULL;
         if (String != NULL && Type != TruncationType_Unknown && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF8_Decode(String);
-            UTF32   **Strings2Remove32          = UTF8_StringArray_Decode(Strings2Remove);
+            UTF32   **Strings2Remove32          = UTF8_StringSet_Decode(Strings2Remove);
             UTF32    *Trimmed32                 = UTF32_Trim(String32, Type, Strings2Remove32);
-            UTF32_StringArray_Deinit(Strings2Remove32);
+            UTF32_StringSet_Deinit(Strings2Remove32);
             Trimmed                             = UTF8_Encode(Trimmed32);
             UTF32_Deinit(String32);
         } else if (String == NULL) {
@@ -2799,9 +2799,9 @@ extern "C" {
         UTF16 *Trimmed = NULL;
         if (String != NULL && Type != TruncationType_Unknown && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF16_Decode(String);
-            UTF32   **Strings2Remove32          = UTF16_StringArray_Decode(Strings2Remove);
+            UTF32   **Strings2Remove32          = UTF16_StringSet_Decode(Strings2Remove);
             UTF32    *Trimmed32                 = UTF32_Trim(String32, Type, Strings2Remove32);
-            UTF32_StringArray_Deinit(Strings2Remove32);
+            UTF32_StringSet_Deinit(Strings2Remove32);
             Trimmed                             = UTF16_Encode(Trimmed32);
             UTF32_Deinit(String32);
         } else if (String == NULL) {
@@ -2818,8 +2818,8 @@ extern "C" {
         UTF32 *Trimmed = NULL;
         if (String != NULL && Type != TruncationType_Unknown && Strings2Remove != NULL) {
             uint64_t   StringSize          = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t   NumRemovalStrings   = UTF32_StringArray_GetNumStrings(Strings2Remove);
-            uint64_t  *RemovalStringSizes  = UTF32_StringArray_GetStringSizesInCodePoints(Strings2Remove);
+            uint64_t   NumRemovalStrings   = UTF32_StringSet_GetNumStrings(Strings2Remove);
+            uint64_t  *RemovalStringSizes  = UTF32_StringSet_GetStringSizesInCodePoints(Strings2Remove);
             uint64_t   NumRemovalPoints    = 0ULL;
             uint64_t   CurrentRemovalPoint = 0ULL;
             uint64_t  *RemovalPointsStart  = NULL; // RemovalPoint[0] = {0, 6}; start and stop points
@@ -2908,11 +2908,11 @@ extern "C" {
         UTF8 **SplitString        = NULL;
         if (String != NULL && Delimiters != NULL) {
             UTF32  *String32      = UTF8_Decode(String);
-            UTF32 **Delimiters32  = UTF8_StringArray_Decode(Delimiters);
+            UTF32 **Delimiters32  = UTF8_StringSet_Decode(Delimiters);
             UTF32 **SplitString32 = UTF32_Split(String32, Delimiters32);
             UTF32_Deinit(String32);
-            UTF32_StringArray_Deinit(Delimiters32);
-            SplitString           = UTF8_StringArray_Encode(SplitString32);
+            UTF32_StringSet_Deinit(Delimiters32);
+            SplitString           = UTF8_StringSet_Encode(SplitString32);
         } else if (String == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Delimiters == NULL) {
@@ -2925,11 +2925,11 @@ extern "C" {
         UTF16 **SplitString       = NULL;
         if (String != NULL && Delimiters != NULL) {
             UTF32  *String32      = UTF16_Decode(String);
-            UTF32 **Delimiters32  = UTF16_StringArray_Decode(Delimiters);
+            UTF32 **Delimiters32  = UTF16_StringSet_Decode(Delimiters);
             UTF32 **SplitString32 = UTF32_Split(String32, Delimiters32);
             UTF32_Deinit(String32);
-            UTF32_StringArray_Deinit(Delimiters32);
-            SplitString           = UTF16_StringArray_Encode(SplitString32);
+            UTF32_StringSet_Deinit(Delimiters32);
+            SplitString           = UTF16_StringSet_Encode(SplitString32);
         } else if (String == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Delimiters == NULL) {
@@ -2948,7 +2948,7 @@ extern "C" {
         uint64_t  *SplitOffsets    = NULL; // The starting position of each split
         if (String != NULL && Delimiters != NULL) {
             StringSize             = UTF32_GetStringSizeInCodePoints(String);
-            NumDelimiters          = UTF32_StringArray_GetNumStrings(Delimiters);
+            NumDelimiters          = UTF32_StringSet_GetNumStrings(Delimiters);
             DelimitersSize         = (uint64_t*) calloc(NumDelimiters + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             if (DelimitersSize != NULL) {
                 for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters; Delimiter++) {
@@ -3154,323 +3154,323 @@ extern "C" {
         }
     }
     
-    /* StringArray Functions */
-    UTF8 **UTF8_StringArray_Init(uint64_t NumStrings) {
-        UTF8 **StringArray = NULL;
+    /* StringSet Functions */
+    UTF8 **UTF8_StringSet_Init(uint64_t NumStrings) {
+        UTF8 **StringSet = NULL;
         if (NumStrings > 0) {
-            StringArray    = (UTF8**) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF8*));
+            StringSet    = (UTF8**) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF8*));
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
-        return StringArray;
+        return StringSet;
     }
     
-    UTF16 **UTF16_StringArray_Init(uint64_t NumStrings) {
-        UTF16 **StringArray = NULL;
+    UTF16 **UTF16_StringSet_Init(uint64_t NumStrings) {
+        UTF16 **StringSet = NULL;
         if (NumStrings > 0) {
-            StringArray     = (UTF16**) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF16*));
+            StringSet     = (UTF16**) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF16*));
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
-        return StringArray;
+        return StringSet;
     }
     
-    UTF32 **UTF32_StringArray_Init(uint64_t NumStrings) {
-        UTF32 **StringArray = NULL;
+    UTF32 **UTF32_StringSet_Init(uint64_t NumStrings) {
+        UTF32 **StringSet = NULL;
         if (NumStrings > 0) {
-            StringArray     = (UTF32**) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF32*));
+            StringSet     = (UTF32**) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF32*));
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
-        return StringArray;
+        return StringSet;
     }
     
-    void UTF8_StringArray_Attach(UTF8 **StringArray, UTF8 *String2Attach, uint64_t Index) {
-        if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
-            StringArray[Index] = String2Attach;
-        } else if (StringArray == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+    void UTF8_StringSet_Attach(UTF8 **StringSet, UTF8 *String2Attach, uint64_t Index) {
+        if (StringSet != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
+            StringSet[Index] = String2Attach;
+        } else if (StringSet == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         } else if (String2Attach == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String2Attach Pointer is NULL"));
         }
     }
     
-    void UTF16_StringArray_Attach(UTF16 **StringArray, UTF16 *String2Attach, uint64_t Index) {
-        if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
-            StringArray[Index] = String2Attach;
-        } else if (StringArray == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+    void UTF16_StringSet_Attach(UTF16 **StringSet, UTF16 *String2Attach, uint64_t Index) {
+        if (StringSet != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
+            StringSet[Index] = String2Attach;
+        } else if (StringSet == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         } else if (String2Attach == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String2Attach Pointer is NULL"));
         }
     }
     
-    void UTF32_StringArray_Attach(UTF32 **StringArray, UTF32 *String2Attach, uint64_t Index) {
-        if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
-            StringArray[Index] = String2Attach;
-        } else if (StringArray == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+    void UTF32_StringSet_Attach(UTF32 **StringSet, UTF32 *String2Attach, uint64_t Index) {
+        if (StringSet != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
+            StringSet[Index] = String2Attach;
+        } else if (StringSet == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         } else if (String2Attach == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String2Attach Pointer is NULL"));
         }
     }
     
-    uint64_t UTF8_StringArray_GetNumStrings(UTF8 **StringArray) {
+    uint64_t UTF8_StringSet_GetNumStrings(UTF8 **StringSet) {
         uint64_t NumStrings = 0ULL;
-        if (StringArray != NULL) {
-            while (StringArray[NumStrings] != FoundationIONULLTerminator) {
+        if (StringSet != NULL) {
+            while (StringSet[NumStrings] != FoundationIONULLTerminator) {
                 NumStrings += 1;
             }
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
         return NumStrings;
     }
     
-    uint64_t UTF16_StringArray_GetNumStrings(UTF16 **StringArray) {
+    uint64_t UTF16_StringSet_GetNumStrings(UTF16 **StringSet) {
         uint64_t NumStrings = 0ULL;
-        if (StringArray != NULL) {
-            while (StringArray[NumStrings] != FoundationIONULLTerminator) {
+        if (StringSet != NULL) {
+            while (StringSet[NumStrings] != FoundationIONULLTerminator) {
                 NumStrings += 1;
             }
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
         return NumStrings;
     }
     
-    uint64_t UTF32_StringArray_GetNumStrings(UTF32 **StringArray) {
+    uint64_t UTF32_StringSet_GetNumStrings(UTF32 **StringSet) {
         uint64_t NumStrings = 0ULL;
-        if (StringArray != NULL) {
-            while (StringArray[NumStrings] != FoundationIONULLTerminator) {
+        if (StringSet != NULL) {
+            while (StringSet[NumStrings] != FoundationIONULLTerminator) {
                 NumStrings += 1;
             }
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
         return NumStrings;
     }
     
-    uint64_t *UTF8_StringArray_GetStringSizesInCodeUnits(UTF8 **StringArray) {
-        uint64_t *StringArraySizes       = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings          = UTF8_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = (uint64_t*) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+    uint64_t *UTF8_StringSet_GetStringSizesInCodeUnits(UTF8 **StringSet) {
+        uint64_t *StringSetSizes       = NULL;
+        if (StringSet != NULL) {
+            uint64_t NumStrings          = UTF8_StringSet_GetNumStrings(StringSet);
+            StringSetSizes             = (uint64_t*) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringArraySizes[String] = UTF8_GetStringSizeInCodeUnits(StringArray[String]);
+                StringSetSizes[String] = UTF8_GetStringSizeInCodeUnits(StringSet[String]);
             }
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
-        return StringArraySizes;
+        return StringSetSizes;
     }
     
-    uint64_t *UTF16_StringArray_GetStringSizesInCodeUnits(UTF16 **StringArray) {
-        uint64_t *StringArraySizes       = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings          = UTF16_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = (uint64_t*) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+    uint64_t *UTF16_StringSet_GetStringSizesInCodeUnits(UTF16 **StringSet) {
+        uint64_t *StringSetSizes       = NULL;
+        if (StringSet != NULL) {
+            uint64_t NumStrings          = UTF16_StringSet_GetNumStrings(StringSet);
+            StringSetSizes             = (uint64_t*) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringArraySizes[String] = UTF16_GetStringSizeInCodeUnits(StringArray[String]);
+                StringSetSizes[String] = UTF16_GetStringSizeInCodeUnits(StringSet[String]);
             }
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
-        return StringArraySizes;
+        return StringSetSizes;
     }
     
-    uint64_t *UTF8_StringArray_GetStringSizesInCodePoints(UTF8 **StringArray) {
-        uint64_t *StringArraySizes       = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings          = UTF8_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = (uint64_t*) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+    uint64_t *UTF8_StringSet_GetStringSizesInCodePoints(UTF8 **StringSet) {
+        uint64_t *StringSetSizes       = NULL;
+        if (StringSet != NULL) {
+            uint64_t NumStrings          = UTF8_StringSet_GetNumStrings(StringSet);
+            StringSetSizes             = (uint64_t*) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringArraySizes[String] = UTF8_GetStringSizeInCodePoints(StringArray[String]);
+                StringSetSizes[String] = UTF8_GetStringSizeInCodePoints(StringSet[String]);
             }
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
-        return StringArraySizes;
+        return StringSetSizes;
     }
     
-    uint64_t *UTF16_StringArray_GetStringSizesInCodePoints(UTF16 **StringArray) {
-        uint64_t *StringArraySizes       = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings          = UTF16_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             =(uint64_t*)  calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+    uint64_t *UTF16_StringSet_GetStringSizesInCodePoints(UTF16 **StringSet) {
+        uint64_t *StringSetSizes       = NULL;
+        if (StringSet != NULL) {
+            uint64_t NumStrings          = UTF16_StringSet_GetNumStrings(StringSet);
+            StringSetSizes             =(uint64_t*)  calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringArraySizes[String] = UTF16_GetStringSizeInCodePoints(StringArray[String]);
+                StringSetSizes[String] = UTF16_GetStringSizeInCodePoints(StringSet[String]);
             }
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
-        return StringArraySizes;
+        return StringSetSizes;
     }
     
-    uint64_t *UTF32_StringArray_GetStringSizesInCodePoints(UTF32 **StringArray) {
-        uint64_t *StringArraySizes       = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings          = UTF32_StringArray_GetNumStrings(StringArray);
-            StringArraySizes             = (uint64_t*) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+    uint64_t *UTF32_StringSet_GetStringSizesInCodePoints(UTF32 **StringSet) {
+        uint64_t *StringSetSizes       = NULL;
+        if (StringSet != NULL) {
+            uint64_t NumStrings          = UTF32_StringSet_GetNumStrings(StringSet);
+            StringSetSizes             = (uint64_t*) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringArraySizes[String] = UTF32_GetStringSizeInCodePoints(StringArray[String]);
+                StringSetSizes[String] = UTF32_GetStringSizeInCodePoints(StringSet[String]);
             }
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
-        return StringArraySizes;
+        return StringSetSizes;
     }
     
-    UTF32 **UTF8_StringArray_Decode(UTF8 **StringArray) {
+    UTF32 **UTF8_StringSet_Decode(UTF8 **StringSet) {
         UTF32 **Decoded             = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings     = UTF8_StringArray_GetNumStrings(StringArray);
-            Decoded                 = UTF32_StringArray_Init(NumStrings);
+        if (StringSet != NULL) {
+            uint64_t NumStrings     = UTF8_StringSet_GetNumStrings(StringSet);
+            Decoded                 = UTF32_StringSet_Init(NumStrings);
             if (Decoded != NULL) {
                 for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                    Decoded[String] = UTF8_Decode(StringArray[String]);
+                    Decoded[String] = UTF8_Decode(StringSet[String]);
                 }
             } else {
-                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringSet"));
             }
             
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
         return Decoded;
     }
     
-    UTF32 **UTF16_StringArray_Decode(UTF16 **StringArray) {
+    UTF32 **UTF16_StringSet_Decode(UTF16 **StringSet) {
         UTF32 **Decoded             = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings     = UTF16_StringArray_GetNumStrings(StringArray);
-            Decoded                 = UTF32_StringArray_Init(NumStrings);
+        if (StringSet != NULL) {
+            uint64_t NumStrings     = UTF16_StringSet_GetNumStrings(StringSet);
+            Decoded                 = UTF32_StringSet_Init(NumStrings);
             if (Decoded != NULL) {
                 for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                    Decoded[String] = UTF16_Decode(StringArray[String]);
+                    Decoded[String] = UTF16_Decode(StringSet[String]);
                 }
             } else {
-                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringSet"));
             }
             
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
         return Decoded;
     }
     
-    UTF8 **UTF8_StringArray_Encode(UTF32 **StringArray) {
+    UTF8 **UTF8_StringSet_Encode(UTF32 **StringSet) {
         UTF8 **Encoded              = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings     = UTF32_StringArray_GetNumStrings(StringArray);
-            Encoded                 = UTF8_StringArray_Init(NumStrings);
+        if (StringSet != NULL) {
+            uint64_t NumStrings     = UTF32_StringSet_GetNumStrings(StringSet);
+            Encoded                 = UTF8_StringSet_Init(NumStrings);
             if (Encoded != NULL) {
                 for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                    Encoded[String] = UTF8_Encode(StringArray[String]);
+                    Encoded[String] = UTF8_Encode(StringSet[String]);
                 }
             } else {
-                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringSet"));
             }
             
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
         return Encoded;
     }
     
-    UTF16 **UTF16_StringArray_Encode(UTF32 **StringArray) {
+    UTF16 **UTF16_StringSet_Encode(UTF32 **StringSet) {
         UTF16 **Encoded             = NULL;
-        if (StringArray != NULL) {
-            uint64_t NumStrings     = UTF32_StringArray_GetNumStrings(StringArray);
-            Encoded                 = UTF16_StringArray_Init(NumStrings);
+        if (StringSet != NULL) {
+            uint64_t NumStrings     = UTF32_StringSet_GetNumStrings(StringSet);
+            Encoded                 = UTF16_StringSet_Init(NumStrings);
             if (Encoded != NULL) {
                 for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                    Encoded[String] = UTF16_Encode(StringArray[String]);
+                    Encoded[String] = UTF16_Encode(StringSet[String]);
                 }
             } else {
-                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringSet"));
             }
             
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
         return Encoded;
     }
     
-    void UTF8_StringArray_Print(UTF8 **StringArray) {
-        if (StringArray != NULL) {
-            uint64_t NumStrings = UTF8_StringArray_GetNumStrings(StringArray);
+    void UTF8_StringSet_Print(UTF8 **StringSet) {
+        if (StringSet != NULL) {
+            uint64_t NumStrings = UTF8_StringSet_GetNumStrings(StringSet);
             printf("\nNumStrings: %llu\n", NumStrings);
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                printf("%s\n", StringArray[String]);
+                printf("%s\n", StringSet[String]);
             }
         }
     }
     
-    void UTF16_StringArray_Print(UTF16 **StringArray) {
-        uint64_t NumStrings = UTF16_StringArray_GetNumStrings(StringArray);
+    void UTF16_StringSet_Print(UTF16 **StringSet) {
+        uint64_t NumStrings = UTF16_StringSet_GetNumStrings(StringSet);
         printf("\nNumStrings: %llu\n", NumStrings);
         for (uint64_t String = 0ULL; String < NumStrings; String++) {
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-            UTF32 *Decoded  = UTF16_Decode(StringArray[String]);
+            UTF32 *Decoded  = UTF16_Decode(StringSet[String]);
             printf("%ls\n", (wchar_t*) Decoded);
             free(Decoded);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            printf("%ls\n", (wchar_t*) StringArray[String]);
+            printf("%ls\n", (wchar_t*) StringSet[String]);
 #endif
         }
     }
     
-    void UTF32_StringArray_Print(UTF32 **StringArray) {
-        uint64_t NumStrings = UTF32_StringArray_GetNumStrings(StringArray);
+    void UTF32_StringSet_Print(UTF32 **StringSet) {
+        uint64_t NumStrings = UTF32_StringSet_GetNumStrings(StringSet);
         printf("\nNumStrings: %llu\n", NumStrings);
         for (uint64_t String = 0ULL; String < NumStrings; String++) {
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-            printf("%ls\n", (wchar_t*) StringArray[String]);
+            printf("%ls\n", (wchar_t*) StringSet[String]);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            UTF16 *Encoded  = UTF16_Encode(StringArray[String]);
+            UTF16 *Encoded  = UTF16_Encode(StringSet[String]);
             printf("%ls\n", (wchar_t*) Encoded);
             free(Decoded);
 #endif
         }
     }
     
-    void UTF8_StringArray_Deinit(UTF8 **StringArray) {
-        if (StringArray != NULL) {
-            uint64_t NumStrings = UTF8_StringArray_GetNumStrings(StringArray);
+    void UTF8_StringSet_Deinit(UTF8 **StringSet) {
+        if (StringSet != NULL) {
+            uint64_t NumStrings = UTF8_StringSet_GetNumStrings(StringSet);
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                free(StringArray[String]);
+                free(StringSet[String]);
             }
-            free(StringArray);
+            free(StringSet);
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
     }
     
-    void UTF16_StringArray_Deinit(UTF16 **StringArray) {
-        if (StringArray != NULL) {
-            uint64_t NumStrings = UTF16_StringArray_GetNumStrings(StringArray);
+    void UTF16_StringSet_Deinit(UTF16 **StringSet) {
+        if (StringSet != NULL) {
+            uint64_t NumStrings = UTF16_StringSet_GetNumStrings(StringSet);
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                free(StringArray[String]);
+                free(StringSet[String]);
             }
-            free(StringArray);
+            free(StringSet);
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
     }
     
-    void UTF32_StringArray_Deinit(UTF32 **StringArray) {
-        if (StringArray != NULL) {
-            uint64_t NumStrings = UTF32_StringArray_GetNumStrings(StringArray);
+    void UTF32_StringSet_Deinit(UTF32 **StringSet) {
+        if (StringSet != NULL) {
+            uint64_t NumStrings = UTF32_StringSet_GetNumStrings(StringSet);
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                free(StringArray[String]);
+                free(StringSet[String]);
             }
-            free(StringArray);
+            free(StringSet);
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSet Pointer is NULL"));
         }
     }
-    /* StringArray Functions */
+    /* StringSet Functions */
     
 #if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 }
