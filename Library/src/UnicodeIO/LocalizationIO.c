@@ -34,13 +34,17 @@ extern "C" {
         TimeFormat_Second3 = 256,
     } LocalizationIO_TimeFormats;
     
-    static void lconv_Init(void) {
+    static void LocalizationIO_Init(void) {
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         setlocale(LC_ALL, NULL);
         setlocale(LC_COLLATE, NULL);
         setlocale(LC_CTYPE, NULL);
         setlocale(LC_MONETARY, NULL);
         setlocale(LC_NUMERIC, NULL);
         setlocale(LC_TIME, NULL);
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+        __do_unsigned_char_lconv_initialization();
+#endif
     }
     
     LocalizationIO_WrittenLanguages Localize_GetWrittenLanguageID(void) {
@@ -92,7 +96,7 @@ extern "C" {
     FoundationIO_StringTypes Localize_GetEncodingID(void) {
         FoundationIO_StringTypes Encoding = StringType_Unknown;
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-        lconv_Init();
+        LocalizationIO_Init();
         UTF8 *LocaleString               = getenv(UTF8String("LANG"));
         if (LocaleString != NULL) {
             uint64_t StringSize          = UTF8_GetStringSizeInCodeUnits(LocaleString);
@@ -120,7 +124,7 @@ extern "C" {
             }
         }
 #elif (FoundationIOTargetOS == FoundtionIOWindowsOS)
-        lconv_Init();
+        LocalizationIO_Init();
         UTF16 *LocaleString             = getenv(UTF16String("LANG"));
         if (LocaleString != NULL) {
             uint64_t StringSize         = UTF16_GetStringSizeInCodeUnits(LocaleString);
@@ -153,7 +157,7 @@ extern "C" {
     
     UTF8 *Localize_UTF8_GetDecimalSeperator(void) {
         UTF8 *DecimalSeperator         = NULL;
-        lconv_Init();
+        LocalizationIO_Init();
         struct lconv *Locale           = localeconv();
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         DecimalSeperator               = UTF8_Clone(Locale->decimal_point);
@@ -171,14 +175,12 @@ extern "C" {
     
     UTF16 *Localize_UTF16_GetDecimalSeperator(void) {
         UTF16 *DecimalSeperator        = NULL;
-        lconv_Init();
+        LocalizationIO_Init();
         struct lconv *Locale           = localeconv();
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         UTF8  *DecimalSeperator8       = UTF8_Clone(Locale->decimal_point);
         if (DecimalSeperator8 != NULL) {
-            UTF32 *DecimalSeperator32  = UTF8_Decode(DecimalSeperator8);
-            DecimalSeperator           = UTF16_Encode(DecimalSeperator32);
-            free(DecimalSeperator32);
+            DecimalSeperator           = UTF8_Convert(DecimalSeperator8);
         }
         free(DecimalSeperator8);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
@@ -189,7 +191,7 @@ extern "C" {
     
     UTF8 *Localize_UTF8_GetGroupingSeperator(void) {
         UTF8 *GroupingSeperator         = NULL;
-        lconv_Init();
+        LocalizationIO_Init();
         struct lconv *Locale            = localeconv();
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         GroupingSeperator               = UTF8_Clone(Locale->thousands_sep);
@@ -207,14 +209,12 @@ extern "C" {
     
     UTF16 *Localize_UTF16_GetGroupingSeperator(void) {
         UTF16 *GroupingSeperator        = NULL;
-        lconv_Init();
+        LocalizationIO_Init();
         struct lconv *Locale            = localeconv();
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         UTF8  *GroupingSeperator8       = UTF8_Clone(Locale->thousands_sep);
         if (GroupingSeperator8 != NULL) {
-            UTF32 *GroupingSeperator32  = UTF8_Decode(GroupingSeperator8);
-            GroupingSeperator           = UTF16_Encode(GroupingSeperator32);
-            free(GroupingSeperator32);
+            GroupingSeperator           = UTF8_Convert(GroupingSeperator8);
         }
         free(GroupingSeperator8);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
@@ -225,7 +225,7 @@ extern "C" {
     
     UTF8 **Localize_UTF8_GetGroupingSize(void) {
         UTF8    **GroupingSize          = NULL;
-        lconv_Init();
+        LocalizationIO_Init();
         struct lconv *Locale            = localeconv();
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         UTF8 *GroupingSizeString        = Locale->grouping;
@@ -246,7 +246,7 @@ extern "C" {
     
     UTF16 **Localize_UTF16_GetGroupingSize(void) {
         UTF16 **GroupingSize            = NULL;
-        lconv_Init();
+        LocalizationIO_Init();
         struct lconv *Locale            = localeconv();
         UTF8 *GroupingSizeString        = Locale->grouping;
         UTF8 *Delimiters[]              = {UTF8String("/"), UTF8String("\\")};
@@ -261,34 +261,22 @@ extern "C" {
     
     UTF8 *Localize_UTF8_GetCurrencySymbol(void) {
         UTF8 *CurrencySymbol            = NULL;
-        lconv_Init();
+        LocalizationIO_Init();
         struct lconv *Locale            = localeconv();
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         CurrencySymbol                  = UTF8_Clone(Locale->currency_symbol);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        UTF8  *CurrencySymbol8          = UTF8_Clone(Locale->currency_symbol);
-        if (CurrencySymbol8 != NULL) {
-            UTF32 *CurrencySymbol32     = UTF8_Decode(CurrencySymbol8);
-            CurrencySymbol              = UTF16_Encode(CurrencySymbol32);
-            free(CurrencySymbol32);
-        }
-        free(CurrencySymbol8);
+        CurrencySymbol                  = UTF8_Convert(Locale->_W_currency_symbol);
 #endif
         return CurrencySymbol;
     }
     
     UTF16 *Localize_UTF16_GetCurrencySymbol(void) {
         UTF16 *CurrencySymbol           = NULL;
-        lconv_Init();
+        LocalizationIO_Init();
         struct lconv *Locale            = localeconv();
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-        UTF8  *CurrencySymbol8          = UTF8_Clone(Locale->currency_symbol);
-        if (CurrencySymbol8 != NULL) {
-            UTF32 *CurrencySymbol32     = UTF8_Decode(CurrencySymbol8);
-            CurrencySymbol              = UTF16_Encode(CurrencySymbol32);
-            free(CurrencySymbol32);
-        }
-        free(CurrencySymbol8);
+        CurrencySymbol                  = UTF8_Convert(Locale->currency_symbol);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         CurrencySymbol                  = UTF8_Clone(Locale->currency_symbol);
 #endif
