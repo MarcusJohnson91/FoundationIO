@@ -6,7 +6,7 @@
  @brief               This header contains types, functions, and tables for automated testing.
  */
 
-#include "Macros.h"                   /* Included for Platform Independence macros */
+#include "PlatformIO.h"                   /* Included for Platform Independence macros */
 #include "CryptographyIO.h"           /* Included for Entropy */
 #include "UnicodeIO/UnicodeTypes.h"
 

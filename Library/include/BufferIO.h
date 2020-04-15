@@ -6,7 +6,7 @@
  @brief               This header contains code for reading and writing files and sockets, and utilities to manage them.
  */
 
-#include "Macros.h"
+#include "PlatformIO.h"
 #include "UnicodeIO/UnicodeTypes.h"
 
 #pragma once

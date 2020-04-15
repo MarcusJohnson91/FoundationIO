@@ -6,7 +6,7 @@
  @brief               This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
  */
 
-#include "../Macros.h"
+#include "../PlatformIO.h"
 #include "../Constants.h"
 #include "UnicodeTypes.h"
 
