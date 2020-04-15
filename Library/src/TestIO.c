@@ -91,7 +91,11 @@ extern "C" {
         clock_getres(CLOCK_MONOTONIC, &Resolution);
         TimerFrequency = Resolution.tv_nsec;
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        QueryPerformanceFrequency(TimerFrequency);
+        LARGE_INTEGER WinFrequency;
+        bool Success = QueryPerformanceFrequency(&WinFrequency);
+        if (Success) {
+            TimerFrequency = WinFrequency.QuadPart;
+        }
 #endif
         return TimerFrequency;
     }
@@ -106,7 +110,11 @@ extern "C" {
             struct timespec *TimeSpec = NULL;
             clock_gettime(CLOCK_MONOTONIC, TimeSpec);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-            QueryPerformanceFrequency(CurrentTime);
+            LARGE_INTEGER WinCounter;
+            bool Success    = QueryPerformanceCounter(CurrentTime);
+            if (Success) {
+                CurrentTime = WinCounter.QuadPart;
+            }
 #endif
             Time            += CurrentTime;
             Time            /= Loop;
