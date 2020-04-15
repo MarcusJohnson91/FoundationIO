@@ -2,7 +2,7 @@
 #include "../Library/include/TestIO.h"
 #include "../Library/include/UnicodeIO/LogIO.h"
 
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 extern "C" {
 #endif
     
@@ -40,6 +40,6 @@ extern "C" {
         return EXIT_SUCCESS;
     }
     
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 }
 #endif

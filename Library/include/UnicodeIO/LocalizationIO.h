@@ -24,47 +24,77 @@ extern "C" {
      */
     
     /*!
-     @enum                      LocalizationIO_LanguageIDs
-     @abstract                                                  "What language is in use, for colation, sorting, etc".
-     @constant                  LanguageID_Unknown              "Unknown file type".
-     @constant                  LanguageID_Default              "Equilivent to C locale".
-     @constant                  LanguageID_English              "The language is English".
-     @constant                  LanguageID_Swedish              "The language is Swedish".
-     @constant                  LanguageID_Norwegian            "The language is Norwegian".
-     @constant                  LanguageID_Icelandic            "The language is Icelandic".
-     @constant                  LanguageID_German               "The language is German".
-     @constant                  LanguageID_Welsh                "The language is Welsh".
-     @constant                  LanguageID_French               "The language is French".
-     @constant                  LanguageID_Lithuanian           "The language is Lithuanian".
-     @constant                  LanguageID_Russian              "The language is Russian".
-     @constant                  LanguageID_Polish               "The language is Polish".
-     @constant                  LanguageID_Danish               "The language is Danish".
-     @constant                  LanguageID_Scottish             "The language is Scottish".
-     @constant                  LanguageID_Irish                "The language is Irish".
-     @constant                  LanguageID_Afrikaans            "The language is Afrikaans".
-     @constant                  LanguageID_Faroese              "The language is Faroese".
-     @constant                  LanguageID_Croatian             "The language is Croatian".
+     @enum       LocalizationIO_WrittenLanguages
+     @abstract   What language is in use, for colation, sorting, etc.
      */
-    typedef enum LocalizationIO_LanguageIDs {
-                                LanguageID_Unknown          = 0,
-                                LanguageID_Default          = 1,
-                                LanguageID_English          = 2,
-                                LanguageID_Swedish          = 3,
-                                LanguageID_Norwegian        = 4,
-                                LanguageID_Icelandic        = 5,
-                                LanguageID_German           = 4,
-                                LanguageID_Welsh            = 5,
-                                LanguageID_French           = 6,
-                                LanguageID_Lithuanian       = 7,
-                                LanguageID_Russian          = 8,
-                                LanguageID_Polish           = 9,
-                                LanguageID_Danish           = 10,
-                                LanguageID_Scottish         = 11,
-                                LanguageID_Irish            = 12,
-                                LanguageID_Afrikaans        = 13,
-                                LanguageID_Faroese          = 14,
-                                LanguageID_Croatian         = 15,
-    } LocalizationIO_LanguageIDs;
+    typedef enum LocalizationIO_WrittenLanguages {
+                 WrittenLanguage_Unspecified  = 0,
+                 WrittenLanguage_English      = 1,
+                 WrittenLanguage_Swedish      = 2,
+                 WrittenLanguage_German       = 3,
+                 WrittenLanguage_Norwegian    = 4,
+                 WrittenLanguage_Icelandic    = 5,
+                 WrittenLanguage_Welsh        = 6,
+                 WrittenLanguage_French       = 7,
+                 WrittenLanguage_Lithuanian   = 8,
+                 WrittenLanguage_Russian      = 9,
+                 WrittenLanguage_Polish       = 10,
+                 WrittenLanguage_Danish       = 11,
+                 WrittenLanguage_Scottish     = 12,
+                 WrittenLanguage_Irish        = 13,
+                 WrittenLanguage_Afrikaans    = 14,
+                 WrittenLanguage_Faroese      = 15,
+                 WrittenLanguage_Croatian     = 16,
+                 WrittenLanguage_Estonian     = 17,
+                 WrittenLanguage_Finnish      = 18,
+                 WrittenLanguage_Hungarian    = 19,
+                 WrittenLanguage_Sami         = 20,
+                 WrittenLanguage_Komi         = 21,
+                 WrittenLanguage_Bulgarian    = 22,
+                 WrittenLanguage_Cornish      = 23,
+                 WrittenLanguage_Dutch        = 24,
+                 WrittenLanguage_Flemish      = 25,
+                 WrittenLanguage_Lithuianian  = 26,
+                 WrittenLanguage_Latvian      = 27,
+                 WrittenLanguage_Macedonian   = 28,
+    } LocalizationIO_WrittenLanguages;
+    
+    /*!
+     @enum       LocalizationIO_SpokenLanguages
+     @abstract   What language is in use, for colation, sorting, etc.
+     @constant   SpokenLanguage_Unspecified    Unspecified, falls back to locale.
+     */
+    typedef enum LocalizationIO_SpokenLanguages {
+                 SpokenLanguage_Unspecified = 0,
+                 SpokenLanguage_English     = 1,
+                 SpokenLanguage_Swedish     = 2,
+                 SpokenLanguage_German      = 3,
+                 SpokenLanguage_Norwegian   = 4,
+                 SpokenLanguage_Icelandic   = 5,
+                 SpokenLanguage_Russian     = 6,
+                 SpokenLanguage_Polish      = 7,
+                 SpokenLanguage_Danish      = 8,
+                 SpokenLanguage_Lithuanian  = 9,
+                 SpokenLanguage_Komi        = 10,
+                 SpokenLanguage_Bulgarian   = 11,
+                 SpokenLanguage_Cornish     = 12,
+                 SpokenLanguage_Faroese     = 13,
+                 SpokenLanguage_Estonian    = 14,
+                 SpokenLanguage_Finnish     = 15,
+                 SpokenLanguage_Sami        = 16,
+                 SpokenLanguage_Dutch       = 17,
+                 SpokenLanguage_Lithuianian = 18,
+                 SpokenLanguage_Latvian     = 19,
+                 SpokenLanguage_Macedonian  = 20,
+                 SpokenLanguage_Scottish    = 21,
+                 SpokenLanguage_Irish       = 22,
+                 SpokenLanguage_Welsh       = 23,
+                 SpokenLanguage_French      = 24,
+                 SpokenLanguage_Afrikaans   = 25,
+                 SpokenLanguage_Croatian    = 26,
+                 SpokenLanguage_Hungarian   = 27,
+                 SpokenLanguage_Flemish     = 28,
+    } LocalizationIO_SpokenLanguages;
     
     /*!
      @enum                      LocalizationIO_RegionIDs
@@ -133,7 +163,7 @@ extern "C" {
      @abstract                                              "Creates a string containing the language code (en for englisn, etc)".
      @return                                                "Returns the LanguageID".
      */
-     LocalizationIO_LanguageIDs Localize_GetLanguageID(void);
+     LocalizationIO_WrittenLanguages Localize_GetWrittenLanguageID(void);
     
     /*!
      @abstract                                              "Creates a string containing the region code (us for America, etc)".
@@ -145,7 +175,7 @@ extern "C" {
      @abstract                                              "Gets the encoding".
      @return                                                "Returns the EncodingID".
      */
-    LocalizationIO_EncodingIDs  Localize_GetEncodingID(void);
+    FoundationIO_StringTypes  Localize_GetEncodingID(void);
     
     /*!
      @abstract                                              "Creates a string containing the symbol to seperate the main value from the decimal (XXX.YYY)".
@@ -201,7 +231,7 @@ extern "C" {
      @param                     String                      "The string to Delocalize".
      @return                                                "Returns the delocalized string".
      */
-    UTF8                       *UTF8_DelocalizeInteger(FoundationIOBases Base, UTF8 *String);
+    UTF8                       *UTF8_DelocalizeInteger(FoundationIO_Bases Base, UTF8 *String);
     
     /*!
      @abstract                                              "Creates a string containing just the base 10 digits from String".
@@ -209,7 +239,7 @@ extern "C" {
      @param                     String                      "The string to Delocalize".
      @return                                                "Returns the delocalized string".
      */
-    UTF16                      *UTF16_DelocalizeInteger(FoundationIOBases Base, UTF16 *String);
+    UTF16                      *UTF16_DelocalizeInteger(FoundationIO_Bases Base, UTF16 *String);
     
     /*!
      @abstract                                              "Creates a string containing just the base 10 digits from String".
@@ -217,7 +247,7 @@ extern "C" {
      @param                     String                      "The string to Delocalize".
      @return                                                "Returns the delocalized string".
      */
-    UTF32                      *UTF32_DelocalizeInteger(FoundationIOBases Base, UTF32 *String);
+    UTF32                      *UTF32_DelocalizeInteger(FoundationIO_Bases Base, UTF32 *String);
     
     /*!
      @abstract                                              "Creates a string containing just the base 10 digits from String".

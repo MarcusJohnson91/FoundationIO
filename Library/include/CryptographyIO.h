@@ -71,10 +71,12 @@ extern "C" {
     double            Entropy_GenerateDecimal(Entropy *Random);
     
     /*!
-     @abstract                             "Erases the entropy pool for sexurity reasons".
-     @param           Random               "The Entropy pointer".
+     @abstract                              Erases the entropy pool for sexurity reasons.
+     @param           Random                The Entropy pointer.
+     @param           NewValue              The value to set each codeunit to while erasing.
+     @return                                Returns the value of the first element of String, or 0xFE if it was unsucessful
      */
-    void              Entropy_Erase(Entropy *Random);
+    uint8_t           Entropy_Erase(Entropy *Random, uint8_t NewValue);
     
     /*!
      @abstract                             "The number of bits of entropy available".

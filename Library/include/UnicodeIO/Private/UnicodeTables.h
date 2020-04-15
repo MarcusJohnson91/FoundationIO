@@ -6,7 +6,7 @@
 #ifndef FoundationIO_UnicodeTables_H
 #define FoundationIO_UnicodeTables_H
 
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 extern "C" {
 #endif
 
@@ -49774,8 +49774,8 @@ extern "C" {
         U"\U0002A600",
     };
 
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 }
-#endif /* C++ */
+#endif
 
 #endif /* FoundationIO_UnicodeTables_H */

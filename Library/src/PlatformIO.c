@@ -7,7 +7,7 @@
 #include <sysinfoapi.h>
 #endif
 
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 extern "C" {
 #endif
     
@@ -44,6 +44,6 @@ extern "C" {
         return TotalMemory;
     }
     
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 }
 #endif

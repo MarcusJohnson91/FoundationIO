@@ -3,7 +3,7 @@
 #include "../Library/include/TestIO.h"
 #include "../Library/include/UnicodeIO/LogIO.h"
 
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 extern "C" {
 #endif
     
@@ -21,7 +21,7 @@ extern "C" {
             BitBuffer_WriteBits(BitB, ByteOrder, BitOrder, NumBits2Extract, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Extract));
             int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder, BitOrder, NumBits2Extract);
-            BitBuffer_Erase(BitB); // Clear the BitBuffer in between each run just to be sure.
+            BitBuffer_Erase(BitB, 0); // Clear the BitBuffer in between each run just to be sure.
         }
         
         return TestPassed;
@@ -46,9 +46,9 @@ extern "C" {
          for (uint16_t Loop = 0; Loop < Times2Loop; Loop++) {
          uint64_t Value      = Entropy_GenerateIntegerInRange(Random, 1, 0x7FFFFFFFFFFFFFFF);
          uint8_t  NumBits    = Logarithm(2, Value);
-         BitBuffer_WriteBits(BitB, MSByteFirst, MSBitFirst, NumBits, Value);
+         BitBuffer_WriteBits(BitB, BitIO_ByteOrder_MSByte, BitIO_BitOrder_MSBit, NumBits, Value);
          BitBuffer_Seek(BitB, -NumBits);
-         uint64_t Decoded    = BitBuffer_ReadBits(BitB, MSByteFirst, MSBitFirst, NumBits);
+         uint64_t Decoded    = BitBuffer_ReadBits(BitB, BitIO_ByteOrder_MSByte, BitIO_BitOrder_MSBit, NumBits);
          if (Decoded != Value) {
          fprintf(stderr, "TEST FAILED: Decoded %llu does not match Value %llu, Offset = %llu, NumBits = %llu\n", Decoded, Value, BitBuffer_GetPosition(BitB), BitBuffer_GetSize(BitB));
          } else {
@@ -60,6 +60,6 @@ extern "C" {
         return Test_WriteReadBits();
     }
     
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 }
 #endif

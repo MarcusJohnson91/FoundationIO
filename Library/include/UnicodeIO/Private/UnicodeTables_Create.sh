@@ -7,6 +7,9 @@ CreateHeaderFileTop() {
     {
         printf "#include \"../../Macros.h\"\n"
         printf "#include \"../UnicodeTypes.h\"\n\n"
+        printf "#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)\n"
+        printf "extern \"C\" {\n"
+        printf "#endif\n\n"
     } >> "$HeaderFile"
     ScriptSHA=$(shasum $0 | awk '{print $1}')
 	printf "#define ScriptHash %s\n\n" "$ScriptSHA" >> "$HeaderFile"
@@ -269,9 +272,9 @@ CreateCaseFoldTables() {
 
 CreateHeaderFileBottom() {
     {
-        printf "#ifdef __cplusplus\n"
+        printf "#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)\n"
         printf "}\n"
-        printf "#endif /* C++ */\n\n"
+        printf "#endif /* C */\n\n"
         printf "#endif /* FoundationIO_UnicodeTables_H */\n"
     } >> "$HeaderFile"
 }

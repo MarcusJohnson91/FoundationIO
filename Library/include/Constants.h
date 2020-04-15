@@ -37,10 +37,24 @@ extern "C" {
 #define MathSeperatorTableSize       4
     
     /*!
-     @enum       FoundationIOBases
+     @enum       FoundationIO_StringTypes
+     @constant   StringType_Unknown                    Invalid/Default value
+     @constant   StringType_UTF8                       UTF-8
+     @constant   StringType_UTF16                      UTF-16
+     @constant   StringType_UTF32                      UTF-32
+     */
+    typedef enum FoundationIO_StringTypes {
+                 StringType_Unknown                    = 0,
+                 StringType_UTF8                       = 1,
+                 StringType_UTF16                      = 2,
+                 StringType_UTF32                      = 4,
+    } FoundationIO_StringTypes;
+    
+    /*!
+     @enum       FoundationIO_Bases
      @abstract                       "Defines the type of option".
      */
-    typedef enum FoundationIOBases {
+    typedef enum FoundationIO_Bases {
                  Base_Unknown        = 0,
                  Base_Integer        = 1,   // Integer
                  Base_Radix2         = 2,   // Integer Only
@@ -52,7 +66,7 @@ extern "C" {
                  Base_Lowercase      = 128, // Only compatible with Base_Radix16
                  Base_Scientific     = 256, // Decimal Only
                  Base_Shortest       = 512, // Decimal Only
-    } FoundationIOBases;
+    } FoundationIO_Bases;
 
 	static const uint8_t BitMaskTable[BitMaskTableSize] = {
 		0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF

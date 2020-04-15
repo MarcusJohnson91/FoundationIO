@@ -19,14 +19,14 @@ extern "C" {
 #endif
     
     /*!
-     @enum                      LogTypes
+     @enum                      LogIO_Severities
      @constant                  Log_DEBUG                       "A internal error happened because there's a bug".
      @constant                  Log_USER                        "An error occured because the user misused something".
      */
-    typedef enum LogTypes {
-                                Log_DEBUG                       = 1,
-                                Log_USER                        = 2,
-    } LogTypes;
+    typedef enum LogIO_Severities {
+                                Severity_DEBUG                  = 1,
+                                Severity_USER                   = 2,
+    } LogIO_Severities;
     
     /*!
      @abstract                                                  "Sets the name or path of the program to give the logs more context".
@@ -48,20 +48,20 @@ extern "C" {
     
     /*!
      @abstract                                                  "Logs to the LogFile, which can be a user specified path, otherwise it's STDERR".
-     @param                     Severity                        "Any of the types provided by LogTypes".
+     @param                     Severity                        "Any of the types provided by LogIO_Severities".
      @param                     FunctionName                    "Which function is calling Log?".
      @param                     Description                     "String describing what went wrong".
      */
 #if   (FoundationIOCompiler == FoundationIOCompilerIsClang)
-    void                        Log(LogTypes Severity, const UTF8 *FunctionName, UTF8 *Description, ...) __attribute__((__format__(__printf__, 3, 4)));
+    void                        Log(LogIO_Severities Severity, const UTF8 *FunctionName, UTF8 *Description, ...) __attribute__((__format__(__printf__, 3, 4)));
 #elif (FoundationIOCompiler == FoundationIOCompilerIsGCC)
-    void                        Log(LogTypes Severity, const UTF8 *FunctionName, UTF8 *Description, ...);
+    void                        Log(LogIO_Severities Severity, const UTF8 *FunctionName, UTF8 *Description, ...);
 #elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 #include <sal.h>
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    void                        Log(LogTypes Severity, const UTF8 *FunctionName, __format_string UTF8 *Description, ...);
+    void                        Log(LogIO_Severities Severity, const UTF8 *FunctionName, __format_string UTF8 *Description, ...);
 #elif    (_MSC_VER >= 1500)
-    void                        Log(LogTypes Severity, const UTF8 *FunctionName, _Printf_format_string_ UTF8 *Description, ...);
+    void                        Log(LogIO_Severities Severity, const UTF8 *FunctionName, _Printf_format_string_ UTF8 *Description, ...);
 #endif /* MSVC Version */
 #endif /* Compiler */
     

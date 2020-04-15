@@ -1,8 +1,8 @@
-#include "../../include/UnicodeIO/FormatIO.h"    /* Included for the Formatter */
 #include "../../include/UnicodeIO/LogIO.h"       /* Included for the Log declarations */
+#include "../../include/UnicodeIO/FormatIO.h"    /* Included for the Formatter */
 #include "../../include/UnicodeIO/StringIO.h"    /* Included for StringIO's declarations */
 
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 extern "C" {
 #endif
     
@@ -108,24 +108,24 @@ extern "C" {
         }
     }
     
-    void Log(LogTypes Severity, const UTF8 *FunctionName, UTF8 *Description, ...) {
+    void Log(LogIO_Severities Severity, const UTF8 *FunctionName, UTF8 *Description, ...) {
         if (Log_Path != NULL && Log_LogFile == NULL) {
             Log_UTF8_OpenFile(Log_Path);
         }
         
-        UTF32 *Error   = UTF32String("ERROR");
-        UTF32 *Mistake = UTF32String("Mistake");
+        UTF32 *Error    = UTF32String("ERROR");
+        UTF32 *Mistake  = UTF32String("Mistake");
         
         UTF32 *SecurityName   = NULL;
         if (Log_ProgramName != NULL) {
-            SecurityName      = UTF32_Format(UTF32String("%Us's %Us in %s: "), Log_ProgramName, Severity == Log_DEBUG ? Error : Mistake, FunctionName);
+            SecurityName      = UTF32_Format(UTF32String("%Us's %Us in %s: "), Log_ProgramName, Severity == Severity_DEBUG ? Error : Mistake, FunctionName);
         } else {
-            SecurityName      = UTF32_Format(UTF32String("%Us in %s: "), Severity == Log_DEBUG ? Error : Mistake, FunctionName);
+            SecurityName      = UTF32_Format(UTF32String("%Us in %s: "), Severity == Severity_DEBUG ? Error : Mistake, FunctionName);
             // "ERROR in %s: "
             // "ERRORn %s: "; Ate " i" aka 2 codepoints too far?
         }
         
-        UTF32 *Description32  = UTF8_Decode(Description);
+        UTF32 *Description32  = UTF8_Decode(UTF8_MakeStringMutable(Description));
         UTF32 *Description2   = UTF32_Insert(Description32, SecurityName, 0);
         free(SecurityName);
         free(Description32);
@@ -141,7 +141,7 @@ extern "C" {
         UTF32 *FormattedString32 = FormatString_UTF32(Specifiers, Description2);
         UTF8  *FormattedString8  = UTF8_Encode(FormattedString32);
         
-        UTF8_WriteLine(Severity == Log_USER ? stdout : stderr, FormattedString8);
+        UTF8_WriteLine(Severity == Severity_USER ? stdout : stderr, FormattedString8);
         fflush(stdout);
         
         if (Log_LogFile != NULL) {
@@ -162,6 +162,6 @@ extern "C" {
         }
     }
     
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 }
 #endif

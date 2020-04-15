@@ -1,6 +1,6 @@
 #include "../include/MathIO.h"           /* Included for our declarations */
 
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 extern "C" {
 #endif
     
@@ -182,21 +182,21 @@ extern "C" {
         return Result * Sign;
     }
     
-    int64_t  Minimum(int64_t Integer1, int64_t Integer2) {
+    int64_t Minimum(int64_t Integer1, int64_t Integer2) {
         int64_t Min1    = Integer1 ^ Integer2;
         int64_t Min2    = -(Integer1 < Integer2);
         int64_t Min3    = Integer2 ^ (Min1 & Min2);
         return  Min3;
     }
     
-    int64_t  Maximum(int64_t Integer1, int64_t Integer2) {
+    int64_t Maximum(int64_t Integer1, int64_t Integer2) {
         int64_t Max1    = Integer1 ^ Integer2;
         int64_t Max2    = -(Integer1 < Integer2);
         int64_t Max3    = Integer1 ^ (Max1 & Max2);
         return Max3;
     }
     
-    bool     DecimalIsNormalF(float Decimal) {
+    bool DecimalIsNormalF(float Decimal) {
         bool   IsNormal = No;
         int8_t Exponent = ExtractExponentF(Decimal);
         if (Exponent >= 1 && Exponent <= 0x7E) {
@@ -205,7 +205,7 @@ extern "C" {
         return IsNormal;
     }
     
-    bool     DecimalIsNormalD(double Decimal) {
+    bool DecimalIsNormalD(double Decimal) {
         bool IsNormal = No;
         int16_t Exponent = ExtractExponentD(Decimal);
         if (Exponent >= 1 && Exponent <= 0x7FE) {
@@ -214,7 +214,7 @@ extern "C" {
         return IsNormal;
     }
     
-    bool     DecimalIsInfinityF(float Decimal) {
+    bool DecimalIsInfinityF(float Decimal) {
         bool    IsInfinity = No;
         uint8_t Exponent   = (((uint32_t)Decimal) & 0x7F800000) >> 23;
         int32_t Mantissa   = ExtractMantissaF(Decimal);
@@ -224,7 +224,7 @@ extern "C" {
         return IsInfinity;
     }
     
-    bool     DecimalIsInfinityD(double Decimal) {
+    bool DecimalIsInfinityD(double Decimal) {
         bool    IsInfinity = No;
         int16_t Exponent   = (((uint64_t)Decimal) & 0x7FF0000000000000) >> 52;
         int64_t Mantissa   = ExtractMantissaD(Decimal);
@@ -234,7 +234,7 @@ extern "C" {
         return IsInfinity;
     }
     
-    bool     DecimalIsNotANumberF(float Decimal) {
+    bool DecimalIsNotANumberF(float Decimal) {
         bool   IsNotANumber = No;
         int8_t  Sign       = ExtractSignF(Decimal);
         uint8_t Exponent   = (((uint32_t)Decimal) & 0x7F800000) >> 23;
@@ -245,7 +245,7 @@ extern "C" {
         return IsNotANumber;
     }
     
-    bool     DecimalIsNotANumberD(double Decimal) {
+    bool DecimalIsNotANumberD(double Decimal) {
         bool   IsNotANumber = No;
         int8_t  Sign       = ExtractSignD(Decimal);
         int16_t Exponent   = (((uint64_t)Decimal) & 0x7FF0000000000000) >> 52;
@@ -256,7 +256,7 @@ extern "C" {
         return IsNotANumber;
     }
     
-    bool     NumberHasDecimalPointF(float Decimal) {
+    bool NumberHasDecimalPointF(float Decimal) {
         bool HasDecimalPoint = No;
         int32_t Mantissa     = ExtractMantissaF(Decimal);
         if ((Mantissa & 0x1FFF) > 0) {
@@ -265,7 +265,7 @@ extern "C" {
         return HasDecimalPoint;
     }
     
-    bool     NumberHasDecimalPointD(double Decimal) {
+    bool NumberHasDecimalPointD(double Decimal) {
         bool HasDecimalPoint = No;
         int64_t Mantissa     = ExtractMantissaD(Decimal);
         if ((Mantissa & 0x7FFFFFFFFFF) > 0) {
@@ -368,7 +368,7 @@ extern "C" {
         return Value;
     }
     
-    int64_t  Logarithm(int64_t Base, int64_t Exponent) {
+    int64_t Logarithm(int64_t Base, int64_t Exponent) {
         uint64_t Result    = 0ULL;
         int64_t  Exponent2 = Exponent;
         if (Exponent2 != 0) {
@@ -415,7 +415,7 @@ extern "C" {
         return Bytes;
     }
     
-    uint8_t  SwapBits(uint8_t Byte) {
+    uint8_t SwapBits(uint8_t Byte) {
         return (
                 (Byte & 0x80 >> 7) |
                 (Byte & 0x40 >> 5) |
@@ -469,6 +469,6 @@ extern "C" {
         return (Value << Bits2Rotate) | (Value >> (64 - Bits2Rotate));
     }
     
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 }
 #endif

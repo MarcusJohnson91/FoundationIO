@@ -19,8 +19,8 @@ extern "C" {
 #endif
     
     /*!
-     @enum                  AudioChannelMask
-     @abstract                                              "Defines the Audio_Types values, OR-able".
+     @enum                  ContainerIO_AudioChannelMask
+     @abstract                                              "Defines the ContainerIO_AudioTypes values, OR-able".
      @constant              AudioMask_Unknown               "Invalid AudioMask, exists solely to tell when it hasn't been set".
      @constant              AudioMask_FrontLeft             "The channel's location is the front left".
      @constant              AudioMask_FrontRight            "The channel's location is the front right".
@@ -44,7 +44,7 @@ extern "C" {
      @constant              AudioMask_StereoLeft            "RF64 Extension, Stereo Downmix, Left".
      @constant              AudioMask_StereoRight           "RF64 Extension, Stereo Downmix, Right".
      */
-    typedef enum AudioChannelMask {
+    typedef enum ContainerIO_AudioChannelMask {
                             AudioMask_Unknown               = 0,
                             AudioMask_FrontLeft             = 1,
                             AudioMask_FrontRight            = 2,
@@ -67,11 +67,11 @@ extern "C" {
                             AudioMask_TopRearCenter         = 262144,
                             AudioMask_StereoLeft            = 524288,
                             AudioMask_StereoRight           = 1048576,
-    } AudioChannelMask;
+    } ContainerIO_AudioChannelMask;
     
     /*!
-     @enum                  Audio_Types
-     @abstract                                              "Defines the Audio_Types values, OR-able".
+     @enum                  ContainerIO_AudioTypes
+     @abstract                                              "Defines the ContainerIO_AudioTypes values, OR-able".
      @constant              AudioType_Unknown               "Invalid AudioType, exists solely to tell when it hasn't been set".
      @constant              AudioType_Unsigned              "The samples are unsigned".
      @constant              AudioType_Signed                "The samples are signed".
@@ -79,17 +79,17 @@ extern "C" {
      @constant              AudioType_Integer16             "The samples values are between 0 and 65535      for Unsigned, -32768      and 32767      for Signed".
      @constant              AudioType_Integer32             "The samples values are between 0 and 4294967295 for Unsigned, -2147483648 and 2147483647 for Signed".
      */
-    typedef enum Audio_Types {
+    typedef enum ContainerIO_AudioTypes {
                             AudioType_Unknown               = 0,
                             AudioType_Unsigned              = 1,
                             AudioType_Signed                = 2,
                             AudioType_Integer8              = 4,
                             AudioType_Integer16             = 8,
                             AudioType_Integer32             = 16,
-    } Audio_Types;
+    } ContainerIO_AudioTypes;
     
     /*!
-     @enum                  ImageChannelMask
+     @enum                  ContainerIO_ImageChannelMask
      @abstract                                              "Defines the ChannelMask values".
      @constant              ImageMask_Unknown               "Invalid ImageMask, exists solely to tell when it hasn't been set".
      @constant              ImageMask_2D                    "The image has two dimensions".
@@ -105,7 +105,7 @@ extern "C" {
      @constant              ImageMask_Blue                  "The channel contains the Blue   color information".
      @constant              ImageMask_Green2                "The channel contains the Green2 color information, for Bayer filtered images".
      */
-    typedef enum ImageChannelMask {
+    typedef enum ContainerIO_ImageChannelMask {
                             ImageMask_Unknown               = 0,
                             ImageMask_2D                    = 1,
                             ImageMask_Luma                  = 2,
@@ -119,48 +119,48 @@ extern "C" {
                             ImageMask_Green                 = 512,
                             ImageMask_Blue                  = 1024,
                             ImageMask_Green2                = 2048,
-    } ImageChannelMask;
+    } ContainerIO_ImageChannelMask;
     
     /*!
-     @enum                  Image_Types
+     @enum                  ContainerIO_ImageTypes
      @abstract                                              "Defines the type of image".
      @constant              ImageType_Unknown               "Invalid ImageType, exists solely to tell when it hasn't been set".
      @constant              ImageType_Integer8              "The pixels are unsigned 8  bit integers".
      @constant              ImageType_Integer16             "The pixels are unsigned 16 bit integers".
      */
-    typedef enum Image_Types {
+    typedef enum ContainerIO_ImageTypes {
                             ImageType_Unknown               = 0,
                             ImageType_Integer8              = 1,
                             ImageType_Integer16             = 2,
-    } Image_Types;
+    } ContainerIO_ImageTypes;
     
     /*!
-     @enum                  FlipTypes
+     @enum                  ContainerIO_FlipTypes
      @abstract                                              "Defines the type of flipping".
      @constant              FlipType_Unknown                "Invalid ImageType, exists solely to tell when it hasn't been set".
      @constant              FlipType_Vertical               "Flip the imge vertically, up and down".
      @constant              FlipType_Horizontal             "Flip the image horizontally, side to side".
      @constant              FlipType_VerticalAndHorizontal  "Flip the image in both ways".
      */
-    typedef enum FlipTypes {
+    typedef enum ContainerIO_FlipTypes {
                             FlipType_Unknown                = 0,
                             FlipType_Vertical               = 1,
                             FlipType_Horizontal             = 2,
                             FlipType_VerticalAndHorizontal  = 3,
-    } FlipTypes;
+    } ContainerIO_FlipTypes;
     
     /*!
-     @enum                  SortTypes
+     @enum                  ContainerIO_SortTypes
      @abstract                                              "Defines the type of sorting".
      @constant              SortType_Unknown                "Invalid SortType, exists solely to tell when it hasn't been set".
      @constant              SortType_Ascending              "Index 0 contains the most common value".
      @constant              SortType_Descending             "Index 0 contains the least common value".
      */
-    typedef enum SortTypes {
+    typedef enum ContainerIO_SortTypes {
                             SortType_Unknown                = 0,
                             SortType_Ascending              = 1,
                             SortType_Descending             = 2,
-    } SortTypes;
+    } ContainerIO_SortTypes;
     
     typedef struct          Audio2DContainer     Audio2DContainer;
     
@@ -182,12 +182,12 @@ extern "C" {
     
     /*!
      @abstract                             "Creates an empty Audio2DContainer".
-     @param                 Type           "A type from Audio_Types".
+     @param                 Type           "A type from ContainerIO_AudioTypes".
      @param                 ChannelMap     "Array of ChannelMasks, one array entry for each channel".
      @param                 SampleRate     "The number of samples in one second of audio".
      @param                 NumSamples     "NumSamples is the number of channel independent samples, e.g. X samples is BitDepth * NumChannels * X".
      */
-    Audio2DContainer       *Audio2DContainer_Init(Audio_Types Type, AudioChannelMap *ChannelMap, uint64_t SampleRate, uint64_t NumSamples);
+    Audio2DContainer       *Audio2DContainer_Init(ContainerIO_AudioTypes Type, AudioChannelMap *ChannelMap, uint64_t SampleRate, uint64_t NumSamples);
     
     /*!
      @abstract                             "Returns the number of channel-agnostic samples in one second".
@@ -211,7 +211,7 @@ extern "C" {
      @abstract                             "Gets the type of the array contained by the Audio2DContainer".
      @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
      */
-    Audio_Types             Audio2DContainer_GetType(Audio2DContainer *Audio);
+    ContainerIO_AudioTypes             Audio2DContainer_GetType(Audio2DContainer *Audio);
     
     /*!
      @abstract                             "Gets a pointer to the array of samples".
@@ -242,10 +242,12 @@ extern "C" {
     int64_t                 Audio2DContainer_GetMin(Audio2DContainer *Audio, uint64_t Channel);
     
     /*!
-     @abstract                             "Securely erases an Audio2DContainer".
-     @param                 Audio          "A pointer to the instance of an Audio2DContainer in question".
+     @abstract                                   Securely erases an Audio2DContainer.
+     @param                 Audio                A pointer to the instance of an Audio2DContainer in question.
+     @param                 NewValue             The value to set each codeunit to while erasing.
+     @return                                     Returns the value of the first element of String, or 0xFE if it was unsucessful
      */
-    void                    Audio2DContainer_Erase(Audio2DContainer *Audio);
+    uint8_t                 Audio2DContainer_Erase(Audio2DContainer *Audio, uint8_t NewValue);
     
     /*!
      @abstract                             "Deletes an Audio2DContainer, and any samples stored within it".
@@ -286,13 +288,15 @@ extern "C" {
      @param                 Histogram      "A pointer to the Audio2DHistogram in question".
      @param                 Sort           "The kind of sorting to do".
      */
-    void                    Audio2DHistogram_Sort(Audio2DHistogram *Histogram, SortTypes Sort);
+    void                    Audio2DHistogram_Sort(Audio2DHistogram *Histogram, ContainerIO_SortTypes Sort);
     
     /*!
-     @abstract                             "Securely erases an Audio2DContainer".
-     @param                 Histogram      "A pointer to the instance of an Audio2DContainer in question".
+     @abstract                                   Securely erases an Audio2DContainer.
+     @param                 Histogram            A pointer to the instance of an Audio2DContainer in question.
+     @param                 NewValue             The value to set each codeunit to while erasing.
+     @return                                     Returns the value of the first element of String, or 0xFE if it was unsucessful
      */
-    void                    Audio2DHistogram_Erase(Audio2DHistogram *Histogram);
+    uint8_t                 Audio2DHistogram_Erase(Audio2DHistogram *Histogram, uint8_t NewValue);
     
     /*!
      @abstract                             "frees a Audio2DHistogram".
@@ -321,19 +325,19 @@ extern "C" {
     uint64_t                Audio2DContainer_GetNumChannels(Audio2DContainer *Audio);
     
     /*!
-     @abstract                             "Adds a AudioChannelMask at the specified Index to the ChannelMap".
+     @abstract                             "Adds a ContainerIO_AudioChannelMask at the specified Index to the ChannelMap".
      @param                 ChannelMap     "The number of channels".
      @param                 Index          "The index in the ChannelMap to add the mask".
      @param                 Mask           "The ChannelMask for the index".
      */
-    void                    AudioChannelMap_AddMask(AudioChannelMap *ChannelMap, uint64_t Index, AudioChannelMask Mask);
+    void                    AudioChannelMap_AddMask(AudioChannelMap *ChannelMap, uint64_t Index, ContainerIO_AudioChannelMask Mask);
     
     /*!
      @abstract                             "Returns the ChannelMask for Index".
      @param                 ChannelMap     "Audio2DContainer Pointer".
      @param                 Index          "The channel index to get the mask for".
      */
-    AudioChannelMask        AudioChannelMap_GetMask(AudioChannelMap *ChannelMap, uint64_t Index);
+    ContainerIO_AudioChannelMask        AudioChannelMap_GetMask(AudioChannelMap *ChannelMap, uint64_t Index);
     
    /*!
     @abstract                              "Finds the lowest index in the ChannelMap that is unused".
@@ -371,8 +375,10 @@ extern "C" {
     /*!
      @abstract                             "Securely erases an Audio3DContainer".
      @param                 Container      "A pointer to the instance of the Audio3DContainer in question".
+     @param                 NewValue       "The value to set each codeunit to while erasing".
+     @return                               "Returns the value of the first element of String, or 0xFE if it was unsucessful".
      */
-    void                    Audio3DContainer_Erase(Audio3DContainer *Container);
+    uint8_t                 Audio3DContainer_Erase(Audio3DContainer *Container, uint8_t NewValue);
     
     /*!
      @abstract                             "frees a Audio3DContainer".
@@ -401,8 +407,10 @@ extern "C" {
     /*!
      @abstract                             "Zeros an AudioVector".
      @param                 Vector         "The AudioVector to zero".
+     @param                 NewValue       "The value to set each codeunit to while erasing".
+     @return                               "Returns the value of the first element of String, or 0xFE if it was unsucessful".
      */
-    void                    AudioVector_Erase(AudioVector *Vector);
+    uint8_t                 AudioVector_Erase(AudioVector *Vector, uint8_t NewValue);
     
     /*!
      @abstract                             "Destroys an AudioVector".
@@ -442,13 +450,15 @@ extern "C" {
      @param                 Histogram      "A pointer to the AudioVectorHistogram in question".
      @param                 Sort           "The kind of sorting to do".
      */
-    void                    AudioVectorHistogram_Sort(AudioVectorHistogram *Histogram, SortTypes Sort);
+    void                    AudioVectorHistogram_Sort(AudioVectorHistogram *Histogram, ContainerIO_SortTypes Sort);
     
     /*!
-     @abstract                             "Zeros an AudioVectorHistogram".
-     @param                 Histogram      "The AudioVector to zero".
+     @abstract                                   Zeros an AudioVectorHistogram.
+     @param                 Histogram            The AudioVector to zero.
+     @param                 NewValue             The value to set each codeunit to while erasing.
+     @return                                     Returns the value of the first element of String, or 0xFE if it was unsucessful
      */
-    void                    AudioVectorHistogram_Erase(AudioVectorHistogram *Histogram);
+    uint8_t                 AudioVectorHistogram_Erase(AudioVectorHistogram *Histogram, uint8_t NewValue);
     
     /*!
      @abstract                             "Destroys an AudioVectorHistogram".
@@ -482,7 +492,7 @@ extern "C" {
      @param                 Mask           "The color you want to find the index of".
      @return                               "Returns the Index".
      */
-    uint8_t                 ImageChannelMap_GetChannelsIndex(ImageChannelMap *ChannelMap, ImageChannelMask Mask);
+    uint8_t                 ImageChannelMap_GetChannelsIndex(ImageChannelMap *ChannelMap, ContainerIO_ImageChannelMask Mask);
     
     /*!
      @abstract                             "Sets a ChannelMap".
@@ -490,7 +500,7 @@ extern "C" {
      @param                 Index          "The index of the channel".
      @param                 Mask           "The ChannelMask for the Index"
      */
-    void                    ImageChannelMap_AddMask(ImageChannelMap *ChannelMap, uint8_t Index, ImageChannelMask Mask);
+    void                    ImageChannelMap_AddMask(ImageChannelMap *ChannelMap, uint8_t Index, ContainerIO_ImageChannelMask Mask);
     
     /*!
      @abstract                             "Destroys an AudioVectorHistogram".
@@ -506,7 +516,7 @@ extern "C" {
      @param                 Width          "The number of pixels making up one row".
      @param                 Height         "The number of pixels making up one column".
      */
-    ImageContainer         *ImageContainer_Init(Image_Types Type, ImageChannelMap *ChannelMap, uint64_t Width, uint64_t Height);
+    ImageContainer         *ImageContainer_Init(ContainerIO_ImageTypes Type, ImageChannelMap *ChannelMap, uint64_t Width, uint64_t Height);
     
     /*!
      @abstract                             "Returns the number of pixels in one row of this image".
@@ -543,7 +553,7 @@ extern "C" {
      @abstract                             "Gets the type of the array contained by the ImageContainer".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      */
-    Image_Types             ImageContainer_GetType(ImageContainer *Image);
+    ContainerIO_ImageTypes             ImageContainer_GetType(ImageContainer *Image);
     
     /*!
      @abstract                             "Gets a pointer to the array of pixels".
@@ -588,7 +598,7 @@ extern "C" {
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
      @param                 FlipType       "The type of flipping to use".
      */
-    void                    ImageContainer_Flip(ImageContainer *Image, FlipTypes FlipType);
+    void                    ImageContainer_Flip(ImageContainer *Image, ContainerIO_FlipTypes FlipType);
     
     /*!
      @abstract                             "Resizes an Image".
@@ -612,8 +622,10 @@ extern "C" {
     /*!
      @abstract                             "Securely erases an ImageContainer".
      @param                 Image          "A pointer to the instance of an ImageContainer in question".
+     @param                 NewValue       "The value to set each codeunit to while erasing".
+     @return                               "Returns the value of the first element of String, or 0xFE if it was unsucessful".
      */
-    void                    ImageContainer_Erase(ImageContainer *Image);
+    uint8_t                 ImageContainer_Erase(ImageContainer *Image, uint8_t NewValue);
     
     /*!
      @abstract                             "Deletes the ImageContainer pointed to".
@@ -654,13 +666,15 @@ extern "C" {
      @param                 Histogram      "A pointer to the ImageHistogram in question".
      @param                 Sort           "The kind of sorting to do".
      */
-    void                    ImageHistogram_Sort(ImageHistogram *Histogram, SortTypes Sort);
+    void                    ImageHistogram_Sort(ImageHistogram *Histogram, ContainerIO_SortTypes Sort);
     
     /*!
      @abstract                             "Securely erases an ImageHistogram".
      @param                 Histogram      "A pointer to the instance of an ImageContainer in question".
+     @param                 NewValue       "The value to set each codeunit to while erasing".
+     @return                               "Returns the value of the first element of String, or 0xFE if it was unsucessful".
      */
-    void                    ImageHistogram_Erase(ImageHistogram *Histogram);
+    uint8_t                 ImageHistogram_Erase(ImageHistogram *Histogram, uint8_t NewValue);
     
     /*!
      @abstract                             "frees a ImageHistogram".

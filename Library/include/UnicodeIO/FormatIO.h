@@ -7,6 +7,7 @@
  */
 
 #include "../Macros.h"
+#include "../Constants.h"
 #include "UnicodeTypes.h"
 
 #pragma once
@@ -19,18 +20,182 @@ extern "C" {
 #endif
     
     /*!
-     @enum                StringIOStringTypes
-     @constant            StringType_Unknown                    "Byte order is unknown".
-     @constant            StringType_UTF8                       "Use the byte order of the host".
-     @constant            StringType_UTF16                      "Use the little endian, Least-Significant-Byte first order".
-     @constant            StringType_UTF32                      "Use the big endian, Most-Significant-Byte first order".
+     @enum       FormatIO_BaseTypes
      */
-    typedef enum StringIOStringTypes {
-                          StringType_Unknown                    = 0,
-                          StringType_UTF8                       = 1,
-                          StringType_UTF16                      = 2,
-                          StringType_UTF32                      = 4,
-    } StringIOStringTypes;
+    typedef enum FormatIO_BaseTypes {
+                 BaseType_Unknown               = 0,
+                 BaseType_Integer               = 1,
+                 BaseType_Decimal               = 2,
+                 BaseType_CodeUnit              = 4,
+                 BaseType_String                = 8,
+                 BaseType_Literal               = 16,
+                 BaseType_Pointer               = 32,
+                 BaseType_Remove                = 64,
+    } FormatIO_BaseTypes;
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX && FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+    extern "C++" {
+        constexpr inline FormatIO_BaseTypes operator|(FormatIO_BaseTypes A, FormatIO_BaseTypes B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<FormatIO_BaseTypes>(A1 | B1);
+        }
+        
+        constexpr inline FormatIO_BaseTypes operator&(FormatIO_BaseTypes A, FormatIO_BaseTypes B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<FormatIO_BaseTypes>(A1 & B1);
+        }
+        
+        constexpr inline FormatIO_BaseTypes operator|=(FormatIO_BaseTypes A, FormatIO_BaseTypes B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<FormatIO_BaseTypes>(A1 = A1 | B1);
+        }
+        
+        constexpr inline FormatIO_BaseTypes operator&=(FormatIO_BaseTypes A, FormatIO_BaseTypes B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<FormatIO_BaseTypes>(A1 = A1 & B1);
+        }
+    }
+#endif /* FoundationIOLanguage */
+    
+    /*!
+     @enum       FormatIO_ModifierTypes
+     */
+    typedef enum FormatIO_ModifierTypes {
+                 ModifierType_Unknown               = 0,
+                 ModifierType_Percent               = 1,
+                 ModifierType_UTF8                  = 2,
+                 ModifierType_UTF16                 = 4,
+                 ModifierType_UTF32                 = 8,
+                 ModifierType_Integer               = 16,
+                 ModifierType_Radix2                = 32,
+                 ModifierType_Radix8                = 64,
+                 ModifierType_Decimal               = 128,
+                 ModifierType_Radix10               = 256,
+                 ModifierType_Radix16               = 512,
+                 ModifierType_Uppercase             = 1024,
+                 ModifierType_Lowercase             = 2048,
+                 ModifierType_Scientific            = 4096,
+                 ModifierType_Shortest              = 8192,
+                 ModifierType_Long                  = 16384,
+                 ModifierType_Signed                = 32768,
+                 ModifierType_Unsigned              = 65536,
+                 ModifierType_N                     = 131072,
+    } FormatIO_ModifierTypes;
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX && FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+    extern "C++" {
+        constexpr inline FormatIO_ModifierTypes operator|(FormatIO_ModifierTypes A, FormatIO_ModifierTypes B) {
+            uint32_t A1 = static_cast<uint32_t>(A);
+            uint32_t B1 = static_cast<uint32_t>(B);
+            return static_cast<FormatIO_ModifierTypes>(A1 | B1);
+        }
+        
+        constexpr inline FormatIO_ModifierTypes operator&(FormatIO_ModifierTypes A, FormatIO_ModifierTypes B) {
+            uint32_t A1 = static_cast<uint32_t>(A);
+            uint32_t B1 = static_cast<uint32_t>(B);
+            return static_cast<FormatIO_ModifierTypes>(A1 & B1);
+        }
+        
+        constexpr inline FormatIO_ModifierTypes operator|=(FormatIO_ModifierTypes A, FormatIO_ModifierTypes B) {
+            uint32_t A1 = static_cast<uint32_t>(A);
+            uint32_t B1 = static_cast<uint32_t>(B);
+            return static_cast<FormatIO_ModifierTypes>(A1 = A1 | B1);
+        }
+        
+        constexpr inline FormatIO_ModifierTypes operator&=(FormatIO_ModifierTypes A, FormatIO_ModifierTypes B) {
+            uint32_t A1 = static_cast<uint32_t>(A);
+            uint32_t B1 = static_cast<uint32_t>(B);
+            return static_cast<FormatIO_ModifierTypes>(A1 = A1 & B1);
+        }
+    }
+#endif /* FoundationIOLanguage */
+    
+    /*!
+     @enum       FormatIO_ModifierLengths
+     */
+    typedef enum FormatIO_ModifierLengths {
+                 ModifierLength_Unknown                 = 0,
+                 ModifierLength_8Bit                    = 1,
+                 ModifierLength_16Bit                   = 2,
+                 ModifierLength_32Bit                   = 4,
+                 ModifierLength_64Bit                   = 8,
+                 ModifierLength_SizeType                = 16,
+                 ModifierLength_PointerDiff             = 32,
+                 ModifierLength_IntMax                  = 64,
+    } FormatIO_ModifierLengths;
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX && FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+    extern "C++" {
+        constexpr inline FormatIO_ModifierLengths operator|(FormatIO_ModifierLengths A, FormatIO_ModifierLengths B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<FormatIO_ModifierLengths>(A1 | B1);
+        }
+        
+        constexpr inline FormatIO_ModifierLengths operator&(FormatIO_ModifierLengths A, FormatIO_ModifierLengths B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<FormatIO_ModifierLengths>(A1 & B1);
+        }
+        
+        constexpr inline FormatIO_ModifierLengths operator|=(FormatIO_ModifierLengths A, FormatIO_ModifierLengths B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<FormatIO_ModifierLengths>(A1 = A1 | B1);
+        }
+        
+        constexpr inline FormatIO_ModifierLengths operator&=(FormatIO_ModifierLengths A, FormatIO_ModifierLengths B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<FormatIO_ModifierLengths>(A1 = A1 & B1);
+        }
+    }
+#endif /* FoundationIOLanguage */
+    
+    /*!
+     @enum       FormatIO_Flags
+     */
+    typedef enum FormatIO_Flags {
+                 Flag_Unknown                   = 0,
+                 Flag_Zero_Pad                  = 1,
+                 Flag_Space_Pad                 = 2,
+                 Flag_Plus_AddSign              = 4,
+                 Flag_Pound_Present             = 8,
+                 Flag_Minus_LeftJustify         = 16,
+                 Flag_Pound_PrefixOctal         = 32,
+                 Flag_Pound_PrefixBase          = 64,
+                 Flag_Pound_DecimalSuffix       = 128,
+                 Flag_Apostrophe_Present        = 256,
+                 Flag_Apostrophe_ExponentGroup  = 512,
+    } FormatIO_Flags;
+    
+    /*!
+     @enum       FormatIO_MinWidths
+     */
+    typedef enum FormatIO_MinWidths {
+                 MinWidth_Unknown               = 0,
+                 MinWidth_Asterisk_NextArg      = 1,
+                 MinWidth_Inline_Digits         = 2,
+    } FormatIO_MinWidths;
+    
+    /*!
+     @enum       FormatIO_Positions
+     */
+    typedef enum FormatIO_Positions {
+                 Position_Unknown               = 0,
+                 Position_Asterisk_NextArg      = 1,
+                 Position_Inline_Digits         = 2,
+    } FormatIO_Positions;
+    
+    /*!
+     @enum       FormatIO_Precisions
+     */
+    typedef enum FormatIO_Precisions {
+                 Precision_Unknown              = 0,
+                 Precision_Asterisk_NextArg     = 1,
+                 Precision_Inline_Digits        = 2,
+    } FormatIO_Precisions;
     
     typedef struct        FormatSpecifiers                      FormatSpecifiers;
     
@@ -47,7 +212,7 @@ extern "C" {
      @param               Specifiers                            "The Format Specifiers".
      @param               StringType                            "The original encoding of the Format string".
      */
-    void                  UTF32_ParseFormatSpecifiers(UTF32 *Format, FormatSpecifiers *Specifiers, StringIOStringTypes StringType);
+    void                  UTF32_ParseFormatSpecifiers(UTF32 *Format, FormatSpecifiers *Specifiers, FoundationIO_StringTypes StringType);
     
     /*!
      @abstract                                                  "Formats a UTF-32 encoded string".
