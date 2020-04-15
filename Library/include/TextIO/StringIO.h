@@ -75,49 +75,49 @@ extern "C" {
     } StringIOCommon;
     
     /*!
-     @enum                StringIONormalizationForms
+     @enum                StringIO_NormalizationForms
      @constant            NormalizationForm_Unknown             "Unknown Normalization Form".
      @constant            NormalizationForm_CanonicalDecompose  "Decompose the String".
      @constant            NormalizationForm_CanonicalCompose    "Decompose, then Compose the String".
      @constant            NormalizationForm_KompatibleDecompose "NormalizationForm_CanonicalDecompose, plus Kompatibility decompositions".
      @constant            NormalizationForm_KompatibleCompose   "NormalizationForm_CanonicalDecompose, plus Kompatibility compositions".
      */
-    typedef enum StringIONormalizationForms {
+    typedef enum StringIO_NormalizationForms {
                           NormalizationForm_Unknown             = 0,
                           NormalizationForm_CanonicalDecompose  = 1,
                           NormalizationForm_CanonicalCompose    = 2,
                           NormalizationForm_KompatibleDecompose = 3,
                           NormalizationForm_KompatibleCompose   = 4,
-    } StringIONormalizationForms;
+    } StringIO_NormalizationForms;
     
     /*!
-     @enum                StringIOByteOrders
-     @constant            ByteOrder_Unknown                     "Byte order is unknown".
-     @constant            ByteOrder_Native                      "Use the byte order of the host".
-     @constant            ByteOrder_Little                      "Use the little endian, Least-Significant-Byte first order".
-     @constant            ByteOrder_Big                         "Use the big endian, Most-Significant-Byte first order".
+     @enum                StringIO_ByteOrders
+     @abstract                                                   What byte order does the string use?
+     @constant            StringIO_ByteOrder_Unknown             Byte order is unknown.
+     @constant            StringIO_ByteOrder_Native              Use the byte order of the host.
+     @constant            StringIO_ByteOrder_Little              Use the little endian, Least-Significant-Byte first order.
+     @constant            StringIO_ByteOrder_Big                 Use the big endian, Most-Significant-Byte first order.
      */
-    typedef enum StringIOByteOrders {
-                          ByteOrder_Unknown                     = 0,
-                          ByteOrder_Native                      = 1,
-                          ByteOrder_Little                      = 2,
-                          ByteOrder_Big                         = 3,
-    } StringIOByteOrders;
+    typedef enum StringIO_ByteOrders {
+                 StringIO_ByteOrder_Unknown                      = 0,
+                 StringIO_ByteOrder_Native                       = 1,
+                 StringIO_ByteOrder_Little                       = 2,
+                 StringIO_ByteOrder_Big                          = 3,
+    } StringIO_ByteOrders;
     
     /*!
-     @enum                TrimStringTypes
-     @abstract                                                  "Is this BitInput or BitOutput connected to a File or Socket?".
-     @constant            TrimString_Unknown                    "Unknown TrimString command".
-     @constant            TrimString_StartEndRemoveAll          "Trim at the beginning and end, removing all occurrences found there".
-     @constant            TrimString_BetweenValidKeep1          "Trim between start and end, removing all but 1 occurrence found between non-removable CodePoints".
-     @constant            TrimString_All                        "Remove all occurrences regardless of context".
+     @enum       StringIO_TruncationTypes
+     @abstract                                          Is this BitInput or BitOutput connected to a File or Socket?
+     @constant   TruncationType_Unknown                 Unknown TrimString command.
+     @constant   TruncationType_All                     Trim at the beginning and end, removing all occurrences found there.
+     @constant   TruncationType_Most1                   Trim between start and end, removing all but 1 occurrence found between non-removable CodePoints
+     @constant   TrimString_All                         Remove all occurrences regardless of context.
      */
-    typedef enum TrimStringTypes {
-                          TrimString_Unknown                    = 0,
-                          TrimString_StartEndRemoveAll          = 1,
-                          TrimString_BetweenValidKeep1          = 2,
-                          TrimString_RemoveAll                  = 3,
-    } TrimStringTypes;
+    typedef enum StringIO_TruncationTypes {
+        TruncationType_Unknown                 = 0,
+        TruncationType_All                     = 1,
+        TruncationType_Most1                   = 2,
+    } StringIO_TruncationTypes;
     
     /*!
      @abstract                             "Creates a UTF8 string plus a NULL terminator".
@@ -354,13 +354,13 @@ extern "C" {
      @abstract                             "Adds the specified BOM to the string".
      @param               String           "The string to add the BOM to".
      */
-    UTF16                *UTF16_AddBOM(UTF16 *String, StringIOByteOrders BOM2Add);
+    UTF16                *UTF16_AddBOM(UTF16 *String, StringIO_ByteOrders BOM2Add);
     
     /*!
      @abstract                             "Adds the specified BOM to the string".
      @param               String           "The string to add the BOM to".
      */
-    UTF32                *UTF32_AddBOM(UTF32 *String, StringIOByteOrders BOM2Add);
+    UTF32                *UTF32_AddBOM(UTF32 *String, StringIO_ByteOrders BOM2Add);
     
     /*!
      @abstract                             "Removes the BOM from the string".
@@ -445,7 +445,7 @@ extern "C" {
      @param               String           "The string to be normalized".
      @param               NormalizedForm   "The type of normalization to use on the String".
      */
-    UTF8                 *UTF8_Normalize(UTF8 *String, StringIONormalizationForms NormalizedForm);
+    UTF8                 *UTF8_Normalize(UTF8 *String, StringIO_NormalizationForms NormalizedForm);
     
     /*!
      @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining CodePoints in lexiographic order".
@@ -454,7 +454,7 @@ extern "C" {
      @param               String           "The string to be normalized".
      @param               NormalizedForm   "The type of normalization to use on the String".
      */
-    UTF16                *UTF16_Normalize(UTF16 *String, StringIONormalizationForms NormalizedForm);
+    UTF16                *UTF16_Normalize(UTF16 *String, StringIO_NormalizationForms NormalizedForm);
     
     /*!
      @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining CodePoints in lexiographic order".
@@ -462,7 +462,7 @@ extern "C" {
      @param               String           "The string to be normalized".
      @param               NormalizedForm   "The type of normalization to use on the String".
      */
-    UTF32                *UTF32_Normalize(UTF32 *String, StringIONormalizationForms NormalizedForm);
+    UTF32                *UTF32_Normalize(UTF32 *String, StringIO_NormalizationForms NormalizedForm);
     
     /*!
      @abstract                             "Extracts a Grapheme from String".
@@ -725,7 +725,7 @@ extern "C" {
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
-    int64_t               UTF8_String2Integer(FoundationIOBases Base, UTF8 *String);
+    int64_t               UTF8_String2Integer(FoundationIO_Bases Base, UTF8 *String);
     
     /*!
      @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
@@ -733,7 +733,7 @@ extern "C" {
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
-    int64_t               UTF16_String2Integer(FoundationIOBases Base, UTF16 *String);
+    int64_t               UTF16_String2Integer(FoundationIO_Bases Base, UTF16 *String);
     
     /*!
      @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
@@ -741,85 +741,85 @@ extern "C" {
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
-    int64_t               UTF32_String2Integer(FoundationIOBases Base, UTF32 *String);
+    int64_t               UTF32_String2Integer(FoundationIO_Bases Base, UTF32 *String);
     
     /*!
      @abstract                             "Converts an integer to a string; replaces itoa".
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF8                 *UTF8_Integer2String(FoundationIOBases Base, int64_t Integer2Convert);
+    UTF8                 *UTF8_Integer2String(FoundationIO_Bases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts an integer to a string; replaces itoa".
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF16                *UTF16_Integer2String(FoundationIOBases Base, int64_t Integer2Convert);
+    UTF16                *UTF16_Integer2String(FoundationIO_Bases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts an integer to a string; replaces itoa".
      @param               Base             "The base to output the integer in".
      @param               Integer2Convert  "The number to convert into a string".
      */
-    UTF32                *UTF32_Integer2String(FoundationIOBases Base, int64_t Integer2Convert);
+    UTF32                *UTF32_Integer2String(FoundationIO_Bases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
-    double                UTF8_String2Decimal(FoundationIOBases Base, UTF8 *String);
+    double                UTF8_String2Decimal(FoundationIO_Bases Base, UTF8 *String);
     
     /*!
      @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
-    double                UTF16_String2Decimal(FoundationIOBases Base, UTF16 *String);
+    double                UTF16_String2Decimal(FoundationIO_Bases Base, UTF16 *String);
     
     /*!
      @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
-    double                UTF32_String2Decimal(FoundationIOBases Base, UTF32 *String);
+    double                UTF32_String2Decimal(FoundationIO_Bases Base, UTF32 *String);
     
     /*!
      @abstract                             "Converts a double to a string; replaces dtostr".
      @param               Decimal          "The decimal number to convert to a string".
      */
-    UTF8                 *UTF8_Decimal2String(FoundationIOBases Base, double Decimal);
+    UTF8                 *UTF8_Decimal2String(FoundationIO_Bases Base, double Decimal);
     
     /*!
      @abstract                             "Converts a double to a string; replaces ftoa".
      @param               Decimal          "The decimal number to convert to a string".
      */
-    UTF16                *UTF16_Decimal2String(FoundationIOBases Base, double Decimal);
+    UTF16                *UTF16_Decimal2String(FoundationIO_Bases Base, double Decimal);
     
     /*!
      @abstract                             "Converts a double to a string; replaces ftoa".
      @param               Decimal          "The decimal number to convert to a string".
      */
-    UTF32                *UTF32_Decimal2String(FoundationIOBases Base, double Decimal);
+    UTF32                *UTF32_Decimal2String(FoundationIO_Bases Base, double Decimal);
     
     /*!
      @abstract                             "Removes substrings (including single CodePoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
-    UTF8                 *UTF8_Trim(UTF8 *String, TrimStringTypes Type, UTF8 **Strings2Remove);
+    UTF8                 *UTF8_Trim(UTF8 *String, StringIO_TruncationTypes Type, UTF8 **Strings2Remove);
     
     /*!
      @abstract                             "Removes substrings (including single CodePoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
-    UTF16                *UTF16_Trim(UTF16 *String, TrimStringTypes Type, UTF16 **Strings2Remove);
+    UTF16                *UTF16_Trim(UTF16 *String, StringIO_TruncationTypes Type, UTF16 **Strings2Remove);
     
     /*!
      @abstract                             "Removes substrings (including single CodePoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringArray to remove from the String".
      */
-    UTF32                *UTF32_Trim(UTF32 *String, TrimStringTypes Type, UTF32 **Strings2Remove);
+    UTF32                *UTF32_Trim(UTF32 *String, StringIO_TruncationTypes Type, UTF32 **Strings2Remove);
     
     /*!
      @abstract                             "Strips all instances of Strings2Remove from String".
@@ -867,22 +867,28 @@ extern "C" {
     UTF32                *UTF32_Clone(UTF32 *String);
     
     /*!
-     @abstract                             "Securely erases a string".
-     @param               String           "Pointer to the String to be erased".
+     @abstract                              Securely erases a string.
+     @param               String            Pointer to the String to be erased.
+     @param               NewValue          The value to set each codeunit to while erasing.
+     @return                                Returns the value of the first element of String, or 0xFE if it was unsucessful
      */
-    void                  UTF8_Erase(UTF8 *String);
+    UTF8                  UTF8_Erase(UTF8 *String, UTF8 NewValue);
     
     /*!
-     @abstract                             "Securely erases a string".
-     @param               String           "Pointer to the String to be erased".
+     @abstract                              Securely erases a string.
+     @param               String            Pointer to the String to be erased.
+     @param               NewValue          The value to set each codeunit to while erasing.
+     @return                                Returns the value of the first element of String, or 0xFE if it was unsucessful
      */
-    void                  UTF16_Erase(UTF16 *String);
+    UTF16                 UTF16_Erase(UTF16 *String, UTF16 NewValue);
     
     /*!
-     @abstract                             "Securely erases a string".
-     @param               String           "Pointer to the String to be erased".
+     @abstract                              Securely erases a string.
+     @param               String            Pointer to the String to be erased.
+     @param               NewValue          The value to set each codeunit to while erasing.
+     @return                                Returns the value of the first element of String, or 0xFE if it was unsucessful
      */
-    void                  UTF32_Erase(UTF32 *String);
+    UTF32                 UTF32_Erase(UTF32 *String, UTF32 NewValue);
     
     /*!
      @abstract                             "Cuts a string down to MaxCodeUnits CodeUnits".
@@ -1054,7 +1060,7 @@ extern "C" {
      @param               Offset           "Where to start looking for digits".
      @return                               "Returns the number of format specifiers found".
      */
-    uint64_t              UTF32_GetNumDigits(FoundationIOBases Base, UTF32 *String, uint64_t Offset); // Format/Deformat
+    uint64_t              UTF32_GetNumDigits(FoundationIO_Bases Base, UTF32 *String, uint64_t Offset); // Format/Deformat
     
     /*!
      @abstract                             "Gets a substring from Offset to where Format and Formatted start matching".

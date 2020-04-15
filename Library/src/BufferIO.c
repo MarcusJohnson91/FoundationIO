@@ -1,14 +1,19 @@
 #include "../include/BitIO.h"                /* Included for our declarations */
+#include "../include/Constants.h"            /* Included for BitMaskTables */
 #include "../include/CryptographyIO.h"       /* Included for Entropy_GenerateInteger for GUUID_Generate */
 #include "../include/MathIO.h"               /* Included for Integer functions */
-#include "../include/Constants.h"            /* Included for BitMaskTables */
 #include "../include/UnicodeIO/FormatIO.h"   /* Included for UTF32_Format */
 #include "../include/UnicodeIO/LogIO.h"      /* Included for Logging */
 #include "../include/UnicodeIO/StringIO.h"   /* Included for StringIO's declarations */
 
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 extern "C" {
 #endif
+    
+    typedef enum BitIO_Constants {
+        GUUIDString_Size                = 20,
+        BinaryGUUID_Size                = 16,
+    } BitIO_Constants;
     
     /* Start BitBuffer section */
     typedef struct BitBuffer {
@@ -18,18 +23,18 @@ extern "C" {
     } BitBuffer;
     
     typedef struct BitInput {
-        FILE           *File;
-        uint64_t        FilePosition;
-        uint64_t        FileSize;
-        int             Socket;
-        BitIOFileTypes  FileType;
+        FILE            *File;
+        uint64_t         FilePosition;
+        uint64_t         FileSize;
+        int              Socket;
+        BitIO_FileTypes  FileType;
     } BitInput;
     
     typedef struct BitOutput {
-        FILE           *File;
-        uint64_t        FilePosition;
-        int             Socket;
-        BitIOFileTypes  FileType;
+        FILE            *File;
+        uint64_t         FilePosition;
+        int              Socket;
+        BitIO_FileTypes  FileType;
     } BitOutput;
     
     BitBuffer *BitBuffer_Init(uint64_t BitBufferSize) {
@@ -41,10 +46,10 @@ extern "C" {
             } else {
                 BitBuffer_Deinit(BitB);
                 BitB                     = NULL;
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate %lld bits for BitBuffer's buffer"), BitBufferSize);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate %lld bits for BitBuffer's buffer"), BitBufferSize);
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BitBuffer"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BitBuffer"));
         }
         return BitB;
     }
@@ -63,20 +68,20 @@ extern "C" {
                 }
             }
             uint64_t BytesRead     = 0ULL;
-            if (BitI->FileType == BitIOFile) {
+            if (BitI->FileType == FileType_File) {
                 BytesRead          = FoundationIO_File_Read(BitB->Buffer, 1, Bytes2Read, BitI->File);
-            } else if (BitI->FileType == BitIOSocket) {
+            } else if (BitI->FileType == FileType_Socket) {
                 BytesRead          = FoundationIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
             }
             if (BytesRead == Bytes2Read) {
                 BitB->NumBits      = (BytesRead * 8) + BitB->BitOffset;
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Num bytes read %llu does not match num bytes requested %llu"), BytesRead, Bytes2Read);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Num bytes read %llu does not match num bytes requested %llu"), BytesRead, Bytes2Read);
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (BitI == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
     }
     
@@ -85,7 +90,7 @@ extern "C" {
         if (BitB != NULL) {
             BitBufferSize      = BitB->NumBits;
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return BitBufferSize;
     }
@@ -94,7 +99,7 @@ extern "C" {
         if (BitB != NULL) {
             BitB->NumBits = Bits;
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
@@ -103,7 +108,7 @@ extern "C" {
         if (BitB != NULL) {
             Position = BitB->BitOffset;
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return Position;
     }
@@ -112,7 +117,7 @@ extern "C" {
         if (BitB != NULL) {
             BitB->BitOffset = Offset;
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
@@ -121,7 +126,7 @@ extern "C" {
         if (BitB != NULL) {
             BitsFree      = BitB->NumBits - BitB->BitOffset;
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return BitsFree;
     }
@@ -133,9 +138,9 @@ extern "C" {
                 AlignmentStatus = Yes;
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (AlignmentSize != 1 || AlignmentSize % 2 != 0) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AlignmentSize: %d isn't 1 or an integer power of 2"), AlignmentSize);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("AlignmentSize: %d isn't 1 or an integer power of 2"), AlignmentSize);
         }
         return AlignmentStatus;
     }
@@ -150,9 +155,9 @@ extern "C" {
             }
             BitB->BitOffset             += Bits2Align;
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (AlignmentSize == 1 || AlignmentSize % 2 == 0) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("AlignmentSize: %d isn't a multiple of 2"), AlignmentSize);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("AlignmentSize: %d isn't a multiple of 2"), AlignmentSize);
         }
     }
     
@@ -160,19 +165,22 @@ extern "C" {
         if (BitB != NULL) {
             BitB->BitOffset += Bits2Seek;
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
-    void BitBuffer_Erase(BitBuffer *BitB) {
+    uint8_t BitBuffer_Erase(BitBuffer *BitB, uint8_t NewValue) {
+        uint8_t Verification = 0xFE;
         if (BitB != NULL) {
             uint64_t BufferSize = Bits2Bytes(BitB->NumBits, RoundingType_Up);
             for (uint64_t Byte = 0ULL; Byte < BufferSize; Byte++) {
-                BitB->Buffer[Byte] = 0;
+                BitB->Buffer[Byte] = NewValue;
             }
+            Verification = BitB->Buffer[0];
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
+        return Verification;
     }
     
     void BitBuffer_Resize(BitBuffer *BitB, uint64_t NewSize) {
@@ -183,10 +191,10 @@ extern "C" {
                 BitB->BitOffset = 0;
                 BitB->NumBits   = NewSize * 8;
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Reallocing the BitBuffer failed"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Reallocing the BitBuffer failed"));
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
@@ -194,9 +202,9 @@ extern "C" {
         if (BitB != NULL && BitI != NULL) {
             uint64_t Bytes2Read      = BitB->NumBits / 8;
             uint64_t BytesRead       = 0ULL;
-            if (BitI->FileType == BitIOFile) {
+            if (BitI->FileType == FileType_File) {
                 BytesRead            = FoundationIO_File_Read(BitB->Buffer, 1, Bytes2Read, BitI->File);
-            } else if (BitI->FileType == BitIOSocket) {
+            } else if (BitI->FileType == FileType_Socket) {
                 BytesRead            = FoundationIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
             }
             if (BytesRead != Bytes2Read) {
@@ -206,13 +214,13 @@ extern "C" {
                     BitB->BitOffset  = 0;
                     BitB->NumBits    = BytesRead * 8;
                 } else {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Reallocating the BitBuffer failed"));
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Reallocating the BitBuffer failed"));
                 }
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (BitI == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
     }
     
@@ -230,13 +238,13 @@ extern "C" {
                 }
             }
         } else if (Source == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Source Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Source Pointer is NULL"));
         } else if (Destination == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Destination Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Destination Pointer is NULL"));
         } else if (BitStart >= BitEnd) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitStart %lld is greater than or equal to BitEnd %lld"), BitStart, BitEnd);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitStart %lld is greater than or equal to BitEnd %lld"), BitStart, BitEnd);
         } else if (BitStart >= Source->NumBits || BitEnd >= Source->NumBits) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitStart %lld or BitEnd %lld is greater than there are bits in Source %lld"), BitStart, BitEnd, Source->NumBits);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitStart %lld or BitEnd %lld is greater than there are bits in Source %lld"), BitStart, BitEnd, Source->NumBits);
         }
     }
     
@@ -465,81 +473,81 @@ extern "C" {
         UTF32 *BitBufferString = NULL;
         if (BitB != NULL && Length >= 1 && Length <= 64) {
             BitBuffer_Seek(BitB, BitB->BitOffset - Length);
-            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %P, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), BitB, BitB->NumBits, BitB->BitOffset, BitBuffer_ReadBits(BitB, MSByteFirst, MSBitFirst, Length));
+            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %P, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), BitB, BitB->NumBits, BitB->BitOffset, BitBuffer_ReadBits(BitB, BitIO_ByteOrder_MSByte, BitIO_BitOrder_MSBit, Length));
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (Length == 0) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Length is zero, less than the minimum of 1"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Length is zero, less than the minimum of 1"));
         } else if (Length > 64) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Length: %u is greater than 64 bits, the maximum"), Length);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Length: %u is greater than 64 bits, the maximum"), Length);
         }
         return BitBufferString;
     }
     
-    uint64_t BitBuffer_PeekBits(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, uint8_t Bits2Peek) {
+    uint64_t BitBuffer_PeekBits(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t Bits2Peek) {
         uint64_t OutputData  = 0ULL;
         if (BitB != NULL && (Bits2Peek >= 1 && Bits2Peek <= 64) && (Bits2Peek <= (BitB->BitOffset - BitB->NumBits))) {
-            if (ByteOrder == LSByteFirst) {
-                if (BitOrder == LSBitFirst) {
+            if (ByteOrder == BitIO_ByteOrder_LSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
                     OutputData          = BitBuffer_Extract_LSByteLSBit(BitB, Bits2Peek);
-                } else if (BitOrder == MSBitFirst) {
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
                     OutputData          = BitBuffer_Extract_LSByteMSBit(BitB, Bits2Peek);
                 }
-            } else if (ByteOrder == MSByteFirst) {
-                if (BitOrder == LSBitFirst) {
+            } else if (ByteOrder == BitIO_ByteOrder_MSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
                     OutputData         = BitBuffer_Extract_MSByteLSBit(BitB, Bits2Peek);
-                } else if (BitOrder == MSBitFirst) {
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
                     OutputData         = BitBuffer_Extract_MSByteMSBit(BitB, Bits2Peek);
                 }
             }
             BitB->BitOffset -= Bits2Peek;
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if ((Bits2Peek == 0 || Bits2Peek > 64) || (Bits2Peek > (BitB->BitOffset - BitB->NumBits))) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Bits2Peek %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_PeekBits can satisfy 1-64"), Bits2Peek, BitB->BitOffset);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Bits2Peek %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_PeekBits can satisfy 1-64"), Bits2Peek, BitB->BitOffset);
         }
         return OutputData;
     }
     
-    uint64_t BitBuffer_ReadBits(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, uint8_t Bits2Read) {
+    uint64_t BitBuffer_ReadBits(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t Bits2Read) {
         uint64_t OutputData    = 0ULL;
         if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
-            if (ByteOrder == LSByteFirst) {
-                if (BitOrder == LSBitFirst) {
+            if (ByteOrder == BitIO_ByteOrder_LSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
                     OutputData          = BitBuffer_Extract_LSByteLSBit(BitB, Bits2Read);
-                } else if (BitOrder == MSBitFirst) {
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
                     OutputData          = BitBuffer_Extract_LSByteMSBit(BitB, Bits2Read);
                 }
-            } else if (ByteOrder == MSByteFirst) {
-                if (BitOrder == LSBitFirst) {
+            } else if (ByteOrder == BitIO_ByteOrder_MSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
                     OutputData         = BitBuffer_Extract_MSByteLSBit(BitB, Bits2Read);
-                } else if (BitOrder == MSBitFirst) {
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
                     OutputData         = BitBuffer_Extract_MSByteMSBit(BitB, Bits2Read);
                 }
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if ((Bits2Read == 0 || Bits2Read > 64) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 1-64"), Bits2Read, BitB->BitOffset);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 1-64"), Bits2Read, BitB->BitOffset);
         }
         return OutputData;
     }
     
-    uint64_t BitBuffer_ReadUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, Unary_StopBits StopBit) {
+    uint64_t BitBuffer_ReadUnary(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, BitIO_UnaryTypes UnaryType, BitIO_UnaryTerminatorTypes StopBit) {
         uint64_t OutputData    = 0ULL;
         if (BitB != NULL) {
             uint8_t CurrentBit = StopBit ^ 1;
             do {
-                if (ByteOrder == LSByteFirst) {
-                    if (BitOrder == LSBitFirst) {
+                if (ByteOrder == BitIO_ByteOrder_LSByte) {
+                    if (BitOrder == BitIO_BitOrder_LSBit) {
                         CurrentBit          = (uint8_t) BitBuffer_Extract_LSByteLSBit(BitB, 1);
-                    } else if (BitOrder == MSBitFirst) {
+                    } else if (BitOrder == BitIO_BitOrder_MSBit) {
                         CurrentBit          = (uint8_t) BitBuffer_Extract_LSByteMSBit(BitB, 1);
                     }
-                } else if (ByteOrder == MSByteFirst) {
-                    if (BitOrder == LSBitFirst) {
+                } else if (ByteOrder == BitIO_ByteOrder_MSByte) {
+                    if (BitOrder == BitIO_BitOrder_LSBit) {
                         CurrentBit         = (uint8_t) BitBuffer_Extract_MSByteLSBit(BitB, 1);
-                    } else if (BitOrder == MSBitFirst) {
+                    } else if (BitOrder == BitIO_BitOrder_MSBit) {
                         CurrentBit         = (uint8_t) BitBuffer_Extract_MSByteMSBit(BitB, 1);
                     }
                 }
@@ -547,9 +555,9 @@ extern "C" {
             } while (CurrentBit != StopBit);
             BitBuffer_Seek(BitB, 1);
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
-        return (UnaryType == CountUnary ? OutputData + 1 : OutputData);
+        return (UnaryType == UnaryType_Count ? OutputData + 1 : OutputData);
     }
     
     uint64_t BitBuffer_GetUTF8StringSize(BitBuffer *BitB) {
@@ -564,7 +572,7 @@ extern "C" {
             }
             BitBuffer_SetPosition(BitB, OriginalOffset);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return StringSize;
     }
@@ -591,7 +599,7 @@ extern "C" {
             }
             BitBuffer_SetPosition(BitB, OriginalOffset);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return StringSize;
     }
@@ -603,29 +611,24 @@ extern "C" {
                 ExtractedString[CodeUnit] = (UTF16) BitBuffer_Extract_LSByteLSBit(BitB, 16);
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return ExtractedString;
     }
     
-    typedef enum GUUIDConstants {
-        GUUIDStringSize                 = 20,
-        BinaryGUUIDSize                 = 16,
-    } GUUIDConstants;
-    
-    uint8_t *BitBuffer_ReadGUUID(BitBuffer *BitB, GUUIDTypes GUUID2Read) {
+    uint8_t *BitBuffer_ReadGUUID(BitBuffer *BitB, BitIO_GUUIDTypes GUUID2Read) {
         uint8_t *GUUID = NULL;
-        if (GUUID2Read != UnknownGUUID && BitB != NULL && (BitBuffer_GetSize(BitB) - BitBuffer_GetPosition(BitB)) >= BinaryGUUIDSize) {
-            if (GUUID2Read == BinaryUUID || GUUID2Read == BinaryGUID) {
-                GUUID                    = (uint8_t*) calloc(BinaryGUUIDSize, sizeof(uint8_t));
+        if (GUUID2Read != GUUIDType_Unknown && BitB != NULL && (BitBuffer_GetSize(BitB) - BitBuffer_GetPosition(BitB)) >= BinaryGUUID_Size) {
+            if (GUUID2Read == GUUIDType_BinaryUUID || GUUID2Read == GUUIDType_BinaryGUID) {
+                GUUID                    = (uint8_t*) calloc(BinaryGUUID_Size, sizeof(uint8_t));
                 if (GUUID != NULL) {
-                    for (uint8_t Byte = 0; Byte < BinaryGUUIDSize; Byte++) {
+                    for (uint8_t Byte = 0; Byte < BinaryGUUID_Size; Byte++) {
                         GUUID[Byte]      = (uint8_t) BitBuffer_Extract_LSByteLSBit(BitB, 8);
                     }
                 } else {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate GUIDString"));
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate GUUIDType_GUIDString"));
                 }
-            } else if (GUUID2Read == UUIDString || GUUID2Read == GUIDString) {
+            } else if (GUUID2Read == GUUIDType_UUIDString || GUUID2Read == GUUIDType_GUIDString) {
                 if (GUUID != NULL) {
                     uint32_t Section1    = (uint32_t) BitBuffer_Extract_LSByteLSBit(BitB, 32);
                     BitBuffer_Seek(BitB, 8);
@@ -636,7 +639,7 @@ extern "C" {
                     uint16_t Section4    = (uint16_t) BitBuffer_Extract_LSByteLSBit(BitB, 16);
                     BitBuffer_Seek(BitB, 8);
                     uint64_t Section5    = (uint64_t) BitBuffer_Extract_LSByteLSBit(BitB, 48);
-                    for (uint8_t Byte = 0; Byte < GUUIDStringSize; Byte++) {
+                    for (uint8_t Byte = 0; Byte < GUUIDString_Size; Byte++) {
                         if (Byte <= 3) {
                             GUUID[Byte]  = Section1 & (0xFF << (Byte * 8));
                         } else if (Byte >= 5 && Byte <= 7) {
@@ -652,69 +655,69 @@ extern "C" {
                         }
                     }
                 } else {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate UUIDString"));
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate GUUIDType_UUIDString"));
                 }
             }
         }
         return GUUID;
     }
     
-    void BitBuffer_WriteBits(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, uint8_t NumBits2Write, uint64_t Bits2Write) {
+    void BitBuffer_WriteBits(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t NumBits2Write, uint64_t Bits2Write) {
         if (BitB != NULL) {
-            if (ByteOrder == LSByteFirst) {
-                if (BitOrder == LSBitFirst) {
+            if (ByteOrder == BitIO_ByteOrder_LSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
                     BitBuffer_Append_LSByteLSBit(BitB, NumBits2Write, Bits2Write);
-                } else if (BitOrder == MSBitFirst) {
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
                     BitBuffer_Append_LSByteMSBit(BitB, NumBits2Write, Bits2Write);
                 }
-            } else if (ByteOrder == MSByteFirst) {
-                if (BitOrder == LSBitFirst) {
+            } else if (ByteOrder == BitIO_ByteOrder_MSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
                     BitBuffer_Append_MSByteLSBit(BitB, NumBits2Write, Bits2Write);
-                } else if (BitOrder == MSBitFirst) {
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
                     BitBuffer_Append_MSByteMSBit(BitB, NumBits2Write, Bits2Write);
                 }
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (NumBits2Write <= 0 || NumBits2Write > 64) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumBits2Write %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_WriteBits can satisfy 1-64"), NumBits2Write, BitB->NumBits);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("NumBits2Write %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_WriteBits can satisfy 1-64"), NumBits2Write, BitB->NumBits);
         }
     }
     
-    void BitBuffer_WriteUnary(BitBuffer *BitB, ByteOrders ByteOrder, BitOrders BitOrder, UnaryTypes UnaryType, Unary_StopBits StopBit, uint8_t UnaryBits2Write) {
+    void BitBuffer_WriteUnary(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, BitIO_UnaryTypes UnaryType, BitIO_UnaryTerminatorTypes StopBit, uint8_t UnaryBits2Write) {
         if (BitB != NULL) {
-            uint8_t EndBit      = StopBit == StopBit_Zero ? 0 : 1;
+            uint8_t EndBit      = StopBit == UnaryTerminator_Zero ? 0 : 1;
             uint8_t Field2Write = UnaryBits2Write;
-            if (UnaryType == CountUnary) {
+            if (UnaryType == UnaryType_Count) {
                 Field2Write -= 1;
             }
             
-            if (ByteOrder == LSByteFirst) {
-                if (BitOrder == LSBitFirst) {
+            if (ByteOrder == BitIO_ByteOrder_LSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
                     BitBuffer_Append_LSByteLSBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
                     BitBuffer_Append_LSByteLSBit(BitB, 1, EndBit);
-                } else if (BitOrder == MSBitFirst) {
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
                     BitBuffer_Append_LSByteMSBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
                     BitBuffer_Append_LSByteMSBit(BitB, 1, EndBit);
                 }
-            } else if (ByteOrder == MSByteFirst) {
-                if (BitOrder == LSBitFirst) {
+            } else if (ByteOrder == BitIO_ByteOrder_MSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
                     BitBuffer_Append_MSByteLSBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
                     BitBuffer_Append_MSByteLSBit(BitB, 1, EndBit);
-                } else if (BitOrder == MSBitFirst) {
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
                     BitBuffer_Append_MSByteMSBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
                     BitBuffer_Append_MSByteMSBit(BitB, 1, EndBit);
                 }
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
-    void BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write, String_WriteTypes WriteType) {
+    void BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write, BitIO_StringTerminatorTypes WriteType) {
         if (BitB != NULL && String2Write != NULL) {
             uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(String2Write);
-            if (WriteType == WriteType_NULLTerminator) {
+            if (WriteType == StringTerminator_NULL) {
                 StringSize     += UTF8CodeUnitSizeInBits;
             }
 
@@ -725,23 +728,23 @@ extern "C" {
                     BitBuffer_Append_MSByteLSBit(BitB, UTF8CodeUnitSizeInBits, String2Write[CodeUnit]);
                     CodeUnit         += 1;
                 }
-                if (WriteType == WriteType_NULLTerminator) {
+                if (WriteType == StringTerminator_NULL) {
                     BitBuffer_Append_MSByteLSBit(BitB, UTF8CodeUnitSizeInBits, 0); // NULL Terminator
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (String2Write == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
-    void BitBuffer_WriteUTF16(BitBuffer *BitB, UTF16 *String2Write, String_WriteTypes WriteType) {
+    void BitBuffer_WriteUTF16(BitBuffer *BitB, UTF16 *String2Write, BitIO_StringTerminatorTypes WriteType) {
         if (BitB != NULL && String2Write != NULL) {
             uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(String2Write);
-            if (WriteType == WriteType_NULLTerminator) {
+            if (WriteType == StringTerminator_NULL) {
                 StringSize += UTF16CodeUnitSizeInBits / 8; // Size in bytes, not bits
             }
 
@@ -752,32 +755,32 @@ extern "C" {
                     BitBuffer_Append_LSByteLSBit(BitB, UTF16CodeUnitSizeInBits, String2Write[CodeUnit]);
                     CodeUnit += 1;
                 }
-                if (WriteType == WriteType_NULLTerminator) {
+                if (WriteType == StringTerminator_NULL) {
                     BitBuffer_Append_LSByteLSBit(BitB, UTF16CodeUnitSizeInBits, 0); // NULL Terminator
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (String2Write == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
-    void BitBuffer_WriteGUUID(BitBuffer *BitB, GUUIDTypes GUUIDType, uint8_t *GUUID2Write) {
+    void BitBuffer_WriteGUUID(BitBuffer *BitB, BitIO_GUUIDTypes GUUIDType, uint8_t *GUUID2Write) {
         if (BitB != NULL && GUUID2Write != NULL) {
             static const uint8_t GUUIDSizeInBits[4] = {168, 168, 128, 128};
             if (BitB->BitOffset + GUUIDSizeInBits[GUUIDType] <= BitB->NumBits) {
-                uint8_t GUUIDSize = ((GUUIDType == GUIDString || GUUIDType == UUIDString) ? GUUIDStringSize : BinaryGUUIDSize);
+                uint8_t GUUIDSize = ((GUUIDType == GUUIDType_GUIDString || GUUIDType == GUUIDType_UUIDString) ? GUUIDString_Size : BinaryGUUID_Size);
                 for (uint8_t Byte = 0; Byte < GUUIDSize; Byte++) {
                     BitBuffer_Append_LSByteLSBit(BitB, 8, GUUID2Write[Byte]);
                 }
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (GUUID2Write == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("GUUID2Write Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("GUUID2Write Pointer is NULL"));
         }
     }
     
@@ -786,9 +789,9 @@ extern "C" {
             uint64_t Bytes2Write  = Bits2Bytes(BitBuffer_GetPosition(BitB), RoundingType_Down);
             uint64_t Bits2Keep    = BitB->BitOffset % 8;
             uint64_t BytesWritten = 0ULL;
-            if (BitO->FileType == BitIOFile) {
+            if (BitO->FileType == FileType_File) {
                 BytesWritten = FoundationIO_File_Write(BitB->Buffer, 1, Bytes2Write, BitO->File);
-            } else if (BitO->FileType == BitIOSocket) {
+            } else if (BitO->FileType == FileType_Socket) {
                 BytesWritten = FoundationIO_Socket_Write(BitO->Socket, BitB->Buffer, Bytes2Write);
             }
             if (BytesWritten == Bytes2Write) {
@@ -799,12 +802,12 @@ extern "C" {
                     BitB->Buffer[Byte] = 0;
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %lld of %lld bits"), BytesWritten * 8, Bytes2Write * 8);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %lld of %lld bits"), BytesWritten * 8, Bytes2Write * 8);
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (BitO == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
         }
     }
     
@@ -813,7 +816,7 @@ extern "C" {
             free(BitB->Buffer);
             free(BitB);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     /* BitBuffer Resource Management */
@@ -824,14 +827,14 @@ extern "C" {
         BitInput *BitI = (BitInput*) calloc(1, sizeof(BitInput));
         if (BitI == NULL) {
             BitInput_Deinit(BitI);
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BitInput"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BitInput"));
         }
         return BitI;
     }
     
     void BitInput_UTF8_OpenFile(BitInput *BitI, UTF8 *Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
-            BitI->FileType                   = BitIOFile;
+            BitI->FileType                   = FileType_File;
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
             bool PathHasBOM                  = UTF8_HasBOM(Path2Open);
             if (PathHasBOM == No) {
@@ -854,18 +857,18 @@ extern "C" {
             if (BitI->File != NULL) {
                 setvbuf(BitI->File, NULL, _IONBF, 0);
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't open file \"%s\": Check that the file exists and the permissions are correct"), Path2Open);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't open file \"%s\": Check that the file exists and the permissions are correct"), Path2Open);
             }
         } else if (BitI == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         } else if (Path2Open == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
     void BitInput_UTF16_OpenFile(BitInput *BitI, UTF16 *Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
-            BitI->FileType                   = BitIOFile;
+            BitI->FileType                   = FileType_File;
             UTF32 *Path32                    = NULL;
             UTF8  *Path8                     = NULL;
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
@@ -905,33 +908,33 @@ extern "C" {
                 Path32                       = UTF16_Decode(Path2Open);
                 Path8                        = UTF8_Encode(Path32);
                 free(Path32);
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't open file \"%s\": Check that the file exists and the permissions are correct"), Path8);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't open file \"%s\": Check that the file exists and the permissions are correct"), Path8);
                 free(Path8);
             }
         } else if (BitI == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         } else if (Path2Open == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
     void BitInput_OpenSocket(BitInput *BitI, int Domain, int Type, int Protocol) {
         if (BitI != NULL) {
-            BitI->FileType = BitIOSocket;
+            BitI->FileType = FileType_Socket;
             BitI->Socket   = FoundationIO_Socket_Create(Domain, Type, Protocol);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
     }
     
     void BitInput_ConnectSocket(BitInput *BitI, struct sockaddr *SocketAddress, uint32_t SocketSize) {
         if (BitI != NULL && SocketAddress != NULL) {
-            BitI->FileType = BitIOSocket;
+            BitI->FileType = FileType_Socket;
             FoundationIO_Socket_Connect(BitI->Socket, SocketAddress, SocketSize);
         } else if (BitI == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         } else if (SocketAddress == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SocketAddress Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SocketAddress Pointer is NULL"));
         }
     }
     
@@ -942,7 +945,7 @@ extern "C" {
             FoundationIO_File_Seek(BitI->File, 0, SEEK_SET);
             BitI->FilePosition = (uint64_t) FoundationIO_File_GetSize(BitI->File);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
     }
     
@@ -954,7 +957,7 @@ extern "C" {
             }
             InputSize     = BitI->FileSize;
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
         return InputSize;
     }
@@ -967,7 +970,7 @@ extern "C" {
             }
             Position    = BitI->FilePosition;
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
         return Position;
     }
@@ -980,21 +983,21 @@ extern "C" {
             }
             BytesLeft    = BitI->FileSize - BitI->FilePosition;
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
         return BytesLeft;
     }
     
     void BitInput_Deinit(BitInput *BitI) {
         if (BitI != NULL) {
-            if (BitI->FileType == BitIOFile) {
+            if (BitI->FileType == FileType_File) {
                 FoundationIO_File_Close(BitI->File);
-            } else if (BitI->FileType == BitIOSocket) {
+            } else if (BitI->FileType == FileType_Socket) {
                 FoundationIO_Socket_Close(BitI->Socket);
             }
             free(BitI);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
     }
     /* BitInput */
@@ -1005,14 +1008,14 @@ extern "C" {
         BitOutput *BitO = (BitOutput*) calloc(1, sizeof(BitOutput));
         if (BitO == NULL) {
             BitOutput_Deinit(BitO);
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BitOutput"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BitOutput"));
         }
         return BitO;
     }
     
     void BitOutput_UTF8_OpenFile(BitOutput *BitO, UTF8 *Path2Open) {
         if (BitO != NULL && Path2Open != NULL) {
-            BitO->FileType                   = BitIOFile;
+            BitO->FileType                   = FileType_File;
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
             bool PathHasBOM                  = UTF8_HasBOM(Path2Open);
             if (PathHasBOM == No) {
@@ -1043,15 +1046,15 @@ extern "C" {
             }
 #endif
         } else if (BitO == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
         } else if (Path2Open == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Path2Open Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Path2Open Pointer is NULL"));
         }
     }
     
     void BitOutput_UTF16_OpenFile(BitOutput *BitO, UTF16 *Path2Open) {
         if (BitO != NULL && Path2Open != NULL) {
-            BitO->FileType              = BitIOFile;
+            BitO->FileType              = FileType_File;
             bool  PathHasBOM            = No;
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
             UTF32 *Decoded              = UTF16_Decode(Path2Open);
@@ -1076,56 +1079,56 @@ extern "C" {
             }
 #endif
         } else if (BitO == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
         } else if (Path2Open == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Path2Open Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Path2Open Pointer is NULL"));
         }
     }
     
     void BitOutput_OpenSocket(BitOutput *BitO, int Domain, int Type, int Protocol) {
         if (BitO != NULL) {
-            BitO->FileType  = BitIOSocket;
+            BitO->FileType  = FileType_Socket;
             BitO->Socket    = FoundationIO_Socket_Create(Domain, Type, Protocol);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
     }
     
     void BitOutput_ConnectSocket(BitOutput *BitO, struct sockaddr *SocketAddress, uint64_t SocketSize) {
         if (BitO != NULL && SocketAddress != NULL) {
-            BitO->FileType = BitIOSocket;
+            BitO->FileType = FileType_Socket;
             FoundationIO_Socket_Connect(BitO->Socket, SocketAddress, SocketSize);
         } else if (BitO == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
         } else if (SocketAddress == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SocketAddress Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SocketAddress Pointer is NULL"));
         }
     }
     
     void BitOutput_Deinit(BitOutput *BitO) {
         if (BitO != NULL) {
             fflush(BitO->File);
-            if (BitO->FileType == BitIOFile) {
+            if (BitO->FileType == FileType_File) {
                 FoundationIO_File_Close(BitO->File);
-            } else if (BitO->FileType == BitIOSocket) {
+            } else if (BitO->FileType == FileType_Socket) {
                 FoundationIO_Socket_Close(BitO->Socket);
             }
             free(BitO);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
         }
     }
     /* BitOutput */
     
     /* GUUID */
-    uint8_t *GUUID_Generate(Entropy *Random, GUUIDTypes GUUIDType) {
+    uint8_t *GUUID_Generate(Entropy *Random, BitIO_GUUIDTypes GUUIDType) {
         uint8_t *GUUID                   = 0;
-        if (Random != NULL && GUUIDType != UnknownGUUID) {
+        if (Random != NULL && GUUIDType != GUUIDType_Unknown) {
             uint64_t LowBits             = Entropy_GenerateInteger(Random, 64);
             uint64_t HighBits            = Entropy_GenerateInteger(Random, 64);
-            uint8_t *BinaryGUUIDData     = (uint8_t*) calloc(BinaryGUUIDSize, sizeof(uint8_t));
+            uint8_t *BinaryGUUIDData     = (uint8_t*) calloc(BinaryGUUID_Size, sizeof(uint8_t));
             if (GUUID != NULL) {
-                for (uint8_t GUUIDByte = 0; GUUIDByte < BinaryGUUIDSize; GUUIDByte++) {
+                for (uint8_t GUUIDByte = 0; GUUIDByte < BinaryGUUID_Size; GUUIDByte++) {
                     if (GUUIDByte < 8) {
                         uint8_t Byte     = (LowBits  & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
                         BinaryGUUIDData[GUUIDByte] = Byte;
@@ -1134,66 +1137,66 @@ extern "C" {
                         BinaryGUUIDData[GUUIDByte] = Byte;
                     }
                 }
-                if (GUUIDType == GUIDString || GUUIDType == UUIDString) {
-                    GUUID                = GUUID_Convert(BinaryGUID, GUIDString, BinaryGUUIDData);
+                if (GUUIDType == GUUIDType_GUIDString || GUUIDType == GUUIDType_UUIDString) {
+                    GUUID                = GUUID_Convert(GUUIDType_BinaryGUID, GUUIDType_GUIDString, BinaryGUUIDData);
                 } else {
                     GUUID                = BinaryGUUIDData;
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate GUUID"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate GUUID"));
             }
         } else if (Random == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
-        } else if (GUUIDType == UnknownGUUID) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("UnknownGUUID is an invalid GUUIDType"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
+        } else if (GUUIDType == GUUIDType_Unknown) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("GUUIDType_Unknown is an invalid GUUIDType"));
         }
         return GUUID;
     }
     
-    bool GUUID_Compare(GUUIDTypes Type2Compare, uint8_t *GUUID1, uint8_t *GUUID2) {
-        uint8_t GUUIDSize       = ((Type2Compare == GUIDString || Type2Compare == UUIDString) ? BinaryGUUIDSize : BinaryGUUIDSize);
+    bool GUUID_Compare(BitIO_GUUIDTypes Type2Compare, uint8_t *GUUID1, uint8_t *GUUID2) {
+        uint8_t GUUIDSize       = ((Type2Compare == GUUIDType_GUIDString || Type2Compare == GUUIDType_UUIDString) ? BinaryGUUID_Size : BinaryGUUID_Size);
         bool GUUIDsMatch        = Yes;
-        if (GUUID1 != NULL && GUUID2 != NULL && Type2Compare != UnknownGUUID) {
+        if (GUUID1 != NULL && GUUID2 != NULL && Type2Compare != GUUIDType_Unknown) {
             for (uint8_t BinaryGUUIDByte = 0; BinaryGUUIDByte < GUUIDSize; BinaryGUUIDByte++) {
                 if (GUUID1[BinaryGUUIDByte] != GUUID2[BinaryGUUIDByte]) {
                     GUUIDsMatch = No;
                 }
             }
         } else if (GUUID1 == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("GUUID1 Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("GUUID1 Pointer is NULL"));
         } else if (GUUID2 == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("GUUID2 Pointer is NULL"));
-        } else if (Type2Compare == UnknownGUUID) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("UnknownGUUID is an invalid GUUID type"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("GUUID2 Pointer is NULL"));
+        } else if (Type2Compare == GUUIDType_Unknown) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("GUUIDType_Unknown is an invalid GUUID type"));
         }
         return GUUIDsMatch;
     }
     
-    uint8_t *GUUID_Convert(GUUIDTypes InputType, GUUIDTypes OutputType, uint8_t *GUUID2Convert) {
+    uint8_t *GUUID_Convert(BitIO_GUUIDTypes InputType, BitIO_GUUIDTypes OutputType, uint8_t *GUUID2Convert) {
         uint8_t  Dash = '-';
-        uint8_t  OutputGUUIDSize = ((OutputType == GUIDString || OutputType == UUIDString) ? GUUIDStringSize : BinaryGUUIDSize);
+        uint8_t  OutputGUUIDSize = ((OutputType == GUUIDType_GUIDString || OutputType == GUUIDType_UUIDString) ? GUUIDString_Size : BinaryGUUID_Size);
         uint8_t *ConvertedGUUID  = (uint8_t*) calloc(OutputGUUIDSize, sizeof(uint8_t));
-        if (ConvertedGUUID != NULL && GUUID2Convert != NULL && InputType != UnknownGUUID && OutputType != UnknownGUUID) {
-            bool ByteOrderDiffers = (((InputType == GUIDString && OutputType == UUIDString) || (InputType == UUIDString && OutputType == GUIDString) || (InputType == BinaryUUID && OutputType == BinaryGUID) || (InputType == BinaryGUID && OutputType == BinaryUUID)) ? Yes : No);
+        if (ConvertedGUUID != NULL && GUUID2Convert != NULL && InputType != GUUIDType_Unknown && OutputType != GUUIDType_Unknown) {
+            bool ByteOrderDiffers = (((InputType == GUUIDType_GUIDString && OutputType == GUUIDType_UUIDString) || (InputType == GUUIDType_UUIDString && OutputType == GUUIDType_GUIDString) || (InputType == GUUIDType_BinaryUUID && OutputType == GUUIDType_BinaryGUID) || (InputType == GUUIDType_BinaryGUID && OutputType == GUUIDType_BinaryUUID)) ? Yes : No);
             
-            bool TypeDiffers      = (((InputType == GUIDString && OutputType == BinaryGUID) || (InputType == BinaryGUID && OutputType == GUIDString) || (InputType == UUIDString && OutputType == BinaryUUID) || (InputType == BinaryUUID && OutputType == UUIDString)) ? Yes : No);
+            bool TypeDiffers      = (((InputType == GUUIDType_GUIDString && OutputType == GUUIDType_BinaryGUID) || (InputType == GUUIDType_BinaryGUID && OutputType == GUUIDType_GUIDString) || (InputType == GUUIDType_UUIDString && OutputType == GUUIDType_BinaryUUID) || (InputType == GUUIDType_BinaryUUID && OutputType == GUUIDType_UUIDString)) ? Yes : No);
             
             if (ByteOrderDiffers == Yes) {
                 GUUID_Swap(InputType, GUUID2Convert);
             }
             
             if (TypeDiffers == Yes) {
-                if ((InputType == UUIDString || InputType == GUIDString) && (OutputType == BinaryUUID || OutputType == BinaryGUID)) {
-                    for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize; StringByte++) {
-                        for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize; BinaryByte++) {
+                if ((InputType == GUUIDType_UUIDString || InputType == GUUIDType_GUIDString) && (OutputType == GUUIDType_BinaryUUID || OutputType == GUUIDType_BinaryGUID)) {
+                    for (uint8_t StringByte = 0; StringByte < BinaryGUUID_Size; StringByte++) {
+                        for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUID_Size; BinaryByte++) {
                             if (GUUID2Convert[StringByte] != Dash) {
                                 ConvertedGUUID[BinaryByte] = GUUID2Convert[StringByte];
                             }
                         }
                     }
-                } else if ((InputType == BinaryUUID || InputType == BinaryGUID) || (OutputType == UUIDString || OutputType == GUIDString)) {
-                    for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUIDSize; BinaryByte++) {
-                        for (uint8_t StringByte = 0; StringByte < BinaryGUUIDSize; StringByte++) {
+                } else if ((InputType == GUUIDType_BinaryUUID || InputType == GUUIDType_BinaryGUID) || (OutputType == GUUIDType_UUIDString || OutputType == GUUIDType_GUIDString)) {
+                    for (uint8_t BinaryByte = 0; BinaryByte < BinaryGUUID_Size; BinaryByte++) {
+                        for (uint8_t StringByte = 0; StringByte < BinaryGUUID_Size; StringByte++) {
                             if (BinaryByte != 4 && BinaryByte != 7 && BinaryByte != 10 && BinaryByte != 13) {
                                 ConvertedGUUID[StringByte]  = GUUID2Convert[BinaryByte];
                             } else {
@@ -1204,23 +1207,23 @@ extern "C" {
                 }
             }
         } else if (ConvertedGUUID == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Insufficent memory to allocate ConvertedGUUID"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Insufficent memory to allocate ConvertedGUUID"));
         } else if (GUUID2Convert == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("GUUID Pointer is NULL"));
-        } else if (InputType == UnknownGUUID) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("InputType is invalid"));
-        } else if (OutputType == UnknownGUUID) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("OutputType is invalid"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("GUUID Pointer is NULL"));
+        } else if (InputType == GUUIDType_Unknown) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("InputType is invalid"));
+        } else if (OutputType == GUUIDType_Unknown) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OutputType is invalid"));
         }
         return ConvertedGUUID;
     }
     
-    uint8_t *GUUID_Swap(GUUIDTypes GUUIDType, uint8_t *GUUID2Swap) {
+    uint8_t *GUUID_Swap(BitIO_GUUIDTypes GUUIDType, uint8_t *GUUID2Swap) {
         uint8_t *SwappedGUUID = NULL;
-        if (GUUID2Swap != NULL && GUUIDType != UnknownGUUID) {
+        if (GUUID2Swap != NULL && GUUIDType != GUUIDType_Unknown) {
             uint8_t Dash = '-';
-            if (GUUIDType == UUIDString || GUUIDType == GUIDString) {
-                SwappedGUUID          = (uint8_t*) calloc(BinaryGUUIDSize, sizeof(uint8_t));
+            if (GUUIDType == GUUIDType_UUIDString || GUUIDType == GUUIDType_GUIDString) {
+                SwappedGUUID          = (uint8_t*) calloc(BinaryGUUID_Size, sizeof(uint8_t));
                 if (SwappedGUUID != NULL) {
                     SwappedGUUID[0]   = GUUID2Swap[3];
                     SwappedGUUID[1]   = GUUID2Swap[2];
@@ -1244,14 +1247,14 @@ extern "C" {
                     
                     SwappedGUUID[13]  = Dash;
                     
-                    for (uint8_t EndBytes = 13; EndBytes < GUUIDStringSize; EndBytes++) {
+                    for (uint8_t EndBytes = 13; EndBytes < GUUIDString_Size; EndBytes++) {
                         SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
                     }
                 } else {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SwappedGUUID Pointer is NULL"));
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SwappedGUUID Pointer is NULL"));
                 }
-            } else if (GUUIDType == BinaryUUID || GUUIDType == BinaryGUID) {
-                SwappedGUUID          = (uint8_t*) calloc(BinaryGUUIDSize, sizeof(uint8_t));
+            } else if (GUUIDType == GUUIDType_BinaryUUID || GUUIDType == GUUIDType_BinaryGUID) {
+                SwappedGUUID          = (uint8_t*) calloc(BinaryGUUID_Size, sizeof(uint8_t));
                 if (SwappedGUUID != NULL) {
                     SwappedGUUID[0]   = GUUID2Swap[3];
                     SwappedGUUID[1]   = GUUID2Swap[2];
@@ -1266,17 +1269,17 @@ extern "C" {
                     
                     SwappedGUUID[8]   = GUUID2Swap[9];
                     SwappedGUUID[9]   = GUUID2Swap[8];
-                    for (uint8_t EndBytes = 10; EndBytes < BinaryGUUIDSize; EndBytes++) {
+                    for (uint8_t EndBytes = 10; EndBytes < BinaryGUUID_Size; EndBytes++) {
                         SwappedGUUID[EndBytes] = GUUID2Swap[EndBytes];
                     }
                 } else {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SwappedGUUID Pointer is NULL"));
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SwappedGUUID Pointer is NULL"));
                 }
             }
         } else if (GUUID2Swap == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("GUUID2Swap Pointer is NULL"));
-        } else if (GUUIDType == UnknownGUUID) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("UnknownGUUID is an invalid GUUID type"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("GUUID2Swap Pointer is NULL"));
+        } else if (GUUIDType == GUUIDType_Unknown) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("GUUIDType_Unknown is an invalid GUUID type"));
         }
         return SwappedGUUID;
     }
@@ -1288,6 +1291,6 @@ extern "C" {
     }
     /* GUUID */
     
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 }
 #endif

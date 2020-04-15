@@ -1,3 +1,4 @@
+#include "../include/Macros.h"
 #include "../include/TestIO.h"                   /* Included for our declarations */
 #include "../include/UnicodeIO/LogIO.h"          /* Included for error reporting */
 #include "../include/UnicodeIO/StringIO.h"       /* Included for UTFX_Init functions */
@@ -7,19 +8,19 @@
 #elif (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && ((FoundationIOTargetOS & FoundationIOAppleOS) == FoundationIOAppleOS))
 #include <mach/mach_time.h>
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-#ifndef   WIN32_LEAN_AND_MEAN
-#define   WIN32_LEAN_AND_MEAN
-#endif /* WIN32_LEAN_AND_MEAN */
-#ifndef   VC_EXTRALEAN
-#define   VC_EXTRALEAN
-#endif /* VC_EXTRALEAN */
-#include <Windows.h>                   /* Included for WinBase.h */
 #include <WinBase.h>                   /* Included for QueryPerformanceCounter, Windows.h MUST be included before winbase */
 #endif
 
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 extern "C" {
 #endif
+    
+    /*
+     Automatic Test Generation:
+     
+     Instrument the functions to see when and where branching occurs and to refine the randomly generated data
+     
+     */
     
     /*
      Automatic test registration:
@@ -120,7 +121,7 @@ extern "C" {
             UTF32  CodePointLow  = (UTF32) Entropy_GenerateIntegerInRange(Random, 0xE000, 0x10FFFF);
             CodePoint            = CodePointLow | CodePointHigh;
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
         }
         return CodePoint;
     }
@@ -134,14 +135,14 @@ extern "C" {
                     String[CodePoint] = UTF32_GenerateCodePoint(Random);
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate string with %llu CodePoints"), NumCodePoints);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate string with %llu CodePoints"), NumCodePoints);
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
         }
         return String;
     }
     
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 }
 #endif

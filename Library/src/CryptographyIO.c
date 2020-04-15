@@ -1,25 +1,18 @@
 #include "../include/BitIO.h"                /* Included for BitBuffer for CRC32 and Adler32 */
+#include "../include/Constants.h"            /* Included for BitMaskTables */
 #include "../include/CryptographyIO.h"       /* Included for our declarations */
 #include "../include/MathIO.h"               /* Included for Bits2Bytes, etc */
-#include "../include/Constants.h"            /* Included for BitMaskTables */
 #include "../include/UnicodeIO/LogIO.h"      /* Included for error logging */
 
 #if   (FoundationIOTargetOS == FoundationIOWindowsOS)
-#ifndef   WIN32_LEAN_AND_MEAN
-#define   WIN32_LEAN_AND_MEAN
-#endif /* WIN32_LEAN_AND_MEAN */
-#ifndef   VC_EXTRALEAN
-#define   VC_EXTRALEAN
-#endif /* VC_EXTRALEAN */
-#include <Windows.h>
 #include <BCrypt.h>
 #endif
 
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 extern "C" {
 #endif
     
-    typedef enum CryptographyIOConstants {
+    typedef enum CryptographyIO_Constants {
         MD5HashSize              = 128 / 8,
         AESTableSize             = 256,
         AESBlockSizeInBytes      = 16,
@@ -27,7 +20,7 @@ extern "C" {
         AES192Rounds             = 12,
         AES128Rounds             = 10,
         AESSubstitutionArraySize = 256,
-    } CryptographyIOConstants;
+    } CryptographyIO_Constants;
     
     static const uint8_t MD5BlockIndexTable[64] = {
         0,  1,  2,  3,  4,  5,  6,  7,
@@ -96,7 +89,7 @@ extern "C" {
             Hash->Hash[2] = 0x98BADCFE;
             Hash->Hash[3] = 0x10325476;
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate MD5"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate MD5"));
         }
         return Hash;
     }
@@ -159,7 +152,7 @@ extern "C" {
         if (MD5 != NULL) {
             
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("MD5 Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("MD5 Pointer is NULL"));
         }
         return Hash;
     }
@@ -175,9 +168,9 @@ extern "C" {
                 }
             }
         } else if (Hash1 == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Hash1 Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Hash1 Pointer is NULL"));
         } else if (Hash2 == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Hash2 Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Hash2 Pointer is NULL"));
         }
         return HashesMatch;
     }
@@ -208,7 +201,7 @@ extern "C" {
             FoundationIO_File_Close(RandomFile);
 #endif
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Can't return more than 8 bytes"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Can't return more than 8 bytes"));
         }
         return RandomValue;
     }
@@ -222,19 +215,19 @@ extern "C" {
                 FILE *RandomFile          = FoundationIO_File_Open(UTF8String("/dev/urandom"), UTF8String("rb"));
                 size_t BytesRead          = fread(Random->EntropyPool, Random->EntropySize, 1, RandomFile);
                 if (BytesRead != Random->EntropySize) {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Failed to read random data, Entropy is extremely insecure, aborting"));
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Failed to read random data, Entropy is extremely insecure, aborting"));
                 }
                 FoundationIO_File_Close(RandomFile);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
                 NTSTATUS Status           = BCryptGenRandom(NULL, Random->EntropyPool, Random->EntropySize, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
                 if (Status <= 0) {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Failed to read random data, Entropy is extremely insecure, aborting"));
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Failed to read random data, Entropy is extremely insecure, aborting"));
                     abort();
                 }
 #endif
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
         }
     }
     
@@ -276,7 +269,7 @@ extern "C" {
                 Random->EntropyPool[Word + 7] = (Rotated4 & 0x00000000000000FF) >> 0;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
         }
     }
     
@@ -302,15 +295,15 @@ extern "C" {
                     Random->BitOffset                += Bits2Get;
                 }
             } else {
-                Entropy_Erase(Random);
+                Entropy_Erase(Random, 0xFF);
                 Entropy_Seed(Random);
                 Entropy_Mix(Random);
                 Bits                                  = Entropy_ExtractBits(Random, NumBits);
             }
         } else if (Random == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
         } else if (NumBits == 0) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Reading zero bits does not make sense"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Reading zero bits does not make sense"));
         }
         return Bits;
     }
@@ -326,10 +319,10 @@ extern "C" {
                 Entropy_Mix(Random);
             } else {
                 Entropy_Deinit(Random);
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate EntropyPool"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate EntropyPool"));
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate Entropy"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate Entropy"));
         }
         return Random;
     }
@@ -339,7 +332,7 @@ extern "C" {
         if (Random != NULL) {
             RemainingBits      = Random->EntropySize - Random->BitOffset;
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
         }
         return RemainingBits;
     }
@@ -349,11 +342,11 @@ extern "C" {
         if (Random != NULL && NumBits >= 1 && NumBits <= 64) {
             GeneratedInteger     = Entropy_ExtractBits(Random, NumBits);
         } else if (Random == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
         } else if (NumBits == 0) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Generating an integer 0 bits long is invalid"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Generating an integer 0 bits long is invalid"));
         } else if (NumBits > 64) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Generating an integer %u bits long is invalid"), NumBits);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Generating an integer %u bits long is invalid"), NumBits);
         }
         return GeneratedInteger;
     }
@@ -375,9 +368,9 @@ extern "C" {
                 }
             }
         } else if (Random == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
         } else if (MinValue > MaxValue) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("MinValud %lld is greater than MaxValue %lld"), MinValue, MaxValue);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("MinValud %lld is greater than MaxValue %lld"), MinValue, MaxValue);
         }
         return RandomInteger;
     }
@@ -393,20 +386,23 @@ extern "C" {
             Decimal           = InsertExponentD(Decimal, Exponent);
             Decimal           = InsertMantissaD(Decimal, Mantissa);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
         }
         return Decimal;
     }
     
-    void Entropy_Erase(Entropy *Random) {
+    uint8_t Entropy_Erase(Entropy *Random, uint8_t NewValue) {
+        uint8_t Verification = 0xFE;
         if (Random != NULL) {
             for (uint64_t Byte = 0ULL; Byte < Random->EntropySize; Byte++) {
-                Random->EntropyPool[Byte] = 0;
+                Random->EntropyPool[Byte] = NewValue;
             }
-            Random->BitOffset             = 0;
+            Random->BitOffset             = NewValue;
+            Verification = Random->EntropyPool[0] & 0xFF;
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Entropy Pointer is NULL"));
         }
+        return Verification;
     }
     
     void Entropy_Deinit(Entropy *Random) {
@@ -423,18 +419,18 @@ extern "C" {
             uint16_t B = 0;
             
             for (uint64_t Byte = Start; Byte < NumBytes - 1; Byte++) {
-                uint8_t Value = BitBuffer_ReadBits(BitB, MSByteFirst, LSBitFirst, 8);
+                uint8_t Value = BitBuffer_ReadBits(BitB, BitIO_ByteOrder_MSByte, BitIO_BitOrder_LSBit, 8);
                 A = (A + Value) % 65521;
                 B = (B + A)     % 65521;
             }
             
             Output = (B << 16) | A;
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (Start * 8 < BitBuffer_GetSize(BitB)) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Start: %lld is larger than the BitBuffer %lld"), Start * 8, BitBuffer_GetSize(BitB));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Start: %lld is larger than the BitBuffer %lld"), Start * 8, BitBuffer_GetSize(BitB));
         } else if ((Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("End: %lld is larger than the BitBuffer %lld"), (Start + NumBytes) * 8, BitBuffer_GetSize(BitB));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("End: %lld is larger than the BitBuffer %lld"), (Start + NumBytes) * 8, BitBuffer_GetSize(BitB));
         }
         return Output;
     }
@@ -444,7 +440,7 @@ extern "C" {
         if (BitB != NULL && Start * 8 < BitBuffer_GetSize(BitB) && (Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
             for (uint64_t Byte = Start; Byte < NumBytes - 1; Byte++) {
                 uint32_t Polynomial = 0x82608EDB;
-                uint8_t  Data       = BitBuffer_ReadBits(BitB, MSByteFirst, LSBitFirst, 8);
+                uint8_t  Data       = BitBuffer_ReadBits(BitB, BitIO_ByteOrder_MSByte, BitIO_BitOrder_LSBit, 8);
                 
                 Output               ^= Data;
                 for (uint8_t Bit = 0; Bit < 8; Bit++) {
@@ -456,11 +452,11 @@ extern "C" {
                 }
             }
         } else if (BitB == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (Start * 8 < BitBuffer_GetSize(BitB)) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Start: %lld is larger than the BitBuffer %lld"), Start * 8, BitBuffer_GetSize(BitB));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Start: %lld is larger than the BitBuffer %lld"), Start * 8, BitBuffer_GetSize(BitB));
         } else if ((Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("End: %lld is larger than the BitBuffer %lld"), (Start + NumBytes) * 8, BitBuffer_GetSize(BitB));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("End: %lld is larger than the BitBuffer %lld"), (Start + NumBytes) * 8, BitBuffer_GetSize(BitB));
         }
         return ~Output;
     }

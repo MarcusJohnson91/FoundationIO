@@ -1,11 +1,11 @@
-#include "../../include/MathIO.h"                          /* Included for endian swapping */
 #include "../../include/Constants.h"                       /* Included for Integer/Decimal Tables */
+#include "../../include/MathIO.h"                          /* Included for endian swapping */
 #include "../../include/UnicodeIO/FormatIO.h"              /* Included for the String formatting code */
 #include "../../include/UnicodeIO/LogIO.h"                 /* Included for error logging */
-#include "../../include/UnicodeIO/Private/UnicodeTables.h" /* Included for the Unicode tables */
+#include "../../include/UnicodeIO/Private/UnicodeTables.h"   /* Included for the Unicode tables */
 #include "../../include/UnicodeIO/StringIO.h"              /* Included for our declarations */
 
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 extern "C" {
 #endif
     
@@ -13,7 +13,7 @@ extern "C" {
         UTF8 *String = NULL;
         String       = (UTF8*) calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
         if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF8)) + FoundationIONULLTerminatorSize);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF8)) + FoundationIONULLTerminatorSize);
         }
         return String;
     }
@@ -22,7 +22,7 @@ extern "C" {
         UTF16 *String = NULL;
         String        = (UTF16*) calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF16));
         if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF16)) + FoundationIONULLTerminatorSize);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF16)) + FoundationIONULLTerminatorSize);
         }
         return String;
     }
@@ -31,7 +31,7 @@ extern "C" {
         UTF32 *String = NULL;
         String        = (UTF32*) calloc(NumCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
         if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodePoints * sizeof(UTF32)) + FoundationIONULLTerminatorSize);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodePoints * sizeof(UTF32)) + FoundationIONULLTerminatorSize);
         }
         return String;
     }
@@ -42,7 +42,7 @@ extern "C" {
                 String[CodeUnit] = Value;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
@@ -52,7 +52,7 @@ extern "C" {
                 String[CodeUnit] = Value;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
@@ -62,7 +62,7 @@ extern "C" {
                 String[CodePoint] = Value;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
@@ -131,28 +131,9 @@ extern "C" {
                     break;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodeUnits Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CodeUnits Pointer is NULL"));
         }
         return CodePoint;
-    }
-    
-    uint64_t UTF8_GetGraphemeSizeInCodeUnits(UTF8 *String, uint64_t OffsetInCodeUnits) {
-        uint64_t GraphemeSize         = 1ULL;
-        if (String != NULL) {
-            uint64_t CodeUnit         = OffsetInCodeUnits;
-            while (String[CodeUnit] != FoundationIONULLTerminator) {
-                UTF32 CodePoint1      = UTF8_DecodeCodePoint(&String[CodeUnit]);
-                for (uint64_t GraphemeExt = 0ULL; GraphemeExt < GraphemeExtensionTableSize; GraphemeExt++) {
-                    if (CodePoint1 == GraphemeExtensionTable[GraphemeExt]) {
-                        GraphemeSize += 1;
-                        CodeUnit     += 1;
-                    }
-                }
-            }
-        } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
-        }
-        return GraphemeSize;
     }
     
     UTF32 UTF16_DecodeCodePoint(UTF16 *CodeUnits) {
@@ -172,9 +153,28 @@ extern "C" {
                     break;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodeUnits Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CodeUnits Pointer is NULL"));
         }
         return CodePoint;
+    }
+    
+    uint64_t UTF8_GetGraphemeSizeInCodeUnits(UTF8 *String, uint64_t OffsetInCodeUnits) {
+        uint64_t GraphemeSize         = 1ULL;
+        if (String != NULL) {
+            uint64_t CodeUnit         = OffsetInCodeUnits;
+            while (String[CodeUnit] != FoundationIONULLTerminator) {
+                UTF32 CodePoint1      = UTF8_DecodeCodePoint(&String[CodeUnit]);
+                for (uint64_t GraphemeExt = 0ULL; GraphemeExt < GraphemeExtensionTableSize; GraphemeExt++) {
+                    if (CodePoint1 == GraphemeExtensionTable[GraphemeExt]) {
+                        GraphemeSize += 1;
+                        CodeUnit     += 1;
+                    }
+                }
+            }
+        } else {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+        }
+        return GraphemeSize;
     }
     
     uint64_t UTF16_GetGraphemeSizeInCodeUnits(UTF16 *String, uint64_t OffsetInCodeUnits) {
@@ -198,7 +198,7 @@ extern "C" {
             }
             free(CodeUnits);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return GraphemeSize;
     }
@@ -216,7 +216,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumCodePoints;
     }
@@ -228,7 +228,7 @@ extern "C" {
                 StringSizeInCodeUnits += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringSizeInCodeUnits;
     }
@@ -240,7 +240,7 @@ extern "C" {
                 StringSizeInCodeUnits += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringSizeInCodeUnits;
     }
@@ -262,7 +262,7 @@ extern "C" {
                 CodePoint            += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return UTF8CodeUnits;
     }
@@ -280,7 +280,7 @@ extern "C" {
                 CodePoint          += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return UTF16CodeUnits;
     }
@@ -294,7 +294,7 @@ extern "C" {
                 CodeUnit               += UTF8_GetCodePointSizeInCodeUnits(String[CodeUnit]);
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringSizeInCodePoints;
     }
@@ -313,7 +313,7 @@ extern "C" {
                 CodeUnit                  += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumCodePoints;
     }
@@ -325,7 +325,7 @@ extern "C" {
                 NumCodePoints += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumCodePoints;
     }
@@ -337,7 +337,7 @@ extern "C" {
             NumGraphemes       = UTF32_GetStringSizeInGraphemes(Decoded);
             UTF32_Deinit(Decoded);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumGraphemes;
     }
@@ -349,7 +349,7 @@ extern "C" {
             NumGraphemes       = UTF32_GetStringSizeInGraphemes(Decoded);
             UTF32_Deinit(Decoded);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumGraphemes;
     }
@@ -387,9 +387,71 @@ extern "C" {
                 CodePoint            += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumGraphemes;
+    }
+    
+    uint64_t UTF8_GetWordSizeInCodePoints(UTF8 *String, uint64_t OffsetInCodeUnits) {
+        uint64_t WordSize = 0ULL;
+        if (String != NULL) {
+            
+        } else {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+        }
+        return WordSize;
+    }
+    
+    uint64_t UTF16_GetWordSizeInCodePoints(UTF16 *String, uint64_t OffsetInCodeUnits) {
+        uint64_t WordSize = 0ULL;
+        if (String != NULL) {
+            
+        } else {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+        }
+        return WordSize;
+    }
+    
+    static bool CodePointIsLineBreak(UTF32 *String) {
+        bool IsWordBreak = No;
+        if (String != NULL) { // Also checks String[CodePoint] implicitly
+            uint64_t CodePoint = 0ULL;
+            while (String[CodePoint] != FoundationIONULLTerminator) {
+                if (String[CodePoint] == UTF32Character('\r') || String[CodePoint] == UTF32Character('\n')) {
+                    
+                }
+                CodePoint += 1;
+            }
+        }
+        // How do we handle CR+LF?
+        return IsWordBreak;
+    }
+    
+    
+    /*
+     
+     Break API:
+     
+     We have a string: "Hi, I'm a string!"
+     
+     What properties do we want to get from this string?
+     
+     The number of CodeUnits, CodePoints, Graphemes, Words, Lines/Sentences, Paragraphs?, and the number of CodeUnits, CodePoints, and Graphemes in each Word, Line/Sentence, Paragraph
+     
+     We can get the size of Words, Sentences, Paragraphs in CodeUnits, CodePoints, Graphemes with the normal functions, all we have to do is find the Size of the Word, Sentence, Paragraph first so it can be split or at least indexed.
+     
+     Should Words include punctuation, or should punctuation be it's own word?
+     
+     */
+    
+    uint64_t UTF32_GetWordSizeInCodePoints(UTF32 *String, uint64_t OffsetInCodeUnits) {
+        uint64_t WordSize = 0ULL;
+        if (String != NULL) {
+            
+        } else {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+        }
+        return WordSize;
     }
     
     UTF8 *UTF8_ExtractCodePoint(UTF8 *String, uint64_t Offset, uint64_t StringSize) {
@@ -404,12 +466,12 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodePoint is %u bytes, which is larger than StringSize: %llu at Offset: %llu"), CodePointSize, StringSize, Offset);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CodePoint is %u bytes, which is larger than StringSize: %llu at Offset: %llu"), CodePointSize, StringSize, Offset);
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Offset > StringSize) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
         }
         return CodeUnits;
     }
@@ -426,12 +488,12 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodePoint is %u bytes, which is larger than StringSize: %llu at Offset: %llu"), CodePointSize, StringSize, Offset);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CodePoint is %u bytes, which is larger than StringSize: %llu at Offset: %llu"), CodePointSize, StringSize, Offset);
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Offset > StringSize) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
         }
         return CodeUnits;
     }
@@ -445,12 +507,12 @@ extern "C" {
                     CodePoint[0] = String[Offset];
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodePoint is %lu bytes, which is larger than StringSize: %llu at Offset: %llu"), sizeof(UTF32), StringSize, Offset);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CodePoint is %lu bytes, which is larger than StringSize: %llu at Offset: %llu"), sizeof(UTF32), StringSize, Offset);
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Offset > StringSize) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
         }
         return CodePoint;
     }
@@ -464,7 +526,7 @@ extern "C" {
             Grapheme          = UTF8_Encode(Grapheme32);
             free(Grapheme32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Grapheme;
     }
@@ -478,25 +540,25 @@ extern "C" {
             Grapheme          = UTF16_Encode(Grapheme32);
             free(Grapheme32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Grapheme;
     }
     
-    UTF32 *UTF32_ExtractGrapheme(UTF32 *String, uint64_t Grapheme2Extract) {
+    UTF32 *UTF32_ExtractGrapheme(UTF32 *String, uint64_t GraphemeIndex) {
         UTF32 *Grapheme                    = NULL;
         if (String != NULL) {
             uint64_t NumCodePointsInString = UTF32_GetStringSizeInCodePoints(String);
             uint64_t NumGraphemesInString  = UTF32_GetStringSizeInGraphemes(String);
             uint64_t CurrentGrapheme       = 0ULL;
             uint64_t CodePointStart        = 0ULL;
-            if (Grapheme2Extract < NumGraphemesInString) {
+            if (GraphemeIndex < NumGraphemesInString) {
                 for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePointsInString; CodePoint++) {
                     for (uint64_t GraphemeCodePoint = 0ULL; GraphemeCodePoint < GraphemeExtensionTableSize; GraphemeCodePoint++) {
                         if (String[CodePoint] == GraphemeExtensionTable[GraphemeCodePoint]) {
                             CurrentGrapheme                         += 1;
                         }
-                        if (CurrentGrapheme == Grapheme2Extract) {
+                        if (CurrentGrapheme == GraphemeIndex) {
                             CodePointStart                           = CodePoint;
                             break;
                         }
@@ -518,13 +580,13 @@ extern "C" {
                         Grapheme[GraphemeCodePoint - CodePointStart] = String[GraphemeCodePoint];
                     }
                 } else {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate %llu CodePoints for the Grapheme"), GraphemeSizeInCodePoints);
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate %llu CodePoints for the Grapheme"), GraphemeSizeInCodePoints);
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Grapheme %llu is greater than there are Graphemes %llu"), Grapheme2Extract, NumGraphemesInString);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Grapheme %llu is greater than there are Graphemes %llu"), GraphemeIndex, NumGraphemesInString);
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Grapheme;
     }
@@ -539,7 +601,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringHasABOM;
     }
@@ -551,7 +613,7 @@ extern "C" {
                 StringHasABOM = Yes;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringHasABOM;
     }
@@ -563,7 +625,7 @@ extern "C" {
                 StringHasABOM = Yes;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringHasABOM;
     }
@@ -597,7 +659,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringIsUNCPath;
     }
@@ -631,7 +693,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringIsUNCPath;
     }
@@ -666,7 +728,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringIsUNCPath;
     }
@@ -687,7 +749,7 @@ extern "C" {
             }
 #endif
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return PathIsAbsolute;
     }
@@ -708,7 +770,7 @@ extern "C" {
             }
 #endif
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return PathIsAbsolute;
     }
@@ -729,7 +791,7 @@ extern "C" {
             }
 #endif
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return PathIsAbsolute;
     }
@@ -741,7 +803,7 @@ extern "C" {
             StringHasNewLine  = UTF32_HasNewLine(String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringHasNewLine;
     }
@@ -753,7 +815,7 @@ extern "C" {
             StringHasNewLine  = UTF32_HasNewLine(String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringHasNewLine;
     }
@@ -775,7 +837,7 @@ extern "C" {
                 CodePoint               += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringHasNewLine;
     }
@@ -797,7 +859,7 @@ extern "C" {
                 CodeUnit += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return IsValidUTF8;
     }
@@ -814,7 +876,7 @@ extern "C" {
                 CodeUnit += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return IsValidUTF16;
     }
@@ -831,7 +893,7 @@ extern "C" {
                 CodePoint       += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return IsValidUTF32;
     }
@@ -840,16 +902,16 @@ extern "C" {
         UTF8 *StringWithBOM = NULL;
         if (String != NULL) {
             UTF32 *String32  = UTF8_Decode(String);
-            UTF32 *BOMAdded  = UTF32_AddBOM(String32, ByteOrder_Big);
+            UTF32 *BOMAdded  = UTF32_AddBOM(String32, StringIO_ByteOrder_Big);
             free(String32);
             StringWithBOM    = UTF8_Encode(BOMAdded);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringWithBOM;
     }
     
-    UTF16 *UTF16_AddBOM(UTF16 *String, StringIOByteOrders BOM2Add) {
+    UTF16 *UTF16_AddBOM(UTF16 *String, StringIO_ByteOrders BOM2Add) {
         UTF16 *StringWithBOM = NULL;
         if (String != NULL) {
             UTF32 *String32  = UTF16_Decode(String);
@@ -857,12 +919,12 @@ extern "C" {
             StringWithBOM    = UTF16_Encode(BOMAdded);
             free(String32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringWithBOM;
     }
     
-    UTF32 *UTF32_AddBOM(UTF32 *String, StringIOByteOrders BOM2Add) {
+    UTF32 *UTF32_AddBOM(UTF32 *String, StringIO_ByteOrders BOM2Add) {
         UTF32   *StringWithBOM        = NULL;
         UTF32    ByteOrder            = 0;
         if (String != NULL) {
@@ -870,15 +932,15 @@ extern "C" {
                 uint64_t StringSize   = UTF32_GetStringSizeInCodePoints(String);
                 StringWithBOM         = UTF32_Init(StringSize + UnicodeBOMSizeInCodePoints);
                 if (StringWithBOM != NULL) {
-                    if (BOM2Add == ByteOrder_Native) {
+                    if (BOM2Add == StringIO_ByteOrder_Native) {
 #if   (FoundationIOTargetByteOrder == FoundationIOByteOrderLE)
                         ByteOrder     = UTF32BOM_LE;
 #elif (FoundationIOTargetByteOrder == FoundationIOByteOrderBE)
                         ByteOrder     = UTF32BOM_BE;
 #endif
-                    } else if (BOM2Add == ByteOrder_Little) {
+                    } else if (BOM2Add == StringIO_ByteOrder_Little) {
                         ByteOrder     = UTF32BOM_LE;
-                    } else if (BOM2Add == ByteOrder_Big) {
+                    } else if (BOM2Add == StringIO_ByteOrder_Big) {
                         ByteOrder     = UTF32BOM_BE;
                     }
                     StringWithBOM[0] = ByteOrder;
@@ -886,11 +948,11 @@ extern "C" {
                         StringWithBOM[CodePoint] = String[CodePoint + 1];
                     }
                 } else {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringWithBOM couldn't be allocated"));
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringWithBOM couldn't be allocated"));
                 }
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringWithBOM;
     }
@@ -908,11 +970,11 @@ extern "C" {
                         BOMLessString[CodeUnit - 3] = String[CodeUnit];
                     }
                 } else {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BOMLessString"));
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BOMLessString"));
                 }
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return BOMLessString;
     }
@@ -930,11 +992,11 @@ extern "C" {
                         BOMLessString[CodeUnit - 1] = String[CodeUnit];
                     }
                 } else {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BOMLessString"));
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BOMLessString"));
                 }
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return BOMLessString;
     }
@@ -952,11 +1014,11 @@ extern "C" {
                         BOMLessString[CodePoint] = String[CodePoint + 1];
                     }
                 } else {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BOMLessString"));
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate BOMLessString"));
                 }
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return BOMLessString;
     }
@@ -973,46 +1035,46 @@ extern "C" {
                     CodeUnit                        += UTF8_GetCodePointSizeInCodeUnits(String[CodePoint]);
                 }
             } else if (DecodedString == NULL) {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate DecodedString"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate DecodedString"));
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return DecodedString;
     }
     
-    static StringIOByteOrders UTF16_GetByteOrder(UTF16 CodeUnit) {
-        StringIOByteOrders ByteOrder = ByteOrder_Unknown;
+    StringIO_ByteOrders UTF16_GetByteOrder(UTF16 CodeUnit) {
+        StringIO_ByteOrders ByteOrder = StringIO_ByteOrder_Unknown;
         if (CodeUnit == UTF16BOM_LE) {
-            ByteOrder                = ByteOrder_Little;
+            ByteOrder                = StringIO_ByteOrder_Little;
         } else if (CodeUnit == UTF16BOM_BE) {
-            ByteOrder                = ByteOrder_Big;
+            ByteOrder                = StringIO_ByteOrder_Big;
         } else { // Heuristic (aka guess) mode
             uint8_t NumBitsInByte0   = CountBitsSet(CodeUnit & 0xFF);
             uint8_t NumBitsInByte1   = CountBitsSet((CodeUnit & 0xFF00) >> 8);
             if (NumBitsInByte0 >= NumBitsInByte1) {
-                ByteOrder            = ByteOrder_Little;
+                ByteOrder            = StringIO_ByteOrder_Little;
             } else {
-                ByteOrder            = ByteOrder_Big;
+                ByteOrder            = StringIO_ByteOrder_Big;
             }
         }
         return ByteOrder;
     }
     
-    static StringIOByteOrders UTF32_GetByteOrder(UTF32 CodeUnit) {
-        StringIOByteOrders ByteOrder = ByteOrder_Unknown;
+    StringIO_ByteOrders UTF32_GetByteOrder(UTF32 CodeUnit) {
+        StringIO_ByteOrders ByteOrder = StringIO_ByteOrder_Unknown;
         if (CodeUnit == UTF32BOM_LE) {
-            ByteOrder                = ByteOrder_Little;
+            ByteOrder                = StringIO_ByteOrder_Little;
         } else if (CodeUnit == UTF32BOM_BE) {
-            ByteOrder                = ByteOrder_Big;
+            ByteOrder                = StringIO_ByteOrder_Big;
         } else { // Heuristic (aka guess) mode
             uint8_t NumBitsInByte0   = CountBitsSet(CodeUnit & 0x000000FF);
             uint8_t NumBitsInByte1   = CountBitsSet((CodeUnit & 0x0000FF00) >> 8);
             uint8_t NumBitsInByte2   = CountBitsSet((CodeUnit & 0x00FF0000) >> 16);
             if (NumBitsInByte0 >= NumBitsInByte1 && NumBitsInByte2 >= NumBitsInByte0) {
-                ByteOrder            = ByteOrder_Big;
+                ByteOrder            = StringIO_ByteOrder_Big;
             } else {
-                ByteOrder            = ByteOrder_Little;
+                ByteOrder            = StringIO_ByteOrder_Little;
             }
         }
         return ByteOrder;
@@ -1030,12 +1092,20 @@ extern "C" {
                     CodeUnit                        += UTF16_GetCodePointSizeInCodeUnits(String[CodeUnit]);
                 }
             } else if (DecodedString == NULL) {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate DecodedString"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate DecodedString"));
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return DecodedString;
+    }
+    
+    static void UTF8_EncodeCodePoint(UTF32 CodePoint2Encode, UTF8 *String) {
+        if (String != NULL) {
+            
+        } else {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+        }
     }
     
     UTF8 *UTF8_Encode(UTF32 *String) {
@@ -1072,10 +1142,10 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Encoded Pointer is NULL"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Encoded Pointer is NULL"));
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return EncodedString;
     }
@@ -1104,10 +1174,10 @@ extern "C" {
                     CodePoint                       += 1;
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Encoded Pointer is NULL"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Encoded Pointer is NULL"));
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return EncodedString;
     }
@@ -1115,11 +1185,12 @@ extern "C" {
     UTF8 *UTF16_Convert(UTF16 *String) {
         UTF8 *String8       = NULL;
         if (String != NULL) {
+            // 0x3FF = UTF32_GetStringSizeInUTF8CodeUnits
             UTF32 *String32 = UTF16_Decode(String);
             String8         = UTF8_Encode(String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return String8;
     }
@@ -1131,7 +1202,7 @@ extern "C" {
             String16        = UTF16_Encode(String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return String16;
     }
@@ -1146,10 +1217,10 @@ extern "C" {
                     Copy[CodeUnit] = String[CodeUnit];
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Copy Pointer is NULL"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Copy Pointer is NULL"));
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Copy;
     }
@@ -1164,10 +1235,10 @@ extern "C" {
                     Copy[CodeUnit] = String[CodeUnit];
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Copy Pointer is NULL"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Copy Pointer is NULL"));
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Copy;
     }
@@ -1182,45 +1253,54 @@ extern "C" {
                     Copy[CodePoint] = String[CodePoint];
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Copy Pointer is NULL"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Copy Pointer is NULL"));
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Copy;
     }
     
-    void UTF8_Erase(UTF8 *String) {
+    UTF8 UTF8_Erase(UTF8 *String, UTF8 NewValue) {
+      UTF8 Verification = 0xFE;
         if (String != NULL) {
             uint64_t StringSize  = UTF8_GetStringSizeInCodePoints(String);
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                String[CodeUnit] = 0;
+                String[CodeUnit] = NewValue;
             }
+            Verification         = String[0];
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
+      return Verification;
     }
     
-    void UTF16_Erase(UTF16 *String) {
+    UTF16 UTF16_Erase(UTF16 *String, UTF16 NewValue) {
+        UTF16 Verification = 0xFE;
         if (String != NULL) {
             uint64_t StringSize  = UTF16_GetStringSizeInCodePoints(String);
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                String[CodeUnit] = 0;
+                String[CodeUnit] = NewValue;
             }
+            Verification = String[0];
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
+        return Verification;
     }
     
-    void UTF32_Erase(UTF32 *String) {
+    UTF32 UTF32_Erase(UTF32 *String, UTF32 NewValue) {
+        UTF32 Verification = 0xFE;
         if (String != NULL) {
             uint64_t StringSize  = UTF32_GetStringSizeInCodePoints(String);
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                String[CodeUnit] = 0;
+                String[CodeUnit] = NewValue;
             }
+            Verification = String[0];
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
+        return Verification;
     }
     
     UTF8 *UTF8_Truncate(UTF8 *String, uint64_t NumGraphemes) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
@@ -1232,7 +1312,7 @@ extern "C" {
             Truncated          = UTF8_Encode(Truncated32);
             free(Truncated32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Truncated;
     }
@@ -1246,7 +1326,7 @@ extern "C" {
             Truncated          = UTF16_Encode(Truncated32);
             free(Truncated32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Truncated;
     }
@@ -1266,13 +1346,13 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Truncated;
     }
     
-    static StringIOStringTypes StringIO_GetStreamOrientation(FILE *File) {
-        StringIOStringTypes StringType = StringType_Unknown;
+    static FoundationIO_StringTypes StringIO_GetStreamOrientation(FILE *File) {
+        FoundationIO_StringTypes StringType = StringType_Unknown;
         int Orientation                = fwide(File, 0);
         if (Orientation < 0) {
             StringType                 = StringType_UTF8;
@@ -1308,7 +1388,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
         return Grapheme;
     }
@@ -1322,7 +1402,7 @@ extern "C" {
             CodePoint             = UTF16_Init(CodePointSize);
             fread(CodePoint, CodePointSize, 1, Source);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
         return CodePoint;
     }
@@ -1332,10 +1412,10 @@ extern "C" {
             uint64_t StringSize       = UTF8_GetStringSizeInCodeUnits(CodePoint);
             uint64_t CodeUnitsWritten = FoundationIO_File_Write(CodePoint, sizeof(UTF8), StringSize, Source);
             if (CodeUnitsWritten != StringSize) {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodeUnitsWritten %llu does not match the size of the string %llu"), CodeUnitsWritten, StringSize);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CodeUnitsWritten %llu does not match the size of the string %llu"), CodeUnitsWritten, StringSize);
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
     }
     
@@ -1344,10 +1424,10 @@ extern "C" {
             uint64_t StringSize       = UTF16_GetStringSizeInCodeUnits(CodePoint);
             uint64_t CodeUnitsWritten = FoundationIO_File_Write(CodePoint, sizeof(UTF16), StringSize, Source);
             if (CodeUnitsWritten != StringSize) {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("CodeUnitsWritten %llu does not match the size of the string %llu"), CodeUnitsWritten, StringSize);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CodeUnitsWritten %llu does not match the size of the string %llu"), CodeUnitsWritten, StringSize);
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
     }
     
@@ -1364,7 +1444,7 @@ extern "C" {
             }
             Line                            = UTF8_Init(StringSizeInCodeUnits);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
         return Line;
     }
@@ -1382,24 +1462,24 @@ extern "C" {
             }
             Line                            = UTF16_Init(StringSizeInCodeUnits);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
         return Line;
     }
     
     void UTF8_WriteLine(FILE *OutputFile, UTF8 *String) {
         if (String != NULL && OutputFile != NULL) {
-            StringIOStringTypes Type   = StringIO_GetStreamOrientation(OutputFile);
-            uint64_t StringSize        = UTF8_GetStringSizeInCodeUnits(String);
-            uint64_t CodeUnitsWritten  = 0ULL;
-            bool     StringHasNewLine  = UTF8_HasNewLine(String);
+            FoundationIO_StringTypes Type = StringIO_GetStreamOrientation(OutputFile);
+            uint64_t StringSize           = UTF8_GetStringSizeInCodeUnits(String);
+            uint64_t CodeUnitsWritten     = 0ULL;
+            bool     StringHasNewLine     = UTF8_HasNewLine(String);
             if (Type == StringType_UTF8) {
                 CodeUnitsWritten       = FoundationIO_File_Write(String, sizeof(UTF8), StringSize, OutputFile);
                 if (StringHasNewLine == No) {
                     fwrite(FoundationIONewLine8, FoundationIONewLine8Size, 1, OutputFile);
                 }
                 if (CodeUnitsWritten != StringSize) {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             } else if (Type == StringType_UTF16) {
                 UTF32 *String32        = UTF8_Decode(String);
@@ -1411,19 +1491,19 @@ extern "C" {
                     fwrite(FoundationIONewLine16, FoundationIONewLine16Size, 1, OutputFile);
                 }
                 if (CodeUnitsWritten != StringSize) {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (OutputFile == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
     }
     
     void UTF16_WriteLine(FILE *OutputFile, UTF16 *String) {
         if (String != NULL && OutputFile != NULL) {
-            StringIOStringTypes Type   = StringIO_GetStreamOrientation(OutputFile);
+            FoundationIO_StringTypes Type   = StringIO_GetStreamOrientation(OutputFile);
             uint64_t StringSize        = UTF16_GetStringSizeInCodeUnits(String);
             uint64_t CodeUnitsWritten  = 0ULL;
             bool     StringHasNewLine  = UTF16_HasNewLine(String);
@@ -1433,7 +1513,7 @@ extern "C" {
                     fwrite(FoundationIONewLine16, FoundationIONewLine16Size, 1, OutputFile);
                 }
                 if (CodeUnitsWritten != StringSize) {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             } else if (Type == StringType_UTF8) {
                 UTF32 *String32        = UTF16_Decode(String);
@@ -1445,13 +1525,13 @@ extern "C" {
                     fwrite(FoundationIONewLine16, FoundationIONewLine16Size, 1, OutputFile);
                 }
                 if (CodeUnitsWritten != StringSize) {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (OutputFile == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("FILE Pointer is NULL"));
         }
     }
     
@@ -1464,7 +1544,7 @@ extern "C" {
             Reversed          = UTF8_Encode(Reversed32);
             free(Reversed32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Reversed;
     }
@@ -1478,7 +1558,7 @@ extern "C" {
             Reversed          = UTF16_Encode(Reversed32);
             free(Reversed32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Reversed;
     }
@@ -1494,7 +1574,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Reverse;
     }
@@ -1508,9 +1588,9 @@ extern "C" {
             free(String32);
             free(SubString32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (SubString == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SubString Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SubString Pointer is NULL"));
         }
         return FoundOffset;
     }
@@ -1524,9 +1604,9 @@ extern "C" {
             free(String32);
             free(SubString32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (SubString == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SubString Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SubString Pointer is NULL"));
         }
         return FoundOffset;
     }
@@ -1544,11 +1624,11 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (SubString == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SubString Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SubString Pointer is NULL"));
         } else if (Length >= 1 && StringSize < Offset + Length) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu + Length %lld is larger than String %llu"), Offset, Length, StringSize);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu + Length %lld is larger than String %llu"), Offset, Length, StringSize);
         }
         return MatchingOffset;
     }
@@ -1562,7 +1642,7 @@ extern "C" {
             free(String32);
             free(Extracted32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return ExtractedSubString;
     }
@@ -1576,7 +1656,7 @@ extern "C" {
             free(String32);
             free(Extracted32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return ExtractedSubString;
     }
@@ -1591,12 +1671,12 @@ extern "C" {
                     ExtractedString[CodePoint - Offset] = String[CodePoint];
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate ExtractedString"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate ExtractedString"));
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (StringSize < Length + Offset) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu + Length %lld is larger than String %llu"), Length, Offset, StringSize);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu + Length %lld is larger than String %llu"), Length, Offset, StringSize);
         }
         return ExtractedString;
     }
@@ -1611,9 +1691,9 @@ extern "C" {
             free(Padding32);
             Padded             = UTF8_Encode(Padded32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Padding == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Padding Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Padding Pointer is NULL"));
         }
         return Padded;
     }
@@ -1628,9 +1708,9 @@ extern "C" {
             free(Padding32);
             Padded             = UTF16_Encode(Padded32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Padding == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Padding Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Padding Pointer is NULL"));
         }
         return Padded;
     }
@@ -1659,14 +1739,14 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Padding == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Padding Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Padding Pointer is NULL"));
         }
         return Padded;
     }
     
-    UTF8  *UTF8_SubstituteSubString(UTF8 *String, UTF8 *Substitution, uint64_t Offset, uint64_t Length) {
+    UTF8 *UTF8_SubstituteSubString(UTF8 *String, UTF8 *Substitution, uint64_t Offset, uint64_t Length) {
         UTF8 *Replaced8           = NULL;
         if (String != NULL && Substitution != NULL) {
             UTF32 *String32       = UTF8_Decode(String);
@@ -1677,9 +1757,9 @@ extern "C" {
             free(Substitution32);
             free(Replaced32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Substitution == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Replacement Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Replacement Pointer is NULL"));
         }
         return Replaced8;
     }
@@ -1695,9 +1775,9 @@ extern "C" {
             free(Substitution32);
             free(Replaced32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Substitution == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Substitution Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Substitution Pointer is NULL"));
         }
         return Replaced16;
     }
@@ -1707,7 +1787,7 @@ extern "C" {
         if (String != NULL && Substitution != NULL) {
             uint64_t StringSize                     = UTF32_GetStringSizeInCodePoints(String);
             uint64_t SubstitutionSize               = UTF32_GetStringSizeInCodePoints(Substitution);
-            uint64_t NewStringSize                  = (StringSize - Length) + SubstitutionSize;
+            uint64_t NewStringSize                  = (Maximum(StringSize, Length) - Minimum(StringSize, Length)) + SubstitutionSize;
             
             NewString                               = UTF32_Init(NewStringSize);
             if (NewString != NULL) {
@@ -1731,9 +1811,9 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Substitution == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Substitution Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Substitution Pointer is NULL"));
         }
         return NewString;
     }
@@ -1746,7 +1826,7 @@ extern "C" {
             free(Decoded);
             Stitched          = UTF8_Encode(Stitched32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Stitched;
     }
@@ -1760,7 +1840,7 @@ extern "C" {
             Stitched          = UTF16_Encode(Stitched32);
             free(Stitched32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Stitched;
     }
@@ -1783,17 +1863,17 @@ extern "C" {
                         CodePoint += 1;
                     }
                 } else {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Could not allocate Stitched string, size: %llu"), StitchedSize);
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Could not allocate Stitched string, size: %llu"), StitchedSize);
                 }
             } else if (Offset > StringSize) {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is greater than the String's size %llu"), Offset, StringSize);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is greater than the String's size %llu"), Offset, StringSize);
             } else if (Length > StringSize) {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Length %llu is greater than the String's size %llu"), Length, StringSize);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Length %llu is greater than the String's size %llu"), Length, StringSize);
             } else if (Offset + Length > StringSize) {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset + Length %llu is greater than the String's size %llu"), Offset + Length, StringSize);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Offset + Length %llu is greater than the String's size %llu"), Offset + Length, StringSize);
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NULL;
     }
@@ -1809,9 +1889,9 @@ extern "C" {
             free(DecodedSubString);
             free(Trimmed32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (SubString2Remove == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SubString2Remove Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SubString2Remove Pointer is NULL"));
         }
         return TrimmedString;
     }
@@ -1827,9 +1907,9 @@ extern "C" {
             free(DecodedSubString);
             free(Trimmed32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (SubString2Remove == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SubString2Remove Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SubString2Remove Pointer is NULL"));
         }
         return TrimmedString;
     }
@@ -1868,7 +1948,7 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate the instances"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate the instances"));
             }
             
             if (Instance2Remove >= 1) {
@@ -1887,14 +1967,14 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate the edited string"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate the edited string"));
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (SubString2Remove == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("SubString2Remove Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SubString2Remove Pointer is NULL"));
         } else if (Instance2Remove == 0) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Removing 0 instances of the SubString does not make sense"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Removing 0 instances of the SubString does not make sense"));
         }
         return EditedString;
     }
@@ -1909,7 +1989,7 @@ extern "C" {
             free(Insert32);
             Inserted          = UTF8_Encode(Inserted32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Inserted;
     }
@@ -1924,7 +2004,7 @@ extern "C" {
             free(Insert32);
             Inserted          = UTF16_Encode(Inserted32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Inserted;
     }
@@ -1948,13 +2028,13 @@ extern "C" {
                         }
                     }
                 } else {
-                    Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate InsertedString"));
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate InsertedString"));
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is greater than the string's size %llu"), Offset, StringSize);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Offset %llu is greater than the string's size %llu"), Offset, StringSize);
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Inserted;
     }
@@ -1968,7 +2048,7 @@ extern "C" {
             CaseFolded        = UTF8_Encode(CaseFold32);
             free(CaseFold32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return CaseFolded;
     }
@@ -1982,7 +2062,7 @@ extern "C" {
             CaseFolded        = UTF16_Encode(CaseFold32);
             free(CaseFold32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return CaseFolded;
     }
@@ -1991,22 +2071,28 @@ extern "C" {
         uint64_t CodePoint        = 0ULL;
         UTF32   *CaseFoldedString = NULL;
         if (String != NULL) {
+            UTF32 **ReplacementStrings = NULL;
+#if (FoundationIOLanguage == FoundationIOLanguageIsC)
+            ReplacementStrings         = CaseFoldStrings;
+#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+            ReplacementStrings         = const_cast<UTF32**>(CaseFoldStrings);
+#endif
             while (String[CodePoint] != FoundationIONULLTerminator) {
                 for (uint64_t Index = 0ULL; Index < CaseFoldTableSize; Index++) {
                     if (String[CodePoint] == CaseFoldCodePoints[Index]) {
                         uint64_t ReplacementSize = UTF32_GetStringSizeInCodePoints(&CaseFoldedString[Index]);
-                        CaseFoldedString         = UTF32_SubstituteSubString(String, CaseFoldStrings[Index], CodePoint, ReplacementSize);
+                        CaseFoldedString         = UTF32_SubstituteSubString(String, ReplacementStrings[Index], CodePoint, ReplacementSize);
                     }
                 }
                 CodePoint += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return CaseFoldedString;
     }
     
-    typedef enum CombiningCharacterClasses {
+    typedef enum StringIO_CombiningCharacterClasses {
         CCCOverlay                           = 1,
         CCCNukta                             = 7,
         CCCKanaVoicing                       = 8,
@@ -2062,7 +2148,7 @@ extern "C" {
         CCCAttachDoubleBelow                 = 233,
         CCCAttachDoubleAbove                 = 234,
         CCCAttachIOTASubscript               = 240,
-    } CombiningCharacterClasses;
+    } StringIO_CombiningCharacterClasses;
     
     static UTF32 *UTF32_Reorder(UTF32 *String) { // Stable sort
         uint64_t CodePoint  = 1ULL;
@@ -2085,7 +2171,7 @@ extern "C" {
                 CodePoint += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NULL;
     }
@@ -2098,20 +2184,20 @@ extern "C" {
                 if (Kompatibility == Yes) {
                     for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
-                            ComposedString = UTF32_SubstituteSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
+                            ComposedString = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(KompatibleNormalizationStrings[Index]), CodePoint, 1);
                         }
                     }
                 } else {
                     for (uint64_t DecomposeCodePoint = 0ULL; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[DecomposeCodePoint]) {
-                            ComposedString = UTF32_SubstituteSubString(String, CanonicalNormalizationStrings[DecomposeCodePoint], CodePoint, 1);
+                            ComposedString = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(CanonicalNormalizationStrings[DecomposeCodePoint]), CodePoint, 1);
                         }
                     }
                 }
                 CodePoint += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return ComposedString;
     }
@@ -2125,13 +2211,13 @@ extern "C" {
                 if (Kompatibility == Yes) {
                     for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
-                            Decomposed = UTF32_SubstituteSubString(String, KompatibleNormalizationStrings[Index], CodePoint, 1);
+                            Decomposed = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(KompatibleNormalizationStrings[Index]), CodePoint, 1);
                         }
                     }
                 } else {
                     for (uint64_t Index = 0ULL; Index < CanonicalNormalizationTableSize; Index++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[Index]) {
-                            Decomposed = UTF32_SubstituteSubString(String, CanonicalNormalizationStrings[Index], CodePoint, 1);
+                            Decomposed = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(CanonicalNormalizationStrings[Index]), CodePoint, 1);
                         }
                     }
                 }
@@ -2140,12 +2226,12 @@ extern "C" {
             DecomposedString           = UTF32_Reorder(Decomposed);
             free(Decomposed);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return DecomposedString;
     }
     
-    UTF8 *UTF8_Normalize(UTF8 *String, StringIONormalizationForms NormalizedForm) {
+    UTF8 *UTF8_Normalize(UTF8 *String, StringIO_NormalizationForms NormalizedForm) {
         UTF8 *NormalizedString8       = NULL;
         if (String != NULL && NormalizedForm != NormalizationForm_Unknown) {
             UTF32 *String32           = UTF8_Decode(String);
@@ -2157,7 +2243,7 @@ extern "C" {
         return NormalizedString8;
     }
     
-    UTF16 *UTF16_Normalize(UTF16 *String, StringIONormalizationForms NormalizedForm) {
+    UTF16 *UTF16_Normalize(UTF16 *String, StringIO_NormalizationForms NormalizedForm) {
         UTF16 *NormalizedString16     = NULL;
         if (String != NULL && NormalizedForm != NormalizationForm_Unknown) {
             UTF32 *String32           = UTF16_Decode(String);
@@ -2169,7 +2255,7 @@ extern "C" {
         return NormalizedString16;
     }
     
-    UTF32 *UTF32_Normalize(UTF32 *String, StringIONormalizationForms NormalizedForm) {
+    UTF32 *UTF32_Normalize(UTF32 *String, StringIO_NormalizationForms NormalizedForm) {
         UTF32 *NormalizedString = NULL;
         if (String != NULL && NormalizedForm != NormalizationForm_Unknown) {
             if (NormalizedForm == NormalizationForm_CanonicalCompose) {
@@ -2186,38 +2272,38 @@ extern "C" {
                 NormalizedString  = UTF32_Decompose(String, Yes);
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (NormalizedForm == NormalizationForm_Unknown) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Unknown Normalization form"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Unknown Normalization form"));
         }
         return NormalizedString;
     }
     
-    int64_t UTF8_String2Integer(FoundationIOBases Base, UTF8 *String) { // Replaces atoi, atol, strtol, strtoul,
+    int64_t UTF8_String2Integer(FoundationIO_Bases Base, UTF8 *String) { // Replaces atoi, atol, strtol, strtoul,
         int64_t Value = 0LL;
         if (String != NULL) {
             UTF32 *String32 = UTF8_Decode(String);
             Value           = UTF32_String2Integer(Base, String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Value;
     }
     
-    int64_t UTF16_String2Integer(FoundationIOBases Base, UTF16 *String) {
+    int64_t UTF16_String2Integer(FoundationIO_Bases Base, UTF16 *String) {
         int64_t Value = 0LL;
         if (String != NULL) {
             UTF32 *String32 = UTF16_Decode(String);
             Value           = UTF32_String2Integer(Base, String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Value;
     }
     
-    int64_t UTF32_String2Integer(FoundationIOBases Base, UTF32 *String) {
+    int64_t UTF32_String2Integer(FoundationIO_Bases Base, UTF32 *String) {
         uint64_t CodePoint = 0ULL;
         int8_t   Sign      = 1;
         int64_t  Value     = 0LL;
@@ -2237,12 +2323,12 @@ extern "C" {
                     }
                 } else if ((Base & Base_Radix10) == Base_Radix10) {
                     while (String[CodePoint] != FoundationIONULLTerminator && ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (CodePoint == 0 && String[CodePoint] == UTF32Character('-')))) {
-                            if (CodePoint == 0 && String[CodePoint] == UTF32Character('-')) { // FIXME: Sign discovery needs work
-                                Sign        = -1;
-                            } else if (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) {
-                                Value      *= 10;
-                                Value      += String[CodePoint] - 0x30;
-                            }
+                        if (CodePoint == 0 && String[CodePoint] == UTF32Character('-')) { // FIXME: Sign discovery needs work
+                            Sign        = -1;
+                        } else if (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) {
+                            Value      *= 10;
+                            Value      += String[CodePoint] - 0x30;
+                        }
                         CodePoint          += 1;
                     }
                 } else if ((Base & Base_Radix16) == Base_Radix16) {
@@ -2271,30 +2357,30 @@ extern "C" {
                     }
                 }
             } else if ((Base & Base_Decimal) == Base_Decimal || Base == Base_Unknown) {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Invalid Base %u"), Base);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Invalid Base %u"), Base);
             }
             Value                      *= Sign;
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Value;
     }
     
-    UTF8 *UTF8_Integer2String(FoundationIOBases Base, int64_t Integer2Convert) {
+    UTF8 *UTF8_Integer2String(FoundationIO_Bases Base, int64_t Integer2Convert) {
         UTF32 *IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
         UTF8  *IntegerString8  = UTF8_Encode(IntegerString32);
         free(IntegerString32);
         return IntegerString8;
     }
     
-    UTF16 *UTF16_Integer2String(FoundationIOBases Base, int64_t Integer2Convert) {
+    UTF16 *UTF16_Integer2String(FoundationIO_Bases Base, int64_t Integer2Convert) {
         UTF32 *IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
         UTF16 *IntegerString16 = UTF16_Encode(IntegerString32);
         free(IntegerString32);
         return IntegerString16;
     }
     
-    UTF32 *UTF32_Integer2String(FoundationIOBases Base, int64_t Integer2Convert) {
+    UTF32 *UTF32_Integer2String(FoundationIO_Bases Base, int64_t Integer2Convert) {
         UTF32   *String               = NULL;
         int64_t  Sign                 = 0LL;
         uint64_t Num                  = AbsoluteI(Integer2Convert);
@@ -2345,39 +2431,39 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Base is not an integer, exiting"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Base is not an integer, exiting"));
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Base: %hu is not an integer"), Base);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Base: %hu is not an integer"), Base);
         }
         return String;
     }
     
-    double UTF8_String2Decimal(FoundationIOBases Base, UTF8 *String) {
+    double UTF8_String2Decimal(FoundationIO_Bases Base, UTF8 *String) {
         double Decimal = 0.0;
         if (String != NULL) {
             UTF32 *String32 = UTF8_Decode(String);
             Decimal         = UTF32_String2Decimal(Base, String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Decimal;
     }
     
-    double UTF16_String2Decimal(FoundationIOBases Base, UTF16 *String) {
+    double UTF16_String2Decimal(FoundationIO_Bases Base, UTF16 *String) {
         double Decimal = 0.0;
         if (String != NULL) {
             UTF32 *String32 = UTF16_Decode(String);
             Decimal         = UTF32_String2Decimal(Base, String32);
             free(String32);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Decimal;
     }
     
-    double UTF32_String2Decimal(FoundationIOBases Base, UTF32 *String) { // Replaces strtod, strtof, strold, atof, and atof_l
+    double UTF32_String2Decimal(FoundationIO_Bases Base, UTF32 *String) { // Replaces strtod, strtof, strold, atof, and atof_l
         double   Value         = 0.0;
         bool     IsNegative    = No;
         if (String != NULL) {
@@ -2398,26 +2484,62 @@ extern "C" {
                 CodePoint     += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return Value;
     }
     
-    UTF8 *UTF8_Decimal2String(FoundationIOBases Base, double Decimal) {
+    UTF8 *UTF8_Decimal2String(FoundationIO_Bases Base, double Decimal) {
         UTF32 *String32 = UTF32_Decimal2String(Base, Decimal);
         UTF8  *String8  = UTF8_Encode(String32);
         free(String32);
         return String8;
     }
     
-    UTF16 *UTF16_Decimal2String(FoundationIOBases Base, double Decimal) {
+    UTF16 *UTF16_Decimal2String(FoundationIO_Bases Base, double Decimal) {
         UTF32 *String32 = UTF32_Decimal2String(Base, Decimal);
         UTF16 *String16 = UTF16_Encode(String32);
         free(String32);
         return String16;
     }
     
-    UTF32 *UTF32_Decimal2String(FoundationIOBases Base, double Number) {
+    static UTF32 *Decimal2String_UTF32(FoundationIO_Bases Base, uint64_t MinimumWidth, uint64_t Precision, double Decimal) {
+        UTF32 *String = NULL;
+        if ((Base & Base_Decimal) != Base_Decimal || Base != Base_Unknown) {
+            if ((Base & Base_Shortest) == Base_Shortest) {
+                if (MinimumWidth == 0 && Precision == 0) {
+                    // Ryu
+                } else {
+                    // Do something stranger
+                }
+            } else if ((Base & Base_Scientific) == Base_Scientific) {
+                if (MinimumWidth == 0 && Precision == 0) {
+                    // Ryu
+                } else {
+                    // Do something stranger
+                }
+            } else if ((Base & Base_Radix10) == Base_Radix10) {
+                if (MinimumWidth == 0 && Precision == 0) {
+                    // Ryu
+                } else {
+                    // Do something stranger
+                }
+            } else if ((Base & Base_Radix16) == Base_Radix16) {
+                if (MinimumWidth == 0 && Precision == 0) {
+                    // Ryu
+                } else {
+                    // Do something stranger
+                }
+            }
+        } else if ((Base & Base_Decimal) != Base_Decimal) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Base must be Base_Decimal"));
+        } else if (Base == Base_Unknown) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Base_Unknown is invalid"));
+        }
+        return String;
+    }
+    
+    UTF32 *UTF32_Decimal2String(FoundationIO_Bases Base, double Number) {
         UTF32   *OutputString     = NULL;
         uint64_t StringSize       = 0ULL;
         int8_t   Sign             = ExtractSignD(Number);
@@ -2428,6 +2550,31 @@ extern "C" {
         bool     IsDenormal       = DecimalIsNormalD(Number);
         bool     IsNotANumber     = DecimalIsNotANumberD(Number);
         bool     IsInfinite       = DecimalIsInfinityD(Number);
+        
+        /*
+         
+         Let's start looking at how to minimize the number of digits in a string, and also how to round
+         
+         Ok, so we always do shortest conversion.
+         
+         then we further fit it to minwidth and precision.
+         
+         Now we just need to support the various modes, Scientific, Hex, Decimal, Shortest
+         
+         Decimal:    3.000003
+         Scientific: 3.0E-5? 10^NumZeros if positive, 10^(NumZeros+1) if negative
+         
+         Maybe there should be a static function that takes the requested format (Scientific, Decimal, Shortest, Hexadecimal), MinWidth, and Precision
+         
+         Decimal2String_UTF32(FoundationIO_Bases Base, uint64_t MinWidth, uint64_t Precision, double Decimal2Convert)
+         
+         */
+        
+        
+        
+        
+        
+        
         
         if (IsNotANumber) {
             OutputString          = UTF32_Clone(UTF32String("Not A Number"));
@@ -2525,9 +2672,9 @@ extern "C" {
             free(String1_32);
             free(String2_32);
         } else if (String1 == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String1 Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String1 Pointer is NULL"));
         } else if (String2 == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String2 Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String2 Pointer is NULL"));
         }
         return StringsMatch;
     }
@@ -2541,9 +2688,9 @@ extern "C" {
             free(String1_32);
             free(String2_32);
         } else if (String1 == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String1 Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String1 Pointer is NULL"));
         } else if (String2 == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String2 Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String2 Pointer is NULL"));
         }
         return StringsMatch;
     }
@@ -2566,9 +2713,9 @@ extern "C" {
                 }
             }
         } else if (String1 == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String1 Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String1 Pointer is NULL"));
         } else if (String2 == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String2 Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String2 Pointer is NULL"));
         }
         return StringsMatch;
     }
@@ -2582,9 +2729,9 @@ extern "C" {
             free(String32);
             free(Sub32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Substring == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Substring Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Substring Pointer is NULL"));
         }
         return SubstringMatchesAtOffset;
     }
@@ -2598,9 +2745,9 @@ extern "C" {
             UTF32_Deinit(String32);
             UTF32_Deinit(Sub32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Substring == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Substring Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Substring Pointer is NULL"));
         }
         return SubstringMatchesAtOffset;
     }
@@ -2620,18 +2767,18 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Substring == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Substring Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Substring Pointer is NULL"));
         } else {
             SubstringMatchesAtOffset             = No;
         }
         return SubstringMatchesAtOffset;
     }
     
-    UTF8  *UTF8_Trim(UTF8 *String, TrimStringTypes Type, UTF8 **Strings2Remove) {
+    UTF8  *UTF8_Trim(UTF8 *String, StringIO_TruncationTypes Type, UTF8 **Strings2Remove) {
         UTF8 *Trimmed = NULL;
-        if (String != NULL && Type != TrimString_Unknown && Strings2Remove != NULL) {
+        if (String != NULL && Type != TruncationType_Unknown && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF8_Decode(String);
             UTF32   **Strings2Remove32          = UTF8_StringArray_Decode(Strings2Remove);
             UTF32    *Trimmed32                 = UTF32_Trim(String32, Type, Strings2Remove32);
@@ -2639,18 +2786,18 @@ extern "C" {
             Trimmed                             = UTF8_Encode(Trimmed32);
             UTF32_Deinit(String32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
-        } else if (Type == TrimString_Unknown) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("TrimString_Unknown is invalid"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+        } else if (Type == TruncationType_Unknown) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("TruncationType_Unknown is invalid"));
         } else if (Strings2Remove == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Strings2Remove Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Strings2Remove Pointer is NULL"));
         }
         return Trimmed;
     }
     
-    UTF16 *UTF16_Trim(UTF16 *String, TrimStringTypes Type, UTF16 **Strings2Remove) {
+    UTF16 *UTF16_Trim(UTF16 *String, StringIO_TruncationTypes Type, UTF16 **Strings2Remove) {
         UTF16 *Trimmed = NULL;
-        if (String != NULL && Type != TrimString_Unknown && Strings2Remove != NULL) {
+        if (String != NULL && Type != TruncationType_Unknown && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF16_Decode(String);
             UTF32   **Strings2Remove32          = UTF16_StringArray_Decode(Strings2Remove);
             UTF32    *Trimmed32                 = UTF32_Trim(String32, Type, Strings2Remove32);
@@ -2658,18 +2805,18 @@ extern "C" {
             Trimmed                             = UTF16_Encode(Trimmed32);
             UTF32_Deinit(String32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
-        } else if (Type == TrimString_Unknown) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("TrimString_Unknown is invalid"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+        } else if (Type == TruncationType_Unknown) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("TruncationType_Unknown is invalid"));
         } else if (Strings2Remove == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Strings2Remove Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Strings2Remove Pointer is NULL"));
         }
         return Trimmed;
     }
     
-    UTF32 *UTF32_Trim(UTF32 *String, TrimStringTypes Type, UTF32 **Strings2Remove) {
+    UTF32 *UTF32_Trim(UTF32 *String, StringIO_TruncationTypes Type, UTF32 **Strings2Remove) {
         UTF32 *Trimmed = NULL;
-        if (String != NULL && Type != TrimString_Unknown && Strings2Remove != NULL) {
+        if (String != NULL && Type != TruncationType_Unknown && Strings2Remove != NULL) {
             uint64_t   StringSize          = UTF32_GetStringSizeInCodePoints(String);
             uint64_t   NumRemovalStrings   = UTF32_StringArray_GetNumStrings(Strings2Remove);
             uint64_t  *RemovalStringSizes  = UTF32_StringArray_GetStringSizesInCodePoints(Strings2Remove);
@@ -2678,7 +2825,8 @@ extern "C" {
             uint64_t  *RemovalPointsStart  = NULL; // RemovalPoint[0] = {0, 6}; start and stop points
             uint64_t  *RemovalPointsEnd    = NULL; // RemovalPoint[0] = {0, 6}; start and stop points
             uint64_t   TrimmedStringSize   = 0ULL;
-            if (Type == TrimString_RemoveAll) {
+            if (Type == TruncationType_All) {
+                // Loop over all the codepoints until you find one that is not on the list, then remove it; BUT JUST FOR THE BEGINNING AND END
                 for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
                     for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
                         bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
@@ -2701,54 +2849,27 @@ extern "C" {
                         }
                     }
                 }
-            } else {
-                if (Type == TrimString_StartEndRemoveAll) {
-                    // Loop over all the codepoints until you find one that is not on the list, then remove it; BUT JUST FOR THE BEGINNING AND END
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
-                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
-                            bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
-                            if (SubstringFound) {
-                                NumRemovalPoints += 1;
-                            }
-                        }
-                    }
-                    
-                    RemovalPointsStart                                  = (uint64_t*) calloc(NumRemovalPoints, sizeof(uint64_t));
-                    RemovalPointsEnd                                    = (uint64_t*) calloc(NumRemovalPoints, sizeof(uint64_t));
-                    
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
-                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
-                            bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
-                            if (SubstringFound) {
-                                RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
-                                RemovalPointsEnd[CurrentRemovalPoint]   = RemovalStringSizes[RemovalString];
-                                CurrentRemovalPoint                    += 1;
-                            }
+            } else if (Type == TruncationType_Most1) {
+                // Loop over all the codepoints until you find one that is not on the list, then remove it.
+                for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                    for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
+                        bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                        if (SubstringFound) {
+                            NumRemovalPoints += 1;
                         }
                     }
                 }
-                if (Type == TrimString_BetweenValidKeep1) {
-                    // Loop over all the codepoints until you find one that is not on the list, then remove it.
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
-                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
-                            bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
-                            if (SubstringFound) {
-                                NumRemovalPoints += 1;
-                            }
-                        }
-                    }
-                    
-                    RemovalPointsStart                                  = (uint64_t*) calloc(NumRemovalPoints, sizeof(uint64_t));
-                    RemovalPointsEnd                                    = (uint64_t*) calloc(NumRemovalPoints, sizeof(uint64_t));
-                    
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
-                        for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
-                            bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
-                            if (SubstringFound) {
-                                RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
-                                RemovalPointsEnd[CurrentRemovalPoint]   = RemovalStringSizes[RemovalString];
-                                CurrentRemovalPoint                    += 1;
-                            }
+                
+                RemovalPointsStart                                  = (uint64_t*) calloc(NumRemovalPoints, sizeof(uint64_t));
+                RemovalPointsEnd                                    = (uint64_t*) calloc(NumRemovalPoints, sizeof(uint64_t));
+                
+                for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                    for (uint64_t RemovalString = 0ULL; RemovalString < NumRemovalStrings; RemovalString++) {
+                        bool SubstringFound                         = UTF32_CompareSubString(String, Strings2Remove[RemovalString], StringCodePoint, 0);
+                        if (SubstringFound) {
+                            RemovalPointsStart[CurrentRemovalPoint] = StringCodePoint;
+                            RemovalPointsEnd[CurrentRemovalPoint]   = RemovalStringSizes[RemovalString];
+                            CurrentRemovalPoint                    += 1;
                         }
                     }
                 }
@@ -2771,14 +2892,14 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate Trimmed string"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate Trimmed string"));
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
-        } else if (Type == TrimString_Unknown) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("TrimString_Unknown is invalid"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+        } else if (Type == TruncationType_Unknown) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("TruncationType_Unknown is invalid"));
         } else if (Strings2Remove == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Strings2Remove Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Strings2Remove Pointer is NULL"));
         }
         return Trimmed;
     }
@@ -2793,9 +2914,9 @@ extern "C" {
             UTF32_StringArray_Deinit(Delimiters32);
             SplitString           = UTF8_StringArray_Encode(SplitString32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Delimiters == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Delimiters Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Delimiters Pointer is NULL"));
         }
         return SplitString;
     }
@@ -2810,9 +2931,9 @@ extern "C" {
             UTF32_StringArray_Deinit(Delimiters32);
             SplitString           = UTF16_StringArray_Encode(SplitString32);
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Delimiters == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Delimiters Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Delimiters Pointer is NULL"));
         }
         return SplitString;
     }
@@ -2834,7 +2955,7 @@ extern "C" {
                     DelimitersSize[Delimiter] = UTF32_GetStringSizeInCodePoints(Delimiters[Delimiter]);
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate space for the delimiter sizes"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate space for the delimiter sizes"));
             }
             // Check if the current delimiter is larger than the string, if so, it can't match.
             // Well we need to loop over the string NumDelimiters times, so Delimiters, String, DelimiterString
@@ -2882,19 +3003,18 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Delimiters == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Delimiters Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Delimiters Pointer is NULL"));
         }
         return SplitStrings;
     }
     
-    uint64_t UTF32_GetNumDigits(FoundationIOBases Base, UTF32 *String, uint64_t Offset) {
+    uint64_t UTF32_GetNumDigits(FoundationIO_Bases Base, UTF32 *String, uint64_t Offset) {
         uint64_t NumDigits      = 0ULL;
         if (String != NULL) {
             uint64_t CodePoint  = Offset;
             bool     ValidDigit = Yes;
-            
             
             if ((Base & Base_Integer) == Base_Integer) {
                 if ((Base & Base_Radix2) == Base_Radix2) {
@@ -2994,7 +3114,7 @@ extern "C" {
                 }
             }
         } else if (String == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumDigits;
     }
@@ -3009,9 +3129,9 @@ extern "C" {
                 Length    += 1;
             }
         } else if (Format == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Format String Poitner is NUlL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Format String Poitner is NUlL"));
         } else if (Formatted == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Formatted String Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Formatted String Pointer is NULL"));
         }
         return Length;
     }
@@ -3040,7 +3160,7 @@ extern "C" {
         if (NumStrings > 0) {
             StringArray    = (UTF8**) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF8*));
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
         return StringArray;
     }
@@ -3050,7 +3170,7 @@ extern "C" {
         if (NumStrings > 0) {
             StringArray     = (UTF16**) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF16*));
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
         return StringArray;
     }
@@ -3060,7 +3180,7 @@ extern "C" {
         if (NumStrings > 0) {
             StringArray     = (UTF32**) calloc(NumStrings + FoundationIONULLTerminatorSize, sizeof(UTF32*));
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
         return StringArray;
     }
@@ -3069,9 +3189,9 @@ extern "C" {
         if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
             StringArray[Index] = String2Attach;
         } else if (StringArray == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         } else if (String2Attach == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String2Attach Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String2Attach Pointer is NULL"));
         }
     }
     
@@ -3079,9 +3199,9 @@ extern "C" {
         if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
             StringArray[Index] = String2Attach;
         } else if (StringArray == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         } else if (String2Attach == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String2Attach Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String2Attach Pointer is NULL"));
         }
     }
     
@@ -3089,9 +3209,9 @@ extern "C" {
         if (StringArray != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
             StringArray[Index] = String2Attach;
         } else if (StringArray == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         } else if (String2Attach == NULL) {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("String2Attach Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String2Attach Pointer is NULL"));
         }
     }
     
@@ -3102,7 +3222,7 @@ extern "C" {
                 NumStrings += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return NumStrings;
     }
@@ -3114,7 +3234,7 @@ extern "C" {
                 NumStrings += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return NumStrings;
     }
@@ -3126,7 +3246,7 @@ extern "C" {
                 NumStrings += 1;
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return NumStrings;
     }
@@ -3140,7 +3260,7 @@ extern "C" {
                 StringArraySizes[String] = UTF8_GetStringSizeInCodeUnits(StringArray[String]);
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return StringArraySizes;
     }
@@ -3154,7 +3274,7 @@ extern "C" {
                 StringArraySizes[String] = UTF16_GetStringSizeInCodeUnits(StringArray[String]);
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return StringArraySizes;
     }
@@ -3168,7 +3288,7 @@ extern "C" {
                 StringArraySizes[String] = UTF8_GetStringSizeInCodePoints(StringArray[String]);
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return StringArraySizes;
     }
@@ -3182,7 +3302,7 @@ extern "C" {
                 StringArraySizes[String] = UTF16_GetStringSizeInCodePoints(StringArray[String]);
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return StringArraySizes;
     }
@@ -3196,7 +3316,7 @@ extern "C" {
                 StringArraySizes[String] = UTF32_GetStringSizeInCodePoints(StringArray[String]);
             }
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return StringArraySizes;
     }
@@ -3211,11 +3331,11 @@ extern "C" {
                     Decoded[String] = UTF8_Decode(StringArray[String]);
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
             }
             
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return Decoded;
     }
@@ -3230,11 +3350,11 @@ extern "C" {
                     Decoded[String] = UTF16_Decode(StringArray[String]);
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
             }
             
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return Decoded;
     }
@@ -3249,11 +3369,11 @@ extern "C" {
                     Encoded[String] = UTF8_Encode(StringArray[String]);
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
             }
             
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return Encoded;
     }
@@ -3268,40 +3388,50 @@ extern "C" {
                     Encoded[String] = UTF16_Encode(StringArray[String]);
                 }
             } else {
-                Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate decoded StringArray"));
             }
             
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
         return Encoded;
     }
     
     void UTF8_StringArray_Print(UTF8 **StringArray) {
         if (StringArray != NULL) {
-            // Get the number of strings
-            // Print each string
             uint64_t NumStrings = UTF8_StringArray_GetNumStrings(StringArray);
-            printf("\nStringArray: NumStrings = %llu\n", NumStrings);
-            fflush(stdout);
+            printf("\nNumStrings: %llu\n", NumStrings);
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 printf("%s\n", StringArray[String]);
-                fflush(stdout);
             }
-            /*
-             StringArray: NumStrings
-             String0
-             String...
-             StringNum
-             */
         }
     }
     
     void UTF16_StringArray_Print(UTF16 **StringArray) {
         uint64_t NumStrings = UTF16_StringArray_GetNumStrings(StringArray);
-        printf("StringArray: NumStrings = %llu", NumStrings);
+        printf("\nNumStrings: %llu\n", NumStrings);
         for (uint64_t String = 0ULL; String < NumStrings; String++) {
-            printf("%ls", (wchar_t*) StringArray[String]);
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+            UTF32 *Decoded  = UTF16_Decode(StringArray[String]);
+            printf("%ls\n", (wchar_t*) Decoded);
+            free(Decoded);
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+            printf("%ls\n", (wchar_t*) StringArray[String]);
+#endif
+        }
+    }
+    
+    void UTF32_StringArray_Print(UTF32 **StringArray) {
+        uint64_t NumStrings = UTF32_StringArray_GetNumStrings(StringArray);
+        printf("\nNumStrings: %llu\n", NumStrings);
+        for (uint64_t String = 0ULL; String < NumStrings; String++) {
+#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+            printf("%ls\n", (wchar_t*) StringArray[String]);
+#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+            UTF16 *Encoded  = UTF16_Encode(StringArray[String]);
+            printf("%ls\n", (wchar_t*) Encoded);
+            free(Decoded);
+#endif
         }
     }
     
@@ -3313,7 +3443,7 @@ extern "C" {
             }
             free(StringArray);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
     }
     
@@ -3325,7 +3455,7 @@ extern "C" {
             }
             free(StringArray);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
     }
     
@@ -3337,11 +3467,11 @@ extern "C" {
             }
             free(StringArray);
         } else {
-            Log(Log_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("StringArray Pointer is NULL"));
         }
     }
     /* StringArray Functions */
     
-#ifdef __cplusplus
+#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 }
 #endif
