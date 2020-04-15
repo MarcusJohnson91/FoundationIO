@@ -74,7 +74,7 @@ extern "C" {
     }
     
     LocalizationIO_RegionIDs Localize_GetRegionID(void) {
-        LocalizationIO_RegionIDs RegionID = RegionID_Unknown;
+        LocalizationIO_RegionIDs RegionID = RegionID_Unspecified;
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         UTF8 *LocaleAll        = setlocale(LC_ALL, NULL);
         
