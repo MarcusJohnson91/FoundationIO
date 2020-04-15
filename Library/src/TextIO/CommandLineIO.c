@@ -295,7 +295,14 @@ extern "C" {
             if (CLI->OptionIDs[MasterID].OptionType == OptionType_PotentialSlaves) {
                 CLI->OptionIDs[MasterID].NumOptionSlaves  += 1;
                 uint64_t NumSlaves                         = CLI->OptionIDs[MasterID].NumOptionSlaves - 1;
+                uint64_t *Slaves_Old                       = CLI->OptionIDs[MasterID].Slaves;
                 CLI->OptionIDs[MasterID].Slaves            = (uint64_t*) realloc(CLI->OptionIDs[MasterID].Slaves, CLI->OptionIDs[MasterID].NumOptionSlaves * sizeof(uint64_t));
+                if (CLI->OptionIDs[MasterID].Slaves != NULL) {
+                    free(Slaves_Old);
+                } else {
+                    CLI->OptionIDs[MasterID].Slaves        = Slaves_Old;
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Realloc failed"));
+                }
                 CLI->OptionIDs[MasterID].Slaves[NumSlaves] = SlaveID;
             } else {
                 Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("MasterID %lld can not have any slaves"), MasterID);
@@ -529,7 +536,14 @@ extern "C" {
                         if (CLI->NumOptions == 1) {
                             CLI->OptionIDs = (CommandLineOption*) calloc(1, sizeof(CommandLineOption));
                         } else {
-                            CLI->OptionIDs = (CommandLineOption*) realloc(CLI->OptionIDs, CLI->NumOptions * sizeof(CommandLineOption));
+                            CommandLineOption *Options_Old = CLI->OptionIDs;
+                            CLI->OptionIDs                 = (CommandLineOption*) realloc(CLI->OptionIDs, CLI->NumOptions * sizeof(CommandLineOption));
+                            if (CLI->OptionIDs != NULL) {
+                                free(Options_Old);
+                            } else {
+                                CLI->OptionIDs             = Options_Old;
+                                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Realloc failed"));
+                            }
                         }
                         CLI->OptionIDs[CLI->NumOptions - 1].OptionID = Switch;
                         
