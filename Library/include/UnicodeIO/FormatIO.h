@@ -293,7 +293,7 @@ extern "C" {
      @abstract                                                  "Splits a string based on the specifiers in Format".
      @param               Format                                "A string with format specifiers".
      @param               Source                                "The string to extract the information from".
-     @return                                                    "Returns a StringArray containing NumFormatSpecifiers strings, one string for each specifier".
+     @return                                                    "Returns a StringSet containing NumFormatSpecifiers strings, one string for each specifier".
      */
     UTF8                **UTF8_Deformat(UTF8 *Format, UTF8 *Source);
     
@@ -301,7 +301,7 @@ extern "C" {
      @abstract                                                  "Splits a string based on the specifiers in Format".
      @param               Format                                "A string with format specifiers".
      @param               Source                                "The string to extract the information from".
-     @return                                                    "Returns a StringArray containing NumFormatSpecifiers strings, one string for each specifier".
+     @return                                                    "Returns a StringSet containing NumFormatSpecifiers strings, one string for each specifier".
      */
     UTF16               **UTF16_Deformat(UTF16 *Format, UTF16 *Source);
     
@@ -309,7 +309,7 @@ extern "C" {
      @abstract                                                  "Splits a string based on the specifiers in Format".
      @param               Format                                "A string with format specifiers".
      @param               Source                                "The string to extract the information from".
-     @return                                                    "Returns a StringArray containing NumFormatSpecifiers strings, one string for each specifier".
+     @return                                                    "Returns a StringSet containing NumFormatSpecifiers strings, one string for each specifier".
      */
     UTF32               **UTF32_Deformat(UTF32 *Format, UTF32 *Source);
     
@@ -317,8 +317,8 @@ extern "C" {
      @abstract                                                 "Deformats a UTF-32 encoded string, essentially scanf replacement".
      @param               Specifiers                           "The Format Specifiers".
      @param               Format                               "The string with specifiers to parse".
-     @param               Result                               "The formatted string to extract the data for the StringArray into".
-     @return                                                   "Returns a StringArray for each specifier".
+     @param               Result                               "The formatted string to extract the data for the StringSet into".
+     @return                                                   "Returns a StringSet for each specifier".
      */
     UTF32               **DeformatString_UTF32(FormatSpecifiers *Specifiers, UTF32 *Format, UTF32 *Result);
     

@@ -236,10 +236,10 @@ extern "C" {
         UTF16 *Delimiters[2]            = {UTF16String("/"), UTF16String("\\")};
         
         UTF16 **GroupingSize16          = UTF16_Split(GroupingSizeString, Delimiters);
-        UTF32 **GroupingSize32          = UTF16_StringArray_Decode(GroupingSize16);
-        UTF16_StringArray_Deinit(GroupingSize16);
-        GroupingSize                    = UTF8_StringArray_Encode(GroupingSize32);
-        UTF32_StringArray_Deinit(GroupingSize32);
+        UTF32 **GroupingSize32          = UTF16_StringSet_Decode(GroupingSize16);
+        UTF16_StringSet_Deinit(GroupingSize16);
+        GroupingSize                    = UTF8_StringSet_Encode(GroupingSize32);
+        UTF32_StringSet_Deinit(GroupingSize32);
 #endif
         return GroupingSize;
     }
@@ -252,10 +252,10 @@ extern "C" {
         UTF8 *Delimiters[]              = {UTF8String("/"), UTF8String("\\")};
         
         UTF8 **GroupingSize8            = UTF8_Split(GroupingSizeString, Delimiters);
-        UTF32 **GroupingSize32          = UTF8_StringArray_Decode(GroupingSize8);
-        UTF8_StringArray_Deinit(GroupingSize8);
-        GroupingSize                    = UTF16_StringArray_Encode(GroupingSize32);
-        UTF32_StringArray_Deinit(GroupingSize32);
+        UTF32 **GroupingSize32          = UTF8_StringSet_Decode(GroupingSize8);
+        UTF8_StringSet_Deinit(GroupingSize8);
+        GroupingSize                    = UTF16_StringSet_Encode(GroupingSize32);
+        UTF32_StringSet_Deinit(GroupingSize32);
         return GroupingSize;
     }
     

@@ -699,7 +699,7 @@ extern "C" {
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
      @remark                               "Replaces strtok from the standard library".
      @param               String           "The string you want to be split".
-     @param               Delimiters       "An StringArray containing the delimiters, one delimiter per string".
+     @param               Delimiters       "An StringSet containing the delimiters, one delimiter per string".
      */
     UTF8                **UTF8_Split(UTF8 *String, UTF8 **Delimiters);
     
@@ -707,7 +707,7 @@ extern "C" {
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
      @remark                               "Replaces strtok from the standard library".
      @param               String           "The string you want to be split".
-     @param               Delimiters       "An StringArray containing the delimiters, one delimiter per string".
+     @param               Delimiters       "An StringSet containing the delimiters, one delimiter per string".
      */
     UTF16               **UTF16_Split(UTF16 *String, UTF16 **Delimiters);
     
@@ -715,7 +715,7 @@ extern "C" {
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
      @remark                               "Replaces strtok from the standard library".
      @param               String           "The string you want to be split".
-     @param               Delimiters       "An StringArray containing the delimiters, one delimiter per string".
+     @param               Delimiters       "An StringSet containing the delimiters, one delimiter per string".
      */
     UTF32               **UTF32_Split(UTF32 *String, UTF32 **Delimiters);
     
@@ -803,42 +803,42 @@ extern "C" {
     /*!
      @abstract                             "Removes substrings (including single CodePoints) from a string".
      @param               String           "The string to perform the trimming operations on".
-     @param               Strings2Remove   "An StringArray to remove from the String".
+     @param               Strings2Remove   "An StringSet to remove from the String".
      */
     UTF8                 *UTF8_Trim(UTF8 *String, StringIO_TruncationTypes Type, UTF8 **Strings2Remove);
     
     /*!
      @abstract                             "Removes substrings (including single CodePoints) from a string".
      @param               String           "The string to perform the trimming operations on".
-     @param               Strings2Remove   "An StringArray to remove from the String".
+     @param               Strings2Remove   "An StringSet to remove from the String".
      */
     UTF16                *UTF16_Trim(UTF16 *String, StringIO_TruncationTypes Type, UTF16 **Strings2Remove);
     
     /*!
      @abstract                             "Removes substrings (including single CodePoints) from a string".
      @param               String           "The string to perform the trimming operations on".
-     @param               Strings2Remove   "An StringArray to remove from the String".
+     @param               Strings2Remove   "An StringSet to remove from the String".
      */
     UTF32                *UTF32_Trim(UTF32 *String, StringIO_TruncationTypes Type, UTF32 **Strings2Remove);
     
     /*!
      @abstract                             "Strips all instances of Strings2Remove from String".
      @param               String           "The string to perform the strip operation on".
-     @param               Strings2Remove   "An StringArray to remove from the String".
+     @param               Strings2Remove   "An StringSet to remove from the String".
      */
     UTF8                 *UTF8_Strip(UTF8 *String, UTF8 **Strings2Remove);
     
     /*!
      @abstract                             "Strips all instances of Strings2Remove from String".
      @param               String           "The string to perform the strip operation on".
-     @param               Strings2Remove   "An StringArray to remove from the String".
+     @param               Strings2Remove   "An StringSet to remove from the String".
      */
     UTF16                *UTF16_Strip(UTF16 *String, UTF16 **Strings2Remove);
     
     /*!
      @abstract                             "Strips all instances of Strings2Remove from String".
      @param               String           "The string to perform the strip operation on".
-     @param               Strings2Remove   "An StringArray to remove from the String".
+     @param               Strings2Remove   "An StringSet to remove from the String".
      */
     UTF32                *UTF32_Strip(UTF32 *String, UTF32 **Strings2Remove);
     
@@ -1090,155 +1090,155 @@ extern "C" {
     void                  UTF32_Deinit(UTF32 *String);
     
     /*!
-     @abstract                             "Creates a UTF-8 encoded StringArray".
-     @param               NumStrings       "How many strings will this StringArray contain"?
-     @return                               "Returns an empty StringArray with room for NumStrings pointers plus a null terminator".
+     @abstract                             "Creates a UTF-8 encoded StringSet".
+     @param               NumStrings       "How many strings will this StringSet contain"?
+     @return                               "Returns an empty StringSet with room for NumStrings pointers plus a null terminator".
      */
-    UTF8                **UTF8_StringArray_Init(uint64_t NumStrings);
+    UTF8                **UTF8_StringSet_Init(uint64_t NumStrings);
     
     /*!
-     @abstract                             "Creates a UTF-16 encoded StringArray".
-     @param               NumStrings       "How many strings will this StringArray contain"?
-     @return                               "Returns an empty StringArray with room for NumStrings pointers plus a null terminator".
+     @abstract                             "Creates a UTF-16 encoded StringSet".
+     @param               NumStrings       "How many strings will this StringSet contain"?
+     @return                               "Returns an empty StringSet with room for NumStrings pointers plus a null terminator".
      */
-    UTF16               **UTF16_StringArray_Init(uint64_t NumStrings);
+    UTF16               **UTF16_StringSet_Init(uint64_t NumStrings);
     
     /*!
-     @abstract                             "Creates a UTF-32 encoded StringArray".
-     @param               NumStrings       "How many strings will this StringArray contain"?
-     @return                               "Returns an empty StringArray with room for NumStrings pointers plus a null terminator".
+     @abstract                             "Creates a UTF-32 encoded StringSet".
+     @param               NumStrings       "How many strings will this StringSet contain"?
+     @return                               "Returns an empty StringSet with room for NumStrings pointers plus a null terminator".
      */
-    UTF32               **UTF32_StringArray_Init(uint64_t NumStrings);
+    UTF32               **UTF32_StringSet_Init(uint64_t NumStrings);
     
     /*!
-     @abstract                             "Attaches a string to a StringArray at the specified position".
-     @param               StringArray      "The StringArray to attach the String to".
+     @abstract                             "Attaches a string to a StringSet at the specified position".
+     @param               StringSet      "The StringSet to attach the String to".
      @param               String2Attach    "The String to attach".
      @param               Index            "Which position should String2Attach be in"?
      */
-    void                  UTF8_StringArray_Attach(UTF8 **StringArray, UTF8 *String2Attach, uint64_t Index);
+    void                  UTF8_StringSet_Attach(UTF8 **StringSet, UTF8 *String2Attach, uint64_t Index);
     
     /*!
-     @abstract                             "Attaches a string to a StringArray at the specified position".
-     @param               StringArray      "The StringArray to attach the String to".
+     @abstract                             "Attaches a string to a StringSet at the specified position".
+     @param               StringSet      "The StringSet to attach the String to".
      @param               String2Attach    "The String to attach".
      @param               Index            "Which position should String2Attach be in"?
      */
-    void                  UTF16_StringArray_Attach(UTF16 **StringArray, UTF16 *String2Attach, uint64_t Index);
+    void                  UTF16_StringSet_Attach(UTF16 **StringSet, UTF16 *String2Attach, uint64_t Index);
     
     /*!
-     @abstract                             "Attaches a string to a StringArray at the specified position".
-     @param               StringArray      "The StringArray to attach the String to".
+     @abstract                             "Attaches a string to a StringSet at the specified position".
+     @param               StringSet      "The StringSet to attach the String to".
      @param               String2Attach    "The String to attach".
      @param               Index            "Which position should String2Attach be in"?
      */
-    void                  UTF32_StringArray_Attach(UTF32 **StringArray, UTF32 *String2Attach, uint64_t Index);
+    void                  UTF32_StringSet_Attach(UTF32 **StringSet, UTF32 *String2Attach, uint64_t Index);
     
     /*!
-     @abstract                             "Gets the number of strings in a StringArray".
-     @param               StringArray      "The StringArray to get the number of strings in".
-     @return                               "Returns the number of strings in StringArray".
+     @abstract                             "Gets the number of strings in a StringSet".
+     @param               StringSet      "The StringSet to get the number of strings in".
+     @return                               "Returns the number of strings in StringSet".
      */
-    uint64_t              UTF8_StringArray_GetNumStrings(UTF8 **StringArray);
+    uint64_t              UTF8_StringSet_GetNumStrings(UTF8 **StringSet);
     
     /*!
-     @abstract                             "Gets the number of strings in a StringArray".
-     @param               StringArray      "The StringArray to get the number of strings in".
-     @return                               "Returns the number of strings in StringArray".
+     @abstract                             "Gets the number of strings in a StringSet".
+     @param               StringSet      "The StringSet to get the number of strings in".
+     @return                               "Returns the number of strings in StringSet".
      */
-    uint64_t              UTF16_StringArray_GetNumStrings(UTF16 **StringArray);
+    uint64_t              UTF16_StringSet_GetNumStrings(UTF16 **StringSet);
     
     /*!
-     @abstract                             "Gets the number of strings in a StringArray".
-     @param               StringArray      "The StringArray to get the number of strings in".
-     @return                               "Returns the number of strings in StringArray".
+     @abstract                             "Gets the number of strings in a StringSet".
+     @param               StringSet      "The StringSet to get the number of strings in".
+     @return                               "Returns the number of strings in StringSet".
      */
-    uint64_t              UTF32_StringArray_GetNumStrings(UTF32 **StringArray);
+    uint64_t              UTF32_StringSet_GetNumStrings(UTF32 **StringSet);
     
     /*!
-     @abstract                             "Gets the size of each string in the StringArray in code units".
-     @param               StringArray      "The StringArray to get the size of each string".
+     @abstract                             "Gets the size of each string in the StringSet in code units".
+     @param               StringSet      "The StringSet to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t             *UTF8_StringArray_GetStringSizesInCodeUnits(UTF8 **StringArray);
+    uint64_t             *UTF8_StringSet_GetStringSizesInCodeUnits(UTF8 **StringSet);
     
     /*!
-     @abstract                             "Gets the size of each string in the StringArray in code units".
-     @param               StringArray      "The StringArray to get the size of each string".
+     @abstract                             "Gets the size of each string in the StringSet in code units".
+     @param               StringSet      "The StringSet to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t             *UTF16_StringArray_GetStringSizesInCodeUnits(UTF16 **StringArray);
+    uint64_t             *UTF16_StringSet_GetStringSizesInCodeUnits(UTF16 **StringSet);
     
     /*!
-     @abstract                             "Gets the size of each string in the StringArray in code points".
-     @param               StringArray      "The StringArray to get the size of each string".
+     @abstract                             "Gets the size of each string in the StringSet in code points".
+     @param               StringSet      "The StringSet to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t             *UTF8_StringArray_GetStringSizesInCodePoints(UTF8 **StringArray);
+    uint64_t             *UTF8_StringSet_GetStringSizesInCodePoints(UTF8 **StringSet);
     
     /*!
-     @abstract                             "Gets the size of each string in the StringArray in code points".
-     @param               StringArray      "The StringArray to get the size of each string".
+     @abstract                             "Gets the size of each string in the StringSet in code points".
+     @param               StringSet      "The StringSet to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t             *UTF16_StringArray_GetStringSizesInCodePoints(UTF16 **StringArray);
+    uint64_t             *UTF16_StringSet_GetStringSizesInCodePoints(UTF16 **StringSet);
     
     /*!
-     @abstract                             "Gets the size of each string in the StringArray in code points".
-     @param               StringArray      "The StringArray to get the size of each string".
+     @abstract                             "Gets the size of each string in the StringSet in code points".
+     @param               StringSet      "The StringSet to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t             *UTF32_StringArray_GetStringSizesInCodePoints(UTF32 **StringArray);
+    uint64_t             *UTF32_StringSet_GetStringSizesInCodePoints(UTF32 **StringSet);
     
     /*!
-     @abstract                             "Decodes a StringArray to a UTF32_StringArray".
-     @param               StringArray      "The StringArray to decode".
-     @return                               "Returns the decoded StringArray".
+     @abstract                             "Decodes a StringSet to a UTF32_StringSet".
+     @param               StringSet      "The StringSet to decode".
+     @return                               "Returns the decoded StringSet".
      */
-    UTF32               **UTF8_StringArray_Decode(UTF8 **StringArray);
+    UTF32               **UTF8_StringSet_Decode(UTF8 **StringSet);
     
     /*!
-     @abstract                             "Decodes a StringArray to a UTF32_StringArray".
-     @param               StringArray      "The StringArray to decode".
-     @return                               "Returns the decoded StringArray".
+     @abstract                             "Decodes a StringSet to a UTF32_StringSet".
+     @param               StringSet      "The StringSet to decode".
+     @return                               "Returns the decoded StringSet".
      */
-    UTF32               **UTF16_StringArray_Decode(UTF16 **StringArray);
+    UTF32               **UTF16_StringSet_Decode(UTF16 **StringSet);
     
     /*!
-     @abstract                             "Encodes a StringArray to a UTF8_StringArray".
-     @param               StringArray      "The StringArray to encode".
-     @return                               "Returns the encoded StringArray".
+     @abstract                             "Encodes a StringSet to a UTF8_StringSet".
+     @param               StringSet      "The StringSet to encode".
+     @return                               "Returns the encoded StringSet".
      */
-    UTF8                **UTF8_StringArray_Encode(UTF32 **StringArray);
+    UTF8                **UTF8_StringSet_Encode(UTF32 **StringSet);
     
     /*!
-     @abstract                             "Encodes a StringArray to a UTF16_StringArray".
-     @param               StringArray      "The StringArray to encode".
-     @return                               "Returns the encoded StringArray".
+     @abstract                             "Encodes a StringSet to a UTF16_StringSet".
+     @param               StringSet      "The StringSet to encode".
+     @return                               "Returns the encoded StringSet".
      */
-    UTF16               **UTF16_StringArray_Encode(UTF32 **StringArray);
+    UTF16               **UTF16_StringSet_Encode(UTF32 **StringSet);
     
-    void                  UTF8_StringArray_Print(UTF8 **StringArray);
+    void                  UTF8_StringSet_Print(UTF8 **StringSet);
     
-    void                  UTF16_StringArray_Print(UTF16 **StringArray);
+    void                  UTF16_StringSet_Print(UTF16 **StringSet);
     
     /*!
-     @abstract                             "Deletes a UTF-8 encoded StringArray (like is returned by SplitString)".
-     @param               StringArray      "An StringArray to deinitialize, all strings will be freed".
+     @abstract                             "Deletes a UTF-8 encoded StringSet (like is returned by SplitString)".
+     @param               StringSet      "An StringSet to deinitialize, all strings will be freed".
      */
-    void                  UTF8_StringArray_Deinit(UTF8 **StringArray);
+    void                  UTF8_StringSet_Deinit(UTF8 **StringSet);
     
     /*!
-     @abstract                             "Deletes a UTF-16 encoded StringArray (like is returned by SplitString)".
-     @param               StringArray      "An StringArray to deinitialize, all strings will be freed".
+     @abstract                             "Deletes a UTF-16 encoded StringSet (like is returned by SplitString)".
+     @param               StringSet      "An StringSet to deinitialize, all strings will be freed".
      */
-    void                  UTF16_StringArray_Deinit(UTF16 **StringArray);
+    void                  UTF16_StringSet_Deinit(UTF16 **StringSet);
     
     /*!
-     @abstract                             "Deletes a UTF-16 encoded StringArray (like is returned by SplitString)".
-     @param               StringArray      "An StringArray to deinitialize, all strings will be freed".
+     @abstract                             "Deletes a UTF-16 encoded StringSet (like is returned by SplitString)".
+     @param               StringSet      "An StringSet to deinitialize, all strings will be freed".
      */
-    void                  UTF32_StringArray_Deinit(UTF32 **StringArray);
+    void                  UTF32_StringSet_Deinit(UTF32 **StringSet);
     
 #ifdef __cplusplus
 }

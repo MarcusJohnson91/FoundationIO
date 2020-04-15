@@ -1058,7 +1058,7 @@ extern "C" {
     }
     
     UTF32 **DeformatString_UTF32(FormatSpecifiers *Specifiers, UTF32 *Format, UTF32 *Formatted) {
-        UTF32 **Deformatted                            = UTF32_StringArray_Init(Specifiers->NumSpecifiers);
+        UTF32 **Deformatted                            = UTF32_StringSet_Init(Specifiers->NumSpecifiers);
         if (Deformatted != NULL) {
             for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
                 /*
@@ -1227,7 +1227,7 @@ extern "C" {
     }
     
     UTF8 **UTF8_Deformat(UTF8 *Format, UTF8 *Formatted) {
-        UTF8 **StringArray                   = NULL;
+        UTF8 **StringSet                   = NULL;
         if (Format != NULL && Formatted != NULL) {
             uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
@@ -1239,19 +1239,19 @@ extern "C" {
                 FormatSpecifiers_Deinit(Specifiers);
                 UTF32_Deinit(Format32);
                 UTF32_Deinit(Formatted32);
-                StringArray                  = UTF8_StringArray_Encode(Strings32);
-                UTF32_StringArray_Deinit(Strings32);
+                StringSet                  = UTF8_StringSet_Encode(Strings32);
+                UTF32_StringSet_Deinit(Strings32);
             }
         } else if (Format == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Format Pointer is NULL"));
         } else if (Formatted == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Formatted String is NULL"));
         }
-        return StringArray;
+        return StringSet;
     }
     
     UTF16 **UTF16_Deformat(UTF16 *Format, UTF16 *Formatted) {
-        UTF16 **StringArray                  = NULL;
+        UTF16 **StringSet                  = NULL;
         if (Format != NULL && Formatted != NULL) {
             uint64_t NumSpecifiers           = UTF16_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
@@ -1263,25 +1263,25 @@ extern "C" {
                 FormatSpecifiers_Deinit(Specifiers);
                 UTF32_Deinit(Format32);
                 UTF32_Deinit(Formatted32);
-                StringArray                  = UTF16_StringArray_Encode(Strings32);
-                UTF32_StringArray_Deinit(Strings32);
+                StringSet                  = UTF16_StringSet_Encode(Strings32);
+                UTF32_StringSet_Deinit(Strings32);
             }
         } else if (Format == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Format Pointer is NULL"));
         } else if (Formatted == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Formatted String is NULL"));
         }
-        return StringArray;
+        return StringSet;
     }
     
     UTF32 **UTF32_Deformat(UTF32 *Format, UTF32 *Formatted) {
-        UTF32 **StringArray                  = NULL;
+        UTF32 **StringSet                  = NULL;
         if (Format != NULL && Formatted != NULL) {
             uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
                 UTF32_ParseFormatSpecifiers(Format, Specifiers, StringType_UTF32);
-                StringArray                  = DeformatString_UTF32(Specifiers, Format, Formatted);
+                StringSet                  = DeformatString_UTF32(Specifiers, Format, Formatted);
                 FormatSpecifiers_Deinit(Specifiers);
             }
         } else if (Format == NULL) {
@@ -1289,7 +1289,7 @@ extern "C" {
         } else if (Formatted == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Formatted String is NULL"));
         }
-        return StringArray;
+        return StringSet;
     }
     
 #if (FoundationIOLanguage == FoundationIOLanguageIsCXX)

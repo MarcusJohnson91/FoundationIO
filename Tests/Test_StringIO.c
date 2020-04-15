@@ -91,7 +91,7 @@ extern "C" {
     bool Test_Deformat(void) {
         bool TestPassed      = No;
         UTF8 **DeformatTest1 = UTF8_Deformat(UTF8String("NumArgs: %1$llu, Equal: %llu, Type: %3$s"), UTF8String("NumArgs: 3, Equal: 1234, Type: Positional"));
-        UTF8_StringArray_Print(DeformatTest1);
+        UTF8_StringSet_Print(DeformatTest1);
         bool  SubString1     = UTF8_Compare(DeformatTest1[0], UTF8String("3"));
         bool  SubString2     = UTF8_Compare(DeformatTest1[1], UTF8String("1234"));
         bool  SubString3     = UTF8_Compare(DeformatTest1[2], UTF8String("Positional"));
