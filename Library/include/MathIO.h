@@ -17,14 +17,10 @@
 extern "C" {
 #endif
     
-#if   (FoundationIOStandardVersionC >= FoundationIOStandardVersionC99)
+#include <math.h>
+    
+#if   (FoundationIOLanguage == FoundationIOLanguageIsC && FoundationIOStandardVersionC >= FoundationIOStandardVersionC99 && FoundationIOTargetOS != FoundationIOWindowsOS)
 #include <tgmath.h>
-#if (defined __STDC_NO_COMPLEX__)
-#include <math.h>
-#elif (defined __STDC_COMPLEX__)
-#include <math.h>
-#include <complex.h>
-#endif /* Complex */
 #endif /* Version check */
     
     /*!
