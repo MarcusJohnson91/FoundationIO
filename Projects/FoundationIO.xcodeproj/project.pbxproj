@@ -10,7 +10,7 @@
 		2C410978236BA3320059FE67 /* BitIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C41096F236BA3050059FE67 /* BitIO.h */; };
 		2C410979236BA3320059FE67 /* ContainerIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CC71D96232B5F43006DA1B8 /* ContainerIO.h */; };
 		2C41097A236BA3320059FE67 /* CryptographyIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CC71D95232B5F43006DA1B8 /* CryptographyIO.h */; };
-		2C41097B236BA3320059FE67 /* Macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CC71D91232B5F43006DA1B8 /* Macros.h */; };
+		2C41097B236BA3320059FE67 /* PlatformIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CC71D91232B5F43006DA1B8 /* PlatformIO.h */; };
 		2C41097C236BA3320059FE67 /* MathIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CC71D92232B5F43006DA1B8 /* MathIO.h */; };
 		2C41097D236BA3320059FE67 /* TestIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CC71D9A232B5F43006DA1B8 /* TestIO.h */; };
 		2C41097E236BA3320059FE67 /* CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C410965236B9EAC0059FE67 /* CommandLineIO.c */; };
@@ -21,7 +21,7 @@
 		2C410983236BA3320059FE67 /* BitIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DAF232B5F56006DA1B8 /* BitIO.c */; };
 		2C410984236BA3320059FE67 /* ContainerIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DAC232B5F56006DA1B8 /* ContainerIO.c */; };
 		2C410985236BA3320059FE67 /* CryptographyIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DA7232B5F56006DA1B8 /* CryptographyIO.c */; };
-		2C410986236BA3320059FE67 /* Macros.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DA9232B5F56006DA1B8 /* Macros.c */; };
+		2C410986236BA3320059FE67 /* PlatformIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DA9232B5F56006DA1B8 /* PlatformIO.c */; };
 		2C410987236BA3320059FE67 /* MathIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DAA232B5F56006DA1B8 /* MathIO.c */; };
 		2C410988236BA3320059FE67 /* TestIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DAD232B5F56006DA1B8 /* TestIO.c */; };
 		2C6E010E23F4BBD1008E2121 /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C6E010D23F4BBD1008E2121 /* Constants.h */; };
@@ -170,13 +170,13 @@
 		2CC71D88232B5F20006DA1B8 /* Test_MathIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_MathIO.c; path = ../Tests/Test_MathIO.c; sourceTree = "<group>"; };
 		2CC71D89232B5F20006DA1B8 /* Test_CryptographyIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_CryptographyIO.c; path = ../Tests/Test_CryptographyIO.c; sourceTree = "<group>"; };
 		2CC71D8A232B5F20006DA1B8 /* Test_BitIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_BitIO.c; path = ../Tests/Test_BitIO.c; sourceTree = "<group>"; };
-		2CC71D91232B5F43006DA1B8 /* Macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Macros.h; path = ../Library/include/Macros.h; sourceTree = "<group>"; };
+		2CC71D91232B5F43006DA1B8 /* PlatformIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = PlatformIO.h; path = ../Library/include/PlatformIO.h; sourceTree = "<group>"; };
 		2CC71D92232B5F43006DA1B8 /* MathIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = MathIO.h; path = ../Library/include/MathIO.h; sourceTree = "<group>"; };
 		2CC71D95232B5F43006DA1B8 /* CryptographyIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = CryptographyIO.h; path = ../Library/include/CryptographyIO.h; sourceTree = "<group>"; };
 		2CC71D96232B5F43006DA1B8 /* ContainerIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = ContainerIO.h; path = ../Library/include/ContainerIO.h; sourceTree = "<group>"; };
 		2CC71D9A232B5F43006DA1B8 /* TestIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = TestIO.h; path = ../Library/include/TestIO.h; sourceTree = "<group>"; };
 		2CC71DA7232B5F56006DA1B8 /* CryptographyIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = CryptographyIO.c; path = ../Library/src/CryptographyIO.c; sourceTree = "<group>"; };
-		2CC71DA9232B5F56006DA1B8 /* Macros.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Macros.c; path = ../Library/src/Macros.c; sourceTree = "<group>"; };
+		2CC71DA9232B5F56006DA1B8 /* PlatformIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = PlatformIO.c; path = ../Library/src/PlatformIO.c; sourceTree = "<group>"; };
 		2CC71DAA232B5F56006DA1B8 /* MathIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = MathIO.c; path = ../Library/src/MathIO.c; sourceTree = "<group>"; };
 		2CC71DAC232B5F56006DA1B8 /* ContainerIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = ContainerIO.c; path = ../Library/src/ContainerIO.c; sourceTree = "<group>"; };
 		2CC71DAD232B5F56006DA1B8 /* TestIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = TestIO.c; path = ../Library/src/TestIO.c; sourceTree = "<group>"; };
@@ -334,7 +334,7 @@
 				2CC71DAF232B5F56006DA1B8 /* BitIO.c */,
 				2CC71DAC232B5F56006DA1B8 /* ContainerIO.c */,
 				2CC71DA7232B5F56006DA1B8 /* CryptographyIO.c */,
-				2CC71DA9232B5F56006DA1B8 /* Macros.c */,
+				2CC71DA9232B5F56006DA1B8 /* PlatformIO.c */,
 				2CC71DAA232B5F56006DA1B8 /* MathIO.c */,
 				2CC71DAD232B5F56006DA1B8 /* TestIO.c */,
 			);
@@ -350,7 +350,7 @@
 				2C41096F236BA3050059FE67 /* BitIO.h */,
 				2CC71D96232B5F43006DA1B8 /* ContainerIO.h */,
 				2CC71D95232B5F43006DA1B8 /* CryptographyIO.h */,
-				2CC71D91232B5F43006DA1B8 /* Macros.h */,
+				2CC71D91232B5F43006DA1B8 /* PlatformIO.h */,
 				2CC71D92232B5F43006DA1B8 /* MathIO.h */,
 				2CC71D9A232B5F43006DA1B8 /* TestIO.h */,
 			);
@@ -377,7 +377,7 @@
 				2C794B1023BB273900282D20 /* UnicodeTables.h in Headers */,
 				2C794B0D23BB272900282D20 /* LocalizationIO.h in Headers */,
 				2C70D27A242C025000632A2C /* UnicodeTypes.h in Headers */,
-				2C41097B236BA3320059FE67 /* Macros.h in Headers */,
+				2C41097B236BA3320059FE67 /* PlatformIO.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -576,7 +576,7 @@
 				2C41097F236BA3320059FE67 /* FormatIO.c in Sources */,
 				2C410983236BA3320059FE67 /* BitIO.c in Sources */,
 				2C410987236BA3320059FE67 /* MathIO.c in Sources */,
-				2C410986236BA3320059FE67 /* Macros.c in Sources */,
+				2C410986236BA3320059FE67 /* PlatformIO.c in Sources */,
 				2C410985236BA3320059FE67 /* CryptographyIO.c in Sources */,
 				2C410981236BA3320059FE67 /* StringIO.c in Sources */,
 				2C41097E236BA3320059FE67 /* CommandLineIO.c in Sources */,

@@ -6,7 +6,7 @@
  @brief               This header contains types, functions, and tables for string formatting/deformatting
  */
 
-#include "../Macros.h"
+#include "../PlatformIO.h"
 #include "../Constants.h"
 #include "UnicodeTypes.h"
 

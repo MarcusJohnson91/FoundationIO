@@ -6,7 +6,7 @@
  @brief               This header contains types, functions, and tables for cryptography and hashing.
  */
 
-#include "Macros.h"
+#include "PlatformIO.h"
 #include "UnicodeIO/UnicodeTypes.h"
 
 #pragma once

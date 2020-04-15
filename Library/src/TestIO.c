@@ -1,4 +1,4 @@
-#include "../include/Macros.h"
+#include "../include/PlatformIO.h"
 #include "../include/TestIO.h"                   /* Included for our declarations */
 #include "../include/UnicodeIO/LogIO.h"          /* Included for error reporting */
 #include "../include/UnicodeIO/StringIO.h"       /* Included for UTFX_Init functions */

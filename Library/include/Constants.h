@@ -6,7 +6,7 @@
  @brief               This header contains tables and enums used across FoundationIO.
  */
 
-#include "Macros.h"
+#include "PlatformIO.h"
 #include "UnicodeIO/UnicodeTypes.h" /* Included for UTF32 */
 
 #pragma once
