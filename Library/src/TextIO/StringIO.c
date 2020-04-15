@@ -2072,11 +2072,7 @@ extern "C" {
         UTF32   *CaseFoldedString = NULL;
         if (String != NULL) {
             UTF32 **ReplacementStrings = NULL;
-#if (FoundationIOLanguage == FoundationIOLanguageIsC)
-            ReplacementStrings         = CaseFoldStrings;
-#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-            ReplacementStrings         = const_cast<UTF32**>(CaseFoldStrings);
-#endif
+            ReplacementStrings    = UTF32_MakeStringMutable(CaseFoldStringSet);
             while (String[CodePoint] != FoundationIONULLTerminator) {
                 for (uint64_t Index = 0ULL; Index < CaseFoldTableSize; Index++) {
                     if (String[CodePoint] == CaseFoldCodePoints[Index]) {
@@ -2184,13 +2180,13 @@ extern "C" {
                 if (Kompatibility == Yes) {
                     for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
-                            ComposedString = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(KompatibleNormalizationStrings[Index]), CodePoint, 1);
+                            ComposedString = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(KompatibleNormalizationStringSet[Index]), CodePoint, 1);
                         }
                     }
                 } else {
                     for (uint64_t DecomposeCodePoint = 0ULL; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[DecomposeCodePoint]) {
-                            ComposedString = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(CanonicalNormalizationStrings[DecomposeCodePoint]), CodePoint, 1);
+                            ComposedString = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(CanonicalNormalizationStringSet[DecomposeCodePoint]), CodePoint, 1);
                         }
                     }
                 }
@@ -2211,13 +2207,13 @@ extern "C" {
                 if (Kompatibility == Yes) {
                     for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
                         if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
-                            Decomposed = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(KompatibleNormalizationStrings[Index]), CodePoint, 1);
+                            Decomposed = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(KompatibleNormalizationStringSet[Index]), CodePoint, 1);
                         }
                     }
                 } else {
                     for (uint64_t Index = 0ULL; Index < CanonicalNormalizationTableSize; Index++) {
                         if (String[CodePoint] == CanonicalNormalizationCodePoints[Index]) {
-                            Decomposed = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(CanonicalNormalizationStrings[Index]), CodePoint, 1);
+                            Decomposed = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(CanonicalNormalizationStringSet[Index]), CodePoint, 1);
                         }
                     }
                 }
@@ -3430,7 +3426,7 @@ extern "C" {
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             UTF16 *Encoded  = UTF16_Encode(StringSet[String]);
             printf("%ls\n", (wchar_t*) Encoded);
-            free(Decoded);
+            free(Encoded);
 #endif
         }
     }

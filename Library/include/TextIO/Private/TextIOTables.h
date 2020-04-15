@@ -36,7 +36,7 @@ extern "C" {
 
 #define CanonicalNormalizationTableSize 13233
 
-    static const UTF32    LineBreakTable[LineBreakTableSize] = {
+    static const UTF32 LineBreakTable[LineBreakTableSize] = {
         0x00000A,
         0x00000B,
         0x00000C,
@@ -46,7 +46,7 @@ extern "C" {
         0x002029,
     };
 
-    static const UTF32    BiDirectionalControlsTable[BiDirectionalControlsTableSize] = {
+    static const UTF32 BiDirectionalControlsTable[BiDirectionalControlsTableSize] = {
         0x00061C,
         0x00200E,
         0x00200F,
@@ -61,7 +61,7 @@ extern "C" {
         0x002069,
     };
 
-    static const UTF32    WordBreakTable[WordBreakTableSize] = {
+    static const UTF32 WordBreakTable[WordBreakTableSize] = {
         0x000020,
         0x0000A0,
         0x001680,
@@ -82,7 +82,7 @@ extern "C" {
         0x003000,
     };
 
-    static const UTF32    CurrencyTable[CurrencyTableSize] = {
+    static const UTF32 CurrencyTable[CurrencyTableSize] = {
         0x000024,
         0x0000A2,
         0x0000A3,
@@ -147,7 +147,7 @@ extern "C" {
         0x01ECB0,
     };
 
-    static const UTF32    DecimalCodePoints[DecimalTableSize] = {
+    static const UTF32 DecimalCodePoints[DecimalTableSize] = {
         0x0000BC,
         0x0000BD,
         0x0000BE,
@@ -273,7 +273,7 @@ extern "C" {
         0x01ED3D,
     };
 
-    static const int8_t   DecimalNumerators[DecimalTableSize] = {
+    static const int8_t DecimalNumerators[DecimalTableSize] = {
         1,
         1,
         3,
@@ -525,7 +525,7 @@ extern "C" {
         6,
     };
 
-    static const UTF32    CombiningCharacterClassTable[CombiningCharacterClassTableSize][2] = {
+    static const UTF32 CombiningCharacterClassTable[CombiningCharacterClassTableSize][2] = {
         {0x000300, 230},
         {0x000301, 230},
         {0x000302, 230},
@@ -1400,7 +1400,7 @@ extern "C" {
         {0x01E94A, 7},
     };
 
-    static const UTF32    IntegerCodePoints[IntegerTableSize] = {
+    static const UTF32 IntegerCodePoints[IntegerTableSize] = {
         0x000030,
         0x000031,
         0x000032,
@@ -4884,7 +4884,7 @@ extern "C" {
         9,
     };
 
-    static const UTF32    GraphemeExtensionTable[GraphemeExtensionTableSize] = {
+    static const UTF32 GraphemeExtensionTable[GraphemeExtensionTableSize] = {
         0x000300,
         0x000301,
         0x000302,
@@ -6866,7 +6866,7 @@ extern "C" {
         0x0E01EF,
     };
 
-    static const UTF32    KompatibleNormalizationCodePoints[KompatibleNormalizationTableSize] = {
+    static const UTF32 KompatibleNormalizationCodePoints[KompatibleNormalizationTableSize] = {
         0x0000A8,
         0x0000AF,
         0x0000B4,
@@ -8925,7 +8925,7 @@ extern "C" {
         0x01FBF9,
     };
 
-    static const UTF32   *KompatibleNormalizationStrings[KompatibleNormalizationTableSize] = {
+    static const UTF32 *KompatibleNormalizationStringSet[KompatibleNormalizationTableSize] = {
         U"\x20\u0308",
         U"\x20\u0304",
         U"\x20\u0301",
@@ -10984,7 +10984,7 @@ extern "C" {
         U"\x39",
     };
 
-    static const UTF32    CaseFoldCodePoints[CaseFoldTableSize] = {
+    static const UTF32 CaseFoldCodePoints[CaseFoldTableSize] = {
         0x000041,
         0x000042,
         0x000043,
@@ -17143,7 +17143,7 @@ extern "C" {
         0x02FA1D,
     };
 
-    static const UTF32   *CaseFoldStrings[CaseFoldTableSize] = {
+    static const UTF32 *CaseFoldStringSet[CaseFoldTableSize] = {
         U"\x61",
         U"\x62",
         U"\x63",
@@ -23302,7 +23302,7 @@ extern "C" {
         U"\U0002A600",
     };
 
-    static const UTF32    CanonicalNormalizationCodePoints[CanonicalNormalizationTableSize] = {
+    static const UTF32 CanonicalNormalizationCodePoints[CanonicalNormalizationTableSize] = {
         0x0000C0,
         0x0000C1,
         0x0000C2,
@@ -36538,7 +36538,7 @@ extern "C" {
         0x02FA1D,
     };
 
-    static const UTF32   *CanonicalNormalizationStrings[CanonicalNormalizationTableSize] = {
+    static const UTF32 *CanonicalNormalizationStringSet[CanonicalNormalizationTableSize] = {
         U"\x41\u0300",
         U"\x41\u0301",
         U"\x41\u0302",
