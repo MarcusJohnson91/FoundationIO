@@ -96,25 +96,25 @@ extern "C" {
     
     static void MD5_A(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += ((B & C) | (~B & D)) + X + AC;
-        A  = (uint32_t) RotateLeft(A, Shift);
+        A  = (uint32_t) Rotate(A, Shift, Rotate_Left);
         A += B;
     }
     
     static void MD5_B(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += ((B & D) | (C & ~D)) + X + AC;
-        A  = (uint32_t) RotateLeft(A, Shift);
+        A  = (uint32_t) Rotate(A, Shift, Rotate_Left);
         A += B;
     }
     
     static void MD5_C(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += (B ^ C ^ D) + X + AC;
-        A  = (uint32_t) RotateLeft(A, Shift);
+        A  = (uint32_t) Rotate(A, Shift, Rotate_Left);
         A += B;
     }
     
     static void MD5_D(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += (C ^ (B | ~D)) + X + AC;
-        A  = (uint32_t) RotateLeft(A, Shift);
+        A  = (uint32_t) Rotate(A, Shift, Rotate_Left);
         A += B;
     }
     
@@ -248,16 +248,16 @@ extern "C" {
                 
                 
                 uint64_t Mixed1   = Integer ^ Seed1;
-                uint64_t Rotated1 = RotateLeft(Mixed1, Rotate1);
+                uint64_t Rotated1 = Rotate(Mixed1, Rotate1, Rotate_Left);
                 
                 uint64_t Mixed2   = Rotated1 & Seed2;
-                uint64_t Rotated2 = RotateLeft(Mixed2, Rotate2);
+                uint64_t Rotated2 = Rotate(Mixed2, Rotate2, Rotate_Left);
                 
                 uint64_t Mixed3   = Rotated2 | Seed3;
-                uint64_t Rotated3 = RotateLeft(Mixed3, Rotate3);
+                uint64_t Rotated3 = Rotate(Mixed3, Rotate3, Rotate_Left);
                 
                 uint64_t Mixed4   = Rotated3 | Seed4;
-                uint64_t Rotated4 = RotateLeft(Mixed4, Rotate4);
+                uint64_t Rotated4 = Rotate(Mixed4, Rotate4, Rotate_Left);
                 
                 Random->EntropyPool[Word + 0] = (Rotated4 & 0xFF00000000000000) >> 56;
                 Random->EntropyPool[Word + 1] = (Rotated4 & 0x00FF000000000000) >> 48;

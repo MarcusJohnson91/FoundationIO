@@ -49,6 +49,12 @@ extern "C" {
                  RoundingType_Up                  = 2,
     } MathIO_RoundingTypes;
     
+    typedef enum MathIO_RotationType {
+        Rotate_Unknown = 0,
+        Rotate_Left    = 1,
+        Rotate_Right   = 2,
+    } MathIO_RotationType;
+    
     /*!
      @abstract                                    Tells if the number is negative.
      @param      Integer                          The value to find the signedness of.
@@ -527,9 +533,10 @@ extern "C" {
      @abstract                                    Rotates Value by Bits2Rotate.
      @param      Value                            The value to rotate.
      @param      Bits2Rotate                      The number of bits to rotate.
+     @param      Rotate                           The direction to rotate.
      @return                                      Returns the rotated value.
      */
-    uint64_t     RotateLeft(uint64_t Value, uint8_t Bits2Rotate);
+    uint64_t     Rotate(uint64_t Value, uint8_t Bits2Rotate, MathIO_RotationType Rotate);
     
 #if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 }
