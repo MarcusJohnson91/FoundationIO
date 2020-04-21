@@ -1,4 +1,5 @@
 #include "../include/MathIO.h"           /* Included for our declarations */
+#include "../include/UnicodeIO/LogIO.h"
 
 #if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 extern "C" {
@@ -461,12 +462,19 @@ extern "C" {
         return NumDigits;
     }
     
-#if (FoundationIOCompiler == FoundationIOCompilerIsClang)
-	uint64_t RotateLeft(uint64_t Value, uint8_t Bits2Rotate) __attribute__((no_sanitize("shift-exponent"))) {
-#else
-	uint64_t RotateLeft(uint64_t Value, uint8_t Bits2Rotate) {
-#endif
-        return (Value << Bits2Rotate) | (Value >> (64 - Bits2Rotate));
+    uint64_t Rotate(uint64_t Value, uint8_t Bits2Rotate, MathIO_RotationType Rotate) {
+        uint64_t Rotated = 0ULL;
+        if (Rotate != Rotate_Unknown) {
+            if (Rotate == Rotate_Left) {
+                Rotated  = (Value << Bits2Rotate) | (Value >> (64 - Bits2Rotate));
+            } else {
+                Rotated  = (Value >> Bits2Rotate) | (Value << (64 - Bits2Rotate));
+            }
+        } else {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Rotate_Unknown is invalid"));
+        }
+        return Rotated;
+        
     }
     
 #if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
