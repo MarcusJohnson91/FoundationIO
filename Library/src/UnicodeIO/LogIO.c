@@ -138,8 +138,9 @@ extern "C" {
         Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
         va_end(VariadicArguments);
         
-        UTF32 *FormattedString32 = FormatString_UTF32(Specifiers, Description2);
-        UTF8  *FormattedString8  = UTF8_Encode(FormattedString32);
+        uint64_t FormattedStringSize  = UTF32_GetFormattedStringSize(Description2, Specifiers);
+        UTF32 *FormattedString32      = FormatString_UTF32(Description2, Specifiers, FormattedStringSize);
+        UTF8  *FormattedString8       = UTF8_Encode(FormattedString32);
         
         UTF8_WriteLine(Severity == Severity_USER ? stdout : stderr, FormattedString8);
         fflush(stdout);

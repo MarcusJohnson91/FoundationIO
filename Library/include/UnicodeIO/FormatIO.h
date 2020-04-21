@@ -207,6 +207,11 @@ extern "C" {
     FormatSpecifiers     *FormatSpecifiers_Init(uint64_t NumSpecifiers);
     
     /*!
+     @remark                                                     MUST be called after Format_Specifiers_RetrieveArguments
+     */
+    uint64_t              UTF32_GetFormattedStringSize(UTF32 *Format, FormatSpecifiers *Specifiers);
+    
+    /*!
      @abstract                                                  "Parses the format specifiers".
      @param               Format                                "The string to substitute the specifiers with".
      @param               Specifiers                            "The Format Specifiers".
@@ -220,7 +225,14 @@ extern "C" {
      @param               Format                                "The string to substitute the specifiers with".
      @return                                                    "Returns the formatted string".
      */
-    UTF32                *FormatString_UTF32(FormatSpecifiers *Specifiers, UTF32 *Format);
+    UTF32                *FormatString_UTF32(UTF32 *Format, FormatSpecifiers *Specifiers, uint64_t FormattedStringSize);
+    
+    /*!
+     @abstract                                                  "Gets the Variadic Arguments from a Va_list, and adds them to FormatSpecifiers".
+     @param               Specifiers                            "Type to hold the Specifiers' data".
+     @param               Arguments                             "The variadic arguments".
+     */
+    void                  Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments);
     
     /*!
      @abstract                                                  "Deletes an instance of FormatSpecifiers".
@@ -283,13 +295,6 @@ extern "C" {
 #endif /* FoundationIOCompiler */
     
     /*!
-     @abstract                                                  "Gets the Variadic Arguments from a Va_list, and adds them to FormatSpecifiers".
-     @param               Specifiers                            "Type to hold the Specifiers' data".
-     @param               Arguments                             "The variadic arguments".
-     */
-    void                  Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments);
-    
-    /*!
      @abstract                                                  "Splits a string based on the specifiers in Format".
      @param               Format                                "A string with format specifiers".
      @param               Source                                "The string to extract the information from".
@@ -315,12 +320,12 @@ extern "C" {
     
     /*!
      @abstract                                                 "Deformats a UTF-32 encoded string, essentially scanf replacement".
-     @param               Specifiers                           "The Format Specifiers".
      @param               Format                               "The string with specifiers to parse".
+     @param               Specifiers                           "The Format Specifiers".
      @param               Result                               "The formatted string to extract the data for the StringSet into".
      @return                                                   "Returns a StringSet for each specifier".
      */
-    UTF32               **DeformatString_UTF32(FormatSpecifiers *Specifiers, UTF32 *Format, UTF32 *Result);
+    UTF32               **DeformatString_UTF32(UTF32 *Format, FormatSpecifiers *Specifiers, UTF32 *Result);
     
 #ifdef __cplusplus
 }
