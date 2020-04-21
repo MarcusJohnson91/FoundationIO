@@ -119,7 +119,15 @@ extern "C" {
          TestIO should also contain all of the Generate functions that, for example CodePoints, Strings, etc.
          */
         
-        bool TestPassed                        = false;
+        bool TestPassed  = false;
+        UTF32 *String1   = UTF32String("%U32s");
+        UTF32 *String2   = UTF32String("wat");
+        UTF32 *TestU32   = UTF32_Format(String1, String2);
+        if (UTF32_Compare(TestU32, String2)) {
+            printf("%s\n", UTF8String("Test1 Passed"));
+        } else {
+            printf("%s\n", UTF8String("Test1 Failed"));
+        }
         
         UTF32 *Test1     = UTF32_SubstituteSubString(UTF32String("surr %1$s ound"), UTF32String("3"), 5, 4);
         printf("%ls\n", (wchar_t*) Test1);
