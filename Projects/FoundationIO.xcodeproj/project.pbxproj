@@ -265,6 +265,7 @@
 			isa = PBXGroup;
 			children = (
 				2C794B0E23BB272D00282D20 /* Private */,
+				2C70D279242C025000632A2C /* UnicodeTypes.h */,
 				2C794B0723BB272900282D20 /* CommandLineIO.h */,
 				2C794B0423BB272900282D20 /* FormatIO.h */,
 				2C794B0823BB272900282D20 /* LocalizationIO.h */,
@@ -345,7 +346,6 @@
 			isa = PBXGroup;
 			children = (
 				2C794B0323BB271C00282D20 /* UnicodeIO */,
-				2C70D279242C025000632A2C /* UnicodeTypes.h */,
 				2C6E010D23F4BBD1008E2121 /* Constants.h */,
 				2C41096F236BA3050059FE67 /* BitIO.h */,
 				2CC71D96232B5F43006DA1B8 /* ContainerIO.h */,
@@ -747,7 +747,7 @@
 					"-g",
 					"-fsanitize-recover=address",
 					"-Wenum-conversion",
-					"-Wassign-enum",
+					"-Wno-assign-enum",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
