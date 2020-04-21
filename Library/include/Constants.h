@@ -52,20 +52,30 @@ extern "C" {
     
     /*!
      @enum       FoundationIO_Bases
-     @abstract                       "Defines the type of option".
+     @abstract                                         Defines the type of option.
+     @constant   Base_Integer                          ORable mask for Integers.
+     @constant   Base_Radix2                           Integer only, base-2/binary.
+     @constant   Base_Radix8                           Integer only, base-8/octal.
+     @constant   Base_Decimal                          ORable mask for floating point numbers.
+     @constant   Base_Radix10                          Integer or Decimal, base-10.
+     @constant   Base_Radix16                          Integer or Decimal, base-16/hexadecimal.
+     @constant   Base_Uppercase                        Base-16 only.
+     @constant   Base_Lowercase                        Base-16 only.
+     @constant   Base_Scientific                       Decimal only.
+     @constant   Base_Shortest                         Decimal only.
      */
     typedef enum FoundationIO_Bases {
-                 Base_Unknown        = 0,
-                 Base_Integer        = 1,   // Integer
-                 Base_Radix2         = 2,   // Integer Only
-                 Base_Radix8         = 4,   // Integer Only
-                 Base_Decimal        = 8,   // Decimal
-                 Base_Radix10        = 16,  // Integer | Decimal
-                 Base_Radix16        = 32,  // Integer | Decimal
-                 Base_Uppercase      = 64,  // Only compatible with Base_Radix16
-                 Base_Lowercase      = 128, // Only compatible with Base_Radix16
-                 Base_Scientific     = 256, // Decimal Only
-                 Base_Shortest       = 512, // Decimal Only
+                 Base_Unknown                          = 0,
+                 Base_Integer                          = 1,
+                 Base_Radix2                           = 2,
+                 Base_Radix8                           = 4,
+                 Base_Decimal                          = 8,
+                 Base_Radix10                          = 16,
+                 Base_Radix16                          = 32,
+                 Base_Uppercase                        = 64,
+                 Base_Lowercase                        = 128,
+                 Base_Scientific                       = 256,
+                 Base_Shortest                         = 512,
     } FoundationIO_Bases;
 
 	static const uint8_t BitMaskTable[BitMaskTableSize] = {

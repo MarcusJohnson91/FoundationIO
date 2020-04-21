@@ -296,7 +296,7 @@ extern "C" {
                 CLI->OptionIDs[MasterID].NumOptionSlaves  += 1;
                 uint64_t NumSlaves                         = CLI->OptionIDs[MasterID].NumOptionSlaves - 1;
                 uint64_t *Slaves_Old                       = CLI->OptionIDs[MasterID].Slaves;
-                CLI->OptionIDs[MasterID].Slaves            = (uint64_t*) realloc(CLI->OptionIDs[MasterID].Slaves, CLI->OptionIDs[MasterID].NumOptionSlaves * sizeof(uint64_t));
+                CLI->OptionIDs[MasterID].Slaves            = (uint64_t*) realloc(CLI->OptionIDs[MasterID].Slaves, CLI->OptionIDs[MasterID].NumOptionSlaves * sizeof(CLI->OptionIDs[MasterID].Slaves));
                 if (CLI->OptionIDs[MasterID].Slaves != NULL) {
                     free(Slaves_Old);
                 } else {
