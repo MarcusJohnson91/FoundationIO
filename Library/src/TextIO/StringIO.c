@@ -2,7 +2,7 @@
 #include "../../include/MathIO.h"                          /* Included for endian swapping */
 #include "../../include/UnicodeIO/FormatIO.h"              /* Included for the String formatting code */
 #include "../../include/UnicodeIO/LogIO.h"                 /* Included for error logging */
-#include "../../include/UnicodeIO/Private/UnicodeTables.h"   /* Included for the Unicode tables */
+#include "../../include/UnicodeIO/Private/UnicodeTables.h" /* Included for the Unicode tables */
 #include "../../include/UnicodeIO/StringIO.h"              /* Included for our declarations */
 
 #if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
@@ -10,28 +10,43 @@ extern "C" {
 #endif
     
     UTF8 *UTF8_Init(uint64_t NumCodeUnits) {
-        UTF8 *String = NULL;
-        String       = (UTF8*) calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF8));
-        if (String == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF8)) + FoundationIONULLTerminatorSize);
+        UTF8 *String            = NULL;
+        if (NumCodeUnits >= 1) {
+            uint64_t StringSize = NumCodeUnits + FoundationIONULLTerminatorSize;
+            String              = (UTF8*) calloc(StringSize, sizeof(UTF8));
+            if (String == NULL) {
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF8));
+            }
+        } else {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Invalid number of CodeUnits to allocate: %llu"), NumCodeUnits);
         }
         return String;
     }
     
     UTF16 *UTF16_Init(uint64_t NumCodeUnits) {
-        UTF16 *String = NULL;
-        String        = (UTF16*) calloc(NumCodeUnits + FoundationIONULLTerminatorSize, sizeof(UTF16));
-        if (String == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodeUnits * sizeof(UTF16)) + FoundationIONULLTerminatorSize);
+        UTF16 *String           = NULL;
+        if (NumCodeUnits >= 1) {
+            uint64_t StringSize = NumCodeUnits + FoundationIONULLTerminatorSize;
+            String              = (UTF16*) calloc(StringSize, sizeof(UTF16));
+            if (String == NULL) {
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF16));
+            }
+        } else {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Invalid number of CodeUnits to allocate: %llu"), NumCodeUnits);
         }
         return String;
     }
     
     UTF32 *UTF32_Init(uint64_t NumCodePoints) {
-        UTF32 *String = NULL;
-        String        = (UTF32*) calloc(NumCodePoints + FoundationIONULLTerminatorSize, sizeof(UTF32));
-        if (String == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), (NumCodePoints * sizeof(UTF32)) + FoundationIONULLTerminatorSize);
+        UTF32 *String           = NULL;
+        if (NumCodePoints >= 1) {
+            uint64_t StringSize = NumCodePoints + FoundationIONULLTerminatorSize;
+            String              = (UTF32*) calloc(StringSize, sizeof(UTF32));
+            if (String == NULL) {
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF32));
+            }
+        } else {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Invalid number of CodePoints to allocate: %llu"), NumCodePoints);
         }
         return String;
     }
