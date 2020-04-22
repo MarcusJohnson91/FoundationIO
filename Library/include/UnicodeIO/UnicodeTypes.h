@@ -16,84 +16,91 @@
 #if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 extern "C" {
 #endif
-    
+  
+#if defined(__has_include)
+#if __has_include(<uchar.h>)
+#include <uchar.h>
+#elif (!__has_include(<uchar.h>)) /* Define the uchar types ourself because there is no uchar header */
+  
+#if   (FoundationIOStandardVersionC <= FoundationIOStandardVersionC2X || FoundationIOStandardVersionCXX <= FoundationIOStandardVersionCXX20)
+#ifdef    __CHAR8_TYPE__
+#undef    __CHAR8_TYPE__
+#endif /* __CHAR8_TYPE__ */
+#define   __CHAR8_TYPE__
+  typedef unsigned char  char8_t;
+#endif /* FoundationIOStandardVersion 20 */
+  
+#if   (FoundationIOStandardVersionC <= FoundationIOStandardVersionC11 || FoundationIOStandardVersionCXX <= FoundationIOStandardVersionCXX11)
+#ifdef    __CHAR16_TYPE__
+#undef    __CHAR16_TYPE__
+#endif /* __CHAR16_TYPE__ */
+#define   __CHAR16_TYPE__
+  typedef uint_least16_t char16_t;
+#endif /* __CHAR16_TYPE__ */
+  
+#ifdef    __CHAR32_TYPE__
+#undef    __CHAR32_TYPE__
+#endif /* __CHAR32_TYPE__ */
+#define   __CHAR32_TYPE__
+  typedef uint_least32_t char32_t;
+#endif /* FoundationIOStandardVersion 11 */
+  
+#elif (!defined(__has_include)) /* Define the Unicode types ourself because there is no __has_include */
+  
+#if   (FoundationIOStandardVersionC <= FoundationIOStandardVersionC2X || FoundationIOStandardVersionCXX <= FoundationIOStandardVersionCXX20)
+#ifdef  __CHAR8_TYPE__
+#undef  __CHAR8_TYPE__
+#define __CHAR8_TYPE__
+#endif /* __CHAR8_TYPE__ */
+typedef unsigned char  char8_t;
+#endif /* FoundationIOStandardVersion 20 */
+  
+#if   (FoundationIOStandardVersionC <= FoundationIOStandardVersionC11 || FoundationIOStandardVersionCXX <= FoundationIOStandardVersionCXX11)
+#ifdef  __CHAR16_TYPE__
+#undef  __CHAR16_TYPE__
+#endif /* __CHAR16_TYPE__ */
+#define __CHAR16_TYPE__
+typedef uint_least16_t char16_t;
+  
+#ifdef  __CHAR32_TYPE__
+#undef  __CHAR32_TYPE__
+#endif /* __CHAR32_TYPE__ */
+#define __CHAR32_TYPE__
+typedef uint_least32_t char32_t;
+#endif /* FoundationIOStandardVersion 11 */
+#endif /* __has_include(<uchar.h>) */
+  
+  
 #ifndef   FoundationIO_StringType8
 #define   FoundationIO_StringType8 (1)
 #ifdef    UTF8
 #undef    UTF8
 #endif /* UTF8 */
-#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
-#if   (FoundationIOStandardVersionC >= FoundationIOStandardVersionC2X)
-#if   ((FoundationIOTargetOS & FoundationIOAppleOS) == FoundationIOAppleOS)
-    typedef               char                                  UTF8;
-#elif ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-    typedef               char8_t                               UTF8;
-#elif  (FoundationIOTargetOS == FoundationIOWindowsOS)
-    typedef               char                                  UTF8;
-#endif
-#else /* FoundationIOStandardVersionC < C11 */
-    typedef               char                                  UTF8;
-#endif /* FoundationIOStandardVersionC */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX20)
-    typedef               char8_t                               UTF8;
-#else
-    typedef               char                                  UTF8;
-#endif
-#endif /* FoundationIOStandardVersionCXX >= CXX11 */
-#endif /* FoundationIOLanguage */
-    
+typedef   char8_t                   UTF8;
+#endif /* FoundationIO_StringType8 */
+  
 #ifndef   FoundationIO_StringType16
 #define   FoundationIO_StringType16 (2)
 #ifdef    UTF16
 #undef    UTF16
 #endif /* UTF16 */
-#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
-#if   (FoundationIOStandardVersionC >= FoundationIOStandardVersionC11)
-#if   ((FoundationIOTargetOS & FoundationIOAppleOS) == FoundationIOAppleOS)
-    typedef               uint_least16_t                        UTF16;
-#elif ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-    typedef               char16_t                              UTF16;
-#elif  (FoundationIOTargetOS == FoundationIOWindowsOS)
-    typedef               uint_least16_t                        UTF16;
-#endif
-#else /* FoundationIOStandardVersionC < C11 */
-    typedef               uint_least16_t                        UTF16;
-#endif /* FoundationIOStandardVersionC */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
-    typedef               char16_t                              UTF16;
-#else
-    typedef               uint_least16_t                        UTF16;
-#endif
-#endif /* FoundationIOStandardVersionCXX >= CXX11 */
-#endif /* FoundationIOLanguage */
-    
-#ifndef   FoundationIO_StringType32
-#define   FoundationIO_StringType32 (4)
-#ifdef    UTF32
-#undef    UTF32
+typedef   char16_t                  UTF16;
+#endif /* FoundationIO_StringType16 */
+  
+  
+#ifndef                   FoundationIO_StringType32
+#define                   FoundationIO_StringType32 (4)
+#ifdef                    UTF32
+#undef                    UTF32
 #endif /* UTF32 */
-#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
-#if   (FoundationIOStandardVersionC >= FoundationIOStandardVersionC11)
-#if   ((FoundationIOTargetOS & FoundationIOAppleOS) == FoundationIOAppleOS)
-    typedef               uint_least32_t                        UTF32;
-#elif ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-    typedef               char32_t                              UTF32;
-#elif  (FoundationIOTargetOS == FoundationIOWindowsOS)
-    typedef               uint_least32_t                        UTF32;
-#endif
-#else /* FoundationIOStandardVersionC < C11 */
-    typedef               uint_least32_t                        UTF32;
-#endif /* FoundationIOStandardVersionC */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
-    typedef               char32_t                              UTF32;
-#else
-    typedef               uint_least32_t                        UTF32;
-#endif
-#endif /* FoundationIOStandardVersionCXX >= CXX11 */
-#endif /* FoundationIOLanguage */
+typedef                   char32_t                  UTF32;
+#endif /* FoundationIO_StringType32 */
+  
+  
+  
+    
+
+
     
     
     
@@ -118,7 +125,7 @@ extern "C" {
 #if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
 #define                   UTF8_MakeStringMutable(String)  const_cast<UTF8*>(String)
 #elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
-#define                   UTF8_MakeStringMutable(String) (String)
+#define                   UTF8_MakeStringMutable(String)  (String)
 #endif /* CXX11 */
 #elif (FoundationIOLanguage == FoundationIOLanguageIsC)
 #define                   UTF8_MakeStringMutable(String)  (String)
