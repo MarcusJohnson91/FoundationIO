@@ -2,7 +2,7 @@
  @header              UnicodeTypes.h
  @author              Marcus Johnson
  @copyright           2020+
- @version             1.0.0
+ @version             1.1.0
  @brief               This header contains types and macros used across FoundationIO.
  */
 
@@ -20,14 +20,37 @@ extern "C" {
 #if defined(__has_include)
 #if __has_include(<uchar.h>)
 #include <uchar.h>
+#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
+#ifndef   __c_char8_t
+#define   __c_char8_t
+#endif /* __c_char8_t */
+#ifdef    __CHAR8_TYPE__
+#undef    __CHAR8_TYPE__
+#define   __CHAR8_TYPE__
+#else
+#define   __CHAR8_TYPE__
+#endif /* __CHAR8_TYPE__ */
+#define   __CHAR8_TYPE__
+typedef                   unsigned char             char8_t;
+#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#ifndef   __cpp_char8_t
+#define   __cpp_char8_t
+#endif /* __cpp_char8_t */
+#ifdef    __CHAR8_TYPE__
+#undef    __CHAR8_TYPE__
+#define   __CHAR8_TYPE__
+#else
+#define   __CHAR8_TYPE__
+#endif /* __CHAR8_TYPE__ */
+typedef                   unsigned char             char8_t;
+#endif /* FoundationIOLanguage */
 #elif (!__has_include(<uchar.h>)) /* Define the uchar types ourself because there is no uchar header */
-  
 #if   (FoundationIOStandardVersionC <= FoundationIOStandardVersionC2X || FoundationIOStandardVersionCXX <= FoundationIOStandardVersionCXX20)
 #ifdef    __CHAR8_TYPE__
 #undef    __CHAR8_TYPE__
 #endif /* __CHAR8_TYPE__ */
 #define   __CHAR8_TYPE__
-  typedef unsigned char  char8_t;
+typedef                   unsigned char             char8_t;
 #endif /* FoundationIOStandardVersion 20 */
   
 #if   (FoundationIOStandardVersionC <= FoundationIOStandardVersionC11 || FoundationIOStandardVersionCXX <= FoundationIOStandardVersionCXX11)
@@ -35,38 +58,38 @@ extern "C" {
 #undef    __CHAR16_TYPE__
 #endif /* __CHAR16_TYPE__ */
 #define   __CHAR16_TYPE__
-  typedef uint_least16_t char16_t;
+typedef                   uint_least16_t            char16_t;
 #endif /* __CHAR16_TYPE__ */
   
 #ifdef    __CHAR32_TYPE__
 #undef    __CHAR32_TYPE__
 #endif /* __CHAR32_TYPE__ */
 #define   __CHAR32_TYPE__
-  typedef uint_least32_t char32_t;
+typedef                   uint_least32_t            char32_t;
 #endif /* FoundationIOStandardVersion 11 */
   
 #elif (!defined(__has_include)) /* Define the Unicode types ourself because there is no __has_include */
   
 #if   (FoundationIOStandardVersionC <= FoundationIOStandardVersionC2X || FoundationIOStandardVersionCXX <= FoundationIOStandardVersionCXX20)
-#ifdef  __CHAR8_TYPE__
-#undef  __CHAR8_TYPE__
-#define __CHAR8_TYPE__
+#ifdef    __CHAR8_TYPE__
+#undef    __CHAR8_TYPE__
+#define   __CHAR8_TYPE__
 #endif /* __CHAR8_TYPE__ */
-typedef unsigned char  char8_t;
+typedef                   unsigned char             char8_t;
 #endif /* FoundationIOStandardVersion 20 */
   
 #if   (FoundationIOStandardVersionC <= FoundationIOStandardVersionC11 || FoundationIOStandardVersionCXX <= FoundationIOStandardVersionCXX11)
-#ifdef  __CHAR16_TYPE__
-#undef  __CHAR16_TYPE__
+#ifdef    __CHAR16_TYPE__
+#undef    __CHAR16_TYPE__
 #endif /* __CHAR16_TYPE__ */
-#define __CHAR16_TYPE__
-typedef uint_least16_t char16_t;
+#define   __CHAR16_TYPE__
+typedef                   uint_least16_t            char16_t;
   
-#ifdef  __CHAR32_TYPE__
-#undef  __CHAR32_TYPE__
+#ifdef    __CHAR32_TYPE__
+#undef    __CHAR32_TYPE__
 #endif /* __CHAR32_TYPE__ */
-#define __CHAR32_TYPE__
-typedef uint_least32_t char32_t;
+#define   __CHAR32_TYPE__
+typedef                   uint_least32_t            char32_t;
 #endif /* FoundationIOStandardVersion 11 */
 #endif /* __has_include(<uchar.h>) */
   
@@ -76,7 +99,7 @@ typedef uint_least32_t char32_t;
 #ifdef    UTF8
 #undef    UTF8
 #endif /* UTF8 */
-typedef   char8_t                   UTF8;
+typedef                   char8_t                   UTF8;
 #endif /* FoundationIO_StringType8 */
   
 #ifndef   FoundationIO_StringType16
@@ -84,26 +107,17 @@ typedef   char8_t                   UTF8;
 #ifdef    UTF16
 #undef    UTF16
 #endif /* UTF16 */
-typedef   char16_t                  UTF16;
+typedef                   char16_t                  UTF16;
 #endif /* FoundationIO_StringType16 */
   
   
-#ifndef                   FoundationIO_StringType32
-#define                   FoundationIO_StringType32 (4)
-#ifdef                    UTF32
-#undef                    UTF32
+#ifndef   FoundationIO_StringType32
+#define   FoundationIO_StringType32 (2)
+#ifdef    UTF32
+#undef    UTF32
 #endif /* UTF32 */
 typedef                   char32_t                  UTF32;
 #endif /* FoundationIO_StringType32 */
-  
-  
-  
-    
-
-
-    
-    
-    
     
 #ifndef                   FoundationIOUnicodePropertyConversion8
 #define                   FoundationIOUnicodePropertyConversion8  (1)
