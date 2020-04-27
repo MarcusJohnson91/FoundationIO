@@ -16,9 +16,6 @@
     <Filter Include="Header Files\UnicodeIO\Private">
       <UniqueIdentifier>{574ed4c7-5d61-43b5-bb46-69615eca2c3f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Private">
-      <UniqueIdentifier>{740037f6-bead-4f44-974e-4ec3fcb11fe9}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Library\src\BitIO.c">
@@ -30,7 +27,7 @@
     <ClCompile Include="..\Library\src\CryptographyIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Library\src\Macros.c">
+    <ClCompile Include="..\Library\src\PlatformIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\src\MathIO.c">
@@ -59,16 +56,19 @@
     <ClInclude Include="..\Library\include\BitIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Library\include\Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\Library\include\ContainerIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\CryptographyIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\Macros.h">
+    <ClInclude Include="..\Library\include\MathIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\MathIO.h">
+    <ClInclude Include="..\Library\include\PlatformIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\TestIO.h">
@@ -89,11 +89,11 @@
     <ClInclude Include="..\Library\include\UnicodeIO\StringIO.h">
       <Filter>Header Files\UnicodeIO</Filter>
     </ClInclude>
+    <ClInclude Include="..\Library\include\UnicodeIO\UnicodeTypes.h">
+      <Filter>Header Files\UnicodeIO</Filter>
+    </ClInclude>
     <ClInclude Include="..\Library\include\UnicodeIO\Private\UnicodeTables.h">
       <Filter>Header Files\UnicodeIO\Private</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\Private\Constants.h">
-      <Filter>Header Files\Private</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

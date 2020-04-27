@@ -22,8 +22,8 @@
     <ClCompile Include="..\Library\src\BitIO.c" />
     <ClCompile Include="..\Library\src\ContainerIO.c" />
     <ClCompile Include="..\Library\src\CryptographyIO.c" />
-    <ClCompile Include="..\Library\src\Macros.c" />
     <ClCompile Include="..\Library\src\MathIO.c" />
+    <ClCompile Include="..\Library\src\PlatformIO.c" />
     <ClCompile Include="..\Library\src\TestIO.c" />
     <ClCompile Include="..\Library\src\UnicodeIO\CommandLineIO.c" />
     <ClCompile Include="..\Library\src\UnicodeIO\FormatIO.c" />
@@ -33,11 +33,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Library\include\BitIO.h" />
+    <ClInclude Include="..\Library\include\Constants.h" />
     <ClInclude Include="..\Library\include\ContainerIO.h" />
     <ClInclude Include="..\Library\include\CryptographyIO.h" />
-    <ClInclude Include="..\Library\include\Macros.h" />
     <ClInclude Include="..\Library\include\MathIO.h" />
-    <ClInclude Include="..\Library\include\Private\Constants.h" />
+    <ClInclude Include="..\Library\include\PlatformIO.h" />
     <ClInclude Include="..\Library\include\TestIO.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\CommandLineIO.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\FormatIO.h" />
@@ -45,6 +45,7 @@
     <ClInclude Include="..\Library\include\UnicodeIO\LogIO.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\Private\UnicodeTables.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\StringIO.h" />
+    <ClInclude Include="..\Library\include\UnicodeIO\UnicodeTypes.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
