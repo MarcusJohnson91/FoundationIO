@@ -431,6 +431,30 @@ extern "C" {
 #else
 #define             FoundationIOWideCharSize (WCHAR_MAX)
 #endif
+  
+  /*!
+   @abstract        FoundationIO_Immutable is for pointers and arrays.
+   @remark          Makes the pointer and the data it points to constant.
+   */
+#ifndef             FoundationIO_Immutable
+#define             FoundationIO_Immutable(PointerType) const PointerType const
+#endif
+    
+    /*!
+     @abstract        FoundationIO_Mutable is for pointers and arrays.
+     @remark          Makes the pointer and the data it points to volatile.
+     */
+#ifndef             FoundationIO_Mutable
+#define             FoundationIO_Mutable(PointerType) volatile PointerType volatile
+#endif
+  
+  /*!
+   @abstract        FoundationIO_Constant is for variables, constants, and values.
+   @remark          Makes the pointer and the data it points to constant.
+   */
+#ifndef             FoundationIO_Constant
+#define             FoundationIO_Constant(Type) const Type
+#endif
     
     uint64_t        FoundationIO_GetNumCPUCores(void);
     

@@ -209,7 +209,7 @@ extern "C" {
     /*!
      @remark                                                     MUST be called after Format_Specifiers_RetrieveArguments
      */
-    uint64_t              UTF32_GetFormattedStringSize(UTF32 *Format, FormatSpecifiers *Specifiers);
+    uint64_t              UTF32_GetFormattedStringSize(FoundationIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers);
     
     /*!
      @abstract                                                  "Parses the format specifiers".
@@ -217,7 +217,7 @@ extern "C" {
      @param               Specifiers                            "The Format Specifiers".
      @param               StringType                            "The original encoding of the Format string".
      */
-    void                  UTF32_ParseFormatSpecifiers(UTF32 *Format, FormatSpecifiers *Specifiers, FoundationIO_StringTypes StringType);
+    void                  UTF32_ParseFormatSpecifiers(FoundationIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, FoundationIO_StringTypes StringType);
     
     /*!
      @abstract                                                  "Formats a UTF-32 encoded string".
@@ -225,7 +225,7 @@ extern "C" {
      @param               Format                                "The string to substitute the specifiers with".
      @return                                                    "Returns the formatted string".
      */
-    UTF32                *FormatString_UTF32(UTF32 *Format, FormatSpecifiers *Specifiers, uint64_t FormattedStringSize);
+    UTF32                *FormatString_UTF32(FoundationIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, uint64_t FormattedStringSize);
     
     /*!
      @abstract                                                  "Gets the Variadic Arguments from a Va_list, and adds them to FormatSpecifiers".
@@ -282,15 +282,15 @@ extern "C" {
      @return                                                    "Returns the formatted string encoded using the UTF-8 format".
      */
 #if   (FoundationIOCompiler == FoundationIOCompilerIsClang)
-    UTF32                *UTF32_Format(UTF32 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+    UTF32                *UTF32_Format(FoundationIO_Immutable(UTF32 *) Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
 #elif (FoundationIOCompiler == FoundationIOCompilerIsGCC)
-    UTF32                *UTF32_Format(UTF32 *Format, ...);
+    UTF32                *UTF32_Format(FoundationIO_Immutable(UTF32 *) Format, ...);
 #elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 #include <sal.h>
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    UTF32                *UTF32_Format(__format_string UTF32 *Format, ...);
+    UTF32                *UTF32_Format(__format_string FoundationIO_Immutable(UTF32 *) Format, ...);
 #elif (_MSC_VER >= 1500)
-    UTF32                *UTF32_Format(_Printf_format_string_ UTF32 *Format, ...);
+    UTF32                *UTF32_Format(_Printf_format_string_ FoundationIO_Immutable(UTF32 *) Format, ...);
 #endif /* MSVC Version */
 #endif /* FoundationIOCompiler */
     
@@ -316,7 +316,7 @@ extern "C" {
      @param               Source                                "The string to extract the information from".
      @return                                                    "Returns a StringSet containing NumFormatSpecifiers strings, one string for each specifier".
      */
-    UTF32               **UTF32_Deformat(UTF32 *Format, UTF32 *Source);
+    UTF32               **UTF32_Deformat(FoundationIO_Immutable(UTF32 *) Format, FoundationIO_Immutable(UTF32 *) Source);
     
     /*!
      @abstract                                                 "Deformats a UTF-32 encoded string, essentially scanf replacement".
@@ -325,7 +325,7 @@ extern "C" {
      @param               Result                               "The formatted string to extract the data for the StringSet into".
      @return                                                   "Returns a StringSet for each specifier".
      */
-    UTF32               **DeformatString_UTF32(UTF32 *Format, FormatSpecifiers *Specifiers, UTF32 *Result);
+    UTF32               **DeformatString_UTF32(FoundationIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, FoundationIO_Immutable(UTF32 *) Result);
     
 #ifdef __cplusplus
 }

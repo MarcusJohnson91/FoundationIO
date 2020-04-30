@@ -126,7 +126,7 @@ extern "C" {
         return SizeChanged;
     }
     
-    void CommandLineIO_SetName(CommandLineIO *CLI, UTF32 *Name) {
+    void CommandLineIO_SetName(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Name) {
         if (CLI != NULL && Name != NULL) {
             UTF32 *Normalized    = UTF32_Normalize(Name, NormalizationForm_KompatibleCompose);
             UTF32 *CaseFolded    = UTF32_CaseFold(Normalized);
@@ -139,7 +139,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_SetVersion(CommandLineIO *CLI, UTF32 *Version) {
+    void CommandLineIO_SetVersion(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Version) {
         if (CLI != NULL && Version != NULL) {
             UTF32 *Normalized    = UTF32_Normalize(Version, NormalizationForm_KompatibleCompose);
             UTF32 *CaseFolded    = UTF32_CaseFold(Normalized);
@@ -152,7 +152,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_SetDescription(CommandLineIO *CLI, UTF32 *Description) {
+    void CommandLineIO_SetDescription(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Description) {
         if (CLI != NULL && Description != NULL) {
             UTF32 *Normalized        = UTF32_Normalize(Description, NormalizationForm_KompatibleCompose);
             UTF32 *CaseFolded        = UTF32_CaseFold(Normalized);
@@ -165,7 +165,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_SetAuthor(CommandLineIO *CLI, UTF32 *Author) {
+    void CommandLineIO_SetAuthor(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Author) {
         if (CLI != NULL && Author != NULL) {
             UTF32 *Normalized   = UTF32_Normalize(Author, NormalizationForm_KompatibleCompose);
             UTF32 *CaseFolded   = UTF32_CaseFold(Normalized);
@@ -178,7 +178,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_SetCopyright(CommandLineIO *CLI, UTF32 *Copyright) {
+    void CommandLineIO_SetCopyright(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Copyright) {
         if (CLI != NULL && Copyright != NULL) {
             UTF32 *Normalized     = UTF32_Normalize(Copyright, NormalizationForm_KompatibleCompose);
             UTF32 *CaseFolded     = UTF32_CaseFold(Normalized);
@@ -191,7 +191,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_SetLicense(CommandLineIO *CLI, CommandLineIO_LicenseTypes LicenseType, UTF32 *Name, UTF32 *LicenseURL) {
+    void CommandLineIO_SetLicense(CommandLineIO *CLI, CommandLineIO_LicenseTypes LicenseType, FoundationIO_Immutable(UTF32 *) Name, FoundationIO_Immutable(UTF32 *) LicenseURL) {
         if (CLI != NULL && LicenseType != LicenseType_Unknown && Name != NULL && LicenseURL != NULL) {
             CLI->LicenseType                = LicenseType;
             UTF32 *NormalizedName           = UTF32_Normalize(Name, NormalizationForm_KompatibleCompose);
@@ -234,7 +234,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF32 **Strings, uint64_t *Numerator, uint64_t *Denominator) {
+    void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, FoundationIO_Immutable(UTF32 **) Strings, FoundationIO_Immutable(uint64_t *) Numerator, FoundationIO_Immutable(uint64_t *) Denominator) {
         if (CLI != NULL) {
             uint64_t *StringSize = (uint64_t*) calloc(NumItems2Display + FoundationIONULLTerminatorSize, sizeof(uint64_t));
             for (uint8_t Item = 0; Item < NumItems2Display; Item++) {
@@ -260,7 +260,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_Option_SetName(CommandLineIO *CLI, uint64_t OptionID, UTF32 *Name) {
+    void CommandLineIO_Option_SetName(CommandLineIO *CLI, uint64_t OptionID, FoundationIO_Immutable(UTF32 *) Name) {
         if (CLI != NULL && OptionID < CLI->NumOptions && Name != NULL) {
             UTF32 *Normalized             = UTF32_Normalize(Name, NormalizationForm_KompatibleCompose);
             UTF32 *CaseFolded             = UTF32_CaseFold(Normalized);
@@ -275,7 +275,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_Option_SetDescription(CommandLineIO *CLI, uint64_t OptionID, UTF32 *Description) {
+    void CommandLineIO_Option_SetDescription(CommandLineIO *CLI, uint64_t OptionID, FoundationIO_Immutable(UTF32 *) Description) {
         if (CLI != NULL && Description != NULL && OptionID < CLI->NumOptions) {
             UTF32 *Normalized                    = UTF32_Normalize(Description, NormalizationForm_KompatibleCompose);
             UTF32 *CaseFolded                    = UTF32_CaseFold(Normalized);
@@ -471,7 +471,7 @@ extern "C" {
         }
     }
     
-    static UTF32 *ArgumentString2OptionFlag(UTF32 *ArgumentString) {
+    static UTF32 *ArgumentString2OptionFlag(FoundationIO_Immutable(UTF32 *) ArgumentString) {
         UTF32 *ArgumentSwitch = NULL;
         if (ArgumentString != NULL) {
             uint8_t  ArgumentStringPrefixSize = 0;
@@ -504,7 +504,7 @@ extern "C" {
         return NumArguments;
     }
     
-    UTF32 **CommandLineIO_GetArgumentArray(void **Arguments) {
+    UTF32 **CommandLineIO_GetArgumentArray(FoundationIO_Immutable(void **) Arguments) {
         UTF32 **ArgumentArray           = NULL;
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         ArgumentArray                   = (UTF32**) UTF8_StringSet_Decode((UTF8**) Arguments);
@@ -522,7 +522,7 @@ extern "C" {
         return ArgumentArray;
     }
     
-    static void CommandLineIO_UTF32_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, UTF32 **Arguments) {
+    static void CommandLineIO_UTF32_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, FoundationIO_Immutable(UTF32 **) Arguments) {
         if (CLI != NULL && CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions) {
             uint64_t     CurrentArgument  = 1LL;
             do {
@@ -575,7 +575,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, UTF8 **Arguments) {
+    void CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, FoundationIO_Immutable(UTF8 **) Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             UTF32 **Arguments32     = UTF32_StringSet_Init(NumArguments);
             for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
@@ -598,7 +598,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, UTF16 **Arguments) {
+    void CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, FoundationIO_Immutable(UTF16 **) Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             UTF32 **Arguments32     = UTF32_StringSet_Init(NumArguments);
             for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
@@ -704,7 +704,7 @@ extern "C" {
         return Result;
     }
     
-    static UTF32 *CommandLineIO_UTF32_GetExtension(UTF32 *Path) {
+    static UTF32 *CommandLineIO_UTF32_GetExtension(FoundationIO_Immutable(UTF32 *) Path) {
         UTF32 *Extension = NULL;
         if (Path != NULL) {
             uint64_t StringSize    = UTF32_GetStringSizeInCodePoints(Path);
@@ -730,7 +730,7 @@ extern "C" {
         return Extension;
     }
     
-    UTF8 *CommandLineIO_UTF8_GetExtension(UTF8 *Path) {
+    UTF8 *CommandLineIO_UTF8_GetExtension(FoundationIO_Immutable(UTF8 *) Path) {
         UTF8 *Extension = NULL;
         if (Path != NULL) {
             UTF32 *Decoded     = UTF8_Decode(Path);
@@ -743,7 +743,7 @@ extern "C" {
         return Extension;
     }
     
-    UTF16 *CommandLineIO_UTF16_GetExtension(UTF16 *Path) {
+    UTF16 *CommandLineIO_UTF16_GetExtension(FoundationIO_Immutable(UTF16 *) Path) {
         UTF16 *Extension       = NULL;
         if (Path != NULL) {
             UTF32 *Decoded     = UTF16_Decode(Path);
@@ -757,7 +757,7 @@ extern "C" {
         return Extension;
     }
     
-    UTF8 *CommandLineIO_UTF8_Colorize(UTF8 *String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
+    UTF8 *CommandLineIO_UTF8_Colorize(FoundationIO_Immutable(UTF8 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
         UTF8 *Colorized    = NULL;
         UTF32 *String32    = UTF8_Decode(String);
         UTF32 *Colorized32 = CommandLineIO_UTF32_Colorize(String32, ColorType, Red, Green, Blue);
@@ -767,7 +767,7 @@ extern "C" {
         return Colorized;
     }
     
-    UTF16 *CommandLineIO_UTF16_Colorize(UTF16 *String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
+    UTF16 *CommandLineIO_UTF16_Colorize(FoundationIO_Immutable(UTF16 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
         UTF16 *Colorized   = NULL;
         UTF32 *String32    = UTF16_Decode(String);
         UTF32 *Colorized32 = CommandLineIO_UTF32_Colorize(String32, ColorType, Red, Green, Blue);
@@ -777,7 +777,7 @@ extern "C" {
         return Colorized;
     }
     
-    UTF32 *CommandLineIO_UTF32_Colorize(UTF32 *String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
+    UTF32 *CommandLineIO_UTF32_Colorize(FoundationIO_Immutable(UTF32 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
         UTF32 *Colorized = NULL;
         uint8_t DigitSize = 0;
         DigitSize       += Logarithm(10, Red);
@@ -802,7 +802,7 @@ extern "C" {
         return Colorized;
     }
     
-    UTF8 *CommandLineIO_UTF8_Decolorize(UTF8 *String) {
+    UTF8 *CommandLineIO_UTF8_Decolorize(FoundationIO_Immutable(UTF8 *) String) {
         UTF8  *Decolorized   = NULL;
         UTF32 *String32      = UTF8_Decode(String);
         UTF32 *Decolorized32 = CommandLineIO_UTF32_Decolorize(String32);
@@ -812,7 +812,7 @@ extern "C" {
         return Decolorized;
     }
     
-    UTF16 *CommandLineIO_UTF16_Decolorize(UTF16 *String) {
+    UTF16 *CommandLineIO_UTF16_Decolorize(FoundationIO_Immutable(UTF16 *) String) {
         UTF16 *Decolorized   = NULL;
         UTF32 *String32      = UTF16_Decode(String);
         UTF32 *Decolorized32 = CommandLineIO_UTF32_Decolorize(String32);
@@ -822,7 +822,7 @@ extern "C" {
         return Decolorized;
     }
     
-    UTF32 *CommandLineIO_UTF32_Decolorize(UTF32 *String) {
+    UTF32 *CommandLineIO_UTF32_Decolorize(FoundationIO_Immutable(UTF32 *) String) {
         UTF32    *Decolorized          = NULL;
         uint64_t  EscapeSequenceSize   = 0;
         uint64_t  EscapeSequenceOffset = 0;

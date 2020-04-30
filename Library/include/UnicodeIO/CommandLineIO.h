@@ -147,42 +147,42 @@ extern "C" {
      @abstract                                                  "Helper function to decode argv/wargv to UTF32 for use with parsing".
      @return                                                    "Returns the decoded Arguments".
      */
-    UTF32                     **CommandLineIO_GetArgumentArray(void **Arguments);
+    UTF32                     **CommandLineIO_GetArgumentArray(FoundationIO_Immutable(void **) Arguments);
     
     /*!
      @abstract                                                  "Sets the name of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Name                            "The name of the program you're building".
      */
-    void                        CommandLineIO_SetName(CommandLineIO *CLI, UTF32 *Name);
+    void                        CommandLineIO_SetName(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Name);
     
     /*!
      @abstract                                                  "Sets the version of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Version                         "The version of the program you're building".
      */
-    void                        CommandLineIO_SetVersion(CommandLineIO *CLI, UTF32 *Version);
+    void                        CommandLineIO_SetVersion(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Version);
     
     /*!
      @abstract                                                  "Sets the description of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Description                     "Description of what the program does".
      */
-    void                        CommandLineIO_SetDescription(CommandLineIO *CLI, UTF32 *Description);
+    void                        CommandLineIO_SetDescription(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Description);
     
     /*!
      @abstract                                                  "Sets the author of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Author                          "Author of this program".
      */
-    void                        CommandLineIO_SetAuthor(CommandLineIO *CLI, UTF32 *Author);
+    void                        CommandLineIO_SetAuthor(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Author);
     
     /*!
      @abstract                                                  "Sets the copyright years of the program".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     Copyright                       "The starting year this program was written dash (CURRENTYEAR)".
      */
-    void                        CommandLineIO_SetCopyright(CommandLineIO *CLI, UTF32 *Copyright);
+    void                        CommandLineIO_SetCopyright(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Copyright);
     
     /*!
      @abstract                                                  "Sets the license of the program".
@@ -191,7 +191,7 @@ extern "C" {
      @param                     Name                            "What is the name of the license"?
      @param                     LicenseURL                      "The actual URL for the license".
      */
-    void                        CommandLineIO_SetLicense(CommandLineIO *CLI, CommandLineIO_LicenseTypes LicenseType, UTF32 *Name, UTF32 *LicenseURL);
+    void                        CommandLineIO_SetLicense(CommandLineIO *CLI, CommandLineIO_LicenseTypes LicenseType, FoundationIO_Immutable(UTF32 *) Name, FoundationIO_Immutable(UTF32 *) LicenseURL);
     
     /*!
      @abstract                                                  "What is the minimum number of options your program needs to operate"?
@@ -214,7 +214,7 @@ extern "C" {
      @param                     Numerator                       "A pointer to an array of the number of X tasks that have been completed".
      @param                     Denominator                     "A pointer to an array of the number of X thats that there are to do".
      */
-    void                        CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, UTF32 **Strings, uint64_t *Numerator, uint64_t *Denominator);
+    void                        CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, FoundationIO_Immutable(UTF32 **) Strings, FoundationIO_Immutable(uint64_t *) Numerator, FoundationIO_Immutable(uint64_t *) Denominator);
     
     /*!
      @abstract                                                  "Sets OptionID's flag in the CommandLineIO instance pointed by CLI".
@@ -223,7 +223,7 @@ extern "C" {
      @param                     OptionID                        "the option to set".
      @param                     Name                            "The flag to identify an option with".
      */
-    void                        CommandLineIO_Option_SetName(CommandLineIO *CLI, uint64_t OptionID, UTF32 *Name);
+    void                        CommandLineIO_Option_SetName(CommandLineIO *CLI, uint64_t OptionID, FoundationIO_Immutable(UTF32 *) Name);
     
     /*!
      @abstract                                                  "Sets OptionDescription's flag in the CommandLineIO instance pointed by CLI".
@@ -231,7 +231,7 @@ extern "C" {
      @param                     OptionID                        "the option to set".
      @param                     Description                     "Pointer to a UTF-8 encoded string containing the description of what this program does".
      */
-    void                        CommandLineIO_Option_SetDescription(CommandLineIO *CLI, uint64_t OptionID, UTF32 *Description);
+    void                        CommandLineIO_Option_SetDescription(CommandLineIO *CLI, uint64_t OptionID, FoundationIO_Immutable(UTF32 *) Description);
     
     /*!
      @abstract                                                  "Sets OptionID's flag in the CommandLineIO instance pointed by CLI".
@@ -262,7 +262,7 @@ extern "C" {
      @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to argc".
      @param                     Arguments                       "An array of UTF-8 encoded arguments; equilivent to argv"
      */
-    void                        CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, UTF8 **Arguments);
+    void                        CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, FoundationIO_Immutable(UTF8 **) Arguments);
     
     /*!
      @abstract                                                  "Parses the Command Line Options as UTF-16 encoded strings".
@@ -270,7 +270,7 @@ extern "C" {
      @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to __argc".
      @param                     Arguments                       "An array of UTF-16 encoded arguments; equilivent to __wargv"
      */
-    void                        CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, UTF16 **Arguments);
+    void                        CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, FoundationIO_Immutable(UTF16 **) Arguments);
     
     /*!
      @abstract                                                  "How many matching options are present in CommandLineIO (will also check for slave options if present)".
@@ -317,7 +317,7 @@ extern "C" {
      @param                     Blue                            "The amount of blue in the color,  0-255".
      @return                                                    "Returns the text but with color".
      */
-    UTF8                       *CommandLineIO_UTF8_Colorize(UTF8 *String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
+    UTF8                       *CommandLineIO_UTF8_Colorize(FoundationIO_Immutable(UTF8 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
     
     /*!
      @abstract                                                  "Makes a string colorful".
@@ -328,7 +328,7 @@ extern "C" {
      @param                     Blue                            "The amount of blue in the color,  0-255".
      @return                                                    "Returns the text but with color".
      */
-    UTF16                      *CommandLineIO_UTF16_Colorize(UTF16 *String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
+    UTF16                      *CommandLineIO_UTF16_Colorize(FoundationIO_Immutable(UTF16 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
     
     /*!
      @abstract                                                  "Makes a string colorful".
@@ -339,28 +339,28 @@ extern "C" {
      @param                     Blue                            "The amount of blue in the color,  0-255".
      @return                                                    "Returns the text but with color".
      */
-    UTF32                      *CommandLineIO_UTF32_Colorize(UTF32 *String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
+    UTF32                      *CommandLineIO_UTF32_Colorize(FoundationIO_Immutable(UTF32 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
     
     /*!
      @abstract                                                  Strips color escape sequences from the string".
      @param                     String                          "The string to decolorize".
      @return                                                    "Returns the text without color".
      */
-    UTF8                       *CommandLineIO_UTF8_Decolorize(UTF8 *String);
+    UTF8                       *CommandLineIO_UTF8_Decolorize(FoundationIO_Immutable(UTF8 *) String);
+    
+    /*!
+     @abstract                                                  Strips color escape sequences from the string.
+     @param                     String                          The string to decolorize.
+     @return                                                    Returns the text without color.
+     */
+    UTF16                      *CommandLineIO_UTF16_Decolorize(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                                                  Strips color escape sequences from the string".
      @param                     String                          "The string to decolorize".
      @return                                                    "Returns the text without color".
      */
-    UTF16                      *CommandLineIO_UTF16_Decolorize(UTF16 *String);
-    
-    /*!
-     @abstract                                                  Strips color escape sequences from the string".
-     @param                     String                          "The string to decolorize".
-     @return                                                    "Returns the text without color".
-     */
-    UTF32                      *CommandLineIO_UTF32_Decolorize(UTF32 *String);
+    UTF32                      *CommandLineIO_UTF32_Decolorize(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                                                  "Deallocates the instance of CommandLineIO pointed to by CLI".

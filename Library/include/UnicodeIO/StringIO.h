@@ -99,24 +99,23 @@ extern "C" {
      @constant            StringIO_ByteOrder_Big                 Use the big endian, Most-Significant-Byte first order.
      */
     typedef enum StringIO_ByteOrders {
-                 StringIO_ByteOrder_Unknown                      = 0,
-                 StringIO_ByteOrder_Native                       = 1,
-                 StringIO_ByteOrder_Little                       = 2,
-                 StringIO_ByteOrder_Big                          = 3,
+                          StringIO_ByteOrder_Unknown             = 0,
+                          StringIO_ByteOrder_Native              = 1,
+                          StringIO_ByteOrder_Little              = 2,
+                          StringIO_ByteOrder_Big                 = 3,
     } StringIO_ByteOrders;
     
     /*!
-     @enum       StringIO_TruncationTypes
-     @abstract                                          Is this BitInput or BitOutput connected to a File or Socket?
-     @constant   TruncationType_Unknown                 Unknown TrimString command.
-     @constant   TruncationType_All                     Trim at the beginning and end, removing all occurrences found there.
-     @constant   TruncationType_Most1                   Trim between start and end, removing all but 1 occurrence found between non-removable CodePoints
-     @constant   TrimString_All                         Remove all occurrences regardless of context.
+     @enum                StringIO_TruncationTypes
+     @abstract                                                   Is this BitInput or BitOutput connected to a File or Socket?
+     @constant            TruncationType_Unknown                 Unknown TrimString command.
+     @constant            TruncationType_All                     Trim at the beginning and end, removing all occurrences found there.
+     @constant            TruncationType_Most1                   Trim between start and end, removing all but 1 occurrence found between non-removable CodePoints
      */
     typedef enum StringIO_TruncationTypes {
-        TruncationType_Unknown                 = 0,
-        TruncationType_All                     = 1,
-        TruncationType_Most1                   = 2,
+                          TruncationType_Unknown                 = 0,
+                          TruncationType_All                     = 1,
+                          TruncationType_Most1                   = 2,
     } StringIO_TruncationTypes;
     
     /*!
@@ -177,266 +176,266 @@ extern "C" {
      @abstract                             "Decodes a CodePoint from UTF-8 CodeUnits".
      @param               CodeUnits        "Must start at a leading codeunit and be followed by at least as many trailing codeunits as indicitated by the leading code unit".
      */
-    UTF32                 UTF8_DecodeCodePoint(UTF8 *CodeUnits);
+    UTF32                 UTF8_DecodeCodePoint(FoundationIO_Immutable(UTF8 *) CodeUnits);
     
     /*!
      @abstract                             "Decodes a CodePoint from UTF-16 CodeUnits".
      @param               CodeUnits        "Must start at a leading codeunit and be followed by at least as many trailing codeunits as indicitated by the leading code unit".
      */
-    UTF32                 UTF16_DecodeCodePoint(UTF16 *CodeUnits);
+    UTF32                 UTF16_DecodeCodePoint(FoundationIO_Immutable(UTF16 *) CodeUnits);
     
     /*!
      @abstract                             "Gets the number of Unicode codeunits in the UTF8 string".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
      @param               String           "The string to get the number of codeunits in".
      */
-    uint64_t              UTF8_GetStringSizeInCodeUnits(UTF8 *String);
+    uint64_t              UTF8_GetStringSizeInCodeUnits(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Gets the number of Unicode codeunits in the UTF8".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
      @param               String           "The string to get the number of CodePoints in".
      */
-    uint64_t              UTF16_GetStringSizeInCodeUnits(UTF16 *String);
+    uint64_t              UTF16_GetStringSizeInCodeUnits(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Gets the number of Unicode CodePoints in the string".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
      @param               String           "The string to get the number of CodePoints in".
      */
-    uint64_t              UTF8_GetStringSizeInCodePoints(UTF8 *String);
+    uint64_t              UTF8_GetStringSizeInCodePoints(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Gets the number of Unicode CodePoints in the string".
      @remark                               "This function is optimized to skip over continuation code units, and will fail MISERABLY with invalid strings".
      @param               String           "The string to get the number of CodePoints in".
      */
-    uint64_t              UTF16_GetStringSizeInCodePoints(UTF16 *String);
+    uint64_t              UTF16_GetStringSizeInCodePoints(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Gets the number of Unicode CodePoints in the string".
      @param               String           "The string to get the number of CodePoints in".
      */
-    uint64_t              UTF32_GetStringSizeInCodePoints(UTF32 *String);
+    uint64_t              UTF32_GetStringSizeInCodePoints(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Gets the number of user visible characters in a UTF-8 string".
      @remark                               "This function just decodes the string and sends it off to the UTF32 version".
      @param               String           "The string to get the number of graphemes in".
      */
-    uint64_t              UTF8_GetStringSizeInGraphemes(UTF8 *String);
+    uint64_t              UTF8_GetStringSizeInGraphemes(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Gets the number of user visible characters in a UTF-16 string".
      @remark                               "This function just decodes the string and sends it off to the UTF32 version".
      @param               String           "The string to get the number of graphemes in".
      */
-    uint64_t              UTF16_GetStringSizeInGraphemes(UTF16 *String);
+    uint64_t              UTF16_GetStringSizeInGraphemes(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Gets the number of user visible characters in a UTF-32 string".
      @param               String           "The string to get the number of graphemes in".
      */
-    uint64_t              UTF32_GetStringSizeInGraphemes(UTF32 *String);
+    uint64_t              UTF32_GetStringSizeInGraphemes(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
      */
-    bool                  UTF8_IsUNCPath(UTF8 *String);
+    bool                  UTF8_IsUNCPath(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
      */
-    bool                  UTF16_IsUNCPath(UTF16 *String);
+    bool                  UTF16_IsUNCPath(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String has "//?/" right after the BOM, if it exists".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string contains "//?/", otherwise it returns No".
      */
-    bool                  UTF32_IsUNCPath(UTF32 *String);
+    bool                  UTF32_IsUNCPath(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String starts with / on POSIX, or the second character is : on Windows".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string starts with "/" or the second character is ":" on Windows, otherwise it returns No".
      */
-    bool                  UTF8_IsAbsolutePath(UTF8 *String);
+    bool                  UTF8_IsAbsolutePath(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String starts with / on POSIX, or the second character is : on Windows".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string starts with "/" or the second character is ":" on Windows, otherwise it returns No".
      */
-    bool                  UTF16_IsAbsolutePath(UTF16 *String);
+    bool                  UTF16_IsAbsolutePath(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String starts with / on POSIX, or the second character is : on Windows".
      @param               String           "The string to check".
      @return                               "Returns Yes if the string starts with "/" or the second character is ":" on Windows, otherwise it returns No".
      */
-    bool                  UTF32_IsAbsolutePath(UTF32 *String);
+    bool                  UTF32_IsAbsolutePath(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String contains a Windows or UNIX style line ending".
      @param               String           "The string to check".
      @return                               "Returns Yes if the String contains a Windows or UNIX style line ending, otherwise no".
      */
-    bool                  UTF8_HasNewLine(UTF8 *String);
+    bool                  UTF8_HasNewLine(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String contains a Windows or UNIX style line ending".
      @param               String           "The string to check".
      @return                               "Returns Yes if the String contains a Windows or UNIX style line ending, otherwise no".
      */
-    bool                  UTF16_HasNewLine(UTF16 *String);
+    bool                  UTF16_HasNewLine(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Tells if the string pointed to by String contains a Windows or UNIX style line ending".
      @param               String           "The string to check".
      @return                               "Returns Yes if the String contains a Windows or UNIX style line ending, otherwise no".
      */
-    bool                  UTF32_HasNewLine(UTF32 *String);
+    bool                  UTF32_HasNewLine(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Tells if the UTF-8 string pointed to by String is a valid UTF-8 encoded string".
      @param               String           "The string to get the validity status from".
      @return                               "Returns Yes if the string is valid, otherwise it returns No".
      */
-    bool                  UTF8_IsValid(UTF8 *String);
+    bool                  UTF8_IsValid(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Tells if the UTF-16 string pointed to by String is a valid UTF-16 encoded string".
      @param               String           "The string to get the validity status from".
      @return                               "Returns Yes if the string is valid, otherwise it returns No".
      */
-    bool                  UTF16_IsValid(UTF16 *String);
+    bool                  UTF16_IsValid(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Tells if the UTF-32 string pointed to by String is a valid UTF-32 encoded string".
      @param               String           "The string to get the validity status from".
      @return                               "Returns Yes if the string is valid, otherwise it returns No".
      */
-    bool                  UTF32_IsValid(UTF32 *String);
+    bool                  UTF32_IsValid(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Tells if the UTF-8 string pointed to by String has a Byte Order Mark at the beginning".
      @param               String           "The string to get the BOM status from".
      @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
      */
-    bool                  UTF8_HasBOM(UTF8 *String);
+    bool                  UTF8_HasBOM(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Tells if the UTF-16 string pointed to by String has a Byte Order Mark at the beginning".
      @param               String           "The string to get the BOM status from".
      @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
      */
-    bool                  UTF16_HasBOM(UTF16 *String);
+    bool                  UTF16_HasBOM(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Tells if the UTF-32 string pointed to by String has a Byte Order Mark at the beginning".
      @param               String           "The string to get the BOM status from".
      @return                               "Returns Yes if the string contains a BOM, otherwise it returns No".
      */
-    bool                  UTF32_HasBOM(UTF32 *String);
+    bool                  UTF32_HasBOM(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Adds the BOM to the UTF-8 string, UTF-8's only valid BOM is BE".
      @param               String           "The string to add the BOM to".
      */
-    UTF8                 *UTF8_AddBOM(UTF8 *String);
+    UTF8                 *UTF8_AddBOM(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Adds the specified BOM to the string".
      @param               String           "The string to add the BOM to".
      */
-    UTF16                *UTF16_AddBOM(UTF16 *String, StringIO_ByteOrders BOM2Add);
+    UTF16                *UTF16_AddBOM(FoundationIO_Immutable(UTF16 *) String, StringIO_ByteOrders BOM2Add);
     
     /*!
      @abstract                             "Adds the specified BOM to the string".
      @param               String           "The string to add the BOM to".
      */
-    UTF32                *UTF32_AddBOM(UTF32 *String, StringIO_ByteOrders BOM2Add);
+    UTF32                *UTF32_AddBOM(FoundationIO_Immutable(UTF32 *) String, StringIO_ByteOrders BOM2Add);
     
     /*!
      @abstract                             "Removes the BOM from the string".
      @param               String           "The string to remove the BOM from".
      */
-    UTF8                 *UTF8_RemoveBOM(UTF8 *String);
+    UTF8                 *UTF8_RemoveBOM(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Removes the BOM from the string".
      @param               String           "The string to remove the BOM from".
      */
-    UTF16                *UTF16_RemoveBOM(UTF16 *String);
+    UTF16                *UTF16_RemoveBOM(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Removes the BOM from the string".
      @param               String           "The string to remove the BOM from".
      */
-    UTF32                *UTF32_RemoveBOM(UTF32 *String);
+    UTF32                *UTF32_RemoveBOM(FoundationIO_Immutable(UTF32 *) String);
     /* Basic String Property Functions */
     
     /*!
      @abstract                             "Decodes a UTF8 string to a UTF32 string".
      @param               String           "The string to decode".
      */
-    UTF32                *UTF8_Decode(UTF8 *String);
+    UTF32                *UTF8_Decode(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Decodes a UTF16 string to a UTF32 string".
      @param               String           "The string to decode".
      */
-    UTF32                *UTF16_Decode(UTF16 *String);
+    UTF32                *UTF16_Decode(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Encodes a UTF32 string to a UTF8 string".
      @param               String           "The UTF32 string to encode to a UTF8 string".
      */
-    UTF8                 *UTF8_Encode(UTF32 *String);
+    UTF8                 *UTF8_Encode(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Encodes a UTF32 string to a UTF16 string".
      @param               String           "The string to encode".
      */
-    UTF16                *UTF16_Encode(UTF32 *String);
+    UTF16                *UTF16_Encode(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Converts a UTF8 string to a UTF16 string".
      @param               String           "The string to convert".
      */
-    UTF16                *UTF8_Convert(UTF8 *String);
+    UTF16                *UTF8_Convert(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Converts a UTF16 string to a UTF8 string".
      @param               String           "The string to convert".
      */
-    UTF8                 *UTF16_Convert(UTF16 *String);
+    UTF8                 *UTF16_Convert(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
      @param               String           "The string to be casefolded".
      @return                               "Returns the case folded string".
      */
-    UTF8                 *UTF8_CaseFold(UTF8 *String);
+    UTF8                 *UTF8_CaseFold(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
      @param               String           "The string to be casefolded".
      @return                               "Returns the case folded string".
      */
-    UTF16                *UTF16_CaseFold(UTF16 *String);
+    UTF16                *UTF16_CaseFold(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Casefolds string for case insensitive comparison".
      @param               String           "The string to be casefolded".
      @return                               "Returns the case folded string".
      */
-    UTF32                *UTF32_CaseFold(UTF32 *String);
+    UTF32                *UTF32_CaseFold(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining CodePoints in lexiographic order".
@@ -445,7 +444,7 @@ extern "C" {
      @param               String           "The string to be normalized".
      @param               NormalizedForm   "The type of normalization to use on the String".
      */
-    UTF8                 *UTF8_Normalize(UTF8 *String, StringIO_NormalizationForms NormalizedForm);
+    UTF8                 *UTF8_Normalize(FoundationIO_Immutable(UTF8 *) String, StringIO_NormalizationForms NormalizedForm);
     
     /*!
      @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining CodePoints in lexiographic order".
@@ -454,7 +453,7 @@ extern "C" {
      @param               String           "The string to be normalized".
      @param               NormalizedForm   "The type of normalization to use on the String".
      */
-    UTF16                *UTF16_Normalize(UTF16 *String, StringIO_NormalizationForms NormalizedForm);
+    UTF16                *UTF16_Normalize(FoundationIO_Immutable(UTF16 *) String, StringIO_NormalizationForms NormalizedForm);
     
     /*!
      @abstract                             "Converts string to use precomposed forms, otherwise it orders the combining CodePoints in lexiographic order".
@@ -462,28 +461,28 @@ extern "C" {
      @param               String           "The string to be normalized".
      @param               NormalizedForm   "The type of normalization to use on the String".
      */
-    UTF32                *UTF32_Normalize(UTF32 *String, StringIO_NormalizationForms NormalizedForm);
+    UTF32                *UTF32_Normalize(FoundationIO_Immutable(UTF32 *) String, StringIO_NormalizationForms NormalizedForm);
     
     /*!
      @abstract                             "Extracts a Grapheme from String".
      @param               String           "The string to extract from".
      @param               Grapheme         "The Grapheme to start extracting from".
      */
-    UTF8                 *UTF8_ExtractGrapheme(UTF8 *String, uint64_t Grapheme);
+    UTF8                 *UTF8_ExtractGrapheme(FoundationIO_Immutable(UTF8 *) String, uint64_t Grapheme);
     
     /*!
      @abstract                             "Extracts a Grapheme from String".
      @param               String           "The string to extract from".
      @param               Grapheme         "The Grapheme to start extracting from".
      */
-    UTF16                *UTF16_ExtractGrapheme(UTF16 *String, uint64_t Grapheme);
+    UTF16                *UTF16_ExtractGrapheme(FoundationIO_Immutable(UTF16 *) String, uint64_t Grapheme);
     
     /*!
      @abstract                             "Extracts a Grapheme from String".
      @param               String           "The string to extract from".
      @param               Grapheme         "The Grapheme to start extracting from".
      */
-    UTF32                *UTF32_ExtractGrapheme(UTF32 *String, uint64_t Grapheme);
+    UTF32                *UTF32_ExtractGrapheme(FoundationIO_Immutable(UTF32 *) String, uint64_t Grapheme);
     
     /*!
      @abstract                             "Compares String1 to String2".
@@ -491,7 +490,7 @@ extern "C" {
      @param               String2          "String2 for comparison".
      @return                               "Returns true if the strings match exactly, otherwise false".
      */
-    bool                  UTF8_Compare(UTF8 *String1, UTF8 *String2);
+    bool                  UTF8_Compare(FoundationIO_Immutable(UTF8 *) String1, FoundationIO_Immutable(UTF8 *) String2);
     
     /*!
      @abstract                             "Compares String1 to String2".
@@ -499,7 +498,7 @@ extern "C" {
      @param               String2          "String2 for comparison".
      @return                               "Returns true if the strings match exactly, otherwise false".
      */
-    bool                  UTF16_Compare(UTF16 *String1, UTF16 *String2);
+    bool                  UTF16_Compare(FoundationIO_Immutable(UTF16 *) String1, FoundationIO_Immutable(UTF16 *) String2);
     
     /*!
      @abstract                             "Compares String1 to String2".
@@ -507,7 +506,7 @@ extern "C" {
      @param               String2          "String2 for comparison".
      @return                               "Returns true if the strings match exactly, otherwise false".
      */
-    bool                  UTF32_Compare(UTF32 *String1, UTF32 *String2);
+    bool                  UTF32_Compare(FoundationIO_Immutable(UTF32 *) String1, FoundationIO_Immutable(UTF32 *) String2);
     
     /*!
      @abstract                             "Prependes Padding to String".
@@ -516,7 +515,7 @@ extern "C" {
      @param               Times2Pad        "The number of times for Padding to be duplicated".
      @return                               "Returns a new string containing Padding Times2Pad times + String".
      */
-    UTF8                 *UTF8_PadString(UTF8 *String, UTF8 *Padding, uint64_t Times2Pad);
+    UTF8                 *UTF8_PadString(FoundationIO_Immutable(UTF8 *) String, FoundationIO_Immutable(UTF8 *) Padding, uint64_t Times2Pad);
     
     /*!
      @abstract                             "Prependes Padding to String".
@@ -525,7 +524,7 @@ extern "C" {
      @param               Times2Pad        "The number of times for Padding to be duplicated".
      @return                               "Returns a new string containing Padding Times2Pad times + String".
      */
-    UTF16                *UTF16_PadString(UTF16 *String, UTF16 *Padding, uint64_t Times2Pad);
+    UTF16                *UTF16_PadString(FoundationIO_Immutable(UTF16 *) String, FoundationIO_Immutable(UTF16 *) Padding, uint64_t Times2Pad);
     
     /*!
      @abstract                             "Prependes Padding to String".
@@ -534,7 +533,7 @@ extern "C" {
      @param               Times2Pad        "The number of times for Padding to be duplicated".
      @return                               "Returns a new string containing Padding Times2Pad times + String".
      */
-    UTF32                *UTF32_PadString(UTF32 *String, UTF32 *Padding, uint64_t Times2Pad);
+    UTF32                *UTF32_PadString(FoundationIO_Immutable(UTF32 *) String, FoundationIO_Immutable(UTF32 *) Padding, uint64_t Times2Pad);
     
     /*!
      @abstract                             "Finds a substring within string, starting at CodePoint Offset, and ending at Offset + Length".
@@ -545,7 +544,7 @@ extern "C" {
      @param               Length           "How many CodePoints should we search for the substring? -1 means all CodePoints".
      @return                               "Returns the offset of the start of the substring in String, or -1 if a match wasn't found.".
      */
-    int64_t               UTF8_FindSubString(UTF8 *String, UTF8 *SubString, uint64_t Offset, int64_t Length);
+    int64_t               UTF8_FindSubString(FoundationIO_Immutable(UTF8 *) String, FoundationIO_Immutable(UTF8 *) SubString, uint64_t Offset, int64_t Length);
     
     /*!
      @abstract                             "Finds a substring within string, starting at CodePoint Offset, and ending at Offset + Length".
@@ -556,7 +555,7 @@ extern "C" {
      @param               Length           "How many CodePoints should we search for the substring? -1 means all CodePoints".
      @return                               "Returns the offset of the start of the substring in String, or -1 if a match wasn't found.".
      */
-    int64_t               UTF16_FindSubString(UTF16 *String, UTF16 *SubString, uint64_t Offset, int64_t Length);
+    int64_t               UTF16_FindSubString(FoundationIO_Immutable(UTF16 *) String, FoundationIO_Immutable(UTF16 *) SubString, uint64_t Offset, int64_t Length);
     
     /*!
      @abstract                             "Finds a substring within string, starting at CodePoint Offset, and ending at Offset + Length".
@@ -567,7 +566,7 @@ extern "C" {
      @param               Length           "How many CodePoints should we search for the substring? -1 means all CodePoints".
      @return                               "Returns the offset of the start of the substring in String, or -1 if a match wasn't found.".
      */
-    int64_t               UTF32_FindSubString(UTF32 *String, UTF32 *SubString, uint64_t Offset, int64_t Length);
+    int64_t               UTF32_FindSubString(FoundationIO_Immutable(UTF32 *) String, FoundationIO_Immutable(UTF32 *) SubString, uint64_t Offset, int64_t Length);
     
     /*!
      @abstract                             "Extracts a SubString from String".
@@ -575,7 +574,7 @@ extern "C" {
      @param               Offset           "The CodePoint to start extracting from".
      @param               Length           "The number of CodePoints to extract".
      */
-    UTF8                 *UTF8_ExtractSubString(UTF8 *String, uint64_t Offset, uint64_t Length);
+    UTF8                 *UTF8_ExtractSubString(FoundationIO_Immutable(UTF8 *) String, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Extracts a SubString from String".
@@ -583,7 +582,7 @@ extern "C" {
      @param               Offset           "The CodePoint to start extracting from".
      @param               Length           "The number of CodePoints to extract".
      */
-    UTF16                *UTF16_ExtractSubString(UTF16 *String, uint64_t Offset, uint64_t Length);
+    UTF16                *UTF16_ExtractSubString(FoundationIO_Immutable(UTF16 *) String, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Extracts a SubString from String".
@@ -591,7 +590,7 @@ extern "C" {
      @param               Offset           "The CodePoint to start extracting from".
      @param               Length           "The number of CodePoints to extract".
      */
-    UTF32                *UTF32_ExtractSubString(UTF32 *String, uint64_t Offset, uint64_t Length);
+    UTF32                *UTF32_ExtractSubString(FoundationIO_Immutable(UTF32 *) String, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Substitutes a section in String starting at Offset and ending at Offset + Length with Replacement".
@@ -600,7 +599,7 @@ extern "C" {
      @param               Offset           "Where to start replacing String with Substituion".
      @param               Length           "The number of CodePoints to substitute, can be more or less than Substituion".
      */
-    UTF8                 *UTF8_SubstituteSubString(UTF8 *String, UTF8 *Substitution, uint64_t Offset, uint64_t Length);
+    UTF8                 *UTF8_SubstituteSubString(FoundationIO_Immutable(UTF8 *) String, FoundationIO_Immutable(UTF8 *) Substitution, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Substitutes a section in String starting at Offset and ending at Offset + Length with Replacement".
@@ -609,7 +608,7 @@ extern "C" {
      @param               Offset           "Where to start replacing String with Substituion".
      @param               Length           "The number of CodePoints to substitute, can be more or less than Substituion".
      */
-    UTF16                *UTF16_SubstituteSubString(UTF16 *String, UTF16 *Substitution, uint64_t Offset, uint64_t Length);
+    UTF16                *UTF16_SubstituteSubString(FoundationIO_Immutable(UTF16 *) String, FoundationIO_Immutable(UTF16 *) Substitution, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Substitutes a section in String starting at Offset and ending at Offset + Length with Replacement".
@@ -618,7 +617,7 @@ extern "C" {
      @param               Offset           "Where to start replacing String with Substituion".
      @param               Length           "The number of CodePoints to substitute, can be more or less than Substituion".
      */
-    UTF32                *UTF32_SubstituteSubString(UTF32 *String, UTF32 *Substitution, uint64_t Offset, uint64_t Length);
+    UTF32                *UTF32_SubstituteSubString(FoundationIO_Immutable(UTF32 *) String, FoundationIO_Immutable(UTF32 *) Substitution, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Reallocates String and copies it except for the CodePoints between Offset and Length (inclusive)".
@@ -626,7 +625,7 @@ extern "C" {
      @param               Offset           "The first CodePoint to remove".
      @param               Length           "The last CodePoint to remove minus Offset".
      */
-    UTF8                 *UTF8_StitchSubString(UTF8 *String, uint64_t Offset, uint64_t Length);
+    UTF8                 *UTF8_StitchSubString(FoundationIO_Immutable(UTF8 *) String, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Reallocates String and copies it except for the CodePoints between Offset and Length (inclusive)".
@@ -634,7 +633,7 @@ extern "C" {
      @param               Offset           "The first CodePoint to remove".
      @param               Length           "The last CodePoint to remove minus Offset".
      */
-    UTF16                *UTF16_StitchSubString(UTF16 *String, uint64_t Offset, uint64_t Length);
+    UTF16                *UTF16_StitchSubString(FoundationIO_Immutable(UTF16 *) String, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Reallocates String and copies it except for the CodePoints between Offset and Length (inclusive)".
@@ -642,7 +641,7 @@ extern "C" {
      @param               Offset           "The first CodePoint to remove".
      @param               Length           "The last CodePoint to remove minus Offset".
      */
-    UTF32                *UTF32_StitchSubString(UTF32 *String, uint64_t Offset, uint64_t Length);
+    UTF32                *UTF32_StitchSubString(FoundationIO_Immutable(UTF32 *) String, uint64_t Offset, uint64_t Length);
     
     /*!
      @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
@@ -650,7 +649,7 @@ extern "C" {
      @param               SubString2Remove "The substring to remove from the string".
      @param               Instance2Remove  "The instance (0 for all) of the substring in the string to remove".
      */
-    UTF8                 *UTF8_RemoveSubString(UTF8 *String, UTF8 *SubString2Remove, uint64_t Instance2Remove);
+    UTF8                 *UTF8_RemoveSubString(FoundationIO_Immutable(UTF8 *) String, FoundationIO_Immutable(UTF8 *) SubString2Remove, uint64_t Instance2Remove);
     
     /*!
      @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
@@ -658,7 +657,7 @@ extern "C" {
      @param               SubString2Remove "The substring to remove from the string".
      @param               Instance2Remove  "The instance (0 for all) of the substring in the string to remove".
      */
-    UTF16                *UTF16_RemoveSubString(UTF16 *String, UTF16 *SubString2Remove, uint64_t Instance2Remove);
+    UTF16                *UTF16_RemoveSubString(FoundationIO_Immutable(UTF16 *) String, FoundationIO_Immutable(UTF16 *) SubString2Remove, uint64_t Instance2Remove);
     
     /*!
      @abstract                             "Reallocates String and copies it except for the instance (-1 for all instances) of the substring".
@@ -666,7 +665,7 @@ extern "C" {
      @param               SubString2Remove "The substring to remove from the string".
      @param               Instance2Remove  "The instance (0 for all) of the substring in the string to remove".
      */
-    UTF32                *UTF32_RemoveSubString(UTF32 *String, UTF32 *SubString2Remove, uint64_t Instance2Remove);
+    UTF32                *UTF32_RemoveSubString(FoundationIO_Immutable(UTF32 *) String, FoundationIO_Immutable(UTF32 *) SubString2Remove, uint64_t Instance2Remove);
     
     /*!
      @abstract                             "Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence".
@@ -675,7 +674,7 @@ extern "C" {
      @param               Substring        "The substring to check".
      @return                               "Returns whether Substring matches at the given offsets".
      */
-    bool                  UTF8_CompareSubString(UTF8 *String, UTF8 *Substring, uint64_t StringOffset, uint64_t SubstringOffset);
+    bool                  UTF8_CompareSubString(FoundationIO_Immutable(UTF8 *) String, FoundationIO_Immutable(UTF8 *) Substring, uint64_t StringOffset, uint64_t SubstringOffset);
     
     /*!
      @abstract                             "Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence".
@@ -684,7 +683,7 @@ extern "C" {
      @param               Substring        "The substring to check".
      @return                               "Returns whether Substring matches at the given offsets".
      */
-    bool                  UTF16_CompareSubString(UTF16 *String, UTF16 *Substring, uint64_t StringOffset, uint64_t SubstringOffset);
+    bool                  UTF16_CompareSubString(FoundationIO_Immutable(UTF16 *) String, FoundationIO_Immutable(UTF16 *) Substring, uint64_t StringOffset, uint64_t SubstringOffset);
     
     /*!
      @abstract                             "Compares String1 at StringOffset and Substring at SubstringOffset until the end of String or Substring for equivalence".
@@ -693,7 +692,7 @@ extern "C" {
      @param               Substring        "The substring to check".
      @return                               "Returns whether Substring matches at the given offsets".
      */
-    bool                  UTF32_CompareSubString(UTF32 *String, UTF32 *Substring, uint64_t StringOffset, uint64_t SubstringOffset);
+    bool                  UTF32_CompareSubString(FoundationIO_Immutable(UTF32 *) String, FoundationIO_Immutable(UTF32 *) Substring, uint64_t StringOffset, uint64_t SubstringOffset);
     
     /*!
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
@@ -701,7 +700,7 @@ extern "C" {
      @param               String           "The string you want to be split".
      @param               Delimiters       "An StringSet containing the delimiters, one delimiter per string".
      */
-    UTF8                **UTF8_Split(UTF8 *String, UTF8 **Delimiters);
+    UTF8                **UTF8_Split(FoundationIO_Immutable(UTF8 *) String, FoundationIO_Immutable(UTF8 **) Delimiters);
     
     /*!
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
@@ -709,7 +708,7 @@ extern "C" {
      @param               String           "The string you want to be split".
      @param               Delimiters       "An StringSet containing the delimiters, one delimiter per string".
      */
-    UTF16               **UTF16_Split(UTF16 *String, UTF16 **Delimiters);
+    UTF16               **UTF16_Split(FoundationIO_Immutable(UTF16 *) String, FoundationIO_Immutable(UTF16 **) Delimiters);
     
     /*!
      @abstract                             "Splits string into X substrings at delimiters, removing any delimiters found from the substrings in the process".
@@ -717,7 +716,7 @@ extern "C" {
      @param               String           "The string you want to be split".
      @param               Delimiters       "An StringSet containing the delimiters, one delimiter per string".
      */
-    UTF32               **UTF32_Split(UTF32 *String, UTF32 **Delimiters);
+    UTF32               **UTF32_Split(FoundationIO_Immutable(UTF32 *) String, FoundationIO_Immutable(UTF32 **) Delimiters);
     
     /*!
      @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
@@ -725,7 +724,7 @@ extern "C" {
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
-    int64_t               UTF8_String2Integer(FoundationIO_Bases Base, UTF8 *String);
+    int64_t               UTF8_String2Integer(FoundationIO_Bases Base, FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
@@ -733,7 +732,7 @@ extern "C" {
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
-    int64_t               UTF16_String2Integer(FoundationIO_Bases Base, UTF16 *String);
+    int64_t               UTF16_String2Integer(FoundationIO_Bases Base, FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Converts a string to an integer; replaces atoi, atol, strtol, strtoul".
@@ -741,7 +740,7 @@ extern "C" {
      @param               Base             "The base to output the integer in".
      @param               String           "The string to extract a number from".
      */
-    int64_t               UTF32_String2Integer(FoundationIO_Bases Base, UTF32 *String);
+    int64_t               UTF32_String2Integer(FoundationIO_Bases Base, FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Converts an integer to a string; replaces itoa".
@@ -768,19 +767,19 @@ extern "C" {
      @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
-    double                UTF8_String2Decimal(FoundationIO_Bases Base, UTF8 *String);
+    double                UTF8_String2Decimal(FoundationIO_Bases Base, FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
-    double                UTF16_String2Decimal(FoundationIO_Bases Base, UTF16 *String);
+    double                UTF16_String2Decimal(FoundationIO_Bases Base, FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l".
      @param               String           "The string composed of a decimal number to convert to a decimal".
      */
-    double                UTF32_String2Decimal(FoundationIO_Bases Base, UTF32 *String);
+    double                UTF32_String2Decimal(FoundationIO_Bases Base, FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Converts a double to a string; replaces dtostr".
@@ -805,42 +804,42 @@ extern "C" {
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringSet to remove from the String".
      */
-    UTF8                 *UTF8_Trim(UTF8 *String, StringIO_TruncationTypes Type, UTF8 **Strings2Remove);
+    UTF8                 *UTF8_Trim(FoundationIO_Immutable(UTF8 *) String, StringIO_TruncationTypes Type, FoundationIO_Immutable(UTF8 **) Strings2Remove);
     
     /*!
      @abstract                             "Removes substrings (including single CodePoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringSet to remove from the String".
      */
-    UTF16                *UTF16_Trim(UTF16 *String, StringIO_TruncationTypes Type, UTF16 **Strings2Remove);
+    UTF16                *UTF16_Trim(FoundationIO_Immutable(UTF16 *) String, StringIO_TruncationTypes Type, FoundationIO_Immutable(UTF16 **) Strings2Remove);
     
     /*!
      @abstract                             "Removes substrings (including single CodePoints) from a string".
      @param               String           "The string to perform the trimming operations on".
      @param               Strings2Remove   "An StringSet to remove from the String".
      */
-    UTF32                *UTF32_Trim(UTF32 *String, StringIO_TruncationTypes Type, UTF32 **Strings2Remove);
+    UTF32                *UTF32_Trim(FoundationIO_Immutable(UTF32 *) String, StringIO_TruncationTypes Type, FoundationIO_Immutable(UTF32 **) Strings2Remove);
     
     /*!
      @abstract                             "Strips all instances of Strings2Remove from String".
      @param               String           "The string to perform the strip operation on".
      @param               Strings2Remove   "An StringSet to remove from the String".
      */
-    UTF8                 *UTF8_Strip(UTF8 *String, UTF8 **Strings2Remove);
+    UTF8                 *UTF8_Strip(FoundationIO_Immutable(UTF8 *) String, FoundationIO_Immutable(UTF8 **) Strings2Remove);
     
     /*!
      @abstract                             "Strips all instances of Strings2Remove from String".
      @param               String           "The string to perform the strip operation on".
      @param               Strings2Remove   "An StringSet to remove from the String".
      */
-    UTF16                *UTF16_Strip(UTF16 *String, UTF16 **Strings2Remove);
+    UTF16                *UTF16_Strip(FoundationIO_Immutable(UTF16 *) String, FoundationIO_Immutable(UTF16 **) Strings2Remove);
     
     /*!
      @abstract                             "Strips all instances of Strings2Remove from String".
      @param               String           "The string to perform the strip operation on".
      @param               Strings2Remove   "An StringSet to remove from the String".
      */
-    UTF32                *UTF32_Strip(UTF32 *String, UTF32 **Strings2Remove);
+    UTF32                *UTF32_Strip(FoundationIO_Immutable(UTF32 *) String, FoundationIO_Immutable(UTF32 **) Strings2Remove);
     
     /*!
      @abstract                             "Copies the String".
@@ -848,7 +847,7 @@ extern "C" {
      @param               String           "Pointer to the String to be copied".
      @return                               "Returns A pointer to a copy of the String".
      */
-    UTF8                 *UTF8_Clone(UTF8 *String);
+    UTF8                 *UTF8_Clone(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Copies the String".
@@ -856,7 +855,7 @@ extern "C" {
      @param               String           "Pointer to the String to be copied".
      @return                               "Returns A pointer to a copy of the String".
      */
-    UTF16                *UTF16_Clone(UTF16 *String);
+    UTF16                *UTF16_Clone(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Copies the String".
@@ -864,7 +863,7 @@ extern "C" {
      @param               String           "Pointer to the String to be copied".
      @return                               "Returns A pointer to a copy of the String".
      */
-    UTF32                *UTF32_Clone(UTF32 *String);
+    UTF32                *UTF32_Clone(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                              Securely erases a string.
@@ -897,7 +896,7 @@ extern "C" {
      @param               NumGraphemes     "The maxiumum amount of CodeUnits in the string, not counting the null terminator".
      @return                               "Returns the truncated, null terminated copy of String".
      */
-    UTF8                 *UTF8_Truncate(UTF8 *String, uint64_t NumGraphemes);
+    UTF8                 *UTF8_Truncate(FoundationIO_Immutable(UTF8 *) String, uint64_t NumGraphemes);
     
     /*!
      @abstract                             "Cuts a string down to MaxCodeUnits CodeUnits".
@@ -906,7 +905,7 @@ extern "C" {
      @param               NumGraphemes     "The maxiumum amount of CodeUnits in the string, not counting the null terminator".
      @return                               "Returns the truncated, null terminated copy of String".
      */
-    UTF16                *UTF16_Truncate(UTF16 *String, uint64_t NumGraphemes);
+    UTF16                *UTF16_Truncate(FoundationIO_Immutable(UTF16 *) String, uint64_t NumGraphemes);
     
     /*!
      @abstract                             "Cuts a string down to MaxCodePoints CodePoints".
@@ -915,7 +914,7 @@ extern "C" {
      @param               NumGraphemes     "The maxiumum amount of CodePoints in the string, not counting the null terminator".
      @return                               "Returns the truncated, null terminated copy of String".
      */
-    UTF32                *UTF32_Truncate(UTF32 *String, uint64_t NumGraphemes);
+    UTF32                *UTF32_Truncate(FoundationIO_Immutable(UTF32 *) String, uint64_t NumGraphemes);
     
     /*!
      @abstract                             "Creates a copy of String, with String2Insert starting at Offset".
@@ -925,7 +924,7 @@ extern "C" {
      @param               Offset           "In CodePoints, not code units".
      @return                               "Returns a pointer to a new string containing the original, and String2Insert at Offset".
      */
-    UTF8                 *UTF8_Insert(UTF8 *String, UTF8 *String2Insert, uint64_t Offset);
+    UTF8                 *UTF8_Insert(FoundationIO_Immutable(UTF8 *) String, FoundationIO_Immutable(UTF8 *) String2Insert, uint64_t Offset);
     
     /*!
      @abstract                             "Creates a copy of String, with String2Insert starting at Offset".
@@ -935,7 +934,7 @@ extern "C" {
      @param               Offset           "In CodePoints, not code units".
      @return                               "Returns a pointer to a new string containing the original, and String2Insert at Offset".
      */
-    UTF16                *UTF16_Insert(UTF16 *String, UTF16 *String2Insert, uint64_t Offset);
+    UTF16                *UTF16_Insert(FoundationIO_Immutable(UTF16 *) String, FoundationIO_Immutable(UTF16 *) String2Insert, uint64_t Offset);
     
     /*!
      @abstract                             "Creates a copy of String, with String2Insert starting at Offset".
@@ -945,28 +944,28 @@ extern "C" {
      @param               Offset           "In CodePoints, not code units".
      @return                               "Returns a pointer to a new string containing the original, and String2Insert at Offset".
      */
-    UTF32                *UTF32_Insert(UTF32 *String, UTF32 *String2Insert, uint64_t Offset);
+    UTF32                *UTF32_Insert(FoundationIO_Immutable(UTF32 *) String, FoundationIO_Immutable(UTF32 *) String2Insert, uint64_t Offset);
     
     /*!
      @abstract                             "Reverses a string Grapheme by Grapheme".
      @remark                               "It is your responsibility to free the returned string when you're done using it".
      @param               String           "A string to reverse".
      */
-    UTF8                 *UTF8_Reverse(UTF8 *String);
+    UTF8                 *UTF8_Reverse(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Reverses a string Grapheme by Grapheme".
      @remark                               "It is your responsibility to free the returned string when you're done using it".
      @param               String           "A string to reverse".
      */
-    UTF16                *UTF16_Reverse(UTF16 *String);
+    UTF16                *UTF16_Reverse(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Reverses a string Grapheme by Grapheme".
      @remark                               "It is your responsibility to free the returned string when you're done using it".
      @param               String           "A string to reverse".
      */
-    UTF32                *UTF32_Reverse(UTF32 *String);
+    UTF32                *UTF32_Reverse(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Reads a Grapheme from Source".
@@ -990,7 +989,7 @@ extern "C" {
      @param               Source           "The file to write to".
      @param               CodePoint        "An array of CodeUnits containing one CodePoint".
      */
-    void                  UTF8_WriteGrapheme(FILE *Source, UTF8 *CodePoint);
+    void                  UTF8_WriteGrapheme(FILE *Source, FoundationIO_Immutable(UTF8 *) CodePoint);
     
     /*!
      @abstract                             "Writes a CodePoint to Source".
@@ -998,7 +997,7 @@ extern "C" {
      @param               Source           "The file to write to".
      @param               CodePoint        "An array of CodeUnits containing one CodePoint".
      */
-    void                  UTF16_WriteGrapheme(FILE *Source, UTF16 *CodePoint);
+    void                  UTF16_WriteGrapheme(FILE *Source, FoundationIO_Immutable(UTF16 *) CodePoint);
     
     /*!
      @abstract                             "Reads a Line (Including mewline) from Source".
@@ -1022,7 +1021,7 @@ extern "C" {
      @param               OutputFile       "The file to write the string to".
      @param               String           "The String to write".
      */
-    void                  UTF8_WriteLine(FILE *OutputFile, UTF8 *String);
+    void                  UTF8_WriteLine(FILE *OutputFile, FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Writes a Line (Including mewline) to Source".
@@ -1030,28 +1029,28 @@ extern "C" {
      @param               OutputFile       "The file to write the string to".
      @param               String           "The String to write".
      */
-    void                  UTF16_WriteLine(FILE *OutputFile, UTF16 *String);
+    void                  UTF16_WriteLine(FILE *OutputFile, FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Counts the number of Format Specifiers in String".
      @param               String           "The string to check".
      @return                               "Returns the number of format specifiers found".
      */
-    uint64_t              UTF8_GetNumFormatSpecifiers(UTF8 *String);
+    uint64_t              UTF8_GetNumFormatSpecifiers(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Counts the number of Format Specifiers in String".
      @param               String           "The string to check".
      @return                               "Returns the number of format specifiers found".
      */
-    uint64_t              UTF16_GetNumFormatSpecifiers(UTF16 *String);
+    uint64_t              UTF16_GetNumFormatSpecifiers(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Counts the number of Format Specifiers in String".
      @param               String           "The string to check".
      @return                               "Returns the number of format specifiers found".
      */
-    uint64_t              UTF32_GetNumFormatSpecifiers(UTF32 *String);
+    uint64_t              UTF32_GetNumFormatSpecifiers(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Counts the number of Digits in String starting at Offset (inclusive)".
@@ -1060,7 +1059,7 @@ extern "C" {
      @param               Offset           "Where to start looking for digits".
      @return                               "Returns the number of format specifiers found".
      */
-    uint64_t              UTF32_GetNumDigits(FoundationIO_Bases Base, UTF32 *String, uint64_t Offset); // Format/Deformat
+    uint64_t              UTF32_GetNumDigits(FoundationIO_Bases Base, FoundationIO_Immutable(UTF32 *) String, uint64_t Offset); // Format/Deformat
     
     /*!
      @abstract                             "Gets a substring from Offset to where Format and Formatted start matching".
@@ -1069,25 +1068,25 @@ extern "C" {
      @param               Offset           "Where to start looking for digits".
      @return                               "Returns the SubString".
      */
-    uint64_t              UTF32_GetSubStringLength(UTF32 *Format, UTF32 *Formatted, uint64_t Offset);
+    uint64_t              UTF32_GetSubStringLength(FoundationIO_Immutable(UTF32 *) Format, FoundationIO_Immutable(UTF32 *) Formatted, uint64_t Offset);
     
     /*!
      @abstract                             "Deletes String".
      @param               String           "The string to deinitialize".
      */
-    void                  UTF8_Deinit(UTF8 *String);
+    void                  UTF8_Deinit(FoundationIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                             "Deletes String".
      @param               String           "The string to deinitialize".
      */
-    void                  UTF16_Deinit(UTF16 *String);
+    void                  UTF16_Deinit(FoundationIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                             "Deletes String".
      @param               String           "The string to deinitialize".
      */
-    void                  UTF32_Deinit(UTF32 *String);
+    void                  UTF32_Deinit(FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                             "Creates a UTF-8 encoded StringSet".
@@ -1112,133 +1111,129 @@ extern "C" {
     
     /*!
      @abstract                             "Attaches a string to a StringSet at the specified position".
-     @param               StringSet      "The StringSet to attach the String to".
+     @param               StringSet        "The StringSet to attach the String to".
      @param               String2Attach    "The String to attach".
      @param               Index            "Which position should String2Attach be in"?
      */
-    void                  UTF8_StringSet_Attach(UTF8 **StringSet, UTF8 *String2Attach, uint64_t Index);
+    void                  UTF8_StringSet_Attach(FoundationIO_Immutable(UTF8 **) StringSet, FoundationIO_Immutable(UTF8 *) String2Attach, uint64_t Index);
     
     /*!
      @abstract                             "Attaches a string to a StringSet at the specified position".
-     @param               StringSet      "The StringSet to attach the String to".
+     @param               StringSet        "The StringSet to attach the String to".
      @param               String2Attach    "The String to attach".
      @param               Index            "Which position should String2Attach be in"?
      */
-    void                  UTF16_StringSet_Attach(UTF16 **StringSet, UTF16 *String2Attach, uint64_t Index);
+    void                  UTF16_StringSet_Attach(FoundationIO_Immutable(UTF16 **) StringSet, FoundationIO_Immutable(UTF16 *) String2Attach, uint64_t Index);
     
     /*!
      @abstract                             "Attaches a string to a StringSet at the specified position".
-     @param               StringSet      "The StringSet to attach the String to".
+     @param               StringSet        "The StringSet to attach the String to".
      @param               String2Attach    "The String to attach".
      @param               Index            "Which position should String2Attach be in"?
      */
-    void                  UTF32_StringSet_Attach(UTF32 **StringSet, UTF32 *String2Attach, uint64_t Index);
+    void                  UTF32_StringSet_Attach(FoundationIO_Immutable(UTF32 **) StringSet, FoundationIO_Immutable(UTF32 *) String2Attach, uint64_t Index);
     
     /*!
      @abstract                             "Gets the number of strings in a StringSet".
-     @param               StringSet      "The StringSet to get the number of strings in".
+     @param               StringSet        "The StringSet to get the number of strings in".
      @return                               "Returns the number of strings in StringSet".
      */
-    uint64_t              UTF8_StringSet_GetNumStrings(UTF8 **StringSet);
+    uint64_t              UTF8_StringSet_GetNumStrings(FoundationIO_Immutable(UTF8 **) StringSet);
     
     /*!
      @abstract                             "Gets the number of strings in a StringSet".
-     @param               StringSet      "The StringSet to get the number of strings in".
+     @param               StringSet        "The StringSet to get the number of strings in".
      @return                               "Returns the number of strings in StringSet".
      */
-    uint64_t              UTF16_StringSet_GetNumStrings(UTF16 **StringSet);
+    uint64_t              UTF16_StringSet_GetNumStrings(FoundationIO_Immutable(UTF16 **) StringSet);
     
     /*!
      @abstract                             "Gets the number of strings in a StringSet".
-     @param               StringSet      "The StringSet to get the number of strings in".
+     @param               StringSet        "The StringSet to get the number of strings in".
      @return                               "Returns the number of strings in StringSet".
      */
-    uint64_t              UTF32_StringSet_GetNumStrings(UTF32 **StringSet);
+    uint64_t              UTF32_StringSet_GetNumStrings(FoundationIO_Immutable(UTF32 **) StringSet);
     
     /*!
      @abstract                             "Gets the size of each string in the StringSet in code units".
-     @param               StringSet      "The StringSet to get the size of each string".
+     @param               StringSet        "The StringSet to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t             *UTF8_StringSet_GetStringSizesInCodeUnits(UTF8 **StringSet);
+    uint64_t             *UTF8_StringSet_GetStringSizesInCodeUnits(FoundationIO_Immutable(UTF8 **) StringSet);
     
     /*!
      @abstract                             "Gets the size of each string in the StringSet in code units".
-     @param               StringSet      "The StringSet to get the size of each string".
+     @param               StringSet        "The StringSet to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t             *UTF16_StringSet_GetStringSizesInCodeUnits(UTF16 **StringSet);
+    uint64_t             *UTF16_StringSet_GetStringSizesInCodeUnits(FoundationIO_Immutable(UTF16 **) StringSet);
     
     /*!
      @abstract                             "Gets the size of each string in the StringSet in code points".
-     @param               StringSet      "The StringSet to get the size of each string".
+     @param               StringSet        "The StringSet to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t             *UTF8_StringSet_GetStringSizesInCodePoints(UTF8 **StringSet);
+    uint64_t             *UTF8_StringSet_GetStringSizesInCodePoints(FoundationIO_Immutable(UTF8 **) StringSet);
     
     /*!
      @abstract                             "Gets the size of each string in the StringSet in code points".
-     @param               StringSet      "The StringSet to get the size of each string".
+     @param               StringSet        "The StringSet to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t             *UTF16_StringSet_GetStringSizesInCodePoints(UTF16 **StringSet);
+    uint64_t             *UTF16_StringSet_GetStringSizesInCodePoints(FoundationIO_Immutable(UTF16 **) StringSet);
     
     /*!
      @abstract                             "Gets the size of each string in the StringSet in code points".
-     @param               StringSet      "The StringSet to get the size of each string".
+     @param               StringSet        "The StringSet to get the size of each string".
      @return                               "Returns an array containing NumStrings elements, where each element contains the size".
      */
-    uint64_t             *UTF32_StringSet_GetStringSizesInCodePoints(UTF32 **StringSet);
+    uint64_t             *UTF32_StringSet_GetStringSizesInCodePoints(FoundationIO_Immutable(UTF32 **) StringSet);
     
     /*!
      @abstract                             "Decodes a StringSet to a UTF32_StringSet".
-     @param               StringSet      "The StringSet to decode".
+     @param               StringSet        "The StringSet to decode".
      @return                               "Returns the decoded StringSet".
      */
-    UTF32               **UTF8_StringSet_Decode(UTF8 **StringSet);
+    UTF32               **UTF8_StringSet_Decode(FoundationIO_Immutable(UTF8 **) StringSet);
     
     /*!
      @abstract                             "Decodes a StringSet to a UTF32_StringSet".
-     @param               StringSet      "The StringSet to decode".
+     @param               StringSet        "The StringSet to decode".
      @return                               "Returns the decoded StringSet".
      */
-    UTF32               **UTF16_StringSet_Decode(UTF16 **StringSet);
+    UTF32               **UTF16_StringSet_Decode(FoundationIO_Immutable(UTF16 **) StringSet);
     
     /*!
      @abstract                             "Encodes a StringSet to a UTF8_StringSet".
-     @param               StringSet      "The StringSet to encode".
+     @param               StringSet        "The StringSet to encode".
      @return                               "Returns the encoded StringSet".
      */
-    UTF8                **UTF8_StringSet_Encode(UTF32 **StringSet);
+    UTF8                **UTF8_StringSet_Encode(FoundationIO_Immutable(UTF32 **) StringSet);
     
     /*!
      @abstract                             "Encodes a StringSet to a UTF16_StringSet".
-     @param               StringSet      "The StringSet to encode".
+     @param               StringSet        "The StringSet to encode".
      @return                               "Returns the encoded StringSet".
      */
-    UTF16               **UTF16_StringSet_Encode(UTF32 **StringSet);
-    
-    void                  UTF8_StringSet_Print(UTF8 **StringSet);
-    
-    void                  UTF16_StringSet_Print(UTF16 **StringSet);
+    UTF16               **UTF16_StringSet_Encode(FoundationIO_Immutable(UTF32 **) StringSet);
     
     /*!
-     @abstract                             "Deletes a UTF-8 encoded StringSet (like is returned by SplitString)".
+     @abstract                           "Deletes a UTF-8 encoded StringSet (like is returned by SplitString)".
      @param               StringSet      "An StringSet to deinitialize, all strings will be freed".
      */
-    void                  UTF8_StringSet_Deinit(UTF8 **StringSet);
+    void                  UTF8_StringSet_Deinit(FoundationIO_Immutable(UTF8 **) StringSet);
     
     /*!
-     @abstract                             "Deletes a UTF-16 encoded StringSet (like is returned by SplitString)".
+     @abstract                           "Deletes a UTF-16 encoded StringSet (like is returned by SplitString)".
      @param               StringSet      "An StringSet to deinitialize, all strings will be freed".
      */
-    void                  UTF16_StringSet_Deinit(UTF16 **StringSet);
+    void                  UTF16_StringSet_Deinit(FoundationIO_Immutable(UTF16 **) StringSet);
     
     /*!
-     @abstract                             "Deletes a UTF-16 encoded StringSet (like is returned by SplitString)".
+     @abstract                           "Deletes a UTF-16 encoded StringSet (like is returned by SplitString)".
      @param               StringSet      "An StringSet to deinitialize, all strings will be freed".
      */
-    void                  UTF32_StringSet_Deinit(UTF32 **StringSet);
+    void                  UTF32_StringSet_Deinit(FoundationIO_Immutable(UTF32 **) StringSet);
     
 #ifdef __cplusplus
 }
