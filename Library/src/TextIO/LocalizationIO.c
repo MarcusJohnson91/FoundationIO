@@ -311,7 +311,7 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF32 *UTF32_DelocalizeInteger(FoundationIO_Bases Base, UTF32 *String) {
+    UTF32 *UTF32_DelocalizeInteger(FoundationIO_Bases Base, FoundationIO_Immutable(UTF32 *) String) {
         UTF32 *Delocalized       = NULL;
         if (String != NULL) {
             uint64_t OGCodePoint = 0ULL;
@@ -362,7 +362,7 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF32 *UTF32_DelocalizeDecimal(UTF32 *String) {
+    UTF32 *UTF32_DelocalizeDecimal(FoundationIO_Immutable(UTF32 *) String) {
         UTF32 *Delocalized       = NULL;
         if (String != NULL) {
             uint64_t StringSize       = UTF32_GetStringSizeInCodePoints(String);

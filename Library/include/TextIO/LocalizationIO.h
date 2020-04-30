@@ -246,7 +246,7 @@ extern "C" {
      @param                     String                       The string to Delocalize.
      @return                                                 Returns the delocalized string.
      */
-    UTF32                      *UTF32_DelocalizeInteger(FoundationIO_Bases Base, UTF32 *String);
+    UTF32                      *UTF32_DelocalizeInteger(FoundationIO_Bases Base, FoundationIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                                               Creates a string containing just the base 10 digits from String.
@@ -267,7 +267,7 @@ extern "C" {
      @param                     String                       The string to Delocalize.
      @return                                                 Returns the delocalized string.
      */
-    UTF32                      *UTF32_DelocalizeDecimal(UTF32 *String);
+    UTF32                      *UTF32_DelocalizeDecimal(FoundationIO_Immutable(UTF32 *) String);
     
 #if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 }

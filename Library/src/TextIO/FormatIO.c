@@ -144,7 +144,7 @@ extern "C" {
         }
     }
     
-    void UTF32_ParseFormatSpecifiers(UTF32 *Format, FormatSpecifiers *Specifiers, FoundationIO_StringTypes StringType) {
+    void UTF32_ParseFormatSpecifiers(FoundationIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, FoundationIO_StringTypes StringType) {
         if (Format != NULL && Specifiers != NULL) {
             Specifiers->StringType                               = StringType;
             uint64_t CodePoint                                   = 0ULL;
@@ -915,7 +915,7 @@ extern "C" {
         }
     }
     
-    static uint64_t UTF32_LocateNextPercent(UTF32 *String) {
+    static uint64_t UTF32_LocateNextPercent(FoundationIO_Immutable(UTF32 *) String) {
         uint64_t NextPercent     = -1;
         if (String != FoundationIONULLTerminator) {
             uint64_t CodePoint   = 0ULL;
@@ -929,7 +929,7 @@ extern "C" {
         return NextPercent;
     }
     
-    UTF32 *FormatString_UTF32(UTF32 *Format, FormatSpecifiers *Specifiers, uint64_t FormattedSize) {
+    UTF32 *FormatString_UTF32(FoundationIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, uint64_t FormattedSize) {
         UTF32 *Formatted                 = NULL;
         if (Format != NULL && Specifiers != NULL) {
             Formatted                    = UTF32_Init(FormattedSize);
@@ -1115,7 +1115,7 @@ extern "C" {
         return Formatted;
     }
     
-    UTF32 **DeformatString_UTF32(UTF32 *Format, FormatSpecifiers *Specifiers, UTF32 *Formatted) {
+    UTF32 **DeformatString_UTF32(FoundationIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, FoundationIO_Immutable(UTF32 *) Formatted) {
         UTF32 **Deformatted                            = UTF32_StringSet_Init(Specifiers->NumSpecifiers);
         if (Format != NULL && Specifiers != NULL) {
             for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
@@ -1147,7 +1147,7 @@ extern "C" {
         return Deformatted;
     }
     
-    uint64_t UTF8_GetNumFormatSpecifiers(UTF8 *String) {
+    uint64_t UTF8_GetNumFormatSpecifiers(FoundationIO_Immutable(UTF8 *) String) {
         uint64_t NumSpecifiers         = 0ULL;
         uint64_t CodeUnit              = 0ULL;
         if (String != NULL) {
@@ -1163,7 +1163,7 @@ extern "C" {
         return NumSpecifiers;
     }
     
-    uint64_t UTF16_GetNumFormatSpecifiers(UTF16 *String) {
+    uint64_t UTF16_GetNumFormatSpecifiers(FoundationIO_Immutable(UTF16 *) String) {
         uint64_t NumSpecifiers         = 0ULL;
         uint64_t CodeUnit              = 0ULL;
         if (String != NULL) {
@@ -1179,7 +1179,7 @@ extern "C" {
         return NumSpecifiers;
     }
     
-    uint64_t UTF32_GetNumFormatSpecifiers(UTF32 *String) {
+    uint64_t UTF32_GetNumFormatSpecifiers(FoundationIO_Immutable(UTF32 *) String) {
         uint64_t NumSpecifiers         = 0ULL;
         uint64_t CodePoint             = 0ULL;
         if (String != NULL) {
@@ -1195,7 +1195,7 @@ extern "C" {
         return NumSpecifiers;
     }
     
-    uint64_t UTF32_GetFormattedStringSize(UTF32 *Format, FormatSpecifiers *Specifiers) {
+    uint64_t UTF32_GetFormattedStringSize(FoundationIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers) {
         uint64_t FormattedStringSize     = 0ULL;
         if (Format != NULL && Specifiers != NULL) {
             FormattedStringSize          = UTF32_GetStringSizeInCodePoints(Format);
@@ -1215,14 +1215,14 @@ extern "C" {
             // Now add the length of each replacement string, which needs to be duplicated
             // We need to know the number of times each positional parameter is used, basically a histogram.
             if (Specifiers->NumUniqueSpecifiers < Specifiers->NumSpecifiers) {
-                uint64_t PositionalSpecifierCount[Specifiers->NumUniqueSpecifiers];
+                Specifiers->UniqueSpecifiers = calloc(Specifiers->NumUniqueSpecifiers, sizeof(Specifiers->UniqueSpecifiers));
                 // Loop over all specifiers, increment .Position in PositionalSpecifierCount
                 for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
-                    PositionalSpecifierCount[Specifiers->Specifiers[Specifier].Position] += 1;
+                    Specifiers->UniqueSpecifiers[Specifiers->Specifiers[Specifier].Position] += 1;
                 }
                 for (uint64_t Unique = 0ULL; Unique < Specifiers->NumUniqueSpecifiers; Unique++) {
                     uint64_t Pos          = Specifiers->UniqueSpecifiers[Unique];
-                    FormattedStringSize += (UTF32_GetStringSizeInCodePoints(Specifiers->Specifiers[Pos].Argument) * PositionalSpecifierCount[Unique]); // Feels like this is wrong
+                    FormattedStringSize  += (UTF32_GetStringSizeInCodePoints(Specifiers->Specifiers[Pos].Argument) * Specifiers->UniqueSpecifiers[Unique]); // Feels like this is wrong
                 }
             } else {
                 for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
@@ -1308,7 +1308,7 @@ extern "C" {
         return Format16;
     }
     
-    UTF32 *UTF32_Format(UTF32 *Format, ...) {
+    UTF32 *UTF32_Format(FoundationIO_Immutable(UTF32 *) Format, ...) {
         UTF32 *FormattedString               = NULL;
         if (Format != NULL) {
             uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
@@ -1356,7 +1356,7 @@ extern "C" {
     }
     
     UTF16 **UTF16_Deformat(UTF16 *Format, UTF16 *Formatted) {
-        UTF16 **StringSet                  = NULL;
+        UTF16 **StringSet                    = NULL;
         if (Format != NULL && Formatted != NULL) {
             uint64_t NumSpecifiers           = UTF16_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
@@ -1379,7 +1379,7 @@ extern "C" {
         return StringSet;
     }
     
-    UTF32 **UTF32_Deformat(UTF32 *Format, UTF32 *Formatted) {
+    UTF32 **UTF32_Deformat(FoundationIO_Immutable(UTF32 *) Format, FoundationIO_Immutable(UTF32 *) Formatted) {
         UTF32 **StringSet                  = NULL;
         if (Format != NULL && Formatted != NULL) {
             uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
