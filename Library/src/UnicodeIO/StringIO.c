@@ -2290,11 +2290,11 @@ extern "C" {
         return NormalizedString;
     }
     
-    int64_t UTF8_String2Integer(FoundationIO_Bases Base, FoundationIO_Immutable(UTF8 *) String) { // Replaces atoi, atol, strtol, strtoul,
+    int64_t UTF8_String2Integer(FoundationIO_Immutable(UTF8 *) String, FoundationIO_Bases Base) { // Replaces atoi, atol, strtol, strtoul,
         int64_t Value = 0LL;
         if (String != NULL) {
             UTF32 *String32 = UTF8_Decode(String);
-            Value           = UTF32_String2Integer(Base, String32);
+            Value           = UTF32_String2Integer(String32, Base);
             free(String32);
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
@@ -2302,11 +2302,11 @@ extern "C" {
         return Value;
     }
     
-    int64_t UTF16_String2Integer(FoundationIO_Bases Base, FoundationIO_Immutable(UTF16 *) String) {
+    int64_t UTF16_String2Integer(FoundationIO_Immutable(UTF16 *) String, FoundationIO_Bases Base) {
         int64_t Value = 0LL;
         if (String != NULL) {
             UTF32 *String32 = UTF16_Decode(String);
-            Value           = UTF32_String2Integer(Base, String32);
+            Value           = UTF32_String2Integer(String32, Base);
             free(String32);
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
@@ -2314,7 +2314,7 @@ extern "C" {
         return Value;
     }
     
-    int64_t UTF32_String2Integer(FoundationIO_Bases Base, FoundationIO_Immutable(UTF32 *) String) {
+    int64_t UTF32_String2Integer(FoundationIO_Immutable(UTF32 *) String, FoundationIO_Bases Base) {
         uint64_t CodePoint = 0ULL;
         int8_t   Sign      = 1;
         int64_t  Value     = 0LL;
@@ -2377,21 +2377,21 @@ extern "C" {
         return Value;
     }
     
-    UTF8 *UTF8_Integer2String(FoundationIO_Bases Base, int64_t Integer2Convert) {
-        FoundationIO_Immutable(UTF32 *) IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
+    UTF8 *UTF8_Integer2String(int64_t Integer2Convert, FoundationIO_Bases Base) {
+        FoundationIO_Immutable(UTF32 *) IntegerString32 = UTF32_Integer2String(Integer2Convert, Base);
         UTF8  *IntegerString8                           = UTF8_Encode(IntegerString32);
         UTF32_Deinit(IntegerString32);
         return IntegerString8;
     }
     
-    UTF16 *UTF16_Integer2String(FoundationIO_Bases Base, int64_t Integer2Convert) {
-        FoundationIO_Immutable(UTF32 *) IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
+    UTF16 *UTF16_Integer2String(int64_t Integer2Convert, FoundationIO_Bases Base) {
+        FoundationIO_Immutable(UTF32 *) IntegerString32 = UTF32_Integer2String(Integer2Convert, Base);
         UTF16 *IntegerString16                          = UTF16_Encode(IntegerString32);
         UTF32_Deinit(IntegerString32);
         return IntegerString16;
     }
     
-    UTF32 *UTF32_Integer2String(FoundationIO_Bases Base, int64_t Integer2Convert) {
+    UTF32 *UTF32_Integer2String(int64_t Integer2Convert, FoundationIO_Bases Base) {
         UTF32   *String               = NULL;
         int64_t  Sign                 = 0LL;
         uint64_t Num                  = AbsoluteI(Integer2Convert);
@@ -2450,11 +2450,11 @@ extern "C" {
         return String;
     }
     
-    double UTF8_String2Decimal(FoundationIO_Bases Base, FoundationIO_Immutable(UTF8 *) String) {
+    double UTF8_String2Decimal(FoundationIO_Immutable(UTF8 *) String, FoundationIO_Bases Base) {
         double Decimal = 0.0;
         if (String != NULL) {
             UTF32 *String32 = UTF8_Decode(String);
-            Decimal         = UTF32_String2Decimal(Base, String32);
+            Decimal         = UTF32_String2Decimal(String32, Base);
             free(String32);
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
@@ -2462,11 +2462,11 @@ extern "C" {
         return Decimal;
     }
     
-    double UTF16_String2Decimal(FoundationIO_Bases Base, FoundationIO_Immutable(UTF16 *) String) {
+    double UTF16_String2Decimal(FoundationIO_Immutable(UTF16 *) String, FoundationIO_Bases Base) {
         double Decimal = 0.0;
         if (String != NULL) {
             UTF32 *String32 = UTF16_Decode(String);
-            Decimal         = UTF32_String2Decimal(Base, String32);
+            Decimal         = UTF32_String2Decimal(String32, Base);
             free(String32);
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
@@ -2474,7 +2474,7 @@ extern "C" {
         return Decimal;
     }
     
-    double UTF32_String2Decimal(FoundationIO_Bases Base, FoundationIO_Immutable(UTF32 *) String) { // Replaces strtod, strtof, strold, atof, and atof_l
+    double UTF32_String2Decimal(FoundationIO_Immutable(UTF32 *) String, FoundationIO_Bases Base) { // Replaces strtod, strtof, strold, atof, and atof_l
         double   Value         = 0.0;
         bool     IsNegative    = No;
         if (String != NULL) {
@@ -2500,21 +2500,21 @@ extern "C" {
         return Value;
     }
     
-    UTF8 *UTF8_Decimal2String(FoundationIO_Bases Base, double Decimal) {
+    UTF8 *UTF8_Decimal2String(double Decimal, FoundationIO_Bases Base) {
         UTF32 *String32 = UTF32_Decimal2String(Base, Decimal);
         UTF8  *String8  = UTF8_Encode(String32);
         free(String32);
         return String8;
     }
     
-    UTF16 *UTF16_Decimal2String(FoundationIO_Bases Base, double Decimal) {
+    UTF16 *UTF16_Decimal2String(double Decimal, FoundationIO_Bases Base) {
         UTF32 *String32 = UTF32_Decimal2String(Base, Decimal);
         UTF16 *String16 = UTF16_Encode(String32);
         free(String32);
         return String16;
     }
     
-    static UTF32 *Decimal2String_UTF32(FoundationIO_Bases Base, uint64_t MinimumWidth, uint64_t Precision, double Decimal) {
+    static UTF32 *Decimal2String_UTF32(double Decimal, uint64_t MinimumWidth, uint64_t Precision, FoundationIO_Bases Base) {
         UTF32 *String = NULL;
         if ((Base & Base_Decimal) != Base_Decimal || Base != Base_Unknown) {
             if ((Base & Base_Shortest) == Base_Shortest) {
@@ -2550,7 +2550,7 @@ extern "C" {
         return String;
     }
     
-    UTF32 *UTF32_Decimal2String(FoundationIO_Bases Base, double Number) {
+    UTF32 *UTF32_Decimal2String(double Number, FoundationIO_Bases Base) {
         UTF32   *OutputString     = NULL;
         uint64_t StringSize       = 0ULL;
         int8_t   Sign             = ExtractSignD(Number);
@@ -2577,7 +2577,7 @@ extern "C" {
          
          Maybe there should be a static function that takes the requested format (Scientific, Decimal, Shortest, Hexadecimal), MinWidth, and Precision
          
-         Decimal2String_UTF32(FoundationIO_Bases Base, uint64_t MinWidth, uint64_t Precision, double Decimal2Convert)
+         Decimal2String_UTF32(double Decimal2Convert, uint64_t MinWidth, uint64_t Precision, FoundationIO_Bases Base)
          
          */
         
@@ -2651,7 +2651,7 @@ extern "C" {
                 }
                 // Write the Exponent
                 uint16_t NumDigitsExponentInDigits = (uint16_t) Logarithm(2, Exponent);
-                UTF32 *ExponentString              = UTF32_Integer2String(Base_Integer | Base_Radix10, Exponent);
+                UTF32 *ExponentString              = UTF32_Integer2String(Exponent, Base_Integer | Base_Radix10);
                 for (uint64_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits; ExponentDigit++) {
                     OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = ExponentString[ExponentDigit]; // FIXME: "Exponent" is NOT right
                 }
@@ -2664,7 +2664,7 @@ extern "C" {
                 }
                 // Write the Exponent
                 uint16_t NumDigitsExponentInDigits = (uint16_t) Logarithm(2, Exponent);
-                UTF32 *ExponentString              = UTF32_Integer2String(Base_Integer | Base_Radix10, Exponent);
+                UTF32 *ExponentString              = UTF32_Integer2String(Exponent, Base_Integer | Base_Radix10);
                 for (uint64_t ExponentDigit = 0ULL; ExponentDigit < NumDigitsExponentInDigits; ExponentDigit++) {
                     OutputString[StringSize + NumDigitsExponent + NumDigitsMantissa + 2 + ExponentDigit] = ExponentString[ExponentDigit]; // FIXME: "Exponent" is NOT right
                 }
@@ -3021,7 +3021,7 @@ extern "C" {
         return SplitStrings;
     }
     
-    uint64_t UTF32_GetNumDigits(FoundationIO_Bases Base, FoundationIO_Immutable(UTF32 *) String, uint64_t Offset) {
+    uint64_t UTF32_GetNumDigits(FoundationIO_Immutable(UTF32 *) String, uint64_t Offset, FoundationIO_Bases Base) {
         uint64_t NumDigits      = 0ULL;
         if (String != NULL) {
             uint64_t CodePoint  = Offset;

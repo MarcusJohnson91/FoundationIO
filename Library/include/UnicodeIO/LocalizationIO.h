@@ -226,27 +226,27 @@ extern "C" {
     
     /*!
      @abstract                                               Creates a string containing just the base 10 digits from String.
-     @param                     Base                         What base is the integer in?
      @param                     String                       The string to Delocalize.
+     @param                     Base                         What base is the integer in?
      @return                                                 Returns the delocalized string.
      */
-    UTF8                       *UTF8_DelocalizeInteger(FoundationIO_Bases Base, UTF8 *String);
+    UTF8                       *UTF8_DelocalizeInteger(FoundationIO_Immutable(UTF8 *) String, FoundationIO_Bases Base);
     
     /*!
      @abstract                                               Creates a string containing just the base 10 digits from String.
-     @param                     Base                         What base is the integer in?
      @param                     String                       The string to Delocalize.
+     @param                     Base                         What base is the integer in?
      @return                                                 Returns the delocalized string.
      */
-    UTF16                      *UTF16_DelocalizeInteger(FoundationIO_Bases Base, UTF16 *String);
+    UTF16                      *UTF16_DelocalizeInteger(FoundationIO_Immutable(UTF16 *) String, FoundationIO_Bases Base);
     
     /*!
      @abstract                                               Creates a string containing just the base 10 digits from String.
-     @param                     Base                         What base is the integer in?
      @param                     String                       The string to Delocalize.
+     @param                     Base                         What base is the integer in?
      @return                                                 Returns the delocalized string.
      */
-    UTF32                      *UTF32_DelocalizeInteger(FoundationIO_Bases Base, FoundationIO_Immutable(UTF32 *) String);
+    UTF32                      *UTF32_DelocalizeInteger(FoundationIO_Immutable(UTF32 *) String, FoundationIO_Bases Base);
     
     /*!
      @abstract                                               Creates a string containing just the base 10 digits from String.

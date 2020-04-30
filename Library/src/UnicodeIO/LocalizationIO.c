@@ -227,20 +227,9 @@ extern "C" {
         UTF8    **GroupingSize          = NULL;
         LocalizationIO_Init();
         struct lconv *Locale            = localeconv();
-#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         UTF8 *GroupingSizeString        = Locale->grouping;
         UTF8 *Delimiters[]              = {UTF8String("/"), UTF8String("\\")};
         GroupingSize                    = UTF8_Split(GroupingSizeString, Delimiters);
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        UTF16 *GroupingSizeString       = Locale->grouping;
-        UTF16 *Delimiters[2]            = {UTF16String("/"), UTF16String("\\")};
-        
-        UTF16 **GroupingSize16          = UTF16_Split(GroupingSizeString, Delimiters);
-        UTF32 **GroupingSize32          = UTF16_StringSet_Decode(GroupingSize16);
-        UTF16_StringSet_Deinit(GroupingSize16);
-        GroupingSize                    = UTF8_StringSet_Encode(GroupingSize32);
-        UTF32_StringSet_Deinit(GroupingSize32);
-#endif
         return GroupingSize;
     }
     
@@ -266,7 +255,7 @@ extern "C" {
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         CurrencySymbol                  = UTF8_Clone(Locale->currency_symbol);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        CurrencySymbol                  = UTF8_Convert(Locale->_W_currency_symbol);
+        CurrencySymbol                  = UTF16_Convert(Locale->_W_currency_symbol);
 #endif
         return CurrencySymbol;
     }
@@ -278,16 +267,16 @@ extern "C" {
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         CurrencySymbol                  = UTF8_Convert(Locale->currency_symbol);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        CurrencySymbol                  = UTF8_Clone(Locale->currency_symbol);
+        CurrencySymbol                  = UTF16_Clone(Locale->_W_currency_symbol);
 #endif
         return CurrencySymbol;
     }
     
-    UTF8 *UTF8_DelocalizeInteger(FoundationIO_Bases Base, UTF8 *String) {
+    UTF8 *UTF8_DelocalizeInteger(FoundationIO_Immutable(UTF8 *) String, FoundationIO_Bases Base) {
         UTF8 *Delocalized = NULL;
         if (String != NULL) {
             UTF32 *String32      = UTF8_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(Base, String32);
+            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(String32, Base);
             free(String32);
             Delocalized          = UTF8_Encode(Delocalized32);
             free(Delocalized32);
@@ -297,11 +286,11 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF16 *UTF16_DelocalizeInteger(FoundationIO_Bases Base, UTF16 *String) {
+    UTF16 *UTF16_DelocalizeInteger(FoundationIO_Immutable(UTF16 *) String, FoundationIO_Bases Base) {
         UTF16 *Delocalized = NULL;
         if (String != NULL) {
             UTF32 *String32      = UTF16_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(Base, String32);
+            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(String32, Base);
             free(String32);
             Delocalized          = UTF16_Encode(Delocalized32);
             free(Delocalized32);
@@ -311,12 +300,12 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF32 *UTF32_DelocalizeInteger(FoundationIO_Bases Base, FoundationIO_Immutable(UTF32 *) String) {
+    UTF32 *UTF32_DelocalizeInteger(FoundationIO_Immutable(UTF32 *) String, FoundationIO_Bases Base) {
         UTF32 *Delocalized       = NULL;
         if (String != NULL) {
             uint64_t OGCodePoint = 0ULL;
             uint64_t DeCodePoint = 0ULL;
-            uint64_t NumDigits   = UTF32_GetNumDigits(Base, String, 0);
+            uint64_t NumDigits   = UTF32_GetNumDigits(String, 0, Base);
             Delocalized          = UTF32_Init(NumDigits);
             if (Delocalized != NULL) {
                 while (String[OGCodePoint] != FoundationIONULLTerminator && DeCodePoint < NumDigits) {
@@ -370,20 +359,20 @@ extern "C" {
             UTF32    DecimalSeperator = 0ULL;
             do {
                 if (
-                    String[CodePoint] != UTF32Character('0') ||
-                    String[CodePoint] != UTF32Character('1') ||
-                    String[CodePoint] != UTF32Character('2') ||
-                    String[CodePoint] != UTF32Character('3') ||
-                    String[CodePoint] != UTF32Character('4') ||
-                    String[CodePoint] != UTF32Character('5') ||
-                    String[CodePoint] != UTF32Character('6') ||
-                    String[CodePoint] != UTF32Character('7') ||
-                    String[CodePoint] != UTF32Character('8') ||
-                    String[CodePoint] != UTF32Character('9') ||
-                    String[CodePoint] != UTF32Character('e') ||
-                    String[CodePoint] != UTF32Character('E') ||
-                    String[CodePoint] != UTF32Character('+') ||
-                    String[CodePoint] != UTF32Character('-')
+                    String[CodePoint] == UTF32Character('0') ||
+                    String[CodePoint] == UTF32Character('1') ||
+                    String[CodePoint] == UTF32Character('2') ||
+                    String[CodePoint] == UTF32Character('3') ||
+                    String[CodePoint] == UTF32Character('4') ||
+                    String[CodePoint] == UTF32Character('5') ||
+                    String[CodePoint] == UTF32Character('6') ||
+                    String[CodePoint] == UTF32Character('7') ||
+                    String[CodePoint] == UTF32Character('8') ||
+                    String[CodePoint] == UTF32Character('9') ||
+                    String[CodePoint] == UTF32Character('e') ||
+                    String[CodePoint] == UTF32Character('E') ||
+                    String[CodePoint] == UTF32Character('+') ||
+                    String[CodePoint] == UTF32Character('-')
                     ) {
                     DecimalSeperator   = String[CodePoint];
                     break;
@@ -391,7 +380,7 @@ extern "C" {
                 CodePoint             -= 1;
             } while (CodePoint > 0);
             
-            uint64_t NumDigits         = UTF32_GetNumDigits(Base_Decimal | Base_Radix16 | Base_Uppercase, String, 0);
+            uint64_t NumDigits         = UTF32_GetNumDigits(String, 0, Base_Decimal | Base_Radix16 | Base_Uppercase);
             Delocalized                = UTF32_Init(NumDigits);
             
             CodePoint                  = 0ULL;
