@@ -538,8 +538,8 @@ extern "C" {
             }
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
-        } else if ((Bits2Read == 0 || Bits2Read > 64) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 1-64"), Bits2Read, BitB->BitOffset);
+        } else if ((Bits2Read == 0 || Bits2Read > 8) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 1-8"), Bits2Read, BitB->BitOffset);
         }
         return OutputData;
     }
@@ -562,14 +562,38 @@ extern "C" {
             }
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
-        } else if ((Bits2Read == 0 || Bits2Read > 64) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 1-64"), Bits2Read, BitB->BitOffset);
+        } else if ((Bits2Read == 0 || Bits2Read > 16) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 1-16"), Bits2Read, BitB->BitOffset);
         }
         return OutputData;
     }
     
     uint32_t BitBuffer_ReadBits32(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t Bits2Read) {
         uint32_t OutputData    = 0UL;
+        if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
+            if (ByteOrder == BitIO_ByteOrder_LSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
+                    OutputData          = (uint32_t) BitBuffer_Extract_LSByteLSBit(BitB, Bits2Read);
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                    OutputData          = (uint32_t) BitBuffer_Extract_LSByteMSBit(BitB, Bits2Read);
+                }
+            } else if (ByteOrder == BitIO_ByteOrder_MSByte) {
+                if (BitOrder == BitIO_BitOrder_LSBit) {
+                    OutputData         = (uint32_t) BitBuffer_Extract_MSByteLSBit(BitB, Bits2Read);
+                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                    OutputData         = (uint32_t) BitBuffer_Extract_MSByteMSBit(BitB, Bits2Read);
+                }
+            }
+        } else if (BitB == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitBuffer Pointer is NULL"));
+        } else if ((Bits2Read == 0 || Bits2Read > 32) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 1-32"), Bits2Read, BitB->BitOffset);
+        }
+        return OutputData;
+    }
+    
+    uint64_t BitBuffer_ReadBits64(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t Bits2Read) {
+        uint64_t OutputData    = 0UL;
         if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
             if (ByteOrder == BitIO_ByteOrder_LSByte) {
                 if (BitOrder == BitIO_BitOrder_LSBit) {
@@ -899,9 +923,15 @@ extern "C" {
             if (PathHasBOM == No) {
                 BitI->File                   = FoundationIO_File_Open(Path2Open, UTF8String("rb"));
             } else {
-                UTF8 *BOMLess                = UTF8_RemoveBOM(Path2Open);
-                BitI->File                   = FoundationIO_File_Open(BOMLess, UTF8String("rb"));
-                free(BOMLess);
+                static UTF8 *UTF8BOMString   = UTF8String("\xEF\xBB\xBF");
+                int64_t GoodCodeUnit         = UTF8_FindSubString(Path2Open, UTF8BOMString, 0, 3) + 3;
+                if (GoodCodeUnit >= 0) {
+                    BitI->File               = FoundationIO_File_Open(&Path2Open[GoodCodeUnit], UTF8String("rb"));
+                } else {
+                    UTF8 *BOMLess            = UTF8_RemoveBOM(Path2Open);
+                    BitI->File               = FoundationIO_File_Open(BOMLess, UTF8String("rb"));
+                    free(BOMLess);
+                }
             }
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
             bool  StringHasBOM               = UTF8_HasBOM(Path2Open);
