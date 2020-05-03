@@ -414,18 +414,6 @@ extern "C" {
 #define             UNCPathPrefix32                                                           (U"//?/")
 #endif
     
-#ifndef             FoundationIO_ImmutablePointer2MutableData
-#define             FoundationIO_ImmutablePointer2MutableData(Type, VariableName)              Type *const VariableName
-#endif
-    
-#ifndef             FoundationIO_MutablePointer2ImmutableData
-#define             FoundationIO_MutablePointer2ImmutableData(Type, VariableName)              Type const *VariableName
-#endif
-    
-#ifndef             FoundationIO_ImmutablePointer2ImmutableData
-#define             FoundationIO_ImmutablePointer2ImmutableData(Type, VariableName)            Type const *const VariableName
-#endif
-    
 #if                (WCHAR_MIN < 0)
 #define             FoundationIOWideCharSize ((WCHAR_MAX * 2) + 1)
 #else

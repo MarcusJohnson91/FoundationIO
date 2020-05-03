@@ -8,15 +8,14 @@ extern "C" {
     
     static FILE  *Log_LogFile      = NULL;
     static UTF32 *Log_ProgramName  = NULL;
-    static UTF8  *Log_Path         = UTF8String("/Users/Marcus/Desktop/FormatIO_Test.log");
     
-    void Log_SetProgramName(UTF8 *ProgramName) {
+    void Log_SetProgramName(FoundationIO_Immutable(UTF8 *) ProgramName) {
         if (ProgramName != NULL) {
             Log_ProgramName        = UTF8_Decode(ProgramName);
         }
     }
     
-    void Log_UTF8_OpenFile(UTF8 *LogFilePath) {
+    void Log_UTF8_OpenFile(FoundationIO_Immutable(UTF8 *) LogFilePath) {
         if (LogFilePath != NULL) {
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
             bool PathHasBOM      = UTF8_HasBOM(LogFilePath);
@@ -60,7 +59,7 @@ extern "C" {
         }
     }
     
-    void Log_UTF16_OpenFile(UTF16 *LogFilePath) {
+    void Log_UTF16_OpenFile(FoundationIO_Immutable(UTF16 *) LogFilePath) {
         if (LogFilePath != NULL) {
             UTF32 *Path32        = UTF16_Decode(LogFilePath);
             bool   PathHasBOM    = UTF32_HasBOM(Path32);
@@ -108,9 +107,9 @@ extern "C" {
         }
     }
     
-    void Log(LogIO_Severities Severity, const UTF8 *FunctionName, UTF8 *Description, ...) {
-        if (Log_Path != NULL && Log_LogFile == NULL) {
-            Log_UTF8_OpenFile(Log_Path);
+    void Log(LogIO_Severities Severity, FoundationIO_Immutable(UTF8 *) FunctionName, UTF8 *Description, ...) {
+        if (Log_LogFile == NULL) {
+            Log_LogFile = stderr;
         }
         
         UTF32 *Error    = UTF32String("ERROR");

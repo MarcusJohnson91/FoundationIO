@@ -246,15 +246,15 @@ extern "C" {
      @return                                                    "Returns the formatted string encoded using the UTF-8 format".
      */
 #if   (FoundationIOCompiler == FoundationIOCompilerIsClang)
-    UTF8                 *UTF8_Format(UTF8 *Format, ...) __attribute__((__format__(__printf__, 1, 2)));
+    UTF8                 *UTF8_Format(FoundationIO_Immutable(UTF8 *) Format, ...) __attribute__((__format__(__printf__, 1, 2)));
 #elif (FoundationIOCompiler == FoundationIOCompilerIsGCC)
-    UTF8                 *UTF8_Format(UTF8 *Format, ...);
+    UTF8                 *UTF8_Format(FoundationIO_Immutable(UTF8 *) Format, ...);
 #elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 #include <sal.h>
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    UTF8                 *UTF8_Format(__format_string UTF8 *Format, ...);
+    UTF8                 *UTF8_Format(__format_string FoundationIO_Immutable(UTF8 *) Format, ...);
 #elif (_MSC_VER >= 1500)
-    UTF8                 *UTF8_Format(_Printf_format_string_ UTF8 *Format, ...);
+    UTF8                 *UTF8_Format(_Printf_format_string_ FoundationIO_Immutable(UTF8 *) Format, ...);
 #endif /* MSVC Version */
 #endif /* FoundationIOCompiler */
     
@@ -264,15 +264,15 @@ extern "C" {
      @return                                                    "Returns the formatted string encoded using the UTF-8 format".
      */
 #if   (FoundationIOCompiler == FoundationIOCompilerIsClang)
-    UTF16                *UTF16_Format(UTF16 *Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+    UTF16                *UTF16_Format(FoundationIO_Immutable(UTF16 *) Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
 #elif (FoundationIOCompiler == FoundationIOCompilerIsGCC)
-    UTF16                *UTF16_Format(UTF16 *Format, ...);
+    UTF16                *UTF16_Format(FoundationIO_Immutable(UTF16 *) Format, ...);
 #elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 #include <sal.h>
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    UTF16                *UTF16_Format(__format_string UTF16 *Format, ...);
+    UTF16                *UTF16_Format(__format_string FoundationIO_Immutable(UTF16 *) Format, ...);
 #elif (_MSC_VER >= 1500)
-    UTF16                *UTF16_Format(_Printf_format_string_ UTF16 *Format, ...);
+    UTF16                *UTF16_Format(_Printf_format_string_ FoundationIO_Immutable(UTF16 *) Format, ...);
 #endif /* MSVC Version */
 #endif /* FoundationIOCompiler */
     

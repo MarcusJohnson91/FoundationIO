@@ -1237,7 +1237,7 @@ extern "C" {
         return FormattedStringSize;
     }
     
-    UTF8 *UTF8_Format(UTF8 *Format, ...) {
+    UTF8 *UTF8_Format(FoundationIO_Immutable(UTF8 *) Format, ...) {
         UTF8 *Format8                        = NULL;
         if (Format != NULL) {
             uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
@@ -1281,7 +1281,7 @@ extern "C" {
         return Format8;
     }
     
-    UTF16 *UTF16_Format(UTF16 *Format, ...) {
+    UTF16 *UTF16_Format(FoundationIO_Immutable(UTF16 *) Format, ...) {
         UTF16 *Format16                      = NULL;
         if (Format != NULL) {
             uint64_t NumSpecifiers           = UTF16_GetNumFormatSpecifiers(Format);
