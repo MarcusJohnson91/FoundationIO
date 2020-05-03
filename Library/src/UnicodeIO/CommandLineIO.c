@@ -504,22 +504,26 @@ extern "C" {
         return NumArguments;
     }
     
-    UTF32 **CommandLineIO_GetArgumentArray(FoundationIO_Immutable(void **) Arguments) {
-        UTF32 **ArgumentArray           = NULL;
+    UTF32 **CommandLineIO_GetArgumentStringSet(void **Arguments) {
+        UTF32 **StringSet               = NULL;
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-        ArgumentArray                   = (UTF32**) UTF8_StringSet_Decode((UTF8**) Arguments);
+#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
+        StringSet                       = (UTF32**) UTF8_StringSet_Decode((UTF8**) Arguments);
+#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+        StringSet                       = (UTF32**) UTF8_StringSet_Decode(reinterpret_cast<FoundationIO_Immutable(UTF8 **)>(Arguments));
+#endif
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         uint64_t NumArguments           = (uint64_t) __argc;
-        ArgumentArray                   = UTF32_StringSet_Init(NumArguments);
+        StringSet                       = UTF32_StringSet_Init(NumArguments);
         if (ArgumentArray != NULL) {
             for (uint64_t Argument = 0ULL; Argument < NumArguments; Argument++) {
-                ArgumentArray[Argument] = UTF16_Decode((UTF16*) Arguments);
+                StringSet[Argument]     = UTF16_Decode((UTF16*) Arguments);
             }
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldnt allocate %llu arguments"), NumArguments);
         }
 #endif
-        return ArgumentArray;
+        return StringSet;
     }
     
     static void CommandLineIO_UTF32_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, FoundationIO_Immutable(UTF32 **) Arguments) {

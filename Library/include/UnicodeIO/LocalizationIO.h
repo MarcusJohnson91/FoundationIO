@@ -201,13 +201,13 @@ extern "C" {
     UTF16                      *Localize_UTF16_GetGroupingSeperator(void);
     
     /*!
-     @abstract                                               Creates a string array containing the number of digits for each group (1,000,000).
-     @return                                                 Returns the string.
+     @abstract                                               Creates a StringSet containing the number of digits for each group (1,000,000).
+     @return                                                 Returns the StringSet.
      */
     UTF8                      **Localize_UTF8_GetGroupingSize(void);
     
     /*!
-     @abstract                                               Creates a string array containing the number of digits for each group (1,000,000).
+     @abstract                                               Creates a StringSet containing the number of digits for each group (1,000,000).
      @return                                                 Returns the string.
      */
     UTF16                     **Localize_UTF16_GetGroupingSize(void);

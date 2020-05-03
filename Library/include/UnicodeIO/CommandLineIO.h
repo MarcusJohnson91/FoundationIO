@@ -147,7 +147,7 @@ extern "C" {
      @abstract                                                  "Helper function to decode argv/wargv to UTF32 for use with parsing".
      @return                                                    "Returns the decoded Arguments".
      */
-    UTF32                     **CommandLineIO_GetArgumentArray(FoundationIO_Immutable(void **) Arguments);
+    UTF32                     **CommandLineIO_GetArgumentStringSet(void **Arguments);
     
     /*!
      @abstract                                                  "Sets the name of the program".
@@ -210,9 +210,9 @@ extern "C" {
      @abstract                                                  "Displays on the screen the progress of X actions that are taking place"
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     NumItems2Display                "The number of things you want to show the progress of".
-     @param                     Strings                         "A pointer to an array of the strings describing what progress is being tracked".
-     @param                     Numerator                       "A pointer to an array of the number of X tasks that have been completed".
-     @param                     Denominator                     "A pointer to an array of the number of X thats that there are to do".
+     @param                     Strings                         "A pointer to a StringSet describing what progress is being tracked".
+     @param                     Numerator                       "A pointer to a StringSet of X tasks that have been completed".
+     @param                     Denominator                     "A pointer to a StringSet of Y thats that there are to do".
      */
     void                        CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, FoundationIO_Immutable(UTF32 **) Strings, FoundationIO_Immutable(uint64_t *) Numerator, FoundationIO_Immutable(uint64_t *) Denominator);
     
@@ -260,7 +260,7 @@ extern "C" {
      @abstract                                                  "Parses the Command Line Options as UTF-8 encoded strings".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to argc".
-     @param                     Arguments                       "An array of UTF-8 encoded arguments; equilivent to argv"
+     @param                     Arguments                       "A StringSet of UTF-8 encoded arguments; equilivent to argv"
      */
     void                        CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, FoundationIO_Immutable(UTF8 **) Arguments);
     
@@ -268,7 +268,7 @@ extern "C" {
      @abstract                                                  "Parses the Command Line Options as UTF-16 encoded strings".
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     NumArguments                    "The number of argument strings present in Arguments; equilivent to __argc".
-     @param                     Arguments                       "An array of UTF-16 encoded arguments; equilivent to __wargv"
+     @param                     Arguments                       "A StringSet of UTF-16 encoded arguments; equilivent to __wargv on Windows"
      */
     void                        CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, FoundationIO_Immutable(UTF16 **) Arguments);
     
@@ -277,7 +277,7 @@ extern "C" {
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     OptionID                        "the option to look for".
      @param                     NumSlaves                       "How many slave Options should we look for"?
-     @param                     SlaveIDs                        "Pointer to an array with all the slaves you want to mke sure are present".
+     @param                     SlaveIDs                        "Pointer to a StringSet with all the slaves you want to make sure are present".
      @return                                                    "Returns the argument number if there is no matching argument it will return -1".
      */
     uint64_t                     CommandLineIO_GetNumMatchingOptions(CommandLineIO *CLI, uint64_t OptionID, uint64_t NumSlaves, uint64_t *SlaveIDs);
@@ -287,7 +287,7 @@ extern "C" {
      @param                     CLI                             "CommandLineIO Pointer".
      @param                     OptionID                        "the option to look for".
      @param                     NumSlaves                       "How many slave Options should we look for"?
-     @param                     SlaveIDs                        "Pointer to an array with all the slaves you want to mke sure are present".
+     @param                     SlaveIDs                        "Pointer to a StringSet with all the slaves you want to mke sure are present".
      @return                                                    "Returns the argument number if there is no matching argument it will return -1".
      */
     uint64_t                     CommandLineIO_GetOptionNum(CommandLineIO *CLI, uint64_t OptionID, uint64_t NumSlaves, uint64_t *SlaveIDs);
