@@ -1080,19 +1080,19 @@ extern "C" {
      @abstract                             "Deletes String".
      @param               String           "The string to deinitialize".
      */
-    void                  UTF8_Deinit(FoundationIO_Immutable(UTF8 *) String);
+    void                  UTF8_Deinit(UTF8 *String);
     
     /*!
      @abstract                             "Deletes String".
      @param               String           "The string to deinitialize".
      */
-    void                  UTF16_Deinit(FoundationIO_Immutable(UTF16 *) String);
+    void                  UTF16_Deinit(UTF16 *String);
     
     /*!
      @abstract                             "Deletes String".
      @param               String           "The string to deinitialize".
      */
-    void                  UTF32_Deinit(FoundationIO_Immutable(UTF32 *) String);
+    void                  UTF32_Deinit(UTF32 *String);
     
     /*!
      @abstract                             "Creates a UTF-8 encoded StringSet".
