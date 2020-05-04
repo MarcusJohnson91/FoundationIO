@@ -51,7 +51,11 @@ extern "C" {
         LocalizationIO_WrittenLanguages LanguageID = WrittenLanguage_Unspecified;
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         /* POSIX uses ISO 639-1 if possible, otherwise ISO 639-2 */
+#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
         UTF8     *LocaleAll      = setlocale(LC_ALL, NULL);
+#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+        UTF8     *LocaleAll      = reinterpret_cast<UTF8*>(setlocale(LC_ALL, NULL));
+#endif
         uint64_t  EndOffset      = UTF8_FindSubString(LocaleAll, UTF8String("_"), 0, 1);
         UTF8     *LanguageString = UTF8_ExtractSubString(LocaleAll, 0, EndOffset);
         uint64_t  StringSize     = UTF8_GetStringSizeInCodeUnits(LocaleAll);
@@ -80,7 +84,11 @@ extern "C" {
     LocalizationIO_RegionIDs Localize_GetRegionID(void) {
         LocalizationIO_RegionIDs RegionID = RegionID_Unspecified;
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-        UTF8 *LocaleAll        = setlocale(LC_ALL, NULL);
+#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
+        UTF8     *LocaleAll    = setlocale(LC_ALL, NULL);
+#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+        UTF8     *LocaleAll    = reinterpret_cast<UTF8*>(setlocale(LC_ALL, NULL));
+#endif
         
         uint64_t StringSize    = UTF8_GetStringSizeInCodeUnits(LocaleAll);
         if (StringSize == 2) { // ISO-639-1
@@ -97,7 +105,11 @@ extern "C" {
         FoundationIO_StringTypes Encoding = StringType_Unknown;
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
         LocalizationIO_Init();
+#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
         UTF8 *LocaleString               = getenv(UTF8String("LANG"));
+#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+        UTF8 *LocaleString               = reinterpret_cast<UTF8*>(getenv(reinterpret_cast<const char*>(UTF8String("LANG"))));
+#endif
         if (LocaleString != NULL) {
             uint64_t StringSize          = UTF8_GetStringSizeInCodeUnits(LocaleString);
             uint64_t Offset              = UTF8_FindSubString(LocaleString, UTF8String("."), 0, 1);
@@ -125,7 +137,11 @@ extern "C" {
         }
 #elif (FoundationIOTargetOS == FoundtionIOWindowsOS)
         LocalizationIO_Init();
+#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
         UTF16 *LocaleString             = getenv(UTF16String("LANG"));
+#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+        UTF16 *LocaleString             = reinterpret_cast<UTF16*>(getenv(reinterpret_cast<const wchar_t*>(UTF16String("LANG"))));
+#endif
         if (LocaleString != NULL) {
             uint64_t StringSize         = UTF16_GetStringSizeInCodeUnits(LocaleString);
             uint64_t Offset             = UTF16_FindSubString(LocaleString, UTF16String("."), 0, 1);
