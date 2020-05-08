@@ -205,7 +205,11 @@ extern "C" {
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
     
 #ifndef             FoundationIO_File_Open
+#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
 #define             FoundationIO_File_Open(UTF8FilePath, UTF8FileMode)                         fopen(UTF8FilePath, UTF8FileMode)
+#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#define             FoundationIO_File_Open(UTF8FilePath, UTF8FileMode)                         fopen(reinterpret_cast<const char * __restrict>(UTF8FilePath), reinterpret_cast<const char * __restrict>(UTF8FileMode))
+#endif
 #endif
     
 #ifndef             FoundationIO_File_Seek
@@ -414,6 +418,26 @@ extern "C" {
 #define             UNCPathPrefix32                                                           (U"//?/")
 #endif
     
+#ifndef             FoundationIOInvisibleString8
+#define             FoundationIOInvisibleString8                                              (u8"\u00A0")
+#endif
+    
+#ifndef             FoundationIOInvisibleCharacter16
+#define             FoundationIOInvisibleCharacter16                                          (u'\u00A0')
+#endif
+    
+#ifndef             FoundationIOInvisibleString16
+#define             FoundationIOInvisibleString16                                             (u"\u00A0")
+#endif
+    
+#ifndef             FoundationIOInvisibleCharacter32
+#define             FoundationIOInvisibleCharacter32                                          (U'\u00A0')
+#endif
+    
+#ifndef             FoundationIOInvisibleString32
+#define             FoundationIOInvisibleString32                                             (U"\u00A0")
+#endif
+    
 #if                (WCHAR_MIN < 0)
 #define             FoundationIOWideCharSize ((WCHAR_MAX * 2) + 1)
 #else
@@ -428,12 +452,20 @@ extern "C" {
 #define             FoundationIO_Immutable(PointerType) const PointerType const
 #endif
     
+#ifndef             FoundationIO_Mutable
+#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
+#define             FoundationIO_Mutable(PointerType, Variable) (PointerType, Variable)
+#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#define             FoundationIO_Mutable(PointerType, Variable) std::remove_const<PointerType>(Variable)
+#endif
+#endif
+    
     /*!
-     @abstract        FoundationIO_Mutable is for pointers and arrays.
+     @abstract        FoundationIO_Volatile is for pointers and arrays.
      @remark          Makes the pointer and the data it points to volatile.
      */
-#ifndef             FoundationIO_Mutable
-#define             FoundationIO_Mutable(PointerType) volatile PointerType volatile
+#ifndef             FoundationIO_Volatile
+#define             FoundationIO_Volatile(PointerType) volatile PointerType volatile
 #endif
   
   /*!
@@ -442,6 +474,10 @@ extern "C" {
    */
 #ifndef             FoundationIO_Constant
 #define             FoundationIO_Constant(Type) const Type
+#endif
+    
+#ifndef             FoundationIO_MakeStringSet
+#define             FoundationIO_MakeStringSet(StringSetSize, ...) {__VA_ARGS__,};
 #endif
     
     uint64_t        FoundationIO_GetNumCPUCores(void);

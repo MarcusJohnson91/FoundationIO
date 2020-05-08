@@ -160,79 +160,79 @@ extern "C" {
                 /* Look for the Type specifier, Find End */
                 while (Format[CodePoint] != FoundationIONULLTerminator && Specifiers->Specifiers[Specifier].End == 0x7FFFFFFFFFFFFFFE && Specifier < Specifiers->NumSpecifiers) {
                     switch (Format[CodePoint]) {
-                        case UTF32Character('a'):
+                        case U'a':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Decimal;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Decimal | ModifierType_Radix16 | ModifierType_Lowercase);
                             if (CodePoint > 1 && (Format[CodePoint - 1] == UTF32Character('L') || Format[CodePoint - 1] == UTF32Character('l'))) {
                                 Specifiers->Specifiers[Specifier].ModifierStart          = CodePoint - 1;
-                                Specifiers->Specifiers[Specifier].LengthModifier         = (ModifierType_Long | ModifierType_Decimal);
+                                Specifiers->Specifiers[Specifier].ModifierType           = (ModifierType_Long | ModifierType_Decimal);
                             }
                             break;
-                        case UTF32Character('A'):
+                        case U'A':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Decimal;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Decimal | ModifierType_Radix16 | ModifierType_Uppercase);
                             if (CodePoint > 1 && (Format[CodePoint - 1] == UTF32Character('L') || Format[CodePoint - 1] == UTF32Character('l'))) {
                                 Specifiers->Specifiers[Specifier].ModifierStart          = CodePoint - 1;
-                                Specifiers->Specifiers[Specifier].LengthModifier         = (ModifierType_Long | ModifierType_Decimal);
+                                Specifiers->Specifiers[Specifier].ModifierType           = (ModifierType_Long | ModifierType_Decimal);
                             }
                             break;
-                        case UTF32Character('e'):
+                        case U'e':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Decimal;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Decimal | ModifierType_Scientific | ModifierType_Lowercase);
                             if (CodePoint > 1 && (Format[CodePoint - 1] == UTF32Character('L') || Format[CodePoint - 1] == UTF32Character('l'))) {
                                 Specifiers->Specifiers[Specifier].ModifierStart          = CodePoint - 1;
-                                Specifiers->Specifiers[Specifier].LengthModifier         = (ModifierType_Long | ModifierType_Decimal);
+                                Specifiers->Specifiers[Specifier].ModifierType           = (ModifierType_Long | ModifierType_Decimal);
                             }
                             break;
-                        case UTF32Character('E'):
+                        case U'E':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Decimal;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Decimal | ModifierType_Scientific | ModifierType_Uppercase);
                             if (CodePoint > 1 && (Format[CodePoint - 1] == UTF32Character('L') || Format[CodePoint - 1] == UTF32Character('l'))) {
                                 Specifiers->Specifiers[Specifier].ModifierStart          = CodePoint - 1;
-                                Specifiers->Specifiers[Specifier].LengthModifier         = (ModifierType_Long | ModifierType_Decimal);
+                                Specifiers->Specifiers[Specifier].ModifierType           = (ModifierType_Long | ModifierType_Decimal);
                             }
                             break;
-                        case UTF32Character('f'):
+                        case U'f':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Decimal;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Decimal | ModifierType_Lowercase);
                             if (CodePoint > 1 && (Format[CodePoint - 1] == UTF32Character('L') || Format[CodePoint - 1] == UTF32Character('l'))) {
                                 Specifiers->Specifiers[Specifier].ModifierStart          = CodePoint - 1;
-                                Specifiers->Specifiers[Specifier].LengthModifier         = (ModifierType_Long | ModifierType_Decimal);
+                                Specifiers->Specifiers[Specifier].ModifierType           = (ModifierType_Long | ModifierType_Decimal);
                             }
                             break;
-                        case UTF32Character('F'):
+                        case U'F':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Decimal;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Decimal | ModifierType_Uppercase);
                             if (CodePoint > 1 && (Format[CodePoint - 1] == UTF32Character('L') || Format[CodePoint - 1] == UTF32Character('l'))) {
                                 Specifiers->Specifiers[Specifier].ModifierStart          = CodePoint - 1;
-                                Specifiers->Specifiers[Specifier].LengthModifier         = (ModifierType_Long | ModifierType_Decimal);
+                                Specifiers->Specifiers[Specifier].ModifierType           = (ModifierType_Long | ModifierType_Decimal);
                             }
                             break;
-                        case UTF32Character('g'):
+                        case U'g':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Decimal;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Decimal | ModifierType_Shortest | ModifierType_Lowercase);
                             if (CodePoint > 1 && (Format[CodePoint - 1] == UTF32Character('L') || Format[CodePoint - 1] == UTF32Character('l'))) {
                                 Specifiers->Specifiers[Specifier].ModifierStart          = CodePoint - 1;
-                                Specifiers->Specifiers[Specifier].LengthModifier         = (ModifierType_Long | ModifierType_Decimal);
+                                Specifiers->Specifiers[Specifier].ModifierType           = (ModifierType_Long | ModifierType_Decimal);
                             }
                             break;
-                        case UTF32Character('G'):
+                        case U'G':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Decimal;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Decimal | ModifierType_Shortest | ModifierType_Uppercase);
                             if (CodePoint > 1 && (Format[CodePoint - 1] == UTF32Character('L') || Format[CodePoint - 1] == UTF32Character('l'))) {
                                 Specifiers->Specifiers[Specifier].ModifierStart          = CodePoint - 1;
-                                Specifiers->Specifiers[Specifier].LengthModifier         = (ModifierType_Long | ModifierType_Decimal);
+                                Specifiers->Specifiers[Specifier].ModifierType           = (ModifierType_Long | ModifierType_Decimal);
                             }
                             break;
-                        case UTF32Character('c'):
+                        case U'c':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_CodeUnit;
                             if (CodePoint > 1 && Format[CodePoint - 1] == UTF32Character('l')) {
@@ -271,7 +271,7 @@ extern "C" {
                                 }
                             }
                             break;
-                        case UTF32Character('C'):
+                        case U'C':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_String;
                             if (CodePoint > 1 && Format[CodePoint - 1] == UTF32Character('l')) {
@@ -310,7 +310,7 @@ extern "C" {
                                 }
                             }
                             break;
-                        case UTF32Character('s'):
+                        case U's':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_String;
                             if (CodePoint > 1 && Format[CodePoint - 1] == UTF32Character('l')) {
@@ -349,7 +349,7 @@ extern "C" {
                                 }
                             }
                             break;
-                        case UTF32Character('S'):
+                        case U'S':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_String;
                             if (CodePoint > 1 && Format[CodePoint - 1] == UTF32Character('l')) {
@@ -388,17 +388,17 @@ extern "C" {
                                 }
                             }
                             break;
-                        case UTF32Character('b'):
+                        case U'b':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Integer | ModifierType_Unsigned | ModifierType_Radix2 | ModifierType_Lowercase);
                             break;
-                        case UTF32Character('B'):
+                        case U'B':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Integer | ModifierType_Unsigned | ModifierType_Radix2 | ModifierType_Uppercase);
                             break;
-                        case UTF32Character('d'):
+                        case U'd':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Integer | ModifierType_Signed | ModifierType_Radix10);
@@ -428,7 +428,7 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].LengthModifier         = ModifierLength_SizeType;
                             }
                             break;
-                        case UTF32Character('i'): // "%s in" = i? what the fuck
+                        case U'i': // "%s in" = i? what the fuck
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Integer | ModifierType_Signed | ModifierType_Radix10);
@@ -458,7 +458,7 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].LengthModifier         = ModifierLength_SizeType;
                             }
                             break;
-                        case UTF32Character('o'):
+                        case U'o':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Integer | ModifierType_Unsigned | ModifierType_Radix8);
@@ -488,7 +488,7 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].LengthModifier         = ModifierLength_SizeType;
                             }
                             break;
-                        case UTF32Character('x'):
+                        case U'x':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Integer | ModifierType_Unsigned | ModifierType_Radix16 | ModifierType_Lowercase);
@@ -518,7 +518,7 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].LengthModifier         = ModifierLength_SizeType;
                             }
                             break;
-                        case UTF32Character('X'):
+                        case U'X':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Integer | ModifierType_Unsigned | ModifierType_Radix16 | ModifierType_Uppercase);
@@ -548,7 +548,7 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].LengthModifier         = ModifierLength_SizeType;
                             }
                             break;
-                        case UTF32Character('u'):
+                        case U'u':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                             Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Integer | ModifierType_Unsigned | ModifierType_Radix10);
@@ -578,7 +578,7 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].LengthModifier         = ModifierLength_SizeType;
                             }
                             break;
-                        case UTF32Character('p'):
+                        case U'p':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Pointer;
                             Specifiers->Specifiers[Specifier].ModifierType               = ModifierType_Lowercase;
@@ -587,7 +587,7 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].LengthModifier         = ModifierLength_PointerDiff;
                             }
                             break;
-                        case UTF32Character('P'):
+                        case U'P':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Pointer;
                             Specifiers->Specifiers[Specifier].ModifierType               = ModifierType_Uppercase;
@@ -596,12 +596,12 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].LengthModifier         = ModifierLength_PointerDiff;
                             }
                             break;
-                        case UTF32Character('%'):
+                        case U'%':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Literal;
                             Specifiers->Specifiers[Specifier].ModifierType               = ModifierType_Percent;
                             break;
-                        case UTF32Character('n'):
+                        case U'n':
                             Specifiers->Specifiers[Specifier].End                        = CodePoint;
                             Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Remove;
                             Specifiers->Specifiers[Specifier].ModifierType               = ModifierType_N;
@@ -626,19 +626,19 @@ extern "C" {
                 while (CodePoint2 != FlagEnd) {
                     uint64_t NumDigits                                      = 0ULL;
                     switch (Format[CodePoint2]) {
-                        case UTF32Character(' '):
+                        case U' ':
                             Specifiers->Specifiers[Specifier].Flag          = Flag_Space_Pad;
                             break;
-                        case UTF32Character('\''):
+                        case U'\'':
                             Specifiers->Specifiers[Specifier].Flag          = Flag_Apostrophe_ExponentGroup;
                             break;
-                        case UTF32Character('+'):
+                        case U'+':
                             Specifiers->Specifiers[Specifier].Flag          = Flag_Plus_AddSign;
                             break;
-                        case UTF32Character('-'):
+                        case U'-':
                             Specifiers->Specifiers[Specifier].Flag          = Flag_Minus_LeftJustify;
                             break;
-                        case UTF32Character('.'):
+                        case U'.':
                             if (Format[CodePoint + 1] != FoundationIONULLTerminator && Format[CodePoint + 1] == U'*') {
                                 Specifiers->Specifiers[Specifier].PrecisionFlag = Precision_Asterisk_NextArg;
                             } else if (Format[CodePoint + 1] != FoundationIONULLTerminator &&
@@ -646,12 +646,12 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].PrecisionFlag  = Precision_Inline_Digits;
                             }
                             break;
-                        case UTF32Character('0'):
+                        case U'0':
                             if ((Specifiers->Specifiers[Specifier].BaseType & BaseType_Integer) == BaseType_Integer || (Specifiers->Specifiers[Specifier].BaseType & BaseType_Decimal) == BaseType_Decimal) {
                                 Specifiers->Specifiers[Specifier].Flag  = Flag_Zero_Pad;
                             }
                             break;
-                        case UTF32Character('#'):
+                        case U'#':
                             if ((Specifiers->Specifiers[Specifier].BaseType & BaseType_Integer) == BaseType_Integer) {
                                 Specifiers->Specifiers[Specifier].Flag      = Flag_Pound_PrefixBase;
                             } else if ((Specifiers->Specifiers[Specifier].BaseType & BaseType_Decimal) == BaseType_Decimal)  {
@@ -660,7 +660,7 @@ extern "C" {
                                 }
                             }
                             break;
-                        case UTF32Character('$'):
+                        case U'$':
                             if (CodePoint >= 1 && Format[CodePoint - 1] == U'*') {
                                 Specifiers->Specifiers[Specifier].PositionFlag = Position_Asterisk_NextArg;
                             } else if (CodePoint >= 1 && Format[CodePoint - 1] >= UTF32Character('0') && Format[CodePoint - 1] <= UTF32Character('9')) {
@@ -693,7 +693,7 @@ extern "C" {
 #endif
                             }
                             break;
-                        case UTF32Character('*'):
+                        case U'*':
                             if (CodePoint - 1 >= 0 && Format[CodePoint - 1] == U'.') {
                                 Specifiers->Specifiers[Specifier].PrecisionFlag = Precision_Asterisk_NextArg;
                             } else if (Format[CodePoint + 1] != FoundationIONULLTerminator && Format[CodePoint + 1] == U'$') {
@@ -702,15 +702,15 @@ extern "C" {
                                 Specifiers->Specifiers[Specifier].MinWidthFlag  = MinWidth_Asterisk_NextArg;
                             }
                             break;
-                        case UTF32Character('1'):
-                        case UTF32Character('2'):
-                        case UTF32Character('3'):
-                        case UTF32Character('4'):
-                        case UTF32Character('5'):
-                        case UTF32Character('6'):
-                        case UTF32Character('7'):
-                        case UTF32Character('8'):
-                        case UTF32Character('9'):
+                        case U'1':
+                        case U'2':
+                        case U'3':
+                        case U'4':
+                        case U'5':
+                        case U'6':
+                        case U'7':
+                        case U'8':
+                        case U'9':
                             // Shit, we gotta account for U16 and U32 now fuck.
                             
                             
@@ -1215,7 +1215,7 @@ extern "C" {
             // Now add the length of each replacement string, which needs to be duplicated
             // We need to know the number of times each positional parameter is used, basically a histogram.
             if (Specifiers->NumUniqueSpecifiers < Specifiers->NumSpecifiers) {
-                Specifiers->UniqueSpecifiers = calloc(Specifiers->NumUniqueSpecifiers, sizeof(Specifiers->UniqueSpecifiers));
+                Specifiers->UniqueSpecifiers = (uint64_t*) calloc(Specifiers->NumUniqueSpecifiers, sizeof(Specifiers->UniqueSpecifiers));
                 // Loop over all specifiers, increment .Position in PositionalSpecifierCount
                 for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
                     Specifiers->UniqueSpecifiers[Specifiers->Specifiers[Specifier].Position] += 1;
@@ -1273,7 +1273,7 @@ extern "C" {
                 printf("UTF-8: \"%s\"\n", Format8);
                 UTF32_Deinit(FormattedString);
             } else {
-                Format8                      = Format;
+                Format8                      = UTF8_Clone(Format);
             }
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
@@ -1300,7 +1300,7 @@ extern "C" {
                 Format16                     = UTF16_Encode(FormattedString);
                 UTF32_Deinit(FormattedString);
             } else {
-                Format16                     = Format;
+                Format16                     = UTF16_Clone(Format);
             }
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
@@ -1323,7 +1323,7 @@ extern "C" {
                 FormattedString              = FormatString_UTF32(Format, Specifiers, FormattedStringSize);
                 FormatSpecifiers_Deinit(Specifiers);
             } else {
-                FormattedString              = Format;
+                FormattedString              = UTF32_Clone(Format);
             }
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
@@ -1336,15 +1336,15 @@ extern "C" {
         if (Format != NULL && Formatted != NULL) {
             uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
-                UTF32 *Format32              = UTF8_Decode(Format);
-                FormatSpecifiers *Specifiers = FormatSpecifiers_Init(NumSpecifiers);
+                FoundationIO_Immutable(UTF32 *) Format32    = UTF8_Decode(Format);
+                FormatSpecifiers *Specifiers                = FormatSpecifiers_Init(NumSpecifiers);
                 UTF32_ParseFormatSpecifiers(Format32, Specifiers, StringType_UTF8);
-                UTF32 *Formatted32           = UTF8_Decode(Formatted);
-                UTF32 **Strings32            = DeformatString_UTF32(Format32, Specifiers, Formatted32);
+                FoundationIO_Immutable(UTF32 *) Formatted32 = UTF8_Decode(Formatted);
+                UTF32 **Strings32                           = DeformatString_UTF32(Format32, Specifiers, Formatted32);
                 FormatSpecifiers_Deinit(Specifiers);
-                UTF32_Deinit(Format32);
-                UTF32_Deinit(Formatted32);
-                StringSet                  = UTF8_StringSet_Encode(Strings32);
+                UTF32_Deinit((UTF32*) Format32);
+                UTF32_Deinit((UTF32*) Formatted32);
+                StringSet                  = UTF8_StringSet_Encode((FoundationIO_Immutable(UTF32**)) Strings32);
                 UTF32_StringSet_Deinit(Strings32);
             }
         } else if (Format == NULL) {
@@ -1368,7 +1368,7 @@ extern "C" {
                 FormatSpecifiers_Deinit(Specifiers);
                 UTF32_Deinit(Format32);
                 UTF32_Deinit(Formatted32);
-                StringSet                  = UTF16_StringSet_Encode(Strings32);
+                StringSet                  = UTF16_StringSet_Encode((FoundationIO_Immutable(UTF32**)) Strings32);
                 UTF32_StringSet_Deinit(Strings32);
             }
         } else if (Format == NULL) {
