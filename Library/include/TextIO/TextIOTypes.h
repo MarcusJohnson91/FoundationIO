@@ -16,82 +16,65 @@
 #if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 extern "C" {
 #endif
-  
-#if defined(__has_include)
-#if __has_include(<uchar.h>)
-#include <uchar.h>
+    
 #if   (FoundationIOLanguage == FoundationIOLanguageIsC)
-#ifndef   __c_char8_t
-#define   __c_char8_t
-#endif /* __c_char8_t */
-#ifdef    __CHAR8_TYPE__
-#undef    __CHAR8_TYPE__
-#define   __CHAR8_TYPE__
-#else
-#define   __CHAR8_TYPE__
-#endif /* __CHAR8_TYPE__ */
-#define   __CHAR8_TYPE__
-typedef                   unsigned char             char8_t;
+#ifdef __has_include
+#if    __has_include(<uchar.h>)
+#include <uchar.h>
+#endif // <uchar.h> exists
+#endif // __has_include
 #elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#ifndef   __cpp_char8_t
-#define   __cpp_char8_t
-#endif /* __cpp_char8_t */
-#ifdef    __CHAR8_TYPE__
-#undef    __CHAR8_TYPE__
-#define   __CHAR8_TYPE__
-#else
-#define   __CHAR8_TYPE__
-#endif /* __CHAR8_TYPE__ */
-typedef                   unsigned char             char8_t;
-#endif /* FoundationIOLanguage */
-#elif (!__has_include(<uchar.h>)) /* Define the uchar types ourself because there is no uchar header */
-#if   (FoundationIOStandardVersionC <= FoundationIOStandardVersionC2X || FoundationIOStandardVersionCXX <= FoundationIOStandardVersionCXX20)
-#ifdef    __CHAR8_TYPE__
-#undef    __CHAR8_TYPE__
-#endif /* __CHAR8_TYPE__ */
-#define   __CHAR8_TYPE__
-typedef                   unsigned char             char8_t;
-#endif /* FoundationIOStandardVersion 20 */
-  
-#if   (FoundationIOStandardVersionC <= FoundationIOStandardVersionC11 || FoundationIOStandardVersionCXX <= FoundationIOStandardVersionCXX11)
-#ifdef    __CHAR16_TYPE__
-#undef    __CHAR16_TYPE__
-#endif /* __CHAR16_TYPE__ */
-#define   __CHAR16_TYPE__
-typedef                   uint_least16_t            char16_t;
-#endif /* __CHAR16_TYPE__ */
-  
-#ifdef    __CHAR32_TYPE__
-#undef    __CHAR32_TYPE__
-#endif /* __CHAR32_TYPE__ */
-#define   __CHAR32_TYPE__
-typedef                   uint_least32_t            char32_t;
-#endif /* FoundationIOStandardVersion 11 */
-  
-#elif (!defined(__has_include)) /* Define the Unicode types ourself because there is no __has_include */
-  
-#if   (FoundationIOStandardVersionC <= FoundationIOStandardVersionC2X || FoundationIOStandardVersionCXX <= FoundationIOStandardVersionCXX20)
-#ifdef    __CHAR8_TYPE__
-#undef    __CHAR8_TYPE__
-#define   __CHAR8_TYPE__
-#endif /* __CHAR8_TYPE__ */
-typedef                   unsigned char             char8_t;
-#endif /* FoundationIOStandardVersion 20 */
-  
-#if   (FoundationIOStandardVersionC <= FoundationIOStandardVersionC11 || FoundationIOStandardVersionCXX <= FoundationIOStandardVersionCXX11)
-#ifdef    __CHAR16_TYPE__
-#undef    __CHAR16_TYPE__
-#endif /* __CHAR16_TYPE__ */
-#define   __CHAR16_TYPE__
-typedef                   uint_least16_t            char16_t;
-  
-#ifdef    __CHAR32_TYPE__
-#undef    __CHAR32_TYPE__
-#endif /* __CHAR32_TYPE__ */
-#define   __CHAR32_TYPE__
-typedef                   uint_least32_t            char32_t;
-#endif /* FoundationIOStandardVersion 11 */
-#endif /* __has_include(<uchar.h>) */
+#ifdef __has_include
+#if    __has_include(<cuchar>)
+#include <cuchar>
+#endif // <cuchar> exists
+#endif // __has_include exists
+#endif // FoundationIOLanguage
+    
+#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
+#ifndef __CHAR8_TYPE__
+#define __CHAR8_TYPE__
+typedef unsigned char char8_t;
+#endif // __CHAR8_TYPE__
+#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#ifndef __cpp_char8_t
+#define __cpp_char8_t
+typedef unsigned char char8_t;
+#endif // __cpp_char8_t
+#endif // FoundationIOLanguage
+    
+    
+#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
+#ifdef __CHAR16_TYPE__
+typedef __CHAR16_TYPE__ char16_t;
+#elif !defined(__CHAR16_TYPE__)
+#if    defined(uint_least16_t)
+typedef uint_least16_t char16_t;
+#elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+typedef _Char16_t char16_t;
+#elif !defined(uint_least16_t)
+#error "Get a modern compiler that supports uint_least16_t"
+#endif // Defined? uint_least16_t
+#endif // Defined? __CHAR16_TYPE__
+
+#ifdef __CHAR32_TYPE__
+typedef __CHAR32_TYPE__ char32_t;
+#elif !defined(__CHAR32_TYPE__)
+#if    defined(uint_least32_t)
+typedef uint_least32_t  char32_t;
+#elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+typedef _Char32_t char32_t;
+#elif !defined(uint_least32_t)
+#error "Get a modern compiler that supports uint_least32_t"
+#endif // Defined? uint_least32_t
+#endif // Defined? __CHAR32_TYPE__
+#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#ifndef __cpp_unicode_characters
+#define __cpp_unicode_characters
+typedef uint_least16_t char16_t;
+typedef uint_least32_t char32_t;
+#endif // __cpp_unicode_characters
+#endif // FoundationIOLanguage
   
   
 #ifndef   FoundationIO_StringType8
@@ -329,7 +312,7 @@ typedef                   char32_t                  UTF32;
 #ifndef                   UTF32_MakeCharacterImmutable
 #if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 #if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
-#define                   UTF32_MakeCharacterImmutable(String)  const_cast<const UTF32>(String)
+#define                   UTF32_MakeCharacterImmutable(String) const_cast<const UTF32>(String)
 #elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
 #define                   UTF32_MakeCharacterImmutable(String) (String)
 #endif /* CXX11 */
@@ -341,7 +324,7 @@ typedef                   char32_t                  UTF32;
 #ifndef                   UTF32_MakeStringImmutable
 #if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
 #if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
-#define                   UTF32_MakeStringImmutable(String)  const_cast<const UTF32*>(String)
+#define                   UTF32_MakeStringImmutable(String) const_cast<const UTF32*>(String)
 #elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
 #define                   UTF32_MakeStringImmutable(String) (String)
 #endif /* CXX11 */
@@ -359,12 +342,12 @@ typedef                   char32_t                  UTF32;
 #define                   UTF8String(Literal)                   reinterpret_cast<UTF8*>(const_cast<UTF8*>(u8##Literal))
 #define                   UTF8Character(Literal)                reinterpret_cast<UTF8>(u8##Literal)
 #elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX20)
-#define                   UTF8String(Literal)                   reinterpret_cast<UTF8*>(const_cast<UTF8*>(u8##Literal))
+#define                   UTF8String(Literal)                   reinterpret_cast<FoundationIO_Immutable(UTF8 *)>(u8##Literal)
 #define                   UTF8Character(Literal)                reinterpret_cast<UTF8>(u8##Literal)
 #endif
 #elif (FoundationIOLanguage == FoundationIOLanguageIsC)
-#define                   UTF8String(Literal)                   u8##Literal
-#define                   UTF8Character(Literal)                u8##Literal
+#define                   UTF8String(Literal)                   (UTF8*) u8##Literal
+#define                   UTF8Character(Literal)                (UTF8) u8##Literal
 #endif /* FoundationIOLanguage */
 #endif /* FoundationIO_Unicodize8 */
     
