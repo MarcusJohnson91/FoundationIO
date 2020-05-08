@@ -176,7 +176,7 @@ extern "C" {
         LocalizationIO_Init();
         struct lconv *Locale           = localeconv();
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-        DecimalSeperator               = UTF8_Clone(Locale->decimal_point);
+        DecimalSeperator               = UTF8_Clone((FoundationIO_Immutable(UTF8 *)) Locale->decimal_point);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         UTF16 *DecimalSeperator16      = UTF16_Clone(Locale->_W_decimal_point);
         if (DecimalSeperator16 != NULL) {
@@ -194,7 +194,7 @@ extern "C" {
         LocalizationIO_Init();
         struct lconv *Locale           = localeconv();
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-        UTF8  *DecimalSeperator8       = UTF8_Clone(Locale->decimal_point);
+        UTF8  *DecimalSeperator8       = UTF8_Clone((FoundationIO_Immutable(UTF8 *)) Locale->decimal_point);
         if (DecimalSeperator8 != NULL) {
             DecimalSeperator           = UTF8_Convert(DecimalSeperator8);
         }
@@ -210,7 +210,7 @@ extern "C" {
         LocalizationIO_Init();
         struct lconv *Locale            = localeconv();
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-        GroupingSeperator               = UTF8_Clone(Locale->thousands_sep);
+        GroupingSeperator               = UTF8_Clone((FoundationIO_Immutable(UTF8 *)) Locale->thousands_sep);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
         UTF16 *GroupingSeperator16      = UTF16_Clone(Locale->_W_thousands_sep);
         if (GroupingSeperator16 != NULL) {
@@ -228,7 +228,7 @@ extern "C" {
         LocalizationIO_Init();
         struct lconv *Locale            = localeconv();
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-        UTF8  *GroupingSeperator8       = UTF8_Clone(Locale->thousands_sep);
+        UTF8  *GroupingSeperator8       = UTF8_Clone((FoundationIO_Immutable(UTF8 *)) Locale->thousands_sep);
         if (GroupingSeperator8 != NULL) {
             GroupingSeperator           = UTF8_Convert(GroupingSeperator8);
         }
@@ -240,12 +240,16 @@ extern "C" {
     }
     
     UTF8 **Localize_UTF8_GetGroupingSize(void) {
-        UTF8    **GroupingSize          = NULL;
+        UTF8    **GroupingSize                            = NULL;
         LocalizationIO_Init();
-        struct lconv *Locale            = localeconv();
-        UTF8 *GroupingSizeString        = Locale->grouping;
-        UTF8 *Delimiters[]              = {UTF8String("/"), UTF8String("\\")};
-        GroupingSize                    = UTF8_Split(GroupingSizeString, Delimiters);
+        struct lconv *Locale                              = localeconv();
+        FoundationIO_Immutable(UTF8 *) GroupingSizeString = UTF8_Clone((FoundationIO_Immutable(UTF8 *)) Locale->grouping);
+        FoundationIO_Immutable(UTF8 *) Delimiters[2]      = FoundationIO_MakeStringSet(2, UTF8String("/"), UTF8String("\\"));
+#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
+        GroupingSize                                      = UTF8_Split(GroupingSizeString, Delimiters);
+#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+        GroupingSize                                      = UTF8_Split((FoundationIO_Immutable(UTF8 *)) GroupingSizeString, (FoundationIO_Immutable(UTF8 **)) Delimiters);
+#endif
         return GroupingSize;
     }
     
@@ -253,13 +257,13 @@ extern "C" {
         UTF16 **GroupingSize            = NULL;
         LocalizationIO_Init();
         struct lconv *Locale            = localeconv();
-        UTF8 *GroupingSizeString        = Locale->grouping;
-        UTF8 *Delimiters[]              = {UTF8String("/"), UTF8String("\\")};
+        UTF8 *GroupingSizeString        = UTF8_Clone((FoundationIO_Immutable(UTF8 *)) Locale->grouping);
+        FoundationIO_Immutable(UTF8 *) Delimiters[2] = FoundationIO_MakeStringSet(2, UTF8String("/"), UTF8String("\\"));
         
-        UTF8 **GroupingSize8            = UTF8_Split(GroupingSizeString, Delimiters);
-        UTF32 **GroupingSize32          = UTF8_StringSet_Decode(GroupingSize8);
+        UTF8 **GroupingSize8            = UTF8_Split((FoundationIO_Immutable(UTF8 *)) GroupingSizeString, (FoundationIO_Immutable(UTF8 **)) Delimiters);
+        UTF32 **GroupingSize32          = UTF8_StringSet_Decode((FoundationIO_Immutable(UTF8 **)) GroupingSize8);
         UTF8_StringSet_Deinit(GroupingSize8);
-        GroupingSize                    = UTF16_StringSet_Encode(GroupingSize32);
+        GroupingSize                    = UTF16_StringSet_Encode((FoundationIO_Immutable(UTF32 **)) GroupingSize32);
         UTF32_StringSet_Deinit(GroupingSize32);
         return GroupingSize;
     }
@@ -269,9 +273,9 @@ extern "C" {
         LocalizationIO_Init();
         struct lconv *Locale            = localeconv();
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-        CurrencySymbol                  = UTF8_Clone(Locale->currency_symbol);
+        CurrencySymbol                  = UTF8_Clone((FoundationIO_Immutable(UTF8 *)) Locale->currency_symbol);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        CurrencySymbol                  = UTF16_Convert(Locale->_W_currency_symbol);
+        CurrencySymbol                  = UTF16_Convert((FoundationIO_Immutable(UTF16 *)) Locale->_W_currency_symbol);
 #endif
         return CurrencySymbol;
     }
@@ -281,9 +285,9 @@ extern "C" {
         LocalizationIO_Init();
         struct lconv *Locale            = localeconv();
 #if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-        CurrencySymbol                  = UTF8_Convert(Locale->currency_symbol);
+        CurrencySymbol                  = UTF8_Convert((FoundationIO_Immutable(UTF8 *)) Locale->currency_symbol);
 #elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-        CurrencySymbol                  = UTF16_Clone(Locale->_W_currency_symbol);
+        CurrencySymbol                  = UTF16_Clone((FoundationIO_Immutable(UTF16 *)) Locale->_W_currency_symbol);
 #endif
         return CurrencySymbol;
     }

@@ -260,7 +260,7 @@ extern "C" {
         return StringSizeInCodeUnits;
     }
     
-    static uint64_t UTF32_GetStringSizeInUTF8CodeUnits(UTF32 *String) {
+    static uint64_t UTF32_GetStringSizeInUTF8CodeUnits(FoundationIO_Immutable(UTF32 *) String) {
         uint64_t CodePoint            = 0ULL;
         uint64_t UTF8CodeUnits        = 0ULL;
         if (String != NULL) {
@@ -282,7 +282,7 @@ extern "C" {
         return UTF8CodeUnits;
     }
     
-    static uint64_t UTF32_GetStringSizeInUTF16CodeUnits(UTF32 *String) {
+    static uint64_t UTF32_GetStringSizeInUTF16CodeUnits(FoundationIO_Immutable(UTF32*) String) {
         uint64_t CodePoint          = 0ULL;
         uint64_t UTF16CodeUnits     = 0ULL;
         if (String != NULL) {
@@ -2376,15 +2376,15 @@ extern "C" {
     }
     
     UTF8 *UTF8_Integer2String(int64_t Integer2Convert, FoundationIO_Bases Base) {
-        FoundationIO_Immutable(UTF32 *) IntegerString32 = UTF32_Integer2String(Integer2Convert, Base);
-        UTF8  *IntegerString8                           = UTF8_Encode(IntegerString32);
+        UTF32 *IntegerString32 = UTF32_Integer2String(Integer2Convert, Base);
+        UTF8  *IntegerString8  = UTF8_Encode((FoundationIO_Immutable(UTF32 *)) IntegerString32);
         UTF32_Deinit(IntegerString32);
         return IntegerString8;
     }
     
     UTF16 *UTF16_Integer2String(int64_t Integer2Convert, FoundationIO_Bases Base) {
-        FoundationIO_Immutable(UTF32 *) IntegerString32 = UTF32_Integer2String(Integer2Convert, Base);
-        UTF16 *IntegerString16                          = UTF16_Encode(IntegerString32);
+        UTF32 *IntegerString32 = UTF32_Integer2String(Integer2Convert, Base);
+        UTF16 *IntegerString16 = UTF16_Encode((FoundationIO_Immutable(UTF32 *)) IntegerString32);
         UTF32_Deinit(IntegerString32);
         return IntegerString16;
     }
@@ -2790,7 +2790,7 @@ extern "C" {
         if (String != NULL && Type != TruncationType_Unknown && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF8_Decode(String);
             UTF32   **Strings2Remove32          = UTF8_StringSet_Decode(Strings2Remove);
-            UTF32    *Trimmed32                 = UTF32_Trim(String32, Type, Strings2Remove32);
+            UTF32    *Trimmed32                 = UTF32_Trim((FoundationIO_Immutable(UTF32*)) String32, Type, (FoundationIO_Immutable(UTF32**)) Strings2Remove32);
             UTF32_StringSet_Deinit(Strings2Remove32);
             Trimmed                             = UTF8_Encode(Trimmed32);
             UTF32_Deinit(String32);
@@ -2809,7 +2809,7 @@ extern "C" {
         if (String != NULL && Type != TruncationType_Unknown && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF16_Decode(String);
             UTF32   **Strings2Remove32          = UTF16_StringSet_Decode(Strings2Remove);
-            UTF32    *Trimmed32                 = UTF32_Trim(String32, Type, Strings2Remove32);
+            UTF32    *Trimmed32                 = UTF32_Trim((FoundationIO_Immutable(UTF32*)) String32, Type, (FoundationIO_Immutable(UTF32**)) Strings2Remove32);
             UTF32_StringSet_Deinit(Strings2Remove32);
             Trimmed                             = UTF16_Encode(Trimmed32);
             UTF32_Deinit(String32);
@@ -2914,13 +2914,13 @@ extern "C" {
     }
     
     UTF8 **UTF8_Split(FoundationIO_Immutable(UTF8 *) String, FoundationIO_Immutable(UTF8 **) Delimiters) {
-        UTF8 **SplitString        = NULL;
+        UTF8 **SplitString                                 = NULL;
         if (String != NULL && Delimiters != NULL) {
-            UTF32  *String32      = UTF8_Decode(String);
-            UTF32 **Delimiters32  = UTF8_StringSet_Decode(Delimiters);
-            UTF32 **SplitString32 = UTF32_Split(String32, Delimiters32);
-            UTF32_Deinit(String32);
-            UTF32_StringSet_Deinit(Delimiters32);
+            FoundationIO_Immutable(UTF32 *)  String32      = UTF8_Decode(String);
+            FoundationIO_Immutable(UTF32 **) Delimiters32  = (FoundationIO_Immutable(UTF32 **)) UTF8_StringSet_Decode(Delimiters);
+            FoundationIO_Immutable(UTF32 **) SplitString32 = (FoundationIO_Immutable(UTF32 **)) UTF32_Split(String32, Delimiters32);
+            UTF32_Deinit((UTF32*) String32);
+            UTF32_StringSet_Deinit((UTF32**) Delimiters32);
             SplitString           = UTF8_StringSet_Encode(SplitString32);
         } else if (String == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
@@ -2935,10 +2935,10 @@ extern "C" {
         if (String != NULL && Delimiters != NULL) {
             UTF32  *String32      = UTF16_Decode(String);
             UTF32 **Delimiters32  = UTF16_StringSet_Decode(Delimiters);
-            UTF32 **SplitString32 = UTF32_Split(String32, Delimiters32);
+            UTF32 **SplitString32 = UTF32_Split((FoundationIO_Immutable(UTF32 *)) String32, (FoundationIO_Immutable(UTF32 **)) Delimiters32);
             UTF32_Deinit(String32);
-            UTF32_StringSet_Deinit(Delimiters32);
-            SplitString           = UTF16_StringSet_Encode(SplitString32);
+            UTF32_StringSet_Deinit((UTF32**) Delimiters32);
+            SplitString           = UTF16_StringSet_Encode((FoundationIO_Immutable(UTF32 **)) SplitString32);
         } else if (String == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
         } else if (Delimiters == NULL) {
@@ -3406,9 +3406,9 @@ extern "C" {
         return Encoded;
     }
     
-    void UTF8_StringSet_Deinit(FoundationIO_Immutable(UTF8 **) StringSet) {
+    void UTF8_StringSet_Deinit(UTF8 **StringSet) {
         if (StringSet != NULL) {
-            uint64_t NumStrings = UTF8_StringSet_GetNumStrings(StringSet);
+            uint64_t NumStrings = UTF8_StringSet_GetNumStrings((FoundationIO_Immutable(UTF8 **)) StringSet);
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 free(StringSet[String]);
             }
@@ -3418,9 +3418,9 @@ extern "C" {
         }
     }
     
-    void UTF16_StringSet_Deinit(FoundationIO_Immutable(UTF16 **) StringSet) {
+    void UTF16_StringSet_Deinit(UTF16 **StringSet) {
         if (StringSet != NULL) {
-            uint64_t NumStrings = UTF16_StringSet_GetNumStrings(StringSet);
+            uint64_t NumStrings = UTF16_StringSet_GetNumStrings((FoundationIO_Immutable(UTF16 **)) StringSet);
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 free(StringSet[String]);
             }
@@ -3430,9 +3430,9 @@ extern "C" {
         }
     }
     
-    void UTF32_StringSet_Deinit(FoundationIO_Immutable(UTF32 **) StringSet) {
+    void UTF32_StringSet_Deinit(UTF32 **StringSet) {
         if (StringSet != NULL) {
-            uint64_t NumStrings = UTF32_StringSet_GetNumStrings(StringSet);
+            uint64_t NumStrings = UTF32_StringSet_GetNumStrings((FoundationIO_Immutable(UTF32 **)) StringSet);
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 free(StringSet[String]);
             }

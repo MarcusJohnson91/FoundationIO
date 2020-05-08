@@ -53,15 +53,15 @@ extern "C" {
      @param                     Description                     "String describing what went wrong".
      */
 #if   (FoundationIOCompiler == FoundationIOCompilerIsClang)
-    void                        Log(LogIO_Severities Severity, FoundationIO_Immutable(UTF8 *) FunctionName, UTF8 *Description, ...) __attribute__((__format__(__printf__, 3, 4)));
+    void                        Log(LogIO_Severities Severity, FoundationIO_Immutable(UTF8 *) FunctionName, FoundationIO_Immutable(UTF8 *) Description, ...) __attribute__((__format__(__printf__, 3, 4)));
 #elif (FoundationIOCompiler == FoundationIOCompilerIsGCC)
-    void                        Log(LogIO_Severities Severity, FoundationIO_Immutable(UTF8 *) FunctionName, UTF8 *Description, ...);
+    void                        Log(LogIO_Severities Severity, FoundationIO_Immutable(UTF8 *) FunctionName, FoundationIO_Immutable(UTF8 *) Description, ...);
 #elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
 #include <sal.h>
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    void                        Log(LogIO_Severities Severity, FoundationIO_Immutable(UTF8 *) FunctionName, __format_string UTF8 *Description, ...);
+    void                        Log(LogIO_Severities Severity, FoundationIO_Immutable(UTF8 *) FunctionName, __format_string FoundationIO_Immutable(UTF8 *) Description, ...);
 #elif    (_MSC_VER >= 1500)
-    void                        Log(LogIO_Severities Severity, FoundationIO_Immutable(UTF8 *) FunctionName, _Printf_format_string_ UTF8 *Description, ...);
+    void                        Log(LogIO_Severities Severity, FoundationIO_Immutable(UTF8 *) FunctionName, _Printf_format_string_ FoundationIO_Immutable(UTF8 *) Description, ...);
 #endif /* MSVC Version */
 #endif /* Compiler */
     

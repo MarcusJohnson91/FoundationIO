@@ -107,7 +107,7 @@ extern "C" {
         }
     }
     
-    void Log(LogIO_Severities Severity, FoundationIO_Immutable(UTF8 *) FunctionName, UTF8 *Description, ...) {
+    void Log(LogIO_Severities Severity, FoundationIO_Immutable(UTF8 *) FunctionName, FoundationIO_Immutable(UTF8 *) Description, ...) {
         if (Log_LogFile == NULL) {
             Log_LogFile = stderr;
         }

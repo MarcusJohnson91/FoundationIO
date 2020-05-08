@@ -1227,19 +1227,19 @@ extern "C" {
      @abstract                           "Deletes a UTF-8 encoded StringSet (like is returned by SplitString)".
      @param               StringSet      "An StringSet to deinitialize, all strings will be freed".
      */
-    void                  UTF8_StringSet_Deinit(FoundationIO_Immutable(UTF8 **) StringSet);
+    void                  UTF8_StringSet_Deinit(UTF8 **StringSet);
     
     /*!
      @abstract                           "Deletes a UTF-16 encoded StringSet (like is returned by SplitString)".
      @param               StringSet      "An StringSet to deinitialize, all strings will be freed".
      */
-    void                  UTF16_StringSet_Deinit(FoundationIO_Immutable(UTF16 **) StringSet);
+    void                  UTF16_StringSet_Deinit(UTF16 **StringSet);
     
     /*!
      @abstract                           "Deletes a UTF-16 encoded StringSet (like is returned by SplitString)".
      @param               StringSet      "An StringSet to deinitialize, all strings will be freed".
      */
-    void                  UTF32_StringSet_Deinit(FoundationIO_Immutable(UTF32 **) StringSet);
+    void                  UTF32_StringSet_Deinit(UTF32 **StringSet);
     
 #ifdef __cplusplus
 }
