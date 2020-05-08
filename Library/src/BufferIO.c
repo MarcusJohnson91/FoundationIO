@@ -923,7 +923,7 @@ extern "C" {
             if (PathHasBOM == No) {
                 BitI->File                   = FoundationIO_File_Open(Path2Open, UTF8String("rb"));
             } else {
-                static UTF8 *UTF8BOMString   = UTF8String("\xEF\xBB\xBF");
+                const UTF8 *const UTF8BOMString = UTF8String("\xEF\xBB\xBF");
                 int64_t GoodCodeUnit         = UTF8_FindSubString(Path2Open, UTF8BOMString, 0, 3) + 3;
                 if (GoodCodeUnit >= 0) {
                     BitI->File               = FoundationIO_File_Open(&Path2Open[GoodCodeUnit], UTF8String("rb"));

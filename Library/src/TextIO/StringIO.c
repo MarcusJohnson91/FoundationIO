@@ -2086,13 +2086,11 @@ extern "C" {
         UTF32   *CaseFoldedString                = NULL;
         if (String != NULL) {
             uint64_t CodePoint                   = 0ULL;
-            UTF32 **ReplacementStrings = NULL;
-            ReplacementStrings                   = UTF32_MakeStringMutable(CaseFoldStringSet);
             while (String[CodePoint] != FoundationIONULLTerminator) {
                 for (uint64_t Index = 0ULL; Index < CaseFoldTableSize; Index++) {
                     if (String[CodePoint] == CaseFoldCodePoints[Index]) {
                         uint64_t ReplacementSize = UTF32_GetStringSizeInCodePoints(String);
-                        CaseFoldedString         = UTF32_SubstituteSubString(String, ReplacementStrings[Index], CodePoint, ReplacementSize);
+                        CaseFoldedString         = UTF32_SubstituteSubString(String, CaseFoldStringSet[Index], CodePoint, ReplacementSize);
                     }
                 }
                 CodePoint += 1;
@@ -2501,14 +2499,14 @@ extern "C" {
     }
     
     UTF8 *UTF8_Decimal2String(double Decimal, FoundationIO_Bases Base) {
-        UTF32 *String32 = UTF32_Decimal2String(Base, Decimal);
+        UTF32 *String32 = UTF32_Decimal2String(Decimal, Base);
         UTF8  *String8  = UTF8_Encode(String32);
         free(String32);
         return String8;
     }
     
     UTF16 *UTF16_Decimal2String(double Decimal, FoundationIO_Bases Base) {
-        UTF32 *String32 = UTF32_Decimal2String(Base, Decimal);
+        UTF32 *String32 = UTF32_Decimal2String(Decimal, Base);
         UTF16 *String16 = UTF16_Encode(String32);
         free(String32);
         return String16;
