@@ -2,7 +2,7 @@
 #include "../include/MathIO.h"          /* Included for Absolute, Max/Min */
 #include "../include/UnicodeIO/LogIO.h" /* Included for error reporting */
 
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
     
@@ -560,7 +560,7 @@ extern "C" {
     
     void Audio2DHistogram_Sort(Audio2DHistogram *Histogram, ContainerIO_SortTypes Sort) {
         if (Histogram != NULL) {
-            uint64_t NumCores = FoundationIO_GetNumCPUCores();
+            uint64_t NumCores = PlatformOS_GetNumCPUCores();
             if (Sort == SortType_Ascending) { // Top to bottom
                 if (Histogram->Type == (AudioType_Integer8 | AudioType_Unsigned)) {
                     uint8_t *Audio = (uint8_t*) Audio2DHistogram_GetArray(Histogram);
@@ -1971,6 +1971,6 @@ extern "C" {
     }
     /* ImageContainer */
     
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif

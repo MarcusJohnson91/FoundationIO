@@ -3,15 +3,15 @@
 #include "../include/UnicodeIO/LogIO.h"          /* Included for error reporting */
 #include "../include/UnicodeIO/StringIO.h"       /* Included for UTFX_Init functions */
 
-#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && ((FoundationIOTargetOS & FoundationIOAppleOS) != FoundationIOAppleOS))
+#if   (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_AppleOS) != PlatformIO_AppleOS))
 #include <time.h>                      /* Included for timespec_get */
-#elif (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && ((FoundationIOTargetOS & FoundationIOAppleOS) == FoundationIOAppleOS))
+#elif (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_AppleOS) == PlatformIO_AppleOS))
 #include <mach/mach_time.h>
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
 #include <WinBase.h>                   /* Included for QueryPerformanceCounter, Windows.h MUST be included before winbase */
 #endif
 
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
     
@@ -86,11 +86,11 @@ extern "C" {
     
     uint64_t GetTimerFrequency(void) {
         uint64_t TimerFrequency = 0LL;
-#if ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+#if ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
         struct timespec Resolution;
         clock_getres(CLOCK_MONOTONIC, &Resolution);
         TimerFrequency = Resolution.tv_nsec;
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
         LARGE_INTEGER WinFrequency;
         bool Success = QueryPerformanceFrequency(&WinFrequency);
         if (Success) {
@@ -104,12 +104,12 @@ extern "C" {
         uint64_t Time        = 0ULL;
         uint64_t CurrentTime = 0ULL;
         for (uint8_t Loop = 1; Loop <= 3; Loop++) {
-#if   ((FoundationIOTargetOS & FoundationIOAppleOS) == FoundationIOAppleOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_AppleOS) == PlatformIO_AppleOS)
                 CurrentTime      = mach_continuous_time();
-#elif (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && ((FoundationIOTargetOS & FoundationIOLinuxOS) == FoundationIOLinuxOS))
+#elif (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS))
             struct timespec *TimeSpec = NULL;
             clock_gettime(CLOCK_MONOTONIC, TimeSpec);
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
             LARGE_INTEGER WinCounter;
             bool Success    = QueryPerformanceCounter(CurrentTime);
             if (Success) {
@@ -151,6 +151,6 @@ extern "C" {
         return String;
     }
     
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif

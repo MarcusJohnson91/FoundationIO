@@ -4,7 +4,7 @@
 #include "../Library/include/UnicodeIO/LogIO.h"
 #include "../Library/include/UnicodeIO/StringIO.h"
 
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
     
@@ -390,6 +390,6 @@ extern "C" {
         return TestSuitePassed;
     }
     
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif

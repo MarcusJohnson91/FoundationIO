@@ -1,7 +1,7 @@
 #include "../include/MathIO.h"           /* Included for our declarations */
 #include "../include/UnicodeIO/LogIO.h"
 
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
     
@@ -477,6 +477,6 @@ extern "C" {
         
     }
     
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif

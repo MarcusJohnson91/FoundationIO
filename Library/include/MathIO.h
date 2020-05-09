@@ -13,13 +13,13 @@
 #ifndef  FoundationIO_MathIO_H
 #define  FoundationIO_MathIO_H
 
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
     
 #include <math.h>
     
-#if   (FoundationIOLanguage == FoundationIOLanguageIsC && FoundationIOStandardVersionC >= FoundationIOStandardVersionC99 && FoundationIOTargetOS != FoundationIOWindowsOS)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersionC >= PlatformIO_LanguageVersionC99 && PlatformIO_TargetOS != PlatformIO_WindowsOS)
 #include <tgmath.h>
 #endif /* Version check */
     
@@ -538,7 +538,7 @@ extern "C" {
      */
     uint64_t     Rotate(uint64_t Value, uint8_t Bits2Rotate, MathIO_RotationType Rotate);
     
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif
 

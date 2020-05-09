@@ -77,33 +77,33 @@ extern "C" {
                  Base_Scientific                       = 256,
                  Base_Shortest                         = 512,
     } FoundationIO_Bases;
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX && FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
         constexpr inline FoundationIO_Bases operator|(FoundationIO_Bases A, FoundationIO_Bases B) {
-            uint8_t A1 = static_cast<uint8_t>(A);
-            uint8_t B1 = static_cast<uint8_t>(B);
+            uint16_t A1 = static_cast<uint16_t>(A);
+            uint16_t B1 = static_cast<uint16_t>(B);
             return static_cast<FoundationIO_Bases>(A1 | B1);
         }
         
         constexpr inline FoundationIO_Bases operator&(FoundationIO_Bases A, FoundationIO_Bases B) {
-            uint8_t A1 = static_cast<uint8_t>(A);
-            uint8_t B1 = static_cast<uint8_t>(B);
+            uint16_t A1 = static_cast<uint16_t>(A);
+            uint16_t B1 = static_cast<uint16_t>(B);
             return static_cast<FoundationIO_Bases>(A1 & B1);
         }
         
         constexpr inline FoundationIO_Bases operator|=(FoundationIO_Bases A, FoundationIO_Bases B) {
-            uint8_t A1 = static_cast<uint8_t>(A);
-            uint8_t B1 = static_cast<uint8_t>(B);
+            uint16_t A1 = static_cast<uint16_t>(A);
+            uint16_t B1 = static_cast<uint16_t>(B);
             return static_cast<FoundationIO_Bases>(A1 |= B1);
         }
         
         constexpr inline FoundationIO_Bases operator&=(FoundationIO_Bases A, FoundationIO_Bases B) {
-            uint8_t A1 = static_cast<uint8_t>(A);
-            uint8_t B1 = static_cast<uint8_t>(B);
+            uint16_t A1 = static_cast<uint16_t>(A);
+            uint16_t B1 = static_cast<uint16_t>(B);
             return static_cast<FoundationIO_Bases>(A1 &= B1);
         }
     }
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 
 	static const uint8_t BitMaskTable[BitMaskTableSize] = {
 		0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF

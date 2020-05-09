@@ -4,11 +4,11 @@
 #include "../include/MathIO.h"               /* Included for Bits2Bytes, etc */
 #include "../include/UnicodeIO/LogIO.h"      /* Included for error logging */
 
-#if   (FoundationIOTargetOS == FoundationIOWindowsOS)
+#if   (PlatformIO_TargetOS == PlatformIO_WindowsOS)
 #include <BCrypt.h>
 #endif
 
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
     
@@ -188,17 +188,17 @@ extern "C" {
     static int64_t Entropy_BaseSeed(uint8_t NumBytes) {
         int64_t RandomValue = 0LL;
         if (NumBytes <= 8) {
-#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (((FoundationIOTargetOS & FoundationIOBSDOS) == FoundationIOBSDOS) || ((FoundationIOTargetOS & FoundationIOAppleOS) == FoundationIOAppleOS)))
+#if   (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && (((PlatformIO_TargetOS & PlatformIO_BSDOS) == PlatformIO_BSDOS) || ((PlatformIO_TargetOS & PlatformIO_AppleOS) == PlatformIO_AppleOS)))
             arc4random_buf(&RandomValue, NumBytes);
-#elif ((FoundationIOTargetOS & FoundationIOLinuxOS) == FoundationIOLinuxOS)
+#elif ((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS)
             #include <linux/random.h>
             getrandom(&RandomValue, NumBytes, GRND_BLOCK);
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
             BCryptGenRandom(NULL, &RandomValue, NumBytes, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
 #else
-            FILE *RandomFile          = FoundationIO_File_Open(UTF8String("/dev/urandom"), UTF8String("rb"));
+            FILE *RandomFile          = PlatformIO_File_Open(UTF8String("/dev/urandom"), UTF8String("rb"));
             size_t BytesRead          = fread(&RandomValue, NumBytes, 1, RandomFile);
-            FoundationIO_File_Close(RandomFile);
+            PlatformIO_File_Close(RandomFile);
 #endif
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Can't return more than 8 bytes"));
@@ -209,16 +209,16 @@ extern "C" {
     static void Entropy_Seed(Entropy *Random) {
         if (Random != NULL) {
             if (Random->EntropyPool != NULL) {
-#if   (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && ((FoundationIOTargetOS & FoundationIOLinuxOS) != FoundationIOLinuxOS))
+#if   (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_LinuxOS) != PlatformIO_LinuxOS))
                 arc4random_buf(Random->EntropyPool, Random->EntropySize);
-#elif (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && ((FoundationIOTargetOS & FoundationIOLinuxOS) == FoundationIOLinuxOS))
-                FILE *RandomFile          = FoundationIO_File_Open(UTF8String("/dev/urandom"), UTF8String("rb"));
+#elif (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS))
+                FILE *RandomFile          = PlatformIO_File_Open(UTF8String("/dev/urandom"), UTF8String("rb"));
                 size_t BytesRead          = fread(Random->EntropyPool, Random->EntropySize, 1, RandomFile);
                 if (BytesRead != Random->EntropySize) {
                     Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Failed to read random data, Entropy is extremely insecure, aborting"));
                 }
-                FoundationIO_File_Close(RandomFile);
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+                PlatformIO_File_Close(RandomFile);
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
                 NTSTATUS Status           = BCryptGenRandom(NULL, Random->EntropyPool, Random->EntropySize, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
                 if (Status <= 0) {
                     Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Failed to read random data, Entropy is extremely insecure, aborting"));

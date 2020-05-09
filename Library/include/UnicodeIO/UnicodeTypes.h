@@ -13,44 +13,44 @@
 #ifndef FoundationIO_UnicodeIO_UnicodeTypes_H
 #define FoundationIO_UnicodeIO_UnicodeTypes_H
 
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
     
-#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
 #ifdef __has_include
 #if    __has_include(<uchar.h>)
 #include <uchar.h>
 #endif // <uchar.h> exists
 #endif // __has_include
-#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 #ifdef __has_include
 #if    __has_include(<cuchar>)
 #include <cuchar>
 #endif // <cuchar> exists
 #endif // __has_include exists
-#endif // FoundationIOLanguage
+#endif // PlatformIO_Language
     
-#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
 #ifndef __CHAR8_TYPE__
 #define __CHAR8_TYPE__
 typedef unsigned char char8_t;
 #endif // __CHAR8_TYPE__
-#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 #ifndef __cpp_char8_t
 #define __cpp_char8_t
 typedef unsigned char char8_t;
 #endif // __cpp_char8_t
-#endif // FoundationIOLanguage
+#endif // PlatformIO_Language
     
     
-#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
 #ifdef __CHAR16_TYPE__
 typedef __CHAR16_TYPE__ char16_t;
 #elif !defined(__CHAR16_TYPE__)
 #if    defined(uint_least16_t)
 typedef uint_least16_t char16_t;
-#elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 typedef _Char16_t char16_t;
 #elif !defined(uint_least16_t)
 #error "Get a modern compiler that supports uint_least16_t"
@@ -62,19 +62,19 @@ typedef __CHAR32_TYPE__ char32_t;
 #elif !defined(__CHAR32_TYPE__)
 #if    defined(uint_least32_t)
 typedef uint_least32_t  char32_t;
-#elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 typedef _Char32_t char32_t;
 #elif !defined(uint_least32_t)
 #error "Get a modern compiler that supports uint_least32_t"
 #endif // Defined? uint_least32_t
 #endif // Defined? __CHAR32_TYPE__
-#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 #ifndef __cpp_unicode_characters
 #define __cpp_unicode_characters
 typedef uint_least16_t char16_t;
 typedef uint_least32_t char32_t;
 #endif // __cpp_unicode_characters
-#endif // FoundationIOLanguage
+#endif // PlatformIO_Language
   
   
 #ifndef   FoundationIO_StringType8
@@ -106,51 +106,51 @@ typedef                   char32_t                  UTF32;
 #define                   FoundationIOUnicodePropertyConversion8  (1)
     
 #ifndef                   UTF8_MakeCharacterMutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF8_MakeCharacterMutable(String)  const_cast<UTF8>(String)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF8_MakeCharacterMutable(String) (String)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF8_MakeCharacterMutable(String) (String)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF8_MakeCharacterMutable */
     
 #ifndef                   UTF8_MakeStringMutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF8_MakeStringMutable(String)  const_cast<UTF8*>(String)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF8_MakeStringMutable(String)  (String)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF8_MakeStringMutable(String)  (String)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF8_MakeStringMutable */
     
 #ifndef                   UTF8_MakeCharacterImmutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF8_MakeCharacterImmutable(String)  const_cast<const UTF8>(String)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF8_MakeCharacterImmutable(String) (String)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF8_MakeCharacterImmutable(String) (const String)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF8_MakeCharacterImmutable */
     
 #ifndef                   UTF8_MakeStringImmutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF8_MakeStringImmutable(String)  const_cast<const UTF8*>(String)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF8_MakeStringImmutable(String) (String)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF8_MakeStringImmutable(String) (const String)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF8_MakeStringImmutable */
 #endif /* FoundationIOUnicodePropertyConversion8 */
     
@@ -159,51 +159,51 @@ typedef                   char32_t                  UTF32;
 #define                   FoundationIOUnicodePropertyConversion16 (2)
     
 #ifndef                   UTF16_MakeCharacterMutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF16_MakeCharacterMutable(String)  const_cast<UTF16>(String)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF16_MakeCharacterMutable(String) (String)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF16_MakeCharacterMutable(String) (String)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF16_MakeCharacterMutable */
     
 #ifndef                   UTF16_MakeStringMutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF16_MakeStringMutable(String)  const_cast<UTF16*>(String)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF16_MakeStringMutable(String) (String)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF16_MakeStringMutable(String) (String)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF16_MakeStringMutable */
     
 #ifndef                   UTF16_MakeCharacterImmutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF16_MakeCharacterImmutable(String)  const_cast<const UTF16>(String)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF16_MakeCharacterImmutable(String) (String)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF16_MakeCharacterImmutable(String) (const String)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF16_MakeCharacterImmutable */
     
 #ifndef                   UTF16_MakeStringImmutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF16_MakeStringImmutable(String)  const_cast<const UTF16*>(String)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF16_MakeStringImmutable(String) (String)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF16_MakeStringImmutable(String) (const String)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF16_MakeStringImmutable */
     
 #endif /* FoundationIOUnicodePropertyConversion16 */
@@ -213,181 +213,181 @@ typedef                   char32_t                  UTF32;
 #define                   FoundationIOUnicodePropertyConversion32 (4)
     
 #ifndef                   UTF32_MakeCharacterMutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF32_MakeCharacterMutable(String)  const_cast<UTF32>(String)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF32_MakeCharacterMutable(String) (String)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF32_MakeCharacterMutable(String) (String)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF32_MakeCharacterMutable */
     
 #ifndef                   UTF32_MakeStringMutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF32_MakeStringMutable(String)  const_cast<UTF32*>(String)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF32_MakeStringMutable(String) (String)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF32_MakeStringMutable(String) (String)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF32_MakeStringMutable */
     
 #ifndef                   UTF8_MakeStringSetMutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF8_MakeStringSetMutable(StringSet)  const_cast<UTF8**>(StringSet)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF8_MakeStringSetMutable(StringSet) (StringSet)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF8_MakeStringSetMutable(StringSet) (StringSet)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF8_MakeStringSetMutable */
     
 #ifndef                   UTF8_MakeStringSetImmutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF8_MakeStringSetImmutable(StringSet)  const_cast<const UTF8**>(StringSet)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF8_MakeStringSetImmutable(StringSet) (StringSet)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF16_MakeStringSetImmutable(StringSet) (const StringSet)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF8_MakeStringSetImmutable */
     
 #ifndef                   UTF16_MakeStringSetMutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF16_MakeStringSetMutable(StringSet)  const_cast<UTF16**>(StringSet)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF16_MakeStringSetMutable(StringSet) (StringSet)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF16_MakeStringSetMutable(StringSet) (StringSet)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF16_MakeStringSetMutable */
     
 #ifndef                   UTF16_MakeStringSetImmutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF16_MakeStringSetImmutable(StringSet)  const_cast<const UTF16**>(StringSet)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF16_MakeStringSetImmutable(StringSet) (StringSet)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF16_MakeStringSetImmutable(StringSet) (const StringSet)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF16_MakeStringSetImmutable */
     
 #ifndef                   UTF32_MakeStringSetMutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF32_MakeStringSetMutable(StringSet)  const_cast<UTF32**>(StringSet)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF32_MakeStringSetMutable(StringSet) (StringSet)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF32_MakeStringSetMutable(StringSet) (StringSet)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF32_MakeStringSetMutable */
     
 #ifndef                   UTF32_MakeStringSetImmutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF32_MakeStringSetImmutable(StringSet)  const_cast<const UTF32**>(StringSet)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF32_MakeStringSetImmutable(StringSet) (StringSet)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF32_MakeStringSetImmutable(StringSet) (const StringSet)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF32_MakeStringSetImmutable */
     
     
 #ifndef                   UTF32_MakeCharacterImmutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF32_MakeCharacterImmutable(String) const_cast<const UTF32>(String)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF32_MakeCharacterImmutable(String) (String)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF32_MakeCharacterImmutable(String) (const String)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF32_MakeCharacterImmutable */
     
 #ifndef                   UTF32_MakeStringImmutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF32_MakeStringImmutable(String) const_cast<const UTF32*>(String)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF32_MakeStringImmutable(String) (String)
 #endif /* CXX11 */
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF32_MakeStringImmutable(String) (const String)
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* UTF32_MakeStringImmutable */
     
 #endif /* FoundationIOUnicodePropertyConversion32 */
     
 #ifndef                   FoundationIO_Unicodize8
 #define                   FoundationIO_Unicodize8               (1)
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX20)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX20)
 #define                   UTF8String(Literal)                   reinterpret_cast<UTF8*>(const_cast<UTF8*>(u8##Literal))
 #define                   UTF8Character(Literal)                reinterpret_cast<UTF8>(u8##Literal)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX20)
-#define                   UTF8String(Literal)                   reinterpret_cast<FoundationIO_Immutable(UTF8 *)>(u8##Literal)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX20)
+#define                   UTF8String(Literal)                   reinterpret_cast<PlatformIO_Immutable(UTF8 *)>(u8##Literal)
 #define                   UTF8Character(Literal)                reinterpret_cast<UTF8>(u8##Literal)
 #endif
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF8String(Literal)                   (UTF8*) u8##Literal
 #define                   UTF8Character(Literal)                (UTF8) u8##Literal
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* FoundationIO_Unicodize8 */
     
 #ifndef                   FoundationIO_Unicodize16
 #define                   FoundationIO_Unicodize16              (2)
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF16String(Literal)                  reinterpret_cast<UTF16*>(const_cast<UTF16*>(u##Literal))
 #define                   UTF16Character(Literal)               reinterpret_cast<UTF16>(u##Literal)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF16String(Literal)                  reinterpret_cast<UTF16*>(const_cast<UTF16*>(u##Literal))
 #define                   UTF16Character(Literal)               reinterpret_cast<UTF16>(u##Literal)
 #endif
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF16String(Literal)                  u##Literal
 #define                   UTF16Character(Literal)               u##Literal
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* FoundationIO_Unicodize16 */
     
 #ifndef                   FoundationIO_Unicodize32
 #define                   FoundationIO_Unicodize32              (4)
-#if   (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#if   (FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
 #define                   UTF32String(Literal)                  reinterpret_cast<UTF32*>(const_cast<UTF32*>(U##Literal))
 #define                   UTF32Character(Literal)               reinterpret_cast<UTF32>(U##Literal)
-#elif (FoundationIOStandardVersionCXX < FoundationIOStandardVersionCXX11)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
 #define                   UTF32String(Literal)                  reinterpret_cast<UTF32*>(const_cast<UTF32*>(U##Literal))
 #define                   UTF32Character(Literal)               reinterpret_cast<UTF32>(U##Literal)
 #endif
-#elif (FoundationIOLanguage == FoundationIOLanguageIsC)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF32String(Literal)                  U##Literal
 #define                   UTF32Character(Literal)               U##Literal
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
 #endif /* FoundationIO_Unicodize32 */
     
 #ifndef                   FoundationIOFunctionName
 #define                   FoundationIOFunctionName              (const UTF8*) __func__
 #endif /* FoundationIOFunctionName */
     
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif
 

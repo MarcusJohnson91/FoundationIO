@@ -32,7 +32,7 @@ extern "C" {
                  BaseType_Pointer               = 32,
                  BaseType_Remove                = 64,
     } FormatIO_BaseTypes;
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX && FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
         constexpr inline FormatIO_BaseTypes operator|(FormatIO_BaseTypes A, FormatIO_BaseTypes B) {
             uint8_t A1 = static_cast<uint8_t>(A);
@@ -58,7 +58,7 @@ extern "C" {
             return static_cast<FormatIO_BaseTypes>(A1 &= B1);
         }
     }
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
     
     /*!
      @enum       FormatIO_ModifierTypes
@@ -84,7 +84,7 @@ extern "C" {
                  ModifierType_Unsigned              = 65536,
                  ModifierType_N                     = 131072,
     } FormatIO_ModifierTypes;
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX && FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
         constexpr inline FormatIO_ModifierTypes operator|(FormatIO_ModifierTypes A, FormatIO_ModifierTypes B) {
             uint32_t A1 = static_cast<uint32_t>(A);
@@ -110,7 +110,7 @@ extern "C" {
             return static_cast<FormatIO_ModifierTypes>(A1 &= B1);
         }
     }
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
     
     /*!
      @enum       FormatIO_ModifierLengths
@@ -125,7 +125,7 @@ extern "C" {
                  ModifierLength_PointerDiff             = 32,
                  ModifierLength_IntMax                  = 64,
     } FormatIO_ModifierLengths;
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX && FoundationIOStandardVersionCXX >= FoundationIOStandardVersionCXX11)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
         constexpr inline FormatIO_ModifierLengths operator|(FormatIO_ModifierLengths A, FormatIO_ModifierLengths B) {
             uint8_t A1 = static_cast<uint8_t>(A);
@@ -151,7 +151,7 @@ extern "C" {
             return static_cast<FormatIO_ModifierLengths>(A1 &= B1);
         }
     }
-#endif /* FoundationIOLanguage */
+#endif /* PlatformIO_Language */
     
     /*!
      @enum       FormatIO_Flags
@@ -209,7 +209,7 @@ extern "C" {
     /*!
      @remark                                                     MUST be called after Format_Specifiers_RetrieveArguments
      */
-    uint64_t              UTF32_GetFormattedStringSize(FoundationIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers);
+    uint64_t              UTF32_GetFormattedStringSize(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers);
     
     /*!
      @abstract                                                  "Parses the format specifiers".
@@ -217,7 +217,7 @@ extern "C" {
      @param               Specifiers                            "The Format Specifiers".
      @param               StringType                            "The original encoding of the Format string".
      */
-    void                  UTF32_ParseFormatSpecifiers(FoundationIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, FoundationIO_StringTypes StringType);
+    void                  UTF32_ParseFormatSpecifiers(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, FoundationIO_StringTypes StringType);
     
     /*!
      @abstract                                                  "Formats a UTF-32 encoded string".
@@ -225,7 +225,7 @@ extern "C" {
      @param               Format                                "The string to substitute the specifiers with".
      @return                                                    "Returns the formatted string".
      */
-    UTF32                *FormatString_UTF32(FoundationIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, uint64_t FormattedStringSize);
+    UTF32                *FormatString_UTF32(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, uint64_t FormattedStringSize);
     
     /*!
      @abstract                                                  "Gets the Variadic Arguments from a Va_list, and adds them to FormatSpecifiers".
@@ -245,54 +245,54 @@ extern "C" {
      @param               Format                                "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                                                    "Returns the formatted string encoded using the UTF-8 format".
      */
-#if   (FoundationIOCompiler == FoundationIOCompilerIsClang)
-    UTF8                 *UTF8_Format(FoundationIO_Immutable(UTF8 *) Format, ...) __attribute__((__format__(__printf__, 1, 2)));
-#elif (FoundationIOCompiler == FoundationIOCompilerIsGCC)
-    UTF8                 *UTF8_Format(FoundationIO_Immutable(UTF8 *) Format, ...);
-#elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
+    UTF8                 *UTF8_Format(PlatformIO_Immutable(UTF8 *) Format, ...) __attribute__((__format__(__printf__, 1, 2)));
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+    UTF8                 *UTF8_Format(PlatformIO_Immutable(UTF8 *) Format, ...);
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 #include <sal.h>
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    UTF8                 *UTF8_Format(__format_string FoundationIO_Immutable(UTF8 *) Format, ...);
+    UTF8                 *UTF8_Format(__format_string PlatformIO_Immutable(UTF8 *) Format, ...);
 #elif (_MSC_VER >= 1500)
-    UTF8                 *UTF8_Format(_Printf_format_string_ FoundationIO_Immutable(UTF8 *) Format, ...);
+    UTF8                 *UTF8_Format(_Printf_format_string_ PlatformIO_Immutable(UTF8 *) Format, ...);
 #endif /* MSVC Version */
-#endif /* FoundationIOCompiler */
+#endif /* PlatformIO_Compiler */
     
     /*!
      @abstract                                                  "Formats a string according to the Format string".
      @param               Format                                "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                                                    "Returns the formatted string encoded using the UTF-8 format".
      */
-#if   (FoundationIOCompiler == FoundationIOCompilerIsClang)
-    UTF16                *UTF16_Format(FoundationIO_Immutable(UTF16 *) Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
-#elif (FoundationIOCompiler == FoundationIOCompilerIsGCC)
-    UTF16                *UTF16_Format(FoundationIO_Immutable(UTF16 *) Format, ...);
-#elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
+    UTF16                *UTF16_Format(PlatformIO_Immutable(UTF16 *) Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+    UTF16                *UTF16_Format(PlatformIO_Immutable(UTF16 *) Format, ...);
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 #include <sal.h>
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    UTF16                *UTF16_Format(__format_string FoundationIO_Immutable(UTF16 *) Format, ...);
+    UTF16                *UTF16_Format(__format_string PlatformIO_Immutable(UTF16 *) Format, ...);
 #elif (_MSC_VER >= 1500)
-    UTF16                *UTF16_Format(_Printf_format_string_ FoundationIO_Immutable(UTF16 *) Format, ...);
+    UTF16                *UTF16_Format(_Printf_format_string_ PlatformIO_Immutable(UTF16 *) Format, ...);
 #endif /* MSVC Version */
-#endif /* FoundationIOCompiler */
+#endif /* PlatformIO_Compiler */
     
     /*!
      @abstract                                                  "Formats a string according to the Format string".
      @param               Format                                "A string with optional format specifiers, all variadic strings need to match Format's type".
      @return                                                    "Returns the formatted string encoded using the UTF-8 format".
      */
-#if   (FoundationIOCompiler == FoundationIOCompilerIsClang)
-    UTF32                *UTF32_Format(FoundationIO_Immutable(UTF32 *) Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
-#elif (FoundationIOCompiler == FoundationIOCompilerIsGCC)
-    UTF32                *UTF32_Format(FoundationIO_Immutable(UTF32 *) Format, ...);
-#elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
+    UTF32                *UTF32_Format(PlatformIO_Immutable(UTF32 *) Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+    UTF32                *UTF32_Format(PlatformIO_Immutable(UTF32 *) Format, ...);
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 #include <sal.h>
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    UTF32                *UTF32_Format(__format_string FoundationIO_Immutable(UTF32 *) Format, ...);
+    UTF32                *UTF32_Format(__format_string PlatformIO_Immutable(UTF32 *) Format, ...);
 #elif (_MSC_VER >= 1500)
-    UTF32                *UTF32_Format(_Printf_format_string_ FoundationIO_Immutable(UTF32 *) Format, ...);
+    UTF32                *UTF32_Format(_Printf_format_string_ PlatformIO_Immutable(UTF32 *) Format, ...);
 #endif /* MSVC Version */
-#endif /* FoundationIOCompiler */
+#endif /* PlatformIO_Compiler */
     
     /*!
      @abstract                                                  "Splits a string based on the specifiers in Format".
@@ -316,7 +316,7 @@ extern "C" {
      @param               Source                                "The string to extract the information from".
      @return                                                    "Returns a StringSet containing NumFormatSpecifiers strings, one string for each specifier".
      */
-    UTF32               **UTF32_Deformat(FoundationIO_Immutable(UTF32 *) Format, FoundationIO_Immutable(UTF32 *) Source);
+    UTF32               **UTF32_Deformat(PlatformIO_Immutable(UTF32 *) Format, PlatformIO_Immutable(UTF32 *) Source);
     
     /*!
      @abstract                                                 "Deformats a UTF-32 encoded string, essentially scanf replacement".
@@ -325,7 +325,7 @@ extern "C" {
      @param               Result                               "The formatted string to extract the data for the StringSet into".
      @return                                                   "Returns a StringSet for each specifier".
      */
-    UTF32               **DeformatString_UTF32(FoundationIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, FoundationIO_Immutable(UTF32 *) Result);
+    UTF32               **DeformatString_UTF32(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, PlatformIO_Immutable(UTF32 *) Result);
     
 #ifdef __cplusplus
 }

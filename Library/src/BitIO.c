@@ -6,7 +6,7 @@
 #include "../include/UnicodeIO/LogIO.h"      /* Included for Logging */
 #include "../include/UnicodeIO/StringIO.h"   /* Included for StringIO's declarations */
 
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
     
@@ -69,9 +69,9 @@ extern "C" {
             }
             uint64_t BytesRead     = 0ULL;
             if (BitI->FileType == FileType_File) {
-                BytesRead          = FoundationIO_File_Read(BitB->Buffer, 1, Bytes2Read, BitI->File);
+                BytesRead          = PlatformIO_File_Read(BitB->Buffer, 1, Bytes2Read, BitI->File);
             } else if (BitI->FileType == FileType_Socket) {
-                BytesRead          = FoundationIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
+                BytesRead          = PlatformIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
             }
             if (BytesRead == Bytes2Read) {
                 BitB->NumBits      = (BytesRead * 8) + BitB->BitOffset;
@@ -212,9 +212,9 @@ extern "C" {
             uint64_t Bytes2Read      = BitB->NumBits / 8;
             uint64_t BytesRead       = 0ULL;
             if (BitI->FileType == FileType_File) {
-                BytesRead            = FoundationIO_File_Read(BitB->Buffer, 1, Bytes2Read, BitI->File);
+                BytesRead            = PlatformIO_File_Read(BitB->Buffer, 1, Bytes2Read, BitI->File);
             } else if (BitI->FileType == FileType_Socket) {
-                BytesRead            = FoundationIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
+                BytesRead            = PlatformIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
             }
             if (BytesRead != Bytes2Read) {
                 uint8_t *Buffer_Old  = BitB->Buffer;
@@ -648,7 +648,7 @@ extern "C" {
         if (BitB != NULL) {
             int64_t  OriginalOffset   = BitBuffer_GetPosition(BitB);
             UTF8     CodeUnit8        = 1;
-            while (CodeUnit8 != FoundationIONULLTerminator) {
+            while (CodeUnit8 != PlatformIO_NULLTerminator) {
                 CodeUnit8             = (UTF8) BitBuffer_Extract_LSByteLSBit(BitB, 8);
                 uint8_t  CodeUnitSize = UTF8_GetCodePointSizeInCodeUnits(CodeUnit8);
                 StringSize           += CodeUnitSize;
@@ -675,7 +675,7 @@ extern "C" {
         if (BitB != NULL) {
             int64_t  OriginalOffset   = BitBuffer_GetPosition(BitB);
             UTF16    CodeUnit16       = 1;
-            while (CodeUnit16 != FoundationIONULLTerminator) {
+            while (CodeUnit16 != PlatformIO_NULLTerminator) {
                 CodeUnit16            = (UTF16) BitBuffer_Extract_LSByteLSBit(BitB, 16);
                 uint8_t  CodeUnitSize = UTF16_GetCodePointSizeInCodeUnits(CodeUnit16);
                 StringSize           += CodeUnitSize;
@@ -807,7 +807,7 @@ extern "C" {
             int64_t  BitsAvailable = BitBuffer_GetBitsFree(BitB);
             uint64_t CodeUnit      = 0ULL;
             if (BitsAvailable >= Bytes2Bits(StringSize)) {
-                while (String2Write[CodeUnit] != FoundationIONULLTerminator) {
+                while (String2Write[CodeUnit] != PlatformIO_NULLTerminator) {
                     BitBuffer_Append_MSByteLSBit(BitB, UTF8CodeUnitSizeInBits, String2Write[CodeUnit]);
                     CodeUnit         += 1;
                 }
@@ -834,7 +834,7 @@ extern "C" {
             int64_t  BitsAvailable = BitBuffer_GetBitsFree(BitB);
             uint64_t CodeUnit = 0ULL;
             if (BitsAvailable >= Bytes2Bits(StringSize)) {
-                while (String2Write[CodeUnit] != FoundationIONULLTerminator) {
+                while (String2Write[CodeUnit] != PlatformIO_NULLTerminator) {
                     BitBuffer_Append_LSByteLSBit(BitB, UTF16CodeUnitSizeInBits, String2Write[CodeUnit]);
                     CodeUnit += 1;
                 }
@@ -873,9 +873,9 @@ extern "C" {
             uint64_t Bits2Keep    = BitB->BitOffset % 8;
             uint64_t BytesWritten = 0ULL;
             if (BitO->FileType == FileType_File) {
-                BytesWritten = FoundationIO_File_Write(BitB->Buffer, 1, Bytes2Write, BitO->File);
+                BytesWritten = PlatformIO_File_Write(BitB->Buffer, 1, Bytes2Write, BitO->File);
             } else if (BitO->FileType == FileType_Socket) {
-                BytesWritten = FoundationIO_Socket_Write(BitO->Socket, BitB->Buffer, Bytes2Write);
+                BytesWritten = PlatformIO_Socket_Write(BitO->Socket, BitB->Buffer, Bytes2Write);
             }
             if (BytesWritten == Bytes2Write) {
                 BitB->Buffer[0] = 0;
@@ -918,29 +918,29 @@ extern "C" {
     void BitInput_UTF8_OpenFile(BitInput *BitI, UTF8 *Path2Open) {
         if (BitI != NULL && Path2Open != NULL) {
             BitI->FileType                   = FileType_File;
-#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
             bool PathHasBOM                  = UTF8_HasBOM(Path2Open);
             if (PathHasBOM == No) {
-                BitI->File                   = FoundationIO_File_Open(Path2Open, UTF8String("rb"));
+                BitI->File                   = PlatformIO_File_Open(Path2Open, UTF8String("rb"));
             } else {
                 const UTF8 *const UTF8BOMString = UTF8String("\xEF\xBB\xBF");
                 int64_t GoodCodeUnit         = UTF8_FindSubString(Path2Open, UTF8BOMString, 0, 3) + 3;
                 if (GoodCodeUnit >= 0) {
-                    BitI->File               = FoundationIO_File_Open(&Path2Open[GoodCodeUnit], UTF8String("rb"));
+                    BitI->File               = PlatformIO_File_Open(&Path2Open[GoodCodeUnit], UTF8String("rb"));
                 } else {
                     UTF8 *BOMLess            = UTF8_RemoveBOM(Path2Open);
-                    BitI->File               = FoundationIO_File_Open(BOMLess, UTF8String("rb"));
+                    BitI->File               = PlatformIO_File_Open(BOMLess, UTF8String("rb"));
                     free(BOMLess);
                 }
             }
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
             bool  StringHasBOM               = UTF8_HasBOM(Path2Open);
             UTF32 *WinPath32                 = UTF8_Decode(Path2Open);
-            UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, UNCPathPrefix32, StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
+            UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, PlatformIO_UNCPathPrefix32, StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
             free(WinPath32);
             UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32);
             free(WinPathLong32);
-            BitI->File                       = FoundationIO_File_Open(WinPath16, UTF16String("rb"));
+            BitI->File                       = PlatformIO_File_Open(WinPath16, UTF16String("rb"));
             free(WinPath16);
 #endif
             if (BitI->File != NULL) {
@@ -960,7 +960,7 @@ extern "C" {
             BitI->FileType                   = FileType_File;
             UTF32 *Path32                    = NULL;
             UTF8  *Path8                     = NULL;
-#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
             Path32                           = UTF16_Decode(Path2Open);
             bool   PathHasBOM                = UTF16_HasBOM(Path2Open);
             bool   PathHasWinPrefix          = UTF16_IsUNCPath(Path2Open);
@@ -971,24 +971,24 @@ extern "C" {
                 Path32                       = BOMLess;
             } else if (PathHasBOM == Yes && PathHasWinPrefix == No) {
                 UTF32 *BOMLess               = UTF32_RemoveBOM(Path32);
-                UTF32 *Prefix                = UTF32_Insert(BOMLess, UNCPathPrefix32, 0);
+                UTF32 *Prefix                = UTF32_Insert(BOMLess, PlatformIO_UNCPathPrefix32, 0);
                 free(Path32);
                 Path32                       = Prefix;
             } else if (PathHasBOM == No && PathHasWinPrefix == No) {
-                UTF32 *Prefix                = UTF32_Insert(Path32, UNCPathPrefix32, 0);
+                UTF32 *Prefix                = UTF32_Insert(Path32, PlatformIO_UNCPathPrefix32, 0);
                 free(Path32);
                 Path32                       = Prefix;
             }
             Path8                            = UTF8_Encode(Path32);
-            BitI->File                       = FoundationIO_File_Open(Path8, UTF8String("rb"));
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+            BitI->File                       = PlatformIO_File_Open(Path8, UTF8String("rb"));
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
             bool  StringHasBOM               = UTF16_HasBOM(Path2Open);
             UTF32 *WinPath32                 = UTF16_Decode(Path2Open);
-            UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, UNCPathPrefix32, StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
+            UTF32 *WinPathLong32             = UTF32_Insert(WinPath32, PlatformIO_UNCPathPrefix32, StringHasBOM == Yes ? UTF8BOMSizeInCodeUnits : 0);
             free(WinPath32);
             UTF16 *WinPath16                 = UTF16_Encode(WinPathLong32);
             free(WinPathLong32);
-            BitI->File                       = FoundationIO_File_Open(WinPath16, UTF16String("rb"));
+            BitI->File                       = PlatformIO_File_Open(WinPath16, UTF16String("rb"));
             free(WinPath16);
 #endif
             if (BitI->File != NULL) {
@@ -1010,7 +1010,7 @@ extern "C" {
     void BitInput_OpenSocket(BitInput *BitI, int Domain, int Type, int Protocol) {
         if (BitI != NULL) {
             BitI->FileType = FileType_Socket;
-            BitI->Socket   = FoundationIO_Socket_Create(Domain, Type, Protocol);
+            BitI->Socket   = PlatformIO_Socket_Create(Domain, Type, Protocol);
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
@@ -1019,7 +1019,7 @@ extern "C" {
     void BitInput_ConnectSocket(BitInput *BitI, struct sockaddr *SocketAddress, uint32_t SocketSize) {
         if (BitI != NULL && SocketAddress != NULL) {
             BitI->FileType = FileType_Socket;
-            FoundationIO_Socket_Connect(BitI->Socket, SocketAddress, SocketSize);
+            PlatformIO_Socket_Connect(BitI->Socket, SocketAddress, SocketSize);
         } else if (BitI == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         } else if (SocketAddress == NULL) {
@@ -1029,10 +1029,10 @@ extern "C" {
     
     static void BitInput_FindFileSize(BitInput *BitI) {
         if (BitI != NULL) {
-            FoundationIO_File_Seek(BitI->File, 0, SEEK_END);
-            BitI->FileSize     = (uint64_t) FoundationIO_File_GetSize(BitI->File);
-            FoundationIO_File_Seek(BitI->File, 0, SEEK_SET);
-            BitI->FilePosition = (uint64_t) FoundationIO_File_GetSize(BitI->File);
+            PlatformIO_File_Seek(BitI->File, 0, SEEK_END);
+            BitI->FileSize     = (uint64_t) PlatformIO_File_GetSize(BitI->File);
+            PlatformIO_File_Seek(BitI->File, 0, SEEK_SET);
+            BitI->FilePosition = (uint64_t) PlatformIO_File_GetSize(BitI->File);
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
@@ -1080,9 +1080,9 @@ extern "C" {
     void BitInput_Deinit(BitInput *BitI) {
         if (BitI != NULL) {
             if (BitI->FileType == FileType_File) {
-                FoundationIO_File_Close(BitI->File);
+                PlatformIO_File_Close(BitI->File);
             } else if (BitI->FileType == FileType_Socket) {
-                FoundationIO_Socket_Close(BitI->Socket);
+                PlatformIO_Socket_Close(BitI->Socket);
             }
             free(BitI);
         } else {
@@ -1105,33 +1105,33 @@ extern "C" {
     void BitOutput_UTF8_OpenFile(BitOutput *BitO, UTF8 *Path2Open) {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType                   = FileType_File;
-#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
             bool PathHasBOM                  = UTF8_HasBOM(Path2Open);
             if (PathHasBOM == No) {
-                BitO->File                   = FoundationIO_File_Open(Path2Open, UTF8String("rb"));
+                BitO->File                   = PlatformIO_File_Open(Path2Open, UTF8String("rb"));
             } else {
                 UTF8 *BOMLess                = UTF8_RemoveBOM(Path2Open);
-                BitO->File                   = FoundationIO_File_Open(BOMLess, UTF8String("rb"));
+                BitO->File                   = PlatformIO_File_Open(BOMLess, UTF8String("rb"));
                 free(BOMLess);
             }
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
             bool   PathIsAbsolute       = UTF8_IsAbsolutePath(Path2Open);
             bool   PathHasUNCPrefix     = UTF8_IsUNCPath(Path2Open);
             UTF32 *Path32               = UTF8_Decode(Path2Open);
             UTF16 *Path16               = NULL;
             if (PathIsAbsolute == Yes && PathHasUNCPrefix == No) {
-                UTF32 *UNCPrefixed      = UTF32_Insert(Path32, UNCPathPrefix32, 0);
+                UTF32 *UNCPrefixed      = UTF32_Insert(Path32, PlatformIO_UNCPathPrefix32, 0);
                 Path16                  = UTF16_Encode(UNCPrefixed);
                 free(UNCPrefixed);
-                FoundationIO_File_Open(Path16, UTF16String("rb"));
+                PlatformIO_File_Open(Path16, UTF16String("rb"));
             } else if (PathIsAbsolute == No && PathHasUNCPrefix == Yes) {
-                UTF32 *Removed          = UTF32_RemoveSubString(Path32, UNCPathPrefix32, 1);
+                UTF32 *Removed          = UTF32_RemoveSubString(Path32, PlatformIO_UNCPathPrefix32, 1);
                 Path16                  = UTF16_Encode(Removed);
                 free(Removed);
-                FoundationIO_File_Open(Path16, UTF16String("rb"));
+                PlatformIO_File_Open(Path16, UTF16String("rb"));
             } else {
                 Path16                  = UTF16_Encode(Path32);
-                FoundationIO_File_Open(Path16, UTF16String("rb"));
+                PlatformIO_File_Open(Path16, UTF16String("rb"));
             }
 #endif
         } else if (BitO == NULL) {
@@ -1145,7 +1145,7 @@ extern "C" {
         if (BitO != NULL && Path2Open != NULL) {
             BitO->FileType              = FileType_File;
             bool  PathHasBOM            = No;
-#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
             UTF32 *Decoded              = UTF16_Decode(Path2Open);
             PathHasBOM                  = UTF32_HasBOM(Decoded);
             UTF8 *Fixed                 = NULL;
@@ -1153,15 +1153,15 @@ extern "C" {
                 UTF32 *Fixed32          = UTF32_RemoveBOM(Decoded);
                 Fixed                   = UTF8_Encode(Fixed32);
             }
-            FoundationIO_File_Open(Fixed, UTF8String("rb"));
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+            PlatformIO_File_Open(Fixed, UTF8String("rb"));
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
             bool   StringHasPathPrefix  = UTF16_IsUNCPath(Path2Open);
             
             UTF32 *Path32               = UTF16_Decode(Path2Open);
             UTF16 *Path16               = NULL;
             if (StringHasPathPrefix == No) {
                 bool   StringHasBOM     = UTF16_HasBOM(Path2Open);
-                UTF32 *PrefixPath       = UTF32_Insert(Path32, UNCPathPrefix32, StringHasBOM == Yes ? UTF16BOMSizeInCodeUnits : 0);
+                UTF32 *PrefixPath       = UTF32_Insert(Path32, PlatformIO_UNCPathPrefix32, StringHasBOM == Yes ? UTF16BOMSizeInCodeUnits : 0);
                 Path16                  = UTF16_Encode(PrefixPath);
             } else {
                 Path16                  = UTF16_Encode(Path32);
@@ -1177,7 +1177,7 @@ extern "C" {
     void BitOutput_OpenSocket(BitOutput *BitO, int Domain, int Type, int Protocol) {
         if (BitO != NULL) {
             BitO->FileType  = FileType_Socket;
-            BitO->Socket    = FoundationIO_Socket_Create(Domain, Type, Protocol);
+            BitO->Socket    = PlatformIO_Socket_Create(Domain, Type, Protocol);
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitInput Pointer is NULL"));
         }
@@ -1186,7 +1186,7 @@ extern "C" {
     void BitOutput_ConnectSocket(BitOutput *BitO, struct sockaddr *SocketAddress, uint64_t SocketSize) {
         if (BitO != NULL && SocketAddress != NULL) {
             BitO->FileType = FileType_Socket;
-            FoundationIO_Socket_Connect(BitO->Socket, SocketAddress, SocketSize);
+            PlatformIO_Socket_Connect(BitO->Socket, SocketAddress, SocketSize);
         } else if (BitO == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("BitOutput Pointer is NULL"));
         } else if (SocketAddress == NULL) {
@@ -1198,9 +1198,9 @@ extern "C" {
         if (BitO != NULL) {
             fflush(BitO->File);
             if (BitO->FileType == FileType_File) {
-                FoundationIO_File_Close(BitO->File);
+                PlatformIO_File_Close(BitO->File);
             } else if (BitO->FileType == FileType_Socket) {
-                FoundationIO_Socket_Close(BitO->Socket);
+                PlatformIO_Socket_Close(BitO->Socket);
             }
             free(BitO);
         } else {
@@ -1380,6 +1380,6 @@ extern "C" {
     }
     /* GUUID */
     
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif
