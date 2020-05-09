@@ -19,7 +19,10 @@ CreateHeaderFileTop() {
     {
         printf "#include \"../../PlatformIO.h\"\n"
         printf "#include \"../UnicodeTypes.h\"\n\n"
-        printf "#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)\n"
+        printf "#pragma once\n\n"
+        printf "#ifndef FoundationIO_UnicodeIO_UnicodeTables_H\n"
+        printf "#define FoundationIO_UnicodeIO_UnicodeTables_H\n\n"
+        printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
         printf "extern \"C\" {\n"
         printf "#endif\n\n"
         printf "#define ScriptHash %s\n\n" "$ScriptSHA"
@@ -221,10 +224,10 @@ CreateCaseFoldTables() { # Good
 }
 
 CreateHeaderFileBottom() {
-    printf "#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)\n"
+    printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
     printf "}\n"
     printf "#endif /* C */\n\n"
-    printf "#endif /* FoundationIO_UnicodeTables_H */\n"
+    printf "#endif /* FoundationIO_UnicodeIO_UnicodeTables_H */\n"
 } >> "$HeaderFile"
 
 DownloadUCD() {

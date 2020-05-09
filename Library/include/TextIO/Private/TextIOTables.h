@@ -6,7 +6,7 @@
 #ifndef FoundationIO_UnicodeTables_H
 #define FoundationIO_UnicodeTables_H
 
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
 
@@ -49774,7 +49774,7 @@ extern "C" {
         U"\U0002A600",
     };
 
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif
 

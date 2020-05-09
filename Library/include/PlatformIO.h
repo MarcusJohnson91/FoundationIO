@@ -1,80 +1,80 @@
 /*!
- @header              Macros.h
+ @header              PlatformIO.h
  @author              Marcus Johnson
  @copyright           2017+
- @version             1.0.0
+ @version             2.0.0
  @brief               This header contains preprocessor macros for generic functions in FoundationIO, and cross-platform compatibility.
  */
 
 #pragma once
 
-#ifndef FoundationIO_Macros_H
-#define FoundationIO_Macros_H
+#ifndef FoundationIO_PlatformIO_H
+#define FoundationIO_PlatformIO_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef             FoundationIOOSUnknown
-#define             FoundationIOOSUnknown                                                     (0)
+#ifndef             PlatformIO_UnknownOS
+#define             PlatformIO_UnknownOS                                                     (0)
 #endif              /* UnknownOS */
 
-#ifndef             FoundationIOMacClassicOS
-#define             FoundationIOMacClassicOS                                                  (1)
+#ifndef             PlatformIO_ClassicMacOS
+#define             PlatformIO_ClassicMacOS                                                  (1)
 #endif              /* MacClassicOS */
 
-#ifndef             FoundationIOWindowsOS
-#define             FoundationIOWindowsOS                                                     (2)
+#ifndef             PlatformIO_WindowsOS
+#define             PlatformIO_WindowsOS                                                     (2)
 #endif              /* Windows */
 
-#ifndef             FoundationIOPOSIXOS
-#define             FoundationIOPOSIXOS                                                       (4)
+#ifndef             PlatformIO_POSIXOS
+#define             PlatformIO_POSIXOS                                                       (4)
 #endif              /* POSIX */
 
-#ifndef             FoundationIOAppleOS
-#define             FoundationIOAppleOS                                                       (8)
-#endif              /* AppleOS (MacOS, iOS, TVOS, etc) */
+#ifndef             PlatformIO_AppleOS
+#define             PlatformIO_AppleOS                                                       (8)
+#endif              /* AppleOS (MacOS, iOS, iPadOS, TVOS, WatchOS, etc) */
 
-#ifndef             FoundationIOBSDOS
-#define             FoundationIOBSDOS                                                         (16)
+#ifndef             PlatformIO_BSDOS
+#define             PlatformIO_BSDOS                                                         (16)
 #endif              /* BSD (FreeBSD, OpenBSD, NetBSD, DragonFlyBSD, etc) */
 
-#ifndef             FoundationIOLinuxOS
-#define             FoundationIOLinuxOS                                                       (32)
+#ifndef             PlatformIO_LinuxOS
+#define             PlatformIO_LinuxOS                                                       (32)
 #endif              /* BSD (Linux, Ubuntu, Android, etc) */
 
 #if ((defined Macintosh) || (defined macintosh))
-#define             FoundationIOTargetOS                                                      (FoundationIOMacClassicOS)
+#define             PlatformIO_TargetOS                                                      (PlatformIO_ClassicMacOS)
 #endif
 
 #if ((defined _WIN16) || (defined _WIN32) || (defined _WIN64))
-#define             FoundationIOTargetOS                                                      (FoundationIOWindowsOS)
+#define             PlatformIO_TargetOS                                                      (PlatformIO_WindowsOS)
 #endif
 
 #if (defined(__APPLE__) && defined(__MACH__))
-#define             FoundationIOTargetOS                                                      (FoundationIOPOSIXOS + FoundationIOAppleOS)
+#define             PlatformIO_TargetOS                                                      (PlatformIO_POSIXOS + PlatformIO_AppleOS)
 #endif
 
 #if (defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__))
-#define             FoundationIOTargetOS                                                      (FoundationIOPOSIXOS + FoundationIOBSDOS)
+#define             PlatformIO_TargetOS                                                      (PlatformIO_POSIXOS + PlatformIO_BSDOS)
 #endif
 
 #if (defined(__linux__) || defined(__ANDROID__) || defined(__gnu_linux__))
-#define             FoundationIOTargetOS                                                      (FoundationIOPOSIXOS + FoundationIOLinuxOS)
+#define             PlatformIO_TargetOS                                                      (PlatformIO_POSIXOS + PlatformIO_LinuxOS)
 #endif
 
 #if (defined(__unix__) || defined(unix))
-#define             FoundationIOTargetOS                                                      (FoundationIOPOSIXOS)
+#define             PlatformIO_TargetOS                                                      (PlatformIO_POSIXOS)
 #endif
 
-#if ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+#if ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
 #ifdef              _FILE_OFFSET_BITS
 #undef              _FILE_OFFSET_BITS
 #define             _FILE_OFFSET_BITS                                                         (64)
 #else
 #define             _FILE_OFFSET_BITS                                                         (64)
 #endif /* _FILE_OFFSET_BITS */
-#endif /* FoundationIOTargetOS */
+#endif /* PlatformIO_TargetOS */
 
 #include <stdarg.h>                   /* Included for va_list, va_copy */
 #include <stdbool.h>                  /* Included for bool */
@@ -111,162 +111,162 @@ extern "C" {
 #define             False                                                                     (0)
 #endif           /* False */
     
-#ifndef             FoundationIOStandardVersionC99
-#define             FoundationIOStandardVersionC99                                            (199901L)
+#ifndef             PlatformIO_LanguageVersionC99
+#define             PlatformIO_LanguageVersionC99                                            (199901L)
 #endif
     
-#ifndef             FoundationIOStandardVersionC11
-#define             FoundationIOStandardVersionC11                                            (201112L)
+#ifndef             PlatformIO_LanguageVersionC11
+#define             PlatformIO_LanguageVersionC11                                            (201112L)
 #endif
     
-#ifndef             FoundationIOStandardVersionC18
-#define             FoundationIOStandardVersionC18                                            (201710L)
+#ifndef             PlatformIO_LanguageVersionC18
+#define             PlatformIO_LanguageVersionC18                                            (201710L)
 #endif
     
-#ifndef             FoundationIOStandardVersionC2X
-#define             FoundationIOStandardVersionC2X                                            (202102L)
+#ifndef             PlatformIO_LanguageVersionC2X
+#define             PlatformIO_LanguageVersionC2X                                            (202102L)
 #endif
     
-#ifndef             FoundationIOStandardVersionC
-#define             FoundationIOStandardVersionC                                              (__STDC_VERSION__)
+#ifndef             PlatformIO_LanguageVersionC
+#define             PlatformIO_LanguageVersionC                                              (__STDC_VERSION__)
 #endif
     
-#ifndef             FoundationIOStandardVersionCXX98
-#define             FoundationIOStandardVersionCXX98                                          (199711L)
+#ifndef             PlatformIO_LanguageVersionCXX98
+#define             PlatformIO_LanguageVersionCXX98                                          (199711L)
 #endif
     
-#ifndef             FoundationIOStandardVersionCXX11
-#define             FoundationIOStandardVersionCXX11                                          (201103L)
+#ifndef             PlatformIO_LanguageVersionCXX11
+#define             PlatformIO_LanguageVersionCXX11                                          (201103L)
 #endif
     
-#ifndef             FoundationIOStandardVersionCXX14
-#define             FoundationIOStandardVersionCXX14                                          (201402L)
+#ifndef             PlatformIO_LanguageVersionCXX14
+#define             PlatformIO_LanguageVersionCXX14                                          (201402L)
 #endif
     
-#ifndef             FoundationIOStandardVersionCXX17
-#define             FoundationIOStandardVersionCXX17                                          (201703L)
+#ifndef             PlatformIO_LanguageVersionCXX17
+#define             PlatformIO_LanguageVersionCXX17                                          (201703L)
 #endif
     
-#ifndef             FoundationIOStandardVersionCXX20
-#define             FoundationIOStandardVersionCXX20                                          (202002L)
+#ifndef             PlatformIO_LanguageVersionCXX20
+#define             PlatformIO_LanguageVersionCXX20                                          (202002L)
 #endif
     
-#ifndef             FoundationIOStandardVersionCXX
-#define             FoundationIOStandardVersionCXX                                            (__cplusplus)
+#ifndef             PlatformIO_LanguageVersionCXX
+#define             PlatformIO_LanguageVersionCXX                                            (__cplusplus)
 #endif
     
-#ifndef             FoundationIOLanguageIsC
-#define             FoundationIOLanguageIsC                                                   (1)
+#ifndef             PlatformIO_LanguageIsC
+#define             PlatformIO_LanguageIsC                                                   (1)
 #endif
     
-#ifndef             FoundationIOLanguageIsCXX
-#define             FoundationIOLanguageIsCXX                                                 (2)
+#ifndef             PlatformIO_LanguageIsCXX
+#define             PlatformIO_LanguageIsCXX                                                 (2)
 #endif
     
-#ifndef             FoundationIOLanguage
+#ifndef             PlatformIO_Language
 #if (defined __cplusplus)
-#define             FoundationIOLanguage                                                      FoundationIOLanguageIsCXX
+#define             PlatformIO_Language                                                      PlatformIO_LanguageIsCXX
 #else
-#define             FoundationIOLanguage                                                      FoundationIOLanguageIsC
+#define             PlatformIO_Language                                                      PlatformIO_LanguageIsC
 #endif
 #endif
     
-#ifndef             FoundationIOCompilerIsUnknown
-#define             FoundationIOCompilerIsUnknown                                             (0)
+#ifndef             PlatformIO_CompilerIsUnknown
+#define             PlatformIO_CompilerIsUnknown                                             (0)
 #endif
     
-#ifndef             FoundationIOCompilerIsClang
-#define             FoundationIOCompilerIsClang                                               (1)
+#ifndef             PlatformIO_CompilerIsClang
+#define             PlatformIO_CompilerIsClang                                               (1)
 #endif
     
-#ifndef             FoundationIOCompilerIsMSVC
-#define             FoundationIOCompilerIsMSVC                                                (2)
+#ifndef             PlatformIO_CompilerIsMSVC
+#define             PlatformIO_CompilerIsMSVC                                                (2)
 #endif
     
-#ifndef             FoundationIOCompilerIsGCC
-#define             FoundationIOCompilerIsGCC                                                 (3)
+#ifndef             PlatformIO_CompilerIsGCC
+#define             PlatformIO_CompilerIsGCC                                                 (3)
 #endif
     
-#ifndef             FoundationIOCompiler
+#ifndef             PlatformIO_Compiler
 #if   defined(__clang__)
-#define             FoundationIOCompiler                                                      (FoundationIOCompilerIsClang)
+#define             PlatformIO_Compiler                                                      (PlatformIO_CompilerIsClang)
 #elif defined(_MSC_VER)
-#define             FoundationIOCompiler                                                      (FoundationIOCompilerIsMSVC)
+#define             PlatformIO_Compiler                                                      (PlatformIO_CompilerIsMSVC)
 #elif defined(__GNUC__) || defined(__GNUG__)
-#define             FoundationIOCompiler                                                      (FoundationIOCompilerIsGCC)
+#define             PlatformIO_Compiler                                                      (PlatformIO_CompilerIsGCC)
 #endif
-#endif /* FoundationIOCompiler */
+#endif /* PlatformIO_Compiler */
     
     /* POSIX shared stuff */
-#if ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+#if ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
 #include <dlfcn.h>      /* Included for shared library support */
 #include <sys/socket.h> /* Included for socket support */
 #include <sys/sysctl.h> /* Included for getting the number of CPU cores */
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
     
-#ifndef             FoundationIO_File_Open
-#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
-#define             FoundationIO_File_Open(UTF8FilePath, UTF8FileMode)                         fopen(UTF8FilePath, UTF8FileMode)
-#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#define             FoundationIO_File_Open(UTF8FilePath, UTF8FileMode)                         fopen(reinterpret_cast<const char * __restrict>(UTF8FilePath), reinterpret_cast<const char * __restrict>(UTF8FileMode))
+#ifndef             PlatformIO_File_Open
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+#define             PlatformIO_File_Open(UTF8FilePath, UTF8FileMode)                         fopen((const char*) UTF8FilePath, (const char*) UTF8FileMode)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#define             PlatformIO_File_Open(UTF8FilePath, UTF8FileMode)                         fopen(reinterpret_cast<const char * __restrict>(UTF8FilePath), reinterpret_cast<const char * __restrict>(UTF8FileMode))
 #endif
 #endif
     
-#ifndef             FoundationIO_File_Seek
-#define             FoundationIO_File_Seek(File, Offset, Origin)                               fseeko(File, Offset, Origin)
+#ifndef             PlatformIO_File_Seek
+#define             PlatformIO_File_Seek(File, Offset, Origin)                               fseeko(File, Offset, Origin)
 #endif
     
-#ifndef             FoundationIO_File_GetSize
-#define             FoundationIO_File_GetSize(File)                                            ftello(File)
+#ifndef             PlatformIO_File_GetSize
+#define             PlatformIO_File_GetSize(File)                                            ftello(File)
 #endif
     
-#ifndef             FoundationIO_File_Read
-#define             FoundationIO_File_Read(Output, ElementSize, NumElements2Read, File2Read)   fread(Output, ElementSize, NumElements2Read, File2Read)
+#ifndef             PlatformIO_File_Read
+#define             PlatformIO_File_Read(Output, ElementSize, NumElements2Read, File2Read)   fread(Output, ElementSize, NumElements2Read, File2Read)
 #endif
     
-#ifndef             FoundationIO_File_Write
-#define             FoundationIO_File_Write(Input, ElementSize, NumElements2Write, File2Write) fwrite(Input, ElementSize, NumElements2Write, File2Write)
+#ifndef             PlatformIO_File_Write
+#define             PlatformIO_File_Write(Input, ElementSize, NumElements2Write, File2Write) fwrite(Input, ElementSize, NumElements2Write, File2Write)
 #endif
     
-#ifndef             FoundationIO_File_Close
-#define             FoundationIO_File_Close(File2Close)                                        fclose(File2Close)
+#ifndef             PlatformIO_File_Close
+#define             PlatformIO_File_Close(File2Close)                                        fclose(File2Close)
 #endif
     
-#ifndef             FoundationIO_Socket_Create
-#define             FoundationIO_Socket_Create(Family, Type, Protocol)                         socket(Family, Type, Protocol)
+#ifndef             PlatformIO_Socket_Create
+#define             PlatformIO_Socket_Create(Family, Type, Protocol)                         socket(Family, Type, Protocol)
 #endif
     
-#ifndef             FoundationIO_Socket_Bind
-#define             FoundationIO_Socket_Bind(Socket2Bind, Name, NameSize)                      bind(Socket2Bind, Name, NameSize)
+#ifndef             PlatformIO_Socket_Bind
+#define             PlatformIO_Socket_Bind(Socket2Bind, Name, NameSize)                      bind(Socket2Bind, Name, NameSize)
 #endif
     
-#ifndef             FoundationIO_Socket_Listen
-#define             FoundationIO_Socket_Listen(BoundUnconnectedSocket, BacklogSize)            listen(BoundUnconnectedSocket, BacklogSize)
+#ifndef             PlatformIO_Socket_Listen
+#define             PlatformIO_Socket_Listen(BoundUnconnectedSocket, BacklogSize)            listen(BoundUnconnectedSocket, BacklogSize)
 #endif
     
-#ifndef             FoundationIO_Socket_Accept
-#define             FoundationIO_Socket_Accept(Socket2Accept, Name, NameSize)                  accept(Socket2Accept, Name, NameSize)
+#ifndef             PlatformIO_Socket_Accept
+#define             PlatformIO_Socket_Accept(Socket2Accept, Name, NameSize)                  accept(Socket2Accept, Name, NameSize)
 #endif
     
-#ifndef             FoundationIO_Socket_Connect
-#define             FoundationIO_Socket_Connect(Socket2Connect, Name, NameSize)                connect(Socket2Connect, Name, NameSize)
+#ifndef             PlatformIO_Socket_Connect
+#define             PlatformIO_Socket_Connect(Socket2Connect, Name, NameSize)                connect(Socket2Connect, Name, NameSize)
 #endif
     
-#ifndef             FoundationIO_Socket_Read
-#define             FoundationIO_Socket_Read(Socket2Read, Buffer2Write, NumBytes)              read(Socket2Read, Buffer2Write, NumBytes)
+#ifndef             PlatformIO_Socket_Read
+#define             PlatformIO_Socket_Read(Socket2Read, Buffer2Write, NumBytes)              read(Socket2Read, Buffer2Write, NumBytes)
 #endif
     
-#ifndef             FoundationIO_Socket_Write
-#define             FoundationIO_Socket_Write(Socket2Write, Buffer2Write, NumBytes)            write(Socket2Write, Buffer2Write, NumBytes)
+#ifndef             PlatformIO_Socket_Write
+#define             PlatformIO_Socket_Write(Socket2Write, Buffer2Write, NumBytes)            write(Socket2Write, Buffer2Write, NumBytes)
 #endif
     
-#ifndef             FoundationIO_Socket_Close
-#define             FoundationIO_Socket_Close(Socket2Close)                                    close(Socket2Close)
+#ifndef             PlatformIO_Socket_Close
+#define             PlatformIO_Socket_Close(Socket2Close)                                    close(Socket2Close)
 #endif
     
-#endif /* FoundationIOTargetOS is some kind of POSIX */
+#endif /* PlatformIO_TargetOS is some kind of POSIX */
     
-#if (FoundationIOTargetOS == FoundationIOWindowsOS)
+#if (PlatformIO_TargetOS == PlatformIO_WindowsOS)
 #ifndef             WIN32_LEAN_AND_MEAN
 #define             WIN32_LEAN_AND_MEAN
 #endif             /* WIN32_LEAN_AND_MEAN */
@@ -279,213 +279,213 @@ extern "C" {
 #include <Windows.h>                  /* Included for Shared Library support, WinCon, QueryPerformanceCounter, etc */
 #include <WinSock2.h>                 /* Included for socket support, Windows.h MUST be included before WinSock2 */
     
-#ifndef             FoundationIO_File_Open
-#define             FoundationIO_File_Open(UTF16FilePath, UTF16FileMode)                       _wfopen(UTF16FilePath, UTF16FileMode)
+#ifndef             PlatformIO_File_Open
+#define             PlatformIO_File_Open(UTF16FilePath, UTF16FileMode)                       _wfopen(UTF16FilePath, UTF16FileMode)
 #endif
     
-#ifndef             FoundationIO_File_Seek
-#define             FoundationIO_File_Seek(File, Offset, Origin)                               _fseeki64(File, Offset, Origin)
+#ifndef             PlatformIO_File_Seek
+#define             PlatformIO_File_Seek(File, Offset, Origin)                               _fseeki64(File, Offset, Origin)
 #endif
     
-#ifndef             FoundationIO_File_GetSize
-#define             FoundationIO_File_GetSize(File)                                            _ftelli64(File)
+#ifndef             PlatformIO_File_GetSize
+#define             PlatformIO_File_GetSize(File)                                            _ftelli64(File)
 #endif
     
-#ifndef             FoundationIO_File_Read
-#define             FoundationIO_File_Read(Output, ElementSize, NumElements2Read, File2Read)   fread(Output, ElementSize, NumElements2Read, File2Read)
+#ifndef             PlatformIO_File_Read
+#define             PlatformIO_File_Read(Output, ElementSize, NumElements2Read, File2Read)   fread(Output, ElementSize, NumElements2Read, File2Read)
 #endif
     
-#ifndef             FoundationIO_File_Write
-#define             FoundationIO_File_Write(Input, ElementSize, NumElements2Read, File2Write)  fwrite(Input, ElementSize, NumElements2Read, File2Write)
+#ifndef             PlatformIO_File_Write
+#define             PlatformIO_File_Write(Input, ElementSize, NumElements2Read, File2Write)  fwrite(Input, ElementSize, NumElements2Read, File2Write)
 #endif
     
-#ifndef             FoundationIO_File_Close
-#define             FoundationIO_File_Close(File2Close)                                        fclose(File2Close)
+#ifndef             PlatformIO_File_Close
+#define             PlatformIO_File_Close(File2Close)                                        fclose(File2Close)
 #endif
     
-#ifndef             FoundationIO_Socket_Create
-#define             FoundationIO_Socket_Create(Family, Type, Protocol)                         socket(Family, Type, Protocol)
+#ifndef             PlatformIO_Socket_Create
+#define             PlatformIO_Socket_Create(Family, Type, Protocol)                         socket(Family, Type, Protocol)
 #endif
     
-#ifndef             FoundationIO_Socket_Bind
-#define             FoundationIO_Socket_Bind(Socket2Bind, Name, NameSize)                      bind(Socket2Bind, Name, NameSize)
+#ifndef             PlatformIO_Socket_Bind
+#define             PlatformIO_Socket_Bind(Socket2Bind, Name, NameSize)                      bind(Socket2Bind, Name, NameSize)
 #endif
     
-#ifndef             FoundationIO_Socket_Listen
-#define             FoundationIO_Socket_Listen(BoundUnconnectedSocket, BacklogSize)            listen(BoundUnconnectedSocket, BacklogSize)
+#ifndef             PlatformIO_Socket_Listen
+#define             PlatformIO_Socket_Listen(BoundUnconnectedSocket, BacklogSize)            listen(BoundUnconnectedSocket, BacklogSize)
 #endif
     
-#ifndef             FoundationIO_Socket_Accept
-#define             FoundationIO_Socket_Accept(Socket2Accept, Name, NameSize)                  accept(Socket2Accept, Name, NameSize)
+#ifndef             PlatformIO_Socket_Accept
+#define             PlatformIO_Socket_Accept(Socket2Accept, Name, NameSize)                  accept(Socket2Accept, Name, NameSize)
 #endif
     
-#ifndef             FoundationIO_Socket_Connect
-#define             FoundationIO_Socket_Connect(Socket2Connect, Name, NameSize)                connect(Socket2Connect, Name, NameSize)
+#ifndef             PlatformIO_Socket_Connect
+#define             PlatformIO_Socket_Connect(Socket2Connect, Name, NameSize)                connect(Socket2Connect, Name, NameSize)
 #endif
     
-#ifndef             FoundationIO_Socket_Read
-#define             FoundationIO_Socket_Read(Socket2Read, Buffer2Write, NumBytes)              read(Socket2Read, Buffer2Write, NumBytes)
+#ifndef             PlatformIO_Socket_Read
+#define             PlatformIO_Socket_Read(Socket2Read, Buffer2Write, NumBytes)              read(Socket2Read, Buffer2Write, NumBytes)
 #endif
     
-#ifndef             FoundationIO_Socket_Write
-#define             FoundationIO_Socket_Write(Socket2Read, Buffer2Write, NumBytes)             write(Socket2Read, Buffer2Write, NumBytes)
+#ifndef             PlatformIO_Socket_Write
+#define             PlatformIO_Socket_Write(Socket2Read, Buffer2Write, NumBytes)             write(Socket2Read, Buffer2Write, NumBytes)
 #endif
     
-#ifndef             FoundationIO_Socket_Close
-#define             FoundationIO_Socket_Close(Socket2Close)                                    close(Socket2Close)
+#ifndef             PlatformIO_Socket_Close
+#define             PlatformIO_Socket_Close(Socket2Close)                                    close(Socket2Close)
 #endif
     
-#endif /* FoundationIOTargetOS is some kind of Windows */
+#endif /* PlatformIO_TargetOS is some kind of Windows */
     
-#ifndef             FoundationIOCompileTimeByteOrderUnknown
-#define             FoundationIOCompileTimeByteOrderUnknown                                   (0)
+#ifndef             PlatformIO_ByteOrder_Unknown
+#define             PlatformIO_ByteOrder_Unknown                                              (0)
 #endif
     
-#ifndef             FoundationIOByteOrderBE
-#define             FoundationIOByteOrderBE                                                   (1)
+#ifndef             PlatformIO_ByteOrder_BE
+#define             PlatformIO_ByteOrder_BE                                                   (1)
 #endif
     
-#ifndef             FoundationIOByteOrderLE
-#define             FoundationIOByteOrderLE                                                   (2)
+#ifndef             PlatformIO_ByteOrder_LE
+#define             PlatformIO_ByteOrder_LE                                                   (2)
 #endif
     
-#if   (FoundationIOCompiler == FoundationIOCompilerIsClang || FoundationIOCompiler == FoundationIOCompilerIsGCC)
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang || PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
 #if   (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-#define             FoundationIOTargetByteOrder                                               (FoundationIOByteOrderBE)
+#define             PlatformIO_TargetByteOrder                                               (PlatformIO_ByteOrder_BE)
 #elif (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define             FoundationIOTargetByteOrder                                               (FoundationIOByteOrderLE)
+#define             PlatformIO_TargetByteOrder                                               (PlatformIO_ByteOrder_LE)
 #endif /* __BYTE_ORDER__ */
-#elif (FoundationIOCompiler == FoundationIOCompilerIsMSVC)
-#define             FoundationIOTargetByteOrder                                               (FoundationIOByteOrderLE)
-#endif /* FoundationIOCompiler */
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
+#define             PlatformIO_TargetByteOrder                                               (PlatformIO_ByteOrder_LE)
+#endif /* PlatformIO_Compiler */
     
-#ifndef             FoundationIONewLine8
-#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-#define             FoundationIONewLine8                                                      (u8"\n")
-#define             FoundationIONewLine8Size                                                  (1)
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-#define             FoundationIONewLine8                                                      (u8"\r\n")
-#define             FoundationIONewLine8Size                                                  (2)
-#elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
-#define             FoundationIONewLine8                                                      (u8"\r")
-#define             FoundationIONewLine8Size                                                  (1)
+#ifndef             PlatformIO_NewLine8
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#define             PlatformIO_NewLine8                                                      (u8"\n")
+#define             PlatformIO_NewLine8Size                                                  (1)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#define             PlatformIO_NewLine8                                                      (u8"\r\n")
+#define             PlatformIO_NewLine8Size                                                  (2)
+#elif (PlatformIO_TargetOS == PlatformIO_ClassicMacOS)
+#define             PlatformIO_NewLine8                                                      (u8"\r")
+#define             PlatformIO_NewLine8Size                                                  (1)
 #endif /* TargetOS */
-#endif /* FoundationIONewLine8 */
+#endif /* PlatformIO_NewLine8 */
     
-#ifndef             FoundationIONewLine16
-#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-#define             FoundationIONewLine16                                                     (u"\n")
-#define             FoundationIONewLine16Size                                                 (1)
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-#define             FoundationIONewLine16                                                     (u"\r\n")
-#define             FoundationIONewLine16Size                                                 (2)
-#elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
-#define             FoundationIONewLine16                                                     (u"\r")
-#define             FoundationIONewLine16Size                                                 (1)
+#ifndef             PlatformIO_NewLine16
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#define             PlatformIO_NewLine16                                                     (u"\n")
+#define             PlatformIO_NewLine16Size                                                 (1)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#define             PlatformIO_NewLine16                                                     (u"\r\n")
+#define             PlatformIO_NewLine16Size                                                 (2)
+#elif (PlatformIO_TargetOS == PlatformIO_ClassicMacOS)
+#define             PlatformIO_NewLine16                                                     (u"\r")
+#define             PlatformIO_NewLine16Size                                                 (1)
 #endif /* TargetOS */
-#endif /* FoundationIONewLine16 */
+#endif /* PlatformIO_NewLine16 */
     
     
-#ifndef             FoundationIONewLine32
-#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-#define             FoundationIONewLine32                                                     (U"\n")
-#define             FoundationIONewLine32Size                                                 (1)
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
-#define             FoundationIONewLine32                                                     (U"\r\n")
-#define             FoundationIONewLine32Size                                                 (2)
-#elif (FoundationIOTargetOS == FoundationIOMacClassicOS)
-#define             FoundationIONewLine32                                                     (U"\r")
-#define             FoundationIONewLine32Size                                                 (1)
+#ifndef             PlatformIO_NewLine32
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#define             PlatformIO_NewLine32                                                     (U"\n")
+#define             PlatformIO_NewLine32Size                                                 (1)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#define             PlatformIO_NewLine32                                                     (U"\r\n")
+#define             PlatformIO_NewLine32Size                                                 (2)
+#elif (PlatformIO_TargetOS == PlatformIO_ClassicMacOS)
+#define             PlatformIO_NewLine32                                                     (U"\r")
+#define             PlatformIO_NewLine32Size                                                 (1)
 #endif /* TargetOS */
-#endif /* FoundationIONewLine32 */
+#endif /* PlatformIO_NewLine32 */
     
-#ifndef             FoundationIONULLTerminator
-#define             FoundationIONULLTerminator                                                (0)
+#ifndef             PlatformIO_NULLTerminator
+#define             PlatformIO_NULLTerminator                                                (0)
 #endif
-#ifndef             FoundationIONULLTerminatorSize
-#define             FoundationIONULLTerminatorSize                                            (1)
-#endif
-    
-#ifndef             UNCPathPrefix8
-#define             UNCPathPrefix8                                                            (u8"//?/")
+#ifndef             PlatformIO_NULLTerminatorSize
+#define             PlatformIO_NULLTerminatorSize                                            (1)
 #endif
     
-#ifndef             UNCPathPrefix16
-#define             UNCPathPrefix16                                                           (u"//?/")
+#ifndef             PlatformIO_UNCPathPrefix8
+#define             PlatformIO_UNCPathPrefix8                                                (u8"//?/")
+#endif
+    
+#ifndef             PlatformIO_UNCPathPrefix16
+#define             PlatformIO_UNCPathPrefix16                                               (u"//?/")
 #endif
 
-#ifndef             UNCPathPrefix32
-#define             UNCPathPrefix32                                                           (U"//?/")
+#ifndef             PlatformIO_UNCPathPrefix32
+#define             PlatformIO_UNCPathPrefix32                                               (U"//?/")
 #endif
     
-#ifndef             FoundationIOInvisibleString8
-#define             FoundationIOInvisibleString8                                              (u8"\u00A0")
+#ifndef             PlatformIO_InvisibleString8
+#define             PlatformIO_InvisibleString8                                              (u8"\u00A0")
 #endif
     
-#ifndef             FoundationIOInvisibleCharacter16
-#define             FoundationIOInvisibleCharacter16                                          (u'\u00A0')
+#ifndef             PlatformIO_InvisibleCharacter16
+#define             PlatformIO_InvisibleCharacter16                                          (u'\u00A0')
 #endif
     
-#ifndef             FoundationIOInvisibleString16
-#define             FoundationIOInvisibleString16                                             (u"\u00A0")
+#ifndef             PlatformIO_InvisibleString16
+#define             PlatformIO_InvisibleString16                                             (u"\u00A0")
 #endif
     
-#ifndef             FoundationIOInvisibleCharacter32
-#define             FoundationIOInvisibleCharacter32                                          (U'\u00A0')
+#ifndef             PlatformIO_InvisibleCharacter8
+#define             PlatformIO_InvisibleCharacter8                                          (U'\u00A0')
 #endif
     
-#ifndef             FoundationIOInvisibleString32
-#define             FoundationIOInvisibleString32                                             (U"\u00A0")
+#ifndef             PlatformIO_InvisibleString32
+#define             PlatformIO_InvisibleString32                                             (U"\u00A0")
 #endif
     
 #if                (WCHAR_MIN < 0)
-#define             FoundationIOWideCharSize ((WCHAR_MAX * 2) + 1)
+#define             PlatformIO_WideCharRange ((WCHAR_MAX * 2) + 1)
 #else
-#define             FoundationIOWideCharSize (WCHAR_MAX)
+#define             PlatformIO_WideCharRange (WCHAR_MAX)
 #endif
   
   /*!
-   @abstract        FoundationIO_Immutable is for pointers and arrays.
+   @abstract        PlatformIO_Immutable is for pointers and arrays.
    @remark          Makes the pointer and the data it points to constant.
    */
-#ifndef             FoundationIO_Immutable
-#define             FoundationIO_Immutable(PointerType) const PointerType const
+#ifndef             PlatformIO_Immutable
+#define             PlatformIO_Immutable(PointerType) const PointerType const
 #endif
     
-#ifndef             FoundationIO_Mutable
-#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
-#define             FoundationIO_Mutable(PointerType, Variable) (PointerType, Variable)
-#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-#define             FoundationIO_Mutable(PointerType, Variable) std::remove_const<PointerType>(Variable)
+#ifndef             PlatformIO_Mutable
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+#define             PlatformIO_Mutable(PointerType, Variable) (PointerType, Variable)
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#define             PlatformIO_Mutable(PointerType, Variable) std::remove_const<PointerType>(Variable)
 #endif
 #endif
     
     /*!
-     @abstract        FoundationIO_Volatile is for pointers and arrays.
+     @abstract        PlatformIO_Volatile is for pointers and arrays.
      @remark          Makes the pointer and the data it points to volatile.
      */
-#ifndef             FoundationIO_Volatile
-#define             FoundationIO_Volatile(PointerType) volatile PointerType volatile
+#ifndef             PlatformIO_Volatile
+#define             PlatformIO_Volatile(PointerType) volatile PointerType volatile
 #endif
   
   /*!
-   @abstract        FoundationIO_Constant is for variables, constants, and values.
+   @abstract        PlatformIO_Constant is for variables, constants, and values.
    @remark          Makes the pointer and the data it points to constant.
    */
-#ifndef             FoundationIO_Constant
-#define             FoundationIO_Constant(Type) const Type
+#ifndef             PlatformIO_Constant
+#define             PlatformIO_Constant(Type) const Type
 #endif
     
-#ifndef             FoundationIO_MakeStringSet
-#define             FoundationIO_MakeStringSet(StringSetSize, ...) {__VA_ARGS__,};
+#ifndef             PlatformIO_MakeStringSet
+#define             PlatformIO_MakeStringSet(StringSetSize, ...) {__VA_ARGS__,};
 #endif
     
-    uint64_t        FoundationIO_GetNumCPUCores(void);
+    uint64_t        PlatformOS_GetNumCPUCores(void);
     
-    uint64_t        FoundationIO_GetTotalMemoryInBytes(void);
+    uint64_t        PlatformOS_GetTotalMemoryInBytes(void);
     
 #ifdef __cplusplus
 }
 #endif
 
-#endif  /* FoundationIO_Macros_H */
+#endif  /* FoundationIO_PlatformIO_H */
