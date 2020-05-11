@@ -79,25 +79,25 @@ extern "C" {
     } FoundationIO_Bases;
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
-        constexpr inline FoundationIO_Bases operator|(FoundationIO_Bases A, FoundationIO_Bases B) {
+        constexpr inline FoundationIO_Bases operator | (FoundationIO_Bases A, FoundationIO_Bases B) {
             uint16_t A1 = static_cast<uint16_t>(A);
             uint16_t B1 = static_cast<uint16_t>(B);
             return static_cast<FoundationIO_Bases>(A1 | B1);
         }
         
-        constexpr inline FoundationIO_Bases operator&(FoundationIO_Bases A, FoundationIO_Bases B) {
+        constexpr inline FoundationIO_Bases operator & (FoundationIO_Bases A, FoundationIO_Bases B) {
             uint16_t A1 = static_cast<uint16_t>(A);
             uint16_t B1 = static_cast<uint16_t>(B);
             return static_cast<FoundationIO_Bases>(A1 & B1);
         }
         
-        constexpr inline FoundationIO_Bases operator|=(FoundationIO_Bases A, FoundationIO_Bases B) {
+        constexpr inline FoundationIO_Bases operator |= (FoundationIO_Bases A, FoundationIO_Bases B) {
             uint16_t A1 = static_cast<uint16_t>(A);
             uint16_t B1 = static_cast<uint16_t>(B);
             return static_cast<FoundationIO_Bases>(A1 |= B1);
         }
         
-        constexpr inline FoundationIO_Bases operator&=(FoundationIO_Bases A, FoundationIO_Bases B) {
+        constexpr inline FoundationIO_Bases operator &= (FoundationIO_Bases A, FoundationIO_Bases B) {
             uint16_t A1 = static_cast<uint16_t>(A);
             uint16_t B1 = static_cast<uint16_t>(B);
             return static_cast<FoundationIO_Bases>(A1 &= B1);
