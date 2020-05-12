@@ -5,18 +5,18 @@
 #include "../../include/UnicodeIO/LogIO.h"          /* Included for Logging */
 #include "../../include/UnicodeIO/StringIO.h"       /* Included for StringIO's declarations */
 
-#if (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (((FoundationIOTargetOS & FoundationIOLinuxOS) != FoundationIOLinuxOS)))
+#if (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && (((PlatformIO_TargetOS & PlatformIO_LinuxOS) != PlatformIO_LinuxOS)))
 #include <signal.h>                    /* Included for SIGWINCH handling */
 #include <sys/ioctl.h>                 /* Included for the terminal size */
 #include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
-#elif (((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS) && (((FoundationIOTargetOS & FoundationIOLinuxOS) == FoundationIOLinuxOS)))
+#elif (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && (((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS)))
 #include <signal.h>                    /* Included for SIGWINCH handling */
 #include <sys/ioctl.h>                 /* Included for the terminal size */
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
 #include <wincon.h>                    /* Included for getting the terminal size */
 #endif
 
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
     
@@ -29,20 +29,31 @@ extern "C" {
      */
     
     typedef struct CommandLineOption {
+        // ok so each option is based on a SwitchID, it may need to hold any used children, as well as argument strings
+        // How do we handle bool strings, and ranges?
+        // Maybe we should just have the user pass in the OptionID to a dedicated function that will handle BoolStrings, Ranges, etc?
+        UTF32    *Argument;
+        uint64_t  SwitchID; // the number matching the switch that this option corresponds to
+        uint64_t  NumChildren; // Number of active children for this option
+        uint64_t *Children;
+    } CommandLineOption;
+    
+    typedef struct CommandLineSwitch {
         UTF32                        *Name;
         UTF32                        *Description;
         UTF32                        *Argument;
         uint64_t                     *IncompatibleOptions;
-        uint64_t                     *Slaves;
+        uint64_t                     *Children;
         uint64_t                      OptionID;
         uint64_t                      NumIncompatibleOptions;
-        uint64_t                      NumOptionSlaves;
-        CommandLineIO_ArgumentTypes   ArgumentType;
-        CommandLineIO_OptionTypes     OptionType;
-        CommandLineIO_OptionStatuses  Status;
-    } CommandLineOption;
+        uint64_t                      NumChildren; // NumOptionSlaves
+        CommandLineIO_SwitchArguments ArgumentType;
+        CommandLineIO_SwitchTypes     SwitchType; // OptionType
+        CommandLineIO_SwitchStatuses  Status;
+    } CommandLineSwitch;
     
     typedef struct CommandLineIO {
+        UTF32                     **Tokens;
         UTF32                      *ProgramName;
         UTF32                      *ProgramAuthor;
         UTF32                      *ProgramDescription;
@@ -51,38 +62,44 @@ extern "C" {
         UTF32                      *ProgramLicenseName;
         UTF32                      *ProgramLicenseDescription;
         UTF32                      *ProgramLicenseURL;
-        CommandLineOption          *OptionIDs;
+        CommandLineSwitch          *Switches; // OptionID -> Switches
+        CommandLineOption          *Options;
+        uint64_t                    NumSwitches;
         uint64_t                    NumOptions;
         uint64_t                    MinOptions;
         uint64_t                    HelpOption;
         CommandLineIO_LicenseTypes  LicenseType;
     } CommandLineIO;
     
-    CommandLineIO *CommandLineIO_Init(uint64_t NumOptions) {
-        CommandLineIO *CLI       = NULL;
-        CLI                      = (CommandLineIO*) calloc(1, sizeof(CommandLineIO));
-        if (CLI != NULL) {
-            CLI->OptionIDs       = (CommandLineOption*) calloc(NumOptions, sizeof(CommandLineOption));
-            if (CLI->OptionIDs != NULL) {
-                CLI->NumOptions = NumOptions;
+    CommandLineIO *CommandLineIO_Init(uint64_t NumSwitches) {
+        CommandLineIO *CLI           = NULL;
+        if (NumSwitches > 0) {
+            CLI                      = (CommandLineIO*) calloc(1, sizeof(CommandLineIO));
+            if (CLI != NULL) {
+                CLI->Switches        = (CommandLineSwitch*) calloc(NumSwitches, sizeof(CommandLineSwitch));
+                if (CLI->Switches != NULL) {
+                    CLI->NumSwitches = NumSwitches;
+                } else {
+                    CommandLineIO_Deinit(CLI);
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate %llu Options"), NumSwitches);
+                }
             } else {
                 CommandLineIO_Deinit(CLI);
-                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate %llu Options"), NumOptions);
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate CommandLineIO"));
             }
         } else {
-            CommandLineIO_Deinit(CLI);
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate CommandLineIO"));
+            Log(Severity_USER, FoundationIOFunctionName, UTF8String("NumSwitches is invalid"));
         }
         return CLI;
     }
     
     uint64_t       CommandLineIO_GetTerminalWidth(void) {
         uint64_t Width = 0ULL;
-#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
         struct winsize       WindowSize;
         ioctl(0, TIOCGWINSZ, &WindowSize);
         Width          = WindowSize.ws_row;
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
         CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
         Width          = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
@@ -92,11 +109,11 @@ extern "C" {
     
     uint64_t       CommandLineIO_GetTerminalHeight(void) {
         uint64_t Height = 0ULL;
-#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
         struct winsize       WindowSize;
         ioctl(0, TIOCGWINSZ, &WindowSize);
         Height          = WindowSize.ws_row;
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
         CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
         Height          = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
@@ -106,7 +123,7 @@ extern "C" {
     
     bool           CommandLineIO_TerminalWasResized(void) {
         bool SizeChanged = No;
-#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
         /*
          We're creating a text UI to show the progress of the program.
          The user resizes the window
@@ -118,7 +135,7 @@ extern "C" {
         struct winsize       WindowSize;
         ioctl(0, TIOCGWINSZ, &WindowSize);
         SizeChanged      = WindowSize.ws_row;
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
         CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
         SizeChanged      = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
@@ -126,7 +143,7 @@ extern "C" {
         return SizeChanged;
     }
     
-    void CommandLineIO_SetName(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Name) {
+    void CommandLineIO_SetName(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Name) {
         if (CLI != NULL && Name != NULL) {
             UTF32 *Normalized    = UTF32_Normalize(Name, NormalizationForm_KompatibleCompose);
             UTF32 *CaseFolded    = UTF32_CaseFold(Normalized);
@@ -139,7 +156,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_SetVersion(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Version) {
+    void CommandLineIO_SetVersion(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Version) {
         if (CLI != NULL && Version != NULL) {
             UTF32 *Normalized    = UTF32_Normalize(Version, NormalizationForm_KompatibleCompose);
             UTF32 *CaseFolded    = UTF32_CaseFold(Normalized);
@@ -152,7 +169,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_SetDescription(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Description) {
+    void CommandLineIO_SetDescription(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Description) {
         if (CLI != NULL && Description != NULL) {
             UTF32 *Normalized        = UTF32_Normalize(Description, NormalizationForm_KompatibleCompose);
             UTF32 *CaseFolded        = UTF32_CaseFold(Normalized);
@@ -165,7 +182,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_SetAuthor(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Author) {
+    void CommandLineIO_SetAuthor(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Author) {
         if (CLI != NULL && Author != NULL) {
             UTF32 *Normalized   = UTF32_Normalize(Author, NormalizationForm_KompatibleCompose);
             UTF32 *CaseFolded   = UTF32_CaseFold(Normalized);
@@ -178,7 +195,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_SetCopyright(CommandLineIO *CLI, FoundationIO_Immutable(UTF32 *) Copyright) {
+    void CommandLineIO_SetCopyright(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Copyright) {
         if (CLI != NULL && Copyright != NULL) {
             UTF32 *Normalized     = UTF32_Normalize(Copyright, NormalizationForm_KompatibleCompose);
             UTF32 *CaseFolded     = UTF32_CaseFold(Normalized);
@@ -191,7 +208,7 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_SetLicense(CommandLineIO *CLI, CommandLineIO_LicenseTypes LicenseType, FoundationIO_Immutable(UTF32 *) Name, FoundationIO_Immutable(UTF32 *) LicenseURL) {
+    void CommandLineIO_SetLicense(CommandLineIO *CLI, CommandLineIO_LicenseTypes LicenseType, PlatformIO_Immutable(UTF32 *) Name, PlatformIO_Immutable(UTF32 *) LicenseURL) {
         if (CLI != NULL && LicenseType != LicenseType_Unknown && Name != NULL && LicenseURL != NULL) {
             CLI->LicenseType                = LicenseType;
             UTF32 *NormalizedName           = UTF32_Normalize(Name, NormalizationForm_KompatibleCompose);
@@ -215,28 +232,28 @@ extern "C" {
     }
     
     void CommandLineIO_SetMinOptions(CommandLineIO *CLI, uint64_t MinOptions) {
-        if (CLI != NULL && MinOptions < CLI->NumOptions) {
+        if (CLI != NULL && MinOptions < CLI->NumSwitches) {
             CLI->MinOptions = MinOptions;
         } else if (CLI == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
-        } else if (MinOptions > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("MinOptions %lld is invalid, it should be between 0 and %lld"), MinOptions, CLI->NumOptions);
+        } else if (MinOptions > CLI->NumSwitches) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("MinOptions %lld is invalid, it should be between 0 and %lld"), MinOptions, CLI->NumSwitches);
         }
     }
     
     void CommandLineIO_SetHelpOption(CommandLineIO *CLI, uint64_t HelpOption) {
-        if (CLI != NULL && HelpOption < CLI->NumOptions) {
+        if (CLI != NULL && HelpOption < CLI->NumSwitches) {
             CLI->HelpOption = HelpOption;
         } else if (CLI == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
-        } else if (HelpOption > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("HelpSwitch %lld is invalid, it should be between 0 and %lld"), HelpOption, CLI->NumOptions);
+        } else if (HelpOption > CLI->NumSwitches) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("HelpSwitch %lld is invalid, it should be between 0 and %lld"), HelpOption, CLI->NumSwitches);
         }
     }
     
-    void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, FoundationIO_Immutable(UTF32 **) Strings, FoundationIO_Immutable(uint64_t *) Numerator, FoundationIO_Immutable(uint64_t *) Denominator) {
+    void CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, PlatformIO_Immutable(UTF32 **) Strings, PlatformIO_Immutable(uint64_t *) Numerator, PlatformIO_Immutable(uint64_t *) Denominator) {
         if (CLI != NULL) {
-            uint64_t *StringSize = (uint64_t*) calloc(NumItems2Display + FoundationIONULLTerminatorSize, sizeof(uint64_t));
+            uint64_t *StringSize = (uint64_t*) calloc(NumItems2Display + PlatformIO_NULLTerminatorSize, sizeof(uint64_t));
             for (uint8_t Item = 0; Item < NumItems2Display; Item++) {
                 StringSize[Item] = UTF32_GetStringSizeInCodePoints(Strings[Item]);
             }
@@ -248,7 +265,7 @@ extern "C" {
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 UTF8    *Indicator           = UTF8_Init(CommandLineIO_GetTerminalWidth());
                 UTF8    *IndicatorFinal      = UTF8_Insert(Indicator, UTF8String("-"), 0);
-                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%Us %llu/%llu %llu/%s%s]"), IndicatorFinal, *Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, FoundationIONewLine8);
+                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%Us %llu/%llu %llu/%s%s]"), IndicatorFinal, *Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, PlatformIO_NewLine8);
                 UTF8_WriteLine(stdout, FormattedString);
                 free(Indicator);
             }
@@ -260,134 +277,49 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_Option_SetName(CommandLineIO *CLI, uint64_t OptionID, FoundationIO_Immutable(UTF32 *) Name) {
-        if (CLI != NULL && OptionID < CLI->NumOptions && Name != NULL) {
-            UTF32 *Normalized             = UTF32_Normalize(Name, NormalizationForm_KompatibleCompose);
-            UTF32 *CaseFolded             = UTF32_CaseFold(Normalized);
-            free(Normalized);
-            CLI->OptionIDs[OptionID].Name = CaseFolded;
-        } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
-        } else if (Name == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Name String is NULL"));
-        } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
-        }
-    }
-    
-    void CommandLineIO_Option_SetDescription(CommandLineIO *CLI, uint64_t OptionID, FoundationIO_Immutable(UTF32 *) Description) {
-        if (CLI != NULL && Description != NULL && OptionID < CLI->NumOptions) {
-            UTF32 *Normalized                    = UTF32_Normalize(Description, NormalizationForm_KompatibleCompose);
-            UTF32 *CaseFolded                    = UTF32_CaseFold(Normalized);
-            free(Normalized);
-            CLI->OptionIDs[OptionID].Description = CaseFolded;
-        } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
-        } else if (Description == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Description String is NULL"));
-        } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
-        }
-    }
-    
-    void CommandLineIO_Option_SetSlave(CommandLineIO *CLI, uint64_t MasterID, uint64_t SlaveID) {
-        if (CLI != NULL && MasterID < CLI->NumOptions - 1 && SlaveID < CLI->NumOptions - 1) {
-            if (CLI->OptionIDs[MasterID].OptionType == OptionType_PotentialSlaves) {
-                CLI->OptionIDs[MasterID].NumOptionSlaves  += 1;
-                uint64_t NumSlaves                         = CLI->OptionIDs[MasterID].NumOptionSlaves - 1;
-                uint64_t *Slaves_Old                       = CLI->OptionIDs[MasterID].Slaves;
-                CLI->OptionIDs[MasterID].Slaves            = (uint64_t*) realloc(CLI->OptionIDs[MasterID].Slaves, CLI->OptionIDs[MasterID].NumOptionSlaves * sizeof(CLI->OptionIDs[MasterID].Slaves));
-                if (CLI->OptionIDs[MasterID].Slaves != NULL) {
-                    free(Slaves_Old);
-                } else {
-                    CLI->OptionIDs[MasterID].Slaves        = Slaves_Old;
-                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Realloc failed"));
-                }
-                CLI->OptionIDs[MasterID].Slaves[NumSlaves] = SlaveID;
-            } else {
-                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("MasterID %lld can not have any slaves"), MasterID);
-            }
-        } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
-        } else if (MasterID > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("MasterID %lld is invalid, it should be between 0 and %lld"), MasterID, CLI->NumOptions - 1);
-        } else if (SlaveID > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SlaveID %lld is invalid, it should be between 0 and %lld"), SlaveID, CLI->NumOptions - 1);
-        }
-    }
-    
-    void CommandLineIO_Option_SetType(CommandLineIO *CLI, uint64_t OptionID, CommandLineIO_OptionTypes OptionType) {
-        if (CLI != NULL && OptionType != OptionType_Unknown && OptionID < CLI->NumOptions - 1) {
-            CLI->OptionIDs[OptionID].OptionType = OptionType;
-        } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
-        } else if (OptionType == OptionType_Unknown) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("You can not set OptionID %lld to OptionType_Unknown"), OptionID);
-        } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
-        }
-    }
-    
-    void CommandLineIO_Option_SetStatus(CommandLineIO *CLI, uint64_t OptionID, CommandLineIO_OptionStatuses Status) {
-        if (CLI != NULL && Status != OptionStatus_Unknown) {
-            if (OptionID < CLI->NumOptions) {
-                CLI->OptionIDs[OptionID].Status = Status;
-            } else {
-                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OptionID %llu is invalid"), OptionID);
-            }
-        } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
-        } else if (Status == OptionStatus_Unknown) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Status is Unknown"));
-        }
-    }
-    
-    void CommandLineIO_Option_SetArgumentType(CommandLineIO *CLI, uint64_t OptionID, CommandLineIO_ArgumentTypes ArgumentType) {
-        if (CLI != NULL && ArgumentType != ArgumentType_Unknown && OptionID < CLI->NumOptions) {
-            CLI->OptionIDs[OptionID].ArgumentType = ArgumentType;
-        } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
-        } else if (ArgumentType == ArgumentType_Unknown) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("You can not set OptionID %lld to ArgumentType_Unknown"), OptionID);
-        } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
-        }
-    }
-    
-    static void CommandLineIO_DisplayHelp(CommandLineIO *CLI) {
+    static void CommandLineIO_ShowHelp(CommandLineIO *CLI) {
         if (CLI != NULL) {
             UTF8 *Name = UTF8_Encode(CLI->ProgramName);
             
-            UTF8 *ProgramsOptions = UTF8_Format(UTF8String("%s's Options (-|--|/):%s"), Name, FoundationIONewLine8);
+            UTF8 *ProgramsOptions = UTF8_Format(UTF8String("%s's Options (-|--|/):%s"), Name, PlatformIO_NewLine8);
             UTF8_WriteLine(stdout, ProgramsOptions);
             free(Name);
             free(ProgramsOptions);
-            for (uint64_t Switch = 0ULL; Switch < CLI->NumOptions; Switch++) {
-                CommandLineIO_OptionTypes CurrentSwitchType = CLI->OptionIDs[Switch].OptionType;
+            
+            uint64_t StringSetSize = 0;
+            for (uint64_t Switch = 0; Switch < CLI->NumSwitches; Switch++) {
+                if (CLI->Switches[Switch].SwitchType == SwitchType_Existential || CLI->Switches[Switch].SwitchType == SwitchType_Standalone) {
+                    StringSetSize += 1;
+                } else if (CLI->Switches[Switch].SwitchType == SwitchType_Parent) {
+                    StringSetSize += CLI->Switches[Switch].NumChildren;
+                }
+            }
+            
+            UTF32 **GeneratedHelp = UTF32_StringSet_Init(StringSetSize);
+            
+            for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
+                CommandLineIO_SwitchTypes CurrentSwitchType = CLI->Switches[Switch].SwitchType;
+                GeneratedHelp[Switch]   = UTF32_Format(UTF32String("%U32s: %U32s%U32s"), CLI->Switches[Switch].Name, CLI->Switches[Switch].Description, PlatformIO_NewLine32);
                 
-                UTF8 *SwitchName        = UTF8_Encode(CLI->OptionIDs[Switch].Name);
-                UTF8 *SwitchDescription = UTF8_Encode(CLI->OptionIDs[Switch].Description);
-                
-                UTF8 *SwitchInfo        = UTF8_Format(UTF8String("%s: %s%s"), SwitchName, SwitchDescription, FoundationIONewLine8);
-                
-                UTF8_WriteLine(stdout, SwitchInfo);
-                if (CurrentSwitchType == OptionType_PotentialSlaves && CLI->OptionIDs[Switch].NumOptionSlaves > 0) {
-                    for (uint64_t SlaveSwitch = 0ULL; SlaveSwitch < CLI->OptionIDs[Switch].NumOptionSlaves; SlaveSwitch++) {
-                        UTF8 *SlaveName        = UTF8_Encode(CLI->OptionIDs[SlaveSwitch].Name);
-                        UTF8 *SlaveDescription = UTF8_Encode(CLI->OptionIDs[SlaveSwitch].Description);
-                        
-                        UTF8 *SlaveSwitchInfo  = UTF8_Format(UTF8String("\t%s: %s%s"), SlaveName, SlaveDescription, FoundationIONewLine8);
-                        
-                        UTF8_WriteLine(stdout, SlaveSwitchInfo);
-                        
-                        free(SlaveName);
-                        free(SlaveDescription);
-                        free(SlaveSwitchInfo);
+                if (CurrentSwitchType == SwitchType_Parent && CLI->Switches[Switch].NumChildren > 0) {
+                    for (uint64_t Child = 0ULL; Child < CLI->Switches[Switch].NumChildren; Child++) {
+                        GeneratedHelp[Switch + Child] = UTF32_Format(UTF32String("\t%U32s: %U32s%U32s"), CLI->Switches[Child].Name, CLI->Switches[Child].Description, PlatformIO_NewLine32);
                     }
                 }
-                free(SwitchName);
-                free(SwitchDescription);
-                free(SwitchInfo);
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+                UTF8 **GeneratedHelp8 = UTF8_StringSet_Encode((PlatformIO_Immutable(UTF32**)) GeneratedHelp);
+                for (uint64_t String = 0; String < StringSetSize; String++) {
+                    UTF8_WriteLine(stdout, GeneratedHelp8[String]);
+                }
+                UTF8_StringSet_Deinit(GeneratedHelp8);
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+                UTF16 **GeneratedHelp16 = UTF16_StringSet_Encode(GeneratedHelp);
+                for (uint64_t String = 0; String < StringSetSize; String++) {
+                    UTF16_WriteLine(stdout, GeneratedHelp16[String]);
+                }
+                UTF16_StringSet_Deinit(GeneratedHelp16);
+#endif
+                UTF32_StringSet_Deinit(GeneratedHelp);
             }
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
@@ -396,82 +328,40 @@ extern "C" {
     
     static void CommandLineIO_ShowBanner(CommandLineIO *CLI) {
         if (CLI != NULL) {
-            UTF8 *Name                  = UTF8_Encode(CLI->ProgramName);
-            UTF8 *Version               = UTF8_Encode(CLI->ProgramVersion);
-            UTF8 *Author                = UTF8_Encode(CLI->ProgramAuthor);
-            UTF8 *Copyright             = UTF8_Encode(CLI->ProgramCopyright);
-            UTF8 *Description           = UTF8_Encode(CLI->ProgramDescription);
-            UTF8 *LicenseName           = UTF8_Encode(CLI->ProgramLicenseName);
-            UTF8 *LicenseDescription    = UTF8_Encode(CLI->ProgramLicenseDescription);
-            UTF8 *LicenseURL            = UTF8_Encode(CLI->ProgramLicenseURL);
-            CommandLineIO_LicenseTypes LicenseType = CLI->LicenseType;
-            
-            if (Name != NULL) {
-                UTF8 *NameString      = UTF8_Format(UTF8String("%s,"), Name);
-                UTF8_WriteLine(stdout, NameString);
-                free(NameString);
-                
-                UTF8 *FormattedString = UTF8_Format(UTF8String(" %s, v. %s by %s © %s%s"), Name, Version, Author, Copyright, FoundationIONewLine8);
-                UTF8_WriteLine(stdout, FormattedString);
+            UTF32 *License = NULL;
+            if (CLI->LicenseType == LicenseType_Permissive || CLI->LicenseType == LicenseType_Copyleft) {
+                License = UTF32_Format(UTF32String("Released under the \"%s\" license, you can see the details of this license at: %U32s"), CLI->ProgramLicenseName != NULL ? CLI->ProgramLicenseName : PlatformIO_InvisibleString32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : PlatformIO_InvisibleString32);
+            } else if (CLI->LicenseType == LicenseType_Proprietary) {
+                License = UTF32_Format(UTF32String("By using this software, you agree to the End User License Agreement:%U32s%U32s%U32s"), PlatformIO_NewLine32, PlatformIO_NewLine32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : PlatformIO_InvisibleString32);
+            } else {
+                Log(Severity_USER, FoundationIOFunctionName, UTF8String("LicenseType isn't set"));
             }
             
-            if (Version != NULL) {
-                UTF8 *VersionString   = UTF8_Format(UTF8String(" v. %s"), Version);
-                UTF8_WriteLine(stdout, VersionString);
-            }
-            
-            if (Author != NULL) {
-                UTF8 *AuthorString   = UTF8_Format(UTF8String(" by %s"), Author);
-                UTF8_WriteLine(stdout, AuthorString);
-            }
-            
-            if (Copyright != NULL) {
-                UTF8 *CopyrightString   = UTF8_Format(UTF8String(" © %s\n"), Copyright);
-                UTF8_WriteLine(stdout, CopyrightString);
-            }
-            
-            if (LicenseType == LicenseType_Permissive || LicenseType == LicenseType_Copyleft) {
-                if (Description != NULL) {
-                    UTF8 *DescriptionString   = UTF8_Format(UTF8String("%s"), Description);
-                    UTF8_WriteLine(stdout, DescriptionString);
-                }
-                
-                if (LicenseName != NULL) {
-                    UTF8 *LicenseNameString   = UTF8_Format(UTF8String(" Released under the \"%s\" license"), LicenseName);
-                    UTF8_WriteLine(stdout, LicenseNameString);
-                }
-                
-                if (LicenseDescription != NULL) {
-                    UTF8 *LicenseDescriptionString   = UTF8_Format(UTF8String(" %s,"), LicenseDescription);
-                    UTF8_WriteLine(stdout, LicenseDescriptionString);
-                }
-                
-                if (LicenseURL != NULL) {
-                    UTF8 *LicenseURLString   = UTF8_Format(UTF8String(" %s\n"), LicenseURL);
-                    UTF8_WriteLine(stdout, LicenseURLString);
-                }
-            } else if (LicenseType == LicenseType_Proprietary) {
-                if (Description != NULL) {
-                    UTF8 *DescriptionString   = UTF8_Format(UTF8String("%s"), Description);
-                    UTF8_WriteLine(stdout, DescriptionString);
-                }
-                
-                if (LicenseDescription != NULL) {
-                    UTF8 *LicenseDescriptionString   = UTF8_Format(UTF8String(" By using this software, you agree to the End User License Agreement %s,"), LicenseDescription);
-                    UTF8_WriteLine(stdout, LicenseDescriptionString);
-                }
-                
-                if (LicenseURL != NULL) {
-                    UTF8 *LicenseURLString   = UTF8_Format(UTF8String(" available at: %s\n"), LicenseURL);
-                    UTF8_WriteLine(stdout, LicenseURLString);
-                }
-            }
+            UTF32 *Banner32 = UTF32_Format(UTF32String("%U32s, v. %U32s by %U32s © %U32s, %U32s, %U32s"),
+                                               CLI->ProgramName        != NULL ? CLI->ProgramName        : PlatformIO_InvisibleString32,
+                                               CLI->ProgramVersion     != NULL ? CLI->ProgramVersion     : PlatformIO_InvisibleString32,
+                                               CLI->ProgramAuthor      != NULL ? CLI->ProgramAuthor      : PlatformIO_InvisibleString32,
+                                               CLI->ProgramCopyright   != NULL ? CLI->ProgramCopyright   : PlatformIO_InvisibleString32,
+                                               CLI->ProgramDescription != NULL ? CLI->ProgramDescription : PlatformIO_InvisibleString32,
+                                               License                 != NULL ? License                 : PlatformIO_InvisibleString32
+                                               );
+            UTF32_Deinit(License);
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+            UTF8 *Banner8 = UTF8_Encode(Banner32);
+            UTF8_WriteLine(stdout, Banner8);
+            UTF8_Deinit(Banner8);
+#elif  (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+            UTF16 *Banner16 = UTF16_Encode(Banner32);
+            UTF16_WriteLine(stdout, Banner16);
+            UTF16_Deinit(Banner16);
+#endif
+            UTF32_Deinit(Banner32);
         } else {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         }
     }
     
-    static UTF32 *ArgumentString2OptionFlag(FoundationIO_Immutable(UTF32 *) ArgumentString) {
+    static UTF32 *ArgumentString2OptionFlag(PlatformIO_Immutable(UTF32 *) ArgumentString) {
         UTF32 *ArgumentSwitch = NULL;
         if (ArgumentString != NULL) {
             uint8_t  ArgumentStringPrefixSize = 0;
@@ -496,9 +386,9 @@ extern "C" {
     
     uint64_t CommandLineIO_GetNumArguments(int argc) {
         uint64_t NumArguments = 0ULL;
-#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
         NumArguments          = (uint64_t) argc;
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
         NumArguments          = (uint64_t) __argc;
 #endif
         return NumArguments;
@@ -506,13 +396,13 @@ extern "C" {
     
     UTF32 **CommandLineIO_GetArgumentStringSet(void **Arguments) {
         UTF32 **StringSet               = NULL;
-#if   ((FoundationIOTargetOS & FoundationIOPOSIXOS) == FoundationIOPOSIXOS)
-#if   (FoundationIOLanguage == FoundationIOLanguageIsC)
-        StringSet                       = (UTF32**) UTF8_StringSet_Decode((UTF8**) Arguments);
-#elif (FoundationIOLanguage == FoundationIOLanguageIsCXX)
-        StringSet                       = (UTF32**) UTF8_StringSet_Decode(reinterpret_cast<FoundationIO_Immutable(UTF8 **)>(Arguments));
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+        StringSet                       = (UTF32**) UTF8_StringSet_Decode((PlatformIO_Immutable(UTF8**)) Arguments);
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+        StringSet                       = (UTF32**) UTF8_StringSet_Decode(reinterpret_cast<PlatformIO_Immutable(UTF8 **)>( const_cast<PlatformIO_Immutable(void **)>(Arguments)));
 #endif
-#elif (FoundationIOTargetOS == FoundationIOWindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
         uint64_t NumArguments           = (uint64_t) __argc;
         StringSet                       = UTF32_StringSet_Init(NumArguments);
         if (ArgumentArray != NULL) {
@@ -526,52 +416,145 @@ extern "C" {
         return StringSet;
     }
     
-    static void CommandLineIO_UTF32_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, FoundationIO_Immutable(UTF32 **) Arguments) {
-        if (CLI != NULL && CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions) {
-            uint64_t     CurrentArgument  = 1LL;
-            do {
-                UTF32   *Argument         = Arguments[CurrentArgument];
-                UTF32   *ArgumentFlag     = ArgumentString2OptionFlag(Argument);
-                
-                for (uint64_t Switch = 0ULL; Switch < CLI->NumOptions; Switch++) {
-                    if (UTF32_CompareSubString(ArgumentFlag, CLI->OptionIDs[Switch].Name, 0, 0) == Yes) {
-                        
-                        CLI->NumOptions   += 1;
-                        if (CLI->NumOptions == 1) {
-                            CLI->OptionIDs = (CommandLineOption*) calloc(1, sizeof(CommandLineOption));
-                        } else {
-                            CommandLineOption *Options_Old = CLI->OptionIDs;
-                            CLI->OptionIDs                 = (CommandLineOption*) realloc(CLI->OptionIDs, CLI->NumOptions * sizeof(CommandLineOption));
-                            if (CLI->OptionIDs != NULL) {
-                                free(Options_Old);
-                            } else {
-                                CLI->OptionIDs             = Options_Old;
-                                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Realloc failed"));
-                            }
-                        }
-                        CLI->OptionIDs[CLI->NumOptions - 1].OptionID = Switch;
-                        
-                        for (uint64_t ArgSlave = 1ULL; ArgSlave < CLI->OptionIDs[Switch].NumOptionSlaves; ArgSlave++) {
-                            UTF32 *PotentialSlaveArg        = Arguments[CurrentArgument + ArgSlave];
-                            for (uint64_t Slave = 0ULL; Slave < CLI->OptionIDs[Switch].NumOptionSlaves; Slave++) {
-                                UTF32 *PotentialSlaveFlag   = CLI->OptionIDs[CLI->OptionIDs[Switch].Slaves[Slave]].Name;
-                                
-                                if (UTF32_CompareSubString(PotentialSlaveArg, PotentialSlaveFlag, 0, 0) == Yes) {
-                                    
-                                    CLI->OptionIDs[CLI->NumOptions - 1].NumOptionSlaves += 1;
-                                    CLI->OptionIDs[CLI->NumOptions - 1].Slaves[CLI->OptionIDs[CLI->NumOptions - 1].NumOptionSlaves - 1] = CLI->OptionIDs[Switch].Slaves[Slave];
-                                }
-                                free(PotentialSlaveFlag);
-                            }
-                            free(PotentialSlaveArg);
-                        }
-                    } else {
-                        // Tell the user that their string wasn't found as a valid argument, or suggest a similar one, or support argument compaction automtically.
+    void CommandLineIO_Switch_SetName(CommandLineIO *CLI, uint64_t SwitchID, PlatformIO_Immutable(UTF32 *) Name) {
+        if (CLI != NULL && SwitchID < CLI->NumSwitches && Name != NULL) {
+            UTF32 *Normalized             = UTF32_Normalize(Name, NormalizationForm_KompatibleCompose);
+            UTF32 *CaseFolded             = UTF32_CaseFold(Normalized);
+            free(Normalized);
+            CLI->Switches[SwitchID].Name  = CaseFolded;
+        } else if (CLI == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+        } else if (Name == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Name String is NULL"));
+        } else if (SwitchID > CLI->NumSwitches) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
+        }
+    }
+    
+    void CommandLineIO_Switch_SetDescription(CommandLineIO *CLI, uint64_t SwitchID, PlatformIO_Immutable(UTF32 *) Description) {
+        if (CLI != NULL && Description != NULL && SwitchID < CLI->NumSwitches) {
+            UTF32 *Normalized                    = UTF32_Normalize(Description, NormalizationForm_KompatibleCompose);
+            UTF32 *CaseFolded                    = UTF32_CaseFold(Normalized);
+            free(Normalized);
+            CLI->Switches[SwitchID].Description  = CaseFolded;
+        } else if (CLI == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+        } else if (Description == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Description String is NULL"));
+        } else if (SwitchID > CLI->NumSwitches) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
+        }
+    }
+    
+    void CommandLineIO_Switch_SetChild(CommandLineIO *CLI, uint64_t ParentID, uint64_t ChildID) {
+        if (CLI != NULL && ParentID < CLI->NumSwitches && ChildID < CLI->NumSwitches) {
+            if (CLI->Switches[ParentID].SwitchType == SwitchType_Parent) {
+                CLI->Switches[ParentID].NumChildren       += 1;
+                uint64_t OLD_NumChildren                   = CLI->Switches[ParentID].NumChildren;
+                uint64_t *Children_OLD                     = CLI->Switches[ParentID].Children;
+                CLI->Switches[ParentID].Children           = (uint64_t*) realloc(CLI->Switches[ParentID].Children, CLI->Switches[ParentID].NumChildren * sizeof(CLI->Switches[ParentID].Children));
+                if (CLI->Switches[ParentID].Children != NULL) {
+                    free(Children_OLD);
+                } else {
+                    CLI->Switches[ParentID].Children       = Children_OLD;
+                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Realloc failed"));
+                }
+                CLI->Switches[ParentID].Children[OLD_NumChildren] = ChildID;
+            } else {
+                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("ParentID %lld can not have any slaves"), ParentID);
+            }
+        } else if (CLI == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+        } else if (ParentID > CLI->NumSwitches) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("ParentID %lld is invalid, it should be between 0 and %lld"), ParentID, CLI->NumSwitches);
+        } else if (ChildID > CLI->NumSwitches) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SlaveID %lld is invalid, it should be between 0 and %lld"), ChildID, CLI->NumSwitches);
+        }
+    }
+    
+    void CommandLineIO_Switch_SetType(CommandLineIO *CLI, uint64_t SwitchID, CommandLineIO_SwitchTypes SwitchType) {
+        if (CLI != NULL && SwitchType != SwitchType_Unknown && SwitchID < CLI->NumSwitches) {
+            CLI->Switches[SwitchID].SwitchType = SwitchType;
+        } else if (CLI == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+        } else if (SwitchType == SwitchType_Unknown) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("You can not set OptionID %lld to SwitchType_Unknown"), SwitchID);
+        } else if (SwitchID > CLI->NumSwitches) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
+        }
+    }
+    
+    void CommandLineIO_Switch_SetArgumentType(CommandLineIO *CLI, uint64_t SwitchID, CommandLineIO_SwitchArguments ArgumentType) {
+        /*
+         TODO: Parser - If there is Children, the Argument is after the Child
+         */
+        if (CLI != NULL && SwitchID < CLI->NumSwitches && ArgumentType != ArgumentType_Unknown) {
+            CLI->Switches[SwitchID].ArgumentType = ArgumentType;
+        } else if (CLI == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+        } else if (SwitchID > CLI->NumSwitches) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
+        } else if (ArgumentType == ArgumentType_Unknown) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("You can not set SwitchID %lld to ArgumentType_Unknown"), SwitchID);
+        }
+    }
+    
+    /*
+     Argc: 2
+     Argv: /Users/Marcus/Library/Developer/Xcode/DerivedData/ArgvTest-eafeawojmembowekykhmfyvegzvu/Build/Products/Debug/ArgvTest
+     Argv: --Input:LeftEye=Path
+     */
+    
+    /*
+     Argc: 7
+     Argv: /Users/Marcus/Library/Developer/Xcode/DerivedData/ArgvTest-eafeawojmembowekykhmfyvegzvu/Build/Products/Debug/ArgvTest
+     Argv: --
+     Argv: Input
+     Argv: :
+     Argv: LeftEye
+     Argv: =
+     Argv: Path
+     */
+    
+    static uint64_t CommandLineIO_UTF32_GetNumTokens(uint64_t NumArguments, PlatformIO_Immutable(UTF32 **) Arguments) {
+        uint64_t NumTokens = 0;
+        if (Arguments != NULL) {
+            // Loop over all the arguments, finding tokens
+            uint64_t *StringSizes = (uint64_t*) calloc(NumArguments, sizeof(uint64_t));
+            StringSizes           = UTF32_StringSet_GetStringSizesInCodePoints(Arguments);
+            for (uint64_t Argument = 1ULL; Argument < NumArguments - 1; Argument++) {
+                for (uint64_t CodePoint = 1ULL; CodePoint < StringSizes[Argument]; CodePoint++) {
+                    if (Arguments[Argument][CodePoint - 1] == UTF32Character('-') && Arguments[Argument][CodePoint] == UTF32Character('-')) { // "--" prefix
+                        NumTokens += 1;
+                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character('-') && Arguments[Argument][CodePoint] != UTF32Character('-')) { // "-" prefix?
+                        NumTokens += 1;
+                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character('/') && Arguments[Argument][CodePoint] != UTF32Character('/')) { // "/" prefix?
+                        NumTokens += 1;
+                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character('\\') && Arguments[Argument][CodePoint] != UTF32Character('\\')) { // "\" prefix?
+                        NumTokens += 1;
+                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character(' ')) { // " " seperator, we should normalize the spaces as well as the case
+                        NumTokens += 1;
+                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character('=')) { // "=" argument seperator?
+                        NumTokens += 1;
+                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character(':')) { // ":" Parent:Child seperator?
+                        NumTokens += 1;
                     }
                 }
-                free(Argument);
-                free(ArgumentFlag);
-            } while (CurrentArgument < NumArguments);
+            }
+        } else {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Arguments Pointer is NULL"));
+        }
+        return NumTokens;
+    }
+    
+    static void CommandLineIO_UTF32_TokenizeArguments(CommandLineIO *CLI, uint64_t NumArguments, PlatformIO_Immutable(UTF32 **) Arguments) {
+        if (CLI != NULL && Arguments != NULL) {
+            uint64_t NumTokens = CommandLineIO_UTF32_GetNumTokens(NumArguments, Arguments);
+            CLI->Tokens        = UTF32_StringSet_Init(NumTokens);
+            for (uint64_t Argument = 1ULL; Argument < NumArguments - 1; Argument++) {
+                
+                
+            }
         } else if (CLI == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
@@ -579,7 +562,87 @@ extern "C" {
         }
     }
     
-    void CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, FoundationIO_Immutable(UTF8 **) Arguments) {
+    static void CommandLineIO_UTF32_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, PlatformIO_Immutable(UTF32 **) Arguments) {
+        if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
+            uint64_t     CurrentArgument  = 1LL;
+            while (CurrentArgument < NumArguments) {
+                /*
+                 Game plan: Look for Switch introducers aka '--', '-', '/', then find a word that doesn't end with a Colon or space
+                 How do we handle Paths tho, Windows uses Colons to seperate the drive from the path, and POSIX uses '/' as a directory seperator, while windows uses the backslash to introduce switches.
+                 
+                 Well a drive letter on Windows is prefixed by a-zA-Z and followed by a '/' or '\'
+                 
+                 on POSIX a '/' is the first character or second of a path
+                 
+                 Windows style switch: "ren /?"
+                 Windows style path: "C:/Users"
+                 
+                 Paths in CommandLineIO need to be introduced with an equals or a space
+                 
+                 so look for "--", "-", "/", "\", then read until you hit a space or equals, then casefold that, then after it's been casefolded do a substring search, seeing if there are any switches that haven't been ruled out, then check if it matches the actual path.
+                 
+                 or maybe we should tokenize the Arguments first.
+                 
+                 how would tokenization work tho?
+                 
+                 the variable could be called Tokenized Arguments
+                 
+                 so the tokenization parameters are, a token break occurs at a space, colon, equals, or the supported switch introducers.
+                 
+                 so loop over all the arguments in argv, except argv[0]
+                 */
+                
+                
+                
+                
+                
+                
+                
+                UTF32   *Argument         = (UTF32*) Arguments[CurrentArgument];
+                UTF32   *ArgumentFlag     = ArgumentString2OptionFlag(Argument);
+                
+                for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
+                    if (UTF32_CompareSubString(ArgumentFlag, CLI->Switches[Switch].Name, 0, 0) == Yes) {
+                        
+                        CLI->NumOptions   += 1;
+                        if (CLI->NumOptions == 1) {
+                            CLI->Options   = (CommandLineOption*) calloc(1, sizeof(CommandLineOption));
+                        } else {
+                            CommandLineOption *Options_Old = CLI->Options;
+                            CLI->Options                   = (CommandLineOption*) realloc(CLI->Options, CLI->NumOptions * sizeof(CommandLineOption));
+                            if (CLI->Options != NULL) {
+                                free(Options_Old);
+                            } else {
+                                CLI->Options               = Options_Old;
+                                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Realloc failed"));
+                            }
+                        }
+                        CLI->Options[Switch].SwitchID      = Switch;
+                        
+                        for (uint64_t Child = 0ULL; Child < CLI->Options[Switch].NumChildren; Child++) {
+                            UTF32 *PotentialChildArg        = (UTF32 *) Arguments[CurrentArgument + Child];
+                            UTF32 *PotentialChildFlag       = CLI->Switches[Child].Name;
+                            if (UTF32_CompareSubString(PotentialChildArg, PotentialChildFlag, 0, 0) == Yes) {
+                                CLI->Switches[CLI->NumOptions - 1].NumChildren += 1;
+                                CLI->Switches[CLI->NumOptions - 1].Children[CLI->Switches[CLI->NumSwitches - 1].NumChildren - 1] = CLI->Switches[Switch].Children[Child];
+                            }
+                            free(PotentialChildArg);
+                        }
+                    } else {
+                        // Tell the user that their string wasn't found as a valid argument, or suggest a similar one, or support argument compaction automtically.
+                    }
+                }
+                free(Argument);
+                free(ArgumentFlag);
+            }
+        } else if (CLI == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+        } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
+        }
+    }
+    
+    void CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, PlatformIO_Immutable(UTF8 **) Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             UTF32 **Arguments32     = UTF32_StringSet_Init(NumArguments);
             for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
@@ -590,7 +653,7 @@ extern "C" {
                 free(CaseFolded);
                 Arguments32[Arg]    = Normalized;
             }
-            CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, Arguments32);
+            CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, (PlatformIO_Immutable(UTF32**)) Arguments32);
             for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
                 free(Arguments32[Arg]);
             }
@@ -598,11 +661,11 @@ extern "C" {
         } else if (CLI == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
-            CommandLineIO_DisplayHelp(CLI);
+            CommandLineIO_ShowHelp(CLI);
         }
     }
     
-    void CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, FoundationIO_Immutable(UTF16 **) Arguments) {
+    void CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, PlatformIO_Immutable(UTF16 **) Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             UTF32 **Arguments32     = UTF32_StringSet_Init(NumArguments);
             for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
@@ -613,7 +676,7 @@ extern "C" {
                 free(CaseFolded);
                 Arguments32[Arg]    = Normalized;
             }
-            CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, Arguments32);
+            CommandLineIO_UTF32_ParseOptions(CLI, NumArguments, (PlatformIO_Immutable(UTF32 **)) Arguments32);
             for (uint64_t Arg = 0ULL; Arg < NumArguments; Arg++) {
                 free(Arguments32[Arg]);
             }
@@ -621,73 +684,166 @@ extern "C" {
         } else if (CLI == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
-            CommandLineIO_DisplayHelp(CLI);
+            CommandLineIO_ShowHelp(CLI);
         }
     }
     
-    uint64_t CommandLineIO_GetNumMatchingOptions(CommandLineIO *CLI, uint64_t OptionID, uint64_t NumSlaves, uint64_t *SlaveIDs) {
-        uint64_t NumMatchingOptions = 0LL;
-        if (CLI != NULL && OptionID <= CLI->NumOptions - 1 && NumSlaves < CLI->NumOptions) {
-            for (uint64_t Option = 0ULL; Option <= CLI->NumOptions; Option++) {
-                if (CLI->OptionIDs[Option].OptionID == OptionID) {
-                    if (NumSlaves == 0) {
-                        NumMatchingOptions               += 1;
-                    } else if (NumSlaves > 0 && CLI->OptionIDs[Option].NumOptionSlaves > 0) {
-                        for (uint64_t ParamSlave = 0ULL; ParamSlave < NumSlaves; ParamSlave++) {
-                            for (uint64_t OptionSlave = 0ULL; OptionSlave < CLI->OptionIDs[Option].NumOptionSlaves; OptionSlave++) {
-                                if (SlaveIDs[ParamSlave] == CLI->OptionIDs[Option].Slaves[OptionSlave]) {
-                                    NumMatchingOptions   += 1;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
-        } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
-        } else if (NumSlaves > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("NumSlaves %lld is invalid, it should be between 0 and %lld"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
+    static void CommandLineIO_Error(CommandLineIO *CLI) {
+        if (CLI != NULL) {
+            /*
+             How do we handle erroring?
+             
+             We can generate some errors ourselves, like f a required switch isn't present, or something doesn't match our syntax, but for more complex things the user will just have to log.
+             
+             and on second thought I think that's ok
+             
+             Make sure all mandatory options are present, and a bunch of other stuff
+             */
+        } else {
+            Log(Severity_USER, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         }
-        return NumMatchingOptions;
     }
     
-    uint64_t CommandLineIO_GetOptionNum(CommandLineIO *CLI, uint64_t OptionID, uint64_t NumSlaves, uint64_t *SlaveIDs) {
-        uint64_t MatchingOption = -1LL;
-        if (CLI != NULL && OptionID <= CLI->NumOptions - 1 && NumSlaves <= CLI->NumOptions - 1) {
-            bool AllOptionsMatch   = No;
+    /*
+     
+     After we parse the Options from the tokens, we need to provide an API for users of ComandLineIO to query Arguments.
+     
+     Which makes sense, but what all information could a user want to know?
+     
+     theres a few status things users may be interested in, like is there an option that contains switch X? (also we should have required switches so we can automatically error)
+     
+     May CommandLineIO_Query, nahh that's too webbitch
+     
+     CommandLineIO_Option_Exists, and that's a simple bool for the return, it takes a SwitchID and any number of ChildIDs and sees if there's an option that matches that criteria
+     
+     Now we can have the API serve a dual purpose, where the function returns either the OptionID that matches the criteria if it exists, or an invalid value if it doesn't
+     
+     so CommandLineIO_Option_Exists should be CommandLineIO_Option_GetOptionID(CLI, SwitchID, NumChildren, Children[])
+     
+     */
+    
+    uint64_t CommandLineIO_Option_GetOptionID(CommandLineIO *CLI, uint64_t SwitchID, uint64_t NumChildren, uint64_t *ChildIDs) {
+        uint64_t OptionID = 0xFFFFFFFFFFFFFFFF;
+        if (CLI != NULL || (NumChildren > 1 && ChildIDs != NULL)) {
             for (uint64_t Option = 0ULL; Option < CLI->NumOptions; Option++) {
-                if (CLI->OptionIDs[Option].OptionID == OptionID) {
-                    if (NumSlaves == 0 && CLI->OptionIDs[Option].NumOptionSlaves == 0) {
-                        AllOptionsMatch       = Yes;
-                        MatchingOption        = Option;
-                    } else {
-                        for (uint64_t ParamSlave = 0ULL; ParamSlave < NumSlaves; ParamSlave++) {
-                            for (uint64_t OptionSlave = 0ULL; OptionSlave < CLI->OptionIDs[Option].NumOptionSlaves; OptionSlave++) {
-                                if (SlaveIDs[ParamSlave] == CLI->OptionIDs[Option].Slaves[OptionSlave]) {
+                if (SwitchID == CLI->Options[Option].SwitchID) {
+                    if (NumChildren > 0 && (CLI->Switches[CLI->Options[Option].SwitchID].Status & SwitchType_Required) == SwitchType_Required) {
+                        
+                        // ok so the logic is: if there are param children, we need to see if the option contains children, if it does not that may be an error so check if the child is required, if it's not then whatever, if it is error
+                        uint64_t OptionChild = 0ULL;
+                        uint64_t ParamChild  = 0ULL;
+                        
+                        while (OptionChild < CLI->Options[Option].NumChildren && ParamChild < NumChildren) {
+                            // ok so what do we do?
+                            
+                            OptionChild += 1;
+                            ParamChild  += 1;
+                        }
+                        
+                        /*
+                        Old nonsense incase of hidden gems:
+                         
+                        bool AllOptionsMatch   = No;
+                        for (uint64_t Option = 0ULL; Option < CLI->NumOptions; Option++) {
+                            if (CLI->OptionIDs[Option].OptionID == OptionID) {
+                                if (NumSlaves == 0 && CLI->OptionIDs[Option].NumOptionSlaves == 0) {
                                     AllOptionsMatch       = Yes;
                                     MatchingOption        = Option;
+                                } else {
+                                    for (uint64_t ParamSlave = 0ULL; ParamSlave < NumSlaves; ParamSlave++) {
+                                        for (uint64_t OptionSlave = 0ULL; OptionSlave < CLI->OptionIDs[Option].NumOptionSlaves; OptionSlave++) {
+                                            if (SlaveIDs[ParamSlave] == CLI->OptionIDs[Option].Slaves[OptionSlave]) {
+                                                AllOptionsMatch       = Yes;
+                                                MatchingOption        = Option;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
+                         */
                     }
                 }
             }
         } else if (CLI == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
-        } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), OptionID, CLI->NumOptions - 1);
-        } else if (NumSlaves > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("NumSlaves %lld is invalid, it should be between 0 and %lld"), NumSlaves, CLI->OptionIDs[OptionID].NumOptionSlaves - 1);
         }
-        return MatchingOption;
+        return OptionID;
+    }
+    
+    int8_t CommandLineIO_ConvertBoolString(CommandLineIO *CLI, uint64_t OptionID) {
+        int8_t Value = -1;
+        if (CLI != NULL && OptionID < CLI->NumOptions) {
+            switch (CLI->Options[OptionID].Argument[0]) {
+                case U'0':
+                    Value = 0;
+                    break;
+                case U'1':
+                    Value = 1;
+                    break;
+                case U'N':
+                case U'n':
+                    // check for the rest of No
+                    if (CLI->Options[OptionID].Argument[1] != PlatformIO_NULLTerminator &&
+                        (CLI->Options[OptionID].Argument[1] == UTF32Character('O') || CLI->Options[OptionID].Argument[1] == UTF32Character('o'))) {
+                        Value = 0;
+                    }
+                    break;
+                case U'Y':
+                case U'y':
+                    // check for the rest of Yes
+                    if (CLI->Options[OptionID].Argument[1] != PlatformIO_NULLTerminator &&
+                        (CLI->Options[OptionID].Argument[1] == UTF32Character('E') || CLI->Options[OptionID].Argument[1] == UTF32Character('e'))) {
+                        if (CLI->Options[OptionID].Argument[2] != PlatformIO_NULLTerminator &&
+                            (CLI->Options[OptionID].Argument[2] == UTF32Character('S') || CLI->Options[OptionID].Argument[2] == UTF32Character('s'))) {
+                            Value = 1;
+                        }
+                    }
+                    break;
+                case U'T':
+                case U't':
+                    // check for the rest of True
+                    if (CLI->Options[OptionID].Argument[1] != PlatformIO_NULLTerminator &&
+                        (CLI->Options[OptionID].Argument[1] == UTF32Character('R') || CLI->Options[OptionID].Argument[1] == UTF32Character('r'))) {
+                        if (CLI->Options[OptionID].Argument[2] != PlatformIO_NULLTerminator &&
+                            (CLI->Options[OptionID].Argument[2] == UTF32Character('U') || CLI->Options[OptionID].Argument[2] == UTF32Character('u'))) {
+                            if (CLI->Options[OptionID].Argument[3] != PlatformIO_NULLTerminator &&
+                                (CLI->Options[OptionID].Argument[3] == UTF32Character('E') || CLI->Options[OptionID].Argument[3] == UTF32Character('E'))) {
+                                Value = 1;
+                            }
+                        }
+                    }
+                    break;
+                case U'F':
+                case U'f':
+                    // check for the rest of False
+                    if (CLI->Options[OptionID].Argument[1] != PlatformIO_NULLTerminator &&
+                        (CLI->Options[OptionID].Argument[1] == UTF32Character('A') || CLI->Options[OptionID].Argument[1] == UTF32Character('a'))) {
+                        if (CLI->Options[OptionID].Argument[2] != PlatformIO_NULLTerminator &&
+                            (CLI->Options[OptionID].Argument[2] == UTF32Character('L') || CLI->Options[OptionID].Argument[2] == UTF32Character('l'))) {
+                            if (CLI->Options[OptionID].Argument[3] != PlatformIO_NULLTerminator &&
+                                (CLI->Options[OptionID].Argument[3] == UTF32Character('S') || CLI->Options[OptionID].Argument[3] == UTF32Character('s'))) {
+                                if (CLI->Options[OptionID].Argument[3] != PlatformIO_NULLTerminator &&
+                                    (CLI->Options[OptionID].Argument[3] == UTF32Character('E') || CLI->Options[OptionID].Argument[3] == UTF32Character('E'))) {
+                                    Value = 0;
+                                }
+                            }
+                        }
+                    }
+                    break;
+            }
+        } else if (CLI == NULL) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+        } else if (OptionID >= CLI->NumOptions) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OptionID: %llu is invalid"), OptionID);
+        }
+        return Value;
     }
     
     UTF8 *CommandLineIO_UTF8_GetOptionResult(CommandLineIO *CLI, uint64_t OptionID) {
         UTF8 *Result = NULL;
         if (CLI != NULL && OptionID <= CLI->NumOptions - 1) {
-            Result = UTF8_Encode(CLI->OptionIDs[OptionID].Argument);
+            Result = UTF8_Encode(CLI->Options[OptionID].Argument);
         } else if (CLI == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
@@ -699,7 +855,7 @@ extern "C" {
     UTF16 *CommandLineIO_UTF16_GetOptionResult(CommandLineIO *CLI, uint64_t OptionID) {
         UTF16 *Result = NULL;
         if (CLI != NULL && OptionID <= CLI->NumOptions - 1) {
-            Result = UTF16_Encode(CLI->OptionIDs[OptionID].Argument);
+            Result = UTF16_Encode(CLI->Options[OptionID].Argument);
         } else if (CLI == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
@@ -708,60 +864,7 @@ extern "C" {
         return Result;
     }
     
-    static UTF32 *CommandLineIO_UTF32_GetExtension(FoundationIO_Immutable(UTF32 *) Path) {
-        UTF32 *Extension = NULL;
-        if (Path != NULL) {
-            uint64_t StringSize    = UTF32_GetStringSizeInCodePoints(Path);
-            uint64_t ExtensionSize = 0ULL;
-            for (uint64_t CodePoint = StringSize; CodePoint > 0; CodePoint--) {
-                if (Path[CodePoint] == UTF32Character('.')) {
-                    ExtensionSize  = CodePoint - StringSize;
-                }
-            }
-            Extension              = UTF32_Init(ExtensionSize);
-            if (Extension != NULL) {
-                for (uint64_t ExtCodePoint = 0ULL; ExtCodePoint < ExtensionSize; ExtCodePoint++) {
-                    for (uint64_t PathCodePoint = StringSize - ExtensionSize; PathCodePoint < StringSize; PathCodePoint++) {
-                        Extension[ExtCodePoint] = Path[PathCodePoint];
-                    }
-                }
-            } else {
-                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate %lld codepoints for the Extension"), ExtensionSize);
-            }
-        } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Path Pointer is NULL"));
-        }
-        return Extension;
-    }
-    
-    UTF8 *CommandLineIO_UTF8_GetExtension(FoundationIO_Immutable(UTF8 *) Path) {
-        UTF8 *Extension = NULL;
-        if (Path != NULL) {
-            UTF32 *Decoded     = UTF8_Decode(Path);
-            UTF32 *Extension32 = CommandLineIO_UTF32_GetExtension(Decoded);
-            free(Decoded);
-            Extension          = UTF8_Encode(Extension32);
-        } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Path Pointer is NULL"));
-        }
-        return Extension;
-    }
-    
-    UTF16 *CommandLineIO_UTF16_GetExtension(FoundationIO_Immutable(UTF16 *) Path) {
-        UTF16 *Extension       = NULL;
-        if (Path != NULL) {
-            UTF32 *Decoded     = UTF16_Decode(Path);
-            UTF32 *Extension32 = CommandLineIO_UTF32_GetExtension(Decoded);
-            free(Decoded);
-            Extension          = UTF16_Encode(Extension32);
-            free(Extension32);
-        } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Path Pointer is NULL"));
-        }
-        return Extension;
-    }
-    
-    UTF8 *CommandLineIO_UTF8_Colorize(FoundationIO_Immutable(UTF8 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
+    UTF8 *CommandLineIO_UTF8_Colorize(PlatformIO_Immutable(UTF8 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
         UTF8 *Colorized    = NULL;
         UTF32 *String32    = UTF8_Decode(String);
         UTF32 *Colorized32 = CommandLineIO_UTF32_Colorize(String32, ColorType, Red, Green, Blue);
@@ -771,7 +874,7 @@ extern "C" {
         return Colorized;
     }
     
-    UTF16 *CommandLineIO_UTF16_Colorize(FoundationIO_Immutable(UTF16 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
+    UTF16 *CommandLineIO_UTF16_Colorize(PlatformIO_Immutable(UTF16 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
         UTF16 *Colorized   = NULL;
         UTF32 *String32    = UTF16_Decode(String);
         UTF32 *Colorized32 = CommandLineIO_UTF32_Colorize(String32, ColorType, Red, Green, Blue);
@@ -781,7 +884,7 @@ extern "C" {
         return Colorized;
     }
     
-    UTF32 *CommandLineIO_UTF32_Colorize(FoundationIO_Immutable(UTF32 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
+    UTF32 *CommandLineIO_UTF32_Colorize(PlatformIO_Immutable(UTF32 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
         UTF32 *Colorized = NULL;
         uint8_t DigitSize = 0;
         DigitSize       += Logarithm(10, Red);
@@ -806,7 +909,7 @@ extern "C" {
         return Colorized;
     }
     
-    UTF8 *CommandLineIO_UTF8_Decolorize(FoundationIO_Immutable(UTF8 *) String) {
+    UTF8 *CommandLineIO_UTF8_Decolorize(PlatformIO_Immutable(UTF8 *) String) {
         UTF8  *Decolorized   = NULL;
         UTF32 *String32      = UTF8_Decode(String);
         UTF32 *Decolorized32 = CommandLineIO_UTF32_Decolorize(String32);
@@ -816,7 +919,7 @@ extern "C" {
         return Decolorized;
     }
     
-    UTF16 *CommandLineIO_UTF16_Decolorize(FoundationIO_Immutable(UTF16 *) String) {
+    UTF16 *CommandLineIO_UTF16_Decolorize(PlatformIO_Immutable(UTF16 *) String) {
         UTF16 *Decolorized   = NULL;
         UTF32 *String32      = UTF16_Decode(String);
         UTF32 *Decolorized32 = CommandLineIO_UTF32_Decolorize(String32);
@@ -826,12 +929,12 @@ extern "C" {
         return Decolorized;
     }
     
-    UTF32 *CommandLineIO_UTF32_Decolorize(FoundationIO_Immutable(UTF32 *) String) {
+    UTF32 *CommandLineIO_UTF32_Decolorize(PlatformIO_Immutable(UTF32 *) String) {
         UTF32    *Decolorized          = NULL;
         uint64_t  EscapeSequenceSize   = 0;
         uint64_t  EscapeSequenceOffset = 0;
         uint64_t  CodePoint            = 0;
-        while (String[CodePoint] != FoundationIONULLTerminator) {
+        while (String[CodePoint] != PlatformIO_NULLTerminator) {
             if (String[CodePoint] == UTF32Character('\x1B')) {
                 EscapeSequenceOffset   = CodePoint;
                 EscapeSequenceSize    += 1;
@@ -850,12 +953,12 @@ extern "C" {
     void CommandLineIO_Deinit(CommandLineIO *CLI) {
         if (CLI != NULL) {
             for (uint64_t Option = 0ULL; Option < CLI->NumOptions; Option++) {
-                free(CLI->OptionIDs[Option].Name);
-                free(CLI->OptionIDs[Option].Description);
-                free(CLI->OptionIDs[Option].Slaves);
-                free(CLI->OptionIDs[Option].Argument);
+                free(CLI->Switches[Option].Name);
+                free(CLI->Switches[Option].Description);
+                free(CLI->Switches[Option].Children);
+                free(CLI->Switches[Option].Argument);
             }
-            free(CLI->OptionIDs);
+            free(CLI->Switches);
             free(CLI->ProgramName);
             free(CLI->ProgramAuthor);
             free(CLI->ProgramDescription);
@@ -870,6 +973,6 @@ extern "C" {
         }
     }
     
-#if (FoundationIOLanguage == FoundationIOLanguageIsCXX)
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif
