@@ -206,6 +206,7 @@ ${CMAKE_C_FLAGS} \
 -fshort-enums \
 -funroll-loops \
 -funsigned-char \
+-fanalyzer
 -std=c2x \
 -Wall \
 -Wextra \
