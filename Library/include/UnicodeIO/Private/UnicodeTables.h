@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-#define ScriptHash 79ce869dd953fe2aaee6a5e08a97cb30ce4b514f
+#define ScriptHash f3928f2639a922eee8604595e2608da7617e8db1
 
 #define UnicodeVersion 13.0.0
 
