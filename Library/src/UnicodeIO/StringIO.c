@@ -2088,9 +2088,9 @@ extern "C" {
             uint64_t CodePoint                   = 0ULL;
             while (String[CodePoint] != PlatformIO_NULLTerminator) {
                 for (uint64_t Index = 0ULL; Index < CaseFoldTableSize; Index++) {
-                    if (String[CodePoint] == CaseFoldCodePoints[Index]) {
+                    if (String[CodePoint] == CaseFoldTable[Index][0][0]) {
                         uint64_t ReplacementSize = UTF32_GetStringSizeInCodePoints(String);
-                        CaseFoldedString         = UTF32_SubstituteSubString(String, CaseFoldStringSet[Index], CodePoint, ReplacementSize);
+                        CaseFoldedString         = UTF32_SubstituteSubString(String, CaseFoldTable[Index][1], CodePoint, ReplacementSize);
                     }
                 }
                 CodePoint += 1;
@@ -2192,14 +2192,14 @@ extern "C" {
             while (String[CodePoint] != PlatformIO_NULLTerminator) {
                 if (Kompatibility == Yes) {
                     for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
-                        if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
-                            ComposedString = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(KompatibleNormalizationStringSet[Index]), CodePoint, 1);
+                        if (String[CodePoint] == KompatibleNormalizationTable[Index][0][0]) { // codepoint stored as a string
+                            ComposedString = UTF32_SubstituteSubString(String, KompatibleNormalizationTable[Index][1], CodePoint, 1);
                         }
                     }
                 } else {
                     for (uint64_t DecomposeCodePoint = 0ULL; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
-                        if (String[CodePoint] == CanonicalNormalizationCodePoints[DecomposeCodePoint]) {
-                            ComposedString = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(CanonicalNormalizationStringSet[DecomposeCodePoint]), CodePoint, 1);
+                        if (String[CodePoint] == CanonicalNormalizationTable[DecomposeCodePoint][0][0]) {
+                            ComposedString = UTF32_SubstituteSubString(String, CanonicalNormalizationTable[DecomposeCodePoint][1], CodePoint, 1);
                         }
                     }
                 }
@@ -2219,14 +2219,14 @@ extern "C" {
             while (String[CodePoint] != PlatformIO_NULLTerminator) {
                 if (Kompatibility == Yes) {
                     for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
-                        if (String[CodePoint] == KompatibleNormalizationCodePoints[Index]) {
-                            Decomposed = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(KompatibleNormalizationStringSet[Index]), CodePoint, 1);
+                        if (String[CodePoint] == KompatibleNormalizationTable[Index][0][0]) {
+                            Decomposed = UTF32_SubstituteSubString(String, CanonicalNormalizationTable[Index][1], CodePoint, 1);
                         }
                     }
                 } else {
                     for (uint64_t Index = 0ULL; Index < CanonicalNormalizationTableSize; Index++) {
-                        if (String[CodePoint] == CanonicalNormalizationCodePoints[Index]) {
-                            Decomposed = UTF32_SubstituteSubString(String, UTF32_MakeStringMutable(CanonicalNormalizationStringSet[Index]), CodePoint, 1);
+                        if (String[CodePoint] == CanonicalNormalizationTable[Index][0][0]) {
+                            Decomposed = UTF32_SubstituteSubString(String, CanonicalNormalizationTable[Index][1], CodePoint, 1);
                         }
                     }
                 }
@@ -2609,8 +2609,8 @@ extern "C" {
             StringSize           += 7; // FIXME: ???
         }
         
-        NumDigitsExponent         = Exponentiate(Radix, Exponent2);
-        NumDigitsMantissa         = Exponentiate(Radix, Mantissa2);
+        NumDigitsExponent         = (uint8_t) Exponentiate(Radix, Exponent2);
+        NumDigitsMantissa         = (uint8_t) Exponentiate(Radix, Mantissa2);
         
         StringSize       += NumDigitsExponent + NumDigitsMantissa;
         
