@@ -45,7 +45,7 @@
     <ClInclude Include="..\Library\include\UnicodeIO\LogIO.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\Private\UnicodeTables.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\StringIO.h" />
-    <ClInclude Include="..\Library\include\UnicodeIO\UnicodeTypes.h" />
+    <ClInclude Include="..\Library\include\UnicodeIO\UnicodeIOTypes.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
