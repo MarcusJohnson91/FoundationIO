@@ -324,7 +324,7 @@ extern "C" {
 #endif
     
 #ifndef             PlatformIO_Socket_Read
-#define             PlatformIO_Socket_Read(Socket2Read, Buffer2Write, NumBytes)              read(Socket2Read, Buffer2Write, NumBytes)
+#define             PlatformIO_Socket_Read(Socket2Read, Buffer2Write, NumBytes)              ReadFile(Socket2Read, Buffer2Write, NumBytes, )
 #endif
     
 #ifndef             PlatformIO_Socket_Write
@@ -480,9 +480,9 @@ extern "C" {
 #define             PlatformIO_MakeStringSet(StringSetSize, ...) {__VA_ARGS__,};
 #endif
     
-    uint64_t        PlatformOS_GetNumCPUCores(void);
+    uint64_t        PlatformIO_GetNumCPUCores(void);
     
-    uint64_t        PlatformOS_GetTotalMemoryInBytes(void);
+    uint64_t        PlatformIO_GetTotalMemoryInBytes(void);
     
 #ifdef __cplusplus
 }

@@ -33,40 +33,40 @@ extern "C" {
     typedef struct    Entropy Entropy;
     
     /*!
-     @abstract                             "Creates an Entropy container for generating random numbers".
-     @param           EntropyPoolSize      "The amount of random data to contain in bytes".
-     @return                               "Returns the newly created entropy".
+     @abstract                              Creates an Entropy container for generating random numbers.
+     @param           EntropyPoolSize       The amount of random data to contain in bytes.
+     @return                                Returns the newly created entropy.
      */
     Entropy          *Entropy_Init(uint64_t EntropyPoolSize);
     
     /*!
-     @abstract                             "The number of bits of entropy available".
-     @param           Random               "The Entropy pointer".
-     @return                               "Returns the the amount of entropy in bits".
+     @abstract                              The number of bits of entropy available.
+     @param           Random                The Entropy pointer.
+     @return                                Returns the the amount of entropy in bits.
      */
     uint64_t          Entropy_GetRemainingEntropy(Entropy *Random);
     
     /*!
-     @abstract                             "Generates an integer occupying NumBits".
-     @param           Random               "The Entropy pointer".
-     @param           NumBits              "The number of bits for the integer to take up, between 1 and 64".
-     @return                               "Returns an integer matching those characteristics".
+     @abstract                              Generates an integer occupying NumBits.
+     @param           Random                The Entropy pointer.
+     @param           NumBits               The number of bits for the integer to take up, between 1 and 64.
+     @return                                Returns an integer matching those characteristics.
      */
     int64_t           Entropy_GenerateInteger(Entropy *Random, uint8_t NumBits);
     
     /*!
-     @abstract                             "Generates an integer between MinValue and MaxValue, inclusive".
-     @param           Random               "The Entropy pointer".
-     @param           MinValue             "The minimum valid value in the range, inclusive".
-     @param           MaxValue             "The maximum valud value in the range, inclusive".
-     @return                               "Returns an integer matching those characteristics".
+     @abstract                              Generates an integer between MinValue and MaxValue, inclusive.
+     @param           Random                The Entropy pointer.
+     @param           MinValue              The minimum valid value in the range, inclusive.
+     @param           MaxValue              The maximum valud value in the range, inclusive.
+     @return                                Returns an integer matching those characteristics.
      */
     int64_t           Entropy_GenerateIntegerInRange(Entropy *Random, int64_t MinValue, int64_t MaxValue);
     
     /*!
-     @abstract                             "Generates a Decimal".
-     @param           Random               "The Entropy pointer".
-     @return                               "Returns the generated decimal".
+     @abstract                              Generates a Decimal.
+     @param           Random                The Entropy pointer.
+     @return                                Returns the generated decimal.
      */
     double            Entropy_GenerateDecimal(Entropy *Random);
     
@@ -79,8 +79,8 @@ extern "C" {
     uint8_t           Entropy_Erase(Entropy *Random, uint8_t NewValue);
     
     /*!
-     @abstract                             "The number of bits of entropy available".
-     @param           Random               "The Entropy pointer".
+     @abstract                              The number of bits of entropy available.
+     @param           Random                The Entropy pointer.
      */
     void              Entropy_Deinit(Entropy *Random);
     

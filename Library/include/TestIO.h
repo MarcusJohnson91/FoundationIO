@@ -21,10 +21,10 @@ extern "C" {
     
     /*!
      @enum                      TestIO_TestStates
-     @abstract                                                  "Defines the state of each test".
-     @constant                  TestState_Unknown               "Invalid state".
-     @constant                  TestState_Enabled               "The test is enabled".
-     @constant                  TestState_Disabled              "The test is disabled".
+     @abstract                                                   Defines the state of each test.
+     @constant                  TestState_Unknown                Invalid state.
+     @constant                  TestState_Enabled                The test is enabled.
+     @constant                  TestState_Disabled               The test is disabled.
      */
     typedef enum TestIO_TestStates {
                                 TestState_Unknown               = 0,
@@ -34,11 +34,11 @@ extern "C" {
     
     /*!
      @enum                      TestIO_TestResults
-     @abstract                                                  "Defines the result of each test".
-     @constant                  TestResult_Unknown              "Invalid state".
-     @constant                  TestResult_Passed               "The test is enabled".
-     @constant                  TestResult_Failed               "The test is disabled".
-     @constant                  TestResult_Untested             "The test wasn't ran".
+     @abstract                                                   Defines the result of each test.
+     @constant                  TestResult_Unknown               Invalid state.
+     @constant                  TestResult_Passed                The test is enabled.
+     @constant                  TestResult_Failed                The test is disabled.
+     @constant                  TestResult_Untested              The test wasn't ran.
      */
     typedef enum TestIO_TestResults {
                                 TestResult_Unknown              = 0,
@@ -60,19 +60,19 @@ extern "C" {
 #endif
     
     /*!
-     @abstract                                                  "Gets how accurate the clock is".
+     @abstract                                                   Gets how accurate the clock is.
      */
     uint64_t                    GetTimerFrequency(void);
     
     /*!
-     @abstract                                                  "Gets the time from the highest frequency timer for each platform".
+     @abstract                                                   Gets the time from the highest frequency timer for each platform.
      */
     uint64_t                    GetTime_Elapsed(void);
     
     /*!
-     @abstract                                                  "Generates a valid UTF-32 string, containing up to 8192 CodePoints".
-     @param                     Random                          "Pointer to an instance of Entropy, from CryptographyIO".
-     @param                     NumCodePoints                   "The number of CodePoints, for the String's size".
+     @abstract                                                   Generates a valid UTF-32 string, containing up to 8192 CodePoints.
+     @param                     Random                           Pointer to an instance of Entropy, from CryptographyIO.
+     @param                     NumCodePoints                    The number of CodePoints, for the String's size.
      */
     UTF32                      *UTF32_GenerateString(Entropy *Random, uint64_t NumCodePoints);
     

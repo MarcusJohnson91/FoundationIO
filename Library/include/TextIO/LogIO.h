@@ -20,8 +20,8 @@ extern "C" {
     
     /*!
      @enum                      LogIO_Severities
-     @constant                  Log_DEBUG                       "A internal error happened because there's a bug".
-     @constant                  Log_USER                        "An error occured because the user misused something".
+     @constant                  Log_DEBUG                        A internal error happened because there's a bug.
+     @constant                  Log_USER                         An error occured because the user misused something.
      */
     typedef enum LogIO_Severities {
                                 Severity_DEBUG                  = 1,
@@ -29,28 +29,28 @@ extern "C" {
     } LogIO_Severities;
     
     /*!
-     @abstract                                                  "Sets the name or path of the program to give the logs more context".
-     @param                     ProgramName                     "String containing either the name or the path of the program that this library was linked into".
+     @abstract                                                   Sets the name or path of the program to give the logs more context.
+     @param                     ProgramName                      String containing either the name or the path of the program that this library was linked into.
      */
     extern void                 Log_SetProgramName(PlatformIO_Immutable(UTF8 *) ProgramName);
     
     /*!
-     @abstract                                                  "Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in LogFile".
-     @param                     LogFilePath                     "Path to the log file to open/create".
+     @abstract                                                   Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in LogFile.
+     @param                     LogFilePath                      Path to the log file to open/create.
      */
     extern void                 Log_UTF8_OpenFile(PlatformIO_Immutable(UTF8 *) LogFilePath);
     
     /*!
-     @abstract                                                  "Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in LogFile".
-     @param                     LogFilePath                     "Path to the log file to open/create".
+     @abstract                                                   Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in LogFile.
+     @param                     LogFilePath                      Path to the log file to open/create.
      */
     extern void                 Log_UTF16_OpenFile(PlatformIO_Immutable(UTF16 *)LogFilePath);
     
     /*!
-     @abstract                                                  "Logs to the LogFile, which can be a user specified path, otherwise it's STDERR".
-     @param                     Severity                        "Any of the types provided by LogIO_Severities".
-     @param                     FunctionName                    "Which function is calling Log?".
-     @param                     Description                     "String describing what went wrong".
+     @abstract                                                   Logs to the LogFile, which can be a user specified path, otherwise it's STDERR.
+     @param                     Severity                         Any of the types provided by LogIO_Severities.
+     @param                     FunctionName                     Which function is calling Log?
+     @param                     Description                      String describing what went wrong.
      */
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
     void                        Log(LogIO_Severities Severity, PlatformIO_Immutable(UTF8 *) FunctionName, PlatformIO_Immutable(UTF8 *) Description, ...) __attribute__((__format__(__printf__, 3, 4)));
@@ -66,7 +66,7 @@ extern "C" {
 #endif /* Compiler */
     
     /*!
-     @abstract                                                  "Closes the LogFile".
+     @abstract                                                   Closes the LogFile.
      */
     void                        Log_Deinit(void);
     

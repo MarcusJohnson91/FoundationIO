@@ -19,6 +19,19 @@ extern "C" {
 #endif
     
     /*
+     Our localization resources will not be a bundle, we'll use an XML file to contain all strings and their localized equilivents
+     So let's say we want to Localize FoundationIO's logs.
+     and the user accidently dereferenced a NULL pointer.
+     
+     the English string is u8"%s Pointer is NULL" where %s is the name of the variable.
+     
+     We'll call that base string by an Enum, the Enum name would be NULLPointerDereference, and it's value would be 386
+     the localized Logging function would take the Enum value as well as the current Language setting, and look up the translated string in the XML file.
+     
+     
+     */
+    
+    /*
      Windows appears to use ISO 639-2, Mac appears to use a mix of ISO-639 1 and 2.
      */
     
