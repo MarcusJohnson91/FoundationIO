@@ -2185,57 +2185,64 @@ extern "C" {
         return NULL;
     }
     
-    static UTF32 *UTF32_Compose(PlatformIO_Immutable(UTF32 *) String, bool Kompatibility) { // FIXME: Must use a stable sorting algorithm
+    static UTF32 *UTF32_Compose(PlatformIO_Immutable(UTF32 *) String, StringIO_NormalizationForms CompositionType) { // FIXME: Must use a stable sorting algorithm
         uint64_t CodePoint      = 0ULL;
         UTF32   *ComposedString = NULL;
-        if (String != NULL && (Kompatibility == No || Kompatibility == Yes)) {
-            while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                if (Kompatibility == Yes) {
-                    for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
-                        if (String[CodePoint] == KompatibleNormalizationTable[Index][0][0]) { // codepoint stored as a string
-                            ComposedString = UTF32_SubstituteSubString(String, KompatibleNormalizationTable[Index][1], CodePoint, 1);
+        if (String != NULL && (CompositionType == NormalizationForm_CanonicalCompose || CompositionType == NormalizationForm_KompatibleCompose)) {
+            if (CompositionType == NormalizationForm_CanonicalCompose) {
+                while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                    for (uint64_t ComposeCodePoint = 0ULL; ComposeCodePoint < CanonicalNormalizationTableSize; ComposeCodePoint++) {
+                        if (String[CodePoint] == CanonicalNormalizationTable[ComposeCodePoint][0][0]) {
+                            ComposedString = UTF32_SubstituteSubString(String, CanonicalNormalizationTable[ComposeCodePoint][1], CodePoint, 1);
                         }
                     }
-                } else {
-                    for (uint64_t DecomposeCodePoint = 0ULL; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
-                        if (String[CodePoint] == CanonicalNormalizationTable[DecomposeCodePoint][0][0]) {
-                            ComposedString = UTF32_SubstituteSubString(String, CanonicalNormalizationTable[DecomposeCodePoint][1], CodePoint, 1);
-                        }
-                    }
+                    CodePoint += 1;
                 }
-                CodePoint += 1;
+            } else if (CompositionType == NormalizationForm_KompatibleCompose) {
+                while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                    for (uint64_t ComposeCodePoint = 0ULL; ComposeCodePoint < KompatibleNormalizationTableSize; ComposeCodePoint++) {
+                        if (String[CodePoint] == KompatibleNormalizationTable[ComposeCodePoint][0][0]) { // codepoint stored as a string
+                            ComposedString = UTF32_SubstituteSubString(String, KompatibleNormalizationTable[ComposeCodePoint][1], CodePoint, 1);
+                        }
+                    }
+                    CodePoint += 1;
+                }
             }
-        } else {
+        } else if (String == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+        } else if (CompositionType != NormalizationForm_CanonicalCompose && CompositionType != NormalizationForm_KompatibleCompose) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Invalid CompositionType"));
         }
         return ComposedString;
     }
     
-    static UTF32 *UTF32_Decompose(PlatformIO_Immutable(UTF32 *) String, bool Kompatibility) { // FIXME: Must use a stable sorting algorithm
-        uint64_t CodePoint             = 0ULL;
-        UTF32   *DecomposedString      = NULL;
-        if (String != NULL && (Kompatibility == No || Kompatibility == Yes)) {
-            UTF32 *Decomposed          = NULL;
-            while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                if (Kompatibility == Yes) {
-                    for (uint64_t Index = 0ULL; Index < KompatibleNormalizationTableSize; Index++) {
-                        if (String[CodePoint] == KompatibleNormalizationTable[Index][0][0]) {
-                            Decomposed = UTF32_SubstituteSubString(String, CanonicalNormalizationTable[Index][1], CodePoint, 1);
+    static UTF32 *UTF32_Decompose(PlatformIO_Immutable(UTF32 *) String, StringIO_NormalizationForms DecompositionType) { // FIXME: Must use a stable sorting algorithm
+        uint64_t CodePoint      = 0ULL;
+        UTF32   *DecomposedString = NULL;
+        if (String != NULL && (DecompositionType == NormalizationForm_CanonicalDecompose || DecompositionType == NormalizationForm_KompatibleDecompose)) {
+            if (DecompositionType == NormalizationForm_CanonicalDecompose) {
+                while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                    for (uint64_t DecomposeCodePoint = 0ULL; DecomposeCodePoint < CanonicalNormalizationTableSize; DecomposeCodePoint++) {
+                        if (String[CodePoint] == CanonicalNormalizationTable[DecomposeCodePoint][0][0]) {
+                            DecomposedString = UTF32_SubstituteSubString(String, CanonicalNormalizationTable[DecomposeCodePoint][1], CodePoint, 1);
                         }
                     }
-                } else {
-                    for (uint64_t Index = 0ULL; Index < CanonicalNormalizationTableSize; Index++) {
-                        if (String[CodePoint] == CanonicalNormalizationTable[Index][0][0]) {
-                            Decomposed = UTF32_SubstituteSubString(String, CanonicalNormalizationTable[Index][1], CodePoint, 1);
-                        }
-                    }
+                    CodePoint += 1;
                 }
-                CodePoint             += 1;
+            } else if (DecompositionType == NormalizationForm_KompatibleDecompose) {
+                while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                    for (uint64_t DecomposeCodePoint = 0ULL; DecomposeCodePoint < KompatibleNormalizationTableSize; DecomposeCodePoint++) {
+                        if (String[CodePoint] == KompatibleNormalizationTable[DecomposeCodePoint][0][0]) { // codepoint stored as a string
+                            DecomposedString = UTF32_SubstituteSubString(String, KompatibleNormalizationTable[DecomposeCodePoint][1], CodePoint, 1);
+                        }
+                    }
+                    CodePoint += 1;
+                }
             }
-            DecomposedString           = UTF32_Reorder(Decomposed);
-            free(Decomposed);
-        } else {
+        } else if (String == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+        } else if (DecompositionType != NormalizationForm_CanonicalDecompose && DecompositionType != NormalizationForm_KompatibleDecompose) {
+            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Invalid CompositionType"));
         }
         return DecomposedString;
     }
@@ -2268,17 +2275,17 @@ extern "C" {
         UTF32 *NormalizedString = NULL;
         if (String != NULL && NormalizedForm != NormalizationForm_Unknown) {
             if (NormalizedForm == NormalizationForm_CanonicalCompose) {
-                UTF32 *Decomposed = UTF32_Decompose(String, No);
-                NormalizedString  = UTF32_Compose(Decomposed, No);
+                UTF32 *Decomposed = UTF32_Decompose(String, NormalizationForm_CanonicalDecompose);
+                NormalizedString  = UTF32_Compose(Decomposed, NormalizationForm_CanonicalCompose);
                 free(Decomposed);
             } else if (NormalizedForm == NormalizationForm_KompatibleCompose) {
-                UTF32 *Decomposed = UTF32_Decompose(String, Yes);
-                NormalizedString  = UTF32_Compose(Decomposed, Yes);
+                UTF32 *Decomposed = UTF32_Decompose(String, NormalizationForm_KompatibleDecompose);
+                NormalizedString  = UTF32_Compose(Decomposed, NormalizationForm_KompatibleCompose);
                 free(Decomposed);
             } else if (NormalizedForm == NormalizationForm_CanonicalDecompose) {
-                NormalizedString  = UTF32_Decompose(String, No);
+                NormalizedString  = UTF32_Decompose(String, NormalizationForm_CanonicalDecompose);
             } else if (NormalizedForm == NormalizationForm_KompatibleDecompose) {
-                NormalizedString  = UTF32_Decompose(String, Yes);
+                NormalizedString  = UTF32_Decompose(String, NormalizationForm_CanonicalDecompose);
             }
         } else if (String == NULL) {
             Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
