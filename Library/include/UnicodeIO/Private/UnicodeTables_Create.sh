@@ -18,7 +18,7 @@ CreateHeaderFileTop() {
     CanonicalNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n "$UCD_Data")
     {
         printf "#include \"../../PlatformIO.h\"\n"
-        printf "#include \"../UnicodeTypes.h\"\n\n"
+        printf "#include \"../UnicodeIOTypes.h\"\n\n"
         printf "#pragma once\n\n"
         printf "#ifndef FoundationIO_UnicodeIO_UnicodeTables_H\n"
         printf "#define FoundationIO_UnicodeIO_UnicodeTables_H\n\n"

@@ -89,7 +89,7 @@
     <ClInclude Include="..\Library\include\UnicodeIO\StringIO.h">
       <Filter>Header Files\UnicodeIO</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\UnicodeIO\UnicodeTypes.h">
+    <ClInclude Include="..\Library\include\UnicodeIO\UnicodeIOTypes.h">
       <Filter>Header Files\UnicodeIO</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\UnicodeIO\Private\UnicodeTables.h">

@@ -51,6 +51,7 @@ set(PUBLIC_HEADER
 "${Library_Dir}/include/UnicodeIO/LocalizationIO.h"
 "${Library_Dir}/include/UnicodeIO/LogIO.h"
 "${Library_Dir}/include/UnicodeIO/StringIO.h"
+"${Library_Dir}/include/UnicodeIO/UnicodeIOTypes.h"
 )
 
 set(Library_Sources

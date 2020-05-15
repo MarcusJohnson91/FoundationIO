@@ -8,7 +8,7 @@
 
 #include "PlatformIO.h"                   /* Included for Platform Independence macros */
 #include "CryptographyIO.h"           /* Included for Entropy */
-#include "UnicodeIO/UnicodeTypes.h"
+#include "UnicodeIO/UnicodeIOTypes.h"
 
 #pragma once
 

@@ -7,7 +7,7 @@
  */
 
 #include "PlatformIO.h"
-#include "UnicodeIO/UnicodeTypes.h" /* Included for UTF32 */
+#include "UnicodeIO/UnicodeIOTypes.h" /* Included for UTF32 */
 
 #pragma once
 

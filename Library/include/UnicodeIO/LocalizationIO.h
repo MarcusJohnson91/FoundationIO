@@ -6,7 +6,7 @@
  @brief               This header contains types, functions, and tables for cryptography and hashing.
  */
 
-#include  "UnicodeTypes.h"
+#include  "UnicodeIOTypes.h"
 #include  "../Constants.h"
 
 #pragma once
