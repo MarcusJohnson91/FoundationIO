@@ -81,14 +81,14 @@ extern "C" {
                     CLI->NumSwitches = NumSwitches;
                 } else {
                     CommandLineIO_Deinit(CLI);
-                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate %llu Options"), NumSwitches);
+                    Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate %llu Options"), NumSwitches);
                 }
             } else {
                 CommandLineIO_Deinit(CLI);
-                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate CommandLineIO"));
+                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate CommandLineIO"));
             }
         } else {
-            Log(Severity_USER, FoundationIOFunctionName, UTF8String("NumSwitches is invalid"));
+            Log(Severity_USER, UnicodeIOTypes_FunctionName, UTF8String("NumSwitches is invalid"));
         }
         return CLI;
     }
@@ -121,7 +121,7 @@ extern "C" {
         return Height;
     }
     
-    bool           CommandLineIO_TerminalWasResized(void) {
+    bool CommandLineIO_TerminalWasResized(void) {
         bool SizeChanged = No;
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
         /*
@@ -150,9 +150,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramName     = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Name == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("The Name string is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("The Name string is NULL"));
         }
     }
     
@@ -163,9 +163,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramVersion  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Version == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("The Version String is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("The Version String is NULL"));
         }
     }
     
@@ -176,9 +176,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramDescription  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Description == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("The Description String is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("The Description String is NULL"));
         }
     }
     
@@ -189,9 +189,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramAuthor  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Author == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("The Author String is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("The Author String is NULL"));
         }
     }
     
@@ -202,9 +202,9 @@ extern "C" {
             free(Normalized);
             CLI->ProgramCopyright = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Copyright == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("The Copyright String is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("The Copyright String is NULL"));
         }
     }
     
@@ -221,13 +221,13 @@ extern "C" {
             free(NormalizedLicenseURL);
             CLI->ProgramLicenseURL          = CaseFoldedLicenseURL;
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (LicenseType == LicenseType_Unknown) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("The LicenseType Is Invalid"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("The LicenseType Is Invalid"));
         } else if (Name == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("License Name Pointer is Invalid"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("License Name Pointer is Invalid"));
         } else if (LicenseURL == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("The License URL must be set"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("The License URL must be set"));
         }
     }
     
@@ -235,9 +235,9 @@ extern "C" {
         if (CLI != NULL && MinOptions < CLI->NumSwitches) {
             CLI->MinOptions = MinOptions;
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (MinOptions > CLI->NumSwitches) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("MinOptions %lld is invalid, it should be between 0 and %lld"), MinOptions, CLI->NumSwitches);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("MinOptions %lld is invalid, it should be between 0 and %lld"), MinOptions, CLI->NumSwitches);
         }
     }
     
@@ -245,9 +245,9 @@ extern "C" {
         if (CLI != NULL && HelpOption < CLI->NumSwitches) {
             CLI->HelpOption = HelpOption;
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (HelpOption > CLI->NumSwitches) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("HelpSwitch %lld is invalid, it should be between 0 and %lld"), HelpOption, CLI->NumSwitches);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("HelpSwitch %lld is invalid, it should be between 0 and %lld"), HelpOption, CLI->NumSwitches);
         }
     }
     
@@ -273,7 +273,7 @@ extern "C" {
             free(NumProgressIndicatorsPerString);
             free(ActualStrings2Print);
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         }
     }
     
@@ -322,7 +322,7 @@ extern "C" {
                 UTF32_StringSet_Deinit(GeneratedHelp);
             }
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         }
     }
     
@@ -334,7 +334,7 @@ extern "C" {
             } else if (CLI->LicenseType == LicenseType_Proprietary) {
                 License = UTF32_Format(UTF32String("By using this software, you agree to the End User License Agreement:%U32s%U32s%U32s"), PlatformIO_NewLine32, PlatformIO_NewLine32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : PlatformIO_InvisibleString32);
             } else {
-                Log(Severity_USER, FoundationIOFunctionName, UTF8String("LicenseType isn't set"));
+                Log(Severity_USER, UnicodeIOTypes_FunctionName, UTF8String("LicenseType isn't set"));
             }
             
             UTF32 *Banner32 = UTF32_Format(UTF32String("%U32s, v. %U32s by %U32s © %U32s, %U32s, %U32s"),
@@ -357,7 +357,7 @@ extern "C" {
 #endif
             UTF32_Deinit(Banner32);
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         }
     }
     
@@ -374,12 +374,12 @@ extern "C" {
                     ArgumentStringPrefixSize  = 1;
                 }
             } else {
-                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("ArgumentString is not an Argument string"));
+                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("ArgumentString is not an Argument string"));
             }
             uint64_t ArgumentSwitchSize    = ArgumentStringSize - ArgumentStringPrefixSize;
             ArgumentSwitch                 = UTF32_ExtractSubString(UTF32_CaseFold(ArgumentString), ArgumentStringPrefixSize, ArgumentSwitchSize);
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return ArgumentSwitch;
     }
@@ -405,12 +405,12 @@ extern "C" {
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
         uint64_t NumArguments           = (uint64_t) __argc;
         StringSet                       = UTF32_StringSet_Init(NumArguments);
-        if (ArgumentArray != NULL) {
+        if (Arguments != NULL) {
             for (uint64_t Argument = 0ULL; Argument < NumArguments; Argument++) {
                 StringSet[Argument]     = UTF16_Decode((UTF16*) Arguments);
             }
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldnt allocate %llu arguments"), NumArguments);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldnt allocate %llu arguments"), NumArguments);
         }
 #endif
         return StringSet;
@@ -423,11 +423,11 @@ extern "C" {
             free(Normalized);
             CLI->Switches[SwitchID].Name  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Name == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Name String is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Name String is NULL"));
         } else if (SwitchID > CLI->NumSwitches) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
         }
     }
     
@@ -438,11 +438,11 @@ extern "C" {
             free(Normalized);
             CLI->Switches[SwitchID].Description  = CaseFolded;
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (Description == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Description String is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Description String is NULL"));
         } else if (SwitchID > CLI->NumSwitches) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
         }
     }
     
@@ -457,18 +457,18 @@ extern "C" {
                     free(Children_OLD);
                 } else {
                     CLI->Switches[ParentID].Children       = Children_OLD;
-                    Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Realloc failed"));
+                    Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Realloc failed"));
                 }
                 CLI->Switches[ParentID].Children[OLD_NumChildren] = ChildID;
             } else {
-                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("ParentID %lld can not have any slaves"), ParentID);
+                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("ParentID %lld can not have any slaves"), ParentID);
             }
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (ParentID > CLI->NumSwitches) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("ParentID %lld is invalid, it should be between 0 and %lld"), ParentID, CLI->NumSwitches);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("ParentID %lld is invalid, it should be between 0 and %lld"), ParentID, CLI->NumSwitches);
         } else if (ChildID > CLI->NumSwitches) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SlaveID %lld is invalid, it should be between 0 and %lld"), ChildID, CLI->NumSwitches);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SlaveID %lld is invalid, it should be between 0 and %lld"), ChildID, CLI->NumSwitches);
         }
     }
     
@@ -476,11 +476,11 @@ extern "C" {
         if (CLI != NULL && SwitchType != SwitchType_Unknown && SwitchID < CLI->NumSwitches) {
             CLI->Switches[SwitchID].SwitchType = SwitchType;
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (SwitchType == SwitchType_Unknown) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("You can not set OptionID %lld to SwitchType_Unknown"), SwitchID);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("You can not set OptionID %lld to SwitchType_Unknown"), SwitchID);
         } else if (SwitchID > CLI->NumSwitches) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
         }
     }
     
@@ -491,11 +491,11 @@ extern "C" {
         if (CLI != NULL && SwitchID < CLI->NumSwitches && ArgumentType != ArgumentType_Unknown) {
             CLI->Switches[SwitchID].ArgumentType = ArgumentType;
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (SwitchID > CLI->NumSwitches) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
         } else if (ArgumentType == ArgumentType_Unknown) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("You can not set SwitchID %lld to ArgumentType_Unknown"), SwitchID);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("You can not set SwitchID %lld to ArgumentType_Unknown"), SwitchID);
         }
     }
     
@@ -542,7 +542,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Arguments Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Arguments Pointer is NULL"));
         }
         return NumTokens;
     }
@@ -556,9 +556,9 @@ extern "C" {
                 
             }
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
         }
     }
     
@@ -614,7 +614,7 @@ extern "C" {
                                 free(Options_Old);
                             } else {
                                 CLI->Options               = Options_Old;
-                                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Realloc failed"));
+                                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Realloc failed"));
                             }
                         }
                         CLI->Options[Switch].SwitchID      = Switch;
@@ -636,9 +636,9 @@ extern "C" {
                 free(ArgumentFlag);
             }
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("You entered %lld options, the minimum is %lld"), NumArguments - 1, CLI->MinOptions);
         }
     }
     
@@ -659,7 +659,7 @@ extern "C" {
             }
             free(Arguments32);
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
             CommandLineIO_ShowHelp(CLI);
         }
@@ -682,7 +682,7 @@ extern "C" {
             }
             free(Arguments32);
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (CLI->MinOptions == 0 || NumArguments < CLI->MinOptions) {
             CommandLineIO_ShowHelp(CLI);
         }
@@ -700,7 +700,7 @@ extern "C" {
              Make sure all mandatory options are present, and a bunch of other stuff
              */
         } else {
-            Log(Severity_USER, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_USER, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         }
     }
     
@@ -766,7 +766,7 @@ extern "C" {
                 }
             }
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         }
         return OptionID;
     }
@@ -833,9 +833,9 @@ extern "C" {
                     break;
             }
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (OptionID >= CLI->NumOptions) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("OptionID: %llu is invalid"), OptionID);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("OptionID: %llu is invalid"), OptionID);
         }
         return Value;
     }
@@ -845,9 +845,9 @@ extern "C" {
         if (CLI != NULL && OptionID <= CLI->NumOptions - 1) {
             Result = UTF8_Encode(CLI->Options[OptionID].Argument);
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Option %lld is outside the range 0 - %lld"), OptionID, CLI->NumOptions - 1);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Option %lld is outside the range 0 - %lld"), OptionID, CLI->NumOptions - 1);
         }
         return Result;
     }
@@ -857,9 +857,9 @@ extern "C" {
         if (CLI != NULL && OptionID <= CLI->NumOptions - 1) {
             Result = UTF16_Encode(CLI->Options[OptionID].Argument);
         } else if (CLI == NULL) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (OptionID > CLI->NumOptions - 1) {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Option %lld is outside the range 0 - %lld"), OptionID, CLI->NumOptions - 1);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Option %lld is outside the range 0 - %lld"), OptionID, CLI->NumOptions - 1);
         }
         return Result;
     }
@@ -969,7 +969,7 @@ extern "C" {
             free(CLI->ProgramLicenseURL);
             free(CLI);
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         }
     }
     

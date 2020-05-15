@@ -102,8 +102,8 @@ typedef                   char16_t                  UTF16;
 typedef                   char32_t                  UTF32;
 #endif /* FoundationIO_StringType32 */
     
-#ifndef                   FoundationIOUnicodePropertyConversion8
-#define                   FoundationIOUnicodePropertyConversion8  (1)
+#ifndef                   UnicodeIOTypes_PropertyConversion8
+#define                   UnicodeIOTypes_PropertyConversion8  (1)
     
 #ifndef                   UTF8_MakeCharacterMutable
 #if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -152,11 +152,11 @@ typedef                   char32_t                  UTF32;
 #define                   UTF8_MakeStringImmutable(String) (const String)
 #endif /* PlatformIO_Language */
 #endif /* UTF8_MakeStringImmutable */
-#endif /* FoundationIOUnicodePropertyConversion8 */
+#endif /* UnicodeIOTypes_PropertyConversion8 */
     
     
-#ifndef                   FoundationIOUnicodePropertyConversion16
-#define                   FoundationIOUnicodePropertyConversion16 (2)
+#ifndef                   UnicodeIOTypes_PropertyConversion16
+#define                   UnicodeIOTypes_PropertyConversion16 (2)
     
 #ifndef                   UTF16_MakeCharacterMutable
 #if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -206,11 +206,11 @@ typedef                   char32_t                  UTF32;
 #endif /* PlatformIO_Language */
 #endif /* UTF16_MakeStringImmutable */
     
-#endif /* FoundationIOUnicodePropertyConversion16 */
+#endif /* UnicodeIOTypes_PropertyConversion16 */
     
     
-#ifndef                   FoundationIOUnicodePropertyConversion32
-#define                   FoundationIOUnicodePropertyConversion32 (4)
+#ifndef                   UnicodeIOTypes_PropertyConversion32
+#define                   UnicodeIOTypes_PropertyConversion32 (4)
     
 #ifndef                   UTF32_MakeCharacterMutable
 #if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -333,7 +333,7 @@ typedef                   char32_t                  UTF32;
 #endif /* PlatformIO_Language */
 #endif /* UTF32_MakeStringImmutable */
     
-#endif /* FoundationIOUnicodePropertyConversion32 */
+#endif /* UnicodeIOTypes_PropertyConversion32 */
     
 #ifndef                   FoundationIO_Unicodize8
 #define                   FoundationIO_Unicodize8               (1)
@@ -383,9 +383,9 @@ typedef                   char32_t                  UTF32;
 #endif /* PlatformIO_Language */
 #endif /* FoundationIO_Unicodize32 */
     
-#ifndef                   FoundationIOFunctionName
-#define                   FoundationIOFunctionName              (const UTF8*) __func__
-#endif /* FoundationIOFunctionName */
+#ifndef                   UnicodeIOTypes_FunctionName
+#define                   UnicodeIOTypes_FunctionName              (const UTF8*) __func__
+#endif /* UnicodeIOTypes_FunctionName */
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

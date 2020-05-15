@@ -75,7 +75,7 @@ extern "C" {
         } else if (StringSize == 3) { // ISO-639-2
             
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Invalid Language string length %llu"), StringSize);
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Invalid Language string length %llu"), StringSize);
         }
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
 #endif
@@ -302,7 +302,7 @@ extern "C" {
             Delocalized          = UTF8_Encode(Delocalized32);
             free(Delocalized32);
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return Delocalized;
     }
@@ -316,7 +316,7 @@ extern "C" {
             Delocalized          = UTF16_Encode(Delocalized32);
             free(Delocalized32);
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return Delocalized;
     }
@@ -336,10 +336,10 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("Couldn't allocate delocaized string"));
+                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate delocaized string"));
             }
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return Delocalized;
     }
@@ -353,7 +353,7 @@ extern "C" {
             Delocalized          = UTF8_Encode(Delocalized32);
             free(Delocalized32);
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return Delocalized;
     }
@@ -367,7 +367,7 @@ extern "C" {
             Delocalized          = UTF16_Encode(Delocalized32);
             free(Delocalized32);
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return Delocalized;
     }
@@ -428,7 +428,7 @@ extern "C" {
                 CodePoint             += 1;
             }
         } else {
-            Log(Severity_DEBUG, FoundationIOFunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
         }
         
         return Delocalized;
