@@ -67,7 +67,7 @@ ContainerIO:
 
 UnicodeIO:
 ------------
-* UnicodeIO isn't actually a real thing, it's just a way to help organize all the files, so the UnicodeIO folders contain FoundationIO's text related components.
+* UnicodeIO isn't a sub-library or actually a real thing at all, it's just a way to help organize all the files, so the UnicodeIO folders contain FoundationIO's text related components.
 
 StringIO:
 ----------
