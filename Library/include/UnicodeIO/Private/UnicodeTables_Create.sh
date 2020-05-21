@@ -114,7 +114,7 @@ CreateCombiningCharacterClassTable() {
 
 CreateIntegerTable() {
     IntegerTable=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -o '0x' -v @cp -o ':' -v @nv -n "$UCD_Data")
-    printf "    static const UTF32 IntegerTable[IntegerTableSize][2] = {\n" >> "$HeaderFile"
+    printf "    static const uint64_t IntegerTable[IntegerTableSize][2] = {\n" >> "$HeaderFile"
     for line in $IntegerTable; do
         echo "$line" | awk -F ':' '{printf "        {0x%06X, %i},\n", $1, $2}' >> "$HeaderFile"
     done

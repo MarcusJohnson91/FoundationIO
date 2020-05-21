@@ -1148,7 +1148,7 @@ extern "C" {
         {0x01E94A, 7},
     };
 
-    static const UTF32 IntegerTable[IntegerTableSize][2] = {
+    static const uint64_t IntegerTable[IntegerTableSize][2] = {
         {0x000030, 0},
         {0x000031, 1},
         {0x000032, 2},
