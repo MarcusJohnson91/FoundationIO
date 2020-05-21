@@ -480,8 +480,6 @@ extern "C" {
 #define             PlatformIO_MakeStringSet(StringSetSize, ...) {__VA_ARGS__,};
 #endif
     
-    uint64_t        PlatformIO_GetNumCPUCores(void);
-    
     uint64_t        PlatformIO_GetTotalMemoryInBytes(void);
     
 #ifdef __cplusplus
