@@ -8,6 +8,9 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
+
+    static UTF8  StringIO_PreallocateCodePoint_UTF8[UTF8MaxCodeUnitsInCodePoint   + PlatformIO_NULLTerminatorSize] = {0, 0, 0, 0, 0}; // Icky Global
+    static UTF16 StringIO_PreallocateCodePoint_UTF16[UTF16MaxCodeUnitsInCodePoint + PlatformIO_NULLTerminatorSize] = {0, 0, 0};       // Icky Global
     
     UTF8 *UTF8_Init(uint64_t NumCodeUnits) {
         UTF8 *String            = NULL;
@@ -108,6 +111,30 @@ extern "C" {
         }
         return CodePointSize;
     }
+
+    uint8_t UTF32_GetCodePointSizeInUTF8CodeUnits(UTF32 CodePoint) {
+        uint8_t UTF8CodeUnits = 0;
+        if (CodePoint <= 0x7F) {
+            UTF8CodeUnits     = 1;
+        } else if (CodePoint >= 0x80 && CodePoint <= 0x7FF) {
+            UTF8CodeUnits     = 2;
+        } else if (CodePoint >= 0x800 && CodePoint <= 0xFFFF) {
+            UTF8CodeUnits     = 3;
+        } else if (CodePoint >= 0x10000 && CodePoint <= UnicodeMaxCodePoint) {
+            UTF8CodeUnits     = 4;
+        }
+        return UTF8CodeUnits;
+    }
+
+    uint8_t UTF32_GetCodePointSizeInUTF16CodeUnits(UTF32 CodePoint) {
+        uint8_t UTF16CodeUnits = 0;
+        if (CodePoint <= 0xFFFF) {
+            UTF16CodeUnits     = 1;
+        } else if (CodePoint >= 0x10000 && CodePoint <= UnicodeMaxCodePoint) {
+            UTF16CodeUnits     = 2;
+        }
+        return UTF16CodeUnits;
+    }
     
     UTF32 UTF8_DecodeCodePoint(PlatformIO_Immutable(UTF8 *) CodeUnits) {
         UTF32 CodePoint                       = 0;
@@ -160,7 +187,7 @@ extern "C" {
                     CodePoint                 =  CodeUnits[0];
                     break;
                 case 2:
-                    CodePoint                |= UTF16MaxCodeUnitValue + 1;
+                    CodePoint                |= UTF16MaxCodeUnitValue + 1; // 0x10000
                     CodePoint                |= (CodeUnits[0] & UTF16SurrogateMask) << UTF16SurrogateShift;
                     if (CodeUnits[1] != PlatformIO_NULLTerminator) {
                         CodePoint            |= (CodeUnits[1] & UTF16SurrogateMask);
@@ -171,6 +198,46 @@ extern "C" {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CodeUnits Pointer is NULL"));
         }
         return CodePoint;
+    }
+
+    static UTF16 *UTF16_EncodeCodePoint(UTF32 CodePoint) {
+        uint8_t CodeUnitSize                           = UTF32_GetCodePointSizeInUTF16CodeUnits(CodePoint);
+        UTF32   Ranged                                 = CodePoint + UTF16SurrogatePairStart;
+        switch (CodeUnitSize) {
+            case 1:
+                StringIO_PreallocateCodePoint_UTF16[0] = (CodePoint & 0xFFFF);
+                break;
+            case 2:
+                StringIO_PreallocateCodePoint_UTF16[0] = UTF16HighSurrogateStart + (Ranged & (UTF16SurrogateMask << UTF16SurrogateShift) >> UTF16SurrogateShift);
+                StringIO_PreallocateCodePoint_UTF16[1] = UTF16LowSurrogateStart  + (Ranged & UTF16SurrogateMask);
+                break;
+        }
+        return StringIO_PreallocateCodePoint_UTF16;
+    }
+
+    static UTF8 *UTF8_EncodeCodePoint(UTF32 CodePoint) {
+        uint8_t CodeUnitSize                          = UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint);
+        switch (CodeUnitSize) {
+            case 1:
+                StringIO_PreallocateCodePoint_UTF8[0] = (CodePoint & 0x7F);
+                break;
+            case 2:
+                StringIO_PreallocateCodePoint_UTF8[0] = 0xC0 | (CodePoint & 0x7C0) >> 6;
+                StringIO_PreallocateCodePoint_UTF8[1] = 0x80 | (CodePoint & 0x3F);
+                break;
+            case 3:
+                StringIO_PreallocateCodePoint_UTF8[0] = 0xE0 | (CodePoint & 0xF000) >> 12;
+                StringIO_PreallocateCodePoint_UTF8[1] = 0x80 | (CodePoint & 0xFC0)  >> 6;
+                StringIO_PreallocateCodePoint_UTF8[2] = 0x80 | (CodePoint & 0x3F);
+                break;
+            case 4:
+                StringIO_PreallocateCodePoint_UTF8[0] = 0xF0 | (CodePoint & 0x1C0000) >> 18;
+                StringIO_PreallocateCodePoint_UTF8[1] = 0x80 | (CodePoint & 0x3F000)  >> 12;
+                StringIO_PreallocateCodePoint_UTF8[2] = 0x80 | (CodePoint & 0xFC0)    >> 6;
+                StringIO_PreallocateCodePoint_UTF8[3] = 0x80 | (CodePoint & 0x3F);
+                break;
+        }
+        return StringIO_PreallocateCodePoint_UTF8;
     }
     
     uint64_t UTF8_GetGraphemeSizeInCodeUnits(UTF8 *String, uint64_t OffsetInCodeUnits) {
@@ -196,7 +263,7 @@ extern "C" {
         uint64_t GraphemeSize         = 1ULL;
         if (String != NULL) {
             uint64_t CodeUnit         = OffsetInCodeUnits;
-            UTF16   *CodeUnits        = UTF16_Init(UTF16MaxCodeUnits);
+            UTF16   *CodeUnits        = UTF16_Init(UTF16MaxCodeUnitsInCodePoint);
             while (String[CodeUnit] != PlatformIO_NULLTerminator) {
                 UTF16 Byte            = String[CodeUnit];
                 uint8_t CodePointSize = UTF16_GetCodePointSizeInCodeUnits(Byte);
@@ -265,15 +332,7 @@ extern "C" {
         uint64_t UTF8CodeUnits        = 0ULL;
         if (String != NULL) {
             while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                if (String[CodePoint] <= 0x7F) {
-                    UTF8CodeUnits    += 1;
-                } else if (String[CodePoint] >= 0x80 && String[CodePoint] <= 0x7FF) {
-                    UTF8CodeUnits    += 2;
-                } else if (String[CodePoint] >= 0x800 && String[CodePoint] <= 0xFFFF) {
-                    UTF8CodeUnits    += 3;
-                } else if (String[CodePoint] >= 0x10000 && String[CodePoint] <= UnicodeMaxCodePoint) {
-                    UTF8CodeUnits    += 4;
-                }
+                UTF8CodeUnits        += UTF32_GetCodePointSizeInUTF8CodeUnits(String[CodePoint]);
                 CodePoint            += 1;
             }
         } else {
@@ -287,12 +346,8 @@ extern "C" {
         uint64_t UTF16CodeUnits     = 0ULL;
         if (String != NULL) {
             while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                if (String[CodePoint] <= UTF16MaxCodeUnitValue) {
-                    UTF16CodeUnits += 1;
-                } else if (String[CodePoint] > UTF16MaxCodeUnitValue && String[CodePoint] <= UnicodeMaxCodePoint) {
-                    UTF16CodeUnits += 2;
-                }
-                CodePoint          += 1;
+                UTF16CodeUnits       += UTF32_GetCodePointSizeInUTF16CodeUnits(String[CodePoint]);
+                CodePoint            += 1;
             }
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
@@ -319,13 +374,8 @@ extern "C" {
         if (String != NULL) {
             uint64_t CodeUnit              = 0ULL;
             while (String[CodeUnit] != PlatformIO_NULLTerminator) {
-                if (String[CodeUnit] < UTF16HighSurrogateStart || String[CodeUnit] > UTF16LowSurrogateEnd) {
-                    NumCodePoints         += 1;
-                } else if (String[CodeUnit] >= UTF16HighSurrogateStart && String[CodeUnit] <= UTF16HighSurrogateEnd) {
-                    NumCodePoints         += 2;
-                    CodeUnit              += 1;
-                }
-                CodeUnit                  += 1;
+                CodeUnit                  += UTF16_GetCodePointSizeInCodeUnits(String[CodeUnit]);
+                NumCodePoints             += 1;
             }
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
@@ -1115,46 +1165,23 @@ extern "C" {
         return DecodedString;
     }
     
-    static void UTF8_EncodeCodePoint(UTF32 CodePoint2Encode, UTF8 *String) {
-        if (String != NULL) {
-            
-        } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
-        }
-    }
-    
     UTF8 *UTF8_Encode(PlatformIO_Immutable(UTF32 *) String) {
         UTF8    *EncodedString                         = NULL;
         if (String != NULL) {
-            uint64_t StringSizeInCodePoints            = UTF32_GetStringSizeInCodePoints(String);
             uint64_t UTF8CodeUnits                     = UTF32_GetStringSizeInUTF8CodeUnits(String);
             EncodedString                              = UTF8_Init(UTF8CodeUnits);
+            uint64_t CodePoint                         = 0ULL;
+            uint64_t CodeUnit                          = 0ULL;
+            uint8_t  Index                             = 0;
             if (EncodedString != NULL) {
-                uint64_t CodeUnitNum                   = 0ULL;
-                for (uint64_t CodePoint = 0ULL; CodePoint < StringSizeInCodePoints; CodePoint++) {
-                    if (String[CodePoint] <= 0x7F) {
-                        EncodedString[CodeUnitNum]     = String[CodePoint] & 0x7F;
-                        CodeUnitNum                   += 1;
-                    } else if (String[CodePoint] <= 0x7FF) {
-                        EncodedString[CodeUnitNum]     = 0xC0 | (String[CodePoint] & ((0x1F << 6) >> 6));
-                        EncodedString[CodeUnitNum + 1] = 0x80 | (String[CodePoint] & 0x3F);
-                        CodeUnitNum                   += 2;
-                    }  else if (String[CodePoint] <= UTF16MaxCodeUnitValue) {
-                        EncodedString[CodeUnitNum]     = 0xE0 | (String[CodePoint] & ((0x0F << 12) >> 12));
-                        EncodedString[CodeUnitNum + 1] = 0x80 | (String[CodePoint] & ((0x3F << 6) >> 6));
-                        EncodedString[CodeUnitNum + 2] = 0x80 | (String[CodePoint] &   0x3F);
-                        CodeUnitNum                   += 3;
-                    } else if (String[CodePoint] <= UnicodeMaxCodePoint) {
-                        uint8_t CodeUnit1              = (String[CodePoint] & 0x1C0000) >> 18;
-                        EncodedString[CodeUnitNum]     = 0xF0 | CodeUnit1;
-                        uint8_t CodeUnit2              = (String[CodePoint] & 0x3F000) >> 12;
-                        EncodedString[CodeUnitNum + 1] = 0x80 | CodeUnit2;
-                        uint8_t CodeUnit3              = (String[CodePoint] & 0xFC0) >> 6;
-                        EncodedString[CodeUnitNum + 2] = 0x80 | CodeUnit3;
-                        uint8_t CodeUnit4              = (String[CodePoint] & 0x3F);
-                        EncodedString[CodeUnitNum + 3] = 0x80 | CodeUnit4;
-                        CodeUnitNum                   += 4;
+                while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                    UTF8 *CodeUnits                    = UTF8_EncodeCodePoint(String[CodePoint]);
+                    while (CodeUnits[Index] != PlatformIO_NULLTerminator) {
+                        EncodedString[CodeUnit]        = CodeUnits[Index];
+                        CodeUnit                      += 1;
+                        Index                         += 1;
                     }
+                    CodePoint += 1;
                 }
             } else {
                 Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Encoded Pointer is NULL"));
@@ -1174,10 +1201,13 @@ extern "C" {
             EncodedString                                = UTF16_Init(NumCodeUnits);
             if (EncodedString != NULL) {
                 while (CodeUnit < NumCodeUnits) {
-                    if (String[CodePoint] > UTF16MaxCodeUnitValue) {
-                        uint32_t Ranged              = String[CodePoint] - UTF16SurrogatePairStart;
+                    if (String[CodePoint] > UTF16MaxCodeUnitValue && String[CodePoint] <= UnicodeMaxCodePoint) {
+                        // CodePoint = 0x10FFFF
+                        uint32_t Ranged              = String[CodePoint] - UTF16SurrogatePairStart; // 0xFFFFF
                         UTF16    HighCodeUnit        = UTF16HighSurrogateStart + (Ranged & (UTF16SurrogateMask << UTF16SurrogateShift) >> UTF16SurrogateShift);
-                        UTF16    LowCodeUnit         = UTF16LowSurrogateStart  + (Ranged &  UTF16SurrogateMask);
+                        // 0xD800 + (0xFFFFF & (0x3FF << 10) aka 0xFFC00) >> 10 = 0x3FF aka 0xDBFF
+                        //0x10FFFF = 0xDBFF 0xDFFF
+                        UTF16    LowCodeUnit         = UTF16LowSurrogateStart  + (Ranged &  UTF16SurrogateMask); // 0xDC00 + (0xFFFFF & 0x3FF) = 0xDFFF
                         
                         EncodedString[CodeUnit]      = HighCodeUnit;
                         EncodedString[CodeUnit + 1]  = LowCodeUnit;
@@ -1277,7 +1307,7 @@ extern "C" {
     }
     
     UTF8 UTF8_Erase(UTF8 *String, UTF8 NewValue) {
-      UTF8 Verification = 0xFE;
+        UTF8 Verification = 0xFE;
         if (String != NULL) {
             uint64_t StringSize  = UTF8_GetStringSizeInCodePoints(String);
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
@@ -1287,7 +1317,7 @@ extern "C" {
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
         }
-      return Verification;
+        return Verification;
     }
     
     UTF16 UTF16_Erase(UTF16 *String, UTF16 NewValue) {
@@ -1381,53 +1411,12 @@ extern "C" {
         return StringType;
     }
     
-    UTF8 *UTF8_ReadGraphemeFromFile(FILE *Source) {
-        UTF8 *Grapheme                         = NULL;
-        if (Source != NULL) {
-            bool     GraphemeFound             = No;
-            uint64_t CodePointSizeInCodeUnits  = 0ULL;
-            UTF8     CodeUnit                  = 0;
-            while (GraphemeFound == No) {
-                PlatformIO_File_Read(&CodeUnit, sizeof(UTF8), 1, Source);
-                CodePointSizeInCodeUnits      += UTF8_GetCodePointSizeInCodeUnits(CodeUnit);
-                PlatformIO_File_Seek(Source, CodePointSizeInCodeUnits, SEEK_CUR);
-                Grapheme                       = UTF8_Init(CodePointSizeInCodeUnits);
-                PlatformIO_File_Read(&Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits, Source);
-                fread(&Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits, Source);
-                UTF32 *CodePoint               = UTF8_Decode(Grapheme);
-                for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
-                    if (CodePoint[0] == GraphemeExtensionTable[GraphemeExtension]) {
-                    } else if (CodePoint[0] != GraphemeExtensionTable[GraphemeExtension] && GraphemeExtension == GraphemeExtensionTableSize - 1) {
-                        GraphemeFound = Yes;
-                    }
-                }
-            }
-        } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
-        }
-        return Grapheme;
-    }
-    
-    UTF16 *UTF16_ReadGraphemeFromFile(FILE *Source) {
-        UTF16 *CodePoint          = NULL;
-        if (Source != NULL) {
-            UTF16 CodeUnit        = 0;
-            fread(&CodeUnit, sizeof(UTF16), 1, Source);
-            uint8_t CodePointSize = UTF16_GetCodePointSizeInCodeUnits(CodeUnit);
-            CodePoint             = UTF16_Init(CodePointSize);
-            fread(CodePoint, CodePointSize, 1, Source);
-        } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
-        }
-        return CodePoint;
-    }
-    
     void UTF8_WriteGrapheme(FILE *Source, PlatformIO_Immutable(UTF8 *) Grapheme) {
         if (Source != NULL) {
             uint64_t StringSize       = UTF8_GetStringSizeInCodeUnits(Grapheme);
-            uint64_t CodeUnitsWritten = PlatformIO_File_Write(Grapheme, sizeof(UTF8), StringSize, Source);
+            uint64_t CodeUnitsWritten = PlatformIO_Write(Source, sizeof(UTF8),  Grapheme, StringSize);
             if (CodeUnitsWritten != StringSize) {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CodeUnitsWritten %llu does not match the size of the string %llu"), CodeUnitsWritten, StringSize);
+                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Wrote %llu CodeUnits but %llu was requested"), CodeUnitsWritten, StringSize);
             }
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
@@ -1437,26 +1426,216 @@ extern "C" {
     void UTF16_WriteGrapheme(FILE *Source, PlatformIO_Immutable(UTF16 *) Grapheme) {
         if (Source != NULL) {
             uint64_t StringSize       = UTF16_GetStringSizeInCodeUnits(Grapheme);
-            uint64_t CodeUnitsWritten = PlatformIO_File_Write(Grapheme, sizeof(UTF16), StringSize, Source);
+            uint64_t CodeUnitsWritten = PlatformIO_Write(Source, sizeof(UTF8),  Grapheme, StringSize);
             if (CodeUnitsWritten != StringSize) {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CodeUnitsWritten %llu does not match the size of the string %llu"), CodeUnitsWritten, StringSize);
+                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Wrote %llu CodeUnits but %llu was requested"), CodeUnitsWritten, StringSize);
             }
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
         }
     }
+
+    static UTF8 UTF8_ReadCodeUnit(FILE *Source) { // Replaces fgetc, getc, getchar; depending on your definition of "Character"
+        UTF8 CodeUnit = 0;
+        if (Source != NULL) {
+            uint64_t CodeUnitsRead = PlatformIO_Read(Source, sizeof(UTF8), &CodeUnit, 1);
+            if (CodeUnitsRead != sizeof(UTF8)) {
+                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Unable to read UTF8 CodeUnit"));
+            }
+        } else {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
+        }
+        return CodeUnit;
+    }
+
+    static UTF16 UTF16_ReadCodeUnit(FILE *Source) {
+        UTF16 CodeUnit = 0;
+        if (Source != NULL) {
+            uint64_t CodeUnitsRead = PlatformIO_Read(Source, sizeof(UTF16), &CodeUnit, 1);
+            if (CodeUnitsRead != sizeof(UTF16)) {
+                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Unable to read UTF16 CodeUnit"));
+            }
+        } else {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
+        }
+        return CodeUnit;
+    }
+
+    static UTF32 UTF8_ReadCodePoint(FILE *Source) {
+        UTF32   CodePoint     = 0;
+        uint8_t CodeUnitsRead = 0;
+        if (Source != NULL) {
+            CodeUnitsRead     = PlatformIO_Read(Source, sizeof(UTF8), &StringIO_PreallocateCodePoint_UTF8[0], 1);
+            if (CodeUnitsRead == 1) {
+                uint8_t CodePointSize = UTF8_GetCodePointSizeInCodeUnits(StringIO_PreallocateCodePoint_UTF8[0]) - 1;
+                CodeUnitsRead = PlatformIO_Read(Source, sizeof(UTF8), &StringIO_PreallocateCodePoint_UTF8[1], CodePointSize);
+                if (CodeUnitsRead == CodePointSize) {
+                    CodePoint = UTF8_DecodeCodePoint(StringIO_PreallocateCodePoint_UTF8);
+                } else {
+                    Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Read %hhu CodeUnits but %hhu was requested"), CodeUnitsRead, CodePointSize);
+                }
+            } else {
+                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Read %hhu CodeUnits but 1 was requested"), CodeUnitsRead);
+            }
+        } else {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
+        }
+        return CodePoint;
+    }
+
+    static UTF32 UTF16_ReadCodePoint(FILE *Source) {
+        UTF32   CodePoint     = 0;
+        uint8_t CodeUnitsRead = 0;
+        if (Source != NULL) {
+            CodeUnitsRead     = PlatformIO_Read(Source, sizeof(UTF16), &StringIO_PreallocateCodePoint_UTF16[0], 1);
+            if (CodeUnitsRead == 1) {
+                uint8_t CodePointSize = UTF16_GetCodePointSizeInCodeUnits(StringIO_PreallocateCodePoint_UTF16[0]) - 1;
+                CodeUnitsRead = PlatformIO_Read(Source, sizeof(UTF16), &StringIO_PreallocateCodePoint_UTF16[1], CodePointSize);
+                if (CodeUnitsRead == CodePointSize) {
+                    CodePoint = UTF16_DecodeCodePoint(StringIO_PreallocateCodePoint_UTF16);
+                } else {
+                    Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Read %hhu CodeUnits but %hhu was requested"), CodeUnitsRead, CodePointSize);
+                }
+            } else {
+                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Read %hhu CodeUnits but 1 was requested"), CodeUnitsRead);
+            }
+        } else {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
+        }
+        return CodePoint;
+    }
+
+    static UTF32 UTF32_ReadCodePoint(FILE *Source) {
+        UTF32 CodePoint = 0;
+        if (Source != NULL) {
+            uint64_t CodeUnitsRead = PlatformIO_Read(Source, sizeof(UTF32), &CodePoint, 1);
+            if (CodeUnitsRead != sizeof(UTF32)) {
+                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Unable to read UTF32 CodePoint"));
+            }
+        } else {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
+        }
+        return CodePoint;
+    }
+
+    UTF8 *UTF8_ReadGrapheme(FILE *Source) {
+        UTF8 *Grapheme                             = NULL;
+        if (Source != NULL) {
+            /*
+             Read a CodePoint, look it up in the GrapheneTable, if it, or the following CodePoint are GraphemeExtenders, keep going.
+             */
+            UTF32 CodePoint1 = UTF8_ReadCodePoint(Source);
+            UTF32 CodePoint2 = UTF8_ReadCodePoint(Source);
+
+            /*
+             CodePoint1 not GREXT = check cp2
+             */
+
+
+
+
+            bool     GraphemeFound                 = No;
+            uint64_t CodePointSizeInCodeUnits      = 0ULL;
+            uint64_t CodeUnitsRead                 = 0ULL;
+            UTF8     CodeUnit                      = 0;
+            while (GraphemeFound == No) {
+                CodeUnitsRead                      = PlatformIO_Read(Source, sizeof(UTF8), &CodeUnit, 1);
+                if (CodeUnitsRead == 1) {
+                    CodePointSizeInCodeUnits      += UTF8_GetCodePointSizeInCodeUnits(CodeUnit);
+                    PlatformIO_File_Seek(Source, CodePointSizeInCodeUnits, SEEK_CUR);
+                    Grapheme                       = UTF8_Init(CodePointSizeInCodeUnits);
+                    CodeUnitsRead                  = PlatformIO_Read(Source, sizeof(UTF8), &Grapheme, CodePointSizeInCodeUnits);
+                    if (CodeUnitsRead == CodePointSizeInCodeUnits) {
+                        fread(&Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits, Source);
+                        UTF32 *CodePoint           = UTF8_Decode(Grapheme);
+                        for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
+                            if (CodePoint[0] == GraphemeExtensionTable[GraphemeExtension]) {
+                            } else if (CodePoint[0] != GraphemeExtensionTable[GraphemeExtension] && GraphemeExtension == GraphemeExtensionTableSize - 1) {
+                                GraphemeFound      = Yes;
+                            }
+                        }
+                    } else {
+                        Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Read %llu bytes but %llu was requested"), CodeUnitsRead, CodePointSizeInCodeUnits);
+                    }
+                } else {
+                    Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Read %llu bytes but 1 was requested"), CodeUnitsRead);
+                }
+            }
+        } else {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
+        }
+        return Grapheme;
+    }
+
+    UTF16 *UTF16_ReadGrapheme(FILE *Source) {
+        UTF16 *Grapheme                            = NULL;
+        if (Source != NULL) {
+            bool     GraphemeFound                 = No;
+            uint64_t CodePointSizeInCodeUnits      = 0ULL;
+            uint64_t CodeUnitsRead                 = 0ULL;
+            UTF16    CodeUnit                      = 0;
+            while (GraphemeFound == No) {
+                CodeUnitsRead                      = PlatformIO_Read(Source, sizeof(UTF16), &CodeUnit, 1);
+                if (CodeUnitsRead == 1) {
+                    CodePointSizeInCodeUnits      += UTF16_GetCodePointSizeInCodeUnits(CodeUnit);
+                    PlatformIO_File_Seek(Source, CodePointSizeInCodeUnits, SEEK_CUR);
+                    Grapheme                       = UTF16_Init(CodePointSizeInCodeUnits);
+                    CodeUnitsRead                  = PlatformIO_Read(Source, sizeof(UTF16), &Grapheme, CodePointSizeInCodeUnits);
+                    if (CodeUnitsRead == CodePointSizeInCodeUnits) {
+                        fread(&Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits, Source);
+                        UTF32 *CodePoint           = UTF16_Decode(Grapheme);
+                        for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
+                            if (CodePoint[0] == GraphemeExtensionTable[GraphemeExtension]) {
+                            } else if (CodePoint[0] != GraphemeExtensionTable[GraphemeExtension] && GraphemeExtension == GraphemeExtensionTableSize - 1) {
+                                GraphemeFound      = Yes;
+                            }
+                        }
+                    } else {
+                        Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Read %llu bytes but %llu was requested"), CodeUnitsRead, CodePointSizeInCodeUnits);
+                    }
+                } else {
+                    Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Read %llu bytes but 1 was requested"), CodeUnitsRead);
+                }
+            }
+        } else {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
+        }
+        return Grapheme;
+    }
     
-    UTF8 *UTF8_ReadLine(FILE *Source) {
+    UTF8 *UTF8_ReadSentence(FILE *Source) {
         UTF8 *Line = NULL;
         if (Source != NULL) {
+            /*
+             Loop:
+             Read each CodePoint until it matches one of the CodePoints in LineBreakTable
+             */
+
+            UTF32    CurrentCodePoint    = 0xFFFFFFFF;
+            uint64_t LineSizeInCodeUnits = 0;
+            UTF8    *CodeUnits           = UTF8_Init(UTF8MaxCodeUnitsInCodePoint);
+            for (uint8_t LineBreak = 0; LineBreak < LineBreakTableSize; LineBreak++) {
+                while (CurrentCodePoint != LineBreakTable[LineBreak] && CurrentCodePoint != PlatformIO_NULLTerminator) {
+                    // Count CodeUnits, then seek back and read them.
+                    // Extract each CodePoint from the stream, gets its size add it and
+                    PlatformIO_Read(Source, sizeof(UTF8), CodeUnits, 1);
+                    LineSizeInCodeUnits += 0;
+                }
+            }
+
+
+
+
             uint64_t StringSizeInCodeUnits  = 0ULL;
             uint64_t StringSizeInCodePoints = 0ULL;
-            UTF32   *CurrentCodePoint       = NULL;
-            while (CurrentCodePoint[0] != UTF32Character('\n') && CurrentCodePoint[0] != PlatformIO_NULLTerminator) {
-                StringSizeInCodePoints     += 1;
-                UTF8 *CodePoint             = UTF8_ReadGraphemeFromFile(Source);
-                CurrentCodePoint            = UTF8_Decode(CodePoint);
-            }
+            //UTF32   *CurrentCodePoint       = NULL;
+            /*
+             while (CurrentCodePoint[0] != UTF32Character('\n') &&  CurrentCodePoint[0] != PlatformIO_NULLTerminator) {
+             StringSizeInCodePoints     += 1;
+             UTF8 *CodePoint             = UTF8_ReadGrapheme(Source);
+             CurrentCodePoint            = UTF8_Decode(CodePoint);
+             }
+             */
             Line                            = UTF8_Init(StringSizeInCodeUnits);
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
@@ -1464,7 +1643,7 @@ extern "C" {
         return Line;
     }
     
-    UTF16 *UTF16_ReadLine(FILE *Source) {
+    UTF16 *UTF16_ReadSentence(FILE *Source) {
         UTF16 *Line = NULL;
         if (Source != NULL) {
             uint64_t StringSizeInCodeUnits  = 0ULL;
@@ -1472,7 +1651,7 @@ extern "C" {
             UTF32   *CurrentCodePoint       = NULL;
             while (CurrentCodePoint[0] != UTF32Character('\n') && CurrentCodePoint[0] != PlatformIO_NULLTerminator) {
                 StringSizeInCodePoints     += 1;
-                UTF16 *CodePoint            = UTF16_ReadGraphemeFromFile(Source);
+                UTF16 *CodePoint            = UTF16_ReadGrapheme(Source);
                 CurrentCodePoint            = UTF16_Decode(CodePoint);
             }
             Line                            = UTF16_Init(StringSizeInCodeUnits);
@@ -1482,7 +1661,7 @@ extern "C" {
         return Line;
     }
     
-    void UTF8_WriteLine(FILE *OutputFile, PlatformIO_Immutable(UTF8 *) String) {
+    void UTF8_WriteSentence(FILE *OutputFile, PlatformIO_Immutable(UTF8 *) String) {
         if (String != NULL && OutputFile != NULL) {
             FoundationIO_StringTypes Type = StringIO_GetStreamOrientation(OutputFile);
             uint64_t StringSize           = UTF8_GetStringSizeInCodeUnits(String);
@@ -1516,7 +1695,7 @@ extern "C" {
         }
     }
     
-    void UTF16_WriteLine(FILE *OutputFile, PlatformIO_Immutable(UTF16 *) String) {
+    void UTF16_WriteSentence(FILE *OutputFile, PlatformIO_Immutable(UTF16 *) String) {
         if (String != NULL && OutputFile != NULL) {
             FoundationIO_StringTypes Type   = StringIO_GetStreamOrientation(OutputFile);
             uint64_t StringSize        = UTF16_GetStringSizeInCodeUnits(String);
@@ -2521,7 +2700,20 @@ extern "C" {
     
     static UTF32 *Decimal2String_UTF32(double Decimal, uint64_t MinimumWidth, uint64_t Precision, FoundationIO_Bases Base) {
         UTF32 *String = NULL;
-        if ((Base & Base_Decimal) != Base_Decimal || Base != Base_Unknown) {
+        if ((Base & Base_Decimal) == Base_Decimal) {
+            uint8_t StringSize        = 0;
+            int8_t  Sign              = ExtractSign(Decimal);
+            int32_t Exponent          = ExtractExponent(Decimal);
+            int64_t Mantissa          = ExtractMantissa(Decimal);
+            uint8_t NumExponentDigits = NumDigitsInInteger(10, Exponent);
+            uint8_t NumMantissaDigits = NumDigitsInInteger(10, Mantissa);
+
+            /*
+             Is there a way to calculate the number of digits needed for correct round tripping?
+
+             if we could find that, we could bypass all of the other nonsense and just create a correct number right off the bat.
+             */
+
             if ((Base & Base_Shortest) == Base_Shortest) {
                 if (MinimumWidth == 0 && Precision == 0) {
                     // Ryu
@@ -2541,10 +2733,31 @@ extern "C" {
                     // Do something stranger
                 }
             } else if ((Base & Base_Radix16) == Base_Radix16) {
-                if (MinimumWidth == 0 && Precision == 0) {
-                    // Ryu
+                StringSize += 2; // + 2 for 0x/0X
+                if ((Base & Base_Uppercase) == Base_Uppercase) {
+                    if (MinimumWidth == 0 && Precision == 0) {
+                        // Ryu
+                        if (Sign == -1) {
+                            // Prefix a hyphen
+                            StringSize += 1;
+                        }
+                        // Prefix 0X
+                        // WriteExponent
+                        // Write period
+                        // Write Hexadecimal Mantissa
+                        // Write P for Power
+                        // Write
+                    } else {
+                        // Do something stranger
+                    }
+                } else if ((Base & Base_Lowercase) == Base_Lowercase) {
+                    if (MinimumWidth == 0 && Precision == 0) {
+                        // Ryu
+                    } else {
+                        // Do something stranger
+                    }
                 } else {
-                    // Do something stranger
+                    Log(Severity_USER, UnicodeIOTypes_FunctionName, UTF8String("Hexadecimal base must be Uppercase or Lowercase"));
                 }
             }
         } else if ((Base & Base_Decimal) != Base_Decimal) {
@@ -2942,7 +3155,7 @@ extern "C" {
         if (String != NULL && Delimiters != NULL) {
             UTF32  *String32      = UTF16_Decode(String);
             UTF32 **Delimiters32  = UTF16_StringSet_Decode(Delimiters);
-            UTF32 **SplitString32 = UTF32_Split((PlatformIO_Immutable(UTF32 *)) String32, (PlatformIO_Immutable(UTF32 **)) Delimiters32);
+            PlatformIO_Immutable(UTF32 **) SplitString32 = (PlatformIO_Immutable(UTF32 **)) UTF32_Split((PlatformIO_Immutable(UTF32 *)) String32, (PlatformIO_Immutable(UTF32 **)) Delimiters32);
             UTF32_Deinit(String32);
             UTF32_StringSet_Deinit((UTF32**) Delimiters32);
             SplitString           = UTF16_StringSet_Encode((PlatformIO_Immutable(UTF32 **)) SplitString32);
@@ -3326,7 +3539,7 @@ extern "C" {
     uint64_t *UTF32_StringSet_GetStringSizesInCodePoints(PlatformIO_Immutable(UTF32 **) StringSet) {
         uint64_t *StringSetSizes       = NULL;
         if (StringSet != NULL) {
-            uint64_t NumStrings          = UTF32_StringSet_GetNumStrings(StringSet);
+            uint64_t NumStrings        = UTF32_StringSet_GetNumStrings(StringSet);
             StringSetSizes             = (uint64_t*) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringSetSizes[String] = UTF32_GetStringSizeInCodePoints(StringSet[String]);
@@ -3415,9 +3628,10 @@ extern "C" {
     
     void UTF8_StringSet_Deinit(UTF8 **StringSet) {
         if (StringSet != NULL) {
-            uint64_t NumStrings = UTF8_StringSet_GetNumStrings((PlatformIO_Immutable(UTF8 **)) StringSet);
-            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+            uint64_t String = 0ULL;
+            while (StringSet[String] != PlatformIO_NULLTerminator) {
                 free(StringSet[String]);
+                String += 1;
             }
             free(StringSet);
         } else {
@@ -3427,9 +3641,10 @@ extern "C" {
     
     void UTF16_StringSet_Deinit(UTF16 **StringSet) {
         if (StringSet != NULL) {
-            uint64_t NumStrings = UTF16_StringSet_GetNumStrings((PlatformIO_Immutable(UTF16 **)) StringSet);
-            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+            uint64_t String = 0ULL;
+            while (StringSet[String] != PlatformIO_NULLTerminator) {
                 free(StringSet[String]);
+                String += 1;
             }
             free(StringSet);
         } else {
@@ -3439,9 +3654,10 @@ extern "C" {
     
     void UTF32_StringSet_Deinit(UTF32 **StringSet) {
         if (StringSet != NULL) {
-            uint64_t NumStrings = UTF32_StringSet_GetNumStrings((PlatformIO_Immutable(UTF32 **)) StringSet);
-            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+            uint64_t String = 0ULL;
+            while (StringSet[String] != PlatformIO_NULLTerminator) {
                 free(StringSet[String]);
+                String += 1;
             }
             free(StringSet);
         } else {
