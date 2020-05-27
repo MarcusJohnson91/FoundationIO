@@ -344,11 +344,11 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF8 *UTF8_DelocalizeDecimal(UTF8 *String) {
+    UTF8 *UTF8_DelocalizeDecimal(PlatformIO_Immutable(UTF8 *) String, FoundationIO_Bases Base) {
         UTF8 *Delocalized = NULL;
         if (String != NULL) {
             UTF32 *String32      = UTF8_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(String32);
+            UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(String32, Base);
             free(String32);
             Delocalized          = UTF8_Encode(Delocalized32);
             free(Delocalized32);
@@ -358,11 +358,11 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF16 *UTF16_DelocalizeDecimal(UTF16 *String) {
+    UTF16 *UTF16_DelocalizeDecimal(PlatformIO_Immutable(UTF16 *) String, FoundationIO_Bases Base) {
         UTF16 *Delocalized = NULL;
         if (String != NULL) {
             UTF32 *String32      = UTF16_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(String32);
+            UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(String32, Base);
             free(String32);
             Delocalized          = UTF16_Encode(Delocalized32);
             free(Delocalized32);
@@ -372,7 +372,7 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF32 *UTF32_DelocalizeDecimal(PlatformIO_Immutable(UTF32 *) String) {
+    UTF32 *UTF32_DelocalizeDecimal(PlatformIO_Immutable(UTF32 *) String, FoundationIO_Bases Base) {
         UTF32 *Delocalized       = NULL;
         if (String != NULL) {
             uint64_t StringSize       = UTF32_GetStringSizeInCodePoints(String);
