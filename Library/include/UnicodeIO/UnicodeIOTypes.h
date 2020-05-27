@@ -6,7 +6,7 @@
  @brief               This header contains types and macros used across FoundationIO.
  */
 
-#include "../PlatformIO.h"
+#include "../PlatformIO.h" /* Included for Platform Independence macros */
 
 #pragma once
 
