@@ -507,7 +507,7 @@ extern "C" {
     @param         Bytes2Read        The number of bytes to read.
     @return                          Returns the amount of data actually read.
     */
-    uint64_t        PlatformIO_Read(FILE *File2Read, uint8_t BufferElementSize, PlatformIO_Immutable(void *), Buffer, uint64_t Bytes2Read);
+    uint64_t        PlatformIO_Read(FILE *File2Read, uint8_t BufferElementSize, void *Buffer, uint64_t Bytes2Read);
 
     /*!
     @abstract                        Writes data to a file.
