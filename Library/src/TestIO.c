@@ -1,13 +1,14 @@
-#include "../include/PlatformIO.h"
-#include "../include/TestIO.h"                   /* Included for our declarations */
-#include "../include/UnicodeIO/LogIO.h"          /* Included for error reporting */
-#include "../include/UnicodeIO/StringIO.h"       /* Included for UTFX_Init functions */
+#include "../include/PlatformIO.h"         /* Included for Platform Independence macros */
+#include "../include/TestIO.h"             /* Included for our declarations */
+#include "../include/UnicodeIO/LogIO.h"    /* Included for error reporting */
+#include "../include/UnicodeIO/StringIO.h" /* Included for UTFX_Init functions */
 
 #if   (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_AppleOS) != PlatformIO_AppleOS))
 #include <time.h>                      /* Included for timespec_get */
 #elif (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_AppleOS) == PlatformIO_AppleOS))
 #include <mach/mach_time.h>
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#include <Windows.h>
 #include <WinBase.h>                   /* Included for QueryPerformanceCounter, Windows.h MUST be included before winbase */
 #endif
 

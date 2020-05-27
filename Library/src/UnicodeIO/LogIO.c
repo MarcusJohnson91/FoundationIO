@@ -112,8 +112,8 @@ extern "C" {
             Log_LogFile = stderr;
         }
         
-        UTF32 *Error    = UTF32String("ERROR");
-        UTF32 *Mistake  = UTF32String("Mistake");
+        const UTF32 *Error    = UTF32String("ERROR");
+        const UTF32 *Mistake  = UTF32String("Mistake");
         
         UTF32 *SecurityName   = NULL;
         if (Log_ProgramName != NULL) {
@@ -141,11 +141,11 @@ extern "C" {
         UTF32 *FormattedString32      = FormatString_UTF32(Description2, Specifiers, FormattedStringSize);
         UTF8  *FormattedString8       = UTF8_Encode(FormattedString32);
         
-        UTF8_WriteLine(Severity == Severity_USER ? stdout : stderr, FormattedString8);
+        UTF8_WriteSentence(Severity == Severity_USER ? stdout : stderr, FormattedString8);
         fflush(stdout);
         
         if (Log_LogFile != NULL) {
-            UTF8_WriteLine(Log_LogFile, FormattedString8);
+            UTF8_WriteSentence(Log_LogFile, FormattedString8);
             fflush(Log_LogFile);
         }
         free(FormattedString32);

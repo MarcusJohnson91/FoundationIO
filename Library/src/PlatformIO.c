@@ -1,4 +1,4 @@
-#include "../include/PlatformIO.h"
+#include "../include/PlatformIO.h" /* Included for Platform Independence macros */
 
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
 #include <stddef.h>

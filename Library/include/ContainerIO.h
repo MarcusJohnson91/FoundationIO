@@ -6,8 +6,7 @@
  @brief               This header contains code for containers (type generic arrays)
  */
 
-#include "PlatformIO.h"
-#include "UnicodeIO/UnicodeIOTypes.h"
+#include "PlatformIO.h" /* Included for Platform Independence macros */
 
 #pragma  once
 

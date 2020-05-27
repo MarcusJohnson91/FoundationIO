@@ -6,7 +6,7 @@
  @brief          This header contains code for specific mathematical functions used in FoundationIO and it's consumers.
  */
 
-#include "PlatformIO.h"
+#include "PlatformIO.h" /* Included for Platform Independence macros */
 
 #pragma  once
 

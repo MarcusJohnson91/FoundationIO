@@ -6,8 +6,8 @@
  @brief               This header contains types, functions, and tables for cryptography and hashing.
  */
 
-#include "PlatformIO.h"
-#include "UnicodeIO/UnicodeIOTypes.h"
+#include "PlatformIO.h"               /* Included for Platform Independence macros */
+#include "UnicodeIO/UnicodeIOTypes.h" /* Included for UTFX types */
 
 #pragma once
 
