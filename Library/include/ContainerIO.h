@@ -18,30 +18,30 @@ extern "C" {
 #endif
     
     /*!
-     @enum                  ContainerIO_AudioChannelMask
-     @abstract                                               Defines the ContainerIO_AudioTypes values, OR-able.
-     @constant              AudioMask_Unknown                Invalid AudioMask, exists solely to tell when it hasn't been set.
-     @constant              AudioMask_FrontLeft              The channel's location is the front left.
-     @constant              AudioMask_FrontRight             The channel's location is the front right.
-     @constant              AudioMask_FrontCenter            The channel's location is the front center.
-     @constant              AudioMask_LFE                    The channel's contains the Low Frequency Effects for subwoofers.
-     @constant              AudioMask_SurroundLeft           The channel's location is the side left.
-     @constant              AudioMask_SurroundRight          The channel's location is the side right.
-     @constant              AudioMask_SurroundCenter         The channel's location is the side center.
-     @constant              AudioMask_RearLeft               The channel's location is the rear left.
-     @constant              AudioMask_RearRight              The channel's location is the rear right.
-     @constant              AudioMask_RearCenter             The channel's location is the rear center.
-     @constant              AudioMask_FrontCenterLeft        The channel's location is the front center left.
-     @constant              AudioMask_FrontCenterRight       The channel's location is the front center right.
-     @constant              AudioMask_TopCenter              The channel's location is the top center.
-     @constant              AudioMask_TopFrontLeft           The channel's location is the top front left.
-     @constant              AudioMask_TopFrontRight          The channel's location is the top front right.
-     @constant              AudioMask_TopFrontCenter         The channel's location is the top front center.
-     @constant              AudioMask_TopRearLeft            The channel's location is the top rear left.
-     @constant              AudioMask_TopRearRight           The channel's location is the top rear right.
-     @constant              AudioMask_TopRearCenter          The channel's location is the top rear center.
-     @constant              AudioMask_StereoLeft             RF64 Extension, Stereo Downmix, Left.
-     @constant              AudioMask_StereoRight            RF64 Extension, Stereo Downmix, Right.
+     @enum       ContainerIO_AudioChannelMask
+     @abstract                                    Defines the ContainerIO_AudioTypes values, OR-able.
+     @constant   AudioMask_Unknown                Invalid AudioMask, exists solely to tell when it hasn't been set.
+     @constant   AudioMask_FrontLeft              The channel's location is the front left.
+     @constant   AudioMask_FrontRight             The channel's location is the front right.
+     @constant   AudioMask_FrontCenter            The channel's location is the front center.
+     @constant   AudioMask_LFE                    The channel's contains the Low Frequency Effects for subwoofers.
+     @constant   AudioMask_SurroundLeft           The channel's location is the side left.
+     @constant   AudioMask_SurroundRight          The channel's location is the side right.
+     @constant   AudioMask_SurroundCenter         The channel's location is the side center.
+     @constant   AudioMask_RearLeft               The channel's location is the rear left.
+     @constant   AudioMask_RearRight              The channel's location is the rear right.
+     @constant   AudioMask_RearCenter             The channel's location is the rear center.
+     @constant   AudioMask_FrontCenterLeft        The channel's location is the front center left.
+     @constant   AudioMask_FrontCenterRight       The channel's location is the front center right.
+     @constant   AudioMask_TopCenter              The channel's location is the top center.
+     @constant   AudioMask_TopFrontLeft           The channel's location is the top front left.
+     @constant   AudioMask_TopFrontRight          The channel's location is the top front right.
+     @constant   AudioMask_TopFrontCenter         The channel's location is the top front center.
+     @constant   AudioMask_TopRearLeft            The channel's location is the top rear left.
+     @constant   AudioMask_TopRearRight           The channel's location is the top rear right.
+     @constant   AudioMask_TopRearCenter          The channel's location is the top rear center.
+     @constant   AudioMask_StereoLeft             RF64 Extension, Stereo Downmix, Left.
+     @constant   AudioMask_StereoRight            RF64 Extension, Stereo Downmix, Right.
      */
     typedef enum ContainerIO_AudioChannelMask {
                             AudioMask_Unknown               = 0,
@@ -69,14 +69,14 @@ extern "C" {
     } ContainerIO_AudioChannelMask;
     
     /*!
-     @enum                  ContainerIO_AudioTypes
-     @abstract                                               Defines the ContainerIO_AudioTypes values, OR-able.
-     @constant              AudioType_Unknown                Invalid AudioType, exists solely to tell when it hasn't been set.
-     @constant              AudioType_Unsigned               The samples are unsigned.
-     @constant              AudioType_Signed                 The samples are signed.
-     @constant              AudioType_Integer8               The samples values are between 0 and 255        for Unsigned, -128        and 127        for Signed.
-     @constant              AudioType_Integer16              The samples values are between 0 and 65535      for Unsigned, -32768      and 32767      for Signed.
-     @constant              AudioType_Integer32              The samples values are between 0 and 4294967295 for Unsigned, -2147483648 and 2147483647 for Signed.
+     @enum       ContainerIO_AudioTypes
+     @abstract                                    Defines the ContainerIO_AudioTypes values, OR-able.
+     @constant   AudioType_Unknown                Invalid AudioType, exists solely to tell when it hasn't been set.
+     @constant   AudioType_Unsigned               The samples are unsigned.
+     @constant   AudioType_Signed                 The samples are signed.
+     @constant   AudioType_Integer8               The samples values are between 0 and 255        for Unsigned, -128        and 127        for Signed.
+     @constant   AudioType_Integer16              The samples values are between 0 and 65535      for Unsigned, -32768      and 32767      for Signed.
+     @constant   AudioType_Integer32              The samples values are between 0 and 4294967295 for Unsigned, -2147483648 and 2147483647 for Signed.
      */
     typedef enum ContainerIO_AudioTypes {
                             AudioType_Unknown               = 0,
@@ -88,21 +88,21 @@ extern "C" {
     } ContainerIO_AudioTypes;
     
     /*!
-     @enum                  ContainerIO_ImageChannelMask
-     @abstract                                               Defines the ChannelMask values.
-     @constant              ImageMask_Unknown                Invalid ImageMask, exists solely to tell when it hasn't been set.
-     @constant              ImageMask_2D                     The image has two dimensions.
-     @constant              ImageMask_Luma                   The channel contains the Luminance aka Brightness information, also used for single channel images.
-     @constant              ImageMask_Chroma1                The channel contains the Chrominance aka Color information.
-     @constant              ImageMask_Chroma2                The channel contains the Chrominance aka Color information.
-     @constant              ImageMask_Chroma3                The channel contains the Chrominance aka Color information.
-     @constant              ImageMask_Alpha                  The channel contains the Alpha aka transparency information.
-     @constant              ImageMask_3D_L                   The image has three dimensions, this one is the left.
-     @constant              ImageMask_3D_R                   The image has three dimensions, this one is the right.
-     @constant              ImageMask_Red                    The channel contains the Red    color information.
-     @constant              ImageMask_Green                  The channel contains the Green  color information.
-     @constant              ImageMask_Blue                   The channel contains the Blue   color information.
-     @constant              ImageMask_Green2                 The channel contains the Green2 color information, for Bayer filtered images.
+     @enum       ContainerIO_ImageChannelMask
+     @abstract                                    Defines the ChannelMask values.
+     @constant   ImageMask_Unknown                Invalid ImageMask, exists solely to tell when it hasn't been set.
+     @constant   ImageMask_2D                     The image has two dimensions.
+     @constant   ImageMask_Luma                   The channel contains the Luminance aka Brightness information, also used for single channel images.
+     @constant   ImageMask_Chroma1                The channel contains the Chrominance aka Color information.
+     @constant   ImageMask_Chroma2                The channel contains the Chrominance aka Color information.
+     @constant   ImageMask_Chroma3                The channel contains the Chrominance aka Color information.
+     @constant   ImageMask_Alpha                  The channel contains the Alpha aka transparency information.
+     @constant   ImageMask_3D_L                   The image has three dimensions, this one is the left.
+     @constant   ImageMask_3D_R                   The image has three dimensions, this one is the right.
+     @constant   ImageMask_Red                    The channel contains the Red    color information.
+     @constant   ImageMask_Green                  The channel contains the Green  color information.
+     @constant   ImageMask_Blue                   The channel contains the Blue   color information.
+     @constant   ImageMask_Green2                 The channel contains the Green2 color information, for Bayer filtered images.
      */
     typedef enum ContainerIO_ImageChannelMask {
                             ImageMask_Unknown               = 0,
@@ -121,11 +121,11 @@ extern "C" {
     } ContainerIO_ImageChannelMask;
     
     /*!
-     @enum                  ContainerIO_ImageTypes
-     @abstract                                               Defines the type of image.
-     @constant              ImageType_Unknown                Invalid ImageType, exists solely to tell when it hasn't been set.
-     @constant              ImageType_Integer8               The pixels are unsigned 8  bit integers.
-     @constant              ImageType_Integer16              The pixels are unsigned 16 bit integers.
+     @enum       ContainerIO_ImageTypes
+     @abstract                                    Defines the type of image.
+     @constant   ImageType_Unknown                Invalid ImageType, exists solely to tell when it hasn't been set.
+     @constant   ImageType_Integer8               The pixels are unsigned 8  bit integers.
+     @constant   ImageType_Integer16              The pixels are unsigned 16 bit integers.
      */
     typedef enum ContainerIO_ImageTypes {
                             ImageType_Unknown               = 0,
@@ -134,12 +134,12 @@ extern "C" {
     } ContainerIO_ImageTypes;
     
     /*!
-     @enum                  ContainerIO_FlipTypes
-     @abstract                                               Defines the type of flipping.
-     @constant              FlipType_Unknown                 Invalid ImageType, exists solely to tell when it hasn't been set.
-     @constant              FlipType_Vertical                Flip the imge vertically, up and down.
-     @constant              FlipType_Horizontal              Flip the image horizontally, side to side.
-     @constant              FlipType_VerticalAndHorizontal   Flip the image in both ways.
+     @enum       ContainerIO_FlipTypes
+     @abstract                                    Defines the type of flipping.
+     @constant   FlipType_Unknown                 Invalid ImageType, exists solely to tell when it hasn't been set.
+     @constant   FlipType_Vertical                Flip the imge vertically, up and down.
+     @constant   FlipType_Horizontal              Flip the image horizontally, side to side.
+     @constant   FlipType_VerticalAndHorizontal   Flip the image in both ways.
      */
     typedef enum ContainerIO_FlipTypes {
                             FlipType_Unknown                = 0,
@@ -149,11 +149,11 @@ extern "C" {
     } ContainerIO_FlipTypes;
     
     /*!
-     @enum                  ContainerIO_SortTypes
-     @abstract                                               Defines the type of sorting.
-     @constant              SortType_Unknown                 Invalid SortType, exists solely to tell when it hasn't been set.
-     @constant              SortType_Ascending               Index 0 contains the most common value.
-     @constant              SortType_Descending              Index 0 contains the least common value.
+     @enum       ContainerIO_SortTypes
+     @abstract                                    Defines the type of sorting.
+     @constant   SortType_Unknown                 Invalid SortType, exists solely to tell when it hasn't been set.
+     @constant   SortType_Ascending               Index 0 contains the most common value.
+     @constant   SortType_Descending              Index 0 contains the least common value.
      */
     typedef enum ContainerIO_SortTypes {
                             SortType_Unknown                = 0,
@@ -180,7 +180,7 @@ extern "C" {
     typedef struct          ImageHistogram       ImageHistogram;
     
     /*!
-     @abstract                              Creates an empty Audio2DContainer.
+     @abstract                                    Creates an empty Audio2DContainer.
      @param                 Type            A type from ContainerIO_AudioTypes.
      @param                 ChannelMap      Array of ChannelMasks, one array entry for each channel.
      @param                 SampleRate      The number of samples in one second of audio.
@@ -189,59 +189,59 @@ extern "C" {
     Audio2DContainer       *Audio2DContainer_Init(ContainerIO_AudioTypes Type, AudioChannelMap *ChannelMap, uint64_t SampleRate, uint64_t NumSamples);
     
     /*!
-     @abstract                              Returns the number of channel-agnostic samples in one second.
+     @abstract                                    Returns the number of channel-agnostic samples in one second.
      @param                 Audio           A pointer to the instance of an Audio2DContainer in question.
      */
     uint64_t                Audio2DContainer_GetSampleRate(Audio2DContainer *Audio);
     
     /*!
-     @abstract                              Returns the number of bits required to represent a audio sample.
+     @abstract                                    Returns the number of bits required to represent a audio sample.
      @param                 Audio           A pointer to the instance of an Audio2DContainer in question.
      */
     uint8_t                 Audio2DContainer_GetBitDepth(Audio2DContainer *Audio);
     
     /*!
-     @abstract                              Returns the number of channel-agnostic audio samples stored in the container.
+     @abstract                                    Returns the number of channel-agnostic audio samples stored in the container.
      @param                 Audio           A pointer to the instance of an Audio2DContainer in question.
      */
     uint64_t                Audio2DContainer_GetNumSamples(Audio2DContainer *Audio);
     
     /*!
-     @abstract                              Gets the type of the array contained by the Audio2DContainer.
+     @abstract                                    Gets the type of the array contained by the Audio2DContainer.
      @param                 Audio           A pointer to the instance of an Audio2DContainer in question.
      */
     ContainerIO_AudioTypes             Audio2DContainer_GetType(Audio2DContainer *Audio);
     
     /*!
-     @abstract                              Gets a pointer to the array of samples.
+     @abstract                                    Gets a pointer to the array of samples.
      @remark                                You need to cast the pointer to the correct type you got from Audio2DContainer_GetType.
      @param                 Audio           A pointer to the instance of an Audio2DContainer in question.
      */
     void                  **Audio2DContainer_GetArray(Audio2DContainer *Audio);
     
     /*!
-     @abstract                              Returns the average of the samples in the buffer.
+     @abstract                                    Returns the average of the samples in the buffer.
      @param                 Audio           A pointer to the instance of an Audio2DContainer in question.
      @param                 Channel         Which index should we get average?
      */
     int64_t                 Audio2DContainer_GetAverage(Audio2DContainer *Audio, uint64_t Channel);
     
     /*!
-     @abstract                              Returns the highest valued sample in the buffer.
+     @abstract                                    Returns the highest valued sample in the buffer.
      @param                 Audio           A pointer to the instance of an Audio2DContainer in question.
      @param                 Channel         Which index should we get the highest value from?
      */
     int64_t                 Audio2DContainer_GetMax(Audio2DContainer *Audio, uint64_t Channel);
     
     /*!
-     @abstract                              Returns the lowest valued sample in the buffer.
+     @abstract                                    Returns the lowest valued sample in the buffer.
      @param                 Audio           A pointer to the instance of an Audio2DContainer in question.
      @param                 Channel         Which index should we get the lowest value from?
      */
     int64_t                 Audio2DContainer_GetMin(Audio2DContainer *Audio, uint64_t Channel);
     
     /*!
-     @abstract                                   Securely erases an Audio2DContainer.
+     @abstract                                    Securely erases an Audio2DContainer.
      @param                 Audio                A pointer to the instance of an Audio2DContainer in question.
      @param                 NewValue             The value to set each codeunit to while erasing.
      @return                                     Returns the value of the first element of String, or 0xFE if it was unsucessful
@@ -249,48 +249,48 @@ extern "C" {
     uint8_t                 Audio2DContainer_Erase(Audio2DContainer *Audio, uint8_t NewValue);
     
     /*!
-     @abstract                              Deletes an Audio2DContainer, and any samples stored within it.
+     @abstract                                    Deletes an Audio2DContainer, and any samples stored within it.
      @param                 Audio           A pointer to the instance of an Audio2DContainer in question.
      */
     void                    Audio2DContainer_Deinit(Audio2DContainer *Audio);
     
     /*!
-     @abstract                              Creates a Audio2DHistogram.
+     @abstract                                    Creates a Audio2DHistogram.
      @param                 Audio           A pointer to the instance of an Audio2DContainer in question.
      @return                                Returns the newly created Histogram.
      */
     Audio2DHistogram       *Audio2DHistogram_Init(Audio2DContainer *Audio);
     
     /*!
-     @abstract                              Gets a pointer to the histogram data.
+     @abstract                                    Gets a pointer to the histogram data.
      @param                 Histogram       A pointer to the instance of an Audio2DHistogram in question.
      @return                                Returns a pointer to the histogram data.
      */
     void                   *Audio2DHistogram_GetArray(Audio2DHistogram *Histogram);
     
     /*!
-     @abstract                              Sets a pointer to the histogram data.
+     @abstract                                    Sets a pointer to the histogram data.
      @param                 Histogram       A pointer to the instance of an Audio2DHistogram in question.
      @param                 Array           A pointer to the histogram data.
      */
     void                    Audio2DHistogram_SetArray(Audio2DHistogram *Histogram, void *Array);
     
     /*!
-     @abstract                              Generates a histogram from an Audio2DContainer.
+     @abstract                                    Generates a histogram from an Audio2DContainer.
      @param                 Audio           A pointer to the instance of an Audio2DContainer in question.
      @return                                Returns the newly created Histogram.
      */
     Audio2DHistogram       *Audio2DHistogram_Generate(Audio2DContainer *Audio);
     
     /*!
-     @abstract                              Sorts a histogram.
+     @abstract                                    Sorts a histogram.
      @param                 Histogram       A pointer to the Audio2DHistogram in question.
      @param                 Sort            The kind of sorting to do.
      */
     void                    Audio2DHistogram_Sort(Audio2DHistogram *Histogram, ContainerIO_SortTypes Sort);
     
     /*!
-     @abstract                                   Securely erases an Audio2DContainer.
+     @abstract                                    Securely erases an Audio2DContainer.
      @param                 Histogram            A pointer to the instance of an Audio2DContainer in question.
      @param                 NewValue             The value to set each codeunit to while erasing.
      @return                                     Returns the value of the first element of String, or 0xFE if it was unsucessful
@@ -298,33 +298,33 @@ extern "C" {
     uint8_t                 Audio2DHistogram_Erase(Audio2DHistogram *Histogram, uint8_t NewValue);
     
     /*!
-     @abstract                              frees a Audio2DHistogram.
+     @abstract                                    frees a Audio2DHistogram.
      @param                 Histogram       A pointer to the Audio2DHistogram to deinitialize.
      */
     void                    Audio2DHistogram_Deinit(Audio2DHistogram *Histogram);
     
     /*!
-     @abstract                              Creates a AudioChannelMap.
+     @abstract                                    Creates a AudioChannelMap.
      @param                 NumChannels     The number of channels.
      @return                                Returns the newly created ChannelMap.
      */
     AudioChannelMap        *AudioChannelMap_Init(uint64_t NumChannels);
     
     /*!
-     @abstract                              Gets a pointer to the ChannelMap.
+     @abstract                                    Gets a pointer to the ChannelMap.
      @param                 Audio           Audio2DContainer Pointer.
      @return                                Returns a pointer to the ChannelMap.
      */
     AudioChannelMap        *Audio2DContainer_GetChannelMap(Audio2DContainer *Audio);
     
     /*!
-     @abstract                              Returns the number of audio channels.
+     @abstract                                    Returns the number of audio channels.
      @param                 Audio           Audio2DContainer Pointer.
      */
     uint64_t                Audio2DContainer_GetNumChannels(Audio2DContainer *Audio);
     
     /*!
-     @abstract                              Adds a ContainerIO_AudioChannelMask at the specified Index to the ChannelMap.
+     @abstract                                    Adds a ContainerIO_AudioChannelMask at the specified Index to the ChannelMap.
      @param                 ChannelMap      The number of channels.
      @param                 Index           The index in the ChannelMap to add the mask.
      @param                 Mask            The ChannelMask for the index.
@@ -332,32 +332,32 @@ extern "C" {
     void                    AudioChannelMap_AddMask(AudioChannelMap *ChannelMap, uint64_t Index, ContainerIO_AudioChannelMask Mask);
     
     /*!
-     @abstract                              Returns the ChannelMask for Index.
+     @abstract                                    Returns the ChannelMask for Index.
      @param                 ChannelMap      Audio2DContainer Pointer.
      @param                 Index           The channel index to get the mask for.
      */
     ContainerIO_AudioChannelMask        AudioChannelMap_GetMask(AudioChannelMap *ChannelMap, uint64_t Index);
     
    /*!
-    @abstract                               Finds the lowest index in the ChannelMap that is unused.
+    @abstract                                    Finds the lowest index in the ChannelMap that is unused.
     @param                  ChannelMap      Pointer to the ChannelMap.
     */
     uint64_t                AudioChannelMap_GetLowestUnusedIndex(AudioChannelMap *ChannelMap);
     
     /*!
-     @abstract                              Deletes a ChannelMap.
+     @abstract                                    Deletes a ChannelMap.
      @param                 ChannelMap      The AudioChannelMap to delete.
      */
     void                    AudioChannelMap_Deinit(AudioChannelMap *ChannelMap);
     
     /*!
-     @abstract                              Creates an empty Audio3DContainer.
+     @abstract                                    Creates an empty Audio3DContainer.
      @return                                Returns a pointer to an Audio3DContainer.
      */
     Audio3DContainer       *Audio3DContainer_Init(void);
     
     /*!
-     @abstract                              Adds a AudioVector to an Audio3DContainer.
+     @abstract                                    Adds a AudioVector to an Audio3DContainer.
      @param                 Container       The Audio3DContainer to add the AudioVector to.
      @param                 Vector          The AudioVector to add.
      @param                 Index           The order of the AudioVector.
@@ -365,20 +365,20 @@ extern "C" {
     void                    Audio3DContainer_SetVector(Audio3DContainer *Container, AudioVector *Vector, uint64_t Index);
     
     /*!
-     @abstract                              Gets a pointer to an AudioVector.
+     @abstract                                    Gets a pointer to an AudioVector.
      @param                 Container       The Audio3DContainer to get the AudioVector from.
      @param                 Index           The AudioVector to get.
      */
     AudioVector            *Audio3DContainer_GetVector(Audio3DContainer *Container, uint64_t Index);
     
     /*!
-     @abstract                                   Gets the total number of samples in the Audio3DContainer.
+     @abstract                                    Gets the total number of samples in the Audio3DContainer.
      @param                 Container            The Audio3DContainer to get the total number of samples from.
      */
     uint64_t                Audio3DContainer_GetTotalNumSamples(Audio3DContainer *Container);
     
     /*!
-     @abstract                                   Downmixes 3D audio to 2D audio.
+     @abstract                                    Downmixes 3D audio to 2D audio.
      @param                 Audio3D              The Audio3DContainer to get the total number of samples from.
      @param                 ChannelMap           The ChannelMap to create the downmix with.
      @param                 Type                 The type of the audio, should this be gleaned from the 3D audio?
@@ -387,7 +387,7 @@ extern "C" {
     
     
     /*!
-     @abstract                              Securely erases an Audio3DContainer.
+     @abstract                                    Securely erases an Audio3DContainer.
      @param                 Container       A pointer to the instance of the Audio3DContainer in question.
      @param                 NewValue        The value to set each codeunit to while erasing.
      @return                                Returns the value of the first element of String, or 0xFE if it was unsucessful.
@@ -395,31 +395,31 @@ extern "C" {
     uint8_t                 Audio3DContainer_Erase(Audio3DContainer *Container, uint8_t NewValue);
     
     /*!
-     @abstract                              frees a Audio3DContainer.
+     @abstract                                    frees a Audio3DContainer.
      @param                 Container       A pointer to the Audio3DContainer to deinitialize.
      */
     void                    Audio3DContainer_Deinit(Audio3DContainer *Container);
     
     /*!
-     @abstract                              Creates an empty AudioVector.
+     @abstract                                    Creates an empty AudioVector.
      */
     AudioVector            *AudioVector_Init(void);
     
     /*!
-     @abstract                              Gets a Pointer to an AudioVector.
+     @abstract                                    Gets a Pointer to an AudioVector.
      @param                 Vector          A pointer to the Audio3DContainer to deinitialize.
      */
     void                   *AudioVector_GetArray(AudioVector *Vector);
     
     /*!
-     @abstract                              Sets a Pointer to the samples for an AudioVector.
+     @abstract                                    Sets a Pointer to the samples for an AudioVector.
      @param                 Vector          A pointer to the AudioVector to set.
      @param                 Array           A pointer to the sample data.
      */
     void                    AudioVector_SetArray(AudioVector *Vector, void *Array);
     
     /*!
-     @abstract                              Zeros an AudioVector.
+     @abstract                                    Zeros an AudioVector.
      @param                 Vector          The AudioVector to zero.
      @param                 NewValue        The value to set each codeunit to while erasing.
      @return                                Returns the value of the first element of String, or 0xFE if it was unsucessful.
@@ -427,47 +427,47 @@ extern "C" {
     uint8_t                 AudioVector_Erase(AudioVector *Vector, uint8_t NewValue);
     
     /*!
-     @abstract                              Destroys an AudioVector.
+     @abstract                                    Destroys an AudioVector.
      @param                 Vector          The AudioVector to destroy.
      */
     void                    AudioVector_Deinit(AudioVector *Vector);
     
     /*!
-     @abstract                              Creates an empty AudioVectorHistogram.
+     @abstract                                    Creates an empty AudioVectorHistogram.
      @param                 Vector          The AudioVector to create the histogram from.
      */
     AudioVectorHistogram   *AudioVectorHistogram_Init(AudioVector *Vector);
     
     /*!
-     @abstract                              Gets a pointer to the histogram data.
+     @abstract                                    Gets a pointer to the histogram data.
      @param                 Histogram       A pointer to the instance of an AudioVectorHistogram in question.
      @return                                Returns a pointer to the histogram data.
      */
     void                   *AudioVectorHistogram_GetArray(AudioVectorHistogram *Histogram);
     
     /*!
-     @abstract                              Sets a pointer to the histogram data.
+     @abstract                                    Sets a pointer to the histogram data.
      @param                 Histogram       A pointer to the instance of an AudioVectorHistogram in question.
      @param                 Array           A pointer to the histogram data.
      */
     void                    AudioVectorHistogram_SetArray(AudioVectorHistogram *Histogram, void *Array);
     
     /*!
-     @abstract                              Generates a histogram from an AudioVector.
+     @abstract                                    Generates a histogram from an AudioVector.
      @param                 Vector          A pointer to the instance of an AudioVector in question.
      @return                                Returns the newly created Histogram.
      */
     AudioVectorHistogram   *AudioVectorHistogram_Generate(AudioVector *Vector);
     
     /*!
-     @abstract                              Sorts a histogram.
+     @abstract                                    Sorts a histogram.
      @param                 Histogram       A pointer to the AudioVectorHistogram in question.
      @param                 Sort            The kind of sorting to do.
      */
     void                    AudioVectorHistogram_Sort(AudioVectorHistogram *Histogram, ContainerIO_SortTypes Sort);
     
     /*!
-     @abstract                                   Zeros an AudioVectorHistogram.
+     @abstract                                    Zeros an AudioVectorHistogram.
      @param                 Histogram            The AudioVector to zero.
      @param                 NewValue             The value to set each codeunit to while erasing.
      @return                                     Returns the value of the first element of String, or 0xFE if it was unsucessful
@@ -475,32 +475,32 @@ extern "C" {
     uint8_t                 AudioVectorHistogram_Erase(AudioVectorHistogram *Histogram, uint8_t NewValue);
     
     /*!
-     @abstract                              Destroys an AudioVectorHistogram.
+     @abstract                                    Destroys an AudioVectorHistogram.
      @param                 Histogram       The AudioVectorHistogram to destroy.
      */
     void                    AudioVectorHistogram_Deinit(AudioVectorHistogram *Histogram);
     
     /*!
-     @abstract                              Creates an empty ImageChannelMap.
+     @abstract                                    Creates an empty ImageChannelMap.
      @param                 NumViews        The number of views in the Image.
      @param                 NumChannels     The number of channels in the Image.
      */
     ImageChannelMap        *ImageChannelMap_Init(uint8_t NumViews, uint8_t NumChannels);
     
     /*!
-     @abstract                              Gets the number of views in the ChannelMap.
+     @abstract                                    Gets the number of views in the ChannelMap.
      @param                 ChannelMap      The ChannelMap to read.
      */
     uint8_t                 ImageChannelMap_GetNumViews(ImageChannelMap *ChannelMap);
     
     /*!
-     @abstract                              Gets the number of channels in the ChannelMap.
+     @abstract                                    Gets the number of channels in the ChannelMap.
      @param                 ChannelMap      The ChannelMap to read.
      */
     uint8_t                 ImageChannelMap_GetNumChannels(ImageChannelMap *ChannelMap);
     
     /*!
-     @abstract                              Gets the index of the Mask.
+     @abstract                                    Gets the index of the Mask.
      @remark                                If the Mask isn't present, NumChannels is returned which is an invalid index.
      @param                 ChannelMap      The ChannelMap to read.
      @param                 Mask            The color you want to find the index of.
@@ -509,7 +509,7 @@ extern "C" {
     uint8_t                 ImageChannelMap_GetChannelsIndex(ImageChannelMap *ChannelMap, ContainerIO_ImageChannelMask Mask);
     
     /*!
-     @abstract                              Sets a ChannelMap.
+     @abstract                                    Sets a ChannelMap.
      @param                 ChannelMap      The ChannelMap to read.
      @param                 Index           The index of the channel.
      @param                 Mask            The ChannelMask for the Index
@@ -517,13 +517,13 @@ extern "C" {
     void                    ImageChannelMap_AddMask(ImageChannelMap *ChannelMap, uint8_t Index, ContainerIO_ImageChannelMask Mask);
     
     /*!
-     @abstract                              Destroys an AudioVectorHistogram.
+     @abstract                                    Destroys an AudioVectorHistogram.
      @param                 ChannelMap      The ChannelMap to destroy.
      */
     void                    ImageChannelMap_Deinit(ImageChannelMap *ChannelMap);
     
     /*!
-     @abstract                              Creates an empty ImageContainer.
+     @abstract                                    Creates an empty ImageContainer.
      @remark                                All channels in an image must have the same bit depth, padding will be added if necessary.
      @param                 Type            The type of array to create.
      @param                 ChannelMap      The channel map.
@@ -533,58 +533,58 @@ extern "C" {
     ImageContainer         *ImageContainer_Init(ContainerIO_ImageTypes Type, ImageChannelMap *ChannelMap, uint64_t Width, uint64_t Height);
     
     /*!
-     @abstract                              Returns the number of pixels in one row of this image.
+     @abstract                                    Returns the number of pixels in one row of this image.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      */
     uint64_t                ImageContainer_GetWidth(ImageContainer *Image);
     
     /*!
-     @abstract                              Returns the number of pixels in one column of this image.
+     @abstract                                    Returns the number of pixels in one column of this image.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      */
     uint64_t                ImageContainer_GetHeight(ImageContainer *Image);
     
     /*!
-     @abstract                              Returns the number of bits needed to represent the image in this container.
+     @abstract                                    Returns the number of bits needed to represent the image in this container.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      */
     uint8_t                 ImageContainer_GetBitDepth(ImageContainer *Image);
     
     /*!
-     @abstract                              Gets the channel mask.
+     @abstract                                    Gets the channel mask.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      */
     ImageChannelMap        *ImageContainer_GetChannelMap(ImageContainer *Image);
     
     /*!
-     @abstract                              Sets the channel mask.
+     @abstract                                    Sets the channel mask.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      @param                 ChannelMap      The new channel map to set to the Image.
      */
     void                    ImageContainer_SetChannelMap(ImageContainer *Image, ImageChannelMap *ChannelMap);
     
     /*!
-     @abstract                              Gets the type of the array contained by the ImageContainer.
+     @abstract                                    Gets the type of the array contained by the ImageContainer.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      */
     ContainerIO_ImageTypes             ImageContainer_GetType(ImageContainer *Image);
     
     /*!
-     @abstract                              Gets a pointer to the array of pixels.
+     @abstract                                    Gets a pointer to the array of pixels.
      @remark                                You need to cast the pointer to the correct type you got from ImageType_GetType.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      */
     void                ****ImageContainer_GetArray(ImageContainer *Image);
     
     /*!
-     @abstract                              Sets a pointer to the array of pixels.
+     @abstract                                    Sets a pointer to the array of pixels.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      @param                 Array           A pointer to the new array.
      */
     void                    ImageContainer_SetArray(ImageContainer *Image, void ****Array);
     
     /*!
-     @abstract                              Returns the average value (rounded) of the pixels in this image.
+     @abstract                                    Returns the average value (rounded) of the pixels in this image.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      @param                 View            Which view should we get the minimum from?
      @param                 Channel         Which channel should we get the minimum from?
@@ -592,7 +592,7 @@ extern "C" {
     uint64_t                ImageContainer_GetAverage(ImageContainer *Image, uint8_t View, uint8_t Channel);
     
     /*!
-     @abstract                              Returns the highest value pixel in this image.
+     @abstract                                    Returns the highest value pixel in this image.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      @param                 View            Which view should we get the minimum from?
      @param                 Channel         Which channel should we get the minimum from?
@@ -600,7 +600,7 @@ extern "C" {
     uint64_t                ImageContainer_GetMax(ImageContainer *Image, uint8_t View, uint8_t Channel);
     
     /*!
-     @abstract                              Returns the lowest value pixel in this image.
+     @abstract                                    Returns the lowest value pixel in this image.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      @param                 View            Which view should we get the minimum from?
      @param                 Channel         Which channel should we get the minimum from?
@@ -608,14 +608,14 @@ extern "C" {
     uint64_t                ImageContainer_GetMin(ImageContainer *Image, uint8_t View, uint8_t Channel);
     
     /*!
-     @abstract                              Rotates an Image, either Vertically, Horizontally, or both.
+     @abstract                                    Rotates an Image, either Vertically, Horizontally, or both.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      @param                 FlipType        The type of flipping to use.
      */
     void                    ImageContainer_Flip(ImageContainer *Image, ContainerIO_FlipTypes FlipType);
     
     /*!
-     @abstract                              Resizes an Image.
+     @abstract                                    Resizes an Image.
      @remark                                0 means keep the same, -1 means remove one, 1 means add one.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      @param                 Top             The offset from the top of the image.
@@ -626,7 +626,7 @@ extern "C" {
     void                    ImageContainer_Resize(ImageContainer *Image, int64_t Left, int64_t Right, int64_t Top, int64_t Bottom);
     
     /*!
-     @abstract                              Compares two Images.
+     @abstract                                    Compares two Images.
      @param                 Reference       A pointer to the reference ImageContainer.
      @param                 Compare         A pointer to the ImageContainer to compare to the Reference.
      @return                                Returns an ImageContainer containing (Reference - Compare) % 2^BitDepth.
@@ -634,7 +634,7 @@ extern "C" {
     ImageContainer         *ImageContainer_Compare(ImageContainer *Reference, ImageContainer *Compare);
     
     /*!
-     @abstract                              Securely erases an ImageContainer.
+     @abstract                                    Securely erases an ImageContainer.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      @param                 NewValue        The value to set each codeunit to while erasing.
      @return                                Returns the value of the first element of String, or 0xFE if it was unsucessful.
@@ -642,48 +642,48 @@ extern "C" {
     uint8_t                 ImageContainer_Erase(ImageContainer *Image, uint8_t NewValue);
     
     /*!
-     @abstract                              Deletes the ImageContainer pointed to.
+     @abstract                                    Deletes the ImageContainer pointed to.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      */
     void                    ImageContainer_Deinit(ImageContainer *Image);
     
     /*!
-     @abstract                              Creates a ImageHistogram.
+     @abstract                                    Creates a ImageHistogram.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      @return                                Returns the newly created Histogram.
      */
     ImageHistogram         *ImageHistogram_Init(ImageContainer *Image);
     
     /*!
-     @abstract                              Gets a pointer to the histogram data.
+     @abstract                                    Gets a pointer to the histogram data.
      @param                 Histogram       A pointer to the instance of an ImageHistogram in question.
      @return                                Returns a pointer to the histogram data.
      */
     void                 ***ImageHistogram_GetArray(ImageHistogram *Histogram);
     
     /*!
-     @abstract                              Sets a pointer to the histogram data.
+     @abstract                                    Sets a pointer to the histogram data.
      @param                 Histogram       A pointer to the instance of an ImageHistogram in question.
      @param                 Array           A pointer to the histogram data.
      */
     void                    ImageHistogram_SetArray(ImageHistogram *Histogram, void ***Array);
     
     /*!
-     @abstract                              Generates a histogram from an ImageContainer.
+     @abstract                                    Generates a histogram from an ImageContainer.
      @param                 Image           A pointer to the instance of an ImageContainer in question.
      @return                                Returns the newly created Histogram.
      */
     ImageHistogram         *ImageHistogram_Generate(ImageContainer *Image);
     
     /*!
-     @abstract                              Sorts a histogram.
+     @abstract                                    Sorts a histogram.
      @param                 Histogram       A pointer to the ImageHistogram in question.
      @param                 Sort            The kind of sorting to do.
      */
     void                    ImageHistogram_Sort(ImageHistogram *Histogram, ContainerIO_SortTypes Sort);
     
     /*!
-     @abstract                              Securely erases an ImageHistogram.
+     @abstract                                    Securely erases an ImageHistogram.
      @param                 Histogram       A pointer to the instance of an ImageContainer in question.
      @param                 NewValue        The value to set each codeunit to while erasing.
      @return                                Returns the value of the first element of String, or 0xFE if it was unsucessful.
@@ -691,13 +691,13 @@ extern "C" {
     uint8_t                 ImageHistogram_Erase(ImageHistogram *Histogram, uint8_t NewValue);
     
     /*!
-     @abstract                              frees a ImageHistogram.
+     @abstract                                    frees a ImageHistogram.
      @param                 Histogram       A pointer to the ImageHistogram to deinitialize.
      */
     void                    ImageHistogram_Deinit(ImageHistogram *Histogram);
     
     /*!
-     @abstract                              Gets a pointer to an ImageChannelMap from an ImageHistogram.
+     @abstract                                    Gets a pointer to an ImageChannelMap from an ImageHistogram.
      @param                 Histogram       A pointer to the ImageHistogram to deinitialize.
      @return                                Returns a pointer to the ImageChannelMap.
      */
