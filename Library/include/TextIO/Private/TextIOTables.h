@@ -1,5 +1,5 @@
-#include "../../PlatformIO.h"
-#include "../UnicodeIOTypes.h"
+#include "../../PlatformIO.h"  /* Included for Platform Independence macros */
+#include "../UnicodeIOTypes.h" /* Included for UTFX types */
 
 #pragma once
 
@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-#define ScriptHash f3928f2639a922eee8604595e2608da7617e8db1
+#define ScriptHash b0c6871b04af33693a8af3d9df6d004688180203
 
 #define UnicodeVersion 13.0.0
 

@@ -17,8 +17,8 @@ CreateHeaderFileTop() {
     CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')])" "$UCD_Data")
     CanonicalNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n "$UCD_Data")
     {
-        printf "#include \"../../PlatformIO.h\"\n"
-        printf "#include \"../UnicodeIOTypes.h\"\n\n"
+        printf "#include "../../PlatformIO.h"  /* Included for Platform Independence macros */\n"
+        printf "#include "../UnicodeIOTypes.h" /* Included for UTFX types */\n\n"
         printf "#pragma once\n\n"
         printf "#ifndef FoundationIO_UnicodeIO_UnicodeTables_H\n"
         printf "#define FoundationIO_UnicodeIO_UnicodeTables_H\n\n"
