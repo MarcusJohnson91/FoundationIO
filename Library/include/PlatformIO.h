@@ -1,9 +1,9 @@
 /*!
- @header              PlatformIO.h
- @author              Marcus Johnson
- @copyright           2017+
- @version             2.0.0
- @brief               This header contains preprocessor macros for generic functions in FoundationIO, and cross-platform compatibility.
+ @header            PlatformIO.h
+ @author            Marcus Johnson
+ @copyright         2017+
+ @version           2.0.0
+ @brief             This header contains preprocessor macros for generic functions in FoundationIO, and cross-platform compatibility.
  */
 
 #pragma once
@@ -16,63 +16,63 @@ extern "C" {
 #endif
 
 #ifndef             PlatformIO_UnknownOS
-#define             PlatformIO_UnknownOS                                                     (0)
+#define             PlatformIO_UnknownOS                                                (0)
 #endif              /* UnknownOS */
 
 #ifndef             PlatformIO_ClassicMacOS
-#define             PlatformIO_ClassicMacOS                                                  (1)
+#define             PlatformIO_ClassicMacOS                                             (1)
 #endif              /* MacClassicOS */
 
 #ifndef             PlatformIO_WindowsOS
-#define             PlatformIO_WindowsOS                                                     (2)
+#define             PlatformIO_WindowsOS                                                (2)
 #endif              /* Windows */
 
 #ifndef             PlatformIO_POSIXOS
-#define             PlatformIO_POSIXOS                                                       (4)
+#define             PlatformIO_POSIXOS                                                  (4)
 #endif              /* POSIX */
 
 #ifndef             PlatformIO_AppleOS
-#define             PlatformIO_AppleOS                                                       (8)
+#define             PlatformIO_AppleOS                                                  (8)
 #endif              /* AppleOS (MacOS, iOS, iPadOS, TVOS, WatchOS, etc) */
 
 #ifndef             PlatformIO_BSDOS
-#define             PlatformIO_BSDOS                                                         (16)
+#define             PlatformIO_BSDOS                                                    (16)
 #endif              /* BSD (FreeBSD, OpenBSD, NetBSD, DragonFlyBSD, etc) */
 
 #ifndef             PlatformIO_LinuxOS
-#define             PlatformIO_LinuxOS                                                       (32)
+#define             PlatformIO_LinuxOS                                                  (32)
 #endif              /* BSD (Linux, Ubuntu, Android, etc) */
 
 #if ((defined Macintosh) || (defined macintosh))
-#define             PlatformIO_TargetOS                                                      (PlatformIO_ClassicMacOS)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_ClassicMacOS)
 #endif
 
 #if ((defined _WIN16) || (defined _WIN32) || (defined _WIN64))
-#define             PlatformIO_TargetOS                                                      (PlatformIO_WindowsOS)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_WindowsOS)
 #endif
 
 #if (defined(__APPLE__) && defined(__MACH__))
-#define             PlatformIO_TargetOS                                                      (PlatformIO_POSIXOS + PlatformIO_AppleOS)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_POSIXOS | PlatformIO_AppleOS)
 #endif
 
 #if (defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__))
-#define             PlatformIO_TargetOS                                                      (PlatformIO_POSIXOS + PlatformIO_BSDOS)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_POSIXOS | PlatformIO_BSDOS)
 #endif
 
 #if (defined(__linux__) || defined(__ANDROID__) || defined(__gnu_linux__))
-#define             PlatformIO_TargetOS                                                      (PlatformIO_POSIXOS + PlatformIO_LinuxOS)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_POSIXOS | PlatformIO_LinuxOS)
 #endif
 
 #if (defined(__unix__) || defined(unix))
-#define             PlatformIO_TargetOS                                                      (PlatformIO_POSIXOS)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_POSIXOS)
 #endif
 
 #if ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
 #ifdef              _FILE_OFFSET_BITS
 #undef              _FILE_OFFSET_BITS
-#define             _FILE_OFFSET_BITS                                                         (64)
+#define             _FILE_OFFSET_BITS                                                   (64)
 #else
-#define             _FILE_OFFSET_BITS                                                         (64)
+#define             _FILE_OFFSET_BITS                                                   (64)
 #endif /* _FILE_OFFSET_BITS */
 #endif /* PlatformIO_TargetOS */
 
@@ -84,116 +84,116 @@ extern "C" {
 #include <wchar.h>                    /* Included for WCHAR_MAX */
     
 #ifndef             Yes
-#define             Yes                                                                       (1)
+#define             Yes                                                                 (1)
 #elif
 #undef              Yes
-#define             Yes                                                                       (1)
+#define             Yes                                                                 (1)
 #endif           /* Yes */
     
 #ifndef             No
-#define             No                                                                        (0)
+#define             No                                                                  (0)
 #elif
 #undef              No
-#define             No                                                                        (0)
+#define             No                                                                  (0)
 #endif           /* No */
     
 #ifndef             True
-#define             True                                                                      (1)
+#define             True                                                                (1)
 #elif
 #undef              True
-#define             True                                                                      (1)
+#define             True                                                                (1)
 #endif           /* True */
     
 #ifndef             False
-#define             False                                                                     (0)
+#define             False                                                               (0)
 #elif
 #undef              False
-#define             False                                                                     (0)
+#define             False                                                               (0)
 #endif           /* False */
     
 #ifndef             PlatformIO_LanguageVersionC99
-#define             PlatformIO_LanguageVersionC99                                            (199901L)
+#define             PlatformIO_LanguageVersionC99                                       (199901L)
 #endif
     
 #ifndef             PlatformIO_LanguageVersionC11
-#define             PlatformIO_LanguageVersionC11                                            (201112L)
+#define             PlatformIO_LanguageVersionC11                                       (201112L)
 #endif
     
 #ifndef             PlatformIO_LanguageVersionC18
-#define             PlatformIO_LanguageVersionC18                                            (201710L)
+#define             PlatformIO_LanguageVersionC18                                       (201710L)
 #endif
     
 #ifndef             PlatformIO_LanguageVersionC2X
-#define             PlatformIO_LanguageVersionC2X                                            (202102L)
+#define             PlatformIO_LanguageVersionC2X                                       (202102L)
 #endif
     
 #ifndef             PlatformIO_LanguageVersionC
-#define             PlatformIO_LanguageVersionC                                              (__STDC_VERSION__)
+#define             PlatformIO_LanguageVersionC                                         (__STDC_VERSION__)
 #endif
     
 #ifndef             PlatformIO_LanguageVersionCXX98
-#define             PlatformIO_LanguageVersionCXX98                                          (199711L)
+#define             PlatformIO_LanguageVersionCXX98                                     (199711L)
 #endif
     
 #ifndef             PlatformIO_LanguageVersionCXX11
-#define             PlatformIO_LanguageVersionCXX11                                          (201103L)
+#define             PlatformIO_LanguageVersionCXX11                                     (201103L)
 #endif
     
 #ifndef             PlatformIO_LanguageVersionCXX14
-#define             PlatformIO_LanguageVersionCXX14                                          (201402L)
+#define             PlatformIO_LanguageVersionCXX14                                     (201402L)
 #endif
     
 #ifndef             PlatformIO_LanguageVersionCXX17
-#define             PlatformIO_LanguageVersionCXX17                                          (201703L)
+#define             PlatformIO_LanguageVersionCXX17                                     (201703L)
 #endif
     
 #ifndef             PlatformIO_LanguageVersionCXX20
-#define             PlatformIO_LanguageVersionCXX20                                          (202002L)
+#define             PlatformIO_LanguageVersionCXX20                                     (202002L)
 #endif
     
 #ifndef             PlatformIO_LanguageVersionCXX
-#define             PlatformIO_LanguageVersionCXX                                            (__cplusplus)
+#define             PlatformIO_LanguageVersionCXX                                       (__cplusplus)
 #endif
     
 #ifndef             PlatformIO_LanguageIsC
-#define             PlatformIO_LanguageIsC                                                   (1)
+#define             PlatformIO_LanguageIsC                                              (1)
 #endif
     
 #ifndef             PlatformIO_LanguageIsCXX
-#define             PlatformIO_LanguageIsCXX                                                 (2)
+#define             PlatformIO_LanguageIsCXX                                            (2)
 #endif
     
 #ifndef             PlatformIO_Language
-#if (defined __cplusplus)
-#define             PlatformIO_Language                                                      PlatformIO_LanguageIsCXX
+#ifdef              __cplusplus
+#define             PlatformIO_Language                                                 PlatformIO_LanguageIsCXX
 #else
-#define             PlatformIO_Language                                                      PlatformIO_LanguageIsC
+#define             PlatformIO_Language                                                 PlatformIO_LanguageIsC
 #endif
 #endif
     
 #ifndef             PlatformIO_CompilerIsUnknown
-#define             PlatformIO_CompilerIsUnknown                                             (0)
+#define             PlatformIO_CompilerIsUnknown                                        (0)
 #endif
     
 #ifndef             PlatformIO_CompilerIsClang
-#define             PlatformIO_CompilerIsClang                                               (1)
+#define             PlatformIO_CompilerIsClang                                          (1)
 #endif
     
 #ifndef             PlatformIO_CompilerIsMSVC
-#define             PlatformIO_CompilerIsMSVC                                                (2)
+#define             PlatformIO_CompilerIsMSVC                                           (2)
 #endif
     
 #ifndef             PlatformIO_CompilerIsGCC
-#define             PlatformIO_CompilerIsGCC                                                 (3)
+#define             PlatformIO_CompilerIsGCC                                            (3)
 #endif
     
 #ifndef             PlatformIO_Compiler
 #if   defined(__clang__)
-#define             PlatformIO_Compiler                                                      (PlatformIO_CompilerIsClang)
+#define             PlatformIO_Compiler                                                 (PlatformIO_CompilerIsClang)
 #elif defined(_MSC_VER)
-#define             PlatformIO_Compiler                                                      (PlatformIO_CompilerIsMSVC)
+#define             PlatformIO_Compiler                                                 (PlatformIO_CompilerIsMSVC)
 #elif defined(__GNUC__) || defined(__GNUG__)
-#define             PlatformIO_Compiler                                                      (PlatformIO_CompilerIsGCC)
+#define             PlatformIO_Compiler                                                 (PlatformIO_CompilerIsGCC)
 #endif
 #endif /* PlatformIO_Compiler */
     
@@ -206,9 +206,9 @@ extern "C" {
     
 #ifndef             PlatformIO_File_Open
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-#define             PlatformIO_File_Open(UTF8FilePath, UTF8FileMode)                         fopen((const char*) UTF8FilePath, (const char*) UTF8FileMode)
+#define             PlatformIO_File_Open(UTF8FilePath, UTF8FileMode)                    fopen((const char*) UTF8FilePath, (const char*) UTF8FileMode)
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#define             PlatformIO_File_Open(UTF8FilePath, UTF8FileMode)                         fopen(reinterpret_cast<const char * __restrict>(UTF8FilePath), reinterpret_cast<const char * __restrict>(UTF8FileMode))
+#define             PlatformIO_File_Open(UTF8FilePath, UTF8FileMode)                    fopen(reinterpret_cast<const char * __restrict>(UTF8FilePath), reinterpret_cast<const char * __restrict>(UTF8FileMode))
 #endif
 #endif
     
@@ -218,10 +218,6 @@ extern "C" {
     
 #ifndef             PlatformIO_File_GetSize
 #define             PlatformIO_File_GetSize(File)                                            ftello(File)
-#endif
-    
-#ifndef             PlatformIO_File_Read
-#define             PlatformIO_File_Read(Output, ElementSize, NumElements2Read, File2Read)   fread(Output, ElementSize, NumElements2Read, File2Read)
 #endif
     
 #ifndef             PlatformIO_File_Write
@@ -289,10 +285,6 @@ extern "C" {
     
 #ifndef             PlatformIO_File_GetSize
 #define             PlatformIO_File_GetSize(File)                                            _ftelli64(File)
-#endif
-    
-#ifndef             PlatformIO_File_Read
-#define             PlatformIO_File_Read(Output, ElementSize, NumElements2Read, File2Read)   fread(Output, ElementSize, NumElements2Read, File2Read)
 #endif
     
 #ifndef             PlatformIO_File_Write
@@ -443,25 +435,52 @@ extern "C" {
 #else
 #define             PlatformIO_WideCharRange (WCHAR_MAX)
 #endif
+
+#ifndef PlatformIO_Cast
+#define PlatformIO_Cast(NewType, Variable)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+#undef  PlatformIO_Cast
+#define PlatformIO_Cast(NewType, Variable) (NewType) Variable
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#undef  PlatformIO_Cast
+#define PlatformIO_Cast(NewType, Variable) reinterpret_cast<NewType>(Variable)
+#endif /* PlatformIO_Cast */
+#endif /* PlatformIO_Language */
   
   /*!
-   @abstract        PlatformIO_Immutable is for pointers and arrays.
+   @abstract                                    PlatformIO_Immutable is for pointers and arrays.
    @remark          Makes the pointer and the data it points to constant.
    */
 #ifndef             PlatformIO_Immutable
 #define             PlatformIO_Immutable(PointerType) const PointerType const
 #endif
+
+
+
+
+#ifndef             PlatformIO_Immutable2
+#define             PlatformIO_Immutable2(PointerType, Variable)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+#undef              PlatformIO_Immutable2
+#define             PlatformIO_Immutable2(PointerType, Variable) const PointerType const Variable
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#undef              PlatformIO_Immutable2
+#define             PlatformIO_Immutable2(PointerType, Variable) const_cast<const PointerType const>(Variable)
+#endif /* PlatformIO_Language */
+#endif /* PlatformIO_Immutable2 */
+
+
     
 #ifndef             PlatformIO_Mutable
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define             PlatformIO_Mutable(PointerType, Variable) (PointerType, Variable)
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#define             PlatformIO_Mutable(PointerType, Variable) std::remove_const<PointerType>(Variable)
+#define             PlatformIO_Mutable(PointerType, Variable) (std::remove_const<PointerType>(Variable))
 #endif
 #endif
     
     /*!
-     @abstract        PlatformIO_Volatile is for pointers and arrays.
+     @abstract                                    PlatformIO_Volatile is for pointers and arrays.
      @remark          Makes the pointer and the data it points to volatile.
      */
 #ifndef             PlatformIO_Volatile
@@ -469,7 +488,7 @@ extern "C" {
 #endif
   
   /*!
-   @abstract        PlatformIO_Constant is for variables, constants, and values.
+   @abstract                                    PlatformIO_Constant is for variables, constants, and values.
    @remark          Makes the pointer and the data it points to constant.
    */
 #ifndef             PlatformIO_Constant
@@ -479,6 +498,26 @@ extern "C" {
 #ifndef             PlatformIO_MakeStringSet
 #define             PlatformIO_MakeStringSet(StringSetSize, ...) {__VA_ARGS__,};
 #endif
+
+    /*!
+    @abstract                        Reads data from a file.
+    @param         File2Read         The File to read the data to.
+    @param         BufferElementSize The size of Buffer's elements in bytes.
+    @param         Buffer            Where to put the data to read.
+    @param         Bytes2Read        The number of bytes to read.
+    @return                          Returns the amount of data actually read.
+    */
+    uint64_t        PlatformIO_Read(FILE *File2Read, uint8_t BufferElementSize, PlatformIO_Immutable(void *), Buffer, uint64_t Bytes2Read);
+
+    /*!
+    @abstract                        Writes data to a file.
+    @param         File2Write        The File to write the data to.
+    @param         BufferElementSize The size of Buffer's elements in bytes.
+    @param         Buffer            Where to get the data to write.
+    @param         Bytes2Write       The number of bytes to write.
+    @return                          Returns the amount of data actually written.
+    */
+    uint64_t        PlatformIO_Write(FILE *File2Write, uint8_t BufferElementSize, PlatformIO_Immutable(void *) Buffer, uint64_t Bytes2Write);
     
     uint64_t        PlatformIO_GetTotalMemoryInBytes(void);
     
