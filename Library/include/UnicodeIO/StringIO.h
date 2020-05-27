@@ -41,8 +41,8 @@ extern "C" {
      @constant     UTF16SurrogatePairStart               The first UTF-32 CodePoint to require Surrogate Pairs in UTF-16.
      @constant     InvalidReplacementCodePoint           The CodePoint to replace invalid codeunits.
      @constant     UnicodeMaxCodePoint                   The highest CodePoint possible in Unicode, 1,114,111.
-     @constant     UTF8MaxCodeUnits                      The maximum number of codeunits per codepoint.
-     @constant     UTF16MaxCodeUnits                     The maximum number of codeunits per codepoint.
+     @constant     UTF8MaxCodeUnitsInCodePoint           The maximum number of codeunits per codepoint.
+     @constant     UTF16MaxCodeUnitsInCodePoint          The maximum number of codeunits per codepoint.
      */
     typedef enum StringIOCommon {
                    UTF8CodeUnitSizeInBits                = 8,
@@ -70,8 +70,8 @@ extern "C" {
                    UTF16SurrogatePairStart               = 0x10000,
                    InvalidReplacementCodePoint           = 0xFFFD,
                    UnicodeMaxCodePoint                   = 0x10FFFF,
-                   UTF8MaxCodeUnits                      = 4,
-                   UTF16MaxCodeUnits                     = 2,
+                   UTF8MaxCodeUnitsInCodePoint           = 4,
+                   UTF16MaxCodeUnitsInCodePoint          = 2,
     } StringIOCommon;
     
     /*!
@@ -979,7 +979,7 @@ extern "C" {
      @param      Source                                  The file to read from.
      @return                                             Returns the UTF-8 encoded CodePoint which will be between 1-4 CodeUnits.
      */
-    UTF8        *UTF8_ReadGraphemeFromFile(FILE *Source);
+    UTF8        *UTF8_ReadGrapheme(FILE *Source);
     
     /*!
      @abstract                                           Reads a Grapheme from Source.
@@ -987,7 +987,7 @@ extern "C" {
      @param      Source                                  The file to read from.
      @return                                             Returns the UTF-16 encoded CodePoint which will be between 1-2 CodeUnits.
      */
-    UTF16       *UTF16_ReadGraphemeFromFile(FILE *Source);
+    UTF16       *UTF16_ReadGrapheme(FILE *Source);
     
     /*!
      @abstract                                           Writes a CodePoint to Source.
@@ -1006,20 +1006,20 @@ extern "C" {
     void         UTF16_WriteGrapheme(FILE *Source, PlatformIO_Immutable(UTF16 *) CodePoint);
     
     /*!
-     @abstract                                           Reads a Line (Including mewline) from Source.
+     @abstract                                           Reads a Sentence (Until it hits a newline, includes the newline) from Source.
      @remark                                             Replaces Fgets and gets.
      @param      Source                                  The file to read from.
      @return                                             Returns the UTF-8 encoded line.
      */
-    UTF8        *UTF8_ReadLine(FILE *Source);
+    UTF8        *UTF8_ReadSentence(FILE *Source);
     
     /*!
-     @abstract                                           Reads a Line (Including mewline) from Source.
+     @abstract                                           Reads a Sentence (Until it hits a newline, includes the newline) from Source.
      @remark                                             Replaces Fgetws and getws.
      @param      Source                                  The file to read from.
      @return                                             Returns the UTF-16 encoded line.
      */
-    UTF16       *UTF16_ReadLine(FILE *Source);
+    UTF16       *UTF16_ReadSentence(FILE *Source);
     
     /*!
      @abstract                                           Writes a Line (Including mewline) to Source.
@@ -1027,7 +1027,7 @@ extern "C" {
      @param      OutputFile                              The file to write the string to.
      @param      String                                  The String to write.
      */
-    void         UTF8_WriteLine(FILE *OutputFile, PlatformIO_Immutable(UTF8 *) String);
+    void         UTF8_WriteSentence(FILE *OutputFile, PlatformIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                                           Writes a Line (Including mewline) to Source.
@@ -1035,7 +1035,7 @@ extern "C" {
      @param      OutputFile                              The file to write the string to.
      @param      String                                  The String to write.
      */
-    void         UTF16_WriteLine(FILE *OutputFile, PlatformIO_Immutable(UTF16 *) String);
+    void         UTF16_WriteSentence(FILE *OutputFile, PlatformIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                                           Counts the number of Format Specifiers in String.
