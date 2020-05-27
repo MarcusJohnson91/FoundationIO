@@ -130,7 +130,6 @@ if(${CMAKE_C_COMPILER_ID} MATCHES "AppleClang" OR ${CMAKE_C_COMPILER_ID} MATCHES
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
 -fPIC \
--fPIE \
 -fshort-enums \
 -funroll-loops \
 -funsigned-char \
@@ -203,7 +202,6 @@ elseif(${CMAKE_C_COMPILER_ID} MATCHES "GNU")
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
 -fPIC \
--fPIE \
 -fshort-enums \
 -funroll-loops \
 -funsigned-char \
