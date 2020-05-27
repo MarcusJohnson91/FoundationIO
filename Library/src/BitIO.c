@@ -69,7 +69,7 @@ extern "C" {
             }
             uint64_t BytesRead     = 0ULL;
             if (BitI->FileType == FileType_File) {
-                BytesRead          = PlatformIO_File_Read(BitB->Buffer, 1, Bytes2Read, BitI->File);
+                BytesRead          = PlatformIO_Read(BitI->File, sizeof(BitB->Buffer[0]), BitB->Buffer, Bytes2Read);
             } else if (BitI->FileType == FileType_Socket) {
                 BytesRead          = PlatformIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
             }
@@ -129,6 +129,29 @@ extern "C" {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return BitsFree;
+    }
+
+    uint8_t *BitBuffer_GetArray(BitBuffer *BitB) {
+        uint8_t *Buffer = NULL;
+        if (BitB != NULL) {
+            Buffer      = BitB->Buffer;
+        } else {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
+        }
+        return Buffer;
+    }
+
+    void BitBuffer_SetArray(BitBuffer *BitB, uint8_t *Buffer, uint64_t BufferSizeInBytes) {
+        if (BitB != NULL && Buffer != NULL && BufferSizeInBytes > 0) {
+            BitB->Buffer  = Buffer;
+            BitB->NumBits = (BufferSizeInBytes * 8);
+        } else if (BitB == NULL) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
+        } else if (Buffer == NULL) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Buffer Pointer is NULL"));
+        } else if (BufferSizeInBytes == 0) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BufferSizeInBytes is 0"));
+        }
     }
     
     bool BitBuffer_IsAligned(BitBuffer *BitB, uint8_t AlignmentSize) {
@@ -212,7 +235,7 @@ extern "C" {
             uint64_t Bytes2Read      = BitB->NumBits / 8;
             uint64_t BytesRead       = 0ULL;
             if (BitI->FileType == FileType_File) {
-                BytesRead            = PlatformIO_File_Read(BitB->Buffer, 1, Bytes2Read, BitI->File);
+                BytesRead            = PlatformIO_Read(BitI->File, sizeof(BitB->Buffer[0]), BitB->Buffer, Bytes2Read);
             } else if (BitI->FileType == FileType_Socket) {
                 BytesRead            = PlatformIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
             }
@@ -267,7 +290,7 @@ extern "C" {
                 uint8_t  BitsInCurrentByte        = Bits2ExtractFromByte(BitB->BitOffset + Bits2Read);
                 uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
                 uint8_t  Shift                    = BitsInCurrentByte - Bits2Get;
-                uint8_t  BitMask                  = BitMaskTable[Bits2Get - 1] << Shift;
+                uint8_t  BitMask                  = (uint8_t) BitMaskTable[Bits2Get - 1] << Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset + Bits2Read, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
                 uint8_t  ApplyBits                = ExtractedBits >> Shift;
@@ -378,7 +401,7 @@ extern "C" {
                 uint8_t  BitsInCurrentByte         = 8 - (BitB->BitOffset % 8);
                 uint8_t  Bits2Append2CurrentByte   = (uint8_t) Minimum(BitsInCurrentByte, Bits2Write);
                 uint8_t  Shift                     = BitsInCurrentByte - Bits2Append2CurrentByte;
-                uint64_t ExtractBitMask            = BitMaskTable[Bits2Append2CurrentByte - 1] << Shift;
+                uint8_t  ExtractBitMask            = BitMaskTable[Bits2Append2CurrentByte - 1] << Shift;
                 uint8_t  ExtractedBits             = (Data2Write & ExtractBitMask) >> (Bits2Write - Bits2Append2CurrentByte);
                 if (BitsInCurrentByte > Bits2Append2CurrentByte) {
                     ExtractedBits                <<= (BitsInCurrentByte - Bits2Append2CurrentByte) - 1;
@@ -400,7 +423,7 @@ extern "C" {
                 uint8_t  BitsInCurrentByte         = 8 - (BitB->BitOffset % 8);
                 uint8_t  Bits2Append2CurrentByte   = (uint8_t) Minimum(BitsInCurrentByte, Bits2Write);
                 uint8_t  Shift                     = BitsInCurrentByte - Bits2Append2CurrentByte;
-                uint64_t ExtractBitMask            = BitMaskTable[Bits2Append2CurrentByte - 1] << Shift;
+                uint8_t  ExtractBitMask            = BitMaskTable[Bits2Append2CurrentByte - 1] << Shift;
                 uint8_t  ExtractedBits             = Data2Write & ExtractBitMask;
                 if (BitsInCurrentByte > Bits2Append2CurrentByte) {
                     ExtractedBits                <<= (BitsInCurrentByte - Bits2Append2CurrentByte) - 1;
@@ -421,7 +444,7 @@ extern "C" {
                 uint8_t  BitsByteCanContain        = 8 - (BitB->BitOffset % 8);
                 uint8_t  Bits2Append2CurrentByte   = (uint8_t) Minimum(BitsByteCanContain, Bits2Write);
                 uint8_t  ExtractionShift           = Bits2Write - Bits2Append2CurrentByte;
-                uint64_t ExtractBitMask            = BitMaskTable[Bits2Append2CurrentByte - 1] << ExtractionShift;
+                uint8_t  ExtractBitMask            = BitMaskTable[Bits2Append2CurrentByte - 1] << ExtractionShift;
                 uint64_t ExtractedBits             = (Data2Append & ExtractBitMask) >> ExtractionShift;
                 if (BitsByteCanContain > Bits2Append2CurrentByte) {
                     ExtractedBits                <<= (BitsByteCanContain - Bits2Append2CurrentByte) - 1;
@@ -616,7 +639,7 @@ extern "C" {
         return OutputData;
     }
     
-    uint64_t BitBuffer_ReadUnary(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, BitIO_UnaryTypes UnaryType, BitIO_UnaryTerminatorTypes StopBit) {
+    uint64_t BitBuffer_ReadUnary(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, BitIO_UnaryTypes UnaryType, BitIO_UnaryTerminators StopBit) {
         uint64_t OutputData    = 0ULL;
         if (BitB != NULL) {
             uint8_t CurrentBit = StopBit ^ 1;
@@ -767,7 +790,7 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteUnary(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, BitIO_UnaryTypes UnaryType, BitIO_UnaryTerminatorTypes StopBit, uint8_t UnaryBits2Write) {
+    void BitBuffer_WriteUnary(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, BitIO_UnaryTypes UnaryType, BitIO_UnaryTerminators StopBit, uint8_t UnaryBits2Write) {
         if (BitB != NULL) {
             uint8_t EndBit      = StopBit == UnaryTerminator_Zero ? 0 : 1;
             uint8_t Field2Write = UnaryBits2Write;
@@ -797,7 +820,7 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write, BitIO_StringTerminatorTypes WriteType) {
+    void BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write, BitIO_StringTerminators WriteType) {
         if (BitB != NULL && String2Write != NULL) {
             uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(String2Write);
             if (WriteType == StringTerminator_NULL) {
@@ -824,7 +847,7 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteUTF16(BitBuffer *BitB, UTF16 *String2Write, BitIO_StringTerminatorTypes WriteType) {
+    void BitBuffer_WriteUTF16(BitBuffer *BitB, UTF16 *String2Write, BitIO_StringTerminators WriteType) {
         if (BitB != NULL && String2Write != NULL) {
             uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(String2Write);
             if (WriteType == StringTerminator_NULL) {
