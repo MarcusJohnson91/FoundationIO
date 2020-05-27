@@ -266,7 +266,7 @@ extern "C" {
                 UTF8    *Indicator           = UTF8_Init(CommandLineIO_GetTerminalWidth());
                 UTF8    *IndicatorFinal      = UTF8_Insert(Indicator, UTF8String("-"), 0);
                 UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%Us %llu/%llu %llu/%s%s]"), IndicatorFinal, *Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, PlatformIO_NewLine8);
-                UTF8_WriteLine(stdout, FormattedString);
+                UTF8_WriteSentence(stdout, FormattedString);
                 free(Indicator);
             }
             free(StringSize);
@@ -282,7 +282,7 @@ extern "C" {
             UTF8 *Name = UTF8_Encode(CLI->ProgramName);
             
             UTF8 *ProgramsOptions = UTF8_Format(UTF8String("%s's Options (-|--|/):%s"), Name, PlatformIO_NewLine8);
-            UTF8_WriteLine(stdout, ProgramsOptions);
+            UTF8_WriteSentence(stdout, ProgramsOptions);
             free(Name);
             free(ProgramsOptions);
             
@@ -309,13 +309,13 @@ extern "C" {
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
                 UTF8 **GeneratedHelp8 = UTF8_StringSet_Encode((PlatformIO_Immutable(UTF32**)) GeneratedHelp);
                 for (uint64_t String = 0; String < StringSetSize; String++) {
-                    UTF8_WriteLine(stdout, GeneratedHelp8[String]);
+                    UTF8_WriteSentence(stdout, GeneratedHelp8[String]);
                 }
                 UTF8_StringSet_Deinit(GeneratedHelp8);
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
                 UTF16 **GeneratedHelp16 = UTF16_StringSet_Encode(GeneratedHelp);
                 for (uint64_t String = 0; String < StringSetSize; String++) {
-                    UTF16_WriteLine(stdout, GeneratedHelp16[String]);
+                    UTF16_WriteSentence(stdout, GeneratedHelp16[String]);
                 }
                 UTF16_StringSet_Deinit(GeneratedHelp16);
 #endif
@@ -348,11 +348,11 @@ extern "C" {
             UTF32_Deinit(License);
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
             UTF8 *Banner8 = UTF8_Encode(Banner32);
-            UTF8_WriteLine(stdout, Banner8);
+            UTF8_WriteSentence(stdout, Banner8);
             UTF8_Deinit(Banner8);
 #elif  (PlatformIO_TargetOS == PlatformIO_WindowsOS)
             UTF16 *Banner16 = UTF16_Encode(Banner32);
-            UTF16_WriteLine(stdout, Banner16);
+            UTF16_WriteSentence(stdout, Banner16);
             UTF16_Deinit(Banner16);
 #endif
             UTF32_Deinit(Banner32);
