@@ -1,13 +1,13 @@
 /*!
- @header              BitIO.h
- @author              Marcus Johnson
- @copyright           2015+
- @version             1.0.0
- @brief               This header contains code for reading and writing files and sockets, and utilities to manage them.
+ @header         BitIO.h
+ @author         Marcus Johnson
+ @copyright      2015+
+ @version        1.0.0
+ @brief          This header contains code for reading and writing files and sockets, and utilities to manage them.
  */
 
-#include "PlatformIO.h"
-#include "UnicodeIO/UnicodeIOTypes.h"
+#include "PlatformIO.h"               /* Included for Platform Independence macros */
+#include "UnicodeIO/UnicodeIOTypes.h" /* Included for UTFX types */
 
 #pragma once
 
