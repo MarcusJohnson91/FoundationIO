@@ -1065,7 +1065,7 @@ extern "C" {
                         Specifiers->Specifiers[Position].Argument          = UTF32_Integer2String(Value, Base_Integer | Base_Radix16 | Base_Lowercase);
                     }
                 } else if ((BaseType & BaseType_Literal) == BaseType_Literal && ModifierType == ModifierType_Percent) {
-                    Specifiers->Specifiers[Position].Argument              = UTF32String("%");
+                    Specifiers->Specifiers[Position].Argument              = U"%";
                 }
                 if (Specifiers->NumSpecifiers == Specifiers->NumUniqueSpecifiers) {
                     Position += 1;

@@ -457,11 +457,6 @@ extern "C" {
         return NumDigits;
     }
     
-    uint8_t NumDigitsInDecimal(double Decimal) {
-        uint8_t NumDigits = 0;
-        return NumDigits;
-    }
-    
     uint64_t Rotate(uint64_t Value, uint8_t Bits2Rotate, MathIO_RotationType Rotate) {
         uint64_t Rotated = 0ULL;
         if (Rotate != Rotate_Unknown) {
