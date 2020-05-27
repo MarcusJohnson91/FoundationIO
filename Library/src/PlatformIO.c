@@ -25,19 +25,13 @@ extern "C" {
         return TotalMemory;
     }
 
-    uint64_t PlatformIO_Read(FILE *File2Read, uint8_t BufferElementSize, PlatformIO_Immutable2(void *, Buffer), uint64_t Elements2Read) {
+    uint64_t PlatformIO_Read(FILE *File2Read, uint8_t BufferElementSize, void *Buffer, uint64_t Elements2Read) {
         uint64_t BytesRead = 0;
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
-        BytesRead = fread(PlatformIO_Mutable(void *, Buffer), BufferElementSize, Elements2Read, File2Read);
-
-
-
-
-
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
         BytesRead = fread((void*) Buffer, BufferElementSize, Elements2Read, File2Read);
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-        BytesRead = fread(const_cast<void*>(Buffer), BufferElementSize, Elements2Read, File2Read);
+        BytesRead = fread(reinterpret_cast<void*>(Buffer), BufferElementSize, Elements2Read, File2Read);
 #endif
 #elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
         ReadFile(File2Read, Buffer, Elements2Read, &BytesRead, NULL);
