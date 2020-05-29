@@ -290,7 +290,7 @@ extern "C" {
 #undef                          BitBuffer_ReadBits
 #define                         BitBuffer_ReadBits(BitBuffer, ByteOrder, BitOrder, Bits2Read) BitBuffer_ReadBits64(BitBuffer, ByteOrder, BitOrder, Bits2Read)
 #else
-#error                          Bits2Read is invalid
+#define                         BitBuffer_ReadBits(BitBuffer, ByteOrder, BitOrder, Bits2Read) BitBuffer_ReadBits64(BitBuffer, ByteOrder, BitOrder, Bits2Read)
 #endif /* Bits2Read */
 #endif /* BitBuffer_ReadBits */
     /*}*/
