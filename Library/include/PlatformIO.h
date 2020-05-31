@@ -79,7 +79,6 @@ extern "C" {
 #include <stdarg.h>                   /* Included for va_list, va_copy */
 #include <stdbool.h>                  /* Included for bool */
 #include <stdint.h>                   /* Included for u/intX_t */
-#include <stdio.h>                    /* Included for FILE, SEEK SET/END/CUR macros */
 #include <stdlib.h>                   /* Included for calloc/free */
 #include <wchar.h>                    /* Included for WCHAR_MAX */
     
@@ -212,16 +211,8 @@ extern "C" {
 #endif
 #endif
     
-#ifndef             PlatformIO_File_Seek
-#define             PlatformIO_File_Seek(File, Offset, Origin)                               fseeko(File, Offset, Origin)
-#endif
-    
 #ifndef             PlatformIO_File_GetSize
 #define             PlatformIO_File_GetSize(File)                                            ftello(File)
-#endif
-    
-#ifndef             PlatformIO_File_Write
-#define             PlatformIO_File_Write(Input, ElementSize, NumElements2Write, File2Write) fwrite(Input, ElementSize, NumElements2Write, File2Write)
 #endif
     
 #ifndef             PlatformIO_File_Close
@@ -279,16 +270,8 @@ extern "C" {
 #define             PlatformIO_File_Open(UTF16FilePath, UTF16FileMode)                       _wfopen(UTF16FilePath, UTF16FileMode)
 #endif
     
-#ifndef             PlatformIO_File_Seek
-#define             PlatformIO_File_Seek(File, Offset, Origin)                               _fseeki64(File, Offset, Origin)
-#endif
-    
 #ifndef             PlatformIO_File_GetSize
 #define             PlatformIO_File_GetSize(File)                                            _ftelli64(File)
-#endif
-    
-#ifndef             PlatformIO_File_Write
-#define             PlatformIO_File_Write(Input, ElementSize, NumElements2Read, File2Write)  fwrite(Input, ElementSize, NumElements2Read, File2Write)
 #endif
     
 #ifndef             PlatformIO_File_Close
@@ -499,24 +482,38 @@ extern "C" {
 #define             PlatformIO_MakeStringSet(StringSetSize, ...) {__VA_ARGS__,};
 #endif
 
-    /*!
-    @abstract                        Reads data from a file.
-    @param         File2Read         The File to read the data to.
-    @param         BufferElementSize The size of Buffer's elements in bytes.
-    @param         Buffer            Where to put the data to read.
-    @param         Bytes2Read        The number of bytes to read.
-    @return                          Returns the amount of data actually read.
-    */
-    uint64_t        PlatformIO_Read(FILE *File2Read, uint8_t BufferElementSize, void *Buffer, uint64_t Bytes2Read);
+    typedef enum PlatformIO_SeekTypes {
+        SeekType_Beginning = 0,
+        SeekType_Current   = 1,
+        SeekType_End       = 2,
+    } PlatformIO_SeekTypes;
 
     /*!
-    @abstract                        Writes data to a file.
-    @param         File2Write        The File to write the data to.
-    @param         BufferElementSize The size of Buffer's elements in bytes.
-    @param         Buffer            Where to get the data to write.
-    @param         Bytes2Write       The number of bytes to write.
-    @return                          Returns the amount of data actually written.
-    */
+     @abstract                        Reads data from a file.
+     @param         File2Read         The File to read the data to.
+     @param         BufferElementSize The size of Buffer's elements in bytes.
+     @param         Buffer            Where to put the data to read.
+     @param         Elements2Read     The number of bytes to read.
+     @return                          Returns the amount of data actually read.
+     */
+    uint64_t        PlatformIO_Read(FILE *File2Read, uint8_t BufferElementSize, void *Buffer, uint64_t Elements2Read);
+
+    /*!
+     @abstract                        Seeks around a file.
+     @param         File2Seek         The File to seek around.
+     @param         SeekSizeInBytes   The number of bytes to seek.
+     @param         SeekType          The kind of seeking to do.
+     */
+    void            PlatformIO_Seek(FILE *File2Seek, int64_t SeekSizeInBytes, PlatformIO_SeekTypes SeekType);
+
+    /*!
+     @abstract                        Writes data to a file.
+     @param         File2Write        The File to write the data to.
+     @param         BufferElementSize The size of Buffer's elements in bytes.
+     @param         Buffer            Where to get the data to write.
+     @param         Bytes2Write       The number of bytes to write.
+     @return                          Returns the amount of data actually written.
+     */
     uint64_t        PlatformIO_Write(FILE *File2Write, uint8_t BufferElementSize, PlatformIO_Immutable(void *) Buffer, uint64_t Bytes2Write);
     
     uint64_t        PlatformIO_GetTotalMemoryInBytes(void);

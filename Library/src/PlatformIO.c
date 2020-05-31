@@ -1,4 +1,6 @@
-#include "../include/PlatformIO.h" /* Included for Platform Independence macros */
+#include <stdio.h>                      /* Included for FILE, SEEK SET/END/CUR macros */
+#include "../include/PlatformIO.h"      /* Included for Platform Independence macros */
+#include "../include/UnicodeIO/LogIO.h" /* Included for logging errors */
 
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
 #include <stddef.h>
@@ -39,13 +41,55 @@ extern "C" {
         return BytesRead;
     }
 
-    uint64_t PlatformIO_Write(FILE *File2Write, uint8_t BufferElementSize, PlatformIO_Immutable(void *) Buffer, uint64_t Bytes2Write) {
+    void PlatformIO_Seek(FILE *File2Seek, int64_t SeekSizeInBytes, PlatformIO_SeekTypes SeekType) {
+        // Always open Streams in Binary Mode, not Text Mode; we'll handle Text conversion ourselves
+        bool SuccessIsZero = 1;
+        if (SeekType == SeekType_Beginning) {
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+            SuccessIsZero = fseeko(File2Seek, SeekSizeInBytes, SEEK_SET);
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+            SuccessIsZero = fseeko(File2Seek, reintrepret_cast<offt>(SeekSizeInBytes), SEEK_SET);
+#endif
+#elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
+            SuccessIsZero = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_SET);
+#endif
+        } else if (SeekType == SeekType_Current) {
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+            SuccessIsZero = fseeko(File2Seek, SeekSizeInBytes, SEEK_CUR);
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+            SuccessIsZero = fseeko(File2Seek, reintrepret_cast<offt>(SeekSizeInBytes), SEEK_CUR);
+#endif
+#elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
+            SuccessIsZero = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_CUR);
+#endif
+        } else if (SeekType == SeekType_End) {
+#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+            SuccessIsZero = fseeko(File2Seek, SeekSizeInBytes, SEEK_END);
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+            SuccessIsZero = fseeko(File2Seek, reintrepret_cast<offt>(SeekSizeInBytes), SEEK_END);
+#endif
+#elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
+            SuccessIsZero = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_END);
+#endif
+        }
+        if (SuccessIsZero != 0) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Seeking failed"));
+        }
+    }
+
+    uint64_t PlatformIO_Write(FILE *File2Write, uint8_t BufferElementSize, PlatformIO_Immutable(void *) Buffer, uint64_t Elements2Write) {
         uint64_t BytesWritten = 0;
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
-        BytesWritten = fwrite(Buffer, BufferElementSize, Bytes2Write, File2Write);
+        BytesWritten = fwrite(Buffer, BufferElementSize, Elements2Write, File2Write);
 #elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
-        WriteFile(File2Write, Buffer, Bytes2Write, &BytesWritten, NULL);
+        WriteFile(File2Write, Buffer, Elements2Write, &BytesWritten, NULL);
 #endif
+        if (BytesWritten != Elements2Write) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Wrote %llu Elements but %llu Elements were requested"), BytesWritten, Elements2Write);
+        }
         return BytesWritten;
     }
     
