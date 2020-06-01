@@ -218,6 +218,7 @@ extern "C" {
     
     /*!
      @abstract                                    Branchless and shiftless Min function.
+     @inspired                                    Inspired by public domain Bit Twiddling Hacks.
      @param      Integer1                         The first integer to compare.
      @param      Integer2                         The second integer to compare.
      @return                                      Returns the smaller value.
@@ -226,6 +227,7 @@ extern "C" {
     
     /*!
      @abstract                                    Branchless and shiftless Max function.
+     @inspired                                    Inspired by public domain Bit Twiddling Hacks.
      @param      Integer1                         The first integer to compare.
      @param      Integer2                         The second integer to compare.
      @return                                      Returns the larger value.
