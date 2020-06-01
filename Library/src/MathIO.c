@@ -456,20 +456,17 @@ extern "C" {
         }
         return NumDigits;
     }
-    
+
     uint64_t Rotate(uint64_t Value, uint8_t Bits2Rotate, MathIO_RotationType Rotate) {
         uint64_t Rotated = 0ULL;
-        if (Rotate != Rotate_Unknown) {
-            if (Rotate == Rotate_Left) {
-                Rotated  = (Value << Bits2Rotate) | (Value >> (64 - Bits2Rotate));
-            } else {
-                Rotated  = (Value >> Bits2Rotate) | (Value << (64 - Bits2Rotate));
-            }
+        if (Rotate == Rotate_Left) {
+            Rotated  = (Value << Bits2Rotate) | (Value >> (64 - Bits2Rotate));
+        } else if (Rotate == Rotate_Right) {
+            Rotated  = (Value >> Bits2Rotate) | (Value << (64 - Bits2Rotate));
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Rotate_Unknown is invalid"));
         }
         return Rotated;
-        
     }
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
