@@ -37,18 +37,13 @@ extern "C" {
      @param      ProgramName                     String containing either the name or the path of the program that this library was linked into.
      */
     void         Log_SetProgramName(PlatformIO_Immutable(UTF8 *) ProgramName);
-    
+
     /*!
-     @abstract                                   Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in LogFile.
-     @param      LogFilePath                     Path to the log file to open/create.
+     @abstract                                   Sets the Log_LogFile global variable to File.
+     @remark                                     If unset stderr is the default location.
+     @param      File                            Opened file to write logs to.
      */
-    void         Log_UTF8_OpenFile(PlatformIO_Immutable(UTF8 *) LogFilePath);
-    
-    /*!
-     @abstract                                   Opens an output file, pointed to by OutputSwitch in CMD and stores the resulting pointer in LogFile.
-     @param      LogFilePath                     Path to the log file to open/create.
-     */
-    void         Log_UTF16_OpenFile(PlatformIO_Immutable(UTF16 *)LogFilePath);
+    void         Log_SetLogFile(FILE *File);
     
     /*!
      @abstract                                    Logs to the LogFile, which can be a user specified path, otherwise it's STDERR.

@@ -418,38 +418,51 @@ extern "C" {
         }
         return NumGraphemes;
     }
+
+    /*
+     Grapheme Handling:
+     IsGraphemeExtender
+     if CodePoint 0 or CodePoint 1 is an extender, we need to loop again
+
+     "e + ́" = 1 Grapheme, 2 CodePoints, 3 CodeUnits
+     "1 e + ́ 2" = 3 Graphemes, 4 CodePoints, 4 CodeUnits
+
+     So Grapheme Boundaries.
+     if the first codepoint isn't a grapheme extender, check the next codepoint, if it is also not a grapheme extender, the first codepoint is it's own grapheme,
+     then check the 3rd codepoint, if it is a grapheme extender, codepoint 2 and 3 are part of the same grapheme and all following codepoints remain part of the grapheme until you find a CodePoint that isn't a grapheme extender.
+     */
     
     static bool UTF32_CodePointIsGraphemeExtender(UTF32 CodePoint) {
         bool IsGraphemeExtender    = No;
-        for (uint64_t GraphemeExtender = 0ULL; GraphemeExtender < GraphemeExtensionTableSize; GraphemeExtender++) {
-            if (CodePoint == GraphemeExtensionTable[GraphemeExtender]) {
-                IsGraphemeExtender = Yes;
-                break;
+        if (CodePoint > 0x7F) { // Don't check ASCII
+            for (uint64_t GraphemeExtender = 0ULL; GraphemeExtender < GraphemeExtensionTableSize; GraphemeExtender++) {
+                if (CodePoint == GraphemeExtensionTable[GraphemeExtender]) {
+                    IsGraphemeExtender = Yes;
+                    break;
+                }
             }
         }
         return IsGraphemeExtender;
     }
     
     uint64_t UTF32_GetStringSizeInGraphemes(PlatformIO_Immutable(UTF32 *) String) {
-        uint64_t NumGraphemes         = 0ULL;
-        uint64_t CodePoint            = 0ULL;
+        uint64_t NumGraphemes          = 0ULL;
+        uint64_t CodePoint             = 1ULL;
         if (String != NULL) {
             while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                /*
-                 
-                 So, basically we need to look at multiple codepoints at once
-                 
-                 for example Region Indicators, all region indicators that touch each other as a single grapheme
-                 
-                 */
-                
-                
-                
-                while (UTF32_CodePointIsGraphemeExtender(String[CodePoint]) == Yes) {
-                    CodePoint        += 1;
+                bool CurrentIsExtender = UTF32_CodePointIsGraphemeExtender(String[CodePoint - 1]);
+                bool NextIsExtender    = UTF32_CodePointIsGraphemeExtender(String[CodePoint]);
+                if (CurrentIsExtender == No && NextIsExtender == No) {
+                    // Both are individual Graphemes, add two
+                    NumGraphemes      += 2;
+                } else if (CurrentIsExtender == Yes && NextIsExtender == No) {
+
                 }
-                NumGraphemes         += 1;
-                CodePoint            += 1;
+
+                else if (CurrentIsExtender == No && NextIsExtender == Yes) {
+                    // Loop until we find a not extender, keep track of the CodePoints
+                }
+                CodePoint             += 1;
             }
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
@@ -477,20 +490,7 @@ extern "C" {
         return WordSize;
     }
     
-    static bool CodePointIsLineBreak(PlatformIO_Immutable(UTF32 *) String) {
-        bool IsWordBreak = No;
-        if (String != NULL) { // Also checks String[CodePoint] implicitly
-            uint64_t CodePoint = 0ULL;
-            while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                if (String[CodePoint] == UTF32Character('\r') || String[CodePoint] == UTF32Character('\n')) {
-                    
-                }
-                CodePoint += 1;
-            }
-        }
-        // How do we handle CR+LF?
-        return IsWordBreak;
-    }
+
     
     
     /*
@@ -1438,7 +1438,7 @@ extern "C" {
     static UTF8 UTF8_ReadCodeUnit(FILE *Source) { // Replaces fgetc, getc, getchar; depending on your definition of "Character"
         UTF8 CodeUnit = 0;
         if (Source != NULL) {
-            uint64_t CodeUnitsRead = PlatformIO_Read(Source, sizeof(UTF8), &CodeUnit, 1);
+            uint64_t CodeUnitsRead = PlatformIO_Read(Source, &CodeUnit, sizeof(UTF8), 1);
             if (CodeUnitsRead != sizeof(UTF8)) {
                 Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Unable to read UTF8 CodeUnit"));
             }
@@ -1451,7 +1451,7 @@ extern "C" {
     static UTF16 UTF16_ReadCodeUnit(FILE *Source) {
         UTF16 CodeUnit = 0;
         if (Source != NULL) {
-            uint64_t CodeUnitsRead = PlatformIO_Read(Source, sizeof(UTF16), &CodeUnit, 1);
+            uint64_t CodeUnitsRead = PlatformIO_Read(Source, &CodeUnit, sizeof(UTF16), 1);
             if (CodeUnitsRead != sizeof(UTF16)) {
                 Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Unable to read UTF16 CodeUnit"));
             }
@@ -1465,10 +1465,10 @@ extern "C" {
         UTF32   CodePoint     = 0;
         uint8_t CodeUnitsRead = 0;
         if (Source != NULL) {
-            CodeUnitsRead     = PlatformIO_Read(Source, sizeof(UTF8), &StringIO_PreallocateCodePoint_UTF8[0], 1);
+            CodeUnitsRead     = PlatformIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[0], UTF8MaxCodeUnitsInCodePoint, 1);
             if (CodeUnitsRead == 1) {
                 uint8_t CodePointSize = UTF8_GetCodePointSizeInCodeUnits(StringIO_PreallocateCodePoint_UTF8[0]) - 1;
-                CodeUnitsRead = PlatformIO_Read(Source, sizeof(UTF8), &StringIO_PreallocateCodePoint_UTF8[1], CodePointSize);
+                CodeUnitsRead = PlatformIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[1], UTF8MaxCodeUnitsInCodePoint, CodePointSize);
                 if (CodeUnitsRead == CodePointSize) {
                     CodePoint = UTF8_DecodeCodePoint(StringIO_PreallocateCodePoint_UTF8);
                 } else {
@@ -1487,10 +1487,10 @@ extern "C" {
         UTF32   CodePoint     = 0;
         uint8_t CodeUnitsRead = 0;
         if (Source != NULL) {
-            CodeUnitsRead     = PlatformIO_Read(Source, sizeof(UTF16), &StringIO_PreallocateCodePoint_UTF16[0], 1);
+            CodeUnitsRead     = PlatformIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[0], UTF16MaxCodeUnitsInCodePoint, 1);
             if (CodeUnitsRead == 1) {
                 uint8_t CodePointSize = UTF16_GetCodePointSizeInCodeUnits(StringIO_PreallocateCodePoint_UTF16[0]) - 1;
-                CodeUnitsRead = PlatformIO_Read(Source, sizeof(UTF16), &StringIO_PreallocateCodePoint_UTF16[1], CodePointSize);
+                CodeUnitsRead = PlatformIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[1], UTF16MaxCodeUnitsInCodePoint, CodePointSize);
                 if (CodeUnitsRead == CodePointSize) {
                     CodePoint = UTF16_DecodeCodePoint(StringIO_PreallocateCodePoint_UTF16);
                 } else {
@@ -1508,7 +1508,7 @@ extern "C" {
     static UTF32 UTF32_ReadCodePoint(FILE *Source) {
         UTF32 CodePoint = 0;
         if (Source != NULL) {
-            uint64_t CodeUnitsRead = PlatformIO_Read(Source, sizeof(UTF32), &CodePoint, 1);
+            uint64_t CodeUnitsRead = PlatformIO_Read(Source, &CodePoint, sizeof(UTF32), 1);
             if (CodeUnitsRead != sizeof(UTF32)) {
                 Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Unable to read UTF32 CodePoint"));
             }
@@ -1539,14 +1539,14 @@ extern "C" {
             uint64_t CodeUnitsRead                 = 0ULL;
             UTF8     CodeUnit                      = 0;
             while (GraphemeFound == No) {
-                CodeUnitsRead                      = PlatformIO_Read(Source, sizeof(UTF8), &CodeUnit, 1);
+                CodeUnitsRead                      = PlatformIO_Read(Source, &CodeUnit, sizeof(UTF8), 1);
                 if (CodeUnitsRead == 1) {
                     CodePointSizeInCodeUnits      += UTF8_GetCodePointSizeInCodeUnits(CodeUnit);
-                    PlatformIO_File_Seek(Source, CodePointSizeInCodeUnits, SEEK_CUR);
+                    PlatformIO_Seek(Source, CodePointSizeInCodeUnits, SeekType_Current);
                     Grapheme                       = UTF8_Init(CodePointSizeInCodeUnits);
-                    CodeUnitsRead                  = PlatformIO_Read(Source, sizeof(UTF8), &Grapheme, CodePointSizeInCodeUnits);
+                    CodeUnitsRead                  = PlatformIO_Read(Source, &Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits);
                     if (CodeUnitsRead == CodePointSizeInCodeUnits) {
-                        fread(&Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits, Source);
+                        PlatformIO_Read(Source, &Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits);
                         UTF32 *CodePoint           = UTF8_Decode(Grapheme);
                         for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
                             if (CodePoint[0] == GraphemeExtensionTable[GraphemeExtension]) {
@@ -1575,14 +1575,14 @@ extern "C" {
             uint64_t CodeUnitsRead                 = 0ULL;
             UTF16    CodeUnit                      = 0;
             while (GraphemeFound == No) {
-                CodeUnitsRead                      = PlatformIO_Read(Source, sizeof(UTF16), &CodeUnit, 1);
+                CodeUnitsRead                      = PlatformIO_Read(Source, &CodeUnit, sizeof(UTF16), 1);
                 if (CodeUnitsRead == 1) {
                     CodePointSizeInCodeUnits      += UTF16_GetCodePointSizeInCodeUnits(CodeUnit);
-                    PlatformIO_File_Seek(Source, CodePointSizeInCodeUnits, SEEK_CUR);
+                    PlatformIO_Seek(Source, CodePointSizeInCodeUnits, SeekType_Current);
                     Grapheme                       = UTF16_Init(CodePointSizeInCodeUnits);
-                    CodeUnitsRead                  = PlatformIO_Read(Source, sizeof(UTF16), &Grapheme, CodePointSizeInCodeUnits);
+                    CodeUnitsRead                  = PlatformIO_Read(Source, &Grapheme, sizeof(UTF16), CodePointSizeInCodeUnits);
                     if (CodeUnitsRead == CodePointSizeInCodeUnits) {
-                        fread(&Grapheme, sizeof(UTF8), CodePointSizeInCodeUnits, Source);
+                        PlatformIO_Read(Source, &Grapheme, sizeof(UTF16), CodePointSizeInCodeUnits);
                         UTF32 *CodePoint           = UTF16_Decode(Grapheme);
                         for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
                             if (CodePoint[0] == GraphemeExtensionTable[GraphemeExtension]) {
@@ -1602,63 +1602,138 @@ extern "C" {
         }
         return Grapheme;
     }
-    
-    UTF8 *UTF8_ReadSentence(FILE *Source) {
-        UTF8 *Line = NULL;
-        if (Source != NULL) {
-            /*
-             Loop:
-             Read each CodePoint until it matches one of the CodePoints in LineBreakTable
-             */
 
-            UTF32    CurrentCodePoint    = 0xFFFFFFFF;
-            uint64_t LineSizeInCodeUnits = 0;
-            UTF8    *CodeUnits           = UTF8_Init(UTF8MaxCodeUnitsInCodePoint);
-            for (uint8_t LineBreak = 0; LineBreak < LineBreakTableSize; LineBreak++) {
-                while (CurrentCodePoint != LineBreakTable[LineBreak] && CurrentCodePoint != PlatformIO_NULLTerminator) {
-                    // Count CodeUnits, then seek back and read them.
-                    // Extract each CodePoint from the stream, gets its size add it and
-                    PlatformIO_Read(Source, sizeof(UTF8), CodeUnits, 1);
-                    LineSizeInCodeUnits += 0;
+    static uint64_t UTF32_LineBreakPosition(UTF32 *String) {
+        uint64_t CodePoint              = 0ULL;
+        if (String != NULL && String[CodePoint] != PlatformIO_NULLTerminator) {
+            if (String[CodePoint] != PlatformIO_NULLTerminator && String[CodePoint + 1] != PlatformIO_NULLTerminator) {
+                if ((String[CodePoint] == '\r' && String[CodePoint + 1] == '\n') || (String[CodePoint] == '\n' && String[CodePoint + 1] == '\r')) { // CR+LF or LF+CR
+                    CodePoint          += 2;
+                } else {
+                    for (uint64_t LineBreak = 0ULL; LineBreak < LineBreakTableSize; LineBreak++) {
+                        if (CodePoint == LineBreakTable[LineBreak]) {
+                            CodePoint  += 1;
+                            break;
+                        }
+                    }
+                }
+            } else if (String[CodePoint] != PlatformIO_NULLTerminator) {
+                for (uint64_t LineBreak = 0ULL; LineBreak < LineBreakTableSize; LineBreak++) {
+                    if (CodePoint == LineBreakTable[LineBreak]) {
+                        CodePoint      += 1;
+                        break;
+                    }
                 }
             }
+        }
+        return CodePoint;
+    }
 
+    typedef enum StringIO_LineBreakTypes {
+        LineBreakType_Unspecified        = 0, // Not a newline
+        LineBreakType_LineFeed           = 1,
+        LineBreakType_VerticalTab        = 2,
+        LineBreakType_FormFeed           = 3,
+        LineBreakType_CarriageReturn     = 4,
+        LineBreakType_CRLF               = 5,
+        LineBreakType_LFCR               = 6,
+        LineBreakType_NextLine           = 7,
+        LineBreakType_LineSeparator      = 8,
+        LineBreakType_ParagraphSeparator = 9,
+    } StringIO_LineBreakTypes;
 
-
-
-            uint64_t StringSizeInCodeUnits  = 0ULL;
-            uint64_t StringSizeInCodePoints = 0ULL;
-            //UTF32   *CurrentCodePoint       = NULL;
-            /*
-             while (CurrentCodePoint[0] != UTF32Character('\n') &&  CurrentCodePoint[0] != PlatformIO_NULLTerminator) {
-             StringSizeInCodePoints     += 1;
-             UTF8 *CodePoint             = UTF8_ReadGrapheme(Source);
-             CurrentCodePoint            = UTF8_Decode(CodePoint);
-             }
-             */
-            Line                            = UTF8_Init(StringSizeInCodeUnits);
+    static StringIO_LineBreakTypes UTF32_GetLineBreakType(UTF32 CodePoint1, UTF32 CodePoint2) {
+        StringIO_LineBreakTypes LineBreakType = LineBreakType_Unspecified;
+        if (CodePoint1 == U'\r' && CodePoint2 == U'\n') {
+            LineBreakType = LineBreakType_CRLF;
+        } else if (CodePoint1 == U'\n' && CodePoint2 == U'\r') {
+            LineBreakType = LineBreakType_LFCR;
+        } else {
+            if (CodePoint1 == U'\n' || CodePoint2 == U'\n') {
+                LineBreakType = LineBreakType_LineFeed;
+            } else if (CodePoint1 == U'\v' || CodePoint2 == U'\v') {
+                LineBreakType = LineBreakType_VerticalTab;
+            } else if (CodePoint1 == U'\f' || CodePoint2 == U'\f') {
+                LineBreakType = LineBreakType_FormFeed;
+            } else if (CodePoint1 == U'\r' || CodePoint2 == U'\r') {
+                LineBreakType = LineBreakType_CarriageReturn;
+            } else if (CodePoint1 == U'\x85' || CodePoint2 == U'\x85') {
+                LineBreakType = LineBreakType_NextLine;
+            } else if (CodePoint1 == U'\u2028' || CodePoint2 == U'\u2028') {
+                LineBreakType = LineBreakType_LineSeparator;
+            } else if (CodePoint1 == U'\u2029' || CodePoint2 == U'\u2029') {
+                LineBreakType = LineBreakType_ParagraphSeparator;
+            }
+        }
+        return LineBreakType;
+    }
+    
+    UTF8 *UTF8_ReadSentence(FILE *Source) {
+        UTF8 *Sentence                                     = NULL;
+        if (Source != NULL) {
+            int64_t   SentenceSize                         = 0LL;
+            StringIO_LineBreakTypes LineBreakType          = LineBreakType_Unspecified;
+            while (LineBreakType == LineBreakType_Unspecified) {
+                UTF32 CodePoint1                           = UTF8_ReadCodePoint(Source);
+                UTF32 CodePoint2                           = UTF8_ReadCodePoint(Source);
+                LineBreakType                              = UTF32_GetLineBreakType(CodePoint1, CodePoint2);
+                if (LineBreakType == LineBreakType_Unspecified) {
+                    SentenceSize                          += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint1);
+                    SentenceSize                          += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint2);
+                } else if (LineBreakType != LineBreakType_CRLF && LineBreakType != LineBreakType_LFCR) {
+                    StringIO_LineBreakTypes LineBreakType1 = UTF32_GetLineBreakType(CodePoint1, InvalidReplacementCodePoint);
+                    StringIO_LineBreakTypes LineBreakType2 = UTF32_GetLineBreakType(CodePoint2, InvalidReplacementCodePoint);
+                    if (LineBreakType1 != LineBreakType_Unspecified) {
+                        SentenceSize                      += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint1);
+                    } else if (LineBreakType2 != LineBreakType_Unspecified) {
+                        SentenceSize                      += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint1);
+                        SentenceSize                      += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint2);
+                    }
+                }
+            }
+            Sentence                                       = UTF8_Init(SentenceSize);
+            if (Sentence != NULL) {
+                PlatformIO_Seek(Source, SentenceSize * -1, SeekType_Current); // Seek back to the beginning, allocate
+                PlatformIO_Read(Source, &Sentence, SentenceSize, 1);
+            }
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
         }
-        return Line;
+        return Sentence;
     }
     
     UTF16 *UTF16_ReadSentence(FILE *Source) {
-        UTF16 *Line = NULL;
+        UTF16 *Sentence                                    = NULL;
         if (Source != NULL) {
-            uint64_t StringSizeInCodeUnits  = 0ULL;
-            uint64_t StringSizeInCodePoints = 0ULL;
-            UTF32   *CurrentCodePoint       = NULL;
-            while (CurrentCodePoint[0] != UTF32Character('\n') && CurrentCodePoint[0] != PlatformIO_NULLTerminator) {
-                StringSizeInCodePoints     += 1;
-                UTF16 *CodePoint            = UTF16_ReadGrapheme(Source);
-                CurrentCodePoint            = UTF16_Decode(CodePoint);
+            int64_t   SentenceSize                         = 0LL;
+            StringIO_LineBreakTypes LineBreakType          = LineBreakType_Unspecified;
+            while (LineBreakType == LineBreakType_Unspecified) {
+                UTF32 CodePoint1                           = UTF16_ReadCodePoint(Source);
+                UTF32 CodePoint2                           = UTF16_ReadCodePoint(Source);
+                LineBreakType                              = UTF32_GetLineBreakType(CodePoint1, CodePoint2);
+                if (LineBreakType == LineBreakType_Unspecified) {
+                    SentenceSize                          += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint1);
+                    SentenceSize                          += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint2);
+                } else if (LineBreakType != LineBreakType_CRLF && LineBreakType != LineBreakType_LFCR) {
+                    StringIO_LineBreakTypes LineBreakType1 = UTF32_GetLineBreakType(CodePoint1, InvalidReplacementCodePoint);
+                    StringIO_LineBreakTypes LineBreakType2 = UTF32_GetLineBreakType(CodePoint2, InvalidReplacementCodePoint);
+                    if (LineBreakType1 != LineBreakType_Unspecified) {
+                        SentenceSize                      += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint1);
+                    } else if (LineBreakType2 != LineBreakType_Unspecified) {
+                        SentenceSize                      += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint1);
+                        SentenceSize                      += UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint2);
+                    }
+                }
             }
-            Line                            = UTF16_Init(StringSizeInCodeUnits);
+            Sentence                                       = UTF16_Init(SentenceSize);
+            if (Sentence != NULL) {
+                PlatformIO_Seek(Source, (SentenceSize * 2) * -1, SeekType_Current); // Seek back to the beginning, allocate
+                PlatformIO_Read(Source, &Sentence, (SentenceSize * 2), SentenceSize);
+            }
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
         }
-        return Line;
+        return Sentence;
     }
     
     void UTF8_WriteSentence(FILE *OutputFile, PlatformIO_Immutable(UTF8 *) String) {
@@ -1668,9 +1743,9 @@ extern "C" {
             uint64_t CodeUnitsWritten     = 0ULL;
             bool     StringHasNewLine     = UTF8_HasNewLine(String);
             if (Type == StringType_UTF8) {
-                CodeUnitsWritten       = PlatformIO_File_Write(String, sizeof(UTF8), StringSize, OutputFile);
+                CodeUnitsWritten          = PlatformIO_Write(OutputFile, sizeof(UTF8), &String, StringSize);
                 if (StringHasNewLine == No) {
-                    fwrite(PlatformIO_NewLine8, PlatformIO_NewLine8Size, 1, OutputFile);
+                    PlatformIO_Write(OutputFile, PlatformIO_NewLine8Size, PlatformIO_NewLine8, 1);
                 }
                 if (CodeUnitsWritten != StringSize) {
                     Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
@@ -1679,10 +1754,10 @@ extern "C" {
                 UTF32 *String32        = UTF8_Decode(String);
                 UTF16 *String16        = UTF16_Encode(String32);
                 free(String32);
-                fwrite(String16, StringSize, sizeof(UTF16), OutputFile);
+                PlatformIO_Write(OutputFile, sizeof(UTF16), String16, PlatformIO_NewLine16Size);
                 free(String16);
                 if (StringHasNewLine == No) {
-                    fwrite(PlatformIO_NewLine16, PlatformIO_NewLine16Size, 1, OutputFile);
+                    PlatformIO_Write(OutputFile, PlatformIO_NewLine16Size, PlatformIO_NewLine16, 1);
                 }
                 if (CodeUnitsWritten != StringSize) {
                     Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
@@ -1697,26 +1772,27 @@ extern "C" {
     
     void UTF16_WriteSentence(FILE *OutputFile, PlatformIO_Immutable(UTF16 *) String) {
         if (String != NULL && OutputFile != NULL) {
-            FoundationIO_StringTypes Type   = StringIO_GetStreamOrientation(OutputFile);
-            uint64_t StringSize        = UTF16_GetStringSizeInCodeUnits(String);
-            uint64_t CodeUnitsWritten  = 0ULL;
-            bool     StringHasNewLine  = UTF16_HasNewLine(String);
+            FoundationIO_StringTypes Type = StringIO_GetStreamOrientation(OutputFile);
+            uint64_t StringSize           = UTF16_GetStringSizeInCodeUnits(String);
+            uint64_t CodeUnitsWritten     = 0ULL;
+            bool     StringHasNewLine     = UTF16_HasNewLine(String);
             if (Type == StringType_UTF16) {
-                CodeUnitsWritten       = fwrite(String, StringSize, sizeof(UTF16), OutputFile);
+                CodeUnitsWritten          = PlatformIO_Write(OutputFile, sizeof(UTF16), &String, StringSize * sizeof(UTF16));
                 if (StringHasNewLine == No) {
-                    fwrite(PlatformIO_NewLine16, PlatformIO_NewLine16Size, 1, OutputFile);
+                    PlatformIO_Write(OutputFile, sizeof(UTF16), PlatformIO_NewLine16, PlatformIO_NewLine16Size);
                 }
                 if (CodeUnitsWritten != StringSize) {
                     Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             } else if (Type == StringType_UTF8) {
-                UTF32 *String32        = UTF16_Decode(String);
-                UTF8  *String8         = UTF8_Encode(String32);
+                UTF32 *String32           = UTF16_Decode(String);
+                UTF8  *String8            = UTF8_Encode(String32);
+                uint64_t StringSize       = UTF8_GetStringSizeInCodeUnits(String8);
                 free(String32);
-                CodeUnitsWritten       = fwrite(String8, StringSize, sizeof(UTF8), OutputFile);
+                CodeUnitsWritten          = PlatformIO_Write(OutputFile, sizeof(UTF8), &String8, StringSize);
                 free(String8);
                 if (StringHasNewLine == No) {
-                    fwrite(PlatformIO_NewLine16, PlatformIO_NewLine16Size, 1, OutputFile);
+                    PlatformIO_Write(OutputFile, sizeof(UTF8), PlatformIO_NewLine8, PlatformIO_NewLine8Size);
                 }
                 if (CodeUnitsWritten != StringSize) {
                     Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
@@ -2497,7 +2573,8 @@ extern "C" {
         }
         return Value;
     }
-    
+
+    // Integer2String should accept any integer base from the lookup table and shift the value until it can't anymore
     int64_t UTF32_String2Integer(PlatformIO_Immutable(UTF32 *) String, FoundationIO_Bases Base) {
         uint64_t CodePoint = 0ULL;
         int8_t   Sign      = 1;
@@ -3005,7 +3082,7 @@ extern "C" {
         return SubstringMatchesAtOffset;
     }
     
-    UTF8  *UTF8_Trim(PlatformIO_Immutable(UTF8 *) String, StringIO_TruncationTypes Type, PlatformIO_Immutable(UTF8 **) Strings2Remove) {
+    UTF8 *UTF8_Trim(PlatformIO_Immutable(UTF8 *) String, StringIO_TruncationTypes Type, PlatformIO_Immutable(UTF8 **) Strings2Remove) {
         UTF8 *Trimmed = NULL;
         if (String != NULL && Type != TruncationType_Unknown && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF8_Decode(String);

@@ -75,7 +75,10 @@ extern "C" {
 #define             _FILE_OFFSET_BITS                                                   (64)
 #endif /* _FILE_OFFSET_BITS */
 #endif /* PlatformIO_TargetOS */
-
+#ifndef __STDC_WANT_LIB_EXT1__
+#define __STDC_WANT_LIB_EXT1__ 1
+#endif 
+#include <stdio.h>                    /* Included for FILE, SEEK SET/END/CUR macros */
 #include <stdarg.h>                   /* Included for va_list, va_copy */
 #include <stdbool.h>                  /* Included for bool */
 #include <stdint.h>                   /* Included for u/intX_t */
@@ -203,22 +206,6 @@ extern "C" {
 #include <sys/sysctl.h> /* Included for getting the number of CPU cores */
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
     
-#ifndef             PlatformIO_File_Open
-#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-#define             PlatformIO_File_Open(UTF8FilePath, UTF8FileMode)                    fopen((const char*) UTF8FilePath, (const char*) UTF8FileMode)
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#define             PlatformIO_File_Open(UTF8FilePath, UTF8FileMode)                    fopen(reinterpret_cast<const char * __restrict>(UTF8FilePath), reinterpret_cast<const char * __restrict>(UTF8FileMode))
-#endif
-#endif
-    
-#ifndef             PlatformIO_File_GetSize
-#define             PlatformIO_File_GetSize(File)                                            ftello(File)
-#endif
-    
-#ifndef             PlatformIO_File_Close
-#define             PlatformIO_File_Close(File2Close)                                        fclose(File2Close)
-#endif
-    
 #ifndef             PlatformIO_Socket_Create
 #define             PlatformIO_Socket_Create(Family, Type, Protocol)                         socket(Family, Type, Protocol)
 #endif
@@ -265,18 +252,6 @@ extern "C" {
 #endif             /* NOGDI */
 #include <Windows.h>                  /* Included for Shared Library support, WinCon, QueryPerformanceCounter, etc */
 #include <WinSock2.h>                 /* Included for socket support, Windows.h MUST be included before WinSock2 */
-    
-#ifndef             PlatformIO_File_Open
-#define             PlatformIO_File_Open(UTF16FilePath, UTF16FileMode)                       _wfopen(UTF16FilePath, UTF16FileMode)
-#endif
-    
-#ifndef             PlatformIO_File_GetSize
-#define             PlatformIO_File_GetSize(File)                                            _ftelli64(File)
-#endif
-    
-#ifndef             PlatformIO_File_Close
-#define             PlatformIO_File_Close(File2Close)                                        fclose(File2Close)
-#endif
     
 #ifndef             PlatformIO_Socket_Create
 #define             PlatformIO_Socket_Create(Family, Type, Protocol)                         socket(Family, Type, Protocol)
@@ -385,30 +360,6 @@ extern "C" {
 #define             PlatformIO_UNCPathPrefix8                                                (u8"//?/")
 #endif
     
-#ifndef             PlatformIO_UNCPathPrefix16
-#define             PlatformIO_UNCPathPrefix16                                               (u"//?/")
-#endif
-
-#ifndef             PlatformIO_UNCPathPrefix32
-#define             PlatformIO_UNCPathPrefix32                                               (U"//?/")
-#endif
-    
-#ifndef             PlatformIO_InvisibleString8
-#define             PlatformIO_InvisibleString8                                              (u8"\u00A0")
-#endif
-    
-#ifndef             PlatformIO_InvisibleCharacter16
-#define             PlatformIO_InvisibleCharacter16                                          (u'\u00A0')
-#endif
-    
-#ifndef             PlatformIO_InvisibleString16
-#define             PlatformIO_InvisibleString16                                             (u"\u00A0")
-#endif
-    
-#ifndef             PlatformIO_InvisibleCharacter8
-#define             PlatformIO_InvisibleCharacter8                                          (U'\u00A0')
-#endif
-    
 #ifndef             PlatformIO_InvisibleString32
 #define             PlatformIO_InvisibleString32                                             (U"\u00A0")
 #endif
@@ -418,28 +369,14 @@ extern "C" {
 #else
 #define             PlatformIO_WideCharRange (WCHAR_MAX)
 #endif
-
-#ifndef PlatformIO_Cast
-#define PlatformIO_Cast(NewType, Variable)
-#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-#undef  PlatformIO_Cast
-#define PlatformIO_Cast(NewType, Variable) (NewType) Variable
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#undef  PlatformIO_Cast
-#define PlatformIO_Cast(NewType, Variable) reinterpret_cast<NewType>(Variable)
-#endif /* PlatformIO_Cast */
-#endif /* PlatformIO_Language */
   
   /*!
-   @abstract                                    PlatformIO_Immutable is for pointers and arrays.
+   @abstract        PlatformIO_Immutable is for pointers and arrays.
    @remark          Makes the pointer and the data it points to constant.
    */
 #ifndef             PlatformIO_Immutable
 #define             PlatformIO_Immutable(PointerType) const PointerType const
 #endif
-
-
-
 
 #ifndef             PlatformIO_Immutable2
 #define             PlatformIO_Immutable2(PointerType, Variable)
@@ -463,7 +400,7 @@ extern "C" {
 #endif
     
     /*!
-     @abstract                                    PlatformIO_Volatile is for pointers and arrays.
+     @abstract        PlatformIO_Volatile is for pointers and arrays.
      @remark          Makes the pointer and the data it points to volatile.
      */
 #ifndef             PlatformIO_Volatile
@@ -471,16 +408,64 @@ extern "C" {
 #endif
   
   /*!
-   @abstract                                    PlatformIO_Constant is for variables, constants, and values.
+   @abstract        PlatformIO_Constant is for variables, constants, and values.
    @remark          Makes the pointer and the data it points to constant.
    */
 #ifndef             PlatformIO_Constant
 #define             PlatformIO_Constant(Type) const Type
 #endif
+
+#ifndef             PlatformIO_Literal
+#define             PlatformIO_Literal(NewType, UnconstType, Literal)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+#undef              PlatformIO_Literal
+#define             PlatformIO_Literal(NewType, UnconstType, Literal) (NewType const) Literal
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#undef              PlatformIO_Literal
+#define             PlatformIO_Literal(NewType, UnconstType, Literal) reinterpret_cast<NewType>(const_cast<UnconstType>(Literal))
+#endif
+#endif
+
     
 #ifndef             PlatformIO_MakeStringSet
 #define             PlatformIO_MakeStringSet(StringSetSize, ...) {__VA_ARGS__,};
 #endif
+
+    typedef enum PlatformIO_FileModes {
+        FileMode_Unspecified = 0,
+        FileMode_Read        = 1,
+        FileMode_Write       = 2,
+        FileMode_Append      = 4,
+        FileMode_Text        = 8,
+        FileMode_Binary      = 16,
+    } PlatformIO_FileModes;
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
+    extern "C++" {
+        constexpr inline PlatformIO_FileModes operator | (PlatformIO_FileModes A, PlatformIO_FileModes B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<PlatformIO_FileModes>(A1 | B1);
+        }
+
+        constexpr inline PlatformIO_FileModes operator & (PlatformIO_FileModes A, PlatformIO_FileModes B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<PlatformIO_FileModes>(A1 & B1);
+        }
+
+        constexpr inline PlatformIO_FileModes operator |= (PlatformIO_FileModes A, PlatformIO_FileModes B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<PlatformIO_FileModes>(A1 |= B1);
+        }
+
+        constexpr inline PlatformIO_FileModes operator &= (PlatformIO_FileModes A, PlatformIO_FileModes B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<PlatformIO_FileModes>(A1 &= B1);
+        }
+    }
+#endif /* PlatformIO_Language */
 
     typedef enum PlatformIO_SeekTypes {
         SeekType_Beginning = 0,
@@ -489,22 +474,46 @@ extern "C" {
     } PlatformIO_SeekTypes;
 
     /*!
+     @abstract                        Opens the file at location Path with Mode.
+     @remark                          Path is a void pointer just for header recursion reasons.
+     @param         Path              Path is a UTF8 encoded string.
+     @param         Mode              Mode is an ORable bitmask specifying the type of file to open.
+     */
+    FILE           *PlatformIO_OpenUTF8(PlatformIO_Immutable(void *) Path, PlatformIO_FileModes Mode);
+
+    /*!
+    @abstract                        Opens the file at location Path with Mode.
+    @remark                          Path is a void pointer just for header recursion reasons.
+    @param         Path              Path is a UTF16 encoded string.
+    @param         Mode              Mode is an ORable bitmask specifying the type of file to open.
+    */
+    FILE           *PlatformIO_OpenUTF16(PlatformIO_Immutable(void *) Path, PlatformIO_FileModes Mode);
+
+    /*!
+    @abstract                        Gets the size of the FILE.
+    @param         File              The file to get the size of.
+    @return                          Returns the size of the file.
+    */
+    uint64_t        PlatformIO_GetSize(FILE *File);
+
+    /*!
      @abstract                        Reads data from a file.
      @param         File2Read         The File to read the data to.
-     @param         BufferElementSize The size of Buffer's elements in bytes.
      @param         Buffer            Where to put the data to read.
+     @param         BufferElementSize The size of Buffer's elements in bytes.
      @param         Elements2Read     The number of bytes to read.
      @return                          Returns the amount of data actually read.
      */
-    uint64_t        PlatformIO_Read(FILE *File2Read, uint8_t BufferElementSize, void *Buffer, uint64_t Elements2Read);
+    uint64_t        PlatformIO_Read(FILE *File2Read, void *Buffer, uint8_t BufferElementSize, uint64_t Elements2Read); // Buffer was after BufferElementSize
 
     /*!
      @abstract                        Seeks around a file.
      @param         File2Seek         The File to seek around.
      @param         SeekSizeInBytes   The number of bytes to seek.
      @param         SeekType          The kind of seeking to do.
+     @return                          Returns true if sucessful.
      */
-    void            PlatformIO_Seek(FILE *File2Seek, int64_t SeekSizeInBytes, PlatformIO_SeekTypes SeekType);
+    bool            PlatformIO_Seek(FILE *File2Seek, int64_t SeekSizeInBytes, PlatformIO_SeekTypes SeekType);
 
     /*!
      @abstract                        Writes data to a file.
@@ -515,6 +524,13 @@ extern "C" {
      @return                          Returns the amount of data actually written.
      */
     uint64_t        PlatformIO_Write(FILE *File2Write, uint8_t BufferElementSize, PlatformIO_Immutable(void *) Buffer, uint64_t Bytes2Write);
+
+    /*!
+     @abstract                       Flushes the File stream and closes it.
+     @param         File             The file you want to close.
+     @return                         Returns true if the file was sucessfully closed.
+     */
+    bool            PlatformIO_Close(FILE *File);
     
     uint64_t        PlatformIO_GetTotalMemoryInBytes(void);
     
