@@ -1064,8 +1064,6 @@ extern "C" {
                         uint64_t Value                                     = va_arg(Arguments, uint64_t);
                         Specifiers->Specifiers[Position].Argument          = UTF32_Integer2String(Value, Base_Integer | Base_Radix16 | Base_Lowercase);
                     }
-                } else if ((BaseType & BaseType_Literal) == BaseType_Literal && ModifierType == ModifierType_Percent) {
-                    Specifiers->Specifiers[Position].Argument              = U"%";
                 }
                 if (Specifiers->NumSpecifiers == Specifiers->NumUniqueSpecifiers) {
                     Position += 1;
@@ -1509,10 +1507,10 @@ extern "C" {
             uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
                 PlatformIO_Immutable(UTF32 *) Format32    = UTF8_Decode(Format);
-                FormatSpecifiers *Specifiers                = FormatSpecifiers_Init(NumSpecifiers);
+                FormatSpecifiers *Specifiers              = FormatSpecifiers_Init(NumSpecifiers);
                 UTF32_ParseFormatSpecifiers(Format32, Specifiers, StringType_UTF8);
                 PlatformIO_Immutable(UTF32 *) Formatted32 = UTF8_Decode(Formatted);
-                UTF32 **Strings32                           = DeformatString_UTF32(Format32, Specifiers, Formatted32);
+                UTF32 **Strings32                         = DeformatString_UTF32(Format32, Specifiers, Formatted32);
                 FormatSpecifiers_Deinit(Specifiers);
                 UTF32_Deinit((UTF32*) Format32);
                 UTF32_Deinit((UTF32*) Formatted32);

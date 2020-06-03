@@ -411,18 +411,11 @@ extern "C" {
     BitInput                   *BitInput_Init(void);
 
     /*!
-     @abstract                                    Opens an input file, pointed to by Path2Open.
-     @param                     BitI                             BitInput Pointer.
-     @param                     Path2Open                        Path to the input file to open.
+     @abstract                                   Sets BitInput's FILE.
+     @param                     BitI             The BitInput to set the File to.
+     @param                     File             The File to set as BitInput's file.
      */
-    void                        BitInput_UTF8_OpenFile(BitInput *BitI, UTF8 *Path2Open);
-
-    /*!
-     @abstract                                    Opens an input file, pointed to by Path2Open.
-     @param                     BitI                             BitInput Pointer.
-     @param                     Path2Open                        Path to the input file to open.
-     */
-    void                        BitInput_UTF16_OpenFile(BitInput *BitI, UTF16 *Path2Open);
+    void                        BitInput_SetFile(BitInput *BitI, FILE *File);
 
     /*!
      @abstract                                    Opens a socket for reading.
@@ -478,18 +471,11 @@ extern "C" {
     BitOutput                  *BitOutput_Init(void);
 
     /*!
-     @abstract                                    Opens an output file for writing.
-     @param                     BitO                             BitOutput Pointer.
-     @param                     Path2Open                        Path to the output file to open.
+     @abstract                                   Sets BitOutput's FILE.
+     @param                     BitO             The BitOutput to set the File to.
+     @param                     File             The File to set as BitOutput's file.
      */
-    void                        BitOutput_UTF8_OpenFile(BitOutput *BitO, UTF8 *Path2Open);
-
-    /*!
-     @abstract                                    Opens an output file for writing.
-     @param                     BitO                             BitOutput Pointer.
-     @param                     Path2Open                        Path to the output file to open.
-     */
-    void                        BitOutput_UTF16_OpenFile(BitOutput *BitO, UTF16 *Path2Open);
+    void                        BitOutput_SetFile(BitOutput *BitO, FILE *File);
 
     /*!
      @abstract                                    Opens a socket for writing.
