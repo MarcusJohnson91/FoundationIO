@@ -3388,6 +3388,9 @@ extern "C" {
         UTF8 **StringSet = NULL;
         if (NumStrings > 0) {
             StringSet    = (UTF8**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF8*));
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                StringSet[String][0] = 0xFFFF;
+            }
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
@@ -3398,6 +3401,9 @@ extern "C" {
         UTF16 **StringSet = NULL;
         if (NumStrings > 0) {
             StringSet     = (UTF16**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF16*));
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                StringSet[String][0] = 0xFFFF;
+            }
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
@@ -3408,40 +3414,70 @@ extern "C" {
         UTF32 **StringSet = NULL;
         if (NumStrings > 0) {
             StringSet     = (UTF32**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF32*));
+            for (uint64_t String = 0ULL; String < NumStrings; String++) {
+                StringSet[String][0] = 0xFFFFFFFF;
+            }
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
         return StringSet;
     }
     
-    void UTF8_StringSet_Attach(PlatformIO_Immutable(UTF8 **) StringSet, PlatformIO_Immutable(UTF8 *) String2Attach, uint64_t Index) {
-        if (StringSet != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
-            StringSet[Index] = String2Attach;
+    bool UTF8_StringSet_Attach(PlatformIO_Immutable(UTF8 **) StringSet, PlatformIO_Immutable(UTF8 *) String2Attach, uint64_t Index) {
+        bool AttachedSucessfully = No;
+        if (StringSet != NULL && String2Attach != NULL) {
+            uint64_t NumStrings  = 0ULL;
+            while (StringSet[NumStrings] != PlatformIO_NULLTerminator) {
+                NumStrings      += 1;
+            }
+            if (NumStrings >= Index) {
+                StringSet[Index] = String2Attach;
+                AttachedSucessfully = Yes;
+            }
         } else if (StringSet == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("StringSet Pointer is NULL"));
         } else if (String2Attach == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String2Attach Pointer is NULL"));
         }
+        return AttachedSucessfully;
     }
     
-    void UTF16_StringSet_Attach(PlatformIO_Immutable(UTF16 **) StringSet, PlatformIO_Immutable(UTF16 *) String2Attach, uint64_t Index) {
-        if (StringSet != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
-            StringSet[Index] = String2Attach;
+    bool UTF16_StringSet_Attach(PlatformIO_Immutable(UTF16 **) StringSet, PlatformIO_Immutable(UTF16 *) String2Attach, uint64_t Index) {
+        bool AttachedSucessfully = No;
+        if (StringSet != NULL && String2Attach != NULL) {
+            uint64_t NumStrings  = 0ULL;
+            while (StringSet[NumStrings] != PlatformIO_NULLTerminator) {
+                NumStrings      += 1;
+            }
+            if (NumStrings >= Index) {
+                StringSet[Index] = String2Attach;
+                AttachedSucessfully = Yes;
+            }
         } else if (StringSet == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("StringSet Pointer is NULL"));
         } else if (String2Attach == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String2Attach Pointer is NULL"));
         }
+        return AttachedSucessfully;
     }
     
-    void UTF32_StringSet_Attach(PlatformIO_Immutable(UTF32 **) StringSet, PlatformIO_Immutable(UTF32 *) String2Attach, uint64_t Index) {
-        if (StringSet != NULL && String2Attach != NULL) { // We can't actually see if there's enough room to attach it because it's all null
-            StringSet[Index] = String2Attach;
+    bool UTF32_StringSet_Attach(PlatformIO_Immutable(UTF32 **) StringSet, PlatformIO_Immutable(UTF32 *) String2Attach, uint64_t Index) {
+        bool AttachedSucessfully = No;
+        if (StringSet != NULL && String2Attach != NULL) {
+            uint64_t NumStrings  = 0ULL;
+            while (StringSet[NumStrings] != PlatformIO_NULLTerminator) {
+                NumStrings      += 1;
+            }
+            if (NumStrings >= Index) {
+                StringSet[Index] = String2Attach;
+                AttachedSucessfully = Yes;
+            }
         } else if (StringSet == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("StringSet Pointer is NULL"));
         } else if (String2Attach == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String2Attach Pointer is NULL"));
         }
+        return AttachedSucessfully;
     }
     
     uint64_t UTF8_StringSet_GetNumStrings(PlatformIO_Immutable(UTF8 **) StringSet) {
@@ -3483,7 +3519,7 @@ extern "C" {
     uint64_t *UTF8_StringSet_GetStringSizesInCodeUnits(PlatformIO_Immutable(UTF8 **) StringSet) {
         uint64_t *StringSetSizes       = NULL;
         if (StringSet != NULL) {
-            uint64_t NumStrings          = UTF8_StringSet_GetNumStrings(StringSet);
+            uint64_t NumStrings        = UTF8_StringSet_GetNumStrings(StringSet);
             StringSetSizes             = (uint64_t*) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringSetSizes[String] = UTF8_GetStringSizeInCodeUnits(StringSet[String]);
@@ -3497,7 +3533,7 @@ extern "C" {
     uint64_t *UTF16_StringSet_GetStringSizesInCodeUnits(PlatformIO_Immutable(UTF16 **) StringSet) {
         uint64_t *StringSetSizes       = NULL;
         if (StringSet != NULL) {
-            uint64_t NumStrings          = UTF16_StringSet_GetNumStrings(StringSet);
+            uint64_t NumStrings        = UTF16_StringSet_GetNumStrings(StringSet);
             StringSetSizes             = (uint64_t*) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringSetSizes[String] = UTF16_GetStringSizeInCodeUnits(StringSet[String]);
@@ -3511,7 +3547,7 @@ extern "C" {
     uint64_t *UTF8_StringSet_GetStringSizesInCodePoints(PlatformIO_Immutable(UTF8 **) StringSet) {
         uint64_t *StringSetSizes       = NULL;
         if (StringSet != NULL) {
-            uint64_t NumStrings          = UTF8_StringSet_GetNumStrings(StringSet);
+            uint64_t NumStrings        = UTF8_StringSet_GetNumStrings(StringSet);
             StringSetSizes             = (uint64_t*) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringSetSizes[String] = UTF8_GetStringSizeInCodePoints(StringSet[String]);
@@ -3525,8 +3561,8 @@ extern "C" {
     uint64_t *UTF16_StringSet_GetStringSizesInCodePoints(PlatformIO_Immutable(UTF16 **) StringSet) {
         uint64_t *StringSetSizes       = NULL;
         if (StringSet != NULL) {
-            uint64_t NumStrings          = UTF16_StringSet_GetNumStrings(StringSet);
-            StringSetSizes             =(uint64_t*)  calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(uint64_t));
+            uint64_t NumStrings        = UTF16_StringSet_GetNumStrings(StringSet);
+            StringSetSizes             = (uint64_t*) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(uint64_t));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringSetSizes[String] = UTF16_GetStringSizeInCodePoints(StringSet[String]);
             }
@@ -3562,7 +3598,6 @@ extern "C" {
             } else {
                 Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate decoded StringSet"));
             }
-            
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("StringSet Pointer is NULL"));
         }
