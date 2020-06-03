@@ -1120,24 +1120,27 @@ extern "C" {
      @param      StringSet                               The StringSet to attach the String to.
      @param      String2Attach                           The String to attach.
      @param      Index                                   Which position should String2Attach be in?
+     @return                                             Returns true when attaching was sucessful.
      */
-    void         UTF8_StringSet_Attach(PlatformIO_Immutable(UTF8 **) StringSet, PlatformIO_Immutable(UTF8 *) String2Attach, uint64_t Index);
+    bool         UTF8_StringSet_Attach(PlatformIO_Immutable(UTF8 **) StringSet, PlatformIO_Immutable(UTF8 *) String2Attach, uint64_t Index);
     
     /*!
      @abstract                                           Attaches a string to a StringSet at the specified position.
      @param      StringSet                               The StringSet to attach the String to.
      @param      String2Attach                           The String to attach.
      @param      Index                                   Which position should String2Attach be in?
+     @return                                             Returns true when attaching was sucessful.
      */
-    void         UTF16_StringSet_Attach(PlatformIO_Immutable(UTF16 **) StringSet, PlatformIO_Immutable(UTF16 *) String2Attach, uint64_t Index);
+    bool         UTF16_StringSet_Attach(PlatformIO_Immutable(UTF16 **) StringSet, PlatformIO_Immutable(UTF16 *) String2Attach, uint64_t Index);
     
     /*!
      @abstract                                           Attaches a string to a StringSet at the specified position.
      @param      StringSet                               The StringSet to attach the String to.
      @param      String2Attach                           The String to attach.
      @param      Index                                   Which position should String2Attach be in?
+     @return                                             Returns true when attaching was sucessful.
      */
-    void         UTF32_StringSet_Attach(PlatformIO_Immutable(UTF32 **) StringSet, PlatformIO_Immutable(UTF32 *) String2Attach, uint64_t Index);
+    bool         UTF32_StringSet_Attach(PlatformIO_Immutable(UTF32 **) StringSet, PlatformIO_Immutable(UTF32 *) String2Attach, uint64_t Index);
     
     /*!
      @abstract                                           Gets the number of strings in a StringSet.
