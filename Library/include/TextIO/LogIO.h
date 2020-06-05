@@ -46,10 +46,10 @@ extern "C" {
     void         Log_SetLogFile(FILE *File);
     
     /*!
-     @abstract                                    Logs to the LogFile, which can be a user specified path, otherwise it's STDERR.
-     @param      Severity                         Any of the types provided by LogIO_Severities.
-     @param      FunctionName                     Which function is calling Log?
-     @param      Description                      String describing what went wrong.
+     @abstract                                   Logs to the LogFile, which can be a user specified path, otherwise it's STDERR.
+     @param      Severity                        Any of the types provided by LogIO_Severities.
+     @param      FunctionName                    Which function is calling Log?
+     @param      Description                     String describing what went wrong.
      */
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang  || PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
     void         Log(LogIO_Severities Severity, PlatformIO_Immutable(UTF8 *) FunctionName, PlatformIO_Immutable(UTF8 *) Description, ...) __attribute__((__format__(__printf__, 3, 4)));
@@ -62,7 +62,7 @@ extern "C" {
 #endif /* Compiler */
     
     /*!
-     @abstract   Closes the LogFile.
+     @abstract                                   Closes the LogFile.
      */
     void         Log_Deinit(void);
     
