@@ -339,6 +339,10 @@ typedef                   char32_t                  UTF32;
 #define                   UTF32_MakeStringImmutable(String) (const String)
 #endif /* PlatformIO_Language */
 #endif /* UTF32_MakeStringImmutable */
+
+#ifndef                   PlatformIO_MakeStringSet
+#define                   PlatformIO_MakeStringSet(StringSetSize, ...) {__VA_ARGS__,};
+#endif
     
 #endif /* UnicodeIOTypes_PropertyConversion32 */
     
