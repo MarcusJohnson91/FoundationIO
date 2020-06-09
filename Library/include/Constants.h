@@ -14,7 +14,7 @@
 #ifndef FoundationIO_Constants_H
 #define FoundationIO_Constants_H
 
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
 
@@ -153,7 +153,7 @@ extern "C" {
 		U',', U'.', U'\'', U' '
 	};
 
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif
 

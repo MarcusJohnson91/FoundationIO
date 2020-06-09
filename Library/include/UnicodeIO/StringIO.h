@@ -15,7 +15,7 @@
 #ifndef FoundationIO_UnicodeIO_StringIO_H
 #define FoundationIO_UnicodeIO_StringIO_H
 
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
     
@@ -1244,7 +1244,7 @@ extern "C" {
      */
     void         UTF32_StringSet_Deinit(UTF32 **StringSet);
     
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif
 

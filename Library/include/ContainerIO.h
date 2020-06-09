@@ -13,7 +13,7 @@
 #ifndef  FoundationIO_ContainerIO_H
 #define  FoundationIO_ContainerIO_H
 
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
     
@@ -703,7 +703,7 @@ extern "C" {
      */
     ImageChannelMap        *ImageHistogram_GetChannelMap(ImageHistogram *Histogram);
     
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif
 

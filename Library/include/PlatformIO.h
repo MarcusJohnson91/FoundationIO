@@ -11,7 +11,7 @@
 #ifndef FoundationIO_PlatformIO_H
 #define FoundationIO_PlatformIO_H
 
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
 
@@ -534,7 +534,7 @@ extern "C" {
     
     uint64_t        PlatformIO_GetTotalMemoryInBytes(void);
     
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif
 
