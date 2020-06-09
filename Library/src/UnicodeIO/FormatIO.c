@@ -1501,7 +1501,7 @@ extern "C" {
         return FormattedString;
     }
     
-    UTF8 **UTF8_Deformat(UTF8 *Format, UTF8 *Formatted) {
+    UTF8 **UTF8_Deformat(PlatformIO_Immutable(UTF8 *) Format, PlatformIO_Immutable(UTF8 *) Formatted) {
         UTF8 **StringSet                   = NULL;
         if (Format != NULL && Formatted != NULL) {
             uint64_t NumSpecifiers           = UTF8_GetNumFormatSpecifiers(Format);
@@ -1525,7 +1525,7 @@ extern "C" {
         return StringSet;
     }
     
-    UTF16 **UTF16_Deformat(UTF16 *Format, UTF16 *Formatted) {
+    UTF16 **UTF16_Deformat(PlatformIO_Immutable(UTF16 *) Format, PlatformIO_Immutable(UTF16 *) Formatted) {
         UTF16 **StringSet                    = NULL;
         if (Format != NULL && Formatted != NULL) {
             uint64_t NumSpecifiers           = UTF16_GetNumFormatSpecifiers(Format);

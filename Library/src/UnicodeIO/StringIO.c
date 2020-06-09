@@ -519,65 +519,63 @@ extern "C" {
         return WordSize;
     }
     
-    UTF8 *UTF8_ExtractCodePoint(PlatformIO_Immutable(UTF8 *) String, uint64_t Offset, uint64_t StringSize) {
-        UTF8 *CodeUnits                     = NULL;
-        if (String != NULL && Offset < StringSize) {
-            uint8_t CodePointSize           = UTF8_GetCodePointSizeInCodeUnits(String[Offset]);
-            if (Offset + CodePointSize <= StringSize) {
-                CodeUnits                   = UTF8_Init(CodePointSize);
-                if (CodeUnits != NULL) {
-                    for (uint8_t CodeUnit = 0; CodeUnit < CodePointSize; CodeUnit++) {
-                        CodeUnits[CodeUnit] = String[Offset + CodeUnit];
-                    }
-                }
-            } else {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CodePoint is %u bytes, which is larger than StringSize: %llu at Offset: %llu"), CodePointSize, StringSize, Offset);
+    UTF8 *UTF8_ExtractCodePoint(PlatformIO_Immutable(UTF8 *) String) {
+        UTF8 *CodeUnits                               = NULL;
+        if (String != NULL && String[0] != PlatformIO_NULLTerminator) {
+            uint8_t CodePointSize                     = UTF8_GetCodePointSizeInCodeUnits(String[0]);
+            switch (CodePointSize) {
+                case 1:
+                    StringIO_PreallocateCodePoint_UTF8[0] = String[0];
+                    CodeUnits                             = StringIO_PreallocateCodePoint_UTF8;
+                    break;
+                case 2:
+                    StringIO_PreallocateCodePoint_UTF8[0] = String[0];
+                    StringIO_PreallocateCodePoint_UTF8[1] = String[1];
+                    CodeUnits                             = StringIO_PreallocateCodePoint_UTF8;
+                    break;
+                case 3:
+                    StringIO_PreallocateCodePoint_UTF8[0] = String[0];
+                    StringIO_PreallocateCodePoint_UTF8[1] = String[1];
+                    StringIO_PreallocateCodePoint_UTF8[2] = String[2];
+                    CodeUnits                             = StringIO_PreallocateCodePoint_UTF8;
+                    break;
+                case 4:
+                    StringIO_PreallocateCodePoint_UTF8[0] = String[0];
+                    StringIO_PreallocateCodePoint_UTF8[1] = String[1];
+                    StringIO_PreallocateCodePoint_UTF8[2] = String[2];
+                    StringIO_PreallocateCodePoint_UTF8[3] = String[3];
+                    CodeUnits                             = StringIO_PreallocateCodePoint_UTF8;
+                    break;
             }
         } else if (String == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (Offset > StringSize) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
         }
         return CodeUnits;
     }
     
-    UTF16 *UTF16_ExtractCodePoint(PlatformIO_Immutable(UTF16 *) String, uint64_t Offset, uint64_t StringSize) {
-        UTF16 *CodeUnits                     = NULL;
-        if (String != NULL && Offset < StringSize) {
-            uint8_t CodePointSize           = UTF16_GetCodePointSizeInCodeUnits(String[Offset]);
-            if (Offset + CodePointSize <= StringSize) {
-                CodeUnits                   = UTF16_Init(CodePointSize);
-                if (CodeUnits != NULL) {
-                    for (uint8_t CodeUnit = 0; CodeUnit < CodePointSize; CodeUnit++) {
-                        CodeUnits[CodeUnit] = String[Offset + CodeUnit];
-                    }
-                }
+    UTF16 *UTF16_ExtractCodePoint(PlatformIO_Immutable(UTF16 *) String) {
+        UTF16 *CodeUnits                               = NULL;
+        if (String != NULL && String[0] != PlatformIO_NULLTerminator) {
+            if (String[0] < UTF16HighSurrogateStart || String[0] > UTF16LowSurrogateEnd) {
+                StringIO_PreallocateCodePoint_UTF16[0] = String[0];
+                CodeUnits                              = StringIO_PreallocateCodePoint_UTF16;
             } else {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CodePoint is %u bytes, which is larger than StringSize: %llu at Offset: %llu"), CodePointSize, StringSize, Offset);
+                StringIO_PreallocateCodePoint_UTF16[0] = String[0];
+                StringIO_PreallocateCodePoint_UTF16[1] = String[1];
+                CodeUnits                              = StringIO_PreallocateCodePoint_UTF16;
             }
         } else if (String == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (Offset > StringSize) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
         }
         return CodeUnits;
     }
     
-    UTF32 *UTF32_ExtractCodePoint(PlatformIO_Immutable(UTF32 *) String, uint64_t Offset, uint64_t StringSize) {
-        UTF32 *CodePoint         = NULL;
-        if (String != NULL && Offset < StringSize) {
-            if (Offset + 1 <= StringSize) {
-                CodePoint        = UTF32_Init(1);
-                if (CodePoint != NULL) {
-                    CodePoint[0] = String[Offset];
-                }
-            } else {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CodePoint is %lu bytes, which is larger than StringSize: %llu at Offset: %llu"), sizeof(UTF32), StringSize, Offset);
-            }
+    UTF32 UTF32_ExtractCodePoint(PlatformIO_Immutable(UTF32 *) String) {
+        UTF32 CodePoint         = 0;
+        if (String != NULL && String[0] != PlatformIO_NULLTerminator) {
+            CodePoint           = String[0];
         } else if (String == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (Offset > StringSize) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Offset %llu is larger than the string %llu"), Offset, StringSize);
         }
         return CodePoint;
     }
@@ -613,42 +611,29 @@ extern "C" {
     UTF32 *UTF32_ExtractGrapheme(PlatformIO_Immutable(UTF32 *) String, uint64_t GraphemeIndex) {
         UTF32 *Grapheme                    = NULL;
         if (String != NULL) {
-            uint64_t NumCodePointsInString = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t NumGraphemesInString  = UTF32_GetStringSizeInGraphemes(String);
-            uint64_t CurrentGrapheme       = 0ULL;
-            uint64_t CodePointStart        = 0ULL;
-            if (GraphemeIndex < NumGraphemesInString) {
-                for (uint64_t CodePoint = 0ULL; CodePoint < NumCodePointsInString; CodePoint++) {
-                    for (uint64_t GraphemeCodePoint = 0ULL; GraphemeCodePoint < GraphemeExtensionTableSize; GraphemeCodePoint++) {
-                        if (String[CodePoint] == GraphemeExtensionTable[GraphemeCodePoint]) {
-                            CurrentGrapheme                         += 1;
-                        }
-                        if (CurrentGrapheme == GraphemeIndex) {
-                            CodePointStart                           = CodePoint;
-                            break;
-                        }
-                    }
+            /*
+             Loop over the string with a while loop
+             extracting each pair of codepoints and finding grapheme boundaries
+             */
+            UTF32    CodePoint1   = 0;
+            UTF32    CodePoint2   = 0;
+            uint64_t CodePoint    = 0;
+            uint64_t GraphemeSize = 0;
+            while (String[CodePoint] != PlatformIO_NULLTerminator && String[CodePoint + 1] != PlatformIO_NULLTerminator) {
+                CodePoint1       = UTF32_ExtractCodePoint(&String[CodePoint]);
+                CodePoint2       = UTF32_ExtractCodePoint(&String[CodePoint + 1]);
+                // Now look up the codepoints to see if they're grapheme extenders
+                bool IsExtender1 = UTF32_CodePointIsGraphemeExtender(CodePoint1);
+                bool IsExtender2 = UTF32_CodePointIsGraphemeExtender(CodePoint2);
+                if (IsExtender1 == Yes && IsExtender2 == No) {
+                    // Grapheme Boundary; CodePoint1 is part of the previous boundary; CodePoint2 is part of the next Grapheme
+                } else if (IsExtender1 == No && IsExtender2 == Yes) {
+                    // Grapheme Boundary, CodePoint1 and CodePoint2 are part of a new Grapheme
+                } else if (IsExtender1 == Yes && IsExtender2 == Yes) {
+                    // Both codepoints are part of a previous grapheme
+                } else if (IsExtender1 == No && IsExtender2 == No) {
+                    // 2 graphemes here
                 }
-                uint64_t GraphemeSizeInCodePoints                    = 0ULL;
-                for (uint64_t CodePoint = CodePointStart; CodePoint < NumCodePointsInString; CodePoint++) {
-                    for (uint64_t GraphemeExtension = 0ULL; GraphemeExtension < GraphemeExtensionTableSize; GraphemeExtension++) {
-                        if (String[CodePoint] == GraphemeExtensionTable[GraphemeExtension]) {
-                            GraphemeSizeInCodePoints                += 1;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                Grapheme                                             = UTF32_Init(GraphemeSizeInCodePoints);
-                if (Grapheme != NULL) {
-                    for (uint64_t GraphemeCodePoint = CodePointStart; GraphemeCodePoint < CodePointStart + GraphemeSizeInCodePoints; GraphemeCodePoint++) {
-                        Grapheme[GraphemeCodePoint - CodePointStart] = String[GraphemeCodePoint];
-                    }
-                } else {
-                    Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate %llu CodePoints for the Grapheme"), GraphemeSizeInCodePoints);
-                }
-            } else {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Grapheme %llu is greater than there are Graphemes %llu"), GraphemeIndex, NumGraphemesInString);
             }
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));

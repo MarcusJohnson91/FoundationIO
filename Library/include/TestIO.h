@@ -79,12 +79,12 @@ extern "C" {
     
     /*!
      @abstract                                    Generates a valid UTF-32 string, containing up to 8192 CodePoints.
-     @param        Random                         Pointer to an instance of Entropy, from CryptographyIO.
+     @param        Random                         Pointer to an instance of SecureRNG, from CryptographyIO.
      @param        NumCodePoints                  The number of CodePoints, for the String's size.
      */
-    UTF32         *UTF32_GenerateString(Entropy *Random, uint64_t NumCodePoints);
+    UTF32         *UTF32_GenerateString(SecureRNG *Random, uint64_t NumCodePoints);
     
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif
 
