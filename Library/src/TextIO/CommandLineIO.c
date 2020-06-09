@@ -6,14 +6,14 @@
 #include "../../include/UnicodeIO/StringIO.h"       /* Included for StringIO's declarations */
 
 #if (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && (((PlatformIO_TargetOS & PlatformIO_LinuxOS) != PlatformIO_LinuxOS)))
-#include <signal.h>                    /* Included for SIGWINCH handling */
-#include <sys/ioctl.h>                 /* Included for the terminal size */
-#include <sys/ttycom.h>                /* Included for winsize, TIOCGWINSZ */
+#include <signal.h>                                 /* Included for SIGWINCH handling */
+#include <sys/ioctl.h>                              /* Included for the terminal size */
+#include <sys/ttycom.h>                             /* Included for winsize, TIOCGWINSZ */
 #elif (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && (((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS)))
-#include <signal.h>                    /* Included for SIGWINCH handling */
-#include <sys/ioctl.h>                 /* Included for the terminal size */
+#include <signal.h>                                 /* Included for SIGWINCH handling */
+#include <sys/ioctl.h>                              /* Included for the terminal size */
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
-#include <wincon.h>                    /* Included for getting the terminal size */
+#include <wincon.h>                                 /* Included for getting the terminal size */
 #endif
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -27,13 +27,29 @@ extern "C" {
      
      Incompatible Options (-Interlace vs -No-Interlace)
      */
+
+    /*
+     User walkthrough:
+
+     I'm a user that's developing a program that does something
+
+     so first I create an enum that contains all the switches a user can enter.
+
+     then I'm creating an interface for CommandLineIO that describes their interactions.
+
+     Switches X and Y are incompatible
+
+     Switches A and B must be used together.
+
+     Switches
+     */
     
     typedef struct CommandLineOption {
         // ok so each option is based on a SwitchID, it may need to hold any used children, as well as argument strings
         // How do we handle bool strings, and ranges?
         // Maybe we should just have the user pass in the OptionID to a dedicated function that will handle BoolStrings, Ranges, etc?
         UTF32    *Argument;
-        uint64_t  SwitchID; // the number matching the switch that this option corresponds to
+        uint64_t  SwitchID;    // the number matching the switch that this option corresponds to
         uint64_t  NumChildren; // Number of active children for this option
         uint64_t *Children;
     } CommandLineOption;
@@ -338,13 +354,13 @@ extern "C" {
             }
             
             UTF32 *Banner32 = UTF32_Format(UTF32String("%U32s, v. %U32s by %U32s © %U32s, %U32s, %U32s"),
-                                               CLI->ProgramName        != NULL ? CLI->ProgramName        : PlatformIO_InvisibleString32,
-                                               CLI->ProgramVersion     != NULL ? CLI->ProgramVersion     : PlatformIO_InvisibleString32,
-                                               CLI->ProgramAuthor      != NULL ? CLI->ProgramAuthor      : PlatformIO_InvisibleString32,
-                                               CLI->ProgramCopyright   != NULL ? CLI->ProgramCopyright   : PlatformIO_InvisibleString32,
-                                               CLI->ProgramDescription != NULL ? CLI->ProgramDescription : PlatformIO_InvisibleString32,
-                                               License                 != NULL ? License                 : PlatformIO_InvisibleString32
-                                               );
+                                           CLI->ProgramName        != NULL ? CLI->ProgramName        : PlatformIO_InvisibleString32,
+                                           CLI->ProgramVersion     != NULL ? CLI->ProgramVersion     : PlatformIO_InvisibleString32,
+                                           CLI->ProgramAuthor      != NULL ? CLI->ProgramAuthor      : PlatformIO_InvisibleString32,
+                                           CLI->ProgramCopyright   != NULL ? CLI->ProgramCopyright   : PlatformIO_InvisibleString32,
+                                           CLI->ProgramDescription != NULL ? CLI->ProgramDescription : PlatformIO_InvisibleString32,
+                                           License                 != NULL ? License                 : PlatformIO_InvisibleString32
+                                           );
             UTF32_Deinit(License);
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
             UTF8 *Banner8 = UTF8_Encode(Banner32);
@@ -741,26 +757,26 @@ extern "C" {
                         }
                         
                         /*
-                        Old nonsense incase of hidden gems:
+                         Old nonsense incase of hidden gems:
                          
-                        bool AllOptionsMatch   = No;
-                        for (uint64_t Option = 0ULL; Option < CLI->NumOptions; Option++) {
-                            if (CLI->OptionIDs[Option].OptionID == OptionID) {
-                                if (NumSlaves == 0 && CLI->OptionIDs[Option].NumOptionSlaves == 0) {
-                                    AllOptionsMatch       = Yes;
-                                    MatchingOption        = Option;
-                                } else {
-                                    for (uint64_t ParamSlave = 0ULL; ParamSlave < NumSlaves; ParamSlave++) {
-                                        for (uint64_t OptionSlave = 0ULL; OptionSlave < CLI->OptionIDs[Option].NumOptionSlaves; OptionSlave++) {
-                                            if (SlaveIDs[ParamSlave] == CLI->OptionIDs[Option].Slaves[OptionSlave]) {
-                                                AllOptionsMatch       = Yes;
-                                                MatchingOption        = Option;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                         bool AllOptionsMatch   = No;
+                         for (uint64_t Option = 0ULL; Option < CLI->NumOptions; Option++) {
+                         if (CLI->OptionIDs[Option].OptionID == OptionID) {
+                         if (NumSlaves == 0 && CLI->OptionIDs[Option].NumOptionSlaves == 0) {
+                         AllOptionsMatch       = Yes;
+                         MatchingOption        = Option;
+                         } else {
+                         for (uint64_t ParamSlave = 0ULL; ParamSlave < NumSlaves; ParamSlave++) {
+                         for (uint64_t OptionSlave = 0ULL; OptionSlave < CLI->OptionIDs[Option].NumOptionSlaves; OptionSlave++) {
+                         if (SlaveIDs[ParamSlave] == CLI->OptionIDs[Option].Slaves[OptionSlave]) {
+                         AllOptionsMatch       = Yes;
+                         MatchingOption        = Option;
+                         }
+                         }
+                         }
+                         }
+                         }
+                         }
                          */
                     }
                 }

@@ -1,6 +1,6 @@
 #include "../include/BitIO.h"                /* Included for our declarations */
 #include "../include/Constants.h"            /* Included for BitMaskTables */
-#include "../include/CryptographyIO.h"       /* Included for Entropy_GenerateInteger for GUUID_Generate */
+#include "../include/CryptographyIO.h"       /* Included for SecureRNG_GenerateInteger for GUUID_Generate */
 #include "../include/MathIO.h"               /* Included for Integer functions */
 #include "../include/UnicodeIO/FormatIO.h"   /* Included for UTF32_Format */
 #include "../include/UnicodeIO/LogIO.h"      /* Included for Logging */
@@ -1090,11 +1090,11 @@ extern "C" {
     /* BitOutput */
     
     /* GUUID */
-    uint8_t *GUUID_Generate(Entropy *Random, BitIO_GUUIDTypes GUUIDType) {
+    uint8_t *GUUID_Generate(SecureRNG *Random, BitIO_GUUIDTypes GUUIDType) {
         uint8_t *GUUID                   = 0;
         if (Random != NULL && GUUIDType != GUUIDType_Unknown) {
-            uint64_t LowBits             = Entropy_GenerateInteger(Random, 64);
-            uint64_t HighBits            = Entropy_GenerateInteger(Random, 64);
+            uint64_t LowBits             = SecureRNG_GenerateInteger(Random, 64);
+            uint64_t HighBits            = SecureRNG_GenerateInteger(Random, 64);
             uint8_t *BinaryGUUIDData     = (uint8_t*) calloc(BinaryGUUID_Size, sizeof(uint8_t));
             if (GUUID != NULL) {
                 for (uint8_t GUUIDByte = 0; GUUIDByte < BinaryGUUID_Size; GUUIDByte++) {
@@ -1115,7 +1115,7 @@ extern "C" {
                 Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate GUUID"));
             }
         } else if (Random == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         } else if (GUUIDType == GUUIDType_Unknown) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("GUUIDType_Unknown is an invalid GUUIDType"));
         }

@@ -24,35 +24,35 @@ extern "C" {
 #endif /* Version check */
     
     /*!
-     @enum       MathIO_Constants
-     @abstract                                    Mathematical constants
+     @enum         MathIO_Constants
+     @abstract                                      Mathematical constants
      */
     typedef enum MathIO_Constants {
-                 Decimal64Bias                    = 1023,
-                 Decimal32Bias                    = 127,
-                 Decimal64MantissaSize            = 52,
-                 Decimal32MantissaSize            = 23,
-                 Decimal64ExponentSize            = 11,
-                 Decimal32ExponentSize            = 8,
+                   Decimal64Bias                    = 1023,
+                   Decimal32Bias                    = 127,
+                   Decimal64MantissaSize            = 52,
+                   Decimal32MantissaSize            = 23,
+                   Decimal64ExponentSize            = 11,
+                   Decimal32ExponentSize            = 8,
     } MathIO_Constants;
     
     /*!
-     @enum       MathIO_RoundingTypes
-     @abstract                                    Defines the type of rounding.
-     @constant   RoundingType_Unknown             Invalid ImageType, exists solely to tell when it hasn't been set.
-     @constant   RoundingType_Down                Flip the imge vertically, up and down.
-     @constant   RoundingType_Up                  Flip the image horizontally, side to side.
+     @enum         MathIO_RoundingTypes
+     @abstract                                      Defines the type of rounding.
+     @constant     RoundingType_Unknown             Invalid ImageType, exists solely to tell when it hasn't been set.
+     @constant     RoundingType_Down                Flip the imge vertically, up and down.
+     @constant     RoundingType_Up                  Flip the image horizontally, side to side.
      */
     typedef enum MathIO_RoundingTypes {
-                 RoundingType_Unknown             = 0,
-                 RoundingType_Down                = 1,
-                 RoundingType_Up                  = 2,
+                   RoundingType_Unknown             = 0,
+                   RoundingType_Down                = 1,
+                   RoundingType_Up                  = 2,
     } MathIO_RoundingTypes;
     
     typedef enum MathIO_RotationType {
-        Rotate_Unknown = 0,
-        Rotate_Left    = 1,
-        Rotate_Right   = 2,
+                   Rotate_Unknown = 0,
+                   Rotate_Left    = 1,
+                   Rotate_Right   = 2,
     } MathIO_RotationType;
     
     /*!

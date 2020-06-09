@@ -295,7 +295,7 @@ extern "C" {
      @param               Source                  The string to extract the information from.
      @return                                      Returns a StringSet containing NumFormatSpecifiers strings, one string for each specifier.
      */
-    UTF8                **UTF8_Deformat(UTF8 *Format, UTF8 *Source);
+    UTF8                **UTF8_Deformat(PlatformIO_Immutable(UTF8 *) Format, PlatformIO_Immutable(UTF8 *) Source);
     
     /*!
     @abstract                                     Splits a string based on the specifiers in Format.
@@ -303,7 +303,7 @@ extern "C" {
     @param               Source                   The string to extract the information from.
     @return                                       Returns a StringSet containing NumFormatSpecifiers strings, one string for each specifier.
     */
-    UTF16               **UTF16_Deformat(UTF16 *Format, UTF16 *Source);
+    UTF16               **UTF16_Deformat(PlatformIO_Immutable(UTF16 *) Format, PlatformIO_Immutable(UTF16 *) Source);
     
     /*!
     @abstract                                     Splits a string based on the specifiers in Format.

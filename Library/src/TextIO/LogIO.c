@@ -25,7 +25,7 @@ extern "C" {
         if (Log_LogFile == NULL) {
             Log_LogFile = stderr;
         }
-        
+
         const UTF32 *Error    = UTF32String("ERROR");
         const UTF32 *Mistake  = UTF32String("Mistake");
         

@@ -18,41 +18,41 @@ extern "C" {
      Let's put it in CommandLineIO
      */
     
-    void Test_UTF8_EncodeDecode(Entropy *Random) {
-        if (Random != NULL) {
-            uint64_t  NumCodePoints    = Entropy_GenerateInteger(Random, 16);
-            UTF32    *GeneratedString  = UTF32_GenerateString(Random, NumCodePoints);
+    void Test_UTF8_EncodeDecode(SecureRNG *Secure) {
+        if (Secure != NULL) {
+            uint64_t  NumCodePoints    = SecureRNG_GenerateInteger(Secure, 16);
+            PlatformIO_Immutable(UTF32*) GeneratedString  = UTF32_GenerateString(Secure, NumCodePoints);
             UTF8     *Generated8       = UTF8_Encode(GeneratedString);
-            UTF32    *Decoded8         = UTF8_Decode(Generated8);
+            PlatformIO_Immutable(UTF32*) Decoded8         = UTF8_Decode(Generated8);
             bool      StringsMatch     = UTF32_Compare(GeneratedString, Decoded8);
             if (StringsMatch == No) {
                 Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Strings DO NOT match!"));
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
     }
     
-    void Test_UTF16_EncodeDecode(Entropy *Random) {
-        if (Random != NULL) {
-            uint64_t  NumCodePoints   = Entropy_GenerateInteger(Random, 16);
-            UTF32    *GeneratedString = UTF32_GenerateString(Random, NumCodePoints);
-            UTF16    *Generated16     = UTF16_Encode(GeneratedString);
-            UTF32    *Decoded16       = UTF16_Decode(Generated16);
+    void Test_UTF16_EncodeDecode(SecureRNG *Secure) {
+        if (Secure != NULL) {
+            uint64_t  NumCodePoints   = SecureRNG_GenerateInteger(Secure, 16);
+            PlatformIO_Immutable(UTF32*) GeneratedString = UTF32_GenerateString(Secure, NumCodePoints);
+            PlatformIO_Immutable(UTF16*) Generated16     = UTF16_Encode(GeneratedString);
+            PlatformIO_Immutable(UTF32*) Decoded16       = UTF16_Decode(Generated16);
             bool      StringsMatch    = UTF32_CompareSubString(GeneratedString, Decoded16, 0, 0);
             if (StringsMatch == No) {
                 Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Strings DO NOT match!"));
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
     }
     
     void Test_UTF8_Insert(void) {
-        UTF8 *Original = UTF8String("Original");
-        UTF8 *Insertee = UTF8String("Insert");
-        UTF8 *Inserted = UTF8_Insert(Original, Insertee, 0);
-        UTF8 *Correct  = UTF8String("InsertOriginal");
+        PlatformIO_Immutable(UTF8 *) Original = UTF8String("Original");
+        PlatformIO_Immutable(UTF8 *) Insertee = UTF8String("Insert");
+        PlatformIO_Immutable(UTF8 *) Inserted = UTF8_Insert(Original, Insertee, 0);
+        PlatformIO_Immutable(UTF8 *) Correct  = UTF8String("InsertOriginal");
         bool Matches   = UTF8_Compare(Inserted, Correct);
         if (Matches == No) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Strings do not match"));
@@ -61,8 +61,8 @@ extern "C" {
     
     bool Test_UTF8_Properties(void) {
         bool      TestPassed     = true;
-        UTF8     *TestString8    = UTF8String("Size: 7");
-        UTF32    *TestString32   = UTF8_Decode(TestString8);
+        PlatformIO_Immutable(UTF8 *) TestString8    = UTF8String("Size: 7");
+        PlatformIO_Immutable(UTF32*) TestString32   = UTF8_Decode(TestString8);
         uint64_t  TestStringSize = UTF32_GetStringSizeInCodePoints(TestString32);
         if (TestStringSize != 7) {
             TestPassed           = false;
@@ -74,23 +74,23 @@ extern "C" {
     bool Test_SubstituteSubString() {
         bool TestPassed = No;
         
-        UTF32 *Replacement = UTF32String("987654321");
-        UTF32 *String      = UTF32String("123456789");
-        UTF32 *Replaced    = UTF32_SubstituteSubString(String, Replacement, 0, 0);
+        PlatformIO_Immutable(UTF32*) Replacement = UTF32String("987654321");
+        PlatformIO_Immutable(UTF32*) String      = UTF32String("123456789");
+        UTF32                       *Replaced    = UTF32_SubstituteSubString(String, Replacement, 0, 0);
         
         return TestPassed;
     }
     
     bool Test_UTF8_StitchSubString(void) {
         bool TestPassed = No;
-        UTF8 *BananaBread = UTF8_StitchSubString(UTF8String("Banana WAT Bread"), 8, 4);
+        PlatformIO_Immutable(UTF8*) BananaBread = UTF8_StitchSubString(UTF8String("Banana WAT Bread"), 8, 4);
         TestPassed        = UTF8_Compare(BananaBread, UTF8String("Banana Bread"));
         return TestPassed;
     }
     
     bool Test_Deformat(void) {
         bool TestPassed      = No;
-        UTF8 **DeformatTest1 = UTF8_Deformat(UTF8String("NumArgs: %1$llu, Equal: %llu, Type: %3$s"), UTF8String("NumArgs: 3, Equal: 1234, Type: Positional"));
+        PlatformIO_Immutable(UTF8 **) DeformatTest1 = (PlatformIO_Immutable(UTF8 **)) UTF8_Deformat(UTF8String("NumArgs: %1$llu, Equal: %llu, Type: %3$s"), UTF8String("NumArgs: 3, Equal: 1234, Type: Positional"));
         bool  SubString1     = UTF8_Compare(DeformatTest1[0], UTF8String("3"));
         bool  SubString2     = UTF8_Compare(DeformatTest1[1], UTF8String("1234"));
         bool  SubString3     = UTF8_Compare(DeformatTest1[2], UTF8String("Positional"));
@@ -119,16 +119,16 @@ extern "C" {
          */
         
         bool TestPassed  = false;
-        UTF32 *String1   = UTF32String("%U32s");
-        UTF32 *String2   = UTF32String("wat");
-        UTF32 *TestU32   = UTF32_Format(String1, String2);
+        PlatformIO_Immutable(UTF32*) String1   = UTF32String("%U32s");
+        PlatformIO_Immutable(UTF32*) String2   = UTF32String("wat");
+        PlatformIO_Immutable(UTF32*) TestU32   = UTF32_Format(String1, String2);
         if (UTF32_Compare(TestU32, String2)) {
             printf("%s\n", UTF8String("Test1 Passed"));
         } else {
             printf("%s\n", UTF8String("Test1 Failed"));
         }
         
-        UTF32 *Test1     = UTF32_SubstituteSubString(UTF32String("surr %1$s ound"), UTF32String("3"), 5, 4);
+        PlatformIO_Immutable(UTF32*) Test1     = UTF32_SubstituteSubString(UTF32String("surr %1$s ound"), UTF32String("3"), 5, 4);
         printf("%ls\n", (wchar_t*) Test1);
         bool  Test1Match = UTF32_Compare(Test1, UTF32String("surr 3 ound"));
         if (Test1Match == No) {
@@ -137,7 +137,7 @@ extern "C" {
             printf("%s\n", UTF8String("Test1 Passed"));
         }
         
-        UTF32 *Test2 = UTF32_SubstituteSubString(UTF32String("surr %s ound"), UTF32String("12"), 5, 2);
+        PlatformIO_Immutable(UTF32*) Test2 = UTF32_SubstituteSubString(UTF32String("surr %s ound"), UTF32String("12"), 5, 2);
         printf("%ls\n", (wchar_t*) Test2);
         bool  Test2Match = UTF32_Compare(Test2, UTF32String("surr 12 ound"));
         if (Test2Match == No) {
@@ -146,7 +146,7 @@ extern "C" {
             printf("%s\n", UTF8String("Test2 Passed"));
         }
         
-        UTF32 *Test3 = UTF32_SubstituteSubString(UTF32String("surr %llu ound"), UTF32String("1,234,567"), 5, 4);
+        PlatformIO_Immutable(UTF32*) Test3 = UTF32_SubstituteSubString(UTF32String("surr %llu ound"), UTF32String("1,234,567"), 5, 4);
         printf("%ls\n", (wchar_t*) Test3);
         bool  Test3Match = UTF32_Compare(Test3, UTF32String("surr 1,234,567 ound"));
         if (Test3Match == No) {
@@ -168,15 +168,15 @@ extern "C" {
         
         // Duplicate Specifiers, something where repition would be helpful
         
-        UTF8 *HLBParent1           = UTF8String("Popa");
-        UTF8 *HLBParent2           = UTF8String("Momma");
-        UTF8 *HLBRhyme1Ending      = UTF8String("ing");
-        UTF8 *HLBRhyme2Ending      = UTF8String("ass");
+        PlatformIO_Immutable(UTF8 *) HLBParent1           = UTF8String("Popa");
+        PlatformIO_Immutable(UTF8 *) HLBParent2           = UTF8String("Momma");
+        PlatformIO_Immutable(UTF8 *) HLBRhyme1Ending      = UTF8String("ing");
+        PlatformIO_Immutable(UTF8 *) HLBRhyme2Ending      = UTF8String("ass");
         
-        UTF8 *HushLittleBabyResult1 = UTF8String("Hush little baby don't say a word, Popa's gonna buy you a Mockingbird; And if that Mockingbird don't sing, Popa's gonna buy you a Diamond ring; and if that Diamond ring turns brass, Popa's gonna buy you a looking glass");
-        UTF8 *HushLittleBabyResult2 = UTF8String("Hush little baby don't say a word, Momma's gonna buy you a Mockingbird; And if that Mockingbird don't sing, Momma's gonna buy you a Diamond ring; and if that Diamond ring turns brass, Momma's gonna buy you a looking glass");
+        PlatformIO_Immutable(UTF8 *) HushLittleBabyResult1 = UTF8String("Hush little baby don't say a word, Popa's gonna buy you a Mockingbird; And if that Mockingbird don't sing, Popa's gonna buy you a Diamond ring; and if that Diamond ring turns brass, Popa's gonna buy you a looking glass");
+        PlatformIO_Immutable(UTF8 *) HushLittleBabyResult2 = UTF8String("Hush little baby don't say a word, Momma's gonna buy you a Mockingbird; And if that Mockingbird don't sing, Momma's gonna buy you a Diamond ring; and if that Diamond ring turns brass, Momma's gonna buy you a looking glass");
         
-        UTF8 *DuplicatePosition2Dad            = UTF8_Format(UTF8String("Hush little baby don't say a word, %1$s's gonna buy you a Mockingbird; And if that Mockingbird don't s%2$s, %1$s's gonna buy you a Diamond r%2$s; and if that Diamond r%2$s turns br%3$s, %1$s's gonna buy you a looking gl%3$s"), HLBParent1, HLBRhyme1Ending, HLBRhyme2Ending); // %1$ = 3, %2$ = 3, %3$ = 2, Dupes = 5
+       PlatformIO_Immutable(UTF8 *) DuplicatePosition2Dad            = UTF8_Format(UTF8String("Hush little baby don't say a word, %1$s's gonna buy you a Mockingbird; And if that Mockingbird don't s%2$s, %1$s's gonna buy you a Diamond r%2$s; and if that Diamond r%2$s turns br%3$s, %1$s's gonna buy you a looking gl%3$s"), HLBParent1, HLBRhyme1Ending, HLBRhyme2Ending); // %1$ = 3, %2$ = 3, %3$ = 2, Dupes = 5
         bool  DuplicatePosition2Test1          = UTF8_Compare(DuplicatePosition2Dad, HushLittleBabyResult1);
         if (DuplicatePosition2Test1 == No) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Rhyme Positional Test Failed"));
@@ -184,7 +184,7 @@ extern "C" {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Rhyme Positional Test Passed"));
         }
         
-        UTF8 *DuplicatePosition2Mom            = UTF8_Format(UTF8String("Hush little baby don't say a word, %1$s's gonna buy you a Mockingbird; And if that Mockingbird don't s%2$s, %1$s's gonna buy you a Diamond r%2$s; and if that Diamond r%2$s turns br%3$s, %1$s's gonna buy you a looking gl%3$s"), HLBParent2, HLBRhyme1Ending, HLBRhyme2Ending);
+        PlatformIO_Immutable(UTF8 *) DuplicatePosition2Mom            = UTF8_Format(UTF8String("Hush little baby don't say a word, %1$s's gonna buy you a Mockingbird; And if that Mockingbird don't s%2$s, %1$s's gonna buy you a Diamond r%2$s; and if that Diamond r%2$s turns br%3$s, %1$s's gonna buy you a looking gl%3$s"), HLBParent2, HLBRhyme1Ending, HLBRhyme2Ending);
         bool  DuplicatePosition2Test2          = UTF8_Compare(DuplicatePosition2Mom, HushLittleBabyResult2);
         if (DuplicatePosition2Test2 == No) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Rhyme Positional Test Failed"));
@@ -382,9 +382,9 @@ extern "C" {
     
     int main(int argc, const char *argv[]) {
         bool TestSuitePassed      = false;
-        //Entropy *Random           = Entropy_Init(8000000);
+        //SecureRNG *Secure           = Entropy_Init(8000000);
         TestSuitePassed           = Test_UTF8_Format();
-        //Test_UTF8_EncodeDecode(Random);
+        //Test_UTF8_EncodeDecode(Secure);
         //TestSuitePassed           = Test_UTF8_Format();
         //TestSuitePassed           = Test_UTF8_StitchSubString();
         return TestSuitePassed;

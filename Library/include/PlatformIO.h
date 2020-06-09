@@ -11,7 +11,7 @@
 #ifndef FoundationIO_PlatformIO_H
 #define FoundationIO_PlatformIO_H
 
-#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -42,6 +42,44 @@ extern "C" {
 #ifndef             PlatformIO_LinuxOS
 #define             PlatformIO_LinuxOS                                                  (32)
 #endif              /* BSD (Linux, Ubuntu, Android, etc) */
+
+#ifndef             PlatformIO_ArchIsAMD64
+#define             PlatformIO_ArchIsAMD64                                              (1)
+#endif
+
+#ifndef             PlatformIO_ArchIsARM64
+#define             PlatformIO_ArchIsARM64                                              (2)
+#endif
+
+#ifndef             PlatformIO_ArchIsMIPS64
+#define             PlatformIO_ArchIsMIPS64                                             (3)
+#endif
+
+#ifndef             PlatformIO_ArchIsRISCV64
+#define             PlatformIO_ArchIsRISCV64                                            (4)
+#endif
+
+#ifndef             PlatformIO_Architecture
+#if                 ((__amd64__ == 1) || (__x86_64__ == 1))
+#define             PlatformIO_Architecture (PlatformIO_ArchIsAMD64)
+#elif               ((__aarch64__ == 1) || (__ARM_64BIT_STATE == 1))
+#define             PlatformIO_Architecture (PlatformIO_ArchIsARM64)
+#elif               (__mips64__)
+#define             PlatformIO_Architecture (PlatformIO_ArchIsMIPS64)
+#elif               (__riscv) && (__riscv_xlen == 64)
+#define             PlatformIO_Architecture (PlatformIO_ArchIsRISCV64)
+#endif
+#endif
+
+#ifndef             PlatformIO_ArchHasSIMDExtensions
+#if                 (__ARM_NEON == 1)
+#define             PlatformIO_ArchHasSIMDExtensions (1)
+#elif               (__AVX__ == 1)
+#define             PlatformIO_ArchHasSIMDExtensions (1)
+#elif               (__MIPS_3D__ == 1)
+#define             PlatformIO_Architecture (PlatformIO_ArchIsMIPS64)
+#endif
+#endif
 
 #if ((defined Macintosh) || (defined macintosh))
 #define             PlatformIO_TargetOS                                                 (PlatformIO_ClassicMacOS)
@@ -426,11 +464,6 @@ extern "C" {
 #endif
 #endif
 
-    
-#ifndef             PlatformIO_MakeStringSet
-#define             PlatformIO_MakeStringSet(StringSetSize, ...) {__VA_ARGS__,};
-#endif
-
     typedef enum PlatformIO_FileModes {
         FileMode_Unspecified = 0,
         FileMode_Read        = 1,
@@ -534,7 +567,7 @@ extern "C" {
     
     uint64_t        PlatformIO_GetTotalMemoryInBytes(void);
     
-#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#ifdef __cplusplus
 }
 #endif
 

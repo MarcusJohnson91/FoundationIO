@@ -123,19 +123,19 @@ extern "C" {
         return Time;
     }
     
-    static UTF32 UTF32_GenerateCodePoint(Entropy *Random) {
+    static UTF32 UTF32_GenerateCodePoint(SecureRNG *Random) {
         UTF32 CodePoint          = 0UL;
         if (Random != NULL) {
-            UTF32  CodePointHigh = (UTF32) Entropy_GenerateIntegerInRange(Random, 1, 0xD7FF);
-            UTF32  CodePointLow  = (UTF32) Entropy_GenerateIntegerInRange(Random, 0xE000, 0x10FFFF);
+            UTF32  CodePointHigh = (UTF32) SecureRNG_GenerateIntegerInRange(Random, 1, 0xD7FF);
+            UTF32  CodePointLow  = (UTF32) SecureRNG_GenerateIntegerInRange(Random, 0xE000, 0x10FFFF);
             CodePoint            = CodePointLow | CodePointHigh;
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
         return CodePoint;
     }
     
-    UTF32 *UTF32_GenerateString(Entropy *Random, uint64_t NumCodePoints) {
+    UTF32 *UTF32_GenerateString(SecureRNG *Random, uint64_t NumCodePoints) {
         UTF32 *String                 = 0UL;
         if (Random != NULL) {
             String                    = UTF32_Init(NumCodePoints);
@@ -147,7 +147,7 @@ extern "C" {
                 Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate string with %llu CodePoints"), NumCodePoints);
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Entropy Pointer is NULL"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
         return String;
     }

@@ -505,10 +505,10 @@ extern "C" {
     /* GUUID */
     /*!
      @abstract                                     Generates a random GUUID.
-     @param        Random                          Pointer to SecureRNG.
+     @param        Secure                          Pointer to SecureRNG.
      @return                                       Returns the generated GUUID.
      */
-    uint8_t        *GUUID_Generate(SecureRNG *Random, BitIO_GUUIDTypes GUUIDType);
+    uint8_t        *GUUID_Generate(SecureRNG *Secure, BitIO_GUUIDTypes GUUIDType);
 
     /*!
      @abstract                                     Compares GUUIDs for equivalence, GUUID1 and 2 HAVE to be the same type.

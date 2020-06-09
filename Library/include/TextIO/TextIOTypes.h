@@ -21,27 +21,27 @@ extern "C" {
 #ifdef __has_include
 #if    __has_include(<uchar.h>)
 #include <uchar.h>
-#endif // <uchar.h> exists
-#endif // __has_include
+#endif /* <uchar.h> exists */
+#endif /* __has_include exists */
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 #ifdef __has_include
 #if    __has_include(<cuchar>)
 #include <cuchar>
-#endif // <cuchar> exists
-#endif // __has_include exists
-#endif // PlatformIO_Language
+#endif /* <cuchar> exists */
+#endif /* __has_include exists */
+#endif /* PlatformIO_Language */
     
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
 #ifndef __CHAR8_TYPE__
-#define __CHAR8_TYPE__
-typedef unsigned char char8_t;
-#endif // __CHAR8_TYPE__
+#define __CHAR8_TYPE__ unsigned char
+typedef __CHAR8_TYPE__ char8_t;
+#endif /* __CHAR8_TYPE__ */
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 #ifndef __cpp_char8_t
 #define __cpp_char8_t
 typedef unsigned char char8_t;
-#endif // __cpp_char8_t
-#endif // PlatformIO_Language
+#endif /* __cpp_char8_t */
+#endif /* PlatformIO_Language */
     
     
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
@@ -57,8 +57,8 @@ typedef uint_least16_t char16_t;
 typedef _Char16_t char16_t;
 #elif !defined(uint_least16_t)
 #error "Get a modern compiler that supports uint_least16_t"
-#endif // Defined? uint_least16_t
-#endif // Defined? __CHAR16_TYPE__
+#endif /* Defined? uint_least16_t */
+#endif /* Defined? __CHAR16_TYPE__ */
 
 #ifndef __STDC_UTF_32__
 #define __STDC_UTF_32__ 1 /* char32_t values is encoded as UTF-32 */
@@ -73,15 +73,15 @@ typedef uint_least32_t  char32_t;
 typedef _Char32_t char32_t;
 #elif !defined(uint_least32_t)
 #error "Get a modern compiler that supports uint_least32_t"
-#endif // Defined? uint_least32_t
-#endif // Defined? __CHAR32_TYPE__
+#endif /* Defined? uint_least32_t */
+#endif /* Defined? __CHAR32_TYPE__ */
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 #ifndef __cpp_unicode_characters
 #define __cpp_unicode_characters
 typedef uint_least16_t char16_t;
 typedef uint_least32_t char32_t;
-#endif // __cpp_unicode_characters
-#endif // PlatformIO_Language
+#endif /* __cpp_unicode_characters */
+#endif /* PlatformIO_Language */
   
   
 #ifndef   FoundationIO_StringType8
