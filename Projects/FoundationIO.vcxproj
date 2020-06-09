@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Library\src\BitIO.c" />
-    <ClCompile Include="..\Library\src\ContainerIO.c" />
     <ClCompile Include="..\Library\src\CryptographyIO.c" />
     <ClCompile Include="..\Library\src\MathIO.c" />
     <ClCompile Include="..\Library\src\PlatformIO.c" />
@@ -34,7 +33,6 @@
   <ItemGroup>
     <ClInclude Include="..\Library\include\BitIO.h" />
     <ClInclude Include="..\Library\include\Constants.h" />
-    <ClInclude Include="..\Library\include\ContainerIO.h" />
     <ClInclude Include="..\Library\include\CryptographyIO.h" />
     <ClInclude Include="..\Library\include\MathIO.h" />
     <ClInclude Include="..\Library\include\PlatformIO.h" />
