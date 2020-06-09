@@ -18,7 +18,7 @@
 #include <sal.h>
 #endif
 
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
     
@@ -66,7 +66,7 @@ extern "C" {
      */
     void         Log_Deinit(void);
     
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif
 

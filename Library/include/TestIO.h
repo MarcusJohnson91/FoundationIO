@@ -8,7 +8,7 @@
  */
 
 #include "PlatformIO.h"               /* Included for Platform Independence macros */
-#include "CryptographyIO.h"           /* Included for Entropy */
+#include "CryptographyIO.h"           /* Included for SecureRNG */
 #include "UnicodeIO/UnicodeIOTypes.h" /* Included for UTFX types */
 
 #pragma once
@@ -16,7 +16,7 @@
 #ifndef FoundationIO_TestIO_H
 #define FoundationIO_TestIO_H
 
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
 
