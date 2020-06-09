@@ -42,7 +42,6 @@ set(RUNTIME_OUTPUT_DIRECTORY       "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHI
 set(PUBLIC_HEADER
 "${Library_Dir}/include/BitIO.h"
 "${Library_Dir}/include/Constants.h"
-"${Library_Dir}/include/ContainerIO.h"
 "${Library_Dir}/include/CryptographyIO.h"
 "${Library_Dir}/include/MathIO.h"
 "${Library_Dir}/include/PlatformIO.h"
@@ -57,7 +56,6 @@ set(PUBLIC_HEADER
 
 set(Library_Sources
 "${Library_Dir}/src/BitIO.c"
-"${Library_Dir}/src/ContainerIO.c"
 "${Library_Dir}/src/CryptographyIO.c"
 "${Library_Dir}/src/MathIO.c"
 "${Library_Dir}/src/PlatformIO.c"
@@ -84,21 +82,18 @@ set_target_properties(FoundationIO PROPERTIES PREFIX "")
 if(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
     add_executable(Test_BitIO "${Test_Dir}/Test_BitIO.c")
     add_executable(Test_CommandLineIO "${Test_Dir}/Test_CommandLineIO.c")
-    add_executable(Test_ContainerIO "${Test_Dir}/Test_ContainerIO.c")
     add_executable(Test_StringIO "${Test_Dir}/Test_StringIO.c")
     add_executable(Test_MathIO "${Test_Dir}/Test_MathIO.c")
     add_executable(Test_CryptographyIO "${Test_Dir}/Test_CryptographyIO.c")
 
     target_link_libraries(Test_BitIO FoundationIO)
     target_link_libraries(Test_CommandLineIO FoundationIO)
-    target_link_libraries(Test_ContainerIO FoundationIO)
     target_link_libraries(Test_StringIO FoundationIO)
     target_link_libraries(Test_MathIO FoundationIO)
     target_link_libraries(Test_CryptographyIO FoundationIO)
 
     add_test(Test_BitIO CONFIGURATIONS Debug RelWithDebInfo)
     add_test(Test_CommandLineIO CONFIGURATIONS Debug RelWithDebInfo)
-    add_test(Test_ContainerIO CONFIGURATIONS Debug RelWithDebInfo)
     add_test(Test_StringIO CONFIGURATIONS Debug RelWithDebInfo)
     add_test(Test_MathIO CONFIGURATIONS Debug RelWithDebInfo)
     add_test(Test_CryptographyIO CONFIGURATIONS Debug RelWithDebInfo)
@@ -120,7 +115,6 @@ install(TARGETS PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 if(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
     install(TARGETS Test_BitIO          DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     install(TARGETS Test_CommandLineIO  DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-    install(TARGETS Test_ContainerIO    DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     install(TARGETS Test_StringIO       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     install(TARGETS Test_MathIO         DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     install(TARGETS Test_CryptographyIO DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

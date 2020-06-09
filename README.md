@@ -1,8 +1,8 @@
 # FoundationIO:
-- FoundationIO is a library containing many modules, namely BitIO, CommandLineIO, ContainerIO, StringIO, Log, and TestIO.
-- BitIO is a module for reading, and writing bits from/to files/sockets.
-- CommandLineIO is a module for parsing command line arguments.
-- StringIO is a module for Unicode, including UTF-8 and UTF-16 en/de coding, as well as normalization, casefolding, string formatting, string splitting, etc.
+- FoundationIO is a library containing many components, namely BitIO, CommandLineIO, StringIO, LogIO, and TestIO.
+- BitIO is a component for reading, and writing bits from/to files/sockets.
+- CommandLineIO is a component for parsing command line arguments.
+- StringIO is a component for Unicode, including UTF-8 and UTF-16 en/de coding, as well as normalization, casefolding, string formatting, string splitting, etc.
 - Currently, there's no stable API, let alone ABI. I break shit constantly because i'm very indecisive.
 
 # License:
@@ -19,7 +19,7 @@ BitIO:
 -----
 * To use BitIO call `BitInput_Init` and `BitOutput_Init` for each file or socket you want to read from or write to.
 * Reading and writing from/to files/sockets, requires a `BitBuffer` Init it with `BitBuffer_Init`.
-* To open a file call `Bit(Input|Output)_UTF(8|16)_OpenFile` (except for the log file, which uses `Log_OpenFile`).
+* To open a file call `Bit(Input|Output)_UTF(8|16)_OpenFile` (except for the log file, which uses `Log_SetLogFile`).
 * To get the size of a file from `BitInput` call `BitInput_GetFileSize`.
 * To read bits from a BitBuffer, use the `ReadBits`/`PeekBits/ReadUnary`.
 * To write bits to a BitBuffer use the `WriteBits/WriteUnary`.
@@ -53,27 +53,15 @@ BitIO:
 
 `GUUID_Deinit`: When you've had enough of GUUID's nonsense, call this function to make your problems disappear.
 
-ContainerIO:
---------------
-* ContainerIO is a module that controls and manipulates Media containers
-
-** ImageContainer: Supports 2D/3D images of any dimensions and any number of channels using any channel layout, and supports runtime selection of 8-16 bit containers depending on the needs of each image.
-
-** ImageHistogram: 
-
-** Audio2DContainer: Supports audio with any number of channels and ay channel layout, bitdepth, sample rate.
-
-** Audio3DContainer: Work in Progress, will support 3D audio based solely on where the sound is located.
-
 UnicodeIO:
 ------------
 * UnicodeIO isn't a sub-library or actually a real thing at all, it's just a way to help organize all the files, so the UnicodeIO folders contain FoundationIO's text related components.
 
 StringIO:
 ----------
-* StringIO is a module for Unicode, it supports UTF-8, UTF-16, and UTF-32; but NOT CESU-8, WTF-8, or Java's Modified UTF-8.
-* To create a Unicode string with StringIO simply include the StringIO header, and declare a string or character literal with the `UTF8`, `UTF16`, or `UTF32` type; then use the `U8()`, `U16()`, or `U32()` macro to ensure the literal is encoded by the compiler correctly.
-* StringIO's types `UTF8`, `UTF16`, `UTF32` are forward declared in the `BitIO`, `CommandLineIO`, `Log` modules; but not the Unicode stringization macros, those are only declared in StringIO.
+* StringIO is a component for Unicode, it supports UTF-8, UTF-16, and UTF-32; but NOT CESU-8, WTF-8, or Java's Modified UTF-8.
+* To create a Unicode string with StringIO simply include the StringIO header, and declare a string or character literal with the `UTF8`, `UTF16`, or `UTF32` type; then use the `UTF8String()`, `UTF16String()`, or `UTF32String()` macro to ensure the literal is encoded by the compiler correctly.
+* StringIO's types `UTF8`, `UTF16`, `UTF32` are declared in the `UnicodeIOTypes.h` header.
 * The functions in StringIO use UTF-32 internally; the vast majority of UTF-8 and UTF-16 functions are simply wrappers around the UTF-32 version.
 * StringIO is meant to provide basic support for Unicode strings, and some of the more advanced operations on them, like case mapping, and de/normalization, but some things will never be on the map, like REGEX. StringIO's primary purpose is supporting input and output, not everything Unicode.
 
@@ -112,7 +100,7 @@ CommandLineIO:
 
 LogIO:
 -----
-* Writes to a file you open with `Log_OpenFile`, if it's unset or otherwise inaccessible, all logs are printed to `stderr`.
+* Writes to a file you open with `Log_SetLogFile`, if it's unset or otherwise inaccessible, all logs are printed to `stderr`.
 * Works on any platform that provides `stderr`.
 
 FormatIO:

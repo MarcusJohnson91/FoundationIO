@@ -21,9 +21,6 @@
     <ClCompile Include="..\Library\src\BitIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Library\src\ContainerIO.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Library\src\CryptographyIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -57,9 +54,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\Constants.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\include\ContainerIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\CryptographyIO.h">
