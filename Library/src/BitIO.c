@@ -1,10 +1,10 @@
-#include "../include/BitIO.h"                       /* Included for our declarations */
-#include "../include/UnicodeIO/Private/Constants.h" /* Included for BitMaskTables */
-#include "../include/CryptographyIO.h"              /* Included for SecureRNG_GenerateInteger for GUUID_Generate */
-#include "../include/MathIO.h"                      /* Included for Integer functions */
-#include "../include/UnicodeIO/FormatIO.h"          /* Included for UTF32_Format */
-#include "../include/UnicodeIO/LogIO.h"             /* Included for Logging */
-#include "../include/UnicodeIO/StringIO.h"          /* Included for StringIO's declarations */
+#include "../include/BitIO.h"              /* Included for our declarations */
+#include "../include/Private/Constants.h"  /* Included for BitMaskTables */
+#include "../include/CryptographyIO.h"     /* Included for SecureRNG_GenerateInteger for GUUID_Generate */
+#include "../include/MathIO.h"             /* Included for Integer functions */
+#include "../include/UnicodeIO/FormatIO.h" /* Included for UTF32_Format */
+#include "../include/UnicodeIO/LogIO.h"    /* Included for Logging */
+#include "../include/UnicodeIO/StringIO.h" /* Included for StringIO's declarations */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -507,7 +507,7 @@ extern "C" {
         UTF32 *BitBufferString = NULL;
         if (BitB != NULL && Length >= 1 && Length <= 64) {
             BitBuffer_Seek(BitB, BitB->BitOffset - Length);
-            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %P, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), BitB, BitB->NumBits, BitB->BitOffset, BitBuffer_ReadBits(BitB, BitIO_ByteOrder_MSByte, BitIO_BitOrder_MSBit, Length));
+            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %P, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), &BitB, BitB->NumBits, BitB->BitOffset, BitBuffer_ReadBits(BitB, BitIO_ByteOrder_MSByte, BitIO_BitOrder_MSBit, Length));
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (Length == 0) {

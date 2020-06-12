@@ -1,8 +1,8 @@
-#include "../include/BitIO.h"                       /* Included for BitBuffer for CRC32 and Adler32 */
-#include "../include/UnicodeIO/Private/Constants.h" /* Included for BitMaskTables */
-#include "../include/CryptographyIO.h"              /* Included for our declarations */
-#include "../include/MathIO.h"                      /* Included for Bits2Bytes, etc */
-#include "../include/UnicodeIO/LogIO.h"             /* Included for error logging */
+#include "../include/BitIO.h"             /* Included for BitBuffer for CRC32 and Adler32 */
+#include "../include/Private/Constants.h" /* Included for BitMaskTables */
+#include "../include/CryptographyIO.h"    /* Included for our declarations */
+#include "../include/MathIO.h"            /* Included for Bits2Bytes, etc */
+#include "../include/UnicodeIO/LogIO.h"   /* Included for error logging */
 
 #if   (PlatformIO_TargetOS == PlatformIO_WindowsOS)
 #include <BCrypt.h>
@@ -647,8 +647,7 @@ extern "C" {
             for (uint64_t Byte = Start; Byte < NumBytes - 1; Byte++) {
                 uint32_t Polynomial = 0x82608EDB;
                 uint8_t  Data       = BitBuffer_ReadBits(BitB, BitIO_ByteOrder_MSByte, BitIO_BitOrder_LSBit, 8);
-
-                Output               ^= Data;
+                Output             ^= Data;
                 for (uint8_t Bit = 0; Bit < 8; Bit++) {
                     if (Output & 1) {
                         Output = (Output >> 1) ^ Polynomial;

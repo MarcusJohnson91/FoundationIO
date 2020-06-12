@@ -32,18 +32,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Library\include\BitIO.h" />
-    <ClInclude Include="..\Library\include\Constants.h" />
     <ClInclude Include="..\Library\include\CryptographyIO.h" />
     <ClInclude Include="..\Library\include\MathIO.h" />
     <ClInclude Include="..\Library\include\PlatformIO.h" />
     <ClInclude Include="..\Library\include\TestIO.h" />
+    <ClInclude Include="..\Library\include\Private\Constants.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\CommandLineIO.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\FormatIO.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\LocalizationIO.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\LogIO.h" />
-    <ClInclude Include="..\Library\include\UnicodeIO\Private\UnicodeTables.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\StringIO.h" />
     <ClInclude Include="..\Library\include\UnicodeIO\UnicodeIOTypes.h" />
+    <ClInclude Include="..\Library\include\UnicodeIO\Private\UnicodeTables.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
