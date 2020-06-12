@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 
 project(FoundationIO C)
 
-#if(NOT BUILD_SHARED_LIBS)
-    #BUILD_SHARED_LIBS=ON
-#endif(NOT BUILD_SHARED_LIBS)
-
 if(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
     enable_testing()
 endif(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
@@ -69,11 +65,19 @@ set(Library_Sources
 "${Library_Dir}/src/UnicodeIO/StringIO.c"
 )
 
+configure_file("${Library_Dir}/../Resources/FoundationIO.pc.in" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/FoundationIO.pc")
+
 if(NOT ${CMAKE_BUILD_TYPE})
     set(CMAKE_BUILD_TYPE "${MinSizeRel}")
 endif(NOT ${CMAKE_BUILD_TYPE})
 
-add_library(FoundationIO ${Library_Sources})
+option(BUILD_SHARED_LIBS "Should FoundationIO be compiled as a dynamic library (.dylib/.dll/.so)?" ON)
+
+if(${BUILD_SHARED_LIBS} MATCHES OFF)
+    add_library(FoundationIO STATIC ${Library_Sources})
+elseif(${BUILD_SHARED_LIBS} MATCHES ON)
+    add_library(FoundationIO SHARED ${Library_Sources})
+endif(${BUILD_SHARED_LIBS} MATCHES OFF)
 
 target_include_directories(FoundationIO PUBLIC "${Library_Dir}/include")
 
@@ -105,8 +109,9 @@ if(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHE
     add_test(Test_CryptographyIO CONFIGURATIONS Debug RelWithDebInfo)
 endif(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
 
+if(NOT DEFINED ${CMAKE_INSTALL_PREFIX})
 if(${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(CMAKE_INSTALL_PREFIX "/usr/local/Packages/FoundationIO")
+    set(CMAKE_INSTALL_PREFIX "/usr/local")
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     if(${CMAKE_GENERATOR_PLATFORM} MATCHES x64)
         set(CMAKE_INSTALL_PREFIX "%ProgramFiles%\FoundationIO")
@@ -114,10 +119,12 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         set(CMAKE_INSTALL_PREFIX "%ProgramFiles(x86)%\FoundationIO")
     endif(${CMAKE_GENERATOR_PLATFORM} MATCHES x64)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+endif(NOT DEFINED ${CMAKE_INSTALL_PREFIX})
 
 install(TARGETS FoundationIO DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 install(FILES ${FOUNDATIONIO_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 install(FILES ${UNICODEIO_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/UnicodeIO)
+install(FILES "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/FoundationIO.pc" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
 
 if(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
     install(TARGETS Test_BitIO          DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
