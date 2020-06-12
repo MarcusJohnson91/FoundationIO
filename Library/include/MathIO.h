@@ -84,7 +84,7 @@ extern "C" {
     bool         IsNegative64(int64_t Integer);
 #ifdef           IsNegative
 #undef           IsNegative
-#define          IsNegative(Value)                _Generic(Value, int8_t:IsNegative8, uint8_t:IsNegative8, int16_t:IsNegative16, uint16_t:IsNegative16, int32_t:IsNegative32, uint32_t:IsNegative32, int64_t:IsNegative64, uint64_t:IsNegative64)(Value)
+#define          IsNegative(Value)                _Generic((Value), int8_t:IsNegative8, uint8_t:IsNegative8, int16_t:IsNegative16, uint16_t:IsNegative16, int32_t:IsNegative32, uint32_t:IsNegative32, int64_t:IsNegative64, uint64_t:IsNegative64)(Value)
 #endif
     
     /*!
@@ -159,7 +159,7 @@ extern "C" {
 #ifdef           Absolute
 #undef           Absolute
 #endif
-#define          Absolute(Value)                  _Generic(Value, int8_t:AbsoluteI, uint8_t:AbsoluteI, int16_t:AbsoluteI, uint16_t:AbsoluteI, int32_t:AbsoluteI, uint32_t:AbsoluteI, int64_t:AbsoluteI, uint64_t:AbsoluteI, float:AbsoluteF, double:AbsoluteD)(Value)
+#define          Absolute(Value)                  _Generic((Value), int8_t:AbsoluteI, uint8_t:AbsoluteI, int16_t:AbsoluteI, uint16_t:AbsoluteI, int32_t:AbsoluteI, uint32_t:AbsoluteI, int64_t:AbsoluteI, uint64_t:AbsoluteI, float:AbsoluteF, double:AbsoluteD)(Value)
     
     /*!
      @abstract                                    Gets the Floor of Decimal.
@@ -329,7 +329,7 @@ extern "C" {
 #ifdef           ExtractSign
 #undef           ExtractSign
 #endif
-#define          ExtractSign(Number)              _Generic(Number, int8_t:ExtractSignI, int16_t:ExtractSignI, int32_t:ExtractSignI, int64_t:ExtractSignI, float:ExtractSignF, double:ExtractSignD)(Number)
+#define          ExtractSign(Number)              _Generic((Number), int8_t:ExtractSignI, int16_t:ExtractSignI, int32_t:ExtractSignI, int64_t:ExtractSignI, float:ExtractSignF, double:ExtractSignD)(Number)
     
     /*!
      @abstract                                    Extracts the exponent from the given Decimal.
@@ -345,7 +345,7 @@ extern "C" {
 #ifdef           ExtractExponent
 #undef           ExtractExponent
 #endif
-#define          ExtractExponent(Decimal)         _Generic(Decimal, float:ExtractExponentF, double:ExtractExponentD)(Decimal)
+#define          ExtractExponent(Decimal)         _Generic((Decimal), float:ExtractExponentF, double:ExtractExponentD)(Decimal)
     
     /*!
      @abstract                                    Extracts the mantissa from the float given as Decimal.
@@ -401,7 +401,7 @@ extern "C" {
 #ifdef           InsertExponent
 #undef           InsertExponent
 #endif
-#define          InsertExponent(Decimal, Exponent) _Generic(Decimal, float:InsertExponentF, double:InsertExponentD)(Decimal, Exponent)
+#define          InsertExponent(Decimal, Exponent) _Generic((Decimal), float:InsertExponentF, double:InsertExponentD)(Decimal, Exponent)
     
     /*!
      @abstract                                    Inserts the mantissa to the float given as Decimal.
@@ -421,7 +421,7 @@ extern "C" {
 #ifdef           InsertMantissa
 #undef           InsertMantissa
 #endif
-#define          InsertMantissa(Decimal, Mantissa) _Generic(Decimal, float:InsertMantissaF, double:InsertMantissaD)(Decimal, Mantissa)
+#define          InsertMantissa(Decimal, Mantissa) _Generic((Decimal), float:InsertMantissaF, double:InsertMantissaD)(Decimal, Mantissa)
     
     /*!
      @abstract                                    Calculates the value of Base raised to Exponent's power (an integer version of the pow function).
@@ -463,7 +463,7 @@ extern "C" {
 #ifdef           SwapEndian
 #undef           SwapEndian
 #endif
-#define          SwapEndiamn(Value2Swap)          _Generic(Value2Swap, int16_t:SwapEndian16, uint16_t:SwapEndian16, int32_t:SwapEndian32, uint32_t:SwapEndian32, int64_t:SwapEndian64, uint64_t:SwapEndian64)(Value2Swap)
+#define          SwapEndiamn(Value2Swap)          _Generic((Value2Swap), int16_t:SwapEndian16, uint16_t:SwapEndian16, int32_t:SwapEndian32, uint32_t:SwapEndian32, int64_t:SwapEndian64, uint64_t:SwapEndian64)(Value2Swap)
     
     /*!
      @abstract                                    Computes the number of bits from the number of bytes.
