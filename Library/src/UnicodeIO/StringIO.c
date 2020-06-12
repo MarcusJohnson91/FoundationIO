@@ -1,4 +1,4 @@
-#include "../../include/Constants.h"                       /* Included for Integer/Decimal Tables */
+#include "../../include/UnicodeIO/Private/Constants.h"     /* Included for Integer/Decimal Tables */
 #include "../../include/MathIO.h"                          /* Included for endian swapping */
 #include "../../include/UnicodeIO/FormatIO.h"              /* Included for the String formatting code */
 #include "../../include/UnicodeIO/LogIO.h"                 /* Included for error logging */

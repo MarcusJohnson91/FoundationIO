@@ -1,4 +1,3 @@
-#include "../../include/Constants.h"                   /* Included for the Number tables */
 #include "../../include/MathIO.h"                      /* Included for Logarithm */
 #include "../../include/UnicodeIO/FormatIO.h"          /* Included for our declarations */
 #include "../../include/UnicodeIO/LogIO.h"             /* Included for Logging */

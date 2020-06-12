@@ -407,11 +407,11 @@ extern "C" {
 #else
 #define             PlatformIO_WideCharRange (WCHAR_MAX)
 #endif
-  
-  /*!
-   @abstract        PlatformIO_Immutable is for pointers and arrays.
-   @remark          Makes the pointer and the data it points to constant.
-   */
+
+    /*!
+     @abstract        PlatformIO_Immutable is for pointers and arrays.
+     @remark          Makes the pointer and the data it points to constant.
+     */
 #ifndef             PlatformIO_Immutable
 #define             PlatformIO_Immutable(PointerType) const PointerType const
 #endif
@@ -444,11 +444,11 @@ extern "C" {
 #ifndef             PlatformIO_Volatile
 #define             PlatformIO_Volatile(PointerType) volatile PointerType volatile
 #endif
-  
-  /*!
-   @abstract        PlatformIO_Constant is for variables, constants, and values.
-   @remark          Makes the pointer and the data it points to constant.
-   */
+
+    /*!
+     @abstract        PlatformIO_Constant is for variables, constants, and values.
+     @remark          Makes the pointer and the data it points to constant.
+     */
 #ifndef             PlatformIO_Constant
 #define             PlatformIO_Constant(Type) const Type
 #endif
@@ -464,13 +464,82 @@ extern "C" {
 #endif
 #endif
 
+    /*!
+     @enum       FoundationIO_StringTypes
+     @constant   StringType_Unknown                    Invalid/Default value
+     @constant   StringType_UTF8                       UTF-8
+     @constant   StringType_UTF16                      UTF-16
+     @constant   StringType_UTF32                      UTF-32
+     */
+    typedef enum FoundationIO_StringTypes {
+        StringType_Unknown                    = 0,
+        StringType_UTF8                       = 1,
+        StringType_UTF16                      = 2,
+        StringType_UTF32                      = 4,
+    } FoundationIO_StringTypes;
+
+    /*!
+     @enum       FoundationIO_Bases
+     @abstract                                         Defines the type of option.
+     @constant   Base_Integer                          ORable mask for Integers.
+     @constant   Base_Radix2                           Integer only, base-2/binary.
+     @constant   Base_Radix8                           Integer only, base-8/octal.
+     @constant   Base_Decimal                          ORable mask for floating point numbers.
+     @constant   Base_Radix10                          Integer or Decimal, base-10.
+     @constant   Base_Radix16                          Integer or Decimal, base-16/hexadecimal.
+     @constant   Base_Uppercase                        Base-16 only.
+     @constant   Base_Lowercase                        Base-16 only.
+     @constant   Base_Scientific                       Decimal only.
+     @constant   Base_Shortest                         Decimal only.
+     */
+    typedef enum FoundationIO_Bases {
+                 Base_Unknown                          = 0,
+                 Base_Integer                          = 1,
+                 Base_Radix2                           = 2,
+                 Base_Radix8                           = 4,
+                 Base_Decimal                          = 8,
+                 Base_Radix10                          = 16,
+                 Base_Radix16                          = 32,
+                 Base_Uppercase                        = 64,
+                 Base_Lowercase                        = 128,
+                 Base_Scientific                       = 256,
+                 Base_Shortest                         = 512,
+    } FoundationIO_Bases;
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
+    extern "C++" {
+        constexpr inline FoundationIO_Bases operator | (FoundationIO_Bases A, FoundationIO_Bases B) {
+            uint16_t A1 = static_cast<uint16_t>(A);
+            uint16_t B1 = static_cast<uint16_t>(B);
+            return static_cast<FoundationIO_Bases>(A1 | B1);
+        }
+
+        constexpr inline FoundationIO_Bases operator & (FoundationIO_Bases A, FoundationIO_Bases B) {
+            uint16_t A1 = static_cast<uint16_t>(A);
+            uint16_t B1 = static_cast<uint16_t>(B);
+            return static_cast<FoundationIO_Bases>(A1 & B1);
+        }
+
+        constexpr inline FoundationIO_Bases operator |= (FoundationIO_Bases A, FoundationIO_Bases B) {
+            uint16_t A1 = static_cast<uint16_t>(A);
+            uint16_t B1 = static_cast<uint16_t>(B);
+            return static_cast<FoundationIO_Bases>(A1 |= B1);
+        }
+
+        constexpr inline FoundationIO_Bases operator &= (FoundationIO_Bases A, FoundationIO_Bases B) {
+            uint16_t A1 = static_cast<uint16_t>(A);
+            uint16_t B1 = static_cast<uint16_t>(B);
+            return static_cast<FoundationIO_Bases>(A1 &= B1);
+        }
+    }
+#endif /* PlatformIO_Language */
+
     typedef enum PlatformIO_FileModes {
-        FileMode_Unspecified = 0,
-        FileMode_Read        = 1,
-        FileMode_Write       = 2,
-        FileMode_Append      = 4,
-        FileMode_Text        = 8,
-        FileMode_Binary      = 16,
+                 FileMode_Unspecified                  = 0,
+                 FileMode_Read                         = 1,
+                 FileMode_Write                        = 2,
+                 FileMode_Append                       = 4,
+                 FileMode_Text                         = 8,
+                 FileMode_Binary                       = 16,
     } PlatformIO_FileModes;
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
@@ -501,9 +570,9 @@ extern "C" {
 #endif /* PlatformIO_Language */
 
     typedef enum PlatformIO_SeekTypes {
-        SeekType_Beginning = 0,
-        SeekType_Current   = 1,
-        SeekType_End       = 2,
+                 SeekType_Beginning                    = 0,
+                 SeekType_Current                      = 1,
+                 SeekType_End                          = 2,
     } PlatformIO_SeekTypes;
 
     /*!
@@ -515,18 +584,18 @@ extern "C" {
     FILE           *PlatformIO_OpenUTF8(PlatformIO_Immutable(void *) Path, PlatformIO_FileModes Mode);
 
     /*!
-    @abstract                        Opens the file at location Path with Mode.
-    @remark                          Path is a void pointer just for header recursion reasons.
-    @param         Path              Path is a UTF16 encoded string.
-    @param         Mode              Mode is an ORable bitmask specifying the type of file to open.
-    */
+     @abstract                        Opens the file at location Path with Mode.
+     @remark                          Path is a void pointer just for header recursion reasons.
+     @param         Path              Path is a UTF16 encoded string.
+     @param         Mode              Mode is an ORable bitmask specifying the type of file to open.
+     */
     FILE           *PlatformIO_OpenUTF16(PlatformIO_Immutable(void *) Path, PlatformIO_FileModes Mode);
 
     /*!
-    @abstract                        Gets the size of the FILE.
-    @param         File              The file to get the size of.
-    @return                          Returns the size of the file.
-    */
+     @abstract                        Gets the size of the FILE.
+     @param         File              The file to get the size of.
+     @return                          Returns the size of the file.
+     */
     uint64_t        PlatformIO_GetSize(FILE *File);
 
     /*!

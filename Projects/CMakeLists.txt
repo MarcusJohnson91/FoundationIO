@@ -39,13 +39,15 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHI
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
 set(RUNTIME_OUTPUT_DIRECTORY       "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
 
-set(PUBLIC_HEADER
+set(FOUNDATIONIO_HEADERS
 "${Library_Dir}/include/BitIO.h"
-"${Library_Dir}/include/Constants.h"
 "${Library_Dir}/include/CryptographyIO.h"
 "${Library_Dir}/include/MathIO.h"
 "${Library_Dir}/include/PlatformIO.h"
 "${Library_Dir}/include/TestIO.h"
+)
+
+set(UNICODEIO_HEADERS
 "${Library_Dir}/include/UnicodeIO/CommandLineIO.h"
 "${Library_Dir}/include/UnicodeIO/FormatIO.h"
 "${Library_Dir}/include/UnicodeIO/LocalizationIO.h"
@@ -71,7 +73,11 @@ if(NOT ${CMAKE_BUILD_TYPE})
     set(CMAKE_BUILD_TYPE "${MinSizeRel}")
 endif(NOT ${CMAKE_BUILD_TYPE})
 
-add_library(FoundationIO ${Library_Sources} ${PUBLIC_HEADER})
+add_library(FoundationIO ${Library_Sources})
+
+target_include_directories(FoundationIO PUBLIC "${Library_Dir}/include")
+
+target_include_directories(FoundationIO PUBLIC "${Library_Dir}/include/UnicodeIO")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(FoundationIO ws2_32 bcrypt)
@@ -102,15 +108,16 @@ endif(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MAT
 if(${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CMAKE_INSTALL_PREFIX "/usr/local/Packages/FoundationIO")
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    if(${CMAKE_GENERATOR_PLATFORM} MATCHES "x64")
-        set(CMAKE_INSTALL_PREFIX "%ProgramFiles%\FoundationIO\")
-    elseif(${CMAKE_GENERATOR_PLATFORM} MATCHES "x86")
-        set(CMAKE_INSTALL_PREFIX "%ProgramFiles(x86)%\FoundationIO\")
-    endif(${CMAKE_GENERATOR_PLATFORM} MATCHES "x64")
+    if(${CMAKE_GENERATOR_PLATFORM} MATCHES x64)
+        set(CMAKE_INSTALL_PREFIX "%ProgramFiles%\FoundationIO")
+    elseif(${CMAKE_GENERATOR_PLATFORM} MATCHES x86)
+        set(CMAKE_INSTALL_PREFIX "%ProgramFiles(x86)%\FoundationIO")
+    endif(${CMAKE_GENERATOR_PLATFORM} MATCHES x64)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 install(TARGETS FoundationIO DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install(TARGETS PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+install(FILES ${FOUNDATIONIO_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+install(FILES ${UNICODEIO_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/UnicodeIO)
 
 if(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
     install(TARGETS Test_BitIO          DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)

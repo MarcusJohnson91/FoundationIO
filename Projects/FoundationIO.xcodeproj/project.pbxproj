@@ -22,14 +22,14 @@
 		2C410986236BA3320059FE67 /* PlatformIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DA9232B5F56006DA1B8 /* PlatformIO.c */; };
 		2C410987236BA3320059FE67 /* MathIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DAA232B5F56006DA1B8 /* MathIO.c */; };
 		2C410988236BA3320059FE67 /* TestIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DAD232B5F56006DA1B8 /* TestIO.c */; };
-		2C6E010E23F4BBD1008E2121 /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C6E010D23F4BBD1008E2121 /* Constants.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2C63CC1B249303DD00438675 /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C63CC1A249303DD00438675 /* Constants.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		2C70D27A242C025000632A2C /* UnicodeIOTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C70D279242C025000632A2C /* UnicodeIOTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C794B0923BB272900282D20 /* FormatIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C794B0423BB272900282D20 /* FormatIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C794B0A23BB272900282D20 /* LogIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C794B0523BB272900282D20 /* LogIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C794B0B23BB272900282D20 /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C794B0623BB272900282D20 /* StringIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C794B0C23BB272900282D20 /* CommandLineIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C794B0723BB272900282D20 /* CommandLineIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C794B0D23BB272900282D20 /* LocalizationIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C794B0823BB272900282D20 /* LocalizationIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C794B1023BB273900282D20 /* UnicodeTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C794B0F23BB273900282D20 /* UnicodeTables.h */; };
+		2C794B1023BB273900282D20 /* UnicodeTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C794B0F23BB273900282D20 /* UnicodeTables.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		2CC71DC6232B5FDF006DA1B8 /* Test_BitIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71D8A232B5F20006DA1B8 /* Test_BitIO.c */; };
 		2CC71DFE232B602E006DA1B8 /* Test_CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71D85232B5F20006DA1B8 /* Test_CommandLineIO.c */; };
 		2CC71E00232B6036006DA1B8 /* Test_CryptographyIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71D89232B5F20006DA1B8 /* Test_CryptographyIO.c */; };
@@ -135,7 +135,7 @@
 		2C410968236B9EAC0059FE67 /* StringIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = StringIO.c; sourceTree = "<group>"; };
 		2C410969236B9EAC0059FE67 /* LocalizationIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = LocalizationIO.c; sourceTree = "<group>"; };
 		2C41096F236BA3050059FE67 /* BitIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BitIO.h; path = ../Library/include/BitIO.h; sourceTree = "<group>"; };
-		2C6E010D23F4BBD1008E2121 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Constants.h; path = ../Library/include/Constants.h; sourceTree = "<group>"; };
+		2C63CC1A249303DD00438675 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = Constants.h; path = ../Library/include/UnicodeIO/Private/Constants.h; sourceTree = "<group>"; };
 		2C70D279242C025000632A2C /* UnicodeIOTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnicodeIOTypes.h; path = ../Library/include/UnicodeIO/UnicodeIOTypes.h; sourceTree = "<group>"; };
 		2C794B0423BB272900282D20 /* FormatIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = FormatIO.h; path = ../Library/include/UnicodeIO/FormatIO.h; sourceTree = "<group>"; };
 		2C794B0523BB272900282D20 /* LogIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = LogIO.h; path = ../Library/include/UnicodeIO/LogIO.h; sourceTree = "<group>"; };
@@ -247,6 +247,7 @@
 			isa = PBXGroup;
 			children = (
 				2C794B0F23BB273900282D20 /* UnicodeTables.h */,
+				2C63CC1A249303DD00438675 /* Constants.h */,
 			);
 			name = Private;
 			sourceTree = "<group>";
@@ -311,7 +312,6 @@
 			isa = PBXGroup;
 			children = (
 				2C794B0323BB271C00282D20 /* UnicodeIO */,
-				2C6E010D23F4BBD1008E2121 /* Constants.h */,
 				2C41096F236BA3050059FE67 /* BitIO.h */,
 				2CC71D95232B5F43006DA1B8 /* CryptographyIO.h */,
 				2CC71D91232B5F43006DA1B8 /* PlatformIO.h */,
@@ -334,8 +334,8 @@
 				2C794B0923BB272900282D20 /* FormatIO.h in Headers */,
 				2C794B0B23BB272900282D20 /* StringIO.h in Headers */,
 				2C794B0A23BB272900282D20 /* LogIO.h in Headers */,
-				2C6E010E23F4BBD1008E2121 /* Constants.h in Headers */,
 				2C41097C236BA3320059FE67 /* MathIO.h in Headers */,
+				2C63CC1B249303DD00438675 /* Constants.h in Headers */,
 				2C41097A236BA3320059FE67 /* CryptographyIO.h in Headers */,
 				2C794B0D23BB272900282D20 /* LocalizationIO.h in Headers */,
 				2C70D27A242C025000632A2C /* UnicodeIOTypes.h in Headers */,
