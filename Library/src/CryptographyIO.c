@@ -1,8 +1,8 @@
-#include "../include/BitIO.h"                /* Included for BitBuffer for CRC32 and Adler32 */
-#include "../include/Constants.h"            /* Included for BitMaskTables */
-#include "../include/CryptographyIO.h"       /* Included for our declarations */
-#include "../include/MathIO.h"               /* Included for Bits2Bytes, etc */
-#include "../include/UnicodeIO/LogIO.h"      /* Included for error logging */
+#include "../include/BitIO.h"                       /* Included for BitBuffer for CRC32 and Adler32 */
+#include "../include/UnicodeIO/Private/Constants.h" /* Included for BitMaskTables */
+#include "../include/CryptographyIO.h"              /* Included for our declarations */
+#include "../include/MathIO.h"                      /* Included for Bits2Bytes, etc */
+#include "../include/UnicodeIO/LogIO.h"             /* Included for error logging */
 
 #if   (PlatformIO_TargetOS == PlatformIO_WindowsOS)
 #include <BCrypt.h>

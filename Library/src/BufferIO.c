@@ -1,10 +1,10 @@
-#include "../include/BitIO.h"                /* Included for our declarations */
-#include "../include/Constants.h"            /* Included for BitMaskTables */
-#include "../include/CryptographyIO.h"       /* Included for SecureRNG_GenerateInteger for GUUID_Generate */
-#include "../include/MathIO.h"               /* Included for Integer functions */
-#include "../include/UnicodeIO/FormatIO.h"   /* Included for UTF32_Format */
-#include "../include/UnicodeIO/LogIO.h"      /* Included for Logging */
-#include "../include/UnicodeIO/StringIO.h"   /* Included for StringIO's declarations */
+#include "../include/BitIO.h"                       /* Included for our declarations */
+#include "../include/UnicodeIO/Private/Constants.h" /* Included for BitMaskTables */
+#include "../include/CryptographyIO.h"              /* Included for SecureRNG_GenerateInteger for GUUID_Generate */
+#include "../include/MathIO.h"                      /* Included for Integer functions */
+#include "../include/UnicodeIO/FormatIO.h"          /* Included for UTF32_Format */
+#include "../include/UnicodeIO/LogIO.h"             /* Included for Logging */
+#include "../include/UnicodeIO/StringIO.h"          /* Included for StringIO's declarations */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

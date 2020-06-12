@@ -7,7 +7,6 @@
  */
 
 #include  "UnicodeIOTypes.h" /* Included for UTFX types */
-#include  "../Constants.h"   /* Included for FoundationIO_StringTypes and FoundationIO_Bases */
 
 #pragma once
 

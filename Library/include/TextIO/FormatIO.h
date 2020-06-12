@@ -7,7 +7,6 @@
  */
 
 #include "../PlatformIO.h"  /* Included for Platform Independence macros */
-#include "../Constants.h"   /* Included for FoundationIO_StringTypes */
 #include "UnicodeIOTypes.h" /* Included for UTFX types */
 
 #pragma once

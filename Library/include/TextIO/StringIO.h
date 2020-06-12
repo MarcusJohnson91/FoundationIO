@@ -6,9 +6,8 @@
  @brief            This header contains types, functions, and tables for Unicode support, including UTF-8, UTF-16, and our internal format, UTF-32.
  */
 
-#include "../PlatformIO.h"  /* Included for Platform Independence macros */
-#include "../Constants.h"   /* Included for FoundationIO_Bases */
-#include "UnicodeIOTypes.h" /* Included for UTFX types */
+#include "../PlatformIO.h"     /* Included for Platform Independence macros */
+#include "UnicodeIOTypes.h"    /* Included for UTFX types */
 
 #pragma once
 
