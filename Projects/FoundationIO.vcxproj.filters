@@ -4,11 +4,14 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{0fbba5d8-a50e-4c0e-b528-47e5ffd69bb1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\UnicodeIO">
+      <UniqueIdentifier>{a9d16bf7-d9c9-46eb-9aad-22e78a12aa6a}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{05add13e-8113-412d-8d79-8e78e2479822}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\UnicodeIO">
-      <UniqueIdentifier>{a9d16bf7-d9c9-46eb-9aad-22e78a12aa6a}</UniqueIdentifier>
+    <Filter Include="Header Files\Private">
+      <UniqueIdentifier>{3e2861ab-cacb-4615-beef-27ccfa5f063f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\UnicodeIO">
       <UniqueIdentifier>{c48625fe-e5fe-4383-b7e1-0db3e425d9c6}</UniqueIdentifier>
@@ -65,7 +68,7 @@
     <ClInclude Include="..\Library\include\TestIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\Constants.h">
+    <ClInclude Include="..\Library\include\Private\Constants.h">
       <Filter>Header Files\Private</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\include\UnicodeIO\CommandLineIO.h">
