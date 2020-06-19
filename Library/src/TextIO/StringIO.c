@@ -952,7 +952,7 @@ extern "C" {
         UTF8 *StringWithBOM = NULL;
         if (String != NULL) {
             UTF32 *String32  = UTF8_Decode(String);
-            UTF32 *BOMAdded  = UTF32_AddBOM(String32, StringIO_ByteOrder_Big);
+            UTF32 *BOMAdded  = UTF32_AddBOM(String32, StringIO_BOM_Big);
             free(String32);
             StringWithBOM    = UTF8_Encode(BOMAdded);
         } else {
@@ -961,7 +961,7 @@ extern "C" {
         return StringWithBOM;
     }
     
-    UTF16 *UTF16_AddBOM(PlatformIO_Immutable(UTF16 *) String, StringIO_ByteOrders BOM2Add) {
+    UTF16 *UTF16_AddBOM(PlatformIO_Immutable(UTF16 *) String, StringIO_BOMs BOM2Add) {
         UTF16 *StringWithBOM = NULL;
         if (String != NULL) {
             UTF32 *String32  = UTF16_Decode(String);
@@ -974,7 +974,7 @@ extern "C" {
         return StringWithBOM;
     }
     
-    UTF32 *UTF32_AddBOM(PlatformIO_Immutable(UTF32 *) String, StringIO_ByteOrders BOM2Add) {
+    UTF32 *UTF32_AddBOM(PlatformIO_Immutable(UTF32 *) String, StringIO_BOMs BOM2Add) {
         UTF32   *StringWithBOM        = NULL;
         UTF32    ByteOrder            = 0;
         if (String != NULL) {
@@ -982,15 +982,15 @@ extern "C" {
                 uint64_t StringSize   = UTF32_GetStringSizeInCodePoints(String);
                 StringWithBOM         = UTF32_Init(StringSize + UnicodeBOMSizeInCodePoints);
                 if (StringWithBOM != NULL) {
-                    if (BOM2Add == StringIO_ByteOrder_Native) {
+                    if (BOM2Add == StringIO_BOM_Native) {
 #if   (PlatformIO_TargetByteOrder == PlatformIO_ByteOrder_LE)
                         ByteOrder     = UTF32BOM_LE;
 #elif (PlatformIO_TargetByteOrder == PlatformIO_ByteOrder_BE)
                         ByteOrder     = UTF32BOM_BE;
 #endif
-                    } else if (BOM2Add == StringIO_ByteOrder_Little) {
+                    } else if (BOM2Add == StringIO_BOM_Little) {
                         ByteOrder     = UTF32BOM_LE;
-                    } else if (BOM2Add == StringIO_ByteOrder_Big) {
+                    } else if (BOM2Add == StringIO_BOM_Big) {
                         ByteOrder     = UTF32BOM_BE;
                     }
                     StringWithBOM[0] = ByteOrder;
@@ -1093,38 +1093,38 @@ extern "C" {
         return DecodedString;
     }
     
-    StringIO_ByteOrders UTF16_GetByteOrder(UTF16 CodeUnit) {
-        StringIO_ByteOrders ByteOrder = StringIO_ByteOrder_Unknown;
+    StringIO_BOMs UTF16_GetByteOrder(UTF16 CodeUnit) {
+        StringIO_BOMs ByteOrder = StringIO_BOM_Unknown;
         if (CodeUnit == UTF16BOM_LE) {
-            ByteOrder                = StringIO_ByteOrder_Little;
+            ByteOrder                = StringIO_BOM_Little;
         } else if (CodeUnit == UTF16BOM_BE) {
-            ByteOrder                = StringIO_ByteOrder_Big;
+            ByteOrder                = StringIO_BOM_Big;
         } else { // Heuristic (aka guess) mode
             uint8_t NumBitsInByte0   = CountBitsSet(CodeUnit & 0xFF);
             uint8_t NumBitsInByte1   = CountBitsSet((CodeUnit & 0xFF00) >> 8);
             if (NumBitsInByte0 >= NumBitsInByte1) {
-                ByteOrder            = StringIO_ByteOrder_Little;
+                ByteOrder            = StringIO_BOM_Little;
             } else {
-                ByteOrder            = StringIO_ByteOrder_Big;
+                ByteOrder            = StringIO_BOM_Big;
             }
         }
         return ByteOrder;
     }
     
-    StringIO_ByteOrders UTF32_GetByteOrder(UTF32 CodeUnit) {
-        StringIO_ByteOrders ByteOrder = StringIO_ByteOrder_Unknown;
+    StringIO_BOMs UTF32_GetByteOrder(UTF32 CodeUnit) {
+        StringIO_BOMs ByteOrder = StringIO_BOM_Unknown;
         if (CodeUnit == UTF32BOM_LE) {
-            ByteOrder                = StringIO_ByteOrder_Little;
+            ByteOrder                = StringIO_BOM_Little;
         } else if (CodeUnit == UTF32BOM_BE) {
-            ByteOrder                = StringIO_ByteOrder_Big;
+            ByteOrder                = StringIO_BOM_Big;
         } else { // Heuristic (aka guess) mode
             uint8_t NumBitsInByte0   = CountBitsSet(CodeUnit & 0x000000FF);
             uint8_t NumBitsInByte1   = CountBitsSet((CodeUnit & 0x0000FF00) >> 8);
             uint8_t NumBitsInByte2   = CountBitsSet((CodeUnit & 0x00FF0000) >> 16);
             if (NumBitsInByte0 >= NumBitsInByte1 && NumBitsInByte2 >= NumBitsInByte0) {
-                ByteOrder            = StringIO_ByteOrder_Big;
+                ByteOrder            = StringIO_BOM_Big;
             } else {
-                ByteOrder            = StringIO_ByteOrder_Little;
+                ByteOrder            = StringIO_BOM_Little;
             }
         }
         return ByteOrder;

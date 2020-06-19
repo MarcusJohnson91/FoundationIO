@@ -90,19 +90,19 @@ extern "C" {
     } StringIO_NormalizationForms;
     
     /*!
-     @enum         StringIO_ByteOrders
+     @enum         StringIO_BOMs
      @abstract                                           What byte order does the string use?
-     @constant     StringIO_ByteOrder_Unknown            Byte order is unknown.
-     @constant     StringIO_ByteOrder_Native             Use the byte order of the host.
-     @constant     StringIO_ByteOrder_Little             Use the little endian, Least-Significant-Byte first order.
-     @constant     StringIO_ByteOrder_Big                Use the big endian, Most-Significant-Byte first order.
+     @constant     StringIO_BOM_Unknown                  Byte order is unknown.
+     @constant     StringIO_BOM_Native                   Use the byte order of the host.
+     @constant     StringIO_BOM_Little                   Use the little endian, Least-Significant-Byte first order.
+     @constant     StringIO_BOM_Big                      Use the big endian, Most-Significant-Byte first order.
      */
-    typedef enum StringIO_ByteOrders {
-                   StringIO_ByteOrder_Unknown            = 0,
-                   StringIO_ByteOrder_Native             = 1,
-                   StringIO_ByteOrder_Little             = 2,
-                   StringIO_ByteOrder_Big                = 3,
-    } StringIO_ByteOrders;
+    typedef enum StringIO_BOMs {
+                   StringIO_BOM_Unknown                  = 0,
+                   StringIO_BOM_Native                   = 1,
+                   StringIO_BOM_Little                   = 2,
+                   StringIO_BOM_Big                      = 3,
+    } StringIO_BOMs;
     
     /*!
      @enum         StringIO_TruncationTypes
@@ -352,13 +352,13 @@ extern "C" {
      @abstract                                           Adds the specified BOM to the string.
      @param      String                                  The string to add the BOM to.
      */
-    UTF16       *UTF16_AddBOM(PlatformIO_Immutable(UTF16 *) String, StringIO_ByteOrders BOM2Add);
+    UTF16       *UTF16_AddBOM(PlatformIO_Immutable(UTF16 *) String, StringIO_BOMs BOM2Add);
     
     /*!
      @abstract                                           Adds the specified BOM to the string.
      @param      String                                  The string to add the BOM to.
      */
-    UTF32       *UTF32_AddBOM(PlatformIO_Immutable(UTF32 *) String, StringIO_ByteOrders BOM2Add);
+    UTF32       *UTF32_AddBOM(PlatformIO_Immutable(UTF32 *) String, StringIO_BOMs BOM2Add);
     
     /*!
      @abstract                                           Removes the BOM from the string.

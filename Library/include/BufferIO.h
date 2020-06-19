@@ -57,14 +57,14 @@ extern "C" {
 
     /*!
      @enum         BitIO_ByteOrders
-     @constant     BitIO_ByteOrder_Unknown         Invalid byte order.
-     @constant     BitIO_ByteOrder_LSByte          Read from the Least Significant Byte to the Most  Significant, aka right to left.
-     @constant     BitIO_ByteOrder_MSByte          Read from the Most  Significant Byte to the Least Significant, aka left to right.
+     @constant     ByteOrder_Unknown               Invalid byte order.
+     @constant     ByteOrder_LSByte                Read from the Least Significant Byte to the Most  Significant, aka right to left.
+     @constant     ByteOrder_MSByte                Read from the Most  Significant Byte to the Least Significant, aka left to right.
      */
     typedef enum BitIO_ByteOrders {
-                   BitIO_ByteOrder_Unknown         = 0,
-                   BitIO_ByteOrder_LSByte          = 1,
-                   BitIO_ByteOrder_MSByte          = 2,
+                   ByteOrder_Unknown               = 0,
+                   ByteOrder_LSByte                = 1,
+                   ByteOrder_MSByte                = 2,
     } BitIO_ByteOrders;
 
     /*!
