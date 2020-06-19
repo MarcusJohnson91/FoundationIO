@@ -1,5 +1,5 @@
 /*!
- @header              UnicodeTypes.h
+ @header              UnicodeIOTypes.h
  @author              Marcus Johnson
  @copyright           2020+
  @version             1.1.0
@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef FoundationIO_UnicodeIO_UnicodeTypes_H
-#define FoundationIO_UnicodeIO_UnicodeTypes_H
+#ifndef FoundationIO_UnicodeIO_UnicodeIOTypes_H
+#define FoundationIO_UnicodeIO_UnicodeIOTypes_H
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -402,4 +402,4 @@ typedef                   char32_t                  UTF32;
 }
 #endif
 
-#endif /* FoundationIO_UnicodeIO_UnicodeTypes_H */
+#endif /* FoundationIO_UnicodeIO_UnicodeIOTypes_H */
