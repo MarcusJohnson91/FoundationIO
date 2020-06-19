@@ -3,3 +3,8 @@
 
 *.h linguist-language=C
 *.h linguist-detectable=true
+
+*.sh linguist-language=Shell
+*.sh linguist-detectable=true
+
+Dependencies/* linguist-vendored
