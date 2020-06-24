@@ -140,7 +140,6 @@ set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
 -fPIC \
 -fshort-enums \
--funroll-loops \
 -funsigned-char \
 -std=c18 \
 -Weverything \
@@ -188,7 +187,16 @@ ${CMAKE_C_FLAGS} \
 -Oz \
 ")
 
-set(LINK_FLAGS ${LINK_FLAGS} "-flto=full")
+set(LINK_FLAGS ${LINK_FLAGS}" \
+-flto=full \
+-lm \
+")
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set(LINK_FLAGS ${LINK_FLAGS}" \
+-dead_strip_dylibs
+")
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 set(LINK_FLAGS_DEBUG " \
 ${LINK_FLAGS} \
@@ -253,7 +261,16 @@ ${CMAKE_C_FLAGS} \
 -Os \
 ")
 
-set(LINK_FLAGS ${LINK_FLAGS} "-flto=full -lm")
+set(LINK_FLAGS ${LINK_FLAGS}" \
+-flto=full \
+-lm \
+")
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set(LINK_FLAGS ${LINK_FLAGS}" \
+-dead_strip_dylibs
+")
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 set(LINK_FLAGS_DEBUG " \
 ${LINK_FLAGS} \
