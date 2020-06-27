@@ -1381,8 +1381,8 @@ extern "C" {
         return Truncated;
     }
     
-    static FoundationIO_StringTypes StringIO_GetStreamOrientation(FILE *File) {
-        FoundationIO_StringTypes StringType = StringType_Unspecified;
+    static UnicodeIO_StringTypes StringIO_GetStreamOrientation(FILE *File) {
+        UnicodeIO_StringTypes StringType = StringType_Unspecified;
         int Orientation                     = fwide(File, 0);
         if (Orientation < 0) {
             StringType                      = StringType_UTF8;
@@ -1723,7 +1723,7 @@ extern "C" {
     
     void UTF8_WriteSentence(FILE *OutputFile, PlatformIO_Immutable(UTF8 *) String) {
         if (String != NULL && OutputFile != NULL) {
-            FoundationIO_StringTypes Type = StringIO_GetStreamOrientation(OutputFile);
+            UnicodeIO_StringTypes Type = StringIO_GetStreamOrientation(OutputFile);
             uint64_t StringSize           = UTF8_GetStringSizeInCodeUnits(String);
             uint64_t CodeUnitsWritten     = 0ULL;
             bool     StringHasNewLine     = UTF8_HasNewLine(String);
@@ -1757,7 +1757,7 @@ extern "C" {
     
     void UTF16_WriteSentence(FILE *OutputFile, PlatformIO_Immutable(UTF16 *) String) {
         if (String != NULL && OutputFile != NULL) {
-            FoundationIO_StringTypes Type = StringIO_GetStreamOrientation(OutputFile);
+            UnicodeIO_StringTypes Type = StringIO_GetStreamOrientation(OutputFile);
             uint64_t StringSize           = UTF16_GetStringSizeInCodeUnits(String);
             uint64_t CodeUnitsWritten     = 0ULL;
             bool     StringHasNewLine     = UTF16_HasNewLine(String);
@@ -2535,7 +2535,7 @@ extern "C" {
         return NormalizedString;
     }
     
-    int64_t UTF8_String2Integer(PlatformIO_Immutable(UTF8 *) String, FoundationIO_Bases Base) { // Replaces atoi, atol, strtol, strtoul,
+    int64_t UTF8_String2Integer(PlatformIO_Immutable(UTF8 *) String, UnicodeIO_Bases Base) { // Replaces atoi, atol, strtol, strtoul,
         int64_t Value = 0LL;
         if (String != NULL) {
             UTF32 *String32 = UTF8_Decode(String);
@@ -2547,7 +2547,7 @@ extern "C" {
         return Value;
     }
     
-    int64_t UTF16_String2Integer(PlatformIO_Immutable(UTF16 *) String, FoundationIO_Bases Base) {
+    int64_t UTF16_String2Integer(PlatformIO_Immutable(UTF16 *) String, UnicodeIO_Bases Base) {
         int64_t Value = 0LL;
         if (String != NULL) {
             UTF32 *String32 = UTF16_Decode(String);
@@ -2560,7 +2560,7 @@ extern "C" {
     }
 
     // Integer2String should accept any integer base from the lookup table and shift the value until it can't anymore
-    int64_t UTF32_String2Integer(PlatformIO_Immutable(UTF32 *) String, FoundationIO_Bases Base) {
+    int64_t UTF32_String2Integer(PlatformIO_Immutable(UTF32 *) String, UnicodeIO_Bases Base) {
         uint64_t CodePoint = 0ULL;
         int8_t   Sign      = 1;
         int64_t  Value     = 0LL;
@@ -2623,21 +2623,21 @@ extern "C" {
         return Value;
     }
     
-    UTF8 *UTF8_Integer2String(int64_t Integer2Convert, FoundationIO_Bases Base) {
+    UTF8 *UTF8_Integer2String(int64_t Integer2Convert, UnicodeIO_Bases Base) {
         UTF32 *IntegerString32 = UTF32_Integer2String(Integer2Convert, Base);
         UTF8  *IntegerString8  = UTF8_Encode((PlatformIO_Immutable(UTF32 *)) IntegerString32);
         UTF32_Deinit(IntegerString32);
         return IntegerString8;
     }
     
-    UTF16 *UTF16_Integer2String(int64_t Integer2Convert, FoundationIO_Bases Base) {
+    UTF16 *UTF16_Integer2String(int64_t Integer2Convert, UnicodeIO_Bases Base) {
         UTF32 *IntegerString32 = UTF32_Integer2String(Integer2Convert, Base);
         UTF16 *IntegerString16 = UTF16_Encode((PlatformIO_Immutable(UTF32 *)) IntegerString32);
         UTF32_Deinit(IntegerString32);
         return IntegerString16;
     }
     
-    UTF32 *UTF32_Integer2String(int64_t Integer2Convert, FoundationIO_Bases Base) {
+    UTF32 *UTF32_Integer2String(int64_t Integer2Convert, UnicodeIO_Bases Base) {
         UTF32   *String               = NULL;
         int64_t  Sign                 = 0LL;
         uint64_t Num                  = AbsoluteI(Integer2Convert);
@@ -2696,7 +2696,7 @@ extern "C" {
         return String;
     }
     
-    double UTF8_String2Decimal(PlatformIO_Immutable(UTF8 *) String, FoundationIO_Bases Base) {
+    double UTF8_String2Decimal(PlatformIO_Immutable(UTF8 *) String, UnicodeIO_Bases Base) {
         double Decimal = 0.0;
         if (String != NULL) {
             UTF32 *String32 = UTF8_Decode(String);
@@ -2708,7 +2708,7 @@ extern "C" {
         return Decimal;
     }
     
-    double UTF16_String2Decimal(PlatformIO_Immutable(UTF16 *) String, FoundationIO_Bases Base) {
+    double UTF16_String2Decimal(PlatformIO_Immutable(UTF16 *) String, UnicodeIO_Bases Base) {
         double Decimal = 0.0;
         if (String != NULL) {
             UTF32 *String32 = UTF16_Decode(String);
@@ -2720,7 +2720,7 @@ extern "C" {
         return Decimal;
     }
     
-    double UTF32_String2Decimal(PlatformIO_Immutable(UTF32 *) String, FoundationIO_Bases Base) { // Replaces strtod, strtof, strold, atof, and atof_l
+    double UTF32_String2Decimal(PlatformIO_Immutable(UTF32 *) String, UnicodeIO_Bases Base) { // Replaces strtod, strtof, strold, atof, and atof_l
         double   Value         = 0.0;
         bool     IsNegative    = No;
         if (String != NULL) {
@@ -2746,21 +2746,21 @@ extern "C" {
         return Value;
     }
     
-    UTF8 *UTF8_Decimal2String(double Decimal, FoundationIO_Bases Base) {
+    UTF8 *UTF8_Decimal2String(double Decimal, UnicodeIO_Bases Base) {
         UTF32 *String32 = UTF32_Decimal2String(Decimal, Base);
         UTF8  *String8  = UTF8_Encode(String32);
         free(String32);
         return String8;
     }
     
-    UTF16 *UTF16_Decimal2String(double Decimal, FoundationIO_Bases Base) {
+    UTF16 *UTF16_Decimal2String(double Decimal, UnicodeIO_Bases Base) {
         UTF32 *String32 = UTF32_Decimal2String(Decimal, Base);
         UTF16 *String16 = UTF16_Encode(String32);
         free(String32);
         return String16;
     }
     
-    static UTF32 *Decimal2String_UTF32(double Decimal, uint64_t MinimumWidth, uint64_t Precision, FoundationIO_Bases Base) {
+    static UTF32 *Decimal2String_UTF32(double Decimal, uint64_t MinimumWidth, uint64_t Precision, UnicodeIO_Bases Base) {
         UTF32 *String = NULL;
         if ((Base & Base_Decimal) == Base_Decimal) {
             uint8_t StringSize        = 0;
@@ -2830,7 +2830,7 @@ extern "C" {
         return String;
     }
     
-    UTF32 *UTF32_Decimal2String(double Number, FoundationIO_Bases Base) {
+    UTF32 *UTF32_Decimal2String(double Number, UnicodeIO_Bases Base) {
         UTF32   *OutputString     = NULL;
         uint64_t StringSize       = 0ULL;
         int8_t   Sign             = ExtractSignD(Number);
@@ -2857,7 +2857,7 @@ extern "C" {
          
          Maybe there should be a static function that takes the requested format (Scientific, Decimal, Shortest, Hexadecimal), MinWidth, and Precision
          
-         Decimal2String_UTF32(double Decimal2Convert, uint64_t MinWidth, uint64_t Precision, FoundationIO_Bases Base)
+         Decimal2String_UTF32(double Decimal2Convert, uint64_t MinWidth, uint64_t Precision, UnicodeIO_Bases Base)
          
          */
         
@@ -3301,7 +3301,7 @@ extern "C" {
         return SplitStrings;
     }
     
-    uint64_t UTF32_GetNumDigits(PlatformIO_Immutable(UTF32 *) String, uint64_t Offset, FoundationIO_Bases Base) {
+    uint64_t UTF32_GetNumDigits(PlatformIO_Immutable(UTF32 *) String, uint64_t Offset, UnicodeIO_Bases Base) {
         uint64_t NumDigits      = 0ULL;
         if (String != NULL) {
             uint64_t CodePoint  = Offset;

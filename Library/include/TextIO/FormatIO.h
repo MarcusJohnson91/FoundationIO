@@ -220,7 +220,7 @@ extern "C" {
      @param           Specifiers                  The Format Specifiers.
      @param           StringType                  The original encoding of the Format string.
      */
-    void              UTF32_ParseFormatSpecifiers(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, FoundationIO_StringTypes StringType);
+    void              UTF32_ParseFormatSpecifiers(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, UnicodeIO_StringTypes StringType);
     
     /*!
      @abstract                                    Formats a UTF-32 encoded string.
