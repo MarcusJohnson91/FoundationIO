@@ -58,13 +58,13 @@ extern "C" {
     /*!
      @enum        BitIO_ByteOrders
      @constant    ByteOrder_Unspecified            Invalid/Native for Strings.
-     @constant    ByteOrder_LSByte                 The least significant byte is the closest to the current offset; or closest to the right most bit
-     @constant    ByteOrder_MSByte                 The least significant byte is the farthest from the current offset; or at the highest byte in a string.
+     @constant    ByteOrder_LSByteIsNearest        The least significant byte is the closest to the current offset; or closest to the right most bit
+     @constant    ByteOrder_LSByteIsFarthest       The least significant byte is the farthest from the current offset; or at the highest byte in a string.
      */
     typedef enum BitIO_ByteOrders {
                   ByteOrder_Unspecified            = 0,
-                  ByteOrder_LSByte                 = 1, // LSBIsNearest
-                  ByteOrder_MSByte                 = 2, // LSBIsFarthest
+                  ByteOrder_LSByteIsNearest        = 1, // ByteOrder_LSByte
+                  ByteOrder_LSByteIsFarthest       = 2, // ByteOrder_MSByte
     } BitIO_ByteOrders;
 
     /*!
