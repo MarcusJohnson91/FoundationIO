@@ -724,7 +724,7 @@ extern "C" {
     
     uint8_t *BitBuffer_ReadGUUID(BitBuffer *BitB, BitIO_GUUIDTypes GUUID2Read) {
         uint8_t *GUUID = NULL;
-        if (GUUID2Read != GUUIDType_Unknown && BitB != NULL && (BitBuffer_GetSize(BitB) - BitBuffer_GetPosition(BitB)) >= BinaryGUUID_Size) {
+        if (GUUID2Read != GUUIDType_Unspecified && BitB != NULL && (BitBuffer_GetSize(BitB) - BitBuffer_GetPosition(BitB)) >= BinaryGUUID_Size) {
             if (GUUID2Read == GUUIDType_BinaryUUID || GUUID2Read == GUUIDType_BinaryGUID) {
                 GUUID                    = (uint8_t*) calloc(BinaryGUUID_Size, sizeof(uint8_t));
                 if (GUUID != NULL) {
@@ -1092,7 +1092,7 @@ extern "C" {
     /* GUUID */
     uint8_t *GUUID_Generate(SecureRNG *Random, BitIO_GUUIDTypes GUUIDType) {
         uint8_t *GUUID                   = 0;
-        if (Random != NULL && GUUIDType != GUUIDType_Unknown) {
+        if (Random != NULL && GUUIDType != GUUIDType_Unspecified) {
             uint64_t LowBits             = SecureRNG_GenerateInteger(Random, 64);
             uint64_t HighBits            = SecureRNG_GenerateInteger(Random, 64);
             uint8_t *BinaryGUUIDData     = (uint8_t*) calloc(BinaryGUUID_Size, sizeof(uint8_t));
@@ -1116,8 +1116,8 @@ extern "C" {
             }
         } else if (Random == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
-        } else if (GUUIDType == GUUIDType_Unknown) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("GUUIDType_Unknown is an invalid GUUIDType"));
+        } else if (GUUIDType == GUUIDType_Unspecified) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("GUUIDType_Unspecified is an invalid GUUIDType"));
         }
         return GUUID;
     }
@@ -1125,7 +1125,7 @@ extern "C" {
     bool GUUID_Compare(BitIO_GUUIDTypes Type2Compare, uint8_t *GUUID1, uint8_t *GUUID2) {
         uint8_t GUUIDSize       = ((Type2Compare == GUUIDType_GUIDString || Type2Compare == GUUIDType_UUIDString) ? BinaryGUUID_Size : BinaryGUUID_Size);
         bool GUUIDsMatch        = Yes;
-        if (GUUID1 != NULL && GUUID2 != NULL && Type2Compare != GUUIDType_Unknown) {
+        if (GUUID1 != NULL && GUUID2 != NULL && Type2Compare != GUUIDType_Unspecified) {
             for (uint8_t BinaryGUUIDByte = 0; BinaryGUUIDByte < GUUIDSize; BinaryGUUIDByte++) {
                 if (GUUID1[BinaryGUUIDByte] != GUUID2[BinaryGUUIDByte]) {
                     GUUIDsMatch = No;
@@ -1135,8 +1135,8 @@ extern "C" {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("GUUID1 Pointer is NULL"));
         } else if (GUUID2 == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("GUUID2 Pointer is NULL"));
-        } else if (Type2Compare == GUUIDType_Unknown) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("GUUIDType_Unknown is an invalid GUUID type"));
+        } else if (Type2Compare == GUUIDType_Unspecified) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("GUUIDType_Unspecified is an invalid GUUID type"));
         }
         return GUUIDsMatch;
     }
@@ -1145,7 +1145,7 @@ extern "C" {
         uint8_t  Dash = '-';
         uint8_t  OutputGUUIDSize = ((OutputType == GUUIDType_GUIDString || OutputType == GUUIDType_UUIDString) ? GUUIDString_Size : BinaryGUUID_Size);
         uint8_t *ConvertedGUUID  = (uint8_t*) calloc(OutputGUUIDSize, sizeof(uint8_t));
-        if (ConvertedGUUID != NULL && GUUID2Convert != NULL && InputType != GUUIDType_Unknown && OutputType != GUUIDType_Unknown) {
+        if (ConvertedGUUID != NULL && GUUID2Convert != NULL && InputType != GUUIDType_Unspecified && OutputType != GUUIDType_Unspecified) {
             bool ByteOrderDiffers = (((InputType == GUUIDType_GUIDString && OutputType == GUUIDType_UUIDString) || (InputType == GUUIDType_UUIDString && OutputType == GUUIDType_GUIDString) || (InputType == GUUIDType_BinaryUUID && OutputType == GUUIDType_BinaryGUID) || (InputType == GUUIDType_BinaryGUID && OutputType == GUUIDType_BinaryUUID)) ? Yes : No);
             
             bool TypeDiffers      = (((InputType == GUUIDType_GUIDString && OutputType == GUUIDType_BinaryGUID) || (InputType == GUUIDType_BinaryGUID && OutputType == GUUIDType_GUIDString) || (InputType == GUUIDType_UUIDString && OutputType == GUUIDType_BinaryUUID) || (InputType == GUUIDType_BinaryUUID && OutputType == GUUIDType_UUIDString)) ? Yes : No);
@@ -1179,9 +1179,9 @@ extern "C" {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Insufficent memory to allocate ConvertedGUUID"));
         } else if (GUUID2Convert == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("GUUID Pointer is NULL"));
-        } else if (InputType == GUUIDType_Unknown) {
+        } else if (InputType == GUUIDType_Unspecified) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("InputType is invalid"));
-        } else if (OutputType == GUUIDType_Unknown) {
+        } else if (OutputType == GUUIDType_Unspecified) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("OutputType is invalid"));
         }
         return ConvertedGUUID;
@@ -1189,7 +1189,7 @@ extern "C" {
     
     uint8_t *GUUID_Swap(BitIO_GUUIDTypes GUUIDType, uint8_t *GUUID2Swap) {
         uint8_t *SwappedGUUID = NULL;
-        if (GUUID2Swap != NULL && GUUIDType != GUUIDType_Unknown) {
+        if (GUUID2Swap != NULL && GUUIDType != GUUIDType_Unspecified) {
             uint8_t Dash = '-';
             if (GUUIDType == GUUIDType_UUIDString || GUUIDType == GUUIDType_GUIDString) {
                 SwappedGUUID          = (uint8_t*) calloc(BinaryGUUID_Size, sizeof(uint8_t));
@@ -1247,8 +1247,8 @@ extern "C" {
             }
         } else if (GUUID2Swap == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("GUUID2Swap Pointer is NULL"));
-        } else if (GUUIDType == GUUIDType_Unknown) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("GUUIDType_Unknown is an invalid GUUID type"));
+        } else if (GUUIDType == GUUIDType_Unspecified) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("GUUIDType_Unspecified is an invalid GUUID type"));
         }
         return SwappedGUUID;
     }

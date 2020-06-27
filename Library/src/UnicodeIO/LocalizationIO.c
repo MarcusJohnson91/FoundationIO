@@ -9,29 +9,29 @@ extern "C" {
 #endif
     
     typedef enum LocalizationIO_DateFormats {
-        DateFormat_Unknown = 0, // & 3 << 0
-        DateFormat_Day1    = 1,
-        DateFormat_Day2    = 2,
-        DateFormat_Day3    = 4,
-        DateFormat_Month1  = 8, // & 3 << 2
-        DateFormat_Month2  = 16,
-        DateFormat_Month3  = 32,
-        DateFormat_Year1   = 64, // & 3 << 4
-        DateFormat_Year2   = 128,
-        DateFormat_Year3   = 256,
+                   DateFormat_Unspecified = 0, // & 3 << 0
+                   DateFormat_Day1        = 1,
+                   DateFormat_Day2        = 2,
+                   DateFormat_Day3        = 4,
+                   DateFormat_Month1      = 8, // & 3 << 2
+                   DateFormat_Month2      = 16,
+                   DateFormat_Month3      = 32,
+                   DateFormat_Year1       = 64, // & 3 << 4
+                   DateFormat_Year2       = 128,
+                   DateFormat_Year3       = 256,
     } LocalizationIO_DateFormats;
     
     typedef enum LocalizationIO_TimeFormats {
-        TimeFormat_Unknown = 0,
-        TimeFormat_Hour1   = 1,
-        TimeFormat_Hour2   = 2,
-        TimeFormat_Hour3   = 4,
-        TimeFormat_Minute1 = 8,
-        TimeFormat_Minute2 = 16,
-        TimeFormat_Minute3 = 32,
-        TimeFormat_Second1 = 64,
-        TimeFormat_Second2 = 128,
-        TimeFormat_Second3 = 256,
+                   TimeFormat_Unspecified = 0,
+                   TimeFormat_Hour1       = 1,
+                   TimeFormat_Hour2       = 2,
+                   TimeFormat_Hour3       = 4,
+                   TimeFormat_Minute1     = 8,
+                   TimeFormat_Minute2     = 16,
+                   TimeFormat_Minute3     = 32,
+                   TimeFormat_Second1     = 64,
+                   TimeFormat_Second2     = 128,
+                   TimeFormat_Second3     = 256,
     } LocalizationIO_TimeFormats;
     
     static void LocalizationIO_Init(void) {
@@ -62,15 +62,15 @@ extern "C" {
         uint64_t  StringSize     = UTF8_GetStringSizeInCodeUnits(LocaleAll);
         if (StringSize == 2) { // ISO-639-1
             if (UTF8_Compare(LanguageString, UTF8String("en"))) {
-                LanguageID     = WrittenLanguage_English;
+                LanguageID       = WrittenLanguage_English;
             } else if (UTF8_Compare(LanguageString, UTF8String("de"))) {
-                LanguageID     = WrittenLanguage_German;
+                LanguageID       = WrittenLanguage_German;
             } else if (UTF8_Compare(LanguageString, UTF8String("sv"))) {
-                LanguageID     = WrittenLanguage_Swedish;
+                LanguageID       = WrittenLanguage_Swedish;
             } else if (UTF8_Compare(LanguageString, UTF8String("da"))) {
-                LanguageID     = WrittenLanguage_Danish;
+                LanguageID       = WrittenLanguage_Danish;
             } else if (UTF8_Compare(LanguageString, UTF8String("is"))) {
-                LanguageID     = WrittenLanguage_Icelandic;
+                LanguageID       = WrittenLanguage_Icelandic;
             }
         } else if (StringSize == 3) { // ISO-639-2
             
@@ -103,7 +103,7 @@ extern "C" {
     }
     
     FoundationIO_StringTypes Localize_GetEncodingID(void) {
-        FoundationIO_StringTypes Encoding = StringType_Unknown;
+        FoundationIO_StringTypes Encoding = StringType_Unspecified;
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
         LocalizationIO_Init();
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)

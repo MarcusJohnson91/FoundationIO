@@ -21,25 +21,25 @@ extern "C" {
     /*!
      @enum       BitIO_FileTypes
      @abstract                                     Is this BitInput or BitOutput connected to a File or Socket?
-     @constant   FileType_Unknown                  Invalid.
+     @constant   FileType_Unspecified              Invalid.
      @constant   FileType_File                     This instance of BitInput/BitOutput is connected to a File.
      @constant   FileType_Socket                   This instance of BitInput/BitOutput is connected to a Socket.
      */
     typedef enum BitIO_FileTypes {
-                 FileType_Unknown                  = 0,
+                 FileType_Unspecified              = 0,
                  FileType_File                     = 1,
                  FileType_Socket                   = 2,
     } BitIO_FileTypes;
 
     /*!
      @enum         BitIO_UnaryTypes
-     @constant     UnaryType_Unknown               Invalid.
+     @constant     UnaryType_Unspecified           Invalid.
      @constant     UnaryType_Count                 Supports whole numbers (including zero).
      @constant     UnaryType_Truncated             Supports counting numbers (excluding zero).
      @constant     UnaryType_Whole                 Supports all the integers including zero and negatives (up to 2^63 anyway).
      */
     typedef enum BitIO_UnaryTypes {
-                   UnaryType_Unknown               = 0,
+                   UnaryType_Unspecified           = 0,
                    UnaryType_Count                 = 1,
                    UnaryType_Truncated             = 2,
                    UnaryType_Whole                 = 3,
@@ -56,39 +56,39 @@ extern "C" {
     } BitIO_UnaryTerminators;
 
     /*!
-     @enum         BitIO_ByteOrders
-     @constant     ByteOrder_Unknown               Invalid byte order.
-     @constant     ByteOrder_LSByte                Read from the Least Significant Byte to the Most  Significant, aka right to left.
-     @constant     ByteOrder_MSByte                Read from the Most  Significant Byte to the Least Significant, aka left to right.
+     @enum        BitIO_ByteOrders
+     @constant    ByteOrder_Unspecified            Invalid/Native for Strings.
+     @constant    ByteOrder_LSByte                 The least significant byte is the closest to the current offset; or closest to the right most bit
+     @constant    ByteOrder_MSByte                 The least significant byte is the farthest from the current offset; or at the highest byte in a string.
      */
     typedef enum BitIO_ByteOrders {
-                   ByteOrder_Unknown               = 0,
-                   ByteOrder_LSByte                = 1,
-                   ByteOrder_MSByte                = 2,
+                  ByteOrder_Unspecified            = 0,
+                  ByteOrder_LSByte                 = 1, // LSBIsNearest
+                  ByteOrder_MSByte                 = 2, // LSBIsFarthest
     } BitIO_ByteOrders;
 
     /*!
      @enum         BitIO_BitOrders
-     @constant     BitIO_BitOrder_Unknown          Invalid bit order.
+     @constant     BitIO_BitOrder_Unspecified      Invalid bit order.
      @constant     BitIO_BitOrder_LSBit            Read from the Least Significant Bit to the Most  Significant, aka right to left.
      @constant     BitIO_BitOrder_MSBit            Read from the Most  Significant Bit to the Least Significant, aka left  to right.
      */
     typedef enum BitIO_BitOrders {
-                   BitIO_BitOrder_Unknown          = 0,
+                   BitIO_BitOrder_Unspecified      = 0,
                    BitIO_BitOrder_LSBit            = 1,
                    BitIO_BitOrder_MSBit            = 2,
     } BitIO_BitOrders;
 
     /*!
      @enum         BitIO_GUUIDTypes
-     @constant     GUUIDType_Unknown               The GUUID type is unknown, invalid.
+     @constant     GUUIDType_Unspecified           The GUUID type is unknown, invalid.
      @constant     GUUIDType_GUIDString            The GUUID is a GUID string, aka LSByte first UUID with hyphens.
      @constant     GUUIDType_UUIDString            The GUUID is a UUID string, aka MSByte first UUID with hyphens.
      @constant     GUUIDType_BinaryGUID            The GUUID is a Binary GUID, aka LSByte first UUID without hyphens.
      @constant     GUUIDType_BinaryUUID            The GUUID is a Binary UUID, aka MSByte first UUID without hypthns.
      */
     typedef enum BitIO_GUUIDTypes {
-                   GUUIDType_Unknown               = 0,
+                   GUUIDType_Unspecified           = 0,
                    GUUIDType_GUIDString            = 1,
                    GUUIDType_UUIDString            = 2,
                    GUUIDType_BinaryGUID            = 3,

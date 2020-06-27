@@ -30,12 +30,12 @@ extern "C" {
     /*!
      @enum         TestIO_TestStates
      @abstract                                    Defines the state of each test.
-     @constant     TestState_Unknown              Invalid state.
+     @constant     TestState_Unspecified          Invalid state.
      @constant     TestState_Enabled              The test is enabled.
      @constant     TestState_Disabled             The test is disabled.
      */
     typedef enum TestIO_TestStates {
-                   TestState_Unknown              = 0,
+                   TestState_Unspecified          = 0,
                    TestState_Enabled              = 1,
                    TestState_Disabled             = 2,
     } TestIO_TestStates;
@@ -43,13 +43,13 @@ extern "C" {
     /*!
      @enum         TestIO_TestResults
      @abstract                                    Defines the result of each test.
-     @constant     TestResult_Unknown             Invalid state.
+     @constant     TestResult_Unspecified         Invalid state.
      @constant     TestResult_Passed              The test is enabled.
      @constant     TestResult_Failed              The test is disabled.
      @constant     TestResult_Untested            The test wasn't ran.
      */
     typedef enum TestIO_TestResults {
-                   TestResult_Unknown             = 0,
+                   TestResult_Unspecified         = 0,
                    TestResult_Passed              = 1,
                    TestResult_Failed              = 2,
                    TestResult_Untested            = 3,

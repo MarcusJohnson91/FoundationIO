@@ -464,7 +464,7 @@ extern "C" {
         } else if (Rotate == Rotate_Right) {
             Rotated  = (Value >> Bits2Rotate) | (Value << (64 - Bits2Rotate));
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Rotate_Unknown is invalid"));
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Rotate_Unspecified is invalid"));
         }
         return Rotated;
     }
