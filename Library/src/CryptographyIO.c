@@ -625,7 +625,7 @@ extern "C" {
             uint16_t B = 0;
 
             for (uint64_t Byte = Start; Byte < NumBytes - 1; Byte++) {
-                uint8_t Value = BitBuffer_ReadBits(BitB, ByteOrder_MSByte, BitIO_BitOrder_LSBit, 8);
+                uint8_t Value = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitIO_BitOrder_LSBit, 8);
                 A = (A + Value) % 65521;
                 B = (B + A)     % 65521;
             }
@@ -646,7 +646,7 @@ extern "C" {
         if (BitB != NULL && Start * 8 < BitBuffer_GetSize(BitB) && (Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
             for (uint64_t Byte = Start; Byte < NumBytes - 1; Byte++) {
                 uint32_t Polynomial = 0x82608EDB;
-                uint8_t  Data       = BitBuffer_ReadBits(BitB, ByteOrder_MSByte, BitIO_BitOrder_LSBit, 8);
+                uint8_t  Data       = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitIO_BitOrder_LSBit, 8);
                 Output             ^= Data;
                 for (uint8_t Bit = 0; Bit < 8; Bit++) {
                     if (Output & 1) {

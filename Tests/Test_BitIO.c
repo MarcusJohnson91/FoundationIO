@@ -46,9 +46,9 @@ extern "C" {
          for (uint16_t Loop = 0; Loop < Times2Loop; Loop++) {
          uint64_t Value      = Entropy_GenerateIntegerInRange(Random, 1, 0x7FFFFFFFFFFFFFFF);
          uint8_t  NumBits    = Logarithm(2, Value);
-         BitBuffer_WriteBits(BitB, ByteOrder_MSByte, BitIO_BitOrder_MSBit, NumBits, Value);
+         BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitIO_BitOrder_MSBit, NumBits, Value);
          BitBuffer_Seek(BitB, -NumBits);
-         uint64_t Decoded    = BitBuffer_ReadBits(BitB, ByteOrder_MSByte, BitIO_BitOrder_MSBit, NumBits);
+         uint64_t Decoded    = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitIO_BitOrder_MSBit, NumBits);
          if (Decoded != Value) {
          fprintf(stderr, "TEST FAILED: Decoded %llu does not match Value %llu, Offset = %llu, NumBits = %llu\n", Decoded, Value, BitBuffer_GetPosition(BitB), BitBuffer_GetSize(BitB));
          } else {
