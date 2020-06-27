@@ -399,6 +399,75 @@ typedef                   char32_t                             UTF32;
 #ifndef                   UnicodeIOTypes_FunctionName
 #define                   UnicodeIOTypes_FunctionName           (PlatformIO_Immutable(UTF8 *)) __func__
 #endif /* UnicodeIOTypes_FunctionName */
+
+    /*!
+     @enum                UnicodeIO_StringTypes
+     @constant            StringType_Unspecified                 Invalid/Default value
+     @constant            StringType_UTF8                        UTF-8
+     @constant            StringType_UTF16                       UTF-16
+     @constant            StringType_UTF32                       UTF-32
+     */
+    typedef enum UnicodeIO_StringTypes {
+                          StringType_Unspecified                 = 0,
+                          StringType_UTF8                        = 1,
+                          StringType_UTF16                       = 2,
+                          StringType_UTF32                       = 4,
+    } UnicodeIO_StringTypes;
+
+    /*!
+     @enum                UnicodeIO_Bases
+     @abstract                                                   Defines the type of option.
+     @constant            Base_Integer                           ORable mask for Integers.
+     @constant            Base_Radix2                            Integer only, base-2/binary.
+     @constant            Base_Radix8                            Integer only, base-8/octal.
+     @constant            Base_Decimal                           ORable mask for floating point numbers.
+     @constant            Base_Radix10                           Integer or Decimal, base-10.
+     @constant            Base_Radix16                           Integer or Decimal, base-16/hexadecimal.
+     @constant            Base_Uppercase                         Base-16 only.
+     @constant            Base_Lowercase                         Base-16 only.
+     @constant            Base_Scientific                        Decimal only.
+     @constant            Base_Shortest                          Decimal only.
+     */
+    typedef enum UnicodeIO_Bases {
+                          Base_Unspecified                       = 0,
+                          Base_Integer                           = 1,
+                          Base_Radix2                            = 2,
+                          Base_Radix8                            = 4,
+                          Base_Decimal                           = 8,
+                          Base_Radix10                           = 16,
+                          Base_Radix16                           = 32,
+                          Base_Uppercase                         = 64,
+                          Base_Lowercase                         = 128,
+                          Base_Scientific                        = 256,
+                          Base_Shortest                          = 512,
+    } UnicodeIO_Bases;
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
+    extern "C++" {
+        constexpr inline UnicodeIO_Bases operator | (UnicodeIO_Bases A, UnicodeIO_Bases B) {
+            uint16_t A1 = static_cast<uint16_t>(A);
+            uint16_t B1 = static_cast<uint16_t>(B);
+            return static_cast<UnicodeIO_Bases>(A1 | B1);
+        }
+
+        constexpr inline UnicodeIO_Bases operator & (UnicodeIO_Bases A, UnicodeIO_Bases B) {
+            uint16_t A1 = static_cast<uint16_t>(A);
+            uint16_t B1 = static_cast<uint16_t>(B);
+            return static_cast<UnicodeIO_Bases>(A1 & B1);
+        }
+
+        constexpr inline UnicodeIO_Bases operator |= (UnicodeIO_Bases A, UnicodeIO_Bases B) {
+            uint16_t A1 = static_cast<uint16_t>(A);
+            uint16_t B1 = static_cast<uint16_t>(B);
+            return static_cast<UnicodeIO_Bases>(A1 |= B1);
+        }
+
+        constexpr inline UnicodeIO_Bases operator &= (UnicodeIO_Bases A, UnicodeIO_Bases B) {
+            uint16_t A1 = static_cast<uint16_t>(A);
+            uint16_t B1 = static_cast<uint16_t>(B);
+            return static_cast<UnicodeIO_Bases>(A1 &= B1);
+        }
+    }
+#endif /* PlatformIO_Language */
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
