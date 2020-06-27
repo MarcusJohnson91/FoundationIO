@@ -151,7 +151,7 @@ extern "C" {
      @abstract                                      What decimal seperator is in use, for collation, sorting, etc.
      */
     typedef enum LocalizationIO_DecimalSeperators {
-                   DecimalSeperator_Unknown         = 0,
+                   DecimalSeperator_Unspecified     = 0,
                    DecimalSeperator_Period          = 1,
                    DecimalSeperator_Comma           = 2,
                    DecimalSeperator_Apostrophe      = 3,
@@ -162,7 +162,7 @@ extern "C" {
      @abstract                                      What group seperator is in use, for collation, sorting, etc.
      */
     typedef enum LocalizationIO_GroupSeperators {
-                   GroupSeperator_Unknown           = 0,
+                   GroupSeperator_Unspecified       = 0,
                    GroupSeperator_Comma             = 1,
                    GroupSeperator_Period            = 2,
                    GroupSeperator_Underscore        = 3,

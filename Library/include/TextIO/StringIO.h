@@ -75,14 +75,14 @@ extern "C" {
     
     /*!
      @enum         StringIO_NormalizationForms
-     @constant     NormalizationForm_Unknown             Unknown Normalization Form.
+     @constant     NormalizationForm_Unspecified         Unknown Normalization Form.
      @constant     NormalizationForm_CanonicalDecompose  Decompose the String.
      @constant     NormalizationForm_CanonicalCompose    Decompose, then Compose the String.
      @constant     NormalizationForm_KompatibleDecompose NormalizationForm_CanonicalDecompose, plus Kompatibility decompositions.
      @constant     NormalizationForm_KompatibleCompose   NormalizationForm_CanonicalDecompose, plus Kompatibility compositions.
      */
     typedef enum StringIO_NormalizationForms {
-                   NormalizationForm_Unknown             = 0,
+                   NormalizationForm_Unspecified         = 0,
                    NormalizationForm_CanonicalDecompose  = 1,
                    NormalizationForm_CanonicalCompose    = 2,
                    NormalizationForm_KompatibleDecompose = 3,
@@ -92,13 +92,13 @@ extern "C" {
     /*!
      @enum         StringIO_BOMs
      @abstract                                           What byte order does the string use?
-     @constant     StringIO_BOM_Unknown                  Byte order is unknown.
+     @constant     StringIO_BOM_Unspecified              Byte order is unknown.
      @constant     StringIO_BOM_Native                   Use the byte order of the host.
      @constant     StringIO_BOM_Little                   Use the little endian, Least-Significant-Byte first order.
      @constant     StringIO_BOM_Big                      Use the big endian, Most-Significant-Byte first order.
      */
     typedef enum StringIO_BOMs {
-                   StringIO_BOM_Unknown                  = 0,
+                   StringIO_BOM_Unspecified              = 0,
                    StringIO_BOM_Native                   = 1,
                    StringIO_BOM_Little                   = 2,
                    StringIO_BOM_Big                      = 3,
@@ -107,12 +107,12 @@ extern "C" {
     /*!
      @enum         StringIO_TruncationTypes
      @abstract                                           Is this BitInput or BitOutput connected to a File or Socket?
-     @constant     TruncationType_Unknown                Unknown TrimString command.
+     @constant     TruncationType_Unspecified            Unknown TrimString command.
      @constant     TruncationType_All                    Trim at the beginning and end, removing all occurrences found there.
      @constant     TruncationType_Most1                  Trim between start and end, removing all but 1 occurrence found between non-removable CodePoints
      */
     typedef enum StringIO_TruncationTypes {
-                   TruncationType_Unknown                = 0,
+                   TruncationType_Unspecified            = 0,
                    TruncationType_All                    = 1,
                    TruncationType_Most1                  = 2,
     } StringIO_TruncationTypes;

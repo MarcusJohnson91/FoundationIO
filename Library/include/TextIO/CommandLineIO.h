@@ -31,28 +31,28 @@ extern "C" {
      --Input SwitchArgument=Path
      --Input:LeftEye=Path ; Switch=Input, Subswitch=LeftEye, SubswitchArgument=Path
      
-     SwitchStates: SwitchState_Unknown, SwitchState_HasChildren, SwitchState_NoChildren
+     SwitchStates: SwitchState_Unspecified, SwitchState_HasChildren, SwitchState_NoChildren
      Switch Name
      Switch Type:
      Existential: no arguments no children; e.g. Help
      Parent: Can only be the parent of another switch or standalone
      Child: Can only be the child of another switch
      
-     SwitchStates: SwitchState_Unknown, SwitchState_Existential, SwitchState_Parent, SwitchState_Child
+     SwitchStates: SwitchState_Unspecified, SwitchState_Existential, SwitchState_Parent, SwitchState_Child
      */
     
     /*!
      @enum         CommandLineIO_SwitchTypes
      @abstract                                     What kind of argument does the switch accept?
      @remark       Syntax:                         Parent:Child=SwitchArgument
-     @constant     SwitchType_Unknown              Invalid argument type
+     @constant     SwitchType_Unspecified          Invalid argument type
      @constant     SwitchType_Existential          This switch can not have parents, children, or arguments.
      @constant     SwitchType_Standalone           This switch can not have parents or children, tho it can accept arguments.
      @constant     SwitchType_Parent               This switch type denotes that it can not have any parents, it has 1 or more children.
      @constant     SwitchType_Child                This switch type denotes that it can not be a parent
      */
     typedef enum CommandLineIO_SwitchTypes {
-                   SwitchType_Unknown              = 0,
+                   SwitchType_Unspecified          = 0,
                    SwitchType_Required             = 1,
                    SwitchType_Existential          = 1,
                    SwitchType_Standalone           = 2,
@@ -63,13 +63,13 @@ extern "C" {
     /*!
      @enum         CommandLineIO_SwitchStatuses
      @abstract                                     Defines the status of each Switch.
-     @constant     SwitchStatus_Unknown            Invalid Switch status.
+     @constant     SwitchStatus_Unspecified        Invalid Switch status.
      @constant     SwitchStatus_Required           The Switch MUST be present.
      @constant     SwitchStatus_Optional           The Switch MAY be present.
      @constant     SwitchStatus_Incompatible       The Switch can only be present if none of it's incompatible Switch are present.
      */
     typedef enum CommandLineIO_SwitchStatuses {
-                   SwitchStatus_Unknown            = 0,
+                   SwitchStatus_Unspecified        = 0,
                    SwitchStatus_Required           = 1,
                    SwitchStatus_Optional           = 2,
                    SwitchStatus_Incompatible       = 3,
@@ -78,7 +78,7 @@ extern "C" {
     /*!
      @enum         CommandLineIO_SwitchArguments
      @abstract                                     What kind of argument does the switch accept?
-     @constant     ArgumentType_Unknown            Invalid argument type.
+     @constant     ArgumentType_Unspecified        Invalid argument type.
      @constant     ArgumentType_Path               String that matches the location of something in the filesystem.
      @constant     ArgumentType_URL                String that is composed of a URL like "https://www.tldrlegal.com/blah"
      @constant     ArgumentType_Range              Number between X and Y inclusively using the syntax X..Y.
@@ -86,7 +86,7 @@ extern "C" {
      @constant     ArgumentType_String             Generic string that the program's author will further process.
      */
     typedef enum CommandLineIO_SwitchArguments {
-                   ArgumentType_Unknown            = 0,
+                   ArgumentType_Unspecified        = 0,
                    ArgumentType_Path               = 1,
                    ArgumentType_URL                = 2,
                    ArgumentType_Range              = 3,
@@ -97,13 +97,13 @@ extern "C" {
     /*!
      @enum         CommandLineIO_LicenseTypes
      @abstract                                     Defines the types of licenses.
-     @constant     LicenseType_Unknown             Unknown Argument type.
+     @constant     LicenseType_Unspecified         Unknown Argument type.
      @constant     LicenseType_Permissive          The Argument may have slaves, but it may not too.
      @constant     LicenseType_Proprietary         The Argument can not have any slaves.
      @constant     LicenseType_Copyleft            The Argument is a slave.
      */
     typedef enum CommandLineIO_LicenseTypes {
-                   LicenseType_Unknown             = 0,
+                   LicenseType_Unspecified         = 0,
                    LicenseType_Permissive          = 1,
                    LicenseType_Proprietary         = 2,
                    LicenseType_Copyleft            = 3,
@@ -112,14 +112,14 @@ extern "C" {
     /*!
      @enum         CommandLineIO_ColorTypes
      @abstract                                     Defines the types of colorizing.
-     @constant     ColorType_Unknown               Unknown colorize type.
+     @constant     ColorType_Unspecified           Unknown colorize type.
      @constant     ColorType_Foreground            Make this color the foreground.
      @constant     ColorType_Background            Make this color the background.
      @constant     ColorType_Bold                  Make this text bold.
      @constant     ColorType_Underlined            Make this text underlined.
      */
     typedef enum CommandLineIO_ColorTypes {
-                   ColorType_Unknown               = 0,
+                   ColorType_Unspecified           = 0,
                    ColorType_Foreground            = 1,
                    ColorType_Background            = 2,
                    ColorType_Bold                  = 4,

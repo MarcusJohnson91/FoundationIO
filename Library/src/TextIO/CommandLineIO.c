@@ -225,7 +225,7 @@ extern "C" {
     }
     
     void CommandLineIO_SetLicense(CommandLineIO *CLI, CommandLineIO_LicenseTypes LicenseType, PlatformIO_Immutable(UTF32 *) Name, PlatformIO_Immutable(UTF32 *) LicenseURL) {
-        if (CLI != NULL && LicenseType != LicenseType_Unknown && Name != NULL && LicenseURL != NULL) {
+        if (CLI != NULL && LicenseType != LicenseType_Unspecified && Name != NULL && LicenseURL != NULL) {
             CLI->LicenseType                = LicenseType;
             UTF32 *NormalizedName           = UTF32_Normalize(Name, NormalizationForm_KompatibleCompose);
             UTF32 *CaseFoldedName           = UTF32_CaseFold(NormalizedName);
@@ -238,7 +238,7 @@ extern "C" {
             CLI->ProgramLicenseURL          = CaseFoldedLicenseURL;
         } else if (CLI == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
-        } else if (LicenseType == LicenseType_Unknown) {
+        } else if (LicenseType == LicenseType_Unspecified) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("The LicenseType Is Invalid"));
         } else if (Name == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("License Name Pointer is Invalid"));
@@ -489,12 +489,12 @@ extern "C" {
     }
     
     void CommandLineIO_Switch_SetType(CommandLineIO *CLI, uint64_t SwitchID, CommandLineIO_SwitchTypes SwitchType) {
-        if (CLI != NULL && SwitchType != SwitchType_Unknown && SwitchID < CLI->NumSwitches) {
+        if (CLI != NULL && SwitchType != SwitchType_Unspecified && SwitchID < CLI->NumSwitches) {
             CLI->Switches[SwitchID].SwitchType = SwitchType;
         } else if (CLI == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
-        } else if (SwitchType == SwitchType_Unknown) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("You can not set OptionID %lld to SwitchType_Unknown"), SwitchID);
+        } else if (SwitchType == SwitchType_Unspecified) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("You can not set OptionID %lld to SwitchType_Unspecified"), SwitchID);
         } else if (SwitchID > CLI->NumSwitches) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("OptionID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
         }
@@ -504,14 +504,14 @@ extern "C" {
         /*
          TODO: Parser - If there is Children, the Argument is after the Child
          */
-        if (CLI != NULL && SwitchID < CLI->NumSwitches && ArgumentType != ArgumentType_Unknown) {
+        if (CLI != NULL && SwitchID < CLI->NumSwitches && ArgumentType != ArgumentType_Unspecified) {
             CLI->Switches[SwitchID].ArgumentType = ArgumentType;
         } else if (CLI == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (SwitchID > CLI->NumSwitches) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
-        } else if (ArgumentType == ArgumentType_Unknown) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("You can not set SwitchID %lld to ArgumentType_Unknown"), SwitchID);
+        } else if (ArgumentType == ArgumentType_Unspecified) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("You can not set SwitchID %lld to ArgumentType_Unspecified"), SwitchID);
         }
     }
     

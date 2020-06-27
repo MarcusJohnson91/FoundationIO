@@ -26,7 +26,7 @@ extern "C" {
      @enum         FormatIO_BaseTypes
      */
     typedef enum FormatIO_BaseTypes {
-                   BaseType_Unknown               = 0,
+                   BaseType_Unspecified           = 0,
                    BaseType_Integer               = 1,
                    BaseType_Decimal               = 2,
                    BaseType_CodeUnit              = 4,
@@ -67,7 +67,7 @@ extern "C" {
      @enum         FormatIO_ModifierTypes
      */
     typedef enum FormatIO_ModifierTypes {
-                   ModifierType_Unknown           = 0,
+                   ModifierType_Unspecified       = 0,
                    ModifierType_Percent           = 1,
                    ModifierType_UTF8              = 2,
                    ModifierType_UTF16             = 4,
@@ -119,7 +119,7 @@ extern "C" {
      @enum         FormatIO_ModifierLengths
      */
     typedef enum FormatIO_ModifierLengths {
-                   ModifierLength_Unknown         = 0,
+                   ModifierLength_Unspecified     = 0,
                    ModifierLength_8Bit            = 1,
                    ModifierLength_16Bit           = 2,
                    ModifierLength_32Bit           = 4,
@@ -160,7 +160,7 @@ extern "C" {
      @enum         FormatIO_Flags
      */
     typedef enum FormatIO_Flags {
-                   Flag_Unknown                   = 0,
+                   Flag_Unspecified               = 0,
                    Flag_Zero_Pad                  = 1,
                    Flag_Space_Pad                 = 2,
                    Flag_Plus_AddSign              = 4,
@@ -177,7 +177,7 @@ extern "C" {
      @enum         FormatIO_MinWidths
      */
     typedef enum FormatIO_MinWidths {
-                   MinWidth_Unknown               = 0,
+                   MinWidth_Unspecified           = 0,
                    MinWidth_Asterisk_NextArg      = 1,
                    MinWidth_Inline_Digits         = 2,
     } FormatIO_MinWidths;
@@ -186,7 +186,7 @@ extern "C" {
      @enum         FormatIO_Positions
      */
     typedef enum FormatIO_Positions {
-                   Position_Unknown               = 0,
+                   Position_Unspecified           = 0,
                    Position_Asterisk_NextArg      = 1,
                    Position_Inline_Digits         = 2,
     } FormatIO_Positions;
@@ -195,7 +195,7 @@ extern "C" {
      @enum         FormatIO_Precisions
      */
     typedef enum FormatIO_Precisions {
-                   Precision_Unknown              = 0,
+                   Precision_Unspecified          = 0,
                    Precision_Asterisk_NextArg     = 1,
                    Precision_Inline_Digits        = 2,
     } FormatIO_Precisions;

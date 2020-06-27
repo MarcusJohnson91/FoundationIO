@@ -1094,7 +1094,7 @@ extern "C" {
     }
     
     StringIO_BOMs UTF16_GetByteOrder(UTF16 CodeUnit) {
-        StringIO_BOMs ByteOrder = StringIO_BOM_Unknown;
+        StringIO_BOMs ByteOrder = StringIO_BOM_Unspecified;
         if (CodeUnit == UTF16BOM_LE) {
             ByteOrder                = StringIO_BOM_Little;
         } else if (CodeUnit == UTF16BOM_BE) {
@@ -1112,7 +1112,7 @@ extern "C" {
     }
     
     StringIO_BOMs UTF32_GetByteOrder(UTF32 CodeUnit) {
-        StringIO_BOMs ByteOrder = StringIO_BOM_Unknown;
+        StringIO_BOMs ByteOrder = StringIO_BOM_Unspecified;
         if (CodeUnit == UTF32BOM_LE) {
             ByteOrder                = StringIO_BOM_Little;
         } else if (CodeUnit == UTF32BOM_BE) {
@@ -1382,7 +1382,7 @@ extern "C" {
     }
     
     static FoundationIO_StringTypes StringIO_GetStreamOrientation(FILE *File) {
-        FoundationIO_StringTypes StringType = StringType_Unknown;
+        FoundationIO_StringTypes StringType = StringType_Unspecified;
         int Orientation                     = fwide(File, 0);
         if (Orientation < 0) {
             StringType                      = StringType_UTF8;
@@ -2489,7 +2489,7 @@ extern "C" {
     
     UTF8 *UTF8_Normalize(PlatformIO_Immutable(UTF8 *) String, StringIO_NormalizationForms NormalizedForm) {
         UTF8 *NormalizedString8       = NULL;
-        if (String != NULL && NormalizedForm != NormalizationForm_Unknown) {
+        if (String != NULL && NormalizedForm != NormalizationForm_Unspecified) {
             UTF32 *String32           = UTF8_Decode(String);
             UTF32 *NormalizedString32 = UTF32_Normalize(String32, NormalizedForm);
             NormalizedString8         = UTF8_Encode(NormalizedString32);
@@ -2501,7 +2501,7 @@ extern "C" {
     
     UTF16 *UTF16_Normalize(PlatformIO_Immutable(UTF16 *) String, StringIO_NormalizationForms NormalizedForm) {
         UTF16 *NormalizedString16     = NULL;
-        if (String != NULL && NormalizedForm != NormalizationForm_Unknown) {
+        if (String != NULL && NormalizedForm != NormalizationForm_Unspecified) {
             UTF32 *String32           = UTF16_Decode(String);
             UTF32 *NormalizedString32 = UTF32_Normalize(String32, NormalizedForm);
             NormalizedString16        = UTF16_Encode(NormalizedString32);
@@ -2513,7 +2513,7 @@ extern "C" {
     
     UTF32 *UTF32_Normalize(PlatformIO_Immutable(UTF32 *) String, StringIO_NormalizationForms NormalizedForm) {
         UTF32 *NormalizedString = NULL;
-        if (String != NULL && NormalizedForm != NormalizationForm_Unknown) {
+        if (String != NULL && NormalizedForm != NormalizationForm_Unspecified) {
             if (NormalizedForm == NormalizationForm_CanonicalCompose) {
                 UTF32 *Decomposed = UTF32_Decompose(String, NormalizationForm_CanonicalDecompose);
                 NormalizedString  = UTF32_Compose(Decomposed, NormalizationForm_CanonicalCompose);
@@ -2529,8 +2529,8 @@ extern "C" {
             }
         } else if (String == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (NormalizedForm == NormalizationForm_Unknown) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Unknown Normalization form"));
+        } else if (NormalizedForm == NormalizationForm_Unspecified) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Unspecified Normalization form"));
         }
         return NormalizedString;
     }
@@ -2613,7 +2613,7 @@ extern "C" {
                         }
                     }
                 }
-            } else if ((Base & Base_Decimal) == Base_Decimal || Base == Base_Unknown) {
+            } else if ((Base & Base_Decimal) == Base_Decimal || Base == Base_Unspecified) {
                 Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Invalid Base %u"), Base);
             }
             Value                      *= Sign;
@@ -2824,8 +2824,8 @@ extern "C" {
             }
         } else if ((Base & Base_Decimal) != Base_Decimal) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Base must be Base_Decimal"));
-        } else if (Base == Base_Unknown) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Base_Unknown is invalid"));
+        } else if (Base == Base_Unspecified) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Base_Unspecified is invalid"));
         }
         return String;
     }
@@ -3069,7 +3069,7 @@ extern "C" {
     
     UTF8 *UTF8_Trim(PlatformIO_Immutable(UTF8 *) String, StringIO_TruncationTypes Type, PlatformIO_Immutable(UTF8 **) Strings2Remove) {
         UTF8 *Trimmed = NULL;
-        if (String != NULL && Type != TruncationType_Unknown && Strings2Remove != NULL) {
+        if (String != NULL && Type != TruncationType_Unspecified && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF8_Decode(String);
             UTF32   **Strings2Remove32          = UTF8_StringSet_Decode(Strings2Remove);
             UTF32    *Trimmed32                 = UTF32_Trim((PlatformIO_Immutable(UTF32*)) String32, Type, (PlatformIO_Immutable(UTF32**)) Strings2Remove32);
@@ -3078,8 +3078,8 @@ extern "C" {
             UTF32_Deinit(String32);
         } else if (String == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (Type == TruncationType_Unknown) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("TruncationType_Unknown is invalid"));
+        } else if (Type == TruncationType_Unspecified) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("TruncationType_Unspecified is invalid"));
         } else if (Strings2Remove == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Strings2Remove Pointer is NULL"));
         }
@@ -3088,7 +3088,7 @@ extern "C" {
     
     UTF16 *UTF16_Trim(PlatformIO_Immutable(UTF16 *) String, StringIO_TruncationTypes Type, PlatformIO_Immutable(UTF16 **) Strings2Remove) {
         UTF16 *Trimmed = NULL;
-        if (String != NULL && Type != TruncationType_Unknown && Strings2Remove != NULL) {
+        if (String != NULL && Type != TruncationType_Unspecified && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF16_Decode(String);
             UTF32   **Strings2Remove32          = UTF16_StringSet_Decode(Strings2Remove);
             UTF32    *Trimmed32                 = UTF32_Trim((PlatformIO_Immutable(UTF32*)) String32, Type, (PlatformIO_Immutable(UTF32**)) Strings2Remove32);
@@ -3097,8 +3097,8 @@ extern "C" {
             UTF32_Deinit(String32);
         } else if (String == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (Type == TruncationType_Unknown) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("TruncationType_Unknown is invalid"));
+        } else if (Type == TruncationType_Unspecified) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("TruncationType_Unspecified is invalid"));
         } else if (Strings2Remove == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Strings2Remove Pointer is NULL"));
         }
@@ -3107,7 +3107,7 @@ extern "C" {
     
     UTF32 *UTF32_Trim(PlatformIO_Immutable(UTF32 *) String, StringIO_TruncationTypes Type, PlatformIO_Immutable(UTF32 **) Strings2Remove) {
         UTF32 *Trimmed = NULL;
-        if (String != NULL && Type != TruncationType_Unknown && Strings2Remove != NULL) {
+        if (String != NULL && Type != TruncationType_Unspecified && Strings2Remove != NULL) {
             uint64_t   StringSize          = UTF32_GetStringSizeInCodePoints(String);
             uint64_t   NumRemovalStrings   = UTF32_StringSet_GetNumStrings(Strings2Remove);
             uint64_t  *RemovalStringSizes  = UTF32_StringSet_GetStringSizesInCodePoints(Strings2Remove);
@@ -3187,8 +3187,8 @@ extern "C" {
             }
         } else if (String == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (Type == TruncationType_Unknown) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("TruncationType_Unknown is invalid"));
+        } else if (Type == TruncationType_Unspecified) {
+            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("TruncationType_Unspecified is invalid"));
         } else if (Strings2Remove == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Strings2Remove Pointer is NULL"));
         }

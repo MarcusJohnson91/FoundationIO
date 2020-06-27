@@ -35,7 +35,7 @@ extern "C" {
     void FormatSpecifiers_Deinit(FormatSpecifiers *Specifiers) {
         if (Specifiers != NULL) {
             for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
-                if (Specifiers->NumUniqueSpecifiers < Specifiers->NumSpecifiers && Specifiers->Specifiers[Specifier].PositionFlag != Position_Unknown) {
+                if (Specifiers->NumUniqueSpecifiers < Specifiers->NumSpecifiers && Specifiers->Specifiers[Specifier].PositionFlag != Position_Unspecified) {
                     // Find the actual argument from the Position by looking up the Position -1 in UniqueSpecifiers, then going to that argument and freeing it.
                     uint64_t Pos = Specifiers->Specifiers[Specifier].Position;
                     UTF32_Deinit(Specifiers->Specifiers[Pos].Argument);
@@ -82,7 +82,7 @@ extern "C" {
     }
     
     static FoundationIO_Bases ConvertModifierType2Base(FormatIO_ModifierTypes ModifierType) {
-        FoundationIO_Bases Base = Base_Unknown;
+        FoundationIO_Bases Base = Base_Unspecified;
         if ((ModifierType & ModifierType_Integer) == ModifierType_Integer) {
             Base               |= Base_Integer;
             if ((ModifierType & ModifierType_Radix2) == ModifierType_Radix2) {
@@ -121,7 +121,7 @@ extern "C" {
                 uint64_t Specifier2 = 0ULL;
                 for (Specifier1 = 0ULL; Specifier1 < Specifiers->NumSpecifiers; Specifier1++) {
                     for (Specifier2 = 0ULL; Specifier2 < Specifier1; Specifier2++) {
-                        if (Specifiers->Specifiers[Specifier1].PositionFlag != Position_Unknown && Specifiers->Specifiers[Specifier1].Position == Specifiers->Specifiers[Specifier2].Position) {
+                        if (Specifiers->Specifiers[Specifier1].PositionFlag != Position_Unspecified && Specifiers->Specifiers[Specifier1].Position == Specifiers->Specifiers[Specifier2].Position) {
                             break;
                         }
                     }
@@ -137,7 +137,7 @@ extern "C" {
                     uint64_t Specifier                                        = 0ULL;
                     for (uint64_t UniqueSpecifier = 0ULL; UniqueSpecifier < Specifiers->NumUniqueSpecifiers; UniqueSpecifier++) {
                         for (Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
-                            if (Specifiers->Specifiers[Specifier].PositionFlag != Position_Unknown && Specifiers->Specifiers[Specifier].Position == Index) {
+                            if (Specifiers->Specifiers[Specifier].PositionFlag != Position_Unspecified && Specifiers->Specifiers[Specifier].Position == Index) {
                                 Specifiers->UniqueSpecifiers[UniqueSpecifier] = Specifier;
                                 Index += 1;
                                 break;
@@ -155,7 +155,6 @@ extern "C" {
 
     static void FormatIO_StringTypeIsDefault(FormatSpecifiers *Specifiers, uint64_t Specifier) {
         switch (Specifiers->StringType) {
-            case StringType_Unknown: // Literally can't happen, here just to get rid of the warning
             case StringType_UTF8:
                 Specifiers->Specifiers[Specifier].ModifierType   = ModifierType_UTF8;
                 break;
@@ -165,6 +164,9 @@ extern "C" {
             case StringType_UTF32:
                 Specifiers->Specifiers[Specifier].ModifierType   = ModifierType_UTF32;
                 break;
+            case StringType_Unspecified:
+            default: // Literally can't happen, here just to get rid of the warning
+                Specifiers->Specifiers[Specifier].ModifierType   = ModifierType_Unspecified;
         }
     }
 
@@ -864,13 +866,13 @@ extern "C" {
         if (Specifiers != NULL) {
             uint64_t                 Position                              = 0ULL;
             uint64_t                 NumSpecifiers                         = 0ULL;
-            FormatIO_BaseTypes       BaseType                              = BaseType_Unknown;
-            FormatIO_ModifierTypes   ModifierType                          = ModifierType_Unknown;
-            FormatIO_ModifierLengths LengthType                            = ModifierLength_Unknown;
-            FormatIO_MinWidths       MinWidthType                          = MinWidth_Unknown;
-            FormatIO_Positions       PositionType                          = Position_Unknown;
-            FormatIO_Precisions      PrecisionType                         = Precision_Unknown;
-            FormatIO_Flags           FlagType                              = Flag_Unknown;
+            FormatIO_BaseTypes       BaseType                              = BaseType_Unspecified;
+            FormatIO_ModifierTypes   ModifierType                          = ModifierType_Unspecified;
+            FormatIO_ModifierLengths LengthType                            = ModifierLength_Unspecified;
+            FormatIO_MinWidths       MinWidthType                          = MinWidth_Unspecified;
+            FormatIO_Positions       PositionType                          = Position_Unspecified;
+            FormatIO_Precisions      PrecisionType                         = Precision_Unspecified;
+            FormatIO_Flags           FlagType                              = Flag_Unspecified;
             uint64_t                 UniqueSpecifier2                      = 0ULL;
             
             while (Position < Specifiers->NumUniqueSpecifiers) {
@@ -1118,7 +1120,7 @@ extern "C" {
                 
                 UTF32                        *Argument                      = NULL;
                 
-                if (Specifiers->NumUniqueSpecifiers < Specifiers->NumSpecifiers && Specifiers->Specifiers[Specifier].PositionFlag != Position_Unknown) {
+                if (Specifiers->NumUniqueSpecifiers < Specifiers->NumSpecifiers && Specifiers->Specifiers[Specifier].PositionFlag != Position_Unspecified) {
                     uint64_t Pos                                            = Specifiers->UniqueSpecifiers[Specifiers->Specifiers[Specifier].Position - 1];
                     Argument                                                = Specifiers->Specifiers[Pos].Argument;
                 } else {
@@ -1145,7 +1147,7 @@ extern "C" {
                 } else if ((BaseType & BaseType_Literal) == BaseType_Literal && (ModifierType & ModifierType_Percent) == ModifierType_Percent) {
                     //FormattedStrings[Specifier + 1]                        = UTF32_SubstituteSubString(FormattedStrings[Specifier], UTF32String("%"), Start, End - Start);
                 } else {
-                    if (MinWidthType != MinWidth_Unknown) {
+                    if (MinWidthType != MinWidth_Unspecified) {
                         uint64_t MinWidth                                  = Specifiers->Specifiers[Specifier].MinWidth;
                         uint64_t ArgSize                                   = UTF32_GetStringSizeInCodePoints(Specifiers->Specifiers[Specifier].Argument);
                         uint64_t PadSize                                   = 0ULL;
@@ -1163,7 +1165,7 @@ extern "C" {
                                 UTF32_Deinit(Padded);
                             }
                         }
-                    } else if (PrecisionType != Precision_Unknown) {
+                    } else if (PrecisionType != Precision_Unspecified) {
                         // Cut or extend the string so it fits
                     }
                     
