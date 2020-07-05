@@ -865,7 +865,6 @@ extern "C" {
     void Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments) {
         if (Specifiers != NULL) {
             uint64_t                 Position                              = 0ULL;
-            uint64_t                 NumSpecifiers                         = 0ULL;
             FormatIO_BaseTypes       BaseType                              = BaseType_Unspecified;
             FormatIO_ModifierTypes   ModifierType                          = ModifierType_Unspecified;
             FormatIO_ModifierLengths LengthType                            = ModifierLength_Unspecified;
