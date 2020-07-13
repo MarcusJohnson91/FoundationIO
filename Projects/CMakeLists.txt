@@ -36,9 +36,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHI
 set(RUNTIME_OUTPUT_DIRECTORY       "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${ARCHITECTURE}/${BUILDTYPE}")
 
 set(FOUNDATIONIO_HEADERS
-"${Library_Dir}/include/BitIO.h"
+"${Library_Dir}/include/BufferIO.h"
 "${Library_Dir}/include/CryptographyIO.h"
+"${Library_Dir}/include/FileIO.h"
 "${Library_Dir}/include/MathIO.h"
+"${Library_Dir}/include/NetworkIO.h"
 "${Library_Dir}/include/PlatformIO.h"
 "${Library_Dir}/include/TestIO.h"
 )
@@ -53,9 +55,11 @@ set(UNICODEIO_HEADERS
 )
 
 set(Library_Sources
-"${Library_Dir}/src/BitIO.c"
+"${Library_Dir}/src/BufferIO.c"
 "${Library_Dir}/src/CryptographyIO.c"
+"${Library_Dir}/src/FileIO.c"
 "${Library_Dir}/src/MathIO.c"
+"${Library_Dir}/src/NetworkIO.c"
 "${Library_Dir}/src/PlatformIO.c"
 "${Library_Dir}/src/TestIO.c"
 "${Library_Dir}/src/UnicodeIO/CommandLineIO.c"
@@ -90,23 +94,32 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 set_target_properties(FoundationIO PROPERTIES PREFIX "")
 
 if(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
-    add_executable(Test_BitIO "${Test_Dir}/Test_BitIO.c")
+    add_executable(Test_BufferIO "${Test_Dir}/Test_BufferIO.c")
     add_executable(Test_CommandLineIO "${Test_Dir}/Test_CommandLineIO.c")
-    add_executable(Test_StringIO "${Test_Dir}/Test_StringIO.c")
-    add_executable(Test_MathIO "${Test_Dir}/Test_MathIO.c")
     add_executable(Test_CryptographyIO "${Test_Dir}/Test_CryptographyIO.c")
+    add_executable(Test_FormatIO "${Test_Dir}/Test_FormatIO.c")
+    add_executable(Test_FileIO "${Test_Dir}/Test_FileIO.c")
+    add_executable(Test_MathIO "${Test_Dir}/Test_MathIO.c")
+    add_executable(Test_NetworkIO "${Test_Dir}/Test_NetworkIO.c")
+    add_executable(Test_StringIO "${Test_Dir}/Test_StringIO.c")
 
-    target_link_libraries(Test_BitIO FoundationIO)
+    target_link_libraries(Test_BufferIO FoundationIO)
     target_link_libraries(Test_CommandLineIO FoundationIO)
-    target_link_libraries(Test_StringIO FoundationIO)
-    target_link_libraries(Test_MathIO FoundationIO)
     target_link_libraries(Test_CryptographyIO FoundationIO)
+    target_link_libraries(Test_FormatIO FoundationIO)
+    target_link_libraries(Test_FileIO FoundationIO)
+    target_link_libraries(Test_MathIO FoundationIO)
+    target_link_libraries(Test_NetworkIO FoundationIO)
+    target_link_libraries(Test_StringIO FoundationIO)
 
-    add_test(Test_BitIO CONFIGURATIONS Debug RelWithDebInfo)
+    add_test(Test_BufferIO CONFIGURATIONS Debug RelWithDebInfo)
     add_test(Test_CommandLineIO CONFIGURATIONS Debug RelWithDebInfo)
-    add_test(Test_StringIO CONFIGURATIONS Debug RelWithDebInfo)
-    add_test(Test_MathIO CONFIGURATIONS Debug RelWithDebInfo)
     add_test(Test_CryptographyIO CONFIGURATIONS Debug RelWithDebInfo)
+    add_test(Test_FormatIO CONFIGURATIONS Debug RelWithDebInfo)
+    add_test(Test_FileIO CONFIGURATIONS Debug RelWithDebInfo)
+    add_test(Test_MathIO CONFIGURATIONS Debug RelWithDebInfo)
+    add_test(Test_NetworkIO CONFIGURATIONS Debug RelWithDebInfo)
+    add_test(Test_StringIO CONFIGURATIONS Debug RelWithDebInfo)
 endif(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
 
 if(NOT DEFINED ${CMAKE_INSTALL_PREFIX})
@@ -127,11 +140,14 @@ install(FILES ${UNICODEIO_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/U
 install(FILES "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/FoundationIO.pc" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
 
 if(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
-    install(TARGETS Test_BitIO          DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS Test_BufferIO       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     install(TARGETS Test_CommandLineIO  DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-    install(TARGETS Test_StringIO       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-    install(TARGETS Test_MathIO         DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     install(TARGETS Test_CryptographyIO DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS Test_FormatIO       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS Test_FileIO         DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS Test_MathIO         DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS Test_NetworkIO      DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS Test_StringIO       DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")
 
 if(${CMAKE_C_COMPILER_ID} MATCHES "AppleClang" OR ${CMAKE_C_COMPILER_ID} MATCHES "Clang")

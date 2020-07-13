@@ -1,4 +1,4 @@
-#include "../include/BitIO.h"              /* Included for our declarations */
+#include "../include/BufferIO.h"           /* Included for our declarations */
 #include "../include/Private/Constants.h"  /* Included for BitMaskTables */
 #include "../include/CryptographyIO.h"     /* Included for SecureRNG_GenerateInteger for GUUID_Generate */
 #include "../include/MathIO.h"             /* Included for Integer functions */
@@ -10,10 +10,10 @@
 extern "C" {
 #endif
     
-    typedef enum BitIO_Constants {
+    typedef enum BufferIO_Constants {
         GUUIDString_Size                = 20,
         BinaryGUUID_Size                = 16,
-    } BitIO_Constants;
+    } BufferIO_Constants;
     
     /* Start BitBuffer section */
     typedef struct BitBuffer {
@@ -21,21 +21,6 @@ extern "C" {
         uint64_t   BitOffset;
         uint64_t   NumBits;
     } BitBuffer;
-    
-    typedef struct BitInput {
-        FILE            *File;
-        uint64_t         FilePosition;
-        uint64_t         FileSize;
-        int              Socket;
-        BitIO_FileTypes  FileType;
-    } BitInput;
-    
-    typedef struct BitOutput {
-        FILE            *File;
-        uint64_t         FilePosition;
-        int              Socket;
-        BitIO_FileTypes  FileType;
-    } BitOutput;
     
     BitBuffer *BitBuffer_Init(uint64_t BitBufferSize) {
         BitBuffer *BitB                  = (BitBuffer*) calloc(1, sizeof(BitBuffer));
@@ -52,37 +37,6 @@ extern "C" {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate BitBuffer"));
         }
         return BitB;
-    }
-    
-    void BitBuffer_Read(BitBuffer *BitB, BitInput *BitI) {
-        if (BitB != NULL && BitI != NULL) {
-            uint64_t Bytes2Read    = Bits2Bytes(BitB->NumBits - BitB->BitOffset, RoundingType_Down);
-            uint8_t  Bits2Save     = BitB->BitOffset % 8;
-            if (Bits2Save > 0) {
-                BitB->Buffer[0]    = 0;
-                uint8_t Saved      = BitB->Buffer[Bytes2Read + 1] & BitMaskTable[Bits2Save - 1];
-                BitB->Buffer[0]    = Saved;
-                BitB->BitOffset    = Bits2Save;
-                for (uint64_t Byte = (uint64_t) Bits2Bytes(BitB->BitOffset, RoundingType_Up); Byte < (uint64_t) Bits2Bytes(BitB->NumBits, RoundingType_Down); Byte++) {
-                    BitB->Buffer[Byte] = 0;
-                }
-            }
-            uint64_t BytesRead     = 0ULL;
-            if (BitI->FileType == FileType_File) {
-                BytesRead          = PlatformIO_Read(BitI->File, BitB->Buffer, sizeof(BitB->Buffer[0]), Bytes2Read);
-            } else if (BitI->FileType == FileType_Socket) {
-                BytesRead          = PlatformIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
-            }
-            if (BytesRead == Bytes2Read) {
-                BitB->NumBits      = (BytesRead * 8) + BitB->BitOffset;
-            } else {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Num bytes read %llu does not match num bytes requested %llu"), BytesRead, Bytes2Read);
-            }
-        } else if (BitB == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
-        } else if (BitI == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitInput Pointer is NULL"));
-        }
     }
     
     uint64_t BitBuffer_GetSize(BitBuffer *BitB) {
@@ -227,34 +181,6 @@ extern "C" {
             }
         } else {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
-        }
-    }
-    
-    void BitBuffer_Refresh(BitBuffer *BitB, BitInput *BitI) {
-        if (BitB != NULL && BitI != NULL) {
-            uint64_t Bytes2Read      = BitB->NumBits / 8;
-            uint64_t BytesRead       = 0ULL;
-            if (BitI->FileType == FileType_File) {
-                BytesRead            = PlatformIO_Read(BitI->File, BitB->Buffer, sizeof(BitB->Buffer[0]), Bytes2Read);
-            } else if (BitI->FileType == FileType_Socket) {
-                BytesRead            = PlatformIO_Socket_Read(BitI->Socket, BitB->Buffer, Bytes2Read);
-            }
-            if (BytesRead != Bytes2Read) {
-                uint8_t *Buffer_Old  = BitB->Buffer;
-                BitB->Buffer         = (uint8_t*) realloc(BitB->Buffer, BytesRead);
-                if (BitB->Buffer != NULL) {
-                    BitB->BitOffset  = 0;
-                    BitB->NumBits    = BytesRead * 8;
-                    free(Buffer_Old);
-                } else {
-                    BitB->Buffer    = Buffer_Old;
-                    Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Realloc failed"));
-                }
-            }
-        } else if (BitB == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
-        } else if (BitI == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitInput Pointer is NULL"));
         }
     }
     
@@ -507,7 +433,7 @@ extern "C" {
         UTF32 *BitBufferString = NULL;
         if (BitB != NULL && Length >= 1 && Length <= 64) {
             BitBuffer_Seek(BitB, BitB->BitOffset - Length);
-            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %P, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), &BitB, BitB->NumBits, BitB->BitOffset, BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitIO_BitOrder_MSBit, Length));
+            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %P, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), &BitB, BitB->NumBits, BitB->BitOffset, BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, Length));
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (Length == 0) {
@@ -518,19 +444,19 @@ extern "C" {
         return BitBufferString;
     }
     
-    uint64_t BitBuffer_PeekBits(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t Bits2Peek) {
+    uint64_t BitBuffer_PeekBits(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t Bits2Peek) {
         uint64_t OutputData  = 0ULL;
         if (BitB != NULL && (Bits2Peek >= 1 && Bits2Peek <= 64) && (Bits2Peek <= (BitB->BitOffset - BitB->NumBits))) {
             if (ByteOrder == ByteOrder_LSByteIsNearest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     OutputData          = BitBuffer_Extract_LSByteLSBit(BitB, Bits2Peek);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     OutputData          = BitBuffer_Extract_LSByteMSBit(BitB, Bits2Peek);
                 }
             } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     OutputData         = BitBuffer_Extract_MSByteLSBit(BitB, Bits2Peek);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     OutputData         = BitBuffer_Extract_MSByteMSBit(BitB, Bits2Peek);
                 }
             }
@@ -543,19 +469,19 @@ extern "C" {
         return OutputData;
     }
     
-    uint8_t BitBuffer_ReadBits8(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t Bits2Read) {
+    uint8_t BitBuffer_ReadBits8(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t Bits2Read) {
         uint8_t OutputData    = 0U;
         if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
             if (ByteOrder == ByteOrder_LSByteIsNearest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     OutputData          = (uint8_t) BitBuffer_Extract_LSByteLSBit(BitB, Bits2Read);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     OutputData          = (uint8_t) BitBuffer_Extract_LSByteMSBit(BitB, Bits2Read);
                 }
             } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     OutputData         = (uint8_t) BitBuffer_Extract_MSByteLSBit(BitB, Bits2Read);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     OutputData         = (uint8_t) BitBuffer_Extract_MSByteMSBit(BitB, Bits2Read);
                 }
             }
@@ -567,19 +493,19 @@ extern "C" {
         return OutputData;
     }
     
-    uint16_t BitBuffer_ReadBits16(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t Bits2Read) {
+    uint16_t BitBuffer_ReadBits16(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t Bits2Read) {
         uint16_t OutputData    = 0U;
         if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
             if (ByteOrder == ByteOrder_LSByteIsNearest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     OutputData          = (uint16_t) BitBuffer_Extract_LSByteLSBit(BitB, Bits2Read);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     OutputData          = (uint16_t) BitBuffer_Extract_LSByteMSBit(BitB, Bits2Read);
                 }
             } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     OutputData         = (uint16_t) BitBuffer_Extract_MSByteLSBit(BitB, Bits2Read);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     OutputData         = (uint16_t) BitBuffer_Extract_MSByteMSBit(BitB, Bits2Read);
                 }
             }
@@ -591,19 +517,19 @@ extern "C" {
         return OutputData;
     }
     
-    uint32_t BitBuffer_ReadBits32(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t Bits2Read) {
+    uint32_t BitBuffer_ReadBits32(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t Bits2Read) {
         uint32_t OutputData    = 0UL;
         if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
             if (ByteOrder == ByteOrder_LSByteIsNearest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     OutputData          = (uint32_t) BitBuffer_Extract_LSByteLSBit(BitB, Bits2Read);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     OutputData          = (uint32_t) BitBuffer_Extract_LSByteMSBit(BitB, Bits2Read);
                 }
             } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     OutputData         = (uint32_t) BitBuffer_Extract_MSByteLSBit(BitB, Bits2Read);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     OutputData         = (uint32_t) BitBuffer_Extract_MSByteMSBit(BitB, Bits2Read);
                 }
             }
@@ -615,19 +541,19 @@ extern "C" {
         return OutputData;
     }
     
-    uint64_t BitBuffer_ReadBits64(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t Bits2Read) {
+    uint64_t BitBuffer_ReadBits64(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t Bits2Read) {
         uint64_t OutputData    = 0UL;
         if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
             if (ByteOrder == ByteOrder_LSByteIsNearest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     OutputData          = (uint32_t) BitBuffer_Extract_LSByteLSBit(BitB, Bits2Read);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     OutputData          = (uint32_t) BitBuffer_Extract_LSByteMSBit(BitB, Bits2Read);
                 }
             } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     OutputData         = (uint32_t) BitBuffer_Extract_MSByteLSBit(BitB, Bits2Read);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     OutputData         = (uint32_t) BitBuffer_Extract_MSByteMSBit(BitB, Bits2Read);
                 }
             }
@@ -639,21 +565,21 @@ extern "C" {
         return OutputData;
     }
     
-    uint64_t BitBuffer_ReadUnary(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, BitIO_UnaryTypes UnaryType, BitIO_UnaryTerminators StopBit) {
+    uint64_t BitBuffer_ReadUnary(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, BufferIO_UnaryTypes UnaryType, BufferIO_UnaryTerminators StopBit) {
         uint64_t OutputData    = 0ULL;
         if (BitB != NULL) {
             uint8_t CurrentBit = StopBit ^ 1;
             do {
                 if (ByteOrder == ByteOrder_LSByteIsNearest) {
-                    if (BitOrder == BitIO_BitOrder_LSBit) {
+                    if (BitOrder == BitOrder_LSBitIsNearest) {
                         CurrentBit          = (uint8_t) BitBuffer_Extract_LSByteLSBit(BitB, 1);
-                    } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                    } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                         CurrentBit          = (uint8_t) BitBuffer_Extract_LSByteMSBit(BitB, 1);
                     }
                 } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-                    if (BitOrder == BitIO_BitOrder_LSBit) {
+                    if (BitOrder == BitOrder_LSBitIsNearest) {
                         CurrentBit         = (uint8_t) BitBuffer_Extract_MSByteLSBit(BitB, 1);
-                    } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                    } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                         CurrentBit         = (uint8_t) BitBuffer_Extract_MSByteMSBit(BitB, 1);
                     }
                 }
@@ -722,7 +648,7 @@ extern "C" {
         return ExtractedString;
     }
     
-    uint8_t *BitBuffer_ReadGUUID(BitBuffer *BitB, BitIO_GUUIDTypes GUUID2Read) {
+    uint8_t *BitBuffer_ReadGUUID(BitBuffer *BitB, BufferIO_GUUIDTypes GUUID2Read) {
         uint8_t *GUUID = NULL;
         if (GUUID2Read != GUUIDType_Unspecified && BitB != NULL && (BitBuffer_GetSize(BitB) - BitBuffer_GetPosition(BitB)) >= BinaryGUUID_Size) {
             if (GUUID2Read == GUUIDType_BinaryUUID || GUUID2Read == GUUIDType_BinaryGUID) {
@@ -768,18 +694,18 @@ extern "C" {
         return GUUID;
     }
     
-    void BitBuffer_WriteBits(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, uint8_t NumBits2Write, uint64_t Bits2Write) {
+    void BitBuffer_WriteBits(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t NumBits2Write, uint64_t Bits2Write) {
         if (BitB != NULL) {
             if (ByteOrder == ByteOrder_LSByteIsNearest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     BitBuffer_Append_LSByteLSBit(BitB, NumBits2Write, Bits2Write);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     BitBuffer_Append_LSByteMSBit(BitB, NumBits2Write, Bits2Write);
                 }
             } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     BitBuffer_Append_MSByteLSBit(BitB, NumBits2Write, Bits2Write);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     BitBuffer_Append_MSByteMSBit(BitB, NumBits2Write, Bits2Write);
                 }
             }
@@ -790,7 +716,7 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteUnary(BitBuffer *BitB, BitIO_ByteOrders ByteOrder, BitIO_BitOrders BitOrder, BitIO_UnaryTypes UnaryType, BitIO_UnaryTerminators StopBit, uint8_t UnaryBits2Write) {
+    void BitBuffer_WriteUnary(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, BufferIO_UnaryTypes UnaryType, BufferIO_UnaryTerminators StopBit, uint8_t UnaryBits2Write) {
         if (BitB != NULL) {
             uint8_t EndBit      = StopBit == UnaryTerminator_Zero ? 0 : 1;
             uint8_t Field2Write = UnaryBits2Write;
@@ -799,18 +725,18 @@ extern "C" {
             }
             
             if (ByteOrder == ByteOrder_LSByteIsNearest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     BitBuffer_Append_LSByteLSBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
                     BitBuffer_Append_LSByteLSBit(BitB, 1, EndBit);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     BitBuffer_Append_LSByteMSBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
                     BitBuffer_Append_LSByteMSBit(BitB, 1, EndBit);
                 }
             } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
-                if (BitOrder == BitIO_BitOrder_LSBit) {
+                if (BitOrder == BitOrder_LSBitIsNearest) {
                     BitBuffer_Append_MSByteLSBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
                     BitBuffer_Append_MSByteLSBit(BitB, 1, EndBit);
-                } else if (BitOrder == BitIO_BitOrder_MSBit) {
+                } else if (BitOrder == BitOrder_LSBitIsFarthest) {
                     BitBuffer_Append_MSByteMSBit(BitB, (uint8_t) Logarithm(2, Field2Write), StopBit ^ 1);
                     BitBuffer_Append_MSByteMSBit(BitB, 1, EndBit);
                 }
@@ -820,7 +746,7 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write, BitIO_StringTerminators WriteType) {
+    void BitBuffer_WriteUTF8(BitBuffer *BitB, UTF8 *String2Write, BufferIO_StringTerminators WriteType) {
         if (BitB != NULL && String2Write != NULL) {
             uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(String2Write);
             if (WriteType == StringTerminator_NULL) {
@@ -847,7 +773,7 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteUTF16(BitBuffer *BitB, UTF16 *String2Write, BitIO_StringTerminators WriteType) {
+    void BitBuffer_WriteUTF16(BitBuffer *BitB, UTF16 *String2Write, BufferIO_StringTerminators WriteType) {
         if (BitB != NULL && String2Write != NULL) {
             uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(String2Write);
             if (WriteType == StringTerminator_NULL) {
@@ -874,7 +800,7 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteGUUID(BitBuffer *BitB, BitIO_GUUIDTypes GUUIDType, uint8_t *GUUID2Write) {
+    void BitBuffer_WriteGUUID(BitBuffer *BitB, BufferIO_GUUIDTypes GUUIDType, uint8_t *GUUID2Write) {
         if (BitB != NULL && GUUID2Write != NULL) {
             static const uint8_t GUUIDSizeInBits[4] = {168, 168, 128, 128};
             if (BitB->BitOffset + GUUIDSizeInBits[GUUIDType] <= BitB->NumBits) {
@@ -890,34 +816,6 @@ extern "C" {
         }
     }
     
-    void BitBuffer_Write(BitBuffer *BitB, BitOutput *BitO) {
-        if (BitB != NULL && BitO != NULL) {
-            uint64_t Bytes2Write  = Bits2Bytes(BitBuffer_GetPosition(BitB), RoundingType_Down);
-            uint64_t Bits2Keep    = BitB->BitOffset % 8;
-            uint64_t BytesWritten = 0ULL;
-            if (BitO->FileType == FileType_File) {
-                BytesWritten      = PlatformIO_Write(BitO->File, sizeof(BitB->Buffer[0]), BitB->Buffer, Bytes2Write);
-            } else if (BitO->FileType == FileType_Socket) {
-                BytesWritten      = PlatformIO_Write(BitO->File, sizeof(BitB->Buffer[0]), BitB->Buffer, Bytes2Write);
-                BytesWritten      = PlatformIO_Socket_Write(BitO->Socket, BitB->Buffer, Bytes2Write);
-            }
-            if (BytesWritten == Bytes2Write) {
-                BitB->Buffer[0] = 0;
-                BitB->Buffer[0] = BitB->Buffer[Bytes2Write + 1] & (Exponentiate(2, Bits2Keep) << (8 - Bits2Keep));
-                BitB->BitOffset = Bits2Keep + 1;
-                for (uint64_t Byte = (uint64_t) Bits2Bytes(BitB->BitOffset, RoundingType_Up); Byte < (uint64_t) Bits2Bytes(BitB->NumBits, RoundingType_Down); Byte++) {
-                    BitB->Buffer[Byte] = 0;
-                }
-            } else {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Wrote %lld of %lld bits"), BytesWritten * 8, Bytes2Write * 8);
-            }
-        } else if (BitB == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
-        } else if (BitO == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitOutput Pointer is NULL"));
-        }
-    }
-    
     void BitBuffer_Deinit(BitBuffer *BitB) {
         if (BitB != NULL) {
             free(BitB->Buffer);
@@ -929,168 +827,8 @@ extern "C" {
     /* BitBuffer Resource Management */
     /* End BitBuffer section */
     
-    /* BitInput */
-    BitInput *BitInput_Init(void) {
-        BitInput *BitI = (BitInput*) calloc(1, sizeof(BitInput));
-        if (BitI == NULL) {
-            BitInput_Deinit(BitI);
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate BitInput"));
-        }
-        return BitI;
-    }
-
-    void BitInput_SetFile(BitInput *BitI, FILE *File) {
-        if (BitI != NULL && File != NULL) {
-            BitI->File = File;
-        } else if (BitI == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitInput Pointer is NULL"));
-        } else if (File == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
-        }
-    }
-    
-    void BitInput_OpenSocket(BitInput *BitI, int Domain, int Type, int Protocol) {
-        if (BitI != NULL) {
-            BitI->FileType = FileType_Socket;
-            BitI->Socket   = PlatformIO_Socket_Create(Domain, Type, Protocol);
-        } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitInput Pointer is NULL"));
-        }
-    }
-    
-    void BitInput_ConnectSocket(BitInput *BitI, struct sockaddr *SocketAddress, uint32_t SocketSize) {
-        if (BitI != NULL && SocketAddress != NULL) {
-            BitI->FileType = FileType_Socket;
-            PlatformIO_Socket_Connect(BitI->Socket, SocketAddress, SocketSize);
-        } else if (BitI == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitInput Pointer is NULL"));
-        } else if (SocketAddress == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SocketAddress Pointer is NULL"));
-        }
-    }
-    
-    static void BitInput_FindFileSize(BitInput *BitI) {
-        if (BitI != NULL) {
-            PlatformIO_Seek(BitI->File, 0, SeekType_End);
-            BitI->FileSize     = (uint64_t) PlatformIO_GetSize(BitI->File);
-            PlatformIO_Seek(BitI->File, 0, SeekType_Beginning);
-            BitI->FilePosition = (uint64_t) PlatformIO_GetSize(BitI->File);
-        } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitInput Pointer is NULL"));
-        }
-    }
-    
-    uint64_t BitInput_GetFileSize(BitInput *BitI) {
-        uint64_t InputSize = 0ULL;
-        if (BitI != NULL) {
-            if (BitI->FileSize == 0) {
-                BitInput_FindFileSize(BitI);
-            }
-            InputSize     = BitI->FileSize;
-        } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitInput Pointer is NULL"));
-        }
-        return InputSize;
-    }
-    
-    uint64_t BitInput_GetFilePosition(BitInput *BitI) {
-        uint64_t Position = 0ULL;
-        if (BitI != NULL) {
-            if (BitI->FilePosition == 0) {
-                BitInput_FindFileSize(BitI);
-            }
-            Position    = BitI->FilePosition;
-        } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitInput Pointer is NULL"));
-        }
-        return Position;
-    }
-    
-    uint64_t BitInput_BytesRemaining(BitInput *BitI) {
-        uint64_t BytesLeft = 0ULL;
-        if (BitI != NULL) {
-            if (BitI->FilePosition == 0) {
-                BitInput_FindFileSize(BitI);
-            }
-            BytesLeft    = BitI->FileSize - BitI->FilePosition;
-        } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitInput Pointer is NULL"));
-        }
-        return BytesLeft;
-    }
-    
-    void BitInput_Deinit(BitInput *BitI) {
-        if (BitI != NULL) {
-            if (BitI->FileType == FileType_File) {
-                PlatformIO_Close(BitI->File);
-            } else if (BitI->FileType == FileType_Socket) {
-                PlatformIO_Socket_Close(BitI->Socket);
-            }
-            free(BitI);
-        } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitInput Pointer is NULL"));
-        }
-    }
-    /* BitInput */
-    
-    
-    /* BitOutput */
-    BitOutput *BitOutput_Init(void) {
-        BitOutput *BitO = (BitOutput*) calloc(1, sizeof(BitOutput));
-        if (BitO == NULL) {
-            BitOutput_Deinit(BitO);
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate BitOutput"));
-        }
-        return BitO;
-    }
-
-    void BitOutput_SetFile(BitOutput *BitO, FILE *File) {
-        if (BitO != NULL && File != NULL) {
-            BitO->File = File;
-        } else if (BitO == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitOutput Pointer is NULL"));
-        } else if (File == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
-        }
-    }
-    
-    void BitOutput_OpenSocket(BitOutput *BitO, int Domain, int Type, int Protocol) {
-        if (BitO != NULL) {
-            BitO->FileType  = FileType_Socket;
-            BitO->Socket    = PlatformIO_Socket_Create(Domain, Type, Protocol);
-        } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitInput Pointer is NULL"));
-        }
-    }
-    
-    void BitOutput_ConnectSocket(BitOutput *BitO, struct sockaddr *SocketAddress, uint64_t SocketSize) {
-        if (BitO != NULL && SocketAddress != NULL) {
-            BitO->FileType = FileType_Socket;
-            PlatformIO_Socket_Connect(BitO->Socket, SocketAddress, SocketSize);
-        } else if (BitO == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitOutput Pointer is NULL"));
-        } else if (SocketAddress == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SocketAddress Pointer is NULL"));
-        }
-    }
-    
-    void BitOutput_Deinit(BitOutput *BitO) {
-        if (BitO != NULL) {
-            fflush(BitO->File);
-            if (BitO->FileType == FileType_File) {
-                PlatformIO_Close(BitO->File);
-            } else if (BitO->FileType == FileType_Socket) {
-                PlatformIO_Socket_Close(BitO->Socket);
-            }
-            free(BitO);
-        } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitOutput Pointer is NULL"));
-        }
-    }
-    /* BitOutput */
-    
     /* GUUID */
-    uint8_t *GUUID_Generate(SecureRNG *Random, BitIO_GUUIDTypes GUUIDType) {
+    uint8_t *GUUID_Generate(SecureRNG *Random, BufferIO_GUUIDTypes GUUIDType) {
         uint8_t *GUUID                   = 0;
         if (Random != NULL && GUUIDType != GUUIDType_Unspecified) {
             uint64_t LowBits             = SecureRNG_GenerateInteger(Random, 64);
@@ -1122,7 +860,7 @@ extern "C" {
         return GUUID;
     }
     
-    bool GUUID_Compare(BitIO_GUUIDTypes Type2Compare, uint8_t *GUUID1, uint8_t *GUUID2) {
+    bool GUUID_Compare(BufferIO_GUUIDTypes Type2Compare, uint8_t *GUUID1, uint8_t *GUUID2) {
         uint8_t GUUIDSize       = ((Type2Compare == GUUIDType_GUIDString || Type2Compare == GUUIDType_UUIDString) ? BinaryGUUID_Size : BinaryGUUID_Size);
         bool GUUIDsMatch        = Yes;
         if (GUUID1 != NULL && GUUID2 != NULL && Type2Compare != GUUIDType_Unspecified) {
@@ -1141,7 +879,7 @@ extern "C" {
         return GUUIDsMatch;
     }
     
-    uint8_t *GUUID_Convert(BitIO_GUUIDTypes InputType, BitIO_GUUIDTypes OutputType, uint8_t *GUUID2Convert) {
+    uint8_t *GUUID_Convert(BufferIO_GUUIDTypes InputType, BufferIO_GUUIDTypes OutputType, uint8_t *GUUID2Convert) {
         uint8_t  Dash = '-';
         uint8_t  OutputGUUIDSize = ((OutputType == GUUIDType_GUIDString || OutputType == GUUIDType_UUIDString) ? GUUIDString_Size : BinaryGUUID_Size);
         uint8_t *ConvertedGUUID  = (uint8_t*) calloc(OutputGUUIDSize, sizeof(uint8_t));
@@ -1187,7 +925,7 @@ extern "C" {
         return ConvertedGUUID;
     }
     
-    uint8_t *GUUID_Swap(BitIO_GUUIDTypes GUUIDType, uint8_t *GUUID2Swap) {
+    uint8_t *GUUID_Swap(BufferIO_GUUIDTypes GUUIDType, uint8_t *GUUID2Swap) {
         uint8_t *SwappedGUUID = NULL;
         if (GUUID2Swap != NULL && GUUIDType != GUUIDType_Unspecified) {
             uint8_t Dash = '-';
