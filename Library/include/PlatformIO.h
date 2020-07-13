@@ -416,16 +416,7 @@ extern "C" {
 #define             PlatformIO_Immutable(PointerType) const PointerType const
 #endif
 
-#ifndef             PlatformIO_Immutable2
-#define             PlatformIO_Immutable2(PointerType, Variable)
-#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-#undef              PlatformIO_Immutable2
-#define             PlatformIO_Immutable2(PointerType, Variable) const PointerType const Variable
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#undef              PlatformIO_Immutable2
-#define             PlatformIO_Immutable2(PointerType, Variable) const_cast<const PointerType const>(Variable)
-#endif /* PlatformIO_Language */
-#endif /* PlatformIO_Immutable2 */
+
 
 
     
