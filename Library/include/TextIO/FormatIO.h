@@ -236,8 +236,10 @@ extern "C" {
      @param               Format                  A string with optional format specifiers.
      @return                                      Returns the formatted string encoded using the UTF-8 format.
      */
-#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang || PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
-    UTF8             *UTF8_Format(PlatformIO_Immutable(UTF8 *) Format, ...) __attribute__((__format__(__printf__, 1, 2)));
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
+    UTF8             *UTF8_Format(PlatformIO_Immutable(UTF8 *) Format, ...) __attribute__((format(printf, 1, 2)));
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+    UTF8             *UTF8_Format(PlatformIO_Immutable(UTF8 *) Format, ...);
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF8             *UTF8_Format(__format_string PlatformIO_Immutable(UTF8 *) Format, ...);
@@ -251,8 +253,10 @@ extern "C" {
     @param               Format                   A string with optional format specifiers.
     @return                                       Returns the formatted string encoded using the UTF-8 format.
     */
-#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang || PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
-    UTF16                *UTF16_Format(PlatformIO_Immutable(UTF16 *) Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
+    UTF16                *UTF16_Format(PlatformIO_Immutable(UTF16 *) Format, ...) __attribute__((format(wprintf, 1, 2)));
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+    UTF16                *UTF16_Format(PlatformIO_Immutable(UTF16 *) Format, ...);
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF16                *UTF16_Format(__format_string PlatformIO_Immutable(UTF16 *) Format, ...);
@@ -266,8 +270,10 @@ extern "C" {
     @param               Format                   A string with optional format specifiers.
     @return                                       Returns the formatted string encoded using the UTF-8 format.
     */
-#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang || PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
-    UTF32                *UTF32_Format(PlatformIO_Immutable(UTF32 *) Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
+    UTF32                *UTF32_Format(PlatformIO_Immutable(UTF32 *) Format, ...) __attribute__((format(wprintf, 1, 2)));
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+    UTF32                *UTF32_Format(PlatformIO_Immutable(UTF32 *) Format, ...);
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
     UTF32                *UTF32_Format(__format_string PlatformIO_Immutable(UTF32 *) Format, ...);

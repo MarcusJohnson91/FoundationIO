@@ -51,8 +51,10 @@ extern "C" {
      @param      FunctionName                    Which function is calling Log?
      @param      Description                     String describing what went wrong.
      */
-#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang  || PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
-    void         Log(LogIO_Severities Severity, PlatformIO_Immutable(UTF8 *) FunctionName, PlatformIO_Immutable(UTF8 *) Description, ...) __attribute__((__format__(__printf__, 3, 4)));
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
+    void         Log(LogIO_Severities Severity, PlatformIO_Immutable(UTF8 *) FunctionName, PlatformIO_Immutable(UTF8 *) Description, ...) __attribute__((format(printf, 3, 4)));
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+    void         Log(LogIO_Severities Severity, PlatformIO_Immutable(UTF8 *) FunctionName, PlatformIO_Immutable(UTF8 *) Description, ...);
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 #if      (_MSC_VER >= 1400 && _MSC_VER < 1500)
     void         Log(LogIO_Severities Severity, PlatformIO_Immutable(UTF8 *) FunctionName, __format_string PlatformIO_Immutable(UTF8 *) Description, ...);
