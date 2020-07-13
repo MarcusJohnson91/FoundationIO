@@ -38,15 +38,11 @@ extern "C" {
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
         constexpr inline FormatIO_BaseTypes operator | (FormatIO_BaseTypes A, FormatIO_BaseTypes B) {
-            uint8_t A1 = static_cast<uint8_t>(A);
-            uint8_t B1 = static_cast<uint8_t>(B);
-            return static_cast<FormatIO_BaseTypes>(A1 | B1);
+            return static_cast<FormatIO_BaseTypes>(static_cast<uint8_t>(A) | static_cast<uint8_t>(B));
         }
         
         constexpr inline FormatIO_BaseTypes operator & (FormatIO_BaseTypes A, FormatIO_BaseTypes B) {
-            uint8_t A1 = static_cast<uint8_t>(A);
-            uint8_t B1 = static_cast<uint8_t>(B);
-            return static_cast<FormatIO_BaseTypes>(A1 & B1);
+            return static_cast<FormatIO_BaseTypes>(static_cast<uint8_t>(A) & static_cast<uint8_t>(B));
         }
         
         constexpr inline FormatIO_BaseTypes operator |= (FormatIO_BaseTypes A, FormatIO_BaseTypes B) {
@@ -90,15 +86,11 @@ extern "C" {
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
         constexpr inline FormatIO_ModifierTypes operator | (FormatIO_ModifierTypes A, FormatIO_ModifierTypes B) {
-            uint32_t A1 = static_cast<uint32_t>(A);
-            uint32_t B1 = static_cast<uint32_t>(B);
-            return static_cast<FormatIO_ModifierTypes>(A1 | B1);
+            return static_cast<FormatIO_ModifierTypes>(static_cast<uint32_t>(A) | static_cast<uint32_t>(B));
         }
         
         constexpr inline FormatIO_ModifierTypes operator & (FormatIO_ModifierTypes A, FormatIO_ModifierTypes B) {
-            uint32_t A1 = static_cast<uint32_t>(A);
-            uint32_t B1 = static_cast<uint32_t>(B);
-            return static_cast<FormatIO_ModifierTypes>(A1 & B1);
+            return static_cast<FormatIO_ModifierTypes>(static_cast<uint32_t>(A) & static_cast<uint32_t>(B));
         }
         
         constexpr inline FormatIO_ModifierTypes operator |= (FormatIO_ModifierTypes A, FormatIO_ModifierTypes B) {
@@ -131,15 +123,11 @@ extern "C" {
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
         constexpr inline FormatIO_ModifierLengths operator | (FormatIO_ModifierLengths A, FormatIO_ModifierLengths B) {
-            uint8_t A1 = static_cast<uint8_t>(A);
-            uint8_t B1 = static_cast<uint8_t>(B);
-            return static_cast<FormatIO_ModifierLengths>(A1 | B1);
+            return static_cast<FormatIO_ModifierLengths>(static_cast<uint8_t>(A) | static_cast<uint8_t>(B));
         }
         
         constexpr inline FormatIO_ModifierLengths operator & (FormatIO_ModifierLengths A, FormatIO_ModifierLengths B) {
-            uint8_t A1 = static_cast<uint8_t>(A);
-            uint8_t B1 = static_cast<uint8_t>(B);
-            return static_cast<FormatIO_ModifierLengths>(A1 & B1);
+            return static_cast<FormatIO_ModifierLengths>(static_cast<uint8_t>(A) & static_cast<uint8_t>(B));
         }
         
         constexpr inline FormatIO_ModifierLengths operator |= (FormatIO_ModifierLengths A, FormatIO_ModifierLengths B) {

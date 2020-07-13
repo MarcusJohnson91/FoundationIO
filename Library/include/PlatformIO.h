@@ -475,15 +475,11 @@ extern "C" {
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
         constexpr inline PlatformIO_FileModes operator | (PlatformIO_FileModes A, PlatformIO_FileModes B) {
-            uint8_t A1 = static_cast<uint8_t>(A);
-            uint8_t B1 = static_cast<uint8_t>(B);
-            return static_cast<PlatformIO_FileModes>(A1 | B1);
+            return static_cast<PlatformIO_FileModes>(static_cast<uint8_t>(A) | static_cast<uint8_t>(B));
         }
 
         constexpr inline PlatformIO_FileModes operator & (PlatformIO_FileModes A, PlatformIO_FileModes B) {
-            uint8_t A1 = static_cast<uint8_t>(A);
-            uint8_t B1 = static_cast<uint8_t>(B);
-            return static_cast<PlatformIO_FileModes>(A1 & B1);
+            return static_cast<PlatformIO_FileModes>(static_cast<uint8_t>(A) & static_cast<uint8_t>(B));
         }
 
         constexpr inline PlatformIO_FileModes operator |= (PlatformIO_FileModes A, PlatformIO_FileModes B) {
