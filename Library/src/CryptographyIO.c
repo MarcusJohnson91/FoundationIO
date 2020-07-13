@@ -205,7 +205,7 @@ extern "C" {
 #include <linux/random.h>
             getrandom(&RandomValue, NumBytes, GRND_BLOCK);
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
-            BCryptGenRandom(NULL, &RandomValue, NumBytes, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+            BCryptGenRandom(NULL, (PUCHAR) &RandomValue, NumBytes, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
 #else
             FILE *RandomFile          = PlatformIO_OpenUTF8(UTF8String("/dev/urandom"), FileMode_Read | FileMode_Binary);
             size_t BytesRead          = PlatformIO_Read(RandomFile, &RandomValue, sizeof(RandomValue), 1);
@@ -230,7 +230,7 @@ extern "C" {
                 }
                 PlatformIO_Close(RandomFile);
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
-                NTSTATUS Status           = BCryptGenRandom(NULL, Random->EntropyPool, Random->EntropySize, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+                NTSTATUS Status           = BCryptGenRandom(NULL, (PUCHAR) Random->EntropyPool, Random->EntropySize, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
                 if (Status <= 0) {
                     Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
                     abort();
@@ -625,7 +625,7 @@ extern "C" {
             uint16_t B = 0;
 
             for (uint64_t Byte = Start; Byte < NumBytes - 1; Byte++) {
-                uint8_t Value = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitIO_BitOrder_LSBit, 8);
+                uint8_t Value = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, 8);
                 A = (A + Value) % 65521;
                 B = (B + A)     % 65521;
             }
@@ -646,7 +646,7 @@ extern "C" {
         if (BitB != NULL && Start * 8 < BitBuffer_GetSize(BitB) && (Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
             for (uint64_t Byte = Start; Byte < NumBytes - 1; Byte++) {
                 uint32_t Polynomial = 0x82608EDB;
-                uint8_t  Data       = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitIO_BitOrder_LSBit, 8);
+                uint8_t  Data       = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, 8);
                 Output             ^= Data;
                 for (uint8_t Bit = 0; Bit < 8; Bit++) {
                     if (Output & 1) {
