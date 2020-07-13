@@ -8,7 +8,7 @@ extern "C" {
 #endif
     
     void Test_CountDigits(void) {
-        SecureRNG *Random        = Entropy_Init(8 * 1000000);
+        SecureRNG *Random      = SecureRNG_Init(8 * 1000000);
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
             uint8_t  NumBits   = SecureRNG_GenerateInteger(Random, 6);
             int64_t  Value     = SecureRNG_GenerateInteger(Random, NumBits);
@@ -23,7 +23,7 @@ extern "C" {
     }
     
     void Test_Logarithm(void) {
-        SecureRNG *Random      = Entropy_Init(64 * 6 * 1000000);
+        SecureRNG *Random    = SecureRNG_Init(64 * 6 * 1000000);
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
             uint8_t  NumBits = SecureRNG_GenerateInteger(Random, 6);
             int64_t  Value   = SecureRNG_GenerateInteger(Random, NumBits);
@@ -35,7 +35,7 @@ extern "C" {
     }
     
     void Test_MinMax(void) {
-        SecureRNG *Random      = Entropy_Init(4096);
+        SecureRNG *Random    = SecureRNG_Init(4096);
         
         for (uint16_t Loop = 0; Loop < 512; Loop++) {
             uint8_t NumBits  = SecureRNG_GenerateInteger(Random, 8);
@@ -52,11 +52,11 @@ extern "C" {
     }
     
     void Test_Decimals() {
-        SecureRNG *Random  = Entropy_Init(4096);
+        SecureRNG *Random  = SecureRNG_Init(4096);
         
-        double  Decimal  = Entropy_GenerateDecimal(Random);
-        double  Ceiled   = CeilD(Decimal);
-        double  Floored  = FloorD(Decimal);
+        double  Decimal    = SecureRNG_GenerateDecimal(Random);
+        double  Ceiled     = CeilD(Decimal);
+        double  Floored    = FloorD(Decimal);
     }
     
     int main() {

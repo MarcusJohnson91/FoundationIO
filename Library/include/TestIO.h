@@ -22,7 +22,7 @@ extern "C" {
 
     /*
      Test Grouping:
-     So, Each Module needs to be tested, BitIO, CommandLineIO, etc
+     So, Each Module needs to be tested, BufferIO, FileIO, CommandLineIO, etc
      within each Module there needs to be tests for each data structure and function.
      within each function there neds to be an individual test case.
      */
