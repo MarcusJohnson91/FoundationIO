@@ -329,7 +329,7 @@ extern "C" {
                 }
                 UTF8_StringSet_Deinit(GeneratedHelp8);
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
-                UTF16 **GeneratedHelp16 = UTF16_StringSet_Encode(GeneratedHelp);
+                UTF16 **GeneratedHelp16 = UTF16_StringSet_Encode((PlatformIO_Immutable(UTF32 **)) GeneratedHelp);
                 for (uint64_t String = 0; String < StringSetSize; String++) {
                     UTF16_WriteSentence(stdout, GeneratedHelp16[String]);
                 }
@@ -906,9 +906,9 @@ extern "C" {
         DigitSize       += Logarithm(10, Red);
         DigitSize       += Logarithm(10, Green);
         DigitSize       += Logarithm(10, Blue);
-        UTF32 *IntegerR  = UTF32_Integer2String(Red, Base_Integer | Base_Radix10);
+        UTF32 *IntegerR  = UTF32_Integer2String(Red,   Base_Integer | Base_Radix10);
         UTF32 *IntegerG  = UTF32_Integer2String(Green, Base_Integer | Base_Radix10);
-        UTF32 *IntegerB  = UTF32_Integer2String(Blue, Base_Integer | Base_Radix10);
+        UTF32 *IntegerB  = UTF32_Integer2String(Blue,  Base_Integer | Base_Radix10);
         DigitSize       += 8;
         if ((ColorType & ColorType_Foreground) == ColorType_Foreground) {
             UTF32 *Formatted = UTF32_Format(UTF32String("%c[38;2;%d;%d;%d;m"), UTF32Character('\x1B'), IntegerR, IntegerG, IntegerB);

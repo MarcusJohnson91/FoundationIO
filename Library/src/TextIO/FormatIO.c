@@ -63,13 +63,13 @@ extern "C" {
                     Specifiers->Specifiers[Specifier].MinWidth       = 0ULL;
                     Specifiers->Specifiers[Specifier].Precision      = 0ULL;
                     Specifiers->Specifiers[Specifier].Position       = 0ULL;
-                    Specifiers->Specifiers[Specifier].ModifierType   = 0ULL;
-                    Specifiers->Specifiers[Specifier].Flag           = 0ULL;
-                    Specifiers->Specifiers[Specifier].BaseType       = 0ULL;
-                    Specifiers->Specifiers[Specifier].LengthModifier = 0ULL;
-                    Specifiers->Specifiers[Specifier].MinWidthFlag   = 0ULL;
-                    Specifiers->Specifiers[Specifier].PrecisionFlag  = 0ULL;
-                    Specifiers->Specifiers[Specifier].PositionFlag   = 0ULL;
+                    Specifiers->Specifiers[Specifier].ModifierType   = ModifierType_Unspecified;
+                    Specifiers->Specifiers[Specifier].Flag           = Flag_Unspecified;
+                    Specifiers->Specifiers[Specifier].BaseType       = BaseType_Unspecified;
+                    Specifiers->Specifiers[Specifier].LengthModifier = ModifierLength_Unspecified;
+                    Specifiers->Specifiers[Specifier].MinWidthFlag   = MinWidth_Unspecified;
+                    Specifiers->Specifiers[Specifier].PrecisionFlag  = Precision_Unspecified;
+                    Specifiers->Specifiers[Specifier].PositionFlag   = Position_Unspecified;
                 }
             } else {
                 FormatSpecifiers_Deinit(Specifiers);
@@ -82,7 +82,7 @@ extern "C" {
     }
     
     static UnicodeIO_Bases ConvertModifierType2Base(FormatIO_ModifierTypes ModifierType) {
-        UnicodeIO_Bases Base = Base_Unspecified;
+        UnicodeIO_Bases Base    = Base_Unspecified;
         if ((ModifierType & ModifierType_Integer) == ModifierType_Integer) {
             Base               |= Base_Integer;
             if ((ModifierType & ModifierType_Radix2) == ModifierType_Radix2) {
@@ -970,10 +970,10 @@ extern "C" {
                 } else if ((BaseType & BaseType_Pointer) == BaseType_Pointer) {
                     if ((ModifierType & ModifierType_Radix16) == ModifierType_Radix16) {
                         uint64_t Value                                     = va_arg(Arguments, uint64_t);
-                        Specifiers->Specifiers[Position].Argument          = UTF32_Integer2String(Value, Base_Integer | Base_Radix16 | Base_Uppercase);
+                        Specifiers->Specifiers[Position].Argument          = UTF32_Integer2String(Value, (Base_Integer | Base_Radix16 | Base_Uppercase));
                     } else if ((ModifierType & ModifierType_Lowercase) == ModifierType_Lowercase) {
                         uint64_t Value                                     = va_arg(Arguments, uint64_t);
-                        Specifiers->Specifiers[Position].Argument          = UTF32_Integer2String(Value, Base_Integer | Base_Radix16 | Base_Lowercase);
+                        Specifiers->Specifiers[Position].Argument          = UTF32_Integer2String(Value, (Base_Integer | Base_Radix16| Base_Lowercase));
                     }
                 }
                 if (Specifiers->NumSpecifiers == Specifiers->NumUniqueSpecifiers) {

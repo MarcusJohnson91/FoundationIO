@@ -101,9 +101,9 @@ extern "C" {
                 }
             }
             if (UTF16_HasBOM(Path16)) {
-                ErrorCode = _wfopen_s(&File, &Path16[UTF16BOMSizeInCodeUnits], ModeString);
+                ErrorCode = _wfopen_s(&File, (const wchar_t*) &Path16[UTF16BOMSizeInCodeUnits], (PlatformIO_Immutable(wchar_t*)) ModeString);
             } else {
-                ErrorCode = _wfopen_s(&File, &Path16[UTF16BOMSizeInCodeUnits], ModeString);
+                ErrorCode = _wfopen_s(&File, (const wchar_t*) &Path16[UTF16BOMSizeInCodeUnits], (PlatformIO_Immutable(wchar_t*)) ModeString);
             }
 #endif /* PlatformIO_TargetOS */
             if (File != NULL) {
@@ -196,9 +196,9 @@ extern "C" {
             }
 
             if (UTF16_HasBOM(Path16)) {
-                ErrorCode = _wfopen_s(&File, &Path16[UTF16BOMSizeInCodeUnits], ModeString);
+                ErrorCode = _wfopen_s(&File, (const wchar_t*) &Path16[UTF16BOMSizeInCodeUnits], (PlatformIO_Immutable(wchar_t*)) ModeString);
             } else {
-                ErrorCode = _wfopen_s(&File, &Path16, ModeString);
+                ErrorCode = _wfopen_s(&File, (const wchar_t*) &Path16, (PlatformIO_Immutable(wchar_t*)) ModeString);
             }
             if (ErrorCode != 0) {
                 Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't open %ls, got Error: %u"), (wchar_t*) Path, ErrorCode);

@@ -26,8 +26,8 @@ extern "C" {
             Log_LogFile = stderr;
         }
 
-        const UTF32 *Error    = UTF32String("ERROR");
-        const UTF32 *Mistake  = UTF32String("Mistake");
+        PlatformIO_Immutable(UTF32 *) Error   = UTF32String("ERROR");
+        PlatformIO_Immutable(UTF32 *) Mistake = UTF32String("Mistake");
         
         UTF32 *SecurityName   = NULL;
         if (Log_ProgramName != NULL) {

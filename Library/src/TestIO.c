@@ -112,7 +112,7 @@ extern "C" {
             clock_gettime(CLOCK_MONOTONIC, TimeSpec);
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
             LARGE_INTEGER WinCounter;
-            bool Success    = QueryPerformanceCounter(CurrentTime);
+            bool Success    = QueryPerformanceCounter(&WinCounter);
             if (Success) {
                 CurrentTime = WinCounter.QuadPart;
             }
