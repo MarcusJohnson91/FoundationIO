@@ -207,7 +207,7 @@ CreateCanonicalNormalizationTable() {
 CreateHeaderFileBottom() {
     printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
     printf "}\n"
-    printf "#endif /* C */\n\n"
+    printf "#endif /* Extern C */\n\n"
     printf "#endif /* FoundationIO_UnicodeIO_UnicodeTables_H */\n"
 } >> "$HeaderFile"
 

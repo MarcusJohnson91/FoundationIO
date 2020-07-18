@@ -154,4 +154,4 @@ extern "C" {
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
-#endif
+#endif /* Extern C */

@@ -465,6 +465,6 @@ typedef                   char32_t                             UTF32;
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
-#endif
+#endif /* Extern C */
 
 #endif /* FoundationIO_UnicodeIO_UnicodeIOTypes_H */

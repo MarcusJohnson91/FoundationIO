@@ -26328,6 +26328,6 @@ extern "C" {
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
-#endif /* C */
+#endif /* Extern C */
 
 #endif /* FoundationIO_UnicodeIO_UnicodeTables_H */

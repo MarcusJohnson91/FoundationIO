@@ -14,7 +14,7 @@
 #ifndef FoundationIO_NetworkIO_H
 #define FoundationIO_NetworkIO_H
 
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
     
@@ -28,8 +28,8 @@ extern "C" {
 
     // So we'll need to get the MAC address of the router or whatever is on the other end of the device that the cable or signal is connected to, how do we do this?
     
-#ifdef __cplusplus
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
-#endif
+#endif /* Extern C */
 
 #endif /* FoundationIO_NetworkIO_H */
