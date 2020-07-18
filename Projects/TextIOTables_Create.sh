@@ -17,8 +17,8 @@ CreateHeaderFileTop() {
     CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')])" "$UCD_Data")
     CanonicalNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n "$UCD_Data")
     {
-        printf "#include "../../PlatformIO.h"  /* Included for Platform Independence macros */\n"
-        printf "#include "../UnicodeIOTypes.h" /* Included for UTFX types */\n\n"
+        printf "#include \"../../PlatformIO.h\"  /* Included for Platform Independence macros */\n"
+        printf "#include \"../UnicodeIOTypes.h\" /* Included for UTFX types */\n\n"
         printf "#pragma once\n\n"
         printf "#ifndef FoundationIO_UnicodeIO_UnicodeTables_H\n"
         printf "#define FoundationIO_UnicodeIO_UnicodeTables_H\n\n"
@@ -132,21 +132,21 @@ CreateGraphemeExtensionTable() {
 
 AddUnicodePrefix2CodePoint() {
     if [ "$1" -le 160 ]; then
-        UnicodePrefixedCodePoint=$(printf "\\x%X" "$1")
+        UnicodePrefixedCodePoint=$(printf "\\\\x%X" "$1")
     elif [ "$1" -le 65535 ]; then
-        UnicodePrefixedCodePoint=$(printf "\\u%04X" "$1")
+        UnicodePrefixedCodePoint=$(printf "\\\\u%04X" "$1")
     elif [ "$1" -le 1114111 ]; then
-        UnicodePrefixedCodePoint=$(printf "\\U%08X" "$1")
+        UnicodePrefixedCodePoint=$(printf "\\\\U%08X" "$1")
     fi
 }
 
 AddUnicodePrefix2String() {
     if [ "$1" -le 160 ]; then
-        UnicodePrefixedString=$(printf "%s\\x%X" "$UnicodePrefixedString" "$1")
+        UnicodeReplacementString=$(printf "%s\\\\x%X" "$UnicodeReplacementString" "$1")
     elif [ "$1" -le 65535 ]; then
-        UnicodePrefixedString=$(printf "%s\\u%04X" "$UnicodePrefixedString" "$1")
+        UnicodeReplacementString=$(printf "%s\\\\u%04X" "$UnicodeReplacementString" "$1")
     elif [ "$1" -le 1114111 ]; then
-        UnicodePrefixedString=$(printf "%s\\U%08X" "$UnicodePrefixedString" "$1")
+        UnicodeReplacementString=$(printf "%s\\\\U%08X" "$UnicodeReplacementString" "$1")
     fi
 }
 
@@ -154,16 +154,16 @@ CreateKompatibleNormalizationTable() {
     Kompatible=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[(@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat') and @dt != '' and @dt != '#' and @dt != 'none']" -o '0x' -v @cp -o ': ' -v @dm -n "$UCD_Data" | sed -e 's/ / 0x/g' -e 's/: /:/g' -e 's/ /|/g')
     printf "    static const UTF32 *KompatibleNormalizationTable[KompatibleNormalizationTableSize][2] = {\n" >> "$HeaderFile"
     for line in $Kompatible; do
-        Value1=$(echo "$line" | awk -F ':' '{printf "%u", $1}')
-        AddUnicodePrefix2CodePoint "$Value1"
-        CodePoint=$UnicodePrefixedCodePoint
+        CodePoint2Replace=$(echo "$line" | awk -F ':' '{printf "%u", $1}')
+        AddUnicodePrefix2CodePoint "$CodePoint2Replace"
+        CodePoint="$UnicodePrefixedCodePoint"
         NumCodePoints=$(echo "$line" | awk -F '[:|]' '{print NF}')
-        UnicodePrefixedString=""
-        for Index in $(seq 2 $NumCodePoints); do
-            Value2=$(echo "$line" | awk -F '[:|]' -v Index=$Index '{printf "%u", $Index}')
-            AddUnicodePrefix2String "$Value2"
+        UnicodeReplacementString=""
+        for Index in $(seq 2 "$NumCodePoints"); do
+            ReplacementCodePoint=$(echo "$line" | awk -F '[:|]' -v Index="$Index" '{printf "%u", $Index}')
+            AddUnicodePrefix2String "$ReplacementCodePoint"
         done
-        printf "        {U\"%s\", U\"%s\"},\n" "$CodePoint" "$UnicodePrefixedString" >> "$HeaderFile"
+        printf "        {U\"%s\", U\"%s\"},\n" "$UnicodePrefixedCodePoint" "$UnicodeReplacementString" >> "$HeaderFile"
     done
     printf "    };\n\n" >> "$HeaderFile"
 }
@@ -172,16 +172,16 @@ CreateCaseFoldTable() {
     CaseFold=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')]" -o '0x' -v @cp -o ': ' -v @NFKC_CF -n "$UCD_Data" | sed -e 's/ / 0x/g' -e 's/: /:/g' -e 's/ /|/g')
     printf "    static const UTF32 *CaseFoldTable[CaseFoldTableSize][2] = {\n" >> "$HeaderFile"
     for line in $CaseFold; do
-        Value1=$(echo "$line" | awk -F ':' '{printf "%u", $1}')
-        AddUnicodePrefix2CodePoint "$Value1"
-        CodePoint=$UnicodePrefixedCodePoint
+        CodePoint2Replace=$(echo "$line" | awk -F ':' '{printf "%u", $1}')
+        AddUnicodePrefix2CodePoint "$CodePoint2Replace"
+        CodePoint="$UnicodePrefixedCodePoint"
         NumCodePoints=$(echo "$line" | awk -F '[:|]' '{print NF}')
-        UnicodePrefixedString=""
-        for Index in $(seq 2 $NumCodePoints); do
-            Value2=$(echo "$line" | awk -F '[:|]' -v Index=$Index '{printf "%u", $Index}')
-            AddUnicodePrefix2String "$Value2"
+        UnicodeReplacementString=""
+        for Index in $(seq 2 "$NumCodePoints"); do
+            ReplacementCodePoint=$(echo "$line" | awk -F '[:|]' -v Index="$Index" '{printf "%u", $Index}')
+            AddUnicodePrefix2String "$ReplacementCodePoint"
         done
-        printf "        {U\"%s\", U\"%s\"},\n" "$CodePoint" "$UnicodePrefixedString" >> "$HeaderFile"
+        printf "        {U\"%s\", U\"%s\"},\n" "$UnicodePrefixedCodePoint" "$UnicodeReplacementString" >> "$HeaderFile"
     done
     printf "    };\n\n" >> "$HeaderFile"
 }
@@ -190,16 +190,16 @@ CreateCanonicalNormalizationTable() {
     Canonical=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dm != @cp and @dm != '#' and @dt = 'can']" -o '0x' -v @cp -o ': ' -v @dm -n "$UCD_Data" | sed -e 's/ / 0x/g' -e 's/: /:/g' -e 's/ /|/g')
     printf "    static const UTF32 *CanonicalNormalizationTable[CanonicalNormalizationTableSize][2] = {\n" >> "$HeaderFile"
     for line in $Canonical; do
-        Value1=$(echo "$line" | awk -F ':' '{printf "%u", $1}')
-        AddUnicodePrefix2CodePoint "$Value1"
-        CodePoint=$UnicodePrefixedCodePoint
+        CodePoint2Replace=$(echo "$line" | awk -F ':' '{printf "%u", $1}')
+        AddUnicodePrefix2CodePoint "$CodePoint2Replace"
+        CodePoint="$UnicodePrefixedCodePoint"
         NumCodePoints=$(echo "$line" | awk -F '[:|]' '{print NF}')
-        UnicodePrefixedString=""
-        for Index in $(seq 2 $NumCodePoints); do
-            Value2=$(echo "$line" | awk -F '[:|]' -v Index=$Index '{printf "%u", $Index}')
-            AddUnicodePrefix2String "$Value2"
+        UnicodeReplacementString=""
+        for Index in $(seq 2 "$NumCodePoints"); do
+            ReplacementCodePoint=$(echo "$line" | awk -F '[:|]' -v Index="$Index" '{printf "%u", $Index}')
+            AddUnicodePrefix2String "$ReplacementCodePoint"
         done
-        printf "        {U\"%s\", U\"%s\"},\n" "$CodePoint" "$UnicodePrefixedString" >> "$HeaderFile"
+        printf "        {U\"%s\", U\"%s\"},\n" "$CodePoint" "$UnicodeReplacementString" >> "$HeaderFile"
     done
     printf "    };\n\n" >> "$HeaderFile"
 }
