@@ -1,4 +1,3 @@
-#include "../include/PlatformIO.h"         /* Included for Platform Independence macros */
 #include "../include/UnicodeIO/LogIO.h"    /* Included for logging errors */
 #include "../include/UnicodeIO/StringIO.h" /* Included for Path functions */
 

@@ -8,7 +8,6 @@
  */
 
 #include "PlatformIO.h"               /* Included for Platform Independence macros */
-#include "CryptographyIO.h"           /* Included for SecureRNG */
 #include "UnicodeIO/UnicodeIOTypes.h" /* Included for UTFX types */
 
 #pragma once
@@ -66,6 +65,11 @@ extern "C" {
 #ifndef TestIO_CreateFunctionName
 #define TestIO_CreateFunctionName(Module, Function) TESTIO_CAT(Test_, Module, Function)
 #endif
+
+    /*!
+    @abstract                                    Forward Declaration of CryptographyIO's SecureRNG.
+    */
+    typedef struct SecureRNG SecureRNG;
     
     /*!
      @abstract                                    Gets how accurate the clock is.
