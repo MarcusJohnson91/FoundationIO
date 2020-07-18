@@ -203,13 +203,13 @@ ${CMAKE_C_FLAGS} \
 -Oz \
 ")
 
-set(LINK_FLAGS ${LINK_FLAGS}" \
+set(LINK_FLAGS ${LINK_FLAGS} " \
 -flto=full \
 -lm \
 ")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-set(LINK_FLAGS ${LINK_FLAGS}" \
+set(LINK_FLAGS ${LINK_FLAGS} " \
 -dead_strip_dylibs
 ")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -277,13 +277,13 @@ ${CMAKE_C_FLAGS} \
 -Os \
 ")
 
-set(LINK_FLAGS ${LINK_FLAGS}" \
+set(LINK_FLAGS ${LINK_FLAGS} " \
 -flto=full \
 -lm \
 ")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-set(LINK_FLAGS ${LINK_FLAGS}" \
+set(LINK_FLAGS ${LINK_FLAGS} " \
 -dead_strip_dylibs
 ")
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
