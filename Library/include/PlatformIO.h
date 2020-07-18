@@ -556,6 +556,6 @@ extern "C" {
     
 #ifdef __cplusplus
 }
-#endif
+#endif /* Extern C */
 
-#endif  /* FoundationIO_PlatformIO_H */
+#endif /* FoundationIO_PlatformIO_H */

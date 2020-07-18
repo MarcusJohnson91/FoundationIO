@@ -397,6 +397,6 @@ extern "C" {
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
-#endif
+#endif /* Extern C */
 
-#endif   /* FoundationIO_BufferIO_H */
+#endif /* FoundationIO_BufferIO_H */
