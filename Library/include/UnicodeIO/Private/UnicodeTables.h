@@ -10,9 +10,25 @@
 extern "C" {
 #endif
 
-#define ScriptHash 0ab8d510d2eb2d90b77dc9c07f98f2423cc7cc80
+#define ScriptHash ef0e18f0f67a539db564981efef92e8d14889be5
 
 #define UnicodeVersion 13.0.0
+
+#define IntegerTableBase2Size 2
+
+#define IntegerTableBase8Size 8
+
+#define TableBase10Size 10
+
+#define IntegerTableBase16Size 16
+
+#define DecimalTableBase10Size 11
+
+#define DecimalTableScientificSize 14
+
+#define DecimalTableHexadecimalSize 21
+
+#define MathSeperatorTableSize 4
 
 #define LineBreakTableSize 7
 
@@ -35,6 +51,150 @@ extern "C" {
 #define CaseFoldTableSize 6156
 
 #define CanonicalNormalizationTableSize 13233
+
+    static const UTF32 IntegerTableBase2[IntegerTableBase2Size] = {
+        U'0',
+        U'1',
+    };
+
+    static const UTF32 IntegerTableBase8[IntegerTableBase8Size] = {
+        U'0',
+        U'1',
+        U'2',
+        U'3',
+        U'4',
+        U'5',
+        U'6',
+        U'7',
+    };
+
+    static const UTF32 TableBase10[TableBase10Size] = {
+        U'0',
+        U'1',
+        U'2',
+        U'3',
+        U'4',
+        U'5',
+        U'6',
+        U'7',
+        U'8',
+        U'9',
+    };
+
+    static const UTF32 IntegerTableUppercaseBase16[IntegerTableBase16Size] = {
+        U'0',
+        U'1',
+        U'2',
+        U'3',
+        U'4',
+        U'5',
+        U'6',
+        U'7',
+        U'8',
+        U'9',
+        U'A',
+        U'B',
+        U'C',
+        U'D',
+        U'E',
+        U'F',
+    };
+
+    static const UTF32 IntegerTableLowercaseBase16[IntegerTableBase16Size] = {
+        U'0',
+        U'1',
+        U'2',
+        U'3',
+        U'4',
+        U'5',
+        U'6',
+        U'7',
+        U'8',
+        U'9',
+        U'a',
+        U'b',
+        U'c',
+        U'd',
+        U'e',
+        U'f',
+    };
+
+    static const UTF32 DecimalScientificUppercase[DecimalTableScientificSize] = {
+        U'0',
+        U'1',
+        U'2',
+        U'3',
+        U'4',
+        U'5',
+        U'6',
+        U'7',
+        U'8',
+        U'9',
+        U'E',
+    };
+
+    static const UTF32 DecimalScientificLowercase[DecimalTableScientificSize] = {
+        U'0',
+        U'1',
+        U'2',
+        U'3',
+        U'4',
+        U'5',
+        U'6',
+        U'7',
+        U'8',
+        U'9',
+        U'e',
+    };
+
+    static const UTF32 DecimalHexUppercase[DecimalTableHexadecimalSize] = {
+        U'0',
+        U'1',
+        U'2',
+        U'3',
+        U'4',
+        U'5',
+        U'6',
+        U'7',
+        U'8',
+        U'9',
+        U'A',
+        U'B',
+        U'C',
+        U'D',
+        U'E',
+        U'F',
+        U'P',
+        U'X',
+    };
+
+    static const UTF32 DecimalHexLowercase[DecimalTableHexadecimalSize] = {
+        U'0',
+        U'1',
+        U'2',
+        U'3',
+        U'4',
+        U'5',
+        U'6',
+        U'7',
+        U'8',
+        U'9',
+        U'a',
+        U'b',
+        U'c',
+        U'd',
+        U'e',
+        U'f',
+        U'p',
+        U'x',
+    };
+
+    static const UTF32 MathSeperators[MathSeperatorTableSize] = {
+        U',',
+        U'.',
+        U'\'',
+        U'\x20',
+    };
 
     static const UTF32 LineBreakTable[LineBreakTableSize] = {
         0x00000A,
