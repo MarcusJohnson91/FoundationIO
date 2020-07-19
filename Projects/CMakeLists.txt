@@ -248,6 +248,13 @@ ${CMAKE_C_FLAGS} \
 -Wno-pointer-sign \
 -Wno-sign-conversion \
 -Wno-varargs \
+-Wsuggest-attribute=const \
+-Wsuggest-attribute=pure \
+-Wsuggest-attribute=malloc \
+-Wsuggest-attribute=noreturn \
+-Wsuggest-attribute=format \
+-Wmissing-format-attribute \
+-Wmissing-noreturn \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
