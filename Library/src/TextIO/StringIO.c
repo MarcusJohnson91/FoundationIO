@@ -1,8 +1,7 @@
+#include "../../include/UnicodeIO/StringIO.h"              /* Included for our declarations */
 #include "../../include/MathIO.h"                          /* Included for endian swapping */
-#include "../../include/UnicodeIO/FormatIO.h"              /* Included for the String formatting code */
 #include "../../include/UnicodeIO/LogIO.h"                 /* Included for error logging */
 #include "../../include/UnicodeIO/Private/UnicodeTables.h" /* Included for the Unicode tables */
-#include "../../include/UnicodeIO/StringIO.h"              /* Included for our declarations */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
