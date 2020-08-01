@@ -74,14 +74,14 @@ extern "C" {
     } StringIOCommon;
 
     /*!
-     @enum         StringIO_CodePages
-     @constant     CodePage_Unspecified                  Invalid conversion type.
-     @constant     CodePage_ISO_8859_1                   ISO/IEC 8859-1 to/from Unicode.
+     @enum         StringIO_CharSets
+     @constant     CharSet_Unspecified                   Invalid conversion type.
+     @constant     CharSet_ISO_8859_1                    ISO/IEC 8859-1 to/from Unicode.
      */
-    typedef enum StringIO_CodePages {
-                   CodePage_Unspecified                  = 0,
-                   CodePage_ISO_8859_1                   = 1,
-    } StringIO_CodePages;
+    typedef enum StringIO_CharSets {
+                   CharSet_Unspecified                   = 0,
+                   CharSet_ISO_8859_1                    = 1,
+    } StringIO_CharSets;
     
     /*!
      @enum         StringIO_NormalizationForms
@@ -1260,7 +1260,7 @@ extern "C" {
      @param      CodePage                                The character set to convert the string into.
      @return                                             Returns the equilivent (or as close as possible) string in the new character set.
      */
-    UTF8        *UTF8_ConvertUnicode2CodePage(PlatformIO_Immutable(UTF8 *) String, StringIO_CodePages CodePage);
+    CharSet8    *UTF8_ConvertUnicode2CharSet(PlatformIO_Immutable(UTF8 *) String, StringIO_CharSets CodePage);
 
     /*!
     @abstract                                           Converts a UTF-16 encoded String to the specified CodePage.
@@ -1268,7 +1268,7 @@ extern "C" {
     @param      CodePage                                The character set to convert the string into.
     @return                                             Returns the equilivent (or as close as possible) string in the new character set.
     */
-    UTF16       *UTF16_ConvertUnicode2CodePage(PlatformIO_Immutable(UTF16 *) String, StringIO_CodePages CodePage);
+    CharSet16  *UTF16_ConvertUnicode2CharSet(PlatformIO_Immutable(UTF16 *) String, StringIO_CharSets CodePage);
 
     /*!
     @abstract                                           Converts a UTF-32 encoded String to the specified CodePage.
@@ -1276,7 +1276,7 @@ extern "C" {
     @param      CodePage                                The character set to convert the string into.
     @return                                             Returns the equilivent (or as close as possible) string in the new character set.
     */
-    UTF32       *UTF32_ConvertUnicode2CodePage(PlatformIO_Immutable(UTF32 *) String, StringIO_CodePages CodePage);
+    CharSet32  *UTF32_ConvertUnicode2CharSet(PlatformIO_Immutable(UTF32 *) String, StringIO_CharSets CodePage);
 
     /*!
      @abstract                                           Converts a UTF-8 encoded String to the specified CodePage.
@@ -1284,7 +1284,7 @@ extern "C" {
      @param      CodePage                                The character set to convert the string into.
      @return                                             Returns the equilivent (or as close as possible) string in the new character set.
      */
-    UTF8        *UTF8_ConvertCodePage2Unicode(PlatformIO_Immutable(UTF8 *) String, StringIO_CodePages CodePage);
+    UTF8        *UTF8_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet8 *) String, StringIO_CharSets CodePage);
 
     /*!
     @abstract                                           Converts a UTF-16 encoded String to the specified CodePage.
@@ -1292,7 +1292,7 @@ extern "C" {
     @param      CodePage                                The character set to convert the string into.
     @return                                             Returns the equilivent (or as close as possible) string in the new character set.
     */
-    UTF16       *UTF16_ConvertCodePage2Unicode(PlatformIO_Immutable(UTF16 *) String, StringIO_CodePages CodePage);
+    UTF16       *UTF16_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet16 *) String, StringIO_CharSets CodePage);
 
     /*!
     @abstract                                           Converts a UTF-32 encoded String to the specified CodePage.
@@ -1300,7 +1300,7 @@ extern "C" {
     @param      CodePage                                The character set to convert the string into.
     @return                                             Returns the equilivent (or as close as possible) string in the new character set.
     */
-    UTF32       *UTF32_ConvertCodePage2Unicode(PlatformIO_Immutable(UTF32 *) String, StringIO_CodePages CodePage);
+    UTF32       *UTF32_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet32 *) String, StringIO_CharSets CodePage);
     /* Unicode Conversion */
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
