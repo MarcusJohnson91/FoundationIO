@@ -33,7 +33,7 @@ extern "C" {
 
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
 #ifndef                   __CHAR8_TYPE__
-#define                   __CHAR8_TYPE__ unsigned char
+#define                   __CHAR8_TYPE__                       unsigned char
 typedef                   __CHAR8_TYPE__                       char8_t;
 #endif /* __CHAR8_TYPE__ */
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -42,7 +42,6 @@ typedef                   __CHAR8_TYPE__                       char8_t;
 typedef                   unsigned char                        char8_t;
 #endif /* __cpp_char8_t */
 #endif /* PlatformIO_Language */
-
 
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
 #ifndef                   __STDC_UTF_16__
@@ -63,7 +62,6 @@ typedef                   _Char16_t                            char16_t;
 #ifndef                   __STDC_UTF_32__
 #define                   __STDC_UTF_32__                     (1) /* char32_t values are encoded as UTF-32 */
 #endif
-
 #ifdef                    __CHAR32_TYPE__
 typedef                   __CHAR32_TYPE__                      char32_t;
 #elif !defined(__CHAR32_TYPE__)
@@ -84,30 +82,51 @@ typedef                   uint_least32_t                       char32_t;
 #endif /* PlatformIO_Language */
 
 
-#ifndef                   FoundationIO_StringType8
-#define                   FoundationIO_StringType8 (1)
+#ifndef                   FoundationIO_StringTypes8
+#define                   FoundationIO_StringTypes8 (1)
 #ifdef                    UTF8
 #undef                    UTF8
 #endif /* UTF8 */
+/*!
+@typedef                  UTF8                                 UTF8 is Guaranteed to only contain valid Unicode.
+*/
 typedef                   char8_t                              UTF8;
-#endif /* FoundationIO_StringType8 */
+#ifdef                    CharSet8
+#undef                    CharSet8
+#endif /* CharSet8 */
+typedef                   char8_t                              CharSet8;
+#endif /* FoundationIO_StringTypes8 */
 
-#ifndef                   FoundationIO_StringType16
-#define                   FoundationIO_StringType16 (2)
+#ifndef                   FoundationIO_StringTypes16
+#define                   FoundationIO_StringTypes16 (2)
 #ifdef                    UTF16
 #undef                    UTF16
 #endif /* UTF16 */
+/*!
+@typedef                  UTF16                                UTF16 is Guaranteed to only contain valid Unicode.
+*/
 typedef                   char16_t                             UTF16;
-#endif /* FoundationIO_StringType16 */
+#ifdef                    CharSet16
+#undef                    CharSet16
+#endif /* CharSet16 */
+typedef                   char16_t                             CharSet16;
+#endif /* FoundationIO_StringTypes16 */
 
 
-#ifndef                   FoundationIO_StringType32
-#define                   FoundationIO_StringType32 (2)
+#ifndef                   FoundationIO_StringTypes32
+#define                   FoundationIO_StringTypes32 (2)
 #ifdef                    UTF32
 #undef                    UTF32
 #endif /* UTF32 */
+/*!
+@typedef                  UTF32                                UTF32 is Guaranteed to only contain valid Unicode.
+*/
 typedef                   char32_t                             UTF32;
-#endif /* FoundationIO_StringType32 */
+#ifdef                    CharSet32
+#undef                    CharSet32
+#endif /* CharSet32 */
+typedef                   char32_t                             CharSet32;
+#endif /* FoundationIO_StringTypes32 */
 
 #ifndef                   UnicodeIOTypes_PropertyConversion8
 #define                   UnicodeIOTypes_PropertyConversion8  (1)
