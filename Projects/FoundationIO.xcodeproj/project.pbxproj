@@ -7,29 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C13197224C245350064A655 /* AllocationIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C13197124C245350064A655 /* AllocationIO.c */; };
 		2C410978236BA3320059FE67 /* BufferIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C41096F236BA3050059FE67 /* BufferIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C41097A236BA3320059FE67 /* CryptographyIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CC71D95232B5F43006DA1B8 /* CryptographyIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C41097B236BA3320059FE67 /* PlatformIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CC71D91232B5F43006DA1B8 /* PlatformIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C41097C236BA3320059FE67 /* MathIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CC71D92232B5F43006DA1B8 /* MathIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C41097D236BA3320059FE67 /* TestIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CC71D9A232B5F43006DA1B8 /* TestIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C41097E236BA3320059FE67 /* CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C410965236B9EAC0059FE67 /* CommandLineIO.c */; };
-		2C41097F236BA3320059FE67 /* FormatIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C410966236B9EAC0059FE67 /* FormatIO.c */; };
-		2C410980236BA3320059FE67 /* LogIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C410967236B9EAC0059FE67 /* LogIO.c */; };
-		2C410981236BA3320059FE67 /* StringIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C410968236B9EAC0059FE67 /* StringIO.c */; };
-		2C410982236BA3320059FE67 /* LocalizationIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C410969236B9EAC0059FE67 /* LocalizationIO.c */; };
 		2C410983236BA3320059FE67 /* BufferIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DAF232B5F56006DA1B8 /* BufferIO.c */; };
 		2C410985236BA3320059FE67 /* CryptographyIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DA7232B5F56006DA1B8 /* CryptographyIO.c */; };
 		2C410986236BA3320059FE67 /* PlatformIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DA9232B5F56006DA1B8 /* PlatformIO.c */; };
 		2C410987236BA3320059FE67 /* MathIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DAA232B5F56006DA1B8 /* MathIO.c */; };
 		2C410988236BA3320059FE67 /* TestIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71DAD232B5F56006DA1B8 /* TestIO.c */; };
-		2C70D27A242C025000632A2C /* UnicodeIOTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C70D279242C025000632A2C /* UnicodeIOTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C78B17F2493A8E20098766B /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C78B17E2493A8E20098766B /* Constants.h */; };
-		2C794B0923BB272900282D20 /* FormatIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C794B0423BB272900282D20 /* FormatIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C794B0A23BB272900282D20 /* LogIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C794B0523BB272900282D20 /* LogIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C794B0B23BB272900282D20 /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C794B0623BB272900282D20 /* StringIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C794B0C23BB272900282D20 /* CommandLineIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C794B0723BB272900282D20 /* CommandLineIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C794B0D23BB272900282D20 /* LocalizationIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C794B0823BB272900282D20 /* LocalizationIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2C794B1023BB273900282D20 /* UnicodeTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C794B0F23BB273900282D20 /* UnicodeTables.h */; };
 		2C88500324BCA09100DAD7ED /* NetworkIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C88500224BCA09100DAD7ED /* NetworkIO.c */; };
 		2C88500524BCA0AD00DAD7ED /* NetworkIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C88500424BCA0AD00DAD7ED /* NetworkIO.h */; };
 		2C88500724BCA22A00DAD7ED /* FileIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C88500624BCA22A00DAD7ED /* FileIO.h */; };
@@ -40,6 +29,7 @@
 		2C88503524BCB9BF00DAD7ED /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
 		2C88503824BCB9C600DAD7ED /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
 		2C88503B24BCB9CD00DAD7ED /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
+		2C9D092924BE218E005FC2B8 /* AllocationIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C9D092824BE218E005FC2B8 /* AllocationIO.h */; };
 		2CC71DC6232B5FDF006DA1B8 /* Test_BufferIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71D8A232B5F20006DA1B8 /* Test_BufferIO.c */; };
 		2CC71DFE232B602E006DA1B8 /* Test_CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71D85232B5F20006DA1B8 /* Test_CommandLineIO.c */; };
 		2CC71E00232B6036006DA1B8 /* Test_CryptographyIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71D89232B5F20006DA1B8 /* Test_CryptographyIO.c */; };
@@ -50,6 +40,18 @@
 		2CC71E13232B6424006DA1B8 /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
 		2CC71E14232B6429006DA1B8 /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
 		2CC71E15232B642F006DA1B8 /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
+		2CF0A7EC24D7C07800135BCC /* TextTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7EB24D7C07800135BCC /* TextTables.h */; };
+		2CF0A7EE24D7C08B00135BCC /* TextIOTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7ED24D7C08B00135BCC /* TextIOTypes.h */; };
+		2CF0A7F424D7C0A700135BCC /* FormatIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7EF24D7C0A600135BCC /* FormatIO.h */; };
+		2CF0A7F524D7C0A700135BCC /* CommandLineIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7F024D7C0A600135BCC /* CommandLineIO.h */; };
+		2CF0A7F624D7C0A700135BCC /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7F124D7C0A700135BCC /* StringIO.h */; };
+		2CF0A7F724D7C0A700135BCC /* LocalizationIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7F224D7C0A700135BCC /* LocalizationIO.h */; };
+		2CF0A7F824D7C0A700135BCC /* LogIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7F324D7C0A700135BCC /* LogIO.h */; };
+		2CF0A7FF24D7C56300135BCC /* CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CF0A7FA24D7C56300135BCC /* CommandLineIO.c */; };
+		2CF0A80024D7C56300135BCC /* LocalizationIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CF0A7FB24D7C56300135BCC /* LocalizationIO.c */; };
+		2CF0A80124D7C56300135BCC /* LogIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CF0A7FC24D7C56300135BCC /* LogIO.c */; };
+		2CF0A80224D7C56300135BCC /* StringIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CF0A7FD24D7C56300135BCC /* StringIO.c */; };
+		2CF0A80324D7C56300135BCC /* FormatIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CF0A7FE24D7C56300135BCC /* FormatIO.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -187,20 +189,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2C410965236B9EAC0059FE67 /* CommandLineIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = CommandLineIO.c; sourceTree = "<group>"; };
-		2C410966236B9EAC0059FE67 /* FormatIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = FormatIO.c; sourceTree = "<group>"; };
-		2C410967236B9EAC0059FE67 /* LogIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = LogIO.c; sourceTree = "<group>"; };
-		2C410968236B9EAC0059FE67 /* StringIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = StringIO.c; sourceTree = "<group>"; };
-		2C410969236B9EAC0059FE67 /* LocalizationIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; path = LocalizationIO.c; sourceTree = "<group>"; };
+		2C13197124C245350064A655 /* AllocationIO.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = AllocationIO.c; path = ../Library/src/AllocationIO.c; sourceTree = "<group>"; };
 		2C41096F236BA3050059FE67 /* BufferIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BufferIO.h; path = ../Library/include/BufferIO.h; sourceTree = "<group>"; };
-		2C70D279242C025000632A2C /* UnicodeIOTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnicodeIOTypes.h; path = ../Library/include/UnicodeIO/UnicodeIOTypes.h; sourceTree = "<group>"; };
 		2C78B17E2493A8E20098766B /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Constants.h; path = ../Library/include/Private/Constants.h; sourceTree = "<group>"; };
-		2C794B0423BB272900282D20 /* FormatIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = FormatIO.h; path = ../Library/include/UnicodeIO/FormatIO.h; sourceTree = "<group>"; };
-		2C794B0523BB272900282D20 /* LogIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = LogIO.h; path = ../Library/include/UnicodeIO/LogIO.h; sourceTree = "<group>"; };
-		2C794B0623BB272900282D20 /* StringIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = StringIO.h; path = ../Library/include/UnicodeIO/StringIO.h; sourceTree = "<group>"; };
-		2C794B0723BB272900282D20 /* CommandLineIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = CommandLineIO.h; path = ../Library/include/UnicodeIO/CommandLineIO.h; sourceTree = "<group>"; };
-		2C794B0823BB272900282D20 /* LocalizationIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = LocalizationIO.h; path = ../Library/include/UnicodeIO/LocalizationIO.h; sourceTree = "<group>"; };
-		2C794B0F23BB273900282D20 /* UnicodeTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = UnicodeTables.h; path = ../Library/include/UnicodeIO/Private/UnicodeTables.h; sourceTree = "<group>"; };
 		2C88500224BCA09100DAD7ED /* NetworkIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = NetworkIO.c; path = ../Library/src/NetworkIO.c; sourceTree = "<group>"; };
 		2C88500424BCA0AD00DAD7ED /* NetworkIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = NetworkIO.h; path = ../Library/include/NetworkIO.h; sourceTree = "<group>"; };
 		2C88500624BCA22A00DAD7ED /* FileIO.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FileIO.h; path = ../Library/include/FileIO.h; sourceTree = "<group>"; };
@@ -211,6 +202,7 @@
 		2C88501C24BCB49F00DAD7ED /* Test_NetworkIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_NetworkIO; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C88502924BCB6AD00DAD7ED /* Test_FormatIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_FormatIO; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C88503024BCB6E400DAD7ED /* Test_FormatIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Test_FormatIO.c; path = ../Tests/Test_FormatIO.c; sourceTree = "<group>"; };
+		2C9D092824BE218E005FC2B8 /* AllocationIO.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AllocationIO.h; path = ../Library/include/AllocationIO.h; sourceTree = "<group>"; };
 		2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = FoundationIO.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CC71D85232B5F20006DA1B8 /* Test_CommandLineIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_CommandLineIO.c; path = ../Tests/Test_CommandLineIO.c; sourceTree = "<group>"; };
 		2CC71D86232B5F20006DA1B8 /* Test_StringIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_StringIO.c; path = ../Tests/Test_StringIO.c; sourceTree = "<group>"; };
@@ -231,6 +223,18 @@
 		2CC71DE1232B6009006DA1B8 /* Test_CryptographyIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_CryptographyIO; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CC71DEC232B6013006DA1B8 /* Test_MathIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_MathIO; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CC71DF7232B601B006DA1B8 /* Test_StringIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_StringIO; sourceTree = BUILT_PRODUCTS_DIR; };
+		2CF0A7EB24D7C07800135BCC /* TextTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = TextTables.h; path = ../Library/include/TextIO/Private/TextTables.h; sourceTree = "<group>"; };
+		2CF0A7ED24D7C08B00135BCC /* TextIOTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = TextIOTypes.h; path = ../Library/include/TextIO/TextIOTypes.h; sourceTree = "<group>"; };
+		2CF0A7EF24D7C0A600135BCC /* FormatIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = FormatIO.h; path = ../Library/include/TextIO/FormatIO.h; sourceTree = "<group>"; };
+		2CF0A7F024D7C0A600135BCC /* CommandLineIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = CommandLineIO.h; path = ../Library/include/TextIO/CommandLineIO.h; sourceTree = "<group>"; };
+		2CF0A7F124D7C0A700135BCC /* StringIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = StringIO.h; path = ../Library/include/TextIO/StringIO.h; sourceTree = "<group>"; };
+		2CF0A7F224D7C0A700135BCC /* LocalizationIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = LocalizationIO.h; path = ../Library/include/TextIO/LocalizationIO.h; sourceTree = "<group>"; };
+		2CF0A7F324D7C0A700135BCC /* LogIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = LogIO.h; path = ../Library/include/TextIO/LogIO.h; sourceTree = "<group>"; };
+		2CF0A7FA24D7C56300135BCC /* CommandLineIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = CommandLineIO.c; path = ../Library/src/TextIO/CommandLineIO.c; sourceTree = "<group>"; };
+		2CF0A7FB24D7C56300135BCC /* LocalizationIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = LocalizationIO.c; path = ../Library/src/TextIO/LocalizationIO.c; sourceTree = "<group>"; };
+		2CF0A7FC24D7C56300135BCC /* LogIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = LogIO.c; path = ../Library/src/TextIO/LogIO.c; sourceTree = "<group>"; };
+		2CF0A7FD24D7C56300135BCC /* StringIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = StringIO.c; path = ../Library/src/TextIO/StringIO.c; sourceTree = "<group>"; };
+		2CF0A7FE24D7C56300135BCC /* FormatIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = FormatIO.c; path = ../Library/src/TextIO/FormatIO.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -308,19 +312,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2C410964236B9EAC0059FE67 /* UnicodeIO */ = {
-			isa = PBXGroup;
-			children = (
-				2C410965236B9EAC0059FE67 /* CommandLineIO.c */,
-				2C410966236B9EAC0059FE67 /* FormatIO.c */,
-				2C410969236B9EAC0059FE67 /* LocalizationIO.c */,
-				2C410967236B9EAC0059FE67 /* LogIO.c */,
-				2C410968236B9EAC0059FE67 /* StringIO.c */,
-			);
-			name = UnicodeIO;
-			path = ../Library/src/UnicodeIO;
-			sourceTree = "<group>";
-		};
 		2C78B17D2493A8CD0098766B /* Private */ = {
 			isa = PBXGroup;
 			children = (
@@ -329,24 +320,24 @@
 			name = Private;
 			sourceTree = "<group>";
 		};
-		2C794B0323BB271C00282D20 /* UnicodeIO */ = {
+		2C794B0323BB271C00282D20 /* TextIO */ = {
 			isa = PBXGroup;
 			children = (
 				2C794B0E23BB272D00282D20 /* Private */,
-				2C70D279242C025000632A2C /* UnicodeIOTypes.h */,
-				2C794B0723BB272900282D20 /* CommandLineIO.h */,
-				2C794B0423BB272900282D20 /* FormatIO.h */,
-				2C794B0823BB272900282D20 /* LocalizationIO.h */,
-				2C794B0523BB272900282D20 /* LogIO.h */,
-				2C794B0623BB272900282D20 /* StringIO.h */,
+				2CF0A7ED24D7C08B00135BCC /* TextIOTypes.h */,
+				2CF0A7F024D7C0A600135BCC /* CommandLineIO.h */,
+				2CF0A7EF24D7C0A600135BCC /* FormatIO.h */,
+				2CF0A7F224D7C0A700135BCC /* LocalizationIO.h */,
+				2CF0A7F324D7C0A700135BCC /* LogIO.h */,
+				2CF0A7F124D7C0A700135BCC /* StringIO.h */,
 			);
-			name = UnicodeIO;
+			name = TextIO;
 			sourceTree = "<group>";
 		};
 		2C794B0E23BB272D00282D20 /* Private */ = {
 			isa = PBXGroup;
 			children = (
-				2C794B0F23BB273900282D20 /* UnicodeTables.h */,
+				2CF0A7EB24D7C07800135BCC /* TextTables.h */,
 			);
 			name = Private;
 			sourceTree = "<group>";
@@ -403,7 +394,8 @@
 		2CC71D82232B5EFB006DA1B8 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				2C410964236B9EAC0059FE67 /* UnicodeIO */,
+				2CF0A7F924D7C55300135BCC /* TextIO */,
+				2C13197124C245350064A655 /* AllocationIO.c */,
 				2CC71DAF232B5F56006DA1B8 /* BufferIO.c */,
 				2CC71DA7232B5F56006DA1B8 /* CryptographyIO.c */,
 				2C88500824BCA32B00DAD7ED /* FileIO.c */,
@@ -418,8 +410,9 @@
 		2CC71D83232B5F01006DA1B8 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
-				2C794B0323BB271C00282D20 /* UnicodeIO */,
+				2C794B0323BB271C00282D20 /* TextIO */,
 				2C78B17D2493A8CD0098766B /* Private */,
+				2C9D092824BE218E005FC2B8 /* AllocationIO.h */,
 				2C41096F236BA3050059FE67 /* BufferIO.h */,
 				2CC71D95232B5F43006DA1B8 /* CryptographyIO.h */,
 				2C88500624BCA22A00DAD7ED /* FileIO.h */,
@@ -431,6 +424,18 @@
 			name = Headers;
 			sourceTree = "<group>";
 		};
+		2CF0A7F924D7C55300135BCC /* TextIO */ = {
+			isa = PBXGroup;
+			children = (
+				2CF0A7FA24D7C56300135BCC /* CommandLineIO.c */,
+				2CF0A7FE24D7C56300135BCC /* FormatIO.c */,
+				2CF0A7FB24D7C56300135BCC /* LocalizationIO.c */,
+				2CF0A7FC24D7C56300135BCC /* LogIO.c */,
+				2CF0A7FD24D7C56300135BCC /* StringIO.c */,
+			);
+			name = TextIO;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -438,21 +443,22 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2C794B0C23BB272900282D20 /* CommandLineIO.h in Headers */,
+				2CF0A7F524D7C0A700135BCC /* CommandLineIO.h in Headers */,
+				2CF0A7F624D7C0A700135BCC /* StringIO.h in Headers */,
 				2C88500724BCA22A00DAD7ED /* FileIO.h in Headers */,
+				2CF0A7EC24D7C07800135BCC /* TextTables.h in Headers */,
+				2C9D092924BE218E005FC2B8 /* AllocationIO.h in Headers */,
+				2CF0A7F824D7C0A700135BCC /* LogIO.h in Headers */,
 				2C41097D236BA3320059FE67 /* TestIO.h in Headers */,
 				2C410978236BA3320059FE67 /* BufferIO.h in Headers */,
-				2C794B0923BB272900282D20 /* FormatIO.h in Headers */,
-				2C794B0B23BB272900282D20 /* StringIO.h in Headers */,
-				2C794B0A23BB272900282D20 /* LogIO.h in Headers */,
 				2C78B17F2493A8E20098766B /* Constants.h in Headers */,
 				2C41097C236BA3320059FE67 /* MathIO.h in Headers */,
 				2C41097A236BA3320059FE67 /* CryptographyIO.h in Headers */,
-				2C794B0D23BB272900282D20 /* LocalizationIO.h in Headers */,
-				2C70D27A242C025000632A2C /* UnicodeIOTypes.h in Headers */,
+				2CF0A7F724D7C0A700135BCC /* LocalizationIO.h in Headers */,
+				2CF0A7F424D7C0A700135BCC /* FormatIO.h in Headers */,
 				2C41097B236BA3320059FE67 /* PlatformIO.h in Headers */,
-				2C794B1023BB273900282D20 /* UnicodeTables.h in Headers */,
 				2C88500524BCA0AD00DAD7ED /* NetworkIO.h in Headers */,
+				2CF0A7EE24D7C08B00135BCC /* TextIOTypes.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -713,17 +719,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2C410982236BA3320059FE67 /* LocalizationIO.c in Sources */,
-				2C410980236BA3320059FE67 /* LogIO.c in Sources */,
-				2C41097F236BA3320059FE67 /* FormatIO.c in Sources */,
+				2CF0A80124D7C56300135BCC /* LogIO.c in Sources */,
+				2C13197224C245350064A655 /* AllocationIO.c in Sources */,
 				2C410983236BA3320059FE67 /* BufferIO.c in Sources */,
 				2C410987236BA3320059FE67 /* MathIO.c in Sources */,
 				2C88500324BCA09100DAD7ED /* NetworkIO.c in Sources */,
+				2CF0A80324D7C56300135BCC /* FormatIO.c in Sources */,
 				2C410986236BA3320059FE67 /* PlatformIO.c in Sources */,
+				2CF0A80224D7C56300135BCC /* StringIO.c in Sources */,
 				2C410985236BA3320059FE67 /* CryptographyIO.c in Sources */,
-				2C410981236BA3320059FE67 /* StringIO.c in Sources */,
+				2CF0A80024D7C56300135BCC /* LocalizationIO.c in Sources */,
 				2C88500924BCA32B00DAD7ED /* FileIO.c in Sources */,
-				2C41097E236BA3320059FE67 /* CommandLineIO.c in Sources */,
+				2CF0A7FF24D7C56300135BCC /* CommandLineIO.c in Sources */,
 				2C410988236BA3320059FE67 /* TestIO.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -946,7 +953,7 @@
 				GCC_C_LANGUAGE_STANDARD = c18;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
-				GCC_INPUT_FILETYPE = automatic;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 1;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1039,7 +1046,7 @@
 				GCC_CHAR_IS_UNSIGNED_CHAR = YES;
 				GCC_C_LANGUAGE_STANDARD = c18;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
-				GCC_INPUT_FILETYPE = automatic;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.cpp;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = z;
 				GCC_SHORT_ENUMS = YES;

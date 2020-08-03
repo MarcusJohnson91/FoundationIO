@@ -7,8 +7,8 @@
  @terminology         Test Case: individual test; Test Suite: group of similar test cases;
  */
 
-#include "PlatformIO.h"               /* Included for Platform Independence macros */
-#include "UnicodeIO/UnicodeIOTypes.h" /* Included for UTFX types */
+#include "PlatformIO.h"         /* Included for Platform Independence macros */
+#include "TextIO/TextIOTypes.h" /* Included for Text types */
 
 #pragma once
 

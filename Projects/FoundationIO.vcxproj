@@ -24,11 +24,11 @@
     <ClCompile Include="..\Library\src\MathIO.c" />
     <ClCompile Include="..\Library\src\PlatformIO.c" />
     <ClCompile Include="..\Library\src\TestIO.c" />
-    <ClCompile Include="..\Library\src\UnicodeIO\CommandLineIO.c" />
-    <ClCompile Include="..\Library\src\UnicodeIO\FormatIO.c" />
-    <ClCompile Include="..\Library\src\UnicodeIO\LocalizationIO.c" />
-    <ClCompile Include="..\Library\src\UnicodeIO\LogIO.c" />
-    <ClCompile Include="..\Library\src\UnicodeIO\StringIO.c" />
+    <ClCompile Include="..\Library\src\TextIO\CommandLineIO.c" />
+    <ClCompile Include="..\Library\src\TextIO\FormatIO.c" />
+    <ClCompile Include="..\Library\src\TextIO\LocalizationIO.c" />
+    <ClCompile Include="..\Library\src\TextIO\LogIO.c" />
+    <ClCompile Include="..\Library\src\TextIO\StringIO.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Library\include\BitIO.h" />
@@ -37,13 +37,13 @@
     <ClInclude Include="..\Library\include\PlatformIO.h" />
     <ClInclude Include="..\Library\include\TestIO.h" />
     <ClInclude Include="..\Library\include\Private\Constants.h" />
-    <ClInclude Include="..\Library\include\UnicodeIO\CommandLineIO.h" />
-    <ClInclude Include="..\Library\include\UnicodeIO\FormatIO.h" />
-    <ClInclude Include="..\Library\include\UnicodeIO\LocalizationIO.h" />
-    <ClInclude Include="..\Library\include\UnicodeIO\LogIO.h" />
-    <ClInclude Include="..\Library\include\UnicodeIO\StringIO.h" />
-    <ClInclude Include="..\Library\include\UnicodeIO\UnicodeIOTypes.h" />
-    <ClInclude Include="..\Library\include\UnicodeIO\Private\UnicodeTables.h" />
+    <ClInclude Include="..\Library\include\TextIO\CommandLineIO.h" />
+    <ClInclude Include="..\Library\include\TextIO\FormatIO.h" />
+    <ClInclude Include="..\Library\include\TextIO\LocalizationIO.h" />
+    <ClInclude Include="..\Library\include\TextIO\LogIO.h" />
+    <ClInclude Include="..\Library\include\TextIO\StringIO.h" />
+    <ClInclude Include="..\Library\include\TextIO\TextIOTypes.h" />
+    <ClInclude Include="..\Library\include\TextIO\Private\UnicodeTables.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

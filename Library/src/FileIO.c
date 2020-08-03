@@ -3,9 +3,9 @@
 #include "../include/CryptographyIO.h"     /* Included for SecureRNG_GenerateInteger for GUUID_Generate */
 #include "../include/MathIO.h"             /* Included for Bits2Bytes */
 #include "../include/Private/Constants.h"  /* Included for BitMaskTables */
-#include "../include/UnicodeIO/FormatIO.h" /* Included for UTF32_Format */
-#include "../include/UnicodeIO/LogIO.h"    /* Included for Logging */
-#include "../include/UnicodeIO/StringIO.h" /* Included for StringIO's declarations */
+#include "../include/TextIO/FormatIO.h" /* Included for UTF32_Format */
+#include "../include/TextIO/LogIO.h"    /* Included for Logging */
+#include "../include/TextIO/StringIO.h" /* Included for StringIO's declarations */
 
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -28,7 +28,7 @@ extern "C" {
         FileInput *Input = (FileInput*) calloc(1, sizeof(FileInput));
         if (Input == NULL) {
             FileInput_Deinit(Input);
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate FileInput"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate FileInput"));
         }
         return Input;
     }
@@ -37,9 +37,9 @@ extern "C" {
         if (Input != NULL && File != NULL) {
             Input->File = File;
         } else if (Input == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FileInput Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FileInput Pointer is NULL"));
         } else if (File == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FILE Pointer is NULL"));
         }
     }
 
@@ -50,7 +50,7 @@ extern "C" {
             PlatformIO_Seek(Input->File, 0, SeekType_Beginning);
             Input->FilePosition = (uint64_t) PlatformIO_GetSize(Input->File);
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FileInput Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FileInput Pointer is NULL"));
         }
     }
 
@@ -62,7 +62,7 @@ extern "C" {
             }
             InputSize     = Input->FileSize;
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FileInput Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FileInput Pointer is NULL"));
         }
         return InputSize;
     }
@@ -75,7 +75,7 @@ extern "C" {
             }
             Position    = Input->FilePosition;
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FileInput Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FileInput Pointer is NULL"));
         }
         return Position;
     }
@@ -88,7 +88,7 @@ extern "C" {
             }
             BytesLeft    = Input->FileSize - Input->FilePosition;
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FileInput Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FileInput Pointer is NULL"));
         }
         return BytesLeft;
     }
@@ -98,7 +98,7 @@ extern "C" {
             PlatformIO_Close(Input->File);
             free(Input);
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FileInput Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FileInput Pointer is NULL"));
         }
     }
     /* FileInput */
@@ -108,7 +108,7 @@ extern "C" {
         FileOutput *Output = (FileOutput*) calloc(1, sizeof(FileOutput));
         if (Output == NULL) {
             FileOutput_Deinit(Output);
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate FileOutput"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate FileOutput"));
         }
         return Output;
     }
@@ -117,9 +117,9 @@ extern "C" {
         if (Output != NULL && File != NULL) {
             Output->File = File;
         } else if (Output == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FileOutput Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FileOutput Pointer is NULL"));
         } else if (File == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FILE Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FILE Pointer is NULL"));
         }
     }
 
@@ -129,7 +129,7 @@ extern "C" {
             PlatformIO_Close(Output->File);
             free(Output);
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FileOutput Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FileOutput Pointer is NULL"));
         }
     }
     /* FileOutput */
@@ -156,12 +156,12 @@ extern "C" {
             if (BytesRead == Bytes2Read) {
                 BitBuffer_SetSize(BitB, Bits2Bytes(BytesRead, RoundingType_Down) + ArrayOffset);
             } else {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Num bytes read %llu does not match num bytes requested %llu"), BytesRead, Bytes2Read);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Num bytes read %llu does not match num bytes requested %llu"), BytesRead, Bytes2Read);
             }
         } else if (Input == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitInput Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitInput Pointer is NULL"));
         } else if (BitB == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
 
@@ -181,13 +181,13 @@ extern "C" {
                     BitBuffer_SetArray(BitB, Buffer_New, BytesRead);
                     free(Buffer_Old);
                 } else {
-                    Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Realloc failed"));
+                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Realloc failed"));
                 }
             }
         } else if (Input == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FileInput Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FileInput Pointer is NULL"));
         } else if (BitB == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
 
@@ -207,12 +207,12 @@ extern "C" {
                     Array[Byte]      = 0;
                 }
             } else {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Wrote %lld of %lld bits"), BytesWritten * 8, Bytes2Write * 8);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %lld of %lld bits"), BytesWritten * 8, Bytes2Write * 8);
             }
         } else if (Output == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitOutput Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitOutput Pointer is NULL"));
         } else if (BitB == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     /* BitBuffer */

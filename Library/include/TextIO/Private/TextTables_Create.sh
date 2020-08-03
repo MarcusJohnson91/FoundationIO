@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Usage (the HeaderFile WILL BE IRRECOVERABLY DELETED): ./UnicodeTables_Create.sh /HeaderPath/HeaderFile.h
+# Usage (the HeaderFile WILL BE IRRECOVERABLY DELETED): ./TextTables_Create.sh /HeaderPath/HeaderFile.h
 # Dependencies: Curl, XMLStarlet (On Mac install Homebrew from brew.sh then call brew install xmlstarlet)
 
 CreateHeaderFileTop() {
@@ -26,10 +26,10 @@ CreateHeaderFileTop() {
     CanonicalNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n "$UCD_Data")
     {
         printf "#include \"../../PlatformIO.h\"  /* Included for Platform Independence macros */\n"
-        printf "#include \"../UnicodeIOTypes.h\" /* Included for UTFX types */\n\n"
+        printf "#include \"../TextIOTypes.h\" /* Included for UTFX types */\n\n"
         printf "#pragma once\n\n"
-        printf "#ifndef FoundationIO_UnicodeIO_UnicodeTables_H\n"
-        printf "#define FoundationIO_UnicodeIO_UnicodeTables_H\n\n"
+        printf "#ifndef FoundationIO_TextIO_TextTables_H\n"
+        printf "#define FoundationIO_TextIO_TextTables_H\n\n"
         printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
         printf "extern \"C\" {\n"
         printf "#endif\n\n"
@@ -361,7 +361,7 @@ CreateHeaderFileBottom() {
     printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
     printf "}\n"
     printf "#endif /* Extern C */\n\n"
-    printf "#endif /* FoundationIO_UnicodeIO_UnicodeTables_H */\n"
+    printf "#endif /* FoundationIO_TextIO_TextTables_H */\n"
 } >> "$HeaderFile"
 
 DownloadUCD() {

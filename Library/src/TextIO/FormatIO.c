@@ -1,7 +1,7 @@
 #include "../../include/MathIO.h"                      /* Included for Logarithm */
-#include "../../include/UnicodeIO/FormatIO.h"          /* Included for our declarations */
-#include "../../include/UnicodeIO/LogIO.h"             /* Included for Logging */
-#include "../../include/UnicodeIO/StringIO.h"          /* Included for StringIO */
+#include "../../include/TextIO/FormatIO.h"          /* Included for our declarations */
+#include "../../include/TextIO/LogIO.h"             /* Included for Logging */
+#include "../../include/TextIO/StringIO.h"          /* Included for StringIO */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -73,10 +73,10 @@ extern "C" {
                 }
             } else {
                 FormatSpecifiers_Deinit(Specifiers);
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate %llu Specifiers"), NumSpecifiers);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate %llu Specifiers"), NumSpecifiers);
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate FormatSpecifiers"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate FormatSpecifiers"));
         }
         return Specifiers;
     }
@@ -149,7 +149,7 @@ extern "C" {
                 Specifiers->NumUniqueSpecifiers = 1;
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
         }
     }
 
@@ -764,13 +764,13 @@ extern "C" {
                                     if (Value <= NL_ARGMAX) {
                                         Specifiers->Specifiers[Specifier].Position = Value;
                                     } else {
-                                        Log(Severity_USER, UnicodeIOTypes_FunctionName, UTF8String("Positional Argument: %llu is greater than NL_ARGMAX: %d"), Value, NL_ARGMAX);
+                                        Log(Severity_USER, PlatformIO_FunctionName, UTF8String("Positional Argument: %llu is greater than NL_ARGMAX: %d"), Value, NL_ARGMAX);
                                     }
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
                                     if (Value <= _ARGMAX) {
                                         Specifiers->Specifiers[Specifier].Position = Value;
                                     } else {
-                                        Log(Severity_USER, UnicodeIOTypes_FunctionName, UTF8String("Positional Argument: %llu is greater than _ARGMAX: %d"), Value, _ARGMAX);
+                                        Log(Severity_USER, PlatformIO_FunctionName, UTF8String("Positional Argument: %llu is greater than _ARGMAX: %d"), Value, _ARGMAX);
                                     }
 #endif
                                 }
@@ -832,9 +832,9 @@ extern "C" {
             
             FormatSpecifiers_GetNumUniqueSpecifiers(Specifiers);
         } else if (Specifiers == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
         } else if (Format == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
     }
     
@@ -992,7 +992,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
         }
     }
     
@@ -1005,7 +1005,7 @@ extern "C" {
             }
             NextPercent          = CodePoint;
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return NextPercent;
     }
@@ -1071,7 +1071,7 @@ extern "C" {
                  }
                  */
             } else {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate %llu CodePoints"), FormattedSize);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate %llu CodePoints"), FormattedSize);
             }
             
             
@@ -1189,9 +1189,9 @@ extern "C" {
             
             //Formatted                                   = FormattedStrings[Specifiers->NumSpecifiers];
         } else if (Specifiers == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
         } else if (Format == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Format Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Format Pointer is NULL"));
         }
         return Formatted;
     }
@@ -1221,9 +1221,9 @@ extern "C" {
                 }
             }
         } else if (Format == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
         } else if (Specifiers == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
         }
         return Deformatted;
     }
@@ -1239,7 +1239,7 @@ extern "C" {
                 CodeUnit              += 1;
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumSpecifiers;
     }
@@ -1255,7 +1255,7 @@ extern "C" {
                 CodeUnit              += 1;
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumSpecifiers;
     }
@@ -1271,7 +1271,7 @@ extern "C" {
                 CodePoint             += 1;
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return NumSpecifiers;
     }
@@ -1311,9 +1311,9 @@ extern "C" {
                 }
             }
         } else if (Format == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Format Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Format Pointer is NULL"));
         } else if (Specifiers == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
         }
         return FormattedStringSize;
     }
@@ -1357,7 +1357,7 @@ extern "C" {
                 Format8                      = UTF8_Clone(Format);
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return Format8;
     }
@@ -1384,7 +1384,7 @@ extern "C" {
                 Format16                     = UTF16_Clone(Format);
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return Format16;
     }
@@ -1407,7 +1407,7 @@ extern "C" {
                 FormattedString              = UTF32_Clone(Format);
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return FormattedString;
     }
@@ -1429,9 +1429,9 @@ extern "C" {
                 UTF32_StringSet_Deinit(Strings32);
             }
         } else if (Format == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Format Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Format Pointer is NULL"));
         } else if (Formatted == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Formatted String is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Formatted String is NULL"));
         }
         return StringSet;
     }
@@ -1453,9 +1453,9 @@ extern "C" {
                 UTF32_StringSet_Deinit(Strings32);
             }
         } else if (Format == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Format Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Format Pointer is NULL"));
         } else if (Formatted == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Formatted String is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Formatted String is NULL"));
         }
         return StringSet;
     }
@@ -1471,9 +1471,9 @@ extern "C" {
                 FormatSpecifiers_Deinit(Specifiers);
             }
         } else if (Format == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Format Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Format Pointer is NULL"));
         } else if (Formatted == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Formatted String is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Formatted String is NULL"));
         }
         return StringSet;
     }

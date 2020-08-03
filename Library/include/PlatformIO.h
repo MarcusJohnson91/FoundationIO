@@ -455,6 +455,10 @@ extern "C" {
 #endif
 #endif
 
+#ifndef                   PlatformIO_FunctionName
+#define                   PlatformIO_FunctionName           (PlatformIO_Immutable(UTF8 *)) __func__
+#endif /* PlatformIO_FunctionName */
+
     typedef enum PlatformIO_FileModes {
                  FileMode_Unspecified                  = 0,
                  FileMode_Read                         = 1,
