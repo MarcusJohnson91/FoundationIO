@@ -29,7 +29,7 @@ extern "C" {
         uint64_t                *UniqueSpecifiers;
         uint64_t                 NumSpecifiers;
         uint64_t                 NumUniqueSpecifiers;
-        UnicodeIO_StringTypes StringType;
+        TextIO_StringTypes       StringType;
     } FormatSpecifiers;
     
     void FormatSpecifiers_Deinit(FormatSpecifiers *Specifiers) {
@@ -81,8 +81,8 @@ extern "C" {
         return Specifiers;
     }
     
-    static UnicodeIO_Bases ConvertModifierType2Base(FormatIO_ModifierTypes ModifierType) {
-        UnicodeIO_Bases Base    = Base_Unspecified;
+    static TextIO_Bases ConvertModifierType2Base(FormatIO_ModifierTypes ModifierType) {
+        TextIO_Bases Base    = Base_Unspecified;
         if ((ModifierType & ModifierType_Integer) == ModifierType_Integer) {
             Base               |= Base_Integer;
             if ((ModifierType & ModifierType_Radix2) == ModifierType_Radix2) {
@@ -221,7 +221,7 @@ extern "C" {
         }
     }
     
-    void UTF32_ParseFormatSpecifiers(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, UnicodeIO_StringTypes StringType) {
+    void UTF32_ParseFormatSpecifiers(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, TextIO_StringTypes StringType) {
         if (Format != NULL && Specifiers != NULL) {
             Specifiers->StringType                               = StringType;
             uint64_t CodePoint                                   = 0ULL;
@@ -894,7 +894,7 @@ extern "C" {
                     Specifiers->Specifiers[Position].Precision             = va_arg(Arguments, uint32_t);
                 }
                 
-                UnicodeIO_Bases Base                                    = ConvertModifierType2Base(ModifierType);
+                TextIO_Bases Base                                    = ConvertModifierType2Base(ModifierType);
                 
                 if ((BaseType & BaseType_Integer) == BaseType_Integer) {
                     if ((ModifierType & ModifierType_Unsigned) == ModifierType_Unsigned) {
@@ -1208,7 +1208,7 @@ extern "C" {
                 uint64_t               Start    = Specifiers->Specifiers[Specifier].Start + 1;
                 
                 if ((BaseType & BaseType_Integer) == BaseType_Integer || (BaseType & BaseType_Decimal) == BaseType_Decimal || (BaseType & BaseType_Pointer) == BaseType_Pointer) {
-                    UnicodeIO_Bases  Base           = ConvertModifierType2Base(Modifier);
+                    TextIO_Bases       Base            = ConvertModifierType2Base(Modifier);
                     uint64_t           SubStringLength = UTF32_GetNumDigits(Formatted, Start, Base);
                     Deformatted[Specifier]             = UTF32_ExtractSubString(Formatted, Start, SubStringLength);
                 } else if ((BaseType & BaseType_CodeUnit) == BaseType_CodeUnit) {

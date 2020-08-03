@@ -422,21 +422,21 @@ typedef                   char32_t                             CharSet32;
 #endif /* FoundationIO_Unicodize32 */
 
     /*!
-     @enum                UnicodeIO_StringTypes
+     @enum                TextIO_StringTypes
      @constant            StringType_Unspecified                 Invalid/Default value
      @constant            StringType_UTF8                        UTF-8
      @constant            StringType_UTF16                       UTF-16
      @constant            StringType_UTF32                       UTF-32
      */
-    typedef enum UnicodeIO_StringTypes {
+    typedef enum TextIO_StringTypes {
                           StringType_Unspecified                 = 0,
                           StringType_UTF8                        = 1,
                           StringType_UTF16                       = 2,
                           StringType_UTF32                       = 4,
-    } UnicodeIO_StringTypes;
+    } TextIO_StringTypes;
 
     /*!
-     @enum                UnicodeIO_Bases
+     @enum                TextIO_Bases
      @abstract                                                   Defines the type of option.
      @constant            Base_Integer                           ORable mask for Integers.
      @constant            Base_Radix2                            Integer only, base-2/binary.
@@ -449,7 +449,7 @@ typedef                   char32_t                             CharSet32;
      @constant            Base_Scientific                        Decimal only.
      @constant            Base_Shortest                          Decimal only.
      */
-    typedef enum UnicodeIO_Bases {
+    typedef enum TextIO_Bases {
                           Base_Unspecified                       = 0,
                           Base_Integer                           = 1,
                           Base_Radix2                            = 2,
@@ -461,27 +461,27 @@ typedef                   char32_t                             CharSet32;
                           Base_Lowercase                         = 128,
                           Base_Scientific                        = 256,
                           Base_Shortest                          = 512,
-    } UnicodeIO_Bases;
+    } TextIO_Bases;
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
-        constexpr inline UnicodeIO_Bases operator | (UnicodeIO_Bases A, UnicodeIO_Bases B) {
-            return static_cast<UnicodeIO_Bases>(static_cast<uint16_t>(A) | static_cast<uint16_t>(B));
+        constexpr inline TextIO_Bases operator | (TextIO_Bases A, TextIO_Bases B) {
+            return static_cast<TextIO_Bases>(static_cast<uint16_t>(A) | static_cast<uint16_t>(B));
         }
 
-        constexpr inline UnicodeIO_Bases operator & (UnicodeIO_Bases A, UnicodeIO_Bases B) {
-            return static_cast<UnicodeIO_Bases>(static_cast<uint16_t>(A) & static_cast<uint16_t>(B));
+        constexpr inline TextIO_Bases operator & (TextIO_Bases A, TextIO_Bases B) {
+            return static_cast<TextIO_Bases>(static_cast<uint16_t>(A) & static_cast<uint16_t>(B));
         }
 
-        constexpr inline UnicodeIO_Bases operator |= (UnicodeIO_Bases A, UnicodeIO_Bases B) {
+        constexpr inline TextIO_Bases operator |= (TextIO_Bases A, TextIO_Bases B) {
             uint16_t A1 = static_cast<uint16_t>(A);
             uint16_t B1 = static_cast<uint16_t>(B);
-            return static_cast<UnicodeIO_Bases>(A1 |= B1);
+            return static_cast<TextIO_Bases>(A1 |= B1);
         }
 
-        constexpr inline UnicodeIO_Bases operator &= (UnicodeIO_Bases A, UnicodeIO_Bases B) {
+        constexpr inline TextIO_Bases operator &= (TextIO_Bases A, TextIO_Bases B) {
             uint16_t A1 = static_cast<uint16_t>(A);
             uint16_t B1 = static_cast<uint16_t>(B);
-            return static_cast<UnicodeIO_Bases>(A1 &= B1);
+            return static_cast<TextIO_Bases>(A1 &= B1);
         }
     }
 #endif /* PlatformIO_Language */
