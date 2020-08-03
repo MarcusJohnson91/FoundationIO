@@ -45,13 +45,13 @@ set(FOUNDATIONIO_HEADERS
 "${Library_Dir}/include/TestIO.h"
 )
 
-set(UNICODEIO_HEADERS
-"${Library_Dir}/include/UnicodeIO/CommandLineIO.h"
-"${Library_Dir}/include/UnicodeIO/FormatIO.h"
-"${Library_Dir}/include/UnicodeIO/LocalizationIO.h"
-"${Library_Dir}/include/UnicodeIO/LogIO.h"
-"${Library_Dir}/include/UnicodeIO/StringIO.h"
-"${Library_Dir}/include/UnicodeIO/UnicodeIOTypes.h"
+set(TextIO_HEADERS
+"${Library_Dir}/include/TextIO/CommandLineIO.h"
+"${Library_Dir}/include/TextIO/FormatIO.h"
+"${Library_Dir}/include/TextIO/LocalizationIO.h"
+"${Library_Dir}/include/TextIO/LogIO.h"
+"${Library_Dir}/include/TextIO/StringIO.h"
+"${Library_Dir}/include/TextIO/TextIOTypes.h"
 )
 
 set(Library_Sources
@@ -62,11 +62,11 @@ set(Library_Sources
 "${Library_Dir}/src/NetworkIO.c"
 "${Library_Dir}/src/PlatformIO.c"
 "${Library_Dir}/src/TestIO.c"
-"${Library_Dir}/src/UnicodeIO/CommandLineIO.c"
-"${Library_Dir}/src/UnicodeIO/FormatIO.c"
-"${Library_Dir}/src/UnicodeIO/LocalizationIO.c"
-"${Library_Dir}/src/UnicodeIO/LogIO.c"
-"${Library_Dir}/src/UnicodeIO/StringIO.c"
+"${Library_Dir}/src/TextIO/CommandLineIO.c"
+"${Library_Dir}/src/TextIO/FormatIO.c"
+"${Library_Dir}/src/TextIO/LocalizationIO.c"
+"${Library_Dir}/src/TextIO/LogIO.c"
+"${Library_Dir}/src/TextIO/StringIO.c"
 )
 
 configure_file("${Library_Dir}/../Resources/FoundationIO.pc.in" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/FoundationIO.pc")
@@ -85,7 +85,7 @@ endif(${BUILD_SHARED_LIBS} MATCHES OFF)
 
 target_include_directories(FoundationIO PUBLIC "${Library_Dir}/include")
 
-target_include_directories(FoundationIO PUBLIC "${Library_Dir}/include/UnicodeIO")
+target_include_directories(FoundationIO PUBLIC "${Library_Dir}/include/TextIO")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(FoundationIO ws2_32 bcrypt)
@@ -135,8 +135,8 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "UNIX" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwi
 endif(NOT DEFINED ${CMAKE_INSTALL_PREFIX})
 
 install(TARGETS FoundationIO DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install(FILES ${FOUNDATIONIO_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-install(FILES ${UNICODEIO_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/UnicodeIO)
+install(FILES  ${FOUNDATIONIO_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+install(FILES  ${TEXTIO_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/TextIO)
 install(FILES "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/FoundationIO.pc" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
 
 if(CMAKE_CONFIGURATION_TYPES MATCHES "Debug" OR CMAKE_CONFIGURATION_TYPES MATCHES "RelWithDebInfo")

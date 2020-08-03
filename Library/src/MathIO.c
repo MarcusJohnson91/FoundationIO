@@ -1,5 +1,5 @@
 #include "../include/MathIO.h"           /* Included for our declarations */
-#include "../include/UnicodeIO/LogIO.h"
+#include "../include/TextIO/LogIO.h"
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -464,7 +464,7 @@ extern "C" {
         } else if (Rotate == Rotate_Right) {
             Rotated  = (Value >> Bits2Rotate) | (Value << (64 - Bits2Rotate));
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Rotate_Unspecified is invalid"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Rotate_Unspecified is invalid"));
         }
         return Rotated;
     }

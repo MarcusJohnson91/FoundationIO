@@ -2,7 +2,7 @@
 #include "../include/Private/Constants.h" /* Included for BitMaskTables */
 #include "../include/CryptographyIO.h"    /* Included for our declarations */
 #include "../include/MathIO.h"            /* Included for Bits2Bytes, etc */
-#include "../include/UnicodeIO/LogIO.h"   /* Included for error logging */
+#include "../include/TextIO/LogIO.h"   /* Included for error logging */
 
 #if   (PlatformIO_TargetOS == PlatformIO_WindowsOS)
 #include <BCrypt.h>
@@ -179,7 +179,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("InsecurePRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("InsecurePRNG Pointer is NULL"));
         }
     }
 
@@ -212,7 +212,7 @@ extern "C" {
             PlatformIO_Close(RandomFile);
 #endif
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Can't return more than 8 bytes"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Can't return more than 8 bytes"));
         }
         return RandomValue;
     }
@@ -226,19 +226,19 @@ extern "C" {
                 FILE *RandomFile          = PlatformIO_OpenUTF8(UTF8String("/dev/random"), FileMode_Read | FileMode_Binary);
                 size_t BytesRead          = PlatformIO_Read(RandomFile, &Random->EntropyPool, Random->EntropySize, 1);
                 if (BytesRead != Random->EntropySize) {
-                    Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
+                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
                 }
                 PlatformIO_Close(RandomFile);
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
                 NTSTATUS Status           = BCryptGenRandom(NULL, (PUCHAR) Random->EntropyPool, Random->EntropySize, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
                 if (Status <= 0) {
-                    Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
+                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
                     abort();
                 }
 #endif
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
     }
 
@@ -276,7 +276,7 @@ extern "C" {
                 }
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
     }
 
@@ -308,9 +308,9 @@ extern "C" {
                 Bits                           = SecureRNG_ExtractBits(Random, NumBits);
             }
         } else if (Random == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         } else if (NumBits == 0) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Reading zero bits does not make sense"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Reading zero bits does not make sense"));
         }
         return Bits;
     }
@@ -327,13 +327,13 @@ extern "C" {
                     SecureRNG_Mix(Random);
                 } else {
                     SecureRNG_Deinit(Random);
-                    Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate EntropyPool"));
+                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate EntropyPool"));
                 }
             } else {
-                Log(Severity_USER, UnicodeIOTypes_FunctionName, UTF8String("EntropyPoolSize %llu is invalid, it MUST be a multiple of 16"), EntropyPoolSize);
+                Log(Severity_USER, PlatformIO_FunctionName, UTF8String("EntropyPoolSize %llu is invalid, it MUST be a multiple of 16"), EntropyPoolSize);
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate SecureRNG"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate SecureRNG"));
         }
         return Random;
     }
@@ -343,7 +343,7 @@ extern "C" {
         if (Random != NULL) {
             RemainingBits      = Random->EntropySize - Random->BitOffset;
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
         return RemainingBits;
     }
@@ -353,11 +353,11 @@ extern "C" {
         if (Random != NULL && NumBits >= 1 && NumBits <= 64) {
             GeneratedInteger     = SecureRNG_ExtractBits(Random, NumBits);
         } else if (Random == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         } else if (NumBits == 0) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Generating an integer 0 bits long is invalid"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Generating an integer 0 bits long is invalid"));
         } else if (NumBits > 64) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Generating an integer %u bits long is invalid"), NumBits);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Generating an integer %u bits long is invalid"), NumBits);
         }
         return GeneratedInteger;
     }
@@ -379,9 +379,9 @@ extern "C" {
                 }
             }
         } else if (Random == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         } else if (MinValue > MaxValue) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("MinValud %lld is greater than MaxValue %lld"), MinValue, MaxValue);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("MinValud %lld is greater than MaxValue %lld"), MinValue, MaxValue);
         }
         return RandomInteger;
     }
@@ -397,7 +397,7 @@ extern "C" {
             Decimal           = InsertExponentD(Decimal, Exponent);
             Decimal           = InsertMantissaD(Decimal, Mantissa);
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
         return Decimal;
     }
@@ -411,7 +411,7 @@ extern "C" {
             Random->BitOffset             = NewValue;
             Verification = Random->EntropyPool[0] & 0xFF;
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
         return Verification;
     }
@@ -490,7 +490,7 @@ extern "C" {
             Hash->Hash[2] = 0x98BADCFE;
             Hash->Hash[3] = 0x10325476;
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate MD5"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate MD5"));
         }
         return Hash;
     }
@@ -553,7 +553,7 @@ extern "C" {
         if (MD5 != NULL) {
             
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("MD5 Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("MD5 Pointer is NULL"));
         }
         return Hash;
     }
@@ -569,9 +569,9 @@ extern "C" {
                 }
             }
         } else if (Hash1 == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Hash1 Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Hash1 Pointer is NULL"));
         } else if (Hash2 == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Hash2 Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Hash2 Pointer is NULL"));
         }
         return HashesMatch;
     }
@@ -632,11 +632,11 @@ extern "C" {
 
             Output = (B << 16) | A;
         } else if (BitB == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (Start * 8 < BitBuffer_GetSize(BitB)) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Start: %lld is larger than the BitBuffer %lld"), Start * 8, BitBuffer_GetSize(BitB));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Start: %lld is larger than the BitBuffer %lld"), Start * 8, BitBuffer_GetSize(BitB));
         } else if ((Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("End: %lld is larger than the BitBuffer %lld"), (Start + NumBytes) * 8, BitBuffer_GetSize(BitB));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("End: %lld is larger than the BitBuffer %lld"), (Start + NumBytes) * 8, BitBuffer_GetSize(BitB));
         }
         return Output;
     }
@@ -657,11 +657,11 @@ extern "C" {
                 }
             }
         } else if (BitB == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (Start * 8 < BitBuffer_GetSize(BitB)) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Start: %lld is larger than the BitBuffer %lld"), Start * 8, BitBuffer_GetSize(BitB));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Start: %lld is larger than the BitBuffer %lld"), Start * 8, BitBuffer_GetSize(BitB));
         } else if ((Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("End: %lld is larger than the BitBuffer %lld"), (Start + NumBytes) * 8, BitBuffer_GetSize(BitB));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("End: %lld is larger than the BitBuffer %lld"), (Start + NumBytes) * 8, BitBuffer_GetSize(BitB));
         }
         return ~Output;
     }

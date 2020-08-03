@@ -7,12 +7,12 @@
  */
 
 #include "../PlatformIO.h"  /* Included for Platform Independence macros */
-#include "UnicodeIOTypes.h" /* Included for UTFX types */
+#include "TextIOTypes.h"    /* Included for Text types */
 
 #pragma once
 
-#ifndef FoundationIO_UnicodeIO_FormatIO_H
-#define FoundationIO_UnicodeIO_FormatIO_H
+#ifndef FoundationIO_TextIO_FormatIO_H
+#define FoundationIO_TextIO_FormatIO_H
 
 #if   (PlatformIO_TargetOS == PlatformIO_WindowsOS)
 #include <sal.h>
@@ -319,4 +319,4 @@ extern "C" {
 }
 #endif /* Extern C */
 
-#endif /* FoundationIO_UnicodeIO_FormatIO_H */
+#endif /* FoundationIO_TextIO_FormatIO_H */

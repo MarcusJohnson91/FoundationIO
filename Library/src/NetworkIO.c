@@ -1,6 +1,15 @@
-#include "../include/NetworkIO.h"                /* Included for our declarations */
-#include "../include/UnicodeIO/UnicodeIOTypes.h" /* Included for Unicode types */
-#include "../include/UnicodeIO/LogIO.h"          /* Included for Unicode types */
+/*!
+@header           NetworkIO.h
+@author           Marcus Johnson
+@copyright        2020+
+@version          1.0.0
+@brief            This header contains types, functions, and structs for Networking.
+@overview         IPv6, IMCPv6, TCPv6, and UDPv6 are the primary focus of NetworkIO and building it all on top of Raw Sockets.
+*/
+
+#include "../include/NetworkIO.h"          /* Included for our declarations */
+#include "../include/TextIO/TextIOTypes.h" /* Included for Unicode types */
+#include "../include/TextIO/LogIO.h"       /* Included for Unicode types */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -38,7 +47,7 @@ extern "C" {
     } IPV6Address;
 
     IPV6Address *IPV6Address_Init(void) {
-        IPV6Address *Address = calloc(16, sizeof(IPV6Address));
+        IPV6Address *Address = (IPV6Address*) calloc(16, sizeof(IPV6Address));
         return Address;
     }
 
@@ -65,10 +74,10 @@ extern "C" {
                 // Loop looking for double colons and counting digits for each
 
             } else if (IPV6 == NULL) {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate IPV6Address"));
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate IPV6Address"));
             }
         } else if (Address == NULL) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Address Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Address Pointer is NULL"));
         }
         return IPV6;
     }

@@ -1,5 +1,5 @@
-#include "../include/UnicodeIO/LogIO.h"    /* Included for logging errors */
-#include "../include/UnicodeIO/StringIO.h" /* Included for Path functions */
+#include "../include/TextIO/LogIO.h"    /* Included for logging errors */
+#include "../include/TextIO/StringIO.h" /* Included for Path functions */
 
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
 #include <stddef.h>
@@ -110,7 +110,7 @@ extern "C" {
             }
 
             if (ErrorCode != 0) {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't open %s, got Error: %u"), Path, ErrorCode);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't open %s, got Error: %u"), Path, ErrorCode);
             }
         }
         return File;
@@ -167,7 +167,7 @@ extern "C" {
             }
 
             if (ErrorCode != 0) {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't open %s, got Error: %u"), Path8, ErrorCode);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't open %s, got Error: %u"), Path8, ErrorCode);
             }
 #endif /* __STDC_LIB_EXT1__ */
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
@@ -200,7 +200,7 @@ extern "C" {
                 ErrorCode = _wfopen_s(&File, (const wchar_t*) &Path16, (PlatformIO_Immutable(wchar_t*)) ModeString);
             }
             if (ErrorCode != 0) {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't open %ls, got Error: %u"), (wchar_t*) Path, ErrorCode);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't open %ls, got Error: %u"), (wchar_t*) Path, ErrorCode);
             }
 #endif /* PlatformIO_TargetOS */
             if (File != NULL) {
@@ -275,7 +275,7 @@ extern "C" {
 #endif
         }
         if (SuccessIsZero != 0) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Seeking failed"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Seeking failed"));
         }
         return ~SeekingWasSucessful;
     }
@@ -288,7 +288,7 @@ extern "C" {
         WriteFile(File2Write, Buffer, Elements2Write, &BytesWritten, NULL);
 #endif
         if (BytesWritten != Elements2Write) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Wrote %llu Elements but %llu Elements were requested"), BytesWritten, Elements2Write);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %llu Elements but %llu Elements were requested"), BytesWritten, Elements2Write);
         }
         return BytesWritten;
     }

@@ -1,8 +1,8 @@
 #include "../Library/include/CryptographyIO.h"
 #include "../Library/include/TestIO.h"
-#include "../Library/include/UnicodeIO/FormatIO.h"
-#include "../Library/include/UnicodeIO/LogIO.h"
-#include "../Library/include/UnicodeIO/StringIO.h"
+#include "../Library/include/TextIO/FormatIO.h"
+#include "../Library/include/TextIO/LogIO.h"
+#include "../Library/include/TextIO/StringIO.h"
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -26,10 +26,10 @@ extern "C" {
             PlatformIO_Immutable(UTF32*) Decoded8         = UTF8_Decode(Generated8);
             bool      StringsMatch     = UTF32_Compare(GeneratedString, Decoded8);
             if (StringsMatch == No) {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Strings DO NOT match!"));
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Strings DO NOT match!"));
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
     }
     
@@ -42,7 +42,7 @@ extern "C" {
             PlatformIO_Immutable(UTF32*) Decoded16       = UTF16_Decode(Generated16);
             TestPassed                                   = UTF32_CompareSubString(GeneratedString, Decoded16, 0, 0);
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
         return TestPassed;
     }
@@ -54,7 +54,7 @@ extern "C" {
         PlatformIO_Immutable(UTF8 *) Correct  = UTF8String("InsertOriginal");
         bool Matches   = UTF8_Compare(Inserted, Correct);
         if (Matches == No) {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Strings do not match"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Strings do not match"));
         }
     }
     
@@ -65,7 +65,7 @@ extern "C" {
         uint64_t  TestStringSize = UTF32_GetStringSizeInCodePoints(TestString32);
         if (TestStringSize != 7) {
             TestPassed           = false;
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("String \"%s\" is supposed to be 7 CodePoints long, but is actually %llu"), TestString8, TestStringSize);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String \"%s\" is supposed to be 7 CodePoints long, but is actually %llu"), TestString8, TestStringSize);
         }
         return TestPassed;
     }

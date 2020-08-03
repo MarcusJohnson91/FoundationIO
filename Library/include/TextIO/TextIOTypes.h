@@ -1,17 +1,17 @@
 /*!
- @header              UnicodeIOTypes.h
+ @header              TextIOTypes.h
  @author              Marcus Johnson
  @copyright           2020+
- @version             1.1.0
- @brief               This header contains types and macros used across FoundationIO.
+ @version             1.2.0
+ @brief               This header contains types and macros used across FoundationIO for Text handling.
  */
 
 #include "../PlatformIO.h" /* Included for Platform Independence macros */
 
 #pragma once
 
-#ifndef                   FoundationIO_UnicodeIO_UnicodeIOTypes_H
-#define                   FoundationIO_UnicodeIO_UnicodeIOTypes_H
+#ifndef FoundationIO_TextIO_TextIOTypes_H
+#define FoundationIO_TextIO_TextIOTypes_H
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -87,13 +87,16 @@ typedef                   uint_least32_t                       char32_t;
 #ifdef                    UTF8
 #undef                    UTF8
 #endif /* UTF8 */
-/*!
-@typedef                  UTF8                                 UTF8 is guaranteed to only contain valid Unicode, use CharSet8 otherwise.
-*/
-typedef                   char8_t                              UTF8;
 #ifdef                    CharSet8
 #undef                    CharSet8
 #endif /* CharSet8 */
+/*!
+@abstract                 UTF8                                 is guaranteed to only contain valid Unicode, use CharSet8 otherwise.
+*/
+typedef                   char8_t                              UTF8;
+/*!
+@abstract                 CharSet8                             is for non-Unicode character sets.
+*/
 typedef                   char8_t                              CharSet8;
 #endif /* FoundationIO_StringTypes8 */
 
@@ -102,34 +105,39 @@ typedef                   char8_t                              CharSet8;
 #ifdef                    UTF16
 #undef                    UTF16
 #endif /* UTF16 */
-/*!
-@typedef                  UTF16                                UTF16 is guaranteed to only contain valid Unicode, use CharSet16 otherwise.
-*/
-typedef                   char16_t                             UTF16;
 #ifdef                    CharSet16
 #undef                    CharSet16
 #endif /* CharSet16 */
+/*!
+@abstract                 UTF16                                is guaranteed to only contain valid Unicode, use CharSet8 otherwise.
+*/
+typedef                   char16_t                             UTF16;
+/*!
+@abstract                 CharSet16                            is for non-Unicode character sets.
+*/
 typedef                   char16_t                             CharSet16;
 #endif /* FoundationIO_StringTypes16 */
 
-
 #ifndef                   FoundationIO_StringTypes32
-#define                   FoundationIO_StringTypes32 (2)
+#define                   FoundationIO_StringTypes32 (4)
 #ifdef                    UTF32
 #undef                    UTF32
 #endif /* UTF32 */
-/*!
-@typedef                  UTF32                                UTF32 is guaranteed to only contain valid Unicode, use CharSet32 otherwise.
-*/
-typedef                   char32_t                             UTF32;
 #ifdef                    CharSet32
 #undef                    CharSet32
 #endif /* CharSet32 */
+/*!
+@abstract                 UTF32                                is guaranteed to only contain valid Unicode, use CharSet8 otherwise.
+ */
+typedef                   char32_t                             UTF32;
+/*!
+@abstract                 CharSet32                            is for non-Unicode character sets.
+ */
 typedef                   char32_t                             CharSet32;
 #endif /* FoundationIO_StringTypes32 */
 
-#ifndef                   UnicodeIOTypes_PropertyConversion8
-#define                   UnicodeIOTypes_PropertyConversion8  (1)
+#ifndef                   TextIOTypes_PropertyConversion8
+#define                   TextIOTypes_PropertyConversion8  (1)
 
 #ifndef                   UTF8_MakeCharacterMutable
 #if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -178,11 +186,11 @@ typedef                   char32_t                             CharSet32;
 #define                   UTF8_MakeStringImmutable(String) (const String)
 #endif /* PlatformIO_Language */
 #endif /* UTF8_MakeStringImmutable */
-#endif /* UnicodeIOTypes_PropertyConversion8 */
+#endif /* TextIOTypes_PropertyConversion8 */
 
 
-#ifndef                   UnicodeIOTypes_PropertyConversion16
-#define                   UnicodeIOTypes_PropertyConversion16 (2)
+#ifndef                   TextIOTypes_PropertyConversion16
+#define                   TextIOTypes_PropertyConversion16 (2)
 
 #ifndef                   UTF16_MakeCharacterMutable
 #if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -232,11 +240,11 @@ typedef                   char32_t                             CharSet32;
 #endif /* PlatformIO_Language */
 #endif /* UTF16_MakeStringImmutable */
 
-#endif /* UnicodeIOTypes_PropertyConversion16 */
+#endif /* TextIOTypes_PropertyConversion16 */
 
 
-#ifndef                   UnicodeIOTypes_PropertyConversion32
-#define                   UnicodeIOTypes_PropertyConversion32 (4)
+#ifndef                   TextIOTypes_PropertyConversion32
+#define                   TextIOTypes_PropertyConversion32 (4)
 
 #ifndef                   UTF32_MakeCharacterMutable
 #if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -363,7 +371,7 @@ typedef                   char32_t                             CharSet32;
 #define                   PlatformIO_MakeStringSet(StringSetSize, ...) {__VA_ARGS__,};
 #endif
 
-#endif /* UnicodeIOTypes_PropertyConversion32 */
+#endif /* TextIOTypes_PropertyConversion32 */
 
 #ifndef                   FoundationIO_Unicodize8
 #define                   FoundationIO_Unicodize8               (1)
@@ -412,10 +420,6 @@ typedef                   char32_t                             CharSet32;
 #define                   UTF32Character(Literal)               (PlatformIO_Constant(UTF32)) U##Literal
 #endif /* PlatformIO_Language */
 #endif /* FoundationIO_Unicodize32 */
-
-#ifndef                   UnicodeIOTypes_FunctionName
-#define                   UnicodeIOTypes_FunctionName           (PlatformIO_Immutable(UTF8 *)) __func__
-#endif /* UnicodeIOTypes_FunctionName */
 
     /*!
      @enum                UnicodeIO_StringTypes
@@ -486,4 +490,4 @@ typedef                   char32_t                             CharSet32;
 }
 #endif /* Extern C */
 
-#endif /* FoundationIO_UnicodeIO_UnicodeIOTypes_H */
+#endif /* FoundationIO_TextIO_TextIOTypes_H */

@@ -1,7 +1,7 @@
 #include "../include/TestIO.h"             /* Included for our declarations */
 #include "../include/CryptographyIO.h"     /* Included for SecureRNG */
-#include "../include/UnicodeIO/LogIO.h"    /* Included for error reporting */
-#include "../include/UnicodeIO/StringIO.h" /* Included for UTFX_Init functions */
+#include "../include/TextIO/LogIO.h"    /* Included for error reporting */
+#include "../include/TextIO/StringIO.h" /* Included for UTFX_Init functions */
 
 #if   (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_AppleOS) != PlatformIO_AppleOS))
 #include <time.h>                      /* Included for timespec_get */
@@ -130,7 +130,7 @@ extern "C" {
             UTF32  CodePointLow  = (UTF32) SecureRNG_GenerateIntegerInRange(Random, 0xE000, 0x10FFFF);
             CodePoint            = CodePointLow | CodePointHigh;
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
         return CodePoint;
     }
@@ -144,10 +144,10 @@ extern "C" {
                     String[CodePoint] = UTF32_GenerateCodePoint(Random);
                 }
             } else {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Couldn't allocate string with %llu CodePoints"), NumCodePoints);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate string with %llu CodePoints"), NumCodePoints);
             }
         } else {
-            Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
         return String;
     }

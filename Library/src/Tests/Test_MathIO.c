@@ -1,7 +1,7 @@
 #include "../Library/include/CryptographyIO.h"
 #include "../Library/include/MathIO.h"
 #include "../Library/include/TestIO.h"
-#include "../Library/include/UnicodeIO/LogIO.h"
+#include "../Library/include/TextIO/LogIO.h"
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -16,7 +16,7 @@ extern "C" {
             uint8_t  NumDigits = NumDigitsInInteger(10, -Value);
             /*
              if (LogCeil != NumDigits) {
-             //Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("NumBits %llu is incorrect"), NumBits);
+             //Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits %llu is incorrect"), NumBits);
              }
              */
         }
@@ -29,7 +29,7 @@ extern "C" {
             int64_t  Value   = SecureRNG_GenerateInteger(Random, NumBits);
             uint8_t  LogCeil = Logarithm(2, Value);
             if (LogCeil != NumBits) {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("NumBits %llu is incorrect"), NumBits);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits %llu is incorrect"), NumBits);
             }
         }
     }
@@ -46,7 +46,7 @@ extern "C" {
             int64_t Maximum1 = Maximum(Integer1, Integer2);
             
             if (Minimum1 > Maximum1) {
-                Log(Severity_DEBUG, UnicodeIOTypes_FunctionName, UTF8String("Minimum/Maximum failed!"));
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Minimum/Maximum failed!"));
             }
         }
     }

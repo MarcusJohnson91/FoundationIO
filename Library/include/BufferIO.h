@@ -6,8 +6,8 @@
  @brief          This header contains code for reading and writing buffers, and utilities to manage them.
  */
 
-#include "PlatformIO.h"               /* Included for Platform Independence macros */
-#include "UnicodeIO/UnicodeIOTypes.h" /* Included for UTFX types */
+#include "PlatformIO.h"         /* Included for Platform Independence macros */
+#include "TextIO/TextIOTypes.h" /* Included for Text types */
 
 #pragma once
 

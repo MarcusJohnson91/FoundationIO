@@ -1,6 +1,6 @@
 #include "../Library/include/TestIO.h"
-#include "../Library/include/UnicodeIO/CommandLineIO.h"
-#include "../Library/include/UnicodeIO/LogIO.h"
+#include "../Library/include/TextIO/CommandLineIO.h"
+#include "../Library/include/TextIO/LogIO.h"
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

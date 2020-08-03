@@ -1,6 +1,6 @@
-#include "../../include/UnicodeIO/LogIO.h"    /* Included for the Log declarations */
-#include "../../include/UnicodeIO/FormatIO.h" /* Included for the Formatter */
-#include "../../include/UnicodeIO/StringIO.h" /* Included for StringIO's declarations */
+#include "../../include/TextIO/LogIO.h"    /* Included for the Log declarations */
+#include "../../include/TextIO/FormatIO.h" /* Included for the Formatter */
+#include "../../include/TextIO/StringIO.h" /* Included for StringIO's declarations */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

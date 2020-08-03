@@ -53,15 +53,15 @@ BitIO:
 
 `GUUID_Deinit`: When you've had enough of GUUID's nonsense, call this function to make your problems disappear.
 
-UnicodeIO:
+TextIO:
 ------------
-* UnicodeIO isn't a sub-library or actually a real thing at all, it's just a way to help organize all the files, so the UnicodeIO folders contain FoundationIO's text related components.
+* TextIO isn't a sub-library or actually a real thing at all, it's just a way to help organize all the files, so the TextIO folders contain FoundationIO's text related components.
 
 StringIO:
 ----------
 * StringIO is a component for Unicode, it supports UTF-8, UTF-16, and UTF-32; but NOT CESU-8, WTF-8, or Java's Modified UTF-8.
 * To create a Unicode string with StringIO simply include the StringIO header, and declare a string or character literal with the `UTF8`, `UTF16`, or `UTF32` type; then use the `UTF8String()`, `UTF16String()`, or `UTF32String()` macro to ensure the literal is encoded by the compiler correctly.
-* StringIO's types `UTF8`, `UTF16`, `UTF32` are declared in the `UnicodeIOTypes.h` header.
+* StringIO's types `UTF8`, `UTF16`, `UTF32` are declared in the `TextIOTypes.h` header.
 * The functions in StringIO use UTF-32 internally; the vast majority of UTF-8 and UTF-16 functions are simply wrappers around the UTF-32 version.
 * StringIO is meant to provide basic support for Unicode strings, and some of the more advanced operations on them, like case mapping, and de/normalization, but some things will never be on the map, like REGEX. StringIO's primary purpose is supporting input and output, not everything Unicode.
 
