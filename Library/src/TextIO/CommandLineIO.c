@@ -1,18 +1,18 @@
-#include "../../include/MathIO.h"                   /* Included for Logarithm */
-#include "../../include/TextIO/CommandLineIO.h"  /* Included for our declarations */
-#include "../../include/TextIO/FormatIO.h"       /* Included for Formatter */
-#include "../../include/TextIO/LogIO.h"          /* Included for Logging */
-#include "../../include/TextIO/StringIO.h"       /* Included for StringIO's declarations */
+#include "../../include/MathIO.h"               /* Included for Logarithm */
+#include "../../include/TextIO/CommandLineIO.h" /* Included for our declarations */
+#include "../../include/TextIO/FormatIO.h"      /* Included for Formatter */
+#include "../../include/TextIO/LogIO.h"         /* Included for Logging */
+#include "../../include/TextIO/StringIO.h"      /* Included for StringIO's declarations */
 
 #if (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && (((PlatformIO_TargetOS & PlatformIO_LinuxOS) != PlatformIO_LinuxOS)))
-#include <signal.h>                                 /* Included for SIGWINCH handling */
-#include <sys/ioctl.h>                              /* Included for the terminal size */
-#include <sys/ttycom.h>                             /* Included for winsize, TIOCGWINSZ */
+#include <signal.h>                             /* Included for SIGWINCH handling */
+#include <sys/ioctl.h>                          /* Included for the terminal size */
+#include <sys/ttycom.h>                         /* Included for winsize, TIOCGWINSZ */
 #elif (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && (((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS)))
-#include <signal.h>                                 /* Included for SIGWINCH handling */
-#include <sys/ioctl.h>                              /* Included for the terminal size */
+#include <signal.h>                             /* Included for SIGWINCH handling */
+#include <sys/ioctl.h>                          /* Included for the terminal size */
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
-#include <wincon.h>                                 /* Included for getting the terminal size */
+#include <wincon.h>                             /* Included for getting the terminal size */
 #endif
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)

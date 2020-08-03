@@ -1,16 +1,24 @@
+/*!
+ @header          TextTables.h
+ @author          Marcus Johnson
+ @copyright       2018+
+ @version         1.2.0
+ @brief           This header contains tables used across FoundationIO for Unicode and character set conversion.
+ */
+
 #include "../../PlatformIO.h"  /* Included for Platform Independence macros */
 #include "../TextIOTypes.h"    /* Included for the Text types */
 
 #pragma once
 
-#ifndef FoundationIO_TextIO_UnicodeTables_H
-#define FoundationIO_TextIO_UnicodeTables_H
+#ifndef FoundationIO_TextIO_TextTables_H
+#define FoundationIO_TextIO_TextTables_H
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
 
-#define ScriptHash ef0e18f0f67a539db564981efef92e8d14889be5
+#define ScriptHash 3501a6d0fb45f83fc0a72e3160f7d415f56f29db
 
 #define UnicodeVersion 13.0.0
 
@@ -26490,4 +26498,4 @@ extern "C" {
 }
 #endif /* Extern C */
 
-#endif /* FoundationIO_TextIO_UnicodeTables_H */
+#endif /* FoundationIO_TextIO_TextTables_H */
