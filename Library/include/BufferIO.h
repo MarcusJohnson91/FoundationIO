@@ -1,9 +1,9 @@
 /*!
- @header         BufferIO.h
- @author         Marcus Johnson
- @copyright      2015+
- @version        1.0.0
- @brief          This header contains code for reading and writing buffers, and utilities to manage them.
+ @header          BufferIO.h
+ @author          Marcus Johnson
+ @copyright       2015+
+ @version         1.0.0
+ @brief           This header contains code for reading and writing buffers, and utilities to manage them.
  */
 
 #include "PlatformIO.h"         /* Included for Platform Independence macros */

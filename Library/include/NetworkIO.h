@@ -1,9 +1,10 @@
 /*!
- @header              NetworkIO.h
- @author              Marcus Johnson
- @copyright           2020+
- @version             1.0.0
- @brief               This header contains types, functions, and tables for Asynchronous Networking.
+ @header          NetworkIO.h
+ @author          Marcus Johnson
+ @copyright       2020+
+ @version         1.0.0
+ @brief           This header contains types, functions, and tables for Asynchronous Networking.
+ @overview        IPv6, IMCPv6, TCPv6, and UDPv6 are the primary focus of NetworkIO and building it all on top of Raw Sockets.
  */
 
 #include "PlatformIO.h"         /* Included for Platform Independence macros */

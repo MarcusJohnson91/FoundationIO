@@ -1,9 +1,9 @@
 /*!
- @header           FormatIO.h
- @author           Marcus Johnson
- @copyright        2019+
- @version          1.0.0
- @brief            This header contains types, functions, and tables for string formatting/deformatting
+ @header          FormatIO.h
+ @author          Marcus Johnson
+ @copyright       2019+
+ @version         1.0.0
+ @brief           This header contains types, functions, and tables for string formatting/deformatting
  */
 
 #include "../PlatformIO.h"  /* Included for Platform Independence macros */

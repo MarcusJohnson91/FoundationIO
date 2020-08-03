@@ -1,9 +1,9 @@
 /*!
- @header              TextIOTypes.h
- @author              Marcus Johnson
- @copyright           2020+
- @version             1.2.0
- @brief               This header contains types and macros used across FoundationIO for Text handling.
+ @header          TextIOTypes.h
+ @author          Marcus Johnson
+ @copyright       2020+
+ @version         1.2.0
+ @brief           This header contains types and macros used across FoundationIO for Text handling.
  */
 
 #include "../PlatformIO.h" /* Included for Platform Independence macros */

@@ -1,12 +1,3 @@
-/*!
-@header           NetworkIO.h
-@author           Marcus Johnson
-@copyright        2020+
-@version          1.0.0
-@brief            This header contains types, functions, and structs for Networking.
-@overview         IPv6, IMCPv6, TCPv6, and UDPv6 are the primary focus of NetworkIO and building it all on top of Raw Sockets.
-*/
-
 #include "../include/NetworkIO.h"          /* Included for our declarations */
 #include "../include/TextIO/TextIOTypes.h" /* Included for Unicode types */
 #include "../include/TextIO/LogIO.h"       /* Included for Unicode types */
@@ -38,8 +29,6 @@ extern "C" {
      Need to accept address strings as any Unicode encoding, especially the big 3 UTF-8, UTF-16, UTF-32.
 
      Link-Local Address: fe80::/10, the suffix is 64 bits, potentially the MAC Address? DO NOT USE THE MAC ADDRESS, RFC-7217.
-
-
      */
 
     typedef struct IPV6Address {

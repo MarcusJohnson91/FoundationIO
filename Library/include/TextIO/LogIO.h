@@ -1,9 +1,9 @@
 /*!
- @header           LogIO.h
- @author           Marcus Johnson
- @copyright        2017+
- @version          1.0.0
- @brief            This header contains code for logging errors and testingR information.
+ @header          LogIO.h
+ @author          Marcus Johnson
+ @copyright       2017+
+ @version         1.0.0
+ @brief           This header contains code for logging errors and testingR information.
  */
 
 #include "../PlatformIO.h"  /* Included for Platform Independence macros */
