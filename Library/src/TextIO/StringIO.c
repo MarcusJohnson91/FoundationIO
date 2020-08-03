@@ -1,7 +1,7 @@
-#include "../../include/TextIO/StringIO.h"              /* Included for our declarations */
-#include "../../include/MathIO.h"                       /* Included for endian swapping */
-#include "../../include/TextIO/LogIO.h"                 /* Included for error logging */
-#include "../../include/TextIO/Private/TextTables.h"    /* Included for the Unicode tables */
+#include "../../include/TextIO/StringIO.h"           /* Included for our declarations */
+#include "../../include/MathIO.h"                    /* Included for endian swapping */
+#include "../../include/TextIO/LogIO.h"              /* Included for error logging */
+#include "../../include/TextIO/Private/TextTables.h" /* Included for the Unicode tables */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {

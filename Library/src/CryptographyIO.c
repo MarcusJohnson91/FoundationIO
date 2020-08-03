@@ -2,7 +2,7 @@
 #include "../include/Private/Constants.h" /* Included for BitMaskTables */
 #include "../include/CryptographyIO.h"    /* Included for our declarations */
 #include "../include/MathIO.h"            /* Included for Bits2Bytes, etc */
-#include "../include/TextIO/LogIO.h"   /* Included for error logging */
+#include "../include/TextIO/LogIO.h"      /* Included for error logging */
 
 #if   (PlatformIO_TargetOS == PlatformIO_WindowsOS)
 #include <BCrypt.h>

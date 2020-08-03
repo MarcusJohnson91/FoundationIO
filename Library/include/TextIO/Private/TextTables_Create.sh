@@ -25,8 +25,15 @@ CreateHeaderFileTop() {
     CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')])" "$UCD_Data")
     CanonicalNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n "$UCD_Data")
     {
+        printf "/*!\n"
+        printf " @header          TextTables.h\n"
+        printf " @author          Marcus Johnson\n"
+        printf " @copyright       2018+\n"
+        printf " @version         1.2.0\n"
+        printf " @brief           This header contains tables used across FoundationIO for Unicode and character set conversion.\n"
+        printf " */\n\n"
         printf "#include \"../../PlatformIO.h\"  /* Included for Platform Independence macros */\n"
-        printf "#include \"../TextIOTypes.h\" /* Included for UTFX types */\n\n"
+        printf "#include \"../TextIOTypes.h\"    /* Included for the Text types */\n\n"
         printf "#pragma once\n\n"
         printf "#ifndef FoundationIO_TextIO_TextTables_H\n"
         printf "#define FoundationIO_TextIO_TextTables_H\n\n"

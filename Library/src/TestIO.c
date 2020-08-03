@@ -1,15 +1,15 @@
-#include "../include/TestIO.h"             /* Included for our declarations */
-#include "../include/CryptographyIO.h"     /* Included for SecureRNG */
+#include "../include/TestIO.h"          /* Included for our declarations */
+#include "../include/CryptographyIO.h"  /* Included for SecureRNG */
 #include "../include/TextIO/LogIO.h"    /* Included for error reporting */
 #include "../include/TextIO/StringIO.h" /* Included for UTFX_Init functions */
 
 #if   (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_AppleOS) != PlatformIO_AppleOS))
-#include <time.h>                      /* Included for timespec_get */
+#include <time.h>                       /* Included for timespec_get */
 #elif (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_AppleOS) == PlatformIO_AppleOS))
-#include <mach/mach_time.h>
+#include <mach/mach_time.h>             /* Included for mach_continuous_time */
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
 #include <Windows.h>
-#include <WinBase.h>                   /* Included for QueryPerformanceCounter, Windows.h MUST be included before winbase */
+#include <WinBase.h>                    /* Included for QueryPerformanceCounter, Windows.h MUST be included first */
 #endif
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
