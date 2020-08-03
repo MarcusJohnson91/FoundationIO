@@ -1,9 +1,9 @@
 /*!
- @header              CryptographyIO.h
- @author              Marcus Johnson
- @copyright           2019+
- @version             1.0.0
- @brief               This header contains types, functions, and tables for cryptography and hashing.
+ @header          CryptographyIO.h
+ @author          Marcus Johnson
+ @copyright       2019+
+ @version         1.0.0
+ @brief           This header contains types, functions, and tables for cryptography and hashing.
  */
 
 #include "PlatformIO.h"         /* Included for Platform Independence macros */

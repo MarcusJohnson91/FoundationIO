@@ -1,16 +1,15 @@
 /*!
- @header           CommandLineIO.h
- @author           Marcus Johnson
- @copyright        2017+
- @version          1.0.0
- @brief            This header contains code for creating a command line interface.
- @description
- Terminology:
-  Arguments:       StringSet of unparsed data.
-  Argument:        A String from StringSet.
-  Switch:          Programmer defined behavior the user may or may not use.
-  SwitchArgument:  The argument to a switch.
-  Option:          User selected switches to direct the program to do something.
+ @header          CommandLineIO.h
+ @author          Marcus Johnson
+ @copyright       2017+
+ @version         1.0.0
+ @brief           This header contains code for creating a command line interface.
+ @terminology
+  Arguments:      StringSet of unparsed data.
+  Argument:       A String from StringSet.
+  Switch:         Programmer defined behavior the user may or may not use.
+  SwitchArgument: The argument to a switch.
+  Option:         User selected switches to direct the program to do something.
  */
 
 #include "../PlatformIO.h"  /* Included for Platform Independence macros */

@@ -1,10 +1,10 @@
 /*!
- @header              TestIO.h
- @author              Marcus Johnson
- @copyright           2019+
- @version             1.0.0
- @brief               This header contains types, functions, and tables for automated testing.
- @terminology         Test Case: individual test; Test Suite: group of similar test cases;
+ @header          TestIO.h
+ @author          Marcus Johnson
+ @copyright       2019+
+ @version         1.0.0
+ @brief           This header contains types, functions, and tables for automated testing.
+ @terminology     Test Case: individual test; Test Suite: group of similar test cases;
  */
 
 #include "PlatformIO.h"         /* Included for Platform Independence macros */
