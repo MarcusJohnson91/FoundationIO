@@ -1,5 +1,5 @@
-#include "../../include/MathIO.h"          /* Included for Logarithm */
 #include "../../include/TextIO/FormatIO.h" /* Included for our declarations */
+#include "../../include/MathIO.h"          /* Included for Logarithm */
 #include "../../include/TextIO/LogIO.h"    /* Included for Logging */
 #include "../../include/TextIO/StringIO.h" /* Included for StringIO */
 
@@ -1461,7 +1461,7 @@ extern "C" {
     }
     
     UTF32 **UTF32_Deformat(PlatformIO_Immutable(UTF32 *) Format, PlatformIO_Immutable(UTF32 *) Formatted) {
-        UTF32 **StringSet                  = NULL;
+        UTF32 **StringSet                    = NULL;
         if (Format != NULL && Formatted != NULL) {
             uint64_t NumSpecifiers           = UTF32_GetNumFormatSpecifiers(Format);
             if (NumSpecifiers > 0) {
