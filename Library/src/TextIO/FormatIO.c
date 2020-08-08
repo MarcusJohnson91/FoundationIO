@@ -1198,10 +1198,37 @@ extern "C" {
     
     UTF32 **DeformatString_UTF32(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, PlatformIO_Immutable(UTF32 *) Formatted) {
         UTF32 **Deformatted                            = UTF32_StringSet_Init(Specifiers->NumSpecifiers);
-        if (Format != NULL && Specifiers != NULL) {
+        if (Format != NULL && Specifiers != NULL && Deformatted != NULL) {
             for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
                 /*
-                 How do wwe support Positional Specifiers?
+                 Example:
+                 "Daddy'll buy you a %sing b%s.", "mock", "ird"
+                 "Daddy'll buy you a mocking bird."
+                 2 specifiers,
+                 0:
+                   start: 19
+                   end: 20
+                 1:
+                   start: 26
+                   end: 27
+
+                 Format string length:    28
+                 Formatted string length: 32
+                 specifiers total size = 4
+                 32 - 28 = 4, so the formatting = 8
+
+                 but theres an easier way.
+
+                 read from the end of the format specifier until the start of the next specifier, or until the string is done.
+                 comparing codepoints as you go.
+
+                 copy until they start matching
+
+                 So, we need to create a StringSet of the number of specifiers
+
+                 ----
+
+                 %U32s is for type specific formatters
                  */
                 FormatIO_BaseTypes     BaseType = Specifiers->Specifiers[Specifier].BaseType;
                 FormatIO_ModifierTypes Modifier = Specifiers->Specifiers[Specifier].ModifierType;
@@ -1224,6 +1251,8 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
         } else if (Specifiers == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FormatSpecifiers Pointer is NULL"));
+        } else if (Deformatted == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("StringSet Pointer is NULL"));
         }
         return Deformatted;
     }
