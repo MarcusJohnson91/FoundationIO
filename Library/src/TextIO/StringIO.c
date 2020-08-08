@@ -3465,7 +3465,7 @@ extern "C" {
         if (NumStrings > 0) {
             StringSet    = (UTF8**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF8*));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringSet[String][0] = 0xFFFF;
+                StringSet[String][0] = 0xFF;
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
