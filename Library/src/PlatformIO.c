@@ -1,3 +1,4 @@
+#include "../include/PlatformIO.h"      /* Included for our declarations */
 #include "../include/TextIO/LogIO.h"    /* Included for logging errors */
 #include "../include/TextIO/StringIO.h" /* Included for Path functions */
 
