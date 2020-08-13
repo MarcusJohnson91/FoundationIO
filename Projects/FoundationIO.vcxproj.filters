@@ -21,9 +21,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Library\src\BitIO.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Library\src\CryptographyIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -51,11 +48,17 @@
     <ClCompile Include="..\Library\src\TextIO\StringIO.c">
       <Filter>Source Files\TextIO</Filter>
     </ClCompile>
+    <ClCompile Include="..\Library\src\BufferIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\src\FileIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\src\NetworkIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Library\include\BitIO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Library\include\CryptographyIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -89,7 +92,16 @@
     <ClInclude Include="..\Library\include\TextIO\TextIOTypes.h">
       <Filter>Header Files\TextIO</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\TextIO\Private\UnicodeTables.h">
+    <ClInclude Include="..\Library\include\BufferIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\FileIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\NetworkIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\TextIO\Private\TextTables.h">
       <Filter>Header Files\TextIO\Private</Filter>
     </ClInclude>
   </ItemGroup>
