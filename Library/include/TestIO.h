@@ -67,9 +67,9 @@ extern "C" {
 #endif
 
     /*!
-    @abstract                                    Forward Declaration of CryptographyIO's SecureRNG.
+    @abstract                                     Forward Declaration of CryptographyIO's SecureRNG.
     */
-    typedef struct SecureRNG SecureRNG;
+    typedef struct SecureRNG                      SecureRNG;
     
     /*!
      @abstract                                    Gets how accurate the clock is.
