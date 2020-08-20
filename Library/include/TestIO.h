@@ -9,6 +9,7 @@
 
 #include "PlatformIO.h"         /* Included for Platform Independence macros */
 #include "TextIO/TextIOTypes.h" /* Included for Text types */
+#include "TextIO/LogIO.h"       /* Included for Logging, tests need to log errors */
 
 #pragma once
 
