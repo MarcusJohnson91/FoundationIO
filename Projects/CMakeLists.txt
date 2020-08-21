@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
-# Ok, so new structure: Globals, followed by Options, followed by config-specific variables.
-
 project(FoundationIO C)
 include(CTest)
 
@@ -154,7 +152,6 @@ if(BUILD_TESTING)
     add_test(Test_CommandLineIO                     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Test_CommandLineIO")
     add_test(Test_FormatIO                          "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Test_FormatIO")
     add_test(Test_StringIO                          "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Test_StringIO")
-    #add_test(address ${TEST_BIN} ${CMAKE_CURRENT_LIST_DIR}/address.wast)
 
     install(TARGETS Test_BufferIO       DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
     install(TARGETS Test_CommandLineIO  DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
