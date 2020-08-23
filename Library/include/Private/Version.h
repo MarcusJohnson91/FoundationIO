@@ -1,12 +1,12 @@
 /*!
- @header          FoundationIO.h
+ @header          Version.h
  @author          Marcus Johnson
  @copyright       2020+
  @version         1.0.0
  @brief           This header contains macros that define FoundationIO's version.
  */
 
-#include "../PlatformIO.h"         /* Included for Platform Independence macros */
+#include "../PlatformIO.h" /* Included for Platform Independence macros */
 
 #pragma once
 

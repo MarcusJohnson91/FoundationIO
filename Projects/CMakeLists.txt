@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+project(FoundationIO LANGUAGES C)
 
-project(FoundationIO C)
+include(DetectArchitecture.cmake)
+FindTargetArchitecture(TargetArchitecture)
+
 include(CTest)
 
 if(DEFINED CMAKE_BUILD_TYPE AND CMAKE_BUILD_TYPE STREQUAL "")
@@ -8,10 +11,6 @@ if(DEFINED CMAKE_BUILD_TYPE AND CMAKE_BUILD_TYPE STREQUAL "")
 elseif(NOT DEFINED CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif(DEFINED CMAKE_BUILD_TYPE AND CMAKE_BUILD_TYPE STREQUAL "")
-
-include(DetectArchitecture.cmake)
-
-FindTargetArchitecture(TargetArchitecture)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${TargetArchitecture}/${CMAKE_BUILD_TYPE}")
 set(CMAKE_OUTPUT_DIRECTORY         "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${TargetArchitecture}/${CMAKE_BUILD_TYPE}")
@@ -21,7 +20,7 @@ set(FoundationIO_Library_Dir       "${CMAKE_CURRENT_SOURCE_DIR}/../Library")
 set(FoundationIO_Test_Dir          "${CMAKE_CURRENT_SOURCE_DIR}/../Tests")
 set(FoundationIO_Resource_Dir      "${CMAKE_CURRENT_SOURCE_DIR}/../Resources")
 
-set(FOUNDATIONIO_PUBLIC_HEADERS
+set(PUBLIC_HEADERS
 "${FoundationIO_Library_Dir}/include/BufferIO.h"
 "${FoundationIO_Library_Dir}/include/CryptographyIO.h"
 "${FoundationIO_Library_Dir}/include/FileIO.h"
@@ -29,9 +28,22 @@ set(FOUNDATIONIO_PUBLIC_HEADERS
 "${FoundationIO_Library_Dir}/include/NetworkIO.h"
 "${FoundationIO_Library_Dir}/include/PlatformIO.h"
 "${FoundationIO_Library_Dir}/include/TestIO.h"
+"${FoundationIO_Library_Dir}/include/TextIO/CommandLineIO.h"
+"${FoundationIO_Library_Dir}/include/TextIO/FormatIO.h"
+"${FoundationIO_Library_Dir}/include/TextIO/LocalizationIO.h"
+"${FoundationIO_Library_Dir}/include/TextIO/LogIO.h"
+"${FoundationIO_Library_Dir}/include/TextIO/StringIO.h"
+"${FoundationIO_Library_Dir}/include/TextIO/TextIOTypes.h"
 )
 
-set(TEXTIO_PUBLIC_HEADERS
+set(PUBLIC_HEADERS
+"${FoundationIO_Library_Dir}/include/BufferIO.h"
+"${FoundationIO_Library_Dir}/include/CryptographyIO.h"
+"${FoundationIO_Library_Dir}/include/FileIO.h"
+"${FoundationIO_Library_Dir}/include/MathIO.h"
+"${FoundationIO_Library_Dir}/include/NetworkIO.h"
+"${FoundationIO_Library_Dir}/include/PlatformIO.h"
+"${FoundationIO_Library_Dir}/include/TestIO.h"
 "${FoundationIO_Library_Dir}/include/TextIO/CommandLineIO.h"
 "${FoundationIO_Library_Dir}/include/TextIO/FormatIO.h"
 "${FoundationIO_Library_Dir}/include/TextIO/LocalizationIO.h"
@@ -70,18 +82,16 @@ endif(CMAKE_HOST_UNIX)
 
 find_package(Git)
 
-include(CMakePrintHelpers)
-
 if(GIT_FOUND)
-    file(READ "../Library/include/Private/FoundationIO.h" FoundationIO_Header)
+    file(READ "../Library/include/Private/Version.h" FoundationIO_Version_Header)
 
-    string(REGEX MATCH "#define FoundationIO_Version_Major [0-9]+" _ "${FoundationIO_Header}")
+    string(REGEX MATCH "#define FoundationIO_Version_Major [0-9]+" _ "${FoundationIO_Version_Header}")
     string(REGEX MATCH "[0-9]+" VERSION_MAJOR "${_}")
 
-    string(REGEX MATCH "#define FoundationIO_Version_Minor [0-9]+" _ "${FoundationIO_Header}")
+    string(REGEX MATCH "#define FoundationIO_Version_Minor [0-9]+" _ "${FoundationIO_Version_Header}")
     string(REGEX MATCH "[0-9]+" VERSION_MINOR "${_}")
 
-    string(REGEX MATCH "#define FoundationIO_Version_Patch [0-9]+" _ "${FoundationIO_Header}")
+    string(REGEX MATCH "#define FoundationIO_Version_Patch [0-9]+" _ "${FoundationIO_Version_Header}")
     string(REGEX MATCH "[0-9]+" VERSION_PATCH "${_}")
 
 
@@ -119,8 +129,7 @@ elseif(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_WIN32)
 endif(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_UNIX)
 
 install(TARGETS FoundationIO                  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install(FILES  ${FOUNDATIONIO_PUBLIC_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
-install(FILES  ${TEXTIO_PUBLIC_HEADERS}       DESTINATION ${CMAKE_INSTALL_PREFIX}/include/TextIO)
+install(DIRECTORY "${FoundationIO_Library_Dir}/include" DESTINATION "${CMAKE_INSTALL_PREFIX}" FILES_MATCHING PATTERN "*.h" PATTERN "*Private*" EXCLUDE)
 install(FILES "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Resources/FoundationIO.pc" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
 
 if(BUILD_TESTING)
