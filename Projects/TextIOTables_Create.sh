@@ -4,7 +4,6 @@
 # Dependencies: Curl, XMLStarlet (On Mac install Homebrew from brew.sh then call brew install xmlstarlet)
 
 CreateHeaderFileTop() {
-    ScriptSHA=$(shasum "$0" | awk '{print $1}')
     IntegerTableBase2Size=2
     IntegerTableBase8Size=8
     TableBase10Size=10
@@ -371,33 +370,8 @@ CreateHeaderFileBottom() {
     printf "#endif /* FoundationIO_TextIO_TextTables_H */\n"
 } >> "$HeaderFile"
 
-DownloadUCD() {
-	ZipFileSize=$(curl -sI "https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" | grep "Content-Length: " | awk '{printf $2}' | sed "s/$(printf '\r')\$//")
-    if [ "$ZipFileSize" -lt "$FreeSpaceInBytes" ]; then
-        curl -s -N "https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" -o "$UCD_Folder/ucd.all.flat.zip"
-        ZipUncompressedSize=$(zipinfo "$UCD_Folder/ucd.all.flat.zip" | tail -n 1 | awk '{printf $3}' | sed "s/$(printf '\r')\$//")
-        if [ "$ZipUncompressedSize" -le "$FreeSpaceInBytes" ]; then
-            echo "Generating the Unicode tables..."
-
-            rm -rf "$HeaderFile"
-            touch "$HeaderFile"
-
-            unzip -q "$UCD_Folder/ucd.all.flat.zip" -d "$UCD_Folder"
-            rm -f "$UCD_Folder/ucd.all.flat.zip"
-
-            UCD_Data="$UCD_Folder/ucd.all.flat.xml"
-		else
-			echo "Couldn't extract UCD, Exiting."
-			exit 0
-		fi
-	else
-		echo "Couldn't download UCD, Exiting."
-		exit 0
-	fi
-}
-
 CreateTables() {
-	CreateHeaderFileTop
+    CreateHeaderFileTop
 
     CreateMathConstantTables
 
@@ -416,6 +390,25 @@ CreateTables() {
     CreateHeaderFileBottom
 }
 
+DownloadUCD() {
+	ZipFileSize=$(curl -sI "https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" | grep "Content-Length: " | awk '{printf $2}' | sed "s/$(printf '\r')\$//")
+    if [ "$ZipFileSize" -lt "$FreeSpaceInBytes" ]; then
+        curl -s -N "https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" -o "$TempFolder/ucd.all.flat.zip"
+        ZipUncompressedSize=$(zipinfo "$TempFolder/ucd.all.flat.zip" | tail -n 1 | awk '{printf $3}' | sed "s/$(printf '\r')\$//")
+        if [ "$ZipUncompressedSize" -le "$FreeSpaceInBytes" ]; then
+            unzip -q "$TempFolder/ucd.all.flat.zip" -d "$TempFolder"
+            rm -f "$TempFolder/ucd.all.flat.zip"
+            UCD_Data="$TempFolder/ucd.all.flat.xml"
+		else
+			echo "Couldn't extract UCD, Exiting." >&2
+			exit 0
+		fi
+	else
+		echo "Couldn't download UCD, Exiting." >&2
+		exit 0
+	fi
+}
+
 # Check that there's exactly 1 argument to the program
 # If there is 1 argument, check if the file exists, 
 # if the file exists check the version number against the latest release of Unicode
@@ -423,79 +416,82 @@ CreateTables() {
 
 HeaderFile=$1
 TempFolder=$(mktemp -d)
-TempPath=$(dirname "$TempFolder")
-rmdir "$TempFolder"
-FreeSpaceInBytes=$(df -H "$TempPath" | awk '{printf $7}' | cut -c 6-)
+FreeSpaceInBytes=$(df -H "$TempFolder" | awk '{printf $7}' | cut -c 6-)
+curl -s "https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt" -o "$TempFolder/readme.txt"
+ReadmeUnicodeVersion=$(grep 'XML Representation of Unicode ' "$TempFolder/readme.txt" | awk '{printf $5}')
 
 if [ $# -eq 1 ]; then
-	XMLStarletPath=$(command -v xmlstarlet)
-	UnzipPath=$(command -v unzip)
-	CurlPath=$(command -v curl)
-	SHAPath=$(command -v shasum)
-	
-	if [ -n "$XMLStarletPath" ] && [ -n "$UnzipPath" ] && [ -n "$CurlPath" ] && [ -n "$SHAPath" ]; then
-		# We're good, we can now test if the headerfile exists.
-		UCD_Folder=$(mktemp -d)
-        
-        ReadmeSize=$(curl -sI "https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt" | grep "Content-Length: " | awk '{printf $2}' | sed "s/$(printf '\r')\$//")
-        if [ "$ReadmeSize" -lt "$FreeSpaceInBytes" ]; then
-            curl -s "https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt" -o "$UCD_Folder/readme.txt"
-            ReadmeUnicodeVersion=$(grep 'XML Representation of Unicode ' "$UCD_Folder/readme.txt" | awk '{printf $5}')
-            ReadmeUnicodeVMajor=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $1}')
-            ReadmeUnicodeVMinor=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $2}')
-            ReadmeUnicodeVPatch=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $3}')
-            
-            if [ -e "$HeaderFile" ]; then
-                HeaderScriptHash=$(grep '#define ScriptHash ' "$HeaderFile" | awk '{printf $3}')
-                
+    SHAPath=$(command -v shasum)
+    if [ -n "$SHAPath"  ]; then
+        HeaderScriptHash=$(grep '#define ScriptHash ' "$HeaderFile" | awk '{printf $3}')
+        ScriptSHA=$(shasum "$0" | awk '{print $1}')
+        if [ "$HeaderScriptHash" != "$ScriptSHA" ]; then
+            CurlPath=$(command -v curl)
+            if [ -n "$CurlPath" ]; then
+                XMLStarletPath=$(command -v xmlstarlet)
+                if [ -n "$XMLStarletPath" ]; then
+                    UnzipPath=$(command -v unzip)
+                    if [ -n "$UnzipPath" ]; then
+                        echo "Deleting header, press Control-C within 5 seconds to abort..."
+                        sleep 5
+                        rm    "$HeaderFile"
+                        touch "$HeaderFile"
+                        DownloadUCD
+                        CreateTables
+                    else
+                        echo "Can't find Unzip, install it and re-run the script."
+                        exit 1
+                    fi
+                else
+                    echo "Can't find XMLStarlet, install it and re-run the script."
+                    exit 1
+                fi
+            else
+                echo "Can't find cURL, install it and re-run the script."
+                exit 1
+            fi
+        else
+            ReadmeSize=$(curl -sI "https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt" | grep "Content-Length: " | awk '{printf $2}' | sed "s/$(printf '\r')\$//")
+
+            if [ "$ReadmeSize" -lt "$FreeSpaceInBytes" ]; then
+                ReadmeUnicodeVMajor=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $1}')
+                ReadmeUnicodeVMinor=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $2}')
+                ReadmeUnicodeVPatch=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $3}')
                 HeaderUnicodeVersion=$(grep '#define UnicodeVersion ' "$HeaderFile" | awk '{printf $3}')
                 HeaderUnicodeVMajor=$(echo "$HeaderUnicodeVersion" | awk -F "." '{printf $1}')
                 HeaderUnicodeVMinor=$(echo "$HeaderUnicodeVersion" | awk -F "." '{printf $2}')
                 HeaderUnicodeVPatch=$(echo "$HeaderUnicodeVersion" | awk -F "." '{printf $3}')
-                
-                if [ "$HeaderScriptHash" != "$ScriptSHA" ]; then
-                    rm "$HeaderFile"
-                    touch "$HeaderFile"
-                    DownloadUCD
-                    CreateTables
-                elif [ "$HeaderUnicodeVPatch" -lt "$ReadmeUnicodeVPatch" ] || [ "$HeaderUnicodeVMinor" -lt "$ReadmeUnicodeVMinor" ] || [ "$HeaderUnicodeVMajor" -lt "$ReadmeUnicodeVMajor" ]; then
-                    rm "$HeaderFile"
-                    touch "$HeaderFile"
-                    DownloadUCD
-                    CreateTables
+
+                if [ "$HeaderUnicodeVPatch" -lt "$ReadmeUnicodeVPatch" ] || [ "$HeaderUnicodeVMinor" -lt "$ReadmeUnicodeVMinor" ] || [ "$HeaderUnicodeVMajor" -lt "$ReadmeUnicodeVMajor" ]; then
+                    if [ -f "$HeaderFile" ] && [ -s "$HeaderFile" ]; then
+                        echo "Deleting header, press Control-C within 5 seconds to abort..."
+                        sleep 5
+                        rm    "$HeaderFile"
+                        touch "$HeaderFile"
+                        DownloadUCD
+                        echo "Generating Text Tables..."
+                        CreateTables
+                    else
+                        DownloadUCD
+                        echo "Generating Text Tables..."
+                        CreateTables
+                    fi
                 else
-                    echo "The Unicode tables are already up to date, Exiting."
-                    exit 0
+                    echo "The Text tables are already up to date."
+                    exit 1
                 fi
             else
-                touch "$HeaderFile"
-                DownloadUCD
-                CreateTables
+                echo "Not enough free space to download the ReadMe, Exiting." >&2
+                exit 0 # -2 is not enough free space
             fi
-        else
-            echo "Not enough free space to download the ReadMe, Exiting."
-            exit 0
         fi
     else
-        echo "You must install the following tools:"
-        if [ -z "$CurlPath" ]; then
-            echo "Curl"
-        fi
-        
-        if [ -z "$SHAPath" ]; then
-            echo "SHASum"
-        fi
-        
-        if [ -z "$UnzipPath" ]; then
-            echo "Unzip"
-        fi
-        
-        if [ -z "$XMLStarletPath" ]; then
-            echo "XMLStarlet"
-        fi
+        echo "Can't find SHASum, install it and re-run the script."
+        exit 1
     fi
 else
-	echo "The first and only argument must be the header file to overwrite."
+	echo "The first and only argument must be the header file to overwrite." >&2
+    exit 0
 fi
 
 # Unicode CLDR Parsing too; download: http://unicode.org/Public/cldr/latest/cldr-common-X.X.zip en.xml from /common/main
