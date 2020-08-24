@@ -80,6 +80,17 @@ elseif(CMAKE_HOST_WIN32)
     target_link_libraries(FoundationIO ws2_32 bcrypt)
 endif(CMAKE_HOST_UNIX)
 
+if(CMAKE_HOST_UNIX)
+    message("We're checking if TextTables.h should be updated, it could take a few seconds or about 15 minutes.")
+    execute_process(
+    COMMAND sh "${FoundationIO_Library_Dir}/include/TextIO/Private/TextTables_Create.sh" "${FoundationIO_Library_Dir}/include/TextIO/Private/TextTables.h"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE TextTables_Create_Status 
+    RESULTS_VARIABLE STDOUT
+    ERROR_VARIABLE STDERR
+)
+endif(CMAKE_HOST_UNIX)
+
 find_package(Git)
 
 if(GIT_FOUND)
