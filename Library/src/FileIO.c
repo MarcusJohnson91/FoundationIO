@@ -2,7 +2,6 @@
 #include "../include/BufferIO.h"          /* Included for BitBuffer */
 #include "../include/CryptographyIO.h"    /* Included for SecureRNG_GenerateInteger for GUUID_Generate */
 #include "../include/MathIO.h"            /* Included for Bits2Bytes */
-#include "../include/Private/Constants.h" /* Included for BitMaskTables */
 #include "../include/TextIO/FormatIO.h"   /* Included for UTF32_Format */
 #include "../include/TextIO/LogIO.h"      /* Included for Logging */
 #include "../include/TextIO/StringIO.h"   /* Included for StringIO's declarations */
@@ -144,7 +143,7 @@ extern "C" {
             uint8_t  Bits2Save       = ArrayOffset % 8;
             if (Bits2Save > 0) {
                 Array[0]             = 0;
-                uint8_t Saved        = Array[Bytes2Read + 1] & BitMaskTable[Bits2Save - 1];
+                uint8_t Saved        = Array[Bytes2Read + 1] & (Logarithm(2, Bits2Save) - 1); // Todo: Add shift
                 Array[0]             = Saved;
                 BitBuffer_SetPosition(BitB, Bits2Save);
                 for (uint64_t Byte   = (uint64_t) Bits2Bytes(ArrayOffset, RoundingType_Down); Byte < (uint64_t) Bits2Bytes(ArraySizeInBits - ArrayOffset, RoundingType_Down); Byte++) {

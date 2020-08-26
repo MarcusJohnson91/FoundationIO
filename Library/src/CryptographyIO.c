@@ -1,6 +1,5 @@
 #include "../include/CryptographyIO.h"    /* Included for our declarations */
 #include "../include/BufferIO.h"          /* Included for BitBuffer for CRC32 and Adler32 */
-#include "../include/Private/Constants.h" /* Included for BitMaskTables */
 #include "../include/MathIO.h"            /* Included for Bits2Bytes, etc */
 #include "../include/TextIO/LogIO.h"      /* Included for error logging */
 
@@ -289,10 +288,29 @@ extern "C" {
                 while (Bits2Read > 0) {
                     uint8_t  BitsInCurrentByte = Bits2ExtractFromByte(Random->BitOffset);
                     uint8_t  Bits2Get          = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
+                    // So convert the number of bits to be read to an actual mask.
+                    // Can't you just do 2^NumBits to get a basic mask, then shift it to where it's needed?
+                    // How much do you shift the mask tho? BitOffset - Bits2Get should do it? that way it's always positioned
                     uint8_t  Shift             = BitsInCurrentByte - Bits2Get;
-                    uint8_t  BitMask           = BitMaskTable[Bits2Get - 1] << Shift;
-                    uint64_t Byte              = Bits2Bytes(Random->BitOffset, RoundingType_Down);
-                    uint8_t  ExtractedBits     = Random->EntropyPool[Byte] & BitMask;
+                    uint64_t BitMask2          = (Logarithm(2, Bits2Get) - 1) << Shift; // Now we just need to shift it, if it's 3 bits shift it 8 - 3 bits to left align.
+                    // But we need to square that with BitOffset.
+                    /*
+                     BitOffset % 8 = (14 % 8) = 6
+                     aka the first 6 bits are already used, 8 - 6 = 2 bits remaining in this byte.
+                     so we need our mask to be 2^Bits2Get
+                     then the mask needs to be shifted by Bits2Get - ?????
+
+                     The mask is naturally right aligned so we need to coerce it to left alignment WHEN the mask is ?????
+
+                     When the mask is of fewer bits than the byte can provide?
+
+                     if the mask is smaller than BitOffsset % 8, it needs to be shifted to the left.
+                     */
+                    if (BitsInCurrentByte > Bits2Get) {
+                        // Left Shift by BitsInCurrentByte - Bits2Get?
+                    }
+                    uint8_t  BitMask           = (Logarithm(2, Bits2Get) - 1) << Shift;
+                    uint8_t  ExtractedBits     = Random->EntropyPool[Bits2Bytes(Random->BitOffset, RoundingType_Down)] & BitMask;
                     ExtractedBits            >>= Shift;
 
                     Bits                     <<= Bits2Get;
