@@ -71,9 +71,6 @@
     <ClInclude Include="..\Library\include\TestIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\Private\Constants.h">
-      <Filter>Header Files\Private</Filter>
-    </ClInclude>
     <ClInclude Include="..\Library\include\TextIO\CommandLineIO.h">
       <Filter>Header Files\TextIO</Filter>
     </ClInclude>

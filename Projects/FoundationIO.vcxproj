@@ -40,7 +40,6 @@
     <ClInclude Include="..\Library\include\NetworkIO.h" />
     <ClInclude Include="..\Library\include\PlatformIO.h" />
     <ClInclude Include="..\Library\include\TestIO.h" />
-	<ClInclude Include="..\Library\include\Private\Constants.h" />
     <ClInclude Include="..\Library\include\TextIO\CommandLineIO.h" />
     <ClInclude Include="..\Library\include\TextIO\FormatIO.h" />
     <ClInclude Include="..\Library\include\TextIO\LocalizationIO.h" />

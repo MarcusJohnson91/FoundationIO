@@ -36,22 +36,6 @@ set(PUBLIC_HEADERS
 "${FoundationIO_Library_Dir}/include/TextIO/TextIOTypes.h"
 )
 
-set(PUBLIC_HEADERS
-"${FoundationIO_Library_Dir}/include/BufferIO.h"
-"${FoundationIO_Library_Dir}/include/CryptographyIO.h"
-"${FoundationIO_Library_Dir}/include/FileIO.h"
-"${FoundationIO_Library_Dir}/include/MathIO.h"
-"${FoundationIO_Library_Dir}/include/NetworkIO.h"
-"${FoundationIO_Library_Dir}/include/PlatformIO.h"
-"${FoundationIO_Library_Dir}/include/TestIO.h"
-"${FoundationIO_Library_Dir}/include/TextIO/CommandLineIO.h"
-"${FoundationIO_Library_Dir}/include/TextIO/FormatIO.h"
-"${FoundationIO_Library_Dir}/include/TextIO/LocalizationIO.h"
-"${FoundationIO_Library_Dir}/include/TextIO/LogIO.h"
-"${FoundationIO_Library_Dir}/include/TextIO/StringIO.h"
-"${FoundationIO_Library_Dir}/include/TextIO/TextIOTypes.h"
-)
-
 set(FOUNDATIONIO_SOURCE
 "${FoundationIO_Library_Dir}/src/BufferIO.c"
 "${FoundationIO_Library_Dir}/src/CryptographyIO.c"

@@ -1,5 +1,4 @@
 #include "../include/BufferIO.h"          /* Included for our declarations */
-#include "../include/Private/Constants.h" /* Included for BitMaskTables */
 #include "../include/CryptographyIO.h"    /* Included for SecureRNG_GenerateInteger for GUUID_Generate */
 #include "../include/MathIO.h"            /* Included for Integer functions */
 #include "../include/TextIO/FormatIO.h"   /* Included for UTF32_Format */
@@ -216,7 +215,7 @@ extern "C" {
                 uint8_t  BitsInCurrentByte        = Bits2ExtractFromByte(BitB->BitOffset + Bits2Read);
                 uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
                 uint8_t  Shift                    = BitsInCurrentByte - Bits2Get;
-                uint8_t  BitMask                  = (uint8_t) BitMaskTable[Bits2Get - 1] << Shift;
+                uint8_t  BitMask                  = (uint8_t) (Logarithm(2, Bits2Get) - 1) << Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset + Bits2Read, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
                 uint8_t  ApplyBits                = ExtractedBits >> Shift;
@@ -239,7 +238,7 @@ extern "C" {
                 uint8_t  BitsInCurrentByte        = Bits2ExtractFromByte(BitB->BitOffset + Bits2Read);
                 uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
                 uint8_t  Shift                    = BitsInCurrentByte - Bits2Get;
-                uint8_t  BitMask                  = BitMaskTable[Bits2Get - 1] << Shift;
+                uint8_t  BitMask                  = (Logarithm(2, Bits2Get) - 1) << Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset + Bits2Read, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
                 uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
@@ -262,7 +261,7 @@ extern "C" {
                 uint8_t  BitsInCurrentByte        = Bits2ExtractFromByte(BitB->BitOffset);
                 uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
                 uint8_t  Shift                    = BitsInCurrentByte - Bits2Get;
-                uint8_t  BitMask                  = BitMaskTable[Bits2Get - 1] << Shift;
+                uint8_t  BitMask                  = (Logarithm(2, Bits2Get) - 1) << Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
                 uint8_t  ApplyBits                = ExtractedBits >> Shift;
@@ -285,7 +284,7 @@ extern "C" {
                 uint8_t  BitsInCurrentByte        = Bits2ExtractFromByte(BitB->BitOffset);
                 uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
                 uint8_t  Shift                    = BitsInCurrentByte - Bits2Get;
-                uint8_t  BitMask                  = BitMaskTable[Bits2Get - 1] << Shift;
+                uint8_t  BitMask                  = (Logarithm(2, Bits2Get) - 1) << Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
                 ExtractedBits                   >>= Shift;
@@ -307,7 +306,7 @@ extern "C" {
                 uint8_t  BitsInCurrentByte        = 8 - (BitB->BitOffset % 8);
                 uint8_t  Bits2Append2CurrentByte  = (uint8_t) Minimum(BitsInCurrentByte, Bits2Write);
                 uint8_t  Shift                    = BitsInCurrentByte - Bits2Append2CurrentByte;
-                uint8_t  ExtractBitMask           = BitMaskTable[Bits2Append2CurrentByte - 1] << Shift;
+                uint8_t  ExtractBitMask           = (Logarithm(2, Bits2Append2CurrentByte) - 1) << Shift;
                 uint8_t  ExtractedBits            = Data2Append & ExtractBitMask;
                 uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
@@ -327,7 +326,7 @@ extern "C" {
                 uint8_t  BitsInCurrentByte         = 8 - (BitB->BitOffset % 8);
                 uint8_t  Bits2Append2CurrentByte   = (uint8_t) Minimum(BitsInCurrentByte, Bits2Write);
                 uint8_t  Shift                     = BitsInCurrentByte - Bits2Append2CurrentByte;
-                uint8_t  ExtractBitMask            = BitMaskTable[Bits2Append2CurrentByte - 1] << Shift;
+                uint8_t  ExtractBitMask            = (Logarithm(2, Bits2Append2CurrentByte) - 1) << Shift;
                 uint8_t  ExtractedBits             = (Data2Write & ExtractBitMask) >> (Bits2Write - Bits2Append2CurrentByte);
                 if (BitsInCurrentByte > Bits2Append2CurrentByte) {
                     ExtractedBits                <<= (BitsInCurrentByte - Bits2Append2CurrentByte) - 1;
@@ -349,7 +348,7 @@ extern "C" {
                 uint8_t  BitsInCurrentByte         = 8 - (BitB->BitOffset % 8);
                 uint8_t  Bits2Append2CurrentByte   = (uint8_t) Minimum(BitsInCurrentByte, Bits2Write);
                 uint8_t  Shift                     = BitsInCurrentByte - Bits2Append2CurrentByte;
-                uint8_t  ExtractBitMask            = BitMaskTable[Bits2Append2CurrentByte - 1] << Shift;
+                uint8_t  ExtractBitMask            = (Logarithm(2, Bits2Append2CurrentByte) - 1) << Shift;
                 uint8_t  ExtractedBits             = Data2Write & ExtractBitMask;
                 if (BitsInCurrentByte > Bits2Append2CurrentByte) {
                     ExtractedBits                <<= (BitsInCurrentByte - Bits2Append2CurrentByte) - 1;
@@ -369,9 +368,9 @@ extern "C" {
             while (Bits2Write > 0) {
                 uint8_t  BitsByteCanContain        = 8 - (BitB->BitOffset % 8);
                 uint8_t  Bits2Append2CurrentByte   = (uint8_t) Minimum(BitsByteCanContain, Bits2Write);
-                uint8_t  ExtractionShift           = Bits2Write - Bits2Append2CurrentByte;
-                uint8_t  ExtractBitMask            = BitMaskTable[Bits2Append2CurrentByte - 1] << ExtractionShift;
-                uint64_t ExtractedBits             = (Data2Append & ExtractBitMask) >> ExtractionShift;
+                uint8_t  Shift                     = Bits2Write - Bits2Append2CurrentByte;
+                uint8_t  ExtractBitMask            = (Logarithm(2, Bits2Append2CurrentByte) - 1) << Shift;
+                uint64_t ExtractedBits             = (Data2Append & ExtractBitMask) >> Shift;
                 if (BitsByteCanContain > Bits2Append2CurrentByte) {
                     ExtractedBits                <<= (BitsByteCanContain - Bits2Append2CurrentByte) - 1;
                 }
