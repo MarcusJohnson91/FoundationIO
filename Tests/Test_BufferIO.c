@@ -1,5 +1,6 @@
 #include "../Library/include/TestIO.h"
 #include "../Library/include/BufferIO.h"
+#include "../Library/include/CryptographyIO.h"
 #include "../Library/include/MathIO.h"
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -20,6 +21,9 @@ extern "C" {
             BitBuffer_WriteBits(BitB, ByteOrder, BitOrder, NumBits2Extract, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Extract));
             int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder, BitOrder, NumBits2Extract);
+            if (ReadInteger != RandomInteger) {
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %llu does not match WrittenInteger: %llu"), ReadInteger, RandomInteger);
+            }
             BitBuffer_Erase(BitB, 0); // Clear the BitBuffer in between each run just to be sure.
         }
         

@@ -29,7 +29,7 @@ extern "C" {
 
     typedef struct SecureRNG {
         uint8_t  *EntropyPool;
-        uint64_t  EntropySize;
+        uint64_t  NumBits;
         uint64_t  BitOffset;
     } SecureRNG;
 
@@ -220,16 +220,16 @@ extern "C" {
         if (Random != NULL) {
             if (Random->EntropyPool != NULL) {
 #if   (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_LinuxOS) != PlatformIO_LinuxOS))
-                arc4random_buf(Random->EntropyPool, Random->EntropySize);
+                arc4random_buf(Random->EntropyPool, Bits2Bytes(Random->NumBits, RoundingType_Down));
 #elif (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS))
                 FILE *RandomFile          = PlatformIO_OpenUTF8(UTF8String("/dev/random"), FileMode_Read | FileMode_Binary);
-                size_t BytesRead          = PlatformIO_Read(RandomFile, &Random->EntropyPool, Random->EntropySize, 1);
-                if (BytesRead != Random->EntropySize) {
+                size_t BytesRead          = PlatformIO_Read(RandomFile, &Random->EntropyPool, Bits2Bytes(Random->NumBits, RoundingType_Down), 1);
+                if (BytesRead != Bits2Bytes(Random->NumBits, RoundingType_Down)) {
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
                 }
                 PlatformIO_Close(RandomFile);
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
-                NTSTATUS Status           = BCryptGenRandom(NULL, (PUCHAR) Random->EntropyPool, Random->EntropySize, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+                NTSTATUS Status           = BCryptGenRandom(NULL, (PUCHAR) Random->EntropyPool, Bits2Bytes(Random->NumBits, RoundingType_Down), BCRYPT_USE_SYSTEM_PREFERRED_RNG);
                 if (Status <= 0) {
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
                     abort();
@@ -243,7 +243,7 @@ extern "C" {
 
     static void SecureRNG_Mix(SecureRNG *Random) {
         if (Random != NULL) {
-            for (uint64_t Word = 0ULL; Word < Random->EntropySize / 8; Word++) {
+            for (uint64_t Word = 0ULL; Word < Bits2Bytes(Random->NumBits, RoundingType_Down) / 8; Word++) {
                 uint64_t Integer  = (int64_t) Random->EntropyPool;
 
                 uint64_t Seed1    = SecureRNG_BaseSeed(8);
@@ -251,10 +251,10 @@ extern "C" {
                 uint64_t Seed3    = SecureRNG_BaseSeed(8);
                 uint64_t Seed4    = SecureRNG_BaseSeed(8);
 
-                uint8_t  Rotate1  = SecureRNG_BaseSeed(1) % 64;
-                uint8_t  Rotate2  = SecureRNG_BaseSeed(1) % 64;
-                uint8_t  Rotate3  = SecureRNG_BaseSeed(1) % 64;
-                uint8_t  Rotate4  = SecureRNG_BaseSeed(1) % 64;
+                uint8_t  Rotate1  = SecureRNG_BaseSeed(1) % 7;
+                uint8_t  Rotate2  = SecureRNG_BaseSeed(1) % 7;
+                uint8_t  Rotate3  = SecureRNG_BaseSeed(1) % 7;
+                uint8_t  Rotate4  = SecureRNG_BaseSeed(1) % 7;
 
 
                 uint64_t Mixed1   = Integer ^ Seed1;
@@ -270,8 +270,7 @@ extern "C" {
                 uint64_t Rotated4 = Rotate(Mixed4, Rotate4, Rotate_Left);
 
                 for (uint8_t Loop = 0; Loop < 8; Loop++) {
-                    uint8_t Shift                    = Loop * 8;
-                    Random->EntropyPool[Word + Loop] = (Rotated4 & (0xFF << Shift)) >> Shift;
+                    Random->EntropyPool[Word + Loop] = (Rotated4 & (0xFF << Loop)) >> Loop;
                 }
             }
         } else {
@@ -334,21 +333,22 @@ extern "C" {
     }
 
     SecureRNG *SecureRNG_Init(uint64_t EntropyPoolSize) {
-        SecureRNG *Random                   = (SecureRNG*) calloc(1, sizeof(SecureRNG));
+        SecureRNG *Random             = (SecureRNG*) calloc(1, sizeof(SecureRNG));
         if (Random != NULL) {
-            if (EntropyPoolSize % 16 == 0) {
-                Random->EntropyPool       = (uint8_t*) calloc(EntropyPoolSize, sizeof(uint8_t));
-                if (Random->EntropyPool != NULL) {
-                    Random->EntropySize   = EntropyPoolSize;
-                    Random->BitOffset     = 0ULL;
-                    SecureRNG_Seed(Random);
-                    SecureRNG_Mix(Random);
-                } else {
-                    SecureRNG_Deinit(Random);
-                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate EntropyPool"));
-                }
+            uint64_t PoolSize         = EntropyPoolSize;
+            if (EntropyPoolSize % 16 != 0) {
+                PoolSize              = EntropyPoolSize + (16 - (EntropyPoolSize % 16));
+            }
+            
+            Random->EntropyPool       = (uint8_t*) calloc(EntropyPoolSize, sizeof(uint8_t));
+            if (Random->EntropyPool != NULL) {
+                Random->NumBits       = EntropyPoolSize * 8;
+                Random->BitOffset     = 0ULL;
+                SecureRNG_Seed(Random);
+                SecureRNG_Mix(Random);
             } else {
-                Log(Severity_USER, PlatformIO_FunctionName, UTF8String("EntropyPoolSize %llu is invalid, it MUST be a multiple of 16"), EntropyPoolSize);
+                SecureRNG_Deinit(Random);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate EntropyPool"));
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate SecureRNG"));
@@ -359,7 +359,7 @@ extern "C" {
     uint64_t SecureRNG_GetRemainingEntropy(SecureRNG *Random) {
         uint64_t RemainingBits = 0ULL;
         if (Random != NULL) {
-            RemainingBits      = Random->EntropySize - Random->BitOffset;
+            RemainingBits      = Random->NumBits - Random->BitOffset;
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         }
@@ -423,7 +423,7 @@ extern "C" {
     uint8_t SecureRNG_Erase(SecureRNG *Random, uint8_t NewValue) {
         uint8_t Verification = 0xFE;
         if (Random != NULL) {
-            for (uint64_t Byte = 0ULL; Byte < Random->EntropySize; Byte++) {
+            for (uint64_t Byte = 0ULL; Byte < Bits2Bytes(Random->NumBits, RoundingType_Down); Byte++) {
                 Random->EntropyPool[Byte] = NewValue;
             }
             Random->BitOffset             = NewValue;
