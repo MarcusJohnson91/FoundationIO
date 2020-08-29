@@ -278,7 +278,7 @@ extern "C" {
         if (SuccessIsZero != 0) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Seeking failed"));
         }
-        return ~SeekingWasSucessful;
+        return !SeekingWasSucessful;
     }
 
     uint64_t PlatformIO_Write(FILE *File2Write, uint8_t BufferElementSize, PlatformIO_Immutable(void *) Buffer, uint64_t Elements2Write) {
@@ -299,9 +299,8 @@ extern "C" {
         if (File != NULL) {
             fflush(File);
             FileClosedSucessfully  = fclose(File);
-
         }
-        return ~FileClosedSucessfully;
+        return !FileClosedSucessfully;
     }
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)

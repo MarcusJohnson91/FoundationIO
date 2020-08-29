@@ -1464,10 +1464,10 @@ extern "C" {
         UTF32   CodePoint     = 0;
         uint8_t CodeUnitsRead = 0;
         if (Source != NULL) {
-            CodeUnitsRead     = PlatformIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[0], UTF8MaxCodeUnitsInCodePoint, 1);
+            CodeUnitsRead     = (uint8_t) PlatformIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[0], UTF8MaxCodeUnitsInCodePoint, 1);
             if (CodeUnitsRead == 1) {
                 uint8_t CodePointSize = UTF8_GetCodePointSizeInCodeUnits(StringIO_PreallocateCodePoint_UTF8[0]) - 1;
-                CodeUnitsRead = PlatformIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[1], UTF8MaxCodeUnitsInCodePoint, CodePointSize);
+                CodeUnitsRead = (uint8_t) PlatformIO_Read(Source, &StringIO_PreallocateCodePoint_UTF8[1], UTF8MaxCodeUnitsInCodePoint, CodePointSize);
                 if (CodeUnitsRead == CodePointSize) {
                     CodePoint = UTF8_DecodeCodePoint(StringIO_PreallocateCodePoint_UTF8);
                 } else {
@@ -1486,10 +1486,10 @@ extern "C" {
         UTF32   CodePoint     = 0;
         uint8_t CodeUnitsRead = 0;
         if (Source != NULL) {
-            CodeUnitsRead     = PlatformIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[0], UTF16MaxCodeUnitsInCodePoint, 1);
+            CodeUnitsRead     = (uint8_t) PlatformIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[0], UTF16MaxCodeUnitsInCodePoint, 1);
             if (CodeUnitsRead == 1) {
                 uint8_t CodePointSize = UTF16_GetCodePointSizeInCodeUnits(StringIO_PreallocateCodePoint_UTF16[0]) - 1;
-                CodeUnitsRead = PlatformIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[1], UTF16MaxCodeUnitsInCodePoint, CodePointSize);
+                CodeUnitsRead = (uint8_t) PlatformIO_Read(Source, &StringIO_PreallocateCodePoint_UTF16[1], UTF16MaxCodeUnitsInCodePoint, CodePointSize);
                 if (CodeUnitsRead == CodePointSize) {
                     CodePoint = UTF16_DecodeCodePoint(StringIO_PreallocateCodePoint_UTF16);
                 } else {
@@ -1670,7 +1670,7 @@ extern "C" {
     UTF8 *UTF8_ReadSentence(FILE *Source) {
         UTF8 *Sentence                                     = NULL;
         if (Source != NULL) {
-            int64_t   SentenceSize                         = 0LL;
+            uint64_t  SentenceSize                         = 0LL;
             StringIO_LineBreakTypes LineBreakType          = LineBreakType_Unspecified;
             while (LineBreakType == LineBreakType_Unspecified) {
                 UTF32 CodePoint1                           = UTF8_ReadCodePoint(Source);
@@ -1704,7 +1704,7 @@ extern "C" {
     UTF16 *UTF16_ReadSentence(FILE *Source) {
         UTF16 *Sentence                                    = NULL;
         if (Source != NULL) {
-            int64_t   SentenceSize                         = 0LL;
+            uint64_t  SentenceSize                         = 0ULL;
             StringIO_LineBreakTypes LineBreakType          = LineBreakType_Unspecified;
             while (LineBreakType == LineBreakType_Unspecified) {
                 UTF32 CodePoint1                           = UTF16_ReadCodePoint(Source);

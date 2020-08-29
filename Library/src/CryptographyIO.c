@@ -229,7 +229,7 @@ extern "C" {
                 }
                 PlatformIO_Close(RandomFile);
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
-                NTSTATUS Status           = BCryptGenRandom(NULL, (PUCHAR) Random->EntropyPool, Bits2Bytes(Random->NumBits, RoundingType_Down), BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+                NTSTATUS Status           = BCryptGenRandom(NULL, (PUCHAR) Random->EntropyPool, (ULONG) Bits2Bytes(Random->NumBits, RoundingType_Down), (ULONG) BCRYPT_USE_SYSTEM_PREFERRED_RNG);
                 if (Status <= 0) {
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
                     abort();
@@ -309,7 +309,7 @@ extern "C" {
                         // Left Shift by BitsInCurrentByte - Bits2Get?
                     }
                     uint8_t  BitMask           = (Logarithm(2, Bits2Get) - 1) << Shift;
-                    uint8_t  ExtractedBits     = Random->EntropyPool[Bits2Bytes(Random->BitOffset, RoundingType_Down)] & BitMask;
+                    uint8_t  ExtractedBits     = (uint8_t) Random->EntropyPool[Bits2Bytes(Random->BitOffset, RoundingType_Down)] & BitMask;
                     ExtractedBits            >>= Shift;
 
                     Bits                     <<= Bits2Get;
@@ -387,7 +387,7 @@ extern "C" {
             RandomInteger                         = SecureRNG_ExtractBits(Random, Bits2Read);
 
             if (RandomInteger < MinValue || RandomInteger > MaxValue) {
-                uint8_t NumFixBits                = (CeilD(Logarithm(2, Maximum(RandomInteger, MaxValue) - Minimum(RandomInteger, MaxValue))) + Bits2Read);
+                uint8_t NumFixBits                = (uint8_t) (CeilD(Logarithm(2, Maximum(RandomInteger, MaxValue) - Minimum(RandomInteger, MaxValue))) + Bits2Read);
                 NumFixBits                        = RoundD(NumFixBits / 2);
                 uint64_t FixBits                  = SecureRNG_ExtractBits(Random, NumFixBits);
                 if (RandomInteger < MinValue) {
@@ -408,7 +408,7 @@ extern "C" {
         double Decimal        = 0.0;
         if (Random != NULL) {
             int8_t   Sign     = SecureRNG_GenerateInteger(Random, 1) == 1 ? 1 : -1;
-            int16_t  Exponent = SecureRNG_GenerateIntegerInRange(Random, -1023, 1023);
+            int16_t  Exponent = (int16_t) SecureRNG_GenerateIntegerInRange(Random, -1023, 1023);
             uint64_t Mantissa = SecureRNG_GenerateInteger(Random, 52);
 
             Decimal           = InsertSignD(Decimal, Sign);

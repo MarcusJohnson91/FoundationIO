@@ -429,7 +429,7 @@ extern "C" {
      @param      Exponent                         How many times should the Base be raised?
      @return                                      Returns the result of 1 *= Base, Exponent times.
      */
-    uint64_t     Exponentiate(uint64_t Base, uint64_t Exponent);
+    int64_t      Exponentiate(uint64_t Base, int64_t Exponent);
     
     /*!
      @abstract                                    Computes the number of times Exponent fits into Base.

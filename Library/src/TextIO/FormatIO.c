@@ -748,9 +748,9 @@ extern "C" {
                                 } else if (Format[CodePoint - 1] >= U'0' && Format[CodePoint - 1] <= U'9') {
                                     Specifiers->Specifiers[Specifier].PositionFlag = Position_Inline_Digits;
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
-                                    uint8_t  MaxDigits              = Logarithm(10, NL_ARGMAX);
+                                    uint8_t  MaxDigits              = (uint8_t) Logarithm(10, NL_ARGMAX);
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
-                                    uint8_t  MaxDigits              = Logarithm(10, _ARGMAX);
+                                    uint8_t  MaxDigits              = (uint8_t) Logarithm(10, _ARGMAX);
 #endif
                                     uint64_t PotentialDigitLocation = CodePoint - 1;
                                     while (Format[PotentialDigitLocation] != UTF32Character('%')) {
@@ -758,7 +758,7 @@ extern "C" {
                                     }
                                     PotentialDigitLocation         += 1;
                                     uint64_t NumPossibleCodePoints  = CodePoint - PotentialDigitLocation;
-                                    uint8_t  NumDigits2Read         = Minimum(NumPossibleCodePoints, MaxDigits);
+                                    uint8_t  NumDigits2Read         = (uint8_t) Minimum(NumPossibleCodePoints, MaxDigits);
                                     uint64_t Value                  = UTF32_String2Integer(&Format[CodePoint - NumDigits2Read], Base_Integer | Base_Radix10);
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
                                     if (Value <= NL_ARGMAX) {
