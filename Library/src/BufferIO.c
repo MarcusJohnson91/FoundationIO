@@ -238,7 +238,7 @@ extern "C" {
                 uint8_t  BitsInCurrentByte        = Bits2ExtractFromByte(BitB->BitOffset + Bits2Read);
                 uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
                 uint8_t  Shift                    = BitsInCurrentByte - Bits2Get;
-                uint8_t  BitMask                  = (Logarithm(2, Bits2Get) - 1) << Shift;
+                uint8_t  BitMask                  = (uint8_t) (Logarithm(2, Bits2Get) - 1) << Shift;
                 uint64_t Byte                     = Bits2Bytes(BitB->BitOffset + Bits2Read, RoundingType_Down);
                 uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
                 uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
@@ -470,7 +470,7 @@ extern "C" {
     
     uint8_t BitBuffer_ReadBits8(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t Bits2Read) {
         uint8_t OutputData    = 0U;
-        if (BitB != NULL && (Bits2Read >= 1 && Bits2Read <= 64) && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
+        if (BitB != NULL && Bits2Read <= 64 && (Bits2Read <= (BitB->BitOffset - BitB->NumBits))) {
             if (ByteOrder == ByteOrder_LSByteIsNearest) {
                 if (BitOrder == BitOrder_LSBitIsNearest) {
                     OutputData          = (uint8_t) BitBuffer_Extract_LSByteLSBit(BitB, Bits2Read);
@@ -486,7 +486,7 @@ extern "C" {
             }
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
-        } else if ((Bits2Read == 0 || Bits2Read > 8) || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
+        } else if (Bits2Read > 8 || (Bits2Read > (BitB->BitOffset - BitB->NumBits))) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Bits2Read %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 1-8"), Bits2Read, BitB->BitOffset);
         }
         return OutputData;

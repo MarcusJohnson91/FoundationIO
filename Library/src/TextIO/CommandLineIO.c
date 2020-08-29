@@ -580,6 +580,9 @@ extern "C" {
     static void CommandLineIO_UTF32_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, PlatformIO_Immutable(UTF32 **) Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             uint64_t     CurrentArgument  = 1LL;
+            if (NumArguments <= 1) {
+                CommandLineIO_ShowBanner(CLI);
+            }
             while (CurrentArgument < NumArguments) {
                 /*
                  Game plan: Look for Switch introducers aka '--', '-', '/', then find a word that doesn't end with a Colon or space
@@ -902,9 +905,9 @@ extern "C" {
     UTF32 *CommandLineIO_UTF32_Colorize(PlatformIO_Immutable(UTF32 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue) {
         UTF32 *Colorized = NULL;
         uint8_t DigitSize = 0;
-        DigitSize       += Logarithm(10, Red);
-        DigitSize       += Logarithm(10, Green);
-        DigitSize       += Logarithm(10, Blue);
+        DigitSize       += (uint8_t) Logarithm(10, Red);
+        DigitSize       += (uint8_t) Logarithm(10, Green);
+        DigitSize       += (uint8_t) Logarithm(10, Blue);
         UTF32 *IntegerR  = UTF32_Integer2String(Red,   Base_Integer | Base_Radix10);
         UTF32 *IntegerG  = UTF32_Integer2String(Green, Base_Integer | Base_Radix10);
         UTF32 *IntegerB  = UTF32_Integer2String(Blue,  Base_Integer | Base_Radix10);

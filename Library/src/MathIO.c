@@ -28,7 +28,7 @@ extern "C" {
     uint64_t AbsoluteI(int64_t Integer) {
         uint64_t AbsoluteValue = 0ULL;
         bool     Sign          = (Integer & 0x8000000000000000) >> 63;
-        AbsoluteValue          = (Integer ^ (-Sign)) + Sign;
+        AbsoluteValue          = (Integer ^ (Sign * -1)) + Sign;
         return AbsoluteValue;
     }
     
@@ -86,7 +86,7 @@ extern "C" {
     }
     
     int16_t FloorF(float Decimal) {
-        int64_t  Result   = 0;
+        int16_t  Result   = 0;
         int8_t   Sign     = ExtractSignF(Decimal);
         int8_t   Exponent = ExtractExponentF(Decimal);
         int32_t  Mantissa = ExtractMantissaF(Decimal);
@@ -104,7 +104,7 @@ extern "C" {
     }
     
     int32_t FloorD(double Decimal) {
-        int64_t  Result   = 0;
+        int32_t  Result   = 0;
         int8_t   Sign     = ExtractSignD(Decimal);
         int16_t  Exponent = ExtractExponentD(Decimal);
         int64_t  Mantissa = ExtractMantissaD(Decimal);
@@ -122,7 +122,7 @@ extern "C" {
     }
     
     int16_t CeilF(float Decimal) {
-        int64_t  Result   = 0;
+        int16_t  Result   = 0;
         int8_t   Sign     = ExtractSignF(Decimal);
         int8_t   Exponent = ExtractExponentF(Decimal);
         int32_t  Mantissa = ExtractMantissaF(Decimal);
@@ -140,7 +140,7 @@ extern "C" {
     }
     
     int32_t CeilD(double Decimal) {
-        int64_t  Result   = 0;
+        int32_t  Result   = 0;
         int8_t   Sign     = ExtractSignD(Decimal);
         int16_t  Exponent = ExtractExponentD(Decimal);
         int64_t  Mantissa = ExtractMantissaD(Decimal);
@@ -158,7 +158,7 @@ extern "C" {
     }
     
     int16_t RoundF(float Decimal) {
-        int64_t  Result   = 0;
+        int16_t  Result   = 0;
         int8_t   Sign     = ExtractSignF(Decimal);
         int8_t   Exponent = ExtractExponentF(Decimal);
         int64_t  Mantissa = ExtractMantissaF(Decimal);
@@ -171,7 +171,7 @@ extern "C" {
     }
     
     int32_t RoundD(double Decimal) {
-        int64_t  Result   = 0;
+        int32_t  Result   = 0;
         int8_t   Sign     = ExtractSignD(Decimal);
         int16_t  Exponent = ExtractExponentD(Decimal);
         int64_t  Mantissa = ExtractMantissaD(Decimal);
@@ -355,7 +355,7 @@ extern "C" {
         return Insertee2.Float;
     }
     
-    uint64_t Exponentiate(uint64_t Base, uint64_t Exponent) {
+    int64_t Exponentiate(uint64_t Base, int64_t Exponent) {
         int64_t Value      = Base;
         int64_t Exponent2  = Exponent - 1;
         if (Base > 0 && Exponent2 > 0) {
@@ -370,7 +370,7 @@ extern "C" {
     }
     
     int64_t Logarithm(int64_t Base, int64_t Exponent) {
-        uint64_t Result    = 0ULL;
+        int64_t  Result    = 0ULL;
         int64_t  Exponent2 = Exponent;
         if (Exponent2 != 0) {
             while (Exponent2 != 0) {
