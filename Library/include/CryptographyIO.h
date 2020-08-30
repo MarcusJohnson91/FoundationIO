@@ -24,7 +24,7 @@ extern "C" {
     typedef struct    InsecurePRNG          InsecurePRNG;
 
     /*!
-     @abstract                              Own algorithm; Uses InsecurePRNG and AES tables as a starting point to generate the (hopefully, UNTESTED) secure random numbers.
+     @abstract                              Own algorithm; Uses InsecurePRNG and AES tables as a starting point to generate (UNTESTED) secure random numbers.
      */
     typedef struct    SecureRNG             SecureRNG;
 
@@ -38,6 +38,12 @@ extern "C" {
      */
     InsecurePRNG     *InsecurePRNG_Init(uint64_t Seed[4]);
 
+    /*!
+     @abstract                              Fills the Entropy pool with insecure random data.
+     @param           Insecure              Instance of InsecurePRNG to use in creating the random data.
+     @param           Buffer                Pointer to a byte array to fill with insecure random data.
+     @param           BufferSize            The size of Buffer in bytes.
+     */
     void              InsecurePRNG_Generate(InsecurePRNG *Insecure, uint8_t *Buffer, uint64_t BufferSize);
 
     /*!
