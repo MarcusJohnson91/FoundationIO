@@ -6,32 +6,94 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
+
+
     
-    bool Test_WriteReadBits(void) {
+    bool Test_ReadWriteBitsNearNear(BitBuffer *BitB, SecureRNG *Random) {
         bool TestPassed                = Yes;
-        BitBuffer *BitB                = BitBuffer_Init(8);
-        SecureRNG   *Random            = SecureRNG_Init(8000000);
         
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
             uint8_t    NumBits2Extract = SecureRNG_GenerateInteger(Random, 3); // 6
             int64_t    RandomInteger   = SecureRNG_GenerateInteger(Random, NumBits2Extract);
-            uint8_t    ByteOrder       = SecureRNG_GenerateInteger(Random, 1) + 1;
-            uint8_t    BitOrder        = SecureRNG_GenerateInteger(Random, 1) + 1;
             
-            BitBuffer_WriteBits(BitB, ByteOrder, BitOrder, NumBits2Extract, RandomInteger);
+            BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, NumBits2Extract, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Extract));
-            int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder, BitOrder, NumBits2Extract);
+            int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, NumBits2Extract);
             if (ReadInteger != RandomInteger) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %llu does not match WrittenInteger: %llu"), ReadInteger, RandomInteger);
             }
-            BitBuffer_Erase(BitB, 0); // Clear the BitBuffer in between each run just to be sure.
+            BitBuffer_Erase(BitB, 0);
         }
         
         return TestPassed;
     }
+
+    bool Test_ReadWriteBitsFarFar(BitBuffer *BitB, SecureRNG *Random) {
+        bool TestPassed                = Yes;
+
+        for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
+            uint8_t    NumBits2Extract = SecureRNG_GenerateInteger(Random, 3); // 6
+            int64_t    RandomInteger   = SecureRNG_GenerateInteger(Random, NumBits2Extract);
+
+            BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, NumBits2Extract, RandomInteger);
+            BitBuffer_Seek(BitB, -(NumBits2Extract));
+            int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, NumBits2Extract);
+            if (ReadInteger != RandomInteger) {
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %llu does not match WrittenInteger: %llu"), ReadInteger, RandomInteger);
+            }
+            BitBuffer_Erase(BitB, 0);
+        }
+
+        return TestPassed;
+    }
+
+    bool Test_ReadWriteBitsNearFar(BitBuffer *BitB, SecureRNG *Random) {
+        bool TestPassed                = Yes;
+
+        for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
+            uint8_t    NumBits2Extract = SecureRNG_GenerateInteger(Random, 3); // 6
+            int64_t    RandomInteger   = SecureRNG_GenerateInteger(Random, NumBits2Extract);
+
+            BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, NumBits2Extract, RandomInteger);
+            BitBuffer_Seek(BitB, -(NumBits2Extract));
+            int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, NumBits2Extract);
+            if (ReadInteger != RandomInteger) {
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %llu does not match WrittenInteger: %llu"), ReadInteger, RandomInteger);
+            }
+            BitBuffer_Erase(BitB, 0);
+        }
+
+        return TestPassed;
+    }
+
+    bool Test_ReadWriteBitsFarNear(BitBuffer *BitB, SecureRNG *Random) {
+        bool TestPassed                = Yes;
+
+        for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
+            uint8_t    NumBits2Extract = SecureRNG_GenerateInteger(Random, 3);
+            int64_t    RandomInteger   = SecureRNG_GenerateInteger(Random, NumBits2Extract); // 2^3 = 8, 8 possible values
+
+            BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, NumBits2Extract, RandomInteger);
+            BitBuffer_Seek(BitB, -(NumBits2Extract));
+            int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, NumBits2Extract);
+            if (ReadInteger != RandomInteger) {
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %llu does not match WrittenInteger: %llu"), ReadInteger, RandomInteger);
+            }
+            BitBuffer_Erase(BitB, 0);
+        }
+
+        return TestPassed;
+    }
     
     int main(int argc, const char *argv[]) {
-        return Test_WriteReadBits();
+        BitBuffer *BitB              = BitBuffer_Init(8);
+        SecureRNG *Random            = SecureRNG_Init(8000000);
+        bool NearNearPassed          = Test_ReadWriteBitsNearNear(BitB, Random);
+        bool FarFarPassed            = Test_ReadWriteBitsFarFar(BitB, Random);
+        bool NearFarPassed           = Test_ReadWriteBitsNearFar(BitB, Random);
+        bool FarNearPassed           = Test_ReadWriteBitsFarNear(BitB, Random);
+        return (NearNearPassed + FarFarPassed + NearFarPassed + FarNearPassed) / 4;
+
     }
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
