@@ -327,13 +327,58 @@ extern "C" {
         if (String != NULL) {
             uint64_t OGCodePoint = 0ULL;
             uint64_t DeCodePoint = 0ULL;
-            uint64_t NumDigits   = UTF32_GetNumDigits(String, 0, Base);
+            uint64_t NumDigits   = UTF32_GetNumDigits(String, Base_Integer | Base_Radix10);
             Delocalized          = UTF32_Init(NumDigits);
-            if (Delocalized != NULL) {
-                while (String[OGCodePoint] != PlatformIO_NULLTerminator && DeCodePoint < NumDigits) {
-                    if (String[OGCodePoint] >= UTF32Character('0') && String[OGCodePoint] <= UTF32Character('9')) {
-                        OGCodePoint += 1;
-                        Delocalized[DeCodePoint] = String[OGCodePoint];
+            if (Delocalized != NULL) { // Now we need to feed a helper function with the value
+                if ((Base & Base_Integer) == Base_Integer) {
+                    if ((Base & Base_Radix2) == Base_Radix2) {
+                        while (String[OGCodePoint] != PlatformIO_NULLTerminator && Delocalized[DeCodePoint] != PlatformIO_NULLTerminator) {
+                            if (String[OGCodePoint] >= UTF32Character('0') || String[OGCodePoint] <= UTF32Character('1')) {
+                                Delocalized[DeCodePoint] = IntegerTableBase2[String[OGCodePoint] - 0x30];
+                                DeCodePoint += 1;
+                            }
+                            OGCodePoint     += 1;
+                        }
+                    } else if ((Base & Base_Radix8) == Base_Radix8) {
+                        while (String[OGCodePoint] != PlatformIO_NULLTerminator && Delocalized[DeCodePoint] != PlatformIO_NULLTerminator) {
+                            if (String[OGCodePoint] >= UTF32Character('0') || String[OGCodePoint] <= UTF32Character('7')) {
+                                Delocalized[DeCodePoint] = IntegerTableBase8[String[OGCodePoint] - 0x30];
+                                DeCodePoint += 1;
+                            }
+                            OGCodePoint     += 1;
+                        }
+                    } else if ((Base & Base_Radix10) == Base_Radix10) {
+                        while (String[OGCodePoint] != PlatformIO_NULLTerminator && Delocalized[DeCodePoint] != PlatformIO_NULLTerminator) {
+                            if (String[OGCodePoint] >= UTF32Character('0') || String[OGCodePoint] <= UTF32Character('9')) {
+                                Delocalized[DeCodePoint] = TableBase10[String[OGCodePoint] - 0x30]; // Problem is here: TableBase10[String[OGCodePoint]]
+                                DeCodePoint += 1;
+                            }
+                            OGCodePoint     += 1;
+                        }
+                    } else if ((Base & Base_Radix16) == Base_Radix16) {
+                        if ((Base & Base_Uppercase) == Base_Uppercase) {
+                            while (String[OGCodePoint] != PlatformIO_NULLTerminator && Delocalized[DeCodePoint] != PlatformIO_NULLTerminator) {
+                                if (String[OGCodePoint] >= UTF32Character('0') || String[OGCodePoint] <= UTF32Character('9')) {
+                                    Delocalized[DeCodePoint] = IntegerTableUppercaseBase16[String[OGCodePoint] - 0x30];
+                                    DeCodePoint += 1;
+                                } else if (String[OGCodePoint] >= UTF32Character('A') || String[OGCodePoint] <= UTF32Character('F')) {
+                                    Delocalized[DeCodePoint] = IntegerTableUppercaseBase16[String[OGCodePoint] - 0x37];
+                                    DeCodePoint += 1;
+                                }
+                                OGCodePoint     += 1;
+                            }
+                        } else if ((Base & Base_Lowercase) == Base_Lowercase) {
+                            while (String[OGCodePoint] != PlatformIO_NULLTerminator && Delocalized[DeCodePoint] != PlatformIO_NULLTerminator) {
+                                if (String[OGCodePoint] >= UTF32Character('0') || String[OGCodePoint] <= UTF32Character('9')) {
+                                    Delocalized[DeCodePoint] = IntegerTableUppercaseBase16[String[OGCodePoint] - 0x30];
+                                    DeCodePoint += 1;
+                                } else if (String[OGCodePoint] >= UTF32Character('a') || String[OGCodePoint] <= UTF32Character('f')) {
+                                    Delocalized[DeCodePoint] = IntegerTableUppercaseBase16[String[OGCodePoint] - 0x57];
+                                    DeCodePoint += 1;
+                                }
+                                OGCodePoint     += 1;
+                            }
+                        }
                     }
                 }
             } else {
@@ -379,6 +424,23 @@ extern "C" {
             uint64_t StringSize       = UTF32_GetStringSizeInCodePoints(String);
             uint64_t CodePoint        = StringSize;
             UTF32    DecimalSeperator = 0ULL;
+            /*
+            if ((Base & Base_Decimal) == Base_Decimal) {
+                if ((Base & Base_Radix10) == Base_Radix10) {
+                    // For Decimal, we'll use C locale default of period decimal seperator and no grouping digits
+                } else if ((Base & Base_Shortest) == Base_Shortest) {
+
+                } else if ((Base & Base_Scientific) == Base_Scientific) {
+
+                } else if ((Base & Base_Radix16) == Base_Radix16) {
+                    if ((Base & Base_Uppercase) == Base_Uppercase) {
+
+                    } else if ((Base & Base_Lowercase) == Base_Lowercase) {
+
+                    }
+                }
+            }
+             */
             do {
                 if (
                     String[CodePoint] == UTF32Character('0') ||
@@ -402,7 +464,7 @@ extern "C" {
                 CodePoint             -= 1;
             } while (CodePoint > 0);
             
-            uint64_t NumDigits         = UTF32_GetNumDigits(String, 0, Base_Decimal | Base_Radix16 | Base_Uppercase);
+            uint64_t NumDigits         = UTF32_GetNumDigits(String, Base_Decimal | Base_Radix16 | Base_Uppercase);
             Delocalized                = UTF32_Init(NumDigits);
             
             CodePoint                  = 0ULL;

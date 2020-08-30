@@ -1236,7 +1236,7 @@ extern "C" {
                 
                 if ((BaseType & BaseType_Integer) == BaseType_Integer || (BaseType & BaseType_Decimal) == BaseType_Decimal || (BaseType & BaseType_Pointer) == BaseType_Pointer) {
                     TextIO_Bases       Base            = ConvertModifierType2Base(Modifier);
-                    uint64_t           SubStringLength = UTF32_GetNumDigits(Formatted, Start, Base);
+                    uint64_t           SubStringLength = UTF32_GetNumDigits(Formatted[Start], Base);
                     Deformatted[Specifier]             = UTF32_ExtractSubString(Formatted, Start, SubStringLength);
                 } else if ((BaseType & BaseType_CodeUnit) == BaseType_CodeUnit) {
                     Deformatted[Specifier]             = UTF32_CodeUnit2String(Formatted[Start]);

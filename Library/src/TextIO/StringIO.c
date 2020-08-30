@@ -15,6 +15,9 @@ extern "C" {
         if (NumCodeUnits >= 1) {
             uint64_t StringSize = NumCodeUnits + PlatformIO_NULLTerminatorSize;
             String              = (UTF8*) calloc(StringSize, sizeof(UTF8));
+            for (uint64_t Index = 0ULL; Index < NumCodeUnits; Index++) {
+                String[Index]   = UTF8BOM_1;
+            }
             if (String == NULL) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF8));
             }
@@ -29,6 +32,9 @@ extern "C" {
         if (NumCodeUnits >= 1) {
             uint64_t StringSize = NumCodeUnits + PlatformIO_NULLTerminatorSize;
             String              = (UTF16*) calloc(StringSize, sizeof(UTF16));
+            for (uint64_t Index = 0ULL; Index < NumCodeUnits; Index++) {
+                String[Index]   = InvalidReplacementCodePoint;
+            }
             if (String == NULL) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF16));
             }
@@ -43,6 +49,9 @@ extern "C" {
         if (NumCodePoints >= 1) {
             uint64_t StringSize = NumCodePoints + PlatformIO_NULLTerminatorSize;
             String              = (UTF32*) calloc(StringSize, sizeof(UTF32));
+            for (uint64_t Index = 0ULL; Index < NumCodePoints; Index++) {
+                String[Index]   = InvalidReplacementCodePoint;
+            }
             if (String == NULL) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF32));
             }
@@ -3315,52 +3324,45 @@ extern "C" {
         return SplitStrings;
     }
     
-    uint64_t UTF32_GetNumDigits(PlatformIO_Immutable(UTF32 *) String, uint64_t Offset, TextIO_Bases Base) {
+    uint64_t UTF32_GetNumDigits(PlatformIO_Immutable(UTF32 *) String, TextIO_Bases Base) {
         uint64_t NumDigits      = 0ULL;
         if (String != NULL) {
-            uint64_t CodePoint  = Offset;
-            bool     ValidDigit = Yes;
+            uint64_t CodePoint  = 0;
             
             if ((Base & Base_Integer) == Base_Integer) {
                 if ((Base & Base_Radix2) == Base_Radix2) {
                     while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                        for (uint8_t Base2CodePoint = 0; Base2CodePoint < IntegerTableBase2Size; Base2CodePoint++) {
-                            if (String[CodePoint] == IntegerTableBase2[Base2CodePoint]) {
-                                NumDigits += 1;
-                            }
+                        if (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('1')) {
+                            NumDigits     += 1;
                         }
                         CodePoint         += 1;
                     }
                 } else if ((Base & Base_Radix8) == Base_Radix8) {
                     while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                        for (uint8_t Base8CodePoint = 0; Base8CodePoint < IntegerTableBase8Size; Base8CodePoint++) {
-                            if (String[CodePoint] == IntegerTableBase8[Base8CodePoint]) {
-                                NumDigits += 1;
-                            }
+                        if (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('7')) {
+                            NumDigits     += 1;
                         }
                         CodePoint         += 1;
                     }
                 } else if ((Base & Base_Radix10) == Base_Radix10) {
-                    while (String[CodePoint] != PlatformIO_NULLTerminator && (String[CodePoint] >= '0' && String[CodePoint] < '9')) {
-                        NumDigits         += 1;
+                    while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                        if (String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) {
+                            NumDigits     += 1;
+                        }
                         CodePoint         += 1;
                     }
                 } else if ((Base & Base_Radix16) == Base_Radix16) {
                     if ((Base & Base_Uppercase) == Base_Uppercase) {
                         while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                            for (uint8_t Base16UCodePoint = 0; Base16UCodePoint < IntegerTableBase16Size; Base16UCodePoint++) {
-                                if (String[CodePoint] == IntegerTableUppercaseBase16[Base16UCodePoint]) {
-                                    NumDigits += 1;
-                                }
+                            if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] >= UTF32Character('A') && String[CodePoint] <= UTF32Character('F'))) {
+                                NumDigits     += 1;
                             }
                             CodePoint         += 1;
                         }
                     } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
                         while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                            for (uint8_t Base16LCodePoint = 0; Base16LCodePoint < IntegerTableBase16Size; Base16LCodePoint++) {
-                                if (String[CodePoint] == IntegerTableLowercaseBase16[Base16LCodePoint]) {
-                                    NumDigits += 1;
-                                }
+                            if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] >= UTF32Character('a') && String[CodePoint] <= UTF32Character('f'))) {
+                                NumDigits     += 1;
                             }
                             CodePoint         += 1;
                         }
@@ -3369,29 +3371,23 @@ extern "C" {
             } else if ((Base & Base_Decimal) == Base_Decimal) {
                 if ((Base & Base_Radix10) == Base_Radix10) {
                     while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                        for (uint8_t DecimalCodePoint = 0; DecimalCodePoint < DecimalTableBase10Size; DecimalCodePoint++) {
-                            if (String[CodePoint] == TableBase10[DecimalCodePoint]) {
-                                NumDigits += 1;
-                            }
+                        if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] == UTF32Character('.'))) {
+                            NumDigits     += 1;
                         }
                         CodePoint         += 1;
                     }
                 } else if ((Base & Base_Scientific) == Base_Scientific || (Base & Base_Shortest) == Base_Shortest) {
                     if ((Base & Base_Uppercase) == Base_Uppercase) {
                         while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                            for (uint8_t ScientificCodePoint = 0; ScientificCodePoint < DecimalTableScientificSize; ScientificCodePoint++) {
-                                if (String[CodePoint] == DecimalScientificUppercase[ScientificCodePoint]) {
-                                    NumDigits += 1;
-                                }
+                            if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] == UTF32Character('.') || String[CodePoint] == UTF32Character('E'))) { // Todo: Make sure the Exponent is preceded by a digit
+                                NumDigits     += 1;
                             }
                             CodePoint         += 1;
                         }
                     } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
                         while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                            for (uint8_t ScientificCodePoint = 0; ScientificCodePoint < DecimalTableScientificSize; ScientificCodePoint++) {
-                                if (String[CodePoint] == DecimalScientificLowercase[ScientificCodePoint]) {
-                                    NumDigits += 1;
-                                }
+                            if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] == UTF32Character('.') || String[CodePoint] == UTF32Character('e'))) { // Todo: Make sure the Exponent is preceded by a digit
+                                NumDigits     += 1;
                             }
                             CodePoint         += 1;
                         }
@@ -3399,19 +3395,15 @@ extern "C" {
                 } else if ((Base & Base_Radix16) == Base_Radix16) {
                     if ((Base & Base_Uppercase) == Base_Uppercase) {
                         while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                            for (uint8_t HexCodePoint = 0; HexCodePoint < DecimalTableHexadecimalSize; HexCodePoint++) {
-                                if (String[CodePoint] == DecimalHexUppercase[HexCodePoint]) {
-                                    NumDigits += 1;
-                                }
+                            if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] >= UTF32Character('A') && String[CodePoint] <= UTF32Character('F')) || String[CodePoint] <= UTF32Character('P') || String[CodePoint] <= UTF32Character('X')) {
+                                NumDigits     += 1;
                             }
                             CodePoint         += 1;
                         }
                     } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
                         while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                            for (uint8_t HexCodePoint = 0; HexCodePoint < DecimalTableHexadecimalSize; HexCodePoint++) {
-                                if (String[CodePoint] == DecimalHexLowercase[HexCodePoint]) {
-                                    NumDigits += 1;
-                                }
+                            if ((String[CodePoint] >= UTF32Character('0') && String[CodePoint] <= UTF32Character('9')) || (String[CodePoint] >= UTF32Character('a') && String[CodePoint] <= UTF32Character('f')) || String[CodePoint] <= UTF32Character('p') || String[CodePoint] <= UTF32Character('x')) {
+                                NumDigits     += 1;
                             }
                             CodePoint         += 1;
                         }
