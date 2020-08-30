@@ -94,6 +94,7 @@ extern "C" {
                 CLI->Switches        = (CommandLineSwitch*) calloc(NumSwitches, sizeof(CommandLineSwitch));
                 if (CLI->Switches != NULL) {
                     CLI->NumSwitches = NumSwitches;
+                    CLI->MinOptions  = 1;
                 } else {
                     CommandLineIO_Deinit(CLI);
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate %llu Options"), NumSwitches);
@@ -580,7 +581,7 @@ extern "C" {
     static void CommandLineIO_UTF32_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, PlatformIO_Immutable(UTF32 **) Arguments) {
         if (CLI != NULL && (CLI->MinOptions >= 1 && NumArguments >= CLI->MinOptions)) {
             uint64_t     CurrentArgument  = 1LL;
-            if (NumArguments <= 1) {
+            if (NumArguments < CLI->MinOptions) {
                 CommandLineIO_ShowBanner(CLI);
             }
             while (CurrentArgument < NumArguments) {
