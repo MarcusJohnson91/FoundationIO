@@ -60,28 +60,28 @@ extern "C" {
      @param      Integer                          The value to find the signedness of.
      @return                                      Returns if @b Integer is negative or not
      */
-    bool         IsNegative8(int8_t Integer);
+    bool         IsNegative8(const int8_t Integer);
     
     /*!
      @abstract                                    Tells if the number is negative.
      @param      Integer                          The value to find the signedness of.
      @return                                      Returns if @b Integer is negative or not
      */
-    bool         IsNegative16(int16_t Integer);
+    bool         IsNegative16(const int16_t Integer);
     
     /*!
      @abstract                                    Tells if the number is negative.
      @param      Integer                          The value to find the signedness of.
      @return                                      Returns if @b Integer is negative or not
      */
-    bool         IsNegative32(int32_t Integer);
+    bool         IsNegative32(const int32_t Integer);
     
     /*!
      @abstract                                    Tells if the number is negative.
      @param      Integer                          The value to find the signedness of.
      @return                                      Returns if @b Integer is negative or not
      */
-    bool         IsNegative64(int64_t Integer);
+    bool         IsNegative64(const int64_t Integer);
 #ifdef           IsNegative
 #undef           IsNegative
 #define          IsNegative(Value)                _Generic((Value), int8_t:IsNegative8, uint8_t:IsNegative8, int16_t:IsNegative16, uint16_t:IsNegative16, int32_t:IsNegative32, uint32_t:IsNegative32, int64_t:IsNegative64, uint64_t:IsNegative64)(Value)
@@ -92,14 +92,14 @@ extern "C" {
      @param      Integer                          The number to see if it's odd or even.
      @return                                      True for odd, false for even.
      */
-    bool         IsOdd(int64_t Integer);
+    bool         IsOdd(const int64_t Integer);
     
     /*!
      @abstract                                    Converts an integer to an array of bytes.
      @param      Integer                          The integer to convert.
      @param      Bytes                            Allocated array of bytes to contain the output bytes.
      */
-    void         GetBytesFromInteger(uint64_t Integer, uint8_t *Bytes);
+    void         GetBytesFromInteger(const uint64_t Integer, uint8_t *Bytes);
     
     /*!
      @abstract                                    Converts an array of bytes to an integer.
@@ -141,21 +141,21 @@ extern "C" {
      @param      Integer                          The value to find the absolute value of.
      @return                                      Returns the absolute value of a number (removes the sign).
      */
-    uint64_t     AbsoluteI(int64_t Integer);
+    uint64_t     AbsoluteI(const int64_t Integer);
     
     /*!
      @abstract                                    Gets the absolute value of a number.
      @param      Decimal                          The value to find the absolute value of.
      @return                                      Returns the absolute value of a number (removes the sign).
      */
-    uint8_t      AbsoluteF(float Decimal);
+    uint8_t      AbsoluteF(const float Decimal);
     
     /*!
      @abstract                                    Gets the absolute value of a number.
      @param      Decimal                          The value to find the absolute value of.
      @return                                      Returns the absolute value of a number (removes the sign).
      */
-    uint16_t     AbsoluteD(double Decimal);
+    uint16_t     AbsoluteD(const double Decimal);
 #ifdef           Absolute
 #undef           Absolute
 #endif
@@ -166,14 +166,14 @@ extern "C" {
      @param      Decimal                          The value to find the floor value of.
      @return                                      Returns the integer value of the float.
      */
-    int16_t      FloorF(float Decimal);
+    int16_t      FloorF(const float Decimal);
     
     /*!
      @abstract                                    Gets the Floor of Decimal.
      @param      Decimal                          The value to find the floor value of.
      @return                                      Returns the integer value of the float.
      */
-    int32_t      FloorD(double Decimal);
+    int32_t      FloorD(const double Decimal);
 #ifdef           Floor
 #undef           Floor
 #endif
@@ -184,14 +184,14 @@ extern "C" {
      @param      Decimal                          The value to find the ceil value of.
      @return                                      Returns the Ceiling value of a decimal.
      */
-    int16_t      CeilF(float Decimal);
+    int16_t      CeilF(const float Decimal);
     
     /*!
      @abstract                                    Gets the Ceil of Decimal.
      @param      Decimal                          The value to find the ceil value of.
      @return                                      Returns the Ceiling value of a decimal.
      */
-    int32_t      CeilD(double Decimal);
+    int32_t      CeilD(const double Decimal);
     
 #ifdef           Ceil
 #undef           Ceil
@@ -203,14 +203,14 @@ extern "C" {
      @param      Decimal                          The value to find the round value of.
      @return                                      Returns the rounded value of a decimal.
      */
-    int16_t      RoundF(float Decimal);
+    int16_t      RoundF(const float Decimal);
     
     /*!
      @abstract                                    Rounds the Decimal
      @param      Decimal                          The value to find the round value of.
      @return                                      Returns the rounded value of a decimal.
      */
-    int32_t      RoundD(double Decimal);
+    int32_t      RoundD(const double Decimal);
 #ifdef           Round
 #undef           Round
 #endif
@@ -223,7 +223,7 @@ extern "C" {
      @param      Integer2                         The second integer to compare.
      @return                                      Returns the smaller value.
      */
-    int64_t      Minimum(int64_t Integer1, int64_t Integer2);
+    int64_t      Minimum(const int64_t Integer1, const int64_t Integer2);
     
     /*!
      @abstract                                    Branchless and shiftless Max function.
@@ -232,21 +232,21 @@ extern "C" {
      @param      Integer2                         The second integer to compare.
      @return                                      Returns the larger value.
      */
-    int64_t      Maximum(int64_t Integer1, int64_t Integer2);
+    int64_t      Maximum(const int64_t Integer1, const int64_t Integer2);
     
     /*!
      @abstract                                    Is the decimal normal?
      @param      Decimal                          The decimal to test for normalcy.
      @return                                      Returns true if the decimal is normal, otherwise false.
      */
-    bool         DecimalIsNormalF(float Decimal);
+    bool         DecimalIsNormalF(const float Decimal);
     
     /*!
      @abstract                                    Is the decimal normal?
      @param      Decimal                          The decimal to test for normalcy.
      @return                                      Returns true if the decimal is normal, otherwise false.
      */
-    bool         DecimalIsNormalD(double Decimal);
+    bool         DecimalIsNormalD(const double Decimal);
 #ifdef           DecimalIsNormal
 #undef           DecimalIsNormal
 #endif
@@ -257,14 +257,14 @@ extern "C" {
      @param      Decimal                          The decimal to test for infinity.
      @return                                      Returns true if the decimal is infinite, otherwise false.
      */
-    bool         DecimalIsInfinityF(float Decimal);
+    bool         DecimalIsInfinityF(const float Decimal);
     
     /*!
      @abstract                                    Is the decimal +/- infinity?
      @param      Decimal                          The decimal to test for infinity.
      @return                                      Returns true if the decimal is infinite, otherwise false.
      */
-    bool         DecimalIsInfinityD(double Decimal);
+    bool         DecimalIsInfinityD(const double Decimal);
 #ifdef           DecimalIsInfinity
 #undef           DecimalIsInfinity
 #endif
@@ -275,14 +275,14 @@ extern "C" {
      @param      Decimal                          The integer number you want to tell if it's a number or not.
      @return                                      Returns true if the decimal is not a number, otherwise false.
      */
-    bool         DecimalIsNotANumberF(float Decimal);
+    bool         DecimalIsNotANumberF(const float Decimal);
     
     /*!
      @abstract                                    Is the decimal not a number?
      @param      Decimal                          The integer number you want to tell if it's a number or not.
      @return                                      Returns true if the decimal is not a number, otherwise false.
      */
-    bool         DecimalIsNotANumberD(double Decimal);
+    bool         DecimalIsNotANumberD(const double Decimal);
 #ifdef           DecimalIsNotANumber
 #undef           DecimalIsNotANumber
 #endif
@@ -293,14 +293,14 @@ extern "C" {
      @param      Decimal                          The decimal you want to know if it contains all zeros for the fraction.
      @return                                      Returns true if the number's fraction bits are set, otherwise false.
      */
-    bool         NumberHasDecimalPointF(float Decimal);
+    bool         NumberHasDecimalPointF(const float Decimal);
     
     /*!
      @abstract                                    Does the decimal contain a decimal point?
      @param      Decimal                          The decimal you want to know if it contains all zeros for the fraction.
      @return                                      Returns true if the number's fraction bits are set, otherwise false.
      */
-    bool         NumberHasDecimalPointD(double Decimal);
+    bool         NumberHasDecimalPointD(const double Decimal);
 #ifdef           DecimalIsNotANumber
 #undef           DecimalIsNotANumber
 #endif
@@ -311,21 +311,21 @@ extern "C" {
      @param       Number                          The Number you want to get the sign from.
      @return                                      Returns -1 if the sign is negative, otherwise 1.
      */
-    int8_t       ExtractSignI(int64_t Number);
+    int8_t       ExtractSignI(const int64_t Number);
     
     /*!
      @abstract                                    Extracts the sign from the Number.
      @param       Number                          The Number you want to get the sign from.
      @return                                      Returns -1 if the sign is negative, otherwise 1.
      */
-    int8_t       ExtractSignF(float Number);
+    int8_t       ExtractSignF(const float Number);
     
     /*!
      @abstract                                    Extracts the sign from the Number.
      @param       Number                          The Number you want to get the sign from.
      @return                                      Returns -1 if the sign is negative, otherwise 1.
      */
-    int8_t       ExtractSignD(double Number);
+    int8_t       ExtractSignD(const double Number);
 #ifdef           ExtractSign
 #undef           ExtractSign
 #endif
@@ -335,13 +335,13 @@ extern "C" {
      @abstract                                    Extracts the exponent from the given Decimal.
      @param      Decimal                          The decimal number you want to get the exponent from.
      */
-    int16_t      ExtractExponentF(float Decimal);
+    int16_t      ExtractExponentF(const float Decimal);
     
     /*!
      @abstract                                    Extracts the exponent from the given Decimal.
      @param      Decimal                          The decimal number you want to get the exponent from.
      */
-    int32_t      ExtractExponentD(double Decimal);
+    int32_t      ExtractExponentD(const double Decimal);
 #ifdef           ExtractExponent
 #undef           ExtractExponent
 #endif
@@ -351,13 +351,13 @@ extern "C" {
      @abstract                                    Extracts the mantissa from the float given as Decimal.
      @param      Decimal                          The mantissa number you want to get the exponent from.
      */
-    int32_t      ExtractMantissaF(float Decimal);
+    int32_t      ExtractMantissaF(const float Decimal);
     
     /*!
      @abstract                                    Extracts the mantissa from the float given as Decimal.
      @param      Decimal                          The mantissa number you want to get the exponent from.
      */
-    int64_t      ExtractMantissaD(double Decimal);
+    int64_t      ExtractMantissaD(const double Decimal);
 #ifdef           ExtractMantissa
 #undef           ExtractMantissa
 #endif
@@ -369,7 +369,7 @@ extern "C" {
      @param      Sign                             The sign to insert.
      @return                                      Returns the edited decimal.
      */
-    float        InsertSignF(float Decimal, int8_t Sign);
+    float        InsertSignF(const float Decimal, const int8_t Sign);
     
     /*!
      @abstract                                    Inserts the sign to the float given as Decimal.
@@ -377,7 +377,7 @@ extern "C" {
      @param      Sign                             The sign to insert.
      @return                                      Returns the edited decimal.
      */
-    double       InsertSignD(double Decimal, int8_t Sign);
+    double       InsertSignD(const double Decimal, const int8_t Sign);
 #ifdef           InsertSign
 #undef           InsertSign
 #endif
@@ -389,7 +389,7 @@ extern "C" {
      @param      Exponent                         The exponent to insert.
      @return                                      Returns the edited decimal.
      */
-    float        InsertExponentF(float Decimal, int8_t Exponent);
+    float        InsertExponentF(const float Decimal, const int8_t Exponent);
     
     /*!
      @abstract                                    Inserts the exponent to the float given as Decimal.
@@ -397,7 +397,7 @@ extern "C" {
      @param      Exponent                         The exponent to insert.
      @return                                      Returns the edited decimal.
      */
-    double       InsertExponentD(double Decimal, int16_t Exponent);
+    double       InsertExponentD(const double Decimal, const int16_t Exponent);
 #ifdef           InsertExponent
 #undef           InsertExponent
 #endif
@@ -409,7 +409,7 @@ extern "C" {
      @param      Mantissa                         The mantissa to insert.
      @return                                      Returns the edited decimal.
      */
-    float        InsertMantissaF(float Decimal, uint32_t Mantissa);
+    float        InsertMantissaF(const float Decimal, const uint32_t Mantissa);
     
     /*!
      @abstract                                    Inserts the mantissa to the float given as Decimal.
@@ -417,7 +417,7 @@ extern "C" {
      @param      Mantissa                         The mantissa to insert.
      @return                                      Returns the edited decimal.
      */
-    double       InsertMantissaD(double Decimal, uint64_t Mantissa);
+    double       InsertMantissaD(const double Decimal, const uint64_t Mantissa);
 #ifdef           InsertMantissa
 #undef           InsertMantissa
 #endif
@@ -429,7 +429,7 @@ extern "C" {
      @param      Exponent                         How many times should the Base be raised?
      @return                                      Returns the result of 1 *= Base, Exponent times.
      */
-    int64_t      Exponentiate(uint64_t Base, int64_t Exponent);
+    int64_t      Exponentiate(const uint64_t Base, const int64_t Exponent);
     
     /*!
      @abstract                                    Computes the number of times Exponent fits into Base.
@@ -438,28 +438,28 @@ extern "C" {
      @param      Exponent                         The value to calculate.
      @return                                      Returns the number of symbols required to store an integer.
      */
-    int64_t      Logarithm(int64_t Base, int64_t Exponent);
+    int64_t      Logarithm(const int64_t Base, const int64_t Exponent);
     
     /*!
      @abstract                                    Byte swaps an integer.
      @param      Value2Swap                       Data to swap endian.
      @return                                      Returns swapped data.
      */
-    uint16_t     SwapEndian16(uint16_t Value2Swap);
+    uint16_t     SwapEndian16(const uint16_t Value2Swap);
     
     /*!
      @abstract                                    Byte swaps an integer.
      @param      Value2Swap                       Data to swap endian.
      @return                                      Returns swapped data.
      */
-    uint32_t     SwapEndian32(uint32_t Value2Swap);
+    uint32_t     SwapEndian32(const uint32_t Value2Swap);
     
     /*!
      @abstract                                    Byte swaps an integer.
      @param      Value2Swap                       Data to swap endian.
      @return                                      Returns swapped data.
      */
-    uint64_t     SwapEndian64(uint64_t Value2Swap);
+    uint64_t     SwapEndian64(const uint64_t Value2Swap);
 #ifdef           SwapEndian
 #undef           SwapEndian
 #endif
@@ -470,7 +470,7 @@ extern "C" {
      @param      Bytes                            The number of bytes you want to interpret as bits.
      @return                                      Returns the number of bits.
      */
-    int64_t      Bytes2Bits(int64_t Bytes);
+    int64_t      Bytes2Bits(const int64_t Bytes);
     
     /*!
      @abstract                                    Computes the number of bytes from the number of bits.
@@ -478,42 +478,42 @@ extern "C" {
      @param      RoundingType                     The type of rounding to do.
      @return                                      Returns the number of bytes.
      */
-    uint64_t     Bits2Bytes(uint64_t Bits, MathIO_RoundingTypes RoundingType);
+    uint64_t     Bits2Bytes(const uint64_t Bits, const MathIO_RoundingTypes RoundingType);
     
     /*!
      @abstract                                    Swaps bits so the the MSB becoems the LSB, and vice versa.
      @param      Byte                             The byte to swap the bits in.
      @return                                      Returns the swapped byte.
      */
-    uint8_t      SwapBits(uint8_t Byte);
+    uint8_t      SwapBits(const uint8_t Byte);
     
     /*!
      @abstract                                    Calculates the number of bits of slack mod 8.
      @param      Offset                           The offset to calculate the number of bits unaccounted for in the byte.
      @return                                      Returns the number of unaccounted for bits.
      */
-    uint8_t      Bits2ExtractFromByte(uint64_t Offset);
+    uint8_t      Bits2ExtractFromByte(const uint64_t Offset);
     
     /*!
      @abstract                                    Creates a bitmask.
      @param      NumBits2Select                   The number of bits to select.
      @return                                      Returns the mask.
      */
-    uint8_t      CreateBitMaskLSBit(uint8_t NumBits2Select);
+    uint8_t      CreateBitMaskLSBit(const uint8_t NumBits2Select);
     
     /*!
      @abstract                                    Creates a bitmask.
      @param      NumBits2Select                   The number of bits to select.
      @return                                      Returns the mask.
      */
-    uint8_t      CreateBitMaskMSBit(uint8_t NumBits2Select);
+    uint8_t      CreateBitMaskMSBit(const uint8_t NumBits2Select);
     
     /*!
      @abstract                                    Counts the number of bits set to 1 in Value.
      @param      Value                            The number of bits to select.
      @return                                      Returns the number of set bits.
      */
-    uint8_t      CountBitsSet(uint64_t Value);
+    uint8_t      CountBitsSet(const uint64_t Value);
     
     /*!
      @abstract                                    Value Mod Base, if the remainder is 0 Value is a power of the base.
@@ -521,7 +521,7 @@ extern "C" {
      @param      Value                            The value to check.
      @return                                      Returns true if there's no remainder, otherwise returns false.
      */
-    bool         IsPowerOfBase(uint8_t Base, uint64_t Value);
+    bool         IsPowerOfBase(const uint8_t Base, const uint64_t Value);
     
     /*!
      @abstract                                    Value Mod Base, if the remainder is 0 Value is a power of the base.
@@ -529,7 +529,7 @@ extern "C" {
      @param      Integer                          The value to check.
      @return                                      Returns true if there's no remainder, otherwise returns false.
      */
-    uint8_t      NumDigitsInInteger(uint8_t Base, int64_t Integer);
+    uint8_t      NumDigitsInInteger(const uint8_t Base, const int64_t Integer);
     
     /*!
      @abstract                                    Rotates Value by Bits2Rotate.
@@ -538,7 +538,7 @@ extern "C" {
      @param      Rotate                           The direction to rotate.
      @return                                      Returns the rotated value.
      */
-    uint64_t     Rotate(uint64_t Value, uint8_t Bits2Rotate, MathIO_RotationType Rotate);
+    uint64_t     Rotate(const uint64_t Value, const uint8_t Bits2Rotate, const MathIO_RotationType Rotate);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
