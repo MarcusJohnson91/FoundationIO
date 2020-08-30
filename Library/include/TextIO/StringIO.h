@@ -1070,11 +1070,10 @@ extern "C" {
     /*!
      @abstract                                           Counts the number of Digits in String starting at Offset (inclusive).
      @param      String                                  The string to check.
-     @param      Offset                                  Where to start looking for digits.
      @param      Base                                    The base the string is in.
      @return                                             Returns the number of format specifiers found.
      */
-    uint64_t     UTF32_GetNumDigits(PlatformIO_Immutable(UTF32 *) String, uint64_t Offset, TextIO_Bases Base); // Format/Deformat
+    uint64_t     UTF32_GetNumDigits(PlatformIO_Immutable(UTF32 *) String, TextIO_Bases Base); // Format/Deformat
     
     /*!
      @abstract                                           Gets a substring from Offset to where Format and Formatted start matching.
