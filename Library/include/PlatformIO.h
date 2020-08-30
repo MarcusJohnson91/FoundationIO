@@ -226,6 +226,16 @@ extern "C" {
 #ifndef             PlatformIO_CompilerIsGCC
 #define             PlatformIO_CompilerIsGCC                                            (3)
 #endif
+
+#ifndef             PlatformIO_CompilerVersion
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
+#define             PlatformIO_CompilerVersion __clang_major__
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+#define             PlatformIO_CompilerVersion __GNUC__
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
+#define             PlatformIO_CompilerVersion _MSC_VER
+#endif /* Compiler */
+#endif /* CompilerVersion */
     
 #ifndef             PlatformIO_Compiler
 #if   defined(__clang__)
@@ -288,8 +298,8 @@ extern "C" {
 #ifndef             NOGDI
 #define             NOGDI
 #endif             /* NOGDI */
-#include <Windows.h>                  /* Included for Shared Library support, WinCon, QueryPerformanceCounter, etc */
-#include <WinSock2.h>                 /* Included for socket support, Windows.h MUST be included before WinSock2 */
+#include <Windows.h>  /* Included for Shared Library support, WinCon, QueryPerformanceCounter, etc */
+#include <WinSock2.h> /* Included for socket support, Windows.h MUST be included before WinSock2 */
     
 #ifndef             PlatformIO_Socket_Create
 #define             PlatformIO_Socket_Create(Family, Type, Protocol)                         socket(Family, Type, Protocol)
@@ -455,17 +465,17 @@ extern "C" {
 #endif
 #endif
 
-#ifndef                   PlatformIO_FunctionName
-#define                   PlatformIO_FunctionName           (PlatformIO_Immutable(UTF8 *)) __func__
+#ifndef             PlatformIO_FunctionName
+#define             PlatformIO_FunctionName           (PlatformIO_Immutable(UTF8 *)) __func__
 #endif /* PlatformIO_FunctionName */
 
     typedef enum PlatformIO_FileModes {
-                 FileMode_Unspecified                  = 0,
-                 FileMode_Read                         = 1,
-                 FileMode_Write                        = 2,
-                 FileMode_Append                       = 4,
-                 FileMode_Text                         = 8,
-                 FileMode_Binary                       = 16,
+                    FileMode_Unspecified               = 0,
+                    FileMode_Read                      = 1,
+                    FileMode_Write                     = 2,
+                    FileMode_Append                    = 4,
+                    FileMode_Text                      = 8,
+                    FileMode_Binary                    = 16,
     } PlatformIO_FileModes;
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
@@ -518,7 +528,7 @@ extern "C" {
      @param         File              The file to get the size of.
      @return                          Returns the size of the file.
      */
-    uint64_t        PlatformIO_GetSize(FILE *File);
+    uint64_t        PlatformIO_GetSize(const FILE *File);
 
     /*!
      @abstract                        Reads data from a file.

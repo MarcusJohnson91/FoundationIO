@@ -37,20 +37,20 @@ extern "C" {
             if ((Mode & FileMode_Read) == FileMode_Read) {
                 if ((Mode & FileMode_Binary) == FileMode_Binary) {
                     ModeString = PlatformIO_Literal(UTF8*, char*, u8"rb");
-                } else if ((Mode & FileMode_Binary) == FileMode_Text) {
+                } else if ((Mode & FileMode_Text) == FileMode_Text) {
                     ModeString = PlatformIO_Literal(UTF8*, char*, u8"r");
                 }
             } else if ((Mode & FileMode_Write) == FileMode_Write) {
                 if ((Mode & FileMode_Append) == FileMode_Append) {
                     if ((Mode & FileMode_Binary) == FileMode_Binary) {
                         ModeString = PlatformIO_Literal(UTF8*, char*, u8"ab");
-                    } else if ((Mode & FileMode_Binary) == FileMode_Text) {
+                    } else if ((Mode & FileMode_Text) == FileMode_Text) {
                         ModeString = PlatformIO_Literal(UTF8*, char*, u8"a");
                     }
                 } else {
                     if ((Mode & FileMode_Binary) == FileMode_Binary) {
                         ModeString = PlatformIO_Literal(UTF8*, char*, u8"wb");
-                    } else if ((Mode & FileMode_Binary) == FileMode_Text) {
+                    } else if ((Mode & FileMode_Text) == FileMode_Text) {
                         ModeString = PlatformIO_Literal(UTF8*, char*, u8"w");
                     }
                 }
@@ -82,20 +82,20 @@ extern "C" {
             if ((Mode & FileMode_Read) == FileMode_Read) {
                 if ((Mode & FileMode_Binary) == FileMode_Binary) {
                     ModeString = u"rb";
-                } else if ((Mode & FileMode_Binary) == FileMode_Text) {
+                } else if ((Mode & FileMode_Text) == FileMode_Text) {
                     ModeString = u"r";
                 }
             } else if ((Mode & FileMode_Write) == FileMode_Write) {
                 if ((Mode & FileMode_Append) == FileMode_Append) {
                     if ((Mode & FileMode_Binary) == FileMode_Binary) {
                         ModeString = u"ab";
-                    } else if ((Mode & FileMode_Binary) == FileMode_Text) {
+                    } else if ((Mode & FileMode_Text) == FileMode_Text) {
                         ModeString = u"a";
                     }
                 } else {
                     if ((Mode & FileMode_Binary) == FileMode_Binary) {
                         ModeString = u"wb";
-                    } else if ((Mode & FileMode_Binary) == FileMode_Text) {
+                    } else if ((Mode & FileMode_Text) == FileMode_Text) {
                         ModeString = u"w";
                     }
                 }
@@ -128,20 +128,20 @@ extern "C" {
             if ((Mode & FileMode_Read) == FileMode_Read) {
                 if ((Mode & FileMode_Binary) == FileMode_Binary) {
                     ModeString = PlatformIO_Literal(UTF8*, char*, u8"rb");
-                } else if ((Mode & FileMode_Binary) == FileMode_Text) {
+                } else if ((Mode & FileMode_Text) == FileMode_Text) {
                     ModeString = PlatformIO_Literal(UTF8*, char*, u8"r");
                 }
             } else if ((Mode & FileMode_Write) == FileMode_Write) {
                 if ((Mode & FileMode_Append) == FileMode_Append) {
                     if ((Mode & FileMode_Binary) == FileMode_Binary) {
                         ModeString = PlatformIO_Literal(UTF8*, char*, u8"ab");
-                    } else if ((Mode & FileMode_Binary) == FileMode_Text) {
+                    } else if ((Mode & FileMode_Text) == FileMode_Text) {
                         ModeString = PlatformIO_Literal(UTF8*, char*, u8"a");
                     }
                 } else {
                     if ((Mode & FileMode_Binary) == FileMode_Binary) {
                         ModeString = PlatformIO_Literal(UTF8*, char*, u8"wb");
-                    } else if ((Mode & FileMode_Binary) == FileMode_Text) {
+                    } else if ((Mode & FileMode_Text) == FileMode_Text) {
                         ModeString = PlatformIO_Literal(UTF8*, char*, u8"w");
                     }
                 }
@@ -176,20 +176,20 @@ extern "C" {
             if ((Mode & FileMode_Read) == FileMode_Read) {
                 if ((Mode & FileMode_Binary) == FileMode_Binary) {
                     ModeString = u"rb";
-                } else if ((Mode & FileMode_Binary) == FileMode_Text) {
+                } else if ((Mode & FileMode_Text) == FileMode_Text) {
                     ModeString = u"r";
                 }
             } else if ((Mode & FileMode_Write) == FileMode_Write) {
                 if ((Mode & FileMode_Append) == FileMode_Append) {
                     if ((Mode & FileMode_Binary) == FileMode_Binary) {
                         ModeString = u"ab";
-                    } else if ((Mode & FileMode_Binary) == FileMode_Text) {
+                    } else if ((Mode & FileMode_Text) == FileMode_Text) {
                         ModeString = u"a";
                     }
                 } else {
                     if ((Mode & FileMode_Binary) == FileMode_Binary) {
                         ModeString = u"wb";
-                    } else if ((Mode & FileMode_Binary) == FileMode_Text) {
+                    } else if ((Mode & FileMode_Text) == FileMode_Text) {
                         ModeString = u"w";
                     }
                 }
@@ -211,7 +211,7 @@ extern "C" {
         return File;
     }
 
-    uint64_t PlatformIO_GetSize(FILE *File) { // Hmm, things that return pointers may be very fancy
+    uint64_t PlatformIO_GetSize(const FILE *File) { // Hmm, things that return pointers may be very fancy
         /*
          in both AMD64 and ARM64 pointer addresses can only be 48 bits, the high 16 bits must be set to all 1's
          */
