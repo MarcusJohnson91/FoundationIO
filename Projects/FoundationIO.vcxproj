@@ -39,6 +39,7 @@
     <ClInclude Include="..\Library\include\MathIO.h" />
     <ClInclude Include="..\Library\include\NetworkIO.h" />
     <ClInclude Include="..\Library\include\PlatformIO.h" />
+    <ClInclude Include="..\Library\include\Private\Version.h" />
     <ClInclude Include="..\Library\include\TestIO.h" />
     <ClInclude Include="..\Library\include\TextIO\CommandLineIO.h" />
     <ClInclude Include="..\Library\include\TextIO\FormatIO.h" />
@@ -46,7 +47,7 @@
     <ClInclude Include="..\Library\include\TextIO\LogIO.h" />
     <ClInclude Include="..\Library\include\TextIO\StringIO.h" />
     <ClInclude Include="..\Library\include\TextIO\TextIOTypes.h" />
-	<ClInclude Include="..\Library\include\TextIO\Private\TextTables.h" />
+    <ClInclude Include="..\Library\include\TextIO\Private\TextTables.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -164,7 +165,6 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <OpenMPSupport>true</OpenMPSupport>
-      <LanguageStandard>stdcpp17</LanguageStandard>
       <CompileAs>Default</CompileAs>
       <ErrorReporting>Send</ErrorReporting>
       <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -189,6 +189,9 @@
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <SupportJustMyCode>true</SupportJustMyCode>
+      <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -244,7 +247,6 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <OpenMPSupport>true</OpenMPSupport>
-      <LanguageStandard>stdcpp17</LanguageStandard>
       <CompileAs>Default</CompileAs>
       <ErrorReporting>Send</ErrorReporting>
       <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -269,6 +271,9 @@
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
       <SupportJustMyCode>true</SupportJustMyCode>
+      <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -306,7 +311,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -322,7 +327,6 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <OpenMPSupport>true</OpenMPSupport>
-      <LanguageStandard>stdcpp17</LanguageStandard>
       <CompileAs>Default</CompileAs>
       <ErrorReporting>Send</ErrorReporting>
       <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -346,6 +350,10 @@
       <ProgramDataBaseFileName>$(IntDir)$(ProjectName).pdb</ProgramDataBaseFileName>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <PreprocessToFile>false</PreprocessToFile>
+      <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -402,7 +410,6 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <OpenMPSupport>true</OpenMPSupport>
-      <LanguageStandard>stdcpp17</LanguageStandard>
       <CompileAs>Default</CompileAs>
       <ErrorReporting>Send</ErrorReporting>
       <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -425,6 +432,9 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <UseUnicodeForAssemblerListing>true</UseUnicodeForAssemblerListing>
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

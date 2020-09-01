@@ -227,16 +227,6 @@ extern "C" {
 #define             PlatformIO_CompilerIsGCC                                            (3)
 #endif
 
-#ifndef             PlatformIO_CompilerVersion
-#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
-#define             PlatformIO_CompilerVersion __clang_major__
-#elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
-#define             PlatformIO_CompilerVersion __GNUC__
-#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
-#define             PlatformIO_CompilerVersion _MSC_VER
-#endif /* Compiler */
-#endif /* CompilerVersion */
-    
 #ifndef             PlatformIO_Compiler
 #if   defined(__clang__)
 #define             PlatformIO_Compiler                                                 (PlatformIO_CompilerIsClang)
@@ -246,6 +236,16 @@ extern "C" {
 #define             PlatformIO_Compiler                                                 (PlatformIO_CompilerIsGCC)
 #endif
 #endif /* PlatformIO_Compiler */
+
+#ifndef             PlatformIO_CompilerVersion
+#if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
+#define             PlatformIO_CompilerVersion __clang_major__
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
+#define             PlatformIO_CompilerVersion __GNUC__
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
+#define             PlatformIO_CompilerVersion _MSC_VER
+#endif /* Compiler */
+#endif /* CompilerVersion */
     
     /* POSIX shared stuff */
 #if ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
@@ -427,7 +427,7 @@ extern "C" {
 #endif
 
 
-
+#define             class                                                           struct
 
     
 #ifndef             PlatformIO_Mutable

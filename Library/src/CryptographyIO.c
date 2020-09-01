@@ -308,7 +308,7 @@ extern "C" {
                     if (BitsInCurrentByte > Bits2Get) {
                         // Left Shift by BitsInCurrentByte - Bits2Get?
                     }
-                    uint8_t  BitMask           = (Logarithm(2, Bits2Get) - 1) << Shift;
+                    uint8_t  BitMask           = (uint8_t) (Logarithm(2, Bits2Get) - 1) << Shift;
                     uint8_t  ExtractedBits     = (uint8_t) Random->EntropyPool[Bits2Bytes(Random->BitOffset, RoundingType_Down)] & BitMask;
                     ExtractedBits            >>= Shift;
 
@@ -387,7 +387,7 @@ extern "C" {
             RandomInteger                         = SecureRNG_ExtractBits(Random, Bits2Read);
 
             if (RandomInteger < MinValue || RandomInteger > MaxValue) {
-                uint8_t NumFixBits                = (uint8_t) (CeilD(Logarithm(2, Maximum(RandomInteger, MaxValue) - Minimum(RandomInteger, MaxValue))) + Bits2Read);
+                uint8_t NumFixBits                = (uint8_t) Logarithm(2, Maximum(RandomInteger, MaxValue) - Minimum(RandomInteger, MaxValue) + Bits2Read);
                 NumFixBits                        = RoundD(NumFixBits / 2);
                 uint64_t FixBits                  = SecureRNG_ExtractBits(Random, NumFixBits);
                 if (RandomInteger < MinValue) {

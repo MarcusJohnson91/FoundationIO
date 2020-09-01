@@ -109,7 +109,7 @@ typedef                   char8_t                              CharSet8;
 #undef                    CharSet16
 #endif /* CharSet16 */
 /*!
-@abstract                 UTF16                                is guaranteed to only contain valid Unicode, use CharSet8 otherwise.
+@abstract                 UTF16                                is guaranteed to only contain valid Unicode, use CharSet16 otherwise.
 */
 typedef                   char16_t                             UTF16;
 /*!
@@ -127,7 +127,7 @@ typedef                   char16_t                             CharSet16;
 #undef                    CharSet32
 #endif /* CharSet32 */
 /*!
-@abstract                 UTF32                                is guaranteed to only contain valid Unicode, use CharSet8 otherwise.
+@abstract                 UTF32                                is guaranteed to only contain valid Unicode, use CharSet32 otherwise.
  */
 typedef                   char32_t                             UTF32;
 /*!

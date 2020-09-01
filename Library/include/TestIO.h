@@ -46,14 +46,48 @@ extern "C" {
      @constant     TestResult_Unspecified         Invalid state.
      @constant     TestResult_Passed              The test is enabled.
      @constant     TestResult_Failed              The test is disabled.
-     @constant     TestResult_Untested            The test wasn't ran.
      */
-    typedef enum TestIO_TestResults {
-                   TestResult_Unspecified         = 0,
-                   TestResult_Passed              = 1,
-                   TestResult_Failed              = 2,
-                   TestResult_Untested            = 3,
+    typedef enum TestIO_ExpectedResults {
+        ExpectedResult_Unspecified     = 0,
+        ExpectedResult_Passed          = 1,
+        ExpectedResult_Failed          = 2,
     } TestIO_TestResults;
+
+    /*!
+     @typedef Forward declared from CryptographyIO
+     */
+    typedef struct SecureRNG SecureRNG;
+
+    typedef bool (*TestIO_TestFunction)(SecureRNG *Secure);
+
+    typedef struct TestCase {
+        TestIO_TestFunction         Function;
+        TestIO_TestStates           TestState;
+        TestIO_TestResults          ExpectedResult;
+        PlatformIO_Immutable(UTF8*) FunctionName;
+    } TestCase;
+
+    typedef struct TestSuite {
+        TestCase *Tests;
+        uint64_t  NumTests;
+        uint64_t  NumWorkedAsExpected;
+        uint64_t  NumUnexpectedFailures;
+        uint64_t *UnexpectedFailues; // Stores Index of unexpected failing tests
+        uint64_t  UnexpectedFailureSize;
+    } TestSuite;
+
+    constexpr static void RegisterTestCase(TestSuite *Suite, TestCase *Test) {
+        if (Suite != NULL && Test != NULL) {
+
+        } else {
+            Suite = calloc(1, sizeof(TestSuite));
+        }
+    }
+    /*
+     What if We register each Test in just one Variadic call, then we'd know the size the make the array as well as each index
+     */
+
+    void TestIO_RunTests(TestSuite *Suite);
     
 #ifndef TESTIO_ARGUMENT
 #define TESTIO_ARGUMENT(...) __VA_ARGS__
@@ -68,8 +102,8 @@ extern "C" {
 #endif
 
     /*!
-    @abstract                                     Forward Declaration of CryptographyIO's SecureRNG.
-    */
+     @abstract                                     Forward Declaration of CryptographyIO's SecureRNG.
+     */
     typedef struct SecureRNG                      SecureRNG;
     
     /*!

@@ -77,20 +77,20 @@ extern "C" {
     /*!
      @enum         CommandLineIO_SwitchArguments
      @abstract                                     What kind of argument does the switch accept?
-     @constant     ArgumentType_Unspecified        Invalid argument type.
-     @constant     ArgumentType_Path               String that matches the location of something in the filesystem.
-     @constant     ArgumentType_URL                String that is composed of a URL like "https://www.tldrlegal.com/blah"
-     @constant     ArgumentType_Range              Number between X and Y inclusively using the syntax X..Y.
-     @constant     ArgumentType_Bool               String containing true, false, yes, no, 1, 0, with any capitalization.
-     @constant     ArgumentType_String             Generic string that the program's author will further process.
+     @constant     SwitchArgument_Unspecified      Invalid argument type.
+     @constant     SwitchArgument_Path             String that matches the location of something in the filesystem.
+     @constant     SwitchArgument_URL              String that is composed of a URL like "https://www.tldrlegal.com/blah"
+     @constant     SwitchArgument_Range            Number between X and Y inclusively using the syntax X..Y.
+     @constant     SwitchArgument_Bool             String containing true, false, yes, no, 1, 0, with any capitalization.
+     @constant     SwitchArgument_String           Generic string that the program's author will further process.
      */
     typedef enum CommandLineIO_SwitchArguments {
-                   ArgumentType_Unspecified        = 0,
-                   ArgumentType_Path               = 1,
-                   ArgumentType_URL                = 2,
-                   ArgumentType_Range              = 3,
-                   ArgumentType_Bool               = 4,
-                   ArgumentType_String             = 5,
+                   SwitchArgument_Unspecified      = 0,
+                   SwitchArgument_Path             = 1,
+                   SwitchArgument_URL              = 2,
+                   SwitchArgument_Range            = 3,
+                   SwitchArgument_Bool             = 4,
+                   SwitchArgument_String           = 5,
     } CommandLineIO_SwitchArguments;
     
     /*!
