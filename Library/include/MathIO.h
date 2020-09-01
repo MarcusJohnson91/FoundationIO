@@ -275,18 +275,18 @@ extern "C" {
      @param      Decimal                          The integer number you want to tell if it's a number or not.
      @return                                      Returns true if the decimal is not a number, otherwise false.
      */
-    bool         DecimalIsNotANumberF(const float Decimal);
+    bool         DecimalIsANumberF(const float Decimal);
     
     /*!
      @abstract                                    Is the decimal not a number?
      @param      Decimal                          The integer number you want to tell if it's a number or not.
      @return                                      Returns true if the decimal is not a number, otherwise false.
      */
-    bool         DecimalIsNotANumberD(const double Decimal);
-#ifdef           DecimalIsNotANumber
-#undef           DecimalIsNotANumber
+    bool         DecimalIsANumberD(const double Decimal);
+#ifdef           DecimalIsANumber
+#undef           DecimalIsANumber
 #endif
-#define          DecimalIsNotANumber(Decimal)     _Generic((Decimal), float:DecimalIsNotANumberF, double:DecimalIsNotANumberD)(Decimal)
+#define          DecimalIsANumber(Decimal)     _Generic((Decimal), float:DecimalIsANumberF, double:DecimalIsANumberD)(Decimal)
     
     /*!
      @abstract                                    Does the decimal contain a decimal point?
@@ -301,8 +301,8 @@ extern "C" {
      @return                                      Returns true if the number's fraction bits are set, otherwise false.
      */
     bool         NumberHasDecimalPointD(const double Decimal);
-#ifdef           DecimalIsNotANumber
-#undef           DecimalIsNotANumber
+#ifdef           NumberHasDecimalPoint
+#undef           NumberHasDecimalPoint
 #endif
 #define          NumberHasDecimalPoint(Decimal)   _Generic((Decimal), float:NumberHasDecimalPointF, double:NumberHasDecimalPointD)(Decimal)
     

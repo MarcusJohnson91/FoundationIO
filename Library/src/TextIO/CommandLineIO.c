@@ -97,6 +97,7 @@ extern "C" {
                     CLI->MinOptions  = 1;
                 } else {
                     CommandLineIO_Deinit(CLI);
+                    CLI              = NULL;
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate %llu Options"), NumSwitches);
                 }
             } else {
@@ -504,14 +505,14 @@ extern "C" {
         /*
          TODO: Parser - If there is Children, the Argument is after the Child
          */
-        if (CLI != NULL && SwitchID < CLI->NumSwitches && ArgumentType != ArgumentType_Unspecified) {
+        if (CLI != NULL && SwitchID < CLI->NumSwitches && ArgumentType != SwitchArgument_Unspecified) {
             CLI->Switches[SwitchID].ArgumentType = ArgumentType;
         } else if (CLI == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (SwitchID > CLI->NumSwitches) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SwitchID %lld is invalid, it should be between 0 and %lld"), SwitchID, CLI->NumSwitches);
-        } else if (ArgumentType == ArgumentType_Unspecified) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("You can not set SwitchID %lld to ArgumentType_Unspecified"), SwitchID);
+        } else if (ArgumentType == SwitchArgument_Unspecified) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("You can not set SwitchID %lld to SwitchArgument_Unspecified"), SwitchID);
         }
     }
     

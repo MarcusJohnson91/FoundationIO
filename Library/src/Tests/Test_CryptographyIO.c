@@ -34,8 +34,22 @@ extern "C" {
         
         return TestPassed;
     }
+
+    bool Test_InsecurePRNG(void) {
+        bool TestPassed = No;
+        uint64_t InitConstants[4] = {0xF61E2562BEBFBC70, 0xFDE5380CA3014314, 0xE9B6C7AAD9D4D039, 0x21E1CDE62AD7D2BB}; // Used Random.org data as index into MD5GeneratedConstants, 17, 40, 36, 59, 20, 45, 25, 63
+        InsecurePRNG *Insecure = InsecurePRNG_Init(InitConstants);
+        /*
+        uint8_t 
+        InsecurePRNG_Generate(Insecure, <#uint8_t *Buffer#>, <#uint64_t BufferSize#>);
+*/
+        return TestPassed;
+    }
     
     int main() {
+        // First lets test InsecureRNG
+        SecureRNG *Random = SecureRNG_Init(12288);
+
         return EXIT_SUCCESS;
     }
     

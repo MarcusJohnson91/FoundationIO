@@ -1,7 +1,8 @@
-#include "../include/TestIO.h"          /* Included for our declarations */
+#include "../include/TestIO.h"        /* Included for our declarations */
 #include "../include/CryptographyIO.h"  /* Included for SecureRNG */
 #include "../include/TextIO/LogIO.h"    /* Included for error reporting */
 #include "../include/TextIO/StringIO.h" /* Included for UTFX_Init functions */
+#include "../include/TextIO/FormatIO.h" /* Included for UTF8_Format */
 
 #if   (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_AppleOS) != PlatformIO_AppleOS))
 #include <time.h>                       /* Included for timespec_get */
@@ -42,48 +43,48 @@ extern "C" {
      
      we might also want to have a good randomnes generator (maybe even Unicode)
      */
+
+    static void RunTests_ReallocateHelper(TestSuite *Suite) {
+        if (Suite != NULL) {
+            uint64_t *OLD_Failures = Suite->UnexpectedFailues;
+            uint64_t *New_Failures = realloc(Suite->UnexpectedFailues, sizeof(uint64_t) * Suite->UnexpectedFailureSize * 2);
+            if (New_Failures != NULL) {
+                Suite->UnexpectedFailues      = New_Failures;
+                Suite->UnexpectedFailureSize *= 2;
+                free(OLD_Failures);
+            } else {
+                free(New_Failures);
+            }
+        } else {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("TestSuite Pointer is NULL"));
+        }
+    }
     
-    /*
-     
-     Catch2 Layout:
-     
-     TEST_CASE -> INTERNAL_CATCH_TESTCASE -> INTERNAL_CATCH_TESTCASE -> INTERNAL_CATCH_TESTCASE2 ->
-     
-     #define INTERNAL_CATCH_TESTCASE2(TestName, ...)                                                                                                                                     \
-     static void TestName();                                                                                                                                                         \
-     CATCH_INTERNAL_START_WARNINGS_SUPPRESSION                                                                                                                                       \
-     CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                                        \
-     namespace {                                                                                                                                                                     \
-     Catch::AutoReg INTERNAL_CATCH_UNIQUE_NAME(autoRegistrar)(Catch::makeTestInvoker(&TestName), CATCH_INTERNAL_LINEINFO, Catch::StringRef(), Catch::NameAndTags {__VA_ARGS__}); \
-     }                                                                                                                                                                   \
-    CATCH_INTERNAL_STOP_WARNINGS_SUPPRESSION                                                                                                                                        \
-    static void TestName()
-     
-     TestIO Layout:
-     
-     ? -> ?? -> ??? -> TestIO_CreateFunction(FunctionBeingTested, TestNumber, ...)
-     
-     Should _Generic be involved?
-     
-     #define TestIO_String_CreateFunction(FunctionBeingTested, TestNumber, ...) \
-     static bool FunctionBeingTested##TestNumber(void) { \
-     
-     #define TestIO_TestString(FunctionName, ReturnType, SolutionString, TestString, TestArguments ...) \
-     Hmm we need to get the type name from the FunctionName and we need to know if it's a pointer or not, well really just copy the return type?
-     ReturnType Result = FunctionName(TestString, TestArguments);
-     
-     
-     
-     */
-    
-    //typedef struct TestIORegistry {
-        /*
-         
-         Well, we need to know the test function names, as well as if they're enabled or not
-         
-         */
-        //void Function_RegisterTestCase(void);
-    //} TestIORegistry;
+    void TestIO_RunTests(TestSuite *Suite) {
+        for (uint64_t Test = 0; Test < Suite->NumTests; Test++) {
+            if (Suite->Tests[Test].TestState == TestState_Enabled) {
+                bool TestPassed                                             = Suite->Tests[Test].Function;
+                if (TestPassed == Suite->Tests[Test].ExpectedResult) {
+                    Suite->NumWorkedAsExpected                             += 1;
+                } else {
+                    if (Suite->NumUnexpectedFailures == Suite->UnexpectedFailureSize) {
+                        RunTests_ReallocateHelper(Suite);
+                    }
+
+                    Suite->NumUnexpectedFailures                           += 1;
+                    Suite->UnexpectedFailues[Suite->NumUnexpectedFailures]  = Test;
+                }
+            }
+        }
+        UTF8 *TestsThatPerformedAsExpected = UTF8_Format(UTF8String("Tests that matched their expectation: %llu"), Suite->NumWorkedAsExpected);
+        UTF8 *UnexpectedFailures           = UTF8_Format(UTF8String("Tests that DID NOT perform as expected: %llu"), Suite->NumUnexpectedFailures);
+        UTF8_WriteSentence(stdout, UTF8String("Test Results:\n"));
+        UTF8_WriteSentence(stdout, TestsThatPerformedAsExpected);
+        UTF8_WriteSentence(stdout, UnexpectedFailures);
+        for (uint64_t FailedTest = 0ULL; FailedTest < Suite->NumUnexpectedFailures; FailedTest++) {
+            UTF8_WriteSentence(stdout, Suite->Tests[Suite->UnexpectedFailues[FailedTest]].FunctionName);
+        }
+    }
     
     uint64_t GetTimerFrequency(void) {
         uint64_t TimerFrequency = 0LL;
@@ -106,7 +107,7 @@ extern "C" {
         uint64_t CurrentTime = 0ULL;
         for (uint8_t Loop = 1; Loop <= 3; Loop++) {
 #if   ((PlatformIO_TargetOS & PlatformIO_AppleOS) == PlatformIO_AppleOS)
-                CurrentTime      = mach_continuous_time();
+            CurrentTime      = mach_continuous_time();
 #elif (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS))
             struct timespec *TimeSpec = NULL;
             clock_gettime(CLOCK_MONOTONIC, TimeSpec);

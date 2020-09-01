@@ -88,7 +88,7 @@ extern "C" {
     int16_t FloorF(const float Decimal) {
         int16_t  Result   = 0;
         int8_t   Sign     = ExtractSignF(Decimal);
-        int8_t   Exponent = ExtractExponentF(Decimal);
+        int16_t  Exponent = ExtractExponentF(Decimal);
         int32_t  Mantissa = ExtractMantissaF(Decimal);
         
         if (Mantissa == 0) {
@@ -124,7 +124,7 @@ extern "C" {
     int16_t CeilF(const float Decimal) {
         int16_t  Result   = 0;
         int8_t   Sign     = ExtractSignF(Decimal);
-        int8_t   Exponent = ExtractExponentF(Decimal);
+        int16_t  Exponent = ExtractExponentF(Decimal);
         int32_t  Mantissa = ExtractMantissaF(Decimal);
         
         if (Mantissa == 0) {
@@ -160,7 +160,7 @@ extern "C" {
     int16_t RoundF(const float Decimal) {
         int16_t  Result   = 0;
         int8_t   Sign     = ExtractSignF(Decimal);
-        int8_t   Exponent = ExtractExponentF(Decimal);
+        int16_t  Exponent = ExtractExponentF(Decimal);
         int64_t  Mantissa = ExtractMantissaF(Decimal);
         if (Mantissa >= 4096) {
             Result        = Exponent + 1;
@@ -198,8 +198,8 @@ extern "C" {
     }
     
     bool DecimalIsNormalF(const float Decimal) {
-        bool   IsNormal = No;
-        int8_t Exponent = ExtractExponentF(Decimal);
+        bool    IsNormal = No;
+        int16_t Exponent = ExtractExponentF(Decimal);
         if (Exponent >= 1 && Exponent <= 0x7E) {
             IsNormal    = Yes;
         }
@@ -235,7 +235,7 @@ extern "C" {
         return IsInfinity;
     }
     
-    bool DecimalIsNotANumberF(const float Decimal) {
+    bool DecimalIsANumberF(const float Decimal) {
         bool   IsNotANumber = No;
         int8_t  Sign       = ExtractSignF(Decimal);
         uint8_t Exponent   = (((uint32_t)Decimal) & 0x7F800000) >> 23;
@@ -246,7 +246,7 @@ extern "C" {
         return IsNotANumber;
     }
     
-    bool DecimalIsNotANumberD(const double Decimal) {
+    bool DecimalIsANumberD(const double Decimal) {
         bool   IsNotANumber = No;
         int8_t  Sign       = ExtractSignD(Decimal);
         int16_t Exponent   = (((uint64_t)Decimal) & 0x7FF0000000000000) >> 52;
@@ -308,13 +308,21 @@ extern "C" {
     int32_t ExtractMantissaF(const float Decimal) {
         uint32_t Integer       = ConvertFloat2Integer(Decimal);
         uint32_t Mantissa      = Integer & 0x7FFFFFUL;
-        return DecimalIsNormalF(Decimal) ? Mantissa |= 0x800000 : Mantissa;
+        bool     IsNormal      = DecimalIsNormal(Decimal);
+        if (IsNormal) {
+            Mantissa          |= 0x800000;
+        }
+        return Mantissa;
     }
     
     int64_t ExtractMantissaD(const double Decimal) {
         uint64_t Integer        = ConvertDouble2Integer(Decimal);
         uint64_t Mantissa       = Integer & 0xFFFFFFFFFFFFFULL;
-        return DecimalIsNormalD(Decimal) ? Mantissa |= 0x10000000000000 : Mantissa;
+        bool     IsNormal       = DecimalIsNormal(Decimal);
+        if (IsNormal) {
+            Mantissa           |= 0x10000000000000;
+        }
+        return Mantissa;
     }
     
     float InsertSignF(float Insertee, const int8_t Sign) {

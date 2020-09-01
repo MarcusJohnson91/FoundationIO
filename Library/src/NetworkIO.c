@@ -72,7 +72,6 @@ extern "C" {
     }
 
     void IPV6Address_Deinit(IPV6Address *Address) {
-        free(Address->Address);
         free(Address);
     }
 

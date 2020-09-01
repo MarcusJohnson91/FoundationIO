@@ -101,5 +101,8 @@
     <ClInclude Include="..\Library\include\TextIO\Private\TextTables.h">
       <Filter>Header Files\TextIO\Private</Filter>
     </ClInclude>
+    <ClInclude Include="..\Library\include\Private\Version.h">
+      <Filter>Header Files\Private</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

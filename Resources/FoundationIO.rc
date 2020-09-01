@@ -1,12 +1,15 @@
-#include "../Library/include/Private/FoundationIO.h"
+#include <Windows.h>
+#include "../Library/include/Private/Version.h"
+
+#pragma code_page(65001)
 
 LANGUAGE LANG_ENGLISH,SUBLANG_DEFAULT
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION    @FoundationIO_VERSION_RESOURCE@
+FILEVERSION    FoundationIO_Version_Major,FoundationIO_Version_Minor,FoundationIO_Version_Patch
 FILEOS         VOS_NT_WINDOWS32
 FILETYPE       VFT_DLL
-PRODUCTVERSION @FoundationIO_VERSION_RESOURCE@
+PRODUCTVERSION FoundationIO_Version_Major,FoundationIO_Version_Minor,FoundationIO_Version_Patch
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
@@ -14,7 +17,7 @@ BEGIN
         BEGIN
             VALUE "LegalCopyright",  "© Marcus Johnson, 2020"
             VALUE "FileDescription", "Platform Independent Base Library"
-            VALUE "FileVersion",     "@FoundationIO_VERSION_STRING@"
+            VALUE "FileVersion",     "FoundationIO_Version_Major.FoundationIO_Version_Minor.FoundationIO_Version_Patch"
         END
     END
 END

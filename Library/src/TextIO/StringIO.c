@@ -1702,7 +1702,7 @@ extern "C" {
             Sentence                                       = UTF8_Init(SentenceSize);
             if (Sentence != NULL) {
                 PlatformIO_Seek(Source, SentenceSize * -1, SeekType_Current); // Seek back to the beginning, allocate
-                PlatformIO_Read(Source, &Sentence, SentenceSize, 1);
+                PlatformIO_Read(Source, &Sentence, 1, SentenceSize);
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FILE Pointer is NULL"));
@@ -2856,14 +2856,14 @@ extern "C" {
     UTF32 *UTF32_Decimal2String(double Number, TextIO_Bases Base) {
         UTF32   *OutputString     = NULL;
         uint64_t StringSize       = 0ULL;
-        int8_t   Sign             = ExtractSignD(Number);
-        int16_t  Exponent         = ExtractExponentD(Number);
-        int16_t  Exponent2        = AbsoluteD(Exponent);
-        int64_t  Mantissa         = ExtractMantissaD(Number);
-        int64_t  Mantissa2        = AbsoluteD(Mantissa);
-        bool     IsDenormal       = DecimalIsNormalD(Number);
-        bool     IsNotANumber     = DecimalIsNotANumberD(Number);
-        bool     IsInfinite       = DecimalIsInfinityD(Number);
+        int8_t   Sign             = ExtractSign(Number);
+        int16_t  Exponent         = ExtractExponent(Number);
+        int16_t  Exponent2        = Absolute(Exponent);
+        int64_t  Mantissa         = ExtractMantissa(Number);
+        int64_t  Mantissa2        = Absolute(Mantissa);
+        bool     IsDenormal       = DecimalIsNormal(Number);
+        bool     IsANumber        = DecimalIsANumber(Number);
+        bool     IsInfinite       = DecimalIsInfinity(Number);
         
         /*
          
@@ -2890,7 +2890,7 @@ extern "C" {
         
         
         
-        if (IsNotANumber) {
+        if (IsANumber) {
             OutputString          = UTF32_Clone(UTF32String("Not A Number"));
         } else if (IsInfinite) {
             OutputString          = UTF32_Clone(UTF32String("Infinity"));
@@ -2978,13 +2978,17 @@ extern "C" {
     /* Number Conversions */
     
     bool UTF8_Compare(PlatformIO_Immutable(UTF8 *) String1, PlatformIO_Immutable(UTF8 *) String2) {
-        bool StringsMatch = No;
+        bool StringsMatch         = No;
         if (String1 != NULL && String2 != NULL) {
-            UTF32 *String1_32 = UTF8_Decode(String1);
-            UTF32 *String2_32 = UTF8_Decode(String2);
-            StringsMatch      = UTF32_Compare(String1_32, String2_32);
-            free(String1_32);
-            free(String2_32);
+            if (String1 != String2) {
+                UTF32 *String1_32 = UTF8_Decode(String1);
+                UTF32 *String2_32 = UTF8_Decode(String2);
+                StringsMatch      = UTF32_Compare(String1_32, String2_32);
+                free(String1_32);
+                free(String2_32);
+            } else {
+                StringsMatch      = Yes;
+            }
         } else if (String1 == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String1 Pointer is NULL"));
         } else if (String2 == NULL) {
@@ -2994,13 +2998,17 @@ extern "C" {
     }
     
     bool UTF16_Compare(PlatformIO_Immutable(UTF16 *) String1, PlatformIO_Immutable(UTF16 *) String2) {
-        bool StringsMatch = No;
+        bool StringsMatch         = No;
         if (String1 != NULL && String2 != NULL) {
-            UTF32 *String1_32 = UTF16_Decode(String1);
-            UTF32 *String2_32 = UTF16_Decode(String2);
-            StringsMatch      = UTF32_Compare(String1_32, String2_32);
-            free(String1_32);
-            free(String2_32);
+            if (String1 != String2) {
+                UTF32 *String1_32 = UTF16_Decode(String1);
+                UTF32 *String2_32 = UTF16_Decode(String2);
+                StringsMatch      = UTF32_Compare(String1_32, String2_32);
+                free(String1_32);
+                free(String2_32);
+            } else {
+                StringsMatch      = Yes;
+            }
         } else if (String1 == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String1 Pointer is NULL"));
         } else if (String2 == NULL) {
@@ -3457,7 +3465,7 @@ extern "C" {
         if (NumStrings > 0) {
             StringSet    = (UTF8**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF8*));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringSet[String][0] = 0xFF;
+                StringSet[String] = UTF8BOM_1;
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
@@ -3470,7 +3478,7 @@ extern "C" {
         if (NumStrings > 0) {
             StringSet     = (UTF16**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF16*));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringSet[String][0] = 0xFFFF;
+                StringSet[String] = InvalidReplacementCodePoint;
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
@@ -3483,7 +3491,7 @@ extern "C" {
         if (NumStrings > 0) {
             StringSet     = (UTF32**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF32*));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringSet[String][0] = 0xFFFFFFFF;
+                StringSet[String] = InvalidReplacementCodePoint;
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
