@@ -197,7 +197,7 @@ extern "C" {
             uint8_t *Array           = BitBuffer_GetArray(BitB);
             uint64_t Bytes2Write     = Bits2Bytes(BitBuffer_GetPosition(BitB), RoundingType_Down);
             uint64_t Bits2Keep       = ArrayOffset % 8;
-            uint64_t BytesWritten    = PlatformIO_Write(Output->File, sizeof(Array[0]), Array, Bytes2Write);
+            uint64_t BytesWritten    = PlatformIO_Write(Output->File, Array, sizeof(uint8_t), Bytes2Write);
             if (BytesWritten == Bytes2Write) {
                 Array[0]             = 0;
                 Array[0]             = Array[Bytes2Write + 1] & (Exponentiate(2, Bits2Keep) << (8 - Bits2Keep));

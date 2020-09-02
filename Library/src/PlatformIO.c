@@ -281,7 +281,7 @@ extern "C" {
         return !SeekingWasSucessful;
     }
 
-    uint64_t PlatformIO_Write(FILE *File2Write, uint8_t BufferElementSize, PlatformIO_Immutable(void *) Buffer, uint64_t Elements2Write) {
+    uint64_t PlatformIO_Write(FILE *File2Write, PlatformIO_Immutable(void *) Buffer, uint8_t BufferElementSize, uint64_t Elements2Write) {
         uint64_t BytesWritten = 0;
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
         BytesWritten = fwrite(Buffer, BufferElementSize, Elements2Write, File2Write);
