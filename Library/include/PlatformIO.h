@@ -538,7 +538,7 @@ extern "C" {
      @param         Elements2Read     The number of bytes to read.
      @return                          Returns the amount of data actually read.
      */
-    uint64_t        PlatformIO_Read(FILE *File2Read, void *Buffer, uint8_t BufferElementSize, uint64_t Elements2Read); // Buffer was after BufferElementSize
+    uint64_t        PlatformIO_Read(FILE *File2Read, void *Buffer, uint8_t BufferElementSize, uint64_t Elements2Read);
 
     /*!
      @abstract                        Seeks around a file.
@@ -552,12 +552,12 @@ extern "C" {
     /*!
      @abstract                        Writes data to a file.
      @param         File2Write        The File to write the data to.
-     @param         BufferElementSize The size of Buffer's elements in bytes.
      @param         Buffer            Where to get the data to write.
-     @param         Bytes2Write       The number of bytes to write.
-     @return                          Returns the amount of data actually written.
+     @param         BufferElementSize The size of Buffer's elements in bytes.
+     @param         Elements2Write    The number of Elements to write.
+     @return                          Returns the amount of data actually written in bytes.
      */
-    uint64_t        PlatformIO_Write(FILE *File2Write, uint8_t BufferElementSize, PlatformIO_Immutable(void *) Buffer, uint64_t Bytes2Write);
+    uint64_t        PlatformIO_Write(FILE *File2Write, PlatformIO_Immutable(void *) Buffer, uint8_t BufferElementSize, uint64_t Elements2Write);
 
     /*!
      @abstract                       Flushes the File stream and closes it.
@@ -565,7 +565,10 @@ extern "C" {
      @return                         Returns true if the file was sucessfully closed.
      */
     bool            PlatformIO_Close(FILE *File);
-    
+
+    /*!
+     @abstract                       Gets the total amount of memory in the system.
+     */
     uint64_t        PlatformIO_GetTotalMemoryInBytes(void);
     
 #ifdef __cplusplus
