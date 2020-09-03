@@ -55,6 +55,8 @@ if(CMAKE_HOST_UNIX)
     add_definitions(-D_LARGEFILE_SOURCE)
     add_definitions(-D_LARGEFILE64_SOURCE)
     add_definitions(-D_FILE_OFFSET_BITS=64)
+    add_definitions(-D__USE_TIME_BITS64=1)
+    add_definitions(-D_POSIX_C_SOURCE=200809L)
     add_definitions(-D__STDC_WANT_LIB_EXT1__)
 elseif(CMAKE_HOST_WIN32)
     add_definitions(-DUNICODE)
@@ -64,7 +66,7 @@ elseif(CMAKE_HOST_WIN32)
     target_link_libraries(FoundationIO ws2_32 bcrypt)
 endif(CMAKE_HOST_UNIX)
 
-if(CMAKE_HOST_UNIX)
+if(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
     message("We're checking if TextTables.h should be updated, it could take a few seconds or about 15 minutes.")
     execute_process(
     COMMAND sh "${FoundationIO_Library_Dir}/include/TextIO/Private/TextTables_Create.sh" "${FoundationIO_Library_Dir}/include/TextIO/Private/TextTables.h"
@@ -73,7 +75,7 @@ if(CMAKE_HOST_UNIX)
     RESULTS_VARIABLE STDOUT
     ERROR_VARIABLE STDERR
 )
-endif(CMAKE_HOST_UNIX)
+endif(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
 
 find_package(Git)
 
@@ -111,6 +113,10 @@ if(BUILD_AS_SHARED_LIBRARY MATCHES ON)
 elseif(BUILD_AS_SHARED_LIBRARY MATCHES OFF)
     add_library(FoundationIO STATIC ${FOUNDATIONIO_SOURCE})
 endif(BUILD_AS_SHARED_LIBRARY MATCHES ON)
+
+if(CMAKE_HOST_WIN32)
+    target_link_libraries(FoundationIO ws2_32 bcrypt)
+endif(CMAKE_HOST_WIN32)
 
 set_target_properties(FoundationIO PROPERTIES PREFIX "")
 
@@ -177,7 +183,7 @@ ${CMAKE_C_FLAGS} \
 -fPIC \
 -fshort-enums \
 -funsigned-char \
--std=c18 \
+-std=c2x \
 -Weverything \
 -Wall \
 -Wextra \
