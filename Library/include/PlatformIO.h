@@ -81,29 +81,21 @@ extern "C" {
 #endif
 #endif
 
-#if ((defined Macintosh) || (defined macintosh))
+#if  !defined(PlatformIO_TargetOS)
+#if   defined(__APPLE__) && defined(__MACH__)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_POSIXOS | PlatformIO_BSDOS | PlatformIO_AppleOS)
+#elif defined(Macintosh) || defined(macintosh)
 #define             PlatformIO_TargetOS                                                 (PlatformIO_ClassicMacOS)
-#endif
-
-#if ((defined _WIN16) || (defined _WIN32) || (defined _WIN64))
+#elif defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
 #define             PlatformIO_TargetOS                                                 (PlatformIO_WindowsOS)
-#endif
-
-#if (defined(__APPLE__) && defined(__MACH__))
-#define             PlatformIO_TargetOS                                                 (PlatformIO_POSIXOS | PlatformIO_AppleOS)
-#endif
-
-#if (defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__))
+#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
 #define             PlatformIO_TargetOS                                                 (PlatformIO_POSIXOS | PlatformIO_BSDOS)
-#endif
-
-#if (defined(__linux__) || defined(__ANDROID__) || defined(__gnu_linux__))
+#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__gnu_linux__) || defined(__ANDROID__)
 #define             PlatformIO_TargetOS                                                 (PlatformIO_POSIXOS | PlatformIO_LinuxOS)
-#endif
-
-#if (defined(__unix__) || defined(unix))
+#elif defined(unix) || defined(__unix) || defined(__unix__)
 #define             PlatformIO_TargetOS                                                 (PlatformIO_POSIXOS)
-#endif
+#endif /* Apple && Mach defined */
+#endif /* PlatformIO_TargetOS undefined */
 
 #if ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
 #ifdef              _FILE_OFFSET_BITS
@@ -251,7 +243,6 @@ extern "C" {
 #if ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
 #include <dlfcn.h>      /* Included for shared library support */
 #include <sys/socket.h> /* Included for socket support */
-#include <sys/sysctl.h> /* Included for getting the number of CPU cores */
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
     
 #ifndef             PlatformIO_Socket_Create

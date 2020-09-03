@@ -198,11 +198,11 @@ extern "C" {
     static int64_t SecureRNG_BaseSeed(uint8_t NumBytes) {
         int64_t RandomValue = 0LL;
         if (NumBytes <= 8) {
-#if   (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && (((PlatformIO_TargetOS & PlatformIO_BSDOS) == PlatformIO_BSDOS) || ((PlatformIO_TargetOS & PlatformIO_AppleOS) == PlatformIO_AppleOS)))
+#if   (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && (((PlatformIO_TargetOS & PlatformIO_BSDOS) == PlatformIO_BSDOS)))
             arc4random_buf(&RandomValue, NumBytes);
 #elif ((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS)
 #include <linux/random.h>
-            getrandom(&RandomValue, NumBytes, GRND_BLOCK);
+            getrandom(&RandomValue, NumBytes, GRND_NONBLOCK);
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
             BCryptGenRandom(NULL, (PUCHAR) &RandomValue, NumBytes, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
 #else

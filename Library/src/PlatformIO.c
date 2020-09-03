@@ -2,12 +2,11 @@
 #include "../include/TextIO/LogIO.h"    /* Included for logging errors */
 #include "../include/TextIO/StringIO.h" /* Included for Path functions */
 
-#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
 #include <stddef.h>
-#include <unistd.h>
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
 #include <sysinfoapi.h>
-#endif
+#endif /* PlatformIO_TargetOS */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
@@ -31,7 +30,7 @@ extern "C" {
         PlatformIO_Immutable(UTF8 *) Path8 = (PlatformIO_Immutable(UTF8 *)) Path;
         FILE *File = NULL;
         if (Path8 != NULL && Mode != FileMode_Unspecified) {
-            errno_t ErrorCode = 0;
+            int ErrorCode = 0;
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
             UTF8 *ModeString = NULL;
             if ((Mode & FileMode_Read) == FileMode_Read) {
@@ -121,7 +120,7 @@ extern "C" {
         PlatformIO_Immutable(UTF16 *) Path16 = (PlatformIO_Immutable(UTF16 *)) Path;
         FILE *File = NULL;
         if (Path16 != NULL && Mode != FileMode_Unspecified) {
-            errno_t ErrorCode = 0;
+            int ErrorCode = 0;
 #if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
             PlatformIO_Immutable(UTF8 *) Path8 = UTF16_Convert(Path16);
             const UTF8 *ModeString = NULL;

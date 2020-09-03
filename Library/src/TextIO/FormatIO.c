@@ -747,32 +747,14 @@ extern "C" {
                                     Specifiers->Specifiers[Specifier].PositionFlag = Position_Asterisk_NextArg;
                                 } else if (Format[CodePoint - 1] >= U'0' && Format[CodePoint - 1] <= U'9') {
                                     Specifiers->Specifiers[Specifier].PositionFlag = Position_Inline_Digits;
-#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
-                                    uint8_t  MaxDigits              = (uint8_t) Logarithm(10, NL_ARGMAX);
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
-                                    uint8_t  MaxDigits              = (uint8_t) Logarithm(10, _ARGMAX);
-#endif
                                     uint64_t PotentialDigitLocation = CodePoint - 1;
                                     while (Format[PotentialDigitLocation] != UTF32Character('%')) {
                                         PotentialDigitLocation     -= 1;
                                     }
                                     PotentialDigitLocation         += 1;
                                     uint64_t NumPossibleCodePoints  = CodePoint - PotentialDigitLocation;
-                                    uint8_t  NumDigits2Read         = (uint8_t) Minimum(NumPossibleCodePoints, MaxDigits);
+                                  uint8_t  NumDigits2Read           = UTF32_GetNumDigits(&Format[CodePoint], BaseType_Integer | Base_Radix10);
                                     uint64_t Value                  = UTF32_String2Integer(&Format[CodePoint - NumDigits2Read], Base_Integer | Base_Radix10);
-#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
-                                    if (Value <= NL_ARGMAX) {
-                                        Specifiers->Specifiers[Specifier].Position = Value;
-                                    } else {
-                                        Log(Severity_USER, PlatformIO_FunctionName, UTF8String("Positional Argument: %llu is greater than NL_ARGMAX: %d"), Value, NL_ARGMAX);
-                                    }
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
-                                    if (Value <= _ARGMAX) {
-                                        Specifiers->Specifiers[Specifier].Position = Value;
-                                    } else {
-                                        Log(Severity_USER, PlatformIO_FunctionName, UTF8String("Positional Argument: %llu is greater than _ARGMAX: %d"), Value, _ARGMAX);
-                                    }
-#endif
                                 }
                             }
                             break;
@@ -1194,7 +1176,7 @@ extern "C" {
                 uint64_t               Start    = Specifiers->Specifiers[Specifier].Start + 1;
                 
                 if ((BaseType & BaseType_Integer) == BaseType_Integer || (BaseType & BaseType_Decimal) == BaseType_Decimal || (BaseType & BaseType_Pointer) == BaseType_Pointer) {
-                    TextIO_Bases       Base            = ConvertModifierType2Base(Modifier);
+                    TextIO_Bases       Base            = ConvertModifierType2Base(&Specifiers->Specifiers[Specifier]);
                     PlatformIO_Immutable(UTF32*) Formatted2 = &Formatted[Start];
                     uint64_t           SubStringLength = UTF32_GetNumDigits(Formatted2, Base);
                     Deformatted[Specifier]             = UTF32_ExtractSubString(Formatted, Start, SubStringLength);
