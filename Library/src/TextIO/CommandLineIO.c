@@ -4,13 +4,14 @@
 #include "../../include/TextIO/LogIO.h"         /* Included for Logging */
 #include "../../include/TextIO/StringIO.h"      /* Included for StringIO's declarations */
 
-#if (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && (((PlatformIO_TargetOS & PlatformIO_LinuxOS) != PlatformIO_LinuxOS)))
+#if ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
 #include <signal.h>                             /* Included for SIGWINCH handling */
 #include <sys/ioctl.h>                          /* Included for the terminal size */
-#include <sys/ttycom.h>                         /* Included for winsize, TIOCGWINSZ */
-#elif (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && (((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS)))
-#include <signal.h>                             /* Included for SIGWINCH handling */
-#include <sys/ioctl.h>                          /* Included for the terminal size */
+#if   ((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS)
+#include <pty.h>                                /* Included for winsize, TIOCGWINSZ */
+#else
+//#include <sys/ttycom.h>                         /* Included for winsize, TIOCGWINSZ */
+#endif /* PlatformIO_LinuxOS */
 #elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
 #include <wincon.h>                             /* Included for getting the terminal size */
 #endif
