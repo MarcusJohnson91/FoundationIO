@@ -58,7 +58,7 @@ extern "C" {
         double  Floored    = FloorD(Decimal);
     }
     
-    int main() {
+    int main(void) {
         Test_CountDigits();
         //Test_Decimals();
         //Test_MinMax();

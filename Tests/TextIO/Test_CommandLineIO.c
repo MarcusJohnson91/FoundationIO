@@ -13,7 +13,7 @@ extern "C" {
         NumSwitches = Help,
     } Switches;
     
-    int main(int argc, const char *argv[]) {
+    int main(const int argc, const char *argv[]) {
         CommandLineIO *CLI = CommandLineIO_Init(NumSwitches);
         
         CommandLineIO_SetMinOptions(CLI, 2);

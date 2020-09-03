@@ -46,7 +46,7 @@ extern "C" {
         return TestPassed;
     }
     
-    int main() {
+    int main(void) {
         // First lets test InsecureRNG
         SecureRNG *Random = SecureRNG_Init(12288);
 
