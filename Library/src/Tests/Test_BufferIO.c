@@ -7,10 +7,12 @@
 extern "C" {
 #endif
 
-
+    TestSuite *BufferIOTests;
     
-    bool Test_ReadWriteBitsNearNear(BitBuffer *BitB, SecureRNG *Random) {
+    bool Test_ReadWriteBitsNearNear(SecureRNG *Random) {
         bool TestPassed                = Yes;
+
+        BitBuffer *BitB                = BitBuffer_Init(8);
         
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
             uint8_t    NumBits2Extract = SecureRNG_GenerateInteger(Random, 3); // 6
@@ -24,12 +26,25 @@ extern "C" {
             }
             BitBuffer_Erase(BitB, 0);
         }
+
+        TestCase ReadWriteBitsNN = {
+            .Function       = Test_ReadWriteBitsNearNear,
+            .TestState      = TestState_Enabled,
+            .FunctionName   = PlatformIO_FunctionName,
+            .ExpectedResult = ExpectedResult_Passed,
+        };
+
+
+
+        //BufferIOTests->Tests[0] = ReadWriteBitsNN;
         
         return TestPassed;
     }
 
-    bool Test_ReadWriteBitsFarFar(BitBuffer *BitB, SecureRNG *Random) {
+    bool Test_ReadWriteBitsFarFar(SecureRNG *Random) {
         bool TestPassed                = Yes;
+
+        BitBuffer *BitB                = BitBuffer_Init(8);
 
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
             uint8_t    NumBits2Extract = SecureRNG_GenerateInteger(Random, 3); // 6
@@ -47,8 +62,10 @@ extern "C" {
         return TestPassed;
     }
 
-    bool Test_ReadWriteBitsNearFar(BitBuffer *BitB, SecureRNG *Random) {
+    bool Test_ReadWriteBitsNearFar(SecureRNG *Random) {
         bool TestPassed                = Yes;
+
+        BitBuffer *BitB                = BitBuffer_Init(8);
 
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
             uint8_t    NumBits2Extract = SecureRNG_GenerateInteger(Random, 3); // 6
@@ -66,8 +83,10 @@ extern "C" {
         return TestPassed;
     }
 
-    bool Test_ReadWriteBitsFarNear(BitBuffer *BitB, SecureRNG *Random) {
+    bool Test_ReadWriteBitsFarNear(SecureRNG *Random) {
         bool TestPassed                = Yes;
+
+        BitBuffer *BitB                = BitBuffer_Init(8);
 
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
             uint8_t    NumBits2Extract = SecureRNG_GenerateInteger(Random, 3);
@@ -85,13 +104,14 @@ extern "C" {
         return TestPassed;
     }
     
-    int main(int argc, const char *argv[]) {
-        BitBuffer *BitB              = BitBuffer_Init(8);
+    int main(const int argc, const char *argv[]) {
+        TestIO_RunTests(BufferIOTests);
+
         SecureRNG *Random            = SecureRNG_Init(8000000);
-        bool NearNearPassed          = Test_ReadWriteBitsNearNear(BitB, Random);
-        bool FarFarPassed            = Test_ReadWriteBitsFarFar(BitB, Random);
-        bool NearFarPassed           = Test_ReadWriteBitsNearFar(BitB, Random);
-        bool FarNearPassed           = Test_ReadWriteBitsFarNear(BitB, Random);
+        bool NearNearPassed          = Test_ReadWriteBitsNearNear(Random);
+        bool FarFarPassed            = Test_ReadWriteBitsFarFar(Random);
+        bool NearFarPassed           = Test_ReadWriteBitsNearFar(Random);
+        bool FarNearPassed           = Test_ReadWriteBitsFarNear(Random);
         return (NearNearPassed + FarFarPassed + NearFarPassed + FarNearPassed) / 4;
 
     }

@@ -162,7 +162,7 @@ extern "C" {
         return TestSuitePassed;
     }
     
-    int main(int argc, const char *argv[]) {
+    int main(const int argc, const char *argv[]) {
         bool TestSuitePassed      = No;
         SecureRNG *Random         = SecureRNG_Init(16 * 1024);
         TestSuitePassed           = Test_UTF8_StringSet();
