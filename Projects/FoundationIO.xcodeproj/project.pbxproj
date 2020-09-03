@@ -347,13 +347,6 @@
 			name = TextIO;
 			sourceTree = "<group>";
 		};
-		2C73A32324EE7A4A006E480E /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		2C78B17D2493A8CD0098766B /* Private */ = {
 			isa = PBXGroup;
 			children = (
@@ -390,7 +383,6 @@
 				2CC71D81232B5EF4006DA1B8 /* FoundationIO */,
 				2CC71D80232B5EED006DA1B8 /* Tests */,
 				2CC71D7A232B5EC8006DA1B8 /* Products */,
-				2C73A32324EE7A4A006E480E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -451,8 +443,8 @@
 		2CC71D83232B5F01006DA1B8 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
-				2C794B0323BB271C00282D20 /* TextIO */,
 				2C78B17D2493A8CD0098766B /* Private */,
+				2C794B0323BB271C00282D20 /* TextIO */,
 				2C41096F236BA3050059FE67 /* BufferIO.h */,
 				2CC71D95232B5F43006DA1B8 /* CryptographyIO.h */,
 				2C88500624BCA22A00DAD7ED /* FileIO.h */,
@@ -689,7 +681,7 @@
 		2CC71D71232B5EC8006DA1B8 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1160;
+				LastUpgradeCheck = 1170;
 				ORGANIZATIONNAME = MarcusJohnson;
 				TargetAttributes = {
 					2C73A31724EE614D006E480E = {
@@ -898,6 +890,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -912,6 +905,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				ENABLE_HARDENED_RUNTIME = YES;
