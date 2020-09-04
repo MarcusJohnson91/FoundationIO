@@ -79,9 +79,12 @@ extern "C" {
         return TestPassed;
     }
 
-    bool Test_UTF8_StringSet(void) {
-        bool TestSuitePassed               = No;
+    bool Test_UTF8_StringSet(SecureRNG *Secure) {
+        bool TestPassed                    = No;
         UTF8 **StringSet8                  = UTF8_StringSet_Init(4);
+        if (StringSet8[0] == (UTF8*) 0x8888888888888888) {
+            TestPassed = Yes;
+        }
         PlatformIO_Immutable(UTF8 *) One   = UTF8String("One");
         PlatformIO_Immutable(UTF8 *) Two   = UTF8String("Two");
         PlatformIO_Immutable(UTF8 *) Three = UTF8String("Three");
@@ -89,7 +92,7 @@ extern "C" {
         StringSet8[0]                      = One;
         StringSet8[1]                      = Two;
         StringSet8[2]                      = Three;
-        StringSet8[3]                      = Four;
+        StringSet8[3]                      = &Four;
         bool Bool1                         = UTF8_Compare(StringSet8[0], One);
         bool Bool2                         = UTF8_Compare(StringSet8[1], Two);
         bool Bool3                         = UTF8_Compare(StringSet8[2], Three);
@@ -165,7 +168,7 @@ extern "C" {
     int main(const int argc, const char *argv[]) {
         bool TestSuitePassed      = No;
         SecureRNG *Random         = SecureRNG_Init(16 * 1024);
-        TestSuitePassed           = Test_UTF8_StringSet();
+        TestSuitePassed           = Test_UTF8_StringSet(Random);
         //TestSuitePassed           = Test_UTF16_EncodeDecode(Random);
         return TestSuitePassed;
     }
