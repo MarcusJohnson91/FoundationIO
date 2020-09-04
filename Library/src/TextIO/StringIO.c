@@ -3465,7 +3465,7 @@ extern "C" {
         if (NumStrings > 0) {
             StringSet    = (UTF8**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF8*));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringSet[String] = UTF8BOM_1;
+                StringSet[String] = (UTF8*) 0x8888888888888888;
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
@@ -3478,7 +3478,7 @@ extern "C" {
         if (NumStrings > 0) {
             StringSet     = (UTF16**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF16*));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringSet[String] = InvalidReplacementCodePoint;
+                StringSet[String] = (UTF16*) 0x1616161616161616;
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
@@ -3491,7 +3491,7 @@ extern "C" {
         if (NumStrings > 0) {
             StringSet     = (UTF32**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF32*));
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
-                StringSet[String] = InvalidReplacementCodePoint;
+                StringSet[String] = (UTF32*) 0x3232323232323232;
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
