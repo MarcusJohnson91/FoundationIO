@@ -309,6 +309,13 @@ extern "C" {
      @return                                             Returns Yes if the String contains a Windows or UNIX style line ending, otherwise no.
      */
     bool         UTF32_HasNewLine(PlatformIO_Immutable(UTF32 *) String);
+
+    /*!
+     @abstract                                           Tells if the CodePoint is Uppercase; Unicode replacement of isupper
+     @param      CodePoint                               The string to check.
+     @return                                             Returns Yes if the CodePoint represents an uppercase character, otherwise No.
+     */
+    bool         UTF32_IsUpperCase(UTF32 CodePoint);
     
     /*!
      @abstract                                           Tells if the UTF-8 string pointed to by String is a valid UTF-8 encoded string.

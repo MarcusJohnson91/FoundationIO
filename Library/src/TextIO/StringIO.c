@@ -914,6 +914,25 @@ extern "C" {
         }
         return StringHasNewLine;
     }
+
+    bool UTF32_IsUpperCase(UTF32 CodePoint) {
+        bool CodePointIsUppercase            = No;
+        if (CodePoint != PlatformIO_NULLTerminator) {
+            if ((CodePoint >= 0x41 && CodePoint <= 0x5A) || (CodePoint >= 0xC0 && CodePoint <= 0xD6) || (CodePoint >= 0xD8 && CodePoint <= 0xDE)) {
+                CodePointIsUppercase         = Yes;
+            } else {
+                uint64_t UppercaseIndex      = 0xDE + 1;
+                while (UppercaseIndex < CaseFoldTableSize) {
+                    if (CodePoint == CaseFoldTable[UppercaseIndex][0][0]) {
+                        CodePointIsUppercase = Yes;
+                        break;
+                    }
+                    UppercaseIndex          += 1;
+                }
+            }
+        }
+        return CodePointIsUppercase;
+    }
     
     bool UTF8_IsValid(PlatformIO_Immutable(UTF8 *) String) {
         uint64_t CodeUnit    = 0ULL;
@@ -2344,16 +2363,44 @@ extern "C" {
         }
         return CaseFolded;
     }
-    
+
+    static uint64_t UTF32_GetCaseFoldedSize(PlatformIO_Immutable(UTF32 *) String) {
+        uint64_t NumCodePoints = 0ULL;
+        uint64_t CodePoint = 0ULL;
+        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+            uint64_t TableIndex = 0ULL;
+            while (TableIndex < CaseFoldTableSize) {
+                if (String[CodePoint] == CaseFoldTable[TableIndex][0][0]) {
+                    NumCodePoints += UTF32_GetStringSizeInCodePoints(CaseFoldTable[TableIndex][1]);
+                    CodePoint     += 1;
+                    break;
+                }
+                TableIndex        += 1;
+            }
+        }
+        return NumCodePoints;
+    }
+
+    static void UTF32_SubstitutePreallocated(UTF32 *String2Edit, PlatformIO_Immutable(UTF32 *) Replacement) {
+        uint64_t CodePoint = 0ULL;
+        while (String2Edit[CodePoint] != PlatformIO_NULLTerminator && Replacement[CodePoint] != PlatformIO_NULLTerminator) {
+            String2Edit[CodePoint] = Replacement[CodePoint];
+            CodePoint += 1;
+        }
+    }
+
     UTF32 *UTF32_CaseFold(PlatformIO_Immutable(UTF32 *) String) {
         UTF32   *CaseFoldedString                = NULL;
         if (String != NULL) {
+            uint64_t CaseFoldedSize              = UTF32_GetCaseFoldedSize(String);
+            CaseFoldedString                     = UTF32_Init(CaseFoldedSize);
             uint64_t CodePoint                   = 0ULL;
             while (String[CodePoint] != PlatformIO_NULLTerminator) {
-                for (uint64_t Index = 0ULL; Index < CaseFoldTableSize; Index++) {
-                    if (String[CodePoint] == CaseFoldTable[Index][0][0]) {
-                        uint64_t ReplacementSize = UTF32_GetStringSizeInCodePoints(String);
-                        CaseFoldedString         = UTF32_SubstituteSubString(String, CaseFoldTable[Index][1], CodePoint, ReplacementSize);
+                if (UTF32_IsUpperCase(String[CodePoint])) {
+                    for (uint64_t Index = 0ULL; Index < CaseFoldTableSize; Index++) {
+                        if (String[CodePoint] == CaseFoldTable[Index][0][0]) {
+                            UTF32_SubstitutePreallocated(CaseFoldedString, CaseFoldTable[Index][1]);
+                        }
                     }
                 }
                 CodePoint += 1;
