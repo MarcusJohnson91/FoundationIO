@@ -80,7 +80,7 @@ SortIncludes: true
 IncludeCategories:
 - Regex: '"*PlatformIO.h"'
   Priority: -5
-- Regex: '"*UnicodeIOTypes.h"'
+- Regex: '"*TextIOTypes.h"'
   Priority: -4
 - Regex: '<[Ww]indows.h>'
   Priority: -3
