@@ -63,7 +63,7 @@ elseif(CMAKE_HOST_WIN32)
     add_definitions(-D_UNICODE)
     add_definitions(-D_ATL_ALLOW_CHAR_UNSIGNED)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-    target_link_libraries(FoundationIO ws2_32 bcrypt)
+    add_definitions(-D__STDC_WANT_LIB_EXT1__)
 endif(CMAKE_HOST_UNIX)
 
 if(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
@@ -133,7 +133,7 @@ install(TARGETS FoundationIO                  DESTINATION ${CMAKE_INSTALL_PREFIX
 install(DIRECTORY "${FoundationIO_Library_Dir}/include" DESTINATION "${CMAKE_INSTALL_PREFIX}" FILES_MATCHING PATTERN "*.h" PATTERN "*Private*" EXCLUDE)
 install(FILES "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Resources/FoundationIO.pc" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
 
-if(BUILD_TESTING)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     enable_testing()
 
     add_executable(Test_BufferIO                    "${FoundationIO_Test_Dir}/Test_BufferIO.c")
@@ -174,7 +174,7 @@ if(BUILD_TESTING)
 
     add_custom_command(TARGET FoundationIO POST_BUILD COMMAND ctest ARGS --output-on-failure WORKING_DIRECTORY ${CMAKE_OUTPUT_DIRECTORY})
 
-endif(BUILD_TESTING)
+endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 
 if(${CMAKE_C_COMPILER_ID} STREQUAL "AppleClang" OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
 
