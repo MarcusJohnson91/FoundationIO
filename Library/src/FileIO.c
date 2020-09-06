@@ -44,10 +44,10 @@ extern "C" {
 
     static void FileInput_FindFileSize(FileInput *Input) {
         if (Input != NULL) {
-            PlatformIO_Seek(Input->File, 0, SeekType_End);
-            Input->FileSize     = (uint64_t) PlatformIO_GetSize(Input->File);
-            PlatformIO_Seek(Input->File, 0, SeekType_Beginning);
-            Input->FilePosition = (uint64_t) PlatformIO_GetSize(Input->File);
+            FileIO_Seek(Input->File, 0, SeekType_End);
+            Input->FileSize     = (uint64_t) FileIO_GetSize(Input->File);
+            FileIO_Seek(Input->File, 0, SeekType_Beginning);
+            Input->FilePosition = (uint64_t) FileIO_GetSize(Input->File);
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FileInput Pointer is NULL"));
         }
@@ -94,7 +94,7 @@ extern "C" {
 
     void FileInput_Deinit(FileInput *Input) {
         if (Input != NULL) {
-            PlatformIO_Close(Input->File);
+            FileIO_Close(Input->File);
             free(Input);
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FileInput Pointer is NULL"));
@@ -125,7 +125,7 @@ extern "C" {
     void FileOutput_Deinit(FileOutput *Output) {
         if (Output != NULL) {
             fflush(Output->File);
-            PlatformIO_Close(Output->File);
+            FileIO_Close(Output->File);
             free(Output);
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FileOutput Pointer is NULL"));
@@ -151,7 +151,7 @@ extern "C" {
                 }
             }
             uint64_t BytesRead       = 0ULL;
-            BytesRead                = PlatformIO_Read(Input->File, Array, sizeof(Array[0]), Bytes2Read);
+            BytesRead                = FileIO_Read(Input->File, Array, sizeof(Array[0]), Bytes2Read);
             if (BytesRead == Bytes2Read) {
                 BitBuffer_SetSize(BitB, Bits2Bytes(BytesRead, RoundingType_Down) + ArrayOffset);
             } else {
@@ -171,7 +171,7 @@ extern "C" {
             uint8_t *Array           = BitBuffer_GetArray(BitB);
             uint64_t Bytes2Read      = Bits2Bytes(BitBuffer_GetSize(BitB), RoundingType_Down);
             uint64_t BytesRead       = 0ULL;
-            BytesRead                = PlatformIO_Read(Input->File, Array, sizeof(Array[0]), Bytes2Read);
+            BytesRead                = FileIO_Read(Input->File, Array, sizeof(Array[0]), Bytes2Read);
             if (BytesRead != Bytes2Read) {
                 uint8_t *Buffer_Old  = Array;
                 uint8_t *Buffer_New  = (uint8_t*) realloc(Array, BytesRead);
@@ -197,7 +197,7 @@ extern "C" {
             uint8_t *Array           = BitBuffer_GetArray(BitB);
             uint64_t Bytes2Write     = Bits2Bytes(BitBuffer_GetPosition(BitB), RoundingType_Down);
             uint64_t Bits2Keep       = ArrayOffset % 8;
-            uint64_t BytesWritten    = PlatformIO_Write(Output->File, Array, sizeof(uint8_t), Bytes2Write);
+            uint64_t BytesWritten    = FileIO_Write(Output->File, Array, sizeof(uint8_t), Bytes2Write);
             if (BytesWritten == Bytes2Write) {
                 Array[0]             = 0;
                 Array[0]             = Array[Bytes2Write + 1] & (Exponentiate(2, Bits2Keep) << (8 - Bits2Keep));
@@ -215,6 +215,281 @@ extern "C" {
         }
     }
     /* BitBuffer */
+
+    /* File Operations */
+    static UTF8 *UTF8_CreateModeString(FileIO_FileModes Mode) {
+        UTF8 *ModeString = NULL;
+        if ((Mode & FileMode_Read) == FileMode_Read) {
+            if ((Mode & FileMode_Binary) == FileMode_Binary) {
+                ModeString = PlatformIO_Literal(UTF8*, char*, u8"rb");
+            } else if ((Mode & FileMode_Text) == FileMode_Text) {
+                ModeString = PlatformIO_Literal(UTF8*, char*, u8"r");
+            }
+        } else if ((Mode & FileMode_Write) == FileMode_Write) {
+            if ((Mode & FileMode_Append) == FileMode_Append) {
+                if ((Mode & FileMode_Binary) == FileMode_Binary) {
+                    ModeString = PlatformIO_Literal(UTF8*, char*, u8"ab");
+                } else if ((Mode & FileMode_Text) == FileMode_Text) {
+                    ModeString = PlatformIO_Literal(UTF8*, char*, u8"a");
+                }
+            } else {
+                if ((Mode & FileMode_Binary) == FileMode_Binary) {
+                    ModeString = PlatformIO_Literal(UTF8*, char*, u8"wb");
+                } else if ((Mode & FileMode_Text) == FileMode_Text) {
+                    ModeString = PlatformIO_Literal(UTF8*, char*, u8"w");
+                }
+            }
+        }
+        return ModeString;
+    }
+
+    static UTF16 *UTF16_CreateModeString(FileIO_FileModes Mode) {
+        UTF16 *ModeString = NULL;
+        if ((Mode & FileMode_Read) == FileMode_Read) {
+            if ((Mode & FileMode_Binary) == FileMode_Binary) {
+                ModeString = PlatformIO_Literal(UTF16*, char*, UTF16String("rb"));
+            } else if ((Mode & FileMode_Text) == FileMode_Text) {
+                ModeString = PlatformIO_Literal(UTF16*, char*, UTF16String("r"));
+            }
+        } else if ((Mode & FileMode_Write) == FileMode_Write) {
+            if ((Mode & FileMode_Append) == FileMode_Append) {
+                if ((Mode & FileMode_Binary) == FileMode_Binary) {
+                    ModeString = PlatformIO_Literal(UTF16*, char*, UTF16String("ab"));
+                } else if ((Mode & FileMode_Text) == FileMode_Text) {
+                    ModeString = PlatformIO_Literal(UTF16*, char*, UTF16String("a"));
+                }
+            } else {
+                if ((Mode & FileMode_Binary) == FileMode_Binary) {
+                    ModeString = PlatformIO_Literal(UTF16*, char*, UTF16String("wb"));
+                } else if ((Mode & FileMode_Text) == FileMode_Text) {
+                    ModeString = PlatformIO_Literal(UTF16*, char*, UTF16String("w"));
+                }
+            }
+        }
+        return ModeString;
+    }
+
+    FILE *FileIO_OpenUTF8(PlatformIO_Immutable(UTF8 *) Path8, FileIO_FileModes Mode) {
+        FILE *File = NULL;
+        if (Path8 != NULL && Mode != FileMode_Unspecified) {
+            bool Path8HasBOM = UTF8_HasBOM(Path8);
+            int  ErrorCode   = 0;
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+            UTF8 *Mode8      = UTF8_CreateModeString(Mode);
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+#ifdef __STDC_LIB_EXT1__
+            if (Path8HasBOM) {
+                ErrorCode = fopen_s(&File, &Path8[UTF8BOMSizeInCodeUnits], Mode8);
+            } else {
+                ErrorCode = fopen_s(&File, Path8, Mode8);
+            }
+            if (ErrorCode != 0) {
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't open \'%s\' got error code: %u"), Path8, ErrorCode);
+            }
+#else
+            if (Path8HasBOM) {
+                File = fopen(&Path8[UTF8BOMSizeInCodeUnits], Mode8);
+            } else {
+                File = fopen(Path8, Mode8);
+            }
+#endif /* __STDC_LIB_EXT1__ */
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+            if (Path8HasBOM) {
+                File = fopen(reinterpret_cast<const char *>(&Path8[UTF8BOMSizeInCodeUnits]), reinterpret_cast<const char *>(Mode8));
+            } else {
+                File = fopen(reinterpret_cast<const char *>(Path8), reinterpret_cast<const char *>(Mode8));
+            }
+#endif /* PlatformIO_Language */
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+            PlatformIO_Immutable(UTF16 *) Path16 = UTF8_Convert(Path8);
+            PlatformIO_Immutable(UTF16 *) Mode16 = UTF16_CreateModeString(Mode);
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+#ifdef __STDC_LIB_EXT1__
+            if (Path8HasBOM) {
+                ErrorCode = _wfopen_s(&File, &Path16[UTF16BOMSizeInCodeUnits], Mode16);
+            } else {
+                ErrorCode = _wfopen_s(&File, Path16, Mode16);
+            }
+#else
+            if (Path8HasBOM) {
+                File = _wfopen(&Path16[UTF16BOMSizeInCodeUnits], Mode16);
+            } else {
+                File = _wfopen(Path16, Mode16);
+            }
+#endif /* __STDC_LIB_EXT1__ */
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+            if (UTF8_HasBOM(Path8)) {
+                File = fopen(reinterpret_cast<const char *>(&Path16[UTF16BOMSizeInCodeUnits]), reinterpret_cast<const char *>(Mode16));
+            } else {
+                File = fopen(reinterpret_cast<const char *>(&Path16), reinterpret_cast<const char *>(Mode16));
+            }
+#endif /* PlatformIO_Language */
+#endif /* TargetOS */
+            if (File != NULL) {
+                setvbuf(File, NULL, _IONBF, 0);
+            }
+
+            if (ErrorCode != 0) {
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't open %s, got Error: %u"), Path8, ErrorCode);
+            }
+        }
+        return File;
+    }
+
+    FILE *FileIO_OpenUTF16(PlatformIO_Immutable(UTF16 *) Path16, FileIO_FileModes Mode) {
+        FILE *File            = NULL;
+        if (Path16 != NULL && Mode != FileMode_Unspecified) {
+            bool Path16HasBOM = UTF16_HasBOM(Path16);
+            int  ErrorCode    = 0;
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+            PlatformIO_Immutable(UTF8 *) Path8 = UTF16_Convert(Path16);
+            PlatformIO_Immutable(UTF8 *) Mode8 = UTF8_CreateModeString(Mode);
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+#ifdef __STDC_LIB_EXT1__
+            if (Path16HasBOM) {
+                ErrorCode = fopen_s(&File, &Path8[UTF8BOMSizeInCodeUnits], Mode8);
+            } else {
+                ErrorCode = fopen_s(&File, Path8, Mode8);
+            }
+#else
+            if (Path16HasBOM) {
+                File = fopen(&Path8[UTF8BOMSizeInCodeUnits], Mode8);
+            } else {
+                File = fopen(Path8, Mode8);
+            }
+#endif /* __STDC_LIB_EXT1__ */
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+            if (Path16HasBOM) {
+                File = fopen(reinterpret_cast<const char *>(&Path8[UTF8BOMSizeInCodeUnits]), reinterpret_cast<const char *>(Mode8));
+            } else {
+                File = fopen(reinterpret_cast<const char *>(Path8), reinterpret_cast<const char *>(Mode8));
+            }
+#endif /* PlatformIO_Language */
+            free(Path8);
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+            PlatformIO_Immutable(UTF16 *) Mode16 = UTF16_CreateModeString(Mode);
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+#ifdef __STDC_LIB_EXT1__
+            if (Path16HasBOM) {
+                ErrorCode = _wfopen_s(&File, &Path16[UTF16BOMSizeInCodeUnits], Mode16);
+            } else {
+                ErrorCode = _wfopen_s(&File, Path16, Mode16);
+            }
+#else
+            if (Path16HasBOM) {
+                File = _wfopen(&Path16[UTF16BOMSizeInCodeUnits], Mode16);
+            } else {
+                File = _wfopen(Path16, Mode16);
+            }
+#endif /* __STDC_LIB_EXT1__ */
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+            if (Path16HasBOM) {
+                File = fopen(reinterpret_cast<const char *>(&Path16[UTF16BOMSizeInCodeUnits]), reinterpret_cast<const char *>(Mode16));
+            } else {
+                File = fopen(reinterpret_cast<const char *>(&Path16), reinterpret_cast<const char *>(Mode16));
+            }
+#endif /* PlatformIO_Language */
+#endif /* TargetOS */
+            if (File != NULL) {
+                setvbuf(File, NULL, _IONBF, 0);
+            }
+
+            if (ErrorCode != 0) {
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't open %s, got Error: %u"), Path8, ErrorCode);
+            }
+        }
+        return File;
+    }
+
+    uint64_t FileIO_GetSize(const FILE *File) {
+        uint64_t FileSize = 0ULL;
+        if (File != NULL) {
+#if   (PlatformIO_TargetOS == PlatformIO_TargetOSIsPOSIX)
+            FileSize      = (uint64_t) ftello(File);
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+            FileSize      = (uint64_t) _ftelli64(File);
+#endif /* PlatformIO_TargetOS */
+        }
+        return FileSize;
+    }
+
+    uint64_t FileIO_Read(PlatformIO_Immutable(FILE *) File2Read, void *Buffer, uint8_t BufferElementSize, uint64_t Elements2Read) {
+        uint64_t BytesRead = 0;
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+        BytesRead = fread((void*) Buffer, BufferElementSize, Elements2Read, File2Read);
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+        BytesRead = fread(reinterpret_cast<void*>(Buffer), BufferElementSize, Elements2Read, File2Read);
+#endif
+#elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
+        ReadFile(File2Read, Buffer, Elements2Read, &BytesRead, NULL);
+#endif
+        return BytesRead;
+    }
+
+    bool FileIO_Seek(PlatformIO_Immutable(FILE *) File2Seek, int64_t SeekSizeInBytes, FileIO_SeekTypes SeekType) {
+        // Always open Streams in Binary Mode, not Text Mode; we'll handle Text conversion ourselves
+        bool SeekingWasSucessful = No;
+        bool SuccessIsZero       = 1;
+        if (SeekType == SeekType_Beginning) {
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+            SeekingWasSucessful = fseeko(File2Seek, SeekSizeInBytes, SEEK_SET);
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+            SeekingWasSucessful = fseeko(File2Seek, reinterpret_cast<off_t>(SeekSizeInBytes), SEEK_SET);
+#endif
+#elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
+            SeekingWasSucessful = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_SET);
+#endif
+        } else if (SeekType == SeekType_Current) {
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+            SeekingWasSucessful = fseeko(File2Seek, SeekSizeInBytes, SEEK_CUR);
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+            SeekingWasSucessful = fseeko(File2Seek, reinterpret_cast<off_t>(SeekSizeInBytes), SEEK_CUR);
+#endif
+#elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
+            SeekingWasSucessful = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_CUR);
+#endif
+        } else if (SeekType == SeekType_End) {
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+            SeekingWasSucessful = fseeko(File2Seek, SeekSizeInBytes, SEEK_END);
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+            SeekingWasSucessful = fseeko(File2Seek, reinterpret_cast<off_t>(SeekSizeInBytes), SEEK_END);
+#endif
+#elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
+            SeekingWasSucessful = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_END);
+#endif
+        }
+        if (SuccessIsZero != 0) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Seeking failed"));
+        }
+        return !SeekingWasSucessful;
+    }
+
+    uint64_t FileIO_Write(PlatformIO_Immutable(FILE *) File2Write, PlatformIO_Immutable(void *) Buffer, uint8_t BufferElementSize, uint64_t Elements2Write) {
+        uint64_t BytesWritten = 0;
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+        BytesWritten = fwrite(Buffer, BufferElementSize, Elements2Write, File2Write);
+#elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
+        WriteFile(File2Write, Buffer, Elements2Write, &BytesWritten, NULL);
+#endif
+        if (BytesWritten != Elements2Write) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %llu Elements but %llu Elements were requested"), BytesWritten, Elements2Write);
+        }
+        return BytesWritten;
+    }
+
+    bool FileIO_Close(FILE *File) {
+        bool FileClosedSucessfully = No;
+        if (File != NULL) {
+            fflush(File);
+            FileClosedSucessfully  = fclose(File);
+        }
+        return !FileClosedSucessfully;
+    }
+    /* File Operations */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

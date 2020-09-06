@@ -4,11 +4,11 @@
 #include "../include/TextIO/StringIO.h" /* Included for UTFX_Init functions */
 #include "../include/TextIO/FormatIO.h" /* Included for UTF8_Format */
 
-#if   (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_AppleOS) != PlatformIO_AppleOS))
+#if   (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) != PlatformIO_TargetOSIsApple))
 #include <time.h>                       /* Included for timespec_get */
-#elif (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_AppleOS) == PlatformIO_AppleOS))
+#elif (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) == PlatformIO_TargetOSIsApple))
 #include <mach/mach_time.h>             /* Included for mach_continuous_time */
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #include <Windows.h>
 #include <WinBase.h>                    /* Included for QueryPerformanceCounter, Windows.h MUST be included first */
 #endif

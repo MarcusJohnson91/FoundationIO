@@ -19,7 +19,7 @@ extern "C" {
     
 #include <math.h>
     
-#if   (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersionC >= PlatformIO_LanguageVersionC99 && PlatformIO_TargetOS != PlatformIO_WindowsOS)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersionC >= PlatformIO_LanguageVersionC99 && PlatformIO_TargetOS != PlatformIO_TargetOSIsWindows)
 #include <tgmath.h>
 #endif /* Version check */
     

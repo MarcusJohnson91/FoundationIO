@@ -69,7 +69,7 @@ extern "C" {
     
     void Log_Deinit(void) {
         if (Log_LogFile != NULL) {
-            PlatformIO_Close(Log_LogFile);
+            FileIO_Close(Log_LogFile);
         }
         if (Log_ProgramName != NULL) {
             free(Log_ProgramName);

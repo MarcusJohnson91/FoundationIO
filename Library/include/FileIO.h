@@ -19,22 +19,75 @@ extern "C" {
 #endif
 
     /*!
+     @enum         FileIO_FileModes
+     @constant     FileMode_Unspecified            Invalid mode
+     @constant     FileMode_Read                   Read the data in a file
+     @constant     FileMode_Write                  Delete the contents of the file and write new data
+     @constant     FileMode_Append                 Add new data at the end of old data without overwriting it
+     @constant     FileMode_Text                   Processes newlines and other text specific stuff
+     @constant     FileMode_Binary                 Raw access as opposed to FileMode_Text
+     */
+    typedef enum FileIO_FileModes {
+                   FileMode_Unspecified            = 0,
+                   FileMode_Read                   = 1,
+                   FileMode_Write                  = 2,
+                   FileMode_Append                 = 4,
+                   FileMode_Text                   = 16,
+                   FileMode_Binary                 = 32,
+    } FileIO_FileModes;
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
+    extern "C++" {
+        constexpr inline FileIO_FileModes operator | (FileIO_FileModes A, FileIO_FileModes B) {
+            return static_cast<FileIO_FileModes>(static_cast<uint8_t>(A) | static_cast<uint8_t>(B));
+        }
+
+        constexpr inline FileIO_FileModes operator & (FileIO_FileModes A, FileIO_FileModes B) {
+            return static_cast<FileIO_FileModes>(static_cast<uint8_t>(A) & static_cast<uint8_t>(B));
+        }
+
+        constexpr inline FileIO_FileModes operator |= (FileIO_FileModes A, FileIO_FileModes B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<FileIO_FileModes>(A1 |= B1);
+        }
+
+        constexpr inline FileIO_FileModes operator &= (FileIO_FileModes A, FileIO_FileModes B) {
+            uint8_t A1 = static_cast<uint8_t>(A);
+            uint8_t B1 = static_cast<uint8_t>(B);
+            return static_cast<FileIO_FileModes>(A1 &= B1);
+        }
+    }
+#endif /* PlatformIO_Language */
+
+    /*!
+     @enum        FileIO_SeekTypes
+     @constant    SeekType_Beginning               Seek from the beginning of the file.
+     @constant    SeekType_Current                 Seek from the current position of the file.
+     @constant    SeekType_End                     Seek from the end of the file.
+     */
+    typedef enum FileIO_SeekTypes {
+                  SeekType_Beginning               = 0,
+                  SeekType_Current                 = 1,
+                  SeekType_End                     = 2,
+    } FileIO_SeekTypes;
+
+    /*!
      @typedef      BitBuffer
      @abstract                                     Forward declaration of BufferIO's BitBuffer.
      */
-    typedef struct BitBuffer BitBuffer;
+    typedef struct BitBuffer                       BitBuffer;
 
     /*!
      @typedef      FileInput
      @abstract                                     Contains File/Socket pointers for reading to a BitBuffer.
      */
-    typedef struct FileInput                        FileInput;
+    typedef struct FileInput                       FileInput;
 
     /*!
      @typedef      FileOutput
      @abstract                                     Contains File/Socket pointers for writing from a BitBuffer.
      */
-    typedef struct FileOutput                       FileOutput;
+    typedef struct FileOutput                      FileOutput;
 
     /* FileInput */
     /*!
@@ -142,6 +195,65 @@ extern "C" {
      */
     void           BitBuffer_Write(FileOutput *Output, BitBuffer *BitB);
     /* BitBuffer */
+
+    /* File Operations */
+    /*!
+     @abstract                                     Opens the file at location Path with Mode.
+     @param        Path8                           Path is a UTF8 encoded string.
+     @param        Mode                            Mode is an ORable bitmask specifying the type of file to open.
+     */
+    FILE          *FileIO_OpenUTF8(PlatformIO_Immutable(UTF8 *) Path8, FileIO_FileModes Mode);
+
+    /*!
+     @abstract                                     Opens the file at location Path with Mode.
+     @param        Path16                          Path is a UTF16 encoded string.
+     @param        Mode                            Mode is an ORable bitmask specifying the type of file to open.
+     */
+    FILE          *FileIO_OpenUTF16(PlatformIO_Immutable(UTF16 *) Path16, FileIO_FileModes Mode);
+
+    /*!
+     @abstract                                     Gets the size of the FILE.
+     @param        File                            The file to get the size of.
+     @return                                       Returns the size of the file.
+     */
+    uint64_t       FileIO_GetSize(PlatformIO_Immutable(FILE *) File);
+
+    /*!
+     @abstract                                     Reads data from a file.
+     @param        File2Read                       The File to read the data to.
+     @param        Buffer                          Where to put the data to read.
+     @param        BufferElementSize               The size of Buffer's elements in bytes.
+     @param        Elements2Read                   The number of bytes to read.
+     @return                                       Returns the amount of data actually read.
+     */
+    uint64_t       FileIO_Read(PlatformIO_Immutable(FILE *) File2Read, void *Buffer, uint8_t BufferElementSize, uint64_t Elements2Read);
+
+    /*!
+     @abstract                                     Seeks around a file.
+     @param        File2Seek                       The File to seek around.
+     @param        SeekSizeInBytes                 The number of bytes to seek.
+     @param        SeekType                        The kind of seeking to do.
+     @return                                       Returns true if sucessful.
+     */
+    bool           FileIO_Seek(PlatformIO_Immutable(FILE *) File2Seek, int64_t SeekSizeInBytes, FileIO_SeekTypes SeekType);
+
+    /*!
+     @abstract                                     Writes data to a file.
+     @param        File2Write                      The File to write the data to.
+     @param        Buffer                          Where to get the data to write.
+     @param        BufferElementSize               The size of Buffer's elements in bytes.
+     @param        Elements2Write                  The number of Elements to write.
+     @return                                       Returns the amount of data actually written in bytes.
+     */
+    uint64_t       FileIO_Write(PlatformIO_Immutable(FILE *) File2Write, PlatformIO_Immutable(void *) Buffer, uint8_t BufferElementSize, uint64_t Elements2Write);
+
+    /*!
+     @abstract                                     Flushes the File stream and closes it.
+     @param        File                            The file you want to close.
+     @return                                       Returns true if the file was sucessfully closed.
+     */
+    bool           FileIO_Close(FILE *File);
+    /* File Operations */
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

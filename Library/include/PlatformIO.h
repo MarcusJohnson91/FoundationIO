@@ -15,32 +15,32 @@
 extern "C" {
 #endif
 
-#ifndef             PlatformIO_UnknownOS
-#define             PlatformIO_UnknownOS                                                (0)
+#ifndef             PlatformIO_TargetOSIsUnknown
+#define             PlatformIO_TargetOSIsUnknown                                                (0)
 #endif              /* UnknownOS */
 
-#ifndef             PlatformIO_ClassicMacOS
-#define             PlatformIO_ClassicMacOS                                             (1)
+#ifndef             PlatformIO_TargetOSIsClassicMac
+#define             PlatformIO_TargetOSIsClassicMac                                             (1)
 #endif              /* MacClassicOS */
 
-#ifndef             PlatformIO_WindowsOS
-#define             PlatformIO_WindowsOS                                                (2)
+#ifndef             PlatformIO_TargetOSIsWindows
+#define             PlatformIO_TargetOSIsWindows                                                (2)
 #endif              /* Windows */
 
-#ifndef             PlatformIO_POSIXOS
-#define             PlatformIO_POSIXOS                                                  (4)
+#ifndef             PlatformIO_TargetOSIsPOSIX
+#define             PlatformIO_TargetOSIsPOSIX                                                  (4)
 #endif              /* POSIX */
 
-#ifndef             PlatformIO_AppleOS
-#define             PlatformIO_AppleOS                                                  (8)
+#ifndef             PlatformIO_TargetOSIsApple
+#define             PlatformIO_TargetOSIsApple                                                  (8)
 #endif              /* AppleOS (MacOS, iOS, iPadOS, TVOS, WatchOS, etc) */
 
-#ifndef             PlatformIO_BSDOS
-#define             PlatformIO_BSDOS                                                    (16)
+#ifndef             PlatformIO_TargetOSIsBSD
+#define             PlatformIO_TargetOSIsBSD                                                    (16)
 #endif              /* BSD (FreeBSD, OpenBSD, NetBSD, DragonFlyBSD, etc) */
 
-#ifndef             PlatformIO_LinuxOS
-#define             PlatformIO_LinuxOS                                                  (32)
+#ifndef             PlatformIO_TargetOSIsLinux
+#define             PlatformIO_TargetOSIsLinux                                                  (32)
 #endif              /* BSD (Linux, Ubuntu, Android, etc) */
 
 #ifndef             PlatformIO_ArchIsAMD64
@@ -83,21 +83,21 @@ extern "C" {
 
 #if  !defined(PlatformIO_TargetOS)
 #if   defined(__APPLE__) && defined(__MACH__)
-#define             PlatformIO_TargetOS                                                 (PlatformIO_POSIXOS | PlatformIO_BSDOS | PlatformIO_AppleOS)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_TargetOSIsPOSIX | PlatformIO_TargetOSIsBSD | PlatformIO_TargetOSIsApple)
 #elif defined(Macintosh) || defined(macintosh)
-#define             PlatformIO_TargetOS                                                 (PlatformIO_ClassicMacOS)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_TargetOSIsClassicMac)
 #elif defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
-#define             PlatformIO_TargetOS                                                 (PlatformIO_WindowsOS)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_TargetOSIsWindows)
 #elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
-#define             PlatformIO_TargetOS                                                 (PlatformIO_POSIXOS | PlatformIO_BSDOS)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_TargetOSIsPOSIX | PlatformIO_TargetOSIsBSD)
 #elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__gnu_linux__) || defined(__ANDROID__)
-#define             PlatformIO_TargetOS                                                 (PlatformIO_POSIXOS | PlatformIO_LinuxOS)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_TargetOSIsPOSIX | PlatformIO_TargetOSIsLinux)
 #elif defined(unix) || defined(__unix) || defined(__unix__)
-#define             PlatformIO_TargetOS                                                 (PlatformIO_POSIXOS)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_TargetOSIsPOSIX)
 #endif /* Apple && Mach defined */
 #endif /* PlatformIO_TargetOS undefined */
 
-#if ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #ifdef              _FILE_OFFSET_BITS
 #undef              _FILE_OFFSET_BITS
 #define             _FILE_OFFSET_BITS                                                   (64)
@@ -240,7 +240,7 @@ extern "C" {
 #endif /* CompilerVersion */
     
     /* POSIX shared stuff */
-#if ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #include <dlfcn.h>      /* Included for shared library support */
 #include <sys/socket.h> /* Included for socket support */
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
@@ -279,7 +279,7 @@ extern "C" {
     
 #endif /* PlatformIO_TargetOS is some kind of POSIX */
     
-#if (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#if (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #ifndef             WIN32_LEAN_AND_MEAN
 #define             WIN32_LEAN_AND_MEAN
 #endif             /* WIN32_LEAN_AND_MEAN */
@@ -349,26 +349,26 @@ extern "C" {
 #endif /* PlatformIO_Compiler */
     
 #ifndef             PlatformIO_NewLine8
-#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #define             PlatformIO_NewLine8                                                      (u8"\n")
 #define             PlatformIO_NewLine8Size                                                  (1)
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #define             PlatformIO_NewLine8                                                      (u8"\r\n")
 #define             PlatformIO_NewLine8Size                                                  (2)
-#elif (PlatformIO_TargetOS == PlatformIO_ClassicMacOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsClassicMac)
 #define             PlatformIO_NewLine8                                                      (u8"\r")
 #define             PlatformIO_NewLine8Size                                                  (1)
 #endif /* TargetOS */
 #endif /* PlatformIO_NewLine8 */
     
 #ifndef             PlatformIO_NewLine16
-#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #define             PlatformIO_NewLine16                                                     (u"\n")
 #define             PlatformIO_NewLine16Size                                                 (1)
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #define             PlatformIO_NewLine16                                                     (u"\r\n")
 #define             PlatformIO_NewLine16Size                                                 (2)
-#elif (PlatformIO_TargetOS == PlatformIO_ClassicMacOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsClassicMac)
 #define             PlatformIO_NewLine16                                                     (u"\r")
 #define             PlatformIO_NewLine16Size                                                 (1)
 #endif /* TargetOS */
@@ -376,13 +376,13 @@ extern "C" {
     
     
 #ifndef             PlatformIO_NewLine32
-#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #define             PlatformIO_NewLine32                                                     (U"\n")
 #define             PlatformIO_NewLine32Size                                                 (1)
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #define             PlatformIO_NewLine32                                                     (U"\r\n")
 #define             PlatformIO_NewLine32Size                                                 (2)
-#elif (PlatformIO_TargetOS == PlatformIO_ClassicMacOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsClassicMac)
 #define             PlatformIO_NewLine32                                                     (U"\r")
 #define             PlatformIO_NewLine32Size                                                 (1)
 #endif /* TargetOS */
@@ -459,103 +459,6 @@ extern "C" {
 #ifndef             PlatformIO_FunctionName
 #define             PlatformIO_FunctionName           (PlatformIO_Immutable(UTF8 *)) __func__
 #endif /* PlatformIO_FunctionName */
-
-    typedef enum PlatformIO_FileModes {
-                    FileMode_Unspecified               = 0,
-                    FileMode_Read                      = 1,
-                    FileMode_Write                     = 2,
-                    FileMode_Append                    = 4,
-                    FileMode_Text                      = 8,
-                    FileMode_Binary                    = 16,
-    } PlatformIO_FileModes;
-#if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
-    extern "C++" {
-        constexpr inline PlatformIO_FileModes operator | (PlatformIO_FileModes A, PlatformIO_FileModes B) {
-            return static_cast<PlatformIO_FileModes>(static_cast<uint8_t>(A) | static_cast<uint8_t>(B));
-        }
-
-        constexpr inline PlatformIO_FileModes operator & (PlatformIO_FileModes A, PlatformIO_FileModes B) {
-            return static_cast<PlatformIO_FileModes>(static_cast<uint8_t>(A) & static_cast<uint8_t>(B));
-        }
-
-        constexpr inline PlatformIO_FileModes operator |= (PlatformIO_FileModes A, PlatformIO_FileModes B) {
-            uint8_t A1 = static_cast<uint8_t>(A);
-            uint8_t B1 = static_cast<uint8_t>(B);
-            return static_cast<PlatformIO_FileModes>(A1 |= B1);
-        }
-
-        constexpr inline PlatformIO_FileModes operator &= (PlatformIO_FileModes A, PlatformIO_FileModes B) {
-            uint8_t A1 = static_cast<uint8_t>(A);
-            uint8_t B1 = static_cast<uint8_t>(B);
-            return static_cast<PlatformIO_FileModes>(A1 &= B1);
-        }
-    }
-#endif /* PlatformIO_Language */
-
-    typedef enum PlatformIO_SeekTypes {
-                 SeekType_Beginning                    = 0,
-                 SeekType_Current                      = 1,
-                 SeekType_End                          = 2,
-    } PlatformIO_SeekTypes;
-
-    /*!
-     @abstract                        Opens the file at location Path with Mode.
-     @remark                          Path is a void pointer just for header recursion reasons.
-     @param         Path              Path is a UTF8 encoded string.
-     @param         Mode              Mode is an ORable bitmask specifying the type of file to open.
-     */
-    FILE           *PlatformIO_OpenUTF8(PlatformIO_Immutable(void *) Path, PlatformIO_FileModes Mode);
-
-    /*!
-     @abstract                        Opens the file at location Path with Mode.
-     @remark                          Path is a void pointer just for header recursion reasons.
-     @param         Path              Path is a UTF16 encoded string.
-     @param         Mode              Mode is an ORable bitmask specifying the type of file to open.
-     */
-    FILE           *PlatformIO_OpenUTF16(PlatformIO_Immutable(void *) Path, PlatformIO_FileModes Mode);
-
-    /*!
-     @abstract                        Gets the size of the FILE.
-     @param         File              The file to get the size of.
-     @return                          Returns the size of the file.
-     */
-    uint64_t        PlatformIO_GetSize(const FILE *File);
-
-    /*!
-     @abstract                        Reads data from a file.
-     @param         File2Read         The File to read the data to.
-     @param         Buffer            Where to put the data to read.
-     @param         BufferElementSize The size of Buffer's elements in bytes.
-     @param         Elements2Read     The number of bytes to read.
-     @return                          Returns the amount of data actually read.
-     */
-    uint64_t        PlatformIO_Read(FILE *File2Read, void *Buffer, uint8_t BufferElementSize, uint64_t Elements2Read);
-
-    /*!
-     @abstract                        Seeks around a file.
-     @param         File2Seek         The File to seek around.
-     @param         SeekSizeInBytes   The number of bytes to seek.
-     @param         SeekType          The kind of seeking to do.
-     @return                          Returns true if sucessful.
-     */
-    bool            PlatformIO_Seek(FILE *File2Seek, int64_t SeekSizeInBytes, PlatformIO_SeekTypes SeekType);
-
-    /*!
-     @abstract                        Writes data to a file.
-     @param         File2Write        The File to write the data to.
-     @param         Buffer            Where to get the data to write.
-     @param         BufferElementSize The size of Buffer's elements in bytes.
-     @param         Elements2Write    The number of Elements to write.
-     @return                          Returns the amount of data actually written in bytes.
-     */
-    uint64_t        PlatformIO_Write(FILE *File2Write, PlatformIO_Immutable(void *) Buffer, uint8_t BufferElementSize, uint64_t Elements2Write);
-
-    /*!
-     @abstract                       Flushes the File stream and closes it.
-     @param         File             The file you want to close.
-     @return                         Returns true if the file was sucessfully closed.
-     */
-    bool            PlatformIO_Close(FILE *File);
 
     /*!
      @abstract                       Gets the total amount of memory in the system.

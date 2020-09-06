@@ -14,7 +14,7 @@
 #ifndef FoundationIO_TextIO_LogIO_H
 #define FoundationIO_TextIO_LogIO_H
 
-#if   (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#if   (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #include <sal.h>
 #endif
 
