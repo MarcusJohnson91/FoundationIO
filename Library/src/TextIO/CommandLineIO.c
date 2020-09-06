@@ -4,15 +4,15 @@
 #include "../../include/TextIO/LogIO.h"         /* Included for Logging */
 #include "../../include/TextIO/StringIO.h"      /* Included for StringIO's declarations */
 
-#if ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #include <signal.h>                             /* Included for SIGWINCH handling */
 #include <sys/ioctl.h>                          /* Included for the terminal size */
-#if   ((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux)
 #include <pty.h>                                /* Included for winsize, TIOCGWINSZ */
 #else
 //#include <sys/ttycom.h>                         /* Included for winsize, TIOCGWINSZ */
-#endif /* PlatformIO_LinuxOS */
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#endif /* PlatformIO_TargetOSIsLinux */
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #include <wincon.h>                             /* Included for getting the terminal size */
 #endif
 
@@ -113,11 +113,11 @@ extern "C" {
     
     uint64_t       CommandLineIO_GetTerminalWidth(void) {
         uint64_t Width = 0ULL;
-#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
         struct winsize       WindowSize;
         ioctl(0, TIOCGWINSZ, &WindowSize);
         Width          = WindowSize.ws_row;
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
         CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
         Width          = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
@@ -127,11 +127,11 @@ extern "C" {
     
     uint64_t       CommandLineIO_GetTerminalHeight(void) {
         uint64_t Height = 0ULL;
-#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
         struct winsize       WindowSize;
         ioctl(0, TIOCGWINSZ, &WindowSize);
         Height          = WindowSize.ws_row;
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
         CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
         Height          = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
@@ -141,7 +141,7 @@ extern "C" {
     
     bool CommandLineIO_TerminalWasResized(void) {
         bool SizeChanged = No;
-#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
         /*
          We're creating a text UI to show the progress of the program.
          The user resizes the window
@@ -153,7 +153,7 @@ extern "C" {
         struct winsize       WindowSize;
         ioctl(0, TIOCGWINSZ, &WindowSize);
         SizeChanged      = WindowSize.ws_row;
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
         CONSOLE_SCREEN_BUFFER_INFO ScreenBufferInfo;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &ScreenBufferInfo);
         SizeChanged      = ScreenBufferInfo.srWindow.Right - ScreenBufferInfo.srWindow.Left + 1;
@@ -324,13 +324,13 @@ extern "C" {
                         GeneratedHelp[Switch + Child] = UTF32_Format(UTF32String("\t%U32s: %U32s%U32s"), CLI->Switches[Child].Name, CLI->Switches[Child].Description, PlatformIO_NewLine32);
                     }
                 }
-#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
                 UTF8 **GeneratedHelp8 = UTF8_StringSet_Encode((PlatformIO_Immutable(UTF32**)) GeneratedHelp);
                 for (uint64_t String = 0; String < StringSetSize; String++) {
                     UTF8_WriteSentence(stdout, GeneratedHelp8[String]);
                 }
                 UTF8_StringSet_Deinit(GeneratedHelp8);
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
                 UTF16 **GeneratedHelp16 = UTF16_StringSet_Encode((PlatformIO_Immutable(UTF32 **)) GeneratedHelp);
                 for (uint64_t String = 0; String < StringSetSize; String++) {
                     UTF16_WriteSentence(stdout, GeneratedHelp16[String]);
@@ -364,11 +364,11 @@ extern "C" {
                                            License                 != NULL ? License                 : PlatformIO_InvisibleString32
                                            );
             UTF32_Deinit(License);
-#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
             UTF8 *Banner8 = UTF8_Encode(Banner32);
             UTF8_WriteSentence(stdout, Banner8);
             UTF8_Deinit(Banner8);
-#elif  (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#elif  (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
             UTF16 *Banner16 = UTF16_Encode(Banner32);
             UTF16_WriteSentence(stdout, Banner16);
             UTF16_Deinit(Banner16);
@@ -404,9 +404,9 @@ extern "C" {
     
     uint64_t CommandLineIO_GetNumArguments(int argc) {
         uint64_t NumArguments = 0ULL;
-#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
         NumArguments          = (uint64_t) argc;
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
         NumArguments          = (uint64_t) __argc;
 #endif
         return NumArguments;
@@ -414,13 +414,13 @@ extern "C" {
     
     UTF32 **CommandLineIO_GetArgumentStringSet(void **Arguments) {
         UTF32 **StringSet               = NULL;
-#if   ((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS)
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
         StringSet                       = (UTF32**) UTF8_StringSet_Decode((PlatformIO_Immutable(UTF8**)) Arguments);
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
         StringSet                       = (UTF32**) UTF8_StringSet_Decode(reinterpret_cast<PlatformIO_Immutable(UTF8 **)>( const_cast<PlatformIO_Immutable(void **)>(Arguments)));
 #endif
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
         uint64_t NumArguments           = (uint64_t) __argc;
         StringSet                       = UTF32_StringSet_Init(NumArguments);
         if (Arguments != NULL) {

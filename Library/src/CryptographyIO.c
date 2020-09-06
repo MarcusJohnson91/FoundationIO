@@ -1,9 +1,10 @@
 #include "../include/CryptographyIO.h"    /* Included for our declarations */
 #include "../include/BufferIO.h"          /* Included for BitBuffer for CRC32 and Adler32 */
+#include "../include/FileIO.h"            /* Included for File operations */
 #include "../include/MathIO.h"            /* Included for Bits2Bytes, etc */
 #include "../include/TextIO/LogIO.h"      /* Included for error logging */
 
-#if   (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#if   (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #include <BCrypt.h>
 #endif
 
@@ -198,17 +199,17 @@ extern "C" {
     static int64_t SecureRNG_BaseSeed(uint8_t NumBytes) {
         int64_t RandomValue = 0LL;
         if (NumBytes <= 8) {
-#if   (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && (((PlatformIO_TargetOS & PlatformIO_BSDOS) == PlatformIO_BSDOS)))
+#if   (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && (((PlatformIO_TargetOS & PlatformIO_TargetOSIsBSD) == PlatformIO_TargetOSIsBSD)))
             arc4random_buf(&RandomValue, NumBytes);
-#elif ((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS)
+#elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux)
 #include <linux/random.h>
             getrandom(&RandomValue, NumBytes, GRND_NONBLOCK);
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
             BCryptGenRandom(NULL, (PUCHAR) &RandomValue, NumBytes, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
 #else
-            FILE *RandomFile          = PlatformIO_OpenUTF8(UTF8String("/dev/urandom"), FileMode_Read | FileMode_Binary);
-            size_t BytesRead          = PlatformIO_Read(RandomFile, &RandomValue, sizeof(RandomValue), 1);
-            PlatformIO_Close(RandomFile);
+            FILE *RandomFile          = FileIO_OpenUTF8(UTF8String("/dev/urandom"), FileMode_Read | FileMode_Binary);
+            size_t BytesRead          = FileIO_Read(RandomFile, &RandomValue, sizeof(RandomValue), 1);
+            FileIO_Close(RandomFile);
 #endif
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Can't return more than 8 bytes"));
@@ -219,16 +220,16 @@ extern "C" {
     static void SecureRNG_Seed(SecureRNG *Random) {
         if (Random != NULL) {
             if (Random->EntropyPool != NULL) {
-#if   (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_LinuxOS) != PlatformIO_LinuxOS))
+#if   (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) != PlatformIO_TargetOSIsLinux))
                 arc4random_buf(Random->EntropyPool, Bits2Bytes(Random->NumBits, RoundingType_Down));
-#elif (((PlatformIO_TargetOS & PlatformIO_POSIXOS) == PlatformIO_POSIXOS) && ((PlatformIO_TargetOS & PlatformIO_LinuxOS) == PlatformIO_LinuxOS))
-                FILE *RandomFile          = PlatformIO_OpenUTF8(UTF8String("/dev/random"), FileMode_Read | FileMode_Binary);
-                size_t BytesRead          = PlatformIO_Read(RandomFile, &Random->EntropyPool, Bits2Bytes(Random->NumBits, RoundingType_Down), 1);
+#elif (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux))
+                FILE *RandomFile          = FileIO_OpenUTF8(UTF8String("/dev/random"), FileMode_Read | FileMode_Binary);
+                size_t BytesRead          = FileIO_Read(RandomFile, &Random->EntropyPool, Bits2Bytes(Random->NumBits, RoundingType_Down), 1);
                 if (BytesRead != Bits2Bytes(Random->NumBits, RoundingType_Down)) {
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
                 }
-                PlatformIO_Close(RandomFile);
-#elif (PlatformIO_TargetOS == PlatformIO_WindowsOS)
+                FileIO_Close(RandomFile);
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
                 NTSTATUS Status           = BCryptGenRandom(NULL, (PUCHAR) Random->EntropyPool, (ULONG) Bits2Bytes(Random->NumBits, RoundingType_Down), (ULONG) BCRYPT_USE_SYSTEM_PREFERRED_RNG);
                 if (Status <= 0) {
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
