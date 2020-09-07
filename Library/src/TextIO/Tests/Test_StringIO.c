@@ -5,6 +5,16 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
+
+    bool Test_UTF8_Graphemes(SecureRNG *Secure) {
+        bool TestPassed = No;
+        UTF8 *Grapheme1 = UTF8String("🇺🇸");
+        uint8_t Grapheme1Size = UTF8_GetStringSizeInGraphemes(Grapheme1);
+        if (Grapheme1Size == 1) {
+            TestPassed = Yes;
+        }
+        return TestPassed;
+    }
     
     bool Test_UTF8_EncodeDecode(SecureRNG *Secure) {
         bool TestPassed                = No;
@@ -168,7 +178,8 @@ extern "C" {
     int main(const int argc, const char *argv[]) {
         bool TestSuitePassed      = No;
         SecureRNG *Random         = SecureRNG_Init(16 * 1024);
-        TestSuitePassed           = Test_UTF8_StringSet(Random);
+        TestSuitePassed           = Test_UTF8_Graphemes(Random);
+        //TestSuitePassed           = Test_UTF8_StringSet(Random);
         //TestSuitePassed           = Test_UTF16_EncodeDecode(Random);
         return TestSuitePassed;
     }

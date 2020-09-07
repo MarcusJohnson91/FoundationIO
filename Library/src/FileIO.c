@@ -401,6 +401,21 @@ extern "C" {
         return File;
     }
 
+    TextIO_StringTypes FileIO_GetFileOrientation(PlatformIO_Immutable(FILE *) File) {
+        TextIO_StringTypes StringType       = StringType_Unspecified;
+        int Orientation                     = fwide(PlatformIO_Literal(FILE*, PlatformIO_Immutable(FILE*), File), 0);
+        if (Orientation < 0) {
+            StringType                      = StringType_UTF8;
+        } else if (Orientation > 0) {
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+            StringType                      = StringType_UTF32;
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+            StringType                      = StringType_UTF16;
+#endif
+        }
+        return StringType;
+    }
+
     uint64_t FileIO_GetSize(const FILE *File) {
         uint64_t FileSize = 0ULL;
         if (File != NULL) {
