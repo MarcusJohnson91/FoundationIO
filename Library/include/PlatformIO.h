@@ -41,7 +41,7 @@ extern "C" {
 
 #ifndef             PlatformIO_TargetOSIsLinux
 #define             PlatformIO_TargetOSIsLinux                                                  (32)
-#endif              /* BSD (Linux, Ubuntu, Android, etc) */
+#endif              /* Linux (Ubuntu, Android, etc) */
 
 #ifndef             PlatformIO_ArchIsAMD64
 #define             PlatformIO_ArchIsAMD64                                              (1)
@@ -410,8 +410,8 @@ extern "C" {
 #endif
 
     /*!
-     @abstract        PlatformIO_Immutable is for pointers and arrays.
-     @remark          Makes the pointer and the data it points to constant.
+     @abstract      PlatformIO_Immutable is for pointers and arrays.
+     @remark        Makes the pointer and the data it points to constant.
      */
 #ifndef             PlatformIO_Immutable
 #define             PlatformIO_Immutable(PointerType) const PointerType const
@@ -430,16 +430,16 @@ extern "C" {
 #endif
     
     /*!
-     @abstract        PlatformIO_Volatile is for pointers and arrays.
-     @remark          Makes the pointer and the data it points to volatile.
+     @abstract      PlatformIO_Volatile is for pointers and arrays.
+     @remark        Makes the pointer and the data it points to volatile.
      */
 #ifndef             PlatformIO_Volatile
 #define             PlatformIO_Volatile(PointerType) volatile PointerType volatile
 #endif
 
     /*!
-     @abstract        PlatformIO_Constant is for variables, constants, and values.
-     @remark          Makes the pointer and the data it points to constant.
+     @abstract      PlatformIO_Constant is for variables, constants, and values.
+     @remark        Makes the pointer and the data it points to constant.
      */
 #ifndef             PlatformIO_Constant
 #define             PlatformIO_Constant(Type) const Type
@@ -461,7 +461,7 @@ extern "C" {
 #endif /* PlatformIO_FunctionName */
 
     /*!
-     @abstract                       Gets the total amount of memory in the system.
+     @abstract      Gets the total amount of memory in the system.
      */
     uint64_t        PlatformIO_GetTotalMemoryInBytes(void);
     
