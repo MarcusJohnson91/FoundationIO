@@ -1424,21 +1424,6 @@ extern "C" {
         return Truncated;
     }
     
-    static TextIO_StringTypes StringIO_GetStreamOrientation(FILE *File) {
-        TextIO_StringTypes StringType       = StringType_Unspecified;
-        int Orientation                     = fwide(File, 0);
-        if (Orientation < 0) {
-            StringType                      = StringType_UTF8;
-        } else if (Orientation > 0) {
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-            StringType                      = StringType_UTF32;
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-            StringType                      = StringType_UTF16;
-#endif
-        }
-        return StringType;
-    }
-    
     void UTF8_WriteGrapheme(FILE *Source, PlatformIO_Immutable(UTF8 *) Grapheme) {
         if (Source != NULL) {
             uint64_t StringSize       = UTF8_GetStringSizeInCodeUnits(Grapheme);
@@ -1766,7 +1751,7 @@ extern "C" {
     
     void UTF8_WriteSentence(FILE *OutputFile, PlatformIO_Immutable(UTF8 *) String) {
         if (String != NULL && OutputFile != NULL) {
-            TextIO_StringTypes Type       = StringIO_GetStreamOrientation(OutputFile);
+            TextIO_StringTypes Type       = FileIO_GetFileOrientation(OutputFile);
             uint64_t StringSize           = UTF8_GetStringSizeInCodeUnits(String);
             uint64_t CodeUnitsWritten     = 0ULL;
             bool     StringHasNewLine     = UTF8_HasNewLine(String);
@@ -1800,7 +1785,7 @@ extern "C" {
     
     void UTF16_WriteSentence(FILE *OutputFile, PlatformIO_Immutable(UTF16 *) String) {
         if (String != NULL && OutputFile != NULL) {
-            TextIO_StringTypes Type       = StringIO_GetStreamOrientation(OutputFile);
+            TextIO_StringTypes Type       = FileIO_GetFileOrientation(OutputFile);
             uint64_t StringSize           = UTF16_GetStringSizeInCodeUnits(String);
             uint64_t CodeUnitsWritten     = 0ULL;
             bool     StringHasNewLine     = UTF16_HasNewLine(String);
