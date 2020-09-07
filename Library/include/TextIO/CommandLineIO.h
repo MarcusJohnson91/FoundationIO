@@ -15,7 +15,7 @@
 #include "../PlatformIO.h"  /* Included for Platform Independence macros */
 #include "TextIOTypes.h"    /* Included for Text types */
 
-#pragma  once
+#pragma once
 
 #ifndef  FoundationIO_TextIO_CommandLineIO_H
 #define  FoundationIO_TextIO_CommandLineIO_H
