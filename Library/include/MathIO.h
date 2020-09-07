@@ -8,7 +8,7 @@
 
 #include "PlatformIO.h" /* Included for Platform Independence macros */
 
-#pragma  once
+#pragma once
 
 #ifndef  FoundationIO_MathIO_H
 #define  FoundationIO_MathIO_H
