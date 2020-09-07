@@ -80,7 +80,7 @@ endif(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUI
 find_package(Git)
 
 if(GIT_FOUND)
-    file(READ "../Library/include/Private/Version.h" FoundationIO_Version_Header)
+    file(READ "../Library/include/Private/FoundationIO_Version.h" FoundationIO_Version_Header)
 
     string(REGEX MATCH "#define FoundationIO_Version_Major [0-9]+" _ "${FoundationIO_Version_Header}")
     string(REGEX MATCH "[0-9]+" VERSION_MAJOR "${_}")
