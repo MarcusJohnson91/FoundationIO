@@ -21,6 +21,7 @@ CreateHeaderFileTop() {
         printf " @copyright       2018+\n"
         printf " @version         1.2.0\n"
         printf " @brief           This header contains tables used across FoundationIO for Unicode and character set conversion.\n"
+        printf " @remark          ScriptHash is used to know if the script has changed since the header was last generated, it is not at all used for security.\n"
         printf " */\n\n"
         printf "#include \"../../PlatformIO.h\"  /* Included for Platform Independence macros */\n"
         printf "#include \"../TextIOTypes.h\"    /* Included for the Text types */\n\n"

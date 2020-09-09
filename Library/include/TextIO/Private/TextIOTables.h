@@ -4,6 +4,7 @@
  @copyright       2018+
  @version         1.2.0
  @brief           This header contains tables used across FoundationIO for Unicode and character set conversion.
+ @remark          ScriptHash is used to know if the script has changed since the header was last generated, it is not at all used for security.
  */
 
 #include "../../PlatformIO.h"  /* Included for Platform Independence macros */
@@ -18,7 +19,7 @@
 extern "C" {
 #endif
 
-#define ScriptHash 4d8b477f8dfa2ccd850375863157efb9408d8b91
+#define ScriptHash e9e484ac397ecf439af8f93e42afbc8bc87b231b
 
 #define UnicodeVersion 13.0.0
 
