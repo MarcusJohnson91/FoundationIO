@@ -276,14 +276,15 @@ extern "C" {
                 StringSize[Item] = UTF32_GetStringSizeInCodePoints(Strings[Item]);
             }
             
-            uint64_t *NumProgressIndicatorsPerString = (uint64_t*) calloc(NumItems2Display, sizeof(uint64_t));
-            UTF8     *ActualStrings2Print            = (UTF8*) calloc(NumItems2Display, sizeof(UTF8));
+            uint64_t NumProgressIndicatorsPerString[NumItems2Display];
+            UTF8     ActualStrings2Print[NumItems2Display];
             for (uint8_t String = 0; String < NumItems2Display; String++) {
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]);
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
-                UTF8    *Indicator           = UTF8_Init(CommandLineIO_GetTerminalWidth());
-                UTF8    *IndicatorFinal      = UTF8_Insert(Indicator, UTF8String("-"), 0);
-                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%Us %llu/%llu %llu/%s%s]"), IndicatorFinal, *Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, PlatformIO_NewLine8);
+                uint64_t TerminalWidth       = CommandLineIO_GetTerminalWidth() / 2;
+                UTF8     Indicator[TerminalWidth + 1];
+                UTF8_Set(Indicator, '-', TerminalWidth);
+                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%U32s %llu/%llu %llu/%s%s]"), Indicator, *Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, PlatformIO_NewLine8);
                 UTF8_WriteSentence(stdout, FormattedString);
                 free(Indicator);
             }
@@ -538,8 +539,7 @@ extern "C" {
         uint64_t NumTokens = 0;
         if (Arguments != NULL) {
             // Loop over all the arguments, finding tokens
-            uint64_t *StringSizes = (uint64_t*) calloc(NumArguments, sizeof(uint64_t));
-            StringSizes           = UTF32_StringSet_GetStringSizesInCodePoints(Arguments);
+            uint64_t *StringSizes           = UTF32_StringSet_GetStringSizesInCodePoints(Arguments);
             for (uint64_t Argument = 1ULL; Argument < NumArguments - 1; Argument++) {
                 for (uint64_t CodePoint = 1ULL; CodePoint < StringSizes[Argument]; CodePoint++) {
                     if (Arguments[Argument][CodePoint - 1] == UTF32Character('-') && Arguments[Argument][CodePoint] == UTF32Character('-')) { // "--" prefix

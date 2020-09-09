@@ -17,7 +17,7 @@ extern "C" {
             uint64_t StringSize = NumCodeUnits + PlatformIO_NULLTerminatorSize;
             String              = (UTF8*) calloc(StringSize, sizeof(UTF8));
             for (uint64_t Index = 0ULL; Index < NumCodeUnits; Index++) {
-                String[Index]   = UTF8BOM_1;
+                String[Index]   = 0x88;
             }
             if (String == NULL) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF8));
@@ -34,7 +34,7 @@ extern "C" {
             uint64_t StringSize = NumCodeUnits + PlatformIO_NULLTerminatorSize;
             String              = (UTF16*) calloc(StringSize, sizeof(UTF16));
             for (uint64_t Index = 0ULL; Index < NumCodeUnits; Index++) {
-                String[Index]   = InvalidReplacementCodePoint;
+                String[Index]   = 0x1616;
             }
             if (String == NULL) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF16));
@@ -51,7 +51,7 @@ extern "C" {
             uint64_t StringSize = NumCodePoints + PlatformIO_NULLTerminatorSize;
             String              = (UTF32*) calloc(StringSize, sizeof(UTF32));
             for (uint64_t Index = 0ULL; Index < NumCodePoints; Index++) {
-                String[Index]   = InvalidReplacementCodePoint;
+                String[Index]   = 0x32323232;
             }
             if (String == NULL) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF32));
@@ -2217,21 +2217,17 @@ extern "C" {
                 }
             }
             
-            Instances = (uint64_t*) calloc(NumInstances, sizeof(uint64_t));
-            if (Instances != NULL) {
-                for (uint64_t Instance = 0ULL; Instance < NumInstances; Instance++) {
-                    for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
-                        for (uint64_t RemoveCodePoint = 0ULL; RemoveCodePoint < SubStringSize; RemoveCodePoint++) {
-                            if (String[StringCodePoint] != SubString2Remove[RemoveCodePoint]) {
-                                break;
-                            } else {
-                                Instances[Instance] = StringCodePoint;
-                            }
+            Instances[NumInstances];
+            for (uint64_t Instance = 0ULL; Instance < NumInstances; Instance++) {
+                for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
+                    for (uint64_t RemoveCodePoint = 0ULL; RemoveCodePoint < SubStringSize; RemoveCodePoint++) {
+                        if (String[StringCodePoint] != SubString2Remove[RemoveCodePoint]) {
+                            break;
+                        } else {
+                            Instances[Instance] = StringCodePoint;
                         }
                     }
                 }
-            } else {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate the instances"));
             }
             
             if (Instance2Remove >= 1) {
@@ -3297,20 +3293,15 @@ extern "C" {
         UTF32    **SplitStrings    = NULL; // What we return, it's a 0 indexed array of strings
         uint64_t   StringSize      = 0ULL; // The size of the first parameter
         uint64_t   NumDelimiters   = 0ULL; // The number of delimiters in the second parameter
-        uint64_t  *DelimitersSize  = NULL; // an array containing the size of each delimiter
         uint64_t   NumSplitStrings = 0ULL; // The number of strings to return
         uint64_t  *SplitSizes      = NULL; // The size of each split string
         uint64_t  *SplitOffsets    = NULL; // The starting position of each split
         if (String != NULL && Delimiters != NULL) {
             StringSize             = UTF32_GetStringSizeInCodePoints(String);
             NumDelimiters          = UTF32_StringSet_GetNumStrings(Delimiters);
-            DelimitersSize         = (uint64_t*) calloc(NumDelimiters + PlatformIO_NULLTerminatorSize, sizeof(uint64_t));
-            if (DelimitersSize != NULL) {
-                for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters; Delimiter++) {
-                    DelimitersSize[Delimiter] = UTF32_GetStringSizeInCodePoints(Delimiters[Delimiter]);
-                }
-            } else {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate space for the delimiter sizes"));
+            uint64_t DelimitersSize[NumDelimiters];
+            for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters; Delimiter++) {
+                DelimitersSize[Delimiter] = UTF32_GetStringSizeInCodePoints(Delimiters[Delimiter]);
             }
             // Check if the current delimiter is larger than the string, if so, it can't match.
             // Well we need to loop over the string NumDelimiters times, so Delimiters, String, DelimiterString
@@ -3328,8 +3319,8 @@ extern "C" {
                 }
             }
             
-            SplitSizes   = (uint64_t*) calloc(NumSplitStrings + PlatformIO_NULLTerminatorSize, sizeof(uint64_t));
-            SplitOffsets = (uint64_t*) calloc(NumSplitStrings + PlatformIO_NULLTerminatorSize, sizeof(uint64_t));
+            SplitSizes[NumSplitStrings];
+            SplitOffsets[NumSplitStrings];
             
             for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters; Delimiter++) {
                 for (uint64_t DelimiterCodePoint = 0ULL; DelimiterCodePoint < DelimitersSize[Delimiter]; DelimiterCodePoint++) {
