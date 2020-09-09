@@ -31,11 +31,9 @@ extern "C" {
         
         UTF32 *SecurityName   = NULL;
         if (Log_ProgramName != NULL) {
-            SecurityName      = UTF32_Format(UTF32String("%Us's %Us in %s: "), Log_ProgramName, Severity == Severity_DEBUG ? Error : Mistake, FunctionName);
+            SecurityName      = UTF32_Format(UTF32String("%U32s's %U32s in %s: "), Log_ProgramName, Severity == Severity_DEBUG ? Error : Mistake, FunctionName);
         } else {
-            SecurityName      = UTF32_Format(UTF32String("%Us in %s: "), Severity == Severity_DEBUG ? Error : Mistake, FunctionName);
-            // "ERROR in %s: "
-            // "ERRORn %s: "; Ate " i" aka 2 codepoints too far?
+            SecurityName      = UTF32_Format(UTF32String("%U32s in %s: "), Severity == Severity_DEBUG ? Error : Mistake, FunctionName);
         }
         
         UTF32 *Description32  = UTF8_Decode(UTF8_MakeStringMutable(Description));
