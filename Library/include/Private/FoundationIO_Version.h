@@ -13,16 +13,8 @@
 #ifndef FoundationIO_Version_H
 #define FoundationIO_Version_H
 
-#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-extern "C" {
-#endif
-
 #define FoundationIO_Version_Major 0
 #define FoundationIO_Version_Minor 9
 #define FoundationIO_Version_Patch 7
-
-#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-}
-#endif /* Extern C */
 
 #endif /* FoundationIO_Version_H */
