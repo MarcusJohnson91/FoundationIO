@@ -3769,6 +3769,61 @@ extern "C" {
         }
         return Encoded;
     }
+
+    UTF8 *UTF8_StringSet_Flatten(PlatformIO_Immutable(UTF8 **) StringSet) {
+        UTF8 *Flattened = NULL;
+        if (StringSet != NULL) {
+            UTF32 **StringSet32 = UTF8_StringSet_Decode(StringSet);
+            UTF32 *Flattened32  = UTF32_StringSet_Flatten(StringSet32);
+            UTF32_StringSet_Deinit(StringSet32);
+            Flattened           = UTF8_Encode(Flattened32);
+            UTF32_Deinit(Flattened32);
+        } else {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("StringSet Pointer is NULL"));
+        }
+        return Flattened;
+    }
+
+    UTF16 *UTF16_StringSet_Flatten(PlatformIO_Immutable(UTF16 **) StringSet) {
+        UTF16 *Flattened        = NULL;
+        if (StringSet != NULL) {
+            UTF32 **StringSet32 = UTF16_StringSet_Decode(StringSet);
+            UTF32 *Flattened32  = UTF32_StringSet_Flatten(StringSet32);
+            UTF32_StringSet_Deinit(StringSet32);
+            Flattened           = UTF16_Encode(Flattened32);
+            UTF32_Deinit(Flattened32);
+        } else {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("StringSet Pointer is NULL"));
+        }
+        return Flattened;
+    }
+
+    UTF32 *UTF32_StringSet_Flatten(PlatformIO_Immutable(UTF32 **) StringSet) {
+        UTF32 *Flattened = NULL;
+        if (StringSet != NULL) {
+            uint64_t NumStrings          = UTF32_StringSet_GetNumStrings(StringSet);
+            uint64_t FlattenedSize       = 0;
+            uint64_t PieceSizes[NumStrings];
+            for (uint64_t String = 0; String < NumStrings; String++) {
+                PieceSizes[String]       = UTF32_GetStringSizeInCodePoints(StringSet[String]);
+                FlattenedSize           += PieceSizes[String];
+            }
+            Flattened                    = UTF32_Init(FlattenedSize);
+            uint64_t FlattenedOffset     = 0;
+            uint64_t CurrentPiece        = 0;
+            uint64_t CurrentPieceOffset  = 0;
+            if (Flattened != NULL) {
+                while (FlattenedOffset < FlattenedSize && CurrentPieceOffset < PieceSizes[CurrentPiece]) {
+                    Flattened[FlattenedOffset] = StringSet[CurrentPiece][CurrentPieceOffset];
+                }
+            } else {
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate Flattened string of size: %llu"), FlattenedSize);
+            }
+        } else {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("StringSet Pointer is NULL"));
+        }
+        return Flattened;
+    }
     
     void UTF8_StringSet_Deinit(UTF8 **StringSet) {
         if (StringSet != NULL) {

@@ -1240,6 +1240,27 @@ extern "C" {
      @return                                             Returns the encoded StringSet.
      */
     UTF16      **UTF16_StringSet_Encode(PlatformIO_Immutable(UTF32 **) StringSet);
+
+    /*!
+     @abstract                                           Creates a String from a StringSet.
+     @param      StringSet                               The StringSet to convert to a string.
+     @return                                             Returns the encoded String.
+     */
+    UTF8        *UTF8_StringSet_Flatten(PlatformIO_Immutable(UTF8 **) StringSet);
+    
+    /*!
+     @abstract                                           Creates a String from a StringSet.
+     @param      StringSet                               The StringSet to convert to a string.
+     @return                                             Returns the encoded String.
+     */
+    UTF16       *UTF16_StringSet_Flatten(PlatformIO_Immutable(UTF16 **) StringSet);
+    
+    /*!
+     @abstract                                           Creates a String from a StringSet.
+     @param      StringSet                               The StringSet to convert to a string.
+     @return                                             Returns the encoded String.
+     */
+    UTF32       *UTF32_StringSet_Flatten(PlatformIO_Immutable(UTF32 **) StringSet);
     
     /*!
      @abstract                                           Deletes a UTF-8 encoded StringSet (like is returned by SplitString).
