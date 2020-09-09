@@ -821,21 +821,34 @@ extern "C" {
         if (Random != NULL && GUUIDType != GUUIDType_Unspecified) {
             uint64_t LowBits             = SecureRNG_GenerateInteger(Random, 64);
             uint64_t HighBits            = SecureRNG_GenerateInteger(Random, 64);
-            uint8_t *BinaryGUUIDData     = (uint8_t*) calloc(BinaryGUUID_Size, sizeof(uint8_t));
+            if (GUUIDType == GUUIDType_GUIDString || GUUIDType == GUUIDType_UUIDString) {
+                GUUID                    = (uint8_t*) calloc(GUUIDString_Size, sizeof(uint8_t));
+            } else if (GUUIDType == GUUIDType_BinaryGUID || GUUIDType == GUUIDType_BinaryUUID) {
+                GUUID                    = (uint8_t*) calloc(BinaryGUUID_Size, sizeof(uint8_t));
+            }
             if (GUUID != NULL) {
-                for (uint8_t GUUIDByte = 0; GUUIDByte < BinaryGUUID_Size; GUUIDByte++) {
-                    if (GUUIDByte < 8) {
-                        uint8_t Byte     = (LowBits  & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
-                        BinaryGUUIDData[GUUIDByte] = Byte;
-                    } else {
-                        uint8_t Byte     = (HighBits & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
-                        BinaryGUUIDData[GUUIDByte] = Byte;
+                if (GUUIDType == GUUIDType_GUIDString || GUUIDType == GUUIDType_UUIDString) { // String
+                    for (uint8_t GUUIDByte = 0; GUUIDByte < GUUIDString_Size; GUUIDByte++) {
+                        if (GUUIDByte != 4 && GUUIDByte != 7 && GUUIDByte != 10) {
+                            if (GUUIDByte < 8) {
+                                uint8_t Byte     = (LowBits  & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
+                                GUUID[GUUIDByte] = Byte;
+                            } else {
+                                uint8_t Byte     = (HighBits & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
+                                GUUID[GUUIDByte] = Byte;
+                            }
+                        }
                     }
-                }
-                if (GUUIDType == GUUIDType_GUIDString || GUUIDType == GUUIDType_UUIDString) {
-                    GUUID                = GUUID_Convert(GUUIDType_BinaryGUID, GUUIDType_GUIDString, BinaryGUUIDData);
-                } else {
-                    GUUID                = BinaryGUUIDData;
+                } else if (GUUIDType == GUUIDType_BinaryGUID || GUUIDType == GUUIDType_BinaryUUID) { // Binary
+                    for (uint8_t GUUIDByte = 0; GUUIDByte < BinaryGUUID_Size; GUUIDByte++) {
+                        if (GUUIDByte < 8) {
+                            uint8_t Byte     = (LowBits  & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
+                            GUUID[GUUIDByte] = Byte;
+                        } else {
+                            uint8_t Byte     = (HighBits & (0xFF << (GUUIDByte * 8))) >> (GUUIDByte * 8);
+                            GUUID[GUUIDByte] = Byte;
+                        }
+                    }
                 }
             } else {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate GUUID"));
@@ -918,7 +931,7 @@ extern "C" {
         if (GUUID2Swap != NULL && GUUIDType != GUUIDType_Unspecified) {
             uint8_t Dash = '-';
             if (GUUIDType == GUUIDType_UUIDString || GUUIDType == GUUIDType_GUIDString) {
-                SwappedGUUID          = (uint8_t*) calloc(BinaryGUUID_Size, sizeof(uint8_t));
+                SwappedGUUID          = (uint8_t*) calloc(GUUIDString_Size, sizeof(uint8_t));
                 if (SwappedGUUID != NULL) {
                     SwappedGUUID[0]   = GUUID2Swap[3];
                     SwappedGUUID[1]   = GUUID2Swap[2];
