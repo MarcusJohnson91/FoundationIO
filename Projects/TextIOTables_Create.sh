@@ -48,7 +48,7 @@ CreateHeaderFileTop() {
     DecimalTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and contains(@nv, '/')])" "$UCD_Data")
     CombiningCharacterClassTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@ccc != '0'])" "$UCD_Data")
     IntegerTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')])" "$UCD_Data")
-    GraphemeExtensionSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Gr_Ext = 'Y'])" "$UCD_Data")
+    GraphemeExtensionSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Gr_Ext = 'Y' or @EComp = 'Y' or @EBase = 'Y'])" "$UCD_Data")
     KompatibleNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[(@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat') and @dt != '' and @dt != '#' and @dt != 'none'])" -n "$UCD_Data")
     CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')])" "$UCD_Data")
     CanonicalNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n "$UCD_Data")
@@ -285,7 +285,7 @@ CreateIntegerTable() {
 
 CreateGraphemeExtensionTable() {
     printf "    static const UTF32 GraphemeExtensionTable[GraphemeExtensionTableSize] = {\n" >> "$HeaderFile"
-    GraphemeExtensions=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Gr_Ext = 'Y']" -o '0x' -v @cp -n "$UCD_Data")
+    GraphemeExtensions=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Gr_Ext = 'Y' or @EComp = 'Y']" -o '0x' -v @cp -n "$UCD_Data")
     for line in $GraphemeExtensions; do
         echo "$line" | awk -F ':' '{printf "        0x%06X,\n", $1}' >> "$HeaderFile"
     done
@@ -429,13 +429,13 @@ CheckUnicodeVersion() {
                 echo "Deleting header, press Control-C within 5 seconds to abort..."
                 sleep 5
                 rm    "$HeaderFile"
+                echo "Creating Header..."
                 touch "$HeaderFile"
                 DownloadUCD
-                echo "Generating Text Tables..."
                 CreateTables
             else
                 DownloadUCD
-                echo "Generating Text Tables..."
+                echo "Creating Header..."
                 CreateTables
             fi
         else
@@ -454,7 +454,6 @@ CheckUnicodeVersion() {
 # If the file does not exist create it and start downloading the UCd and writing the tables
 
 HeaderFile=$1
-echo "DEBUG HeaderFile: " "$HeaderFile"
 TempFolder=$(mktemp -d)
 FreeSpaceInBytes=$(df -H "$TempFolder" | awk '{printf $7}' | cut -c 6-)
 curl -s "https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt" -o "$TempFolder/readme.txt"
@@ -475,9 +474,9 @@ if [ $# -eq 1 ]; then
                 echo "Deleting header, press Control-C within 5 seconds to abort..."
                 sleep 5
                 rm    "$HeaderFile"
+                echo "Creating Header..."
                 touch "$HeaderFile"
                 DownloadUCD
-                echo "Generating Text Tables..."
                 CreateTables
             else
                 # Script hash matches, but we still need to know if the tables are current

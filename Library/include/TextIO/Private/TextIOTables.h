@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#define ScriptHash fc856a3f34b2f1ce278147ed96d5da331330b7c7
+#define ScriptHash 4d8b477f8dfa2ccd850375863157efb9408d8b91
 
 #define UnicodeVersion 13.0.0
 
@@ -52,7 +52,7 @@ extern "C" {
 
 #define IntegerTableSize 1739
 
-#define GraphemeExtensionTableSize 1979
+#define GraphemeExtensionTableSize 2149
 
 #define KompatibleNormalizationTableSize 2056
 
@@ -3059,6 +3059,18 @@ extern "C" {
     };
 
     static const UTF32 GraphemeExtensionTable[GraphemeExtensionTableSize] = {
+        0x000023,
+        0x00002A,
+        0x000030,
+        0x000031,
+        0x000032,
+        0x000033,
+        0x000034,
+        0x000035,
+        0x000036,
+        0x000037,
+        0x000038,
+        0x000039,
         0x000300,
         0x000301,
         0x000302,
@@ -3907,6 +3919,7 @@ extern "C" {
         0x001DFE,
         0x001DFF,
         0x00200C,
+        0x00200D,
         0x0020D0,
         0x0020D1,
         0x0020D2,
@@ -4702,6 +4715,41 @@ extern "C" {
         0x01E948,
         0x01E949,
         0x01E94A,
+        0x01F1E6,
+        0x01F1E7,
+        0x01F1E8,
+        0x01F1E9,
+        0x01F1EA,
+        0x01F1EB,
+        0x01F1EC,
+        0x01F1ED,
+        0x01F1EE,
+        0x01F1EF,
+        0x01F1F0,
+        0x01F1F1,
+        0x01F1F2,
+        0x01F1F3,
+        0x01F1F4,
+        0x01F1F5,
+        0x01F1F6,
+        0x01F1F7,
+        0x01F1F8,
+        0x01F1F9,
+        0x01F1FA,
+        0x01F1FB,
+        0x01F1FC,
+        0x01F1FD,
+        0x01F1FE,
+        0x01F1FF,
+        0x01F3FB,
+        0x01F3FC,
+        0x01F3FD,
+        0x01F3FE,
+        0x01F3FF,
+        0x01F9B0,
+        0x01F9B1,
+        0x01F9B2,
+        0x01F9B3,
         0x0E0020,
         0x0E0021,
         0x0E0022,
