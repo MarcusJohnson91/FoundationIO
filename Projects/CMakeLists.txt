@@ -67,7 +67,7 @@ elseif(CMAKE_HOST_WIN32)
 endif(CMAKE_HOST_UNIX)
 
 if(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
-    message("We're checking if TextTables.h should be updated, it could take a few seconds or about 15 minutes.")
+    message("We're checking if TextTables.h should be updated, it could take a few seconds or about 12 minutes.")
     execute_process(
     COMMAND sh "${FoundationIO_Library_Dir}/include/TextIO/Private/TextTables_Create.sh" "${FoundationIO_Library_Dir}/include/TextIO/Private/TextTables.h"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
