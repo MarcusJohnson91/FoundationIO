@@ -1080,7 +1080,7 @@ extern "C" {
      @param      Base                                    The base the string is in.
      @return                                             Returns the number of format specifiers found.
      */
-    uint64_t     UTF32_GetNumDigits(PlatformIO_Immutable(UTF32 *) String, TextIO_Bases Base); // Format/Deformat
+    uint64_t     UTF32_GetNumDigits(PlatformIO_Immutable(UTF32 *) String, TextIO_Bases Base);
     
     /*!
      @abstract                                           Gets a substring from Offset to where Format and Formatted start matching.
@@ -1247,14 +1247,14 @@ extern "C" {
      @return                                             Returns the encoded String.
      */
     UTF8        *UTF8_StringSet_Flatten(PlatformIO_Immutable(UTF8 **) StringSet);
-    
+
     /*!
      @abstract                                           Creates a String from a StringSet.
      @param      StringSet                               The StringSet to convert to a string.
      @return                                             Returns the encoded String.
      */
     UTF16       *UTF16_StringSet_Flatten(PlatformIO_Immutable(UTF16 **) StringSet);
-    
+
     /*!
      @abstract                                           Creates a String from a StringSet.
      @param      StringSet                               The StringSet to convert to a string.

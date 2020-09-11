@@ -180,6 +180,7 @@ if(${CMAKE_C_COMPILER_ID} STREQUAL "AppleClang" OR ${CMAKE_C_COMPILER_ID} STREQU
 
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
+-ferror-limit=1024 \
 -fPIC \
 -fshort-enums \
 -funsigned-char \

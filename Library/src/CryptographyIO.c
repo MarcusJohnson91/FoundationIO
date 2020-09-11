@@ -283,37 +283,16 @@ extern "C" {
         uint64_t Bits                          = 0ULL;
         if (Random != NULL && NumBits > 0) {
             if (NumBits <= SecureRNG_GetRemainingEntropy(Random)) {
-                uint64_t Bits2Read             = NumBits;
+                uint8_t  Bits2Read             = NumBits;
 
                 while (Bits2Read > 0) {
-                    uint8_t  BitsInCurrentByte = Bits2ExtractFromByte(Random->BitOffset);
+                    uint8_t  BitsInCurrentByte = BitsAvailableInByte(Random->BitOffset);
                     uint8_t  Bits2Get          = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
-                    // So convert the number of bits to be read to an actual mask.
-                    // Can't you just do 2^NumBits to get a basic mask, then shift it to where it's needed?
-                    // How much do you shift the mask tho? BitOffset - Bits2Get should do it? that way it's always positioned
-                    uint8_t  Shift             = BitsInCurrentByte - Bits2Get;
-                    uint64_t BitMask2          = (Logarithm(2, Bits2Get) - 1) << Shift; // Now we just need to shift it, if it's 3 bits shift it 8 - 3 bits to left align.
-                    // But we need to square that with BitOffset.
-                    /*
-                     BitOffset % 8 = (14 % 8) = 6
-                     aka the first 6 bits are already used, 8 - 6 = 2 bits remaining in this byte.
-                     so we need our mask to be 2^Bits2Get
-                     then the mask needs to be shifted by Bits2Get - ?????
-
-                     The mask is naturally right aligned so we need to coerce it to left alignment WHEN the mask is ?????
-
-                     When the mask is of fewer bits than the byte can provide?
-
-                     if the mask is smaller than BitOffsset % 8, it needs to be shifted to the left.
-                     */
-                    if (BitsInCurrentByte > Bits2Get) {
-                        // Left Shift by BitsInCurrentByte - Bits2Get?
-                    }
-                    uint8_t  BitMask           = (uint8_t) (Logarithm(2, Bits2Get) - 1) << Shift;
-                    uint8_t  ExtractedBits     = (uint8_t) Random->EntropyPool[Bits2Bytes(Random->BitOffset, RoundingType_Down)] & BitMask;
-                    ExtractedBits            >>= Shift;
-
-                    Bits                     <<= Bits2Get;
+                    uint8_t  BufferShift       = BitsInCurrentByte % 8;
+                    uint8_t  BufferMask        = (Logarithm(2, Bits2Get) - 1) << BufferShift;
+                    uint8_t  ExtractedBits     = Random->EntropyPool[Bits2Bytes(Random->BitOffset, RoundingType_Down)] & BufferMask;
+                    uint8_t  ValueShift        = NumBits - Bits2Read;
+                    Bits                     <<= ValueShift;
                     Bits                      |= ExtractedBits;
 
                     Bits2Read                 -= Bits2Get;
@@ -327,8 +306,6 @@ extern "C" {
             }
         } else if (Random == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
-        } else if (NumBits == 0) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Reading zero bits does not make sense"));
         }
         return Bits;
     }
@@ -373,8 +350,6 @@ extern "C" {
             GeneratedInteger     = SecureRNG_ExtractBits(Random, NumBits);
         } else if (Random == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
-        } else if (NumBits == 0) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Generating an integer 0 bits long is invalid"));
         } else if (NumBits > 64) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Generating an integer %u bits long is invalid"), NumBits);
         }

@@ -437,7 +437,7 @@ extern "C" {
                 );
     }
     
-    uint8_t Bits2ExtractFromByte(const uint64_t Offset) {
+    uint8_t BitsAvailableInByte(const uint64_t Offset) {
         return 8 - (Offset % 8);
     }
     
@@ -465,6 +465,9 @@ extern "C" {
         return NumDigits;
     }
 
+#if (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
+__attribute__((no_sanitize("undefined")))
+#endif
     uint64_t Rotate(const uint64_t Value, const uint8_t Bits2Rotate, const MathIO_RotationType Rotate) {
         uint64_t Rotated      = 0ULL;
         uint8_t  Bits2Rotate2 = Bits2Rotate & 0x7F;

@@ -7,9 +7,9 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
-
-    static UTF8  StringIO_PreallocateCodePoint_UTF8[UTF8MaxCodeUnitsInCodePoint   + PlatformIO_NULLTerminatorSize] = {0, 0, 0, 0, 0}; // Icky Global
-    static UTF16 StringIO_PreallocateCodePoint_UTF16[UTF16MaxCodeUnitsInCodePoint + PlatformIO_NULLTerminatorSize] = {0, 0, 0};       // Icky Global
+    
+    static UTF8  StringIO_PreallocateCodePoint_UTF8[UTF8MaxCodeUnitsInCodePoint   + PlatformIO_NULLTerminatorSize] = {0, 0, 0, 0, 0};
+    static UTF16 StringIO_PreallocateCodePoint_UTF16[UTF16MaxCodeUnitsInCodePoint + PlatformIO_NULLTerminatorSize] = {0, 0, 0};
     
     UTF8 *UTF8_Init(uint64_t NumCodeUnits) {
         UTF8 *String            = NULL;
@@ -119,7 +119,7 @@ extern "C" {
         }
         return CodePointSize;
     }
-
+    
     uint8_t UTF32_GetCodePointSizeInUTF8CodeUnits(UTF32 CodePoint) {
         uint8_t UTF8CodeUnits = 0;
         if (CodePoint <= 0x7F) {
@@ -133,7 +133,7 @@ extern "C" {
         }
         return UTF8CodeUnits;
     }
-
+    
     uint8_t UTF32_GetCodePointSizeInUTF16CodeUnits(UTF32 CodePoint) {
         uint8_t UTF16CodeUnits = 0;
         if (CodePoint <= 0xFFFF) {
@@ -195,7 +195,7 @@ extern "C" {
                     CodePoint                 =  CodeUnits[0];
                     break;
                 case 2:
-                    CodePoint                |= UTF16MaxCodeUnitValue + 1; // 0x10000
+                    CodePoint                |= UTF16MaxCodeUnitValue + 1;
                     CodePoint                |= (CodeUnits[0] & UTF16SurrogateMask) << UTF16SurrogateShift;
                     if (CodeUnits[1] != PlatformIO_NULLTerminator) {
                         CodePoint            |= (CodeUnits[1] & UTF16SurrogateMask);
@@ -207,7 +207,7 @@ extern "C" {
         }
         return CodePoint;
     }
-
+    
     static UTF16 *UTF16_EncodeCodePoint(UTF32 CodePoint) {
         uint8_t CodeUnitSize                           = UTF32_GetCodePointSizeInUTF16CodeUnits(CodePoint);
         UTF32   Ranged                                 = CodePoint + UTF16SurrogatePairStart;
@@ -222,7 +222,7 @@ extern "C" {
         }
         return StringIO_PreallocateCodePoint_UTF16;
     }
-
+    
     static UTF8 *UTF8_EncodeCodePoint(UTF32 CodePoint) {
         uint8_t CodeUnitSize                          = UTF32_GetCodePointSizeInUTF8CodeUnits(CodePoint);
         switch (CodeUnitSize) {
@@ -426,15 +426,15 @@ extern "C" {
         }
         return NumGraphemes;
     }
-
+    
     /*
      Grapheme Handling:
      IsGraphemeExtender
      if CodePoint 0 or CodePoint 1 is an extender, we need to loop again
-
+     
      "e + ́" = 1 Grapheme, 2 CodePoints, 3 CodeUnits
      "1 e + ́ 2" = 3 Graphemes, 4 CodePoints, 4 CodeUnits
-
+     
      So Grapheme Boundaries.
      if the first codepoint isn't a grapheme extender, check the next codepoint, if it is also not a grapheme extender, the first codepoint is it's own grapheme,
      then check the 3rd codepoint, if it is a grapheme extender, codepoint 2 and 3 are part of the same grapheme and all following codepoints remain part of the grapheme until you find a CodePoint that isn't a grapheme extender.
@@ -442,7 +442,7 @@ extern "C" {
     
     static bool UTF32_CodePointIsGraphemeExtender(UTF32 CodePoint) {
         bool IsGraphemeExtender    = No;
-        if (CodePoint > 0x7F) { // Don't check ASCII
+        if (CodePoint > 0x7F) {
             for (uint64_t GraphemeExtender = 0ULL; GraphemeExtender < GraphemeExtensionTableSize; GraphemeExtender++) {
                 if (CodePoint == GraphemeExtensionTable[GraphemeExtender]) {
                     IsGraphemeExtender = Yes;
@@ -464,9 +464,9 @@ extern "C" {
                     // Both are individual Graphemes, add two
                     NumGraphemes      += 2;
                 } else if (CurrentIsExtender == Yes && NextIsExtender == No) {
-
+                    
                 }
-
+                
                 else if (CurrentIsExtender == No && NextIsExtender == Yes) {
                     // Loop until we find a not extender, keep track of the CodePoints
                 }
@@ -498,7 +498,7 @@ extern "C" {
         return WordSize;
     }
     
-
+    
     
     
     /*
@@ -526,7 +526,7 @@ extern "C" {
         }
         return WordSize;
     }
-
+    
     static void UTF8_Clear_Preallocated(void) {
         StringIO_PreallocateCodePoint_UTF8[0] = 0;
         StringIO_PreallocateCodePoint_UTF8[1] = 0;
@@ -569,7 +569,7 @@ extern "C" {
         }
         return CodeUnits;
     }
-
+    
     static void UTF16_Clear_Preallocated(void) {
         StringIO_PreallocateCodePoint_UTF16[0] = 0;
         StringIO_PreallocateCodePoint_UTF16[1] = 0;
@@ -810,16 +810,20 @@ extern "C" {
     bool UTF8_IsAbsolutePath(PlatformIO_Immutable(UTF8 *) String) {
         bool PathIsAbsolute = No;
         if (String != NULL) {
+            bool StringHasBOM      = UTF8_HasBOM(String);
 #if  ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-            if (String[0] == '/') { // Assumes there is no BOM
+            if (StringHasBOM && String[UTF8BOMSizeInCodeUnits] != PlatformIO_NULLTerminator && String[UTF8BOMSizeInCodeUnits] == '/') {
+                PathIsAbsolute     = Yes;
+            } else if (String[UTF8BOMSizeInCodeUnits] != PlatformIO_NULLTerminator && String[UTF8BOMSizeInCodeUnits] == '/') {
                 PathIsAbsolute     = Yes;
             }
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-            uint64_t StringSize    = UTF8_GetStringSizeInCodeUnits(String);
-            if (StringSize > 2) {
-                if (String[1] == ':') {
+            if (StringHasBOM && String[0] != 0 && String[1] != 0 && String[2] != 0 && String[3] != 0 && String[4] != 0) {
+                if (((String[3] >= 'A' && String[3] <= 'Z') || (String[3] >= 'a' && String[3] <= 'z')) && String[4] == ':') {
                     PathIsAbsolute = Yes;
                 }
+            } else if (String[0] != 0 && String[1] != 0 && ((String[0] >= 'A' && String[0] <= 'Z') || (String[0] >= 'a' && String[0] <= 'z')) && String[1] == ':') {
+                PathIsAbsolute     = Yes;
             }
 #endif
         } else {
@@ -831,16 +835,20 @@ extern "C" {
     bool UTF16_IsAbsolutePath(PlatformIO_Immutable(UTF16 *) String) {
         bool PathIsAbsolute        = No;
         if (String != NULL) {
+            bool StringHasBOM      = UTF16_HasBOM(String);
 #if  ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-            if (String[0] == UTF16Character('/')) {
+            if (StringHasBOM && String[UTF8BOMSizeInCodeUnits] != PlatformIO_NULLTerminator && String[UTF8BOMSizeInCodeUnits] == '/') {
+                PathIsAbsolute     = Yes;
+            } else if (String[UTF8BOMSizeInCodeUnits] != PlatformIO_NULLTerminator && String[UTF8BOMSizeInCodeUnits] == '/') {
                 PathIsAbsolute     = Yes;
             }
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-            uint64_t StringSize    = UTF16_GetStringSizeInCodeUnits(String);
-            if (StringSize > 2) {
-                if (String[1] == UTF16Character(':')) {
+            if (StringHasBOM && String[0] != 0 && String[1] != 0 && String[2] != 0 && String[3] != 0 && String[4] != 0) {
+                if (((String[3] >= 'A' && String[3] <= 'Z') || (String[3] >= 'a' && String[3] <= 'z')) && String[4] == ':') {
                     PathIsAbsolute = Yes;
                 }
+            } else if (String[0] != 0 && String[1] != 0 && ((String[0] >= 'A' && String[0] <= 'Z') || (String[0] >= 'a' && String[0] <= 'z')) && String[1] == ':') {
+                PathIsAbsolute     = Yes;
             }
 #endif
         } else {
@@ -850,18 +858,22 @@ extern "C" {
     }
     
     bool UTF32_IsAbsolutePath(PlatformIO_Immutable(UTF32 *) String) {
-        bool PathIsAbsolute = No;
+        bool PathIsAbsolute        = No;
         if (String != NULL) {
+            bool StringHasBOM      = UTF32_HasBOM(String);
 #if  ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-            if (String[0] == UTF32Character('/')) {
-                PathIsAbsolute = Yes;
+            if (StringHasBOM && String[UTF8BOMSizeInCodeUnits] != PlatformIO_NULLTerminator && String[UTF8BOMSizeInCodeUnits] == '/') {
+                PathIsAbsolute     = Yes;
+            } else if (String[UTF8BOMSizeInCodeUnits] != PlatformIO_NULLTerminator && String[UTF8BOMSizeInCodeUnits] == '/') {
+                PathIsAbsolute     = Yes;
             }
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-            uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
-            if (StringSize > 2) {
-                if (String[1] == UTF32Character(':')) {
+            if (StringHasBOM && String[0] != 0 && String[1] != 0 && String[2] != 0 && String[3] != 0 && String[4] != 0) {
+                if (((String[3] >= 'A' && String[3] <= 'Z') || (String[3] >= 'a' && String[3] <= 'z')) && String[4] == ':') {
                     PathIsAbsolute = Yes;
                 }
+            } else if (String[0] != 0 && String[1] != 0 && ((String[0] >= 'A' && String[0] <= 'Z') || (String[0] >= 'a' && String[0] <= 'z')) && String[1] == ':') {
+                PathIsAbsolute     = Yes;
             }
 #endif
         } else {
@@ -915,7 +927,7 @@ extern "C" {
         }
         return StringHasNewLine;
     }
-
+    
     bool UTF32_IsUpperCase(UTF32 CodePoint) {
         bool CodePointIsUppercase            = No;
         if (CodePoint != PlatformIO_NULLTerminator) {
@@ -1447,7 +1459,7 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FILE Pointer is NULL"));
         }
     }
-
+    
     static UTF8 UTF8_ReadCodeUnit(FILE *Source) { // Replaces fgetc, getc, getchar; depending on your definition of "Character"
         UTF8 CodeUnit = 0;
         if (Source != NULL) {
@@ -1460,7 +1472,7 @@ extern "C" {
         }
         return CodeUnit;
     }
-
+    
     static UTF16 UTF16_ReadCodeUnit(FILE *Source) {
         UTF16 CodeUnit = 0;
         if (Source != NULL) {
@@ -1473,7 +1485,7 @@ extern "C" {
         }
         return CodeUnit;
     }
-
+    
     static UTF32 UTF8_ReadCodePoint(FILE *Source) {
         UTF32   CodePoint     = 0;
         uint8_t CodeUnitsRead = 0;
@@ -1495,7 +1507,7 @@ extern "C" {
         }
         return CodePoint;
     }
-
+    
     static UTF32 UTF16_ReadCodePoint(FILE *Source) {
         UTF32   CodePoint     = 0;
         uint8_t CodeUnitsRead = 0;
@@ -1517,7 +1529,7 @@ extern "C" {
         }
         return CodePoint;
     }
-
+    
     static UTF32 UTF32_ReadCodePoint(FILE *Source) {
         UTF32 CodePoint = 0;
         if (Source != NULL) {
@@ -1530,7 +1542,7 @@ extern "C" {
         }
         return CodePoint;
     }
-
+    
     UTF8 *UTF8_ReadGrapheme(FILE *Source) {
         UTF8 *Grapheme                             = NULL;
         if (Source != NULL) {
@@ -1539,14 +1551,14 @@ extern "C" {
              */
             UTF32 CodePoint1 = UTF8_ReadCodePoint(Source);
             UTF32 CodePoint2 = UTF8_ReadCodePoint(Source);
-
+            
             /*
              CodePoint1 not GREXT = check cp2
              */
-
-
-
-
+            
+            
+            
+            
             bool     GraphemeFound                 = No;
             uint64_t CodePointSizeInCodeUnits      = 0ULL;
             uint64_t CodeUnitsRead                 = 0ULL;
@@ -1579,7 +1591,7 @@ extern "C" {
         }
         return Grapheme;
     }
-
+    
     UTF16 *UTF16_ReadGrapheme(FILE *Source) {
         UTF16 *Grapheme                            = NULL;
         if (Source != NULL) {
@@ -1615,7 +1627,7 @@ extern "C" {
         }
         return Grapheme;
     }
-
+    
     static uint64_t UTF32_LineBreakPosition(UTF32 *String) {
         uint64_t CodePoint              = 0ULL;
         if (String != NULL && String[CodePoint] != PlatformIO_NULLTerminator) {
@@ -1641,7 +1653,7 @@ extern "C" {
         }
         return CodePoint;
     }
-
+    
     typedef enum StringIO_LineBreakTypes {
         LineBreakType_Unspecified        = 0, // Not a newline
         LineBreakType_LineFeed           = 1,
@@ -1654,7 +1666,7 @@ extern "C" {
         LineBreakType_LineSeparator      = 8,
         LineBreakType_ParagraphSeparator = 9,
     } StringIO_LineBreakTypes;
-
+    
     static StringIO_LineBreakTypes UTF32_GetLineBreakType(UTF32 CodePoint1, UTF32 CodePoint2) {
         StringIO_LineBreakTypes LineBreakType = LineBreakType_Unspecified;
         if (CodePoint1 == U'\r' && CodePoint2 == U'\n') {
@@ -2345,7 +2357,7 @@ extern "C" {
         }
         return CaseFolded;
     }
-
+    
     static uint64_t UTF32_GetCaseFoldedSize(PlatformIO_Immutable(UTF32 *) String) {
         uint64_t NumCodePoints = 0ULL;
         uint64_t CodePoint = 0ULL;
@@ -2362,7 +2374,7 @@ extern "C" {
         }
         return NumCodePoints;
     }
-
+    
     static void UTF32_SubstitutePreallocated(UTF32 *String2Edit, PlatformIO_Immutable(UTF32 *) Replacement) {
         uint64_t CodePoint = 0ULL;
         while (String2Edit[CodePoint] != PlatformIO_NULLTerminator && Replacement[CodePoint] != PlatformIO_NULLTerminator) {
@@ -2370,7 +2382,7 @@ extern "C" {
             CodePoint += 1;
         }
     }
-
+    
     UTF32 *UTF32_CaseFold(PlatformIO_Immutable(UTF32 *) String) {
         UTF32   *CaseFoldedString                = NULL;
         if (String != NULL) {
@@ -2610,7 +2622,7 @@ extern "C" {
         }
         return Value;
     }
-
+    
     // Integer2String should accept any integer base from the lookup table and shift the value until it can't anymore
     int64_t UTF32_String2Integer(PlatformIO_Immutable(UTF32 *) String, TextIO_Bases Base) {
         uint64_t CodePoint = 0ULL;
@@ -2821,13 +2833,13 @@ extern "C" {
             int64_t Mantissa          = ExtractMantissa(Decimal);
             uint8_t NumExponentDigits = NumDigitsInInteger(10, Exponent);
             uint8_t NumMantissaDigits = NumDigitsInInteger(10, Mantissa);
-
+            
             /*
              Is there a way to calculate the number of digits needed for correct round tripping?
-
+             
              if we could find that, we could bypass all of the other nonsense and just create a correct number right off the bat.
              */
-
+            
             if ((Base & Base_Shortest) == Base_Shortest) {
                 if (MinimumWidth == 0 && Precision == 0) {
                     // Ryu
@@ -3760,7 +3772,7 @@ extern "C" {
         }
         return Encoded;
     }
-
+    
     UTF8 *UTF8_StringSet_Flatten(PlatformIO_Immutable(UTF8 **) StringSet) {
         UTF8 *Flattened = NULL;
         if (StringSet != NULL) {
@@ -3774,7 +3786,7 @@ extern "C" {
         }
         return Flattened;
     }
-
+    
     UTF16 *UTF16_StringSet_Flatten(PlatformIO_Immutable(UTF16 **) StringSet) {
         UTF16 *Flattened        = NULL;
         if (StringSet != NULL) {
@@ -3788,7 +3800,7 @@ extern "C" {
         }
         return Flattened;
     }
-
+    
     UTF32 *UTF32_StringSet_Flatten(PlatformIO_Immutable(UTF32 **) StringSet) {
         UTF32 *Flattened = NULL;
         if (StringSet != NULL) {
@@ -3855,7 +3867,7 @@ extern "C" {
         }
     }
     /* StringSet Functions */
-
+    
     /* Unicode Conversion */
     CharSet8 *UTF8_ConvertUnicode2CharSet(PlatformIO_Immutable(UTF8 *) String, StringIO_CharSets CodePage) {
         CharSet8 *Encoded = NULL;
@@ -3887,7 +3899,7 @@ extern "C" {
         }
         return Encoded;
     }
-
+    
     CharSet16 *UTF16_ConvertUnicode2CharSet(PlatformIO_Immutable(UTF16 *) String, StringIO_CharSets CodePage) {
         CharSet16 *Encoded = NULL;
         if (String != NULL && CodePage != CharSet_Unspecified) {
@@ -3918,7 +3930,7 @@ extern "C" {
         }
         return Encoded;
     }
-
+    
     CharSet32 *UTF32_ConvertUnicode2CharSet(PlatformIO_Immutable(UTF32 *) String, StringIO_CharSets CodePage) {
         CharSet32 *Encoded = NULL;
         if (String != NULL && CodePage != CharSet_Unspecified) {
@@ -3948,7 +3960,7 @@ extern "C" {
         }
         return Encoded;
     }
-
+    
     UTF8 *UTF8_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet8 *) String, StringIO_CharSets CodePage) {
         UTF8 *Unicode = NULL;
         if (String != NULL && CodePage != CharSet_Unspecified) {
@@ -3977,7 +3989,7 @@ extern "C" {
         }
         return Unicode;
     }
-
+    
     UTF16 *UTF16_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet16 *) String, StringIO_CharSets CodePage) {
         UTF16 *Unicode = NULL;
         if (String != NULL && CodePage != CharSet_Unspecified) {
@@ -4006,7 +4018,7 @@ extern "C" {
         }
         return Unicode;
     }
-
+    
     UTF32 *UTF32_ConvertCharSet2Unicode(PlatformIO_Immutable(CharSet32 *) String, StringIO_CharSets CodePage) {
         UTF32 *Unicode = NULL;
         if (String != NULL && CodePage != CharSet_Unspecified) {

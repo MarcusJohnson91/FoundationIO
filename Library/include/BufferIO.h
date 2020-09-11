@@ -230,30 +230,7 @@ extern "C" {
      @param        BitOrder                        What bit order are the bits to be read?
      @param        Bits2Read                       The number of bits to read from the BitBuffer.
      */
-    /*{*/
-    uint8_t        BitBuffer_ReadBits8(BitBuffer *BitB,  BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t Bits2Read);
-    uint16_t       BitBuffer_ReadBits16(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t Bits2Read);
-    uint32_t       BitBuffer_ReadBits32(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t Bits2Read);
-    uint64_t       BitBuffer_ReadBits64(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t Bits2Read);
-#ifndef            BitBuffer_ReadBits
-#define            BitBuffer_ReadBits(BitBuffer, ByteOrder, BitOrder, Bits2Read)
-#if   (Bits2Read <= 8)
-#undef             BitBuffer_ReadBits
-#define            BitBuffer_ReadBits(BitBuffer, ByteOrder, BitOrder, Bits2Read) BitBuffer_ReadBits8(BitBuffer, ByteOrder, BitOrder, Bits2Read)
-#elif (Bits2Read <= 16)
-#undef             BitBuffer_ReadBits
-#define            BitBuffer_ReadBits(BitBuffer, ByteOrder, BitOrder, Bits2Read) BitBuffer_ReadBits16(BitBuffer, ByteOrder, BitOrder, Bits2Read)
-#elif (Bits2Read <= 32)
-#undef             BitBuffer_ReadBits
-#define            BitBuffer_ReadBits(BitBuffer, ByteOrder, BitOrder, Bits2Read) BitBuffer_ReadBits32(BitBuffer, ByteOrder, BitOrder, Bits2Read)
-#elif (Bits2Read <= 64)
-#undef             BitBuffer_ReadBits
-#define            BitBuffer_ReadBits(BitBuffer, ByteOrder, BitOrder, Bits2Read) BitBuffer_ReadBits64(BitBuffer, ByteOrder, BitOrder, Bits2Read)
-#else
-#define            BitBuffer_ReadBits(BitBuffer, ByteOrder, BitOrder, Bits2Read) BitBuffer_ReadBits64(BitBuffer, ByteOrder, BitOrder, Bits2Read)
-#endif /* Bits2Read */
-#endif /* BitBuffer_ReadBits */
-    /*}*/
+    uint64_t       BitBuffer_ReadBits(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t Bits2Read);
 
     /*!
      @abstract                                     Reads unary encoded fields from the BitBuffer.
