@@ -23,8 +23,8 @@
 		2C73A32024EE615B006E480E /* Test_StringIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C73A30E24EE6119006E480E /* Test_StringIO.c */; };
 		2C73A32424EE7A4A006E480E /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
 		2C88500324BCA09100DAD7ED /* NetworkIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C88500224BCA09100DAD7ED /* NetworkIO.c */; };
-		2C88500524BCA0AD00DAD7ED /* NetworkIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C88500424BCA0AD00DAD7ED /* NetworkIO.h */; };
-		2C88500724BCA22A00DAD7ED /* FileIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C88500624BCA22A00DAD7ED /* FileIO.h */; };
+		2C88500524BCA0AD00DAD7ED /* NetworkIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C88500424BCA0AD00DAD7ED /* NetworkIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2C88500724BCA22A00DAD7ED /* FileIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C88500624BCA22A00DAD7ED /* FileIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C88500924BCA32B00DAD7ED /* FileIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C88500824BCA32B00DAD7ED /* FileIO.c */; };
 		2C88502324BCB4BD00DAD7ED /* Test_NetworkIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C88500C24BCB47500DAD7ED /* Test_NetworkIO.c */; };
 		2C88502424BCB4CC00DAD7ED /* Test_FileIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C88500A24BCB45A00DAD7ED /* Test_FileIO.c */; };
@@ -41,12 +41,12 @@
 		2CC71E14232B6429006DA1B8 /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
 		2CC71E15232B642F006DA1B8 /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
 		2CF0A7EC24D7C07800135BCC /* TextTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7EB24D7C07800135BCC /* TextTables.h */; };
-		2CF0A7EE24D7C08B00135BCC /* TextIOTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7ED24D7C08B00135BCC /* TextIOTypes.h */; };
-		2CF0A7F424D7C0A700135BCC /* FormatIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7EF24D7C0A600135BCC /* FormatIO.h */; };
-		2CF0A7F524D7C0A700135BCC /* CommandLineIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7F024D7C0A600135BCC /* CommandLineIO.h */; };
-		2CF0A7F624D7C0A700135BCC /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7F124D7C0A700135BCC /* StringIO.h */; };
-		2CF0A7F724D7C0A700135BCC /* LocalizationIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7F224D7C0A700135BCC /* LocalizationIO.h */; };
-		2CF0A7F824D7C0A700135BCC /* LogIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7F324D7C0A700135BCC /* LogIO.h */; };
+		2CF0A7EE24D7C08B00135BCC /* TextIOTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7ED24D7C08B00135BCC /* TextIOTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CF0A7F424D7C0A700135BCC /* FormatIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7EF24D7C0A600135BCC /* FormatIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CF0A7F524D7C0A700135BCC /* CommandLineIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7F024D7C0A600135BCC /* CommandLineIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CF0A7F624D7C0A700135BCC /* StringIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7F124D7C0A700135BCC /* StringIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CF0A7F724D7C0A700135BCC /* LocalizationIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7F224D7C0A700135BCC /* LocalizationIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2CF0A7F824D7C0A700135BCC /* LogIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7F324D7C0A700135BCC /* LogIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2CF0A7FF24D7C56300135BCC /* CommandLineIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CF0A7FA24D7C56300135BCC /* CommandLineIO.c */; };
 		2CF0A80024D7C56300135BCC /* LocalizationIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CF0A7FB24D7C56300135BCC /* LocalizationIO.c */; };
 		2CF0A80124D7C56300135BCC /* LogIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CF0A7FC24D7C56300135BCC /* LogIO.c */; };
@@ -479,17 +479,17 @@
 				2CF0A7F624D7C0A700135BCC /* StringIO.h in Headers */,
 				2C88500724BCA22A00DAD7ED /* FileIO.h in Headers */,
 				2CF0A7EC24D7C07800135BCC /* TextTables.h in Headers */,
-				2CF0A7F824D7C0A700135BCC /* LogIO.h in Headers */,
 				2CA4C55B24EF9E31007803FD /* FoundationIO_Version.h in Headers */,
 				2C41097D236BA3320059FE67 /* TestIO.h in Headers */,
 				2C410978236BA3320059FE67 /* BufferIO.h in Headers */,
-				2C41097C236BA3320059FE67 /* MathIO.h in Headers */,
-				2C41097A236BA3320059FE67 /* CryptographyIO.h in Headers */,
+				2CF0A7F824D7C0A700135BCC /* LogIO.h in Headers */,
 				2CF0A7F724D7C0A700135BCC /* LocalizationIO.h in Headers */,
 				2CF0A7F424D7C0A700135BCC /* FormatIO.h in Headers */,
-				2C41097B236BA3320059FE67 /* PlatformIO.h in Headers */,
 				2C88500524BCA0AD00DAD7ED /* NetworkIO.h in Headers */,
 				2CF0A7EE24D7C08B00135BCC /* TextIOTypes.h in Headers */,
+				2C41097C236BA3320059FE67 /* MathIO.h in Headers */,
+				2C41097A236BA3320059FE67 /* CryptographyIO.h in Headers */,
+				2C41097B236BA3320059FE67 /* PlatformIO.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1044,6 +1044,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_CHAR_IS_UNSIGNED_CHAR = YES;
@@ -1141,6 +1142,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_CHAR_IS_UNSIGNED_CHAR = YES;
@@ -1252,7 +1254,7 @@
 				INSTALL_PATH = /usr/local/Packages/FoundationIO;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				KEEP_PRIVATE_EXTERNS = NO;
-				LLVM_LTO = YES;
+				LLVM_LTO = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;

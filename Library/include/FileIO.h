@@ -177,7 +177,7 @@ extern "C" {
      @param             Input                           The FileInput to read from.
      @param             BitB                            The BitBuffer to read to.
      */
-    void                FileInput_ReadBitBuffer(FileInput *Input, BitBuffer *BitB); // FileInput_ReadBitBuffer, FileOutput_WriteBitBuffer
+    void                FileInput_ReadBitBuffer(FileInput *Input, BitBuffer *BitB);
 
     /*!
      @abstract                                          Reads fresh data to a BitBuffer from a BitInput.
@@ -193,7 +193,7 @@ extern "C" {
      @param             Output                          The FileOutput to write to.
      @param             BitB                            The BitBuffer to write.
      */
-    void                BitBuffer_Write(FileOutput *Output, BitBuffer *BitB);
+    void                FileOutput_WriteBitBuffer(FileOutput *Output, BitBuffer *BitB);
     /* BitBuffer */
 
     /* File Operations */

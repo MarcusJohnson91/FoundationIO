@@ -10,7 +10,6 @@
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux)
 #include <pty.h>                                /* Included for winsize, TIOCGWINSZ */
 #else
-//#include <sys/ttycom.h>                         /* Included for winsize, TIOCGWINSZ */
 #endif /* PlatformIO_TargetOSIsLinux */
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #include <wincon.h>                             /* Included for getting the terminal size */
@@ -45,12 +44,9 @@ extern "C" {
      */
     
     typedef struct CommandLineOption {
-        // ok so each option is based on a SwitchID, it may need to hold any used children, as well as argument strings
-        // How do we handle bool strings, and ranges?
-        // Maybe we should just have the user pass in the OptionID to a dedicated function that will handle BoolStrings, Ranges, etc?
         UTF32    *Argument;
-        uint64_t  SwitchID;    // the number matching the switch that this option corresponds to
-        uint64_t  NumChildren; // Number of active children for this option
+        uint64_t  SwitchID;
+        uint64_t  NumChildren;
         uint64_t *Children;
     } CommandLineOption;
     
@@ -62,9 +58,9 @@ extern "C" {
         uint64_t                     *Children;
         uint64_t                      OptionID;
         uint64_t                      NumIncompatibleOptions;
-        uint64_t                      NumChildren; // NumOptionSlaves
+        uint64_t                      NumChildren;
         CommandLineIO_SwitchArguments ArgumentType;
-        CommandLineIO_SwitchTypes     SwitchType; // OptionType
+        CommandLineIO_SwitchTypes     SwitchType;
         CommandLineIO_SwitchStatuses  Status;
     } CommandLineSwitch;
     
@@ -78,7 +74,7 @@ extern "C" {
         UTF32                      *ProgramLicenseName;
         UTF32                      *ProgramLicenseDescription;
         UTF32                      *ProgramLicenseURL;
-        CommandLineSwitch          *Switches; // OptionID -> Switches
+        CommandLineSwitch          *Switches;
         CommandLineOption          *Options;
         uint64_t                    NumSwitches;
         uint64_t                    NumOptions;
@@ -538,23 +534,22 @@ extern "C" {
     static uint64_t CommandLineIO_UTF32_GetNumTokens(uint64_t NumArguments, PlatformIO_Immutable(UTF32 **) Arguments) {
         uint64_t NumTokens = 0;
         if (Arguments != NULL) {
-            // Loop over all the arguments, finding tokens
             uint64_t *StringSizes           = UTF32_StringSet_GetStringSizesInCodePoints(Arguments);
             for (uint64_t Argument = 1ULL; Argument < NumArguments - 1; Argument++) {
                 for (uint64_t CodePoint = 1ULL; CodePoint < StringSizes[Argument]; CodePoint++) {
-                    if (Arguments[Argument][CodePoint - 1] == UTF32Character('-') && Arguments[Argument][CodePoint] == UTF32Character('-')) { // "--" prefix
+                    if (Arguments[Argument][CodePoint - 1] == UTF32Character('-') && Arguments[Argument][CodePoint] == UTF32Character('-')) {
                         NumTokens += 1;
-                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character('-') && Arguments[Argument][CodePoint] != UTF32Character('-')) { // "-" prefix?
+                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character('-') && Arguments[Argument][CodePoint] != UTF32Character('-')) {
                         NumTokens += 1;
-                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character('/') && Arguments[Argument][CodePoint] != UTF32Character('/')) { // "/" prefix?
+                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character('/') && Arguments[Argument][CodePoint] != UTF32Character('/')) {
                         NumTokens += 1;
-                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character('\\') && Arguments[Argument][CodePoint] != UTF32Character('\\')) { // "\" prefix?
+                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character('\\') && Arguments[Argument][CodePoint] != UTF32Character('\\')) {
                         NumTokens += 1;
-                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character(' ')) { // " " seperator, we should normalize the spaces as well as the case
+                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character(' ')) {
                         NumTokens += 1;
-                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character('=')) { // "=" argument seperator?
+                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character('=')) {
                         NumTokens += 1;
-                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character(':')) { // ":" Parent:Child seperator?
+                    } else if (Arguments[Argument][CodePoint - 1] == UTF32Character(':')) {
                         NumTokens += 1;
                     }
                 }
@@ -587,38 +582,6 @@ extern "C" {
                 CommandLineIO_ShowBanner(CLI);
             }
             while (CurrentArgument < NumArguments) {
-                /*
-                 Game plan: Look for Switch introducers aka '--', '-', '/', then find a word that doesn't end with a Colon or space
-                 How do we handle Paths tho, Windows uses Colons to seperate the drive from the path, and POSIX uses '/' as a directory seperator, while windows uses the backslash to introduce switches.
-                 
-                 Well a drive letter on Windows is prefixed by a-zA-Z and followed by a '/' or '\'
-                 
-                 on POSIX a '/' is the first character or second of a path
-                 
-                 Windows style switch: "ren /?"
-                 Windows style path: "C:/Users"
-                 
-                 Paths in CommandLineIO need to be introduced with an equals or a space
-                 
-                 so look for "--", "-", "/", "\", then read until you hit a space or equals, then casefold that, then after it's been casefolded do a substring search, seeing if there are any switches that haven't been ruled out, then check if it matches the actual path.
-                 
-                 or maybe we should tokenize the Arguments first.
-                 
-                 how would tokenization work tho?
-                 
-                 the variable could be called Tokenized Arguments
-                 
-                 so the tokenization parameters are, a token break occurs at a space, colon, equals, or the supported switch introducers.
-                 
-                 so loop over all the arguments in argv, except argv[0]
-                 */
-                
-                
-                
-                
-                
-                
-                
                 UTF32   *Argument         = (UTF32*) Arguments[CurrentArgument];
                 UTF32   *ArgumentFlag     = ArgumentString2OptionFlag(Argument);
                 
@@ -749,40 +712,14 @@ extern "C" {
             for (uint64_t Option = 0ULL; Option < CLI->NumOptions; Option++) {
                 if (SwitchID == CLI->Options[Option].SwitchID) {
                     if (NumChildren > 0 && (CLI->Switches[CLI->Options[Option].SwitchID].Status & SwitchType_Required) == SwitchType_Required) {
-                        
-                        // ok so the logic is: if there are param children, we need to see if the option contains children, if it does not that may be an error so check if the child is required, if it's not then whatever, if it is error
                         uint64_t OptionChild = 0ULL;
                         uint64_t ParamChild  = 0ULL;
                         
                         while (OptionChild < CLI->Options[Option].NumChildren && ParamChild < NumChildren) {
-                            // ok so what do we do?
                             
                             OptionChild += 1;
                             ParamChild  += 1;
                         }
-                        
-                        /*
-                         Old nonsense incase of hidden gems:
-                         
-                         bool AllOptionsMatch   = No;
-                         for (uint64_t Option = 0ULL; Option < CLI->NumOptions; Option++) {
-                         if (CLI->OptionIDs[Option].OptionID == OptionID) {
-                         if (NumSlaves == 0 && CLI->OptionIDs[Option].NumOptionSlaves == 0) {
-                         AllOptionsMatch       = Yes;
-                         MatchingOption        = Option;
-                         } else {
-                         for (uint64_t ParamSlave = 0ULL; ParamSlave < NumSlaves; ParamSlave++) {
-                         for (uint64_t OptionSlave = 0ULL; OptionSlave < CLI->OptionIDs[Option].NumOptionSlaves; OptionSlave++) {
-                         if (SlaveIDs[ParamSlave] == CLI->OptionIDs[Option].Slaves[OptionSlave]) {
-                         AllOptionsMatch       = Yes;
-                         MatchingOption        = Option;
-                         }
-                         }
-                         }
-                         }
-                         }
-                         }
-                         */
                     }
                 }
             }
@@ -804,7 +741,6 @@ extern "C" {
                     break;
                 case U'N':
                 case U'n':
-                    // check for the rest of No
                     if (CLI->Options[OptionID].Argument[1] != PlatformIO_NULLTerminator &&
                         (CLI->Options[OptionID].Argument[1] == UTF32Character('O') || CLI->Options[OptionID].Argument[1] == UTF32Character('o'))) {
                         Value = 0;
@@ -812,7 +748,6 @@ extern "C" {
                     break;
                 case U'Y':
                 case U'y':
-                    // check for the rest of Yes
                     if (CLI->Options[OptionID].Argument[1] != PlatformIO_NULLTerminator &&
                         (CLI->Options[OptionID].Argument[1] == UTF32Character('E') || CLI->Options[OptionID].Argument[1] == UTF32Character('e'))) {
                         if (CLI->Options[OptionID].Argument[2] != PlatformIO_NULLTerminator &&
@@ -823,7 +758,6 @@ extern "C" {
                     break;
                 case U'T':
                 case U't':
-                    // check for the rest of True
                     if (CLI->Options[OptionID].Argument[1] != PlatformIO_NULLTerminator &&
                         (CLI->Options[OptionID].Argument[1] == UTF32Character('R') || CLI->Options[OptionID].Argument[1] == UTF32Character('r'))) {
                         if (CLI->Options[OptionID].Argument[2] != PlatformIO_NULLTerminator &&
@@ -837,7 +771,6 @@ extern "C" {
                     break;
                 case U'F':
                 case U'f':
-                    // check for the rest of False
                     if (CLI->Options[OptionID].Argument[1] != PlatformIO_NULLTerminator &&
                         (CLI->Options[OptionID].Argument[1] == UTF32Character('A') || CLI->Options[OptionID].Argument[1] == UTF32Character('a'))) {
                         if (CLI->Options[OptionID].Argument[2] != PlatformIO_NULLTerminator &&

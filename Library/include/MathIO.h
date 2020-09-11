@@ -492,7 +492,7 @@ extern "C" {
      @param      Offset                           The offset to calculate the number of bits unaccounted for in the byte.
      @return                                      Returns the number of unaccounted for bits.
      */
-    uint8_t      Bits2ExtractFromByte(const uint64_t Offset);
+    uint8_t      BitsAvailableInByte(const uint64_t Offset);
     
     /*!
      @abstract                                    Creates a bitmask.

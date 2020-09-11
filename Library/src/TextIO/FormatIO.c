@@ -36,10 +36,8 @@ extern "C" {
         if (Specifiers != NULL) {
             for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
                 if (Specifiers->NumUniqueSpecifiers < Specifiers->NumSpecifiers && Specifiers->Specifiers[Specifier].PositionFlag != Position_Unspecified) {
-                    // Find the actual argument from the Position by looking up the Position -1 in UniqueSpecifiers, then going to that argument and freeing it.
                     uint64_t Pos = Specifiers->Specifiers[Specifier].Position;
                     UTF32_Deinit(Specifiers->Specifiers[Pos].Argument);
-                    // I'm expecting this to break
                 } else {
                     UTF32_Deinit(Specifiers->Specifiers[Specifier].Argument);
                 }
@@ -167,7 +165,7 @@ extern "C" {
                 Specifiers->Specifiers[Specifier].ModifierType   = ModifierType_UTF32;
                 break;
             case StringType_Unspecified:
-            default: // Literally can't happen, here just to get rid of the warning
+            default:
                 Specifiers->Specifiers[Specifier].ModifierType   = ModifierType_Unspecified;
         }
     }
@@ -179,7 +177,6 @@ extern "C" {
                 if (Specifier > 0) {
                     CodePoint      = Specifiers->Specifiers[Specifier - 1].End + 1;
                 }
-                // Find the Start Offset, it must be after the previous ones End, if there is one
                 while (Specifiers->Specifiers[Specifier].Start == 0x7FFFFFFFFFFFFFFE && Format[CodePoint] != PlatformIO_NULLTerminator) {
                     if (Format[CodePoint] == U'%') {
                         Specifiers->Specifiers[Specifier].Start = CodePoint;
@@ -228,14 +225,9 @@ extern "C" {
             Specifiers->StringType                               = StringType;
             uint64_t CodePoint                                   = 0ULL;
             uint64_t Specifier                                   = 0ULL;
-            // We know how many specifiers there is, so lets loop over the number of specifiers
-            // Lets find the boundaries for each specifier
-
 
             while (Specifier < Specifiers->NumSpecifiers && Format[CodePoint] != PlatformIO_NULLTerminator && Specifiers->Specifiers[Specifier].Start == 0x7FFFFFFFFFFFFFFE) {
                 FormatIO_FindSpecifierBoundaries(Format, Specifiers);
-
-                // Start figuring out what the specifier means; go to end.
 
                 CodePoint = Specifiers->Specifiers[Specifier].End;
 
@@ -323,10 +315,10 @@ extern "C" {
                     case U'c':
                         Specifiers->Specifiers[Specifier].BaseType                   = BaseType_CodeUnit;
                         if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 3 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') { // U32; UTF-32
+                            if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].ModifierType       = ModifierType_UTF32;
-                            } else if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'1' && Format[CodePoint - 1] == U'6') { // U16; UTF-16
+                            } else if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'1' && Format[CodePoint - 1] == U'6') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].ModifierType       = ModifierType_UTF16;
                             } else {
@@ -356,10 +348,10 @@ extern "C" {
                     case U'C':
                         Specifiers->Specifiers[Specifier].BaseType                   = BaseType_String;
                         if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 3 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') { // U32; UTF-32
+                            if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].ModifierType       = ModifierType_UTF32;
-                            } else if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'1' && Format[CodePoint - 1] == U'6') { // U16; UTF-16
+                            } else if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'1' && Format[CodePoint - 1] == U'6') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].ModifierType       = ModifierType_UTF16;
                             } else {
@@ -389,10 +381,10 @@ extern "C" {
                     case U's':
                         Specifiers->Specifiers[Specifier].BaseType                   = BaseType_String;
                         if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 3 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') { // U32; UTF-32
+                            if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].ModifierType       = ModifierType_UTF32;
-                            } else if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'1' && Format[CodePoint - 1] == U'6') { // U16; UTF-16
+                            } else if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'1' && Format[CodePoint - 1] == U'6') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].ModifierType       = ModifierType_UTF16;
                             } else {
@@ -422,10 +414,10 @@ extern "C" {
                     case U'S':
                         Specifiers->Specifiers[Specifier].BaseType                   = BaseType_String;
                         if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 3 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') { // U32; UTF-32
+                            if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].ModifierType       = ModifierType_UTF32;
-                            } else if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'1' && Format[CodePoint - 1] == U'6') { // U16; UTF-16
+                            } else if (Format[CodePoint - 3] == U'U' && Format[CodePoint - 2] == U'1' && Format[CodePoint - 1] == U'6') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].ModifierType       = ModifierType_UTF16;
                             } else {
@@ -456,24 +448,24 @@ extern "C" {
                         Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                         Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Signed | ModifierType_Radix10);
                         if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 1 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') { // I32/eye32; Microsoft Extension
+                            if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_32Bit;
-                            } else if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'6' && Format[CodePoint - 1] == U'4') { // I64/eye64; Microsoft Extension
+                            } else if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'6' && Format[CodePoint - 1] == U'4') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_64Bit;
                             }
                         } else if (CodePoint - 2 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 1 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 2] == U'l' && Format[CodePoint - 1] == U'l') { // ll/ellell; Posix Extension
+                            if (Format[CodePoint - 2] == U'l' && Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 2;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_64Bit;
-                            } else if (Format[CodePoint - 2] != U'l' && Format[CodePoint - 1] == U'l') { // l/ell; 32 bit
+                            } else if (Format[CodePoint - 2] != U'l' && Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_32Bit;
                             } else if (Format[CodePoint - 2] != U'h' && Format[CodePoint - 1] == U'h') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_16Bit;
-                            } else if (Format[CodePoint - 2] == U'h' && Format[CodePoint - 1] == U'h') { // hh
+                            } else if (Format[CodePoint - 2] == U'h' && Format[CodePoint - 1] == U'h') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_8Bit;
                             }
@@ -487,28 +479,28 @@ extern "C" {
                             }
                         }
                         break;
-                    case U'i': // "%s in" = i? what the fuck
+                    case U'i':
                         Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                         Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Signed | ModifierType_Radix10);
                         if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 1 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') { // I32/eye32; Microsoft Extension
+                            if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_32Bit;
-                            } else if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'6' && Format[CodePoint - 1] == U'4') { // I64/eye64; Microsoft Extension
+                            } else if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'6' && Format[CodePoint - 1] == U'4') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_64Bit;
                             }
                         } else if (CodePoint - 2 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 1 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 2] == U'l' && Format[CodePoint - 1] == U'l') { // ll/ellell; Posix Extension
+                            if (Format[CodePoint - 2] == U'l' && Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 2;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_64Bit;
-                            } else if (Format[CodePoint - 2] != U'l' && Format[CodePoint - 1] == U'l') { // l/ell; 32 bit
+                            } else if (Format[CodePoint - 2] != U'l' && Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_32Bit;
                             } else if (Format[CodePoint - 2] != U'h' && Format[CodePoint - 1] == U'h') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_16Bit;
-                            } else if (Format[CodePoint - 2] == U'h' && Format[CodePoint - 1] == U'h') { // hh
+                            } else if (Format[CodePoint - 2] == U'h' && Format[CodePoint - 1] == U'h') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_8Bit;
                             }
@@ -526,24 +518,24 @@ extern "C" {
                         Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                         Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Unsigned | ModifierType_Radix8);
                         if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 1 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') { // I32/eye32; Microsoft Extension
+                            if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_32Bit;
-                            } else if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'6' && Format[CodePoint - 1] == U'4') { // I64/eye64; Microsoft Extension
+                            } else if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'6' && Format[CodePoint - 1] == U'4') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_64Bit;
                             }
                         } else if (CodePoint - 2 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 1 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 2] == U'l' && Format[CodePoint - 1] == U'l') { // ll/ellell; Posix Extension
+                            if (Format[CodePoint - 2] == U'l' && Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 2;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_64Bit;
-                            } else if (Format[CodePoint - 2] != U'l' && Format[CodePoint - 1] == U'l') { // l/ell; 32 bit
+                            } else if (Format[CodePoint - 2] != U'l' && Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_32Bit;
                             } else if (Format[CodePoint - 2] != U'h' && Format[CodePoint - 1] == U'h') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_16Bit;
-                            } else if (Format[CodePoint - 2] == U'h' && Format[CodePoint - 1] == U'h') { // hh
+                            } else if (Format[CodePoint - 2] == U'h' && Format[CodePoint - 1] == U'h') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_8Bit;
                             }
@@ -561,24 +553,24 @@ extern "C" {
                         Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                         Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Unsigned | ModifierType_Radix16 | ModifierType_Lowercase);
                         if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 1 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') { // I32/eye32; Microsoft Extension
+                            if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_32Bit;
-                            } else if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'6' && Format[CodePoint - 1] == U'4') { // I64/eye64; Microsoft Extension
+                            } else if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'6' && Format[CodePoint - 1] == U'4') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_64Bit;
                             }
                         } else if (CodePoint - 2 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 1 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 2] == U'l' && Format[CodePoint - 1] == U'l') { // ll/ellell; Posix Extension
+                            if (Format[CodePoint - 2] == U'l' && Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 2;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_64Bit;
-                            } else if (Format[CodePoint - 2] != U'l' && Format[CodePoint - 1] == U'l') { // l/ell; 32 bit
+                            } else if (Format[CodePoint - 2] != U'l' && Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_32Bit;
                             } else if (Format[CodePoint - 2] != U'h' && Format[CodePoint - 1] == U'h') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_16Bit;
-                            } else if (Format[CodePoint - 2] == U'h' && Format[CodePoint - 1] == U'h') { // hh
+                            } else if (Format[CodePoint - 2] == U'h' && Format[CodePoint - 1] == U'h') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_8Bit;
                             }
@@ -596,24 +588,24 @@ extern "C" {
                         Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                         Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Unsigned | ModifierType_Radix16 | ModifierType_Uppercase);
                         if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 1 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') { // I32/eye32; Microsoft Extension
+                            if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_32Bit;
-                            } else if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'6' && Format[CodePoint - 1] == U'4') { // I64/eye64; Microsoft Extension
+                            } else if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'6' && Format[CodePoint - 1] == U'4') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_64Bit;
                             }
                         } else if (CodePoint - 2 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 1 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 2] == U'l' && Format[CodePoint - 1] == U'l') { // ll/ellell; Posix Extension
+                            if (Format[CodePoint - 2] == U'l' && Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 2;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_64Bit;
-                            } else if (Format[CodePoint - 2] != U'l' && Format[CodePoint - 1] == U'l') { // l/ell; 32 bit
+                            } else if (Format[CodePoint - 2] != U'l' && Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_32Bit;
                             } else if (Format[CodePoint - 2] != U'h' && Format[CodePoint - 1] == U'h') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_16Bit;
-                            } else if (Format[CodePoint - 2] == U'h' && Format[CodePoint - 1] == U'h') { // hh
+                            } else if (Format[CodePoint - 2] == U'h' && Format[CodePoint - 1] == U'h') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_8Bit;
                             }
@@ -631,24 +623,24 @@ extern "C" {
                         Specifiers->Specifiers[Specifier].BaseType                   = BaseType_Integer;
                         Specifiers->Specifiers[Specifier].ModifierType               = (ModifierType_Unsigned | ModifierType_Radix10);
                         if (CodePoint - 3 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 1 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') { // I32/eye32; Microsoft Extension
+                            if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'3' && Format[CodePoint - 1] == U'2') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_32Bit;
-                            } else if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'6' && Format[CodePoint - 1] == U'4') { // I64/eye64; Microsoft Extension
+                            } else if (Format[CodePoint - 3] == U'I' && Format[CodePoint - 2] == U'6' && Format[CodePoint - 1] == U'4') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 3;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_64Bit;
                             }
                         } else if (CodePoint - 2 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 1 <= Specifiers->Specifiers[Specifier].End) {
-                            if (Format[CodePoint - 2] == U'l' && Format[CodePoint - 1] == U'l') { // ll/ellell; Posix Extension
+                            if (Format[CodePoint - 2] == U'l' && Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 2;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_64Bit;
-                            } else if (Format[CodePoint - 2] != U'l' && Format[CodePoint - 1] == U'l') { // l,ell; 32 bit
+                            } else if (Format[CodePoint - 2] != U'l' && Format[CodePoint - 1] == U'l') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_32Bit;
                             } else if (Format[CodePoint - 2] != U'h' && Format[CodePoint - 1] == U'h') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_16Bit;
-                            } else if (Format[CodePoint - 2] == U'h' && Format[CodePoint - 1] == U'h') { // hh
+                            } else if (Format[CodePoint - 2] == U'h' && Format[CodePoint - 1] == U'h') {
                                 Specifiers->Specifiers[Specifier].ModifierStart      = CodePoint - 1;
                                 Specifiers->Specifiers[Specifier].LengthModifier     = ModifierLength_8Bit;
                             }
@@ -1274,7 +1266,7 @@ extern "C" {
                 }
                 for (uint64_t Unique = 0ULL; Unique < Specifiers->NumUniqueSpecifiers; Unique++) {
                     uint64_t Pos          = Specifiers->UniqueSpecifiers[Unique];
-                    FormattedStringSize  += (UTF32_GetStringSizeInCodePoints(Specifiers->Specifiers[Pos].Argument) * Specifiers->UniqueSpecifiers[Unique]); // Feels like this is wrong
+                    FormattedStringSize  += (UTF32_GetStringSizeInCodePoints(Specifiers->Specifiers[Pos].Argument) * Specifiers->UniqueSpecifiers[Unique]);
                 }
             } else {
                 for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {

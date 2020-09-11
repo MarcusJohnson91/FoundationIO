@@ -9,14 +9,14 @@ extern "C" {
 #endif
     
     typedef enum LocalizationIO_DateFormats {
-                   DateFormat_Unspecified = 0, // & 3 << 0
+                   DateFormat_Unspecified = 0,
                    DateFormat_Day1        = 1,
                    DateFormat_Day2        = 2,
                    DateFormat_Day3        = 4,
-                   DateFormat_Month1      = 8, // & 3 << 2
+                   DateFormat_Month1      = 8,
                    DateFormat_Month2      = 16,
                    DateFormat_Month3      = 32,
-                   DateFormat_Year1       = 64, // & 3 << 4
+                   DateFormat_Year1       = 64,
                    DateFormat_Year2       = 128,
                    DateFormat_Year3       = 256,
     } LocalizationIO_DateFormats;
@@ -60,7 +60,7 @@ extern "C" {
         uint64_t EndOffset      = UTF8_FindSubString(LocaleAll, UTF8String("_"), 0, 1);
         UTF8 *   LanguageString = UTF8_ExtractSubString(LocaleAll, 0, EndOffset);
         uint64_t StringSize     = UTF8_GetStringSizeInCodeUnits(LocaleAll);
-        if (StringSize == 2) { // ISO-639-1
+        if (StringSize == 2) {
             if (UTF8_Compare(LanguageString, UTF8String("en"))) {
                 LanguageID = WrittenLanguage_English;
             } else if (UTF8_Compare(LanguageString, UTF8String("de"))) {
@@ -72,7 +72,7 @@ extern "C" {
             } else if (UTF8_Compare(LanguageString, UTF8String("is"))) {
                 LanguageID = WrittenLanguage_Icelandic;
             }
-        } else if (StringSize == 3) { // ISO-639-2
+        } else if (StringSize == 3) {
             
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Invalid Language string length %llu"), StringSize);
@@ -92,9 +92,9 @@ extern "C" {
 #endif
         
         uint64_t StringSize = UTF8_GetStringSizeInCodeUnits(LocaleAll);
-        if (StringSize == 2) { // ISO-639-1
+        if (StringSize == 2) {
             
-        } else if (StringSize == 3) { // ISO-639-2
+        } else if (StringSize == 3) {
         }
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #endif
