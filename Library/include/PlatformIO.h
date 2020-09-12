@@ -460,6 +460,26 @@ extern "C" {
 #define             PlatformIO_FunctionName           (PlatformIO_Immutable(UTF8 *)) __func__
 #endif /* PlatformIO_FunctionName */
 
+#ifndef             PlatformIO_BuildTypeIsUnknown
+#define             PlatformIO_BuildTypeIsUnknown      0
+#endif
+
+#ifndef             PlatformIO_BuildTypeIsDebug
+#define             PlatformIO_BuildTypeIsDebug        1
+#endif
+
+#ifndef             PlatformIO_BuildTypeIsRelease
+#define             PlatformIO_BuildTypeIsRelease      2
+#endif
+
+#ifndef             PlatformIO_BuildType
+#if defined(_DEBUG) || defined(DEBUG)
+#define             PlatformIO_BuildType               PlatformIO_BuildTypeIsDebug
+#else
+#define             PlatformIO_BuildType               PlatformIO_BuildTypeIsRelease
+#endif /* Debug defined */
+#endif /* PlatformIO_BuildType */
+
     /*!
      @abstract      Gets the total amount of memory in the system.
      */
