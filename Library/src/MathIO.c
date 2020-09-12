@@ -469,14 +469,11 @@ extern "C" {
 __attribute__((no_sanitize("undefined")))
 #endif
     uint64_t Rotate(const uint64_t Value, const uint8_t Bits2Rotate, const MathIO_RotationType Rotate) {
-        uint64_t Rotated      = 0ULL;
-        uint8_t  Bits2Rotate2 = Bits2Rotate & 0x7F;
+        uint64_t Rotated = 0ULL;
         if (Rotate == Rotate_Left) {
-            Rotated  = (Value << Bits2Rotate2) | (Value >> (64 - Bits2Rotate2));
+            Rotated      = (Value << Bits2Rotate) | (Value >> (64 - Bits2Rotate));
         } else if (Rotate == Rotate_Right) {
-            Rotated  = (Value >> Bits2Rotate2) | (Value << (64 - Bits2Rotate2));
-        } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Rotate_Unspecified is invalid"));
+            Rotated      = (Value >> Bits2Rotate) | (Value << (64 - Bits2Rotate));
         }
         return Rotated;
     }

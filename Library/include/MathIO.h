@@ -50,9 +50,8 @@ extern "C" {
     } MathIO_RoundingTypes;
     
     typedef enum MathIO_RotationType {
-                   Rotate_Unspecified             = 0,
-                   Rotate_Left                    = 1,
-                   Rotate_Right                   = 2,
+                   Rotate_Left                    = 0,
+                   Rotate_Right                   = 1,
     } MathIO_RotationType;
     
     /*!
