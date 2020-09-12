@@ -107,7 +107,7 @@ extern "C" {
         return CLI;
     }
     
-    uint64_t       CommandLineIO_GetTerminalWidth(void) {
+    uint64_t CommandLineIO_GetTerminalWidth(void) {
         uint64_t Width = 0ULL;
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
         struct winsize       WindowSize;
@@ -121,7 +121,7 @@ extern "C" {
         return Width;
     }
     
-    uint64_t       CommandLineIO_GetTerminalHeight(void) {
+    uint64_t CommandLineIO_GetTerminalHeight(void) {
         uint64_t Height = 0ULL;
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
         struct winsize       WindowSize;
