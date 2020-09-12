@@ -425,7 +425,7 @@ extern "C" {
                 StringSet[Argument]     = UTF16_Decode((UTF16*) Arguments);
             }
         } else {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldnt allocate %llu arguments"), NumArguments);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate %llu arguments"), NumArguments);
         }
 #endif
         return StringSet;
@@ -684,7 +684,7 @@ extern "C" {
              Make sure all mandatory options are present, and a bunch of other stuff
              */
         } else {
-            Log(Severity_USER, PlatformIO_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         }
     }
     

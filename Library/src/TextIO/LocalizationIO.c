@@ -394,7 +394,7 @@ extern "C" {
                     }
                 }
             } else {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate delocaized string"));
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate delocalized string"));
             }
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
