@@ -16,9 +16,11 @@ extern "C" {
         if (NumCodeUnits >= 1) {
             uint64_t StringSize = NumCodeUnits + PlatformIO_NULLTerminatorSize;
             String              = (UTF8*) calloc(StringSize, sizeof(UTF8));
+#if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
             for (uint64_t Index = 0ULL; Index < NumCodeUnits; Index++) {
                 String[Index]   = 0x88;
             }
+#endif
             if (String == NULL) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF8));
             }
@@ -33,9 +35,11 @@ extern "C" {
         if (NumCodeUnits >= 1) {
             uint64_t StringSize = NumCodeUnits + PlatformIO_NULLTerminatorSize;
             String              = (UTF16*) calloc(StringSize, sizeof(UTF16));
+#if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
             for (uint64_t Index = 0ULL; Index < NumCodeUnits; Index++) {
                 String[Index]   = 0x1616;
             }
+#endif
             if (String == NULL) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF16));
             }
@@ -50,9 +54,11 @@ extern "C" {
         if (NumCodePoints >= 1) {
             uint64_t StringSize = NumCodePoints + PlatformIO_NULLTerminatorSize;
             String              = (UTF32*) calloc(StringSize, sizeof(UTF32));
+#if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
             for (uint64_t Index = 0ULL; Index < NumCodePoints; Index++) {
                 String[Index]   = 0x32323232;
             }
+#endif
             if (String == NULL) {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Allocation failure: Couldn't allocate %llu bytes"), StringSize * sizeof(UTF32));
             }
@@ -3500,9 +3506,11 @@ extern "C" {
         UTF8 **StringSet = NULL;
         if (NumStrings > 0) {
             StringSet    = (UTF8**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF8*));
+#if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringSet[String] = (UTF8*) 0x8888888888888888;
             }
+#endif
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
@@ -3513,9 +3521,11 @@ extern "C" {
         UTF16 **StringSet = NULL;
         if (NumStrings > 0) {
             StringSet     = (UTF16**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF16*));
+#if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringSet[String] = (UTF16*) 0x1616161616161616;
             }
+#endif
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
@@ -3526,9 +3536,11 @@ extern "C" {
         UTF32 **StringSet = NULL;
         if (NumStrings > 0) {
             StringSet     = (UTF32**) calloc(NumStrings + PlatformIO_NULLTerminatorSize, sizeof(UTF32*));
+#if   (PlatformIO_BuildType == PlatformIO_BuildTypeIsDebug)
             for (uint64_t String = 0ULL; String < NumStrings; String++) {
                 StringSet[String] = (UTF32*) 0x3232323232323232;
             }
+#endif
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings %llu is invalid"), NumStrings);
         }
