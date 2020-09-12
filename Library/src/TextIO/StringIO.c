@@ -3470,7 +3470,7 @@ extern "C" {
                 Length    += 1;
             }
         } else if (Format == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Format String Poitner is NUlL"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Format String Pointer is NUlL"));
         } else if (Formatted == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Formatted String Pointer is NULL"));
         }

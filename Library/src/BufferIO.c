@@ -843,7 +843,7 @@ extern "C" {
                 }
             }
         } else if (ConvertedGUUID == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Insufficent memory to allocate ConvertedGUUID"));
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate ConvertedGUUID"));
         } else if (GUUID2Convert == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("GUUID Pointer is NULL"));
         } else if (InputType == GUUIDType_Unspecified) {

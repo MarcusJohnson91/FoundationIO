@@ -375,7 +375,7 @@ extern "C" {
         } else if (Random == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
         } else if (MinValue > MaxValue) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("MinValud %lld is greater than MaxValue %lld"), MinValue, MaxValue);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("MinValue %lld is greater than MaxValue %lld"), MinValue, MaxValue);
         }
         return RandomInteger;
     }
