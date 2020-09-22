@@ -81,20 +81,21 @@ find_package(Git)
 
 if(GIT_FOUND)
     file(READ "../Library/include/Private/FoundationIO_Version.h" FoundationIO_Version_Header)
+    string(REGEX MATCH "#define FoundationIO_Version_Major    ([0-9]+)" MAJOR ${FoundationIO_Version_Header})
+    #string(REGEX MATCH "[0-9]+" VERSION_MAJOR ${MAJOR})
 
-    string(REGEX MATCH "#define FoundationIO_Version_Major [0-9]+" _ "${FoundationIO_Version_Header}")
-    string(REGEX MATCH "[0-9]+" VERSION_MAJOR "${_}")
+    string(REGEX MATCH "#define FoundationIO_Version_Minor    ([0-9]+)" MINOR ${FoundationIO_Version_Header})
+    #string(REGEX MATCH "[0-9]+" VERSION_MINOR ${MINOR})
 
-    string(REGEX MATCH "#define FoundationIO_Version_Minor [0-9]+" _ "${FoundationIO_Version_Header}")
-    string(REGEX MATCH "[0-9]+" VERSION_MINOR "${_}")
+    string(REGEX MATCH "#define FoundationIO_Version_Patch    ([0-9]+)" PATCH ${FoundationIO_Version_Header})
+    #string(REGEX MATCH "[0-9]+" VERSION_PATCH ${PATCH})
 
-    string(REGEX MATCH "#define FoundationIO_Version_Patch [0-9]+" _ "${FoundationIO_Version_Header}")
-    string(REGEX MATCH "[0-9]+" VERSION_PATCH "${_}")
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --verify master WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" OUTPUT_VARIABLE "GIT_COMMIT_ID" RESULTS_VARIABLE STDOUT ERROR_VARIABLE STDERR)
+    string(REGEX REPLACE "\n$" "" "GIT_COMMIT_ID_STRIPPED" "${GIT_COMMIT_ID}")
+    string(TOUPPER "${GIT_COMMIT_ID_STRIPPED}" "GIT_COMMIT_ID_STRIPPED_CAPS")
 
-
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --verify master WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_VARIABLE GIT_COMMIT_ID RESULTS_VARIABLE STDOUT ERROR_VARIABLE STDERR)
-    string(REGEX REPLACE "\n$" "" GIT_COMMIT_ID_STRIPPED "${GIT_COMMIT_ID}")
-    string(TOUPPER "${GIT_COMMIT_ID_STRIPPED}" GIT_COMMIT_ID_STRIPPED_CAPS)
+    string(APPEND "CommitID_Header" "#pragma once\n\n#define FoundationIO_Version_CommitID " "${GIT_COMMIT_ID_STRIPPED_CAPS}")
+    file(WRITE "../Library/include/Private/FoundationIO_CommitID.h" "${CommitID_Header}")
 
     set(FoundationIO_VERSION_STRING "")
     string(APPEND FoundationIO_VERSION_STRING "${VERSION_MAJOR}" "." "${VERSION_MINOR}" "." "${VERSION_PATCH}" ":" "${GIT_COMMIT_ID_STRIPPED_CAPS}")
@@ -104,7 +105,6 @@ if(GIT_FOUND)
 endif(GIT_FOUND)
 
 configure_file("${FoundationIO_Resource_Dir}/FoundationIO.pc.in" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Resources/FoundationIO.pc")
-configure_file("${FoundationIO_Resource_Dir}/FoundationIO.rc.in" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Resources/FoundationIO.rc")
 
 option(BUILD_AS_SHARED_LIBRARY "Should FoundationIO be compiled as a dynamic library (.dylib/.dll/.so)?" ON)
 
@@ -207,8 +207,9 @@ ${CMAKE_C_FLAGS} \
 -fsanitize=address,undefined \
 -fno-omit-frame-pointer \
 -DDEBUG=1 \
--g \
+-g3 \
 -O1 \
+-glldb \
 ")
 
 set(CMAKE_C_FLAGS_RELEASE " \
