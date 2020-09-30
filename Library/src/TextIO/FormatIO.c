@@ -81,7 +81,7 @@ extern "C" {
     }
     
     static TextIO_Bases ConvertModifierType2Base(FormatSpecifier *Specifier) {
-        TextIO_Bases Base                   = Base_Unspecified;
+        TextIO_Bases           Base         = Base_Unspecified;
         FormatIO_BaseTypes     BaseType     = Specifier->BaseType;
         FormatIO_ModifierTypes ModifierType = Specifier->ModifierType;
 
@@ -745,7 +745,7 @@ extern "C" {
                                     }
                                     PotentialDigitLocation         += 1;
                                     uint64_t NumPossibleCodePoints  = CodePoint - PotentialDigitLocation;
-                                  uint8_t  NumDigits2Read           = UTF32_GetNumDigits(&Format[CodePoint], BaseType_Integer | Base_Radix10);
+                                    uint8_t  NumDigits2Read         = UTF32_GetNumDigits(&Format[CodePoint], Base_Integer | Base_Radix10);
                                     uint64_t Value                  = UTF32_String2Integer(&Format[CodePoint - NumDigits2Read], Base_Integer | Base_Radix10);
                                 }
                             }

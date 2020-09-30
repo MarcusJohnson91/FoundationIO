@@ -5,6 +5,16 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
+
+    bool Test_Exponentiate(SecureRNG *Secure) { // Even, Odd, Positive, Negative
+        bool Passed = No;
+        int64_t Even = Exponentiate(2, 2); // 4
+        int64_t Odd  = Exponentiate(2, 3); // 8
+        if (Even == 4 && Odd == 8) {
+            Passed = Yes;
+        }
+        return Passed;
+    }
     
     void Test_CountDigits(void) {
         SecureRNG *Random      = SecureRNG_Init(8 * 1000000);
@@ -59,6 +69,7 @@ extern "C" {
     }
     
     int main(void) {
+        Test_Exponentiate(NULL);
         Test_CountDigits();
         //Test_Decimals();
         //Test_MinMax();

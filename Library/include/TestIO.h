@@ -72,11 +72,11 @@ extern "C" {
         uint64_t  NumTests;
         uint64_t  NumWorkedAsExpected;
         uint64_t  NumUnexpectedFailures;
-        uint64_t *UnexpectedFailues; // Stores Index of unexpected failing tests
+        uint64_t *UnexpectedFailues;
         uint64_t  UnexpectedFailureSize;
     } TestSuite;
 
-    constexpr static void RegisterTestCase(TestSuite *Suite, TestCase *Test) {
+    static void RegisterTestCase(TestSuite *Suite, TestCase *Test) {
         if (Suite != NULL && Test != NULL) {
 
         } else {
