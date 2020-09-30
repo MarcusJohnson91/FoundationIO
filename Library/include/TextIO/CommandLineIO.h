@@ -279,16 +279,16 @@ extern "C" {
     /*!
      @abstract                                     Parses the Command Line Options as UTF-8 encoded strings.
      @param        CLI                             CommandLineIO Pointer.
-     @param        NumArguments                    The number of argument strings present in Arguments; equilivent to argc.
-     @param        Arguments                       A StringSet of UTF-8 encoded arguments; equilivent to argv
+     @param        NumArguments                    The number of argument strings present in Arguments; equivalent to argc.
+     @param        Arguments                       A StringSet of UTF-8 encoded arguments; equivalent to argv
      */
     void           CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, PlatformIO_Immutable(UTF8 **) Arguments);
     
     /*!
      @abstract                                     Parses the Command Line Options as UTF-16 encoded strings.
      @param        CLI                             CommandLineIO Pointer.
-     @param        NumArguments                    The number of argument strings present in Arguments; equilivent to __argc.
-     @param        Arguments                       A StringSet of UTF-16 encoded arguments; equilivent to __wargv on Windows
+     @param        NumArguments                    The number of argument strings present in Arguments; equivalent to __argc.
+     @param        Arguments                       A StringSet of UTF-16 encoded arguments; equivalent to __wargv on Windows
      */
     void           CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, PlatformIO_Immutable(UTF16 **) Arguments);
     
