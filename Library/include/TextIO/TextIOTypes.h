@@ -475,13 +475,13 @@ typedef                   char32_t                             CharSet32;
         constexpr inline TextIO_Bases operator |= (TextIO_Bases A, TextIO_Bases B) {
             uint16_t A1 = static_cast<uint16_t>(A);
             uint16_t B1 = static_cast<uint16_t>(B);
-            return static_cast<TextIO_Bases>(A1 |= B1);
+            return static_cast<TextIO_Bases>(A1 | B1);
         }
 
         constexpr inline TextIO_Bases operator &= (TextIO_Bases A, TextIO_Bases B) {
             uint16_t A1 = static_cast<uint16_t>(A);
             uint16_t B1 = static_cast<uint16_t>(B);
-            return static_cast<TextIO_Bases>(A1 &= B1);
+            return static_cast<TextIO_Bases>(A1 & B1);
         }
     }
 #endif /* PlatformIO_Language */
