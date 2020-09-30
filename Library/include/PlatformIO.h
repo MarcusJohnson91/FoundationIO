@@ -83,7 +83,7 @@ extern "C" {
 
 #if  !defined(PlatformIO_TargetOS)
 #if   defined(__APPLE__) && defined(__MACH__)
-#define             PlatformIO_TargetOS                                                 (PlatformIO_TargetOSIsPOSIX | PlatformIO_TargetOSIsBSD | PlatformIO_TargetOSIsApple)
+#define             PlatformIO_TargetOS                                                 (PlatformIO_TargetOSIsPOSIX | PlatformIO_TargetOSIsApple)
 #elif defined(Macintosh) || defined(macintosh)
 #define             PlatformIO_TargetOS                                                 (PlatformIO_TargetOSIsClassicMac)
 #elif defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
@@ -416,16 +416,12 @@ extern "C" {
 #ifndef             PlatformIO_Immutable
 #define             PlatformIO_Immutable(PointerType) const PointerType const
 #endif
-
-
-#define             class                                                           struct
-
     
 #ifndef             PlatformIO_Mutable
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-#define             PlatformIO_Mutable(PointerType, Variable) (PointerType, Variable)
+#define             PlatformIO_Mutable(PointerType, Variable) (PointerType) Variable
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#define             PlatformIO_Mutable(PointerType, Variable) (std::remove_const<PointerType>(Variable))
+#define             PlatformIO_Mutable(PointerType, Variable) const_cast<PointerType>(Variable)
 #endif
 #endif
     
@@ -452,12 +448,16 @@ extern "C" {
 #define             PlatformIO_Literal(NewType, UnconstType, Literal) (NewType const) Literal
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 #undef              PlatformIO_Literal
-#define             PlatformIO_Literal(NewType, UnconstType, Literal) reinterpret_cast<NewType>(const_cast<UnconstType>(Literal))
+#define             PlatformIO_Literal(NewType, UnconstType, Literal) reinterpret_cast<NewType>(const_cast<NewType>(Literal))
 #endif
 #endif
 
 #ifndef             PlatformIO_FunctionName
+#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define             PlatformIO_FunctionName           (PlatformIO_Immutable(UTF8 *)) __func__
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#define             PlatformIO_FunctionName           reinterpret_cast<const UTF8*>(__PRETTY_FUNCTION__)
+#endif /* Language */
 #endif /* PlatformIO_FunctionName */
 
 #ifndef             PlatformIO_BuildTypeIsUnknown

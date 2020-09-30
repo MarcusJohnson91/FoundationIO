@@ -143,7 +143,7 @@ extern "C" {
         UTF16 *LocaleString = reinterpret_cast<UTF16 *>(_wgetenv(L"LANG"));
 #endif
         
-        UTF16 *LocaleString = getenv(PlatformIO_Literal(const char *, char *, "LANG"));
+        UTF16 *LocaleString = getenv((PlatformIO_Immutable(UTF8*)) "LANG");
         if (LocaleString != NULL) {
             uint64_t StringSize         = UTF16_GetStringSizeInCodeUnits(LocaleString);
             uint64_t Offset             = UTF16_FindSubString(LocaleString, UTF16String("."), 0, 1);

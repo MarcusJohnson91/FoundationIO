@@ -253,22 +253,22 @@ extern "C" {
         UTF16 *ModeString = NULL;
         if ((Mode & FileMode_Read) == FileMode_Read) {
             if ((Mode & FileMode_Binary) == FileMode_Binary) {
-                ModeString = PlatformIO_Literal(UTF16*, char*, UTF16String("rb"));
+                ModeString = PlatformIO_Literal(UTF16*, char16_t*, UTF16String("rb"));
             } else if ((Mode & FileMode_Text) == FileMode_Text) {
-                ModeString = PlatformIO_Literal(UTF16*, char*, UTF16String("r"));
+                ModeString = PlatformIO_Literal(UTF16*, char16_t*, UTF16String("r"));
             }
         } else if ((Mode & FileMode_Write) == FileMode_Write) {
             if ((Mode & FileMode_Append) == FileMode_Append) {
                 if ((Mode & FileMode_Binary) == FileMode_Binary) {
-                    ModeString = PlatformIO_Literal(UTF16*, char*, UTF16String("ab"));
+                    ModeString = PlatformIO_Literal(UTF16*, char16_t*, UTF16String("ab"));
                 } else if ((Mode & FileMode_Text) == FileMode_Text) {
-                    ModeString = PlatformIO_Literal(UTF16*, char*, UTF16String("a"));
+                    ModeString = PlatformIO_Literal(UTF16*, char16_t*, UTF16String("a"));
                 }
             } else {
                 if ((Mode & FileMode_Binary) == FileMode_Binary) {
-                    ModeString = PlatformIO_Literal(UTF16*, char*, UTF16String("wb"));
+                    ModeString = PlatformIO_Literal(UTF16*, char16_t*, UTF16String("wb"));
                 } else if ((Mode & FileMode_Text) == FileMode_Text) {
-                    ModeString = PlatformIO_Literal(UTF16*, char*, UTF16String("w"));
+                    ModeString = PlatformIO_Literal(UTF16*, char16_t*, UTF16String("w"));
                 }
             }
         }
@@ -372,11 +372,11 @@ extern "C" {
         /* Windows is more complicated, so we'll use _stat64 */
         UTF16 *CWP16[_MAX_PATH];
         _wgetcwd((wchar_t*) &CWP16, _MAX_PATH);
-        CurrentWorkingPath       = UTF16_Convert(CMP16);
+        CurrentWorkingPath       = UTF16_Convert(CWP16);
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
         UTF16 *CWP16[_MAX_PATH];
         _wgetcwd(reinterpret_cast<wchar_t *>(&CWP16), _MAX_PATH);
-        CurrentWorkingPath       = UTF16_Convert(CMP16);
+        CurrentWorkingPath       = UTF16_Convert(CWP16);
 #endif /* Language */
 #endif /* TargetOS */
         return CurrentWorkingPath;
@@ -389,17 +389,17 @@ extern "C" {
         //UTF16 *CWF8[MAX_PATH];
         //CurrentWorkingPath        = (UTF8*) getcwd(NULL, 0);
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-        CurrentWorkingPath        = reinterpret_cast<UTF8 *>(getcwd(NULL, 0));
+        CurrentWorkingPath        = reinterpret_cast<UTF16 *>(getcwd(NULL, 0));
 #endif /* Language */
 #elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsWindows) == PlatformIO_TargetOSIsWindows)
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
         UTF16 CWP16[_MAX_PATH];
         _wgetcwd((wchar_t*) &CWP16, _MAX_PATH);
-        CurrentWorkingPath        = UTF16_Convert(CMP16);
+        CurrentWorkingPath        = UTF16_Convert(CWP16);
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
         UTF16 CWP16[_MAX_PATH];
         _wgetcwd(reinterpret_cast<wchar_t *>(&CWP16), _MAX_PATH);
-        CurrentWorkingPath        = UTF16_Convert(CMP16);
+        CurrentWorkingPath        = UTF16_Convert(CWP16);
 #endif /* Language */
 #endif /* TargetOS */
         return CurrentWorkingPath;
@@ -478,8 +478,8 @@ extern "C" {
             bool Path16HasBOM = UTF16_HasBOM(Path16);
             int  ErrorCode    = 0;
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-            PlatformIO_Immutable(UTF8 *) Path8 = UTF16_Convert(Path16);
-            PlatformIO_Immutable(UTF8 *) Mode8 = UTF8_CreateModeString(Mode);
+            UTF8 *Path8       = UTF16_Convert(Path16);
+            UTF8 *Mode8       = UTF8_CreateModeString(Mode);
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
 #ifdef __STDC_LIB_EXT1__
             if (Path16HasBOM) {
@@ -537,9 +537,10 @@ extern "C" {
         return File;
     }
 
-    TextIO_StringTypes FileIO_GetFileOrientation(PlatformIO_Immutable(FILE *) File) {
+    TextIO_StringTypes FileIO_GetFileOrientation(PlatformIO_Immutable(FILE *) File2Orient) {
         TextIO_StringTypes StringType       = StringType_Unspecified;
-        int Orientation                     = fwide(PlatformIO_Literal(FILE*, PlatformIO_Immutable(FILE*), File), 0);
+        FILE *File2Orient2                  = PlatformIO_Mutable(FILE*, File2Orient);
+        int Orientation                     = fwide(File2Orient2, 0);
         if (Orientation < 0) {
             StringType                      = StringType_UTF8;
         } else if (Orientation > 0) {
@@ -567,11 +568,7 @@ extern "C" {
     uint64_t FileIO_Read(PlatformIO_Immutable(FILE *) File2Read, void *Buffer, uint8_t BufferElementSize, uint64_t Elements2Read) {
         uint64_t BytesRead = 0;
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-        BytesRead = fread((void*) Buffer, BufferElementSize, Elements2Read, File2Read);
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-        BytesRead = fread(reinterpret_cast<void*>(Buffer), BufferElementSize, Elements2Read, File2Read);
-#endif
+        BytesRead = fread((void*) Buffer, BufferElementSize, Elements2Read, PlatformIO_Mutable(FILE*, File2Read));
 #elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
         ReadFile(File2Read, Buffer, Elements2Read, &BytesRead, NULL);
 #endif
@@ -584,9 +581,9 @@ extern "C" {
             // TODO: Maybe we should make sure that SeekSize fits within the file
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-            SuccessIsZero       = fseeko(File2Seek, SeekSizeInBytes, SEEK_SET);
+            SuccessIsZero       = fseeko(PlatformIO_Literal(FILE*, PlatformIO_Immutable(FILE*), File2Seek), SeekSizeInBytes, SEEK_SET);
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-            SuccessIsZero       = fseeko(File2Seek, reinterpret_cast<off_t>(SeekSizeInBytes), SEEK_SET);
+            SuccessIsZero       = fseeko(const_cast<FILE*>(File2Seek), reinterpret_cast<off_t>(SeekSizeInBytes), SEEK_SET);
 #endif
 #elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
             SuccessIsZero       = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_SET);
@@ -594,9 +591,9 @@ extern "C" {
         } else if ((SeekType & SeekType_Current) == SeekType_Current) {
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-            SuccessIsZero       = fseeko(File2Seek, SeekSizeInBytes, SEEK_CUR);
+            SuccessIsZero       = fseeko(PlatformIO_Literal(FILE*, PlatformIO_Immutable(FILE*), File2Seek), SeekSizeInBytes, SEEK_CUR);
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-            SuccessIsZero       = fseeko(File2Seek, reinterpret_cast<off_t>(SeekSizeInBytes), SEEK_CUR);
+            SuccessIsZero       = fseeko(const_cast<FILE*>(File2Seek), reinterpret_cast<off_t>(SeekSizeInBytes), SEEK_CUR);
 #endif
 #elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
             SuccessIsZero       = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_CUR);
@@ -604,9 +601,9 @@ extern "C" {
         } else if ((SeekType & SeekType_End) == SeekType_End) {
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-            SuccessIsZero       = fseeko(File2Seek, SeekSizeInBytes, SEEK_END);
+            SuccessIsZero       = fseeko(PlatformIO_Literal(FILE*, PlatformIO_Immutable(FILE*), File2Seek), SeekSizeInBytes, SEEK_END);
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-            SuccessIsZero       = fseeko(File2Seek, reinterpret_cast<off_t>(SeekSizeInBytes), SEEK_END);
+            SuccessIsZero       = fseeko(const_cast<FILE*>(File2Seek), reinterpret_cast<off_t>(SeekSizeInBytes), SEEK_END);
 #endif
 #elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
             SuccessIsZero       = _fseeki64(File2Seek, SeekSizeInBytes, SEEK_END);
@@ -618,7 +615,7 @@ extern "C" {
     uint64_t FileIO_Write(PlatformIO_Immutable(FILE *) File2Write, PlatformIO_Immutable(void *) Buffer, uint8_t BufferElementSize, uint64_t Elements2Write) {
         uint64_t BytesWritten = 0;
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-        BytesWritten = fwrite(Buffer, BufferElementSize, Elements2Write, File2Write);
+        BytesWritten          = fwrite(Buffer, BufferElementSize, Elements2Write, PlatformIO_Mutable(FILE*, File2Write));
 #elif (PlatformIO_TargetOS == PlatformIOWindowsOS)
         WriteFile(File2Write, Buffer, Elements2Write, &BytesWritten, NULL);
 #endif
