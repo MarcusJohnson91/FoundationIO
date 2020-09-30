@@ -127,7 +127,7 @@ extern "C" {
             int64_t  Bits2Align          = AlignmentSizeInBits - (BitB->BitOffset % AlignmentSizeInBits);
             if (BitB->BitOffset + Bits2Align > BitB->NumBits) {
                 uint8_t *Buffer_Old      = BitB->Buffer;
-                BitB->Buffer             = (uint8_t*) realloc(BitB->Buffer, Bits2Bytes(BitB->NumBits + Bits2Align, RoundingType_Up));
+                BitB->Buffer             = (uint8_t*) realloc(BitB->Buffer, Bits2Bytes(RoundingType_Up, BitB->NumBits + Bits2Align));
                 if (BitB->Buffer != NULL) {
                     free(Buffer_Old);
                 } else {
@@ -159,7 +159,7 @@ extern "C" {
     uint8_t BitBuffer_Erase(BitBuffer *BitB, uint8_t NewValue) {
         uint8_t Verification = 0xFE;
         if (BitB != NULL) {
-            uint64_t BufferSize = Bits2Bytes(BitB->NumBits, RoundingType_Up);
+            uint64_t BufferSize = Bits2Bytes(RoundingType_Up, BitB->NumBits);
             for (uint64_t Byte = 0ULL; Byte < BufferSize; Byte++) {
                 BitB->Buffer[Byte] = NewValue;
             }
@@ -214,19 +214,19 @@ extern "C" {
     static uint64_t BitBuffer_Extract_FarByte_FarBit(BitBuffer *BitB, uint8_t NumBits) {
         uint64_t Extracted = 0ULL;
         while (NumBits > 0) {
-            uint8_t  BitsByteCanContain        = BitsAvailableInByte(BitB->BitOffset + NumBits);
-            uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsByteCanContain, NumBits);
-            uint8_t  Shift                    = BitsByteCanContain - Bits2Get;
-            uint8_t  BitMask                  = (uint8_t) (Logarithm(2, Bits2Get) - 1) << Shift;
-            uint64_t Byte                     = Bits2Bytes(BitB->BitOffset + NumBits, RoundingType_Down);
-            uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
-            uint8_t  ApplyBits                = ExtractedBits >> Shift;
+            uint8_t  BitsByteCanContain = BitsAvailableInByte(BitB->BitOffset + NumBits);
+            uint8_t  Bits2Get           = (uint8_t) Minimum(BitsByteCanContain, NumBits);
+            uint8_t  Shift              = 8 - Bits2Get;
+            uint8_t  BitMask            = (uint8_t) (Exponentiate(2, Bits2Get) - 1) << Shift;
+            uint64_t Byte               = Bits2Bytes(RoundingType_Down, BitB->BitOffset + NumBits);
+            uint8_t  ExtractedBits      = BitB->Buffer[Byte] & BitMask;
+            uint8_t  ApplyBits          = ExtractedBits >> Shift;
 
-            Extracted                       <<= Bits2Get;
-            Extracted                        |= ApplyBits;
+            Extracted                 <<= Bits2Get;
+            Extracted                  |= ApplyBits;
 
-            NumBits                          -= Bits2Get;
-            BitB->BitOffset                  += Bits2Get;
+            NumBits                    -= Bits2Get;
+            BitB->BitOffset            += Bits2Get;
         }
         return Extracted;
     }
@@ -234,85 +234,86 @@ extern "C" {
     static uint64_t BitBuffer_Extract_FarByte_NearBit(BitBuffer *BitB, uint8_t NumBits) {
         uint64_t Extracted = 0ULL;
         while (NumBits > 0) {
-            uint8_t  BitsByteCanContain        = BitsAvailableInByte(BitB->BitOffset + NumBits);
-            uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsByteCanContain, NumBits);
-            uint8_t  Shift                    = BitsByteCanContain - Bits2Get;
-            uint8_t  BitMask                  = (uint8_t) (Logarithm(2, Bits2Get) - 1) << Shift;
-            uint64_t Byte                     = Bits2Bytes(BitB->BitOffset + NumBits, RoundingType_Down);
-            uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
-            uint8_t  ApplyBits                = (uint8_t) (ExtractedBits << Shift);
+            uint8_t  BitsByteCanContain = BitsAvailableInByte(BitB->BitOffset + NumBits);
+            uint8_t  Bits2Get           = (uint8_t) Minimum(BitsByteCanContain, NumBits);
+            uint8_t  Shift              = 8 - Bits2Get;
+            uint8_t  BitMask            = (uint8_t) (Exponentiate(2, Bits2Get) - 1) << Shift;
+            uint64_t Byte               = Bits2Bytes(RoundingType_Down, BitB->BitOffset + NumBits);
+            uint8_t  ExtractedBits      = BitB->Buffer[Byte] & BitMask;
+            uint8_t  ApplyBits          = (uint8_t) (ExtractedBits << Shift);
 
-            Extracted                       <<= Bits2Get;
-            Extracted                        |= ApplyBits;
+            Extracted                 <<= Bits2Get;
+            Extracted                  |= ApplyBits;
 
-            NumBits                        -= Bits2Get;
-            BitB->BitOffset                  += Bits2Get;
+            NumBits                    -= Bits2Get;
+            BitB->BitOffset            += Bits2Get;
         }
         return Extracted;
     }
     
     static uint64_t BitBuffer_Extract_NearByte_FarBit(BitBuffer *BitB, uint8_t NumBits) {
-        uint64_t Bits = 0ULL;
+        uint64_t Extracted = 0ULL;
         while (NumBits > 0) {
             uint8_t  BitsByteCanContain = BitsAvailableInByte(BitB->BitOffset);
-            uint8_t  Bits2Get          = (uint8_t) Minimum(BitsByteCanContain, NumBits);
-            uint8_t  BufferShift       = BitsByteCanContain % 8;
-            uint8_t  BufferMask        = (Logarithm(2, Bits2Get) - 1) << BufferShift;
-            uint8_t  ExtractedBits     = BitB->Buffer[Bits2Bytes(BitB->BitOffset, RoundingType_Down)] & BufferMask;
-            uint8_t  ValueShift        = NumBits - NumBits;
-            Bits                     <<= ValueShift;
-            Bits                      |= ExtractedBits;
+            uint8_t  Bits2Get           = (uint8_t) Minimum(BitsByteCanContain, NumBits);
+            uint8_t  BufferShift        = 8 - Bits2Get;
+            uint8_t  BufferMask         = (Exponentiate(2, Bits2Get) - 1) << BufferShift;
+            uint8_t  ApplyBits          = BitB->Buffer[Bits2Bytes(RoundingType_Down, BitB->BitOffset)] & BufferMask;
+            uint8_t  ValueShift         = NumBits - NumBits;
 
-            NumBits                 -= Bits2Get;
-            BitB->BitOffset           += Bits2Get;
+            Extracted                 <<= Bits2Get;
+            Extracted                  |= ApplyBits;
+
+            NumBits                    -= Bits2Get;
+            BitB->BitOffset            += Bits2Get;
         }
-        return Bits;
+        return Extracted;
     }
     
     static uint64_t BitBuffer_Extract_NearByte_NearBit(BitBuffer *BitB, uint8_t NumBits) {
         uint64_t Extracted = 0ULL;
         while (NumBits > 0) {
-            uint8_t  BitsByteCanContain        = BitsAvailableInByte(BitB->BitOffset);
-            uint8_t  Bits2Get                 = (uint8_t) Minimum(BitsByteCanContain, NumBits);
-            uint8_t  Shift                    = BitsByteCanContain - Bits2Get;
-            uint8_t  BitMask                  = (uint8_t) (Logarithm(2, Bits2Get) - 1) << Shift;
-            uint64_t Byte                     = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
-            uint8_t  ExtractedBits            = BitB->Buffer[Byte] & BitMask;
-            ExtractedBits                   >>= Shift;
+            uint8_t  BitsByteCanContain = BitsAvailableInByte(BitB->BitOffset);
+            uint8_t  Bits2Get           = (uint8_t) Minimum(BitsByteCanContain, NumBits);
+            uint8_t  Shift              = 8 - Bits2Get;
+            uint8_t  BitMask            = (uint8_t) (Exponentiate(2, Bits2Get) - 1) << Shift;
+            uint64_t Byte               = Bits2Bytes(RoundingType_Down, BitB->BitOffset);
+            uint8_t  ApplyBits          = BitB->Buffer[Byte] & BitMask;
+            ApplyBits                 >>= Shift;
 
-            Extracted                       <<= Bits2Get;
-            Extracted                        |= ExtractedBits;
+            Extracted                 <<= Bits2Get;
+            Extracted                  |= ApplyBits;
 
-            NumBits                        -= Bits2Get;
-            BitB->BitOffset                  += Bits2Get;
+            NumBits                    -= Bits2Get;
+            BitB->BitOffset            += Bits2Get;
         }
         return Extracted;
     }
     
     static void BitBuffer_Append_FarByte_FarBit(BitBuffer *BitB, uint8_t NumBits, uint64_t Data2Append) {
         while (NumBits > 0) {
-            uint8_t  BitsByteCanContain  = BitsAvailableInByte(BitB->BitOffset);
-            uint8_t  NumBits2Append      = (uint8_t) Minimum(BitsByteCanContain, NumBits);
-            uint8_t  ExtractBitMask      = (uint8_t) (Logarithm(2, NumBits2Append) - 1);
-            uint8_t  ExtractedBits       = (Data2Append & ExtractBitMask);
-            uint64_t Byte                = Bits2Bytes(BitB->BitOffset + NumBits, RoundingType_Down);
-            BitB->Buffer[Byte]          |= ExtractedBits;
-            NumBits                     -= NumBits2Append;
-            BitB->BitOffset             += NumBits2Append;
+            uint8_t  BitsByteCanContain = BitsAvailableInByte(BitB->BitOffset);
+            uint8_t  NumBits2Append     = (uint8_t) Minimum(BitsByteCanContain, NumBits);
+            uint8_t  ExtractBitMask     = (uint8_t) (Exponentiate(2, NumBits2Append) - 1);
+            uint8_t  ExtractedBits      = (Data2Append & ExtractBitMask);
+            uint64_t Byte               = Bits2Bytes(RoundingType_Down, BitB->BitOffset + NumBits);
+            BitB->Buffer[Byte]         |= ExtractedBits;
+            NumBits                    -= NumBits2Append;
+            BitB->BitOffset            += NumBits2Append;
         }
     }
     
     static void BitBuffer_Append_FarByte_NearBit(BitBuffer *BitB, uint8_t NumBits, uint64_t Data2Append) {
         while (NumBits > 0) {
-            uint8_t  BitsByteCanContain  = BitsAvailableInByte(BitB->BitOffset);
-            uint8_t  NumBits2Append      = (uint8_t) Minimum(BitsByteCanContain, NumBits);
-            uint8_t  Shift               = BitsByteCanContain - NumBits2Append;
-            uint8_t  ExtractBitMask      = (uint8_t) (Logarithm(2, NumBits2Append) - 1) << Shift;
-            uint8_t  ExtractedBits       = (Data2Append & ExtractBitMask) >> (NumBits - NumBits2Append);
-            uint64_t Byte                = Bits2Bytes(BitB->BitOffset + NumBits, RoundingType_Down);
-            BitB->Buffer[Byte]          |= ExtractedBits;
-            NumBits                     -= NumBits2Append;
-            BitB->BitOffset             += NumBits2Append;
+            uint8_t  BitsByteCanContain = BitsAvailableInByte(BitB->BitOffset);
+            uint8_t  NumBits2Append     = (uint8_t) Minimum(BitsByteCanContain, NumBits);
+            uint8_t  Shift              = BitsByteCanContain - NumBits2Append;
+            uint8_t  ExtractBitMask     = (uint8_t) (Exponentiate(2, NumBits2Append) - 1) << Shift;
+            uint8_t  ExtractedBits      = (Data2Append & ExtractBitMask) >> (NumBits - NumBits2Append);
+            uint64_t Byte               = Bits2Bytes(RoundingType_Down, BitB->BitOffset + NumBits);
+            BitB->Buffer[Byte]         |= ExtractedBits;
+            NumBits                    -= NumBits2Append;
+            BitB->BitOffset            += NumBits2Append;
         }
     }
     
@@ -337,10 +338,10 @@ extern "C" {
         while (NumBits > 0) {
             uint8_t  BitsByteCanContain  = BitsAvailableInByte(BitB->BitOffset);
             uint8_t  NumBits2Append      = (uint8_t) Minimum(BitsByteCanContain, NumBits);
-            uint8_t  Mask                = Logarithm(2, NumBits2Append) - 1;
+            uint8_t  Mask                = Exponentiate(2, NumBits2Append) - 1;
             uint8_t  Shift               = BitsByteCanContain - NumBits2Append;
             uint8_t  ExtractedBits       = (Data2Append & Mask) >> Shift;
-            uint64_t Byte                = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
+            uint64_t Byte                = Bits2Bytes(RoundingType_Down, BitB->BitOffset);
             BitB->Buffer[Byte]          |= ExtractedBits;
             NumBits                     -= NumBits2Append;
             BitB->BitOffset             += NumBits2Append;
@@ -352,9 +353,9 @@ extern "C" {
             uint8_t  BitsByteCanContain  = BitsAvailableInByte(BitB->BitOffset);
             uint8_t  NumBits2Append      = (uint8_t) Minimum(BitsByteCanContain, NumBits);
             uint8_t  MaskShift           = NumBits2Append - NumBits2Append;
-            uint64_t Mask                = (Logarithm(2, NumBits2Append) - 1) << MaskShift;
+            uint64_t Mask                = Exponentiate(2, NumBits2Append) - 1; // Mask is 1 bit short for 0x33 aka 6 bits
             uint8_t  ExtractedBits       = (Data2Append & Mask) >> MaskShift;
-            uint64_t Byte                = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
+            uint64_t Byte                = Bits2Bytes(RoundingType_Down, BitB->BitOffset);
             BitB->Buffer[Byte]          |= ExtractedBits;
             NumBits                     -= NumBits2Append;
             BitB->BitOffset             += NumBits2Append;
@@ -365,7 +366,8 @@ extern "C" {
         UTF32 *BitBufferString = NULL;
         if (BitB != NULL && Length >= 1 && Length <= 64) {
             BitBuffer_Seek(BitB, BitB->BitOffset - Length);
-            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %P, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), &BitB, BitB->NumBits, BitB->BitOffset, BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, Length));
+            uint64_t Data    = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, Length);
+            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %P, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), &BitB, BitB->NumBits, BitB->BitOffset, Data);
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (Length == 0) {
@@ -377,19 +379,19 @@ extern "C" {
     }
     
     uint64_t BitBuffer_PeekBits(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t NumBits) {
-        uint64_t OutputData  = 0ULL;
+        uint64_t Extracted = 0;
         if (BitB != NULL && NumBits <= 64 && (NumBits <= (BitB->BitOffset - BitB->NumBits))) {
             if (ByteOrder == ByteOrder_LSByteIsNearest) {
                 if (BitOrder == BitOrder_LSBitIsNearest) {
-                    OutputData = BitBuffer_Extract_NearByte_NearBit(BitB, NumBits);
+                    Extracted           = BitBuffer_Extract_NearByte_NearBit(BitB, NumBits);
                 } else if (BitOrder == BitOrder_LSBitIsFarthest) {
-                    OutputData = BitBuffer_Extract_NearByte_FarBit(BitB, NumBits);
+                    Extracted           = BitBuffer_Extract_NearByte_FarBit(BitB, NumBits);
                 }
             } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
                 if (BitOrder == BitOrder_LSBitIsNearest) {
-                    OutputData = BitBuffer_Extract_FarByte_NearBit(BitB, NumBits);
+                    Extracted           = BitBuffer_Extract_FarByte_NearBit(BitB, NumBits);
                 } else if (BitOrder == BitOrder_LSBitIsFarthest) {
-                    OutputData = BitBuffer_Extract_FarByte_FarBit(BitB, NumBits);
+                    Extracted           = BitBuffer_Extract_FarByte_FarBit(BitB, NumBits);
                 }
             }
             BitB->BitOffset   -= NumBits;
@@ -398,23 +400,23 @@ extern "C" {
         } else if (NumBits > 64 || (NumBits > (BitB->BitOffset - BitB->NumBits))) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Bits2Peek %d is greater than BitBuffer can provide %lld, or greater than BitBuffer_PeekBits can satisfy 0-64"), NumBits, BitB->BitOffset);
         }
-        return OutputData;
+        return Extracted;
     }
     
     uint64_t BitBuffer_ReadBits(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t NumBits) {
-        uint64_t OutputData    = 0ULL;
+        uint64_t Extracted;
         if (BitB != NULL && NumBits <= 64 && NumBits <= (BitB->NumBits - BitB->BitOffset)) {
             if (ByteOrder == ByteOrder_LSByteIsNearest) {
                 if (BitOrder == BitOrder_LSBitIsNearest) {
-                    OutputData = BitBuffer_Extract_NearByte_NearBit(BitB, NumBits);
+                    Extracted = BitBuffer_Extract_NearByte_NearBit(BitB, NumBits);
                 } else if (BitOrder == BitOrder_LSBitIsFarthest) {
-                    OutputData = BitBuffer_Extract_NearByte_FarBit(BitB, NumBits);
+                    Extracted = BitBuffer_Extract_NearByte_FarBit(BitB, NumBits);
                 }
             } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
                 if (BitOrder == BitOrder_LSBitIsNearest) {
-                    OutputData = BitBuffer_Extract_FarByte_NearBit(BitB, NumBits);
+                    Extracted = BitBuffer_Extract_FarByte_NearBit(BitB, NumBits);
                 } else if (BitOrder == BitOrder_LSBitIsFarthest) {
-                    OutputData = BitBuffer_Extract_FarByte_FarBit(BitB, NumBits);
+                    Extracted = BitBuffer_Extract_FarByte_FarBit(BitB, NumBits);
                 }
             }
         } else if (BitB == NULL) {
@@ -422,49 +424,48 @@ extern "C" {
         } else if (NumBits > 64 || NumBits <= (BitB->NumBits - BitB->BitOffset)) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits %d is greater than BitBuffer can provide %lld, or greater than can be satisfied 0-64"), NumBits, BitB->BitOffset);
         }
-        return OutputData;
+        return Extracted;
     }
     
     uint64_t BitBuffer_ReadUnary(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, BufferIO_UnaryTypes UnaryType, BufferIO_UnaryTerminators StopBit) {
-        uint64_t OutputData    = 0ULL;
+        uint64_t Extracted;
+        if (UnaryType == UnaryType_Count) {
+            Extracted   += 1;
+        }
         if (BitB != NULL) {
             uint8_t CurrentBit = StopBit ^ 1;
             while (CurrentBit != StopBit) {
-                /*
-                 Algorithm:
-                 We could just iterate over the array, stopping once we found the stop bit
-                 */
                 if (ByteOrder == ByteOrder_LSByteIsNearest) {
                     if (BitOrder == BitOrder_LSBitIsNearest) {
-                        BitBuffer_Extract_NearByte_NearBit(BitB, 1);
+                        Extracted = BitBuffer_Extract_NearByte_NearBit(BitB, 1);
                     } else if (BitOrder == BitOrder_LSBitIsFarthest) {
-                        BitBuffer_Extract_NearByte_FarBit(BitB, 1);
+                        Extracted = BitBuffer_Extract_NearByte_FarBit(BitB, 1);
                     }
                 } else if (ByteOrder == ByteOrder_LSByteIsFarthest) {
                     if (BitOrder == BitOrder_LSBitIsNearest) {
-                        BitBuffer_Extract_FarByte_NearBit(BitB, 1);
+                        Extracted = BitBuffer_Extract_FarByte_NearBit(BitB, 1);
                     } else if (BitOrder == BitOrder_LSBitIsFarthest) {
-                        BitBuffer_Extract_FarByte_FarBit(BitB, 1);
+                        Extracted = BitBuffer_Extract_FarByte_FarBit(BitB, 1);
                     }
                 }
-                OutputData    += 1;
+                Extracted += 1;
             };
             BitBuffer_Seek(BitB, 1);
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
-        return (UnaryType == UnaryType_Count ? OutputData + 1 : OutputData);
+        return Extracted;
     }
     
     uint64_t BitBuffer_GetUTF8StringSize(BitBuffer *BitB) {
-        uint64_t StringSize           = 0ULL;
+        uint64_t StringSize               = 0ULL;
         if (BitB != NULL) {
-            int64_t  OriginalOffset   = BitBuffer_GetPosition(BitB);
-            UTF8     CodeUnit8        = 1;
-            while (CodeUnit8 != PlatformIO_NULLTerminator) {
-                CodeUnit8             = (UTF8) BitBuffer_Extract_FarByte_FarBit(BitB, 8);
-                uint8_t  CodeUnitSize = UTF8_GetCodePointSizeInCodeUnits(CodeUnit8);
-                StringSize           += CodeUnitSize;
+            int64_t  OriginalOffset       = BitBuffer_GetPosition(BitB);
+            uint64_t Extracted            = 1;
+            while (Extracted != PlatformIO_NULLTerminator) {
+                Extracted                 = BitBuffer_Extract_FarByte_FarBit(BitB, 8);
+                uint8_t  CodeUnitSize     = UTF8_GetCodePointSizeInCodeUnits((UTF8) Extracted);
+                StringSize               += CodeUnitSize;
             }
             BitBuffer_SetPosition(BitB, OriginalOffset);
         } else {
@@ -474,24 +475,26 @@ extern "C" {
     }
     
     UTF8 *BitBuffer_ReadUTF8(BitBuffer *BitB, uint64_t StringSize) {
-        UTF8 *ExtractedString             = UTF8_Init(StringSize);
+        UTF8 *ExtractedString                 = UTF8_Init(StringSize);
+        UTF8 Extracted;
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                ExtractedString[CodeUnit] = (UTF8) BitBuffer_Extract_FarByte_FarBit(BitB, 8);
+                Extracted                     = BitBuffer_Extract_FarByte_FarBit(BitB, 8);
+                ExtractedString[CodeUnit]     = (UTF8) Extracted;
             }
         }
         return ExtractedString;
     }
     
     uint64_t BitBuffer_GetUTF16StringSize(BitBuffer *BitB) {
-        uint64_t StringSize           = 0ULL;
+        uint64_t StringSize               = 0ULL;
         if (BitB != NULL) {
-            int64_t  OriginalOffset   = BitBuffer_GetPosition(BitB);
-            UTF16    CodeUnit16       = 1;
-            while (CodeUnit16 != PlatformIO_NULLTerminator) {
-                CodeUnit16            = (UTF16) BitBuffer_Extract_FarByte_FarBit(BitB, 16);
-                uint8_t  CodeUnitSize = UTF16_GetCodePointSizeInCodeUnits(CodeUnit16);
-                StringSize           += CodeUnitSize;
+            int64_t  OriginalOffset       = BitBuffer_GetPosition(BitB);
+            uint64_t Extracted            = 1;
+            while (Extracted != PlatformIO_NULLTerminator) {
+                Extracted                 = BitBuffer_Extract_FarByte_FarBit(BitB, 16);
+                uint8_t  CodeUnitSize     = UTF8_GetCodePointSizeInCodeUnits((UTF16) Extracted);
+                StringSize               += CodeUnitSize;
             }
             BitBuffer_SetPosition(BitB, OriginalOffset);
         } else {
@@ -501,13 +504,13 @@ extern "C" {
     }
     
     UTF16 *BitBuffer_ReadUTF16(BitBuffer *BitB, uint64_t StringSize) {
-        UTF16 *ExtractedString            = UTF16_Init(StringSize);
+        UTF16 *ExtractedString                = UTF16_Init(StringSize);
+        UTF16 Extracted;
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
-                ExtractedString[CodeUnit] = (UTF16) BitBuffer_Extract_FarByte_FarBit(BitB, 16);
+                Extracted                     = BitBuffer_Extract_FarByte_FarBit(BitB, 16);
+                ExtractedString[CodeUnit]     = (UTF16) Extracted;
             }
-        } else if (BitB == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
         return ExtractedString;
     }
@@ -526,15 +529,15 @@ extern "C" {
                 }
             } else if (GUUID2Read == GUUIDType_UUIDString || GUUID2Read == GUUIDType_GUIDString) {
                 if (GUUID != NULL) {
-                    uint32_t Section1    = (uint32_t) BitBuffer_Extract_FarByte_FarBit(BitB, 32);
+                    uint32_t Section1  = BitBuffer_Extract_FarByte_FarBit(BitB, 32);
                     BitBuffer_Seek(BitB, 8);
-                    uint16_t Section2    = (uint16_t) BitBuffer_Extract_FarByte_FarBit(BitB, 16);
+                    uint16_t Section2  = BitBuffer_Extract_FarByte_FarBit(BitB, 16);
                     BitBuffer_Seek(BitB, 8);
-                    uint16_t Section3    = (uint16_t) BitBuffer_Extract_FarByte_FarBit(BitB, 16);
+                    uint16_t Section3  = BitBuffer_Extract_FarByte_FarBit(BitB, 16);
                     BitBuffer_Seek(BitB, 8);
-                    uint16_t Section4    = (uint16_t) BitBuffer_Extract_FarByte_FarBit(BitB, 16);
+                    uint16_t Section4  = BitBuffer_Extract_FarByte_FarBit(BitB, 16);
                     BitBuffer_Seek(BitB, 8);
-                    uint64_t Section5    = (uint64_t) BitBuffer_Extract_FarByte_FarBit(BitB, 48);
+                    uint64_t Section5  = BitBuffer_Extract_FarByte_FarBit(BitB, 48);
                     for (uint8_t Byte = 0; Byte < GUUIDString_Size; Byte++) {
                         if (Byte <= 3) {
                             GUUID[Byte]  = Section1 & (0xFF << (Byte * 8));
@@ -589,9 +592,9 @@ extern "C" {
                         uint8_t  BitsByteCanContain  = BitsAvailableInByte(BitB->BitOffset);
                         uint8_t  NumBits2Append      = (uint8_t) Minimum(BitsByteCanContain, NumBits);
                         uint8_t  MaskShift           = NumBits2Append - NumBits2Append;
-                        uint64_t Mask                = (Logarithm(2, NumBits2Append) - 1) << MaskShift;
+                        uint64_t Mask                = (Exponentiate(2, NumBits2Append) - 1) << MaskShift;
                         uint8_t  ExtractedBits       = (Bits2Write & Mask) >> MaskShift;
-                        uint64_t Byte                = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
+                        uint64_t Byte                = Bits2Bytes(RoundingType_Down, BitB->BitOffset);
                         BitB->Buffer[Byte]          |= ExtractedBits;
                         NumBits                     -= NumBits2Append;
                         BitB->BitOffset             += NumBits2Append;
@@ -600,10 +603,10 @@ extern "C" {
                     while (NumBits > 0) {
                         uint8_t  BitsByteCanContain   = BitsAvailableInByte(BitB->BitOffset);
                         uint8_t  Bits2Write          = (uint8_t) Minimum(BitsByteCanContain, NumBits);
-                        uint8_t  Mask                = Logarithm(2, Bits2Write) - 1;
+                        uint8_t  Mask                = Exponentiate(2, Bits2Write) - 1;
                         uint8_t  Shift               = NumBits2Write - NumBits;
                         uint8_t  ExtractedBits       = (Bits2Write & Mask) >> Shift;
-                        uint64_t Byte                = Bits2Bytes(BitB->BitOffset, RoundingType_Down);
+                        uint64_t Byte                = Bits2Bytes(RoundingType_Down, BitB->BitOffset);
                         BitB->Buffer[Byte]          |= ExtractedBits;
                         NumBits                     -= Bits2Write;
                         BitB->BitOffset             += NumBits;
@@ -615,9 +618,9 @@ extern "C" {
                         uint8_t  BitsByteCanContain  = BitsAvailableInByte(BitB->BitOffset);
                         uint8_t  NumBits2Append      = (uint8_t) Minimum(BitsByteCanContain, NumBits);
                         uint8_t  Shift               = BitsByteCanContain - NumBits2Append;
-                        uint8_t  ExtractBitMask      = (uint8_t) (Logarithm(2, NumBits2Append) - 1) << Shift;
+                        uint8_t  ExtractBitMask      = (uint8_t) (Exponentiate(2, NumBits2Append) - 1) << Shift;
                         uint8_t  ExtractedBits       = (Bits2Write & ExtractBitMask) >> (NumBits - NumBits2Append);
-                        uint64_t Byte                = Bits2Bytes(BitB->BitOffset + NumBits, RoundingType_Down);
+                        uint64_t Byte                = Bits2Bytes(RoundingType_Down, BitB->BitOffset + NumBits);
                         BitB->Buffer[Byte]          |= ExtractedBits;
                         NumBits                     -= NumBits2Append;
                         BitB->BitOffset             += NumBits2Append;
@@ -626,9 +629,9 @@ extern "C" {
                     while (NumBits > 0) {
                         uint8_t  BitsByteCanContain  = BitsAvailableInByte(BitB->BitOffset);
                         uint8_t  NumBits2Append      = (uint8_t) Minimum(BitsByteCanContain, NumBits);
-                        uint8_t  ExtractBitMask      = (uint8_t) (Logarithm(2, NumBits2Append) - 1);
+                        uint8_t  ExtractBitMask      = (uint8_t) (Exponentiate(2, NumBits2Append) - 1);
                         uint8_t  ExtractedBits       = (Bits2Write & ExtractBitMask);
-                        uint64_t Byte                = Bits2Bytes(BitB->BitOffset + NumBits, RoundingType_Down);
+                        uint64_t Byte                = Bits2Bytes(RoundingType_Down, BitB->BitOffset + NumBits);
                         BitB->Buffer[Byte]          |= ExtractedBits;
                         NumBits                     -= NumBits2Append;
                         BitB->BitOffset             += NumBits2Append;

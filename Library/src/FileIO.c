@@ -145,21 +145,21 @@ extern "C" {
             uint64_t ArraySizeInBits = BitBuffer_GetSize(BitB);
             uint64_t ArrayOffset     = BitBuffer_GetPosition(BitB);
             uint8_t *Array           = BitBuffer_GetArray(BitB);
-            uint64_t Bytes2Read      = Bits2Bytes(ArraySizeInBits - ArrayOffset, RoundingType_Down);
+            uint64_t Bytes2Read      = Bits2Bytes(RoundingType_Down, ArraySizeInBits - ArrayOffset);
             uint8_t  Bits2Save       = ArrayOffset % 8;
             if (Bits2Save > 0) {
                 Array[0]             = 0;
-                uint8_t Saved        = Array[Bytes2Read + 1] & (Logarithm(2, Bits2Save) - 1); // Todo: Add shift
+                uint8_t Saved        = Array[Bytes2Read + 1] & (Exponentiate(2, Bits2Save) - 1); // Todo: Add shift
                 Array[0]             = Saved;
                 BitBuffer_SetPosition(BitB, Bits2Save);
-                for (uint64_t Byte   = (uint64_t) Bits2Bytes(ArrayOffset, RoundingType_Down); Byte < (uint64_t) Bits2Bytes(ArraySizeInBits - ArrayOffset, RoundingType_Down); Byte++) {
+                for (uint64_t Byte   = (uint64_t) Bits2Bytes(RoundingType_Down, ArrayOffset); Byte < (uint64_t) Bits2Bytes(RoundingType_Down, ArraySizeInBits - ArrayOffset); Byte++) {
                     Array[Byte]      = 0;
                 }
             }
             uint64_t BytesRead       = 0ULL;
             BytesRead                = FileIO_Read(Input->File, Array, sizeof(Array[0]), Bytes2Read);
             if (BytesRead == Bytes2Read) {
-                BitBuffer_SetSize(BitB, Bits2Bytes(BytesRead, RoundingType_Down) + ArrayOffset);
+                BitBuffer_SetSize(BitB, BytesRead + ArrayOffset);
             } else {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Num bytes read %llu does not match num bytes requested %llu"), BytesRead, Bytes2Read);
             }
@@ -175,7 +175,7 @@ extern "C" {
             uint64_t ArraySizeInBits = BitBuffer_GetSize(BitB);
             uint64_t ArrayOffset     = BitBuffer_GetPosition(BitB);
             uint8_t *Array           = BitBuffer_GetArray(BitB);
-            uint64_t Bytes2Read      = Bits2Bytes(BitBuffer_GetSize(BitB), RoundingType_Down);
+            uint64_t Bytes2Read      = Bits2Bytes(RoundingType_Down, BitBuffer_GetSize(BitB));
             uint64_t BytesRead       = 0ULL;
             BytesRead                = FileIO_Read(Input->File, Array, sizeof(Array[0]), Bytes2Read);
             if (BytesRead != Bytes2Read) {
@@ -201,14 +201,14 @@ extern "C" {
             uint64_t ArraySizeInBits = BitBuffer_GetSize(BitB);
             uint64_t ArrayOffset     = BitBuffer_GetPosition(BitB);
             uint8_t *Array           = BitBuffer_GetArray(BitB);
-            uint64_t Bytes2Write     = Bits2Bytes(BitBuffer_GetPosition(BitB), RoundingType_Down);
+            uint64_t Bytes2Write     = Bits2Bytes(RoundingType_Down, BitBuffer_GetPosition(BitB));
             uint64_t Bits2Keep       = ArrayOffset % 8;
             uint64_t BytesWritten    = FileIO_Write(Output->File, Array, sizeof(uint8_t), Bytes2Write);
             if (BytesWritten == Bytes2Write) {
                 Array[0]             = 0;
                 Array[0]             = Array[Bytes2Write + 1] & (Exponentiate(2, Bits2Keep) << (8 - Bits2Keep));
                 BitBuffer_SetPosition(BitB, Bits2Keep + 1);
-                for (uint64_t Byte = (uint64_t) Bits2Bytes(ArrayOffset, RoundingType_Up); Byte < (uint64_t) Bits2Bytes(ArraySizeInBits, RoundingType_Down); Byte++) {
+                for (uint64_t Byte = (uint64_t) Bits2Bytes(RoundingType_Up, ArrayOffset); Byte < (uint64_t) Bits2Bytes(RoundingType_Down, ArraySizeInBits); Byte++) {
                     Array[Byte]      = 0;
                 }
             } else {

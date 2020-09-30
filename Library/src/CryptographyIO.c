@@ -199,17 +199,19 @@ extern "C" {
     static int64_t SecureRNG_BaseSeed(uint8_t NumBytes) {
         int64_t RandomValue = 0LL;
         if (NumBytes <= 8) {
-#if   (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && (((PlatformIO_TargetOS & PlatformIO_TargetOSIsBSD) == PlatformIO_TargetOSIsBSD)))
-            arc4random_buf(&RandomValue, NumBytes);
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) == PlatformIO_TargetOSIsApple)
+            FILE  *RandomFile         = FileIO_OpenUTF8(UTF8String("/dev/urandom"), FileMode_Read | FileMode_Binary);
+            size_t BytesRead          = FileIO_Read(RandomFile, &RandomValue, sizeof(RandomValue), 1);
+            FileIO_Close(RandomFile);
 #elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux)
 #include <linux/random.h>
             getrandom(&RandomValue, NumBytes, GRND_NONBLOCK);
+#elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsBSD)   == PlatformIO_TargetOSIsBSD)
+            arc4random_buf(&RandomValue, NumBytes);
+#endif
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
             BCryptGenRandom(NULL, (PUCHAR) &RandomValue, NumBytes, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
-#else
-            FILE *RandomFile          = FileIO_OpenUTF8(UTF8String("/dev/urandom"), FileMode_Read | FileMode_Binary);
-            size_t BytesRead          = FileIO_Read(RandomFile, &RandomValue, sizeof(RandomValue), 1);
-            FileIO_Close(RandomFile);
 #endif
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Can't return more than 8 bytes"));
@@ -221,16 +223,16 @@ extern "C" {
         if (Random != NULL) {
             if (Random->EntropyPool != NULL) {
 #if   (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) != PlatformIO_TargetOSIsLinux))
-                arc4random_buf(Random->EntropyPool, Bits2Bytes(Random->NumBits, RoundingType_Down));
+                arc4random_buf(Random->EntropyPool, Bits2Bytes(RoundingType_Down, Random->NumBits));
 #elif (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux))
                 FILE *RandomFile          = FileIO_OpenUTF8(UTF8String("/dev/random"), FileMode_Read | FileMode_Binary);
-                size_t BytesRead          = FileIO_Read(RandomFile, &Random->EntropyPool, Bits2Bytes(Random->NumBits, RoundingType_Down), 1);
-                if (BytesRead != Bits2Bytes(Random->NumBits, RoundingType_Down)) {
+                size_t BytesRead          = FileIO_Read(RandomFile, &Random->EntropyPool, Bits2Bytes(RoundingType_Down, Random->NumBits), 1);
+                if (BytesRead != Bits2Bytes(RoundingType_Down, Random->NumBits)) {
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
                 }
                 FileIO_Close(RandomFile);
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-                NTSTATUS Status           = BCryptGenRandom(NULL, (PUCHAR) Random->EntropyPool, (ULONG) Bits2Bytes(Random->NumBits, RoundingType_Down), (ULONG) BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+                NTSTATUS Status           = BCryptGenRandom(NULL, (PUCHAR) Random->EntropyPool, (ULONG) Bits2Bytes(RoundingType_Down, Random->NumBits), (ULONG) BCRYPT_USE_SYSTEM_PREFERRED_RNG);
                 if (Status <= 0) {
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
                     abort();
@@ -244,7 +246,7 @@ extern "C" {
 
     static void SecureRNG_Mix(SecureRNG *Random) {
         if (Random != NULL) {
-            for (uint64_t Word = 0ULL; Word < Bits2Bytes(Random->NumBits, RoundingType_Down) / 8; Word++) {
+            for (uint64_t Word = 0ULL; Word < Bits2Bytes(RoundingType_Down, Random->NumBits) / 8; Word++) {
                 uint64_t Integer  = (int64_t) Random->EntropyPool;
 
                 uint64_t Seed1    = SecureRNG_BaseSeed(8);
@@ -259,16 +261,16 @@ extern "C" {
 
 
                 uint64_t Mixed1   = Integer ^ Seed1;
-                uint64_t Rotated1 = Rotate(Mixed1, Rotate1, Rotate_Left);
+                uint64_t Rotated1 = Rotate(Rotate_Left, Rotate1, Mixed1);
 
                 uint64_t Mixed2   = Rotated1 & Seed2;
-                uint64_t Rotated2 = Rotate(Mixed2, Rotate2, Rotate_Left);
+                uint64_t Rotated2 = Rotate(Rotate_Left, Rotate2, Mixed2);
 
                 uint64_t Mixed3   = Rotated2 | Seed3;
-                uint64_t Rotated3 = Rotate(Mixed3, Rotate3, Rotate_Left);
+                uint64_t Rotated3 = Rotate(Rotate_Left, Rotate3, Mixed3);
 
                 uint64_t Mixed4   = Rotated3 | Seed4;
-                uint64_t Rotated4 = Rotate(Mixed4, Rotate4, Rotate_Left);
+                uint64_t Rotated4 = Rotate(Rotate_Left, Rotate4, Mixed4);
 
                 for (uint8_t Loop = 0; Loop < 8; Loop++) {
                     Random->EntropyPool[Word + Loop] = (Rotated4 & (0xFF << Loop)) >> Loop;
@@ -289,8 +291,8 @@ extern "C" {
                     uint8_t  BitsInCurrentByte = BitsAvailableInByte(Random->BitOffset);
                     uint8_t  Bits2Get          = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
                     uint8_t  BufferShift       = BitsInCurrentByte % 8;
-                    uint8_t  BufferMask        = (Logarithm(2, Bits2Get) - 1) << BufferShift;
-                    uint8_t  ExtractedBits     = Random->EntropyPool[Bits2Bytes(Random->BitOffset, RoundingType_Down)] & BufferMask;
+                    uint8_t  BufferMask        = (Exponentiate(2, Bits2Get) - 1) << BufferShift;
+                    uint8_t  ExtractedBits     = Random->EntropyPool[Bits2Bytes(RoundingType_Down, Random->BitOffset)] & BufferMask;
                     uint8_t  ValueShift        = NumBits - Bits2Read;
                     Bits                     <<= ValueShift;
                     Bits                      |= ExtractedBits;
@@ -359,11 +361,11 @@ extern "C" {
     int64_t SecureRNG_GenerateIntegerInRange(SecureRNG *Random, int64_t MinValue, int64_t MaxValue) {
         int64_t RandomInteger                     = 0ULL;
         if (Random != NULL && MinValue <= MaxValue) {
-            uint8_t Bits2Read                     = (uint8_t) Logarithm(2, Minimum(MinValue, MaxValue) - Maximum(MinValue, MaxValue));
+            uint8_t Bits2Read                     = (uint8_t) Exponentiate(2, Minimum(MinValue, MaxValue) - Maximum(MinValue, MaxValue));
             RandomInteger                         = SecureRNG_ExtractBits(Random, Bits2Read);
 
             if (RandomInteger < MinValue || RandomInteger > MaxValue) {
-                uint8_t NumFixBits                = (uint8_t) Logarithm(2, Maximum(RandomInteger, MaxValue) - Minimum(RandomInteger, MaxValue) + Bits2Read);
+                uint8_t NumFixBits                = (uint8_t) Exponentiate(2, Maximum(RandomInteger, MaxValue) - Minimum(RandomInteger, MaxValue) + Bits2Read);
                 NumFixBits                        = RoundD(NumFixBits / 2);
                 uint64_t FixBits                  = SecureRNG_ExtractBits(Random, NumFixBits);
                 if (RandomInteger < MinValue) {
@@ -399,7 +401,7 @@ extern "C" {
     uint8_t SecureRNG_Erase(SecureRNG *Random, uint8_t NewValue) {
         uint8_t Verification = 0xFE;
         if (Random != NULL) {
-            for (uint64_t Byte = 0ULL; Byte < Bits2Bytes(Random->NumBits, RoundingType_Down); Byte++) {
+            for (uint64_t Byte = 0ULL; Byte < Bits2Bytes(RoundingType_Down, Random->NumBits); Byte++) {
                 Random->EntropyPool[Byte] = NewValue;
             }
             Random->BitOffset             = NewValue;
@@ -491,25 +493,25 @@ extern "C" {
     
     static void MD5_A(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += ((B & C) | (~B & D)) + X + AC;
-        A  = (uint32_t) Rotate(A, Shift, Rotate_Left);
+        A  = (uint32_t) Rotate(Rotate_Left, Shift, A);
         A += B;
     }
     
     static void MD5_B(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += ((B & D) | (C & ~D)) + X + AC;
-        A  = (uint32_t) Rotate(A, Shift, Rotate_Left);
+        A  = (uint32_t) Rotate(Rotate_Left, Shift, A);
         A += B;
     }
     
     static void MD5_C(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += (B ^ C ^ D) + X + AC;
-        A  = (uint32_t) Rotate(A, Shift, Rotate_Left);
+        A  = (uint32_t) Rotate(Rotate_Left, Shift, A);
         A += B;
     }
     
     static void MD5_D(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += (C ^ (B | ~D)) + X + AC;
-        A  = (uint32_t) Rotate(A, Shift, Rotate_Left);
+        A  = (uint32_t) Rotate(Rotate_Left, Shift, A);
         A += B;
     }
     
