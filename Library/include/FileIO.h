@@ -48,13 +48,13 @@ extern "C" {
         constexpr inline FileIO_FileModes operator |= (FileIO_FileModes A, FileIO_FileModes B) {
             uint8_t A1 = static_cast<uint8_t>(A);
             uint8_t B1 = static_cast<uint8_t>(B);
-            return static_cast<FileIO_FileModes>(A1 |= B1);
+            return static_cast<FileIO_FileModes>(A1 | B1);
         }
 
         constexpr inline FileIO_FileModes operator &= (FileIO_FileModes A, FileIO_FileModes B) {
             uint8_t A1 = static_cast<uint8_t>(A);
             uint8_t B1 = static_cast<uint8_t>(B);
-            return static_cast<FileIO_FileModes>(A1 &= B1);
+            return static_cast<FileIO_FileModes>(A1 & B1);
         }
     }
 #endif /* PlatformIO_Language */
