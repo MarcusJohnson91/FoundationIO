@@ -473,18 +473,11 @@ extern "C" {
     
     /*!
      @abstract                                    Computes the number of bytes from the number of bits.
-     @param      Bits                             The bits to convert to bytes.
      @param      RoundingType                     The type of rounding to do.
+     @param      Bits                             The bits to convert to bytes.
      @return                                      Returns the number of bytes.
      */
-    uint64_t     Bits2Bytes(const uint64_t Bits, const MathIO_RoundingTypes RoundingType);
-    
-    /*!
-     @abstract                                    Swaps bits so the the MSB becoems the LSB, and vice versa.
-     @param      Byte                             The byte to swap the bits in.
-     @return                                      Returns the swapped byte.
-     */
-    uint8_t      SwapBits(const uint8_t Byte);
+    uint64_t     Bits2Bytes(const MathIO_RoundingTypes RoundingType, const uint64_t Bits);
     
     /*!
      @abstract                                    Calculates the number of bits of slack mod 8.
@@ -532,12 +525,12 @@ extern "C" {
     
     /*!
      @abstract                                    Rotates Value by Bits2Rotate.
-     @param      Value                            The value to rotate.
-     @param      Bits2Rotate                      The number of bits to rotate.
      @param      Rotate                           The direction to rotate.
+     @param      NumBits2Rotate                   The number of bits to rotate.
+     @param      Value                            The value to rotate.
      @return                                      Returns the rotated value.
      */
-    uint64_t     Rotate(const uint64_t Value, const uint8_t Bits2Rotate, const MathIO_RotationType Rotate);
+    int64_t      Rotate(const MathIO_RotationType Rotate, const uint8_t NumBits2Rotate, const int64_t Value);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

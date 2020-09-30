@@ -364,15 +364,11 @@ extern "C" {
     }
     
     int64_t Exponentiate(const uint64_t Base, const int64_t Exponent) {
-        int64_t Value      = Base;
-        int64_t Exponent2  = Exponent - 1;
-        if (Base > 0 && Exponent2 > 0) {
-            while (Exponent2 != 0) {
-                Exponent2 -= 1;
-                Value     *= Base;
-            }
-        } else {
-            Value          = 1;
+        int64_t Value     = Base;
+        int64_t Exponent2 = Exponent;
+        while (Exponent2 > 1) {
+            Value        *= Base;
+            Exponent2    -= 1;
         }
         return Value;
     }
@@ -414,27 +410,12 @@ extern "C" {
         return Bytes * 8;
     }
     
-    uint64_t Bits2Bytes(const uint64_t Bits, const MathIO_RoundingTypes RoundingType) {
+    uint64_t Bits2Bytes(const MathIO_RoundingTypes RoundingType, const uint64_t Bits) {
         uint64_t Bytes        = Bits / 8;
-        
-        if (Bits % 8 != 0 && RoundingType == RoundingType_Up) {
+        if (RoundingType == RoundingType_Up && Bits % 8 != 0) {
             Bytes            += 1;
         }
-        
         return Bytes;
-    }
-    
-    uint8_t SwapBits(const uint8_t Byte) {
-        return (
-                (Byte & 0x80 >> 7) |
-                (Byte & 0x40 >> 5) |
-                (Byte & 0x20 >> 3) |
-                (Byte & 0x10 >> 1) |
-                (Byte & 0x08 << 1) |
-                (Byte & 0x04 << 3) |
-                (Byte & 0x02 << 5) |
-                (Byte & 0x01 << 7)
-                );
     }
     
     uint8_t BitsAvailableInByte(const uint64_t Offset) {
@@ -468,12 +449,13 @@ extern "C" {
 #if (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
 __attribute__((no_sanitize("undefined")))
 #endif
-    uint64_t Rotate(const uint64_t Value, const uint8_t Bits2Rotate, const MathIO_RotationType Rotate) {
-        uint64_t Rotated = 0ULL;
+    int64_t Rotate(const MathIO_RotationType Rotate, const uint8_t NumBits2Rotate, const int64_t Value) {
+        int64_t Rotated = 0ULL;
         if (Rotate == Rotate_Left) {
-            Rotated      = (Value << Bits2Rotate) | (Value >> (64 - Bits2Rotate));
+            Rotated     = (Value << NumBits2Rotate) | (Value >> (64 - NumBits2Rotate));
+            Rotated     = (Value << NumBits2Rotate) | (Value >> (-NumBits2Rotate) & 63);
         } else if (Rotate == Rotate_Right) {
-            Rotated      = (Value >> Bits2Rotate) | (Value << (64 - Bits2Rotate));
+            Rotated     = (Value >> NumBits2Rotate) | (Value << (64 - NumBits2Rotate));
         }
         return Rotated;
     }
