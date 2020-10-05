@@ -3317,7 +3317,7 @@ extern "C" {
         if (String != NULL && Delimiters != NULL) {
             StringSize             = UTF32_GetStringSizeInCodePoints(String);
             NumDelimiters          = UTF32_StringSet_GetNumStrings(Delimiters);
-            uint64_t DelimitersSize[NumDelimiters];
+            uint64_t *DelimitersSize = calloc(NumDelimiters, sizeof(uint64_t));
             for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters; Delimiter++) {
                 DelimitersSize[Delimiter] = UTF32_GetStringSizeInCodePoints(Delimiters[Delimiter]);
             }
@@ -3789,7 +3789,7 @@ extern "C" {
         UTF8 *Flattened = NULL;
         if (StringSet != NULL) {
             UTF32 **StringSet32 = UTF8_StringSet_Decode(StringSet);
-            UTF32 *Flattened32  = UTF32_StringSet_Flatten(StringSet32);
+            UTF32  *Flattened32 = UTF32_StringSet_Flatten((PlatformIO_Immutable(UTF32**)) StringSet32);
             UTF32_StringSet_Deinit(StringSet32);
             Flattened           = UTF8_Encode(Flattened32);
             UTF32_Deinit(Flattened32);
@@ -3803,7 +3803,7 @@ extern "C" {
         UTF16 *Flattened        = NULL;
         if (StringSet != NULL) {
             UTF32 **StringSet32 = UTF16_StringSet_Decode(StringSet);
-            UTF32 *Flattened32  = UTF32_StringSet_Flatten(StringSet32);
+            UTF32  *Flattened32 = UTF32_StringSet_Flatten((PlatformIO_Immutable(UTF32**)) StringSet32);
             UTF32_StringSet_Deinit(StringSet32);
             Flattened           = UTF16_Encode(Flattened32);
             UTF32_Deinit(Flattened32);
@@ -3816,9 +3816,9 @@ extern "C" {
     UTF32 *UTF32_StringSet_Flatten(PlatformIO_Immutable(UTF32 **) StringSet) {
         UTF32 *Flattened = NULL;
         if (StringSet != NULL) {
-            uint64_t NumStrings          = UTF32_StringSet_GetNumStrings(StringSet);
-            uint64_t FlattenedSize       = 0;
-            uint64_t PieceSizes[NumStrings];
+            uint64_t  NumStrings         = UTF32_StringSet_GetNumStrings(StringSet);
+            uint64_t  FlattenedSize      = 0;
+            uint64_t *PieceSizes         = calloc(NumStrings, sizeof(uint64_t));
             for (uint64_t String = 0; String < NumStrings; String++) {
                 PieceSizes[String]       = UTF32_GetStringSizeInCodePoints(StringSet[String]);
                 FlattenedSize           += PieceSizes[String];
