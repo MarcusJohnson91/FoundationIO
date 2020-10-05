@@ -272,13 +272,13 @@ extern "C" {
                 StringSize[Item] = UTF32_GetStringSizeInCodePoints(Strings[Item]);
             }
             
-            uint64_t NumProgressIndicatorsPerString[NumItems2Display];
-            UTF8     ActualStrings2Print[NumItems2Display];
+            uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
+            UTF8     *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF8*));
             for (uint8_t String = 0; String < NumItems2Display; String++) {
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]);
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 uint64_t TerminalWidth       = CommandLineIO_GetTerminalWidth() / 2;
-                UTF8     Indicator[TerminalWidth + 1];
+                UTF8     *Indicator          = UTF8_Init(TerminalWidth);
                 UTF8_Set(Indicator, '-', TerminalWidth);
                 UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%U32s %llu/%llu %llu/%s%s]"), Indicator, *Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, PlatformIO_NewLine8);
                 UTF8_WriteSentence(stdout, FormattedString);
