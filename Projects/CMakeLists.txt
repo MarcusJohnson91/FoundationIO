@@ -51,21 +51,6 @@ set(FOUNDATIONIO_SOURCE
 "${FoundationIO_Library_Dir}/src/TextIO/StringIO.c"
 )
 
-if(CMAKE_HOST_UNIX)
-    add_definitions(-D_LARGEFILE_SOURCE)
-    add_definitions(-D_LARGEFILE64_SOURCE)
-    add_definitions(-D_FILE_OFFSET_BITS=64)
-    add_definitions(-D__USE_TIME_BITS64=1)
-    add_definitions(-D_POSIX_C_SOURCE=200809L)
-    add_definitions(-D__STDC_WANT_LIB_EXT1__)
-elseif(CMAKE_HOST_WIN32)
-    add_definitions(-DUNICODE)
-    add_definitions(-D_UNICODE)
-    add_definitions(-D_ATL_ALLOW_CHAR_UNSIGNED)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-    add_definitions(-D__STDC_WANT_LIB_EXT1__)
-endif(CMAKE_HOST_UNIX)
-
 if(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
     message("We're checking if TextTables.h should be updated, it could take a few seconds or about 12 minutes.")
     execute_process(
