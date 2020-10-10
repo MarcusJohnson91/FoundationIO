@@ -737,89 +737,89 @@ extern "C" {
     /*!
      @abstract                                           Converts a string to an integer; replaces atoi, atol, strtol, strtoul.
      @remark                                             If the number can be negatiev, check for a minus before extracting the digits as a substring.
-     @param      String                                  The string to extract a number from.
      @param      Base                                    The base to output the integer in.
+     @param      String                                  The string to extract a number from.
      */
-    int64_t      UTF8_String2Integer(PlatformIO_Immutable(UTF8 *) String, TextIO_Bases Base);
+    int64_t      UTF8_String2Integer(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                                           Converts a string to an integer; replaces atoi, atol, strtol, strtoul.
      @remark                                             If the number can be negatiev, check for a minus before extracting the digits as a substring.
-     @param      String                                  The string to extract a number from.
      @param      Base                                    The base to output the integer in.
+     @param      String                                  The string to extract a number from.
      */
-    int64_t      UTF16_String2Integer(PlatformIO_Immutable(UTF16 *) String, TextIO_Bases Base);
+    int64_t      UTF16_String2Integer(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                                           Converts a string to an integer; replaces atoi, atol, strtol, strtoul.
      @remark                                             If the number can be negatiev, check for a minus before extracting the digits as a substring.
+     @param      Base                                    The base to output the integer in.
      @param      String                                  The string to extract a number from.
-     @param      Base                                    The base to output the integer in.
      */
-    int64_t      UTF32_String2Integer(PlatformIO_Immutable(UTF32 *) String, TextIO_Bases Base);
+    int64_t      UTF32_String2Integer(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                                           Converts an integer to a string; replaces itoa.
-     @param      Integer2Convert                         The number to convert into a string.
      @param      Base                                    The base to output the integer in.
+     @param      Integer2Convert                         The number to convert into a string.
      */
-    UTF8        *UTF8_Integer2String(int64_t Integer2Convert, TextIO_Bases Base);
+    UTF8        *UTF8_Integer2String(TextIO_Bases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                                           Converts an integer to a string; replaces itoa.
-     @param      Integer2Convert                         The number to convert into a string.
      @param      Base                                    The base to output the integer in.
+     @param      Integer2Convert                         The number to convert into a string.
      */
-    UTF16       *UTF16_Integer2String(int64_t Integer2Convert, TextIO_Bases Base);
+    UTF16       *UTF16_Integer2String(TextIO_Bases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                                           Converts an integer to a string; replaces itoa.
-     @param      Integer2Convert                         The number to convert into a string.
      @param      Base                                    The base to output the integer in.
+     @param      Integer2Convert                         The number to convert into a string.
      */
-    UTF32       *UTF32_Integer2String(int64_t Integer2Convert, TextIO_Bases Base);
+    UTF32       *UTF32_Integer2String(TextIO_Bases Base, int64_t Integer2Convert);
     
     /*!
      @abstract                                           Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l.
-     @param      String                                  The string composed of a decimal number to convert to a decimal.
      @param      Base                                    The radix to convert the Decimal into.
+     @param      String                                  The string composed of a decimal number to convert to a decimal.
      */
-    double       UTF8_String2Decimal(PlatformIO_Immutable(UTF8 *) String, TextIO_Bases Base);
+    double       UTF8_String2Decimal(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                                           Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l.
-     @param      String                                  The string composed of a decimal number to convert to a decimal.
      @param      Base                                    The radix to convert the Decimal into.
+     @param      String                                  The string composed of a decimal number to convert to a decimal.
      */
-    double       UTF16_String2Decimal(PlatformIO_Immutable(UTF16 *) String, TextIO_Bases Base);
+    double       UTF16_String2Decimal(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                                           Converts a string to a double; replaces strtod, strtof, strold, atof, and atof_l.
-     @param      String                                  The string composed of a decimal number to convert to a decimal.
      @param      Base                                    The radix to convert the Decimal into.
+     @param      String                                  The string composed of a decimal number to convert to a decimal.
      */
-    double       UTF32_String2Decimal(PlatformIO_Immutable(UTF32 *) String, TextIO_Bases Base);
+    double       UTF32_String2Decimal(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                                           Converts a double to a string; replaces dtostr.
-     @param      Decimal                                 The decimal number to convert to a string.
      @param      Base                                    The radix to convert the Decimal into.
+     @param      Decimal                                 The decimal number to convert to a string.
      */
-    UTF8        *UTF8_Decimal2String(double Decimal, TextIO_Bases Base);
+    UTF8        *UTF8_Decimal2String(TextIO_Bases Base, double Decimal);
     
     /*!
-     @abstract                                           Converts a double to a string; replaces ftoa.
-     @param      Decimal                                 The decimal number to convert to a string.
+     @abstract                                           Converts a double to a string; replaces dtostr.
      @param      Base                                    The radix to convert the Decimal into.
+     @param      Decimal                                 The decimal number to convert to a string.
      */
-    UTF16       *UTF16_Decimal2String(double Decimal, TextIO_Bases Base);
+    UTF16       *UTF16_Decimal2String(TextIO_Bases Base, double Decimal);
     
     /*!
-     @abstract                                           Converts a double to a string; replaces ftoa.
-     @param      Decimal                                 The decimal number to convert to a string.
+     @abstract                                           Converts a double to a string; replaces dtostr.
      @param      Base                                    The radix to convert the Decimal into.
+     @param      Decimal                                 The decimal number to convert to a string.
      */
-    UTF32       *UTF32_Decimal2String(double Decimal, TextIO_Bases Base);
+    UTF32       *UTF32_Decimal2String(TextIO_Bases Base, double Decimal);
     
     /*!
      @abstract                                           Removes substrings (including single CodePoints) from a string.
@@ -1076,11 +1076,11 @@ extern "C" {
     
     /*!
      @abstract                                           Counts the number of Digits in String starting at Offset (inclusive).
-     @param      String                                  The string to check.
      @param      Base                                    The base the string is in.
+     @param      String                                  The string to check.
      @return                                             Returns the number of format specifiers found.
      */
-    uint64_t     UTF32_GetNumDigits(PlatformIO_Immutable(UTF32 *) String, TextIO_Bases Base);
+    uint64_t     UTF32_GetNumDigits(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                                           Gets a substring from Offset to where Format and Formatted start matching.

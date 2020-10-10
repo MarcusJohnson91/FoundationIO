@@ -239,51 +239,51 @@ extern "C" {
     
     /*!
      @abstract                                      Creates a string containing just digits of Base from String.
+     @param                     Base                What base is the Integer in?
      @param                     String              The string to Delocalize.
-     @param                     Base                What base is the integer in?
      @return                                        Returns the delocalized string.
      */
-    UTF8                       *UTF8_DelocalizeInteger(PlatformIO_Immutable(UTF8 *) String, TextIO_Bases Base);
+    UTF8                       *UTF8_DelocalizeInteger(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                                      Creates a string containing just digits of Base from String.
+     @param                     Base                What base is the Integer in?
      @param                     String              The string to Delocalize.
-     @param                     Base                What base is the integer in?
      @return                                        Returns the delocalized string.
      */
-    UTF16                      *UTF16_DelocalizeInteger(PlatformIO_Immutable(UTF16 *) String, TextIO_Bases Base);
+    UTF16                      *UTF16_DelocalizeInteger(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                                      Creates a string containing just digits of Base from String.
+     @param                     Base                What base is the Integer in?
      @param                     String              The string to Delocalize.
-     @param                     Base                What base is the integer in?
      @return                                        Returns the delocalized string.
      */
-    UTF32                      *UTF32_DelocalizeInteger(PlatformIO_Immutable(UTF32 *) String, TextIO_Bases Base);
+    UTF32                      *UTF32_DelocalizeInteger(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String);
     
     /*!
      @abstract                                      Creates a string containing just digits of Base from String.
-     @param                     String              The string to Delocalize.
      @param                     Base                What base is the Decimal in?
+     @param                     String              The string to Delocalize.
      @return                                        Returns the delocalized string.
      */
-    UTF8                       *UTF8_DelocalizeDecimal(PlatformIO_Immutable(UTF8 *) String, TextIO_Bases Base);
+    UTF8                       *UTF8_DelocalizeDecimal(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String);
     
     /*!
      @abstract                                      Creates a string containing just digits of Base from String.
-     @param                     String              The string to Delocalize.
      @param                     Base                What base is the Decimal in?
+     @param                     String              The string to Delocalize.
      @return                                        Returns the delocalized string.
      */
-    UTF16                      *UTF16_DelocalizeDecimal(PlatformIO_Immutable(UTF16 *) String, TextIO_Bases Base);
+    UTF16                      *UTF16_DelocalizeDecimal(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String);
     
     /*!
      @abstract                                      Creates a string containing just digits of Base from String.
-     @param                     String              The string to Delocalize.
      @param                     Base                What base is the Decimal in?
+     @param                     String              The string to Delocalize.
      @return                                        Returns the delocalized string.
      */
-    UTF32                      *UTF32_DelocalizeDecimal(PlatformIO_Immutable(UTF32 *) String, TextIO_Bases Base);
+    UTF32                      *UTF32_DelocalizeDecimal(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
