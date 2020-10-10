@@ -745,8 +745,8 @@ extern "C" {
                                     }
                                     PotentialDigitLocation         += 1;
                                     uint64_t NumPossibleCodePoints  = CodePoint - PotentialDigitLocation;
-                                    uint8_t  NumDigits2Read         = UTF32_GetNumDigits(&Format[CodePoint], Base_Integer | Base_Radix10);
-                                    uint64_t Value                  = UTF32_String2Integer(&Format[CodePoint - NumDigits2Read], Base_Integer | Base_Radix10);
+                                    uint8_t  NumDigits2Read         = UTF32_GetNumDigits(Base_Integer | Base_Radix10, &Format[CodePoint]);
+                                    uint64_t Value                  = UTF32_String2Integer(Base_Integer | Base_Radix10, &Format[CodePoint - NumDigits2Read]);
                                 }
                             }
                             break;
@@ -780,20 +780,20 @@ extern "C" {
                             if (CodePoint - 1 >= Specifiers->Specifiers[Specifier].Start && CodePoint - 1 <= Specifiers->Specifiers[Specifier].End) {
                                 if (Format[CodePoint - 1] == U'.') {
                                     Specifiers->Specifiers[Specifier].PrecisionFlag = Precision_Inline_Digits;
-                                    Specifiers->Specifiers[Specifier].Precision     = (uint64_t) UTF32_String2Integer(&Format[CodePoint - NumDigits], Base_Integer | Base_Radix10);
+                                    Specifiers->Specifiers[Specifier].Precision     = (uint64_t) UTF32_String2Integer(Base_Integer | Base_Radix10, &Format[CodePoint - NumDigits]);
                                 } else if (Format[CodePoint + NumDigits + 1] >= U'0' && Format[CodePoint] <= U'9') {
                                     Specifiers->Specifiers[Specifier].PrecisionFlag = Precision_Inline_Digits;
                                 } else {
                                     Specifiers->Specifiers[Specifier].MinWidthFlag  = MinWidth_Inline_Digits;
-                                    Specifiers->Specifiers[Specifier].MinWidth      = (uint64_t) UTF32_String2Integer(&Format[CodePoint - NumDigits], Base_Integer | Base_Radix10);
+                                    Specifiers->Specifiers[Specifier].MinWidth      = (uint64_t) UTF32_String2Integer(Base_Integer | Base_Radix10, &Format[CodePoint - NumDigits]);
                                 }
                             } else if (CodePoint + NumDigits + 1 >= Specifiers->Specifiers[Specifier].Start && CodePoint + NumDigits + 1 <= Specifiers->Specifiers[Specifier].End) {
                                 if (Format[CodePoint + NumDigits + 1] == U'$') {
                                     Specifiers->Specifiers[Specifier].PositionFlag  = Position_Inline_Digits;
-                                    Specifiers->Specifiers[Specifier].Position      = (uint64_t) UTF32_String2Integer(&Format[CodePoint - NumDigits], Base_Integer | Base_Radix10);
+                                    Specifiers->Specifiers[Specifier].Position      = (uint64_t) UTF32_String2Integer(Base_Integer | Base_Radix10, &Format[CodePoint - NumDigits]);
                                 } else {
                                     Specifiers->Specifiers[Specifier].MinWidthFlag  = MinWidth_Inline_Digits;
-                                    Specifiers->Specifiers[Specifier].MinWidth      = (uint64_t) UTF32_String2Integer(&Format[CodePoint - NumDigits], Base_Integer | Base_Radix10);
+                                    Specifiers->Specifiers[Specifier].MinWidth      = (uint64_t) UTF32_String2Integer(Base_Integer | Base_Radix10, &Format[CodePoint - NumDigits]);
                                 }
                             }
                             break;
@@ -874,45 +874,45 @@ extern "C" {
                     if ((ModifierType & ModifierType_Unsigned) == ModifierType_Unsigned) {
                         if ((LengthType & ModifierLength_8Bit) == ModifierLength_8Bit) {
                             uint8_t   Arg                                  = (uint8_t) va_arg(Arguments, uint32_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Arg, Base);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((LengthType & ModifierLength_16Bit) == ModifierLength_16Bit) {
                             uint16_t  Arg                                  = (uint16_t) va_arg(Arguments, uint32_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Arg, Base);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((LengthType & ModifierLength_32Bit) == ModifierLength_32Bit) {
                             uint32_t  Arg                                  = va_arg(Arguments, uint32_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Arg, Base);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((LengthType & ModifierLength_64Bit) == ModifierLength_64Bit) {
                             uint64_t  Arg                                  = va_arg(Arguments, uint64_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Arg, Base);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else {
                             uint32_t  Arg                                  = va_arg(Arguments, uint32_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Arg, Base);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         }
                     } else if ((ModifierType & ModifierType_Signed) == ModifierType_Signed) {
                         if ((LengthType & ModifierLength_8Bit) == ModifierLength_8Bit) {
                             int8_t    Arg                                  = (int8_t) va_arg(Arguments, int32_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Arg, Base);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((LengthType & ModifierLength_16Bit) == ModifierLength_16Bit) {
                             int16_t   Arg                                  = (int16_t) va_arg(Arguments, int32_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Arg, Base);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((LengthType & ModifierLength_32Bit) == ModifierLength_32Bit) {
                             int32_t   Arg                                  = va_arg(Arguments, int32_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Arg, Base);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else if ((LengthType & ModifierLength_64Bit) == ModifierLength_64Bit) {
                             int64_t   Arg                                  = va_arg(Arguments, int64_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Arg, Base);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         } else {
                             int32_t   Arg                                  = va_arg(Arguments, int32_t);
-                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Arg, Base);
+                            Specifiers->Specifiers[Position].Argument      = UTF32_Integer2String(Base, Arg);
                         }
                     }
                 } else if ((BaseType & BaseType_Decimal) == BaseType_Decimal) {
                     if ((LengthType & ModifierLength_32Bit) == ModifierLength_32Bit) {
                         float    Arg                                       = (float) va_arg(Arguments, double);
-                        Specifiers->Specifiers[Position].Argument          = UTF32_Decimal2String(Arg, Base);
+                        Specifiers->Specifiers[Position].Argument          = UTF32_Decimal2String(Base, Arg);
                     } else if ((LengthType & ModifierLength_64Bit) == ModifierLength_64Bit) {
                         double   Arg                                       = va_arg(Arguments, double);
-                        Specifiers->Specifiers[Position].Argument          = UTF32_Decimal2String(Arg, Base);
+                        Specifiers->Specifiers[Position].Argument          = UTF32_Decimal2String(Base, Arg);
                     }
                 } else if ((BaseType & BaseType_CodeUnit) == BaseType_CodeUnit) {
                     if ((ModifierType & ModifierType_UTF8) == ModifierType_UTF8) {
@@ -1170,7 +1170,7 @@ extern "C" {
                 if ((BaseType & BaseType_Integer) == BaseType_Integer || (BaseType & BaseType_Decimal) == BaseType_Decimal || (BaseType & BaseType_Pointer) == BaseType_Pointer) {
                     TextIO_Bases       Base            = ConvertModifierType2Base(&Specifiers->Specifiers[Specifier]);
                     PlatformIO_Immutable(UTF32*) Formatted2 = &Formatted[Start];
-                    uint64_t           SubStringLength = UTF32_GetNumDigits(Formatted2, Base);
+                    uint64_t           SubStringLength = UTF32_GetNumDigits(Base, Formatted2);
                     Deformatted[Specifier]             = UTF32_ExtractSubString(Formatted, Start, SubStringLength);
                 } else if ((BaseType & BaseType_CodeUnit) == BaseType_CodeUnit) {
                     Deformatted[Specifier]             = UTF32_CodeUnit2String(Formatted[Start]);

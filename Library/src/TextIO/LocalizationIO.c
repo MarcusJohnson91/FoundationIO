@@ -294,11 +294,11 @@ extern "C" {
         return CurrencySymbol;
     }
     
-    UTF8 *UTF8_DelocalizeInteger(PlatformIO_Immutable(UTF8 *) String, TextIO_Bases Base) {
+    UTF8 *UTF8_DelocalizeInteger(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String) {
         UTF8 *Delocalized = NULL;
         if (String != NULL) {
             UTF32 *String32      = UTF8_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(String32, Base);
+            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(Base, String32);
             free(String32);
             Delocalized          = UTF8_Encode(Delocalized32);
             free(Delocalized32);
@@ -308,11 +308,11 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF16 *UTF16_DelocalizeInteger(PlatformIO_Immutable(UTF16 *) String, TextIO_Bases Base) {
+    UTF16 *UTF16_DelocalizeInteger(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String) {
         UTF16 *Delocalized = NULL;
         if (String != NULL) {
             UTF32 *String32      = UTF16_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(String32, Base);
+            UTF32 *Delocalized32 = UTF32_DelocalizeInteger(Base, String32);
             free(String32);
             Delocalized          = UTF16_Encode(Delocalized32);
             free(Delocalized32);
@@ -322,12 +322,12 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF32 *UTF32_DelocalizeInteger(PlatformIO_Immutable(UTF32 *) String, TextIO_Bases Base) {
+    UTF32 *UTF32_DelocalizeInteger(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String) {
         UTF32 *Delocalized       = NULL;
         if (String != NULL) {
             uint64_t OGCodePoint = 0ULL;
             uint64_t DeCodePoint = 0ULL;
-            uint64_t NumDigits   = UTF32_GetNumDigits(String, Base);
+            uint64_t NumDigits   = UTF32_GetNumDigits(Base, String);
             Delocalized          = UTF32_Init(NumDigits);
             if (Delocalized != NULL) {
                 if ((Base & Base_Integer) == Base_Integer) {
@@ -402,11 +402,11 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF8 *UTF8_DelocalizeDecimal(PlatformIO_Immutable(UTF8 *) String, TextIO_Bases Base) {
+    UTF8 *UTF8_DelocalizeDecimal(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String) {
         UTF8 *Delocalized = NULL;
         if (String != NULL) {
             UTF32 *String32      = UTF8_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(String32, Base);
+            UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(Base, String32);
             free(String32);
             Delocalized          = UTF8_Encode(Delocalized32);
             free(Delocalized32);
@@ -416,11 +416,11 @@ extern "C" {
         return Delocalized;
     }
     
-    UTF16 *UTF16_DelocalizeDecimal(PlatformIO_Immutable(UTF16 *) String, TextIO_Bases Base) {
+    UTF16 *UTF16_DelocalizeDecimal(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String) {
         UTF16 *Delocalized = NULL;
         if (String != NULL) {
             UTF32 *String32      = UTF16_Decode(String);
-            UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(String32, Base);
+            UTF32 *Delocalized32 = UTF32_DelocalizeDecimal(Base, String32);
             free(String32);
             Delocalized          = UTF16_Encode(Delocalized32);
             free(Delocalized32);
@@ -447,12 +447,12 @@ extern "C" {
         return DiscoveredSeperator;
     }
     
-    UTF32 *UTF32_DelocalizeDecimal(PlatformIO_Immutable(UTF32 *) String, TextIO_Bases Base) {
+    UTF32 *UTF32_DelocalizeDecimal(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String) {
         UTF32 *Delocalized       = NULL;
         if (String != NULL) {
             uint64_t OGCodePoint = 0ULL;
             uint64_t DeCodePoint = 0ULL;
-            uint64_t NumDigits   = UTF32_GetNumDigits(String, Base);
+            uint64_t NumDigits   = UTF32_GetNumDigits(Base, String);
             Delocalized          = UTF32_Init(NumDigits);
             UTF32    Seperator   = UTF32_DiscoverDecimalSeperator(String);
             if (Delocalized != NULL) {
