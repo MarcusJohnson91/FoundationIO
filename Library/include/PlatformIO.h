@@ -499,7 +499,7 @@ extern "C" {
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
 #endif /* PlatformIO_TargetOSIsPOSIX */
 
-#if  (PlatformIO_TargetOS == Windows)
+#if  (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #include <Windows.h>    /* Included for Shared Library support, WinCon, QueryPerformanceCounter, etc */
 #include <WinSock2.h>   /* Windows.h MUST be included before WinSock2 */
 #endif
