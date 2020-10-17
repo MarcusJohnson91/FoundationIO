@@ -196,6 +196,10 @@ extern "C" {
         int64_t Max3    = Integer1 ^ (Max1 & Max2);
         return Max3;
     }
+
+    int64_t Subtract(const int64_t Integer1, const int64_t Integer2) {
+        return Maximum(Integer1, Integer2) - Minimum(Integer1, Integer2);
+    }
     
     bool DecimalIsNormalF(const float Decimal) {
         bool    IsNormal = No;
