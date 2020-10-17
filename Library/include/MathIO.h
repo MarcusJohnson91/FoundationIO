@@ -217,7 +217,7 @@ extern "C" {
     
     /*!
      @abstract                                    Branchless and shiftless Min function.
-     @inspired                                    Inspired by public domain Bit Twiddling Hacks.
+     @remark                                      Inspired by public domain Bit Twiddling Hacks.
      @param      Integer1                         The first integer to compare.
      @param      Integer2                         The second integer to compare.
      @return                                      Returns the smaller value.
@@ -226,12 +226,21 @@ extern "C" {
     
     /*!
      @abstract                                    Branchless and shiftless Max function.
-     @inspired                                    Inspired by public domain Bit Twiddling Hacks.
+     @remark                                      Inspired by public domain Bit Twiddling Hacks.
      @param      Integer1                         The first integer to compare.
      @param      Integer2                         The second integer to compare.
      @return                                      Returns the larger value.
      */
     int64_t      Maximum(const int64_t Integer1, const int64_t Integer2);
+
+    /*!
+     @abstract                                    Subtracts the minimum value from the maximum value.
+     @remark                                      To help prevent under/over flows
+     @param      Integer1                         The first integer to compare.
+     @param      Integer2                         The second integer to compare.
+     @return                                      Returns the larger value.
+     */
+    int64_t      Subtract(const int64_t Integer1, const int64_t Integer2);
     
     /*!
      @abstract                                    Is the decimal normal?

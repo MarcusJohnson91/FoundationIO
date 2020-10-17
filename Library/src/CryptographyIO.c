@@ -361,11 +361,11 @@ extern "C" {
     int64_t SecureRNG_GenerateIntegerInRange(SecureRNG *Random, int64_t MinValue, int64_t MaxValue) {
         int64_t RandomInteger                     = 0ULL;
         if (Random != NULL && MinValue <= MaxValue) {
-            uint8_t Bits2Read                     = (uint8_t) Exponentiate(2, Minimum(MinValue, MaxValue) - Maximum(MinValue, MaxValue));
+            uint8_t Bits2Read                     = (uint8_t) Exponentiate(2, Subtract(MinValue, MaxValue));
             RandomInteger                         = SecureRNG_ExtractBits(Random, Bits2Read);
 
             if (RandomInteger < MinValue || RandomInteger > MaxValue) {
-                uint8_t NumFixBits                = (uint8_t) Exponentiate(2, Maximum(RandomInteger, MaxValue) - Minimum(RandomInteger, MaxValue) + Bits2Read);
+                uint8_t NumFixBits                = (uint8_t) Exponentiate(2, Subtract(RandomInteger, MaxValue) + Bits2Read);
                 NumFixBits                        = RoundD(NumFixBits / 2);
                 uint64_t FixBits                  = SecureRNG_ExtractBits(Random, NumFixBits);
                 if (RandomInteger < MinValue) {
