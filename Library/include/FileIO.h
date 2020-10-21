@@ -72,6 +72,30 @@ extern "C" {
     } FileIO_SeekTypes;
 
     /*!
+     @enum        FileIO_PathTypes
+     @constant    PathType_Unknown                      Invalid PathType.
+     @constant    PathType_File                         The PathType is a File.
+     @constant    PathType_Directory                    The PathType is a Folder, it can contain other files.
+     @constant    PathType_Link_Soft                    The PathType is a Softlink/Symbolic Link; It points to another file.
+     @constant    PathType_Link_Hard                    The PathType is a Hardlink; Multiple files can point to it.
+     @constant    PathType_Socket                       The PathType is a Socket; for network access.
+     @constant    PathType_Special_Char                 The PathType is a Character Block Device, Hardware represented as a file.
+     @constant    PathType_Special_IPCPipe              The PathType is a IPC Block Device; used fr Inter-Process Communication.
+     @constant    PathType_Special_Block                The PathType is a Block Device.
+     */
+    typedef enum FileIO_PathTypes {
+                  PathType_Unknown                      = 0,
+                  PathType_File                         = 1,
+                  PathType_Directory                    = 2,
+                  PathType_Link_Soft                    = 4,
+                  PathType_Link_Hard                    = 8,
+                  PathType_Socket                       = 16,
+                  PathType_Special_Char                 = 32,
+                  PathType_Special_IPCPipe              = 64,
+                  PathType_Special_Block                = 128,
+    } FileIO_PathTypes;
+
+    /*!
      @typedef           BitBuffer
      @abstract                                          Forward declaration of BufferIO's BitBuffer.
      */
@@ -196,6 +220,38 @@ extern "C" {
     void                FileOutput_WriteBitBuffer(FileOutput *Output, BitBuffer *BitB);
     /* BitBuffer */
 
+    /* Path Operations */
+    /*!
+     @abstract                                          Returns just the filename portion of a path string
+     @remark                                            Equilivent to `basename` command,
+     @remark                                            On Windows checks '/' and '\' as directory seperators, on POSIX checks '\'
+     @param             Path8                           Path is a UTF8 encoded string.
+     */
+    UTF8               *FileIO_UTF8_GetFileName(PlatformIO_Immutable(UTF8 *) Path8);
+
+    /*!
+     @abstract                                          Returns just the filename portion of a path string
+     @remark                                            Equilivent to `basename` command
+     @remark                                            On Windows checks '/' and '\' as directory seperators, on POSIX checks '\'
+     @param             Path16                          Path is a UTF16 encoded string.
+     */
+    UTF16              *FileIO_UTF16_GetFileName(PlatformIO_Immutable(UTF16 *) Path16);
+
+    /*!
+     @abstract                                         Returns the extension from a filename
+     @param             Path8                          Path is a UTF8 encoded string
+     */
+    UTF8               *FileIO_UTF8_GetFileExtension(PlatformIO_Immutable(UTF8 *) Path8);
+
+    /*!
+     @abstract                                         Returns the extension from a filename
+     @param             Path16                         Path is a UTF16 encoded string
+     */
+    UTF16              *FileIO_UTF16_GetFileExtension(PlatformIO_Immutable(UTF16 *) Path16);
+
+    /* Function to return the type of a path, folder, file, soft/hard link? */
+    /* Path Operations */
+
     /* File Operations */
     /*!
      @abstract                                          Opens the file at location Path with Mode.
@@ -212,6 +268,8 @@ extern "C" {
     FILE               *FileIO_OpenUTF16(PlatformIO_Immutable(UTF16 *) Path16, FileIO_FileModes Mode);
 
     /*!
+     @abstract                                          Detects the Unicode encoding the File has been opened for
+     @param             File                            The file to check
      */
     TextIO_StringTypes  FileIO_GetFileOrientation(PlatformIO_Immutable(FILE *) File);
 
