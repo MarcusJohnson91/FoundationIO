@@ -65,7 +65,7 @@ extern "C" {
             for (uint64_t Test = 0; Test < Suite->NumTests; Test++) {
                 if (Suite->Tests[Test].TestState == TestState_Enabled) {
                     bool TestPassed                                             = Suite->Tests[Test].Function;
-                    if (TestPassed == Suite->Tests[Test].ExpectedResult) {
+                    if (TestPassed == Suite->Tests[Test].TestOutcome) {
                         Suite->NumWorkedAsExpected                             += 1;
                     } else {
                         if (Suite->NumUnexpectedFailures == Suite->UnexpectedFailureSize) {
@@ -83,7 +83,7 @@ extern "C" {
             UTF8_WriteSentence(stdout, TestsThatPerformedAsExpected);
             UTF8_WriteSentence(stdout, UnexpectedFailures);
             for (uint64_t FailedTest = 0ULL; FailedTest < Suite->NumUnexpectedFailures; FailedTest++) {
-                UTF8_WriteSentence(stdout, Suite->Tests[Suite->UnexpectedFailues[FailedTest]].FunctionName);
+                //UTF8_WriteSentence(stdout, Suite->Tests[Suite->UnexpectedFailues[FailedTest]].FunctionName);
             }
         }
     }

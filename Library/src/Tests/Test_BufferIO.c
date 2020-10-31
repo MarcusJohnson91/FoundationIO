@@ -47,13 +47,13 @@ extern "C" {
         uint8_t NearNear2 = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize2);
         uint8_t NearNear3 = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsNearest, BitOrder_LSBitIsNearest, FieldSize3);
 
-        if (NearNear1.Value == Field1 && NearNear2.Value == Field2 && NearNear3.Value == Field3) {
+        if (NearNear1 == Field1 && NearNear2 == Field2 && NearNear3 == Field3) {
             TestPassed    = Yes;
-        } else if (NearNear1.Value != Field1) {
+        } else if (NearNear1 != Field1) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NearNear1 is incorrect: %d"), NearNear1);
-        } else if (NearNear2.Value != Field2) {
+        } else if (NearNear2 != Field2) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NearNear2 is incorrect: %d"), NearNear2);
-        } else if (NearNear3.Value != Field3) {
+        } else if (NearNear3 != Field3) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NearNear3 is incorrect: %d"), NearNear3);
         }
 
@@ -136,7 +136,7 @@ extern "C" {
             .Function       = Test_ReadWriteBitsNearNear,
             .TestState      = TestState_Enabled,
             .FunctionName   = PlatformIO_FunctionName,
-            .ExpectedResult = ExpectedResult_Passed,
+            .ExpectedResult = Outcome_Passed,
         };
 
 

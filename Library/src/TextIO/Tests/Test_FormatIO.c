@@ -1,10 +1,13 @@
 #include "../../Library/include/TestIO.h"
 #include "../../Library/include/TextIO/FormatIO.h"
 #include "../../Library/include/CryptographyIO.h"
+#include "../../Library/include/TextIO/StringIO.h"
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
+
+    TestSuite FormatTests;
 
     bool Test_UTF8_Deformat(void) {
         bool TestPassed      = No;
@@ -18,7 +21,17 @@ extern "C" {
             TestPassed       = Yes;
         }
         return TestPassed;
+
+        TestCase TestCase_Deformat8 = {
+            .Function     = Test_UTF8_Deformat,
+            .TestState    = TestState_Enabled,
+            .TestOutcome  = Outcome_Passed,
+            .FunctionName = UTF8String("UTF8_Deformat"), // UTF8String("UTF8_Deformat"),
+            // Hmm, I need tthe name of the actual function called,
+        } _Refract(FormatTests->Tests, FormatTests->NumTests);
     }
+
+
 
     bool Test_UTF8_Format(void) {
         /*
@@ -226,6 +239,13 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("LongerTest Failed"));
         }
         return TestPassed;
+
+        TestCase TestCase_Format8 = {
+            .Function     = Test_UTF8_Format,
+            .TestState    = TestState_Enabled,
+            .TestOutcome  = Outcome_Passed, // TestOutcome?
+            .FunctionName = UTF8String("UTF8_Format"),
+        } _Refract(FormatTests->Tests, FormatTests->NumTests);
     }
 
     int main(const int argc, const char *argv[]) {

@@ -20,11 +20,49 @@
 extern "C" {
 #endif
 
+    typedef struct TestIO_Function {
+
+    } FunctionTest;
+
     /*
      Test Grouping:
      So, Each Module needs to be tested, BufferIO, FileIO, CommandLineIO, etc
      within each Module there needs to be tests for each data structure and function.
      within each function there neds to be an individual test case.
+
+     So, what's the Hierarchy here?
+
+     We can run very small tests, like making sure an individual function for example Minimum works.
+
+     but how do we make sure that larger structures work, like making sure a JPEG decoder works?
+
+     Bottom up testing is the approach I want to use with TestIO.
+
+     Make sure everything works individually, then increase the complexity of the system til it's at full capacity and still works together.
+
+     So, maybe we can break that into phases:
+
+     The Individual Test
+
+     The Compound Test
+
+     FunctionTest and ComponentTest could be the struct names for the subsystems?
+
+     A FunctionTest verifies the behavior of an individual function.
+
+     A ComponentTest verifies everything works together
+
+     A function test takes no arguments, they're just hard coded negative zero positive is the general pattern.
+
+     A Component Test requires some state but how do we Genericify that?
+
+     Well, we can approach it similar to MediaIO; void pointer, ElementSize, NumElements.
+
+     but that would only work for 1D arrays? how do you take the address of a 4D array?
+
+     Well, a 4D array would be an implementation detail that the component would need to create.
+
+     Also, one other thing I'd like to do is store the time it takes for the test to run so we can track that information too.
      */
     
     /*!
@@ -41,17 +79,17 @@ extern "C" {
     } TestIO_TestStates;
     
     /*!
-     @enum         TestIO_TestResults
+     @enum         TestIO_TestOutcomes
      @abstract                                    Defines the result of each test.
-     @constant     TestResult_Unspecified         Invalid state.
-     @constant     TestResult_Passed              The test is enabled.
-     @constant     TestResult_Failed              The test is disabled.
+     @constant     Outcome_Unspecified            Invalid state.
+     @constant     Outcome_Passed                 The test is enabled.
+     @constant     Outcome_Failed                 The test is disabled.
      */
-    typedef enum TestIO_ExpectedResults {
-        ExpectedResult_Unspecified     = 0,
-        ExpectedResult_Passed          = 1,
-        ExpectedResult_Failed          = 2,
-    } TestIO_TestResults;
+    typedef enum TestIO_TestOutcomes {
+                   Outcome_Unspecified     = 0,
+                   Outcome_Passed          = 1,
+                   Outcome_Failed          = 2,
+    } TestIO_TestOutcomes;
 
     /*!
      @typedef Forward declared from CryptographyIO
@@ -61,18 +99,17 @@ extern "C" {
     typedef bool (*TestIO_TestFunction)(SecureRNG *Secure);
 
     typedef struct TestCase {
-        TestIO_TestFunction         Function;
-        TestIO_TestStates           TestState;
-        TestIO_TestResults          ExpectedResult;
-        PlatformIO_Immutable(UTF8*) FunctionName;
+        TestIO_TestFunction  Function;
+        TestIO_TestStates    TestState;
+        TestIO_TestOutcomes  TestOutcome;
     } TestCase;
 
     typedef struct TestSuite {
         TestCase *Tests;
+        uint64_t *UnexpectedFailues;
         uint64_t  NumTests;
         uint64_t  NumWorkedAsExpected;
         uint64_t  NumUnexpectedFailures;
-        uint64_t *UnexpectedFailues;
         uint64_t  UnexpectedFailureSize;
     } TestSuite;
 
