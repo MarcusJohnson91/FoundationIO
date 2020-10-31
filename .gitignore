@@ -1,4 +1,4 @@
-FoundationIO_CommitID.h
+CommitID.h
 # ^ We don't want to commit this file, we just want cmake to generate it
 *.a
 *.bak

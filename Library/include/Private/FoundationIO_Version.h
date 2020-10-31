@@ -11,3 +11,4 @@
 #define FoundationIO_Version_Major 0
 #define FoundationIO_Version_Minor 9
 #define FoundationIO_Version_Patch 7
+#include "CommitID.h"
