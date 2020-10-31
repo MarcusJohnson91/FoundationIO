@@ -404,7 +404,7 @@ extern "C" {
     }
     
     uint64_t BitBuffer_ReadBits(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, uint8_t NumBits) {
-        uint64_t Extracted;
+        uint64_t Extracted = 0ULL;
         if (BitB != NULL && NumBits <= 64 && NumBits <= (BitB->NumBits - BitB->BitOffset)) {
             if (ByteOrder == ByteOrder_LSByteIsNearest) {
                 if (BitOrder == BitOrder_LSBitIsNearest) {
@@ -428,7 +428,7 @@ extern "C" {
     }
     
     uint64_t BitBuffer_ReadUnary(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, BufferIO_UnaryTypes UnaryType, BufferIO_UnaryTerminators StopBit) {
-        uint64_t Extracted;
+        uint64_t Extracted = 0ULL;
         if (UnaryType == UnaryType_Count) {
             Extracted   += 1;
         }

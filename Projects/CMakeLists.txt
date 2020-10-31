@@ -80,7 +80,7 @@ if(GIT_FOUND)
     string(TOUPPER "${GIT_COMMIT_ID_STRIPPED}" "GIT_COMMIT_ID_STRIPPED_CAPS")
 
     string(APPEND "CommitID_Header" "#pragma once\n\n#define FoundationIO_Version_CommitID " "${GIT_COMMIT_ID_STRIPPED_CAPS}")
-    file(WRITE "../Library/include/Private/FoundationIO_CommitID.h" "${CommitID_Header}")
+    file(WRITE "../Library/include/Private/CommitID.h" "${CommitID_Header}")
 
     set(FoundationIO_VERSION_STRING "")
     string(APPEND FoundationIO_VERSION_STRING "${VERSION_MAJOR}" "." "${VERSION_MINOR}" "." "${VERSION_PATCH}" ":" "${GIT_COMMIT_ID_STRIPPED_CAPS}")
@@ -182,9 +182,7 @@ ${CMAKE_C_FLAGS} \
 -Wno-pointer-sign \
 -Wno-reserved-id-macro \
 -Wno-sign-conversion \
--Wsuggest-attribute=const \
 -Wenum-conversion \
--v \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
