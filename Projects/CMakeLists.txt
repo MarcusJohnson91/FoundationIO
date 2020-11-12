@@ -1,8 +1,11 @@
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(FoundationIO LANGUAGES C)
 
 include(DetectArchitecture.cmake)
 FindTargetArchitecture(TargetArchitecture)
+
+include(GetVersion.cmake)
+GetVersionString(VERSION_STRING "../Library/include/Private")
 
 include(CTest)
 
@@ -52,42 +55,23 @@ set(FOUNDATIONIO_SOURCE
 )
 
 if(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
-    message("We're checking if TextTables.h should be updated, it could take a few seconds or about 12 minutes.")
+    message("We're checking if TextIOTables.h should be updated, it could take a few seconds or about 12 minutes.")
     execute_process(
-    COMMAND sh "${FoundationIO_Library_Dir}/include/TextIO/Private/TextTables_Create.sh" "${FoundationIO_Library_Dir}/include/TextIO/Private/TextTables.h"
+    COMMAND sh "${FoundationIO_Library_Dir}/include/TextIO/Private/TextIOTables_Create.sh" "${FoundationIO_Library_Dir}/include/TextIO/Private/TextIOTables.h"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    OUTPUT_VARIABLE TextTables_Create_Status 
+    OUTPUT_VARIABLE TextIOTables_Create_Status 
     RESULTS_VARIABLE STDOUT
     ERROR_VARIABLE STDERR
 )
 endif(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
 
-find_package(Git)
-
-if(GIT_FOUND)
-    file(READ "../Library/include/Private/FoundationIO_Version.h" FoundationIO_Version_Header)
-    string(REGEX MATCH "#define FoundationIO_Version_Major    ([0-9]+)" MAJOR ${FoundationIO_Version_Header})
-    #string(REGEX MATCH "[0-9]+" VERSION_MAJOR ${MAJOR})
-
-    string(REGEX MATCH "#define FoundationIO_Version_Minor    ([0-9]+)" MINOR ${FoundationIO_Version_Header})
-    #string(REGEX MATCH "[0-9]+" VERSION_MINOR ${MINOR})
-
-    string(REGEX MATCH "#define FoundationIO_Version_Patch    ([0-9]+)" PATCH ${FoundationIO_Version_Header})
-    #string(REGEX MATCH "[0-9]+" VERSION_PATCH ${PATCH})
-
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --verify master WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" OUTPUT_VARIABLE "GIT_COMMIT_ID" RESULTS_VARIABLE STDOUT ERROR_VARIABLE STDERR)
-    string(REGEX REPLACE "\n$" "" "GIT_COMMIT_ID_STRIPPED" "${GIT_COMMIT_ID}")
-    string(TOUPPER "${GIT_COMMIT_ID_STRIPPED}" "GIT_COMMIT_ID_STRIPPED_CAPS")
-
-    string(APPEND "CommitID_Header" "#pragma once\n\n#define FoundationIO_Version_CommitID " "${GIT_COMMIT_ID_STRIPPED_CAPS}")
-    file(WRITE "../Library/include/Private/CommitID.h" "${CommitID_Header}")
-
-    set(FoundationIO_VERSION_STRING "")
-    string(APPEND FoundationIO_VERSION_STRING "${VERSION_MAJOR}" "." "${VERSION_MINOR}" "." "${VERSION_PATCH}" ":" "${GIT_COMMIT_ID_STRIPPED_CAPS}")
-
-    set(FoundationIO_VERSION_RESOURCE "")
-    string(APPEND FoundationIO_VERSION_RESOURCE "${VERSION_MAJOR}" "," "${VERSION_MINOR}" "," "${VERSION_PATCH}" "," "${GIT_COMMIT_ID_STRIPPED_CAPS}")
-endif(GIT_FOUND)
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+set(DynlibExt dylib)
+elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+set(DynlibExt dll)
+else()
+set(DynlibExt so)
+endif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
 
 configure_file("${FoundationIO_Resource_Dir}/FoundationIO.pc.in" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Resources/FoundationIO.pc")
 

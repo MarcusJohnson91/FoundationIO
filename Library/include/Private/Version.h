@@ -1,5 +1,5 @@
 /*!
- @header          FoundationIO_Version.h
+ @header          Version.h
  @author          Marcus Johnson
  @copyright       2020+
  @version         0.9.7
@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define FoundationIO_Version_Major 0
-#define FoundationIO_Version_Minor 9
-#define FoundationIO_Version_Patch 7
+#define Version_Major 0
+#define Version_Minor 9
+#define Version_Patch 7
 #include "CommitID.h"
