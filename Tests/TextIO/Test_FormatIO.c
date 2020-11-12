@@ -26,9 +26,7 @@ extern "C" {
             .Function     = Test_UTF8_Deformat,
             .TestState    = TestState_Enabled,
             .TestOutcome  = Outcome_Passed,
-            .FunctionName = UTF8String("UTF8_Deformat"), // UTF8String("UTF8_Deformat"),
-            // Hmm, I need tthe name of the actual function called,
-        } _Refract(FormatTests->Tests, FormatTests->NumTests);
+        };
     }
 
 
@@ -244,8 +242,7 @@ extern "C" {
             .Function     = Test_UTF8_Format,
             .TestState    = TestState_Enabled,
             .TestOutcome  = Outcome_Passed, // TestOutcome?
-            .FunctionName = UTF8String("UTF8_Format"),
-        } _Refract(FormatTests->Tests, FormatTests->NumTests);
+        };
     }
 
     int main(const int argc, const char *argv[]) {

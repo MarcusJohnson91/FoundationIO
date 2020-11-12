@@ -4,13 +4,13 @@
 #include "../include/TextIO/StringIO.h" /* Included for UTFX_Init functions */
 #include "../include/TextIO/FormatIO.h" /* Included for UTF8_Format */
 
-#if   (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) != PlatformIO_TargetOSIsApple))
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) == PlatformIO_TargetOSIsApple)
 #include <time.h>                       /* Included for timespec_get */
-#elif (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) == PlatformIO_TargetOSIsApple))
 #include <mach/mach_time.h>             /* Included for mach_continuous_time */
+#elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#include <time.h>                       /* Included for timespec_get */
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-#include <Windows.h>
-#include <WinBase.h>                    /* Included for QueryPerformanceCounter, Windows.h MUST be included first */
+#include <WinBase.h>                    /* Included for QueryPerformanceCounter */
 #endif
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
@@ -90,13 +90,13 @@ extern "C" {
 
     uint64_t GetTimerFrequency(void) {
         uint64_t TimerFrequency = 0LL;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) == PlatformIO_TargetOSIsApple)
         struct timespec Resolution;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux)
         clock_getres(CLOCK_MONOTONIC, &Resolution);
-#else
-        clock_getres(CLOCK_REALTIME, &Resolution);
-#endif /* PlatformIO_TargetOSIsLinux */
+        TimerFrequency = Resolution.tv_nsec;
+#elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+        struct timespec Resolution;
+        clock_getres(CLOCK_MONOTONIC, &Resolution);
         TimerFrequency = Resolution.tv_nsec;
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
         LARGE_INTEGER WinFrequency;
@@ -104,7 +104,7 @@ extern "C" {
         if (Success) {
             TimerFrequency = WinFrequency.QuadPart;
         }
-#endif /* PlatformIO_TargetOS */
+#endif
         return TimerFrequency;
     }
 

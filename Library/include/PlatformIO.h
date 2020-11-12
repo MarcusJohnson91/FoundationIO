@@ -497,12 +497,9 @@ extern "C" {
 #include <dlfcn.h>      /* Included for shared library support */
 #include <sys/socket.h> /* Included for socket support */
 #include <unistd.h>     /* Included for stdin/stdout/stderr */
-#endif /* PlatformIO_TargetOSIsPOSIX */
-
-#if  (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #include <Windows.h>    /* Included for Shared Library support, WinCon, QueryPerformanceCounter, etc */
-#include <WinSock2.h>   /* Windows.h MUST be included before WinSock2 */
-#endif
+#endif /* PlatformIO_TargetOSIsPOSIX */
 
 #if   (WCHAR_MAX == 0x7FFFFFFF || WCHAR_MAX == 0xFFFFFFFF)
 #define             PlatformIO_WideCharType                                             PlatformIO_WideCharTypeIsUTF32
