@@ -1,11 +1,12 @@
 name: FoundationIO
-description: Provides Unicode text handling: command-line parsing, localization, formatting, logging, and general operations; bitstream operations, encryption, unit testing, platform-specific interoperability, and math functions.
+description:
+Provides Unicode text handling: command-line parsing, localization, formatting, logging, and general operations;
+bitstream operations, encryption, unit testing, platform-specific interoperability, and math functions.
 
 prefix=${CMAKE_INSTALL_PREFIX}
 exec_prefix=${CMAKE_INSTALL_PREFIX}
-libdir=${CMAKE_INSTALL_PREFIX}/lib
 includedir=${CMAKE_INSTALL_PREFIX}/include
-Version: @FoundationIO_VERSION_STRING@
-Libs: -L${CMAKE_INSTALL_PREFIX}/lib -lFoundationIO
-Libs.private: -lm
-Cflags: -I${includedir}
+libdir=${CMAKE_INSTALL_PREFIX}/lib
+Libs: -L${CMAKE_INSTALL_PREFIX}/lib -l:FoundationIO.@DynlibExt@
+Cflags: -I${CMAKE_INSTALL_PREFIX}/include
+Version: @VERSION_STRING@

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Usage (the HeaderFile WILL BE IRRECOVERABLY DELETED): ./TextTables_Create.sh /HeaderPath/HeaderFile.h
+# Usage (the HeaderFile WILL BE IRRECOVERABLY DELETED): ./TextIOTables_Create.sh /TextIO/Private/TextIOTables.h
 # Dependencies: Curl, XMLStarlet (On Mac install Homebrew from brew.sh then call brew install xmlstarlet)
 
 CreateHeaderFileTop() {
@@ -16,7 +16,7 @@ CreateHeaderFileTop() {
     NumWordBreakCodePoints=18
     {
         printf "/*!\n"
-        printf " @header          TextTables.h\n"
+        printf " @header          TextIOTables.h\n"
         printf " @author          Marcus Johnson\n"
         printf " @copyright       2018+\n"
         printf " @version         1.2.0\n"
@@ -26,8 +26,8 @@ CreateHeaderFileTop() {
         printf "#include \"../../PlatformIO.h\"  /* Included for Platform Independence macros */\n"
         printf "#include \"../TextIOTypes.h\"    /* Included for the Text types */\n\n"
         printf "#pragma once\n\n"
-        printf "#ifndef FoundationIO_TextIO_TextTables_H\n"
-        printf "#define FoundationIO_TextIO_TextTables_H\n\n"
+        printf "#ifndef FoundationIO_TextIO_TextIOTables_H\n"
+        printf "#define FoundationIO_TextIO_TextIOTables_H\n\n"
         printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
         printf "extern \"C\" {\n"
         printf "#endif\n\n"
@@ -371,7 +371,7 @@ CreateHeaderFileBottom() {
     printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
     printf "}\n"
     printf "#endif /* Extern C */\n\n"
-    printf "#endif /* FoundationIO_TextIO_TextTables_H */\n"
+    printf "#endif /* FoundationIO_TextIO_TextIOTables_H */\n"
 } >> "$HeaderFile"
 
 CreateTables() {

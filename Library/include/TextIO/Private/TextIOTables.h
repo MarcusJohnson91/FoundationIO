@@ -1,5 +1,5 @@
 /*!
- @header          TextTables.h
+ @header          TextIOTables.h
  @author          Marcus Johnson
  @copyright       2018+
  @version         1.2.0
@@ -12,14 +12,14 @@
 
 #pragma once
 
-#ifndef FoundationIO_TextIO_TextTables_H
-#define FoundationIO_TextIO_TextTables_H
+#ifndef FoundationIO_TextIO_TextIOTables_H
+#define FoundationIO_TextIO_TextIOTables_H
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
 
-#define ScriptHash e9e484ac397ecf439af8f93e42afbc8bc87b231b
+#define ScriptHash 01f9cdfa14a9b67fa29db09733abac53a763cfe6
 
 #define UnicodeVersion 13.0.0
 
@@ -26547,4 +26547,4 @@ extern "C" {
 }
 #endif /* Extern C */
 
-#endif /* FoundationIO_TextIO_TextTables_H */
+#endif /* FoundationIO_TextIO_TextIOTables_H */

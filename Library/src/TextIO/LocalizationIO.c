@@ -1,7 +1,7 @@
-#include "../../include/TextIO/LocalizationIO.h"     /* Included for our declarations */
-#include "../../include/TextIO/LogIO.h"              /* Included for error logging */
-#include "../../include/TextIO/Private/TextTables.h" /* Included for Currency tables */
-#include "../../include/TextIO/StringIO.h"           /* Included for UTF8_GetStringSizeInCideUnits */
+#include "../../include/TextIO/LocalizationIO.h"       /* Included for our declarations */
+#include "../../include/TextIO/LogIO.h"                /* Included for error logging */
+#include "../../include/TextIO/Private/TextIOTables.h" /* Included for Currency tables */
+#include "../../include/TextIO/StringIO.h"             /* Included for UTF8_GetStringSizeInCideUnits */
 #include <locale.h>
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
