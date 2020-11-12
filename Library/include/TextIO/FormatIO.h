@@ -300,7 +300,7 @@ extern "C" {
      @return                                      Returns the formatted string encoded using the UTF-8 format.
      */
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
-    UTF16                *UTF16_Format(PlatformIO_Immutable(UTF16 *) Format, ...) __attribute__((format(printf, 1, 2)));
+    UTF16                *UTF16_Format(PlatformIO_Immutable(UTF16 *) Format, ...) __attribute__((format(wprintf, 1, 2)));
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
     UTF16                *UTF16_Format(PlatformIO_Immutable(UTF16 *) Format, ...);
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
@@ -317,7 +317,7 @@ extern "C" {
      @return                                      Returns the formatted string encoded using the UTF-8 format.
      */
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
-    UTF32                *UTF32_Format(PlatformIO_Immutable(UTF32 *) Format, ...) __attribute__((format(printf, 1, 2)));
+    UTF32                *UTF32_Format(PlatformIO_Immutable(UTF32 *) Format, ...) __attribute__((format(wprintf, 1, 2)));
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
     UTF32                *UTF32_Format(PlatformIO_Immutable(UTF32 *) Format, ...);
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)

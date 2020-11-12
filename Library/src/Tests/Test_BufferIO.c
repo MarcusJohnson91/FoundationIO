@@ -131,18 +131,11 @@ extern "C" {
             }
             BitBuffer_Erase(BitB, 0);
         }
-
         TestCase ReadWriteBitsNN = {
-            .Function       = Test_ReadWriteBitsNearNear,
-            .TestState      = TestState_Enabled,
-            .FunctionName   = PlatformIO_FunctionName,
-            .ExpectedResult = Outcome_Passed,
+            .Function    = Test_ReadWriteBitsNearNear,
+            .TestState   = TestState_Enabled,
+            .TestOutcome = Outcome_Passed,
         };
-
-
-
-        //BufferIOTests->Tests[0] = ReadWriteBitsNN;
-        
         return TestPassed;
     }
 

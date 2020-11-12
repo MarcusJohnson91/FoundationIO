@@ -33,7 +33,7 @@ extern "C" {
     TestCase UTF8_EncodeDecode_Test = {
         .TestState      = TestState_Enabled,
         .Function       = Test_UTF8_EncodeDecode,
-        .ExpectedResult = Outcome_Passed,
+        .TestOutcome    = Outcome_Passed,
     };
     
     bool Test_UTF16_EncodeDecode(SecureRNG *Secure) {

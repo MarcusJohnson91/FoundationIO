@@ -99,9 +99,9 @@ extern "C" {
     typedef bool (*TestIO_TestFunction)(SecureRNG *Secure);
 
     typedef struct TestCase {
-        TestIO_TestFunction  Function;
-        TestIO_TestStates    TestState;
-        TestIO_TestOutcomes  TestOutcome;
+        TestIO_TestFunction Function;
+        TestIO_TestStates   TestState;
+        TestIO_TestOutcomes TestOutcome;
     } TestCase;
 
     typedef struct TestSuite {
@@ -112,14 +112,6 @@ extern "C" {
         uint64_t  NumUnexpectedFailures;
         uint64_t  UnexpectedFailureSize;
     } TestSuite;
-
-    static void RegisterTestCase(TestSuite *Suite, TestCase *Test) {
-        if (Suite != NULL && Test != NULL) {
-
-        } else {
-            Suite = calloc(1, sizeof(TestSuite));
-        }
-    }
     /*
      What if We register each Test in just one Variadic call, then we'd know the size the make the array as well as each index
      */
