@@ -1,15 +1,22 @@
 #include <Windows.h>
 #include "../Library/include/Private/Version.h"
+#include "../Library/include/Private/CommitID.h"
 
 #pragma code_page(65001)
 
 LANGUAGE LANG_ENGLISH,SUBLANG_DEFAULT
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION    Version_Major,Version_Minor,Version_Patch,Version_CommitID
+FILEVERSION    Version_Major,Version_Minor,Version_Patch
+PRODUCTVERSION Version_Major,Version_Minor,Version_Patch
+SpecialBuild   Version_CommitID
 FILEOS         VOS_NT_WINDOWS32
 FILETYPE       VFT_DLL
-PRODUCTVERSION Version_Major,Version_Minor,Version_Patch,Version_CommitID
+#if CONFIGURATION == Debug
+FILEFLAGSMASK  VS_FF_SPECIALBUILD|VS_FF_DEBUG
+#elif CONFIGURATION == Release
+FILEFLAGSMASK  VS_FF_SPECIALBUILD|VS_FF_RELEASE
+#endif
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
@@ -17,7 +24,8 @@ BEGIN
         BEGIN
             VALUE "LegalCopyright",  "© Marcus Johnson, 2020"
             VALUE "FileDescription", "Platform Independent Base Library"
-            VALUE "FileVersion",     "Version_Major.Version_Minor.Version_Patch.Version_CommitID"
+            VALUE "FileVersion",     Version_Major,Version_Minor,Version_Patch,
+			VALUE "SpecialBuild"     Version_CommitID
         END
     END
 END

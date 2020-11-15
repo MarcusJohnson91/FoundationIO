@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{0fbba5d8-a50e-4c0e-b528-47e5ffd69bb1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\TextIO">
-      <UniqueIdentifier>{a9d16bf7-d9c9-46eb-9aad-22e78a12aa6a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{05add13e-8113-412d-8d79-8e78e2479822}</UniqueIdentifier>
     </Filter>
@@ -18,6 +12,12 @@
     </Filter>
     <Filter Include="Header Files\TextIO\Private">
       <UniqueIdentifier>{574ed4c7-5d61-43b5-bb46-69615eca2c3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{0fbba5d8-a50e-4c0e-b528-47e5ffd69bb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TextIO">
+      <UniqueIdentifier>{a9d16bf7-d9c9-46eb-9aad-22e78a12aa6a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -98,11 +98,14 @@
     <ClInclude Include="..\Library\include\NetworkIO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\include\TextIO\Private\TextTables.h">
-      <Filter>Header Files\TextIO\Private</Filter>
-    </ClInclude>
     <ClInclude Include="..\Library\include\Private\Version.h">
       <Filter>Header Files\Private</Filter>
     </ClInclude>
+    <ClInclude Include="..\Library\include\TextIO\Private\TextIOTables.h">
+      <Filter>Header Files\TextIO\Private</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\Resources\FoundationIO.rc" />
   </ItemGroup>
 </Project>
