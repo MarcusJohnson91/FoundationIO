@@ -44,8 +44,12 @@ typedef                   unsigned char                        char8_t;
 #endif /* PlatformIO_Language */
 
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
+#ifdef __has_include
+#if   !__has_include(<uchar.h>)
 #ifndef                   __STDC_UTF_16__
-#define                   __STDC_UTF_16__                     (1) /* char16_t values is encoded as UTF-16 */
+#define                   __STDC_UTF_16__                     (1) /* char16_t values are encoded as UTF-16 */
+#endif /* Only define __STDC_UTF_X__ macros if uchar is not available */
+#endif /* Is __has_include available? */
 #endif
 #ifdef                    __CHAR16_TYPE__
 typedef                   __CHAR16_TYPE__                      char16_t;
@@ -59,8 +63,12 @@ typedef                   _Char16_t                            char16_t;
 #endif /* Defined? uint_least16_t */
 #endif /* Defined? __CHAR16_TYPE__ */
 
+#ifdef __has_include
+#if   !__has_include(<uchar.h>)
 #ifndef                   __STDC_UTF_32__
 #define                   __STDC_UTF_32__                     (1) /* char32_t values are encoded as UTF-32 */
+#endif /* Only define __STDC_UTF_X__ macros if uchar is not available */
+#endif /* Is __has_include available? */
 #endif
 #ifdef                    __CHAR32_TYPE__
 typedef                   __CHAR32_TYPE__                      char32_t;
