@@ -241,6 +241,14 @@ extern "C" {
      @return                                      Returns the larger value.
      */
     int64_t      Subtract(const int64_t Integer1, const int64_t Integer2);
+
+    /*!
+     @abstract                                    Takes the top bit and copies it to all higher bits.
+     @param      HighestSetBit                    The highest set bit's index, starting at 1.
+     @param      Integer                          The Integer to extend.
+     @return                                      Returns the extended integger
+     */
+    int64_t       SignExtend(const uint8_t HighestSetBit, const int64_t Integer);
     
     /*!
      @abstract                                    Is the decimal normal?

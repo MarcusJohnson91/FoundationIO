@@ -200,6 +200,17 @@ extern "C" {
     int64_t Subtract(const int64_t Integer1, const int64_t Integer2) {
         return Maximum(Integer1, Integer2) - Minimum(Integer1, Integer2);
     }
+
+    int64_t SignExtend(const uint8_t HighestSetBit, const int64_t Integer) {
+        int64_t Extended = 0;
+        int8_t  Shift    = HighestSetBit - 1;
+        int8_t  Sign     = Integer >> Shift;
+        if (Sign == 1) {
+            Extended     = (0xFFFFFFFFFFFFFFFF >> Shift) << Shift;
+        }
+        Extended        |= Integer;
+        return Extended;
+    }
     
     bool DecimalIsNormalF(const float Decimal) {
         bool    IsNormal = No;
