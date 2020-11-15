@@ -655,7 +655,7 @@ extern "C" {
             }
 
             if (ErrorCode != 0) {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't open %s, got Error: %u"), Path8, ErrorCode);
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't open %U16s, got Error: %u"), Path16, ErrorCode);
             }
         }
         return File;
