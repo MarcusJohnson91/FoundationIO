@@ -2235,7 +2235,7 @@ extern "C" {
                 }
             }
             
-            Instances[NumInstances];
+            Instances = calloc(NumInstances, sizeof(uint64_t));
             for (uint64_t Instance = 0ULL; Instance < NumInstances; Instance++) {
                 for (uint64_t StringCodePoint = 0ULL; StringCodePoint < StringSize; StringCodePoint++) {
                     for (uint64_t RemoveCodePoint = 0ULL; RemoveCodePoint < SubStringSize; RemoveCodePoint++) {
@@ -2711,7 +2711,7 @@ extern "C" {
         UTF32   *String               = NULL;
         int64_t  Sign                 = 0LL;
         uint64_t Num                  = AbsoluteI(Integer2Convert);
-        uint8_t  Radix                = 0;
+        uint8_t  Radix                = 1;
         uint8_t  NumDigits            = 0;
         
         if (Integer2Convert < 0) { // Signed
@@ -3337,8 +3337,8 @@ extern "C" {
                 }
             }
             
-            SplitSizes[NumSplitStrings];
-            SplitOffsets[NumSplitStrings];
+            SplitSizes   = calloc(NumSplitStrings, sizeof(uint64_t));
+            SplitOffsets = calloc(NumSplitStrings, sizeof(uint64_t));
             
             for (uint64_t Delimiter = 0ULL; Delimiter < NumDelimiters; Delimiter++) {
                 for (uint64_t DelimiterCodePoint = 0ULL; DelimiterCodePoint < DelimitersSize[Delimiter]; DelimiterCodePoint++) {
@@ -3371,6 +3371,8 @@ extern "C" {
         } else if (Delimiters == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Delimiters Pointer is NULL"));
         }
+        free(SplitSizes);
+        free(SplitOffsets);
         return SplitStrings;
     }
     

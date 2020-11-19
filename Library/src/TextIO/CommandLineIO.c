@@ -273,7 +273,7 @@ extern "C" {
             }
             
             uint64_t *NumProgressIndicatorsPerString = calloc(NumItems2Display, sizeof(uint64_t));
-            UTF8     *ActualStrings2Print            = calloc(NumItems2Display, sizeof(UTF8*));
+            UTF8    **ActualStrings2Print            = UTF8_StringSet_Init(NumItems2Display);
             for (uint8_t String = 0; String < NumItems2Display; String++) {
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]);
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
@@ -467,7 +467,7 @@ extern "C" {
                 CLI->Switches[ParentID].NumChildren       += 1;
                 uint64_t OLD_NumChildren                   = CLI->Switches[ParentID].NumChildren;
                 uint64_t *Children_OLD                     = CLI->Switches[ParentID].Children;
-                CLI->Switches[ParentID].Children           = (uint64_t*) realloc(CLI->Switches[ParentID].Children, CLI->Switches[ParentID].NumChildren * sizeof(CLI->Switches[ParentID].Children));
+                CLI->Switches[ParentID].Children           = (uint64_t*) realloc(CLI->Switches[ParentID].Children, CLI->Switches[ParentID].NumChildren * sizeof(uint64_t));
                 if (CLI->Switches[ParentID].Children != NULL) {
                     free(Children_OLD);
                 } else {
@@ -708,7 +708,7 @@ extern "C" {
     
     uint64_t CommandLineIO_Option_GetOptionID(CommandLineIO *CLI, uint64_t SwitchID, uint64_t NumChildren, uint64_t *ChildIDs) {
         uint64_t OptionID = 0xFFFFFFFFFFFFFFFF;
-        if (CLI != NULL || (NumChildren > 1 && ChildIDs != NULL)) {
+        if (CLI != NULL && (NumChildren > 1 && ChildIDs != NULL)) {
             for (uint64_t Option = 0ULL; Option < CLI->NumOptions; Option++) {
                 if (SwitchID == CLI->Options[Option].SwitchID) {
                     if (NumChildren > 0 && (CLI->Switches[CLI->Options[Option].SwitchID].Status & SwitchType_Required) == SwitchType_Required) {
