@@ -1259,7 +1259,7 @@ extern "C" {
             // Now add the length of each replacement string, which needs to be duplicated
             // We need to know the number of times each positional parameter is used, basically a histogram.
             if (Specifiers->NumUniqueSpecifiers < Specifiers->NumSpecifiers) {
-                Specifiers->UniqueSpecifiers = (uint64_t*) calloc(Specifiers->NumUniqueSpecifiers, sizeof(Specifiers->UniqueSpecifiers));
+                Specifiers->UniqueSpecifiers = (uint64_t*) calloc(Specifiers->NumUniqueSpecifiers, sizeof(uint64_t));
                 // Loop over all specifiers, increment .Position in PositionalSpecifierCount
                 for (uint64_t Specifier = 0ULL; Specifier < Specifiers->NumSpecifiers; Specifier++) {
                     Specifiers->UniqueSpecifiers[Specifiers->Specifiers[Specifier].Position] += 1;
