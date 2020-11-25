@@ -5,7 +5,7 @@ include(DetectArchitecture.cmake)
 FindTargetArchitecture(TargetArchitecture)
 
 include(GetVersion.cmake)
-GetVersionString(VERSION_STRING "../Library/include/Private")
+GetVersionString(VERSION_STRING "/Library/include/Private")
 
 include(CTest)
 
@@ -24,6 +24,7 @@ set(FoundationIO_Test_Dir          "${CMAKE_CURRENT_SOURCE_DIR}/../Tests")
 set(FoundationIO_Resource_Dir      "${CMAKE_CURRENT_SOURCE_DIR}/../Resources")
 
 set(PUBLIC_HEADERS
+"${FoundationIO_Library_Dir}/include/AsynchronousIO.h"
 "${FoundationIO_Library_Dir}/include/BufferIO.h"
 "${FoundationIO_Library_Dir}/include/CryptographyIO.h"
 "${FoundationIO_Library_Dir}/include/FileIO.h"
@@ -40,6 +41,8 @@ set(PUBLIC_HEADERS
 )
 
 set(FOUNDATIONIO_SOURCE
+"${PUBLIC_HEADERS}"
+"${FoundationIO_Library_Dir}/src/AsynchronousIO.c"
 "${FoundationIO_Library_Dir}/src/BufferIO.c"
 "${FoundationIO_Library_Dir}/src/CryptographyIO.c"
 "${FoundationIO_Library_Dir}/src/FileIO.c"
