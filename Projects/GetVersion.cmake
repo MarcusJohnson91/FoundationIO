@@ -6,8 +6,28 @@ find_package(Git)
 if(GIT_FOUND)
 # VersionString is the output variable, VersionFilesFolder is the path where Version.h and CommitID can be found.
 function(GetVersionString VersionString VersionFilesFolder)
-    string(CONCAT VersionHeaderPath ${VersionFilesFolder} "/Version.h")
-    file(READ ${VersionHeaderPath} Version_Header)
+
+#Maybe we should just have Cmake run the scripts depending on platform, then parse the headers?
+
+# Now load up the Version.h and CommitID.h files, then parse them
+
+# /Users/Marcus/Source/FoundationIO/Projects/../Library/include/Private /Users/Marcus/Source/FoundationIO/Projects/../Library/include/Private/Version.h
+
+get_filename_component(PARENT_DIR ${CMAKE_SOURCE_DIR} DIRECTORY)
+
+string(CONCAT VersionHeaderPath "${PARENT_DIR}${VersionFilesFolder}/Version.h")
+file(READ ${VersionHeaderPath} Version_Header)
+
+if(CMAKE_HOST_UNIX)
+    #add_custom_target(GitHash ALL COMMAND sh ./GetGitHash.sh)
+    execute_process(COMMAND sh "${CMAKE_SOURCE_DIR}/GetGitHash.sh")
+else(CMAKE_HOST_WIN32)
+    #add_custom_target(GitHash ALL COMMAND cmd.exe "${CMAKE_SOURCE_DIR}/GetGitHash.cmd")
+    execute_process(COMMAND cmd.exe "./GetGitHash.cmd")
+endif(CMAKE_HOST_UNIX)
+
+string(CONCAT CommitIDHeaderPath "${PARENT_DIR}${VersionFilesFolder}/CommitID.h")
+file(READ ${CommitIDHeaderPath} CommitID_Header)
 
     string(REGEX MATCH "#define Version_Major ([0-9]+)" MATCH_STRING ${Version_Header})
     set(VERSION_MAJOR ${CMAKE_MATCH_1})
@@ -15,12 +35,8 @@ function(GetVersionString VersionString VersionFilesFolder)
     set(VERSION_MINOR ${CMAKE_MATCH_1})
     string(REGEX MATCH "#define Version_Patch ([0-9]+)" MATCH_STRING ${Version_Header})
     set(VERSION_PATCH ${CMAKE_MATCH_1})
-
-    execute_process(COMMAND ${GIT_EXECUTABLE} symbolic-ref -q HEAD WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" OUTPUT_VARIABLE "GIT_BRANCH_PATH" RESULTS_VARIABLE STDOUT ERROR_VARIABLE STDERR)
-
-    string(REGEX REPLACE "\n$" "" "GIT_BRANCH_PATH_STRIPPED" "${GIT_BRANCH_PATH}")
-
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --verify ${GIT_BRANCH_PATH_STRIPPED} WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}" OUTPUT_VARIABLE "GIT_COMMIT_ID" RESULTS_VARIABLE STDOUT ERROR_VARIABLE STDERR)
+    string(REGEX MATCH "#define Version_CommitID ([0-9]+)" MATCH_STRING ${CommitID_Header})
+    set(VERSION_COMMITID ${CMAKE_MATCH_1})
 
     string(REGEX REPLACE "\n$" "" "GIT_COMMIT_ID_STRIPPED" "${GIT_COMMIT_ID}")
 
@@ -28,11 +44,6 @@ function(GetVersionString VersionString VersionFilesFolder)
 
     set(VERSION_STRING "")
     string(CONCAT VERSION_STRING "${VERSION_MAJOR}" "." "${VERSION_MINOR}" "." "${VERSION_PATCH}" ":" "${GIT_COMMIT_ID_STRIPPED_CAPS}")
-
-    string(APPEND "CommitID_Header" "#pragma once\n\n#define Version_CommitID " "${GIT_COMMIT_ID_STRIPPED_CAPS}")
-
-    string(CONCAT VersionHeaderPath ${VersionFilesFolder} "/CommitID.h")
-    file(WRITE ${VersionHeaderPath} "${CommitID_Header}")
 
     set(${VersionString} "${VERSION_STRING}" PARENT_SCOPE)
 endfunction()
