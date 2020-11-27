@@ -19,6 +19,11 @@ extern "C" {
 #endif
 
     /*!
+     @abstract                              Forward declare BitBuffer
+     */
+    typedef struct    BitBuffer             BitBuffer;
+
+    /*!
      @abstract                              Algorithm inspired by public domain Shishua; Nothing was copied.
      */
     typedef struct    InsecurePRNG          InsecurePRNG;
@@ -102,6 +107,22 @@ extern "C" {
      @param           Random                The SecureRNG pointer.
      */
     void              SecureRNG_Deinit(SecureRNG *Random);
+
+    /*!
+     @abstract                              Runs Adler32 hash over the Buffer starting at Offset
+     @param           BitB                  The BitBuffer pointer.
+     @param           OffsetInBits          The Offset into the BitBuffer
+     @param           NumBytes              The number of bytes to read
+     */
+    uint32_t          Adler32(BitBuffer *BitB, uint64_t OffsetInBits, uint64_t NumBytes);
+
+    /*!
+     @abstract                              Runs CRC32 hash over the Buffer starting at Offset
+     @param           BitB                  The BitBuffer pointer.
+     @param           OffsetInBits          The Offset into the BitBuffer
+     @param           NumBytes              The number of bytes to read
+     */
+    uint32_t          CRC32(BitBuffer *BitB, uint64_t OffsetInBits, uint64_t NumBytes);
 
     MD5              *MD5_Init(void);
 
