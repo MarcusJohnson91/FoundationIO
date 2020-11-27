@@ -614,13 +614,13 @@ extern "C" {
         },
     };
 
-    uint32_t Adler32(BitBuffer *BitB, uint64_t Start, uint64_t NumBytes) {
+    uint32_t Adler32(BitBuffer *BitB, uint64_t OffsetInBits, uint64_t NumBytes) {
         uint32_t Output = 0;
-        if (BitB != NULL && Start * 8 < BitBuffer_GetSize(BitB) && (Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
+        if (BitB != NULL && OffsetInBits * 8 < BitBuffer_GetSize(BitB) && (OffsetInBits + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
             uint16_t A = 1;
             uint16_t B = 0;
 
-            for (uint64_t Byte = Start; Byte < NumBytes - 1; Byte++) {
+            for (uint64_t Byte = OffsetInBits; Byte < NumBytes - 1; Byte++) {
                 uint8_t Value = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsNearest, 8);
                 A = (A + Value) % 65521;
                 B = (B + A)     % 65521;
@@ -629,10 +629,10 @@ extern "C" {
             Output = (B << 16) | A;
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
-        } else if (Start * 8 < BitBuffer_GetSize(BitB)) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Start: %lld is larger than the BitBuffer %lld"), Start * 8, BitBuffer_GetSize(BitB));
-        } else if ((Start + NumBytes) * 8 <= BitBuffer_GetSize(BitB)) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("End: %lld is larger than the BitBuffer %lld"), (Start + NumBytes) * 8, BitBuffer_GetSize(BitB));
+        } else if (OffsetInBits < BitBuffer_GetSize(BitB)) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Start: %lld is larger than the BitBuffer %lld"), OffsetInBits, BitBuffer_GetSize(BitB));
+        } else if (OffsetInBits + NumBytes <= BitBuffer_GetSize(BitB)) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("End: %lld is larger than the BitBuffer %lld"), (OffsetInBits + NumBytes), BitBuffer_GetSize(BitB));
         }
         return Output;
     }
