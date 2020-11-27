@@ -271,7 +271,7 @@ extern "C" {
      @remark        Makes the pointer and the data it points to constant.
      */
 #ifndef             PlatformIO_Immutable
-#define             PlatformIO_Immutable(PointerType)                                   const PointerType const
+#define             PlatformIO_Immutable(PointerTypeWithStar)                           const PointerTypeWithStar const
 #endif /* PlatformIO_Immutable */
 
 #ifndef             PlatformIO_Mutable
