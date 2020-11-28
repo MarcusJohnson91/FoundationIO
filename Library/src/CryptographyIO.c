@@ -1,4 +1,5 @@
 #include "../include/CryptographyIO.h"    /* Included for our declarations */
+#include "../include/AsynchronousIO.h"    /* Included for AsyncIOStream_Init */
 #include "../include/BufferIO.h"          /* Included for BitBuffer for CRC32 and Adler32 */
 #include "../include/FileIO.h"            /* Included for File operations */
 #include "../include/AsynchronousIO.h"    /* Included for raw AsyncIO operations */
