@@ -1,6 +1,7 @@
 #include "../include/CryptographyIO.h"    /* Included for our declarations */
 #include "../include/BufferIO.h"          /* Included for BitBuffer for CRC32 and Adler32 */
 #include "../include/FileIO.h"            /* Included for File operations */
+#include "../include/AsynchronousIO.h"    /* Included for raw AsyncIO operations */
 #include "../include/MathIO.h"            /* Included for Bits2Bytes, etc */
 #include "../include/TextIO/LogIO.h"      /* Included for error logging */
 
@@ -201,9 +202,15 @@ extern "C" {
         if (NumBytes <= 8) {
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) == PlatformIO_TargetOSIsApple)
-            FILE  *RandomFile         = FileIO_OpenUTF8(UTF8String("/dev/urandom"), FileMode_Read | FileMode_Binary);
-            size_t BytesRead          = FileIO_Read(RandomFile, &RandomValue, sizeof(RandomValue), 1);
-            FileIO_Close(RandomFile);
+            AsyncIOStream *Random     = AsyncIOStream_Init();
+            bool OpenedSuccessfully   = AsyncIOStream_OpenUTF8(Random, UTF8String("/dev/urandom"), FileMode_Read | FileMode_Binary);
+            if (OpenedSuccessfully) {
+                size_t BytesRead      = AsyncIOStream_Read(Random, &RandomValue, 8, 1);
+                if (BytesRead != 8) {
+                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Could not read 8 bytes from /dev/urandom"));
+                }
+            }
+            AsyncIOStream_Deinit(Random);
 #elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux)
 #include <linux/random.h>
             getrandom(&RandomValue, NumBytes, GRND_NONBLOCK);
@@ -225,12 +232,15 @@ extern "C" {
 #if   (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) != PlatformIO_TargetOSIsLinux))
                 arc4random_buf(Random->EntropyPool, Bits2Bytes(RoundingType_Down, Random->NumBits));
 #elif (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux))
-                FILE *RandomFile          = FileIO_OpenUTF8(UTF8String("/dev/random"), FileMode_Read | FileMode_Binary);
-                size_t BytesRead          = FileIO_Read(RandomFile, &Random->EntropyPool, Bits2Bytes(RoundingType_Down, Random->NumBits), 1);
-                if (BytesRead != Bits2Bytes(RoundingType_Down, Random->NumBits)) {
-                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Failed to read random data, SecureRNG is extremely insecure, aborting"));
+                AsyncIOStream *Random     = AsyncIOStream_Init();
+                bool OpenedSuccessfully   = AsyncIOStream_OpenUTF8(Random, UTF8String("/dev/random"), FileMode_Read | FileMode_Binary);
+                if (OpenedSuccessfully) {
+                    size_t BytesRead      = AsyncIOStream_Read(&Random->EntropyPool, &RandomValue, Bits2Bytes(RoundingType_Down, Random->NumBits), 1);
+                    if (BytesRead != Bits2Bytes(RoundingType_Down, Random->NumBits)) {
+                        Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Could not read 8 bytes from /dev/urandom"));
+                    }
                 }
-                FileIO_Close(RandomFile);
+                AsyncIOStream_Deinit(Random);
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
                 NTSTATUS Status           = BCryptGenRandom(NULL, (PUCHAR) Random->EntropyPool, (ULONG) Bits2Bytes(RoundingType_Down, Random->NumBits), (ULONG) BCRYPT_USE_SYSTEM_PREFERRED_RNG);
                 if (Status <= 0) {

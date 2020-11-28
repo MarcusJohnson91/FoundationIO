@@ -13,7 +13,7 @@ extern "C" {
     /*
      Asynchronous RAW Socket Networking API, the OS only has to manage the hardware is the goal of NetworkIO.
 
-     BitIO needs to be split with BitInput/BitOutput becoming FileInput/FileOutput.
+     BitIO needs to be split with BitInput/BitOutput becoming FileIO_FileInput/FileIO_FileOutput.
 
      BitIO it's self being renamed BufferIO and it's BitBuffer type being the intermediary for both FileIO and NetworkIO
      */

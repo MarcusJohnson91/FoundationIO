@@ -215,6 +215,19 @@ extern "C" {
     void           BitBuffer_Copy(BitBuffer *Source, BitBuffer *Destination, uint64_t BitStart, uint64_t BitEnd);
 
     /*!
+     @abstract                                     Reads BitBuffer's Input Stream into BitBuffer's array
+     @param        BitB                            The BitBuffer to read to.
+     */
+    void           BitBuffer_ReadStream(BitBuffer *BitB);
+
+    /*!
+     @abstract                                     Writes BitBuffer's array to BitBuffer's Output Stream
+     @remark                                       Only writes actually used data.
+     @param        BitB                            The BitBuffer to write.
+     */
+    void           BitBuffer_WriteStream(BitBuffer *BitB);
+
+    /*!
      @abstract                                     Peeks (reads but without recording that it's been read) bits from BitBuffer.
      @param        BitB                            BitBuffer Pointer.
      @param        ByteOrder                       What byte order are the bits to be peeked?
