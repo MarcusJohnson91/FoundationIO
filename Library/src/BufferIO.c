@@ -619,7 +619,7 @@ extern "C" {
     
     UTF8 *BitBuffer_ReadUTF8(BitBuffer *BitB, uint64_t StringSize) {
         UTF8 *ExtractedString                 = UTF8_Init(StringSize);
-        UTF8 Extracted;
+        UTF8 Extracted                        = 0;
         if (BitB != NULL && ExtractedString != NULL) {
             for (uint64_t CodeUnit = 0ULL; CodeUnit < StringSize; CodeUnit++) {
                 Extracted                     = BitBuffer_Extract_FarByte_FarBit(BitB, 8);
