@@ -27,14 +27,17 @@ extern "C" {
             Log_LogFile = stderr;
         }
 
-        PlatformIO_Immutable(UTF32 *) Error   = UTF32String("ERROR");
-        PlatformIO_Immutable(UTF32 *) Mistake = UTF32String("Mistake");
+        PlatformIO_Immutable(UTF32*) Severities[3] = {
+            [0] = UTF32String("ERROR"),
+            [1] = UTF32String("Mistake"),
+            [2] = UTF32String("Warning"),
+        };
         
         UTF32 *SecurityName   = NULL;
         if (Log_ProgramName != NULL) {
-            SecurityName      = UTF32_Format(UTF32String("%U32s's %U32s in %s: "), Log_ProgramName, Severity == Severity_DEBUG ? Error : Mistake, FunctionName);
+            SecurityName      = UTF32_Format(UTF32String("%U32s's %U32s in %s: "), Log_ProgramName, Severities[Severity - 1], FunctionName);
         } else {
-            SecurityName      = UTF32_Format(UTF32String("%U32s in %s: "), Severity == Severity_DEBUG ? Error : Mistake, FunctionName);
+            SecurityName      = UTF32_Format(UTF32String("%U32s in %s: "), Severities[Severity - 1], FunctionName);
         }
         
         UTF32 *Description32  = UTF8_Decode(UTF8_MakeStringMutable(Description));
@@ -53,9 +56,6 @@ extern "C" {
         uint64_t FormattedStringSize  = UTF32_GetFormattedStringSize(Description2, Specifiers);
         UTF32 *FormattedString32      = FormatString_UTF32(Description2, Specifiers, FormattedStringSize);
         UTF8  *FormattedString8       = UTF8_Encode(FormattedString32);
-        
-        UTF8_WriteSentence(Severity == Severity_USER ? stdout : stderr, FormattedString8);
-        fflush(stdout);
         
         if (Log_LogFile != NULL) {
             UTF8_WriteSentence(Log_LogFile, FormattedString8);
