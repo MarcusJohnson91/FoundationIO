@@ -1,4 +1,5 @@
 #include "../include/BufferIO.h"          /* Included for our declarations */
+#include "../include/AsynchronousIO.h"    /* Included for AsyncIOStream */
 #include "../include/CryptographyIO.h"    /* Included for SecureRNG_GenerateInteger for GUUID_Generate */
 #include "../include/MathIO.h"            /* Included for Integer functions */
 #include "../include/TextIO/FormatIO.h"   /* Included for UTF32_Format */
@@ -200,17 +201,18 @@ extern "C" {
                     .sigev_notify_function   = 0,
                     .sigev_notify_attributes = 0,
                 };
-                
-                struct aiocb Async = {
-                    .aio_fildes     = AsyncIOStream_GetDescriptor(BitB->Input),
-                    .aio_offset     = AsyncIOStream_GetPosition(BitB->Input),
-                    .aio_buf        = &BitB->Buffer[Bytes2Save],
-                    .aio_nbytes     = BufferSize - Bytes2Save,
-                    /* aio_reqprio  = Request Priority */
-                    .aio_sigevent   = SignalEvent,
-                    .aio_lio_opcode = 0, // What operation are we doing?
-                };
-                aio_read(&Async);
+                /*
+                 struct aiocb Async = {
+                 .aio_fildes     = AsyncIOStream_GetDescriptor(BitB->Input),
+                 .aio_offset     = AsyncIOStream_GetPosition(BitB->Input),
+                 .aio_buf        = &BitB->Buffer[Bytes2Save],
+                 .aio_nbytes     = BufferSize - Bytes2Save,
+                 // aio_reqprio  = Request Priority
+                 .aio_sigevent   = SignalEvent,
+                 .aio_lio_opcode = 0, // What operation are we doing?
+                 };
+                 aio_read(&Async);
+                 */
                 AsyncIOStream_Read(BitB->Input, BitB->Buffer, 1, Bits2Bytes(RoundingType_Down, BitB->NumBits));
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
                 // IO completion ports

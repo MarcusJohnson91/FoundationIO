@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -40,6 +40,8 @@
 		2CC71E13232B6424006DA1B8 /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
 		2CC71E14232B6429006DA1B8 /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
 		2CC71E15232B642F006DA1B8 /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
+		2CE9AD7225511E5F0092CBC8 /* AsynchronousIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CE9AD7125511E5F0092CBC8 /* AsynchronousIO.h */; };
+		2CE9AD93255122B20092CBC8 /* AsynchronousIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CE9AD92255122B20092CBC8 /* AsynchronousIO.c */; };
 		2CF0A7EC24D7C07800135BCC /* TextTables.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7EB24D7C07800135BCC /* TextTables.h */; };
 		2CF0A7EE24D7C08B00135BCC /* TextIOTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7ED24D7C08B00135BCC /* TextIOTypes.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		2CF0A7F424D7C0A700135BCC /* FormatIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CF0A7EF24D7C0A600135BCC /* FormatIO.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -239,6 +241,8 @@
 		2CC71DE1232B6009006DA1B8 /* Test_CryptographyIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_CryptographyIO; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CC71DEC232B6013006DA1B8 /* Test_MathIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_MathIO; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CC71DF7232B601B006DA1B8 /* Test_StringIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_StringIO; sourceTree = BUILT_PRODUCTS_DIR; };
+		2CE9AD7125511E5F0092CBC8 /* AsynchronousIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = AsynchronousIO.h; path = ../Library/include/AsynchronousIO.h; sourceTree = "<group>"; };
+		2CE9AD92255122B20092CBC8 /* AsynchronousIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = AsynchronousIO.c; path = ../Library/src/AsynchronousIO.c; sourceTree = "<group>"; };
 		2CF0A7EB24D7C07800135BCC /* TextTables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = TextTables.h; path = ../Library/include/TextIO/Private/TextTables.h; sourceTree = "<group>"; };
 		2CF0A7ED24D7C08B00135BCC /* TextIOTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = TextIOTypes.h; path = ../Library/include/TextIO/TextIOTypes.h; sourceTree = "<group>"; };
 		2CF0A7EF24D7C0A600135BCC /* FormatIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = FormatIO.h; path = ../Library/include/TextIO/FormatIO.h; sourceTree = "<group>"; };
@@ -429,6 +433,7 @@
 			isa = PBXGroup;
 			children = (
 				2CF0A7F924D7C55300135BCC /* TextIO */,
+				2CE9AD92255122B20092CBC8 /* AsynchronousIO.c */,
 				2CC71DAF232B5F56006DA1B8 /* BufferIO.c */,
 				2CC71DA7232B5F56006DA1B8 /* CryptographyIO.c */,
 				2C88500824BCA32B00DAD7ED /* FileIO.c */,
@@ -445,6 +450,7 @@
 			children = (
 				2C78B17D2493A8CD0098766B /* Private */,
 				2C794B0323BB271C00282D20 /* TextIO */,
+				2CE9AD7125511E5F0092CBC8 /* AsynchronousIO.h */,
 				2C41096F236BA3050059FE67 /* BufferIO.h */,
 				2CC71D95232B5F43006DA1B8 /* CryptographyIO.h */,
 				2C88500624BCA22A00DAD7ED /* FileIO.h */,
@@ -479,6 +485,7 @@
 				2CF0A7EC24D7C07800135BCC /* TextTables.h in Headers */,
 				2CA4C55B24EF9E31007803FD /* FoundationIO_Version.h in Headers */,
 				2C41097D236BA3320059FE67 /* TestIO.h in Headers */,
+				2CE9AD7225511E5F0092CBC8 /* AsynchronousIO.h in Headers */,
 				2C410978236BA3320059FE67 /* BufferIO.h in Headers */,
 				2C88500524BCA0AD00DAD7ED /* NetworkIO.h in Headers */,
 				2C41097C236BA3320059FE67 /* MathIO.h in Headers */,
@@ -572,6 +579,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2CC71D7D232B5EC8006DA1B8 /* Build configuration list for PBXNativeTarget "FoundationIO" */;
 			buildPhases = (
+				2C01A5F5256253D20041A52F /* ShellScript */,
 				2CC71D75232B5EC8006DA1B8 /* Headers */,
 				2CC71D76232B5EC8006DA1B8 /* Sources */,
 				2CC71D77232B5EC8006DA1B8 /* Frameworks */,
@@ -681,7 +689,8 @@
 		2CC71D71232B5EC8006DA1B8 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1200;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1220;
 				ORGANIZATIONNAME = MarcusJohnson;
 				TargetAttributes = {
 					2C73A31724EE614D006E480E = {
@@ -743,6 +752,22 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2C01A5F5256253D20041A52F /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			outputPaths = (
+				"$(PROJECT_DIR)/../Library/include/Private/CommitID.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "./GetGitHash.sh\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		2C73A31424EE614D006E480E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -780,6 +805,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2CE9AD93255122B20092CBC8 /* AsynchronousIO.c in Sources */,
 				2CF0A80124D7C56300135BCC /* LogIO.c in Sources */,
 				2C410983236BA3320059FE67 /* BufferIO.c in Sources */,
 				2C410987236BA3320059FE67 /* MathIO.c in Sources */,
@@ -896,9 +922,10 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INPUT_FILETYPE = automatic;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = 1;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Debug;
 		};
@@ -914,6 +941,7 @@
 				GCC_INPUT_FILETYPE = automatic;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Release;
 		};
@@ -926,9 +954,10 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = 1;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Debug;
 		};
@@ -943,6 +972,7 @@
 				GCC_C_LANGUAGE_STANDARD = c11;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Release;
 		};
@@ -955,9 +985,10 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = 1;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Debug;
 		};
@@ -972,6 +1003,7 @@
 				GCC_C_LANGUAGE_STANDARD = c11;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Release;
 		};
@@ -984,9 +1016,10 @@
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = 1;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Debug;
 		};
@@ -1001,14 +1034,17 @@
 				GCC_C_LANGUAGE_STANDARD = c11;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Release;
 		};
 		2CC71D7B232B5EC8006DA1B8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ADDITIONAL_SDKS = "";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLY_RULES_IN_COPY_FILES = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ANALYZER_GCD_PERFORMANCE = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1042,11 +1078,15 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CLANG_X86_VECTOR_INSTRUCTIONS = avx;
+				"CLANG_X86_VECTOR_INSTRUCTIONS[arch=arm64]" = default;
+				"CLANG_X86_VECTOR_INSTRUCTIONS[arch=x86_64]" = avx;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMPILER_INDEX_STORE_ENABLE = NO;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_BITCODE = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -1056,7 +1096,8 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_INPUT_FILETYPE = automatic;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = 1;
+				"GCC_OPTIMIZATION_LEVEL[arch=*]" = 1;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -1072,8 +1113,9 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_OUTPUT_FORMAT = binary;
 				INSTALL_PATH = /usr/local/FoundationIO;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LLVM_LTO = YES;
+				"LLVM_LTO[arch=*]" = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1099,8 +1141,8 @@
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
-				SUPPORTED_PLATFORMS = macosx;
-				TVOS_DEPLOYMENT_TARGET = 10.0;
+				SUPPORTED_PLATFORMS = "MacOSX iPadOS iPhoneOS";
+				TVOS_DEPLOYMENT_TARGET = 12.0;
 				VALID_ARCHS = "arm64 x86_64";
 				WATCHOS_DEPLOYMENT_TARGET = 3.0;
 			};
@@ -1109,8 +1151,10 @@
 		2CC71D7C232B5EC8006DA1B8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ADDITIONAL_SDKS = "";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLY_RULES_IN_COPY_FILES = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ANALYZER_GCD_PERFORMANCE = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1144,11 +1188,13 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CLANG_X86_VECTOR_INSTRUCTIONS = avx;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMPILER_INDEX_STORE_ENABLE = NO;
-				COPY_PHASE_STRIP = NO;
+				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1157,7 +1203,8 @@
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_INPUT_FILETYPE = automatic;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = z;
+				"GCC_OPTIMIZATION_LEVEL[arch=*]" = z;
 				GCC_SHORT_ENUMS = YES;
 				GCC_UNROLL_LOOPS = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1169,19 +1216,21 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_OUTPUT_FORMAT = binary;
 				INSTALL_PATH = /usr/local/FoundationIO;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LLVM_LTO = YES;
+				"LLVM_LTO[arch=*]" = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
-				SUPPORTED_PLATFORMS = macosx;
-				TVOS_DEPLOYMENT_TARGET = 10.0;
+				SUPPORTED_PLATFORMS = "MacOSX iPadOS iPhoneOS";
+				TVOS_DEPLOYMENT_TARGET = 12.0;
 				VALID_ARCHS = "arm64 x86_64";
 				WATCHOS_DEPLOYMENT_TARGET = 3.0;
 			};
@@ -1190,7 +1239,7 @@
 		2CC71D7E232B5EC8006DA1B8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ADDITIONAL_SDKS = iphoneos;
+				ADDITIONAL_SDKS = "${inherited}";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLY_RULES_IN_COPY_FILES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1265,11 +1314,12 @@
 				GENERATE_PROFILING_CODE = YES;
 				INFOPLIST_OUTPUT_FORMAT = binary;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 13.1;
 				KEEP_PRIVATE_EXTERNS = NO;
 				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)";
-				LLVM_LTO = NO;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				LLVM_LTO = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1283,8 +1333,10 @@
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 				STRIP_INSTALLED_PRODUCT = NO;
-				SUPPORTED_PLATFORMS = macosx;
-				TVOS_DEPLOYMENT_TARGET = 10.0;
+				SUPPORTED_PLATFORMS = "$(inherited)";
+				SUPPORTS_MACCATALYST = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TVOS_DEPLOYMENT_TARGET = 12.0;
 				USE_HEADERMAP = NO;
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "arm64 x86_64";
@@ -1297,7 +1349,7 @@
 		2CC71D7F232B5EC8006DA1B8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ADDITIONAL_SDKS = iphoneos;
+				ADDITIONAL_SDKS = "${inherited}";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				APPLY_RULES_IN_COPY_FILES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1364,11 +1416,12 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_OUTPUT_FORMAT = binary;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 13.1;
 				KEEP_PRIVATE_EXTERNS = NO;
 				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)";
 				LLVM_LTO = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_CFLAGS = "$(inherited)";
@@ -1380,8 +1433,10 @@
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
-				SUPPORTED_PLATFORMS = macosx;
-				TVOS_DEPLOYMENT_TARGET = 10.0;
+				SUPPORTED_PLATFORMS = "$(inherited)";
+				SUPPORTS_MACCATALYST = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TVOS_DEPLOYMENT_TARGET = 12.0;
 				USE_HEADERMAP = NO;
 				VALIDATE_PRODUCT = YES;
 				VALID_ARCHS = "arm64 x86_64";
@@ -1398,9 +1453,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Debug;
 		};
@@ -1411,9 +1467,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Release;
 		};
@@ -1424,9 +1481,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Debug;
 		};
@@ -1437,9 +1495,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Release;
 		};
@@ -1450,9 +1509,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Debug;
 		};
@@ -1463,9 +1523,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Release;
 		};
@@ -1476,9 +1537,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Debug;
 		};
@@ -1489,9 +1551,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Release;
 		};
@@ -1502,9 +1565,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Debug;
 		};
@@ -1515,9 +1579,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
 			name = Release;
 		};
