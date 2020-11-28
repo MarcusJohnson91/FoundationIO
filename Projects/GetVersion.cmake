@@ -4,14 +4,7 @@ cmake_policy(SET CMP0066 NEW)
 find_package(Git)
 
 if(GIT_FOUND)
-# VersionString is the output variable, VersionFilesFolder is the path where Version.h and CommitID can be found.
 function(GetVersionString VersionString VersionFilesFolder)
-
-#Maybe we should just have Cmake run the scripts depending on platform, then parse the headers?
-
-# Now load up the Version.h and CommitID.h files, then parse them
-
-# /Users/Marcus/Source/FoundationIO/Projects/../Library/include/Private /Users/Marcus/Source/FoundationIO/Projects/../Library/include/Private/Version.h
 
 get_filename_component(PARENT_DIR ${CMAKE_SOURCE_DIR} DIRECTORY)
 

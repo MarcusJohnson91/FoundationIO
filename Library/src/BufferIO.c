@@ -16,9 +16,11 @@ extern "C" {
     
     /* Start BitBuffer section */
     typedef struct BitBuffer {
-        uint8_t   *Buffer;
-        uint64_t   BitOffset;
-        uint64_t   NumBits;
+        AsyncIOStream *Input;
+        AsyncIOStream *Output;
+        uint8_t      *Buffer;
+        uint64_t      BitOffset;
+        uint64_t      NumBits;
     } BitBuffer;
     
     BitBuffer *BitBuffer_Init(uint64_t BitBufferSize) {
@@ -36,6 +38,26 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Couldn't allocate BitBuffer"));
         }
         return BitB;
+    }
+
+    void BitBuffer_SetInputStream(BitBuffer *BitB, AsyncIOStream *Input) {
+        if (BitB != NULL && Input != NULL) {
+            BitB->Input = Input;
+        } else if (BitB == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
+        } else if (Input == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("AsyncIOStream Pointer is NULL"));
+        }
+    }
+
+    void BitBuffer_SetOutputStream(BitBuffer *BitB, AsyncIOStream *Output) {
+        if (BitB != NULL && Output != NULL) {
+            BitB->Input = Output;
+        } else if (BitB == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
+        } else if (Output == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("AsyncIOStream Pointer is NULL"));
+        }
     }
     
     uint64_t BitBuffer_GetSize(BitBuffer *BitB) {
@@ -155,6 +177,73 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
+
+    void BitBuffer_Read(BitBuffer *BitB) {
+        if (BitB != NULL) {
+            // save up to 1 byte
+            if (BitB->BitOffset != 0) {
+                uint64_t BitOffset  = BitB->BitOffset; // Saved for restoration
+                uint64_t NumBits    = BitB->NumBits;
+                uint64_t Bytes2Save = Bits2Bytes(RoundingType_Up, BitOffset);
+                uint64_t BufferSize = Bits2Bytes(RoundingType_Up, NumBits);
+
+                for (uint64_t Byte2Keep = BufferSize - Bytes2Save; Byte2Keep < BufferSize; Byte2Keep++) {
+                    BitB->Buffer[BufferSize - (Bytes2Save + Byte2Keep)] = BitB->Buffer[Byte2Keep];
+                }
+
+                // Now we need to read in BufferSize - Bytes2Save, starting the array at Bytes2Save
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+                struct sigevent SignalEvent = {
+                    .sigev_notify            = 0,
+                    .sigev_signo             = 0,
+                    .sigev_value             = 0,
+                    .sigev_notify_function   = 0,
+                    .sigev_notify_attributes = 0,
+                };
+                
+                struct aiocb Async = {
+                    .aio_fildes     = AsyncIOStream_GetDescriptor(BitB->Input),
+                    .aio_offset     = AsyncIOStream_GetPosition(BitB->Input),
+                    .aio_buf        = &BitB->Buffer[Bytes2Save],
+                    .aio_nbytes     = BufferSize - Bytes2Save,
+                    /* aio_reqprio  = Request Priority */
+                    .aio_sigevent   = SignalEvent,
+                    .aio_lio_opcode = 0, // What operation are we doing?
+                };
+                aio_read(&Async);
+                AsyncIOStream_Read(BitB->Input, BitB->Buffer, 1, Bits2Bytes(RoundingType_Down, BitB->NumBits));
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+                // IO completion ports
+#endif
+
+                /*
+                 Async is Preferred, I've got an idea to optimize this while keeping the data correct.
+
+                 Just return after the read or write has been cue'd.
+
+                 we only need to worry about the buffer being correct if a call is made to Read or Write to the BitBuffer, so handle that check or loop or whatever it may be in that function.
+
+                 We may need to have our own signal handler here to support different platforms...
+
+                 Well, those are for the future
+                 */
+
+
+
+
+                /*
+                 Ok, so, round up the bits to full bytes, copy that many bytes from the end of the buffer to the beginning.
+                 then read in the new data, but what if there were some bits left over?
+                 We have to shift everything?
+                 Well, don't worry about that too much because the Write function only allows us to write at a byte resolution.
+
+                 Also, we should consider having a function specifically for moving data in an aray because this is really common
+
+                 Just, where should it go?
+                 */
+            }
+        }
+    }
     
     uint8_t BitBuffer_Erase(BitBuffer *BitB, uint8_t NewValue) {
         uint8_t Verification = 0xFE;
@@ -208,6 +297,58 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitStart %lld is greater than or equal to BitEnd %lld"), BitStart, BitEnd);
         } else if (BitStart >= Source->NumBits || BitEnd >= Source->NumBits) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitStart %lld or BitEnd %lld is greater than there are bits in Source %lld"), BitStart, BitEnd, Source->NumBits);
+        }
+    }
+
+    void BitBuffer_ReadStream(BitBuffer *BitB) {
+        if (BitB != NULL) {
+            uint64_t ArraySizeInBits = BitBuffer_GetSize(BitB);
+            uint64_t ArrayOffset     = BitBuffer_GetPosition(BitB);
+            uint8_t *Array           = BitBuffer_GetArray(BitB);
+            uint64_t Bytes2Read      = Bits2Bytes(RoundingType_Down, ArraySizeInBits - ArrayOffset);
+            uint8_t  Bits2Save       = ArrayOffset % 8;
+            if (Bits2Save > 0) {
+                Array[0]             = 0;
+                uint8_t Saved        = Array[Bytes2Read + 1] & (Exponentiate(2, Bits2Save) - 1); // Todo: Add shift
+                Array[0]             = Saved;
+                BitBuffer_SetPosition(BitB, Bits2Save);
+                for (uint64_t Byte   = (uint64_t) Bits2Bytes(RoundingType_Down, ArrayOffset); Byte < (uint64_t) Bits2Bytes(RoundingType_Down, ArraySizeInBits - ArrayOffset); Byte++) {
+                    Array[Byte]      = 0;
+                }
+            }
+            uint64_t BytesRead       = Bytes2Read;
+            //BytesRead                = FileIO_Read(Input->FileID, Array, sizeof(Array[0]), Bytes2Read);
+            if (BytesRead == Bytes2Read) {
+                BitBuffer_SetSize(BitB, BytesRead + ArrayOffset);
+            } else {
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Num bytes read %llu does not match num bytes requested %llu"), BytesRead, Bytes2Read);
+            }
+        } else if (BitB == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
+        }
+    }
+
+    void BitBuffer_WriteStream(BitBuffer *BitB) {
+        if (BitB != NULL) {
+            uint64_t ArraySizeInBits = BitBuffer_GetSize(BitB);
+            uint64_t ArrayOffset     = BitBuffer_GetPosition(BitB);
+            uint8_t *Array           = BitBuffer_GetArray(BitB);
+            uint64_t Bytes2Write     = Bits2Bytes(RoundingType_Down, BitBuffer_GetPosition(BitB));
+            uint64_t Bits2Keep       = ArrayOffset % 8;
+            uint64_t   BytesWritten    = Bytes2Write; // Just to get it to compile to test core dumps
+                                                      //uint64_t BytesWritten    = FileIO_Write(Output->FileID, Array, sizeof(uint8_t), Bytes2Write);
+            if (BytesWritten == Bytes2Write) {
+                Array[0]             = 0;
+                Array[0]             = Array[Bytes2Write + 1] & (Exponentiate(2, Bits2Keep) << (8 - Bits2Keep));
+                BitBuffer_SetPosition(BitB, Bits2Keep + 1);
+                for (uint64_t Byte = (uint64_t) Bits2Bytes(RoundingType_Up, ArrayOffset); Byte < (uint64_t) Bits2Bytes(RoundingType_Down, ArraySizeInBits); Byte++) {
+                    Array[Byte]      = 0;
+                }
+            } else {
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %lld of %lld bits"), BytesWritten * 8, Bytes2Write * 8);
+            }
+        } else if (BitB == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
     }
     
@@ -859,7 +1000,7 @@ extern "C" {
     
     uint8_t *GUUID_Swap(BufferIO_GUUIDTypes GUUIDType, uint8_t *GUUID2Swap) {
         uint8_t *SwappedGUUID = NULL;
-        if (GUUID2Swap != NULL && GUUIDType != GUUIDType_Unspecified) {
+        if (GUUIDType != GUUIDType_Unspecified && GUUIDType <= 4) {
             uint8_t Dash = '-';
             if (GUUIDType == GUUIDType_UUIDString || GUUIDType == GUUIDType_GUIDString) {
                 SwappedGUUID          = (uint8_t*) calloc(GUUIDString_Size, sizeof(uint8_t));
@@ -915,18 +1056,16 @@ extern "C" {
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SwappedGUUID Pointer is NULL"));
                 }
             }
-        } else if (GUUID2Swap == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("GUUID2Swap Pointer is NULL"));
         } else if (GUUIDType == GUUIDType_Unspecified) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("GUUIDType_Unspecified is an invalid GUUID type"));
+        } else if (GUUIDType > 4) {
+            Log(Severity_USER, PlatformIO_FunctionName, UTF8String("GUUIDTypes are not ORable"));
         }
         return SwappedGUUID;
     }
     
     void GUUID_Deinit(uint8_t *GUUID) {
-        if (GUUID != NULL) {
-            free(GUUID);
-        }
+        free(GUUID);
     }
     /* GUUID */
     
