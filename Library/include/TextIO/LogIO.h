@@ -26,10 +26,12 @@ extern "C" {
      @enum       LogIO_Severities
      @constant   Severity_DEBUG                  A internal error happened because there's a bug.
      @constant   Severity_USER                   An error occured because the user misused something.
+     @constant   Severity_WARNING                Just an informational message.
      */
     typedef enum LogIO_Severities {
                  Severity_DEBUG                  = 1,
                  Severity_USER                   = 2,
+                 Severity_WARNING                = 3,
     } LogIO_Severities;
     
     /*!
