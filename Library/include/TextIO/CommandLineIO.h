@@ -257,16 +257,17 @@ extern "C" {
      @abstract                                     Sets OptionID's flag in the CommandLineIO instance pointed by CLI.
      @param        CLI                             CommandLineIO Pointer.
      @param        OptionID                        Which option are we talking about?
+     @param        SwitchType                      What kind of switch is this?
      */
-    void           CommandLineIO_Switch_SetType(CommandLineIO *CLI, uint64_t OptionID, CommandLineIO_SwitchTypes OptionType);
+    void           CommandLineIO_Switch_SetType(CommandLineIO *CLI, uint64_t OptionID, CommandLineIO_SwitchTypes SwitchType);
     
     /*!
      @abstract                                     Sets OptionID as accepting arguments of only a certain type.
      @param        CLI                             CommandLineIO Pointer.
      @param        OptionID                        The option to apply the ArgumentType to.
-     @param        ArgumentType                    The argument type from CommandLineIO_SwitchArguments.
+     @param        SwitchArgument                  The argument type from CommandLineIO_SwitchArguments.
      */
-    void           CommandLineIO_Switch_SetArgumentType(CommandLineIO *CLI, uint64_t OptionID, CommandLineIO_SwitchArguments ArgumentType);
+    void           CommandLineIO_Switch_SetArgumentType(CommandLineIO *CLI, uint64_t OptionID, CommandLineIO_SwitchArguments SwitchArgument);
     
     /*!
      @abstract                                     Sets MetaFlag option as a meta flag for OptionID.

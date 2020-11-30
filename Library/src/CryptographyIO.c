@@ -272,16 +272,16 @@ extern "C" {
 
 
                 uint64_t Mixed1   = Integer ^ Seed1;
-                uint64_t Rotated1 = Rotate(Rotate_Left, Rotate1, Mixed1);
+                uint64_t Rotated1 = Rotate(RotationType_Left, Rotate1, Mixed1);
 
                 uint64_t Mixed2   = Rotated1 & Seed2;
-                uint64_t Rotated2 = Rotate(Rotate_Left, Rotate2, Mixed2);
+                uint64_t Rotated2 = Rotate(RotationType_Left, Rotate2, Mixed2);
 
                 uint64_t Mixed3   = Rotated2 | Seed3;
-                uint64_t Rotated3 = Rotate(Rotate_Left, Rotate3, Mixed3);
+                uint64_t Rotated3 = Rotate(RotationType_Left, Rotate3, Mixed3);
 
                 uint64_t Mixed4   = Rotated3 | Seed4;
-                uint64_t Rotated4 = Rotate(Rotate_Left, Rotate4, Mixed4);
+                uint64_t Rotated4 = Rotate(RotationType_Left, Rotate4, Mixed4);
 
                 for (uint8_t Loop = 0; Loop < 8; Loop++) {
                     Random->EntropyPool[Word + Loop] = (Rotated4 & (0xFF << Loop)) >> Loop;
@@ -504,25 +504,25 @@ extern "C" {
     
     static void MD5_A(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += ((B & C) | (~B & D)) + X + AC;
-        A  = (uint32_t) Rotate(Rotate_Left, Shift, A);
+        A  = (uint32_t) Rotate(RotationType_Left, Shift, A);
         A += B;
     }
     
     static void MD5_B(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += ((B & D) | (C & ~D)) + X + AC;
-        A  = (uint32_t) Rotate(Rotate_Left, Shift, A);
+        A  = (uint32_t) Rotate(RotationType_Left, Shift, A);
         A += B;
     }
     
     static void MD5_C(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += (B ^ C ^ D) + X + AC;
-        A  = (uint32_t) Rotate(Rotate_Left, Shift, A);
+        A  = (uint32_t) Rotate(RotationType_Left, Shift, A);
         A += B;
     }
     
     static void MD5_D(uint32_t A, uint32_t B, uint32_t C, uint32_t D, uint32_t X, uint8_t Shift, uint32_t AC) {
         A += (C ^ (B | ~D)) + X + AC;
-        A  = (uint32_t) Rotate(Rotate_Left, Shift, A);
+        A  = (uint32_t) Rotate(RotationType_Left, Shift, A);
         A += B;
     }
     

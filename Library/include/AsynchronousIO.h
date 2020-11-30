@@ -86,9 +86,9 @@ extern "C" {
      @constant    SeekType_End                          Seek from the end of the file.
      */
     typedef enum AsyncIO_SeekTypes {
-        SeekType_Beginning                    = 0,
-        SeekType_Current                      = 1,
-        SeekType_End                          = 2,
+                  SeekType_Beginning                    = 0,
+                  SeekType_Current                      = 1,
+                  SeekType_End                          = 2,
     } AsyncIO_SeekTypes;
 
     /*!
@@ -104,15 +104,15 @@ extern "C" {
      @constant    PathType_Special_Block                The PathType is a Block Device.
      */
     typedef enum AsyncIO_PathTypes {
-        PathType_Unknown                      = 0,
-        PathType_File                         = 1,
-        PathType_Directory                    = 2,
-        PathType_Link_Soft                    = 4,
-        PathType_Link_Hard                    = 8,
-        PathType_Socket                       = 16,
-        PathType_Special_Char                 = 32,
-        PathType_Special_IPCPipe              = 64,
-        PathType_Special_Block                = 128,
+                  PathType_Unknown                      = 0,
+                  PathType_File                         = 1,
+                  PathType_Directory                    = 2,
+                  PathType_Link_Soft                    = 4,
+                  PathType_Link_Hard                    = 8,
+                  PathType_Socket                       = 16,
+                  PathType_Special_Char                 = 32,
+                  PathType_Special_IPCPipe              = 64,
+                  PathType_Special_Block                = 128,
     } AsyncIO_PathTypes;
 
     /*!
@@ -133,7 +133,7 @@ extern "C" {
      @abstract                                          Gets AsyncIOStream's FileDescriptor
      @param             Stream                          The AsyncIOStream to get the Descriptor from
      */
-    AsyncIO_Descriptor   AsyncIOStream_GetDescriptor(AsyncIOStream *Stream);
+    AsyncIO_Descriptor  AsyncIOStream_GetDescriptor(AsyncIOStream *Stream);
 
     /*!
      @abstract                                          Sets AsyncIOStream's FileDescriptor.
@@ -170,17 +170,17 @@ extern "C" {
      @abstract                                          Opens a UTF8 encoded path and assigns it to Stream
      @param             Stream                          A fresh instance of AsyncIOStream
      @param             Path8                           The UTF-8 encoded string to open
-     @param             AsyncIO_Mode                    The configuration to use when Opening
+     @param             FileMode                        The configuration to use when Opening
      */
-    bool                AsyncIOStream_OpenUTF8(AsyncIOStream *Stream, PlatformIO_Immutable(UTF8 *) Path8, AsyncIO_FileModes AsyncIO_Mode);
+    bool                AsyncIOStream_OpenUTF8(AsyncIOStream *Stream, PlatformIO_Immutable(UTF8 *) Path8, AsyncIO_FileModes FileMode);
 
     /*!
      @abstract                                          Opens a UTF16 encoded path and assigns it to Stream
      @param             Stream                          A fresh instance of AsyncIOStream
      @param             Path16                          The UTF-16 encoded string to open
-     @param             AsyncIO_Mode                    The configuration to use when Opening
+     @param             FileMode                        The configuration to use when Opening
      */
-    bool                AsyncIOStream_OpenUTF16(AsyncIOStream *Stream, PlatformIO_Immutable(UTF16 *) Path16, AsyncIO_FileModes AsyncIO_Mode);
+    bool                AsyncIOStream_OpenUTF16(AsyncIOStream *Stream, PlatformIO_Immutable(UTF16 *) Path16, AsyncIO_FileModes FileMode);
 
     /*!
      @abstract                                          Reads data from Stream to Array

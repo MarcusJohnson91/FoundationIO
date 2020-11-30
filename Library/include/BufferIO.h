@@ -251,9 +251,9 @@ extern "C" {
      @param        ByteOrder                       What byte order are the bits to be read?
      @param        BitOrder                        What bit order are the bits to be read?
      @param        UnaryType                       What type of Unary coding are we reading?
-     @param        StopBit                         Is the stop bit a one or a zero?
+     @param        UnaryTerminator                 Is the stop bit a one or a zero?
      */
-    uint64_t       BitBuffer_ReadUnary(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, BufferIO_UnaryTypes UnaryType, BufferIO_UnaryTerminators StopBit);
+    uint64_t       BitBuffer_ReadUnary(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, BufferIO_UnaryTypes UnaryType, BufferIO_UnaryTerminators UnaryTerminator);
 
     /*!
      @abstract                                     Reads data from the Bitbuffer until it stops matching the UTF-8 format.
@@ -309,10 +309,10 @@ extern "C" {
      @param        ByteOrder                       What byte order should the Bits2Write be in?
      @param        BitOrder                        What bit order should the Bits2Write be in?
      @param        UnaryType                       What type of Unary coding should we use?
-     @param        StopBit                         Is the stop bit a one or a zero?
+     @param        UnaryTerminator                 Is the stop bit a one or a zero?
      @param        Bits2Write                      The actual data to write.
      */
-    void           BitBuffer_WriteUnary(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, BufferIO_UnaryTypes UnaryType, BufferIO_UnaryTerminators StopBit, uint8_t Bits2Write);
+    void           BitBuffer_WriteUnary(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, BufferIO_UnaryTypes UnaryType, BufferIO_UnaryTerminators UnaryTerminator, uint8_t Bits2Write);
 
     /*!
      @abstract                                     Writes a UTF-8 encoded string to the BitBuffer.
@@ -364,11 +364,11 @@ extern "C" {
     /*!
      @abstract                                     Converts a GUUID from one representation to another (String/Binary) || (UUID/GUID).
      @remark                                       The original GUUID is untouched, the user needs to deinit it.
-     @param        InputType                       What type of GUUID are we converting from?
-     @param        OutputType                      What type of GUUID are we converting to?
+     @param        GUUIDType_Input                 What type of GUUID are we converting from?
+     @param        GUUIDType_Output                What type of GUUID are we converting to?
      @return                                       Returns the converted GUUID.
      */
-    uint8_t        *GUUID_Convert(BufferIO_GUUIDTypes InputType, BufferIO_GUUIDTypes OutputType, uint8_t *GUUID2Convert);
+    uint8_t        *GUUID_Convert(BufferIO_GUUIDTypes GUUIDType_Input, BufferIO_GUUIDTypes GUUIDType_Output, uint8_t *GUUID2Convert);
 
     /*!
      @abstract                                     Swaps the byte order of a BinaryGUUID or GUUIDString.

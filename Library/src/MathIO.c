@@ -4,6 +4,19 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
+
+    /*!
+     @enum         MathIO_Constants
+     @abstract                                    Mathematical constants
+     */
+    typedef enum MathIO_Constants {
+                   Decimal64Bias                  = 1023,
+                   Decimal32Bias                  = 127,
+                   Decimal64MantissaSize          = 52,
+                   Decimal32MantissaSize          = 23,
+                   Decimal64ExponentSize          = 11,
+                   Decimal32ExponentSize          = 8,
+    } MathIO_Constants;
     
     bool IsNegative8(const int8_t Integer) {
         return (Integer & 0x80) >> 7;
@@ -464,13 +477,12 @@ extern "C" {
 #if (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
 __attribute__((no_sanitize("undefined")))
 #endif
-    int64_t Rotate(const MathIO_RotationType Rotate, const uint8_t NumBits2Rotate, const int64_t Value) {
+    int64_t Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const int64_t Value) {
         int64_t Rotated = 0ULL;
-        if (Rotate == Rotate_Left) {
-            Rotated     = (Value << NumBits2Rotate) | (Value >> (64 - NumBits2Rotate));
+        if (RotationType == RotationType_Left) {
             Rotated     = (Value << NumBits2Rotate) | (Value >> (-NumBits2Rotate) & 63);
-        } else if (Rotate == Rotate_Right) {
-            Rotated     = (Value >> NumBits2Rotate) | (Value << (64 - NumBits2Rotate));
+        } else if (RotationType == RotationType_Right) {
+            Rotated     = (Value >> NumBits2Rotate) | (Value << (-NumBits2Rotate) & 63);
         }
         return Rotated;
     }
