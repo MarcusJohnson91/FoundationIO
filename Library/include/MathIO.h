@@ -24,19 +24,6 @@ extern "C" {
 #endif /* Version check */
     
     /*!
-     @enum         MathIO_Constants
-     @abstract                                    Mathematical constants
-     */
-    typedef enum MathIO_Constants {
-                   Decimal64Bias                  = 1023,
-                   Decimal32Bias                  = 127,
-                   Decimal64MantissaSize          = 52,
-                   Decimal32MantissaSize          = 23,
-                   Decimal64ExponentSize          = 11,
-                   Decimal32ExponentSize          = 8,
-    } MathIO_Constants;
-    
-    /*!
      @enum         MathIO_RoundingTypes
      @abstract                                    Defines the type of rounding.
      @constant     RoundingType_Unspecified       Invalid ImageType, exists solely to tell when it hasn't been set.
@@ -49,10 +36,10 @@ extern "C" {
                    RoundingType_Up                = 2,
     } MathIO_RoundingTypes;
     
-    typedef enum MathIO_RotationType {
-                   Rotate_Left                    = 0,
-                   Rotate_Right                   = 1,
-    } MathIO_RotationType;
+    typedef enum MathIO_RotationTypes {
+                   RotationType_Left              = 0,
+                   RotationType_Right             = 1,
+    } MathIO_RotationTypes;
     
     /*!
      @abstract                                    Tells if the number is negative.
@@ -542,12 +529,12 @@ extern "C" {
     
     /*!
      @abstract                                    Rotates Value by Bits2Rotate.
-     @param      Rotate                           The direction to rotate.
+     @param      RotationType                     The direction to rotate.
      @param      NumBits2Rotate                   The number of bits to rotate.
      @param      Value                            The value to rotate.
      @return                                      Returns the rotated value.
      */
-    int64_t      Rotate(const MathIO_RotationType Rotate, const uint8_t NumBits2Rotate, const int64_t Value);
+    int64_t      Rotate(const MathIO_RotationTypes RotationType, const uint8_t NumBits2Rotate, const int64_t Value);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

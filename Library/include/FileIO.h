@@ -60,9 +60,9 @@ extern "C" {
     /*!
      @abstract                                          Detects the Unicode encoding the File has been opened for
      @param             Stream                          The stream
-     @param             Orientation                     What width should the Stream use
+     @param             StringType                      What width should the Stream use
      */
-    bool                FileIO_SetFileOrientation(AsyncIOStream *Stream, TextIO_StringTypes Orientation);
+    bool                FileIO_SetFileOrientation(AsyncIOStream *Stream, TextIO_StringTypes StringType);
 
     /*!
      @abstract                                          Detects the Unicode encoding the File has been opened for
