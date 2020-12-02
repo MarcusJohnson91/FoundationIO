@@ -7,12 +7,14 @@ extern "C" {
 #endif
 
     bool Test_FileOpenWriteReadClose8(SecureRNG *Secure) {
-        bool TestPassed = No;
-        FILE *Write     = FileIO_OpenUTF8(UTF8String("\xEF\xBB\xBF/Users/Marcus/Desktop/FileIO_Test.bin"), FileMode_Write | FileMode_Binary);
-        FileIO_Write(Write, UTF8String("Wat"), 1, 4);
+        bool TestPassed      = No;
+        AsyncIOStream *Write = AsyncIOStream_Init();
+        AsyncIOStream_OpenUTF8(Write, UTF8String("\xEF\xBB\xBF/Users/Marcus/Desktop/FileIO_Test.bin"), FileMode_Write | FileMode_Binary);
+        AsyncIOStream_Write(Write, UTF8String("Wat"), 1, 4);
         UTF8  String[4];
-        FILE *Read      = FileIO_OpenUTF8(UTF8String("\xEF\xBB\xBF/Users/Marcus/Desktop/FileIO_Test.bin"), FileMode_Read | FileMode_Binary);
-        FileIO_Read(Read, &String, 1, 3);
+        AsyncIOStream *Read  = AsyncIOStream_Init();
+        AsyncIOStream_OpenUTF8(Read, UTF8String("\xEF\xBB\xBF/Users/Marcus/Desktop/FileIO_Test.bin"), FileMode_Read | FileMode_Binary);
+        AsyncIOStream_Read(Read, &String, 1, 3);
         if (String[0] == 'W' && String[1] == 'a' && String[2] == 't') {
             TestPassed  = Yes;
         }
