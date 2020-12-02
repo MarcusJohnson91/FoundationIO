@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C3158072578258C00AF9697 /* Test_AsynchronousIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C3157E42578254100AF9697 /* Test_AsynchronousIO.c */; };
+		2C31584D257825B400AF9697 /* Test_PlatformIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C3157E52578256700AF9697 /* Test_PlatformIO.c */; };
 		2C410978236BA3320059FE67 /* BufferIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C41096F236BA3050059FE67 /* BufferIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C41097A236BA3320059FE67 /* CryptographyIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CC71D95232B5F43006DA1B8 /* CryptographyIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C41097B236BA3320059FE67 /* PlatformIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CC71D91232B5F43006DA1B8 /* PlatformIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -123,6 +125,24 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		2C3157E82578257E00AF9697 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		2C315820257825A400AF9697 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		2C73A31624EE614D006E480E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -207,6 +227,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2C3157E42578254100AF9697 /* Test_AsynchronousIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_AsynchronousIO.c; path = ../Tests/Test_AsynchronousIO.c; sourceTree = "<group>"; };
+		2C3157E52578256700AF9697 /* Test_PlatformIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_PlatformIO.c; path = ../Tests/Test_PlatformIO.c; sourceTree = "<group>"; };
+		2C3157EA2578257E00AF9697 /* Test_AsynchronousIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_AsynchronousIO; sourceTree = BUILT_PRODUCTS_DIR; };
+		2C315822257825A400AF9697 /* Test_PlatformIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_PlatformIO; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C41096F236BA3050059FE67 /* BufferIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = BufferIO.h; path = ../Library/include/BufferIO.h; sourceTree = "<group>"; };
 		2C73A30E24EE6119006E480E /* Test_StringIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_StringIO.c; path = ../Tests/TextIO/Test_StringIO.c; sourceTree = "<group>"; };
 		2C73A30F24EE6119006E480E /* Test_FormatIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_FormatIO.c; path = ../Tests/TextIO/Test_FormatIO.c; sourceTree = "<group>"; };
@@ -258,6 +282,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		2C3157E72578257E00AF9697 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2C31581F257825A400AF9697 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2C73A31524EE614D006E480E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -403,6 +441,8 @@
 				2C88501C24BCB49F00DAD7ED /* Test_NetworkIO */,
 				2C88502924BCB6AD00DAD7ED /* Test_FormatIO */,
 				2C73A31824EE614D006E480E /* Test_LocalizationIO */,
+				2C3157EA2578257E00AF9697 /* Test_AsynchronousIO */,
+				2C315822257825A400AF9697 /* Test_PlatformIO */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -411,11 +451,13 @@
 			isa = PBXGroup;
 			children = (
 				2C73A30D24EE60FC006E480E /* TextIO */,
+				2C3157E42578254100AF9697 /* Test_AsynchronousIO.c */,
 				2CC71D8A232B5F20006DA1B8 /* Test_BufferIO.c */,
 				2CC71D89232B5F20006DA1B8 /* Test_CryptographyIO.c */,
-				2CC71D88232B5F20006DA1B8 /* Test_MathIO.c */,
 				2C88500A24BCB45A00DAD7ED /* Test_FileIO.c */,
+				2CC71D88232B5F20006DA1B8 /* Test_MathIO.c */,
 				2C88500C24BCB47500DAD7ED /* Test_NetworkIO.c */,
+				2C3157E52578256700AF9697 /* Test_PlatformIO.c */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
@@ -503,6 +545,40 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		2C3157E92578257E00AF9697 /* Test_AsynchronousIO */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2C3157EE2578257E00AF9697 /* Build configuration list for PBXNativeTarget "Test_AsynchronousIO" */;
+			buildPhases = (
+				2C3157E62578257E00AF9697 /* Sources */,
+				2C3157E72578257E00AF9697 /* Frameworks */,
+				2C3157E82578257E00AF9697 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Test_AsynchronousIO;
+			productName = Test_AsynchronousIO;
+			productReference = 2C3157EA2578257E00AF9697 /* Test_AsynchronousIO */;
+			productType = "com.apple.product-type.tool";
+		};
+		2C315821257825A400AF9697 /* Test_PlatformIO */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2C315826257825A500AF9697 /* Build configuration list for PBXNativeTarget "Test_PlatformIO" */;
+			buildPhases = (
+				2C31581E257825A400AF9697 /* Sources */,
+				2C31581F257825A400AF9697 /* Frameworks */,
+				2C315820257825A400AF9697 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Test_PlatformIO;
+			productName = Test_PlatformIO;
+			productReference = 2C315822257825A400AF9697 /* Test_PlatformIO */;
+			productType = "com.apple.product-type.tool";
+		};
 		2C73A31724EE614D006E480E /* Test_LocalizationIO */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2C73A31C24EE614D006E480E /* Build configuration list for PBXNativeTarget "Test_LocalizationIO" */;
@@ -693,6 +769,12 @@
 				LastUpgradeCheck = 1220;
 				ORGANIZATIONNAME = MarcusJohnson;
 				TargetAttributes = {
+					2C3157E92578257E00AF9697 = {
+						CreatedOnToolsVersion = 12.2;
+					};
+					2C315821257825A400AF9697 = {
+						CreatedOnToolsVersion = 12.2;
+					};
 					2C73A31724EE614D006E480E = {
 						CreatedOnToolsVersion = 11.6;
 					};
@@ -739,6 +821,7 @@
 			projectRoot = "";
 			targets = (
 				2CC71D78232B5EC8006DA1B8 /* FoundationIO */,
+				2C3157E92578257E00AF9697 /* Test_AsynchronousIO */,
 				2CC71DBE232B5FD9006DA1B8 /* Test_BufferIO */,
 				2CC71DCA232B5FF4006DA1B8 /* Test_CommandLineIO */,
 				2CC71DE0232B6009006DA1B8 /* Test_CryptographyIO */,
@@ -748,6 +831,7 @@
 				2C88501B24BCB49F00DAD7ED /* Test_NetworkIO */,
 				2C88502824BCB6AD00DAD7ED /* Test_FormatIO */,
 				2C73A31724EE614D006E480E /* Test_LocalizationIO */,
+				2C315821257825A400AF9697 /* Test_PlatformIO */,
 			);
 		};
 /* End PBXProject section */
@@ -769,6 +853,22 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		2C3157E62578257E00AF9697 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2C3158072578258C00AF9697 /* Test_AsynchronousIO.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2C31581E257825A400AF9697 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2C31584D257825B400AF9697 /* Test_PlatformIO.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2C73A31424EE614D006E480E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -912,6 +1012,66 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		2C3157EF2578257E00AF9697 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2C3157F02578257E00AF9697 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		2C315827257825A500AF9697 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2C315828257825A500AF9697 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		2C73A31D24EE614D006E480E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -924,6 +1084,7 @@
 				GCC_INPUT_FILETYPE = automatic;
 				GCC_OPTIMIZATION_LEVEL = 1;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -940,6 +1101,7 @@
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_INPUT_FILETYPE = automatic;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -956,6 +1118,7 @@
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_OPTIMIZATION_LEVEL = 1;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -971,6 +1134,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -987,6 +1151,7 @@
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_OPTIMIZATION_LEVEL = 1;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1002,6 +1167,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1018,6 +1184,7 @@
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_OPTIMIZATION_LEVEL = 1;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1033,6 +1200,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1135,12 +1303,15 @@
 					"-glldb",
 					"-Wenum-conversion",
 					"-Wno-assign-enum",
+					"-Wswitch-enum",
 				);
+				OTHER_LDFLAGS = "-dead_strip_dylibs";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
+				STRIP_INSTALLED_PRODUCT = NO;
 				SUPPORTED_PLATFORMS = "MacOSX iPadOS iPhoneOS";
 				TVOS_DEPLOYMENT_TARGET = 12.0;
 				VALID_ARCHS = "arm64 x86_64";
@@ -1194,6 +1365,7 @@
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEPLOYMENT_POSTPROCESSING = YES;
 				ENABLE_BITCODE = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -1224,6 +1396,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-dead_strip_dylibs";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = NO;
@@ -1281,7 +1454,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
+				DEPLOYMENT_POSTPROCESSING = NO;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				DYLIB_INSTALL_NAME_BASE = "$(INSTALL_PATH)/lib/$(TARGET_NAME).$(EXECUTABLE_EXTENSION)";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -1324,8 +1497,8 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "-dead_strip_dylibs";
-				OTHER_LIBTOOLFLAGS = "-v";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_LIBTOOLFLAGS = "";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
 				PRIVATE_HEADERS_FOLDER_PATH = "$(INSTALL_PATH)/include/TextIO";
 				PUBLIC_HEADERS_FOLDER_PATH = "$(INSTALL_PATH)/include";
@@ -1333,6 +1506,7 @@
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = all;
 				SUPPORTED_PLATFORMS = "$(inherited)";
 				SUPPORTS_MACCATALYST = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1425,14 +1599,15 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "-dead_strip_dylibs";
-				OTHER_LIBTOOLFLAGS = "-v";
+				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_LIBTOOLFLAGS = "";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
 				PRIVATE_HEADERS_FOLDER_PATH = "$(INSTALL_PATH)/include/TextIO";
 				PUBLIC_HEADERS_FOLDER_PATH = "$(INSTALL_PATH)/include";
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
+				STRIP_STYLE = all;
 				SUPPORTED_PLATFORMS = "$(inherited)";
 				SUPPORTS_MACCATALYST = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1455,6 +1630,7 @@
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1469,6 +1645,7 @@
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1483,6 +1660,7 @@
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1497,6 +1675,7 @@
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1511,6 +1690,7 @@
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1525,6 +1705,7 @@
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1539,6 +1720,7 @@
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1553,6 +1735,7 @@
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1567,6 +1750,7 @@
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1581,6 +1765,7 @@
 				INSTALL_PATH = /usr/local/Packages/FoundationIO/bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_CFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
 			};
@@ -1589,6 +1774,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		2C3157EE2578257E00AF9697 /* Build configuration list for PBXNativeTarget "Test_AsynchronousIO" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2C3157EF2578257E00AF9697 /* Debug */,
+				2C3157F02578257E00AF9697 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2C315826257825A500AF9697 /* Build configuration list for PBXNativeTarget "Test_PlatformIO" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2C315827257825A500AF9697 /* Debug */,
+				2C315828257825A500AF9697 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		2C73A31C24EE614D006E480E /* Build configuration list for PBXNativeTarget "Test_LocalizationIO" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

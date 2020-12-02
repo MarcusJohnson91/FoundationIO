@@ -7,13 +7,11 @@ FindTargetArchitecture(TargetArchitecture)
 include(GetVersion.cmake)
 GetVersionString(VERSION_STRING "/Library/include/Private")
 
-include(CTest)
-
-if(DEFINED CMAKE_BUILD_TYPE AND CMAKE_BUILD_TYPE STREQUAL "")
-    set(CMAKE_BUILD_TYPE "Debug")
-elseif(NOT DEFINED CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Debug")
-endif(DEFINED CMAKE_BUILD_TYPE AND CMAKE_BUILD_TYPE STREQUAL "")
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "Debug")
+elseif(CMAKE_BUILD_TYPE STREQUAL "")
+	set(CMAKE_BUILD_TYPE "Debug")
+endif(NOT DEFINED CMAKE_BUILD_TYPE)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${TargetArchitecture}/${CMAKE_BUILD_TYPE}")
 set(CMAKE_OUTPUT_DIRECTORY         "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${TargetArchitecture}/${CMAKE_BUILD_TYPE}")
@@ -58,7 +56,7 @@ set(FOUNDATIONIO_SOURCE
 )
 
 if(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
-    message("We're checking if TextIOTables.h should be updated, it could take a few seconds or about 12 minutes.")
+    message("We're checking if TextIOTables.h should be updated, it could take a few seconds to about 12 minutes.")
     execute_process(
     COMMAND sh "${FoundationIO_Library_Dir}/include/TextIO/Private/TextIOTables_Create.sh" "${FoundationIO_Library_Dir}/include/TextIO/Private/TextIOTables.h"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -107,45 +105,57 @@ install(FILES "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Resources/FoundationIO.pc" DEST
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     enable_testing()
+    include(CTest)
 
+    add_executable(Test_AsynchronousIO              "${FoundationIO_Test_Dir}/Test_AsynchronousIO.c")
     add_executable(Test_BufferIO                    "${FoundationIO_Test_Dir}/Test_BufferIO.c")
     add_executable(Test_CryptographyIO              "${FoundationIO_Test_Dir}/Test_CryptographyIO.c")
     add_executable(Test_FileIO                      "${FoundationIO_Test_Dir}/Test_FileIO.c")
     add_executable(Test_MathIO                      "${FoundationIO_Test_Dir}/Test_MathIO.c")
     add_executable(Test_NetworkIO                   "${FoundationIO_Test_Dir}/Test_NetworkIO.c")
+    add_executable(Test_PlatformIO                  "${FoundationIO_Test_Dir}/Test_PlatformIO.c")
     add_executable(Test_CommandLineIO               "${FoundationIO_Test_Dir}/TextIO/Test_CommandLineIO.c")
     add_executable(Test_FormatIO                    "${FoundationIO_Test_Dir}/TextIO/Test_FormatIO.c")
+    add_executable(Test_LocalizationIO              "${FoundationIO_Test_Dir}/TextIO/Test_LocalizationIO.c")
     add_executable(Test_StringIO                    "${FoundationIO_Test_Dir}/TextIO/Test_StringIO.c")
 
+    target_link_libraries(Test_AsynchronousIO       FoundationIO)
     target_link_libraries(Test_BufferIO             FoundationIO)
     target_link_libraries(Test_CryptographyIO       FoundationIO)
     target_link_libraries(Test_FileIO               FoundationIO)
     target_link_libraries(Test_MathIO               FoundationIO)
     target_link_libraries(Test_NetworkIO            FoundationIO)
+    target_link_libraries(Test_PlatformIO           FoundationIO)
     target_link_libraries(Test_CommandLineIO        FoundationIO)
     target_link_libraries(Test_FormatIO             FoundationIO)
+    target_link_libraries(Test_LocalizationIO       FoundationIO)
     target_link_libraries(Test_StringIO             FoundationIO)
 
-    add_test(Test_BufferIO                          "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Test_BufferIO")
-    add_test(Test_CryptographyIO                    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Test_CryptographyIO")
-    add_test(Test_FileIO                            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Test_FileIO")
-    add_test(Test_MathIO                            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Test_MathIO")
-    add_test(Test_NetworkIO                         "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Test_NetworkIO")
-    add_test(Test_CommandLineIO                     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Test_CommandLineIO")
-    add_test(Test_FormatIO                          "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Test_FormatIO")
-    add_test(Test_StringIO                          "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Test_StringIO")
+    add_test(NAME AsynchronousIO COMMAND $<TARGET_FILE:Test_AsynchronousIO>)
+    add_test(NAME BufferIO       COMMAND $<TARGET_FILE:Test_BufferIO>)
+    add_test(NAME CryptographyIO COMMAND $<TARGET_FILE:Test_CryptographyIO>)
+    add_test(NAME FileIO         COMMAND $<TARGET_FILE:Test_FileIO>)
+    add_test(NAME MathIO         COMMAND $<TARGET_FILE:Test_MathIO>)
+    add_test(NAME NetworkIO      COMMAND $<TARGET_FILE:Test_NetworkIO>)
+    add_test(NAME PlatformIO     COMMAND $<TARGET_FILE:Test_PlatformIO>)
+    add_test(NAME CommandLineIO  COMMAND $<TARGET_FILE:Test_CommandLineIO>)
+    add_test(NAME FormatIO       COMMAND $<TARGET_FILE:Test_FormatIO>)
+    add_test(NAME LocalizationIO COMMAND $<TARGET_FILE:Test_LocalizationIO>)
+    add_test(NAME StringIO       COMMAND $<TARGET_FILE:Test_StringIO>)
 
+    install(TARGETS Test_AsynchronousIO DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
     install(TARGETS Test_BufferIO       DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-    install(TARGETS Test_CommandLineIO  DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
     install(TARGETS Test_CryptographyIO DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-    install(TARGETS Test_FormatIO       DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
     install(TARGETS Test_FileIO         DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
     install(TARGETS Test_MathIO         DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
     install(TARGETS Test_NetworkIO      DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+    install(TARGETS Test_PlatformIO     DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+    install(TARGETS Test_CommandLineIO  DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+    install(TARGETS Test_FormatIO       DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+    install(TARGETS Test_LocalizationIO DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
     install(TARGETS Test_StringIO       DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
 
     add_custom_command(TARGET FoundationIO POST_BUILD COMMAND ctest ARGS --output-on-failure WORKING_DIRECTORY ${CMAKE_OUTPUT_DIRECTORY})
-
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 
 if(${CMAKE_C_COMPILER_ID} STREQUAL "AppleClang" OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
@@ -170,6 +180,7 @@ ${CMAKE_C_FLAGS} \
 -Wno-reserved-id-macro \
 -Wno-sign-conversion \
 -Wenum-conversion \
+-Wswitch-enum \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
@@ -252,6 +263,7 @@ ${CMAKE_C_FLAGS} \
 -Wsuggest-attribute=format \
 -Wmissing-format-attribute \
 -Wmissing-noreturn \
+-Wswitch-enum \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
