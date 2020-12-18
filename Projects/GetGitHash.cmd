@@ -2,11 +2,7 @@
 SETLOCAL EnableExtensions
 SETLOCAL EnableDelayedExpansion
 
-SET Header=%~dp0..\Library\include\Private\CommitID.h
-
-echo !Header!
-
-echo|set /p="#define Version_CommitID " !CommitID_U! >!Header!
+echo|set /p="#define Version_CommitID " !CommitID_U! >!${CommitIDHeaderPath}!
 
 FOR /F %%A IN ('git branch --show-current') DO SET GitBranch=%%A
 
@@ -14,7 +10,7 @@ FOR /F %%A IN ('git rev-parse !GitBranch!') DO SET CommitID=%%A
 
 SET CommitID_U=!CommitID!
 CALL :HexUpper CommitID_U
-echo !CommitID_U!>>!Header!
+echo !CommitID_U!>>!${CommitIDHeaderPath}!
 exit /b
 
 :HexUpper
