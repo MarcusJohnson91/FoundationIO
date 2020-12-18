@@ -24,6 +24,8 @@
 		2C73A31F24EE6153006E480E /* Test_LocalizationIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C73A31024EE6119006E480E /* Test_LocalizationIO.c */; };
 		2C73A32024EE615B006E480E /* Test_StringIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C73A30E24EE6119006E480E /* Test_StringIO.c */; };
 		2C73A32424EE7A4A006E480E /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
+		2C7CD429258C5EDA0039F608 /* Test_LogIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C7CD375258C5E5C0039F608 /* Test_LogIO.c */; };
+		2C7CD454258C5FEE0039F608 /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
 		2C88500324BCA09100DAD7ED /* NetworkIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2C88500224BCA09100DAD7ED /* NetworkIO.c */; };
 		2C88500524BCA0AD00DAD7ED /* NetworkIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C88500424BCA0AD00DAD7ED /* NetworkIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C88500724BCA22A00DAD7ED /* FileIO.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C88500624BCA22A00DAD7ED /* FileIO.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -60,6 +62,13 @@
 
 /* Begin PBXContainerItemProxy section */
 		2C73A32124EE7A46006E480E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2CC71D71232B5EC8006DA1B8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2CC71D78232B5EC8006DA1B8;
+			remoteInfo = FoundationIO;
+		};
+		2C7CD451258C5FE90039F608 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 2CC71D71232B5EC8006DA1B8 /* Project object */;
 			proxyType = 1;
@@ -144,6 +153,15 @@
 			runOnlyForDeploymentPostprocessing = 1;
 		};
 		2C73A31624EE614D006E480E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		2C7CD384258C5E890039F608 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -237,6 +255,8 @@
 		2C73A31024EE6119006E480E /* Test_LocalizationIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_LocalizationIO.c; path = ../Tests/TextIO/Test_LocalizationIO.c; sourceTree = "<group>"; };
 		2C73A31124EE6119006E480E /* Test_CommandLineIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_CommandLineIO.c; path = ../Tests/TextIO/Test_CommandLineIO.c; sourceTree = "<group>"; };
 		2C73A31824EE614D006E480E /* Test_LocalizationIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_LocalizationIO; sourceTree = BUILT_PRODUCTS_DIR; };
+		2C7CD375258C5E5C0039F608 /* Test_LogIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_LogIO.c; path = ../Tests/TextIO/Test_LogIO.c; sourceTree = "<group>"; };
+		2C7CD386258C5E890039F608 /* Test_LogIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_LogIO; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C88500224BCA09100DAD7ED /* NetworkIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = NetworkIO.c; path = ../Library/src/NetworkIO.c; sourceTree = "<group>"; };
 		2C88500424BCA0AD00DAD7ED /* NetworkIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = NetworkIO.h; path = ../Library/include/NetworkIO.h; sourceTree = "<group>"; };
 		2C88500624BCA22A00DAD7ED /* FileIO.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FileIO.h; path = ../Library/include/FileIO.h; sourceTree = "<group>"; };
@@ -301,6 +321,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				2C73A32424EE7A4A006E480E /* FoundationIO.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2C7CD383258C5E890039F608 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2C7CD454258C5FEE0039F608 /* FoundationIO.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,6 +413,7 @@
 				2C73A30F24EE6119006E480E /* Test_FormatIO.c */,
 				2C73A31024EE6119006E480E /* Test_LocalizationIO.c */,
 				2C73A30E24EE6119006E480E /* Test_StringIO.c */,
+				2C7CD375258C5E5C0039F608 /* Test_LogIO.c */,
 			);
 			name = TextIO;
 			sourceTree = "<group>";
@@ -443,6 +472,7 @@
 				2C73A31824EE614D006E480E /* Test_LocalizationIO */,
 				2C3157EA2578257E00AF9697 /* Test_AsynchronousIO */,
 				2C315822257825A400AF9697 /* Test_PlatformIO */,
+				2C7CD386258C5E890039F608 /* Test_LogIO */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -595,6 +625,24 @@
 			name = Test_LocalizationIO;
 			productName = Test_LocalizationIO;
 			productReference = 2C73A31824EE614D006E480E /* Test_LocalizationIO */;
+			productType = "com.apple.product-type.tool";
+		};
+		2C7CD385258C5E890039F608 /* Test_LogIO */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2C7CD38A258C5E890039F608 /* Build configuration list for PBXNativeTarget "Test_LogIO" */;
+			buildPhases = (
+				2C7CD382258C5E890039F608 /* Sources */,
+				2C7CD383258C5E890039F608 /* Frameworks */,
+				2C7CD384258C5E890039F608 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2C7CD452258C5FE90039F608 /* PBXTargetDependency */,
+			);
+			name = Test_LogIO;
+			productName = Test_LogIO;
+			productReference = 2C7CD386258C5E890039F608 /* Test_LogIO */;
 			productType = "com.apple.product-type.tool";
 		};
 		2C88501024BCB48600DAD7ED /* Test_FileIO */ = {
@@ -766,7 +814,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1220;
+				LastUpgradeCheck = 1230;
 				ORGANIZATIONNAME = MarcusJohnson;
 				TargetAttributes = {
 					2C3157E92578257E00AF9697 = {
@@ -777,6 +825,9 @@
 					};
 					2C73A31724EE614D006E480E = {
 						CreatedOnToolsVersion = 11.6;
+					};
+					2C7CD385258C5E890039F608 = {
+						CreatedOnToolsVersion = 12.3;
 					};
 					2C88501024BCB48600DAD7ED = {
 						CreatedOnToolsVersion = 11.5;
@@ -823,15 +874,16 @@
 				2CC71D78232B5EC8006DA1B8 /* FoundationIO */,
 				2C3157E92578257E00AF9697 /* Test_AsynchronousIO */,
 				2CC71DBE232B5FD9006DA1B8 /* Test_BufferIO */,
-				2CC71DCA232B5FF4006DA1B8 /* Test_CommandLineIO */,
 				2CC71DE0232B6009006DA1B8 /* Test_CryptographyIO */,
-				2CC71DEB232B6013006DA1B8 /* Test_MathIO */,
-				2CC71DF6232B601B006DA1B8 /* Test_StringIO */,
 				2C88501024BCB48600DAD7ED /* Test_FileIO */,
+				2CC71DEB232B6013006DA1B8 /* Test_MathIO */,
 				2C88501B24BCB49F00DAD7ED /* Test_NetworkIO */,
+				2C315821257825A400AF9697 /* Test_PlatformIO */,
+				2CC71DCA232B5FF4006DA1B8 /* Test_CommandLineIO */,
 				2C88502824BCB6AD00DAD7ED /* Test_FormatIO */,
 				2C73A31724EE614D006E480E /* Test_LocalizationIO */,
-				2C315821257825A400AF9697 /* Test_PlatformIO */,
+				2CC71DF6232B601B006DA1B8 /* Test_StringIO */,
+				2C7CD385258C5E890039F608 /* Test_LogIO */,
 			);
 		};
 /* End PBXProject section */
@@ -874,6 +926,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				2C73A31F24EE6153006E480E /* Test_LocalizationIO.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2C7CD382258C5E890039F608 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2C7CD429258C5EDA0039F608 /* Test_LogIO.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -969,6 +1029,11 @@
 			target = 2CC71D78232B5EC8006DA1B8 /* FoundationIO */;
 			targetProxy = 2C73A32124EE7A46006E480E /* PBXContainerItemProxy */;
 		};
+		2C7CD452258C5FE90039F608 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2CC71D78232B5EC8006DA1B8 /* FoundationIO */;
+			targetProxy = 2C7CD451258C5FE90039F608 /* PBXContainerItemProxy */;
+		};
 		2C88503324BCB9BB00DAD7ED /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 2CC71D78232B5EC8006DA1B8 /* FoundationIO */;
@@ -1017,6 +1082,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1032,6 +1098,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
@@ -1047,6 +1114,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1062,6 +1130,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = 628J9L7WK5;
@@ -1104,6 +1173,38 @@
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "$(inherited)";
+			};
+			name = Release;
+		};
+		2C7CD38B258C5E890039F608 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2C7CD38C258C5E890039F608 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = 628J9L7WK5;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -1252,7 +1353,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMPILER_INDEX_STORE_ENABLE = NO;
 				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
+				DEAD_CODE_STRIPPING = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_BITCODE = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1299,11 +1400,14 @@
 					"-fsanitize-recover=address",
 					"-fno-common",
 					"-Wno-unused-command-line-argument",
-					"-g3",
+					"-g",
 					"-glldb",
 					"-Wenum-conversion",
 					"-Wno-assign-enum",
 					"-Wswitch-enum",
+					"-fstandalone-debug",
+					"-fno-eliminate-unused-debug-types",
+					"-fdebug-macro",
 				);
 				OTHER_LDFLAGS = "-dead_strip_dylibs";
 				PLIST_FILE_OUTPUT_FORMAT = binary;
@@ -1312,6 +1416,7 @@
 				SDKROOT = macosx;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = "";
 				SUPPORTED_PLATFORMS = "MacOSX iPadOS iPhoneOS";
 				TVOS_DEPLOYMENT_TARGET = 12.0;
 				VALID_ARCHS = "arm64 x86_64";
@@ -1797,6 +1902,15 @@
 			buildConfigurations = (
 				2C73A31D24EE614D006E480E /* Debug */,
 				2C73A31E24EE614D006E480E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2C7CD38A258C5E890039F608 /* Build configuration list for PBXNativeTarget "Test_LogIO" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2C7CD38B258C5E890039F608 /* Debug */,
+				2C7CD38C258C5E890039F608 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

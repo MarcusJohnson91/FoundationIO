@@ -1,11 +1,7 @@
-cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(FoundationIO LANGUAGES C)
 
-include(DetectArchitecture.cmake)
-FindTargetArchitecture(TargetArchitecture)
-
-include(GetVersion.cmake)
-GetVersionString(VERSION_STRING "/Library/include/Private")
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 if(NOT DEFINED CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Debug")
@@ -13,52 +9,30 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "")
 	set(CMAKE_BUILD_TYPE "Debug")
 endif(NOT DEFINED CMAKE_BUILD_TYPE)
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${TargetArchitecture}/${CMAKE_BUILD_TYPE}")
-set(CMAKE_OUTPUT_DIRECTORY         "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${TargetArchitecture}/${CMAKE_BUILD_TYPE}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${TargetArchitecture}/${CMAKE_BUILD_TYPE}")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../BUILD/${TargetArchitecture}/${CMAKE_BUILD_TYPE}")
-set(FoundationIO_Library_Dir       "${CMAKE_CURRENT_SOURCE_DIR}/../Library")
-set(FoundationIO_Test_Dir          "${CMAKE_CURRENT_SOURCE_DIR}/../Tests")
-set(FoundationIO_Resource_Dir      "${CMAKE_CURRENT_SOURCE_DIR}/../Resources")
+if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+add_compile_definitions(PlatformIO_LoggingStatus=PlatformIO_EnableLogging)
+endif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 
-set(PUBLIC_HEADERS
-"${FoundationIO_Library_Dir}/include/AsynchronousIO.h"
-"${FoundationIO_Library_Dir}/include/BufferIO.h"
-"${FoundationIO_Library_Dir}/include/CryptographyIO.h"
-"${FoundationIO_Library_Dir}/include/FileIO.h"
-"${FoundationIO_Library_Dir}/include/MathIO.h"
-"${FoundationIO_Library_Dir}/include/NetworkIO.h"
-"${FoundationIO_Library_Dir}/include/PlatformIO.h"
-"${FoundationIO_Library_Dir}/include/TestIO.h"
-"${FoundationIO_Library_Dir}/include/TextIO/CommandLineIO.h"
-"${FoundationIO_Library_Dir}/include/TextIO/FormatIO.h"
-"${FoundationIO_Library_Dir}/include/TextIO/LocalizationIO.h"
-"${FoundationIO_Library_Dir}/include/TextIO/LogIO.h"
-"${FoundationIO_Library_Dir}/include/TextIO/StringIO.h"
-"${FoundationIO_Library_Dir}/include/TextIO/TextIOTypes.h"
-)
+include(DetectArchitecture.cmake)
+FindTargetArchitecture(TargetArchitecture)
 
-set(FOUNDATIONIO_SOURCE
-"${PUBLIC_HEADERS}"
-"${FoundationIO_Library_Dir}/src/AsynchronousIO.c"
-"${FoundationIO_Library_Dir}/src/BufferIO.c"
-"${FoundationIO_Library_Dir}/src/CryptographyIO.c"
-"${FoundationIO_Library_Dir}/src/FileIO.c"
-"${FoundationIO_Library_Dir}/src/MathIO.c"
-"${FoundationIO_Library_Dir}/src/NetworkIO.c"
-"${FoundationIO_Library_Dir}/src/PlatformIO.c"
-"${FoundationIO_Library_Dir}/src/TestIO.c"
-"${FoundationIO_Library_Dir}/src/TextIO/CommandLineIO.c"
-"${FoundationIO_Library_Dir}/src/TextIO/FormatIO.c"
-"${FoundationIO_Library_Dir}/src/TextIO/LocalizationIO.c"
-"${FoundationIO_Library_Dir}/src/TextIO/LogIO.c"
-"${FoundationIO_Library_Dir}/src/TextIO/StringIO.c"
-)
+set(BASE_DIRECTORY      "${CMAKE_CURRENT_SOURCE_DIR}/.." CACHE PATH INTERNAL FORCE)
+set(LIBRARY_DIRECTORY   "${BASE_DIRECTORY}/Library" CACHE PATH INTERNAL FORCE)
+set(TESTSRC_DIRECTORY   "${BASE_DIRECTORY}/Tests" CACHE PATH INTERNAL FORCE)
+set(RESOURCE_DIRECTORY  "${BASE_DIRECTORY}/Resources" CACHE PATH INTERNAL FORCE)
+set(VERSION_DIRECTORY   "${BASE_DIRECTORY}/Library/include/Private/Version" CACHE PATH INTERNAL FORCE)
+set(VERSION_STRING      "")
+set(BUILD_DIRECTORY     "${BASE_DIRECTORY}/BUILD/${TargetArchitecture}/${CMAKE_BUILD_TYPE}")
+
+include(GetVersion.cmake)
+GetVersionString(${VERSION_DIRECTORY} VERSION_STRING)
+
+message("VERSION_STRING = ${VERSION_STRING}")
 
 if(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
     message("We're checking if TextIOTables.h should be updated, it could take a few seconds to about 12 minutes.")
     execute_process(
-    COMMAND sh "${FoundationIO_Library_Dir}/include/TextIO/Private/TextIOTables_Create.sh" "${FoundationIO_Library_Dir}/include/TextIO/Private/TextIOTables.h"
+    COMMAND sh "${LIBRARY_DIRECTORY}/include/TextIO/Private/TextIOTables_Create.sh"                                              "${LIBRARY_DIRECTORY}/include/TextIO/Private/TextIOTables.h"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     OUTPUT_VARIABLE TextIOTables_Create_Status 
     RESULTS_VARIABLE STDOUT
@@ -74,15 +48,42 @@ else()
 set(DynlibExt so)
 endif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
 
-configure_file("${FoundationIO_Resource_Dir}/FoundationIO.pc.in" "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Resources/FoundationIO.pc")
+configure_file(../Resources/FoundationIO.pc.in "${BUILD_DIRECTORY}/Resources/FoundationIO.pc")
+
+set(LIBRARY_SOURCE
+"${LIBRARY_DIRECTORY}/src/AsynchronousIO.c"
+"${LIBRARY_DIRECTORY}/src/BufferIO.c"
+"${LIBRARY_DIRECTORY}/src/CryptographyIO.c"
+"${LIBRARY_DIRECTORY}/src/FileIO.c"
+"${LIBRARY_DIRECTORY}/src/MathIO.c"
+"${LIBRARY_DIRECTORY}/src/NetworkIO.c"
+"${LIBRARY_DIRECTORY}/src/PlatformIO.c"
+"${LIBRARY_DIRECTORY}/src/TestIO.c"
+"${LIBRARY_DIRECTORY}/src/TextIO/CommandLineIO.c"
+"${LIBRARY_DIRECTORY}/src/TextIO/FormatIO.c"
+"${LIBRARY_DIRECTORY}/src/TextIO/LocalizationIO.c"
+"${LIBRARY_DIRECTORY}/src/TextIO/LogIO.c"
+"${LIBRARY_DIRECTORY}/src/TextIO/StringIO.c"
+)
 
 option(BUILD_AS_SHARED_LIBRARY "Should FoundationIO be compiled as a dynamic library (.dylib/.dll/.so)?" ON)
 
 if(BUILD_AS_SHARED_LIBRARY MATCHES ON)
-    add_library(FoundationIO SHARED ${FOUNDATIONIO_SOURCE})
+    add_library(FoundationIO SHARED ${LIBRARY_SOURCE})
 elseif(BUILD_AS_SHARED_LIBRARY MATCHES OFF)
-    add_library(FoundationIO STATIC ${FOUNDATIONIO_SOURCE})
+    add_library(FoundationIO STATIC ${LIBRARY_SOURCE})
 endif(BUILD_AS_SHARED_LIBRARY MATCHES ON)
+
+if(NOT WIN32)
+  string(REGEX MATCH "^([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9a-fA-F]+)$" MATCH_STRING ${VERSION_STRING})
+  #string(REGEX MATCH "#define Version_Major ([0-9]+)" MATCH_STRING ${Version_Header})
+  set("VERSION_MAJOR" ${CMAKE_MATCH_1})
+  set("VERSION_MINOR" ${CMAKE_MATCH_2})
+  set("VERSION_PATCH" ${CMAKE_MATCH_3})
+  set(SANITIZED_VERSION "")
+  string(CONCAT SANITIZED_VERSION "${VERSION_MAJOR}" "." "${VERSION_MINOR}" "." "${VERSION_PATCH}")
+  set_target_properties(FoundationIO PROPERTIES VERSION ${SANITIZED_VERSION})
+endif(NOT WIN32)
 
 if(CMAKE_HOST_WIN32)
     target_link_libraries(FoundationIO ws2_32 bcrypt)
@@ -90,8 +91,8 @@ endif(CMAKE_HOST_WIN32)
 
 set_target_properties(FoundationIO PROPERTIES PREFIX "")
 
-target_include_directories(FoundationIO PUBLIC "${FoundationIO_Library_Dir}/include")
-target_include_directories(FoundationIO PUBLIC "${FoundationIO_Library_Dir}/include/TextIO")
+target_include_directories(FoundationIO PUBLIC "${LIBRARY_DIRECTORY}/include")
+target_include_directories(FoundationIO PUBLIC "${LIBRARY_DIRECTORY}/include/TextIO")
 
 if(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_UNIX)
     set(CMAKE_INSTALL_PREFIX "/usr/local")
@@ -99,25 +100,25 @@ elseif(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_WIN32)
     set(CMAKE_INSTALL_PREFIX "%ProgramFiles%\FoundationIO")
 endif(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_UNIX)
 
-install(TARGETS FoundationIO                  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install(DIRECTORY "${FoundationIO_Library_Dir}/include" DESTINATION "${CMAKE_INSTALL_PREFIX}" FILES_MATCHING PATTERN "*.h" PATTERN "*Private*" EXCLUDE)
-install(FILES "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Resources/FoundationIO.pc" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
+install(TARGETS FoundationIO                     DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(DIRECTORY "${LIBRARY_DIRECTORY}/include" DESTINATION "${CMAKE_INSTALL_PREFIX}" FILES_MATCHING PATTERN "*.h" PATTERN "*Private*" EXCLUDE)
+install(FILES "${BUILD_DIRECTORY}/Resources/FoundationIO.pc" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     enable_testing()
     include(CTest)
 
-    add_executable(Test_AsynchronousIO              "${FoundationIO_Test_Dir}/Test_AsynchronousIO.c")
-    add_executable(Test_BufferIO                    "${FoundationIO_Test_Dir}/Test_BufferIO.c")
-    add_executable(Test_CryptographyIO              "${FoundationIO_Test_Dir}/Test_CryptographyIO.c")
-    add_executable(Test_FileIO                      "${FoundationIO_Test_Dir}/Test_FileIO.c")
-    add_executable(Test_MathIO                      "${FoundationIO_Test_Dir}/Test_MathIO.c")
-    add_executable(Test_NetworkIO                   "${FoundationIO_Test_Dir}/Test_NetworkIO.c")
-    add_executable(Test_PlatformIO                  "${FoundationIO_Test_Dir}/Test_PlatformIO.c")
-    add_executable(Test_CommandLineIO               "${FoundationIO_Test_Dir}/TextIO/Test_CommandLineIO.c")
-    add_executable(Test_FormatIO                    "${FoundationIO_Test_Dir}/TextIO/Test_FormatIO.c")
-    add_executable(Test_LocalizationIO              "${FoundationIO_Test_Dir}/TextIO/Test_LocalizationIO.c")
-    add_executable(Test_StringIO                    "${FoundationIO_Test_Dir}/TextIO/Test_StringIO.c")
+    add_executable(Test_AsynchronousIO              "${TESTSRC_DIRECTORY}/Test_AsynchronousIO.c")
+    add_executable(Test_BufferIO                    "${TESTSRC_DIRECTORY}/Test_BufferIO.c")
+    add_executable(Test_CryptographyIO              "${TESTSRC_DIRECTORY}/Test_CryptographyIO.c")
+    add_executable(Test_FileIO                      "${TESTSRC_DIRECTORY}/Test_FileIO.c")
+    add_executable(Test_MathIO                      "${TESTSRC_DIRECTORY}/Test_MathIO.c")
+    add_executable(Test_NetworkIO                   "${TESTSRC_DIRECTORY}/Test_NetworkIO.c")
+    add_executable(Test_PlatformIO                  "${TESTSRC_DIRECTORY}/Test_PlatformIO.c")
+    add_executable(Test_CommandLineIO               "${TESTSRC_DIRECTORY}/TextIO/Test_CommandLineIO.c")
+    add_executable(Test_FormatIO                    "${TESTSRC_DIRECTORY}/TextIO/Test_FormatIO.c")
+    add_executable(Test_LocalizationIO              "${TESTSRC_DIRECTORY}/TextIO/Test_LocalizationIO.c")
+    add_executable(Test_StringIO                    "${TESTSRC_DIRECTORY}/TextIO/Test_StringIO.c")
 
     target_link_libraries(Test_AsynchronousIO       FoundationIO)
     target_link_libraries(Test_BufferIO             FoundationIO)
@@ -155,10 +156,11 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
     install(TARGETS Test_LocalizationIO DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
     install(TARGETS Test_StringIO       DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
 
-    add_custom_command(TARGET FoundationIO POST_BUILD COMMAND ctest ARGS --output-on-failure WORKING_DIRECTORY ${CMAKE_OUTPUT_DIRECTORY})
+    add_custom_command(TARGET FoundationIO POST_BUILD COMMAND ctest ARGS --output-on-failure WORKING_DIRECTORY ${BUILD_DIRECTORY})
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 
-if(${CMAKE_C_COMPILER_ID} STREQUAL "AppleClang" OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
+#if(${CMAKE_C_COMPILER_ID} STREQUAL "AppleClang" OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
+if($<C_COMPILER_ID:AppleClang,ARMClang,XLClang,Clang>)
 
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
@@ -239,7 +241,8 @@ set(LINK_FLAGS_MINSIZEREL " \
 ${LINK_FLAGS} \
 ")
 
-elseif(${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
+#elseif(${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
+elseif($<C_COMPILER_ID:GNU>)
 
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
@@ -320,7 +323,8 @@ set(LINK_FLAGS_MINSIZEREL " \
 ${LINK_FLAGS} \
 ")
 
-elseif(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
+#elseif(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
+elseif($<C_COMPILER_ID:MSVC>)
 
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
@@ -409,4 +413,5 @@ ${LINK_FLAGS} \
 /RELEASE \
 ")
 
-endif(${CMAKE_C_COMPILER_ID} STREQUAL "AppleClang" OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
+#endif(${CMAKE_C_COMPILER_ID} STREQUAL "AppleClang" OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
+endif($<C_COMPILER_ID:AppleClang,ARMClang,XLClang,Clang>)
