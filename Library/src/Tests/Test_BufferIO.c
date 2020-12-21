@@ -33,8 +33,6 @@ extern "C" {
 #define FieldSize3 7
 #define Field3     0x41
 
-
-
     bool Test_WriteReadBits(SecureRNG *Secure) {
         bool TestPassed   = No;
         BitBuffer *BitB   = BitBuffer_Init(8);
@@ -145,22 +143,25 @@ extern "C" {
         BitBuffer *BitB                = BitBuffer_Init(8);
 
         for (uint64_t Loop = 0ULL; Loop < 1000000; Loop++) {
-            //uint8_t    NumBits2Extract = SecureRNG_GenerateInteger(Random, 3); // 6
-            //int64_t    RandomInteger   = SecureRNG_GenerateInteger(Random, NumBits2Extract);
+            uint8_t    NumBits2Write   = SecureRNG_GenerateInteger(Random, 3); // 6
+            int64_t    RandomInteger   = SecureRNG_GenerateInteger(Random, NumBits2Write);
+            /*
 #define NumBits2Write 64
 #define RandomInteger 0x0807060504030201
-
+             */
             BitBuffer_WriteBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, NumBits2Write, RandomInteger);
             BitBuffer_Seek(BitB, -(NumBits2Write));
             int64_t ReadInteger        = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, NumBits2Write);
             if (ReadInteger != RandomInteger) {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %llu does not match WrittenInteger: %llu"), ReadInteger, RandomInteger);
+                TestPassed = No;
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ReadInteger: %llu does not match WrittenInteger: %llu"), ReadInteger, RandomInteger);
             }
             BitBuffer_Erase(BitB, 0);
         }
+        /*
 #undef NumBits2Write
 #undef RandomInteger
-
+         */
         return TestPassed;
     }
 
@@ -211,12 +212,12 @@ extern "C" {
 
         SecureRNG *Random            = SecureRNG_Init(8000000);
 
-        //bool NearNearPassed          = Test_ReadWriteBitsNearNear(Random);
-        //bool FarFarPassed            = Test_ReadWriteBitsFarFar(Random);
-        //bool NearFarPassed           = Test_ReadWriteBitsNearFar(Random);
-        //bool FarNearPassed           = Test_ReadWriteBitsFarNear(Random);
-        return Test_WriteReadBits(Random);
-
+        bool NearNearPassed          = Test_ReadWriteBitsNearNear(Random);
+        bool FarFarPassed            = Test_ReadWriteBitsFarFar(Random);
+        bool NearFarPassed           = Test_ReadWriteBitsNearFar(Random);
+        bool FarNearPassed           = Test_ReadWriteBitsFarNear(Random);
+        uint8_t AllTestsPassed       = (NearNearPassed + FarFarPassed + NearFarPassed + FarNearPassed) == 4;
+        return AllTestsPassed == true ? EXIT_SUCCESS : EXIT_FAILURE;
     }
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)

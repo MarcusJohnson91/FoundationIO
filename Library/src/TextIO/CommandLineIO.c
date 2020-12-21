@@ -26,20 +26,20 @@ extern "C" {
      
      Incompatible Options (-Interlace vs -No-Interlace)
      */
-
+    
     /*
      User walkthrough:
-
+     
      I'm a user that's developing a program that does something
-
+     
      so first I create an enum that contains all the switches a user can enter.
-
+     
      then I'm creating an interface for CommandLineIO that describes their interactions.
-
+     
      Switches X and Y are incompatible
-
+     
      Switches A and B must be used together.
-
+     
      Switches
      */
     

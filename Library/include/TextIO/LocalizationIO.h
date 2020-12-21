@@ -124,27 +124,32 @@ extern "C" {
     /*!
      @enum       LocalizationIO_RegionIDs
      @abstract                                            What region is in use, for collation, sorting, etc.
-     @constant   RegionID_Unspecified                     Unspecified, falls back to locale.
+     @constant   RegionID_Unspecified                     Unspecified, falls back to locale, if there is no locale it uses the default of Unicode
+     @constant   RegionID_Unicode                         Use the CodePoint's value for sorting.
+     @constant   RegionID_ASCII                           a-z and A-Z are sorted in a traditional, C/POSIX way.
+     What about C and POSIX tho?
      */
     typedef enum LocalizationIO_RegionIDs {
                    RegionID_Unspecified                   = 0,
-                   RegionID_UnitedStates                  = 1,
-                   RegionID_Canada                        = 2,
-                   RegionID_Mexico                        = 3,
-                   RegionID_UnitedKingdom                 = 4,
-                   RegionID_Sweden                        = 5,
-                   RegionID_Denmark                       = 6,
-                   RegionID_Norway                        = 7,
-                   RegionID_Finland                       = 8,
-                   RegionID_Estonia                       = 9,
-                   RegionID_Latvia                        = 10,
-                   RegionID_Lithuania                     = 11,
-                   RegionID_Poland                        = 12,
-                   RegionID_Russia                        = 13,
-                   RegionID_Croatia                       = 14,
-                   RegionIO_Russia                        = 15,
-                   RegionID_Germany                       = 16,
-                   RegionID_Austria                       = 17,
+                   RegionID_Unicode                       = 1,
+                   RegionID_ASCII                         = 2,
+                   RegionID_UnitedStates                  = 3,
+                   RegionID_Canada                        = 4,
+                   RegionID_Mexico                        = 5,
+                   RegionID_UnitedKingdom                 = 6,
+                   RegionID_Sweden                        = 7,
+                   RegionID_Denmark                       = 8,
+                   RegionID_Norway                        = 9,
+                   RegionID_Finland                       = 10,
+                   RegionID_Estonia                       = 11,
+                   RegionID_Latvia                        = 12,
+                   RegionID_Lithuania                     = 13,
+                   RegionID_Poland                        = 14,
+                   RegionID_Russia                        = 15,
+                   RegionID_Croatia                       = 16,
+                   RegionIO_Russia                        = 17,
+                   RegionID_Germany                       = 18,
+                   RegionID_Austria                       = 19,
     } LocalizationIO_RegionIDs;
     
     /*!

@@ -23,47 +23,49 @@ extern "C" {
     }
     
     void Log(LogIO_Severities Severity, PlatformIO_Immutable(UTF8 *) FunctionName, PlatformIO_Immutable(UTF8 *) Description, ...) {
+        UTF8 *ProgramName8 = NULL;
         if (Log_LogFile == NULL) {
-            Log_LogFile = stderr;
+            Log_LogFile  = stderr;
+        } else {
+            ProgramName8 = UTF8_Encode(Log_ProgramName);
         }
 
-        PlatformIO_Immutable(UTF32*) Severities[3] = {
-            [0] = UTF32String("ERROR"),
-            [1] = UTF32String("Mistake"),
-            [2] = UTF32String("Warning"),
+        PlatformIO_Immutable(UTF8*) Severities[3] = {
+            [0] = UTF8String("ERROR"),
+            [1] = UTF8String("Mistake"),
+            [2] = UTF8String("Warning"),
         };
-        
-        UTF32 *SecurityName   = NULL;
+
+        UTF8 *SecurityName8 = NULL;
         if (Log_ProgramName != NULL) {
-            SecurityName      = UTF32_Format(UTF32String("%U32s's %U32s in %s: "), Log_ProgramName, Severities[Severity - 1], FunctionName);
+            uint64_t Size      = sprintf(NULL, 0, UTF8String("%s's %s in %s: "), ProgramName8, Severities[Severity - 1], FunctionName);
+            SecurityName8      = UTF8_Init(Size);
+            sprintf(SecurityName8, UTF8String("%s's %s in %s: "), ProgramName8, Severities[Severity - 1], FunctionName);
         } else {
-            SecurityName      = UTF32_Format(UTF32String("%U32s in %s: "), Severities[Severity - 1], FunctionName);
+            uint64_t Size      = sprintf(NULL, 0, UTF8String("%s in %s: "), Severities[Severity - 1], FunctionName);
+            SecurityName8      = UTF8_Init(Size);
+            sprintf(SecurityName8, UTF8String("%s in %s: "), Severities[Severity - 1], FunctionName);
         }
-        
-        UTF32 *Description32  = UTF8_Decode(UTF8_MakeStringMutable(Description));
-        UTF32 *Description2   = UTF32_Insert(Description32, SecurityName, 0);
-        free(SecurityName);
-        free(Description32);
-        
-        uint64_t NumVariadicArguments = UTF32_GetNumFormatSpecifiers(Description2);
-        FormatSpecifiers *Specifiers  = FormatSpecifiers_Init(NumVariadicArguments);
-        UTF32_ParseFormatSpecifiers(Description2, Specifiers, StringType_UTF32);
-        va_list VariadicArguments;
-        va_start(VariadicArguments, Description);
-        Format_Specifiers_RetrieveArguments(Specifiers, VariadicArguments);
-        va_end(VariadicArguments);
-        
-        uint64_t FormattedStringSize  = UTF32_GetFormattedStringSize(Description2, Specifiers);
-        UTF32 *FormattedString32      = FormatString_UTF32(Description2, Specifiers, FormattedStringSize);
-        UTF8  *FormattedString8       = UTF8_Encode(FormattedString32);
-        
+
+        UTF8 *FormattedArgs = NULL;
+        va_list Arguments   = {0};
+        int Size2           = vsnprintf(FormattedArgs, 0, Description, Arguments);
+        FormattedArgs       = UTF8_Init(Size2);
+        vsnprintf(FormattedArgs, Size2, Description, Arguments);
+        va_end(Arguments);
+
+        // Now we need to combine the parts
+        UTF8 *Combined   = NULL;
+        int SizeCombined = snprintf(Combined, 0, "%s %s", SecurityName8, FormattedArgs);
+        Combined         = UTF8_Init(SizeCombined);
+        snprintf(Combined, SizeCombined, "%s %s", SecurityName8, FormattedArgs);
+
         if (Log_LogFile != NULL) {
-            UTF8_WriteSentence(Log_LogFile, FormattedString8);
+            UTF8_WriteSentence(Log_LogFile, FormattedArgs);
             fflush(Log_LogFile);
+        } else {
+            printf("%s", FormattedArgs);
         }
-        free(FormattedString32);
-        free(FormattedString8);
-        va_end(VariadicArguments);
     }
     
     void Log_Deinit(void) {

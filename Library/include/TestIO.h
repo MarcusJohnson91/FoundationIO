@@ -20,10 +20,6 @@
 extern "C" {
 #endif
 
-    typedef struct TestIO_Function {
-
-    } FunctionTest;
-
     /*
      Test Grouping:
      So, Each Module needs to be tested, BufferIO, FileIO, CommandLineIO, etc

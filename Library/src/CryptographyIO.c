@@ -302,7 +302,7 @@ extern "C" {
                     uint8_t  BitsInCurrentByte = BitsAvailableInByte(Random->BitOffset);
                     uint8_t  Bits2Get          = (uint8_t) Minimum(BitsInCurrentByte, Bits2Read);
                     uint8_t  BufferShift       = BitsInCurrentByte % 8;
-                    uint8_t  BufferMask        = (Exponentiate(2, Bits2Get) - 1) << BufferShift;
+                    uint64_t BufferMask        = (Exponentiate(2, Bits2Get) - 1) << BufferShift;
                     uint8_t  ExtractedBits     = Random->EntropyPool[Bits2Bytes(RoundingType_Down, Random->BitOffset)] & BufferMask;
                     uint8_t  ValueShift        = NumBits - Bits2Read;
                     Bits                     <<= ValueShift;
