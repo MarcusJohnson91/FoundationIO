@@ -5,7 +5,7 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
-
+    
     bool Test_Exponentiate(SecureRNG *Secure) { // Even, Odd, Positive, Negative
         bool Passed = No;
         int64_t Even = Exponentiate(2, 2); // 4
@@ -23,11 +23,10 @@ extern "C" {
             int64_t  Value     = SecureRNG_GenerateInteger(Random, NumBits);
             uint8_t  LogCeil   = Logarithm(10, -Value) - 1;
             uint8_t  NumDigits = NumDigitsInInteger(10, -Value);
-            /*
-             if (LogCeil != NumDigits) {
-             //Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits %llu is incorrect"), NumBits);
-             }
-             */
+            
+            if (LogCeil != NumDigits) {
+                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits %llu is incorrect"), NumBits);
+            }
         }
     }
     
