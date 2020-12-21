@@ -171,7 +171,6 @@ extern "C" {
 #define             PlatformIO_LanguageIsCXX                                            (2)
 #endif
 
-
 #ifndef             PlatformIO_BuildTypeIsUnknown
 #define             PlatformIO_BuildTypeIsUnknown                                       (0)
 #endif
@@ -426,7 +425,7 @@ extern "C" {
 
 #ifndef             __TIMESIZE
 #define             __TIMESIZE                                                          (64)
-#elif               defined(__TIMESIZE)
+#else
 #undef              __TIMESIZE
 #define             __TIMESIZE                                                          (64)
 #endif
