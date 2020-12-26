@@ -76,7 +76,6 @@ endif(BUILD_AS_SHARED_LIBRARY MATCHES ON)
 
 if(NOT WIN32)
   string(REGEX MATCH "^([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9a-fA-F]+)$" MATCH_STRING ${VERSION_STRING})
-  #string(REGEX MATCH "#define Version_Major ([0-9]+)" MATCH_STRING ${Version_Header})
   set("VERSION_MAJOR" ${CMAKE_MATCH_1})
   set("VERSION_MINOR" ${CMAKE_MATCH_2})
   set("VERSION_PATCH" ${CMAKE_MATCH_3})
@@ -118,6 +117,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
     add_executable(Test_CommandLineIO               "${TESTSRC_DIRECTORY}/TextIO/Test_CommandLineIO.c")
     add_executable(Test_FormatIO                    "${TESTSRC_DIRECTORY}/TextIO/Test_FormatIO.c")
     add_executable(Test_LocalizationIO              "${TESTSRC_DIRECTORY}/TextIO/Test_LocalizationIO.c")
+    add_executable(Test_LogIO                       "${TESTSRC_DIRECTORY}/TextIO/Test_LogIO.c")
     add_executable(Test_StringIO                    "${TESTSRC_DIRECTORY}/TextIO/Test_StringIO.c")
 
     target_link_libraries(Test_AsynchronousIO       FoundationIO)
@@ -130,6 +130,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
     target_link_libraries(Test_CommandLineIO        FoundationIO)
     target_link_libraries(Test_FormatIO             FoundationIO)
     target_link_libraries(Test_LocalizationIO       FoundationIO)
+    target_link_libraries(Test_LogIO                FoundationIO)
     target_link_libraries(Test_StringIO             FoundationIO)
 
     add_test(NAME AsynchronousIO COMMAND $<TARGET_FILE:Test_AsynchronousIO>)
@@ -142,6 +143,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
     add_test(NAME CommandLineIO  COMMAND $<TARGET_FILE:Test_CommandLineIO>)
     add_test(NAME FormatIO       COMMAND $<TARGET_FILE:Test_FormatIO>)
     add_test(NAME LocalizationIO COMMAND $<TARGET_FILE:Test_LocalizationIO>)
+    add_test(NAME LogIO          COMMAND $<TARGET_FILE:Test_LogIO>)
     add_test(NAME StringIO       COMMAND $<TARGET_FILE:Test_StringIO>)
 
     install(TARGETS Test_AsynchronousIO DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
@@ -154,12 +156,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
     install(TARGETS Test_CommandLineIO  DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
     install(TARGETS Test_FormatIO       DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
     install(TARGETS Test_LocalizationIO DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+    install(TARGETS Test_LogIO          DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
     install(TARGETS Test_StringIO       DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
 
     add_custom_command(TARGET FoundationIO POST_BUILD COMMAND ctest ARGS --output-on-failure WORKING_DIRECTORY ${BUILD_DIRECTORY})
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 
-#if(${CMAKE_C_COMPILER_ID} STREQUAL "AppleClang" OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
 if($<C_COMPILER_ID:AppleClang,ARMClang,XLClang,Clang>)
 
 set(CMAKE_C_FLAGS " \
@@ -187,8 +189,9 @@ ${CMAKE_C_FLAGS} \
 
 set(CMAKE_C_FLAGS_DEBUG " \
 ${CMAKE_C_FLAGS} \
--fsanitize=address,undefined \
+-fsanitize=address \
 -fno-omit-frame-pointer \
+-fno-optimize-sibling-calls \
 -DDEBUG=1 \
 -g3 \
 -O1 \
@@ -202,8 +205,9 @@ ${CMAKE_C_FLAGS} \
 
 set(CMAKE_C_FLAGS_RELWITHDEBINFO " \
 ${CMAKE_C_FLAGS} \
--fsanitize=address,undefined \
+-fsanitize=address \
 -fno-omit-frame-pointer \
+-fno-optimize-sibling-calls \
 -DDEBUG=1 \
 -g \
 -Ofast \
@@ -214,34 +218,33 @@ ${CMAKE_C_FLAGS} \
 -Oz \
 ")
 
-set(LINK_FLAGS ${LINK_FLAGS} " \
+set(CMAKE_LINKER_FLAGS ${CMAKE_LINKER_FLAGS} " \
 -flto=full \
 -lm \
 ")
 
 if(CMAKE_HOST_APPLE)
-set(LINK_FLAGS ${LINK_FLAGS} " \
+set(CMAKE_LINKER_FLAGS ${CMAKE_LINKER_FLAGS} " \
 -dead_strip_dylibs
 ")
 endif(CMAKE_HOST_APPLE)
 
-set(LINK_FLAGS_DEBUG " \
-${LINK_FLAGS} \
+set(CMAKE_LINKER_FLAGS_DEBUG ${CMAKE_LINKER_FLAGS} " \
+-fsanitize=address \
+-fno-omit-frame-pointer \
 ")
 
-set(LINK_FLAGS_RELWITHDEBINFO " \
-${LINK_FLAGS} \
+set(CMAKE_LINKER_FLAGS_RELWITHDEBINFO ${CMAKE_LINKER_FLAGS} " \
+-fsanitize=address \
+-fno-omit-frame-pointer \
 ")
 
-set(LINK_FLAGS_RELEASE " \
-${LINK_FLAGS} \
+set(CMAKE_LINKER_FLAGS_RELEASE ${CMAKE_LINKER_FLAGS} " \
 ")
 
-set(LINK_FLAGS_MINSIZEREL " \
-${LINK_FLAGS} \
+set(CMAKE_LINKER_FLAGS_MINSIZEREL ${CMAKE_LINKER_FLAGS} " \
 ")
 
-#elseif(${CMAKE_C_COMPILER_ID} STREQUAL "GNU")
 elseif($<C_COMPILER_ID:GNU>)
 
 set(CMAKE_C_FLAGS " \
@@ -323,7 +326,6 @@ set(LINK_FLAGS_MINSIZEREL " \
 ${LINK_FLAGS} \
 ")
 
-#elseif(${CMAKE_C_COMPILER_ID} STREQUAL "MSVC")
 elseif($<C_COMPILER_ID:MSVC>)
 
 set(CMAKE_C_FLAGS " \
@@ -413,5 +415,4 @@ ${LINK_FLAGS} \
 /RELEASE \
 ")
 
-#endif(${CMAKE_C_COMPILER_ID} STREQUAL "AppleClang" OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
 endif($<C_COMPILER_ID:AppleClang,ARMClang,XLClang,Clang>)
