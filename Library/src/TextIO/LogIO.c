@@ -7,18 +7,43 @@
 extern "C" {
 #endif
     
-    static FILE  *Log_LogFile      = NULL;
-    static UTF32 *Log_ProgramName  = NULL;
+    static FILE          *Log_LogFile     = NULL;
+    static AsyncIOStream *Async_LogFile   = NULL;
+    static UTF32         *Log_ProgramName = NULL;
     
     void Log_SetProgramName(PlatformIO_Immutable(UTF8 *) ProgramName) {
         if (ProgramName != NULL) {
-            Log_ProgramName        = UTF8_Decode(ProgramName);
+            Log_ProgramName  = UTF8_Decode(ProgramName);
         }
     }
     
     void Log_SetLogFile(FILE *File) {
         if (File != NULL) {
             Log_LogFile = File;
+        }
+    }
+    
+    void Log_OpenLogFilePath(PlatformIO_Immutable(UTF8 *) Path) {
+        if (Path != NULL && Async_LogFile == NULL) {
+            UTF8 *FoldedPath = UTF8_CaseFold(Path);
+            Async_LogFile    = AsyncIOStream_Init();
+            
+            if (UTF8_Compare(FoldedPath, UTF8String("stdin")) ||
+                UTF8_Compare(FoldedPath, UTF8String("zero")) ||
+                UTF8_Compare(FoldedPath, UTF8String("0"))
+                ) {
+                // STDIN
+            } else if (UTF8_Compare(FoldedPath, UTF8String("stdout")) ||
+                UTF8_Compare(FoldedPath, UTF8String("one")) ||
+                UTF8_Compare(FoldedPath, UTF8String("1"))
+                ) {
+                // STDOUT
+            } else if (UTF8_Compare(FoldedPath, UTF8String("stderr")) ||
+                UTF8_Compare(FoldedPath, UTF8String("two")) ||
+                UTF8_Compare(FoldedPath, UTF8String("2"))
+                ) {
+                // STDERR
+            }
         }
     }
     
@@ -37,34 +62,39 @@ extern "C" {
         };
 
         UTF8 *SecurityName8 = NULL;
+        PlatformIO_Immutable(UTF8*) WarnString = Severities[Severity - 1];
         if (Log_ProgramName != NULL) {
-            uint64_t Size      = sprintf(NULL, 0, UTF8String("%s's %s in %s: "), ProgramName8, Severities[Severity - 1], FunctionName);
+            uint64_t Size      = snprintf(NULL, 0, UTF8String("%s's %s in %s: "), ProgramName8, WarnString, FunctionName);
             SecurityName8      = UTF8_Init(Size);
-            sprintf(SecurityName8, UTF8String("%s's %s in %s: "), ProgramName8, Severities[Severity - 1], FunctionName);
+            snprintf(SecurityName8, Size, UTF8String("%s's %s in %s: "), ProgramName8, WarnString, FunctionName);
         } else {
-            uint64_t Size      = sprintf(NULL, 0, UTF8String("%s in %s: "), Severities[Severity - 1], FunctionName);
+            uint64_t Size      = snprintf(NULL, 0, UTF8String("%s in %s: "), WarnString, FunctionName);
             SecurityName8      = UTF8_Init(Size);
-            sprintf(SecurityName8, UTF8String("%s in %s: "), Severities[Severity - 1], FunctionName);
+            snprintf(SecurityName8, Size, UTF8String("%s in %s: "), WarnString, FunctionName);
         }
+        free(ProgramName8);
 
-        UTF8 *FormattedArgs = NULL;
-        va_list Arguments   = {0};
-        int Size2           = vsnprintf(FormattedArgs, 0, Description, Arguments);
-        FormattedArgs       = UTF8_Init(Size2);
+        va_list Arguments;
+        va_start(Arguments, Description);
+        int Size2           = vsnprintf(NULL, 0, Description, Arguments);
+        UTF8 *FormattedArgs = UTF8_Init(Size2);
         vsnprintf(FormattedArgs, Size2, Description, Arguments);
         va_end(Arguments);
 
         // Now we need to combine the parts
         UTF8 *Combined   = NULL;
-        int SizeCombined = snprintf(Combined, 0, "%s %s", SecurityName8, FormattedArgs);
+        int SizeCombined = snprintf(NULL, 0, "%s %s", SecurityName8, FormattedArgs);
         Combined         = UTF8_Init(SizeCombined);
         snprintf(Combined, SizeCombined, "%s %s", SecurityName8, FormattedArgs);
+        
+        free(FormattedArgs);
+        free(SecurityName8);
 
         if (Log_LogFile != NULL) {
-            UTF8_WriteSentence(Log_LogFile, FormattedArgs);
+            UTF8_WriteSentence(Log_LogFile, Combined);
             fflush(Log_LogFile);
         } else {
-            printf("%s", FormattedArgs);
+            printf("%s", Combined);
         }
     }
     
