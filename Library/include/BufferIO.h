@@ -165,7 +165,7 @@ extern "C" {
     void           BitBuffer_SetArray(BitBuffer *BitB, uint8_t *Buffer, uint64_t BufferSizeInBytes);
 
     /*!
-     @abstract                                     Gets if the BitBuffer's offset is aligned to boundary AlignmentSize.
+     @abstract                                     Checks if the BitBuffer's offset is aligned to boundary AlignmentSize.
      @remark                                       Alignment means the offset of a BitBuffer is a multiple of AlignmentSize.
      @param        BitB                            BitBuffer Pointer.
      @param        AlignmentSize                   The number of bytes to check the alignment of.
@@ -176,6 +176,7 @@ extern "C" {
     /*!
      @abstract                                     Aligns BitBuffer.
      @remark                                       Zero pads the BitBuffer's offset to a multiple of AlignmentSize.
+     @remark                                       We might want to add a parameter to set the padding value, like SHA-3 requires paddng in 512 bit blocks with the first padding bit set to 1 and the rest to 0
      @param        BitB                            BitBuffer Pointer.
      @param        AlignmentSizeInBytes            The alignment size in bytes.
      */
@@ -256,7 +257,7 @@ extern "C" {
     uint64_t       BitBuffer_ReadUnary(BitBuffer *BitB, BufferIO_ByteOrders ByteOrder, BufferIO_BitOrders BitOrder, BufferIO_UnaryTypes UnaryType, BufferIO_UnaryTerminators UnaryTerminator);
 
     /*!
-     @abstract                                     Reads data from the Bitbuffer until it stops matching the UTF-8 format.
+     @abstract                                     Reads data from the BitBuffer until it stops matching the UTF-8 format.
      @remark                                       Does NOT count any potential NULL terminator.
      @param        BitB                            BitBuffer Pointer.
      */
@@ -271,7 +272,7 @@ extern "C" {
     UTF8          *BitBuffer_ReadUTF8(BitBuffer *BitB, uint64_t StringSize);
 
     /*!
-     @abstract                                     Reads data from the Bitbuffer until it stops matching the UTF-8 format.
+     @abstract                                     Reads data from the BitBuffer until it stops matching the UTF-8 format.
      @remark                                       Does NOT count any potential NULL terminator.
      @param        BitB                            BitBuffer Pointer.
      */

@@ -17,11 +17,11 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
-
+    
     /*
      This is the Low Level variant; We're not dealing with BitBuffer or any of it's shit here
      */
-
+    
     /*!
      @enum         AsyncIO_StreamTypes
      @constant     StreamType_Unspecified               Invalid type
@@ -78,7 +78,7 @@ extern "C" {
         }
     }
 #endif /* PlatformIO_Language */
-
+    
     /*!
      @enum        AsyncIO_SeekTypes
      @constant    SeekType_Beginning                    Seek from the beginning of the file.
@@ -123,7 +123,7 @@ extern "C" {
 
     /*!
      @typedef           AsyncIO_Descriptor
-     @abstract                                          Contains File/Socket pointers for writing from a BitBuffer.
+     @abstract                                          Index to File/Socket pointers for writing from a BitBuffer.
      */
     typedef             int                             AsyncIO_Descriptor;
 
@@ -164,7 +164,7 @@ extern "C" {
      */
     int64_t             AsyncIOStream_GetBytesRemaining(AsyncIOStream *Stream);
     /* AsyncIOStream */
-
+    
     /* BitBuffer */
     /*!
      @abstract                                          Opens a UTF8 encoded path and assigns it to Stream
@@ -173,7 +173,7 @@ extern "C" {
      @param             FileMode                        The configuration to use when Opening
      */
     bool                AsyncIOStream_OpenUTF8(AsyncIOStream *Stream, PlatformIO_Immutable(UTF8 *) Path8, AsyncIO_FileModes FileMode);
-
+    
     /*!
      @abstract                                          Opens a UTF16 encoded path and assigns it to Stream
      @param             Stream                          A fresh instance of AsyncIOStream
@@ -181,7 +181,7 @@ extern "C" {
      @param             FileMode                        The configuration to use when Opening
      */
     bool                AsyncIOStream_OpenUTF16(AsyncIOStream *Stream, PlatformIO_Immutable(UTF16 *) Path16, AsyncIO_FileModes FileMode);
-
+    
     /*!
      @abstract                                          Reads data from Stream to Array
      @remark                                            ElementSize = 2 Bytes, NumElements = 2; 4 bytes read
@@ -192,7 +192,7 @@ extern "C" {
      @return                                            Returns the number of bytes actually read
      */
     uint64_t            AsyncIOStream_Read(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, uint8_t NumElements);
-
+    
     /*!
      @abstract                                          Writes data from Array to Stream
      @remark                                            ElementSize = 2 Bytes, NumElements = 2; 4 bytes read
@@ -203,14 +203,14 @@ extern "C" {
      @return                                            Returns the number of bytes actually written
      */
     uint64_t            AsyncIOStream_Write(AsyncIOStream *Stream, void *Array, uint8_t ElementSize, uint8_t NumElements);
-
+    
     /*!
      @abstract                                          Closes the Descriptor, after flushing any unwritten data
      @param             Stream                          The Stream to close
      @return                                            Returns true if the Descriptor was sucessfully (flushed, if necessary) and closed
      */
     bool                AsyncIOStream_Deinit(AsyncIOStream *Stream);
-
+    
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif /* Extern C */

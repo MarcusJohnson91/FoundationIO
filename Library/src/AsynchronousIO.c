@@ -102,7 +102,7 @@ extern "C" {
                 Path16Offset      = UTF16BOMSizeInCodeUnits;
             }
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-            UTF8 *Path8          = UTF16_Convert(&Path16[UTF16BOMSizeInCodeUnits]);
+            UTF8 *Path8          = UTF16_Convert(&Path16[Path16Offset]);
 #ifndef __STDC_LIB_EXT1__
             Stream->StreamID     = open(Path8, Mode);
 #else

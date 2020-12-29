@@ -7,13 +7,15 @@
 extern "C" {
 #endif
     
-    static FILE          *Log_LogFile     = NULL;
-    static AsyncIOStream *Async_LogFile   = NULL;
-    static UTF32         *Log_ProgramName = NULL;
+    static FILE          *Log_LogFile       = NULL;
+    static AsyncIOStream *Async_LogFile     = NULL;
+    //static UTF32         *Log_ProgramName   = NULL;
+    static UTF8          *Log_ProgramName8  = NULL;
     
     void Log_SetProgramName(PlatformIO_Immutable(UTF8 *) ProgramName) {
         if (ProgramName != NULL) {
-            Log_ProgramName  = UTF8_Decode(ProgramName);
+            Log_ProgramName8 = ProgramName;
+            //Log_ProgramName  = UTF8_Decode(ProgramName);
         }
     }
     
@@ -48,11 +50,8 @@ extern "C" {
     }
     
     void Log(LogIO_Severities Severity, PlatformIO_Immutable(UTF8 *) FunctionName, PlatformIO_Immutable(UTF8 *) Description, ...) {
-        UTF8 *ProgramName8 = NULL;
         if (Log_LogFile == NULL) {
             Log_LogFile  = stderr;
-        } else {
-            ProgramName8 = UTF8_Encode(Log_ProgramName);
         }
 
         PlatformIO_Immutable(UTF8*) Severities[3] = {
@@ -63,16 +62,15 @@ extern "C" {
 
         UTF8 *SecurityName8 = NULL;
         PlatformIO_Immutable(UTF8*) WarnString = Severities[Severity - 1];
-        if (Log_ProgramName != NULL) {
-            uint64_t Size      = snprintf(NULL, 0, UTF8String("%s's %s in %s: "), ProgramName8, WarnString, FunctionName);
+        if (Log_ProgramName8 != NULL) {
+            uint64_t Size      = snprintf(NULL, 0, UTF8String("%s's %s in %s: "), Log_ProgramName8, WarnString, FunctionName);
             SecurityName8      = UTF8_Init(Size);
-            snprintf(SecurityName8, Size, UTF8String("%s's %s in %s: "), ProgramName8, WarnString, FunctionName);
+            snprintf(SecurityName8, Size, UTF8String("%s's %s in %s: "), Log_ProgramName8, WarnString, FunctionName);
         } else {
             uint64_t Size      = snprintf(NULL, 0, UTF8String("%s in %s: "), WarnString, FunctionName);
             SecurityName8      = UTF8_Init(Size);
             snprintf(SecurityName8, Size, UTF8String("%s in %s: "), WarnString, FunctionName);
         }
-        free(ProgramName8);
 
         va_list Arguments;
         va_start(Arguments, Description);
@@ -102,8 +100,8 @@ extern "C" {
         if (Log_LogFile != NULL) {
             FileIO_Close(Log_LogFile);
         }
-        if (Log_ProgramName != NULL) {
-            free(Log_ProgramName);
+        if (Log_ProgramName8 != NULL) {
+            free(Log_ProgramName8);
         }
     }
     

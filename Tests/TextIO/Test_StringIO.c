@@ -5,6 +5,35 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
+    
+    bool Test_StringSet(SecureRNG *Secure) {
+        bool TestPassed = Yes;
+        PlatformIO_Immutable(UTF8*) StringSet[4] = {
+            [0] = UTF8String("String1"),
+            [1] = UTF8String("String2"),
+            [2] = UTF8String("String3"),
+        };
+        uint64_t NumStrings = UTF8_StringSet_GetNumStrings(StringSet);
+        if (NumStrings != 3) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumStrings is %llu but should be 3"), NumStrings);
+            TestPassed = No;
+        }
+        uint64_t *StringSizes = UTF8_StringSet_GetStringSizesInCodeUnits(StringSet);
+        if (StringSizes[0] != 7 || StringSizes[1] != 7 || StringSizes[2] != 7) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Size of StringSet's Strings doesn't = 7"));
+        }
+        /* So far so good, now lets test Allocation, Assignment, and Deinitalization */
+        PlatformIO_Immutable(UTF8**) StringSet2 = UTF8_StringSet_Init(3);
+        UTF8_StringSet_Attach(StringSet2, StringSet[0], 0);
+        UTF8_StringSet_Attach(StringSet2, StringSet[1], 1);
+        UTF8_StringSet_Attach(StringSet2, StringSet[2], 2);
+        
+        if (StringSet[0] != StringSet2[0]) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Addresses don't match"));
+        }
+        
+        return TestPassed;
+    }
 
     bool Test_UTF8_Graphemes(SecureRNG *Secure) {
         bool TestPassed = No;
@@ -178,6 +207,7 @@ extern "C" {
     int main(const int argc, const char *argv[]) {
         bool TestSuitePassed      = No;
         SecureRNG *Random         = SecureRNG_Init(16 * 1024);
+        TestSuitePassed           = Test_StringSet(Random);
         TestSuitePassed           = Test_UTF8_Graphemes(Random);
         //TestSuitePassed           = Test_UTF8_StringSet(Random);
         //TestSuitePassed           = Test_UTF16_EncodeDecode(Random);

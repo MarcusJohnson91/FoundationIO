@@ -19,9 +19,9 @@ extern "C" {
     
 #include <math.h>
     
-#if   (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersionC >= PlatformIO_LanguageVersionC99 && PlatformIO_TargetOS != PlatformIO_TargetOSIsWindows)
+#if defined(__has_include) && __has_include(<tgmath.h>)
 #include <tgmath.h>
-#endif /* Version check */
+#endif
     
     /*!
      @enum         MathIO_RoundingTypes

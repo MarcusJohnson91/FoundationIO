@@ -20,12 +20,6 @@
 extern "C" {
 #endif
 
-    /*!
-     @typedef           AsyncIOStream
-     @abstract                                          Contains File/Socket descriptors for file management.
-     */
-    typedef struct      AsyncIOStream                   AsyncIOStream;
-
     /* Path Operations */
     /*!
      @abstract                                          Returns just the filename portion of a path string

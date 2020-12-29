@@ -27,8 +27,6 @@ set(BUILD_DIRECTORY     "${BASE_DIRECTORY}/BUILD/${TargetArchitecture}/${CMAKE_B
 include(GetVersion.cmake)
 GetVersionString(${VERSION_DIRECTORY} VERSION_STRING)
 
-message("VERSION_STRING = ${VERSION_STRING}")
-
 if(CMAKE_HOST_UNIX AND (${CMAKE_BUILD_TYPE} STREQUAL "Release" OR ${CMAKE_BUILD_TYPE} STREQUAL "MinSizeRel"))
     message("We're checking if TextIOTables.h should be updated, it could take a few seconds to about 12 minutes.")
     execute_process(
@@ -145,6 +143,19 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
     add_test(NAME LocalizationIO COMMAND $<TARGET_FILE:Test_LocalizationIO>)
     add_test(NAME LogIO          COMMAND $<TARGET_FILE:Test_LogIO>)
     add_test(NAME StringIO       COMMAND $<TARGET_FILE:Test_StringIO>)
+
+    set_tests_properties(AsynchronousIO PROPERTIES TIMEOUT 90)
+    set_tests_properties(BufferIO       PROPERTIES TIMEOUT 90)
+    set_tests_properties(CryptographyIO PROPERTIES TIMEOUT 90)
+    set_tests_properties(FileIO         PROPERTIES TIMEOUT 90)
+    set_tests_properties(MathIO         PROPERTIES TIMEOUT 90)
+    set_tests_properties(NetworkIO      PROPERTIES TIMEOUT 90)
+    set_tests_properties(PlatformIO     PROPERTIES TIMEOUT 90)
+    set_tests_properties(CommandLineIO  PROPERTIES TIMEOUT 90)
+    set_tests_properties(FormatIO       PROPERTIES TIMEOUT 90)
+    set_tests_properties(LocalizationIO PROPERTIES TIMEOUT 90)
+    set_tests_properties(LogIO          PROPERTIES TIMEOUT 90)
+    set_tests_properties(StringIO       PROPERTIES TIMEOUT 90)
 
     install(TARGETS Test_AsynchronousIO DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
     install(TARGETS Test_BufferIO       DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
