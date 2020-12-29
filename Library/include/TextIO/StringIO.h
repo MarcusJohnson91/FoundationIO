@@ -434,6 +434,7 @@ extern "C" {
     
     /*!
      @abstract                                           Casefolds string for case insensitive comparison.
+     @remark                                             Uppercase CodePoints are connverted to lowercase for the comparison
      @param      String                                  The string to be casefolded.
      @return                                             Returns the case folded string.
      */
@@ -441,6 +442,7 @@ extern "C" {
     
     /*!
      @abstract                                           Casefolds string for case insensitive comparison.
+     @remark                                             Uppercase CodePoints are connverted to lowercase for the comparison
      @param      String                                  The string to be casefolded.
      @return                                             Returns the case folded string.
      */
@@ -448,6 +450,7 @@ extern "C" {
     
     /*!
      @abstract                                           Casefolds string for case insensitive comparison.
+     @remark                                             Uppercase CodePoints are connverted to lowercase for the comparison
      @param      String                                  The string to be casefolded.
      @return                                             Returns the case folded string.
      */

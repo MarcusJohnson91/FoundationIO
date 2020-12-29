@@ -474,14 +474,6 @@ extern "C" {
         return Base;
     }
     
-    void FileIO_UTF8_ChangeCurrentDirectory(PlatformIO_Immutable(UTF8 *) NewCurrentDirectory) {
-        
-    }
-    
-    void FileIO_UTF16_ChangeCurrentDirectory(PlatformIO_Immutable(UTF16 *) NewCurrentDirectory) {
-        
-    }
-    
     uint64_t FileIO_Read(PlatformIO_Immutable(FILE *) File2Read, void *Buffer, uint8_t BufferElementSize, uint64_t Elements2Read) {
         uint64_t BytesRead = 0;
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
@@ -551,6 +543,8 @@ extern "C" {
         return !FileClosedSucessfully;
     }
     /* File Operations */
+    
+    // fchdir changes the current working directory
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }

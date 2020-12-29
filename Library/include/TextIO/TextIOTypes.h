@@ -18,77 +18,138 @@ extern "C" {
 #endif
 
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-#ifdef __has_include
-#if    __has_include(<uchar.h>)
+#if defined(__has_include) && __has_include(<uchar.h>)
 #include <uchar.h>
-#endif /* <uchar.h> exists */
-#endif /* __has_include exists */
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#ifdef __has_include
-#if    __has_include(<cuchar>)
-#include <cuchar>
-#endif /* <cuchar> exists */
-#endif /* __has_include exists */
-#endif /* PlatformIO_Language */
-
-#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-#ifndef                   __CHAR8_TYPE__
-#define                   __CHAR8_TYPE__                       unsigned char
-typedef                   __CHAR8_TYPE__                       char8_t;
+#else
+    
+#ifdef  __CHAR8_TYPE__
+#undef  __CHAR8_TYPE__
+#define __CHAR8_TYPE__ unsigned char
+#else
+#define __CHAR8_TYPE__ unsigned char
 #endif /* __CHAR8_TYPE__ */
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#ifndef                   __cpp_char8_t
-#define                   __cpp_char8_t
-typedef                   unsigned char                        char8_t;
-#endif /* __cpp_char8_t */
-#endif /* PlatformIO_Language */
-
-#if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-#ifdef __has_include
-#if   !__has_include(<uchar.h>)
-#ifndef                   __STDC_UTF_16__
-#define                   __STDC_UTF_16__                     (1) /* char16_t values are encoded as UTF-16 */
-#endif /* Only define __STDC_UTF_X__ macros if uchar is not available */
-#endif /* Is __has_include available? */
-#endif
-#ifdef                    __CHAR16_TYPE__
-typedef                   __CHAR16_TYPE__                      char16_t;
+    
+    typedef __CHAR8_TYPE__ char8_t;
+    
+#ifdef  __CHAR16_TYPE__
+#undef  __CHAR16_TYPE__
+#if   (PlatformIO_Compiler != PlatformIO_CompilerIsMSVC)
+#define __CHAR16_TYPE__ uint_least16_t
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
+#define __CHAR16_TYPE__ _Char16_t
+#endif /* PlatformIO_Compiler */
 #elif !defined(__CHAR16_TYPE__)
-#if    defined(uint_least16_t)
-typedef                   uint_least16_t                       char16_t;
+#define __CHAR16_TYPE__ uint_least16_t
+#endif /* __CHAR16_TYPE__ */
+    
+    typedef __CHAR16_TYPE__ char16_t;
+    
+#ifdef  __STDC_UTF_16__
+#undef  __STDC_UTF_16__
+#define __STDC_UTF_16__ (1)
+#else
+#define __STDC_UTF_16__ (1)
+#endif /* __STDC_UTF_16__ */
+    
+#ifdef  __CHAR32_TYPE__
+#undef  __CHAR32_TYPE__
+#if   (PlatformIO_Compiler != PlatformIO_CompilerIsMSVC)
+#define __CHAR32_TYPE__ uint_least32_t
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
-typedef                   _Char16_t                            char16_t;
-#elif !defined(uint_least16_t)
-#error "Get a modern compiler that supports uint_least16_t"
-#endif /* Defined? uint_least16_t */
-#endif /* Defined? __CHAR16_TYPE__ */
-
-#ifdef __has_include
-#if   !__has_include(<uchar.h>)
-#ifndef                   __STDC_UTF_32__
-#define                   __STDC_UTF_32__                     (1) /* char32_t values are encoded as UTF-32 */
-#endif /* Only define __STDC_UTF_X__ macros if uchar is not available */
-#endif /* Is __has_include available? */
-#endif
-#ifdef                    __CHAR32_TYPE__
-typedef                   __CHAR32_TYPE__                      char32_t;
+#define __CHAR32_TYPE__ _Char32_t
+#endif /* PlatformIO_Compiler */
 #elif !defined(__CHAR32_TYPE__)
-#if    defined(uint_least32_t)
-typedef                   uint_least32_t                       char32_t;
-#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
-typedef                   _Char32_t                            char32_t;
-#elif !defined(uint_least32_t)
-#error "Get a modern compiler that supports uint_least32_t"
-#endif /* Defined? uint_least32_t */
-#endif /* Defined? __CHAR32_TYPE__ */
+#define __CHAR32_TYPE__ uint_least32_t
+#endif /* __CHAR32_TYPE__ */
+    
+    typedef __CHAR32_TYPE__ char32_t;
+    
+#ifdef  __STDC_UTF_32__
+#undef  __STDC_UTF_32__
+#define __STDC_UTF_32__ (1)
+#else
+#define __STDC_UTF_32__ (1)
+#endif /* __STDC_UTF_32__ */
+#endif /* Include <uchar.h> */
+    
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-#ifndef                   __cpp_unicode_characters
-#define                   __cpp_unicode_characters
-typedef                   uint_least16_t                       char16_t;
-typedef                   uint_least32_t                       char32_t;
-#endif /* __cpp_unicode_characters */
+#if defined(__has_include) && __has_include(<cuchar>)
+#include <cuchar>
+#else
+#ifndef __cpp_char8_t
+#define __cpp_char8_t
+#endif
+    
+#ifndef __cpp_unicode_characters
+#define __cpp_unicode_characters
+#endif
+    
+#ifdef  __CHAR8_TYPE__
+#undef  __CHAR8_TYPE__
+#define __CHAR8_TYPE__ unsigned char
+#else
+#define __CHAR8_TYPE__ unsigned char
+#endif /* __CHAR8_TYPE__ */
+    
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX) && (PlatformIO_LanguageVersion < PlatformIO_LanguageVersionCXX20)
+    typedef __CHAR8_TYPE__ char8_t;
+#endif
+    
+#ifdef  __CHAR16_TYPE__
+#undef  __CHAR16_TYPE__
+#if   (PlatformIO_Compiler != PlatformIO_CompilerIsMSVC)
+#define __CHAR16_TYPE__ uint_least16_t
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
+#define __CHAR16_TYPE__ _Char16_t
+#endif /* PlatformIO_Compiler */
+#elif !defined(__CHAR16_TYPE__)
+#if   (PlatformIO_Compiler != PlatformIO_CompilerIsMSVC)
+#define __CHAR16_TYPE__ uint_least16_t
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
+#define __CHAR16_TYPE__ _Char16_t
+#endif /* PlatformIO_Compiler */
+#endif /* __CHAR16_TYPE__ */
+    
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX) && (PlatformIO_LanguageVersion < PlatformIO_LanguageVersionCXX11)
+    typedef <#type#> <#name#>;
+    typedef __CHAR16_TYPE__ char16_t;
+#endif
+    
+#ifdef  __STDC_UTF_16__
+#undef  __STDC_UTF_16__
+#define __STDC_UTF_16__ (1)
+#else
+#define __STDC_UTF_16__ (1)
+#endif /* __STDC_UTF_16__ */
+    
+#ifdef  __CHAR32_TYPE__
+#undef  __CHAR32_TYPE__
+#if   (PlatformIO_Compiler != PlatformIO_CompilerIsMSVC)
+#define __CHAR32_TYPE__ uint_least32_t
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
+#define __CHAR32_TYPE__ _Char32_t
+#endif /* PlatformIO_Compiler */
+#elif !defined(__CHAR32_TYPE__)
+#if   (PlatformIO_Compiler != PlatformIO_CompilerIsMSVC)
+#define __CHAR32_TYPE__ uint_least32_t
+#elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
+#define __CHAR32_TYPE__ _Char32_t
+#endif /* PlatformIO_Compiler */
+#endif /* __CHAR32_TYPE__ */
+    
+#if (PlatformIO_Language == PlatformIO_LanguageIsCXX) && (PlatformIO_LanguageVersion < PlatformIO_LanguageVersionCXX11)
+    typedef __CHAR32_TYPE__ char32_t;
+#endif
+    
+#ifdef  __STDC_UTF_32__
+#undef  __STDC_UTF_32__
+#define __STDC_UTF_32__ (1)
+#else
+#define __STDC_UTF_32__ (1)
+#endif /* __STDC_UTF_32__ */
+    
+#endif /* <cuchar> exists */
 #endif /* PlatformIO_Language */
-
 
 #ifndef                   FoundationIO_StringTypes8
 #define                   FoundationIO_StringTypes8 (1)
@@ -105,7 +166,7 @@ typedef                   char8_t                              UTF8;
 /*!
 @abstract                 CharSet8                             is for non-Unicode character sets.
 */
-typedef                   char8_t                              CharSet8;
+typedef                   __CHAR8_TYPE__                       CharSet8;
 #endif /* FoundationIO_StringTypes8 */
 
 #ifndef                   FoundationIO_StringTypes16
@@ -123,7 +184,7 @@ typedef                   char16_t                             UTF16;
 /*!
 @abstract                 CharSet16                            is for non-Unicode character sets.
 */
-typedef                   char16_t                             CharSet16;
+typedef                   __CHAR16_TYPE__                      CharSet16;
 #endif /* FoundationIO_StringTypes16 */
 
 #ifndef                   FoundationIO_StringTypes32
@@ -141,7 +202,7 @@ typedef                   char32_t                             UTF32;
 /*!
 @abstract                 CharSet32                            is for non-Unicode character sets.
  */
-typedef                   char32_t                             CharSet32;
+typedef                   __CHAR32_TYPE__                      CharSet32;
 #endif /* FoundationIO_StringTypes32 */
 
 #ifndef                   TextIOTypes_PropertyConversion8

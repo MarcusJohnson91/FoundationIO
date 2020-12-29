@@ -566,13 +566,12 @@ extern "C" {
     }
     
     bool MD5_Compare(uint8_t *Hash1, uint8_t *Hash2) {
-        bool HashesMatch            = No;
+        bool HashesMatch            = Yes;
         if (Hash1 != NULL && Hash2 != NULL) {
             for (uint8_t Byte = 0; Byte < MD5HashSize; Byte++) {
-                while (Hash1[Byte] == Hash2[Byte]) {
-                    if (Byte == MD5HashSize - 1) {
-                        HashesMatch = Yes;
-                    }
+                if (Hash1[Byte] != Hash2[Byte]) {
+                    HashesMatch     = No;
+                    return HashesMatch;
                 }
             }
         } else if (Hash1 == NULL) {
