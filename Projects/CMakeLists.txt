@@ -64,12 +64,16 @@ set(LIBRARY_SOURCE
 "${LIBRARY_DIRECTORY}/src/TextIO/StringIO.c"
 )
 
+set(PRIVATE_SOURCE
+"${LIBRARY_DIRECTORY}/src/TextIO/Private/TextIOTables.c"
+)
+
 option(BUILD_AS_SHARED_LIBRARY "Should FoundationIO be compiled as a dynamic library (.dylib/.dll/.so)?" ON)
 
 if(BUILD_AS_SHARED_LIBRARY MATCHES ON)
-    add_library(FoundationIO SHARED ${LIBRARY_SOURCE})
+    add_library(FoundationIO SHARED ${LIBRARY_SOURCE} ${PRIVATE_SOURCE})
 elseif(BUILD_AS_SHARED_LIBRARY MATCHES OFF)
-    add_library(FoundationIO STATIC ${LIBRARY_SOURCE})
+    add_library(FoundationIO STATIC ${LIBRARY_SOURCE} ${PRIVATE_SOURCE})
 endif(BUILD_AS_SHARED_LIBRARY MATCHES ON)
 
 if(NOT WIN32)

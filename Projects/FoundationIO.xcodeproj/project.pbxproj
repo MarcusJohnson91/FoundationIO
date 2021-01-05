@@ -35,6 +35,7 @@
 		2C88503524BCB9BF00DAD7ED /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
 		2C88503824BCB9C600DAD7ED /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
 		2C88503B24BCB9CD00DAD7ED /* FoundationIO.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */; };
+		2CB668D125A0A8140076D65C /* TextIOTables.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CB668D025A0A8140076D65C /* TextIOTables.c */; };
 		2CC71DC6232B5FDF006DA1B8 /* Test_BufferIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71D8A232B5F20006DA1B8 /* Test_BufferIO.c */; };
 		2CC71E00232B6036006DA1B8 /* Test_CryptographyIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71D89232B5F20006DA1B8 /* Test_CryptographyIO.c */; };
 		2CC71E01232B603A006DA1B8 /* Test_MathIO.c in Sources */ = {isa = PBXBuildFile; fileRef = 2CC71D88232B5F20006DA1B8 /* Test_MathIO.c */; };
@@ -266,6 +267,7 @@
 		2C88501124BCB48600DAD7ED /* Test_FileIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_FileIO; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C88501C24BCB49F00DAD7ED /* Test_NetworkIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_NetworkIO; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C88502924BCB6AD00DAD7ED /* Test_FormatIO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test_FormatIO; sourceTree = BUILT_PRODUCTS_DIR; };
+		2CB668D025A0A8140076D65C /* TextIOTables.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = TextIOTables.c; path = ../Library/src/TextIO/Private/TextIOTables.c; sourceTree = "<group>"; };
 		2CC71D79232B5EC8006DA1B8 /* FoundationIO.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = FoundationIO.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CC71D88232B5F20006DA1B8 /* Test_MathIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_MathIO.c; path = ../Tests/Test_MathIO.c; sourceTree = "<group>"; };
 		2CC71D89232B5F20006DA1B8 /* Test_CryptographyIO.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; lineEnding = 0; name = Test_CryptographyIO.c; path = ../Tests/Test_CryptographyIO.c; sourceTree = "<group>"; };
@@ -448,6 +450,14 @@
 			name = Private;
 			sourceTree = "<group>";
 		};
+		2CB668CF25A0A8010076D65C /* Private */ = {
+			isa = PBXGroup;
+			children = (
+				2CB668D025A0A8140076D65C /* TextIOTables.c */,
+			);
+			name = Private;
+			sourceTree = "<group>";
+		};
 		2CC71D70232B5EC8006DA1B8 = {
 			isa = PBXGroup;
 			children = (
@@ -537,6 +547,7 @@
 		2CF0A7F924D7C55300135BCC /* TextIO */ = {
 			isa = PBXGroup;
 			children = (
+				2CB668CF25A0A8010076D65C /* Private */,
 				2CF0A7FA24D7C56300135BCC /* CommandLineIO.c */,
 				2CF0A7FE24D7C56300135BCC /* FormatIO.c */,
 				2CF0A7FB24D7C56300135BCC /* LocalizationIO.c */,
@@ -966,6 +977,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CE9AD93255122B20092CBC8 /* AsynchronousIO.c in Sources */,
+				2CB668D125A0A8140076D65C /* TextIOTables.c in Sources */,
 				2CF0A80124D7C56300135BCC /* LogIO.c in Sources */,
 				2C410983236BA3320059FE67 /* BufferIO.c in Sources */,
 				2C410987236BA3320059FE67 /* MathIO.c in Sources */,

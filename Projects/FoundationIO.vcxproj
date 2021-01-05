@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Release|x64">
@@ -31,6 +31,7 @@
     <ClCompile Include="..\Library\src\TextIO\LocalizationIO.c" />
     <ClCompile Include="..\Library\src\TextIO\LogIO.c" />
     <ClCompile Include="..\Library\src\TextIO\StringIO.c" />
+    <ClCompile Include="..\Library\src\TextIO\Private\TextIOTables.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Library\include\BufferIO.h" />
@@ -45,9 +46,9 @@
     <ClInclude Include="..\Library\include\TextIO\FormatIO.h" />
     <ClInclude Include="..\Library\include\TextIO\LocalizationIO.h" />
     <ClInclude Include="..\Library\include\TextIO\LogIO.h" />
-    <ClInclude Include="..\Library\include\TextIO\Private\TextIOTables.h" />
     <ClInclude Include="..\Library\include\TextIO\StringIO.h" />
     <ClInclude Include="..\Library\include\TextIO\TextIOTypes.h" />
+    <ClInclude Include="..\Library\include\TextIO\Private\TextIOTables.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\Resources\FoundationIO.rc" />
