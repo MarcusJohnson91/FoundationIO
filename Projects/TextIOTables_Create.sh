@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-# Usage (the HeaderFile WILL BE IRRECOVERABLY DELETED): ./TextIOTables_Create.sh /TextIO/Private/TextIOTables.h
+# Usage (the HeaderFile WILL BE IRRECOVERABLY DELETED): ./TextIOTables_Create.sh
 # Dependencies: Curl, XMLStarlet (On Mac install Homebrew from brew.sh then call brew install xmlstarlet)
 
-CreateHeaderFileTop() {
+CreateHeaderFile() {
     IntegerTableBase2Size=2
     IntegerTableBase8Size=8
     TableBase10Size=10
@@ -14,6 +14,15 @@ CreateHeaderFileTop() {
     MathSeperatorTableSize=4
     NumLineBreakCodePoints=7
     NumWordBreakCodePoints=18
+    NumBiDirectionalControls=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Bidi_C='Y'])" "$UCD_Data")
+    NumCurrencyCodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@gc='Sc'])" "$UCD_Data")
+    DecimalTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and contains(@nv, '/')])" "$UCD_Data")
+    CombiningCharacterClassTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@ccc != '0'])" "$UCD_Data")
+    IntegerTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')])" "$UCD_Data")
+    GraphemeExtensionSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Gr_Ext = 'Y' or @EComp = 'Y' or @EBase = 'Y'])" "$UCD_Data")
+    KompatibleNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[(@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat') and @dt != '' and @dt != '#' and @dt != 'none'])" -n "$UCD_Data")
+    CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')])" "$UCD_Data")
+    CanonicalNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n "$UCD_Data")
     {
         printf "/*!\n"
         printf " @header          TextIOTables.h\n"
@@ -21,7 +30,7 @@ CreateHeaderFileTop() {
         printf " @copyright       2018+\n"
         printf " @version         1.2.0\n"
         printf " @brief           This header contains tables used across FoundationIO for Unicode and character set conversion.\n"
-        printf " @remark          ScriptHash is used to know if the script has changed since the header was last generated, it is not at all used for security.\n"
+        printf " @remark          ScriptHash is to know if the script has changed since the header was last created.\n"
         printf " */\n\n"
         printf "#include \"../../PlatformIO.h\"  /* Included for Platform Independence macros */\n"
         printf "#include \"../TextIOTypes.h\"    /* Included for the Text types */\n\n"
@@ -33,46 +42,78 @@ CreateHeaderFileTop() {
         printf "#endif\n\n"
         printf "#define ScriptHash %s\n\n" "$ScriptSHA"
         printf "#define UnicodeVersion %s\n\n" "$ReadmeUnicodeVersion"
-        printf "#define IntegerTableBase2Size %d\n\n" "$IntegerTableBase2Size"
-        printf "#define IntegerTableBase8Size %d\n\n" "$IntegerTableBase8Size"
-        printf "#define TableBase10Size %d\n\n" "$TableBase10Size"
-        printf "#define IntegerTableBase16Size %d\n\n" "$IntegerTableBase16Size"
-        printf "#define DecimalTableBase10Size %d\n\n" "$DecimalTableBase10Size"
-        printf "#define DecimalTableScientificSize %d\n\n" "$DecimalTableScientificSize"
-        printf "#define DecimalTableHexadecimalSize %d\n\n" "$DecimalTableHexadecimalSize"
-        printf "#define MathSeperatorTableSize %d\n\n" "$MathSeperatorTableSize"
-        printf "#define LineBreakTableSize %d\n\n" "$NumLineBreakCodePoints"
-
-    } >> "$HeaderFile"
-    NumBiDirectionalControls=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Bidi_C='Y'])" "$UCD_Data")
-    NumCurrencyCodePoints=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@gc='Sc'])" "$UCD_Data")
-    DecimalTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and contains(@nv, '/')])" "$UCD_Data")
-    CombiningCharacterClassTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@ccc != '0'])" "$UCD_Data")
-    IntegerTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')])" "$UCD_Data")
-    GraphemeExtensionSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@Gr_Ext = 'Y' or @EComp = 'Y' or @EBase = 'Y'])" "$UCD_Data")
-    KompatibleNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[(@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat') and @dt != '' and @dt != '#' and @dt != 'none'])" -n "$UCD_Data")
-    CaseFoldTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')])" "$UCD_Data")
-    CanonicalNormalizationTableSize=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -c "count(//u:char[@dm != @cp and @dt = 'can'])" -n "$UCD_Data")
-    {
-        printf "#define BiDirectionalControlsTableSize %d\n\n" "$NumBiDirectionalControls"
-        printf "#define WordBreakTableSize %d\n\n" "$NumWordBreakCodePoints"
-        printf "#define CurrencyTableSize %d\n\n" "$NumCurrencyCodePoints"
-        printf "#define DecimalTableSize %d\n\n" "$DecimalTableSize"
-        printf "#define CombiningCharacterClassTableSize %d\n\n" "$CombiningCharacterClassTableSize"
-        printf "#define IntegerTableSize %d\n\n" "$IntegerTableSize"
-        printf "#define GraphemeExtensionTableSize %d\n\n" "$GraphemeExtensionSize"
-        printf "#define KompatibleNormalizationTableSize %d\n\n" "$KompatibleNormalizationTableSize"
-        printf "#define CaseFoldTableSize %d\n\n" "$CaseFoldTableSize"
-        printf "#define CanonicalNormalizationTableSize %d\n\n" "$CanonicalNormalizationTableSize"
+        printf "    typedef enum TextIOConstants {\n"
+        printf "        IntegerTableBase2Size            = %u,\n" "$IntegerTableBase2Size"
+        printf "        IntegerTableBase8Size            = %u,\n" "$IntegerTableBase8Size"
+        printf "        TableBase10Size                  = %u,\n" "$TableBase10Size"
+        printf "        IntegerTableBase16Size           = %u,\n" "$IntegerTableBase16Size"
+        printf "        DecimalTableBase10Size           = %u,\n" "$DecimalTableBase10Size"
+        printf "        DecimalTableScientificSize       = %u,\n" "$DecimalTableScientificSize"
+        printf "        DecimalTableHexadecimalSize      = %u,\n" "$DecimalTableHexadecimalSize"
+        printf "        MathSeperatorTableSize           = %u,\n" "$MathSeperatorTableSize"
+        printf "        LineBreakTableSize               = %u,\n" "$NumLineBreakCodePoints"
+        printf "        BiDirectionalControlsTableSize   = %u,\n" "$NumBiDirectionalControls"
+        printf "        WordBreakTableSize               = %u,\n" "$NumWordBreakCodePoints"
+        printf "        CurrencyTableSize                = %u,\n" "$NumCurrencyCodePoints"
+        printf "        DecimalTableSize                 = %u,\n" "$DecimalTableSize"
+        printf "        CombiningCharacterClassTableSize = %u,\n" "$CombiningCharacterClassTableSize"
+        printf "        IntegerTableSize                 = %u,\n" "$IntegerTableSize"
+        printf "        GraphemeExtensionTableSize       = %u,\n" "$GraphemeExtensionSize"
+        printf "        KompatibleNormalizationTableSize = %u,\n" "$KompatibleNormalizationTableSize"
+        printf "        CaseFoldTableSize                = %u,\n" "$CaseFoldTableSize"
+        printf "        CanonicalNormalizationTableSize  = %u,\n" "$CanonicalNormalizationTableSize"
+        printf "    } TextIOConstants;\n\n"
+        printf "    extern const UTF32    IntegerTableBase2[IntegerTableBase2Size];\n\n"
+        printf "    extern const UTF32    IntegerTableBase8[IntegerTableBase8Size];\n\n"
+        printf "    extern const UTF32    TableBase10[TableBase10Size];\n\n"
+        printf "    extern const UTF32    IntegerTableUppercaseBase16[IntegerTableBase16Size];\n\n"
+        printf "    extern const UTF32    IntegerTableLowercaseBase16[IntegerTableBase16Size];\n\n"
+        printf "    extern const UTF32    DecimalScientificUppercase[DecimalTableScientificSize];\n\n"
+        printf "    extern const UTF32    DecimalScientificLowercase[DecimalTableScientificSize];\n\n"
+        printf "    extern const UTF32    DecimalHexUppercase[DecimalTableHexadecimalSize];\n\n"
+        printf "    extern const UTF32    DecimalHexLowercase[DecimalTableHexadecimalSize];\n\n"
+        printf "    extern const UTF32    MathSeperators[MathSeperatorTableSize];\n\n"
+        printf "    extern const UTF32    LineBreakTable[LineBreakTableSize];\n\n"
+        printf "    extern const UTF32    BiDirectionalControlsTable[BiDirectionalControlsTableSize];\n\n"
+        printf "    extern const UTF32    WordBreakTable[WordBreakTableSize];\n\n"
+        printf "    extern const UTF32    CurrencyTable[CurrencyTableSize];\n\n"
+        printf "    extern const int32_t  DecimalTable[DecimalTableSize][3];\n\n"
+        printf "    extern const UTF32    CombiningCharacterClassTable[CombiningCharacterClassTableSize][2];\n\n"
+        printf "    extern const uint64_t IntegerTable[IntegerTableSize][2];\n\n"
+        printf "    extern const UTF32    GraphemeExtensionTable[GraphemeExtensionTableSize];\n\n"
+        printf "    extern const UTF32   *KompatibleNormalizationTable[KompatibleNormalizationTableSize][2];\n\n"
+        printf "    extern const UTF32   *CaseFoldTable[CaseFoldTableSize][2];\n\n"
+        printf "    extern const UTF32   *CanonicalNormalizationTable[CanonicalNormalizationTableSize][2];\n\n"
+        printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
+        printf "}\n"
+        printf "#endif /* Extern C */\n\n"
+        printf "#endif /* FoundationIO_TextIO_TextIOTables_H */\n"
     } >> "$HeaderFile"
 }
 
+CreateSourceFileTop() {
+    {
+        printf "#include \"../../../include/TextIO/Private/TextIOTables.h\" /* Included for our declarations */\n\n"
+        printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
+        printf "extern \"C\" {\n"
+        printf "#endif\n\n"
+    } >> "$SourceFile"
+}
+
+CreateSourceFileBottom() {
+    {
+        printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
+        printf "}\n"
+        printf "#endif /* Extern C */\n\n"
+    } >> "$SourceFile"
+}
+
 CreateMathConstantTables() {
-    printf "    static const UTF32 IntegerTableBase2[IntegerTableBase2Size] = {\n"
+    printf "    const UTF32 IntegerTableBase2[IntegerTableBase2Size] = {\n"
     printf "        U'0',\n"
     printf "        U'1',\n"
     printf "    };\n\n"
-    printf "    static const UTF32 IntegerTableBase8[IntegerTableBase8Size] = {\n"
+    printf "    const UTF32 IntegerTableBase8[IntegerTableBase8Size] = {\n"
     printf "        U'0',\n"
     printf "        U'1',\n"
     printf "        U'2',\n"
@@ -82,7 +123,7 @@ CreateMathConstantTables() {
     printf "        U'6',\n"
     printf "        U'7',\n"
     printf "    };\n\n"
-    printf "    static const UTF32 TableBase10[TableBase10Size] = {\n"
+    printf "    const UTF32 TableBase10[TableBase10Size] = {\n"
     printf "        U'0',\n"
     printf "        U'1',\n"
     printf "        U'2',\n"
@@ -94,7 +135,7 @@ CreateMathConstantTables() {
     printf "        U'8',\n"
     printf "        U'9',\n"
     printf "    };\n\n"
-    printf "    static const UTF32 IntegerTableUppercaseBase16[IntegerTableBase16Size] = {\n"
+    printf "    const UTF32 IntegerTableUppercaseBase16[IntegerTableBase16Size] = {\n"
     printf "        U'0',\n"
     printf "        U'1',\n"
     printf "        U'2',\n"
@@ -112,7 +153,7 @@ CreateMathConstantTables() {
     printf "        U'E',\n"
     printf "        U'F',\n"
     printf "    };\n\n"
-    printf "    static const UTF32 IntegerTableLowercaseBase16[IntegerTableBase16Size] = {\n"
+    printf "    const UTF32 IntegerTableLowercaseBase16[IntegerTableBase16Size] = {\n"
     printf "        U'0',\n"
     printf "        U'1',\n"
     printf "        U'2',\n"
@@ -130,7 +171,7 @@ CreateMathConstantTables() {
     printf "        U'e',\n"
     printf "        U'f',\n"
     printf "    };\n\n"
-    printf "    static const UTF32 DecimalScientificUppercase[DecimalTableScientificSize] = {\n"
+    printf "    const UTF32 DecimalScientificUppercase[DecimalTableScientificSize] = {\n"
     printf "        U'0',\n"
     printf "        U'1',\n"
     printf "        U'2',\n"
@@ -143,7 +184,7 @@ CreateMathConstantTables() {
     printf "        U'9',\n"
     printf "        U'E',\n"
     printf "    };\n\n"
-    printf "    static const UTF32 DecimalScientificLowercase[DecimalTableScientificSize] = {\n"
+    printf "    const UTF32 DecimalScientificLowercase[DecimalTableScientificSize] = {\n"
     printf "        U'0',\n"
     printf "        U'1',\n"
     printf "        U'2',\n"
@@ -156,7 +197,7 @@ CreateMathConstantTables() {
     printf "        U'9',\n"
     printf "        U'e',\n"
     printf "    };\n\n"
-    printf "    static const UTF32 DecimalHexUppercase[DecimalTableHexadecimalSize] = {\n"
+    printf "    const UTF32 DecimalHexUppercase[DecimalTableHexadecimalSize] = {\n"
     printf "        U'0',\n"
     printf "        U'1',\n"
     printf "        U'2',\n"
@@ -176,7 +217,7 @@ CreateMathConstantTables() {
     printf "        U'P',\n"
     printf "        U'X',\n"
     printf "    };\n\n"
-    printf "    static const UTF32 DecimalHexLowercase[DecimalTableHexadecimalSize] = {\n"
+    printf "    const UTF32 DecimalHexLowercase[DecimalTableHexadecimalSize] = {\n"
     printf "        U'0',\n"
     printf "        U'1',\n"
     printf "        U'2',\n"
@@ -196,16 +237,16 @@ CreateMathConstantTables() {
     printf "        U'p',\n"
     printf "        U'x',\n"
     printf "    };\n\n"
-    printf "    static const UTF32 MathSeperators[MathSeperatorTableSize] = {\n"
+    printf "    const UTF32 MathSeperators[MathSeperatorTableSize] = {\n"
     printf "        U',',\n"
     printf "        U'.',\n"
     printf "        U'\\\'',\n"
     printf "        U'\\\x20',\n"
     printf "    };\n\n"
-} >> "$HeaderFile"
+} >> "$SourceFile"
 
 CreateLineBreakTable() {
-    printf "    static const UTF32 LineBreakTable[LineBreakTableSize] = {\n"
+    printf "    const UTF32 LineBreakTable[LineBreakTableSize] = {\n"
     printf "        0x00000A,\n"
     printf "        0x00000B,\n"
     printf "        0x00000C,\n"
@@ -214,19 +255,19 @@ CreateLineBreakTable() {
     printf "        0x002028,\n"
     printf "        0x002029,\n"
     printf "    };\n\n"
-} >> "$HeaderFile"
+} >> "$SourceFile"
 
 CreateBiDirectionalControlsTable() {
-    printf "    static const UTF32 BiDirectionalControlsTable[BiDirectionalControlsTableSize] = {\n" >> "$HeaderFile"
+    printf "    const UTF32 BiDirectionalControlsTable[BiDirectionalControlsTableSize] = {\n" >> "$SourceFile"
     BiDirectionalControls=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Bidi_C = 'Y']" -o '0x' -v @cp -n "$UCD_Data")
     for line in $BiDirectionalControls; do
-        echo "$line" | awk -F ':' '{printf "        0x%06X,\n", $1}' >> "$HeaderFile"
+        echo "$line" | awk -F ':' '{printf "        0x%06X,\n", $1}' >> "$SourceFile"
     done
-    printf "    };\n\n" >> "$HeaderFile"
+    printf "    };\n\n" >> "$SourceFile"
 }
 
 CreateWordBreakTable() {
-    printf "    static const UTF32 WordBreakTable[WordBreakTableSize] = {\n"
+    printf "    const UTF32 WordBreakTable[WordBreakTableSize] = {\n"
     printf "        0x000020,\n"
     printf "        0x0000A0,\n"
     printf "        0x001680,\n"
@@ -246,51 +287,51 @@ CreateWordBreakTable() {
     printf "        0x00205F,\n"
     printf "        0x003000,\n"
     printf "    };\n\n"
-} >> "$HeaderFile"
+} >> "$SourceFile"
 
 CreateCurrencyTable() {
-    printf "    static const UTF32 CurrencyTable[CurrencyTableSize] = {\n" >> "$HeaderFile"
+    printf "    const UTF32 CurrencyTable[CurrencyTableSize] = {\n" >> "$SourceFile"
     Currency=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@gc = 'Sc']" -o '0x' -v @cp -n "$UCD_Data")
     for line in $Currency; do
-        echo "$line" | awk -F ':' '{printf "        0x%06X,\n", $1}' >> "$HeaderFile"
+        echo "$line" | awk -F ':' '{printf "        0x%06X,\n", $1}' >> "$SourceFile"
     done
-    printf "    };\n\n" >> "$HeaderFile"
+    printf "    };\n\n" >> "$SourceFile"
 }
 
 CreateDecimalTable() {
     CodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and contains(@nv, '/') and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -o '0x' -v @cp -o ':' -v @nv -n "$UCD_Data")
-    printf "    static const int32_t DecimalTable[DecimalTableSize][3] = {\n" >> "$HeaderFile"
+    printf "    const int32_t DecimalTable[DecimalTableSize][3] = {\n" >> "$SourceFile"
     for line in $CodePointAndValue; do
-        echo "$line" | awk -F '[:/]' '{printf "        {0x%06X, %i, %i},\n", $1, $2, $3}' >> "$HeaderFile"
+        echo "$line" | awk -F '[:/]' '{printf "        {0x%06X, %i, %i},\n", $1, $2, $3}' >> "$SourceFile"
     done
-    printf "    };\n\n" >> "$HeaderFile"
+    printf "    };\n\n" >> "$SourceFile"
 }
 
 CreateCombiningCharacterClassTable() {
-    printf "    static const UTF32 CombiningCharacterClassTable[CombiningCharacterClassTableSize][2] = {\n" >> "$HeaderFile"
+    printf "    const UTF32 CombiningCharacterClassTable[CombiningCharacterClassTableSize][2] = {\n" >> "$SourceFile"
     CombiningCharacterClassCodePointAndValue=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@ccc != '0']" -o '0x' -v @cp -o ':' -v @ccc -n "$UCD_Data")
     for line in $CombiningCharacterClassCodePointAndValue; do
-        echo "$line" | awk -F '[: ]' '{printf "        {0x%06X, %d},\n", $1, $2}' >> "$HeaderFile"
+        echo "$line" | awk -F '[: ]' '{printf "        {0x%06X, %d},\n", $1, $2}' >> "$SourceFile"
     done
-    printf "    };\n\n" >> "$HeaderFile"
+    printf "    };\n\n" >> "$SourceFile"
 }
 
 CreateIntegerTable() {
     IntegerTable=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@nv != 'NaN' and not(contains(@nv, '/')) and (@nt = 'None' or @nt = 'Di' or @nt = 'Nu' or @nt = 'De')]" -o '0x' -v @cp -o ':' -v @nv -n "$UCD_Data")
-    printf "    static const uint64_t IntegerTable[IntegerTableSize][2] = {\n" >> "$HeaderFile"
+    printf "    const uint64_t IntegerTable[IntegerTableSize][2] = {\n" >> "$SourceFile"
     for line in $IntegerTable; do
-        echo "$line" | awk -F ':' '{printf "        {0x%06X, %i},\n", $1, $2}' >> "$HeaderFile"
+        echo "$line" | awk -F ':' '{printf "        {0x%06X, %i},\n", $1, $2}' >> "$SourceFile"
     done
-    printf "    };\n\n" >> "$HeaderFile"
+    printf "    };\n\n" >> "$SourceFile"
 }
 
 CreateGraphemeExtensionTable() {
-    printf "    static const UTF32 GraphemeExtensionTable[GraphemeExtensionTableSize] = {\n" >> "$HeaderFile"
+    printf "    const UTF32 GraphemeExtensionTable[GraphemeExtensionTableSize] = {\n" >> "$SourceFile"
     GraphemeExtensions=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@Gr_Ext = 'Y' or @EComp = 'Y']" -o '0x' -v @cp -n "$UCD_Data")
     for line in $GraphemeExtensions; do
-        echo "$line" | awk -F ':' '{printf "        0x%06X,\n", $1}' >> "$HeaderFile"
+        echo "$line" | awk -F ':' '{printf "        0x%06X,\n", $1}' >> "$SourceFile"
     done
-    printf "    };\n\n" >> "$HeaderFile"
+    printf "    };\n\n" >> "$SourceFile"
 }
 
 AddUnicodePrefix2CodePoint() {
@@ -315,7 +356,7 @@ AddUnicodePrefix2String() {
 
 CreateKompatibleNormalizationTable() {
     Kompatible=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[(@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat') and @dt != '' and @dt != '#' and @dt != 'none']" -o '0x' -v @cp -o ': ' -v @dm -n "$UCD_Data" | sed -e 's/ / 0x/g' -e 's/: /:/g' -e 's/ /|/g')
-    printf "    static const UTF32 *KompatibleNormalizationTable[KompatibleNormalizationTableSize][2] = {\n" >> "$HeaderFile"
+    printf "    const UTF32 *KompatibleNormalizationTable[KompatibleNormalizationTableSize][2] = {\n" >> "$SourceFile"
     for line in $Kompatible; do
         CodePoint2Replace=$(echo "$line" | awk -F ':' '{printf "%u", $1}')
         AddUnicodePrefix2CodePoint "$CodePoint2Replace"
@@ -326,14 +367,14 @@ CreateKompatibleNormalizationTable() {
             ReplacementCodePoint=$(echo "$line" | awk -F '[:|]' -v Index="$Index" '{printf "%u", $Index}')
             AddUnicodePrefix2String "$ReplacementCodePoint"
         done
-        printf "        {U\"%s\", U\"%s\"},\n" "$UnicodePrefixedCodePoint" "$UnicodeReplacementString" >> "$HeaderFile"
+        printf "        {U\"%s\", U\"%s\"},\n" "$UnicodePrefixedCodePoint" "$UnicodeReplacementString" >> "$SourceFile"
     done
-    printf "    };\n\n" >> "$HeaderFile"
+    printf "    };\n\n" >> "$SourceFile"
 }
 
 CreateCaseFoldTable() {
     CaseFold=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')]" -o '0x' -v @cp -o ': ' -v @NFKC_CF -n "$UCD_Data" | sed -e 's/ / 0x/g' -e 's/: /:/g' -e 's/ /|/g')
-    printf "    static const UTF32 *CaseFoldTable[CaseFoldTableSize][2] = {\n" >> "$HeaderFile"
+    printf "    const UTF32 *CaseFoldTable[CaseFoldTableSize][2] = {\n" >> "$SourceFile"
     for line in $CaseFold; do
         CodePoint2Replace=$(echo "$line" | awk -F ':' '{printf "%u", $1}')
         AddUnicodePrefix2CodePoint "$CodePoint2Replace"
@@ -344,14 +385,14 @@ CreateCaseFoldTable() {
             ReplacementCodePoint=$(echo "$line" | awk -F '[:|]' -v Index="$Index" '{printf "%u", $Index}')
             AddUnicodePrefix2String "$ReplacementCodePoint"
         done
-        printf "        {U\"%s\", U\"%s\"},\n" "$UnicodePrefixedCodePoint" "$UnicodeReplacementString" >> "$HeaderFile"
+        printf "        {U\"%s\", U\"%s\"},\n" "$UnicodePrefixedCodePoint" "$UnicodeReplacementString" >> "$SourceFile"
     done
-    printf "    };\n\n" >> "$HeaderFile"
+    printf "    };\n\n" >> "$SourceFile"
 }
 
 CreateCanonicalNormalizationTable() {
     Canonical=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dm != @cp and @dm != '#' and @dt = 'can']" -o '0x' -v @cp -o ': ' -v @dm -n "$UCD_Data" | sed -e 's/ / 0x/g' -e 's/: /:/g' -e 's/ /|/g')
-    printf "    static const UTF32 *CanonicalNormalizationTable[CanonicalNormalizationTableSize][2] = {\n" >> "$HeaderFile"
+    printf "    const UTF32 *CanonicalNormalizationTable[CanonicalNormalizationTableSize][2] = {\n" >> "$SourceFile"
     for line in $Canonical; do
         CodePoint2Replace=$(echo "$line" | awk -F ':' '{printf "%u", $1}')
         AddUnicodePrefix2CodePoint "$CodePoint2Replace"
@@ -362,23 +403,16 @@ CreateCanonicalNormalizationTable() {
             ReplacementCodePoint=$(echo "$line" | awk -F '[:|]' -v Index="$Index" '{printf "%u", $Index}')
             AddUnicodePrefix2String "$ReplacementCodePoint"
         done
-        printf "        {U\"%s\", U\"%s\"},\n" "$CodePoint" "$UnicodeReplacementString" >> "$HeaderFile"
+        printf "        {U\"%s\", U\"%s\"},\n" "$CodePoint" "$UnicodeReplacementString" >> "$SourceFile"
     done
-    printf "    };\n\n" >> "$HeaderFile"
+    printf "    };\n\n" >> "$SourceFile"
 }
 
-CreateHeaderFileBottom() {
-    printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
-    printf "}\n"
-    printf "#endif /* Extern C */\n\n"
-    printf "#endif /* FoundationIO_TextIO_TextIOTables_H */\n"
-} >> "$HeaderFile"
-
 CreateTables() {
-    CreateHeaderFileTop
+    CreateHeaderFile
 
+    CreateSourceFileTop
     CreateMathConstantTables
-
     CreateLineBreakTable
     CreateBiDirectionalControlsTable
     CreateWordBreakTable
@@ -390,8 +424,7 @@ CreateTables() {
     CreateKompatibleNormalizationTable
     CreateCaseFoldTable
     CreateCanonicalNormalizationTable
-
-    CreateHeaderFileBottom
+    CreateSourceFileBottom
 }
 
 DownloadUCD() {
@@ -432,6 +465,7 @@ CheckUnicodeVersion() {
                 rm    "$HeaderFile"
                 echo "Creating Header..."
                 touch "$HeaderFile"
+                touch "$SourceFile"
                 DownloadUCD
                 CreateTables
             else
@@ -440,7 +474,7 @@ CheckUnicodeVersion() {
                 CreateTables
             fi
         else
-            echo "The Text tables are already up to date."
+            echo "The tables are already up to date."
             exit 1
         fi
     else
@@ -450,11 +484,16 @@ CheckUnicodeVersion() {
 }
 
 # Check that there's exactly 1 argument to the program
-# If there is 1 argument, check if the file exists, 
+# If there is 1 argument, check if the Header exists,
 # if the file exists check the version number against the latest release of Unicode
 # If the file does not exist create it and start downloading the UCd and writing the tables
 
-HeaderFile=$1
+# HeaderFile: /Library/incude/TextIO/Private/TextIOTables.h
+# SourceFile: /Library/src/TextIO/Private/TextIOTables.h
+
+LibraryPath="$(dirname "$(dirname "$(dirname "$(echo "$(cd "$(dirname "$1")"; pwd)/$(basename "$1")")")")")"
+HeaderFile=$(printf "%s/%s" "$LibraryPath" "include/TextIO/Private/TextIOTables.h")
+SourceFile=$(printf "%s/%s" "$LibraryPath" "src/TextIO/Private/TextIOTables.c")
 TempFolder=$(mktemp -d)
 FreeSpaceInBytes=$(df -H "$TempFolder" | awk '{printf $7}' | cut -c 6-)
 curl -s "https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt" -o "$TempFolder/readme.txt"
@@ -464,7 +503,7 @@ CurlPath=$(command -v curl)
 UnzipPath=$(command -v unzip)
 XMLStarletPath=$(command -v xmlstarlet)
 
-if [ $# -eq 1 ]; then
+if [ $# -eq 0 ]; then
     if test -f "$HeaderFile"; then
         # Header exists, check the version
         if test -x "$SHAPath"; then
@@ -472,11 +511,15 @@ if [ $# -eq 1 ]; then
             ScriptSHA=$(shasum "$0" | awk '{print $1}')
             if [ "$HeaderScriptHash" != "$ScriptSHA" ]; then
                 # Update the Tables
-                echo "Deleting header, press Control-C within 5 seconds to abort..."
+                echo "The following two files will be deleted, press Control-C within 5 seconds to abort..."
+                echo $HeaderFile
+                echo $SourceFile
                 sleep 5
-                rm    "$HeaderFile"
-                echo "Creating Header..."
+                rm -rf "$HeaderFile"
+                rm -rf "$SourceFile"
+                echo "Creating Tables..."
                 touch "$HeaderFile"
+                touch "$SourceFile"
                 DownloadUCD
                 CreateTables
             else
@@ -491,6 +534,7 @@ if [ $# -eq 1 ]; then
         if [[ ! -z "$SHAPath" ]] && [[ ! -z "$CurlPath" ]] && [[ ! -z "$UnzipPath" ]] && [[ ! -z "$XMLStarletPath" ]]; then
             echo "Creating Header..."
             touch "$HeaderFile"
+            touch "$SourceFile"
             DownloadUCD
             CreateTables
         else
@@ -505,13 +549,11 @@ if [ $# -eq 1 ]; then
             if [[ -z "$UnzipPath" ]]; then
                 echo "We need 'unzip', install it then re-run the command"
             fi
-
             if [[ -z "$XMLStarletPath" ]]; then
                 echo "We need 'XMLStarlet', install it then re-run the command"
             fi
         fi
     fi
 fi
-
 
 # Unicode CLDR Parsing too; download: http://unicode.org/Public/cldr/latest/cldr-common-X.X.zip en.xml from /common/main

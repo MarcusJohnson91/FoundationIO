@@ -48,6 +48,9 @@
     <ClCompile Include="..\Library\src\TextIO\StringIO.c">
       <Filter>Source Files\TextIO</Filter>
     </ClCompile>
+    <ClCompile Include="..\Library\src\TextIO\Private\TextIOTables.c">
+      <Filter>Source Files\TextIO\Private</Filter>
+    </ClCompile>
     <ClCompile Include="..\Library\src\BufferIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
