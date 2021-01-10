@@ -19,6 +19,12 @@
     <Filter Include="Source Files\TextIO">
       <UniqueIdentifier>{a9d16bf7-d9c9-46eb-9aad-22e78a12aa6a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{d571789b-ee99-4595-b72d-b2c947235e7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TextIO\Private">
+      <UniqueIdentifier>{a4d73d99-204f-4f4a-95ba-c51d240e333f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Library\src\CryptographyIO.c">
@@ -48,9 +54,6 @@
     <ClCompile Include="..\Library\src\TextIO\StringIO.c">
       <Filter>Source Files\TextIO</Filter>
     </ClCompile>
-    <ClCompile Include="..\Library\src\TextIO\Private\TextIOTables.c">
-      <Filter>Source Files\TextIO\Private</Filter>
-    </ClCompile>
     <ClCompile Include="..\Library\src\BufferIO.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -59,6 +62,12 @@
     </ClCompile>
     <ClCompile Include="..\Library\src\NetworkIO.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\src\AsynchronousIO.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\src\TextIO\Private\TextIOTables.c">
+      <Filter>Source Files\TextIO\Private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -107,8 +116,16 @@
     <ClInclude Include="..\Library\include\TextIO\Private\TextIOTables.h">
       <Filter>Header Files\TextIO\Private</Filter>
     </ClInclude>
+    <ClInclude Include="..\Library\include\AsynchronousIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\include\Private\CommitID.h">
+      <Filter>Header Files\Private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\Resources\FoundationIO.rc" />
+    <ResourceCompile Include="..\Resources\FoundationIO.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
