@@ -82,7 +82,7 @@ extern "C" {
 #endif
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
             UTF16 *Path16        = UTF8_Convert(&Path8[Path8Offset]);
-            Stream->StreamID     = _wsopen((wchar_t*) Path16, FileIO_Mode, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+            Stream->StreamID     = _wsopen((wchar_t*) Path16, Mode, _SH_DENYNO, _S_IREAD | _S_IWRITE);
             UTF16_Deinit(Path16);
 #endif
         } else if (Path8 == NULL) {
@@ -110,7 +110,7 @@ extern "C" {
 #endif
             UTF8_Deinit(Path8);
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-            Stream->StreamID     = _wsopen((wchar_t*) Path16, FileIO_Mode, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+            Stream->StreamID     = _wsopen((wchar_t*) Path16, Mode, _SH_DENYNO, _S_IREAD | _S_IWRITE);
 #endif
         } else if (Path16 == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Path8 Pointer is NULL"));
