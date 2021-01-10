@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Library\src\AsynchronousIO.c" />
     <ClCompile Include="..\Library\src\BufferIO.c" />
     <ClCompile Include="..\Library\src\CryptographyIO.c" />
     <ClCompile Include="..\Library\src\FileIO.c" />
@@ -30,16 +31,18 @@
     <ClCompile Include="..\Library\src\TextIO\FormatIO.c" />
     <ClCompile Include="..\Library\src\TextIO\LocalizationIO.c" />
     <ClCompile Include="..\Library\src\TextIO\LogIO.c" />
-    <ClCompile Include="..\Library\src\TextIO\StringIO.c" />
     <ClCompile Include="..\Library\src\TextIO\Private\TextIOTables.c" />
+    <ClCompile Include="..\Library\src\TextIO\StringIO.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Library\include\AsynchronousIO.h" />
     <ClInclude Include="..\Library\include\BufferIO.h" />
     <ClInclude Include="..\Library\include\CryptographyIO.h" />
     <ClInclude Include="..\Library\include\FileIO.h" />
     <ClInclude Include="..\Library\include\MathIO.h" />
     <ClInclude Include="..\Library\include\NetworkIO.h" />
     <ClInclude Include="..\Library\include\PlatformIO.h" />
+    <ClInclude Include="..\Library\include\Private\CommitID.h" />
     <ClInclude Include="..\Library\include\Private\Version.h" />
     <ClInclude Include="..\Library\include\TestIO.h" />
     <ClInclude Include="..\Library\include\TextIO\CommandLineIO.h" />
@@ -68,6 +71,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <UseOfMfc>false</UseOfMfc>
     <PlatformToolset>v142</PlatformToolset>
+    <EnableUnitySupport>false</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -76,6 +80,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <UseOfMfc>false</UseOfMfc>
     <PlatformToolset>v142</PlatformToolset>
+    <EnableUnitySupport>false</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -84,6 +89,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <UseOfMfc>false</UseOfMfc>
     <PlatformToolset>v142</PlatformToolset>
+    <EnableUnitySupport>false</EnableUnitySupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -92,6 +98,7 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <UseOfMfc>false</UseOfMfc>
     <PlatformToolset>v142</PlatformToolset>
+    <EnableUnitySupport>false</EnableUnitySupport>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -196,6 +203,7 @@
       <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -233,10 +241,10 @@
       <UpdateFileHashes>false</UpdateFileHashes>
     </Manifest>
     <PreBuildEvent>
-      <Command>call "$(ProjectDir)GetGitHash.cmd"</Command>
+      <Command>call $(ProjectDir)GetGitHash.cmd</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Writing the Git Commit Hash to the Version header</Message>
+      <Message>Getting the Git Commit Hash...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -284,6 +292,7 @@
       <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -319,10 +328,10 @@
       <UpdateFileHashes>false</UpdateFileHashes>
     </Manifest>
     <PreBuildEvent>
-      <Command>call "$(ProjectDir)GetGitHash.cmd"</Command>
+      <Command>call $(ProjectDir)GetGitHash.cmd</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Writing the Git Commit Hash to the Version header</Message>
+      <Message>Getting the Git Commit Hash...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -370,6 +379,7 @@
       <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -408,10 +418,10 @@
       <UpdateFileHashes>false</UpdateFileHashes>
     </Manifest>
     <PreBuildEvent>
-      <Command>call "$(ProjectDir)GetGitHash.cmd"</Command>
+      <Command>call $(ProjectDir)GetGitHash.cmd</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Writing the Git Commit Hash to the Version header</Message>
+      <Message>Getting the Git Commit Hash...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -457,6 +467,7 @@
       <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <UseStandardPreprocessor>true</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -494,10 +505,10 @@
       <UpdateFileHashes>false</UpdateFileHashes>
     </Manifest>
     <PreBuildEvent>
-      <Command>call "$(ProjectDir)GetGitHash.cmd"</Command>
+      <Command>call $(ProjectDir)GetGitHash.cmd</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Writing the Git Commit Hash to the Version header</Message>
+      <Message>Getting the Git Commit Hash...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
