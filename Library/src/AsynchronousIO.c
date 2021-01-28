@@ -5,6 +5,12 @@
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #include <aio.h>                          /* Included for aio_read and aio_write */
 #include <fcntl.h>                        /* Included for open */
+#include <sys/types.h>                    /* Included for Socket API */
+#include <sys/socket.h>                   /* Included for Socket API */
+#elif ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux)
+#include <sys/socket.h>                   /* Included for Socket API */
+#include <netinet/in.h>                   /* Included for Socket API */
+#include <netinet/ip.h>                   /* Included for Socket API */
 #elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
 #include <process.h>
 #endif
@@ -66,7 +72,7 @@ extern "C" {
         Stream->StreamPosition = Position;
     }
 
-    bool AsyncIOStream_OpenUTF8(AsyncIOStream *Stream, PlatformIO_Immutable(UTF8 *) Path8, AsyncIO_FileModes Mode) {
+    bool AsyncIOStream_OpenPathUTF8(AsyncIOStream *Stream, PlatformIO_Immutable(UTF8 *) Path8, AsyncIO_FileModes Mode) {
         bool OpenedSucessfully   = No;
         if (Path8 != NULL && Mode != FileMode_Unspecified ) {
             uint64_t Path8Offset = 0;
@@ -93,7 +99,7 @@ extern "C" {
         return OpenedSucessfully;
     }
 
-    bool AsyncIOStream_OpenUTF16(AsyncIOStream *Stream, PlatformIO_Immutable(UTF16 *) Path16, AsyncIO_FileModes Mode) {
+    bool AsyncIOStream_OpenPathUTF16(AsyncIOStream *Stream, PlatformIO_Immutable(UTF16 *) Path16, AsyncIO_FileModes Mode) {
         bool OpenedSucessfully   = No;
         if (Path16 != NULL && Mode != FileMode_Unspecified ) {
             uint64_t Path16Offset = 0;

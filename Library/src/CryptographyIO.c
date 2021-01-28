@@ -204,7 +204,7 @@ extern "C" {
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsApple) == PlatformIO_TargetOSIsApple)
             AsyncIOStream *Random     = AsyncIOStream_Init();
-            bool OpenedSuccessfully   = AsyncIOStream_OpenUTF8(Random, UTF8String("/dev/urandom"), FileMode_Read | FileMode_Binary);
+            bool OpenedSuccessfully   = AsyncIOStream_OpenPathUTF8(Random, UTF8String("/dev/urandom"), FileMode_Read | FileMode_Binary);
             if (OpenedSuccessfully) {
                 size_t BytesRead      = AsyncIOStream_Read(Random, &RandomValue, 8, 1);
                 if (BytesRead != 8) {
@@ -234,7 +234,7 @@ extern "C" {
                 arc4random_buf(Random->EntropyPool, Bits2Bytes(RoundingType_Down, Random->NumBits));
 #elif (((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX) && ((PlatformIO_TargetOS & PlatformIO_TargetOSIsLinux) == PlatformIO_TargetOSIsLinux))
                 AsyncIOStream *Random     = AsyncIOStream_Init();
-                bool OpenedSuccessfully   = AsyncIOStream_OpenUTF8(Random, UTF8String("/dev/random"), FileMode_Read | FileMode_Binary);
+                bool OpenedSuccessfully   = AsyncIOStream_OpenPathUTF8(Random, UTF8String("/dev/random"), FileMode_Read | FileMode_Binary);
                 if (OpenedSuccessfully) {
                     size_t BytesRead      = AsyncIOStream_Read(&Random->EntropyPool, &RandomValue, Bits2Bytes(RoundingType_Down, Random->NumBits), 1);
                     if (BytesRead != Bits2Bytes(RoundingType_Down, Random->NumBits)) {
