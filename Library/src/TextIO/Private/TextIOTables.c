@@ -5032,7 +5032,7 @@ extern "C" {
         0x0E01EF,
     };
 
-    const UTF32 *KompatibleNormalizationTable[KompatibleNormalizationTableSize][2] = {
+    const UTF32 *const KompatibleNormalizationTable[KompatibleNormalizationTableSize][2] = {
         {U"\u00A8", U"\x20\u0308"},
         {U"\u00AF", U"\x20\u0304"},
         {U"\u00B4", U"\x20\u0301"},
@@ -7091,7 +7091,7 @@ extern "C" {
         {U"\U0001FBF9", U"\x39"},
     };
 
-    const UTF32 *CaseFoldTable[CaseFoldTableSize][2] = {
+    const UTF32 *const CaseFoldTable[CaseFoldTableSize][2] = {
         {U"\x41", U"\x61"},
         {U"\x42", U"\x62"},
         {U"\x43", U"\x63"},
@@ -13250,7 +13250,7 @@ extern "C" {
         {U"\U0002FA1D", U"\U0002A600"},
     };
 
-    const UTF32 *CanonicalNormalizationTable[CanonicalNormalizationTableSize][2] = {
+    const UTF32 *const CanonicalNormalizationTable[CanonicalNormalizationTableSize][2] = {
         {U"\u00C0", U"\x41\u0300"},
         {U"\u00C1", U"\x41\u0301"},
         {U"\u00C2", U"\x41\u0302"},

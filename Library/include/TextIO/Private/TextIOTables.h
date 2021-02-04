@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-#define ScriptHash 981f8b4f3d56a52757f44e78ddee9636e06bd856
+#define ScriptHash b311ed6e29ff70b1a1a107406bb970ba1808a53d
 
 #define UnicodeVersion 13.0.0
 
@@ -44,50 +44,48 @@ extern "C" {
         CaseFoldTableSize                = 6156,
         CanonicalNormalizationTableSize  = 13233,
     } TextIOConstants;
-    
-    extern const UTF32    GraphemeExtensionTable[GraphemeExtensionTableSize];
 
-    extern const UTF32    IntegerTableBase2[IntegerTableBase2Size];
+    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase2[IntegerTableBase2Size];
 
-    extern const UTF32    IntegerTableBase8[IntegerTableBase8Size];
+    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase8[IntegerTableBase8Size];
 
-    extern const UTF32    TableBase10[TableBase10Size];
+    PlatformIO_HiddenSymbol extern UTF32 const        TableBase10[TableBase10Size];
 
-    extern const UTF32    IntegerTableUppercaseBase16[IntegerTableBase16Size];
+    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableUppercaseBase16[IntegerTableBase16Size];
 
-    extern const UTF32    IntegerTableLowercaseBase16[IntegerTableBase16Size];
+    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableLowercaseBase16[IntegerTableBase16Size];
 
-    extern const UTF32    DecimalScientificUppercase[DecimalTableScientificSize];
+    PlatformIO_HiddenSymbol extern UTF32 const        DecimalScientificUppercase[DecimalTableScientificSize];
 
-    extern const UTF32    DecimalScientificLowercase[DecimalTableScientificSize];
+    PlatformIO_HiddenSymbol extern UTF32 const        DecimalScientificLowercase[DecimalTableScientificSize];
 
-    extern const UTF32    DecimalHexUppercase[DecimalTableHexadecimalSize];
+    PlatformIO_HiddenSymbol extern UTF32 const        DecimalHexUppercase[DecimalTableHexadecimalSize];
 
-    extern const UTF32    DecimalHexLowercase[DecimalTableHexadecimalSize];
+    PlatformIO_HiddenSymbol extern UTF32 const        DecimalHexLowercase[DecimalTableHexadecimalSize];
 
-    extern const UTF32    MathSeperators[MathSeperatorTableSize];
+    PlatformIO_HiddenSymbol extern UTF32 const        MathSeperators[MathSeperatorTableSize];
 
-    extern const UTF32    LineBreakTable[LineBreakTableSize];
+    PlatformIO_HiddenSymbol extern UTF32 const        LineBreakTable[LineBreakTableSize];
 
-    extern const UTF32    BiDirectionalControlsTable[BiDirectionalControlsTableSize];
+    PlatformIO_HiddenSymbol extern UTF32 const        BiDirectionalControlsTable[BiDirectionalControlsTableSize];
 
-    extern const UTF32    WordBreakTable[WordBreakTableSize];
+    PlatformIO_HiddenSymbol extern UTF32 const        WordBreakTable[WordBreakTableSize];
 
-    extern const UTF32    CurrencyTable[CurrencyTableSize];
+    PlatformIO_HiddenSymbol extern UTF32 const        CurrencyTable[CurrencyTableSize];
 
-    extern const int32_t  DecimalTable[DecimalTableSize][3];
+    PlatformIO_HiddenSymbol extern int32_t const      DecimalTable[DecimalTableSize][3];
 
-    extern const UTF32    CombiningCharacterClassTable[CombiningCharacterClassTableSize][2];
+    PlatformIO_HiddenSymbol extern UTF32 const        CombiningCharacterClassTable[CombiningCharacterClassTableSize][2];
 
-    extern const uint64_t IntegerTable[IntegerTableSize][2];
+    PlatformIO_HiddenSymbol extern uint64_t const     IntegerTable[IntegerTableSize][2];
 
-    extern const UTF32    GraphemeExtensionTable[GraphemeExtensionTableSize];
+    PlatformIO_HiddenSymbol extern UTF32 const        GraphemeExtensionTable[GraphemeExtensionTableSize];
 
-    extern const UTF32   *KompatibleNormalizationTable[KompatibleNormalizationTableSize][2];
+    PlatformIO_HiddenSymbol extern const UTF32 *const KompatibleNormalizationTable[KompatibleNormalizationTableSize][2];
 
-    extern const UTF32   *CaseFoldTable[CaseFoldTableSize][2];
+    PlatformIO_HiddenSymbol extern const UTF32 *const CaseFoldTable[CaseFoldTableSize][2];
 
-    extern const UTF32   *CanonicalNormalizationTable[CanonicalNormalizationTableSize][2];
+    PlatformIO_HiddenSymbol extern const UTF32 *const CanonicalNormalizationTable[CanonicalNormalizationTableSize][2];
 
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
