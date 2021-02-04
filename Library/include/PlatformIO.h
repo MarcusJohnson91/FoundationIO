@@ -315,6 +315,10 @@ extern "C" {
 #define             PlatformIO_FunctionName                                             reinterpret_cast<const UTF8*>(__PRETTY_FUNCTION__)
 #endif /* Language */
 #endif /* PlatformIO_FunctionName */
+    
+#ifndef             PlatformIO_HiddenSymbol
+#define             PlatformIO_HiddenSymbol                                             __attribute__((visibility("hidden")))
+#endif /* PlatformIO_HiddenSymbol */
 
 #if  !defined(PlatformIO_TargetOS)
 #if   defined(__APPLE__) && defined(__MACH__)
