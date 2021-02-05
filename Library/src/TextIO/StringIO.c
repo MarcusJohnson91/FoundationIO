@@ -11,6 +11,60 @@ extern "C" {
     static UTF8  StringIO_PreallocateCodePoint_UTF8[UTF8MaxCodeUnitsInCodePoint   + PlatformIO_NULLTerminatorSize] = {0, 0, 0, 0, 0};
     static UTF16 StringIO_PreallocateCodePoint_UTF16[UTF16MaxCodeUnitsInCodePoint + PlatformIO_NULLTerminatorSize] = {0, 0, 0};
     
+    typedef struct StringSlice {
+        void              *String;
+        uint64_t           StartInCodeUnits;
+        uint64_t           EndInCodeUnits;
+        TextIO_StringTypes StringType;
+    } StringSlice;
+    
+    StringSlice *StringSlice_Init(void *String, TextIO_StringTypes StringType, uint64_t StartInCodeUnits, uint64_t EndInCodeUnits) {
+        StringSlice *Slice          = calloc(1, sizeof(StringSlice));
+        if (Slice != NULL) {
+            Slice->String           = String;
+            Slice->StringType       = StringType;
+            Slice->StartInCodeUnits = StartInCodeUnits;
+            Slice->EndInCodeUnits   = EndInCodeUnits;
+        }
+        return Slice;
+    }
+    
+    uint64_t StringSlice_GetStartInCodeUnits(StringSlice *Slice) {
+        return Slice->StartInCodeUnits;
+    }
+    
+    uint64_t StringSlice_GetEndInCodeUnits(StringSlice *Slice) {
+        return Slice->EndInCodeUnits;
+    }
+    
+    TextIO_StringTypes StringSlice_GetStringType(StringSlice *Slice) {
+        return Slice->StringType;
+    }
+    
+    UTF8 *StringSlice_GetUTF8String(StringSlice *Slice) {
+        UTF8 *String = NULL;
+        if (Slice->StringType == StringType_UTF8) {
+            String   = Slice->String;
+        }
+        return String;
+    }
+    
+    UTF16 *StringSlice_GetUTF16String(StringSlice *Slice) {
+        UTF16 *String = NULL;
+        if (Slice->StringType == StringType_UTF16) {
+            String    = Slice->String;
+        }
+        return String;
+    }
+    
+    UTF32 *StringSlice_GetUTF32String(StringSlice *Slice) {
+        UTF32 *String = NULL;
+        if (Slice->StringType == StringType_UTF32) {
+            String    = Slice->String;
+        }
+        return String;
+    }
+    
     UTF8 *UTF8_Init(uint64_t NumCodeUnits) {
         UTF8 *String            = NULL;
         if (NumCodeUnits >= 1) {
