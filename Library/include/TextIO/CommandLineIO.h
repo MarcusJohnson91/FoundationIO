@@ -127,7 +127,7 @@ extern "C" {
     
     /*!
      @typedef      CommandLineIO
-     @abstract                                     Contains all the information, and relationships between options and Options on the command line.
+     @abstract                                     Contains all the information, and relationships between Arguments and Options on the command line.
      */
     typedef struct CommandLineIO                   CommandLineIO;
     
