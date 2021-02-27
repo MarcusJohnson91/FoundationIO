@@ -3,8 +3,8 @@
  @author          Marcus Johnson
  @copyright       2018+
  @version         1.2.0
- @brief           This header contains tables used across FoundationIO for Unicode and character set conversion.
- @remark          ScriptHash is to know if the script has changed since the header was last created.
+ @brief           This header contains table declarations used across FoundationIO for Unicode and character set conversion.
+ @remark          ScriptHash is to know if the script has changed since the tables were last generated.
  */
 
 #include "../../PlatformIO.h"  /* Included for Platform Independence macros */
@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-#define ScriptHash b311ed6e29ff70b1a1a107406bb970ba1808a53d
+#define ScriptHash caca09a112c1ee277f12b2d6d46fedf81f39bb81
 
 #define UnicodeVersion 13.0.0
 
