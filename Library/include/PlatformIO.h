@@ -315,10 +315,6 @@ extern "C" {
 #define             PlatformIO_FunctionName                                             reinterpret_cast<const UTF8*>(__PRETTY_FUNCTION__)
 #endif /* Language */
 #endif /* PlatformIO_FunctionName */
-    
-#ifndef             PlatformIO_HiddenSymbol
-#define             PlatformIO_HiddenSymbol                                             __attribute__((visibility("hidden")))
-#endif /* PlatformIO_HiddenSymbol */
 
 #if  !defined(PlatformIO_TargetOS)
 #if   defined(__APPLE__) && defined(__MACH__)
@@ -509,6 +505,14 @@ extern "C" {
 #elif (WCHAR_MAX == 0x7FFF || WCGAR_MAX == 0xFFFF)
 #define             PlatformIO_WideCharType                                             PlatformIO_WideCharTypeIsUTF16
 #endif /* WCHAR_MAX */
+
+#ifndef             PlatformIO_HiddenSymbol
+#if (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
+#define             PlatformIO_HiddenSymbol
+#else
+#define             PlatformIO_HiddenSymbol                                             __attribute__((visibility("hidden")))
+#endif /* Compiler is MSVC */
+#endif /* PlatformIO_HiddenSymbol */
 
     /*!
      @abstract      Gets the total amount of memory in the system.
