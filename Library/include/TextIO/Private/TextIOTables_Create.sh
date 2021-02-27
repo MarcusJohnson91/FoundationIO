@@ -30,7 +30,7 @@ CreateHeaderFile() {
         printf " @copyright       2018+\n"
         printf " @version         1.2.0\n"
         printf " @brief           This header contains table declarations used across FoundationIO for Unicode and character set conversion.\n"
-        printf " @remark          ScriptHash is to know if the script has changed since the tables was last generated.\n"
+        printf " @remark          ScriptHash is to know if the script has changed since the tables were last generated.\n"
         printf " */\n\n"
         printf "#include \"../../PlatformIO.h\"  /* Included for Platform Independence macros */\n"
         printf "#include \"../TextIOTypes.h\"    /* Included for the Text types */\n\n"
@@ -104,7 +104,7 @@ CreateSourceFileBottom() {
     {
         printf "#if (PlatformIO_Language == PlatformIO_LanguageIsCXX)\n"
         printf "}\n"
-        printf "#endif /* Extern C */\n\n"
+        printf "#endif /* Extern C */\n"
     } >> "$SourceFile"
 }
 
@@ -460,9 +460,13 @@ CheckUnicodeVersion() {
 
         if [ "$HeaderUnicodeVPatch" -lt "$ReadmeUnicodeVPatch" ] || [ "$HeaderUnicodeVMinor" -lt "$ReadmeUnicodeVMinor" ] || [ "$HeaderUnicodeVMajor" -lt "$ReadmeUnicodeVMajor" ]; then
             if [ -f "$HeaderFile" ] && [ -s "$HeaderFile" ]; then
-                echo "Deleting Tables, press Control-C within 5 seconds to abort..."
+                echo "The following two files will be deleted, press Control-C within 5 seconds to abort..."
+                echo $HeaderFile
+                echo $SourceFile
                 sleep 5
-                rm    "$HeaderFile"
+                echo "Deleting..."
+                rm -rf "$HeaderFile"
+                rm -rf "$SourceFile"
                 echo "Creating Tables..."
                 touch "$HeaderFile"
                 touch "$SourceFile"
@@ -488,10 +492,7 @@ CheckUnicodeVersion() {
 # if the file exists check the version number against the latest release of Unicode
 # If the file does not exist create it and start downloading the UCd and writing the tables
 
-# HeaderFile: /Library/incude/TextIO/Private/TextIOTables.h
-# SourceFile: /Library/src/TextIO/Private/TextIOTables.h
-
-LibraryPath="$(dirname "$(dirname "$(dirname "$(echo "$(cd "$(dirname "$1")"; pwd)/$(basename "$1")")")")")"
+LibraryPath="$(dirname "$(dirname "$(dirname "$(echo "$(cd "$(dirname "$0")"; pwd)/$(basename "$1")")")")")"
 HeaderFile=$(printf "%s/%s" "$LibraryPath" "include/TextIO/Private/TextIOTables.h")
 SourceFile=$(printf "%s/%s" "$LibraryPath" "src/TextIO/Private/TextIOTables.c")
 TempFolder=$(mktemp -d)
@@ -515,6 +516,7 @@ if [ $# -eq 0 ]; then
                 echo $HeaderFile
                 echo $SourceFile
                 sleep 5
+                echo "Deleting..."
                 rm -rf "$HeaderFile"
                 rm -rf "$SourceFile"
                 echo "Creating Tables..."
