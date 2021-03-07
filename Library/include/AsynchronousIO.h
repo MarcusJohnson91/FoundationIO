@@ -172,7 +172,7 @@ extern "C" {
      @param             Path8                           The UTF-8 encoded string to open
      @param             FileMode                        The configuration to use when Opening
      */
-    bool                AsyncIOStream_OpenPathUTF8(AsyncIOStream *Stream, PlatformIO_Immutable(UTF8 *) Path8, AsyncIO_FileModes FileMode);
+    bool                AsyncIOStream_OpenPathUTF8(AsyncIOStream *Stream, ImmutableString_UTF8 Path8, AsyncIO_FileModes FileMode);
     
     /*!
      @abstract                                          Opens a UTF16 encoded path and assigns it to Stream
@@ -180,7 +180,7 @@ extern "C" {
      @param             Path16                          The UTF-16 encoded string to open
      @param             FileMode                        The configuration to use when Opening
      */
-    bool                AsyncIOStream_OpenPathUTF16(AsyncIOStream *Stream, PlatformIO_Immutable(UTF16 *) Path16, AsyncIO_FileModes FileMode);
+    bool                AsyncIOStream_OpenPathUTF16(AsyncIOStream *Stream, ImmutableString_UTF16 Path16, AsyncIO_FileModes FileMode);
     
     /*!
      @abstract                                          Reads data from Stream to Array

@@ -27,7 +27,7 @@ extern "C" {
      @remark                                            On Windows checks '/' and '\' as directory seperators, on POSIX checks '\'
      @param             Path8                           Path is a UTF8 encoded string.
      */
-    UTF8               *FileIO_UTF8_GetFileName(PlatformIO_Immutable(UTF8 *) Path8);
+    UTF8               *FileIO_UTF8_GetFileName(ImmutableString_UTF8 Path8);
 
     /*!
      @abstract                                          Returns just the filename portion of a path string
@@ -35,19 +35,19 @@ extern "C" {
      @remark                                            On Windows checks '/' and '\' as directory seperators, on POSIX checks '\'
      @param             Path16                          Path is a UTF16 encoded string.
      */
-    UTF16              *FileIO_UTF16_GetFileName(PlatformIO_Immutable(UTF16 *) Path16);
+    UTF16              *FileIO_UTF16_GetFileName(ImmutableString_UTF16 Path16);
 
     /*!
      @abstract                                         Returns the extension from a filename
      @param             Path8                          Path is a UTF8 encoded string
      */
-    UTF8               *FileIO_UTF8_GetFileExtension(PlatformIO_Immutable(UTF8 *) Path8);
+    UTF8               *FileIO_UTF8_GetFileExtension(ImmutableString_UTF8 Path8);
 
     /*!
      @abstract                                         Returns the extension from a filename
      @param             Path16                         Path is a UTF16 encoded string
      */
-    UTF16              *FileIO_UTF16_GetFileExtension(PlatformIO_Immutable(UTF16 *) Path16);
+    UTF16              *FileIO_UTF16_GetFileExtension(ImmutableString_UTF16 Path16);
     /* Path Operations */
 
     /* File Operations */

@@ -12,7 +12,7 @@ extern "C" {
     //static UTF32         *Log_ProgramName   = NULL;
     static UTF8          *Log_ProgramName8  = NULL;
     
-    void Log_SetProgramName(PlatformIO_Immutable(UTF8 *) ProgramName) {
+    void Log_SetProgramName(ImmutableString_UTF8 ProgramName) {
         if (ProgramName != NULL) {
             Log_ProgramName8 = ProgramName;
             //Log_ProgramName  = UTF8_Decode(ProgramName);
@@ -25,7 +25,7 @@ extern "C" {
         }
     }
     
-    void Log_OpenLogFilePath(PlatformIO_Immutable(UTF8 *) Path) {
+    void Log_OpenLogFilePath(ImmutableString_UTF8 Path) {
         if (Path != NULL && Async_LogFile == NULL) {
             UTF8 *FoldedPath = UTF8_CaseFold(Path);
             Async_LogFile    = AsyncIOStream_Init();
@@ -49,19 +49,19 @@ extern "C" {
         }
     }
     
-    void Log(LogIO_Severities Severity, PlatformIO_Immutable(UTF8 *) FunctionName, PlatformIO_Immutable(UTF8 *) Description, ...) {
+    void Log(LogIO_Severities Severity, ImmutableString_UTF8 FunctionName, ImmutableString_UTF8 Description, ...) {
         if (Log_LogFile == NULL) {
             Log_LogFile  = stderr;
         }
 
-        PlatformIO_Immutable(UTF8*) Severities[3] = {
+        ImmutableString_UTF8 Severities[3] = {
             [0] = UTF8String("ERROR"),
             [1] = UTF8String("Mistake"),
             [2] = UTF8String("Warning"),
         };
 
         UTF8 *SecurityName8 = NULL;
-        PlatformIO_Immutable(UTF8*) WarnString = Severities[Severity - 1];
+        ImmutableString_UTF8 WarnString = Severities[Severity - 1];
         if (Log_ProgramName8 != NULL) {
             uint64_t Size      = snprintf(NULL, 0, UTF8String("%s's %s in %s: "), Log_ProgramName8, WarnString, FunctionName);
             SecurityName8      = UTF8_Init(Size);
@@ -104,7 +104,7 @@ extern "C" {
             free(Log_ProgramName8);
         }
     }
-    
+  
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif /* Extern C */

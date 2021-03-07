@@ -321,7 +321,7 @@ extern "C" {
      @param        String2Write                    The string to write to the BitBuffer.
      @param        WriteType                       Should the NULL terminator be written?
      */
-    void           BitBuffer_WriteUTF8(BitBuffer *BitB, PlatformIO_Immutable(UTF8 *) String2Write, BufferIO_StringTerminators WriteType);
+    void           BitBuffer_WriteUTF8(BitBuffer *BitB, ImmutableString_UTF8 String2Write, BufferIO_StringTerminators WriteType);
 
     /*!
      @abstract                                     Writes a UTF-16 encoded string to the BitBuffer.
@@ -330,7 +330,7 @@ extern "C" {
      @param        String2Write                    The string to write to the BitBuffer.
      @param        WriteType                       Should the NULL terminator be written?
      */
-    void           BitBuffer_WriteUTF16(BitBuffer *BitB, PlatformIO_Immutable(UTF16 *) String2Write, BufferIO_StringTerminators WriteType);
+    void           BitBuffer_WriteUTF16(BitBuffer *BitB, ImmutableString_UTF16 String2Write, BufferIO_StringTerminators WriteType);
 
     /*!
      @abstract                                     Writes a GUUID to the BitBuffer.

@@ -818,7 +818,7 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteUTF8(BitBuffer *BitB, PlatformIO_Immutable(UTF8 *) String2Write, BufferIO_StringTerminators WriteType) {
+    void BitBuffer_WriteUTF8(BitBuffer *BitB, ImmutableString_UTF8 String2Write, BufferIO_StringTerminators WriteType) {
         if (BitB != NULL && String2Write != NULL) {
             uint64_t CodeUnit      = 0ULL;
             while (String2Write[CodeUnit] != PlatformIO_NULLTerminator) {
@@ -835,7 +835,7 @@ extern "C" {
         }
     }
     
-    void BitBuffer_WriteUTF16(BitBuffer *BitB, PlatformIO_Immutable(UTF16 *) String2Write, BufferIO_StringTerminators WriteType) {
+    void BitBuffer_WriteUTF16(BitBuffer *BitB, ImmutableString_UTF16 String2Write, BufferIO_StringTerminators WriteType) {
         if (BitB != NULL && String2Write != NULL) {
             uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(String2Write);
             if (WriteType == StringTerminator_NULL) {

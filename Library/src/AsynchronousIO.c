@@ -72,7 +72,7 @@ extern "C" {
         Stream->StreamPosition = Position;
     }
 
-    bool AsyncIOStream_OpenPathUTF8(AsyncIOStream *Stream, PlatformIO_Immutable(UTF8 *) Path8, AsyncIO_FileModes Mode) {
+    bool AsyncIOStream_OpenPathUTF8(AsyncIOStream *Stream, ImmutableString_UTF8 Path8, AsyncIO_FileModes Mode) {
         bool OpenedSucessfully   = No;
         if (Path8 != NULL && Mode != FileMode_Unspecified ) {
             uint64_t Path8Offset = 0;
@@ -99,7 +99,7 @@ extern "C" {
         return OpenedSucessfully;
     }
 
-    bool AsyncIOStream_OpenPathUTF16(AsyncIOStream *Stream, PlatformIO_Immutable(UTF16 *) Path16, AsyncIO_FileModes Mode) {
+    bool AsyncIOStream_OpenPathUTF16(AsyncIOStream *Stream, ImmutableString_UTF16 Path16, AsyncIO_FileModes Mode) {
         bool OpenedSucessfully   = No;
         if (Path16 != NULL && Mode != FileMode_Unspecified ) {
             uint64_t Path16Offset = 0;
