@@ -22,9 +22,9 @@ extern "C" {
         StringSlice *Slice          = calloc(1, sizeof(StringSlice));
         if (Slice != NULL) {
             Slice->String           = String;
-            Slice->StringType       = StringType;
             Slice->StartInCodeUnits = StartInCodeUnits;
             Slice->EndInCodeUnits   = EndInCodeUnits;
+            Slice->StringType       = StringType;
         }
         return Slice;
     }
@@ -204,7 +204,7 @@ extern "C" {
         return UTF16CodeUnits;
     }
     
-    UTF32 UTF8_DecodeCodePoint(PlatformIO_Immutable(UTF8 *) CodeUnits) {
+    UTF32 UTF8_DecodeCodePoint(ImmutableString_UTF8 CodeUnits) {
         UTF32 CodePoint                       = 0;
         if (CodeUnits != NULL) {
             uint8_t CodePointSize             = UTF8_GetCodePointSizeInCodeUnits(CodeUnits[0]);
@@ -246,7 +246,7 @@ extern "C" {
         return CodePoint;
     }
     
-    UTF32 UTF16_DecodeCodePoint(PlatformIO_Immutable(UTF16 *) CodeUnits) {
+    UTF32 UTF16_DecodeCodePoint(ImmutableString_UTF16 CodeUnits) {
         UTF32 CodePoint                       = 0;
         if (CodeUnits != NULL) {
             uint8_t CodePointSize             = UTF16_GetCodePointSizeInCodeUnits(CodeUnits[0]);
@@ -371,7 +371,7 @@ extern "C" {
         return NumCodePoints;
     }
     
-    uint64_t UTF8_GetStringSizeInCodeUnits(PlatformIO_Immutable(UTF8 *) String) {
+    uint64_t UTF8_GetStringSizeInCodeUnits(ImmutableString_UTF8 String) {
         uint64_t StringSizeInCodeUnits = 0ULL;
         if (String != NULL) {
             while (String[StringSizeInCodeUnits] != PlatformIO_NULLTerminator) {
@@ -383,7 +383,7 @@ extern "C" {
         return StringSizeInCodeUnits;
     }
     
-    uint64_t UTF16_GetStringSizeInCodeUnits(PlatformIO_Immutable(UTF16 *) String) {
+    uint64_t UTF16_GetStringSizeInCodeUnits(ImmutableString_UTF16 String) {
         uint64_t StringSizeInCodeUnits = 0ULL;
         if (String != NULL) {
             while (String[StringSizeInCodeUnits] != PlatformIO_NULLTerminator) {
@@ -395,7 +395,7 @@ extern "C" {
         return StringSizeInCodeUnits;
     }
     
-    static uint64_t UTF32_GetStringSizeInUTF8CodeUnits(PlatformIO_Immutable(UTF32 *) String) {
+    static uint64_t UTF32_GetStringSizeInUTF8CodeUnits(ImmutableString_UTF32 String) {
         uint64_t CodePoint            = 0ULL;
         uint64_t UTF8CodeUnits        = 0ULL;
         if (String != NULL) {
@@ -409,7 +409,7 @@ extern "C" {
         return UTF8CodeUnits;
     }
     
-    static uint64_t UTF32_GetStringSizeInUTF16CodeUnits(PlatformIO_Immutable(UTF32*) String) {
+    static uint64_t UTF32_GetStringSizeInUTF16CodeUnits(ImmutableString_UTF32 String) {
         uint64_t CodePoint          = 0ULL;
         uint64_t UTF16CodeUnits     = 0ULL;
         if (String != NULL) {
@@ -423,7 +423,7 @@ extern "C" {
         return UTF16CodeUnits;
     }
     
-    uint64_t UTF8_GetStringSizeInCodePoints(PlatformIO_Immutable(UTF8 *) String) {
+    uint64_t UTF8_GetStringSizeInCodePoints(ImmutableString_UTF8 String) {
         uint64_t StringSizeInCodePoints = 0ULL;
         uint64_t CodeUnit               = 0ULL;
         if (String != NULL) {
@@ -437,7 +437,7 @@ extern "C" {
         return StringSizeInCodePoints;
     }
     
-    uint64_t UTF16_GetStringSizeInCodePoints(PlatformIO_Immutable(UTF16 *) String) {
+    uint64_t UTF16_GetStringSizeInCodePoints(ImmutableString_UTF16 String) {
         uint64_t NumCodePoints             = 0ULL;
         if (String != NULL) {
             uint64_t CodeUnit              = 0ULL;
@@ -451,7 +451,7 @@ extern "C" {
         return NumCodePoints;
     }
     
-    uint64_t UTF32_GetStringSizeInCodePoints(PlatformIO_Immutable(UTF32 *) String) {
+    uint64_t UTF32_GetStringSizeInCodePoints(ImmutableString_UTF32 String) {
         uint64_t NumCodePoints = 0ULL;
         if (String != NULL) {
             while (String[NumCodePoints] != PlatformIO_NULLTerminator) {
@@ -463,7 +463,7 @@ extern "C" {
         return NumCodePoints;
     }
     
-    uint64_t UTF8_GetStringSizeInGraphemes(PlatformIO_Immutable(UTF8 *) String) {
+    uint64_t UTF8_GetStringSizeInGraphemes(ImmutableString_UTF8 String) {
         uint64_t NumGraphemes  = 0ULL;
         if (String != NULL) {
             UTF32 *Decoded     = UTF8_Decode(String);
@@ -475,7 +475,7 @@ extern "C" {
         return NumGraphemes;
     }
     
-    uint64_t UTF16_GetStringSizeInGraphemes(PlatformIO_Immutable(UTF16 *) String) {
+    uint64_t UTF16_GetStringSizeInGraphemes(ImmutableString_UTF16 String) {
         uint64_t NumGraphemes  = 0ULL;
         if (String != NULL) {
             UTF32 *Decoded     = UTF16_Decode(String);
@@ -513,7 +513,7 @@ extern "C" {
         return IsGraphemeExtender;
     }
     
-    uint64_t UTF32_GetStringSizeInGraphemes(PlatformIO_Immutable(UTF32 *) String) {
+    uint64_t UTF32_GetStringSizeInGraphemes(ImmutableString_UTF32 String) {
         uint64_t NumGraphemes          = 0ULL;
         uint64_t CodePoint             = 1ULL;
         if (String != NULL) {
@@ -538,7 +538,7 @@ extern "C" {
         return NumGraphemes;
     }
     
-    uint64_t UTF8_GetWordSizeInCodePoints(PlatformIO_Immutable(UTF8 *) String, uint64_t OffsetInCodeUnits) {
+    uint64_t UTF8_GetWordSizeInCodePoints(ImmutableString_UTF8 String, uint64_t OffsetInCodeUnits) {
         uint64_t WordSize = 0ULL;
         if (String != NULL) {
             
@@ -548,7 +548,7 @@ extern "C" {
         return WordSize;
     }
     
-    uint64_t UTF16_GetWordSizeInCodePoints(PlatformIO_Immutable(UTF16 *) String, uint64_t OffsetInCodeUnits) {
+    uint64_t UTF16_GetWordSizeInCodePoints(ImmutableString_UTF16 String, uint64_t OffsetInCodeUnits) {
         uint64_t WordSize = 0ULL;
         if (String != NULL) {
             
@@ -577,7 +577,7 @@ extern "C" {
      
      */
     
-    uint64_t UTF32_GetWordSizeInCodePoints(PlatformIO_Immutable(UTF32 *) String, uint64_t OffsetInCodeUnits) {
+    uint64_t UTF32_GetWordSizeInCodePoints(ImmutableString_UTF32 String, uint64_t OffsetInCodeUnits) {
         uint64_t WordSize = 0ULL;
         if (String != NULL) {
             
@@ -595,7 +595,7 @@ extern "C" {
         StringIO_PreallocateCodePoint_UTF8[4] = 0;
     }
     
-    UTF8 *UTF8_ExtractCodePoint(PlatformIO_Immutable(UTF8 *) String) {
+    UTF8 *UTF8_ExtractCodePoint(ImmutableString_UTF8 String) {
         UTF8 *CodeUnits                                   = NULL;
         if (String != NULL && String[0] != PlatformIO_NULLTerminator) {
             UTF8_Clear_Preallocated();
@@ -636,7 +636,7 @@ extern "C" {
         StringIO_PreallocateCodePoint_UTF16[2] = 0;
     }
     
-    UTF16 *UTF16_ExtractCodePoint(PlatformIO_Immutable(UTF16 *) String) {
+    UTF16 *UTF16_ExtractCodePoint(ImmutableString_UTF16 String) {
         UTF16 *CodeUnits                               = NULL;
         if (String != NULL && String[0] != PlatformIO_NULLTerminator) {
             UTF16_Clear_Preallocated();
@@ -654,7 +654,7 @@ extern "C" {
         return CodeUnits;
     }
     
-    UTF32 UTF32_ExtractCodePoint(PlatformIO_Immutable(UTF32 *) String) {
+    UTF32 UTF32_ExtractCodePoint(ImmutableString_UTF32 String) {
         UTF32 CodePoint         = 0;
         if (String != NULL && String[0] != PlatformIO_NULLTerminator) {
             CodePoint           = String[0];
@@ -664,7 +664,7 @@ extern "C" {
         return CodePoint;
     }
     
-    UTF8 *UTF8_ExtractGrapheme(PlatformIO_Immutable(UTF8 *) String, uint64_t Grapheme2Extract) {
+    UTF8 *UTF8_ExtractGrapheme(ImmutableString_UTF8 String, uint64_t Grapheme2Extract) {
         UTF8 *Grapheme        = NULL;
         if (String != NULL) {
             UTF32 *String32   = UTF8_Decode(String);
@@ -678,7 +678,7 @@ extern "C" {
         return Grapheme;
     }
     
-    UTF16 *UTF16_ExtractGrapheme(PlatformIO_Immutable(UTF16 *) String, uint64_t Grapheme2Extract) {
+    UTF16 *UTF16_ExtractGrapheme(ImmutableString_UTF16 String, uint64_t Grapheme2Extract) {
         UTF16 *Grapheme        = NULL;
         if (String != NULL) {
             UTF32 *String32   = UTF16_Decode(String);
@@ -692,7 +692,7 @@ extern "C" {
         return Grapheme;
     }
     
-    UTF32 *UTF32_ExtractGrapheme(PlatformIO_Immutable(UTF32 *) String, uint64_t GraphemeIndex) {
+    UTF32 *UTF32_ExtractGrapheme(ImmutableString_UTF32 String, uint64_t GraphemeIndex) {
         UTF32 *Grapheme                    = NULL;
         if (String != NULL) {
             /*
@@ -725,7 +725,7 @@ extern "C" {
         return Grapheme;
     }
     
-    bool UTF8_HasBOM(PlatformIO_Immutable(UTF8 *) String) {
+    bool UTF8_HasBOM(ImmutableString_UTF8 String) {
         bool StringHasABOM        = No;
         if (String != NULL) {
             uint64_t StringSize   = UTF8_GetStringSizeInCodeUnits(String);
@@ -740,7 +740,7 @@ extern "C" {
         return StringHasABOM;
     }
     
-    bool UTF16_HasBOM(PlatformIO_Immutable(UTF16 *) String) {
+    bool UTF16_HasBOM(ImmutableString_UTF16 String) {
         bool StringHasABOM    = No;
         if (String != NULL) {
             if (String[0] == UTF16BOM_LE || String[0] == UTF16BOM_BE) {
@@ -752,7 +752,7 @@ extern "C" {
         return StringHasABOM;
     }
     
-    bool UTF32_HasBOM(PlatformIO_Immutable(UTF32 *) String) {
+    bool UTF32_HasBOM(ImmutableString_UTF32 String) {
         bool StringHasABOM    = No;
         if (String != NULL) {
             if (String[0] == UTF32BOM_LE || String[0] == UTF32BOM_BE) {
@@ -764,7 +764,7 @@ extern "C" {
         return StringHasABOM;
     }
     
-    bool UTF8_IsUNCPath(PlatformIO_Immutable(UTF8 *) String) {
+    bool UTF8_IsUNCPath(ImmutableString_UTF8 String) {
         bool StringIsUNCPath = No;
         if (String != NULL) {
             uint64_t StringSize     = UTF8_GetStringSizeInCodePoints(String);
@@ -798,7 +798,7 @@ extern "C" {
         return StringIsUNCPath;
     }
     
-    bool UTF16_IsUNCPath(PlatformIO_Immutable(UTF16 *) String) {
+    bool UTF16_IsUNCPath(ImmutableString_UTF16 String) {
         bool StringIsUNCPath = No;
         if (String != NULL) {
             uint64_t StringSize     = UTF16_GetStringSizeInCodePoints(String);
@@ -832,7 +832,7 @@ extern "C" {
         return StringIsUNCPath;
     }
     
-    bool UTF32_IsUNCPath(PlatformIO_Immutable(UTF32 *) String) {
+    bool UTF32_IsUNCPath(ImmutableString_UTF32 String) {
         bool StringIsUNCPath = No;
         if (String != NULL) {
             uint64_t StringSize     = UTF32_GetStringSizeInCodePoints(String);
@@ -867,7 +867,7 @@ extern "C" {
         return StringIsUNCPath;
     }
     
-    bool UTF8_IsAbsolutePath(PlatformIO_Immutable(UTF8 *) String) {
+    bool UTF8_IsAbsolutePath(ImmutableString_UTF8 String) {
         bool PathIsAbsolute = No;
         if (String != NULL) {
             bool StringHasBOM      = UTF8_HasBOM(String);
@@ -892,7 +892,7 @@ extern "C" {
         return PathIsAbsolute;
     }
     
-    bool UTF16_IsAbsolutePath(PlatformIO_Immutable(UTF16 *) String) {
+    bool UTF16_IsAbsolutePath(ImmutableString_UTF16 String) {
         bool PathIsAbsolute        = No;
         if (String != NULL) {
             bool StringHasBOM      = UTF16_HasBOM(String);
@@ -917,7 +917,7 @@ extern "C" {
         return PathIsAbsolute;
     }
     
-    bool UTF32_IsAbsolutePath(PlatformIO_Immutable(UTF32 *) String) {
+    bool UTF32_IsAbsolutePath(ImmutableString_UTF32 String) {
         bool PathIsAbsolute        = No;
         if (String != NULL) {
             bool StringHasBOM      = UTF32_HasBOM(String);
@@ -942,7 +942,7 @@ extern "C" {
         return PathIsAbsolute;
     }
     
-    bool UTF8_HasNewLine(PlatformIO_Immutable(UTF8 *) String) {
+    bool UTF8_HasNewLine(ImmutableString_UTF8 String) {
         bool StringHasNewLine = No;
         if (String != NULL) {
             UTF32 *String32   = UTF8_Decode(String);
@@ -954,7 +954,7 @@ extern "C" {
         return StringHasNewLine;
     }
     
-    bool UTF16_HasNewLine(PlatformIO_Immutable(UTF16 *) String) {
+    bool UTF16_HasNewLine(ImmutableString_UTF16 String) {
         bool StringHasNewLine = No;
         if (String != NULL) {
             UTF32 *String32   = UTF16_Decode(String);
@@ -966,7 +966,7 @@ extern "C" {
         return StringHasNewLine;
     }
     
-    bool UTF32_HasNewLine(PlatformIO_Immutable(UTF32 *) String) {
+    bool UTF32_HasNewLine(ImmutableString_UTF32 String) {
         bool StringHasNewLine            = No;
         if (String != NULL) {
             uint64_t CodePoint           = 1ULL;
@@ -1007,7 +1007,7 @@ extern "C" {
         return CodePointIsUppercase;
     }
     
-    bool UTF8_IsValid(PlatformIO_Immutable(UTF8 *) String) {
+    bool UTF8_IsValid(ImmutableString_UTF8 String) {
         uint64_t CodeUnit    = 0ULL;
         bool     IsValidUTF8 = Yes;
         if (String != NULL) {
@@ -1029,7 +1029,7 @@ extern "C" {
         return IsValidUTF8;
     }
     
-    bool UTF16_IsValid(PlatformIO_Immutable(UTF16 *) String) {
+    bool UTF16_IsValid(ImmutableString_UTF16 String) {
         uint64_t CodeUnit             = 1ULL;
         bool     IsValidUTF16         = Yes;
         if (String != NULL) {
@@ -1046,7 +1046,7 @@ extern "C" {
         return IsValidUTF16;
     }
     
-    bool UTF32_IsValid(PlatformIO_Immutable(UTF32 *) String) {
+    bool UTF32_IsValid(ImmutableString_UTF32 String) {
         uint64_t CodePoint       = 0ULL;
         bool     IsValidUTF32    = Yes;
         if (String != NULL) {
@@ -1063,7 +1063,7 @@ extern "C" {
         return IsValidUTF32;
     }
     
-    UTF8 *UTF8_AddBOM(PlatformIO_Immutable(UTF8 *) String) {
+    UTF8 *UTF8_AddBOM(ImmutableString_UTF8 String) {
         UTF8 *StringWithBOM = NULL;
         if (String != NULL) {
             UTF32 *String32  = UTF8_Decode(String);
@@ -1076,7 +1076,7 @@ extern "C" {
         return StringWithBOM;
     }
     
-    UTF16 *UTF16_AddBOM(PlatformIO_Immutable(UTF16 *) String, StringIO_BOMs BOM2Add) {
+    UTF16 *UTF16_AddBOM(ImmutableString_UTF16 String, StringIO_BOMs BOM2Add) {
         UTF16 *StringWithBOM = NULL;
         if (String != NULL) {
             UTF32 *String32  = UTF16_Decode(String);
@@ -1089,7 +1089,7 @@ extern "C" {
         return StringWithBOM;
     }
     
-    UTF32 *UTF32_AddBOM(PlatformIO_Immutable(UTF32 *) String, StringIO_BOMs BOM2Add) {
+    UTF32 *UTF32_AddBOM(ImmutableString_UTF32 String, StringIO_BOMs BOM2Add) {
         UTF32   *StringWithBOM        = NULL;
         UTF32    ByteOrder            = 0;
         if (String != NULL) {
@@ -1122,7 +1122,7 @@ extern "C" {
         return StringWithBOM;
     }
     
-    UTF8 *UTF8_RemoveBOM(PlatformIO_Immutable(UTF8 *) String) {
+    UTF8 *UTF8_RemoveBOM(ImmutableString_UTF8 String) {
         UTF8    *BOMLessString                      = NULL;
         uint64_t StringSize                         = 0ULL;
         if (String != NULL) {
@@ -1144,7 +1144,7 @@ extern "C" {
         return BOMLessString;
     }
     
-    UTF16 *UTF16_RemoveBOM(PlatformIO_Immutable(UTF16 *) String) {
+    UTF16 *UTF16_RemoveBOM(ImmutableString_UTF16 String) {
         UTF16   *BOMLessString                      = NULL;
         uint64_t StringSize                         = 0ULL;
         if (String != NULL) {
@@ -1166,7 +1166,7 @@ extern "C" {
         return BOMLessString;
     }
     
-    UTF32 *UTF32_RemoveBOM(PlatformIO_Immutable(UTF32 *) String) {
+    UTF32 *UTF32_RemoveBOM(ImmutableString_UTF32 String) {
         UTF32   *BOMLessString                   = NULL;
         uint64_t StringSize                      = 0ULL;
         if (String != NULL) {
@@ -1188,7 +1188,7 @@ extern "C" {
         return BOMLessString;
     }
     
-    UTF32 *UTF8_Decode(PlatformIO_Immutable(UTF8 *) String) {
+    UTF32 *UTF8_Decode(ImmutableString_UTF8 String) {
         UTF32   *DecodedString                       = NULL;
         if (String != NULL) {
             uint64_t CodeUnit                        = 0ULL;
@@ -1245,7 +1245,7 @@ extern "C" {
         return ByteOrder;
     }
     
-    UTF32 *UTF16_Decode(PlatformIO_Immutable(UTF16 *) String) {
+    UTF32 *UTF16_Decode(ImmutableString_UTF16 String) {
         UTF32   *DecodedString                       = NULL;
         if (String != NULL) {
             uint64_t CodeUnit                        = 0ULL;
@@ -1265,7 +1265,7 @@ extern "C" {
         return DecodedString;
     }
     
-    UTF8 *UTF8_Encode(PlatformIO_Immutable(UTF32 *) String) {
+    UTF8 *UTF8_Encode(ImmutableString_UTF32 String) {
         UTF8    *EncodedString                         = NULL;
         if (String != NULL) {
             uint64_t UTF8CodeUnits                     = UTF32_GetStringSizeInUTF8CodeUnits(String);
@@ -1292,7 +1292,7 @@ extern "C" {
         return EncodedString;
     }
     
-    UTF16 *UTF16_Encode(PlatformIO_Immutable(UTF32 *) String) {
+    UTF16 *UTF16_Encode(ImmutableString_UTF32 String) {
         UTF16   *EncodedString                           = NULL;
         if (String != NULL) {
             uint64_t CodePoint                           = 0ULL;
@@ -1327,7 +1327,7 @@ extern "C" {
         return EncodedString;
     }
     
-    UTF8 *UTF16_Convert(PlatformIO_Immutable(UTF16 *) String) {
+    UTF8 *UTF16_Convert(ImmutableString_UTF16 String) {
         UTF8 *String8       = NULL;
         if (String != NULL) {
             // 0x3FF = UTF32_GetStringSizeInUTF8CodeUnits
@@ -1340,7 +1340,7 @@ extern "C" {
         return String8;
     }
     
-    UTF16 *UTF8_Convert(PlatformIO_Immutable(UTF8 *) String) {
+    UTF16 *UTF8_Convert(ImmutableString_UTF8 String) {
         UTF16 *String16     = NULL;
         if (String != NULL) {
             UTF32 *String32 = UTF8_Decode(String);
@@ -1352,7 +1352,7 @@ extern "C" {
         return String16;
     }
     
-    UTF8 *UTF8_Clone(PlatformIO_Immutable(UTF8 *) String) {
+    UTF8 *UTF8_Clone(ImmutableString_UTF8 String) {
         UTF8 *Copy = NULL;
         if (String != NULL) {
             uint64_t StringSizeInCodeUnits = UTF8_GetStringSizeInCodeUnits(String);
@@ -1370,7 +1370,7 @@ extern "C" {
         return Copy;
     }
     
-    UTF16 *UTF16_Clone(PlatformIO_Immutable(UTF16 *) String) {
+    UTF16 *UTF16_Clone(ImmutableString_UTF16 String) {
         UTF16 *Copy = NULL;
         if (String != NULL) {
             uint64_t StringSizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(String);
@@ -1388,7 +1388,7 @@ extern "C" {
         return Copy;
     }
     
-    UTF32 *UTF32_Clone(PlatformIO_Immutable(UTF32 *) String) {
+    UTF32 *UTF32_Clone(ImmutableString_UTF32 String) {
         UTF32 *Copy = NULL;
         if (String != NULL) {
             uint64_t StringSizeInCodePoints = UTF32_GetStringSizeInCodePoints(String);
@@ -1448,7 +1448,7 @@ extern "C" {
         return Verification;
     }
     
-    UTF8 *UTF8_Truncate(PlatformIO_Immutable(UTF8 *) String, uint64_t NumGraphemes) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
+    UTF8 *UTF8_Truncate(ImmutableString_UTF8 String, uint64_t NumGraphemes) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
         UTF8 *Truncated = NULL;
         if (String != NULL) {
             UTF32 *String32    = UTF8_Decode(String);
@@ -1462,7 +1462,7 @@ extern "C" {
         return Truncated;
     }
     
-    UTF16 *UTF16_Truncate(PlatformIO_Immutable(UTF16 *) String, uint64_t NumGraphemes) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
+    UTF16 *UTF16_Truncate(ImmutableString_UTF16 String, uint64_t NumGraphemes) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
         UTF16 *Truncated = NULL;
         if (String != NULL) {
             UTF32 *String32    = UTF16_Decode(String);
@@ -1476,7 +1476,7 @@ extern "C" {
         return Truncated;
     }
     
-    UTF32 *UTF32_Truncate(PlatformIO_Immutable(UTF32 *) String, uint64_t NumGraphemes) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
+    UTF32 *UTF32_Truncate(ImmutableString_UTF32 String, uint64_t NumGraphemes) { // FIXME: Rewrite this so it works on Graphemes not CodeUnits
         UTF32 *Truncated = NULL;
         if (String != NULL) {
             uint64_t StringSize      = UTF32_GetStringSizeInCodePoints(String);
@@ -1496,7 +1496,7 @@ extern "C" {
         return Truncated;
     }
     
-    void UTF8_WriteGrapheme(FILE *Source, PlatformIO_Immutable(UTF8 *) Grapheme) {
+    void UTF8_WriteGrapheme(FILE *Source, ImmutableString_UTF8 Grapheme) {
         if (Source != NULL) {
             uint64_t StringSize       = UTF8_GetStringSizeInCodeUnits(Grapheme);
             uint64_t CodeUnitsWritten = FileIO_Write(Source, Grapheme, sizeof(UTF8), StringSize);
@@ -1508,7 +1508,7 @@ extern "C" {
         }
     }
     
-    void UTF16_WriteGrapheme(FILE *Source, PlatformIO_Immutable(UTF16 *) Grapheme) {
+    void UTF16_WriteGrapheme(FILE *Source, ImmutableString_UTF16 Grapheme) {
         if (Source != NULL) {
             uint64_t StringSize       = UTF16_GetStringSizeInCodeUnits(Grapheme);
             uint64_t CodeUnitsWritten = FileIO_Write(Source, Grapheme, sizeof(UTF8), StringSize);
@@ -1821,7 +1821,7 @@ extern "C" {
         return Sentence;
     }
     
-    void UTF8_WriteSentence(FILE *OutputFile, PlatformIO_Immutable(UTF8 *) String) {
+    void UTF8_WriteSentence(FILE *OutputFile, ImmutableString_UTF8 String) {
         if (String != NULL && OutputFile != NULL) {
             TextIO_StringTypes Type       = FileIO_GetFileOrientation(OutputFile);
             uint64_t StringSize           = UTF8_GetStringSizeInCodeUnits(String);
@@ -1855,7 +1855,7 @@ extern "C" {
         }
     }
     
-    void UTF16_WriteSentence(FILE *OutputFile, PlatformIO_Immutable(UTF16 *) String) {
+    void UTF16_WriteSentence(FILE *OutputFile, ImmutableString_UTF16 String) {
         if (String != NULL && OutputFile != NULL) {
             TextIO_StringTypes Type       = FileIO_GetFileOrientation(OutputFile);
             uint64_t StringSize           = UTF16_GetStringSizeInCodeUnits(String);
@@ -1890,7 +1890,7 @@ extern "C" {
         }
     }
     
-    UTF8 *UTF8_Reverse(PlatformIO_Immutable(UTF8 *) String) {
+    UTF8 *UTF8_Reverse(ImmutableString_UTF8 String) {
         UTF8 *Reversed        = NULL;
         if (String != NULL) {
             UTF32 *String32   = UTF8_Decode(String);
@@ -1904,7 +1904,7 @@ extern "C" {
         return Reversed;
     }
     
-    UTF16 *UTF16_Reverse(PlatformIO_Immutable(UTF16 *) String) {
+    UTF16 *UTF16_Reverse(ImmutableString_UTF16 String) {
         UTF16 *Reversed = NULL;
         if (String != NULL) {
             UTF32 *String32   = UTF16_Decode(String);
@@ -1918,7 +1918,7 @@ extern "C" {
         return Reversed;
     }
     
-    UTF32 *UTF32_Reverse(PlatformIO_Immutable(UTF32 *) String) {
+    UTF32 *UTF32_Reverse(ImmutableString_UTF32 String) {
         UTF32 *Reverse = NULL;
         if (String != NULL) {
             uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
@@ -1934,7 +1934,7 @@ extern "C" {
         return Reverse;
     }
     
-    int64_t UTF8_FindSubString(PlatformIO_Immutable(UTF8 *) String, PlatformIO_Immutable(UTF8 *) SubString, uint64_t Offset, int64_t Length) {
+    int64_t UTF8_FindSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 SubString, uint64_t Offset, int64_t Length) {
         int64_t FoundOffset    = 0LL;
         if (String != NULL && SubString != NULL) {
             UTF32 *String32    = UTF8_Decode(String);
@@ -1950,7 +1950,7 @@ extern "C" {
         return FoundOffset;
     }
     
-    int64_t UTF16_FindSubString(PlatformIO_Immutable(UTF16 *) String, PlatformIO_Immutable(UTF16 *) SubString, uint64_t Offset, int64_t Length) {
+    int64_t UTF16_FindSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 SubString, uint64_t Offset, int64_t Length) {
         int64_t FoundOffset = 0LL;
         if (String != NULL && SubString != NULL) {
             UTF32 *String32    = UTF16_Decode(String);
@@ -1966,7 +1966,7 @@ extern "C" {
         return FoundOffset;
     }
     
-    int64_t UTF32_FindSubString(PlatformIO_Immutable(UTF32 *) String, PlatformIO_Immutable(UTF32 *) SubString, uint64_t Offset, int64_t Length) {
+    int64_t UTF32_FindSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 SubString, uint64_t Offset, int64_t Length) {
         uint64_t StringSize            = UTF32_GetStringSizeInCodePoints(String);
         uint64_t SubStringSize         = UTF32_GetStringSizeInCodePoints(SubString);
         int64_t  MatchingOffset        = 0LL;
@@ -1988,11 +1988,11 @@ extern "C" {
         return MatchingOffset;
     }
     
-    UTF8 *UTF8_ExtractSubString(PlatformIO_Immutable(UTF8 *) String, uint64_t Offset, uint64_t Length) {
+    UTF8 *UTF8_ExtractSubString(ImmutableString_UTF8 String, uint64_t Offset, uint64_t NumCodeUnits) {
         UTF8 *ExtractedSubString = NULL;
         if (String != NULL) {
             UTF32 *String32    = UTF8_Decode(String);
-            UTF32 *Extracted32 = UTF32_ExtractSubString(String32, Offset, Length);
+            UTF32 *Extracted32 = UTF32_ExtractSubString(String32, Offset, NumCodeUnits);
             ExtractedSubString = UTF8_Encode(Extracted32);
             free(String32);
             free(Extracted32);
@@ -2002,11 +2002,11 @@ extern "C" {
         return ExtractedSubString;
     }
     
-    UTF16 *UTF16_ExtractSubString(PlatformIO_Immutable(UTF16 *) String, uint64_t Offset, uint64_t Length) {
+    UTF16 *UTF16_ExtractSubString(ImmutableString_UTF16 String, uint64_t Offset, uint64_t NumCodeUnits) {
         UTF16 *ExtractedSubString = NULL;
         if (String != NULL) {
             UTF32 *String32    = UTF16_Decode(String);
-            UTF32 *Extracted32 = UTF32_ExtractSubString(String32, Offset, Length);
+            UTF32 *Extracted32 = UTF32_ExtractSubString(String32, Offset, NumCodeUnits);
             ExtractedSubString = UTF16_Encode(Extracted32);
             free(String32);
             free(Extracted32);
@@ -2016,13 +2016,13 @@ extern "C" {
         return ExtractedSubString;
     }
     
-    UTF32 *UTF32_ExtractSubString(PlatformIO_Immutable(UTF32 *) String, uint64_t Offset, uint64_t Length) {
+    UTF32 *UTF32_ExtractSubString(ImmutableString_UTF32 String, uint64_t Offset, uint64_t NumCodePoints) {
         uint64_t  StringSize                            = UTF32_GetStringSizeInCodePoints(String);
         UTF32    *ExtractedString                       = NULL;
-        if (String != NULL && StringSize >= Length + Offset) {
-            ExtractedString                             = UTF32_Init(Length);
+        if (String != NULL && StringSize >= Offset + NumCodePoints) {
+            ExtractedString                             = UTF32_Init(NumCodePoints);
             if (ExtractedString != NULL) {
-                for (uint64_t CodePoint = Offset; CodePoint < Offset + Length; CodePoint++) {
+                for (uint64_t CodePoint = Offset; CodePoint < Offset + NumCodePoints; CodePoint++) {
                     ExtractedString[CodePoint - Offset] = String[CodePoint];
                 }
             } else {
@@ -2030,78 +2030,57 @@ extern "C" {
             }
         } else if (String == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
-        } else if (StringSize < Length + Offset) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Offset %llu + Length %lld is larger than String %llu"), Length, Offset, StringSize);
+        } else if (StringSize < Offset + NumCodePoints) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Offset %llu + NumCodePoints %lld is larger than String %llu"), Offset, NumCodePoints, StringSize);
         }
         return ExtractedString;
     }
     
-    UTF8 *UTF8_PadString(PlatformIO_Immutable(UTF8 *) String, PlatformIO_Immutable(UTF8 *) Padding, uint64_t Times2Pad) {
+    UTF8 *UTF8_Create(ImmutableString_UTF8 Padding, uint64_t Times2Pad) {
         UTF8 *Padded           = NULL;
-        if (String != NULL && Padding != NULL) {
-            UTF32 *String32    = UTF8_Decode(String);
+        if (Padding != NULL) {
             UTF32 *Padding32   = UTF8_Decode(Padding);
-            UTF32 *Padded32    = UTF32_PadString(String32, Padding32, Times2Pad);
-            free(String32);
+            UTF32 *Padded32    = UTF32_Create(Padding32, Times2Pad);
             free(Padding32);
             Padded             = UTF8_Encode(Padded32);
-        } else if (String == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         } else if (Padding == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Padding Pointer is NULL"));
         }
         return Padded;
     }
     
-    UTF16 *UTF16_PadString(PlatformIO_Immutable(UTF16 *) String, PlatformIO_Immutable(UTF16 *) Padding, uint64_t Times2Pad) {
+    UTF16 *UTF16_Create(ImmutableString_UTF16 Padding, uint64_t Times2Pad) {
         UTF16 *Padded          = NULL;
-        if (String != NULL && Padding != NULL) {
-            UTF32 *String32    = UTF16_Decode(String);
+        if (Padding != NULL) {
             UTF32 *Padding32   = UTF16_Decode(Padding);
-            UTF32 *Padded32    = UTF32_PadString(String32, Padding32, Times2Pad);
-            free(String32);
+            UTF32 *Padded32    = UTF32_Create(Padding32, Times2Pad);
             free(Padding32);
             Padded             = UTF16_Encode(Padded32);
-        } else if (String == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         } else if (Padding == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Padding Pointer is NULL"));
         }
         return Padded;
     }
     
-    UTF32 *UTF32_PadString(PlatformIO_Immutable(UTF32 *) String, PlatformIO_Immutable(UTF32 *) Padding, uint64_t Times2Pad) {
-        UTF32 *Padded                        = NULL;
-        if (String != NULL && Padding != NULL) {
-            uint64_t StringSize              = UTF32_GetStringSizeInCodePoints(String);
-            uint64_t PaddingSize             = UTF32_GetStringSizeInCodePoints(Padding);
-            uint64_t PaddedSize              = StringSize + (PaddingSize * Times2Pad);
-            Padded                           = UTF32_Init(PaddedSize);
-            
-            uint64_t PaddedCodePoint         = 0ULL;
-            uint64_t StringCodePoint         = 0ULL;
-            uint64_t PaddingCodePoint        = 0ULL;
-            while (PaddedCodePoint < PaddedSize && StringCodePoint < StringSize) {
-                while (PaddingCodePoint < Times2Pad * PaddingSize) {
-                    Padded[PaddedCodePoint]  = Padding[PaddingCodePoint];
-                    PaddedCodePoint         += 1;
-                    PaddingCodePoint        += 1;
-                }
-                if (PaddedCodePoint >= (PaddingSize * Times2Pad)) {
-                    Padded[PaddedCodePoint] += String[StringCodePoint];
-                    PaddedCodePoint         += 1;
-                    StringCodePoint         += 1;
+    UTF32 *UTF32_Create(ImmutableString_UTF32 Padding, uint64_t Times2Pad) {
+        UTF32 *Padded                     = NULL;
+        if (Padding != NULL) {
+            uint64_t Size                 = UTF32_GetStringSizeInCodePoints(Padding);
+            Padded                        = UTF32_Init(Size * Times2Pad);
+            if (Padded != NULL) {
+                for (uint64_t PadString = 0; PadString < Size * Times2Pad; PadString++) {
+                    for (uint64_t PaddingCodePoint = 0; PaddingCodePoint < Size; PaddingCodePoint++) {
+                        Padded[PadString] = Padding[PaddingCodePoint];
+                    }
                 }
             }
-        } else if (String == NULL) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         } else if (Padding == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Padding Pointer is NULL"));
         }
         return Padded;
     }
     
-    UTF8 *UTF8_SubstituteSubString(PlatformIO_Immutable(UTF8 *) String, PlatformIO_Immutable(UTF8 *) Substitution, uint64_t Offset, uint64_t Length) {
+    UTF8 *UTF8_SubstituteSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 Substitution, uint64_t Offset, uint64_t Length) {
         UTF8 *Replaced8           = NULL;
         if (String != NULL && Substitution != NULL) {
             UTF32 *String32       = UTF8_Decode(String);
@@ -2119,7 +2098,7 @@ extern "C" {
         return Replaced8;
     }
     
-    UTF16 *UTF16_SubstituteSubString(PlatformIO_Immutable(UTF16 *) String, PlatformIO_Immutable(UTF16 *) Substitution, uint64_t Offset, uint64_t Length) {
+    UTF16 *UTF16_SubstituteSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 Substitution, uint64_t Offset, uint64_t Length) {
         UTF16 *Replaced16         = NULL;
         if (String != NULL && Substitution != NULL) {
             UTF32 *String32       = UTF16_Decode(String);
@@ -2137,7 +2116,7 @@ extern "C" {
         return Replaced16;
     }
     
-    UTF32 *UTF32_SubstituteSubString(PlatformIO_Immutable(UTF32 *) String, PlatformIO_Immutable(UTF32 *) Substitution, uint64_t Offset, uint64_t Length) {
+    UTF32 *UTF32_SubstituteSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 Substitution, uint64_t Offset, uint64_t Length) {
         UTF32 *NewString                            = NULL;
         if (String != NULL && Substitution != NULL) {
             uint64_t StringSize                     = UTF32_GetStringSizeInCodePoints(String);
@@ -2173,7 +2152,7 @@ extern "C" {
         return NewString;
     }
     
-    UTF8 *UTF8_StitchSubString(PlatformIO_Immutable(UTF8 *) String, uint64_t Offset, uint64_t Length) {
+    UTF8 *UTF8_StitchSubString(ImmutableString_UTF8 String, uint64_t Offset, uint64_t Length) {
         UTF8 *Stitched = NULL;
         if (String != NULL) {
             UTF32 *Decoded    = UTF8_Decode(String);
@@ -2186,7 +2165,7 @@ extern "C" {
         return Stitched;
     }
     
-    UTF16 *UTF16_StitchSubString(PlatformIO_Immutable(UTF16 *) String, uint64_t Offset, uint64_t Length) {
+    UTF16 *UTF16_StitchSubString(ImmutableString_UTF16 String, uint64_t Offset, uint64_t Length) {
         UTF16 *Stitched       = NULL;
         if (String != NULL) {
             UTF32 *Decoded    = UTF16_Decode(String);
@@ -2200,7 +2179,7 @@ extern "C" {
         return Stitched;
     }
     
-    UTF32 *UTF32_StitchSubString(PlatformIO_Immutable(UTF32 *) String, uint64_t Offset, uint64_t Length) {
+    UTF32 *UTF32_StitchSubString(ImmutableString_UTF32 String, uint64_t Offset, uint64_t Length) {
         UTF32 *Stitched = NULL;
         if (String != NULL) {
             uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
@@ -2233,7 +2212,7 @@ extern "C" {
         return NULL;
     }
     
-    UTF8 *UTF8_RemoveSubString(PlatformIO_Immutable(UTF8 *) String, PlatformIO_Immutable(UTF8 *) SubString2Remove, uint64_t Instance2Remove) {
+    UTF8 *UTF8_RemoveSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 SubString2Remove, uint64_t Instance2Remove) {
         UTF8 *TrimmedString         = NULL;
         if (String != NULL && SubString2Remove != NULL) {
             UTF32 *DecodedString    = UTF8_Decode(String);
@@ -2251,7 +2230,7 @@ extern "C" {
         return TrimmedString;
     }
     
-    UTF16 *UTF16_RemoveSubString(PlatformIO_Immutable(UTF16 *) String, PlatformIO_Immutable(UTF16 *) SubString2Remove, uint64_t Instance2Remove) {
+    UTF16 *UTF16_RemoveSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 SubString2Remove, uint64_t Instance2Remove) {
         UTF16 *TrimmedString        = NULL;
         if (String != NULL && SubString2Remove != NULL) {
             UTF32 *DecodedString    = UTF16_Decode(String);
@@ -2269,7 +2248,7 @@ extern "C" {
         return TrimmedString;
     }
     
-    UTF32 *UTF32_RemoveSubString(PlatformIO_Immutable(UTF32 *) String, PlatformIO_Immutable(UTF32 *) SubString2Remove, uint64_t Instance2Remove) {
+    UTF32 *UTF32_RemoveSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 SubString2Remove, uint64_t Instance2Remove) {
         UTF32 *EditedString = NULL;
         if (String != NULL && SubString2Remove != NULL && Instance2Remove > 0) {
             uint64_t StringSize       = UTF32_GetStringSizeInCodePoints(String);
@@ -2330,7 +2309,7 @@ extern "C" {
         return EditedString;
     }
     
-    UTF8 *UTF8_Insert(PlatformIO_Immutable(UTF8 *) String, PlatformIO_Immutable(UTF8 *) String2Insert, uint64_t Offset) {
+    UTF8 *UTF8_Insert(ImmutableString_UTF8 String, ImmutableString_UTF8 String2Insert, uint64_t Offset) {
         UTF8 *Inserted = NULL;
         if (String != NULL && String2Insert != NULL) {
             UTF32 *String32   = UTF8_Decode(String);
@@ -2345,7 +2324,7 @@ extern "C" {
         return Inserted;
     }
     
-    UTF16 *UTF16_Insert(PlatformIO_Immutable(UTF16 *) String, PlatformIO_Immutable(UTF16 *) String2Insert, uint64_t Offset) {
+    UTF16 *UTF16_Insert(ImmutableString_UTF16 String, ImmutableString_UTF16 String2Insert, uint64_t Offset) {
         UTF16 *Inserted = NULL;
         if (String != NULL && String2Insert != NULL) {
             UTF32 *String32   = UTF16_Decode(String);
@@ -2360,7 +2339,7 @@ extern "C" {
         return Inserted;
     }
     
-    UTF32 *UTF32_Insert(PlatformIO_Immutable(UTF32 *) String, PlatformIO_Immutable(UTF32 *) String2Insert, uint64_t Offset) {
+    UTF32 *UTF32_Insert(ImmutableString_UTF32 String, ImmutableString_UTF32 String2Insert, uint64_t Offset) {
         UTF32 *Inserted = NULL;
         if (String != NULL && String2Insert != NULL) {
             uint64_t StringSize = UTF32_GetStringSizeInCodePoints(String);
@@ -2390,7 +2369,7 @@ extern "C" {
         return Inserted;
     }
     
-    UTF8 *UTF8_CaseFold(PlatformIO_Immutable(UTF8 *) String) {
+    UTF8 *UTF8_CaseFold(ImmutableString_UTF8 String) {
         UTF8 *CaseFolded      = NULL;
         if (String != NULL) {
             UTF32 *String32   = UTF8_Decode(String);
@@ -2404,7 +2383,7 @@ extern "C" {
         return CaseFolded;
     }
     
-    UTF16 *UTF16_CaseFold(PlatformIO_Immutable(UTF16 *) String) {
+    UTF16 *UTF16_CaseFold(ImmutableString_UTF16 String) {
         UTF16 *CaseFolded     = NULL;
         if (String != NULL) {
             UTF32 *String32   = UTF16_Decode(String);
@@ -2418,7 +2397,7 @@ extern "C" {
         return CaseFolded;
     }
     
-    static uint64_t UTF32_GetCaseFoldedSize(PlatformIO_Immutable(UTF32 *) String) {
+    static uint64_t UTF32_GetCaseFoldedSize(ImmutableString_UTF32 String) {
         uint64_t NumCodePoints = 0ULL;
         uint64_t CodePoint = 0ULL;
         while (String[CodePoint] != PlatformIO_NULLTerminator) {
@@ -2435,7 +2414,7 @@ extern "C" {
         return NumCodePoints;
     }
     
-    static void UTF32_SubstitutePreallocated(UTF32 *String2Edit, PlatformIO_Immutable(UTF32 *) Replacement) {
+    static void UTF32_SubstitutePreallocated(UTF32 *String2Edit, ImmutableString_UTF32 Replacement) {
         uint64_t CodePoint = 0ULL;
         while (String2Edit[CodePoint] != PlatformIO_NULLTerminator && Replacement[CodePoint] != PlatformIO_NULLTerminator) {
             String2Edit[CodePoint] = Replacement[CodePoint];
@@ -2443,7 +2422,7 @@ extern "C" {
         }
     }
     
-    UTF32 *UTF32_CaseFold(PlatformIO_Immutable(UTF32 *) String) {
+    UTF32 *UTF32_CaseFold(ImmutableString_UTF32 String) {
         UTF32   *CaseFoldedString                = NULL;
         if (String != NULL) {
             uint64_t CaseFoldedSize              = UTF32_GetCaseFoldedSize(String);
@@ -2549,7 +2528,7 @@ extern "C" {
         return NULL;
     }
     
-    static UTF32 *UTF32_Compose(PlatformIO_Immutable(UTF32 *) String, StringIO_NormalizationForms CompositionType) { // FIXME: Must use a stable sorting algorithm
+    static UTF32 *UTF32_Compose(ImmutableString_UTF32 String, StringIO_NormalizationForms CompositionType) { // FIXME: Must use a stable sorting algorithm
         uint64_t CodePoint      = 0ULL;
         UTF32   *ComposedString = NULL;
         if (String != NULL && (CompositionType == NormalizationForm_CanonicalCompose || CompositionType == NormalizationForm_KompatibleCompose)) {
@@ -2580,7 +2559,7 @@ extern "C" {
         return ComposedString;
     }
     
-    static UTF32 *UTF32_Decompose(PlatformIO_Immutable(UTF32 *) String, StringIO_NormalizationForms DecompositionType) { // FIXME: Must use a stable sorting algorithm
+    static UTF32 *UTF32_Decompose(ImmutableString_UTF32 String, StringIO_NormalizationForms DecompositionType) { // FIXME: Must use a stable sorting algorithm
         uint64_t CodePoint      = 0ULL;
         UTF32   *DecomposedString = NULL;
         if (String != NULL && (DecompositionType == NormalizationForm_CanonicalDecompose || DecompositionType == NormalizationForm_KompatibleDecompose)) {
@@ -2611,7 +2590,7 @@ extern "C" {
         return DecomposedString;
     }
     
-    UTF8 *UTF8_Normalize(PlatformIO_Immutable(UTF8 *) String, StringIO_NormalizationForms NormalizedForm) {
+    UTF8 *UTF8_Normalize(ImmutableString_UTF8 String, StringIO_NormalizationForms NormalizedForm) {
         UTF8 *NormalizedString8       = NULL;
         if (String != NULL && NormalizedForm != NormalizationForm_Unspecified) {
             UTF32 *String32           = UTF8_Decode(String);
@@ -2623,7 +2602,7 @@ extern "C" {
         return NormalizedString8;
     }
     
-    UTF16 *UTF16_Normalize(PlatformIO_Immutable(UTF16 *) String, StringIO_NormalizationForms NormalizedForm) {
+    UTF16 *UTF16_Normalize(ImmutableString_UTF16 String, StringIO_NormalizationForms NormalizedForm) {
         UTF16 *NormalizedString16     = NULL;
         if (String != NULL && NormalizedForm != NormalizationForm_Unspecified) {
             UTF32 *String32           = UTF16_Decode(String);
@@ -2635,7 +2614,7 @@ extern "C" {
         return NormalizedString16;
     }
     
-    UTF32 *UTF32_Normalize(PlatformIO_Immutable(UTF32 *) String, StringIO_NormalizationForms NormalizedForm) {
+    UTF32 *UTF32_Normalize(ImmutableString_UTF32 String, StringIO_NormalizationForms NormalizedForm) {
         UTF32 *NormalizedString = NULL;
         if (String != NULL && NormalizedForm != NormalizationForm_Unspecified) {
             if (NormalizedForm == NormalizationForm_CanonicalCompose) {
@@ -2659,7 +2638,7 @@ extern "C" {
         return NormalizedString;
     }
     
-    int64_t UTF8_String2Integer(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String) { // Replaces atoi, atol, strtol, strtoul,
+    int64_t UTF8_String2Integer(TextIO_Bases Base, ImmutableString_UTF8 String) { // Replaces atoi, atol, strtol, strtoul,
         int64_t Value = 0LL;
         if (String != NULL) {
             UTF32 *String32 = UTF8_Decode(String);
@@ -2671,7 +2650,7 @@ extern "C" {
         return Value;
     }
     
-    int64_t UTF16_String2Integer(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String) {
+    int64_t UTF16_String2Integer(TextIO_Bases Base, ImmutableString_UTF16 String) {
         int64_t Value = 0LL;
         if (String != NULL) {
             UTF32 *String32 = UTF16_Decode(String);
@@ -2684,7 +2663,7 @@ extern "C" {
     }
     
     // Integer2String should accept any integer base from the lookup table and shift the value until it can't anymore
-    int64_t UTF32_String2Integer(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String) {
+    int64_t UTF32_String2Integer(TextIO_Bases Base, ImmutableString_UTF32 String) {
         uint64_t CodePoint = 0ULL;
         int8_t   Sign      = 1;
         int64_t  Value     = 0LL;
@@ -2749,14 +2728,14 @@ extern "C" {
     
     UTF8 *UTF8_Integer2String(TextIO_Bases Base, int64_t Integer2Convert) {
         UTF32 *IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
-        UTF8  *IntegerString8  = UTF8_Encode((PlatformIO_Immutable(UTF32 *)) IntegerString32);
+        UTF8  *IntegerString8  = UTF8_Encode((ImmutableString_UTF32) IntegerString32);
         UTF32_Deinit(IntegerString32);
         return IntegerString8;
     }
     
     UTF16 *UTF16_Integer2String(TextIO_Bases Base, int64_t Integer2Convert) {
         UTF32 *IntegerString32 = UTF32_Integer2String(Base, Integer2Convert);
-        UTF16 *IntegerString16 = UTF16_Encode((PlatformIO_Immutable(UTF32 *)) IntegerString32);
+        UTF16 *IntegerString16 = UTF16_Encode((ImmutableString_UTF32) IntegerString32);
         UTF32_Deinit(IntegerString32);
         return IntegerString16;
     }
@@ -2820,7 +2799,7 @@ extern "C" {
         return String;
     }
     
-    double UTF8_String2Decimal(TextIO_Bases Base, PlatformIO_Immutable(UTF8 *) String) {
+    double UTF8_String2Decimal(TextIO_Bases Base, ImmutableString_UTF8 String) {
         double Decimal = 0.0;
         if (String != NULL) {
             UTF32 *String32 = UTF8_Decode(String);
@@ -2832,7 +2811,7 @@ extern "C" {
         return Decimal;
     }
     
-    double UTF16_String2Decimal(TextIO_Bases Base, PlatformIO_Immutable(UTF16 *) String) {
+    double UTF16_String2Decimal(TextIO_Bases Base, ImmutableString_UTF16 String) {
         double Decimal = 0.0;
         if (String != NULL) {
             UTF32 *String32 = UTF16_Decode(String);
@@ -2844,7 +2823,7 @@ extern "C" {
         return Decimal;
     }
     
-    double UTF32_String2Decimal(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String) { // Replaces strtod, strtof, strold, atof, and atof_l
+    double UTF32_String2Decimal(TextIO_Bases Base, ImmutableString_UTF32 String) { // Replaces strtod, strtof, strold, atof, and atof_l
         double   Value         = 0.0;
         bool     IsNegative    = No;
         if (String != NULL) {
@@ -3078,7 +3057,7 @@ extern "C" {
     }
     /* Number Conversions */
     
-    bool UTF8_Compare(PlatformIO_Immutable(UTF8 *) String1, PlatformIO_Immutable(UTF8 *) String2) {
+    bool UTF8_Compare(ImmutableString_UTF8 String1, ImmutableString_UTF8 String2) {
         bool StringsMatch         = No;
         if (String1 != NULL && String2 != NULL) {
             if (String1 != String2) {
@@ -3098,7 +3077,7 @@ extern "C" {
         return StringsMatch;
     }
     
-    bool UTF16_Compare(PlatformIO_Immutable(UTF16 *) String1, PlatformIO_Immutable(UTF16 *) String2) {
+    bool UTF16_Compare(ImmutableString_UTF16 String1, ImmutableString_UTF16 String2) {
         bool StringsMatch         = No;
         if (String1 != NULL && String2 != NULL) {
             if (String1 != String2) {
@@ -3118,7 +3097,7 @@ extern "C" {
         return StringsMatch;
     }
     
-    bool UTF32_Compare(PlatformIO_Immutable(UTF32 *) String1, PlatformIO_Immutable(UTF32 *) String2) {
+    bool UTF32_Compare(ImmutableString_UTF32 String1, ImmutableString_UTF32 String2) {
         bool StringsMatch                    = No;
         if (String1 != NULL && String2 != NULL) {
             uint64_t String1SizeInCodePoints = UTF32_GetStringSizeInCodePoints(String1);
@@ -3143,7 +3122,7 @@ extern "C" {
         return StringsMatch;
     }
     
-    bool UTF8_CompareSubString(PlatformIO_Immutable(UTF8 *) String, PlatformIO_Immutable(UTF8 *) Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
+    bool UTF8_CompareSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
         bool SubstringMatchesAtOffset = No;
         if (String != NULL && Substring != NULL) {
             UTF32 *String32           = UTF8_Decode(String);
@@ -3159,7 +3138,7 @@ extern "C" {
         return SubstringMatchesAtOffset;
     }
     
-    bool UTF16_CompareSubString(PlatformIO_Immutable(UTF16 *) String, PlatformIO_Immutable(UTF16 *) Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
+    bool UTF16_CompareSubString(ImmutableString_UTF16 String, ImmutableString_UTF16 Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
         bool SubstringMatchesAtOffset = No;
         if (String != NULL && Substring != NULL) {
             UTF32 *String32           = UTF16_Decode(String);
@@ -3175,7 +3154,7 @@ extern "C" {
         return SubstringMatchesAtOffset;
     }
     
-    bool UTF32_CompareSubString(PlatformIO_Immutable(UTF32 *) String, PlatformIO_Immutable(UTF32 *) Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
+    bool UTF32_CompareSubString(ImmutableString_UTF32 String, ImmutableString_UTF32 Substring, uint64_t StringOffset, uint64_t SubstringOffset) {
         bool SubstringMatchesAtOffset            = No;
         if (String != NULL && Substring != NULL) {
             uint64_t StringSize                  = UTF32_GetStringSizeInCodePoints(String);
@@ -3199,12 +3178,12 @@ extern "C" {
         return SubstringMatchesAtOffset;
     }
     
-    UTF8 *UTF8_Trim(PlatformIO_Immutable(UTF8 *) String, StringIO_TruncationTypes Type, PlatformIO_Immutable(UTF8 **) Strings2Remove) {
+    UTF8 *UTF8_Trim(ImmutableString_UTF8 String, StringIO_TruncationTypes Type, ImmutableStringSet_UTF8 Strings2Remove) {
         UTF8 *Trimmed = NULL;
         if (String != NULL && Type != TruncationType_Unspecified && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF8_Decode(String);
             UTF32   **Strings2Remove32          = UTF8_StringSet_Decode(Strings2Remove);
-            UTF32    *Trimmed32                 = UTF32_Trim((PlatformIO_Immutable(UTF32*)) String32, Type, (PlatformIO_Immutable(UTF32**)) Strings2Remove32);
+            UTF32    *Trimmed32                 = UTF32_Trim((ImmutableString_UTF32) String32, Type, (ImmutableStringSet_UTF32) Strings2Remove32);
             UTF32_StringSet_Deinit(Strings2Remove32);
             Trimmed                             = UTF8_Encode(Trimmed32);
             UTF32_Deinit(String32);
@@ -3218,12 +3197,12 @@ extern "C" {
         return Trimmed;
     }
     
-    UTF16 *UTF16_Trim(PlatformIO_Immutable(UTF16 *) String, StringIO_TruncationTypes Type, PlatformIO_Immutable(UTF16 **) Strings2Remove) {
+    UTF16 *UTF16_Trim(ImmutableString_UTF16 String, StringIO_TruncationTypes Type, ImmutableStringSet_UTF16 Strings2Remove) {
         UTF16 *Trimmed = NULL;
         if (String != NULL && Type != TruncationType_Unspecified && Strings2Remove != NULL) {
             UTF32    *String32                  = UTF16_Decode(String);
             UTF32   **Strings2Remove32          = UTF16_StringSet_Decode(Strings2Remove);
-            UTF32    *Trimmed32                 = UTF32_Trim((PlatformIO_Immutable(UTF32*)) String32, Type, (PlatformIO_Immutable(UTF32**)) Strings2Remove32);
+            UTF32    *Trimmed32                 = UTF32_Trim((ImmutableString_UTF32) String32, Type, (ImmutableStringSet_UTF32) Strings2Remove32);
             UTF32_StringSet_Deinit(Strings2Remove32);
             Trimmed                             = UTF16_Encode(Trimmed32);
             UTF32_Deinit(String32);
@@ -3237,7 +3216,7 @@ extern "C" {
         return Trimmed;
     }
     
-    UTF32 *UTF32_Trim(PlatformIO_Immutable(UTF32 *) String, StringIO_TruncationTypes Type, PlatformIO_Immutable(UTF32 **) Strings2Remove) {
+    UTF32 *UTF32_Trim(ImmutableString_UTF32 String, StringIO_TruncationTypes Type, ImmutableStringSet_UTF32 Strings2Remove) {
         UTF32 *Trimmed = NULL;
         if (String != NULL && Type != TruncationType_Unspecified && Strings2Remove != NULL) {
             uint64_t   StringSize          = UTF32_GetStringSizeInCodePoints(String);
@@ -3327,12 +3306,12 @@ extern "C" {
         return Trimmed;
     }
     
-    UTF8 **UTF8_Split(PlatformIO_Immutable(UTF8 *) String, PlatformIO_Immutable(UTF8 **) Delimiters) {
+    UTF8 **UTF8_Split(ImmutableString_UTF8 String, ImmutableStringSet_UTF8 Delimiters) {
         UTF8 **SplitString                                 = NULL;
         if (String != NULL && Delimiters != NULL) {
-            PlatformIO_Immutable(UTF32 *)  String32      = UTF8_Decode(String);
-            PlatformIO_Immutable(UTF32 **) Delimiters32  = (PlatformIO_Immutable(UTF32 **)) UTF8_StringSet_Decode(Delimiters);
-            PlatformIO_Immutable(UTF32 **) SplitString32 = (PlatformIO_Immutable(UTF32 **)) UTF32_Split(String32, Delimiters32);
+            ImmutableString_UTF32  String32      = UTF8_Decode(String);
+            ImmutableStringSet_UTF32 Delimiters32  = (ImmutableStringSet_UTF32) UTF8_StringSet_Decode(Delimiters);
+            ImmutableStringSet_UTF32 SplitString32 = (ImmutableStringSet_UTF32) UTF32_Split(String32, Delimiters32);
             UTF32_Deinit((UTF32*) String32);
             UTF32_StringSet_Deinit((UTF32**) Delimiters32);
             SplitString           = UTF8_StringSet_Encode(SplitString32);
@@ -3344,15 +3323,15 @@ extern "C" {
         return SplitString;
     }
     
-    UTF16 **UTF16_Split(PlatformIO_Immutable(UTF16 *) String, PlatformIO_Immutable(UTF16 **) Delimiters) {
+    UTF16 **UTF16_Split(ImmutableString_UTF16 String, ImmutableStringSet_UTF16 Delimiters) {
         UTF16 **SplitString       = NULL;
         if (String != NULL && Delimiters != NULL) {
             UTF32  *String32      = UTF16_Decode(String);
             UTF32 **Delimiters32  = UTF16_StringSet_Decode(Delimiters);
-            PlatformIO_Immutable(UTF32 **) SplitString32 = (PlatformIO_Immutable(UTF32 **)) UTF32_Split((PlatformIO_Immutable(UTF32 *)) String32, (PlatformIO_Immutable(UTF32 **)) Delimiters32);
+            ImmutableStringSet_UTF32 SplitString32 = (ImmutableStringSet_UTF32) UTF32_Split((ImmutableString_UTF32) String32, (ImmutableStringSet_UTF32) Delimiters32);
             UTF32_Deinit(String32);
             UTF32_StringSet_Deinit((UTF32**) Delimiters32);
-            SplitString           = UTF16_StringSet_Encode((PlatformIO_Immutable(UTF32 **)) SplitString32);
+            SplitString           = UTF16_StringSet_Encode((ImmutableStringSet_UTF32) SplitString32);
         } else if (String == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         } else if (Delimiters == NULL) {
@@ -3361,7 +3340,7 @@ extern "C" {
         return SplitString;
     }
     
-    UTF32 **UTF32_Split(PlatformIO_Immutable(UTF32 *) String, PlatformIO_Immutable(UTF32 **) Delimiters) {
+    UTF32 **UTF32_Split(ImmutableString_UTF32 String, ImmutableStringSet_UTF32 Delimiters) {
         UTF32    **SplitStrings    = NULL; // What we return, it's a 0 indexed array of strings
         uint64_t   StringSize      = 0ULL; // The size of the first parameter
         uint64_t   NumDelimiters   = 0ULL; // The number of delimiters in the second parameter
@@ -3430,7 +3409,7 @@ extern "C" {
         return SplitStrings;
     }
     
-    uint64_t UTF32_GetNumDigits(TextIO_Bases Base, PlatformIO_Immutable(UTF32 *) String) {
+    uint64_t UTF32_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF32 String) {
         uint64_t NumDigits      = 0ULL;
         if (String != NULL) {
             uint64_t CodePoint  = 0;
@@ -3522,7 +3501,7 @@ extern "C" {
         return NumDigits;
     }
     
-    uint64_t UTF32_GetSubStringLength(PlatformIO_Immutable(UTF32 *) Format, PlatformIO_Immutable(UTF32 *)Formatted, uint64_t Offset) {
+    uint64_t UTF32_GetSubStringLength(ImmutableString_UTF32 Format, ImmutableString_UTF32 Formatted, uint64_t Offset) {
         uint64_t Length        = 0ULL;
         if (Format != NULL && Formatted != NULL) {
             uint64_t CodePoint = Offset;
@@ -3603,7 +3582,7 @@ extern "C" {
         return StringSet;
     }
     
-    bool UTF8_StringSet_Attach(PlatformIO_Immutable(UTF8 **) StringSet, PlatformIO_Immutable(UTF8 *) String2Attach, uint64_t Index) {
+    bool UTF8_StringSet_Attach(UTF8 **StringSet, ImmutableString_UTF8 String2Attach, uint64_t Index) {
         bool AttachedSucessfully = No;
         if (StringSet != NULL && String2Attach != NULL) {
             uint64_t NumStrings  = 0ULL;
@@ -3622,7 +3601,7 @@ extern "C" {
         return AttachedSucessfully;
     }
     
-    bool UTF16_StringSet_Attach(PlatformIO_Immutable(UTF16 **) StringSet, PlatformIO_Immutable(UTF16 *) String2Attach, uint64_t Index) {
+    bool UTF16_StringSet_Attach(UTF16 **StringSet, ImmutableString_UTF16 String2Attach, uint64_t Index) {
         bool AttachedSucessfully = No;
         if (StringSet != NULL && String2Attach != NULL) {
             uint64_t NumStrings  = 0ULL;
@@ -3641,7 +3620,7 @@ extern "C" {
         return AttachedSucessfully;
     }
     
-    bool UTF32_StringSet_Attach(PlatformIO_Immutable(UTF32 **) StringSet, PlatformIO_Immutable(UTF32 *) String2Attach, uint64_t Index) {
+    bool UTF32_StringSet_Attach(UTF32 **StringSet, ImmutableString_UTF32 String2Attach, uint64_t Index) {
         bool AttachedSucessfully = No;
         if (StringSet != NULL && String2Attach != NULL) {
             uint64_t NumStrings  = 0ULL;
@@ -3649,7 +3628,7 @@ extern "C" {
                 NumStrings      += 1;
             }
             if (NumStrings >= Index) {
-                StringSet[Index] = String2Attach;
+                StringSet[Index] = (UTF32*) String2Attach;
                 AttachedSucessfully = Yes;
             }
         } else if (StringSet == NULL) {
@@ -3660,7 +3639,7 @@ extern "C" {
         return AttachedSucessfully;
     }
     
-    uint64_t UTF8_StringSet_GetNumStrings(PlatformIO_Immutable(UTF8 **) StringSet) {
+    uint64_t UTF8_StringSet_GetNumStrings(ImmutableStringSet_UTF8 StringSet) {
         uint64_t NumStrings = 0ULL;
         if (StringSet != NULL) {
             while (StringSet[NumStrings] != PlatformIO_NULLTerminator) {
@@ -3672,7 +3651,7 @@ extern "C" {
         return NumStrings;
     }
     
-    uint64_t UTF16_StringSet_GetNumStrings(PlatformIO_Immutable(UTF16 **) StringSet) {
+    uint64_t UTF16_StringSet_GetNumStrings(ImmutableStringSet_UTF16 StringSet) {
         uint64_t NumStrings = 0ULL;
         if (StringSet != NULL) {
             while (StringSet[NumStrings] != PlatformIO_NULLTerminator) {
@@ -3684,7 +3663,7 @@ extern "C" {
         return NumStrings;
     }
     
-    uint64_t UTF32_StringSet_GetNumStrings(PlatformIO_Immutable(UTF32 **) StringSet) {
+    uint64_t UTF32_StringSet_GetNumStrings(ImmutableStringSet_UTF32 StringSet) {
         uint64_t NumStrings = 0ULL;
         if (StringSet != NULL) {
             while (StringSet[NumStrings] != PlatformIO_NULLTerminator) {
@@ -3696,7 +3675,7 @@ extern "C" {
         return NumStrings;
     }
     
-    uint64_t *UTF8_StringSet_GetStringSizesInCodeUnits(PlatformIO_Immutable(UTF8 **) StringSet) {
+    uint64_t *UTF8_StringSet_GetStringSizesInCodeUnits(ImmutableStringSet_UTF8 StringSet) {
         uint64_t *StringSetSizes       = NULL;
         if (StringSet != NULL) {
             uint64_t NumStrings        = UTF8_StringSet_GetNumStrings(StringSet);
@@ -3710,7 +3689,7 @@ extern "C" {
         return StringSetSizes;
     }
     
-    uint64_t *UTF16_StringSet_GetStringSizesInCodeUnits(PlatformIO_Immutable(UTF16 **) StringSet) {
+    uint64_t *UTF16_StringSet_GetStringSizesInCodeUnits(ImmutableStringSet_UTF16 StringSet) {
         uint64_t *StringSetSizes       = NULL;
         if (StringSet != NULL) {
             uint64_t NumStrings        = UTF16_StringSet_GetNumStrings(StringSet);
@@ -3724,7 +3703,7 @@ extern "C" {
         return StringSetSizes;
     }
     
-    uint64_t *UTF8_StringSet_GetStringSizesInCodePoints(PlatformIO_Immutable(UTF8 **) StringSet) {
+    uint64_t *UTF8_StringSet_GetStringSizesInCodePoints(ImmutableStringSet_UTF8 StringSet) {
         uint64_t *StringSetSizes       = NULL;
         if (StringSet != NULL) {
             uint64_t NumStrings        = UTF8_StringSet_GetNumStrings(StringSet);
@@ -3738,7 +3717,7 @@ extern "C" {
         return StringSetSizes;
     }
     
-    uint64_t *UTF16_StringSet_GetStringSizesInCodePoints(PlatformIO_Immutable(UTF16 **) StringSet) {
+    uint64_t *UTF16_StringSet_GetStringSizesInCodePoints(ImmutableStringSet_UTF16 StringSet) {
         uint64_t *StringSetSizes       = NULL;
         if (StringSet != NULL) {
             uint64_t NumStrings        = UTF16_StringSet_GetNumStrings(StringSet);
@@ -3752,7 +3731,7 @@ extern "C" {
         return StringSetSizes;
     }
     
-    uint64_t *UTF32_StringSet_GetStringSizesInCodePoints(PlatformIO_Immutable(UTF32 **) StringSet) {
+    uint64_t *UTF32_StringSet_GetStringSizesInCodePoints(ImmutableStringSet_UTF32 StringSet) {
         uint64_t *StringSetSizes       = NULL;
         if (StringSet != NULL) {
             uint64_t NumStrings        = UTF32_StringSet_GetNumStrings(StringSet);
@@ -3766,7 +3745,7 @@ extern "C" {
         return StringSetSizes;
     }
     
-    UTF32 **UTF8_StringSet_Decode(PlatformIO_Immutable(UTF8 **) StringSet) {
+    UTF32 **UTF8_StringSet_Decode(ImmutableStringSet_UTF8 StringSet) {
         UTF32 **Decoded             = NULL;
         if (StringSet != NULL) {
             uint64_t NumStrings     = UTF8_StringSet_GetNumStrings(StringSet);
@@ -3784,7 +3763,7 @@ extern "C" {
         return Decoded;
     }
     
-    UTF32 **UTF16_StringSet_Decode(PlatformIO_Immutable(UTF16 **) StringSet) {
+    UTF32 **UTF16_StringSet_Decode(ImmutableStringSet_UTF16 StringSet) {
         UTF32 **Decoded             = NULL;
         if (StringSet != NULL) {
             uint64_t NumStrings     = UTF16_StringSet_GetNumStrings(StringSet);
@@ -3803,7 +3782,7 @@ extern "C" {
         return Decoded;
     }
     
-    UTF8 **UTF8_StringSet_Encode(PlatformIO_Immutable(UTF32 **) StringSet) {
+    UTF8 **UTF8_StringSet_Encode(ImmutableStringSet_UTF32 StringSet) {
         UTF8 **Encoded              = NULL;
         if (StringSet != NULL) {
             uint64_t NumStrings     = UTF32_StringSet_GetNumStrings(StringSet);
@@ -3822,7 +3801,7 @@ extern "C" {
         return Encoded;
     }
     
-    UTF16 **UTF16_StringSet_Encode(PlatformIO_Immutable(UTF32 **) StringSet) {
+    UTF16 **UTF16_StringSet_Encode(ImmutableStringSet_UTF32 StringSet) {
         UTF16 **Encoded             = NULL;
         if (StringSet != NULL) {
             uint64_t NumStrings     = UTF32_StringSet_GetNumStrings(StringSet);
@@ -3841,11 +3820,11 @@ extern "C" {
         return Encoded;
     }
     
-    UTF8 *UTF8_StringSet_Flatten(PlatformIO_Immutable(UTF8 **) StringSet) {
+    UTF8 *UTF8_StringSet_Flatten(ImmutableStringSet_UTF8 StringSet) {
         UTF8 *Flattened = NULL;
         if (StringSet != NULL) {
             UTF32 **StringSet32 = UTF8_StringSet_Decode(StringSet);
-            UTF32  *Flattened32 = UTF32_StringSet_Flatten((PlatformIO_Immutable(UTF32**)) StringSet32);
+            UTF32  *Flattened32 = UTF32_StringSet_Flatten((ImmutableStringSet_UTF32) StringSet32);
             UTF32_StringSet_Deinit(StringSet32);
             Flattened           = UTF8_Encode(Flattened32);
             UTF32_Deinit(Flattened32);
@@ -3855,11 +3834,11 @@ extern "C" {
         return Flattened;
     }
     
-    UTF16 *UTF16_StringSet_Flatten(PlatformIO_Immutable(UTF16 **) StringSet) {
+    UTF16 *UTF16_StringSet_Flatten(ImmutableStringSet_UTF16 StringSet) {
         UTF16 *Flattened        = NULL;
         if (StringSet != NULL) {
             UTF32 **StringSet32 = UTF16_StringSet_Decode(StringSet);
-            UTF32  *Flattened32 = UTF32_StringSet_Flatten((PlatformIO_Immutable(UTF32**)) StringSet32);
+            UTF32  *Flattened32 = UTF32_StringSet_Flatten((ImmutableStringSet_UTF32) StringSet32);
             UTF32_StringSet_Deinit(StringSet32);
             Flattened           = UTF16_Encode(Flattened32);
             UTF32_Deinit(Flattened32);
@@ -3869,7 +3848,7 @@ extern "C" {
         return Flattened;
     }
     
-    UTF32 *UTF32_StringSet_Flatten(PlatformIO_Immutable(UTF32 **) StringSet) {
+    UTF32 *UTF32_StringSet_Flatten(ImmutableStringSet_UTF32 StringSet) {
         UTF32 *Flattened = NULL;
         if (StringSet != NULL) {
             uint64_t  NumStrings         = UTF32_StringSet_GetNumStrings(StringSet);
@@ -3937,7 +3916,7 @@ extern "C" {
     /* StringSet Functions */
     
     /* Unicode Conversion */
-    CharSet8 *UTF8_ConvertUnicode2CharSet(PlatformIO_Immutable(UTF8 *) String, StringIO_CharSets CodePage) {
+    CharSet8 *UTF8_ConvertUnicode2CharSet(ImmutableString_UTF8 String, StringIO_CharSets CodePage) {
         CharSet8 *Encoded = NULL;
         if (String != NULL && CodePage != CharSet_Unspecified) {
             UTF32 *Decoded      = UTF8_Decode(String);
@@ -3968,7 +3947,7 @@ extern "C" {
         return Encoded;
     }
     
-    CharSet16 *UTF16_ConvertUnicode2CharSet(PlatformIO_Immutable(UTF16 *) String, StringIO_CharSets CodePage) {
+    CharSet16 *UTF16_ConvertUnicode2CharSet(ImmutableString_UTF16 String, StringIO_CharSets CodePage) {
         CharSet16 *Encoded = NULL;
         if (String != NULL && CodePage != CharSet_Unspecified) {
             UTF32 *Decoded      = UTF16_Decode(String);
@@ -3999,7 +3978,7 @@ extern "C" {
         return Encoded;
     }
     
-    CharSet32 *UTF32_ConvertUnicode2CharSet(PlatformIO_Immutable(UTF32 *) String, StringIO_CharSets CodePage) {
+    CharSet32 *UTF32_ConvertUnicode2CharSet(ImmutableString_UTF32 String, StringIO_CharSets CodePage) {
         CharSet32 *Encoded = NULL;
         if (String != NULL && CodePage != CharSet_Unspecified) {
             UTF32 *Composed     = UTF32_Normalize(String, NormalizationForm_KompatibleCompose);

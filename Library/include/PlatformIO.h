@@ -310,7 +310,7 @@ extern "C" {
 
 #ifndef             PlatformIO_FunctionName
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
-#define             PlatformIO_FunctionName                                             (PlatformIO_Immutable(UTF8 *)) __func__
+#define             PlatformIO_FunctionName                                             (ImmutableString_UTF8) __func__
 #elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 #define             PlatformIO_FunctionName                                             reinterpret_cast<const UTF8*>(__PRETTY_FUNCTION__)
 #endif /* Language */

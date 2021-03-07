@@ -8,7 +8,7 @@ extern "C" {
     
     bool Test_StringSet(SecureRNG *Secure) {
         bool TestPassed = Yes;
-        PlatformIO_Immutable(UTF8*) StringSet[4] = {
+        ImmutableString_UTF8 StringSet[4] = {
             [0] = UTF8String("String1"),
             [1] = UTF8String("String2"),
             [2] = UTF8String("String3"),
@@ -23,7 +23,7 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Size of StringSet's Strings doesn't = 7"));
         }
         /* So far so good, now lets test Allocation, Assignment, and Deinitalization */
-        PlatformIO_Immutable(UTF8**) StringSet2 = UTF8_StringSet_Init(3);
+        ImmutableStringSet_UTF8 StringSet2 = UTF8_StringSet_Init(3);
         UTF8_StringSet_Attach(StringSet2, StringSet[0], 0);
         UTF8_StringSet_Attach(StringSet2, StringSet[1], 1);
         UTF8_StringSet_Attach(StringSet2, StringSet[2], 2);
@@ -49,9 +49,9 @@ extern "C" {
         bool TestPassed                = No;
         if (Secure != NULL) {
             uint64_t  NumCodePoints    = SecureRNG_GenerateInteger(Secure, 16);
-            PlatformIO_Immutable(UTF32*) GeneratedString  = UTF32_GenerateString(Secure, NumCodePoints);
+            ImmutableString_UTF32 GeneratedString  = UTF32_GenerateString(Secure, NumCodePoints);
             UTF8     *Generated8       = UTF8_Encode(GeneratedString);
-            PlatformIO_Immutable(UTF32*) Decoded8         = UTF8_Decode(Generated8);
+            ImmutableString_UTF32 Decoded8         = UTF8_Decode(Generated8);
             TestPassed                 = UTF32_Compare(GeneratedString, Decoded8);
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
@@ -69,9 +69,9 @@ extern "C" {
         bool TestPassed = Yes;
         if (Secure != NULL) {
             uint64_t  NumCodePoints                      = SecureRNG_GenerateInteger(Secure, 16);
-            PlatformIO_Immutable(UTF32*) GeneratedString = UTF32_GenerateString(Secure, NumCodePoints);
-            PlatformIO_Immutable(UTF16*) Generated16     = UTF16_Encode(GeneratedString);
-            PlatformIO_Immutable(UTF32*) Decoded16       = UTF16_Decode(Generated16);
+            ImmutableString_UTF32 GeneratedString = UTF32_GenerateString(Secure, NumCodePoints);
+            ImmutableString_UTF16 Generated16     = UTF16_Encode(GeneratedString);
+            ImmutableString_UTF32 Decoded16       = UTF16_Decode(Generated16);
             TestPassed                                   = UTF32_CompareSubString(GeneratedString, Decoded16, 0, 0);
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("SecureRNG Pointer is NULL"));
@@ -81,18 +81,18 @@ extern "C" {
     
     bool Test_UTF8_Insert(SecureRNG *Secure) {
         bool TestPassed = No;
-        PlatformIO_Immutable(UTF8 *) Original = UTF8String("Original");
-        PlatformIO_Immutable(UTF8 *) Insertee = UTF8String("Insert");
-        PlatformIO_Immutable(UTF8 *) Inserted = UTF8_Insert(Original, Insertee, 0);
-        PlatformIO_Immutable(UTF8 *) Correct  = UTF8String("InsertOriginal");
+        ImmutableString_UTF8 Original = UTF8String("Original");
+        ImmutableString_UTF8 Insertee = UTF8String("Insert");
+        ImmutableString_UTF8 Inserted = UTF8_Insert(Original, Insertee, 0);
+        ImmutableString_UTF8 Correct  = UTF8String("InsertOriginal");
         TestPassed                            = UTF8_Compare(Inserted, Correct);
         return TestPassed;
     }
     
     bool Test_UTF8_Properties(SecureRNG *Secure) {
         bool      TestPassed     = Yes;
-        PlatformIO_Immutable(UTF8 *) TestString8    = UTF8String("Size: 7");
-        PlatformIO_Immutable(UTF32*) TestString32   = UTF8_Decode(TestString8);
+        ImmutableString_UTF8 TestString8    = UTF8String("Size: 7");
+        ImmutableString_UTF32 TestString32   = UTF8_Decode(TestString8);
         uint64_t  TestStringSize = UTF32_GetStringSizeInCodePoints(TestString32);
         if (TestStringSize != 7) {
             TestPassed           = No;
@@ -104,8 +104,8 @@ extern "C" {
     bool Test_SubstituteSubString(SecureRNG *Secure) {
         bool TestPassed = No;
         
-        PlatformIO_Immutable(UTF32*) Replacement = UTF32String("987654321");
-        PlatformIO_Immutable(UTF32*) String      = UTF32String("123456789");
+        ImmutableString_UTF32 Replacement = UTF32String("987654321");
+        ImmutableString_UTF32 String      = UTF32String("123456789");
         UTF32                       *Replaced    = UTF32_SubstituteSubString(String, Replacement, 0, 0);
         
         return TestPassed;
@@ -113,7 +113,7 @@ extern "C" {
     
     bool Test_UTF8_StitchSubString(SecureRNG *Secure) {
         bool TestPassed                         = No;
-        PlatformIO_Immutable(UTF8*) BananaBread = UTF8_StitchSubString(UTF8String("Banana NUT Bread"), 8, 4);
+        ImmutableString_UTF8 BananaBread = UTF8_StitchSubString(UTF8String("Banana NUT Bread"), 8, 4);
         TestPassed                              = UTF8_Compare(BananaBread, UTF8String("Banana Bread"));
         return TestPassed;
     }
@@ -124,10 +124,10 @@ extern "C" {
         if (StringSet8[0] == (UTF8*) 0x8888888888888888) {
             TestPassed = Yes;
         }
-        PlatformIO_Immutable(UTF8 *) One   = UTF8String("One");
-        PlatformIO_Immutable(UTF8 *) Two   = UTF8String("Two");
-        PlatformIO_Immutable(UTF8 *) Three = UTF8String("Three");
-        PlatformIO_Immutable(UTF8 *) Four  = UTF8String("Four");
+        ImmutableString_UTF8 One   = UTF8String("One");
+        ImmutableString_UTF8 Two   = UTF8String("Two");
+        ImmutableString_UTF8 Three = UTF8String("Three");
+        ImmutableString_UTF8 Four  = UTF8String("Four");
         StringSet8[0]                      = One;
         StringSet8[1]                      = Two;
         StringSet8[2]                      = Three;

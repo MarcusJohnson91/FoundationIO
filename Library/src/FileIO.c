@@ -310,7 +310,7 @@ extern "C" {
         return CurrentWorkingPath;
     }
     
-    UTF8 *FileIO_UTF8_GetFileName(PlatformIO_Immutable(UTF8 *) Path8) {
+    UTF8 *FileIO_UTF8_GetFileName(ImmutableString_UTF8 Path8) {
         UTF8 *Base = NULL;
         uint64_t Path8SizeInCodeUnits  = UTF8_GetStringSizeInCodeUnits(Path8);
         uint64_t Start                 = Path8SizeInCodeUnits;
@@ -336,7 +336,7 @@ extern "C" {
         return Base;
     }
     
-    UTF16 *FileIO_UTF16_GetFileName(PlatformIO_Immutable(UTF16 *) Path16) {
+    UTF16 *FileIO_UTF16_GetFileName(ImmutableString_UTF16 Path16) {
         UTF16 *Base = NULL;
         uint64_t Path16SizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(Path16);
         uint64_t Start                 = Path16SizeInCodeUnits;
@@ -365,7 +365,7 @@ extern "C" {
     /*!
      @abstract Dirname replacement
      */
-    UTF8 *FileIO_UTF8_GetDirectoryName(PlatformIO_Immutable(UTF8 *) Path8) {
+    UTF8 *FileIO_UTF8_GetDirectoryName(ImmutableString_UTF8 Path8) {
         UTF8 *DirectoryName = NULL;
         return DirectoryName;
     }
@@ -373,7 +373,7 @@ extern "C" {
     /*!
      @abstract Dirname replacement
      */
-    UTF16 *FileIO_UTF16_GetDirectoryName(PlatformIO_Immutable(UTF16 *) Path16) {
+    UTF16 *FileIO_UTF16_GetDirectoryName(ImmutableString_UTF16 Path16) {
         UTF16 *DirectoryName = NULL;
         return DirectoryName;
     }
@@ -381,7 +381,7 @@ extern "C" {
     /*!
      @abstract Realpath replacement
      */
-    UTF8 *FileIO_UTF8_GetAbsolutePath(PlatformIO_Immutable(UTF8 *) Path8) {
+    UTF8 *FileIO_UTF8_GetAbsolutePath(ImmutableString_UTF8 Path8) {
         UTF8 *DirectoryName = NULL;
         return DirectoryName;
     }
@@ -389,12 +389,12 @@ extern "C" {
     /*!
      @abstract Realpath replacement
      */
-    UTF16 *FileIO_UTF16_GetAbsolutePath(PlatformIO_Immutable(UTF16 *) Path16) {
+    UTF16 *FileIO_UTF16_GetAbsolutePath(ImmutableString_UTF16 Path16) {
         UTF16 *DirectoryName = NULL;
         return DirectoryName;
     }
     
-    UTF8 *FileIO_UTF8_GetFileExtension(PlatformIO_Immutable(UTF8 *) Path8) {
+    UTF8 *FileIO_UTF8_GetFileExtension(ImmutableString_UTF8 Path8) {
         UTF8 *Base = NULL;
         /*
          if you find a '.' before a slash or after the start of the string, it has an extension.
@@ -436,7 +436,7 @@ extern "C" {
         return Base;
     }
     
-    UTF16 *FileIO_UTF16_GetFileExtension(PlatformIO_Immutable(UTF16 *) Path16) {
+    UTF16 *FileIO_UTF16_GetFileExtension(ImmutableString_UTF16 Path16) {
         UTF16 *Base = NULL;
         uint64_t Path16SizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(Path16);
         uint64_t Start                 = Path16SizeInCodeUnits;

@@ -173,35 +173,35 @@ extern "C" {
      @param        CLI                             CommandLineIO Pointer.
      @param        Name                            The name of the program you're building.
      */
-    void           CommandLineIO_SetName(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Name);
+    void           CommandLineIO_SetName(CommandLineIO *CLI, ImmutableString_UTF32 Name);
     
     /*!
      @abstract                                     Sets the version of the program.
      @param        CLI                             CommandLineIO Pointer.
      @param        Version                         The version of the program you're building.
      */
-    void           CommandLineIO_SetVersion(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Version);
+    void           CommandLineIO_SetVersion(CommandLineIO *CLI, ImmutableString_UTF32 Version);
     
     /*!
      @abstract                                     Sets the description of the program.
      @param        CLI                             CommandLineIO Pointer.
      @param        Description                     Description of what the program does.
      */
-    void           CommandLineIO_SetDescription(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Description);
+    void           CommandLineIO_SetDescription(CommandLineIO *CLI, ImmutableString_UTF32 Description);
     
     /*!
      @abstract                                     Sets the author of the program.
      @param        CLI                             CommandLineIO Pointer.
      @param        Author                          Author of this program.
      */
-    void           CommandLineIO_SetAuthor(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Author);
+    void           CommandLineIO_SetAuthor(CommandLineIO *CLI, ImmutableString_UTF32 Author);
     
     /*!
      @abstract                                     Sets the copyright years of the program.
      @param        CLI                             CommandLineIO Pointer.
      @param        Copyright                       The starting year this program was written dash (CURRENTYEAR).
      */
-    void           CommandLineIO_SetCopyright(CommandLineIO *CLI, PlatformIO_Immutable(UTF32 *) Copyright);
+    void           CommandLineIO_SetCopyright(CommandLineIO *CLI, ImmutableString_UTF32 Copyright);
     
     /*!
      @abstract                                     Sets the license of the program.
@@ -210,7 +210,7 @@ extern "C" {
      @param        Name                            What is the name of the license?
      @param        LicenseURL                      The actual URL for the license.
      */
-    void           CommandLineIO_SetLicense(CommandLineIO *CLI, CommandLineIO_LicenseTypes LicenseType, PlatformIO_Immutable(UTF32 *) Name, PlatformIO_Immutable(UTF32 *) LicenseURL);
+    void           CommandLineIO_SetLicense(CommandLineIO *CLI, CommandLineIO_LicenseTypes LicenseType, ImmutableString_UTF32 Name, ImmutableString_UTF32 LicenseURL);
     
     /*!
      @abstract                                     What is the minimum number of options your program needs to operate?
@@ -234,7 +234,7 @@ extern "C" {
      @param        Numerator                       A pointer to a StringSet of X tasks that have been completed.
      @param        Denominator                     A pointer to a StringSet of Y thats that there are to do.
      */
-    void           CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, PlatformIO_Immutable(UTF32 **) Strings, PlatformIO_Immutable(uint64_t *) Numerator, PlatformIO_Immutable(uint64_t *) Denominator);
+    void           CommandLineIO_ShowProgress(CommandLineIO *CLI, uint8_t NumItems2Display, ImmutableStringSet_UTF32 Strings, PlatformIO_Immutable(uint64_t *) Numerator, PlatformIO_Immutable(uint64_t *) Denominator);
     
     /*!
      @abstract                                     Sets OptionID's flag in the CommandLineIO instance pointed by CLI.
@@ -243,7 +243,7 @@ extern "C" {
      @param        OptionID                        The option to set.
      @param        Name                            The flag to identify an option with.
      */
-    void           CommandLineIO_Switch_SetName(CommandLineIO *CLI, uint64_t OptionID, PlatformIO_Immutable(UTF32 *) Name);
+    void           CommandLineIO_Switch_SetName(CommandLineIO *CLI, uint64_t OptionID, ImmutableString_UTF32 Name);
     
     /*!
      @abstract                                     Sets OptionDescription's flag in the CommandLineIO instance pointed by CLI.
@@ -251,7 +251,7 @@ extern "C" {
      @param        OptionID                        The option to set.
      @param        Description                     Pointer to a UTF-8 encoded string containing the description of what this program does.
      */
-    void           CommandLineIO_Switch_SetDescription(CommandLineIO *CLI, uint64_t OptionID, PlatformIO_Immutable(UTF32 *) Description);
+    void           CommandLineIO_Switch_SetDescription(CommandLineIO *CLI, uint64_t OptionID, ImmutableString_UTF32 Description);
     
     /*!
      @abstract                                     Sets OptionID's flag in the CommandLineIO instance pointed by CLI.
@@ -283,7 +283,7 @@ extern "C" {
      @param        NumArguments                    The number of argument strings present in Arguments; equivalent to argc.
      @param        Arguments                       A StringSet of UTF-8 encoded arguments; equivalent to argv
      */
-    void           CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, PlatformIO_Immutable(UTF8 **) Arguments);
+    void           CommandLineIO_UTF8_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, ImmutableStringSet_UTF8 Arguments);
     
     /*!
      @abstract                                     Parses the Command Line Options as UTF-16 encoded strings.
@@ -291,7 +291,7 @@ extern "C" {
      @param        NumArguments                    The number of argument strings present in Arguments; equivalent to __argc.
      @param        Arguments                       A StringSet of UTF-16 encoded arguments; equivalent to __wargv on Windows
      */
-    void           CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, PlatformIO_Immutable(UTF16 **) Arguments);
+    void           CommandLineIO_UTF16_ParseOptions(CommandLineIO *CLI, uint64_t NumArguments, ImmutableStringSet_UTF16 Arguments);
     
     /*!
      @abstract                                     How many Master options are present in the Options (will also check for slave options if present).
@@ -336,7 +336,7 @@ extern "C" {
      @param        Blue                            The amount of blue in the color,  0-255.
      @return                                       Returns the text but with color.
      */
-    UTF8          *CommandLineIO_UTF8_Colorize(PlatformIO_Immutable(UTF8 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
+    UTF8          *CommandLineIO_UTF8_Colorize(ImmutableString_UTF8 String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
     
     /*!
      @abstract                                     Makes a string colorful.
@@ -347,7 +347,7 @@ extern "C" {
      @param        Blue                            The amount of blue in the color,  0-255.
      @return                                       Returns the text but with color.
      */
-    UTF16         *CommandLineIO_UTF16_Colorize(PlatformIO_Immutable(UTF16 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
+    UTF16         *CommandLineIO_UTF16_Colorize(ImmutableString_UTF16 String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
     
     /*!
      @abstract                                     Makes a string colorful.
@@ -358,28 +358,28 @@ extern "C" {
      @param        Blue                            The amount of blue in the color,  0-255.
      @return                                       Returns the text but with color.
      */
-    UTF32         *CommandLineIO_UTF32_Colorize(PlatformIO_Immutable(UTF32 *) String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
+    UTF32         *CommandLineIO_UTF32_Colorize(ImmutableString_UTF32 String, CommandLineIO_ColorTypes ColorType, uint8_t Red, uint8_t Green, uint8_t Blue);
     
     /*!
      @abstract                                     Strips color escape sequences from the string.
      @param        String                          The string to decolorize.
      @return                                       Returns the text without color.
      */
-    UTF8          *CommandLineIO_UTF8_Decolorize(PlatformIO_Immutable(UTF8 *) String);
+    UTF8          *CommandLineIO_UTF8_Decolorize(ImmutableString_UTF8 String);
     
     /*!
      @abstract                                     Strips color escape sequences from the string.
      @param        String                          The string to decolorize.
      @return                                       Returns the text without color.
      */
-    UTF16         *CommandLineIO_UTF16_Decolorize(PlatformIO_Immutable(UTF16 *) String);
+    UTF16         *CommandLineIO_UTF16_Decolorize(ImmutableString_UTF16 String);
     
     /*!
      @abstract                                     Strips color escape sequences from the string.
      @param        String                          The string to decolorize.
      @return                                       Returns the text without color.
      */
-    UTF32         *CommandLineIO_UTF32_Decolorize(PlatformIO_Immutable(UTF32 *) String);
+    UTF32         *CommandLineIO_UTF32_Decolorize(ImmutableString_UTF32 String);
     
     /*!
      @abstract                                     Deallocates the instance of CommandLineIO pointed to by CLI.
