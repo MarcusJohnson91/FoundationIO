@@ -22,63 +22,20 @@
 extern "C" {
 #endif
     
-    typedef struct    FormatSpecifiers            FormatSpecifiers;
-    
-    /*!
-     @abstract                                    Creates a instance of FormatSpecifiers.
-     @param           NumSpecifiers               The number of Specifiers to create.
-     @return                                      Returns the newly created FormatSpecifiers.
-     */
-    FormatSpecifiers *FormatSpecifiers_Init(uint64_t NumSpecifiers);
-    
-    /*!
-     @remark                                      MUST be called after Format_Specifiers_RetrieveArguments
-     */
-    uint64_t          UTF32_GetFormattedStringSize(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers);
-    
-    /*!
-     @abstract                                    Parses the format specifiers.
-     @param           Format                      The string to substitute the specifiers with.
-     @param           Specifiers                  The Format Specifiers.
-     @param           StringType                  The original encoding of the Format string.
-     */
-    void              UTF32_ParseFormatSpecifiers(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, TextIO_StringTypes StringType);
-    
-    /*!
-     @abstract                                    Formats a UTF-32 encoded string.
-     @param           Specifiers                  The Format Specifiers.
-     @param           Format                      The string to substitute the specifiers with.
-     @return                                      Returns the formatted string.
-     */
-    UTF32            *FormatString_UTF32(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, uint64_t FormattedStringSize);
-    
-    /*!
-     @abstract                                    Gets the Variadic Arguments from a Va_list, and adds them to FormatSpecifiers.
-     @param           Specifiers                  Type to hold the Specifiers' data.
-     @param           Arguments                   The variadic arguments.
-     */
-    void              Format_Specifiers_RetrieveArguments(FormatSpecifiers *Specifiers, va_list Arguments);
-    
-    /*!
-     @abstract                                    Deletes an instance of FormatSpecifiers.
-     @param           Specifiers                  The Specifiers to delete.
-     */
-    void              FormatSpecifiers_Deinit(FormatSpecifiers *Specifiers);
-    
     /*!
      @abstract                                    Formats a string according to the Format string.
      @param           Format                      A string with optional format specifiers.
      @return                                      Returns the formatted string encoded using the UTF-8 format.
      */
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
-    UTF8             *UTF8_Format(PlatformIO_Immutable(UTF8 *) Format, ...) __attribute__((format(printf, 1, 2)));
+    UTF8             *UTF8_Format(ImmutableString_UTF8 Format, ...) __attribute__((format(printf, 1, 2)));
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
-    UTF8             *UTF8_Format(PlatformIO_Immutable(UTF8 *) Format, ...);
+    UTF8             *UTF8_Format(ImmutableString_UTF8 Format, ...);
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    UTF8             *UTF8_Format(__format_string PlatformIO_Immutable(UTF8 *) Format, ...);
+    UTF8             *UTF8_Format(__format_string ImmutableString_UTF8 Format, ...);
 #elif (_MSC_VER >= 1500)
-    UTF8             *UTF8_Format(_Printf_format_string_ PlatformIO_Immutable(UTF8 *) Format, ...);
+    UTF8             *UTF8_Format(_Printf_format_string_ ImmutableString_UTF8 Format, ...);
 #endif /* MSVC Version */
 #endif /* PlatformIO_Compiler */
     
@@ -88,14 +45,14 @@ extern "C" {
      @return                                      Returns the formatted string encoded using the UTF-8 format.
      */
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
-    UTF16            *UTF16_Format(PlatformIO_Immutable(UTF16 *) Format, ...) __attribute__((format(wprintf, 1, 2)));
+    UTF16            *UTF16_Format(ImmutableString_UTF16 Format, ...) __attribute__((format(wprintf, 1, 2)));
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
-    UTF16            *UTF16_Format(PlatformIO_Immutable(UTF16 *) Format, ...);
+    UTF16            *UTF16_Format(ImmutableString_UTF16 Format, ...);
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    UTF16            *UTF16_Format(__format_string PlatformIO_Immutable(UTF16 *) Format, ...);
+    UTF16            *UTF16_Format(__format_string ImmutableString_UTF16 Format, ...);
 #elif (_MSC_VER >= 1500)
-    UTF16            *UTF16_Format(_Printf_format_string_ PlatformIO_Immutable(UTF16 *) Format, ...);
+    UTF16            *UTF16_Format(_Printf_format_string_ ImmutableString_UTF16 Format, ...);
 #endif /* MSVC Version */
 #endif /* PlatformIO_Compiler */
     
@@ -105,14 +62,14 @@ extern "C" {
      @return                                      Returns the formatted string encoded using the UTF-8 format.
      */
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
-    UTF32            *UTF32_Format(PlatformIO_Immutable(UTF32 *) Format, ...) __attribute__((format(wprintf, 1, 2)));
+    UTF32            *UTF32_Format(ImmutableString_UTF32 Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsGCC)
-    UTF32            *UTF32_Format(PlatformIO_Immutable(UTF32 *) Format, ...);
+    UTF32            *UTF32_Format(ImmutableString_UTF32 Format, ...);
 #elif (PlatformIO_Compiler == PlatformIO_CompilerIsMSVC)
 #if   (_MSC_VER >= 1400 && _MSC_VER < 1500)
-    UTF32            *UTF32_Format(__format_string PlatformIO_Immutable(UTF32 *) Format, ...);
+    UTF32            *UTF32_Format(__format_string ImmutableString_UTF32 Format, ...);
 #elif (_MSC_VER >= 1500)
-    UTF32            *UTF32_Format(_Printf_format_string_ PlatformIO_Immutable(UTF32 *) Format, ...);
+    UTF32            *UTF32_Format(_Printf_format_string_ ImmutableString_UTF32 Format, ...);
 #endif /* MSVC Version */
 #endif /* PlatformIO_Compiler */
     
@@ -122,7 +79,7 @@ extern "C" {
      @param           Source                      The string to extract the information from.
      @return                                      Returns a StringSet containing NumFormatSpecifiers strings, one string for each specifier.
      */
-    UTF8            **UTF8_Deformat(PlatformIO_Immutable(UTF8 *) Format, PlatformIO_Immutable(UTF8 *) Source);
+    UTF8            **UTF8_Deformat(ImmutableString_UTF8 Format, ImmutableString_UTF8 Source);
     
     /*!
      @abstract                                    Splits a string based on the specifiers in Format.
@@ -130,7 +87,7 @@ extern "C" {
      @param           Source                      The string to extract the information from.
      @return                                      Returns a StringSet containing NumFormatSpecifiers strings, one string for each specifier.
      */
-    UTF16           **UTF16_Deformat(PlatformIO_Immutable(UTF16 *) Format, PlatformIO_Immutable(UTF16 *) Source);
+    UTF16           **UTF16_Deformat(ImmutableString_UTF16 Format, ImmutableString_UTF16 Source);
     
     /*!
      @abstract                                    Splits a string based on the specifiers in Format.
@@ -138,16 +95,7 @@ extern "C" {
      @param           Source                      The string to extract the information from.
      @return                                      Returns a StringSet containing NumFormatSpecifiers strings, one string for each specifier.
      */
-    UTF32           **UTF32_Deformat(PlatformIO_Immutable(UTF32 *) Format, PlatformIO_Immutable(UTF32 *) Source);
-    
-    /*!
-     @abstract                                    Deformats a UTF-32 encoded string, essentially scanf replacement.
-     @param           Format                      The string with specifiers to parse.
-     @param           Specifiers                  The Format Specifiers.
-     @param           Result                      The formatted string to extract the data for the StringSet into.
-     @return                                      Returns a StringSet for each specifier.
-     */
-    UTF32           **DeformatString_UTF32(PlatformIO_Immutable(UTF32 *) Format, FormatSpecifiers *Specifiers, PlatformIO_Immutable(UTF32 *) Result);
+    UTF32           **UTF32_Deformat(ImmutableString_UTF32 Format, ImmutableString_UTF32 Source);
     
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
