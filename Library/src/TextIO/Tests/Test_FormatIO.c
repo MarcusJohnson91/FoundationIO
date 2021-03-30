@@ -9,7 +9,7 @@ extern "C" {
 
     TestSuite FormatTests;
 
-    bool Test_UTF8_Deformat(void) {
+    bool Test_UTF8_Deformat(SecureRNG *Secure) {
         bool TestPassed      = No;
         ImmutableStringSet_UTF8 DeformatTest1 = (ImmutableStringSet_UTF8) UTF8_Deformat(UTF8String("NumArgs: %1$llu, Equal: %llu, Type: %3$s"), UTF8String("NumArgs: 3, Equal: 1234, Type: Positional"));
         bool  SubString1     = UTF8_Compare(DeformatTest1[0], UTF8String("3"));
