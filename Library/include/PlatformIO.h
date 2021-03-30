@@ -289,14 +289,6 @@ extern "C" {
 #define             PlatformIO_Volatile(PointerType)                                    volatile PointerType volatile
 #endif /* PlatformIO_Volatile */
 
-    /*!
-     @abstract      PlatformIO_Constant is for variables, constants, and values.
-     @remark        Makes the pointer and the data it points to constant.
-     */
-#ifndef             PlatformIO_Constant
-#define             PlatformIO_Constant(Type)                                           const Type
-#endif /* PlatformIO_Constant */
-
 #ifndef             PlatformIO_Literal
 #define             PlatformIO_Literal(NewType, UnconstType, Literal)
 #if   (PlatformIO_Language == PlatformIO_LanguageIsC)
