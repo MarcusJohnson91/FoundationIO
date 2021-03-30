@@ -38,7 +38,7 @@ extern "C" {
      @abstract                                   Sets the name or path of the program to give the logs more context.
      @param      ProgramName                     String containing either the name or the path of the program that this library was linked into.
      */
-    void         Log_SetProgramName(ImmutableString_UTF8 ProgramName);
+    void         Log_SetProgramName(UTF8 *ProgramName);
 
     /*!
      @abstract                                   Sets the Log_LogFile global variable to File.

@@ -12,7 +12,7 @@ extern "C" {
     //static UTF32         *Log_ProgramName   = NULL;
     static UTF8          *Log_ProgramName8  = NULL;
     
-    void Log_SetProgramName(ImmutableString_UTF8 ProgramName) {
+    void Log_SetProgramName(UTF8 *ProgramName) {
         if (ProgramName != NULL) {
             Log_ProgramName8 = ProgramName;
             //Log_ProgramName  = UTF8_Decode(ProgramName);
