@@ -42,7 +42,7 @@ extern "C" {
     /*!
      @abstract                                    Formats a string according to the Format string.
      @param           Format                      A string with optional format specifiers.
-     @return                                      Returns the formatted string encoded using the UTF-8 format.
+     @return                                      Returns the formatted string encoded using the UTF-16 format.
      */
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
     UTF16            *UTF16_Format(ImmutableString_UTF16 Format, ...) __attribute__((format(wprintf, 1, 2)));
@@ -59,7 +59,7 @@ extern "C" {
     /*!
      @abstract                                    Formats a string according to the Format string.
      @param           Format                      A string with optional format specifiers.
-     @return                                      Returns the formatted string encoded using the UTF-8 format.
+     @return                                      Returns the formatted string encoded using the UTF-32 format.
      */
 #if   (PlatformIO_Compiler == PlatformIO_CompilerIsClang)
     UTF32            *UTF32_Format(ImmutableString_UTF32 Format, ...) __attribute__((__format__(__wprintf__, 1, 2)));
