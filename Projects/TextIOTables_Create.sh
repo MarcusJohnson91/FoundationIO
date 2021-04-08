@@ -461,8 +461,8 @@ CheckUnicodeVersion() {
         if [ "$HeaderUnicodeVPatch" -lt "$ReadmeUnicodeVPatch" ] || [ "$HeaderUnicodeVMinor" -lt "$ReadmeUnicodeVMinor" ] || [ "$HeaderUnicodeVMajor" -lt "$ReadmeUnicodeVMajor" ]; then
             if [ -f "$HeaderFile" ] && [ -s "$HeaderFile" ]; then
                 echo "The following two files will be deleted, press Control-C within 5 seconds to abort..."
-                echo $HeaderFile
-                echo $SourceFile
+                echo "$HeaderFile"
+                echo "$SourceFile"
                 sleep 5
                 echo "Deleting..."
                 rm -rf "$HeaderFile"
@@ -513,8 +513,8 @@ if [ $# -eq 0 ]; then
             if [ "$HeaderScriptHash" != "$ScriptSHA" ]; then
                 # Update the Tables
                 echo "The following two files will be deleted, press Control-C within 5 seconds to abort..."
-                echo $HeaderFile
-                echo $SourceFile
+                echo "$HeaderFile"
+                echo "$SourceFile"
                 sleep 5
                 echo "Deleting..."
                 rm -rf "$HeaderFile"
@@ -533,7 +533,7 @@ if [ $# -eq 0 ]; then
             echo "We need 'shasum', install it then re-run the command"
         fi
     else
-        if [[ ! -z "$SHAPath" ]] && [[ ! -z "$CurlPath" ]] && [[ ! -z "$UnzipPath" ]] && [[ ! -z "$XMLStarletPath" ]]; then
+        if [[ -n "$SHAPath" ]] && [[ -n "$CurlPath" ]] && [[ -n "$UnzipPath" ]] && [[ -n "$XMLStarletPath" ]]; then #! - z
             echo "Creating Tables..."
             touch "$HeaderFile"
             touch "$SourceFile"
