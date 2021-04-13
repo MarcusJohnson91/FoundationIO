@@ -53,8 +53,6 @@ extern "C" {
 #endif /* __has_include */
 #endif /* Language */
 
-
-
 #ifdef  __CHAR8_TYPE__
 #undef  __CHAR8_TYPE__
 #define __CHAR8_TYPE__ unsigned char
@@ -91,12 +89,24 @@ extern "C" {
 #define __CHAR32_TYPE__ _Char32_t
 #endif /* PlatformIO_Compiler */
 #endif /* __CHAR32_TYPE__ */
-
-    typedef __CHAR8_TYPE__  char8_t;
-
-    typedef __CHAR16_TYPE__ char16_t;
-
-    typedef __CHAR32_TYPE__ char32_t;
+  
+#if (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersion < PlatformIO_LanguageVersionC2X)
+  typedef __CHAR8_TYPE__  char8_t;
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX20)
+  typedef __CHAR8_TYPE__  char8_t;
+#endif
+  
+#if (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersion < PlatformIO_LanguageVersionC11)
+  typedef __CHAR16_TYPE__  char16_t;
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
+  typedef __CHAR16_TYPE__  char16_t;
+#endif
+  
+#if (PlatformIO_Language == PlatformIO_LanguageIsC && PlatformIO_LanguageVersion < PlatformIO_LanguageVersionC11)
+  typedef __CHAR32_TYPE__  char32_t;
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
+  typedef __CHAR32_TYPE__  char32_t;
+#endif
 
 #ifndef                   FoundationIO_StringTypes8
 #define                   FoundationIO_StringTypes8 (1)
@@ -109,11 +119,11 @@ extern "C" {
 /*!
 @abstract                 UTF8                                 is guaranteed to only contain valid Unicode, use CharSet8 otherwise.
 */
-typedef                   __CHAR8_TYPE__                       UTF8;
+typedef                   char8_t                              UTF8;
 /*!
 @abstract                 CharSet8                             is for non-Unicode character sets.
 */
-typedef                   __CHAR8_TYPE__                       CharSet8;
+typedef                   char8_t                              CharSet8;
 #endif /* FoundationIO_StringTypes8 */
 
 #ifndef                   FoundationIO_StringTypes16
@@ -127,11 +137,11 @@ typedef                   __CHAR8_TYPE__                       CharSet8;
 /*!
 @abstract                 UTF16                                is guaranteed to only contain valid Unicode, use CharSet16 otherwise.
 */
-typedef                   __CHAR16_TYPE__                      UTF16;
+typedef                   char16_t                             UTF16;
 /*!
 @abstract                 CharSet16                            is for non-Unicode character sets.
 */
-typedef                   __CHAR16_TYPE__                      CharSet16;
+typedef                   char16_t                             CharSet16;
 #endif /* FoundationIO_StringTypes16 */
 
 #ifndef                   FoundationIO_StringTypes32
@@ -145,11 +155,11 @@ typedef                   __CHAR16_TYPE__                      CharSet16;
 /*!
 @abstract                 UTF32                                is guaranteed to only contain valid Unicode, use CharSet32 otherwise.
  */
-typedef                   __CHAR32_TYPE__                      UTF32;
+typedef                   char32_t                             UTF32;
 /*!
 @abstract                 CharSet32                            is for non-Unicode character sets.
  */
-typedef                   __CHAR32_TYPE__                      CharSet32;
+typedef                   char32_t                             CharSet32;
 #endif /* FoundationIO_StringTypes32 */
 
 #ifndef                   TextIOTypes_PropertyConversion8
@@ -389,6 +399,7 @@ typedef                   __CHAR32_TYPE__                      CharSet32;
 
 #endif /* TextIOTypes_PropertyConversion32 */
   
+#if (PlatformIO_Language == PlatformIO_LanguageIsC)
   typedef const UTF8  ImmutableChar_UTF8;
   typedef const UTF16 ImmutableChar_UTF16;
   typedef const UTF32 ImmutableChar_UTF32;
@@ -400,6 +411,19 @@ typedef                   __CHAR32_TYPE__                      CharSet32;
   typedef const UTF8  *const *const ImmutableStringSet_UTF8;
   typedef const UTF16 *const *const ImmutableStringSet_UTF16;
   typedef const UTF32 *const *const ImmutableStringSet_UTF32;
+#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+  typedef const UTF8     ImmutableChar_UTF8;
+  typedef const char16_t ImmutableChar_UTF16;
+  typedef const char32_t ImmutableChar_UTF32;
+  
+  typedef const UTF8     *const ImmutableString_UTF8;
+  typedef const char16_t *const ImmutableString_UTF16;
+  typedef const char32_t *const ImmutableString_UTF32;
+  
+  typedef const UTF8     *const *const ImmutableStringSet_UTF8;
+  typedef const char16_t *const *const ImmutableStringSet_UTF16;
+  typedef const char32_t *const *const ImmutableStringSet_UTF32;
+#endif /* PlatformIO_LanguageIsC */
 
 #ifndef                   FoundationIO_Unicodize8
 #define                   FoundationIO_Unicodize8               (1)
