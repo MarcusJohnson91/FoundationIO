@@ -1098,20 +1098,34 @@ extern "C" {
     UTF16             *UTF16_ReadSentence(FILE *Source);
     
     /*!
-     @abstract                                           Writes a Line (Including mewline) to Source.
+     @abstract                                           Writes a String to Source.
+     @remark                                             DOES NOT terminate the written string with a newline
+     @remark                                             Automatically converts string to the streams orientation
      @remark                                             Replaces Fputs and puts.
      @param            OutputFile                        The file to write the string to.
      @param            String                            The String to write.
      */
-    void               UTF8_WriteSentence(FILE *OutputFile, ImmutableString_UTF8 String);
+    void               UTF8_File_WriteString(FILE *OutputFile, ImmutableString_UTF8 String);
     
     /*!
-     @abstract                                           Writes a Line (Including mewline) to Source.
+     @abstract                                           Writes a String to Source.
+     @remark                                             DOES NOT terminate the written string with a newline
+     @remark                                             Automatically converts string to the streams orientation
      @remark                                             Replaces Fputws and putws.
      @param            OutputFile                        The file to write the string to.
      @param            String                            The String to write.
      */
-    void               UTF16_WriteSentence(FILE *OutputFile, ImmutableString_UTF16 String);
+    void               UTF16_File_WriteString(FILE *OutputFile, ImmutableString_UTF16 String);
+    
+    /*!
+     @abstract                                           Writes a String to Source.
+     @remark                                             DOES NOT terminate the written string with a newline
+     @remark                                             Automatically converts string to the streams orientation
+     @remark                                             Replaces Fputws and putws.
+     @param            OutputFile                        The file to write the string to.
+     @param            String                            The String to write.
+     */
+    void               UTF32_File_WriteString(FILE *OutputFile, ImmutableString_UTF32 String);
     
     /*!
      @abstract                                           Counts the number of Format Specifiers in String.

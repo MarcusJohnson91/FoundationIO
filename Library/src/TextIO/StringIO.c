@@ -1821,29 +1821,29 @@ extern "C" {
         return Sentence;
     }
     
-    void UTF8_WriteSentence(FILE *OutputFile, ImmutableString_UTF8 String) {
+    void UTF8_File_WriteString(FILE *OutputFile, ImmutableString_UTF8 String) {
         if (String != NULL && OutputFile != NULL) {
             TextIO_StringTypes Type       = FileIO_GetFileOrientation(OutputFile);
             uint64_t StringSize           = UTF8_GetStringSizeInCodeUnits(String);
             uint64_t CodeUnitsWritten     = 0ULL;
-            bool     StringHasNewLine     = UTF8_HasNewLine(String);
             if (Type == StringType_UTF8) {
                 CodeUnitsWritten          = FileIO_Write(OutputFile, &String, sizeof(UTF8), StringSize);
-                if (StringHasNewLine == No) {
-                    FileIO_Write(OutputFile, PlatformIO_NewLine8, sizeof(UTF8), PlatformIO_NewLine8Size);
-                }
                 if (CodeUnitsWritten != StringSize) {
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
             } else if (Type == StringType_UTF16) {
                 UTF32 *String32        = UTF8_Decode(String);
                 UTF16 *String16        = UTF16_Encode(String32);
-                free(String32);
+                UTF32_Deinit(String32);
                 FileIO_Write(OutputFile, String16, sizeof(UTF16), PlatformIO_NewLine16Size);
-                free(String16);
-                if (StringHasNewLine == No) {
-                    FileIO_Write(OutputFile, PlatformIO_NewLine16, sizeof(UTF8), PlatformIO_NewLine16Size);
+                UTF16_Deinit(String16);
+                if (CodeUnitsWritten != StringSize) {
+                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
+            } else if (Type == StringType_UTF32) {
+                UTF32 *String32        = UTF8_Decode(String);
+                FileIO_Write(OutputFile, String32, sizeof(UTF32), PlatformIO_NewLine32Size);
+                UTF32_Deinit(String32);
                 if (CodeUnitsWritten != StringSize) {
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
@@ -1855,17 +1855,13 @@ extern "C" {
         }
     }
     
-    void UTF16_WriteSentence(FILE *OutputFile, ImmutableString_UTF16 String) {
+    void UTF16_File_WriteString(FILE *OutputFile, ImmutableString_UTF16 String) {
         if (String != NULL && OutputFile != NULL) {
             TextIO_StringTypes Type       = FileIO_GetFileOrientation(OutputFile);
             uint64_t StringSize           = UTF16_GetStringSizeInCodeUnits(String);
             uint64_t CodeUnitsWritten     = 0ULL;
-            bool     StringHasNewLine     = UTF16_HasNewLine(String);
             if (Type == StringType_UTF16) {
                 CodeUnitsWritten          = FileIO_Write(OutputFile, &String, sizeof(UTF16), StringSize);
-                if (StringHasNewLine == No) {
-                    FileIO_Write(OutputFile, PlatformIO_NewLine16, sizeof(UTF16), PlatformIO_NewLine16Size);
-                }
                 if (CodeUnitsWritten != StringSize) {
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
@@ -1873,12 +1869,51 @@ extern "C" {
                 UTF32 *String32           = UTF16_Decode(String);
                 UTF8  *String8            = UTF8_Encode(String32);
                 uint64_t StringSize       = UTF8_GetStringSizeInCodeUnits(String8);
-                free(String32);
+                UTF32_Deinit(String32);
                 CodeUnitsWritten          = FileIO_Write(OutputFile, &String8, sizeof(UTF8), StringSize);
-                free(String8);
-                if (StringHasNewLine == No) {
-                    FileIO_Write(OutputFile, PlatformIO_NewLine8, sizeof(UTF8), PlatformIO_NewLine8Size);
+                UTF8_Deinit(String8);
+                if (CodeUnitsWritten != StringSize) {
+                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }
+            } else if (Type == StringType_UTF32) {
+                UTF32 *String32           = UTF16_Decode(String);
+                uint64_t StringSize       = UTF32_GetStringSizeInCodePoints(String32);
+                CodeUnitsWritten          = FileIO_Write(OutputFile, &String32, sizeof(UTF32), StringSize);
+                UTF32_Deinit(String32);
+                if (CodeUnitsWritten != StringSize) {
+                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
+                }
+            }
+        } else if (String == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
+        } else if (OutputFile == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("FILE Pointer is NULL"));
+        }
+    }
+    
+    void UTF32_File_WriteString(FILE *OutputFile, ImmutableString_UTF32 String) {
+        if (String != NULL && OutputFile != NULL) {
+            TextIO_StringTypes Type       = FileIO_GetFileOrientation(OutputFile);
+            uint64_t StringSize           = UTF32_GetStringSizeInCodePoints(String);
+            uint64_t CodeUnitsWritten     = 0ULL;
+            if (Type == StringType_UTF8) {
+                UTF8  *String8            = UTF8_Encode(String);
+                uint64_t StringSize8      = UTF8_GetStringSizeInCodeUnits(String8);
+                CodeUnitsWritten          = FileIO_Write(OutputFile, &String8, sizeof(UTF8), StringSize8);
+                UTF8_Deinit(String8);
+                if (CodeUnitsWritten != StringSize) {
+                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
+                }
+            } else if (Type == StringType_UTF16) {
+                UTF16 *String16           = UTF16_Encode(String);
+                uint64_t StringSize       = UTF16_GetStringSizeInCodeUnits(String16);
+                CodeUnitsWritten          = FileIO_Write(OutputFile, &String16, sizeof(UTF16), StringSize);
+                UTF16_Deinit(String16);
+                if (CodeUnitsWritten != StringSize) {
+                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
+                }
+            } else if (Type == StringType_UTF32) {
+                CodeUnitsWritten          = FileIO_Write(OutputFile, &String, sizeof(UTF32), StringSize);
                 if (CodeUnitsWritten != StringSize) {
                     Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Wrote %llu CodeUnits of %llu"), CodeUnitsWritten, StringSize);
                 }

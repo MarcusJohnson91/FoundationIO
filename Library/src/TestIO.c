@@ -79,11 +79,11 @@ extern "C" {
             }
             UTF8 *TestsThatPerformedAsExpected = UTF8_Format(UTF8String("Tests that matched their expectation: %llu"), Suite->NumWorkedAsExpected);
             UTF8 *UnexpectedFailures           = UTF8_Format(UTF8String("Tests that DID NOT perform as expected: %llu"), Suite->NumUnexpectedFailures);
-            UTF8_WriteSentence(stdout, UTF8String("Test Results:\n"));
-            UTF8_WriteSentence(stdout, TestsThatPerformedAsExpected);
-            UTF8_WriteSentence(stdout, UnexpectedFailures);
+            UTF8_File_WriteString(stdout, UTF8String("Test Results:\n"));
+            UTF8_File_WriteString(stdout, TestsThatPerformedAsExpected);
+            UTF8_File_WriteString(stdout, UnexpectedFailures);
             for (uint64_t FailedTest = 0ULL; FailedTest < Suite->NumUnexpectedFailures; FailedTest++) {
-                //UTF8_WriteSentence(stdout, Suite->Tests[Suite->UnexpectedFailues[FailedTest]].FunctionName);
+                //UTF8_File_WriteString(stdout, Suite->Tests[Suite->UnexpectedFailues[FailedTest]].FunctionName);
             }
         }
     }

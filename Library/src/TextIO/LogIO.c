@@ -89,7 +89,7 @@ extern "C" {
         free(SecurityName8);
 
         if (Log_LogFile != NULL) {
-            UTF8_WriteSentence(Log_LogFile, Combined);
+            UTF8_File_WriteString(Log_LogFile, Combined);
             fflush(Log_LogFile);
         } else {
             printf("%s", Combined);
