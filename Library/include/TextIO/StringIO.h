@@ -1101,7 +1101,7 @@ extern "C" {
      @abstract                                           Writes a String to Source.
      @remark                                             DOES NOT terminate the written string with a newline
      @remark                                             Automatically converts string to the streams orientation
-     @remark                                             Replaces Fputs and puts.
+     @remark                                             Replaces Fputs completely.
      @param            OutputFile                        The file to write the string to.
      @param            String                            The String to write.
      */
@@ -1111,7 +1111,7 @@ extern "C" {
      @abstract                                           Writes a String to Source.
      @remark                                             DOES NOT terminate the written string with a newline
      @remark                                             Automatically converts string to the streams orientation
-     @remark                                             Replaces Fputws and putws.
+     @remark                                             Replaces Fputws.
      @param            OutputFile                        The file to write the string to.
      @param            String                            The String to write.
      */
@@ -1126,27 +1126,6 @@ extern "C" {
      @param            String                            The String to write.
      */
     void               UTF32_File_WriteString(FILE *OutputFile, ImmutableString_UTF32 String);
-    
-    /*!
-     @abstract                                           Counts the number of Format Specifiers in String.
-     @param            String                            The string to check.
-     @return                                             Returns the number of format specifiers found.
-     */
-    uint64_t           UTF8_GetNumFormatSpecifiers(ImmutableString_UTF8 String);
-    
-    /*!
-     @abstract                                           Counts the number of Format Specifiers in String.
-     @param            String                            The string to check.
-     @return                                             Returns the number of format specifiers found.
-     */
-    uint64_t           UTF16_GetNumFormatSpecifiers(ImmutableString_UTF16 String);
-    
-    /*!
-     @abstract                                           Counts the number of Format Specifiers in String.
-     @param            String                            The string to check.
-     @return                                             Returns the number of format specifiers found.
-     */
-    uint64_t           UTF32_GetNumFormatSpecifiers(ImmutableString_UTF32 String);
     
     /*!
      @abstract                                           Counts the number of Digits in String starting at Offset (inclusive).

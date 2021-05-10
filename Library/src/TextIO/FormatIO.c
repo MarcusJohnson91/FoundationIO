@@ -1503,7 +1503,7 @@ extern "C" {
         return Deformatted;
     }
     
-    uint64_t UTF8_GetNumFormatSpecifiers(ImmutableString_UTF8 String) {
+    static uint64_t UTF8_GetNumFormatSpecifiers(ImmutableString_UTF8 String) {
         uint64_t NumSpecifiers         = 0ULL;
         uint64_t CodeUnit              = 0ULL;
         if (String != NULL) {
@@ -1519,7 +1519,7 @@ extern "C" {
         return NumSpecifiers;
     }
     
-    uint64_t UTF16_GetNumFormatSpecifiers(ImmutableString_UTF16 String) {
+    static uint64_t UTF16_GetNumFormatSpecifiers(ImmutableString_UTF16 String) {
         uint64_t NumSpecifiers         = 0ULL;
         uint64_t CodeUnit              = 0ULL;
         if (String != NULL) {
@@ -1535,7 +1535,7 @@ extern "C" {
         return NumSpecifiers;
     }
     
-    uint64_t UTF32_GetNumFormatSpecifiers(ImmutableString_UTF32 String) {
+    static uint64_t UTF32_GetNumFormatSpecifiers(ImmutableString_UTF32 String) {
         uint64_t NumSpecifiers         = 0ULL;
         uint64_t CodePoint             = 0ULL;
         if (String != NULL) {

@@ -72,8 +72,6 @@ extern "C" {
             } else if (UTF8_Compare(LanguageString, UTF8String("is"))) {
                 LanguageID = WrittenLanguage_Icelandic;
             }
-        } else if (StringSize == 3) {
-            
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Invalid Language string length %llu"), StringSize);
         }

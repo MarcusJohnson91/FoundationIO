@@ -9,8 +9,8 @@ extern "C" {
     typedef enum Switches {
         Input       = 0,
         Output      = 1,
-        Help        = 3,
-        NumSwitches = Help,
+        Help        = 2,
+        NumSwitches = Help + 1,
     } Switches;
     
     int main(const int argc, const char *argv[]) {
