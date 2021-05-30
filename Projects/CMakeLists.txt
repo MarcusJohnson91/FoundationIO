@@ -1,13 +1,16 @@
 cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 project(FoundationIO LANGUAGES C)
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
 if(NOT DEFINED CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Debug")
 elseif(CMAKE_BUILD_TYPE STREQUAL "")
 	set(CMAKE_BUILD_TYPE "Debug")
 endif(NOT DEFINED CMAKE_BUILD_TYPE)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    include(CTest)
+    enable_testing()
+endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 
 if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 add_compile_definitions(PlatformIO_LoggingStatus=PlatformIO_EnableLogging)
@@ -96,88 +99,51 @@ target_include_directories(FoundationIO PUBLIC "${LIBRARY_DIRECTORY}/include")
 target_include_directories(FoundationIO PUBLIC "${LIBRARY_DIRECTORY}/include/TextIO")
 
 if(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_UNIX)
-    set(CMAKE_INSTALL_PREFIX "/usr/local")
+    set(CMAKE_INSTALL_PREFIX "/usr/local/FoundationIO") # and lets alias the executables and library back to the normal /usr/local location
 elseif(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_WIN32)
     set(CMAKE_INSTALL_PREFIX "%ProgramFiles%\FoundationIO")
 endif(NOT DEFINED CMAKE_INSTALL_PREFIX AND CMAKE_HOST_UNIX)
 
-install(TARGETS FoundationIO                     DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-install(DIRECTORY "${LIBRARY_DIRECTORY}/include" DESTINATION "${CMAKE_INSTALL_PREFIX}" FILES_MATCHING PATTERN "*.h" PATTERN "*Private*" EXCLUDE)
+install(TARGETS FoundationIO                                 DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
+install(DIRECTORY "${BUILD_DIRECTORY}/include"               DESTINATION "${CMAKE_INSTALL_PREFIX}/include" FILES_MATCHING PATTERN "*.h" PATTERN "*Private*" EXCLUDE)
 install(FILES "${BUILD_DIRECTORY}/Resources/FoundationIO.pc" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/pkgconfig")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    enable_testing()
-    include(CTest)
+    macro(register_test Name)
+        string(CONCAT Test_Name "Test_${Name}")
 
-    add_executable(Test_AsynchronousIO              "${TESTSRC_DIRECTORY}/Test_AsynchronousIO.c")
-    add_executable(Test_BufferIO                    "${TESTSRC_DIRECTORY}/Test_BufferIO.c")
-    add_executable(Test_CryptographyIO              "${TESTSRC_DIRECTORY}/Test_CryptographyIO.c")
-    add_executable(Test_FileIO                      "${TESTSRC_DIRECTORY}/Test_FileIO.c")
-    add_executable(Test_MathIO                      "${TESTSRC_DIRECTORY}/Test_MathIO.c")
-    add_executable(Test_NetworkIO                   "${TESTSRC_DIRECTORY}/Test_NetworkIO.c")
-    add_executable(Test_PlatformIO                  "${TESTSRC_DIRECTORY}/Test_PlatformIO.c")
-    add_executable(Test_CommandLineIO               "${TESTSRC_DIRECTORY}/TextIO/Test_CommandLineIO.c")
-    add_executable(Test_FormatIO                    "${TESTSRC_DIRECTORY}/TextIO/Test_FormatIO.c")
-    add_executable(Test_LocalizationIO              "${TESTSRC_DIRECTORY}/TextIO/Test_LocalizationIO.c")
-    add_executable(Test_LogIO                       "${TESTSRC_DIRECTORY}/TextIO/Test_LogIO.c")
-    add_executable(Test_StringIO                    "${TESTSRC_DIRECTORY}/TextIO/Test_StringIO.c")
+        add_executable(${Test_Name} "${TESTSRC_DIRECTORY}/${Test_Name}.c")
 
-    target_link_libraries(Test_AsynchronousIO       FoundationIO)
-    target_link_libraries(Test_BufferIO             FoundationIO)
-    target_link_libraries(Test_CryptographyIO       FoundationIO)
-    target_link_libraries(Test_FileIO               FoundationIO)
-    target_link_libraries(Test_MathIO               FoundationIO)
-    target_link_libraries(Test_NetworkIO            FoundationIO)
-    target_link_libraries(Test_PlatformIO           FoundationIO)
-    target_link_libraries(Test_CommandLineIO        FoundationIO)
-    target_link_libraries(Test_FormatIO             FoundationIO)
-    target_link_libraries(Test_LocalizationIO       FoundationIO)
-    target_link_libraries(Test_LogIO                FoundationIO)
-    target_link_libraries(Test_StringIO             FoundationIO)
+        target_link_libraries(${Test_Name} FoundationIO)
 
-    add_test(NAME AsynchronousIO COMMAND $<TARGET_FILE:Test_AsynchronousIO>)
-    add_test(NAME BufferIO       COMMAND $<TARGET_FILE:Test_BufferIO>)
-    add_test(NAME CryptographyIO COMMAND $<TARGET_FILE:Test_CryptographyIO>)
-    add_test(NAME FileIO         COMMAND $<TARGET_FILE:Test_FileIO>)
-    add_test(NAME MathIO         COMMAND $<TARGET_FILE:Test_MathIO>)
-    add_test(NAME NetworkIO      COMMAND $<TARGET_FILE:Test_NetworkIO>)
-    add_test(NAME PlatformIO     COMMAND $<TARGET_FILE:Test_PlatformIO>)
-    add_test(NAME CommandLineIO  COMMAND $<TARGET_FILE:Test_CommandLineIO>)
-    add_test(NAME FormatIO       COMMAND $<TARGET_FILE:Test_FormatIO>)
-    add_test(NAME LocalizationIO COMMAND $<TARGET_FILE:Test_LocalizationIO>)
-    add_test(NAME LogIO          COMMAND $<TARGET_FILE:Test_LogIO>)
-    add_test(NAME StringIO       COMMAND $<TARGET_FILE:Test_StringIO>)
+        set(UNIT_TEST_TARGETS ${UNIT_TEST_TARGETS} ${Test_Name})
 
-    set_tests_properties(AsynchronousIO PROPERTIES TIMEOUT 90)
-    set_tests_properties(BufferIO       PROPERTIES TIMEOUT 90)
-    set_tests_properties(CryptographyIO PROPERTIES TIMEOUT 90)
-    set_tests_properties(FileIO         PROPERTIES TIMEOUT 90)
-    set_tests_properties(MathIO         PROPERTIES TIMEOUT 90)
-    set_tests_properties(NetworkIO      PROPERTIES TIMEOUT 90)
-    set_tests_properties(PlatformIO     PROPERTIES TIMEOUT 90)
-    set_tests_properties(CommandLineIO  PROPERTIES TIMEOUT 90)
-    set_tests_properties(FormatIO       PROPERTIES TIMEOUT 90)
-    set_tests_properties(LocalizationIO PROPERTIES TIMEOUT 90)
-    set_tests_properties(LogIO          PROPERTIES TIMEOUT 90)
-    set_tests_properties(StringIO       PROPERTIES TIMEOUT 90)
+        add_test(${Test_Name} "${CMAKE_CURRENT_BINARY_DIR}/${Test_Name}")
 
-    install(TARGETS Test_AsynchronousIO DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-    install(TARGETS Test_BufferIO       DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-    install(TARGETS Test_CryptographyIO DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-    install(TARGETS Test_FileIO         DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-    install(TARGETS Test_MathIO         DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-    install(TARGETS Test_NetworkIO      DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-    install(TARGETS Test_PlatformIO     DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-    install(TARGETS Test_CommandLineIO  DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-    install(TARGETS Test_FormatIO       DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-    install(TARGETS Test_LocalizationIO DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-    install(TARGETS Test_LogIO          DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
-    install(TARGETS Test_StringIO       DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+        set_tests_properties(${Test_Name} PROPERTIES TIMEOUT 15)
 
-    add_custom_command(TARGET FoundationIO POST_BUILD COMMAND ctest ARGS --output-on-failure WORKING_DIRECTORY ${BUILD_DIRECTORY})
+    endmacro(register_test)
+
+    register_test(AsynchronousIO)
+    register_test(BufferIO)
+    register_test(CryptographyIO)
+    register_test(FileIO)
+    register_test(MathIO)
+    register_test(NetworkIO)
+    register_test(PlatformIO)
+    register_test(CommandLineIO)
+    register_test(FormatIO)
+    register_test(LocalizationIO)
+    register_test(LogIO)
+    register_test(StringIO)
+
+    add_custom_target(All_Tests ALL DEPENDS ${UNIT_TEST_TARGETS})
+    add_custom_command(TARGET All_Tests COMMENT "Run tests" POST_BUILD COMMAND ctest ARGS --output-on-failure WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 
 if($<C_COMPILER_ID:AppleClang,ARMClang,XLClang,Clang>)
+
+set(CMAKE_EXE_LINKER_FLAGS_INIT "-fsanitize=address,undefined -fno-omit-frame-pointer")
 
 set(CMAKE_C_FLAGS " \
 ${CMAKE_C_FLAGS} \
@@ -204,7 +170,7 @@ ${CMAKE_C_FLAGS} \
 
 set(CMAKE_C_FLAGS_DEBUG " \
 ${CMAKE_C_FLAGS} \
--fsanitize=address \
+-fsanitize=address,undefined \
 -fno-omit-frame-pointer \
 -fno-optimize-sibling-calls \
 -DDEBUG=1 \
@@ -220,7 +186,7 @@ ${CMAKE_C_FLAGS} \
 
 set(CMAKE_C_FLAGS_RELWITHDEBINFO " \
 ${CMAKE_C_FLAGS} \
--fsanitize=address \
+-fsanitize=address,undefined \
 -fno-omit-frame-pointer \
 -fno-optimize-sibling-calls \
 -DDEBUG=1 \
@@ -233,31 +199,31 @@ ${CMAKE_C_FLAGS} \
 -Oz \
 ")
 
-set(CMAKE_LINKER_FLAGS ${CMAKE_LINKER_FLAGS} " \
+set(LINK_FLAGS ${LINK_FLAGS} " \
 -flto=full \
 -lm \
 ")
 
 if(CMAKE_HOST_APPLE)
-set(CMAKE_LINKER_FLAGS ${CMAKE_LINKER_FLAGS} " \
+set(LINK_FLAGS ${LINK_FLAGS} " \
 -dead_strip_dylibs
 ")
 endif(CMAKE_HOST_APPLE)
 
-set(CMAKE_LINKER_FLAGS_DEBUG ${CMAKE_LINKER_FLAGS} " \
--fsanitize=address \
+set(LINK_FLAGS_DEBUG ${LINK_FLAGS} " \
+-fsanitize=address,undefined \
 -fno-omit-frame-pointer \
 ")
 
-set(CMAKE_LINKER_FLAGS_RELWITHDEBINFO ${CMAKE_LINKER_FLAGS} " \
--fsanitize=address \
+set(LINK_FLAGS_RELWITHDEBINFO ${LINK_FLAGS} " \
+-fsanitize=address,undefined \
 -fno-omit-frame-pointer \
 ")
 
-set(CMAKE_LINKER_FLAGS_RELEASE ${CMAKE_LINKER_FLAGS} " \
+set(LINK_FLAGS_RELEASE ${LINK_FLAGS} " \
 ")
 
-set(CMAKE_LINKER_FLAGS_MINSIZEREL ${CMAKE_LINKER_FLAGS} " \
+set(LINK_FLAGS_MINSIZEREL ${LINK_FLAGS} " \
 ")
 
 elseif($<C_COMPILER_ID:GNU>)
@@ -289,6 +255,7 @@ ${CMAKE_C_FLAGS} \
 
 set(CMAKE_C_FLAGS_DEBUG " \
 ${CMAKE_C_FLAGS} \
+-fno-omit-frame-pointer \
 -fsanitize=address,undefined \
 -DDEBUG=1 \
 -g \
@@ -302,6 +269,7 @@ ${CMAKE_C_FLAGS} \
 
 set(CMAKE_C_FLAGS_RELWITHDEBINFO " \
 ${CMAKE_C_FLAGS} \
+-fno-omit-frame-pointer \
 -fsanitize=address,undefined \
 -fno-omit-frame-pointer \
 -DDEBUG=1 \
@@ -327,10 +295,14 @@ endif(CMAKE_HOST_APPLE)
 
 set(LINK_FLAGS_DEBUG " \
 ${LINK_FLAGS} \
+-fno-omit-frame-pointer \
+-fsanitize=address,undefined \
 ")
 
 set(LINK_FLAGS_RELWITHDEBINFO " \
 ${LINK_FLAGS} \
+-fno-omit-frame-pointer \
+-fsanitize=address,undefined \
 ")
 
 set(LINK_FLAGS_RELEASE " \
