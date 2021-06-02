@@ -1133,6 +1133,22 @@ extern "C" {
      @param            String                            The string to check.
      @return                                             Returns the number of format specifiers found.
      */
+    uint64_t           UTF8_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF8 String);
+    
+    /*!
+     @abstract                                           Counts the number of Digits in String starting at Offset (inclusive).
+     @param            Base                              The base the string is in.
+     @param            String                            The string to check.
+     @return                                             Returns the number of format specifiers found.
+     */
+    uint64_t           UTF16_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF16 String);
+    
+    /*!
+     @abstract                                           Counts the number of Digits in String starting at Offset (inclusive).
+     @param            Base                              The base the string is in.
+     @param            String                            The string to check.
+     @return                                             Returns the number of format specifiers found.
+     */
     uint64_t           UTF32_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF32 String);
     
     /*!

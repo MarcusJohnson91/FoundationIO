@@ -3444,6 +3444,190 @@ extern "C" {
         return SplitStrings;
     }
     
+    uint64_t UTF8_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF8 String) {
+        uint64_t NumDigits      = 0ULL;
+        if (String != NULL) {
+            uint64_t CodePoint  = 0;
+            
+            if ((Base & Base_Integer) == Base_Integer) {
+                if ((Base & Base_Radix2) == Base_Radix2) {
+                    while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                        if (String[CodePoint] >= '0' && String[CodePoint] <= '1') {
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                } else if ((Base & Base_Radix8) == Base_Radix8) {
+                    while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                        if (String[CodePoint] >= '0' && String[CodePoint] <= '7') {
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                } else if ((Base & Base_Radix10) == Base_Radix10) {
+                    while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                        if (String[CodePoint] >= '0' && String[CodePoint] <= '9') {
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                } else if ((Base & Base_Radix16) == Base_Radix16) {
+                    if ((Base & Base_Uppercase) == Base_Uppercase) {
+                        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                            if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] >= 'A' && String[CodePoint] <= 'F')) {
+                                NumDigits     += 1;
+                            }
+                            CodePoint         += 1;
+                        }
+                    } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
+                        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                            if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] >= 'a' && String[CodePoint] <= 'f')) {
+                                NumDigits     += 1;
+                            }
+                            CodePoint         += 1;
+                        }
+                    }
+                }
+            } else if ((Base & Base_Decimal) == Base_Decimal) {
+                if ((Base & Base_Radix10) == Base_Radix10) {
+                    while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                        if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] == '.')) {
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                } else if ((Base & Base_Scientific) == Base_Scientific || (Base & Base_Shortest) == Base_Shortest) {
+                    if ((Base & Base_Uppercase) == Base_Uppercase) {
+                        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                            if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] == '.' || String[CodePoint] == 'E')) { // Todo: Make sure the Exponent is preceded by a digit
+                                NumDigits     += 1;
+                            }
+                            CodePoint         += 1;
+                        }
+                    } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
+                        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                            if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] == '.' || String[CodePoint] == 'e')) { // Todo: Make sure the Exponent is preceded by a digit
+                                NumDigits     += 1;
+                            }
+                            CodePoint         += 1;
+                        }
+                    }
+                } else if ((Base & Base_Radix16) == Base_Radix16) {
+                    if ((Base & Base_Uppercase) == Base_Uppercase) {
+                        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                            if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] >= 'A' && String[CodePoint] <= 'F') || String[CodePoint] <= 'P' || String[CodePoint] <= 'X') {
+                                NumDigits     += 1;
+                            }
+                            CodePoint         += 1;
+                        }
+                    } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
+                        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                            if ((String[CodePoint] >= '0' && String[CodePoint] <= '9') || (String[CodePoint] >= 'a' && String[CodePoint] <= 'f') || String[CodePoint] <= 'p' || String[CodePoint] <= 'x') {
+                                NumDigits     += 1;
+                            }
+                            CodePoint         += 1;
+                        }
+                    }
+                }
+            }
+        } else if (String == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
+        }
+        return NumDigits;
+    }
+    
+    uint64_t UTF16_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF16 String) {
+        uint64_t NumDigits      = 0ULL;
+        if (String != NULL) {
+            uint64_t CodePoint  = 0;
+            
+            if ((Base & Base_Integer) == Base_Integer) {
+                if ((Base & Base_Radix2) == Base_Radix2) {
+                    while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                        if (String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('1')) {
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                } else if ((Base & Base_Radix8) == Base_Radix8) {
+                    while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                        if (String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('7')) {
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                } else if ((Base & Base_Radix10) == Base_Radix10) {
+                    while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                        if (String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) {
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                } else if ((Base & Base_Radix16) == Base_Radix16) {
+                    if ((Base & Base_Uppercase) == Base_Uppercase) {
+                        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                            if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] >= UTF16Character('A') && String[CodePoint] <= UTF16Character('F'))) {
+                                NumDigits     += 1;
+                            }
+                            CodePoint         += 1;
+                        }
+                    } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
+                        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                            if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] >= UTF16Character('a') && String[CodePoint] <= UTF16Character('f'))) {
+                                NumDigits     += 1;
+                            }
+                            CodePoint         += 1;
+                        }
+                    }
+                }
+            } else if ((Base & Base_Decimal) == Base_Decimal) {
+                if ((Base & Base_Radix10) == Base_Radix10) {
+                    while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                        if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] == UTF16Character('.'))) {
+                            NumDigits     += 1;
+                        }
+                        CodePoint         += 1;
+                    }
+                } else if ((Base & Base_Scientific) == Base_Scientific || (Base & Base_Shortest) == Base_Shortest) {
+                    if ((Base & Base_Uppercase) == Base_Uppercase) {
+                        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                            if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] == UTF16Character('.') || String[CodePoint] == UTF16Character('E'))) { // Todo: Make sure the Exponent is preceded by a digit
+                                NumDigits     += 1;
+                            }
+                            CodePoint         += 1;
+                        }
+                    } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
+                        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                            if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] == UTF16Character('.') || String[CodePoint] == UTF16Character('e'))) { // Todo: Make sure the Exponent is preceded by a digit
+                                NumDigits     += 1;
+                            }
+                            CodePoint         += 1;
+                        }
+                    }
+                } else if ((Base & Base_Radix16) == Base_Radix16) {
+                    if ((Base & Base_Uppercase) == Base_Uppercase) {
+                        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                            if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] >= UTF16Character('A') && String[CodePoint] <= UTF16Character('F')) || String[CodePoint] <= UTF16Character('P') || String[CodePoint] <= UTF16Character('X')) {
+                                NumDigits     += 1;
+                            }
+                            CodePoint         += 1;
+                        }
+                    } else if (((Base & Base_Lowercase) == Base_Lowercase)) {
+                        while (String[CodePoint] != PlatformIO_NULLTerminator) {
+                            if ((String[CodePoint] >= UTF16Character('0') && String[CodePoint] <= UTF16Character('9')) || (String[CodePoint] >= UTF16Character('a') && String[CodePoint] <= UTF16Character('f')) || String[CodePoint] <= UTF16Character('p') || String[CodePoint] <= UTF16Character('x')) {
+                                NumDigits     += 1;
+                            }
+                            CodePoint         += 1;
+                        }
+                    }
+                }
+            }
+        } else if (String == NULL) {
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
+        }
+        return NumDigits;
+    }
+    
     uint64_t UTF32_GetNumDigits(TextIO_Bases Base, ImmutableString_UTF32 String) {
         uint64_t NumDigits      = 0ULL;
         if (String != NULL) {

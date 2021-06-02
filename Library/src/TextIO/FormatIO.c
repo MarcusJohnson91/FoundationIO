@@ -1233,7 +1233,7 @@ extern "C" {
         }
         // Okay then, so now we need to Start worrying about the Formatted Start and End
         uint64_t Specifier = 0ULL;
-        while (Specifier < Specifiers->NumSpecifiers) {
+        while (Specifiers != NULL & Specifier < Specifiers->NumSpecifiers) {
             if (Specifier == 0) {
                 Specifiers->Specifiers[Specifier].FormattedStart = Specifiers->Specifiers[Specifier].FormatStart;
                 Specifiers->Specifiers[Specifier].FormatEnd      = Specifiers->Specifiers[Specifier].FormatEnd;
@@ -1473,7 +1473,7 @@ extern "C" {
                  
                  ----
                  
-                 %U32s is for type specific formatters
+                 %l32s is for type specific formatters
                  */
                 FormatIO_BaseTypes     BaseType = Specifiers->Specifiers[Specifier].BaseType;
                 FormatIO_ModifierTypes Modifier = Specifiers->Specifiers[Specifier].ModifierType;

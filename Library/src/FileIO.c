@@ -16,7 +16,7 @@
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 extern "C" {
 #endif
-
+    
     /*
      File Operations:
      Open
@@ -27,6 +27,203 @@ extern "C" {
      Delete
      GetType
      */
+    
+    UTF8 *FileIO_UTF8_GetFileName(ImmutableString_UTF8 Path8) {
+        UTF8 *Base = NULL;
+        uint64_t Path8SizeInCodeUnits  = UTF8_GetStringSizeInCodeUnits(Path8);
+        uint64_t Start                 = Path8SizeInCodeUnits;
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+        while (Start > 0 && Path8[Start] != '\\') {
+            Start                     -= 1;
+        }
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+        while (Start > 0 && (Path8[Start] != '\\' || Path8[Start] != '/')) {
+            Start                     -= 1;
+        }
+#endif
+        uint64_t BaseSize              = Path8SizeInCodeUnits - Start;
+        Base                           = UTF8_Init(BaseSize);
+        if (Base != NULL) {
+            uint64_t BaseIndex         = 0;
+            uint64_t Path8Index        = Start;
+            while (BaseIndex < BaseSize && Path8Index < Path8SizeInCodeUnits) {
+                Base[BaseIndex]        = Path8[Path8Index];
+                BaseIndex             += 1;
+            }
+        }
+        return Base;
+    }
+    
+    UTF16 *FileIO_UTF16_GetFileName(ImmutableString_UTF16 Path16) {
+        UTF16 *Base = NULL;
+        uint64_t Path16SizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(Path16);
+        uint64_t Start                 = Path16SizeInCodeUnits;
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+        while (Start > 0 && Path16[Start] != '\\') {
+            Start                     -= 1;
+        }
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+        while (Start > 0 && (Path16[Start] != '\\' || Path16[Start] != '/')) {
+            Start                     -= 1;
+        }
+#endif
+        uint64_t BaseSize              = Path16SizeInCodeUnits - Start;
+        Base                           = UTF16_Init(BaseSize);
+        if (Base != NULL) {
+            uint64_t BaseIndex         = 0;
+            uint64_t Path16Index       = Start;
+            while (BaseIndex < BaseSize && Path16Index < Path16SizeInCodeUnits) {
+                Base[BaseIndex]        = Path16[Path16Index];
+                BaseIndex             += 1;
+            }
+        }
+        return Base;
+    }
+    
+    UTF32 *FileIO_UTF32_GetFileName(ImmutableString_UTF32 Path32) {
+        UTF32 *Base = NULL;
+        uint64_t Path32SizeInCodeUnits = UTF32_GetStringSizeInCodePoints(Path32);
+        uint64_t Start                 = Path32SizeInCodeUnits;
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+        while (Start > 0 && Path32[Start] != '\\') {
+            Start                     -= 1;
+        }
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+        while (Start > 0 && (Path32[Start] != '\\' || Path32[Start] != '/')) {
+            Start                     -= 1;
+        }
+#endif
+        uint64_t BaseSize              = Path32SizeInCodeUnits - Start;
+        Base                           = UTF32_Init(BaseSize);
+        if (Base != NULL) {
+            uint64_t BaseIndex         = 0;
+            uint64_t Path32Index       = Start;
+            while (BaseIndex < BaseSize && Path32Index < Path32SizeInCodeUnits) {
+                Base[BaseIndex]        = Path32[Path32Index];
+                BaseIndex             += 1;
+            }
+        }
+        return Base;
+    }
+    
+    UTF8 *FileIO_UTF8_GetFileExtension(ImmutableString_UTF8 Path8) {
+        UTF8 *Base = NULL;
+        /*
+         if you find a '.' before a slash or after the start of the string, it has an extension.
+         Start at the end of the string, loop until you find a dot or the start of the string or a slash
+         */
+        uint64_t Path8SizeInCodeUnits  = UTF8_GetStringSizeInCodeUnits(Path8);
+        uint64_t Start                 = Path8SizeInCodeUnits;
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+        while (Start > 0) {
+            if (Path8[Start] == '\\') { // Stop the loop because we're now in a folder
+                return Base;
+            } else if (Path8[Start] == '.') {
+                Start                 -= 1;
+                break;
+            }
+            Start                     -= 1;
+        }
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+        while (Start > 0) {
+            if (Path8[Start] == '\\' || Path8[Start] == '/') { // Stop the loop because we're now in a folder
+                return Base;
+            } else if (Path8[Start] == '.') {
+                Start                 -= 1;
+                break;
+            }
+            Start                     -= 1;
+        }
+#endif
+        uint64_t BaseSize              = Path8SizeInCodeUnits - Start;
+        Base                           = UTF8_Init(BaseSize);
+        if (Base != NULL) {
+            uint64_t BaseIndex         = 0;
+            uint64_t Path8Index        = Start;
+            while (BaseIndex < BaseSize && Path8Index < Path8SizeInCodeUnits) {
+                Base[BaseIndex]        = Path8[Path8Index];
+                BaseIndex             += 1;
+            }
+        }
+        return Base;
+    }
+    
+    UTF16 *FileIO_UTF16_GetFileExtension(ImmutableString_UTF16 Path16) {
+        UTF16 *Base = NULL;
+        uint64_t Path16SizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(Path16);
+        uint64_t Start                 = Path16SizeInCodeUnits;
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+        while (Start > 0) {
+            if (Path16[Start] == '\\') { // Stop the loop because we're now in a folder
+                return Base;
+            } else if (Path16[Start] == '.') {
+                Start                 -= 1;
+                break;
+            }
+            Start                     -= 1;
+        }
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+        while (Start > 0) {
+            if (Path16[Start] == '\\') { // Stop the loop because we're now in a folder
+                return Base;
+            } else if (Path16[Start] == '.') {
+                Start                 -= 1;
+                break;
+            }
+            Start                     -= 1;
+        }
+#endif
+        uint64_t BaseSize              = Path16SizeInCodeUnits - Start;
+        Base                           = UTF16_Init(BaseSize);
+        if (Base != NULL) {
+            uint64_t BaseIndex         = 0;
+            uint64_t Path16Index       = Start;
+            while (BaseIndex < BaseSize && Path16Index < Path16SizeInCodeUnits) {
+                Base[BaseIndex]        = Path16[Path16Index];
+                BaseIndex             += 1;
+            }
+        }
+        return Base;
+    }
+    
+    UTF32 *FileIO_UTF32_GetFileExtension(ImmutableString_UTF32 Path32) {
+        UTF32 *Base = NULL;
+        uint64_t Path32SizeInCodeUnits = UTF32_GetStringSizeInCodePoints(Path32);
+        uint64_t Start                 = Path32SizeInCodeUnits;
+#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
+        while (Start > 0) {
+            if (Path32[Start] == '\\') { // Stop the loop because we're now in a folder
+                return Base;
+            } else if (Path32[Start] == '.') {
+                Start                 -= 1;
+                break;
+            }
+            Start                     -= 1;
+        }
+#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
+        while (Start > 0) {
+            if (Path32[Start] == '\\') { // Stop the loop because we're now in a folder
+                return Base;
+            } else if (Path32[Start] == '.') {
+                Start                 -= 1;
+                break;
+            }
+            Start                     -= 1;
+        }
+#endif
+        uint64_t BaseSize              = Path32SizeInCodeUnits - Start;
+        Base                           = UTF32_Init(BaseSize);
+        if (Base != NULL) {
+            uint64_t BaseIndex         = 0;
+            uint64_t Path32Index       = Start;
+            while (BaseIndex < BaseSize && Path32Index < Path32SizeInCodeUnits) {
+                Base[BaseIndex]        = Path32[Path32Index];
+                BaseIndex             += 1;
+            }
+        }
+        return Base;
+    }
+    
     
     TextIO_StringTypes FileIO_GetFileOrientation(PlatformIO_Immutable(FILE *) File2Orient) {
         TextIO_StringTypes StringType       = StringType_Unspecified;
@@ -45,6 +242,58 @@ extern "C" {
     }
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    uint8_t FileIO_GetEncodingSize(AsyncIOStream *Stream) {
+        uint8_t EncodingSize = 0;
+        return EncodingSize;
+    }
     
     
     
@@ -220,6 +469,8 @@ extern "C" {
         _stat64(".", &Info);
 #endif /* TargetOS */
         
+        // Why can't we just implement CWD from scratch? how does stat/_stat64/_wstat64 work?
+        
         // We need to find the current working directory, aka stat"."? Yes stat . is correct
         
         // So then all we need to do is loop like the other guy said  until we reach root, which we can do by
@@ -249,7 +500,7 @@ extern "C" {
         dev_t DeviceID;
         ino_t iNodeID;
     } FileID;
-
+    
     UTF8 *FileIO_UTF8_GetCurrentWorkingPath(void) {
         UTF8 *CurrentWorkingPath = NULL;
         /*
@@ -310,63 +561,12 @@ extern "C" {
         return CurrentWorkingPath;
     }
     
-    UTF8 *FileIO_UTF8_GetFileName(ImmutableString_UTF8 Path8) {
-        UTF8 *Base = NULL;
-        uint64_t Path8SizeInCodeUnits  = UTF8_GetStringSizeInCodeUnits(Path8);
-        uint64_t Start                 = Path8SizeInCodeUnits;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-        while (Start > 0 && Path8[Start] != '\\') {
-            Start                     -= 1;
-        }
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-        while (Start > 0 && (Path8[Start] != '\\' || Path8[Start] != '/')) {
-            Start                     -= 1;
-        }
-#endif
-        uint64_t BaseSize              = Path8SizeInCodeUnits - Start;
-        Base                           = UTF8_Init(BaseSize);
-        if (Base != NULL) {
-            uint64_t BaseIndex         = 0;
-            uint64_t Path8Index        = Start;
-            while (BaseIndex < BaseSize && Path8Index < Path8SizeInCodeUnits) {
-                Base[BaseIndex]        = Path8[Path8Index];
-                BaseIndex             += 1;
-            }
-        }
-        return Base;
-    }
-    
-    UTF16 *FileIO_UTF16_GetFileName(ImmutableString_UTF16 Path16) {
-        UTF16 *Base = NULL;
-        uint64_t Path16SizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(Path16);
-        uint64_t Start                 = Path16SizeInCodeUnits;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-        while (Start > 0 && Path16[Start] != '\\') {
-            Start                     -= 1;
-        }
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-        while (Start > 0 && (Path16[Start] != '\\' || Path16[Start] != '/')) {
-            Start                     -= 1;
-        }
-#endif
-        uint64_t BaseSize              = Path16SizeInCodeUnits - Start;
-        Base                           = UTF16_Init(BaseSize);
-        if (Base != NULL) {
-            uint64_t BaseIndex         = 0;
-            uint64_t Path16Index       = Start;
-            while (BaseIndex < BaseSize && Path16Index < Path16SizeInCodeUnits) {
-                Base[BaseIndex]        = Path16[Path16Index];
-                BaseIndex             += 1;
-            }
-        }
-        return Base;
-    }
-    
     /*!
      @abstract Dirname replacement
      */
     UTF8 *FileIO_UTF8_GetDirectoryName(ImmutableString_UTF8 Path8) {
         UTF8 *DirectoryName = NULL;
+        // Just lob off the trailing slash, filename, and extension
         return DirectoryName;
     }
     
@@ -376,102 +576,6 @@ extern "C" {
     UTF16 *FileIO_UTF16_GetDirectoryName(ImmutableString_UTF16 Path16) {
         UTF16 *DirectoryName = NULL;
         return DirectoryName;
-    }
-    
-    /*!
-     @abstract Realpath replacement
-     */
-    UTF8 *FileIO_UTF8_GetAbsolutePath(ImmutableString_UTF8 Path8) {
-        UTF8 *DirectoryName = NULL;
-        return DirectoryName;
-    }
-    
-    /*!
-     @abstract Realpath replacement
-     */
-    UTF16 *FileIO_UTF16_GetAbsolutePath(ImmutableString_UTF16 Path16) {
-        UTF16 *DirectoryName = NULL;
-        return DirectoryName;
-    }
-    
-    UTF8 *FileIO_UTF8_GetFileExtension(ImmutableString_UTF8 Path8) {
-        UTF8 *Base = NULL;
-        /*
-         if you find a '.' before a slash or after the start of the string, it has an extension.
-         Start at the end of the string, loop until you find a dot or the start of the string or a slash
-         */
-        uint64_t Path8SizeInCodeUnits  = UTF8_GetStringSizeInCodeUnits(Path8);
-        uint64_t Start                 = Path8SizeInCodeUnits;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-        while (Start > 0) {
-            if (Path8[Start] == '\\') { // Stop the loop because we're now in a folder
-                return Base;
-            } else if (Path8[Start] == '.') {
-                Start                 -= 1;
-                break;
-            }
-            Start                     -= 1;
-        }
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-        while (Start > 0) {
-            if (Path8[Start] == '\\' || Path8[Start] == '/') { // Stop the loop because we're now in a folder
-                return Base;
-            } else if (Path8[Start] == '.') {
-                Start                 -= 1;
-                break;
-            }
-            Start                     -= 1;
-        }
-#endif
-        uint64_t BaseSize              = Path8SizeInCodeUnits - Start;
-        Base                           = UTF8_Init(BaseSize);
-        if (Base != NULL) {
-            uint64_t BaseIndex         = 0;
-            uint64_t Path8Index        = Start;
-            while (BaseIndex < BaseSize && Path8Index < Path8SizeInCodeUnits) {
-                Base[BaseIndex]        = Path8[Path8Index];
-                BaseIndex             += 1;
-            }
-        }
-        return Base;
-    }
-    
-    UTF16 *FileIO_UTF16_GetFileExtension(ImmutableString_UTF16 Path16) {
-        UTF16 *Base = NULL;
-        uint64_t Path16SizeInCodeUnits = UTF16_GetStringSizeInCodeUnits(Path16);
-        uint64_t Start                 = Path16SizeInCodeUnits;
-#if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
-        while (Start > 0) {
-            if (Path16[Start] == '\\') { // Stop the loop because we're now in a folder
-                return Base;
-            } else if (Path16[Start] == '.') {
-                Start                 -= 1;
-                break;
-            }
-            Start                     -= 1;
-        }
-#elif (PlatformIO_TargetOS == PlatformIO_TargetOSIsWindows)
-        while (Start > 0) {
-            if (Path16[Start] == '\\') { // Stop the loop because we're now in a folder
-                return Base;
-            } else if (Path16[Start] == '.') {
-                Start                 -= 1;
-                break;
-            }
-            Start                     -= 1;
-        }
-#endif
-        uint64_t BaseSize              = Path16SizeInCodeUnits - Start;
-        Base                           = UTF16_Init(BaseSize);
-        if (Base != NULL) {
-            uint64_t BaseIndex         = 0;
-            uint64_t Path16Index       = Start;
-            while (BaseIndex < BaseSize && Path16Index < Path16SizeInCodeUnits) {
-                Base[BaseIndex]        = Path16[Path16Index];
-                BaseIndex             += 1;
-            }
-        }
-        return Base;
     }
     
     uint64_t FileIO_Read(PlatformIO_Immutable(FILE *) File2Read, void *Buffer, uint8_t BufferElementSize, uint64_t Elements2Read) {

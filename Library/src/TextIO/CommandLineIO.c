@@ -278,9 +278,9 @@ extern "C" {
                 NumProgressIndicatorsPerString[String] = CommandLineIO_GetTerminalWidth() - (2 + StringSize[String]);
                 uint64_t PercentComplete     = ((Numerator[String] / Denominator[String]) % 100);
                 uint64_t TerminalWidth       = CommandLineIO_GetTerminalWidth() / 2;
-                UTF8     *Indicator          = UTF8_Init(TerminalWidth);
+                UTF8    *Indicator           = UTF8_Init(TerminalWidth);
                 UTF8_Set(Indicator, '-', TerminalWidth);
-                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%U32s %llu/%llu %llu/%s%s]"), Indicator, *Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, PlatformIO_NewLine8);
+                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%l32s %llu/%llu %llu/%s%s]"), Indicator, &Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, PlatformIO_NewLine8);
                 UTF8_File_WriteString(stdout, FormattedString);
                 free(Indicator);
             }
@@ -314,11 +314,11 @@ extern "C" {
             
             for (uint64_t Switch = 0ULL; Switch < CLI->NumSwitches; Switch++) {
                 CommandLineIO_SwitchTypes CurrentSwitchType = CLI->Switches[Switch].SwitchType;
-                GeneratedHelp[Switch]   = UTF32_Format(UTF32String("%U32s: %U32s%U32s"), CLI->Switches[Switch].Name, CLI->Switches[Switch].Description, PlatformIO_NewLine32);
+                GeneratedHelp[Switch]   = UTF32_Format(UTF32String("%l32s: %l32s%l32s"), CLI->Switches[Switch].Name, CLI->Switches[Switch].Description, PlatformIO_NewLine32);
                 
                 if (CurrentSwitchType == SwitchType_Parent && CLI->Switches[Switch].NumChildren > 0) {
                     for (uint64_t Child = 0ULL; Child < CLI->Switches[Switch].NumChildren; Child++) {
-                        GeneratedHelp[Switch + Child] = UTF32_Format(UTF32String("\t%U32s: %U32s%U32s"), CLI->Switches[Child].Name, CLI->Switches[Child].Description, PlatformIO_NewLine32);
+                        GeneratedHelp[Switch + Child] = UTF32_Format(UTF32String("\t%l32s: %l32s%l32s"), CLI->Switches[Child].Name, CLI->Switches[Child].Description, PlatformIO_NewLine32);
                     }
                 }
 #if   ((PlatformIO_TargetOS & PlatformIO_TargetOSIsPOSIX) == PlatformIO_TargetOSIsPOSIX)
@@ -345,14 +345,14 @@ extern "C" {
         if (CLI != NULL) {
             UTF32 *License = NULL;
             if (CLI->LicenseType == LicenseType_Permissive || CLI->LicenseType == LicenseType_Copyleft) {
-                License = UTF32_Format(UTF32String("Released under the \"%s\" license, you can see the details of this license at: %U32s"), CLI->ProgramLicenseName != NULL ? CLI->ProgramLicenseName : PlatformIO_InvisibleString32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : PlatformIO_InvisibleString32);
+                License = UTF32_Format(UTF32String("Released under the \"%l32s\" license, you can see the details of this license at: %l32s"), CLI->ProgramLicenseName != NULL ? CLI->ProgramLicenseName : PlatformIO_InvisibleString32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : PlatformIO_InvisibleString32);
             } else if (CLI->LicenseType == LicenseType_Proprietary) {
-                License = UTF32_Format(UTF32String("By using this software, you agree to the End User License Agreement:%U32s%U32s%U32s"), PlatformIO_NewLine32, PlatformIO_NewLine32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : PlatformIO_InvisibleString32);
+                License = UTF32_Format(UTF32String("By using this software, you agree to the End User License Agreement:%l32s%l32s%l32s"), PlatformIO_NewLine32, PlatformIO_NewLine32, CLI->ProgramLicenseURL != NULL ? CLI->ProgramLicenseURL : PlatformIO_InvisibleString32);
             } else {
                 Log(Severity_USER, PlatformIO_FunctionName, UTF8String("LicenseType isn't set"));
             }
             
-            UTF32 *Banner32 = UTF32_Format(UTF32String("%U32s, v. %U32s by %U32s © %U32s, %U32s, %U32s"),
+            UTF32 *Banner32 = UTF32_Format(UTF32String("%l32s, v. %l32s by %l32s © %l32s, %l32s, %l32s"),
                                            CLI->ProgramName        != NULL ? CLI->ProgramName        : PlatformIO_InvisibleString32,
                                            CLI->ProgramVersion     != NULL ? CLI->ProgramVersion     : PlatformIO_InvisibleString32,
                                            CLI->ProgramAuthor      != NULL ? CLI->ProgramAuthor      : PlatformIO_InvisibleString32,
@@ -465,16 +465,7 @@ extern "C" {
         if (CLI != NULL && ParentID < CLI->NumSwitches && ChildID < CLI->NumSwitches) {
             if (CLI->Switches[ParentID].SwitchType == SwitchType_Parent) {
                 CLI->Switches[ParentID].NumChildren       += 1;
-                uint64_t OLD_NumChildren                   = CLI->Switches[ParentID].NumChildren;
-                uint64_t *Children_OLD                     = CLI->Switches[ParentID].Children;
                 CLI->Switches[ParentID].Children           = (uint64_t*) realloc(CLI->Switches[ParentID].Children, CLI->Switches[ParentID].NumChildren * sizeof(uint64_t));
-                if (CLI->Switches[ParentID].Children != NULL) {
-                    free(Children_OLD);
-                } else {
-                    CLI->Switches[ParentID].Children       = Children_OLD;
-                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Realloc failed"));
-                }
-                CLI->Switches[ParentID].Children[OLD_NumChildren] = ChildID;
             } else {
                 Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("ParentID %lld can not have any slaves"), ParentID);
             }
@@ -589,18 +580,7 @@ extern "C" {
                     if (UTF32_CompareSubString(ArgumentFlag, CLI->Switches[Switch].Name, 0, 0) == Yes) {
                         
                         CLI->NumOptions   += 1;
-                        if (CLI->NumOptions == 1) {
-                            CLI->Options   = (CommandLineOption*) calloc(1, sizeof(CommandLineOption));
-                        } else {
-                            CommandLineOption *Options_Old = CLI->Options;
-                            CLI->Options                   = (CommandLineOption*) realloc(CLI->Options, CLI->NumOptions * sizeof(CommandLineOption));
-                            if (CLI->Options != NULL) {
-                                free(Options_Old);
-                            } else {
-                                CLI->Options               = Options_Old;
-                                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Realloc failed"));
-                            }
-                        }
+                        CLI->Options       = (CommandLineOption*) realloc(CLI->Options, CLI->NumOptions * sizeof(CommandLineOption));
                         CLI->Options[Switch].SwitchID      = Switch;
                         
                         for (uint64_t Child = 0ULL; Child < CLI->Options[Switch].NumChildren; Child++) {
@@ -849,11 +829,11 @@ extern "C" {
         UTF32 *IntegerB  = UTF32_Integer2String(Base_Integer | Base_Radix10, Blue);
         DigitSize       += 8;
         if ((ColorType & ColorType_Foreground) == ColorType_Foreground) {
-            UTF32 *Formatted = UTF32_Format(UTF32String("%c[38;2;%d;%d;%d;m"), UTF32Character('\x1B'), IntegerR, IntegerG, IntegerB);
+            UTF32 *Formatted = UTF32_Format(UTF32String("%l32c[38;2;%l32s;%l32s;%l32s;m"), U'\x1B', IntegerR, IntegerG, IntegerB);
             Colorized        = UTF32_Insert(String, Formatted, 0);
             UTF32_Deinit(Formatted);
         } else if ((ColorType & ColorType_Background) == ColorType_Background) {
-            UTF32 *Formatted = UTF32_Format(UTF32String("%c[48;2;%d;%d;%dm"), UTF32Character('\x1B'), IntegerR, IntegerG, IntegerB);
+            UTF32 *Formatted = UTF32_Format(UTF32String("%l32c[48;2;%l32s;%l32s;%l32s:m"), UTF32Character('\x1B'), IntegerR, IntegerG, IntegerB);
             Colorized        = UTF32_Insert(String, Formatted, 0);
             UTF32_Deinit(Formatted);
         }

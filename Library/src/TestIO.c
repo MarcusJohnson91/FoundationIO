@@ -46,15 +46,8 @@ extern "C" {
 
     static void RunTests_ReallocateHelper(TestSuite *Suite) {
         if (Suite != NULL) {
-            uint64_t *OLD_Failures = Suite->UnexpectedFailues;
-            uint64_t *New_Failures = realloc(Suite->UnexpectedFailues, sizeof(uint64_t) * Suite->UnexpectedFailureSize * 2);
-            if (New_Failures != NULL) {
-                Suite->UnexpectedFailues      = New_Failures;
-                Suite->UnexpectedFailureSize *= 2;
-                free(OLD_Failures);
-            } else {
-                free(New_Failures);
-            }
+            realloc(Suite->UnexpectedFailues, sizeof(uint64_t) * Suite->UnexpectedFailureSize * 2);
+            Suite->UnexpectedFailureSize *= 2;
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("TestSuite Pointer is NULL"));
         }

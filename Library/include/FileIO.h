@@ -36,18 +36,35 @@ extern "C" {
      @param             Path16                          Path is a UTF16 encoded string.
      */
     UTF16              *FileIO_UTF16_GetFileName(ImmutableString_UTF16 Path16);
+    
+    /*!
+     @abstract                                          Returns just the filename portion of a path string
+     @remark                                            Equilivent to `basename` command
+     @remark                                            On Windows checks '/' and '\' as directory seperators, on POSIX checks '\'
+     @param             Path32                          Path is a UTF32 encoded string.
+     */
+    UTF32              *FileIO_UTF32_GetFileName(ImmutableString_UTF32 Path32);
 
     /*!
      @abstract                                         Returns the extension from a filename
+     @remark                                           Stops at the earliest period, e.g. '.tar.gz' is extracted properly
      @param             Path8                          Path is a UTF8 encoded string
      */
     UTF8               *FileIO_UTF8_GetFileExtension(ImmutableString_UTF8 Path8);
 
     /*!
      @abstract                                         Returns the extension from a filename
+     @remark                                           Stops at the earliest period, e.g. '.tar.gz' is extracted properly
      @param             Path16                         Path is a UTF16 encoded string
      */
     UTF16              *FileIO_UTF16_GetFileExtension(ImmutableString_UTF16 Path16);
+    
+    /*!
+     @abstract                                         Returns the extension from a filename
+     @remark                                           Stops at the earliest period, e.g. '.tar.gz' is extracted properly
+     @param             Path32                         Path is a UTF32 encoded string
+     */
+    UTF32              *FileIO_UTF32_GetFileExtension(ImmutableString_UTF32 Path32);
     /* Path Operations */
 
     /* File Operations */
@@ -66,10 +83,19 @@ extern "C" {
 
     /*!
      @abstract                                          Gets the size of the Stream
-     @param             AsyncIOStream                    FileIO_Input or FileIO_Output
+     @param             AsyncIOStream                   FileIO_Input or FileIO_Output
      @return                                            Returns the size of the file
      */
     int64_t             FileIO_GetSize(PlatformIO_Immutable(void *) AsyncIOStream);
+    
+    /*!
+     @abstract                                          Gets the size of the elements in the Stream
+     @remark                                            Primarily intended for character type identification, 8/16/32 bit characters
+     @remark                                            Size is in bytes
+     @param             Stream                          FileIO_Input or FileIO_Output
+     @return                                            Returns the size of the file's elements
+     */
+    uint8_t             FileIO_GetEncodingSize(AsyncIOStream *Stream);
 
     /*!
      @abstract                                          Reads data from a file.

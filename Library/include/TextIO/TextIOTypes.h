@@ -469,7 +469,7 @@ typedef                   char32_t                             CharSet32;
 #endif
 #elif (PlatformIO_Language == PlatformIO_LanguageIsC)
 #define                   UTF32String(Literal)                  (ImmutableString_UTF32) U##Literal
-#define                   UTF32Character(Literal)               (ImmutableChar_UTF32) U##Literal
+#define                   UTF32Character(Literal)               U##Literal
 #endif /* PlatformIO_Language */
 #endif /* FoundationIO_Unicodize32 */
 
@@ -517,22 +517,22 @@ typedef                   char32_t                             CharSet32;
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX && PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
     extern "C++" {
         constexpr inline TextIO_Bases operator | (TextIO_Bases A, TextIO_Bases B) {
-            return static_cast<TextIO_Bases>(static_cast<uint16_t>(A) | static_cast<uint16_t>(B));
+            return static_cast<TextIO_Bases>(static_cast<int>(A) | static_cast<int>(B));
         }
 
         constexpr inline TextIO_Bases operator & (TextIO_Bases A, TextIO_Bases B) {
-            return static_cast<TextIO_Bases>(static_cast<uint16_t>(A) & static_cast<uint16_t>(B));
+            return static_cast<TextIO_Bases>(static_cast<int>(A) & static_cast<int>(B));
         }
 
         constexpr inline TextIO_Bases operator |= (TextIO_Bases A, TextIO_Bases B) {
-            uint16_t A1 = static_cast<uint16_t>(A);
-            uint16_t B1 = static_cast<uint16_t>(B);
+            uint16_t A1 = static_cast<int>(A);
+            uint16_t B1 = static_cast<int>(B);
             return static_cast<TextIO_Bases>(A1 | B1);
         }
 
         constexpr inline TextIO_Bases operator &= (TextIO_Bases A, TextIO_Bases B) {
-            uint16_t A1 = static_cast<uint16_t>(A);
-            uint16_t B1 = static_cast<uint16_t>(B);
+            uint16_t A1 = static_cast<int>(A);
+            uint16_t B1 = static_cast<int>(B);
             return static_cast<TextIO_Bases>(A1 & B1);
         }
     }

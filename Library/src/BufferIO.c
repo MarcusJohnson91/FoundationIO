@@ -149,14 +149,7 @@ extern "C" {
             int64_t  AlignmentSizeInBits = Bytes2Bits(AlignmentSize);
             int64_t  Bits2Align          = AlignmentSizeInBits - (BitB->BitOffset % AlignmentSizeInBits);
             if (BitB->BitOffset + Bits2Align > BitB->NumBits) {
-                uint8_t *Buffer_Old      = BitB->Buffer;
                 BitB->Buffer             = (uint8_t*) realloc(BitB->Buffer, Bits2Bytes(RoundingType_Up, BitB->NumBits + Bits2Align));
-                if (BitB->Buffer != NULL) {
-                    free(Buffer_Old);
-                } else {
-                    BitB->Buffer         = Buffer_Old;
-                    Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Realloc failed"));
-                }
                 BitB->NumBits           += Bits2Align;
             }
             BitB->BitOffset             += Bits2Align;
@@ -263,16 +256,9 @@ extern "C" {
     
     void BitBuffer_Resize(BitBuffer *BitB, uint64_t NewSize) {
         if (BitB != NULL && NewSize * 8 >= BitB->BitOffset) {
-            uint8_t *Buffer_Old = BitB->Buffer;
-            BitB->Buffer        = (uint8_t*) realloc(BitB->Buffer, NewSize);
-            if (BitB->Buffer != NULL) {
-                BitB->BitOffset = 0;
-                BitB->NumBits   = NewSize * 8;
-                free(Buffer_Old);
-            } else {
-                BitB->Buffer    = Buffer_Old;
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Realloc failed"));
-            }
+            BitB->Buffer    = (uint8_t*) realloc(BitB->Buffer, NewSize);
+            BitB->BitOffset = 0;
+            BitB->NumBits   = NewSize * 8;
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         }
@@ -510,7 +496,7 @@ extern "C" {
         if (BitB != NULL && Length >= 1 && Length <= 64) {
             BitBuffer_Seek(BitB, BitB->BitOffset - Length);
             uint64_t Data    = BitBuffer_ReadBits(BitB, ByteOrder_LSByteIsFarthest, BitOrder_LSBitIsFarthest, Length);
-            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %P, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), &BitB, BitB->NumBits, BitB->BitOffset, Data);
+            BitBufferString  = UTF32_Format(UTF32String("BitBuffer: %X, NumBits: %llu, BitOffset: %llu, Buffer: %llX"), &BitB, BitB->NumBits, BitB->BitOffset, Data);
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
         } else if (Length == 0) {
