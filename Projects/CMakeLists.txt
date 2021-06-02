@@ -59,13 +59,17 @@ set(LIBRARY_SOURCE
 "${LIBRARY_DIRECTORY}/src/MathIO.c"
 "${LIBRARY_DIRECTORY}/src/NetworkIO.c"
 "${LIBRARY_DIRECTORY}/src/PlatformIO.c"
-"${LIBRARY_DIRECTORY}/src/TestIO.c"
 "${LIBRARY_DIRECTORY}/src/TextIO/CommandLineIO.c"
 "${LIBRARY_DIRECTORY}/src/TextIO/FormatIO.c"
 "${LIBRARY_DIRECTORY}/src/TextIO/LocalizationIO.c"
 "${LIBRARY_DIRECTORY}/src/TextIO/LogIO.c"
 "${LIBRARY_DIRECTORY}/src/TextIO/StringIO.c"
 )
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    set(LIBRARY_SOURCE "${LIBRARY_SOURCE}" "${LIBRARY_DIRECTORY}/src/TestIO.c") #Only compile TestIO into FoundationIO if we're in debug mode and linking the test programs
+endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+
 
 set(PRIVATE_SOURCE
 "${LIBRARY_DIRECTORY}/src/TextIO/Private/TextIOTables.c"
