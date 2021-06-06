@@ -428,10 +428,10 @@ CreateTables() {
 }
 
 DownloadUCD() {
-	ZipFileSize=$(curl -sI "https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" | grep "Content-Length: " | awk '{printf $2}' | sed "s/$(printf '\r')\$//")
+	ZipFileSize=$(curl -I "http://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" | grep "Content-Length: " | cut -d' ' -f2 | tr -d '\r')
     if [ "$ZipFileSize" -lt "$FreeSpaceInBytes" ]; then
-        curl -s -N "https://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" -o "$TempFolder/ucd.all.flat.zip"
-        ZipUncompressedSize=$(zipinfo "$TempFolder/ucd.all.flat.zip" | tail -n 1 | awk '{printf $3}' | sed "s/$(printf '\r')\$//")
+        curl -s -N "http://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip" -o "$TempFolder/ucd.all.flat.zip"
+        ZipUncompressedSize=$(zipinfo "$TempFolder/ucd.all.flat.zip" | tail -n 1 | awk '{printf $3}') # sed "s/$(printf '\r')\$//"
         if [ "$ZipUncompressedSize" -le "$FreeSpaceInBytes" ]; then
             unzip -q "$TempFolder/ucd.all.flat.zip" -d "$TempFolder"
             rm -f "$TempFolder/ucd.all.flat.zip"
@@ -448,7 +448,7 @@ DownloadUCD() {
 
 CheckUnicodeVersion() {
     # Download the ReadMe, read the Tables Unicode version, do the thang
-    ReadmeSize=$(curl -sI "https://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt" | grep "Content-Length: " | awk '{printf $2}' | sed "s/$(printf '\r')\$//")
+    ReadmeSize=$(curl -I "http://www.unicode.org/Public/UCD/latest/ucdxml/ucdxml.readme.txt" | grep "Content-Length: " | awk '{printf $2}' | cut -c 6-)
     if [ "$ReadmeSize" -lt "$FreeSpaceInBytes" ]; then
         ReadmeUnicodeVMajor=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $1}')
         ReadmeUnicodeVMinor=$(echo "$ReadmeUnicodeVersion" | awk -F "." '{printf $2}')
