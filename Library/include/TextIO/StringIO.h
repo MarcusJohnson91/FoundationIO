@@ -128,6 +128,19 @@ extern "C" {
     } StringIO_TruncationTypes;
     
     /*!
+     @enum         StringIO_WhitespaceTypes
+     @abstract                                           Should whitespace be ignored or not?
+     @constant     WhitespaceType_Unspecified            Unknown TrimString command.
+     @constant     WhitespaceType_Insignificant          Ignore whitespace.
+     @constant     WhitespaceType_Significant            Whitespace matters, don't ignore it.
+     */
+    typedef enum StringIO_WhitespaceTypes {
+                   WhitespaceType_Unspecified            = 0,
+                   WhitespaceType_Insignificant          = 1,
+                   WhitespaceType_Significant            = 2,
+    } StringIO_WhitespaceTypes;
+    
+    /*!
      @typedef          StringSlice
      @abstract                                           Contains the start and end position in codeunits of a string for UTF8, UTF16, and UTF32
      */
@@ -1069,6 +1082,36 @@ extern "C" {
      @param            String                            A string to reverse.
      */
     UTF32             *UTF32_Reverse(ImmutableString_UTF32 String);
+    
+    /*!
+     @abstract                                           Finds a substring
+     @param            String                            The String to search.
+     @param            StringLength                      The size of the String in CodeUnits.
+     @param            String2Find                       What to search the String for.
+     @param            WhitespaceType                    How to handle whitespace.
+     @return                                             Returns the offset of the start of String2Find, or -1.
+     */
+    size_t             UTF8_Find(UTF8 *String, size_t StringLength, UTF8 *String2Find, StringIO_WhitespaceTypes WhitespaceType);
+    
+    /*!
+     @abstract                                           Finds a substring
+     @param            String                            The String to search.
+     @param            StringLength                      The size of the String in CodeUnits.
+     @param            String2Find                       What to search the String for.
+     @param            WhitespaceType                    How to handle whitespace.
+     @return                                             Returns the offset of the start of String2Find, or -1.
+     */
+    size_t             UTF16_Find(UTF16 *String, size_t StringLength, UTF16 *String2Find, StringIO_WhitespaceTypes WhitespaceType);
+    
+    /*!
+     @abstract                                           Finds a substring
+     @param            String                            The String to search.
+     @param            StringLength                      The size of the String in CodeUnits.
+     @param            String2Find                       What to search the String for.
+     @param            WhitespaceType                    How to handle whitespace.
+     @return                                             Returns the offset of the start of String2Find, or -1.
+     */
+    size_t             UTF32_Find(UTF32 *String, size_t StringLength, UTF32 *String2Find, StringIO_WhitespaceTypes WhitespaceType);
     
     /*!
      @abstract                                           Reads a Grapheme from Source.

@@ -2000,6 +2000,81 @@ extern "C" {
         return Reverse;
     }
     
+    size_t UTF8_Find(UTF8 *String, size_t StringLength, UTF8 *String2Find, StringIO_WhitespaceTypes WhitespaceType) {
+        size_t Offset = 0;
+        uint64_t String2FindSize = UTF8_GetStringSizeInCodeUnits(String2Find);
+        if (StringLength >= String2FindSize) {
+            if (WhitespaceType == WhitespaceType_Insignificant) {
+                while (UTF8_IsWordBreak(&String[Offset])) {
+                    Offset += 1;
+                }
+            } else if (WhitespaceType == WhitespaceType_Unspecified) {
+                Log(Severity_USER, PlatformIO_FunctionName, UTF8String("WhitespaceType_Unspecified is invalid"));
+            }
+            
+            for (uint64_t SubCodePoint = 0ULL; SubCodePoint < String2FindSize; SubCodePoint++) {
+                for (uint64_t StringCodePoint = Offset; StringCodePoint < Offset + StringLength; StringCodePoint++) {
+                    if (String[StringCodePoint] != String2Find[SubCodePoint]) {
+                        Offset = SubCodePoint;
+                    }
+                }
+            }
+        } else {
+            Log(Severity_USER, PlatformIO_FunctionName, UTF8String("StringLength %zu is smaller than String2Find %llu"), StringLength, String2FindSize);
+        }
+        return Offset;
+    }
+    
+    size_t UTF16_Find(UTF16 *String, size_t StringLength, UTF16 *String2Find, StringIO_WhitespaceTypes WhitespaceType) {
+        size_t Offset = 0;
+        uint64_t String2FindSize = UTF16_GetStringSizeInCodeUnits(String2Find);
+        if (StringLength >= String2FindSize) {
+            if (WhitespaceType == WhitespaceType_Insignificant) {
+                while (UTF16_IsWordBreak(String[Offset])) {
+                    Offset += 1;
+                }
+            } else if (WhitespaceType == WhitespaceType_Unspecified) {
+                Log(Severity_USER, PlatformIO_FunctionName, UTF8String("WhitespaceType_Unspecified is invalid"));
+            }
+            
+            for (uint64_t SubCodePoint = 0ULL; SubCodePoint < String2FindSize; SubCodePoint++) {
+                for (uint64_t StringCodePoint = Offset; StringCodePoint < Offset + StringLength; StringCodePoint++) {
+                    if (String[StringCodePoint] != String2Find[SubCodePoint]) {
+                        Offset = SubCodePoint;
+                    }
+                }
+            }
+        } else {
+            Log(Severity_USER, PlatformIO_FunctionName, UTF8String("StringLength %zu is smaller than String2Find %llu"), StringLength, String2FindSize);
+        }
+        return Offset;
+    }
+    
+    size_t UTF32_Find(UTF32 *String, size_t StringLength, UTF32 *String2Find, StringIO_WhitespaceTypes WhitespaceType) {
+        size_t Offset = 0;
+        uint64_t String2FindSize = UTF32_GetStringSizeInCodePoints(String2Find);
+        if (StringLength >= String2FindSize) {
+            if (WhitespaceType == WhitespaceType_Insignificant) {
+                while (UTF32_IsWordBreak(String[Offset])) {
+                    Offset += 1;
+                }
+            } else if (WhitespaceType == WhitespaceType_Unspecified) {
+                Log(Severity_USER, PlatformIO_FunctionName, UTF8String("WhitespaceType_Unspecified is invalid"));
+            }
+            
+            for (uint64_t SubCodePoint = 0ULL; SubCodePoint < String2FindSize; SubCodePoint++) {
+                for (uint64_t StringCodePoint = Offset; StringCodePoint < Offset + StringLength; StringCodePoint++) {
+                    if (String[StringCodePoint] != String2Find[SubCodePoint]) {
+                        Offset = SubCodePoint;
+                    }
+                }
+            }
+        } else {
+            Log(Severity_USER, PlatformIO_FunctionName, UTF8String("StringLength %zu is smaller than String2Find %llu"), StringLength, String2FindSize);
+        }
+        return Offset;
+    }
+    
     int64_t UTF8_FindSubString(ImmutableString_UTF8 String, ImmutableString_UTF8 SubString, uint64_t Offset, int64_t Length) {
         int64_t FoundOffset    = 0LL;
         if (String != NULL && SubString != NULL) {
