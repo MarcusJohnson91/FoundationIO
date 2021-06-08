@@ -420,6 +420,27 @@ extern "C" {
     bool               UTF32_HasBOM(ImmutableString_UTF32 String);
     
     /*!
+     @abstract                                           Is this codepoint a wordbreak.
+     @param            CodePoint                         The CodePoint to get the status from.
+     @return                                             Returns Yes if the CodePoint is a wordbreak, otherwise it returns No.
+     */
+    bool               UTF8_IsWordBreak(const UTF8 *CodePoint);
+    
+    /*!
+     @abstract                                           Is this codepoint a wordbreak.
+     @param            CodePoint                         The CodePoint to get the status from.
+     @return                                             Returns Yes if the CodePoint is a wordbreak, otherwise it returns No.
+     */
+    bool               UTF16_IsWordBreak(const UTF16 CodePoint);
+    
+    /*!
+     @abstract                                           Is this codepoint a wordbreak.
+     @param            CodePoint                         The CodePoint to get the status from.
+     @return                                             Returns Yes if the CodePoint is a wordbreak, otherwise it returns No.
+     */
+    bool               UTF32_IsWordBreak(const UTF32 CodePoint);
+    
+    /*!
      @abstract                                           Adds the BOM to the UTF-8 string, UTF-8's only valid BOM is BE.
      @param            String                            The string to add the BOM to.
      */

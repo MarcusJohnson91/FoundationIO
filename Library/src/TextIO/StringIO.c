@@ -595,6 +595,12 @@ extern "C" {
         StringIO_PreallocateCodePoint_UTF8[4] = 0;
     }
     
+    static void UTF16_Clear_Preallocated(void) {
+        StringIO_PreallocateCodePoint_UTF16[0] = 0;
+        StringIO_PreallocateCodePoint_UTF16[1] = 0;
+        StringIO_PreallocateCodePoint_UTF16[2] = 0;
+    }
+    
     UTF8 *UTF8_ExtractCodePoint(ImmutableString_UTF8 String) {
         UTF8 *CodeUnits                                   = NULL;
         if (String != NULL && String[0] != PlatformIO_NULLTerminator) {
@@ -628,12 +634,6 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return CodeUnits;
-    }
-    
-    static void UTF16_Clear_Preallocated(void) {
-        StringIO_PreallocateCodePoint_UTF16[0] = 0;
-        StringIO_PreallocateCodePoint_UTF16[1] = 0;
-        StringIO_PreallocateCodePoint_UTF16[2] = 0;
     }
     
     UTF16 *UTF16_ExtractCodePoint(ImmutableString_UTF16 String) {
@@ -762,6 +762,37 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("String Pointer is NULL"));
         }
         return StringHasABOM;
+    }
+    
+    bool UTF8_IsWordBreak(const UTF8 *CodePoint) {
+        bool IsWordBreak = false;
+        UTF32 *Decoded = UTF8_Decode(CodePoint);
+        for (uint8_t TableCodePoint = 0; TableCodePoint < WordBreakTableSize; TableCodePoint++) {
+            if (Decoded[0] == WordBreakTable[TableCodePoint]) {
+                IsWordBreak = true;
+            }
+        }
+        return IsWordBreak;
+    }
+    
+    bool UTF16_IsWordBreak(const UTF16 CodePoint) {
+        bool IsWordBreak = false;
+        for (uint8_t TableCodePoint = 0; TableCodePoint < WordBreakTableSize; TableCodePoint++) {
+            if (CodePoint == WordBreakTable[TableCodePoint]) {
+                IsWordBreak = true;
+            }
+        }
+        return IsWordBreak;
+    }
+    
+    bool UTF32_IsWordBreak(const UTF32 CodePoint) {
+        bool IsWordBreak = false;
+        for (uint8_t TableCodePoint = 0; TableCodePoint < WordBreakTableSize; TableCodePoint++) {
+            if (CodePoint == WordBreakTable[TableCodePoint]) {
+                IsWordBreak = true;
+            }
+        }
+        return IsWordBreak;
     }
     
     bool UTF8_IsUNCPath(ImmutableString_UTF8 String) {
