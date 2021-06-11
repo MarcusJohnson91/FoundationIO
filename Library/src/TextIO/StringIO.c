@@ -794,6 +794,219 @@ extern "C" {
         }
         return IsWordBreak;
     }
+  
+    bool UTF8_String2Bool(UTF8 *String) {
+        bool   Boolean  = false;
+        size_t CodeUnit = 0;
+        while (String[CodeUnit] != PlatformIO_NULLTerminator) {
+            if (String[CodeUnit] == '1') {
+                Boolean = true;
+                break;
+            } else if (String[CodeUnit] == '0') {
+                Boolean = false;
+                break;
+            } else if (String[CodeUnit] == 'N' || String[CodeUnit] == 'n') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'O' || String[CodeUnit] == 'o') {
+                    Boolean = true;
+                    break;
+                }
+            } else if (String[CodeUnit] == 'O' || String[CodeUnit] == 'o') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'N' || String[CodeUnit] == 'n') {
+                    Boolean = true;
+                    break;
+                }
+            } else if (String[CodeUnit] == 'O' || String[CodeUnit] == 'o') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'F' || String[CodeUnit] == 'f') {
+                    CodeUnit += 1;
+                    if (String[CodeUnit] == 'F' || String[CodeUnit] == 'f') {
+                        Boolean = true;
+                        break;
+                    }
+                }
+            } else if (String[CodeUnit] == 'Y' || String[CodeUnit] == 'y') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'E' || String[CodeUnit] == 'e') {
+                    CodeUnit += 1;
+                    if (String[CodeUnit] == 'S' || String[CodeUnit] == 's') {
+                        Boolean = true;
+                        break;
+                    }
+                }
+            } else if (String[CodeUnit] == 'T' || String[CodeUnit] == 't') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'R' || String[CodeUnit] == 'r') {
+                    CodeUnit += 1;
+                    if (String[CodeUnit] == 'U' || String[CodeUnit] == 'u') {
+                        CodeUnit += 1;
+                        if (String[CodeUnit] == 'E' || String[CodeUnit] == 'e') {
+                            Boolean = true;
+                            break;
+                        }
+                    }
+                }
+            } else if (String[CodeUnit] == 'F' || String[CodeUnit] == 'f') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'A' || String[CodeUnit] == 'a') {
+                    CodeUnit += 1;
+                    if (String[CodeUnit] == 'L' || String[CodeUnit] == 'l') {
+                        CodeUnit += 1;
+                        if (String[CodeUnit] == 'S' || String[CodeUnit] == 's') {
+                            CodeUnit += 1;
+                            if (String[CodeUnit] == 'E' || String[CodeUnit] == 'e') {
+                                CodeUnit += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Boolean;
+    }
+    
+    bool UTF16_String2Bool(UTF16 *String) {
+        bool   Boolean  = false;
+        size_t CodeUnit = 0;
+        while (String[CodeUnit] != PlatformIO_NULLTerminator) {
+            if (String[CodeUnit] == '1') {
+                Boolean = true;
+                break;
+            } else if (String[CodeUnit] == '0') {
+                Boolean = false;
+                break;
+            } else if (String[CodeUnit] == 'N' || String[CodeUnit] == 'n') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'O' || String[CodeUnit] == 'o') {
+                    Boolean = true;
+                    break;
+                }
+            } else if (String[CodeUnit] == 'O' || String[CodeUnit] == 'o') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'N' || String[CodeUnit] == 'n') {
+                    Boolean = true;
+                    break;
+                }
+            } else if (String[CodeUnit] == 'O' || String[CodeUnit] == 'o') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'F' || String[CodeUnit] == 'f') {
+                    CodeUnit += 1;
+                    if (String[CodeUnit] == 'F' || String[CodeUnit] == 'f') {
+                        Boolean = true;
+                        break;
+                    }
+                }
+            } else if (String[CodeUnit] == 'Y' || String[CodeUnit] == 'y') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'E' || String[CodeUnit] == 'e') {
+                    CodeUnit += 1;
+                    if (String[CodeUnit] == 'S' || String[CodeUnit] == 's') {
+                        Boolean = true;
+                        break;
+                    }
+                }
+            } else if (String[CodeUnit] == 'T' || String[CodeUnit] == 't') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'R' || String[CodeUnit] == 'r') {
+                    CodeUnit += 1;
+                    if (String[CodeUnit] == 'U' || String[CodeUnit] == 'u') {
+                        CodeUnit += 1;
+                        if (String[CodeUnit] == 'E' || String[CodeUnit] == 'e') {
+                            Boolean = true;
+                            break;
+                        }
+                    }
+                }
+            } else if (String[CodeUnit] == 'F' || String[CodeUnit] == 'f') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'A' || String[CodeUnit] == 'a') {
+                    CodeUnit += 1;
+                    if (String[CodeUnit] == 'L' || String[CodeUnit] == 'l') {
+                        CodeUnit += 1;
+                        if (String[CodeUnit] == 'S' || String[CodeUnit] == 's') {
+                            CodeUnit += 1;
+                            if (String[CodeUnit] == 'E' || String[CodeUnit] == 'e') {
+                                CodeUnit += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Boolean;
+    }
+    
+    bool UTF32_String2Bool(UTF32 *String) {
+        bool   Boolean  = false;
+        size_t CodeUnit = 0;
+        while (String[CodeUnit] != PlatformIO_NULLTerminator) {
+            if (String[CodeUnit] == '1') {
+                Boolean = true;
+                break;
+            } else if (String[CodeUnit] == '0') {
+                Boolean = false;
+                break;
+            } else if (String[CodeUnit] == 'N' || String[CodeUnit] == 'n') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'O' || String[CodeUnit] == 'o') {
+                    Boolean = true;
+                    break;
+                }
+            } else if (String[CodeUnit] == 'O' || String[CodeUnit] == 'o') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'N' || String[CodeUnit] == 'n') {
+                    Boolean = true;
+                    break;
+                }
+            } else if (String[CodeUnit] == 'O' || String[CodeUnit] == 'o') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'F' || String[CodeUnit] == 'f') {
+                    CodeUnit += 1;
+                    if (String[CodeUnit] == 'F' || String[CodeUnit] == 'f') {
+                        Boolean = true;
+                        break;
+                    }
+                }
+            } else if (String[CodeUnit] == 'Y' || String[CodeUnit] == 'y') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'E' || String[CodeUnit] == 'e') {
+                    CodeUnit += 1;
+                    if (String[CodeUnit] == 'S' || String[CodeUnit] == 's') {
+                        Boolean = true;
+                        break;
+                    }
+                }
+            } else if (String[CodeUnit] == 'T' || String[CodeUnit] == 't') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'R' || String[CodeUnit] == 'r') {
+                    CodeUnit += 1;
+                    if (String[CodeUnit] == 'U' || String[CodeUnit] == 'u') {
+                        CodeUnit += 1;
+                        if (String[CodeUnit] == 'E' || String[CodeUnit] == 'e') {
+                            Boolean = true;
+                            break;
+                        }
+                    }
+                }
+            } else if (String[CodeUnit] == 'F' || String[CodeUnit] == 'f') {
+                CodeUnit += 1;
+                if (String[CodeUnit] == 'A' || String[CodeUnit] == 'a') {
+                    CodeUnit += 1;
+                    if (String[CodeUnit] == 'L' || String[CodeUnit] == 'l') {
+                        CodeUnit += 1;
+                        if (String[CodeUnit] == 'S' || String[CodeUnit] == 's') {
+                            CodeUnit += 1;
+                            if (String[CodeUnit] == 'E' || String[CodeUnit] == 'e') {
+                                CodeUnit += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Boolean;
+    }
     
     bool UTF8_IsUNCPath(ImmutableString_UTF8 String) {
         bool StringIsUNCPath = No;

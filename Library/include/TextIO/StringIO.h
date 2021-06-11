@@ -321,6 +321,24 @@ extern "C" {
     uint64_t           UTF32_GetStringSizeInGraphemes(ImmutableString_UTF32 String);
     
     /*!
+     @abstract                                           Converts yes/no/true/false/on/off/1/0 to true or false.
+     @param            String                            The string to convert to a bool.
+     */
+    bool               UTF8_String2Bool(UTF8 *String);
+    
+    /*!
+     @abstract                                           Converts yes/no/true/false/on/off/1/0 to true or false.
+     @param            String                            The string to convert to a bool.
+     */
+    bool               UTF16_String2Bool(UTF16 *String);
+    
+    /*!
+     @abstract                                           Converts yes/no/true/false/on/off/1/0 to true or false.
+     @param            String                            The string to convert to a bool.
+     */
+    bool               UTF32_String2Bool(UTF32 *String);
+    
+    /*!
      @abstract                                           Tells if the string pointed to by String has "//?/" right after the BOM, if it exists.
      @param            String                            The string to check.
      @return                                             Returns Yes if the string contains "//?/", otherwise it returns No.

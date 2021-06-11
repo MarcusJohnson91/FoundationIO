@@ -712,60 +712,8 @@ extern "C" {
     int8_t CommandLineIO_ConvertBoolString(CommandLineIO *CLI, uint64_t OptionID) {
         int8_t Value = -1;
         if (CLI != NULL && OptionID < CLI->NumOptions) {
-            switch (CLI->Options[OptionID].Argument[0]) {
-                case U'0':
-                    Value = 0;
-                    break;
-                case U'1':
-                    Value = 1;
-                    break;
-                case U'N':
-                case U'n':
-                    if (CLI->Options[OptionID].Argument[1] != PlatformIO_NULLTerminator &&
-                        (CLI->Options[OptionID].Argument[1] == UTF32Character('O') || CLI->Options[OptionID].Argument[1] == UTF32Character('o'))) {
-                        Value = 0;
-                    }
-                    break;
-                case U'Y':
-                case U'y':
-                    if (CLI->Options[OptionID].Argument[1] != PlatformIO_NULLTerminator &&
-                        (CLI->Options[OptionID].Argument[1] == UTF32Character('E') || CLI->Options[OptionID].Argument[1] == UTF32Character('e'))) {
-                        if (CLI->Options[OptionID].Argument[2] != PlatformIO_NULLTerminator &&
-                            (CLI->Options[OptionID].Argument[2] == UTF32Character('S') || CLI->Options[OptionID].Argument[2] == UTF32Character('s'))) {
-                            Value = 1;
-                        }
-                    }
-                    break;
-                case U'T':
-                case U't':
-                    if (CLI->Options[OptionID].Argument[1] != PlatformIO_NULLTerminator &&
-                        (CLI->Options[OptionID].Argument[1] == UTF32Character('R') || CLI->Options[OptionID].Argument[1] == UTF32Character('r'))) {
-                        if (CLI->Options[OptionID].Argument[2] != PlatformIO_NULLTerminator &&
-                            (CLI->Options[OptionID].Argument[2] == UTF32Character('U') || CLI->Options[OptionID].Argument[2] == UTF32Character('u'))) {
-                            if (CLI->Options[OptionID].Argument[3] != PlatformIO_NULLTerminator &&
-                                (CLI->Options[OptionID].Argument[3] == UTF32Character('E') || CLI->Options[OptionID].Argument[3] == UTF32Character('E'))) {
-                                Value = 1;
-                            }
-                        }
-                    }
-                    break;
-                case U'F':
-                case U'f':
-                    if (CLI->Options[OptionID].Argument[1] != PlatformIO_NULLTerminator &&
-                        (CLI->Options[OptionID].Argument[1] == UTF32Character('A') || CLI->Options[OptionID].Argument[1] == UTF32Character('a'))) {
-                        if (CLI->Options[OptionID].Argument[2] != PlatformIO_NULLTerminator &&
-                            (CLI->Options[OptionID].Argument[2] == UTF32Character('L') || CLI->Options[OptionID].Argument[2] == UTF32Character('l'))) {
-                            if (CLI->Options[OptionID].Argument[3] != PlatformIO_NULLTerminator &&
-                                (CLI->Options[OptionID].Argument[3] == UTF32Character('S') || CLI->Options[OptionID].Argument[3] == UTF32Character('s'))) {
-                                if (CLI->Options[OptionID].Argument[3] != PlatformIO_NULLTerminator &&
-                                    (CLI->Options[OptionID].Argument[3] == UTF32Character('E') || CLI->Options[OptionID].Argument[3] == UTF32Character('E'))) {
-                                    Value = 0;
-                                }
-                            }
-                        }
-                    }
-                    break;
-            }
+            bool Bool = UTF32_String2Bool(CLI->Options[OptionID].Argument);
+            Value = Bool == false ? -1 : true;
         } else if (CLI == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         } else if (OptionID >= CLI->NumOptions) {
