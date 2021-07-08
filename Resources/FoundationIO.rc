@@ -28,14 +28,14 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-		    VALUE "CompanyName",         "github.com/MarcusJohnson91\0"
-            VALUE "FileDescription",     "Platform Independent Base Library\0"
-            VALUE "FileVersion",          VERSION_STRING
-			VALUE "InternalName",        "FoundationIO\0"
-            VALUE "LegalCopyright",      "© Marcus Johnson, 2015+\0"
-            VALUE "OriginalFilename",    "FoundationIO.dll\0"
-            VALUE "ProductName",         "FoundationIO\0"
-            VALUE "ProductVersion",       VERSION_STRING
+			VALUE "ProductName",         "FoundationIO"
+			VALUE "InternalName",        "FoundationIO"
+			VALUE "OriginalFilename",    "FoundationIO.dll"
+			VALUE "FileDescription",     "Platform Independent Base Library"
+			VALUE "LegalCopyright",      "© Marcus Johnson, 2015+"
+		    VALUE "CompanyName",         "github.com/MarcusJohnson91"
+            VALUE "ProductVersion",       HUMAN_VERSION_STRING
+			VALUE "FileVersion",          HUMAN_VERSION_STRING
         END
 	END
 	BLOCK "VarFileInfo"
