@@ -170,6 +170,9 @@ ${CMAKE_C_FLAGS} \
 -Wno-sign-conversion \
 -Wenum-conversion \
 -Wswitch-enum \
+-Bsymbolic \
+-fno-semantic-interposition \
+-fvisibility-inlines-hidden \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
@@ -255,6 +258,9 @@ ${CMAKE_C_FLAGS} \
 -Wmissing-format-attribute \
 -Wmissing-noreturn \
 -Wswitch-enum \
+-Bsymbolic \
+-fno-semantic-interposition \
+-fvisibility-inlines-hidden \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \

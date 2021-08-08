@@ -91,12 +91,29 @@ extern "C" {
                    StringTerminator_NULL           = 1,
                    StringTerminator_Sized          = 2,
     } BufferIO_StringTerminators;
+    
+    typedef enum BufferIO_Constants {
+                   GUUIDString_Size                = 20,
+                   BinaryGUUID_Size                = 16,
+    } BufferIO_Constants;
 
     /*!
      @typedef      BitBuffer
      @abstract                                     Contains variables and a pointer to a buffer for reading and writing bits.
      */
     typedef struct BitBuffer                       BitBuffer;
+    
+    /*!
+     @typedef      BinaryGUUID
+     @abstract                                     A binary GUUID is just the raw data without dashes.
+     */
+    typedef        uint8_t                         BinaryGUUID[BinaryGUUID_Size];
+    
+    /*!
+     @typedef      GUUIDString
+     @abstract                                     A GUUID string is the GUUID with dashes and a NULL terminator
+     */
+    typedef        uint8_t                         GUUIDString[GUUIDString_Size + PlatformIO_NULLTerminatorSize];
 
     /*!
      @typedef      SecureRNG

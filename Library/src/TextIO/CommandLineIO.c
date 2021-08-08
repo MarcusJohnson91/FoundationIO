@@ -280,7 +280,7 @@ extern "C" {
                 uint64_t TerminalWidth       = CommandLineIO_GetTerminalWidth() / 2;
                 UTF8    *Indicator           = UTF8_Init(TerminalWidth);
                 UTF8_Set(Indicator, '-', TerminalWidth);
-                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%l32s %llu/%llu %llu/%s%s]"), Indicator, &Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, PlatformIO_NewLine8);
+                UTF8    *FormattedString     = UTF8_Format(UTF8String("[%s%l32s %llu/%llu %llu/%llu%s]%s"), Indicator, Strings[String], Numerator[String], Denominator[String], PercentComplete, Indicator, PlatformIO_NewLine8);
                 UTF8_File_WriteString(stdout, FormattedString);
                 free(Indicator);
             }

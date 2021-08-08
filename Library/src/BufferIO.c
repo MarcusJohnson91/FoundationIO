@@ -10,11 +10,6 @@
 extern "C" {
 #endif
     
-    typedef enum BufferIO_Constants {
-        GUUIDString_Size                = 20,
-        BinaryGUUID_Size                = 16,
-    } BufferIO_Constants;
-    
     /* Start BitBuffer section */
     typedef struct BitBuffer {
         AsyncIOStream *Input;
@@ -448,9 +443,13 @@ extern "C" {
     
     static void BitBuffer_Append_NearByte_FarBit(BitBuffer *BitB, uint8_t NumBits, uint64_t Data2Append) {
         /*
-         Buffer = 0[SSSSSSSS] 1[TTTTTTTT] 2[UUUUUUUU] 3[VVVVVVVV] 4[WWWWWWWW] 5[XXXXXXXX] 6[YYYYYYYY] 7[ZZZZZZZZ]
-
-         Append = 0[SSSSSSSS] 1[TTTTTTTT] 2[UUUUUUUU] 3[VVVVVVVV] 4[WWWWWWWW] 5[XXXXXXXX] 6[YYYYYYYY] 7[ZZZZZZZZ]
+         BitOrder =  01234567
+         Buffer   = [AAAAAAAA] [BBBBBBBB] [CCCCCCCC] [DDDDDDDD] [EEEEEEEE] [FFFFFFFF] [GGGGGGGG] [HHHHHHHH]
+         Append   = [SSSSSSSS] [TTTTTTTT] [UUUUUUUU] [VVVVVVVV] [WWWWWWWW] [XXXXXXXX] [YYYYYYYY] [ZZZZZZZZ]
+         
+         NearByte_FarBit = start at byte S, and Bit 7
+         
+         So, if we need to write 6 bits and there's 6 bits available
 
          The goal here is to extract data from Append in such a way that it can be written in the direction the function name specifies
 
@@ -812,7 +811,7 @@ extern "C" {
                 CodeUnit          += 1;
             }
             if (WriteType == StringTerminator_NULL) {
-                BitBuffer_Seek(BitB, 8); // Write the NULL terminator
+                BitBuffer_Seek(BitB, UTF8CodeUnitSizeInBits); // Write the NULL terminator
             }
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
@@ -823,23 +822,13 @@ extern "C" {
     
     void BitBuffer_WriteUTF16(BitBuffer *BitB, ImmutableString_UTF16 String2Write, BufferIO_StringTerminators WriteType) {
         if (BitB != NULL && String2Write != NULL) {
-            uint64_t StringSize = UTF16_GetStringSizeInCodeUnits(String2Write);
-            if (WriteType == StringTerminator_NULL) {
-                StringSize += UTF16CodeUnitSizeInBits / 8; // Size in bytes, not bits
-            }
-
-            int64_t  BitsAvailable = BitBuffer_GetBitsFree(BitB);
             uint64_t CodeUnit = 0ULL;
-            if (BitsAvailable >= Bytes2Bits(StringSize)) {
-                while (String2Write[CodeUnit] != PlatformIO_NULLTerminator) {
-                    BitBuffer_Append_FarByte_FarBit(BitB, UTF16CodeUnitSizeInBits, String2Write[CodeUnit]);
-                    CodeUnit += 1;
-                }
-                if (WriteType == StringTerminator_NULL) {
-                    BitBuffer_Append_FarByte_FarBit(BitB, UTF16CodeUnitSizeInBits, 0); // NULL Terminator
-                }
-            } else {
-                Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("StringSize: %lld bits is bigger than the buffer can contain: %lld"), Bytes2Bits(StringSize), BitsAvailable);
+            while (String2Write[CodeUnit] != PlatformIO_NULLTerminator) {
+                BitBuffer_Append_NearByte_FarBit(BitB, UTF16CodeUnitSizeInBits, String2Write[CodeUnit]);
+                CodeUnit          += 1;
+            }
+            if (WriteType == StringTerminator_NULL) {
+                BitBuffer_Seek(BitB, UTF16CodeUnitSizeInBits); // Write the NULL terminator
             }
         } else if (BitB == NULL) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("BitBuffer Pointer is NULL"));
@@ -989,7 +978,7 @@ extern "C" {
     uint8_t *GUUID_Swap(BufferIO_GUUIDTypes GUUIDType, uint8_t *GUUID2Swap) {
         uint8_t *SwappedGUUID = NULL;
         if (GUUIDType != GUUIDType_Unspecified && GUUIDType <= 4) {
-            uint8_t Dash = '-';
+            uint8_t Dash              = '-';
             if (GUUIDType == GUUIDType_UUIDString || GUUIDType == GUUIDType_GUIDString) {
                 SwappedGUUID          = (uint8_t*) calloc(GUUIDString_Size, sizeof(uint8_t));
                 if (SwappedGUUID != NULL) {
