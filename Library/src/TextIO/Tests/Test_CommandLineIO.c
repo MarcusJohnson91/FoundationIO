@@ -20,10 +20,10 @@ extern "C" {
 
         uint64_t FakeArgC = 4;
         UTF8 **FakeArgV   = UTF8_StringSet_Init(FakeArgC);
-        FakeArgV[0]       = u8"--Input";
-        FakeArgV[1]       = u8"/Fake/Path/For/Testing.png";
-        FakeArgV[2]       = u8"--Output";
-        FakeArgV[3]       = u8"/Fake/Path/For/Testing.jpg";
+        FakeArgV[0]       = UTF8String("--Input");
+        FakeArgV[1]       = UTF8String("/Fake/Path/For/Testing.png");
+        FakeArgV[2]       = UTF8String("--Output");
+        FakeArgV[3]       = UTF8String("/Fake/Path/For/Testing.jpg");
 
         /*
          Now we should test case conversion, and maybe option shortening and all kinds of other things

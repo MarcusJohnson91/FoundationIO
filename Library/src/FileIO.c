@@ -379,22 +379,22 @@ extern "C" {
         UTF8 *ModeString = NULL;
         if ((Mode & FileMode_Read) == FileMode_Read) {
             if ((Mode & FileMode_Binary) == FileMode_Binary) {
-                ModeString = PlatformIO_Literal(UTF8*, char*, u8"rb");
+                ModeString = UTF8String("rb");
             } else if ((Mode & FileMode_Text) == FileMode_Text) {
-                ModeString = PlatformIO_Literal(UTF8*, char*, u8"r");
+                ModeString = UTF8String("r");
             }
         } else if ((Mode & FileMode_Write) == FileMode_Write) {
             if ((Mode & FileMode_Append) == FileMode_Append) {
                 if ((Mode & FileMode_Binary) == FileMode_Binary) {
-                    ModeString = PlatformIO_Literal(UTF8*, char*, u8"ab");
+                    ModeString = UTF8String("ab");
                 } else if ((Mode & FileMode_Text) == FileMode_Text) {
-                    ModeString = PlatformIO_Literal(UTF8*, char*, u8"a");
+                    ModeString = UTF8String("a");
                 }
             } else {
                 if ((Mode & FileMode_Binary) == FileMode_Binary) {
-                    ModeString = PlatformIO_Literal(UTF8*, char*, u8"wb");
+                    ModeString = UTF8String("wb");
                 } else if ((Mode & FileMode_Text) == FileMode_Text) {
-                    ModeString = PlatformIO_Literal(UTF8*, char*, u8"w");
+                    ModeString = UTF8String("w");
                 }
             }
         }
@@ -405,22 +405,22 @@ extern "C" {
         UTF16 *ModeString = NULL;
         if ((Mode & FileMode_Read) == FileMode_Read) {
             if ((Mode & FileMode_Binary) == FileMode_Binary) {
-                ModeString = PlatformIO_Literal(UTF16*, char16_t*, UTF16String("rb"));
+                ModeString = FoundationIO_String(ModeString, "rb");
             } else if ((Mode & FileMode_Text) == FileMode_Text) {
-                ModeString = PlatformIO_Literal(UTF16*, char16_t*, UTF16String("r"));
+                ModeString = FoundationIO_String(ModeString, "r");
             }
         } else if ((Mode & FileMode_Write) == FileMode_Write) {
             if ((Mode & FileMode_Append) == FileMode_Append) {
                 if ((Mode & FileMode_Binary) == FileMode_Binary) {
-                    ModeString = PlatformIO_Literal(UTF16*, char16_t*, UTF16String("ab"));
+                    ModeString = FoundationIO_String(ModeString, "ab");
                 } else if ((Mode & FileMode_Text) == FileMode_Text) {
-                    ModeString = PlatformIO_Literal(UTF16*, char16_t*, UTF16String("a"));
+                    ModeString = FoundationIO_String(ModeString, "a");
                 }
             } else {
                 if ((Mode & FileMode_Binary) == FileMode_Binary) {
-                    ModeString = PlatformIO_Literal(UTF16*, char16_t*, UTF16String("wb"));
+                    ModeString = FoundationIO_String(ModeString, "wb");
                 } else if ((Mode & FileMode_Text) == FileMode_Text) {
-                    ModeString = PlatformIO_Literal(UTF16*, char16_t*, UTF16String("w"));
+                    ModeString = FoundationIO_String(ModeString, "w");
                 }
             }
         }

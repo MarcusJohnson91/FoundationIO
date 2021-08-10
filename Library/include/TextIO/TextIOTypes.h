@@ -399,31 +399,17 @@ typedef                   char32_t                             CharSet32;
 
 #endif /* TextIOTypes_PropertyConversion32 */
   
-#if (PlatformIO_Language == PlatformIO_LanguageIsC)
-  typedef const UTF8  ImmutableChar_UTF8;
-  typedef const UTF16 ImmutableChar_UTF16;
-  typedef const UTF32 ImmutableChar_UTF32;
-  
-  typedef const UTF8  *const ImmutableString_UTF8;
-  typedef const UTF16 *const ImmutableString_UTF16;
-  typedef const UTF32 *const ImmutableString_UTF32;
-  
-  typedef const UTF8  *const *const ImmutableStringSet_UTF8;
-  typedef const UTF16 *const *const ImmutableStringSet_UTF16;
-  typedef const UTF32 *const *const ImmutableStringSet_UTF32;
-#elif (PlatformIO_Language == PlatformIO_LanguageIsCXX)
-  typedef const UTF8     ImmutableChar_UTF8;
-  typedef const char16_t ImmutableChar_UTF16;
-  typedef const char32_t ImmutableChar_UTF32;
-  
-  typedef const UTF8     *const ImmutableString_UTF8;
-  typedef const char16_t *const ImmutableString_UTF16;
-  typedef const char32_t *const ImmutableString_UTF32;
-  
-  typedef const UTF8     *const *const ImmutableStringSet_UTF8;
-  typedef const char16_t *const *const ImmutableStringSet_UTF16;
-  typedef const char32_t *const *const ImmutableStringSet_UTF32;
-#endif /* PlatformIO_LanguageIsC */
+typedef const UTF8     ImmutableChar_UTF8;
+typedef const char16_t ImmutableChar_UTF16;
+typedef const char32_t ImmutableChar_UTF32;
+
+typedef const UTF8     *const ImmutableString_UTF8;
+typedef const char16_t *const ImmutableString_UTF16;
+typedef const char32_t *const ImmutableString_UTF32;
+
+typedef const UTF8     *const *const ImmutableStringSet_UTF8;
+typedef const char16_t *const *const ImmutableStringSet_UTF16;
+typedef const char32_t *const *const ImmutableStringSet_UTF32;
 
 #ifndef                   FoundationIO_Unicodize8
 #define                   FoundationIO_Unicodize8               (1)
@@ -436,8 +422,8 @@ typedef                   char32_t                             CharSet32;
 #define                   UTF8Character(Literal)                reinterpret_cast<ImmutableChar_UTF8>(u8##Literal)
 #endif
 #elif (PlatformIO_Language == PlatformIO_LanguageIsC)
-#define                   UTF8String(Literal)                   (ImmutableString_UTF8) u8##Literal
-#define                   UTF8Character(Literal)                (ImmutableChar_UTF8)   u8##Literal
+#define                   UTF8String(Literal)                   _Generic((0,Literal), unsigned char:(UTF8 *) u8##Literal, unsigned char*:(UTF8*) u8##Literal, signed char:(UTF8*) u8##Literal, signed char*:(UTF8*) u8##Literal, char:(UTF8*) u8##Literal, char*:(UTF8*) u8##Literal)
+#define                   UTF8Character(Literal)                _Generic((0,Literal), unsigned char:(UTF8) u8##Literal, signed char:(UTF8) u8##Literal, char:(UTF8) u8##Literal)
 #endif /* PlatformIO_Language */
 #endif /* FoundationIO_Unicodize8 */
 
@@ -452,7 +438,7 @@ typedef                   char32_t                             CharSet32;
 #define                   UTF16Character(Literal)               reinterpret_cast<ImmutableChar_UTF16>(u##Literal)
 #endif
 #elif (PlatformIO_Language == PlatformIO_LanguageIsC)
-#define                   UTF16String(Literal)                  (ImmutableString_UTF16) u##Literal
+#define                   UTF16String(Literal)                  _Generic((0,Literal), unsigned short:(UTF16*) u##Literal, unsigned short*:(UTF16*) u##Literal, signed short:(UTF16*) u##Literal, signed short*:(UTF16*) u##Literal, char:(UTF16*) u##Literal, char*:(UTF16*) u##Literal)
 #define                   UTF16Character(Literal)               (ImmutableChar_UTF16)   u##Literal
 #endif /* PlatformIO_Language */
 #endif /* FoundationIO_Unicodize16 */
@@ -468,7 +454,25 @@ typedef                   char32_t                             CharSet32;
 #define                   UTF32Character(Literal)               reinterpret_cast<ImmutableChar_UTF32>(U##Literal)
 #endif
 #elif (PlatformIO_Language == PlatformIO_LanguageIsC)
-#define                   UTF32String(Literal)                  (ImmutableString_UTF32) U##Literal
+#define                   UTF32String(Literal)                  _Generic((0,Literal), unsigned char:(UTF32*) U##Literal, unsigned char*:(UTF32*) U##Literal, signed char:(UTF32*) U##Literal, signed char*:(UTF32*) U##Literal, char:(UTF32*) U##Literal, char*:(UTF32*) U##Literal)
+/* TODO: ^Not sure how if programming model (LP64 vs ILP64 etc) needs to be handled or not, so I'll skip it */
+#define                   UTF32Character(Literal)               U##Literal
+#endif /* PlatformIO_Language */
+#endif /* FoundationIO_Unicodize32 */
+
+#ifndef                   FoundationIO_Stringize
+#define                   FoundationIO_Stringize                (1)
+#if   (PlatformIO_Language == PlatformIO_LanguageIsCXX)
+#if   (PlatformIO_LanguageVersionCXX >= PlatformIO_LanguageVersionCXX11)
+#define                   UTF32String(Literal)                  reinterpret_cast<ImmutableString_UTF32>(const_cast<ImmutableString_UTF32>(U##Literal))
+#define                   UTF32Character(Literal)               reinterpret_cast<ImmutableChar_UTF32>(U##Literal)
+#elif (PlatformIO_LanguageVersionCXX < PlatformIO_LanguageVersionCXX11)
+#define                   UTF32String(Literal)                  reinterpret_cast<ImmutableString_UTF32>(const_cast<ImmutableString_UTF32>(U##Literal))
+#define                   UTF32Character(Literal)               reinterpret_cast<ImmutableChar_UTF32>(U##Literal)
+#endif
+#elif (PlatformIO_Language == PlatformIO_LanguageIsC)
+#define                   FoundationIO_String(OutputVariable, Literal) _Generic((OutputVariable), const UTF8*:u8##Literal, UTF8*:u8##Literal, const UTF16*:u##Literal, UTF16*:u##Literal, const UTF32*:U##Literal, UTF32*:U##Literal)
+/* TODO: ^Not sure how if programming model (LP64 vs ILP64 etc) needs to be handled or not, so I'll skip it */
 #define                   UTF32Character(Literal)               U##Literal
 #endif /* PlatformIO_Language */
 #endif /* FoundationIO_Unicodize32 */
