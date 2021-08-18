@@ -403,7 +403,7 @@ typedef const UTF8     ImmutableChar_UTF8;
 typedef const char16_t ImmutableChar_UTF16;
 typedef const char32_t ImmutableChar_UTF32;
 
-typedef const UTF8     *const ImmutableString_UTF8;
+typedef const char8_t  *const ImmutableString_UTF8;
 typedef const char16_t *const ImmutableString_UTF16;
 typedef const char32_t *const ImmutableString_UTF32;
 
