@@ -6,10 +6,35 @@
 extern "C" {
 #endif
     
+    TestSuite *MathIO;
+    
+    /* 3 levels of testing:
+     Module/Component, Data Structure/Function, Test Case
+     Individual Tests are registered to a Data Structure/Function Suite
+     and there may be multiple suites that all need to be tested.
+     
+     So, just write a macro that will create
+     */
+    
+    /*
+     
+     
+     Solution: transfers_1[0] = (nrf_twi_mngr_transfer_t)NRF_TWI_MNGR_WRITE(//Your arguments);
+     
+     So, for each Test Case, we need to register it with a suite.
+     
+     the suite needs to know all of the functions in the test suite, each test's enabled/disabled status, the correct value for comparison, and is that it?
+     */
+    
+    
+    
     bool Test_Exponentiate(SecureRNG *Secure) { // Even, Odd, Positive, Negative
+        TestIO_Register(MathIO, Test_Exponentiate, TestState_Enabled, Outcome_Passed);
         bool Passed = No;
         int64_t Even = Exponentiate(2, 2); // 4
         int64_t Odd  = Exponentiate(2, 3); // 8
+        int64_t NegE = Exponentiate(2, -2); // .25
+        int64_t NegO = Exponentiate(2, -1); // .5
         if (Even == 4 && Odd == 8) {
             Passed = Yes;
         }
@@ -32,7 +57,7 @@ extern "C" {
         int64_t  Value   = SecureRNG_GenerateInteger(Secure, NumBits);
         uint8_t  LogCeil = Logarithm(2, Value);
         if (LogCeil != NumBits) {
-            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits %llu is incorrect"), NumBits);
+            Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("NumBits %hhu is incorrect"), NumBits);
         }
     }
     
@@ -57,8 +82,9 @@ extern "C" {
     
     int main(void) {
         SecureRNG *Secure = SecureRNG_Init(67108864);
-        Test_Exponentiate(Secure);
-        Test_CountDigits(Secure);
+        TestIO_RunTests(MathIO);
+        //Test_Exponentiate(Secure);
+        //Test_CountDigits(Secure);
         //Test_Decimals();
         //Test_MinMax();
         return EXIT_SUCCESS;

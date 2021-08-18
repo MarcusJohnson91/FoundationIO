@@ -23,9 +23,9 @@ extern "C" {
         return TestPassed;
 
         TestCase TestCase_Deformat8 = {
-            .Function     = Test_UTF8_Deformat,
-            .TestState    = TestState_Enabled,
-            .TestOutcome  = Outcome_Passed,
+            .Function       = Test_UTF8_Deformat,
+            .State      = TestState_Enabled,
+            .Expectation = Outcome_Passed,
         };
     }
 
@@ -183,10 +183,8 @@ extern "C" {
          }
          */
 
-        UTF8 *Positional3                      = UTF8_Format(UTF8String("NumArgs: %2$d, %1$s EXTEND THE STRING"), UTF8String("Positional"), 2); // Remapping isn't working.
+        UTF8 *Positional3                      = UTF8_Format(UTF8String("NumArgs: %2$d, %1$s EXTEND THE STRING"), UTF8String("Positional"), 2);
         bool  Positional3Test                  = UTF8_Compare(Positional3, UTF8String("NumArgs: 2, Positional EXTEND THE STRING"));
-        // "NumArgs: -$llu, Positi"
-        // "NumArgs: Positional, %12XTEND THE STRING"
         if (Positional3Test == No) {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Positional3Test Failed"));
         }
@@ -248,9 +246,9 @@ extern "C" {
         return TestPassed;
 
         TestCase TestCase_Format8 = {
-            .Function     = Test_UTF8_Format,
-            .TestState    = TestState_Enabled,
-            .TestOutcome  = Outcome_Passed, // TestOutcome?
+            .Function       = Test_UTF8_Format,
+            .State      = TestState_Enabled,
+            .Expectation = Outcome_Passed, // TestOutcome?
         };
     }
 

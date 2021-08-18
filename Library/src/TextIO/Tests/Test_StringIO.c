@@ -60,9 +60,9 @@ extern "C" {
     }
 
     TestCase UTF8_EncodeDecode_Test = {
-        .TestState      = TestState_Enabled,
-        .Function       = Test_UTF8_EncodeDecode,
-        .TestOutcome    = Outcome_Passed,
+        .State       = TestState_Enabled,
+        .Function        = Test_UTF8_EncodeDecode,
+        .ExpectedOutcome = Outcome_Passed,
     };
     
     bool Test_UTF16_EncodeDecode(SecureRNG *Secure) {

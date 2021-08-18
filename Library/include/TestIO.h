@@ -1,7 +1,7 @@
 /*!
  @header          TestIO.h
  @author          Marcus Johnson
- @copyright       2019+
+ @copyright       2021+
  @version         1.0.0
  @brief           This header contains types, functions, and tables for automated testing.
  @terminology     Test Case: individual test; Test Suite: group of similar test cases;
@@ -21,10 +21,18 @@ extern "C" {
 #endif
 
     /*
+     So, FoundationIO_String(Tokens32.ProcS, "<?"), is a valid expression.
+
+     So, maybe we can use _Generic, __COUNTER__, and macros to assign tests to a test suite
+     */
+
+    /*
      Test Grouping:
      So, Each Module needs to be tested, BufferIO, FileIO, CommandLineIO, etc
      within each Module there needs to be tests for each data structure and function.
-     within each function there neds to be an individual test case.
+     within each function there needs to be an individual test case.
+
+     Ok, so each data structure tested needs to have it's own Test Suite.
 
      So, what's the Hierarchy here?
 
@@ -60,7 +68,7 @@ extern "C" {
 
      Also, one other thing I'd like to do is store the time it takes for the test to run so we can track that information too.
      */
-    
+
     /*!
      @enum         TestIO_TestStates
      @abstract                                    Defines the state of each test.
@@ -69,11 +77,11 @@ extern "C" {
      @constant     TestState_Disabled             The test is disabled.
      */
     typedef enum TestIO_TestStates {
-                   TestState_Unspecified          = 0,
-                   TestState_Enabled              = 1,
-                   TestState_Disabled             = 2,
+        TestState_Unspecified          = 0,
+        TestState_Enabled              = 1,
+        TestState_Disabled             = 2,
     } TestIO_TestStates;
-    
+
     /*!
      @enum         TestIO_TestOutcomes
      @abstract                                    Defines the result of each test.
@@ -82,9 +90,9 @@ extern "C" {
      @constant     Outcome_Failed                 The test is disabled.
      */
     typedef enum TestIO_TestOutcomes {
-                   Outcome_Unspecified     = 0,
-                   Outcome_Passed          = 1,
-                   Outcome_Failed          = 2,
+        Outcome_Unspecified            = 0,
+        Outcome_Passed                 = 1,
+        Outcome_Failed                 = 2,
     } TestIO_TestOutcomes;
 
     /*!
@@ -95,59 +103,64 @@ extern "C" {
     typedef bool (*TestIO_TestFunction)(SecureRNG *Secure);
 
     typedef struct TestCase {
-        TestIO_TestFunction Function;
-        TestIO_TestStates   TestState;
-        TestIO_TestOutcomes TestOutcome;
+        UTF8                *Name;
+        TestIO_TestFunction  Function;
+        TestIO_TestStates    State;
+        TestIO_TestOutcomes  Expectation;
+        TestIO_TestOutcomes  Outcome; // the actual pass/fail value from the test when it ran
+        // We need to know what the result should be, but should it go in the TestCase? if so, how do we handle strings vs scalars, etc?
     } TestCase;
 
     typedef struct TestSuite {
-        TestCase *Tests;
-        uint64_t *UnexpectedFailues;
-        uint64_t  NumTests;
-        uint64_t  NumWorkedAsExpected;
-        uint64_t  NumUnexpectedFailures;
-        uint64_t  UnexpectedFailureSize;
+        TestCase            *Tests;
+        TestIO_TestOutcomes *Outcomes; // Array so we know which tests failed, but it shouldn't be just the failures, it should be for every test
+        uint64_t             NumTests;
+        uint64_t             NumCorrectOutcomes; // The number of times the outcome was what was expected
+        uint64_t             NumCompleted; // Where in the suite are we, how many tests have completed?
     } TestSuite;
     /*
      What if We register each Test in just one Variadic call, then we'd know the size the make the array as well as each index
      */
 
     void TestIO_RunTests(TestSuite *Suite);
-    
-#ifndef TESTIO_ARGUMENT
-#define TESTIO_ARGUMENT(...) __VA_ARGS__
+
+    bool TestIO_RegisterCase(TestSuite *Suite, UTF8 *FunctionName, TestIO_TestFunction Function2Test, TestIO_TestStates State, TestIO_TestOutcomes Expectation);
+
+#ifndef TestIO_Register
+#define TestIO_Register(Suite, Function2Test, State, Expectation) \
+TestIO_RegisterCase(Suite, UTF8String("##Function2Test"), Function2Test, State, Expectation)
 #endif
-    
-#ifndef TESTIO_CAT
-#define TESTIO_CAT(TOKEN1, TOKEN2, TOKEN3) TOKEN1 ## TOKEN2 ## _ ## TOKEN3
+
+#ifndef TestIO_RegisterCase
+#define TestIO_RegisterCase(...) Error_Do_Not_Call_TestIO_RegisterCase_Directly \
+#error("Do not call TestIO_RegisterCase directly, use TestIO_Register to call it for you")
 #endif
-    
-#ifndef TestIO_CreateFunctionName
-#define TestIO_CreateFunctionName(Module, Function) TESTIO_CAT(Test_, Module, Function)
-#endif
+
+    // Always use the macro "func" instead of calling "_func" directly.
+    #define func(dummy, ...) (_func)(dummy, __VA_ARGS__, NULL)
 
     /*!
      @abstract                                     Forward Declaration of CryptographyIO's SecureRNG.
      */
     typedef struct SecureRNG                      SecureRNG;
-    
+
     /*!
      @abstract                                    Gets how accurate the clock is.
      */
     uint64_t       GetTimerFrequency(void);
-    
+
     /*!
      @abstract                                    Gets the time from the highest frequency timer for each platform.
      */
     uint64_t       GetTime_Elapsed(void);
-    
+
     /*!
      @abstract                                    Generates a valid UTF-32 string, containing up to 8192 CodePoints.
      @param        Random                         Pointer to an instance of SecureRNG, from CryptographyIO.
      @param        NumCodePoints                  The number of CodePoints, for the String's size.
      */
     UTF32         *UTF32_GenerateString(SecureRNG *Random, uint64_t NumCodePoints);
-    
+
 #if (PlatformIO_Language == PlatformIO_LanguageIsCXX)
 }
 #endif /* Extern C */

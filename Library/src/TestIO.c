@@ -44,6 +44,18 @@ extern "C" {
      we might also want to have a good randomnes generator (maybe even Unicode)
      */
 
+
+
+
+
+
+
+
+
+
+
+
+/*
     static void RunTests_ReallocateHelper(TestSuite *Suite) {
         if (Suite != NULL) {
             realloc(Suite->UnexpectedFailues, sizeof(uint64_t) * Suite->UnexpectedFailureSize * 2);
@@ -52,34 +64,57 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("TestSuite Pointer is NULL"));
         }
     }
+ */
 
     void TestIO_RunTests(TestSuite *Suite) {
         if (Suite != NULL) {
+            uint64_t NumEnabledTests               = 0ULL;
             for (uint64_t Test = 0; Test < Suite->NumTests; Test++) {
-                if (Suite->Tests[Test].TestState == TestState_Enabled) {
-                    bool TestPassed                                             = Suite->Tests[Test].Function;
-                    if (TestPassed == Suite->Tests[Test].TestOutcome) {
-                        Suite->NumWorkedAsExpected                             += 1;
-                    } else {
-                        if (Suite->NumUnexpectedFailures == Suite->UnexpectedFailureSize) {
-                            RunTests_ReallocateHelper(Suite);
-                        }
-
-                        Suite->NumUnexpectedFailures                           += 1;
-                        Suite->UnexpectedFailues[Suite->NumUnexpectedFailures]  = Test;
+                if (Suite->Tests[Test].State == TestState_Enabled) {
+                    NumEnabledTests               += 1;
+                    bool Outcome                   = Suite->Tests[Test].Function;
+                    if (Outcome == Suite->Tests[Test].Expectation) {
+                        Suite->NumCorrectOutcomes += 1; // Not good enough, we need to know which tests passed and which failed; gotta add a field to TestCase
                     }
                 }
             }
-            UTF8 *TestsThatPerformedAsExpected = UTF8_Format(UTF8String("Tests that matched their expectation: %llu"), Suite->NumWorkedAsExpected);
-            UTF8 *UnexpectedFailures           = UTF8_Format(UTF8String("Tests that DID NOT perform as expected: %llu"), Suite->NumUnexpectedFailures);
-            UTF8_File_WriteString(stdout, UTF8String("Test Results:\n"));
-            UTF8_File_WriteString(stdout, TestsThatPerformedAsExpected);
-            UTF8_File_WriteString(stdout, UnexpectedFailures);
-            for (uint64_t FailedTest = 0ULL; FailedTest < Suite->NumUnexpectedFailures; FailedTest++) {
-                //UTF8_File_WriteString(stdout, Suite->Tests[Suite->UnexpectedFailues[FailedTest]].FunctionName);
+            /*
+             Pass/Fail is not the correct abstraction:
+
+             If a test was supposed to fail and it does, the test actually passed...
+
+             Sooo how do I word this?
+
+             Correct/Incorrect outcome seems good
+             */
+            UTF8 *EnabledDisabledTests         = UTF8_Format(UTF8String("Enabled/Disabled Tests: %llu/%llu"), NumEnabledTests, Suite->NumTests - NumEnabledTests);
+            UTF8 *TestResults                  = UTF8_Format(UTF8String("Correct/Incorrect Outcome: %llu/%llu"), Suite->NumCorrectOutcomes, Suite->NumTests - Suite->NumCompleted);
+            UTF8_File_WriteString(stdout, EnabledDisabledTests);
+            UTF8_File_WriteString(stdout, TestResults);
+            UTF8_File_WriteString(stdout, UTF8String("Incorrect Tests:\n"));
+            for (uint64_t Test = 0; Test < Suite->NumTests; Test++) {
+                if (Suite->Tests[Test].State == TestState_Enabled && Suite->Tests[Test].Expectation != Suite->Tests[Test].Outcome) {
+                    UTF8_File_WriteString(stdout, Suite->Tests[Test].Name);
+                }
             }
         }
     }
+
+#ifdef TestIO_RegisterCase
+#undef TestIO_RegisterCase
+#endif /* Undefine TestIO_RegisterCase as a macro so the real function can be defined, we do this so it can only be called through TestIO_Register */
+
+    bool TestIO_RegisterCase(TestSuite *Suite, UTF8 *FunctionName, TestIO_TestFunction Function2Test, TestIO_TestStates State, TestIO_TestOutcomes Expectation) {
+        TestCase Case = {
+           .Name         = FunctionName,
+           .Function     = Function2Test,
+           .State        = State,
+           .Expectation  = Expectation,
+       };
+       Suite->Tests[Suite->NumTests] = Case;
+       Suite->NumTests += 1;
+       return true;
+   }
 
     uint64_t GetTimerFrequency(void) {
         uint64_t TimerFrequency = 0LL;
