@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
+emulate sh
 
 # Usage (the HeaderFile WILL BE IRRECOVERABLY DELETED): ./TextIOTables_Create.sh
 # Dependencies: Curl, XMLStarlet (On Mac install Homebrew from brew.sh then call brew install xmlstarlet)
@@ -335,76 +336,83 @@ CreateGraphemeExtensionTable() {
 }
 
 AddUnicodePrefix2CodePoint() {
-    if [ "$1" -le 160 ]; then
-        UnicodePrefixedCodePoint=$(printf "\\\\x%X" "$1")
-    elif [ "$1" -le 65535 ]; then
-        UnicodePrefixedCodePoint=$(printf "\\\\u%04X" "$1")
-    elif [ "$1" -le 1114111 ]; then
-        UnicodePrefixedCodePoint=$(printf "\\\\U%08X" "$1")
+    CodePoint_Decimal=$(printf "%u" "$1")
+    if [ "$CodePoint_Decimal" -le 160 ]; then
+        UnicodePrefixedCodePoint=$(printf "\\\\x%X" "$CodePoint_Decimal")
+    elif [ "$CodePoint_Decimal" -le 65535 ]; then
+        UnicodePrefixedCodePoint=$(printf "\\\\u%04X" "$CodePoint_Decimal")
+    elif [ "$CodePoint_Decimal" -le 1114111 ]; then
+        UnicodePrefixedCodePoint=$(printf "\\\\U%08X" "$CodePoint_Decimal")
     fi
 }
 
 AddUnicodePrefix2String() {
-    if [ "$1" -le 160 ]; then
-        UnicodeReplacementString=$(printf "%s\\\\x%X" "$UnicodeReplacementString" "$1")
-    elif [ "$1" -le 65535 ]; then
-        UnicodeReplacementString=$(printf "%s\\\\u%04X" "$UnicodeReplacementString" "$1")
-    elif [ "$1" -le 1114111 ]; then
-        UnicodeReplacementString=$(printf "%s\\\\U%08X" "$UnicodeReplacementString" "$1")
+    UnicodeReplacementString=""
+    CodePoint_Decimal=$(printf "%u" "$1")
+    if [ "$CodePoint_Decimal" -le 160 ]; then
+        UnicodeReplacementString=$(printf "%s\\\\x%X" "$UnicodeReplacementString" "$CodePoint_Decimal")
+    elif [ "$CodePoint_Decimal" -le 65535 ]; then
+        UnicodeReplacementString=$(printf "%s\\\\u%04X" "$UnicodeReplacementString" "$CodePoint_Decimal")
+    elif [ "$CodePoint_Decimal" -le 1114111 ]; then
+        UnicodeReplacementString=$(printf "%s\\\\U%08X" "$UnicodeReplacementString" "$CodePoint_Decimal")
     fi
 }
 
 CreateKompatibleNormalizationTable() {
     Kompatible=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[(@dt = 'com' or @dt = 'font' or @dt = 'nobreak' or @dt = 'initial' or @dt = 'medial' or @dt = 'final' or @dt = 'isolated' or @dt = 'circle' or @dt = 'super' or @dt = 'sub' or @dt = 'vertical' or @dt = 'wide' or @dt = 'narrow' or @dt = 'small' or @dt = 'square' or @dt = 'fraction' or @dt = 'compat') and @dt != '' and @dt != '#' and @dt != 'none']" -o '0x' -v @cp -o ': ' -v @dm -n "$UCD_Data" | sed -e 's/ / 0x/g' -e 's/: /:/g' -e 's/ /|/g')
     printf "    const UTF32 *const KompatibleNormalizationTable[KompatibleNormalizationTableSize][2] = {\n" >> "$SourceFile"
-    for line in $Kompatible; do
-        CodePoint2Replace=$(echo "$line" | awk -F ':' '{printf "%u", $1}')
-        AddUnicodePrefix2CodePoint "$CodePoint2Replace"
-        CodePoint="$UnicodePrefixedCodePoint"
-        NumCodePoints=$(echo "$line" | awk -F '[:|]' '{print NF}')
-        UnicodeReplacementString=""
-        for Index in $(seq 2 "$NumCodePoints"); do
-            ReplacementCodePoint=$(echo "$line" | awk -F '[:|]' -v Index="$Index" '{printf "%u", $Index}')
+
+    while IFS=':' read -d $'\n' CodePoint Replacement; do
+        echo "CodePoint=$CodePoint"
+        echo "Replacement=$Replacement"
+        ReplacementString=""
+        while IFS=' ' read ReplacementCodePoint; do
+            echo "ReplacementCodePoint=$ReplacementCodePoint"
             AddUnicodePrefix2String "$ReplacementCodePoint"
-        done
-        printf "        {U\"%s\", U\"%s\"},\n" "$UnicodePrefixedCodePoint" "$UnicodeReplacementString" >> "$SourceFile"
-    done
+            ReplacementString=$(printf "%s%s" "$ReplacementString" "$UnicodePrefixedCodePoint")
+
+        done <<< "$Replacement"
+        printf "        {U\"%s\", U\"%s\"},\n" "$CodePoint" "$UnicodeReplacementString" >> "$SourceFile"
+    done <<< "$Kompatible"
+    
     printf "    };\n\n" >> "$SourceFile"
 }
 
 CreateCaseFoldTable() {
     CaseFold=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@NFKC_CF != @cp and @NFKC_CF != '' and @NFKC_CF != '#' and (@CWCF='Y' or @CWCM ='Y' or @CWL = 'Y' or @CWKCF = 'Y')]" -o '0x' -v @cp -o ': ' -v @NFKC_CF -n "$UCD_Data" | sed -e 's/ / 0x/g' -e 's/: /:/g' -e 's/ /|/g')
     printf "    const UTF32 *const CaseFoldTable[CaseFoldTableSize][2] = {\n" >> "$SourceFile"
-    for line in $CaseFold; do
-        CodePoint2Replace=$(echo "$line" | awk -F ':' '{printf "%u", $1}')
-        AddUnicodePrefix2CodePoint "$CodePoint2Replace"
-        CodePoint="$UnicodePrefixedCodePoint"
-        NumCodePoints=$(echo "$line" | awk -F '[:|]' '{print NF}')
-        UnicodeReplacementString=""
-        for Index in $(seq 2 "$NumCodePoints"); do
-            ReplacementCodePoint=$(echo "$line" | awk -F '[:|]' -v Index="$Index" '{printf "%u", $Index}')
+
+    while IFS=':' read -d $'\n' CodePoint Replacement; do
+        echo "CodePoint=$CodePoint"
+        echo "Replacement=$Replacement"
+        ReplacementString=""
+        while IFS=' ' read ReplacementCodePoint; do
+            echo "ReplacementCodePoint=$ReplacementCodePoint"
             AddUnicodePrefix2String "$ReplacementCodePoint"
-        done
-        printf "        {U\"%s\", U\"%s\"},\n" "$UnicodePrefixedCodePoint" "$UnicodeReplacementString" >> "$SourceFile"
-    done
+            ReplacementString=$(printf "%s%s" "$ReplacementString" "$UnicodePrefixedCodePoint")
+        done <<< "$Replacement"
+        printf "        {U\"%s\", U\"%s\"},\n" "$CodePoint" "$UnicodeReplacementString" >> "$SourceFile"
+    done <<< "$CaseFold"
+
     printf "    };\n\n" >> "$SourceFile"
 }
 
 CreateCanonicalNormalizationTable() {
     Canonical=$(xmlstarlet select -N u="http://www.unicode.org/ns/2003/ucd/1.0" -t -m "//u:char[@dm != @cp and @dm != '#' and @dt = 'can']" -o '0x' -v @cp -o ': ' -v @dm -n "$UCD_Data" | sed -e 's/ / 0x/g' -e 's/: /:/g' -e 's/ /|/g')
     printf "    const UTF32 *const CanonicalNormalizationTable[CanonicalNormalizationTableSize][2] = {\n" >> "$SourceFile"
-    for line in $Canonical; do
-        CodePoint2Replace=$(echo "$line" | awk -F ':' '{printf "%u", $1}')
-        AddUnicodePrefix2CodePoint "$CodePoint2Replace"
-        CodePoint="$UnicodePrefixedCodePoint"
-        NumCodePoints=$(echo "$line" | awk -F '[:|]' '{print NF}')
-        UnicodeReplacementString=""
-        for Index in $(seq 2 "$NumCodePoints"); do
-            ReplacementCodePoint=$(echo "$line" | awk -F '[:|]' -v Index="$Index" '{printf "%u", $Index}')
+
+    while IFS=':' read -d $'\n' CodePoint Replacement; do
+        echo "CodePoint=$CodePoint"
+        echo "Replacement=$Replacement"
+        ReplacementString=""
+        while IFS=' ' read ReplacementCodePoint; do
+            echo "ReplacementCodePoint=$ReplacementCodePoint"
             AddUnicodePrefix2String "$ReplacementCodePoint"
-        done
+            ReplacementString=$(printf "%s%s" "$ReplacementString" "$UnicodePrefixedCodePoint")
+
+        done <<< "$Replacement"
         printf "        {U\"%s\", U\"%s\"},\n" "$CodePoint" "$UnicodeReplacementString" >> "$SourceFile"
-    done
+    done <<< "$Canonical"
     printf "    };\n\n" >> "$SourceFile"
 }
 
@@ -533,26 +541,26 @@ if [ $# -eq 0 ]; then
             echo "We need 'shasum', install it then re-run the command"
         fi
     else
-        if [[ -n "$SHAPath" ]] && [[ -n "$CurlPath" ]] && [[ -n "$UnzipPath" ]] && [[ -n "$XMLStarletPath" ]]; then #! - z
+        if [ -n "$SHAPath" ] && [ -n "$CurlPath" ] && [ -n "$UnzipPath" ] && [ -n "$XMLStarletPath" ]; then #! - z
             echo "Creating Tables..."
             touch "$HeaderFile"
             touch "$SourceFile"
             DownloadUCD
             CreateTables
         else
-            if [[ -z "$SHAPath" ]]; then
+            if [ -z "$SHAPath" ]; then
                 echo "We need 'shasum', install it then re-run the command"
             fi
 
-            if [[ -z "$CurlPath" ]]; then
+            if [ -z "$CurlPath" ]; then
                 echo "We need 'curl', install it then re-run the command"
             fi
 
-            if [[ -z "$UnzipPath" ]]; then
+            if [ -z "$UnzipPath" ]; then
                 echo "We need 'unzip', install it then re-run the command"
             fi
-            if [[ -z "$XMLStarletPath" ]]; then
-                echo "We need 'XMLStarlet', install it then re-run the command"
+            if [ -z "$XMLStarletPath" ]; then
+                brew install xmlstarlet
             fi
         fi
     fi
