@@ -14,9 +14,9 @@ extern "C" {
     typedef struct BitBuffer {
         AsyncIOStream *Input;
         AsyncIOStream *Output;
-        uint8_t      *Buffer;
-        uint64_t      BitOffset;
-        uint64_t      NumBits;
+        uint8_t       *Buffer;
+        uint64_t       BitOffset;
+        uint64_t       NumBits;
     } BitBuffer;
     
     BitBuffer *BitBuffer_Init(uint64_t BitBufferSize) {

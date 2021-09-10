@@ -130,11 +130,12 @@ extern "C" {
 #define TestIO_Register(Suite, Function2Test, State, Expectation) \
 TestIO_RegisterCase(Suite, UTF8String("##Function2Test"), Function2Test, State, Expectation)
 #endif
-
+/*
 #ifndef TestIO_RegisterCase
 #define TestIO_RegisterCase(...) Error_Do_Not_Call_TestIO_RegisterCase_Directly \
-#error("Do not call TestIO_RegisterCase directly, use TestIO_Register to call it for you")
+//#error("Do not call TestIO_RegisterCase directly, use TestIO_Register to call it for you")
 #endif
+ */
 
     // Always use the macro "func" instead of calling "_func" directly.
     #define func(dummy, ...) (_func)(dummy, __VA_ARGS__, NULL)

@@ -173,6 +173,7 @@ ${CMAKE_C_FLAGS} \
 -Bsymbolic \
 -fno-semantic-interposition \
 -fvisibility-inlines-hidden \
+-foptimize-sibling-calls \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \
@@ -261,6 +262,7 @@ ${CMAKE_C_FLAGS} \
 -Bsymbolic \
 -fno-semantic-interposition \
 -fvisibility-inlines-hidden \
+-foptimize-sibling-calls \
 ")
 
 set(CMAKE_C_FLAGS_DEBUG " \

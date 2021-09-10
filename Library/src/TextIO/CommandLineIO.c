@@ -286,7 +286,7 @@ extern "C" {
             }
             free(StringSize);
             free(NumProgressIndicatorsPerString);
-            free(ActualStrings2Print);
+            UTF8_Deinit(ActualStrings2Print);
         } else {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("CommandLineIO Pointer is NULL"));
         }

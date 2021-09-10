@@ -23,7 +23,7 @@ extern "C" {
             Log(Severity_DEBUG, PlatformIO_FunctionName, UTF8String("Size of StringSet's Strings doesn't = 7"));
         }
         /* So far so good, now lets test Allocation, Assignment, and Deinitalization */
-        ImmutableStringSet_UTF8 StringSet2 = UTF8_StringSet_Init(3);
+        UTF8 **StringSet2 = UTF8_StringSet_Init(3);
         UTF8_StringSet_Attach(StringSet2, StringSet[0], 0);
         UTF8_StringSet_Attach(StringSet2, StringSet[1], 1);
         UTF8_StringSet_Attach(StringSet2, StringSet[2], 2);
@@ -61,8 +61,8 @@ extern "C" {
 
     TestCase UTF8_EncodeDecode_Test = {
         .State       = TestState_Enabled,
-        .Function        = Test_UTF8_EncodeDecode,
-        .ExpectedOutcome = Outcome_Passed,
+        .Function    = Test_UTF8_EncodeDecode,
+        .Expectation = Outcome_Passed,
     };
     
     bool Test_UTF16_EncodeDecode(SecureRNG *Secure) {
