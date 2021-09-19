@@ -3133,13 +3133,13 @@ extern "C" {
                         if (Sign == -1 && CodePoint == 1) {
                             String[CodePoint - 1] = UTF32Character('-');
                         } else {
-                            String[CodePoint - 1] = TableBase10[Digit];
+                            String[CodePoint - 1] = IntegerTableBase10[Digit];
                         }
                     } else if ((Base & Base_Integer) == Base_Integer && (Base & Base_Radix16) == Base_Radix16) {
                         if ((Base & Base_Uppercase) == Base_Uppercase) {
-                            String[CodePoint - 1] = IntegerTableUppercaseBase16[Digit];
+                            String[CodePoint - 1] = IntegerTableBase16Uppercase[Digit];
                         } else if ((Base & Base_Lowercase) == Base_Lowercase) {
-                            String[CodePoint - 1] = IntegerTableLowercaseBase16[Digit];
+                            String[CodePoint - 1] = IntegerTableBase16Lowercase[Digit];
                         }
                         Radix                     = 16;
                     }

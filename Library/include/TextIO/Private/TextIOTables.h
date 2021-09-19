@@ -2,7 +2,7 @@
  @header          TextIOTables.h
  @author          Marcus Johnson
  @copyright       2018+
- @version         1.2.0
+ @version         1.3.0
  @brief           This header contains table declarations used across FoundationIO for Unicode and character set conversion.
  @remark          ScriptHash is to know if the script has changed since the tables were last generated.
  */
@@ -19,29 +19,29 @@
 extern "C" {
 #endif
 
-#define ScriptHash 1dd15b2e477b926920f0549de876156111ab294e
+#define ScriptHash cc5d2f50c504fa953fec34238dcb51dd41fff08f
 
-#define UnicodeVersion 13.0.0
+#define UnicodeVersion 14.0.0
 
     typedef enum TextIOConstants {
         IntegerTableBase2Size            = 2,
         IntegerTableBase8Size            = 8,
-        TableBase10Size                  = 10,
+        IntegerTableBase10Size           = 10,
         IntegerTableBase16Size           = 16,
+        IntegerValueTableSize            = 1749,
         DecimalTableBase10Size           = 11,
         DecimalTableScientificSize       = 14,
         DecimalTableHexadecimalSize      = 21,
+        DecimalValueTableSize            = 123,
         MathSeperatorTableSize           = 4,
         LineBreakTableSize               = 7,
         BiDirectionalControlsTableSize   = 12,
         WordBreakTableSize               = 18,
-        CurrencyTableSize                = 62,
-        DecimalTableSize                 = 123,
-        CombiningCharacterClassTableSize = 872,
-        IntegerTableSize                 = 1739,
-        GraphemeExtensionTableSize       = 2149,
+        CurrencyTableSize                = 63,
+        CombiningCharacterClassTableSize = 912,
+        GraphemeExtensionTableSize       = 2270,
         KompatibleNormalizationTableSize = 2056,
-        CaseFoldTableSize                = 6156,
+        CaseFoldTableSize                = 6255,
         CanonicalNormalizationTableSize  = 13233,
     } TextIOConstants;
 
@@ -49,19 +49,23 @@ extern "C" {
 
     PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase8[IntegerTableBase8Size];
 
-    PlatformIO_HiddenSymbol extern UTF32 const        TableBase10[TableBase10Size];
+    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase10[IntegerTableBase10Size];
 
-    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableUppercaseBase16[IntegerTableBase16Size];
+    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase16Uppercase[IntegerTableBase16Size];
 
-    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableLowercaseBase16[IntegerTableBase16Size];
+    PlatformIO_HiddenSymbol extern UTF32 const        IntegerTableBase16Lowercase[IntegerTableBase16Size];
 
-    PlatformIO_HiddenSymbol extern UTF32 const        DecimalScientificUppercase[DecimalTableScientificSize];
+    PlatformIO_HiddenSymbol extern uint64_t const     IntegerValueTable[IntegerValueTableSize][2];
 
-    PlatformIO_HiddenSymbol extern UTF32 const        DecimalScientificLowercase[DecimalTableScientificSize];
+    PlatformIO_HiddenSymbol extern UTF32 const        DecimalTableScientificUppercase[DecimalTableScientificSize];
 
-    PlatformIO_HiddenSymbol extern UTF32 const        DecimalHexUppercase[DecimalTableHexadecimalSize];
+    PlatformIO_HiddenSymbol extern UTF32 const        DecimalTableScientificLowercase[DecimalTableScientificSize];
 
-    PlatformIO_HiddenSymbol extern UTF32 const        DecimalHexLowercase[DecimalTableHexadecimalSize];
+    PlatformIO_HiddenSymbol extern UTF32 const        DecimalTableHexadecimalUppercase[DecimalTableHexadecimalSize];
+
+    PlatformIO_HiddenSymbol extern UTF32 const        DecimalTableHexadecimalLowercase[DecimalTableHexadecimalSize];
+
+    PlatformIO_HiddenSymbol extern int32_t const      DecimalValueTable[DecimalValueTableSize][3];
 
     PlatformIO_HiddenSymbol extern UTF32 const        MathSeperators[MathSeperatorTableSize];
 
@@ -73,11 +77,7 @@ extern "C" {
 
     PlatformIO_HiddenSymbol extern UTF32 const        CurrencyTable[CurrencyTableSize];
 
-    PlatformIO_HiddenSymbol extern int32_t const      DecimalTable[DecimalTableSize][3];
-
     PlatformIO_HiddenSymbol extern UTF32 const        CombiningCharacterClassTable[CombiningCharacterClassTableSize][2];
-
-    PlatformIO_HiddenSymbol extern uint64_t const     IntegerTable[IntegerTableSize][2];
 
     PlatformIO_HiddenSymbol extern UTF32 const        GraphemeExtensionTable[GraphemeExtensionTableSize];
 
